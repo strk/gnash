@@ -31,53 +31,35 @@
 
 namespace gnash {
 
-Timer::Timer()
-    :
-    _interval(0),
-    _start(std::numeric_limits<unsigned long>::max()),
-    _object(0),
-    _runOnce(false)
-{
-}
-
 Timer::~Timer()
 {
 }
 
-void
-Timer::setInterval(as_function& method, unsigned long ms,
-        boost::intrusive_ptr<as_object> this_ptr, 
-        ArgsContainer& args, bool runOnce)
+Timer::Timer(as_function& method, unsigned long ms,
+        as_object* this_ptr, const fn_call::Args& args, bool runOnce)
+    :
+    _interval(ms),
+    _start(std::numeric_limits<unsigned long>::max()),
+    _function(&method),
+    _methodName(0),
+    _object(this_ptr),
+    _args(args),
+    _runOnce(runOnce)
 {
-    _function = &method;
-    _interval = ms; 
-    _object = this_ptr;
-    _args = args;
-    _runOnce = runOnce;
     start();
 }
 
-void
-Timer::setInterval(as_function& method, unsigned long ms,
-        boost::intrusive_ptr<as_object> this_ptr, bool runOnce)
+Timer::Timer(as_object* this_ptr, string_table::key methodName,
+        unsigned long ms, const fn_call::Args& args, bool runOnce)
+    :
+    _interval(ms),
+    _start(std::numeric_limits<unsigned long>::max()),
+    _function(0),
+    _methodName(methodName),
+    _object(this_ptr),
+    _args(args),
+    _runOnce(runOnce)
 {
-    _function = &method;
-    _interval = ms; 
-    _object = this_ptr;
-    _runOnce = runOnce;
-    start();
-}
-
-void
-Timer::setInterval(boost::intrusive_ptr<as_object> this_ptr,
-        const std::string& methodName, unsigned long ms, 
-        std::vector<as_value>& args, bool runOnce)
-{
-    _object = this_ptr;
-    _methodName = methodName;
-    _interval = ms; 
-    _args = args;
-    _runOnce = runOnce;
     start();
 }
 
@@ -120,17 +102,17 @@ Timer::execute()
 
     as_value timer_method;
 
-    as_object* super = _object->get_super(_function ? 0 : _methodName.c_str());
+    // If _function is not 0, _methodName should be 0 anyway, but the
+    // ternary operator is there for clarity.
+    as_object* super = _object->get_super(_function ? 0 : _methodName);
     VM& vm = getVM(*_object);
 
-    if (_function.get() ) {
-        timer_method.set_as_function(_function.get());
+    if (_function) {
+        timer_method.set_as_function(_function);
     }
     else {
-        string_table::key k = vm.getStringTable().find(_methodName);
         as_value tmp;
-
-        if ( ! _object->get_member(k, &tmp) ) {
+        if (!_object->get_member(_methodName, &tmp)) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("object %p has no member named %s (interval method)",
                      _object, _methodName);
@@ -143,7 +125,7 @@ Timer::execute()
         if (!f) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("member %s of object %p (interval method) is not "
-                "a function (%s)", _methodName, (void*)_object.get(), tmp);
+                "a function (%s)", _methodName, (void*)_object, tmp);
             );
             return;
         }
@@ -153,11 +135,9 @@ Timer::execute()
     as_environment env(vm); 
 
     // Copy args 
-    fn_call::Args::container_type argsCopy(_args);
-    fn_call::Args args;
-    args.swap(argsCopy);
+    fn_call::Args argsCopy(_args);
 
-    call_method(timer_method, env, _object.get(), args, super);
+    call_method(timer_method, env, _object, argsCopy, super);
 
 }
 
@@ -165,8 +145,7 @@ Timer::execute()
 void
 Timer::markReachableResources() const
 {
-    std::for_each(_args.begin(), _args.end(),
-                    std::mem_fun_ref(&as_value::setReachable));
+    _args.setReachable();
 
     if (_function) _function->setReachable();
     if (_object) _object->setReachable();

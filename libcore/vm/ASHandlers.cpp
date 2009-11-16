@@ -3128,7 +3128,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     // Get number of args, modifying it if not enough values are on the stack.
     unsigned nargs = unsigned(env.pop().to_number());
     unsigned available_args = env.stack_size(); 
-    if ( available_args < nargs )
+    if (available_args < nargs)
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("Attempt to call a method with %u arguments "
@@ -3150,7 +3150,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     bool hasMethodName = ((!method_name.is_undefined()) &&
             (!method_string.empty()) );
 
-    boost::intrusive_ptr<as_object> obj = convertToObject(getGlobal(thread.env), obj_value);
+    as_object* obj = convertToObject(getGlobal(thread.env), obj_value);
     if (!obj) {
         // SWF integrity check
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3162,13 +3162,15 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
         return;
     }
 
-    as_object* this_ptr = obj.get();
+    as_object* this_ptr = obj;
 
-    if ( obj->isSuper() )
-    {
-        if ( thread.isFunction() ) this_ptr = thread.getThisPointer();
+    if (obj->isSuper()) {
+        if (thread.isFunction()) this_ptr = thread.getThisPointer();
     }
-    as_object* super = obj->get_super(hasMethodName ? method_string.c_str() : 0);
+
+    string_table& st = getStringTable(env);
+    as_object* super =
+        obj->get_super(hasMethodName ? st.find(method_string) : 0);
 
     as_value method_val;
 

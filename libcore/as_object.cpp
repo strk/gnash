@@ -140,7 +140,7 @@ public:
 
 	virtual bool isSuper() const { return true; }
 
-	virtual as_object* get_super(const char* fname=0);
+	virtual as_object* get_super(string_table::key fname = 0);
 
 	// Fetching members from 'super' yelds a lookup on the associated prototype
 	virtual bool get_member(string_table::key name, as_value* val,
@@ -192,7 +192,7 @@ private:
 };
 
 as_object*
-as_super::get_super(const char* fname)
+as_super::get_super(string_table::key fname)
 {
 	// Super references the super class of our class prototype.
 	// Our class prototype is __proto__.
@@ -206,11 +206,8 @@ as_super::get_super(const char* fname)
         return new as_super(getGlobal(*this), proto);
     }
 
-    string_table& st = getStringTable(*this);
-    string_table::key k = st.find(fname);
-
     as_object* owner = 0;
-    proto->findProperty(k, 0, &owner);
+    proto->findProperty(fname, 0, &owner);
     if (!owner) return 0;
 
     if (owner == proto) return new as_super(getGlobal(*this), proto);
@@ -458,7 +455,7 @@ as_object::getByIndex(int index)
 }
 
 as_object*
-as_object::get_super(const char* fname)
+as_object::get_super(string_table::key fname)
 {
 	// Super references the super class of our class prototype.
 	// Our class prototype is __proto__.
@@ -467,12 +464,9 @@ as_object::get_super(const char* fname)
 	// Our class prototype is __proto__.
 	as_object* proto = get_prototype();
 
-	if ( fname && getSWFVersion(*this) > 6)
-	{
+	if (fname && getSWFVersion(*this) > 6) {
 		as_object* owner = 0;
-		string_table& st = getStringTable(*this);
-		string_table::key k = st.find(fname);
-		findProperty(k, 0, &owner);
+		findProperty(fname, 0, &owner);
         // should be 0 if findProperty returned 0
 		if (owner != this) proto = owner; 
 	}

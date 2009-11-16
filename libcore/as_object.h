@@ -644,7 +644,7 @@ public:
     /// itself, or __proto__.__proto__ if this is not a prototype
     /// object. This is only conceptual however, and may be more
     /// convoluted to obtain the actual super.
-    virtual as_object* get_super(const char* fname=0);
+    virtual as_object* get_super(string_table::key fname = 0);
 
     /// Get the constructor for this object.
     ///

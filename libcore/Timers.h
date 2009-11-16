@@ -53,35 +53,9 @@ class DSOEXPORT Timer
 {
 public:
       
-    /// Arguments list type
-    typedef std::vector<as_value> ArgsContainer;
-
-    /// Construct a disabled (cleared) timer.
-    Timer();
-
     ~Timer();
 
-    /// Setup the Timer, enabling it.
-    //
-    /// @param method
-    ///    The function to call from execution operator.
-    ///    Will be stored in an intrusive_ptr.
-    ///
-    /// @param ms
-    ///    The number of milliseconds between expires.
-    ///
-    /// @param this_ptr
-    ///    The object to be used as 'this' pointer when calling the
-    ///    associated function. Will be stored in an intrusive_ptr.
-    ///    It is allowed to be NULL as long as fn_call is allowed
-    ///    a NULL as 'this_ptr' (we might want to change this).
-    ///
-    /// @param runOnce
-    ///     If true the interval will run only once. False if omitted.
-    void setInterval(as_function& method, unsigned long ms,
-            boost::intrusive_ptr<as_object> this_ptr, bool runOnce = false);
-
-    /// Setup the Timer, enabling it.
+    /// Construct a Timer, enabling it.
     //
     /// @param method
     ///    The function to call from execution operator.
@@ -101,11 +75,10 @@ public:
     ///
     /// @param runOnce
     ///     If true the interval will run only once. False if omitted.
-    void setInterval(as_function& method, unsigned long ms,
-            boost::intrusive_ptr<as_object> this_ptr,
-            std::vector<as_value>& args, bool runOnce = false);
+    Timer(as_function& method, unsigned long ms, as_object* this_ptr,
+            const fn_call::Args& args, bool runOnce = false);
 
-    /// Setup the Timer to call a late-evaluated object method, enabling it.
+    /// Construct the Timer to call a late-evaluated object method, enabling it.
     //
     /// @param this_ptr
     ///    The object to be used as 'this' pointer when calling the
@@ -124,9 +97,8 @@ public:
     ///
     /// @param runOnce
     ///     If true the interval will run only once. False if omitted.
-    void setInterval(boost::intrusive_ptr<as_object> obj,
-            const std::string& methodName, unsigned long ms,
-            std::vector<as_value>& args, bool runOnce = false);
+    Timer(as_object* obj, string_table::key methodName, unsigned long ms,
+            const fn_call::Args& args, bool runOnce = false);
 
     /// Clear the timer, ready for reuse
     //
@@ -212,16 +184,17 @@ private:
 
     /// The associated function (if statically-bound) stored in
     /// an intrusive pointer
-    boost::intrusive_ptr<as_function> _function;
+    as_function* _function;
 
-    /// The associated method name, stored in an intrusive pointer
-    std::string _methodName;
+    string_table::key _methodName;
 
     /// Context for the function call. Will be used as 'this' pointer.
-    boost::intrusive_ptr<as_object> _object;
+    as_object* _object;
 
     /// List of arguments
-    ArgsContainer _args;
+    //
+    /// This must be copied before passing to a function call.
+    const fn_call::Args _args;
 
     /// True if the timer should execute only once (for setTimeout)
     bool _runOnce;
