@@ -25,6 +25,14 @@
 #include "GnashException.h"
 #include "as_function.h"
 
+#include <boost/preprocessor/arithmetic/inc.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
+#include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/control.hpp>
+#include <boost/preprocessor/expand.hpp>
+
 // Forward declarations
 namespace gnash {
 	class builtin_function;
@@ -181,7 +189,7 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
 /// Call an as_value on an as_object.
 //
 /// The call will fail harmlessly if the as_value is not a function.
-DSOEXPORT as_value
+inline DSOEXPORT as_value
 invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
         fn_call::Args& args, as_object* super = 0,
         const movie_definition* callerDef = 0)
@@ -213,6 +221,44 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 	}
 	return val;
 }
+
+/// Helper macro for callMethod arguments.
+#define VALUE_ARG(z, n, t) BOOST_PP_COMMA_IF(n) t arg##n
+
+/// Call a member function of this object in an AS-compatible way
+//
+/// This is a macro to cope with a varying number of arguments. The function
+/// signature is as follows:
+//
+/// as_value callMethod(as_object* obj, string_table::key key,
+///     const as_value& arg1, ..., const as_value& argN);
+//
+/// If the member function exists and is a function, invoke() is called on
+/// the member with the object as the this pointer.
+//
+/// @param obj          The object to call the method on. This may be null, in
+///                     which case the call is a no-op. This is because calling
+///                     methods on null or non-objects in AS is harmless.
+/// @param name         The name of the method. 
+///
+/// @param arg0..argN   The arguments to pass
+///
+/// @return             The return value of the call (possibly undefined).
+#define CALL_METHOD(x, n, t) \
+inline as_value \
+callMethod(as_object* obj, string_table::key key BOOST_PP_COMMA_IF(n)\
+        BOOST_PP_REPEAT(n, VALUE_ARG, const as_value&)) {\
+    if (!obj) return as_value();\
+    as_value func;\
+    if (!obj->get_member(key, &func)) return as_value();\
+    fn_call::Args args;\
+    BOOST_PP_EXPR_IF(n, (args += BOOST_PP_REPEAT(n, VALUE_ARG, ));)\
+    return invoke(func, as_environment(getVM(*obj)), obj, args);\
+}
+
+/// The maximum number of as_value arguments allowed in callMethod functions.
+#define MAX_ARGS 3
+BOOST_PP_REPEAT(BOOST_PP_INC(MAX_ARGS), CALL_METHOD, )
 
 /// Convenience function for finding a class constructor.
 //

@@ -1190,27 +1190,6 @@ isNativeType(as_object* obj, T*& relay)
     return relay;
 }
 
-/// Call a method of this object in an AS-compatible way
-//
-/// @param obj          The object to call the method on. This may be null, in
-///                     which case the call is a no-op. This is because calling
-///                     methods on null or non-objects in AS is harmless.
-/// @param name         The name of the method. 
-///
-/// @param arg0..nargs  The arguments to pass
-///
-/// @return             The return value of the call (possibly undefined).
-as_value callMethod(as_object* obj, string_table::key name);
-as_value callMethod(as_object* obj, string_table::key name,
-        const as_value& arg0);
-as_value callMethod(as_object* obj, string_table::key name,
-        const as_value& arg0, const as_value& arg1);
-as_value callMethod(as_object* obj, string_table::key name,
-        const as_value& arg0, const as_value& arg1, const as_value& arg2);
-as_value callMethod(as_object* obj, string_table::key name,
-        const as_value& arg0, const as_value& arg1, const as_value& arg2,
-        const as_value& arg3);
-
 /// Get the VM from an as_object
 VM& getVM(const as_object& o);
 
