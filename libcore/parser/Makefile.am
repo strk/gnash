@@ -53,11 +53,6 @@ libgnashparser_la_SOURCES = \
 	sound_definition.cpp \
 	sprite_definition.cpp
 
-if ENABLE_AVM2
-libgnashparser_la_SOURCES += \
-	AbcBlock.cpp
-endif
-
 noinst_HEADERS = \
 	action_buffer.h \
 	BitmapMovieDefinition.h \
@@ -66,11 +61,6 @@ noinst_HEADERS = \
 	SWFMovieDefinition.h \
 	sound_definition.h \
 	sprite_definition.h
-
-if ENABLE_AVM2
-noinst_HEADERS += \
-	AbcBlock.h
-endif
 
 EXTENSIONS_API = \
 	movie_definition.h \

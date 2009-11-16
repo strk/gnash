@@ -55,6 +55,7 @@ namespace gnash {
 
 namespace gnash {
  
+
 /// A class to represent, abstractly, ActionScript prototypes.
 ///
 /// This class is intended to be able to capture the structure of an

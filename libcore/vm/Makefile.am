@@ -27,6 +27,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libcore/asobj/flash \
 	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libcore/abc \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libamf \
@@ -56,7 +57,6 @@ endif
 noinst_HEADERS = \
 	ASHandlers.h \
 	CodeStream.h \
-	MultiName.h \
 	ActionExec.h \
 	ExecutableCode.h \
 	with_stack_entry.h \
@@ -72,7 +72,6 @@ EXTENSIONS_API = \
 
 if ENABLE_AVM2
 noinst_HEADERS += \
-	MultiName.h \
 	CodeStream.h \
 	Machine.h \
 	$(NULL)
