@@ -58,26 +58,23 @@ call_method(const as_value& method, const as_environment& env,
 	call.super = super;
     call.callerDef = callerDef;
 
-	try
-	{
-		if ( as_function* as_func = method.to_as_function() )
-		{
-		    // It's an ActionScript function.  Call it.
-		    val = (*as_func)(call);
+	try {
+		if (as_function* func = method.to_as_function()) {
+            // Call function.
+		    val = (*func)(call);
 		}
-		else
-		{
-			boost::format fmt = boost::format(_("Attempt to call a "
-                        "value which is neither a C nor an ActionScript "
-                        "function (%s)")) % method;
-			throw ActionTypeError(fmt.str());
+		else {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("Attempt to call a value which is not "
+                    "a function (%s)", method);
+            );
+            return val;
 		}
 	}
-	catch (ActionTypeError& e)
-	{
+	catch (ActionTypeError& e) {
 		assert(val.is_undefined());
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("%s", e.what());
+            log_aserror("%s", e.what());
 		);
 	}
 
