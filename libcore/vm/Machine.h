@@ -46,6 +46,8 @@ namespace gnash {
 
 namespace abc {
 
+/// The virtual machine for executing ABC (ActionScript Bytecode).
+//
 /// This machine is intended to work without relying on the C++ call stack,
 /// by resetting its Stream and Stack members (actually, by limiting the stack)
 /// to make function calls, rather than calling them directly in C++.
