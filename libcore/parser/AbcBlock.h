@@ -138,12 +138,13 @@ inline void checkBounds(size_t i, const T& container)
 
 }
 
+
+/// The ActionScript bytecode of a single ABC tag in a SWF.
+//
 /// ABC blocks have their own "names" for all resources. In Gnash, these are
 /// a string table index. They are different from global names. These are used
 /// to locate resources inside the ABC block.
 // 
-/// Namespaces
-//
 /// ABC blocks have a set of "namespace" resources. Some namespaces are
 /// private. We make these into anonymous namespaces.
 // 
