@@ -176,7 +176,7 @@ Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
 	  if (bytes) {
 	      buf = new amf::Buffer(bytes);
 	  } else {
-	      return buf;
+	      return 0;
 	  }
 	  int ret = http.readNet(fd, buf);
 	  if (ret) {
