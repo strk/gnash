@@ -291,26 +291,28 @@ bool FBGui::init(int /*argc*/, char *** /*argv*/)
 }
 
 bool FBGui::initialize_renderer() {
-  int _width    = var_screeninfo.xres;
-  int _height   = var_screeninfo.yres;
-  int _bpp = var_screeninfo.bits_per_pixel;
-  int _size = fix_screeninfo.smem_len;   // TODO: should recalculate!  
-  unsigned char *_mem;
-  Renderer_agg_base *agg_handler;
+  const int width    = var_screeninfo.xres;
+  const int height   = var_screeninfo.yres;
+  const int bpp = var_screeninfo.bits_per_pixel;
+  const int size = fix_screeninfo.smem_len; 
+
+  // TODO: should recalculate!  
+  unsigned char* mem;
+  Renderer_agg_base* agg_handler;
   
-  m_stage_width = _width;
-  m_stage_height = _height;
+  m_stage_width = width;
+  m_stage_height = height;
   
-  _validbounds.setTo(0, 0, _width-1, _height-1);
+  _validbounds.setTo(0, 0, width - 1, height - 1);
     
   
-  #ifdef DOUBLE_BUFFER
+#ifdef DOUBLE_BUFFER
   log_debug(_("Double buffering enabled"));
-  _mem = buffer;
-  #else
+  mem = buffer;
+#else
   log_debug(_("Double buffering disabled"));
-  _mem = fbmem;
-  #endif
+  mem = fbmem;
+#endif
   
   
   agg_handler = NULL;
@@ -329,7 +331,7 @@ bool FBGui::initialize_renderer() {
     var_screeninfo.red.offset, var_screeninfo.red.length,
     var_screeninfo.green.offset, var_screeninfo.green.length,
     var_screeninfo.blue.offset, var_screeninfo.blue.length,
-    _bpp
+    bpp
   );
 
   if (pixelformat) {    
@@ -339,14 +341,15 @@ bool FBGui::initialize_renderer() {
     return false;
   }
 
-  assert(agg_handler!=NULL);
+  assert(agg_handler);
+
   _renderer.reset(agg_handler);
 
-  _runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
+  _runResources.setRenderer(_renderer);
   
-  m_rowsize = var_screeninfo.xres_virtual*((_bpp+7)/8);
+  m_rowsize = var_screeninfo.xres_virtual*((bpp+7)/8);
   
-  agg_handler->init_buffer(_mem, _size, _width, _height, m_rowsize);
+  agg_handler->init_buffer(mem, size, width, height, m_rowsize);
   
   disable_terminal();
 
