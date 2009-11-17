@@ -169,7 +169,7 @@ HTTPServer::processClientRequest(Handler *hand, int fd, amf::Buffer *buf)
 	if (filestream->fullyPopulated()) {
 	    filestream->close();
 	}
-	cache.addFile(_filespec, filestream);
+//  	cache.addFile(_filespec, filestream);
     }
 #endif
     
@@ -224,13 +224,18 @@ HTTPServer::processGetRequest(Handler *hand, int fd, amf::Buffer *buf)
 	    // cache.addFile(_filespec, filestream);
 	}
     }
-    // Close the file but leave resident for now.
+    // Closing the file closes the disk file, but leaves data resident
+    // in memory for future access to this file. If we've been opened,
+    // the next operation is to start writing the file next time
+    // ::play() is called.
     if (_diskstream->fullyPopulated()) {
 	_diskstream->close();
     }
-    // cache.addFile(_filespec, filestream);
+    _diskstream->setState(DiskStream::PLAY);
+// 	cache.addFile(_filespec, _diskstream);
 
-    // Send the reply
+    // Create the reply message
+//     _close = true; Force sending the close connection in the header
     amf::Buffer &reply = formatHeader(_diskstream->getFileType(),
 				      _diskstream->getFileSize(),
 				      HTTPServer::OK);
@@ -1006,8 +1011,8 @@ HTTPServer::http_handler(Handler *hand, int netfd, amf::Buffer *buf)
     struct timespec start;
     clock_gettime (CLOCK_REALTIME, &start);
 #endif
-    
-    if (buf->allocated()) {
+
+    if (buf) {
 	log_network("FIXME: Existing data in packet!");
     } else {
 	log_network("FIXME: No existing data in packet!");    
@@ -1026,7 +1031,7 @@ HTTPServer::http_handler(Handler *hand, int netfd, amf::Buffer *buf)
 	if (_diskstream) {
 	    log_debug("Found active DiskStream! for fd #%d: %s", netfd, _filespec);
 	    hand->setDiskStream(netfd, _diskstream);
-	    cache.addFile(_filespec, _diskstream);
+ 	    cache.addFile(_filespec, _diskstream);
 // Send the first chunk of the file to the client.
 	    _diskstream->play(netfd, false);
 	}
