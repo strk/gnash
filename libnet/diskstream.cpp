@@ -1131,7 +1131,7 @@ DiskStream::dump()
     cerr << "File type is \"" << type_str[_filetype] << "\"" << endl;
     cerr << "Filespec is \"" << _filespec << "\"" << endl;
     cerr << "Disk file descriptor is fd #" << _filefd << endl;
-    cerr << "Network file descritor is fd #" << _netfd << endl;
+    cerr << "Network file descriptor is fd #" << _netfd << endl;
     cerr << "File size is " <<  _filesize << endl;
     cerr << "Memory Page size is " << _pagesize << endl;
     cerr << "Memory Offset is " << _offset << endl;
