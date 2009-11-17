@@ -148,6 +148,8 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height,
     } else {
         // The QMainWindow takes ownership of the widgets.
         _window->setCentralWidget(_embedWidget);
+        if (xPosition > -1 || yPosition > -1)
+            _window->move(xPosition, yPosition);
         _window->show();
     }
 
