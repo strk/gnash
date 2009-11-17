@@ -107,7 +107,7 @@ HTTPServer::processClientRequest(Handler *hand, int fd, amf::Buffer *buf)
 	_cmd = extractCommand(buf->reference());
 	switch (_cmd) {
 	  case HTTP::HTTP_GET:
-	      result = processGetRequest(fd, buf);
+	      result = processGetRequest(hand, fd, buf);
 	      break;
 	  case HTTP::HTTP_POST:
 	      result = processPostRequest(fd, buf);
@@ -178,7 +178,7 @@ HTTPServer::processClientRequest(Handler *hand, int fd, amf::Buffer *buf)
 
 // A GET request asks the server to send a file to the client
 amf::Buffer &
-HTTPServer::processGetRequest(int fd, amf::Buffer *buf)
+HTTPServer::processGetRequest(Handler *hand, int fd, amf::Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -201,8 +201,10 @@ HTTPServer::processGetRequest(int fd, amf::Buffer *buf)
     
     string url = _docroot + _filespec;
 
-    // cache.addFile(url, filestream);	FIXME: always reload from disk for now.
-
+    boost::shared_ptr<DiskStream> ds = hand->getDiskStream(fd);
+    if (ds) {
+	_diskstream = ds;
+    }
     if (!_diskstream) {
 	_diskstream.reset(new DiskStream);
 	log_network("New filestream %s", _filespec);
@@ -244,7 +246,6 @@ HTTPServer::processGetRequest(int fd, amf::Buffer *buf)
 	struct timespec start;
 	clock_gettime (CLOCK_REALTIME, &start);
 #endif	
-	// _diskstream->play(fd, true);
 	
 #ifdef USE_STATS_CACHE
 	struct timespec end;
