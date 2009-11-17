@@ -856,10 +856,17 @@ connection_handler(Network::thread_params_t *args)
 	    if (!hand) {
 		hand = new Handler;
 		hand->addClient(args->netfd, Network::HTTP);
- 		amf::Buffer *buf = hand->parseFirstRequest(args->netfd, Network::HTTP);
-		if (!buf) {
-		    continue;
-		}
+		int retries = 3;
+		amf::Buffer *buf = 0;
+		do {
+		    buf = hand->parseFirstRequest(args->netfd, Network::HTTP);
+		    if (!buf) {
+			retries--;
+			continue;
+		    } else {
+			break;
+		    }
+		} while (retries);
 		string &key = hand->getKey(args->netfd);
 		log_network("Creating new %s Handler for %s using fd #%d",
 			    proto_str[hargs->protocol], key, hargs->netfd);
@@ -1030,20 +1037,16 @@ event_handler(Network::thread_params_t *args)
 	if (filestream) {
 	    filestream->dump();
 	}
-#else
-	cache.dump();
+// #else
+//      	cache.dump();
 #endif
+	hand->dump();
 	for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
 	    boost::shared_ptr<DiskStream> ds = hand->getDiskStream(i);
 	    if (ds) {
-		// hand->getDiskStream(i)->dump();
-		if ((ds->getState() == DiskStream::OPEN)
-		    || (ds->getState() == DiskStream::CLOSED)
-		    || (ds->getState() == DiskStream::PAUSE)
-		    || (ds->getState() == DiskStream::PLAY)) {
-		    // Only play the next chunk of the file.
-		    ds->play(i, true);
-		}
+//   		ds->dump();
+		// Only play the next chunk of the file.
+		ds->play(i, false);
 	    }
 	}
     
