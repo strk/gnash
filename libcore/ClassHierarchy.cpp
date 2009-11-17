@@ -186,12 +186,6 @@ public:
                 log_error("Native class %s is not an object after "
                         "initialization (%s)", st.value(mDeclaration.name), us);
             }
-            if (mDeclaration.super_name &&
-                    !us.to_object(gl)->hasOwnProperty(NSV::PROP_uuPROTOuu)) {
-                
-                us.to_object(gl)->set_prototype(
-                        super.to_function()->getPrototype());
-            }
         }
         else
         {
