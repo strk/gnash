@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __FBSUP_H__
-#define __FBSUP_H__
+#ifndef GNASH_FBSUP_H
+#define GNASH_FBSUP_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -107,8 +107,6 @@ namespace gnash
 ///
 ///   any PS/2 compatible mouse (may be emulated by the kernel) talking 
 ///   to /dev/input/mice
-
-
 class FBGui : public Gui
 {
 	private:
