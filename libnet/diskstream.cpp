@@ -643,8 +643,9 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 
     // If DONE, then we were previously open, but not closed, so we
     // just reopen the same stream.
-    if (_state == DONE) {
+    if ((_state == DONE) || (_state == CLOSED)) {
 	_state = OPEN;
+	return true;
     }
     
     _netfd = netfd;
