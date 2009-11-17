@@ -721,7 +721,7 @@ DiskStream::play(int netfd, bool flag)
 	      if (_dataptr) {
 		  log_network("Restarting Diskstream %s for %d", _filespec, netfd);
 	      }
-	      _state = DONE;
+	      done = true;
 	      continue;
           case OPEN:
 	      loadToMem(0);
@@ -812,16 +812,6 @@ DiskStream::play(int netfd, bool flag)
     // _seekptr += nbytes;
 #endif
 
-#if 0
-#ifdef _WIN32
-    UnmapViewOfFile(_dataptr);
-#elif defined(__amigaos4__)
-	if (_dataptr) free(_dataptr);
-#else
-    munmap(_dataptr, _filesize);
-#endif
-#endif
-    
     return true;
 }
 
