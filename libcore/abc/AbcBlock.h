@@ -329,7 +329,6 @@ private:
 	std::vector<boost::uint32_t> _uIntegerPool;
 	std::vector<double> _doublePool;
 	std::vector<std::string> _stringPool;
-	std::vector<string_table::key> _stringPoolTableIDs;
 	std::vector<Namespace*> _namespacePool;
 	std::vector<NamespaceSet> _namespaceSetPool;
 	std::vector<Method*> _methods;

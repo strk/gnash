@@ -529,11 +529,9 @@ AbcBlock::read_string_constants()
 	boost::uint32_t count = _stream->read_V32();
 	log_abc("There are %u string constants.", count);
 	_stringPool.resize(count);
-	_stringPoolTableIDs.resize(count);
 
     if (count) {
 		_stringPool[0] = "";
-		_stringPoolTableIDs[0] = 0;
 	}
 
     for (size_t i = 1; i < count; ++i) {
@@ -541,7 +539,6 @@ AbcBlock::read_string_constants()
 		_stream->read_string_with_length(length, _stringPool[i]);
 		log_abc("Adding string constant to string pool: index=%u %s",
                 i, _stringPool[i]);
-		_stringPoolTableIDs[i] = 0;
 	}
 	return true;
 }
