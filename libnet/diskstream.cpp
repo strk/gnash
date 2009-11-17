@@ -355,8 +355,9 @@ DiskStream::close()
 
     // reset everything in case we get reopened.
     _filefd = 0;
-    _seekptr = _dataptr;
+    _netfd = 0;
     _offset = 0;
+    _seekptr = _dataptr + _pagesize;
     _state = CLOSED;
 
 #if 0				// FIXME: don't unmap the memory for debugging
@@ -662,6 +663,7 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 		 (long long int) _filesize);
 	_state = OPEN;
 	_filetype = determineFileType(filespec);
+	loadToMem(0); // load the first page into memory
     } else {
 	log_error (_("File %s doesn't exist"), _filespec);
 	_state = DONE;
@@ -705,22 +707,25 @@ bool
 DiskStream::play(int netfd, bool flag)
 {
     GNASH_REPORT_FUNCTION;
+
     bool done = false;
-    if (!flag) {
-	done = true;
-    }
+//     dump();
     
     _netfd = netfd;
 
     while (!done) {
+	// If flag is false, only play the one page of the file.
+	if (!flag) {
+	    done = true;
+	}
         switch (_state) {
 	  case NO_STATE:
-	      log_network("No Diskstream open %s for %d", _filespec, netfd);
+	      log_network("No Diskstream open %s for net fd #%d", _filespec, netfd);
 	      break;
           case CREATED:
           case CLOSED:
 	      if (_dataptr) {
-		  log_network("Restarting Diskstream %s for %d", _filespec, netfd);
+		  log_network("Diskstream %s is closed on net fd #%d.", _filespec, netfd);
 	      }
 	      done = true;
 	      continue;
@@ -745,8 +750,7 @@ DiskStream::play(int netfd, bool flag)
 		  }
 #endif
 		  log_debug("Done playing file %s, size was: %d", _filespec, _filesize);
-		  _state = DONE;
-		  close();
+ 		  close();
 		  done = true;
 		  // reset to the beginning of the file
 		  _offset = 0;
@@ -792,7 +796,7 @@ DiskStream::play(int netfd, bool flag)
 	      _offset = 0;
 	      _filefd = 0;
 	      _state = PLAY;
-	      _seekptr = _dataptr;
+	      _seekptr = _dataptr + _pagesize;
 	      _netfd = netfd;
               continue;
           default:
