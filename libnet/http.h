@@ -151,6 +151,7 @@ public:
     std::string &getField(const std::string &name) { return _fields[name]; };
     size_t NumOfFields() { return _fields.size(); };
     void clearFields() { _fields.clear(); };
+    std::map<std::string, std::string> &getFields() { return _fields; };
 
     // Get an array of values for header field 'name'.
     boost::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
