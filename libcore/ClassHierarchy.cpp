@@ -112,12 +112,6 @@ public:
             // Successfully loaded it, now find it, set its proto, and return.
             as_value us;
             mTarget->get_member(mDeclaration.name, &us);
-            if (mDeclaration.super_name && 
-                    !us.to_object(gl)->hasOwnProperty(NSV::PROP_uuPROTOuu))
-            {
-                us.to_object(gl)->set_prototype(
-                        super.to_function()->getPrototype());
-            }
             return us;
         }
         // Error here -- not successful in loading.
