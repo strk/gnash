@@ -33,30 +33,14 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value fontstyle_ctor(const fn_call& fn);
     void attachFontStyleInterface(as_object& o);
-    void attachFontStyleStaticInterface(as_object& o);
-    as_object* getFontStyleInterface();
-
 }
-
-class FontStyle_as : public as_object
-{
-
-public:
-
-    FontStyle_as()
-        :
-        as_object(getFontStyleInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
 fontstyle_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, fontstyle_ctor, attachFontStyleInterface, 
-        attachFontStyleStaticInterface, uri);
+    registerBuiltinObject(where, attachFontStyleInterface, uri);
 }
 
 namespace {
@@ -64,31 +48,6 @@ namespace {
 void
 attachFontStyleInterface(as_object& /*o*/)
 {
-}
-
-void
-attachFontStyleStaticInterface(as_object& /*o*/)
-{
-
-}
-
-as_object*
-getFontStyleInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachFontStyleInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-fontstyle_ctor(const fn_call& /*fn*/)
-{
-    boost::intrusive_ptr<as_object> obj = new FontStyle_as;
-
-    return as_value(obj.get()); // will keep alive
 }
 
 } // anonymous namespace 

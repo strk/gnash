@@ -36,27 +36,15 @@ namespace {
     as_value textlinemetrics_ctor(const fn_call& fn);
     void attachTextLineMetricsInterface(as_object& o);
     void attachTextLineMetricsStaticInterface(as_object& o);
-    as_object* getTextLineMetricsInterface();
-
 }
-
-class TextLineMetrics_as : public as_object
-{
-
-public:
-
-    TextLineMetrics_as()
-        :
-        as_object(getTextLineMetricsInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
 textlinemetrics_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, textlinemetrics_ctor, attachTextLineMetricsInterface, 
-        attachTextLineMetricsStaticInterface, uri);
+    registerBuiltinClass(where, textlinemetrics_ctor,
+            attachTextLineMetricsInterface, 
+            attachTextLineMetricsStaticInterface, uri);
 }
 
 namespace {
@@ -72,23 +60,10 @@ attachTextLineMetricsStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getTextLineMetricsInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachTextLineMetricsInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 textlinemetrics_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new TextLineMetrics_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

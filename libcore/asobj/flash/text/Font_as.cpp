@@ -42,17 +42,6 @@ namespace {
 
 }
 
-class Font_as : public as_object
-{
-
-public:
-
-    Font_as()
-        :
-        as_object(getFontInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 font_class_init(as_object& where, const ObjectURI& uri)
@@ -76,21 +65,10 @@ attachFontStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getFontInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachFontInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 font_hasGlyphs(const fn_call& fn)
 {
-    Font_as* ptr = ensure<ThisIs<Font_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -99,7 +77,7 @@ font_hasGlyphs(const fn_call& fn)
 as_value
 font_registerFont(const fn_call& fn)
 {
-    Font_as* ptr = ensure<ThisIs<Font_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -108,9 +86,7 @@ font_registerFont(const fn_call& fn)
 as_value
 font_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Font_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 
