@@ -44,8 +44,6 @@ namespace {
     as_value urlloader_ctor(const fn_call& fn);
     void attachURLLoaderInterface(as_object& o);
     void attachURLLoaderStaticInterface(as_object& o);
-    as_object* getURLLoaderInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -53,7 +51,8 @@ void
 urlloader_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = getURLLoaderInterface();
+    as_object* proto = gl.createObject();
+    attachURLLoaderInterface(*proto);
     as_object* cl = gl.createClass(&urlloader_ctor, proto);
     attachURLLoaderStaticInterface(*cl);
 

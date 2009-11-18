@@ -68,8 +68,6 @@ namespace {
     as_value socket_ctor(const fn_call& fn);
     void attachSocketInterface(as_object& o);
     void attachSocketStaticInterface(as_object& o);
-    as_object* getSocketInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -77,7 +75,8 @@ void
 socket_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = getSocketInterface();
+    as_object* proto = gl.createObject();
+    attachSocketInterface(*proto);
     as_object* cl = gl.createClass(&socket_ctor, proto);
     attachSocketStaticInterface(*cl);
 

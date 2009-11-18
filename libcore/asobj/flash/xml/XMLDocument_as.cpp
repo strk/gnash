@@ -83,19 +83,19 @@ namespace {
 
 XMLDocument_as::XMLDocument_as() 
     :
-    as_object(getXMLInterface()),
     _loaded(XML_LOADED_UNDEFINED), 
     _status(XML_OK)
 {
+    set_prototype(getXMLInterface());
 }
 
 // Parse the ASCII XML string into an XMLNode tree
 XMLDocument_as::XMLDocument_as(const std::string& xml)
     :
-    as_object(getXMLInterface()),
     _loaded(XML_LOADED_UNDEFINED), 
     _status(XML_OK)
 {
+    set_prototype(getXMLInterface());
     parseXML(xml);
 }
 

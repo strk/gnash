@@ -47,8 +47,6 @@ namespace {
     as_value displayobject_ctor(const fn_call& fn);
     void attachDisplayObjectInterface(as_object& o);
     void attachDisplayObjectStaticInterface(as_object& o);
-    as_object* getDisplayObjectInterface();
-
 }
 
 // extern (used by Global.cpp)
@@ -56,7 +54,8 @@ void
 displayobject_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = getDisplayObjectInterface();
+    as_object* proto = gl.createObject();
+    attachDisplayObjectInterface(*proto);
     as_object* cl = gl.createClass(&displayobject_ctor, proto);
     attachDisplayObjectStaticInterface(*cl);
 
