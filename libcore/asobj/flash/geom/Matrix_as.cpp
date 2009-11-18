@@ -164,7 +164,7 @@ matrix_clone(const fn_call& fn)
         return as_value();
     }
 
-    as_object* o = ctor->constructInstance(fn.env(), args).get();
+    as_object* o = ctor->constructInstance(fn.env(), args);
 
     return as_value(o);
 }

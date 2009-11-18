@@ -72,7 +72,7 @@ constructPoint(const fn_call& fn, const as_value& x, const as_value& y)
     fn_call::Args args;
     args += x, y;
 
-    return ctor->constructInstance(fn.env(), args).get();
+    return ctor->constructInstance(fn.env(), args);
 }
 
 void

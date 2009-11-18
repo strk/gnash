@@ -139,7 +139,7 @@ Rectangle_clone(const fn_call& fn)
     fn_call::Args args;
     args += x, y, w, h;
 
-    return ctor->constructInstance(fn.env(), args).get();
+    return ctor->constructInstance(fn.env(), args);
 }
 
 as_value
