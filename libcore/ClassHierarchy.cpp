@@ -108,7 +108,6 @@ public:
         if (mExtension->initModuleWithFunc(mDeclaration.file_name,
             mDeclaration.init_name, *mTarget))
         {
-            Global_as& gl = getGlobal(fn);
             // Successfully loaded it, now find it, set its proto, and return.
             as_value us;
             mTarget->get_member(mDeclaration.name, &us);
