@@ -1755,7 +1755,7 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type OBJECT");
 #endif
-	  as_object* obj = new as_object(getObjectInterface());
+          as_object* obj = gl.createObject();
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
 		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
