@@ -2093,47 +2093,47 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 
 		case amf::Element::OBJECT_AMF0:
         {
-                string_table& st = vm.getStringTable();
+            string_table& st = vm.getStringTable();
 
-				as_object* obj = new as_object(getObjectInterface()); // GC-managed
+            as_object* obj = gl.createObject(); 
 
-                // set the value immediately, so if there's any problem parsing
-                // (like premature end of buffer) we still get something.
-				ret.set_as_object(obj);
+            // set the value immediately, so if there's any problem parsing
+            // (like premature end of buffer) we still get something.
+            ret.set_as_object(obj);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of OBJECT");
+            log_debug("amf0 starting read of OBJECT");
 #endif
-                objRefs.push_back(obj);
+            objRefs.push_back(obj);
 
-				as_value tmp;
-				std::string keyString;
-				for(;;)
-				{
-					if ( ! amf0_read_value(b, end, tmp, 
-                                amf::Element::STRING_AMF0, objRefs, vm) )
-					{
-						return false;
-					}
-					keyString = tmp.to_string();
+            as_value tmp;
+            std::string keyString;
+            for(;;)
+            {
+                if ( ! amf0_read_value(b, end, tmp, 
+                            amf::Element::STRING_AMF0, objRefs, vm) )
+                {
+                    return false;
+                }
+                keyString = tmp.to_string();
 
-					if ( keyString.empty() )
-					{
-						if (b < end) {
-							b += 1; // AMF0 has a redundant "object end" byte
-						} else {
-							log_error("AMF buffer terminated just before "
-                                    "object end byte. continuing anyway.");
-						}
-						return true;
-					}
+                if ( keyString.empty() )
+                {
+                    if (b < end) {
+                        b += 1; // AMF0 has a redundant "object end" byte
+                    } else {
+                        log_error("AMF buffer terminated just before "
+                                "object end byte. continuing anyway.");
+                    }
+                    return true;
+                }
 
-					if ( ! amf0_read_value(b, end, tmp, -1, objRefs, vm) )
-					{
-						return false;
-					}
-					obj->set_member(st.find(keyString), tmp);
-				}
+                if ( ! amf0_read_value(b, end, tmp, -1, objRefs, vm) )
+                {
+                    return false;
+                }
+                obj->set_member(st.find(keyString), tmp);
+            }
         }
 
 		case amf::Element::UNDEFINED_AMF0:
