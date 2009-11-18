@@ -135,7 +135,7 @@ createTextFieldObject(Global_as& gl)
     if (!ctor) return 0;
     fn_call::Args args;
     as_environment env(getVM(gl));
-    return ctor->constructInstance(env, args).get();
+    return ctor->constructInstance(env, args);
 }
 
 
@@ -3290,7 +3290,7 @@ textfield_getTextFormat(const fn_call& fn)
     if (!ctor) return as_value();
 
     fn_call::Args args;
-    as_object* textformat = ctor->constructInstance(fn.env(), args).get();
+    as_object* textformat = ctor->constructInstance(fn.env(), args);
     TextFormat_as* tf;
 
     if (!isNativeType(textformat, tf)) {

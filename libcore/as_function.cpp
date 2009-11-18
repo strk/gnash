@@ -122,7 +122,7 @@ as_function::getFunctionConstructor()
 	return func;
 }
 
-boost::intrusive_ptr<as_object>
+as_object*
 as_function::constructInstance(const as_environment& env, fn_call::Args& args)
 {
 

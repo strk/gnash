@@ -1259,7 +1259,7 @@ global_assetuperror(const fn_call& fn)
         as_function* ctor = gl.getMember(NSV::CLASS_ERROR).to_function();
         if (ctor) {
             fn_call::Args args;
-            as_object* proto = ctor->constructInstance(fn.env(), args).get();
+            as_object* proto = ctor->constructInstance(fn.env(), args);
 
             // Not really sure what the point of this is.
             gl.createClass(local_errorConstructor, proto);
@@ -1479,7 +1479,7 @@ constructObject(Global_as& gl, const T& arg, string_table::key className)
     args += arg;
 
     as_environment env(getVM(gl));
-    as_object* ret = ctor->constructInstance(env, args).get();
+    as_object* ret = ctor->constructInstance(env, args);
 
     return ret;
 
@@ -1491,7 +1491,7 @@ registerNatives(as_object& global)
     
     VM& vm = getVM(global);
 
-    // ASNew was dropped as a builtin function but exists
+    // ASNew was dropped as an API function but exists
     // as ASnative.
     vm.registerNative(global_assetpropflags, 1, 0);
     vm.registerNative(global_asnew, 2, 0);    
