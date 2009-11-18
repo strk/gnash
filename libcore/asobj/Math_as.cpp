@@ -28,7 +28,6 @@
 #include "log.h"
 #include "builtin_function.h" 
 #include "NativeFunction.h" 
-#include "Object.h" // for getObjectInterface
 #include "GnashNumeric.h"
 
 #include <cmath>

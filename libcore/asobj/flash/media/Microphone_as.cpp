@@ -29,7 +29,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h"
 #include "NativeFunction.h"
-#include "Object.h" // for getObjectInterface
+#include "Object.h"
 #include <cmath>
 
 #ifdef USE_GST

@@ -25,7 +25,6 @@
 #include "MultiName.h"
 #include "fn_call.h"
 #include "abc_function.h"
-#include "Object.h"
 #include "VM.h"
 #include "Globals.h"
 #include "Global_as.h"

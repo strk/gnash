@@ -22,7 +22,6 @@
 #include "Global_as.h"
 #include "as_object.h"
 #include "builtin_function.h" 
-#include "Object.h"
 
 #include "log.h"
 

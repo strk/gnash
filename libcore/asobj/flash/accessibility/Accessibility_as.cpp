@@ -29,7 +29,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h"
 #include "NativeFunction.h"
-#include "Object.h" // for AS inheritance
 
 namespace gnash {
 

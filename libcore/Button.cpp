@@ -35,7 +35,6 @@
 #include "fn_call.h" 
 #include "ExecutableCode.h"
 #include "namedStrings.h"
-#include "Object.h" // for getObjectInterface
 #include "StringPredicates.h"
 #include "GnashKey.h" 
 #include "SoundInfoRecord.h" 

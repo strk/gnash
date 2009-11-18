@@ -20,7 +20,6 @@
 #define GNASH_GLOBAL_H
 
 #include "as_object.h" // for inheritance
-#include "Object.h"
 #include "fn_call.h"
 #include "GnashException.h"
 #include "as_function.h"

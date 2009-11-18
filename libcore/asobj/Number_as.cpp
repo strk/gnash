@@ -28,7 +28,6 @@
 #include "builtin_function.h"
 #include "NativeFunction.h"
 #include "VM.h"
-#include "Object.h" // for getObjectInterface
 
 #include <sstream>
 #include <cmath>

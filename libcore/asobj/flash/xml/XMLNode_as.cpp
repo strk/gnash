@@ -23,7 +23,6 @@
 
 #include "xml/XMLNode_as.h"
 #include "xml/XMLDocument_as.h"
-#include "Object.h"
 #include "VM.h"
 #include "log.h"
 #include "fn_call.h"
@@ -34,6 +33,7 @@
 #include "string_table.h"
 #include "PropertyList.h"
 #include "Global_as.h"
+#include "Object.h"
 
 #include <boost/bind.hpp>
 #include <string>

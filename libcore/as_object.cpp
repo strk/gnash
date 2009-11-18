@@ -32,7 +32,6 @@
 #include "VM.h"
 #include "GnashException.h"
 #include "fn_call.h" 
-#include "Object.h" 
 #include "Array_as.h"
 #include "as_function.h"
 #include "Global_as.h" 

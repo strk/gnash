@@ -30,7 +30,6 @@
 #include "NativeFunction.h"
 #include "GnashException.h"
 #include "VM.h" 
-#include "Object.h" // for getObjectInterface
 
 namespace gnash {
 

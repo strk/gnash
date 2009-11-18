@@ -35,7 +35,6 @@
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" // need builtin_function
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "Object.h"
 #include "VM.h"
 #include "namedStrings.h"
 #include "ExportableResource.h"
@@ -79,7 +78,6 @@ namespace {
     as_value sound_progress(const fn_call& fn);
     as_value sound_ctor(const fn_call& fn);
     void attachSoundInterface(as_object& o);
-    as_object* getSoundInterface();
 }
 
 Sound_as::Sound_as(as_object* owner) 
@@ -119,10 +117,12 @@ void
 sound_class_init(as_object& where, const ObjectURI& uri)
 {
 
-    as_object* iface = getSoundInterface();
     Global_as& gl = getGlobal(where);
-    as_object* cl = gl.createClass(&sound_new, iface);
-    iface->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&sound_new, proto);
+    attachSoundInterface(*proto);
+    proto->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);
+    proto->set_member_flags(NSV::PROP_uuPROTOuu, PropFlags::readOnly, 0);
 
     // Register _global.String
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
@@ -772,22 +772,6 @@ attachSoundInterface(as_object& o)
             &checkPolicyFile_getset, fl_hp);
 }
 
-
-as_object*
-getSoundInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL )
-    {
-        o = new as_object(getObjectInterface());
-        attachSoundInterface(*o);
-
-        // TODO: make this an additional second arg to as_object(__proto__) ctor !
-        o->set_member_flags(NSV::PROP_uuPROTOuu, PropFlags::readOnly, 0);
-    }
-
-    return o.get();
-}
 
 as_value
 sound_new(const fn_call& fn)

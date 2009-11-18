@@ -22,7 +22,6 @@
 #include "Global_as.h"
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
-#include "Object.h"
 #include "log.h"
 
 /// TextFieldAutoSize is an AVM2-only class

@@ -32,7 +32,6 @@
 #include "GnashException.h"
 #include "movie_definition.h" 
 #include "VM.h" 
-#include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "utf8.h"
 #include "String_as.h"

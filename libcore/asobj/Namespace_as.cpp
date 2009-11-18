@@ -29,7 +29,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" 
 #include "GnashException.h"
-#include "Object.h" 
 #include "VM.h" 
 
 #include <sstream>

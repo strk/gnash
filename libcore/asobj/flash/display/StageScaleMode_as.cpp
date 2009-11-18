@@ -28,7 +28,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
-#include "Object.h"
 
 namespace gnash {
 

@@ -48,7 +48,6 @@
 #include "StreamProvider.h"
 #include "LoadVariablesThread.h" 
 #include "ExecutableCode.h" // for inheritance of ConstructEvent
-#include "Object.h" // for getObjectInterface
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
 #include "styles.h" // for cap_style_e and join_style_e enums

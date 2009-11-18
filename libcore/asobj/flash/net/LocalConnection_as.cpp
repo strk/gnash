@@ -37,7 +37,6 @@
 #include "NativeFunction.h"
 #include "amf.h"
 #include "lcshm.h"
-#include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "StringPredicates.h"
 

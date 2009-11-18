@@ -30,7 +30,6 @@
 #include "movie_root.h"
 #include "GnashNumeric.h"
 #include "as_value.h"
-#include "Object.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"

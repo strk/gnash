@@ -18,7 +18,6 @@
 // 
 
 #include "log.h"
-#include "Object.h" // for getObjectInterface
 #include "TextFormat_as.h"
 #include "fn_call.h"
 #include "Global_as.h"

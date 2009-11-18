@@ -31,7 +31,6 @@
 #include "namedStrings.h"
 #include "element.h"
 #include "GnashException.h"
-#include "Object.h"
 #include "amf.h"
 #include "Array_as.h"
 #include "Date_as.h" // for Date type (readAMF0)

@@ -36,6 +36,7 @@
 #include "StringPredicates.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "GnashException.h" // for ActionException
+#include "Object.h"
 
 #include <string>
 #include <sstream>

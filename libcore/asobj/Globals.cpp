@@ -38,7 +38,6 @@
 #include "String_as.h"
 #include "Selection_as.h"
 #include "Number_as.h"
-#include "Object.h"
 #include "Math_as.h"
 #include "flash/accessibility/Accessibility_as.h"
 #include "flash/ui/ContextMenu_as.h"
@@ -105,6 +104,7 @@
 #include "LoadVars_as.h"
 #include "Namespace_as.h"
 #include "QName_as.h"
+#include "Object.h"
 
 #include <limits> 
 #include <sstream>

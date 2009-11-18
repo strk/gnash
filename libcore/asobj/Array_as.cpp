@@ -32,7 +32,6 @@
 #include "Global_as.h"
 #include "GnashException.h"
 #include "VM.h" 
-#include "Object.h" 
 #include "GnashNumeric.h"
 
 #include <string>

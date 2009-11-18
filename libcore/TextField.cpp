@@ -45,7 +45,6 @@
 #include "NativeFunction.h"
 #include "Font.h" 
 #include "fontlib.h" 
-#include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"

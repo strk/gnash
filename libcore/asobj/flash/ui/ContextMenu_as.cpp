@@ -28,7 +28,6 @@
 #include "Global_as.h"
 #include "smart_ptr.h" 
 #include "builtin_function.h" 
-#include "Object.h" 
 #include "namedStrings.h"
 #include "Array_as.h"
 

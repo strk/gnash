@@ -35,7 +35,6 @@
 #include "VM.h" // for the string table.
 #include "string_table.h" // for the string table.
 #include "builtin_function.h"
-#include "Object.h" // for getObjectInterface
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
 #include "ExecutableCode.h"

@@ -37,7 +37,6 @@
 #include "Global_as.h"
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
-#include "Object.h" // for getObjectInterface
 #include "VM.h"
 #include "Property.h"
 #include "string_table.h"
@@ -47,6 +46,7 @@
 #include "rtmp_client.h"
 #include "URL.h"
 #include "NetConnection_as.h"
+#include "Object.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>

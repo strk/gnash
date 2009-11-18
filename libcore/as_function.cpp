@@ -27,9 +27,9 @@
 #include "fn_call.h"
 #include "GnashException.h"
 #include "VM.h"
-#include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "NativeFunction.h"
+#include "Object.h"
 
 #include <iostream>
 

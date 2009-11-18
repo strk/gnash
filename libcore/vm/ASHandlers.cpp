@@ -37,7 +37,6 @@
 #include "URL.h"
 #include "action_buffer.h"
 #include "as_object.h"
-#include "Object.h"
 #include "drag_state.h"
 #include "VM.h" // for getting the root
 #include "movie_root.h" // for set_drag_state (ActionStartDragMovie)

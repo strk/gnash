@@ -24,6 +24,7 @@
 #include "ExternalInterface_as.h"
 #include "namedStrings.h"
 #include "external_pkg.h"
+#include "Global_as.h"
 
 namespace gnash {
 
