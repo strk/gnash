@@ -40,23 +40,11 @@ namespace {
 
 }
 
-class BlendMode_as : public as_object
-{
-
-public:
-
-    BlendMode_as()
-        :
-        as_object(getBlendModeInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 blendmode_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, blendmode_ctor, attachBlendModeInterface, 
-        attachBlendModeStaticInterface, uri);
+    registerBuiltinObject(where, attachBlendModeInterface, uri);
 }
 
 namespace {
@@ -64,31 +52,6 @@ namespace {
 void
 attachBlendModeInterface(as_object& /*o*/)
 {
-}
-
-void
-attachBlendModeStaticInterface(as_object& /*o*/)
-{
-
-}
-
-as_object*
-getBlendModeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachBlendModeInterface(*o);
-    }
-    return o.get();
-}
-
-as_value
-blendmode_ctor(const fn_call& /*fn*/)
-{
-    boost::intrusive_ptr<as_object> obj = new BlendMode_as;
-
-    return as_value(obj.get()); // will keep alive
 }
 
 } // anonymous namespace 
