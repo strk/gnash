@@ -37,20 +37,7 @@ namespace {
     as_value soundchannel_ctor(const fn_call& fn);
     void attachSoundChannelInterface(as_object& o);
     void attachSoundChannelStaticInterface(as_object& o);
-    as_object* getSoundChannelInterface();
-
 }
-
-class SoundChannel_as : public as_object
-{
-
-public:
-
-    SoundChannel_as()
-        :
-        as_object(getSoundChannelInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -74,21 +61,10 @@ attachSoundChannelStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getSoundChannelInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSoundChannelInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 soundchannel_soundComplete(const fn_call& fn)
 {
-    SoundChannel_as* ptr = ensure<ThisIs<SoundChannel_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -97,9 +73,7 @@ soundchannel_soundComplete(const fn_call& fn)
 as_value
 soundchannel_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new SoundChannel_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

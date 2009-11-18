@@ -38,20 +38,7 @@ namespace {
     as_value soundmixer_ctor(const fn_call& fn);
     void attachSoundMixerInterface(as_object& o);
     void attachSoundMixerStaticInterface(as_object& o);
-    as_object* getSoundMixerInterface();
-
 }
-
-class SoundMixer_as : public as_object
-{
-
-public:
-
-    SoundMixer_as()
-        :
-        as_object(getSoundMixerInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -76,21 +63,10 @@ attachSoundMixerStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getSoundMixerInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSoundMixerInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 soundmixer_computeSpectrum(const fn_call& fn)
 {
-    SoundMixer_as* ptr = ensure<ThisIs<SoundMixer_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -99,7 +75,7 @@ soundmixer_computeSpectrum(const fn_call& fn)
 as_value
 soundmixer_stopAll(const fn_call& fn)
 {
-    SoundMixer_as* ptr = ensure<ThisIs<SoundMixer_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -108,9 +84,7 @@ soundmixer_stopAll(const fn_call& fn)
 as_value
 soundmixer_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new SoundMixer_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -36,20 +36,7 @@ namespace {
     as_value soundtransform_ctor(const fn_call& fn);
     void attachSoundTransformInterface(as_object& o);
     void attachSoundTransformStaticInterface(as_object& o);
-    as_object* getSoundTransformInterface();
-
 }
-
-class SoundTransform_as : public as_object
-{
-
-public:
-
-    SoundTransform_as()
-        :
-        as_object(getSoundTransformInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachSoundTransformStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getSoundTransformInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSoundTransformInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 soundtransform_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new SoundTransform_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

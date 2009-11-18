@@ -131,7 +131,7 @@ getMicrophoneInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object(getObjectInterface());
+        o->set_prototype(getObjectInterface());
 		attachMicrophoneInterface(*o);
 	}
 	return o.get();
@@ -144,9 +144,8 @@ class Microphone_as: public as_object, public media::gst::AudioInputGst
 public:
 
 	Microphone_as()
-		:
-		as_object(getMicrophoneInterface())
 	{
+        set_prototype(getCameraInterface());
         attachMicrophoneProperties(*get_prototype());
     }
 
@@ -162,9 +161,8 @@ class Microphone_as: public as_object, public media::AudioInput
 public:
 
 	Microphone_as()
-		:
-		as_object(getMicrophoneInterface())
 	{
+        set_prototype(getMicrophoneInterface());
         attachMicrophoneProperties(*get_prototype());
     }
 

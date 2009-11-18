@@ -36,20 +36,7 @@ namespace {
     as_value id3info_ctor(const fn_call& fn);
     void attachID3InfoInterface(as_object& o);
     void attachID3InfoStaticInterface(as_object& o);
-    as_object* getID3InfoInterface();
-
 }
-
-class ID3Info_as : public as_object
-{
-
-public:
-
-    ID3Info_as()
-        :
-        as_object(getID3InfoInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachID3InfoStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getID3InfoInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachID3InfoInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 id3info_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new ID3Info_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 
