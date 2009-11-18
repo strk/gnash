@@ -39,20 +39,7 @@ namespace {
     as_value loader_ctor(const fn_call& fn);
     void attachLoaderInterface(as_object& o);
     void attachLoaderStaticInterface(as_object& o);
-    as_object* getLoaderInterface();
-
 }
-
-class Loader_as : public as_object
-{
-
-public:
-
-    Loader_as()
-        :
-        as_object(getLoaderInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -79,21 +66,10 @@ attachLoaderStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getLoaderInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachLoaderInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 loader_load(const fn_call& fn)
 {
-    Loader_as* ptr = ensure<ThisIs<Loader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -102,7 +78,7 @@ loader_load(const fn_call& fn)
 as_value
 loader_loadBytes(const fn_call& fn)
 {
-    Loader_as* ptr = ensure<ThisIs<Loader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -111,7 +87,7 @@ loader_loadBytes(const fn_call& fn)
 as_value
 loader_unload(const fn_call& fn)
 {
-    Loader_as* ptr = ensure<ThisIs<Loader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -120,9 +96,7 @@ loader_unload(const fn_call& fn)
 as_value
 loader_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Loader_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

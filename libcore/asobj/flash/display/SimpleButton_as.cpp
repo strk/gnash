@@ -40,17 +40,6 @@ namespace {
 
 }
 
-class SimpleButton_as : public as_object
-{
-
-public:
-
-    SimpleButton_as()
-        :
-        as_object(getSimpleButtonInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 simplebutton_class_init(as_object& where, const ObjectURI& uri)
@@ -72,23 +61,10 @@ attachSimpleButtonStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getSimpleButtonInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSimpleButtonInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 simplebutton_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new SimpleButton_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

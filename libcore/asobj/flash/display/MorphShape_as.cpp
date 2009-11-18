@@ -36,20 +36,7 @@ namespace {
     as_value morphshape_ctor(const fn_call& fn);
     void attachMorphShapeInterface(as_object& o);
     void attachMorphShapeStaticInterface(as_object& o);
-    as_object* getMorphShapeInterface();
-
 }
-
-class MorphShape_as : public as_object
-{
-
-public:
-
-    MorphShape_as()
-        :
-        as_object(getMorphShapeInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachMorphShapeStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getMorphShapeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachMorphShapeInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 morphshape_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new MorphShape_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -40,17 +40,6 @@ namespace {
 
 }
 
-class Scene_as : public as_object
-{
-
-public:
-
-    Scene_as()
-        :
-        as_object(getSceneInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 scene_class_init(as_object& where, const ObjectURI& uri)
@@ -72,23 +61,10 @@ attachSceneStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getSceneInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSceneInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 scene_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Scene_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

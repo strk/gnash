@@ -36,20 +36,7 @@ namespace {
     as_value shape_ctor(const fn_call& fn);
     void attachShapeInterface(as_object& o);
     void attachShapeStaticInterface(as_object& o);
-    as_object* getShapeInterface();
-
 }
-
-class Shape_as : public as_object
-{
-
-public:
-
-    Shape_as()
-        :
-        as_object(getShapeInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachShapeStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getShapeInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachShapeInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 shape_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Shape_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

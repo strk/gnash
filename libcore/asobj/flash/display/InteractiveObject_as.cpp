@@ -40,23 +40,13 @@ namespace {
 
 }
 
-class InteractiveObject_as : public as_object
-{
-
-public:
-
-    InteractiveObject_as()
-        :
-        as_object(getInteractiveObjectInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 interactiveobject_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, interactiveobject_ctor, attachInteractiveObjectInterface, 
-        attachInteractiveObjectStaticInterface, uri);
+    registerBuiltinClass(where, interactiveobject_ctor,
+            attachInteractiveObjectInterface, 
+            attachInteractiveObjectStaticInterface, uri);
 }
 
 namespace {
@@ -72,23 +62,10 @@ attachInteractiveObjectStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getInteractiveObjectInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachInteractiveObjectInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 interactiveobject_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new InteractiveObject_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -36,20 +36,7 @@ namespace {
     as_value framelabel_ctor(const fn_call& fn);
     void attachFrameLabelInterface(as_object& o);
     void attachFrameLabelStaticInterface(as_object& o);
-    as_object* getFrameLabelInterface();
-
 }
-
-class FrameLabel_as : public as_object
-{
-
-public:
-
-    FrameLabel_as()
-        :
-        as_object(getFrameLabelInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachFrameLabelStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getFrameLabelInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachFrameLabelInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 framelabel_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new FrameLabel_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 
