@@ -26,6 +26,7 @@
 #include "FileReferenceList_as.h"
 #include "FileReference_as.h"
 #include "net_pkg.h"
+#include "Global_as.h"
 
 namespace gnash {
 
@@ -36,7 +37,7 @@ get_flash_net_package(const fn_call& fn)
  
     Global_as& gl = getGlobal(fn);
 
-    as_object* pkg = gl.createObject()
+    as_object* pkg = gl.createObject();
     
     string_table& st = getStringTable(fn);
     const string_table::key global = 0;
