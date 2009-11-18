@@ -86,7 +86,7 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
     if (constructor) {
         fn_call::Args args;
         VM& vm = getVM(where);
-        proto = constructor->constructInstance(as_environment(vm), args).get();
+        proto = constructor->constructInstance(as_environment(vm), args);
     }
     else proto = 0;
 
