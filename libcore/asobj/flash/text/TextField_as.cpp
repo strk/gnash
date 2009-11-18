@@ -56,20 +56,7 @@ namespace {
     as_value textfield_ctor(const fn_call& fn);
     void attachTextFieldInterface(as_object& o);
     void attachTextFieldStaticInterface(as_object& o);
-    as_object* getTextFieldInterface();
-
 }
-
-class TextField_as : public as_object
-{
-
-public:
-
-    TextField_as()
-        :
-        as_object(getTextFieldInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -109,26 +96,12 @@ attachTextFieldInterface(as_object& o)
 void
 attachTextFieldStaticInterface(as_object& o)
 {
-    Global_as& gl = getGlobal(o);
-
-}
-
-as_object*
-getTextFieldInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachTextFieldInterface(*o);
-    }
-    return o.get();
 }
 
 as_value
 textfield_getCharBoundaries(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -137,8 +110,7 @@ textfield_getCharBoundaries(const fn_call& fn)
 as_value
 textfield_getCharIndexAtPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -147,8 +119,7 @@ textfield_getCharIndexAtPoint(const fn_call& fn)
 as_value
 textfield_getFirstCharInParagraph(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -157,8 +128,7 @@ textfield_getFirstCharInParagraph(const fn_call& fn)
 as_value
 textfield_getImageReference(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -167,8 +137,7 @@ textfield_getImageReference(const fn_call& fn)
 as_value
 textfield_getLineIndexAtPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -177,8 +146,7 @@ textfield_getLineIndexAtPoint(const fn_call& fn)
 as_value
 textfield_getLineIndexOfChar(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -187,8 +155,7 @@ textfield_getLineIndexOfChar(const fn_call& fn)
 as_value
 textfield_getLineLength(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -197,8 +164,7 @@ textfield_getLineLength(const fn_call& fn)
 as_value
 textfield_getLineMetrics(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -207,8 +173,7 @@ textfield_getLineMetrics(const fn_call& fn)
 as_value
 textfield_getLineOffset(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -217,8 +182,7 @@ textfield_getLineOffset(const fn_call& fn)
 as_value
 textfield_getLineText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -227,8 +191,7 @@ textfield_getLineText(const fn_call& fn)
 as_value
 textfield_getParagraphLength(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -237,8 +200,7 @@ textfield_getParagraphLength(const fn_call& fn)
 as_value
 textfield_getTextFormat(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -247,8 +209,7 @@ textfield_getTextFormat(const fn_call& fn)
 as_value
 textfield_replaceSelectedText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -257,8 +218,7 @@ textfield_replaceSelectedText(const fn_call& fn)
 as_value
 textfield_replaceText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -267,8 +227,7 @@ textfield_replaceText(const fn_call& fn)
 as_value
 textfield_setSelection(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -277,8 +236,7 @@ textfield_setSelection(const fn_call& fn)
 as_value
 textfield_setTextFormat(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -287,8 +245,7 @@ textfield_setTextFormat(const fn_call& fn)
 as_value
 textfield_change(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -297,8 +254,7 @@ textfield_change(const fn_call& fn)
 as_value
 textfield_link(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -307,8 +263,7 @@ textfield_link(const fn_call& fn)
 as_value
 textfield_scroll(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -317,8 +272,7 @@ textfield_scroll(const fn_call& fn)
 as_value
 textfield_textInput(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField_as> ptr =
-        ensureType<TextField_as>(fn.this_ptr);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -327,9 +281,7 @@ textfield_textInput(const fn_call& fn)
 as_value
 textfield_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new TextField_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 
