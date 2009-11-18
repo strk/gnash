@@ -33,8 +33,10 @@ static as_value
 get_flash_net_package(const fn_call& fn)
 {
     log_debug("Loading flash.net package");
-    
-    as_object *pkg = new as_object(getObjectInterface());
+ 
+    Global_as& gl = getGlobal(fn);
+
+    as_object* pkg = gl.createObject()
     
     string_table& st = getStringTable(fn);
     const string_table::key global = 0;
