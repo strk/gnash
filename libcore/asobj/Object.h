@@ -28,9 +28,6 @@ class ObjectURI;
 /// Initialize the global Object class
 void object_class_init(as_object& global, const ObjectURI& uri);
 
-/// Return an Object instance
-as_object* init_object_instance();
-
 as_object* getObjectInterface();
 
 void registerObjectNative(as_object& global);

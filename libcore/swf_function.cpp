@@ -23,8 +23,7 @@
 #include "ActionExec.h" // for operator()
 #include "VM.h" // for storing _global in a local register
 #include "NativeFunction.h" // for Function constructor
-#include "Object.h" // for getObjectInterface
-#include "Global_as.h" // for getObjectInterface
+#include "Global_as.h" 
 #include "namedStrings.h"
 
 #include <typeinfo>
