@@ -231,11 +231,12 @@ public:
     ~SharedObject_as();
 
     SharedObject_as()
-        : as_object(getSharedObjectInterface()),
-          _data(0),
-          _persistance(0),
-	  _connected(false)
+        :
+        _data(0),
+        _persistance(0),
+        _connected(false)
     { 
+        set_prototype(getSharedObjectInterface());
     }
 
     bool flush(int space = 0) const;
