@@ -36,20 +36,7 @@ namespace {
     as_value newobjectsample_ctor(const fn_call& fn);
     void attachNewObjectSampleInterface(as_object& o);
     void attachNewObjectSampleStaticInterface(as_object& o);
-    as_object* getNewObjectSampleInterface();
-
 }
-
-class NewObjectSample_as : public as_object
-{
-
-public:
-
-    NewObjectSample_as()
-        :
-        as_object(getNewObjectSampleInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachNewObjectSampleStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getNewObjectSampleInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachNewObjectSampleInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 newobjectsample_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new NewObjectSample_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 
