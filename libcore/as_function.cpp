@@ -81,8 +81,8 @@ as_function::setPrototype(as_object* proto)
 void
 as_function::extends(as_function& superclass)
 {
-	as_object* newproto = new as_object(superclass.getPrototype().get());
-	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
+	as_object* newproto = new as_object();
+	newproto->set_prototype(superclass.getPrototype().get());
 
     if (getSWFVersion(superclass) > 5) {
         const int flags = PropFlags::dontEnum;
