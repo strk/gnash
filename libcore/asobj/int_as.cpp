@@ -20,8 +20,8 @@
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "as_object.h" // for inheritance
-#include "builtin_function.h" // need builtin_function
+#include "as_object.h"
+#include "builtin_function.h" 
 #include "Object.h"
 
 #include "log.h"
@@ -30,62 +30,47 @@
 #include <sstream>
 
 namespace gnash {
-class int_as_object : public as_object
+
+class int_as : public Relay
 {
-
 public:
+    int_as(int32_t v)
+        :
+        _int(v)
+    {}
 
-	int_as_object()
-		:
-		as_object()
-	{
-	}
+private:
+    boost::int32_t _int;
 
 };
 
-static as_value
+as_value
 int_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new int_as_object();
+    as_object* obj = ensure<ValidThis>(fn);
 
-    if ( fn.nargs )
-    {
+    if (fn.nargs) {
         LOG_ONCE( log_unimpl("Arguments passed to int() ctor unhandled") );
     }
 	
-	return as_value(obj.get()); // will keep alive
+    obj->setRelay(new int_as(fn.nargs ? fn.arg(0).to_int() : 0));
+    return as_value();
 }
 
-as_object*
-getintInterface()
+// Note that this class can be constructed but is not usable!
+//
+// It needs support in as_value first.
+void
+int_class_init(as_object& global, const ObjectURI& uri)
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-	}
-	return o.get();
-}
 
-// extern (used by Global.cpp)
-void int_class_init(as_object& global, const ObjectURI& uri)
-{
-    static boost::intrusive_ptr<as_object> cl;
-
-        Global_as& gl = getGlobal(global);
-        as_object* proto = getintInterface();
-        cl = gl.createClass(&int_ctor, proto);
+    Global_as& gl = getGlobal(global);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&int_ctor, proto);
 
 	// Register _global.DisplayObject
-	global.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+	global.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
-
-std::auto_ptr<as_object>
-init_int_instance()
-{
-	return std::auto_ptr<as_object>(new int_as_object);
-}
-
 
 }
