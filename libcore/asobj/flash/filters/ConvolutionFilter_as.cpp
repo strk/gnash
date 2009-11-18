@@ -22,7 +22,6 @@
 #include "Global_as.h"
 #include "BitmapFilter_as.h"
 #include "builtin_function.h"
-#include "Object.h"
 
 namespace gnash {
 

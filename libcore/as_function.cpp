@@ -27,9 +27,9 @@
 #include "fn_call.h"
 #include "GnashException.h"
 #include "VM.h"
-#include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "NativeFunction.h"
+#include "Object.h"
 
 #include <iostream>
 
@@ -81,8 +81,8 @@ as_function::setPrototype(as_object* proto)
 void
 as_function::extends(as_function& superclass)
 {
-	as_object* newproto = new as_object(superclass.getPrototype().get());
-	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
+	as_object* newproto = new as_object();
+	newproto->set_prototype(superclass.getPrototype().get());
 
     if (getSWFVersion(superclass) > 5) {
         const int flags = PropFlags::dontEnum;
@@ -122,7 +122,7 @@ as_function::getFunctionConstructor()
 	return func;
 }
 
-boost::intrusive_ptr<as_object>
+as_object*
 as_function::constructInstance(const as_environment& env, fn_call::Args& args)
 {
 

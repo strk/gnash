@@ -28,7 +28,6 @@
 #include "GnashException.h"
 #include "builtin_function.h"
 #include "movie_root.h"
-#include "Object.h" // for getObjectInterface
 #include "StreamProvider.h"
 #include "URLAccessManager.h"
 #include "URL.h"

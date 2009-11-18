@@ -40,17 +40,6 @@ namespace {
 
 }
 
-class AVM1Movie_as : public as_object
-{
-
-public:
-
-    AVM1Movie_as()
-        :
-        as_object(getAVM1MovieInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 avm1movie_class_init(as_object& where, const ObjectURI& uri)
@@ -72,23 +61,10 @@ attachAVM1MovieStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getAVM1MovieInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachAVM1MovieInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 avm1movie_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new AVM1Movie_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -32,7 +32,6 @@
 #include "VM.h"
 #include "GnashException.h"
 #include "fn_call.h" 
-#include "Object.h" 
 #include "Array_as.h"
 #include "as_function.h"
 #include "Global_as.h" 
@@ -283,28 +282,6 @@ as_object::as_object()
 	_vm(VM::get()),
 	_members(_vm)
 {
-}
-
-as_object::as_object(as_object* proto)
-	:
-    _displayObject(0),
-    _array(false),
-    _relay(0),
-	_vm(VM::get()),
-	_members(_vm)
-{
-	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
-}
-
-as_object::as_object(boost::intrusive_ptr<as_object> proto)
-	:
-    _displayObject(0),
-    _array(false),
-    _relay(0),
-	_vm(VM::get()),
-	_members(_vm)
-{
-	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
 }
 
 std::pair<bool,bool>

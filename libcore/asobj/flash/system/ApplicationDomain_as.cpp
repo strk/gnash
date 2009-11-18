@@ -37,20 +37,7 @@ namespace {
     as_value applicationdomain_ctor(const fn_call& fn);
     void attachApplicationDomainInterface(as_object& o);
     void attachApplicationDomainStaticInterface(as_object& o);
-    as_object* getApplicationDomainInterface();
-
 }
-
-class ApplicationDomain_as : public as_object
-{
-
-public:
-
-    ApplicationDomain_as()
-        :
-        as_object(getApplicationDomainInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -74,21 +61,10 @@ attachApplicationDomainStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getApplicationDomainInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachApplicationDomainInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 applicationdomain_hasDefinition(const fn_call& fn)
 {
-    ApplicationDomain_as* ptr = ensure<ThisIs<ApplicationDomain_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -97,9 +73,7 @@ applicationdomain_hasDefinition(const fn_call& fn)
 as_value
 applicationdomain_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new ApplicationDomain_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

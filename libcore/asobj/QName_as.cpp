@@ -28,7 +28,6 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" 
-#include "Object.h" 
 #include "VM.h" 
 
 #include <sstream>
@@ -39,23 +38,8 @@ namespace {
     as_value qname_ctor(const fn_call& fn);
     as_value qname_uri(const fn_call& fn);
     as_value qname_localName(const fn_call& fn);
-    
-    as_object* getQNameInterface();
     void attachQNameInterface(as_object& o);
 }
-
-
-class QName_as : public as_object
-{
-
-public:
-
-    QName_as()
-        :
-        as_object(getQNameInterface())
-    {}
-
-};
 
 
 // extern 

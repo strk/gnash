@@ -37,7 +37,6 @@
 #include "URL.h"
 #include "action_buffer.h"
 #include "as_object.h"
-#include "Object.h"
 #include "drag_state.h"
 #include "VM.h" // for getting the root
 #include "movie_root.h" // for set_drag_state (ActionStartDragMovie)
@@ -3775,7 +3774,7 @@ construct_object(as_function* ctor_as_func, as_environment& env,
     for (size_t i = 0; i < nargs; ++i) {
         args += env.pop();
     } 
-    return ctor_as_func->constructInstance(env, args).get();
+    return ctor_as_func->constructInstance(env, args);
 }
 
 // Common code for GetUrl and GetUrl2. See:

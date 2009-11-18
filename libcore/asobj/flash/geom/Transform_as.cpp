@@ -29,7 +29,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
-#include "Object.h" // for AS inheritance
 #include "VM.h"
 #include "MovieClip.h" // For MovieClip
 #include "ColorTransform_as.h"
@@ -78,8 +77,16 @@ public:
         _movieClip(movieClip)
     {}
 
+    SWFMatrix getWorldMatrix() const {
+        return _movieClip.getWorldMatrix();
+    }
     const SWFMatrix& getMatrix() const { return _movieClip.getMatrix(); }
     const cxform& getColorTransform() const { return _movieClip.get_cxform(); }
+
+    cxform getWorldColorTransform() const {
+        return _movieClip.get_world_cxform();
+    }
+
     void setMatrix(const SWFMatrix& mat) { _movieClip.setMatrix(mat); }
     void setColorTransform(const cxform& cx) { _movieClip.set_cxform(cx); }
 
@@ -123,8 +130,7 @@ transform_colorTransform(const fn_call& fn)
         // If it's not found, construction will fail.
         as_value colorTrans(fn.env().find_object("flash.geom.ColorTransform"));
 
-        boost::intrusive_ptr<as_function> colorTransformCtor =
-            colorTrans.to_function();
+        as_function* colorTransformCtor = colorTrans.to_function();
 
         if (!colorTransformCtor) {
             log_error("Failed to construct flash.geom.ColorTransform!");
@@ -138,10 +144,10 @@ transform_colorTransform(const fn_call& fn)
         args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,
              c.rb, c.gb, c.bb, c.ab;
 
-        boost::intrusive_ptr<as_object> colorTransformObj =
+        as_object* colorTransformObj =
             colorTransformCtor->constructInstance(fn.env(), args);
 
-        return as_value(colorTransformObj.get());
+        return as_value(colorTransformObj);
     }
 
     // Setter
@@ -156,7 +162,7 @@ transform_colorTransform(const fn_call& fn)
         );
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
+    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -172,7 +178,7 @@ transform_colorTransform(const fn_call& fn)
     // or whether it can be any object.
     ColorTransform_as* transform;
 
-    if (!isNativeType(obj.get(), transform)) {
+    if (!isNativeType(obj, transform)) {
 
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
@@ -201,18 +207,74 @@ transform_colorTransform(const fn_call& fn)
 as_value
 transform_concatenatedColorTransform(const fn_call& fn)
 {
+    const double factor = 256.0;
+
     Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
-    UNUSED(relay);
-    LOG_ONCE(log_unimpl (__FUNCTION__));
+
+    if (!fn.nargs) {
+
+        // If it's not found, construction will fail.
+        as_value colorTrans(fn.env().find_object("flash.geom.ColorTransform"));
+
+        as_function* colorTransformCtor = colorTrans.to_function();
+
+        if (!colorTransformCtor) {
+            log_error("Failed to construct flash.geom.ColorTransform!");
+            return as_value();
+        }
+
+        // Construct a ColorTransform from the sprite cxform.
+        const cxform& c = relay->getWorldColorTransform();
+
+        fn_call::Args args;
+        args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,
+             c.rb, c.gb, c.bb, c.ab;
+
+        as_object* colorTransformObj =
+            colorTransformCtor->constructInstance(fn.env(), args);
+
+        return as_value(colorTransformObj);
+    }
+
     return as_value();
 }
 
 as_value
 transform_concatenatedMatrix(const fn_call& fn)
 {
+
+    const double factor = 65536.0;
+
     Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
-    UNUSED(relay);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (!fn.nargs)
+    {
+
+        // If it's not found, construction will fail.
+        as_value matrix(fn.env().find_object("flash.geom.Matrix"));
+
+        as_function* matrixCtor = matrix.to_function();
+
+        if (!matrixCtor) {
+            log_error("Failed to construct flash.geom.Matrix!");
+            return as_value();
+        }
+
+        const SWFMatrix& m = relay->getWorldMatrix();
+
+        fn_call::Args args;
+        args += m.sx / factor,
+                m.shx / factor,
+                m.shy / factor,
+                m.sy / factor,
+                twipsToPixels(m.tx),
+                twipsToPixels(m.ty);
+
+        as_object* matrixObj = matrixCtor->constructInstance(fn.env(), args);
+
+        return as_value(matrixObj);
+    }
+
     return as_value();
 }
 
@@ -235,7 +297,7 @@ transform_matrix(const fn_call& fn)
         // If it's not found, construction will fail.
         as_value matrix(fn.env().find_object("flash.geom.Matrix"));
 
-        boost::intrusive_ptr<as_function> matrixCtor = matrix.to_function();
+        as_function* matrixCtor = matrix.to_function();
 
         if (!matrixCtor) {
             log_error("Failed to construct flash.geom.Matrix!");
@@ -252,10 +314,9 @@ transform_matrix(const fn_call& fn)
                 twipsToPixels(m.tx),
                 twipsToPixels(m.ty);
 
-        boost::intrusive_ptr<as_object> matrixObj =
-            matrixCtor->constructInstance(fn.env(), args);
+        as_object* matrixObj = matrixCtor->constructInstance(fn.env(), args);
 
-        return as_value(matrixObj.get());
+        return as_value(matrixObj);
     }
 
     // Setter
@@ -271,7 +332,7 @@ transform_matrix(const fn_call& fn)
     }
 
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
+    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -370,12 +431,11 @@ attachTransformInterface(as_object& o)
 
     o.init_property("matrix", transform_matrix, transform_matrix,
             protectedFlags);
-    o.init_property("concatenatedMatrix", transform_concatenatedMatrix,
-            transform_concatenatedMatrix, protectedFlags);
+    o.init_readonly_property("concatenatedMatrix", transform_concatenatedMatrix,
+            protectedFlags);
     o.init_property("colorTransform", transform_colorTransform,
             transform_colorTransform, protectedFlags);
-    o.init_property("concatenatedColorTransform",
-            transform_concatenatedColorTransform,
+    o.init_readonly_property("concatenatedColorTransform",
             transform_concatenatedColorTransform, protectedFlags);
     o.init_property("pixelBounds", transform_pixelBounds,
             transform_pixelBounds, protectedFlags);

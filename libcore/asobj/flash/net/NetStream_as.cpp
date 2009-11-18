@@ -32,7 +32,6 @@
 #include "NativeFunction.h"
 #include "GnashException.h"
 #include "NetConnection_as.h"
-#include "Object.h" // for getObjectInterface
 #include "VM.h"
 #include "namedStrings.h"
 #include "movie_root.h"

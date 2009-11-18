@@ -39,20 +39,7 @@ namespace {
     as_value stackframe_ctor(const fn_call& fn);
     void attachStackFrameInterface(as_object& o);
     void attachStackFrameStaticInterface(as_object& o);
-    as_object* getStackFrameInterface();
-
 }
-
-class StackFrame_as : public as_object
-{
-
-public:
-
-    StackFrame_as()
-        :
-        as_object(getStackFrameInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -79,21 +66,10 @@ attachStackFrameStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getStackFrameInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachStackFrameInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 stackframe_file(const fn_call& fn)
 {
-    StackFrame_as* ptr = ensure<ThisIs<StackFrame_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -102,7 +78,7 @@ stackframe_file(const fn_call& fn)
 as_value
 stackframe_line(const fn_call& fn)
 {
-    StackFrame_as* ptr = ensure<ThisIs<StackFrame_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -111,7 +87,7 @@ stackframe_line(const fn_call& fn)
 as_value
 stackframe_name(const fn_call& fn)
 {
-    StackFrame_as* ptr = ensure<ThisIs<StackFrame_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -120,9 +96,7 @@ stackframe_name(const fn_call& fn)
 as_value
 stackframe_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new StackFrame_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -25,7 +25,6 @@
 #include "builtin_function.h"
 #include "Class.h"
 #include "Global_as.h"
-#include "Object.h"
 #include "extension.h"
 
 namespace gnash {
@@ -108,16 +107,9 @@ public:
         if (mExtension->initModuleWithFunc(mDeclaration.file_name,
             mDeclaration.init_name, *mTarget))
         {
-            Global_as& gl = getGlobal(fn);
             // Successfully loaded it, now find it, set its proto, and return.
             as_value us;
             mTarget->get_member(mDeclaration.name, &us);
-            if (mDeclaration.super_name && 
-                    !us.to_object(gl)->hasOwnProperty(NSV::PROP_uuPROTOuu))
-            {
-                us.to_object(gl)->set_prototype(
-                        super.to_function()->getPrototype());
-            }
             return us;
         }
         // Error here -- not successful in loading.

@@ -40,23 +40,13 @@ namespace {
 
 }
 
-class IBitmapDrawable_as : public as_object
-{
-
-public:
-
-    IBitmapDrawable_as()
-        :
-        as_object(getIBitmapDrawableInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 ibitmapdrawable_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, ibitmapdrawable_ctor, attachIBitmapDrawableInterface, 
-        attachIBitmapDrawableStaticInterface, uri);
+    registerBuiltinClass(where, ibitmapdrawable_ctor,
+            attachIBitmapDrawableInterface, 
+            attachIBitmapDrawableStaticInterface, uri);
 }
 
 namespace {
@@ -72,23 +62,10 @@ attachIBitmapDrawableStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getIBitmapDrawableInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIBitmapDrawableInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 ibitmapdrawable_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new IBitmapDrawable_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

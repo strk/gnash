@@ -37,7 +37,6 @@
 #include "Global_as.h"
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
-#include "Object.h" // for getObjectInterface
 #include "VM.h"
 #include "Property.h"
 #include "string_table.h"
@@ -47,6 +46,7 @@
 #include "rtmp_client.h"
 #include "URL.h"
 #include "NetConnection_as.h"
+#include "Object.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -231,11 +231,12 @@ public:
     ~SharedObject_as();
 
     SharedObject_as()
-        : as_object(getSharedObjectInterface()),
-          _data(0),
-          _persistance(0),
-	  _connected(false)
+        :
+        _data(0),
+        _persistance(0),
+        _connected(false)
     { 
+        set_prototype(getSharedObjectInterface());
     }
 
     bool flush(int space = 0) const;
@@ -809,7 +810,8 @@ getSharedObjectInterface()
 
     static boost::intrusive_ptr<as_object> o;
     if ( ! o ) {
-        o = new as_object(getObjectInterface());
+        o = new as_object();
+        o->set_prototype(getObjectInterface());
         attachSharedObjectInterface(*o);
     }
     return o.get();
@@ -1134,10 +1136,12 @@ readSOL(VM& vm, const std::string& filespec)
 
 #ifdef BUFFERED_AMF_SOL
 
+    Global_as& gl = *vm.getGlobal();
+
     // The 'data' member is initialized only on getLocal() (and probably
     // getRemote()): i.e. when there is some data, or when it's ready to
     // be added.
-    as_object* data = new as_object(getObjectInterface());
+    as_object* data = gl.createObject();
 
     struct stat st;
 

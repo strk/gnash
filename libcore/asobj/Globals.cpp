@@ -38,7 +38,6 @@
 #include "String_as.h"
 #include "Selection_as.h"
 #include "Number_as.h"
-#include "Object.h"
 #include "Math_as.h"
 #include "flash/accessibility/Accessibility_as.h"
 #include "flash/ui/ContextMenu_as.h"
@@ -79,13 +78,13 @@
 #include "flash/text/TextDisplayMode_as.h"
 #include "flash/text/TextFieldType_as.h"
 #include "flash/text/TextFormatAlign_as.h"
+#include "flash/text/TextFormat_as.h"
 #include "flash/text/TextLineMetrics_as.h"
 #include "flash/text/TextRenderer_as.h"
 #include "flash/xml/XMLDocument_as.h"
 #include "flash/xml/XMLNode_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
-#include "TextFormat_as.h"
 #include "Video.h"
 #include "extension.h"
 #include "VM.h"
@@ -105,6 +104,7 @@
 #include "LoadVars_as.h"
 #include "Namespace_as.h"
 #include "QName_as.h"
+#include "Object.h"
 
 #include <limits> 
 #include <sstream>
@@ -200,7 +200,9 @@ AVM2Global::registerClasses()
 as_object*
 AVM1Global::createObject()
 {
-    return new as_object(getObjectInterface());
+    as_object* obj = new as_object(*this);
+    obj->set_prototype(getObjectInterface());
+    return obj;
 }
 
 builtin_function*
@@ -284,7 +286,9 @@ AVM1Global::createBoolean(bool b)
 as_object*
 AVM2Global::createObject()
 {
-    return new as_object(getObjectInterface());
+    as_object* obj = new as_object(*this);
+    obj->set_prototype(getObjectInterface());
+    return obj;
 }
 
 builtin_function*
@@ -1259,7 +1263,7 @@ global_assetuperror(const fn_call& fn)
         as_function* ctor = gl.getMember(NSV::CLASS_ERROR).to_function();
         if (ctor) {
             fn_call::Args args;
-            as_object* proto = ctor->constructInstance(fn.env(), args).get();
+            as_object* proto = ctor->constructInstance(fn.env(), args);
 
             // Not really sure what the point of this is.
             gl.createClass(local_errorConstructor, proto);
@@ -1479,7 +1483,7 @@ constructObject(Global_as& gl, const T& arg, string_table::key className)
     args += arg;
 
     as_environment env(getVM(gl));
-    as_object* ret = ctor->constructInstance(env, args).get();
+    as_object* ret = ctor->constructInstance(env, args);
 
     return ret;
 
@@ -1491,7 +1495,7 @@ registerNatives(as_object& global)
     
     VM& vm = getVM(global);
 
-    // ASNew was dropped as a builtin function but exists
+    // ASNew was dropped as an API function but exists
     // as ASnative.
     vm.registerNative(global_assetpropflags, 1, 0);
     vm.registerNative(global_asnew, 2, 0);    

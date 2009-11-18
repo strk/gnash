@@ -1,4 +1,4 @@
-// DisplayObject_as.cpp:  ActionScript "DisplayObject" class, for Gnash.
+// as_object.cpp:  ActionScript "DisplayObject" class, for Gnash.
 //
 //   Copyright (C) 2009 Free Software Foundation, Inc.
 //
@@ -47,35 +47,20 @@ namespace {
     as_value displayobject_ctor(const fn_call& fn);
     void attachDisplayObjectInterface(as_object& o);
     void attachDisplayObjectStaticInterface(as_object& o);
-    as_object* getDisplayObjectInterface();
-
 }
 
-class DisplayObject_as : public as_object
-{
-
-public:
-
-    DisplayObject_as()
-        :
-        as_object(getDisplayObjectInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void displayobject_class_init(as_object& where, const ObjectURI& uri)
+void
+displayobject_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as& gl = getGlobal(where);
-        as_object* proto = getDisplayObjectInterface();
-        cl = gl.createClass(&displayobject_ctor, proto);
-        attachDisplayObjectStaticInterface(*cl);
-    }
+    Global_as& gl = getGlobal(where);
+    as_object* proto = gl.createObject();
+    attachDisplayObjectInterface(*proto);
+    as_object* cl = gl.createClass(&displayobject_ctor, proto);
+    attachDisplayObjectStaticInterface(*cl);
 
     // Register _global.DisplayObject
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
@@ -104,21 +89,10 @@ attachDisplayObjectStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getDisplayObjectInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachDisplayObjectInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 displayobject_getRect(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -127,7 +101,7 @@ displayobject_getRect(const fn_call& fn)
 as_value
 displayobject_globalToLocal(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -136,7 +110,7 @@ displayobject_globalToLocal(const fn_call& fn)
 as_value
 displayobject_hitTestObject(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -145,7 +119,7 @@ displayobject_hitTestObject(const fn_call& fn)
 as_value
 displayobject_hitTestPoint(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -154,7 +128,7 @@ displayobject_hitTestPoint(const fn_call& fn)
 as_value
 displayobject_localToGlobal(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -163,7 +137,7 @@ displayobject_localToGlobal(const fn_call& fn)
 as_value
 displayobject_added(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -172,7 +146,7 @@ displayobject_added(const fn_call& fn)
 as_value
 displayobject_addedToStage(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -181,7 +155,7 @@ displayobject_addedToStage(const fn_call& fn)
 as_value
 displayobject_enterFrame(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -190,7 +164,7 @@ displayobject_enterFrame(const fn_call& fn)
 as_value
 displayobject_removed(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -199,7 +173,7 @@ displayobject_removed(const fn_call& fn)
 as_value
 displayobject_removedFromStage(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -208,7 +182,7 @@ displayobject_removedFromStage(const fn_call& fn)
 as_value
 displayobject_render(const fn_call& fn)
 {
-    DisplayObject_as* ptr = ensure<ThisIs<DisplayObject_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -217,9 +191,7 @@ displayobject_render(const fn_call& fn)
 as_value
 displayobject_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new DisplayObject_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

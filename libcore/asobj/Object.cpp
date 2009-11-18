@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "Object.h"
 #include "Movie.h"
 #include "DisplayObject.h"
 #include "smart_ptr.h"
@@ -30,6 +29,7 @@
 #include "VM.h" 
 #include "namedStrings.h" // for NSV::PROP_TO_STRING
 #include "Global_as.h"
+#include "Object.h"
 
 #include "log.h"
 
@@ -57,12 +57,6 @@ namespace {
 
 }
 
-
-as_object*
-init_object_instance()
-{
-	return new as_object(getObjectInterface());
-}
 
 void
 registerObjectNative(as_object& global)

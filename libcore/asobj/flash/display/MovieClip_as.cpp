@@ -30,7 +30,6 @@
 #include "movie_root.h"
 #include "GnashNumeric.h"
 #include "as_value.h"
-#include "Object.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
@@ -127,7 +126,8 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
     as_object* proto = gl.createObject();
 
     if (isAS3(getVM(where))) {
-        as_object* cl = new as_object(proto);
+        as_object* cl = new as_object();
+        cl->set_prototype(proto);
         attachMovieClipAS3Interface(*proto);
         
         // TODO: fix AVM2Global::createClass to work for AVM2.

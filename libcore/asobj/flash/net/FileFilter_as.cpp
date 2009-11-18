@@ -36,20 +36,7 @@ namespace {
     as_value filefilter_ctor(const fn_call& fn);
     void attachFileFilterInterface(as_object& o);
     void attachFileFilterStaticInterface(as_object& o);
-    as_object* getFileFilterInterface();
-
 }
-
-class FileFilter_as : public as_object
-{
-
-public:
-
-    FileFilter_as()
-        :
-        as_object(getFileFilterInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachFileFilterStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getFileFilterInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachFileFilterInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 filefilter_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new FileFilter_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

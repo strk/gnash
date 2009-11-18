@@ -57,22 +57,8 @@ namespace {
     as_value urlstream_ctor(const fn_call& fn);
     void attachURLStreamInterface(as_object& o);
     void attachURLStreamStaticInterface(as_object& o);
-    as_object* getURLStreamInterface();
-
 }
 
-class URLStream_as : public as_object
-{
-
-public:
-
-    URLStream_as()
-        :
-        as_object(getURLStreamInterface())
-    {}
-};
-
-// extern (used by Global.cpp)
 void
 urlstream_class_init(as_object& where, const ObjectURI& uri)
 {
@@ -115,21 +101,10 @@ attachURLStreamStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getURLStreamInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachURLStreamInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 urlstream_load(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -138,7 +113,7 @@ urlstream_load(const fn_call& fn)
 as_value
 urlstream_readBoolean(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -147,7 +122,7 @@ urlstream_readBoolean(const fn_call& fn)
 as_value
 urlstream_readByte(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -156,7 +131,7 @@ urlstream_readByte(const fn_call& fn)
 as_value
 urlstream_readBytes(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -165,7 +140,7 @@ urlstream_readBytes(const fn_call& fn)
 as_value
 urlstream_readDouble(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -174,7 +149,7 @@ urlstream_readDouble(const fn_call& fn)
 as_value
 urlstream_readFloat(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -183,7 +158,7 @@ urlstream_readFloat(const fn_call& fn)
 as_value
 urlstream_readInt(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -192,7 +167,7 @@ urlstream_readInt(const fn_call& fn)
 as_value
 urlstream_readMultiByte(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -201,7 +176,7 @@ urlstream_readMultiByte(const fn_call& fn)
 as_value
 urlstream_readObject(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -210,7 +185,7 @@ urlstream_readObject(const fn_call& fn)
 as_value
 urlstream_readShort(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -219,7 +194,7 @@ urlstream_readShort(const fn_call& fn)
 as_value
 urlstream_readUnsignedByte(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -228,7 +203,7 @@ urlstream_readUnsignedByte(const fn_call& fn)
 as_value
 urlstream_readUnsignedInt(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -237,7 +212,7 @@ urlstream_readUnsignedInt(const fn_call& fn)
 as_value
 urlstream_readUnsignedShort(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -246,7 +221,7 @@ urlstream_readUnsignedShort(const fn_call& fn)
 as_value
 urlstream_readUTF(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -255,7 +230,7 @@ urlstream_readUTF(const fn_call& fn)
 as_value
 urlstream_readUTFBytes(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -264,7 +239,7 @@ urlstream_readUTFBytes(const fn_call& fn)
 as_value
 urlstream_complete(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -273,7 +248,7 @@ urlstream_complete(const fn_call& fn)
 as_value
 urlstream_httpStatus(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -282,7 +257,7 @@ urlstream_httpStatus(const fn_call& fn)
 as_value
 urlstream_ioError(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -291,7 +266,7 @@ urlstream_ioError(const fn_call& fn)
 as_value
 urlstream_open(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -300,7 +275,7 @@ urlstream_open(const fn_call& fn)
 as_value
 urlstream_progress(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -309,7 +284,7 @@ urlstream_progress(const fn_call& fn)
 as_value
 urlstream_securityError(const fn_call& fn)
 {
-    URLStream_as* ptr = ensure<ThisIs<URLStream_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -318,9 +293,7 @@ urlstream_securityError(const fn_call& fn)
 as_value
 urlstream_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new URLStream_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

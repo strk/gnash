@@ -36,20 +36,7 @@ namespace {
     as_value printjoboptions_ctor(const fn_call& fn);
     void attachPrintJobOptionsInterface(as_object& o);
     void attachPrintJobOptionsStaticInterface(as_object& o);
-    as_object* getPrintJobOptionsInterface();
-
 }
-
-class PrintJobOptions_as : public as_object
-{
-
-public:
-
-    PrintJobOptions_as()
-        :
-        as_object(getPrintJobOptionsInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachPrintJobOptionsStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getPrintJobOptionsInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachPrintJobOptionsInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 printjoboptions_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new PrintJobOptions_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

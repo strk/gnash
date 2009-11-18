@@ -36,20 +36,7 @@ namespace {
     as_value securitydomain_ctor(const fn_call& fn);
     void attachSecurityDomainInterface(as_object& o);
     void attachSecurityDomainStaticInterface(as_object& o);
-    as_object* getSecurityDomainInterface();
-
 }
-
-class SecurityDomain_as : public as_object
-{
-
-public:
-
-    SecurityDomain_as()
-        :
-        as_object(getSecurityDomainInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachSecurityDomainStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getSecurityDomainInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSecurityDomainInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 securitydomain_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new SecurityDomain_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -25,7 +25,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
-#include "Object.h" // for AS inheritance
 #include "VM.h"
 
 #include <cmath>
@@ -164,7 +163,7 @@ matrix_clone(const fn_call& fn)
         return as_value();
     }
 
-    as_object* o = ctor->constructInstance(fn.env(), args).get();
+    as_object* o = ctor->constructInstance(fn.env(), args);
 
     return as_value(o);
 }

@@ -38,20 +38,7 @@ namespace {
     as_value printjob_ctor(const fn_call& fn);
     void attachPrintJobInterface(as_object& o);
     void attachPrintJobStaticInterface(as_object& o);
-    as_object* getPrintJobInterface();
-
 }
-
-class PrintJob_as : public as_object
-{
-
-public:
-
-    PrintJob_as()
-        :
-        as_object(getPrintJobInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -76,21 +63,10 @@ attachPrintJobStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getPrintJobInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachPrintJobInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 printjob_send(const fn_call& fn)
 {
-    PrintJob_as* ptr = ensure<ThisIs<PrintJob_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -99,7 +75,7 @@ printjob_send(const fn_call& fn)
 as_value
 printjob_start(const fn_call& fn)
 {
-    PrintJob_as* ptr = ensure<ThisIs<PrintJob_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -108,9 +84,7 @@ printjob_start(const fn_call& fn)
 as_value
 printjob_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new PrintJob_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 

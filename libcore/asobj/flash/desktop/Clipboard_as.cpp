@@ -28,7 +28,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
-#include "Object.h"
 
 namespace gnash {
 
@@ -45,7 +44,7 @@ namespace {
 void clipboard_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
+    as_object* proto = gl.createObject();
 
     as_object* cl = gl.createClass(&clipboard_ctor, proto);
 

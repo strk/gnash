@@ -28,7 +28,6 @@
 #include "NativeFunction.h" 
 #include "movie_root.h"
 #include "VM.h"
-#include "Object.h"
 #include "MediaHandler.h" // for setting up embedded video decoder 
 #include "VideoDecoder.h" // for setting up embedded video decoder
 #include "namedStrings.h"

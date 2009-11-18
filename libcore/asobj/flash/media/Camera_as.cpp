@@ -29,9 +29,9 @@
 #include "smart_ptr.h" 
 #include "builtin_function.h" 
 #include "NativeFunction.h" 
-#include "Object.h" 
 #include "MediaHandler.h"
 #include "VideoInput.h"
+#include "Object.h"
 
 #include <sstream>
 
@@ -139,7 +139,8 @@ getCameraInterface()
     static boost::intrusive_ptr<as_object> o;
     if ( ! o )
     {
-        o = new as_object(getObjectInterface());
+        o = new as_object();
+        o->set_prototype(getObjectInterface());
         attachCameraInterface(*o);
     }
     return o.get();
@@ -151,10 +152,10 @@ public:
 
     Camera_as(media::VideoInput* input)
         :
-        as_object(getCameraInterface()),
         _input(input),
         _loopback(false)
     {
+        set_prototype(getCameraInterface());
         assert(input);
     }
 

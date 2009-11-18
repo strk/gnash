@@ -36,20 +36,7 @@ namespace {
     as_value bitmap_ctor(const fn_call& fn);
     void attachBitmapInterface(as_object& o);
     void attachBitmapStaticInterface(as_object& o);
-    as_object* getBitmapInterface();
-
 }
-
-class Bitmap_as : public as_object
-{
-
-public:
-
-    Bitmap_as()
-        :
-        as_object(getBitmapInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachBitmapStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getBitmapInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachBitmapInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 bitmap_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Bitmap_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

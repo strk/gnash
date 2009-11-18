@@ -40,17 +40,6 @@ namespace {
 
 }
 
-class CSMSettings_as : public as_object
-{
-
-public:
-
-    CSMSettings_as()
-        :
-        as_object(getCSMSettingsInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
 void
 csmsettings_class_init(as_object& where, const ObjectURI& uri)
@@ -69,26 +58,12 @@ attachCSMSettingsInterface(as_object& /*o*/)
 void
 attachCSMSettingsStaticInterface(as_object& /*o*/)
 {
-
-}
-
-as_object*
-getCSMSettingsInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachCSMSettingsInterface(*o);
-    }
-    return o.get();
 }
 
 as_value
 csmsettings_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new CSMSettings_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

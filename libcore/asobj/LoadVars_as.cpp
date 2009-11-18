@@ -29,7 +29,6 @@
 #include "as_function.h" // for calling event handlers
 #include "as_value.h" // for setting up a fn_call
 #include "VM.h"
-#include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "PropertyList.h"
 #include "Global_as.h"

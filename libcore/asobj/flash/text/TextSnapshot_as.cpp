@@ -31,7 +31,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" 
 #include "NativeFunction.h"
-#include "Object.h" // for getObjectInterface
 #include "StaticText.h"
 #include "DisplayList.h"
 #include "MovieClip.h"

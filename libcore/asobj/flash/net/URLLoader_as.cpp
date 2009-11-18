@@ -44,35 +44,20 @@ namespace {
     as_value urlloader_ctor(const fn_call& fn);
     void attachURLLoaderInterface(as_object& o);
     void attachURLLoaderStaticInterface(as_object& o);
-    as_object* getURLLoaderInterface();
-
 }
 
-class URLLoader_as : public as_object
-{
-
-public:
-
-    URLLoader_as()
-        :
-        as_object(getURLLoaderInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void urlloader_class_init(as_object& where, const ObjectURI& uri)
+void
+urlloader_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as& gl = getGlobal(where);
-        as_object* proto = getURLLoaderInterface();
-        cl = gl.createClass(&urlloader_ctor, proto);
-        attachURLLoaderStaticInterface(*cl);
-    }
+    Global_as& gl = getGlobal(where);
+    as_object* proto = gl.createObject();
+    attachURLLoaderInterface(*proto);
+    as_object* cl = gl.createClass(&urlloader_ctor, proto);
+    attachURLLoaderStaticInterface(*cl);
 
     // Register _global.URLLoader
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
@@ -97,21 +82,10 @@ attachURLLoaderStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getURLLoaderInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachURLLoaderInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 urlloader_close(const fn_call& fn)
 {
-    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -120,7 +94,7 @@ urlloader_close(const fn_call& fn)
 as_value
 urlloader_load(const fn_call& fn)
 {
-    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -129,7 +103,7 @@ urlloader_load(const fn_call& fn)
 as_value
 urlloader_complete(const fn_call& fn)
 {
-    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -138,7 +112,7 @@ urlloader_complete(const fn_call& fn)
 as_value
 urlloader_httpStatus(const fn_call& fn)
 {
-    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -147,7 +121,7 @@ urlloader_httpStatus(const fn_call& fn)
 as_value
 urlloader_ioError(const fn_call& fn)
 {
-    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -156,7 +130,7 @@ urlloader_ioError(const fn_call& fn)
 as_value
 urlloader_open(const fn_call& fn)
 {
-    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -165,7 +139,7 @@ urlloader_open(const fn_call& fn)
 as_value
 urlloader_progress(const fn_call& fn)
 {
-    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -174,7 +148,7 @@ urlloader_progress(const fn_call& fn)
 as_value
 urlloader_securityError(const fn_call& fn)
 {
-    URLLoader_as* ptr = ensure<ThisIs<URLLoader_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -183,9 +157,7 @@ urlloader_securityError(const fn_call& fn)
 as_value
 urlloader_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new URLLoader_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

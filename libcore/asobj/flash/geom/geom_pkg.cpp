@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "Object.h"
 #include "Global_as.h" 
 #include "as_object.h"
 #include "string_table.h"

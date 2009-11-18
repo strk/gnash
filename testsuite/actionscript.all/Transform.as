@@ -63,14 +63,14 @@ check_equals(typeOf(t), "object");
 check(t instanceOf Transform);
 
 check(t.matrix instanceOf Matrix);
-xcheck(t.concatenatedMatrix instanceOf Matrix);
+check(t.concatenatedMatrix instanceOf Matrix);
 check(t.colorTransform instanceOf ColorTransform);
-xcheck(t.concatenatedColorTransform instanceOf ColorTransform);
+check(t.concatenatedColorTransform instanceOf ColorTransform);
 xcheck(t.pixelBounds instanceOf Rectangle);
 
 check_equals(t.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 check_equals(t.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
-xcheck_equals(t.concatenatedColorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+check_equals(t.concatenatedColorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
 // These vary slightly with the pp
 //check_equals(t.concatenatedMatrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 //check_equals(t.pixelBounds.toString(), "(x=-2, y=48, w=804, h=804)");

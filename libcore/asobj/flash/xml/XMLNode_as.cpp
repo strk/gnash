@@ -23,7 +23,6 @@
 
 #include "xml/XMLNode_as.h"
 #include "xml/XMLDocument_as.h"
-#include "Object.h"
 #include "VM.h"
 #include "log.h"
 #include "fn_call.h"
@@ -34,6 +33,7 @@
 #include "string_table.h"
 #include "PropertyList.h"
 #include "Global_as.h"
+#include "Object.h"
 
 #include <boost/bind.hpp>
 #include <string>
@@ -80,26 +80,23 @@ namespace {
 }
 
 XMLNode_as::XMLNode_as()
-	: as_object(getXMLNodeInterface()),
-    	  _parent(0),
-    	  _attributes(new as_object),
-    	  _type(Element)
+    :
+    _parent(0),
+    _attributes(new as_object),
+    _type(Element)
 {
-    //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
-#ifdef DEBUG_MEMORY_ALLOCATION
-    log_debug(_("\tCreating XMLNode data at %p"), this);
-#endif
+    set_prototype(getXMLNodeInterface());
 }
 
 XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     :
-    as_object(getXMLNodeInterface()),
     _parent(0), // _parent is never implicitly copied
     _attributes(0),
     _name(tpl._name),
     _value(tpl._value),
     _type(tpl._type)
 {
+    set_prototype(getXMLNodeInterface());
     // only clone children if in deep mode
     if (deep) {
         const Children& from=tpl._children;
@@ -452,7 +449,8 @@ getXMLNodeInterface()
 {
     static boost::intrusive_ptr<as_object> o;
     if ( o == NULL ) {
-        o = new as_object(getObjectInterface());
+        o = new as_object();
+        o->set_prototype(getObjectInterface());
         attachXMLNodeInterface(*o);
     }
     return o.get();

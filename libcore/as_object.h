@@ -184,14 +184,6 @@ public:
     /// Construct an ActionScript object with no prototype associated.
     as_object();
 
-    /// \brief
-    /// Construct an ActionScript object based on the given prototype.
-    /// Adds a reference to the prototype, if any.
-    explicit as_object(as_object* proto);
-
-    /// Construct an ActionScript object based on the given prototype.
-    explicit as_object(boost::intrusive_ptr<as_object> proto);
-    
     /// The most common flags for built-in properties.
     //
     /// Most API properties, including classes and objects, have these flags.

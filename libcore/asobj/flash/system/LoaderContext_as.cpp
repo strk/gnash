@@ -36,20 +36,7 @@ namespace {
     as_value loadercontext_ctor(const fn_call& fn);
     void attachLoaderContextInterface(as_object& o);
     void attachLoaderContextStaticInterface(as_object& o);
-    as_object* getLoaderContextInterface();
-
 }
-
-class LoaderContext_as : public as_object
-{
-
-public:
-
-    LoaderContext_as()
-        :
-        as_object(getLoaderContextInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachLoaderContextStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getLoaderContextInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachLoaderContextInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 loadercontext_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new LoaderContext_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

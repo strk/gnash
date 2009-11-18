@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "Object.h" // for getObjectInterface
 #include "as_object.h"
 
 #include "string_table.h"
@@ -27,6 +26,7 @@
 #include "display/BitmapData_as.h"
 #include "namedStrings.h"
 #include "display_pkg.h"
+#include "Global_as.h"
 
 namespace gnash {
 
@@ -35,7 +35,9 @@ get_flash_display_package(const fn_call& fn)
 {
 	log_debug("Loading flash.display package");
 
-    as_object *pkg = new as_object(getObjectInterface());
+    Global_as& gl = getGlobal(fn);
+
+    as_object* pkg = gl.createObject();
     
     string_table& st = getStringTable(fn);
     const string_table::key global = 0;

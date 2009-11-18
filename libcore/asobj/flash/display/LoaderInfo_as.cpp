@@ -47,31 +47,18 @@ namespace {
 
 }
 
-class LoaderInfo_as : public as_object
-{
-
-public:
-
-    LoaderInfo_as()
-        :
-        as_object(getLoaderInfoInterface())
-    {}
-};
-
 // extern (used by Global.cpp)
-void loaderinfo_class_init(as_object& where, const ObjectURI& uri)
+void
+loaderinfo_class_init(as_object& where, const ObjectURI& uri)
 {
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as& gl = getGlobal(where);
-        as_object* proto = getLoaderInfoInterface();
-        cl = gl.createClass(&loaderinfo_ctor, proto);
-        attachLoaderInfoStaticInterface(*cl);
-    }
+    Global_as& gl = getGlobal(where);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&loaderinfo_ctor, proto);
+    attachLoaderInfoInterface(*proto);
+    attachLoaderInfoStaticInterface(*cl);
 
     // Register _global.LoaderInfo
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
+    where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
 }
 
@@ -95,21 +82,10 @@ attachLoaderInfoStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getLoaderInfoInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachLoaderInfoInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 loaderinfo_complete(const fn_call& fn)
 {
-    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -118,7 +94,7 @@ loaderinfo_complete(const fn_call& fn)
 as_value
 loaderinfo_httpStatus(const fn_call& fn)
 {
-    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -127,7 +103,7 @@ loaderinfo_httpStatus(const fn_call& fn)
 as_value
 loaderinfo_init(const fn_call& fn)
 {
-    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -136,7 +112,7 @@ loaderinfo_init(const fn_call& fn)
 as_value
 loaderinfo_ioError(const fn_call& fn)
 {
-    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -145,7 +121,7 @@ loaderinfo_ioError(const fn_call& fn)
 as_value
 loaderinfo_open(const fn_call& fn)
 {
-    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -154,7 +130,7 @@ loaderinfo_open(const fn_call& fn)
 as_value
 loaderinfo_progress(const fn_call& fn)
 {
-    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -163,7 +139,7 @@ loaderinfo_progress(const fn_call& fn)
 as_value
 loaderinfo_unload(const fn_call& fn)
 {
-    LoaderInfo_as* ptr = ensure<ThisIs<LoaderInfo_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -172,9 +148,7 @@ loaderinfo_unload(const fn_call& fn)
 as_value
 loaderinfo_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new LoaderInfo_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); // will keep alive
 }
 
 } // anonymous namespace 

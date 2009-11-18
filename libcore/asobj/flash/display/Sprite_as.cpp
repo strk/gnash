@@ -37,22 +37,8 @@ namespace {
     as_value sprite_ctor(const fn_call& fn);
     void attachSpriteInterface(as_object& o);
     void attachSpriteStaticInterface(as_object& o);
-    as_object* getSpriteInterface();
-
 }
 
-class Sprite_as : public as_object
-{
-
-public:
-
-    Sprite_as()
-        :
-        as_object(getSpriteInterface())
-    {}
-};
-
-// extern (used by Global.cpp)
 void
 sprite_class_init(as_object& where, const ObjectURI& uri)
 {
@@ -74,21 +60,10 @@ attachSpriteStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getSpriteInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSpriteInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 sprite_stopDrag(const fn_call& fn)
 {
-    Sprite_as* ptr = ensure<ThisIs<Sprite_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -97,9 +72,7 @@ sprite_stopDrag(const fn_call& fn)
 as_value
 sprite_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Sprite_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

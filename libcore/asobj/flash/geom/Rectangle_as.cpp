@@ -29,7 +29,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
-#include "Object.h" // for AS inheritance
 #include "VM.h"
 #include "as_value.h"
 #include "namedStrings.h"
@@ -139,7 +138,7 @@ Rectangle_clone(const fn_call& fn)
     fn_call::Args args;
     args += x, y, w, h;
 
-    return ctor->constructInstance(fn.env(), args).get();
+    return ctor->constructInstance(fn.env(), args);
 }
 
 as_value

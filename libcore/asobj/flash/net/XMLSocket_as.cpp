@@ -33,7 +33,6 @@
 #include "builtin_function.h" 
 #include "NativeFunction.h" 
 #include "URLAccessManager.h"
-#include "Object.h" // for getObjectInterface
 #include "Global_as.h" 
 #include "log.h"
 

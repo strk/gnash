@@ -21,7 +21,6 @@
 #include "VM.h"
 #include "fn_call.h"
 #include "namedStrings.h"
-#include "Object.h" // for getObjectInterface
 #include "flash_pkg.h"
 #include "display/display_pkg.h"
 #include "external/external_pkg.h"
@@ -29,6 +28,7 @@
 #include "geom/geom_pkg.h"
 #include "net/net_pkg.h"
 #include "text/text_pkg.h"
+#include "Global_as.h"
 
 namespace gnash {
 
@@ -38,7 +38,9 @@ class as_object;
 static as_value
 get_flash_package(const fn_call& fn)
 {
-    as_object *pkg = new as_object(getObjectInterface());
+    Global_as& gl = getGlobal(fn);
+
+    as_object* pkg = gl.createObject();
     
     string_table& st = getStringTable(fn);
 

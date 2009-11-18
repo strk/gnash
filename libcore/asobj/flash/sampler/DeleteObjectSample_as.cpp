@@ -36,20 +36,7 @@ namespace {
     as_value deleteobjectsample_ctor(const fn_call& fn);
     void attachDeleteObjectSampleInterface(as_object& o);
     void attachDeleteObjectSampleStaticInterface(as_object& o);
-    as_object* getDeleteObjectSampleInterface();
-
 }
-
-class DeleteObjectSample_as : public as_object
-{
-
-public:
-
-    DeleteObjectSample_as()
-        :
-        as_object(getDeleteObjectSampleInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachDeleteObjectSampleStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getDeleteObjectSampleInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachDeleteObjectSampleInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 deleteobjectsample_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new DeleteObjectSample_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

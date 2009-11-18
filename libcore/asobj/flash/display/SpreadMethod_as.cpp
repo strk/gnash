@@ -27,7 +27,6 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" 
-#include "Object.h" 
 
 /// The flash.display.SpreadMethod class is AS3 only. It enumerates
 /// constants for use in other classes.

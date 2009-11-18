@@ -1667,11 +1667,11 @@ check_equals(props.toString(), "pixelBounds,concatenatedColorTransform,colorTran
 check_equals(typeof(_root.transform.colorTransform), 'object');
 // TODO: test colorTransform
 
-xcheck_equals(typeof(_root.transform.concatenatedColorTransform), 'object');
+check_equals(typeof(_root.transform.concatenatedColorTransform), 'object');
 // TODO: test concatenatedColorTransform
 
-xcheck_equals(typeof(_root.transform.concatenatedMatrix), 'object');
-xcheck(_root.transform.concatenatedMatrix instanceOf Matrix);
+check_equals(typeof(_root.transform.concatenatedMatrix), 'object');
+check(_root.transform.concatenatedMatrix instanceOf Matrix);
 
 check_equals(typeof(_root.transform.matrix), 'object');
 check(_root.transform.matrix instanceOf Matrix);

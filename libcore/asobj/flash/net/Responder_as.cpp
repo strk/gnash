@@ -36,20 +36,7 @@ namespace {
     as_value responder_ctor(const fn_call& fn);
     void attachResponderInterface(as_object& o);
     void attachResponderStaticInterface(as_object& o);
-    as_object* getResponderInterface();
-
 }
-
-class Responder_as : public as_object
-{
-
-public:
-
-    Responder_as()
-        :
-        as_object(getResponderInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachResponderStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getResponderInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachResponderInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 responder_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Responder_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

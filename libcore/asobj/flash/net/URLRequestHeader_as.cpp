@@ -36,20 +36,7 @@ namespace {
     as_value urlrequestheader_ctor(const fn_call& fn);
     void attachURLRequestHeaderInterface(as_object& o);
     void attachURLRequestHeaderStaticInterface(as_object& o);
-    as_object* getURLRequestHeaderInterface();
-
 }
-
-class URLRequestHeader_as : public as_object
-{
-
-public:
-
-    URLRequestHeader_as()
-        :
-        as_object(getURLRequestHeaderInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachURLRequestHeaderStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getURLRequestHeaderInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachURLRequestHeaderInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 urlrequestheader_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new URLRequestHeader_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 
