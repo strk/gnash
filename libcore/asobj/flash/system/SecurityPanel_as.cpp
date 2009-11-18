@@ -36,20 +36,7 @@ namespace {
     as_value securitypanel_ctor(const fn_call& fn);
     void attachSecurityPanelInterface(as_object& o);
     void attachSecurityPanelStaticInterface(as_object& o);
-    as_object* getSecurityPanelInterface();
-
 }
-
-class SecurityPanel_as : public as_object
-{
-
-public:
-
-    SecurityPanel_as()
-        :
-        as_object(getSecurityPanelInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachSecurityPanelStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getSecurityPanelInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachSecurityPanelInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 securitypanel_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new SecurityPanel_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -38,20 +38,7 @@ namespace {
     as_value ime_ctor(const fn_call& fn);
     void attachIMEInterface(as_object& o);
     void attachIMEStaticInterface(as_object& o);
-    as_object* getIMEInterface();
-
 }
-
-class IME_as : public as_object
-{
-
-public:
-
-    IME_as()
-        :
-        as_object(getIMEInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -76,21 +63,10 @@ attachIMEStaticInterface(as_object& /*o*/)
 {
 }
 
-as_object*
-getIMEInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIMEInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 ime_setCompositionString(const fn_call& fn)
 {
-    IME_as* ptr = ensure<ThisIs<IME_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -99,7 +75,7 @@ ime_setCompositionString(const fn_call& fn)
 as_value
 ime_imeComposition(const fn_call& fn)
 {
-    IME_as* ptr = ensure<ThisIs<IME_as> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
@@ -108,9 +84,7 @@ ime_imeComposition(const fn_call& fn)
 as_value
 ime_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new IME_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value(); 
 }
 
 } // anonymous namespace 
