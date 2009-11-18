@@ -36,22 +36,9 @@ namespace {
     as_value objectencoding_ctor(const fn_call& fn);
     void attachObjectEncodingInterface(as_object& o);
     void attachObjectEncodingStaticInterface(as_object& o);
-    as_object* getObjectEncodingInterface();
-
 }
 
-class ObjectEncoding_as : public as_object
-{
 
-public:
-
-    ObjectEncoding_as()
-        :
-        as_object(getObjectEncodingInterface())
-    {}
-};
-
-// extern (used by Global.cpp)
 void
 objectencoding_class_init(as_object& where, const ObjectURI& uri)
 {
@@ -72,23 +59,10 @@ attachObjectEncodingStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getObjectEncodingInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachObjectEncodingInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 objectencoding_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new ObjectEncoding_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

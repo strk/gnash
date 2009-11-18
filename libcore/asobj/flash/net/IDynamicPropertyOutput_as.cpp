@@ -36,20 +36,7 @@ namespace {
     as_value idynamicpropertyoutput_ctor(const fn_call& fn);
     void attachIDynamicPropertyOutputInterface(as_object& o);
     void attachIDynamicPropertyOutputStaticInterface(as_object& o);
-    as_object* getIDynamicPropertyOutputInterface();
-
 }
-
-class IDynamicPropertyOutput_as : public as_object
-{
-
-public:
-
-    IDynamicPropertyOutput_as()
-        :
-        as_object(getIDynamicPropertyOutputInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +59,10 @@ attachIDynamicPropertyOutputStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getIDynamicPropertyOutputInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachIDynamicPropertyOutputInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 idynamicpropertyoutput_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new IDynamicPropertyOutput_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 
