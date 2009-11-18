@@ -49,7 +49,7 @@
 #include "namedStrings.h"
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
-#include "TextFormat_as.h"
+#include "flash/text/TextFormat_as.h"
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
 #include "Global_as.h"

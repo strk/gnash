@@ -42,7 +42,6 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Selection_as.cpp \
 	asobj/QName_as.cpp \
 	asobj/Namespace_as.cpp \
-	asobj/TextFormat_as.cpp \
 	asobj/MovieClipLoader.cpp\
 	asobj/String_as.cpp \
 	asobj/LoadableObject.cpp \
@@ -64,7 +63,6 @@ noinst_HEADERS += \
 	asobj/Number_as.h \
 	asobj/PlayHead.h \
 	asobj/Selection_as.h \
-	asobj/TextFormat_as.h \
 	asobj/String_as.h \
 	asobj/LoadableObject.h \
 	asobj/QName_as.h \

@@ -74,7 +74,6 @@ libgnashasobjs_la_SOURCES = \
 	PlayHead.cpp \
 	Selection_as.cpp \
 	Namespace_as.cpp \
-	TextFormat_as.cpp \
 	TextSnapshot_as.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
@@ -101,7 +100,6 @@ noinst_HEADERS = \
 	Number_as.h \
 	PlayHead.h \
 	Selection_as.h \
-	TextFormat_as.h \
 	TextSnapshot_as.h \
 	String_as.h \
 	LoadableObject.h \
