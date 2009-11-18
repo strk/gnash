@@ -284,28 +284,6 @@ as_object::as_object()
 {
 }
 
-as_object::as_object(as_object* proto)
-	:
-    _displayObject(0),
-    _array(false),
-    _relay(0),
-	_vm(VM::get()),
-	_members(_vm)
-{
-	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
-}
-
-as_object::as_object(boost::intrusive_ptr<as_object> proto)
-	:
-    _displayObject(0),
-    _array(false),
-    _relay(0),
-	_vm(VM::get()),
-	_members(_vm)
-{
-	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
-}
-
 std::pair<bool,bool>
 as_object::delProperty(string_table::key name, string_table::key nsname)
 {
