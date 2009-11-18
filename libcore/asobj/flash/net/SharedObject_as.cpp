@@ -809,7 +809,8 @@ getSharedObjectInterface()
 
     static boost::intrusive_ptr<as_object> o;
     if ( ! o ) {
-        o = new as_object(getObjectInterface());
+        o = new as_object();
+        o->set_prototype(getObjectInterface());
         attachSharedObjectInterface(*o);
     }
     return o.get();
@@ -1134,10 +1135,12 @@ readSOL(VM& vm, const std::string& filespec)
 
 #ifdef BUFFERED_AMF_SOL
 
+    Global_as& gl = *vm.getGlobal();
+
     // The 'data' member is initialized only on getLocal() (and probably
     // getRemote()): i.e. when there is some data, or when it's ready to
     // be added.
-    as_object* data = new as_object(getObjectInterface());
+    as_object* data = gl.createObject();
 
     struct stat st;
 

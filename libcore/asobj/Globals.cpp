@@ -200,7 +200,9 @@ AVM2Global::registerClasses()
 as_object*
 AVM1Global::createObject()
 {
-    return new as_object(getObjectInterface());
+    as_object* obj = new as_object();
+    obj->set_prototype(getObjectInterface());
+    return obj;
 }
 
 builtin_function*
@@ -284,7 +286,9 @@ AVM1Global::createBoolean(bool b)
 as_object*
 AVM2Global::createObject()
 {
-    return new as_object(getObjectInterface());
+    as_object* obj = new as_object();
+    obj->set_prototype(getObjectInterface());
+    return obj;
 }
 
 builtin_function*
