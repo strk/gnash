@@ -36,7 +36,6 @@
 #include "GnashNumeric.h"
 #include "Global_as.h"
 #include "utf8.h"
-#include "LoadableObject.h"
 #include "IOChannel.h"
 
 #include <boost/algorithm/string/replace.hpp>
@@ -1569,7 +1568,8 @@ movie_root::executeAdvanceCallbacks()
     }
 
     if (!_loadCallbacks.empty()) {
-        _loadCallbacks.remove_if(processLoad);
+        _loadCallbacks.remove_if(
+                std::mem_fun_ref(&movie_root::LoadCallback::processLoad));
     }
 
     processActionQueue();
@@ -1660,10 +1660,8 @@ movie_root::markReachableResources() const
     std::for_each(_objectCallbacks.begin(), _objectCallbacks.end(),
             std::mem_fun(&ActiveRelay::setReachable));
 
-    for (LoadCallbacks::const_iterator i = _loadCallbacks.begin(),
-            e = _loadCallbacks.end(); i != e; ++i) {
-        i->obj->setReachable();
-    }
+    std::for_each(_loadCallbacks.begin(), _loadCallbacks.end(),
+            std::mem_fun_ref(&movie_root::LoadCallback::setReachable));
 
     // Mark LoadMovieRequest handlers as reachable
     _movieLoader.setReachable();
@@ -2211,6 +2209,89 @@ stringToStageAlign(const std::string& str)
 
 }
 
+void
+movie_root::LoadCallback::setReachable() const
+{
+    _obj->setReachable();
+}
+
+bool
+movie_root::LoadCallback::processLoad()
+{
+
+    if (!_stream) {
+        callMethod(_obj, NSV::PROP_ON_DATA, as_value());
+        return true;
+    }
+
+    const size_t chunksize = 65535;
+    uint8_t chunk[chunksize];
+
+    size_t actuallyRead = _stream->readNonBlocking(chunk, chunksize);
+
+    // We must still call onData if the stream is in error condition, e.g.
+    // when an HTTP 404 error is returned.
+    if (_stream->bad()) {
+        callMethod(_obj, NSV::PROP_ON_DATA, as_value());
+        return true;
+    }
+
+    if (actuallyRead) {
+
+        // set total size only on first read
+        if (_buf.empty()) {
+            _obj->set_member(NSV::PROP_uBYTES_TOTAL, _stream->size());
+        }
+
+        _buf.append(chunk, actuallyRead);
+
+        _obj->set_member(NSV::PROP_uBYTES_LOADED, _buf.size());
+
+        log_debug("LoadableObject Loaded %d bytes, reaching %d/%d",
+            actuallyRead, _buf.size(), _stream->size());
+    }
+
+    // We haven't finished till EOF 
+    if (!_stream->eof()) return false;
+
+    log_debug("LoadableObject reached EOF (%d/%d loaded)",
+                _buf.size(), _stream->size());
+
+    // got nothing, won't bother BOFs of nulls
+    if (_buf.empty()) {
+        callMethod(_obj, NSV::PROP_ON_DATA, as_value());
+        return true;
+    }
+
+    // Terminate the string
+    _buf.appendByte('\0');
+
+    // Strip BOM, if any.
+    // See http://savannah.gnu.org/bugs/?19915
+    utf8::TextEncoding encoding;
+    size_t size = _buf.size();
+
+    // NOTE: the call below will possibly change 'size' parameter
+    char* bufptr = utf8::stripBOM((char*)_buf.data(), size, encoding);
+    if (encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED) {
+        log_unimpl("%s to utf8 conversion in LoadableObject input parsing", 
+                utf8::textEncodingName(encoding));
+    }
+
+    // NOTE: Data copy here !!
+    as_value dataVal(bufptr); 
+
+    // NOTE: we could release memory associated
+    // with the buffer here, before invoking a new method,
+    // but at the time of writing there's no method of SimpleBuffer
+    // providing memory release except destruction. Will be
+    // destroyed as soon as we return though...
+
+    // NOTE: Another data copy here !
+    callMethod(_obj, NSV::PROP_ON_DATA, dataVal);
+
+    return true;
+}
 
 namespace {
 
