@@ -50,15 +50,8 @@ namespace {
 void
 urlloader_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
-    attachURLLoaderInterface(*proto);
-    as_object* cl = gl.createClass(&urlloader_ctor, proto);
-    attachURLLoaderStaticInterface(*cl);
-
-    // Register _global.URLLoader
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, urlloader_ctor, attachURLLoaderInterface,
+            attachURLLoaderStaticInterface, uri);
 }
 
 namespace {

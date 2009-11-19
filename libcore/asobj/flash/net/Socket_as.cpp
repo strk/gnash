@@ -74,15 +74,8 @@ namespace {
 void
 socket_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
-    attachSocketInterface(*proto);
-    as_object* cl = gl.createClass(&socket_ctor, proto);
-    attachSocketStaticInterface(*cl);
-
-    // Register _global.Socket
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, socket_ctor, attachSocketInterface,
+            attachSocketStaticInterface, uri);
 }
 
 namespace {
