@@ -1359,6 +1359,14 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
     }
 }
 
+
+/// Implements the "implements" opcode
+//
+/// Example AS code: "C implements B;"
+//
+/// The above code makes an instance of C ("var c = new C();") return true
+/// for "c instanceOf B);". That seems to be the end of its usefulness, as
+/// c inherits no properties from B.
 void
 SWFHandlers::ActionImplementsOp(ActionExec& thread)
 {
@@ -1431,7 +1439,7 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
             log_action("%s (with .prototype %p) implements %s (with "
                 ".prototype %p)", objval, (void*)obj, ctorval, (void*)inter);
         );
-        obj->add_interface(inter);
+        obj->addInterface(inter);
     }
 }
 
