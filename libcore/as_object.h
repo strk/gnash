@@ -1078,7 +1078,7 @@ private:
     std::list<as_object*> mInterfaces;
 
     typedef std::map<ObjectURI, Trigger> TriggerContainer;
-    TriggerContainer _trigs;
+    boost::scoped_ptr<TriggerContainer> _trigs;
 };
 
 /// Function objects for visiting properties.
