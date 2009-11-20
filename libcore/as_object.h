@@ -1082,7 +1082,7 @@ private:
     //
     /// There is no need to use a complex container as the list of 
     /// interfaces is generally small and the opcode rarely used anyway.
-    std::list<as_object*> _interfaces;
+    std::vector<as_object*> _interfaces;
 
     typedef std::map<ObjectURI, Trigger> TriggerContainer;
     boost::scoped_ptr<TriggerContainer> _trigs;

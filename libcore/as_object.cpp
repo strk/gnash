@@ -1213,11 +1213,11 @@ as_object::markAsObjectReachable() const
         }
     }
 
-    /// Mark interfaces reachable.
+    // Mark interfaces reachable.
     std::for_each(_interfaces.begin(), _interfaces.end(), 
             std::mem_fun(&as_object::setReachable));
 
-    /// Proxy objects can contain references to other as_objects.
+    // Proxy objects can contain references to other as_objects.
     if (_relay) _relay->setReachable();
     if (_displayObject) _displayObject->setReachable();
 }
