@@ -295,35 +295,33 @@ void
 as_object::add_property(const std::string& name, as_function& getter,
 		as_function* setter)
 {
-	string_table &st = getStringTable(*this);
+	string_table& st = getStringTable(*this);
 	string_table::key k = st.find(name);
 
 	as_value cacheVal;
 
 	Property* prop = _members.getProperty(k);
-	if ( prop )
-	{
-		cacheVal = prop->getCache();
 
+    if (prop) {
+		cacheVal = prop->getCache();
         // Used to return the return value of addGetterSetter, but this
         // is always true.
 		_members.addGetterSetter(k, getter, setter, cacheVal);
-
         return;
 		// NOTE: watch triggers not called when adding a new
         // getter-setter property
 	}
-	else
-	{
+	else {
 
 		_members.addGetterSetter(k, getter, setter, cacheVal);
 
-#if 1
+        // Nothing more to do if there are no triggers.
+        if (!_trigs.get()) return;
+
 		// check if we have a trigger, if so, invoke it
 		// and set val to its return
-		TriggerContainer::iterator trigIter = _trigs.find(ObjectURI(k, 0));
-		if ( trigIter != _trigs.end() )
-		{
+		TriggerContainer::iterator trigIter = _trigs->find(ObjectURI(k, 0));
+		if (trigIter != _trigs->end()) {
 			Trigger& trig = trigIter->second;
 
 			log_debug("add_property: property %s is being watched, "
@@ -334,15 +332,13 @@ as_object::add_property(const std::string& name, as_function& getter,
 			// so we check for its existence again, and do NOT put
 			// it back in if it was deleted
 			prop = _members.getProperty(k);
-			if ( ! prop )
-			{
+			if (!prop) {
 				log_debug("Property %s deleted by trigger on create "
                         "(getter-setter)", name);
 				return;
 			}
 			prop->setCache(cacheVal);
 		}
-#endif
 		return;
 	}
 }
@@ -591,10 +587,12 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
 {
 
     // check if we have a trigger, if so, invoke it
-    // and set val to it's return
-    TriggerContainer::iterator trigIter = _trigs.find(uri);
+    // and set val to its return
+    TriggerContainer::iterator trigIter;
     
-    if (trigIter == _trigs.end()) {
+    // If there are no triggers or the trigger is not found, just set
+    // the property.
+    if (!_trigs.get() || (trigIter = _trigs->find(uri)) == _trigs->end()) {
         if (prop) {
             prop->setValue(*this, val);
             prop->clearVisible(getSWFVersion(*this));
@@ -605,7 +603,7 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     Trigger& trig = trigIter->second;
 
     if (trig.dead()) {
-        _trigs.erase(trigIter);
+        _trigs->erase(trigIter);
         return;
     }
 
@@ -622,7 +620,7 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     as_value newVal = trig.call(curVal, val, *this);
     
     // This is a particularly clear and concise way of removing dead triggers.
-    EraseIf(_trigs, boost::bind(boost::mem_fn(&Trigger::dead), 
+    EraseIf(*_trigs, boost::bind(boost::mem_fn(&Trigger::dead), 
             boost::bind(SecondElement<TriggerContainer::value_type>(), _1)));
                     
     // The trigger call could have deleted the property,
@@ -1167,10 +1165,12 @@ as_object::watch(string_table::key key, as_function& trig,
 	ObjectURI k(key, ns);
 	std::string propname = getStringTable(*this).value(key);
 
-	TriggerContainer::iterator it = _trigs.find(k);
-	if (it == _trigs.end())
+    if (!_trigs.get()) _trigs.reset(new TriggerContainer);
+
+	TriggerContainer::iterator it = _trigs->find(k);
+	if (it == _trigs->end())
 	{
-		return _trigs.insert(
+		return _trigs->insert(
                 std::make_pair(k, Trigger(propname, trig, cust))).second;
 	}
 	it->second = Trigger(propname, trig, cust);
@@ -1180,16 +1180,16 @@ as_object::watch(string_table::key key, as_function& trig,
 bool
 as_object::unwatch(string_table::key key, string_table::key ns)
 {
-	TriggerContainer::iterator trigIter = _trigs.find(ObjectURI(key, ns));
-	if ( trigIter == _trigs.end() )
-	{
+    if (!_trigs.get()) return false; 
+
+	TriggerContainer::iterator trigIter = _trigs->find(ObjectURI(key, ns));
+	if (trigIter == _trigs->end()) {
 		log_debug("No watch for property %s",
                 getStringTable(*this).value(key));
 		return false;
 	}
 	Property* prop = _members.getProperty(key, ns);
-	if ( prop && prop->isGetterSetter() )
-	{
+	if (prop && prop->isGetterSetter()) {
 		log_debug("Watch on %s not removed (is a getter-setter)",
                 getStringTable(*this).value(key));
 		return false;
@@ -1204,11 +1204,13 @@ as_object::markAsObjectReachable() const
 {
 	_members.setReachable();
 
-	for (TriggerContainer::const_iterator it = _trigs.begin();
-			it != _trigs.end(); ++it)
-	{
-		it->second.setReachable();
-	}
+    if (_trigs.get()) {
+        for (TriggerContainer::const_iterator it = _trigs->begin();
+                it != _trigs->end(); ++it)
+        {
+            it->second.setReachable();
+        }
+    }
 
     /// Proxy objects can contain references to other as_objects.
     if (_relay) _relay->setReachable();
@@ -1229,12 +1231,12 @@ Trigger::call(const as_value& oldval, const as_value& newval,
 {
     assert(!_dead);
 
-	if ( _executing ) return newval;
+	if (_executing) return newval;
 
 	_executing = true;
 
 	try {
-		as_environment env(VM::get()); // TODO: get VM in some other way 
+		as_environment env(getVM(this_obj));
 
         fn_call::Args args;
         args += _propname, oldval, newval, _customArg;
@@ -1248,8 +1250,7 @@ Trigger::call(const as_value& oldval, const as_value& newval,
 		return ret;
 
 	}
-	catch (GnashException&)
-	{
+	catch (GnashException&) {
 		_executing = false;
 		throw;
 	}
