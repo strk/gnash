@@ -752,37 +752,23 @@ MovieClip::setTextFieldVariables(string_table::key name, const as_value& val,
         string_table::key /*nsname*/)
 {
 
-    bool found = false;
-
     // Try textfield variables
     //
     // FIXME: Turn textfield variables into Getter/Setters (Properties)
-    //                so that as_object::set_member will do this automatically.
-    //                The problem is that setting a TextVariable named after
-    //                a builtin property will prevent *any* setting for the
-    //                property (ie: have a textfield use _x as variable name and
-    //                be scared)
-    //
-    TextFields* etc = get_textfield_variable(getStringTable(*getObject(this)).value(name));
-    if ( etc )
-    {
-#ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("it's a Text Variable, associated with %d TextFields"), etc->size());
-#endif
-        for (TextFields::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
-        {
-            (*i)->updateText(val.to_string());
-        }
-        found = true;
-    }
-#ifdef DEBUG_DYNTEXT_VARIABLES
-    else
-    {
-        log_debug(_("it's NOT a Text Variable"));
-    }
-#endif
+    //           so that as_object::set_member will do this automatically.
+    //           The problem is that setting a TextVariable named after
+    //           a builtin property will prevent *any* setting for the
+    //           property (ie: have a textfield use _x as variable name and
+    //           be scared)
+    TextFields* etc = get_textfield_variable(
+            getStringTable(*getObject(this)).value(name));
 
-    return found;
+    if (!etc) return false;
+
+    for (TextFields::iterator i=etc->begin(), e=etc->end(); i!=e; ++i) {
+        (*i)->updateText(val.to_string());
+    }
+    return true;
 }
 
 /// Remove the 'contents' of the MovieClip, but leave properties and
