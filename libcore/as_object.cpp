@@ -711,10 +711,6 @@ as_object::set_member(string_table::key key, const as_value& val,
 		return true;
 	}
 
-    // Return true if we found a textfield variable, even if it was not
-    // an own property.
-    if (tfVarFound) return true;
-
 	// Else, add new property...
 	if (ifFound) return false;
 
@@ -729,6 +725,9 @@ as_object::set_member(string_table::key key, const as_value& val,
 	}
 
     executeTriggers(prop, uri, val);
+
+    // Return true if we found a textfield variable.
+    if (tfVarFound) return true;
 
 	return false;
 }
