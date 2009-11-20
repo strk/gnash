@@ -310,8 +310,6 @@ AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
         prototype->init_member(NSV::PROP_CONSTRUCTOR, cl); 
         cl->init_member(NSV::PROP_PROTOTYPE, prototype);
     }
-    cl->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor());
     return cl;
 }
 

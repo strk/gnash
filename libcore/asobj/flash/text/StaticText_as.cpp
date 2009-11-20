@@ -43,15 +43,8 @@ namespace {
 void
 statictext_class_init(as_object& where, const ObjectURI& uri)
 {
-    Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
-    as_object* cl = gl.createClass(&statictext_ctor, proto);
-    attachStaticTextInterface(*proto);
-    attachStaticTextStaticInterface(*cl);
-
-    // Register _global.StaticText
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    registerBuiltinClass(where, statictext_ctor, attachStaticTextInterface,
+            attachStaticTextStaticInterface, uri);
 }
 
 namespace {

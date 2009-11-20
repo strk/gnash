@@ -36,8 +36,6 @@ void registerLoadableNative(as_object& global);
 /// This implements built-in functions.
 void attachLoadableInterface(as_object& where, int flags);
 
-bool processLoad(movie_root::LoadCallbacks::value_type& v);
-
 }
 
 #endif

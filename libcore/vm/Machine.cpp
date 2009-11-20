@@ -1524,8 +1524,7 @@ Machine::execute()
                     
                     as_object* obj = _stack.top(argc).to_object(*_global);
 
-                    // Using get_super() here fails; is it broken, or is
-                    // prototype what we want?
+                    // Is get_prototype what we want?
                     as_object* super = obj ? obj->get_prototype() : 0;
                     log_abc("CONSTRUCTSUPER: object %s, super %s, args %s",
                             _stack.top(argc), super, argc);
@@ -1715,11 +1714,6 @@ Machine::execute()
                     // What if there isn't one?
                     assert(scmethod);
                     
-                    /// This can be null.
-                    as_function* static_constructor = scmethod->getPrototype();
-                    new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,
-                            as_value(static_constructor), 0);
-                    
                     as_function* ctor = c->getConstructor()->getPrototype();
                     new_class->init_member(NSV::PROP_CONSTRUCTOR, ctor, 0);
 
@@ -1728,14 +1722,15 @@ Machine::execute()
                     // Call the class's static constructor (which may be
                     // undefined).
                     as_environment env = as_environment(_vm);
-                    as_value property = new_class->getMember(
-                            NSV::PROP_uuCONSTRUCTORuu, 0);
 
+                    /// This can be null.
+                    as_function* staticCtor = scmethod->getPrototype();
+                    
+                    // We don't care about the return.
                     fn_call::Args args;
-                    as_value value = invoke(property, env, new_class,
-                            args);
+                    invoke(staticCtor, env, new_class, args);
 
-                    log_abc("NEWCLASS(%2%) finished. Return: %1%", value,
+                    log_abc("NEWCLASS(%1%) finished.",
                             mST.value(c->getName()));
 
                     break;

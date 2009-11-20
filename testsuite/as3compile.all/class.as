@@ -57,7 +57,7 @@ package hello {
 
             xcheck_equals(S, "[class S]");
             xcheck_equals(S.constructor, "[class Class]");
-            xcheck_equals(S.__constructor__, undefined);
+            check_equals(S.__constructor__, undefined);
             
             check_equals(S.s, null);
             xcheck_equals(typeof(S.s), "object");
@@ -74,8 +74,8 @@ package hello {
 
             xcheck_equals(Derived.constructor, "[class Class]");
             xcheck_equals(Base.constructor, "[class Class]");
-            xcheck_equals(Derived.__constructor__, undefined);
-            xcheck_equals(Base.__constructor__, undefined);
+            check_equals(Derived.__constructor__, undefined);
+            check_equals(Base.__constructor__, undefined);
 
             // Objects are objects in AS3, not functions.
             check_equals(typeof(Base), "object");

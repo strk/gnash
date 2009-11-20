@@ -147,12 +147,19 @@ class DSOEXPORT movie_root : boost::noncopyable
 
 public:
 
-    struct LoadCallback {
-        boost::shared_ptr<IOChannel> stream;
-        as_object* obj;
-        SimpleBuffer buf;
+    class LoadCallback {
+    public:
         LoadCallback(boost::shared_ptr<IOChannel> s, as_object* o)
-            : stream(s), obj(o) {}
+            :
+            _stream(s),
+            _obj(o)
+        {}
+        bool processLoad();
+        void setReachable() const;
+    private:
+        boost::shared_ptr<IOChannel> _stream;
+        SimpleBuffer _buf;
+        as_object* _obj;
     };
         
     typedef std::list<LoadCallback> LoadCallbacks;
