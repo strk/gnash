@@ -171,9 +171,16 @@ enum TagType
 
     DEFINESCENEANDFRAMELABELDATA = 86,
 
+    /// http://www.m2osw.com/en/swf_alexref.html#tag_definebinarydata
+    DEFINEBINARYDATA      = 87,
+
+    /// http://www.m2osw.com/en/swf_alexref.html#tag_definefontname
     DEFINEFONTNAME        = 88,	
 
     STARTSOUND2           = 89,
+
+    /// (SWF10) http://www.m2osw.com/en/swf_alexref.html#tag_definebitsjpeg4
+    DEFINEBITSJPEG4       = 90,
 
     REFLEX                = 777,
 
