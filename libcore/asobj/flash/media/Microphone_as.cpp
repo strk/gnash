@@ -146,7 +146,7 @@ public:
 
 	Microphone_as()
 	{
-        set_prototype(getCameraInterface());
+        set_prototype(getMicrophoneInterface());
         attachMicrophoneProperties(*get_prototype());
     }
 
