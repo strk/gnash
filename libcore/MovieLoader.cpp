@@ -171,9 +171,9 @@ log_debug("waking up loader thread");
 #endif
         requestsLock.unlock(); // allow the thread to die
 
-log_debug("notified, joining");
+log_debug("MovieLoader notified, joining");
         _thread->join();
-log_debug("joined");
+log_debug("MovieLoader joined");
         _thread.reset();
     }
 
