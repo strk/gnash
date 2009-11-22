@@ -33,17 +33,19 @@ AC_DEFUN([GNASH_PATH_QT4], [
     fi
   ])				dnl end of cache ac_cv_path_qt4_incl
 
-  dnl Only run these tests if this version was specified by the user, and they
-  dnl haven't spcified a custom path.
-  if test x"${build_qt4}" = xyes -a x"${ac_cv_path_qt4_incl}" = x; then
-    dnl if QTDIR is set in the users environment, use that, as that's what
-    dnl most QT programmers do, as it's required by the QT build system.
-    if test x$QTDIR != x; then
-      if test -f $QTDIR/include/QtCore/qobject.h; then
-        qt_base=`basename $QTDIR`
-        dnl Only support version 4 in this file.
-        if test x"${qt_base}" != x"qt4"; then
-          AC_MSG_ERROR([Mismatched QT versions! Reset QTDIR in your environment!])
+  dnl Only run these tests if this version was specified by the user.
+  if test x"${build_qt4}" = xyes; then
+
+    if test x"${ac_cv_path_qt4_incl}" = x; then
+      dnl if QTDIR is set in the users environment, use that, as that's what
+      dnl most QT programmers do, as it's required by the QT build system.
+      if test x$QTDIR != x; then
+        if test -f $QTDIR/include/QtCore/qobject.h; then
+          qt_base=`basename $QTDIR`
+          dnl Only support version 4 in this file.
+          if test x"${qt_base}" != x"qt4"; then
+            AC_MSG_ERROR([Mismatched QT versions! Reset QTDIR in your environment!])
+          fi
         fi
       fi
     fi
