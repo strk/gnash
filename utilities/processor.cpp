@@ -115,16 +115,9 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 #endif
 }
 
-struct movie_data
-{
-    gnash::movie_definition* m_movie;
-    std::string	m_filename;
-};
-
-static boost::intrusive_ptr<gnash::movie_definition> play_movie(
+static bool play_movie(
         const std::string& filename, const RunResources& runResources);
 
-static bool s_do_output = false;
 static bool s_stop_on_errors = true;
 
 // How many time do we allow to hit the end ?
@@ -275,15 +268,12 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity();
     }
 
-    while ((c = getopt (argc, argv, ":hwvapr:gf:d:n")) != -1) {
+    while ((c = getopt (argc, argv, ":hvapr:gf:d:n")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
               dbglogfile.removeLog();
 	      exit(EXIT_SUCCESS);
-	  case 'w':
-	      s_do_output = true;
-	      break;
 	  case 'v':
 	      dbglogfile.setVerbosity();
 	      log_debug (_("Verbose output turned on"));
@@ -376,8 +366,6 @@ main(int argc, char *argv[])
 
     boost::shared_ptr<StreamProvider> sp(new StreamProvider);
 
-    std::vector<movie_data>	data;
-        
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
@@ -392,9 +380,8 @@ main(int argc, char *argv[])
         runResources.setStreamProvider(sp);
         runResources.setTagLoaders(loaders);
 
-	    boost::intrusive_ptr<gnash::movie_definition> m =
-            play_movie(*i, runResources);
-	    if (!m) {
+	    bool success = play_movie(*i, runResources);
+	    if (!success) {
 	        if (s_stop_on_errors) {
 		    // Fail.
                 std::cerr << "error playing through movie " << *i << std::endl;
@@ -402,12 +389,7 @@ main(int argc, char *argv[])
 	        }
         }
 	
-        movie_data	md;
-        md.m_movie = m.get();
-        md.m_filename = *i;
-        data.push_back(md);
     }
-    
     
     return 0;
 }
@@ -416,15 +398,12 @@ main(int argc, char *argv[])
 // I.e. run through and render all the frames, even though we are not
 // actually doing any output (our output handlers are disabled).
 //
-// What this does is warm up all the cached data in the movie, so that
-// if we save that data for later, we won't have to tesselate shapes
-// or build font textures again.
-//
-// Return the movie definition.
-boost::intrusive_ptr<gnash::movie_definition>
+bool
 play_movie(const std::string& filename, const RunResources& runResources)
 {
     boost::intrusive_ptr<gnash::movie_definition> md;
+
+    quitrequested = false;
 
     URL url(filename);
 
@@ -461,7 +440,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     }
     if (md == NULL) {
         std::cerr << "error: can't play movie: "<< filename << std::endl;
-	    std::exit(EXIT_FAILURE);
+	    return false;
     }
 
     float fps = md->get_frame_rate();
@@ -487,12 +466,6 @@ play_movie(const std::string& filename, const RunResources& runResources)
     MovieClip::MovieVariables v;
     m.init(md.get(), v);
 
-    if (quitrequested) {
-        // setRootMovie would execute actions in first frame
-        quitrequested = false;
-        return md;
-    }
-
     log_debug("iteration, timer: %lu, localDelay: %ld\n",
             cl.elapsed(), localDelay);
     gnashSleep(localDelay);
@@ -505,7 +478,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     size_t end_hitcount=0;
     size_t nadvances=0;
     // Run through the movie.
-    for (;;) {
+    while (!quitrequested) {
         // @@ do we also have to run through all sprite frames
         // as well?
         //
@@ -524,7 +497,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
         if ( quitrequested ) 
         {
             quitrequested = false;
-            return md;
+            break;
         }
 
         m.display(); // FIXME: for which reason are we calling display here ??
@@ -602,33 +575,49 @@ play_movie(const std::string& filename, const RunResources& runResources)
         gnashSleep(localDelay);
     }
 
-    // clear movie_root (too early?)
+    log_debug("-- Playback completed");
+
+    log_debug("-- Dropping ref of movie_definition");
+
+    // drop reference to movie_definition, to force
+    // destruction when core gnash doesn't need it anymore
+    md = 0;
+
+    log_debug("-- Clearning movie_root");
+
+    // clear movie_root (shouldn't have bad consequences on itself)
     m.clear();
+
+    log_debug("-- Clearning gnash");
  
     // Clear resources.
+    // Forces run of GC, which in turn may invoke
+    // destuctors of (say) MovieClip which would try
+    // to access the movie_root to unregister self
+    //
+    // This means that movie_root must be available
+    // while gnash::clear() runs
+    // 
     gnash::clear();
-    
-    return md;
+
+    return true;
 }
 
 static void
 usage (const char *name)
 {
     printf(
-	_("gprocessor -- an SWF preprocessor for Gnash.\n"
+	_("gprocessor -- an SWF processor for Gnash.\n"
 	"\n"
 	"usage: %s [options] <file>\n"
 	"\n"
-	"Preprocesses the given SWF movie files.  Optionally write preprocessed shape\n"
-	"and font data to cache files, so the associated SWF files can be loaded\n"
-	"faster.\n"
+	"Process the given SWF movie files.\n"
 	"\n"
         "%s%s%s%s"), name, _(
 	"options:\n"
 	"\n"
 	"  --help(-h)  Print this info.\n"	
 	"  --version   Print the version numbers.\n"	
-	"  -w          Write a .gsc file with preprocessed info, for each input file.\n"	
 	"  -v          Be verbose; i.e. print log messages to stdout\n"
           ),
 #if VERBOSE_PARSE
