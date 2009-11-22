@@ -1,12 +1,15 @@
 Gnash 0.8.7
 
-Improvements since 0.8.5 release are:
+Improvements since 0.8.6 release are:
 
  * Asynchronous load of all resources (XML, variables, movies, bitmaps)
 
 Gnash 0.8.6
 
-????
+Improvements since 0.8.5 release are:
+
+ * Fix in sendAndLoad forcing use of POST
+ * ????
 
 
 2009-03-04 Rob Savoye  <rob@welcomehome.org>
