@@ -32,58 +32,58 @@ namespace media {
 /// exactly what's specified in the livedocs. Most of the real work is done
 /// in the AudioInputGst or AudioInputFFMPEG source files, respectively.
 class AudioInput {
-	
+    
 public:
 
-	DSOEXPORT AudioInput();
+    DSOEXPORT AudioInput();
 
-	// virtual classes need a virtual destructor !
-	virtual ~AudioInput() {}
-	
-	//setters and getters
-	void set_activityLevel(double a) {_activityLevel = a; };
-	double get_activityLevel() {return _activityLevel;};
-	
-	void set_gain(double g) { _gain = g;};
-	double get_gain() { return _gain; };
-	
-	void set_index(int i) {_index = i;};
-	int get_index() {return _index;};
-	
-	void set_muted(bool b) {_muted = b;};
-	bool get_muted() {return _muted;};
-	
-	void set_name(std::string name) {_name = name;};
-	std::string get_name() {return _name;};
-	
-	std::vector<std::string> get_names() {return _names;}
-	
-	void set_rate(int r) {_rate = r;};
-	int get_rate() {return _rate;};
-	
-	void set_silenceLevel(double s) {_silenceLevel = s; };
-	double get_silenceLevel() {return _silenceLevel;};
-	
-	void set_silenceTimeout(int s) {_silenceTimeout = s;};
-	int get_silenceTimeout() {return _silenceTimeout;};
-	
-	void set_useEchoSuppression(bool e) {_useEchoSuppression = e;};
-	bool get_useEchoSuppression() {return _useEchoSuppression;};
-	
+    // virtual classes need a virtual destructor !
+    virtual ~AudioInput() {}
+    
+    //setters and getters
+    void set_activityLevel(double a) {_activityLevel = a; };
+    double get_activityLevel() {return _activityLevel;};
+    
+    void set_gain(double g) { _gain = g;};
+    double get_gain() { return _gain; };
+    
+    void set_index(int i) {_index = i;};
+    int get_index() {return _index;};
+    
+    void set_muted(bool b) {_muted = b;};
+    bool get_muted() {return _muted;};
+    
+    void set_name(std::string name) {_name = name;};
+    std::string get_name() {return _name;};
+    
+    std::vector<std::string> get_names() {return _names;}
+    
+    void set_rate(int r) {_rate = r;};
+    int get_rate() {return _rate;};
+    
+    void set_silenceLevel(double s) {_silenceLevel = s; };
+    double get_silenceLevel() {return _silenceLevel;};
+    
+    void set_silenceTimeout(int s) {_silenceTimeout = s;};
+    int get_silenceTimeout() {return _silenceTimeout;};
+    
+    void set_useEchoSuppression(bool e) {_useEchoSuppression = e;};
+    bool get_useEchoSuppression() {return _useEchoSuppression;};
+    
 protected:
-	double _activityLevel;
-	double _gain;
-	int _index;
-	bool _muted;
-	std::string _name;
-	std::vector<std::string> _names;
-	int _rate;
-	double _silenceLevel;
-	int _silenceTimeout;
-	bool _useEchoSuppression;
+    double _activityLevel;
+    double _gain;
+    int _index;
+    bool _muted;
+    std::string _name;
+    std::vector<std::string> _names;
+    int _rate;
+    double _silenceLevel;
+    int _silenceTimeout;
+    bool _useEchoSuppression;
 };
 
-	
+    
 } // gnash.media namespace 
 } // gnash namespace
 
