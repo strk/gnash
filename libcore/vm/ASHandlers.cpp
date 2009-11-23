@@ -1326,7 +1326,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
     as_object* instance = convertToObject(getGlobal(thread.env), env.top(0));
 
     // Get the "super" function
-    as_function* super = env.top(1).to_function();
+    as_object* super = convertToObject(getGlobal(thread.env), env.top(1));
 
     // Invalid args!
     if (!super || ! instance)
@@ -2434,7 +2434,8 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     // is dropped from the stack.
     const std::string& funcname = env.pop().to_string();
     as_object* this_ptr = thread.getThisPointer();
-    as_object* super = NULL;
+
+    as_object* super(0);
 
     as_value function = thread.getVariable(funcname, &this_ptr);
 
@@ -2442,6 +2443,14 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         IF_VERBOSE_ASCODING_ERRORS (
         log_aserror(_("ActionCallFunction: %s is not an object"), funcname);
         )
+    }
+    else if (function.to_object(getGlobal(thread.env))->isSuper() )
+    {
+        this_ptr = thread.getThisPointer();
+
+        // the new 'super' will be computed from the old one
+        as_object* oldSuper = function.to_object(getGlobal(thread.env));
+        super = oldSuper->get_super();
     }
     else if (!function.is_function()) {
         log_error(_("ActionCallFunction: function name %s evaluated to "
@@ -2455,14 +2464,6 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
             log_aserror(_("Object doesn't have a constructor"));
             )
         }
-    }
-    else if ( function.to_function()->isSuper() )
-    {
-        this_ptr = thread.getThisPointer();
-
-        // the new 'super' will be computed from the old one
-        as_function* oldSuper = function.to_function();
-        super = oldSuper->get_super();
     }
 
     // Get number of args, modifying it if not enough values are on the stack.
@@ -2554,12 +2555,11 @@ SWFHandlers::ActionNew(ActionExec& thread)
     unsigned nargs = unsigned(env.pop().to_number());
 
     as_value constructorval = thread.getVariable(classname);
-    boost::intrusive_ptr<as_function> constructor = constructorval.to_function();
-    if ( ! constructor )
-    {
+    as_function* constructor = constructorval.to_function();
+    if (!constructor) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("ActionNew: "
-            "'%s' is not a constructor"), classname);
+            log_aserror(_("ActionNew: "
+                "'%s' is not a constructor"), classname);
         );
         env.drop(nargs);
         env.push(as_value()); // should we push an object anyway ?
@@ -2571,7 +2571,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
     // deleted. BitmapData also fails to construct anything under
     // some circumstances.
     try {
-        as_object* newobj = construct_object(constructor.get(), env, nargs);
+        as_object* newobj = construct_object(constructor, env, nargs);
 #ifdef USE_DEBUGGER
         debugger.addSymbol(newobj, classname);
 #endif
@@ -2987,46 +2987,9 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     if (!hasMethodName) {
         // We'll be calling the super constructor here
         method_val = obj_value;
-
-        if (!method_val.is_function())
-        {
-
-            log_debug(_("Function object given to ActionCallMethod"
-                       " is not a function (%s), will try to use"
-                       " its 'constructor' member (but should instead "
-                       "invoke its [[Call]] method"), obj_value);
-
-            // TODO: all this crap should go into an
-            // as_object::getConstructor instead
-            as_value ctor;
-            if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &ctor) )
-            {
-                IF_VERBOSE_ASCODING_ERRORS(
-                    log_aserror(_("ActionCallMethod: object has no "
-                            "constructor"));
-                );
-                env.drop(nargs);
-                env.push(as_value());
-                return;
-            }
-            if (!ctor.is_function())
-            {
-                IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("ActionCallMethod: object constructor "
-                        "is not a function"));
-                );
-                env.drop(nargs);
-                env.push(as_value());
-                return;
-            }
-            method_val = ctor;
-        }
     }
-    else
-    {
-
-        if ( ! thread.getObjectMember(*obj, method_string, method_val) )
-        {
+    else {
+        if (!thread.getObjectMember(*obj, method_string, method_val)) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("ActionCallMethod: "
                 "Can't find method %s of object %s"),
@@ -3123,7 +3086,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
         }
     }
 
-    boost::intrusive_ptr<as_function> method = method_val.to_function();
+    as_function* method = method_val.to_function();
     if (!method) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("ActionNewMethod: method name is undefined "
@@ -3140,7 +3103,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
     // deleted. BitmapData also fails to construct anything under
     // some circumstances.
     try {
-        as_object* newobj = construct_object(method.get(), env, nargs);
+        as_object* newobj = construct_object(method, env, nargs);
         env.push(newobj);
         return;
     }
@@ -3335,7 +3298,7 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    as_function* super = env.top(0).to_function();
+    as_object* super = env.top(0).to_object(getGlobal(thread.env));
     as_function* sub = env.top(1).to_function();
 
     if ( ! super || ! sub )

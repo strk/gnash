@@ -94,7 +94,7 @@ public:
 	boost::intrusive_ptr<as_object> getPrototype();
 
 	/// Make this function a subclass of the given as_function
-	void extends(as_function& superclass);
+	void extends(as_object& superclass);
 
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin() { return false; }

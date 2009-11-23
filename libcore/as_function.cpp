@@ -79,10 +79,13 @@ as_function::setPrototype(as_object* proto)
 }
 
 void
-as_function::extends(as_function& superclass)
+as_function::extends(as_object& superclass)
 {
 	as_object* newproto = new as_object();
-	newproto->set_prototype(superclass.getPrototype().get());
+	as_object* p =
+        superclass.getMember(NSV::PROP_PROTOTYPE).to_object(
+                *VM::get().getGlobal());
+	newproto->set_prototype(p);
 
     if (getSWFVersion(superclass) > 5) {
         const int flags = PropFlags::dontEnum;
@@ -271,8 +274,7 @@ as_value
 function_apply(const fn_call& fn)
 {
 
-	// Get function body 
-	as_function* function_obj = ensure<ThisIs<as_function> >(fn);
+	as_object* function_obj = ensure<ValidThis>(fn);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
@@ -329,8 +331,7 @@ as_value
 function_call(const fn_call& fn)
 {
 
-	// Get function body 
-	as_function* function_obj = ensure<ThisIs<as_function> >(fn);
+	as_object* function_obj = ensure<ValidThis>(fn);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed

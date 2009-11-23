@@ -124,13 +124,13 @@ namespace {
 /// to change this in the future to implement what ECMA-262 refers to
 /// as the [[Call]] property of objects.
 ///
-class as_super : public as_function
+class as_super : public as_object
 {
 public:
 
 	as_super(Global_as& gl, as_object* super)
 		:
-        as_function(gl),
+        as_object(gl),
 		_super(super)
 	{
 		set_prototype(prototype());
@@ -173,7 +173,7 @@ protected:
 	virtual void markReachableResources() const
 	{
 		if (_super) _super->setReachable();
-		markAsFunctionReachable();
+		markAsObjectReachable();
 	}
 
 private:
@@ -284,7 +284,7 @@ as_object::as_object()
 }
 
 as_value
-as_object::call(const fn_call& fn) {
+as_object::call(const fn_call& /*fn*/) {
     throw ActionTypeError();
 }
 
