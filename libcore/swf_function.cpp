@@ -106,7 +106,7 @@ struct TargetGuard {
 
 // Dispatch.
 as_value
-swf_function::operator()(const fn_call& fn)
+swf_function::call(const fn_call& fn)
 {
     // Extract caller before pushing ourself on the call stack
     as_object* caller = 0;

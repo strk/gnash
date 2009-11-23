@@ -202,7 +202,7 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 	try {
 		if (as_function* func = method.to_function()) {
             // Call function.
-		    val = (*func)(call);
+		    val = func->call(call);
 		}
 		else {
             IF_VERBOSE_ASCODING_ERRORS(

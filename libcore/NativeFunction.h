@@ -56,7 +56,7 @@ public:
 	}
 
 	/// Invoke this function
-	virtual as_value operator()(const fn_call& fn)
+	virtual as_value call(const fn_call& fn)
 	{
 		assert(_func);
 		return _func(fn);

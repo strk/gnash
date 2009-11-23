@@ -151,7 +151,7 @@ public:
 	}
 
 	/// Dispatch.
-	virtual as_value operator()(const fn_call& fn)
+	virtual as_value call(const fn_call& fn)
 	{
 
         // TODO: this is a hack to make sure objects are constructed, not
@@ -261,7 +261,6 @@ public:
 } // end of anonymous namespace
 
 
-
 const int as_object::DefaultFlags;
 
 as_object::as_object(Global_as& gl)
@@ -282,6 +281,11 @@ as_object::as_object()
 	_vm(VM::get()),
 	_members(_vm)
 {
+}
+
+as_value
+as_object::call(const fn_call& fn) {
+    throw ActionTypeError();
 }
 
 std::pair<bool,bool>

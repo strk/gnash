@@ -377,7 +377,7 @@ function_call(const fn_call& fn)
 	}
 
 	// Call the function 
-	return (*function_obj)(new_fn_call);
+	return function_obj->call(new_fn_call);
 
 }
 

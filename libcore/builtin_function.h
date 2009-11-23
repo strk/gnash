@@ -59,7 +59,7 @@ public:
 	}
 
 	/// Invoke this function or this Class constructor
-	virtual as_value operator()(const fn_call& fn)
+	virtual as_value call(const fn_call& fn)
 	{
 		// Real native functions don't put self on the CallStack
 		// (they never end up in an arguments.caller).

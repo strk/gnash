@@ -34,7 +34,7 @@ abc_function::abc_function(Method* methodInfo, Machine* machine)
 
 // Dispatch.
 as_value
-abc_function::operator()(const fn_call& fn)
+abc_function::call(const fn_call& fn)
 {
 
 	log_abc("Calling an abc_function id=%u.", _methodInfo->methodID());

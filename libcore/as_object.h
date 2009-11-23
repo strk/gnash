@@ -184,6 +184,13 @@ public:
     /// Construct an ActionScript object with no prototype associated.
     as_object();
 
+    /// Function dispatch
+    //
+    /// Various objects can be called, including functions and super objects.
+    /// A normal object has no call functionality, so the default
+    /// implementation throws an ActionTypeError.
+    virtual as_value call(const fn_call& fn);
+
     /// The most common flags for built-in properties.
     //
     /// Most API properties, including classes and objects, have these flags.

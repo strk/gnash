@@ -67,11 +67,11 @@ public:
 	// Avoid RTTI
 	as_function* to_function() { return this; }
 
-	/// Dispatch.
-	virtual as_value operator()(const fn_call& fn) = 0;
-
-	/// Alias for operator()
-	as_value call(const fn_call& fn) { return operator()(fn); }
+	/// Function dispatch.
+    //
+    /// Override from as_object, although as_objects cannot generally 
+    /// be called.
+	virtual as_value call(const fn_call& fn) = 0;
 
 	/// Construct an instance of this class
 	// 

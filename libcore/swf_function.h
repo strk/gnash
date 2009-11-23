@@ -139,7 +139,7 @@ public:
 	void set_length(int len);
 
 	/// Dispatch.
-	as_value operator()(const fn_call& fn);
+	virtual as_value call(const fn_call& fn);
 
 #ifdef GNASH_USE_GC
 	/// Mark reachable resources. Override from as_function.
