@@ -687,9 +687,9 @@ check_equals(checkpoint, 4);
 //-----------------------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- xcheck_totals(52); // gnash runs +2 tests ?!
+ check_totals(52); // gnash runs +2 tests ?!
 #else
- xcheck_totals(57); // gnash runs +2 tests ?!
+ check_totals(57); // gnash runs +2 tests ?!
 #endif
 
 #else // ndef MING_SUPPORT_ASM
