@@ -157,7 +157,9 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
                PropFlags::dontEnum);
     }
 
-    fn_call fn(newobj, env, args, newobj->get_super(), true);
+    // Don't set a super so that it will be constructed only if required
+    // by the function.
+    fn_call fn(newobj, env, args, 0, true);
     as_value ret;
 
     try {
