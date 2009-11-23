@@ -2433,28 +2433,25 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     // In all cases, even undefined, the specified number of arguments
     // is dropped from the stack.
     const std::string& funcname = env.pop().to_string();
-    as_object* this_ptr = thread.getThisPointer();
 
     as_object* super(0);
 
+    as_object* this_ptr;
     as_value function = thread.getVariable(funcname, &this_ptr);
 
     if (!function.is_object()) {
+        // In this case the call to invoke() will fail. We won't return 
+        // because we still need to handle the stack, and the attempt to
+        // convert the value to an object may have effects in AS (haven't
+        // checked).
         IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_("ActionCallFunction: %s is not an object"), funcname);
+            log_aserror(_("ActionCallFunction: %s is not an object"),
+                funcname);
         )
     }
-    else if (function.to_object(getGlobal(thread.env))->isSuper() )
-    {
-        this_ptr = thread.getThisPointer();
-
-        // the new 'super' will be computed from the old one
-        as_object* oldSuper = function.to_object(getGlobal(thread.env));
-        super = oldSuper->get_super();
-    }
     else if (!function.is_function()) {
-        log_error(_("ActionCallFunction: function name %s evaluated to "
-                "non-function value %s"), funcname, function);
+        as_object* obj = function.to_object(getGlobal(thread.env));
+        super = obj->get_super();
         this_ptr = thread.getThisPointer();
     }
 
