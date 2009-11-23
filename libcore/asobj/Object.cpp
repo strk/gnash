@@ -188,7 +188,7 @@ object_toString(const fn_call& fn)
 {
     as_object* obj = fn.this_ptr;
 
-    if (obj && obj->to_function() && !obj->isSuper()) {
+    if (obj && obj->to_function()) {
         return as_value("[type Function]");
     }
     return as_value("[object Object]");
