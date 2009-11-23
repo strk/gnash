@@ -2,15 +2,32 @@ Gnash 0.8.7
 
 Improvements since 0.8.6 release are:
 
- * Asynchronous load of all resources (XML, variables, movies, bitmaps)
+ * Asynchronous load of all resources (XML, variables, movies, bitmaps).
 
 Gnash 0.8.6
 
 Improvements since 0.8.5 release are:
 
- * Fix in sendAndLoad forcing use of POST
- * ????
-
+ * TextSnapshot, Camera, Microphone, TextField and TextFormat implemented.
+ * ASSetNative, ASSetNativeAccessor, ASconstructor implemented.
+ * New utilities for finding input devices for Camera and Microphone.
+ * Fix bitmap smoothing handling in AGG renderer (Bug #25894).
+ * Custom Gnash GTK widget.
+ * Various improvements to text handling.
+ * large-scale refactoring of object and class creation for improved
+   AS compatibility.
+ * extension of native classes now works in many cases.
+ * PyGTK module support.
+ * Native and built-in functions properly separated, more native functions
+   added.
+ * AmigaOS4 support (gui and sound handler).
+ * Fixes to XMLSocket crash and event order.
+ * Performance improvement for SDL gui (invalidated regions).
+ * Corrected timing of various AS events, fixing various SWFs that rely on them.
+ * Many minor bug fixes.
+ * Better A/V synchronization.
+ * Rudimentary AVM2 implementation when enabled.
+ * Fix in sendAndLoad forcing use of POST.
 
 2009-03-04 Rob Savoye  <rob@welcomehome.org>
 
