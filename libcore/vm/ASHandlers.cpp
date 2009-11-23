@@ -2972,8 +2972,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     as_value method_val;
 
     if (!hasMethodName) {
-        // We'll be calling the super constructor here
         method_val = obj_value;
+        this_ptr = 0;
     }
     else {
         if (!thread.getObjectMember(*obj, method_string, method_val)) {

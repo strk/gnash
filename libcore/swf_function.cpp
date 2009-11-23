@@ -170,12 +170,11 @@ swf_function::call(const fn_call& fn)
 		}
 
 		// Add 'this'
-		assert(fn.this_ptr);
-		m_env.set_local("this", fn.this_ptr);
+		m_env.set_local("this", fn.this_ptr ? fn.this_ptr : as_value());
 
 		// Add 'super' (SWF6+ only)
 		if (super && swfversion > 5) {
-			m_env.set_local("super", as_value(super));
+			m_env.set_local("super", super);
 		}
 
 		// Add 'arguments'
@@ -195,13 +194,15 @@ swf_function::call(const fn_call& fn)
 		if ((m_function2_flags & PRELOAD_THIS) &&
                 !(m_function2_flags & SUPPRESS_THIS)) {
 			// preload 'this' into a register.
-			m_env.setRegister(current_reg, as_value(fn.this_ptr)); 
+            // TODO: check whether it should be undefined or null if this_ptr
+            // is null.
+			m_env.setRegister(current_reg, fn.this_ptr); 
 			current_reg++;
 		}
 
 		if (!(m_function2_flags & SUPPRESS_THIS)) {
 			// Put 'this' in a local var.
-			m_env.add_local("this", as_value(fn.this_ptr));
+			m_env.add_local("this", fn.this_ptr ? fn.this_ptr : as_value());
 		}
 
 		// Init arguments array, if it's going to be needed.
@@ -220,14 +221,14 @@ swf_function::call(const fn_call& fn)
 
 		if (!(m_function2_flags & SUPPRESS_ARGUMENTS)) {
 			// Put 'arguments' in a local var.
-			m_env.add_local("arguments", as_value(arg_array));
+			m_env.add_local("arguments", arg_array);
 		}
 
 		if ((m_function2_flags & PRELOAD_SUPER) && swfversion > 5) {
 			// Put 'super' in a register (SWF6+ only).
 			// TOCHECK: should we still set it if not available ?
 			if ( super ) {
-				m_env.setRegister(current_reg, as_value(super));
+				m_env.setRegister(current_reg, super);
 				current_reg++;
 			}
 		}
@@ -236,7 +237,7 @@ swf_function::call(const fn_call& fn)
 		    if (super && swfversion > 5) {
                 // TOCHECK: should we still set it if unavailable ?
                 // Put 'super' in a local var (SWF6+ only)
-                m_env.add_local("super", as_value(super));
+                m_env.add_local("super", super);
             }
 		}
 
@@ -246,7 +247,7 @@ swf_function::call(const fn_call& fn)
 			if (tgtch) {
 				// NOTE: _lockroot will be handled by getAsRoot()
 				as_object* r = getObject(tgtch->getAsRoot());
-				m_env.setRegister(current_reg, as_value(r));
+				m_env.setRegister(current_reg, r);
 				++current_reg;
 			}
 		}
@@ -263,7 +264,7 @@ swf_function::call(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_GLOBAL) {
 			// Put '_global' in a register.
 			as_object* global = vm.getGlobal();
-			m_env.setRegister(current_reg, as_value(global));
+			m_env.setRegister(current_reg, global);
 			++current_reg;
 		}
 
