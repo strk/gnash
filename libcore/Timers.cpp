@@ -100,37 +100,13 @@ void
 Timer::execute()
 {
 
-    as_value timer_method;
-
     // If _function is not 0, _methodName should be 0 anyway, but the
     // ternary operator is there for clarity.
     as_object* super = _object->get_super(_function ? 0 : _methodName);
     VM& vm = getVM(*_object);
 
-    if (_function) {
-        timer_method.set_as_function(_function);
-    }
-    else {
-        as_value tmp;
-        if (!_object->get_member(_methodName, &tmp)) {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("object %p has no member named %s (interval method)",
-                     _object, _methodName);
-            );
-            return;
-        }
-
-        as_function* f = tmp.to_function();
-
-        if (!f) {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("member %s of object %p (interval method) is not "
-                "a function (%s)", _methodName, (void*)_object, tmp);
-            );
-            return;
-        }
-        timer_method.set_as_function(f);
-    }
+    as_value timer_method = _function ? _function :
+                                        _object->getMember(_methodName);
 
     as_environment env(vm); 
 
