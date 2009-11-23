@@ -868,12 +868,13 @@ as_object::set_member_flags(string_table::key name,
 }
 
 void
-as_object::add_interface(as_object* obj)
+as_object::addInterface(as_object* obj)
 {
 	assert(obj);
-
-	if (std::find(mInterfaces.begin(), mInterfaces.end(), obj) == mInterfaces.end())
-		mInterfaces.push_back(obj);
+	if (std::find(_interfaces.begin(), _interfaces.end(), obj) ==
+            _interfaces.end()) {
+		_interfaces.push_back(obj);
+    }
 }
 
 bool
@@ -884,52 +885,53 @@ as_object::instanceOf(as_object* ctor)
     if (!ctor) return false;
 
 	as_value protoVal;
-	if ( ! ctor->get_member(NSV::PROP_PROTOTYPE, &protoVal) )
-	{
+	if (!ctor->get_member(NSV::PROP_PROTOTYPE, &protoVal)) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
-		log_debug("Object %p can't be an instance of an object (%p) w/out 'prototype'",
+		log_debug("Object %p can't be an instance of an object (%p) "
+                "with no 'prototype'",
 			(void*)this, (void*)ctor);
 #endif
 		return false;
 	}
+
 	as_object* ctorProto = protoVal.to_object(getGlobal(*this));
-	if ( ! ctorProto )
-	{
+	if (!ctorProto) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
-		log_debug("Object %p can't be an instance of an object (%p) with non-object 'prototype' (%s)",
+		log_debug("Object %p can't be an instance of an object (%p) "
+                "with non-object 'prototype' (%s)",
 			(void*)this, (void*)ctor, protoVal);
 #endif
 		return false;
 	}
 
 	// TODO: cleanup the iteration, make it more readable ...
-
-	std::set< as_object* > visited;
+	std::set<as_object*> visited;
 
 	as_object* obj = this;
-	while (obj && visited.insert(obj).second )
-	{
+	while (obj && visited.insert(obj).second) {
 		as_object* thisProto = obj->get_prototype();
-		if ( ! thisProto )
-		{
+		if (!thisProto) {
 			break;
 		}
 
 		// Check our proto
-		if ( thisProto == ctorProto )
-		{
+		if (thisProto == ctorProto) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
-			log_debug("Object %p is an instance of constructor %p as the constructor exposes our __proto__ %p",
+			log_debug("Object %p is an instance of constructor %p as "
+                    "the constructor exposes our __proto__ %p",
 				(void*)obj, (void*)ctor, (void*)thisProto);
 #endif
 			return true;
 		}
 
 		// Check our proto interfaces
-		if (std::find(thisProto->mInterfaces.begin(), thisProto->mInterfaces.end(), ctorProto) != thisProto->mInterfaces.end())
-		{
+		if (std::find(thisProto->_interfaces.begin(),
+                    thisProto->_interfaces.end(), ctorProto)
+                != thisProto->_interfaces.end()) {
+
 #ifdef GNASH_DEBUG_INSTANCE_OF
-			log_debug("Object %p __proto__ %p had one interface matching with the constructor prototype %p",
+			log_debug("Object %p __proto__ %p had one interface matching "
+                    "with the constructor prototype %p",
 				(void*)obj, (void*)thisProto, (void*)ctorProto);
 #endif
 			return true;
@@ -946,7 +948,7 @@ as_object::prototypeOf(as_object& instance)
 {
 	boost::intrusive_ptr<as_object> obj = &instance;
 
-	std::set< as_object* > visited;
+	std::set<as_object*> visited;
 
 	while (obj && visited.insert(obj.get()).second )
 	{
@@ -1211,7 +1213,11 @@ as_object::markAsObjectReachable() const
         }
     }
 
-    /// Proxy objects can contain references to other as_objects.
+    // Mark interfaces reachable.
+    std::for_each(_interfaces.begin(), _interfaces.end(), 
+            std::mem_fun(&as_object::setReachable));
+
+    // Proxy objects can contain references to other as_objects.
     if (_relay) _relay->setReachable();
     if (_displayObject) _displayObject->setReachable();
 }

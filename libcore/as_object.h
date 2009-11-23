@@ -783,8 +783,13 @@ public:
     virtual bool isSuper() const { return false; }
 
     /// Add an interface to the list of interfaces.
-    /// Used by instanceOf
-    void add_interface(as_object* ctor);
+    //
+    /// This is used by the action "implements". This opcode is a compile-time
+    /// promise that a class will implement all the methods of an
+    /// otherwise unrelated interface class. The only use in AVM1 is to
+    /// allow instanceOf to return true when a class implements another
+    /// class.
+    void addInterface(as_object* ctor);
 
     /// \brief
     /// Check whether this object is an instance of the given
@@ -929,7 +934,7 @@ public:
     //
     /// The Relay object is a polymorphic object containing native type
     /// characteristics. It is rarely useful to use this function directly.
-    /// Instead use the convenience functions ensureNativeType() and
+    /// Instead use the convenience functions ensure<>() and
     /// isNativeType() to access the Relay object.
     //
     /// Relay objects are not available to ActionScript, so this object
@@ -1073,9 +1078,11 @@ private:
     void executeTriggers(Property* prop, const ObjectURI& uri,
             const as_value& val);
 
-    /// The constructors of the objects which are the interfaces
-    /// implemented by this one.
-    std::list<as_object*> mInterfaces;
+    /// The constructors of the objects implemented by this as_object.
+    //
+    /// There is no need to use a complex container as the list of 
+    /// interfaces is generally small and the opcode rarely used anyway.
+    std::vector<as_object*> _interfaces;
 
     typedef std::map<ObjectURI, Trigger> TriggerContainer;
     boost::scoped_ptr<TriggerContainer> _trigs;

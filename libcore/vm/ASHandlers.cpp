@@ -1359,88 +1359,87 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
     }
 }
 
+
+/// Implements the "implements" opcode
+//
+/// Example AS code: "C implements B;"
+//
+/// The above code makes an instance of C ("var c = new C();") return true
+/// for "c instanceOf B);". That seems to be the end of its usefulness, as
+/// c inherits no properties from B.
 void
 SWFHandlers::ActionImplementsOp(ActionExec& thread)
 {
     
-//    TODO: This doesn't work quite right, yet.
     as_environment& env = thread.env;
 
     as_value objval = env.pop();
     as_object *obj = convertToObject(getGlobal(thread.env), objval);
     int count = static_cast<int>(env.pop().to_number());
-    as_value a(1);
 
-    if (!obj)
-    {
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Stack value on IMPLEMENTSOP is not an object: %s."),
-            objval);
+            log_aserror(_("Stack value on IMPLEMENTSOP is not an object: %s."),
+                objval);
         );
         return;
     }
 
     as_value protoval;
-    if ( ! obj->get_member(NSV::PROP_PROTOTYPE, &protoval) )
-    {
+    if (!obj->get_member(NSV::PROP_PROTOTYPE, &protoval)) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Target object for IMPLEMENTSOP has no prototype."));
+            log_aserror(_("Target object for IMPLEMENTSOP has no prototype."));
         );
         return;
     }
     obj = convertToObject(getGlobal(thread.env), protoval);
-    if (!obj)
-    {
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("IMPLEMENTSOP target object's prototype is not an object (%s)"),
-            protoval);
+            log_aserror(_("IMPLEMENTSOP target object's prototype is not "
+                    "an object (%s)"), protoval);
         );
         return;
     }
 
-    if ( count <= 0 )
-    {
+    if (count <= 0) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Invalid interfaces count (%d) on IMPLEMENTSOP"), count);
+            log_aserror(_("Invalid interfaces count (%d) on IMPLEMENTSOP"),
+                count);
         );
         return;
     }
 
-    while (count--)
-    {
+    while (count--) {
         as_value ctorval = env.pop();
-
         as_object* ctor = convertToObject(getGlobal(thread.env), ctorval);
-        if ( ! ctor )
-        {
+        if (!ctor) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("class found on stack on IMPLEMENTSOP is not an object: %s"), ctorval);
+                log_aserror(_("class found on stack on IMPLEMENTSOP is "
+                        "not an object: %s"), ctorval);
             );
             continue;
         }
-        if ( ! ctor->get_member(NSV::PROP_PROTOTYPE, &protoval) )
-        {
+        if (!ctor->get_member(NSV::PROP_PROTOTYPE, &protoval)) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Interface object for IMPLEMENTSOP has no prototype."));
+                log_aserror(_("Interface object for IMPLEMENTSOP has no "
+                        "prototype."));
             );
             continue;
         }
         as_object *inter = convertToObject(getGlobal(thread.env), protoval);
-        if ( ! inter )
-        {
+        if (!inter) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Prototype of interface object for IMPLEMENTSOP is not an object (%s)."),
-                protoval);
+                log_aserror(_("Prototype of interface object for "
+                        "IMPLEMENTSOP is not an object (%s)."), protoval);
             );
             continue;
         }
 
         IF_VERBOSE_ACTION(
-        log_action("%s (with .prototype %p) implements %s (with .prototype %p)",
-            objval, (void*)obj, ctorval,
-            (void*)inter);
+            log_action("%s (with .prototype %p) implements %s (with "
+                ".prototype %p)", objval, (void*)obj, ctorval, (void*)inter);
         );
-        obj->add_interface(inter);
+        obj->addInterface(inter);
     }
 }
 
