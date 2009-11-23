@@ -40,6 +40,15 @@ SC_AS3_XMLTESTS = \
 	$(NULL)
 
 # XML tests that rely on comparing trace output.
+
+TRACE_AS2_TESTS = \
+	super.xml \
+	$(NULL)	
+
+TRACE_AS2_TRACES = \
+	super.trace \
+	$(NULL)	
+
 TRACE_AS3_TESTS = \
 	scope1.xml \
 	stack1.xml \
@@ -52,7 +61,9 @@ TRACE_AS3_TRACES = \
 
 EXTRA_DIST = $(SC_AS2_XMLTESTS) \
 	     $(SC_AS3_XMLTESTS) \
-	     $(TRACE_AS3_TESTS) \
+		 $(TRACE_AS2_TESTS) \
+	     $(TRACE_AS2_TRACES) \
+		 $(TRACE_AS3_TESTS) \
 	     $(TRACE_AS3_TRACES) \
 	     gen-swfmill-trace-runner.sh \
 	     $(NULL)
@@ -70,20 +81,26 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/testsuite \
 	$(NULL)
 
+TRACE_TESTS = $(TRACE_AS2_TESTS)
+TRACES = $(TRACE_AS2_TRACES)
 SC_XMLTESTS_OUT = $(SC_AS2_XMLTESTS:.xml=.swf)
-TRACE_XMLTESTS_OUT = 
+
 
 if ENABLE_AVM2
 if SWFMILL_AS3_SUPPORT
+TRACE_TESTS += $(TRACE_AS3_TESTS)
+TRACES += $(TRACE_AS3_TRACES)
 SC_XMLTESTS_OUT += $(SC_AS3_XMLTESTS:.xml=.swf)
-TRACE_XMLTESTS_OUT += $(TRACE_AS3_TESTS:.xml=.swf)
 endif
 endif
+
+TRACE_XMLTESTS_OUT = $(TRACE_TESTS:.xml=.swf)
 
 # Dependencies for all self-contained SWF tests
 $(SC_XMLTESTS_OUT) : 
 
 check_SCRIPTS = \
+	trace-test-runner	\
 	mixed-bytecode-as2-runner	\
 	jump_after_end-runner	\
 	jump_to_prev_block-runner	\
@@ -98,7 +115,6 @@ if ENABLE_AVM2
 if SWFMILL_AS3_SUPPORT
 check_SCRIPTS += \
 	mixed-bytecode-as3-runner	\
-	trace-test-runner	\
 	$(NULL)
 endif
 endif
