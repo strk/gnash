@@ -122,11 +122,8 @@ swf_function::call(const fn_call& fn)
 
 	// Some features are version-dependant.
 	const int swfversion = vm.getSWFVersion();
-	as_object *super = NULL;
-	if (swfversion > 5) {
-		super = fn.super;
-	}
-	else {
+
+	if (swfversion < 6) {
 		// In SWF5, when 'this' is a DisplayObject it becomes
 		// the target for this function call.
 		// See actionscript.all/setProperty.as
@@ -171,6 +168,9 @@ swf_function::call(const fn_call& fn)
 
 		// Add 'this'
 		m_env.set_local("this", fn.this_ptr ? fn.this_ptr : as_value());
+
+        as_object* super = fn.super ? fn.super :
+            fn.this_ptr ? fn.this_ptr->get_super() : 0;
 
 		// Add 'super' (SWF6+ only)
 		if (super && swfversion > 5) {
@@ -224,19 +224,20 @@ swf_function::call(const fn_call& fn)
 			m_env.add_local("arguments", arg_array);
 		}
 
-		if ((m_function2_flags & PRELOAD_SUPER) && swfversion > 5) {
-			// Put 'super' in a register (SWF6+ only).
-			// TOCHECK: should we still set it if not available ?
-			if ( super ) {
+        // If super is not suppressed it is either placed in a register
+        // or set as a local variable, but not both.
+        if (swfversion > 5 && !(m_function2_flags & SUPPRESS_SUPER)) {
+            
+            // Put 'super' in a register (SWF6+ only).
+            // TOCHECK: should we still set it if not available ?
+            as_object* super = fn.super ? fn.super :
+                fn.this_ptr ? fn.this_ptr->get_super() : 0;
+
+            if (super && (m_function2_flags & PRELOAD_SUPER)) {
 				m_env.setRegister(current_reg, super);
 				current_reg++;
 			}
-		}
-
-		if (!(m_function2_flags & SUPPRESS_SUPER)) {
-		    if (super && swfversion > 5) {
-                // TOCHECK: should we still set it if unavailable ?
-                // Put 'super' in a local var (SWF6+ only)
+            else if (super) {
                 m_env.add_local("super", super);
             }
 		}
