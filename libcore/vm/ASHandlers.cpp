@@ -2467,14 +2467,15 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     }
 
     // Get number of args, modifying it if not enough values are on the stack.
-    unsigned nargs = unsigned(env.pop().to_number());
-    unsigned available_args = env.stack_size(); 
-    if ( available_args < nargs )
-    {
+    // TODO: this may cause undefined behaviour if the number on the stack
+    // is too large. Fix it.
+    size_t nargs = static_cast<size_t>(env.pop().to_number());
+    const size_t available_args = env.stack_size(); 
+    if (available_args < nargs) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("Attempt to call a function with %u arguments "
-            "while only %u are available on the stack."),
-            nargs, available_args);
+            log_swferror(_("Attempt to call a function with %u arguments "
+                "while only %u are available on the stack."),
+                nargs, available_args);
         );
         nargs = available_args;
     }
@@ -2495,8 +2496,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     env.push(result);
 
     // If the function threw an exception, do so here.
-    if (result.is_exception())
-    {
+    if (result.is_exception()) {
         thread.skipRemainingBuffer();
     }
 
@@ -2936,18 +2936,16 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     as_value obj_value = env.pop();
 
     // Get number of args, modifying it if not enough values are on the stack.
-    unsigned nargs = unsigned(env.pop().to_number());
-    unsigned available_args = env.stack_size(); 
-    if (available_args < nargs)
-    {
+    size_t nargs = static_cast<size_t>(env.pop().to_number());
+    const size_t available_args = env.stack_size(); 
+    if (available_args < nargs) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("Attempt to call a method with %u arguments "
-            "while only %u are available on the stack."),
-            nargs, available_args);
+            log_swferror(_("Attempt to call a method with %u arguments "
+                "while only %u are available on the stack."),
+                nargs, available_args);
         );
         nargs = available_args;
     }
-
 
     IF_VERBOSE_ACTION (
         log_action(_(" method name: %s"), method_name);
@@ -3003,16 +3001,13 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     }
 
 #ifdef USE_DEBUGGER
-//    log_debug (_("FIXME: method name is: %s"), method_namexxx);
-//    // IT IS NOT GUARANTEE WE DO HAVE A METHOD NAME HERE !
-    if ( ! method_name.is_undefined() )
-    {
+    if (! method_name.is_undefined()) {
         debugger.callStackPush(method_name.to_string());
         debugger.matchBreakPoint(method_name.to_string(), true);
     }
-    else
-    {
-        LOG_ONCE( log_unimpl(_("FIXME: debugger doesn't deal with anonymous function calls")) );
+    else {
+        LOG_ONCE( log_unimpl(_("FIXME: debugger doesn't deal with "
+            "anonymous function calls")) );
     }
 #endif
 
