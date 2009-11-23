@@ -197,7 +197,7 @@ swf_function::call(const fn_call& fn)
             // TODO: check whether it should be undefined or null if this_ptr
             // is null.
 			m_env.setRegister(current_reg, fn.this_ptr); 
-			current_reg++;
+			++current_reg;
 		}
 
 		if (!(m_function2_flags & SUPPRESS_THIS)) {
