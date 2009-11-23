@@ -187,7 +187,7 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
 
 /// Call an as_value on an as_object.
 //
-/// The call will fail harmlessly if the as_value is not a function.
+/// The call will fail harmlessly if the as_value is not callable.
 inline DSOEXPORT as_value
 invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
         fn_call::Args& args, as_object* super = 0,
@@ -200,9 +200,9 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
     call.callerDef = callerDef;
 
 	try {
-		if (as_function* func = method.to_function()) {
+		if (as_object* func = method.to_object(getGlobal(env))) {
             // Call function.
-		    val = (*func)(call);
+		    val = func->call(call);
 		}
 		else {
             IF_VERBOSE_ASCODING_ERRORS(

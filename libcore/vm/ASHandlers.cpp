@@ -1326,7 +1326,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
     as_object* instance = convertToObject(getGlobal(thread.env), env.top(0));
 
     // Get the "super" function
-    as_function* super = env.top(1).to_function();
+    as_object* super = convertToObject(getGlobal(thread.env), env.top(1));
 
     // Invalid args!
     if (!super || ! instance)
@@ -2432,47 +2432,38 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     // In all cases, even undefined, the specified number of arguments
     // is dropped from the stack.
     const std::string& funcname = env.pop().to_string();
-    as_object* this_ptr = thread.getThisPointer();
-    as_object* super = NULL;
 
+    as_object* super(0);
+
+    as_object* this_ptr;
     as_value function = thread.getVariable(funcname, &this_ptr);
 
     if (!function.is_object()) {
+        // In this case the call to invoke() will fail. We won't return 
+        // because we still need to handle the stack, and the attempt to
+        // convert the value to an object may have effects in AS (haven't
+        // checked).
         IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_("ActionCallFunction: %s is not an object"), funcname);
+            log_aserror(_("ActionCallFunction: %s is not an object"),
+                funcname);
         )
     }
     else if (!function.is_function()) {
-        log_error(_("ActionCallFunction: function name %s evaluated to "
-                "non-function value %s"), funcname, function);
-        // Calling super ? 
-        as_object* obj = convertToObject(getGlobal(thread.env), function);
+        as_object* obj = function.to_object(getGlobal(thread.env));
+        super = obj->get_super();
         this_ptr = thread.getThisPointer();
-        if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &function) )
-        {
-            IF_VERBOSE_ASCODING_ERRORS (
-            log_aserror(_("Object doesn't have a constructor"));
-            )
-        }
-    }
-    else if ( function.to_function()->isSuper() )
-    {
-        this_ptr = thread.getThisPointer();
-
-        // the new 'super' will be computed from the old one
-        as_function* oldSuper = function.to_function();
-        super = oldSuper->get_super();
     }
 
     // Get number of args, modifying it if not enough values are on the stack.
-    unsigned nargs = unsigned(env.pop().to_number());
-    unsigned available_args = env.stack_size(); 
-    if ( available_args < nargs )
-    {
+    // TODO: this may cause undefined behaviour if the number on the stack
+    // is too large. Fix it.
+    size_t nargs = static_cast<size_t>(env.pop().to_number());
+    const size_t available_args = env.stack_size(); 
+    if (available_args < nargs) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("Attempt to call a function with %u arguments "
-            "while only %u are available on the stack."),
-            nargs, available_args);
+            log_swferror(_("Attempt to call a function with %u arguments "
+                "while only %u are available on the stack."),
+                nargs, available_args);
         );
         nargs = available_args;
     }
@@ -2493,8 +2484,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     env.push(result);
 
     // If the function threw an exception, do so here.
-    if (result.is_exception())
-    {
+    if (result.is_exception()) {
         thread.skipRemainingBuffer();
     }
 
@@ -2553,12 +2543,11 @@ SWFHandlers::ActionNew(ActionExec& thread)
     unsigned nargs = unsigned(env.pop().to_number());
 
     as_value constructorval = thread.getVariable(classname);
-    boost::intrusive_ptr<as_function> constructor = constructorval.to_function();
-    if ( ! constructor )
-    {
+    as_function* constructor = constructorval.to_function();
+    if (!constructor) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("ActionNew: "
-            "'%s' is not a constructor"), classname);
+            log_aserror(_("ActionNew: "
+                "'%s' is not a constructor"), classname);
         );
         env.drop(nargs);
         env.push(as_value()); // should we push an object anyway ?
@@ -2570,7 +2559,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
     // deleted. BitmapData also fails to construct anything under
     // some circumstances.
     try {
-        as_object* newobj = construct_object(constructor.get(), env, nargs);
+        as_object* newobj = construct_object(constructor, env, nargs);
 #ifdef USE_DEBUGGER
         debugger.addSymbol(newobj, classname);
 #endif
@@ -2923,6 +2912,27 @@ SWFHandlers::ActionDecrement(ActionExec& thread)
     env.top(0).set_double(env.top(0).to_number() - 1);
 }
 
+
+/// Call a method of an object
+//
+/// Stack: method, object, argc, arg0 ... argn
+//
+/// The standard use of this opcode is:
+/// 1. First stack value converted to a string (method name).
+/// 2. Second stack value converted to an object (this pointer).
+/// 3. Arg count and arguments parsed.
+/// 4. The method name must be a property of the object and is called with
+///    the object as its 'this'.
+//
+/// But it can also be used in a different way under some circumstances.
+//
+/// 1. If the method name is defined and not empty, the object value must
+///    be an object and the method name must be a property of the object
+///    (may be inherited). Otherwise the call fails and returns undefined.
+/// 2. If the method name is undefined or empty, the second stack value is
+///    called, and call's 'this' pointer is undefined.
+//
+/// In both usages the arguments are passed.
 void
 SWFHandlers::ActionCallMethod(ActionExec& thread)
 {
@@ -2931,22 +2941,22 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     // Get name function of the method
     as_value method_name = env.pop();
 
+    std::string method_string = method_name.to_string();
+    
     // Get an object
     as_value obj_value = env.pop();
 
     // Get number of args, modifying it if not enough values are on the stack.
-    unsigned nargs = unsigned(env.pop().to_number());
-    unsigned available_args = env.stack_size(); 
-    if (available_args < nargs)
-    {
+    size_t nargs = static_cast<size_t>(env.pop().to_number());
+    const size_t available_args = env.stack_size(); 
+    if (available_args < nargs) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("Attempt to call a method with %u arguments "
-            "while only %u are available on the stack."),
-            nargs, available_args);
+            log_swferror(_("Attempt to call a method with %u arguments "
+                "while only %u are available on the stack."),
+                nargs, available_args);
         );
         nargs = available_args;
     }
-
 
     IF_VERBOSE_ACTION (
         log_action(_(" method name: %s"), method_name);
@@ -2954,78 +2964,38 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
         log_action(_(" method nargs: %d"), nargs);
     );
 
-    std::string method_string = method_name.to_string();
-
-    bool hasMethodName = ((!method_name.is_undefined()) &&
-            (!method_string.empty()) );
-
     as_object* obj = convertToObject(getGlobal(thread.env), obj_value);
     if (!obj) {
-        // SWF integrity check
+        // If this value is not an object, it can neither have any members
+        // nor be called as a function, so neither opcode usage is possible.
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("ActionCallMethod invoked with "
-            "non-object object/func (%s)"), obj_value);
+            log_aserror(_("ActionCallMethod invoked with "
+                "non-object object/func (%s)"), obj_value);
         );
         env.drop(nargs);
         env.push(as_value());
         return;
     }
 
-    as_object* this_ptr = obj;
+    const bool noMeth = (method_name.is_undefined() || method_string.empty());
 
-    if (obj->isSuper()) {
-        if (thread.isFunction()) this_ptr = thread.getThisPointer();
-    }
+    // The method to call
+    as_value method;
 
+    // The object to be the 'this' pointer during the call.
+    as_object* this_ptr(0);
     string_table& st = getStringTable(env);
-    as_object* super =
-        obj->get_super(hasMethodName ? st.find(method_string) : 0);
+    as_object* super = obj->get_super(noMeth ? 0 : st.find(method_string));
 
-    as_value method_val;
-
-    if (!hasMethodName) {
-        // We'll be calling the super constructor here
-        method_val = obj_value;
-
-        if (!method_val.is_function())
-        {
-
-            log_debug(_("Function object given to ActionCallMethod"
-                       " is not a function (%s), will try to use"
-                       " its 'constructor' member (but should instead "
-                       "invoke its [[Call]] method"), obj_value);
-
-            // TODO: all this crap should go into an
-            // as_object::getConstructor instead
-            as_value ctor;
-            if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &ctor) )
-            {
-                IF_VERBOSE_ASCODING_ERRORS(
-                    log_aserror(_("ActionCallMethod: object has no "
-                            "constructor"));
-                );
-                env.drop(nargs);
-                env.push(as_value());
-                return;
-            }
-            if (!ctor.is_function())
-            {
-                IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("ActionCallMethod: object constructor "
-                        "is not a function"));
-                );
-                env.drop(nargs);
-                env.push(as_value());
-                return;
-            }
-            method_val = ctor;
-        }
+    // If the method name is undefined or evaluates to an empty string,
+    // the first argument is used as the method name and the 'this' pointer
+    // is undefined. We can signify this by leaving the 'this' pointer as
+    // null.a
+    if (noMeth) {
+        method = obj_value;
     }
-    else
-    {
-
-        if ( ! thread.getObjectMember(*obj, method_string, method_val) )
-        {
+    else {
+        if (!thread.getObjectMember(*obj, method_string, method)) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("ActionCallMethod: "
                 "Can't find method %s of object %s"),
@@ -3033,22 +3003,29 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
                 obj_value);
             );
             env.drop(nargs);
-            env.push(as_value()); // should we push an object anyway ?
+            env.push(as_value()); 
             return;
+        }
+        else {
+            this_ptr = obj;
         }
     }
 
+    // If we are calling a method of a super object, the 'this' pointer
+    // for the call is always the this pointer of the function that called
+    // super().
+    if (obj->isSuper()) {
+        if (thread.isFunction()) this_ptr = thread.getThisPointer();
+    }
+
 #ifdef USE_DEBUGGER
-//    log_debug (_("FIXME: method name is: %s"), method_namexxx);
-//    // IT IS NOT GUARANTEE WE DO HAVE A METHOD NAME HERE !
-    if ( ! method_name.is_undefined() )
-    {
+    if (! method_name.is_undefined()) {
         debugger.callStackPush(method_name.to_string());
         debugger.matchBreakPoint(method_name.to_string(), true);
     }
-    else
-    {
-        LOG_ONCE( log_unimpl(_("FIXME: debugger doesn't deal with anonymous function calls")) );
+    else {
+        LOG_ONCE( log_unimpl(_("FIXME: debugger doesn't deal with "
+            "anonymous function calls")) );
     }
 #endif
 
@@ -3057,7 +3034,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
         args += env.pop();
     } 
 
-    as_value result = invoke(method_val, env, this_ptr, 
+    as_value result = invoke(method, env, this_ptr, 
             args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
@@ -3122,7 +3099,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
         }
     }
 
-    boost::intrusive_ptr<as_function> method = method_val.to_function();
+    as_function* method = method_val.to_function();
     if (!method) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("ActionNewMethod: method name is undefined "
@@ -3139,7 +3116,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
     // deleted. BitmapData also fails to construct anything under
     // some circumstances.
     try {
-        as_object* newobj = construct_object(method.get(), env, nargs);
+        as_object* newobj = construct_object(method, env, nargs);
         env.push(newobj);
         return;
     }
@@ -3334,21 +3311,17 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    as_function* super = env.top(0).to_function();
+    as_object* super = env.top(0).to_object(getGlobal(thread.env));
     as_function* sub = env.top(1).to_function();
 
-    if ( ! super || ! sub )
-    {
-        IF_VERBOSE_ASCODING_ERRORS
-        (
-            if ( ! super )
-            {
-                log_aserror(_("ActionExtends: Super is not an as_function (%s)"),
+    if (!super ||!sub) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            if (!super) {
+                log_aserror(_("ActionExtends: Super is not an object (%s)"),
                     env.top(0));
             }
-            if ( ! sub )
-            {
-                log_aserror(_("ActionExtends: Sub is not an as_function (%s)"),
+            if (!sub) {
+                log_aserror(_("ActionExtends: Sub is not a function (%s)"),
                     env.top(1));
             }
         );

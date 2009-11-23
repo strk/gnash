@@ -106,7 +106,7 @@ struct TargetGuard {
 
 // Dispatch.
 as_value
-swf_function::operator()(const fn_call& fn)
+swf_function::call(const fn_call& fn)
 {
     // Extract caller before pushing ourself on the call stack
     as_object* caller = 0;
@@ -122,11 +122,8 @@ swf_function::operator()(const fn_call& fn)
 
 	// Some features are version-dependant.
 	const int swfversion = vm.getSWFVersion();
-	as_object *super = NULL;
-	if (swfversion > 5) {
-		super = fn.super;
-	}
-	else {
+
+	if (swfversion < 6) {
 		// In SWF5, when 'this' is a DisplayObject it becomes
 		// the target for this function call.
 		// See actionscript.all/setProperty.as
@@ -170,12 +167,14 @@ swf_function::operator()(const fn_call& fn)
 		}
 
 		// Add 'this'
-		assert(fn.this_ptr);
-		m_env.set_local("this", fn.this_ptr);
+		m_env.set_local("this", fn.this_ptr ? fn.this_ptr : as_value());
+
+        as_object* super = fn.super ? fn.super :
+            fn.this_ptr ? fn.this_ptr->get_super() : 0;
 
 		// Add 'super' (SWF6+ only)
 		if (super && swfversion > 5) {
-			m_env.set_local("super", as_value(super));
+			m_env.set_local("super", super);
 		}
 
 		// Add 'arguments'
@@ -195,13 +194,15 @@ swf_function::operator()(const fn_call& fn)
 		if ((m_function2_flags & PRELOAD_THIS) &&
                 !(m_function2_flags & SUPPRESS_THIS)) {
 			// preload 'this' into a register.
-			m_env.setRegister(current_reg, as_value(fn.this_ptr)); 
-			current_reg++;
+            // TODO: check whether it should be undefined or null if this_ptr
+            // is null.
+			m_env.setRegister(current_reg, fn.this_ptr); 
+			++current_reg;
 		}
 
 		if (!(m_function2_flags & SUPPRESS_THIS)) {
 			// Put 'this' in a local var.
-			m_env.add_local("this", as_value(fn.this_ptr));
+			m_env.add_local("this", fn.this_ptr ? fn.this_ptr : as_value());
 		}
 
 		// Init arguments array, if it's going to be needed.
@@ -220,23 +221,24 @@ swf_function::operator()(const fn_call& fn)
 
 		if (!(m_function2_flags & SUPPRESS_ARGUMENTS)) {
 			// Put 'arguments' in a local var.
-			m_env.add_local("arguments", as_value(arg_array));
+			m_env.add_local("arguments", arg_array);
 		}
 
-		if ((m_function2_flags & PRELOAD_SUPER) && swfversion > 5) {
-			// Put 'super' in a register (SWF6+ only).
-			// TOCHECK: should we still set it if not available ?
-			if ( super ) {
-				m_env.setRegister(current_reg, as_value(super));
+        // If super is not suppressed it is either placed in a register
+        // or set as a local variable, but not both.
+        if (swfversion > 5 && !(m_function2_flags & SUPPRESS_SUPER)) {
+            
+            // Put 'super' in a register (SWF6+ only).
+            // TOCHECK: should we still set it if not available ?
+            as_object* super = fn.super ? fn.super :
+                fn.this_ptr ? fn.this_ptr->get_super() : 0;
+
+            if (super && (m_function2_flags & PRELOAD_SUPER)) {
+				m_env.setRegister(current_reg, super);
 				current_reg++;
 			}
-		}
-
-		if (!(m_function2_flags & SUPPRESS_SUPER)) {
-		    if (super && swfversion > 5) {
-                // TOCHECK: should we still set it if unavailable ?
-                // Put 'super' in a local var (SWF6+ only)
-                m_env.add_local("super", as_value(super));
+            else if (super) {
+                m_env.add_local("super", super);
             }
 		}
 
@@ -246,7 +248,7 @@ swf_function::operator()(const fn_call& fn)
 			if (tgtch) {
 				// NOTE: _lockroot will be handled by getAsRoot()
 				as_object* r = getObject(tgtch->getAsRoot());
-				m_env.setRegister(current_reg, as_value(r));
+				m_env.setRegister(current_reg, r);
 				++current_reg;
 			}
 		}
@@ -263,7 +265,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_GLOBAL) {
 			// Put '_global' in a register.
 			as_object* global = vm.getGlobal();
-			m_env.setRegister(current_reg, as_value(global));
+			m_env.setRegister(current_reg, global);
 			++current_reg;
 		}
 

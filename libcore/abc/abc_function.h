@@ -43,7 +43,7 @@ class abc_function : public as_function
 public:
 	abc_function(Method* methodInfo, Machine* machine);
 
-	as_value operator()(const fn_call& fn);
+	as_value call(const fn_call& fn);
 
 	CodeStream* getCodeStream() const {
         return _methodInfo->getBody();

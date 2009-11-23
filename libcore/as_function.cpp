@@ -79,10 +79,13 @@ as_function::setPrototype(as_object* proto)
 }
 
 void
-as_function::extends(as_function& superclass)
+as_function::extends(as_object& superclass)
 {
 	as_object* newproto = new as_object();
-	newproto->set_prototype(superclass.getPrototype().get());
+	as_object* p =
+        superclass.getMember(NSV::PROP_PROTOTYPE).to_object(
+                *VM::get().getGlobal());
+	newproto->set_prototype(p);
 
     if (getSWFVersion(superclass) > 5) {
         const int flags = PropFlags::dontEnum;
@@ -154,7 +157,9 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
                PropFlags::dontEnum);
     }
 
-    fn_call fn(newobj, env, args, newobj->get_super(), true);
+    // Don't set a super so that it will be constructed only if required
+    // by the function.
+    fn_call fn(newobj, env, args, 0, true);
     as_value ret;
 
     try {
@@ -271,8 +276,7 @@ as_value
 function_apply(const fn_call& fn)
 {
 
-	// Get function body 
-	as_function* function_obj = ensure<ThisIs<as_function> >(fn);
+	as_object* function_obj = ensure<ValidThis>(fn);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
@@ -294,7 +298,13 @@ function_apply(const fn_call& fn)
         if (!obj) obj = new as_object; 
 
         new_fn_call.this_ptr = obj;
-        new_fn_call.super = obj->get_super();
+
+        // Note: do not override fn_call::super by creating a super
+        // object, as it may not be needed. Doing so can have a very
+        // detrimental effect on memory usage!
+        // Normal supers will be created when needed in the function
+        // call.
+        new_fn_call.super = 0;
 
 		// Check for second argument ('arguments' array)
 		if (fn.nargs > 1)
@@ -329,8 +339,7 @@ as_value
 function_call(const fn_call& fn)
 {
 
-	// Get function body 
-	as_function* function_obj = ensure<ThisIs<as_function> >(fn);
+	as_object* function_obj = ensure<ValidThis>(fn);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
@@ -364,7 +373,15 @@ function_call(const fn_call& fn)
 			new_fn_call.this_ptr = this_ptr;
 			as_object* proto = this_ptr->get_prototype();
             if (proto) {
-                new_fn_call.super = this_ptr->get_super();
+                // Note: do not override fn_call::super by creating a super
+                // object, as it may not be needed. Doing so can have a very
+                // detrimental effect on memory usage!
+                // Normal supers will be created when needed in the function
+                // call.
+
+                // TODO: it seems pointless to copy the old fn_call and
+                // then change almost everything...
+                new_fn_call.super = 0;
             }
             else {
                 // TODO: check this !
@@ -377,7 +394,7 @@ function_call(const fn_call& fn)
 	}
 
 	// Call the function 
-	return (*function_obj)(new_fn_call);
+	return function_obj->call(new_fn_call);
 
 }
 

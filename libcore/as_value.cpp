@@ -1269,8 +1269,7 @@ as_value::typeOf() const
 			return "null";
 
 		case as_value::AS_FUNCTION:
-			if ( getFun()->isSuper() ) return "object";
-			else return "function";
+			return "function";
 
 		default:
 			if (is_exception())

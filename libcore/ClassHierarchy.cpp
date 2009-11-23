@@ -75,7 +75,7 @@ public:
     {
     }
 
-    virtual as_value operator()(const fn_call& fn)
+    virtual as_value call(const fn_call& fn)
     {
         string_table& st = getStringTable(fn);
         log_debug("Loading extension class %s", st.value(mDeclaration.name));
@@ -134,7 +134,7 @@ public:
     {
     }
 
-    virtual as_value operator()(const fn_call& fn)
+    virtual as_value call(const fn_call& fn)
     {
         string_table& st = getStringTable(fn);
         log_debug("Loading native class %s", st.value(mDeclaration.name));

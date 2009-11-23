@@ -125,7 +125,7 @@ GetterSetter::UserDefinedGetterSetter::get(fn_call& fn) const
 		return underlyingValue;
 	}
 
-	if ( mGetter ) return (*mGetter)(fn);
+	if (mGetter) return mGetter->call(fn);
 	else return as_value(); // should we return underlyingValue here ?
 }
 
@@ -139,7 +139,7 @@ GetterSetter::UserDefinedGetterSetter::set(fn_call& fn)
 		return;
 	}
 
-	(*mSetter)(fn);
+	mSetter->call(fn);
 }
 
 as_value

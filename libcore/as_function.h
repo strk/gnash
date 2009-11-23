@@ -67,11 +67,11 @@ public:
 	// Avoid RTTI
 	as_function* to_function() { return this; }
 
-	/// Dispatch.
-	virtual as_value operator()(const fn_call& fn) = 0;
-
-	/// Alias for operator()
-	as_value call(const fn_call& fn) { return operator()(fn); }
+	/// Function dispatch.
+    //
+    /// Override from as_object, although as_objects cannot generally 
+    /// be called.
+	virtual as_value call(const fn_call& fn) = 0;
 
 	/// Construct an instance of this class
 	// 
@@ -94,7 +94,7 @@ public:
 	boost::intrusive_ptr<as_object> getPrototype();
 
 	/// Make this function a subclass of the given as_function
-	void extends(as_function& superclass);
+	void extends(as_object& superclass);
 
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin() { return false; }

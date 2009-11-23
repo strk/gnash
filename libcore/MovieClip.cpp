@@ -1949,7 +1949,7 @@ MovieClip::constructAsScriptObject()
                 call.super = super;
 
                     // we don't use the constructor return (should we?)
-                (*ctor)(call);
+                ctor->call(call);
             }
         }
 
