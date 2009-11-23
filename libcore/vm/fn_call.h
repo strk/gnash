@@ -109,60 +109,18 @@ private:
 class fn_call
 {
 public:
+
     typedef FunctionArgs<as_value> Args;
 
-	/// The as_object (or a pointer derived thereof) on which this call
-	/// is taking place.
-	as_object* this_ptr;
-
-	/// The "super" object in this function call context
-	as_object* super;
-
-	/// Number of arguments to this ActionScript function call.
-    Args::size_type nargs;
-
-    /// Definition containing caller code. 0 if spontaneous (system event).
-    const movie_definition* callerDef;
-
-    fn_call(const fn_call& fn)
-        :
-        this_ptr(fn.this_ptr),
-        super(fn.super),
-		nargs(fn.nargs),
-        callerDef(fn.callerDef),
-        _new(false),
-        _env(fn._env),
-        _args(fn._args)
-	{
-	}
-
-	fn_call(const fn_call& fn, as_object* this_in, as_object* sup = 0)
-		:
-        this_ptr(this_in),
-        super(sup),
-        nargs(fn.nargs),
-        callerDef(fn.callerDef),
-        _new(false),
-		_env(fn._env),
-        _args(fn._args)
-	{
-	}
-
-	fn_call(as_object* this_in, const as_environment& env_in,
-			int nargs_in, size_t first_in, as_object* sup = 0)
-		:
-		this_ptr(this_in),
-		super(sup),
-		nargs(nargs_in),
-        callerDef(0),
-        _new(false),
-		_env(env_in)
-	{
-		assert(first_in + 1 == env_in.stack_size());
-		readArgs(env_in, first_in, nargs);
-	}
-
-	fn_call(as_object* this_in, const as_environment& env_in,
+    /// Construct a fn_call
+    //
+    /// @param isNew        Pass true if this is a constructing fn_call,
+    ///                     i.e. if it is called as a result of 'new'.
+    /// @param super        Pass an overridden super value to the function
+    ///                     call. If this is 0, the super reference will be
+    ///                     calculated from the this pointer (if that is not
+    ///                     null) whenever a function requires it.
+    fn_call(as_object* this_in, const as_environment& env_in,
             Args& args, as_object* sup = 0, bool isNew = false)
 		:
 		this_ptr(this_in),
@@ -175,7 +133,7 @@ public:
         args.swap(_args);
 	}
 
-	fn_call(as_object* this_in, const as_environment& env_in)
+    fn_call(as_object* this_in, const as_environment& env_in)
 		:
 		this_ptr(this_in),
 		super(0),
@@ -186,6 +144,34 @@ public:
 	{
 	}
 
+    /// Copy constructor
+    fn_call(const fn_call& fn)
+        :
+        this_ptr(fn.this_ptr),
+        super(fn.super),
+		nargs(fn.nargs),
+        callerDef(fn.callerDef),
+        _new(false),
+        _env(fn._env),
+        _args(fn._args)
+	{
+	}
+
+	/// The as_object (or a pointer derived thereof) on which this call
+	/// is taking place.
+	as_object* this_ptr;
+
+	/// The "super" object in this function call context
+    //
+    /// If this is 0, the super may be constructed from the this pointer.
+	as_object* super;
+
+	/// Number of arguments to this ActionScript function call.
+    Args::size_type nargs;
+
+    /// Definition containing caller code. 0 if spontaneous (system event).
+    const movie_definition* callerDef;
+
     /// Return the VM this fn_call is running from
     VM& getVM() const
     {
@@ -195,12 +181,6 @@ public:
 	/// Return true if this call is an object instantiation
 	bool isInstantiation() const
 	{
-		// Currently the as_function::constructInstance
-		// will set 'this_ptr' to NULL when calling a builtin
-		// function, so we use this info to find out.
-		// For the future, we might use an explicit flag instead
-		// as I belive there are some cases in which 'this' is
-		// undefined even in a normal function call.
 		return _new;
 	}
 
@@ -267,14 +247,6 @@ private:
 
 	/// The actual arguments
     Args::container_type _args;
-
-	void readArgs(const as_environment& env, int first_in, size_t nargs)
-	{
-		_args.clear();
-		for (size_t i = 0; i < nargs; ++i) {
-			_args.push_back(env.bottom(first_in - i));
-        }
-	}
 
 };
 
