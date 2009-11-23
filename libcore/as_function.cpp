@@ -298,7 +298,13 @@ function_apply(const fn_call& fn)
         if (!obj) obj = new as_object; 
 
         new_fn_call.this_ptr = obj;
-        new_fn_call.super = obj->get_super();
+
+        // Note: do not override fn_call::super by creating a super
+        // object, as it may not be needed. Doing so can have a very
+        // detrimental effect on memory usage!
+        // Normal supers will be created when needed in the function
+        // call.
+        new_fn_call.super = 0;
 
 		// Check for second argument ('arguments' array)
 		if (fn.nargs > 1)
@@ -367,7 +373,15 @@ function_call(const fn_call& fn)
 			new_fn_call.this_ptr = this_ptr;
 			as_object* proto = this_ptr->get_prototype();
             if (proto) {
-                new_fn_call.super = this_ptr->get_super();
+                // Note: do not override fn_call::super by creating a super
+                // object, as it may not be needed. Doing so can have a very
+                // detrimental effect on memory usage!
+                // Normal supers will be created when needed in the function
+                // call.
+
+                // TODO: it seems pointless to copy the old fn_call and
+                // then change almost everything...
+                new_fn_call.super = 0;
             }
             else {
                 // TODO: check this !
