@@ -2455,15 +2455,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     else if (!function.is_function()) {
         log_error(_("ActionCallFunction: function name %s evaluated to "
                 "non-function value %s"), funcname, function);
-        // Calling super ? 
-        as_object* obj = convertToObject(getGlobal(thread.env), function);
         this_ptr = thread.getThisPointer();
-        if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &function) )
-        {
-            IF_VERBOSE_ASCODING_ERRORS (
-            log_aserror(_("Object doesn't have a constructor"));
-            )
-        }
     }
 
     // Get number of args, modifying it if not enough values are on the stack.
