@@ -45,7 +45,8 @@ namespace gnash {
 
 // Function Prototypes
 namespace {
-    void enumerateAttributes(const XMLNode_as& node, PropertyList::SortedPropertyList&attributes);
+    void enumerateAttributes(const XMLNode_as& node,
+            PropertyList::SortedPropertyList& attributes);
     bool prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
             const std::string& prefix);
     bool namespaceMatches(
