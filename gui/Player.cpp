@@ -564,6 +564,23 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         return "";
     }
 
+    if (event == "Stage.resize")
+    {
+        if ( _gui.isPlugin() ) {
+            log_debug("Player doing nothing on Stage.resize as we're a plugin");
+            return "";
+        }
+
+        // arg contains WIDTHxHEIGHT
+        log_debug("Player got Stage.resize(%s) message", arg);
+        int width, height;
+        sscanf(arg.c_str(), "%dx%d", &width, &height);
+        _gui.resizeWindow(width, height);
+
+        return "";
+    }
+
+
     if (event == "System.capabilities.screenResolutionX")
     {
         std::ostringstream ss;

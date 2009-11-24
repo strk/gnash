@@ -748,6 +748,22 @@ GtkGui::createMenuAlt()
     return true;
 }
 
+void
+GtkGui::resizeWindow(int width, int height)
+{
+    log_debug("GtkGui: Window resize request received");
+
+    if (!_xid) {
+    
+        // This sets the *minimum* size for the drawing area and thus will
+        // also resize the window if needed. 
+        // Advantage: The window is sized correctly, no matter what other
+        // widgets are visible
+        // Disadvantage: The window will never be shrinked, which is bad.   
+        gtk_widget_set_size_request(_canvas, width, height);
+    }
+}
+
 bool
 GtkGui::createWindow(const char *title, int width, int height,
                      int xPosition, int yPosition)

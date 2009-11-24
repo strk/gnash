@@ -121,6 +121,8 @@ public:
     virtual bool createWindow(const char* title, int width, int height,
                        int xPosition = 0, int yPosition = 0) = 0;
 
+    virtual void resizeWindow(int width, int height);
+
     /// Start main rendering loop.
     virtual bool run() = 0;
 

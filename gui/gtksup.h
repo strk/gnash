@@ -63,6 +63,7 @@ public:
     virtual bool createWindow(int width, int height);
     virtual bool createWindow(const char *title, int width, int height,
                               int xPosition = 0, int yPosition = 0);
+    virtual void resizeWindow(int width, int height);
 
     virtual bool run();
 

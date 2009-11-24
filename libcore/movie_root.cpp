@@ -318,6 +318,20 @@ movie_root::setLevel(unsigned int num, Movie* movie)
 			//       (like, unregistering all childs etc...)
 			//       Tested, but not automated, is that other
 			//       levels should be maintained alive.
+            // Sat Nov 14 10:31:19 CET 2009
+            // ^^^ not confirmed in this date, I think other levels 
+            //     are dropped too! (strk)
+
+            m_viewport_width = static_cast<int>(movie->widthPixels());
+            m_viewport_height = static_cast<int>(movie->heightPixels());
+
+            // notify  stage replacement
+            if ( _interfaceHandler )
+            {
+                std::stringstream ss;
+                ss << m_viewport_width << "x" << m_viewport_height;
+                _interfaceHandler->call("Stage.resize", ss.str());
+            }
 		}
 
 		it->second->destroy();

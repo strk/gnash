@@ -181,6 +181,12 @@ Gui::setFullscreen()
 }
 
 void
+Gui::resizeWindow(int /*width*/, int /*height*/)
+{
+    log_unimpl(_("Window resize not yet supported in this GUI"));
+}
+
+void
 Gui::unsetFullscreen()
 {
     log_unimpl(_("Fullscreen not yet supported in this GUI"));
