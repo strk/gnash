@@ -52,11 +52,17 @@ TRACE_AS2_TRACES = \
 TRACE_AS3_TESTS = \
 	scope1.xml \
 	stack1.xml \
+	noshowframe.xml \
+	earlyshowframe.xml \
+	earlysymbolclass.xml \
 	$(NULL)
 
 TRACE_AS3_TRACES = \
 	scope1.trace \
 	stack1.trace \
+	noshowframe.trace \
+	earlyshowframe.trace \
+	earlysymbolclass.trace \
 	$(NULL)
 
 EXTRA_DIST = $(SC_AS2_XMLTESTS) \
