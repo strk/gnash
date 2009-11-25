@@ -68,7 +68,7 @@ clean-local:
 		gnash.sum 
 
 
-TEST_DRIVERS = ../simple.exp
+TEST_DRIVERS = ../../simple.exp
 TEST_CASES = ${check_SCRIPTS} 
 
 check-DEJAGNU: site-update $(check_PROGRAMS)
