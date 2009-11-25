@@ -49,10 +49,16 @@ package main {
             check(Object.prototype.hasOwnProperty("constructor"));
             check(Object.prototype.hasOwnProperty("hasOwnProperty"));
             check(Object.prototype.hasOwnProperty("isPrototypeOf"));
-            xcheck(Object.prototype.hasOwnProperty("propertyIsEnumerable"));
-            xcheck(Object.prototype.hasOwnProperty("setPropertyIsEnumerable"));
+            check(Object.prototype.hasOwnProperty("propertyIsEnumerable"));
+            check(Object.prototype.hasOwnProperty("setPropertyIsEnumerable"));
             check(Object.prototype.hasOwnProperty("toString"));
             check(Object.prototype.hasOwnProperty("valueOf"));
+            check(Object.prototype.hasOwnProperty("toLocaleString"));
+
+            // AS2-only properties
+            check(!Object.prototype.hasOwnProperty("addProperty"));
+            check(!Object.prototype.hasOwnProperty("watch"));
+            check(!Object.prototype.hasOwnProperty("unwatch"));
             
             check(!Object.prototype.hasOwnProperty("__proto__"));
             check(!Object.prototype.hasOwnProperty("prototype"));
@@ -70,14 +76,14 @@ package main {
             check(!a.hasOwnProperty("toString"));
             check(!a.hasOwnProperty("valueOf"));
             
-            xcheck(!a.hasOwnProperty("__proto__"));
+            check(!a.hasOwnProperty("__proto__"));
             check(!a.hasOwnProperty("prototype"));
 
             // This crashes the Adobe player 9.
             // check(Object.isPrototypeOf(this));
 		
 
-            totals(27);
+            totals(31);
             done();
         }
     }

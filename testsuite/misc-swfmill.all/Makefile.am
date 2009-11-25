@@ -21,6 +21,19 @@ AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 abs_topbuilddir=$(shell cd $(top_builddir); pwd)
 abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-swfmill.all; pwd)
 
+if ENABLE_AVM2
+if SWFMILL_AS3_SUPPORT
+DIR_TRACE_AS3 = trace-as3
+endif
+endif
+
+SUBDIRS = trace-as2 $(DIR_TRACE_AS3)
+
+DIST_SUBDIRS = \
+	trace-as2 \
+	trace-as3 \
+	$(NULL)
+
 ## Self-contained XML tests
 SC_AS2_XMLTESTS =			\
 	mixed-bytecode-as2.xml	\
@@ -41,30 +54,8 @@ SC_AS3_XMLTESTS = \
 
 # XML tests that rely on comparing trace output.
 
-TRACE_AS2_TESTS = \
-	super.xml \
-	$(NULL)	
-
-TRACE_AS2_TRACES = \
-	super.trace \
-	$(NULL)	
-
-TRACE_AS3_TESTS = \
-	scope1.xml \
-	stack1.xml \
-	$(NULL)
-
-TRACE_AS3_TRACES = \
-	scope1.trace \
-	stack1.trace \
-	$(NULL)
-
 EXTRA_DIST = $(SC_AS2_XMLTESTS) \
 	     $(SC_AS3_XMLTESTS) \
-		 $(TRACE_AS2_TESTS) \
-	     $(TRACE_AS2_TRACES) \
-		 $(TRACE_AS3_TESTS) \
-	     $(TRACE_AS3_TRACES) \
 	     gen-swfmill-trace-runner.sh \
 	     $(NULL)
 
@@ -81,26 +72,12 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/testsuite \
 	$(NULL)
 
-TRACE_TESTS = $(TRACE_AS2_TESTS)
-TRACES = $(TRACE_AS2_TRACES)
 SC_XMLTESTS_OUT = $(SC_AS2_XMLTESTS:.xml=.swf)
-
-
-if ENABLE_AVM2
-if SWFMILL_AS3_SUPPORT
-TRACE_TESTS += $(TRACE_AS3_TESTS)
-TRACES += $(TRACE_AS3_TRACES)
-SC_XMLTESTS_OUT += $(SC_AS3_XMLTESTS:.xml=.swf)
-endif
-endif
-
-TRACE_XMLTESTS_OUT = $(TRACE_TESTS:.xml=.swf)
 
 # Dependencies for all self-contained SWF tests
 $(SC_XMLTESTS_OUT) : 
 
 check_SCRIPTS = \
-	trace-test-runner	\
 	mixed-bytecode-as2-runner	\
 	jump_after_end-runner	\
 	jump_to_prev_block-runner	\
@@ -111,21 +88,9 @@ check_SCRIPTS = \
 	Try-without-jump-runner \
 	$(NULL)
 
-if ENABLE_AVM2
-if SWFMILL_AS3_SUPPORT
-check_SCRIPTS += \
-	mixed-bytecode-as3-runner	\
-	$(NULL)
-endif
-endif
-
 check_PROGRAMS = \
 	backgroundTestRunner \
 	$(NULL)
-
-trace-test-runner: $(srcdir)/gen-swfmill-trace-runner.sh $(TRACE_AS3_TESTS) $(TRACE_XMLTESTS_OUT)
-	sh $< $(srcdir) $(builddir) > $@
-	chmod 755 $@
 
 mixed-bytecode-as3-runner: $(srcdir)/../generic-testrunner.sh mixed-bytecode-as3.swf Makefile
 	sh $< -r 50 -c "AS3" $(top_builddir) mixed-bytecode-as3.swf > $@

@@ -73,14 +73,14 @@ package hello {
             xcheck(!m.hasOwnProperty("constructor"));
             
             // MovieClip properties
-            xcheck(m.hasOwnProperty("nextFrame"));
-            xcheck(m.hasOwnProperty("prevFrame"));
-            xcheck(m.hasOwnProperty("gotoAndStop"));
-            xcheck(m.hasOwnProperty("nextScene"));
-            xcheck(m.hasOwnProperty("prevScene"));
-            xcheck(m.hasOwnProperty("play"));
-            xcheck(m.hasOwnProperty("stop"));
-            xcheck(m.hasOwnProperty("addFrameScript"));
+            check(m.hasOwnProperty("nextFrame"));
+            check(m.hasOwnProperty("prevFrame"));
+            check(m.hasOwnProperty("gotoAndStop"));
+            check(m.hasOwnProperty("nextScene"));
+            check(m.hasOwnProperty("prevScene"));
+            check(m.hasOwnProperty("play"));
+            check(m.hasOwnProperty("stop"));
+            check(m.hasOwnProperty("addFrameScript"));
             xcheck(m.hasOwnProperty("framesLoaded"));
             xcheck(m.hasOwnProperty("totalFrames"));
             xcheck(m.hasOwnProperty("currentFrame"));
