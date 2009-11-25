@@ -23,11 +23,17 @@ AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 TRACE_TESTS = \
 	scope1.xml \
 	stack1.xml \
+	earlyshowframe.xml \
+	noshowframe.xml \
+	earlysymbolclass.xml \
 	$(NULL)	
 
 TRACE_TRACES = \
 	scope1.trace \
 	stack1.trace \
+	earlyshowframe.trace \
+	noshowframe.trace \
+	earlysymbolclass.trace \
 	$(NULL)	
 
 EXTRA_DIST = \
