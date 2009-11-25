@@ -39,7 +39,6 @@ namespace gnash {
 // Forward declarations
 class fn_call;
 class URL;
-class LoaderThread;
 
 /// Implements XML (AS2) and flash.xml.XMLDocument (AS3) class.
 //

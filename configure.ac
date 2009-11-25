@@ -2381,6 +2381,8 @@ testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
 testsuite/misc-haxe.all/classes.all/Makefile
 testsuite/misc-swfmill.all/Makefile
+testsuite/misc-swfmill.all/trace-as2/Makefile
+testsuite/misc-swfmill.all/trace-as3/Makefile
 testsuite/misc-swfc.all/Makefile
 testsuite/network.all/Makefile
 testsuite/movies.all/Makefile

@@ -9,7 +9,7 @@ TESTDIR=$1
 BUILDDIR=$2
 PASSFILE="${TESTDIR}/PASSING"
 
-TESTER="${BUILDDIR}/../../utilities/gprocessor -v -r0 -f 10 "
+TESTER="${BUILDDIR}/../../../utilities/gprocessor -v -r0 -f 10 "
 
 cat<<EOF
 #!/bin/sh
