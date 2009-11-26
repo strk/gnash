@@ -117,11 +117,13 @@ check(XML.prototype instanceof XMLNode);
 var tmp = new XML();
 
 
-// These two properties are added to the prototype here.
+// These properties are added to the prototype here.
 check(!tmp.hasOwnProperty("docTypeDecl") );
 check(!tmp.hasOwnProperty("xmlDecl") );
 check(XML.prototype.hasOwnProperty("docTypeDecl") );
 check(XML.prototype.hasOwnProperty("xmlDecl") );
+check(XML.prototype.hasOwnProperty("contentType") );
+check(XML.prototype.hasOwnProperty("ignoreWhite") );
 
 #if OUTPUT_VERSION >= 6
  check( ! tmp.hasOwnProperty("nodeValue") );
