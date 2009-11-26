@@ -34,6 +34,7 @@
 #include "PropertyList.h"
 #include "Global_as.h"
 #include "Object.h"
+#include "Array_as.h"
 
 #include <boost/bind.hpp>
 #include <string>
@@ -137,16 +138,36 @@ XMLNode_as::object()
     return _object;
 }
 
+void
+XMLNode_as::updateChildNodes()
+{
+    if (!_childNodes) {
+        _childNodes = _global.createArray();
+    }
+
+    // Clear array of all elements.
+    _childNodes->set_member(NSV::PROP_LENGTH, 0.0);
+
+    string_table& st = getStringTable(_global);
+
+    // Set up the array without calling push()!
+    const size_t size = _children.size();
+    Children::const_iterator it = _children.begin();
+    for (size_t i = 0; i != size; ++i, ++it) {
+        XMLNode_as* node = *it;
+        const string_table::key key = arrayKey(st, i);
+        _childNodes->set_member(key, node->object());
+
+        // All elements are set to readonly.
+        _childNodes->set_member_flags(key, PropFlags::readOnly);
+    }
+}
+
 as_object*
 XMLNode_as::childNodes()
 {
     if (!_childNodes) {
-        _childNodes = _global.createArray();
-        for (Children::const_iterator it = _children.begin(),
-                e = _children.end(); it != e; ++it) {
-            XMLNode_as* node = *it;
-            callMethod(_childNodes, NSV::PROP_PUSH, node->object());
-        }
+        updateChildNodes();
     }
     return _childNodes;
 }
@@ -182,18 +203,20 @@ XMLNode_as::lastChild()
 }
 
 void
-XMLNode_as::appendChild(XMLNode_as* node)
+XMLNode_as::removeChild(XMLNode_as* node)
+{
+    node->setParent(0);
+    _children.remove(node);
+    updateChildNodes();
+}
+
+void
+XMLNode_as::appendChild(XMLNode_as* node, bool update)
 {
     assert(node);
-
-    XMLNode_as* oldparent = node->getParent();
     node->setParent(this);
     _children.push_back(node);
-    if (oldparent) {
-        oldparent->_children.remove(node);
-        oldparent->_childNodes = 0;
-    }
-    _childNodes = 0;
+    if (update) updateChildNodes();
 }
 
 void
@@ -211,29 +234,15 @@ XMLNode_as::insertBefore(XMLNode_as* newnode, XMLNode_as* pos)
         return;
     }
 
+    XMLNode_as* parent = newnode->getParent();
+    if (parent) {
+        parent->removeChild(newnode);
+    }
+    
     _children.insert(it, newnode);
-    XMLNode_as* oldparent = newnode->getParent();
     newnode->setParent(this);
-    if (oldparent) {
-        oldparent->_children.remove(newnode);
-        oldparent->_childNodes = 0;
-    }
-    _childNodes = 0;
-}
+    updateChildNodes();
 
-void
-XMLNode_as::removeNode()
-{
-    // This is only called on AS-referenced nodes, so the GC will take
-    // care of deleting it (and its children) when there are no more
-    // references to it.
-    assert(_object);
-    XMLNode_as* oldparent = getParent();
-    if (oldparent) {
-        oldparent->_children.remove(this);
-        oldparent->_childNodes = 0;
-    }
-    _parent = 0;
 }
 
 XMLNode_as *
@@ -379,6 +388,9 @@ XMLNode_as::clearChildren()
         }
     }
     _children.clear();
+
+    // Reset so that it is reinitialized on next access.
+    _childNodes = 0;
 }
 
 void
@@ -579,25 +591,29 @@ xmlnode_appendChild(const fn_call& fn)
 
 	XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
 
-	if ( ! fn.nargs )
-	{
+	if (!fn.nargs) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("XMLNode::appendChild() needs at least one argument"));
+            log_aserror(_("XMLNode::appendChild() needs at least one "
+                    "argument"));
 		);
 		return as_value();
 	}
 
-	XMLNode_as* xml_obj;
-
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), xml_obj)) {
+	XMLNode_as* node;
+    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), node)) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("First argument to XMLNode::appendChild() is not "
-                "an XMLNode"));
+            log_aserror(_("First argument to XMLNode::appendChild() is not "
+                    "an XMLNode"));
 		);
 		return as_value();
 	}
 
-	ptr->appendChild(xml_obj);
+    XMLNode_as* parent = node->getParent();
+    if (parent) {
+        parent->removeChild(node);
+    }
+	ptr->appendChild(node);
+
 	return as_value(); 
 
 }
@@ -790,7 +806,8 @@ xmlnode_removeNode(const fn_call& fn)
 {
     XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     
-    ptr->removeNode();
+    XMLNode_as* parent = ptr->getParent();
+    if (parent) parent->removeChild(ptr);
     return as_value();
 }
 
@@ -967,7 +984,6 @@ as_value
 xmlnode_childNodes(const fn_call& fn)
 {
     XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
- 
     return ptr->childNodes();
 }
 

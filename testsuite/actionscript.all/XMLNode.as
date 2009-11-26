@@ -123,29 +123,29 @@ check_equals(node1.childNodes.length, 3);
 
 // Now it has 4, but the latest element is not an XMLNode
 node1.childNodes.push("not a node");
-xcheck_equals(node1.childNodes.length, 4);
+check_equals(node1.childNodes.length, 4);
 check(!node1.childNodes[3] instanceOf XMLNode);
 
 // Now 5. The latest element is an XMLNode, but it does not become
 // lastChild
 node1.childNodes.push(new XMLNode (1, "an XMLNode"));
-xcheck_equals(node1.childNodes.length, 5);
-xcheck(node1.childNodes[4] instanceOf XMLNode);
+check_equals(node1.childNodes.length, 5);
+check(node1.childNodes[4] instanceOf XMLNode);
 check_equals(node1.lastChild.toString(), "<node3>third text node</node3>");
 
 // childNodes really is just an array: it can be sorted
 check_equals(node1.childNodes[0].toString(), "first text node");
 check_equals(node1.childNodes[2].toString(), "<node3>third text node</node3>");
-xcheck_equals(node1.childNodes[3].toString(), "not a node");
+check_equals(node1.childNodes[3].toString(), "not a node");
 node1.childNodes.sort();
 xcheck_equals(node1.childNodes[0].toString(), "<an XMLNode />");
 check_equals(node1.childNodes[2].toString(), "<node3>third text node</node3>");
-xcheck_equals(node1.childNodes[3].toString(), "first text node");
+check_equals(node1.childNodes[3].toString(), "first text node");
 
 // It can store anything
 node1.childNodes.push(new Date());
-xcheck_equals(node1.childNodes.length, 6);
-xcheck(node1.childNodes[5] instanceOf Date);
+check_equals(node1.childNodes.length, 6);
+check(node1.childNodes[5] instanceOf Date);
 check_equals(node1.childNodes.childNodes[5].hasChildNodes(), undefined);
 
 node1.childNodes.lastChild.appendChild(new XMLNode(1, "datenode"));
@@ -156,10 +156,10 @@ o.toString = function() {
     return "o.toString()";
 };
 
-xcheck_equals(node1.childNodes.length, 6);
+check_equals(node1.childNodes.length, 6);
 node1.childNodes.push(o);
-xcheck_equals(node1.childNodes.length, 7);
-xcheck_equals(node1.childNodes[6].toString(), "o.toString()");
+check_equals(node1.childNodes.length, 7);
+check_equals(node1.childNodes[6].toString(), "o.toString()");
 
 // The last child is still node3
 check(node1.lastChild != node1.childNodes[6]);

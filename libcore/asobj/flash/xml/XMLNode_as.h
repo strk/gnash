@@ -138,27 +138,25 @@ public:
     /// in an exact copy of the original object's document tree. 
     XMLNode_as* cloneNode(bool deep);
 
-    /// Append a child node the the XML object
+    /// Append a child node to this XML object
     //
-    /// Appends the specified node to the XML object's child
-    /// list. This method operates directly on the node referenced by the
-    /// childNode parameter; it does not append a copy of the node. If the
-    /// node to be appended already exists in another tree structure,
-    /// appending the node to the new location will remove it from its
-    /// current location. If the childNode parameter refers to a node that
-    /// already exists in another XML tree structure, the appended child
-    /// node is placed in the new tree structure after it is removed from
-    /// its existing parent node. 
-    ///
-    /// @param child    The XMLNode_as object to append as a child.
-	void appendChild(XMLNode_as* child);
-
-    void removeChild(XMLNode_as* child);
-
-    /// Set the parent XMLNode_as of this node.
+    /// The child node's parent is set to this object, the node is added to
+    /// this object's children, the _childNodes array may be updated.
     //
-    /// @param node     The new parent of this node. May be 0.
-    void setParent(XMLNode_as* node) { _parent = node; }
+    /// @param node     The node to add as a child
+    /// @param update   Whether to update the array of childNodes. When XML
+    ///                 trees are automatically created, e.g. during parseXML,
+    ///                 there is no need to create or update the array on
+    ///                 each append. Omitting the update reduces CPU usage
+    ///                 and memory usage (creating the array means creating
+    ///                 a referenceable object).
+	void appendChild(XMLNode_as* node, bool update = true);
+
+    /// Remove a child node from this XML object
+    //
+    /// The child node's parent is set to 0, the node is removed from
+    /// this object's children, the _childNodes array is updated.
+    void removeChild(XMLNode_as* node);
 
     /// Get the parent XMLNode_as of this node. Can be 0.
     XMLNode_as* getParent() const {
@@ -181,11 +179,6 @@ public:
     ///     Must be a child of this XMLNode or the operation will fail.
     ///
     void insertBefore(XMLNode_as* newnode, XMLNode_as* pos);
-
-    /// Removes the specified XML object from its parent.
-    //
-    /// Also deletes all descendants of the node.
-    void removeNode();
 
     /// Convert the XMLNode to a string
     //
@@ -211,7 +204,9 @@ public:
 
     /// Associate an as_object with this XMLNode_as.
     //
-    /// Ownership is immediately be passed to the as_object!
+    /// An XMLNode_as with an associated object is regarded as being owned
+    /// by that object, so make sure it is! Using as_object::setRelay will
+    /// achieve that.
     void setObject(as_object* o) {
         assert(!_object);
         assert(o);
@@ -240,10 +235,20 @@ protected:
 
 private:
 
-    Children _children;
+    /// Set the parent XMLNode_as of this node.
+    //
+    /// @param node     The new parent of this node. May be 0.
+    void setParent(XMLNode_as* node) { _parent = node; }
+
+    /// Reset the array of childNodes to match the actual children.
+    //
+    /// Only called when the XML structure changes.
+    void updateChildNodes();
 
     /// A non-trivial copy-constructor for cloning nodes.
     XMLNode_as(const XMLNode_as &node, bool deep);
+
+    Children _children;
 
     as_object* _object;
 

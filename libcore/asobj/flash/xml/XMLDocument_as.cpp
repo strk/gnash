@@ -498,7 +498,7 @@ XMLDocument_as::parseTag(XMLNode_as*& node, const std::string& xml,
             childNode->setAttribute(i->first, i->second);
         }
 
-        node->appendChild(childNode);
+        node->appendChild(childNode, false);
         if (*it == '/') ++it;
         else node = childNode;
 
@@ -562,7 +562,7 @@ XMLDocument_as::parseText(XMLNode_as* node, const std::string& xml,
     unescapeXML(content);
 
     childNode->nodeValueSet(content);
-    node->appendChild(childNode);
+    node->appendChild(childNode, false);
 
     //log_debug("appended text node: %s", content);
 }
@@ -599,7 +599,7 @@ XMLDocument_as::parseCData(XMLNode_as* node, const std::string& xml,
     XMLNode_as* childNode = new XMLNode_as(_global);
     childNode->nodeValueSet(content);
     childNode->nodeTypeSet(Text);
-    node->appendChild(childNode);
+    node->appendChild(childNode, false);
     
 }
 
