@@ -125,7 +125,7 @@ public:
     // Use a list for quick erasing
     typedef std::list<XMLNode_as*> Children;
 
-    Children& childNodes() { return _children; }
+    as_object* childNodes();
 
     XMLNode_as* previousSibling();
     XMLNode_as* nextSibling();
@@ -150,9 +150,10 @@ public:
     /// node is placed in the new tree structure after it is removed from
     /// its existing parent node. 
     ///
-    /// @param childNode    The XMLNode_as object to append as a child.
+    /// @param child    The XMLNode_as object to append as a child.
+	void appendChild(XMLNode_as* child);
 
-	void appendChild(XMLNode_as* childNode);
+    void removeChild(XMLNode_as* child);
 
     /// Set the parent XMLNode_as of this node.
     //
@@ -249,6 +250,8 @@ private:
     XMLNode_as* _parent;
 
     as_object* _attributes;
+
+    as_object* _childNodes;
 
     std::string _name;
 

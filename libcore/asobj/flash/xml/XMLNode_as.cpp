@@ -85,6 +85,7 @@ XMLNode_as::XMLNode_as(Global_as& gl)
     _object(0),
     _parent(0),
     _attributes(new as_object),
+    _childNodes(0),
     _type(Element)
 {
 }
@@ -95,6 +96,7 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     _object(0),
     _parent(0), 
     _attributes(new as_object),
+    _childNodes(0),
     _name(tpl._name),
     _value(tpl._value),
     _type(tpl._type)
@@ -104,7 +106,6 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
         const Children& from=tpl._children;
         for (Children::const_iterator it=from.begin(), itEnd=from.end();
                         it != itEnd; ++it) {
-
             _children.push_back(new XMLNode_as(*(*it), deep));
         }
     }
@@ -136,17 +137,30 @@ XMLNode_as::object()
     return _object;
 }
 
+as_object*
+XMLNode_as::childNodes()
+{
+    if (!_childNodes) {
+        _childNodes = _global.createArray();
+        for (Children::const_iterator it = _children.begin(),
+                e = _children.end(); it != e; ++it) {
+            XMLNode_as* node = *it;
+            callMethod(_childNodes, NSV::PROP_PUSH, node->object());
+        }
+    }
+    return _childNodes;
+}
+
 bool
 XMLNode_as::hasChildNodes()
 {
-    if (_children.size()) return true;
-    return false;
+    return !_children.empty();
 }
 
 XMLNode_as*
 XMLNode_as::firstChild()
 {
-    if ( _children.empty() ) return NULL;
+    if (_children.empty()) return 0;
     return _children.front();
 }
 
@@ -170,20 +184,23 @@ XMLNode_as::lastChild()
 void
 XMLNode_as::appendChild(XMLNode_as* node)
 {
-    assert (node);
+    assert(node);
 
     XMLNode_as* oldparent = node->getParent();
     node->setParent(this);
     _children.push_back(node);
     if (oldparent) {
         oldparent->_children.remove(node);
+        oldparent->_childNodes = 0;
     }
-
+    _childNodes = 0;
 }
 
 void
 XMLNode_as::insertBefore(XMLNode_as* newnode, XMLNode_as* pos)
 {
+    assert(_object);
+
 	// find iterator for positional parameter
     Children::iterator it = std::find(_children.begin(), _children.end(), pos);
     if (it == _children.end()) {
@@ -199,18 +216,22 @@ XMLNode_as::insertBefore(XMLNode_as* newnode, XMLNode_as* pos)
     newnode->setParent(this);
     if (oldparent) {
         oldparent->_children.remove(newnode);
+        oldparent->_childNodes = 0;
     }
+    _childNodes = 0;
 }
 
 void
 XMLNode_as::removeNode()
 {
     // This is only called on AS-referenced nodes, so the GC will take
-    // care of deleting it (and its children).
+    // care of deleting it (and its children) when there are no more
+    // references to it.
     assert(_object);
     XMLNode_as* oldparent = getParent();
     if (oldparent) {
         oldparent->_children.remove(this);
+        oldparent->_childNodes = 0;
     }
     _parent = 0;
 }
@@ -441,6 +462,8 @@ XMLNode_as::setReachable()
 	if (_attributes) _attributes->setReachable();
 
     if (_object) _object->setReachable();
+
+    if (_childNodes) _childNodes->setReachable();
 }
 
 void
@@ -940,27 +963,12 @@ xmlnode_parentNode(const fn_call& fn)
     return rv;
 }
 
-
 as_value
 xmlnode_childNodes(const fn_call& fn)
 {
     XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
  
-    Global_as& gl = getGlobal(fn);
-    as_object* ary = gl.createArray();
-
-    typedef XMLNode_as::Children Children;
-
-    Children& child = ptr->childNodes();
-    for ( Children::const_iterator it=child.begin(), itEnd=child.end();
-                    it != itEnd; ++it )
-    {
-        XMLNode_as* node = *it;
-        as_object* obj = node->object();
-        callMethod(ary, NSV::PROP_PUSH, obj);
-    }
-
-    return as_value(ary);
+    return ptr->childNodes();
 }
 
 
