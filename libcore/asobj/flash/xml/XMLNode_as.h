@@ -108,11 +108,11 @@ public:
     ///  returns false.
     bool hasChildNodes();
 
-    boost::intrusive_ptr<XMLNode_as> firstChild();
-    boost::intrusive_ptr<XMLNode_as> lastChild();
+    XMLNode_as* firstChild();
+    XMLNode_as* lastChild();
     
     // Use a list for quick erasing
-    typedef std::list<boost::intrusive_ptr<XMLNode_as> > Children;
+    typedef std::list<XMLNode_as*> Children;
 
     Children& childNodes() { return _children; }
 
@@ -125,7 +125,7 @@ public:
     /// name, value, and attributes as the specified XML object. If deep
     /// is set to true, all child nodes are recursively cloned, resulting
     /// in an exact copy of the original object's document tree. 
-    boost::intrusive_ptr<XMLNode_as> cloneNode(bool deep);
+    XMLNode_as* cloneNode(bool deep);
 
     /// Append a child node the the XML object
     //
@@ -141,7 +141,7 @@ public:
     ///
     /// @param childNode    The XMLNode_as object to append as a child.
 
-	void appendChild(boost::intrusive_ptr<XMLNode_as> childNode);
+	void appendChild(XMLNode_as* childNode);
 
     /// Set the parent XMLNode_as of this node.
     //
@@ -149,8 +149,8 @@ public:
     void setParent(XMLNode_as* node) { _parent = node; }
 
     /// Get the parent XMLNode_as of this node. Can be 0.
-    XMLNode_as *getParent() const {
-        return _parent.get();
+    XMLNode_as* getParent() const {
+        return _parent;
     }
 
     /// Insert a node before a node
@@ -168,8 +168,7 @@ public:
     ///     The node before which to insert the new one.
     ///     Must be a child of this XMLNode or the operation will fail.
     ///
-    void insertBefore(boost::intrusive_ptr<XMLNode_as> newnode, 
-            boost::intrusive_ptr<XMLNode_as> pos);
+    void insertBefore(XMLNode_as* newnode, XMLNode_as* pos);
 
     /// Removes the specified XML object from its parent.
     //
@@ -218,7 +217,7 @@ private:
     /// A non-trivial copy-constructor for cloning nodes.
     XMLNode_as(const XMLNode_as &node, bool deep);
 
-    boost::intrusive_ptr<XMLNode_as> _parent;
+    XMLNode_as* _parent;
 
     as_object* _attributes;
 

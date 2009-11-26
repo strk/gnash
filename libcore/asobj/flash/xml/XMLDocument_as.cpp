@@ -654,7 +654,7 @@ xml_new(const fn_call& fn)
             xml_obj = dynamic_cast<XMLDocument_as*>(obj);
 
             if (xml_obj) {
-                as_object* clone = xml_obj->cloneNode(true).get();
+                as_object* clone = xml_obj->cloneNode(true);
                 attachXMLProperties(*clone);
                 return as_value(clone);
             }
