@@ -60,6 +60,11 @@ check(XML.prototype.hasOwnProperty("parseXML") );
 check(XML.prototype.hasOwnProperty("send") );
 check(XML.prototype.hasOwnProperty("sendAndLoad") );
 
+check(!XML.prototype.hasOwnProperty("docTypeDecl") );
+check(!XML.prototype.hasOwnProperty("xmlDecl") );
+// ignoreWhite is undefined by default, but is used when set to true
+check(!XML.prototype.hasOwnProperty("ignoreWhite") );
+
 check(!XML.hasOwnProperty("createElement") );
 check(!XML.hasOwnProperty("addRequestHeader") );
 check(!XML.hasOwnProperty("createTextNode") );
@@ -71,8 +76,8 @@ check(!XML.hasOwnProperty("send") );
 check(!XML.hasOwnProperty("sendAndLoad") );
 check(!XML.hasOwnProperty("nodeValue"));
 check(!XML.hasOwnProperty("_customHeaders"));
-// ignoreWhite is undefined by default, but is used when set to true
-check(!XML.prototype.hasOwnProperty("ignoreWhite") );
+check(!XML.hasOwnProperty("docTypeDecl") );
+check(!XML.hasOwnProperty("xmlDecl") );
 
 check(XMLNode.prototype.hasOwnProperty("appendChild") );
 check(XMLNode.prototype.hasOwnProperty("cloneNode") );
@@ -110,6 +115,13 @@ check(! XMLNode.hasOwnProperty("nodeValue"));
 check(XML.prototype instanceof XMLNode);
 
 var tmp = new XML();
+
+
+// These two properties are added to the prototype here.
+check(!tmp.hasOwnProperty("docTypeDecl") );
+check(!tmp.hasOwnProperty("xmlDecl") );
+check(XML.prototype.hasOwnProperty("docTypeDecl") );
+check(XML.prototype.hasOwnProperty("xmlDecl") );
 
 #if OUTPUT_VERSION >= 6
  check( ! tmp.hasOwnProperty("nodeValue") );
