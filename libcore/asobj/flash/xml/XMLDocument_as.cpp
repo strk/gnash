@@ -51,9 +51,7 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    as_object* getXMLInterface();
-	void attachXMLInterface(as_object& o);
-	void attachXMLProperties(as_object& o);
+
     as_value xml_new(const fn_call& fn);
     as_value xml_createElement(const fn_call& fn);
     as_value xml_createTextNode(const fn_call& fn);
@@ -77,7 +75,6 @@ namespace {
 	
     void attachXMLProperties(as_object& o);
 	void attachXMLInterface(as_object& o);
-    as_object* getXMLInterface();
 
 }
 
@@ -105,7 +102,7 @@ const XMLDocument_as::Entities&
 XMLDocument_as::getEntities()
 {
 
-    static Entities entities = boost::assign::map_list_of
+    static const Entities entities = boost::assign::map_list_of
         ("&amp;", "&")
         ("&quot;", "\"")
         ("&lt;", "<")
@@ -563,7 +560,16 @@ XMLDocument_as::init(as_object& where, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(where);
-    as_object* proto = getXMLInterface();
+    as_object* proto = 0;
+    as_function* ctor = gl.getMember(NSV::CLASS_XMLNODE).to_function();
+    if (ctor) {
+        // XML.prototype is an XMLNode(1, "");
+        fn_call::Args args;
+        args += 1, "";
+        proto = ctor->constructInstance(as_environment(getVM(where)), args);
+        attachXMLInterface(*proto);
+    }
+
     as_object* cl = gl.createClass(&xml_new, proto);
     
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
@@ -582,6 +588,7 @@ XMLDocument_as::registerNative(as_object& where)
 }
 
 namespace {
+
 void
 attachXMLProperties(as_object& o)
 {
@@ -620,27 +627,6 @@ attachXMLInterface(as_object& o)
     o.init_member("onData", gl.createFunction(xml_onData), flags);
     o.init_member("onLoad", gl.createFunction(xml_onLoad), flags);
 
-}
-
-as_object*
-getXMLInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL )
-    {
-        Global_as& gl = *VM::get().getGlobal();
-        as_function* ctor = gl.getMember(NSV::CLASS_XMLNODE).to_function();
-        if (!ctor) return 0;
-
-        // XML.prototype is an XMLNode(1, "");
-        fn_call::Args args;
-        args += 1, "";
-        o = ctor->constructInstance(as_environment(VM::get()), args);
-
-        VM::get().addStatic(o.get());
-        attachXMLInterface(*o);
-    }
-    return o.get();
 }
 
 as_value

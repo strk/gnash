@@ -77,7 +77,6 @@ namespace {
     as_value xmlnode_prefix(const fn_call& fn);
     void attachXMLNodeInterface(as_object& o);
     void attachXMLNodeStaticInterface(as_object& o);
-    as_object* getXMLNodeInterface();
 }
 
 XMLNode_as::XMLNode_as(Global_as& gl)
@@ -457,7 +456,8 @@ void
 XMLNode_as::init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = getXMLNodeInterface();
+    as_object* proto = gl.createObject();
+    attachXMLNodeInterface(*proto);
     as_object* cl = gl.createClass(&xmlnode_new, proto);
 
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
@@ -466,19 +466,6 @@ XMLNode_as::init(as_object& where, const ObjectURI& uri)
 }
 
 namespace {
-
-as_object*
-getXMLNodeInterface()
-{
-    static as_object* o;
-    if ( o == NULL ) {
-        o = new as_object();
-        o->set_prototype(getObjectInterface());
-        attachXMLNodeInterface(*o);
-    }
-    return o;
-}
-
 
 void
 attachXMLNodeInterface(as_object& o)
