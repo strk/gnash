@@ -723,12 +723,16 @@ namespace {
 void
 attachXMLProperties(as_object& o)
 {
-    const int flags = 0;
-    o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
-    o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);
 
     as_object* proto = o.get_prototype();
     if (!proto) return;
+    const int flags = 0;
+    proto->init_member("ignoreWhite", false, flags);
+    proto->init_member("contentType", "application/x-www-form-urlencoded",
+            flags);
+    proto->init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
+    proto->init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl,
+            flags);
     proto->init_property("loaded", xml_loaded, xml_loaded);
     proto->init_property("status", xml_status, xml_status);
 

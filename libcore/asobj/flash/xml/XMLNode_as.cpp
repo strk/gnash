@@ -118,14 +118,18 @@ XMLNode_as::~XMLNode_as()
 as_object*
 XMLNode_as::object() 
 {
+
+    // This is almost the same as if the XMLNode constructor were called,
+    // but not quite. There is no __constructor__ property, and when we
+    // override _global.XMLNode, we can show that it is not called.
     if (!_object) {
         as_object* o = _global.createObject();
         as_object* xn =
             _global.getMember(NSV::CLASS_XMLNODE).to_object(_global);
         if (xn) {
             o->set_prototype(xn->getMember(NSV::PROP_PROTOTYPE));
+            o->init_member(NSV::PROP_CONSTRUCTOR, xn);
         }
-
         o->setRelay(this);
         setObject(o);
     }
