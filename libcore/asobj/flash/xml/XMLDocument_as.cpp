@@ -81,21 +81,23 @@ namespace {
 
 }
 
-XMLDocument_as::XMLDocument_as() 
+XMLDocument_as::XMLDocument_as(as_object& object) 
     :
+    XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
     _status(XML_OK)
 {
-    set_prototype(getXMLInterface());
+    setObject(&object);
 }
 
 // Parse the ASCII XML string into an XMLNode tree
-XMLDocument_as::XMLDocument_as(const std::string& xml)
+XMLDocument_as::XMLDocument_as(as_object& object, const std::string& xml)
     :
+    XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
     _status(XML_OK)
 {
-    set_prototype(getXMLInterface());
+    setObject(&object);
     parseXML(xml);
 }
 
@@ -328,7 +330,7 @@ XMLDocument_as::parseTag(XMLNode_as*& node, const std::string& xml,
 
     if (!closing) {
 
-        XMLNode_as* childNode = new XMLNode_as;
+        XMLNode_as* childNode = new XMLNode_as(_global);
         childNode->nodeNameSet(tagName);
         childNode->nodeTypeSet(Element);
 
@@ -424,7 +426,7 @@ XMLDocument_as::parseText(XMLNode_as* node, const std::string& xml,
     if (ignoreWhite() && 
         content.find_first_not_of("\t\r\n ") == std::string::npos) return;
 
-    XMLNode_as* childNode = new XMLNode_as;
+    XMLNode_as* childNode = new XMLNode_as(_global);
 
     childNode->nodeTypeSet(XMLNode_as::Text);
 
@@ -466,7 +468,7 @@ XMLDocument_as::parseCData(XMLNode_as* node, const std::string& xml,
         return;
     }
 
-    XMLNode_as* childNode = new XMLNode_as;
+    XMLNode_as* childNode = new XMLNode_as(_global);
     childNode->nodeValueSet(content);
     childNode->nodeTypeSet(Text);
     node->appendChild(childNode);
@@ -535,18 +537,19 @@ void
 XMLDocument_as::clear()
 {
     // TODO: should set childs's parent to NULL ?
-    _children.clear();
+    clearChildren();
     _docTypeDecl.clear();
     _xmlDecl.clear();
 }
 
 bool
-XMLDocument_as::ignoreWhite() const
+XMLDocument_as::ignoreWhite() 
 {
 
-    string_table::key propnamekey = getStringTable(*this).find("ignoreWhite");
+    const string_table::key propnamekey =
+        getStringTable(_global).find("ignoreWhite");
     as_value val;
-    if (!const_cast<XMLDocument_as*>(this)->get_member(propnamekey, &val)) {
+    if (!object()->get_member(propnamekey, &val)) {
         return false;
     }
     return val.to_bool();
@@ -644,42 +647,41 @@ as_value
 xml_new(const fn_call& fn)
 {
 
-    XMLDocument_as* xml_obj;
+    as_object* obj = ensure<ValidThis>(fn);
 
     if (fn.nargs > 0) {
 
         // Copy constructor clones nodes.
         if (fn.arg(0).is_object()) {
-            as_object* obj = fn.arg(0).to_object(getGlobal(fn));
-            xml_obj = dynamic_cast<XMLDocument_as*>(obj);
-
-            if (xml_obj) {
-                as_object* clone = xml_obj->cloneNode(true);
+            as_object* other = fn.arg(0).to_object(getGlobal(fn));
+            XMLDocument_as* xml;
+            if (isNativeType(other, xml)) {
+                as_object* clone = xml->cloneNode(true)->object();
                 attachXMLProperties(*clone);
                 return as_value(clone);
             }
         }
 
         const std::string& xml_in = fn.arg(0).to_string();
-        if (xml_in.empty())
-        {
+        if (xml_in.empty()) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("First arg given to XML constructor (%s) "
                     "evaluates to the empty string"), fn.arg(0));
             );
         }
-        else
-        {
-            xml_obj = new XMLDocument_as(xml_in);
-            attachXMLProperties(*xml_obj);
-            return as_value(xml_obj);
+        else {
+            XMLDocument_as* newxml = new XMLDocument_as(*obj, xml_in);
+            obj->setRelay(newxml);
+            attachXMLProperties(*obj);
+            return as_value();
         }
     }
 
-    xml_obj = new XMLDocument_as;
-    attachXMLProperties(*xml_obj);
+    XMLDocument_as* newxml = new XMLDocument_as(*obj);
+    obj->setRelay(newxml);
+    attachXMLProperties(*obj);
 
-    return as_value(xml_obj);
+    return as_value();
 }
 
 /// This is attached to the prototype (an XMLNode) on construction of XML
@@ -690,7 +692,7 @@ xml_new(const fn_call& fn)
 as_value
 xml_loaded(const fn_call& fn)
 {
-    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
+    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
 
     if (!fn.nargs) {
         XMLDocument_as::LoadStatus ls = ptr->loaded();
@@ -705,7 +707,7 @@ xml_loaded(const fn_call& fn)
 as_value
 xml_status(const fn_call& fn)
 {
-    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
+    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
     
     if (!fn.nargs) {
         return as_value(ptr->status());
@@ -750,11 +752,11 @@ xml_createElement(const fn_call& fn)
     if (fn.nargs > 0)
     {
         const std::string& text = fn.arg(0).to_string();
-        XMLNode_as *xml_obj = new XMLNode_as;
+        XMLNode_as *xml_obj = new XMLNode_as(getGlobal(fn));
         xml_obj->nodeNameSet(text);
         xml_obj->nodeTypeSet(XMLNode_as::Text);
 
-        return as_value(xml_obj);
+        return as_value(xml_obj->object());
         
     }
     else {
@@ -778,10 +780,10 @@ xml_createTextNode(const fn_call& fn)
 
     if (fn.nargs > 0) {
         const std::string& text = fn.arg(0).to_string();
-        XMLNode_as* xml_obj = new XMLNode_as;
+        XMLNode_as* xml_obj = new XMLNode_as(getGlobal(fn));
         xml_obj->nodeValueSet(text);
         xml_obj->nodeTypeSet(XMLNode_as::Text);
-        return as_value(xml_obj);
+        return as_value(xml_obj->object());
     }
     else {
         log_error(_("no text for text node creation"));
@@ -794,7 +796,7 @@ as_value
 xml_parseXML(const fn_call& fn)
 {
 
-    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
+    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
 
     if (fn.nargs < 1)
     {
@@ -813,7 +815,7 @@ xml_parseXML(const fn_call& fn)
 as_value
 xml_xmlDecl(const fn_call& fn)
 {
-    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
+    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
 
     if (!fn.nargs)
     {
@@ -835,7 +837,7 @@ xml_xmlDecl(const fn_call& fn)
 as_value
 xml_docTypeDecl(const fn_call& fn)
 {
-    XMLDocument_as* ptr = ensure<ThisIs<XMLDocument_as> >(fn);
+    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
 
     if (!fn.nargs)
     {

@@ -67,9 +67,9 @@ public:
         XML_LOADED_TRUE = true
     };
 
-    XMLDocument_as();
+    XMLDocument_as(as_object& object);
 
-    XMLDocument_as(const std::string& xml);
+    XMLDocument_as(as_object& object, const std::string& xml);
 
     ~XMLDocument_as() {};
     
@@ -177,7 +177,7 @@ private:
     /// \brief
     /// Return true if ignoreWhite property was set to anything evaluating
     /// to true.
-    bool ignoreWhite() const;
+    bool ignoreWhite();
 
     // -1 if never asked to load anything
     //  0 if asked to load but not yet loaded (or failure)

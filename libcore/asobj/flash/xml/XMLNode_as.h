@@ -35,7 +35,23 @@
 
 namespace gnash {
 
-class XMLNode_as : public as_object
+
+/// A node in an XML tree.
+//
+/// This class has various complications to reduce memory usage when parsing
+/// very large XML documents.
+//
+/// 1. It is a Relay class that can be attached to an as_object.
+/// 2. It does not have to have an associated object. This is only created
+///    once the XMLNode is accessed in ActionScript.
+/// 3. The top node of an XML tree is always accessible in ActionScript, either
+///    as an XMLDocument_as or a user-created XMLNode_as.
+/// 4. XMLNodes consequently mark their children as reachable, but not their
+///    parent.
+/// 5. When an XMLNode is destroyed, any children without an associated object
+///    are also deleted. Children with an associated object will be destroyed
+///    when the GC destroys the object.
+class XMLNode_as : public Relay
 {
 public:
 
@@ -54,7 +70,7 @@ public:
         Notation = 12
     };
 
-    XMLNode_as();
+    XMLNode_as(Global_as& gl);
 
     virtual ~XMLNode_as();
 
@@ -162,7 +178,7 @@ public:
     /// method. If beforeNode is not a child of my_xml, the insertion
     /// fails.
     ///
-    /// @param newnoe
+    /// @param newnode
     ///     The node to insert, moving from its current tree
     ///
     /// @param beforeWhich
@@ -198,25 +214,42 @@ public:
     /// @param value    The value to set the named attribute to.
     void setAttribute(const std::string& name, const std::string& value);
 
+    /// Associate an as_object with this XMLNode_as.
+    //
+    /// The ownership should immediately be passed to the as_object!
+    void setObject(as_object* o) {
+        assert(!_object);
+        _object = o;
+    }
+
+    /// Return the object associated with this XMLNode_as.
+    //
+    /// The object will be created if it does not already exist.
+    as_object* object();
+
 protected:
 
-#ifdef GNASH_USE_GC
-	/// Mark XMLNode-specific reachable resources and invoke
-	/// the parent's class version (markAsObjectReachable)
-	//
 	/// XMLNode-specific reachable resources are:
 	/// 	- The child elements (_children)
 	/// 	- The parent elements (_parent)
-	///
-	virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
+	virtual void setReachable();
 
-    Children _children;
+    Global_as& _global;
+
+    /// Clear all children, making sure unreferenced children are deleted.
+    //
+    /// AS-referenced child nodes will no longer be marked as reachable, so
+    /// the GC will remove them on the next run.
+    void clearChildren();
 
 private:
 
+    Children _children;
+
     /// A non-trivial copy-constructor for cloning nodes.
     XMLNode_as(const XMLNode_as &node, bool deep);
+
+    as_object* _object;
 
     XMLNode_as* _parent;
 

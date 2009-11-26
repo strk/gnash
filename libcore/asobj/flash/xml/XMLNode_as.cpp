@@ -52,6 +52,7 @@ namespace {
     bool namespaceMatches(
             const PropertyList::SortedPropertyList::value_type& val,
             const std::string& ns);    
+
     as_value xmlnode_new(const fn_call& fn);
     as_value xmlnode_nodeName(const fn_call& fn);
     as_value xmlnode_nodeValue(const fn_call& fn);
@@ -74,30 +75,31 @@ namespace {
     as_value xmlnode_toString(const fn_call& fn);
     as_value xmlnode_localName(const fn_call& fn);
     as_value xmlnode_prefix(const fn_call& fn);
-    as_value xmlnode_ctor(const fn_call& fn);
     void attachXMLNodeInterface(as_object& o);
     void attachXMLNodeStaticInterface(as_object& o);
     as_object* getXMLNodeInterface();
 }
 
-XMLNode_as::XMLNode_as()
+XMLNode_as::XMLNode_as(Global_as& gl)
     :
+    _global(gl),
+    _object(0),
     _parent(0),
     _attributes(new as_object),
     _type(Element)
 {
-    set_prototype(getXMLNodeInterface());
 }
 
 XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     :
-    _parent(0), // _parent is never implicitly copied
-    _attributes(0),
+    _global(tpl._global),
+    _object(0),
+    _parent(0), 
+    _attributes(new as_object),
     _name(tpl._name),
     _value(tpl._value),
     _type(tpl._type)
 {
-    set_prototype(getXMLNodeInterface());
     // only clone children if in deep mode
     if (deep) {
         const Children& from=tpl._children;
@@ -111,12 +113,25 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
 
 XMLNode_as::~XMLNode_as()
 {
-#ifdef DEBUG_MEMORY_ALLOCATION
-    log_debug(_("\tDeleting XMLNode data %s with as_value %s at %p"),
-            this->_name, this->as_value, this);
-#endif
+    clearChildren();
 }
-	
+
+as_object*
+XMLNode_as::object() 
+{
+    if (!_object) {
+        as_object* o = _global.createObject();
+        as_object* xn =
+            _global.getMember(NSV::CLASS_XMLNODE).to_object(_global);
+        if (xn) {
+            o->set_prototype(xn->getMember(NSV::PROP_PROTOTYPE));
+        }
+        o->setRelay(const_cast<XMLNode_as*>(this));
+        setObject(o);
+    }
+    return _object;
+}
+
 bool
 XMLNode_as::hasChildNodes()
 {
@@ -156,15 +171,14 @@ XMLNode_as::appendChild(XMLNode_as* node)
     XMLNode_as* oldparent = node->getParent();
     node->setParent(this);
     _children.push_back(node);
-    if ( oldparent ) {
+    if (oldparent) {
         oldparent->_children.remove(node);
     }
 
 }
 
 void
-XMLNode_as::insertBefore(XMLNode_as* newnode,
-        XMLNode_as* pos)
+XMLNode_as::insertBefore(XMLNode_as* newnode, XMLNode_as* pos)
 {
 	// find iterator for positional parameter
     Children::iterator it = std::find(_children.begin(), _children.end(), pos);
@@ -184,11 +198,12 @@ XMLNode_as::insertBefore(XMLNode_as* newnode,
     }
 }
 
-// \brief removes the specified XML object from its parent. Also
-// deletes all descendants of the node.
 void
 XMLNode_as::removeNode()
 {
+    // This is only called on AS-referenced nodes, so the GC will take
+    // care of deleting it (and its children).
+    assert(_object);
     XMLNode_as* oldparent = getParent();
     if (oldparent) {
         oldparent->_children.remove(this);
@@ -243,7 +258,7 @@ void
 XMLNode_as::setAttribute(const std::string& name, const std::string& value)
 {
     if (_attributes) {
-        string_table& st = getStringTable(*this);
+        string_table& st = getStringTable(_global);
         _attributes->set_member(st.find(name), value);
     }
 }
@@ -329,6 +344,19 @@ XMLNode_as::extractPrefix(std::string& prefix)
 }
 
 void
+XMLNode_as::clearChildren()
+{
+    for (Children::const_iterator it = _children.begin(), e = _children.end();
+            it != e; ++it) {
+        const XMLNode_as* node = *it;
+        if (!node->_object) {
+            delete node;
+        }
+    }
+    _children.clear();
+}
+
+void
 XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode) 
 {
 
@@ -360,7 +388,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         }
 
     	// If the node has no content, just close the tag now
-    	if ( nodeValue.empty() && xml._children.empty() ) {
+    	if (nodeValue.empty() && xml._children.empty()) {
     		xmlout << " />";
             return;
     	}
@@ -374,14 +402,13 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     // Node as_value first, then children
     if (type == Text)
     {
-        as_object* global = getVM(xml).getGlobal();
-        assert(global);
+        Global_as& gl = xml._global;
 
         // Insert entities.
         std::string escaped(nodeValue);
         XMLDocument_as::escape(escaped);
         const std::string& val = encode ? 
-            callMethod(global, NSV::PROP_ESCAPE, escaped).to_string() :
+            callMethod(&gl, NSV::PROP_ESCAPE, escaped).to_string() :
             escaped;
 
 	    xmlout << val;
@@ -399,23 +426,18 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     }
 }
 
-#ifdef GNASH_USE_GC
 void
-XMLNode_as::markReachableResources() const
+XMLNode_as::setReachable() 
 {
 	// Mark children
     std::for_each(_children.begin(), _children.end(),
-            boost::mem_fn(&as_object::setReachable));
-
-	// Mark parent
-	if (_parent) _parent->setReachable();
+            boost::mem_fn(&XMLNode_as::setReachable));
 
 	// Mark attributes object
 	if (_attributes) _attributes->setReachable();
 
-	markAsObjectReachable();
+    if (_object) _object->setReachable();
 }
-#endif // GNASH_USE_GC
 
 void
 XMLNode_as::registerNative(as_object& where)
@@ -506,8 +528,10 @@ as_value
 xmlnode_new(const fn_call& fn)
 {
     
-    XMLNode_as *xml_obj = new XMLNode_as;
-    if ( fn.nargs > 0 )
+    as_object* obj = ensure<ValidThis>(fn);
+
+    XMLNode_as* xml_obj = new XMLNode_as(getGlobal(fn));
+    if (fn.nargs > 0)
     {
         xml_obj->nodeTypeSet(XMLNode_as::NodeType(fn.arg(0).to_int()));
         if (fn.nargs > 1)
@@ -516,7 +540,10 @@ xmlnode_new(const fn_call& fn)
         }
     }
     
-    return as_value(xml_obj);
+    obj->setRelay(xml_obj);
+    xml_obj->setObject(obj);
+
+    return as_value();
 }
 
 
@@ -524,7 +551,7 @@ as_value
 xmlnode_appendChild(const fn_call& fn)
 {
 
-	XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+	XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
 
 	if ( ! fn.nargs )
 	{
@@ -534,11 +561,9 @@ xmlnode_appendChild(const fn_call& fn)
 		return as_value();
 	}
 
-	XMLNode_as* xml_obj = 
-        dynamic_cast<XMLNode_as*>(fn.arg(0).to_object(getGlobal(fn)));
+	XMLNode_as* xml_obj;
 
-	if ( ! xml_obj )
-	{
+    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), xml_obj)) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("First argument to XMLNode::appendChild() is not "
                 "an XMLNode"));
@@ -547,19 +572,19 @@ xmlnode_appendChild(const fn_call& fn)
 	}
 
 	ptr->appendChild(xml_obj);
-	return as_value(); // undefined
+	return as_value(); 
 
 }
 
 as_value
 xmlnode_cloneNode(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
 
     bool deep = false;
     if (fn.nargs > 0) deep = fn.arg(0).to_bool();
 
-    XMLNode_as* newnode = ptr->cloneNode(deep);
+    as_object* newnode = ptr->cloneNode(deep)->object();
     return as_value(newnode);
 }
 
@@ -567,7 +592,7 @@ xmlnode_cloneNode(const fn_call& fn)
 as_value
 xmlnode_insertBefore(const fn_call& fn)
 {
-	XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+	XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
 
 	if ( fn.nargs < 2 )
 	{
@@ -579,10 +604,9 @@ xmlnode_insertBefore(const fn_call& fn)
 		return as_value();
 	}
 
-	XMLNode_as* newnode = 
-        dynamic_cast<XMLNode_as*>(fn.arg(0).to_object(getGlobal(fn)));
+	XMLNode_as* newnode;
 
-	if (!newnode) {
+    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), newnode)) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
 		log_aserror(_("First argument to XMLNode.insertBefore(%s) is not "
@@ -591,10 +615,9 @@ xmlnode_insertBefore(const fn_call& fn)
 		return as_value();
 	}
 
-	XMLNode_as* pos = 
-        dynamic_cast<XMLNode_as*>(fn.arg(1).to_object(getGlobal(fn)));
+	XMLNode_as* pos;
 
-	if (!pos) {
+    if (!isNativeType(fn.arg(1).to_object(getGlobal(fn)), pos)) {
 		IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
 		log_aserror(_("Second argument to XMLNode.insertBefore(%s) is not "
@@ -612,7 +635,7 @@ xmlnode_insertBefore(const fn_call& fn)
 as_value
 xmlnode_getNamespaceForPrefix(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     if (!fn.nargs) {
         return as_value();
     }
@@ -628,7 +651,7 @@ xmlnode_getNamespaceForPrefix(const fn_call& fn)
 as_value
 xmlnode_getPrefixForNamespace(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     if (!fn.nargs) {
         return as_value();
     }
@@ -655,7 +678,7 @@ xmlnode_getPrefixForNamespace(const fn_call& fn)
 as_value
 xmlnode_namespaceURI(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
 
     // Read-only property
     
@@ -692,7 +715,7 @@ xmlnode_namespaceURI(const fn_call& fn)
 as_value
 xmlnode_prefix(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
 
     // Read-only property
     
@@ -714,7 +737,7 @@ xmlnode_prefix(const fn_call& fn)
 as_value
 xmlnode_localName(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
 
     // Read-only property
     
@@ -739,7 +762,7 @@ xmlnode_localName(const fn_call& fn)
 as_value
 xmlnode_removeNode(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     
     ptr->removeNode();
     return as_value();
@@ -750,7 +773,7 @@ as_value
 xmlnode_toString(const fn_call& fn)
 {
     
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     
     std::stringstream ss;
     ptr->toString(ss);
@@ -762,7 +785,7 @@ xmlnode_toString(const fn_call& fn)
 as_value
 xmlnode_hasChildNodes(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     return as_value(ptr->hasChildNodes());
 }
 
@@ -770,7 +793,7 @@ xmlnode_hasChildNodes(const fn_call& fn)
 as_value
 xmlnode_nodeValue(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     as_value rv;
     rv.set_null();
     
@@ -790,7 +813,7 @@ xmlnode_nodeValue(const fn_call& fn)
 as_value
 xmlnode_nodeName(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     as_value rv;
     rv.set_null();
 
@@ -809,7 +832,7 @@ xmlnode_nodeName(const fn_call& fn)
 as_value
 xmlnode_nodeType(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     return as_value(ptr->nodeType());
 }
 
@@ -817,7 +840,7 @@ xmlnode_nodeType(const fn_call& fn)
 as_value
 xmlnode_attributes(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
 
     as_object* attrs = ptr->getAttributes();
     if (attrs) return as_value(attrs);
@@ -836,13 +859,13 @@ xmlnode_attributes(const fn_call& fn)
 as_value
 xmlnode_firstChild(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     as_value rv;
     rv.set_null();
 
     XMLNode_as* node = ptr->firstChild();
     if (node) {
-       rv = node;
+        rv = node->object();
     }
 
     return rv;
@@ -858,12 +881,14 @@ xmlnode_firstChild(const fn_call& fn)
 as_value
 xmlnode_lastChild(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     as_value rv;
     rv.set_null();
 
     XMLNode_as* node = ptr->lastChild();
-    if (node) rv = node;
+    if (node) {
+        rv = node->object();
+    }
 
     return rv;
 }
@@ -875,10 +900,10 @@ xmlnode_nextSibling(const fn_call& fn)
     as_value rv;
     rv.set_null();
 
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     XMLNode_as *node = ptr->nextSibling();
     if (node) {
-	rv = node;
+        rv = node->object();
     }
     return rv;
 }
@@ -890,10 +915,10 @@ xmlnode_previousSibling(const fn_call& fn)
     as_value rv;
     rv.set_null();
 
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     XMLNode_as *node = ptr->previousSibling();
     if (node) {
-	rv = node;
+        rv = node->object();
     }
     return rv;
 }
@@ -905,10 +930,10 @@ xmlnode_parentNode(const fn_call& fn)
     as_value rv;
     rv.set_null();
 
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
     XMLNode_as *node = ptr->getParent();
     if (node) {
-	rv = node;
+        rv = node->object();
     }
     return rv;
 }
@@ -917,7 +942,7 @@ xmlnode_parentNode(const fn_call& fn)
 as_value
 xmlnode_childNodes(const fn_call& fn)
 {
-    XMLNode_as* ptr = ensure<ThisIs<XMLNode_as> >(fn);
+    XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
  
     Global_as& gl = getGlobal(fn);
     as_object* ary = gl.createArray();
@@ -929,7 +954,8 @@ xmlnode_childNodes(const fn_call& fn)
                     it != itEnd; ++it )
     {
         XMLNode_as* node = *it;
-        callMethod(ary, NSV::PROP_PUSH, node);
+        as_object* obj = node->object();
+        callMethod(ary, NSV::PROP_PUSH, obj);
     }
 
     return as_value(ary);
@@ -938,7 +964,7 @@ xmlnode_childNodes(const fn_call& fn)
 
 void
 enumerateAttributes(const XMLNode_as& node,
-            PropertyList::SortedPropertyList& attrs)
+        PropertyList::SortedPropertyList& attrs)
 {
     attrs.clear();
     const as_object* obj = node.getAttributes();
@@ -977,14 +1003,6 @@ prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
     if (!noCaseCompare(name.substr(0, 6), "xmlns:")) return false;
 
     return noCaseCompare(prefix, name.substr(6));
-}
-
-as_value
-xmlnode_ctor(const fn_call& /*fn*/)
-{
-    as_object* obj = new XMLNode_as;
-
-    return as_value(obj); // will keep alive
 }
 
 } // anonymous namespace 
