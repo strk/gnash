@@ -518,11 +518,23 @@ xmlnode_new(const fn_call& fn)
     
     as_object* obj = ensure<ValidThis>(fn);
 
+    if (!fn.nargs) {
+        return as_value();
+    }
+
     std::auto_ptr<XMLNode_as> xml(new XMLNode_as(getGlobal(fn)));
-    if (fn.nargs > 0) {
-        xml->nodeTypeSet(XMLNode_as::NodeType(fn.arg(0).to_int()));
-        if (fn.nargs > 1) {
-            xml->nodeValueSet(fn.arg(1).to_string());
+    xml->nodeTypeSet(XMLNode_as::NodeType(fn.arg(0).to_int()));
+
+    if (fn.nargs > 1) {
+        const std::string& str = fn.arg(1).to_string();
+        switch (xml->nodeType())
+        {
+            case XMLNode_as::Element:
+                xml->nodeNameSet(str);
+                break;
+            default:
+                xml->nodeValueSet(str);
+                break;
         }
     }
     
@@ -808,8 +820,7 @@ xmlnode_nodeName(const fn_call& fn)
         const std::string& val = ptr->nodeName();
         if ( ! val.empty() ) rv = val;
     }
-    else
-    {
+    else {
         ptr->nodeNameSet(fn.arg(0).to_string());
     }
     return rv;
