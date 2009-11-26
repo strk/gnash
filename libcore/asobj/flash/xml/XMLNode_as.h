@@ -141,21 +141,21 @@ public:
     /// Append a child node to this XML object
     //
     /// The child node's parent is set to this object, the node is added to
-    /// this object's children, the _childNodes array may be updated.
+    /// this object's children.
+    //
+    /// The childNodes array will be updated if it exists.
     //
     /// @param node     The node to add as a child
-    /// @param update   Whether to update the array of childNodes. When XML
-    ///                 trees are automatically created, e.g. during parseXML,
-    ///                 there is no need to create or update the array on
-    ///                 each append. Omitting the update reduces CPU usage
-    ///                 and memory usage (creating the array means creating
-    ///                 a referenceable object).
-	void appendChild(XMLNode_as* node, bool update = true);
+	void appendChild(XMLNode_as* node);
 
     /// Remove a child node from this XML object
     //
     /// The child node's parent is set to 0, the node is removed from
-    /// this object's children, the _childNodes array is updated.
+    /// this object's children.
+    //
+    /// The childNodes array will be updated if it exists.
+    //
+    /// @param node     The node to remove.
     void removeChild(XMLNode_as* node);
 
     /// Get the parent XMLNode_as of this node. Can be 0.
@@ -174,7 +174,7 @@ public:
     /// @param newnode
     ///     The node to insert, moving from its current tree
     ///
-    /// @param beforeWhich
+    /// @param pos
     ///     The node before which to insert the new one.
     ///     Must be a child of this XMLNode or the operation will fail.
     ///
@@ -242,7 +242,9 @@ private:
 
     /// Reset the array of childNodes to match the actual children.
     //
-    /// Only called when the XML structure changes.
+    /// Only called when the XML structure changes, and only once the
+    /// childNodes array has been created. Before this point it is not
+    /// referenceable, so we don't need to do anything.
     void updateChildNodes();
 
     /// A non-trivial copy-constructor for cloning nodes.
