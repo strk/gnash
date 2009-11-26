@@ -148,6 +148,8 @@ XMLNode_as::updateChildNodes()
     // Clear array of all elements.
     _childNodes->set_member(NSV::PROP_LENGTH, 0.0);
 
+    if (_children.empty()) return;
+
     string_table& st = getStringTable(_global);
 
     // Set up the array without calling push()!
@@ -234,15 +236,15 @@ XMLNode_as::insertBefore(XMLNode_as* newnode, XMLNode_as* pos)
         return;
     }
 
+    _children.insert(it, newnode);
+
     XMLNode_as* parent = newnode->getParent();
     if (parent) {
         parent->removeChild(newnode);
     }
     
-    _children.insert(it, newnode);
     newnode->setParent(this);
     updateChildNodes();
-
 }
 
 XMLNode_as *
