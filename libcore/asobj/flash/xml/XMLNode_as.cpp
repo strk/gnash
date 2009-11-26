@@ -141,9 +141,7 @@ XMLNode_as::object()
 void
 XMLNode_as::updateChildNodes()
 {
-    if (!_childNodes) {
-        _childNodes = _global.createArray();
-    }
+    if (!_childNodes) return;
 
     // Clear array of all elements.
     _childNodes->set_member(NSV::PROP_LENGTH, 0.0);
@@ -169,6 +167,7 @@ as_object*
 XMLNode_as::childNodes()
 {
     if (!_childNodes) {
+        _childNodes = _global.createArray();
         updateChildNodes();
     }
     return _childNodes;
@@ -213,12 +212,12 @@ XMLNode_as::removeChild(XMLNode_as* node)
 }
 
 void
-XMLNode_as::appendChild(XMLNode_as* node, bool update)
+XMLNode_as::appendChild(XMLNode_as* node)
 {
     assert(node);
     node->setParent(this);
     _children.push_back(node);
-    if (update) updateChildNodes();
+    updateChildNodes();
 }
 
 void
