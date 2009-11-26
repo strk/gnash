@@ -656,15 +656,13 @@ xml_new(const fn_call& fn)
             );
         }
         else {
-            XMLDocument_as* newxml = new XMLDocument_as(*obj, xml_in);
-            obj->setRelay(newxml);
+            obj->setRelay(new XMLDocument_as(*obj, xml_in));
             attachXMLProperties(*obj);
             return as_value();
         }
     }
 
-    XMLDocument_as* newxml = new XMLDocument_as(*obj);
-    obj->setRelay(newxml);
+    obj->setRelay(new XMLDocument_as(*obj));
     attachXMLProperties(*obj);
 
     return as_value();

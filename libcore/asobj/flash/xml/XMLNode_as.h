@@ -216,9 +216,10 @@ public:
 
     /// Associate an as_object with this XMLNode_as.
     //
-    /// The ownership should immediately be passed to the as_object!
+    /// Ownership is immediately be passed to the as_object!
     void setObject(as_object* o) {
         assert(!_object);
+        assert(o);
         _object = o;
     }
 
@@ -229,9 +230,9 @@ public:
 
 protected:
 
-	/// XMLNode-specific reachable resources are:
-	/// 	- The child elements (_children)
-	/// 	- The parent elements (_parent)
+    /// Mark reachable elements
+    //
+    /// These are: children, attributes object, associated as_object.
 	virtual void setReachable();
 
     Global_as& _global;

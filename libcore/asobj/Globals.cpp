@@ -515,9 +515,9 @@ avm1Classes()
         (N(xmlsocket_class_init, NSV::CLASS_XMLSOCKET, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
-        (N(XMLDocument_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
         (N(XMLNode_as::init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
+           NS_GLOBAL, 5))
+        (N(XMLDocument_as::init, NSV::CLASS_XML, NSV::CLASS_OBJECT,
            NS_GLOBAL, 5))
         (N(mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
         (N(number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT,
@@ -677,9 +677,9 @@ avm2Classes(string_table& st)
         // Error classes
         
         // XML classes
-        (N(XMLDocument_as::init, st.find("XMLDocument"), NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_XML, 5))
         (N(XMLNode_as::init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
+           NSV::NS_FLASH_XML, 5))
+        (N(XMLDocument_as::init, st.find("XMLDocument"), NSV::CLASS_OBJECT,
            NSV::NS_FLASH_XML, 5))
 
         // UI classes

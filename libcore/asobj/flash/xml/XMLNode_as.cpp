@@ -125,7 +125,8 @@ XMLNode_as::object()
         if (xn) {
             o->set_prototype(xn->getMember(NSV::PROP_PROTOTYPE));
         }
-        o->setRelay(const_cast<XMLNode_as*>(this));
+
+        o->setRelay(this);
         setObject(o);
     }
     return _object;
@@ -517,18 +518,17 @@ xmlnode_new(const fn_call& fn)
     
     as_object* obj = ensure<ValidThis>(fn);
 
-    XMLNode_as* xml_obj = new XMLNode_as(getGlobal(fn));
-    if (fn.nargs > 0)
-    {
-        xml_obj->nodeTypeSet(XMLNode_as::NodeType(fn.arg(0).to_int()));
-        if (fn.nargs > 1)
-        {
-            xml_obj->nodeValueSet(fn.arg(1).to_string());
+    std::auto_ptr<XMLNode_as> xml(new XMLNode_as(getGlobal(fn)));
+    if (fn.nargs > 0) {
+        xml->nodeTypeSet(XMLNode_as::NodeType(fn.arg(0).to_int()));
+        if (fn.nargs > 1) {
+            xml->nodeValueSet(fn.arg(1).to_string());
         }
     }
     
-    obj->setRelay(xml_obj);
-    xml_obj->setObject(obj);
+    // This sets the relay!
+    xml->setObject(obj);
+    obj->setRelay(xml.release());
 
     return as_value();
 }

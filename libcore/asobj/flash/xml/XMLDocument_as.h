@@ -67,6 +67,10 @@ public:
         XML_LOADED_TRUE = true
     };
 
+    /// Create an XML object.
+    //
+    /// An XMLDocument is always user-created, so always starts with an
+    /// associated object.
     XMLDocument_as(as_object& object);
 
     XMLDocument_as(as_object& object, const std::string& xml);
