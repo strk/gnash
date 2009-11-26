@@ -689,17 +689,19 @@ xml_class_init(as_object& where, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(where);
-    as_object* proto = 0;
+    as_object* cl = gl.createClass(&xml_new, 0);
+
     as_function* ctor = gl.getMember(NSV::CLASS_XMLNODE).to_function();
+
     if (ctor) {
         // XML.prototype is an XMLNode(1, "");
         fn_call::Args args;
         args += 1, "";
-        proto = ctor->constructInstance(as_environment(getVM(where)), args);
+        as_object* proto =
+            ctor->constructInstance(as_environment(getVM(where)), args);
         attachXMLInterface(*proto);
+        cl->init_member(NSV::PROP_PROTOTYPE, proto);
     }
-
-    as_object* cl = gl.createClass(&xml_new, proto);
     
     where.init_member(getName(uri), cl, as_object::DefaultFlags,
             getNamespace(uri));
