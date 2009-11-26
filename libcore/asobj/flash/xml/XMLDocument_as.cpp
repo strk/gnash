@@ -73,10 +73,156 @@ namespace {
             std::string& content);
 	
 	
+    typedef std::map<std::string, std::string> Entities;
+    const Entities& getEntities();
+
     void attachXMLProperties(as_object& o);
 	void attachXMLInterface(as_object& o);
 
 }
+
+
+/// Implements XML (AS2) and flash.xml.XMLDocument (AS3) class.
+//
+/// This class interface is identical in AS3 and AS2; it is probably 
+/// included in AS3 for backward compatibility.
+class XMLDocument_as : public XMLNode_as
+{
+public:
+
+    enum ParseStatus {
+            XML_OK = 0,
+            XML_UNTERMINATED_CDATA = -2,
+            XML_UNTERMINATED_XML_DECL = -3,
+            XML_UNTERMINATED_DOCTYPE_DECL = -4,
+            XML_UNTERMINATED_COMMENT = -5,
+            XML_UNTERMINATED_ELEMENT = -6,
+            XML_OUT_OF_MEMORY = -7,
+            XML_UNTERMINATED_ATTRIBUTE = -8,
+            XML_MISSING_CLOSE_TAG = -9,
+            XML_MISSING_OPEN_TAG = -10
+    };
+
+    enum LoadStatus {
+        XML_LOADED_UNDEFINED = -1,
+        XML_LOADED_FALSE = false,
+        XML_LOADED_TRUE = true
+    };
+
+    /// Create an XML object.
+    //
+    /// An XMLDocument is always user-created, so always starts with an
+    /// associated object.
+    XMLDocument_as(as_object& object);
+
+    XMLDocument_as(as_object& object, const std::string& xml);
+
+    ~XMLDocument_as() {};
+    
+    /// Convert the XML object to a string
+    //
+    /// This calls XMLNode::toString after adding an xmlDecl and
+    /// docTypeDecl
+    //
+    /// @param o        The ostream to write the string to.
+    /// @param encode   Whether to URL encode the node values.
+    void toString(std::ostream& o, bool encode) const;
+
+    const std::string& getXMLDecl() const {
+        return _xmlDecl;
+    }
+
+    void setXMLDecl(const std::string& xml) {
+        _xmlDecl = xml;
+    }
+
+    const std::string& getDocTypeDecl() const {
+        return _docTypeDecl;
+    }
+
+    void setDocTypeDecl(const std::string& docType) {
+        _docTypeDecl = docType;
+    }
+
+    // Methods
+
+    /// Parses an XML document into the specified XML object tree.
+    //
+    /// This reads in an XML file from disk and parses into into a memory
+    /// resident tree which can be walked through later.
+    ///
+    /// Calls to this function clear any precedently parsed data.
+    ///
+    void parseXML(const std::string& xml);
+
+    XMLNode_as* createElement(const std::string& name);
+
+    XMLNode_as* createTextNode(const std::string& name);
+
+    ParseStatus status() const {
+        return _status;
+    }
+
+    void setStatus(ParseStatus st) {
+        _status = st;
+    }
+
+    LoadStatus loaded() const {
+        return _loaded;
+    }
+
+    void setLoaded(LoadStatus st) {
+        _loaded = st;
+    }
+
+private:
+
+    typedef std::map<std::string, std::string, StringNoCaseLessThan> Attributes;
+
+    void parseTag(XMLNode_as*& node, const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseAttribute(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it, Attributes& attributes);
+
+    void parseDocTypeDecl(const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseText(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseXMLDecl(const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseComment(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseCData(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it);
+ 
+    /// Clear all properties.
+    //
+    /// This removes all children, resets doctype and xml decls, and
+    /// sets status to XML.
+    void clear();
+  
+    /// \brief
+    /// Return true if ignoreWhite property was set to anything evaluating
+    /// to true.
+    bool ignoreWhite();
+
+    // -1 if never asked to load anything
+    //  0 if asked to load but not yet loaded (or failure)
+    //  1 if successfully loaded
+    LoadStatus _loaded;
+
+    ParseStatus _status;	
+ 
+    std::string _docTypeDecl;
+
+    std::string _xmlDecl;
+
+};
 
 XMLDocument_as::XMLDocument_as(as_object& object) 
     :
@@ -98,23 +244,8 @@ XMLDocument_as::XMLDocument_as(as_object& object, const std::string& xml)
     parseXML(xml);
 }
 
-const XMLDocument_as::Entities&
-XMLDocument_as::getEntities()
-{
-
-    static const Entities entities = boost::assign::map_list_of
-        ("&amp;", "&")
-        ("&quot;", "\"")
-        ("&lt;", "<")
-        ("&gt;", ">")
-        ("&apos;", "'");
-
-    return entities;
-
-}
-
 void
-XMLDocument_as::escape(std::string& text)
+escapeXML(std::string& text)
 {
     const Entities& ent = getEntities();
 
@@ -126,7 +257,7 @@ XMLDocument_as::escape(std::string& text)
 }
 
 void
-XMLDocument_as::unescape(std::string& text)
+unescapeXML(std::string& text)
 {
     const Entities& ent = getEntities();
 
@@ -207,7 +338,7 @@ XMLDocument_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     std::string value(it, end);
 
     // Replace entities in the value.
-    unescape(value);
+    unescapeXML(value);
 
     //log_debug("adding attribute to node %s: %s, %s", node->nodeName(),
     //        name, value);
@@ -428,7 +559,7 @@ XMLDocument_as::parseText(XMLNode_as* node, const std::string& xml,
     childNode->nodeTypeSet(XMLNode_as::Text);
 
     // Replace any entitites.
-    unescape(content);
+    unescapeXML(content);
 
     childNode->nodeValueSet(content);
     node->appendChild(childNode);
@@ -477,17 +608,14 @@ XMLDocument_as::parseCData(XMLNode_as* node, const std::string& xml,
 void
 XMLDocument_as::parseXML(const std::string& xml)
 {
-    //GNASH_REPORT_FUNCTION; 
 
-    if (xml.empty())
-    {
+    if (xml.empty()) {
         log_error(_("XML data is empty"));
         return;
     }
 
     // Clear current data
     clear(); 
-    _status = XML_OK;
 
     std::string::const_iterator it = xml.begin();
     XMLNode_as* node = this;
@@ -537,6 +665,7 @@ XMLDocument_as::clear()
     clearChildren();
     _docTypeDecl.clear();
     _xmlDecl.clear();
+    _status = XML_OK;
 }
 
 bool
@@ -552,11 +681,11 @@ XMLDocument_as::ignoreWhite()
     return val.to_bool();
 }
 
-// TODO: XML.prototype is assigned after the class has been constructed, so it
+// XML.prototype is assigned after the class has been constructed, so it
 // replaces the original prototype and does not have a 'constructor'
 // property.
 void
-XMLDocument_as::init(as_object& where, const ObjectURI& uri)
+xml_class_init(as_object& where, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(where);
@@ -578,7 +707,7 @@ XMLDocument_as::init(as_object& where, const ObjectURI& uri)
 }
 
 void
-XMLDocument_as::registerNative(as_object& where)
+registerXMLNative(as_object& where)
 {
     VM& vm = getVM(where);
     vm.registerNative(xml_escape, 100, 5);
@@ -717,7 +846,7 @@ xml_escape(const fn_call& fn)
     if (!fn.nargs) return as_value();
 
     std::string escaped = fn.arg(0).to_string();
-    XMLDocument_as::escape(escaped);
+    escapeXML(escaped);
     return as_value(escaped);
 }
 
@@ -931,6 +1060,21 @@ parseNodeWithTerminator(const std::string& xml,
     it = end + terminator.length();
 
     return true;
+}
+
+const Entities&
+getEntities()
+{
+
+    static const Entities entities = boost::assign::map_list_of
+        ("&amp;", "&")
+        ("&quot;", "\"")
+        ("&lt;", "<")
+        ("&gt;", ">")
+        ("&apos;", "'");
+
+    return entities;
+
 }
 
 } // anonymous namespace 

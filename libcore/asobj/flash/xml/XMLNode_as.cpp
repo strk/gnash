@@ -382,7 +382,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
 
             for (PropertyList::SortedPropertyList::iterator i = 
                     attrs.begin(), e = attrs.end(); i != e; ++i) { 
-                XMLDocument_as::escape(i->second);
+                escapeXML(i->second);
                 xmlout << " " << i->first << "=\"" << i->second << "\"";
             }
         }
@@ -406,7 +406,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
 
         // Insert entities.
         std::string escaped(nodeValue);
-        XMLDocument_as::escape(escaped);
+        escapeXML(escaped);
         const std::string& val = encode ? 
             callMethod(&gl, NSV::PROP_ESCAPE, escaped).to_string() :
             escaped;
@@ -440,7 +440,7 @@ XMLNode_as::setReachable()
 }
 
 void
-XMLNode_as::registerNative(as_object& where)
+registerXMLNodeNative(as_object& where)
 {
     VM& vm = getVM(where);
     vm.registerNative(xmlnode_cloneNode, 253, 1);
@@ -454,7 +454,7 @@ XMLNode_as::registerNative(as_object& where)
 }
 
 void
-XMLNode_as::init(as_object& where, const ObjectURI& uri)
+xmlnode_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
     as_object* proto = gl.createObject();
