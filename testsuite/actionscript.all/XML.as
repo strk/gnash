@@ -909,12 +909,12 @@ myxml.onLoad = function(success)
 #endif
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(419);
+		check_totals(429);
 #else
 # if OUTPUT_VERSION < 8
-		check_totals(454);
+		check_totals(464);
 # else
-		check_totals(435);
+		check_totals(445);
 # endif
 #endif
 		play();
