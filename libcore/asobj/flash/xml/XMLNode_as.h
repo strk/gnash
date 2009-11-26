@@ -34,7 +34,8 @@
 #include <sstream>
 
 namespace gnash {
-class XMLNode_as : public virtual as_object
+
+class XMLNode_as : public as_object
 {
 public:
 
