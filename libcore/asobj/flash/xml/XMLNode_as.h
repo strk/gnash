@@ -88,15 +88,12 @@ public:
 	    _type = type;
     }
 
-    /// Set name of this node, but only if it doesn't have a name yet
-    //
-    /// TODO: check if this is the correct behaviour
-    ///
+    /// Set name of this node
     void nodeNameSet(const std::string& name) { _name = name; }
 
     bool extractPrefix(std::string& prefix);
 
-    /// Set value of this node, overriding any previous value
+    /// Set value of this node
     void nodeValueSet(const std::string& value) { _value = value; }
 
     /// Performs a recursive search of node attributes to find a match
