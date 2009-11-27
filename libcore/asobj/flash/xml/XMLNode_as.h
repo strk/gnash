@@ -128,7 +128,7 @@ public:
     XMLNode_as* nextSibling();
 
     /// Copy a node
-    //  UNIMPLEMENTED
+    //  
     /// Method; constructs and returns a new XML node of the same type,
     /// name, value, and attributes as the specified XML object. If deep
     /// is set to true, all child nodes are recursively cloned, resulting

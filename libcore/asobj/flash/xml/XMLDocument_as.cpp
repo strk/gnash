@@ -262,11 +262,13 @@ unescapeXML(std::string& text)
     const Entities& ent = getEntities();
 
     for (Entities::const_iterator i = ent.begin(), e = ent.end();
-            i != e; ++i)
-    {
+            i != e; ++i) {
         boost::replace_all(text, i->first, i->second);
     }
 
+    // Additionally, the &nbsp; entity is unescaped (but never escaped).
+    // Note we do this as UTF-8, which is most likely wrong for SWF5.
+    boost::replace_all(text, "&nbsp;", "\xc2\xa0");
 }
 
 void
