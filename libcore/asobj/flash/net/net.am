@@ -119,7 +119,7 @@ NET_HEADERS += asobj/flash/net/URLStream_as.h
 endif
 
 if BUILD_URLVARIABLES_AS3
-# NET_SOURCES += asobj/flash/net/URLVariables_as.cpp
+NET_SOURCES += asobj/flash/net/URLVariables_as.cpp
 NET_HEADERS += asobj/flash/net/URLVariables_as.h
 endif
 
