@@ -60,10 +60,10 @@ GnashAudioPrivate::GnashAudioPrivate() {
 AudioInputGst::AudioInputGst() 
     :
     _activityLevel(-1),
-    _gain(50),
+    _gain(0),
     _index(0),
     _muted(true),
-    _rate(8),
+    _rate(8000),
     _silenceLevel(10),
     _silenceTimeout(2000), 
     _useEchoSuppression(false)
