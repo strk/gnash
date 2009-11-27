@@ -27,60 +27,54 @@
 namespace gnash {
 namespace media {
 
-/// \class AudioInput
-/// This is the base class that talks to Microphone_as.cpp. It is basically
-/// exactly what's specified in the livedocs. Most of the real work is done
-/// in the AudioInputGst or AudioInputFFMPEG source files, respectively.
-class AudioInput {
+/// A class representing a single AudioInput device.
+//
+/// This interface has almost everything needed for control of the input
+/// device, but currently no data-fetching functions. These should be
+/// implemented only when the requirements of AS have been investigated!
+class AudioInput
+{
     
 public:
 
-    DSOEXPORT AudioInput();
+    DSOEXPORT AudioInput() {}
 
-    // virtual classes need a virtual destructor !
     virtual ~AudioInput() {}
     
-    //setters and getters
-    void set_activityLevel(double a) {_activityLevel = a; };
-    double get_activityLevel() {return _activityLevel;};
+    virtual void setActivityLevel(double a) = 0;
+
+    virtual double activityLevel() const = 0;
     
-    void set_gain(double g) { _gain = g;};
-    double get_gain() { return _gain; };
+    virtual void setGain(double g) = 0;
+
+    virtual double gain() const = 0;
     
-    void set_index(int i) {_index = i;};
-    int get_index() {return _index;};
+    virtual void setIndex(int i) = 0;
+
+    virtual int index() const = 0;
     
-    void set_muted(bool b) {_muted = b;};
-    bool get_muted() {return _muted;};
+    virtual bool muted() = 0;
     
-    void set_name(std::string name) {_name = name;};
-    std::string get_name() {return _name;};
+    virtual void setName(std::string name) = 0;
+
+    virtual const std::string& name() const = 0;
     
-    std::vector<std::string> get_names() {return _names;}
+    virtual void setRate(int r) = 0;
+
+    virtual int rate() const = 0;
     
-    void set_rate(int r) {_rate = r;};
-    int get_rate() {return _rate;};
+    virtual void setSilenceLevel(double s) = 0;
     
-    void set_silenceLevel(double s) {_silenceLevel = s; };
-    double get_silenceLevel() {return _silenceLevel;};
+    virtual double silenceLevel() const = 0;
     
-    void set_silenceTimeout(int s) {_silenceTimeout = s;};
-    int get_silenceTimeout() {return _silenceTimeout;};
+    virtual void setSilenceTimeout(int s) = 0;
     
-    void set_useEchoSuppression(bool e) {_useEchoSuppression = e;};
-    bool get_useEchoSuppression() {return _useEchoSuppression;};
+    virtual int silenceTimeout() const = 0;
     
-protected:
-    double _activityLevel;
-    double _gain;
-    int _index;
-    bool _muted;
-    std::string _name;
-    std::vector<std::string> _names;
-    int _rate;
-    double _silenceLevel;
-    int _silenceTimeout;
-    bool _useEchoSuppression;
+    virtual void setUseEchoSuppression(bool e) = 0;
+
+    virtual bool useEchoSuppression() const = 0;
+    
 };
 
     

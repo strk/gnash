@@ -132,6 +132,8 @@ public:
     ///                 or null if it is not available. 
     virtual VideoInput* getVideoInput(size_t index) = 0;
 
+    virtual AudioInput* getAudioInput(size_t index) = 0;
+
     /// Return a list of available cameras.
     //
     /// This is re-generated every time the function is called.

@@ -64,6 +64,8 @@ public:
     virtual size_t getInputPaddingSize() const;
     
     virtual VideoInput* getVideoInput(size_t index);
+    
+    virtual AudioInput* getAudioInput(size_t index);
 
     virtual void cameraNames(std::vector<std::string>& names) const;
 

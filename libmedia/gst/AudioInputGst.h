@@ -19,10 +19,11 @@
 #ifndef GNASH_AUDIOINPUTGST_H
 #define GNASH_AUDIOINPUTGST_H
 
-#include <boost/cstdint.hpp> // for C99 int types
 #include "gst/gst.h"
 #include "AudioInput.h"
+#include <boost/cstdint.hpp> // for C99 int types
 #include <vector>
+#include <cassert>
 
 namespace gnash {
 namespace media {
@@ -228,15 +229,136 @@ class GnashAudioPrivate {
 /// \brief The main AudioInputGst class, which actually doesn't store too
 /// much important information (most of that is stored in the GnashAudio
 /// and GnashAudioPrivate classes)
-class AudioInputGst : public AudioInput, public GnashAudioPrivate {
+//
+/// The top part of this class implements the AudioInput interface, which
+/// is more or less what is needed to implement the rest, though it lacks
+/// any data-fetching methods.
+//
+/// I'm not sure what the rest of it does, but it's not anything useful.
+/// Anyone implementing this class should start by implementing the
+/// interface.
+class AudioInputGst : public AudioInput, public GnashAudioPrivate
+{
 	
 public:
-    /// \brief AudioInputGst class constructor
+
+    /// This part implements the interface
+
 	AudioInputGst();
 
-    /// \brief AudioInputGst class destructor
-	~AudioInputGst();
+	virtual ~AudioInputGst();
+
+    //setters and getters
+    virtual void setActivityLevel(double a) {
+        _activityLevel = a;
+    }
+
+    virtual double activityLevel() const {
+        return _activityLevel;
+    }
     
+    /// Set the input's gain
+    //
+    /// Interface range is 0..100, gst range is -60 to 60
+    /// TODO: shouldn't we set the value in the input rather than storing
+    /// it here?
+    virtual void setGain(double g) {
+        assert (g >= 0 && g <= 100);
+        _gain = (g - 50) * 1.2;
+        audioChangeSourceBin(getGlobalAudio());
+    }
+
+    /// Get the input's gain
+    //
+    /// Interface range is 0..100, gst range is -60 to 60
+    /// TODO: shouldn't we query the value from the input rather than storing
+    /// it here?
+    virtual double gain() const {
+        return (_gain / 1.2) + 50;
+    }
+    
+    virtual void setIndex(int i) {
+        _index = i;
+    }
+
+    virtual int index() const {
+        return _index; 
+    }
+    
+    virtual bool muted() {
+        return _muted;
+    }
+    
+    virtual void setName(std::string name) {
+        _name = name;
+    }
+
+    virtual const std::string& name() const { return _name; }
+    
+    /// Supported rates are (maybe hardware-dependent): 5, 8, 11, 16, 22, 44
+    //
+    /// TODO: store in device and query that.
+    virtual void setRate(int r) {
+
+        // Yes, this isn't pretty, but it is only designed for the 
+        // testsuite to continue passing.
+        if (r >= 44) {
+            _rate = 44000;
+            audioChangeSourceBin(getGlobalAudio());
+            return;
+        }
+        static const int rates[] = { 5, 8, 11, 16, 22, 44 };
+        const int* rate = rates;
+        while (*rate < r) ++rate;
+        _rate = *rate * 1000;
+        audioChangeSourceBin(getGlobalAudio());
+    }
+
+    /// Supported rates are (maybe hardware-dependent): 5, 8, 11, 16, 22, 44
+    //
+    /// TODO: store in device and query that.
+    virtual int rate() const {
+        return _rate / 1000;
+    }
+    
+    virtual void setSilenceLevel(double s) {
+        _silenceLevel = s;
+    }
+    
+    virtual double silenceLevel() const {
+        return _silenceLevel;
+    }
+    
+    virtual void setSilenceTimeout(int s) {
+        _silenceTimeout = s;
+    }
+    
+    virtual int silenceTimeout() const {
+        return _silenceTimeout;
+    }
+    
+    virtual void setUseEchoSuppression(bool e) {
+        _useEchoSuppression = e;
+    }
+
+    virtual bool useEchoSuppression() const {
+        return _useEchoSuppression;
+    }
+
+private:
+
+    double _activityLevel;
+    double _gain;
+    int _index;
+    bool _muted;
+    std::string _name;
+    int _rate;
+    double _silenceLevel;
+    int _silenceTimeout;
+    bool _useEchoSuppression;
+
+    /// End of interface implementation
+
     /// \brief This function enumerates information about the audio input devices
     /// attached to the machine and stores them in the _audioVect vector.
     /// @param Nothing.

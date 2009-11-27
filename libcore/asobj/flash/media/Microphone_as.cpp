@@ -30,13 +30,11 @@
 #include "builtin_function.h"
 #include "NativeFunction.h"
 #include "Object.h"
-#include <cmath>
-
-#ifdef USE_GST
-#include "gst/AudioInputGst.h"
-#endif
-
+#include "GnashNumeric.h"
 #include "AudioInput.h"
+#include "MediaHandler.h"
+
+#include <algorithm>
 
 namespace gnash {
 
@@ -89,25 +87,26 @@ attachMicrophoneProperties(as_object& o)
 {
     Global_as& gl = getGlobal(o);
 
-    boost::intrusive_ptr<builtin_function> getset;
+    builtin_function* getset;
+
     getset = gl.createFunction(microphone_activityLevel);
-    o.init_property("activityLevel", *getset, *getset);
+    o.init_readonly_property("activityLevel", microphone_activityLevel);
     getset = gl.createFunction(microphone_gain);
-    o.init_property("gain", *getset, *getset);
+    o.init_readonly_property("gain", microphone_gain);
     getset = gl.createFunction(microphone_index);
-    o.init_property("index", *getset, *getset);
+    o.init_readonly_property("index", microphone_index);
     getset = gl.createFunction(microphone_muted);
-    o.init_property("muted", *getset, *getset);
+    o.init_readonly_property("muted", microphone_muted);
     getset = gl.createFunction(microphone_name);
-    o.init_property("name", *getset, *getset);
+    o.init_readonly_property("name", *getset);
     getset = gl.createFunction(microphone_rate);
-    o.init_property("rate", *getset, *getset);
+    o.init_readonly_property("rate", *getset);
     getset = gl.createFunction(microphone_silenceLevel);
-    o.init_property("silenceLevel", *getset, *getset);
+    o.init_readonly_property("silenceLevel", *getset);
     getset = gl.createFunction(microphone_silenceTimeout);
-    o.init_property("silenceTimeout", *getset, *getset);
+    o.init_readonly_property("silenceTimeout", *getset);
     getset = gl.createFunction(microphone_useEchoSuppression);
-    o.init_property("useEchoSuppression", *getset, *getset);
+    o.init_readonly_property("useEchoSuppression", *getset);
 }
 
 static void
@@ -138,37 +137,98 @@ getMicrophoneInterface()
 	return o.get();
 }
 
-#ifdef USE_GST
-class Microphone_as: public as_object, public media::gst::AudioInputGst
+class Microphone_as : public as_object
 {
 
 public:
 
-	Microphone_as()
+	Microphone_as(media::AudioInput* input)
+        :
+        _input(input)
 	{
+        assert(_input);
         set_prototype(getMicrophoneInterface());
         attachMicrophoneProperties(*get_prototype());
     }
 
-};
-#endif
-
-// FIXME: this should be USE_FFMPEG, but Microphone has no ffmpeg
-// support yet.
-#ifndef USE_GST
-class Microphone_as: public as_object, public media::AudioInput
-{
-
-public:
-
-	Microphone_as()
-	{
-        set_prototype(getMicrophoneInterface());
-        attachMicrophoneProperties(*get_prototype());
+    /// Takes a value from 0..100
+    void setGain(int gain) {
+        _input->setGain(gain);
     }
 
+    /// Returns a value from 0..100
+    int gain() const {
+        return _input->gain();
+    }
+
+    /// The index of this AudioInput.
+    //
+    /// Should this be stored in the AudioInput, this class, or somewhere else?
+    size_t index() const {
+        return _input->index();
+    }
+
+    /// Whether Microphone access is allowedd
+    //
+    /// This is set in the rcfile; should we query that, or the AudioInput
+    /// itself?
+    bool muted() const {
+        return _input->muted();
+    }
+
+    /// The name of the Microphone
+    const std::string& name() const {
+        return _input->name();
+    }
+
+    /// Takes any int, is then set to the nearest available by the AudioInput
+    //
+    /// Supported rates are: 5, 8, 11, 16, 22, 44
+    void setRate(int rate) {
+        _input->setRate(rate);
+    }
+
+    /// Returns the actual value of the AudioInput rate
+    //
+    /// Values are in kHz.
+    int rate() const {
+        return _input->rate();
+    }
+
+    /// Range 0..100
+    int silenceLevel() const {
+        return _input->silenceLevel();
+    }
+
+    /// Range?
+    int activityLevel() const {
+        return _input->activityLevel();
+    }
+
+    void setUseEchoSuppression(bool b) {
+        _input->setUseEchoSuppression(b);
+    }
+
+    bool useEchoSuppression() const {
+        return _input->useEchoSuppression();
+    }
+
+    int silenceTimeout() const {
+        return _input->silenceTimeout();
+    }
+
+    void setSilenceTimeout(int i) const {
+        _input->setSilenceTimeout(i);
+    }
+
+    void setSilenceLevel(int i) const {
+        _input->setSilenceLevel(i);
+    }
+
+private:
+    media::AudioInput* _input;
+
 };
-#endif
 
 // There is a constructor for Microphone that returns an object with
 // the correct properties, but it is not usable.
@@ -182,18 +242,33 @@ microphone_ctor(const fn_call& /*fn*/)
 as_value
 microphone_get(const fn_call& /*fn*/)
 {
-    static size_t newcount = 0;
-    static boost::intrusive_ptr<Microphone_as> permaMicPtr;
-    boost::intrusive_ptr<Microphone_as> ptr;
-    if (newcount == 0) {
-        log_debug("creating a new microphone_as object");
-        ptr = new Microphone_as;
-        newcount++;
-        permaMicPtr = ptr;
-        return as_value(ptr);
-    } else {
-        return as_value(permaMicPtr);
+    // Properties are attached to the prototype when get() is called.
+    as_object* proto = getMicrophoneInterface();
+
+    // This is an AS2-only function, so don't worry about VM version.
+    attachMicrophoneProperties(*proto);
+
+    // TODO: this should return the same object when the same device is
+    // meant, not a new object each time. It will be necessary to query
+    // the MediaHandler for this, and possibly to store the as_objects
+    // somewhere.
+    //
+    media::MediaHandler* handler = media::MediaHandler::get();
+    if (!handler) {
+        log_error(_("No MediaHandler exists! Cannot create a Microphone "
+                    "object"));
+        return as_value();
     }
+    media::AudioInput* input = handler->getAudioInput(0);
+
+    if (!input) {
+        // TODO: what should happen if the index is not available?
+        return as_value();
+    }
+
+    as_object* obj = new Microphone_as(input);
+    return as_value(obj);
+
 }
 
 // AS3 static accessor.
@@ -203,7 +278,8 @@ microphone_getMicrophone(const fn_call& fn)
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     int numargs = fn.nargs;
     if (numargs > 0) {
-        log_debug("%s: the mic is automatically chosen from gnashrc", __FUNCTION__);
+        log_debug("Microphone.getMicrophone: the mic is automatically "
+                "chosen from gnashrc");
     }
     return as_value(ptr); 
 }
@@ -214,46 +290,14 @@ microphone_setgain(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
-    int numargs = fn.nargs;
-    if (numargs != 1) {
-        log_error("%s: wrong number of parameters passed", __FUNCTION__);
-    } else {
-        const int32_t argument = fn.arg(0).to_int();
-        if (argument >= 0 && argument <= 100) { 
-#ifdef USE_GST
-            // gstreamer's gain values can be between -60 and 60,
-            // whereas actionscript uses values between 0 and 100.
-            // this conversion is made here and the proper
-            // value is passed to gstreamer. so, plug the argument
-            // into this equation
-            // and then send the new value for use with gstreamer
-            ptr->set_gain((argument - 50) * 1.2);
-            ptr->audioChangeSourceBin(ptr->getGlobalAudio());
-#endif
-#ifdef USE_FFMPEG
-            // haven't yet implemented FFMPEG support for this, so we
-            // might need to do a conversion similar to the one above
-            // for Gstreamer
-            ptr->set_gain(argument);
-#endif
-        } else {
-            //set to highest or lowest gain if bad value was passed
-#ifdef USE_GST
-            if (argument < 0) {
-                ptr->set_gain(-60);
-            } else if (argument > 100) {
-                ptr->set_gain(60);
-            }
-#endif
-#ifdef USE_FFMPEG
-            if (argument < 0) {
-                ptr->set_gain(0);
-            } else if (argument > 100) {
-                ptr->set_gain(100);
-            }
-#endif
-        }
-    }
+    // Really return if there are 2 args?
+    if (fn.nargs != 1) {
+        log_error("Microphone.gain(): wrong number of parameters passed");
+        return as_value();
+    } 
+
+    const int32_t gain = clamp(fn.arg(0).to_int(), 0, 100);
+    ptr->setGain(gain);
     return as_value();
 }
 
@@ -263,39 +307,11 @@ microphone_setrate(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
-    int numargs = fn.nargs;
-    const int32_t argument = fn.arg(0).to_int();
-    
-    if (numargs != 1) {
-        log_error("%s: wrong number of parameters passed", __FUNCTION__);
-    } else if ((argument != 5) && (argument != 8) && (argument != 11) &&
-        (argument != 16) && (argument != 22) && (argument != 44)) {
-        log_error("%s: invalid rate argument (%d) passed", __FUNCTION__,
-            argument);
-        //choose the next supported rate
-        if (argument > 44) {
-            ptr->set_rate(44000);
-        } else {
-            int supported[] = {5, 8, 11, 16, 22, 44};
-            for (size_t i = 0; i < 6; ++i) {
-                if (argument < supported[i]) {
-                    ptr->set_rate(supported[i]*1000);
-                    break;
-                } else {
-                    continue;
-                }
-            }
-        }
-#ifdef USE_GST
-        ptr->audioChangeSourceBin(ptr->getGlobalAudio());
-#endif
-    } else {
-        int32_t gstarg = argument * 1000;
-        ptr->set_rate(gstarg);
-#ifdef USE_GST
-        ptr->audioChangeSourceBin(ptr->getGlobalAudio());
-#endif
+    if (fn.nargs != 1) {
+        log_error("Microphone.setRate: wrong number of parameters passed");
+        return as_value();
     }
+    ptr->setRate(fn.arg(0).to_int());
     return as_value();
 }
 
@@ -304,17 +320,14 @@ microphone_activityLevel(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
         
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (!fn.nargs) {
         log_unimpl("Microphone::activityLevel only has default value (-1)");
-        return as_value(ptr->get_activityLevel());
+        return as_value(ptr->activityLevel());
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
+
+    IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set activity property of Microphone"));
-        );
-    }
+    );
 
     return as_value();
 }
@@ -324,31 +337,9 @@ microphone_gain(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
         
-    if ( fn.nargs == 0 ) // getter
-    {
-#ifdef USE_GST
-    double gain;
-    if (ptr->get_gain() == 0) {
-        return as_value(50.0);
-    } else {
-        gain = ((ptr->get_gain())*(0.8333333333333)) + 50;
-        gain = round(gain);
-        return as_value(gain);
+    if (!fn.nargs) {
+        return as_value(ptr->gain());
     }
-#else
-    UNUSED(ptr);
-#endif
-
-        log_unimpl("FFMPEG not implemented. Returning a number");
-        return as_value(50.0);
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set gain property of Microphone, use setGain()"));
-        );
-    }
-
     return as_value();
 }
 
@@ -357,15 +348,8 @@ microphone_index(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->get_index());
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set index property of Microphone"));
-        );
+    if (!fn.nargs) {
+        return as_value(ptr->index());
     }
 
     return as_value();
@@ -376,16 +360,9 @@ microphone_muted(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (!fn.nargs) {
         log_unimpl("Microphone::muted is always false (always allows access)");
-        return as_value(ptr->get_muted());
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set muted property of Microphone"));
-        );
+        return as_value(ptr->muted());
     }
 
     return as_value();
@@ -396,15 +373,8 @@ microphone_name(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
         
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->get_name());
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set name property of Microphone"));
-        );
+    if (!fn.nargs) {
+        return as_value(ptr->name());
     }
 
     return as_value();
@@ -422,21 +392,10 @@ microphone_names(const fn_call& fn)
     Global_as& gl = getGlobal(fn);
     as_object* data = gl.createArray();
     
-    for (size_t i=0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         callMethod(data, NSV::PROP_PUSH, vect[i]);
     }
         
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(data);
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set names property of Microphone"));
-        );
-    }
-
     return as_value();
 } 
 
@@ -446,24 +405,7 @@ microphone_rate(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
-    if ( fn.nargs == 0 ) // getter
-    {
-#ifdef USE_GST
-        return as_value(ptr->get_rate()/1000);
-#else
-        UNUSED(ptr);
-        log_unimpl("FFMPEG is unsupported, returning default val");
-        return as_value(8);
-#endif
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set rate property of Microphone"));
-        );
-    }
-
-    return as_value();
+    return as_value(ptr->rate());
 }
 
 as_value
@@ -471,19 +413,7 @@ microphone_silenceLevel(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
 
-    if ( fn.nargs == 0 ) // getter
-    {
-        log_unimpl("Microphone::silenceLevel can be set, but is unimplemented");
-        return as_value(ptr->get_silenceLevel());
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set silenceLevel property of Microphone, use setSilenceLevel"));
-        );
-    }
-
-    return as_value();
+    return as_value(ptr->silenceLevel());
 }
 
 as_value
@@ -491,89 +421,40 @@ microphone_silenceTimeout(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
         
-    if ( fn.nargs == 0 ) // getter
-    {
-        log_unimpl("Microphone::silenceTimeout can be set, but is unimplemented");
-        return as_value(ptr->get_silenceTimeout());
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set silenceTimeout property of Microphone"));
-        );
-    }
-
-    return as_value();
+    log_unimpl("Microphone::silenceTimeout can be set, but is unimplemented");
+    return as_value(ptr->silenceTimeout());
 }
 
 as_value
 microphone_useEchoSuppression(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
-    
-    if ( fn.nargs == 0 ) // getter
-    {
-        log_unimpl("Microphone::useEchoSuppression can be set, but is "
-                "unimplemented");
-        return as_value(static_cast<double>(ptr->get_useEchoSuppression()));
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set useEchoSuppression property of Microphone"));
-        );
-    }
-
-    return as_value();
+ 
+    // Documented to be a bool (which would make sense), but is a number.
+    const double d = ptr->useEchoSuppression();
+    return as_value(d);
 }
 
 
 as_value
 microphone_setsilencelevel(const fn_call& fn)
 {
-    log_unimpl ("Microphone::setSilenceLevel can be set, but it's not "
-            "implemented");
 
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
-    int numargs = fn.nargs;
+    const size_t numargs = fn.nargs;
     if (numargs > 2) {
         log_error("%s: Too many arguments", __FUNCTION__);
-    } else {
-        if (numargs == 2) {
-            double argument = fn.arg(0).to_number();
-            if ((argument >= 0) && (argument <=100)) {
-                //then the arg is valid
-                ptr->set_silenceLevel(argument);
-            } else {
-                log_error("%s: argument 1 out of acceptable range", __FUNCTION__);
-                if (argument < 0) {
-                    ptr->set_silenceLevel(0);
-                } else if (argument > 100) {
-                    ptr->set_silenceLevel(100);
-                }
-            }
-            int argument2 = fn.arg(1).to_int();
-            if (argument2 >= 0) {
-                ptr->set_silenceTimeout(argument2);
-            } else {
-                log_error("%s: argument 2 out of acceptable range", __FUNCTION__);
-                ptr->set_silenceTimeout(0);
-            }
-        } else {
-            double argument = fn.arg(0).to_number();
-            if ((argument >= 0) && (argument <=100)) {
-                //then the arg is valid
-                ptr->set_silenceLevel(argument);
-            } else {
-                log_error("%s: argument 1 out of acceptable range", __FUNCTION__);
-                if (argument < 0) {
-                    ptr->set_silenceLevel(0);
-                } else if (argument > 100) {
-                    ptr->set_silenceLevel(100);
-                }
-            }
-        }
+        return as_value();
+    }
+
+    const double level = clamp<double>(fn.arg(0).to_number(), 0, 100);
+    ptr->setSilenceLevel(level);
+    
+    if (numargs > 1) {
+        // If it's less than 0, it's set to 0.
+        const int timeout = std::max(fn.arg(1).to_int(), 0);
+        ptr->setSilenceTimeout(timeout);
     }
     return as_value();
 }
@@ -581,16 +462,12 @@ microphone_setsilencelevel(const fn_call& fn)
 as_value 
 microphone_setuseechosuppression(const fn_call& fn)
 {
-    log_unimpl ("Microphone::setUseEchoSuppression can be set, but it's not "
-            "implemented");
     Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
     
-    int numargs = fn.nargs;
-    if (numargs > 1) {
-        log_error("%s: Too many arguments", __FUNCTION__);
-    } else {
-        ptr->set_useEchoSuppression(fn.arg(0).to_bool());
+    if (!fn.nargs) {
+        return as_value();
     }
+    ptr->setUseEchoSuppression(fn.arg(0).to_bool());
     return as_value();
 }
 

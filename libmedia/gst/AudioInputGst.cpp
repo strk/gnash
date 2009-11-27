@@ -63,11 +63,6 @@ AudioInputGst::AudioInputGst()
         
         findAudioDevs();
         
-        //enumerate names array for actionscript accessibility
-        for (size_t i = 0; i < _audioVect.size(); ++i) {
-            _names.push_back(_audioVect[i]->getProductName());
-        }
-        
         int devSelection = makeAudioDevSelection();
         _index = devSelection;
         
@@ -304,8 +299,7 @@ AudioInputGst::AudioInputGst()
         command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%f",
             audio->_audioDevice->getGstreamerSrc(),
             audio->_audioDevice->getDevLocation(),
-            gnash::media::AudioInput::_rate, gnash::media::AudioInput::_rate,
-            gnash::media::AudioInput::_gain);
+            _rate, _rate, _gain);
         
         log_debug ("GstPipeline command is: %s\n", command);
         
@@ -361,8 +355,7 @@ AudioInputGst::AudioInputGst()
         command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%f",
             audio->_audioDevice->getGstreamerSrc(),
             audio->_audioDevice->getDevLocation(),
-            gnash::media::AudioInput::_rate, gnash::media::AudioInput::_rate,
-            gnash::media::AudioInput::_gain);
+            _rate, _rate, _gain);
         
         log_debug ("GstPipeline command is: %s", command);
         
