@@ -46,11 +46,6 @@ class URL;
 /// Note this is not the same as a URL escape.
 void escapeXML(std::string& text);
 
-/// Unescape XML entities.
-//
-/// Note this is not the same as a URL unescape.
-void unescapeXML(std::string& text);
-
 /// Register the XML class.
 void xml_class_init(as_object& where, const ObjectURI& uri);
 
