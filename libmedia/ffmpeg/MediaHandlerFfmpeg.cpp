@@ -26,6 +26,7 @@
 #include "FLVParser.h"
 #include "VideoConverterFfmpeg.h"
 #include "VideoInputFfmpeg.h"
+#include "AudioInputFfmpeg.h"
 
 #include "IOChannel.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
@@ -115,6 +116,12 @@ MediaHandlerFfmpeg::createAudioDecoder(const AudioInfo& info)
     }
 
 	return ret;
+}
+
+AudioInput*
+MediaHandlerFfmpeg::getAudioInput(size_t /*index*/)
+{
+    return new AudioInputFfmpeg();
 }
 
 VideoInput*

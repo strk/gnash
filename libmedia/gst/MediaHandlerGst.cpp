@@ -24,6 +24,7 @@
 #include "MediaParserGst.h"
 #include "VideoConverterGst.h"
 #include "VideoInputGst.h"
+#include "AudioInputGst.h"
 #include "FLVParser.h"
 
 #ifdef DECODING_SPEEX
@@ -152,6 +153,14 @@ MediaHandlerGst::createVideoConverter(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC
     }
     
     return converter;
+}
+
+AudioInput*
+MediaHandlerGst::getAudioInput(size_t /*index*/)
+{
+    // FIXME: these should be stored in the media handler, not newly
+    // created each time. The documentation is correct, implementation wrong.
+    return new AudioInputGst();
 }
 
 VideoInput*

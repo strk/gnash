@@ -16,39 +16,39 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "AudioInput.h"
+#include "AudioInputFfmpeg.h"
 #include "gnashconfig.h"
 
 namespace gnash {
 namespace media {
     
-    //constructor
-    AudioInput::AudioInput()
-        :
-        //actionscript default values
-        _activityLevel(-1),
-//Gstreamer uses different values for the gain parameter, thus this doesn't
-//exactly match the AS livedocs, but when you get the value back it will be
-//correct (see libcore/asobj/flash/Microphone_as.cpp:gain)
-#ifdef USE_GST
-        _gain(0),
-#else
-        _gain(50),
-#endif
-        _index(0),
-        _muted(true),
-//Again, gstreamer wants a different value for the _rate parameter (in hz) whereas
-//AS wants the value in khz. Thus, the ifdefs
-#ifdef USE_GST
-        _rate(8000),
-#else
-        _rate(8),
-#endif
-        _silenceLevel(10),
-        _silenceTimeout(2000), // in milliseconds
-        _useEchoSuppression(false)
-    {
-    } 
+AudioInputFfmpeg::AudioInputFfmpeg()
+    :
+    _activityLevel(-1),
+    _gain(50),
+    _index(0),
+    _muted(true),
+    _rate(8),
+    _silenceLevel(10),
+    _silenceTimeout(2000), 
+    _useEchoSuppression(false)
+{
+} 
     
+void
+AudioInputFfmpeg::setRate(int r)
+{
+    // Yes, this isn't pretty, but it is only designed for the 
+    // testsuite to continue passing.
+    if (r >= 44) {
+        _rate = 44;
+        return;
+    }
+    static const int rates[] = { 5, 8, 11, 16, 22, 44 };
+    const int* rate = rates;
+    while (*rate < r) ++rate;
+    _rate = *rate;
+}
+
 } //media namespace
 } //gnash namespace
