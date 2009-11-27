@@ -1,4 +1,4 @@
-/ URLRequest_as.cpp:  ActionScript "URLRequest" class, for Gnash.
+// URLRequest_as.cpp:  ActionScript "URLRequest" class, for Gnash.
 //
 //   Copyright (C) 2009 Free Software Foundation, Inc.
 //
@@ -27,7 +27,6 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
 
 namespace gnash {
 
@@ -36,20 +35,7 @@ namespace {
     as_value urlrequest_ctor(const fn_call& fn);
     void attachURLRequestInterface(as_object& o);
     void attachURLRequestStaticInterface(as_object& o);
-    as_object* getURLRequestInterface();
-
 }
-
-class URLRequest_as : public as_object
-{
-
-public:
-
-    URLRequest_as()
-        :
-        as_object(getURLRequestInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -72,23 +58,10 @@ attachURLRequestStaticInterface(as_object& /*o*/)
 
 }
 
-as_object*
-getURLRequestInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachURLRequestInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
 urlrequest_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new URLRequest_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

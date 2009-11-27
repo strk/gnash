@@ -37,7 +37,7 @@ class SharedObjectLibrary
 {
 public:
 
-    typedef std::map<std::string, SharedObject_as *> SoLib;
+    typedef std::map<std::string, SharedObject_as*> SoLib;
 
     SharedObjectLibrary(VM& vm);
 
@@ -47,15 +47,15 @@ public:
     //
     /// May return NULL if name is invalid or can't access the given root
     ///
-    SharedObject_as* getLocal(const std::string& name, const std::string& root);
+    as_object* getLocal(const std::string& name, const std::string& root);
 
     /// Return a remote shared object with given name
     ///
-    /// @param persistance false
+    /// @param persistence false
     /// May return NULL if name is invalid or can't access the given root
     ///
-    SharedObject_as* getRemote(const std::string& name, const std::string& uri,
-	const std::string& persistance);
+    as_object* getRemote(const std::string& name, const std::string& uri,
+            const std::string& persistence);
 
     void markReachableResources() const;
 

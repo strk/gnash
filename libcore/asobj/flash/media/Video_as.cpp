@@ -38,20 +38,7 @@ namespace {
     as_value video_ctor(const fn_call& fn);
     void attachVideoInterface(as_object& o);
     void attachVideoStaticInterface(as_object& o);
-    as_object* getVideoInterface();
-
 }
-
-class Video_as : public as_object
-{
-
-public:
-
-    Video_as()
-        :
-        as_object(getVideoInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -74,36 +61,18 @@ void
 attachVideoStaticInterface(as_object& o)
 {
     Global_as& gl = getGlobal(o);
-
-}
-
-as_object*
-getVideoInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachVideoInterface(*o);
-    }
-    return o.get();
 }
 
 as_value
-video_attachNetStream(const fn_call& fn)
+video_attachNetStream(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Video_as> ptr =
-        ensureType<Video_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 as_value
-video_clear(const fn_call& fn)
+video_clear(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<Video_as> ptr =
-        ensureType<Video_as>(fn.this_ptr);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -111,9 +80,7 @@ video_clear(const fn_call& fn)
 as_value
 video_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new Video_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

@@ -1,4 +1,4 @@
-/ URLVariables_as.cpp:  ActionScript "URLVariables" class, for Gnash.
+// URLVariables_as.cpp:  ActionScript "URLVariables" class, for Gnash.
 //
 //   Copyright (C) 2009 Free Software Foundation, Inc.
 //
@@ -27,7 +27,6 @@
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
 
 namespace gnash {
 
@@ -37,20 +36,7 @@ namespace {
     as_value urlvariables_ctor(const fn_call& fn);
     void attachURLVariablesInterface(as_object& o);
     void attachURLVariablesStaticInterface(as_object& o);
-    as_object* getURLVariablesInterface();
-
 }
-
-class URLVariables_as : public as_object
-{
-
-public:
-
-    URLVariables_as()
-        :
-        as_object(getURLVariablesInterface())
-    {}
-};
 
 // extern (used by Global.cpp)
 void
@@ -74,22 +60,9 @@ attachURLVariablesStaticInterface(as_object& o)
 {
 }
 
-as_object*
-getURLVariablesInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachURLVariablesInterface(*o);
-    }
-    return o.get();
-}
-
 as_value
-urlvariables_toString(const fn_call& fn)
+urlvariables_toString(const fn_call& /*fn*/)
 {
-    URLVariables_as* ptr = ensure<ThisIs<URLVariables_as> >(fn);
-    UNUSED(ptr);
     log_unimpl (__FUNCTION__);
     return as_value();
 }
@@ -97,9 +70,7 @@ urlvariables_toString(const fn_call& fn)
 as_value
 urlvariables_ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new URLVariables_as;
-
-    return as_value(obj.get()); // will keep alive
+    return as_value();
 }
 
 } // anonymous namespace 

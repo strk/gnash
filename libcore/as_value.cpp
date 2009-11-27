@@ -93,6 +93,18 @@ boost::uint8_t parseHex(char c)
 	}
 }
 
+inline boost::uint16_t
+readNetworkShort(const boost::uint8_t* buf) {
+	boost::uint16_t s = buf[0] << 8 | buf[1];
+	return s;
+}
+
+inline boost::uint32_t
+readNetworkLong(const boost::uint8_t* buf) {
+	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
+	return s;
+}
+
 /// Truncates a double to a 32-bit unsigned int.
 //
 /// In fact, it is a 32-bit unsigned int with an additional sign, cast
@@ -1866,19 +1878,6 @@ as_value::as_value(const amf::Element& el)
                   el.getType());
           break;
     }
-}
-
-
-static boost::uint16_t
-readNetworkShort(const boost::uint8_t* buf) {
-	boost::uint16_t s = buf[0] << 8 | buf[1];
-	return s;
-}
-
-static boost::uint32_t
-readNetworkLong(const boost::uint8_t* buf) {
-	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
-	return s;
 }
 
 // Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
