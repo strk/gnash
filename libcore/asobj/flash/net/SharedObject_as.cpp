@@ -88,6 +88,8 @@ namespace {
     void attachSharedObjectStaticInterface(as_object& o);
     void flushSOL(SharedObjectLibrary::SoLib::value_type& sol);
     bool validateName(const std::string& solName);
+
+    SharedObject_as* createSharedObject(Global_as& gl);
 }
 
 // Serializer helper
@@ -627,11 +629,10 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 
     log_debug("SharedObject %s not loaded. Loading it now", key);
 
-    // Otherwise create a new one and register to the lib
-    as_object* o = _vm.getGlobal()->createObject();
 
-    SharedObject_as* sh = new SharedObject_as(*o);
-    o->setRelay(sh);
+    // Otherwise create a new one and register to the lib
+    SharedObject_as* sh = createSharedObject(*_vm.getGlobal());
+    if (!sh) return 0;
 
     sh->setObjectName(objName);
 
@@ -651,7 +652,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     // The SharedObjectLibrary must set this as reachable.
     _soLib[key] = sh;
 
-    return o;
+    return &sh->owner();
 }
 
 as_object*
@@ -686,10 +687,9 @@ SharedObjectLibrary::getRemote(const std::string& objName,
     log_debug("SharedObject %s not loaded. Loading it now", key);
 
     // Otherwise create a new one and register to the lib
-    as_object* o = _vm.getGlobal()->createObject();
+    SharedObject_as* sh = createSharedObject(*_vm.getGlobal());
+    if (!sh) return 0;
 
-    SharedObject_as* sh = new SharedObject_as(*o);
-    o->setRelay(sh);
     _soLib[key] = sh;
 
     sh->setObjectName(objName);
@@ -711,7 +711,7 @@ SharedObjectLibrary::getRemote(const std::string& objName,
         }
     }
 
-    return o;
+    return &sh->owner();
 }
 
 void
@@ -1294,6 +1294,22 @@ flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
 {
 //    GNASH_REPORT_FUNCTION;
     sol.second->flush();
+}
+
+SharedObject_as*
+createSharedObject(Global_as& gl)
+{
+    as_function* ctor = gl.getMember(NSV::CLASS_SHARED_OBJECT).to_function();
+    if (!ctor) return 0;
+    as_environment env(getVM(gl));
+    fn_call::Args args;
+    as_object* o = ctor->constructInstance(env, args);
+
+    std::auto_ptr<SharedObject_as> sh(new SharedObject_as(*o));
+    o->setRelay(sh.release());
+
+    // We know what it is...
+    return &static_cast<SharedObject_as&>(*o->relay());;
 }
 
 } // anonymous namespace
