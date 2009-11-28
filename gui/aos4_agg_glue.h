@@ -52,7 +52,7 @@ namespace gnash
 		void			 setFullscreen();
 		void			 unsetFullscreen();
 		void 			 resize(int width, int height);
-		void 			 saveOrigiginalDimension(int width, int height, int xPosition, int yPosition);
+		void 			 saveOrigiginalDimension(int width, int height);
 	 private:
     	geometry::Range2d<int> _validbounds;
 	    std::vector< geometry::Range2d<int> > _drawbounds;
@@ -65,10 +65,6 @@ namespace gnash
     	int 			 	 _orig_width;
 	    int				 	 _height;
 	    int				 	 _orig_height;
-	    int				 	 _xPosition;
-	    int				 	 _orig_xPosition;
-	    int				 	 _yPosition;
-	    int				 	 _orig_yPosition;
     	int				 	 _stride;
 		int				 	 _btype;
 		struct Menu 		*_menu;

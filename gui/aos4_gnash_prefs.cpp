@@ -19,6 +19,11 @@
 
 #include <string.h>
 
+VOID prefshookfunc( struct Hook *me, APTR winobj, struct UIPrefs *p )
+{
+	IExec->DebugPrintF("new prefs hook called\n");
+}
+
 Object *Objects[OBJ_NUM];
 #define OBJ(x) Objects[x]
 #define GAD(x) (struct Gadget *)Objects[x]
@@ -27,6 +32,7 @@ CONST_STRPTR PageLabels_1[] = {"Logging", "Security", "Network", "Media", "Playe
 
 #define SPACE LAYOUT_AddChild, SpaceObject, End
 
+struct Hook newprefshook;
 Object *win;
 
 struct MsgPort *AppPort;
@@ -36,6 +42,10 @@ make_window(struct GnashPrefs *preferences)
 {
 	char verb_level[3];
 
+	/* create hook */
+	newprefshook.h_Entry = (HOOKFUNC)prefshookfunc;
+	newprefshook.h_SubEntry = NULL;
+	newprefshook.h_Data = NULL;
 /*
 	printf("1)%s - %d\n",preferences->logfilename,strlen(preferences->logfilename));
 	printf("2)%s - %d\n",preferences->sharedobjdir,strlen(preferences->sharedobjdir));
@@ -367,6 +377,7 @@ make_window(struct GnashPrefs *preferences)
         WINDOW_IconifyGadget,  TRUE,
         WINDOW_IconTitle,      "Gnash",
         WINDOW_AppPort,        AppPort,
+        WINDOW_NewPrefsHook,   &newprefshook,
         WINDOW_Position,       WPOS_CENTERSCREEN,
         WINDOW_Layout,         VLayoutObject,
             LAYOUT_AddChild,       OBJ(OBJ_CLICKTAB_MAIN),

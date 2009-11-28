@@ -31,28 +31,28 @@ struct NewMenu nm[] =
 {
 	/* Type, Label, CommKey, Flags, MutualExclude, UserData */
 
-	{ NM_TITLE, (CONST_STRPTR)"File",               	NULL,   0, 0L, NULL },          /* Menu 0 */
-		{ NM_ITEM,  (CONST_STRPTR)"Load File..",          (CONST_STRPTR)"L",	0, 0L, NULL },          /* Item 0 */
-		{ NM_ITEM,  (CONST_STRPTR)"Save",                 (CONST_STRPTR)"S",	NM_ITEMDISABLED, 0L, NULL },          /* Item 1 */
-		{ NM_ITEM,  (CONST_STRPTR)"Save As..",            (CONST_STRPTR)"A",	NM_ITEMDISABLED, 0L, NULL },          /* Item 2 */
+	{ NM_TITLE, "File",               	NULL,   0, 0L, NULL },          /* Menu 0 */
+		{ NM_ITEM,  "Load File..",          "L",	0, 0L, NULL },          /* Item 0 */
+		{ NM_ITEM,  "Save",                 "S",	NM_ITEMDISABLED, 0L, NULL },          /* Item 1 */
+		{ NM_ITEM,  "Save As..",            "A",	NM_ITEMDISABLED, 0L, NULL },          /* Item 2 */
 		{ NM_ITEM,  NM_BARLABEL,              NULL,	0, 0L, NULL },			/* Item 3 */
-		{ NM_ITEM,  (CONST_STRPTR)"Properties",           (CONST_STRPTR)"E",	0, 0L, NULL },			/* Item 4 */
+		{ NM_ITEM,  "Properties",           "E",	0, 0L, NULL },			/* Item 4 */
 		{ NM_ITEM,  NM_BARLABEL,              NULL,	0, 0L, NULL },			/* Item 5 */
-		{ NM_ITEM,  (CONST_STRPTR)"Exit",                 (CONST_STRPTR)"Q",	0, 0L, NULL },          /* Item 6 */
-	{ NM_TITLE, (CONST_STRPTR)"Edit",               	NULL,   0, 0L, NULL },          /* Menu 1 */
-		{ NM_ITEM,  (CONST_STRPTR)"Preferences",			(CONST_STRPTR)"O",	0, 0L, NULL },          /* Item 0 */
-	{ NM_TITLE, (CONST_STRPTR)"View", 		            NULL,	0, 0L, NULL },		/* Menu 2 */
-		{ NM_ITEM,  (CONST_STRPTR)"Redraw",				(CONST_STRPTR)"D",	0 , 0L, NULL },			/* Item 0 */
-		{ NM_ITEM,  (CONST_STRPTR)"Toggle fullscreen",	(CONST_STRPTR)"F",	0 , 0L, NULL },		/* Item 1 */
-		{ NM_ITEM,  (CONST_STRPTR)"Show updated ranges",	(CONST_STRPTR)"U",	MENUTOGGLE|CHECKIT , 0L, NULL },		/* Item 2 */
-	{ NM_TITLE, (CONST_STRPTR)"Movie Control",			NULL,	0, 0L, NULL },		/* Menu 3 */
-		{ NM_ITEM,  (CONST_STRPTR)"Play",					(CONST_STRPTR)"Y",	0 , 0, NULL },			/* Item 0 */
-		{ NM_ITEM,  (CONST_STRPTR)"Pause",				(CONST_STRPTR)"P",	0 , 0, NULL },			/* Item 1 */
-        { NM_ITEM,  (CONST_STRPTR)"Stop",					(CONST_STRPTR)"T",	0 , 0, NULL },			/* Item 2 */
+		{ NM_ITEM,  "Exit",                 "Q",	0, 0L, NULL },          /* Item 6 */
+	{ NM_TITLE, "Edit",               	NULL,   0, 0L, NULL },          /* Menu 1 */
+		{ NM_ITEM,  "Preferences",			"O",	0, 0L, NULL },          /* Item 0 */
+	{ NM_TITLE, "View", 		            NULL,	0, 0L, NULL },		/* Menu 2 */
+		{ NM_ITEM,  "Redraw",				"D",	0 , 0L, NULL },			/* Item 0 */
+		{ NM_ITEM,  "Toggle fullscreen",	"F",	0 , 0L, NULL },		/* Item 1 */
+		{ NM_ITEM,  "Show updated ranges",	"U",	MENUTOGGLE|CHECKIT , 0L, NULL },		/* Item 2 */
+	{ NM_TITLE, "Movie Control",			NULL,	0, 0L, NULL },		/* Menu 3 */
+		{ NM_ITEM,  "Play",					"Y",	0 , 0, NULL },			/* Item 0 */
+		{ NM_ITEM,  "Pause",				"P",	0 , 0, NULL },			/* Item 1 */
+        { NM_ITEM,  "Stop",					"T",	0 , 0, NULL },			/* Item 2 */
         { NM_ITEM,  NM_BARLABEL,              NULL,	0, 0L, NULL },			/* Item 3 */
-        { NM_ITEM,  (CONST_STRPTR)"Restart",				(CONST_STRPTR)"R",	0 , 0, NULL },			/* Item 4 */
-      { NM_TITLE, (CONST_STRPTR)"Help",					NULL,	0, 0L, NULL },		/* Menu 4 */
-          { NM_ITEM,  (CONST_STRPTR)"About",				(CONST_STRPTR)"?",	0 , 0, NULL },		/* Item 0 */
+        { NM_ITEM,  "Restart",				"R",	0 , 0, NULL },			/* Item 4 */
+      { NM_TITLE, "Help",					NULL,	0, 0L, NULL },		/* Menu 4 */
+          { NM_ITEM,  "About",				"?",	0 , 0, NULL },		/* Item 0 */
       { NM_END,   NULL,                     NULL,	0, 0L, NULL }           /* Terminator */
     };
 /* END OF MENU DEFINITION */
@@ -135,7 +135,7 @@ void
 AOS4AggGlue::setFullscreen()
 {
 
-	saveOrigiginalDimension(_width,_height,_xPosition,_yPosition);
+	saveOrigiginalDimension(_width,_height);
 
 	_screen = IIntuition->LockPubScreen("Workbench");
 	int new_width   = _screen->Width;
@@ -152,12 +152,10 @@ AOS4AggGlue::setFullscreen()
 }
 
 void 
-AOS4AggGlue::saveOrigiginalDimension(int width, int height, int xPosition, int yPosition)
+AOS4AggGlue::saveOrigiginalDimension(int width, int height)
 {
-	_orig_width     = width;
-	_orig_height    = height;
-	_orig_xPosition = xPosition;
-	_orig_yPosition = yPosition;
+	_orig_width  = width;
+	_orig_height = height;
 }
 
 void
@@ -171,8 +169,6 @@ AOS4AggGlue::unsetFullscreen()
 
 	_width  = _orig_width;
 	_height = _orig_height;
-	_xPosition = _orig_xPosition;
-	_yPosition = _orig_yPosition;
 
     resize(_width, _height);
 }
@@ -194,16 +190,8 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
 	{
 	    if ( ( _menu_screen = IIntuition->LockPubScreen ( "Workbench") ) )
 	    {
-		    if ((_xPosition == 0) && (_yPosition==0))
-		    {
-		    	left = (_menu_screen->Width-_width)/2;
-			    top  = (_menu_screen->Height-_height)/2;
-			}
-			else
-			{
-				left = _xPosition;
-				top  = _yPosition;
-			}
+		    left=(_menu_screen->Width-_width)/2;
+		    top=(_menu_screen->Height-_height)/2;
 
         	vi = IGadTools->GetVisualInfoA(_menu_screen,NULL);
 	        if (vi)
