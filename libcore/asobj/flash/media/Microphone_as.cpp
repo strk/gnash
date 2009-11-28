@@ -296,7 +296,7 @@ microphone_setgain(const fn_call& fn)
         return as_value();
     } 
 
-    const int32_t gain = clamp(fn.arg(0).to_int(), 0, 100);
+    const int32_t gain = clamp(fn.arg(0).to_int(), (boost::int32_t)0, (boost::int32_t)100);
     ptr->setGain(gain);
     return as_value();
 }
@@ -453,7 +453,7 @@ microphone_setsilencelevel(const fn_call& fn)
     
     if (numargs > 1) {
         // If it's less than 0, it's set to 0.
-        const int timeout = std::max(fn.arg(1).to_int(), 0);
+        const int timeout = std::max(fn.arg(1).to_int(), (boost::int32_t)0);
         ptr->setSilenceTimeout(timeout);
     }
     return as_value();
