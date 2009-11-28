@@ -72,7 +72,7 @@ public:
     AOS4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~AOS4Gui();
     virtual bool init(int argc, char **argv[]);
-    virtual bool createWindow(const char *title, int width, int height);
+    virtual bool createWindow(const char *title, int width, int height, int xPosition = 0, int yPosition = 0);
     virtual bool run();
     virtual bool createMenu();
     virtual bool setupEvents();
@@ -111,6 +111,8 @@ private:
 
    	int	 _orig_width;
     int	 _orig_height;
+   	int	 _orig_xPosition;
+    int	 _orig_yPosition;
 
 #ifdef RENDERER_AGG
     AOS4AggGlue      _glue;

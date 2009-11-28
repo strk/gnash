@@ -615,14 +615,16 @@ AOS4Gui::init(int argc, char **argv[])
 
 
 bool
-AOS4Gui::createWindow(const char *title, int width, int height)
+AOS4Gui::createWindow(const char *title, int width, int height, int xPosition, int yPosition)
 {
     _width = width;
     _height = height;
-
-    _glue.saveOrigiginalDimension(width,height);
+	
+    _glue.saveOrigiginalDimension(width,height,xPosition,yPosition);
 	_orig_width  = width;
 	_orig_height = height;
+	_orig_xPosition = xPosition;
+	_orig_yPosition = yPosition;
 
     _glue.prepDrawingArea(_width, _height);
 
@@ -636,7 +638,7 @@ AOS4Gui::createWindow(const char *title, int width, int height)
 	strcpy(_window_title,title);
 
 	IIntuition->SetWindowTitles(_window,title,title);
-
+	IIntuition->ChangeWindowBox(_window,xPosition,yPosition,width,height);
     return true;
 }
 
