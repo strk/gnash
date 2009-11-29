@@ -981,12 +981,62 @@ inc(a);
 check_equals(a.count, 2);
 check_equals(b.count, 1); // See bug #22203
 
+
+/// Check property construction.
+
+#if OUTPUT_VERSION >= 6
+
+check(_global.Function.prototype.constructor === _global.Function);
+
+f = ASnative(1, 0);
+check(f.__proto__ === _global.Function.prototype);
+
+backup = _global.Function.prototype;
+_global.Function.prototype = 8;
+
+// Obviously this doesn't change already assigned properties
+check(f.__proto__ === backup);
+
+// Native function __proto__ is _global.Function.prototype
+f = ASnative(1, 0);
+check(f.__proto__ === _global.Function.prototype);
+check(f.__proto__ === 8);
+
+funbackup = _global.Function;
+
+_global.Function = function() { this.a = "string"; };
+o = { p:"hi" };
+_global.Function.prototype = o;
+_global.Function.prototype.constructor = 2;
+_global.Function.constructor = 6;
+
+// 1. Does not call new Function();
+// 2. Does not call Function.constructor;
+// 3. does not call Function.prototype.constructor;
+
+// The only things it does are:
+
+// 4. Sets constructor to be _global.Function (whatever that is and regardless
+//    of visibility.
+// 5. Sets __proto__ to be _global.Function.prototype (whatever that is) and
+//    regardless of visibility.
+
+f = ASnative(1, 0);
+check(f.__proto__  === o);
+
+// Inherited property.
+check(f.p === "hi");
+check(f instanceOf _global.Function);
+check(f.constructor === _global.Function);
+check(f.constructor !== _global.Function.prototype.constructor);
+#endif
+
 #if OUTPUT_VERSION == 5
  check_totals(150); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(216); // SWF6
+ check_totals(226); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(217); // SWF7,SWF8
+ check_totals(227); // SWF7,SWF8
 #endif
