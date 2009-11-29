@@ -49,6 +49,8 @@
               <StackDictionaryLookup index="1"/>
             </items>
           </PushData>
+
+          <!-- Check super for a normal function (nothing)-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -74,7 +76,7 @@
             </items>
           </PushData>
 
-          <!-- Check what's in register 0 for a normal function (nothing)-->
+          <!-- Check what's in register 1 for a normal function (nothing)-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -151,7 +153,7 @@
             </items>
           </PushData>
 
-          <!-- Check what register 0 is when super is preloaded-->
+          <!-- Check what register 1 is when super is preloaded-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -202,7 +204,7 @@
             </items>
           </PushData>
 
-          <!-- Check what super is when it's suppressed and preloaded-->
+          <!-- Check what register 1 is when it's suppressed and preloaded-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="1" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
