@@ -232,13 +232,12 @@ getFunctionPrototype()
 	if (proto.get() == NULL) {
 
 		// Initialize Function prototype
-		proto = new as_object();
+        proto = VM::get().getGlobal()->createObject();
         
 		// We initialize the __proto__ member separately, as getObjectInterface
 		// will end up calling getFunctionPrototype again and we want that
 		// call to return the still-not-completely-constructed prototype rather
 		// then create a new one. 
-		proto->set_prototype(getObjectInterface());
 
         VM& vm = VM::get();
 
