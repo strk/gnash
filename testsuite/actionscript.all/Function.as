@@ -1029,14 +1029,45 @@ xcheck(f.p === "hi");
 xcheck(f instanceOf _global.Function);
 xcheck(f.constructor === _global.Function);
 check(f.constructor !== _global.Function.prototype.constructor);
+
+_global.Function = 8;
+
+// Neither property is added if _global.Function is not an object.
+f = ASnative(1, 0);
+check_equals(typeof(f), "function");
+f.hasOwnProperty = Object.prototype.hasOwnProperty;
+xcheck(!f.hasOwnProperty("__proto__"));
+xcheck(!f.hasOwnProperty("constructor"));
+
+
+_global.Function = {};
+
+// Neither property is added if _global.Function is not a function.
+f = ASnative(1, 0);
+check_equals(typeof(f), "function");
+f.hasOwnProperty = Object.prototype.hasOwnProperty;
+xcheck(!f.hasOwnProperty("__proto__"));
+xcheck(!f.hasOwnProperty("constructor"));
+
+called = 0;
+_global.Function = function() { ++called; };
+
+// But the function is not called.
+f = ASnative(1, 0);
+check_equals(typeof(f), "function");
+f.hasOwnProperty = Object.prototype.hasOwnProperty;
+check(f.hasOwnProperty("__proto__"));
+check(f.hasOwnProperty("constructor"));
+
+check_equals(called, 0);
 #endif
 
 #if OUTPUT_VERSION == 5
  check_totals(150); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(226); // SWF6
+ check_totals(236); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(227); // SWF7,SWF8
+ check_totals(237); // SWF7,SWF8
 #endif
