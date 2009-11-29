@@ -95,22 +95,6 @@ public:
 	/// Return the built-in Function constructor
 	static NativeFunction* getFunctionConstructor();
 
-#ifdef GNASH_USE_GC
-	/// Mark reachable resources. Override from GcResource
-	//
-	/// Reachable resources from this object is its prototype
-	/// and the default as_object reachables (properties and parent).
-	///
-	/// The default implementation only marks that. If you
-	/// override this function from a derived class remember
-	/// to call markAsFunctionReachableResources() as a final step.
-	///
-	virtual void markReachableResources() const
-	{
-		markAsFunctionReachable();
-	}
-#endif // GNASH_USE_GC
-
 protected:
 	
     /// Construct a function with no interface
@@ -118,21 +102,6 @@ protected:
 	/// For SWF>5 the function object will have derive from Function.
 	///
 	as_function(Global_as& gl);
-
-#ifdef GNASH_USE_GC
-	/// Mark prototype (properties) as being reachable and invoke
-	/// the as_object class marker.
-	//
-	/// Call this function from an override of markReachableResources
-	/// in a derived class
-	///
-	void markAsFunctionReachable() const
-	{
-		//_properties->setReachable();
-
-		markAsObjectReachable();
-	}
-#endif // GNASH_USE_GC
 
 };
 
