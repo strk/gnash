@@ -270,9 +270,8 @@ VmGcRoot::markReachableResources() const
 }
 
 void
-VM::registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y)
+VM::registerNative(Global_as::ASFunction fun, unsigned int x, unsigned int y)
 {
-    //log_debug("Registering function %p as ASnative(%d, %d) ", (void*)fun, x, y);
     assert(fun);
     assert(!_asNativeTable[x][y]);
     _asNativeTable[x][y] = fun;
@@ -285,7 +284,7 @@ VM::getNative(unsigned int x, unsigned int y) const
     if (row == _asNativeTable.end()) return 0;
     FuncMap::const_iterator col = row->second.find(y);
     if (col == row->second.end()) return 0;
-    as_c_function_ptr fun = col->second;
+    Global_as::ASFunction fun = col->second;
 
     NativeFunction* f = new NativeFunction(*_global, fun);
     f->init_member(NSV::PROP_CONSTRUCTOR,
