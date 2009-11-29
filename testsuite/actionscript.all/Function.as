@@ -999,8 +999,8 @@ check(f.__proto__ === backup);
 
 // Native function __proto__ is _global.Function.prototype
 f = ASnative(1, 0);
-check(f.__proto__ === _global.Function.prototype);
-check(f.__proto__ === 8);
+xcheck(f.__proto__ === _global.Function.prototype);
+xcheck(f.__proto__ === 8);
 
 funbackup = _global.Function;
 
@@ -1022,12 +1022,12 @@ _global.Function.constructor = 6;
 //    regardless of visibility.
 
 f = ASnative(1, 0);
-check(f.__proto__  === o);
+xcheck(f.__proto__  === o);
 
 // Inherited property.
-check(f.p === "hi");
-check(f instanceOf _global.Function);
-check(f.constructor === _global.Function);
+xcheck(f.p === "hi");
+xcheck(f instanceOf _global.Function);
+xcheck(f.constructor === _global.Function);
 check(f.constructor !== _global.Function.prototype.constructor);
 #endif
 
