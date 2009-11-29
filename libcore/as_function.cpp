@@ -71,19 +71,6 @@ as_function::as_function(Global_as& gl)
 	init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
 }
 
-
-boost::intrusive_ptr<as_object>
-as_function::getPrototype()
-{
-	// TODO: create if not available ?
-	// TODO WARNING: what if user overwrites the 'prototype' member ?!
-	//               this function should likely return the *new*
-	//               prototype, not the old !!
-	as_value proto;
-	get_member(NSV::PROP_PROTOTYPE, &proto);
-	return proto.to_object(*VM::get().getGlobal());
-}
-
 NativeFunction*
 as_function::getFunctionConstructor()
 {

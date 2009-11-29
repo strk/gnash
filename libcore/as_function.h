@@ -89,10 +89,6 @@ public:
 	as_object* constructInstance(const as_environment& env,
 			fn_call::Args& args);
 
-	/// Get this function's "prototype" member (exported interface).
-	///
-	boost::intrusive_ptr<as_object> getPrototype();
-
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin() { return false; }
 
