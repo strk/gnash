@@ -138,10 +138,6 @@ protected:
 	}
 #endif // GNASH_USE_GC
 
-
-private:
-
-	void setPrototype(as_object* proto);
 };
 
 /// Initialize the global Function constructor

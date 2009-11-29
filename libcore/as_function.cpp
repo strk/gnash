@@ -72,12 +72,6 @@ as_function::as_function(Global_as& gl)
 }
 
 
-void
-as_function::setPrototype(as_object* proto)
-{
-	init_member(NSV::PROP_PROTOTYPE, as_value(proto));
-}
-
 boost::intrusive_ptr<as_object>
 as_function::getPrototype()
 {
