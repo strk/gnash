@@ -1030,6 +1030,16 @@ xcheck(f instanceOf _global.Function);
 xcheck(f.constructor === _global.Function);
 check(f.constructor !== _global.Function.prototype.constructor);
 
+
+// SWF-defined functions:
+// __proto__ is _global.Function.prototype
+uf = function() {};
+check(uf.p === "hi");
+check(uf.__proto__ === _global.Function.prototype);
+
+// uf.prototype is a new object.
+check(uf.prototype.constructor === uf);
+
 _global.Function = 8;
 
 // Neither property is added if _global.Function is not an object.
@@ -1066,8 +1076,8 @@ check_equals(called, 0);
  check_totals(150); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(236); // SWF6
+ check_totals(239); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(237); // SWF7,SWF8
+ check_totals(240); // SWF7,SWF8
 #endif
