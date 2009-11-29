@@ -1034,8 +1034,8 @@ check(f.constructor !== _global.Function.prototype.constructor);
 // SWF-defined functions:
 // __proto__ is _global.Function.prototype
 uf = function() {};
-check(uf.p === "hi");
-check(uf.__proto__ === _global.Function.prototype);
+xcheck(uf.p === "hi");
+xcheck(uf.__proto__ === _global.Function.prototype);
 
 // uf.prototype is a new object.
 check(uf.prototype.constructor === uf);
