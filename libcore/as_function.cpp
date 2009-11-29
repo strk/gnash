@@ -78,23 +78,6 @@ as_function::setPrototype(as_object* proto)
 	init_member(NSV::PROP_PROTOTYPE, as_value(proto));
 }
 
-void
-as_function::extends(as_object& superclass)
-{
-	as_object* newproto = new as_object();
-	as_object* p =
-        superclass.getMember(NSV::PROP_PROTOTYPE).to_object(
-                *VM::get().getGlobal());
-	newproto->set_prototype(p);
-
-    if (getSWFVersion(superclass) > 5) {
-        const int flags = PropFlags::dontEnum;
-        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass, flags); 
-    }
-
-	init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
-}
-
 boost::intrusive_ptr<as_object>
 as_function::getPrototype()
 {
