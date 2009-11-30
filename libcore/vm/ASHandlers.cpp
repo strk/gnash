@@ -3311,7 +3311,9 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    as_object* super = env.top(0).to_object(getGlobal(thread.env));
+    Global_as& gl = getGlobal(thread.env);
+
+    as_object* super = env.top(0).to_object(gl);
     as_function* sub = env.top(1).to_function();
 
     if (!super ||!sub) {
@@ -3330,7 +3332,16 @@ SWFHandlers::ActionExtends(ActionExec& thread)
     }
     env.drop(2);
 
-    sub->extends(*super);
+	as_object* newproto = new as_object(gl);
+	as_object* p = super->getMember(NSV::PROP_PROTOTYPE).to_object(gl);
+	newproto->set_prototype(p);
+
+    if (getSWFVersion(*super) > 5) {
+        const int flags = PropFlags::dontEnum;
+        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, super, flags); 
+    }
+
+	sub->init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
 
 }
 

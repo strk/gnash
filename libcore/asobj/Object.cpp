@@ -77,12 +77,14 @@ registerObjectNative(as_object& global)
 
 // extern (used by Global.cpp)
 void
-object_class_init(as_object& where, const ObjectURI& uri)
+initObjectClass(as_object* proto, as_object& where, const ObjectURI& uri)
 {
 
+    assert(proto);
+    attachObjectInterface(*proto);
+
     Global_as& gl = getGlobal(where);
-    as_object* proto = getObjectInterface();
-    boost::intrusive_ptr<as_object> cl = gl.createClass(object_ctor, proto);
+    as_object* cl = gl.createClass(object_ctor, proto);
 
     // The as_function ctor takes care of initializing these, but they
     // are different for the Object class.
@@ -97,37 +99,9 @@ object_class_init(as_object& where, const ObjectURI& uri)
 		     
 	// Register _global.Object (should only be visible in SWF5 up)
 	int flags = PropFlags::dontEnum; 
-	where.init_member(getName(uri), cl.get(), flags, getNamespace(uri));
+	where.init_member(getName(uri), cl, flags, getNamespace(uri));
 
 }
-
-
-as_object*
-getObjectInterface()
-{
-    VM& vm = VM::get();
-    
-    if (isAS3(vm)) {
-        static boost::intrusive_ptr<as_object> o;
-        if ( o == NULL )
-        {
-            o = new as_object(); // end of the inheritance chain
-            attachObjectInterface(*o);
-        }
-        return o.get();
-    }
-
-    static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL )
-    {
-        o = new as_object(); // end of the inheritance chain
-        attachObjectInterface(*o);
-    }
-    return o.get();
-
-}
-
-
 
 
 namespace {

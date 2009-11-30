@@ -981,12 +981,103 @@ inc(a);
 check_equals(a.count, 2);
 check_equals(b.count, 1); // See bug #22203
 
+
+/// Check property construction.
+
+#if OUTPUT_VERSION >= 6
+
+check(_global.Function.prototype.constructor === _global.Function);
+
+f = ASnative(1, 0);
+check(f.__proto__ === _global.Function.prototype);
+
+backup = _global.Function.prototype;
+_global.Function.prototype = 8;
+
+// Obviously this doesn't change already assigned properties
+check(f.__proto__ === backup);
+
+// Native function __proto__ is _global.Function.prototype
+f = ASnative(1, 0);
+xcheck(f.__proto__ === _global.Function.prototype);
+xcheck(f.__proto__ === 8);
+
+funbackup = _global.Function;
+
+_global.Function = function() { this.a = "string"; };
+o = { p:"hi" };
+_global.Function.prototype = o;
+_global.Function.prototype.constructor = 2;
+_global.Function.constructor = 6;
+
+// 1. Does not call new Function();
+// 2. Does not call Function.constructor;
+// 3. does not call Function.prototype.constructor;
+
+// The only things it does are:
+
+// 4. Sets constructor to be _global.Function (whatever that is and regardless
+//    of visibility.
+// 5. Sets __proto__ to be _global.Function.prototype (whatever that is) and
+//    regardless of visibility.
+
+f = ASnative(1, 0);
+xcheck(f.__proto__  === o);
+
+// Inherited property.
+xcheck(f.p === "hi");
+xcheck(f instanceOf _global.Function);
+xcheck(f.constructor === _global.Function);
+check(f.constructor !== _global.Function.prototype.constructor);
+
+
+// SWF-defined functions:
+// __proto__ is _global.Function.prototype
+uf = function() {};
+xcheck(uf.p === "hi");
+xcheck(uf.__proto__ === _global.Function.prototype);
+
+// uf.prototype is a new object.
+check(uf.prototype.constructor === uf);
+
+_global.Function = 8;
+
+// Neither property is added if _global.Function is not an object.
+f = ASnative(1, 0);
+check_equals(typeof(f), "function");
+f.hasOwnProperty = Object.prototype.hasOwnProperty;
+xcheck(!f.hasOwnProperty("__proto__"));
+xcheck(!f.hasOwnProperty("constructor"));
+
+
+_global.Function = {};
+
+// Neither property is added if _global.Function is not a function.
+f = ASnative(1, 0);
+check_equals(typeof(f), "function");
+f.hasOwnProperty = Object.prototype.hasOwnProperty;
+xcheck(!f.hasOwnProperty("__proto__"));
+xcheck(!f.hasOwnProperty("constructor"));
+
+called = 0;
+_global.Function = function() { ++called; };
+
+// But the function is not called.
+f = ASnative(1, 0);
+check_equals(typeof(f), "function");
+f.hasOwnProperty = Object.prototype.hasOwnProperty;
+check(f.hasOwnProperty("__proto__"));
+check(f.hasOwnProperty("constructor"));
+
+check_equals(called, 0);
+#endif
+
 #if OUTPUT_VERSION == 5
  check_totals(150); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(216); // SWF6
+ check_totals(239); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(217); // SWF7,SWF8
+ check_totals(240); // SWF7,SWF8
 #endif

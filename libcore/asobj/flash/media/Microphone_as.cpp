@@ -130,8 +130,7 @@ getMicrophoneInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-        o = new as_object();
-        o->set_prototype(getObjectInterface());
+        o = VM::get().getGlobal()->createObject();
 		attachMicrophoneInterface(*o);
 	}
 	return o.get();

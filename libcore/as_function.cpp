@@ -71,42 +71,6 @@ as_function::as_function(Global_as& gl)
 	init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
 }
 
-
-void
-as_function::setPrototype(as_object* proto)
-{
-	init_member(NSV::PROP_PROTOTYPE, as_value(proto));
-}
-
-void
-as_function::extends(as_object& superclass)
-{
-	as_object* newproto = new as_object();
-	as_object* p =
-        superclass.getMember(NSV::PROP_PROTOTYPE).to_object(
-                *VM::get().getGlobal());
-	newproto->set_prototype(p);
-
-    if (getSWFVersion(superclass) > 5) {
-        const int flags = PropFlags::dontEnum;
-        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass, flags); 
-    }
-
-	init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
-}
-
-boost::intrusive_ptr<as_object>
-as_function::getPrototype()
-{
-	// TODO: create if not available ?
-	// TODO WARNING: what if user overwrites the 'prototype' member ?!
-	//               this function should likely return the *new*
-	//               prototype, not the old !!
-	as_value proto;
-	get_member(NSV::PROP_PROTOTYPE, &proto);
-	return proto.to_object(*VM::get().getGlobal());
-}
-
 NativeFunction*
 as_function::getFunctionConstructor()
 {
@@ -232,13 +196,12 @@ getFunctionPrototype()
 	if (proto.get() == NULL) {
 
 		// Initialize Function prototype
-		proto = new as_object();
+        proto = VM::get().getGlobal()->createObject();
         
 		// We initialize the __proto__ member separately, as getObjectInterface
 		// will end up calling getFunctionPrototype again and we want that
 		// call to return the still-not-completely-constructed prototype rather
 		// then create a new one. 
-		proto->set_prototype(getObjectInterface());
 
         VM& vm = VM::get();
 

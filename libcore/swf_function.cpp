@@ -351,7 +351,7 @@ swf_function::markReachableResources() const
 	m_env.markReachableResources();
 
 	// Invoke parent class marker
-	markAsFunctionReachable(); 
+	markAsObjectReachable(); 
 }
 #endif // GNASH_USE_GC
 

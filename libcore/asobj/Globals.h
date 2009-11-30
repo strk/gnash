@@ -111,6 +111,8 @@ private:
 
     ClassHierarchy _classes;
     VM& _vm;
+    
+    as_object* _objectProto;
 
 };
 
@@ -162,6 +164,7 @@ protected:
 
     virtual void markReachableResources() const {
         _classes.markReachableResources();
+        _objectProto->setReachable();
         markAsObjectReachable();
     }
 
@@ -169,6 +172,7 @@ private:
 
     ClassHierarchy _classes;
     VM& _vm;
+    as_object* _objectProto;
 
 };
 

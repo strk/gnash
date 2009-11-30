@@ -167,7 +167,8 @@ namespace {
 AVM2Global::AVM2Global(abc::Machine& /*machine*/, VM& vm)
     :
     _classes(this, 0),
-    _vm(vm)
+    _vm(vm),
+    _objectProto(new as_object(*this))
 {
 }
 
@@ -177,7 +178,9 @@ AVM2Global::registerClasses()
    
     const string_table::key NS_GLOBAL(0);
     
-    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+    initObjectClass(_objectProto, *this,
+            ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+
     function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
     string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
     array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
@@ -201,7 +204,7 @@ as_object*
 AVM1Global::createObject()
 {
     as_object* obj = new as_object(*this);
-    obj->set_prototype(getObjectInterface());
+    obj->set_prototype(_objectProto);
     return obj;
 }
 
@@ -287,7 +290,7 @@ as_object*
 AVM2Global::createObject()
 {
     as_object* obj = new as_object(*this);
-    obj->set_prototype(getObjectInterface());
+    obj->set_prototype(_objectProto);
     return obj;
 }
 
@@ -348,13 +351,15 @@ void
 AVM1Global::markReachableResources() const
 {
     _classes.markReachableResources();
+    _objectProto->setReachable();
     markAsObjectReachable();
 }
 
 AVM1Global::AVM1Global(VM& vm)
     :
     _classes(this, &_et),
-    _vm(vm)
+    _vm(vm),
+    _objectProto(new as_object(*this))
 {
 }
 
@@ -365,7 +370,9 @@ AVM1Global::registerClasses()
 
     const string_table::key NS_GLOBAL(0);
 
-    object_class_init(*this, ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+    initObjectClass(_objectProto, *this,
+            ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+
     function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
     string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
     array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 

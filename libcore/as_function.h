@@ -89,34 +89,11 @@ public:
 	as_object* constructInstance(const as_environment& env,
 			fn_call::Args& args);
 
-	/// Get this function's "prototype" member (exported interface).
-	///
-	boost::intrusive_ptr<as_object> getPrototype();
-
-	/// Make this function a subclass of the given as_function
-	void extends(as_object& superclass);
-
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin() { return false; }
 
 	/// Return the built-in Function constructor
 	static NativeFunction* getFunctionConstructor();
-
-#ifdef GNASH_USE_GC
-	/// Mark reachable resources. Override from GcResource
-	//
-	/// Reachable resources from this object is its prototype
-	/// and the default as_object reachables (properties and parent).
-	///
-	/// The default implementation only marks that. If you
-	/// override this function from a derived class remember
-	/// to call markAsFunctionReachableResources() as a final step.
-	///
-	virtual void markReachableResources() const
-	{
-		markAsFunctionReachable();
-	}
-#endif // GNASH_USE_GC
 
 protected:
 	
@@ -126,25 +103,6 @@ protected:
 	///
 	as_function(Global_as& gl);
 
-#ifdef GNASH_USE_GC
-	/// Mark prototype (properties) as being reachable and invoke
-	/// the as_object class marker.
-	//
-	/// Call this function from an override of markReachableResources
-	/// in a derived class
-	///
-	void markAsFunctionReachable() const
-	{
-		//_properties->setReachable();
-
-		markAsObjectReachable();
-	}
-#endif // GNASH_USE_GC
-
-
-private:
-
-	void setPrototype(as_object* proto);
 };
 
 /// Initialize the global Function constructor

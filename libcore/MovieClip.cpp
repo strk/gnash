@@ -1908,7 +1908,7 @@ MovieClip::constructAsScriptObject()
         if ( ctor && ! ctor->isBuiltin() )
         {
             // Set the new prototype *after* the constructor was called
-            boost::intrusive_ptr<as_object> proto = ctor->getPrototype();
+            as_value proto = ctor->getMember(NSV::PROP_PROTOTYPE);
             getObject(this)->set_prototype(proto);
 
             // Call event handlers *after* setting up the __proto__

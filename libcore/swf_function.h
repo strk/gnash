@@ -142,9 +142,9 @@ public:
 	virtual as_value call(const fn_call& fn);
 
 #ifdef GNASH_USE_GC
-	/// Mark reachable resources. Override from as_function.
+	/// Mark reachable resources. Override from as_object
 	//
-	/// Reachable resources from this object is it's scope stack
+	/// Reachable resources from this object are its scope stack
 	/// and the prototype.
 	///
 	virtual void markReachableResources() const;
