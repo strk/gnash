@@ -1,0 +1,372 @@
+<?xml version="1.0"?>
+<swf version="7" compressed="1">
+
+<!-- Tests when and where super is preloaded -->
+<!-- The answer is:
+	If it's suppressed, it's not available at all.
+	If it's preloaded, it is only available in a register, not as
+	a local variable.
+-->
+
+  <Header framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+      <DoAction>
+        <actions>
+          <Dictionary>
+            <strings>
+              <String value="o"/>
+              <String value="ns"/>
+              <String value="arguments"/>
+              <String value="nr"/>
+              <String value="sss"/>
+              <String value="pss"/>
+              <String value="psr"/>
+              <String value="psss"/>
+              <String value="pssr"/>
+              <String value="__proto__"/>
+              <String value="oo"/>
+            </strings>
+          </Dictionary>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+              <StackInteger value="0"/>
+            </items>
+          </PushData>
+          <DeclareObject/>
+          <SetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="1"/>
+            </items>
+          </PushData>
+
+	  <!-- Check arguments for a normal function -->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+            <args/>
+            <actions>
+              <PushData>
+                <items>
+                  <StackDictionaryLookup index="2"/>
+                </items>
+              </PushData>
+              <GetVariable/>
+              <Return/>
+            </actions>
+          </DeclareFunction2>
+          <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="3"/>
+            </items>
+          </PushData>
+
+          <!-- Check what's in register 1 for a normal function (nothing)-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+            <args/>
+            <actions>
+              <PushData>
+                <items>
+                  <StackRegister reg="1"/>
+                </items>
+              </PushData>
+              <Return/>
+            </actions>
+          </DeclareFunction2>
+          <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="4"/>
+            </items>
+          </PushData>
+
+          <!-- Check what arguments is when it's suppressed-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="1" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+            <args/>
+            <actions>
+              <PushData>
+                <items>
+                  <StackDictionaryLookup index="2"/>
+                </items>
+              </PushData>
+              <GetVariable/>
+              <Return/>
+            </actions>
+          </DeclareFunction2>
+          <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="5"/>
+            </items>
+          </PushData>
+
+          <!-- Check what arguments is when it's preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="1" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+            <args/>
+            <actions>
+              <PushData>
+                <items>
+                  <StackDictionaryLookup index="2"/>
+                </items>
+              </PushData>
+              <GetVariable/>
+              <Return/>
+            </actions>
+          </DeclareFunction2>
+          <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="6"/>
+            </items>
+          </PushData>
+
+          <!-- Check what register 1 is when arguments is preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="1" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+            <args/>
+            <actions>
+              <PushData>
+                <items>
+                  <StackRegister reg="1"/>
+                </items>
+              </PushData>
+              <Return/>
+            </actions>
+          </DeclareFunction2>
+          <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="7"/>
+            </items>
+          </PushData>
+
+          <!-- Check what arguments is when it's suppressed and preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="1" preloadArguments="1" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+            <args/>
+            <actions>
+              <PushData>
+                <items>
+                  <StackDictionaryLookup index="2"/>
+                </items>
+              </PushData>
+              <GetVariable/>
+              <Return/>
+            </actions>
+          </DeclareFunction2>
+          <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="8"/>
+            </items>
+          </PushData>
+
+          <!-- Check what register 1 is when arguments suppressed and preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="1" preloadArguments="1" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+            <args/>
+            <actions>
+              <PushData>
+                <items>
+                  <StackRegister reg="1"/>
+                </items>
+              </PushData>
+              <Return/>
+            </actions>
+          </DeclareFunction2>
+          <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="9"/>
+              <StackInteger value="0"/>
+            </items>
+          </PushData>
+          <DeclareObject/>
+          <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="10"/>
+              <StackInteger value="0"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <New/>
+	  <SetLocalVariable/>
+
+	  <!-- Start function calls -->
+          <PushData>
+            <items>
+              <StackInteger value="6.5"/>
+              <StackInteger value="1"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="1"/>
+            </items>
+          </PushData>
+          <CallMethod/>
+          <Trace/>
+          <PushData>
+            <items>
+              <StackInteger value="6.5"/>
+              <StackInteger value="1"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="3"/>
+            </items>
+          </PushData>
+          <CallMethod/>
+          <Trace/>
+          <PushData>
+            <items>
+              <StackInteger value="6.5"/>
+              <StackInteger value="1"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="4"/>
+            </items>
+          </PushData>
+          <CallMethod/>
+          <Trace/>
+          <PushData>
+            <items>
+              <StackInteger value="6.5"/>
+              <StackInteger value="1"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="5"/>
+            </items>
+          </PushData>
+          <CallMethod/>
+          <Trace/>
+          <PushData>
+            <items>
+              <StackInteger value="6.5"/>
+              <StackInteger value="1"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="6"/>
+            </items>
+          </PushData>
+          <CallMethod/>
+          <Trace/>
+          <PushData>
+            <items>
+              <StackInteger value="6.5"/>
+              <StackInteger value="1"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="7"/>
+            </items>
+          </PushData>
+          <CallMethod/>
+          <Trace/>
+          <PushData>
+            <items>
+              <StackInteger value="6.5"/>
+              <StackInteger value="1"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="8"/>
+            </items>
+          </PushData>
+          <CallMethod/>
+          <Trace/>
+          <PushData>
+            <items>
+              <StackInteger value="6.5"/>
+              <StackInteger value="1"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="1"/>
+            </items>
+          </PushData>
+          <CallMethod/>
+          <Trace/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>
