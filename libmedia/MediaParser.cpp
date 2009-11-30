@@ -124,6 +124,46 @@ MediaParser::peekNextVideoFrame() const
 }
 
 bool
+MediaParser::nextFrameTimestamp(boost::uint64_t& ts) const
+{
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+    boost::mutex::scoped_lock lock(_qMutex);
+#else // ndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+    while (!parsingCompleted() && _videoInfo.get() && _videoFrames.empty())
+    {
+        const_cast<MediaParser*>(this)->parseNextChunk();
+    }
+#endif
+
+    if (_videoFrames.empty())
+    {
+        if (_audioFrames.empty())
+        {
+            return false;
+        }
+        else
+        {
+            ts = _audioFrames.front()->timestamp;
+            return true;
+        }
+    }
+    else
+    {
+        if (_audioFrames.empty())
+        {
+            ts = _videoFrames.front()->timestamp();
+            return true;
+        }
+        else
+        {
+            ts = std::min(_videoFrames.front()->timestamp(),
+                          _audioFrames.front()->timestamp);
+            return true;
+        }
+    }
+}
+
+bool
 MediaParser::nextVideoFrameTimestamp(boost::uint64_t& ts) const
 {
 	const EncodedVideoFrame* ef = peekNextVideoFrame();

@@ -492,6 +492,13 @@ public:
 		_bufferTime=t;
 	}
 
+	/// Get timestamp of the next frame available, if any
+	//
+	/// @param ts will be set to timestamp of next available frame
+	/// @return false if no frame is available yet
+	///
+	DSOEXPORT bool nextFrameTimestamp(boost::uint64_t& ts) const;
+
 	/// Get timestamp of the video frame which would be returned on nextVideoFrame
 	//
 	/// @return false if there no video frame left
