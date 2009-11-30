@@ -108,7 +108,7 @@ attachContextMenuInterface(as_object& o)
 as_value
 contextmenu_hideBuiltInItems(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     string_table& st = getStringTable(fn);
 
     Global_as& gl = getGlobal(fn);
@@ -122,7 +122,7 @@ contextmenu_hideBuiltInItems(const fn_call& fn)
 as_value
 contextmenu_copy(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     Global_as& gl = getGlobal(fn);
 

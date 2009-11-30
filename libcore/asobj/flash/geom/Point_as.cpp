@@ -103,7 +103,7 @@ attachPointStaticProperties(as_object& o)
 as_value
 point_add(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -166,7 +166,7 @@ point_add(const fn_call& fn)
 as_value
 point_clone(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);
@@ -178,7 +178,7 @@ point_clone(const fn_call& fn)
 as_value
 point_equals(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     if ( ! fn.nargs )
     {
@@ -224,7 +224,7 @@ point_equals(const fn_call& fn)
 as_value
 point_normalize(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value argval;
 
@@ -278,7 +278,7 @@ point_normalize(const fn_call& fn)
 as_value
 point_offset(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     as_value x, y;
     ptr->get_member(NSV::PROP_X, &x);

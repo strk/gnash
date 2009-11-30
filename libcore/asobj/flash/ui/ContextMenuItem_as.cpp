@@ -62,7 +62,7 @@ attachContextMenuItemInterface(as_object& o)
 as_value
 contextmenuitem_copy(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     Global_as& gl = getGlobal(fn);
     string_table& st = getStringTable(fn);

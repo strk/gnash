@@ -103,9 +103,9 @@ attachColorInterface(as_object& o)
 as_value
 color_getrgb(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+	as_object* obj = ensure<ValidThis>(fn);
 
-    MovieClip* sp = getTarget(obj.get(), fn);
+    MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
 	const cxform& trans = sp->get_user_cxform();
@@ -122,9 +122,9 @@ color_getrgb(const fn_call& fn)
 as_value
 color_gettransform(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+	as_object* obj = ensure<ValidThis>(fn);
 
-    MovieClip* sp = getTarget(obj.get(), fn);
+    MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
 	const cxform& cx = sp->get_user_cxform();
@@ -150,7 +150,7 @@ color_gettransform(const fn_call& fn)
 as_value
 color_setrgb(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+	as_object* obj = ensure<ValidThis>(fn);
 	
     if (!fn.nargs) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -159,7 +159,7 @@ color_setrgb(const fn_call& fn)
 		return as_value();
 	}
 
-    MovieClip* sp = getTarget(obj.get(), fn);
+    MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
 	boost::int32_t color = fn.arg(0).to_int();
@@ -183,7 +183,7 @@ color_setrgb(const fn_call& fn)
 as_value
 color_settransform(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+	as_object* obj = ensure<ValidThis>(fn);
 
 	if (!fn.nargs) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -192,7 +192,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<as_object> trans = fn.arg(0).to_object(getGlobal(fn));
+	as_object* trans = fn.arg(0).to_object(getGlobal(fn));
 
     if (!trans) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -203,7 +203,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-    MovieClip* sp = getTarget(obj.get(), fn);
+    MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
 	string_table& st = getStringTable(*obj);
