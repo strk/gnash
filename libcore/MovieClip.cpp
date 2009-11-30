@@ -1867,8 +1867,10 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 void
 MovieClip::constructAsScriptObject()
 {
-
     as_object* mc = getObject(this);
+
+    // A MovieClip should always have an associated object.
+    assert(mc);
 
     if (!isAS3(getVM(*mc)) && !get_parent()) {
         mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
@@ -1885,6 +1887,7 @@ MovieClip::constructAsScriptObject()
             getTarget(), (void*)ctor); 
 #endif
 
+    // Set this MovieClip object to be an instance of the class.
     if (ctor) {
         Property* proto = ctor->getOwnProperty(NSV::PROP_PROTOTYPE);
         if (proto) mc->set_prototype(proto->getValue(*ctor));
@@ -1901,7 +1904,6 @@ MovieClip::constructAsScriptObject()
             ctor->construct(*mc, get_environment(), args);
         }
     }
-
 }
 
 bool
