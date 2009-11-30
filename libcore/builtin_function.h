@@ -50,7 +50,6 @@ public:
 	/// @param func
 	///	The C function to call when this as_function is invoked.
 	/// 	For classes, the function pointer is the constructor.
-	///
 	builtin_function(Global_as& gl, ASFunction func)
 		:
 		as_function(gl),
@@ -61,20 +60,8 @@ public:
 	/// Invoke this function or this Class constructor
 	virtual as_value call(const fn_call& fn)
 	{
-		// Real native functions don't put self on the CallStack
-		// (they never end up in an arguments.caller).
-		// This is, for example, the case for Array.sort when
-		// calling a custom comparator.
-		// Unfortunately gnash implements all builtin as natives
-		// while the proprietary player doesn't (for example
-		// MovieClip.meth does end up in arguments.caller).
-		//
-		// A possible short-term solution to this could be
-		// specifying for a builtin_function whether or not
-		// it should be considered 'native'.
-		// If not 'native', we'd push a CallFrame on stack...
         as_environment env = fn.env();
-		as_environment::FrameGuard guard(env, this);
+		as_environment::FrameGuard guard(env, *this);
 
 		assert(_func);
 		return _func(fn);

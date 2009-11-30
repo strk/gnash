@@ -47,8 +47,6 @@ public:
     /// A stack of objects used for variables/members lookup
     typedef std::vector<as_object*> ScopeStack;
 
-    typedef std::vector<as_value> Registers;
-
     as_environment(VM& vm);
 
     VM& getVM() const { return _vm; }
@@ -219,7 +217,7 @@ public:
     ///
     void add_local_registers(unsigned int register_count) {
         assert(!_localFrames.empty());
-        return _localFrames.back().registers.resize(register_count);
+        return _localFrames.back().resizeRegisters(register_count);
     }
 
     /// Set value of a register (local or global).
@@ -275,22 +273,10 @@ public:
     ///
     unsigned int getRegister(unsigned int regnum, as_value& v);
 
-    /// Return a reference to the Nth local register.
-    //
-    /// Local registers are only meaningful within a function2 context.
-    ///
-    as_value& local_register(boost::uint8_t n) {
-        assert(!_localFrames.empty());
-        return _localFrames.back().registers[n];
-    }
-
     /// Set the Nth local register to something
     void set_local_register(boost::uint8_t n, as_value &val) {
         if (! _localFrames.empty()) {
-            Registers& registers = _localFrames.back().registers;
-            if (n < registers.size()) {
-                registers[n] = val;
-            }
+            _localFrames.back().setRegister(n, val);
         }
     }
 
@@ -416,8 +402,9 @@ public:
     class FrameGuard
     {
         as_environment& _env;
+
     public:
-        FrameGuard(as_environment& env, as_function* func)
+        FrameGuard(as_environment& env, as_function& func)
             :
             _env(env)
         {
@@ -474,7 +461,7 @@ private:
     /// @param func
     /// The function being called
     ///
-    void pushCallFrame(as_function* func);
+    void pushCallFrame(as_function& func);
 
     /// Remove current call frame from the stack
     //
@@ -544,18 +531,6 @@ private:
     /// @return true if the variable was found, false otherwise
     ///
     bool setLocal(const std::string& varname, const as_value& val);
-
-    /// Set a variable of the given object, if it exists.
-    //
-    /// @param varname
-    /// Name of the local variable
-    ///
-    /// @param val
-    /// Value to assign to the variable
-    ///
-    /// @return true if the variable was found, false otherwise
-    ///
-    bool setLocal(as_object* locals, const std::string& varname, const as_value& val);
 
     static as_value undefVal;
         

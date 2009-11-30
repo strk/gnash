@@ -41,7 +41,7 @@
 
 #ifndef DEBUG_STACK
 
-// temporarly disabled as will produce lots of output with -v
+// temporarily disabled as will produce lots of output with -v
 // we'd need another switch maybe, as -va does also produce
 // too much information for my tastes. I really want just
 // to see how stack changes while executing actions...
@@ -52,7 +52,7 @@
 # define STACK_DUMP_LIMIT 32
 
 // Define to get debugging messages for try / catch
-//#define GNASH_DEBUG_TRY 1
+#define GNASH_DEBUG_TRY 1
 
 #endif
 
@@ -64,11 +64,11 @@ namespace gnash {
 static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
 
-ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr)
+ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
+        as_value* nRetVal, as_object* this_ptr)
     :
     _withStack(),
     _scopeStack(func.getScopeStack()),
-    // See comment in header
     _withStackLimit(7),
     _func(&func),
     _this_ptr(this_ptr),
@@ -81,7 +81,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
     _abortOnUnload(false),
     pc(func.getStartPC()),
     next_pc(pc),
-    stop_pc(pc+func.getLength()),
+    stop_pc(pc + func.getLength()),
     code(func.getActionBuffer()),
     env(newEnv),
     retval(nRetVal)
@@ -105,25 +105,23 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
     //              set local var: i=[number:0]
     //              push 'i' getvariable
     //              get var: i=[undefined] 
-    // 
-    if ( code.getDefinitionVersion() > 5 )
-    //if ( env.get_version() > 5 )
-    {
-        // We assume that the swf_function () operator already initialized its environment
-        // so that it's activation object is now in the top element of the CallFrame stack
-        //
+    if (code.getDefinitionVersion() > 5) {
+        // We assume that the swf_function () operator already initialized
+        // its environment so that its activation object is now in the
+        // top element of the CallFrame stack
         CallFrame& topFrame = newEnv.topCallFrame();
-        assert(topFrame.func == &func);
-        _scopeStack.push_back(topFrame.locals);
+        assert(&topFrame.function() == &func);
+        _scopeStack.push_back(&topFrame.locals());
     }
 }
 
-ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool abortOnUnloaded)
+ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
+        bool abortOnUnloaded)
     :
     _withStack(),
     _scopeStack(), // TODO: initialize the scope stack somehow
     _withStackLimit(7),
-    _func(NULL),
+    _func(0),
     _initialStackSize(0),
     _initialCallStackDepth(0),
     _originalTarget(0),
@@ -138,25 +136,24 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
     env(newEnv),
     retval(0)
 {
-    //GNASH_REPORT_FUNCTION;
-
     /// See comment in header
     // TODO: stack limit dependent on function version or VM version ?
-    if ( env.get_version() > 5 ) {
+    if (env.get_version() > 5) {
         _withStackLimit = 15;
     }
 }
 
 void
-ActionExec::operator() ()
+ActionExec::operator()()
 {
     VM& vm = getVM(env);
 
     // Do not execute if scripts are disabled
-    if ( vm.getRoot().scriptsDisabled() ) return;
+    if (vm.getRoot().scriptsDisabled()) return;
 
     _origExecSWFVersion = vm.getSWFVersion();
-    int codeVersion = code.getDefinitionVersion();
+
+    const int codeVersion = code.getDefinitionVersion();
     vm.setSWFVersion(codeVersion);
 
     static const SWF::SWFHandlers& ash = SWF::SWFHandlers::instance();
@@ -184,8 +181,6 @@ ActionExec::operator() ()
     // TODO: specify in the .gnashrc !!
     static const size_t maxBranchCount = 65536; // what's enough ?
 
-    //WallClockTimer timer;
-
     // stop_pc: set to the code boundary at which we should check
     // for exceptions. If there is no exception in a TryBlock, it
     // is set to the end of that block; all the code (including catch
@@ -200,18 +195,19 @@ ActionExec::operator() ()
 
     size_t branchCount = 0;
     try {
-        while (1) // We might not stop at stop_pc, if we are trying.
-        {
-            if (pc >= stop_pc)
-            {
+        log_debug("Try list size: %s", _tryList.size());
+
+        // We might not stop at stop_pc, if we are trying.
+        while (1) {
+
+            if (pc >= stop_pc) {
                 // No try blocks
                 if (_tryList.empty()) {
                 
                     // Check for any uncaught exceptions.
-                    if (env.stack_size() && env.top(0).is_exception())
-                    {
+                    if (env.stack_size() && env.top(0).is_exception()) {
                         log_debug ("Exception on stack, no handlers left.");
-                        // Stop execution (for how long?) if an exception
+                        // Stop execution if an exception
                         // is still on the stack and there is nothing
                         // left to catch it.
                         throw ActionScriptException();
@@ -222,7 +218,7 @@ ActionExec::operator() ()
                 // If we are in a try block, check to see if we have thrown.
                 TryBlock& t = _tryList.back();
                 
-                if (! processExceptions(t)) break;
+                if (!processExceptions(t)) break;
 
                 continue;
             }
@@ -248,28 +244,26 @@ ActionExec::operator() ()
 
             // Set default next_pc offset, control flow action handlers
             // will be able to reset it.
-            if ((action_id & 0x80) == 0)
-            {
+            if ((action_id & 0x80) == 0) {
                 // action with no extra data
                 next_pc = pc+1;
             }
-            else
-            {
+            else {
                 // action with extra data
-                boost::uint16_t length = boost::uint16_t(code.read_int16(pc + 1));
+                // Note this converts from int to uint!
+                boost::uint16_t length(code.read_int16(pc + 1));
+
                 next_pc = pc + length + 3;
-                if ( next_pc > stop_pc )
-                {
+                if (next_pc > stop_pc) {
                     IF_VERBOSE_MALFORMED_SWF(
                     log_swferror(_("Length %u (%d) of action tag"
                                    " id %u at pc %d"
                                    " overflows actions buffer size %d"),
-                      length, static_cast<int>(length),
-                      static_cast<unsigned>(action_id), pc,
-                      stop_pc);
+                          length, static_cast<int>(length),
+                          static_cast<unsigned>(action_id), pc,
+                          stop_pc);
                     );
                     
-                    //throw ActionException(ss.str());
                     // no way to recover from this actually...
                     // Give this action handler a chance anyway.
                     // Maybe it will be able to do something about
@@ -279,30 +273,28 @@ ActionExec::operator() ()
             }
 
             // Do we still need this ?
-            if ( action_id == SWF::ACTION_END )
-            {
+            if (action_id == SWF::ACTION_END) {
                 break;
             }
 
             ash.execute(static_cast<SWF::ActionType>(action_id), *this);
 
-#if 1 // See bugs: #20974, #21069, #20996.
-
-#if 0
-            // curveball.swf and feed.swf break with this
-            DisplayObject* guardedChar = env.get_original_target(); // watch out : _originalTarget is not necessarely the same
-#else
-            // curveball.swf and feed.swf suggest that it is the *current* target,
-            // not the *original* one that matters.
+            // Code round here has to do with bugs: #20974, #21069, #20996,
+            // but since there is so much disabled code it's not clear exactly
+            // what part.
+            
+            // curveball.swf and feed.swf suggest that it is the
+            // *current* target, not the *original* one that matters.
             DisplayObject* guardedChar = env.get_target();
-#endif
 
-            if ( _abortOnUnload && guardedChar && guardedChar->unloaded() )
-            // action_execution_order_test8.c shows that the opcode guard is not SWF version based (TODO: automate it!)
-            {
+            if (_abortOnUnload && guardedChar && guardedChar->unloaded()) {
+                // action_execution_order_test8.c shows that the opcode
+                // guard is not SWF version based (TODO: automate it!)
                 std::stringstream ss;
                 ss << "Target of action_buffer (" << guardedChar->getTarget() 
-                    << " of type " << typeName(*guardedChar) << ") unloaded by execution of opcode: " << std::endl;
+                    << " of type " << typeName(*guardedChar) << ") unloaded "
+                    "by execution of opcode: " << std::endl;
+
                 dumpActions(pc, next_pc, ss);
                 ss << "Discarding " << stop_pc-next_pc
                     << " bytes of remaining opcodes: " << std::endl;
@@ -310,7 +302,6 @@ ActionExec::operator() ()
                 log_debug("%s", ss.str());
                 break;
             }
-#endif
 
 
 #ifdef USE_DEBUGGER
@@ -324,7 +315,8 @@ ActionExec::operator() ()
         
 #if DEBUG_STACK
             IF_VERBOSE_ACTION (
-                log_action(_("After execution: PC %d, next PC %d, stack follows"), pc, next_pc);
+                log_action(_("After execution: PC %d, next PC %d, "
+                        "stack follows"), pc, next_pc);
                 std::stringstream ss;
                 env.dump_stack(ss, STACK_DUMP_LIMIT);
                 env.dump_global_registers(ss);
@@ -339,51 +331,33 @@ ActionExec::operator() ()
 
             // Check for script limits hit. 
             // See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
-            // 
-#if 0
-            // TODO: only check on branch-back ? (would be less aggressive..)
-            // WARNING: if the movie is stopped, the wall clock continues to run !
-            if ( timeLimit && timer.elapsed() > timeLimit )
-            {
-                throw ActionLimitException("Script exceeded time limit");
-            }
-#else
-            if ( pc <= oldPc )
-            {
-                if ( ++branchCount > maxBranchCount )
-                {
+            if (pc <= oldPc) {
+                if (++branchCount > maxBranchCount) {
                     boost::format fmt(_("Loop iterations count exceeded "
                                 "limit of %d. Last branch was from pc %d "
                                 "to %d"));
                     fmt % maxBranchCount % oldPc % pc;
                     throw ActionLimitException(fmt.str());
                 }
-                //log_debug("Branch count: %u", branchCount);
             }
-#endif
-
         }
-
     }
-    catch (ActionLimitException& ex)
-    {
+    catch (ActionLimitException& ex) {
         // Script execution should stop (for this frame only?)
         // Here's were we should pop-up a window to prompt user about
         // what to do next (abort or not ?)
-        //log_error("Script aborted due to exceeded limit: %s - cleaning up after run", ex.what());
         cleanupAfterRun(true); // we expect inconsistencies here
         throw;
     }
-    catch (ActionScriptException& ex)
-    {
+    catch (ActionScriptException& ex) {
         // An unhandled ActionScript exception was thrown.
         cleanupAfterRun(true);
 
-	// Forceably clear the stack.
-	// - Fixes misc-mtasc.all/exception.swf
-	// By commenting the line above, we get an XPASS in
-	// - swfdec/catch-in-caller.swf
-	env.drop(env.stack_size());
+        // Forceably clear the stack.
+        // - Fixes misc-mtasc.all/exception.swf
+        // By commenting the line above, we get an XPASS in
+        // - swfdec/catch-in-caller.swf
+        env.drop(env.stack_size());
 
         return;
     }

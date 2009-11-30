@@ -14,19 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
+
 #include "CallStack.h"
 #include "as_object.h"
 #include "as_function.h" 
 #include "Global_as.h" 
 
+#include <ostream>
+
 namespace gnash {
 
-CallFrame::CallFrame(as_function* funcPtr)
-	:
-	locals(new as_object),
-	func(funcPtr)
+CallFrame::CallFrame(as_function* f)
+    :
+    _locals(new as_object(getGlobal(*f))),
+    _func(f)
 {
+    assert(_func);
 }
 
 /// Mark all reachable resources
@@ -36,13 +39,26 @@ CallFrame::CallFrame(as_function* funcPtr)
 void
 CallFrame::markReachableResources() const
 {
-	if ( func ) func->setReachable();
-	for (Registers::const_iterator i=registers.begin(), e=registers.end(); i!=e; ++i)
-	{
-		i->setReachable();
-	}
-	if (locals)
-		locals->setReachable();
+    // Func is always valid.
+    assert(_func);
+    _func->setReachable();
+
+    std::for_each(_registers.begin(), _registers.end(),
+            std::mem_fun_ref(&as_value::setReachable));
+
+    if (_locals) _locals->setReachable();
 }
 
+std::ostream&
+operator<<(std::ostream& o, const CallFrame& fr)
+{
+    CallFrame::Registers r = fr._registers;
+
+    for (size_t i = 0; i < r.size(); ++i) {
+        if (i) o << ", ";
+        o << i << ':' << '"' << r[i] << '"';
+    }
+    return o;
+    
+}
 } // namespace gnash

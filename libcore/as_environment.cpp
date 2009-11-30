@@ -57,10 +57,10 @@ namespace {
 ///
 /// @return true if the variable was found, false otherwise
 bool
-getLocal(as_object* locals, const std::string& name, as_value& ret)
+getLocal(as_object& locals, const std::string& name, as_value& ret)
 {
-    string_table& st = getStringTable(*locals);
-    return locals->get_member(st.find(name), &ret);
+    string_table& st = getStringTable(locals);
+    return locals.get_member(st.find(name), &ret);
 }
 
 /// Delete a local variable
@@ -69,12 +69,30 @@ getLocal(as_object* locals, const std::string& name, as_value& ret)
 /// Name of the local variable
 ///
 /// @return true if the variable was found and deleted, false otherwise
-///
 bool
-deleteLocal(as_object* locals, const std::string& varname)
+deleteLocal(as_object& locals, const std::string& varname)
 {
-    string_table& st = getStringTable(*locals);
-    return locals->delProperty(st.find(varname)).second;
+    string_table& st = getStringTable(locals);
+    return locals.delProperty(st.find(varname)).second;
+}
+
+/// Set a variable of the given object, if it exists.
+//
+/// @param varname
+/// Name of the local variable
+///
+/// @param val
+/// Value to assign to the variable
+///
+/// @return true if the variable was found, false otherwise
+bool
+setLocal(as_object& locals, const std::string& varname, const as_value& val)
+{
+    string_table& st = getStringTable(locals);
+    Property* prop = locals.getOwnProperty(st.find(varname));
+    if (!prop) return false;
+    prop->setValue(locals, val);
+    return true;
 }
 
 as_object*
@@ -431,10 +449,10 @@ as_environment::set_local(const std::string& varname, const as_value& val)
     else
     {
         // Not in frame; create a new local var.
-        assert( ! varname.empty() ); // null varnames are invalid!
-        as_object* locals = _localFrames.back().locals;
+        assert(!varname.empty()); // null varnames are invalid!
+        as_object& locals = _localFrames.back().locals();
         //locals.push_back(as_environment::frame_slot(varname, val));
-        locals->set_member(varkey, val);
+        locals.set_member(varkey, val);
     }
 }
     
@@ -446,10 +464,10 @@ as_environment::declare_local(const std::string& varname)
     if ( ! findLocal(varname, tmp) )
     {
         // Not in frame; create a new local var.
-        assert( ! _localFrames.empty() );
+        assert(!_localFrames.empty());
         assert( ! varname.empty() );    // null varnames are invalid!
-        as_object* locals = _localFrames.back().locals;
-        locals->set_member(_vm.getStringTable().find(varname), as_value());
+        as_object& locals = _localFrames.back().locals();
+        locals.set_member(_vm.getStringTable().find(varname), as_value());
     }
 }
 
@@ -744,45 +762,28 @@ as_environment::get_version() const
     return _vm.getSWFVersion();
 }
 
-static void
-dump(const as_environment::Registers& r, std::ostream& out) 
-{
-    for (size_t i=0; i<r.size(); ++i)
-    {
-        if (i) out << ", ";
-        out << i << ':' << '"' << r[i] << '"';
-    }
-}
-
 void
 as_environment::dump_local_registers(std::ostream& out) const
 {
     if ( _localFrames.empty() ) return;
     out << "Local registers: ";
-#ifndef DUMP_LOCAL_REGISTERS_IN_ALL_CALL_FRAMES
-    dump(_localFrames.back().registers, out);
-#else
     for (CallStack::const_iterator it=_localFrames.begin(),
-            itEnd=_localFrames.end();
-            it != itEnd; ++it)
-    {
-        if ( it != _localFrames.begin() ) out << " | ";
-        dump(it->registers, out);
+            itEnd=_localFrames.end(); it != itEnd; ++it) {
+        if (it != _localFrames.begin()) out << " | ";
+        out << *it;
     }
-#endif
     out << std::endl;
 }
 
 static void
-dump(const as_object* locals, std::ostream& out)
+dump(as_object& locals, std::ostream& out)
 {
     typedef std::map<std::string, as_value> PropMap;
     PropMap props;
-    const_cast<as_object*>(locals)->dump_members(props);
+    locals.dump_members(props);
     
     int count = 0;
-    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i)
-    {
+    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i) {
         if (count++) out << ", ";
         // TODO: define output operator for as_value !
         out << i->first << "==" << i->second;
@@ -795,17 +796,12 @@ as_environment::dump_local_variables(std::ostream& out) const
 {
     if ( _localFrames.empty() ) return;
     out << "Local variables: ";
-#ifndef DUMP_LOCAL_VARIABLES_IN_ALL_CALL_FRAMES
-    dump(_localFrames.back().locals, out);
-#else
-    for (CallStack::const_iterator it=_localFrames.begin(),
-            itEnd=_localFrames.end();
-            it != itEnd; ++it)
-    {
+    for (CallStack::iterator it=_localFrames.begin(),
+            itEnd=_localFrames.end(); it != itEnd; ++it) {
+
         if ( it != _localFrames.begin() ) out << " | ";
-        dump(it->locals, out);
+        dump(it->locals(), out);
     }
-#endif
     out << std::endl;
 }
 
@@ -818,7 +814,7 @@ as_environment::dump_global_registers(std::ostream& out) const
 
     ss << "Global registers: ";
     int defined=0;
-    for (unsigned int i=0; i<numGlobalRegisters; ++i)
+    for (unsigned int i = 0; i < numGlobalRegisters; ++i)
     {
         if ( m_global_register[i].is_undefined() ) continue;
 
@@ -836,9 +832,10 @@ as_environment::findLocal(const std::string& varname, as_value& ret,
 {
     if (_localFrames.empty()) return false;
 
-    if (getLocal(_localFrames.back().locals, varname, ret)) {
+    as_object& locals = _localFrames.back().locals();
 
-        if (retTarget) *retTarget = _localFrames.back().locals;
+    if (getLocal(locals, varname, ret)) {
+        if (retTarget) *retTarget = &locals;
         return true;
     }
 
@@ -849,28 +846,21 @@ bool
 as_environment::delLocal(const std::string& varname)
 {
     if (_localFrames.empty()) return false;
-    return deleteLocal(_localFrames.back().locals, varname);
+    return deleteLocal(_localFrames.back().locals(), varname);
 }
 
 bool
 as_environment::setLocal(const std::string& varname, const as_value& val)
 {
     if (_localFrames.empty()) return false;
-    return setLocal(_localFrames.back().locals, varname, val);
-}
 
-bool
-as_environment::setLocal(as_object* locals, const std::string& varname,
-        const as_value& val)
-{
-    Property* prop = locals->getOwnProperty(_vm.getStringTable().find(varname));
-    if (!prop) return false;
-    prop->setValue(*locals, val);
-    return true;
+    // If this name is not qualified, the compiler fails to look beyond
+    // as_environment::setLocal.
+    return gnash::setLocal(_localFrames.back().locals(), varname, val);
 }
 
 void
-as_environment::pushCallFrame(as_function* func)
+as_environment::pushCallFrame(as_function& func)
 {
 
     // The stack size can be changed by the ScriptLimits
@@ -878,7 +868,7 @@ as_environment::pushCallFrame(as_function* func)
     // TODO: override from gnashrc.
     
     // A stack size of 0 is apparently legitimate.
-    const boost::uint16_t recursionLimit = getRoot(*func).getRecursionLimit();
+    const boost::uint16_t recursionLimit = getRoot(func).getRecursionLimit();
 
     // Don't proceed if local call frames would reach the recursion limit.
     if (_localFrames.size() + 1 >= recursionLimit) {
@@ -890,7 +880,7 @@ as_environment::pushCallFrame(as_function* func)
         throw ActionLimitException(ss.str()); 
     }
 
-    _localFrames.push_back(CallFrame(func));
+    _localFrames.push_back(CallFrame(&func));
 
 }
 
@@ -904,15 +894,7 @@ as_environment::popCallFrame()
 void
 as_environment::set_target(DisplayObject* target)
 {
-    //assert(target);
-    if ( ! _original_target )
-    {
-        //assert(target); // we assume any as_environment creator sets a target too I guess..
-        // WRONG ASSUMPTION: ^^^^^^^^^ : as_value::to_primitive doesn't care about setting a target here
-
-        //log_debug("as_environment(%p)::set_target(%p): setting original target to %s", this, target, target ? target->getTarget() : "<null>");
-        _original_target = target;
-    }
+    if (!_original_target) _original_target = target;
     m_target = target;
 }
 
@@ -922,8 +904,8 @@ as_environment::add_local(const std::string& varname, const as_value& val)
     assert(!varname.empty());   
     assert(!_localFrames.empty());
 
-    as_object* locals = _localFrames.back().locals;
-    locals->set_member(_vm.getStringTable().find(varname), val);
+    as_object& locals = _localFrames.back().locals();
+    locals.set_member(_vm.getStringTable().find(varname), val);
 }
 
 void
@@ -953,16 +935,19 @@ as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 unsigned int
 as_environment::setRegister(unsigned int regnum, const as_value& v)
 {
-    if (_localFrames.empty() || _localFrames.back().registers.empty()) {
-        if ( regnum >= numGlobalRegisters ) return 0;
-        m_global_register[regnum] = v;
-        return 1;
+    // If there is a call frame and it has registers, the value must be
+    // set there.
+    if (!_localFrames.empty()) {
+        CallFrame& fr = _localFrames.back();
+        if (fr.hasRegisters()) {
+            if (_localFrames.back().setRegister(regnum, v)) return 2;
+            return 0;
+        }
     }
 
-    Registers& registers = _localFrames.back().registers;
-    if (regnum < registers.size()) {
-        registers[regnum] = v;
-        return 2;
+    if (regnum < numGlobalRegisters) {
+        m_global_register[regnum] = v;
+        return 1;
     }
 
     return 0;
@@ -971,16 +956,20 @@ as_environment::setRegister(unsigned int regnum, const as_value& v)
 unsigned int
 as_environment::getRegister(unsigned int regnum, as_value& v)
 {
-    if (_localFrames.empty() || _localFrames.back().registers.empty()) {
-        if ( regnum >= numGlobalRegisters ) return 0;
-        v = m_global_register[regnum];
-        return 1;
+    // If there is a call frame and it has registers, the value must be
+    // sought there.
+    if (!_localFrames.empty()) {
+        const CallFrame& fr = _localFrames.back();
+        if (fr.hasRegisters()) {
+            if (fr.getRegister(regnum, v)) return 2;
+            return 0;
+        }
     }
 
-    Registers& registers = _localFrames.back().registers;
-    if (regnum < registers.size()) {
-        v = registers[regnum];
-        return 2;
+    // Otherwise it can be in the global registers.
+    if (regnum < numGlobalRegisters) {
+        v = m_global_register[regnum];
+        return 1;
     }
 
     return 0;

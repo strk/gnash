@@ -106,10 +106,10 @@ swf_function::call(const fn_call& fn)
     VM& vm = getVM(fn); 
     CallStack& cs = vm.getCallStack();
 
-    as_object* caller = cs.empty() ? 0 : cs.back().func;
+    as_object* caller = cs.empty() ? 0 : &cs.back().function();
 
 	// Set up local stack frame, for parameters and locals.
-	as_environment::FrameGuard guard(_env, this);
+	as_environment::FrameGuard guard(_env, *this);
 
 	DisplayObject* target = _env.get_target();
 	DisplayObject* orig_target = _env.get_original_target();
