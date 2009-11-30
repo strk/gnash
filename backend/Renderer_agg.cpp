@@ -173,6 +173,10 @@ AGG resources
 	#define round(x) rint(x)
 #endif
 
+// Print a debugging warning when rendering of a whole character
+// is skipped 
+//#define GNASH_WARN_WHOLE_CHARACTER_SKIP
+
 
 #include <boost/numeric/conversion/converter.hpp>
 
@@ -1030,7 +1034,9 @@ public:
         
 
         if (_clipbounds_selected.empty()) {
+#ifdef GNASH_WARN_WHOLE_CHARACTER_SKIP
             log_debug(_("Warning: AGG renderer skipping a whole character"));
+#endif
             return; 
         }
 
