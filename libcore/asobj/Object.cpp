@@ -63,16 +63,16 @@ registerObjectNative(as_object& global)
 {
     VM& vm = getVM(global);
 
-	vm.registerNative(object_watch, 101, 0); 
-	vm.registerNative(object_unwatch, 101, 1); 
-	vm.registerNative(object_addproperty, 101, 2); 
-	vm.registerNative(object_valueOf, 101, 3); 
-	vm.registerNative(object_toString, 101, 4); 
-	vm.registerNative(object_hasOwnProperty, 101, 5); 
-	vm.registerNative(object_isPrototypeOf, 101, 6); 
-	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
-	vm.registerNative(object_registerClass, 101, 8);
-	vm.registerNative(object_ctor, 101, 9);
+    vm.registerNative(object_watch, 101, 0); 
+    vm.registerNative(object_unwatch, 101, 1); 
+    vm.registerNative(object_addproperty, 101, 2); 
+    vm.registerNative(object_valueOf, 101, 3); 
+    vm.registerNative(object_toString, 101, 4); 
+    vm.registerNative(object_hasOwnProperty, 101, 5); 
+    vm.registerNative(object_isPrototypeOf, 101, 6); 
+    vm.registerNative(object_isPropertyEnumerable, 101, 7); 
+    vm.registerNative(object_registerClass, 101, 8);
+    vm.registerNative(object_ctor, 101, 9);
 }
 
 // extern (used by Global.cpp)
@@ -96,10 +96,10 @@ initObjectClass(as_object* proto, as_object& where, const ObjectURI& uri)
     VM& vm = getVM(where);
     const int readOnlyFlags = as_object::DefaultFlags | PropFlags::readOnly;
     cl->init_member("registerClass", vm.getNative(101, 8), readOnlyFlags);
-		     
-	// Register _global.Object (should only be visible in SWF5 up)
-	int flags = PropFlags::dontEnum; 
-	where.init_member(getName(uri), cl, flags, getNamespace(uri));
+             
+    // Register _global.Object (should only be visible in SWF5 up)
+    int flags = PropFlags::dontEnum; 
+    where.init_member(getName(uri), cl, flags, getNamespace(uri));
 
 }
 
@@ -109,25 +109,25 @@ namespace {
 void
 attachObjectInterface(as_object& o)
 {
-	VM& vm = getVM(o);
+    VM& vm = getVM(o);
 
-	// We register natives despite swf version,
+    // We register natives despite swf version,
     Global_as& gl = getGlobal(o);
 
-	o.init_member("valueOf", vm.getNative(101, 3));
-	o.init_member("toString", vm.getNative(101, 4));
-	o.init_member("toLocaleString", gl.createFunction(object_toLocaleString));
+    o.init_member("valueOf", vm.getNative(101, 3));
+    o.init_member("toString", vm.getNative(101, 4));
+    o.init_member("toLocaleString", gl.createFunction(object_toLocaleString));
 
-	int swf6flags = PropFlags::dontEnum | 
+    int swf6flags = PropFlags::dontEnum | 
         PropFlags::dontDelete | 
         PropFlags::onlySWF6Up;
 
-	o.init_member("addProperty", vm.getNative(101, 2), swf6flags);
-	o.init_member("hasOwnProperty", vm.getNative(101, 5), swf6flags);
-	o.init_member("isPropertyEnumerable", vm.getNative(101, 7), swf6flags);
-	o.init_member("isPrototypeOf", vm.getNative(101, 6), swf6flags);
-	o.init_member("watch", vm.getNative(101, 0), swf6flags);
-	o.init_member("unwatch", vm.getNative(101, 1), swf6flags);
+    o.init_member("addProperty", vm.getNative(101, 2), swf6flags);
+    o.init_member("hasOwnProperty", vm.getNative(101, 5), swf6flags);
+    o.init_member("isPropertyEnumerable", vm.getNative(101, 7), swf6flags);
+    o.init_member("isPrototypeOf", vm.getNative(101, 6), swf6flags);
+    o.init_member("watch", vm.getNative(101, 0), swf6flags);
+    o.init_member("unwatch", vm.getNative(101, 1), swf6flags);
 }
 
 
@@ -136,16 +136,16 @@ object_ctor(const fn_call& fn)
 {
     Global_as& gl = getGlobal(fn);
 
-	if (fn.nargs == 1) {
+    if (fn.nargs == 1) {
         as_object* obj = fn.arg(0).to_object(gl);
         if (obj) return as_value(obj);
-	}
+    }
 
-	if (fn.nargs > 1) {
-		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(_("Too many args to Object constructor"));
-		);
-	}
+    if (fn.nargs > 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Too many args to Object constructor"));
+        );
+    }
 
     if (!fn.isInstantiation()) {
         return new as_object();
@@ -171,7 +171,7 @@ object_toString(const fn_call& fn)
 as_value
 object_valueOf(const fn_call& fn)
 {
-	return fn.this_ptr;
+    return fn.this_ptr;
 }
 
 
@@ -180,191 +180,188 @@ object_valueOf(const fn_call& fn)
 as_value
 object_addproperty(const fn_call& fn)
 {
-	assert(fn.this_ptr);
-	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
+    assert(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = fn.this_ptr;
 
     /// Extra arguments are just ignored.
-	if ( fn.nargs < 3 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss;
-		fn.dump_args(ss);
-		log_aserror(_("Invalid call to Object.addProperty(%s) - "
-			"expected 3 arguments (<name>, <getter>, <setter>)"),
-		       	ss.str());
-		);
+    if ( fn.nargs < 3 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss;
+        fn.dump_args(ss);
+        log_aserror(_("Invalid call to Object.addProperty(%s) - "
+            "expected 3 arguments (<name>, <getter>, <setter>)"),
+                   ss.str());
+        );
 
-		// if we've been given more args then needed there's
-		// no need to abort here
-		if ( fn.nargs < 3 )
-		{
-			return as_value(false);
-		}
-	}
+        // if we've been given more args then needed there's
+        // no need to abort here
+        if ( fn.nargs < 3 )
+        {
+            return as_value(false);
+        }
+    }
 
-	const std::string& propname = fn.arg(0).to_string();
-	if (propname.empty())
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to Object.addProperty() - "
-			"empty property name"));
-		);
-		return as_value(false);
-	}
+    const std::string& propname = fn.arg(0).to_string();
+    if (propname.empty())
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Invalid call to Object.addProperty() - "
+            "empty property name"));
+        );
+        return as_value(false);
+    }
 
-	as_function* getter = fn.arg(1).to_function();
-	if (!getter)
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to Object.addProperty() - "
-			"getter is not an AS function"));
-		);
-		return as_value(false);
-	}
+    as_function* getter = fn.arg(1).to_function();
+    if (!getter)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Invalid call to Object.addProperty() - "
+            "getter is not an AS function"));
+        );
+        return as_value(false);
+    }
 
-	as_function* setter = NULL;
-	const as_value& setterval = fn.arg(2);
-	if (!setterval.is_null())
-	{
-		setter = setterval.to_function();
-		if (!setter)
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Invalid call to Object.addProperty() - "
-				"setter is not null and not an AS function (%s)"),
-				setterval);
-			);
-			return as_value(false);
-		}
-	}
+    as_function* setter = NULL;
+    const as_value& setterval = fn.arg(2);
+    if (!setterval.is_null())
+    {
+        setter = setterval.to_function();
+        if (!setter)
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Invalid call to Object.addProperty() - "
+                "setter is not null and not an AS function (%s)"),
+                setterval);
+            );
+            return as_value(false);
+        }
+    }
 
-	// Now that we checked everything, let's call the as_object
-	// interface for getter/setter properties :)
-	obj->add_property(propname, *getter, setter);
+    // Now that we checked everything, let's call the as_object
+    // interface for getter/setter properties :)
+    obj->add_property(propname, *getter, setter);
 
-	return as_value(true);
+    return as_value(true);
 }
 
 
 as_value
 object_registerClass(const fn_call& fn)
 {
-	assert(fn.this_ptr);
+    assert(fn.this_ptr);
 
-	if ( fn.nargs != 2 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss;
-		fn.dump_args(ss);
-		log_aserror(_("Invalid call to Object.registerClass(%s) - "
-			"expected 2 arguments (<symbol>, <constructor>)"),
-			ss.str());
-		);
+    if ( fn.nargs != 2 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss;
+        fn.dump_args(ss);
+        log_aserror(_("Invalid call to Object.registerClass(%s) - "
+            "expected 2 arguments (<symbol>, <constructor>)"),
+            ss.str());
+        );
 
-		// if we've been given more args then needed there's
-		// no need to abort here
-		if ( fn.nargs < 2 )
-		{
-			return as_value(false);
-		}
-	}
+        // if we've been given more args then needed there's
+        // no need to abort here
+        if ( fn.nargs < 2 )
+        {
+            return as_value(false);
+        }
+    }
 
-	const std::string& symbolid = fn.arg(0).to_string();
-	if ( symbolid.empty() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss;
-		fn.dump_args(ss);
-		log_aserror(_("Invalid call to Object.registerClass(%s) - "
-			"first argument (symbol id) evaluates to empty string"), ss.str());
-		);
-		return as_value(false);
-	}
+    const std::string& symbolid = fn.arg(0).to_string();
+    if ( symbolid.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss;
+        fn.dump_args(ss);
+        log_aserror(_("Invalid call to Object.registerClass(%s) - "
+            "first argument (symbol id) evaluates to empty string"), ss.str());
+        );
+        return as_value(false);
+    }
 
-	as_function* theclass = fn.arg(1).to_function();
-	if ( ! theclass )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss;
-		fn.dump_args(ss);
-		log_aserror(_("Invalid call to Object.registerClass(%s) - "
-			"second argument (class) is not a function)"), ss.str());
-		);
-		return as_value(false);
-	}
+    as_function* theclass = fn.arg(1).to_function();
+    if (!theclass) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::stringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("Invalid call to Object.registerClass(%s) - "
+                "second argument (class) is not a function)"), ss.str());
+            );
+        return as_value(false);
+    }
 
-	// Find the exported resource
+    // Find the exported resource
 
-	// Using definition of current target fixes the youtube beta case
-	// https://savannah.gnu.org/bugs/index.php?23130
-	DisplayObject* tgt = fn.env().get_target();
-	if ( ! tgt ) {
-		log_error("current environment has no target, wouldn't know where to look for symbol required for registerClass"); 
-		return as_value(false);
-	}
-	Movie* relRoot = tgt->get_root();
-	assert(relRoot);
-	const movie_definition* def = relRoot->definition();
-	
-    boost::intrusive_ptr<ExportableResource> exp_res =
-        def->get_exported_resource(symbolid);
-	if ( ! exp_res )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Object.registerClass(%s, %s): "
-			"can't find exported symbol"),
-			symbolid, 
-			typeid(theclass).name());
-		);
-		return as_value(false);
-	}
+    // Using definition of current target fixes the youtube beta case
+    // https://savannah.gnu.org/bugs/index.php?23130
+    DisplayObject* tgt = fn.env().get_target();
+    if (!tgt) {
+        log_error("current environment has no target, wouldn't know "
+                "where to look for symbol required for registerClass"); 
+        return as_value(false);
+    }
 
-	// Check that the exported resource is a sprite_definition
-	// (we're looking for a MovieClip symbol)
+    Movie* relRoot = tgt->get_root();
+    assert(relRoot);
+    const movie_definition* def = relRoot->definition();
+    
+    ExportableResource* exp_res = def->get_exported_resource(symbolid).get();
+    if (!exp_res) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Object.registerClass(%s, %s): "
+                "can't find exported symbol"),
+                symbolid, typeName(theclass));
+            );
+        return as_value(false);
+    }
 
-	boost::intrusive_ptr<sprite_definition> exp_clipdef(
-            dynamic_cast<sprite_definition*>(exp_res.get()));
+    // Check that the exported resource is a sprite_definition
+    // (we're looking for a MovieClip symbol)
+
+    sprite_definition* exp_clipdef(
+            dynamic_cast<sprite_definition*>(exp_res));
 
 
-	if ( ! exp_clipdef )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Object.registerClass(%s, %s): "
-			"exported symbol is not a MovieClip symbol "
-			"(sprite_definition), but a %s"),
-			symbolid, typeName(theclass), typeName(exp_res));
-		);
-		return as_value(false);
-	}
+    if (!exp_clipdef) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Object.registerClass(%s, %s): "
+            "exported symbol is not a MovieClip symbol "
+            "(sprite_definition), but a %s"),
+            symbolid, typeName(theclass), typeName(exp_res));
+        );
+        return as_value(false);
+    }
 
-	exp_clipdef->registerClass(theclass);
-	return as_value(true);
+    exp_clipdef->registerClass(theclass);
+    return as_value(true);
 }
 
 
 as_value
 object_hasOwnProperty(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
 
-	//assert(fn.result->is_undefined());
-	if ( fn.nargs < 1 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Object.hasOwnProperty() requires one arg"));
-		);
-		return as_value(false);
-	}
-	const as_value& arg = fn.arg(0);
-	const std::string& propname = arg.to_string();
-	if ( arg.is_undefined() || propname.empty() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to Object.hasOwnProperty('%s')"), arg);
-		);
-		return as_value(false);
-	}
-	//log_debug("%p.hasOwnProperty", fn.this_ptr);
+    //assert(fn.result->is_undefined());
+    if ( fn.nargs < 1 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Object.hasOwnProperty() requires one arg"));
+        );
+        return as_value(false);
+    }
+    const as_value& arg = fn.arg(0);
+    const std::string& propname = arg.to_string();
+    if ( arg.is_undefined() || propname.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Invalid call to Object.hasOwnProperty('%s')"), arg);
+        );
+        return as_value(false);
+    }
+    //log_debug("%p.hasOwnProperty", fn.this_ptr);
     const bool found =
         fn.this_ptr->hasOwnProperty(getStringTable(fn).find(propname));
     return as_value(found);
@@ -373,59 +370,57 @@ object_hasOwnProperty(const fn_call& fn)
 as_value
 object_isPropertyEnumerable(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
 
-	//assert(fn.result->is_undefined());
-	if ( fn.nargs < 1 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Object.isPropertyEnumerable() requires one arg"));
-		);
-		return as_value();
-	}
-	const as_value& arg = fn.arg(0);
-	const std::string& propname = arg.to_string();
-	if ( arg.is_undefined() || propname.empty() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to Object.isPropertyEnumerable('%s')"), arg);
-		);
-		return as_value();
-	}
+    if (fn.nargs < 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Object.isPropertyEnumerable() requires one arg"));
+        );
+        return as_value();
+    }
+    const as_value& arg = fn.arg(0);
+    const std::string& propname = arg.to_string();
+    if (arg.is_undefined() || propname.empty()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Invalid call to Object.isPropertyEnumerable('%s')"),
+                arg);
+            );
+        return as_value();
+    }
 
-	Property* prop =
+    Property* prop =
         fn.this_ptr->getOwnProperty(getStringTable(fn).find(propname));
-	if ( ! prop )
-	{
-		return as_value(false);
-	}
 
-	return as_value( ! prop->getFlags().get_dont_enum() );
+    if (!prop) {
+        return as_value(false);
+    }
+
+    return as_value(!prop->getFlags().get_dont_enum());
 }
 
 
 as_value
 object_isPrototypeOf(const fn_call& fn)
 {
-	//assert(fn.result->is_undefined());
-	if ( fn.nargs < 1 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Object.isPrototypeOf() requires one arg"));
-		);
-		return as_value(false); 
-	}
+    //assert(fn.result->is_undefined());
+    if ( fn.nargs < 1 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Object.isPrototypeOf() requires one arg"));
+        );
+        return as_value(false); 
+    }
 
-	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
-	if ( ! obj )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("First arg to Object.isPrototypeOf(%s) is not an object"), fn.arg(0));
-		);
-		return as_value(false);
-	}
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
+    if ( ! obj )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("First arg to Object.isPrototypeOf(%s) is not an object"), fn.arg(0));
+        );
+        return as_value(false);
+    }
 
-	return as_value(fn.this_ptr->prototypeOf(*obj));
+    return as_value(fn.this_ptr->prototypeOf(*obj));
 
 }
 
@@ -433,62 +428,62 @@ object_isPrototypeOf(const fn_call& fn)
 as_value
 object_watch(const fn_call& fn)
 {
-	as_object* obj = fn.this_ptr;
+    as_object* obj = fn.this_ptr;
 
-	if ( fn.nargs < 2 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Object.watch(%s): missing arguments"));
-		);
-		return as_value(false);
-	}
+    if ( fn.nargs < 2 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror(_("Object.watch(%s): missing arguments"));
+        );
+        return as_value(false);
+    }
 
-	const as_value& propval = fn.arg(0);
-	const as_value& funcval = fn.arg(1);
+    const as_value& propval = fn.arg(0);
+    const as_value& funcval = fn.arg(1);
 
-	if ( ! funcval.is_function() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Object.watch(%s): second argument is not a function"));
-		);
-		return as_value(false);
-	}
+    if ( ! funcval.is_function() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror(_("Object.watch(%s): second argument is not a function"));
+        );
+        return as_value(false);
+    }
 
-	string_table& st = getStringTable(fn);
+    string_table& st = getStringTable(fn);
 
-	std::string propname = propval.to_string();
-	string_table::key propkey = st.find(propname);
-	as_function* trig = funcval.to_function();
-	as_value cust; if ( fn.nargs > 2 ) cust = fn.arg(2);
+    std::string propname = propval.to_string();
+    string_table::key propkey = st.find(propname);
+    as_function* trig = funcval.to_function();
+    as_value cust; if ( fn.nargs > 2 ) cust = fn.arg(2);
 
-	return as_value(obj->watch(propkey, *trig, cust));
+    return as_value(obj->watch(propkey, *trig, cust));
 }
 
 
 as_value
 object_unwatch(const fn_call& fn)
 {
-	as_object* obj = fn.this_ptr;
+    as_object* obj = fn.this_ptr;
 
-	if ( fn.nargs < 1 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Object.unwatch(%s): missing argument"));
-		);
-		return as_value(false);
-	}
+    if ( fn.nargs < 1 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror(_("Object.unwatch(%s): missing argument"));
+        );
+        return as_value(false);
+    }
 
-	const as_value& propval = fn.arg(0);
+    const as_value& propval = fn.arg(0);
 
-	string_table& st = getStringTable(fn);
+    string_table& st = getStringTable(fn);
 
-	std::string propname = propval.to_string();
-	string_table::key propkey = st.find(propname);
+    std::string propname = propval.to_string();
+    string_table::key propkey = st.find(propname);
 
-	return as_value(obj->unwatch(propkey));
+    return as_value(obj->unwatch(propkey));
 }
 
 
@@ -496,7 +491,7 @@ as_value
 object_toLocaleString(const fn_call& fn)
 {
     as_object* obj = ensure<ValidThis>(fn);
-	return callMethod(obj, NSV::PROP_TO_STRING);
+    return callMethod(obj, NSV::PROP_TO_STRING);
 }
   
 } // anonymous namespace
