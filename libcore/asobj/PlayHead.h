@@ -44,6 +44,7 @@ public:
     /// as clock source.
     //
     /// The PlayHead will have initial state set to PAUSED
+    /// and initial position set to 0.
     ///
     /// @param clockSource
     /// The VirtualClock to use as time source.
