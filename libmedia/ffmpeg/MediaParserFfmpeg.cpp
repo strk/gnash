@@ -129,7 +129,11 @@ MediaParserFfmpeg::seek(boost::uint32_t& pos)
 	av_seek_frame(_formatCtx, _videoStreamIndex, newpos, 0);
 
 	newtime = static_cast<boost::int32_t>(newtime / 1000.0);
-	return newtime;
+	log_debug("Seek requested to time %d triggered seek to key frame at "
+            "time %d", pos, newtime);
+	pos = newtime;
+
+    return true;
 }
 
 bool
