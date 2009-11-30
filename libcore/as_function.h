@@ -74,10 +74,13 @@ public:
 
 	/// Run this function as a constructor on an object
     //
-    /// AS2 classes are functions with a 'prototype' property.
-	// 
-    /// If this function is a class, the returned object will be an instance
-    /// of the class. This function assigns all the required properties.
+    /// This function assigns various constructor properties and runs the
+    /// constructor.
+    //
+    /// NB: This function does not make the object an 'instance of' the
+    /// constructor, i.e. it does not assign a __proto__ property. For
+    /// ActionScript compatibility, callers should ensure this is already
+    /// done. 
     //
     /// @param newobj   The object to construct. This will be used as the
     ///                 'this' object in the constructor.
@@ -111,7 +114,9 @@ protected:
 
 /// Construct a new object from the given constructor
 //
-/// This function takes care of creating the new object.
+/// This function takes care of creating the new object and assigning the
+/// __proto__ property. The construct() function is then called with the
+/// new object as its 'this' object.
 //
 /// @param ctor     The constructor to run.
 /// @param env      The environment to use for the function call.
