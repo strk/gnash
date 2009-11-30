@@ -3757,7 +3757,7 @@ construct_object(as_function* ctor_as_func, as_environment& env,
     for (size_t i = 0; i < nargs; ++i) {
         args += env.pop();
     } 
-    return ctor_as_func->constructInstance(env, args);
+    return constructInstance(*ctor_as_func, env, args);
 }
 
 // Common code for GetUrl and GetUrl2. See:

@@ -79,7 +79,7 @@ contextmenuitem_copy(const fn_call& fn)
         ptr->getMember(NSV::PROP_ENABLED),
         ptr->getMember(st.find("visible"));
 
-    return ctor->constructInstance(fn.env(), args);
+    return constructInstance(*ctor, fn.env(), args);
 }
 
 

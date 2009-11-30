@@ -90,7 +90,7 @@ public:
     ///                 necessitates returning a different object from the
     ///                 passed 'this' pointer.
     as_object* construct(as_object& newobj, const as_environment& env,
-            fn_call::Args& args)
+            fn_call::Args& args);
 
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin() { return false; }

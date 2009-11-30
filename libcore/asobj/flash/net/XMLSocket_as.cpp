@@ -547,7 +547,7 @@ xmlsocket_onData(const fn_call& fn)
 
     as_value xml;
     if (ctor) {
-        xml = ctor->constructInstance(fn.env(), args);
+        xml = constructInstance(*ctor, fn.env(), args);
     }
 
     // The built-in function calls:

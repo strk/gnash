@@ -132,7 +132,7 @@ contextmenu_copy(const fn_call& fn)
     }
 
     fn_call::Args args;
-    as_object* o = ctor->constructInstance(fn.env(), args);
+    as_object* o = constructInstance(*ctor, fn.env(), args);
 
     if (!o) return as_value();
     
@@ -158,7 +158,7 @@ contextmenu_copy(const fn_call& fn)
     as_function* arrayctor = getClassConstructor(fn, "Array");
     if (arrayctor) {
         fn_call::Args args;
-        as_object* arr = arrayctor->constructInstance(fn.env(), args);
+        as_object* arr = constructInstance(*arrayctor, fn.env(), args);
         if (arr) {
             as_object* customs;
             if (customItems.is_object() &&

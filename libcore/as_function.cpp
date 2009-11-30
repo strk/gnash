@@ -93,19 +93,17 @@ as_object*
 constructInstance(as_function& ctor, const as_environment& env,
         fn_call::Args& args)
 {
-
-	const int swfversion = getSWFVersion(env);
-
     Global_as& gl = getGlobal(ctor);
     as_object* newobj = new as_object(gl);
     ctor.construct(*newobj, env, args);
-
+    return newobj;
 }
 
 as_object*
 as_function::construct(as_object& newobj, const as_environment& env,
         fn_call::Args& args)
 {
+	const int swfversion = getSWFVersion(env);
 
     Property* proto = getOwnProperty(NSV::PROP_PROTOTYPE);
 		
@@ -113,16 +111,16 @@ as_function::construct(as_object& newobj, const as_environment& env,
     // The function's prototype property always becomes the new object's
     // __proto__ member, regardless of whether it is an object and regardless
     // of its visibility.
-    if (proto) newobj->set_prototype(proto->getValue(*this));
+    if (proto) newobj.set_prototype(proto->getValue(*this));
 
     // Add a __constructor__ member to the new object visible from version 6.
     const int flags = PropFlags::dontEnum | 
                       PropFlags::onlySWF6Up; 
 
-    newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, this, flags);
+    newobj.init_member(NSV::PROP_uuCONSTRUCTORuu, this, flags);
 
     if (swfversion < 7) {
-        newobj->init_member(NSV::PROP_CONSTRUCTOR, this, PropFlags::dontEnum);
+        newobj.init_member(NSV::PROP_CONSTRUCTOR, this, PropFlags::dontEnum);
     }
     
     // Don't set a super so that it will be constructed only if required
@@ -339,7 +337,6 @@ function_call(const fn_call& fn)
 		}
 		else {
 			new_fn_call.this_ptr = this_ptr;
-			as_object* proto = this_ptr->get_prototype();
             // Note: do not override fn_call::super by creating a super
             // object, as it may not be needed. Doing so can have a very
             // detrimental effect on memory usage!

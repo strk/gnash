@@ -163,7 +163,7 @@ matrix_clone(const fn_call& fn)
         return as_value();
     }
 
-    as_object* o = ctor->constructInstance(fn.env(), args);
+    as_object* o = constructInstance(*ctor, fn.env(), args);
 
     return as_value(o);
 }
@@ -421,7 +421,7 @@ matrix_deltaTransformPoint(const fn_call& fn)
     fn_call::Args args;
     args += point(0), point(1);
 
-    as_value ret = pointCtor->constructInstance(fn.env(), args);
+    as_value ret = constructInstance(*pointCtor, fn.env(), args);
 
     return as_value(ret);
 }
@@ -737,7 +737,7 @@ matrix_transformPoint(const fn_call& fn)
     fn_call::Args args;
     args += point(0) + tx.to_number(), point(1) + ty.to_number();
 
-    as_value ret = pointCtor->constructInstance(fn.env(), args);
+    as_value ret = constructInstance(*pointCtor, fn.env(), args);
 
     return as_value(ret);
 }

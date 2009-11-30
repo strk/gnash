@@ -1587,7 +1587,7 @@ Machine::execute()
                     
                     if (ctor) {
                         boost::intrusive_ptr<as_object> newobj =
-                            ctor->constructInstance(env, args);
+                            constructInstance(*ctor, env, args);
                         push_stack(as_value(newobj));
                     }
 
