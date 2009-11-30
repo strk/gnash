@@ -83,8 +83,13 @@ initObjectClass(as_object* proto, as_object& where, const ObjectURI& uri)
     assert(proto);
     attachObjectInterface(*proto);
 
-    Global_as& gl = getGlobal(where);
-    as_object* cl = gl.createClass(object_ctor, proto);
+    // Object is a native constructor.
+    VM& vm = getVM(where);
+    as_object* cl = vm.getNative(101, 9);
+    cl->init_member(NSV::PROP_PROTOTYPE, proto);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
+
+    attachObjectInterface(*proto);
 
     // The as_function ctor takes care of initializing these, but they
     // are different for the Object class.
@@ -93,7 +98,6 @@ initObjectClass(as_object* proto, as_object& where, const ObjectURI& uri)
     cl->set_member_flags(NSV::PROP_CONSTRUCTOR, readOnly);
     cl->set_member_flags(NSV::PROP_PROTOTYPE, readOnly);
 
-    VM& vm = getVM(where);
     const int readOnlyFlags = as_object::DefaultFlags | PropFlags::readOnly;
     cl->init_member("registerClass", vm.getNative(101, 8), readOnlyFlags);
              
