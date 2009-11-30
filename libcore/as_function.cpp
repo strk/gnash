@@ -95,7 +95,15 @@ constructInstance(as_function& ctor, const as_environment& env,
         fn_call::Args& args)
 {
     Global_as& gl = getGlobal(ctor);
+
+    // Create an empty object, with a ref to the constructor's prototype.
+    // The function's prototype property always becomes the new object's
+    // __proto__ member, regardless of whether it is an object and regardless
+    // of its visibility.
     as_object* newobj = new as_object(gl);
+    Property* proto = ctor.getOwnProperty(NSV::PROP_PROTOTYPE);
+    if (proto) newobj->set_prototype(proto->getValue(ctor));
+
     return ctor.construct(*newobj, env, args);
 }
 
@@ -104,20 +112,6 @@ as_function::construct(as_object& newobj, const as_environment& env,
         fn_call::Args& args)
 {
 	const int swfversion = getSWFVersion(env);
-
-    Property* proto = getOwnProperty(NSV::PROP_PROTOTYPE);
-		
-    // Create an empty object, with a ref to the constructor's prototype.
-    // The function's prototype property always becomes the new object's
-    // __proto__ member, regardless of whether it is an object and regardless
-    // of its visibility.
-    if (proto) newobj.set_prototype(proto->getValue(*this));
-
-    // If the object is a DisplayObject, send the construct event. This
-    // must be done after the __proto__  member is set.
-    if (DisplayObject* d = get<DisplayObject>(&newobj)) {
-        d->notifyEvent(event_id::CONSTRUCT);
-    }
 
     // Add a __constructor__ member to the new object visible from version 6.
     const int flags = PropFlags::dontEnum | 

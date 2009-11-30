@@ -1867,13 +1867,16 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 void
 MovieClip::constructAsScriptObject()
 {
+
 #ifdef GNASH_DEBUG
     log_debug(_("constructAsScriptObject called for movieclip %s"), 
             getTarget());
 #endif
 
-    if (!isAS3(getVM(*getObject(this))) && !get_parent()) {
-        getObject(this)->init_member("$version", getVM(*getObject(this)).getPlayerVersion(), 0); 
+    as_object* mc = getObject(this);
+
+    if (!isAS3(getVM(*mc)) && !get_parent()) {
+        mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
     }
 
     bool eventHandlersInvoked = false;
@@ -1902,10 +1905,16 @@ MovieClip::constructAsScriptObject()
         // TODO: builtin constructors are different from user-defined ones
         // we should likely change that. See also vm/ASHandlers.cpp 
         // (construct_object)
-        if (ctor && ! ctor->isBuiltin()) {
+        if (ctor) {
 
-            as_object* mc = getObject(this);
+            Property* proto = ctor->getOwnProperty(NSV::PROP_PROTOTYPE);
+            if (proto) mc->set_prototype(proto->getValue(*ctor));
+
             eventHandlersInvoked = true;
+
+            // If the object is a DisplayObject, send the construct event. This
+            // must be done after the __proto__  member is set.
+            notifyEvent(event_id::CONSTRUCT);
             
             const int swfversion = getSWFVersion(*mc);
             if (swfversion > 5) {
