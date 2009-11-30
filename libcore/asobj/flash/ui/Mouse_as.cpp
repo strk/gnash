@@ -77,6 +77,10 @@ attachMouseInterface(as_object& o)
     // Mouse is always initialized as an AsBroadcaster, even for
     // SWF5.   
     AsBroadcaster::initialize(o);
+
+    Global_as& gl = getGlobal(o);
+    as_object* null = 0;
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 7);
 }
 
 /// Returns whether the mouse was visible before the call.
