@@ -34,18 +34,12 @@ namespace gnash {
 
 namespace {
 
-	/// Return an 'arguments' object.
+	/// Add properties to an 'arguments' object.
 	//
 	/// The 'arguments' variable is an array with an additional
 	/// 'callee' member, set to the function being called.
-	///
-	/// NOTE: the callee as_object will be stored in an as_value, thus
-	///       getting wrapped into an intrusive_ptr. Make sure you have
-	///	  a reference on it!
-	///	  
-	///
-	as_object* getArguments(swf_function& callee, const fn_call& fn,
-            as_object* caller);
+	as_object* getArguments(swf_function& callee, as_object& args, 
+            const fn_call& fn, as_object* caller);
 }
 
 swf_function::swf_function(const action_buffer& ab, as_environment& env,
@@ -109,10 +103,10 @@ as_value
 swf_function::call(const fn_call& fn)
 {
     // Extract caller before pushing ourself on the call stack
-    as_object* caller = 0;
     VM& vm = getVM(fn); 
     CallStack& cs = vm.getCallStack();
-    if ( ! cs.empty() ) caller = cs.back().func;
+
+    as_object* caller = cs.empty() ? 0 : cs.back().func;
 
 	// Set up local stack frame, for parameters and locals.
 	as_environment::FrameGuard guard(m_env, this);
@@ -121,7 +115,7 @@ swf_function::call(const fn_call& fn)
 	DisplayObject* orig_target = m_env.get_original_target();
 
 	// Some features are version-dependant.
-	const int swfversion = vm.getSWFVersion();
+	const int swfversion = getSWFVersion(fn);
 
 	if (swfversion < 6) {
 		// In SWF5, when 'this' is a DisplayObject it becomes
@@ -178,7 +172,8 @@ swf_function::call(const fn_call& fn)
 		}
 
 		// Add 'arguments'
-		m_env.set_local("arguments", getArguments(*this, fn, caller));
+        as_object* args = getGlobal(fn).createArray();
+		m_env.set_local("arguments", getArguments(*this, *args, fn, caller));
 	}
 	else
 	{
@@ -208,19 +203,31 @@ swf_function::call(const fn_call& fn)
             }
         }
 
-		// Init arguments array, if it's going to be needed.
-		if (!(m_function2_flags & SUPPRESS_ARGUMENTS)) {
-            as_object* arg_array = getArguments(*this, fn, caller);
+        // This works slightly differently from 'super' and 'this'. The
+        // arguments are only ever either placed in the register or a
+        // local variable, but if both preload and suppress arguments flags
+        // are set, an empty array is still placed to the register.
+        // This seems like a bug in the reference player.
+        if (!(m_function2_flags & SUPPRESS_ARGUMENTS) ||
+                (m_function2_flags & PRELOAD_ARGUMENTS)) {
+            
+            as_object* args = getGlobal(fn).createArray();
+
+            if (!(m_function2_flags & SUPPRESS_ARGUMENTS)) {
+                getArguments(*this, *args, fn, caller);
+            }
+
             if (m_function2_flags & PRELOAD_ARGUMENTS) {
                 // preload 'arguments' into a register.
-                m_env.setRegister(current_reg, arg_array);
+                m_env.setRegister(current_reg, args);
                 ++current_reg;
             }
             else {
                 // Put 'arguments' in a local var.
-                m_env.add_local("arguments", arg_array);
+                m_env.add_local("arguments", args);
             }
-		}
+
+        }
 
         // If super is not suppressed it is either placed in a register
         // or set as a local variable, but not both.
@@ -341,21 +348,18 @@ swf_function::markReachableResources() const
 
 namespace {
 
-as_object* 
-getArguments(swf_function& callee, const fn_call& fn,
+as_object*
+getArguments(swf_function& callee, as_object& args, const fn_call& fn,
         as_object* caller)
 { 
 
-	as_object* arguments = getGlobal(fn).createArray();
 	for (size_t i = 0; i < fn.nargs; ++i) {
-		callMethod(arguments, NSV::PROP_PUSH, fn.arg(i));
+		callMethod(&args, NSV::PROP_PUSH, fn.arg(i));
 	}
 
-	arguments->init_member(NSV::PROP_CALLEE, &callee);
-
-	arguments->init_member(NSV::PROP_CALLER, caller);
-
-	return arguments;
+	args.init_member(NSV::PROP_CALLEE, &callee);
+	args.init_member(NSV::PROP_CALLER, caller);
+    return &args;
 
 }
 
