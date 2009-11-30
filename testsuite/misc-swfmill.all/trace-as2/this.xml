@@ -50,7 +50,7 @@
             </items>
           </PushData>
 
-	  <!-- Check this for a normal function -->
+	  <!-- ns(): Check this for a normal function -->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -76,7 +76,7 @@
             </items>
           </PushData>
 
-          <!-- Check what's in register 1 for a normal function (nothing)-->
+          <!-- nr(): Check what's in register 1 for a normal function (nothing)-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -101,7 +101,7 @@
             </items>
           </PushData>
 
-          <!-- Check what this is when it's suppressed-->
+          <!-- sss(): Check what this is when it's suppressed-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="1" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -127,7 +127,7 @@
             </items>
           </PushData>
 
-          <!-- Check what this is when it's preloaded-->
+          <!-- pss(): Check what this is when it's preloaded-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="1" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -153,7 +153,7 @@
             </items>
           </PushData>
 
-          <!-- Check what register 1 is when this is preloaded-->
+          <!-- psr(): Check what register 1 is when this is preloaded-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="1" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -178,7 +178,7 @@
             </items>
           </PushData>
 
-          <!-- Check what this is when it's suppressed and preloaded-->
+          <!-- psss(): Check what this is when it's suppressed and preloaded-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="1" preloadThis="1" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -204,7 +204,7 @@
             </items>
           </PushData>
 
-          <!-- Check what register 1 is when this suppressed and preloaded-->
+          <!-- pssr(): Check what register 1 is when this suppressed and preloaded-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="1" preloadThis="1" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -231,15 +231,6 @@
           </PushData>
           <DeclareObject/>
           <SetMember/>
-          <PushData>
-            <items>
-              <StackDictionaryLookup index="10"/>
-              <StackInteger value="0"/>
-              <StackDictionaryLookup index="0"/>
-            </items>
-          </PushData>
-          <New/>
-	  <SetLocalVariable/>
 
 	  <!-- Start function calls -->
           <PushData>
