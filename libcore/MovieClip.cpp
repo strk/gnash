@@ -1868,68 +1868,52 @@ void
 MovieClip::constructAsScriptObject()
 {
 
-#ifdef GNASH_DEBUG
-    log_debug(_("constructAsScriptObject called for movieclip %s"), 
-            getTarget());
-#endif
-
     as_object* mc = getObject(this);
 
     if (!isAS3(getVM(*mc)) && !get_parent()) {
         mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
     }
 
-    bool eventHandlersInvoked = false;
+    as_function* ctor(0);
 
-    do {
-        // instance name will be needed for properly setting up
-        // a reference to 'this' object for ActionScript actions.
-        // If the instance doesn't have a name, it will NOT be
-        // an ActionScript referenceable object so we don't have
-        // anything more to do.
-        if (_name.empty()) break;
+    // instance name will be needed for properly setting up
+    // a reference to 'this' object for ActionScript actions.
+    // If the instance doesn't have a name, it will NOT be
+    // an ActionScript referenceable object so we don't have
+    // anything more to do.
+    if (!_name.empty()) {
 
         const sprite_definition* def = 
             dynamic_cast<const sprite_definition*>(_def.get());
 
         // We won't "construct" top-level movies
-        if (!def) break;
-
-        as_function* ctor = def->getRegisteredClass();
+        if (def) {
+            ctor = def->getRegisteredClass();
+        }
+    }
 
 #ifdef GNASH_DEBUG
         log_debug(_("Attached movieclips %s registered class is %p"),
                 getTarget(), (void*)ctor); 
 #endif
 
-        // TODO: builtin constructors are different from user-defined ones
-        // we should likely change that. See also vm/ASHandlers.cpp 
-        // (construct_object)
-        if (ctor) {
-
-            Property* proto = ctor->getOwnProperty(NSV::PROP_PROTOTYPE);
-            if (proto) mc->set_prototype(proto->getValue(*ctor));
-
-            eventHandlersInvoked = true;
-
-            // If the object is a DisplayObject, send the construct event. This
-            // must be done after the __proto__  member is set.
-            notifyEvent(event_id::CONSTRUCT);
-            
-            const int swfversion = getSWFVersion(*mc);
-            if (swfversion > 5) {
-                fn_call::Args args;
-                ctor->construct(*mc, get_environment(), args);
-            }
-        }
-
-    } while (0);
-
-    /// Invoke event handlers if not done yet
-    if (!eventHandlersInvoked)
-    {
-        notifyEvent(event_id::CONSTRUCT);
+    if (ctor) {
+        Property* proto = ctor->getOwnProperty(NSV::PROP_PROTOTYPE);
+        if (proto) mc->set_prototype(proto->getValue(*ctor));
     }
+
+    // Send the construct event. This must be done after the __proto__ 
+    // member is set. It is always done.
+    notifyEvent(event_id::CONSTRUCT);
+        
+    if (ctor) {
+        const int swfversion = getSWFVersion(*mc);
+        if (swfversion > 5) {
+            fn_call::Args args;
+            ctor->construct(*mc, get_environment(), args);
+        }
+    }
+
 }
 
 bool
