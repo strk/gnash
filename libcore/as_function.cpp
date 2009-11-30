@@ -95,8 +95,7 @@ constructInstance(as_function& ctor, const as_environment& env,
 {
     Global_as& gl = getGlobal(ctor);
     as_object* newobj = new as_object(gl);
-    ctor.construct(*newobj, env, args);
-    return newobj;
+    return ctor.construct(*newobj, env, args);
 }
 
 as_object*
