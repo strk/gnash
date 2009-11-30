@@ -67,27 +67,30 @@ public:
 	// Avoid RTTI
 	as_function* to_function() { return this; }
 
-	/// Function dispatch.
-    //
+	/// Function dispatch.  //
     /// Override from as_object, although as_objects cannot generally 
     /// be called.
 	virtual as_value call(const fn_call& fn) = 0;
 
-	/// Construct an instance of this class
+	/// Run this function as a constructor on an object
+    //
+    /// AS2 classes are functions with a 'prototype' property.
 	// 
-	///  Post-conditions:
-	///      - The returned object is an instance of this class.
-	///        See as_object::instanceOf
-	///  
-	/// @param env
-	///	The environment to use for stack, local variables,
-	///	registers and scope chain.
-	/// 
-	/// @param args
-	///	Arguments for the constructor invocation
-	///
-	as_object* constructInstance(const as_environment& env,
-			fn_call::Args& args);
+    /// If this function is a class, the returned object will be an instance
+    /// of the class. This function assigns all the required properties.
+    //
+    /// @param newobj   The object to construct. This will be used as the
+    ///                 'this' object in the constructor.
+	/// @param env      The environment to use for stack, local variables,
+	///	                registers and scope chain.
+	/// @param args     Arguments for the constructor invocation
+    /// @return         The constructed object. TODO: return void; currently
+    ///                 there is a hack to cope with some remaining bogus
+    ///                 constructors (Microphone and Camera), which
+    ///                 necessitates returning a different object from the
+    ///                 passed 'this' pointer.
+    as_object* construct(as_object& newobj, const as_environment& env,
+            fn_call::Args& args)
 
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin() { return false; }
@@ -104,6 +107,19 @@ protected:
 	as_function(Global_as& gl);
 
 };
+
+
+/// Construct a new object from the given constructor
+//
+/// This function takes care of creating the new object.
+//
+/// @param ctor     The constructor to run.
+/// @param env      The environment to use for the function call.
+/// @param arg      The arguments to pass to the constructor function.
+/// @return         A newly-created object constructed by the specified
+///                 function.
+as_object* constructInstance(as_function& ctor, const as_environment& env,
+        fn_call::Args& args);
 
 /// Initialize the global Function constructor
 void function_class_init(as_object& global, const ObjectURI& uri);

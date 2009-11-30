@@ -90,14 +90,22 @@ as_function::getFunctionConstructor()
 }
 
 as_object*
-as_function::constructInstance(const as_environment& env, fn_call::Args& args)
+constructInstance(as_function& ctor, const as_environment& env,
+        fn_call::Args& args)
 {
 
-#ifndef GNASH_USE_GC
-	assert(get_ref_count() > 0);
-#endif // GNASH_USE_GC
+	const int swfversion = getSWFVersion(env);
 
-	int swfversion = getSWFVersion(env);
+    Global_as& gl = getGlobal(ctor);
+    as_object* newobj = new as_object(gl);
+    ctor.construct(*newobj, env, args);
+
+}
+
+as_object*
+as_function::construct(as_object& newobj, const as_environment& env,
+        fn_call::Args& args)
+{
 
     Property* proto = getOwnProperty(NSV::PROP_PROTOTYPE);
 		
@@ -105,25 +113,21 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
     // The function's prototype property always becomes the new object's
     // __proto__ member, regardless of whether it is an object and regardless
     // of its visibility.
-    as_object* newobj = new as_object();
     if (proto) newobj->set_prototype(proto->getValue(*this));
-    
-    // Add a __constructor__ member to the new object, but only for SWF6 up
-    // (to be checked). NOTE that we assume the builtin constructors
-    // won't set __constructor__ to some other value...
-    int flags = PropFlags::dontEnum | 
-                PropFlags::onlySWF6Up; 
 
-    newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
+    // Add a __constructor__ member to the new object visible from version 6.
+    const int flags = PropFlags::dontEnum | 
+                      PropFlags::onlySWF6Up; 
+
+    newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, this, flags);
 
     if (swfversion < 7) {
-        newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this),
-               PropFlags::dontEnum);
+        newobj->init_member(NSV::PROP_CONSTRUCTOR, this, PropFlags::dontEnum);
     }
-
+    
     // Don't set a super so that it will be constructed only if required
     // by the function.
-    fn_call fn(newobj, env, args, 0, true);
+    fn_call fn(&newobj, env, args, 0, true);
     as_value ret;
 
     try {
@@ -149,19 +153,20 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
     // 'this' pointer. Others return a new object. This is to handle those
     // cases.
     if (isBuiltin() && ret.is_object()) {
-        newobj = ret.to_object(getGlobal(env));
+        as_object* fakeobj = ret.to_object(getGlobal(env));
 
-        newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this),
+        fakeobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this),
                 flags);
 
         // Also for SWF5+ only?
         if (swfversion < 7) {
-            newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this),
+            fakeobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this),
                     PropFlags::dontEnum);
         }
+        return fakeobj;
     }
 
-	return newobj;
+	return &newobj;
 }
 
 
