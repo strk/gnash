@@ -1874,27 +1874,15 @@ MovieClip::constructAsScriptObject()
         mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
     }
 
-    as_function* ctor(0);
+    const sprite_definition* def = 
+        dynamic_cast<const sprite_definition*>(_def.get());
 
-    // instance name will be needed for properly setting up
-    // a reference to 'this' object for ActionScript actions.
-    // If the instance doesn't have a name, it will NOT be
-    // an ActionScript referenceable object so we don't have
-    // anything more to do.
-    if (!_name.empty()) {
-
-        const sprite_definition* def = 
-            dynamic_cast<const sprite_definition*>(_def.get());
-
-        // We won't "construct" top-level movies
-        if (def) {
-            ctor = def->getRegisteredClass();
-        }
-    }
+    // We won't "construct" top-level movies
+    as_function* ctor = def ? def->getRegisteredClass() : 0;
 
 #ifdef GNASH_DEBUG
-        log_debug(_("Attached movieclips %s registered class is %p"),
-                getTarget(), (void*)ctor); 
+    log_debug(_("Attached movieclips %s registered class is %p"),
+            getTarget(), (void*)ctor); 
 #endif
 
     if (ctor) {
