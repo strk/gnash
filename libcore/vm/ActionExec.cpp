@@ -195,7 +195,7 @@ ActionExec::operator()()
 
     size_t branchCount = 0;
     try {
-        log_debug("Try list size: %s", _tryList.size());
+        //log_debug("Try list size: %s", _tryList.size());
 
         // We might not stop at stop_pc, if we are trying.
         while (1) {
