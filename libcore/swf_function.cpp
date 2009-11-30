@@ -209,22 +209,17 @@ swf_function::call(const fn_call& fn)
         }
 
 		// Init arguments array, if it's going to be needed.
-        as_object* arg_array = 0;
-
-		if ((m_function2_flags & PRELOAD_ARGUMENTS) || 
-                !(m_function2_flags & SUPPRESS_ARGUMENTS)) {
-			arg_array = getArguments(*this, fn, caller);
-		}
-
-		if (m_function2_flags & PRELOAD_ARGUMENTS) {
-			// preload 'arguments' into a register.
-			m_env.setRegister(current_reg, as_value(arg_array));
-			current_reg++;
-		}
-
 		if (!(m_function2_flags & SUPPRESS_ARGUMENTS)) {
-			// Put 'arguments' in a local var.
-			m_env.add_local("arguments", arg_array);
+            as_object* arg_array = getArguments(*this, fn, caller);
+            if (m_function2_flags & PRELOAD_ARGUMENTS) {
+                // preload 'arguments' into a register.
+                m_env.setRegister(current_reg, arg_array);
+                ++current_reg;
+            }
+            else {
+                // Put 'arguments' in a local var.
+                m_env.add_local("arguments", arg_array);
+            }
 		}
 
         // If super is not suppressed it is either placed in a register
