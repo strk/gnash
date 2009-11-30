@@ -48,6 +48,9 @@
 // Define the following macro to enable decoding debugging
 //#define GNASH_DEBUG_DECODING
 
+// Define the following macro to enable decoding of playhead activity
+//#define GNASH_DEBUG_PLAYHEAD
+
 namespace gnash {
 
 namespace {
@@ -92,9 +95,14 @@ NetStream_as::NetStream_as(as_object* owner)
     _videoInfoKnown(false),
     _audioDecoder(0),
     _audioInfoKnown(false),
+
+    // Playback clock starts in 'stop' mode
     _playbackClock(
             new InterruptableVirtualClock(getVM(*owner).getClock())),
+
+    // Playhead starts at position 0 with a stopped source clock
     _playHead(_playbackClock.get()), 
+
     _soundHandler(getRunResources(*owner).soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
     _audioStreamer(_soundHandler),
@@ -358,6 +366,13 @@ void NetStream_as::close()
     // seems to be removed before netstream is destroyed.
     _audioStreamer.detachAuxStreamer();
 
+    // Drop all information about decoders and parser
+    _videoInfoKnown = false;
+    _videoDecoder.reset();
+    _audioInfoKnown = false;
+    _audioDecoder.reset();
+    m_parser.reset();
+
     m_imageframe.reset();
 
     stopAdvanceTimer();
@@ -367,6 +382,7 @@ void NetStream_as::close()
 void
 NetStream_as::play(const std::string& c_url)
 {
+
     // It doesn't matter if the NetStream object is already streaming; this
     // starts it again, possibly with a new URL.
 
@@ -403,6 +419,9 @@ NetStream_as::play(const std::string& c_url)
         log_error("Couldn't load URL %s", c_url);
         return;
     }
+
+    // Reset any previously active playback
+    close();
 
     log_security( _("Connecting to movie: %s"), url );
 
@@ -480,6 +499,13 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
 bool
 NetStream_as::startPlayback()
 {
+    // Make sure no old information is around
+    assert(!_videoInfoKnown);
+    assert(!_videoDecoder.get());
+    assert(!_audioInfoKnown);
+    assert(!_audioDecoder.get());
+    // TODO: assert advance timer is not running either !
+
 
     // Register advance callback. This must be registered in order for
     // status notifications to be received (e.g. streamNotFound).
@@ -524,9 +550,17 @@ NetStream_as::startPlayback()
 
     decodingStatus(DEC_BUFFERING);
 
-    // NOTE: should be paused already 
+    // NOTE: might be running due to a previous playback in progress
     _playbackClock->pause();
 
+    // NOTE: we set playhead position to 0 here but
+    //       other code should take this as a sign
+    //       that playHead should be advanced to first available
+    //       timeframe timestamp instead.
+#ifdef GNASH_DEBUG_PLAYHEAD
+     log_debug("%p.startPlayback: playHead position reset to 0", this);
+#endif
+    _playHead.seekTo(0);
     _playHead.setState(PlayHead::PLAY_PLAYING);
 
 #ifdef GNASH_DEBUG_STATUS
@@ -761,6 +795,9 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
     _audioStreamer.cleanAudioQueue();
     
     // 'newpos' will always be on a keyframe (supposedly)
+#ifdef GNASH_DEBUG_PLAYHEAD
+     log_debug("%p.seek: playHead position set to %d", this, newpos);
+#endif
     _playHead.seekTo(newpos);
     decodingStatus(DEC_BUFFERING); 
     
@@ -877,6 +914,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 
             return; 
         }
+
     }
 
     bool consumed = false;
@@ -1297,6 +1335,28 @@ NetStream_as::update()
         setStatus(bufferFull);
         decodingStatus(DEC_DECODING);
         _playbackClock->resume();
+    }
+
+    // If playhead position needs to be updated
+    // is set to Set playhead to first available frame, if any
+    // TODO: use another flag to signify 'initialization-needed'
+    boost::uint64_t curPosition = _playHead.getPosition();
+    if ( curPosition == 0 )
+    {
+        boost::uint64_t firstFrameTimestamp;
+        if ( m_parser->nextFrameTimestamp(firstFrameTimestamp) )
+        {
+             _playHead.seekTo(firstFrameTimestamp);
+#ifdef GNASH_DEBUG_PLAYHEAD
+            log_debug("%p.advance: playHead position set to timestamp of first frame: %d", this, firstFrameTimestamp);
+#endif
+        }
+#ifdef GNASH_DEBUG_PLAYHEAD
+        else
+        {
+            log_debug("%p.advance: playHead position is 0 and parser still doesn't have a frame to set it to", this);
+        }
+#endif
     }
 
     // Find video frame with the most suited timestamp in the video queue,
