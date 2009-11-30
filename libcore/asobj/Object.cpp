@@ -160,7 +160,7 @@ object_ctor(const fn_call& fn)
 as_value
 object_toString(const fn_call& fn)
 {
-    as_object* obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
 
     if (obj && obj->to_function()) {
         return as_value("[type Function]");
@@ -180,8 +180,7 @@ object_valueOf(const fn_call& fn)
 as_value
 object_addproperty(const fn_call& fn)
 {
-    assert(fn.this_ptr);
-    boost::intrusive_ptr<as_object> obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
 
     /// Extra arguments are just ignored.
     if ( fn.nargs < 3 )
@@ -249,34 +248,32 @@ object_addproperty(const fn_call& fn)
 as_value
 object_registerClass(const fn_call& fn)
 {
-    assert(fn.this_ptr);
 
-    if ( fn.nargs != 2 )
-    {
+    if (fn.nargs != 2) {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss;
-        fn.dump_args(ss);
-        log_aserror(_("Invalid call to Object.registerClass(%s) - "
-            "expected 2 arguments (<symbol>, <constructor>)"),
-            ss.str());
+            std::stringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("Invalid call to Object.registerClass(%s) - "
+                "expected 2 arguments (<symbol>, <constructor>)"),
+                ss.str());
         );
 
         // if we've been given more args then needed there's
         // no need to abort here
-        if ( fn.nargs < 2 )
-        {
+        if (fn.nargs < 2) {
             return as_value(false);
         }
     }
 
     const std::string& symbolid = fn.arg(0).to_string();
-    if ( symbolid.empty() )
+    if (symbolid.empty())
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss;
-        fn.dump_args(ss);
-        log_aserror(_("Invalid call to Object.registerClass(%s) - "
-            "first argument (symbol id) evaluates to empty string"), ss.str());
+            std::stringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("Invalid call to Object.registerClass(%s) - "
+                "first argument (symbol id) evaluates to empty string"),
+                ss.str());
         );
         return as_value(false);
     }
@@ -342,9 +339,8 @@ object_registerClass(const fn_call& fn)
 as_value
 object_hasOwnProperty(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
+    as_object* obj = ensure<ValidThis>(fn);
 
-    //assert(fn.result->is_undefined());
     if ( fn.nargs < 1 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -354,23 +350,22 @@ object_hasOwnProperty(const fn_call& fn)
     }
     const as_value& arg = fn.arg(0);
     const std::string& propname = arg.to_string();
-    if ( arg.is_undefined() || propname.empty() )
+    if (arg.is_undefined() || propname.empty())
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Invalid call to Object.hasOwnProperty('%s')"), arg);
         );
         return as_value(false);
     }
-    //log_debug("%p.hasOwnProperty", fn.this_ptr);
-    const bool found =
-        fn.this_ptr->hasOwnProperty(getStringTable(fn).find(propname));
+
+    const bool found = obj->hasOwnProperty(getStringTable(fn).find(propname));
     return as_value(found);
 }
 
 as_value
 object_isPropertyEnumerable(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
+    as_object* obj = ensure<ValidThis>(fn);
 
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -388,8 +383,7 @@ object_isPropertyEnumerable(const fn_call& fn)
         return as_value();
     }
 
-    Property* prop =
-        fn.this_ptr->getOwnProperty(getStringTable(fn).find(propname));
+    Property* prop = obj->getOwnProperty(getStringTable(fn).find(propname));
 
     if (!prop) {
         return as_value(false);
@@ -402,25 +396,25 @@ object_isPropertyEnumerable(const fn_call& fn)
 as_value
 object_isPrototypeOf(const fn_call& fn)
 {
-    //assert(fn.result->is_undefined());
-    if ( fn.nargs < 1 )
-    {
+    as_object* obj = ensure<ValidThis>(fn);
+
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Object.isPrototypeOf() requires one arg"));
         );
         return as_value(false); 
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
-    if ( ! obj )
-    {
+    as_object* arg = fn.arg(0).to_object(getGlobal(fn));
+    if (!arg) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("First arg to Object.isPrototypeOf(%s) is not an object"), fn.arg(0));
-        );
+            log_aserror(_("First arg to Object.isPrototypeOf(%s) is "
+                    "not an object"), fn.arg(0));
+            );
         return as_value(false);
     }
 
-    return as_value(fn.this_ptr->prototypeOf(*obj));
+    return as_value(obj->prototypeOf(*arg));
 
 }
 
@@ -428,7 +422,7 @@ object_isPrototypeOf(const fn_call& fn)
 as_value
 object_watch(const fn_call& fn)
 {
-    as_object* obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
 
     if ( fn.nargs < 2 )
     {
@@ -465,7 +459,7 @@ object_watch(const fn_call& fn)
 as_value
 object_unwatch(const fn_call& fn)
 {
-    as_object* obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
 
     if ( fn.nargs < 1 )
     {
