@@ -335,23 +335,15 @@ function_call(const fn_call& fn)
 		else {
 			new_fn_call.this_ptr = this_ptr;
 			as_object* proto = this_ptr->get_prototype();
-            if (proto) {
-                // Note: do not override fn_call::super by creating a super
-                // object, as it may not be needed. Doing so can have a very
-                // detrimental effect on memory usage!
-                // Normal supers will be created when needed in the function
-                // call.
+            // Note: do not override fn_call::super by creating a super
+            // object, as it may not be needed. Doing so can have a very
+            // detrimental effect on memory usage!
+            // Normal supers will be created when needed in the function
+            // call.
 
-                // TODO: it seems pointless to copy the old fn_call and
-                // then change almost everything...
-                new_fn_call.super = 0;
-            }
-            else {
-                // TODO: check this !
-                log_debug("No prototype in 'this' pointer "
-                        "passed to Function.call");
-                new_fn_call.super = function_obj->get_super();
-			}
+            // TODO: it seems pointless to copy the old fn_call and
+            // then change almost everything...
+            new_fn_call.super = 0;
 		}
 		new_fn_call.drop_bottom();
 	}
