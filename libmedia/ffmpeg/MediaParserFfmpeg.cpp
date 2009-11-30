@@ -200,7 +200,7 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
         dts=0;
     }
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(dts * as_double(_audioStream->time_base) * 1000.0); 
-    log_debug("On getting audio frame with timestamp %d, duration is %d", timestamp, _audioStream->duration);
+    //log_debug("On getting audio frame with timestamp %d, duration is %d", timestamp, _audioStream->duration);
 
 	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 
