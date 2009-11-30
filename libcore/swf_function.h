@@ -76,7 +76,7 @@ public:
 		//
 		/// TODO: check this.
         /// See:
-        /// http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
+        /// http://www.m2osw.com/swf_alexref.html#action_declare_function2
 		///       Looks like flags would look swapped
 		PRELOAD_GLOBAL = 256 // 0x100
 
@@ -103,37 +103,35 @@ public:
 
 	size_t getStartPC() const
 	{
-		return m_start_pc;
+		return _startPC;
 	}
 
 	size_t getLength() const
 	{
-		return m_length;
+		return _length;
 	}
 
 	bool isFunction2() const
 	{
-		return m_is_function2;
+		return _isFunction2;
 	}
 
-	void set_is_function2() { m_is_function2 = true; }
+	void set_is_function2() { _isFunction2 = true; }
 
 	void set_local_register_count(boost::uint8_t ct) {
-        assert(m_is_function2);
-        m_local_register_count = ct;
+        assert(_isFunction2);
+        _registerCount = ct;
     }
 
 	void set_function2_flags(boost::uint16_t flags) {
-        assert(m_is_function2);
-        m_function2_flags = flags;
+        assert(_isFunction2);
+        _function2Flags = flags;
     }
 
 	void add_arg(int arg_register, const char* name)
 	{
-		assert(arg_register == 0 || m_is_function2 == true);
-		m_args.resize(m_args.size() + 1);
-		m_args.back().m_register = arg_register;
-		m_args.back().m_name = PROPNAME(name);
+		assert(arg_register == 0 || _isFunction2 == true);
+        _args.push_back(Argument(arg_register, name));
 	}
 
 	void set_length(int len);
@@ -156,7 +154,7 @@ private:
 	const action_buffer& m_action_buffer;
 
 	/// @@ might need some kind of ref count here, but beware cycles
-	as_environment& m_env;
+	as_environment& _env;
 
 	/// Scope stack on function definition.
 	ScopeStack _scopeStack;
@@ -164,28 +162,31 @@ private:
 	/// \brief
 	/// Offset within the action_buffer where
 	/// start of the function is found.
-	size_t	m_start_pc;
+	size_t	_startPC;
 
 	/// Length of the function within the action_buffer
 	//
 	/// This is currently expressed in bytes as the
-	/// action_buffer is just a blog of memory corresponding
+	/// action_buffer is just a blocḱ of memory corresponding
 	/// to a DoAction block
-	size_t m_length;
+	size_t _length;
 
-	struct arg_spec
+	struct Argument
 	{
-		int m_register;
-		std::string m_name;
+        Argument(int r, const std::string& n) : reg(r), name(n) {}
+		int reg;
+		std::string name;
 	};
-	std::vector<arg_spec>	m_args;
-	bool m_is_function2;
-	boost::uint8_t m_local_register_count;
+
+	std::vector<Argument> _args;
+	bool _isFunction2;
+	boost::uint8_t _registerCount;
 
 	/// used by function2 to control implicit arg register assignments
 	// 
-	/// See http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
-	boost::uint16_t	m_function2_flags;
+	/// See
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
+	boost::uint16_t	_function2Flags;
 
 };
 
