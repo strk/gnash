@@ -297,34 +297,20 @@ swf_function::call(const fn_call& fn)
 		}
 	}
 
-	as_value result;
-
 	// Execute the actions.
 	// Do this in a try block to proper drop the pushed call frame 
 	// in case of problems (most interesting action limits)
 	try 
 	{
+        as_value result;
 		ActionExec exec(*this, m_env, &result, fn.this_ptr);
 		exec();
+        return result;
 	}
 	catch (ActionLimitException& ale) // expected and sane 
 	{
-		//log_debug("ActionLimitException got from swf_function execution: %s", ale.what());
 		throw;
 	}
-	catch (std::exception& ex) // unexpected but we can tell what it is
-	{
-		log_debug("Unexpected exception from swf_function execution: %s",
-                ex.what());
-		throw;
-	}
-	catch (...) // unexpected, unknown, but why not cleaning up...
-	{
-		log_debug("Unknown exception got from swf_function execution");
-		throw;
-	}
-
-        return result;
 }
 
 void
