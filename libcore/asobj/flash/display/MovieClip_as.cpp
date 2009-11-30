@@ -1239,7 +1239,7 @@ movieclip_getTextSnapshot(const fn_call& fn)
     args += getObject(movieclip);
 
     boost::intrusive_ptr<as_object> ts =
-        tsCtor->constructInstance(fn.env(), args);
+        constructInstance(*tsCtor, fn.env(), args);
 
     return as_value(ts.get());
 }
@@ -2330,7 +2330,7 @@ movieclip_transform(const fn_call& fn)
     args += getObject(ptr);
 
     boost::intrusive_ptr<as_object> newTrans =
-        transCtor->constructInstance(fn.env(), args);
+        constructInstance(*transCtor, fn.env(), args);
 
     return as_value(newTrans.get());
 }

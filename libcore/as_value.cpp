@@ -2186,7 +2186,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             if (ctor) {
                 fn_call::Args args;
                 args += dub;
-                ret.set_as_object(ctor->constructInstance(as_environment(vm),
+                ret.set_as_object(constructInstance(*ctor, as_environment(vm),
                             args));
             }
 

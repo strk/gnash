@@ -138,7 +138,7 @@ Rectangle_clone(const fn_call& fn)
     fn_call::Args args;
     args += x, y, w, h;
 
-    return ctor->constructInstance(fn.env(), args);
+    return constructInstance(*ctor, fn.env(), args);
 }
 
 as_value
@@ -430,7 +430,7 @@ Rectangle_bottomRight(const fn_call& fn)
         fn_call::Args args;
         args += x, y;
 
-        as_value ret = pointCtor->constructInstance(fn.env(), args);
+        as_value ret = constructInstance(*pointCtor, fn.env(), args);
         return ret;
     }
 
@@ -524,7 +524,7 @@ Rectangle_size(const fn_call& fn)
         fn_call::Args args;
         args += w, h;
 
-        ret = pointCtor->constructInstance(fn.env(), args);
+        ret = constructInstance(*pointCtor, fn.env(), args);
     }
     else // setter
     {
@@ -589,7 +589,7 @@ Rectangle_topLeft(const fn_call& fn)
         fn_call::Args args;
         args += x, y;
 
-        ret = pointCtor->constructInstance(fn.env(), args);
+        ret = constructInstance(*pointCtor, fn.env(), args);
 
     }
     else // setter

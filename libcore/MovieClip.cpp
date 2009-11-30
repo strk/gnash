@@ -991,17 +991,16 @@ MovieClip::goto_frame(size_t target_frame_number)
     // and stop at that frame. 
     setPlayState(PLAYSTATE_STOP);
 
-    if ( target_frame_number > _def->get_frame_count() - 1)
-    {
+    if (target_frame_number > _def->get_frame_count() - 1) {
+
         target_frame_number = _def->get_frame_count() - 1;
 
-        if ( ! _def->ensure_frame_loaded(target_frame_number+1) )
-        {
+        if (!_def->ensure_frame_loaded(target_frame_number + 1)) {
             log_error(_("Target frame of a gotoFrame(%d) was never loaded,"
                         "although frame count in header (%d) said we "
                         "should have found it"),
                         target_frame_number+1, _def->get_frame_count());
-            return; // ... I guess, or not ?
+            return; 
         }
 
         // Just set _currentframe and return.
@@ -1011,25 +1010,23 @@ MovieClip::goto_frame(size_t target_frame_number)
         return;
     }
 
-    if (target_frame_number == _currentFrame)
-    {
+    if (target_frame_number == _currentFrame) {
         // don't push actions
         return;
     }
 
     // Unless the target frame is the next one, stop playback of soundstream
-    if (target_frame_number != _currentFrame+1 )
-    {
+    if (target_frame_number != _currentFrame + 1) {
         stopStreamSound();
     }
 
-    size_t loaded_frames = get_loaded_frames();
+    const size_t loaded_frames = get_loaded_frames();
+
     // target_frame_number is 0-based, get_loaded_frames() is 1-based
     // so in order to goto_frame(3) loaded_frames must be at least 4
     // if goto_frame(4) is called, and loaded_frames is 4 we're jumping
     // forward
-    if ( target_frame_number >= loaded_frames )
-    {
+    if (target_frame_number >= loaded_frames) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("GotoFrame(%d) targets a yet "
             "to be loaded frame (%d) loaded). "
@@ -1039,13 +1036,12 @@ MovieClip::goto_frame(size_t target_frame_number)
             loaded_frames);
 
         );
-        if ( ! _def->ensure_frame_loaded(target_frame_number+1) )
-        {
+        if (!_def->ensure_frame_loaded(target_frame_number + 1)) {
             log_error(_("Target frame of a gotoFrame(%d) was never loaded, "
                         "although frame count in header (%d) said we should"
                         " have found it"),
-                        target_frame_number+1, _def->get_frame_count());
-            return; // ... I guess, or not ?
+                        target_frame_number + 1, _def->get_frame_count());
+            return;
         }
     }
 
@@ -1054,8 +1050,8 @@ MovieClip::goto_frame(size_t target_frame_number)
     // Construct the DisplayList of the target frame
     //
 
-    if (target_frame_number < _currentFrame)
-    {
+    if (target_frame_number < _currentFrame) {
+
         // Go backward to a previous frame
         // NOTE: just in case we're being called by code in a called frame
         // we'll backup and resume the _callingFrameActions flag
@@ -1068,13 +1064,11 @@ MovieClip::goto_frame(size_t target_frame_number)
         assert(_currentFrame == target_frame_number);
         _callingFrameActions = callingFrameActionsBackup;
     }
-    else
-    // Go forward to a later frame
-    {
+    else {
+        // Go forward to a later frame
         // We'd immediately return if target_frame_number == _currentFrame
         assert(target_frame_number > _currentFrame);
-        while (++_currentFrame < target_frame_number)
-        {
+        while (++_currentFrame < target_frame_number) {
             //for (size_t f = _currentFrame+1; f<target_frame_number; ++f) 
             // Second argument requests that only "DisplayList" tags
             // are executed. This means NO actions will be
@@ -1083,7 +1077,6 @@ MovieClip::goto_frame(size_t target_frame_number)
                     SWF::ControlTag::TAG_DLIST);
         }
         assert(_currentFrame == target_frame_number);
-
 
         // Now execute target frame tags (queuing actions)
         // NOTE: just in case we're being called by code in a called frame
@@ -1107,17 +1100,16 @@ MovieClip::goto_labeled_frame(const std::string& label)
     if (!_def) return false;
 
     size_t target_frame;
-    if (_def->get_labeled_frame(label, target_frame))
-    {
+    if (_def->get_labeled_frame(label, target_frame)) {
         goto_frame(target_frame);
         return true;
     }
 
-        IF_VERBOSE_MALFORMED_SWF(
+    IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("MovieClip::goto_labeled_frame('%s') "
             "unknown label"), label);
-        );
-        return false;
+    );
+    return false;
 }
 
 void
@@ -1867,98 +1859,42 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 void
 MovieClip::constructAsScriptObject()
 {
-#ifdef GNASH_DEBUG
-    log_debug(_("constructAsScriptObject called for movieclip %s"), 
-            getTarget());
-#endif
+    as_object* mc = getObject(this);
 
-    if (!isAS3(getVM(*getObject(this))) && !get_parent()) {
-        getObject(this)->init_member("$version", getVM(*getObject(this)).getPlayerVersion(), 0); 
+    // A MovieClip should always have an associated object.
+    assert(mc);
+
+    if (!isAS3(getVM(*mc)) && !get_parent()) {
+        mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
     }
 
-    bool eventHandlersInvoked = false;
+    const sprite_definition* def = 
+        dynamic_cast<const sprite_definition*>(_def.get());
 
-    do {
+    // We won't "construct" top-level movies
+    as_function* ctor = def ? def->getRegisteredClass() : 0;
 
-        if ( _name.empty() )
-        {
-            // instance name will be needed for properly setting up
-            // a reference to 'this' object for ActionScript actions.
-            // If the instance doesn't have a name, it will NOT be
-            // an ActionScript referenceable object so we don't have
-            // anything more to do.
-            break;
-        }
-
-        const sprite_definition* def = 
-            dynamic_cast<const sprite_definition*>(_def.get());
-
-        // We won't "construct" top-level movies
-        if (!def) break;
-
-        as_function* ctor = def->getRegisteredClass();
 #ifdef GNASH_DEBUG
-        log_debug(_("Attached movieclips %s registered class is %p"),
-                getTarget(), (void*)ctor); 
+    log_debug(_("Attached movieclips %s registered class is %p"),
+            getTarget(), (void*)ctor); 
 #endif
 
-        // TODO: builtin constructors are different from user-defined ones
-        // we should likely change that. See also vm/ASHandlers.cpp 
-        // (construct_object)
-        if ( ctor && ! ctor->isBuiltin() )
-        {
-            // Set the new prototype *after* the constructor was called
-            as_value proto = ctor->getMember(NSV::PROP_PROTOTYPE);
-            getObject(this)->set_prototype(proto);
+    // Set this MovieClip object to be an instance of the class.
+    if (ctor) {
+        Property* proto = ctor->getOwnProperty(NSV::PROP_PROTOTYPE);
+        if (proto) mc->set_prototype(proto->getValue(*ctor));
+    }
 
-            // Call event handlers *after* setting up the __proto__
-            // but *before* calling the registered class constructor
-            notifyEvent(event_id::CONSTRUCT);
-            eventHandlersInvoked = true;
-
-            int swfversion = getSWFVersion(*getObject(this));
-
-            // Set the '__constructor__' and 'constructor' members, as well
-            // as calling the actual constructor.
-            //
-            // TODO: this would be best done by an
-            // as_function::constructInstance() method. We have one but it
-            // returns a new object rather then initializing a given object.
-            // We just need to add another one...
-            if ( swfversion > 5 )
-            {
-
-                const int flags = PropFlags::dontEnum;
-
-                getObject(this)->set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
-                getObject(this)->set_member_flags(NSV::PROP_uuCONSTRUCTORuu, flags);
-                if ( swfversion == 6 )
-                {
-                    getObject(this)->set_member(NSV::PROP_CONSTRUCTOR, ctor);
-                    getObject(this)->set_member_flags(NSV::PROP_CONSTRUCTOR, flags);
-                }
-
-                // Provide a 'super' reference..
-                // Super is computed from the object we're constructing,
-                // It will work as long as we did set its __proto__ 
-                // and __constructor__ properties already.
-                as_object* super = getObject(this)->get_super();
-
-                as_environment& env = get_environment();
-                fn_call call(getObject(this), env);
-                call.super = super;
-
-                    // we don't use the constructor return (should we?)
-                ctor->call(call);
-            }
+    // Send the construct event. This must be done after the __proto__ 
+    // member is set. It is always done.
+    notifyEvent(event_id::CONSTRUCT);
+        
+    if (ctor) {
+        const int swfversion = getSWFVersion(*mc);
+        if (swfversion > 5) {
+            fn_call::Args args;
+            ctor->construct(*mc, get_environment(), args);
         }
-
-    } while (0);
-
-    /// Invoke event handlers if not done yet
-    if ( ! eventHandlersInvoked )
-    {
-        notifyEvent(event_id::CONSTRUCT);
     }
 }
 

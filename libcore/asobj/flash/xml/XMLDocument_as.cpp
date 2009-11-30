@@ -687,7 +687,7 @@ xml_class_init(as_object& where, const ObjectURI& uri)
         fn_call::Args args;
         args += 1, "";
         as_object* proto =
-            ctor->constructInstance(as_environment(getVM(where)), args);
+            constructInstance(*ctor, as_environment(getVM(where)), args);
         attachXMLInterface(*proto);
         cl->init_member(NSV::PROP_PROTOTYPE, proto);
     }

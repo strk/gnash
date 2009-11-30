@@ -145,7 +145,7 @@ transform_colorTransform(const fn_call& fn)
              c.rb, c.gb, c.bb, c.ab;
 
         as_object* colorTransformObj =
-            colorTransformCtor->constructInstance(fn.env(), args);
+            constructInstance(*colorTransformCtor, fn.env(), args);
 
         return as_value(colorTransformObj);
     }
@@ -231,7 +231,7 @@ transform_concatenatedColorTransform(const fn_call& fn)
              c.rb, c.gb, c.bb, c.ab;
 
         as_object* colorTransformObj =
-            colorTransformCtor->constructInstance(fn.env(), args);
+            constructInstance(*colorTransformCtor, fn.env(), args);
 
         return as_value(colorTransformObj);
     }
@@ -270,7 +270,7 @@ transform_concatenatedMatrix(const fn_call& fn)
                 twipsToPixels(m.tx),
                 twipsToPixels(m.ty);
 
-        as_object* matrixObj = matrixCtor->constructInstance(fn.env(), args);
+        as_object* matrixObj = constructInstance(*matrixCtor, fn.env(), args);
 
         return as_value(matrixObj);
     }
@@ -314,7 +314,7 @@ transform_matrix(const fn_call& fn)
                 twipsToPixels(m.tx),
                 twipsToPixels(m.ty);
 
-        as_object* matrixObj = matrixCtor->constructInstance(fn.env(), args);
+        as_object* matrixObj = constructInstance(*matrixCtor, fn.env(), args);
 
         return as_value(matrixObj);
     }

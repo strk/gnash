@@ -62,7 +62,7 @@ attachContextMenuItemInterface(as_object& o)
 as_value
 contextmenuitem_copy(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     Global_as& gl = getGlobal(fn);
     string_table& st = getStringTable(fn);
@@ -79,7 +79,7 @@ contextmenuitem_copy(const fn_call& fn)
         ptr->getMember(NSV::PROP_ENABLED),
         ptr->getMember(st.find("visible"));
 
-    return ctor->constructInstance(fn.env(), args);
+    return constructInstance(*ctor, fn.env(), args);
 }
 
 

@@ -419,7 +419,7 @@ date_new(const fn_call& fn)
         as_function* ctor = gl.getMember(NSV::CLASS_DATE).to_function();
         if (!ctor) return as_value();
         fn_call::Args args;
-        return ctor->constructInstance(fn.env(), args);
+        return constructInstance(*ctor, fn.env(), args);
     }
 
     // Reject all date specifications containing Infinities and NaNs.

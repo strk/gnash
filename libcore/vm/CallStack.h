@@ -19,6 +19,7 @@
 #define GNASH_VM_CALL_STACK_H
 
 #include <vector>
+
 #include "as_value.h"
 
 // Forward declarations
@@ -30,27 +31,61 @@ namespace gnash {
 namespace gnash {
 
 /// An element of a CallStack
-struct CallFrame
+class CallFrame 
 {
+public:
+
     typedef std::vector<as_value> Registers;
 
-
-    CallFrame(as_function* funcPtr);
+    CallFrame(as_function* func);
 
     CallFrame(const CallFrame& other)
         :
-        locals(other.locals),
-        registers(other.registers),
-        func(other.func)
-    {/**/}
+        _locals(other._locals),
+        _registers(other._registers),
+        _func(other._func)
+    {}
+
+    as_object& locals() {
+        return *_locals;
+    }
+
+    as_function& function() {
+        return *_func;
+    }
+
+    bool getRegister(size_t i, as_value& val) const {
+        if (i >= _registers.size()) return false;
+        val = _registers[i];
+        return true;
+    }
+
+    bool setRegister(size_t i, const as_value& val) {
+        if (i >= _registers.size()) return false;
+        _registers[i] = val;
+        return true;
+    }
+
+    void resizeRegisters(size_t i) {
+        _registers.resize(i);
+    }
+
+    bool hasRegisters() const {
+        return !_registers.empty();
+    }
+
+
+private:
+
+    friend std::ostream& operator<<(std::ostream&, const CallFrame&);
 
     /// function use this 
-    as_object* locals;
+    as_object* _locals;
 
     /// function2 also use this
-    Registers registers;
+    Registers _registers;
 
-    as_function* func;
+    as_function* _func;
 
     /// Mark all reachable resources
     //
@@ -61,6 +96,7 @@ struct CallFrame
 
 typedef std::vector<CallFrame> CallStack;
 
+std::ostream& operator<<(std::ostream& o, const CallFrame& fr);
 
 } // namespace gnash
 

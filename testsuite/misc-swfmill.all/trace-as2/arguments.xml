@@ -19,7 +19,7 @@
             <strings>
               <String value="o"/>
               <String value="ns"/>
-              <String value="super"/>
+              <String value="arguments"/>
               <String value="nr"/>
               <String value="sss"/>
               <String value="pss"/>
@@ -27,6 +27,7 @@
               <String value="psss"/>
               <String value="pssr"/>
               <String value="__proto__"/>
+              <String value="oo"/>
             </strings>
           </Dictionary>
           <PushData>
@@ -49,7 +50,7 @@
             </items>
           </PushData>
 
-          <!-- ns(): Check super for a normal function (nothing)-->
+	  <!-- Check arguments for a normal function -->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -75,8 +76,7 @@
             </items>
           </PushData>
 
-          <!-- nr(): Check what's in register 1 for a normal function
-          (nothing)-->
+          <!-- Check what's in register 1 for a normal function (nothing)-->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -101,8 +101,8 @@
             </items>
           </PushData>
 
-          <!-- sss(): Check what super is when it's suppressed-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="1" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what arguments is when it's suppressed-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="1" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -127,8 +127,8 @@
             </items>
           </PushData>
 
-          <!-- pss(): Check what super is when it's preloaded-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what arguments is when it's preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="1" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -153,8 +153,8 @@
             </items>
           </PushData>
 
-          <!-- psr(): Check what register 1 is when super is preloaded-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what register 1 is when arguments is preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="1" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -178,8 +178,8 @@
             </items>
           </PushData>
 
-          <!-- psss(): Check what super is when it's suppressed and preloaded-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="1" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what arguments is when it's suppressed and preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="1" preloadArguments="1" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -204,9 +204,8 @@
             </items>
           </PushData>
 
-          <!-- pssr(): Check what register 1 is when it's suppressed and
-          preloaded-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="1" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what register 1 is when arguments suppressed and preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="1" preloadArguments="1" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -232,11 +231,21 @@
           </PushData>
           <DeclareObject/>
           <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="10"/>
+              <StackInteger value="0"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <New/>
+	  <SetLocalVariable/>
 
 	  <!-- Start function calls -->
           <PushData>
             <items>
-              <StackInteger value="0"/>
+              <StackDouble value="6.5"/>
+              <StackInteger value="1"/>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
@@ -250,7 +259,8 @@
           <Trace/>
           <PushData>
             <items>
-              <StackInteger value="0"/>
+              <StackDouble value="6.5"/>
+              <StackInteger value="1"/>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
@@ -264,7 +274,8 @@
           <Trace/>
           <PushData>
             <items>
-              <StackInteger value="0"/>
+              <StackDouble value="6.5"/>
+              <StackInteger value="1"/>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
@@ -278,7 +289,8 @@
           <Trace/>
           <PushData>
             <items>
-              <StackInteger value="0"/>
+              <StackDouble value="6.5"/>
+              <StackInteger value="1"/>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
@@ -292,7 +304,8 @@
           <Trace/>
           <PushData>
             <items>
-              <StackInteger value="0"/>
+              <StackDouble value="6.5"/>
+              <StackInteger value="1"/>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
@@ -306,7 +319,8 @@
           <Trace/>
           <PushData>
             <items>
-              <StackInteger value="0"/>
+              <StackDouble value="6.5"/>
+              <StackInteger value="1"/>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
@@ -320,7 +334,8 @@
           <Trace/>
           <PushData>
             <items>
-              <StackInteger value="0"/>
+              <StackDouble value="6.5"/>
+              <StackInteger value="1"/>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
@@ -334,7 +349,8 @@
           <Trace/>
           <PushData>
             <items>
-              <StackInteger value="0"/>
+              <StackDouble value="6.5"/>
+              <StackInteger value="1"/>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>

@@ -1303,7 +1303,7 @@ createSharedObject(Global_as& gl)
     if (!ctor) return 0;
     as_environment env(getVM(gl));
     fn_call::Args args;
-    as_object* o = ctor->constructInstance(env, args);
+    as_object* o = constructInstance(*ctor, env, args);
 
     std::auto_ptr<SharedObject_as> sh(new SharedObject_as(*o));
     o->setRelay(sh.release());

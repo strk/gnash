@@ -594,7 +594,7 @@ bitmapdata_rectangle(const fn_call& fn)
     args += 0.0, 0.0, ptr->getWidth(), ptr->getHeight();
 
     boost::intrusive_ptr<as_object> newRect =
-            rectCtor->constructInstance(fn.env(), args);
+            constructInstance(*rectCtor, fn.env(), args);
 
     return as_value(newRect.get());
 }

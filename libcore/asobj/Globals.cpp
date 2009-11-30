@@ -1268,7 +1268,7 @@ global_assetuperror(const fn_call& fn)
         as_function* ctor = gl.getMember(NSV::CLASS_ERROR).to_function();
         if (ctor) {
             fn_call::Args args;
-            as_object* proto = ctor->constructInstance(fn.env(), args);
+            as_object* proto = constructInstance(*ctor, fn.env(), args);
 
             // Not really sure what the point of this is.
             gl.createClass(local_errorConstructor, proto);
@@ -1488,7 +1488,7 @@ constructObject(Global_as& gl, const T& arg, string_table::key className)
     args += arg;
 
     as_environment env(getVM(gl));
-    as_object* ret = ctor->constructInstance(env, args);
+    as_object* ret = constructInstance(*ctor, env, args);
 
     return ret;
 

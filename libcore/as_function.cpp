@@ -30,6 +30,7 @@
 #include "namedStrings.h"
 #include "NativeFunction.h"
 #include "Object.h"
+#include "DisplayObject.h"
 
 #include <iostream>
 
@@ -90,40 +91,41 @@ as_function::getFunctionConstructor()
 }
 
 as_object*
-as_function::constructInstance(const as_environment& env, fn_call::Args& args)
+constructInstance(as_function& ctor, const as_environment& env,
+        fn_call::Args& args)
 {
+    Global_as& gl = getGlobal(ctor);
 
-#ifndef GNASH_USE_GC
-	assert(get_ref_count() > 0);
-#endif // GNASH_USE_GC
-
-	int swfversion = getSWFVersion(env);
-
-    Property* proto = getOwnProperty(NSV::PROP_PROTOTYPE);
-		
     // Create an empty object, with a ref to the constructor's prototype.
     // The function's prototype property always becomes the new object's
     // __proto__ member, regardless of whether it is an object and regardless
     // of its visibility.
-    as_object* newobj = new as_object();
-    if (proto) newobj->set_prototype(proto->getValue(*this));
-    
-    // Add a __constructor__ member to the new object, but only for SWF6 up
-    // (to be checked). NOTE that we assume the builtin constructors
-    // won't set __constructor__ to some other value...
-    int flags = PropFlags::dontEnum | 
-                PropFlags::onlySWF6Up; 
+    as_object* newobj = new as_object(gl);
+    Property* proto = ctor.getOwnProperty(NSV::PROP_PROTOTYPE);
+    if (proto) newobj->set_prototype(proto->getValue(ctor));
 
-    newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
+    return ctor.construct(*newobj, env, args);
+}
+
+as_object*
+as_function::construct(as_object& newobj, const as_environment& env,
+        fn_call::Args& args)
+{
+	const int swfversion = getSWFVersion(env);
+
+    // Add a __constructor__ member to the new object visible from version 6.
+    const int flags = PropFlags::dontEnum | 
+                      PropFlags::onlySWF6Up; 
+
+    newobj.init_member(NSV::PROP_uuCONSTRUCTORuu, this, flags);
 
     if (swfversion < 7) {
-        newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this),
-               PropFlags::dontEnum);
+        newobj.init_member(NSV::PROP_CONSTRUCTOR, this, PropFlags::dontEnum);
     }
-
+    
     // Don't set a super so that it will be constructed only if required
     // by the function.
-    fn_call fn(newobj, env, args, 0, true);
+    fn_call fn(&newobj, env, args, 0, true);
     as_value ret;
 
     try {
@@ -149,19 +151,20 @@ as_function::constructInstance(const as_environment& env, fn_call::Args& args)
     // 'this' pointer. Others return a new object. This is to handle those
     // cases.
     if (isBuiltin() && ret.is_object()) {
-        newobj = ret.to_object(getGlobal(env));
+        as_object* fakeobj = ret.to_object(getGlobal(env));
 
-        newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this),
+        fakeobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this),
                 flags);
 
         // Also for SWF5+ only?
         if (swfversion < 7) {
-            newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this),
+            fakeobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this),
                     PropFlags::dontEnum);
         }
+        return fakeobj;
     }
 
-	return newobj;
+	return &newobj;
 }
 
 
@@ -334,24 +337,15 @@ function_call(const fn_call& fn)
 		}
 		else {
 			new_fn_call.this_ptr = this_ptr;
-			as_object* proto = this_ptr->get_prototype();
-            if (proto) {
-                // Note: do not override fn_call::super by creating a super
-                // object, as it may not be needed. Doing so can have a very
-                // detrimental effect on memory usage!
-                // Normal supers will be created when needed in the function
-                // call.
+            // Note: do not override fn_call::super by creating a super
+            // object, as it may not be needed. Doing so can have a very
+            // detrimental effect on memory usage!
+            // Normal supers will be created when needed in the function
+            // call.
 
-                // TODO: it seems pointless to copy the old fn_call and
-                // then change almost everything...
-                new_fn_call.super = 0;
-            }
-            else {
-                // TODO: check this !
-                log_debug("No prototype in 'this' pointer "
-                        "passed to Function.call");
-                new_fn_call.super = function_obj->get_super();
-			}
+            // TODO: it seems pointless to copy the old fn_call and
+            // then change almost everything...
+            new_fn_call.super = 0;
 		}
 		new_fn_call.drop_bottom();
 	}

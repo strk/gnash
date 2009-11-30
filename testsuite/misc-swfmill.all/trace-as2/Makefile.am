@@ -25,10 +25,14 @@ abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-swfmill.all; pwd)
 
 TRACE_TESTS = \
 	super.xml \
+	this.xml \
+	arguments.xml \
 	$(NULL)	
 
 TRACE_TRACES = \
 	super.trace \
+	this.trace \
+	arguments.trace \
 	$(NULL)	
 
 EXTRA_DIST = \
