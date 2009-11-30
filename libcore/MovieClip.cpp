@@ -1879,16 +1879,12 @@ MovieClip::constructAsScriptObject()
     bool eventHandlersInvoked = false;
 
     do {
-
-        if ( _name.empty() )
-        {
-            // instance name will be needed for properly setting up
-            // a reference to 'this' object for ActionScript actions.
-            // If the instance doesn't have a name, it will NOT be
-            // an ActionScript referenceable object so we don't have
-            // anything more to do.
-            break;
-        }
+        // instance name will be needed for properly setting up
+        // a reference to 'this' object for ActionScript actions.
+        // If the instance doesn't have a name, it will NOT be
+        // an ActionScript referenceable object so we don't have
+        // anything more to do.
+        if (_name.empty()) break;
 
         const sprite_definition* def = 
             dynamic_cast<const sprite_definition*>(_def.get());
@@ -1897,6 +1893,7 @@ MovieClip::constructAsScriptObject()
         if (!def) break;
 
         as_function* ctor = def->getRegisteredClass();
+
 #ifdef GNASH_DEBUG
         log_debug(_("Attached movieclips %s registered class is %p"),
                 getTarget(), (void*)ctor); 
@@ -1905,58 +1902,22 @@ MovieClip::constructAsScriptObject()
         // TODO: builtin constructors are different from user-defined ones
         // we should likely change that. See also vm/ASHandlers.cpp 
         // (construct_object)
-        if ( ctor && ! ctor->isBuiltin() )
-        {
-            // Set the new prototype *after* the constructor was called
-            as_value proto = ctor->getMember(NSV::PROP_PROTOTYPE);
-            getObject(this)->set_prototype(proto);
+        if (ctor && ! ctor->isBuiltin()) {
 
-            // Call event handlers *after* setting up the __proto__
-            // but *before* calling the registered class constructor
-            notifyEvent(event_id::CONSTRUCT);
+            as_object* mc = getObject(this);
             eventHandlersInvoked = true;
-
-            int swfversion = getSWFVersion(*getObject(this));
-
-            // Set the '__constructor__' and 'constructor' members, as well
-            // as calling the actual constructor.
-            //
-            // TODO: this would be best done by an
-            // as_function::constructInstance() method. We have one but it
-            // returns a new object rather then initializing a given object.
-            // We just need to add another one...
-            if ( swfversion > 5 )
-            {
-
-                const int flags = PropFlags::dontEnum;
-
-                getObject(this)->set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
-                getObject(this)->set_member_flags(NSV::PROP_uuCONSTRUCTORuu, flags);
-                if ( swfversion == 6 )
-                {
-                    getObject(this)->set_member(NSV::PROP_CONSTRUCTOR, ctor);
-                    getObject(this)->set_member_flags(NSV::PROP_CONSTRUCTOR, flags);
-                }
-
-                // Provide a 'super' reference..
-                // Super is computed from the object we're constructing,
-                // It will work as long as we did set its __proto__ 
-                // and __constructor__ properties already.
-                as_object* super = getObject(this)->get_super();
-
-                as_environment& env = get_environment();
-                fn_call call(getObject(this), env);
-                call.super = super;
-
-                    // we don't use the constructor return (should we?)
-                ctor->call(call);
+            
+            const int swfversion = getSWFVersion(*mc);
+            if (swfversion > 5) {
+                fn_call::Args args;
+                ctor->construct(*mc, get_environment(), args);
             }
         }
 
     } while (0);
 
     /// Invoke event handlers if not done yet
-    if ( ! eventHandlersInvoked )
+    if (!eventHandlersInvoked)
     {
         notifyEvent(event_id::CONSTRUCT);
     }

@@ -30,6 +30,7 @@
 #include "namedStrings.h"
 #include "NativeFunction.h"
 #include "Object.h"
+#include "DisplayObject.h"
 
 #include <iostream>
 
@@ -111,6 +112,12 @@ as_function::construct(as_object& newobj, const as_environment& env,
     // __proto__ member, regardless of whether it is an object and regardless
     // of its visibility.
     if (proto) newobj.set_prototype(proto->getValue(*this));
+
+    // If the object is a DisplayObject, send the construct event. This
+    // must be done after the __proto__  member is set.
+    if (DisplayObject* d = get<DisplayObject>(&newobj)) {
+        d->notifyEvent(event_id::CONSTRUCT);
+    }
 
     // Add a __constructor__ member to the new object visible from version 6.
     const int flags = PropFlags::dontEnum | 
