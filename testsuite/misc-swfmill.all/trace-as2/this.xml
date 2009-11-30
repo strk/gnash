@@ -19,7 +19,7 @@
             <strings>
               <String value="o"/>
               <String value="ns"/>
-              <String value="super"/>
+              <String value="this"/>
               <String value="nr"/>
               <String value="sss"/>
               <String value="pss"/>
@@ -27,6 +27,7 @@
               <String value="psss"/>
               <String value="pssr"/>
               <String value="__proto__"/>
+              <String value="oo"/>
             </strings>
           </Dictionary>
           <PushData>
@@ -49,7 +50,7 @@
             </items>
           </PushData>
 
-          <!-- Check super for a normal function (nothing)-->
+	  <!-- Check this for a normal function -->
           <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
@@ -100,8 +101,8 @@
             </items>
           </PushData>
 
-          <!-- Check what super is when it's suppressed-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="1" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what this is when it's suppressed-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="1" preloadThis="0" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -126,8 +127,8 @@
             </items>
           </PushData>
 
-          <!-- Check what super is when it's preloaded-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what this is when it's preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="1" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -152,8 +153,8 @@
             </items>
           </PushData>
 
-          <!-- Check what register 1 is when super is preloaded-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what register 1 is when this is preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="1" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -177,8 +178,8 @@
             </items>
           </PushData>
 
-          <!-- Check what super is when it's suppressed and preloaded-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="1" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what this is when it's suppressed and preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="1" preloadThis="1" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -203,8 +204,8 @@
             </items>
           </PushData>
 
-          <!-- Check what register 1 is when it's suppressed and preloaded-->
-          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="1" preloadSuper="1" suppressArguments="0" preloadArguments="0" suppressThis="0" preloadThis="0" reserved="0" preloadGlobal="0">
+          <!-- Check what register 1 is when this suppressed and preloaded-->
+          <DeclareFunction2 name="" argc="0" regc="2" preloadParent="0" preloadRoot="0" suppressSuper="0" preloadSuper="0" suppressArguments="0" preloadArguments="0" suppressThis="1" preloadThis="1" reserved="0" preloadGlobal="0">
             <args/>
             <actions>
               <PushData>
@@ -230,6 +231,15 @@
           </PushData>
           <DeclareObject/>
           <SetMember/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="10"/>
+              <StackInteger value="0"/>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <New/>
+	  <SetLocalVariable/>
 
 	  <!-- Start function calls -->
           <PushData>
