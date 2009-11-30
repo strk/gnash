@@ -518,14 +518,17 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_GOTOFRAME));
 #endif
 
-    size_t frame = code.read_int16(thread.getCurrentPC()+3);
+    size_t frame = code.read_int16(thread.getCurrentPC() + 3);
 
     DisplayObject* tgtch = env.get_target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
 
     // frame number within this tag is hard-coded and 0-based
-    if ( tgt ) tgt->goto_frame(frame);
-    else log_debug(_("ActionGotoFrame: as_environment target is null or not a sprite"));
+    if (tgt) tgt->goto_frame(frame);
+    else {
+        log_debug(_("ActionGotoFrame: as_environment target is null "
+                "or not a sprite"));
+    }
 }
 
 void

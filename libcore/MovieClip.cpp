@@ -991,17 +991,16 @@ MovieClip::goto_frame(size_t target_frame_number)
     // and stop at that frame. 
     setPlayState(PLAYSTATE_STOP);
 
-    if ( target_frame_number > _def->get_frame_count() - 1)
-    {
+    if (target_frame_number > _def->get_frame_count() - 1) {
+
         target_frame_number = _def->get_frame_count() - 1;
 
-        if ( ! _def->ensure_frame_loaded(target_frame_number+1) )
-        {
+        if (!_def->ensure_frame_loaded(target_frame_number + 1)) {
             log_error(_("Target frame of a gotoFrame(%d) was never loaded,"
                         "although frame count in header (%d) said we "
                         "should have found it"),
                         target_frame_number+1, _def->get_frame_count());
-            return; // ... I guess, or not ?
+            return; 
         }
 
         // Just set _currentframe and return.
@@ -1011,25 +1010,23 @@ MovieClip::goto_frame(size_t target_frame_number)
         return;
     }
 
-    if (target_frame_number == _currentFrame)
-    {
+    if (target_frame_number == _currentFrame) {
         // don't push actions
         return;
     }
 
     // Unless the target frame is the next one, stop playback of soundstream
-    if (target_frame_number != _currentFrame+1 )
-    {
+    if (target_frame_number != _currentFrame + 1) {
         stopStreamSound();
     }
 
-    size_t loaded_frames = get_loaded_frames();
+    const size_t loaded_frames = get_loaded_frames();
+
     // target_frame_number is 0-based, get_loaded_frames() is 1-based
     // so in order to goto_frame(3) loaded_frames must be at least 4
     // if goto_frame(4) is called, and loaded_frames is 4 we're jumping
     // forward
-    if ( target_frame_number >= loaded_frames )
-    {
+    if (target_frame_number >= loaded_frames) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("GotoFrame(%d) targets a yet "
             "to be loaded frame (%d) loaded). "
@@ -1039,13 +1036,12 @@ MovieClip::goto_frame(size_t target_frame_number)
             loaded_frames);
 
         );
-        if ( ! _def->ensure_frame_loaded(target_frame_number+1) )
-        {
+        if (!_def->ensure_frame_loaded(target_frame_number + 1)) {
             log_error(_("Target frame of a gotoFrame(%d) was never loaded, "
                         "although frame count in header (%d) said we should"
                         " have found it"),
-                        target_frame_number+1, _def->get_frame_count());
-            return; // ... I guess, or not ?
+                        target_frame_number + 1, _def->get_frame_count());
+            return;
         }
     }
 
@@ -1054,8 +1050,8 @@ MovieClip::goto_frame(size_t target_frame_number)
     // Construct the DisplayList of the target frame
     //
 
-    if (target_frame_number < _currentFrame)
-    {
+    if (target_frame_number < _currentFrame) {
+
         // Go backward to a previous frame
         // NOTE: just in case we're being called by code in a called frame
         // we'll backup and resume the _callingFrameActions flag
@@ -1068,13 +1064,11 @@ MovieClip::goto_frame(size_t target_frame_number)
         assert(_currentFrame == target_frame_number);
         _callingFrameActions = callingFrameActionsBackup;
     }
-    else
-    // Go forward to a later frame
-    {
+    else {
+        // Go forward to a later frame
         // We'd immediately return if target_frame_number == _currentFrame
         assert(target_frame_number > _currentFrame);
-        while (++_currentFrame < target_frame_number)
-        {
+        while (++_currentFrame < target_frame_number) {
             //for (size_t f = _currentFrame+1; f<target_frame_number; ++f) 
             // Second argument requests that only "DisplayList" tags
             // are executed. This means NO actions will be
@@ -1083,7 +1077,6 @@ MovieClip::goto_frame(size_t target_frame_number)
                     SWF::ControlTag::TAG_DLIST);
         }
         assert(_currentFrame == target_frame_number);
-
 
         // Now execute target frame tags (queuing actions)
         // NOTE: just in case we're being called by code in a called frame
@@ -1107,17 +1100,16 @@ MovieClip::goto_labeled_frame(const std::string& label)
     if (!_def) return false;
 
     size_t target_frame;
-    if (_def->get_labeled_frame(label, target_frame))
-    {
+    if (_def->get_labeled_frame(label, target_frame)) {
         goto_frame(target_frame);
         return true;
     }
 
-        IF_VERBOSE_MALFORMED_SWF(
+    IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("MovieClip::goto_labeled_frame('%s') "
             "unknown label"), label);
-        );
-        return false;
+    );
+    return false;
 }
 
 void
