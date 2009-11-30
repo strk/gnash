@@ -1319,7 +1319,7 @@ NetStream_as::update()
             if (!m_imageframe.get() && 
                     _playHead.getState() != PlayHead::PLAY_PAUSED)
             {
-                log_debug("refreshing video frame for the first time");
+                //log_debug("refreshing video frame for the first time");
                 refreshVideoFrame(true);
             }
 
