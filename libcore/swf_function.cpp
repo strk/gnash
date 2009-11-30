@@ -190,20 +190,23 @@ swf_function::call(const fn_call& fn)
 		// Handle the implicit args.
 		// @@ why start at 1 ? Note that starting at 0 makes	
 		// intro.swf movie fail to play correctly.
-		unsigned int current_reg = 1;
-		if ((m_function2_flags & PRELOAD_THIS) &&
-                !(m_function2_flags & SUPPRESS_THIS)) {
-			// preload 'this' into a register.
-            // TODO: check whether it should be undefined or null if this_ptr
-            // is null.
-			m_env.setRegister(current_reg, fn.this_ptr); 
-			++current_reg;
-		}
+        size_t current_reg(1);
 
+        // If this is not suppressed it is either placed in a register
+        // or set as a local variable, but not both.
 		if (!(m_function2_flags & SUPPRESS_THIS)) {
-			// Put 'this' in a local var.
-			m_env.add_local("this", fn.this_ptr ? fn.this_ptr : as_value());
-		}
+            if (m_function2_flags & PRELOAD_THIS) {
+                // preload 'this' into a register.
+                // TODO: check whether it should be undefined or null
+                // if this_ptr is null.
+                m_env.setRegister(current_reg, fn.this_ptr); 
+                ++current_reg;
+            }
+            else {
+                // Put 'this' in a local var.
+                m_env.add_local("this", fn.this_ptr ? fn.this_ptr : as_value());
+            }
+        }
 
 		// Init arguments array, if it's going to be needed.
         as_object* arg_array = 0;
