@@ -287,8 +287,8 @@ test_obj(const as_object* o)
         if (ao1.get() == 0) {
             runtest.unresolved("as_value(Element &prop1)");
         } else {
-            ao1.get()->get_member(st.find(PROPNAME("foo")), &fooas);
-            ao1.get()->get_member(st.find(PROPNAME("bar")), &baras);
+            ao1.get()->get_member(st.find("foo"), &fooas);
+            ao1.get()->get_member(st.find("bar"), &baras);
             if ((fooas.is_string()) && (fooas.to_string() == foo->to_string())) {
                 runtest.pass("as_value(Element prop1)");
             } else {
