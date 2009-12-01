@@ -182,6 +182,8 @@ public:
     explicit as_object(Global_as& global);
 
     /// Construct an ActionScript object with no prototype associated.
+    //
+    /// This constructor is deprecated!
     as_object();
 
     /// Function dispatch
@@ -190,6 +192,12 @@ public:
     /// A normal object has no call functionality, so the default
     /// implementation throws an ActionTypeError.
     virtual as_value call(const fn_call& fn);
+
+    /// Return the string representation for this object
+    //
+    /// This is dependent on the VM version and the type of object, function,
+    /// or class.
+    virtual const std::string& stringValue() const;
 
     /// The most common flags for built-in properties.
     //
@@ -1196,23 +1204,26 @@ isNativeType(as_object* obj, T*& relay)
     return relay;
 }
 
-/// Get the VM from an as_object
+/// Get the VM from an as_object.
 VM& getVM(const as_object& o);
 
-/// Get the movie_root from an as_object
+/// Get the movie_root from an as_object.
 movie_root& getRoot(const as_object& o);
 
-/// Get the string_table from an as_object
+/// Get the string_table from an as_object.
 string_table& getStringTable(const as_object& o);
 
-/// Get the RunResources from an as_object
+/// Get the RunResources from an as_object.
 const RunResources& getRunResources(const as_object& o);
 
-/// Get the executing VM version from an as_object
+/// Get the executing VM version from an as_object.
 int getSWFVersion(const as_object& o);
 
-/// Get the Global object from an as_object
+/// Get the Global object from an as_object.
 Global_as& getGlobal(const as_object& o);
+
+/// Return whether the object is an AS3 object.
+bool isAS3(const as_object& o);
 
 
 } // namespace gnash

@@ -72,6 +72,15 @@ as_function::as_function(Global_as& gl)
 	init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
 }
 
+const std::string&
+as_function::stringValue() const
+{
+    // TODO: find out what AS3 functions return.
+    static const std::string str("[type Function]");
+    return str;
+}
+
+
 NativeFunction*
 as_function::getFunctionConstructor()
 {

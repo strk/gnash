@@ -284,8 +284,23 @@ as_object::as_object()
 }
 
 as_value
-as_object::call(const fn_call& /*fn*/) {
+as_object::call(const fn_call& /*fn*/)
+{
     throw ActionTypeError();
+}
+
+const std::string&
+as_object::stringValue() const
+{
+    // TODO: AS3 returns a string describing the type of object, e.g.
+    // "[object MyObject]"
+    if (isAS3(*this)) {
+        static const std::string str("[object Object]");
+        return str;
+    }
+
+    static const std::string str("[object Object]");
+    return str;
 }
 
 std::pair<bool,bool>
@@ -1310,10 +1325,16 @@ getSWFVersion(const as_object& o)
     return o.vm().getSWFVersion();
 }
 
-Global_as& getGlobal(const as_object& o)
+Global_as&
+getGlobal(const as_object& o)
 {
     return *o.vm().getGlobal();
 }
 
+bool
+isAS3(const as_object& o)
+{
+    return isAS3(getVM(o));
+}
 
 } // end of gnash namespace
