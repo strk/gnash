@@ -1033,7 +1033,7 @@ global_asnative(const fn_call& fn)
         log_aserror(_("ASNative(%s): needs at least two arguments"),
             fn.dump_args());
         )
-        return ret;
+        return as_value();
     }
 
     const int sx = fn.arg(0).to_int();
