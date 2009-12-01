@@ -149,18 +149,6 @@ PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 }
 
 bool
-PropertyList::getValue(const string_table::key key, as_value& val,
-		as_object& this_ptr, const string_table::key nsId) 
-{
-	container::iterator found = iterator_find(_props, key, nsId);
-	if (found == _props.end())
-		return false;
-
-	val = found->getValue(this_ptr);
-	return true;
-}
-
-bool
 PropertyList::setValue(string_table::key key, const as_value& val,
 		as_object& this_ptr, string_table::key nsId,
 		const PropFlags& flagsIfMissing)

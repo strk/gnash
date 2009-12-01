@@ -143,37 +143,6 @@ public:
 		}
 	}
 
-	/// Get the as_value value of a named property
-	//
-	/// If the named property is a getter/setter one it's getter
-	/// will be invoked using this instance's _owner as 'this' pointer.
-	///
-	/// @param key
-	///	Name of the property. Search is case-*sensitive*
-	///
-	/// @param value
-	///	a reference to the as_value to which a found property
-	///	value will be copied (it will be left untouched if
-	///	no property was found)
-	///
-	/// @param this_ptr
-	/// 	The as_object used to set the 'this' pointer
-	/// 	for calling getter/setter function (GetterSetterProperty);
-	/// 	it will be unused when getting or setting SimpleProperty
-	/// 	properties.
-	///	This parameter is non-const as nothing prevents an
-	///	eventual "Getter" function from actually modifying it,
-	///	so we can't promise constness.
-	///	Note that the PropertyList itself might be changed
-	///	from this call, accessed trough the 'this' pointer,
-	///	so this method too is non-const.
-	///
-	/// @return true if the value was successfully retrived, false
-	///         otherwise (and value will be untouched)
-	///
-	bool getValue(string_table::key key, as_value& value,
-			as_object& this_ptr, string_table::key nsId = 0);
-
 	/// Get the as_value value of an ordered property
 	///
 	/// getter/setter will be invoked, just as for getValue
