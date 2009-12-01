@@ -788,7 +788,7 @@ void
 as_object::init_property(const std::string& key, as_function& getter,
 		as_function& setter, int flags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(key);
 	init_property(k, getter, setter, flags, nsname);
 }
 
@@ -807,7 +807,7 @@ void
 as_object::init_property(const std::string& key, as_c_function_ptr getter,
 		as_c_function_ptr setter, int flags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(key);
 	init_property(k, getter, setter, flags, nsname);
 }
 
@@ -842,7 +842,7 @@ void
 as_object::init_readonly_property(const std::string& key, as_function& getter,
 	int initflags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(key);
 
 	init_property(k, getter, getter, initflags | PropFlags::readOnly
 		| PropFlags::isProtected, nsname);
@@ -862,7 +862,7 @@ void
 as_object::init_readonly_property(const std::string& key,
         as_c_function_ptr getter, int initflags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(key);
 
 	init_property(k, getter, getter, initflags | PropFlags::readOnly
 		| PropFlags::isProtected, nsname);

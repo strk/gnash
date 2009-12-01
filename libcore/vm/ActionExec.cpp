@@ -676,14 +676,14 @@ bool
 ActionExec::delObjectMember(as_object& obj, const std::string& name)
 {
     string_table& st = getStringTable(env);
-    std::pair<bool,bool> ret = obj.delProperty(st.find(PROPNAME(name)));
+    std::pair<bool,bool> ret = obj.delProperty(st.find(name));
     return ret.second;
 }
 
 void
 ActionExec::setVariable(const std::string& name, const as_value& val)
 {
-    return env.set_variable(PROPNAME(name), val, getScopeStack());
+    return env.set_variable(name, val, getScopeStack());
 }
 
 as_value
@@ -695,7 +695,7 @@ ActionExec::getVariable(const std::string& name)
 as_value
 ActionExec::getVariable(const std::string& name, as_object** target)
 {
-    return env.get_variable(PROPNAME(name), getScopeStack(), target);
+    return env.get_variable(name, getScopeStack(), target);
 }
 
 void
@@ -703,11 +703,11 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 {
     if ( isFunction() ) {
         // TODO: set local in the function object?
-        env.set_local(PROPNAME(name), val);
+        env.set_local(name, val);
     } else {
         // TODO: set target member  ?
         //       what about 'with' stack ?
-        env.set_variable(PROPNAME(name), val, getScopeStack());
+        env.set_variable(name, val, getScopeStack());
     }
 }
 

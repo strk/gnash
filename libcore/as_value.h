@@ -81,13 +81,6 @@ isInf(const T& num)
 }
 
 
-/// Use this methods to obtain a properly-formatted property name
-/// The methods will convert the name to lowercase if the current VM target
-/// is SWF6 or lower
-///
-//#define PROPNAME(x) ( VM::get().getSWFVersion() < 7 ? boost::to_lower_copy(std::string(x)) : (x) )
-#define PROPNAME(x) ( x )
-
 /// These are the primitive types, see the ECMAScript reference.
 enum primitive_types
 {
