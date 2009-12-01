@@ -1,0 +1,398 @@
+<?xml version="1.0"?>
+<swf version="10" compressed="0">
+  <Header framerate="24" frames="1">
+    <size>
+      <Rectangle left="0" right="12000" top="0" bottom="8000"/>
+    </size>
+    <tags>
+      <FileAttributes hasMetaData="0" allowABC="1" suppressCrossDomainCaching="0" swfRelativeURLs="0" useNetwork="0"/>
+      <SetBackgroundColor>
+        <color>
+          <Color red="51" green="51" blue="51"/>
+        </color>
+      </SetBackgroundColor>
+      <DefineEditText objectID="1" wordWrap="0" multiLine="1" password="0" readOnly="1" autoSize="1" hasLayout="0" notSelectable="0" hasBorder="0" isHTML="0" useOutlines="0" variableName="tt" initialText="Testing script order.">
+        <size>
+          <Rectangle left="0" right="12000" top="0" bottom="8000"/>
+        </size>
+        <color>
+          <Color red="255" green="255" blue="255" alpha="255"/>
+        </color>
+      </DefineEditText>
+      <PlaceObject2 replace="0" depth="2" objectID="1" name="edittext"/>
+      <DoABCDefine flags="0" name="PyPy">
+        <actions>
+          <Action3 minorVersion="16" majorVersion="46">
+            <constants>
+              <Constants>
+                <ints/>
+                <uints/>
+                <doubles/>
+                <strings>
+                  <String2 value="trace"/>
+                  <String2 value=""/>
+                  <String2 value="1. ScriptTest_Script0 cinit called"/>
+                  <String2 value="3. ScriptTest_Script0 iinit (construct)"/>
+                  <String2 value="ScriptTest_Script1"/>
+                  <String2 value="void"/>
+                  <String2 value="ScriptTest_Script0"/>
+                  <String2 value="Sprite"/>
+                  <String2 value="flash.display"/>
+                  <String2 value="edittext"/>
+                  <String2 value="TextField"/>
+                  <String2 value="flash.text"/>
+                  <String2 value="Object"/>
+                  <String2 value="EventDispatcher"/>
+                  <String2 value="flash.events"/>
+                  <String2 value="DisplayObject"/>
+                  <String2 value="InteractiveObject"/>
+                  <String2 value="DisplayObjectContainer"/>
+                  <String2 value="4. ScriptTest_Script1 cinit called in script0 construction (iinit)"/>
+                  <String2 value="5. ScriptTest_Script1 iinit (constructed twice)"/>
+                  <String2 value="ScriptTest_Script2 cinit here"/>
+                  <String2 value="ScriptTest_Script2"/>
+                  <String2 value="2. ScriptTest_Script3 cinit called"/>
+                  <String2 value="ScriptTest_Script3 iinit"/>
+                  <String2 value="ScriptTest_Script3"/>
+                </strings>
+                <namespaces>
+                  <PackageNamespace index="2"/>
+                  <PackageNamespace index="9"/>
+                  <PackageNamespace index="12"/>
+                  <PackageNamespace index="15"/>
+                </namespaces>
+                <namespaceSets/>
+                <multinames>
+                  <QName namespaceIndex="1" nameIndex="1"/>
+                  <QName namespaceIndex="1" nameIndex="5"/>
+                  <QName namespaceIndex="1" nameIndex="6"/>
+                  <QName namespaceIndex="1" nameIndex="7"/>
+                  <QName namespaceIndex="2" nameIndex="8"/>
+                  <QName namespaceIndex="1" nameIndex="10"/>
+                  <QName namespaceIndex="3" nameIndex="11"/>
+                  <QName namespaceIndex="1" nameIndex="13"/>
+                  <QName namespaceIndex="4" nameIndex="14"/>
+                  <QName namespaceIndex="2" nameIndex="16"/>
+                  <QName namespaceIndex="2" nameIndex="17"/>
+                  <QName namespaceIndex="2" nameIndex="18"/>
+                  <QName namespaceIndex="1" nameIndex="22"/>
+                  <QName namespaceIndex="1" nameIndex="25"/>
+                </multinames>
+              </Constants>
+            </constants>
+            <methods>
+              <MethodInfo retType="0" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="3" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="0" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="0" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="3" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="0" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="0" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="3" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="0" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="0" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="3" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+              <MethodInfo retType="0" nameIndex="2" hasParamNames="0" setSDXNs="0" isExplicit="0" ignoreRest="0" hasOptional="0" needRest="0" needActivation="0" needArguments="0">
+                <paramTypes/>
+              </MethodInfo>
+            </methods>
+            <metadata/>
+            <instances>
+              <InstanceInfo nameIndex="4" superIndex="5" hasProtectedNS="0" interface="0" final="0" sealed="1" iInitIndex="1">
+                <interfaces/>
+                <traits>
+                  <TraitInfo nameIndex="6" override="0" final="0">
+                    <trait>
+                      <Slot slotID="0" typeIndex="7" valueIndex="0"/>
+                    </trait>
+                  </TraitInfo>
+                </traits>
+              </InstanceInfo>
+              <InstanceInfo nameIndex="2" superIndex="8" hasProtectedNS="0" interface="0" final="0" sealed="1" iInitIndex="4">
+                <interfaces/>
+                <traits/>
+              </InstanceInfo>
+              <InstanceInfo nameIndex="13" superIndex="8" hasProtectedNS="0" interface="0" final="0" sealed="1" iInitIndex="7">
+                <interfaces/>
+                <traits/>
+              </InstanceInfo>
+              <InstanceInfo nameIndex="14" superIndex="8" hasProtectedNS="0" interface="0" final="0" sealed="1" iInitIndex="10">
+                <interfaces/>
+                <traits/>
+              </InstanceInfo>
+            </instances>
+            <classes>
+              <ClassInfo cInitIndex="0">
+                <traits/>
+              </ClassInfo>
+              <ClassInfo cInitIndex="3">
+                <traits/>
+              </ClassInfo>
+              <ClassInfo cInitIndex="6">
+                <traits/>
+              </ClassInfo>
+              <ClassInfo cInitIndex="9">
+                <traits/>
+              </ClassInfo>
+            </classes>
+            <scripts>
+              <ScriptInfo initIndex="2">
+                <traits>
+                  <TraitInfo nameIndex="4" override="0" final="0">
+                    <trait>
+                      <Class slotID="0" classInfo="0"/>
+                    </trait>
+                  </TraitInfo>
+                </traits>
+              </ScriptInfo>
+              <ScriptInfo initIndex="5">
+                <traits>
+                  <TraitInfo nameIndex="2" override="0" final="0">
+                    <trait>
+                      <Class slotID="0" classInfo="1"/>
+                    </trait>
+                  </TraitInfo>
+                </traits>
+              </ScriptInfo>
+              <ScriptInfo initIndex="8">
+                <traits>
+                  <TraitInfo nameIndex="13" override="0" final="0">
+                    <trait>
+                      <Class slotID="0" classInfo="2"/>
+                    </trait>
+                  </TraitInfo>
+                </traits>
+              </ScriptInfo>
+              <ScriptInfo initIndex="11">
+                <traits>
+                  <TraitInfo nameIndex="14" override="0" final="0">
+                    <trait>
+                      <Class slotID="0" classInfo="3"/>
+                    </trait>
+                  </TraitInfo>
+                </traits>
+              </ScriptInfo>
+            </scripts>
+            <methodBodies>
+              <MethodBody methodInfo="0" maxStack="3" maxRegs="1" scopeDepth="0" maxScope="1" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpFindPropStrict name="1"/>
+                  <OpPushString index="3"/>
+                  <OpCallProperty name="1" argc="1"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="1" maxStack="4" maxRegs="3" scopeDepth="0" maxScope="1" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpGetLocal address="0"/>
+                  <OpConstructSuper argc="0"/>
+                  <OpFindPropStrict name="1"/>
+                  <OpPushString index="4"/>
+                  <OpCallProperty name="1" argc="1"/>
+                  <OpFindPropStrict name="2"/>
+                  <OpConstructProp name="2" argc="0"/>
+                  <OpSetLocal1/>
+                  <OpFindPropStrict name="2"/>
+                  <OpConstructProp name="2" argc="0"/>
+                  <OpSetLocal2/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="2" maxStack="3" maxRegs="1" scopeDepth="0" maxScope="7" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpGetScopeObject scopeIndex="0"/>
+                  <OpGetLex name="8"/>
+                  <OpPushScope/>
+                  <OpGetLex name="9"/>
+                  <OpPushScope/>
+                  <OpGetLex name="10"/>
+                  <OpPushScope/>
+                  <OpGetLex name="11"/>
+                  <OpPushScope/>
+                  <OpGetLex name="12"/>
+                  <OpPushScope/>
+                  <OpGetLex name="5"/>
+                  <OpPushScope/>
+                  <OpGetLex name="5"/>
+                  <OpNewClass classIndex="0"/>
+                  <OpPopScope/>
+                  <OpPopScope/>
+                  <OpPopScope/>
+                  <OpPopScope/>
+                  <OpPopScope/>
+                  <OpPopScope/>
+                  <OpInitProperty name="4"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="3" maxStack="3" maxRegs="1" scopeDepth="0" maxScope="1" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpFindPropStrict name="1"/>
+                  <OpPushString index="19"/>
+                  <OpCallProperty name="1" argc="1"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="4" maxStack="4" maxRegs="1" scopeDepth="0" maxScope="1" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpGetLocal address="0"/>
+                  <OpConstructSuper argc="0"/>
+                  <OpFindPropStrict name="1"/>
+                  <OpPushString index="20"/>
+                  <OpCallProperty name="1" argc="1"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="5" maxStack="3" maxRegs="1" scopeDepth="0" maxScope="2" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpGetScopeObject scopeIndex="0"/>
+                  <OpGetLex name="8"/>
+                  <OpPushScope/>
+                  <OpGetLex name="8"/>
+                  <OpNewClass classIndex="1"/>
+                  <OpPopScope/>
+                  <OpInitProperty name="2"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="6" maxStack="3" maxRegs="1" scopeDepth="0" maxScope="1" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpFindPropStrict name="1"/>
+                  <OpPushString index="21"/>
+                  <OpCallProperty name="1" argc="1"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="7" maxStack="2" maxRegs="1" scopeDepth="0" maxScope="1" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpGetLocal address="0"/>
+                  <OpConstructSuper argc="0"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="8" maxStack="3" maxRegs="1" scopeDepth="0" maxScope="2" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpGetScopeObject scopeIndex="0"/>
+                  <OpGetLex name="8"/>
+                  <OpPushScope/>
+                  <OpGetLex name="8"/>
+                  <OpNewClass classIndex="2"/>
+                  <OpPopScope/>
+                  <OpInitProperty name="13"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="9" maxStack="3" maxRegs="1" scopeDepth="0" maxScope="1" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpFindPropStrict name="1"/>
+                  <OpPushString index="23"/>
+                  <OpCallProperty name="1" argc="1"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="10" maxStack="4" maxRegs="1" scopeDepth="0" maxScope="1" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpGetLocal address="0"/>
+                  <OpConstructSuper argc="0"/>
+                  <OpFindPropStrict name="1"/>
+                  <OpPushString index="24"/>
+                  <OpCallProperty name="1" argc="1"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+              <MethodBody methodInfo="11" maxStack="3" maxRegs="1" scopeDepth="0" maxScope="2" exceptionCount="0">
+                <code>
+                  <OpGetLocal0/>
+                  <OpPushScope/>
+                  <OpGetScopeObject scopeIndex="0"/>
+                  <OpGetLex name="8"/>
+                  <OpPushScope/>
+                  <OpGetLex name="8"/>
+                  <OpNewClass classIndex="3"/>
+                  <OpPopScope/>
+                  <OpInitProperty name="14"/>
+                  <OpReturnVoid/>
+                </code>
+                <exceptions/>
+                <traits/>
+              </MethodBody>
+            </methodBodies>
+          </Action3>
+        </actions>
+      </DoABCDefine>
+      <SymbolClass>
+        <symbols>
+          <Symbol objectID="0" name="ScriptTest_Script0"/>
+        </symbols>
+      </SymbolClass>
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>
