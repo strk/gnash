@@ -63,7 +63,7 @@ namespace abc {
 //
 /// TODO: update this documentation when we've worked it out.
 //
-/// A Script is a bytecode description of a Class. Scripts have the following
+/// A Script is a static description of a Class. Scripts have the following
 /// important properties:
 //
 /// 1.  A static initialization method ("cinit"). This is executed no more
@@ -73,6 +73,9 @@ namespace abc {
 /// 2.  A constructor method ("iinit"). This is run every time the Class
 ///     is constructed. As not all Classes are constructed, the iinit method
 ///     may never be executed.
+//
+/// Note that Gnash (and AS3), a Class is regarded as an instance of a
+/// Script, and an Object is an instance of a Class.
 class Script
 {
 public:

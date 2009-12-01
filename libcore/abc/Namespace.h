@@ -42,8 +42,8 @@ namespace abc {
 /// they must never store any AbcBlock-internal information, particularly
 /// not the AbcURI.
 //
-/// A Namespace is a collection of Scripts. Scripts are static descriptions
-/// of AS3 classes.
+/// A Namespace is currently a collection of Scripts, which should be 
+/// turned into a Class on first use.
 class Namespace
 {
 public:
@@ -79,7 +79,7 @@ public:
 
 	/// Add a Script to the namespace. The namespace stores this, but
 	/// does not take ownership.
-	bool addScript(string_table::key name, abc::Script* a)
+	bool addScript(string_table::key name, Script* a)
 	{
 		if (getScriptInternal(name)) return false;
 		_scripts[static_cast<std::size_t>(name)] = a;
@@ -90,11 +90,11 @@ public:
 
 	/// Get the named class. Returns NULL if information is not known
 	/// about the class. (Stubbed classes still return NULL here.)
-	abc::Script* getScript(string_table::key name) 
+	Script* getScript(string_table::key name) 
 	{
 		if (mRecursePrevent) return NULL;
 
-		abc::Script* found = getScriptInternal(name);
+		Script* found = getScriptInternal(name);
 
 		if (found || !getParent()) return found;
 
@@ -124,7 +124,7 @@ private:
 	string_table::key _uri;
 	string_table::key _prefix;
 
-	typedef std::map<string_table::key, abc::Script*> container;
+	typedef std::map<string_table::key, Script*> container;
 	container _scripts;
 	mutable bool mRecursePrevent;
 
@@ -132,7 +132,7 @@ private:
 	bool _protected;
 	bool _package;
 
-	abc::Script* getScriptInternal(string_table::key name) const
+	Script* getScriptInternal(string_table::key name) const
 	{
 		container::const_iterator i;
 		
