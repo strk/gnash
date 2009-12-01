@@ -28,22 +28,22 @@
 #include <sstream>
 
 namespace gnash {
+namespace abc {
 
 void
 Namespace::stubPrototype(ClassHierarchy& ch, string_table::key name)
 {
-	abc::Class *pClass = ch.newClass();
+	abc::Script *pClass = ch.newScript();
 	pClass->setName(name);
-	addClass(name, pClass);
+	addScript(name, pClass);
 }
 
 void
 Namespace::dump(string_table& st)
 {
-#if ENABLE_AVM2
     std::ostringstream s;
 
-    for (container::const_iterator i = _classes.begin(), e = _classes.end();
+    for (container::const_iterator i = _scripts.begin(), e = _scripts.end();
             i != e; ++i)
     {
         const string_table::key t = i->second->getName();
@@ -52,7 +52,7 @@ Namespace::dump(string_table& st)
 
     log_debug("Classes in namespace %s (URI: %s): %s",
             st.value(_uri), _uri, s.str());
-#endif
 }
 
-}
+} // namespace abc
+} // namespace gnash

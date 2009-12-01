@@ -20,11 +20,14 @@
 #include <vector>
 
 namespace gnash {
+    class as_object;
+    class Property;
+    namespace abc {
+        class Namespace;
+    }
+}
 
-class as_object;
-class Namespace;
-class Property;
-
+namespace gnash {
 namespace abc {
 
 /// This type should always be used for the index of AbcBlocks' names.

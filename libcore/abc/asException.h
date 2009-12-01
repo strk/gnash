@@ -19,6 +19,13 @@
 #define GNASH_AS_EXCEPTION_H
 
 namespace gnash {
+    namespace abc {
+        class Namespace;
+        class Script;
+    }
+}
+
+namespace gnash {
 
 class asException
 {
@@ -27,8 +34,8 @@ public:
 	void setEnd(boost::uint32_t i) { mEnd = i; }
 	void setCatch(boost::uint32_t i) { mCatch = i; }
 	void catchAny() { mCatchAny = true; }
-	void setCatchType(abc::Class* p) { mCatchType = p; }
-	void setNamespace(Namespace* n) { _namespace = n; }
+	void setCatchType(abc::Script* p) { mCatchType = p; }
+	void setNamespace(abc::Namespace* n) { _namespace = n; }
 	void setName(string_table::key name) { _name = name; }
 
 private:
@@ -36,8 +43,8 @@ private:
 	boost::uint32_t mEnd;
 	boost::uint32_t mCatch;
 	bool mCatchAny;
-	abc::Class *mCatchType;
-	Namespace *_namespace;
+	abc::Script *mCatchType;
+    abc::Namespace *_namespace;
 	string_table::key _name;
 };
 

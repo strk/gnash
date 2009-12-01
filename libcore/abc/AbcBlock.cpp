@@ -24,7 +24,7 @@
 #include "VM.h"
 #include "log.h"
 #include "ClassHierarchy.h"
-#include "Class.h"
+#include "Script.h"
 #include "namedStrings.h"
 #include "CodeStream.h"
 #include "action_buffer.h"
@@ -36,10 +36,10 @@ namespace gnash {
 namespace abc {
 
 bool
-Trait::finalize(AbcBlock *pBlock, abc::Class *pClass, bool do_static)
+Trait::finalize(AbcBlock *pBlock, abc::Script *pScript, bool do_static)
 {
 	log_abc("Finalize class %s (%s), trait kind: %s", 
-            pBlock->_stringTable->value(pClass->getName()), pClass, _kind);
+            pBlock->_stringTable->value(pScript->getName()), pScript, _kind);
 
 	switch (_kind)
 	{
@@ -47,12 +47,12 @@ Trait::finalize(AbcBlock *pBlock, abc::Class *pClass, bool do_static)
 	case KIND_CONST:
 	{
 		// Validate the type.
-		abc::Class *pType;
+		abc::Script *pType;
 		if (_typeIndex) {
 			log_abc("Trait type: %s", 
                 pBlock->_stringPool[
                     pBlock->_multinamePool[_typeIndex].getABCName()]);
-			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
+			pType = pBlock->locateScript(pBlock->_multinamePool[_typeIndex]);
 		}
 		else {
 			pType = pBlock->mTheObject;
@@ -73,23 +73,23 @@ Trait::finalize(AbcBlock *pBlock, abc::Class *pClass, bool do_static)
 		log_abc("Adding property=%s with value=%s slot=%u",
                 pBlock->_stringPool[_name], _value, _slotID);
 
-		pClass->addValue(_globalName, _namespace, _slotID, pType, 
+		pScript->addValue(_globalName, _namespace, _slotID, pType, 
 			_value, _kind == KIND_CONST, do_static);
 		break;
 	}
 	case KIND_METHOD:
 	{
-		pClass->addMethod(_globalName, _namespace, _method, false);
+		pScript->addMethod(_globalName, _namespace, _method, false);
 		break;
 	}
 	case KIND_GETTER:
 	{
-		pClass->addGetter(_name, _namespace, _method, do_static);
+		pScript->addGetter(_name, _namespace, _method, do_static);
 		break;
 	}
 	case KIND_SETTER:
 	{
-		pClass->addSetter(_name, _namespace, _method, do_static);
+		pScript->addSetter(_name, _namespace, _method, do_static);
 		break;
 	}
 	case KIND_CLASS:
@@ -97,13 +97,13 @@ Trait::finalize(AbcBlock *pBlock, abc::Class *pClass, bool do_static)
 		log_abc("Adding class %s, value %s, slot=%u",
                 pBlock->_stringPool[_name], _value, _slotID);
 
-		pClass->addMemberClass(_globalName, _namespace, _slotID, 
+		pScript->addMemberScript(_globalName, _namespace, _slotID, 
 			pBlock->_classes[_classInfoIndex], do_static);
 		break;
 	}
 	case KIND_FUNCTION:
 	{
-		pClass->addSlotFunction(_name, _namespace, _slotID, _method, do_static);
+		pScript->addSlotFunction(_name, _namespace, _slotID, _method, do_static);
 		break;
 	}
 	default:
@@ -124,9 +124,9 @@ Trait::finalize_mbody(AbcBlock *pBlock, Method *pMethod)
 	case KIND_CONST:
 	{
 		// Validate the type.
-		abc::Class *pType;
+		abc::Script *pType;
 		if (_typeIndex) {
-			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
+			pType = pBlock->locateScript(pBlock->_multinamePool[_typeIndex]);
         }
 		else {
 			pType = pBlock->mTheObject;
@@ -165,7 +165,7 @@ Trait::finalize_mbody(AbcBlock *pBlock, Method *pMethod)
 	}
 	case KIND_CLASS:
 	{
-		pMethod->addMemberClass(_name, _namespace, _slotID, 
+		pMethod->addMemberScript(_name, _namespace, _slotID, 
 			pBlock->_classes[_classInfoIndex]);
 		break;
 	}
@@ -250,13 +250,13 @@ Trait::read(SWFStream* in, AbcBlock *pBlock)
         {
             _slotID = in->read_V32();
             _classInfoIndex = in->read_V32();
-            log_abc("Slot id: %u Class index: %u Class Name: %s", _slotID, 
+            log_abc("Slot id: %u Script index: %u Script Name: %s", _slotID, 
                 _classInfoIndex, 
                 pBlock->_stringTable->value(
                     pBlock->_classes[_classInfoIndex]->getName()));
 
             if (_classInfoIndex >= pBlock->_classes.size()) {
-                log_error(_("Bad Class id in trait."));
+                log_error(_("Bad Script id in trait."));
                 return false;
             }
             break;
@@ -321,7 +321,7 @@ AbcBlock::AbcBlock()
 	mCH = &VM::get().getMachine()->global()->classHierarchy();
 	// TODO: Make this the real 'Object' prototype.
 	mCH->getGlobalNs()->stubPrototype(*mCH, NSV::CLASS_OBJECT);
-	mTheObject = mCH->getGlobalNs()->getClass(NSV::CLASS_OBJECT);
+	mTheObject = mCH->getGlobalNs()->getScript(NSV::CLASS_OBJECT);
 }
 
 void
@@ -329,11 +329,11 @@ AbcBlock::prepare(Machine* mach)
 {
 
     std::for_each(_classes.begin(), _classes.end(),
-            std::mem_fun(&abc::Class::initPrototype));
+            std::mem_fun(&abc::Script::initPrototype));
 
     // The last (entry) script has Global as its prototype.
     // This can be deduced because the global classes are initialized with a
-    // slot on script 0 (entry script). OpNewClass then attempts to set the
+    // slot on script 0 (entry script). OpNewScript then attempts to set the
     // corresponding slot once the class has been constructed. At this point,
     // global should verifiably be on the stack, so the slots are expected
     // to be set on the global object.
@@ -341,7 +341,7 @@ AbcBlock::prepare(Machine* mach)
     // scripts have Global as a target object (prototype), so for now we
     // will do that.
     std::for_each(_scripts.begin(), _scripts.end(),
-            boost::bind(&abc::Class::setPrototype, _1, mach->global()));
+            boost::bind(&abc::Script::setPrototype, _1, mach->global()));
  
     std::for_each(_methods.begin(), _methods.end(),
             boost::bind(&Method::initPrototype, _1, mach));
@@ -405,8 +405,8 @@ AbcBlock::setNamespaceURI(Namespace *ns, abc::URI ABCName)
 	log_abc("Namespace: %s AbcURI=%u URI=%u.", name, ABCName, global_key);
 }
 
-abc::Class*
-AbcBlock::locateClass(const std::string& className)
+abc::Script*
+AbcBlock::locateScript(const std::string& className)
 {
 
     const std::string::size_type pos = className.rfind(".");
@@ -432,18 +432,18 @@ AbcBlock::locateClass(const std::string& className)
         }
     }
     
-    return locateClass(a);
+    return locateScript(a);
 
 }
 
-abc::Class*
-AbcBlock::locateClass(MultiName& m)
+abc::Script*
+AbcBlock::locateScript(MultiName& m)
 {
-	abc::Class* found = 0;
+	abc::Script* found = 0;
 
 	if (m.getNamespace())
 	{
-		found = m.getNamespace()->getClass(m.getGlobalName());
+		found = m.getNamespace()->getScript(m.getGlobalName());
 		if (found) return found;
 	}
 	if (m.namespaceSet() && !m.namespaceSet()->empty())
@@ -451,7 +451,7 @@ AbcBlock::locateClass(MultiName& m)
 		std::vector<Namespace*>::const_iterator i;
 		for (i = m.namespaceSet()->begin(); i != m.namespaceSet()->end(); ++i) {
 
-			found = (*i)->getClass(m.getGlobalName());
+			found = (*i)->getScript(m.getGlobalName());
 			if (found) return found;
 		}
 	}
@@ -823,12 +823,12 @@ AbcBlock::read_method_infos()
             // TODO: this can be 'void', which clearly isn't a class, so this
             // seems bogus. As setReturnType is a no-op, we should log it
             // and ignore it.
-            abc::Class* rtClass = locateClass(_multinamePool[return_type]);
-            if (!rtClass) {
+            abc::Script* rtScript = locateScript(_multinamePool[return_type]);
+            if (!rtScript) {
                 log_abc(_("ABC: Unknown return type."));
             }
 
-            pMethod->setReturnType(rtClass);
+            pMethod->setReturnType(rtScript);
         }
 		for (size_t j = 0; j < param_count; ++j) {
 			log_abc("  Reading parameter %u", j);
@@ -848,7 +848,7 @@ AbcBlock::read_method_infos()
 			
             // A value of 0 is legitimate, meaning 'any (*)'. 
             if (ptype) {
-                abc::Class* param_type = locateClass(_multinamePool[ptype]);
+                abc::Script* param_type = locateScript(_multinamePool[ptype]);
 
                 if (!param_type) {
                     log_abc((_("ABC: Unknown parameter type.")));
@@ -936,7 +936,7 @@ AbcBlock::read_instances()
 	log_abc("There are %u instances.", count);
 	_classes.resize(count);
 	for (size_t i = 0; i < count; ++i) {
-		abc::Class* pClass;
+		abc::Script* pScript;
 		//Read multiname index.
 		boost::uint32_t index = _stream->read_V32();
 		// 0 is allowed as a name, typically for the last entry.
@@ -958,16 +958,16 @@ AbcBlock::read_instances()
 			return false;
 		}
 
-		pClass = locateClass(multiname);
+		pScript = locateScript(multiname);
 		
-        if (!pClass) {
+        if (!pScript) {
 
             const string_table::key className = multiname.getGlobalName();
 
-			pClass = mCH->newClass();
-            pClass->setName(className);
+			pScript = mCH->newScript();
+            pScript->setName(className);
 
-			if (!multiname.getNamespace()->addClass(className, pClass)) {
+			if (!multiname.getNamespace()->addScript(className, pScript)) {
 
 				log_error(_("Duplicate class registration."));
 				return false;
@@ -980,8 +980,8 @@ AbcBlock::read_instances()
             multiname.getNamespace()->dump(*_stringTable);
 
 		}
-		pClass->setDeclared();
-		_classes[i] = pClass;
+		pScript->setDeclared();
+		_classes[i] = pScript;
 		boost::uint32_t super_index = _stream->read_V32();
 
 		if (super_index && super_index >= _multinamePool.size()) {
@@ -990,10 +990,10 @@ AbcBlock::read_instances()
 		}
 
 		if (!super_index) {
-			pClass->setSuper(mTheObject);
+			pScript->setSuper(mTheObject);
 		}
 		else {
-			abc::Class *pSuper = locateClass(_multinamePool[super_index]);
+			abc::Script *pSuper = locateScript(_multinamePool[super_index]);
 			if (!pSuper)
 			{
 				log_error(_("ABC: Super type not found (%s)"), 
@@ -1013,25 +1013,25 @@ AbcBlock::read_instances()
 				return false;
 			}
 
-			if (pSuper == pClass)
+			if (pSuper == pScript)
 			{
-				log_error(_("ABC: Class cannot be its own supertype."));
+				log_error(_("ABC: Script cannot be its own supertype."));
 				return false;
 			}
-			pClass->setSuper(pSuper);
+			pScript->setSuper(pSuper);
 			pSuper->setInherited();
 		}
 
 		boost::uint8_t flags = _stream->read_u8();
 		log_abc("Instance %u(%s) multiname index=%u name=%s super index=%u "
-                "flags=%X", i, pClass, index, 
+                "flags=%X", i, pScript, index, 
                 _stringPool[_multinamePool[index].getABCName()],
                 super_index, flags | 0x0);
 
-		if (flags & INSTANCE_SEALED) pClass->setSealed();
-		if (flags & INSTANCE_FINAL) pClass->setFinal();
-		if (flags & INSTANCE_INTERFACE) pClass->setInterface();
-		if ((flags & 7) == INSTANCE_DYNAMIC) pClass->setDynamic();
+		if (flags & INSTANCE_SEALED) pScript->setSealed();
+		if (flags & INSTANCE_FINAL) pScript->setFinal();
+		if (flags & INSTANCE_INTERFACE) pScript->setInterface();
+		if ((flags & 7) == INSTANCE_DYNAMIC) pScript->setDynamic();
 
 		if (flags & INSTANCE_PROTECTED_NS) {
 			boost::uint32_t ns_index = _stream->read_V32();
@@ -1040,10 +1040,10 @@ AbcBlock::read_instances()
 				return false;
 			}
 			// Set the protected namespace's parent, if it exists.
-			if (pClass->getSuper()->hasProtectedNs())
+			if (pScript->getSuper()->hasProtectedNs())
 				_namespacePool[ns_index]->setParent(
-                        pClass->getSuper()->getProtectedNs());
-			pClass->setProtectedNs(_namespacePool[ns_index]);
+                        pScript->getSuper()->getProtectedNs());
+			pScript->setProtectedNs(_namespacePool[ns_index]);
 		}
 
 		// This is the list of interfaces which the instances has agreed to
@@ -1058,14 +1058,14 @@ AbcBlock::read_instances()
 				log_error(_("ABC: Bad name for interface."));
 				return false;
 			}
-			abc::Class *pInterface = locateClass(_multinamePool[i_index]);
+			abc::Script *pInterface = locateScript(_multinamePool[i_index]);
 			// These may be undefined still, so don't check interface just yet.
 			if (0) //!pInterface || !pInterface->isInterface())
 			{
 				log_error(_("ABC: Can't implement a non-interface type."));
 				return false;
 			}
-			pClass->pushInterface(pInterface);
+			pScript->pushInterface(pInterface);
 		}
 
 		// The next thing should be the constructor.
@@ -1078,12 +1078,12 @@ AbcBlock::read_instances()
 			return false;
 		}
 		// Don't validate for previous owner.
-		pClass->setConstructor(_methods[offset]);
+		pScript->setConstructor(_methods[offset]);
 
 		/*	Calling the Method::setOwner always results in a segmentation fault, 
 		since it tries to modify Method.mPrototype, which is never
 		initialized.  The parser seems to work ok without this call.*/
-//		_methods[offset]->setOwner(pClass);
+//		_methods[offset]->setOwner(pScript);
 
 		// Next come the 'traits' of the instance. (The members.)
 		boost::uint32_t tcount = _stream->read_V32();
@@ -1091,7 +1091,7 @@ AbcBlock::read_instances()
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			Trait &aTrait = newTrait();
-			aTrait.set_target(pClass, false);
+			aTrait.set_target(pScript, false);
 			if (!aTrait.read(_stream, this))
 				return false;
 		}
@@ -1109,9 +1109,9 @@ AbcBlock::read_classes()
 	log_abc("There are %u classes.", count);
 	
     for (size_t i = 0; i < count; ++i) {
-		abc::Class* pClass = _classes[i];
+		abc::Script* pScript = _classes[i];
 		boost::uint32_t offset = _stream->read_V32();
-		log_abc("Class %u(%s) static constructor index=%u", i, pClass, offset);
+		log_abc("Script %u(%s) static constructor index=%u", i, pScript, offset);
 
         if (offset >= _methods.size()) {
 			log_error(_("ABC: Out of bound static constructor for class."));
@@ -1119,18 +1119,18 @@ AbcBlock::read_classes()
 		}
 
 		// Don't validate for previous owner.
-		pClass->setStaticConstructor(_methods[offset]);
+		pScript->setStaticConstructor(_methods[offset]);
 
 		/*	Calling the Method::setOwner always results in a segmentation fault, 
 		since it tries to modify Method.mPrototype, which is never
 		initialized.  The parser seems to work ok without this call.*/
-//		_methods[offset]->setOwner(pClass);
+//		_methods[offset]->setOwner(pScript);
 		
 		boost::uint32_t tcount = _stream->read_V32();
 		log_abc("This class has %u traits.", tcount);
 		for (size_t j = 0; j < tcount; ++j) {
 			Trait &aTrait = newTrait();
-			aTrait.set_target(pClass, true);
+			aTrait.set_target(pScript, true);
 			if (!(aTrait.read(_stream, this)))
 				return false;
 		}
@@ -1149,7 +1149,7 @@ AbcBlock::read_scripts()
 	_scripts.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		abc::Class* pScript = mCH->newClass();
+		abc::Script* pScript = mCH->newScript();
 		_scripts[i] = pScript;
 
 		boost::uint32_t offset = _stream->read_V32();
@@ -1257,7 +1257,7 @@ AbcBlock::read_method_bodies()
 				pExcept->catchAny();
 			}
 			else {
-				abc::Class *pType = locateClass(_multinamePool[catch_type]);
+				abc::Script *pType = locateScript(_multinamePool[catch_type]);
 				if (!pType) {
 
 					log_error(_("ABC: Unknown type of object to catch. (%s)"), 

@@ -700,7 +700,7 @@ Debugger::lookupSymbol(std::string &name)
 //    GNASH_REPORT_FUNCTION;
     if (_symbols.size()) {
 	VM& vm = VM::get(); // cache this ?
-	std::string namei = PROPNAME(name);
+	std::string namei = name;
 	std::map<void *, std::string>::const_iterator it;
 	for (it=_symbols.begin(); it != _symbols.end(); it++) {
 	    if (it->second == namei) {
@@ -718,7 +718,7 @@ Debugger::addSymbol(void *ptr, std::string name)
 {
 //    GNASH_REPORT_FUNCTION;
     VM& vm = VM::get(); // cache this ?
-    std::string namei = PROPNAME(name);
+    std::string namei = name;
     if (namei.size() > 1)
     {
 //	log_debug ("Adding symbol %s at address: %p", namei, ptr);

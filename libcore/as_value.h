@@ -50,7 +50,6 @@ namespace gnash {
 	class as_function;
 	class MovieClip;
 	class DisplayObject;
-	class Namespace;
     class SimpleBuffer;
 }
 namespace amf {
@@ -80,13 +79,6 @@ isInf(const T& num)
 	return isNaN(num - num);
 }
 
-
-/// Use this methods to obtain a properly-formatted property name
-/// The methods will convert the name to lowercase if the current VM target
-/// is SWF6 or lower
-///
-//#define PROPNAME(x) ( VM::get().getSWFVersion() < 7 ? boost::to_lower_copy(std::string(x)) : (x) )
-#define PROPNAME(x) ( x )
 
 /// These are the primitive types, see the ECMAScript reference.
 enum primitive_types
@@ -135,10 +127,6 @@ public:
 		OBJECT,
 		OBJECT_EXCEPT,
 
-		/// ActionScript function reference
-		AS_FUNCTION,
-		AS_FUNCTION_EXCEPT,
-
 		/// MovieClip reference
 		MOVIECLIP,
 		MOVIECLIP_EXCEPT
@@ -171,7 +159,7 @@ public:
 	/// Construct a value from an AMF element
 	as_value(const amf::Element& el);
 	
-	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
+	/// Construct a NULL, OBJECT, MOVIECLIP value
 	//
 	/// See as_object::to_movie and as_object::to_function
 	///
@@ -180,23 +168,17 @@ public:
 	///
 	as_value(as_object* obj);
 
-	/// Construct an NULL, MOVIECLIP, AS_FUNCTION or OBJECT value
-	as_value(boost::intrusive_ptr<as_object> obj);
-
-	/// Construct a NULL or AS_FUNCTION value
-	as_value(as_function* func);
-
 	/// Read AMF0 data from the given buffer
 	//
 	/// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
 	/// encoded data. Must start with a type byte unless third parameter is set.
 	///
 	/// On success, sets the given as_value and returns true.
-	/// On error (premature end of buffer, etc.) returns false and leaves the given
-	/// as_value untouched.
+	/// On error (premature end of buffer, etc.) returns false and
+    /// leaves the given as_value untouched.
 	///
-	/// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but use what
-	/// you passed instead.
+	/// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but
+    /// use what you passed instead.
 	///
 	/// The l-value you pass as the first parameter (buffer start) is updated to
 	/// point just past the last byte parsed
@@ -292,10 +274,7 @@ public:
 
 	/// \brief
 	/// Return true if this value is callable
-	/// (AS_FUNCTION).
-	bool is_function() const {
-		return m_type == AS_FUNCTION;
-	}
+	bool is_function() const;
 
 	/// Return true if this value is strictly a string
 	//
@@ -323,10 +302,10 @@ public:
 
 	/// \brief
 	/// Return true if this value is an object
-	/// (OBJECT, AS_FUNCTION or MOVIECLIP).
+	/// (OBJECT, or MOVIECLIP).
 	bool is_object() const
 	{
-		return m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP;
+		return m_type == OBJECT || m_type == MOVIECLIP;
 	}
 
 	/// \brief
@@ -513,7 +492,7 @@ public:
 
 	void set_nan() { set_double(NaN); }
 
-	/// Make this value a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
+	/// Make this value a NULL, OBJECT, MOVIECLIP value
 	//
 	/// See as_object::to_movie and as_object::to_function
 	///
@@ -521,11 +500,6 @@ public:
 	/// if not-null
 	///
 	void set_as_object(as_object* obj);
-
-	void set_as_object(boost::intrusive_ptr<as_object> obj);
-
-	/// Make this a NULL or AS_FUNCTION value
-	void set_as_function(as_function* func);
 
 	void set_undefined();
 
@@ -543,7 +517,7 @@ public:
     bool is_exception() const {
         return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
                 || m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
-                || m_type == OBJECT_EXCEPT || m_type == AS_FUNCTION_EXCEPT
+                || m_type == OBJECT_EXCEPT 
                 || m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT);
 	}
 
@@ -618,13 +592,15 @@ private:
 	/// 4. Object
 	/// 5. MovieClip
 	/// 6. String
-    typedef boost::variant<boost::blank, double,
-            bool, as_object*, CharacterProxy, std::string> AsValueType;
+    typedef boost::variant<boost::blank,
+                           double,
+                           bool,
+                           as_object*,
+                           CharacterProxy,
+                           std::string>
+    AsValueType;
     
     AsValueType _value;
-
-	/// Get the function pointer variant member (we assume m_type == FUNCTION)
-	as_function* getFun() const;
 
 	/// Get the object pointer variant member (we assume m_type == OBJECT)
 	as_object* getObj() const;

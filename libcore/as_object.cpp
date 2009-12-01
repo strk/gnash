@@ -43,7 +43,6 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <utility> // for std::pair
 #include "namedStrings.h"
-#include "Class.h"
 
 
 namespace gnash {
@@ -284,8 +283,23 @@ as_object::as_object()
 }
 
 as_value
-as_object::call(const fn_call& /*fn*/) {
+as_object::call(const fn_call& /*fn*/)
+{
     throw ActionTypeError();
+}
+
+const std::string&
+as_object::stringValue() const
+{
+    // TODO: AS3 returns a string describing the type of object, e.g.
+    // "[object MyObject]"
+    if (isAS3(*this)) {
+        static const std::string str("[object Object]");
+        return str;
+    }
+
+    static const std::string str("[object Object]");
+    return str;
 }
 
 std::pair<bool,bool>
@@ -773,7 +787,7 @@ void
 as_object::init_property(const std::string& key, as_function& getter,
 		as_function& setter, int flags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(key);
 	init_property(k, getter, setter, flags, nsname);
 }
 
@@ -792,7 +806,7 @@ void
 as_object::init_property(const std::string& key, as_c_function_ptr getter,
 		as_c_function_ptr setter, int flags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(key);
 	init_property(k, getter, setter, flags, nsname);
 }
 
@@ -827,7 +841,7 @@ void
 as_object::init_readonly_property(const std::string& key, as_function& getter,
 	int initflags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(key);
 
 	init_property(k, getter, getter, initflags | PropFlags::readOnly
 		| PropFlags::isProtected, nsname);
@@ -847,7 +861,7 @@ void
 as_object::init_readonly_property(const std::string& key,
         as_c_function_ptr getter, int initflags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(PROPNAME(key));
+	string_table::key k = getStringTable(*this).find(key);
 
 	init_property(k, getter, getter, initflags | PropFlags::readOnly
 		| PropFlags::isProtected, nsname);
@@ -1310,10 +1324,16 @@ getSWFVersion(const as_object& o)
     return o.vm().getSWFVersion();
 }
 
-Global_as& getGlobal(const as_object& o)
+Global_as&
+getGlobal(const as_object& o)
 {
     return *o.vm().getGlobal();
 }
 
+bool
+isAS3(const as_object& o)
+{
+    return isAS3(getVM(o));
+}
 
 } // end of gnash namespace

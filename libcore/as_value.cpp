@@ -271,7 +271,7 @@ public:
         if ( _error ) return true;
 
         // Tested with SharedObject and AMFPHP
-        if ( val.is_function() )
+        if (val.is_function())
         {
             log_debug("AMF0: skip serialization of FUNCTION property");
             return true;
@@ -318,23 +318,6 @@ private:
 
 };
     
-//
-// as_value -- ActionScript value type
-//
-
-as_value::as_value(as_function* func)
-    :
-    m_type(AS_FUNCTION)
-{
-	if (func) {
-		_value = func;
-	}
-	else {
-		m_type = NULLTYPE;
-		_value = boost::blank();
-	}
-}
-
 // Conversion to const std::string&.
 std::string
 as_value::to_string() const
@@ -385,10 +368,9 @@ as_value::to_string() const
 			return b ? "true" : "false";
 		}
 
-		case AS_FUNCTION:
 		case OBJECT:
 		{
-            as_object* obj = m_type == AS_FUNCTION ? getFun() : getObj();
+            as_object* obj = getObj();
             String_as* s;
             if (isNativeType(obj, s)) return s->value();
 
@@ -411,9 +393,10 @@ as_value::to_string() const
 #endif
 			}
 
-			if ( m_type == OBJECT ) return "[type Object]";
-			assert(m_type == AS_FUNCTION);
-			return "[type Function]";
+			if (m_type == OBJECT) {
+                return is_function() ? "[type Function]" :
+                                       "[type Object]";
+            }
 
 		}
 
@@ -449,7 +432,6 @@ as_value::ptype() const
 	{
         case STRING: return PTYPE_STRING;
         case NUMBER: return PTYPE_NUMBER;
-        case AS_FUNCTION:
         case UNDEFINED:
         case NULLTYPE:
         case MOVIECLIP:
@@ -504,7 +486,7 @@ as_value::convert_to_primitive()
 as_value
 as_value::to_primitive(AsType hint) const
 {
-	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
+	if (m_type != OBJECT) return *this; 
 
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
@@ -513,21 +495,18 @@ as_value::to_primitive(AsType hint) const
 	// TODO: implement as_object::DefaultValue (ECMA-262 - 8.6.2.6)
 
 	as_value method;
-	as_object* obj = NULL;
+	as_object* obj(0);
 
-	if (hint == NUMBER)
-	{
-#if 1
-		if ( m_type == MOVIECLIP )
-		{
-			return as_value(NaN);
-		}
-#endif
-		if ( m_type == OBJECT ) obj = getObj();
-		else obj = getFun();
+	if (hint == NUMBER) {
 
-		if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function())) 
-		{
+		if (m_type == MOVIECLIP) return as_value(NaN);
+
+        assert(m_type == OBJECT);
+		obj = getObj();
+
+		if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
+                (!method.is_function())) {
+
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" valueOf not found");
 #endif
@@ -538,17 +517,12 @@ as_value::to_primitive(AsType hint) const
             return as_value();
 		}
 	}
-	else
-	{
-		assert(hint==STRING);
+	else {
+		assert(hint == STRING);
 
-		if ( m_type == MOVIECLIP )
-		{
-			return as_value(getCharacterProxy().getTarget());
-		}
-
-		if ( m_type == OBJECT ) obj = getObj();
-		else obj = getFun();
+		if (m_type == MOVIECLIP) return getCharacterProxy().getTarget();
+        assert(m_type == OBJECT);
+		obj = getObj();
 
 		// @@ Moock says, "the value that results from
 		// calling toString() on the object".
@@ -558,14 +532,14 @@ as_value::to_primitive(AsType hint) const
 		// text representation for that object is used
 		// instead.
 		//
-		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) ||
-                (!method.is_function()) ) // ECMA says ! is_object()
+		if ((!obj->get_member(NSV::PROP_TO_STRING, &method)) ||
+                (!method.is_function())) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" toString not found");
 #endif
-			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
-                    (!method.is_function()) ) // ECMA says ! is_object()
+			if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
+                    (!method.is_function())) // ECMA says ! is_object()
 			{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(" valueOf not found");
@@ -583,7 +557,7 @@ as_value::to_primitive(AsType hint) const
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);
 #endif
-	if ( ret.m_type == OBJECT || ret.m_type == AS_FUNCTION ) // not a primitive 
+	if (ret.m_type == OBJECT)
 	{
 		throw ActionTypeError();
 	}
@@ -711,7 +685,6 @@ as_value::to_number() const
             return getNum();
 
         case OBJECT:
-        case AS_FUNCTION:
         {
             // @@ Moock says the result here should be
             // "the return value of the object's valueOf()
@@ -729,7 +702,9 @@ as_value::to_number() const
                 log_debug(_("to_primitive(%s, NUMBER) threw an "
                             "ActionTypeError %s"), *this, e.what());
 #endif
-                if (m_type == AS_FUNCTION && swfversion < 6) return 0;
+                if (is_function() && swfversion < 6) {
+                    return 0;
+                }
                 
                 return NaN;
             }
@@ -754,7 +729,7 @@ as_value::to_element() const
     VM& vm = VM::get();
     //int swfVersion = vm.getSWFVersion();
     boost::shared_ptr<amf::Element> el ( new amf::Element );
-    boost::intrusive_ptr<as_object> ptr = to_object(*vm.getGlobal());
+    as_object* ptr = to_object(*vm.getGlobal());
 
     switch (m_type) {
       case UNDEFINED:
@@ -774,15 +749,12 @@ as_value::to_element() const
 	  break;
       case OBJECT:
       {
-	  el->makeObject();
-	  PropsSerializer props(*el, vm);
-	  ptr->visitProperties<Exists>(props);
+          if (is_function()) break;
+          el->makeObject();
+          PropsSerializer props(*el, vm);
+          ptr->visitProperties<Exists>(props);
 	  break;
       }
-      case AS_FUNCTION:
-	  log_unimpl("Converting an AS function to an element is not supported");
-          // TODO: what kind of Element will be left with ? Should we throw an exception ?
-	  break;
       case MOVIECLIP:
 	  log_unimpl("Converting a Movie Clip to an element is not supported");
           // TODO: what kind of Element will be left with ? Should we throw an exception ?
@@ -823,7 +795,6 @@ as_value::to_bool_v7() const
 		case BOOLEAN:
 			return getBool();
 		case OBJECT:
-		case AS_FUNCTION:
 			return true;
 
 		case MOVIECLIP:
@@ -855,7 +826,6 @@ as_value::to_bool_v5() const
 		case BOOLEAN:
 			return getBool();
 		case OBJECT:
-		case AS_FUNCTION:
 			return true;
 
 		case MOVIECLIP:
@@ -888,7 +858,6 @@ as_value::to_bool_v6() const
 		case BOOLEAN:
 			return getBool();
 		case OBJECT:
-		case AS_FUNCTION:
 			return true;
 
 		case MOVIECLIP:
@@ -918,9 +887,6 @@ as_value::to_object(Global_as& global) const
 	{
 		case OBJECT:
 			return getObj();
-
-		case AS_FUNCTION:
-			return getFun();
 
 		case MOVIECLIP:
 			return getObject(toDisplayObject());
@@ -970,12 +936,11 @@ as_value::setDisplayObject(DisplayObject& sprite)
 as_function*
 as_value::to_function() const
 {
-    if (m_type == AS_FUNCTION) {
-	    // OK.
-	    return getFun();
+    if (m_type == OBJECT) {
+	    return getObj()->to_function();
     }
 
-    return NULL;
+    return 0;
 }
 
 void
@@ -1006,41 +971,11 @@ as_value::set_as_object(as_object* obj)
 		setDisplayObject(*obj->displayObject());
 		return;
 	}
-	as_function* func = obj->to_function();
-	if ( func )
-	{
-		set_as_function(func);
-		return;
-	}
-	if (m_type != OBJECT || getObj() != obj)
-	{
+
+	if (m_type != OBJECT || getObj() != obj) {
 		m_type = OBJECT;
 		_value = obj;
 	}
-}
-
-void
-as_value::set_as_object(boost::intrusive_ptr<as_object> obj)
-{
-	set_as_object(obj.get());
-}
-
-void
-as_value::set_as_function(as_function* func)
-{
-    if (m_type != AS_FUNCTION || getFun() != func)
-    {
-	m_type = AS_FUNCTION;
-	if (func)
-	{
-		_value = func;
-	}
-	else
-	{
-		m_type = NULLTYPE;
-		_value = boost::blank(); // to properly destroy anything else might be stuffed into it
-	}
-    }
 }
 
 bool
@@ -1063,8 +998,8 @@ as_value::equals(const as_value& v) const
     //
     if ( SWFVersion < 6 )
     {
-        if ( m_type == AS_FUNCTION ) this_nulltype = true;
-        if ( v.m_type == AS_FUNCTION ) v_nulltype = true;
+        if (is_function()) this_nulltype = true;
+        if (v.is_function()) v_nulltype = true;
     }
 
     if (this_nulltype || v_nulltype)
@@ -1075,8 +1010,8 @@ as_value::equals(const as_value& v) const
         return this_nulltype == v_nulltype;
     }
 
-    bool obj_or_func = (m_type == OBJECT || m_type == AS_FUNCTION);
-    bool v_obj_or_func = (v.m_type == OBJECT || v.m_type == AS_FUNCTION);
+    bool obj_or_func = (m_type == OBJECT);
+    bool v_obj_or_func = (v.m_type == OBJECT);
 
     /// Compare to same type
     if ( obj_or_func && v_obj_or_func )
@@ -1119,7 +1054,7 @@ as_value::equals(const as_value& v) const
     // 20. If Type(x) is either String or Number and Type(y) is Object,
     //     return the result of the comparison x == ToPrimitive(y).
     if ( (m_type == STRING || m_type == NUMBER ) && 
-            (v.m_type == OBJECT || v.m_type == AS_FUNCTION ))
+            (v.m_type == OBJECT))
     {
         // convert this value to a primitive and recurse
 	try
@@ -1146,7 +1081,7 @@ as_value::equals(const as_value& v) const
     // 21. If Type(x) is Object and Type(y) is either String or Number,
     //    return the result of the comparison ToPrimitive(x) == y.
     if ((v.m_type == STRING || v.m_type == NUMBER) && 
-            (m_type == OBJECT || m_type == AS_FUNCTION))
+            (m_type == OBJECT))
     {
         // convert this value to a primitive and recurse
         try
@@ -1267,7 +1202,7 @@ as_value::typeOf() const
 			return "boolean";
 
 		case as_value::OBJECT:
-			return "object";
+            return is_function() ? "function" : "object";
 
 		case as_value::MOVIECLIP:
 		{
@@ -1279,9 +1214,6 @@ as_value::typeOf() const
 
 		case as_value::NULLTYPE:
 			return "null";
-
-		case as_value::AS_FUNCTION:
-			return "function";
 
 		default:
 			if (is_exception())
@@ -1309,7 +1241,6 @@ as_value::equalsSameType(const as_value& v) const
 			return true;
 
 		case OBJECT:
-		case AS_FUNCTION:
 		case BOOLEAN:
 		case STRING:
 			return _value == v._value;
@@ -1370,12 +1301,6 @@ as_value::toDebugString() const
 			ret = boost::format("[object(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
 			return ret.str();
 		}
-		case AS_FUNCTION:
-		{
-			as_function* obj = getFun();
-			ret = boost::format("[function(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
-			return ret.str();
-		}
 		case STRING:
 			return "[string:" + getStr() + "]";
 		case NUMBER:
@@ -1422,28 +1347,9 @@ as_value::toDebugString() const
 void
 as_value::operator=(const as_value& v)
 {
-#if 0
-	type the_type = v.m_type;
-	if (v.is_exception())
-		the_type = (type) ((int) the_type - 1);
-#endif
-
 	m_type = v.m_type;
 	_value = v._value;
-
-#if 0
-	if (v.is_exception())
-		flag_exception();
-#endif
 }
-
-as_value::as_value(boost::intrusive_ptr<as_object> obj)
-	:
-	m_type(UNDEFINED)
-{
-	set_as_object(obj);
-}
-
 
 /// Examples:
 //
@@ -1564,13 +1470,6 @@ as_value::setReachable() const
 				op->setReachable();
 			break;
 		}
-		case AS_FUNCTION:
-		{
-			as_function* fp = getFun();
-			if (fp)
-				fp->setReachable();
-			break;
-		}
 		case MOVIECLIP:
 		{
 			CharacterProxy sp = getCharacterProxy();
@@ -1580,13 +1479,6 @@ as_value::setReachable() const
 		default: break;
 	}
 #endif // GNASH_USE_GC
-}
-
-as_function*
-as_value::getFun() const
-{
-	assert(m_type == AS_FUNCTION);
-	return boost::get<as_object*>(_value)->to_function();
 }
 
 as_object*
@@ -1672,14 +1564,17 @@ as_value::as_value(as_object* obj)
 	set_as_object(obj);
 }
 
+bool
+as_value::is_function() const
+{
+    return m_type == OBJECT && getObj()->to_function();
+}
 
 /// Instantiate this value from an AMF element 
 as_value::as_value(const amf::Element& el)
 	:
 	m_type(UNDEFINED)
 {
-//     GNASH_REPORT_FUNCTION;    
-//     el.dump();
     
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
@@ -2236,12 +2131,9 @@ as_value::writeAMF0(SimpleBuffer& buf,
             log_unimpl(_("serialization of as_value of type %d"), m_type);
             return false;
 
-        case AS_FUNCTION:
-            log_unimpl(_("serialization of as_value of type FUNCTION"), m_type);
-            return false;
-
         case OBJECT:
         {
+            if (is_function()) return false;
             as_object* obj = to_object(*vm.getGlobal());
             assert(obj);
             OffsetTable::iterator it = offsetTable.find(obj);

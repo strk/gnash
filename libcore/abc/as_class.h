@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,34 +15,29 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "log.h"
-#include "abc_function.h"
-#include "fn_call.h"
-#include "Machine.h"
+#ifndef GNASH_ABC_AS_CLASS_H
+#define GNASH_ABC_AS_CLASS_H
+
+#include "as_object.h"
 
 namespace gnash {
 namespace abc {
 
-abc_function::abc_function(Method* methodInfo, Machine* machine)
-    :
-    as_function(*machine->global()),
-    _methodInfo(methodInfo),
-    _machine(machine)
+/// The implementation of a 'Class' type in ActionScript 3.
+//
+/// A Class is a first-class type, i.e. it can be referenced itself in
+/// ActionScript.
+class as_class : public as_object
 {
-}
+public:
+    as_class(Global_as& gl) : as_object(gl) {}
+    virtual ~as_class() {}
 
-// Dispatch.
-as_value
-abc_function::call(const fn_call& fn)
-{
+    virtual const std::string& stringValue() const;
 
-	log_abc("Calling an abc_function id=%u.", _methodInfo->methodID());
-	as_value val = _machine->executeFunction(_methodInfo,fn);
-	log_abc("Done calling abc_function id=%u value=%s",
-            _methodInfo->methodID(), val);
-	return val;
-
-}
+};
 
 } // namespace abc
 } // namespace gnash
+
+#endif

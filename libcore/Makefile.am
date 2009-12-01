@@ -130,15 +130,16 @@ libgnashcore_la_SOURCES = \
 	styles.cpp \
 	Timers.cpp \
 	RGBA.cpp 	\
-	abc/Class.cpp \
 	MovieFactory.cpp \
 	MovieLoader.cpp \
-	Namespace.cpp \
 	$(FREETYPE_SOURCES) \
 	$(NULL)
 
 if ENABLE_AVM2
 libgnashcore_la_SOURCES += \
+	abc/Script.cpp \
+	abc/Namespace.cpp \
+	abc/as_class.cpp \
 	abc/abc_function.cpp \
 	abc/Method.cpp \
 	abc/AbcBlock.cpp \
@@ -214,7 +215,10 @@ noinst_HEADERS = \
 
 if ENABLE_AVM2
 noinst_HEADERS += \
+	abc/Script.h \
+	abc/Namespace.h \
 	swf/DoABCTag.h \
+	abc/as_class.h \
 	abc/abc_function.h \
 	abc/Method.h \
 	abc/asException.h \
@@ -269,8 +273,6 @@ EXTENSIONS_API = \
 	RGBA.h	\
 	Geometry.h	\
 	Video.h \
-	abc/Class.h \
-	Namespace.h \
 	$(NULL)
 
 # These makefile fragments build the ActionScript library for

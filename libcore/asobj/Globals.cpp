@@ -163,42 +163,6 @@ namespace {
     template<typename T> as_object* constructObject(Global_as& gl, const T& arg,
             string_table::key className);
 }
-
-AVM2Global::AVM2Global(abc::Machine& /*machine*/, VM& vm)
-    :
-    _classes(this, 0),
-    _vm(vm),
-    _objectProto(new as_object(*this))
-{
-}
-
-void
-AVM2Global::registerClasses()
-{
-   
-    const string_table::key NS_GLOBAL(0);
-    
-    initObjectClass(_objectProto, *this,
-            ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
-
-    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
-    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
-    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
-    
-    init_member("trace", createFunction(global_trace));
-    init_member("escape", createFunction(global_escape));
-
-    _classes.declareAll(avm2Classes(_vm.getStringTable()));
-    _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_FUNCTION);
-    _classes.getGlobalNs()->getClass(NSV::CLASS_FUNCTION)->setDeclared();
-    _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_OBJECT);
-    _classes.getGlobalNs()->getClass(NSV::CLASS_OBJECT)->setDeclared();
-    _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_ARRAY);
-    _classes.getGlobalNs()->getClass(NSV::CLASS_ARRAY)->setDeclared();
-    _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_STRING);
-    _classes.getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
-
-}
     
 as_object*
 AVM1Global::createObject()
@@ -285,67 +249,6 @@ AVM1Global::createBoolean(bool b)
 {
     return constructObject(*this, b, NSV::CLASS_BOOLEAN);
 }
-    
-as_object*
-AVM2Global::createObject()
-{
-    as_object* obj = new as_object(*this);
-    obj->set_prototype(_objectProto);
-    return obj;
-}
-
-builtin_function*
-AVM2Global::createFunction(Global_as::ASFunction function)
-{
-    builtin_function* f = new builtin_function(*this, function);
-    f->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor());
-    return f;
-}
-
-as_object*
-AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
-{
-    // TODO: this should attach the function to the prototype as its
-    as_object* cl = new builtin_function(*this, ctor);
-    
-    if (prototype) {
-        prototype->init_member(NSV::PROP_CONSTRUCTOR, cl); 
-        cl->init_member(NSV::PROP_PROTOTYPE, prototype);
-    }
-    return cl;
-}
-
-as_object*
-AVM2Global::createString(const std::string& s)
-{
-    // What AVM2 does for createString is untested, so we do the same
-    // as AVM1 for now.
-    return constructObject(*this, s, NSV::CLASS_STRING);
-}
-
-as_object*
-AVM2Global::createNumber(double d)
-{
-    return constructObject(*this, d, NSV::CLASS_NUMBER);
-}
-
-as_object*
-AVM2Global::createBoolean(bool b)
-{
-    return constructObject(*this, b, NSV::CLASS_BOOLEAN);
-}
-
-/// This serves the purpose of hiding the Array_as type from the
-/// implementation, which at least enforces good behaviour from users.
-as_object*
-AVM2Global::createArray()
-{
-    as_object* array = new as_object(*this);
-    array->setArray();
-    array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
-    return array;
-}
 
 void 
 AVM1Global::markReachableResources() const
@@ -430,20 +333,8 @@ AVM1Global::registerClasses()
         case 7:
         case 6:
 
-            _classes.getGlobalNs()->stubPrototype(_classes, 
-                    NSV::CLASS_FUNCTION);
-            
-            _classes.getGlobalNs()->getClass(
-                    NSV::CLASS_FUNCTION)->setDeclared();
-
         case 5:
         
-            _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_OBJECT);
-            _classes.getGlobalNs()->getClass(NSV::CLASS_OBJECT)->setDeclared();
-            _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_ARRAY);
-            _classes.getGlobalNs()->getClass(NSV::CLASS_ARRAY)->setDeclared();
-            _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_STRING);
-            _classes.getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
             // This is surely not correct, but they are not available
             // in SWF4
             init_member("escape", _vm.getNative(100, 0));
@@ -489,6 +380,107 @@ AVM1Global::loadExtensions()
     }
 
 }
+
+#ifdef ENABLE_AVM2
+
+AVM2Global::AVM2Global(abc::Machine& /*machine*/, VM& vm)
+    :
+    _classes(this, 0),
+    _vm(vm),
+    _objectProto(new as_object(*this))
+{
+}
+
+void
+AVM2Global::registerClasses()
+{
+   
+    const string_table::key NS_GLOBAL(0);
+    
+    initObjectClass(_objectProto, *this,
+            ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
+
+    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
+    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
+    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
+    
+    init_member("trace", createFunction(global_trace));
+    init_member("escape", createFunction(global_escape));
+
+    _classes.declareAll(avm2Classes(_vm.getStringTable()));
+    _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_FUNCTION);
+    _classes.getGlobalNs()->getScript(NSV::CLASS_FUNCTION)->setDeclared();
+    _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_OBJECT);
+    _classes.getGlobalNs()->getScript(NSV::CLASS_OBJECT)->setDeclared();
+    _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_ARRAY);
+    _classes.getGlobalNs()->getScript(NSV::CLASS_ARRAY)->setDeclared();
+    _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_STRING);
+    _classes.getGlobalNs()->getScript(NSV::CLASS_STRING)->setDeclared();        
+
+}
+
+as_object*
+AVM2Global::createObject()
+{
+    as_object* obj = new as_object(*this);
+    obj->set_prototype(_objectProto);
+    return obj;
+}
+
+builtin_function*
+AVM2Global::createFunction(Global_as::ASFunction function)
+{
+    builtin_function* f = new builtin_function(*this, function);
+    f->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor());
+    return f;
+}
+
+as_object*
+AVM2Global::createClass(Global_as::ASFunction ctor, as_object* prototype)
+{
+    // TODO: this should attach the function to the prototype as its
+    as_object* cl = new builtin_function(*this, ctor);
+    
+    if (prototype) {
+        prototype->init_member(NSV::PROP_CONSTRUCTOR, cl); 
+        cl->init_member(NSV::PROP_PROTOTYPE, prototype);
+    }
+    return cl;
+}
+
+as_object*
+AVM2Global::createString(const std::string& s)
+{
+    // What AVM2 does for createString is untested, so we do the same
+    // as AVM1 for now.
+    return constructObject(*this, s, NSV::CLASS_STRING);
+}
+
+as_object*
+AVM2Global::createNumber(double d)
+{
+    return constructObject(*this, d, NSV::CLASS_NUMBER);
+}
+
+as_object*
+AVM2Global::createBoolean(bool b)
+{
+    return constructObject(*this, b, NSV::CLASS_BOOLEAN);
+}
+
+/// This serves the purpose of hiding the Array_as type from the
+/// implementation, which at least enforces good behaviour from users.
+as_object*
+AVM2Global::createArray()
+{
+    as_object* array = new as_object(*this);
+    array->setArray();
+    array->init_member(NSV::PROP_CONSTRUCTOR, getMember(NSV::CLASS_ARRAY));
+    return array;
+}
+
+#endif
 
 namespace {
 
@@ -567,6 +559,8 @@ avm1Classes()
     return s;
 
 }
+
+#ifdef ENABLE_AVM2
 
 const ClassHierarchy::NativeClasses&
 avm2Classes(string_table& st)
@@ -709,9 +703,10 @@ avm2Classes(string_table& st)
         (N(eventdispatcher_class_init, NSV::CLASS_EVENTDISPATCHER,
            NSV::CLASS_OBJECT, NSV::NS_FLASH_EVENTS, 5));
         
-
     return s;
 }
+
+#endif
 
 as_value
 global_trace(const fn_call& fn)
@@ -1027,15 +1022,13 @@ as_value
 global_asnative(const fn_call& fn)
 {
 
-    as_value ret;
-
     if (fn.nargs < 2)
     {
         IF_VERBOSE_ASCODING_ERRORS(    
         log_aserror(_("ASNative(%s): needs at least two arguments"),
             fn.dump_args());
         )
-        return ret;
+        return as_value();
     }
 
     const int sx = fn.arg(0).to_int();
@@ -1054,12 +1047,11 @@ global_asnative(const fn_call& fn)
 
     VM& vm = getVM(fn);
     as_function* fun = vm.getNative(x, y);
-    if ( ! fun ) {
+    if (!fun) {
         log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
-        return ret;
+        return as_value();
     }
-    ret.set_as_function(fun);
-    return ret;
+    return as_value(fun);
         
 }
 

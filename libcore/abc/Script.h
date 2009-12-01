@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_AS_CLASS_H
-#define GNASH_AS_CLASS_H
+#ifndef GNASH_ABC_SCRIPT_H
+#define GNASH_ABC_SCRIPT_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -44,10 +44,10 @@ namespace gnash {
         class BoundValue;
         class BoundAccessor;
         class Method;
-        class Class;
+        class Script;
         typedef Property Binding;
+        class Namespace;
     }
-    class Namespace;
     class ClassHierarchy;
     class Property;
 }
@@ -55,17 +55,32 @@ namespace gnash {
 namespace gnash {
 namespace abc {
 
-/// A class to represent, abstractly, ActionScript prototypes.
-///
-/// This class is intended to be able to capture the structure of an
-/// ActionScript prototype as a type, rather than as an object. This is
-/// contrary to the spirit of ActionScript as a dynamic language, but it is
-/// incredibly helpful to an interpreter for that language.
-class Class
+/// A class to represent, AS3 scripts.
+//
+/// Used to store ABC scripts. These are not themselves AS-referenceable
+/// objects, but can be associated with AS3 Class objects in a way that
+/// is yet to be determined.
+//
+/// TODO: update this documentation when we've worked it out.
+//
+/// A Script is a static description of a Class. Scripts have the following
+/// important properties:
+//
+/// 1.  A static initialization method ("cinit"). This is executed no more
+///     than once. The point at which the cinit method is called depends on
+///     the structure of the SWF. It is always executed before the iinit
+///     method is called.
+/// 2.  A constructor method ("iinit"). This is run every time the Class
+///     is constructed. As not all Classes are constructed, the iinit method
+///     may never be executed.
+//
+/// Note that Gnash (and AS3), a Class is regarded as an instance of a
+/// Script, and an Object is an instance of a Class.
+class Script
 {
 public:
 
-	Class()
+	Script()
         :
         _prototype(0),
         _final(false),
@@ -104,11 +119,11 @@ public:
 #ifdef ENABLE_AVM2
 
 	bool addValue(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Class *type, as_value& val,
+            boost::uint32_t slotID, Script *type, as_value& val,
             bool isconst, bool isstatic);
 
 	bool addSlot(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Class *type, bool isstatic);
+            boost::uint32_t slotID, Script *type, bool isstatic);
 
 	bool addMethod(string_table::key name, Namespace *ns, Method *method,
 		bool isstatic);
@@ -119,8 +134,8 @@ public:
 	bool addSetter(string_table::key name, Namespace *ns, Method *method,
 		bool isstatic);
 
-	bool addMemberClass(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, Class *type, bool isstatic);
+	bool addMemberScript(string_table::key name, Namespace *ns,
+		boost::uint32_t slotID, Script *type, bool isstatic);
 
 	// TODO: Figure out how this differs from addMethod
 	bool addSlotFunction(string_table::key name, Namespace *ns,
@@ -177,33 +192,41 @@ public:
         _prototype = prototype;
     }
 
-	void initPrototype() {
-        _prototype =  new as_object();
-    }
+	void initPrototype();
 
-	/// What is the type of our parent class?
-	Class* getSuper() const { return _super; }
+    /// TODO: see if these are useful.
+	Script* getSuper() const { return _super; }
+	void setSuper(Script *p) { _super = p; }
 
 	/// We implement this interface.
-	void pushInterface(Class* p) { _interfaces.push_back(p); }
+	void pushInterface(Script* p) { _interfaces.push_back(p); }
 
-	/// This is our constructor.
+	/// Set the iinit method.
+    //
+    /// This is used to construct instances of the Class.
 	void setConstructor(Method *m) { _constructor = m; }
-	Method *getConstructor() { return _constructor; }
 
+    /// Get the iinit method or 'constructor'.
+    //
+    /// A Script is also valid if it does not have an iinit method, so this
+    /// function can return 0.
+	Method* getConstructor() const {
+        return _constructor;
+    }
+
+    /// Set the cinit method
+    //
+    /// This is used to initialize the Class.
 	void setStaticConstructor(Method *m) { _staticConstructor = m; }
-	
+
+    /// Get the cinit method or 'static constructor'.
+    //
+    /// A Script may have no cinit method, so this function can return 0.
     Method* getStaticConstructor() const { 
         return _staticConstructor;
     }
 
-	void setSuper(Class *p) { _super = p; }
-
-	/// Try to build an Class object from just a prototype.
-	void buildFro_prototype(as_object *o, string_table::key name,
-		ClassHierarchy *);
-
-	Binding *getBinding(string_table::key name)
+	Binding* getBinding(string_table::key name)
 	{
 		BindingContainer::iterator i;
 		if (_bindings.empty()) return NULL;
@@ -246,9 +269,9 @@ private:
 	bool _dynamic;
 	bool _interface;
 	string_table::key _name;
-	std::list<Class*> _interfaces;
+	std::list<Script*> _interfaces;
 	Namespace* _protectedNs;
-	Class* _super;
+	Script* _super;
 	Method* _constructor;
 	Method* _staticConstructor;
 

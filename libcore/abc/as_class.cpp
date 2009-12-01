@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,34 +15,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "log.h"
-#include "abc_function.h"
-#include "fn_call.h"
-#include "Machine.h"
+#include "as_class.h"
+#include <string>
 
 namespace gnash {
 namespace abc {
 
-abc_function::abc_function(Method* methodInfo, Machine* machine)
-    :
-    as_function(*machine->global()),
-    _methodInfo(methodInfo),
-    _machine(machine)
+const std::string&
+as_class::stringValue() const
 {
+    assert(isAS3(*this));
+
+    static const std::string str("[class Class]");
+    return str;
 }
 
-// Dispatch.
-as_value
-abc_function::call(const fn_call& fn)
-{
-
-	log_abc("Calling an abc_function id=%u.", _methodInfo->methodID());
-	as_value val = _machine->executeFunction(_methodInfo,fn);
-	log_abc("Done calling abc_function id=%u value=%s",
-            _methodInfo->methodID(), val);
-	return val;
-
 }
-
-} // namespace abc
-} // namespace gnash
+}

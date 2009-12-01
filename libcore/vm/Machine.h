@@ -23,7 +23,7 @@
 #include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
-#include "Class.h"
+#include "Script.h"
 #include "SWF.h"
 #include "as_environment.h"
 #include "VM.h"
@@ -120,7 +120,7 @@ public:
 	///
 	/// @return
 	/// Null if the superclass was not found, or the superclass.
-	Class* findSuper(as_value& obj, bool find_primitive);
+	Script* findSuper(as_value& obj, bool find_primitive);
 
 	/// Get a member from an object.
 	///
@@ -138,7 +138,7 @@ public:
 	/// This returns the value, but on the stack.
 	/// (Since the return value is not known until after control has left
 	/// the caller of this, it's impossible to return a meaningful value.
-	void getMember(Class* pDefinition, MultiName& name,
+	void getMember(Script* pDefinition, MultiName& name,
             as_value& source);
 
 	/// Set a member in an object.
@@ -157,7 +157,7 @@ public:
 	///
 	/// @return
 	/// Nothing.
-	void setMember(Class*, MultiName&, as_value& target, as_value& val);
+	void setMember(Script*, MultiName&, as_value& target, as_value& val);
 
 	Binding* findProperty(MultiName&) { return NULL; }
 
@@ -330,15 +330,14 @@ private:
 
 	void push_scope_stack(as_value object);
 
-	boost::intrusive_ptr<as_object> pop_scope_stack() {
+	as_object* pop_scope_stack() {
 		log_abc("Popping value %s off the scope stack.  There will be "
                 "%u items left.", as_value(_scopeStack.top(0)),
                 _scopeStack.size()-1);
 		return _scopeStack.pop();
 	}
 
-	boost::intrusive_ptr<as_object> get_scope_stack(boost::uint8_t depth)
-        const {
+	as_object* get_scope_stack(boost::uint8_t depth) const {
 		log_abc("Getting value from scope stack %u from the bottom.",
                 depth | 0x0);
 		return _scopeStack.value(depth);
@@ -356,7 +355,7 @@ private:
     /// before.
     /// Most importantly, the complete stack is used for lookups, including
     /// the section that is not changeable.
-	SafeStack<boost::intrusive_ptr<as_object> > _scopeStack;
+	SafeStack<as_object*> _scopeStack;
 
     CodeStream *mStream;
 

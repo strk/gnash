@@ -34,7 +34,8 @@ namespace gnash {
     namespace abc {
         class Machine;
         class abc_function;
-	class Class;
+        class Namespace;
+        class Script;
     }
     class CodeStream;
     class as_object;
@@ -52,7 +53,7 @@ class Method
 {
 public:
 	
-    typedef std::list<Class*> ArgumentList;
+    typedef std::list<Script*> ArgumentList;
 
 	Method();
 
@@ -124,10 +125,10 @@ public:
 	void setBody(CodeStream *b) { _body = b; }
 
 	bool addValue(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Class *type, as_value& val, bool isconst);
+            boost::uint32_t slotID, Script *type, as_value& val, bool isconst);
 
 	bool addSlot(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Class *type);
+            boost::uint32_t slotID, Script *type);
 
 	bool addMethod(string_table::key name, Namespace *ns, Method *method);
 
@@ -135,30 +136,30 @@ public:
 
 	bool addSetter(string_table::key name, Namespace *ns, Method *method);
 
-	bool addMemberClass(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, Class *type);
+	bool addMemberScript(string_table::key name, Namespace *ns,
+		boost::uint32_t slotID, Script *type);
 	
 	bool addSlotFunction(string_table::key name, Namespace *ns,
 		boost::uint32_t slotID, Method *method);
 
 	/// \brief
 	/// Set the owner of this method.
-	void setOwner(Class* s);
+	void setOwner(Script* s);
 
 	/// \brief
 	/// Get the unique identifier for the return type. 0 is 'anything'.
 	/// (This is the value of any dynamic property.)
 	/// Id reference: Type
-	Class* getReturnType() const;
+	Script* getReturnType() const;
 
 	/// Set the return type
     //
     /// TODO: This is currently a no-op, so find out what it's for and
     /// implement it.
     /// NB: the return type of a method can be * (any) or void, neither of
-    /// which are abc::Classes, so this may not be an appropriate way to
+    /// which are abc::Scriptes, so this may not be an appropriate way to
     /// handle return type.
-	void setReturnType(Class* t);
+	void setReturnType(Script* t);
 
 	Method *getSuper();
 
@@ -220,7 +221,7 @@ public:
 	/// Push an argument of type t into the method definition
     //
     /// A value of 0 stands for 'any'.
-	void pushArgument(Class* t) { _arguments.push_back(t); }
+	void pushArgument(Script* t) { _arguments.push_back(t); }
 
 	/// Push an optional argument's default value.
 	void pushOptional(const as_value& v) { _optionalArguments.push_back(v); }

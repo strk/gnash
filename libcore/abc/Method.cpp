@@ -20,7 +20,7 @@
 #endif
 
 #include "Method.h"
-#include "Class.h"
+#include "Script.h"
 #include "CodeStream.h"
 #include "abc_function.h"
 #include "Global_as.h"
@@ -65,7 +65,7 @@ Method::print_body()
 }
 
 void
-Method::setOwner(Class *pOwner)
+Method::setOwner(Script *pOwner)
 {
 	log_debug("Method::setOwner");
 	if (!_prototype) {
@@ -75,14 +75,14 @@ Method::setOwner(Class *pOwner)
 }
 
 void
-Method::setReturnType(Class* /*type*/)
+Method::setReturnType(Script* /*type*/)
 {
 	/* No-op */
 }
 
 bool
 Method::addValue(string_table::key name, Namespace *ns,
-        boost::uint32_t slotId, Class *type, as_value& val, bool isconst)
+        boost::uint32_t slotId, Script *type, as_value& val, bool isconst)
 {
     Global_as* g = VM::get().getGlobal();
 	if (val.is_object()) {
@@ -142,15 +142,15 @@ Method::addSetter(string_table::key name, Namespace *ns, Method *method)
 }
 
 bool
-Method::addMemberClass(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, Class *type)
+Method::addMemberScript(string_table::key name, Namespace *ns,
+	boost::uint32_t slotId, Script *type)
 {
 	return addSlot(name, ns, slotId, type);
 }
 
 bool
 Method::addSlot(string_table::key name, Namespace* ns, boost::uint32_t slotId,
-	Class */*type*/)
+	Script */*type*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 	int flags = PropFlags::dontDelete;
@@ -163,7 +163,7 @@ bool
 Method::addSlotFunction(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, Method *method)
 {
-	Class a;
+	Script a;
 	a.setName(NSV::CLASS_FUNCTION);
 	as_value b(method->getPrototype());
 	return addValue(name, ns, slotId, &a, b, false);
