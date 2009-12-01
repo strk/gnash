@@ -1027,8 +1027,6 @@ as_value
 global_asnative(const fn_call& fn)
 {
 
-    as_value ret;
-
     if (fn.nargs < 2)
     {
         IF_VERBOSE_ASCODING_ERRORS(    
@@ -1054,12 +1052,11 @@ global_asnative(const fn_call& fn)
 
     VM& vm = getVM(fn);
     as_function* fun = vm.getNative(x, y);
-    if ( ! fun ) {
+    if (!fun) {
         log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
-        return ret;
+        return as_value();
     }
-    ret.set_as_function(fun);
-    return ret;
+    return as_value(fun);
         
 }
 

@@ -330,15 +330,14 @@ private:
 
 	void push_scope_stack(as_value object);
 
-	boost::intrusive_ptr<as_object> pop_scope_stack() {
+	as_object* pop_scope_stack() {
 		log_abc("Popping value %s off the scope stack.  There will be "
                 "%u items left.", as_value(_scopeStack.top(0)),
                 _scopeStack.size()-1);
 		return _scopeStack.pop();
 	}
 
-	boost::intrusive_ptr<as_object> get_scope_stack(boost::uint8_t depth)
-        const {
+	as_object* get_scope_stack(boost::uint8_t depth) const {
 		log_abc("Getting value from scope stack %u from the bottom.",
                 depth | 0x0);
 		return _scopeStack.value(depth);
@@ -356,7 +355,7 @@ private:
     /// before.
     /// Most importantly, the complete stack is used for lookups, including
     /// the section that is not changeable.
-	SafeStack<boost::intrusive_ptr<as_object> > _scopeStack;
+	SafeStack<as_object*> _scopeStack;
 
     CodeStream *mStream;
 

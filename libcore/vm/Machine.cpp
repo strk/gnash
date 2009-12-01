@@ -360,8 +360,8 @@ Machine::global()
 void
 Machine::push_scope_stack(as_value object)
 {
-    boost::intrusive_ptr<as_object> scopeObj = object.to_object(*_global);
-    assert(scopeObj.get());
+    as_object* scopeObj = object.to_object(*_global);
+    assert(scopeObj);
     log_abc("Pushing value %s onto scope stack.", object);
     _scopeStack.push(scopeObj);
     print_scope_stack();
@@ -1583,11 +1583,10 @@ Machine::execute()
                     // TODO: don't do this. Classes should not be functions;
                     // we should always use the constructor member, most
                     // likely.
-                    boost::intrusive_ptr<as_function> ctor = c.to_function();
+                    as_function* ctor = c.to_function();
                     
                     if (ctor) {
-                        boost::intrusive_ptr<as_object> newobj =
-                            constructInstance(*ctor, env, args);
+                        as_object* newobj = constructInstance(*ctor, env, args);
                         push_stack(as_value(newobj));
                     }
 
@@ -1915,9 +1914,7 @@ Machine::execute()
                 ///  global -- The global scope object
                 case SWF::ABC_ACTION_GETGLOBALSCOPE:
                 {
-                    // TODO: Use get_scope_stack here.
-                    push_stack(as_value(_scopeStack.value(0).get()));
-                    //print_stack();
+                    push_stack(_scopeStack.value(0));
                     break;
                 }
 
@@ -3266,7 +3263,7 @@ Machine::find_prop_strict(MultiName multiname)
 
 	for (size_t i = 0; i < _scopeStack.totalSize(); ++i)
     {
-		as_object* scope_object = _scopeStack.at(i).get();
+		as_object* scope_object = _scopeStack.at(i);
 		if (!scope_object) {
 			log_abc("Scope object is NULL.");
 			continue;
@@ -3308,7 +3305,7 @@ Machine::print_scope_stack()
     size_t totalSize = _scopeStack.totalSize();
 
     for (unsigned int i = 0; i < totalSize; ++i) {
-		ss << as_value(_scopeStack.at(i).get()).toDebugString();
+		ss << as_value(_scopeStack.at(i)).toDebugString();
 	}
 	log_abc("%s", ss.str());
 }	
