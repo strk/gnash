@@ -36,10 +36,10 @@
 
 // Forward declaration
 namespace gnash {
-	class as_object;
-	class as_environment;
-	class as_function;
-	class ObjectURI;
+    class as_object;
+    class as_environment;
+    class as_function;
+    class ObjectURI;
 }
 
 namespace gnash {
@@ -59,75 +59,74 @@ public:
     
 
     /// A tag type for multi-index
-	struct oType {};
+    struct oType {};
 
-	/// The actual container
-	/// index 0 is the fully indexed name/namespace pairs, which are unique
-	/// Because of the way searching works, this index can also be
+    /// The actual container
+    /// index 0 is the fully indexed name/namespace pairs, which are unique
+    /// Because of the way searching works, this index can also be
     /// used to search for the names alone (composite keys are sorted
     /// lexographically, beginning with the first element specified)
-	///
-	/// index 1 is an ordered sequence, and it is used for the AS3 style
-	/// enumeration (which requires an order number for each property),
-	/// for slot access, and for array access.
-	typedef boost::multi_index_container<
-		Property,
-		boost::multi_index::indexed_by<
-			boost::multi_index::ordered_unique<
-				boost::multi_index::composite_key<
-					Property,
-					boost::multi_index::member<Property,string_table::key,&Property::mName>,
-					boost::multi_index::member<Property,string_table::key,&Property::mNamespace>
-				>
-			>,
-			boost::multi_index::ordered_unique<
-				boost::multi_index::tag<PropertyList::oType>,
-				boost::multi_index::member<Property,int,&Property::mOrderId>
-			>
-		>
-	> container;
+    ///
+    /// index 1 is an ordered sequence, and it is used for the AS3 style
+    /// enumeration (which requires an order number for each property),
+    /// for slot access, and for array access.
+    typedef boost::multi_index_container<
+        Property,
+        boost::multi_index::indexed_by<
+            boost::multi_index::ordered_unique<
+                boost::multi_index::composite_key<
+                    Property,
+                    boost::multi_index::member<Property,string_table::key,&Property::mName>,
+                    boost::multi_index::member<Property,string_table::key,&Property::mNamespace>
+                >
+            >,
+            boost::multi_index::ordered_unique<
+                boost::multi_index::tag<PropertyList::oType>,
+                boost::multi_index::member<Property,int,&Property::mOrderId>
+            >
+        >
+    > container;
 
-	/// Construct the PropertyList 
+    /// Construct the PropertyList 
     //
     /// The constructor takes a VM reference because PropertyList
     /// conceptually needs access to Virtual Machine resources
     /// (string_table) but not to the Stage.
-	PropertyList(VM& vm)
-		:
-		_props(),
-		mDefaultOrder(0),
+    PropertyList(VM& vm)
+        :
+        _props(),
+        mDefaultOrder(0),
         _vm(vm)
-	{
+    {
     }
 
-	/// Copy constructor
-	PropertyList(const PropertyList& pl);
+    /// Copy constructor
+    PropertyList(const PropertyList& pl);
 
-	/// Assignment operator
-	PropertyList& operator=(const PropertyList&);
+    /// Assignment operator
+    PropertyList& operator=(const PropertyList&);
 
-	/// Visit properties 
-	//
-	/// The method will invoke the given visitor method
-	/// passing it two arguments: name of the property and
-	/// value of it.
-	//
-    /// @tparam V   The type of the visitor.
-    /// @tparam U   An object that may check property values. The object's
-    ///             operator() should return false if the property is not
-    ///             acceptable.
+    /// Visit properties 
     //
-	/// @param visitor  The visitor function. It must have the function:
+    /// The method will invoke the given visitor method
+    /// passing it two arguments: name of the property and
+    /// value of it.
+    //
+    /// @tparam V       The type of the visitor.
+    /// @tparam U       An object that may check property values. The object's
+    ///                 operator() should return false if the property is not
+    ///                 acceptable.
+    //
+    /// @param visitor  The visitor function. It must implement the function:
     ///                     bool accept(string_table::key, const as_value&);
-	///	                Scan is by enumeration order and stops if accept()
+    ///                 Scan is by enumeration order and stops when accept()
     ///                 returns false.
-	///
-	/// @param this_ptr
-	///	The object reference used to extract values from properties.
-	///
-	template <class U, class V>
-	void visitValues(V& visitor, const as_object& this_ptr, U cmp = U()) const
-	{
+    ///
+    /// @param this_ptr The object reference used to extract values from
+    ///                 properties.
+    template <class U, class V>
+    void visitValues(V& visitor, const as_object& this_ptr, U cmp = U()) const
+    {
         typedef container::nth_index<1>::type ContainerByOrder;
 
         // The template keyword is not required by the Standard here, but the
@@ -136,393 +135,302 @@ public:
         for (ContainerByOrder::const_reverse_iterator
                 it = _props.template get<1>().rbegin(),
                 ie = _props.template get<1>().rend(); it != ie; ++it)
-		{
+        {
             if (!cmp(*it)) continue;
-			as_value val = it->getValue(this_ptr);
-			if (!visitor.accept(it->mName, val)) return;
-		}
-	}
+            as_value val = it->getValue(this_ptr);
+            if (!visitor.accept(it->mName, val)) return;
+        }
+    }
 
-	/// Get the as_value value of a named property
-	//
-	/// If the named property is a getter/setter one it's getter
-	/// will be invoked using this instance's _owner as 'this' pointer.
-	///
-	/// @param key
-	///	Name of the property. Search is case-*sensitive*
-	///
-	/// @param value
-	///	a reference to the as_value to which a found property
-	///	value will be copied (it will be left untouched if
-	///	no property was found)
-	///
-	/// @param this_ptr
-	/// 	The as_object used to set the 'this' pointer
-	/// 	for calling getter/setter function (GetterSetterProperty);
-	/// 	it will be unused when getting or setting SimpleProperty
-	/// 	properties.
-	///	This parameter is non-const as nothing prevents an
-	///	eventual "Getter" function from actually modifying it,
-	///	so we can't promise constness.
-	///	Note that the PropertyList itself might be changed
-	///	from this call, accessed trough the 'this' pointer,
-	///	so this method too is non-const.
-	///
-	/// @return true if the value was successfully retrived, false
-	///         otherwise (and value will be untouched)
-	///
-	bool getValue(string_table::key key, as_value& value,
-			as_object& this_ptr, string_table::key nsId = 0);
+    /// Get the as_value value of an ordered property
+    //
+    /// getter/setter will be invoked, just as for getValue
+    ///
+    /// @param order    The order number: negative for default values, 
+    ///                 non-negative for properties which were specifically
+    ///                 positioned.
+    bool getValueByOrder(int order, as_value& val, as_object& this_ptr);
+    
+    /// Get the order number just after the passed order number.
+    ///
+    /// @param order    0 is a special value indicating the first order
+    ///                 should be returned, otherwise, this should be the
+    ///                 result of a previous call to getOrderAfter
+    /// @return         A value which can be used for ordered access. 
+    const Property* getOrderAfter(int order);
 
-	/// Get the as_value value of an ordered property
-	///
-	/// getter/setter will be invoked, just as for getValue
-	///
-	/// @param order
-	/// The order number: negative for default values,  non-negative for
-	/// properties which were specifically positioned.
-	///
-	bool getValueByOrder(int order, as_value& val, as_object& this_ptr);
-	
-	/// Get the order number just after the passed order number.
-	///
-	/// @param order
-	/// 0 is a special value indicating the first order should be returned,
-	/// otherwise, this should be the result of a previous call to
-	/// getOrderAfter
-	///
-	/// @return
-	/// A value which can be used for ordered access. 
-	const Property* getOrderAfter(int order);
+    /// Set the value of a property, creating a new one if unexistent.
+    //
+    /// If the named property is a getter/setter one it's setter
+    /// will be invoked using the given as_object as 'this' pointer.
+    /// If the property is not found a SimpleProperty will be created.
+    ///
+    /// @param key
+    ///    Name of the property. Search is case-*sensitive*
+    ///
+    /// @param value
+    ///    a const reference to the as_value to use for setting
+    ///    or creating the property. 
+    ///
+    /// @param this_ptr
+    ///     The as_object used to set the 'this' pointer
+    ///     for calling getter/setter function (GetterSetterProperty);
+    ///     it will be unused when getting or setting SimpleProperty
+    ///     properties.
+    ///    This parameter is non-const as nothing prevents an
+    ///    eventual "Setter" function from actually modifying it,
+    ///    so we can't promise constness.
+    ///
+    /// @param namespaceId
+    ///    The namespace in which this should be entered. If 0 is given,
+    ///    this will use the first value found, if it exists.
+    ///
+    /// @param flagsIfMissing
+    ///    Flags to associate to the property if a new one is created.
+    ///
+    /// @return true if the value was successfully set, false
+    ///         otherwise (found a read-only property, most likely).
+    bool setValue(string_table::key key, const as_value& value,
+            as_object& this_ptr, string_table::key namespaceId = 0,
+            const PropFlags& flagsIfMissing = 0);
 
-	/// Set the value of a property, creating a new one if unexistent.
-	//
-	/// If the named property is a getter/setter one it's setter
-	/// will be invoked using the given as_object as 'this' pointer.
-	/// If the property is not found a SimpleProperty will be created.
-	///
-	/// @param key
-	///	Name of the property. Search is case-*sensitive*
-	///
-	/// @param value
-	///	a const reference to the as_value to use for setting
-	///	or creating the property. 
-	///
-	/// @param this_ptr
-	/// 	The as_object used to set the 'this' pointer
-	/// 	for calling getter/setter function (GetterSetterProperty);
-	/// 	it will be unused when getting or setting SimpleProperty
-	/// 	properties.
-	///	This parameter is non-const as nothing prevents an
-	///	eventual "Setter" function from actually modifying it,
-	///	so we can't promise constness.
-	///
-	/// @param namespaceId
-	///	The namespace in which this should be entered. If 0 is given,
-	///	this will use the first value found, if it exists.
-	///
-	/// @param flagsIfMissing
-	///	Flags to associate to the property if a new one is created.
-	///
-	/// @return true if the value was successfully set, false
-	///         otherwise (found a read-only property, most likely).
-	///
-	bool setValue(string_table::key key, const as_value& value,
-			as_object& this_ptr, string_table::key namespaceId = 0,
-			const PropFlags& flagsIfMissing=0);
+    /// Reserves a slot number for a property
+    ///
+    /// @param slotId
+    /// The slot id to use. (Note that getOrder() on this property will return
+    /// this slot number + 1 if the assignment was successful.)
+    //
+    /// @param key      Name of the property.
+    ///
+    /// @param nsId     The namespace in which the property should be found.
+    ///
+    /// @return         true if the slot did not previously exist.
+    bool reserveSlot(const ObjectURI& uri, boost::uint16_t slotId);
 
-	/// Reserves a slot number for a property
-	///
-	/// @param slotId
-	/// The slot id to use. (Note that getOrder() on this property will return
-	/// this slot number + 1 if the assignment was successful.)
-	///
-	/// @param key
-	/// Name of the property.
-	///
-	/// @param nsId
-	/// The namespace in which the property should be found.
-	///
-	/// @return true if the slot did not previously exist.
-	bool reserveSlot(const ObjectURI& uri, boost::uint16_t slotId);
-
-	/// Get a property, if existing
-	//
-	/// @param key
-	///	Name of the property. Search is case-*sensitive*
-	///
-	/// @param nsId
-	/// The id of the namespace to search
-	///
-	/// @return a Property or NULL, if no such property exists
-	///	ownership of returned Propery is kept by the PropertyList,
-	///	so plase *don't* delete it !
-	///
-	Property* getProperty(string_table::key key, string_table::key nsId = 0)
+    /// Get a property if it exists.
+    //
+    /// @param key  Name of the property. Search is case-*sensitive*
+    ///
+    /// @param nsId The id of the namespace to search
+    ///
+    /// @return     A Property or 0, if no such property exists.
+    ///             All Property objects are owned by this PropertyList. Do
+    ///             not delete them.
+    Property* getProperty(string_table::key key, string_table::key nsId = 0)
         const;
 
-	/// Get a property, if existing, by order
-	///
-	/// @param order
-	/// The ordering id
-	///
-	const Property* getPropertyByOrder(int order);
-	
-	/// Delete a propery, if exising and not protected from deletion.
-	//
-	///
-	/// @param key
-	///	Name of the property. Search is case-*sensitive*
-	///
-	/// @param nsId
-	/// Name of the namespace
-	///
-	/// @return a pair of boolean values expressing whether the property
-	///	was found (first) and whether it was deleted (second).
-	///	Of course a pair(false, true) would be invalid (deleted
-	///	a non-found property!?). Valid returns are:
-	///	- (false, false) : property not found
-	///	- (true, false) : property protected from deletion
-	///	- (true, true) : property successfully deleted
-	///
-	std::pair<bool,bool> delProperty(string_table::key key,
-		string_table::key nsId = 0);
+    /// Get a property, if existing, by order
+    //
+    /// @param order    The ordering id
+    const Property* getPropertyByOrder(int order);
+    
+    /// Delete a propery, if exising and not protected from deletion.
+    //
+    ///
+    /// @param key      Name of the property.
+    ///
+    /// @param nsId     Name of the namespace
+    ///
+    /// @return         a pair of boolean values expressing whether the property
+    ///                 was found (first) and whether it was deleted (second).
+    ///                 Of course a pair(false, true) would be invalid (deleted
+    ///                 a non-found property!?). Valid returns are:
+    ///                     - (false, false) : property not found
+    ///                     - (true, false) : property protected from deletion
+    ///                     - (true, true) : property successfully deleted
+    std::pair<bool,bool> delProperty(string_table::key key,
+        string_table::key nsId = 0);
 
-	/// \brief
-	/// Add a getter/setter property, if not already existing
-	/// (or should we allow override ?)
-	//
-	/// @param key
-	///	Name of the property. Search is case-*sensitive*
-	///
-	/// @param getter
-	///	A function to invoke when this property value is requested.
-	///	add_ref will be called on the function.
-	///
-	/// @param setter
-	///	A function to invoke when setting this property's value.
-	///	add_ref will be called on the function.
-	///
-	/// @param cacheVal
-	///	The value to use as a cache. If null uses any cache
-	///	from pre-existing property with same name.
-	///
-	/// @param flagsIfMissing
-	///	Flags to associate to the property if a new one is created.
-	///
-	/// @return true if the property was successfully added, false
-	///         otherwise (property already existent?)
-	///
-	bool addGetterSetter(string_table::key key, as_function& getter,
-		as_function* setter, const as_value& cacheVal,
-		const PropFlags& flagsIfMissing=0, string_table::key ns=0);
+    /// Add a getter/setter property, if not already existing
+    //
+    /// TODO: this function has far too many arguments.
+    //
+    /// @param key      Name of the property. Search is case-*sensitive*
+    ///
+    /// @param getter   A function to invoke when this property value is
+    ///                 requested. 
+    /// @param setter   A function to invoke when setting this property's value.
+    ///
+    /// @param cacheVal The value to use as a cache. If null uses any cache
+    ///                 from pre-existing property with same name.
+    /// @param flagsIfMissing Flags to associate to the property if a new one
+    ///                       is created.
+    /// @return         true if the property was successfully added, false
+    ///                 otherwise.
+    bool addGetterSetter(string_table::key key, as_function& getter,
+        as_function* setter, const as_value& cacheVal,
+        const PropFlags& flagsIfMissing = 0, string_table::key ns = 0);
 
-	/// \brief
-	/// Add a getter/setter property, if not already existing
-	/// (or should we allow override ?)
-	//
-	/// @param key
-	///	Name of the property. Search is case-*sensitive*
-	///
-	/// @param getter
-	///	A function to invoke when this property value is requested.
-	///	add_ref will be called on the function.
-	///
-	/// @param setter
-	///	A function to invoke when setting this property's value.
-	///	add_ref will be called on the function.
-	///
-	/// @return true if the property was successfully added, false
-	///         otherwise (property already existent?)
-	///
-	bool addGetterSetter(string_table::key key, as_c_function_ptr getter,
-		as_c_function_ptr setter, const PropFlags& flagsIfMissing,
-		string_table::key ns = 0);
+    /// Add a getter/setter property, if not already existing
+    //
+    /// @param key      Name of the property.
+    ///
+    /// @param getter   A function to invoke when this property value is
+    ///                 requested.
+    /// @param setter   A function to invoke when setting this property's value.
+    /// @return         true if the property was successfully added, false
+    ///                 otherwise.
+    bool addGetterSetter(string_table::key key, as_c_function_ptr getter,
+        as_c_function_ptr setter, const PropFlags& flagsIfMissing,
+        string_table::key ns = 0);
 
-	/// \brief
-	/// Add a destructive getter property, if not already existant.
-	///
-	/// @param key
-	/// Name of the property. Case-sensitive search.
-	///
-	/// @param getter
-	/// A function to invoke when this property value is requested.
-	///
-	/// @param flagsIfMissing
-	///	Flags to associate to the property if a new one is created.
-	///
-	/// @return true if the property was successfully added, false
-	/// otherwise.
-	///
-	bool addDestructiveGetter(string_table::key key,
-		as_function& getter, string_table::key ns = 0,
-		const PropFlags& flagsIfMissing=0);
+    /// Add a destructive getter property, if not already existant.
+    //
+    /// @param key      Name of the property.
+    /// @param getter   A function to invoke when this property value is
+    ///                 requested.
+    /// @param flagsIfMissing Flags to associate to the property if a new
+    ///                             one is created.
+    /// @return         true if the property was successfully added.
+    bool addDestructiveGetter(string_table::key key,
+        as_function& getter, string_table::key ns = 0,
+        const PropFlags& flagsIfMissing=0);
 
-	/// \brief
-	/// Add a destructive getter property, if not already existant.
-	///
-	/// @param key
-	/// Name of the property. Case-sensitive search.
-	///
-	/// @param getter
-	/// A function to invoke when this property value is requested.
-	///
-	/// @param flagsIfMissing
-	///	Flags to associate to the property if a new one is created.
-	///
-	/// @return true if the property was successfully added, false
-	/// otherwise.
-	///
-	bool addDestructiveGetter(string_table::key key,
-		as_c_function_ptr getter, string_table::key ns = 0,
-		const PropFlags& flagsIfMissing=0);
+    /// Add a destructive getter property, if not already existant.
+    ///
+    /// @param key      Name of the property. Case-sensitive search.
+    /// @param getter   A function to invoke when this property value is
+    ///                 requested.
+    ///
+    /// @param flagsIfMissing   Flags to associate to the property if a new
+    //                          one is created.
+    /// @return         true if the property was successfully added, false
+    ///                 otherwise.
+    bool addDestructiveGetter(string_table::key key,
+        as_c_function_ptr getter, string_table::key ns = 0,
+        const PropFlags& flagsIfMissing=0);
 
-	/// Set the flags of a property.
-	//
-	/// @param key
-	///	Name of the property. Search is case-*sensitive*
-	///
-	/// @param setTrue
-	///	the set of flags to set
-	///
-	/// @param setFalse
-	///	the set of flags to clear
-	///
-	/// @return true if the value was successfully set, false
-	///         otherwise (either not found or protected)
-	///
-	bool setFlags(string_table::key key, int setTrue, int setFalse,
-		string_table::key ns = 0);
+    /// Set the flags of a property.
+    //
+    /// @param key      Name of the property. Search is case-*sensitive*
+    /// @param setTrue  The set of flags to set
+    /// @param setFalse The set of flags to clear
+    /// @return         true if the value was successfully set, false
+    ///                 otherwise (either not found or protected)
+    bool setFlags(string_table::key key, int setTrue, int setFalse,
+        string_table::key ns = 0);
 
-	/// Set the flags of all properties.
-	//
-	/// @param setTrue
-	///	the set of flags to set
-	///
-	/// @param setFalse
-	///	the set of flags to clear
-	///
-	/// @return a pair containing number of successes 
-	///         (first) and number of failures (second).
-	///         Failures are due to protected properties,
-	///	    on which flags cannot be set.
-	///
-	std::pair<size_t,size_t> setFlagsAll(int setTrue, int setFalse);
+    /// Set the flags of all properties.
+    //
+    /// Note: no one cares about the return, so it can be made void.
+    //
+    /// @param setTrue      The set of flags to set
+    ///
+    /// @param setFalse     The set of flags to clear
+    ///
+    /// @return             a pair containing number of successes 
+    ///                     (first) and number of failures (second).
+    ///                     Failures are due to protected properties,
+    ///                     on which flags cannot be set.
+    std::pair<size_t,size_t> setFlagsAll(int setTrue, int setFalse);
 
-	/// Set the flags of all properties whose name matches
-	/// any key in the given PropertyList object
-	//
-	/// @param props
-	///	the properties to use for finding names
-	///
-	/// @param setTrue
-	///	the set of flags to set
-	///
-	/// @param setFalse
-	///	the set of flags to clear
-	///
-	/// @return a pair containing number of successes 
-	///         (first) and number of failures (second).
-	///         Failures are due to either protected properties
-	///	    of keys in the props argument not found in
-	///	    this properties set.
-	///
-	std::pair<size_t,size_t> setFlagsAll( const PropertyList& props,
-			int setTrue, int setFalse);
+    /// Set the flags of all properties whose name matches
+    /// any key in the given PropertyList object
+    //
+    /// @param props    The properties to use for finding names
+    /// @param setTrue  The set of flags to set
+    /// @param setFalse The set of flags to clear
+    /// @return         a pair containing number of successes 
+    ///                 (first) and number of failures (second).
+    ///                 Failures are due to either protected properties
+    ///                 of keys in the props argument not found in
+    ///                 this properties set.
+    std::pair<size_t,size_t> setFlagsAll( const PropertyList& props,
+            int setTrue, int setFalse);
 
-	/// \brief
-	/// Copy all properties from the given PropertyList
-	/// instance.
-	//
-	/// Unexistent properties are created. Existing properties
-	/// are updated with the new value.
-	///
-	/// @param props
-	///	the properties to copy from
-	///
-	void import(const PropertyList& props);
+    /// \brief
+    /// Copy all properties from the given PropertyList
+    /// instance.
+    //
+    /// Unexistent properties are created. Existing properties
+    /// are updated with the new value.
+    ///
+    /// @param props
+    ///    the properties to copy from
+    ///
+    void import(const PropertyList& props);
 
-	// Used to keep track of which properties have been enumerated.
-	typedef std::set<std::pair<string_table::key, string_table::key> > propNameSet;
+    // Used to keep track of which properties have been enumerated.
+    typedef std::set<std::pair<string_table::key, string_table::key> >
+        propNameSet;
 
-	/// \brief
-	/// Enumerate all non-hidden properties pushing
-	/// their keys to the given as_environment.
+    /// \brief
+    /// Enumerate all non-hidden properties pushing
+    /// their keys to the given as_environment.
     /// Follows enumeration order.
-	///
-	/// @param donelist
-	/// Don't enumerate those in donelist. Add those done to donelist.
-	///
-	void enumerateKeys(as_environment& env, propNameSet& donelist) const;
+    ///
+    /// @param donelist
+    /// Don't enumerate those in donelist. Add those done to donelist.
+    void enumerateKeys(as_environment& env, propNameSet& donelist) const;
 
-	/// \brief
-	/// Enumerate all non-hidden properties inserting
-	/// their name/value pair to the given SortedPropertyList.
+    /// \brief
+    /// Enumerate all non-hidden properties inserting
+    /// their name/value pair to the given SortedPropertyList.
     /// Follows enumeration order.
-	///
-	/// @param this_ptr
-	/// 	The as_object used to set the 'this' pointer
-	/// 	for calling getter/setter function (GetterSetterProperty);
-	/// 	it will be unused when getting or setting SimpleProperty
-	/// 	properties.
-	void enumerateKeyValue(const as_object& this_ptr, SortedPropertyList& to) const;
+    ///
+    /// @param this_ptr
+    ///     The as_object used to set the 'this' pointer
+    ///     for calling getter/setter function (GetterSetterProperty);
+    ///     it will be unused when getting or setting SimpleProperty
+    ///     properties.
+    void enumerateKeyValue(const as_object& this_ptr, SortedPropertyList& to)
+        const;
 
-	/// Remove all entries in the container
-	void clear();
+    /// Remove all entries in the container
+    void clear();
 
-	/// Return number of properties in this list
-	size_t size() const
-	{
-		return _props.size();
-	}
+    /// Return number of properties in this list
+    size_t size() const {
+        return _props.size();
+    }
 
-	/// Dump all members (using log_debug)
-	//
-	/// @param this_ptr
-	/// 	The as_object used to set the 'this' pointer
-	/// 	for calling getter/setter function (GetterSetterProperty);
-	/// 	it will be unused when getting or setting SimpleProperty
-	/// 	properties.
-	///	This parameter is non-const as nothing prevents an
-	///	eventual "Getter" function from actually modifying it,
-	///	so we can't promise constness.
-	///	Note that the PropertyList itself might be changed
-	///	from this call, accessed trough the 'this' pointer,
-	///	so this method too is non-const.
+    /// Dump all members (using log_debug)
+    //
+    /// @param this_ptr
+    ///     The as_object used to set the 'this' pointer
+    ///     for calling getter/setter function (GetterSetterProperty);
+    ///     it will be unused when getting or setting SimpleProperty
+    ///     properties.
+    ///    This parameter is non-const as nothing prevents an
+    ///    eventual "Getter" function from actually modifying it,
+    ///    so we can't promise constness.
+    ///    Note that the PropertyList itself might be changed
+    ///    from this call, accessed trough the 'this' pointer,
+    ///    so this method too is non-const.
     ///
     /// This does not reflect the normal enumeration order. It is sorted
     /// lexicographically by property.
-	///
-	void dump(as_object& this_ptr);
+    ///
+    void dump(as_object& this_ptr);
 
-	/// Dump all members into the given map
-	//
-	/// @param this_ptr
-	/// 	The as_object used to set the 'this' pointer
-	/// 	for calling getter/setter function (GetterSetterProperty);
-	/// 	it will be unused when getting or setting SimpleProperty
-	/// 	properties.
-	///	This parameter is non-const as nothing prevents an
-	///	eventual "Getter" function from actually modifying it,
-	///	so we can't promise constness.
-	///	Note that the PropertyList itself might be changed
-	///	from this call, accessed trough the 'this' pointer,
-	///	so this method too is non-const.
+    /// Dump all members into the given map
+    //
+    /// @param this_ptr
+    ///     The as_object used to set the 'this' pointer
+    ///     for calling getter/setter function (GetterSetterProperty);
+    ///     it will be unused when getting or setting SimpleProperty
+    ///     properties.
+    ///    This parameter is non-const as nothing prevents an
+    ///    eventual "Getter" function from actually modifying it,
+    ///    so we can't promise constness.
+    ///    Note that the PropertyList itself might be changed
+    ///    from this call, accessed trough the 'this' pointer,
+    ///    so this method too is non-const.
     ///
     /// This does not reflect the normal enumeration order. It is sorted
     /// lexicographically by property.
-	///
-	void dump(as_object& this_ptr, std::map<std::string, as_value>& to);
+    ///
+    void dump(as_object& this_ptr, std::map<std::string, as_value>& to);
 
-	/// Mark all simple properties, getters and setters
-	/// as being reachable (for the GC)
-	void setReachable() const;
+    /// Mark all simple properties, getters and setters
+    /// as being reachable (for the GC)
+    void setReachable() const;
 
 private:
 
     container _props;
 
-    unsigned short mDefaultOrder;
+    boost::uint32_t mDefaultOrder;
     
     VM& _vm;
 

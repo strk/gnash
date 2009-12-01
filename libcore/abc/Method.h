@@ -157,7 +157,7 @@ public:
     /// TODO: This is currently a no-op, so find out what it's for and
     /// implement it.
     /// NB: the return type of a method can be * (any) or void, neither of
-    /// which are abc::Scriptes, so this may not be an appropriate way to
+    /// which are known names, so this may not be an appropriate way to
     /// handle return type.
 	void setReturnType(Script* t);
 
@@ -245,10 +245,6 @@ public:
 	/// \brief
 	/// Print the opcodes that define a method using log_parse.
 	void print_body();
-
-	void print_static_constructor(){
-
-	}
 
 private:
 
