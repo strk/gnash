@@ -333,7 +333,7 @@ AbcBlock::prepare(Machine* mach)
 
     // The last (entry) script has Global as its prototype.
     // This can be deduced because the global classes are initialized with a
-    // slot on script 0 (entry script). OpNewScript then attempts to set the
+    // slot on script 0 (entry script). OpNewClass then attempts to set the
     // corresponding slot once the class has been constructed. At this point,
     // global should verifiably be on the stack, so the slots are expected
     // to be set on the global object.
