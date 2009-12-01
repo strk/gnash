@@ -1,0 +1,6 @@
+1. ScriptTest_Script0 cinit called
+2. ScriptTest_Script3 cinit called
+3. ScriptTest_Script0 iinit (construct)
+4. ScriptTest_Script1 cinit called in script0 construction (iinit)
+5. ScriptTest_Script1 iinit (constructed twice)
+5. ScriptTest_Script1 iinit (constructed twice)

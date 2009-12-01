@@ -26,6 +26,7 @@ TRACE_TESTS = \
 	earlyshowframe.xml \
 	noshowframe.xml \
 	earlysymbolclass.xml \
+	scriptorder.xml \
 	$(NULL)	
 
 TRACE_TRACES = \
@@ -34,6 +35,7 @@ TRACE_TRACES = \
 	earlyshowframe.trace \
 	noshowframe.trace \
 	earlysymbolclass.trace \
+	scriptorder.trace \
 	$(NULL)	
 
 EXTRA_DIST = \
