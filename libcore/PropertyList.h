@@ -522,7 +522,7 @@ private:
 
     container _props;
 
-    unsigned short mDefaultOrder;
+    boost::uint32_t mDefaultOrder;
     
     VM& _vm;
 
