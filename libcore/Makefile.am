@@ -139,6 +139,7 @@ libgnashcore_la_SOURCES = \
 
 if ENABLE_AVM2
 libgnashcore_la_SOURCES += \
+	abc/as_class.cpp \
 	abc/abc_function.cpp \
 	abc/Method.cpp \
 	abc/AbcBlock.cpp \
@@ -215,6 +216,7 @@ noinst_HEADERS = \
 if ENABLE_AVM2
 noinst_HEADERS += \
 	swf/DoABCTag.h \
+	abc/as_class.h \
 	abc/abc_function.h \
 	abc/Method.h \
 	abc/asException.h \
