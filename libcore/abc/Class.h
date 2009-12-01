@@ -177,9 +177,7 @@ public:
         _prototype = prototype;
     }
 
-	void initPrototype() {
-        _prototype =  new as_object();
-    }
+	void initPrototype();
 
 	/// What is the type of our parent class?
 	Class* getSuper() const { return _super; }

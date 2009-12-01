@@ -65,6 +65,13 @@ Class::addValue(string_table::key name, Namespace *ns,
 	}
 	return true;
 }
+
+void
+Class::initPrototype()
+{
+    _prototype = new as_object();
+}
+
 bool
 Class::addMemberClass(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, Class *type, bool isstatic)
@@ -105,11 +112,6 @@ Class::addMethod(string_table::key name, Namespace* /*ns*/,
 	as_value val = new abc::abc_function(method,
             getVM(*_prototype).getMachine());
 	_prototype->init_member(name, val);
-//	int flags = PropFlags::readOnly | PropFlags::dontDelete
-//		| PropFlags::dontEnum;
-//	if (isstatic)
-//		flags |= PropFlags::staticProp;
-
 	return true;
 }
 
