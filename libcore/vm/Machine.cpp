@@ -136,8 +136,8 @@ pool_method(boost::uint32_t index, AbcBlock* pool)
     }
 }
 
-inline Class*
-pool_class(boost::uint32_t index, AbcBlock* pool)
+inline Script*
+pool_script(boost::uint32_t index, AbcBlock* pool)
 {
 	if (!pool) throw ASException();
     try {
@@ -1580,7 +1580,7 @@ Machine::execute()
 
                     as_value c = object->getMember(a.getGlobalName(), ns);
 
-                    // TODO: don't do this. Classes should not be functions;
+                    // TODO: don't do this. Scriptes should not be functions;
                     // we should always use the constructor member, most
                     // likely.
                     as_function* ctor = c.to_function();
@@ -1697,8 +1697,8 @@ Machine::execute()
                 case SWF::ABC_ACTION_NEWCLASS:
                 {
                     boost::uint32_t cid = mStream->read_V32();
-                    log_abc("Class index: %s", cid);
-                    Class *c = pool_class(cid, mPoolObject);
+                    log_abc("Script index: %s", cid);
+                    Script* c = pool_script(cid, mPoolObject);
                     log_abc("Creating new class id=%u name=%s", c->getName(),
                             mST.value(c->getName()));
                     
@@ -2898,7 +2898,7 @@ Machine::execute()
 } 
 
 void
-Machine::getMember(Class* pDefinition, MultiName& name,
+Machine::getMember(Script* pDefinition, MultiName& name,
 	as_value& instance)
 {
 	if (!instance.is_object())
@@ -2922,7 +2922,7 @@ UNUSED(name);
 }
 
 void
-Machine::setMember(Class *pDefinition, MultiName& name, as_value& instance,
+Machine::setMember(Script *pDefinition, MultiName& name, as_value& instance,
 	as_value& newvalue)
 {
 	if (!instance.is_object())
@@ -2979,20 +2979,20 @@ Machine::completeName(MultiName& name, int offset)
 	return size;
 }
 
-Class *
+Script *
 Machine::findSuper(as_value &v, bool find_for_primitive)
 {
 	if (v.is_undefined() || v.is_null()) return NULL;
 
 	if (v.is_object()) {
-		Class *pProto = NULL; // TODO: v.to_object(*_global)->getClass();
+		Script *pProto = NULL; // TODO: v.to_object(*_global)->getScript();
 		return pProto ? pProto->getSuper() : NULL;
 	}
 
 	if (!find_for_primitive) return 0;
 
 	if (v.is_number()) {
-		return NULL; // TODO: _classes->getClass(NSV::CLASS_NUMBER);
+		return NULL; // TODO: _classes->getScript(NSV::CLASS_NUMBER);
 	}
 
 	// And so on...
@@ -3126,7 +3126,7 @@ Machine::initMachine(AbcBlock* pool_block)
 {
 	mPoolObject = pool_block;
 	log_debug("Getting entry script.");
-	Class* start_script = pool_block->scripts().back();
+	Script* start_script = pool_block->scripts().back();
 	log_debug("Getting constructor.");
 	Method* constructor = start_script->getConstructor();
 	clearRegisters(constructor->getMaxRegisters());
@@ -3202,7 +3202,7 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
 
     log_debug("instantiateClass: class name %s", className);
 
-	Class* cl = mPoolObject->locateClass(className);
+	Script* cl = mPoolObject->locateScript(className);
     if (!cl)
     {
         /// This seems like a big error.
@@ -3213,7 +3213,7 @@ Machine::instantiateClass(std::string className, as_object* /*global*/)
     Method* ctor = cl->getConstructor();
 
     if (!ctor) {
-        log_error("Class found has no constructor, can't instantiate "
+        log_error("Script found has no constructor, can't instantiate "
                 "class");
         return;
     }

@@ -116,6 +116,8 @@ private:
 
 };
 
+#ifdef ENABLE_AVM2
+
 class AVM2Global : public Global_as
 {
 public:
@@ -175,6 +177,8 @@ private:
     as_object* _objectProto;
 
 };
+
+#endif 
 
 } // namespace gnash
 

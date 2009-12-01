@@ -50,7 +50,6 @@ namespace gnash {
 	class as_function;
 	class MovieClip;
 	class DisplayObject;
-	class Namespace;
     class SimpleBuffer;
 }
 namespace amf {

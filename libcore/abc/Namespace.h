@@ -24,13 +24,14 @@
 // Forward declarations
 namespace gnash {
     namespace abc {
-        class Class;
+        class Script;
     }
     class ClassHierarchy;
     class string_table;
 }
 
 namespace gnash {
+namespace abc {
 
 /// Represent an ActionScript Namespace
 //
@@ -40,6 +41,9 @@ namespace gnash {
 /// Because there is no guarantee that a Namespace is private to an AbcBlock,
 /// they must never store any AbcBlock-internal information, particularly
 /// not the AbcURI.
+//
+/// A Namespace is a collection of Scripts. Scripts are static descriptions
+/// of AS3 classes.
 class Namespace
 {
 public:
@@ -50,7 +54,7 @@ public:
         _parent(0),
         _uri(0),
         _prefix(0),
-        _classes(),
+        _scripts(),
 		mRecursePrevent(false),
         _private(false),
         _protected(false),
@@ -73,12 +77,12 @@ public:
 	/// What is the XML prefix?
 	string_table::key getPrefix() const { return _prefix; }
 
-	/// Add a class to the namespace. The namespace stores this, but
-	/// does not take ownership. (So don't delete it.)
-	bool addClass(string_table::key name, abc::Class *a)
+	/// Add a Script to the namespace. The namespace stores this, but
+	/// does not take ownership.
+	bool addScript(string_table::key name, abc::Script* a)
 	{
-		if (getClassInternal(name)) return false;
-		_classes[static_cast<std::size_t>(name)] = a;
+		if (getScriptInternal(name)) return false;
+		_scripts[static_cast<std::size_t>(name)] = a;
 		return true;
 	}
 
@@ -86,16 +90,16 @@ public:
 
 	/// Get the named class. Returns NULL if information is not known
 	/// about the class. (Stubbed classes still return NULL here.)
-	abc::Class* getClass(string_table::key name) 
+	abc::Script* getScript(string_table::key name) 
 	{
 		if (mRecursePrevent) return NULL;
 
-		abc::Class* found = getClassInternal(name);
+		abc::Script* found = getScriptInternal(name);
 
 		if (found || !getParent()) return found;
 
 		mRecursePrevent = true;
-		found = getParent()->getClass(name);
+		found = getParent()->getScript(name);
 		mRecursePrevent = false;
 		return found;
 	}
@@ -120,27 +124,28 @@ private:
 	string_table::key _uri;
 	string_table::key _prefix;
 
-	typedef std::map<string_table::key, abc::Class*> container;
-	container _classes;
+	typedef std::map<string_table::key, abc::Script*> container;
+	container _scripts;
 	mutable bool mRecursePrevent;
 
 	bool _private;
 	bool _protected;
 	bool _package;
 
-	abc::Class* getClassInternal(string_table::key name) const
+	abc::Script* getScriptInternal(string_table::key name) const
 	{
 		container::const_iterator i;
 		
-        if (_classes.empty()) return NULL;
+        if (_scripts.empty()) return NULL;
 
-		i = _classes.find(name);
+		i = _scripts.find(name);
 
-		if (i == _classes.end()) return NULL;
+		if (i == _scripts.end()) return NULL;
 		return i->second;
 	}
 };
 
+} // namespace abc
 } // namespace gnash
 
 #endif

@@ -23,7 +23,7 @@
 #include "ClassHierarchy.h"
 #include "as_function.h"
 #include "builtin_function.h"
-#include "Class.h"
+#include "Script.h"
 #include "Global_as.h"
 #include "extension.h"
 
@@ -204,13 +204,15 @@ ClassHierarchy::declareClass(ExtensionClass& c)
 {
     if (!mExtension) return false; 
 
-    mGlobalNamespace->stubPrototype(*this, c.name);
-    mGlobalNamespace->getClass(c.name)->setDeclared();
-    mGlobalNamespace->getClass(c.name)->setSystem();
+#ifdef ENABLE_AVM2
+    if (isAS3(*mGlobal)) {
+        mGlobalNamespace->stubPrototype(*this, c.name);
+        mGlobalNamespace->getScript(c.name)->setDeclared();
+        mGlobalNamespace->getScript(c.name)->setSystem();
+    }
+#endif
 
-    boost::intrusive_ptr<as_function> getter =
-        new declare_extension_function(c, mGlobal, mExtension);
-
+    as_function* getter(new declare_extension_function(c, mGlobal, mExtension));
 
     int flags=PropFlags::dontEnum;
     addVisibilityFlag(flags, c.version);
@@ -220,18 +222,20 @@ ClassHierarchy::declareClass(ExtensionClass& c)
 bool
 ClassHierarchy::declareClass(const NativeClass& c)
 {
-    // AS2 classes should be registered with namespace 0, so they all
-    // appear in a single global namespace.
-    Namespace *nso = findNamespace(c.namespace_name);
 
-    if (!nso) nso = addNamespace(c.namespace_name);
+#ifdef ENABLE_AVM2
+    if (isAS3(*mGlobal)) {
+        abc::Namespace *nso = findNamespace(c.namespace_name);
 
-    nso->stubPrototype(*this, c.name);
-    nso->getClass(c.name)->setDeclared();
-    nso->getClass(c.name)->setSystem();
+        if (!nso) nso = addNamespace(c.namespace_name);
 
-    boost::intrusive_ptr<as_function> getter =
-        new declare_native_function(c, mGlobal);
+        nso->stubPrototype(*this, c.name);
+        nso->getScript(c.name)->setDeclared();
+        nso->getScript(c.name)->setSystem();
+    }
+#endif
+
+    as_function* getter = new declare_native_function(c, mGlobal);
     
     int flags = PropFlags::dontEnum;
     addVisibilityFlag(flags, c.version);

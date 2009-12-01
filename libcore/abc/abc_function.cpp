@@ -17,7 +17,6 @@
 
 #include "log.h"
 #include "abc_function.h"
-#include "Class.h"
 #include "fn_call.h"
 #include "Machine.h"
 

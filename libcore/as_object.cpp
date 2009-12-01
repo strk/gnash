@@ -43,7 +43,6 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <utility> // for std::pair
 #include "namedStrings.h"
-#include "Class.h"
 
 
 namespace gnash {

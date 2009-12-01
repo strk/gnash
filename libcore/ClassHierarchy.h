@@ -24,11 +24,11 @@
 #endif
 
 #include "as_object.h"
-#include "SafeStack.h"
-#include "Class.h"
-#include "Namespace.h"
 
 #ifdef ENABLE_AVM2
+# include "SafeStack.h"
+# include "Script.h"
+# include "Namespace.h"
 # include "BoundValues.h"
 # include "asException.h"
 # include "Method.h"
@@ -116,12 +116,12 @@ public:
 	ClassHierarchy(as_object* global, Extension* e)
         :
 		mGlobal(global),
-        mExtension(e) ,
-		mAnonNamespaces(),
-        mGlobalNamespace(addNamespace(0)),
-		mClassMemory()
+        mExtension(e)
 #ifdef ENABLE_AVM2
         ,
+		mAnonNamespaces(),
+        mGlobalNamespace(addNamespace(0)),
+		mScriptMemory(),
         mExceptionMemory(),
 		mMethodMemory(),
 		mBoundValueMemory(),
@@ -132,7 +132,6 @@ public:
 	/// \brief
 	/// Delete our private namespaces.
 	~ClassHierarchy();
-
 
     typedef std::vector<NativeClass> NativeClasses;
 
@@ -155,21 +154,20 @@ public:
 	/// Declare a list of native classes.
 	void declareAll(const NativeClasses& classes);
 
+#ifdef ENABLE_AVM2
+
 	/// The global namespace
 	///
 	/// Get the global namespace.  This is not the Global object -- it only
 	/// contains the classes, not any globally available functions or anything
 	/// else.
-	Namespace* getGlobalNs() { return mGlobalNamespace; }
-
-	// Chad: Document
-	as_object* newOfType(string_table::key /*whattype*/) { return NULL; }
+    abc::Namespace* getGlobalNs() { return mGlobalNamespace; }
 
 	/// Find a namespace with the given uri.
 	///
 	/// @return 
 	/// The namespace with the given uri or NULL if it doesn't exist.
-	Namespace* findNamespace(string_table::key uri)
+    abc::Namespace* findNamespace(string_table::key uri)
 	{
 		namespacesContainer::iterator i;
 		if (mNamespaces.empty())
@@ -186,10 +184,10 @@ public:
 	/// can't ever be found. (They must be kept and passed to the appropriate
 	/// objects.)
 	///
-	Namespace* anonNamespace(string_table::key uri)
+    abc::Namespace* anonNamespace(string_table::key uri)
 	{
 		mAnonNamespaces.grow(1); 
-		Namespace *n = &mAnonNamespaces.top(0); 
+        abc::Namespace *n = &mAnonNamespaces.top(0); 
 		n->setURI(uri); 
 		return n; 
 	}
@@ -198,9 +196,9 @@ public:
 	/// Add a namespace to the set. Don't use to add unnamed namespaces.
 	/// Will overwrite existing namespaces 'kind' and 'prefix' values. 
 	/// Returns the added space.
-	Namespace* addNamespace(string_table::key uri)
+    abc::Namespace* addNamespace(string_table::key uri)
 	{
-		Namespace *n = findNamespace(uri);
+        abc::Namespace *n = findNamespace(uri);
 		if (n) return n;
 		// The set should create it automatically here. TODO: Make sure
 		mNamespaces[uri].setURI(uri);
@@ -208,12 +206,10 @@ public:
 	}
 	
     /// Create a new abc::Class object for use.
-    abc::Class* newClass() {
-        mClassMemory.grow(1);
-        return &mClassMemory.top(0);
+    abc::Script* newScript() {
+        mScriptMemory.grow(1);
+        return &mScriptMemory.top(0);
     }
-
-#ifdef ENABLE_AVM2
 
 	asException* newException() {
         mExceptionMemory.grow(1);
@@ -245,13 +241,12 @@ private:
 	as_object* mGlobal;
 	Extension* mExtension;
 
-	typedef std::map<string_table::key, Namespace> namespacesContainer;
-	namespacesContainer mNamespaces;
-	SafeStack<Namespace> mAnonNamespaces;
-	Namespace* mGlobalNamespace;
-	SafeStack<abc::Class> mClassMemory;
-
 #ifdef ENABLE_AVM2
+	typedef std::map<string_table::key, abc::Namespace> namespacesContainer;
+	namespacesContainer mNamespaces;
+	SafeStack<abc::Namespace> mAnonNamespaces;
+    abc::Namespace* mGlobalNamespace;
+	SafeStack<abc::Script> mScriptMemory;
 	SafeStack<asException> mExceptionMemory;
 	SafeStack<abc::Method> mMethodMemory;
 	SafeStack<abc::BoundValue> mBoundValueMemory;

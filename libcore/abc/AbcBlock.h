@@ -35,11 +35,11 @@ namespace gnash {
     namespace abc {
         class AbcBlock;
         class Machine;
-        class Class;
+        class Script;
         class Method;
     }
     class SWFStream; // for read signature
-    class ClassHierarchy;
+    class ClasstHierarchy;
 }
 
 namespace gnash {
@@ -78,7 +78,7 @@ public:
 	Method* _method;
 	bool _valueSet;
 
-	abc::Class* _classTarget;
+	abc::Script* _classTarget;
 	Method* _methodTarget;
 	bool _static;
 
@@ -102,12 +102,12 @@ public:
 
 	bool read(SWFStream* in, AbcBlock *pBlock);
 
-	bool finalize(AbcBlock* pBlock, abc::Class* pClass, bool do_static);
+	bool finalize(AbcBlock* pBlock, abc::Script* pScript, bool do_static);
 
 	bool finalize_mbody(AbcBlock* pBlock, Method* pMethod);
 
-	void set_target(abc::Class* pClass, bool do_static) {
-        _classTarget = pClass;
+	void set_target(abc::Script* pScript, bool do_static) {
+        _classTarget = pScript;
         _static = do_static;
     }
 
@@ -159,7 +159,7 @@ inline void checkBounds(size_t i, const T& container)
 /// flash.text namespace. Using the global name means that we 'import' the
 /// built-in namespace into our own resources.
 //
-/// Instances / Classes 
+/// Instances / Scriptes 
 //
 /// Likewise, classes are always given a global name, not an ABC name. This is
 /// because they become globally available, including (we assume) to other ABC
@@ -169,14 +169,14 @@ inline void checkBounds(size_t i, const T& container)
 /// the built-in classes already in a namespace: ABC names and global names
 /// can have the same index even when the names are different.
 //
-/// Class lookup
+/// Script lookup
 //
-/// This is particularly important for locateClass (called by instantiateClass
-/// from SymbolClass tag execution). The SymbolClass tag identifies a class
+/// This is particularly important for locateScript (called by instantiateScript
+/// from SymbolScript tag execution). The SymbolScript tag identifies a class
 /// using a global name, which may be qualified with a namespace. If it is
 /// not qualified, we look in the global namespace 0.
 // 
-/// When we call locateClass, we use global names, not ABC names, because
+/// When we call locateScript, we use global names, not ABC names, because
 /// classes are identified by global names (see above). However, we
 /// still look only in the ABC block's namespaces. The block's first namespace
 /// is always the global namespace; other package namespaces are imported
@@ -233,9 +233,9 @@ public:
 
 	AbcBlock();
 
-    abc::Class* locateClass(MultiName &m);
+    abc::Script* locateScript(MultiName &m);
 
-	abc::Class* locateClass(const std::string& className);
+	abc::Script* locateScript(const std::string& className);
 
 	abc::Trait &newTrait()
 	{
@@ -248,7 +248,7 @@ public:
 
 	void update_global_name(unsigned int multiname_index);
 
-    const std::vector<abc::Class*>& scripts() const {
+    const std::vector<abc::Script*>& scripts() const {
         return _scripts;
     }
 
@@ -282,7 +282,7 @@ public:
         return _multinamePool[i];
     }
 
-    abc::Class* classPoolAt(size_t i) const {
+    abc::Script* classPoolAt(size_t i) const {
         checkBounds(i, _classes);
         return _classes[i];
     }
@@ -333,14 +333,14 @@ private:
 	std::vector<NamespaceSet> _namespaceSetPool;
 	std::vector<Method*> _methods;
 	std::vector<MultiName> _multinamePool;
-	std::vector<Class*> _classes; 
-	std::vector<Class*> _scripts;
+	std::vector<Script*> _classes; 
+	std::vector<Script*> _scripts;
 	std::vector<Trait*> _traits;
 
 	string_table* _stringTable;
 	SWFStream* _stream; // Not stored beyond one read.
 
-	abc::Class *mTheObject;
+	abc::Script *mTheObject;
 	ClassHierarchy *mCH;
 
 	boost::uint32_t mVersion;
