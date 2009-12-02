@@ -43,7 +43,7 @@ namespace gnash {
 
 PropertyList::PropertyList(const PropertyList& pl)
 	:
-	mDefaultOrder(pl.mDefaultOrder),
+	_defaultOrder(pl._defaultOrder),
     _vm(pl._vm)
 {
 	import(pl);
@@ -55,7 +55,7 @@ PropertyList::operator=(const PropertyList& pl)
 	if ( this != &pl )
 	{
 		clear();
-		mDefaultOrder = pl.mDefaultOrder;
+		_defaultOrder = pl._defaultOrder;
 		import(pl);
 	}
 	return *this;
@@ -149,7 +149,7 @@ PropertyList::setValue(string_table::key key, const as_value& val,
 		// create a new member
 		Property a(key, nsId, val, flagsIfMissing);
 		// Non slot properties are negative ordering in insertion order
-		a.setOrder(- ++mDefaultOrder - 1);
+		a.setOrder(- ++_defaultOrder - 1);
 		_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
 		string_table& st = _vm.getStringTable();
@@ -369,7 +369,7 @@ PropertyList::import(const PropertyList& o)
 		else
 		{
 			Property a = *it;
-			a.setOrder(- ++mDefaultOrder - 1);
+			a.setOrder(- ++_defaultOrder - 1);
 			_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
 			string_table& st = _vm.getStringTable();
@@ -386,7 +386,7 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 	const PropFlags& flagsIfMissing, string_table::key nsId)
 {
 	Property a(key, nsId, &getter, setter, flagsIfMissing);
-	a.setOrder(- ++mDefaultOrder - 1);
+	a.setOrder(- ++_defaultOrder - 1);
 
 	container::iterator found = iterator_find(_props, key, nsId);
 	if (found != _props.end())
@@ -424,7 +424,7 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 	string_table::key nsId)
 {
 	Property a(key, nsId, getter, setter, flagsIfMissing);
-	a.setOrder(- ++mDefaultOrder - 1);
+	a.setOrder(- ++_defaultOrder - 1);
 
 	container::iterator found = iterator_find(_props, key, nsId);
 	if (found != _props.end())
@@ -473,7 +473,7 @@ PropertyList::addDestructiveGetter(string_table::key key,
 
 	// destructive getter don't need a setter
 	Property a(key, nsId, &getter, (as_function*)0, flagsIfMissing, true);
-	a.setOrder(- ++mDefaultOrder - 1);
+	a.setOrder(- ++_defaultOrder - 1);
 	_props.insert(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
@@ -496,7 +496,7 @@ PropertyList::addDestructiveGetter(string_table::key key,
 
 	// destructive getter don't need a setter
 	Property a(key, nsId, getter, (as_c_function_ptr)0, flagsIfMissing, true);
-	a.setOrder(- ++mDefaultOrder - 1);
+	a.setOrder(- ++_defaultOrder - 1);
 	_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
 	string_table& st = _vm.getStringTable();

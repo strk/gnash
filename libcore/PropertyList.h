@@ -95,7 +95,7 @@ public:
     PropertyList(VM& vm)
         :
         _props(),
-        mDefaultOrder(0),
+        _defaultOrder(0),
         _vm(vm)
     {
     }
@@ -421,7 +421,7 @@ private:
 
     container _props;
 
-    boost::uint32_t mDefaultOrder;
+    boost::uint32_t _defaultOrder;
     
     VM& _vm;
 
