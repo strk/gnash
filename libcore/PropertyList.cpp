@@ -195,36 +195,14 @@ PropertyList::setFlags(string_table::key key,
 #endif
 }
 
-std::pair<size_t,size_t>
+void
 PropertyList::setFlagsAll(int setFlags, int clearFlags)
 {
-	size_t success=0;
-	size_t failure=0;
-
-#ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = _vm.getStringTable();
-#endif
-
-        PropertyList::container::iterator it;
-        for (it=_props.begin(); it != _props.end(); ++it)
-	{
-#ifdef GNASH_DEBUG_PROPERTY
-		PropFlags oldFlags = it->getFlags();
-#endif
-
+    PropertyList::container::iterator it;
+    for (it=_props.begin(); it != _props.end(); ++it) {
 		PropFlags& f = const_cast<PropFlags&>(it->getFlags());
-		if (f.set_flags(setFlags, clearFlags))
-			++success;
-		else
-			++failure;
-
-#ifdef GNASH_DEBUG_PROPERTY
-		log_debug("Flags of property %s in namespace %s changed from %s to  %s",
-			st.value(it->getName()), st.value(it->getNamespace()), oldFlags, it->getFlags());
-#endif
-	}
-
-	return std::make_pair(success,failure);
+		f.set_flags(setFlags, clearFlags);
+    }
 }
 
 Property*
@@ -253,26 +231,6 @@ PropertyList::delProperty(string_table::key key, string_table::key nsId)
 
 	_props.erase(found);
 	return std::make_pair(true,true);
-}
-
-std::pair<size_t,size_t>
-PropertyList::setFlagsAll(const PropertyList& props,
-		int flagsSet, int flagsClear)
-{
-	size_t success=0;
-	size_t failure=0;
-
-	for (container::const_iterator it = props._props.begin(),
-		itEnd = props._props.end(); it != itEnd; ++it )
-	{
-		string_table::key key = it->_name;
-
-		if (setFlags(key, flagsSet, flagsClear, it->_namespace)) ++success;
-		else ++failure;
-	}
-
-	return std::make_pair(success,failure);
-
 }
 
 void

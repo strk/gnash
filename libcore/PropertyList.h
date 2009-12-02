@@ -303,31 +303,9 @@ public:
 
     /// Set the flags of all properties.
     //
-    /// Note: no one cares about the return, so it can be made void.
-    //
     /// @param setTrue      The set of flags to set
-    ///
     /// @param setFalse     The set of flags to clear
-    ///
-    /// @return             a pair containing number of successes 
-    ///                     (first) and number of failures (second).
-    ///                     Failures are due to protected properties,
-    ///                     on which flags cannot be set.
-    std::pair<size_t,size_t> setFlagsAll(int setTrue, int setFalse);
-
-    /// Set the flags of all properties whose name matches
-    /// any key in the given PropertyList object
-    //
-    /// @param props    The properties to use for finding names
-    /// @param setTrue  The set of flags to set
-    /// @param setFalse The set of flags to clear
-    /// @return         a pair containing number of successes 
-    ///                 (first) and number of failures (second).
-    ///                 Failures are due to either protected properties
-    ///                 of keys in the props argument not found in
-    ///                 this properties set.
-    std::pair<size_t,size_t> setFlagsAll( const PropertyList& props,
-            int setTrue, int setFalse);
+    void setFlagsAll(int setTrue, int setFalse);
 
     /// \brief
     /// Copy all properties from the given PropertyList
