@@ -505,7 +505,7 @@ skip_duplicates:
 	}
 	if (p)
 	{
-		if (findProperty(p->getName(), p->getNamespace()) != p)
+		if (findProperty(p->name(), p->ns()) != p)
 		{
 			index = p->getOrder() * 256 | depth;
 			goto skip_duplicates; // Faster than recursion.
@@ -583,7 +583,7 @@ as_object::get_member_slot(int order, as_value* val){
 	
 	const Property* prop = _members.getPropertyByOrder(order);
 	if (prop) {
-		return get_member(prop->getName(), val, prop->getNamespace());
+		return get_member(prop->name(), val, prop->ns());
 	}
     return false;
 }
@@ -594,7 +594,7 @@ as_object::set_member_slot(int order, const as_value& val, bool ifFound)
 {
 	const Property* prop = _members.getPropertyByOrder(order);
 	if (prop) {
-		return set_member(prop->getName(), val, prop->getNamespace(), ifFound);
+		return set_member(prop->name(), val, prop->ns(), ifFound);
 	}
     return false;
 }
@@ -820,20 +820,22 @@ as_object::init_property(string_table::key key, as_c_function_ptr getter,
 }
 
 bool
-as_object::init_destructive_property(string_table::key key, as_function& getter,
-	int flags, string_table::key nsname)
+as_object::init_destructive_property(const ObjectURI& uri, as_function& getter,
+        int flags)
 {
 	// No case check, since we've already got the key.
-	bool success = _members.addDestructiveGetter(key, getter, nsname, flags);
+	bool success = _members.addDestructiveGetter(getName(uri), getter, 
+            getNamespace(uri), flags);
 	return success;
 }
 
 bool
-as_object::init_destructive_property(string_table::key key,
-        as_c_function_ptr getter, int flags, string_table::key nsname)
+as_object::init_destructive_property(const ObjectURI& uri,
+        as_c_function_ptr getter, int flags)
 {
 	// No case check, since we've already got the key.
-	bool success = _members.addDestructiveGetter(key, getter, nsname, flags);
+	bool success = _members.addDestructiveGetter(getName(uri), getter,
+            getNamespace(uri), flags);
 	return success;
 }
 

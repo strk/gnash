@@ -54,8 +54,7 @@ bitmapfilter_class_init(as_object& where, const ObjectURI& uri)
 {
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-    where.init_destructive_property(getName(uri), getBitmapFilterConstructor,
-		    flags, getNamespace(uri));
+    where.init_destructive_property(uri, getBitmapFilterConstructor, flags);
 }
 
 void

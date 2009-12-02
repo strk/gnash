@@ -61,30 +61,28 @@ PropertyList::operator=(const PropertyList& pl)
 	return *this;
 }
 
+
+namespace {
+
 // Should find in any namespace if nsId is 0, and any namespace should find
 // something in namespace 0.
-static inline
+inline
 PropertyList::container::iterator
-iterator_find(const PropertyList::container &p, string_table::key name,
-	string_table::key nsId)
+iterator_find(const PropertyList::container &p, const ObjectURI& uri)
 {
-	if (nsId)
-	{
-		PropertyList::container::iterator i =
-			p.find(boost::make_tuple(name, nsId));
-		if (i != p.end())
-			return i;
-		return p.find(boost::make_tuple(name, 0));
-	}
+    PropertyList::container::iterator i = p.find(uri);
+    if (i != p.end() || !getNamespace(uri)) return i;
 
-	return p.find(boost::make_tuple(name));
+    // If a namespace was specified, search the global namespace too.
+    return p.find(getName(uri));
 }
 
-typedef PropertyList::container::index<PropertyList::oType>::type::iterator
-	orderIterator;
+}
 
-static inline
-orderIterator
+typedef PropertyList::container::index<PropertyList::OrderTag>::type::iterator
+    order_iterator;
+
+order_iterator
 iterator_find(PropertyList::container &p, int order)
 {
 	return p.get<1>().find(order);
@@ -93,7 +91,7 @@ iterator_find(PropertyList::container &p, int order)
 const Property*
 PropertyList::getPropertyByOrder(int order)
 {
-	orderIterator i = iterator_find(_props, order);
+    order_iterator i = iterator_find(_props, order);
 	if (i == _props.get<1>().end())
 		return NULL;
 
@@ -103,7 +101,7 @@ PropertyList::getPropertyByOrder(int order)
 const Property*
 PropertyList::getOrderAfter(int order)
 {
-	orderIterator i = iterator_find(_props, order);
+    order_iterator i = iterator_find(_props, order);
 
 	if (i == _props.get<1>().end())
 		return NULL; // Not found at all.
@@ -121,7 +119,7 @@ PropertyList::getOrderAfter(int order)
 bool
 PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 {
-	orderIterator found = iterator_find(_props, slotId + 1);
+    order_iterator found = iterator_find(_props, slotId + 1);
 	if (found != _props.get<1>().end()) return false;
 
 	Property a(getName(uri), getNamespace(uri), as_value());
@@ -142,7 +140,7 @@ PropertyList::setValue(string_table::key key, const as_value& val,
 		as_object& this_ptr, string_table::key nsId,
 		const PropFlags& flagsIfMissing)
 {
-	container::iterator found = iterator_find(_props, key, nsId);
+	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
 	
 	if (found == _props.end())
 	{
@@ -180,7 +178,7 @@ bool
 PropertyList::setFlags(string_table::key key,
 		int setFlags, int clearFlags, string_table::key nsId)
 {
-	container::iterator found = iterator_find(_props, key, nsId);
+	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
 	if ( found == _props.end() ) return false;
 
 	PropFlags oldFlags = found->getFlags();
@@ -208,7 +206,7 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 Property*
 PropertyList::getProperty(string_table::key key, string_table::key nsId) const
 {
-	container::iterator found = iterator_find(_props, key, nsId);
+	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
 	if (found == _props.end()) return 0;
 	return const_cast<Property*>(&(*found));
 }
@@ -217,7 +215,7 @@ std::pair<bool,bool>
 PropertyList::delProperty(string_table::key key, string_table::key nsId)
 {
 	//GNASH_REPORT_FUNCTION;
-	container::iterator found = iterator_find(_props, key, nsId);
+	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
 	if (found == _props.end())
 	{
 		return std::make_pair(false,false);
@@ -246,11 +244,11 @@ PropertyList::enumerateKeys(as_environment& env, PropTracker& donelist) const
 
 		if (i->getFlags().get_dont_enum()) continue;
 
-		if (donelist.insert(std::make_pair(i->_name, i->_namespace)).second) {
+		if (donelist.insert(i->uri()).second) {
 
-            const std::string& qname = i->_namespace ?
-                st.value(i->_name) + "." + st.value(i->_namespace) :
-                st.value(i->_name);
+            const std::string& qname = i->ns() ?
+                st.value(i->name()) + "." + st.value(i->ns()) :
+                st.value(i->name());
 
 			env.push(qname);
 		}
@@ -273,7 +271,7 @@ PropertyList::enumerateKeyValue(const as_object& this_ptr,
         // Undefined values should be "undefined" for SWF7 and
         // empty for SWF6.
         const int version = vm.getSWFVersion();
-		to.push_back(std::make_pair(st.value(i->_name),
+		to.push_back(std::make_pair(st.value(i->name()),
 				i->getValue(this_ptr).to_string_versioned(version)));
 	}
 }
@@ -289,7 +287,7 @@ PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to)
             i != ie; ++i)
 	{
 		to.insert(std::make_pair(
-                    st.value(i->_namespace) + "::" + st.value(i->_name),
+                    st.value(i->ns()) + "::" + st.value(i->name()),
                     i->getValue(this_ptr)));
 	}
 }
@@ -300,7 +298,7 @@ PropertyList::dump(as_object& this_ptr)
 	string_table& st = _vm.getStringTable();
 	for (container::const_iterator it=_props.begin(), itEnd=_props.end(); it != itEnd; ++it )
 	{
-		log_debug("  %s::%s: %s", st.value(it->_namespace), st.value(it->_name),
+		log_debug("  %s::%s: %s", st.value(it->ns()), st.value(it->name()),
 			it->getValue(this_ptr));
 	}
 }
@@ -312,7 +310,7 @@ PropertyList::import(const PropertyList& o)
 		itEnd = o._props.end(); it != itEnd; ++it)
 	{
 		// overwrite any previous property with this name
-		container::iterator found = iterator_find(_props, it->_name, it->_namespace);
+		container::iterator found = iterator_find(_props, it->uri());
 		if (found != _props.end())
 		{
 			Property a = *it;
@@ -346,7 +344,7 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 	Property a(key, nsId, &getter, setter, flagsIfMissing);
 	a.setOrder(- ++_defaultOrder - 1);
 
-	container::iterator found = iterator_find(_props, key, nsId);
+	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
@@ -384,7 +382,7 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 	Property a(key, nsId, getter, setter, flagsIfMissing);
 	a.setOrder(- ++_defaultOrder - 1);
 
-	container::iterator found = iterator_find(_props, key, nsId);
+	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
@@ -392,7 +390,6 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 		f = found->getFlags();
 
 		_props.replace(found, a);
-		//assert ( iterator_find(_props, key, nsId) != _props.end() );
 #ifdef GNASH_DEBUG_PROPERTY
 		string_table& st = _vm.getStringTable();
 		log_debug("Native GetterSetter %s in namespace %s replaced "
@@ -404,7 +401,6 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 	else
 	{
 		_props.insert(a);
-        	//assert ( iterator_find(_props, key, nsId) != _props.end() );
 #ifdef GNASH_DEBUG_PROPERTY
 		string_table& st = _vm.getStringTable();
 		log_debug("Native GetterSetter %s in namespace %s inserted with "
@@ -420,7 +416,7 @@ PropertyList::addDestructiveGetter(string_table::key key,
 	as_function& getter, string_table::key nsId,
 	const PropFlags& flagsIfMissing)
 {
-	container::iterator found = iterator_find(_props, key, nsId);
+	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
 	if (found != _props.end())
 	{
 		string_table& st = _vm.getStringTable();
@@ -449,7 +445,7 @@ PropertyList::addDestructiveGetter(string_table::key key,
 	as_c_function_ptr getter, string_table::key nsId,
 	const PropFlags& flagsIfMissing)
 {
-	container::iterator found = iterator_find(_props, key, nsId);
+	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
 	if (found != _props.end()) return false; 
 
 	// destructive getter don't need a setter

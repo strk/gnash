@@ -32,6 +32,7 @@
 #include "PropFlags.h" // for enum
 #include "GnashException.h"
 #include "Relay.h"
+#include "ObjectURI.h"
 
 #include <cmath>
 #include <utility> // for std::pair
@@ -133,25 +134,6 @@ private:
     /// erased from the container straight away, so this flag prevents
     /// any execution.
     bool _dead;
-
-};
-
-/// A URI for describing as_objects.
-//
-/// This is used as a unique identifier for any object member, especially
-/// prototypes, class, constructors.
-struct ObjectURI
-{
-
-    /// Construct an ObjectURI from name and namespace.
-    ObjectURI(string_table::key name, string_table::key ns)
-        :
-        name(name),
-        ns(ns)
-    {}
-
-    string_table::key name;
-    string_table::key ns;
 
 };
 
@@ -471,8 +453,8 @@ public:
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
     ///
-    bool init_destructive_property(string_table::key key, as_function& getter,
-        int flags = PropFlags::dontEnum, string_table::key nsname = 0);
+    bool init_destructive_property(const ObjectURI& uri, as_function& getter,
+            int flags = PropFlags::dontEnum);
 
     /// \brief
     /// Initialize a destructive getter property
@@ -498,9 +480,8 @@ public:
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
     ///
-    bool init_destructive_property(string_table::key key,
-            as_c_function_ptr getter, int flags = PropFlags::dontEnum,
-            string_table::key nsname = 0);
+    bool init_destructive_property(const ObjectURI& uri, 
+            as_c_function_ptr getter, int flags = PropFlags::dontEnum);
 
 
     /// \brief
@@ -1157,28 +1138,6 @@ get(as_object* o)
 }
 
 as_object* getObjectWithPrototype(Global_as& gl, string_table::key c);
-
-/// Comparator for ObjectURI so it can serve as a key in stdlib containers.
-inline bool
-operator<(const ObjectURI& a, const ObjectURI& b)
-{
-    if (a.name < b.name) return true;
-    return a.ns < b.ns;
-}
-
-/// Get the name element of an ObjectURI
-inline string_table::key
-getName(const ObjectURI& o)
-{
-    return o.name;
-}
-
-/// Get the namespace element of an ObjectURI
-inline string_table::key
-getNamespace(const ObjectURI& o)
-{
-    return o.ns;
-}
 
 /// Check whether the object is an instance of a known type.
 //

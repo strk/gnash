@@ -62,14 +62,8 @@ public:
 		/// mysql_class_init
 		std::string init_name;
 
-		/// The name of the class.
-		string_table::key name;
-
-		/// The name of the inherited class. Ordinarily should be CLASS_OBJECT
-		string_table::key super_name;
-
-		/// The name of the namespace in which this belongs.
-		string_table::key namespace_name;
+        const ObjectURI uri;
+        const ObjectURI super;
 
 		/// The version at which this should be added.
 		int version;
@@ -81,13 +75,12 @@ public:
         /// The type of function to use for initialization
 		typedef void (*InitFunc)(as_object& obj, const ObjectURI& uri);
 
-        NativeClass(InitFunc init, string_table::key n,
-                string_table::key sc, string_table::key ns, int ver)
+        NativeClass(InitFunc init, const ObjectURI& u, const ObjectURI& s,
+                int ver)
             :
             initializer(init),
-            name(n),
-            super_name(sc),
-            namespace_name(ns),
+            uri(u),
+            super(s),
             version(ver)
         {}
 
@@ -97,14 +90,10 @@ public:
 		InitFunc initializer;
 
 		/// The name of the class.
-		string_table::key name;
+		const ObjectURI uri;
 
-		/// The name of the inherited class. Object is assumed if
-		/// none is given. (Unless name is itself Object)
-		string_table::key super_name;
-
-		/// The name of the namespace in which this belongs.
-		string_table::key namespace_name;
+		/// The name of the inherited class.
+		const ObjectURI super;
 
 		/// The version at which this should be visible.
 		int version;

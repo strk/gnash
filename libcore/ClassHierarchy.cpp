@@ -58,7 +58,7 @@ addVisibilityFlag(int& flags, int version)
 class declare_extension_function : public as_function
 {
 private:
-    ClassHierarchy::ExtensionClass mDeclaration;
+    ClassHierarchy::ExtensionClass _decl;
     as_object *mTarget;
     Extension *mExtension;
 
@@ -69,7 +69,7 @@ public:
             Extension* e)
         :
         as_function(getGlobal(*g)),
-        mDeclaration(c),
+        _decl(c),
         mTarget(g),
         mExtension(e)
     {
@@ -78,19 +78,22 @@ public:
     virtual as_value call(const fn_call& fn)
     {
         string_table& st = getStringTable(fn);
-        log_debug("Loading extension class %s", st.value(mDeclaration.name));
+        log_debug("Loading extension class %s", st.value(getName(_decl.uri)));
 
         as_value super;
-        if (mDeclaration.super_name)
+        if (getName(_decl.super))
         {
             // Check to be sure our super exists.
             // This will trigger its instantiation if necessary.
-            if (!mTarget->get_member(mDeclaration.super_name, &super))
+            if (!mTarget->get_member(getName(_decl.super), &super,
+                        getNamespace(_decl.super)))
             {
                 // Error here -- doesn't exist.
-                log_error("Can't find %s (Superclass of %s)",
-                    st.value(mDeclaration.super_name),
-                    st.value(mDeclaration.name));
+                log_error("Can't find %s.%s (Superclass of %s.%s)",
+                    st.value(getNamespace(_decl.super)),
+                    st.value(getName(_decl.super)),
+                    st.value(getNamespace(_decl.uri)),
+                    st.value(getName(_decl.uri)));
                 super.set_undefined();
                 return super;
             }
@@ -98,22 +101,23 @@ public:
             {
                 // Error here -- not an object.
                 log_error("%s (Superclass of %s) is not a function (%s)",
-                    st.value(mDeclaration.super_name),
-                    st.value(mDeclaration.name), super);
+                    st.value(getName(_decl.super)),
+                    st.value(getName(_decl.uri)), super);
                 super.set_undefined();
                 return super;
             }
         }
-        if (mExtension->initModuleWithFunc(mDeclaration.file_name,
-            mDeclaration.init_name, *mTarget))
+        if (mExtension->initModuleWithFunc(_decl.file_name,
+            _decl.init_name, *mTarget))
         {
             // Successfully loaded it, now find it, set its proto, and return.
             as_value us;
-            mTarget->get_member(mDeclaration.name, &us);
+            mTarget->get_member(getName(_decl.uri), &us,
+                    getNamespace(_decl.uri));
             return us;
         }
         // Error here -- not successful in loading.
-        log_error("Could not load class %s", st.value(mDeclaration.name));
+        log_error("Could not load class %s", st.value(getName(_decl.uri)));
         super.set_undefined();
         return super;
     }
@@ -123,13 +127,13 @@ class declare_native_function : public as_function
 {
 
 public:
+
     bool isBuiltin() { return true; }
 
-    declare_native_function(const ClassHierarchy::NativeClass &c,
-        as_object *g)
+    declare_native_function(const ClassHierarchy::NativeClass &c, as_object *g)
         :
         as_function(getGlobal(*g)),
-        mDeclaration(c),
+        _decl(c),
         mTarget(g)
     {
     }
@@ -137,26 +141,28 @@ public:
     virtual as_value call(const fn_call& fn)
     {
         string_table& st = getStringTable(fn);
-        log_debug("Loading native class %s", st.value(mDeclaration.name));
+        log_debug("Loading native class %s", st.value(getName(_decl.uri)));
 
-        mDeclaration.initializer(*mTarget,
-                ObjectURI(mDeclaration.name, mDeclaration.namespace_name));
+        _decl.initializer(*mTarget, _decl.uri);
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
-        if (mTarget->get_member(mDeclaration.name, &us,
-                    mDeclaration.namespace_name)) {
+        if (mTarget->get_member(getName(_decl.uri), &us,
+                    getNamespace(_decl.uri))) {
 
             as_value super;
-            if (mDeclaration.super_name)
+            if (getName(_decl.super))
             {
                 // Check to be sure our super exists.
                 // This will trigger its instantiation if necessary.
-                if (!mTarget->get_member(mDeclaration.super_name, &super))
+                if (!mTarget->get_member(getName(_decl.super), &super,
+                            getNamespace(_decl.super)))
                 {
                     // Error here -- doesn't exist.
-                    log_error("Can't find %s (Superclass of %s)",
-                        st.value(mDeclaration.super_name),
-                        st.value(mDeclaration.name));
+                    log_error("Can't find %s.%s (Superclass of %s.%s)",
+                        st.value(getNamespace(_decl.super)),
+                        st.value(getName(_decl.super)),
+                        st.value(getNamespace(_decl.uri)),
+                        st.value(getName(_decl.uri)));
                     super.set_undefined();
                     return super;
                 }
@@ -164,8 +170,8 @@ public:
                 {
                     // Error here -- not an object.
                     log_error("%s (Superclass of %s) is not a function (%s)",
-                        st.value(mDeclaration.super_name),
-                        st.value(mDeclaration.name), super);
+                        st.value(getName(_decl.super)),
+                        st.value(getName(_decl.uri)), super);
                     super.set_undefined();
                     return super;
                 }
@@ -176,19 +182,21 @@ public:
 
             if (!us.to_object(gl)) {
                 log_error("Native class %s is not an object after "
-                        "initialization (%s)", st.value(mDeclaration.name), us);
+                        "initialization (%s)",
+                        st.value(getName(_decl.uri)), us);
             }
         }
         else
         {
             log_error("Native class %s is not found after initialization", 
-                st.value(mDeclaration.name));
+                st.value(getName(_decl.uri)));
         }
         return us;
     }
 
 private:
-    ClassHierarchy::NativeClass mDeclaration;
+
+    ClassHierarchy::NativeClass _decl;
     as_object *mTarget;
 
 };
@@ -206,17 +214,17 @@ ClassHierarchy::declareClass(ExtensionClass& c)
 
 #ifdef ENABLE_AVM2
     if (isAS3(*mGlobal)) {
-        mGlobalNamespace->stubPrototype(*this, c.name);
-        mGlobalNamespace->getScript(c.name)->setDeclared();
-        mGlobalNamespace->getScript(c.name)->setSystem();
+        mGlobalNamespace->stubPrototype(*this, getName(c.uri));
+        mGlobalNamespace->getScript(getName(c.uri))->setDeclared();
+        mGlobalNamespace->getScript(getName(c.uri))->setSystem();
     }
 #endif
 
     as_function* getter(new declare_extension_function(c, mGlobal, mExtension));
 
-    int flags=PropFlags::dontEnum;
+    int flags = PropFlags::dontEnum;
     addVisibilityFlag(flags, c.version);
-    return mGlobal->init_destructive_property(c.name, *getter, flags);
+    return mGlobal->init_destructive_property(c.uri, *getter, flags);
 }
 
 bool
@@ -225,13 +233,13 @@ ClassHierarchy::declareClass(const NativeClass& c)
 
 #ifdef ENABLE_AVM2
     if (isAS3(*mGlobal)) {
-        abc::Namespace *nso = findNamespace(c.namespace_name);
+        abc::Namespace *nso = findNamespace(getNamespace(c.uri));
 
-        if (!nso) nso = addNamespace(c.namespace_name);
+        if (!nso) nso = addNamespace(getNamespace(c.uri));
 
-        nso->stubPrototype(*this, c.name);
-        nso->getScript(c.name)->setDeclared();
-        nso->getScript(c.name)->setSystem();
+        nso->stubPrototype(*this, getName(c.uri));
+        nso->getScript(getName(c.uri))->setDeclared();
+        nso->getScript(getName(c.uri))->setSystem();
     }
 #endif
 
@@ -239,8 +247,7 @@ ClassHierarchy::declareClass(const NativeClass& c)
     
     int flags = PropFlags::dontEnum;
     addVisibilityFlag(flags, c.version);
-    return mGlobal->init_destructive_property(c.name, *getter, flags,
-            c.namespace_name);
+    return mGlobal->init_destructive_property(c.uri, *getter, flags);
 }
 
 
@@ -266,9 +273,9 @@ operator<<(std::ostream& os, const ClassHierarchy::NativeClass& c)
     string_table& st = VM::get().getStringTable();
 
     os << "("
-        << " name:" << st.value(c.name)
-        << " super:" << st.value(c.super_name)
-        << " namespace:" << st.value(c.namespace_name)
+        << " name:" << st.value(getName(c.uri))
+        << " super:" << st.value(getName(c.super))
+        << " namespace:" << st.value(getNamespace(c.uri))
         << " version:" << c.version
         << ")";
 
@@ -282,9 +289,9 @@ operator<<(std::ostream& os, const ClassHierarchy::ExtensionClass& c)
 
     os << "(file:" << c.file_name
         << " init:" << c.init_name
-        << " name:" << st.value(c.name)
-        << " super:" << st.value(c.super_name)
-        << " namespace:" << st.value(c.namespace_name)
+        << " name:" << st.value(getName(c.uri))
+        << " super:" << st.value(getName(c.super))
+        << " namespace:" << st.value(getNamespace(c.uri))
         << " version:" << c.version
         << ")";
 

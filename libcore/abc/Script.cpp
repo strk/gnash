@@ -46,8 +46,7 @@ Script::addValue(string_table::key name, Namespace *ns,
     Global_as* g = VM::get().getGlobal();
 
     if (val.is_object()) {
-		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE, 
-			std::size_t(type->getName()));
+		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE, type->getName());
     }
 
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);

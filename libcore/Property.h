@@ -23,6 +23,7 @@
 #include "as_value.h"
 #include "string_table.h"
 #include "log.h"
+#include "ObjectURI.h"
 
 #include <boost/variant.hpp>
 #include <cassert>
@@ -257,8 +258,7 @@ public:
         : 
 		_bound(as_value()),
         _destructive(false),
-        _name(name),
-        _namespace(nsId),
+        _uri(name, nsId),
 		_orderID(0)
 	{}
 
@@ -268,8 +268,7 @@ public:
 		_flags(p._flags),
         _bound(p._bound),
         _destructive(p._destructive),
-		_name(p._name),
-        _namespace(p._namespace),
+        _uri(p._uri),
         _orderID(p._orderID)
 	{}
 
@@ -280,8 +279,7 @@ public:
         _flags(flags),
 		_bound(as_value()),
         _destructive(false),
-        _name(name),
-        _namespace(nsId),
+        _uri(name, nsId),
 		_orderID(0)
 	{}
 
@@ -290,8 +288,7 @@ public:
         :
         _bound(value),
         _destructive(false),
-		_name(name),
-        _namespace(nsId),
+        _uri(name, nsId),
 		_orderID(0)
 	{}
 
@@ -301,8 +298,7 @@ public:
 		_flags(flags),
         _bound(value),
         _destructive(false),
-		_name(name),
-        _namespace(nsId),
+		_uri(name, nsId),
 		_orderID(0)
 	{}
 
@@ -313,8 +309,7 @@ public:
 		_flags(flags), 
         _bound(GetterSetter(getter, setter)),
 		_destructive(destroy),
-        _name(name),
-        _namespace(nsId),
+        _uri(name, nsId),
 		_orderID(0)
 	{}
 
@@ -324,8 +319,7 @@ public:
 		_flags(),
         _bound(GetterSetter(getter, setter)),
         _destructive(destroy),
-		_name(name),
-        _namespace(nsId),
+        _uri(name, nsId),
 		_orderID(0)
 	{}
 
@@ -336,8 +330,7 @@ public:
 		_flags(flags),
         _bound(GetterSetter(getter, setter)),
         _destructive(destroy),
-		_name(name),
-        _namespace(nsId),
+        _uri(name, nsId),
 		_orderID(0)
 	{}
 
@@ -436,18 +429,21 @@ public:
 	/// Clear visibility flags
 	void clearVisible(int swfVersion) { _flags.clear_visible(swfVersion); }
 
+    /// The name-namespace pair (ObjectURI) of this Property
+    const ObjectURI& uri() const {
+        return _uri;
+    }
+
 	/// What is the name of this property?
-	string_table::key getName() const { return _name; }
+	string_table::key name() const { return getName(_uri); }
 
 	/// What is the namespace of this property?
-	string_table::key getNamespace() const { return _namespace; }
+	string_table::key ns() const { return getNamespace(_uri); }
 
 	/// Mark this property as being reachable (for the GC)
 	void setReachable() const;
 
 private:
-
-	friend class PropertyList; // For index access
 
 	/// Properties flags
 	PropFlags _flags;
@@ -470,8 +466,8 @@ private:
 	// overwritten if not readOnly)
 	mutable bool _destructive;
 	
-	string_table::key _name;
-	string_table::key _namespace;
+    // TODO: this should be const, but the assignment operator is still needed 
+    ObjectURI _uri;
 
 	// An ordering number, for access by order
 	// (AS3 enumeration and slots, AS2 arrays)

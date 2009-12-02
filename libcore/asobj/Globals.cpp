@@ -130,7 +130,10 @@ namespace gnash {
 namespace {
 
     const ClassHierarchy::NativeClasses& avm1Classes();
-    const ClassHierarchy::NativeClasses& avm2Classes(string_table& st);
+
+    // These functions are for AVM2 only.
+    const ClassHierarchy::NativeClasses& avm2Classes();
+    ObjectURI knownClass(string_table::key key);
 
     as_value global_trace(const fn_call& fn);
     as_value global_isNaN(const fn_call& fn);
@@ -271,14 +274,11 @@ AVM1Global::registerClasses()
 {
     registerNatives(*this);
 
-    const string_table::key NS_GLOBAL(0);
+    initObjectClass(_objectProto, *this, NSV::CLASS_OBJECT); 
 
-    initObjectClass(_objectProto, *this,
-            ObjectURI(NSV::CLASS_OBJECT, NS_GLOBAL)); 
-
-    function_class_init(*this, ObjectURI(NSV::CLASS_FUNCTION, NS_GLOBAL));
-    string_class_init(*this, ObjectURI(NSV::CLASS_STRING, NS_GLOBAL)); 
-    array_class_init(*this, ObjectURI(NSV::CLASS_ARRAY, NS_GLOBAL)); 
+    function_class_init(*this, NSV::CLASS_FUNCTION);
+    string_class_init(*this, NSV::CLASS_STRING); 
+    array_class_init(*this, NSV::CLASS_ARRAY); 
 
     // No idea why, but it seems there's a NULL _global.o 
     // defined at player startup...
@@ -319,7 +319,7 @@ AVM1Global::registerClasses()
 
     // SWF8 visibility:
     const string_table::key NS_FLASH = st.find("flash");
-    flash_package_init(*this, ObjectURI(NS_FLASH, NS_GLOBAL)); 
+    flash_package_init(*this, NS_FLASH); 
 
     const int version = _vm.getSWFVersion();
 
@@ -407,7 +407,7 @@ AVM2Global::registerClasses()
     init_member("trace", createFunction(global_trace));
     init_member("escape", createFunction(global_escape));
 
-    _classes.declareAll(avm2Classes(_vm.getStringTable()));
+    _classes.declareAll(avm2Classes());
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_FUNCTION);
     _classes.getGlobalNs()->getScript(NSV::CLASS_FUNCTION)->setDeclared();
     _classes.getGlobalNs()->stubPrototype(_classes, NSV::CLASS_OBJECT);
@@ -488,73 +488,47 @@ const ClassHierarchy::NativeClasses&
 avm1Classes()
 {
 
-    const string_table::key NS_GLOBAL = 0;
-
     typedef ClassHierarchy::NativeClass N;
 
     // Since we maintain separate lists for AVM1 and AVM2, these are all
-    // considered to be in the 'Global' namespace (AVM1 has no namespaces).
+    // considered to be in the 'Global' namespace (AVM1 has no namespaces)
+    // An ObjectURI constructed without a namespace is in the global namespace.
     static const ClassHierarchy::NativeClasses s = boost::assign::list_of
 
-        (N(system_class_init, NSV::CLASS_SYSTEM, 0, NS_GLOBAL, 1))
-        (N(stage_class_init, NSV::CLASS_STAGE, 0, NS_GLOBAL, 1))
-        (N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0, NS_GLOBAL, 3))
-        (N(textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, NS_GLOBAL, 3))
-        (N(math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4))
-        (N(boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(button_class_init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(sound_class_init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(xmlsocket_class_init, NSV::CLASS_XMLSOCKET, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
-        (N(xmlnode_class_init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(xml_class_init, NSV::CLASS_XML, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
-        (N(number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(keyboard_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT, NS_GLOBAL, 6))
-        (N(camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(sharedobject_class_init, NSV::CLASS_SHARED_OBJECT,
-           NSV::CLASS_OBJECT, NS_GLOBAL, 5))
-        (N(loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(localconnection_class_init, NSV::CLASS_LOCALCONNECTION,
-           NSV::CLASS_OBJECT, NS_GLOBAL, 6))
-        (N(customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS,
-           NSV::CLASS_OBJECT, NS_GLOBAL, 6))
-        (N(netconnection_class_init, NSV::CLASS_NET_CONNECTION,
-           NSV::CLASS_OBJECT, NS_GLOBAL, 6))
-        (N(netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 6))
-        (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(contextmenuitem_class_init, NSV::CLASS_CONTEXTMENUITEM,
-           NSV::CLASS_OBJECT, NS_GLOBAL, 5))
-        (N(moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER,
-           NSV::CLASS_OBJECT, NS_GLOBAL, 5))
-        (N(Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
-        (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY,
-           NSV::CLASS_OBJECT, NS_GLOBAL, 5));
+        (N(system_class_init, NSV::CLASS_SYSTEM, 0, 1))
+        (N(stage_class_init, NSV::CLASS_STAGE, 0, 1))
+        (N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0, 3))
+        (N(textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, 3))
+        (N(math_class_init, NSV::CLASS_MATH, 0, 4))
+        (N(boolean_class_init, NSV::CLASS_BOOLEAN, 0, 5))
+        (N(button_class_init, NSV::CLASS_BUTTON, 0, 5))
+        (N(color_class_init, NSV::CLASS_COLOR, 0, 5))
+        (N(selection_class_init, NSV::CLASS_SELECTION, 0, 5))
+        (N(sound_class_init, NSV::CLASS_SOUND, 0, 5))
+        (N(xmlsocket_class_init, NSV::CLASS_XMLSOCKET, 0, 5))
+        (N(date_class_init, NSV::CLASS_DATE, 0, 5))
+        (N(xmlnode_class_init, NSV::CLASS_XMLNODE, 0, 5))
+        (N(xml_class_init, NSV::CLASS_XML, 0, 5))
+        (N(mouse_class_init, NSV::CLASS_MOUSE, 0, 5))
+        (N(number_class_init, NSV::CLASS_NUMBER, 0, 5))
+        (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, 0, 5))
+        (N(keyboard_class_init, NSV::CLASS_KEY, 0, 5))
+        (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, 0, 5))
+        (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, 0, 5))
+        (N(video_class_init, NSV::CLASS_VIDEO, 0, 6))
+        (N(camera_class_init, NSV::CLASS_CAMERA, 0, 5))
+        (N(microphone_class_init, NSV::CLASS_MICROPHONE, 0, 5))
+        (N(sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, 0, 5))
+        (N(loadvars_class_init, NSV::CLASS_LOAD_VARS, 0, 5))
+        (N(localconnection_class_init, NSV::CLASS_LOCALCONNECTION, 0, 6))
+        (N(customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, 0, 6))
+        (N(netconnection_class_init, NSV::CLASS_NET_CONNECTION, 0, 6))
+        (N(netstream_class_init, NSV::CLASS_NET_STREAM, 0, 6))
+        (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, 0, 5))
+        (N(contextmenuitem_class_init, NSV::CLASS_CONTEXTMENUITEM, 0, 5))
+        (N(moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, 0, 5))
+        (N(Error_class_init, NSV::CLASS_ERROR, 0, 5))
+        (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY, 0, 5));
 
     return s;
 
@@ -563,147 +537,202 @@ avm1Classes()
 #ifdef ENABLE_AVM2
 
 const ClassHierarchy::NativeClasses&
-avm2Classes(string_table& st)
+avm2Classes()
 {
 
-    const string_table::key NS_GLOBAL = 0;
-
     typedef ClassHierarchy::NativeClass N;
+
+    ObjectURI(*c)(string_table::key) = knownClass;
 
     static const ClassHierarchy::NativeClasses s = boost::assign::list_of
 
         // Global classes
-        (N(math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4))
-        (N(boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(namespace_class_init, NSV::CLASS_NAMESPACE, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(qname_class_init, NSV::CLASS_QNAME, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
-        (N(date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5))
-        (N(Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT,
-           NS_GLOBAL, 5))
+        (N(math_class_init, c(NSV::CLASS_MATH), c(NSV::CLASS_OBJECT), 4))
+        (N(boolean_class_init, c(NSV::CLASS_BOOLEAN), c(NSV::CLASS_OBJECT), 5))
+        (N(number_class_init, c(NSV::CLASS_NUMBER), c(NSV::CLASS_OBJECT), 5))
+        (N(int_class_init, c(NSV::CLASS_INT), c(NSV::CLASS_OBJECT), 5))
+        (N(namespace_class_init, c(NSV::CLASS_NAMESPACE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(qname_class_init, c(NSV::CLASS_QNAME), c(NSV::CLASS_OBJECT), 5))
+        (N(date_class_init, c(NSV::CLASS_DATE), c(NSV::CLASS_OBJECT), 5))
+        (N(Error_class_init, c(NSV::CLASS_ERROR), c(NSV::CLASS_OBJECT), 5))
 
         // System classes
-        (N(system_class_init, NSV::CLASS_SYSTEM, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_SYSTEM, 1))
+        (N(system_class_init, c(NSV::CLASS_SYSTEM), c(NSV::CLASS_OBJECT), 1))
 
         // Display classes
-        (N(shape_class_init, st.find("Shape"), NSV::CLASS_DISPLAYOBJECT,
-           NSV::NS_FLASH_DISPLAY, 3))
-        (N(displayobject_class_init, NSV::CLASS_DISPLAYOBJECT,
-           NSV::CLASS_EVENTDISPATCHER, NSV::NS_FLASH_DISPLAY, 3))
-        (N(interactiveobject_class_init, NSV::CLASS_INTERACTIVEOBJECT,
-           NSV::CLASS_DISPLAYOBJECT, NSV::NS_FLASH_DISPLAY, 3))
-        (N(displayobjectcontainer_class_init, NSV::CLASS_DISPLAYOBJECTCONTAINER,
-           NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_DISPLAY, 3))
-        (N(sprite_class_init, NSV::CLASS_SPRITE,
-           NSV::CLASS_DISPLAYOBJECTCONTAINER, NSV::NS_FLASH_DISPLAY, 3))
-        (N(bitmap_class_init, NSV::CLASS_BITMAP, NSV::CLASS_DISPLAYOBJECT,
-           NSV::NS_FLASH_DISPLAY, 3))
-        (N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, NSV::CLASS_SPRITE,
-           NSV::NS_FLASH_DISPLAY, 3))
-        (N(stage_class_init, NSV::CLASS_STAGE, NSV::CLASS_MOVIE_CLIP,
-           NSV::NS_FLASH_DISPLAY, 1))
-        (N(button_class_init, st.find("SimpleButton"),
-           NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_DISPLAY, 5))
+        (N(shape_class_init, c(NSV::CLASS_SHAPE),
+           c(NSV::CLASS_DISPLAYOBJECT), 3))
+        (N(displayobject_class_init, c(NSV::CLASS_DISPLAYOBJECT),
+           c(NSV::CLASS_EVENTDISPATCHER), 3))
+        (N(interactiveobject_class_init, c(NSV::CLASS_INTERACTIVEOBJECT),
+           c(NSV::CLASS_DISPLAYOBJECT), 3))
+        (N(displayobjectcontainer_class_init,
+           c(NSV::CLASS_DISPLAYOBJECTCONTAINER),
+           c(NSV::CLASS_INTERACTIVEOBJECT), 3))
+        (N(sprite_class_init, c(NSV::CLASS_SPRITE),
+           c(NSV::CLASS_DISPLAYOBJECTCONTAINER), 3))
+        (N(bitmap_class_init, c(NSV::CLASS_BITMAP),
+           c(NSV::CLASS_DISPLAYOBJECT), 3))
+        (N(movieclip_class_init, c(NSV::CLASS_MOVIE_CLIP),
+           c(NSV::CLASS_SPRITE), 3))
+        (N(stage_class_init, c(NSV::CLASS_STAGE),
+           c(NSV::CLASS_MOVIE_CLIP), 1))
+        (N(button_class_init, c(NSV::CLASS_SIMPLE_BUTTON),
+           c(NSV::CLASS_INTERACTIVEOBJECT), 5))
 
         // Text classes
-        (N(textfield_class_init, NSV::CLASS_TEXT_FIELD,
-           NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_TEXT, 3))
-        (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_TEXT, 5))
-        (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_TEXT, 5))
-        (N(textfieldautosize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(font_class_init, NSV::CLASS_FONT, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_TEXT, 5))
-        (N(fontstyle_class_init, NSV::CLASS_FONTSTYLE, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_TEXT, 5))
-        (N(antialiastype_class_init, NSV::CLASS_ANTIALIASTYPE,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(csmsettings_class_init, NSV::CLASS_CSMTEXTSETTINGS,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(gridfittype_class_init, NSV::CLASS_GRIDFITTYPE,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(statictext_class_init, NSV::CLASS_STATICTEXT,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(stylesheet_class_init, NSV::CLASS_STYLESHEET,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(textfield_class_init, c(NSV::CLASS_TEXT_FIELD),
+           c(NSV::CLASS_INTERACTIVEOBJECT), 3))
+        (N(textformat_class_init, c(NSV::CLASS_TEXT_FORMAT),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(textsnapshot_class_init, c(NSV::CLASS_TEXT_SNAPSHOT),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(textfieldautosize_class_init, c(NSV::CLASS_TEXTFIELDAUTOSIZE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(font_class_init, c(NSV::CLASS_FONT), c(NSV::CLASS_OBJECT), 5))
+        (N(fontstyle_class_init, c(NSV::CLASS_FONTSTYLE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(antialiastype_class_init, c(NSV::CLASS_ANTIALIASTYPE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(csmsettings_class_init, c(NSV::CLASS_CSMTEXTSETTINGS),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(gridfittype_class_init, c(NSV::CLASS_GRIDFITTYPE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(statictext_class_init, c(NSV::CLASS_STATICTEXT),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(stylesheet_class_init, c(NSV::CLASS_STYLESHEET),
+           c(NSV::CLASS_OBJECT), 5))
 #if 0
         // This one isn't stubbed for some reason.
-        (N(textcolor_class_init, NSV::CLASS_TEXTCOLOR,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(textcolor_class_init, c(NSV::CLASS_TEXTCOLOR),
+           c(NSV::CLASS_OBJECT), 5))
 #endif
-        (N(textcolortype_class_init, NSV::CLASS_TEXTCOLORTYPE,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(textdisplaymode_class_init, NSV::CLASS_TEXTDISPLAYMODE,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(textfieldtype_class_init, NSV::CLASS_TEXTFIELDTYPE,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(textformatalign_class_init, NSV::CLASS_TEXTFORMATALIGN,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(textlinemetrics_class_init, NSV::CLASS_TEXTLINEMETRICS,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
-        (N(textrenderer_class_init, NSV::CLASS_TEXTRENDERER,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 5))
+        (N(textcolortype_class_init, c(NSV::CLASS_TEXTCOLORTYPE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(textdisplaymode_class_init, c(NSV::CLASS_TEXTDISPLAYMODE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(textfieldtype_class_init, c(NSV::CLASS_TEXTFIELDTYPE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(textformatalign_class_init, c(NSV::CLASS_TEXTFORMATALIGN),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(textlinemetrics_class_init, c(NSV::CLASS_TEXTLINEMETRICS),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(textrenderer_class_init, c(NSV::CLASS_TEXTRENDERER),
+           c(NSV::CLASS_OBJECT), 5))
 
         // Media classes
-        (N(sound_class_init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_MEDIA, 5))
-        (N(video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_DISPLAYOBJECT,
-           NSV::NS_FLASH_MEDIA, 6))
-        (N(camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_MEDIA, 6))
-        (N(microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_MEDIA, 6))
-
+        (N(sound_class_init, c(NSV::CLASS_SOUND), c(NSV::CLASS_OBJECT), 5))
+        (N(video_class_init, c(NSV::CLASS_VIDEO),
+           c(NSV::CLASS_DISPLAYOBJECT), 6))
+        (N(camera_class_init, c(NSV::CLASS_CAMERA), c(NSV::CLASS_OBJECT), 6))
+        (N(microphone_class_init, c(NSV::CLASS_MICROPHONE),
+           c(NSV::CLASS_OBJECT), 6))
         // Net classes
-        (N(xmlsocket_class_init, NSV::CLASS_XMLSOCKET, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_NET, 5))
-        (N(sharedobject_class_init, NSV::CLASS_SHARED_OBJECT,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5))
-        (N(localconnection_class_init, NSV::CLASS_LOCALCONNECTION,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6))
-        (N(netconnection_class_init, NSV::CLASS_NET_CONNECTION,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6))
-        (N(netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_NET, 6))
-        
+        (N(xmlsocket_class_init, c(NSV::CLASS_XMLSOCKET),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(sharedobject_class_init, c(NSV::CLASS_SHARED_OBJECT),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(localconnection_class_init, c(NSV::CLASS_LOCALCONNECTION),
+           c(NSV::CLASS_OBJECT), 6))
+        (N(netconnection_class_init, c(NSV::CLASS_NET_CONNECTION),
+           c(NSV::CLASS_OBJECT), 6))
+        (N(netstream_class_init, c(NSV::CLASS_NET_STREAM),
+           c(NSV::CLASS_OBJECT), 6))
         // Error classes
-        
         // XML classes
-        (N(xmlnode_class_init, NSV::CLASS_XMLNODE, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_XML, 5))
-        (N(xml_class_init, st.find("XMLDocument"), NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_XML, 5))
-
+        (N(xmlnode_class_init, c(NSV::CLASS_XMLNODE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(xml_class_init, c(NSV::CLASS_XML_DOCUMENT),
+           c(NSV::CLASS_OBJECT), 5))
         // UI classes
-        (N(mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_UI, 5))
-        (N(keyboard_class_init, st.find("Keyboard"), NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_UI, 5))
-        (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, NSV::CLASS_OBJECT,
-           NSV::NS_FLASH_UI, 7))
-        (N(contextmenuitem_class_init, NSV::CLASS_CONTEXTMENUITEM,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5))
-        
+        (N(mouse_class_init, c(NSV::CLASS_MOUSE),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(keyboard_class_init, c(NSV::CLASS_KEYBOARD),
+           c(NSV::CLASS_OBJECT), 5))
+        (N(contextmenu_class_init, c(NSV::CLASS_CONTEXTMENU),
+           c(NSV::CLASS_OBJECT), 7))
+        (N(contextmenuitem_class_init, c(NSV::CLASS_CONTEXTMENUITEM),
+           c(NSV::CLASS_OBJECT), 5))
         // Accessibility classes
-        (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_ACCESSIBILITY, 5))
-       
+        (N(accessibility_class_init, c(NSV::CLASS_ACCESSIBILITY),
+           c(NSV::CLASS_OBJECT), 5))
         // Event classes
-        (N(event_class_init, NSV::CLASS_EVENT,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_EVENTS, 5))
-        (N(eventdispatcher_class_init, NSV::CLASS_EVENTDISPATCHER,
-           NSV::CLASS_OBJECT, NSV::NS_FLASH_EVENTS, 5));
-        
-    return s;
+        (N(event_class_init, c(NSV::CLASS_EVENT), c(NSV::CLASS_OBJECT), 5))
+        (N(eventdispatcher_class_init, c(NSV::CLASS_EVENTDISPATCHER),
+           c(NSV::CLASS_OBJECT), 5));
+
+        return s;
+
+}
+
+ObjectURI
+knownClass(string_table::key key)
+{
+    typedef std::map<string_table::key, string_table::key> KnownClasses;
+
+    const string_table::key NS_GLOBAL(0);
+
+    static const KnownClasses knownClasses = boost::assign::map_list_of
+         (NSV::CLASS_OBJECT, NS_GLOBAL)
+         (NSV::CLASS_MATH, NS_GLOBAL)
+         (NSV::CLASS_BOOLEAN, NS_GLOBAL)
+         (NSV::CLASS_NUMBER, NS_GLOBAL)
+         (NSV::CLASS_INT, NS_GLOBAL)
+         (NSV::CLASS_NAMESPACE, NS_GLOBAL)
+         (NSV::CLASS_QNAME, NS_GLOBAL)
+         (NSV::CLASS_DATE, NS_GLOBAL)
+         (NSV::CLASS_ERROR, NS_GLOBAL)
+         (NSV::CLASS_SYSTEM, NSV::NS_FLASH_SYSTEM)
+         (NSV::CLASS_SHAPE, NSV::NS_FLASH_DISPLAY)
+         (NSV::CLASS_DISPLAYOBJECT, NSV::NS_FLASH_DISPLAY)
+         (NSV::CLASS_INTERACTIVEOBJECT, NSV::NS_FLASH_DISPLAY)
+         (NSV::CLASS_DISPLAYOBJECTCONTAINER, NSV::NS_FLASH_DISPLAY)
+         (NSV::CLASS_SPRITE, NSV::NS_FLASH_DISPLAY)
+         (NSV::CLASS_BITMAP, NSV::NS_FLASH_DISPLAY)
+         (NSV::CLASS_MOVIE_CLIP, NSV::NS_FLASH_DISPLAY)
+         (NSV::CLASS_STAGE, NSV::NS_FLASH_DISPLAY)
+         (NSV::CLASS_SIMPLE_BUTTON, NSV::NS_FLASH_DISPLAY)
+         (NSV::CLASS_TEXT_FIELD, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_TEXT_FORMAT, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_TEXT_SNAPSHOT, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_TEXTFIELDAUTOSIZE, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_FONT, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_FONTSTYLE, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_ANTIALIASTYPE, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_CSMTEXTSETTINGS, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_GRIDFITTYPE, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_STATICTEXT, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_STYLESHEET, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_TEXTCOLORTYPE, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_TEXTDISPLAYMODE, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_TEXTFIELDTYPE, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_TEXTFORMATALIGN, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_TEXTLINEMETRICS, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_TEXTRENDERER, NSV::NS_FLASH_TEXT)
+         (NSV::CLASS_SOUND, NSV::NS_FLASH_MEDIA)
+         (NSV::CLASS_VIDEO, NSV::NS_FLASH_MEDIA)
+         (NSV::CLASS_CAMERA, NSV::NS_FLASH_MEDIA)
+         (NSV::CLASS_MICROPHONE, NSV::NS_FLASH_MEDIA)
+         (NSV::CLASS_XMLSOCKET, NSV::NS_FLASH_NET)
+         (NSV::CLASS_SHARED_OBJECT, NSV::NS_FLASH_NET)
+         (NSV::CLASS_LOCALCONNECTION, NSV::NS_FLASH_NET)
+         (NSV::CLASS_NET_CONNECTION, NSV::NS_FLASH_NET)
+         (NSV::CLASS_NET_STREAM, NSV::NS_FLASH_NET)
+         (NSV::CLASS_XMLNODE, NSV::NS_FLASH_XML)
+         (NSV::CLASS_XML_DOCUMENT, NSV::NS_FLASH_XML)
+         (NSV::CLASS_MOUSE, NSV::NS_FLASH_UI)
+         (NSV::CLASS_KEYBOARD, NSV::NS_FLASH_UI)
+         (NSV::CLASS_SHAPE, NSV::NS_FLASH_UI)
+         (NSV::CLASS_CONTEXTMENU, NSV::NS_FLASH_UI)
+         (NSV::CLASS_CONTEXTMENUITEM, NSV::NS_FLASH_UI)
+         (NSV::CLASS_ACCESSIBILITY, NSV::NS_FLASH_ACCESSIBILITY)
+         (NSV::CLASS_EVENT, NSV::NS_FLASH_EVENTS)
+         (NSV::CLASS_EVENTDISPATCHER, NSV::NS_FLASH_EVENTS);
+
+    KnownClasses::const_iterator it = knownClasses.find(key);
+    assert(it != knownClasses.end());
+    return ObjectURI(key, it->second);
 }
 
 #endif

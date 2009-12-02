@@ -231,6 +231,7 @@ endif
 EXTENSIONS_API = \
 	Relay.h \
 	as_object.h \
+	ObjectURI.h \
 	Property.h \
 	PropertyList.h \
 	as_value.h \

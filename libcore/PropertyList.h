@@ -22,6 +22,7 @@
 #include "PropFlags.h" // for templated functions
 #include "as_value.h" // for templated functions
 #include "string_table.h"
+#include "ObjectURI.h"
 
 #include <map> 
 #include <string> // for use within map 
@@ -57,12 +58,11 @@ public:
     typedef std::pair<std::string, std::string> KeyValuePair;
     typedef std::vector<KeyValuePair> SortedPropertyList;
     
-    // Used to keep track of which properties have been enumerated.
-    typedef std::set<std::pair<string_table::key, string_table::key> >
-        PropTracker;
+    /// Used to keep track of which properties have been enumerated.
+    typedef std::set<ObjectURI> PropTracker;
 
-    /// A tag type for multi-index
-    struct oType {};
+    /// A tag for identifying an index in the container.
+    struct OrderTag {};
 
     /// The actual container
     /// index 0 is the fully indexed name/namespace pairs, which are unique
@@ -77,15 +77,11 @@ public:
         Property,
         boost::multi_index::indexed_by<
             boost::multi_index::ordered_unique<
-                boost::multi_index::composite_key<
-                    Property,
-                    boost::multi_index::member<Property,string_table::key,&Property::_name>,
-                    boost::multi_index::member<Property,string_table::key,&Property::_namespace>
-                >
+                boost::multi_index::const_mem_fun<Property,const ObjectURI&,&Property::uri>
             >,
             boost::multi_index::ordered_unique<
-                boost::multi_index::tag<PropertyList::oType>,
-                boost::multi_index::member<Property,int,&Property::_orderID>
+                boost::multi_index::tag<OrderTag>,
+                boost::multi_index::const_mem_fun<Property,int,&Property::getOrder>
             >
         >
     > container;
@@ -141,7 +137,7 @@ public:
         {
             if (!cmp(*it)) continue;
             as_value val = it->getValue(this_ptr);
-            if (!visitor.accept(it->_name, val)) return;
+            if (!visitor.accept(it->name(), val)) return;
         }
     }
 

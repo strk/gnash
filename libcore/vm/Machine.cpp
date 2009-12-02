@@ -949,7 +949,7 @@ Machine::execute()
                     
                     _stack.drop(1);
                     const Property *b = obj->getByIndex(index);
-                    if (b) _stack.top(0) = mST.value(b->getName());
+                    if (b) _stack.top(0) = mST.value(b->name());
                     else _stack.top(0) = "";
                     break;
                 }
