@@ -23,7 +23,7 @@
 #include "ClassHierarchy.h"
 #include "as_function.h"
 #include "builtin_function.h"
-#include "Script.h"
+#include "Class.h"
 #include "Global_as.h"
 #include "extension.h"
 

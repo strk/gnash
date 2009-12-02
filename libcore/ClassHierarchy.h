@@ -27,7 +27,7 @@
 
 #ifdef ENABLE_AVM2
 # include "SafeStack.h"
-# include "Script.h"
+# include "Class.h"
 # include "Namespace.h"
 # include "BoundValues.h"
 # include "asException.h"
@@ -110,7 +110,7 @@ public:
         ,
 		mAnonNamespaces(),
         mGlobalNamespace(addNamespace(0)),
-		mScriptMemory(),
+		_classMemory(),
         mExceptionMemory(),
 		mMethodMemory(),
 		mBoundValueMemory(),
@@ -195,9 +195,9 @@ public:
 	}
 	
     /// Create a new abc::Class object for use.
-    abc::Script* newScript() {
-        mScriptMemory.grow(1);
-        return &mScriptMemory.top(0);
+    abc::Class* newClass() {
+        _classMemory.grow(1);
+        return &_classMemory.top(0);
     }
 
 	asException* newException() {
@@ -235,7 +235,7 @@ private:
 	namespacesContainer mNamespaces;
 	SafeStack<abc::Namespace> mAnonNamespaces;
     abc::Namespace* mGlobalNamespace;
-	SafeStack<abc::Script> mScriptMemory;
+	SafeStack<abc::Class> _classMemory;
 	SafeStack<asException> mExceptionMemory;
 	SafeStack<abc::Method> mMethodMemory;
 	SafeStack<abc::BoundValue> mBoundValueMemory;
