@@ -137,7 +137,7 @@ libgnashcore_la_SOURCES = \
 
 if ENABLE_AVM2
 libgnashcore_la_SOURCES += \
-	abc/Script.cpp \
+	abc/Class.cpp \
 	abc/Namespace.cpp \
 	abc/as_class.cpp \
 	abc/abc_function.cpp \
@@ -215,7 +215,7 @@ noinst_HEADERS = \
 
 if ENABLE_AVM2
 noinst_HEADERS += \
-	abc/Script.h \
+	abc/Class.h \
 	abc/Namespace.h \
 	swf/DoABCTag.h \
 	abc/as_class.h \

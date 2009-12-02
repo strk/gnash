@@ -24,7 +24,7 @@
 #include "VM.h"
 #include "log.h"
 #include "ClassHierarchy.h"
-#include "Script.h"
+#include "Class.h"
 #include "namedStrings.h"
 #include "CodeStream.h"
 #include "action_buffer.h"
@@ -36,7 +36,7 @@ namespace gnash {
 namespace abc {
 
 bool
-Trait::finalize(AbcBlock *pBlock, abc::Script *pScript, bool do_static)
+Trait::finalize(AbcBlock *pBlock, abc::Class *pScript, bool do_static)
 {
 	log_abc("Finalize class %s (%s), trait kind: %s", 
             pBlock->_stringTable->value(pScript->getName()), pScript, _kind);
@@ -47,12 +47,12 @@ Trait::finalize(AbcBlock *pBlock, abc::Script *pScript, bool do_static)
 	case KIND_CONST:
 	{
 		// Validate the type.
-		abc::Script *pType;
+		abc::Class *pType;
 		if (_typeIndex) {
 			log_abc("Trait type: %s", 
                 pBlock->_stringPool[
                     pBlock->_multinamePool[_typeIndex].getABCName()]);
-			pType = pBlock->locateScript(pBlock->_multinamePool[_typeIndex]);
+			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
 		}
 		else {
 			pType = pBlock->mTheObject;
@@ -124,9 +124,9 @@ Trait::finalize_mbody(AbcBlock *pBlock, Method *pMethod)
 	case KIND_CONST:
 	{
 		// Validate the type.
-		abc::Script *pType;
+		abc::Class *pType;
 		if (_typeIndex) {
-			pType = pBlock->locateScript(pBlock->_multinamePool[_typeIndex]);
+			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
         }
 		else {
 			pType = pBlock->mTheObject;
@@ -250,13 +250,13 @@ Trait::read(SWFStream* in, AbcBlock *pBlock)
         {
             _slotID = in->read_V32();
             _classInfoIndex = in->read_V32();
-            log_abc("Slot id: %u Script index: %u Script Name: %s", _slotID, 
+            log_abc("Slot id: %u Class index: %u Class Name: %s", _slotID, 
                 _classInfoIndex, 
                 pBlock->_stringTable->value(
                     pBlock->_classes[_classInfoIndex]->getName()));
 
             if (_classInfoIndex >= pBlock->_classes.size()) {
-                log_error(_("Bad Script id in trait."));
+                log_error(_("Bad Class id in trait."));
                 return false;
             }
             break;
@@ -329,7 +329,7 @@ AbcBlock::prepare(Machine* mach)
 {
 
     std::for_each(_classes.begin(), _classes.end(),
-            std::mem_fun(&abc::Script::initPrototype));
+            std::mem_fun(&abc::Class::initPrototype));
 
     // The last (entry) script has Global as its prototype.
     // This can be deduced because the global classes are initialized with a
@@ -341,7 +341,7 @@ AbcBlock::prepare(Machine* mach)
     // scripts have Global as a target object (prototype), so for now we
     // will do that.
     std::for_each(_scripts.begin(), _scripts.end(),
-            boost::bind(&abc::Script::setPrototype, _1, mach->global()));
+            boost::bind(&abc::Class::setPrototype, _1, mach->global()));
  
     std::for_each(_methods.begin(), _methods.end(),
             boost::bind(&Method::initPrototype, _1, mach));
@@ -405,8 +405,8 @@ AbcBlock::setNamespaceURI(Namespace *ns, abc::URI ABCName)
 	log_abc("Namespace: %s AbcURI=%u URI=%u.", name, ABCName, global_key);
 }
 
-abc::Script*
-AbcBlock::locateScript(const std::string& className)
+abc::Class*
+AbcBlock::locateClass(const std::string& className)
 {
 
     const std::string::size_type pos = className.rfind(".");
@@ -432,14 +432,14 @@ AbcBlock::locateScript(const std::string& className)
         }
     }
     
-    return locateScript(a);
+    return locateClass(a);
 
 }
 
-abc::Script*
-AbcBlock::locateScript(MultiName& m)
+abc::Class*
+AbcBlock::locateClass(MultiName& m)
 {
-	abc::Script* found = 0;
+	abc::Class* found = 0;
 
 	if (m.getNamespace())
 	{
@@ -823,7 +823,7 @@ AbcBlock::read_method_infos()
             // TODO: this can be 'void', which clearly isn't a class, so this
             // seems bogus. As setReturnType is a no-op, we should log it
             // and ignore it.
-            abc::Script* rtScript = locateScript(_multinamePool[return_type]);
+            abc::Class* rtScript = locateClass(_multinamePool[return_type]);
             if (!rtScript) {
                 log_abc(_("ABC: Unknown return type."));
             }
@@ -848,7 +848,7 @@ AbcBlock::read_method_infos()
 			
             // A value of 0 is legitimate, meaning 'any (*)'. 
             if (ptype) {
-                abc::Script* param_type = locateScript(_multinamePool[ptype]);
+                abc::Class* param_type = locateClass(_multinamePool[ptype]);
 
                 if (!param_type) {
                     log_abc((_("ABC: Unknown parameter type.")));
@@ -936,7 +936,7 @@ AbcBlock::read_instances()
 	log_abc("There are %u instances.", count);
 	_classes.resize(count);
 	for (size_t i = 0; i < count; ++i) {
-		abc::Script* pScript;
+		abc::Class* pScript;
 		//Read multiname index.
 		boost::uint32_t index = _stream->read_V32();
 		// 0 is allowed as a name, typically for the last entry.
@@ -958,7 +958,7 @@ AbcBlock::read_instances()
 			return false;
 		}
 
-		pScript = locateScript(multiname);
+		pScript = locateClass(multiname);
 		
         if (!pScript) {
 
@@ -993,7 +993,7 @@ AbcBlock::read_instances()
 			pScript->setSuper(mTheObject);
 		}
 		else {
-			abc::Script *pSuper = locateScript(_multinamePool[super_index]);
+			abc::Class *pSuper = locateClass(_multinamePool[super_index]);
 			if (!pSuper)
 			{
 				log_error(_("ABC: Super type not found (%s)"), 
@@ -1015,7 +1015,7 @@ AbcBlock::read_instances()
 
 			if (pSuper == pScript)
 			{
-				log_error(_("ABC: Script cannot be its own supertype."));
+				log_error(_("ABC: Class cannot be its own supertype."));
 				return false;
 			}
 			pScript->setSuper(pSuper);
@@ -1058,7 +1058,7 @@ AbcBlock::read_instances()
 				log_error(_("ABC: Bad name for interface."));
 				return false;
 			}
-			abc::Script *pInterface = locateScript(_multinamePool[i_index]);
+			abc::Class *pInterface = locateClass(_multinamePool[i_index]);
 			// These may be undefined still, so don't check interface just yet.
 			if (0) //!pInterface || !pInterface->isInterface())
 			{
@@ -1109,9 +1109,9 @@ AbcBlock::read_classes()
 	log_abc("There are %u classes.", count);
 	
     for (size_t i = 0; i < count; ++i) {
-		abc::Script* pScript = _classes[i];
+		abc::Class* pScript = _classes[i];
 		boost::uint32_t offset = _stream->read_V32();
-		log_abc("Script %u(%s) static constructor index=%u", i, pScript, offset);
+		log_abc("Class %u(%s) static constructor index=%u", i, pScript, offset);
 
         if (offset >= _methods.size()) {
 			log_error(_("ABC: Out of bound static constructor for class."));
@@ -1149,7 +1149,7 @@ AbcBlock::read_scripts()
 	_scripts.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		abc::Script* pScript = mCH->newScript();
+		abc::Class* pScript = mCH->newScript();
 		_scripts[i] = pScript;
 
 		boost::uint32_t offset = _stream->read_V32();
@@ -1160,12 +1160,6 @@ AbcBlock::read_scripts()
 			log_error(_("ABC: Out of bounds method for script."));
 			return false;
 		}
-
-		// Calling the Method::setOwner always results in a segmentation
-        // fault, since it tries to modify Method.mPrototype, which is never
-		// initialized.  The parser seems to work ok without this call.
-		// Don't validate for previous owner.
-//		_methods[offset]->setOwner(pScript);
 
 		pScript->setConstructor(_methods[offset]);
 		pScript->setSuper(mTheObject);
@@ -1257,7 +1251,7 @@ AbcBlock::read_method_bodies()
 				pExcept->catchAny();
 			}
 			else {
-				abc::Script *pType = locateScript(_multinamePool[catch_type]);
+				abc::Class *pType = locateClass(_multinamePool[catch_type]);
 				if (!pType) {
 
 					log_error(_("ABC: Unknown type of object to catch. (%s)"), 

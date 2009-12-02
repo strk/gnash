@@ -21,7 +21,7 @@
 namespace gnash {
     namespace abc {
         class Namespace;
-        class Script;
+        class Class;
     }
 }
 
@@ -34,7 +34,7 @@ public:
 	void setEnd(boost::uint32_t i) { mEnd = i; }
 	void setCatch(boost::uint32_t i) { mCatch = i; }
 	void catchAny() { mCatchAny = true; }
-	void setCatchType(abc::Script* p) { mCatchType = p; }
+	void setCatchType(abc::Class* p) { mCatchType = p; }
 	void setNamespace(abc::Namespace* n) { _namespace = n; }
 	void setName(string_table::key name) { _name = name; }
 
@@ -43,7 +43,7 @@ private:
 	boost::uint32_t mEnd;
 	boost::uint32_t mCatch;
 	bool mCatchAny;
-	abc::Script *mCatchType;
+	abc::Class *mCatchType;
     abc::Namespace *_namespace;
 	string_table::key _name;
 };

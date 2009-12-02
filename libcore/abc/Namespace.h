@@ -24,7 +24,7 @@
 // Forward declarations
 namespace gnash {
     namespace abc {
-        class Script;
+        class Class;
     }
     class ClassHierarchy;
     class string_table;
@@ -77,9 +77,9 @@ public:
 	/// What is the XML prefix?
 	string_table::key getPrefix() const { return _prefix; }
 
-	/// Add a Script to the namespace. The namespace stores this, but
+	/// Add a Class to the namespace. The namespace stores this, but
 	/// does not take ownership.
-	bool addScript(string_table::key name, Script* a)
+	bool addScript(string_table::key name, Class* a)
 	{
 		if (getScriptInternal(name)) return false;
 		_scripts[static_cast<std::size_t>(name)] = a;
@@ -90,11 +90,11 @@ public:
 
 	/// Get the named class. Returns NULL if information is not known
 	/// about the class. (Stubbed classes still return NULL here.)
-	Script* getScript(string_table::key name) 
+	Class* getScript(string_table::key name) 
 	{
 		if (mRecursePrevent) return NULL;
 
-		Script* found = getScriptInternal(name);
+		Class* found = getScriptInternal(name);
 
 		if (found || !getParent()) return found;
 
@@ -124,7 +124,7 @@ private:
 	string_table::key _uri;
 	string_table::key _prefix;
 
-	typedef std::map<string_table::key, Script*> container;
+	typedef std::map<string_table::key, Class*> container;
 	container _scripts;
 	mutable bool mRecursePrevent;
 
@@ -132,7 +132,7 @@ private:
 	bool _protected;
 	bool _package;
 
-	Script* getScriptInternal(string_table::key name) const
+	Class* getScriptInternal(string_table::key name) const
 	{
 		container::const_iterator i;
 		

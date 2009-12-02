@@ -19,7 +19,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Script.h"
+#include "Class.h"
 #include "as_object.h"
 #include "ClassHierarchy.h"
 #include "VM.h"
@@ -39,8 +39,8 @@ namespace abc {
 
 #ifdef ENABLE_AVM2    
 bool
-Script::addValue(string_table::key name, Namespace *ns,
-        boost::uint32_t slotId, Script *type, as_value& val, bool isconst,
+Class::addValue(string_table::key name, Namespace *ns,
+        boost::uint32_t slotId, Class *type, as_value& val, bool isconst,
         bool isstatic)
 {
     Global_as* g = VM::get().getGlobal();
@@ -67,32 +67,32 @@ Script::addValue(string_table::key name, Namespace *ns,
 }
 
 void
-Script::initPrototype()
+Class::initPrototype()
 {
     Global_as& gl = *VM::get().getGlobal();
     _prototype = new as_class(gl);
 }
 
 bool
-Script::addMemberScript(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, Script *type, bool isstatic)
+Class::addMemberScript(string_table::key name, Namespace *ns,
+	boost::uint32_t slotId, Class *type, bool isstatic)
 {
 	return addSlot(name, ns, slotId, type, isstatic);
 }
 
 bool
-Script::addSlotFunction(string_table::key name, Namespace *ns,
+Class::addSlotFunction(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, Method *method, bool isstatic)
 {
-	Script a;
+	Class a;
 	a.setName(NSV::CLASS_FUNCTION);
 	as_value b(method->getPrototype());
 	return addValue(name, ns, slotId, &a, b, false, isstatic);
 }
 
 bool
-Script::addSlot(string_table::key name, Namespace* ns,
-        boost::uint32_t slotId, Script* /*type*/, bool /*isstatic*/)
+Class::addSlot(string_table::key name, Namespace* ns,
+        boost::uint32_t slotId, Class* /*type*/, bool /*isstatic*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : 0;
 
@@ -107,7 +107,7 @@ Script::addSlot(string_table::key name, Namespace* ns,
 }
 
     bool
-Script::addMethod(string_table::key name, Namespace* /*ns*/,
+Class::addMethod(string_table::key name, Namespace* /*ns*/,
         Method* method, bool /*isstatic*/)
 {
 	as_value val = new abc::abc_function(method,
@@ -118,7 +118,7 @@ Script::addMethod(string_table::key name, Namespace* /*ns*/,
 
 
 bool
-Script::addGetter(string_table::key name, Namespace *ns, Method *method,
+Class::addGetter(string_table::key name, Namespace *ns, Method *method,
 	bool isstatic)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
@@ -141,7 +141,7 @@ Script::addGetter(string_table::key name, Namespace *ns, Method *method,
 }
 
 bool
-Script::addSetter(string_table::key name, Namespace *ns, Method *method,
+Class::addSetter(string_table::key name, Namespace *ns, Method *method,
 	bool isstatic)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
@@ -163,7 +163,7 @@ Script::addSetter(string_table::key name, Namespace *ns, Method *method,
 
 #if 0 // TODO
 void
-Script::buildFromPrototype(as_object *o, string_table::key name,
+Class::buildFromPrototype(as_object *o, string_table::key name,
 	ClassHierarchy *pCH)
 {
 	setName(name);
@@ -190,8 +190,8 @@ Script::buildFromPrototype(as_object *o, string_table::key name,
 }
 
 bool
-Script::addValue(string_table::key name, Namespace *ns, boost::uint32_t slotId,
-	Script *type, as_value& val, bool isconst, bool isstatic,
+Class::addValue(string_table::key name, Namespace *ns, boost::uint32_t slotId,
+	Class *type, as_value& val, bool isconst, bool isstatic,
 	ClassHierarchy *CH)
 {
 	asBoundValue *bv = CH->newBoundValue();
@@ -203,8 +203,8 @@ Script::addValue(string_table::key name, Namespace *ns, boost::uint32_t slotId,
 }
 
 bool
-Script::addSlot(string_table::key name, Namespace *ns, boost::uint32_t slotId,
-	Script *type, bool isstatic, ClassHierarchy *CH)
+Class::addSlot(string_table::key name, Namespace *ns, boost::uint32_t slotId,
+	Class *type, bool isstatic, ClassHierarchy *CH)
 {
 	asBoundValue *bv = CH->newBoundValue();
 	bv->setType(type);
@@ -214,7 +214,7 @@ Script::addSlot(string_table::key name, Namespace *ns, boost::uint32_t slotId,
 }
 
 bool
-Script::addMethod(string_table::key name, Namespace *ns, Method *method,
+Class::addMethod(string_table::key name, Namespace *ns, Method *method,
 	bool isstatic)
 {
 	if (!isstatic)
@@ -224,8 +224,8 @@ Script::addMethod(string_table::key name, Namespace *ns, Method *method,
 }
 
 bool
-Script::addMemberScript(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, Script *type, bool isstatic)
+Class::addMemberScript(string_table::key name, Namespace *ns,
+	boost::uint32_t slotId, Class *type, bool isstatic)
 {
 	if (!isstatic)
 		return addBinding(name, asBinding(ns, type, slotId, isstatic));
@@ -234,7 +234,7 @@ Script::addMemberScript(string_table::key name, Namespace *ns,
 
 // TODO: Figure out how this differs from addMethod
 bool
-Script::addSlotFunction(string_table::key name, Namespace *ns,
+Class::addSlotFunction(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, Method *method, bool isstatic)
 {
 	if (!isstatic)

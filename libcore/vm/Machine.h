@@ -23,7 +23,7 @@
 #include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
-#include "Script.h"
+#include "Class.h"
 #include "SWF.h"
 #include "as_environment.h"
 #include "VM.h"
@@ -120,7 +120,7 @@ public:
 	///
 	/// @return
 	/// Null if the superclass was not found, or the superclass.
-	Script* findSuper(as_value& obj, bool find_primitive);
+	Class* findSuper(as_value& obj, bool find_primitive);
 
 	/// Get a member from an object.
 	///
@@ -138,7 +138,7 @@ public:
 	/// This returns the value, but on the stack.
 	/// (Since the return value is not known until after control has left
 	/// the caller of this, it's impossible to return a meaningful value.
-	void getMember(Script* pDefinition, MultiName& name,
+	void getMember(Class* pDefinition, MultiName& name,
             as_value& source);
 
 	/// Set a member in an object.
@@ -157,7 +157,7 @@ public:
 	///
 	/// @return
 	/// Nothing.
-	void setMember(Script*, MultiName&, as_value& target, as_value& val);
+	void setMember(Class*, MultiName&, as_value& target, as_value& val);
 
 	Binding* findProperty(MultiName&) { return NULL; }
 

@@ -35,7 +35,7 @@ namespace gnash {
         class Machine;
         class abc_function;
         class Namespace;
-        class Script;
+        class Class;
     }
     class CodeStream;
     class as_object;
@@ -53,7 +53,7 @@ class Method
 {
 public:
 	
-    typedef std::list<Script*> ArgumentList;
+    typedef std::list<Class*> ArgumentList;
 
 	Method();
 
@@ -125,10 +125,10 @@ public:
 	void setBody(CodeStream *b) { _body = b; }
 
 	bool addValue(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Script *type, as_value& val, bool isconst);
+            boost::uint32_t slotID, Class *type, as_value& val, bool isconst);
 
 	bool addSlot(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Script *type);
+            boost::uint32_t slotID, Class *type);
 
 	bool addMethod(string_table::key name, Namespace *ns, Method *method);
 
@@ -137,20 +137,20 @@ public:
 	bool addSetter(string_table::key name, Namespace *ns, Method *method);
 
 	bool addMemberScript(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, Script *type);
+		boost::uint32_t slotID, Class *type);
 	
 	bool addSlotFunction(string_table::key name, Namespace *ns,
 		boost::uint32_t slotID, Method *method);
 
 	/// \brief
 	/// Set the owner of this method.
-	void setOwner(Script* s);
+	void setOwner(Class* s);
 
 	/// \brief
 	/// Get the unique identifier for the return type. 0 is 'anything'.
 	/// (This is the value of any dynamic property.)
 	/// Id reference: Type
-	Script* getReturnType() const;
+	Class* getReturnType() const;
 
 	/// Set the return type
     //
@@ -159,7 +159,7 @@ public:
     /// NB: the return type of a method can be * (any) or void, neither of
     /// which are known names, so this may not be an appropriate way to
     /// handle return type.
-	void setReturnType(Script* t);
+	void setReturnType(Class* t);
 
 	Method *getSuper();
 
@@ -221,7 +221,7 @@ public:
 	/// Push an argument of type t into the method definition
     //
     /// A value of 0 stands for 'any'.
-	void pushArgument(Script* t) { _arguments.push_back(t); }
+	void pushArgument(Class* t) { _arguments.push_back(t); }
 
 	/// Push an optional argument's default value.
 	void pushOptional(const as_value& v) { _optionalArguments.push_back(v); }

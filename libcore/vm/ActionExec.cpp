@@ -343,7 +343,7 @@ ActionExec::operator()()
         }
     }
     catch (ActionLimitException& ex) {
-        // Script execution should stop (for this frame only?)
+        // Class execution should stop (for this frame only?)
         // Here's were we should pop-up a window to prompt user about
         // what to do next (abort or not ?)
         cleanupAfterRun(true); // we expect inconsistencies here

@@ -44,7 +44,7 @@ namespace gnash {
         class BoundValue;
         class BoundAccessor;
         class Method;
-        class Script;
+        class Class;
         typedef Property Binding;
         class Namespace;
     }
@@ -55,32 +55,31 @@ namespace gnash {
 namespace gnash {
 namespace abc {
 
-/// A class to represent, AS3 scripts.
+/// A class to represent AS3 Classes.
 //
-/// Used to store ABC scripts. These are not themselves AS-referenceable
+/// Used to store ABC classes. These are not themselves AS-referenceable
 /// objects, but can be associated with AS3 Class objects in a way that
 /// is yet to be determined.
 //
 /// TODO: update this documentation when we've worked it out.
 //
-/// A Script is a static description of a Class. Scripts have the following
-/// important properties:
+/// An abc::Class is a static description of an ActionScript Class. Classes
+/// have the following important properties:
 //
 /// 1.  A static initialization method ("cinit"). This is executed no more
-///     than once. The point at which the cinit method is called depends on
-///     the structure of the SWF. It is always executed before the iinit
-///     method is called.
+///     than once. 
 /// 2.  A constructor method ("iinit"). This is run every time the Class
 ///     is constructed. As not all Classes are constructed, the iinit method
 ///     may never be executed.
 //
-/// Note that Gnash (and AS3), a Class is regarded as an instance of a
-/// Script, and an Object is an instance of a Class.
-class Script
+/// A Script may contain more than one class. When a Script runs, the cinit
+/// methods of all its classes are executed in the order they appear in the
+/// Script. 
+class Class
 {
 public:
 
-	Script()
+	Class()
         :
         _prototype(0),
         _final(false),
@@ -119,11 +118,11 @@ public:
 #ifdef ENABLE_AVM2
 
 	bool addValue(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Script *type, as_value& val,
+            boost::uint32_t slotID, Class *type, as_value& val,
             bool isconst, bool isstatic);
 
 	bool addSlot(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Script *type, bool isstatic);
+            boost::uint32_t slotID, Class *type, bool isstatic);
 
 	bool addMethod(string_table::key name, Namespace *ns, Method *method,
 		bool isstatic);
@@ -135,7 +134,7 @@ public:
 		bool isstatic);
 
 	bool addMemberScript(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, Script *type, bool isstatic);
+		boost::uint32_t slotID, Class *type, bool isstatic);
 
 	// TODO: Figure out how this differs from addMethod
 	bool addSlotFunction(string_table::key name, Namespace *ns,
@@ -195,11 +194,11 @@ public:
 	void initPrototype();
 
     /// TODO: see if these are useful.
-	Script* getSuper() const { return _super; }
-	void setSuper(Script *p) { _super = p; }
+	Class* getSuper() const { return _super; }
+	void setSuper(Class *p) { _super = p; }
 
 	/// We implement this interface.
-	void pushInterface(Script* p) { _interfaces.push_back(p); }
+	void pushInterface(Class* p) { _interfaces.push_back(p); }
 
 	/// Set the iinit method.
     //
@@ -208,7 +207,7 @@ public:
 
     /// Get the iinit method or 'constructor'.
     //
-    /// A Script is also valid if it does not have an iinit method, so this
+    /// A Class is also valid if it does not have an iinit method, so this
     /// function can return 0.
 	Method* getConstructor() const {
         return _constructor;
@@ -221,7 +220,7 @@ public:
 
     /// Get the cinit method or 'static constructor'.
     //
-    /// A Script may have no cinit method, so this function can return 0.
+    /// A Class may have no cinit method, so this function can return 0.
     Method* getStaticConstructor() const { 
         return _staticConstructor;
     }
@@ -274,9 +273,9 @@ private:
 	bool _dynamic;
 	bool _interface;
 	string_table::key _name;
-	std::list<Script*> _interfaces;
+	std::list<Class*> _interfaces;
 	Namespace* _protectedNs;
-	Script* _super;
+	Class* _super;
 	Method* _constructor;
 	Method* _staticConstructor;
 

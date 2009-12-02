@@ -33,7 +33,7 @@ namespace abc {
 void
 Namespace::stubPrototype(ClassHierarchy& ch, string_table::key name)
 {
-	abc::Script *pClass = ch.newScript();
+	abc::Class *pClass = ch.newScript();
 	pClass->setName(name);
 	addScript(name, pClass);
 }
