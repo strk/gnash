@@ -23,21 +23,55 @@
 
 namespace gnash {
 
+void
+GetterSetter::UserDefinedGetterSetter::markReachableResources() const
+{
+	if (_getter) _getter->setReachable();
+	if (_setter) _setter->setReachable();
+	_underlyingValue.setReachable();
+}
+
+as_value
+GetterSetter::UserDefinedGetterSetter::get(fn_call& fn) const
+{
+	ScopedLock lock(*this);
+	if (!lock.obtainedLock()) {
+		return _underlyingValue;
+	}
+
+	if (_getter) return _getter->call(fn);
+    
+    // should we return underlyingValue here ?
+	return as_value(); 
+}
+
+void
+GetterSetter::UserDefinedGetterSetter::set(fn_call& fn)
+{
+	ScopedLock lock(*this);
+	if (!lock.obtainedLock() || ! _setter) {
+		_underlyingValue = fn.arg(0);
+		return;
+	}
+
+	_setter->call(fn);
+}
+
 as_value
 Property::getDelayedValue(const as_object& this_ptr) const
 {
-	const GetterSetter* a = boost::get<const GetterSetter>(&mBound);
+	const GetterSetter* a = boost::get<const GetterSetter>(&_bound);
 
 	as_environment env(getVM(this_ptr));
 	fn_call fn(const_cast<as_object*>(&this_ptr), env);
-	if (mDestructive)
+	if (_destructive)
 	{
 		as_value ret = a->get(fn);
 		// The getter might have called the setter, and we should not override.
-		if (mDestructive)
+		if (_destructive)
 		{
-			mBound = ret;
-			mDestructive = false;
+			_bound = ret;
+			_destructive = false;
 		}
 		return ret;
 	}
@@ -48,7 +82,7 @@ Property::getDelayedValue(const as_object& this_ptr) const
 void
 Property::setDelayedValue(as_object& this_ptr, const as_value& value)
 {
-	GetterSetter* a = boost::get<GetterSetter>(&mBound);
+	GetterSetter* a = boost::get<GetterSetter>(&_bound);
 
 	as_environment env(getVM(this_ptr));
 
@@ -66,11 +100,11 @@ Property::setSetter(as_function* func)
 {
 	if (isGetterSetter())
 	{
-		GetterSetter* a = boost::get<GetterSetter>(&mBound);
+		GetterSetter* a = boost::get<GetterSetter>(&_bound);
 		a->setSetter(func);
 	}
 	else
-		mBound = GetterSetter(NULL, func);
+		_bound = GetterSetter(NULL, func);
 }
 
 void
@@ -78,83 +112,46 @@ Property::setGetter(as_function* func)
 {
 	if (isGetterSetter())
 	{
-		GetterSetter* a = boost::get<GetterSetter>(&mBound);
+		GetterSetter* a = boost::get<GetterSetter>(&_bound);
 		a->setGetter(func);
 	}
-	else mBound = GetterSetter(func, 0);
+	else _bound = GetterSetter(func, 0);
 }
 
 void
 Property::setReachable() const
 {
-	switch (mBound.which())
+	switch (_bound.which())
 	{
-	    case 0: // Blank, nothing to do.
+	    case TYPE_EMPTY: 
 		    break;
-	    case 1: // Simple property, value
-	    {
-		    boost::get<as_value>(mBound).setReachable();
+
+        case TYPE_VALUE: 
+		    boost::get<as_value>(_bound).setReachable();
 		    break;
-	    }
-	    case 2: // Getter/setter
+
+	    case TYPE_GETTER_SETTER: 
 	    {
-		    const GetterSetter& a = boost::get<GetterSetter>(mBound);
+		    const GetterSetter& a = boost::get<GetterSetter>(_bound);
 		    a.markReachableResources();
 		    break;
 	    }
-	    default:
-	    	abort(); // Not here.
-		    break;
 	}
-}
-
-void
-GetterSetter::UserDefinedGetterSetter::markReachableResources() const
-{
-	if (mGetter) mGetter->setReachable();
-	if (mSetter) mSetter->setReachable();
-	underlyingValue.setReachable();
-}
-
-as_value
-GetterSetter::UserDefinedGetterSetter::get(fn_call& fn) const
-{
-	ScopedLock lock(*this);
-	if ( ! lock.obtained() )
-	{
-		return underlyingValue;
-	}
-
-	if (mGetter) return mGetter->call(fn);
-	else return as_value(); // should we return underlyingValue here ?
-}
-
-void
-GetterSetter::UserDefinedGetterSetter::set(fn_call& fn)
-{
-	ScopedLock lock(*this);
-	if ( ! lock.obtained() || ! mSetter )
-	{
-		underlyingValue = fn.arg(0);
-		return;
-	}
-
-	mSetter->call(fn);
 }
 
 as_value
 Property::getValue(const as_object& this_ptr) const
 {
-	switch (mBound.which())
+	switch (_bound.which())
 	{
-	case 0: // blank, nothing to do.
-		return as_value();
-	case 1: // Bound value
-		return boost::get<as_value>(mBound);
-	case 2: // Getter/setter
-		return getDelayedValue(this_ptr);
-	} // end of switch
-	return as_value(); // Not reached.
+        case TYPE_EMPTY:
+            return as_value();
+        case TYPE_VALUE:
+            return boost::get<as_value>(_bound);
+        case TYPE_GETTER_SETTER: 
+            return getDelayedValue(this_ptr);
+	} 
+    return as_value();
 }
 
 const as_value&
@@ -162,51 +159,50 @@ Property::getCache() const
 {
 	static as_value undefVal;
 
-	switch (mBound.which())
+	switch (_bound.which())
 	{
-	case 0: // blank, nothing to do.
-		return undefVal;
-	case 1: // Bound value
-		return boost::get<as_value&>(mBound);
-	case 2: // Getter/setter
-		return boost::get<GetterSetter&>(mBound).getCache();
-	} // end of switch
-	return undefVal; // not reached
+        case TYPE_EMPTY:
+            return undefVal;
+        case TYPE_VALUE:
+            return boost::get<as_value&>(_bound);
+        case TYPE_GETTER_SETTER:
+            return boost::get<GetterSetter&>(_bound).getCache();
+	} 
+    return undefVal;
 }
 
 void
 Property::setValue(as_object& this_ptr, const as_value &value)
 {
-	switch (mBound.which())
+	switch (_bound.which())
 	{
-	case 0: // As yet unbound, so make it a simple
-	case 1: // Bound value, set. Trust our callers to check read-only.
-		mBound = value;
-		return;
-	case 2: // Getter/setter
-		// Destructive are always overwritten.
-		if (mDestructive)
-		{
-			mDestructive = false;
-			mBound = value;
-		}
-		else setDelayedValue(this_ptr, value);
-		return;
-	}
+        case TYPE_EMPTY: 
+        case TYPE_VALUE: 
+            _bound = value;
+            return;
+        case TYPE_GETTER_SETTER:
+            // Destructive are always overwritten.
+            if (_destructive) {
+                _destructive = false;
+                _bound = value;
+            }
+            else setDelayedValue(this_ptr, value);
+            return;
+        }
 }
 
 void
 Property::setCache(const as_value &value)
 {
-	switch (mBound.which())
+	switch (_bound.which())
 	{
-	case 0: // As yet unbound, so make it a simple
-	case 1: // Bound value, set. Trust our callers to check read-only.
-		mBound = value;
-		return;
-	case 2: // Getter/setter
-		boost::get<GetterSetter&>(mBound).setCache(value);
-		return;
+        case TYPE_EMPTY:
+        case TYPE_VALUE: 
+            _bound = value;
+            return;
+        case TYPE_GETTER_SETTER: 
+            boost::get<GetterSetter&>(_bound).setCache(value);
+            return;
 	}
 }
 

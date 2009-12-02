@@ -90,18 +90,6 @@ iterator_find(PropertyList::container &p, int order)
 	return p.get<1>().find(order);
 }
 
-bool
-PropertyList::getValueByOrder(int order, as_value& val,
-	as_object& this_ptr)
-{
-	orderIterator i = iterator_find(_props, order);
-	if (i == _props.get<1>().end())
-		return false;
-
-	val = i->getValue(this_ptr);
-	return true;
-}
-
 const Property*
 PropertyList::getPropertyByOrder(int order)
 {
@@ -134,17 +122,18 @@ bool
 PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 {
 	orderIterator found = iterator_find(_props, slotId + 1);
-	if (found != _props.get<1>().end())
-		return false;
+	if (found != _props.get<1>().end()) return false;
 
 	Property a(getName(uri), getNamespace(uri), as_value());
 	a.setOrder(slotId + 1);
 	_props.insert(a);
+
 #ifdef GNASH_DEBUG_PROPERTY
 	string_table& st = _vm.getStringTable();
 	log_debug("Slot for AS property %s::%s inserted with flags %s",
             getNamespace(uri), getName(uri), a.getFlags());
 #endif
+
 	return true;
 }
 
@@ -276,9 +265,9 @@ PropertyList::setFlagsAll(const PropertyList& props,
 	for (container::const_iterator it = props._props.begin(),
 		itEnd = props._props.end(); it != itEnd; ++it )
 	{
-		string_table::key key = it->mName;
+		string_table::key key = it->_name;
 
-		if (setFlags(key, flagsSet, flagsClear, it->mNamespace)) ++success;
+		if (setFlags(key, flagsSet, flagsClear, it->_namespace)) ++success;
 		else ++failure;
 	}
 
@@ -299,11 +288,11 @@ PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 
 		if (i->getFlags().get_dont_enum()) continue;
 
-		if (donelist.insert(std::make_pair(i->mName, i->mNamespace)).second) {
+		if (donelist.insert(std::make_pair(i->_name, i->_namespace)).second) {
 
-            const std::string& qname = i->mNamespace ?
-                st.value(i->mName) + "." + st.value(i->mNamespace) :
-                st.value(i->mName);
+            const std::string& qname = i->_namespace ?
+                st.value(i->_name) + "." + st.value(i->_namespace) :
+                st.value(i->_name);
 
 			env.push(qname);
 		}
@@ -326,7 +315,7 @@ PropertyList::enumerateKeyValue(const as_object& this_ptr,
         // Undefined values should be "undefined" for SWF7 and
         // empty for SWF6.
         const int version = vm.getSWFVersion();
-		to.push_back(std::make_pair(st.value(i->mName),
+		to.push_back(std::make_pair(st.value(i->_name),
 				i->getValue(this_ptr).to_string_versioned(version)));
 	}
 }
@@ -342,7 +331,7 @@ PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to)
             i != ie; ++i)
 	{
 		to.insert(std::make_pair(
-                    st.value(i->mNamespace) + "::" + st.value(i->mName),
+                    st.value(i->_namespace) + "::" + st.value(i->_name),
                     i->getValue(this_ptr)));
 	}
 }
@@ -353,7 +342,7 @@ PropertyList::dump(as_object& this_ptr)
 	string_table& st = _vm.getStringTable();
 	for (container::const_iterator it=_props.begin(), itEnd=_props.end(); it != itEnd; ++it )
 	{
-		log_debug("  %s::%s: %s", st.value(it->mNamespace), st.value(it->mName),
+		log_debug("  %s::%s: %s", st.value(it->_namespace), st.value(it->_name),
 			it->getValue(this_ptr));
 	}
 }
@@ -365,7 +354,7 @@ PropertyList::import(const PropertyList& o)
 		itEnd = o._props.end(); it != itEnd; ++it)
 	{
 		// overwrite any previous property with this name
-		container::iterator found = iterator_find(_props, it->mName, it->mNamespace);
+		container::iterator found = iterator_find(_props, it->_name, it->_namespace);
 		if (found != _props.end())
 		{
 			Property a = *it;

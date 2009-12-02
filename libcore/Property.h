@@ -47,13 +47,13 @@ public:
 	GetterSetter(as_function* getter, as_function* setter)
 		:
 		_getset(UserDefinedGetterSetter(getter, setter))
-	{/**/}
+	{}
 
 	/// Construct a native getter-setter
 	GetterSetter(as_c_function_ptr getter, as_c_function_ptr setter)
 		:
 		_getset(NativeGetterSetter(getter, setter))
-	{/**/}
+	{}
 
 	/// Invoke the getter
 	as_value get(fn_call& fn) const
@@ -101,10 +101,11 @@ public:
 	/// Get the cache value (for user-defined getter-setters)
 	const as_value& getCache() const
 	{
-		switch ( _getset.which() )
+		switch (_getset.which())
 		{
 			case 0: // user-defined
-				return boost::get<UserDefinedGetterSetter>(_getset).getUnderlying();
+				return boost::get<UserDefinedGetterSetter>(
+                        _getset).getUnderlying();
 		}
 		static as_value undefVal;
 		return undefVal;
@@ -113,8 +114,7 @@ public:
 	/// Set a user-defined getter
 	void setGetter(as_function* fun)
 	{
-		if ( _getset.which() == 0 )
-		{
+		if (_getset.which() == 0) {
 			boost::get<UserDefinedGetterSetter>(_getset).setGetter(fun);
 		}
 	}
@@ -122,31 +122,32 @@ public:
 	/// Set a user-defined setter
 	void setSetter(as_function* fun)
 	{
-		if ( _getset.which() == 0 )
-		{
+		if (_getset.which() == 0) {
 			boost::get<UserDefinedGetterSetter>(_getset).setSetter(fun);
 		}
 	}
 
 	void markReachableResources() const
 	{
-		if ( _getset.which() == 0 )
-		{
-			boost::get<UserDefinedGetterSetter>(_getset).markReachableResources();
+		if (_getset.which() == 0) {
+			boost::get<UserDefinedGetterSetter>(
+                    _getset).markReachableResources();
 		}
 	}
 
 private:
 
 	/// User-defined getter/setter
-	class UserDefinedGetterSetter {
+	class UserDefinedGetterSetter
+    {
 	public:
+
 		UserDefinedGetterSetter(as_function* get, as_function* set)
 			:
-			mGetter(get),
-			mSetter(set),
-			underlyingValue(),
-			beingAccessed(false)
+			_getter(get),
+			_setter(set),
+			_underlyingValue(),
+			_beingAccessed(false)
 		{}
 
 		/// Invoke the getter
@@ -156,49 +157,49 @@ private:
 		void set(fn_call& fn);
 
 		/// Get the underlying value
-		const as_value& getUnderlying() const { return underlyingValue; }
+		const as_value& getUnderlying() const { return _underlyingValue; }
 
 		/// Set the underlying value
-		void setUnderlying(const as_value& v) { underlyingValue=v; }
+		void setUnderlying(const as_value& v) { _underlyingValue = v; }
 
 		/// Set the setter
-		void setSetter(as_function* setter) { mSetter = setter; }
+		void setSetter(as_function* setter) { _setter = setter; }
 
 		/// Set the getter
-		void setGetter(as_function* getter) { mGetter = getter; }
+		void setGetter(as_function* getter) { _getter = getter; }
 
 		void markReachableResources() const;
 
 	private:
-		as_function* mGetter;
-		as_function* mSetter;
 
-		as_value underlyingValue;
+		as_function* _getter;
+		as_function* _setter;
 
-		mutable bool beingAccessed;
+		as_value _underlyingValue;
 
-		/// For SWF6 (not higher) a user-defined getter-setter would not be invoked
-		/// while being set. This ScopedLock helps marking a
-		/// Getter-Setter as being invoked in an exception-safe
-		/// manner.
-		class ScopedLock {
-			const UserDefinedGetterSetter& a;
-			bool obtainedLock;
+		mutable bool _beingAccessed;
 
-			ScopedLock(ScopedLock&);
-			ScopedLock& operator==(ScopedLock&);
+		/// For SWF6 (not higher) a user-defined getter-setter would not
+        /// be invoked while being set. This ScopedLock helps marking a
+        /// Getter-Setter as being invoked in an exception-safe manner.
+        //
+        /// Note this is not thread safe and does not attempt to provide 
+        /// thread safety.
+		class ScopedLock : boost::noncopyable
+        {
 		public:
 
-			ScopedLock(const UserDefinedGetterSetter& na) : a(na)
+			ScopedLock(const UserDefinedGetterSetter& na)
+                :
+                _a(na),
+                _obtainedLock(_a._beingAccessed ? false : true)
 			{
-				if ( a.beingAccessed ) obtainedLock=false;
-				else {
-					a.beingAccessed = true;
-					obtainedLock = true;
-				}
+                // If we didn't obtain the lock it would be true anyway,
+                // but it's probably polite to avoid touching it.
+                if (_obtainedLock) _a._beingAccessed = true;
 			}
 
-			~ScopedLock() { if ( obtainedLock) a.beingAccessed = false; }
+			~ScopedLock() { if ( _obtainedLock) _a._beingAccessed = false; }
 
 			/// Return true if the lock was obtained
 			//
@@ -206,12 +207,15 @@ private:
 			/// which means we should set the underlyingValue instead
 			/// of calling the setter (for SWF6, again).
 			///
-			bool obtained() const { return obtainedLock; }
-		};
+			bool obtainedLock() const { return _obtainedLock; }
 
-		friend class ScopedLock;
+        private:
 
-	};
+			const UserDefinedGetterSetter& _a;
+			bool _obtainedLock;
+
+        };
+    };
 
 	/// Native GetterSetter
 	class NativeGetterSetter {
@@ -220,25 +224,24 @@ private:
 
 		NativeGetterSetter(as_c_function_ptr get, as_c_function_ptr set)
 			:
-			cGetter(get), cSetter(set) {}
+			_getter(get), _setter(set) {}
 
 		/// Invoke the getter
 		as_value get(fn_call& fn) const
 		{
-			return cGetter(fn);
+			return _getter(fn);
 		}
 
 		/// Invoke the setter
 		void set(fn_call& fn)
 		{
-			cSetter(fn);
+			_setter(fn);
 		}
 
 	private:
 
-		as_c_function_ptr cGetter;
-
-		as_c_function_ptr cSetter;
+		as_c_function_ptr _getter;
+		as_c_function_ptr _setter;
 	};
 
 	boost::variant<UserDefinedGetterSetter, NativeGetterSetter> _getset;
@@ -248,56 +251,26 @@ private:
 /// An abstract property
 class Property
 {
-private:
-	friend class PropertyList; // For index access
-
-	/// Properties flags
-	PropFlags _flags;
-
-	// Store the various types of things that can be held.
-	typedef boost::variant<boost::blank, as_value, GetterSetter> boundType;
-
-	// Changing this doesn't change the identity of the property, so it is
-	// mutable.
-	mutable boundType mBound;
-
-	// If true, as soon as getValue has been invoked once, the
-	// returned value becomes a fixed return (though it can be
-	// overwritten if not readOnly)
-	mutable bool mDestructive;
-	
-	string_table::key mName;
-	string_table::key mNamespace;
-	// An ordering number, for access by order
-	// (AS3 enumeration and slots, AS2 arrays)
-	int mOrderId;
-
-	/// Get a value from a getter function.
-	as_value getDelayedValue(const as_object& this_ptr) const;
-
-	/// Set a value using a setter function.
-	void setDelayedValue(as_object& this_ptr, const as_value& value);
-
 public:
 	/// Default constructor
 	Property(string_table::key name = 0, string_table::key nsId = 0)
         : 
-		mBound(as_value()),
-        mDestructive(false),
-        mName(name),
-        mNamespace(nsId),
-		mOrderId(0)
+		_bound(as_value()),
+        _destructive(false),
+        _name(name),
+        _namespace(nsId),
+		_orderID(0)
 	{}
 
 	/// Copy constructor
 	Property(const Property& p)
         :
 		_flags(p._flags),
-        mBound(p.mBound),
-        mDestructive(p.mDestructive),
-		mName(p.mName),
-        mNamespace(p.mNamespace),
-        mOrderId(p.mOrderId)
+        _bound(p._bound),
+        _destructive(p._destructive),
+		_name(p._name),
+        _namespace(p._namespace),
+        _orderID(p._orderID)
 	{}
 
 	/// Constructor taking initial flags
@@ -305,32 +278,32 @@ public:
 		const PropFlags& flags)
         :
         _flags(flags),
-		mBound(as_value()),
-        mDestructive(false),
-        mName(name),
-        mNamespace(nsId),
-		mOrderId(0)
+		_bound(as_value()),
+        _destructive(false),
+        _name(name),
+        _namespace(nsId),
+		_orderID(0)
 	{}
 
 	Property(string_table::key name, string_table::key nsId, 
 		const as_value& value)
         :
-        mBound(value),
-        mDestructive(false),
-		mName(name),
-        mNamespace(nsId),
-		mOrderId(0)
+        _bound(value),
+        _destructive(false),
+		_name(name),
+        _namespace(nsId),
+		_orderID(0)
 	{}
 
 	Property(string_table::key name, string_table::key nsId,
 		const as_value& value, const PropFlags& flags)
         :
 		_flags(flags),
-        mBound(value),
-        mDestructive(false),
-		mName(name),
-        mNamespace(nsId),
-		mOrderId(0)
+        _bound(value),
+        _destructive(false),
+		_name(name),
+        _namespace(nsId),
+		_orderID(0)
 	{}
 
 	Property(string_table::key name, string_table::key nsId,
@@ -338,22 +311,22 @@ public:
 		const PropFlags& flags, bool destroy = false)
         :
 		_flags(flags), 
-        mBound(GetterSetter(getter, setter)),
-		mDestructive(destroy),
-        mName(name),
-        mNamespace(nsId),
-		mOrderId(0)
+        _bound(GetterSetter(getter, setter)),
+		_destructive(destroy),
+        _name(name),
+        _namespace(nsId),
+		_orderID(0)
 	{}
 
 	Property(string_table::key name, string_table::key nsId,
 		as_function *getter, as_function *setter, bool destroy = false)
         :
 		_flags(),
-        mBound(GetterSetter(getter, setter)),
-        mDestructive(destroy),
-		mName(name),
-        mNamespace(nsId),
-		mOrderId(0)
+        _bound(GetterSetter(getter, setter)),
+        _destructive(destroy),
+		_name(name),
+        _namespace(nsId),
+		_orderID(0)
 	{}
 
 	Property(string_table::key name, string_table::key nsId,
@@ -361,11 +334,11 @@ public:
 		const PropFlags& flags, bool destroy = false)
 		:
 		_flags(flags),
-        mBound(GetterSetter(getter, setter)),
-        mDestructive(destroy),
-		mName(name),
-        mNamespace(nsId),
-		mOrderId(0)
+        _bound(GetterSetter(getter, setter)),
+        _destructive(destroy),
+		_name(name),
+        _namespace(nsId),
+		_orderID(0)
 	{}
 
 	/// Set a user-defined setter
@@ -436,19 +409,21 @@ public:
 	///       the index invariant. (at least this is what happens
 	///       with standard containers indexed on an element's member).
 	///
-	void setOrder(int order) { mOrderId = order; }
+	void setOrder(int order) { _orderID = order; }
 
 	/// Get the order id
-	int getOrder() const { return mOrderId; }
+	int getOrder() const { return _orderID; }
 
 	/// is this a read-only member ?
 	bool isReadOnly() const { return _flags.get_read_only(); }
 
 	/// Is this a getter/setter property?
-	bool isGetterSetter() const { return mBound.which() == 2; }
+	bool isGetterSetter() const {
+        return _bound.which() == TYPE_GETTER_SETTER;
+    }
 
 	/// is this a destructive property ?
-	bool isDestructive() const { return mDestructive; }
+	bool isDestructive() const { return _destructive; }
 
 	/// Is this a static property?
 	bool isStatic() const { return _flags.get_static(); }
@@ -462,13 +437,52 @@ public:
 	void clearVisible(int swfVersion) { _flags.clear_visible(swfVersion); }
 
 	/// What is the name of this property?
-	string_table::key getName() const { return mName; }
+	string_table::key getName() const { return _name; }
 
 	/// What is the namespace of this property?
-	string_table::key getNamespace() const { return mNamespace; }
+	string_table::key getNamespace() const { return _namespace; }
 
 	/// Mark this property as being reachable (for the GC)
 	void setReachable() const;
+
+private:
+
+	friend class PropertyList; // For index access
+
+	/// Properties flags
+	PropFlags _flags;
+
+    enum Type {
+        TYPE_EMPTY,
+        TYPE_VALUE,
+        TYPE_GETTER_SETTER
+    };
+
+	// Store the various types of things that can be held.
+	typedef boost::variant<boost::blank, as_value, GetterSetter> BoundType;
+
+	// Changing this doesn't change the identity of the property, so it is
+	// mutable.
+	mutable BoundType _bound;
+
+	// If true, as soon as getValue has been invoked once, the
+	// returned value becomes a fixed return (though it can be
+	// overwritten if not readOnly)
+	mutable bool _destructive;
+	
+	string_table::key _name;
+	string_table::key _namespace;
+
+	// An ordering number, for access by order
+	// (AS3 enumeration and slots, AS2 arrays)
+	int _orderID;
+
+	/// Get a value from a getter function.
+	as_value getDelayedValue(const as_object& this_ptr) const;
+
+	/// Set a value using a setter function.
+	void setDelayedValue(as_object& this_ptr, const as_value& value);
+
 };
 
 } // namespace gnash

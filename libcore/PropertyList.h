@@ -76,13 +76,13 @@ public:
             boost::multi_index::ordered_unique<
                 boost::multi_index::composite_key<
                     Property,
-                    boost::multi_index::member<Property,string_table::key,&Property::mName>,
-                    boost::multi_index::member<Property,string_table::key,&Property::mNamespace>
+                    boost::multi_index::member<Property,string_table::key,&Property::_name>,
+                    boost::multi_index::member<Property,string_table::key,&Property::_namespace>
                 >
             >,
             boost::multi_index::ordered_unique<
                 boost::multi_index::tag<PropertyList::oType>,
-                boost::multi_index::member<Property,int,&Property::mOrderId>
+                boost::multi_index::member<Property,int,&Property::_orderID>
             >
         >
     > container;
@@ -138,19 +138,10 @@ public:
         {
             if (!cmp(*it)) continue;
             as_value val = it->getValue(this_ptr);
-            if (!visitor.accept(it->mName, val)) return;
+            if (!visitor.accept(it->_name, val)) return;
         }
     }
 
-    /// Get the as_value value of an ordered property
-    //
-    /// getter/setter will be invoked, just as for getValue
-    ///
-    /// @param order    The order number: negative for default values, 
-    ///                 non-negative for properties which were specifically
-    ///                 positioned.
-    bool getValueByOrder(int order, as_value& val, as_object& this_ptr);
-    
     /// Get the order number just after the passed order number.
     ///
     /// @param order    0 is a special value indicating the first order
