@@ -1061,7 +1061,7 @@ as_object::enumerateProperties(as_environment& env) const
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
 	std::set< const as_object* > visited;
-	PropertyList::propNameSet named;
+	PropertyList::PropTracker named;
 
 	boost::intrusive_ptr<const as_object> obj(this);
 	

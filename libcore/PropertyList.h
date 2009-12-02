@@ -57,6 +57,9 @@ public:
     typedef std::pair<std::string, std::string> KeyValuePair;
     typedef std::vector<KeyValuePair> SortedPropertyList;
     
+    // Used to keep track of which properties have been enumerated.
+    typedef std::set<std::pair<string_table::key, string_table::key> >
+        PropTracker;
 
     /// A tag type for multi-index
     struct oType {};
@@ -150,7 +153,7 @@ public:
     /// @return         A value which can be used for ordered access. 
     const Property* getOrderAfter(int order);
 
-    /// Set the value of a property, creating a new one if unexistent.
+    /// Set the value of a property, creating a new one if it doesn't exist.
     //
     /// If the named property is a getter/setter one it's setter
     /// will be invoked using the given as_object as 'this' pointer.
@@ -158,11 +161,9 @@ public:
     ///
     /// @param key
     ///    Name of the property. Search is case-*sensitive*
-    ///
     /// @param value
     ///    a const reference to the as_value to use for setting
     ///    or creating the property. 
-    ///
     /// @param this_ptr
     ///     The as_object used to set the 'this' pointer
     ///     for calling getter/setter function (GetterSetterProperty);
@@ -171,14 +172,11 @@ public:
     ///    This parameter is non-const as nothing prevents an
     ///    eventual "Setter" function from actually modifying it,
     ///    so we can't promise constness.
-    ///
     /// @param namespaceId
     ///    The namespace in which this should be entered. If 0 is given,
     ///    this will use the first value found, if it exists.
-    ///
     /// @param flagsIfMissing
     ///    Flags to associate to the property if a new one is created.
-    ///
     /// @return true if the value was successfully set, false
     ///         otherwise (found a read-only property, most likely).
     bool setValue(string_table::key key, const as_value& value,
@@ -190,20 +188,15 @@ public:
     /// @param slotId
     /// The slot id to use. (Note that getOrder() on this property will return
     /// this slot number + 1 if the assignment was successful.)
-    //
     /// @param key      Name of the property.
-    ///
     /// @param nsId     The namespace in which the property should be found.
-    ///
     /// @return         true if the slot did not previously exist.
     bool reserveSlot(const ObjectURI& uri, boost::uint16_t slotId);
 
     /// Get a property if it exists.
     //
     /// @param key  Name of the property. Search is case-*sensitive*
-    ///
     /// @param nsId The id of the namespace to search
-    ///
     /// @return     A Property or 0, if no such property exists.
     ///             All Property objects are owned by this PropertyList. Do
     ///             not delete them.
@@ -219,9 +212,7 @@ public:
     //
     ///
     /// @param key      Name of the property.
-    ///
     /// @param nsId     Name of the namespace
-    ///
     /// @return         a pair of boolean values expressing whether the property
     ///                 was found (first) and whether it was deleted (second).
     ///                 Of course a pair(false, true) would be invalid (deleted
@@ -237,11 +228,9 @@ public:
     /// TODO: this function has far too many arguments.
     //
     /// @param key      Name of the property. Search is case-*sensitive*
-    ///
     /// @param getter   A function to invoke when this property value is
     ///                 requested. 
     /// @param setter   A function to invoke when setting this property's value.
-    ///
     /// @param cacheVal The value to use as a cache. If null uses any cache
     ///                 from pre-existing property with same name.
     /// @param flagsIfMissing Flags to associate to the property if a new one
@@ -255,7 +244,6 @@ public:
     /// Add a getter/setter property, if not already existing
     //
     /// @param key      Name of the property.
-    ///
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param setter   A function to invoke when setting this property's value.
@@ -319,10 +307,6 @@ public:
     ///
     void import(const PropertyList& props);
 
-    // Used to keep track of which properties have been enumerated.
-    typedef std::set<std::pair<string_table::key, string_table::key> >
-        propNameSet;
-
     /// \brief
     /// Enumerate all non-hidden properties pushing
     /// their keys to the given as_environment.
@@ -330,7 +314,7 @@ public:
     ///
     /// @param donelist
     /// Don't enumerate those in donelist. Add those done to donelist.
-    void enumerateKeys(as_environment& env, propNameSet& donelist) const;
+    void enumerateKeys(as_environment& env, PropTracker& donelist) const;
 
     /// \brief
     /// Enumerate all non-hidden properties inserting

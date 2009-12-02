@@ -167,9 +167,6 @@ class as_object : public GcResource
     friend class abc::Class;
     friend class abc::Machine;
 
-    typedef std::set<std::pair<string_table::key, string_table::key> >
-        propNameSet;
-
     typedef PropertyList::SortedPropertyList SortedPropertyList;
 
 public:

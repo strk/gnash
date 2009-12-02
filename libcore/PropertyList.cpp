@@ -234,7 +234,7 @@ PropertyList::delProperty(string_table::key key, string_table::key nsId)
 }
 
 void
-PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
+PropertyList::enumerateKeys(as_environment& env, PropTracker& donelist) const
 {
 	string_table& st = getStringTable(env);
 
