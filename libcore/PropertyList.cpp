@@ -64,17 +64,11 @@ PropertyList::operator=(const PropertyList& pl)
 
 namespace {
 
-// Should find in any namespace if nsId is 0, and any namespace should find
-// something in namespace 0.
 inline
 PropertyList::container::iterator
 iterator_find(const PropertyList::container &p, const ObjectURI& uri)
 {
-    PropertyList::container::iterator i = p.find(uri);
-    if (i != p.end() || !getNamespace(uri)) return i;
-
-    // If a namespace was specified, search the global namespace too.
-    return p.find(getName(uri));
+    return p.find(uri);
 }
 
 }
