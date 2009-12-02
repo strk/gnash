@@ -105,12 +105,13 @@ public:
         _st(vm.getStringTable())
     {};
 
-    bool accept(string_table::key key, const as_value& val) 
+    bool accept(const ObjectURI& uri, const as_value& val) 
     {
         AMF amf;
         boost::shared_ptr<amf::Element> el;
         
-        const std::string& name = _st.string_table::value(key);
+        // We omit the namespace.
+        const std::string& name = _st.string_table::value(getName(uri));
 
         //log_debug("Serializing SharedObject property %s:%s", name, val);
 
@@ -167,7 +168,7 @@ public:
     
     bool success() const { return !_error; }
 
-    virtual bool accept(string_table::key key, const as_value& val) 
+    virtual bool accept(const ObjectURI& uri, const as_value& val) 
     {
         assert(!_error);
 
@@ -175,6 +176,8 @@ public:
             log_debug("SOL: skip serialization of FUNCTION property");
             return true;
         }
+
+        const string_table::key key = getName(uri);
 
         // Test conducted with AMFPHP:
         // '__proto__' and 'constructor' members

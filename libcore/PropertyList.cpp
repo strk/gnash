@@ -122,37 +122,36 @@ PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
     order_iterator found = iterator_find(_props, slotId + 1);
 	if (found != _props.get<1>().end()) return false;
 
-	Property a(getName(uri), getNamespace(uri), as_value());
+	Property a(uri, as_value());
 	a.setOrder(slotId + 1);
 	_props.insert(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = _vm.getStringTable();
-	log_debug("Slot for AS property %s::%s inserted with flags %s",
-            getNamespace(uri), getName(uri), a.getFlags());
+    ObjectURI::Logger l(_vm.getStringTable());
+	log_debug("Slot for AS property %s inserted with flags %s", l(uri)
+            a.getFlags());
 #endif
 
 	return true;
 }
 
 bool
-PropertyList::setValue(string_table::key key, const as_value& val,
-		as_object& this_ptr, string_table::key nsId,
-		const PropFlags& flagsIfMissing)
+PropertyList::setValue(const ObjectURI& uri, const as_value& val,
+		as_object& this_ptr, const PropFlags& flagsIfMissing)
 {
-	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
+	container::iterator found = iterator_find(_props, uri);
 	
 	if (found == _props.end())
 	{
 		// create a new member
-		Property a(key, nsId, val, flagsIfMissing);
+		Property a(uri, val, flagsIfMissing);
 		// Non slot properties are negative ordering in insertion order
 		a.setOrder(- ++_defaultOrder - 1);
 		_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = _vm.getStringTable();
-		log_debug("Simple AS property %s in namespace %s inserted with flags %s",
-			st.value(key), st.value(nsId), a.getFlags());
+        ObjectURI::Logger l(_vm.getStringTable());
+		log_debug("Simple AS property %s inserted with flags %s",
+			l(uri), a.getFlags());
 #endif
 		return true;
 	}
@@ -160,9 +159,9 @@ PropertyList::setValue(string_table::key key, const as_value& val,
 	const Property& prop = *found;
 	if (prop.isReadOnly() && ! prop.isDestructive())
 	{
-		string_table& st = _vm.getStringTable();
-		log_error(_("Property %s (key %d) in namespace %s (key %d) is read-only %s, not setting it to %s"), 
-			st.value(key), key, st.value(nsId), nsId, prop.getFlags(), val);
+        ObjectURI::Logger l(_vm.getStringTable());
+		log_error(_("Property %s is read-only %s, not setting it to %s"), 
+			l(uri), prop.getFlags(), val);
 		return false;
 	}
 
@@ -175,10 +174,9 @@ PropertyList::setValue(string_table::key key, const as_value& val,
 }
 
 bool
-PropertyList::setFlags(string_table::key key,
-		int setFlags, int clearFlags, string_table::key nsId)
+PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 {
-	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
+	container::iterator found = iterator_find(_props, uri);
 	if ( found == _props.end() ) return false;
 
 	PropFlags oldFlags = found->getFlags();
@@ -187,9 +185,9 @@ PropertyList::setFlags(string_table::key key,
 	return f.set_flags(setFlags, clearFlags);
 
 #ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = _vm.getStringTable();
-	log_debug("Flags of property %s in namespace %s changed from %s to  %s",
-		st.value(key), st.value(nsId), oldFlags, found->getFlags());
+    ObjectURI::Logger l(_vm.getStringTable());
+	log_debug("Flags of property %s changed from %s to  %s",
+		l(uri), oldFlags, found->getFlags());
 #endif
 }
 
@@ -204,18 +202,18 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 }
 
 Property*
-PropertyList::getProperty(string_table::key key, string_table::key nsId) const
+PropertyList::getProperty(const ObjectURI& uri) const
 {
-	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
+	container::iterator found = iterator_find(_props, uri);
 	if (found == _props.end()) return 0;
 	return const_cast<Property*>(&(*found));
 }
 
 std::pair<bool,bool>
-PropertyList::delProperty(string_table::key key, string_table::key nsId)
+PropertyList::delProperty(const ObjectURI& uri)
 {
 	//GNASH_REPORT_FUNCTION;
-	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
+	container::iterator found = iterator_find(_props, uri);
 	if (found == _props.end())
 	{
 		return std::make_pair(false,false);
@@ -244,11 +242,13 @@ PropertyList::enumerateKeys(as_environment& env, PropTracker& donelist) const
 
 		if (i->getFlags().get_dont_enum()) continue;
 
-		if (donelist.insert(i->uri()).second) {
+        const ObjectURI& uri = i->uri();
 
-            const std::string& qname = i->ns() ?
-                st.value(i->name()) + "." + st.value(i->ns()) :
-                st.value(i->name());
+		if (donelist.insert(uri).second) {
+
+            const std::string& qname = getNamespace(uri) ?
+                st.value(getName(uri)) + "." + st.value(getNamespace(uri)) :
+                st.value(getName(uri));
 
 			env.push(qname);
 		}
@@ -271,7 +271,7 @@ PropertyList::enumerateKeyValue(const as_object& this_ptr,
         // Undefined values should be "undefined" for SWF7 and
         // empty for SWF6.
         const int version = vm.getSWFVersion();
-		to.push_back(std::make_pair(st.value(i->name()),
+		to.push_back(std::make_pair(st.value(getName(i->uri())),
 				i->getValue(this_ptr).to_string_versioned(version)));
 	}
 }
@@ -281,25 +281,22 @@ PropertyList::enumerateKeyValue(const as_object& this_ptr,
 void
 PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to) 
 {
-	string_table& st = _vm.getStringTable();
+    ObjectURI::Logger l(_vm.getStringTable());
 
 	for (container::const_iterator i=_props.begin(), ie=_props.end();
             i != ie; ++i)
 	{
-		to.insert(std::make_pair(
-                    st.value(i->ns()) + "::" + st.value(i->name()),
-                    i->getValue(this_ptr)));
+		to.insert(std::make_pair(l(i->uri()), i->getValue(this_ptr)));
 	}
 }
 
 void
 PropertyList::dump(as_object& this_ptr)
 {
-	string_table& st = _vm.getStringTable();
-	for (container::const_iterator it=_props.begin(), itEnd=_props.end(); it != itEnd; ++it )
-	{
-		log_debug("  %s::%s: %s", st.value(it->ns()), st.value(it->name()),
-			it->getValue(this_ptr));
+    ObjectURI::Logger l(_vm.getStringTable());
+	for (container::const_iterator it=_props.begin(), itEnd=_props.end();
+            it != itEnd; ++it) {
+		log_debug("  %s: %s", l(it->uri()), it->getValue(this_ptr));
 	}
 }
 
@@ -317,9 +314,9 @@ PropertyList::import(const PropertyList& o)
 			a.setOrder(found->getOrder());
 			_props.replace(found, a);
 #ifdef GNASH_DEBUG_PROPERTY
-			string_table& st = _vm.getStringTable();
-			log_debug("Property %s in namespace %s replaced on import: new flags %s",
-				st.value(a.getName()), st.value(a.getNamespace()), a.getFlags());
+            ObjectURI::Logger l(_vm.getStringTable());
+			log_debug("Property %s replaced on import: new flags %s",
+				l(a.uri()), a.getFlags());
 #endif
 		}
 		else
@@ -328,35 +325,35 @@ PropertyList::import(const PropertyList& o)
 			a.setOrder(- ++_defaultOrder - 1);
 			_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-			string_table& st = _vm.getStringTable();
-			log_debug("Property %s in namespace %s imported with flags %s",
-				st.value(a.getName()), st.value(a.getNamespace()), a.getFlags());
+            ObjectURI::Logger l(_vm.getStringTable());
+			log_debug("Property %s imported with flags %s",
+				l(a.uri()), a.getFlags());
 #endif
 		}
 	}
 }
 
 bool
-PropertyList::addGetterSetter(string_table::key key, as_function& getter,
+PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 	as_function* setter, const as_value& cacheVal,
-	const PropFlags& flagsIfMissing, string_table::key nsId)
+	const PropFlags& flagsIfMissing)
 {
-	Property a(key, nsId, &getter, setter, flagsIfMissing);
+	Property a(uri, &getter, setter, flagsIfMissing);
 	a.setOrder(- ++_defaultOrder - 1);
 
-	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
+	container::iterator found = iterator_find(_props, uri);
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
 		PropFlags& f = a.getFlags();
 		f = found->getFlags();
 		a.setCache(found->getCache());
-
 		_props.replace(found, a);
+
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = _vm.getStringTable();
-		log_debug("AS GetterSetter %s in namespace %s replaced copying "
-                "flags %s", st.value(key), st.value(nsId), a.getFlags());
+        ObjectURI::Logger l(_vm.getStringTable());
+		log_debug("AS GetterSetter %s replaced copying flags %s", l(uri),
+                a.getFlags());
 #endif
 
 	}
@@ -365,9 +362,9 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 		a.setCache(cacheVal);
 		_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = _vm.getStringTable();
-		log_debug("AS GetterSetter %s in namespace %s inserted with flags %s",
-			st.value(key), st.value(nsId), a.getFlags());
+        ObjectURI::Logger l(_vm.getStringTable());
+		log_debug("AS GetterSetter %s inserted with flags %s", l(uri),
+                a.getFlags());
 #endif
 	}
 
@@ -375,25 +372,23 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 }
 
 bool
-PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
-	as_c_function_ptr setter, const PropFlags& flagsIfMissing,
-	string_table::key nsId)
+PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
+	as_c_function_ptr setter, const PropFlags& flagsIfMissing)
 {
-	Property a(key, nsId, getter, setter, flagsIfMissing);
+	Property a(uri, getter, setter, flagsIfMissing);
 	a.setOrder(- ++_defaultOrder - 1);
 
-	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
+	container::iterator found = iterator_find(_props, uri);
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
 		PropFlags& f = a.getFlags();
 		f = found->getFlags();
-
 		_props.replace(found, a);
+
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = _vm.getStringTable();
-		log_debug("Native GetterSetter %s in namespace %s replaced "
-                "copying flags %s", st.value(key), st.value(nsId),
+        ObjectURI::Logger l(_vm.getStringTable());
+		log_debug("Native GetterSetter %s replaced copying flags %s", l(uri),
                 a.getFlags());
 #endif
 
@@ -412,50 +407,48 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 }
 
 bool
-PropertyList::addDestructiveGetter(string_table::key key,
-	as_function& getter, string_table::key nsId,
+PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter, 
 	const PropFlags& flagsIfMissing)
 {
-	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
+	container::iterator found = iterator_find(_props, uri);
 	if (found != _props.end())
 	{
-		string_table& st = _vm.getStringTable();
-		log_error("Property %s in namespace %s already exists, "
-                "can't addDestructiveGetter", st.value(key), st.value(nsId));
+        ObjectURI::Logger l(_vm.getStringTable());
+		log_error("Property %s already exists, can't addDestructiveGetter",
+                l(uri));
 		return false; // Already exists.
 	}
 
 	// destructive getter don't need a setter
-	Property a(key, nsId, &getter, (as_function*)0, flagsIfMissing, true);
+	Property a(uri, &getter, (as_function*)0, flagsIfMissing, true);
 	a.setOrder(- ++_defaultOrder - 1);
 	_props.insert(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = _vm.getStringTable();
-	log_debug("Destructive AS property %s (key %d) in namespace %s "
-            "(key %d) inserted with flags %s",
-		    st.value(key), key, st.value(nsId), nsId, a.getFlags());
+    ObjectURI::Logger l(_vm.getStringTable());
+	log_debug("Destructive AS property %s inserted with flags %s",
+            l(uri), a.getFlags());
 #endif
 
 	return true;
 }
 
 bool
-PropertyList::addDestructiveGetter(string_table::key key,
-	as_c_function_ptr getter, string_table::key nsId,
-	const PropFlags& flagsIfMissing)
+PropertyList::addDestructiveGetter(const ObjectURI& uri,
+	as_c_function_ptr getter, const PropFlags& flagsIfMissing)
 {
-	container::iterator found = iterator_find(_props, ObjectURI(key, nsId));
+	container::iterator found = iterator_find(_props, uri);
 	if (found != _props.end()) return false; 
 
 	// destructive getter don't need a setter
-	Property a(key, nsId, getter, (as_c_function_ptr)0, flagsIfMissing, true);
+	Property a(uri, getter, (as_c_function_ptr)0, flagsIfMissing, true);
 	a.setOrder(- ++_defaultOrder - 1);
 	_props.insert(a);
+
 #ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = _vm.getStringTable();
-	log_debug("Destructive native property %s in namespace %s inserted "
-            "with flags %s", st.value(key), st.value(nsId), a.getFlags());
+    ObjectURI::Logger l(_vm.getStringTable());
+	log_debug("Destructive native property %s with flags %s", l(uri),
+            a.getFlags());
 #endif
 	return true;
 }

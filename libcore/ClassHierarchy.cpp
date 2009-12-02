@@ -85,9 +85,7 @@ public:
         {
             // Check to be sure our super exists.
             // This will trigger its instantiation if necessary.
-            if (!mTarget->get_member(getName(_decl.super), &super,
-                        getNamespace(_decl.super)))
-            {
+            if (!mTarget->get_member(_decl.super, &super)) {
                 // Error here -- doesn't exist.
                 log_error("Can't find %s.%s (Superclass of %s.%s)",
                     st.value(getNamespace(_decl.super)),
@@ -112,8 +110,7 @@ public:
         {
             // Successfully loaded it, now find it, set its proto, and return.
             as_value us;
-            mTarget->get_member(getName(_decl.uri), &us,
-                    getNamespace(_decl.uri));
+            mTarget->get_member(_decl.uri, &us);
             return us;
         }
         // Error here -- not successful in loading.
@@ -146,17 +143,14 @@ public:
         _decl.initializer(*mTarget, _decl.uri);
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
-        if (mTarget->get_member(getName(_decl.uri), &us,
-                    getNamespace(_decl.uri))) {
+        if (mTarget->get_member(_decl.uri, &us)) {
 
             as_value super;
             if (getName(_decl.super))
             {
                 // Check to be sure our super exists.
                 // This will trigger its instantiation if necessary.
-                if (!mTarget->get_member(getName(_decl.super), &super,
-                            getNamespace(_decl.super)))
-                {
+                if (!mTarget->get_member(_decl.super, &super)) {
                     // Error here -- doesn't exist.
                     log_error("Can't find %s.%s (Superclass of %s.%s)",
                         st.value(getNamespace(_decl.super)),

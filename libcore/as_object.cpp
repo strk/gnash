@@ -51,11 +51,10 @@ class
 as_object::PrototypeRecursor
 {
 public:
-    PrototypeRecursor(as_object* top, const ObjectURI& property, T cmp = T())
+    PrototypeRecursor(as_object* top, const ObjectURI& uri, T cmp = T())
         :
         _object(top),
-        _name(getName(property)),
-        _ns(getNamespace(property)),
+        _uri(uri),
         _iterations(0),
         _condition(cmp)
     {
@@ -92,7 +91,7 @@ public:
     Property* getProperty(as_object** owner = 0) const {
 
         assert(_object);
-        Property* prop = _object->_members.getProperty(_name, _ns);
+        Property* prop = _object->_members.getProperty(_uri);
         
         if (prop && _condition(*prop)) {
             if (owner) *owner = _object;
@@ -103,8 +102,7 @@ public:
 
 private:
     as_object* _object;
-    const string_table::key _name;
-    const string_table::key _ns;
+    const ObjectURI& _uri;
     std::set<const as_object*> _visited;
     size_t _iterations;
     T _condition;
@@ -140,11 +138,10 @@ public:
 	virtual as_object* get_super(string_table::key fname = 0);
 
 	// Fetching members from 'super' yelds a lookup on the associated prototype
-	virtual bool get_member(string_table::key name, as_value* val,
-		string_table::key nsname = 0)
+	virtual bool get_member(const ObjectURI& uri, as_value* val)
 	{
         as_object* proto = prototype();
-		if (proto) return proto->get_member(name, val, nsname);
+		if (proto) return proto->get_member(uri, val);
 		log_debug("Super has no associated prototype");
 		return false;
 	}
@@ -204,7 +201,7 @@ as_super::get_super(string_table::key fname)
     }
 
     as_object* owner = 0;
-    proto->findProperty(fname, 0, &owner);
+    proto->findProperty(fname, &owner);
     if (!owner) return 0;
 
     if (owner == proto) return new as_super(getGlobal(*this), proto);
@@ -229,9 +226,8 @@ as_super::get_super(string_table::key fname)
 
 
 /// A PropertyList visitor copying properties to an object
-class PropsCopier : public AbstractPropertyVisitor {
-
-	as_object& _tgt;
+class PropsCopier : public AbstractPropertyVisitor
+{
 
 public:
 
@@ -248,13 +244,14 @@ public:
 	/// Use the set_member function to properly set *inherited* properties
 	/// of the given target object
 	///
-	bool accept(string_table::key name, const as_value& val)
+	bool accept(const ObjectURI& uri, const as_value& val)
 	{
-		if (name == NSV::PROP_uuPROTOuu) return true;
-		//log_debug(_("Setting member '%s' to value '%s'"), name, val);
-		_tgt.set_member(name, val);
+		if (getName(uri) == NSV::PROP_uuPROTOuu) return true;
+		_tgt.set_member(getName(uri), val);
         return true;
 	}
+private:
+	as_object& _tgt;
 };
 
 } // end of anonymous namespace
@@ -303,9 +300,9 @@ as_object::stringValue() const
 }
 
 std::pair<bool,bool>
-as_object::delProperty(string_table::key name, string_table::key nsname)
+as_object::delProperty(const ObjectURI& uri)
 {
-	return _members.delProperty(name, nsname);
+	return _members.delProperty(uri);
 }
 
 
@@ -371,21 +368,19 @@ as_object::add_property(const std::string& name, as_function& getter,
 /// 4. __resolve property of this object and all __proto__ objects (a Display
 ///    Object ends the chain). This should ignore visibility but doesn't.
 bool
-as_object::get_member(string_table::key name, as_value* val,
-	string_table::key nsname)
+as_object::get_member(const ObjectURI& uri, as_value* val)
 {
 	assert(val);
 
     const int version = getSWFVersion(*this);
 
-    PrototypeRecursor<IsVisible> pr(this, ObjectURI(name, nsname),
-        IsVisible(version));
+    PrototypeRecursor<IsVisible> pr(this, uri, IsVisible(version));
 	
 	Property* prop = pr.getProperty();
     if (!prop) {
         if (displayObject()) {
             DisplayObject* d = displayObject();
-            if (getDisplayObjectProperty(*d, name, *val)) return true;
+            if (getDisplayObjectProperty(*d, getName(uri), *val)) return true;
         }
         while (pr()) {
             if ((prop = pr.getProperty())) break;
@@ -396,13 +391,13 @@ as_object::get_member(string_table::key name, as_value* val,
     // inheritance chain, try the __resolve property.
     if (!prop) {
 
-        prop = findProperty(NSV::PROP_uuRESOLVE, nsname);
+        prop = findProperty(NSV::PROP_uuRESOLVE);
         if (!prop) return false;
 
         /// If __resolve exists, call it with the name of the undefined
         /// property.
         string_table& st = getStringTable(*this);
-        const std::string& undefinedName = st.value(name);
+        const std::string& undefinedName = st.value(getName(uri));
         log_debug("__resolve exists, calling with '%s'", undefinedName);
 
         // TODO: we've found the property, don't search for it again.
@@ -456,7 +451,7 @@ as_object::get_super(string_table::key fname)
 
 	if (fname && getSWFVersion(*this) > 6) {
 		as_object* owner = 0;
-		findProperty(fname, 0, &owner);
+		findProperty(fname, &owner);
         // should be 0 if findProperty returned 0
 		if (owner != this) proto = owner; 
 	}
@@ -505,7 +500,7 @@ skip_duplicates:
 	}
 	if (p)
 	{
-		if (findProperty(p->name(), p->ns()) != p)
+		if (findProperty(p->uri()) != p)
 		{
 			index = p->getOrder() * 256 | depth;
 			goto skip_duplicates; // Faster than recursion.
@@ -519,14 +514,12 @@ skip_duplicates:
 
 /*private*/
 Property*
-as_object::findProperty(string_table::key key, string_table::key nsname, 
-	as_object **owner)
+as_object::findProperty(const ObjectURI& uri, as_object **owner)
 {
 
     const int version = getSWFVersion(*this);
 
-    PrototypeRecursor<IsVisible> pr(this, ObjectURI(key, nsname),
-        IsVisible(version));
+    PrototypeRecursor<IsVisible> pr(this, uri, IsVisible(version));
 
     do {
         Property* prop = pr.getProperty(owner);
@@ -534,7 +527,7 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
     } while (pr());
 
 	// No Property found
-	return NULL;
+	return 0;
 }
 
 Property*
@@ -568,7 +561,8 @@ as_object::set_prototype(const as_value& proto)
 	// TODO: check what happens if __proto__ is set as a user-defined 
     // getter/setter
 	// TODO: check triggers !!
-	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this, 0,
+    // Note that this sets __proto__ in namespace 0
+	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this,
             as_object::DefaultFlags);
 }
 
@@ -583,7 +577,7 @@ as_object::get_member_slot(int order, as_value* val){
 	
 	const Property* prop = _members.getPropertyByOrder(order);
 	if (prop) {
-		return get_member(prop->name(), val, prop->ns());
+		return get_member(prop->uri(), val);
 	}
     return false;
 }
@@ -594,7 +588,8 @@ as_object::set_member_slot(int order, const as_value& val, bool ifFound)
 {
 	const Property* prop = _members.getPropertyByOrder(order);
 	if (prop) {
-		return set_member(prop->name(), val, prop->ns(), ifFound);
+		return set_member(getName(prop->uri()), val, getNamespace(prop->uri()),
+                    ifFound);
 	}
     return false;
 }
@@ -763,17 +758,17 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 	string_table::key nsname, int order)
 {
 
-	if (order >= 0 && !_members.
-		reserveSlot(ObjectURI(key, nsname),
-            static_cast<boost::uint16_t>(order)))
-	{
+    const ObjectURI uri(key, nsname);
+
+	if (order >= 0 && !_members.reserveSlot(uri,
+                static_cast<boost::uint16_t>(order))) {
 		log_error(_("Attempt to set a slot for either a slot or a property "
 			"which already exists."));
 		return;
 	}
 		
 	// Set (or create) a SimpleProperty 
-	if (! _members.setValue(key, val, *this, nsname, flags) )
+	if (! _members.setValue(uri, val, *this, flags) )
 	{
 		log_error(_("Attempt to initialize read-only property ``%s''"
 			" on object ``%p'' twice"),
@@ -788,18 +783,18 @@ as_object::init_property(const std::string& key, as_function& getter,
 		as_function& setter, int flags, string_table::key nsname)
 {
 	string_table::key k = getStringTable(*this).find(key);
-	init_property(k, getter, setter, flags, nsname);
+	init_property(ObjectURI(k, nsname), getter, setter, flags);
 }
 
 void
-as_object::init_property(string_table::key key, as_function& getter,
-		as_function& setter, int flags, string_table::key nsname)
+as_object::init_property(const ObjectURI& uri, as_function& getter,
+		as_function& setter, int flags)
 {
 	as_value cacheValue;
 
     // PropertyList::addGetterSetter always returns true (used to be
     // an assert).
-	_members.addGetterSetter(key, getter, &setter, cacheValue, flags, nsname);
+	_members.addGetterSetter(uri, getter, &setter, cacheValue, flags);
 }
 
 void
@@ -807,16 +802,16 @@ as_object::init_property(const std::string& key, as_c_function_ptr getter,
 		as_c_function_ptr setter, int flags, string_table::key nsname)
 {
 	string_table::key k = getStringTable(*this).find(key);
-	init_property(k, getter, setter, flags, nsname);
+	init_property(ObjectURI(k, nsname), getter, setter, flags);
 }
 
 void
-as_object::init_property(string_table::key key, as_c_function_ptr getter,
-		as_c_function_ptr setter, int flags, string_table::key nsname)
+as_object::init_property(const ObjectURI& uri, as_c_function_ptr getter,
+		as_c_function_ptr setter, int flags)
 {
     // PropertyList::addGetterSetter always returns true (used to be
     // an assert).
-	_members.addGetterSetter(key, getter, setter, flags, nsname);
+	_members.addGetterSetter(uri, getter, setter, flags);
 }
 
 bool
@@ -824,8 +819,7 @@ as_object::init_destructive_property(const ObjectURI& uri, as_function& getter,
         int flags)
 {
 	// No case check, since we've already got the key.
-	bool success = _members.addDestructiveGetter(getName(uri), getter, 
-            getNamespace(uri), flags);
+	bool success = _members.addDestructiveGetter(uri, getter, flags);
 	return success;
 }
 
@@ -834,8 +828,7 @@ as_object::init_destructive_property(const ObjectURI& uri,
         as_c_function_ptr getter, int flags)
 {
 	// No case check, since we've already got the key.
-	bool success = _members.addDestructiveGetter(getName(uri), getter,
-            getNamespace(uri), flags);
+	bool success = _members.addDestructiveGetter(uri, getter, flags);
 	return success;
 }
 
@@ -845,18 +838,18 @@ as_object::init_readonly_property(const std::string& key, as_function& getter,
 {
 	string_table::key k = getStringTable(*this).find(key);
 
-	init_property(k, getter, getter, initflags | PropFlags::readOnly
-		| PropFlags::isProtected, nsname);
-	assert(_members.getProperty(k, nsname));
+	init_property(ObjectURI(k, nsname), getter, getter,
+            initflags | PropFlags::readOnly | PropFlags::isProtected);
+	assert(_members.getProperty(ObjectURI(k, nsname)));
 }
 
 void
-as_object::init_readonly_property(const string_table::key& k,
-        as_function& getter, int initflags, string_table::key nsname)
+as_object::init_readonly_property(const ObjectURI& uri, as_function& getter,
+        int initflags)
 {
-	init_property(k, getter, getter, initflags | PropFlags::readOnly
-		| PropFlags::isProtected, nsname);
-	assert(_members.getProperty(k, nsname));
+	init_property(uri, getter, getter,
+            initflags | PropFlags::readOnly | PropFlags::isProtected);
+	assert(_members.getProperty(uri));
 }
 
 void
@@ -865,26 +858,25 @@ as_object::init_readonly_property(const std::string& key,
 {
 	string_table::key k = getStringTable(*this).find(key);
 
-	init_property(k, getter, getter, initflags | PropFlags::readOnly
-		| PropFlags::isProtected, nsname);
-	assert(_members.getProperty(k, nsname));
+	init_property(ObjectURI(k, nsname), getter, getter,
+            initflags | PropFlags::readOnly | PropFlags::isProtected);
+	assert(_members.getProperty(ObjectURI(k, nsname)));
 }
 
 void
-as_object::init_readonly_property(const string_table::key& k,
-        as_c_function_ptr getter, int initflags, string_table::key nsname)
+as_object::init_readonly_property(const ObjectURI& uri,
+        as_c_function_ptr getter, int initflags)
 {
-	init_property(k, getter, getter, initflags | PropFlags::readOnly
-		| PropFlags::isProtected, nsname);
-	assert(_members.getProperty(k, nsname));
+	init_property(uri, getter, getter, initflags | PropFlags::readOnly
+		| PropFlags::isProtected);
+	assert(_members.getProperty(uri));
 }
 
 
 bool
-as_object::set_member_flags(string_table::key name,
-		int setTrue, int setFalse, string_table::key nsname)
+as_object::set_member_flags(const ObjectURI& uri, int setTrue, int setFalse)
 {
-	return _members.setFlags(name, setTrue, setFalse, nsname);
+	return _members.setFlags(uri, setTrue, setFalse);
 }
 
 void
@@ -1097,15 +1089,15 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 
 
 Property*
-as_object::getOwnProperty(string_table::key key, string_table::key nsname)
+as_object::getOwnProperty(const ObjectURI& uri)
 {
-	return _members.getProperty(key, nsname);
+	return _members.getProperty(uri);
 }
 
 bool
-as_object::hasOwnProperty(string_table::key key, string_table::key nsname)
+as_object::hasOwnProperty(const ObjectURI& uri)
 {
-	return getOwnProperty(key, nsname) != NULL;
+	return getOwnProperty(uri);
 }
 
 as_object*
@@ -1123,10 +1115,10 @@ as_object::get_prototype() const
 }
 
 as_value
-as_object::getMember(string_table::key name, string_table::key nsname)
+as_object::getMember(const ObjectURI& uri)
 {
 	as_value ret;
-	get_member(name, &ret, nsname);
+	get_member(uri, &ret);
 	return ret;
 }
 
@@ -1179,40 +1171,39 @@ getURLEncodedVars(as_object& o, std::string& data)
 }
 
 bool
-as_object::watch(string_table::key key, as_function& trig,
-		const as_value& cust, string_table::key ns)
+as_object::watch(const ObjectURI& uri, as_function& trig,
+		const as_value& cust)
 {
 	
-	ObjectURI k(key, ns);
-	std::string propname = getStringTable(*this).value(key);
+	std::string propname = getStringTable(*this).value(getName(uri));
 
     if (!_trigs.get()) _trigs.reset(new TriggerContainer);
 
-	TriggerContainer::iterator it = _trigs->find(k);
+	TriggerContainer::iterator it = _trigs->find(uri);
 	if (it == _trigs->end())
 	{
 		return _trigs->insert(
-                std::make_pair(k, Trigger(propname, trig, cust))).second;
+                std::make_pair(uri, Trigger(propname, trig, cust))).second;
 	}
 	it->second = Trigger(propname, trig, cust);
 	return true;
 }
 
 bool
-as_object::unwatch(string_table::key key, string_table::key ns)
+as_object::unwatch(const ObjectURI& uri)
 {
     if (!_trigs.get()) return false; 
 
-	TriggerContainer::iterator trigIter = _trigs->find(ObjectURI(key, ns));
+	TriggerContainer::iterator trigIter = _trigs->find(uri);
 	if (trigIter == _trigs->end()) {
 		log_debug("No watch for property %s",
-                getStringTable(*this).value(key));
+                getStringTable(*this).value(getName(uri)));
 		return false;
 	}
-	Property* prop = _members.getProperty(key, ns);
+	Property* prop = _members.getProperty(uri);
 	if (prop && prop->isGetterSetter()) {
 		log_debug("Watch on %s not removed (is a getter-setter)",
-                getStringTable(*this).value(key));
+                getStringTable(*this).value(getName(uri)));
 		return false;
 	}
 	trigIter->second.kill();

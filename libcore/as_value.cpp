@@ -176,8 +176,11 @@ public:
 	    _st(vm.getStringTable())
 	{}
     
-    bool accept(string_table::key key, const as_value& val) 
+    bool accept(const ObjectURI& uri, const as_value& val) 
     {
+
+        // We are not taking account of the namespace.
+        const string_table::key key = getName(uri);
 
         // Test conducted with AMFPHP:
         // '__proto__' and 'constructor' members
@@ -266,7 +269,7 @@ public:
     
     bool success() const { return !_error; }
 
-    bool accept(string_table::key key, const as_value& val) 
+    bool accept(const ObjectURI& uri, const as_value& val) 
     {
         if ( _error ) return true;
 
@@ -277,13 +280,14 @@ public:
             return true;
         }
 
+        const string_table::key key = getName(uri);
+
         // Test conducted with AMFPHP:
         // '__proto__' and 'constructor' members
         // of an object don't get back from an 'echo-service'.
         // Dunno if they are not serialized or just not sent back.
         // A '__constructor__' member gets back, but only if 
         // not a function. Actually no function gets back.
-        // 
         if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR)
         {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE

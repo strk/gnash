@@ -733,7 +733,7 @@ MovieClip::pathElement(string_table::key key)
 
     // See if it's a member
     as_value tmp;
-    if (!obj->as_object::get_member(key, &tmp, 0)) {
+    if (!obj->as_object::get_member(key, &tmp)) {
         return NULL;
     }
     if (!tmp.is_object()) {

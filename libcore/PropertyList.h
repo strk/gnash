@@ -117,7 +117,7 @@ public:
     ///                 acceptable.
     //
     /// @param visitor  The visitor function. It must implement the function:
-    ///                     bool accept(string_table::key, const as_value&);
+    ///                     bool accept(const ObjectURI&, const as_value&);
     ///                 Scan is by enumeration order and stops when accept()
     ///                 returns false.
     ///
@@ -137,7 +137,7 @@ public:
         {
             if (!cmp(*it)) continue;
             as_value val = it->getValue(this_ptr);
-            if (!visitor.accept(it->name(), val)) return;
+            if (!visitor.accept(it->uri(), val)) return;
         }
     }
 
@@ -175,9 +175,8 @@ public:
     ///    Flags to associate to the property if a new one is created.
     /// @return true if the value was successfully set, false
     ///         otherwise (found a read-only property, most likely).
-    bool setValue(string_table::key key, const as_value& value,
-            as_object& this_ptr, string_table::key namespaceId = 0,
-            const PropFlags& flagsIfMissing = 0);
+    bool setValue(const ObjectURI& uri, const as_value& value,
+            as_object& this_ptr, const PropFlags& flagsIfMissing = 0);
 
     /// Reserves a slot number for a property
     ///
@@ -196,7 +195,7 @@ public:
     /// @return     A Property or 0, if no such property exists.
     ///             All Property objects are owned by this PropertyList. Do
     ///             not delete them.
-    Property* getProperty(string_table::key key, string_table::key nsId = 0)
+    Property* getProperty(const ObjectURI& uri)
         const;
 
     /// Get a property, if existing, by order
@@ -216,8 +215,7 @@ public:
     ///                     - (false, false) : property not found
     ///                     - (true, false) : property protected from deletion
     ///                     - (true, true) : property successfully deleted
-    std::pair<bool,bool> delProperty(string_table::key key,
-        string_table::key nsId = 0);
+    std::pair<bool,bool> delProperty(const ObjectURI& uri);
 
     /// Add a getter/setter property, if not already existing
     //
@@ -233,9 +231,9 @@ public:
     ///                       is created.
     /// @return         true if the property was successfully added, false
     ///                 otherwise.
-    bool addGetterSetter(string_table::key key, as_function& getter,
+    bool addGetterSetter(const ObjectURI& uri, as_function& getter,
         as_function* setter, const as_value& cacheVal,
-        const PropFlags& flagsIfMissing = 0, string_table::key ns = 0);
+        const PropFlags& flagsIfMissing = 0);
 
     /// Add a getter/setter property, if not already existing
     //
@@ -245,9 +243,8 @@ public:
     /// @param setter   A function to invoke when setting this property's value.
     /// @return         true if the property was successfully added, false
     ///                 otherwise.
-    bool addGetterSetter(string_table::key key, as_c_function_ptr getter,
-        as_c_function_ptr setter, const PropFlags& flagsIfMissing,
-        string_table::key ns = 0);
+    bool addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
+        as_c_function_ptr setter, const PropFlags& flagsIfMissing);
 
     /// Add a destructive getter property, if not already existant.
     //
@@ -257,9 +254,8 @@ public:
     /// @param flagsIfMissing Flags to associate to the property if a new
     ///                             one is created.
     /// @return         true if the property was successfully added.
-    bool addDestructiveGetter(string_table::key key,
-        as_function& getter, string_table::key ns = 0,
-        const PropFlags& flagsIfMissing=0);
+    bool addDestructiveGetter(const ObjectURI& uri, as_function& getter,
+        const PropFlags& flagsIfMissing = 0);
 
     /// Add a destructive getter property, if not already existant.
     ///
@@ -271,9 +267,8 @@ public:
     //                          one is created.
     /// @return         true if the property was successfully added, false
     ///                 otherwise.
-    bool addDestructiveGetter(string_table::key key,
-        as_c_function_ptr getter, string_table::key ns = 0,
-        const PropFlags& flagsIfMissing=0);
+    bool addDestructiveGetter(const ObjectURI& uri, as_c_function_ptr getter, 
+        const PropFlags& flagsIfMissing = 0);
 
     /// Set the flags of a property.
     //
@@ -282,8 +277,7 @@ public:
     /// @param setFalse The set of flags to clear
     /// @return         true if the value was successfully set, false
     ///                 otherwise (either not found or protected)
-    bool setFlags(string_table::key key, int setTrue, int setFalse,
-        string_table::key ns = 0);
+    bool setFlags(const ObjectURI& uri, int setTrue, int setFalse);
 
     /// Set the flags of all properties.
     //

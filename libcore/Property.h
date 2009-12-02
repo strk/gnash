@@ -254,11 +254,11 @@ class Property
 {
 public:
 	/// Default constructor
-	Property(string_table::key name = 0, string_table::key nsId = 0)
+	Property(const ObjectURI& uri)
         : 
 		_bound(as_value()),
         _destructive(false),
-        _uri(name, nsId),
+        _uri(uri),
 		_orderID(0)
 	{}
 
@@ -272,65 +272,45 @@ public:
         _orderID(p._orderID)
 	{}
 
-	/// Constructor taking initial flags
-	Property(string_table::key name, string_table::key nsId,
-		const PropFlags& flags)
-        :
-        _flags(flags),
-		_bound(as_value()),
-        _destructive(false),
-        _uri(name, nsId),
-		_orderID(0)
-	{}
-
-	Property(string_table::key name, string_table::key nsId, 
-		const as_value& value)
-        :
-        _bound(value),
-        _destructive(false),
-        _uri(name, nsId),
-		_orderID(0)
-	{}
-
-	Property(string_table::key name, string_table::key nsId,
-		const as_value& value, const PropFlags& flags)
+	Property(const ObjectURI& uri, const as_value& value,
+            const PropFlags& flags = PropFlags())
         :
 		_flags(flags),
         _bound(value),
         _destructive(false),
-		_uri(name, nsId),
+		_uri(uri),
 		_orderID(0)
 	{}
 
-	Property(string_table::key name, string_table::key nsId,
+	Property(const ObjectURI& uri,
 		as_function *getter, as_function *setter, 
 		const PropFlags& flags, bool destroy = false)
         :
 		_flags(flags), 
         _bound(GetterSetter(getter, setter)),
 		_destructive(destroy),
-        _uri(name, nsId),
+        _uri(uri),
 		_orderID(0)
 	{}
 
-	Property(string_table::key name, string_table::key nsId,
-		as_function *getter, as_function *setter, bool destroy = false)
+	Property(const ObjectURI& uri, as_function *getter, as_function *setter,
+            bool destroy = false)
         :
 		_flags(),
         _bound(GetterSetter(getter, setter)),
         _destructive(destroy),
-        _uri(name, nsId),
+        _uri(uri),
 		_orderID(0)
 	{}
 
-	Property(string_table::key name, string_table::key nsId,
-		as_c_function_ptr getter, as_c_function_ptr setter,
-		const PropFlags& flags, bool destroy = false)
+	Property(const ObjectURI& uri, as_c_function_ptr getter,
+            as_c_function_ptr setter, const PropFlags& flags,
+            bool destroy = false)
 		:
 		_flags(flags),
         _bound(GetterSetter(getter, setter)),
         _destructive(destroy),
-        _uri(name, nsId),
+        _uri(uri),
 		_orderID(0)
 	{}
 
@@ -433,12 +413,6 @@ public:
     const ObjectURI& uri() const {
         return _uri;
     }
-
-	/// What is the name of this property?
-	string_table::key name() const { return getName(_uri); }
-
-	/// What is the namespace of this property?
-	string_table::key ns() const { return getNamespace(_uri); }
 
 	/// Mark this property as being reachable (for the GC)
 	void setReachable() const;

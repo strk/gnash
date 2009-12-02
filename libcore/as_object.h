@@ -65,7 +65,7 @@ class AbstractPropertyVisitor {
 public:
 
     /// This function should return false if no further visits are needed.
-    virtual bool accept(string_table::key key, const as_value& val) = 0;
+    virtual bool accept(const ObjectURI& uri, const as_value& val) = 0;
     virtual ~AbstractPropertyVisitor() {}
 };
 
@@ -198,8 +198,7 @@ public:
     /// @returns a Property if found, NULL if not found
     ///          or not visible in current VM version
     ///
-    Property* findProperty(string_table::key name, string_table::key nsname,
-        as_object **owner = NULL);
+    Property* findProperty(const ObjectURI& uri, as_object **owner = NULL);
 
     /// Return a reference to this as_object's global object.
     VM& vm() const {
@@ -395,9 +394,8 @@ public:
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
-    void init_property(string_table::key key, as_function& getter,
-        as_function& setter, int flags = DefaultFlags,
-        string_table::key nsname = 0);
+    void init_property(const ObjectURI& uri, as_function& getter,
+        as_function& setter, int flags = DefaultFlags);
 
     /// \brief
     /// Initialize a getter/setter property by key
@@ -424,9 +422,8 @@ public:
     /// @param nsname
     /// The id of the namespace to which this member belongs. 0 is a wildcard
     /// and will be matched by anything not asking for a specific namespace.
-    void init_property(string_table::key key, as_c_function_ptr getter,
-        as_c_function_ptr setter, int flags = DefaultFlags,
-        string_table::key nsname = 0);
+    void init_property(const ObjectURI& uri, as_c_function_ptr getter,
+        as_c_function_ptr setter, int flags = DefaultFlags);
 
 
     /// \brief
@@ -513,9 +510,8 @@ public:
     void init_readonly_property(const std::string& key, as_function& getter,
             int flags = DefaultFlags, string_table::key nsname = 0);
 
-    void init_readonly_property(const string_table::key& key,
-            as_function& getter, int flags = DefaultFlags,
-            string_table::key nsname = 0);
+    void init_readonly_property(const ObjectURI& uri,
+            as_function& getter, int flags = DefaultFlags);
 
     /// Use this method for read-only properties.
     //
@@ -545,9 +541,8 @@ public:
             as_c_function_ptr getter, int flags = DefaultFlags,
             string_table::key nsname = 0);
 
-    void init_readonly_property(const string_table::key& key,
-            as_c_function_ptr getter, int flags = DefaultFlags,
-            string_table::key nsname = 0);
+    void init_readonly_property(const ObjectURI& uri,
+            as_c_function_ptr getter, int flags = DefaultFlags);
 
     /// \brief
     /// Add a watch trigger, overriding any other defined for same name.
@@ -569,8 +564,7 @@ public:
     /// @return true if the trigger was successfully added, false
     ///         otherwise (error? should always be possible to add...)
     ///
-    bool watch(string_table::key key, as_function& trig,
-        const as_value& cust, string_table::key ns = 0);
+    bool watch(const ObjectURI& uri, as_function& trig, const as_value& cust);
 
     /// \brief
     /// Remove a watch trigger.
@@ -584,7 +578,7 @@ public:
     /// @return true if the trigger was successfully removed, false
     ///         otherwise (no such trigger...)
     ///
-    bool unwatch(string_table::key key, string_table::key ns = 0);
+    bool unwatch(const ObjectURI& uri);
 
     /// Get a member as_value by name
     ///
@@ -609,8 +603,7 @@ public:
     ///
     /// @return true of the named property was found, false otherwise.
     ///
-    virtual bool get_member(string_table::key name, as_value* val,
-        string_table::key nsname = 0);
+    virtual bool get_member(const ObjectURI& uri, as_value* val);
 
     /// Resolve the given relative path component
     //
@@ -644,33 +637,23 @@ public:
     ///      that the 'getter' won't change this object trough
     ///     use of the 'this' reference. 
     ///
-    /// @param name
-    ///    Name of the property. Will be converted to lowercase
-    ///    if the current VM is initialized for a  target
-    ///    up to SWF6.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
+    /// @param uri      Name and namespace of the property. Note that
+    ///                 if you do not care about the namespace (AS2 does not),
+    ///                 you can call this function with the name key only.
     ///
     /// @return value of the member (possibly undefined),
     ///    or undefined if not found. Use get_member if you
     ///    need to know wheter it was found or not.
     ///
-    as_value getMember(string_table::key name, string_table::key nsname = 0);
+    as_value getMember(const ObjectURI& uri);
 
     /// Delete a property of this object, unless protected from deletion.
     //
     /// This function does *not* recurse in this object's prototype.
-    ///
-    /// @param name
-    ///     Name of the property.
-    ///    Case insensitive up to SWF6,
-    ///    case *sensitive* from SWF7 up.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
+    //
+    /// @param uri      Name and namespace of the property. Note that
+    ///                 if you do not care about the namespace (AS2 does not),
+    ///                 you can call this function with the name key only.
     ///
     /// @return a pair of boolean values expressing whether the property
     ///    was found (first) and whether it was deleted (second).
@@ -680,46 +663,29 @@ public:
     ///    - (true, false) : property protected from deletion
     ///    - (true, true) : property successfully deleted
     ///
-    std::pair<bool,bool> delProperty(string_table::key name,
-            string_table::key nsname = 0);
+    std::pair<bool,bool> delProperty(const ObjectURI& uri);
 
     /// Get this object's own named property, if existing.
     //
     /// This function does *not* recurse in this object's prototype.
-    ///
-    /// @param name
-    ///     Name of the property.
-    ///    Case insensitive up to SWF6,
-    ///    case *sensitive* from SWF7 up.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
-    ///
-    /// @return
-    ///    a Property pointer, or NULL if this object doesn't
-    ///    contain the named property.
-    ///
-    Property* getOwnProperty(string_table::key name,
-            string_table::key nsname = 0);
+    //
+    /// @param uri      The name and namespace of the property. Note that
+    ///                 if you do not care about the namespace (AS2 does not),
+    ///                 you can call this function with the name key only.
+    /// @return         A Property pointer, or NULL if this object doesn't
+    ///                 contain the named property.
+    Property* getOwnProperty(const ObjectURI& uri);
 
     /// Return true if this object has the named property
     //
-    /// @param name
-    ///     Name of the property.
-    ///    Case insensitive up to SWF6,
-    ///    case *sensitive* from SWF7 up.
-    ///
-    /// @param nsname
-    ///     The id of the namespace to which this member belongs.
-    ///     0 is a wildcard and will be matched by anything not asking
-    ///     for a specific namespace.
+    /// @param uri      Name and namespace of the property. Note that
+    ///                 if you do not care about the namespace (AS2 does not),
+    ///                 you can call this function with the name key only.
     ///
     /// @return
     ///    true if the object has the property, false otherwise.
     ///
-    bool hasOwnProperty(string_table::key name,
-            string_table::key nsname = 0);
+    bool hasOwnProperty(const ObjectURI& uri);
 
     /// Get a property from this object (or a prototype) by ordering index.
     ///
@@ -766,8 +732,7 @@ public:
     /// @return true on success, false on failure
     ///    (non-existent or protected member)
     ///
-    bool set_member_flags(string_table::key name,
-            int setTrue, int setFalse=0, string_table::key nsname = 0);
+    bool set_member_flags(const ObjectURI& uri, int setTrue, int setFalse = 0);
 
     /// Cast to a as_function, or return NULL
     virtual as_function* to_function() { return NULL; }
@@ -964,7 +929,6 @@ protected:
 
     ///Get a member value at a given slot.
     //
-    ///This is a wrapper around get_member_default.
     /// @param order
     /// The slot index of the property.
     ///

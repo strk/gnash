@@ -812,9 +812,10 @@ private:
 }
 
 bool
-IsStrictArray::accept(string_table::key key, const as_value& /*val*/)
+IsStrictArray::accept(const ObjectURI& uri, const as_value& /*val*/)
 {
-    if (isIndex(_st.value(key)) >= 0) return true;
+    // We ignore namespace.
+    if (isIndex(_st.value(getName(uri))) >= 0) return true;
     _strict = false;
     return false;
 }
