@@ -22,6 +22,7 @@
 #include "PropFlags.h" // for templated functions
 #include "as_value.h" // for templated functions
 #include "string_table.h"
+#include "ObjectURI.h"
 
 #include <map> 
 #include <string> // for use within map 
@@ -57,9 +58,11 @@ public:
     typedef std::pair<std::string, std::string> KeyValuePair;
     typedef std::vector<KeyValuePair> SortedPropertyList;
     
+    /// Used to keep track of which properties have been enumerated.
+    typedef std::set<ObjectURI> PropTracker;
 
-    /// A tag type for multi-index
-    struct oType {};
+    /// A tag for identifying an index in the container.
+    struct OrderTag {};
 
     /// The actual container
     /// index 0 is the fully indexed name/namespace pairs, which are unique
@@ -74,15 +77,11 @@ public:
         Property,
         boost::multi_index::indexed_by<
             boost::multi_index::ordered_unique<
-                boost::multi_index::composite_key<
-                    Property,
-                    boost::multi_index::member<Property,string_table::key,&Property::mName>,
-                    boost::multi_index::member<Property,string_table::key,&Property::mNamespace>
-                >
+                boost::multi_index::const_mem_fun<Property,const ObjectURI&,&Property::uri>
             >,
             boost::multi_index::ordered_unique<
-                boost::multi_index::tag<PropertyList::oType>,
-                boost::multi_index::member<Property,int,&Property::mOrderId>
+                boost::multi_index::tag<OrderTag>,
+                boost::multi_index::const_mem_fun<Property,int,&Property::getOrder>
             >
         >
     > container;
@@ -95,7 +94,7 @@ public:
     PropertyList(VM& vm)
         :
         _props(),
-        mDefaultOrder(0),
+        _defaultOrder(0),
         _vm(vm)
     {
     }
@@ -118,7 +117,7 @@ public:
     ///                 acceptable.
     //
     /// @param visitor  The visitor function. It must implement the function:
-    ///                     bool accept(string_table::key, const as_value&);
+    ///                     bool accept(const ObjectURI&, const as_value&);
     ///                 Scan is by enumeration order and stops when accept()
     ///                 returns false.
     ///
@@ -138,19 +137,10 @@ public:
         {
             if (!cmp(*it)) continue;
             as_value val = it->getValue(this_ptr);
-            if (!visitor.accept(it->mName, val)) return;
+            if (!visitor.accept(it->uri(), val)) return;
         }
     }
 
-    /// Get the as_value value of an ordered property
-    //
-    /// getter/setter will be invoked, just as for getValue
-    ///
-    /// @param order    The order number: negative for default values, 
-    ///                 non-negative for properties which were specifically
-    ///                 positioned.
-    bool getValueByOrder(int order, as_value& val, as_object& this_ptr);
-    
     /// Get the order number just after the passed order number.
     ///
     /// @param order    0 is a special value indicating the first order
@@ -159,7 +149,7 @@ public:
     /// @return         A value which can be used for ordered access. 
     const Property* getOrderAfter(int order);
 
-    /// Set the value of a property, creating a new one if unexistent.
+    /// Set the value of a property, creating a new one if it doesn't exist.
     //
     /// If the named property is a getter/setter one it's setter
     /// will be invoked using the given as_object as 'this' pointer.
@@ -167,11 +157,9 @@ public:
     ///
     /// @param key
     ///    Name of the property. Search is case-*sensitive*
-    ///
     /// @param value
     ///    a const reference to the as_value to use for setting
     ///    or creating the property. 
-    ///
     /// @param this_ptr
     ///     The as_object used to set the 'this' pointer
     ///     for calling getter/setter function (GetterSetterProperty);
@@ -180,43 +168,34 @@ public:
     ///    This parameter is non-const as nothing prevents an
     ///    eventual "Setter" function from actually modifying it,
     ///    so we can't promise constness.
-    ///
     /// @param namespaceId
     ///    The namespace in which this should be entered. If 0 is given,
     ///    this will use the first value found, if it exists.
-    ///
     /// @param flagsIfMissing
     ///    Flags to associate to the property if a new one is created.
-    ///
     /// @return true if the value was successfully set, false
     ///         otherwise (found a read-only property, most likely).
-    bool setValue(string_table::key key, const as_value& value,
-            as_object& this_ptr, string_table::key namespaceId = 0,
-            const PropFlags& flagsIfMissing = 0);
+    bool setValue(const ObjectURI& uri, const as_value& value,
+            as_object& this_ptr, const PropFlags& flagsIfMissing = 0);
 
     /// Reserves a slot number for a property
     ///
     /// @param slotId
     /// The slot id to use. (Note that getOrder() on this property will return
     /// this slot number + 1 if the assignment was successful.)
-    //
     /// @param key      Name of the property.
-    ///
     /// @param nsId     The namespace in which the property should be found.
-    ///
     /// @return         true if the slot did not previously exist.
     bool reserveSlot(const ObjectURI& uri, boost::uint16_t slotId);
 
     /// Get a property if it exists.
     //
     /// @param key  Name of the property. Search is case-*sensitive*
-    ///
     /// @param nsId The id of the namespace to search
-    ///
     /// @return     A Property or 0, if no such property exists.
     ///             All Property objects are owned by this PropertyList. Do
     ///             not delete them.
-    Property* getProperty(string_table::key key, string_table::key nsId = 0)
+    Property* getProperty(const ObjectURI& uri)
         const;
 
     /// Get a property, if existing, by order
@@ -228,9 +207,7 @@ public:
     //
     ///
     /// @param key      Name of the property.
-    ///
     /// @param nsId     Name of the namespace
-    ///
     /// @return         a pair of boolean values expressing whether the property
     ///                 was found (first) and whether it was deleted (second).
     ///                 Of course a pair(false, true) would be invalid (deleted
@@ -238,41 +215,36 @@ public:
     ///                     - (false, false) : property not found
     ///                     - (true, false) : property protected from deletion
     ///                     - (true, true) : property successfully deleted
-    std::pair<bool,bool> delProperty(string_table::key key,
-        string_table::key nsId = 0);
+    std::pair<bool,bool> delProperty(const ObjectURI& uri);
 
     /// Add a getter/setter property, if not already existing
     //
     /// TODO: this function has far too many arguments.
     //
     /// @param key      Name of the property. Search is case-*sensitive*
-    ///
     /// @param getter   A function to invoke when this property value is
     ///                 requested. 
     /// @param setter   A function to invoke when setting this property's value.
-    ///
     /// @param cacheVal The value to use as a cache. If null uses any cache
     ///                 from pre-existing property with same name.
     /// @param flagsIfMissing Flags to associate to the property if a new one
     ///                       is created.
     /// @return         true if the property was successfully added, false
     ///                 otherwise.
-    bool addGetterSetter(string_table::key key, as_function& getter,
+    bool addGetterSetter(const ObjectURI& uri, as_function& getter,
         as_function* setter, const as_value& cacheVal,
-        const PropFlags& flagsIfMissing = 0, string_table::key ns = 0);
+        const PropFlags& flagsIfMissing = 0);
 
     /// Add a getter/setter property, if not already existing
     //
     /// @param key      Name of the property.
-    ///
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param setter   A function to invoke when setting this property's value.
     /// @return         true if the property was successfully added, false
     ///                 otherwise.
-    bool addGetterSetter(string_table::key key, as_c_function_ptr getter,
-        as_c_function_ptr setter, const PropFlags& flagsIfMissing,
-        string_table::key ns = 0);
+    bool addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
+        as_c_function_ptr setter, const PropFlags& flagsIfMissing);
 
     /// Add a destructive getter property, if not already existant.
     //
@@ -282,9 +254,8 @@ public:
     /// @param flagsIfMissing Flags to associate to the property if a new
     ///                             one is created.
     /// @return         true if the property was successfully added.
-    bool addDestructiveGetter(string_table::key key,
-        as_function& getter, string_table::key ns = 0,
-        const PropFlags& flagsIfMissing=0);
+    bool addDestructiveGetter(const ObjectURI& uri, as_function& getter,
+        const PropFlags& flagsIfMissing = 0);
 
     /// Add a destructive getter property, if not already existant.
     ///
@@ -296,9 +267,8 @@ public:
     //                          one is created.
     /// @return         true if the property was successfully added, false
     ///                 otherwise.
-    bool addDestructiveGetter(string_table::key key,
-        as_c_function_ptr getter, string_table::key ns = 0,
-        const PropFlags& flagsIfMissing=0);
+    bool addDestructiveGetter(const ObjectURI& uri, as_c_function_ptr getter, 
+        const PropFlags& flagsIfMissing = 0);
 
     /// Set the flags of a property.
     //
@@ -307,36 +277,13 @@ public:
     /// @param setFalse The set of flags to clear
     /// @return         true if the value was successfully set, false
     ///                 otherwise (either not found or protected)
-    bool setFlags(string_table::key key, int setTrue, int setFalse,
-        string_table::key ns = 0);
+    bool setFlags(const ObjectURI& uri, int setTrue, int setFalse);
 
     /// Set the flags of all properties.
     //
-    /// Note: no one cares about the return, so it can be made void.
-    //
     /// @param setTrue      The set of flags to set
-    ///
     /// @param setFalse     The set of flags to clear
-    ///
-    /// @return             a pair containing number of successes 
-    ///                     (first) and number of failures (second).
-    ///                     Failures are due to protected properties,
-    ///                     on which flags cannot be set.
-    std::pair<size_t,size_t> setFlagsAll(int setTrue, int setFalse);
-
-    /// Set the flags of all properties whose name matches
-    /// any key in the given PropertyList object
-    //
-    /// @param props    The properties to use for finding names
-    /// @param setTrue  The set of flags to set
-    /// @param setFalse The set of flags to clear
-    /// @return         a pair containing number of successes 
-    ///                 (first) and number of failures (second).
-    ///                 Failures are due to either protected properties
-    ///                 of keys in the props argument not found in
-    ///                 this properties set.
-    std::pair<size_t,size_t> setFlagsAll( const PropertyList& props,
-            int setTrue, int setFalse);
+    void setFlagsAll(int setTrue, int setFalse);
 
     /// \brief
     /// Copy all properties from the given PropertyList
@@ -350,10 +297,6 @@ public:
     ///
     void import(const PropertyList& props);
 
-    // Used to keep track of which properties have been enumerated.
-    typedef std::set<std::pair<string_table::key, string_table::key> >
-        propNameSet;
-
     /// \brief
     /// Enumerate all non-hidden properties pushing
     /// their keys to the given as_environment.
@@ -361,7 +304,7 @@ public:
     ///
     /// @param donelist
     /// Don't enumerate those in donelist. Add those done to donelist.
-    void enumerateKeys(as_environment& env, propNameSet& donelist) const;
+    void enumerateKeys(as_environment& env, PropTracker& donelist) const;
 
     /// \brief
     /// Enumerate all non-hidden properties inserting
@@ -430,7 +373,7 @@ private:
 
     container _props;
 
-    boost::uint32_t mDefaultOrder;
+    boost::uint32_t _defaultOrder;
     
     VM& _vm;
 

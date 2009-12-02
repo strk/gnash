@@ -46,8 +46,7 @@ Script::addValue(string_table::key name, Namespace *ns,
     Global_as* g = VM::get().getGlobal();
 
     if (val.is_object()) {
-		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE, 
-			std::size_t(type->getName()));
+		val.to_object(*g)->set_member(NSV::INTERNAL_TYPE, type->getName());
     }
 
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
@@ -124,7 +123,9 @@ Script::addGetter(string_table::key name, Namespace *ns, Method *method,
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
-	Property *getset = _prototype->getOwnProperty(name, nsname);
+    const ObjectURI uri(name, nsname);
+
+	Property *getset = _prototype->getOwnProperty(uri);
 
 	if (getset)
 		getset->setGetter(method->getPrototype());
@@ -133,8 +134,8 @@ Script::addGetter(string_table::key name, Namespace *ns, Method *method,
 		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
 		if (isstatic)
 			flags |= PropFlags::staticProp;
-		_prototype->init_property(name, *method->getPrototype(), 
-			*method->getPrototype(), flags, nsname);
+		_prototype->init_property(uri, *method->getPrototype(), 
+			*method->getPrototype(), flags);
 	}
 	return true;
 }
@@ -144,18 +145,18 @@ Script::addSetter(string_table::key name, Namespace *ns, Method *method,
 	bool isstatic)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
+    const ObjectURI uri(name, nsname);
 
-	Property *getset = _prototype->getOwnProperty(name, nsname);
+	Property *getset = _prototype->getOwnProperty(uri);
 
 	if (getset)
 		getset->setSetter(method->getPrototype());
 	else
 	{
 		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
-		if (isstatic)
-			flags |= PropFlags::staticProp;
-		_prototype->init_property(name, *method->getPrototype(), 
-			*method->getPrototype(), flags, nsname);
+		if (isstatic) flags |= PropFlags::staticProp;
+		_prototype->init_property(uri, *method->getPrototype(), 
+			*method->getPrototype(), flags);
 	}
 	return true;
 }

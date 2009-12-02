@@ -444,8 +444,9 @@ Machine::execute()
                     
                     // If we don't have a super, throw.
                     if (!super) throw ASReferenceError();
-                    Property *b = super->findProperty(a.getABCName(), 
-                        a.getNamespace()->getURI());
+                    const ObjectURI uri(a.getGlobalName(),
+                            a.getNamespace()->getURI());
+                    Property *b = super->findProperty(uri);
                     // The object is on the top already.
                     pushGet(super, _stack.top(0), b);
                     break;
@@ -474,8 +475,11 @@ Machine::execute()
                     as_object* super = _stack.pop().to_object(*_global)->
                         get_prototype();
                     if (!super) throw ASReferenceError();
-                    Property* b = super->findProperty(a.getABCName(), 
-                        a.getNamespace()->getURI());
+
+                    const ObjectURI uri(a.getGlobalName(),
+                            a.getNamespace()->getURI());
+                    Property* b = super->findProperty(uri);
+
                     _stack.push(vobj);
                     pushSet(super, vobj, b);
                     break;
@@ -949,7 +953,7 @@ Machine::execute()
                     
                     _stack.drop(1);
                     const Property *b = obj->getByIndex(index);
-                    if (b) _stack.top(0) = mST.value(b->getName());
+                    if (b) _stack.top(0) = mST.value(getName(b->uri()));
                     else _stack.top(0) = "";
                     break;
                 }
@@ -1361,8 +1365,9 @@ Machine::execute()
 
                     if (!super) throw ASReferenceError();
                     
-                    Property* b = super->findProperty(a.getABCName(),
+                    const ObjectURI uri(a.getGlobalName(),
                             a.getNamespace()->getURI());
+                    Property* b = super->findProperty(uri);
                     
                     if (!b) throw ASReferenceError();
                     
@@ -1422,8 +1427,8 @@ Machine::execute()
                     }
                     else {
 
-                        as_value property = object->getMember(
-                                a.getGlobalName(), 0);
+                        as_value property =
+                            object->getMember(a.getGlobalName());
                     
                         if (!property.is_undefined() && !property.is_null()) {
                             log_abc("Calling method %s on object %s",
@@ -1534,7 +1539,7 @@ Machine::execute()
                         throw ASException();
                     }
 
-                    as_value c = super->getMember(NSV::PROP_CONSTRUCTOR, 0);
+                    as_value c = super->getMember(NSV::PROP_CONSTRUCTOR);
                     pushCall(c.to_function(), super, mIgnoreReturn,
                             argc, -1);
                     break;
@@ -1578,7 +1583,8 @@ Machine::execute()
                     string_table::key ns = a.getNamespace() ?
                         a.getNamespace()->getURI() : 0;
 
-                    as_value c = object->getMember(a.getGlobalName(), ns);
+                    as_value c = object->getMember(
+                            ObjectURI(a.getGlobalName(), ns));
 
                     // TODO: don't do this. Scriptes should not be functions;
                     // we should always use the constructor member, most
@@ -1603,7 +1609,7 @@ Machine::execute()
                         }
                         else {
                             as_value val = c.to_object(*_global)->getMember(
-                                    NSV::PROP_CONSTRUCTOR, 0);
+                                    NSV::PROP_CONSTRUCTOR);
 
                             invoke(val, env, c.to_object(*_global), args);
 
@@ -1970,7 +1976,8 @@ Machine::execute()
                     
                     as_value prop;
                     
-                    const bool found = object->get_member(name, &prop, ns);
+                    const ObjectURI uri(name, ns);
+                    const bool found = object->get_member(uri, &prop);
                     if (!found) {
                         log_abc("GETPROPERTY: property %s not found",
                                 mST.value(name));
@@ -2041,7 +2048,8 @@ Machine::execute()
                     const string_table::key ns = n ? n->getURI() : 0;
                     const string_table::key prop = a.getGlobalName();
 
-                    const bool deleted = obj->delProperty(prop, ns).second;
+                    const bool deleted = obj->delProperty(
+                            ObjectURI(prop, ns)).second;
                     _stack.top(0) = deleted;
                     break;
                 }
@@ -3269,7 +3277,7 @@ Machine::find_prop_strict(MultiName multiname)
 			continue;
 		}
         
-        if (scope_object->get_member(var, &val, ns)) {
+        if (scope_object->get_member(ObjectURI(var, ns), &val)) {
             push_stack(_scopeStack.at(i));
 			return val;
 		}

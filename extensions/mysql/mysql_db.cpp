@@ -331,7 +331,7 @@ mysql_qetData(const fn_call& fn)
             row = qresult[i];
             for (size_t j=0; j< row.size(); j++) {
                 as_value entry = row[j];
-                arr->callMethod(NSV::PROP_PUSH, entry);
+                callMethod(arr, NSV::PROP_PUSH, entry);
             }
         }
         return as_value(true);
@@ -366,7 +366,7 @@ mysql_fetch(const fn_call& fn)
         as_value aaa = *res;       
         Global_as& gl = getGlobal(fn);
         as_object* arr = gl.createArray();
-        arr->callMethod(NSV::PROP_PUSH, aaa);
+        callMethod(arr, NSV::PROP_PUSH, aaa);
         return as_value(arr);
     }
     log_aserror("Mysql.fetch(): missing arguments");

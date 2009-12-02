@@ -248,10 +248,15 @@ private:
 
     as_object *_prototype;
 
-	bool addBinding(string_table::key name, Binding b)
-	{ _bindings[name] = b; return true; }
-	bool addStaticBinding(string_table::key name, Binding b)
-	{ _staticBindings[name] = b; return true; }
+	bool addBinding(string_table::key name, const Binding& b) {
+        _bindings.insert(std::make_pair(name, b));
+        return true;
+    }
+
+	bool addStaticBinding(string_table::key name, const Binding& b) {
+        _staticBindings.insert(std::make_pair(name, b));
+        return true;
+    }
 
 	Binding *getStaticBinding(string_table::key name)
 	{

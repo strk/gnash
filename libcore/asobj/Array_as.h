@@ -55,7 +55,7 @@ class IsStrictArray : public AbstractPropertyVisitor
 {
 public:
     IsStrictArray(string_table& st) : _strict(true), _st(st) {}
-    virtual bool accept(string_table::key key, const as_value& val);
+    virtual bool accept(const ObjectURI& uri, const as_value& val);
 
     bool strict() const {
         return _strict;

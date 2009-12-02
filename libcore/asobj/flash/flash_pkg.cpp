@@ -60,8 +60,7 @@ void
 flash_package_init(as_object& where, const ObjectURI& uri)
 {
     const int flags = PropFlags::dontEnum | PropFlags::onlySWF8Up;
-    where.init_destructive_property(getName(uri), get_flash_package, flags,
-        getNamespace(uri));
+    where.init_destructive_property(uri, get_flash_package, flags);
 }
 
 }
