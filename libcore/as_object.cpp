@@ -265,7 +265,7 @@ as_object::as_object(Global_as& gl)
     _array(false),
     _relay(0),
 	_vm(getVM(gl)),
-	_members(_vm)
+	_members(*this)
 {
 }
 
@@ -275,7 +275,7 @@ as_object::as_object()
     _array(false),
     _relay(0),
 	_vm(VM::get()),
-	_members(_vm)
+	_members(*this)
 {
 }
 
@@ -562,8 +562,7 @@ as_object::set_prototype(const as_value& proto)
     // getter/setter
 	// TODO: check triggers !!
     // Note that this sets __proto__ in namespace 0
-	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this,
-            as_object::DefaultFlags);
+	_members.setValue(NSV::PROP_uuPROTOuu, proto, as_object::DefaultFlags);
 }
 
 void
@@ -728,7 +727,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 	if (ifFound) return false;
 
 	// Property does not exist, so it won't be read-only. Set it.
-	if (!_members.setValue(key, val, *this, nsname)) {
+	if (!_members.setValue(key, val)) {
 
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Unknown failure in setting property '%s' on "
@@ -768,8 +767,7 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 	}
 		
 	// Set (or create) a SimpleProperty 
-	if (! _members.setValue(uri, val, *this, flags) )
-	{
+	if (!_members.setValue(uri, val, flags)) {
 		log_error(_("Attempt to initialize read-only property ``%s''"
 			" on object ``%p'' twice"),
 			getStringTable(*this).value(key), (void*)this);
@@ -982,13 +980,13 @@ as_object::dump_members()
 {
 	log_debug(_("%d members of object %p follow"),
 		_members.size(), (const void*)this);
-	_members.dump(*this);
+	_members.dump();
 }
 
 void
 as_object::dump_members(std::map<std::string, as_value>& to)
 {
-	_members.dump(*this, to);
+	_members.dump(to);
 }
 
 void
@@ -1054,20 +1052,15 @@ as_object::enumerateProperties(as_environment& env) const
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< const as_object* > visited;
+	std::set<const as_object*> visited;
 	PropertyList::PropTracker named;
 
-	boost::intrusive_ptr<const as_object> obj(this);
+	const as_object* obj(this);
 	
-	while ( obj && visited.insert(obj.get()).second )
-	{
+	while (obj && visited.insert(obj).second) {
 		obj->_members.enumerateKeys(env, named);
 		obj = obj->get_prototype();
 	}
-
-	// This happens always since top object in hierarchy
-	// is always Object, which in turn derives from itself
-	//if ( obj ) log_error(_("prototype loop during Enumeration"));
 }
 
 void
@@ -1081,7 +1074,7 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 	boost::intrusive_ptr<const as_object> obj(this);
 	while ( obj && visited.insert(obj.get()).second )
 	{
-		obj->_members.enumerateKeyValue(*this, to);
+		obj->_members.enumerateKeyValue(to);
 		obj = obj->get_prototype();
 	}
 

@@ -828,7 +828,7 @@ public:
     ///
     template<typename T>
     void visitProperties(AbstractPropertyVisitor& visitor) const {
-        _members.visitValues<T>(visitor, *this);
+        _members.visitValues<T>(visitor);
     }
 
     /// \brief

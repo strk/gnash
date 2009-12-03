@@ -87,7 +87,7 @@ main(int /*argc*/, char** /*argv*/)
 	log_debug("VM version %d", vm.getSWFVersion());
 
 	as_object obj;
-	PropertyList props(vm);
+	PropertyList props(obj);
 
 	as_value val("value");
 	as_value val2("value2");
@@ -99,7 +99,7 @@ main(int /*argc*/, char** /*argv*/)
 	if (vm.getSWFVersion() > 6) // SWF 7 or higher is case sensitive.
 	{
 		check_equals(props.size(), 0);
-		check ( props.setValue(st.find("Var0"), val, obj) );
+		check ( props.setValue(st.find("Var0"), val) );
 		check_equals(props.size(), 1);
 
 		check (getVal(props, st.find("Var0"), ret, obj) );
@@ -109,22 +109,22 @@ main(int /*argc*/, char** /*argv*/)
 		check (!getVal(props, st.find("var0"), ret, obj) );
 
 		// new value overrides existing value
-		check ( props.setValue(st.find("Var0"), val2, obj) );
+		check ( props.setValue(st.find("Var0"), val2) );
 		check_equals(props.size(), 1);
 		check (getVal(props, st.find("Var0"), ret, obj) );
 		check_strictly_equals ( ret, val2 );
 
 		// case-sensitive setting value doesn't overrides existing value
-		check ( props.setValue(st.find("var0"), val3, obj) );
+		check ( props.setValue(st.find("var0"), val3) );
 		check_equals(props.size(), 2);
 		check (!getVal(props, st.find("vAr0"), ret, obj) );
 
 		// Now add some new labels
-		check ( props.setValue(st.find("var1"), val, obj) );
+		check ( props.setValue(st.find("var1"), val) );
 		check_equals(props.size(), 3);
-		check ( props.setValue(st.find("var2"), val, obj) );
+		check ( props.setValue(st.find("var2"), val) );
 		check_equals(props.size(), 4);
-		check ( props.setValue(st.find("var3"), val, obj) );
+		check ( props.setValue(st.find("var3"), val) );
 		check_equals(props.size(), 5);
 
 		// Test deletion of properties
@@ -146,7 +146,7 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(props.size(), 4);
 
         PropertyList::SortedPropertyList vals;
-		props.enumerateKeyValue(obj, vals);
+		props.enumerateKeyValue(vals);
 		check_equals( vals.size(), 4 );
 		check_equals( vals[0].first, "var0");
 		check_equals( vals[0].second, "value3");
@@ -162,7 +162,7 @@ main(int /*argc*/, char** /*argv*/)
 		// Below SWF or is not case sensitive.
 
 		check_equals(props.size(), 0);
-		check ( props.setValue(st.find("Var0"), val, obj) );
+		check ( props.setValue(st.find("Var0"), val) );
 		check_equals(props.size(), 1);
 
 		check (getVal(props, st.find("Var0"), ret, obj) );
@@ -173,23 +173,23 @@ main(int /*argc*/, char** /*argv*/)
 		check_strictly_equals ( ret, val );
 
 		// new value overrides existing value
-		check ( props.setValue(st.find("Var0"), val2, obj) );
+		check ( props.setValue(st.find("Var0"), val2) );
 		check_equals(props.size(), 1);
 		check (getVal(props, st.find("Var0"), ret, obj) );
 		check_strictly_equals ( ret, val2 );
 
 		// case-insensitive setting value should override existing value
-		check ( props.setValue(st.find("var0"), val3, obj) );
+		check ( props.setValue(st.find("var0"), val3) );
 		check_equals(props.size(), 1);
 		check (getVal(props, st.find("vAr0"), ret, obj) );
 		check_strictly_equals ( ret, val3 );
 
 		// Now add some new labels
-		check ( props.setValue(st.find("var1"), val, obj) );
+		check ( props.setValue(st.find("var1"), val) );
 		check_equals(props.size(), 2);
-		check ( props.setValue(st.find("var2"), val, obj) );
+		check ( props.setValue(st.find("var2"), val) );
 		check_equals(props.size(), 3);
-		check ( props.setValue(st.find("var3"), val, obj) );
+		check ( props.setValue(st.find("var3"), val) );
 		check_equals(props.size(), 4);
 
 		// Test deletion of properties
@@ -211,7 +211,7 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(props.size(), 3);
 
         PropertyList::SortedPropertyList vals;
-		props.enumerateKeyValue(obj, vals);
+		props.enumerateKeyValue(vals);
 		check_equals( vals.size(), 3 );
 		check_equals( vals[0].first, "var2");
 		check_equals( vals[0].second, "value");

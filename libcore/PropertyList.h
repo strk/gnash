@@ -25,6 +25,7 @@
 #include "ObjectURI.h"
 
 #include <map> 
+#include <deque> 
 #include <string> // for use within map 
 #include <cassert> // for inlines
 #include <utility> // for std::pair
@@ -33,7 +34,7 @@
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/key_extractors.hpp>
-
+#include <boost/noncopyable.hpp>
 
 // Forward declaration
 namespace gnash {
@@ -45,18 +46,35 @@ namespace gnash {
 
 namespace gnash {
 
-/// Set of properties associated to an ActionScript object.
+/// Set of properties associated with an ActionScript object.
 //
 /// The PropertyList container is the sole owner of the Property
 /// elements in it contained and has full responsibility of their
 /// construction and destruction.
-///
-class PropertyList
+//
+/// A PropertyList holds a reference to the as_object whose properties it
+/// contains. This reference will always be valid if the PropertyList
+/// is a member of as_object.
+//
+/// It is theoretically possible for a PropertyList to be used with any
+/// as_object, not just original as_object it was use with. Currently (as
+/// there is no use for this scenario) it is not possible to change the
+/// owner.
+class PropertyList : boost::noncopyable
 {
 public:
 
     typedef std::pair<std::string, std::string> KeyValuePair;
-    typedef std::vector<KeyValuePair> SortedPropertyList;
+
+    /// This is used to hold an intermediate copy of an as_object's properties.
+    //
+    /// AS enumerates in reverse order of creation. In order to make sure
+    /// that the properties are in the correct order, the first element of
+    /// a SortedPropertyList should hold the last created property.
+    //
+    /// We use a deque because we push to the front in order to preserve the
+    /// ordering for the copy.
+    typedef std::deque<KeyValuePair> SortedPropertyList;
     
     /// Used to keep track of which properties have been enumerated.
     typedef std::set<ObjectURI> PropTracker;
@@ -88,22 +106,16 @@ public:
 
     /// Construct the PropertyList 
     //
-    /// The constructor takes a VM reference because PropertyList
-    /// conceptually needs access to Virtual Machine resources
-    /// (string_table) but not to the Stage.
-    PropertyList(VM& vm)
+    /// @param obj      The as_object to which this PropertyList belongs.
+    ///                 This object is not fully constructed at this stage,
+    ///                 so this constructor should not do anything with it!
+    PropertyList(as_object& obj)
         :
         _props(),
         _defaultOrder(0),
-        _vm(vm)
+        _owner(obj)
     {
     }
-
-    /// Copy constructor
-    PropertyList(const PropertyList& pl);
-
-    /// Assignment operator
-    PropertyList& operator=(const PropertyList&);
 
     /// Visit properties 
     //
@@ -120,11 +132,8 @@ public:
     ///                     bool accept(const ObjectURI&, const as_value&);
     ///                 Scan is by enumeration order and stops when accept()
     ///                 returns false.
-    ///
-    /// @param this_ptr The object reference used to extract values from
-    ///                 properties.
     template <class U, class V>
-    void visitValues(V& visitor, const as_object& this_ptr, U cmp = U()) const
+    void visitValues(V& visitor, U cmp = U()) const
     {
         typedef container::nth_index<1>::type ContainerByOrder;
 
@@ -136,7 +145,7 @@ public:
                 ie = _props.template get<1>().rend(); it != ie; ++it)
         {
             if (!cmp(*it)) continue;
-            as_value val = it->getValue(this_ptr);
+            as_value val = it->getValue(_owner);
             if (!visitor.accept(it->uri(), val)) return;
         }
     }
@@ -160,14 +169,6 @@ public:
     /// @param value
     ///    a const reference to the as_value to use for setting
     ///    or creating the property. 
-    /// @param this_ptr
-    ///     The as_object used to set the 'this' pointer
-    ///     for calling getter/setter function (GetterSetterProperty);
-    ///     it will be unused when getting or setting SimpleProperty
-    ///     properties.
-    ///    This parameter is non-const as nothing prevents an
-    ///    eventual "Setter" function from actually modifying it,
-    ///    so we can't promise constness.
     /// @param namespaceId
     ///    The namespace in which this should be entered. If 0 is given,
     ///    this will use the first value found, if it exists.
@@ -176,7 +177,7 @@ public:
     /// @return true if the value was successfully set, false
     ///         otherwise (found a read-only property, most likely).
     bool setValue(const ObjectURI& uri, const as_value& value,
-            as_object& this_ptr, const PropFlags& flagsIfMissing = 0);
+            const PropFlags& flagsIfMissing = 0);
 
     /// Reserves a slot number for a property
     ///
@@ -286,18 +287,6 @@ public:
     void setFlagsAll(int setTrue, int setFalse);
 
     /// \brief
-    /// Copy all properties from the given PropertyList
-    /// instance.
-    //
-    /// Unexistent properties are created. Existing properties
-    /// are updated with the new value.
-    ///
-    /// @param props
-    ///    the properties to copy from
-    ///
-    void import(const PropertyList& props);
-
-    /// \brief
     /// Enumerate all non-hidden properties pushing
     /// their keys to the given as_environment.
     /// Follows enumeration order.
@@ -310,14 +299,7 @@ public:
     /// Enumerate all non-hidden properties inserting
     /// their name/value pair to the given SortedPropertyList.
     /// Follows enumeration order.
-    ///
-    /// @param this_ptr
-    ///     The as_object used to set the 'this' pointer
-    ///     for calling getter/setter function (GetterSetterProperty);
-    ///     it will be unused when getting or setting SimpleProperty
-    ///     properties.
-    void enumerateKeyValue(const as_object& this_ptr, SortedPropertyList& to)
-        const;
+    void enumerateKeyValue(SortedPropertyList& to) const;
 
     /// Remove all entries in the container
     void clear();
@@ -329,41 +311,16 @@ public:
 
     /// Dump all members (using log_debug)
     //
-    /// @param this_ptr
-    ///     The as_object used to set the 'this' pointer
-    ///     for calling getter/setter function (GetterSetterProperty);
-    ///     it will be unused when getting or setting SimpleProperty
-    ///     properties.
-    ///    This parameter is non-const as nothing prevents an
-    ///    eventual "Getter" function from actually modifying it,
-    ///    so we can't promise constness.
-    ///    Note that the PropertyList itself might be changed
-    ///    from this call, accessed trough the 'this' pointer,
-    ///    so this method too is non-const.
-    ///
     /// This does not reflect the normal enumeration order. It is sorted
     /// lexicographically by property.
-    ///
-    void dump(as_object& this_ptr);
+    void dump();
 
     /// Dump all members into the given map
     //
-    /// @param this_ptr
-    ///     The as_object used to set the 'this' pointer
-    ///     for calling getter/setter function (GetterSetterProperty);
-    ///     it will be unused when getting or setting SimpleProperty
-    ///     properties.
-    ///    This parameter is non-const as nothing prevents an
-    ///    eventual "Getter" function from actually modifying it,
-    ///    so we can't promise constness.
-    ///    Note that the PropertyList itself might be changed
-    ///    from this call, accessed trough the 'this' pointer,
-    ///    so this method too is non-const.
-    ///
     /// This does not reflect the normal enumeration order. It is sorted
     /// lexicographically by property.
     ///
-    void dump(as_object& this_ptr, std::map<std::string, as_value>& to);
+    void dump(std::map<std::string, as_value>& to);
 
     /// Mark all simple properties, getters and setters
     /// as being reachable (for the GC)
@@ -375,7 +332,7 @@ private:
 
     boost::uint32_t _defaultOrder;
     
-    VM& _vm;
+    as_object& _owner;
 
 };
 

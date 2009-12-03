@@ -41,27 +41,6 @@
 
 namespace gnash {
 
-PropertyList::PropertyList(const PropertyList& pl)
-	:
-	_defaultOrder(pl._defaultOrder),
-    _vm(pl._vm)
-{
-	import(pl);
-}
-
-PropertyList&
-PropertyList::operator=(const PropertyList& pl)
-{
-	if ( this != &pl )
-	{
-		clear();
-		_defaultOrder = pl._defaultOrder;
-		import(pl);
-	}
-	return *this;
-}
-
-
 namespace {
 
 inline
@@ -121,7 +100,7 @@ PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 	_props.insert(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
-    ObjectURI::Logger l(_vm.getStringTable());
+    ObjectURI::Logger l(getStringTable(_owner));
 	log_debug("Slot for AS property %s inserted with flags %s", l(uri)
             a.getFlags());
 #endif
@@ -131,7 +110,7 @@ PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 
 bool
 PropertyList::setValue(const ObjectURI& uri, const as_value& val,
-		as_object& this_ptr, const PropFlags& flagsIfMissing)
+        const PropFlags& flagsIfMissing)
 {
 	container::iterator found = iterator_find(_props, uri);
 	
@@ -143,7 +122,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		a.setOrder(- ++_defaultOrder - 1);
 		_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-        ObjectURI::Logger l(_vm.getStringTable());
+        ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("Simple AS property %s inserted with flags %s",
 			l(uri), a.getFlags());
 #endif
@@ -153,7 +132,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 	const Property& prop = *found;
 	if (prop.isReadOnly() && ! prop.isDestructive())
 	{
-        ObjectURI::Logger l(_vm.getStringTable());
+        ObjectURI::Logger l(getStringTable(_owner));
 		log_error(_("Property %s is read-only %s, not setting it to %s"), 
 			l(uri), prop.getFlags(), val);
 		return false;
@@ -162,7 +141,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 	// Property is const because the container uses its members
 	// for indexing. We don't use value (only name and namespace)
 	// so this const_cast is safe
-	const_cast<Property&>(prop).setValue(this_ptr, val);
+	const_cast<Property&>(prop).setValue(_owner, val);
 
 	return true;
 }
@@ -179,7 +158,7 @@ PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 	return f.set_flags(setFlags, clearFlags);
 
 #ifdef GNASH_DEBUG_PROPERTY
-    ObjectURI::Logger l(_vm.getStringTable());
+    ObjectURI::Logger l(getStringTable(_owner));
 	log_debug("Flags of property %s changed from %s to  %s",
 		l(uri), oldFlags, found->getFlags());
 #endif
@@ -208,19 +187,17 @@ PropertyList::delProperty(const ObjectURI& uri)
 {
 	//GNASH_REPORT_FUNCTION;
 	container::iterator found = iterator_find(_props, uri);
-	if (found == _props.end())
-	{
-		return std::make_pair(false,false);
+	if (found == _props.end()) {
+		return std::make_pair(false, false);
 	}
 
 	// check if member is protected from deletion
-	if (found->getFlags().get_dont_delete())
-	{
-		return std::make_pair(true,false);
+	if (found->getFlags().get_dont_delete()) {
+		return std::make_pair(true, false);
 	}
 
 	_props.erase(found);
-	return std::make_pair(true,true);
+	return std::make_pair(true, true);
 }
 
 void
@@ -249,81 +226,56 @@ PropertyList::enumerateKeys(as_environment& env, PropTracker& donelist) const
 	}
 }
 
-void
-PropertyList::enumerateKeyValue(const as_object& this_ptr,
-        SortedPropertyList& to) const
+class Enumerator
 {
-    VM& vm = getVM(this_ptr);
-	string_table& st = vm.getStringTable();
-    typedef container::nth_index<1>::type ContainerByOrder;
+public:
+    Enumerator(const as_object& this_ptr, PropertyList::SortedPropertyList& to)
+        :
+        _version(getSWFVersion(this_ptr)),
+        _st(getStringTable(this_ptr)),
+        _to(to)
+    {}
 
-	for (ContainerByOrder::const_iterator i=_props.get<1>().begin(),
-            ie=_props.get<1>().end(); i != ie; ++i)
-	{
-		if (i->getFlags().get_dont_enum()) continue;
+    bool accept(const ObjectURI& uri, as_value& val) {
+		_to.push_front(std::make_pair(_st.value(getName(uri)),
+				val.to_string_versioned(_version)));
+        return true;
+    }
 
-        // Undefined values should be "undefined" for SWF7 and
-        // empty for SWF6.
-        const int version = vm.getSWFVersion();
-		to.push_back(std::make_pair(st.value(getName(i->uri())),
-				i->getValue(this_ptr).to_string_versioned(version)));
-	}
+private:
+    const int _version;
+    string_table& _st;
+    PropertyList::SortedPropertyList& _to;
+};
+
+void
+PropertyList::enumerateKeyValue(SortedPropertyList& to) const
+{
+    Enumerator e(_owner, to);
+    visitValues(e, IsEnumerable());
 }
 
 /// This does not reflect the normal enumeration order. It is sorted
 /// lexicographically by property.
 void
-PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to) 
+PropertyList::dump(std::map<std::string, as_value>& to) 
 {
-    ObjectURI::Logger l(_vm.getStringTable());
+    ObjectURI::Logger l(getStringTable(_owner));
 
 	for (container::const_iterator i=_props.begin(), ie=_props.end();
             i != ie; ++i)
 	{
-		to.insert(std::make_pair(l(i->uri()), i->getValue(this_ptr)));
+		to.insert(std::make_pair(l(i->uri()), i->getValue(_owner)));
 	}
 }
 
 void
-PropertyList::dump(as_object& this_ptr)
+PropertyList::dump()
 {
-    ObjectURI::Logger l(_vm.getStringTable());
+    ObjectURI::Logger l(getStringTable(_owner));
 	for (container::const_iterator it=_props.begin(), itEnd=_props.end();
             it != itEnd; ++it) {
-		log_debug("  %s: %s", l(it->uri()), it->getValue(this_ptr));
-	}
-}
-
-void
-PropertyList::import(const PropertyList& o) 
-{
-	for (container::const_iterator it = o._props.begin(),
-		itEnd = o._props.end(); it != itEnd; ++it)
-	{
-		// overwrite any previous property with this name
-		container::iterator found = iterator_find(_props, it->uri());
-		if (found != _props.end())
-		{
-			Property a = *it;
-			a.setOrder(found->getOrder());
-			_props.replace(found, a);
-#ifdef GNASH_DEBUG_PROPERTY
-            ObjectURI::Logger l(_vm.getStringTable());
-			log_debug("Property %s replaced on import: new flags %s",
-				l(a.uri()), a.getFlags());
-#endif
-		}
-		else
-		{
-			Property a = *it;
-			a.setOrder(- ++_defaultOrder - 1);
-			_props.insert(a);
-#ifdef GNASH_DEBUG_PROPERTY
-            ObjectURI::Logger l(_vm.getStringTable());
-			log_debug("Property %s imported with flags %s",
-				l(a.uri()), a.getFlags());
-#endif
-		}
+		log_debug("  %s: %s", l(it->uri()), it->getValue(_owner));
 	}
 }
 
@@ -345,7 +297,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 		_props.replace(found, a);
 
 #ifdef GNASH_DEBUG_PROPERTY
-        ObjectURI::Logger l(_vm.getStringTable());
+        ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("AS GetterSetter %s replaced copying flags %s", l(uri),
                 a.getFlags());
 #endif
@@ -356,7 +308,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 		a.setCache(cacheVal);
 		_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-        ObjectURI::Logger l(_vm.getStringTable());
+        ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("AS GetterSetter %s inserted with flags %s", l(uri),
                 a.getFlags());
 #endif
@@ -381,7 +333,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 		_props.replace(found, a);
 
 #ifdef GNASH_DEBUG_PROPERTY
-        ObjectURI::Logger l(_vm.getStringTable());
+        ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("Native GetterSetter %s replaced copying flags %s", l(uri),
                 a.getFlags());
 #endif
@@ -391,7 +343,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 	{
 		_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = _vm.getStringTable();
+		string_table& st = getStringTable(_owner);
 		log_debug("Native GetterSetter %s in namespace %s inserted with "
                 "flags %s", st.value(key), st.value(nsId), a.getFlags());
 #endif
@@ -407,7 +359,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 	container::iterator found = iterator_find(_props, uri);
 	if (found != _props.end())
 	{
-        ObjectURI::Logger l(_vm.getStringTable());
+        ObjectURI::Logger l(getStringTable(_owner));
 		log_error("Property %s already exists, can't addDestructiveGetter",
                 l(uri));
 		return false; // Already exists.
@@ -419,7 +371,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 	_props.insert(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
-    ObjectURI::Logger l(_vm.getStringTable());
+    ObjectURI::Logger l(getStringTable(_owner));
 	log_debug("Destructive AS property %s inserted with flags %s",
             l(uri), a.getFlags());
 #endif
@@ -440,7 +392,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri,
 	_props.insert(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
-    ObjectURI::Logger l(_vm.getStringTable());
+    ObjectURI::Logger l(getStringTable(_owner));
 	log_debug("Destructive native property %s with flags %s", l(uri),
             a.getFlags());
 #endif
