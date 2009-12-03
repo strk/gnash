@@ -24,7 +24,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "string_table.h"
-#include "ref_counted.h" // for inheritance  (to drop)
 #include "GC.h" // for inheritance from GcResource (to complete)
 #include "PropertyList.h"
 #include "as_value.h" // for return of get_primitive_value
@@ -39,6 +38,7 @@
 #include <set>
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
+#include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -144,10 +144,8 @@ private:
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class as_object : public GcResource
+class as_object : public GcResource, boost::noncopyable
 {
-    friend class abc::Class;
-    friend class abc::Machine;
 
     typedef PropertyList::SortedPropertyList SortedPropertyList;
 
@@ -804,7 +802,6 @@ public:
     /// This implementation will keep track of visited object
     /// to avoid loops in prototype chain. 
     /// NOTE: the MM player just chokes in this case (loop)
-    ///
     void enumerateProperties(as_environment& env) const;
 
     /// \brief
@@ -815,7 +812,6 @@ public:
     /// This implementation will keep track of visited object
     /// to avoid loops in prototype chain. 
     /// NOTE: the MM player just chokes in this case (loop)
-    ///
     void enumerateProperties(SortedPropertyList& to) const;
 
     /// Visit the properties of this object by key/as_value pairs
@@ -925,8 +921,6 @@ public:
         _displayObject = d;
     }
 
-protected:
-
     ///Get a member value at a given slot.
     //
     /// @param order
@@ -961,7 +955,8 @@ protected:
     ///
     bool set_member_slot(int order, const as_value& val, bool ifFound = false);
 
-#ifdef GNASH_USE_GC
+protected:
+
     /// Mark all reachable resources, override from GcResource.
     //
     /// The default implementation marks all properties
@@ -970,24 +965,14 @@ protected:
     /// If a derived class provides access to more GC-managed
     /// resources, it should override this method and call 
     /// markAsObjectReachable() as the last step.
-    ///
-    virtual void markReachableResources() const
-    {
+    virtual void markReachableResources() const {
         markAsObjectReachable();
     }
 
     /// Mark properties and triggers list as reachable (for the GC)
     void markAsObjectReachable() const;
 
-#endif // GNASH_USE_GC
-
 private:
-
-    /// Do not allow copies.
-    as_object(const as_object& other);
-
-    /// Don't allow implicit assignment.
-    as_object& operator=(const as_object&);
 
     /// A utility class for processing this as_object's inheritance chain
     template<typename T> class PrototypeRecursor;
