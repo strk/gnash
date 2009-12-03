@@ -240,18 +240,38 @@ public:
 		_tgt(tgt)
 	{}
 
-	/// \brief
-	/// Use the set_member function to properly set *inherited* properties
-	/// of the given target object
+	/// Set *inherited* properties of the given target object
 	///
-	bool accept(const ObjectURI& uri, const as_value& val)
-	{
+	bool accept(const ObjectURI& uri, const as_value& val) {
 		if (getName(uri) == NSV::PROP_uuPROTOuu) return true;
 		_tgt.set_member(getName(uri), val);
         return true;
 	}
 private:
 	as_object& _tgt;
+};
+
+class PropertyEnumerator : public AbstractPropertyVisitor
+{
+public:
+    PropertyEnumerator(const as_object& this_ptr,
+            PropertyList::SortedPropertyList& to)
+        :
+        _version(getSWFVersion(this_ptr)),
+        _st(getStringTable(this_ptr)),
+        _to(to)
+    {}
+
+    bool accept(const ObjectURI& uri, const as_value& val) {
+		_to.push_front(std::make_pair(_st.value(getName(uri)),
+				val.to_string_versioned(_version)));
+        return true;
+    }
+
+private:
+    const int _version;
+    string_table& _st;
+    PropertyList::SortedPropertyList& _to;
 };
 
 } // end of anonymous namespace
@@ -1072,9 +1092,12 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 	std::set< const as_object* > visited;
 
 	boost::intrusive_ptr<const as_object> obj(this);
+
+    PropertyEnumerator e(*this, to);
+
 	while ( obj && visited.insert(obj.get()).second )
 	{
-		obj->_members.enumerateKeyValue(to);
+		obj->visitProperties<IsEnumerable>(e);
 		obj = obj->get_prototype();
 	}
 

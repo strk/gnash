@@ -226,33 +226,10 @@ PropertyList::enumerateKeys(as_environment& env, PropTracker& donelist) const
 	}
 }
 
-class Enumerator
-{
-public:
-    Enumerator(const as_object& this_ptr, PropertyList::SortedPropertyList& to)
-        :
-        _version(getSWFVersion(this_ptr)),
-        _st(getStringTable(this_ptr)),
-        _to(to)
-    {}
-
-    bool accept(const ObjectURI& uri, as_value& val) {
-		_to.push_front(std::make_pair(_st.value(getName(uri)),
-				val.to_string_versioned(_version)));
-        return true;
-    }
-
-private:
-    const int _version;
-    string_table& _st;
-    PropertyList::SortedPropertyList& _to;
-};
-
 void
 PropertyList::enumerateKeyValue(SortedPropertyList& to) const
 {
-    Enumerator e(_owner, to);
-    visitValues(e, IsEnumerable());
+    std::abort();
 }
 
 /// This does not reflect the normal enumeration order. It is sorted
