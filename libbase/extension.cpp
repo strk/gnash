@@ -44,7 +44,10 @@
 #include "ltdl.h"
 #include "sharedlib.h"
 #include "extension.h"
-#include "as_object.h"
+
+namespace gnash {
+    class as_object;
+}
 
 #if defined(WIN32) || defined(_WIN32)
 int        lt_dlsetsearchpath   (const char *search_path);

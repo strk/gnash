@@ -24,8 +24,6 @@
 
 #include <string>
 
-#include "as_object.h" // for inheritance
-
 #include <sys/types.h>
 #if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__)
 # include <sys/ipc.h>
@@ -167,17 +165,6 @@ public:
     }
     void destroy(pointer __p)   { __p->~_Tp(); }
 };
-
-class shm_as_object : public as_object
-{
-public:
-    Shm obj;
-};
-
-as_value shm_getname(const fn_call& fn);
-as_value shm_getsize(const fn_call& fn);
-as_value shm_getallocated(const fn_call& fn);
-as_value shm_exists(const fn_call& fn);
 
 } // end of gnash namespace
 
