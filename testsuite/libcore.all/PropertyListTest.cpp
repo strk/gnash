@@ -145,16 +145,6 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(delpair.second, false); // property was NOT deleted
 		check_equals(props.size(), 4);
 
-        PropertyList::SortedPropertyList vals;
-		props.enumerateKeyValue(vals);
-		check_equals( vals.size(), 4 );
-		check_equals( vals[0].first, "var0");
-		check_equals( vals[0].second, "value3");
-		check_equals( vals[1].first, "Var0");
-		check_equals( vals[1].second, "value2");
-		check_equals( vals[2].first, "var1");
-		check_equals( vals[2].second, "value");
-
 	}
 	else
 	{
@@ -209,16 +199,6 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(delpair.first, true); // property was found
 		check_equals(delpair.second, false); // property was NOT deleted
 		check_equals(props.size(), 3);
-
-        PropertyList::SortedPropertyList vals;
-		props.enumerateKeyValue(vals);
-		check_equals( vals.size(), 3 );
-		check_equals( vals[0].first, "var2");
-		check_equals( vals[0].second, "value");
-		check_equals( vals[1].first, "var1");
-		check_equals( vals[1].second, "value");
-		check_equals( vals[2].first, "Var0");
-		check_equals( vals[2].second, "value3");
 
 	}
 }

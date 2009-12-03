@@ -147,9 +147,19 @@ private:
 class as_object : public GcResource, boost::noncopyable
 {
 
-    typedef PropertyList::SortedPropertyList SortedPropertyList;
-
 public:
+    
+    typedef std::pair<std::string, std::string> KeyValuePair;
+
+    /// This is used to hold an intermediate copy of an as_object's properties.
+    //
+    /// AS enumerates in reverse order of creation. In order to make sure
+    /// that the properties are in the correct order, the first element of
+    /// a SortedPropertyList should hold the last created property.
+    //
+    /// We use a deque because we push to the front in order to preserve the
+    /// ordering for the copy.
+    typedef std::deque<KeyValuePair> SortedPropertyList;
     
     /// Construct an ActionScript object with no prototype associated.
     //
@@ -542,6 +552,18 @@ public:
     void init_readonly_property(const ObjectURI& uri,
             as_c_function_ptr getter, int flags = DefaultFlags);
 
+
+    /// Enumerate all non-hidden property keys to the given as_environment.
+    //
+    /// NB: this function does not access the property values, so callers
+    /// can be certain no values will be changed.
+    //
+    /// The enumeration recurses through the prototype chain. This
+    /// implementation will keep track of visited object to avoid infinite
+    /// loops in the prototype chain.  NOTE: the MM player just chokes in
+    /// this case.
+    void enumeratePropertyKeys(as_environment& env) const;
+
     /// \brief
     /// Add a watch trigger, overriding any other defined for same name.
     //
@@ -793,26 +815,6 @@ public:
     {
         _members.clear();
     }
-
-    /// \brief
-    /// Enumerate all non-hidden properties pushing
-    /// their value to the given as_environment.
-    //
-    /// The enumeration recurse in prototype.
-    /// This implementation will keep track of visited object
-    /// to avoid loops in prototype chain. 
-    /// NOTE: the MM player just chokes in this case (loop)
-    void enumerateProperties(as_environment& env) const;
-
-    /// \brief
-    /// Enumerate all non-hidden properties inserting
-    /// their name/value pair to the given map.
-    //
-    /// The enumeration recurse in prototype.
-    /// This implementation will keep track of visited object
-    /// to avoid loops in prototype chain. 
-    /// NOTE: the MM player just chokes in this case (loop)
-    void enumerateProperties(SortedPropertyList& to) const;
 
     /// Visit the properties of this object by key/as_value pairs
     //
@@ -1108,6 +1110,16 @@ isNativeType(as_object* obj, T*& relay)
     relay = dynamic_cast<T*>(obj->relay());
     return relay;
 }
+
+/// Enumerate all non-hidden properties to the passed container
+//
+/// NB: it is likely that this call will change the object, as accessing
+/// propertyproperty  values may call getter-setters.
+//
+/// The enumeration recurses through the prototype chain. This implementation
+/// will keep track of visited object to avoid infinite loops in the
+/// prototype chain.  NOTE: the MM player just chokes in this case.
+void enumerateProperties(as_object& o, as_object::SortedPropertyList& to);
 
 /// Get the VM from an as_object.
 VM& getVM(const as_object& o);

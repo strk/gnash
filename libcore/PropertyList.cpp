@@ -200,10 +200,26 @@ PropertyList::delProperty(const ObjectURI& uri)
 	return std::make_pair(true, true);
 }
 
+
+/// This does not reflect the normal enumeration order. It is sorted
+/// lexicographically by property.
 void
-PropertyList::enumerateKeys(as_environment& env, PropTracker& donelist) const
+PropertyList::dump(std::map<std::string, as_value>& to) 
 {
-	string_table& st = getStringTable(env);
+    ObjectURI::Logger l(getStringTable(_owner));
+
+	for (container::const_iterator i=_props.begin(), ie=_props.end();
+            i != ie; ++i)
+	{
+		to.insert(std::make_pair(l(i->uri()), i->getValue(_owner)));
+	}
+}
+
+void
+PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
+    const
+{
+	string_table& st = getStringTable(_owner);
 
     // We should enumerate in order of creation, not lexicographically.
     typedef container::nth_index<1>::type ContainerByOrder;
@@ -223,26 +239,6 @@ PropertyList::enumerateKeys(as_environment& env, PropTracker& donelist) const
 
 			env.push(qname);
 		}
-	}
-}
-
-void
-PropertyList::enumerateKeyValue(SortedPropertyList& to) const
-{
-    std::abort();
-}
-
-/// This does not reflect the normal enumeration order. It is sorted
-/// lexicographically by property.
-void
-PropertyList::dump(std::map<std::string, as_value>& to) 
-{
-    ObjectURI::Logger l(getStringTable(_owner));
-
-	for (container::const_iterator i=_props.begin(), ie=_props.end();
-            i != ie; ++i)
-	{
-		to.insert(std::make_pair(l(i->uri()), i->getValue(_owner)));
 	}
 }
 

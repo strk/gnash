@@ -24,12 +24,11 @@
 #include "string_table.h"
 #include "ObjectURI.h"
 
+#include <set> 
 #include <map> 
-#include <deque> 
 #include <string> // for use within map 
 #include <cassert> // for inlines
 #include <utility> // for std::pair
-#include <set>
 #include <boost/cstdint.hpp> 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -64,20 +63,7 @@ class PropertyList : boost::noncopyable
 {
 public:
 
-    typedef std::pair<std::string, std::string> KeyValuePair;
-
-    /// This is used to hold an intermediate copy of an as_object's properties.
-    //
-    /// AS enumerates in reverse order of creation. In order to make sure
-    /// that the properties are in the correct order, the first element of
-    /// a SortedPropertyList should hold the last created property.
-    //
-    /// We use a deque because we push to the front in order to preserve the
-    /// ordering for the copy.
-    typedef std::deque<KeyValuePair> SortedPropertyList;
-    
-    /// Used to keep track of which properties have been enumerated.
-    typedef std::set<ObjectURI> PropTracker;
+    typedef std::set<ObjectURI> PropertyTracker;
 
     /// A tag for identifying an index in the container.
     struct OrderTag {};
@@ -150,6 +136,17 @@ public:
         }
     }
 
+    /// Enumerate all non-hidden properties to the given as_environment.
+    //
+    /// Follows enumeration order. Note that this enumeration does not
+    /// access the values. Accessing the values can result in changes to
+    /// the object if the value is a getter-setter, and key enumeration must
+    /// avoid this.
+    ///
+    /// @param donelist     Don't enumerate properties in donelist.
+    ///                     Enumerated properties are added to donelist.
+    void enumerateKeys(as_environment& env, PropertyTracker& donelist) const;
+
     /// Get the order number just after the passed order number.
     ///
     /// @param order    0 is a special value indicating the first order
@@ -204,7 +201,7 @@ public:
     /// @param order    The ordering id
     const Property* getPropertyByOrder(int order);
     
-    /// Delete a propery, if exising and not protected from deletion.
+    /// Delete a Property, if existing and not protected from deletion.
     //
     ///
     /// @param key      Name of the property.
@@ -285,21 +282,6 @@ public:
     /// @param setTrue      The set of flags to set
     /// @param setFalse     The set of flags to clear
     void setFlagsAll(int setTrue, int setFalse);
-
-    /// \brief
-    /// Enumerate all non-hidden properties pushing
-    /// their keys to the given as_environment.
-    /// Follows enumeration order.
-    ///
-    /// @param donelist
-    /// Don't enumerate those in donelist. Add those done to donelist.
-    void enumerateKeys(as_environment& env, PropTracker& donelist) const;
-
-    /// \brief
-    /// Enumerate all non-hidden properties inserting
-    /// their name/value pair to the given SortedPropertyList.
-    /// Follows enumeration order.
-    void enumerateKeyValue(SortedPropertyList& to) const;
 
     /// Remove all entries in the container
     void clear();

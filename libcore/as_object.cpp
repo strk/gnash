@@ -241,7 +241,6 @@ public:
 	{}
 
 	/// Set *inherited* properties of the given target object
-	///
 	bool accept(const ObjectURI& uri, const as_value& val) {
 		if (getName(uri) == NSV::PROP_uuPROTOuu) return true;
 		_tgt.set_member(getName(uri), val);
@@ -255,7 +254,7 @@ class PropertyEnumerator : public AbstractPropertyVisitor
 {
 public:
     PropertyEnumerator(const as_object& this_ptr,
-            PropertyList::SortedPropertyList& to)
+            as_object::SortedPropertyList& to)
         :
         _version(getSWFVersion(this_ptr)),
         _st(getStringTable(this_ptr)),
@@ -271,7 +270,7 @@ public:
 private:
     const int _version;
     string_table& _st;
-    PropertyList::SortedPropertyList& _to;
+    as_object::SortedPropertyList& _to;
 };
 
 } // end of anonymous namespace
@@ -434,8 +433,9 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
 		throw;
 	}
 	catch (ActionTypeError& exc) {
-		// TODO: check if this should be an 'as' error.. (log_aserror)
-		log_error(_("Caught exception: %s"), exc.what());
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Caught exception: %s"), exc.what());
+        );
 		return false;
 	}
 
@@ -1061,8 +1061,9 @@ as_object::copyProperties(const as_object& o)
 }
 
 void
-as_object::enumerateProperties(as_environment& env) const
+as_object::enumeratePropertyKeys(as_environment& env) const
 {
+
 	assert(env.top(0).is_undefined());
 
     // Hack to handle MovieClips.
@@ -1073,32 +1074,30 @@ as_object::enumerateProperties(as_environment& env) const
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
 	std::set<const as_object*> visited;
-	PropertyList::PropTracker named;
 
-	const as_object* obj(this);
+    PropertyList::PropertyTracker doneList;
 	
-	while (obj && visited.insert(obj).second) {
-		obj->_members.enumerateKeys(env, named);
-		obj = obj->get_prototype();
+	const as_object* current(this);
+	while (current && visited.insert(current).second) {
+		current->_members.enumerateKeys(env, doneList);
+		current = current->get_prototype();
 	}
 }
 
 void
-as_object::enumerateProperties(SortedPropertyList& to) const
+enumerateProperties(as_object& obj, as_object::SortedPropertyList& to)
 {
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< const as_object* > visited;
+	std::set<as_object*> visited;
 
-	boost::intrusive_ptr<const as_object> obj(this);
+    PropertyEnumerator e(obj, to);
+	as_object* current(&obj);
 
-    PropertyEnumerator e(*this, to);
-
-	while ( obj && visited.insert(obj.get()).second )
-	{
-		obj->visitProperties<IsEnumerable>(e);
-		obj = obj->get_prototype();
+	while (current && visited.insert(current).second) {
+		current->visitProperties<IsEnumerable>(e);
+		current = current->get_prototype();
 	}
 
 }
@@ -1167,13 +1166,13 @@ as_object::get_path_element(string_table::key key)
 void
 getURLEncodedVars(as_object& o, std::string& data)
 {
-    PropertyList::SortedPropertyList props;
-    o.enumerateProperties(props);
+    as_object::SortedPropertyList props;
+    enumerateProperties(o, props);
 
     std::string del;
     data.clear();
     
-    for (PropertyList::SortedPropertyList::const_iterator i=props.begin(),
+    for (as_object::SortedPropertyList::const_iterator i=props.begin(),
             e=props.end(); i!=e; ++i) {
         std::string name = i->first;
         std::string value = i->second;
