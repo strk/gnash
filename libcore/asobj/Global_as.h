@@ -142,8 +142,7 @@ registerBuiltinObject(as_object& where, Global_as::Properties p,
     as_object* obj = gl.createObject();
     if (p) p(*obj);
     
-    where.init_member(getName(uri), obj, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, obj, as_object::DefaultFlags);
 
     return obj;
 }
@@ -180,8 +179,7 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
     if (p) p(*proto);
 
     // Register class with specified object.
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, cl, as_object::DefaultFlags);
     return cl;
 }
 

@@ -68,8 +68,7 @@ int_class_init(as_object& global, const ObjectURI& uri)
     as_object* cl = gl.createClass(&int_ctor, proto);
 
 	// Register _global.DisplayObject
-	global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+	global.init_member(uri, cl, as_object::DefaultFlags);
 }
 
 }

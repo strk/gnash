@@ -75,8 +75,7 @@ boolean_class_init(as_object& where, const ObjectURI& uri)
     attachBooleanInterface(*proto);
     
     // Register _global.Boolean
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, cl, as_object::DefaultFlags);
 
 }
 

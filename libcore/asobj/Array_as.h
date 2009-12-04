@@ -71,8 +71,8 @@ private:
 /// The only distinction between Arrays and Objects is that the length
 /// property is changed when an element is added, and that changing the length
 /// can result in deleted properties.
-void checkArrayLength(as_object& array, string_table::key name,
-        const as_value& val, string_table::key nsname = 0);
+void checkArrayLength(as_object& array, const ObjectURI& uri,
+        const as_value& val);
 
 template<typename T>
 void foreachArray(as_object& array, T& pred)

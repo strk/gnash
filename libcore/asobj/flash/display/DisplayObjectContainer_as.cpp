@@ -69,8 +69,7 @@ displayobjectcontainer_class_init(as_object& where, const ObjectURI& uri)
     }
 
     // Register _global.DisplayObjectContainer
-    where.init_member(getName(uri), cl.get(), as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, cl.get(), as_object::DefaultFlags);
 }
 
 as_object*

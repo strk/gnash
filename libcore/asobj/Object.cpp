@@ -103,7 +103,7 @@ initObjectClass(as_object* proto, as_object& where, const ObjectURI& uri)
              
     // Register _global.Object (should only be visible in SWF5 up)
     int flags = PropFlags::dontEnum; 
-    where.init_member(getName(uri), cl, flags, getNamespace(uri));
+    where.init_member(uri, cl, flags);
 
 }
 

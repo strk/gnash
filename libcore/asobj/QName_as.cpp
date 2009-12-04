@@ -51,8 +51,7 @@ qname_class_init(as_object& where, const ObjectURI& uri)
     as_object* proto = gl.createObject();
     as_object* cl = gl.createClass(&qname_ctor, proto);
 
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, cl, as_object::DefaultFlags);
 }
 
 

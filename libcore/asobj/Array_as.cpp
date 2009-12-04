@@ -821,9 +821,9 @@ IsStrictArray::accept(const ObjectURI& uri, const as_value& /*val*/)
 }
 
 void
-checkArrayLength(as_object& array, string_table::key name, const as_value& val,
-        string_table::key /*nsname*/)
+checkArrayLength(as_object& array, const ObjectURI& uri, const as_value& val)
 {
+    const string_table::key name = getName(uri);
     if (name == NSV::PROP_LENGTH) {
         resizeArray(array, val.to_int());
         return;
@@ -888,7 +888,7 @@ array_class_init(as_object& where, const ObjectURI& uri)
     attachArrayStatics(*cl);
 
     const int flags = PropFlags::dontEnum; 
-    where.init_member(getName(uri), cl, flags, getNamespace(uri));
+    where.init_member(uri, cl, flags);
 }
 
 // Used by foreachArray, declared in Array_as.h

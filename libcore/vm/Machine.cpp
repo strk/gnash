@@ -1885,7 +1885,7 @@ Machine::execute()
                         break;
                     }
 
-                    object->set_member(name, value, ns, false);
+                    object->set_member(ObjectURI(name, ns), value, false);
                     break;
                 }
 

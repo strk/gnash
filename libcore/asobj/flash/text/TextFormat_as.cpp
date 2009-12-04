@@ -156,8 +156,7 @@ textformat_class_init(as_object& global, const ObjectURI& uri)
     as_object* proto = gl.createObject();;
     as_object* cl = gl.createClass(&textformat_new, proto);
 
-	global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+	global.init_member(uri, cl, as_object::DefaultFlags);
 
 }
 

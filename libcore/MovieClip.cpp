@@ -445,8 +445,9 @@ MovieClip::getDisplayObjectAtDepth(int depth)
 /// The TextField variables should probably be handled in a more generic
 /// way.
 bool
-MovieClip::getTextFieldVariables(string_table::key name_key, as_value& val)
+MovieClip::getTextFieldVariables(const ObjectURI& uri, as_value& val)
 {
+    const string_table::key name_key = getName(uri);
 
     const std::string& name = getStringTable(*getObject(this)).value(name_key);
 
@@ -748,9 +749,10 @@ MovieClip::pathElement(string_table::key key)
 }
 
 bool
-MovieClip::setTextFieldVariables(string_table::key name, const as_value& val,
-        string_table::key /*nsname*/)
+MovieClip::setTextFieldVariables(const ObjectURI& uri, const as_value& val)
 {
+
+    const string_table::key name = getName(uri);
 
     // Try textfield variables
     //

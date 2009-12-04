@@ -95,8 +95,7 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
     // so the new prototype doesn't have a constructor property. We do the
     // same here.
     cl->set_member(NSV::PROP_PROTOTYPE, proto);
-    where.init_member(getName(uri) , cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri , cl, as_object::DefaultFlags);
 
 }
 

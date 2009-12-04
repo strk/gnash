@@ -136,16 +136,14 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
 
         log_debug("AVM2 MovieClip, proto %s", cl);
 
-        where.init_member(getName(uri), cl, as_object::DefaultFlags,
-                getNamespace(uri));
+        where.init_member(uri, cl, as_object::DefaultFlags);
         return;
     }
 
     as_object* cl = gl.createClass(&movieclip_as2_ctor, proto);
     attachMovieClipAS2Interface(*proto);
 
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, cl, as_object::DefaultFlags);
 }
 
 void

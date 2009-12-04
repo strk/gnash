@@ -410,7 +410,7 @@ as_environment::set_variable_raw(const std::string& varname,
     for (size_t i = scopeStack.size(); i > 0; --i)
     {
         as_object* obj = scopeStack[i-1];
-        if (obj && obj->set_member(varkey, val, 0, true)) {
+        if (obj && obj->set_member(varkey, val, true)) {
             return;
         }
     }

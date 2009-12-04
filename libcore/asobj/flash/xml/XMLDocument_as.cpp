@@ -692,8 +692,7 @@ xml_class_init(as_object& where, const ObjectURI& uri)
         cl->init_member(NSV::PROP_PROTOTYPE, proto);
     }
     
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, cl, as_object::DefaultFlags);
 
 }
 

@@ -3440,7 +3440,6 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
                         "starts at PC %d"), name, func->getStartPC());
         );
 
-        //env.set_member(name, function_value);
         thread.setVariable(name, function_value);
     }
 
@@ -3645,7 +3644,6 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
                         "PC %d", name, func->getStartPC());
         );
 
-        //env.set_member(name, function_value);
         thread.setVariable(name, function_value);
 #ifdef USE_DEBUGGER
         // WARNING: convertToObject(getGlobal(thread.env), new_obj) can return a newly allocated

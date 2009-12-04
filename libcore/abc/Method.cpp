@@ -96,11 +96,13 @@ Method::addValue(string_table::key name, Namespace *ns,
 
 	if (isconst) flags |= PropFlags::readOnly;
 
+    const ObjectURI uri(name, nsname);
+
 	if (slotId == 0) {
-		_prototype->init_member(name, val, flags, nsname);
+		_prototype->init_member(uri, val, flags);
 	}
 	else {
-		_prototype->init_member(name, val, flags, nsname, slotId);
+		_prototype->init_member(uri, val, flags, slotId);
 	}
 	return true;
 }
@@ -154,12 +156,12 @@ Method::addMemberScript(string_table::key name, Namespace *ns,
 
 bool
 Method::addSlot(string_table::key name, Namespace* ns, boost::uint32_t slotId,
-	Class */*type*/)
+	Class* /*type*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 	int flags = PropFlags::dontDelete;
 
-	_prototype->init_member(name, as_value(), flags, nsname, slotId);
+	_prototype->init_member(ObjectURI(name, nsname), as_value(), flags, slotId);
 	return true;
 }
 

@@ -243,7 +243,7 @@ public:
 	/// Set *inherited* properties of the given target object
 	bool accept(const ObjectURI& uri, const as_value& val) {
 		if (getName(uri) == NSV::PROP_uuPROTOuu) return true;
-		_tgt.set_member(getName(uri), val);
+		_tgt.set_member(uri, val);
         return true;
 	}
 private:
@@ -607,8 +607,7 @@ as_object::set_member_slot(int order, const as_value& val, bool ifFound)
 {
 	const Property* prop = _members.getPropertyByOrder(order);
 	if (prop) {
-		return set_member(getName(prop->uri()), val, getNamespace(prop->uri()),
-                    ifFound);
+		return set_member(prop->uri(), val, ifFound);
 	}
     return false;
 }
@@ -679,23 +678,20 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
 /// 3. Visible own getter-setter properties of all __proto__ objects
 ///    (a DisplayObject ends the chain).
 bool
-as_object::set_member(string_table::key key, const as_value& val,
-	string_table::key nsname, bool ifFound)
+as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
 {
 
     bool tfVarFound = false;
     if (displayObject()) {
         MovieClip* mc = dynamic_cast<MovieClip*>(displayObject());
-        if (mc) tfVarFound = mc->setTextFieldVariables(key, val, nsname);
+        if (mc) tfVarFound = mc->setTextFieldVariables(uri, val);
         // We still need to set the member.
     }
 
     // Handle the length property for arrays. NB: checkArrayLength() will
     // call this function again if the key is a valid index.
-    if (array()) checkArrayLength(*this, key, val, nsname);
+    if (array()) checkArrayLength(*this, uri, val);
 
-    const ObjectURI uri(key, nsname);
-    
     PrototypeRecursor<Exists> pr(this, uri);
 
 	Property* prop = pr.getProperty();
@@ -706,7 +702,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 
         if (displayObject()) {
             DisplayObject* d = displayObject();
-            if (setDisplayObjectProperty(*d, key, val)) return true;
+            if (setDisplayObjectProperty(*d, getName(uri), val)) return true;
             // TODO: should we execute triggers?
         }
 
@@ -726,8 +722,9 @@ as_object::set_member(string_table::key key, const as_value& val,
 
 		if (prop->isReadOnly()) {
 			IF_VERBOSE_ASCODING_ERRORS(
-                    log_aserror(_("Attempt to set read-only property '%s'"),
-                    getStringTable(*this).value(key));
+                ObjectURI::Logger l(getStringTable(*this));
+                log_aserror(_("Attempt to set read-only property '%s'"),
+                    l(uri));
             );
 			return true;
 		}
@@ -737,7 +734,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 		}
 		catch (ActionTypeError& exc) {
 			log_aserror(_("%s: Exception %s. Will create a new member"),
-				getStringTable(*this).value(key), exc.what());
+				getStringTable(*this).value(getName(uri)), exc.what());
 		}
 
 		return true;
@@ -747,11 +744,12 @@ as_object::set_member(string_table::key key, const as_value& val,
 	if (ifFound) return false;
 
 	// Property does not exist, so it won't be read-only. Set it.
-	if (!_members.setValue(key, val)) {
+	if (!_members.setValue(uri, val)) {
 
 		IF_VERBOSE_ASCODING_ERRORS(
+            ObjectURI::Logger l(getStringTable(*this));
 			log_aserror(_("Unknown failure in setting property '%s' on "
-			"object '%p'"), getStringTable(*this).value(key), (void*) this);
+			"object '%p'"), l(uri), (void*) this);
 	    );
 		return false;
 	}
@@ -769,15 +767,14 @@ void
 as_object::init_member(const std::string& key1, const as_value& val, int flags,
 	string_table::key nsname)
 {
-	init_member(getStringTable(*this).find(key1), val, flags, nsname);
+	const ObjectURI uri(getStringTable(*this).find(key1), nsname);
+	init_member(uri, val, flags);
 }
 
 void
-as_object::init_member(string_table::key key, const as_value& val, int flags,
-	string_table::key nsname, int order)
+as_object::init_member(const ObjectURI& uri, const as_value& val, int flags,
+	int order)
 {
-
-    const ObjectURI uri(key, nsname);
 
 	if (order >= 0 && !_members.reserveSlot(uri,
                 static_cast<boost::uint16_t>(order))) {
@@ -788,9 +785,9 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 		
 	// Set (or create) a SimpleProperty 
 	if (!_members.setValue(uri, val, flags)) {
+        ObjectURI::Logger l(getStringTable(*this));
 		log_error(_("Attempt to initialize read-only property ``%s''"
-			" on object ``%p'' twice"),
-			getStringTable(*this).value(key), (void*)this);
+			" on object ``%p'' twice"), l(uri), (void*)this);
 		// We shouldn't attempt to initialize a member twice, should we ?
 		abort();
 	}

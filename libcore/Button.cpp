@@ -925,8 +925,7 @@ button_class_init(as_object& global, const ObjectURI& uri)
     attachButtonInterface(*proto);
 
     // Register _global.MovieClip
-    global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    global.init_member(uri, cl, as_object::DefaultFlags);
 }
 
 void

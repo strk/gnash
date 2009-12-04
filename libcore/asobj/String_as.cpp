@@ -125,7 +125,7 @@ string_class_init(as_object& where, const ObjectURI& uri)
     cl->init_member("fromCharCode", vm.getNative(251, 14)); 
 
     const int flags = PropFlags::dontEnum; 
-    where.init_member(getName(uri), cl, flags, getNamespace(uri));
+    where.init_member(uri, cl, flags);
 }
 
 

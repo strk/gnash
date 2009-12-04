@@ -222,8 +222,7 @@ date_class_init(as_object& global, const ObjectURI& uri)
     attachDateStaticInterface(*cl);
 
     // Register _global.Date
-    global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    global.init_member(uri, cl, as_object::DefaultFlags);
 
 }
 

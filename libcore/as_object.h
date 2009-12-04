@@ -253,8 +253,8 @@ public:
     ///          after setting.
     ///    
     ///
-    virtual bool set_member(string_table::key key, const as_value& val,
-        string_table::key nsname = 0, bool ifFound=false);
+    virtual bool set_member(const ObjectURI& uri, const as_value& val,
+        bool ifFound = false);
 
     /// Reserve a slot
     ///
@@ -313,9 +313,8 @@ public:
     /// this is used as the slotId and can be subsequently found with
     /// get_slot
     ///
-    void init_member(string_table::key key, const as_value& val, 
-        int flags = DefaultFlags, string_table::key nsname = 0,
-        int slotId = -1);
+    void init_member(const ObjectURI& uri, const as_value& val, 
+        int flags = DefaultFlags, int slotId = -1);
 
     /// \brief
     /// Initialize a getter/setter property by name
