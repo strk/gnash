@@ -32,6 +32,13 @@ struct ObjectURI
 
 };
 
+/// ObjectURIs are equal if both name and namespace are equal.
+inline bool
+operator==(const ObjectURI& a, const ObjectURI& b)
+{
+    return a.name == b.name && a.ns == b.ns;
+}
+
 /// Comparator for ObjectURI so it can serve as a key in stdlib containers.
 inline bool
 operator<(const ObjectURI& a, const ObjectURI& b)
@@ -69,7 +76,10 @@ public:
                " %3%(%4%)") % _st.value(name) % name % _st.value(ns) % ns;
         return f.str();
 #else
-        return _st.value(getNamespace(uri)) + "." + _st.value(getName(uri));
+        const string_table::key ns = getNamespace(uri);
+        const string_table::key name = getName(uri);
+        if (ns) return _st.value(ns) + "." + _st.value(name);
+        return _st.value(name);
 #endif
 
     }

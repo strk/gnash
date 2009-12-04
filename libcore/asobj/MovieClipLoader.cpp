@@ -82,8 +82,7 @@ moviecliploader_class_init(as_object& where, const ObjectURI& uri)
     as_object* null = 0;
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, proto, null, 1027);
 
-	where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri)); 
+	where.init_member(uri, cl, as_object::DefaultFlags); 
 }
 
 

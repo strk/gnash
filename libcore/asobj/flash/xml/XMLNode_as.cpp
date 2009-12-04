@@ -47,11 +47,11 @@ namespace gnash {
 // Function Prototypes
 namespace {
     void enumerateAttributes(const XMLNode_as& node,
-            PropertyList::SortedPropertyList& attributes);
-    bool prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
+            as_object::SortedPropertyList& attributes);
+    bool prefixMatches(const as_object::SortedPropertyList::value_type& val,
             const std::string& prefix);
     bool namespaceMatches(
-            const PropertyList::SortedPropertyList::value_type& val,
+            const as_object::SortedPropertyList::value_type& val,
             const std::string& ns);    
 
     as_value xmlnode_new(const fn_call& fn);
@@ -302,8 +302,8 @@ bool
 XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
 {
     XMLNode_as* node = this;
-    PropertyList::SortedPropertyList::const_iterator it; 
-    PropertyList::SortedPropertyList attrs;
+    as_object::SortedPropertyList::const_iterator it; 
+    as_object::SortedPropertyList attrs;
     
     while (node) {
         enumerateAttributes(*node, attrs);
@@ -339,8 +339,8 @@ void
 XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
 {
     XMLNode_as* node = this;
-    PropertyList::SortedPropertyList::const_iterator it; 
-    PropertyList::SortedPropertyList attrs;
+    as_object::SortedPropertyList::const_iterator it; 
+    as_object::SortedPropertyList attrs;
     
     while (node) {
 
@@ -414,11 +414,11 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         xmlout << "<" << nodeName;
     
         // Process the attributes, if any
-        PropertyList::SortedPropertyList attrs;
+        as_object::SortedPropertyList attrs;
         enumerateAttributes(xml, attrs);
         if (!attrs.empty()) {
 
-            for (PropertyList::SortedPropertyList::iterator i = 
+            for (as_object::SortedPropertyList::iterator i = 
                     attrs.begin(), e = attrs.end(); i != e; ++i) { 
                 escapeXML(i->second);
                 xmlout << " " << i->first << "=\"" << i->second << "\"";
@@ -501,8 +501,7 @@ xmlnode_class_init(as_object& where, const ObjectURI& uri)
     attachXMLNodeInterface(*proto);
     as_object* cl = gl.createClass(&xmlnode_new, proto);
 
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, cl, as_object::DefaultFlags);
 
 }
 
@@ -991,12 +990,12 @@ xmlnode_childNodes(const fn_call& fn)
 
 void
 enumerateAttributes(const XMLNode_as& node,
-        PropertyList::SortedPropertyList& attrs)
+        as_object::SortedPropertyList& attrs)
 {
     attrs.clear();
-    const as_object* obj = node.getAttributes();
+    as_object* obj = node.getAttributes();
     if (obj) {
-        obj->enumerateProperties(attrs);
+        enumerateProperties(*obj, attrs);
     }
 
 }
@@ -1004,7 +1003,7 @@ enumerateAttributes(const XMLNode_as& node,
 /// Return true if this attribute is a namespace specifier and the
 /// namespace matches.
 bool
-namespaceMatches(const PropertyList::SortedPropertyList::value_type& val,
+namespaceMatches(const as_object::SortedPropertyList::value_type& val,
         const std::string& ns)
 {
     StringNoCaseEqual noCaseCompare;
@@ -1014,7 +1013,7 @@ namespaceMatches(const PropertyList::SortedPropertyList::value_type& val,
 
 
 bool
-prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
+prefixMatches(const as_object::SortedPropertyList::value_type& val,
         const std::string& prefix)
 {
     const std::string& name = val.first;

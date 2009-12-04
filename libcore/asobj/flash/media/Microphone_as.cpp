@@ -490,8 +490,7 @@ microphone_class_init(as_object& where, const ObjectURI& uri)
     }
         
 	// Register _global.Microphone
-	where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+	where.init_member(uri, cl, as_object::DefaultFlags);
 
 }
 

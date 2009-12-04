@@ -55,7 +55,7 @@ package hello {
             xcheck_equals(this.constructor.constructor, "[class Class]");
             xcheck_equals(this.parent, "[object Stage]");
 
-            xcheck_equals(S, "[class S]");
+            check_equals(S, "[class S]");
             xcheck_equals(S.constructor, "[class Class]");
             check_equals(S.__constructor__, undefined);
             
@@ -67,10 +67,10 @@ package hello {
 
             trace(Base);
 
-            xcheck_equals(Base, "[class Base]");
-            xcheck_equals(Base.prototype, "[object Object]");
-            xcheck_equals(Derived, "[class Derived]");
-            xcheck_equals(Base.prototype, "[object Object]");
+            check_equals(Base, "[class Base]");
+            check_equals(Base.prototype, "[object Object]");
+            check_equals(Derived, "[class Derived]");
+            check_equals(Base.prototype, "[object Object]");
 
             xcheck_equals(Derived.constructor, "[class Class]");
             xcheck_equals(Base.constructor, "[class Class]");

@@ -186,10 +186,7 @@ public:
     virtual void toString(std::ostream& str, bool encode = false) const;
 
     /// Return the attributes object associated with this node.
-    as_object* getAttributes() { return _attributes; }
-
-    /// Return a read-only version of this node's attributes object.
-    const as_object* getAttributes() const { return _attributes; }
+    as_object* getAttributes() const { return _attributes; }
 
     /// Set a named attribute to a value.
     //

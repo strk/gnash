@@ -25,7 +25,6 @@
 #include <boost/thread/mutex.hpp>
 #include <string>
 #include <map>
-#include "as_object.h"
 #include "dsodefs.h" // DSOEXPORT
 
 #ifdef _WIN32
@@ -40,9 +39,11 @@
 #include <libgen.h>
 #endif
 
-namespace gnash 
-{
+namespace gnash {
+    class as_object;
+}
 
+namespace gnash {
 
 /// TODO: document this class
 class SharedLib

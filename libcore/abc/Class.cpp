@@ -57,11 +57,13 @@ Class::addValue(string_table::key name, Namespace *ns,
 	if (isstatic)
 		flags |= PropFlags::staticProp;
 
-	if(slotId == 0){
-		_prototype->init_member(name, val, flags, nsname);
+    const ObjectURI uri(name, nsname);
+
+	if (slotId == 0) {
+		_prototype->init_member(uri, val, flags);
 	}
-	else{
-		_prototype->init_member(name, val, flags, nsname, slotId);
+	else {
+		_prototype->init_member(uri, val, flags, slotId);
 	}
 	return true;
 }
@@ -70,7 +72,7 @@ void
 Class::initPrototype()
 {
     Global_as& gl = *VM::get().getGlobal();
-    _prototype = new as_class(gl);
+    _prototype = new as_class(gl, this);
 }
 
 bool
@@ -98,7 +100,7 @@ Class::addSlot(string_table::key name, Namespace* ns,
 
 	//TODO: Set flags.
 	if (slotId == 0) {
-		_prototype->init_member(name, as_value(), 0, nsname);
+		_prototype->init_member(ObjectURI(name, nsname), as_value(), 0);
 	}
 	else {
 		_prototype->reserveSlot(ObjectURI(name, nsname), slotId);

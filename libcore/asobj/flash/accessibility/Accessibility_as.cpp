@@ -63,8 +63,7 @@ accessibility_class_init(as_object& where, const ObjectURI& uri)
     attachAccessibilityStaticInterface(*obj);
 
     // Register _global.Accessibility
-    where.init_member(getName(uri), obj, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, obj, as_object::DefaultFlags);
 }
 
 void

@@ -39,7 +39,7 @@ package main {
         public function Main() {
 
             xcheck_equals(Object, "[class Object]");
-            xcheck_equals(Object.prototype, "[object Object]");
+            check_equals(Object.prototype, "[object Object]");
             xcheck_equals(Object.constructor, "[class Class]");
             
             xcheck_equals(typeof(Object), "object");
@@ -61,7 +61,7 @@ package main {
             check(Object.prototype.isPrototypeOf(this));
 
             var a = new Object();
-            xcheck_equals(a, "[object Object]");       
+            check_equals(a, "[object Object]");       
             check(!a.hasOwnProperty("constructor"));
             check(!a.hasOwnProperty("hasOwnProperty"));
             check(!a.hasOwnProperty("isPrototypeOf"));

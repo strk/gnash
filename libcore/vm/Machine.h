@@ -142,8 +142,7 @@ public:
 	/// This returns the value, but on the stack.
 	/// (Since the return value is not known until after control has left
 	/// the caller of this, it's impossible to return a meaningful value.
-	void getMember(Class* pDefinition, MultiName& name,
-            as_value& source);
+	void getMember(Class* pDefinition, MultiName& name, as_value& source);
 
 	/// Set a member in an object.
 	///

@@ -24,7 +24,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "string_table.h"
-#include "ref_counted.h" // for inheritance  (to drop)
 #include "GC.h" // for inheritance from GcResource (to complete)
 #include "PropertyList.h"
 #include "as_value.h" // for return of get_primitive_value
@@ -39,6 +38,7 @@
 #include <set>
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
+#include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -144,14 +144,22 @@ private:
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class as_object : public GcResource
+class as_object : public GcResource, boost::noncopyable
 {
-    friend class abc::Class;
-    friend class abc::Machine;
-
-    typedef PropertyList::SortedPropertyList SortedPropertyList;
 
 public:
+    
+    typedef std::pair<std::string, std::string> KeyValuePair;
+
+    /// This is used to hold an intermediate copy of an as_object's properties.
+    //
+    /// AS enumerates in reverse order of creation. In order to make sure
+    /// that the properties are in the correct order, the first element of
+    /// a SortedPropertyList should hold the last created property.
+    //
+    /// We use a deque because we push to the front in order to preserve the
+    /// ordering for the copy.
+    typedef std::deque<KeyValuePair> SortedPropertyList;
     
     /// Construct an ActionScript object with no prototype associated.
     //
@@ -245,8 +253,8 @@ public:
     ///          after setting.
     ///    
     ///
-    virtual bool set_member(string_table::key key, const as_value& val,
-        string_table::key nsname = 0, bool ifFound=false);
+    virtual bool set_member(const ObjectURI& uri, const as_value& val,
+        bool ifFound = false);
 
     /// Reserve a slot
     ///
@@ -305,9 +313,8 @@ public:
     /// this is used as the slotId and can be subsequently found with
     /// get_slot
     ///
-    void init_member(string_table::key key, const as_value& val, 
-        int flags = DefaultFlags, string_table::key nsname = 0,
-        int slotId = -1);
+    void init_member(const ObjectURI& uri, const as_value& val, 
+        int flags = DefaultFlags, int slotId = -1);
 
     /// \brief
     /// Initialize a getter/setter property by name
@@ -543,6 +550,18 @@ public:
 
     void init_readonly_property(const ObjectURI& uri,
             as_c_function_ptr getter, int flags = DefaultFlags);
+
+
+    /// Enumerate all non-hidden property keys to the given as_environment.
+    //
+    /// NB: this function does not access the property values, so callers
+    /// can be certain no values will be changed.
+    //
+    /// The enumeration recurses through the prototype chain. This
+    /// implementation will keep track of visited object to avoid infinite
+    /// loops in the prototype chain.  NOTE: the MM player just chokes in
+    /// this case.
+    void enumeratePropertyKeys(as_environment& env) const;
 
     /// \brief
     /// Add a watch trigger, overriding any other defined for same name.
@@ -796,28 +815,6 @@ public:
         _members.clear();
     }
 
-    /// \brief
-    /// Enumerate all non-hidden properties pushing
-    /// their value to the given as_environment.
-    //
-    /// The enumeration recurse in prototype.
-    /// This implementation will keep track of visited object
-    /// to avoid loops in prototype chain. 
-    /// NOTE: the MM player just chokes in this case (loop)
-    ///
-    void enumerateProperties(as_environment& env) const;
-
-    /// \brief
-    /// Enumerate all non-hidden properties inserting
-    /// their name/value pair to the given map.
-    //
-    /// The enumeration recurse in prototype.
-    /// This implementation will keep track of visited object
-    /// to avoid loops in prototype chain. 
-    /// NOTE: the MM player just chokes in this case (loop)
-    ///
-    void enumerateProperties(SortedPropertyList& to) const;
-
     /// Visit the properties of this object by key/as_value pairs
     //
     /// The method will invoke the given visitor method
@@ -832,7 +829,7 @@ public:
     ///
     template<typename T>
     void visitProperties(AbstractPropertyVisitor& visitor) const {
-        _members.visitValues<T>(visitor, *this);
+        _members.visitValues<T>(visitor);
     }
 
     /// \brief
@@ -925,8 +922,6 @@ public:
         _displayObject = d;
     }
 
-protected:
-
     ///Get a member value at a given slot.
     //
     /// @param order
@@ -961,7 +956,8 @@ protected:
     ///
     bool set_member_slot(int order, const as_value& val, bool ifFound = false);
 
-#ifdef GNASH_USE_GC
+protected:
+
     /// Mark all reachable resources, override from GcResource.
     //
     /// The default implementation marks all properties
@@ -970,24 +966,14 @@ protected:
     /// If a derived class provides access to more GC-managed
     /// resources, it should override this method and call 
     /// markAsObjectReachable() as the last step.
-    ///
-    virtual void markReachableResources() const
-    {
+    virtual void markReachableResources() const {
         markAsObjectReachable();
     }
 
     /// Mark properties and triggers list as reachable (for the GC)
     void markAsObjectReachable() const;
 
-#endif // GNASH_USE_GC
-
 private:
-
-    /// Do not allow copies.
-    as_object(const as_object& other);
-
-    /// Don't allow implicit assignment.
-    as_object& operator=(const as_object&);
 
     /// A utility class for processing this as_object's inheritance chain
     template<typename T> class PrototypeRecursor;
@@ -1123,6 +1109,16 @@ isNativeType(as_object* obj, T*& relay)
     relay = dynamic_cast<T*>(obj->relay());
     return relay;
 }
+
+/// Enumerate all non-hidden properties to the passed container
+//
+/// NB: it is likely that this call will change the object, as accessing
+/// propertyproperty  values may call getter-setters.
+//
+/// The enumeration recurses through the prototype chain. This implementation
+/// will keep track of visited object to avoid infinite loops in the
+/// prototype chain.  NOTE: the MM player just chokes in this case.
+void enumerateProperties(as_object& o, as_object::SortedPropertyList& to);
 
 /// Get the VM from an as_object.
 VM& getVM(const as_object& o);

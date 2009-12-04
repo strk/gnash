@@ -240,18 +240,37 @@ public:
 		_tgt(tgt)
 	{}
 
-	/// \brief
-	/// Use the set_member function to properly set *inherited* properties
-	/// of the given target object
-	///
-	bool accept(const ObjectURI& uri, const as_value& val)
-	{
+	/// Set *inherited* properties of the given target object
+	bool accept(const ObjectURI& uri, const as_value& val) {
 		if (getName(uri) == NSV::PROP_uuPROTOuu) return true;
-		_tgt.set_member(getName(uri), val);
+		_tgt.set_member(uri, val);
         return true;
 	}
 private:
 	as_object& _tgt;
+};
+
+class PropertyEnumerator : public AbstractPropertyVisitor
+{
+public:
+    PropertyEnumerator(const as_object& this_ptr,
+            as_object::SortedPropertyList& to)
+        :
+        _version(getSWFVersion(this_ptr)),
+        _st(getStringTable(this_ptr)),
+        _to(to)
+    {}
+
+    bool accept(const ObjectURI& uri, const as_value& val) {
+		_to.push_front(std::make_pair(_st.value(getName(uri)),
+				val.to_string_versioned(_version)));
+        return true;
+    }
+
+private:
+    const int _version;
+    string_table& _st;
+    as_object::SortedPropertyList& _to;
 };
 
 } // end of anonymous namespace
@@ -265,7 +284,7 @@ as_object::as_object(Global_as& gl)
     _array(false),
     _relay(0),
 	_vm(getVM(gl)),
-	_members(_vm)
+	_members(*this)
 {
 }
 
@@ -275,7 +294,7 @@ as_object::as_object()
     _array(false),
     _relay(0),
 	_vm(VM::get()),
-	_members(_vm)
+	_members(*this)
 {
 }
 
@@ -414,8 +433,9 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
 		throw;
 	}
 	catch (ActionTypeError& exc) {
-		// TODO: check if this should be an 'as' error.. (log_aserror)
-		log_error(_("Caught exception: %s"), exc.what());
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Caught exception: %s"), exc.what());
+        );
 		return false;
 	}
 
@@ -562,8 +582,7 @@ as_object::set_prototype(const as_value& proto)
     // getter/setter
 	// TODO: check triggers !!
     // Note that this sets __proto__ in namespace 0
-	_members.setValue(NSV::PROP_uuPROTOuu, proto, *this,
-            as_object::DefaultFlags);
+	_members.setValue(NSV::PROP_uuPROTOuu, proto, as_object::DefaultFlags);
 }
 
 void
@@ -588,8 +607,7 @@ as_object::set_member_slot(int order, const as_value& val, bool ifFound)
 {
 	const Property* prop = _members.getPropertyByOrder(order);
 	if (prop) {
-		return set_member(getName(prop->uri()), val, getNamespace(prop->uri()),
-                    ifFound);
+		return set_member(prop->uri(), val, ifFound);
 	}
     return false;
 }
@@ -660,23 +678,20 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
 /// 3. Visible own getter-setter properties of all __proto__ objects
 ///    (a DisplayObject ends the chain).
 bool
-as_object::set_member(string_table::key key, const as_value& val,
-	string_table::key nsname, bool ifFound)
+as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
 {
 
     bool tfVarFound = false;
     if (displayObject()) {
         MovieClip* mc = dynamic_cast<MovieClip*>(displayObject());
-        if (mc) tfVarFound = mc->setTextFieldVariables(key, val, nsname);
+        if (mc) tfVarFound = mc->setTextFieldVariables(uri, val);
         // We still need to set the member.
     }
 
     // Handle the length property for arrays. NB: checkArrayLength() will
     // call this function again if the key is a valid index.
-    if (array()) checkArrayLength(*this, key, val, nsname);
+    if (array()) checkArrayLength(*this, uri, val);
 
-    const ObjectURI uri(key, nsname);
-    
     PrototypeRecursor<Exists> pr(this, uri);
 
 	Property* prop = pr.getProperty();
@@ -687,7 +702,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 
         if (displayObject()) {
             DisplayObject* d = displayObject();
-            if (setDisplayObjectProperty(*d, key, val)) return true;
+            if (setDisplayObjectProperty(*d, getName(uri), val)) return true;
             // TODO: should we execute triggers?
         }
 
@@ -707,8 +722,9 @@ as_object::set_member(string_table::key key, const as_value& val,
 
 		if (prop->isReadOnly()) {
 			IF_VERBOSE_ASCODING_ERRORS(
-                    log_aserror(_("Attempt to set read-only property '%s'"),
-                    getStringTable(*this).value(key));
+                ObjectURI::Logger l(getStringTable(*this));
+                log_aserror(_("Attempt to set read-only property '%s'"),
+                    l(uri));
             );
 			return true;
 		}
@@ -718,7 +734,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 		}
 		catch (ActionTypeError& exc) {
 			log_aserror(_("%s: Exception %s. Will create a new member"),
-				getStringTable(*this).value(key), exc.what());
+				getStringTable(*this).value(getName(uri)), exc.what());
 		}
 
 		return true;
@@ -728,11 +744,12 @@ as_object::set_member(string_table::key key, const as_value& val,
 	if (ifFound) return false;
 
 	// Property does not exist, so it won't be read-only. Set it.
-	if (!_members.setValue(key, val, *this, nsname)) {
+	if (!_members.setValue(uri, val)) {
 
 		IF_VERBOSE_ASCODING_ERRORS(
+            ObjectURI::Logger l(getStringTable(*this));
 			log_aserror(_("Unknown failure in setting property '%s' on "
-			"object '%p'"), getStringTable(*this).value(key), (void*) this);
+			"object '%p'"), l(uri), (void*) this);
 	    );
 		return false;
 	}
@@ -750,15 +767,14 @@ void
 as_object::init_member(const std::string& key1, const as_value& val, int flags,
 	string_table::key nsname)
 {
-	init_member(getStringTable(*this).find(key1), val, flags, nsname);
+	const ObjectURI uri(getStringTable(*this).find(key1), nsname);
+	init_member(uri, val, flags);
 }
 
 void
-as_object::init_member(string_table::key key, const as_value& val, int flags,
-	string_table::key nsname, int order)
+as_object::init_member(const ObjectURI& uri, const as_value& val, int flags,
+	int order)
 {
-
-    const ObjectURI uri(key, nsname);
 
 	if (order >= 0 && !_members.reserveSlot(uri,
                 static_cast<boost::uint16_t>(order))) {
@@ -768,11 +784,10 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 	}
 		
 	// Set (or create) a SimpleProperty 
-	if (! _members.setValue(uri, val, *this, flags) )
-	{
+	if (!_members.setValue(uri, val, flags)) {
+        ObjectURI::Logger l(getStringTable(*this));
 		log_error(_("Attempt to initialize read-only property ``%s''"
-			" on object ``%p'' twice"),
-			getStringTable(*this).value(key), (void*)this);
+			" on object ``%p'' twice"), l(uri), (void*)this);
 		// We shouldn't attempt to initialize a member twice, should we ?
 		abort();
 	}
@@ -982,13 +997,13 @@ as_object::dump_members()
 {
 	log_debug(_("%d members of object %p follow"),
 		_members.size(), (const void*)this);
-	_members.dump(*this);
+	_members.dump();
 }
 
 void
 as_object::dump_members(std::map<std::string, as_value>& to)
 {
-	_members.dump(*this, to);
+	_members.dump(to);
 }
 
 void
@@ -1043,8 +1058,9 @@ as_object::copyProperties(const as_object& o)
 }
 
 void
-as_object::enumerateProperties(as_environment& env) const
+as_object::enumeratePropertyKeys(as_environment& env) const
 {
+
 	assert(env.top(0).is_undefined());
 
     // Hack to handle MovieClips.
@@ -1054,35 +1070,31 @@ as_object::enumerateProperties(as_environment& env) const
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< const as_object* > visited;
-	PropertyList::PropTracker named;
+	std::set<const as_object*> visited;
 
-	boost::intrusive_ptr<const as_object> obj(this);
+    PropertyList::PropertyTracker doneList;
 	
-	while ( obj && visited.insert(obj.get()).second )
-	{
-		obj->_members.enumerateKeys(env, named);
-		obj = obj->get_prototype();
+	const as_object* current(this);
+	while (current && visited.insert(current).second) {
+		current->_members.enumerateKeys(env, doneList);
+		current = current->get_prototype();
 	}
-
-	// This happens always since top object in hierarchy
-	// is always Object, which in turn derives from itself
-	//if ( obj ) log_error(_("prototype loop during Enumeration"));
 }
 
 void
-as_object::enumerateProperties(SortedPropertyList& to) const
+enumerateProperties(as_object& obj, as_object::SortedPropertyList& to)
 {
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< const as_object* > visited;
+	std::set<as_object*> visited;
 
-	boost::intrusive_ptr<const as_object> obj(this);
-	while ( obj && visited.insert(obj.get()).second )
-	{
-		obj->_members.enumerateKeyValue(*this, to);
-		obj = obj->get_prototype();
+    PropertyEnumerator e(obj, to);
+	as_object* current(&obj);
+
+	while (current && visited.insert(current).second) {
+		current->visitProperties<IsEnumerable>(e);
+		current = current->get_prototype();
 	}
 
 }
@@ -1151,13 +1163,13 @@ as_object::get_path_element(string_table::key key)
 void
 getURLEncodedVars(as_object& o, std::string& data)
 {
-    PropertyList::SortedPropertyList props;
-    o.enumerateProperties(props);
+    as_object::SortedPropertyList props;
+    enumerateProperties(o, props);
 
     std::string del;
     data.clear();
     
-    for (PropertyList::SortedPropertyList::const_iterator i=props.begin(),
+    for (as_object::SortedPropertyList::const_iterator i=props.begin(),
             e=props.end(); i!=e; ++i) {
         std::string name = i->first;
         std::string value = i->second;

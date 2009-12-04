@@ -292,8 +292,7 @@ video_class_init(as_object& global, const ObjectURI& uri)
     attachVideoInterface(*proto);
 
 	// Register _global.Video
-	global.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+	global.init_member(uri, cl, as_object::DefaultFlags);
 }
 
 void

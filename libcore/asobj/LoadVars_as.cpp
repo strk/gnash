@@ -123,12 +123,12 @@ loadvars_onLoad(const fn_call& /*fn*/)
 as_value
 loadvars_tostring(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+	as_object* ptr = ensure<ValidThis>(fn);
 
-	typedef PropertyList::SortedPropertyList VarMap;
+	typedef as_object::SortedPropertyList VarMap;
 	VarMap vars;
 
-	ptr->enumerateProperties(vars);
+	enumerateProperties(*ptr, vars);
 
     as_object* global = &getGlobal(*ptr);
     std::ostringstream o;

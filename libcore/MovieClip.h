@@ -490,13 +490,12 @@ public:
     //
     /// TODO: this is unlikely to be the best way of doing it, and it would
     /// simplify things if this function could be dropped.
-    bool getTextFieldVariables(string_table::key name, as_value& val);
+    bool getTextFieldVariables(const ObjectURI& uri, as_value& val);
 
     // Set TextField variables
     //
     /// TODO: this is also unlikely to be the best way to do it.
-    bool setTextFieldVariables(string_table::key name, const as_value& val,
-        string_table::key nsname = 0);
+    bool setTextFieldVariables(const ObjectURI& uri, const as_value& val);;
 
     /// Search for a named object on the DisplayList
     //

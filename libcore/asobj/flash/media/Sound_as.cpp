@@ -125,8 +125,7 @@ sound_class_init(as_object& where, const ObjectURI& uri)
     proto->set_member_flags(NSV::PROP_uuPROTOuu, PropFlags::readOnly, 0);
 
     // Register _global.String
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, cl, as_object::DefaultFlags);
 
 }
 

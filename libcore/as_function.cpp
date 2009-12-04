@@ -194,7 +194,7 @@ function_class_init(as_object& global, const ObjectURI& uri)
 	int swf6flags = PropFlags::dontEnum | 
                     PropFlags::dontDelete | 
                     PropFlags::onlySWF6Up;
-	global.init_member(getName(uri), func, swf6flags, getNamespace(uri));
+	global.init_member(uri, func, swf6flags);
 }
 
 namespace {

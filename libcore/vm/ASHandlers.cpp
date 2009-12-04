@@ -2692,7 +2692,7 @@ static void
 enumerateObject(as_environment& env, const as_object& obj)
 {
     assert(env.top(0).is_undefined());
-    obj.enumerateProperties(env);
+    obj.enumeratePropertyKeys(env);
 }
 
 void
@@ -3440,7 +3440,6 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
                         "starts at PC %d"), name, func->getStartPC());
         );
 
-        //env.set_member(name, function_value);
         thread.setVariable(name, function_value);
     }
 
@@ -3458,12 +3457,8 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
     //          thing into the intrusive_ptr, so the debugger
     //          will be left with a deleted object !!
     //          Rob: we don't want to use void pointers here..
-    boost::intrusive_ptr<as_object> o = convertToObject(getGlobal(thread.env), function_value);
-#ifndef GNASH_USE_GC
-    o->add_ref(); // this will leak, but at least debugger won't end up
-                  // with a dangling reference...
-#endif //ndef GNASH_USE_GC
-        debugger.addSymbol(o.get(), name);
+    as_object* o = convertToObject(getGlobal(thread.env), function_value);
+    debugger.addSymbol(o.get(), name);
 #endif
 }
 
@@ -3649,7 +3644,6 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
                         "PC %d", name, func->getStartPC());
         );
 
-        //env.set_member(name, function_value);
         thread.setVariable(name, function_value);
 #ifdef USE_DEBUGGER
         // WARNING: convertToObject(getGlobal(thread.env), new_obj) can return a newly allocated

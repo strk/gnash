@@ -252,6 +252,12 @@ pool_name(boost::uint32_t index, AbcBlock* pool)
 inline bool abstractEquality(const as_value& a, const as_value& b,
        bool strictness_on)
 {
+    // TODO: this is a very quick hack to fix some tests without touching
+    // as_value. Tamarin has a detailed algorithm for working out equality,
+    // which can be implemented as a separate member function of as_value.
+    if (a.is_object() && !b.is_object()) {
+        return a.to_string() == b.to_string();
+    }
     if ( strictness_on ) return a.strictly_equals(b);
     else return a.equals(b);
 }								
@@ -1621,19 +1627,21 @@ Machine::execute()
                     
                     break;
                 }
-            /// 0x55 ABC_ACTION_NEWOBJECT
-            /// Stream: V32 'arg_count'
-            /// Stack In:
-            ///  prop_value_1 -- a value object
-            ///  prop_name_1 -- a string
-            ///  .
-            ///  . (arg_count value/name pairs in all)
-            ///  .
-            ///  prop_value_n -- a value object
-            ///  prop_name_n -- a string
-            /// Stack Out:
-            ///  obj -- A new object which contains all of the given properties.
-            /// NB: This builds an object from its properties, it's not a constructor.
+                /// 0x55 ABC_ACTION_NEWOBJECT
+                /// Stream: V32 'arg_count'
+                /// Stack In:
+                ///  prop_value_1 -- a value object
+                ///  prop_name_1 -- a string
+                ///  .
+                ///  . (arg_count value/name pairs in all)
+                ///  .
+                ///  prop_value_n -- a value object
+                ///  prop_name_n -- a string
+                /// Stack Out:
+                ///  obj -- A new object which contains all of the given
+                ///  properties.
+                /// NB: This builds an object from its properties, it's not
+                ///  a constructor.
                 case SWF::ABC_ACTION_NEWOBJECT:
                 {
                     as_object *obj = _global->createObject();
@@ -1885,7 +1893,7 @@ Machine::execute()
                         break;
                     }
 
-                    object->set_member(name, value, ns, false);
+                    object->set_member(ObjectURI(name, ns), value, false);
                     break;
                 }
 
@@ -2988,7 +2996,7 @@ Machine::completeName(MultiName& name, int offset)
 	return size;
 }
 
-Class *
+Class*
 Machine::findSuper(as_value &v, bool find_for_primitive)
 {
 	if (v.is_undefined() || v.is_null()) return NULL;

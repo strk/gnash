@@ -2350,8 +2350,7 @@ textfield_class_init(as_object& where, const ObjectURI& uri)
     attachTextFieldInterface(*proto);
     attachTextFieldStaticMembers(*cl);
              
-    where.init_member(getName(uri), cl, as_object::DefaultFlags,
-            getNamespace(uri));
+    where.init_member(uri, cl, as_object::DefaultFlags);
 
     // ASSetPropFlags is called on the TextField class.
     as_object* null = 0;
