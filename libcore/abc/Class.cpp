@@ -72,7 +72,7 @@ void
 Class::initPrototype()
 {
     Global_as& gl = *VM::get().getGlobal();
-    _prototype = new as_class(gl);
+    _prototype = new as_class(gl, this);
 }
 
 bool

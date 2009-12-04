@@ -19,6 +19,11 @@
 #define GNASH_ABC_AS_CLASS_H
 
 #include "as_object.h"
+namespace gnash {
+    namespace abc {
+        class Class;
+    }
+}
 
 namespace gnash {
 namespace abc {
@@ -27,14 +32,30 @@ namespace abc {
 //
 /// A Class is a first-class type, i.e. it can be referenced itself in
 /// ActionScript.
+//
+/// Although Classes are nominally 'dynamic' types, there seems to be no
+/// way to alter them in ActionScript, or to create them dynamically. In
+/// order to reference them, the Class must already be constructed and
+/// known in the execution scope, then retrieved by name.
+//
+/// Accordingly, all as_class objects have an associated Class, which is its
+/// static definition.
+//
+/// TODO: see how to implement "[class Class]", the prototype of all classes.
 class as_class : public as_object
 {
 public:
-    as_class(Global_as& gl) : as_object(gl) {}
+
+    as_class(Global_as& gl, Class* c);
     virtual ~as_class() {}
 
     virtual const std::string& stringValue() const;
 
+private:
+
+    Class* _class;
+
+    const std::string _name;
 };
 
 } // namespace abc

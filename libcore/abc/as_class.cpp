@@ -16,18 +16,25 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "as_class.h"
+#include "Class.h"
+#include "Global_as.h"
 #include <string>
 
 namespace gnash {
 namespace abc {
 
+as_class::as_class(Global_as& gl, Class* c)
+    :
+    as_object(gl),
+    _class(c),
+    _name("[class " + getStringTable(gl).value(c->getName()) + "]")
+{}
+
 const std::string&
 as_class::stringValue() const
 {
     assert(isAS3(*this));
-
-    static const std::string str("[class Class]");
-    return str;
+    return _name;
 }
 
 }
