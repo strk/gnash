@@ -32,12 +32,12 @@ package hello {
             
             xcheck_equals(QName.prototype, "");    
             xcheck_equals(QName.constructor, "[class Class]");    
-            xcheck_equals(QName.constructor.prototype, "[object Object]");    
+            check_equals(QName.constructor.prototype, "[object Object]");    
 
             var q = new QName();
             xcheck_equals(q.constructor, "[class QName]");    
             xcheck_equals(q.constructor.constructor, "[class Class]");    
-            xcheck_equals(q.constructor.constructor.prototype,
+            check_equals(q.constructor.constructor.prototype,
                                 "[object Object]");    
             
             check(q.hasOwnProperty("uri"));

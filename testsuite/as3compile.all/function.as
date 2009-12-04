@@ -62,7 +62,7 @@ public class Main extends MovieClip {
         check_equals(typeof(A.bb()), "number");
         check_equals(A.cc(), 2.45);
         check_equals(typeof(A.cc()), "number");
-        xcheck_equals(A.dd(), "[object Object]");
+        check_equals(A.dd(), "[object Object]");
         check_equals(typeof(A.dd()), "object");
         check_equals(A.ee("f"), "f");
         check_equals(typeof(A.ee("f")), typeof("f"));
@@ -81,7 +81,7 @@ public class Main extends MovieClip {
         check_equals(typeof(a.b()), "number");
         check_equals(a.c(), 5.65);
         check_equals(typeof(a.c()), "number");
-        xcheck_equals(a.d(), "[object Object]");
+        check_equals(a.d(), "[object Object]");
         check_equals(typeof(a.d()), "object");
         check_equals(a.e("f"), "f");
         check_equals(typeof(a.e("f")), typeof("f"));

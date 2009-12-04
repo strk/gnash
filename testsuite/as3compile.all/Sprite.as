@@ -28,7 +28,7 @@ package hello {
 
         public function Main() {
 
-            xcheck_equals(Sprite.prototype, "[object Object]");
+            check_equals(Sprite.prototype, "[object Object]");
             xcheck_equals(Sprite.constructor, "[class Class]");
             
             // The prototype seems really to be just an object. Just
