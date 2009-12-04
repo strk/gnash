@@ -252,6 +252,12 @@ pool_name(boost::uint32_t index, AbcBlock* pool)
 inline bool abstractEquality(const as_value& a, const as_value& b,
        bool strictness_on)
 {
+    // TODO: this is a very quick hack to fix some tests without touching
+    // as_value. Tamarin has a detailed algorithm for working out equality,
+    // which can be implemented as a separate member function of as_value.
+    if (a.is_object() && !b.is_object()) {
+        return a.to_string() == b.to_string();
+    }
     if ( strictness_on ) return a.strictly_equals(b);
     else return a.equals(b);
 }								
