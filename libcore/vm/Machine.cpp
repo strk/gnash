@@ -1627,19 +1627,21 @@ Machine::execute()
                     
                     break;
                 }
-            /// 0x55 ABC_ACTION_NEWOBJECT
-            /// Stream: V32 'arg_count'
-            /// Stack In:
-            ///  prop_value_1 -- a value object
-            ///  prop_name_1 -- a string
-            ///  .
-            ///  . (arg_count value/name pairs in all)
-            ///  .
-            ///  prop_value_n -- a value object
-            ///  prop_name_n -- a string
-            /// Stack Out:
-            ///  obj -- A new object which contains all of the given properties.
-            /// NB: This builds an object from its properties, it's not a constructor.
+                /// 0x55 ABC_ACTION_NEWOBJECT
+                /// Stream: V32 'arg_count'
+                /// Stack In:
+                ///  prop_value_1 -- a value object
+                ///  prop_name_1 -- a string
+                ///  .
+                ///  . (arg_count value/name pairs in all)
+                ///  .
+                ///  prop_value_n -- a value object
+                ///  prop_name_n -- a string
+                /// Stack Out:
+                ///  obj -- A new object which contains all of the given
+                ///  properties.
+                /// NB: This builds an object from its properties, it's not
+                ///  a constructor.
                 case SWF::ABC_ACTION_NEWOBJECT:
                 {
                     as_object *obj = _global->createObject();
@@ -2994,7 +2996,7 @@ Machine::completeName(MultiName& name, int offset)
 	return size;
 }
 
-Class *
+Class*
 Machine::findSuper(as_value &v, bool find_for_primitive)
 {
 	if (v.is_undefined() || v.is_null()) return NULL;
