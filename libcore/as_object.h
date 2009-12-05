@@ -39,6 +39,7 @@
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
+#include <deque>
 
 // Forward declarations
 namespace gnash {
