@@ -304,7 +304,7 @@ bitmapdata_draw(const fn_call& fn)
         return as_value();
     }
 
-    MovieClip* mc = fn.arg(0).to_sprite();
+    MovieClip* mc = fn.arg(0).toMovieClip();
 
     if (!mc) {
         // log error

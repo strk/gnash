@@ -664,7 +664,7 @@ textsnapshot_ctor(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    MovieClip* mc = (fn.nargs == 1) ? fn.arg(0).to_sprite() : 0;
+    MovieClip* mc = (fn.nargs == 1) ? fn.arg(0).toMovieClip() : 0;
 
     ptr->setRelay(new TextSnapshot_as(mc));
     return as_value();

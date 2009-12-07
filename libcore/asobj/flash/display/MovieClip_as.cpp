@@ -641,7 +641,7 @@ movieclip_swapDepths(const fn_call& fn)
     int target_depth = 0;
 
     // movieclip.swapDepth(movieclip)
-    if (MovieClip* target_movieclip = fn.arg(0).to_sprite()) {
+    if (MovieClip* target_movieclip = fn.arg(0).toMovieClip()) {
 
         if (movieclip == target_movieclip) {
             IF_VERBOSE_ASCODING_ERRORS(

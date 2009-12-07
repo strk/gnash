@@ -66,7 +66,8 @@ static const double NaN = std::numeric_limits<double>::quiet_NaN();
 // type safety (i.e., they will only compile for floating point arguments).
 template <typename T>
 inline bool
-isNaN(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0)
+isNaN(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::
+        type* dummy = 0)
 {
 	UNUSED(dummy);
 	return num != num;
@@ -99,44 +100,27 @@ class as_value
 
 public:
 
+    // The exception type should always be one greater than the normal type.
 	enum AsType
 	{
-		// Always make the exception type one greater than the normal type.
-		
-		/// Undefined value
 		UNDEFINED,
 		UNDEFINED_EXCEPT,
-
-		/// NULL value
 		NULLTYPE,
 		NULLTYPE_EXCEPT,
-
-		/// Boolean value
 		BOOLEAN,
 		BOOLEAN_EXCEPT,
-
-		/// String value
 		STRING,
 		STRING_EXCEPT,
-
-		/// Number value
 		NUMBER, 
 		NUMBER_EXCEPT,
-
-		/// Object reference
 		OBJECT,
 		OBJECT_EXCEPT,
-
-		/// MovieClip reference
-		MOVIECLIP,
-		MOVIECLIP_EXCEPT
+		DISPLAYOBJECT,
+		DISPLAYOBJECT_EXCEPT
 	};
 
 	/// Construct an UNDEFINED value
 	DSOEXPORT as_value();
-
-	/// Copy constructor.
-	as_value(const as_value& value);
 
 	/// Construct a STRING value 
 	as_value(const char* str);
@@ -155,80 +139,15 @@ public:
 
 	/// Construct a NUMBER value
 	as_value(double val);
+	
+	/// Construct a NULL, OBJECT, or DISPLAYOBJECT value
+	as_value(as_object* obj);
+
+	/// Copy constructor.
+	as_value(const as_value& value);
 
 	/// Construct a value from an AMF element
 	as_value(const amf::Element& el);
-	
-	/// Construct a NULL, OBJECT, MOVIECLIP value
-	//
-	/// See as_object::to_movie and as_object::to_function
-	///
-	/// Internally adds a reference to the ref-counted as_object, 
-	/// if not-null
-	///
-	as_value(as_object* obj);
-
-	/// Read AMF0 data from the given buffer
-	//
-	/// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
-	/// encoded data. Must start with a type byte unless third parameter is set.
-	///
-	/// On success, sets the given as_value and returns true.
-	/// On error (premature end of buffer, etc.) returns false and
-    /// leaves the given as_value untouched.
-	///
-	/// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but
-    /// use what you passed instead.
-	///
-	/// The l-value you pass as the first parameter (buffer start) is updated to
-	/// point just past the last byte parsed
-	///
-	/// TODO restore first parameter on parse errors
-	///
-	/// @param b
-    ///     Pointer to buffer where to start reading.
-    ///     Will be moved as data is read.
-    ///
-	/// @param end
-    ///     Pointer to end of buffer. Reading from this would
-    ///     be invalid.
-    ///
-	/// @param inType
-    ///     Type of the AMF object to read. If -1, type will be
-    ///     read from a type byte.
-    ///
-	/// @param objRefs
-	///     A vector of already-parsed objects to properly interpret references.
-	///     Pass an empty vector on first call as it will be used internally.
-	///     On return, the vector will be filled with pointers to every
-    ///     complex object parsed from the stream.
-    ///
-	/// @param vm
-    ///     Virtual machine to use for initialization of the values
-    ///     (string_table)
-	///
-	DSOEXPORT bool readAMF0(const boost::uint8_t*& b,
-            const boost::uint8_t* const end, int inType,
-            std::vector<as_object*>& objRefs, VM& vm);
-
-    /// Serialize value in AMF0 format.
-    //
-    /// @param buf
-    ///     The buffer to append serialized version of this value to.
-    ///
-    /// @param offsetTable
-    ///     A map of already-parsed objects, pass an empty map on first call as
-    ///     it will be used internally.
-    ///
-	/// @param vm
-    ///     Virtual machine to use for serialization of property names
-    ///     (string_table)
-    ///
-	/// @param allowStrictArray
-    ///     If true strict arrays will be encoded a STRICT_ARRAY types.
-    ///
-    bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable,
-                   VM& vm, bool allowStrictArray) const;
 
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//
@@ -272,48 +191,29 @@ public:
     /// Only used in AVM2
 	primitive_types ptype() const;
 
-	/// \brief
-	/// Return true if this value is callable
+	/// Return true if this value is a function
 	bool is_function() const;
 
-	/// Return true if this value is strictly a string
-	//
-	/// Note that you usually DON'T need to call this
-	/// function, as if you really want a string you
-	/// can always call the to_string() or to_std_string()
-	/// method to perform a conversion.
-	///
-	bool is_string() const
-	{
+	/// Return true if this value is a string
+	bool is_string() const {
 		return m_type == STRING;
 	}
 
 	/// Return true if this value is strictly a number
-	//
-	/// Note that you usually DON'T need to call this
-	/// function, as if you really want a number you
-	/// can always call the to_number()
-	/// method to perform a conversion.
-	///
-	bool is_number() const
-	{
+	bool is_number() const {
 		return m_type == NUMBER;
 	}
 
-	/// \brief
 	/// Return true if this value is an object
-	/// (OBJECT, or MOVIECLIP).
-	bool is_object() const
-	{
-		return m_type == OBJECT || m_type == MOVIECLIP;
+    //
+    /// Both DisplayObjects and Objects count as Objects
+	bool is_object() const {
+		return m_type == OBJECT || m_type == DISPLAYOBJECT;
 	}
 
-	/// \brief
-	/// Return true if this value is a MOVIECLIP 
-	/// 
-	bool is_sprite() const
-	{
-		return m_type == MOVIECLIP;
+	/// Return true if this value is a DISPLAYOBJECT 
+	bool is_sprite() const {
+		return m_type == DISPLAYOBJECT;
 	}
 
 	/// Get a std::string representation for this value.
@@ -392,10 +292,8 @@ public:
 
 	/// Return value as an object, converting primitive values as needed.
 	//
-	/// Make sure you don't break the intrusive_ptr chain
-	/// as the returned object might be a newly allocated one in case
-	/// of a conversion from a primitive string, number or boolean value.
-	///
+    /// This function does perform a conversion.
+    //
 	/// string values are converted to String objects
 	/// numeric values are converted to Number objects
 	/// boolean values are converted to Boolean objects
@@ -408,34 +306,36 @@ public:
     ///                 conversion.
 	as_object* to_object(Global_as& global) const;
 
-	/// Return value as a sprite or NULL if this is not possible.
+	/// Returns value as a MovieClip if it is a MovieClip.
 	//
+    /// This function performs no conversion, so returns 0 if the as_value is
+    /// not a MovieClip.
+    //
 	/// This is just a wrapper around toDisplayObject() performing 
 	/// an additional final cast.
-	///
-	MovieClip* to_sprite(bool skipRebinding=false) const;
+	MovieClip* toMovieClip(bool skipRebinding = false) const;
 
 	/// Return value as a DisplayObject or NULL if this is not possible.
 	//
-	/// If the value is a MOVIECLIP value, the stored DisplayObject target
+    /// Note that this function performs no conversion, so returns 0 if the
+    /// as_value is not a DisplayObject.
+    //
+	/// If the value is a DisplayObject value, the stored DisplayObject target
 	/// is evaluated using the root movie's environment.
 	/// If the target points to something that doesn't cast to a DisplayObject,
-	/// NULL is returned.
+	/// 0 is returned.
 	///
-	/// Note that if the value is NOT a MOVIECLIP type, NULL is always
-	/// returned.
-	///
-	/// @param skipRebinding
-	/// 	If true a reference to a destroyed DisplayObject is still returned
-	///	as such, rather then attempted to be resolved as a soft-reference.
-	///	Main use for this is during paths resolution, to avoid
-	///	infinite loops. See bug #21647.
-	///
-	DisplayObject* toDisplayObject(bool skipRebinding=false) const;
+	/// @param skipRebinding    If true a reference to a destroyed
+    ///                         DisplayObject is still returned, rather than
+    ///                         attempting to resolve it as a soft-reference.
+	///	                        Main use for this is during paths resolution,
+    ///                         to avoid infinite loops. See bug #21647.
+	DisplayObject* toDisplayObject(bool skipRebinding = false) const;
 
-	/// \brief
-	/// Return value as an ActionScript function ptr
-	/// or NULL if it is not an ActionScript function.
+    /// Return the value as a function only if it is a function.
+    //
+    /// Note that this performs no conversion, so returns 0 if the as_value
+    /// is not a function.
 	as_function* to_function() const;
 
 	/// Return value as a primitive type
@@ -471,28 +371,15 @@ public:
 	///
 	as_value& convert_to_primitive();
 
-	// These set_*()'s are more type-safe; should be used
-	// in preference to generic overloaded set().  You are
-	// more likely to get a warning/error if misused.
-
 	void set_string(const std::string& str);
 
 	void set_double(double val);
 
 	void set_bool(bool val);
 
-    /// Set this as_value to a DisplayObject
-    //
-    /// as_value itself does not distinguish between MovieClips and other
-    /// types of DisplayObject; TextFields initially appear as type
-    /// "movieclip".
-	void setDisplayObject(DisplayObject& sp);
-
-	void set_int(int val) { set_double(val); }
-
 	void set_nan() { set_double(NaN); }
 
-	/// Make this value a NULL, OBJECT, MOVIECLIP value
+	/// Make this value a NULL, OBJECT, DISPLAYOBJECT value
 	//
 	/// See as_object::to_movie and as_object::to_function
 	///
@@ -518,7 +405,7 @@ public:
         return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
                 || m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
                 || m_type == OBJECT_EXCEPT 
-                || m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT);
+                || m_type == DISPLAYOBJECT_EXCEPT || m_type == STRING_EXCEPT);
 	}
 
 	// Flag or unflag an as_value as an exception -- this gets flagged
@@ -566,6 +453,68 @@ public:
 	///
 	void setReachable() const;
 
+	/// Read AMF0 data from the given buffer
+	//
+	/// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
+	/// encoded data. Must start with a type byte unless third parameter is set.
+	///
+	/// On success, sets the given as_value and returns true.
+	/// On error (premature end of buffer, etc.) returns false and
+    /// leaves the given as_value untouched.
+	///
+	/// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but
+    /// use what you passed instead.
+	///
+	/// The l-value you pass as the first parameter (buffer start) is updated to
+	/// point just past the last byte parsed
+	///
+	/// TODO restore first parameter on parse errors
+	///
+	/// @param b
+    ///     Pointer to buffer where to start reading.
+    ///     Will be moved as data is read.
+    ///
+	/// @param end
+    ///     Pointer to end of buffer. Reading from this would
+    ///     be invalid.
+    ///
+	/// @param inType
+    ///     Type of the AMF object to read. If -1, type will be
+    ///     read from a type byte.
+    ///
+	/// @param objRefs
+	///     A vector of already-parsed objects to properly interpret references.
+	///     Pass an empty vector on first call as it will be used internally.
+	///     On return, the vector will be filled with pointers to every
+    ///     complex object parsed from the stream.
+    ///
+	/// @param vm
+    ///     Virtual machine to use for initialization of the values
+    ///     (string_table)
+	///
+	DSOEXPORT bool readAMF0(const boost::uint8_t*& b,
+            const boost::uint8_t* const end, int inType,
+            std::vector<as_object*>& objRefs, VM& vm);
+
+    /// Serialize value in AMF0 format.
+    //
+    /// @param buf
+    ///     The buffer to append serialized version of this value to.
+    ///
+    /// @param offsetTable
+    ///     A map of already-parsed objects, pass an empty map on first call as
+    ///     it will be used internally.
+    ///
+	/// @param vm
+    ///     Virtual machine to use for serialization of property names
+    ///     (string_table)
+    ///
+	/// @param allowStrictArray
+    ///     If true strict arrays will be encoded a STRICT_ARRAY types.
+    ///
+    bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable,
+                   VM& vm, bool allowStrictArray) const;
+
 private:
 
     /// Use the relevant equality function, not operator==
@@ -582,8 +531,6 @@ private:
 
 	AsType m_type;
 
-	typedef DisplayObject* CharacterPtr;
-	
 	/// AsValueType handles the following AS types:
 	//
 	/// 1. undefined / null
@@ -605,13 +552,13 @@ private:
 	/// Get the object pointer variant member (we assume m_type == OBJECT)
 	as_object* getObj() const;
 
-	/// Get the DisplayObject variant member (we assume m_type == MOVIECLIP)
+	/// Get the DisplayObject variant member (we assume m_type == DISPLAYOBJECT)
 	//
 	/// NOTE: this is possibly NULL !
 	///
-	CharacterPtr getCharacter(bool skipRebinding=false) const;
+	DisplayObject* getCharacter(bool skipRebinding=false) const;
 
-	/// Get the sprite proxy variant member (we assume m_type == MOVIECLIP)
+	/// Get the sprite proxy variant member (we assume m_type == DISPLAYOBJECT)
 	//
 	CharacterProxy getCharacterProxy() const;
 

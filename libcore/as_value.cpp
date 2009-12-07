@@ -21,11 +21,11 @@
 #include "as_value.h"
 #include "as_object.h"
 #include "as_function.h" // for as_function
-#include "MovieClip.h" // for MOVIECLIP values
-#include "DisplayObject.h" // for MOVIECLIP values
-#include "as_environment.h" // for MOVIECLIP values
-#include "VM.h" // for MOVIECLIP values
-#include "movie_root.h" // for MOVIECLIP values
+#include "MovieClip.h" // for DISPLAYOBJECT values
+#include "DisplayObject.h" // for DISPLAYOBJECT values
+#include "as_environment.h" // for DISPLAYOBJECT values
+#include "VM.h" // for DISPLAYOBJECT values
+#include "movie_root.h" // for DISPLAYOBJECT values
 #include "utility.h" // for typeName() 
 #include "GnashNumeric.h"
 #include "namedStrings.h"
@@ -332,7 +332,7 @@ as_value::to_string() const
 		case STRING:
 			return getStr();
 
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 		{
 			const CharacterProxy& sp = getCharacterProxy();
 			if ( ! sp.get() )
@@ -438,7 +438,7 @@ as_value::ptype() const
         case NUMBER: return PTYPE_NUMBER;
         case UNDEFINED:
         case NULLTYPE:
-        case MOVIECLIP:
+        case DISPLAYOBJECT:
             return PTYPE_NUMBER;
         case OBJECT:
         {
@@ -503,7 +503,7 @@ as_value::to_primitive(AsType hint) const
 
 	if (hint == NUMBER) {
 
-		if (m_type == MOVIECLIP) return as_value(NaN);
+		if (m_type == DISPLAYOBJECT) return as_value(NaN);
 
         assert(m_type == OBJECT);
 		obj = getObj();
@@ -524,7 +524,7 @@ as_value::to_primitive(AsType hint) const
 	else {
 		assert(hint == STRING);
 
-		if (m_type == MOVIECLIP) return getCharacterProxy().getTarget();
+		if (m_type == DISPLAYOBJECT) return getCharacterProxy().getTarget();
         assert(m_type == OBJECT);
 		obj = getObj();
 
@@ -714,7 +714,7 @@ as_value::to_number() const
             }
         }
 
-        case MOVIECLIP:
+        case DISPLAYOBJECT:
         {
             // This is tested, no valueOf is going
             // to be invoked for movieclips.
@@ -759,7 +759,7 @@ as_value::to_element() const
           ptr->visitProperties<Exists>(props);
 	  break;
       }
-      case MOVIECLIP:
+      case DISPLAYOBJECT:
 	  log_unimpl("Converting a Movie Clip to an element is not supported");
           // TODO: what kind of Element will be left with ? Should we throw an exception ?
 	  break;
@@ -801,7 +801,7 @@ as_value::to_bool_v7() const
 		case OBJECT:
 			return true;
 
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 			return true;
 		default:
 			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
@@ -832,7 +832,7 @@ as_value::to_bool_v5() const
 		case OBJECT:
 			return true;
 
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 			return true;
 		default:
 			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
@@ -864,7 +864,7 @@ as_value::to_bool_v6() const
 		case OBJECT:
 			return true;
 
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 			return true;
 		default:
 			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
@@ -892,7 +892,7 @@ as_value::to_object(Global_as& global) const
 		case OBJECT:
 			return getObj();
 
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 			return getObject(toDisplayObject());
 
 		case STRING:
@@ -911,9 +911,9 @@ as_value::to_object(Global_as& global) const
 }
 
 MovieClip*
-as_value::to_sprite(bool allowUnloaded) const
+as_value::toMovieClip(bool allowUnloaded) const
 {
-	if ( m_type != MOVIECLIP ) return 0;
+	if ( m_type != DISPLAYOBJECT ) return 0;
 
 	DisplayObject *ch = getCharacter(allowUnloaded);
 	if ( ! ch ) return 0;
@@ -923,16 +923,9 @@ as_value::to_sprite(bool allowUnloaded) const
 DisplayObject*
 as_value::toDisplayObject(bool allowUnloaded) const
 {
-	if ( m_type != MOVIECLIP ) return NULL;
+	if ( m_type != DISPLAYOBJECT ) return NULL;
 
 	return getCharacter(allowUnloaded);
-}
-
-void
-as_value::setDisplayObject(DisplayObject& sprite)
-{
-	m_type = MOVIECLIP;
-	_value = CharacterProxy(&sprite);
 }
 
 // Return value as an ActionScript function.  Returns NULL if value is
@@ -972,7 +965,8 @@ as_value::set_as_object(as_object* obj)
     if (obj->displayObject()) {
         // The static cast is fine as long as the as_object is genuinely
         // a DisplayObject.
-		setDisplayObject(*obj->displayObject());
+        m_type = DISPLAYOBJECT;
+        _value = CharacterProxy(obj->displayObject());
 		return;
 	}
 
@@ -1116,7 +1110,7 @@ as_value::equals(const as_value& v) const
 
 
 #ifdef GNASH_DEBUG_EQUALITY
-	// Both operands are objects (OBJECT,AS_FUNCTION,MOVIECLIP)
+	// Both operands are objects (OBJECT,AS_FUNCTION,DISPLAYOBJECT)
 	if ( ! is_object() || ! v.is_object() )
 	{
 		log_debug("Equals(%s,%s)", *this, v);
@@ -1208,7 +1202,7 @@ as_value::typeOf() const
 		case as_value::OBJECT:
             return is_function() ? "function" : "object";
 
-		case as_value::MOVIECLIP:
+		case as_value::DISPLAYOBJECT:
 		{
 			DisplayObject* ch = getCharacter();
 			if ( ! ch ) return "movieclip"; // dangling
@@ -1249,7 +1243,7 @@ as_value::equalsSameType(const as_value& v) const
 		case STRING:
 			return _value == v._value;
 
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 			return toDisplayObject() == v.toDisplayObject(); 
 
 		case NUMBER:
@@ -1313,7 +1307,7 @@ as_value::toDebugString() const
 			stream << getNum();
 			return "[number:" + stream.str() + "]";
 		}
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 		{
 			const CharacterProxy& sp = getCharacterProxy();
 			if ( sp.isDangling() )
@@ -1474,7 +1468,7 @@ as_value::setReachable() const
 				op->setReachable();
 			break;
 		}
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 		{
 			CharacterProxy sp = getCharacterProxy();
 			sp.setReachable();
@@ -1495,11 +1489,11 @@ as_value::getObj() const
 CharacterProxy
 as_value::getCharacterProxy() const
 {
-	assert(m_type == MOVIECLIP);
+	assert(m_type == DISPLAYOBJECT);
 	return boost::get<CharacterProxy>(_value);
 }
 
-as_value::CharacterPtr
+DisplayObject*
 as_value::getCharacter(bool allowUnloaded) const
 {
 	return getCharacterProxy().get(allowUnloaded);
@@ -1611,11 +1605,11 @@ as_value::as_value(const amf::Element& el)
       case amf::Element::MOVIECLIP_AMF0:
       {
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type MOVIECLIP");
+            log_debug("as_value(Element&) : AMF type DISPLAYOBJECT");
 #endif
-            log_unimpl("MOVIECLIP AMF0 type");
+            log_unimpl("DISPLAYOBJECT AMF0 type");
             set_undefined();
-            //m_type = MOVIECLIP;
+            //m_type = DISPLAYOBJECT;
             //_value = el.getData();
 
             break;
@@ -2273,10 +2267,10 @@ as_value::writeAMF0(SimpleBuffer& buf,
             return true;
         }
 
-        case MOVIECLIP:
+        case DISPLAYOBJECT:
         {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_("writeAMF0: serializing MOVIECLIP (as undefined)"));
+            log_debug(_("writeAMF0: serializing DISPLAYOBJECT (as undefined)"));
 #endif
             // See misc-ming.all/SharedObjectTest.as
             buf.appendByte(amf::Element::UNDEFINED_AMF0);

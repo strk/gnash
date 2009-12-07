@@ -725,7 +725,7 @@ AbcBlock::pool_value(boost::uint32_t index, PoolConstant type, as_value &v)
 			log_error(_("Action Block: Bad index in optional argument."));
 			return false;
 		}
-		v.set_int(_integerPool[index]);
+		v.set_double(_integerPool[index]);
 		break;
 	}
 	case POOL_UINTEGER:
@@ -735,7 +735,7 @@ AbcBlock::pool_value(boost::uint32_t index, PoolConstant type, as_value &v)
 			log_error(_("Action Block: Bad index in optional argument."));
 			return false;
 		}
-		v.set_int(_uIntegerPool[index]);
+		v.set_double(_uIntegerPool[index]);
 		break;
 	}
 	case POOL_DOUBLE: 
