@@ -859,7 +859,7 @@ Machine::execute()
                     if (!_stack.top(0).is_number()) throw ASException();
 
                     boost::uint32_t index =
-                        _stack.top(0).to_number<boost::uint32_t>();
+                        _stack.top(0).to_number();
                     _stack.drop(1);
 
                     mStream->seekBy(3); // Skip the intial offset.
@@ -948,7 +948,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(1));
                     as_object *obj = _stack.top(1).to_object(*_global);
                     const boost::uint32_t index =
-                        _stack.top(0).to_number<boost::uint32_t>();
+                        _stack.top(0).to_number();
                     
                     if (!obj) {
                         // TODO: check what to do here.
@@ -980,7 +980,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(1));
                     as_object *obj = _stack.top(1).to_object(*_global);
                     boost::uint32_t index =
-                        _stack.top(0).to_number<boost::uint32_t>();
+                        _stack.top(0).to_number();
                     _stack.drop(1);
                     assert(obj);
                     _stack.top(0) = obj->nextIndex(index);
@@ -1020,7 +1020,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(1));
                     as_object *obj = _stack.top(1).to_object(*_global);
                     const boost::uint32_t index =
-                        _stack.top(0).to_number<boost::uint32_t>();
+                        _stack.top(0).to_number();
                     const Property *b = obj->getByIndex(index);
                     _stack.drop(1);
                     if (!b) _stack.top(0).set_undefined();
@@ -1202,7 +1202,7 @@ Machine::execute()
                         break;
                     }
                     
-                    boost::uint32_t index = indexv.to_number<boost::uint32_t>();
+                    boost::uint32_t index = indexv.to_int();
 
                     as_object *owner = 0;
                     int next = obj->nextIndex(index, &owner);
@@ -2218,7 +2218,8 @@ Machine::execute()
                 ///  int_value -- value as an unsigned integer object
                 case SWF::ABC_ACTION_CONVERT_U:
                 case SWF::ABC_ACTION_COERCE_U:
-                    _stack.top(0) = _stack.top(0).to_number<unsigned int>();
+                    _stack.top(0) = static_cast<boost::uint32_t>(
+                            _stack.top(0).to_number());
                     break;
 
                 /// 0x75 ABC_ACTION_CONVERT_D
@@ -2549,7 +2550,8 @@ Machine::execute()
                 ///  ((unsigned) a) >> b
                 case SWF::ABC_ACTION_URSHIFT:
                 {
-                    _stack.top(1) = _stack.top(1).to_number<unsigned int>()
+                    _stack.top(1) =
+                        static_cast<boost::uint32_t>(_stack.top(1).to_number())
                         >> _stack.top(0).to_int();
                     _stack.drop(1);
                     break;

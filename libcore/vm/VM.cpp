@@ -307,14 +307,14 @@ newAdd(as_value& op1, const as_value& op2, VM& vm)
     // The order of the operations is important: op2 is converted to
     // primitive before op1.
 
-	try { r = r.to_primitive(); }
+	try { convertToPrimitive(r, vm); }
 	catch (ActionTypeError& e)
 	{
         log_debug(_("%s.to_primitive() threw an error during "
                 "ActionNewAdd"), r);
 	}
 	
-    try { op1 = op1.to_primitive(); }
+    try { convertToPrimitive(op1, vm); }
 	catch (ActionTypeError& e)
 	{
         log_debug(_("%s.to_primitive() threw an error during "

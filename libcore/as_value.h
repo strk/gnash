@@ -131,7 +131,7 @@ public:
 	as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type*
             dummy = 0)
 		:
-        m_type(BOOLEAN),
+        _type(BOOLEAN),
 		_value(val)
 	{
 		UNUSED(dummy);
@@ -196,24 +196,24 @@ public:
 
 	/// Return true if this value is a string
 	bool is_string() const {
-		return m_type == STRING;
+		return _type == STRING;
 	}
 
 	/// Return true if this value is strictly a number
 	bool is_number() const {
-		return m_type == NUMBER;
+		return _type == NUMBER;
 	}
 
 	/// Return true if this value is an object
     //
     /// Both DisplayObjects and Objects count as Objects
 	bool is_object() const {
-		return m_type == OBJECT || m_type == DISPLAYOBJECT;
+		return _type == OBJECT || _type == DISPLAYOBJECT;
 	}
 
 	/// Return true if this value is a DISPLAYOBJECT 
 	bool is_sprite() const {
-		return m_type == DISPLAYOBJECT;
+		return _type == DISPLAYOBJECT;
 	}
 
 	/// Get a std::string representation for this value.
@@ -236,59 +236,30 @@ public:
 	std::string to_string_versioned(int version) const;
 
 	/// Get a number representation for this value
-	double	to_number() const;
+	double to_number() const;
 
 	/// Get an AMF element representation for this value
-        boost::shared_ptr<amf::Element> to_element() const;
+    boost::shared_ptr<amf::Element> to_element() const;
 
-	/// Conversion to 32bit integer
-	//
-	/// Use this conversion whenever an int is needed.
-	/// This is NOT the same as calling to_number<boost::int32_t>().
-	///
-	boost::int32_t	to_int() const;
-
-	/// Shorthand: casts the result of to_number() to the requested number
-	/// type.
-	//
-	/// Parameter identical to that of to_number().
-	///
-	/// TODO: deprecate this function, it gets confusing as when an integer
-	///       is needed the caller should invoke to_int() rather then to_number().
-	///       Implementing specializations for *all* integer types might be tedious
-	///
-	template <typename T>
-	T to_number () const
-	{
-		return static_cast<T>(to_number());
-	}
+	/// AS-compatible conversion to 32bit integer
+    //
+    /// This truncates large numbers to fit in the 32-bit space.
+	boost::int32_t to_int() const;
 
 	/// Conversion to boolean.
 	//
 	/// Will call version-dependent functions
 	/// based on current version.
-	///
-	/// See to_bool_v5(), to_bool_v6(), to_bool_v7() 
-	///
-	bool	to_bool() const;
+	bool to_bool() const;
 
 	/// Conversion to boolean for SWF7 and up
-	//
-	/// See to_bool()
-	///
-	bool	to_bool_v7() const;
+	bool to_bool_v7() const;
 
 	/// Conversion to boolean for SWF6
-	//
-	/// See to_bool()
-	///
-	bool	to_bool_v6() const;
+	bool to_bool_v6() const;
 
 	/// Conversion to boolean up to SWF5
-	//
-	/// See to_bool()
-	///
-	bool	to_bool_v5() const;
+	bool to_bool_v5() const;
 
 	/// Return value as an object, converting primitive values as needed.
 	//
@@ -338,17 +309,12 @@ public:
     /// is not a function.
 	as_function* to_function() const;
 
-	/// Return value as a primitive type
-	//
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
-	///
-	/// @throw ActionTypeError if an object can't be converted to a primitive
-	///
-	as_value to_primitive() const;
+	AsType defaultPrimitive(int version) const;
 
 	/// Return value as a primitive type, with a preference
 	//
+    /// This function performs no conversion.
+    //
 	/// Primitive types are: undefined, null, boolean, string, number.
 	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
 	///
@@ -359,16 +325,6 @@ public:
 	///
 	as_value to_primitive(AsType hint) const;
 
-	/// Convert this value to a primitive type, with a preference
-	//
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
-	///
-	/// @param hint
-	/// 	NUMBER or STRING, the preferred representation we're asking for.
-	///
-	/// @throw ActionTypeError if an object can't be converted to a primitive
-	///
 	as_value& convert_to_primitive();
 
 	void set_string(const std::string& str);
@@ -395,30 +351,30 @@ public:
 
 	void operator=(const as_value& v);
 
-	bool is_undefined() const { return (m_type == UNDEFINED); }
+	bool is_undefined() const { return (_type == UNDEFINED); }
 
-	bool is_null() const { return (m_type == NULLTYPE); }
+	bool is_null() const { return (_type == NULLTYPE); }
 
-	bool is_bool() const { return (m_type == BOOLEAN); }
+	bool is_bool() const { return (_type == BOOLEAN); }
 
     bool is_exception() const {
-        return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
-                || m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
-                || m_type == OBJECT_EXCEPT 
-                || m_type == DISPLAYOBJECT_EXCEPT || m_type == STRING_EXCEPT);
+        return (_type == UNDEFINED_EXCEPT || _type == NULLTYPE_EXCEPT
+                || _type == BOOLEAN_EXCEPT || _type == NUMBER_EXCEPT
+                || _type == OBJECT_EXCEPT || _type == DISPLAYOBJECT_EXCEPT
+                || _type == STRING_EXCEPT);
 	}
 
 	// Flag or unflag an as_value as an exception -- this gets flagged
 	// when an as_value is 'thrown'.
 	void flag_exception() {
         if (!is_exception()) {
-            m_type = static_cast<AsType>(static_cast<int>(m_type) + 1);
+            _type = static_cast<AsType>(static_cast<int>(_type) + 1);
         }
     }
 
 	void unflag_exception() {
         if (is_exception()) {
-            m_type = static_cast<AsType>(static_cast<int>(m_type) - 1);
+            _type = static_cast<AsType>(static_cast<int>(_type) - 1);
         }
     }
 
@@ -517,20 +473,6 @@ public:
 
 private:
 
-    /// Use the relevant equality function, not operator==
-    bool operator==(const as_value& v) const;
-
-    /// Use the relevant inequality function, not operator!=
-    bool operator!=(const as_value& v) const;
-
-	/// Compare values of the same type
-	//
-	/// NOTE: will abort if values are not of the same type!
-	///
-	bool equalsSameType(const as_value& v) const;
-
-	AsType m_type;
-
 	/// AsValueType handles the following AS types:
 	//
 	/// 1. undefined / null
@@ -547,36 +489,58 @@ private:
                            std::string>
     AsValueType;
     
+    /// Use the relevant equality function, not operator==
+    bool operator==(const as_value& v) const;
+
+    /// Use the relevant inequality function, not operator!=
+    bool operator!=(const as_value& v) const;
+
+	/// Compare values of the same type
+	//
+	/// NOTE: will abort if values are not of the same type!
+	///
+	bool equalsSameType(const as_value& v) const;
+
+	AsType _type;
+
     AsValueType _value;
 
-	/// Get the object pointer variant member (we assume m_type == OBJECT)
+	/// Get the object pointer variant member.
+    //
+    /// Callers must check that this is an Object (including DisplayObjects).
 	as_object* getObj() const;
 
-	/// Get the DisplayObject variant member (we assume m_type == DISPLAYOBJECT)
-	//
-	/// NOTE: this is possibly NULL !
-	///
-	DisplayObject* getCharacter(bool skipRebinding=false) const;
+	/// Get the DisplayObject variant member.
+    //
+    /// The caller must check that this is a DisplayObject.
+	DisplayObject* getCharacter(bool skipRebinding = false) const;
 
-	/// Get the sprite proxy variant member (we assume m_type == DISPLAYOBJECT)
-	//
+	/// Get the DisplayObject proxy variant member.
+    //
+    /// The caller must check that this value is a DisplayObject
 	CharacterProxy getCharacterProxy() const;
 
-	/// Get the number variant member (we assume m_type == NUMBER)
+	/// Get the number variant member.
+    //
+    /// The caller must check that this value is a Number.
 	double getNum() const {
-		assert(m_type == NUMBER);
+		assert(_type == NUMBER);
 		return boost::get<double>(_value);
 	}
 
-	/// Get the boolean variant member (we assume m_type == BOOLEAN)
+	/// Get the boolean variant member.
+    //
+    /// The caller must check that this value is a Boolean.
 	bool getBool() const {
-		assert(m_type == BOOLEAN);
+		assert(_type == BOOLEAN);
 		return boost::get<bool>(_value);
 	}
 
-	/// Get the boolean variant member (we assume m_type == STRING)
+	/// Get the boolean variant member.
+    //
+    /// The caller must check that this value is a String.
 	const std::string& getStr() const {
-		assert(m_type == STRING);
+		assert(_type == STRING);
 		return boost::get<std::string>(_value);
 	}
 
@@ -591,6 +555,9 @@ as_value& convertToString(as_value& v, VM& vm);
 
 /// Force type to bool.
 as_value& convertToBoolean(as_value& v, VM& vm);
+
+/// Convert to primitive type
+as_value& convertToPrimitive(as_value& v, VM& vm);
 
 inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
 	return os << v.toDebugString();

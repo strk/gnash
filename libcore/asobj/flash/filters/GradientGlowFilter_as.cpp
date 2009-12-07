@@ -147,7 +147,7 @@ gradientglowfilter_blurX(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
-    float sp_blurX = fn.arg(0).to_number<float> ();
+    float sp_blurX = fn.arg(0).to_number ();
     ptr->m_blurX = sp_blurX;
     return as_value();
 }
@@ -159,7 +159,7 @@ gradientglowfilter_blurY(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
-    float sp_blurY = fn.arg(0).to_number<float> ();
+    float sp_blurY = fn.arg(0).to_number ();
     ptr->m_blurY = sp_blurY;
     return as_value();
 }
@@ -171,7 +171,7 @@ gradientglowfilter_strength(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_strength );
     }
-    float sp_strength = fn.arg(0).to_number<float> ();
+    float sp_strength = fn.arg(0).to_number ();
     ptr->m_strength = sp_strength;
     return as_value();
 }
@@ -183,7 +183,7 @@ gradientglowfilter_quality(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
-    boost::uint8_t sp_quality = fn.arg(0).to_number<boost::uint8_t> ();
+    boost::uint8_t sp_quality = fn.arg(0).to_number ();
     ptr->m_quality = sp_quality;
     return as_value();
 }

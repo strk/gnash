@@ -2750,13 +2750,13 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_NEWEQUALS));
 #endif
 
-    const VM& vm = getVM(env);
+    VM& vm = getVM(env);
 
     int swfVersion = vm.getSWFVersion();
     if (swfVersion <= 5)
     {
         as_value op1 = env.top(0);
-        try { op1 = op1.to_primitive(); }
+        try { convertToPrimitive(op1, vm); }
         catch (ActionTypeError& e)
         {
             log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
@@ -2764,7 +2764,7 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
         }
 
         as_value op2 = env.top(1);
-        try { op2 = op2.to_primitive(); }
+        try { convertToPrimitive(op2, vm); }
         catch (ActionTypeError& e)
         {
             log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),

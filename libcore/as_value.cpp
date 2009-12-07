@@ -326,7 +326,7 @@ private:
 std::string
 as_value::to_string() const
 {
-	switch (m_type)
+	switch (_type)
 	{
 
 		case STRING:
@@ -352,7 +352,6 @@ as_value::to_string() const
 		}
 
 		case UNDEFINED: 
-
 			// Behavior depends on file version.  In
 			// version 7+, it's "undefined", in versions
 			// 6-, it's "".
@@ -367,10 +366,7 @@ as_value::to_string() const
 			return "null";
 
 		case BOOLEAN:
-		{
-			bool b = getBool();
-			return b ? "true" : "false";
-		}
+			return getBool() ? "true" : "false";
 
 		case OBJECT:
 		{
@@ -378,8 +374,7 @@ as_value::to_string() const
             String_as* s;
             if (isNativeType(obj, s)) return s->value();
 
-			try
-			{
+			try {
 				as_value ret = to_primitive(STRING);
 				// This additional is_string test is NOT compliant with ECMA-262
 				// specification, but seems required for compatibility with the
@@ -389,15 +384,14 @@ as_value::to_string() const
 #endif
 				if ( ret.is_string() ) return ret.to_string();
 			}
-			catch (ActionTypeError& e)
-			{
+			catch (ActionTypeError& e) {
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(_("to_primitive(%s, STRING) threw an ActionTypeError %s"),
 						*this, e.what());
 #endif
 			}
 
-			if (m_type == OBJECT) {
+			if (_type == OBJECT) {
                 return is_function() ? "[type Function]" :
                                        "[type Object]";
             }
@@ -414,7 +408,7 @@ as_value::to_string() const
 std::string
 as_value::to_string_versioned(int version) const
 {
-	if (m_type == UNDEFINED)
+	if (_type == UNDEFINED)
 	{
 		// Version-dependent behavior.
 		if (version <= 6)
@@ -422,8 +416,7 @@ as_value::to_string_versioned(int version) const
 		    return "";
 		}
 		return "undefined";
-	}
-		
+    }	
 	return to_string();
 }
 
@@ -432,7 +425,7 @@ primitive_types
 as_value::ptype() const
 {
 
-	switch (m_type)
+	switch (_type)
 	{
         case STRING: return PTYPE_STRING;
         case NUMBER: return PTYPE_NUMBER;
@@ -452,45 +445,21 @@ as_value::ptype() const
 	return PTYPE_NUMBER;
 }
 
-// Conversion to primitive value.
-as_value
-as_value::to_primitive() const
+as_value::AsType
+as_value::defaultPrimitive(int version) const
 {
-	VM& vm = VM::get();
-	int swfVersion = vm.getSWFVersion();
-
-	AsType hint = NUMBER;
-
-	if (m_type == OBJECT && swfVersion > 5) {
+	if (_type == OBJECT && version > 5) {
         Date_as* d;
-        if (isNativeType(getObj(), d)) hint = STRING;
+        if (isNativeType(getObj(), d)) return STRING;
     }
-
-	return to_primitive(hint);
-}
-
-as_value&
-as_value::convert_to_primitive()
-{
-	VM& vm = VM::get();
-	int swfVersion = vm.getSWFVersion();
-
-	AsType hint = NUMBER;
-
-	if (m_type == OBJECT && swfVersion > 5) {
-        Date_as* d;
-        if (isNativeType<Date_as>(getObj(), d)) hint = STRING;
-    }
-
-    *this = to_primitive(hint);
-    return *this;
+    return NUMBER;
 }
 
 // Conversion to primitive value.
 as_value
 as_value::to_primitive(AsType hint) const
 {
-	if (m_type != OBJECT) return *this; 
+	if (_type != OBJECT) return *this; 
 
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
@@ -503,9 +472,9 @@ as_value::to_primitive(AsType hint) const
 
 	if (hint == NUMBER) {
 
-		if (m_type == DISPLAYOBJECT) return as_value(NaN);
+		if (_type == DISPLAYOBJECT) return as_value(NaN);
 
-        assert(m_type == OBJECT);
+        assert(_type == OBJECT);
 		obj = getObj();
 
 		if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
@@ -524,8 +493,8 @@ as_value::to_primitive(AsType hint) const
 	else {
 		assert(hint == STRING);
 
-		if (m_type == DISPLAYOBJECT) return getCharacterProxy().getTarget();
-        assert(m_type == OBJECT);
+		if (_type == DISPLAYOBJECT) return getCharacterProxy().getTarget();
+        assert(_type == OBJECT);
 		obj = getObj();
 
 		// @@ Moock says, "the value that results from
@@ -558,17 +527,15 @@ as_value::to_primitive(AsType hint) const
 	as_environment env(getVM(*obj));
     fn_call::Args args;
 	as_value ret = invoke(method, env, obj, args);
+
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);
 #endif
-	if (ret.m_type == OBJECT)
-	{
+
+	if (ret._type == OBJECT) {
 		throw ActionTypeError();
 	}
-
-
 	return ret;
-
 }
 
 bool
@@ -617,7 +584,7 @@ as_value::to_number() const
 
     const int swfversion = VM::get().getSWFVersion();
 
-    switch (m_type)
+    switch (_type)
     {
         case STRING:
         {
@@ -735,7 +702,7 @@ as_value::to_element() const
     boost::shared_ptr<amf::Element> el ( new amf::Element );
     as_object* ptr = to_object(*vm.getGlobal());
 
-    switch (m_type) {
+    switch (_type) {
       case UNDEFINED:
 	  el->makeUndefined();
 	  break;
@@ -787,7 +754,7 @@ as_value::to_int() const
 bool
 as_value::to_bool_v7() const
 {
-	    switch (m_type)
+	    switch (_type)
 	    {
 		case  STRING:
 			return getStr() != "";
@@ -804,7 +771,7 @@ as_value::to_bool_v7() const
 		case DISPLAYOBJECT:
 			return true;
 		default:
-			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
+			assert(_type == UNDEFINED || _type == NULLTYPE ||
 				is_exception());
 			return false;
 	}
@@ -814,7 +781,7 @@ as_value::to_bool_v7() const
 bool
 as_value::to_bool_v5() const
 {
-	    switch (m_type)
+	    switch (_type)
 	    {
 		case  STRING:
 		{
@@ -835,7 +802,7 @@ as_value::to_bool_v5() const
 		case DISPLAYOBJECT:
 			return true;
 		default:
-			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
+			assert(_type == UNDEFINED || _type == NULLTYPE ||
 				is_exception());
 			return false;
 	}
@@ -845,7 +812,7 @@ as_value::to_bool_v5() const
 bool
 as_value::to_bool_v6() const
 {
-	    switch (m_type)
+	    switch (_type)
 	    {
 		case  STRING:
 		{
@@ -867,7 +834,7 @@ as_value::to_bool_v6() const
 		case DISPLAYOBJECT:
 			return true;
 		default:
-			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
+			assert(_type == UNDEFINED || _type == NULLTYPE ||
 				is_exception());
 			return false;
 	}
@@ -887,7 +854,7 @@ as_value::to_bool() const
 as_object*
 as_value::to_object(Global_as& global) const
 {
-	switch (m_type)
+	switch (_type)
 	{
 		case OBJECT:
 			return getObj();
@@ -913,7 +880,7 @@ as_value::to_object(Global_as& global) const
 MovieClip*
 as_value::toMovieClip(bool allowUnloaded) const
 {
-	if ( m_type != DISPLAYOBJECT ) return 0;
+	if ( _type != DISPLAYOBJECT ) return 0;
 
 	DisplayObject *ch = getCharacter(allowUnloaded);
 	if ( ! ch ) return 0;
@@ -923,8 +890,7 @@ as_value::toMovieClip(bool allowUnloaded) const
 DisplayObject*
 as_value::toDisplayObject(bool allowUnloaded) const
 {
-	if ( m_type != DISPLAYOBJECT ) return NULL;
-
+	if (_type != DISPLAYOBJECT) return NULL;
 	return getCharacter(allowUnloaded);
 }
 
@@ -933,7 +899,7 @@ as_value::toDisplayObject(bool allowUnloaded) const
 as_function*
 as_value::to_function() const
 {
-    if (m_type == OBJECT) {
+    if (_type == OBJECT) {
 	    return getObj()->to_function();
     }
 
@@ -943,14 +909,14 @@ as_value::to_function() const
 void
 as_value::set_undefined()
 {
-	m_type = UNDEFINED;
+	_type = UNDEFINED;
 	_value = boost::blank();
 }
 
 void
 as_value::set_null()
 {
-	m_type = NULLTYPE;
+	_type = NULLTYPE;
 	_value = boost::blank();
 }
 
@@ -965,13 +931,13 @@ as_value::set_as_object(as_object* obj)
     if (obj->displayObject()) {
         // The static cast is fine as long as the as_object is genuinely
         // a DisplayObject.
-        m_type = DISPLAYOBJECT;
+        _type = DISPLAYOBJECT;
         _value = CharacterProxy(obj->displayObject());
 		return;
 	}
 
-	if (m_type != OBJECT || getObj() != obj) {
-		m_type = OBJECT;
+	if (_type != OBJECT || getObj() != obj) {
+		_type = OBJECT;
 		_value = obj;
 	}
 }
@@ -988,131 +954,109 @@ as_value::equals(const as_value& v) const
 
     int SWFVersion = VM::get().getSWFVersion();
 
-    bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
-    bool v_nulltype = (v.m_type == UNDEFINED || v.m_type == NULLTYPE);
+    bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
+    bool v_nulltype = (v._type == UNDEFINED || v._type == NULLTYPE);
 
     // It seems like functions are considered the same as a NULL type
     // in SWF5 (and I hope below, didn't check)
     //
-    if ( SWFVersion < 6 )
-    {
+    if (SWFVersion < 6) {
         if (is_function()) this_nulltype = true;
         if (v.is_function()) v_nulltype = true;
     }
 
-    if (this_nulltype || v_nulltype)
-    {
+    if (this_nulltype || v_nulltype) {
 #ifdef GNASH_DEBUG_EQUALITY
        log_debug(" one of the two things is undefined or null");
 #endif
         return this_nulltype == v_nulltype;
     }
 
-    bool obj_or_func = (m_type == OBJECT);
-    bool v_obj_or_func = (v.m_type == OBJECT);
+    bool obj_or_func = (_type == OBJECT);
+    bool v_obj_or_func = (v._type == OBJECT);
 
     /// Compare to same type
-    if ( obj_or_func && v_obj_or_func )
-    {
-        return boost::get<as_object*>(_value) == boost::get<as_object*>(v._value); 
+    if (obj_or_func && v_obj_or_func) {
+        return boost::get<as_object*>(_value) ==
+            boost::get<as_object*>(v._value); 
     }
 
-    if ( m_type == v.m_type ) return equalsSameType(v);
+    if (_type == v._type) return equalsSameType(v);
 
     // 16. If Type(x) is Number and Type(y) is String,
     //    return the result of the comparison x == ToNumber(y).
-    if (m_type == NUMBER && v.m_type == STRING)
-    {
-        double n = v.to_number();
+    if (_type == NUMBER && v._type == STRING) {
+        const double n = v.to_number();
         if (!isFinite(n)) return false;
         return equalsSameType(n);
     }
 
     // 17. If Type(x) is String and Type(y) is Number,
     //     return the result of the comparison ToNumber(x) == y.
-    if (v.m_type == NUMBER && m_type == STRING)
-    {
-        double n = to_number();
+    if (v._type == NUMBER && _type == STRING) {
+        const double n = to_number();
         if (!isFinite(n)) return false;
         return v.equalsSameType(n); 
     }
 
     // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
-    if (m_type == BOOLEAN)
-    {
+    if (_type == BOOLEAN) {
         return as_value(to_number()).equals(v); 
     }
 
     // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
-    if (v.m_type == BOOLEAN)
-    {
+    if (v._type == BOOLEAN) {
         return as_value(v.to_number()).equals(*this); 
     }
 
     // 20. If Type(x) is either String or Number and Type(y) is Object,
     //     return the result of the comparison x == ToPrimitive(y).
-    if ( (m_type == STRING || m_type == NUMBER ) && 
-            (v.m_type == OBJECT))
+    if ((_type == STRING || _type == NUMBER) && (v._type == OBJECT))
     {
         // convert this value to a primitive and recurse
-	try
-	{
-		as_value v2 = v.to_primitive(); 
-		if ( v.strictly_equals(v2) ) return false;
-
+        try {
+            as_value v2 = v.to_primitive(v.defaultPrimitive(SWFVersion)); 
+            if (v.strictly_equals(v2)) return false;
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" 20: convertion to primitive : %s -> %s", v, v2);
+            log_debug(" 20: convertion to primitive : %s -> %s", v, v2);
 #endif
-
-		return equals(v2);
-	}
-	catch (ActionTypeError& e)
-	{
+            return equals(v2);
+        }
+        catch (ActionTypeError& e) {
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" %s.to_primitive() threw an ActionTypeError %s", v, e.what());
+            log_debug(" %s.to_primitive() threw an ActionTypeError %s", v,
+                    e.what());
 #endif
-		return false; // no valid conversion
-	}
-
+            return false; 
+        }
     }
 
     // 21. If Type(x) is Object and Type(y) is either String or Number,
     //    return the result of the comparison ToPrimitive(x) == y.
-    if ((v.m_type == STRING || v.m_type == NUMBER) && 
-            (m_type == OBJECT))
-    {
+    if ((v._type == STRING || v._type == NUMBER) && (_type == OBJECT)) {
         // convert this value to a primitive and recurse
-        try
-        {
+        try {
             // Date objects default to primitive type STRING from SWF6 up,
             // but we always prefer valueOf to toString in this case.
         	as_value v2 = to_primitive(NUMBER); 
-            if ( strictly_equals(v2) ) return false;
-
+            if (strictly_equals(v2)) return false;
 #ifdef GNASH_DEBUG_EQUALITY
             log_debug(" 21: convertion to primitive : %s -> %s", *this, v2);
 #endif
-
             return v2.equals(v);
         }
-        catch (ActionTypeError& e)
-        {
-
+        catch (ActionTypeError& e) {
 #ifdef GNASH_DEBUG_EQUALITY
             log_debug(" %s.to_primitive() threw an ActionTypeError %s",
                     *this, e.what());
 #endif
-
-            return false; // no valid conversion
+            return false; 
         }
-
     }
 
-
 #ifdef GNASH_DEBUG_EQUALITY
-	// Both operands are objects (OBJECT,AS_FUNCTION,DISPLAYOBJECT)
-	if ( ! is_object() || ! v.is_object() )
-	{
+	// Both operands are objects (OBJECT,DISPLAYOBJECT)
+	if (!is_object() || !v.is_object()) {
 		log_debug("Equals(%s,%s)", *this, v);
 	}
 #endif
@@ -1122,48 +1066,44 @@ as_value::equals(const as_value& v) const
 	as_value p = *this;
 	as_value vp = v;
 
-	int converted = 0;
-	try
-	{
-		p = to_primitive(); 
-		if ( ! strictly_equals(p) ) ++converted;
+    bool converted(false);
+
+	try {
+		p = to_primitive(p.defaultPrimitive(SWFVersion)); 
+		if (!strictly_equals(p)) converted = true;
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" convertion to primitive (this): %s -> %s", *this, p);
 #endif
 	}
-	catch (ActionTypeError& e)
-	{
+	catch (ActionTypeError& e) {
 #ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
 		log_debug(" %s.to_primitive() threw an ActionTypeError %s",
 			*this, e.what());
 #endif
 	}
 
-	try
-	{
-		vp = v.to_primitive(); 
-		if ( ! v.strictly_equals(vp) ) ++converted;
+	try {
+		vp = v.to_primitive(v.defaultPrimitive(SWFVersion)); 
+		if (!v.strictly_equals(vp)) converted = true;
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" convertion to primitive (that): %s -> %s", v, vp);
 #endif
 	}
-	catch (ActionTypeError& e)
-	{
+	catch (ActionTypeError& e) {
 #ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
 		log_debug(" %s.to_primitive() threw an ActionTypeError %s",
 			v, e.what());
 #endif
 	}
 
-	if ( converted )
+	if (converted)
 	{
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" some conversion took place, recurring");
 #endif
 		return p.equals(vp);
 	}
-	else
-	{
+	else {
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" no conversion took place, returning false");
 #endif
@@ -1178,14 +1118,14 @@ void
 as_value::string_concat(const std::string& str)
 {
     std::string currVal = to_string();
-    m_type = STRING;
+    _type = STRING;
     _value = currVal + str;
 }
 
 const char*
 as_value::typeOf() const
 {
-	switch(m_type)
+	switch(_type)
 	{
 		case as_value::UNDEFINED:
 			return "undefined"; 
@@ -1231,8 +1171,8 @@ as_value::equalsSameType(const as_value& v) const
     static int count=0;
     log_debug("equalsSameType(%s, %s) called [%d]", *this, v, count++);
 #endif
-	assert(m_type == v.m_type);
-	switch (m_type)
+	assert(_type == v._type);
+	switch (_type)
 	{
 		case UNDEFINED:
 		case NULLTYPE:
@@ -1275,7 +1215,7 @@ as_value::equalsSameType(const as_value& v) const
 bool
 as_value::strictly_equals(const as_value& v) const
 {
-	if ( m_type != v.m_type ) return false;
+	if ( _type != v._type ) return false;
 	return equalsSameType(v);
 }
 
@@ -1284,7 +1224,7 @@ as_value::toDebugString() const
 {
     boost::format ret;
 
-	switch (m_type)
+	switch (_type)
 	{
 		case UNDEFINED:
 			return "[undefined]";
@@ -1345,7 +1285,7 @@ as_value::toDebugString() const
 void
 as_value::operator=(const as_value& v)
 {
-	m_type = v.m_type;
+	_type = v._type;
 	_value = v._value;
 }
 
@@ -1459,7 +1399,7 @@ void
 as_value::setReachable() const
 {
 #ifdef GNASH_USE_GC
-	switch (m_type)
+	switch (_type)
 	{
 		case OBJECT:
 		{
@@ -1482,14 +1422,14 @@ as_value::setReachable() const
 as_object*
 as_value::getObj() const
 {
-	assert(m_type == OBJECT);
+	assert(_type == OBJECT);
 	return boost::get<as_object*>(_value);
 }
 
 CharacterProxy
 as_value::getCharacterProxy() const
 {
-	assert(m_type == DISPLAYOBJECT);
+	assert(_type == DISPLAYOBJECT);
 	return boost::get<CharacterProxy>(_value);
 }
 
@@ -1502,62 +1442,62 @@ as_value::getCharacter(bool allowUnloaded) const
 void
 as_value::set_string(const std::string& str)
 {
-	m_type = STRING;
+	_type = STRING;
 	_value = str;
 }
 
 void
 as_value::set_double(double val)
 {
-	m_type = NUMBER;
+	_type = NUMBER;
 	_value = val;
 }
 
 void
 as_value::set_bool(bool val)
 {
-	m_type = BOOLEAN;
+	_type = BOOLEAN;
 	_value = val;
 }
 
 as_value::as_value()
 	:
-	m_type(UNDEFINED),
+	_type(UNDEFINED),
 	_value(boost::blank())
 {
 }
 
 as_value::as_value(const as_value& v)
 	:
-	m_type(v.m_type),
+	_type(v._type),
 	_value(v._value)
 {
 }
 
 as_value::as_value(const char* str)
 	:
-	m_type(STRING),
+	_type(STRING),
 	_value(std::string(str))
 {
 }
 
 as_value::as_value(const std::string& str)
 	:
-	m_type(STRING),
+	_type(STRING),
 	_value(str)
 {
 }
 
 as_value::as_value(double num)
 	:
-	m_type(NUMBER),
+	_type(NUMBER),
 	_value(num)
 {
 }
 
 as_value::as_value(as_object* obj)
 	:
-	m_type(UNDEFINED)
+	_type(UNDEFINED)
 {
 	set_as_object(obj);
 }
@@ -1565,13 +1505,13 @@ as_value::as_value(as_object* obj)
 bool
 as_value::is_function() const
 {
-    return m_type == OBJECT && getObj()->to_function();
+    return _type == OBJECT && getObj()->to_function();
 }
 
 /// Instantiate this value from an AMF element 
 as_value::as_value(const amf::Element& el)
 	:
-	m_type(UNDEFINED)
+	_type(UNDEFINED)
 {
     
     VM& vm = VM::get();
@@ -1609,7 +1549,7 @@ as_value::as_value(const amf::Element& el)
 #endif
             log_unimpl("DISPLAYOBJECT AMF0 type");
             set_undefined();
-            //m_type = DISPLAYOBJECT;
+            //_type = DISPLAYOBJECT;
             //_value = el.getData();
 
             break;
@@ -1745,7 +1685,7 @@ as_value::as_value(const amf::Element& el)
 	  set_double(num);
 	  break;
       }
-      //if (swfVersion > 5) m_type = STRING;
+      //if (swfVersion > 5) _type = STRING;
       
       case amf::Element::UNSUPPORTED_AMF0:
       {
@@ -2123,10 +2063,10 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
     assert (!is_exception());
 
-    switch (m_type)
+    switch (_type)
     {
         default:
-            log_unimpl(_("serialization of as_value of type %d"), m_type);
+            log_unimpl(_("serialization of as_value of type %d"), _type);
             return false;
 
         case OBJECT:
@@ -2334,6 +2274,15 @@ convertToBoolean(as_value& v, VM& /*vm*/)
     v.set_bool(v.to_bool());
     return v;
 }
+
+as_value&
+convertToPrimitive(as_value& v, VM& vm)
+{
+    const as_value::AsType t(v.defaultPrimitive(vm.getSWFVersion()));
+    v = v.to_primitive(t);
+    return v;
+}
+
 } // namespace gnash
 
 
