@@ -612,7 +612,7 @@ public:
         args += b, a;
         ret = invoke(cmp_method, _env, _object, args);
 
-        return (*_zeroCmp)(ret.to_int());
+        return (*_zeroCmp)(toInt(ret));
     }
 };
 
@@ -825,7 +825,7 @@ checkArrayLength(as_object& array, const ObjectURI& uri, const as_value& val)
 {
     const string_table::key name = getName(uri);
     if (name == NSV::PROP_LENGTH) {
-        resizeArray(array, val.to_int());
+        resizeArray(array, toInt(val));
         return;
     }
 
@@ -845,7 +845,7 @@ arrayLength(as_object& array)
     as_value length;
     if (!array.get_member(NSV::PROP_LENGTH, &length)) return 0;
     
-    const int size = length.to_int();
+    const int size = toInt(length);
     if (size < 0) return 0;
     return size;
 }
@@ -949,7 +949,7 @@ array_splice(const fn_call& fn)
     // Get start offset
     //----------------
 
-    int start = fn.arg(0).to_int();
+    int start = toInt(fn.arg(0));
     if (start < 0) start = size + start; 
     start = clamp<int>(start, 0, size);
 
@@ -957,7 +957,7 @@ array_splice(const fn_call& fn)
     size_t remove = size - start;
     
     if (fn.nargs > 1) {
-        int remval = fn.arg(1).to_int();
+        int remval = toInt(fn.arg(1));
         if (remval < 0) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Array.splice(%d,%d): negative length "
@@ -1177,7 +1177,7 @@ array_sortOn(const fn_call& fn)
         // case: sortOn(["prop1", "prop2"], Array.FLAG)
         else {
             boost::uint8_t flags = 
-                static_cast<boost::uint8_t>(fn.arg(1).to_int());
+                static_cast<boost::uint8_t>(toInt(fn.arg(1)));
             flags = flag_preprocess(flags, &do_unique, &do_index);
             as_cmp_fn c = get_basic_cmp(flags, version);
 
@@ -1402,10 +1402,10 @@ array_slice(const fn_call& fn)
         );
     }
 
-    int startindex = fn.nargs ? fn.arg(0).to_int() : 0;
+    int startindex = fn.nargs ? toInt(fn.arg(0)) : 0;
 
     // if we sent at least two arguments, setup endindex
-    int endindex = fn.nargs > 1 ? fn.arg(1).to_int() :
+    int endindex = fn.nargs > 1 ? toInt(fn.arg(1)) :
         std::numeric_limits<int>::max();
 
     Global_as& gl = getGlobal(fn);
@@ -1435,7 +1435,7 @@ array_new(const fn_call& fn)
     }
 
     if (fn.nargs == 1 && fn.arg(0).is_number()) {
-        int newSize = fn.arg(0).to_int();
+        int newSize = toInt(fn.arg(0));
         if (newSize < 0) newSize = 0;
         else {
             ao->set_member(NSV::PROP_LENGTH, newSize);

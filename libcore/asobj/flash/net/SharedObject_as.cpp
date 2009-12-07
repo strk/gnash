@@ -952,7 +952,7 @@ sharedobject_flush(const fn_call& fn)
 
     int space = 0;
     if (fn.nargs) {
-        space = fn.arg(0).to_int();
+        space = toInt(fn.arg(0));
     }
 
     /// If there is no data member, returns undefined.

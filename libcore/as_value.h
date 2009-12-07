@@ -91,10 +91,28 @@ enum primitive_types
 
 /// ActionScript value type.
 //
-/// Any ActionScript value is stored into an instance of this
-/// class. The instance keeps primitive types by value and
-/// composite types by reference (smart pointer).
-///
+/// The as_value class can store basic ActionScript types.
+//
+/// These are the primitive types (Number, Boolean, String, null, and
+/// undefined), as well as complex types (Object and DisplayObject).
+//
+/// Most type handling is hidden within the class. There are two different
+/// types of access to the as_value: converting and non-converting.
+//
+/// Non-converting access
+/// Non-converting access is available for the complex types, for instance
+/// to_function() and toMovieClip(). In these cases, an object pointer is
+/// return only if the as_value is currently of the requested type. There
+/// are no ActionScript side-effects in such cases.
+//
+/// Converting access
+/// The primitive types and Objects have converting access. This means that
+/// as_values of a different type are converted to the requested type. These
+/// functions may have ActionScript side-effects, for instance the calling of
+/// toString or valueOf, or construction of an object.
+//
+/// It is possible to check the current type of an as_value using is_string(),
+/// is_number() etc. These functions have no ActionScript side effects.
 class as_value
 {
 
@@ -119,14 +137,14 @@ public:
 		DISPLAYOBJECT_EXCEPT
 	};
 
-	/// Construct an UNDEFINED value
+	/// Construct an undefined value
 	DSOEXPORT as_value();
 
-	/// Construct a STRING value 
+	/// Construct a primitive String value 
 	as_value(const char* str);
 	as_value(const std::string& str);
 
-	/// Construct a BOOLEAN value
+	/// Construct a primitive Boolean value
 	template <typename T>
 	as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type*
             dummy = 0)
@@ -137,51 +155,19 @@ public:
 		UNUSED(dummy);
 	}
 
-	/// Construct a NUMBER value
+	/// Construct a primitive Number value
 	as_value(double val);
 	
-	/// Construct a NULL, OBJECT, or DISPLAYOBJECT value
+	/// Construct a null, Object, or DisplayObject value
 	as_value(as_object* obj);
 
 	/// Copy constructor.
 	as_value(const as_value& value);
 
+#if 0
 	/// Construct a value from an AMF element
 	as_value(const amf::Element& el);
-
-	/// Convert numeric value to string value, following ECMA-262 specification
-	//
-	// Printing formats:
-	//
-	// If _val > 1, Print up to 15 significant digits, then switch
-	// to scientific notation, rounding at the last place and
-	// omitting trailing zeroes.
-	// For values < 1, print up to 4 leading zeroes after the
-	// decimal point, then switch to scientific notation with up
-	// to 15 significant digits, rounding with no trailing zeroes
-	// If the value is negative, just add a '-' to the start; this
-	// does not affect the precision of the printed value.
-	//
-	// This almost corresponds to iomanip's std::setprecision(15)
-	// format, except that iomanip switches to scientific notation
-	// at e-05 not e-06, and always prints at least two digits for the exponent.
-	static std::string doubleToString(double val, int radix=10);
-
-    /// Try to parse a string into a 32-bit signed int using base 8 or 16.  //
-    /// This function will throw a boost::bad_lexical_cast (or a derived
-    /// exception) if the passed string cannot be converted.
-    //
-    /// @param s      The string to parse
-    /// @param d      The 32-bit int represented as a double. This is only a
-    ///               valid number if the return value is true.
-    /// @param whole  If true, expect the whole string to be valid, i.e.
-    ///               throw if there are any invalid DisplayObjects. If false,
-    ///               returns any valid number up to the first invalid
-    ///               DisplayObject.
-    /// @return       True if the string was non-decimal and successfully
-    ///               parsed.
-    static bool parseNonDecimalInt(const std::string& s, double& d,
-            bool whole = true);
+#endif
 
 	/// Return the primitive type of this value as a string.
 	const char* typeOf() const;
@@ -219,10 +205,6 @@ public:
 	/// Get a std::string representation for this value.
 	std::string to_string() const;
 
-    // Used for operator<< to give useful information about an
-    // as_value object.
-	DSOEXPORT std::string toDebugString() const;
-
 	/// Get a string representation for this value.
 	//
 	/// This differs from to_string() in that returned
@@ -236,34 +218,18 @@ public:
 	std::string to_string_versioned(int version) const;
 
 	/// Get a number representation for this value
-	double to_number() const;
-
-	/// Get an AMF element representation for this value
-    boost::shared_ptr<amf::Element> to_element() const;
-
-	/// AS-compatible conversion to 32bit integer
     //
-    /// This truncates large numbers to fit in the 32-bit space.
-	boost::int32_t to_int() const;
+    /// This function performs conversion if necessary.
+	double to_number() const;
 
 	/// Conversion to boolean.
 	//
-	/// Will call version-dependent functions
-	/// based on current version.
+    /// This function performs conversion if necessary.
 	bool to_bool() const;
-
-	/// Conversion to boolean for SWF7 and up
-	bool to_bool_v7() const;
-
-	/// Conversion to boolean for SWF6
-	bool to_bool_v6() const;
-
-	/// Conversion to boolean up to SWF5
-	bool to_bool_v5() const;
 
 	/// Return value as an object, converting primitive values as needed.
 	//
-    /// This function does perform a conversion.
+    /// This function performs conversion where necessary.
     //
 	/// string values are converted to String objects
 	/// numeric values are converted to Number objects
@@ -309,6 +275,13 @@ public:
     /// is not a function.
 	as_function* to_function() const;
 
+	/// Get an AMF element representation for this value
+    boost::shared_ptr<amf::Element> to_element() const;
+
+    // Used for operator<< to give useful information about an
+    // as_value object.
+	DSOEXPORT std::string toDebugString() const;
+
 	AsType defaultPrimitive(int version) const;
 
 	/// Return value as a primitive type, with a preference
@@ -325,25 +298,19 @@ public:
 	///
 	as_value to_primitive(AsType hint) const;
 
-	as_value& convert_to_primitive();
-
+    /// Set to a primitive string.
 	void set_string(const std::string& str);
 
+    /// Set to a primitive number.
 	void set_double(double val);
 
+    /// Set to a primitive boolean.
 	void set_bool(bool val);
 
-	void set_nan() { set_double(NaN); }
-
 	/// Make this value a NULL, OBJECT, DISPLAYOBJECT value
-	//
-	/// See as_object::to_movie and as_object::to_function
-	///
-	/// Internally adds a reference to the ref-counted as_object, 
-	/// if not-null
-	///
 	void set_as_object(as_object* obj);
 
+    /// Set to undefined.
 	void set_undefined();
 
 	/// Set this value to the NULL value
@@ -351,11 +318,17 @@ public:
 
 	void operator=(const as_value& v);
 
-	bool is_undefined() const { return (_type == UNDEFINED); }
+	bool is_undefined() const {
+        return (_type == UNDEFINED);
+    }
 
-	bool is_null() const { return (_type == NULLTYPE); }
+	bool is_null() const {
+        return (_type == NULLTYPE);
+    }
 
-	bool is_bool() const { return (_type == BOOLEAN); }
+	bool is_bool() const {
+        return (_type == BOOLEAN);
+    }
 
     bool is_exception() const {
         return (_type == UNDEFINED_EXCEPT || _type == NULLTYPE_EXCEPT
@@ -501,6 +474,15 @@ private:
 	///
 	bool equalsSameType(const as_value& v) const;
 
+	/// Conversion to boolean for SWF7 and up
+	bool to_bool_v7() const;
+
+	/// Conversion to boolean for SWF6
+	bool to_bool_v6() const;
+
+	/// Conversion to boolean up to SWF5
+	bool to_bool_v5() const;
+
 	AsType _type;
 
     AsValueType _value;
@@ -561,6 +543,54 @@ as_value& convertToPrimitive(as_value& v, VM& vm);
 
 inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
 	return os << v.toDebugString();
+}
+
+/// Convert numeric value to string value, following ECMA-262 specification
+//
+// Printing formats:
+//
+// If _val > 1, Print up to 15 significant digits, then switch
+// to scientific notation, rounding at the last place and
+// omitting trailing zeroes.
+// For values < 1, print up to 4 leading zeroes after the
+// decimal point, then switch to scientific notation with up
+// to 15 significant digits, rounding with no trailing zeroes
+// If the value is negative, just add a '-' to the start; this
+// does not affect the precision of the printed value.
+//
+// This almost corresponds to iomanip's std::setprecision(15)
+// format, except that iomanip switches to scientific notation
+// at e-05 not e-06, and always prints at least two digits for the exponent.
+std::string doubleToString(double val, int radix = 10);
+
+/// Try to parse a string into a 32-bit signed int using base 8 or 16.  //
+/// This function will throw a boost::bad_lexical_cast (or a derived
+/// exception) if the passed string cannot be converted.
+//
+/// @param s      The string to parse
+/// @param d      The 32-bit int represented as a double. This is only a
+///               valid number if the return value is true.
+/// @param whole  If true, expect the whole string to be valid, i.e.
+///               throw if there are any invalid DisplayObjects. If false,
+///               returns any valid number up to the first invalid
+///               DisplayObject.
+/// @return       True if the string was non-decimal and successfully
+///               parsed.
+bool parseNonDecimalInt(const std::string& s, double& d, bool whole = true);
+
+/// AS2-compatible conversion to 32bit integer
+//
+/// This truncates large numbers to fit in the 32-bit space. It is not a 
+/// proper function of as_value because it is simply a further operation on
+/// the stored number type.
+//
+/// This function calls to_number(), so performs a conversion if necessary.
+boost::int32_t toInt(const as_value& val);
+
+/// Set a value to NaN
+inline void
+setNaN(as_value& v) {
+    v.set_double(NaN);
 }
 
 } // namespace gnash

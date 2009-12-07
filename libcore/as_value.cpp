@@ -538,46 +538,6 @@ as_value::to_primitive(AsType hint) const
 	return ret;
 }
 
-bool
-as_value::parseNonDecimalInt(const std::string& s, double& d, bool whole)
-{
-    const std::string::size_type slen = s.length();
-
-    // "0#" would still be octal, but has the same value as a decimal.
-    if (slen < 3) return false;
-
-    bool negative = false;
-
-    if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
-    {
-        // The only legitimate place for a '-' is after 0x. If it's a
-        // '+' we don't care, as it won't disturb the conversion.
-        std::string::size_type start = 2;
-        if (s[2] == '-') {
-            negative = true;
-            ++start;
-        }
-        d = parsePositiveInt(s.substr(start), BASE_HEX, whole);
-        if (negative) d = -d;
-        return true;
-    }
-    else if ((s[0] == '0' || ((s[0] == '-' || s[0] == '+') && s[1] == '0')) &&
-            s.find_first_not_of("01234567", 1) == std::string::npos)
-    {
-        std::string::size_type start = 0;
-        if (s[0] == '-') {
-            negative = true;
-            ++start;
-        }
-        d = parsePositiveInt(s.substr(start), BASE_OCT, whole);
-        if (negative) d = -d;
-        return true;
-    }
-
-    return false;
-
-}
-
 double
 as_value::to_number() const
 {
@@ -735,19 +695,6 @@ as_value::to_element() const
     }
 
     return el;
-}
-
-// This returns an as_value as an integer. It is
-// probably used for most implicit conversions to 
-// int, for instance in the String class.
-boost::int32_t
-as_value::to_int() const
-{
-	double d = to_number();
-
-	if (!isFinite(d)) return 0;
-
-    return truncateToInt(d);
 }
 
 // Conversion to boolean for SWF7 and up
@@ -1289,112 +1236,6 @@ as_value::operator=(const as_value& v)
 	_value = v._value;
 }
 
-/// Examples:
-//
-/// e.g. for 9*.1234567890123456789:
-/// 9999.12345678901
-/// 99999.123456789
-/// 999999.123456789
-/// 9999999.12345679
-/// [...]
-/// 999999999999.123
-/// 9999999999999.12
-/// 99999999999999.1
-/// 999999999999999
-/// 1e+16
-/// 1e+17
-//
-/// For 1*.111111111111111111111111111111111111:
-/// 1111111111111.11
-/// 11111111111111.1
-/// 111111111111111
-/// 1.11111111111111e+15
-/// 1.11111111111111e+16
-//
-/// For 1.234567890123456789 * 10^-i:
-/// 1.23456789012346
-/// 0.123456789012346
-/// 0.0123456789012346
-/// 0.00123456789012346
-/// 0.000123456789012346
-/// 0.0000123456789012346
-/// 0.00000123456789012346
-/// 1.23456789012346e-6
-/// 1.23456789012346e-7
-std::string
-as_value::doubleToString(double val, int radix)
-{
-	// Handle non-numeric values.
-	if (isNaN(val)) return "NaN";
-	
-    if (isInf(val)) return val < 0 ? "-Infinity" : "Infinity";
-
-    if (val == 0.0 || val == -0.0) return "0"; 
-
-    std::ostringstream ostr;
-
-	if (radix == 10)
-	{
-		// ActionScript always expects dot as decimal point.
-		ostr.imbue(std::locale::classic()); 
-		
-		// force to decimal notation for this range (because the
-        // reference player does)
-		if (std::abs(val) < 0.0001 && std::abs(val) >= 0.00001)
-		{
-			// All nineteen digits (4 zeros + up to 15 significant digits)
-			ostr << std::fixed << std::setprecision(19) << val;
-			
-            std::string str = ostr.str();
-			
-			// Because 'fixed' also adds trailing zeros, remove them.
-			std::string::size_type pos = str.find_last_not_of('0');
-			if (pos != std::string::npos) {
-				str.erase(pos + 1);
-			}
-            return str;
-		}
-
-        ostr << std::setprecision(15) << val;
-        
-        std::string str = ostr.str();
-        
-        // Remove a leading zero from 2-digit exponent if any
-        std::string::size_type pos = str.find("e", 0);
-
-        if (pos != std::string::npos && str.at(pos + 2) == '0') {
-            str.erase(pos + 2, 1);
-        }
-
-        return str;
-	}
-
-    // Radix isn't 10
-	bool negative = (val < 0);
-	if (negative) val = -val;
-
-	double left = std::floor(val);
-	if (left < 1) return "0";
-
-    std::string str;
-    const std::string digits = "0123456789abcdefghijklmnopqrstuvwxyz";
-
-    // Construct the string backwards for speed, then reverse.
-    while (left)
-	{
-		double n = left;
-		left = std::floor(left / radix);
-		n -= (left * radix);
-		str.push_back(digits[static_cast<int>(n)]);
-	}
-	if (negative) str.push_back('-'); 
-
-    std::reverse(str.begin(), str.end());
-
-	return str;
-	
-}
-
 void
 as_value::setReachable() const
 {
@@ -1506,211 +1347,6 @@ bool
 as_value::is_function() const
 {
     return _type == OBJECT && getObj()->to_function();
-}
-
-/// Instantiate this value from an AMF element 
-as_value::as_value(const amf::Element& el)
-	:
-	_type(UNDEFINED)
-{
-    
-    VM& vm = VM::get();
-    string_table& st = vm.getStringTable();
-    Global_as& gl = *vm.getGlobal();
-
-    switch (el.getType()) {
-      case amf::Element::NOTYPE:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-	  log_debug("as_value(Element&) : AMF type NO TYPE!");
-#endif
-	  break;
-      }
-      case amf::Element::NULL_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type NULL");
-#endif
-            set_null();
-            break;
-      }
-      case amf::Element::UNDEFINED_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type UNDEFINED");
-#endif
-            set_undefined();
-            break;
-      }
-      case amf::Element::MOVIECLIP_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type DISPLAYOBJECT");
-#endif
-            log_unimpl("DISPLAYOBJECT AMF0 type");
-            set_undefined();
-            //_type = DISPLAYOBJECT;
-            //_value = el.getData();
-
-            break;
-      }
-      case amf::Element::NUMBER_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type NUMBER");
-#endif
-            double num = el.to_number();
-            set_double(num);
-            break;
-      }
-      case amf::Element::BOOLEAN_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type BOOLEAN");
-#endif
-            bool flag = el.to_bool();
-            set_bool(flag);
-            break;
-      }
-
-      case amf::Element::STRING_AMF0:
-      case amf::Element::LONG_STRING_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type STRING");
-#endif
-	    std::string str;
-	    // If there is data, convert it to a string for the as_value
-	    if (el.getDataSize() != 0) {
-		str = el.to_string();
-		// Element's store the property name as the name, not as data.
-	    } else if (el.getNameSize() != 0) {
-		str = el.getName();
-	    }
-	    
-	    set_string(str);
-            break;
-      }
-
-      case amf::Element::OBJECT_AMF0:
-      {
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-          log_debug("as_value(Element&) : AMF type OBJECT");
-#endif
-          as_object* obj = gl.createObject();
-          if (el.propertySize()) {
-              for (size_t i=0; i < el.propertySize(); i++) {
-		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-		  if (prop == 0) {
-		      break;
-		  } else {
-		      if (prop->getNameSize() == 0) {
-			  log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
-		      } else {
-			  obj->set_member(st.find(prop->getName()), as_value(*prop));
-		      }
-		  }
-              }
-          }
-	  set_as_object(obj);
-          break;
-      }
-
-      case amf::Element::ECMA_ARRAY_AMF0:
-      {
-          // TODO: fixme: ECMA_ARRAY has an additional fiedl, dunno
-          //              if accessible trought Element class
-          //              (the theoretic number of elements in it)
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-          log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
-#endif
-
-          as_object* obj = gl.createArray();
-
-          if (el.propertySize()) {
-              for (size_t i=0; i < el.propertySize(); i++) {
-		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-		  if (prop == 0) {
-		      break;
-		  } else {
-		      obj->set_member(st.find(prop->getName()), as_value(*prop));
-		  }
-              }
-          }
-          set_as_object(obj);
-          break;
-      }
-    
-
-      case amf::Element::STRICT_ARRAY_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-          log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
-#endif
-          as_object* obj = gl.createArray();
-          size_t len = el.propertySize();
-          obj->set_member(NSV::PROP_LENGTH, len);
-
-          for (size_t i=0; i < el.propertySize(); i++) {
-              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-              if (prop == 0) {
-                  break;
-              } else {
-		  if (prop->getNameSize() == 0) {
-		      log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
-		  } else {
-		      obj->set_member(st.find(prop->getName()), as_value(*prop));
-		  }
-              }
-          }
-          
-          set_as_object(obj);
-          break;
-      }
-
-      case amf::Element::REFERENCE_AMF0:
-      {
-        log_unimpl("REFERENCE Element to as_value");
-        break;
-      }
-
-      case amf::Element::DATE_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-	  log_debug("as_value(Element&) : AMF type DATE");
-#endif
-	  double num = el.to_number();
-	  set_double(num);
-	  break;
-      }
-      //if (swfVersion > 5) _type = STRING;
-      
-      case amf::Element::UNSUPPORTED_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-	  log_debug("as_value(Element&) : AMF type UNSUPPORTED");
-#endif
-	  break;
-      }
-      case amf::Element::RECORD_SET_AMF0:
-          log_unimpl("Record Set data type is not supported yet");
-          break;
-      case amf::Element::XML_OBJECT_AMF0:
-          log_unimpl("XML data type is not supported yet");
-          break;
-      case amf::Element::TYPED_OBJECT_AMF0:
-          log_unimpl("Typed Object data type is not supported yet");
-          break;
-      case amf::Element::AMF3_DATA:
-          log_unimpl("AMF3 data type is not supported yet");
-          break;
-      default:
-          log_unimpl("Element to as_value - unsupported Element type %d", 
-                  el.getType());
-          break;
-    }
 }
 
 // Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
@@ -2251,6 +1887,161 @@ as_value::writeAMF0(SimpleBuffer& buf,
     }
 }
 
+
+boost::int32_t
+toInt(const as_value& val) 
+{
+	const double d = val.to_number();
+
+	if (!isFinite(d)) return 0;
+
+    return truncateToInt(d);
+}
+
+bool
+parseNonDecimalInt(const std::string& s, double& d, bool whole)
+{
+    const std::string::size_type slen = s.length();
+
+    // "0#" would still be octal, but has the same value as a decimal.
+    if (slen < 3) return false;
+
+    bool negative = false;
+
+    if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
+        // The only legitimate place for a '-' is after 0x. If it's a
+        // '+' we don't care, as it won't disturb the conversion.
+        std::string::size_type start = 2;
+        if (s[2] == '-') {
+            negative = true;
+            ++start;
+        }
+        d = parsePositiveInt(s.substr(start), BASE_HEX, whole);
+        if (negative) d = -d;
+        return true;
+    }
+    else if ((s[0] == '0' || ((s[0] == '-' || s[0] == '+') && s[1] == '0')) &&
+            s.find_first_not_of("01234567", 1) == std::string::npos) {
+
+        std::string::size_type start = 0;
+        if (s[0] == '-') {
+            negative = true;
+            ++start;
+        }
+        d = parsePositiveInt(s.substr(start), BASE_OCT, whole);
+        if (negative) d = -d;
+        return true;
+    }
+
+    return false;
+
+}
+
+std::string
+doubleToString(double val, int radix)
+{
+    // Examples:
+    //
+    // e.g. for 9*.1234567890123456789:
+    // 9999.12345678901
+    // 99999.123456789
+    // 999999.123456789
+    // 9999999.12345679
+    // [...]
+    // 999999999999.123
+    // 9999999999999.12
+    // 99999999999999.1
+    // 999999999999999
+    // 1e+16
+    // 1e+17
+    //
+    // For 1*.111111111111111111111111111111111111:
+    // 1111111111111.11
+    // 11111111111111.1
+    // 111111111111111
+    // 1.11111111111111e+15
+    // 1.11111111111111e+16
+    //
+    // For 1.234567890123456789 * 10^-i:
+    // 1.23456789012346
+    // 0.123456789012346
+    // 0.0123456789012346
+    // 0.00123456789012346
+    // 0.000123456789012346
+    // 0.0000123456789012346
+    // 0.00000123456789012346
+    // 1.23456789012346e-6
+    // 1.23456789012346e-7
+
+	// Handle non-numeric values.
+	if (isNaN(val)) return "NaN";
+	
+    if (isInf(val)) return val < 0 ? "-Infinity" : "Infinity";
+
+    if (val == 0.0 || val == -0.0) return "0"; 
+
+    std::ostringstream ostr;
+
+	if (radix == 10) {
+
+		// ActionScript always expects dot as decimal point.
+		ostr.imbue(std::locale::classic()); 
+		
+		// force to decimal notation for this range (because the
+        // reference player does)
+		if (std::abs(val) < 0.0001 && std::abs(val) >= 0.00001) {
+
+			// All nineteen digits (4 zeros + up to 15 significant digits)
+			ostr << std::fixed << std::setprecision(19) << val;
+			
+            std::string str = ostr.str();
+			
+			// Because 'fixed' also adds trailing zeros, remove them.
+			std::string::size_type pos = str.find_last_not_of('0');
+			if (pos != std::string::npos) {
+				str.erase(pos + 1);
+			}
+            return str;
+		}
+
+        ostr << std::setprecision(15) << val;
+        
+        std::string str = ostr.str();
+        
+        // Remove a leading zero from 2-digit exponent if any
+        std::string::size_type pos = str.find("e", 0);
+
+        if (pos != std::string::npos && str.at(pos + 2) == '0') {
+            str.erase(pos + 2, 1);
+        }
+
+        return str;
+	}
+
+    // Radix isn't 10
+	bool negative = (val < 0);
+	if (negative) val = -val;
+
+	double left = std::floor(val);
+	if (left < 1) return "0";
+
+    std::string str;
+    const std::string digits = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+    // Construct the string backwards for speed, then reverse.
+    while (left) {
+		double n = left;
+		left = std::floor(left / radix);
+		n -= (left * radix);
+		str.push_back(digits[static_cast<int>(n)]);
+	}
+	if (negative) str.push_back('-'); 
+
+    std::reverse(str.begin(), str.end());
+
+	return str;
+}
+
 /// Force type to number.
 as_value&
 convertToNumber(as_value& v, VM& /*vm*/)
@@ -2283,6 +2074,213 @@ convertToPrimitive(as_value& v, VM& vm)
     return v;
 }
 
+#if 0
+
+/// Instantiate this value from an AMF element 
+as_value::as_value(const amf::Element& el)
+	:
+	_type(UNDEFINED)
+{
+    
+    VM& vm = VM::get();
+    string_table& st = vm.getStringTable();
+    Global_as& gl = *vm.getGlobal();
+
+    switch (el.getType()) {
+      case amf::Element::NOTYPE:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type NO TYPE!");
+#endif
+	  break;
+      }
+      case amf::Element::NULL_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type NULL");
+#endif
+            set_null();
+            break;
+      }
+      case amf::Element::UNDEFINED_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type UNDEFINED");
+#endif
+            set_undefined();
+            break;
+      }
+      case amf::Element::MOVIECLIP_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type DISPLAYOBJECT");
+#endif
+            log_unimpl("DISPLAYOBJECT AMF0 type");
+            set_undefined();
+            //_type = DISPLAYOBJECT;
+            //_value = el.getData();
+
+            break;
+      }
+      case amf::Element::NUMBER_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type NUMBER");
+#endif
+            double num = el.to_number();
+            set_double(num);
+            break;
+      }
+      case amf::Element::BOOLEAN_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type BOOLEAN");
+#endif
+            bool flag = el.to_bool();
+            set_bool(flag);
+            break;
+      }
+
+      case amf::Element::STRING_AMF0:
+      case amf::Element::LONG_STRING_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type STRING");
+#endif
+	    std::string str;
+	    // If there is data, convert it to a string for the as_value
+	    if (el.getDataSize() != 0) {
+		str = el.to_string();
+		// Element's store the property name as the name, not as data.
+	    } else if (el.getNameSize() != 0) {
+		str = el.getName();
+	    }
+	    
+	    set_string(str);
+            break;
+      }
+
+      case amf::Element::OBJECT_AMF0:
+      {
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+          log_debug("as_value(Element&) : AMF type OBJECT");
+#endif
+          as_object* obj = gl.createObject();
+          if (el.propertySize()) {
+              for (size_t i=0; i < el.propertySize(); i++) {
+		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
+		  if (prop == 0) {
+		      break;
+		  } else {
+		      if (prop->getNameSize() == 0) {
+			  log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
+		      } else {
+			  obj->set_member(st.find(prop->getName()), as_value(*prop));
+		      }
+		  }
+              }
+          }
+	  set_as_object(obj);
+          break;
+      }
+
+      case amf::Element::ECMA_ARRAY_AMF0:
+      {
+          // TODO: fixme: ECMA_ARRAY has an additional fiedl, dunno
+          //              if accessible trought Element class
+          //              (the theoretic number of elements in it)
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+          log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
+#endif
+
+          as_object* obj = gl.createArray();
+
+          if (el.propertySize()) {
+              for (size_t i=0; i < el.propertySize(); i++) {
+		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
+		  if (prop == 0) {
+		      break;
+		  } else {
+		      obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  }
+              }
+          }
+          set_as_object(obj);
+          break;
+      }
+    
+
+      case amf::Element::STRICT_ARRAY_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+          log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
+#endif
+          as_object* obj = gl.createArray();
+          size_t len = el.propertySize();
+          obj->set_member(NSV::PROP_LENGTH, len);
+
+          for (size_t i=0; i < el.propertySize(); i++) {
+              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
+              if (prop == 0) {
+                  break;
+              } else {
+		  if (prop->getNameSize() == 0) {
+		      log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
+		  } else {
+		      obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  }
+              }
+          }
+          
+          set_as_object(obj);
+          break;
+      }
+
+      case amf::Element::REFERENCE_AMF0:
+      {
+        log_unimpl("REFERENCE Element to as_value");
+        break;
+      }
+
+      case amf::Element::DATE_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type DATE");
+#endif
+	  double num = el.to_number();
+	  set_double(num);
+	  break;
+      }
+      //if (swfVersion > 5) _type = STRING;
+      
+      case amf::Element::UNSUPPORTED_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type UNSUPPORTED");
+#endif
+	  break;
+      }
+      case amf::Element::RECORD_SET_AMF0:
+          log_unimpl("Record Set data type is not supported yet");
+          break;
+      case amf::Element::XML_OBJECT_AMF0:
+          log_unimpl("XML data type is not supported yet");
+          break;
+      case amf::Element::TYPED_OBJECT_AMF0:
+          log_unimpl("Typed Object data type is not supported yet");
+          break;
+      case amf::Element::AMF3_DATA:
+          log_unimpl("AMF3 data type is not supported yet");
+          break;
+      default:
+          log_unimpl("Element to as_value - unsupported Element type %d", 
+                  el.getType());
+          break;
+    }
+}
+#endif
 } // namespace gnash
 
 

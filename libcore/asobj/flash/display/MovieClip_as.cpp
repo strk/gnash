@@ -341,7 +341,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
-    ptr->addDisplayListObject(mc, fn.arg(1).to_int());
+    ptr->addDisplayListObject(mc, toInt(fn.arg(1)));
     return as_value(o);
 }
 
@@ -936,7 +936,7 @@ movieclip_loadMovie(const fn_call& fn)
     // TODO: if GET/POST should send variables of *this* movie,
     // no matter if the target will be replaced by another movie !!
     const MovieClip::VariablesMethod method =
-        static_cast<MovieClip::VariablesMethod>(val.to_int());
+        static_cast<MovieClip::VariablesMethod>(toInt(val));
 
     std::string data;
 
@@ -993,7 +993,7 @@ movieclip_loadVariables(const fn_call& fn)
     }
 
     const MovieClip::VariablesMethod method =
-        static_cast<MovieClip::VariablesMethod>(val.to_int());
+        static_cast<MovieClip::VariablesMethod>(toInt(val));
 
     movieclip->loadVariables(urlstr, method);
     log_debug("MovieClip.loadVariables(%s) - TESTING ", urlstr);
@@ -1101,7 +1101,7 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
         return as_value();
     }
 
-    const int depth = fn.arg(0).to_int();
+    const int depth = toInt(fn.arg(0));
 
     DisplayObject* ch = mc->getDisplayObjectAtDepth(depth);
  
@@ -1161,7 +1161,7 @@ movieclip_getURL(const fn_call& fn)
 
 
     MovieClip::VariablesMethod method =
-        static_cast<MovieClip::VariablesMethod>(val.to_int());
+        static_cast<MovieClip::VariablesMethod>(toInt(val));
 
     std::string vars;
 
@@ -1646,7 +1646,7 @@ movieclip_lineStyle(const fn_call& fn)
                               "first eight will be discarded"), ss.str());
                 );
         case 8:
-            miterLimitFactor = clamp<int>(fn.arg(7).to_int(), 1, 255);
+            miterLimitFactor = clamp<int>(toInt(fn.arg(7)), 1, 255);
         case 7:
         {
             std::string joinStyleStr = fn.arg(6).to_string();
@@ -1725,7 +1725,7 @@ movieclip_lineStyle(const fn_call& fn)
             // See pollock.swf for eventual regressions.
             // It sets color to a random number from
             // 0 to 160000000 (about 10 times more then the max).
-            boost::uint32_t rgbval = fn.arg(1).to_int();
+            boost::uint32_t rgbval = toInt(fn.arg(1));
             r = boost::uint8_t((rgbval & 0xFF0000) >> 16);
             g = boost::uint8_t((rgbval & 0x00FF00) >> 8);
             b = boost::uint8_t((rgbval & 0x0000FF) );
@@ -1879,7 +1879,7 @@ movieclip_beginFill(const fn_call& fn)
 
     if ( fn.nargs > 1 )
     {
-        a = 255 * clamp<int>(fn.arg(1).to_int(), 0, 100) / 100;
+        a = 255 * clamp<int>(toInt(fn.arg(1)), 0, 100) / 100;
         IF_VERBOSE_ASCODING_ERRORS(
         if ( fn.nargs > 2 )
         {
@@ -2087,10 +2087,10 @@ movieclip_beginGradientFill(const fn_call& fn)
     // Create the gradients vector
     // ----------------------------
 
-    size_t ngradients = colors->getMember(NSV::PROP_LENGTH).to_int();
+    size_t ngradients = toInt(colors->getMember(NSV::PROP_LENGTH));
     // Check length compatibility of all args
-    if ( ngradients != (size_t)alphas->getMember(NSV::PROP_LENGTH).to_int() ||
-        ngradients != (size_t)ratios->getMember(NSV::PROP_LENGTH).to_int() )
+    if (ngradients != (size_t)toInt(alphas->getMember(NSV::PROP_LENGTH)) ||
+        ngradients != (size_t)toInt(ratios->getMember(NSV::PROP_LENGTH)))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -2121,15 +2121,15 @@ movieclip_beginGradientFill(const fn_call& fn)
         string_table::key key = st.find(boost::lexical_cast<std::string>(i));
 
         as_value colVal = colors->getMember(key);
-        boost::uint32_t col = colVal.is_number() ? colVal.to_int() : 0;
+        boost::uint32_t col = colVal.is_number() ? toInt(colVal) : 0;
 
         as_value alpVal = alphas->getMember(key);
         boost::uint8_t alp = alpVal.is_number() ? 
-            clamp<int>(alpVal.to_int(), 0, 255) : 0;
+            clamp<int>(toInt(alpVal), 0, 255) : 0;
 
         as_value ratVal = ratios->getMember(key);
         boost::uint8_t rat = ratVal.is_number() ? 
-            clamp<int>(ratVal.to_int(), 0, 255) : 0;
+            clamp<int>(toInt(ratVal), 0, 255) : 0;
 
         rgba color;
         color.parseRGB(col);
@@ -2291,7 +2291,7 @@ movieclip_attachBitmap(const fn_call& fn)
         return as_value();
     }
 
-    int depth = fn.arg(1).to_int();
+    int depth = toInt(fn.arg(1));
 
     DisplayObject* bm = new Bitmap(getRoot(fn), 0, bd, ptr);
     ptr->attachCharacter(*bm, depth, 0);

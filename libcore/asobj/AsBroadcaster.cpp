@@ -325,14 +325,14 @@ asbroadcaster_removeListener(const fn_call& fn)
     
     // This is an ActionScript-like implementation, which is why it looks
     // like poor C++.
-    int length = listeners->getMember(NSV::PROP_LENGTH).to_int();
+    const int length = toInt(listeners->getMember(NSV::PROP_LENGTH));
     int i = 0;
     string_table& st = getStringTable(fn);
+
     while (i < length) {
         std::ostringstream s;
         s << i;
-        as_value el =
-            listeners->getMember(st.find(s.str()));
+        as_value el = listeners->getMember(st.find(s.str()));
         if (el.equals(listenerToRemove)) {
             callMethod(listeners, NSV::PROP_SPLICE, s.str(), 1);
             return as_value(true);
@@ -347,7 +347,7 @@ asbroadcaster_removeListener(const fn_call& fn)
 as_value
 asbroadcaster_broadcastMessage(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
 
     as_value listenersValue;
 
@@ -355,12 +355,10 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     //       inheritance chain in case its own property _listeners 
     //       has been deleted while another one is found in any base
     //       class.
-    if ( ! obj->get_member(NSV::PROP_uLISTENERS, &listenersValue) )
-    {
+    if (!obj->get_member(NSV::PROP_uLISTENERS, &listenersValue)) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("%p.addListener(%s): this object has no "
-                    "_listeners member"), (void*)fn.this_ptr,
-                    fn.dump_args());
+                    "_listeners member"), obj, fn.dump_args());
         );
         return as_value(); // TODO: check this
     }

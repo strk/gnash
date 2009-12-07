@@ -162,7 +162,7 @@ color_setrgb(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	boost::int32_t color = fn.arg(0).to_int();
+	boost::int32_t color = toInt(fn.arg(0));
 
 	const int r = (color & 0xff0000) >> 16;
 	const int g = (color & 0x00ff00) >> 8;

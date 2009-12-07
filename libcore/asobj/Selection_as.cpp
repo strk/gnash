@@ -244,8 +244,8 @@ selection_setSelection(const fn_call& fn)
         return as_value();
     }
 
-    int start = fn.arg(0).to_int();
-    int end = fn.arg(1).to_int();
+    int start = toInt(fn.arg(0));
+    int end = toInt(fn.arg(1));
 
     tf->setSelection(start, end);
 

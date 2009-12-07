@@ -716,7 +716,7 @@ SWFHandlers::ActionDivide(ActionExec& thread)
             env.top(1).set_string("#ERROR#");
         }
         else if (operand1 == 0 || isNaN(operand1) || isNaN(operand2)) {
-            env.top(1).set_nan();
+            setNaN(env.top(1));
         }
         else {
             // Division by -0.0 is not possible in AS, so 
@@ -851,8 +851,8 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     const as_value& strval = env.top(2);
 
     // Undefined values should resolve to 0.
-    int size = env.top(0).to_int();
-    int start = env.top(1).to_int();
+    int size = toInt(env.top(0));
+    int start = toInt(env.top(1));
 
     const int version = env.get_version();
     const std::wstring wstr = utf8::decodeCanonicalString(
@@ -936,8 +936,7 @@ void
 SWFHandlers::ActionInt(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    
-    env.top(0).set_double((env.top(0).to_int()));
+    env.top(0).set_double(toInt(env.top(0)));
 }
 
 void
@@ -1452,7 +1451,6 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
 void
 SWFHandlers::ActionFscommand2(ActionExec& thread)
 {
-    
 
 #if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_FSCOMMAND2)); // 0x0E
@@ -1462,7 +1460,7 @@ SWFHandlers::ActionFscommand2(ActionExec& thread)
 
     unsigned int off=0;
     
-    const unsigned int nargs = env.top(off++).to_int();
+    const unsigned int nargs = toInt(env.top(off++));
 
     std::string cmd = env.top(off++).to_string();
 
@@ -1495,7 +1493,7 @@ SWFHandlers::ActionRandom(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    int max = env.top(0).to_int();
+    int max = toInt(env.top(0));
 
     if (max < 1) max = 1;
 
@@ -1661,7 +1659,7 @@ SWFHandlers::ActionChr(ActionExec& thread)
     as_environment& env = thread.env;
     
     // Only handles values up to 65535
-    boost::uint16_t c = static_cast<boost::uint16_t>(env.top(0).to_int());
+    boost::uint16_t c = static_cast<boost::uint16_t>(toInt(env.top(0)));
 
     // If the argument to chr() is '0', we return
     // nothing, not NULL
@@ -1715,8 +1713,8 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     const as_value& arg1 = env.top(1);
 
     // Undefined values should resolve to 0.
-    int size = env.top(0).to_int();
-    int start = env.top(1).to_int();
+    int size = toInt(env.top(0));
+    int start = toInt(env.top(1));
 
     as_value& string_val = env.top(2);
 
@@ -1832,7 +1830,7 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
     }
 
     // Cut to uint16, as characters above 65535 'wrap around'
-    const boost::uint16_t i = static_cast<boost::uint16_t> (env.top(0).to_int());
+    const boost::uint16_t i = static_cast<boost::uint16_t> (toInt(env.top(0)));
     
     std::string out = utf8::encodeUnicodeCharacter(i);
     
@@ -2602,7 +2600,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    const int array_size = env.pop().to_int();
+    const int array_size = toInt(env.pop());
     assert(array_size >= 0); // TODO: trigger this !!
     
     Global_as& gl = getGlobal(env);
@@ -2634,7 +2632,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     //     [003]   Integer: 1
     //    SWFACTION_INITOBJECT
 
-    const int nmembers = env.pop().to_int();
+    const int nmembers = toInt(env.pop());
 
     // TODO: see if this could call the ASnative function(101, 9).
     Global_as& gl = getGlobal(env);
@@ -3193,8 +3191,8 @@ SWFHandlers::ActionBitwiseAnd(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    int operand1 = env.top(1).to_int();
-    int operand2 = env.top(0).to_int();
+    int operand1 = toInt(env.top(1));
+    int operand2 = toInt(env.top(0));
 
     env.top(1) = operand1 & operand2;
     env.drop(1);
@@ -3206,8 +3204,8 @@ SWFHandlers::ActionBitwiseOr(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    int operand1 = env.top(1).to_int();
-    int operand2 = env.top(0).to_int();
+    int operand1 = toInt(env.top(1));
+    int operand2 = toInt(env.top(0));
 
     env.top(1) = operand1|operand2;
     env.drop(1);
@@ -3219,8 +3217,8 @@ SWFHandlers::ActionBitwiseXor(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    int operand1 = env.top(1).to_int();
-    int operand2 = env.top(0).to_int();
+    int operand1 = toInt(env.top(1));
+    int operand2 = toInt(env.top(0));
 
     env.top(1) = operand1^operand2;
     env.drop(1);
@@ -3235,10 +3233,10 @@ SWFHandlers::ActionShiftLeft(ActionExec& thread)
     /// A left shift of more than or equal to the size in
     /// bits of the left operand, or a negative shift, results
     /// in undefined behaviour in C++.
-    boost::int32_t amount = env.top(0).to_int() % 32;
+    boost::int32_t amount = toInt(env.top(0)) % 32;
     if (amount < 0) amount += 32;
     
-    boost::int32_t value = env.top(1).to_int();
+    boost::int32_t value = toInt(env.top(1));
 
     value = value << amount;
 
@@ -3252,8 +3250,8 @@ SWFHandlers::ActionShiftRight(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = env.top(0).to_int();
-    boost::int32_t value = env.top(1).to_int();
+    boost::uint32_t amount = toInt(env.top(0));
+    boost::int32_t value = toInt(env.top(1));
 
     value = value >> amount;
 
@@ -3267,8 +3265,8 @@ SWFHandlers::ActionShiftRight2(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = env.top(0).to_int(); 
-    boost::int32_t value = env.top(1).to_int();
+    boost::uint32_t amount = toInt(env.top(0)); 
+    boost::int32_t value = toInt(env.top(1));
 
     value = boost::uint32_t(value) >> amount;
 

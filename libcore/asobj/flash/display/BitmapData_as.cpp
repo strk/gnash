@@ -364,9 +364,9 @@ bitmapdata_fillRect(const fn_call& fn)
     obj->get_member(NSV::PROP_WIDTH, &w);
     obj->get_member(NSV::PROP_HEIGHT, &h);    
 
-    boost::uint32_t color = fn.arg(1).to_int();
+    const boost::uint32_t color = toInt(fn.arg(1));
        
-    ptr->fillRect(x.to_int(), y.to_int(), w.to_int(), h.to_int(), color);
+    ptr->fillRect(toInt(x), toInt(y), toInt(w), toInt(h), color);
     
 	return as_value();
 }
@@ -411,9 +411,8 @@ bitmapdata_getPixel(const fn_call& fn)
     }
     
     // TODO: what happens when the pixel is outside the image?
-    
-    int x = fn.arg(0).to_int();
-    int y = fn.arg(1).to_int();
+    const int x = toInt(fn.arg(0));
+    const int y = toInt(fn.arg(1));
     
     return ptr->getPixel(x, y, false);
 }
@@ -429,9 +428,8 @@ bitmapdata_getPixel32(const fn_call& fn)
     }
     
     // TODO: what happens when the pixel is outside the image?
-    
-    int x = fn.arg(0).to_int();
-    int y = fn.arg(1).to_int();
+    const int x = toInt(fn.arg(0));
+    const int y = toInt(fn.arg(1));
     
     return ptr->getPixel(x, y, true);
 }
@@ -517,7 +515,7 @@ bitmapdata_setPixel(const fn_call& fn)
     }
 
     // Ignore any transparency here.
-    boost::uint32_t color = fn.arg(2).to_int() & 0xffffff;
+    const boost::uint32_t color = toInt(fn.arg(2)) & 0xffffff;
 
     ptr->setPixel(x, y, color);
 
@@ -541,7 +539,7 @@ bitmapdata_setPixel32(const fn_call& fn)
     }
 
     // TODO: multiply.
-    boost::uint32_t color = fn.arg(2).to_int();
+    const boost::uint32_t color = toInt(fn.arg(2));
 
     ptr->setPixel32(x, y, color);
 
@@ -669,13 +667,13 @@ bitmapdata_ctor(const fn_call& fn)
         default:
             // log AS coding error
         case 4:
-            fillColor = fn.arg(3).to_int();
+            fillColor = toInt(fn.arg(3));
         case 3:
             transparent = fn.arg(2).to_bool();
         case 2:
             // Is to_int correct?
-            height = fn.arg(1).to_int();
-            width = fn.arg(0).to_int();
+            height = toInt(fn.arg(1));
+            width = toInt(fn.arg(0));
             break;
     }
     

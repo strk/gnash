@@ -309,7 +309,7 @@ colortransform_rgb(const fn_call& fn)
 
     // Setter
 
-    boost::uint32_t rgb = fn.arg(0).to_int();
+    boost::uint32_t rgb = toInt(fn.arg(0));
     relay->setRedOffset((rgb & 0xFF0000) >> 16);
     relay->setGreenOffset((rgb & 0x00FF00) >> 8);
     relay->setBlueOffset(rgb & 0x0000FF);
