@@ -305,7 +305,7 @@ private:
     
 // Conversion to const std::string&.
 std::string
-as_value::to_string() const
+as_value::to_string(int version) const
 {
 	switch (_type)
 	{
@@ -327,9 +327,7 @@ as_value::to_string() const
 		}
 
 		case UNDEFINED: 
-			// Behavior depends on file version.  In
-			// version 7+, it's "undefined", in versions
-			// 6-, it's "".
+		    if (version <= 6) return "";
 			return "undefined";
 
 		case NULLTYPE:
@@ -372,22 +370,6 @@ as_value::to_string() const
 			return "[exception]";
     }
     
-}
-
-// Conversion to const std::string&.
-std::string
-as_value::to_string_versioned(int version) const
-{
-	if (_type == UNDEFINED)
-	{
-		// Version-dependent behavior.
-		if (version <= 6)
-		{
-		    return "";
-		}
-		return "undefined";
-    }	
-	return to_string();
 }
 
 /// This is only used in AVM2.
@@ -1900,7 +1882,7 @@ convertToNumber(as_value& v, VM& /*vm*/)
 as_value&
 convertToString(as_value& v, VM& vm)
 {
-    v.set_string(v.to_string_versioned(vm.getSWFVersion()));
+    v.set_string(v.to_string(vm.getSWFVersion()));
     return v;
 }
 

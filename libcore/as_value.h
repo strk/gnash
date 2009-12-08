@@ -203,19 +203,14 @@ public:
 	}
 
 	/// Get a std::string representation for this value.
-	std::string to_string() const;
-
-	/// Get a string representation for this value.
-	//
-	/// This differs from to_string() in that returned
-	/// representation will depend on version of the SWF
-	/// source. 
-	/// @@ shouldn't this be the default ?
-	///
-	/// @param version
-    ///     SWF version for which the operation is desired.
-	///
-	std::string to_string_versioned(int version) const;
+    //
+    /// @param version      The SWF version to use to transform the string.
+    ///                     This only affects undefined values, which trace
+    ///                     "undefined" for version 7 and above, nothing
+    ///                     for lower versions.
+    //
+    /// TODO: drop the default argument.
+	std::string to_string(int version = 7) const;
 
 	/// Get a number representation for this value
     //
