@@ -64,13 +64,13 @@ namespace {
     as_value xml_loaded(const fn_call& fn);
     as_value xml_status(const fn_call& fn);
 
-    bool textAfterWhitespace(const std::string& xml,
-            std::string::const_iterator& it);
-    bool textMatch(const std::string& xml, std::string::const_iterator& it,
+    typedef std::string::const_iterator xml_iterator;
+
+    bool textAfterWhitespace(xml_iterator& it, xml_iterator end);
+    bool textMatch(xml_iterator& it, xml_iterator end,
             const std::string& match, bool advance = true);
-    bool parseNodeWithTerminator(const std::string& xml,
-            std::string::const_iterator& it, const std::string& terminator,
-            std::string& content);
+    bool parseNodeWithTerminator( xml_iterator& it, xml_iterator end,
+            const std::string& terminator, std::string& content);
 	
 	
     typedef std::map<std::string, std::string> Entities;
@@ -181,26 +181,20 @@ private:
 
     typedef std::map<std::string, std::string, StringNoCaseLessThan> Attributes;
 
-    void parseTag(XMLNode_as*& node, const std::string& xml, 
-            std::string::const_iterator& it);
+    void parseTag(XMLNode_as*& node, xml_iterator& it, xml_iterator end);
 
-    void parseAttribute(XMLNode_as* node, const std::string& xml, 
-            std::string::const_iterator& it, Attributes& attributes);
+    void parseAttribute(XMLNode_as* node, xml_iterator& it,
+            xml_iterator end, Attributes& attributes);
 
-    void parseDocTypeDecl(const std::string& xml, 
-            std::string::const_iterator& it);
+    void parseDocTypeDecl( xml_iterator& it, xml_iterator end);
 
-    void parseText(XMLNode_as* node, const std::string& xml, 
-            std::string::const_iterator& it);
+    void parseText(XMLNode_as* node, xml_iterator& it, xml_iterator end);
 
-    void parseXMLDecl(const std::string& xml, 
-            std::string::const_iterator& it);
+    void parseXMLDecl(xml_iterator& it, xml_iterator end);
 
-    void parseComment(XMLNode_as* node, const std::string& xml, 
-            std::string::const_iterator& it);
+    void parseComment(XMLNode_as* node, xml_iterator& it, xml_iterator end);
 
-    void parseCData(XMLNode_as* node, const std::string& xml, 
-            std::string::const_iterator& it);
+    void parseCData(XMLNode_as* node, xml_iterator& it, xml_iterator end);
  
     /// Clear all properties.
     //
@@ -268,20 +262,20 @@ XMLDocument_as::toString(std::ostream& o, bool encode) const
 }
 
 void
-XMLDocument_as::parseAttribute(XMLNode_as* node, const std::string& xml,
-        std::string::const_iterator& it, Attributes& attributes)
+XMLDocument_as::parseAttribute(XMLNode_as* node, xml_iterator& it,
+        const xml_iterator end, Attributes& attributes)
 {
 
     const std::string terminators("\r\t\n >=");
 
-    std::string::const_iterator end = std::find_first_of(it, xml.end(),
+    xml_iterator ourend = std::find_first_of(it, end,
             terminators.begin(), terminators.end());
 
-    if (end == xml.end()) {
+    if (ourend == end) {
         _status = XML_UNTERMINATED_ELEMENT;
         return;
     }
-    std::string name(it, end);
+    std::string name(it, ourend);
     
     if (name.empty()) {
         _status = XML_UNTERMINATED_ELEMENT;
@@ -289,11 +283,11 @@ XMLDocument_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     }
 
     // Point iterator to the DisplayObject after the name.
-    it = end;
+    it = ourend;
 
     // Skip any whitespace before the '='. If we reach the end of the string
     // or don't find an '=', it's a parser error.
-    if (!textAfterWhitespace(xml, it) || *it != '=') {
+    if (!textAfterWhitespace(it, end) || *it != '=') {
         _status = XML_UNTERMINATED_ELEMENT;
         return;
     }
@@ -303,7 +297,7 @@ XMLDocument_as::parseAttribute(XMLNode_as* node, const std::string& xml,
 
     // Skip any whitespace. If we reach the end of the string, or don't find
     // a " or ', it's a parser error.
-    if (!textAfterWhitespace(xml, it) || (*it != '"' && *it != '\'')) {
+    if (!textAfterWhitespace(it, end) || (*it != '"' && *it != '\'')) {
         _status = XML_UNTERMINATED_ELEMENT;
         return;
     }
@@ -312,29 +306,26 @@ XMLDocument_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     // as long as it's not escaped. We begin one after the present position,
     // which should be the opening DisplayObject. We want to remember what the
     // iterator is pointing to for a while, so don't advance it.
-    end = it;
+    ourend = it;
     do {
-        ++end;
-        end = std::find(end, xml.end(), *it);
-    } while (end != xml.end() && *(end - 1) == '\\');
+        ++ourend;
+        ourend = std::find(ourend, end, *it);
+    } while (ourend != end && *(ourend - 1) == '\\');
 
-    if (end == xml.end()) {
+    if (ourend == end) {
         _status = XML_UNTERMINATED_ATTRIBUTE;
         return;
     }
     ++it;
 
-    std::string value(it, end);
+    std::string value(it, ourend);
 
     // Replace entities in the value.
     unescapeXML(value);
 
-    //log_debug("adding attribute to node %s: %s, %s", node->nodeName(),
-    //        name, value);
-
-    // We've already checked that end != xml.end(), so we can advance at 
+    // We've already checked that ourend != end, so we can advance at 
     // least once.
-    it = end;
+    it = ourend;
     // Advance past the last attribute DisplayObject
     ++it;
 
@@ -355,12 +346,11 @@ XMLDocument_as::parseAttribute(XMLNode_as* node, const std::string& xml,
 /// Parse and set the docTypeDecl. This is stored without any validation and
 /// with the same case as in the parsed XML.
 void
-XMLDocument_as::parseDocTypeDecl(const std::string& xml,
-        std::string::const_iterator& it)
+XMLDocument_as::parseDocTypeDecl(xml_iterator& it, const xml_iterator end)
 {
 
-    std::string::const_iterator end;
-    std::string::const_iterator current = it; 
+    xml_iterator ourend;
+    xml_iterator current = it; 
 
     std::string::size_type count = 1;
 
@@ -368,32 +358,32 @@ XMLDocument_as::parseDocTypeDecl(const std::string& xml,
     while (count) {
 
         // Find the next closing bracket after the current position.
-        end = std::find(current, xml.end(), '>');
-        if (end == xml.end()) {
+        ourend = std::find(current, end, '>');
+        if (ourend == end) {
             _status = XML_UNTERMINATED_DOCTYPE_DECL;
             return;
         }
         --count;
 
         // Count any opening brackets in between.
-        count += std::count(current, end, '<');
-        current = end;
+        count += std::count(current, ourend, '<');
+        current = ourend;
         ++current;
     }
 
-    const std::string content(it, end);
+    const std::string content(it, ourend);
     std::ostringstream os;
     os << '<' << content << '>';
     _docTypeDecl = os.str();
-    it = end + 1;
+    it = ourend + 1;
 }
 
 
 void
-XMLDocument_as::parseXMLDecl(const std::string& xml, std::string::const_iterator& it)
+XMLDocument_as::parseXMLDecl(xml_iterator& it, const xml_iterator end)
 {
     std::string content;
-    if (!parseNodeWithTerminator(xml, it, "?>", content))
+    if (!parseNodeWithTerminator(it, end, "?>", content))
     {
         _status = XML_UNTERMINATED_XML_DECL;
         return;
@@ -409,10 +399,9 @@ XMLDocument_as::parseXMLDecl(const std::string& xml, std::string::const_iterator
 
 // The iterator should be pointing to the first char after the '<'
 void
-XMLDocument_as::parseTag(XMLNode_as*& node, const std::string& xml,
-    std::string::const_iterator& it)
+XMLDocument_as::parseTag(XMLNode_as*& node, xml_iterator& it,
+        const xml_iterator end)
 {
-    //log_debug("Processing node: %s", node->nodeName());
 
     bool closing = (*it == '/');
     if (closing) ++it;
@@ -420,11 +409,11 @@ XMLDocument_as::parseTag(XMLNode_as*& node, const std::string& xml,
     // These are for terminating the tag name, not (necessarily) the tag.
     const std::string terminators("\r\n\t >");
 
-    std::string::const_iterator endName = std::find_first_of(it, xml.end(),
-            terminators.begin(), terminators.end());
+    xml_iterator endName = std::find_first_of(it, end, terminators.begin(),
+            terminators.end());
 
     // Check that one of the terminators was found; otherwise it's malformed.
-    if (endName == xml.end()) {
+    if (endName == end) {
         _status = XML_UNTERMINATED_ELEMENT;
         return;
     }
@@ -451,11 +440,10 @@ XMLDocument_as::parseTag(XMLNode_as*& node, const std::string& xml,
         childNode->nodeNameSet(tagName);
         childNode->nodeTypeSet(Element);
 
-        //log_debug("created childNode with name %s", childNode->nodeName());
         // Skip to the end of any whitespace after the tag name
         it = endName;
 
-        if (!textAfterWhitespace(xml, it)) {
+        if (!textAfterWhitespace(it, end)) {
             _status = XML_UNTERMINATED_ELEMENT;
            return;
         }
@@ -464,16 +452,16 @@ XMLDocument_as::parseTag(XMLNode_as*& node, const std::string& xml,
         // '>'
         // Attributes are added in reverse order and without any duplicates.
         Attributes attributes;
-        while (it != xml.end() && *it != '>' && _status == XML_OK)
+        while (it != end && *it != '>' && _status == XML_OK)
         {
-            if (xml.end() - it > 1 && std::equal(it, it + 2, "/>")) break;
+            if (end - it > 1 && std::equal(it, it + 2, "/>")) break;
 
             // This advances the iterator
-            parseAttribute(childNode, xml, it, attributes);
+            parseAttribute(childNode, it, end, attributes);
 
             // Skip any whitespace. If we reach the end of the string,
             // it's malformed.
-            if (!textAfterWhitespace(xml, it)) {
+            if (!textAfterWhitespace(it, end)) {
                 _status = XML_UNTERMINATED_ELEMENT;
                 return;
             }
@@ -498,10 +486,9 @@ XMLDocument_as::parseTag(XMLNode_as*& node, const std::string& xml,
 
     // If we reach here, this is a closing tag.
 
-    it = std::find(endName, xml.end(), '>');
+    it = std::find(endName, end, '>');
 
-    if (it == xml.end())
-    {
+    if (it == end) {
        _status = XML_UNTERMINATED_ELEMENT;
        return;
     }
@@ -532,13 +519,13 @@ XMLDocument_as::parseTag(XMLNode_as*& node, const std::string& xml,
 }
 
 void
-XMLDocument_as::parseText(XMLNode_as* node, const std::string& xml, 
-        std::string::const_iterator& it)
+XMLDocument_as::parseText(XMLNode_as* node, xml_iterator& it,
+        const xml_iterator end)
 {
-    std::string::const_iterator end = std::find(it, xml.end(), '<');
-    std::string content(it, end);
+    xml_iterator ourend = std::find(it, end, '<');
+    std::string content(it, ourend);
     
-    it = end;
+    it = ourend;
 
     if (ignoreWhite() && 
         content.find_first_not_of("\t\r\n ") == std::string::npos) return;
@@ -553,34 +540,29 @@ XMLDocument_as::parseText(XMLNode_as* node, const std::string& xml,
     childNode->nodeValueSet(content);
     node->appendChild(childNode);
 
-    //log_debug("appended text node: %s", content);
 }
 
-
-
 void
-XMLDocument_as::parseComment(XMLNode_as* /*node*/, const std::string& xml, 
-        std::string::const_iterator& it)
+XMLDocument_as::parseComment(XMLNode_as* /*node*/, xml_iterator& it,
+        const xml_iterator end)
 {
-    //log_debug("discarding comment node");
 
     std::string content;
 
-    if (!parseNodeWithTerminator(xml, it, "-->", content)) {
+    if (!parseNodeWithTerminator(it, end, "-->", content)) {
         _status = XML_UNTERMINATED_COMMENT;
         return;
     }
     // Comments are discarded at least up to SWF8
-    
 }
 
 void
-XMLDocument_as::parseCData(XMLNode_as* node, const std::string& xml, 
-        std::string::const_iterator& it)
+XMLDocument_as::parseCData(XMLNode_as* node, xml_iterator& it,
+        const xml_iterator end)
 {
     std::string content;
 
-    if (!parseNodeWithTerminator(xml, it, "]]>", content)) {
+    if (!parseNodeWithTerminator(it, end, "]]>", content)) {
         _status = XML_UNTERMINATED_CDATA;
         return;
     }
@@ -606,37 +588,38 @@ XMLDocument_as::parseXML(const std::string& xml)
     // Clear current data
     clear(); 
 
-    std::string::const_iterator it = xml.begin();
+    xml_iterator it = xml.begin();
+    const xml_iterator end = xml.end();
     XMLNode_as* node = this;
 
-    while (it != xml.end() && _status == XML_OK)
+    while (it != end && _status == XML_OK)
     {
         if (*it == '<')
         {
             ++it;
-            if (textMatch(xml, it, "!DOCTYPE", false))
+            if (textMatch(it, end, "!DOCTYPE", false))
             {
                 // We should not advance past the DOCTYPE label, as
                 // the case is preserved.
-                parseDocTypeDecl(xml, it);
+                parseDocTypeDecl(it, end);
             }
-            else if (textMatch(xml, it, "?xml", false))
+            else if (textMatch(it, end, "?xml", false))
             {
                 // We should not advance past the xml label, as
                 // the case is preserved.
-                parseXMLDecl(xml, it);
+                parseXMLDecl(it, end);
             }
-            else if (textMatch(xml, it, "!--"))
+            else if (textMatch(it, end, "!--"))
             {
-                parseComment(node, xml, it);
+                parseComment(node, it, end);
             }
-            else if (textMatch(xml, it, "![CDATA["))
+            else if (textMatch(it, end, "![CDATA["))
             {
-                parseCData(node, xml, it);
+                parseCData(node, it, end);
             }
-            else parseTag(node, xml, it);
+            else parseTag(node, it, end);
         }
-        else parseText(node, xml, it);
+        else parseText(node, it, end);
     }
 
     // If everything parsed correctly, check that we've got back to the
@@ -758,7 +741,7 @@ xml_new(const fn_call& fn)
 
     as_object* obj = ensure<ValidThis>(fn);
 
-    if (fn.nargs > 0) {
+    if (fn.nargs && !fn.arg(0).is_undefined()) {
 
         // Copy constructor clones nodes.
         if (fn.arg(0).is_object()) {
@@ -771,18 +754,12 @@ xml_new(const fn_call& fn)
             }
         }
 
-        const std::string& xml_in = fn.arg(0).to_string();
-        if (xml_in.empty()) {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("First arg given to XML constructor (%s) "
-                    "evaluates to the empty string"), fn.arg(0));
-            );
-        }
-        else {
-            obj->setRelay(new XMLDocument_as(*obj, xml_in));
-            attachXMLProperties(*obj);
-            return as_value();
-        }
+        const int version = getSWFVersion(fn);
+        const std::string& xml_in = fn.arg(0).to_string(version);
+        // It doesn't matter if the string is empty.
+        obj->setRelay(new XMLDocument_as(*obj, xml_in));
+        attachXMLProperties(*obj);
+        return as_value();
     }
 
     obj->setRelay(new XMLDocument_as(*obj));
@@ -1000,12 +977,11 @@ xml_onData(const fn_call& fn)
 /// DisplayObjects left or if there is no match. If there is a match, and advance
 /// is not false, the iterator points to the DisplayObject after the match.
 bool
-textMatch(const std::string& xml, std::string::const_iterator& it,
+textMatch(xml_iterator& it, const xml_iterator end,
         const std::string& match, bool advance)
 {
 
     const std::string::size_type len = match.length();
-    const std::string::const_iterator end = xml.end();
 
     if (static_cast<size_t>(end - it) < len) return false;
 
@@ -1021,11 +997,11 @@ textMatch(const std::string& xml, std::string::const_iterator& it,
 /// @return true if there is text after the whitespace, false if we 
 ///         reach the end of the string.
 bool
-textAfterWhitespace(const std::string& xml, std::string::const_iterator& it)
+textAfterWhitespace(xml_iterator& it, const xml_iterator end)
 {
     const std::string whitespace("\r\t\n ");
-    while (it != xml.end() && whitespace.find(*it) != std::string::npos) ++it;
-    return (it != xml.end());
+    while (it != end && whitespace.find(*it) != std::string::npos) ++it;
+    return (it != end);
 }
 
 /// Parse a complete node up to a specified terminator.
@@ -1039,19 +1015,18 @@ textAfterWhitespace(const std::string& xml, std::string::const_iterator& it)
 ///                 the tag.
 /// @param xml      The complete XML string.
 bool
-parseNodeWithTerminator(const std::string& xml,
-        std::string::const_iterator& it, const std::string& terminator,
-        std::string& content)
+parseNodeWithTerminator( xml_iterator& it, const xml_iterator end,
+        const std::string& terminator, std::string& content)
 {
-    std::string::const_iterator end = std::search(it, xml.end(),
-            terminator.begin(), terminator.end());
+    xml_iterator ourend = std::search(it, end, terminator.begin(),
+            terminator.end());
 
-    if (end == xml.end()) {
+    if (ourend == end) {
         return false;
     }
 
-    content = std::string(it, end);
-    it = end + terminator.length();
+    content = std::string(it, ourend);
+    it = ourend + terminator.length();
 
     return true;
 }

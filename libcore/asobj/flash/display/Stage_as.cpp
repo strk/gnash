@@ -121,28 +121,24 @@ stage_scalemode(const fn_call& fn)
 
     movie_root& m = getRoot(fn);
 
-	if ( fn.nargs == 0 ) // getter
-	{
+	if (!fn.nargs) {
 		return as_value(getScaleModeString(m.getStageScaleMode()));
 	}
-	else // setter
-	{
-	    // Defaults to showAll if the string is invalid.
-		movie_root::ScaleMode mode = movie_root::showAll;
 
-		const std::string& str = fn.arg(0).to_string();
-		
-		StringNoCaseEqual noCaseCompare;
-		
-		if ( noCaseCompare(str, "noScale") ) mode = movie_root::noScale;
-		else if ( noCaseCompare(str, "exactFit") ) mode = movie_root::exactFit;
-		else if ( noCaseCompare(str, "noBorder") ) mode = movie_root::noBorder;
+    // Defaults to showAll if the string is invalid.
+    movie_root::ScaleMode mode = movie_root::showAll;
 
-        if ( m.getStageScaleMode() == mode ) return as_value(); // nothing to do
+    const int version = getSWFVersion(fn);
+    const std::string& str = fn.arg(0).to_string(version);
+    
+    StringNoCaseEqual noCaseCompare;
+    
+    if (noCaseCompare(str, "noScale")) mode = movie_root::noScale;
+    else if (noCaseCompare(str, "exactFit")) mode = movie_root::exactFit;
+    else if (noCaseCompare(str, "noBorder")) mode = movie_root::noBorder;
 
-	    m.setStageScaleMode(mode);
-		return as_value();
-	}
+    m.setStageScaleMode(mode);
+    return as_value();
 }
 
 as_value
@@ -187,20 +183,18 @@ stage_align(const fn_call& fn)
 {
     movie_root& m = getRoot(fn);
     
-	if ( fn.nargs == 0 ) // getter
-	{
+	if (!fn.nargs) {
 	    return as_value (m.getStageAlignMode());
 	}
-	else // setter
-	{
-		const std::string& str = fn.arg(0).to_string();
 
-        const short am = stringToStageAlign(str);
+    const int version = getSWFVersion(fn);
+    const std::string& str = fn.arg(0).to_string(version);
 
-        m.setStageAlignment(am);
+    const short am = stringToStageAlign(str);
 
-		return as_value();
-	}
+    m.setStageAlignment(am);
+
+    return as_value();
 }
 
 as_value
@@ -234,7 +228,9 @@ stage_displaystate(const fn_call& fn)
 
     StringNoCaseEqual noCaseCompare;
 
-    const std::string& str = fn.arg(0).to_string();
+    const int version = getSWFVersion(fn);
+    const std::string& str = fn.arg(0).to_string(version);
+
     if (noCaseCompare(str, "normal")) {
         m.setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
     }
