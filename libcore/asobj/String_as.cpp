@@ -162,7 +162,7 @@ string_concat(const fn_call& fn)
     const int version = getStringVersioned(fn, val, str);
 
     for (size_t i = 0; i < fn.nargs; i++) {
-        str += fn.arg(i).to_string_versioned(version);
+        str += fn.arg(i).to_string(version);
     }
 
     return as_value(str);
@@ -350,7 +350,7 @@ string_lastIndexOf(const fn_call& fn)
 
     if (!checkArgs(fn, 1, 2, "String.lastIndexOf()")) return as_value(-1);
 
-    const std::string& toFind = fn.arg(0).to_string_versioned(version);
+    const std::string& toFind = fn.arg(0).to_string(version);
 
     int start = str.size();
 
@@ -482,7 +482,7 @@ string_indexOf(const fn_call& fn)
 
     const as_value& tfarg = fn.arg(0); // to find arg
     const std::wstring& toFind =
-        utf8::decodeCanonicalString(tfarg.to_string_versioned(version),
+        utf8::decodeCanonicalString(tfarg.to_string(version),
                 version);
 
     size_t start = 0;
@@ -730,7 +730,7 @@ as_value
 string_valueOf(const fn_call& fn)
 {
     const int version = getSWFVersion(fn);
-    return as_value(fn.this_ptr).to_string_versioned(version);
+    return as_value(fn.this_ptr).to_string(version);
 }
 
 as_value
@@ -749,7 +749,7 @@ string_ctor(const fn_call& fn)
     std::string str;
 
     if (fn.nargs) {
-        str = fn.arg(0).to_string_versioned(version);
+        str = fn.arg(0).to_string(version);
     }
 
     if (!fn.isInstantiation())
@@ -784,7 +784,7 @@ getStringVersioned(const fn_call& fn, const as_value& val, std::string& str)
     const int version = fn.callerDef ? fn.callerDef->get_version() :
         getSWFVersion(fn);
     
-    str = val.to_string_versioned(version);
+    str = val.to_string(version);
 
     return version;
 

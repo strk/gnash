@@ -257,7 +257,7 @@ loadableobject_decode(const fn_call& fn)
     ValuesMap vals;
 
     const int version = getSWFVersion(fn);
-    const std::string qs = fn.arg(0).to_string_versioned(version);
+    const std::string qs = fn.arg(0).to_string(version);
 
     if (qs.empty()) return as_value();
 

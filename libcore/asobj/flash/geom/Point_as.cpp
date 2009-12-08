@@ -375,8 +375,8 @@ point_toString(const fn_call& fn)
     int version = getSWFVersion(fn);
 
     std::stringstream ss;
-    ss << "(x=" << x.to_string_versioned(version)
-        << ", y=" << y.to_string_versioned(version)
+    ss << "(x=" << x.to_string(version)
+        << ", y=" << y.to_string(version)
         << ")";
 
     return as_value(ss.str());

@@ -317,16 +317,16 @@ struct as_value_lt
 
     inline int str_cmp(const as_value& a, const as_value& b)
     {
-        std::string s = a.to_string_versioned(_version);
-        return s.compare(b.to_string_versioned(_version));
+        std::string s = a.to_string(_version);
+        return s.compare(b.to_string(_version));
     }
 
     inline int str_nocase_cmp(const as_value& a, const as_value& b)
     {
         using namespace boost::algorithm;
 
-        std::string c = to_upper_copy(a.to_string_versioned(_version));
-        std::string d = to_upper_copy(b.to_string_versioned(_version));
+        std::string c = to_upper_copy(a.to_string(_version));
+        std::string d = to_upper_copy(b.to_string(_version));
         return c.compare(d);
     }
 
@@ -762,7 +762,7 @@ public:
         _version(version)
     {}
     void operator()(const as_value& val) {
-        _v.push_back(_st.find(val.to_string_versioned(_version)));
+        _v.push_back(_st.find(val.to_string(_version)));
     }
 private:
     std::vector<string_table::key>& _v;
@@ -1094,7 +1094,7 @@ array_sortOn(const fn_call& fn)
     if (fn.arg(0).is_string()) 
     {
         string_table::key propField =
-            st.find(fn.arg(0).to_string_versioned(version));
+            st.find(fn.arg(0).to_string(version));
 
         if (fn.nargs > 1 && fn.arg(1).is_number()) {
             flags = static_cast<boost::uint8_t>(fn.arg(1).to_number());
@@ -1333,7 +1333,7 @@ array_join(const fn_call& fn)
 
     const int version = getSWFVersion(fn);
     const std::string separator =
-        fn.nargs ? fn.arg(0).to_string_versioned(version) : ",";
+        fn.nargs ? fn.arg(0).to_string(version) : ",";
 
     return join(array, separator);
 }
@@ -1470,7 +1470,7 @@ join(as_object* array, const std::string& separator)
         if (i) s += separator;
         as_value el;
         array->get_member(st.find(os.str()), &el);
-        s += el.to_string_versioned(version);
+        s += el.to_string(version);
     }
     return as_value(s);
 }

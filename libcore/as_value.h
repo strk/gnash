@@ -350,7 +350,6 @@ public:
 	//
 	/// Strict equality is defined as the two values being of the
 	/// same type and the same value.
-	///
 	bool strictly_equals(const as_value& v) const;
 
 	/// Return true if this value is abstractly equal to the given one
@@ -363,18 +362,12 @@ public:
 	///	- A == B is equivalent to B == A, except for order of
 	///	  evaluation of A and B.
 	///
-	/// @param v
-    ///     The as_value to compare to
-	///
+	/// @param v     The as_value to compare to
 	bool equals(const as_value& v) const;
-
-	/// Sets this value to this string plus the given string.
-	void string_concat(const std::string& str);
 
 	/// Set any object value as reachable (for the GC)
 	//
 	/// Object values are values stored by pointer (objects and functions)
-	///
 	void setReachable() const;
 
 	/// Read AMF0 data from the given buffer

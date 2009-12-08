@@ -347,10 +347,7 @@ as_value::to_string(int version) const
 				// This additional is_string test is NOT compliant with ECMA-262
 				// specification, but seems required for compatibility with the
 				// reference player.
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(" %s.to_primitive(STRING) returned %s", *this, ret);
-#endif
-				if ( ret.is_string() ) return ret.to_string();
+				if (ret.is_string()) return ret.getStr();
 			}
 			catch (ActionTypeError& e) {
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
@@ -421,9 +418,6 @@ as_value::to_primitive(AsType hint) const
 	as_object* obj(0);
 
 	if (hint == NUMBER) {
-
-		if (_type == DISPLAYOBJECT) return as_value(NaN);
-
         assert(_type == OBJECT);
 		obj = getObj();
 
@@ -437,19 +431,11 @@ as_value::to_primitive(AsType hint) const
 	}
 	else {
 		assert(hint == STRING);
-
-		if (_type == DISPLAYOBJECT) return getCharacterProxy().getTarget();
         assert(_type == OBJECT);
 		obj = getObj();
 
 		// @@ Moock says, "the value that results from
 		// calling toString() on the object".
-		//
-		// When the toString() method doesn't exist, or
-		// doesn't return a valid number, the default
-		// text representation for that object is used
-		// instead.
-		//
 		if (!findMethod(*obj, NSV::PROP_TO_STRING, method) &&
                 !findMethod(*obj, NSV::PROP_VALUE_OF, method)) {
 				throw ActionTypeError();
@@ -538,12 +524,10 @@ as_value::to_number() const
         {
             // Evan: from my tests
             // Martin: FlashPlayer6 gives 0; FP9 gives NaN.
-            return ( swfversion >= 7 ? NaN : 0 );
+            return (swfversion >= 7 ? NaN : 0);
         }
 
         case BOOLEAN: 
-            // Evan: from my tests
-            // Martin: confirmed
             return getBool() ? 1 : 0;
 
         case NUMBER:
@@ -556,8 +540,7 @@ as_value::to_number() const
             // method".
             //
             // Arrays and Movieclips should return NaN.
-            try
-            {
+            try {
                 as_value ret = to_primitive(NUMBER);
                 return ret.to_number();
             }
@@ -918,15 +901,6 @@ as_value::equals(const as_value& v) const
 
 }
 	
-// Sets *this to this string plus the given string.
-void
-as_value::string_concat(const std::string& str)
-{
-    std::string currVal = to_string();
-    _type = STRING;
-    _value = currVal + str;
-}
-
 const char*
 as_value::typeOf() const
 {

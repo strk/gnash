@@ -810,8 +810,8 @@ SWFHandlers::ActionStringEq(ActionExec& thread)
     as_environment& env = thread.env;
     
     const int version = env.get_version();
-    const std::string& str0 = env.top(0).to_string_versioned(version);
-    const std::string& str1 = env.top(1).to_string_versioned(version);
+    const std::string& str0 = env.top(0).to_string(version);
+    const std::string& str1 = env.top(1).to_string(version);
 
     env.top(1).set_bool(str0 == str1);
     env.drop(1);
@@ -834,7 +834,7 @@ SWFHandlers::ActionStringLength(ActionExec& thread)
     }
     else
     {
-        env.top(0).set_double(env.top(0).to_string_versioned(version).size());
+        env.top(0).set_double(env.top(0).to_string(version).size());
     }
 }
 
@@ -856,7 +856,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 
     const int version = env.get_version();
     const std::wstring wstr = utf8::decodeCanonicalString(
-                                strval.to_string_versioned(version), version);
+                                strval.to_string(version), version);
     
 
     if (size < 0)
@@ -1021,7 +1021,7 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
     //
     // For _versioned, see swfdec's settarget2-tostring.as (swf 7 and 8)
     // 
-    std::string target_name = env.top(0).to_string_versioned(env.get_version());
+    std::string target_name = env.top(0).to_string(env.get_version());
 
     CommonSetTarget(thread, target_name);
 
@@ -1031,12 +1031,11 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 void
 SWFHandlers::ActionStringConcat(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-
-    const int version = env.get_version();
-    convertToString(env.top(1), getVM(env));
-    env.top(1).string_concat(env.top(0).to_string_versioned(version));
+    const int version = getSWFVersion(env);
+    env.top(1).set_string(env.top(1).to_string(version) +
+            env.top(0).to_string(version));
+    
     env.drop(1);
 }
 
@@ -1301,7 +1300,7 @@ SWFHandlers::ActionStringCompare(ActionExec& thread)
     as_environment& env = thread.env;
     
     const int ver = env.get_version();
-    env.top(1).set_bool(env.top(1).to_string_versioned(ver) < env.top(0).to_string_versioned(ver));
+    env.top(1).set_bool(env.top(1).to_string(ver) < env.top(0).to_string(ver));
     env.drop(1);
 }
 
@@ -1725,7 +1724,7 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     env.drop(2);
 
     const int version = env.get_version();
-    std::string str = string_val.to_string_versioned(version);
+    std::string str = string_val.to_string(version);
     int length = 0;
     std::vector<int> offsets;
 
@@ -2428,7 +2427,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     // function is called. If it is undefined, nothing happens, even if
     // there is a function called 'undefined'.
     //
-    // Using to_string_versioned() would produce the wrong behaviour.
+    // Using to_string() would produce the wrong behaviour.
     //
     // In all cases, even undefined, the specified number of arguments
     // is dropped from the stack.
@@ -3301,7 +3300,7 @@ SWFHandlers::ActionStringGreater(ActionExec& thread)
     
     as_environment& env = thread.env;
     
-    // No need to use to_string_versioned() here, this is a swf7 opcode
+    // No need to use to_string() here, this is a swf7 opcode
     env.top(1).set_bool(env.top(1).to_string() > env.top(0).to_string());
     env.drop(1);
 }

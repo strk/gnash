@@ -263,7 +263,7 @@ public:
 
     bool accept(const ObjectURI& uri, const as_value& val) {
 		_to.push_front(std::make_pair(_st.value(getName(uri)),
-				val.to_string_versioned(_version)));
+				val.to_string(_version)));
         return true;
     }
 

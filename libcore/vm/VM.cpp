@@ -330,7 +330,7 @@ newAdd(as_value& op1, const as_value& op2, VM& vm)
 		// use string semantic
 		const int version = vm.getSWFVersion();
 		convertToString(op1, vm);
-		op1.string_concat(r.to_string_versioned(version));
+		op1.set_string(op1.to_string(version) + r.to_string(version));
         return;
 	}
 

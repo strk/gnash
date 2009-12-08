@@ -3676,7 +3676,7 @@ textfield_replaceText(const fn_call& fn)
     int version = getSWFVersion(fn);
 
     // TODO: check if it's possible for SWF6 to use this function
-    //       and if it is whether to_string should be to_string_versioned
+    //       and if it is whether to_string should be to_string
     //       (affects the way undefined values are considered)
     const wstring& replacement =
         utf8::decodeCanonicalString(fn.arg(2).to_string(), version);

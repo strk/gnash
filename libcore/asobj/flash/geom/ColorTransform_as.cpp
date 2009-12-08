@@ -270,14 +270,14 @@ colortransform_toString(const fn_call& fn)
     
     const int version = getSWFVersion(fn);
 
-    ss << "(redMultiplier=" << rm.to_string_versioned(version) << ", "
-       << "greenMultiplier=" << gm.to_string_versioned(version) << ", "
-       << "blueMultiplier=" << bm.to_string_versioned(version) << ", "
-       << "alphaMultiplier=" << am.to_string_versioned(version) << ", "
-       << "redOffset=" << ro.to_string_versioned(version) << ", "
-       << "greenOffset=" << go.to_string_versioned(version) << ", "
-       << "blueOffset=" << bo.to_string_versioned(version) << ", "
-       << "alphaOffset=" << ao.to_string_versioned(version) << ")";
+    ss << "(redMultiplier=" << rm.to_string(version) << ", "
+       << "greenMultiplier=" << gm.to_string(version) << ", "
+       << "blueMultiplier=" << bm.to_string(version) << ", "
+       << "alphaMultiplier=" << am.to_string(version) << ", "
+       << "redOffset=" << ro.to_string(version) << ", "
+       << "greenOffset=" << go.to_string(version) << ", "
+       << "blueOffset=" << bo.to_string(version) << ", "
+       << "alphaOffset=" << ao.to_string(version) << ")";
        
     return as_value(ss.str());
 
