@@ -309,33 +309,23 @@ as_value::to_string(int version) const
 {
 	switch (_type)
 	{
-
 		case STRING:
 			return getStr();
-
 		case DISPLAYOBJECT:
 		{
 			const CharacterProxy& sp = getCharacterProxy();
 			if (!sp.get()) return "";
             return sp.getTarget();
 		}
-
 		case NUMBER:
-		{
-			const double d = getNum();
-			return doubleToString(d);
-		}
-
+			return doubleToString(getNum());
 		case UNDEFINED: 
 		    if (version <= 6) return "";
 			return "undefined";
-
 		case NULLTYPE:
 			return "null";
-
 		case BOOLEAN:
 			return getBool() ? "true" : "false";
-
 		case OBJECT:
 		{
             as_object* obj = getObj();
@@ -350,15 +340,10 @@ as_value::to_string(int version) const
 				if (ret.is_string()) return ret.getStr();
 			}
 			catch (ActionTypeError& e) {
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(_("to_primitive(%s, STRING) threw an ActionTypeError %s"),
-						*this, e.what());
-#endif
 			}
 
 			if (_type == OBJECT) {
-                return is_function() ? "[type Function]" :
-                                       "[type Object]";
+                return is_function() ? "[type Function]" : "[type Object]";
             }
 
 		}
