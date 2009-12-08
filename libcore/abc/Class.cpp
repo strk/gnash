@@ -29,15 +29,12 @@
 #include "Global_as.h"
 #include "as_class.h"
 
-#ifdef ENABLE_AVM2
 #include "Method.h"
 #include "abc_function.h"
-#endif
 
 namespace gnash {
 namespace abc {
 
-#ifdef ENABLE_AVM2    
 bool
 Class::addValue(string_table::key name, Namespace *ns,
         boost::uint32_t slotId, Class *type, as_value& val, bool isconst,
@@ -108,7 +105,7 @@ Class::addSlot(string_table::key name, Namespace* ns,
 	return true;
 }
 
-    bool
+bool
 Class::addMethod(string_table::key name, Namespace* /*ns*/,
         Method* method, bool /*isstatic*/)
 {
@@ -245,7 +242,6 @@ Class::addSlotFunction(string_table::key name, Namespace *ns,
 }
 #endif 
 
-#endif
 
 } // namespace abc 
 } // namespace gnash 

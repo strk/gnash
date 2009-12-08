@@ -1179,7 +1179,7 @@ AbcBlock::read_scripts()
 
 			pScript->_traits.push_back(aTrait);
 		}
-	} // end of scripts loop
+	} 
 	return true;
 }
 
