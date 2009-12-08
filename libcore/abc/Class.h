@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_ABC_SCRIPT_H
-#define GNASH_ABC_SCRIPT_H
+#ifndef GNASH_ABC_CLASS_H
+#define GNASH_ABC_CLASS_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -30,11 +30,8 @@
 #include "as_value.h"
 #include "as_object.h"
 #include "Property.h"
-
-#ifdef ENABLE_AVM2
-# include "CodeStream.h"
-# include "AbcBlock.h"
-#endif
+#include "CodeStream.h"
+#include "AbcBlock.h"
 
 namespace gnash {
     namespace abc {
@@ -72,9 +69,16 @@ namespace abc {
 ///     is constructed. As not all Classes are constructed, the iinit method
 ///     may never be executed.
 //
+/// Classes are parsed from the "instances" and "classes" section of an
+/// ABCBlock. Each of these contains the same number of entries. The iinit
+/// methods are found in the instances section, the cinit methods in the
+/// classes section.
+//
+/// Note: the following does not describe very well how the data are organized
+/// in the ABC file.
 /// A Script may contain more than one class. When a Script runs, the cinit
 /// methods of all its classes are executed in the order they appear in the
-/// Script. 
+/// Script.
 class Class
 {
 public:
@@ -114,8 +118,6 @@ public:
 	void setName(string_table::key name) { _name = name; }
 
 	void dump();
-
-#ifdef ENABLE_AVM2
 
 	bool addValue(string_table::key name, Namespace *ns,
             boost::uint32_t slotID, Class *type, as_value& val,
@@ -239,7 +241,6 @@ public:
 	Binding* getSetBinding(as_value& v, abc::MultiName& n);
     std::vector<abc::Trait> _traits;
 
-#endif
 
 private:
 	
