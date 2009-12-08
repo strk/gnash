@@ -68,29 +68,11 @@ namespace gnash {
 
 namespace {
 
-struct invalidHexDigit {};
-boost::uint8_t parseHex(char c)
+/// Returns a member only if it is an object.
+inline bool
+findMethod(as_object& obj, string_table::key m, as_value& ret)
 {
-	switch (c)
-	{
-		case '0': return 0;
-		case '1': return 1;
-		case '2': return 2;
-		case '3': return 3;
-		case '4': return 4;
-		case '5': return 5;
-		case '6': return 6;
-		case '7': return 7;
-		case '8': return 8;
-		case '9': return 9;
-		case 'a': case 'A': return 10;
-		case 'b': case 'B': return 11;
-		case 'c': case 'C': return 12;
-		case 'd': case 'D': return 13;
-		case 'e': case 'E': return 14;
-		case 'f': case 'F': return 15;
-		default: throw invalidHexDigit();
-	}
+    return obj.get_member(m, &ret) && ret.is_object();
 }
 
 inline boost::uint16_t
@@ -114,8 +96,7 @@ readNetworkLong(const boost::uint8_t* buf) {
 boost::int32_t
 truncateToInt(double d)
 {
-    if (d < 0)
-    {   
+    if (d < 0) {   
 	    return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
     }
 	
@@ -335,19 +316,13 @@ as_value::to_string() const
 		case DISPLAYOBJECT:
 		{
 			const CharacterProxy& sp = getCharacterProxy();
-			if ( ! sp.get() )
-			{
-				return "";
-			}
-			else
-			{
-				return sp.getTarget();
-			}
+			if (!sp.get()) return "";
+            return sp.getTarget();
 		}
 
 		case NUMBER:
 		{
-			double d = getNum();
+			const double d = getNum();
 			return doubleToString(d);
 		}
 
@@ -355,11 +330,6 @@ as_value::to_string() const
 			// Behavior depends on file version.  In
 			// version 7+, it's "undefined", in versions
 			// 6-, it's "".
-			//
-			// We'll go with the v7 behavior by default,
-			// and conditionalize via _versioned()
-			// functions.
-			// 
 			return "undefined";
 
 		case NULLTYPE:
@@ -427,21 +397,19 @@ as_value::ptype() const
 
 	switch (_type)
 	{
-        case STRING: return PTYPE_STRING;
-        case NUMBER: return PTYPE_NUMBER;
+        case STRING:
+            return PTYPE_STRING;
+        case NUMBER: 
         case UNDEFINED:
         case NULLTYPE:
         case DISPLAYOBJECT:
-            return PTYPE_NUMBER;
         case OBJECT:
-        {
             return PTYPE_NUMBER;
-        }
         case BOOLEAN:
             return PTYPE_BOOLEAN;
         default:
-            break; // Should be only exceptions here.
-        }
+            break;
+    }
 	return PTYPE_NUMBER;
 }
 
@@ -477,12 +445,7 @@ as_value::to_primitive(AsType hint) const
         assert(_type == OBJECT);
 		obj = getObj();
 
-		if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
-                (!method.is_function())) {
-
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" valueOf not found");
-#endif
+		if (!findMethod(*obj, NSV::PROP_VALUE_OF, method)) {
             // Returning undefined here instead of throwing
             // a TypeError passes tests in actionscript.all/Object.as
             // and many swfdec tests, with no new failures (though
@@ -505,21 +468,10 @@ as_value::to_primitive(AsType hint) const
 		// text representation for that object is used
 		// instead.
 		//
-		if ((!obj->get_member(NSV::PROP_TO_STRING, &method)) ||
-                (!method.is_function())) // ECMA says ! is_object()
-		{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" toString not found");
-#endif
-			if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
-                    (!method.is_function())) // ECMA says ! is_object()
-			{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(" valueOf not found");
-#endif
+		if (!findMethod(*obj, NSV::PROP_TO_STRING, method) &&
+                !findMethod(*obj, NSV::PROP_VALUE_OF, method)) {
 				throw ActionTypeError();
-			}
-		}
+        }
 	}
 
 	assert(obj);
@@ -688,7 +640,6 @@ as_value::to_element() const
       }
       case DISPLAYOBJECT:
 	  log_unimpl("Converting a Movie Clip to an element is not supported");
-          // TODO: what kind of Element will be left with ? Should we throw an exception ?
 	  break;
       default:
 	  break;
@@ -697,79 +648,22 @@ as_value::to_element() const
     return el;
 }
 
-// Conversion to boolean for SWF7 and up
+// Conversion to boolean 
 bool
-as_value::to_bool_v7() const
+as_value::to_bool() const
 {
-	    switch (_type)
-	    {
-		case  STRING:
-			return getStr() != "";
-		case NUMBER:
+    const int version = VM::get().getSWFVersion();
+    switch (_type)
+    {
+		case STRING:
 		{
-			double d = getNum();
-			return d && ! isNaN(d);
-		}
-		case BOOLEAN:
-			return getBool();
-		case OBJECT:
-			return true;
-
-		case DISPLAYOBJECT:
-			return true;
-		default:
-			assert(_type == UNDEFINED || _type == NULLTYPE ||
-				is_exception());
-			return false;
-	}
-}
-
-// Conversion to boolean up to SWF5
-bool
-as_value::to_bool_v5() const
-{
-	    switch (_type)
-	    {
-		case  STRING:
-		{
-			double num = to_number();
-			bool ret = num && ! isNaN(num);
-			return ret;
+            if (version >= 7) return !getStr().empty();
+			const double num = to_number();
+			return num && !isNaN(num);
 		}
 		case NUMBER:
 		{
-			double d = getNum();
-			return d && ! isNaN(d);
-		}
-		case BOOLEAN:
-			return getBool();
-		case OBJECT:
-			return true;
-
-		case DISPLAYOBJECT:
-			return true;
-		default:
-			assert(_type == UNDEFINED || _type == NULLTYPE ||
-				is_exception());
-			return false;
-	}
-}
-
-// Conversion to boolean for SWF6
-bool
-as_value::to_bool_v6() const
-{
-	    switch (_type)
-	    {
-		case  STRING:
-		{
-			double num = to_number();
-			bool ret = num && ! isNaN(num);
-			return ret;
-		}
-		case NUMBER:
-		{
-			double d = getNum();
+			const double d = getNum();
             // see testsuite/swfdec/if-6.swf
 			return d && ! isNaN(d);
 		}
@@ -777,26 +671,14 @@ as_value::to_bool_v6() const
 			return getBool();
 		case OBJECT:
 			return true;
-
 		case DISPLAYOBJECT:
 			return true;
 		default:
-			assert(_type == UNDEFINED || _type == NULLTYPE ||
-				is_exception());
+			assert(_type == UNDEFINED || _type == NULLTYPE || is_exception());
 			return false;
 	}
 }
 
-// Conversion to boolean.
-bool
-as_value::to_bool() const
-{
-    int ver = VM::get().getSWFVersion();
-    if ( ver >= 7 ) return to_bool_v7();
-    else if ( ver == 6 ) return to_bool_v6();
-    else return to_bool_v5();
-}
-	
 // Return value as an object.
 as_object*
 as_value::to_object(Global_as& global) const
@@ -894,11 +776,6 @@ as_value::equals(const as_value& v) const
 {
     // Comments starting with numbers refer to the ECMA-262 document
 
-#ifdef GNASH_DEBUG_EQUALITY
-    static int count=0;
-    log_debug("equals(%s, %s) called [%d]", *this, v, count++);
-#endif
-
     int SWFVersion = VM::get().getSWFVersion();
 
     bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
@@ -906,7 +783,6 @@ as_value::equals(const as_value& v) const
 
     // It seems like functions are considered the same as a NULL type
     // in SWF5 (and I hope below, didn't check)
-    //
     if (SWFVersion < 6) {
         if (is_function()) this_nulltype = true;
         if (v.is_function()) v_nulltype = true;
@@ -1019,7 +895,7 @@ as_value::equals(const as_value& v) const
 		p = to_primitive(p.defaultPrimitive(SWFVersion)); 
 		if (!strictly_equals(p)) converted = true;
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" convertion to primitive (this): %s -> %s", *this, p);
+		log_debug(" conversion to primitive (this): %s -> %s", *this, p);
 #endif
 	}
 	catch (ActionTypeError& e) {
@@ -1033,7 +909,7 @@ as_value::equals(const as_value& v) const
 		vp = v.to_primitive(v.defaultPrimitive(SWFVersion)); 
 		if (!v.strictly_equals(vp)) converted = true;
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" convertion to primitive (that): %s -> %s", v, vp);
+		log_debug(" conversion to primitive (that): %s -> %s", v, vp);
 #endif
 	}
 	catch (ActionTypeError& e) {
@@ -1046,7 +922,7 @@ as_value::equals(const as_value& v) const
 	if (converted)
 	{
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" some conversion took place, recurring");
+		log_debug(" some conversion took place, recursing");
 #endif
 		return p.equals(vp);
 	}
@@ -1072,24 +948,24 @@ as_value::string_concat(const std::string& str)
 const char*
 as_value::typeOf() const
 {
-	switch(_type)
+	switch (_type)
 	{
-		case as_value::UNDEFINED:
+		case UNDEFINED:
 			return "undefined"; 
 
-		case as_value::STRING:
+		case STRING:
 			return "string";
 
-		case as_value::NUMBER:
+		case NUMBER:
 			return "number";
 
-		case as_value::BOOLEAN:
+		case BOOLEAN:
 			return "boolean";
 
-		case as_value::OBJECT:
+		case OBJECT:
             return is_function() ? "function" : "object";
 
-		case as_value::DISPLAYOBJECT:
+		case DISPLAYOBJECT:
 		{
 			DisplayObject* ch = getCharacter();
 			if ( ! ch ) return "movieclip"; // dangling
@@ -1097,28 +973,21 @@ as_value::typeOf() const
 			return "object"; // bound to some other DisplayObject
 		}
 
-		case as_value::NULLTYPE:
+		case NULLTYPE:
 			return "null";
 
 		default:
-			if (is_exception())
-			{
-				return "exception";
-		    }
-			abort();
-			return NULL;
+			if (is_exception()) return "exception";
+            std::abort();
+			return 0;
 	}
 }
 
-/*private*/
 bool
 as_value::equalsSameType(const as_value& v) const
 {
-#ifdef GNASH_DEBUG_EQUALITY
-    static int count=0;
-    log_debug("equalsSameType(%s, %s) called [%d]", *this, v, count++);
-#endif
 	assert(_type == v._type);
+
 	switch (_type)
 	{
 		case UNDEFINED:
@@ -1135,27 +1004,16 @@ as_value::equalsSameType(const as_value& v) const
 
 		case NUMBER:
 		{
-			double a = getNum();
-			double b = v.getNum();
-
-			// Nan != NaN
-			//if ( isNaN(a) || isNaN(b) ) return false;
-
-			if ( isNaN(a) && isNaN(b) ) return true;
-
-			// -0.0 == 0.0
-			if ( (a == -0 && b == 0) || (a == 0 && b == -0) ) return true;
-
+			const double a = getNum();
+			const double b = v.getNum();
+			if (isNaN(a) && isNaN(b)) return true;
 			return a == b;
 		}
 		default:
-			if (is_exception())
-			{
-				return false; // Exceptions equal nothing.
-		    }
+			if (is_exception()) return false; 
 
 	}
-	abort();
+    std::abort();
 	return false;
 }
 
@@ -1183,7 +1041,8 @@ as_value::toDebugString() const
 		case OBJECT:
 		{
 			as_object* obj = getObj();
-			ret = boost::format("[object(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
+			ret = boost::format("[object(%s):%p]") % typeName(*obj) %
+                                              static_cast<void*>(obj);
 			return ret.str();
 		}
 		case STRING:
@@ -1197,23 +1056,19 @@ as_value::toDebugString() const
 		case DISPLAYOBJECT:
 		{
 			const CharacterProxy& sp = getCharacterProxy();
-			if ( sp.isDangling() )
-			{
+			if (sp.isDangling()) {
 				DisplayObject* rebound = sp.get();
-				if ( rebound )
-				{
+				if (rebound) {
 				    ret = boost::format("[rebound %s(%s):%p]") % 
 						typeName(*rebound) % sp.getTarget() %
 						static_cast<void*>(rebound);
 				}
-				else
-				{
+				else {
 				    ret = boost::format("[dangling DisplayObject:%s]") % 
 					    sp.getTarget();
 				}
 			}
-			else
-			{
+			else {
 				DisplayObject* ch = sp.get();
 				ret = boost::format("[%s(%s):%p]") % typeName(*ch) %
 				                sp.getTarget() % static_cast<void*>(ch);
@@ -1221,11 +1076,8 @@ as_value::toDebugString() const
 			return ret.str();
 		}
 		default:
-			if (is_exception())
-			{
-				return "[exception]";
-			}
-			abort();
+			if (is_exception()) return "[exception]";
+            std::abort();
 	}
 }
 
@@ -1239,14 +1091,12 @@ as_value::operator=(const as_value& v)
 void
 as_value::setReachable() const
 {
-#ifdef GNASH_USE_GC
 	switch (_type)
 	{
 		case OBJECT:
 		{
 			as_object* op = getObj();
-			if (op)
-				op->setReachable();
+			if (op) op->setReachable();
 			break;
 		}
 		case DISPLAYOBJECT:
@@ -1257,7 +1107,6 @@ as_value::setReachable() const
 		}
 		default: break;
 	}
-#endif // GNASH_USE_GC
 }
 
 as_object*
@@ -1507,8 +1356,10 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             
             log_debug("array size: %d", li);
             
-            // the count specifies array size, so to have that even if none of the members are indexed
-            // if short, will be incremented everytime an indexed member is found
+            // the count specifies array size, so to have that even if none
+            // of the members are indexed
+            // if short, will be incremented everytime an indexed member is
+            // found
             obj->set_member(NSV::PROP_LENGTH, li);
 
             // TODO: do boundary checking (if b >= end...)
@@ -1530,11 +1381,9 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 
                 // end of ECMA_ARRAY is signalled by an empty string
                 // followed by an OBJECT_END_AMF0 (0x09) byte
-                if ( ! strlen )
-                {
+                if (!strlen) {
                     // expect an object terminator here
-                    if ( *b++ != amf::Element::OBJECT_END_AMF0 )
-                    {
+                    if (*b++ != amf::Element::OBJECT_END_AMF0) {
                         log_error("MALFORMED SOL: empty member name not "
                                 "followed by OBJECT_END_AMF0 byte");
                     }
@@ -1547,8 +1396,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
                 log_debug("amf0 ECMA_ARRAY prop name is %s", name);
 #endif
                 b += strlen;
-                if ( ! amf0_read_value(b, end, objectElement, -1, objRefs, vm) )
-                {
+                if (!amf0_read_value(b, end, objectElement, -1, objRefs, vm)) {
                     return false;
                 }
                 obj->set_member(st.find(name), objectElement);
@@ -1583,8 +1431,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
                 }
                 keyString = tmp.to_string();
 
-                if ( keyString.empty() )
-                {
+                if (keyString.empty()) {
                     if (b < end) {
                         b += 1; // AMF0 has a redundant "object end" byte
                     } else {
@@ -1594,8 +1441,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
                     return true;
                 }
 
-                if ( ! amf0_read_value(b, end, tmp, -1, objRefs, vm) )
-                {
+                if (!amf0_read_value(b, end, tmp, -1, objRefs, vm)) {
                     return false;
                 }
                 obj->set_member(st.find(keyString), tmp);
