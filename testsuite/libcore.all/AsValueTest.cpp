@@ -189,6 +189,7 @@ test_conversion()
 void
 test_el()
 {
+#if 0
 //    bool notest = false;
     
     Element el1;
@@ -240,11 +241,13 @@ test_el()
     //}
 
     // There is no equivalent AMF element type to the as_value AS_FUNCTION type
+#endif
 }
 
 void
 test_obj(const as_object* o)
 {
+#if 0
     // Create an object element with some properties
     bool notest = false;
     Element top;
@@ -317,6 +320,7 @@ test_obj(const as_object* o)
     } else {
         runtest.fail("as_value::to_element()");
     }
+#endif
 }
 
 void

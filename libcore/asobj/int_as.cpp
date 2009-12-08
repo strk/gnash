@@ -52,7 +52,7 @@ int_ctor(const fn_call& fn)
         LOG_ONCE( log_unimpl("Arguments passed to int() ctor unhandled") );
     }
 	
-    obj->setRelay(new int_as(fn.nargs ? fn.arg(0).to_int() : 0));
+    obj->setRelay(new int_as(fn.nargs ? toInt(fn.arg(0)) : 0));
     return as_value();
 }
 

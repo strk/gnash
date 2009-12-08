@@ -1148,7 +1148,7 @@ netconnection_connect(const fn_call& fn)
     const as_value& uri = fn.arg(0);
 
     const VM& vm = getVM(fn);
-    const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
+    const std::string& uriStr = uri.to_string(vm.getSWFVersion());
     
     // This is always set without validification.
     ptr->setURI(uriStr);

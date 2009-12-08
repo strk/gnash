@@ -270,14 +270,14 @@ colortransform_toString(const fn_call& fn)
     
     const int version = getSWFVersion(fn);
 
-    ss << "(redMultiplier=" << rm.to_string_versioned(version) << ", "
-       << "greenMultiplier=" << gm.to_string_versioned(version) << ", "
-       << "blueMultiplier=" << bm.to_string_versioned(version) << ", "
-       << "alphaMultiplier=" << am.to_string_versioned(version) << ", "
-       << "redOffset=" << ro.to_string_versioned(version) << ", "
-       << "greenOffset=" << go.to_string_versioned(version) << ", "
-       << "blueOffset=" << bo.to_string_versioned(version) << ", "
-       << "alphaOffset=" << ao.to_string_versioned(version) << ")";
+    ss << "(redMultiplier=" << rm.to_string(version) << ", "
+       << "greenMultiplier=" << gm.to_string(version) << ", "
+       << "blueMultiplier=" << bm.to_string(version) << ", "
+       << "alphaMultiplier=" << am.to_string(version) << ", "
+       << "redOffset=" << ro.to_string(version) << ", "
+       << "greenOffset=" << go.to_string(version) << ", "
+       << "blueOffset=" << bo.to_string(version) << ", "
+       << "alphaOffset=" << ao.to_string(version) << ")";
        
     return as_value(ss.str());
 
@@ -309,7 +309,7 @@ colortransform_rgb(const fn_call& fn)
 
     // Setter
 
-    boost::uint32_t rgb = fn.arg(0).to_int();
+    boost::uint32_t rgb = toInt(fn.arg(0));
     relay->setRedOffset((rgb & 0xFF0000) >> 16);
     relay->setGreenOffset((rgb & 0x00FF00) >> 8);
     relay->setBlueOffset(rgb & 0x0000FF);

@@ -354,10 +354,12 @@ Rectangle_toString(const fn_call& fn)
     ptr->get_member(NSV::PROP_HEIGHT, &h);
 
     std::stringstream ss;
-    ss << "(x=" << x.to_string()
-        << ", y=" << y.to_string()
-        << ", w=" << w.to_string()
-        << ", h=" << h.to_string()
+    const int version = getSWFVersion(fn);
+
+    ss << "(x=" << x.to_string(version)
+        << ", y=" << y.to_string(version)
+        << ", w=" << w.to_string(version)
+        << ", h=" << h.to_string(version)
          << ")";
 
     return as_value(ss.str());

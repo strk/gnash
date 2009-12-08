@@ -185,13 +185,13 @@ textformat_new(const fn_call& fn)
 	    default:
 	        log_error(_("Too many args (%d) passed to TextFormat"), args);
 	    case 13:
-	        tf->leadingSet(pixelsToTwips(fn.arg(12).to_int()));
+	        tf->leadingSet(pixelsToTwips(toInt(fn.arg(12))));
 	    case 12:
-	        tf->indentSet(pixelsToTwips(fn.arg(11).to_int()));
+	        tf->indentSet(pixelsToTwips(toInt(fn.arg(11))));
 	    case 11:
-	        tf->rightMarginSet(pixelsToTwips(fn.arg(10).to_int()));
+	        tf->rightMarginSet(pixelsToTwips(toInt(fn.arg(10))));
 	    case 10:
-	        tf->leftMarginSet(pixelsToTwips(fn.arg(9).to_int()));
+	        tf->leftMarginSet(pixelsToTwips(toInt(fn.arg(9))));
 	    case 9:
 	        tf->alignSet(fn.arg(8).to_string());
 	    case 8:
@@ -207,11 +207,11 @@ textformat_new(const fn_call& fn)
 	    case 3:
 	    {
 	        rgba col;
-	        col.parseRGB(fn.arg(2).to_int());
+	        col.parseRGB(toInt(fn.arg(2)));
 	        tf->colorSet(col);
 	    }
 	    case 2:
-	        tf->sizeSet(pixelsToTwips(fn.arg(1).to_int()));
+	        tf->sizeSet(pixelsToTwips(toInt(fn.arg(1))));
 	    case 1:
 	        tf->fontSet(fn.arg(0).to_string());
 	        break;
@@ -330,7 +330,7 @@ textformat_blockIndent(const fn_call& fn)
 	}
 	else // setter
 	{
-		relay->blockIndentSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->blockIndentSet(pixelsToTwips(toInt(fn.arg(0))));
 	}
 
 	return ret;
@@ -350,7 +350,7 @@ textformat_leading(const fn_call& fn)
 	}
 	else // setter
 	{
-		relay->leadingSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->leadingSet(pixelsToTwips(toInt(fn.arg(0))));
 	}
 
 	return ret;
@@ -370,7 +370,7 @@ textformat_indent(const fn_call& fn)
 	}
 	else // setter
 	{
-		relay->indentSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->indentSet(pixelsToTwips(toInt(fn.arg(0))));
 	}
 
 	return ret;
@@ -390,7 +390,7 @@ textformat_rightMargin(const fn_call& fn)
 	}
 	else // setter
 	{
-		relay->rightMarginSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->rightMarginSet(pixelsToTwips(toInt(fn.arg(0))));
 	}
 
 	return ret;
@@ -412,7 +412,7 @@ textformat_leftMargin(const fn_call& fn)
 	}
 	else // setter
 	{
-		relay->leftMarginSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->leftMarginSet(pixelsToTwips(toInt(fn.arg(0))));
 	}
 
 	return ret;
@@ -555,7 +555,7 @@ textformat_color(const fn_call& fn)
 	else // setter
 	{
 		rgba newcolor;
-		newcolor.parseRGB(fn.arg(0).to_int());
+		newcolor.parseRGB(toInt(fn.arg(0)));
 		relay->colorSet(newcolor);
 	}
 
@@ -576,7 +576,7 @@ textformat_size(const fn_call& fn)
 	}
 	else // setter
 	{
-		relay->sizeSet(pixelsToTwips(fn.arg(0).to_int()));
+		relay->sizeSet(pixelsToTwips(toInt(fn.arg(0))));
 	}
 
 	return ret;

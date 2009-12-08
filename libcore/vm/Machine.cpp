@@ -859,7 +859,7 @@ Machine::execute()
                     if (!_stack.top(0).is_number()) throw ASException();
 
                     boost::uint32_t index =
-                        _stack.top(0).to_number<boost::uint32_t>();
+                        _stack.top(0).to_number();
                     _stack.drop(1);
 
                     mStream->seekBy(3); // Skip the intial offset.
@@ -948,7 +948,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(1));
                     as_object *obj = _stack.top(1).to_object(*_global);
                     const boost::uint32_t index =
-                        _stack.top(0).to_number<boost::uint32_t>();
+                        _stack.top(0).to_number();
                     
                     if (!obj) {
                         // TODO: check what to do here.
@@ -980,7 +980,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(1));
                     as_object *obj = _stack.top(1).to_object(*_global);
                     boost::uint32_t index =
-                        _stack.top(0).to_number<boost::uint32_t>();
+                        _stack.top(0).to_number();
                     _stack.drop(1);
                     assert(obj);
                     _stack.top(0) = obj->nextIndex(index);
@@ -1020,7 +1020,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(1));
                     as_object *obj = _stack.top(1).to_object(*_global);
                     const boost::uint32_t index =
-                        _stack.top(0).to_number<boost::uint32_t>();
+                        _stack.top(0).to_number();
                     const Property *b = obj->getByIndex(index);
                     _stack.drop(1);
                     if (!b) _stack.top(0).set_undefined();
@@ -1074,7 +1074,7 @@ Machine::execute()
                 ///  NaN -- the NaN object
                 case SWF::ABC_ACTION_PUSHNAN:
                     _stack.grow(1);
-                    _stack.top(0).set_nan();
+                    setNaN(_stack.top(0));
                     break;
             
                 /// 0x29 ABC_ACTION_POP
@@ -1202,7 +1202,7 @@ Machine::execute()
                         break;
                     }
                     
-                    boost::uint32_t index = indexv.to_number<boost::uint32_t>();
+                    boost::uint32_t index = toInt(indexv);
 
                     as_object *owner = 0;
                     int next = obj->nextIndex(index, &owner);
@@ -2207,7 +2207,7 @@ Machine::execute()
                 ///  int_value -- value as an integer object
                 case SWF::ABC_ACTION_CONVERT_I:
                 case SWF::ABC_ACTION_COERCE_I:
-                    _stack.top(0) = _stack.top(0).to_int();
+                    _stack.top(0) = toInt(_stack.top(0));
                     break;
 
                 /// 0x74 ABC_ACTION_CONVERT_U
@@ -2218,7 +2218,8 @@ Machine::execute()
                 ///  int_value -- value as an unsigned integer object
                 case SWF::ABC_ACTION_CONVERT_U:
                 case SWF::ABC_ACTION_COERCE_U:
-                    _stack.top(0) = _stack.top(0).to_number<unsigned int>();
+                    _stack.top(0) = static_cast<boost::uint32_t>(
+                            _stack.top(0).to_number());
                     break;
 
                 /// 0x75 ABC_ACTION_CONVERT_D
@@ -2451,7 +2452,7 @@ Machine::execute()
                 /// Stack Out:
                 ///  nint -- ~((Int) obj)
                 case SWF::ABC_ACTION_BITNOT:
-                    _stack.top(0) = ~_stack.top(0).to_int();
+                    _stack.top(0) = ~toInt(_stack.top(0));
                     break;
 
                 /// 0xA0 ABC_ACTION_ADD	
@@ -2523,7 +2524,7 @@ Machine::execute()
                 ///  a << b
                 case SWF::ABC_ACTION_LSHIFT:
                 {
-                    _stack.top(1) = _stack.top(1).to_int() << _stack.top(0).to_int();
+                    _stack.top(1) = toInt(_stack.top(1)) << toInt(_stack.top(0));
                     _stack.drop(1);
                     break;
                 }
@@ -2536,7 +2537,7 @@ Machine::execute()
                 ///  a >> b
                 case SWF::ABC_ACTION_RSHIFT:
                 {
-                    _stack.top(1) = _stack.top(1).to_int() >> _stack.top(0).to_int();
+                    _stack.top(1) = toInt(_stack.top(1)) >> toInt(_stack.top(0));
                     _stack.drop(1);
                     break;
                 }
@@ -2549,8 +2550,9 @@ Machine::execute()
                 ///  ((unsigned) a) >> b
                 case SWF::ABC_ACTION_URSHIFT:
                 {
-                    _stack.top(1) = _stack.top(1).to_number<unsigned int>()
-                        >> _stack.top(0).to_int();
+                    _stack.top(1) =
+                        static_cast<boost::uint32_t>(_stack.top(1).to_number())
+                        >> toInt(_stack.top(0));
                     _stack.drop(1);
                     break;
                 }
@@ -2561,7 +2563,7 @@ Machine::execute()
                 /// Stack Out:
                 ///  a & b
                 case SWF::ABC_ACTION_BITAND:
-                    _stack.top(1) = _stack.top(1).to_int() & _stack.top(0).to_int();
+                    _stack.top(1) = toInt(_stack.top(1)) & toInt(_stack.top(0));
                     _stack.drop(1);
                     break;
 
@@ -2572,7 +2574,7 @@ Machine::execute()
                 /// Stack Out:
                 ///  a | b
                 case SWF::ABC_ACTION_BITOR:
-                    _stack.top(1) = _stack.top(1).to_int() | _stack.top(0).to_int();
+                    _stack.top(1) = toInt(_stack.top(1)) | toInt(_stack.top(0));
                     _stack.drop(1);
                     break;
 
@@ -2584,7 +2586,7 @@ Machine::execute()
                 ///  a ^ b
                 case SWF::ABC_ACTION_BITXOR:
                 {
-                    _stack.top(1) = _stack.top(1).to_int() ^ _stack.top(0).to_int();
+                    _stack.top(1) = toInt(_stack.top(1)) ^ toInt(_stack.top(0));
                     _stack.drop(1);
                     break;
                 }
@@ -2755,7 +2757,7 @@ Machine::execute()
                 /// See: 0x91 (ABC_ACTION_INCREMENT), but forces types to int, not double
                 case SWF::ABC_ACTION_INCREMENT_I:
                 {
-                    _stack.top(0) = _stack.top(0).to_int() + 1;
+                    _stack.top(0) = toInt(_stack.top(0)) + 1;
                     break;
                 }
 
@@ -2763,7 +2765,7 @@ Machine::execute()
                 /// See: 0x93 (ABC_ACTION_DECREMENT), but forces types to int, not double
                 case SWF::ABC_ACTION_DECREMENT_I:
                 {
-                    _stack.top(0) = _stack.top(0).to_int() - 1;
+                    _stack.top(0) = toInt(_stack.top(0)) - 1;
                     break;
                 }
 
@@ -2773,7 +2775,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_INCLOCAL_I:
                 {
                     const boost::uint32_t foff = mStream->read_V32();
-                    setRegister(foff,  getRegister(foff).to_int() + 1);
+                    setRegister(foff,  toInt(getRegister(foff)) + 1);
                     break;
                 }
 
@@ -2783,7 +2785,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_DECLOCAL_I:
                 {
                     const boost::uint32_t foff = mStream->read_V32();
-                    setRegister(foff, getRegister(foff).to_int() - 1);
+                    setRegister(foff, toInt(getRegister(foff)) - 1);
                     break;
                 }
 
@@ -2792,7 +2794,7 @@ Machine::execute()
                 /// not double
                 case SWF::ABC_ACTION_NEGATE_I:
                 {
-                    _stack.top(0) = - _stack.top(0).to_int();
+                    _stack.top(0) = - toInt(_stack.top(0));
                     break;
                 }
 
@@ -2800,8 +2802,8 @@ Machine::execute()
                 /// See: 0xA0 (ABC_ACTION_ADD), but forces type to int
                 case SWF::ABC_ACTION_ADD_I:
                 {
-                    _stack.top(1) = _stack.top(1).to_int() +
-                        _stack.top(0).to_int();
+                    _stack.top(1) = toInt(_stack.top(1)) +
+                        toInt(_stack.top(0));
                     _stack.drop(1);
                     break;
                 }
@@ -2810,8 +2812,8 @@ Machine::execute()
                 /// See: 0xA1 (ABC_ACTION_SUBTRACT), but forces type to int
                 case SWF::ABC_ACTION_SUBTRACT_I:
                 {
-                    _stack.top(1) = _stack.top(1).to_int() -
-                        _stack.top(0).to_int();
+                    _stack.top(1) = toInt(_stack.top(1)) -
+                        toInt(_stack.top(0));
                     _stack.drop(1);
                     break;
                 }
@@ -2820,7 +2822,7 @@ Machine::execute()
                 /// See: 0xA2 (ABC_ACTION_MULTIPLY), but forces type to int
                 case SWF::ABC_ACTION_MULTIPLY_I:
                 {
-                    _stack.top(1) = _stack.top(0).to_int() * _stack.top(1).to_int();
+                    _stack.top(1) = toInt(_stack.top(0)) * toInt(_stack.top(1));
                     _stack.drop(1);
                     break;
                 }

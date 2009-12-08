@@ -501,8 +501,8 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max<boost::int32_t>(0, fn.arg(0).to_int());
-    size_t end = std::max<boost::int32_t>(start + 1, fn.arg(1).to_int());
+    size_t start = std::max<boost::int32_t>(0, toInt(fn.arg(0)));
+    size_t end = std::max<boost::int32_t>(start + 1, toInt(fn.arg(1)));
 
     Global_as& gl = getGlobal(fn);
     as_object* ri = gl.createArray();;
@@ -526,7 +526,7 @@ textsnapshot_findText(const fn_call& fn)
         return as_value();
     }
 
-    boost::int32_t start = fn.arg(0).to_int();
+    boost::int32_t start = toInt(fn.arg(0));
     const std::string& text = fn.arg(1).to_string();
 
     /// Yes, the pp is case-insensitive by default. We don't write
@@ -565,8 +565,8 @@ textsnapshot_getSelected(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max<boost::int32_t>(0, fn.arg(0).to_int());
-    size_t end = std::max<boost::int32_t>(start + 1, fn.arg(1).to_int());
+    size_t start = std::max<boost::int32_t>(0, toInt(fn.arg(0)));
+    size_t end = std::max<boost::int32_t>(start + 1, toInt(fn.arg(1)));
 
     return as_value(ts->getSelected(start, end));
 }
@@ -604,8 +604,8 @@ textsnapshot_getText(const fn_call& fn)
         return as_value();
     }
 
-    boost::int32_t start = fn.arg(0).to_int();
-    boost::int32_t end = fn.arg(1).to_int();
+    boost::int32_t start = toInt(fn.arg(0));
+    boost::int32_t end = toInt(fn.arg(1));
 
     const bool newline = (fn.nargs > 2) ? fn.arg(2).to_bool() : false;
 
@@ -649,8 +649,8 @@ textsnapshot_setSelected(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max<boost::int32_t>(0, fn.arg(0).to_int());
-    size_t end = std::max<boost::int32_t>(start, fn.arg(1).to_int());
+    size_t start = std::max<boost::int32_t>(0, toInt(fn.arg(0)));
+    size_t end = std::max<boost::int32_t>(start, toInt(fn.arg(1)));
 
     bool selected = (fn.nargs > 2) ? fn.arg(2).to_bool() : true;
 
@@ -664,7 +664,7 @@ textsnapshot_ctor(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    MovieClip* mc = (fn.nargs == 1) ? fn.arg(0).to_sprite() : 0;
+    MovieClip* mc = (fn.nargs == 1) ? fn.arg(0).toMovieClip() : 0;
 
     ptr->setRelay(new TextSnapshot_as(mc));
     return as_value();

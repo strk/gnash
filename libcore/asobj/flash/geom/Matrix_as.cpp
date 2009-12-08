@@ -666,12 +666,12 @@ matrix_toString(const fn_call& fn)
     
     const int version = getSWFVersion(fn);
 
-    ss << "(a=" << a.to_string_versioned(version) << ", "
-          "b="<< b.to_string_versioned(version) << ", "
-          "c="<< c.to_string_versioned(version) << ", "
-          "d="<< d.to_string_versioned(version) << ", "
-          "tx="<< tx.to_string_versioned(version) << ", "
-          "ty="<< ty.to_string_versioned(version) << ")";
+    ss << "(a=" << a.to_string(version) << ", "
+          "b="<< b.to_string(version) << ", "
+          "c="<< c.to_string(version) << ", "
+          "d="<< d.to_string(version) << ", "
+          "tx="<< tx.to_string(version) << ", "
+          "ty="<< ty.to_string(version) << ")";
     
     return as_value(ss.str());
 }

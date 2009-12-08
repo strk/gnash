@@ -87,7 +87,7 @@ glowfilter_inner(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_inner );
     }
-    boost::uint32_t sp_inner = fn.arg(0).to_number<boost::uint32_t> ();
+    boost::uint32_t sp_inner = fn.arg(0).to_number ();
     ptr->m_inner = sp_inner;
     return as_value();
 }
@@ -99,7 +99,7 @@ glowfilter_color(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_color );
     }
-    float sp_color = fn.arg(0).to_number<float> ();
+    float sp_color = fn.arg(0).to_number ();
     ptr->m_color = sp_color;
     return as_value();
 }
@@ -111,7 +111,7 @@ glowfilter_alpha(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_alpha );
     }
-    float sp_alpha = fn.arg(0).to_number<float> ();
+    float sp_alpha = fn.arg(0).to_number ();
     ptr->m_alpha = sp_alpha;
     return as_value();
 }
@@ -123,7 +123,7 @@ glowfilter_blurX(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
-    float sp_blurX = fn.arg(0).to_number<float> ();
+    float sp_blurX = fn.arg(0).to_number ();
     ptr->m_blurX = sp_blurX;
     return as_value();
 }
@@ -135,7 +135,7 @@ glowfilter_blurY(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
-    float sp_blurY = fn.arg(0).to_number<float> ();
+    float sp_blurY = fn.arg(0).to_number ();
     ptr->m_blurY = sp_blurY;
     return as_value();
 }
@@ -147,7 +147,7 @@ glowfilter_strength(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_strength );
     }
-    float sp_strength = fn.arg(0).to_number<float> ();
+    float sp_strength = fn.arg(0).to_number ();
     ptr->m_strength = sp_strength;
     return as_value();
 }
@@ -159,7 +159,7 @@ glowfilter_quality(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
-    boost::uint8_t sp_quality = fn.arg(0).to_number<boost::uint8_t> ();
+    boost::uint8_t sp_quality = fn.arg(0).to_number ();
     ptr->m_quality = sp_quality;
     return as_value();
 }

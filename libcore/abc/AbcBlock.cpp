@@ -36,86 +36,86 @@ namespace gnash {
 namespace abc {
 
 bool
-Trait::finalize(AbcBlock *pBlock, abc::Class *pScript, bool do_static)
+Trait::finalize(AbcBlock *block, abc::Class* script, bool do_static)
 {
 	log_abc("Finalize class %s (%s), trait kind: %s", 
-            pBlock->_stringTable->value(pScript->getName()), pScript, _kind);
+            block->_stringTable->value(script->getName()), script, _kind);
 
 	switch (_kind)
 	{
-	case KIND_SLOT:
-	case KIND_CONST:
-	{
-		// Validate the type.
-		abc::Class *pType;
-		if (_typeIndex) {
-			log_abc("Trait type: %s", 
-                pBlock->_stringPool[
-                    pBlock->_multinamePool[_typeIndex].getABCName()]);
-			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
-		}
-		else {
-			pType = pBlock->mTheObject;
-		}
+        case KIND_SLOT:
+        case KIND_CONST:
+        {
+            // Validate the type.
+            abc::Class *type;
+            if (_typeIndex) {
+                log_abc("Trait type: %s", 
+                    block->_stringPool[
+                        block->_multinamePool[_typeIndex].getABCName()]);
+                type = block->locateClass(block->_multinamePool[_typeIndex]);
+            }
+            else {
+                type = block->mTheObject;
+            }
 
-		if (!pType) {
-			log_error(_("ABC: Finalizing trait yielded bad type for slot."));
-			return false;
-		}
+            if (!type) {
+                log_error(_("ABC: Finalizing trait yielded bad type for slot."));
+                return false;
+            }
 
-		// The name has been validated in read.
-		// TODO: Find a better way to initialize trait values.
-		if (!_hasValue) {
-            as_object* null = 0;
-			_value = null; 
-		}
+            // The name has been validated in read.
+            // TODO: Find a better way to initialize trait values.
+            if (!_hasValue) {
+                as_object* null = 0;
+                _value = null; 
+            }
 
-		log_abc("Adding property=%s with value=%s slot=%u",
-                pBlock->_stringPool[_name], _value, _slotID);
+            log_abc("Adding property=%s with value=%s slot=%u",
+                    block->_stringPool[_name], _value, _slotID);
 
-		pScript->addValue(_globalName, _namespace, _slotID, pType, 
-			_value, _kind == KIND_CONST, do_static);
-		break;
-	}
-	case KIND_METHOD:
-	{
-		pScript->addMethod(_globalName, _namespace, _method, false);
-		break;
-	}
-	case KIND_GETTER:
-	{
-		pScript->addGetter(_name, _namespace, _method, do_static);
-		break;
-	}
-	case KIND_SETTER:
-	{
-		pScript->addSetter(_name, _namespace, _method, do_static);
-		break;
-	}
-	case KIND_CLASS:
-	{
-		log_abc("Adding class %s, value %s, slot=%u",
-                pBlock->_stringPool[_name], _value, _slotID);
+            script->addValue(_globalName, _namespace, _slotID, type, 
+                _value, _kind == KIND_CONST, do_static);
+            break;
+        }
+        case KIND_METHOD:
+        {
+            script->addMethod(_globalName, _namespace, _method, false);
+            break;
+        }
+        case KIND_GETTER:
+        {
+            script->addGetter(_name, _namespace, _method, do_static);
+            break;
+        }
+        case KIND_SETTER:
+        {
+            script->addSetter(_name, _namespace, _method, do_static);
+            break;
+        }
+        case KIND_CLASS:
+        {
+            log_abc("Adding class %s, value %s, slot=%u",
+                    block->_stringPool[_name], _value, _slotID);
 
-		pScript->addMemberScript(_globalName, _namespace, _slotID, 
-			pBlock->_classes[_classInfoIndex], do_static);
-		break;
-	}
-	case KIND_FUNCTION:
-	{
-		pScript->addSlotFunction(_name, _namespace, _slotID, _method, do_static);
-		break;
-	}
-	default:
-		// Not here -- validated already in read.
-		return false;
-		break;
+            script->addMemberScript(_globalName, _namespace, _slotID, 
+                block->_classes[_classInfoIndex], do_static);
+            break;
+        }
+        case KIND_FUNCTION:
+        {
+            script->addSlotFunction(_name, _namespace, _slotID, _method, do_static);
+            break;
+        }
+        default:
+            // Not here -- validated already in read.
+            return false;
+            break;
 	} // end of switch
 	return true;
 }
 
 bool
-Trait::finalize_mbody(AbcBlock *pBlock, Method *pMethod)
+Trait::finalize_mbody(AbcBlock *block, Method *pMethod)
 {
 	log_abc("Finalizing method trait: kind %s", _kind);
 	switch (_kind)
@@ -124,15 +124,15 @@ Trait::finalize_mbody(AbcBlock *pBlock, Method *pMethod)
 	case KIND_CONST:
 	{
 		// Validate the type.
-		abc::Class *pType;
+		abc::Class *type;
 		if (_typeIndex) {
-			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
+			type = block->locateClass(block->_multinamePool[_typeIndex]);
         }
 		else {
-			pType = pBlock->mTheObject;
+			type = block->mTheObject;
         }
 
-		if (!pType) {
+		if (!type) {
 			log_error(_("ABC: Finalizing trait yielded bad type for slot."));
 			return false;
 		}
@@ -143,8 +143,8 @@ Trait::finalize_mbody(AbcBlock *pBlock, Method *pMethod)
 			_value = as_value((as_object*)0); // NULL value, right ?
 		}
 		log_abc("Adding property=%s with value=%s slot=%u",
-                pBlock->_stringPool[_name], _value.toDebugString(), _slotID);
-		pMethod->addValue(_globalName, _namespace, _slotID, pType, 
+                block->_stringPool[_name], _value.toDebugString(), _slotID);
+		pMethod->addValue(_globalName, _namespace, _slotID, type, 
 			_value, _kind == KIND_CONST);
 		break;
 	}
@@ -166,7 +166,7 @@ Trait::finalize_mbody(AbcBlock *pBlock, Method *pMethod)
 	case KIND_CLASS:
 	{
 		pMethod->addMemberScript(_name, _namespace, _slotID, 
-			pBlock->_classes[_classInfoIndex]);
+			block->_classes[_classInfoIndex]);
 		break;
 	}
 	case KIND_FUNCTION:
@@ -183,29 +183,29 @@ Trait::finalize_mbody(AbcBlock *pBlock, Method *pMethod)
 
 /// Read an AS3 'trait'
 bool
-Trait::read(SWFStream* in, AbcBlock *pBlock)
+Trait::read(SWFStream* in, AbcBlock *block)
 {
 	boost::uint32_t name = in->read_V32();
-	if (name >= pBlock->_multinamePool.size())
+	if (name >= block->_multinamePool.size())
 	{
 		log_error(_("ABC: Bad name for trait."));
 		return false;
 	}
-	if (!pBlock->_multinamePool[name].isQName())
+	if (!block->_multinamePool[name].isQName())
 	{
 		log_error(_("ABC: Trait name must be fully qualified."));
 		return false;
 	}
-	MultiName multiname = pBlock->_multinamePool[name];
-	_name = pBlock->_multinamePool[name].getABCName();
-	_globalName = pBlock->_multinamePool[name].getGlobalName();
-	_namespace = pBlock->_multinamePool[name].getNamespace();
+	MultiName multiname = block->_multinamePool[name];
+	_name = block->_multinamePool[name].getABCName();
+	_globalName = block->_multinamePool[name].getGlobalName();
+	_namespace = block->_multinamePool[name].getNamespace();
 
 	boost::uint8_t kind = in->read_u8();
 	_kind = static_cast<Kind>(kind & 0x0F);
 
 	log_abc("Trait name: %s, Trait kind: %s",
-            pBlock->_stringPool[multiname.getABCName()], _kind);
+            block->_stringPool[multiname.getABCName()], _kind);
 
     switch (_kind)
 	{
@@ -216,14 +216,14 @@ Trait::read(SWFStream* in, AbcBlock *pBlock)
             _typeIndex = in->read_V32();
             boost::uint32_t vindex = in->read_V32();
             log_abc("Slot ID=%u Type=%s Pool index=%u", _slotID,
-                    pBlock->_stringPool[
-                    pBlock->_multinamePool[_typeIndex].getABCName()], vindex);
+                    block->_stringPool[
+                    block->_multinamePool[_typeIndex].getABCName()], vindex);
             
             if (vindex) {
                 const AbcBlock::PoolConstant c =
                     static_cast<AbcBlock::PoolConstant>(in->read_u8());
 
-                if (!pBlock->pool_value(vindex, c, _value))
+                if (!block->pool_value(vindex, c, _value))
                     return false; // Message done by pool_value
                 _hasValue = true;
             }
@@ -239,11 +239,11 @@ Trait::read(SWFStream* in, AbcBlock *pBlock)
 
             boost::uint32_t offset = in->read_V32();
             log_abc("Method index=%u", offset);
-            if (offset >= pBlock->_methods.size()) {
+            if (offset >= block->_methods.size()) {
                 log_error(_("Bad method id in trait."));
                 return false;
             }
-            _method = pBlock->_methods[offset];
+            _method = block->_methods[offset];
             break;
         }
         case KIND_CLASS:
@@ -252,10 +252,10 @@ Trait::read(SWFStream* in, AbcBlock *pBlock)
             _classInfoIndex = in->read_V32();
             log_abc("Slot id: %u Class index: %u Class Name: %s", _slotID, 
                 _classInfoIndex, 
-                pBlock->_stringTable->value(
-                    pBlock->_classes[_classInfoIndex]->getName()));
+                block->_stringTable->value(
+                    block->_classes[_classInfoIndex]->getName()));
 
-            if (_classInfoIndex >= pBlock->_classes.size()) {
+            if (_classInfoIndex >= block->_classes.size()) {
                 log_error(_("Bad Class id in trait."));
                 return false;
             }
@@ -265,11 +265,11 @@ Trait::read(SWFStream* in, AbcBlock *pBlock)
         {
             _slotID = in->read_V32();
             boost::uint32_t offset = in->read_V32();
-            if (offset >= pBlock->_methods.size()) {
+            if (offset >= block->_methods.size()) {
                 log_error(_("Bad method id in trait."));
                 return false;
             }
-            _method = pBlock->_methods[offset];
+            _method = block->_methods[offset];
             break;
         }
         default:
@@ -725,7 +725,7 @@ AbcBlock::pool_value(boost::uint32_t index, PoolConstant type, as_value &v)
 			log_error(_("Action Block: Bad index in optional argument."));
 			return false;
 		}
-		v.set_int(_integerPool[index]);
+		v.set_double(_integerPool[index]);
 		break;
 	}
 	case POOL_UINTEGER:
@@ -735,7 +735,7 @@ AbcBlock::pool_value(boost::uint32_t index, PoolConstant type, as_value &v)
 			log_error(_("Action Block: Bad index in optional argument."));
 			return false;
 		}
-		v.set_int(_uIntegerPool[index]);
+		v.set_double(_uIntegerPool[index]);
 		break;
 	}
 	case POOL_DOUBLE: 
@@ -936,7 +936,6 @@ AbcBlock::read_instances()
 	log_abc("There are %u instances.", count);
 	_classes.resize(count);
 	for (size_t i = 0; i < count; ++i) {
-		abc::Class* pScript;
 		//Read multiname index.
 		boost::uint32_t index = _stream->read_V32();
 		// 0 is allowed as a name, typically for the last entry.
@@ -958,16 +957,16 @@ AbcBlock::read_instances()
 			return false;
 		}
 
-		pScript = locateClass(multiname);
+        abc::Class* cl = locateClass(multiname);
 		
-        if (!pScript) {
+        if (!cl) {
 
             const string_table::key className = multiname.getGlobalName();
 
-			pScript = mCH->newClass();
-            pScript->setName(className);
+			cl = mCH->newClass();
+            cl->setName(className);
 
-			if (!multiname.getNamespace()->addScript(className, pScript)) {
+			if (!multiname.getNamespace()->addScript(className, cl)) {
 
 				log_error(_("Duplicate class registration."));
 				return false;
@@ -980,8 +979,8 @@ AbcBlock::read_instances()
             multiname.getNamespace()->dump(*_stringTable);
 
 		}
-		pScript->setDeclared();
-		_classes[i] = pScript;
+		cl->setDeclared();
+		_classes[i] = cl;
 		boost::uint32_t super_index = _stream->read_V32();
 
 		if (super_index && super_index >= _multinamePool.size()) {
@@ -990,7 +989,7 @@ AbcBlock::read_instances()
 		}
 
 		if (!super_index) {
-			pScript->setSuper(mTheObject);
+			cl->setSuper(mTheObject);
 		}
 		else {
 			abc::Class *pSuper = locateClass(_multinamePool[super_index]);
@@ -1013,25 +1012,25 @@ AbcBlock::read_instances()
 				return false;
 			}
 
-			if (pSuper == pScript)
+			if (pSuper == cl)
 			{
 				log_error(_("ABC: Class cannot be its own supertype."));
 				return false;
 			}
-			pScript->setSuper(pSuper);
+			cl->setSuper(pSuper);
 			pSuper->setInherited();
 		}
 
 		boost::uint8_t flags = _stream->read_u8();
 		log_abc("Instance %u(%s) multiname index=%u name=%s super index=%u "
-                "flags=%X", i, pScript, index, 
+                "flags=%X", i, cl, index, 
                 _stringPool[_multinamePool[index].getABCName()],
                 super_index, flags | 0x0);
 
-		if (flags & INSTANCE_SEALED) pScript->setSealed();
-		if (flags & INSTANCE_FINAL) pScript->setFinal();
-		if (flags & INSTANCE_INTERFACE) pScript->setInterface();
-		if ((flags & 7) == INSTANCE_DYNAMIC) pScript->setDynamic();
+		if (flags & INSTANCE_SEALED) cl->setSealed();
+		if (flags & INSTANCE_FINAL) cl->setFinal();
+		if (flags & INSTANCE_INTERFACE) cl->setInterface();
+		if ((flags & 7) == INSTANCE_DYNAMIC) cl->setDynamic();
 
 		if (flags & INSTANCE_PROTECTED_NS) {
 			boost::uint32_t ns_index = _stream->read_V32();
@@ -1040,10 +1039,10 @@ AbcBlock::read_instances()
 				return false;
 			}
 			// Set the protected namespace's parent, if it exists.
-			if (pScript->getSuper()->hasProtectedNs())
+			if (cl->getSuper()->hasProtectedNs())
 				_namespacePool[ns_index]->setParent(
-                        pScript->getSuper()->getProtectedNs());
-			pScript->setProtectedNs(_namespacePool[ns_index]);
+                        cl->getSuper()->getProtectedNs());
+			cl->setProtectedNs(_namespacePool[ns_index]);
 		}
 
 		// This is the list of interfaces which the instances has agreed to
@@ -1065,7 +1064,7 @@ AbcBlock::read_instances()
 				log_error(_("ABC: Can't implement a non-interface type."));
 				return false;
 			}
-			pScript->pushInterface(pInterface);
+			cl->pushInterface(pInterface);
 		}
 
 		// The next thing should be the constructor.
@@ -1078,12 +1077,7 @@ AbcBlock::read_instances()
 			return false;
 		}
 		// Don't validate for previous owner.
-		pScript->setConstructor(_methods[offset]);
-
-		/*	Calling the Method::setOwner always results in a segmentation fault, 
-		since it tries to modify Method.mPrototype, which is never
-		initialized.  The parser seems to work ok without this call.*/
-//		_methods[offset]->setOwner(pScript);
+		cl->setConstructor(_methods[offset]);
 
 		// Next come the 'traits' of the instance. (The members.)
 		boost::uint32_t tcount = _stream->read_V32();
@@ -1091,7 +1085,7 @@ AbcBlock::read_instances()
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			Trait &aTrait = newTrait();
-			aTrait.set_target(pScript, false);
+			aTrait.set_target(cl, false);
 			if (!aTrait.read(_stream, this))
 				return false;
 		}
@@ -1109,9 +1103,9 @@ AbcBlock::read_classes()
 	log_abc("There are %u classes.", count);
 	
     for (size_t i = 0; i < count; ++i) {
-		abc::Class* pScript = _classes[i];
+		abc::Class* cl = _classes[i];
 		boost::uint32_t offset = _stream->read_V32();
-		log_abc("Class %u(%s) static constructor index=%u", i, pScript, offset);
+		log_abc("Class %u(%s) static constructor index=%u", i, cl, offset);
 
         if (offset >= _methods.size()) {
 			log_error(_("ABC: Out of bound static constructor for class."));
@@ -1119,18 +1113,13 @@ AbcBlock::read_classes()
 		}
 
 		// Don't validate for previous owner.
-		pScript->setStaticConstructor(_methods[offset]);
+		cl->setStaticConstructor(_methods[offset]);
 
-		/*	Calling the Method::setOwner always results in a segmentation fault, 
-		since it tries to modify Method.mPrototype, which is never
-		initialized.  The parser seems to work ok without this call.*/
-//		_methods[offset]->setOwner(pScript);
-		
 		boost::uint32_t tcount = _stream->read_V32();
 		log_abc("This class has %u traits.", tcount);
 		for (size_t j = 0; j < tcount; ++j) {
 			Trait &aTrait = newTrait();
-			aTrait.set_target(pScript, true);
+			aTrait.set_target(cl, true);
 			if (!(aTrait.read(_stream, this)))
 				return false;
 		}
@@ -1144,42 +1133,41 @@ bool
 AbcBlock::read_scripts()
 {
 	log_abc("Begin reading scripts.");
-	boost::uint32_t count = _stream->read_V32();
-	log_abc("There are %u scripts.", count);
-	_scripts.resize(count);
-	for (unsigned int i = 0; i < count; ++i)
-	{
-		abc::Class* pScript = mCH->newClass();
-		_scripts[i] = pScript;
+
+	const boost::uint32_t scriptcount = _stream->read_V32();
+	log_abc("There are %u scripts.", scriptcount);
+
+	_scripts.resize(scriptcount);
+	for (size_t i = 0; i < scriptcount; ++i) {
+
+		abc::Class* script = mCH->newClass();
+		_scripts[i] = script;
 
 		boost::uint32_t offset = _stream->read_V32();
 		log_abc("Reading script %u(%s) initializer method index=%u", i,
-                pScript, offset);
-		if (offset >= _methods.size())
-		{
+                script, offset);
+		if (offset >= _methods.size()) {
 			log_error(_("ABC: Out of bounds method for script."));
 			return false;
 		}
 
-		pScript->setConstructor(_methods[offset]);
-		pScript->setSuper(mTheObject);
+		script->setConstructor(_methods[offset]);
 
-		boost::uint32_t tcount = _stream->read_V32();
-		for (unsigned int j = 0; j < tcount; ++j)
-		{
+		const boost::uint32_t tcount = _stream->read_V32();
+		for (size_t j = 0; j < tcount; ++j) {
 			
-			Trait &aTrait = newTrait();
-			aTrait.set_target(pScript, false);
-			if (!(aTrait.read(_stream, this))) {
+			Trait& trait = newTrait();
+			trait.set_target(script, false);
+			if (!(trait.read(_stream, this))) {
 				return false;
             }
 			log_abc("Trait: %u name: %s(%u) kind: %s value: %s ", j, 
-                    _stringPool[aTrait._name], aTrait._name, aTrait._kind,
-                    aTrait._value.to_string());
+                    _stringPool[trait._name], trait._name, trait._kind,
+                    trait._value.to_string());
 
-			pScript->_traits.push_back(aTrait);
+			script->_traits.push_back(trait);
 		}
-	} // end of scripts loop
+	} 
 	return true;
 }
 
@@ -1232,14 +1220,14 @@ AbcBlock::read_method_bodies()
         // Exception count and exceptions
 		const boost::uint32_t ecount = _stream->read_V32();
 		for (unsigned int j = 0; j < ecount; ++j) {
-			asException *pExcept = mCH->newException();
+			asException *ex = mCH->newException();
 
 			// Where the try block begins and ends.
-			pExcept->setStart(_stream->read_V32());
-			pExcept->setEnd(_stream->read_V32());
+			ex->setStart(_stream->read_V32());
+			ex->setEnd(_stream->read_V32());
 
 			// Where to go when the exception is activated.
-			pExcept->setCatch(_stream->read_V32());
+			ex->setCatch(_stream->read_V32());
 
 			// What types should be caught.
 			boost::uint32_t catch_type = _stream->read_V32();
@@ -1248,11 +1236,11 @@ AbcBlock::read_method_bodies()
 				return false;
 			}
 			if (!catch_type) {
-				pExcept->catchAny();
+				ex->catchAny();
 			}
 			else {
-				abc::Class *pType = locateClass(_multinamePool[catch_type]);
-				if (!pType) {
+				abc::Class *type = locateClass(_multinamePool[catch_type]);
+				if (!type) {
 
 					log_error(_("ABC: Unknown type of object to catch. (%s)"), 
 						_stringTable->value(
@@ -1260,10 +1248,10 @@ AbcBlock::read_method_bodies()
 
                     // return false;
 					// Fake it, for now:
-					pExcept->catchAny();
+					ex->catchAny();
 				}
 				else {
-					pExcept->setCatchType(pType);
+					ex->setCatchType(type);
 				}
 			}
 
@@ -1276,8 +1264,8 @@ AbcBlock::read_method_bodies()
                                 "exception."));
 					return false;
 				}
-				pExcept->setName(_multinamePool[cvn].getABCName());
-				pExcept->setNamespace(_multinamePool[cvn].getNamespace());
+				ex->setName(_multinamePool[cvn].getABCName());
+				ex->setNamespace(_multinamePool[cvn].getNamespace());
 			}
 		} 
 

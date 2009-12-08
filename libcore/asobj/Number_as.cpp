@@ -70,7 +70,7 @@ number_toString(const fn_call& fn)
 
     if ( fn.nargs ) 
     {
-        int userRadix = fn.arg(0).to_int();
+        int userRadix = toInt(fn.arg(0));
         if ( userRadix >= 2 && userRadix <= 36 ) radix=userRadix;
         else
         {
@@ -82,7 +82,7 @@ number_toString(const fn_call& fn)
         }
 
     }
-    return as_value::doubleToString(val, radix); 
+    return doubleToString(val, radix); 
 }
 
 as_value

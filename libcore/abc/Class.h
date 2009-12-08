@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_ABC_SCRIPT_H
-#define GNASH_ABC_SCRIPT_H
+#ifndef GNASH_ABC_CLASS_H
+#define GNASH_ABC_CLASS_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -30,11 +30,8 @@
 #include "as_value.h"
 #include "as_object.h"
 #include "Property.h"
-
-#ifdef ENABLE_AVM2
-# include "CodeStream.h"
-# include "AbcBlock.h"
-#endif
+#include "CodeStream.h"
+#include "AbcBlock.h"
 
 namespace gnash {
     namespace abc {
@@ -45,7 +42,6 @@ namespace gnash {
         class BoundAccessor;
         class Method;
         class Class;
-        typedef Property Binding;
         class Namespace;
     }
     class ClassHierarchy;
@@ -72,9 +68,16 @@ namespace abc {
 ///     is constructed. As not all Classes are constructed, the iinit method
 ///     may never be executed.
 //
+/// Classes are parsed from the "instances" and "classes" section of an
+/// ABCBlock. Each of these contains the same number of entries. The iinit
+/// methods are found in the instances section, the cinit methods in the
+/// classes section.
+//
+/// Note: the following does not describe very well how the data are organized
+/// in the ABC file.
 /// A Script may contain more than one class. When a Script runs, the cinit
 /// methods of all its classes are executed in the order they appear in the
-/// Script. 
+/// Script.
 class Class
 {
 public:
@@ -114,8 +117,6 @@ public:
 	void setName(string_table::key name) { _name = name; }
 
 	void dump();
-
-#ifdef ENABLE_AVM2
 
 	bool addValue(string_table::key name, Namespace *ns,
             boost::uint32_t slotID, Class *type, as_value& val,
@@ -180,7 +181,7 @@ public:
 	bool hasProtectedNs() const { return _protectedNs; }
 
 	/// Get the protected namespace.
-	Namespace *getProtectedNs() { return _protectedNs; }
+	Namespace* getProtectedNs() { return _protectedNs; }
 
 	/// Set the protected namespace.
 	void setProtectedNs(Namespace *n) { _protectedNs = n; }
@@ -192,9 +193,13 @@ public:
     }
 
 	void initPrototype();
+	
+    /// Retrieve the Class from which this Class derives.
+    Class* getSuper() const { return _super; }
 
-    /// TODO: see if these are useful.
-	Class* getSuper() const { return _super; }
+    /// Set the Super Class.
+    //
+    /// This is the base class for this Class.
 	void setSuper(Class *p) { _super = p; }
 
 	/// We implement this interface.
@@ -225,7 +230,7 @@ public:
         return _staticConstructor;
     }
 
-	Binding* getBinding(string_table::key name)
+	Property* getBinding(string_table::key name)
 	{
 		BindingContainer::iterator i;
 		if (_bindings.empty()) return NULL;
@@ -235,36 +240,31 @@ public:
 		return &i->second;
 	}
 
-	Binding* getGetBinding(as_value& v, abc::MultiName& n);
-	Binding* getSetBinding(as_value& v, abc::MultiName& n);
+	Property* getGetBinding(as_value& v, abc::MultiName& n);
+	Property* getSetBinding(as_value& v, abc::MultiName& n);
     std::vector<abc::Trait> _traits;
-
-#endif
 
 private:
 	
-	typedef std::map<string_table::key, Binding> BindingContainer;
+	typedef std::map<string_table::key, Property> BindingContainer;
 
     as_object *_prototype;
 
-	bool addBinding(string_table::key name, const Binding& b) {
+	bool addBinding(string_table::key name, const Property& b) {
         _bindings.insert(std::make_pair(name, b));
         return true;
     }
 
-	bool addStaticBinding(string_table::key name, const Binding& b) {
+	bool addStaticBinding(string_table::key name, const Property& b) {
         _staticBindings.insert(std::make_pair(name, b));
         return true;
     }
 
-	Binding *getStaticBinding(string_table::key name)
+	Property *getStaticBinding(string_table::key name)
 	{
-		BindingContainer::iterator i;
-		if (_staticBindings.empty())
-			return NULL;
-		i = _staticBindings.find(name);
-		if (i == _staticBindings.end())
-			return NULL;
+		if (_staticBindings.empty()) return 0;
+		BindingContainer::iterator i = _staticBindings.find(name);
+		if (i == _staticBindings.end()) return 0;
 		return &i->second;
 	}
 

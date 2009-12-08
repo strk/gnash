@@ -865,7 +865,7 @@ sharedobject_connect(const fn_call& fn)
 #if 0
         const as_value& uri = fn.arg(1);
         const VM& vm = getVM(fn);
-        const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
+        const std::string& uriStr = uri.to_string(vm.getSWFVersion());
 #endif
     }
     
@@ -952,7 +952,7 @@ sharedobject_flush(const fn_call& fn)
 
     int space = 0;
     if (fn.nargs) {
-        space = fn.arg(0).to_int();
+        space = toInt(fn.arg(0));
     }
 
     /// If there is no data member, returns undefined.
@@ -970,7 +970,7 @@ sharedobject_getLocal(const fn_call& fn)
 
     as_value objNameVal;
     if (fn.nargs > 0) objNameVal = fn.arg(0);
-    const std::string objName = objNameVal.to_string_versioned(swfVersion);
+    const std::string objName = objNameVal.to_string(swfVersion);
     if (objName.empty()) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
@@ -986,7 +986,7 @@ sharedobject_getLocal(const fn_call& fn)
     std::string root;
     if (fn.nargs > 1)
     {
-        root = fn.arg(1).to_string_versioned(swfVersion);
+        root = fn.arg(1).to_string(swfVersion);
     }
 
     log_debug("SO name:%s, root:%s", objName, root);
@@ -1012,7 +1012,7 @@ sharedobject_getRemote(const fn_call& fn)
         objNameVal = fn.arg(0);
     }
     
-    std::string objName = objNameVal.to_string_versioned(swfVersion);
+    std::string objName = objNameVal.to_string(swfVersion);
     if (objName.empty()) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
@@ -1036,8 +1036,8 @@ sharedobject_getRemote(const fn_call& fn)
     // cases and just checking the argument type here.
     std::string persistence;
     if (fn.nargs > 1) {
-        root = fn.arg(1).to_string_versioned(swfVersion);
-        persistence = fn.arg(2).to_string_versioned(swfVersion);
+        root = fn.arg(1).to_string(swfVersion);
+        persistence = fn.arg(2).to_string(swfVersion);
     }
 
     log_debug("SO name:%s, root:%s, persistence: %s", objName, root, persistence);

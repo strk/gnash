@@ -51,7 +51,6 @@ class Trait
 {
 public:
 
-
     enum Kind
 	{
 		KIND_SLOT = 0,
@@ -62,25 +61,6 @@ public:
 		KIND_CLASS = 4,
 		KIND_FUNCTION = 5
 	};
-
-	bool _hasValue;
-	Kind _kind;
-	boost::uint32_t _slotID;
-	boost::uint32_t _typeIndex;
-	boost::uint32_t _classInfoIndex;
-	as_value _value;
-
-	URI _name;
-
-	string_table::key _globalName;
-
-	Namespace* _namespace;
-	Method* _method;
-	bool _valueSet;
-
-	abc::Class* _classTarget;
-	Method* _methodTarget;
-	bool _static;
 
 	Trait()
         :
@@ -100,29 +80,52 @@ public:
         _static(false)
 	{}
 
-	bool read(SWFStream* in, AbcBlock *pBlock);
+	bool read(SWFStream* in, AbcBlock *block);
 
-	bool finalize(AbcBlock* pBlock, abc::Class* pScript, bool do_static);
+	bool finalize(AbcBlock* block, abc::Class* cl, bool do_static);
 
-	bool finalize_mbody(AbcBlock* pBlock, Method* pMethod);
+	bool finalize_mbody(AbcBlock* block, Method* m);
 
-	void set_target(abc::Class* pScript, bool do_static) {
-        _classTarget = pScript;
+	void set_target(abc::Class* cl, bool do_static) {
+        _classTarget = cl;
         _static = do_static;
     }
 
-	void set_target(Method *pMethod) {
+	void set_target(Method *m) {
         _classTarget = 0;
-        _methodTarget = pMethod;
+        _methodTarget = m;
     }
 
-	bool finalize(AbcBlock* pBlock)
+	bool finalize(AbcBlock* block)
 	{
 		if (_classTarget) {
-			return finalize(pBlock, _classTarget, _static);
+			return finalize(block, _classTarget, _static);
         }
-		return finalize_mbody(pBlock, _methodTarget);
+		return finalize_mbody(block, _methodTarget);
 	}
+
+private:
+
+    friend class AbcBlock;
+
+	bool _hasValue;
+	Kind _kind;
+	boost::uint32_t _slotID;
+	boost::uint32_t _typeIndex;
+	boost::uint32_t _classInfoIndex;
+	as_value _value;
+
+	URI _name;
+    string_table::key _globalName;
+
+	Namespace* _namespace;
+	Method* _method;
+	bool _valueSet;
+
+	abc::Class* _classTarget;
+	Method* _methodTarget;
+	bool _static;
+
 };
 
 /// Output stream operator for abc::Trait::Kind
@@ -237,7 +240,7 @@ public:
 
 	abc::Class* locateClass(const std::string& className);
 
-	abc::Trait &newTrait()
+	abc::Trait& newTrait()
 	{
 		abc::Trait *p = new abc::Trait;
 		_traits.push_back(p);

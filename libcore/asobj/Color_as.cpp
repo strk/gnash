@@ -162,7 +162,7 @@ color_setrgb(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	boost::int32_t color = fn.arg(0).to_int();
+	boost::int32_t color = toInt(fn.arg(0));
 
 	const int r = (color & 0xff0000) >> 16;
 	const int g = (color & 0x00ff00) >> 8;
@@ -275,7 +275,7 @@ inline MovieClip*
 getTarget(as_object* obj, const fn_call& fn)
 {
     const as_value& target = obj->getMember(NSV::PROP_TARGET);
-    MovieClip* sp = target.to_sprite();
+    MovieClip* sp = target.toMovieClip();
     if (sp) return sp;
     DisplayObject* o = fn.env().find_target(target.to_string());
     if (o) return o->to_movie();

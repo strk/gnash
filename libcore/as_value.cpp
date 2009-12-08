@@ -21,11 +21,11 @@
 #include "as_value.h"
 #include "as_object.h"
 #include "as_function.h" // for as_function
-#include "MovieClip.h" // for MOVIECLIP values
-#include "DisplayObject.h" // for MOVIECLIP values
-#include "as_environment.h" // for MOVIECLIP values
-#include "VM.h" // for MOVIECLIP values
-#include "movie_root.h" // for MOVIECLIP values
+#include "MovieClip.h" // for DISPLAYOBJECT values
+#include "DisplayObject.h" // for DISPLAYOBJECT values
+#include "as_environment.h" // for DISPLAYOBJECT values
+#include "VM.h" // for DISPLAYOBJECT values
+#include "movie_root.h" // for DISPLAYOBJECT values
 #include "utility.h" // for typeName() 
 #include "GnashNumeric.h"
 #include "namedStrings.h"
@@ -68,29 +68,11 @@ namespace gnash {
 
 namespace {
 
-struct invalidHexDigit {};
-boost::uint8_t parseHex(char c)
+/// Returns a member only if it is an object.
+inline bool
+findMethod(as_object& obj, string_table::key m, as_value& ret)
 {
-	switch (c)
-	{
-		case '0': return 0;
-		case '1': return 1;
-		case '2': return 2;
-		case '3': return 3;
-		case '4': return 4;
-		case '5': return 5;
-		case '6': return 6;
-		case '7': return 7;
-		case '8': return 8;
-		case '9': return 9;
-		case 'a': case 'A': return 10;
-		case 'b': case 'B': return 11;
-		case 'c': case 'C': return 12;
-		case 'd': case 'D': return 13;
-		case 'e': case 'E': return 14;
-		case 'f': case 'F': return 15;
-		default: throw invalidHexDigit();
-	}
+    return obj.get_member(m, &ret) && ret.is_object();
 }
 
 inline boost::uint16_t
@@ -114,8 +96,7 @@ readNetworkLong(const boost::uint8_t* buf) {
 boost::int32_t
 truncateToInt(double d)
 {
-    if (d < 0)
-    {   
+    if (d < 0) {   
 	    return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
     }
 	
@@ -324,82 +305,45 @@ private:
     
 // Conversion to const std::string&.
 std::string
-as_value::to_string() const
+as_value::to_string(int version) const
 {
-	switch (m_type)
+	switch (_type)
 	{
-
 		case STRING:
 			return getStr();
-
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 		{
 			const CharacterProxy& sp = getCharacterProxy();
-			if ( ! sp.get() )
-			{
-				return "";
-			}
-			else
-			{
-				return sp.getTarget();
-			}
+			if (!sp.get()) return "";
+            return sp.getTarget();
 		}
-
 		case NUMBER:
-		{
-			double d = getNum();
-			return doubleToString(d);
-		}
-
+			return doubleToString(getNum());
 		case UNDEFINED: 
-
-			// Behavior depends on file version.  In
-			// version 7+, it's "undefined", in versions
-			// 6-, it's "".
-			//
-			// We'll go with the v7 behavior by default,
-			// and conditionalize via _versioned()
-			// functions.
-			// 
+		    if (version <= 6) return "";
 			return "undefined";
-
 		case NULLTYPE:
 			return "null";
-
 		case BOOLEAN:
-		{
-			bool b = getBool();
-			return b ? "true" : "false";
-		}
-
+			return getBool() ? "true" : "false";
 		case OBJECT:
 		{
             as_object* obj = getObj();
             String_as* s;
             if (isNativeType(obj, s)) return s->value();
 
-			try
-			{
+			try {
 				as_value ret = to_primitive(STRING);
 				// This additional is_string test is NOT compliant with ECMA-262
 				// specification, but seems required for compatibility with the
 				// reference player.
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(" %s.to_primitive(STRING) returned %s", *this, ret);
-#endif
-				if ( ret.is_string() ) return ret.to_string();
+				if (ret.is_string()) return ret.getStr();
 			}
-			catch (ActionTypeError& e)
-			{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(_("to_primitive(%s, STRING) threw an ActionTypeError %s"),
-						*this, e.what());
-#endif
+			catch (ActionTypeError& e) {
 			}
 
-			if (m_type == OBJECT) {
-                return is_function() ? "[type Function]" :
-                                       "[type Object]";
+			if (_type == OBJECT) {
+                return is_function() ? "[type Function]" : "[type Object]";
             }
 
 		}
@@ -410,87 +354,44 @@ as_value::to_string() const
     
 }
 
-// Conversion to const std::string&.
-std::string
-as_value::to_string_versioned(int version) const
-{
-	if (m_type == UNDEFINED)
-	{
-		// Version-dependent behavior.
-		if (version <= 6)
-		{
-		    return "";
-		}
-		return "undefined";
-	}
-		
-	return to_string();
-}
-
 /// This is only used in AVM2.
 primitive_types
 as_value::ptype() const
 {
 
-	switch (m_type)
+	switch (_type)
 	{
-        case STRING: return PTYPE_STRING;
-        case NUMBER: return PTYPE_NUMBER;
+        case STRING:
+            return PTYPE_STRING;
+        case NUMBER: 
         case UNDEFINED:
         case NULLTYPE:
-        case MOVIECLIP:
-            return PTYPE_NUMBER;
+        case DISPLAYOBJECT:
         case OBJECT:
-        {
             return PTYPE_NUMBER;
-        }
         case BOOLEAN:
             return PTYPE_BOOLEAN;
         default:
-            break; // Should be only exceptions here.
-        }
+            break;
+    }
 	return PTYPE_NUMBER;
 }
 
-// Conversion to primitive value.
-as_value
-as_value::to_primitive() const
+as_value::AsType
+as_value::defaultPrimitive(int version) const
 {
-	VM& vm = VM::get();
-	int swfVersion = vm.getSWFVersion();
-
-	AsType hint = NUMBER;
-
-	if (m_type == OBJECT && swfVersion > 5) {
+	if (_type == OBJECT && version > 5) {
         Date_as* d;
-        if (isNativeType(getObj(), d)) hint = STRING;
+        if (isNativeType(getObj(), d)) return STRING;
     }
-
-	return to_primitive(hint);
-}
-
-as_value&
-as_value::convert_to_primitive()
-{
-	VM& vm = VM::get();
-	int swfVersion = vm.getSWFVersion();
-
-	AsType hint = NUMBER;
-
-	if (m_type == OBJECT && swfVersion > 5) {
-        Date_as* d;
-        if (isNativeType<Date_as>(getObj(), d)) hint = STRING;
-    }
-
-    *this = to_primitive(hint);
-    return *this;
+    return NUMBER;
 }
 
 // Conversion to primitive value.
 as_value
 as_value::to_primitive(AsType hint) const
 {
-	if (m_type != OBJECT) return *this; 
+	if (_type != OBJECT) return *this; 
 
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
@@ -502,18 +403,10 @@ as_value::to_primitive(AsType hint) const
 	as_object* obj(0);
 
 	if (hint == NUMBER) {
-
-		if (m_type == MOVIECLIP) return as_value(NaN);
-
-        assert(m_type == OBJECT);
+        assert(_type == OBJECT);
 		obj = getObj();
 
-		if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
-                (!method.is_function())) {
-
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" valueOf not found");
-#endif
+		if (!findMethod(*obj, NSV::PROP_VALUE_OF, method)) {
             // Returning undefined here instead of throwing
             // a TypeError passes tests in actionscript.all/Object.as
             // and many swfdec tests, with no new failures (though
@@ -523,34 +416,15 @@ as_value::to_primitive(AsType hint) const
 	}
 	else {
 		assert(hint == STRING);
-
-		if (m_type == MOVIECLIP) return getCharacterProxy().getTarget();
-        assert(m_type == OBJECT);
+        assert(_type == OBJECT);
 		obj = getObj();
 
 		// @@ Moock says, "the value that results from
 		// calling toString() on the object".
-		//
-		// When the toString() method doesn't exist, or
-		// doesn't return a valid number, the default
-		// text representation for that object is used
-		// instead.
-		//
-		if ((!obj->get_member(NSV::PROP_TO_STRING, &method)) ||
-                (!method.is_function())) // ECMA says ! is_object()
-		{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-			log_debug(" toString not found");
-#endif
-			if ((!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
-                    (!method.is_function())) // ECMA says ! is_object()
-			{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(" valueOf not found");
-#endif
+		if (!findMethod(*obj, NSV::PROP_TO_STRING, method) &&
+                !findMethod(*obj, NSV::PROP_VALUE_OF, method)) {
 				throw ActionTypeError();
-			}
-		}
+        }
 	}
 
 	assert(obj);
@@ -558,57 +432,15 @@ as_value::to_primitive(AsType hint) const
 	as_environment env(getVM(*obj));
     fn_call::Args args;
 	as_value ret = invoke(method, env, obj, args);
+
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);
 #endif
-	if (ret.m_type == OBJECT)
-	{
+
+	if (ret._type == OBJECT) {
 		throw ActionTypeError();
 	}
-
-
 	return ret;
-
-}
-
-bool
-as_value::parseNonDecimalInt(const std::string& s, double& d, bool whole)
-{
-    const std::string::size_type slen = s.length();
-
-    // "0#" would still be octal, but has the same value as a decimal.
-    if (slen < 3) return false;
-
-    bool negative = false;
-
-    if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
-    {
-        // The only legitimate place for a '-' is after 0x. If it's a
-        // '+' we don't care, as it won't disturb the conversion.
-        std::string::size_type start = 2;
-        if (s[2] == '-') {
-            negative = true;
-            ++start;
-        }
-        d = parsePositiveInt(s.substr(start), BASE_HEX, whole);
-        if (negative) d = -d;
-        return true;
-    }
-    else if ((s[0] == '0' || ((s[0] == '-' || s[0] == '+') && s[1] == '0')) &&
-            s.find_first_not_of("01234567", 1) == std::string::npos)
-    {
-        std::string::size_type start = 0;
-        if (s[0] == '-') {
-            negative = true;
-            ++start;
-        }
-        d = parsePositiveInt(s.substr(start), BASE_OCT, whole);
-        if (negative) d = -d;
-        return true;
-    }
-
-    return false;
-
 }
 
 double
@@ -617,7 +449,7 @@ as_value::to_number() const
 
     const int swfversion = VM::get().getSWFVersion();
 
-    switch (m_type)
+    switch (_type)
     {
         case STRING:
         {
@@ -677,12 +509,10 @@ as_value::to_number() const
         {
             // Evan: from my tests
             // Martin: FlashPlayer6 gives 0; FP9 gives NaN.
-            return ( swfversion >= 7 ? NaN : 0 );
+            return (swfversion >= 7 ? NaN : 0);
         }
 
         case BOOLEAN: 
-            // Evan: from my tests
-            // Martin: confirmed
             return getBool() ? 1 : 0;
 
         case NUMBER:
@@ -695,8 +525,7 @@ as_value::to_number() const
             // method".
             //
             // Arrays and Movieclips should return NaN.
-            try
-            {
+            try {
                 as_value ret = to_primitive(NUMBER);
                 return ret.to_number();
             }
@@ -714,7 +543,7 @@ as_value::to_number() const
             }
         }
 
-        case MOVIECLIP:
+        case DISPLAYOBJECT:
         {
             // This is tested, no valueOf is going
             // to be invoked for movieclips.
@@ -735,7 +564,7 @@ as_value::to_element() const
     boost::shared_ptr<amf::Element> el ( new amf::Element );
     as_object* ptr = to_object(*vm.getGlobal());
 
-    switch (m_type) {
+    switch (_type) {
       case UNDEFINED:
 	  el->makeUndefined();
 	  break;
@@ -759,9 +588,8 @@ as_value::to_element() const
           ptr->visitProperties<Exists>(props);
 	  break;
       }
-      case MOVIECLIP:
+      case DISPLAYOBJECT:
 	  log_unimpl("Converting a Movie Clip to an element is not supported");
-          // TODO: what kind of Element will be left with ? Should we throw an exception ?
 	  break;
       default:
 	  break;
@@ -770,92 +598,22 @@ as_value::to_element() const
     return el;
 }
 
-// This returns an as_value as an integer. It is
-// probably used for most implicit conversions to 
-// int, for instance in the String class.
-boost::int32_t
-as_value::to_int() const
-{
-	double d = to_number();
-
-	if (!isFinite(d)) return 0;
-
-    return truncateToInt(d);
-}
-
-// Conversion to boolean for SWF7 and up
+// Conversion to boolean 
 bool
-as_value::to_bool_v7() const
+as_value::to_bool() const
 {
-	    switch (m_type)
-	    {
-		case  STRING:
-			return getStr() != "";
-		case NUMBER:
+    const int version = VM::get().getSWFVersion();
+    switch (_type)
+    {
+		case STRING:
 		{
-			double d = getNum();
-			return d && ! isNaN(d);
-		}
-		case BOOLEAN:
-			return getBool();
-		case OBJECT:
-			return true;
-
-		case MOVIECLIP:
-			return true;
-		default:
-			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
-				is_exception());
-			return false;
-	}
-}
-
-// Conversion to boolean up to SWF5
-bool
-as_value::to_bool_v5() const
-{
-	    switch (m_type)
-	    {
-		case  STRING:
-		{
-			double num = to_number();
-			bool ret = num && ! isNaN(num);
-			return ret;
+            if (version >= 7) return !getStr().empty();
+			const double num = to_number();
+			return num && !isNaN(num);
 		}
 		case NUMBER:
 		{
-			double d = getNum();
-			return d && ! isNaN(d);
-		}
-		case BOOLEAN:
-			return getBool();
-		case OBJECT:
-			return true;
-
-		case MOVIECLIP:
-			return true;
-		default:
-			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
-				is_exception());
-			return false;
-	}
-}
-
-// Conversion to boolean for SWF6
-bool
-as_value::to_bool_v6() const
-{
-	    switch (m_type)
-	    {
-		case  STRING:
-		{
-			double num = to_number();
-			bool ret = num && ! isNaN(num);
-			return ret;
-		}
-		case NUMBER:
-		{
-			double d = getNum();
+			const double d = getNum();
             // see testsuite/swfdec/if-6.swf
 			return d && ! isNaN(d);
 		}
@@ -863,36 +621,24 @@ as_value::to_bool_v6() const
 			return getBool();
 		case OBJECT:
 			return true;
-
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 			return true;
 		default:
-			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
-				is_exception());
+			assert(_type == UNDEFINED || _type == NULLTYPE || is_exception());
 			return false;
 	}
 }
 
-// Conversion to boolean.
-bool
-as_value::to_bool() const
-{
-    int ver = VM::get().getSWFVersion();
-    if ( ver >= 7 ) return to_bool_v7();
-    else if ( ver == 6 ) return to_bool_v6();
-    else return to_bool_v5();
-}
-	
 // Return value as an object.
 as_object*
 as_value::to_object(Global_as& global) const
 {
-	switch (m_type)
+	switch (_type)
 	{
 		case OBJECT:
 			return getObj();
 
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 			return getObject(toDisplayObject());
 
 		case STRING:
@@ -911,9 +657,9 @@ as_value::to_object(Global_as& global) const
 }
 
 MovieClip*
-as_value::to_sprite(bool allowUnloaded) const
+as_value::toMovieClip(bool allowUnloaded) const
 {
-	if ( m_type != MOVIECLIP ) return 0;
+	if ( _type != DISPLAYOBJECT ) return 0;
 
 	DisplayObject *ch = getCharacter(allowUnloaded);
 	if ( ! ch ) return 0;
@@ -923,16 +669,8 @@ as_value::to_sprite(bool allowUnloaded) const
 DisplayObject*
 as_value::toDisplayObject(bool allowUnloaded) const
 {
-	if ( m_type != MOVIECLIP ) return NULL;
-
+	if (_type != DISPLAYOBJECT) return NULL;
 	return getCharacter(allowUnloaded);
-}
-
-void
-as_value::setDisplayObject(DisplayObject& sprite)
-{
-	m_type = MOVIECLIP;
-	_value = CharacterProxy(&sprite);
 }
 
 // Return value as an ActionScript function.  Returns NULL if value is
@@ -940,7 +678,7 @@ as_value::setDisplayObject(DisplayObject& sprite)
 as_function*
 as_value::to_function() const
 {
-    if (m_type == OBJECT) {
+    if (_type == OBJECT) {
 	    return getObj()->to_function();
     }
 
@@ -950,14 +688,14 @@ as_value::to_function() const
 void
 as_value::set_undefined()
 {
-	m_type = UNDEFINED;
+	_type = UNDEFINED;
 	_value = boost::blank();
 }
 
 void
 as_value::set_null()
 {
-	m_type = NULLTYPE;
+	_type = NULLTYPE;
 	_value = boost::blank();
 }
 
@@ -972,12 +710,13 @@ as_value::set_as_object(as_object* obj)
     if (obj->displayObject()) {
         // The static cast is fine as long as the as_object is genuinely
         // a DisplayObject.
-		setDisplayObject(*obj->displayObject());
+        _type = DISPLAYOBJECT;
+        _value = CharacterProxy(obj->displayObject());
 		return;
 	}
 
-	if (m_type != OBJECT || getObj() != obj) {
-		m_type = OBJECT;
+	if (_type != OBJECT || getObj() != obj) {
+		_type = OBJECT;
 		_value = obj;
 	}
 }
@@ -987,138 +726,110 @@ as_value::equals(const as_value& v) const
 {
     // Comments starting with numbers refer to the ECMA-262 document
 
-#ifdef GNASH_DEBUG_EQUALITY
-    static int count=0;
-    log_debug("equals(%s, %s) called [%d]", *this, v, count++);
-#endif
-
     int SWFVersion = VM::get().getSWFVersion();
 
-    bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
-    bool v_nulltype = (v.m_type == UNDEFINED || v.m_type == NULLTYPE);
+    bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
+    bool v_nulltype = (v._type == UNDEFINED || v._type == NULLTYPE);
 
     // It seems like functions are considered the same as a NULL type
     // in SWF5 (and I hope below, didn't check)
-    //
-    if ( SWFVersion < 6 )
-    {
+    if (SWFVersion < 6) {
         if (is_function()) this_nulltype = true;
         if (v.is_function()) v_nulltype = true;
     }
 
-    if (this_nulltype || v_nulltype)
-    {
+    if (this_nulltype || v_nulltype) {
 #ifdef GNASH_DEBUG_EQUALITY
        log_debug(" one of the two things is undefined or null");
 #endif
         return this_nulltype == v_nulltype;
     }
 
-    bool obj_or_func = (m_type == OBJECT);
-    bool v_obj_or_func = (v.m_type == OBJECT);
+    bool obj_or_func = (_type == OBJECT);
+    bool v_obj_or_func = (v._type == OBJECT);
 
     /// Compare to same type
-    if ( obj_or_func && v_obj_or_func )
-    {
-        return boost::get<as_object*>(_value) == boost::get<as_object*>(v._value); 
+    if (obj_or_func && v_obj_or_func) {
+        return boost::get<as_object*>(_value) ==
+            boost::get<as_object*>(v._value); 
     }
 
-    if ( m_type == v.m_type ) return equalsSameType(v);
+    if (_type == v._type) return equalsSameType(v);
 
     // 16. If Type(x) is Number and Type(y) is String,
     //    return the result of the comparison x == ToNumber(y).
-    if (m_type == NUMBER && v.m_type == STRING)
-    {
-        double n = v.to_number();
+    if (_type == NUMBER && v._type == STRING) {
+        const double n = v.to_number();
         if (!isFinite(n)) return false;
         return equalsSameType(n);
     }
 
     // 17. If Type(x) is String and Type(y) is Number,
     //     return the result of the comparison ToNumber(x) == y.
-    if (v.m_type == NUMBER && m_type == STRING)
-    {
-        double n = to_number();
+    if (v._type == NUMBER && _type == STRING) {
+        const double n = to_number();
         if (!isFinite(n)) return false;
         return v.equalsSameType(n); 
     }
 
     // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
-    if (m_type == BOOLEAN)
-    {
+    if (_type == BOOLEAN) {
         return as_value(to_number()).equals(v); 
     }
 
     // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
-    if (v.m_type == BOOLEAN)
-    {
+    if (v._type == BOOLEAN) {
         return as_value(v.to_number()).equals(*this); 
     }
 
     // 20. If Type(x) is either String or Number and Type(y) is Object,
     //     return the result of the comparison x == ToPrimitive(y).
-    if ( (m_type == STRING || m_type == NUMBER ) && 
-            (v.m_type == OBJECT))
+    if ((_type == STRING || _type == NUMBER) && (v._type == OBJECT))
     {
         // convert this value to a primitive and recurse
-	try
-	{
-		as_value v2 = v.to_primitive(); 
-		if ( v.strictly_equals(v2) ) return false;
-
+        try {
+            as_value v2 = v.to_primitive(v.defaultPrimitive(SWFVersion)); 
+            if (v.strictly_equals(v2)) return false;
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" 20: convertion to primitive : %s -> %s", v, v2);
+            log_debug(" 20: convertion to primitive : %s -> %s", v, v2);
 #endif
-
-		return equals(v2);
-	}
-	catch (ActionTypeError& e)
-	{
+            return equals(v2);
+        }
+        catch (ActionTypeError& e) {
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" %s.to_primitive() threw an ActionTypeError %s", v, e.what());
+            log_debug(" %s.to_primitive() threw an ActionTypeError %s", v,
+                    e.what());
 #endif
-		return false; // no valid conversion
-	}
-
+            return false; 
+        }
     }
 
     // 21. If Type(x) is Object and Type(y) is either String or Number,
     //    return the result of the comparison ToPrimitive(x) == y.
-    if ((v.m_type == STRING || v.m_type == NUMBER) && 
-            (m_type == OBJECT))
-    {
+    if ((v._type == STRING || v._type == NUMBER) && (_type == OBJECT)) {
         // convert this value to a primitive and recurse
-        try
-        {
+        try {
             // Date objects default to primitive type STRING from SWF6 up,
             // but we always prefer valueOf to toString in this case.
         	as_value v2 = to_primitive(NUMBER); 
-            if ( strictly_equals(v2) ) return false;
-
+            if (strictly_equals(v2)) return false;
 #ifdef GNASH_DEBUG_EQUALITY
             log_debug(" 21: convertion to primitive : %s -> %s", *this, v2);
 #endif
-
             return v2.equals(v);
         }
-        catch (ActionTypeError& e)
-        {
-
+        catch (ActionTypeError& e) {
 #ifdef GNASH_DEBUG_EQUALITY
             log_debug(" %s.to_primitive() threw an ActionTypeError %s",
                     *this, e.what());
 #endif
-
-            return false; // no valid conversion
+            return false; 
         }
-
     }
 
-
 #ifdef GNASH_DEBUG_EQUALITY
-	// Both operands are objects (OBJECT,AS_FUNCTION,MOVIECLIP)
-	if ( ! is_object() || ! v.is_object() )
-	{
+	// Both operands are objects (OBJECT,DISPLAYOBJECT)
+	if (!is_object() || !v.is_object()) {
 		log_debug("Equals(%s,%s)", *this, v);
 	}
 #endif
@@ -1128,48 +839,44 @@ as_value::equals(const as_value& v) const
 	as_value p = *this;
 	as_value vp = v;
 
-	int converted = 0;
-	try
-	{
-		p = to_primitive(); 
-		if ( ! strictly_equals(p) ) ++converted;
+    bool converted(false);
+
+	try {
+		p = to_primitive(p.defaultPrimitive(SWFVersion)); 
+		if (!strictly_equals(p)) converted = true;
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" convertion to primitive (this): %s -> %s", *this, p);
+		log_debug(" conversion to primitive (this): %s -> %s", *this, p);
 #endif
 	}
-	catch (ActionTypeError& e)
-	{
+	catch (ActionTypeError& e) {
 #ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
 		log_debug(" %s.to_primitive() threw an ActionTypeError %s",
 			*this, e.what());
 #endif
 	}
 
-	try
-	{
-		vp = v.to_primitive(); 
-		if ( ! v.strictly_equals(vp) ) ++converted;
+	try {
+		vp = v.to_primitive(v.defaultPrimitive(SWFVersion)); 
+		if (!v.strictly_equals(vp)) converted = true;
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" convertion to primitive (that): %s -> %s", v, vp);
+		log_debug(" conversion to primitive (that): %s -> %s", v, vp);
 #endif
 	}
-	catch (ActionTypeError& e)
-	{
+	catch (ActionTypeError& e) {
 #ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
 		log_debug(" %s.to_primitive() threw an ActionTypeError %s",
 			v, e.what());
 #endif
 	}
 
-	if ( converted )
+	if (converted)
 	{
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" some conversion took place, recurring");
+		log_debug(" some conversion took place, recursing");
 #endif
 		return p.equals(vp);
 	}
-	else
-	{
+	else {
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" no conversion took place, returning false");
 #endif
@@ -1179,36 +886,27 @@ as_value::equals(const as_value& v) const
 
 }
 	
-// Sets *this to this string plus the given string.
-void
-as_value::string_concat(const std::string& str)
-{
-    std::string currVal = to_string();
-    m_type = STRING;
-    _value = currVal + str;
-}
-
 const char*
 as_value::typeOf() const
 {
-	switch(m_type)
+	switch (_type)
 	{
-		case as_value::UNDEFINED:
+		case UNDEFINED:
 			return "undefined"; 
 
-		case as_value::STRING:
+		case STRING:
 			return "string";
 
-		case as_value::NUMBER:
+		case NUMBER:
 			return "number";
 
-		case as_value::BOOLEAN:
+		case BOOLEAN:
 			return "boolean";
 
-		case as_value::OBJECT:
+		case OBJECT:
             return is_function() ? "function" : "object";
 
-		case as_value::MOVIECLIP:
+		case DISPLAYOBJECT:
 		{
 			DisplayObject* ch = getCharacter();
 			if ( ! ch ) return "movieclip"; // dangling
@@ -1216,29 +914,22 @@ as_value::typeOf() const
 			return "object"; // bound to some other DisplayObject
 		}
 
-		case as_value::NULLTYPE:
+		case NULLTYPE:
 			return "null";
 
 		default:
-			if (is_exception())
-			{
-				return "exception";
-		    }
-			abort();
-			return NULL;
+			if (is_exception()) return "exception";
+            std::abort();
+			return 0;
 	}
 }
 
-/*private*/
 bool
 as_value::equalsSameType(const as_value& v) const
 {
-#ifdef GNASH_DEBUG_EQUALITY
-    static int count=0;
-    log_debug("equalsSameType(%s, %s) called [%d]", *this, v, count++);
-#endif
-	assert(m_type == v.m_type);
-	switch (m_type)
+	assert(_type == v._type);
+
+	switch (_type)
 	{
 		case UNDEFINED:
 		case NULLTYPE:
@@ -1249,39 +940,28 @@ as_value::equalsSameType(const as_value& v) const
 		case STRING:
 			return _value == v._value;
 
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 			return toDisplayObject() == v.toDisplayObject(); 
 
 		case NUMBER:
 		{
-			double a = getNum();
-			double b = v.getNum();
-
-			// Nan != NaN
-			//if ( isNaN(a) || isNaN(b) ) return false;
-
-			if ( isNaN(a) && isNaN(b) ) return true;
-
-			// -0.0 == 0.0
-			if ( (a == -0 && b == 0) || (a == 0 && b == -0) ) return true;
-
+			const double a = getNum();
+			const double b = v.getNum();
+			if (isNaN(a) && isNaN(b)) return true;
 			return a == b;
 		}
 		default:
-			if (is_exception())
-			{
-				return false; // Exceptions equal nothing.
-		    }
+			if (is_exception()) return false; 
 
 	}
-	abort();
+    std::abort();
 	return false;
 }
 
 bool
 as_value::strictly_equals(const as_value& v) const
 {
-	if ( m_type != v.m_type ) return false;
+	if ( _type != v._type ) return false;
 	return equalsSameType(v);
 }
 
@@ -1290,7 +970,7 @@ as_value::toDebugString() const
 {
     boost::format ret;
 
-	switch (m_type)
+	switch (_type)
 	{
 		case UNDEFINED:
 			return "[undefined]";
@@ -1302,7 +982,8 @@ as_value::toDebugString() const
 		case OBJECT:
 		{
 			as_object* obj = getObj();
-			ret = boost::format("[object(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
+			ret = boost::format("[object(%s):%p]") % typeName(*obj) %
+                                              static_cast<void*>(obj);
 			return ret.str();
 		}
 		case STRING:
@@ -1313,26 +994,22 @@ as_value::toDebugString() const
 			stream << getNum();
 			return "[number:" + stream.str() + "]";
 		}
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 		{
 			const CharacterProxy& sp = getCharacterProxy();
-			if ( sp.isDangling() )
-			{
+			if (sp.isDangling()) {
 				DisplayObject* rebound = sp.get();
-				if ( rebound )
-				{
+				if (rebound) {
 				    ret = boost::format("[rebound %s(%s):%p]") % 
 						typeName(*rebound) % sp.getTarget() %
 						static_cast<void*>(rebound);
 				}
-				else
-				{
+				else {
 				    ret = boost::format("[dangling DisplayObject:%s]") % 
 					    sp.getTarget();
 				}
 			}
-			else
-			{
+			else {
 				DisplayObject* ch = sp.get();
 				ret = boost::format("[%s(%s):%p]") % typeName(*ch) %
 				                sp.getTarget() % static_cast<void*>(ch);
@@ -1340,141 +1017,30 @@ as_value::toDebugString() const
 			return ret.str();
 		}
 		default:
-			if (is_exception())
-			{
-				return "[exception]";
-			}
-			abort();
+			if (is_exception()) return "[exception]";
+            std::abort();
 	}
 }
 
 void
 as_value::operator=(const as_value& v)
 {
-	m_type = v.m_type;
+	_type = v._type;
 	_value = v._value;
-}
-
-/// Examples:
-//
-/// e.g. for 9*.1234567890123456789:
-/// 9999.12345678901
-/// 99999.123456789
-/// 999999.123456789
-/// 9999999.12345679
-/// [...]
-/// 999999999999.123
-/// 9999999999999.12
-/// 99999999999999.1
-/// 999999999999999
-/// 1e+16
-/// 1e+17
-//
-/// For 1*.111111111111111111111111111111111111:
-/// 1111111111111.11
-/// 11111111111111.1
-/// 111111111111111
-/// 1.11111111111111e+15
-/// 1.11111111111111e+16
-//
-/// For 1.234567890123456789 * 10^-i:
-/// 1.23456789012346
-/// 0.123456789012346
-/// 0.0123456789012346
-/// 0.00123456789012346
-/// 0.000123456789012346
-/// 0.0000123456789012346
-/// 0.00000123456789012346
-/// 1.23456789012346e-6
-/// 1.23456789012346e-7
-std::string
-as_value::doubleToString(double val, int radix)
-{
-	// Handle non-numeric values.
-	if (isNaN(val)) return "NaN";
-	
-    if (isInf(val)) return val < 0 ? "-Infinity" : "Infinity";
-
-    if (val == 0.0 || val == -0.0) return "0"; 
-
-    std::ostringstream ostr;
-
-	if (radix == 10)
-	{
-		// ActionScript always expects dot as decimal point.
-		ostr.imbue(std::locale::classic()); 
-		
-		// force to decimal notation for this range (because the
-        // reference player does)
-		if (std::abs(val) < 0.0001 && std::abs(val) >= 0.00001)
-		{
-			// All nineteen digits (4 zeros + up to 15 significant digits)
-			ostr << std::fixed << std::setprecision(19) << val;
-			
-            std::string str = ostr.str();
-			
-			// Because 'fixed' also adds trailing zeros, remove them.
-			std::string::size_type pos = str.find_last_not_of('0');
-			if (pos != std::string::npos) {
-				str.erase(pos + 1);
-			}
-            return str;
-		}
-
-        ostr << std::setprecision(15) << val;
-        
-        std::string str = ostr.str();
-        
-        // Remove a leading zero from 2-digit exponent if any
-        std::string::size_type pos = str.find("e", 0);
-
-        if (pos != std::string::npos && str.at(pos + 2) == '0') {
-            str.erase(pos + 2, 1);
-        }
-
-        return str;
-	}
-
-    // Radix isn't 10
-	bool negative = (val < 0);
-	if (negative) val = -val;
-
-	double left = std::floor(val);
-	if (left < 1) return "0";
-
-    std::string str;
-    const std::string digits = "0123456789abcdefghijklmnopqrstuvwxyz";
-
-    // Construct the string backwards for speed, then reverse.
-    while (left)
-	{
-		double n = left;
-		left = std::floor(left / radix);
-		n -= (left * radix);
-		str.push_back(digits[static_cast<int>(n)]);
-	}
-	if (negative) str.push_back('-'); 
-
-    std::reverse(str.begin(), str.end());
-
-	return str;
-	
 }
 
 void
 as_value::setReachable() const
 {
-#ifdef GNASH_USE_GC
-	switch (m_type)
+	switch (_type)
 	{
 		case OBJECT:
 		{
 			as_object* op = getObj();
-			if (op)
-				op->setReachable();
+			if (op) op->setReachable();
 			break;
 		}
-		case MOVIECLIP:
+		case DISPLAYOBJECT:
 		{
 			CharacterProxy sp = getCharacterProxy();
 			sp.setReachable();
@@ -1482,24 +1048,23 @@ as_value::setReachable() const
 		}
 		default: break;
 	}
-#endif // GNASH_USE_GC
 }
 
 as_object*
 as_value::getObj() const
 {
-	assert(m_type == OBJECT);
+	assert(_type == OBJECT);
 	return boost::get<as_object*>(_value);
 }
 
 CharacterProxy
 as_value::getCharacterProxy() const
 {
-	assert(m_type == MOVIECLIP);
+	assert(_type == DISPLAYOBJECT);
 	return boost::get<CharacterProxy>(_value);
 }
 
-as_value::CharacterPtr
+DisplayObject*
 as_value::getCharacter(bool allowUnloaded) const
 {
 	return getCharacterProxy().get(allowUnloaded);
@@ -1508,62 +1073,62 @@ as_value::getCharacter(bool allowUnloaded) const
 void
 as_value::set_string(const std::string& str)
 {
-	m_type = STRING;
+	_type = STRING;
 	_value = str;
 }
 
 void
 as_value::set_double(double val)
 {
-	m_type = NUMBER;
+	_type = NUMBER;
 	_value = val;
 }
 
 void
 as_value::set_bool(bool val)
 {
-	m_type = BOOLEAN;
+	_type = BOOLEAN;
 	_value = val;
 }
 
 as_value::as_value()
 	:
-	m_type(UNDEFINED),
+	_type(UNDEFINED),
 	_value(boost::blank())
 {
 }
 
 as_value::as_value(const as_value& v)
 	:
-	m_type(v.m_type),
+	_type(v._type),
 	_value(v._value)
 {
 }
 
 as_value::as_value(const char* str)
 	:
-	m_type(STRING),
+	_type(STRING),
 	_value(std::string(str))
 {
 }
 
 as_value::as_value(const std::string& str)
 	:
-	m_type(STRING),
+	_type(STRING),
 	_value(str)
 {
 }
 
 as_value::as_value(double num)
 	:
-	m_type(NUMBER),
+	_type(NUMBER),
 	_value(num)
 {
 }
 
 as_value::as_value(as_object* obj)
 	:
-	m_type(UNDEFINED)
+	_type(UNDEFINED)
 {
 	set_as_object(obj);
 }
@@ -1571,212 +1136,7 @@ as_value::as_value(as_object* obj)
 bool
 as_value::is_function() const
 {
-    return m_type == OBJECT && getObj()->to_function();
-}
-
-/// Instantiate this value from an AMF element 
-as_value::as_value(const amf::Element& el)
-	:
-	m_type(UNDEFINED)
-{
-    
-    VM& vm = VM::get();
-    string_table& st = vm.getStringTable();
-    Global_as& gl = *vm.getGlobal();
-
-    switch (el.getType()) {
-      case amf::Element::NOTYPE:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-	  log_debug("as_value(Element&) : AMF type NO TYPE!");
-#endif
-	  break;
-      }
-      case amf::Element::NULL_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type NULL");
-#endif
-            set_null();
-            break;
-      }
-      case amf::Element::UNDEFINED_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type UNDEFINED");
-#endif
-            set_undefined();
-            break;
-      }
-      case amf::Element::MOVIECLIP_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type MOVIECLIP");
-#endif
-            log_unimpl("MOVIECLIP AMF0 type");
-            set_undefined();
-            //m_type = MOVIECLIP;
-            //_value = el.getData();
-
-            break;
-      }
-      case amf::Element::NUMBER_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type NUMBER");
-#endif
-            double num = el.to_number();
-            set_double(num);
-            break;
-      }
-      case amf::Element::BOOLEAN_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type BOOLEAN");
-#endif
-            bool flag = el.to_bool();
-            set_bool(flag);
-            break;
-      }
-
-      case amf::Element::STRING_AMF0:
-      case amf::Element::LONG_STRING_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type STRING");
-#endif
-	    std::string str;
-	    // If there is data, convert it to a string for the as_value
-	    if (el.getDataSize() != 0) {
-		str = el.to_string();
-		// Element's store the property name as the name, not as data.
-	    } else if (el.getNameSize() != 0) {
-		str = el.getName();
-	    }
-	    
-	    set_string(str);
-            break;
-      }
-
-      case amf::Element::OBJECT_AMF0:
-      {
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-          log_debug("as_value(Element&) : AMF type OBJECT");
-#endif
-          as_object* obj = gl.createObject();
-          if (el.propertySize()) {
-              for (size_t i=0; i < el.propertySize(); i++) {
-		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-		  if (prop == 0) {
-		      break;
-		  } else {
-		      if (prop->getNameSize() == 0) {
-			  log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
-		      } else {
-			  obj->set_member(st.find(prop->getName()), as_value(*prop));
-		      }
-		  }
-              }
-          }
-	  set_as_object(obj);
-          break;
-      }
-
-      case amf::Element::ECMA_ARRAY_AMF0:
-      {
-          // TODO: fixme: ECMA_ARRAY has an additional fiedl, dunno
-          //              if accessible trought Element class
-          //              (the theoretic number of elements in it)
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-          log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
-#endif
-
-          as_object* obj = gl.createArray();
-
-          if (el.propertySize()) {
-              for (size_t i=0; i < el.propertySize(); i++) {
-		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-		  if (prop == 0) {
-		      break;
-		  } else {
-		      obj->set_member(st.find(prop->getName()), as_value(*prop));
-		  }
-              }
-          }
-          set_as_object(obj);
-          break;
-      }
-    
-
-      case amf::Element::STRICT_ARRAY_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-          log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
-#endif
-          as_object* obj = gl.createArray();
-          size_t len = el.propertySize();
-          obj->set_member(NSV::PROP_LENGTH, len);
-
-          for (size_t i=0; i < el.propertySize(); i++) {
-              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-              if (prop == 0) {
-                  break;
-              } else {
-		  if (prop->getNameSize() == 0) {
-		      log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
-		  } else {
-		      obj->set_member(st.find(prop->getName()), as_value(*prop));
-		  }
-              }
-          }
-          
-          set_as_object(obj);
-          break;
-      }
-
-      case amf::Element::REFERENCE_AMF0:
-      {
-        log_unimpl("REFERENCE Element to as_value");
-        break;
-      }
-
-      case amf::Element::DATE_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-	  log_debug("as_value(Element&) : AMF type DATE");
-#endif
-	  double num = el.to_number();
-	  set_double(num);
-	  break;
-      }
-      //if (swfVersion > 5) m_type = STRING;
-      
-      case amf::Element::UNSUPPORTED_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-	  log_debug("as_value(Element&) : AMF type UNSUPPORTED");
-#endif
-	  break;
-      }
-      case amf::Element::RECORD_SET_AMF0:
-          log_unimpl("Record Set data type is not supported yet");
-          break;
-      case amf::Element::XML_OBJECT_AMF0:
-          log_unimpl("XML data type is not supported yet");
-          break;
-      case amf::Element::TYPED_OBJECT_AMF0:
-          log_unimpl("Typed Object data type is not supported yet");
-          break;
-      case amf::Element::AMF3_DATA:
-          log_unimpl("AMF3 data type is not supported yet");
-          break;
-      default:
-          log_unimpl("Element to as_value - unsupported Element type %d", 
-                  el.getType());
-          break;
-    }
+    return _type == OBJECT && getObj()->to_function();
 }
 
 // Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
@@ -1937,8 +1297,10 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             
             log_debug("array size: %d", li);
             
-            // the count specifies array size, so to have that even if none of the members are indexed
-            // if short, will be incremented everytime an indexed member is found
+            // the count specifies array size, so to have that even if none
+            // of the members are indexed
+            // if short, will be incremented everytime an indexed member is
+            // found
             obj->set_member(NSV::PROP_LENGTH, li);
 
             // TODO: do boundary checking (if b >= end...)
@@ -1960,11 +1322,9 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 
                 // end of ECMA_ARRAY is signalled by an empty string
                 // followed by an OBJECT_END_AMF0 (0x09) byte
-                if ( ! strlen )
-                {
+                if (!strlen) {
                     // expect an object terminator here
-                    if ( *b++ != amf::Element::OBJECT_END_AMF0 )
-                    {
+                    if (*b++ != amf::Element::OBJECT_END_AMF0) {
                         log_error("MALFORMED SOL: empty member name not "
                                 "followed by OBJECT_END_AMF0 byte");
                     }
@@ -1977,8 +1337,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
                 log_debug("amf0 ECMA_ARRAY prop name is %s", name);
 #endif
                 b += strlen;
-                if ( ! amf0_read_value(b, end, objectElement, -1, objRefs, vm) )
-                {
+                if (!amf0_read_value(b, end, objectElement, -1, objRefs, vm)) {
                     return false;
                 }
                 obj->set_member(st.find(name), objectElement);
@@ -2013,8 +1372,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
                 }
                 keyString = tmp.to_string();
 
-                if ( keyString.empty() )
-                {
+                if (keyString.empty()) {
                     if (b < end) {
                         b += 1; // AMF0 has a redundant "object end" byte
                     } else {
@@ -2024,8 +1382,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
                     return true;
                 }
 
-                if ( ! amf0_read_value(b, end, tmp, -1, objRefs, vm) )
-                {
+                if (!amf0_read_value(b, end, tmp, -1, objRefs, vm)) {
                     return false;
                 }
                 obj->set_member(st.find(keyString), tmp);
@@ -2129,10 +1486,10 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
     assert (!is_exception());
 
-    switch (m_type)
+    switch (_type)
     {
         default:
-            log_unimpl(_("serialization of as_value of type %d"), m_type);
+            log_unimpl(_("serialization of as_value of type %d"), _type);
             return false;
 
         case OBJECT:
@@ -2273,10 +1630,10 @@ as_value::writeAMF0(SimpleBuffer& buf,
             return true;
         }
 
-        case MOVIECLIP:
+        case DISPLAYOBJECT:
         {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_("writeAMF0: serializing MOVIECLIP (as undefined)"));
+            log_debug(_("writeAMF0: serializing DISPLAYOBJECT (as undefined)"));
 #endif
             // See misc-ming.all/SharedObjectTest.as
             buf.appendByte(amf::Element::UNDEFINED_AMF0);
@@ -2317,6 +1674,161 @@ as_value::writeAMF0(SimpleBuffer& buf,
     }
 }
 
+
+boost::int32_t
+toInt(const as_value& val) 
+{
+	const double d = val.to_number();
+
+	if (!isFinite(d)) return 0;
+
+    return truncateToInt(d);
+}
+
+bool
+parseNonDecimalInt(const std::string& s, double& d, bool whole)
+{
+    const std::string::size_type slen = s.length();
+
+    // "0#" would still be octal, but has the same value as a decimal.
+    if (slen < 3) return false;
+
+    bool negative = false;
+
+    if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
+        // The only legitimate place for a '-' is after 0x. If it's a
+        // '+' we don't care, as it won't disturb the conversion.
+        std::string::size_type start = 2;
+        if (s[2] == '-') {
+            negative = true;
+            ++start;
+        }
+        d = parsePositiveInt(s.substr(start), BASE_HEX, whole);
+        if (negative) d = -d;
+        return true;
+    }
+    else if ((s[0] == '0' || ((s[0] == '-' || s[0] == '+') && s[1] == '0')) &&
+            s.find_first_not_of("01234567", 1) == std::string::npos) {
+
+        std::string::size_type start = 0;
+        if (s[0] == '-') {
+            negative = true;
+            ++start;
+        }
+        d = parsePositiveInt(s.substr(start), BASE_OCT, whole);
+        if (negative) d = -d;
+        return true;
+    }
+
+    return false;
+
+}
+
+std::string
+doubleToString(double val, int radix)
+{
+    // Examples:
+    //
+    // e.g. for 9*.1234567890123456789:
+    // 9999.12345678901
+    // 99999.123456789
+    // 999999.123456789
+    // 9999999.12345679
+    // [...]
+    // 999999999999.123
+    // 9999999999999.12
+    // 99999999999999.1
+    // 999999999999999
+    // 1e+16
+    // 1e+17
+    //
+    // For 1*.111111111111111111111111111111111111:
+    // 1111111111111.11
+    // 11111111111111.1
+    // 111111111111111
+    // 1.11111111111111e+15
+    // 1.11111111111111e+16
+    //
+    // For 1.234567890123456789 * 10^-i:
+    // 1.23456789012346
+    // 0.123456789012346
+    // 0.0123456789012346
+    // 0.00123456789012346
+    // 0.000123456789012346
+    // 0.0000123456789012346
+    // 0.00000123456789012346
+    // 1.23456789012346e-6
+    // 1.23456789012346e-7
+
+	// Handle non-numeric values.
+	if (isNaN(val)) return "NaN";
+	
+    if (isInf(val)) return val < 0 ? "-Infinity" : "Infinity";
+
+    if (val == 0.0 || val == -0.0) return "0"; 
+
+    std::ostringstream ostr;
+
+	if (radix == 10) {
+
+		// ActionScript always expects dot as decimal point.
+		ostr.imbue(std::locale::classic()); 
+		
+		// force to decimal notation for this range (because the
+        // reference player does)
+		if (std::abs(val) < 0.0001 && std::abs(val) >= 0.00001) {
+
+			// All nineteen digits (4 zeros + up to 15 significant digits)
+			ostr << std::fixed << std::setprecision(19) << val;
+			
+            std::string str = ostr.str();
+			
+			// Because 'fixed' also adds trailing zeros, remove them.
+			std::string::size_type pos = str.find_last_not_of('0');
+			if (pos != std::string::npos) {
+				str.erase(pos + 1);
+			}
+            return str;
+		}
+
+        ostr << std::setprecision(15) << val;
+        
+        std::string str = ostr.str();
+        
+        // Remove a leading zero from 2-digit exponent if any
+        std::string::size_type pos = str.find("e", 0);
+
+        if (pos != std::string::npos && str.at(pos + 2) == '0') {
+            str.erase(pos + 2, 1);
+        }
+
+        return str;
+	}
+
+    // Radix isn't 10
+	bool negative = (val < 0);
+	if (negative) val = -val;
+
+	double left = std::floor(val);
+	if (left < 1) return "0";
+
+    std::string str;
+    const std::string digits = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+    // Construct the string backwards for speed, then reverse.
+    while (left) {
+		double n = left;
+		left = std::floor(left / radix);
+		n -= (left * radix);
+		str.push_back(digits[static_cast<int>(n)]);
+	}
+	if (negative) str.push_back('-'); 
+
+    std::reverse(str.begin(), str.end());
+
+	return str;
+}
+
 /// Force type to number.
 as_value&
 convertToNumber(as_value& v, VM& /*vm*/)
@@ -2329,7 +1841,7 @@ convertToNumber(as_value& v, VM& /*vm*/)
 as_value&
 convertToString(as_value& v, VM& vm)
 {
-    v.set_string(v.to_string_versioned(vm.getSWFVersion()));
+    v.set_string(v.to_string(vm.getSWFVersion()));
     return v;
 }
 
@@ -2340,6 +1852,222 @@ convertToBoolean(as_value& v, VM& /*vm*/)
     v.set_bool(v.to_bool());
     return v;
 }
+
+as_value&
+convertToPrimitive(as_value& v, VM& vm)
+{
+    const as_value::AsType t(v.defaultPrimitive(vm.getSWFVersion()));
+    v = v.to_primitive(t);
+    return v;
+}
+
+#if 0
+
+/// Instantiate this value from an AMF element 
+as_value::as_value(const amf::Element& el)
+	:
+	_type(UNDEFINED)
+{
+    
+    VM& vm = VM::get();
+    string_table& st = vm.getStringTable();
+    Global_as& gl = *vm.getGlobal();
+
+    switch (el.getType()) {
+      case amf::Element::NOTYPE:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type NO TYPE!");
+#endif
+	  break;
+      }
+      case amf::Element::NULL_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type NULL");
+#endif
+            set_null();
+            break;
+      }
+      case amf::Element::UNDEFINED_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type UNDEFINED");
+#endif
+            set_undefined();
+            break;
+      }
+      case amf::Element::MOVIECLIP_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type DISPLAYOBJECT");
+#endif
+            log_unimpl("DISPLAYOBJECT AMF0 type");
+            set_undefined();
+            //_type = DISPLAYOBJECT;
+            //_value = el.getData();
+
+            break;
+      }
+      case amf::Element::NUMBER_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type NUMBER");
+#endif
+            double num = el.to_number();
+            set_double(num);
+            break;
+      }
+      case amf::Element::BOOLEAN_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type BOOLEAN");
+#endif
+            bool flag = el.to_bool();
+            set_bool(flag);
+            break;
+      }
+
+      case amf::Element::STRING_AMF0:
+      case amf::Element::LONG_STRING_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type STRING");
+#endif
+	    std::string str;
+	    // If there is data, convert it to a string for the as_value
+	    if (el.getDataSize() != 0) {
+		str = el.to_string();
+		// Element's store the property name as the name, not as data.
+	    } else if (el.getNameSize() != 0) {
+		str = el.getName();
+	    }
+	    
+	    set_string(str);
+            break;
+      }
+
+      case amf::Element::OBJECT_AMF0:
+      {
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+          log_debug("as_value(Element&) : AMF type OBJECT");
+#endif
+          as_object* obj = gl.createObject();
+          if (el.propertySize()) {
+              for (size_t i=0; i < el.propertySize(); i++) {
+		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
+		  if (prop == 0) {
+		      break;
+		  } else {
+		      if (prop->getNameSize() == 0) {
+			  log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
+		      } else {
+			  obj->set_member(st.find(prop->getName()), as_value(*prop));
+		      }
+		  }
+              }
+          }
+	  set_as_object(obj);
+          break;
+      }
+
+      case amf::Element::ECMA_ARRAY_AMF0:
+      {
+          // TODO: fixme: ECMA_ARRAY has an additional fiedl, dunno
+          //              if accessible trought Element class
+          //              (the theoretic number of elements in it)
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+          log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
+#endif
+
+          as_object* obj = gl.createArray();
+
+          if (el.propertySize()) {
+              for (size_t i=0; i < el.propertySize(); i++) {
+		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
+		  if (prop == 0) {
+		      break;
+		  } else {
+		      obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  }
+              }
+          }
+          set_as_object(obj);
+          break;
+      }
+    
+
+      case amf::Element::STRICT_ARRAY_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+          log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
+#endif
+          as_object* obj = gl.createArray();
+          size_t len = el.propertySize();
+          obj->set_member(NSV::PROP_LENGTH, len);
+
+          for (size_t i=0; i < el.propertySize(); i++) {
+              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
+              if (prop == 0) {
+                  break;
+              } else {
+		  if (prop->getNameSize() == 0) {
+		      log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
+		  } else {
+		      obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  }
+              }
+          }
+          
+          set_as_object(obj);
+          break;
+      }
+
+      case amf::Element::REFERENCE_AMF0:
+      {
+        log_unimpl("REFERENCE Element to as_value");
+        break;
+      }
+
+      case amf::Element::DATE_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type DATE");
+#endif
+	  double num = el.to_number();
+	  set_double(num);
+	  break;
+      }
+      //if (swfVersion > 5) _type = STRING;
+      
+      case amf::Element::UNSUPPORTED_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type UNSUPPORTED");
+#endif
+	  break;
+      }
+      case amf::Element::RECORD_SET_AMF0:
+          log_unimpl("Record Set data type is not supported yet");
+          break;
+      case amf::Element::XML_OBJECT_AMF0:
+          log_unimpl("XML data type is not supported yet");
+          break;
+      case amf::Element::TYPED_OBJECT_AMF0:
+          log_unimpl("Typed Object data type is not supported yet");
+          break;
+      case amf::Element::AMF3_DATA:
+          log_unimpl("AMF3 data type is not supported yet");
+          break;
+      default:
+          log_unimpl("Element to as_value - unsupported Element type %d", 
+                  el.getType());
+          break;
+    }
+}
+#endif
 } // namespace gnash
 
 

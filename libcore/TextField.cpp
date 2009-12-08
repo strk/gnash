@@ -2882,11 +2882,11 @@ textfield_createTextField(const fn_call& fn)
     }
 
     const std::string& name = fn.arg(0).to_string();
-    const int depth = fn.arg(1).to_int();
-    const int x = fn.arg(2).to_int();
-    const int y = fn.arg(3).to_int();
+    const int depth = toInt(fn.arg(1));
+    const int x = toInt(fn.arg(2));
+    const int y = toInt(fn.arg(3));
     
-    int width = fn.arg(4).to_int();
+    int width = toInt(fn.arg(4));
     if (width < 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("createTextField: negative width (%d)"
@@ -2895,7 +2895,7 @@ textfield_createTextField(const fn_call& fn)
         width = -width;
     }
 
-    int height = fn.arg(5).to_int();
+    int height = toInt(fn.arg(5));
     if ( height < 0 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2971,7 +2971,7 @@ textfield_backgroundColor(const fn_call& fn)
     }
     else {
         rgba newColor;
-        newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_int()));
+        newColor.parseRGB(static_cast<boost::uint32_t>(toInt(fn.arg(0))));
         ptr->setBackgroundColor(newColor);
     }
 
@@ -3512,7 +3512,7 @@ textfield_maxChars(const fn_call& fn)
         return as_value(maxChars);
     }
     // Setter
-    text->maxChars(fn.arg(0).to_int());
+    text->maxChars(toInt(fn.arg(0)));
     return as_value();
 }
 
@@ -3659,7 +3659,7 @@ textfield_replaceText(const fn_call& fn)
         return as_value();
     }
 
-    int userEnd = fn.arg(1).to_int();
+    int userEnd = toInt(fn.arg(1));
     if ( userEnd < 0 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3670,13 +3670,13 @@ textfield_replaceText(const fn_call& fn)
         return as_value();
     }
 
-    wstring::size_type start = fn.arg(0).to_int();
+    wstring::size_type start = toInt(fn.arg(0));
     wstring::size_type end = userEnd;
 
     int version = getSWFVersion(fn);
 
     // TODO: check if it's possible for SWF6 to use this function
-    //       and if it is whether to_string should be to_string_versioned
+    //       and if it is whether to_string should be to_string
     //       (affects the way undefined values are considered)
     const wstring& replacement =
         utf8::decodeCanonicalString(fn.arg(2).to_string(), version);
