@@ -936,7 +936,6 @@ AbcBlock::read_instances()
 	log_abc("There are %u instances.", count);
 	_classes.resize(count);
 	for (size_t i = 0; i < count; ++i) {
-		abc::Class* pScript;
 		//Read multiname index.
 		boost::uint32_t index = _stream->read_V32();
 		// 0 is allowed as a name, typically for the last entry.
@@ -958,16 +957,16 @@ AbcBlock::read_instances()
 			return false;
 		}
 
-		pScript = locateClass(multiname);
+        abc::Class* cl = locateClass(multiname);
 		
-        if (!pScript) {
+        if (!cl) {
 
             const string_table::key className = multiname.getGlobalName();
 
-			pScript = mCH->newClass();
-            pScript->setName(className);
+			cl = mCH->newClass();
+            cl->setName(className);
 
-			if (!multiname.getNamespace()->addScript(className, pScript)) {
+			if (!multiname.getNamespace()->addScript(className, cl)) {
 
 				log_error(_("Duplicate class registration."));
 				return false;
@@ -980,8 +979,8 @@ AbcBlock::read_instances()
             multiname.getNamespace()->dump(*_stringTable);
 
 		}
-		pScript->setDeclared();
-		_classes[i] = pScript;
+		cl->setDeclared();
+		_classes[i] = cl;
 		boost::uint32_t super_index = _stream->read_V32();
 
 		if (super_index && super_index >= _multinamePool.size()) {
@@ -990,7 +989,7 @@ AbcBlock::read_instances()
 		}
 
 		if (!super_index) {
-			pScript->setSuper(mTheObject);
+			cl->setSuper(mTheObject);
 		}
 		else {
 			abc::Class *pSuper = locateClass(_multinamePool[super_index]);
@@ -1013,25 +1012,25 @@ AbcBlock::read_instances()
 				return false;
 			}
 
-			if (pSuper == pScript)
+			if (pSuper == cl)
 			{
 				log_error(_("ABC: Class cannot be its own supertype."));
 				return false;
 			}
-			pScript->setSuper(pSuper);
+			cl->setSuper(pSuper);
 			pSuper->setInherited();
 		}
 
 		boost::uint8_t flags = _stream->read_u8();
 		log_abc("Instance %u(%s) multiname index=%u name=%s super index=%u "
-                "flags=%X", i, pScript, index, 
+                "flags=%X", i, cl, index, 
                 _stringPool[_multinamePool[index].getABCName()],
                 super_index, flags | 0x0);
 
-		if (flags & INSTANCE_SEALED) pScript->setSealed();
-		if (flags & INSTANCE_FINAL) pScript->setFinal();
-		if (flags & INSTANCE_INTERFACE) pScript->setInterface();
-		if ((flags & 7) == INSTANCE_DYNAMIC) pScript->setDynamic();
+		if (flags & INSTANCE_SEALED) cl->setSealed();
+		if (flags & INSTANCE_FINAL) cl->setFinal();
+		if (flags & INSTANCE_INTERFACE) cl->setInterface();
+		if ((flags & 7) == INSTANCE_DYNAMIC) cl->setDynamic();
 
 		if (flags & INSTANCE_PROTECTED_NS) {
 			boost::uint32_t ns_index = _stream->read_V32();
@@ -1040,10 +1039,10 @@ AbcBlock::read_instances()
 				return false;
 			}
 			// Set the protected namespace's parent, if it exists.
-			if (pScript->getSuper()->hasProtectedNs())
+			if (cl->getSuper()->hasProtectedNs())
 				_namespacePool[ns_index]->setParent(
-                        pScript->getSuper()->getProtectedNs());
-			pScript->setProtectedNs(_namespacePool[ns_index]);
+                        cl->getSuper()->getProtectedNs());
+			cl->setProtectedNs(_namespacePool[ns_index]);
 		}
 
 		// This is the list of interfaces which the instances has agreed to
@@ -1065,7 +1064,7 @@ AbcBlock::read_instances()
 				log_error(_("ABC: Can't implement a non-interface type."));
 				return false;
 			}
-			pScript->pushInterface(pInterface);
+			cl->pushInterface(pInterface);
 		}
 
 		// The next thing should be the constructor.
@@ -1078,12 +1077,12 @@ AbcBlock::read_instances()
 			return false;
 		}
 		// Don't validate for previous owner.
-		pScript->setConstructor(_methods[offset]);
+		cl->setConstructor(_methods[offset]);
 
 		/*	Calling the Method::setOwner always results in a segmentation fault, 
 		since it tries to modify Method.mPrototype, which is never
 		initialized.  The parser seems to work ok without this call.*/
-//		_methods[offset]->setOwner(pScript);
+//		_methods[offset]->setOwner(cl);
 
 		// Next come the 'traits' of the instance. (The members.)
 		boost::uint32_t tcount = _stream->read_V32();
@@ -1091,7 +1090,7 @@ AbcBlock::read_instances()
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			Trait &aTrait = newTrait();
-			aTrait.set_target(pScript, false);
+			aTrait.set_target(cl, false);
 			if (!aTrait.read(_stream, this))
 				return false;
 		}
@@ -1109,9 +1108,9 @@ AbcBlock::read_classes()
 	log_abc("There are %u classes.", count);
 	
     for (size_t i = 0; i < count; ++i) {
-		abc::Class* pScript = _classes[i];
+		abc::Class* cl = _classes[i];
 		boost::uint32_t offset = _stream->read_V32();
-		log_abc("Class %u(%s) static constructor index=%u", i, pScript, offset);
+		log_abc("Class %u(%s) static constructor index=%u", i, cl, offset);
 
         if (offset >= _methods.size()) {
 			log_error(_("ABC: Out of bound static constructor for class."));
@@ -1119,18 +1118,13 @@ AbcBlock::read_classes()
 		}
 
 		// Don't validate for previous owner.
-		pScript->setStaticConstructor(_methods[offset]);
+		cl->setStaticConstructor(_methods[offset]);
 
-		/*	Calling the Method::setOwner always results in a segmentation fault, 
-		since it tries to modify Method.mPrototype, which is never
-		initialized.  The parser seems to work ok without this call.*/
-//		_methods[offset]->setOwner(pScript);
-		
 		boost::uint32_t tcount = _stream->read_V32();
 		log_abc("This class has %u traits.", tcount);
 		for (size_t j = 0; j < tcount; ++j) {
 			Trait &aTrait = newTrait();
-			aTrait.set_target(pScript, true);
+			aTrait.set_target(cl, true);
 			if (!(aTrait.read(_stream, this)))
 				return false;
 		}
@@ -1144,40 +1138,39 @@ bool
 AbcBlock::read_scripts()
 {
 	log_abc("Begin reading scripts.");
-	boost::uint32_t count = _stream->read_V32();
-	log_abc("There are %u scripts.", count);
-	_scripts.resize(count);
-	for (unsigned int i = 0; i < count; ++i)
-	{
-		abc::Class* pScript = mCH->newClass();
-		_scripts[i] = pScript;
+
+	const boost::uint32_t scriptcount = _stream->read_V32();
+	log_abc("There are %u scripts.", scriptcount);
+
+	_scripts.resize(scriptcount);
+	for (size_t i = 0; i < scriptcount; ++i) {
+
+		abc::Class* script = mCH->newClass();
+		_scripts[i] = script;
 
 		boost::uint32_t offset = _stream->read_V32();
 		log_abc("Reading script %u(%s) initializer method index=%u", i,
-                pScript, offset);
-		if (offset >= _methods.size())
-		{
+                script, offset);
+		if (offset >= _methods.size()) {
 			log_error(_("ABC: Out of bounds method for script."));
 			return false;
 		}
 
-		pScript->setConstructor(_methods[offset]);
-		pScript->setSuper(mTheObject);
+		script->setConstructor(_methods[offset]);
 
-		boost::uint32_t tcount = _stream->read_V32();
-		for (unsigned int j = 0; j < tcount; ++j)
-		{
+		const boost::uint32_t tcount = _stream->read_V32();
+		for (size_t j = 0; j < tcount; ++j) {
 			
-			Trait &aTrait = newTrait();
-			aTrait.set_target(pScript, false);
-			if (!(aTrait.read(_stream, this))) {
+			Trait& trait = newTrait();
+			trait.set_target(script, false);
+			if (!(trait.read(_stream, this))) {
 				return false;
             }
 			log_abc("Trait: %u name: %s(%u) kind: %s value: %s ", j, 
-                    _stringPool[aTrait._name], aTrait._name, aTrait._kind,
-                    aTrait._value.to_string());
+                    _stringPool[trait._name], trait._name, trait._kind,
+                    trait._value.to_string());
 
-			pScript->_traits.push_back(aTrait);
+			script->_traits.push_back(trait);
 		}
 	} 
 	return true;
