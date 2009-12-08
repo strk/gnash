@@ -126,13 +126,10 @@ Class::addGetter(string_table::key name, Namespace *ns, Method *method,
 
 	Property *getset = _prototype->getOwnProperty(uri);
 
-	if (getset)
-		getset->setGetter(method->getPrototype());
-	else
-	{
+	if (getset) getset->setGetter(method->getPrototype());
+	else {
 		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
-		if (isstatic)
-			flags |= PropFlags::staticProp;
+		if (isstatic) flags |= PropFlags::staticProp;
 		_prototype->init_property(uri, *method->getPrototype(), 
 			*method->getPrototype(), flags);
 	}
@@ -148,8 +145,7 @@ Class::addSetter(string_table::key name, Namespace *ns, Method *method,
 
 	Property *getset = _prototype->getOwnProperty(uri);
 
-	if (getset)
-		getset->setSetter(method->getPrototype());
+	if (getset) getset->setSetter(method->getPrototype());
 	else
 	{
 		int flags = PropFlags::dontDelete | PropFlags::dontEnum;
@@ -161,33 +157,6 @@ Class::addSetter(string_table::key name, Namespace *ns, Method *method,
 }
 
 #if 0 // TODO
-void
-Class::buildFromPrototype(as_object *o, string_table::key name,
-	ClassHierarchy *pCH)
-{
-	setName(name);
-	PropertyList *pList = &o->_members;
-	PropertyList::iterator i = pList->begin();
-
-	for ( ; i != pList->end(); ++i)
-	{
-		Property *pProp = i->second;
-		fprintf(stderr, "Evaluating property %s.\n", STV(i->first));
-		if (pProp->isDestructive())
-		{
-			fprintf(stderr, "%s is destructive.\n", STV(i->first));
-		}
-		if (pProp->isGetterSetter())
-		{
-			fprintf(stderr, "%s is a getset.\n", STV(i->first));
-		}
-		if (pProp->isReadOnly())
-		{
-			fprintf(stderr, "%s is read only.\n", STV(i->first));
-		}
-	}
-}
-
 bool
 Class::addValue(string_table::key name, Namespace *ns, boost::uint32_t slotId,
 	Class *type, as_value& val, bool isconst, bool isstatic,

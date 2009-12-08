@@ -34,7 +34,6 @@ namespace gnash {
         class MultiName;
         class Class;
         class abc_function;
-        typedef Property Binding;
         class Method;
         class Namespace;
     }
@@ -162,7 +161,7 @@ public:
 	/// Nothing.
 	void setMember(Class*, MultiName&, as_value& target, as_value& val);
 
-	Binding* findProperty(MultiName&) { return NULL; }
+	Property* findProperty(MultiName&) { return NULL; }
 
 	void execute();
 

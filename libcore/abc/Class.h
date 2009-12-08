@@ -42,7 +42,6 @@ namespace gnash {
         class BoundAccessor;
         class Method;
         class Class;
-        typedef Property Binding;
         class Namespace;
     }
     class ClassHierarchy;
@@ -182,7 +181,7 @@ public:
 	bool hasProtectedNs() const { return _protectedNs; }
 
 	/// Get the protected namespace.
-	Namespace *getProtectedNs() { return _protectedNs; }
+	Namespace* getProtectedNs() { return _protectedNs; }
 
 	/// Set the protected namespace.
 	void setProtectedNs(Namespace *n) { _protectedNs = n; }
@@ -194,9 +193,13 @@ public:
     }
 
 	void initPrototype();
+	
+    /// Retrieve the Class from which this Class derives.
+    Class* getSuper() const { return _super; }
 
-    /// TODO: see if these are useful.
-	Class* getSuper() const { return _super; }
+    /// Set the Super Class.
+    //
+    /// This is the base class for this Class.
 	void setSuper(Class *p) { _super = p; }
 
 	/// We implement this interface.
@@ -227,7 +230,7 @@ public:
         return _staticConstructor;
     }
 
-	Binding* getBinding(string_table::key name)
+	Property* getBinding(string_table::key name)
 	{
 		BindingContainer::iterator i;
 		if (_bindings.empty()) return NULL;
@@ -237,35 +240,31 @@ public:
 		return &i->second;
 	}
 
-	Binding* getGetBinding(as_value& v, abc::MultiName& n);
-	Binding* getSetBinding(as_value& v, abc::MultiName& n);
+	Property* getGetBinding(as_value& v, abc::MultiName& n);
+	Property* getSetBinding(as_value& v, abc::MultiName& n);
     std::vector<abc::Trait> _traits;
-
 
 private:
 	
-	typedef std::map<string_table::key, Binding> BindingContainer;
+	typedef std::map<string_table::key, Property> BindingContainer;
 
     as_object *_prototype;
 
-	bool addBinding(string_table::key name, const Binding& b) {
+	bool addBinding(string_table::key name, const Property& b) {
         _bindings.insert(std::make_pair(name, b));
         return true;
     }
 
-	bool addStaticBinding(string_table::key name, const Binding& b) {
+	bool addStaticBinding(string_table::key name, const Property& b) {
         _staticBindings.insert(std::make_pair(name, b));
         return true;
     }
 
-	Binding *getStaticBinding(string_table::key name)
+	Property *getStaticBinding(string_table::key name)
 	{
-		BindingContainer::iterator i;
-		if (_staticBindings.empty())
-			return NULL;
-		i = _staticBindings.find(name);
-		if (i == _staticBindings.end())
-			return NULL;
+		if (_staticBindings.empty()) return 0;
+		BindingContainer::iterator i = _staticBindings.find(name);
+		if (i == _staticBindings.end()) return 0;
 		return &i->second;
 	}
 
