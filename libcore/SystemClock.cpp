@@ -27,32 +27,31 @@
 
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
 
-namespace gnash
-{
+namespace gnash {
 
-/* static private */
+namespace {
+
 boost::uint64_t
-SystemClock::fetchSystemTime() 
+fetchSystemTime() 
 {
-    // Time::getTicks always returns milliseconds
+    // ClockTime::getTicks always returns milliseconds
     return clocktime::getTicks();
 }
 
-/* public */
+}
+
 SystemClock::SystemClock() 
 	:
 	_startTime(fetchSystemTime())
 {
 }
 
-/* public */
 unsigned long int
 SystemClock::elapsed() const
 {
     return fetchSystemTime() - _startTime;
 }
 
-/* public */
 void
 SystemClock::restart()
 {

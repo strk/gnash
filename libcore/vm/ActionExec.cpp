@@ -34,6 +34,7 @@
 #include "ASHandlers.h"
 #include "as_environment.h"
 #include "debugger.h"
+#include "SystemClock.h"
 
 #include <sstream>
 #include <string>
@@ -178,9 +179,6 @@ ActionExec::operator()()
     );
 #endif
 
-    // TODO: specify in the .gnashrc !!
-    static const size_t maxBranchCount = 65536; // what's enough ?
-
     // stop_pc: set to the code boundary at which we should check
     // for exceptions. If there is no exception in a TryBlock, it
     // is set to the end of that block; all the code (including catch
@@ -193,9 +191,11 @@ ActionExec::operator()()
     // code. There may be no catch and/or finally block, but certain operations
     // must still be carried out. 
 
-    size_t branchCount = 0;
+    // TODO: set this in gnashrc.
+    const size_t maxTime = 40 * 1000;
+    SystemClock clock;
+
     try {
-        //log_debug("Try list size: %s", _tryList.size());
 
         // We might not stop at stop_pc, if we are trying.
         while (1) {
@@ -331,14 +331,9 @@ ActionExec::operator()()
 
             // Check for script limits hit. 
             // See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
-            if (pc <= oldPc) {
-                if (++branchCount > maxBranchCount) {
-                    boost::format fmt(_("Loop iterations count exceeded "
-                                "limit of %d. Last branch was from pc %d "
-                                "to %d"));
-                    fmt % maxBranchCount % oldPc % pc;
-                    throw ActionLimitException(fmt.str());
-                }
+            if (pc <= oldPc && clock.elapsed() > maxTime) {
+                boost::format fmt(_("Time exceeded"));
+                throw ActionLimitException(fmt.str());
             }
         }
     }
@@ -346,12 +341,12 @@ ActionExec::operator()()
         // Class execution should stop (for this frame only?)
         // Here's were we should pop-up a window to prompt user about
         // what to do next (abort or not ?)
-        cleanupAfterRun(true); // we expect inconsistencies here
+        cleanupAfterRun(); // we expect inconsistencies here
         throw;
     }
     catch (ActionScriptException& ex) {
         // An unhandled ActionScript exception was thrown.
-        cleanupAfterRun(true);
+        cleanupAfterRun();
 
         // Forceably clear the stack.
         // - Fixes misc-mtasc.all/exception.swf
@@ -567,13 +562,11 @@ ActionExec::processExceptions(TryBlock& t)
     return true;
 }
 
-/*private*/
 void
-ActionExec::cleanupAfterRun(bool /*expectInconsistencies*/) // TODO: drop argument...
+ActionExec::cleanupAfterRun() 
 {
     VM& vm = getVM(env);
 
-    //assert(_originalTarget); // this execution context might have been started while target had a null target
     env.set_target(_originalTarget);
     _originalTarget = NULL;
 
@@ -584,8 +577,8 @@ ActionExec::cleanupAfterRun(bool /*expectInconsistencies*/) // TODO: drop argume
         // check if the stack was smashed
         if ( _initialStackSize > env.stack_size() )
         {
-            log_swferror(_("Stack smashed (ActionScript compiler bug, or obfuscated SWF)."
-                 " Taking no action to fix (as expected)."));
+            log_swferror(_("Stack smashed (ActionScript compiler bug, or "
+                    "obfuscated SWF).Taking no action to fix (as expected)."));
         }
         else if ( _initialStackSize < env.stack_size() )
         {
