@@ -113,8 +113,6 @@ public:
     /// This allows
 	/// for switches and enums and such, but be careful you don't set two
 	/// strings with the same id, as this does not check for such occurrences.
-	/// Converts the strings to lower case if mSetToLower is true.
-	/// In any case, sets mSetToLower to false at the end.
 	///
 	/// @param pList
 	/// An array of svt objects, these should be fully constructed, including
@@ -123,12 +121,7 @@ public:
 	/// @param size
     /// Number of elements in the svt objects array
     ///
-	void insert_group(svt* pList, std::size_t size);
-
-	/// \brief
-	/// Call this just before calling insert_group if the next group should
-	/// be set to lower_case before addition.
-	void lower_next_group() { mSetToLower = true; }
+	void insert_group(const svt* pList, std::size_t size);
 
 	/// Insert a string when you will handle the locking yourself.
     //
@@ -153,7 +146,6 @@ public:
 		mTable(),
 		mLock(),
 		mHighestKey(0),
-		mSetToLower(false),
 		mCaseInsensitive(false)
 	{/**/}
 
@@ -162,7 +154,6 @@ private:
 	static const std::string mEmpty; // The empty string, universally.
 	boost::mutex mLock;
 	std::size_t mHighestKey;
-	bool mSetToLower; // If true, affects the next group addition.
 	bool mCaseInsensitive;
 };
 

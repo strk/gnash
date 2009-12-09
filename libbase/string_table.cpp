@@ -43,11 +43,9 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 		to_find = &t_f;
 		
 	// Empty strings all map to 0
-	if (to_find->empty())
-		return 0;
+	if (to_find->empty()) return 0;
 
-	table::nth_index<0>::type::iterator i =
-		mTable.get<0>().find(*to_find);
+	table::nth_index<0>::type::iterator i = mTable.get<0>().find(*to_find);
 
 	if (i == mTable.end())
 	{
@@ -98,29 +96,22 @@ string_table::insert(const std::string& to_insert)
 }
 
 void
-string_table::insert_group(svt* pList, std::size_t size)
+string_table::insert_group(const svt* l, std::size_t size)
 {
 	boost::mutex::scoped_lock aLock(mLock);
 
 	for (std::size_t i = 0; i < size; ++i)
 	{
-		if (mSetToLower)
-		{
-			boost::to_lower(pList[i].mValue);
-			boost::to_lower(pList[i].mComp);
-		}
-		else if (mCaseInsensitive)
-		{
-			boost::to_lower(pList[i].mComp);
-		}
+        // Copy to avoid changing the original table.
+        svt s = l[i];
+        if (mCaseInsensitive) boost::to_lower(s.mComp);
 
 		// The keys don't have to be consecutive, so any time we find a key
-		// that is too big, jump a few keys to avoid rewriting this on every item.
-		if (pList[i].mId > mHighestKey)
-			mHighestKey = pList[i].mId + 256;
-		mTable.insert(pList[i]);
+		// that is too big, jump a few keys to avoid rewriting this on every
+        // item.
+		if (s.mId > mHighestKey) mHighestKey = s.mId + 256;
+		mTable.insert(s);
 	}
-	mSetToLower = false;
 }
 
 string_table::key
