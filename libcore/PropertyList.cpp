@@ -65,8 +65,7 @@ const Property*
 PropertyList::getPropertyByOrder(int order)
 {
     order_iterator i = iterator_find(_props, order);
-	if (i == _props.get<1>().end())
-		return NULL;
+	if (i == _props.get<1>().end()) return 0;
 
 	return &(*i);
 }
@@ -76,14 +75,11 @@ PropertyList::getOrderAfter(int order)
 {
     order_iterator i = iterator_find(_props, order);
 
-	if (i == _props.get<1>().end())
-		return NULL; // Not found at all.
+	if (i == _props.get<1>().end()) return 0;
 
-	do
-	{
+	do {
 		++i;
-		if (i == _props.get<1>().end())
-			return NULL;
+		if (i == _props.get<1>().end()) return 0;
 	} while (i->getFlags().get_dont_enum());
 
 	return &(*i);
