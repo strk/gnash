@@ -89,6 +89,14 @@ void EraseIf(Container& c, Predicate p)
 }
 
 
+/// Get the size of an array without passing a pointer by mistake
+template<typename T, size_t N>
+size_t
+arraySize(T(&)[N])
+{
+    return N;
+}
+
 
 /// Delete a pointer safely
 //
