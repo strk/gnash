@@ -26,6 +26,7 @@
 #include "builtin_function.h"
 #include "NativeFunction.h" 
 #include "VM.h" // for getPlayerVersion() 
+#include "GnashAlgorithm.h"
 
 #include <sstream>
 
@@ -486,9 +487,10 @@ systemLanguage(as_object& proto)
 				"pl", "hu", "cs", "tr", "fi",
 				"da", "nl", "no", "ru"};
 	
-	const unsigned int size = sizeof (languages) / sizeof (*languages);
+	const size_t size = arraySize(languages);
 	
-	if (std::find(languages, languages + size, lang.substr(0,2)) != languages + size)
+	if (std::find(languages, languages + size, lang.substr(0, 2)) !=
+            languages + size)
 	{
 		if (lang.substr(0,2) == "zh")
 		{
