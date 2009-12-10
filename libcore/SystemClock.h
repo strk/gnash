@@ -47,9 +47,6 @@ public:
 
 private:
 
-    /// Query system time and return it in milliseconds
-    static boost::uint64_t fetchSystemTime();
-
     /// System time at time of start
     boost::uint64_t _startTime;
 };

@@ -137,13 +137,7 @@ private:
 	/// calls in DOACTION block before frame actions queued by the same
 	/// cause (the latter would be pushed in the same level gotoFrame is
 	/// found)
-	///
-	/// @param expectInconsistencies
-	///	If true, don't print an error if stack is bigger or smaller
-	///	then we expect. The parameter is used when calling the
-	///	cleanup function due to a thrown ActionLimitException.
-	///
-	void cleanupAfterRun(bool expectInconsistencies=false);
+	void cleanupAfterRun();
 
 	/// the 'with' stack associated with this execution thread
 	std::vector<with_stack_entry> _withStack;

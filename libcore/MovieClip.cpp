@@ -1608,10 +1608,9 @@ MovieClip::mouseEnabled() const
         event_id(event_id::DRAG_OUT),
     };
 
-    static const size_t size = sizeof(EH) / sizeof(EH[0]);
+    const size_t size = arraySize(EH);
 
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         const event_id &event = EH[i];
 
         // Check event handlers

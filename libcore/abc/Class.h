@@ -62,22 +62,18 @@ namespace abc {
 /// An abc::Class is a static description of an ActionScript Class. Classes
 /// have the following important properties:
 //
-/// 1.  A static initialization method ("cinit"). This is executed no more
-///     than once. 
+/// 1.  A static initialization method ("cinit"). This is executed during
+///     the opcode NewClass, which is generally called only once per class.
 /// 2.  A constructor method ("iinit"). This is run every time the Class
 ///     is constructed. As not all Classes are constructed, the iinit method
 ///     may never be executed.
+/// 3. A set of class Traits.
+/// 4. A set of instance Traits.
 //
 /// Classes are parsed from the "instances" and "classes" section of an
 /// ABCBlock. Each of these contains the same number of entries. The iinit
 /// methods are found in the instances section, the cinit methods in the
 /// classes section.
-//
-/// Note: the following does not describe very well how the data are organized
-/// in the ABC file.
-/// A Script may contain more than one class. When a Script runs, the cinit
-/// methods of all its classes are executed in the order they appear in the
-/// Script.
 class Class
 {
 public:
@@ -101,8 +97,6 @@ public:
         _inherited(false),
 		_system(false)
 	{}
-
-	as_object* getPrototype() { return _prototype; }
 	
     void setDeclared() { _declared = true; }
 	bool isDeclared() { return _declared; }
@@ -186,13 +180,8 @@ public:
 	/// Set the protected namespace.
 	void setProtectedNs(Namespace *n) { _protectedNs = n; }
 
+    /// The global name of the class.
 	string_table::key getName() const { return _name; }
-
-    void setPrototype(as_object* prototype) {
-        _prototype = prototype;
-    }
-
-	void initPrototype();
 	
     /// Retrieve the Class from which this Class derives.
     Class* getSuper() const { return _super; }
@@ -243,6 +232,17 @@ public:
 	Property* getGetBinding(as_value& v, abc::MultiName& n);
 	Property* getSetBinding(as_value& v, abc::MultiName& n);
     std::vector<abc::Trait> _traits;
+
+    /// Necessary for the current bogus implementation.
+    void setPrototype(as_object* prototype) {
+        _prototype = prototype;
+    }
+
+    /// Necessary for the current bogus implementation.
+	void initPrototype();
+
+    /// Necessary for the current bogus implementation.
+	as_object* getPrototype() { return _prototype; }
 
 private:
 	

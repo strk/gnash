@@ -331,7 +331,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
         )
     }
 
-    Movie* m = getRoot(fn).topLevelMovie();
+    Movie* m = ptr->get_root();
     as_object* o = getObjectWithPrototype(getGlobal(fn), NSV::CLASS_MOVIE_CLIP);
     MovieClip* mc = new MovieClip(o, 0, m, ptr);
 
