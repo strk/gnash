@@ -40,7 +40,7 @@ Requires: libx11_6 libxt_6
 Requires: libX11 libXt 
 %endif
 Requires: agg boost libcurl SDL boost-date-time boost-thread
-Requires: freetype fontconfig libstdc++ libz
+Requires: freetype fontconfig libstdc++
 
 # BuildRequires:  scrollkeeper
 
