@@ -71,7 +71,7 @@ Description: free SWF movie player - standalone player for KDE
 Package: gnash-tools
 Section: utils
 Architecture: any
-Depends: gnash-common (= ${binary:Version}), ${misc:Depends}, libboost1.38-dev | libboost1.37-dev | libboost1.36-dev | libboost1.35-dev | libboost1.34-dev, libboost-thread1.38-dev | libboost-thread1.37-dev | libboost-thread1.36-dev | libboost-thread1.35-dev | libboost-thread1.34-dev
+Depends: gnash-common (= ${binary:Version}), ${misc:Depends}, libboost1.40-dev | libboost1.39-dev | libboost1.38-dev | libboost1.37-dev | libboost1.36-dev | libboost1.35-dev | libboost1.34-dev, libboost-thread1.40-dev | libboost-thread1.39-dev | libboost-thread1.38-dev | libboost-thread1.37-dev | libboost-thread1.36-dev | libboost-thread1.35-dev | libboost-thread1.34-dev, libboost-date-time1.40 |  libboost-date-time1.39 |  libboost-date-time1.38 |  libboost-date-time1.37 |  libboost-date-time1.36  libboost-date-time1.35 |  libboost-date-time1.34
 Description: free SWF movie player - Command-line Tools
  Gnash is a free Flash movie player, which works either standalone, or as
  plugin for Firefox/Mozilla or Konqueror. Currently it is in a alpha state.
