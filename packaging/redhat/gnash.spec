@@ -16,7 +16,8 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 BuildRequires:  libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  gtk2-devel glib2-devel
 BuildRequires:  atk-devel pango-devel openssl-devel
-BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
+BuildRequires:  agg-devel boost-devel boost-date-time boost-thread
+BuildRequires:	curl-devel libXt-devel
 BuildRequires:  pygtk2-devel giflib-devel
 BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
 # These are for the kde4 support
@@ -38,7 +39,8 @@ Requires: libx11_6 libxt_6
 %else
 Requires: libX11 libXt 
 %endif
-Requires: agg boost libcurl SDL
+Requires: agg boost libcurl SDL boost-date-time boost-thread
+Requires: freetype fontconfig libstdc++ libz
 
 # BuildRequires:  scrollkeeper
 
@@ -50,7 +52,7 @@ Requires(postun): /sbin/ldconfig
 #Requires(preun): /sbin/install-info
 
 %description
-Gnash is a GNU SWF movie player that supports many SWF v7 features, with growing support for swf v8 and v9.
+Gnash is a GNU SWF movie player that supports many SWF v7 features, with growing support for swf v8, v9, and v10.
 
 %package plugin
 Summary:   Web-client SWF player plugin 
@@ -255,7 +257,6 @@ scrollkeeper-update -q || :
 %{_bindir}/findwebcams
 %{_bindir}/dumpshm
 %{_libdir}/gnash/*.so*
-%{_libdir}/mozilla/plugins/*.so
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
 %{_datadir}/man/man1/*.1*
