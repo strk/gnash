@@ -315,6 +315,7 @@ if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 check_SCRIPTS += VarAndCharClashTest-Runner \
 	gotoFrame2Test-Runner \
 	FlashVarsTest-Runner \
+	attachImported-Runner \
 	SharedObjectTestRunner
 endif
 
@@ -1239,6 +1240,14 @@ attachMovieLoopingTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
+# This will only work with Ming-0.4.0beta2
+# (support for prebuilt clips inclusion)
+attachImported.swf: Dejagnu.swf $(srcdir)/attachImported.as attachMovieTest.swf
+	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -i attachMovieTest.swf:redsquare -o $@ Dejagnu.swf $(srcdir)/attachImported.as
+attachImported-Runner: $(srcdir)/../generic-testrunner.sh attachImported.swf Makefile
+	sh $< -r5 $(top_builddir) attachImported.swf > $@
+	chmod 755 $@
+
 simple_loop_test_SOURCES =	\
 	simple_loop_test.c	\
 	$(NULL)
@@ -2065,7 +2074,8 @@ TEST_CASES += VarAndCharClashTest-Runner \
 	FlashVarsTest-Runner \
 	SharedObjectTestRunner \
 	intervalTestRunner \
-	gotoFrame2Test-Runner 
+	gotoFrame2Test-Runner \
+	attachImported-Runner
 endif
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
