@@ -777,7 +777,14 @@ SWFMovieDefinition::importResources(
                         "movie '%s'"), symbolName, source->get_url());
 			continue;
         }
-        else if (Font* f = dynamic_cast<Font*>(res.get()))
+
+#ifdef DEBUG_EXPORTS
+        log_debug("Exporting symbol %s imported from source %s",
+            symbolName, source->get_url());
+#endif
+        export_resource(symbolName, res.get());
+
+        if (Font* f = dynamic_cast<Font*>(res.get()))
 		{
 			// Add this shared font to the currently-loading movie.
 			add_font(id, f);
