@@ -985,8 +985,24 @@ as_environment::markReachableResources() const
     if (m_target) m_target->setReachable();
     if (_original_target) _original_target->setReachable();
 
+#ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
+    /// Mark all (including unreachable) stack elements
+    for (SafeStack<as_value>::StackSize i=0, n=_stack.totalSize(); i<n; ++i)
+    {
+        _stack.at(i).setReachable();
+    }
+
+    /// Mark call stack 
+    for (CallStack::size_type i=0, n=_localFrames.size(); i<n; ++i)
+    {
+        _localFrames[i].markReachableResources();
+    }
+
+#else
     assert (_localFrames.empty());
     assert (_stack.empty());
+#endif
+
 }
 #endif // GNASH_USE_GC
 
