@@ -74,6 +74,12 @@ public:
         return !_registers.empty();
     }
 
+    /// Mark all reachable resources
+    //
+    /// Reachable resources would be registers and
+    /// locals (expected to be empty?) and function.
+    void markReachableResources() const;
+
 
 private:
 
@@ -87,11 +93,6 @@ private:
 
     as_function* _func;
 
-    /// Mark all reachable resources
-    //
-    /// Reachable resources would be registers and
-    /// locals (expected to be empty?) and function.
-    void markReachableResources() const;
 };
 
 typedef std::vector<CallFrame> CallStack;
