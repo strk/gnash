@@ -242,7 +242,6 @@ VM::getTime() const
 void
 VM::markReachableResources() const
 {
-#ifdef GNASH_USE_GC
 
 	_rootMovie.markReachableResources();
 
@@ -259,6 +258,23 @@ VM::markReachableResources() const
 	}
 
     if (_shLib.get()) _shLib->markReachableResources();
+
+#ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
+    /// Mark all (including unreachable) stack elements
+    for (SafeStack<as_value>::StackSize i=0, n=_stack.totalSize(); i<n; ++i)
+    {
+        _stack.at(i).setReachable();
+    }
+
+    /// Mark call stack 
+    for (CallStack::size_type i=0, n=_callStack.size(); i<n; ++i)
+    {
+        _callStack[i].markReachableResources();
+    }
+
+#else
+    assert (_callStack.empty());
+    assert (_stack.totalSize() == 0);
 #endif
 
 }
