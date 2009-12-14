@@ -1246,7 +1246,7 @@ attachMovieLoopingTestRunner_DEPENDENCIES = \
 attachImported.swf: Dejagnu.swf $(srcdir)/attachImported.as attachMovieTest.swf
 	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -i attachMovieTest.swf:redsquare -o $@ Dejagnu.swf $(srcdir)/attachImported.as
 attachImported-Runner: $(srcdir)/../generic-testrunner.sh attachImported.swf Makefile
-	sh $< -r5 $(top_builddir) attachImported.swf > $@
+	sh $< -r5 -c "END_OF_TEST" $(top_builddir) attachImported.swf > $@
 	chmod 755 $@
 
 # This will only work with Ming-0.4.0beta2
@@ -1254,7 +1254,7 @@ attachImported-Runner: $(srcdir)/../generic-testrunner.sh attachImported.swf Mak
 attachExtImported.swf: Dejagnu.swf $(srcdir)/attachExtImported.as attachImported.swf attachMovieTest.swf
 	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -i attachImported.swf:redsquare -o $@ Dejagnu.swf $(srcdir)/attachExtImported.as
 attachExtImported-Runner: $(srcdir)/../generic-testrunner.sh attachExtImported.swf Makefile
-	sh $< -r5 $(top_builddir) attachExtImported.swf > $@
+	sh $< -r5 -c "END_OF_TEST" $(top_builddir) attachExtImported.swf > $@
 	chmod 755 $@
 
 simple_loop_test_SOURCES =	\
