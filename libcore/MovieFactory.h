@@ -80,7 +80,8 @@ public:
     /// @param postdata
     /// If not NULL, use POST method (only valid for HTTP).
     /// NOTE: when POSTing, the movies library won't be used.
-    static DSOEXPORT movie_definition* makeMovie(const URL& url,
+    static DSOEXPORT boost::intrusive_ptr<movie_definition> makeMovie(
+        const URL& url,
         const RunResources& runResources, const char* real_url = NULL,
         bool startLoaderThread = true, const std::string* postdata = NULL);
     
@@ -108,7 +109,8 @@ public:
     /// This is typically used to postpone parsing until a VirtualMachine
     /// is initialized. Initializing the VirtualMachine requires a target
     /// SWF version, which can be found in the SWF header.
-    static DSOEXPORT movie_definition* makeMovie(std::auto_ptr<IOChannel> in,
+    static DSOEXPORT boost::intrusive_ptr<movie_definition> makeMovie(
+            std::auto_ptr<IOChannel> in,
             const std::string& url, const RunResources& runResources,
             bool startLoaderThread);
 

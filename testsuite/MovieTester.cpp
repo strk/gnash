@@ -153,7 +153,7 @@ MovieTester::MovieTester(const std::string& url)
 
 	// Finally, place the root movie on the stage ...
     MovieClip::MovieVariables v;
-    _movie_root->init(_movie_def, v);
+    _movie_root->init(_movie_def.get(), v);
 
 	// ... and render it
 	render();
@@ -625,7 +625,7 @@ MovieTester::restart()
 {
 	_movie_root->clear(); // restart();
     MovieClip::MovieVariables v;
-	_movie_root->init(_movie_def, v);
+	_movie_root->init(_movie_def.get(), v);
 
 	// Set _movie before calling ::render
 	render();

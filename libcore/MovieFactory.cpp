@@ -125,30 +125,32 @@ getFileType(IOChannel& in)
 // Create a SWFMovieDefinition from an SWF stream
 // NOTE: this method assumes this *is* an SWF stream
 //
-SWFMovieDefinition*
+boost::intrusive_ptr<SWFMovieDefinition>
 createSWFMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         const RunResources& runResources, bool startLoaderThread)
 {
 
-    std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runResources));
+    boost::intrusive_ptr<SWFMovieDefinition> m = new SWFMovieDefinition(runResources);
 
     const std::string& absURL = URL(url).str();
 
     if (!m->readHeader(in, absURL)) return 0;
     if (startLoaderThread && !m->completeLoad()) return 0;
 
-    return m.release();
+    return m;
 }
 
 // Create a movie_definition from an image format stream
 // NOTE: this method assumes this *is* the format described in the
 // FileType type
 // TODO: The pp won't display PNGs for SWF7 or below.
-movie_definition*
+boost::intrusive_ptr<BitmapMovieDefinition>
 createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         const RunResources& r, FileType type)
 {
     assert (in.get());
+
+    boost::intrusive_ptr<BitmapMovieDefinition> ret;
 
     // readImageData takes a shared pointer because JPEG streams sometimes need
     // to transfer ownership.
@@ -161,30 +163,31 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
         if (!im.get()) {
             log_error(_("Can't read image file from %s"), url);
-            return NULL;
+            return ret;
         }
 
         Renderer* renderer = r.renderer();
 
-        BitmapMovieDefinition* mdef =
-            new BitmapMovieDefinition(im, renderer, url);
+        ret =  new BitmapMovieDefinition(im, renderer, url);
 
-        return mdef;
+        return ret;
 
     }
     catch (ParserException& e)
     {
         log_error(_("Parsing error: %s"), e.what());
-        return NULL;
+        return ret;
     }
 
 }
 
-movie_definition*
+boost::intrusive_ptr<movie_definition>
 createNonLibraryMovie(const URL& url, const RunResources& runResources,
         const char* reset_url, bool startLoaderThread,
         const std::string* postdata)
 {
+
+  boost::intrusive_ptr<movie_definition> ret;
 
   std::auto_ptr<IOChannel> in;
 
@@ -200,25 +203,22 @@ createNonLibraryMovie(const URL& url, const RunResources& runResources,
   if ( ! in.get() )
   {
       log_error(_("failed to open '%s'; can't create movie"), url);
-      return NULL;
+      return ret;
   }
   
   if (in->bad())
   {
       log_error(_("streamProvider opener can't open '%s'"), url);
-      return NULL;
+      return ret;
   }
 
   std::string movie_url = reset_url ? reset_url : url.str();
-  movie_definition* ret = MovieFactory::makeMovie(in, movie_url, runResources,
+  ret = MovieFactory::makeMovie(in, movie_url, runResources,
           startLoaderThread);
 
   return ret;
 
-
 }
-
-
 
 
 } // anonymous namespace
@@ -226,10 +226,12 @@ createNonLibraryMovie(const URL& url, const RunResources& runResources,
 
 MovieLibrary MovieFactory::movieLibrary;
 
-movie_definition*
+boost::intrusive_ptr<movie_definition>
 MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         const RunResources& runResources, bool startLoaderThread)
 {
+  boost::intrusive_ptr<movie_definition> ret;
+
   assert(in.get());
 
   // see if it's a jpeg or an swf
@@ -248,34 +250,37 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
                            "image, for which we don't yet have the "
                            "concept of a 'loading thread'"));
             }
-            return createBitmapMovie(in, url, runResources, type);
+            ret = createBitmapMovie(in, url, runResources, type);
+            break;
         }
 
 
         case GNASH_FILETYPE_SWF:
-            return createSWFMovie(in, url, runResources, startLoaderThread);
+            ret = createSWFMovie(in, url, runResources, startLoaderThread);
+            break;
 
         case GNASH_FILETYPE_FLV:
             log_unimpl(_("FLV can't be loaded directly as a movie"));
-            return NULL;
+            return ret;
 
         default:
             log_error(_("unknown file type (%s)"), type);
             break;
     }
 
-    return NULL;
+    return ret;
 }
 
 // Try to load a movie from the given url, if we haven't
 // loaded it already.  Add it to our library on success, and
 // return a pointer to it.
 //
-movie_definition*
+boost::intrusive_ptr<movie_definition>
 MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
         const char* real_url, bool startLoaderThread,
         const std::string* postdata)
 {
+    boost::intrusive_ptr<movie_definition>  mov;
 
     // Use real_url as label for cache if available 
     std::string cache_label = real_url ? URL(real_url).str() : url.str();
@@ -283,11 +288,10 @@ MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
     // Is the movie already in the library? (don't check if we have post data!)
     if (!postdata)
     {
-        boost::intrusive_ptr<movie_definition>  m;
-        if ( movieLibrary.get(cache_label, &m) )
+        if ( movieLibrary.get(cache_label, &mov) )
         {
             log_debug(_("Movie %s already in library"), cache_label);
-            return m.get();
+            return mov;
         }
     }
 
@@ -295,20 +299,18 @@ MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
     // the loader thread now to avoid IMPORT tag loaders from 
     // calling createMovie() again and NOT finding
     // the just-created movie.
-    movie_definition* mov = createNonLibraryMovie(url, runResources,
-            real_url, false,
-            postdata);
+    mov = createNonLibraryMovie(url, runResources, real_url, false, postdata);
 
     if (!mov)
     {
         log_error(_("Couldn't load library movie '%s'"), url.str());
-        return NULL;
+        return mov;
     }
 
     // Movie is good, add to the library 
     if (!postdata) // don't add if we POSTed
     {
-        movieLibrary.add(cache_label, mov);
+        movieLibrary.add(cache_label, mov.get());
         log_debug(_("Movie %s (SWF%d) added to library"),
                 cache_label, mov->get_version());
     }

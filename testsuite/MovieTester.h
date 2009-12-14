@@ -320,7 +320,7 @@ private:
 
 	gnash::movie_root* _movie_root;
 
-	gnash::movie_definition* _movie_def;
+	boost::intrusive_ptr<gnash::movie_definition> _movie_def;
 
     boost::shared_ptr<sound::sound_handler> _sound_handler;
 
