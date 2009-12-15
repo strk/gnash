@@ -268,19 +268,6 @@ TextField::TextField(as_object* object, DisplayObject* parent,
 void
 TextField::init()
 {
-#if 0
-    as_environment env(getVM(*getObject(this)));
-    as_object* proto = env.find_object("_global.TextField.prototype");
-    if (proto) {
-        attachPrototypeProperties(*proto);
-    }
-     
-    getObject(this)->set_prototype(proto);
-
-    as_object* ar = getGlobal(*getObject(this)).createArray();
-    callMethod(ar, NSV::PROP_PUSH, getObject(this));
-    getObject(this)->set_member(NSV::PROP_uLISTENERS, ar);
-#endif
     registerTextVariable();
 
     reset_bounding_box(0, 0);
