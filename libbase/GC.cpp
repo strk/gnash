@@ -24,13 +24,6 @@
 #include "GC.h"
 #include "utility.h" // for typeName()
 
-#ifndef GNASH_GC_DEBUG
-// For debug level up to 1 it's enough to set it here
-// but for higher levels you'll need to touch the header file.
-// Touching this file is cheaper (won't need full rebuild)
-//# define GNASH_GC_DEBUG 1
-#endif
-
 #ifdef GNASH_GC_DEBUG
 #include "log.h"
 #endif
