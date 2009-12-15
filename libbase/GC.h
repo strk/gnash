@@ -45,6 +45,7 @@
 
 #ifdef GNASH_GC_DEBUG
 # include "log.h"
+# include "utility.h"
 # include <typeinfo>
 #endif
 
@@ -112,7 +113,7 @@ public:
 		{
 #if GNASH_GC_DEBUG > 2
 			log_debug(_("Instance %p of class %s already reachable, setReachable doing nothing"),
-					(void*)this, typeid(*this).name());
+					(void*)this, typeName(*this));
 #endif
 			return;
 		}

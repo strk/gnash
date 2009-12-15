@@ -33,7 +33,7 @@
 namespace gnash {
 
 GC* GC::_singleton = NULL;
-unsigned int GC::maxNewCollectablesCount = 50;
+unsigned int GC::maxNewCollectablesCount = 64;
 
 GC&
 GC::init(GcRoot& root)
@@ -67,7 +67,7 @@ GC::cleanup()
 GC::~GC()
 {
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC %p deleted, deleting all managed resources - collector run %d times"), (void*)this, _collectorRuns);
+	log_debug(_("GC deleted, deleting all managed resources - collector run %d times"), _collectorRuns);
 #endif
 
 #if 1
@@ -84,7 +84,7 @@ GC::cleanUnreachable()
 	size_t deleted = 0;
 
 #if (GNASH_GC_DEBUG > 1)
-	log_debug(_("GC %p: SWEEP SCAN"), (void*)this);
+	log_debug(_("GC: sweep scan started"));
 #endif
 
 	for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
@@ -93,8 +93,8 @@ GC::cleanUnreachable()
 		if ( ! res->isReachable() )
 		{
 #if GNASH_GC_DEBUG > 1
-			log_debug(_("GC %p: cleanUnreachable deleting object %p (%s)"),
-					(void*)this, (void*)res, typeName(*res).c_str());
+			log_debug(_("GC: recycling object %p (%s)"),
+					res, typeName(*res).c_str());
 #endif
 			++deleted;
 			delete res;
@@ -113,22 +113,54 @@ GC::cleanUnreachable()
 void 
 GC::collect()
 {
-	size_t curResSize = _resList.size(); // this is O(n) on GNU stdc++ lib !
-	if ( curResSize <  _lastResCount + maxNewCollectablesCount )
+	// Heuristic to decide wheter or not to run the collection cycle
+	//
+	//
+	// Things to consider:
+	//
+	//  - Cost 
+	//      - Depends on the number of reachable collectables
+	//      - Depends on the frequency of runs
+	//
+	//  - Advantages 
+	//      - Depends on the number of unreachable collectables
+	//
+	//  - Cheaply computable informations
+	//      - Number of collectables (currently O(n) but can be optimized)
+	//      - Total heap-allocated memory (currently unavailable)
+	//
+	// Current heuristic:
+	//
+	//  - We run the cycle again if X new collectables were allocated
+	//    since last cycle run. X defaults to maxNewCollectablesCount
+	//    and can be changed by user (GNASH_GC_TRIGGER_THRESHOLD env
+	//    variable).
+	//
+	// Possible improvements:
+	//
+	//  - Adapt X (maxNewCollectablesCount) based on cost/advantage
+	//    runtime analisys
+	//
+
+	size_t curResCount = _resList.size(); // this is O(n) on GNU stdc++ lib !
+	if ( curResCount <  _lastResCount + maxNewCollectablesCount )
 	{
 #if GNASH_GC_DEBUG  > 1
-		log_debug(_("Garbage collection skipped since number of collectables added since last run is too low (%d)"),
-			       curResSize - _lastResCount);
+		log_debug(_("GC: collection cycle skipped - %d/%d new resources allocated since last run (from %d to %d)"), curResCount-_lastResCount, maxNewCollectablesCount, _lastResCount, curResCount);
 #endif // GNASH_GC_DEBUG
 		return;
 	}
+
+	//
+	// Collection cycle
+	//
 
 #ifdef GNASH_GC_DEBUG 
 	++_collectorRuns;
 #endif
 
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC %p Starting collector: %d collectables (from %d of last run)"), (void *)this, curResSize, _lastResCount);
+	log_debug(_("GC: collection cycle started - %d/%d new resources allocated since last run (from %d to %d)"), curResCount-_lastResCount, maxNewCollectablesCount, _lastResCount, curResCount);
 #endif // GNASH_GC_DEBUG
 
 #ifndef NDEBUG
@@ -142,14 +174,14 @@ GC::collect()
 	// clean unreachable resources, and mark the others as reachable again
 	size_t deleted = cleanUnreachable();
 
-	_lastResCount = curResSize - deleted;
+	_lastResCount = curResCount - deleted;
 
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC %p: cleanUnreachable deleted %d unreachable resources, "
-            "leaving %d alive"),
-			(void*)this, deleted, _lastResCount);
-	assert(_lastResCount == _resList.size()); // again O(n)...
+	log_debug(_("GC: recycled %d unreachable resources - %d left"),
+			deleted, _lastResCount);
 #endif
+
+	//assert(_lastResCount == _resList.size()); // again O(n)...
 
 }
 
