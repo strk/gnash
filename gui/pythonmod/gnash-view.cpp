@@ -68,7 +68,7 @@ struct _GnashView {
     /// (currently: of the Gui).
     std::auto_ptr<gnash::RunResources> run_info;
 
-    std::auto_ptr<gnash::movie_definition> movie_definition;
+    boost::intrusive_ptr<gnash::movie_definition> movie_definition;
     gnash::Movie* movie;
     std::auto_ptr<gnash::movie_root> stage;
     std::auto_ptr<gnash::SystemClock> system_clock;
@@ -459,8 +459,8 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     }
 
     // Load the actual movie.
-    view->movie_definition.reset(gnash::MovieFactory::makeMovie(url,
-            *view->run_info, url.str().c_str(), false));
+    view->movie_definition = gnash::MovieFactory::makeMovie(url,
+            *view->run_info, url.str().c_str(), false);
 
     g_return_if_fail(view->movie_definition.get() != NULL);
 
