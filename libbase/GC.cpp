@@ -93,12 +93,11 @@ GC::cleanUnreachable()
 		if ( ! res->isReachable() )
 		{
 #if GNASH_GC_DEBUG > 1
-			log_debug(_("GC: recycling object %p (%s)"),
-					res, typeName(*res).c_str());
+			log_debug(_("GC: recycling object %p (%s)"), res, typeName(*res));
 #endif
 			++deleted;
 			delete res;
-			i = _resList.erase(i);
+			i = _resList.erase(i); // _resListSize updated at end of loop
 		}
 		else
 		{
@@ -106,6 +105,8 @@ GC::cleanUnreachable()
 			++i;
 		}
 	}
+
+    _resListSize -= deleted;
 
 	return deleted;
 }
@@ -142,7 +143,7 @@ GC::collect()
 	//    runtime analisys
 	//
 
-	size_t curResCount = _resList.size(); // this is O(n) on GNU stdc++ lib !
+	size_t curResCount = _resListSize;
 	if ( curResCount <  _lastResCount + maxNewCollectablesCount )
 	{
 #if GNASH_GC_DEBUG  > 1
@@ -181,7 +182,7 @@ GC::collect()
 			deleted, _lastResCount);
 #endif
 
-	//assert(_lastResCount == _resList.size()); // again O(n)...
+	//assert(_lastResCount == _resList.size()); // O(n)...
 
 }
 

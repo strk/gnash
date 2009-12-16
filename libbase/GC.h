@@ -41,7 +41,7 @@
 //   2 - print a message for every GcResource being registered and being deleted
 //   3 - print info about the mark scan 
 //   
-//#define GNASH_GC_DEBUG 1
+#define GNASH_GC_DEBUG 1
 
 #ifdef GNASH_GC_DEBUG
 # include "log.h"
@@ -237,9 +237,9 @@ public:
 		//assert(std::find(_resList.begin(), _resList.end(), item) == _resList.end());
 #endif
 
-		_resList.push_back(item);
+		_resList.push_back(item); ++_resListSize;
 #if GNASH_GC_DEBUG > 1
-		log_debug(_("GC %p: collectable %p added, num collectables: %d"), (void*)this, (void*)item, _resList.size());
+		log_debug(_("GC: collectable %p added, num collectables: %d"), item, _resListSize);
 #endif
 	}
 
@@ -264,6 +264,7 @@ private:
 	/// Create a garbage collector, using the given root
 	GC(GcRoot& root)
 		:
+		_resListSize(0),
 		_root(root),
 		_lastResCount(0)
 #ifdef GNASH_GC_DEBUG 
@@ -296,7 +297,14 @@ private:
 	///
 	size_t cleanUnreachable();
 
+	/// List of collectable resources
 	ResList _resList;
+
+	// Size of the list above, to avoid the
+	// cost of computing it  ..
+	// .. this is O(n) on GNU stdc++ lib !
+	//
+	ResList::size_type _resListSize;
 
 	GcRoot& _root;
 
