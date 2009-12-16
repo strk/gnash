@@ -97,6 +97,7 @@
 #endif
 
 #include <vector>
+#include <deque>
 #include <list>
 #include <set>
 #include <bitset>
@@ -1063,8 +1064,13 @@ private:
     /// The list of advanceable DisplayObject, in placement order
     LiveChars _liveChars;
 
-    typedef std::list<ExecutableCode*> ActionQueue;
 
+    /// A number of queues of code to execute
+    //
+    /// This is a deque because it needs no insertion in the middle but
+    /// frequent push_back and pop_front. We also have to traverse it, so
+    /// a std::queue is not usable.
+    typedef std::deque<ExecutableCode*> ActionQueue;
     ActionQueue _actionQueue[apSIZE];
 
     /// Process all actions in the queue
