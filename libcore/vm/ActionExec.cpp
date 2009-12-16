@@ -236,7 +236,6 @@ ActionExec::operator()()
 
             // Get the opcode.
             boost::uint8_t action_id = code[pc];
-            size_t oldPc = pc;
 
             IF_VERBOSE_ACTION (
                 log_action("PC:%d - EX: %s", pc, code.disasm(pc));
@@ -326,15 +325,23 @@ ActionExec::operator()()
             );
 #endif
 
+
+            // Do some housecleaning on branch back
+            if ( next_pc <= pc )
+            {
+                // Check for script limits hit. 
+                // See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
+                if (clock.elapsed() > maxTime) {
+                    boost::format fmt(_("Time exceeded"));
+                    throw ActionLimitException(fmt.str());
+                }
+
+                // TODO: Run garbage collector ? If stack isn't too big ?
+            }
+
             // Control flow actions will change the PC (next_pc)
             pc = next_pc;
 
-            // Check for script limits hit. 
-            // See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
-            if (pc <= oldPc && clock.elapsed() > maxTime) {
-                boost::format fmt(_("Time exceeded"));
-                throw ActionLimitException(fmt.str());
-            }
         }
     }
     catch (ActionLimitException& ex) {
