@@ -192,8 +192,8 @@ SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 // Set the scale & rotation part of the SWFMatrix.
 // angle in radians.
 {
-    double   cos_angle = cos(angle);
-    double   sin_angle = sin(angle);
+    double   cos_angle = std::cos(angle);
+    double   sin_angle = std::sin(angle);
     sx  = DoubleToFixed16(x_scale * cos_angle);
     shy = DoubleToFixed16(y_scale * -sin_angle);
     shx = DoubleToFixed16(x_scale * sin_angle);
@@ -233,10 +233,10 @@ SWFMatrix::set_rotation(double rotation)
     double scale_x = get_x_scale();
     double scale_y = get_y_scale();
  
-    sx  = DoubleToFixed16(scale_x * cos(rotation));
-    shx = DoubleToFixed16(scale_x * sin(rotation)); 
-    shy = -DoubleToFixed16(scale_y * sin(rot_y - rot_x + rotation));
-    sy  =  DoubleToFixed16(scale_y * cos(rot_y - rot_x + rotation));
+    sx  = DoubleToFixed16(scale_x * std::cos(rotation));
+    shx = DoubleToFixed16(scale_x * std::sin(rotation)); 
+    shy = -DoubleToFixed16(scale_y * std::sin(rot_y - rot_x + rotation));
+    sy  =  DoubleToFixed16(scale_y * std::cos(rot_y - rot_x + rotation));
 }
 
 void

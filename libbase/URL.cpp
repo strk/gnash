@@ -182,7 +182,7 @@ URL::URL(const std::string& absolute_url)
 
         if (!dir) {
             std::stringstream err;
-            err << "getcwd failed: " << strerror(errno);
+            err << "getcwd failed: " << std::strerror(errno);
             throw gnash::GnashException(err.str());
         }
 

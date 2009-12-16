@@ -81,7 +81,7 @@ AudioResampler::convert_raw_data(
     if (inc == 1 && dup == 1)
     {
 	    // No tranformation required
-	    memcpy(out_data, data, output_sample_count * sizeof(boost::int16_t));
+	    std::memcpy(out_data, data, output_sample_count * sizeof(boost::int16_t));
     }
     else if (inc > 1)
     {

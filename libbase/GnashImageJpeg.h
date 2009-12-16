@@ -58,7 +58,7 @@ private:
 
     const char* _errorOccurred;
 
-    jmp_buf _jmpBuf;
+    std::jmp_buf _jmpBuf;
 
     // State needed for input.
     jpeg::jpeg_decompress_struct m_cinfo;

@@ -57,6 +57,8 @@
 namespace gnash {
 namespace media {
 
+const double sqrt1_2 = 0.70710678118654752440;
+
 float nelly_neg_unpack_table[64] = {
 -0.0061359000, -0.0306748003, -0.0551952012, -0.0796824023, -0.1041216031,
 -0.1284981072, -0.1527972072, -0.1770042032, -0.2011045963, -0.2250839025,
@@ -674,7 +676,7 @@ nelly_decode_block(nelly_handle* nh, const unsigned char block[NELLY_BLOCK_LEN],
 	for (i = 0; i < 23; i++) {
 		if (i > 0)
 			val += nelly_delta_table[get_bits(block, &bit_offset, 5)];
-		pval = pow(2, val/2048);
+		pval = std::pow(2, val/2048);
 		for (j = 0; j < nelly_copy_count[i]; j++) {
 			*bptr = val;
 			*pptr = pval;
@@ -695,7 +697,7 @@ nelly_decode_block(nelly_handle* nh, const unsigned char block[NELLY_BLOCK_LEN],
 
 		for (j = 0; j < NELLY_FILL_LEN; j++) {
 			if (bits[j] <= 0) {
-				buf[j] = M_SQRT1_2*pows[j];
+				buf[j] = sqrt1_2*pows[j];
 
         
 				if (gimme_random() % 2)

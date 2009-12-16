@@ -1471,7 +1471,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 }
 
 bool
-as_value::readAMF0(const boost::uint8_t *&b, const boost::uint8_t *end,
+as_value::readAMF0(const boost::uint8_t *&b, const boost::uint8_t *const end,
         int inType, std::vector<as_object*>& objRefs, VM& vm)
 {
 	return amf0_read_value(b, end, *this, inType, objRefs, vm);
