@@ -2332,13 +2332,25 @@ SWFHandlers::ActionDelete(ActionExec& thread)
             // assume it's a variable and try to delete.
             env.top(1).set_bool(thread.delVariable(propertyname));
         }
-        else {
+        else
+        {
             as_value target = thread.getVariable(path);
-            obj = toObject(getGlobal(thread.env), target);
-            propertyname = var;
+
+            if ( target.is_object() ) // Don't syntetize one otherwise !!
+            {
+                obj = toObject(getGlobal(thread.env), target);
+
+                propertyname = var;
+            }
         }
     }
-    else obj = toObject(getGlobal(thread.env), env.top(1));
+    else
+    {
+        if ( env.top(1).is_object() ) // Don't syntetize one otherwise !!
+        {
+            obj = toObject(getGlobal(thread.env), env.top(1));
+        }
+    }
 
     if (!obj)
     {
@@ -2347,7 +2359,7 @@ SWFHandlers::ActionDelete(ActionExec& thread)
                         env.top(1), env.top(0));
         );
         env.top(1).set_bool(false);
-        env.drop(1);
+        env.drop(1); 
         return;
     }
 
@@ -2380,19 +2392,20 @@ SWFHandlers::ActionDelete2(ActionExec& thread)
     
     // Otherwise see if it's an object and delete it.
     as_value target = thread.getVariable(path);
-    boost::intrusive_ptr<as_object> obj = toObject(getGlobal(thread.env), target);
-
-    if (!obj)
+    if ( ! target.is_object() )
     {
+        // Don't syntetize one !!
+
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("delete2 called with a path that does not resolve "
                     "to an object"), env.top(1), env.top(0));
         );
         env.top(1).set_bool(false);
-        env.drop(1);
+        env.drop(1); 
         return;
     }
 
+    as_object* obj = toObject(getGlobal(thread.env), target);
     env.top(1).set_bool(thread.delObjectMember(*obj, var));
 }
 
