@@ -42,7 +42,7 @@ AC_DEFUN([GNASH_PATH_AGG],
         $PKG_CONFIG --atleast-version 2.5.0 libagg && agg25=yes
  
         dnl I think this setting of agg_include_dir is too error prone!
-        agg_include_dir="`$PKG_CONFIG --cflags-only-I libagg | cut -d " " -f 1 | sed -e 's/-I//g'`"
+        agg_include_dir="`$PKG_CONFIG --cflags-only-I libagg | cut -d ' ' -f 1 | sed -e 's/-I//g'`"
         if test -f $agg_include_dir/agg_gradient_lut.h ; then
           agg25=yes
         fi

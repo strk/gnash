@@ -1475,6 +1475,7 @@ AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
+AC_CHECK_HEADERS(ieeefp.h)
 dnl libcurl3-dev on Ubuntu has a dependency on lber, and Gnash won't link
 dnl on most machines without it. While it isn't diretly used by Gnash at all,
 dnl it's to work around an Ubuntu packaging bug.
@@ -1559,30 +1560,36 @@ fi
 dnl AC_CHECK_FUNCS(strcasecmp stricmp)
 dnl AC_CHECK_FUNCS(vsnprintf)
 
-dnl These two tests need the math library or they won't link
-dnl on OpenBSD, even if the functions exist.
-save_LIBS=$LIBS
-LIBS="$LIBS -lm"
 AC_CACHE_CHECK([for finite], ac_cv_finite,
- [AC_TRY_LINK([#include <math.h>],
+ [AC_TRY_COMPILE([
+   #include <math.h>
+   #ifdef HAVE_IEEEFP_H
+   #include <ieeefp.h>
+   #endif],
  [double x; int y; y = finite(x);],
  ac_cv_finite=yes,
  ac_cv_finite=no
 )])
 if test x"$ac_cv_finite" = x"yes"; then
-  AC_DEFINE(HAVE_FINITE, [1], [Has finite])
+  AC_SEARCH_LIBS(finite, m,
+    [AC_DEFINE(HAVE_FINITE, [1], [Has finite])]
+  )
 fi
 
+AC_LANG_PUSH(C++)
 AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
- [AC_TRY_LINK([#include <math.h>],
- [double x; int y; y = isfinite(x);],
+ [AC_TRY_COMPILE([#include <cmath>],
+ [using namespace std; double x; int y; y = isfinite(x);],
  ac_cv_isfinite=yes,
  ac_cv_isfinite=no
 )])
+AC_LANG_POP(C++)
 if test x"$ac_cv_isfinite" = x"yes"; then
+  dnl Don't give up if isfinite is not found in -lm
+  dnl isfinite is defined as a macro in C99.
+  AC_SEARCH_LIBS(isfinite, m)
   AC_DEFINE(HAVE_ISFINITE, [1], [Has isfinite])
 fi
-LIBS=$save_LIBS
 
 AC_LANG_PUSH(C++)
 AC_CACHE_CHECK([whether $CXX implements __PRETTY_FUNCTION__], ac_cv_implements___PRETTY_FUNCTION__, [

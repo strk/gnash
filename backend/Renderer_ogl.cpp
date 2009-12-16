@@ -789,8 +789,8 @@ public:
 
     gluOrtho2D(x0, x1, y0, y1);
     
-    _width  = fabsf(x1 - x0);
-    _height = fabsf(y1 - y0);
+    _width  = std::fabs(x1 - x0);
+    _height = std::fabs(y1 - y0);
 
     glScalef(static_cast<float>(twipsToPixels(_width)) /
     static_cast<float>(viewport_width),
@@ -1309,9 +1309,9 @@ public:
          LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in OGL renderer")) );
       }
       
-      float stroke_scale = fabsf(mat.get_x_scale()) + fabsf(mat.get_y_scale());
+      float stroke_scale = std::fabs(mat.get_x_scale()) + std::fabs(mat.get_y_scale());
       stroke_scale /= 2.0f;
-      stroke_scale *= (fabsf(_xscale) + fabsf(_yscale)) / 2.0f;
+      stroke_scale *= (std::fabs(_xscale) + std::fabs(_yscale)) / 2.0f;
       width *= stroke_scale;
       width = twipsToPixels(width);
 

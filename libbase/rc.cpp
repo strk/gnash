@@ -37,7 +37,7 @@
 #include <limits>
 #include <cstdlib> // getenv
 #include <string>
-#include <vector>
+#include <list>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -164,17 +164,22 @@ RcInitFile::loadFiles()
     }
 
     // Check the GNASHRC environment variable
-    // TODO: keep note of the already-parsed files
-    //       to avoid parsign multiple times ?
-    //       (would mess up user-reguested order)
+    // Parse each file only once
     char *gnashrc = std::getenv("GNASHRC");
     if (gnashrc)
     {
         std::string paths(gnashrc);
-
         Tok t(paths, Sep(":"));
 
+        std::list<std::string> l;
+
         for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i)
+        {
+            l.remove(*i);
+            l.push_back(*i);
+        }
+
+        for (std::list<std::string>::const_iterator i = l.begin(), e = l.end(); i != e; ++i)
         {
             parseFile(*i);
         }

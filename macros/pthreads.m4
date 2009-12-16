@@ -118,7 +118,6 @@ for flag in $pthread_flags; do\
       -*)
         AC_MSG_CHECKING([whether pthreads work with $flag])
         PTHREAD_CFLAGS="$flag"
-        CXXFLAGS="$CXXFLAGS $flag"
 	      PTHREAD_LIBS=""
         ;;
 
@@ -149,8 +148,10 @@ for flag in $pthread_flags; do\
 
     save_LIBS="$LIBS"
     save_CFLAGS="$CFLAGS"
+    save_CXXFLAGS="$CXXFLAGS"
     LIBS="$PTHREAD_LIBS $LIBS"
     CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+    CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 
     dnl Check for various functions.  We must include pthread.h,
     dnl since some functions may be macros.  (On the Sequent, we
@@ -169,6 +170,7 @@ for flag in $pthread_flags; do\
 
     LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+    CXXFLAGS="$save_CXXFLAGS"
 
     AC_MSG_RESULT($pthreads)
     if test "x$pthreads" = xyes; then

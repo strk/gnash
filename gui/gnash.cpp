@@ -51,7 +51,7 @@ extern "C" {
 #include <ios>
 
 #ifdef ENABLE_NLS
-# include <clocale>
+# include <locale>
 #endif
 
 #ifdef GUI_ALP
