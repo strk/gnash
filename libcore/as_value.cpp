@@ -1495,7 +1495,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
         case OBJECT:
         {
             if (is_function()) return false;
-            as_object* obj = to_object(*vm.getGlobal());
+            as_object* obj = getObj();
             assert(obj);
             OffsetTable::iterator it = offsetTable.find(obj);
             if (it == offsetTable.end()) {

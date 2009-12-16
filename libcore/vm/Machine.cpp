@@ -445,7 +445,6 @@ Machine::execute()
                     // Get the target object.
                     ENSURE_OBJECT(_stack.top(0));
                     
-                    // Use get_super?
                     as_object *super = _stack.top(0).to_object(*_global)->
                         get_prototype();
                     
@@ -478,7 +477,6 @@ Machine::execute()
 
                     ENSURE_OBJECT(_stack.top(0));
                     
-                    // Use get_super?
                     as_object* super = _stack.pop().to_object(*_global)->
                         get_prototype();
                     if (!super) throw ASReferenceError();
@@ -1366,7 +1364,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(argc + dropsize));
                     _stack.drop(dropsize);
 
-                    // Why get_super() here and get_prototype everywhere else?
+                    // get_super is wrong!
                     as_object* super =
                         _stack.top(argc).to_object(*_global)->get_super();
 

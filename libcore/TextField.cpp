@@ -268,19 +268,6 @@ TextField::TextField(as_object* object, DisplayObject* parent,
 void
 TextField::init()
 {
-#if 0
-    as_environment env(getVM(*getObject(this)));
-    as_object* proto = env.find_object("_global.TextField.prototype");
-    if (proto) {
-        attachPrototypeProperties(*proto);
-    }
-     
-    getObject(this)->set_prototype(proto);
-
-    as_object* ar = getGlobal(*getObject(this)).createArray();
-    callMethod(ar, NSV::PROP_PUSH, getObject(this));
-    getObject(this)->set_member(NSV::PROP_uLISTENERS, ar);
-#endif
     registerTextVariable();
 
     reset_bounding_box(0, 0);
@@ -3539,6 +3526,8 @@ textfield_text(const fn_call& fn)
 as_value
 textfield_htmlText(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
+
     TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
     if (!fn.nargs)
     {
@@ -3600,7 +3589,7 @@ textfield_scroll(const fn_call& fn)
         return as_value(1 + text->getScroll());
     }
     // Setter
-    text->setScroll(int(fn.arg(0).to_number()) - 1); //zero is the first number, everybody knows that.
+    text->setScroll(int(fn.arg(0).to_number()) - 1); 
 
     return as_value();
 }
@@ -3609,7 +3598,6 @@ as_value
 textfield_hscroll(const fn_call& fn)
 {
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
-    UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField._hscroll is not complete"));
 
@@ -3628,17 +3616,13 @@ as_value
 textfield_maxscroll(const fn_call& fn)
 {
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
-    UNUSED(text);
 
     LOG_ONCE(log_unimpl("TextField.maxscroll is not complete"));
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // Getter
         return as_value(text->getMaxScroll());
     }
-    // Setter
-    //text->setMaxScroll(int(fn.arg(0).to_number())); READ-ONLY
 
     return as_value();
 }
