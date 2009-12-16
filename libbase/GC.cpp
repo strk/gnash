@@ -106,7 +106,13 @@ GC::cleanUnreachable()
 		}
 	}
 
-    _resListSize -= deleted;
+	_resListSize -= deleted;
+
+#ifdef GNASH_GC_DEBUG 
+	log_debug(_("GC: recycled %d unreachable resources - %d left"),
+			deleted, _resListSize);
+#endif
+
 
 	return deleted;
 }
@@ -143,11 +149,10 @@ GC::collect()
 	//    runtime analisys
 	//
 
-	size_t curResCount = _resListSize;
-	if ( curResCount <  _lastResCount + maxNewCollectablesCount )
+	if ( _resListSize <  _lastResCount + maxNewCollectablesCount )
 	{
 #if GNASH_GC_DEBUG  > 1
-		log_debug(_("GC: collection cycle skipped - %d/%d new resources allocated since last run (from %d to %d)"), curResCount-_lastResCount, maxNewCollectablesCount, _lastResCount, curResCount);
+		log_debug(_("GC: collection cycle skipped - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, maxNewCollectablesCount, _lastResCount, _resListSize);
 #endif // GNASH_GC_DEBUG
 		return;
 	}
@@ -161,7 +166,7 @@ GC::collect()
 #endif
 
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC: collection cycle started - %d/%d new resources allocated since last run (from %d to %d)"), curResCount-_lastResCount, maxNewCollectablesCount, _lastResCount, curResCount);
+	log_debug(_("GC: collection cycle started - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, maxNewCollectablesCount, _lastResCount, _resListSize);
 #endif // GNASH_GC_DEBUG
 
 #ifndef NDEBUG
@@ -173,14 +178,9 @@ GC::collect()
 	markReachable();
 
 	// clean unreachable resources, and mark the others as reachable again
-	size_t deleted = cleanUnreachable();
+	cleanUnreachable();
 
-	_lastResCount = curResCount - deleted;
-
-#ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC: recycled %d unreachable resources - %d left"),
-			deleted, _lastResCount);
-#endif
+	_lastResCount = _resListSize;
 
 	//assert(_lastResCount == _resList.size()); // O(n)...
 
