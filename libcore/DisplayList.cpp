@@ -28,6 +28,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stack>
+#include <cassert>
 #include <boost/bind.hpp>
 
 namespace gnash {
@@ -107,7 +108,7 @@ public:
     NameEquals(const std::string& name) : _name(name) {}
 
     bool operator() (const DisplayItem& item) {
-        if (!item) return false;
+        assert (item);
         return item->get_name() == _name;
     }
 
@@ -122,7 +123,7 @@ public:
     NameEqualsNoCase(const std::string& name) : _name(name) {}
 
     bool operator() (const DisplayItem& item) {
-        if (!item) return false;
+        assert (item);
         return _noCaseEquals(item->get_name(), _name);
     }
 
