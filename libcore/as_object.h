@@ -769,19 +769,10 @@ public:
     /// class.
     void addInterface(as_object* ctor);
 
-    /// \brief
-    /// Check whether this object is an instance of the given
-    /// constructor
-    //
-    /// NOTE: built-in classes should NOT be C_FUNCTIONS for this to
-    /// work
-    ///
+    /// Check whether this object is an instance of the given constructor
     bool instanceOf(as_object* ctor);
 
-    /// \brief
-    /// Check whether this object is a 'prototype' in the given
-    /// object's inheritance chain.
-    //
+    /// Check whether this object is a 'prototype' object's inheritance chain.
     bool prototypeOf(as_object& instance);
 
     /// Set property flags
@@ -792,7 +783,6 @@ public:
     ///     somehting is broken).
     ///    Property strings are case insensitive up to SWF6,
     ///    case *sensitive* from SWF7 up.
-    ///    
     ///
     /// @param set_false
     /// @param set_true
