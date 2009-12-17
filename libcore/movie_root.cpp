@@ -1405,7 +1405,7 @@ movie_root::minPopulatedPriorityQueue() const
 {
 	for (int l=0; l<apSIZE; ++l)
 	{
-		if ( ! _actionQueue[l].empty() ) return l;
+		if (!_actionQueue[l].empty()) return l;
 	}
 	return apSIZE;
 }
