@@ -47,7 +47,7 @@ Trait::finalize(AbcBlock *block, abc::Class* script, bool do_static)
         case KIND_CONST:
         {
             // Validate the type.
-            abc::Class *type;
+            abc::Class* type;
             if (_typeIndex) {
                 log_abc("Trait type: %s", 
                     block->_stringPool[
@@ -77,40 +77,34 @@ Trait::finalize(AbcBlock *block, abc::Class* script, bool do_static)
                 _value, _kind == KIND_CONST, do_static);
             break;
         }
+
         case KIND_METHOD:
-        {
             script->addMethod(_globalName, _namespace, _method, false);
             break;
-        }
+        
         case KIND_GETTER:
-        {
             script->addGetter(_name, _namespace, _method, do_static);
             break;
-        }
+
         case KIND_SETTER:
-        {
             script->addSetter(_name, _namespace, _method, do_static);
             break;
-        }
+        
         case KIND_CLASS:
-        {
             log_abc("Adding class %s, value %s, slot=%u",
                     block->_stringPool[_name], _value, _slotID);
-
             script->addMemberScript(_globalName, _namespace, _slotID, 
                 block->_classes[_classInfoIndex], do_static);
             break;
-        }
+
         case KIND_FUNCTION:
-        {
-            script->addSlotFunction(_name, _namespace, _slotID, _method, do_static);
+            script->addSlotFunction(_name, _namespace, _slotID, _method,
+                    do_static);
             break;
-        }
+
         default:
-            // Not here -- validated already in read.
             return false;
-            break;
-	} // end of switch
+	} 
 	return true;
 }
 
