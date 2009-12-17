@@ -72,6 +72,17 @@ Class::initPrototype()
     _prototype = new as_class(gl, this);
 }
 
+   
+void
+Class::initTraits(AbcBlock& bl)
+{
+    std::for_each(_instanceTraits.begin(), _instanceTraits.end(),
+            boost::bind(&Trait::finalize, _1, &bl));
+
+    std::for_each(_staticTraits.begin(), _staticTraits.end(),
+            boost::bind(&Trait::finalize, _1, &bl));
+}
+
 bool
 Class::addMemberScript(string_table::key name, Namespace *ns,
 	boost::uint32_t slotId, Class *type, bool isstatic)

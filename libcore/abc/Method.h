@@ -26,6 +26,7 @@
 #include "string_table.h"
 #include "Property.h"
 #include "namedStrings.h"
+#include "AbcBlock.h"
 
 #include <list>
 
@@ -102,6 +103,17 @@ public:
     }
 
     abc_function* getPrototype() { return _prototype; }
+
+    /// Add a Trait to this Method.
+    void addTrait(const Trait& t) {
+        _traits.push_back(t);
+    }
+
+
+    /// Initialize Traits. This is bogus.
+    //
+    /// TODO: fix!
+    void initTraits(AbcBlock& bl);
 
 	asBinding* getBinding(string_table::key name);
 
@@ -260,6 +272,8 @@ private:
 	typedef std::map<string_table::key, asBinding> BindingContainer;
 
 	bool addBinding(string_table::key name, asBinding b);
+    
+    std::vector<Trait> _traits;
 	
     boost::uint32_t _methodID;
 

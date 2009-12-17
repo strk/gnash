@@ -75,6 +75,13 @@ Method::setOwner(Class *pOwner)
 }
 
 void
+Method::initTraits(AbcBlock& bl)
+{
+    std::for_each(_traits.begin(), _traits.end(),
+            boost::bind(&Trait::finalize, _1, &bl));
+}
+
+void
 Method::setReturnType(Class* /*type*/)
 {
 	/* No-op */

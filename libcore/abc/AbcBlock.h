@@ -240,13 +240,6 @@ public:
 
 	abc::Class* locateClass(const std::string& className);
 
-	abc::Trait& newTrait()
-	{
-		abc::Trait *p = new abc::Trait;
-		_traits.push_back(p);
-		return *p;
-	}
-	
     bool read(SWFStream& in);
 
 	void update_global_name(unsigned int multiname_index);
@@ -341,7 +334,6 @@ private:
 	std::vector<MultiName> _multinamePool;
 	std::vector<Class*> _classes; 
 	std::vector<Class*> _scripts;
-	std::vector<Trait*> _traits;
 
 	string_table* _stringTable;
 	SWFStream* _stream; // Not stored beyond one read.

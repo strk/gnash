@@ -219,6 +219,14 @@ public:
         return _staticConstructor;
     }
 
+    void addStaticTrait(const Trait& t) {
+        _staticTraits.push_back(t);
+    }
+
+    void addInstanceTrait(const Trait& t) {
+        _instanceTraits.push_back(t);
+    }
+
 	Property* getBinding(string_table::key name)
 	{
 		BindingContainer::iterator i;
@@ -231,7 +239,12 @@ public:
 
 	Property* getGetBinding(as_value& v, abc::MultiName& n);
 	Property* getSetBinding(as_value& v, abc::MultiName& n);
-    std::vector<abc::Trait> _traits;
+
+    /// This initializes all the traits.
+    //
+    /// Note: this is only necessary because the implementation is bogus.
+    /// TODO: fix it.
+    void initTraits(AbcBlock& bl);
 
     /// Necessary for the current bogus implementation.
     void setPrototype(as_object* prototype) {
@@ -245,10 +258,6 @@ public:
 	as_object* getPrototype() { return _prototype; }
 
 private:
-	
-	typedef std::map<string_table::key, Property> BindingContainer;
-
-    as_object *_prototype;
 
 	bool addBinding(string_table::key name, const Property& b) {
         _bindings.insert(std::make_pair(name, b));
@@ -268,6 +277,17 @@ private:
 		return &i->second;
 	}
 
+    
+    /// The Traits for instances of this class
+    std::vector<Trait> _instanceTraits;
+
+    /// The static Traits for this class;
+    std::vector<Trait> _staticTraits;
+
+	
+	typedef std::map<string_table::key, Property> BindingContainer;
+
+    as_object *_prototype;
 	bool _final;
 	bool _sealed;
 	bool _dynamic;

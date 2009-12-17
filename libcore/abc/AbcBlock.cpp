@@ -330,7 +330,6 @@ AbcBlock::prepare(Machine* mach)
 
     std::for_each(_classes.begin(), _classes.end(),
             std::mem_fun(&abc::Class::initPrototype));
-
     // The last (entry) script has Global as its prototype.
     // This can be deduced because the global classes are initialized with a
     // slot on script 0 (entry script). OpNewClass then attempts to set the
@@ -345,11 +344,15 @@ AbcBlock::prepare(Machine* mach)
  
     std::for_each(_methods.begin(), _methods.end(),
             boost::bind(&Method::initPrototype, _1, mach));
-
-    std::for_each(_traits.begin(), _traits.end(),
-            boost::bind(&Trait::finalize, _1, this));
-
-    _traits.clear();
+    
+    // TODO: Remove this, initialize traits only when needed; possibly 
+    // consruct them on parsing without the need for a finalize method.
+    std::for_each(_methods.begin(), _methods.end(),
+            boost::bind(&abc::Method::initTraits, _1, *this));
+    std::for_each(_classes.begin(), _classes.end(),
+            boost::bind(&abc::Class::initTraits, _1, *this));
+    std::for_each(_scripts.begin(), _scripts.end(),
+            boost::bind(&abc::Class::initTraits, _1, *this));
 
 }
 
@@ -1084,12 +1087,12 @@ AbcBlock::read_instances()
 		log_abc("Trait count: %u", tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
-			Trait &aTrait = newTrait();
-			aTrait.set_target(cl, false);
-			if (!aTrait.read(_stream, this))
-				return false;
+			Trait t;
+			t.set_target(cl, false);
+			if (!t.read(_stream, this)) return false;
+            cl->addInstanceTrait(t);
 		}
-	} // End of instances loop.
+	} 
 	return true;
 }
 
@@ -1118,10 +1121,10 @@ AbcBlock::read_classes()
 		boost::uint32_t tcount = _stream->read_V32();
 		log_abc("This class has %u traits.", tcount);
 		for (size_t j = 0; j < tcount; ++j) {
-			Trait &aTrait = newTrait();
-			aTrait.set_target(cl, true);
-			if (!(aTrait.read(_stream, this)))
-				return false;
+            Trait t;
+			t.set_target(cl, true);
+			if (!(t.read(_stream, this))) return false;
+            cl->addStaticTrait(t);
 		}
 	} 
 	return true;
@@ -1156,16 +1159,16 @@ AbcBlock::read_scripts()
 		const boost::uint32_t tcount = _stream->read_V32();
 		for (size_t j = 0; j < tcount; ++j) {
 			
-			Trait& trait = newTrait();
-			trait.set_target(script, false);
-			if (!(trait.read(_stream, this))) {
+            Trait t;
+			t.set_target(script, false);
+			if (!(t.read(_stream, this))) {
 				return false;
             }
 			log_abc("Trait: %u name: %s(%u) kind: %s value: %s ", j, 
-                    _stringPool[trait._name], trait._name, trait._kind,
-                    trait._value.to_string());
+                    _stringPool[t._name], t._name, t._kind, t._value);
 
-			script->_traits.push_back(trait);
+            // TODO: this should not use Class!
+			script->addStaticTrait(t);
 		}
 	} 
 	return true;
@@ -1273,16 +1276,16 @@ AbcBlock::read_method_bodies()
 		boost::uint32_t tcount = _stream->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
-			Trait& aTrait = newTrait();
-			aTrait.set_target(_methods[offset]);
+			Trait t;
+			t.set_target(_methods[offset]);
 			
-            if (!aTrait.read(_stream, this)) {
+            if (!t.read(_stream, this)) {
 				return false;
             }
 
 			log_abc("Activation trait: %u name: %s, kind: %s, value: %s ", j, 
-                    _stringPool[aTrait._name], aTrait._kind, 
-                    aTrait._value.to_string());
+                    _stringPool[t._name], t._kind, t._value);
+            _methods[offset]->addTrait(t);
 		}
 	} 
 	return true;
@@ -1337,18 +1340,6 @@ AbcBlock::read(SWFStream& in)
 		log_abc("Method %d body:", i);
 		IF_VERBOSE_PARSE(_methods[i]->print_body());
 	}
-/*	The loop below causes a segmentation fault, because it tries to modify 
-	Method.mPrototype, which is never initialized.  The parser seems 
-	to work ok without this call.*/
-/*	std::vector<Trait*>::iterator i = mTraits.begin();
-	for ( ; i != mTraits.end(); ++i)
-	{
-		if (!(*i)->finalize(this))
-			return false;
-	}
-	mTraits.clear();
-*/
-	//mCH->dump();
 	return true;
 }
 
