@@ -47,6 +47,27 @@ namespace gnash {
 /// ABC-only resources for parsing and execution.
 namespace abc {
 
+/// Class describing a static property
+//
+/// Traits are non-dynamic properties. That is, they are not deletable or
+/// modifiable in certain ways through ActionScript. They exist for reasons
+/// of performance. A property lookup on an object always checks the Traits
+/// before dynamic properties.
+//
+/// Traits can belong to Methods, Classes, and Scripts. Classes have both
+/// instance and Class traits.
+//
+/// TODO: Traits currently need finalization. This performs two tasks. At least
+/// one, and possibly both, are wrong:
+/// 1. Trait definitions contain references to AbcBlock definitions. Currently
+///    these references are resolved during finalization. It may be possible
+///    to do this during parsing.
+/// 2. Traits should be made available to ActionScript. Currently this is done
+///    by attaching them to an object. This is plain wrong and doesn't even
+///    work in many cases.
+//
+/// TODO: As Traits are stored in the correct Class, Method etc, they do not
+///       need to store a target.
 class Trait
 {
 public:
