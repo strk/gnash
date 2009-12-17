@@ -241,7 +241,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     try
     {
-    // NOTE: we can NOT limit input SWFStream here as the same jpeg::input
+    // NOTE: we cannot limit input SWFStream here as the same jpeg::input
     // instance will be used for reading subsequent DEFINEBITS and similar
     // tags, which are *different* tags, so have different boundaries !!
     //
@@ -1051,7 +1051,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
     {
         // is this nice to do?
         log_error(_("There is no sound handler currently active, "
-            "so DisplayObject with id %d will NOT be added to "
+            "so DisplayObject with id %d will not be added to "
             "the dictionary"),
               id);
     }
