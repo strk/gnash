@@ -1375,7 +1375,7 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
     as_environment& env = thread.env;
 
     as_value objval = env.pop();
-    as_object *obj = toObject(getGlobal(thread.env), objval);
+    as_object* obj = toObject(getGlobal(thread.env), objval);
     int count = static_cast<int>(env.pop().to_number());
 
     if (!obj) {
@@ -3184,9 +3184,8 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
     // as we copied that as_value.
     env.top(0).set_undefined();
 
-    const boost::intrusive_ptr<as_object> obj = toObject(getGlobal(thread.env), obj_val);
-    if ( !obj || !obj_val.is_object() )
-    {
+    as_object* obj = toObject(getGlobal(thread.env), obj_val);
+    if (!obj || !obj_val.is_object()) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Top of stack not an object %s at ActionEnum2 "
             " execution"), obj_val);
