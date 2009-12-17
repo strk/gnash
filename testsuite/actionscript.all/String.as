@@ -1304,9 +1304,24 @@ check(!String.prototype.hasOwnProperty('length'));
 
 #endif
 
+//----------------------------------------------------------------------
+// Test lifetime of temporary objects created from string
+//----------------------------------------------------------------------
+
+a='string';
+String.prototype.saveMe = function(saved) { saved.value=this; };
+saved1={}; a.saveMe(saved1);
+check_equals(typeof(saved1.value), 'object');
+check_equals(saved1.value, 'string');
+a='another string';
+check_equals(saved1.value, 'string');
+saved2={}; a.saveMe(saved2);
+check_equals(saved1.value, 'string');
+check_equals(saved2.value, 'another string');
+
 //----- END OF TESTS
 
-var baseTests = 320;
+var baseTests = 325;
 var asmTests = 23;
 var ge6Tests = 16;
 
