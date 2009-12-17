@@ -1318,10 +1318,15 @@ check_equals(saved1.value, 'string');
 saved2={}; a.saveMe(saved2);
 check_equals(saved1.value, 'string');
 check_equals(saved2.value, 'another string');
+// Test that the syntethized object return is always a new one!
+saved2.value.prop = 6;
+saved3 = {}; a.saveMe(saved3); 
+check(saved2.value.prop != saved3.value.prop);
+check(saved2.value !== saved3.value);
 
 //----- END OF TESTS
 
-var baseTests = 325;
+var baseTests = 327;
 var asmTests = 23;
 var ge6Tests = 16;
 
