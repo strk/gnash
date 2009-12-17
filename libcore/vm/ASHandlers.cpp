@@ -2997,8 +2997,10 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
     // The object to be the 'this' pointer during the call.
     as_object* this_ptr(0);
-    string_table& st = getStringTable(env);
-    as_object* super = obj->get_super(noMeth ? 0 : st.find(method_string));
+
+    // Will be used to find super later
+    string_table::key method_key = 0;
+    as_object* super = 0;
 
     // If the method name is undefined or evaluates to an empty string,
     // the first argument is used as the method name and the 'this' pointer
@@ -3007,8 +3009,17 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     if (noMeth) {
         method = obj_value;
     }
-    else {
-        if (!thread.getObjectMember(*obj, method_string, method)) {
+    else
+    {
+
+        string_table& st = getStringTable(env);
+        method_key = st.find(method_string);
+
+        // Alright, not using 'thread' object here is kind of
+        // a policy break, but saves a duplicated string_table::find
+        // call so for now I'm fine like this ...
+        //if (!thread.getObjectMember(*obj, method_string, method)) {
+        if ( ! obj->get_member(method_key, &method) ) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("ActionCallMethod: "
                 "Can't find method %s of object %s"),
@@ -3019,9 +3030,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
             env.push(as_value()); 
             return;
         }
-        else {
-            this_ptr = obj;
-        }
+        this_ptr = obj;
     }
 
     // If we are calling a method of a super object, the 'this' pointer
@@ -3047,6 +3056,10 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
         args += env.pop();
     } 
 
+    // TODO: don't construct super if method is a builtin
+    super = obj->get_super(method_key);
+
+    // TODO: see how we can pass more info here (key, objects...)
     as_value result = invoke(method, env, this_ptr, 
             args, super, &(thread.code.getMovieDefinition()));
 
