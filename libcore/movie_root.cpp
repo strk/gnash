@@ -1693,32 +1693,44 @@ movie_root::markReachableResources() const
     // Mark DisplayObject being dragged, if any
     m_drag_state.markReachableResources();
 
-    // NOTE: we don't need to mark _liveChars as any elements in that list
-    //       should be NOT unloaded and thus marked as reachable by their
-    //       parent.
-#if GNASH_PARANOIA_LEVEL > 1
+    // NOTE: cleanupDisplayList() should have cleaned up all
+    // unloaded live characters. The remaining ones should be marked
+    // by their parents.
+#if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
     for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
             i!=e; ++i) {
+#ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
+        (*i)->setReachable();
+#else
         assert((*i)->isReachable());
+#endif
     }
 #endif
     
-    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded
+    // NOTE: cleanupUnloadedListeners() should have cleaned up all unloaded
     // key listeners. The remaining ones should be marked by their parents
-#if GNASH_PARANOIA_LEVEL > 1
+#if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
     for (LiveChars::const_iterator i=_keyListeners.begin(),
             e=_keyListeners.end(); i!=e; ++i) {
+#ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
+        (*i)->setReachable();
+#else
         assert((*i)->isReachable());
+#endif
     }
 #endif
 
-    // NOTE: cleanupUnloadedListeners should have cleaned up all
+    // NOTE: cleanupUnloadedListeners() should have cleaned up all
     // unloaded mouse listeners. The remaining ones should be marked by
     // their parents
-#if GNASH_PARANOIA_LEVEL > 1
+#if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
     for (LiveChars::const_iterator i = _mouseListeners.begin(),
             e = _mouseListeners.end(); i!=e; ++i) {
+#ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
+        (*i)->setReachable();
+#else
         assert((*i)->isReachable());
+#endif
     }
 #endif
 
