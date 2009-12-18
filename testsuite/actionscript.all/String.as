@@ -1324,11 +1324,33 @@ saved3 = {}; a.saveMe(saved3);
 check(saved2.value.prop != saved3.value.prop);
 check(saved2.value !== saved3.value);
 
+//----------------------------------------------------------------------
+// Test that objects created from string literals will be constructed
+// by user-defined _global.String, if defined 
+//----------------------------------------------------------------------
+
+// _global isn't accessible in SWF5
+#if OUTPUT_VERSION > 5
+
+OrigString = _global.String;
+
+a='a string';
+_global.String = function() { this.id = 'wonder1'; };
+check_equals(a.id, 'wonder1'); 
+_global.String = function() { this.id = 'wonder2'; };
+check_equals(a.id, 'wonder2'); 
+_global.String = function() { this.id = 'wonder3'; };
+check_equals(a.id, 'wonder3'); 
+
+_global.String = OrigString;
+
+#endif // OUTPUT_VERISION > 5
+
 //----- END OF TESTS
 
 var baseTests = 327;
 var asmTests = 23;
-var ge6Tests = 16;
+var ge6Tests = 19;
 
 var totalTests = baseTests;
 #ifdef MING_SUPPORTS_ASM
