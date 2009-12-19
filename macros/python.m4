@@ -128,7 +128,7 @@ AC_DEFUN([GNASH_PATH_PYTHON],
 
     AM_PATH_PYTHON
     AC_PATH_PROG(PYGOBJECT_CODEGEN, pygobject-codegen-2.0, no)
-    if test x"${PYGOBJECT_CODEGEN}" = x; then
+    if test x"${PYGOBJECT_CODEGEN}" = xno; then
       AC_MSG_WARN(could not find pygobject-codegen-2.0 script)
       AC_PATH_PROG(PYGTK_CODEGEN, pygtk-codegen-2.0, no)
       if test x"${PYGTK_CODEGEN}" = xno; then
