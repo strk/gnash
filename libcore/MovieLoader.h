@@ -22,12 +22,12 @@
 #include "as_object.h" // for setReachable inline
 #include "movie_definition.h" // for use in intrusive_ptr (inline)
 #include "MovieClip.h" // for MovieClip::VariablesMethod type
+#include "smart_ptr.h" // for intrusive_ptr
 
 #include <list>
 #include <string>
 #include <boost/noncopyable.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/intrusive_ptr.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
 
