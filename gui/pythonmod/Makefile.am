@@ -100,12 +100,11 @@ if HAS_PYTHON
 	    --register $(PYGTK_DEFSDIR)/gtk-types.defs \
 	    --override $(srcdir)/gnash.override \
 	    --prefix pygnash $(srcdir)/gnash.defs > gen-gnash.c; \
-	fi
-	if test x"$(PYGTK_CODEGEN)" != xno; then \
+	else if test x"$(PYGTK_CODEGEN)" != xno; then \
 	  $(PYGTK_CODEGEN) \
 	    --register $(PYGTK_DEFSDIR)/gdk-types.defs \
 	    --register $(PYGTK_DEFSDIR)/gtk-types.defs \
 	    --override $(srcdir)/gnash.override \
 	    --prefix pygnash $(srcdir)/gnash.defs > gen-gnash.c; \
-	 fi
+	 fi; fi
 endif
