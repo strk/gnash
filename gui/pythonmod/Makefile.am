@@ -94,8 +94,15 @@ EXTRA_DIST = gnash.override gnash.defs
 
 gen-gnash.c:   gnash.override gnash.defs
 if HAS_PYTHON
-	if test x"$(PYGOBJECT_CODEGEN)" != x; then \
+	if test x"$(PYGOBJECT_CODEGEN)" != xno; then \
 	  $(PYGOBJECT_CODEGEN) \
+	    --register $(PYGTK_DEFSDIR)/gdk-types.defs \
+	    --register $(PYGTK_DEFSDIR)/gtk-types.defs \
+	    --override $(srcdir)/gnash.override \
+	    --prefix pygnash $(srcdir)/gnash.defs > gen-gnash.c; \
+	fi
+	if test x"$(PYGTK_CODEGEN)" != xno; then \
+	  $(PYGTK_CODEGEN) \
 	    --register $(PYGTK_DEFSDIR)/gdk-types.defs \
 	    --register $(PYGTK_DEFSDIR)/gtk-types.defs \
 	    --override $(srcdir)/gnash.override \
