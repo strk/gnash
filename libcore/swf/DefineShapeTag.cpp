@@ -92,11 +92,6 @@ DefineShapeTag::display(Renderer& renderer, const DisplayObject& inst) const
     renderer.drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
 }
 
-void
-DefineShapeTag::markReachableResources() const
-{
-}
-
 } // namespace SWF
 } // namespace gnash
 

@@ -72,13 +72,6 @@ Font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
 {}
 
 
-#ifdef GNASH_USE_GC
-void
-Font::GlyphInfo::markReachableResources() const
-{
-}
-#endif
-
 Font::Font(std::auto_ptr<SWF::DefineFontTag> ft)
     :
     _fontTag(ft.release()),
@@ -365,22 +358,6 @@ bool
 Font::is_subpixel_font() const {
     return _fontTag ? _fontTag->subpixelFont() : false;
 }
-
-#ifdef GNASH_USE_GC
-/// Mark reachable resources (for the GC)
-//
-/// Reachable resources are:
-void
-Font::markReachableResources() const
-{
-	// Mark device glyphs (textured and vector)
-	for (GlyphInfoRecords::const_iterator i = _deviceGlyphTable.begin(),
-            e=_deviceGlyphTable.end(); i != e; ++i) {
-		i->markReachableResources();
-	}
-
-}
-#endif // GNASH_USE_GC
 
 
 }	// end namespace gnash

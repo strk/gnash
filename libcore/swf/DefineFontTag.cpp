@@ -80,19 +80,6 @@ DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
     }
 }
 
-#ifdef GNASH_USE_GC
-void
-DefineFontTag::markReachableResources() const
-{
-	// Mark glyphs
-	for (Font::GlyphInfoRecords::const_iterator i = _glyphTable.begin(),
-            e = _glyphTable.end(); i != e; ++i)
-	{
-		i->markReachableResources();
-	}
-}
-#endif
-
 
 DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, TagType tag,
         const RunResources& r)

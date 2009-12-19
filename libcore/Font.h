@@ -220,11 +220,6 @@ public:
 
         GlyphInfo(const GlyphInfo& o);
 
-#ifdef GNASH_USE_GC
-        /// Mark any glyph and texture glyph resources as reachable
-        void markReachableResources() const;
-#endif
-
         boost::shared_ptr<SWF::ShapeRecord> glyph;
 
         float advance;
@@ -315,16 +310,6 @@ private:
 
 	mutable std::auto_ptr<FreetypeGlyphsProvider> _ftProvider;
 
-protected:
-
-#ifdef GNASH_USE_GC
-	/// Mark reachable resources (for the GC)
-	//
-	/// Reachable resources are:
-	///	- DefineShapeTags (vector glyphs)
-	///
-	void markReachableResources() const;
-#endif // GNASH_USE_GC
 };
 
 

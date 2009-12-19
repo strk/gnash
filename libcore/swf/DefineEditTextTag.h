@@ -186,15 +186,6 @@ public:
         return _font;
     }
 
-protected:
-
-#ifdef GNASH_USE_GC
-    void markReachableResources() const
-    {
-        if (_font) _font->setReachable();
-    }
-#endif
-
 private:
 
     /// Construct a DefineEditTextTag.

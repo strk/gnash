@@ -49,21 +49,10 @@ public:
 
 		ButtonSound()
 			:
-            soundID(0),
+			soundID(0),
 			sample(0)
 		{}
 
-#ifdef GNASH_USE_GC
-		/// Mark all reachable resources (for GC)
-		//
-		/// Reachable resources are:
-		///  - sound sample (sample)
-		///
-		void markReachableResources() const
-        {
-            if (sample) sample->setReachable();
-        }
-#endif // GNASH_USE_GC
 	};
 
     typedef std::vector<ButtonSound> Sounds;
@@ -77,21 +66,6 @@ public:
         assert (index < 4);
         return _sounds[index];
     }
-#ifdef GNASH_USE_GC
-    /// Mark all reachable resources (for GC)
-    //
-    /// Reachable resources are:
-    ///  - button sound infos (_sounds)
-    ///
-    void markReachableResources() const
-    {
-        for (Sounds::const_iterator i=_sounds.begin(), e = _sounds.end();
-                i != e; ++i)
-        {
-            i->markReachableResources();
-        }
-    }
-#endif // GNASH_USE_GC
 
 private:
 

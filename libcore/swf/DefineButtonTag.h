@@ -101,12 +101,6 @@ public:
         return (_definitionTag);
     }
 
-#ifdef GNASH_USE_GC
-    void markReachableResources() const {
-        if (_definitionTag) _definitionTag->setReachable();
-    }
-#endif // GNASH_USE_GC
-
 private:
 
     /// SWF8 and above can have a number of filters
@@ -263,28 +257,6 @@ public:
         }
     }
     
-protected:
-
-#ifdef GNASH_USE_GC
-    /// Mark all reachable resources (for GC)
-    //
-    /// Reachable resources are:
-    ///  - button records (_button_records)
-    ///  - button sound definition (_sound)
-    ///
-    void markReachableResources() const
-    {
-        assert(isReachable());
-        for (ButtonRecords::const_iterator i = _buttonRecords.begin(),
-                e = _buttonRecords.end(); i!=e; ++i)
-        {
-            i->markReachableResources();
-        }
-
-        if (_soundTag) _soundTag->markReachableResources();
-    }
-#endif // GNASH_USE_GC
-
 private:
 
     /// DefineButton2Tag::loader also needs to create a DefineButtonTag.

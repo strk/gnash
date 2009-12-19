@@ -53,16 +53,6 @@ public:
 
 protected:
 
-#ifdef GNASH_USE_GC
-    /// Mark reachable resources (for the GC)
-    //
-    /// Reachable resources are:
-    ///	- Associated fill styles (_fill_styles).
-    ///	  These are not actual resources, but may contain some.
-    ///
-    virtual void markReachableResources() const;
-#endif 
-
 private:
 
     DefineShapeTag(SWFStream& in, TagType tag, movie_definition& m,

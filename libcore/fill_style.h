@@ -21,11 +21,11 @@
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "SWFMatrix.h"
 #include "BitmapInfo.h"
 #include "SWF.h"
 #include "RGBA.h" // for rgba type
+#include "smart_ptr.h" // for BitmapInfo (shared)
 
 #include <vector> // for composition
 #include <iosfwd> // for output operator forward declarations
@@ -230,17 +230,6 @@ public:
 	/// and right edges of the rectangle.
 	float get_focal_point() const { return m_focal_point; }
 	void set_focal_point(float f) { m_focal_point = f; }
-
-#ifdef GNASH_USE_GC
-	/// Mark reachable resources (for the GC)
-	//
-	/// fill_style specific reachable resources are:
-	///
-	///	- gradient bitmap info (_gradientBitmapInfo)
-	///	- bitmap DisplayObject (_bitmap)
-	///
-	void markReachableResources() const;
-#endif // GNASH_USE_GC
 
 private:
 

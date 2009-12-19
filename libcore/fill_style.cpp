@@ -19,7 +19,6 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "fill_style.h"
 #include "log.h"
 #include "SWFStream.h"
@@ -654,15 +653,6 @@ std::ostream& operator << (std::ostream& os,
     }
     return os;
 }
-
-
-#ifdef GNASH_USE_GC
-void
-fill_style::markReachableResources() const
-{
-    if ( _bitmapInfo ) _bitmapInfo->setReachable();
-}
-#endif // GNASH_USE_GC
 
 } // end of namespace
 

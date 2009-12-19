@@ -92,14 +92,9 @@ public:
     bool descent() const { return _descent; }
     const std::string& name() const { return _name; }
 
-#ifdef GNASH_USE_GC
-        /// Mark glyph resources as reachable
-        void markReachableResources() const;
-#endif
-
     /// Read Font::CodeTable, which maps glyph indices to DisplayObject codes.
-	static void readCodeTable(SWFStream& in, Font::CodeTable& table,
-            bool wideCodes, size_t glyphCount);
+    static void readCodeTable(SWFStream& in, Font::CodeTable& table,
+        bool wideCodes, size_t glyphCount);
 
 private:
 
