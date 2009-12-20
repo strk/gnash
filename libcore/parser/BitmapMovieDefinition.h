@@ -126,16 +126,6 @@ public:
 
 protected:
 
-#ifdef GNASH_USE_GC
-	/// Mark reachable resources of a BitmapMovieDefinition
-	//
-	/// Reachable resources are:
-	///	- dynamic shape (_shapedef)
-	///	- bitmap (_bitmap)
-	///
-	void markReachableResources() const;
-#endif 
-
 private:
 
 	int _version;

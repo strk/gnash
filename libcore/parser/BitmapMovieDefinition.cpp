@@ -58,12 +58,4 @@ BitmapMovieDefinition::createDisplayObject(Global_as& /*gl*/,
     return 0;
 }
 
-#ifdef GNASH_USE_GC
-void
-BitmapMovieDefinition::markReachableResources() const
-{
-	if (_bitmap.get()) _bitmap->setReachable();
-}
-#endif // GNASH_USE_GC
-
 } // namespace gnash
