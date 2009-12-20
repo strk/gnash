@@ -71,7 +71,7 @@ Description: free SWF movie player - standalone player for KDE
 Package: gnash-tools
 Section: utils
 Architecture: any
-Depends: gnash-common (= ${binary:Version}), ${misc:Depends}, allDepends: gnash-common
+Depends: gnash-common (= ${binary:Version}), ${misc:Depends}
 Description: free SWF movie player - Command-line Tools
  Gnash is a free Flash movie player, which works either standalone, or as
  plugin for Firefox/Mozilla or Konqueror. Currently it is in a alpha state.
@@ -144,7 +144,7 @@ Description: free SWF movie player - Plugin for Konqueror
 Package: gtk-plugin-gnash
 Section: libs
 Architecture: any
-Depends: gnash-common (= ${binary:Version}), ${misc:Depends}, python2.6-dev | python2.5-dev | python2.4-dev, allDepends: gnash-common, gnash
+Depends: gnash-common (= ${binary:Version}), ${misc:Depends}, python2.6-dev | python2.5-dev | python2.4-dev
 Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384,92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a,aa5ca914-c309-495d-91cf-3141bbb04115
 Xb-Npp-MimeType: application/x-shockwave-flash
 Xb-Npp-Name: Gnash SWF Player
