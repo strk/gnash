@@ -98,25 +98,25 @@ public:
     transport_type_t getTransportType() { return _transporttype; };
 
     int authKbdint();
-    int authKbdint(SSH_SESSION *);
+    int authKbdint(ssh_session);
 
     // Channel operations
-    CHANNEL *openChannel();
-    CHANNEL *openChannel(SSH_SESSION *session);
+    ssh_channel openChannel();
+    ssh_channel openChannel(ssh_session session);
 
     void closeChannel();
-    void closeChannel(CHANNEL *channel);
+    void closeChannel(ssh_channel channel);
 
     // Accessors
-    CHANNEL *getChannel()     { return _channel; };
-    SSH_SESSION *getSession() { return _session; };
+    ssh_channel getChannel() { return _channel; };
+    ssh_session getSession() { return _session; };
     boost::shared_ptr<amf::Buffer> &getBuffer()  { return _buffer; };
 
     // Dump internal data to the screen for debugging
     void dump();
  protected:
-    int readChannel(CHANNEL *channel, amf::Buffer &buf);
-    int writeChannel(CHANNEL *channel, amf::Buffer &buf);
+    int readChannel (ssh_channel channel, amf::Buffer &buf);
+    int writeChannel(ssh_channel channel, amf::Buffer &buf);
 
     std::string		_hostname;
     std::string		_user;
@@ -126,12 +126,11 @@ public:
     transport_type_t	_transporttype;
     int			_state;
 #if 0
-    boost::shared_ptr<SSH_SESSION> _session;
+    boost::shared_ptr<ssh_session> _session;
     boost::shared_ptr<SSH_OPTIONS> _options;
 #else
-    SSH_SESSION *_session;
-    SSH_OPTIONS *_options;
-    CHANNEL	*_channel;
+    ssh_session _session;
+    ssh_channel	_channel;
 #endif
     boost::shared_ptr<amf::Buffer> _buffer;
 };

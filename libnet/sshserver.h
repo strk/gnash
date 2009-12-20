@@ -64,26 +64,25 @@ class DSOEXPORT SSHServer : public SSHClient {
     
     // Authenticate the password from the user
     bool authPassword(std::string &user, std::string &passwd);
-    bool authPassword(SSH_SESSION *session, std::string &user, std::string &passwd);
+    bool authPassword(ssh_session session, std::string &user, std::string &passwd);
 
     // Wait for an incoming network connection
     bool acceptConnections();
     bool acceptConnections(short port);
-    bool acceptConnections(SSH_SESSION *session);
-    bool acceptConnections(SSH_SESSION *session, short port);
+    bool acceptConnections(ssh_session session);
+    bool acceptConnections(ssh_session session, short port);
 
     // Parse an SSH command message and do something
-    bool processSSHMessage(SSH_MESSAGE *message);
+    bool processSSHMessage(ssh_message message);
 
     void dump();
  protected:
     // Get the SSH command message
-    SSH_MESSAGE *getSSHMessage();
-    SSH_MESSAGE *getSSHMessage(SSH_SESSION *session);
+    ssh_message getSSHMessage();
+    ssh_message getSSHMessage(ssh_session session);
 
-    SSH_SESSION *_session;	// the current session
-    SSH_OPTIONS *_options;	// the current list of options
-    SSH_MESSAGE *_message;	// the current SSH command message
+    ssh_session _session;	// the current session
+    ssh_message _message;	// the current SSH command message
 };
     
 } // end of gnash namespace

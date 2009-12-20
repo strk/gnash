@@ -79,7 +79,6 @@ SSHClient::SSHClient()
       _need_server_auth(true),
       _state(0),
       _session(0),
-      _options(0),
       _channel(0)
 {
 //     GNASH_REPORT_FUNCTION;
@@ -173,37 +172,29 @@ SSHClient::sshConnect(int fd)
 }
 
 bool
-SSHClient::sshConnect(int fd, std::string &hostname)
+SSHClient::sshConnect(int /* fd */, std::string &hostname)
 {
 //     GNASH_REPORT_FUNCTION;
     char *password;
     char *banner;
     char *hexa;
-    char buf[10];
-
-//    _options.reset(ssh_options_new());
-    // Setup the options to for this SSH session
-    _options = ssh_options_new();
 
     // We always need a hostname to connect to
-    if (ssh_options_set_host(_options, hostname.c_str()) < 0) {
+    if (ssh_options_set(_session, SSH_OPTIONS_HOST, hostname.c_str()) < 0) {
 	log_error("Couldn't set hostname option");
-	ssh_options_free(_options);
 	return false;
     }
 
     // We always need a user name for the connection
     if (_user.empty()) {
-	if (ssh_options_set_username(_options, _user.c_str()) < 0) {
+	if (ssh_options_set(_session, SSH_OPTIONS_USER, _user.c_str()) < 0) {
 	    log_error("Couldn't set user name option");
-	    ssh_options_free(_options);
 	    return false;
 	}
     }
     
     // Start a new session
     _session = ssh_new();
-    ssh_set_options(_session, _options);
     if(ssh_connect(_session)){
         log_error("Connection failed : %s\n", ssh_get_error(_session));
 	sshShutdown();
@@ -345,7 +336,7 @@ SSHClient::authKbdint()
 }
 
 int
-SSHClient::authKbdint(SSH_SESSION *session)
+SSHClient::authKbdint(ssh_session session)
 {
 //    GNASH_REPORT_FUNCTION;
     int err = ssh_userauth_kbdint(session, NULL, NULL);
@@ -354,15 +345,15 @@ SSHClient::authKbdint(SSH_SESSION *session)
     int i,n;
     char echo;
     while (err == SSH_AUTH_INFO){
-        name = ssh_userauth_kbdint_getname(session);
-        instruction = ssh_userauth_kbdint_getinstruction(session);
+        name = const_cast<char *>(ssh_userauth_kbdint_getname(session));
+        instruction = const_cast<char *>(ssh_userauth_kbdint_getinstruction(session));
         n=ssh_userauth_kbdint_getnprompts(session);
         if(strlen(name)>0)
             log_debug("%s", name);
         if(strlen(instruction)>0)
             log_debug("%s", instruction);
         for(i=0; i<n; ++i){
-            prompt = ssh_userauth_kbdint_getprompt(session, i, &echo);
+            prompt = const_cast<char *>(ssh_userauth_kbdint_getprompt(session, i, &echo));
             if(echo){
                 log_debug("%s", prompt);
                 fgets(buffer,sizeof(buffer),stdin);
@@ -387,7 +378,7 @@ SSHClient::authKbdint(SSH_SESSION *session)
 }
 
 // Channel operations
-CHANNEL *
+ssh_channel
 SSHClient::openChannel()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -395,8 +386,8 @@ SSHClient::openChannel()
 }
 
 
-CHANNEL *
-SSHClient::openChannel(SSH_SESSION *session)
+ssh_channel
+SSHClient::openChannel(ssh_session session)
 {
 //    GNASH_REPORT_FUNCTION;
     if (session) {
@@ -414,7 +405,7 @@ SSHClient::openChannel(SSH_SESSION *session)
 }
 
 int 
-SSHClient::readChannel(CHANNEL *channel, amf::Buffer &buf)
+SSHClient::readChannel(ssh_channel channel, amf::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = -1;
@@ -429,7 +420,7 @@ SSHClient::readChannel(CHANNEL *channel, amf::Buffer &buf)
 }
 
 int 
-SSHClient::writeChannel(CHANNEL *channel, amf::Buffer &buf)
+SSHClient::writeChannel(ssh_channel channel, amf::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = -1;
@@ -439,6 +430,8 @@ SSHClient::writeChannel(CHANNEL *channel, amf::Buffer &buf)
     } else {
 	log_error("Can't write to a non-existant channel!");
     }
+
+    return ret;
 }
 
 void 
@@ -449,7 +442,7 @@ SSHClient::closeChannel()
 }
 
 void 
-SSHClient::closeChannel(CHANNEL *channel)
+SSHClient::closeChannel(ssh_channel channel)
 {
 //    GNASH_REPORT_FUNCTION;
 

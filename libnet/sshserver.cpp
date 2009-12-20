@@ -95,50 +95,56 @@ SSHServer::~SSHServer()
 
 // Authenticate the password from the user
 bool
-SSHServer::authPassword(string &user, string &passwd)
+SSHServer::authPassword(string & /* user */, string & /* passwd */)
 {
+    return false;
 }
 
 bool
-SSHServer::authPassword(SSH_SESSION *session, string &user, string &passwd)
+SSHServer::authPassword(ssh_session /* session */, string &/* user */, string & /* passwd */)
 {
+    return false;
 }
 
 // Wait for an incoming network connection
 bool
 SSHServer::acceptConnections()
 {
+    return false;
 }
 
 bool
-SSHServer::acceptConnections(short port)
+SSHServer::acceptConnections(short /* port */)
 {
+    return false;
 }
 
 bool
-SSHServer::acceptConnections(SSH_SESSION *session)
+SSHServer::acceptConnections(ssh_session /* session */)
 {
+    return false;
 }
 
 bool
-SSHServer::acceptConnections(SSH_SESSION *session, short port)
+SSHServer::acceptConnections(ssh_session /* session */, short /* port */)
 {
+    return false;
 }
 
 // Parse an SSH command message and do something
 bool
-SSHServer::processSSHMessage(SSH_MESSAGE *message)
+SSHServer::processSSHMessage(ssh_message message)
 {
     if (!message) {
 	return false;
     }
     switch(ssh_message_type(message)){
-    case SSH_AUTH_REQUEST:
+    case SSH_REQUEST_AUTH:
 	switch(ssh_message_subtype(message)) {
 	    // not authenticated, send default message
- 	case SSH_AUTH_NONE:
+ 	case SSH_AUTH_METHOD_NONE:
  	    break;
-	case SSH_AUTH_PASSWORD:
+	case SSH_AUTH_METHOD_PASSWORD:
 	    {
 		log_debug("User %s wants to auth with pass %s\n",
 			  ssh_message_auth_user(message),
@@ -152,20 +158,20 @@ SSHServer::processSSHMessage(SSH_MESSAGE *message)
 		}
 		break;
 	    }
-	case SSH_AUTH_HOSTBASED:
+	case SSH_AUTH_METHOD_HOSTBASED:
 	    break;
-	case SSH_AUTH_PUBLICKEY:
+	case SSH_AUTH_METHOD_PUBLICKEY:
 	    break;
-	case SSH_AUTH_KEYBINT:
+	case SSH_AUTH_METHOD_INTERACTIVE:
 	    break;
-	case SSH_AUTH_UNKNOWN:
+	case SSH_AUTH_METHOD_UNKNOWN:
 	    break;
 	default:
-	    ssh_message_auth_set_methods(message,SSH_AUTH_PASSWORD);
+	    ssh_message_auth_set_methods(message,SSH_AUTH_METHOD_PASSWORD);
 	    ssh_message_reply_default(message);
 	    break;
 	}
-    case SSH_CHANNEL_REQUEST_OPEN:
+    case SSH_REQUEST_CHANNEL_OPEN:
 	if(ssh_message_subtype(message)==SSH_CHANNEL_SESSION){
 	    _channel = ssh_message_channel_request_open_reply_accept(message);
 	    break;
@@ -185,6 +191,8 @@ SSHServer::processSSHMessage(SSH_MESSAGE *message)
 	ssh_message_reply_default(message);
     }
     ssh_message_free(message);
+
+    return false;
 }
 
 void
