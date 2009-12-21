@@ -285,7 +285,7 @@ DSOEXPORT void processLog_abc(const boost::format& fmt);
 /// Use "g++ -E log.h" or "cpp log.h" to check.
 #define LOG_TEMPLATES(z, n, data)\
 template<BOOST_PP_ENUM_PARAMS(BOOST_PP_INC(n), typename T)>\
-void log_##data(BOOST_PP_REPEAT(BOOST_PP_INC(n), TOKENIZE_ARGS, t)) \
+inline void log_##data(BOOST_PP_REPEAT(BOOST_PP_INC(n), TOKENIZE_ARGS, t)) \
 {\
     if (LogFile::getDefaultInstance().getVerbosity() == 0) return; \
     boost::format f(t0); \
@@ -316,6 +316,7 @@ BOOST_PP_SEQ_FOR_EACH(GENERATE_LOG_TYPES, _, LOG_TYPES)
 
 #undef TOKENIZE_ARGS
 #undef TOKENIZE_FORMAT
+#undef TOKENIZE_ARGS
 #undef GENERATE_LOG_TYPES
 #undef LOG_TEMPLATES
 #undef ARG_NUMBER
@@ -446,10 +447,10 @@ public:
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \
-    log_debug("entering")
+    gnash::log_debug("entering")
 
 #define GNASH_REPORT_RETURN \
-    log_debug("returning")
+    gnash::log_debug("returning")
 #endif
 
 }
