@@ -49,13 +49,6 @@ GC::init(GcRoot& root)
     return *_singleton;
 }
 
-GC&
-GC::get()
-{
-    assert(_singleton);
-    return *_singleton;
-}
-
 void
 GC::cleanup()
 {

@@ -207,7 +207,9 @@ public:
     /// An assertion will fail if the GC has not been initialized yet.
     /// See init(GcRoot&).
     ///
-    static GC& get();
+    static GC& get() {
+        return *_singleton;
+    }
 
     /// Add an heap object to the list of managed collectables
     //
