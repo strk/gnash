@@ -948,9 +948,9 @@ VideoInputGst::checkForSupportedFramerate(GnashWebcamPrivate *webcam,
 {
     
     for (int i = 0; i < webcam->_currentFormat->numFramerates; ++i) {
-        int val = std::ceil(
+        int val = std::ceil(static_cast<double>(
                 webcam->_currentFormat->framerates[i].numerator /
-               webcam->_currentFormat->framerates[i].denominator);
+               webcam->_currentFormat->framerates[i].denominator));
         if (val == fps) {
             return true;
         }

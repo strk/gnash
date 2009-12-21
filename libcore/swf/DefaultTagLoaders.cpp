@@ -58,175 +58,180 @@
 namespace gnash {
 namespace SWF {
 
+
 namespace {
-    class AddLoader
+
+typedef TagLoadersTable::Loaders::value_type TagPair;
+
+class AddLoader
+{
+public:
+
+    AddLoader(TagLoadersTable& table)
+        :
+        _table(table)
+    {}
+
+    void operator()(const TagPair& p)
     {
-    public:
-        AddLoader(TagLoadersTable& table)
-            :
-            _table(table)
-        {}
-        void operator()(const TagLoadersTable::Loaders::value_type& p)
-        {
-            _table.registerLoader(p.first, p.second);
-        }
-    private:
-        TagLoadersTable& _table;
-    };
+        _table.registerLoader(p.first, p.second);
+    }
+private:
+    TagLoadersTable& _table;
+};
+
 }
 
 void
 addDefaultLoaders(TagLoadersTable& table)
 {
 
-    const std::map<TagType, TagLoadersTable::TagLoader> tags =
-        boost::assign::map_list_of
+    const std::vector<TagPair> tags = boost::assign::list_of
+        (TagPair(SWF::END, end_loader))
+        (TagPair(SWF::DEFINESHAPE, DefineShapeTag::loader))
+        (TagPair(SWF::FREECHARACTER, fixme_loader)) // 03
+        (TagPair(SWF::PLACEOBJECT, PlaceObject2Tag::loader))
+        (TagPair(SWF::REMOVEOBJECT, RemoveObjectTag::loader)) // 05
+        (TagPair(SWF::DEFINEBITS, define_bits_jpeg_loader))
+        (TagPair(SWF::DEFINEBUTTON, DefineButtonTag::loader))
+        (TagPair(SWF::JPEGTABLES, jpeg_tables_loader))
+        (TagPair(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader))
+        (TagPair(SWF::DEFINEFONT, DefineFontTag::loader))
+        (TagPair(SWF::DEFINETEXT, DefineTextTag::loader))
+        (TagPair(SWF::DOACTION,  DoActionTag::loader))
+        (TagPair(SWF::DEFINEFONTINFO, DefineFontInfoTag::loader))
+        // 62
+        (TagPair(SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader))
+        (TagPair(SWF::DEFINESOUND, define_sound_loader))
+        (TagPair(SWF::STARTSOUND, StartSoundTag::loader))
+        // 89
+        (TagPair(SWF::STARTSOUND2, StartSound2Tag::loader))
 
-    (SWF::END, end_loader)
-    (SWF::DEFINESHAPE, DefineShapeTag::loader)
-    (SWF::FREECHARACTER, fixme_loader) // 03
-    (SWF::PLACEOBJECT, PlaceObject2Tag::loader)
-    (SWF::REMOVEOBJECT, RemoveObjectTag::loader) // 05
-    (SWF::DEFINEBITS, define_bits_jpeg_loader)
-    (SWF::DEFINEBUTTON, DefineButtonTag::loader)
-    (SWF::JPEGTABLES, jpeg_tables_loader)
-    (SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader)
-    (SWF::DEFINEFONT, DefineFontTag::loader)
-    (SWF::DEFINETEXT, DefineTextTag::loader)
-    (SWF::DOACTION,  DoActionTag::loader)
-    (SWF::DEFINEFONTINFO, DefineFontInfoTag::loader)
-    // 62
-    (SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader)
-    (SWF::DEFINESOUND, define_sound_loader)
-    (SWF::STARTSOUND, StartSoundTag::loader)
-    // 89
-    (SWF::STARTSOUND2, StartSound2Tag::loader)
+        (TagPair(SWF::STOPSOUND, fixme_loader)) // 16 
 
-    (SWF::STOPSOUND, fixme_loader) // 16 
+        // 17
+        (TagPair(SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader))
+        // 18
+        (TagPair(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader))
+        // 19
+        (TagPair(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader))
+        (TagPair(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader))
+        (TagPair(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader))
+        (TagPair(SWF::DEFINESHAPE2,  DefineShapeTag::loader))
+        (TagPair(SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader)) // 23
+        // "protect" tag; we're not an authoring tool so we don't care.
+        // (might be nice to dump the password instead..)
+        (TagPair(SWF::PROTECT, null_loader))
+        (TagPair(SWF::PATHSAREPOSTSCRIPT, fixme_loader)) // 25
+        (TagPair(SWF::PLACEOBJECT2,  PlaceObject2Tag::loader))
+        // 27 - _UNKNOWN_ unimplemented
+        (TagPair(SWF::REMOVEOBJECT2, RemoveObjectTag::loader)) // 28
+        (TagPair(SWF::SYNCFRAME, fixme_loader)) // 29
+        // 30 - _UNKNOWN_ unimplemented
+        (TagPair(SWF::FREEALL, fixme_loader)) // 31
+        (TagPair(SWF::DEFINESHAPE3,  DefineShapeTag::loader))
+        (TagPair(SWF::DEFINETEXT2, DefineText2Tag::loader))
+        // 37
+        (TagPair(SWF::DEFINEBUTTON2, DefineButton2Tag::loader))
+        (TagPair(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader))
+        (TagPair(SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader))
+        (TagPair(SWF::DEFINEEDITTEXT, DefineEditTextTag::loader))
+        (TagPair(SWF::DEFINEVIDEO, fixme_loader)) // 38
+        (TagPair(SWF::DEFINESPRITE,  sprite_loader))
+        (TagPair(SWF::NAMECHARACTER, fixme_loader)) // 40
+        (TagPair(SWF::SERIALNUMBER,  serialnumber_loader)) // 41
+        (TagPair(SWF::DEFINETEXTFORMAT, fixme_loader)) // 42
+        (TagPair(SWF::FRAMELABEL,  frame_label_loader)) // 43
 
-    // 17
-    (SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader)
-    // 18
-    (SWF::SOUNDSTREAMHEAD, sound_stream_head_loader)
-    // 19
-    (SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader)
-    (SWF::DEFINELOSSLESS, define_bits_lossless_2_loader)
-    (SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader)
-    (SWF::DEFINESHAPE2,  DefineShapeTag::loader)
-    (SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader) // 23
-    // "protect" tag; we're not an authoring tool so we don't care.
-    // (might be nice to dump the password instead..)
-    (SWF::PROTECT, null_loader)
-    (SWF::PATHSAREPOSTSCRIPT, fixme_loader) // 25
-    (SWF::PLACEOBJECT2,  PlaceObject2Tag::loader)
-    // 27 - _UNKNOWN_ unimplemented
-    (SWF::REMOVEOBJECT2, RemoveObjectTag::loader) // 28
-    (SWF::SYNCFRAME, fixme_loader) // 29
-    // 30 - _UNKNOWN_ unimplemented
-    (SWF::FREEALL, fixme_loader) // 31
-    (SWF::DEFINESHAPE3,  DefineShapeTag::loader)
-    (SWF::DEFINETEXT2, DefineText2Tag::loader)
-    // 37
-    (SWF::DEFINEBUTTON2, DefineButton2Tag::loader)
-    (SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader)
-    (SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader)
-    (SWF::DEFINEEDITTEXT, DefineEditTextTag::loader)
-    (SWF::DEFINEVIDEO, fixme_loader) // 38
-    (SWF::DEFINESPRITE,  sprite_loader)
-    (SWF::NAMECHARACTER, fixme_loader) // 40
-    (SWF::SERIALNUMBER,  serialnumber_loader) // 41
-    (SWF::DEFINETEXTFORMAT, fixme_loader) // 42
-    (SWF::FRAMELABEL,  frame_label_loader) // 43
+        // TODO: Implement, but fixme_loader breaks tests.
+        (TagPair(SWF::DEFINEBEHAVIOR, fixme_loader)) // 44
 
-    // TODO: Implement, but fixme_loader breaks tests.
-    (SWF::DEFINEBEHAVIOR, fixme_loader) // 44
+        (TagPair(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader)) // 45
+        // 46
+        (TagPair(SWF::DEFINEMORPHSHAPE, DefineMorphShapeTag::loader))
+        (TagPair(SWF::FRAMETAG,  fixme_loader)) // 47
+        // 48
+        (TagPair(SWF::DEFINEFONT2, DefineFontTag::loader))
+        (TagPair(SWF::GENCOMMAND,  fixme_loader)) // 49
+        (TagPair(SWF::DEFINECOMMANDOBJ, fixme_loader)) // 50
+        (TagPair(SWF::CHARACTERSET,  fixme_loader)) // 51
+        (TagPair(SWF::FONTREF, fixme_loader)) // 52
 
-    (SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader) // 45
-    // 46
-    (SWF::DEFINEMORPHSHAPE, DefineMorphShapeTag::loader)
-    (SWF::FRAMETAG,  fixme_loader) // 47
-    // 48
-    (SWF::DEFINEFONT2, DefineFontTag::loader)
-    (SWF::GENCOMMAND,  fixme_loader) // 49
-    (SWF::DEFINECOMMANDOBJ, fixme_loader) // 50
-    (SWF::CHARACTERSET,  fixme_loader) // 51
-    (SWF::FONTREF, fixme_loader) // 52
+        // TODO: Implement, but fixme_loader breaks tests.
+        (TagPair(SWF::DEFINEFUNCTION, fixme_loader)) // 53 
+        (TagPair(SWF::PLACEFUNCTION, fixme_loader)) // 54 
+        (TagPair(SWF::GENTAGOBJECT, fixme_loader)) // 55 
 
-    // TODO: Implement, but fixme_loader breaks tests.
-    (SWF::DEFINEFUNCTION, fixme_loader) // 53 
-    (SWF::PLACEFUNCTION, fixme_loader) // 54 
-    (SWF::GENTAGOBJECT, fixme_loader) // 55 
+        (TagPair(SWF::EXPORTASSETS, export_loader)) // 56
+        (TagPair(SWF::IMPORTASSETS, import_loader)) // 57
 
-    (SWF::EXPORTASSETS, export_loader) // 56
-    (SWF::IMPORTASSETS, import_loader) // 57
+        //  We're not an authoring tool so we don't care.
+        // (might be nice to dump the password instead..)
+        (TagPair(SWF::ENABLEDEBUGGER, null_loader))    // 58
 
-    //  We're not an authoring tool so we don't care.
-    // (might be nice to dump the password instead..)
-    (SWF::ENABLEDEBUGGER, null_loader)    // 58
+        // 59
+        (TagPair(SWF::INITACTION, DoInitActionTag::loader)) 
+        // 60
+        (TagPair(SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader))
+        // 61
+        (TagPair(SWF::VIDEOFRAME, VideoFrameTag::loader))
 
-    // 59
-    (SWF::INITACTION, DoInitActionTag::loader) 
-    // 60
-    (SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader)
-    // 61
-    (SWF::VIDEOFRAME, VideoFrameTag::loader)
+        // 62, DEFINEFONTINFO2 is done above.
+        // We're not an authoring tool.
+        (TagPair(SWF::DEBUGID, null_loader)) // 63
 
-    // 62, DEFINEFONTINFO2 is done above.
-    // We're not an authoring tool.
-    (SWF::DEBUGID, null_loader) // 63
+        //  We're not an authoring tool so we don't care.
+        // (might be nice to dump the password instead..)
+        (TagPair(SWF::ENABLEDEBUGGER2, null_loader))    // 64
+        (TagPair(SWF::SCRIPTLIMITS, ScriptLimitsTag::loader)) //65
 
-    //  We're not an authoring tool so we don't care.
-    // (might be nice to dump the password instead..)
-    (SWF::ENABLEDEBUGGER2, null_loader)    // 64
-    (SWF::SCRIPTLIMITS, ScriptLimitsTag::loader) //65
+        // TODO: Fix this, but probably not critical.
+        (TagPair(SWF::SETTABINDEX, SetTabIndexTag::loader)) //66 
 
-    // TODO: Fix this, but probably not critical.
-    (SWF::SETTABINDEX, SetTabIndexTag::loader) //66 
-
-    // TODO: Alexis reference says these are 83, 84. The 67, 68 comes from
-    // Tamarin. Figure out which one is correct (possibly both are).
-    // 67
-    (SWF::DEFINESHAPE4_, DefineShapeTag::loader)
-    // 68
-    (SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader)
-    // 69
-    (SWF::FILEATTRIBUTES, file_attributes_loader)
-    // 70
-    (SWF::PLACEOBJECT3, PlaceObject2Tag::loader)
-    // 71
-    (SWF::IMPORTASSETS2, import_loader)
-    // 73
-    (SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader)
-    // 74
-    (SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader)
-    // 75
-    (SWF::DEFINEFONT3, DefineFontTag::loader)
-    // 77
-    (SWF::METADATA, metadata_loader)
-    // 78
-    (SWF::DEFINESCALINGGRID, DefineScalingGridTag::loader)
-    // 83
-    (SWF::DEFINESHAPE4, DefineShapeTag::loader)
-    // 84
-    (SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader)
-    // 88
-    (SWF::DEFINEFONTNAME, DefineFontNameTag::loader)
-    // 777
-    (SWF::REFLEX, reflex_loader)
+        // TODO: Alexis reference says these are 83, 84. The 67, 68 comes from
+        // Tamarin. Figure out which one is correct (possibly both are).
+        // 67
+        (TagPair(SWF::DEFINESHAPE4_, DefineShapeTag::loader))
+        // 68
+        (TagPair(SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader))
+        // 69
+        (TagPair(SWF::FILEATTRIBUTES, file_attributes_loader))
+        // 70
+        (TagPair(SWF::PLACEOBJECT3, PlaceObject2Tag::loader))
+        // 71
+        (TagPair(SWF::IMPORTASSETS2, import_loader))
+        // 73
+        (TagPair(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader))
+        // 74
+        (TagPair(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader))
+        // 75
+        (TagPair(SWF::DEFINEFONT3, DefineFontTag::loader))
+        // 77
+        (TagPair(SWF::METADATA, metadata_loader))
+        // 78
+        (TagPair(SWF::DEFINESCALINGGRID, DefineScalingGridTag::loader))
+        // 83
+        (TagPair(SWF::DEFINESHAPE4, DefineShapeTag::loader))
+        // 84
+        (TagPair(SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader))
+        // 88
+        (TagPair(SWF::DEFINEFONTNAME, DefineFontNameTag::loader))
+        // 777
+        (TagPair(SWF::REFLEX, reflex_loader))
 
 #ifdef ENABLE_AVM2
-    // The following tags are AVM2 only.
-    // 72 -- AS3 codeblock.
-    (SWF::DOABC, DoABCTag::loader) 
-    // 76
-    (SWF::SYMBOLCLASS, SymbolClassTag::loader)
-    // 82
-    (SWF::DOABCDEFINE, DoABCTag::loader)
-    // 86
-    (SWF::DEFINESCENEANDFRAMELABELDATA,
-            DefineSceneAndFrameLabelDataTag::loader)
+        // The following tags are AVM2 only.
+        // 72 -- AS3 codeblock.
+        (TagPair(SWF::DOABC, DoABCTag::loader)) 
+        // 76
+        (TagPair(SWF::SYMBOLCLASS, SymbolClassTag::loader))
+        // 82
+        (TagPair(SWF::DOABCDEFINE, DoABCTag::loader))
+        // 86
+        (TagPair(SWF::DEFINESCENEANDFRAMELABELDATA,
+                DefineSceneAndFrameLabelDataTag::loader))
 #endif
-    ;
+        ;
 
     std::for_each(tags.begin(), tags.end(), AddLoader(table));
 
