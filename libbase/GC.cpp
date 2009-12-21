@@ -38,163 +38,163 @@ unsigned int GC::maxNewCollectablesCount = 64;
 GC&
 GC::init(GcRoot& root)
 {
-	assert(!_singleton);
-	_singleton = new GC(root);
-	char *gcgap = std::getenv("GNASH_GC_TRIGGER_THRESHOLD");
-	if ( gcgap )
-	{
-		unsigned int gap = strtoul(gcgap, NULL, 0);
-		_singleton->maxNewCollectablesCount = gap;
-	}
-	return *_singleton;
+    assert(!_singleton);
+    _singleton = new GC(root);
+    char *gcgap = std::getenv("GNASH_GC_TRIGGER_THRESHOLD");
+    if ( gcgap )
+    {
+        unsigned int gap = strtoul(gcgap, NULL, 0);
+        _singleton->maxNewCollectablesCount = gap;
+    }
+    return *_singleton;
 }
 
 GC&
 GC::get()
 {
-	assert(_singleton);
-	return *_singleton;
+    assert(_singleton);
+    return *_singleton;
 }
 
 void
 GC::cleanup()
 {
-	assert(_singleton);
-	delete _singleton;
-	_singleton = NULL;
+    assert(_singleton);
+    delete _singleton;
+    _singleton = NULL;
 }
 
 GC::~GC()
 {
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC deleted, deleting all managed resources - collector run %d times"), _collectorRuns);
+    log_debug(_("GC deleted, deleting all managed resources - collector run %d times"), _collectorRuns);
 #endif
 
 #if 1
-	for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
-	{
-		delete *i;
-	}
+    for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
+    {
+        delete *i;
+    }
 #endif
 }
 
 size_t
 GC::cleanUnreachable()
 {
-	size_t deleted = 0;
+    size_t deleted = 0;
 
 #if (GNASH_GC_DEBUG > 1)
-	log_debug(_("GC: sweep scan started"));
+    log_debug(_("GC: sweep scan started"));
 #endif
 
-	for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
-	{
-		const GcResource* res = *i;
-		if ( ! res->isReachable() )
-		{
+    for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
+    {
+        const GcResource* res = *i;
+        if ( ! res->isReachable() )
+        {
 #if GNASH_GC_DEBUG > 1
-			log_debug(_("GC: recycling object %p (%s)"), res, typeName(*res));
+            log_debug(_("GC: recycling object %p (%s)"), res, typeName(*res));
 #endif
-			++deleted;
-			delete res;
-			i = _resList.erase(i); // _resListSize updated at end of loop
-		}
-		else
-		{
-			res->clearReachable();
-			++i;
-		}
-	}
+            ++deleted;
+            delete res;
+            i = _resList.erase(i); // _resListSize updated at end of loop
+        }
+        else
+        {
+            res->clearReachable();
+            ++i;
+        }
+    }
 
-	_resListSize -= deleted;
+    _resListSize -= deleted;
 
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC: recycled %d unreachable resources - %d left"),
-			deleted, _resListSize);
+    log_debug(_("GC: recycled %d unreachable resources - %d left"),
+            deleted, _resListSize);
 #endif
 
 
-	return deleted;
+    return deleted;
 }
 
 void 
 GC::collect()
 {
-	// Heuristic to decide wheter or not to run the collection cycle
-	//
-	//
-	// Things to consider:
-	//
-	//  - Cost 
-	//      - Depends on the number of reachable collectables
-	//      - Depends on the frequency of runs
-	//
-	//  - Advantages 
-	//      - Depends on the number of unreachable collectables
-	//
-	//  - Cheaply computable informations
-	//      - Number of collectables (currently O(n) but can be optimized)
-	//      - Total heap-allocated memory (currently unavailable)
-	//
-	// Current heuristic:
-	//
-	//  - We run the cycle again if X new collectables were allocated
-	//    since last cycle run. X defaults to maxNewCollectablesCount
-	//    and can be changed by user (GNASH_GC_TRIGGER_THRESHOLD env
-	//    variable).
-	//
-	// Possible improvements:
-	//
-	//  - Adapt X (maxNewCollectablesCount) based on cost/advantage
-	//    runtime analisys
-	//
+    // Heuristic to decide wheter or not to run the collection cycle
+    //
+    //
+    // Things to consider:
+    //
+    //  - Cost 
+    //      - Depends on the number of reachable collectables
+    //      - Depends on the frequency of runs
+    //
+    //  - Advantages 
+    //      - Depends on the number of unreachable collectables
+    //
+    //  - Cheaply computable informations
+    //      - Number of collectables (currently O(n) but can be optimized)
+    //      - Total heap-allocated memory (currently unavailable)
+    //
+    // Current heuristic:
+    //
+    //  - We run the cycle again if X new collectables were allocated
+    //    since last cycle run. X defaults to maxNewCollectablesCount
+    //    and can be changed by user (GNASH_GC_TRIGGER_THRESHOLD env
+    //    variable).
+    //
+    // Possible improvements:
+    //
+    //  - Adapt X (maxNewCollectablesCount) based on cost/advantage
+    //    runtime analisys
+    //
 
-	if ( _resListSize <  _lastResCount + maxNewCollectablesCount )
-	{
+    if ( _resListSize <  _lastResCount + maxNewCollectablesCount )
+    {
 #if GNASH_GC_DEBUG  > 1
-		log_debug(_("GC: collection cycle skipped - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, maxNewCollectablesCount, _lastResCount, _resListSize);
+        log_debug(_("GC: collection cycle skipped - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, maxNewCollectablesCount, _lastResCount, _resListSize);
 #endif // GNASH_GC_DEBUG
-		return;
-	}
+        return;
+    }
 
-	//
-	// Collection cycle
-	//
+    //
+    // Collection cycle
+    //
 
 #ifdef GNASH_GC_DEBUG 
-	++_collectorRuns;
+    ++_collectorRuns;
 #endif
 
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC: collection cycle started - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, maxNewCollectablesCount, _lastResCount, _resListSize);
+    log_debug(_("GC: collection cycle started - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, maxNewCollectablesCount, _lastResCount, _resListSize);
 #endif // GNASH_GC_DEBUG
 
 #ifndef NDEBUG
-	boost::thread self;
-	assert(self == mainThread);
+    boost::thread self;
+    assert(self == mainThread);
 #endif
 
-	// Mark all resources as reachable
-	markReachable();
+    // Mark all resources as reachable
+    markReachable();
 
-	// clean unreachable resources, and mark the others as reachable again
-	cleanUnreachable();
+    // clean unreachable resources, and mark the others as reachable again
+    cleanUnreachable();
 
-	_lastResCount = _resListSize;
+    _lastResCount = _resListSize;
 
-	//assert(_lastResCount == _resList.size()); // O(n)...
+    //assert(_lastResCount == _resList.size()); // O(n)...
 
 }
 
 void
 GC::countCollectables(CollectablesCount& count) const
 {
-	for (ResList::const_iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
-	{
-		const GcResource* res = *i;
-		std::string type = typeName(*res);
-		count[type]++;
-	}
+    for (ResList::const_iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
+    {
+        const GcResource* res = *i;
+        std::string type = typeName(*res);
+        count[type]++;
+    }
 }
 
 } // end of namespace gnash

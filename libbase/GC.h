@@ -68,17 +68,17 @@ class GcRoot
 
 public:
 
-	/// Scan all GC resources reachable by this instance.
-	//
-	/// This function is invoked on roots registered to
-	/// the collector.
-	///
-	/// Use setReachable() on the resources stored in this
-	/// container.
-	///
-	virtual void markReachableResources() const=0;
+    /// Scan all GC resources reachable by this instance.
+    //
+    /// This function is invoked on roots registered to
+    /// the collector.
+    ///
+    /// Use setReachable() on the resources stored in this
+    /// container.
+    ///
+    virtual void markReachableResources() const=0;
 
-	virtual ~GcRoot() {}
+    virtual ~GcRoot() {}
 };
 
 /// Collectable resource
@@ -90,85 +90,85 @@ class GcResource
 
 public:
 
-	friend class GC;
+    friend class GC;
 
-	/// Create a Garbage-collected resource.
-	//
-	/// The resource will be automatically registered with
-	/// the garbage collector singleton.
-	///
-	GcResource();
+    /// Create a Garbage-collected resource.
+    //
+    /// The resource will be automatically registered with
+    /// the garbage collector singleton.
+    ///
+    GcResource();
 
-	/// \brief
-	/// Mark this resource as being reachable, possibly triggering
-	/// further marking of all resources reachable by this object.
-	//
-	/// If the object wasn't reachable before, this call triggers
-	/// scan of all contained objects too...
-	///
-	void setReachable() const
-	{
+    /// \brief
+    /// Mark this resource as being reachable, possibly triggering
+    /// further marking of all resources reachable by this object.
+    //
+    /// If the object wasn't reachable before, this call triggers
+    /// scan of all contained objects too...
+    ///
+    void setReachable() const
+    {
 
-		if ( _reachable )
-		{
+        if ( _reachable )
+        {
 #if GNASH_GC_DEBUG > 2
-			log_debug(_("Instance %p of class %s already reachable, setReachable doing nothing"),
-					(void*)this, typeName(*this));
+            log_debug(_("Instance %p of class %s already reachable, setReachable doing nothing"),
+                    (void*)this, typeName(*this));
 #endif
-			return;
-		}
+            return;
+        }
 
 #if GNASH_GC_DEBUG  > 2
-		log_debug(_("Instance %p of class %s set to reachable, scanning reachable resources from it"),
-				(void*)this, typeid(*this).name());
+        log_debug(_("Instance %p of class %s set to reachable, scanning reachable resources from it"),
+                (void*)this, typeid(*this).name());
 #endif
 
-		_reachable = true;
-		markReachableResources();
-	}
+        _reachable = true;
+        markReachableResources();
+    }
 
-	/// Return true if this object is marked as reachable
-	bool isReachable() const { return _reachable; }
+    /// Return true if this object is marked as reachable
+    bool isReachable() const { return _reachable; }
 
-	/// Clear the reachable flag
-	void clearReachable() const { _reachable = false; }
+    /// Clear the reachable flag
+    void clearReachable() const { _reachable = false; }
 
 protected:
 
-	/// Scan all GC resources reachable by this instance.
-	//
-	/// This function is invoked everytime this object
-	/// switches from unreachable to reachable, and is
-	/// used to recursively mark all contained resources
-	/// as reachable.
-	///
-	/// See setReachable(), which is the function to invoke
-	/// against all reachable methods.
-	///
-	/// Feel free to assert(_reachable) in your implementation.
-	///
-	/// The default implementation doesn't mark anything.
-	///
-	virtual void markReachableResources() const
-	{
-		assert(_reachable);
+    /// Scan all GC resources reachable by this instance.
+    //
+    /// This function is invoked everytime this object
+    /// switches from unreachable to reachable, and is
+    /// used to recursively mark all contained resources
+    /// as reachable.
+    ///
+    /// See setReachable(), which is the function to invoke
+    /// against all reachable methods.
+    ///
+    /// Feel free to assert(_reachable) in your implementation.
+    ///
+    /// The default implementation doesn't mark anything.
+    ///
+    virtual void markReachableResources() const
+    {
+        assert(_reachable);
 #if GNASH_GC_DEBUG > 1
-		log_debug(_("Class %s didn't override the markReachableResources() method"), typeid(*this).name());
+        log_debug(_("Class %s didn't override the markReachableResources() method"), typeid(*this).name());
 #endif
-	}
+    }
 
-	/// Delete this resource.
-	//
-	/// This is protected to allow subclassing, but ideally it
-	/// sould be private, so only the GC is allowed to delete us.
-	///
-	virtual ~GcResource()
-	{
-	}
+    /// Delete this resource.
+    //
+    /// This is protected to allow subclassing, but ideally it
+    /// sould be private, so only the GC is allowed to delete us.
+    ///
+    virtual ~GcResource()
+    {
+    }
 
 private:
 
-	mutable bool _reachable;
+    mutable bool _reachable;
 
 };
 
@@ -191,148 +191,148 @@ class DSOEXPORT GC
 
 public:
 
-	/// Init the singleton instance using the given GcRoot
-	//
-	static GC& init(GcRoot& r);
+    /// Init the singleton instance using the given GcRoot
+    //
+    static GC& init(GcRoot& r);
 
-	/// Delete the singleton. You'll need to call init() again
-	/// after this call, if you want to use the singleton.
-	//
-	/// See init(GcRoot&)
-	///
-	static void cleanup();
+    /// Delete the singleton. You'll need to call init() again
+    /// after this call, if you want to use the singleton.
+    //
+    /// See init(GcRoot&)
+    ///
+    static void cleanup();
 
-	/// Get the singleton 
-	//
-	/// An assertion will fail if the GC has not been initialized yet.
-	/// See init(GcRoot&).
-	///
-	static GC& get();
+    /// Get the singleton 
+    //
+    /// An assertion will fail if the GC has not been initialized yet.
+    /// See init(GcRoot&).
+    ///
+    static GC& get();
 
-	/// Add an heap object to the list of managed collectables
-	//
-	/// The given object is expected not to be already in the
-	/// list. Failing to do so would just decrease performances
-	/// but might not be a problem. Anyway, an assertion will fail
-	/// if adding an object twice.
-	///
-	/// PRECONDITIONS:
-	///	- the object isn't already in this GC list.
-	///	- the object isn't marked as reachable.
-	///	- the object isn't managed by another GC (UNCHECKED)
-	///
-	/// @param item
-	///	The item to be managed by this collector.
-	///	Can't be NULL. The caller gives up ownerhip
-	///	of it, which will only be deleted by this GC.
-	///
-	void addCollectable(const GcResource* item)
-	{
+    /// Add an heap object to the list of managed collectables
+    //
+    /// The given object is expected not to be already in the
+    /// list. Failing to do so would just decrease performances
+    /// but might not be a problem. Anyway, an assertion will fail
+    /// if adding an object twice.
+    ///
+    /// PRECONDITIONS:
+    /// - the object isn't already in this GC list.
+    /// - the object isn't marked as reachable.
+    /// - the object isn't managed by another GC (UNCHECKED)
+    ///
+    /// @param item
+    /// The item to be managed by this collector.
+    /// Can't be NULL. The caller gives up ownerhip
+    /// of it, which will only be deleted by this GC.
+    ///
+    void addCollectable(const GcResource* item)
+    {
 #ifndef NDEBUG
-		boost::thread self;
-		assert(self == mainThread);
-		assert(item);
-		assert(! item->isReachable());
-		// The following assertion is expensive ...
-		//assert(std::find(_resList.begin(), _resList.end(), item) == _resList.end());
+        boost::thread self;
+        assert(self == mainThread);
+        assert(item);
+        assert(! item->isReachable());
+        // The following assertion is expensive ...
+        //assert(std::find(_resList.begin(), _resList.end(), item) == _resList.end());
 #endif
 
-		_resList.push_back(item); ++_resListSize;
+        _resList.push_back(item); ++_resListSize;
 #if GNASH_GC_DEBUG > 1
-		log_debug(_("GC: collectable %p added, num collectables: %d"), item, _resListSize);
+        log_debug(_("GC: collectable %p added, num collectables: %d"), item, _resListSize);
 #endif
-	}
+    }
 
 
-	/// Run the collector
-	//
-	/// Find all reachable collectables, destroy all the others.
-	///
-	void collect();
+    /// Run the collector
+    //
+    /// Find all reachable collectables, destroy all the others.
+    ///
+    void collect();
 
-	typedef std::map<std::string, unsigned int> CollectablesCount;
+    typedef std::map<std::string, unsigned int> CollectablesCount;
 
-	/// Count collectables
-	void countCollectables(CollectablesCount& count) const;
+    /// Count collectables
+    void countCollectables(CollectablesCount& count) const;
 
 private:
 
-	/// Number of newly registered collectable since last collection run
-	/// triggering next collection.
-	static unsigned int maxNewCollectablesCount;
+    /// Number of newly registered collectable since last collection run
+    /// triggering next collection.
+    static unsigned int maxNewCollectablesCount;
 
-	/// Create a garbage collector, using the given root
-	GC(GcRoot& root)
-		:
-		_resListSize(0),
-		_root(root),
-		_lastResCount(0)
+    /// Create a garbage collector, using the given root
+    GC(GcRoot& root)
+        :
+        _resListSize(0),
+        _root(root),
+        _lastResCount(0)
 #ifdef GNASH_GC_DEBUG 
-		, _collectorRuns(0)
+        , _collectorRuns(0)
 #endif
-	{
+    {
 #ifdef GNASH_GC_DEBUG 
-		log_debug(_("GC %p created"), (void*)this);
+        log_debug(_("GC %p created"), (void*)this);
 #endif
-	}
+    }
 
-	/// Destroy the collector, releasing all collectables.
-	~GC();
+    /// Destroy the collector, releasing all collectables.
+    ~GC();
 
-	/// List of collectables
-	typedef std::list<const GcResource *> ResList;
+    /// List of collectables
+    typedef std::list<const GcResource *> ResList;
 
-	/// Mark all reachable resources
-	void markReachable()
-	{
+    /// Mark all reachable resources
+    void markReachable()
+    {
 #if GNASH_GC_DEBUG > 2
-		log_debug(_("GC %p: MARK SCAN"), (void*)this);
+        log_debug(_("GC %p: MARK SCAN"), (void*)this);
 #endif
-		_root.markReachableResources();
-	}
+        _root.markReachableResources();
+    }
 
-	/// Delete all unreachable objects, and mark the others unreachable again
-	//
-	/// @return number of objects deleted
-	///
-	size_t cleanUnreachable();
+    /// Delete all unreachable objects, and mark the others unreachable again
+    //
+    /// @return number of objects deleted
+    ///
+    size_t cleanUnreachable();
 
-	/// List of collectable resources
-	ResList _resList;
+    /// List of collectable resources
+    ResList _resList;
 
-	// Size of the list above, to avoid the
-	// cost of computing it  ..
-	// .. this is O(n) on GNU stdc++ lib !
-	//
-	ResList::size_type _resListSize;
+    // Size of the list above, to avoid the
+    // cost of computing it  ..
+    // .. this is O(n) on GNU stdc++ lib !
+    //
+    ResList::size_type _resListSize;
 
-	GcRoot& _root;
+    GcRoot& _root;
 
-	static GC* _singleton;
+    static GC* _singleton;
 
 #ifndef NDEBUG
-	/// The thread that initialized the GC is 
-	/// the only one allowed to run the collector
-	/// and to register collectable objects
-	boost::thread mainThread;
+    /// The thread that initialized the GC is 
+    /// the only one allowed to run the collector
+    /// and to register collectable objects
+    boost::thread mainThread;
 #endif
 
-	/// Number of resources in collectable list at end of last
-	/// collect() call.
-	ResList::size_type _lastResCount;
+    /// Number of resources in collectable list at end of last
+    /// collect() call.
+    ResList::size_type _lastResCount;
 
 #ifdef GNASH_GC_DEBUG 
-	/// Number of times the collector runs (stats/profiling)
-	size_t _collectorRuns;
+    /// Number of times the collector runs (stats/profiling)
+    size_t _collectorRuns;
 #endif
 };
 
 
 inline GcResource::GcResource()
-	:
-	_reachable(false)
+    :
+    _reachable(false)
 {
-	GC::get().addCollectable(this);
+    GC::get().addCollectable(this);
 }
 
 } // namespace gnash
