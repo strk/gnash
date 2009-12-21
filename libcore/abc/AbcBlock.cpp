@@ -47,7 +47,7 @@ Trait::finalize(AbcBlock *block, abc::Class* script, bool do_static)
         case KIND_CONST:
         {
             // Validate the type.
-            abc::Class *type;
+            abc::Class* type;
             if (_typeIndex) {
                 log_abc("Trait type: %s", 
                     block->_stringPool[
@@ -77,40 +77,34 @@ Trait::finalize(AbcBlock *block, abc::Class* script, bool do_static)
                 _value, _kind == KIND_CONST, do_static);
             break;
         }
+
         case KIND_METHOD:
-        {
             script->addMethod(_globalName, _namespace, _method, false);
             break;
-        }
+        
         case KIND_GETTER:
-        {
             script->addGetter(_name, _namespace, _method, do_static);
             break;
-        }
+
         case KIND_SETTER:
-        {
             script->addSetter(_name, _namespace, _method, do_static);
             break;
-        }
+        
         case KIND_CLASS:
-        {
             log_abc("Adding class %s, value %s, slot=%u",
                     block->_stringPool[_name], _value, _slotID);
-
             script->addMemberScript(_globalName, _namespace, _slotID, 
                 block->_classes[_classInfoIndex], do_static);
             break;
-        }
+
         case KIND_FUNCTION:
-        {
-            script->addSlotFunction(_name, _namespace, _slotID, _method, do_static);
+            script->addSlotFunction(_name, _namespace, _slotID, _method,
+                    do_static);
             break;
-        }
+
         default:
-            // Not here -- validated already in read.
             return false;
-            break;
-	} // end of switch
+	} 
 	return true;
 }
 
@@ -120,63 +114,63 @@ Trait::finalize_mbody(AbcBlock *block, Method *pMethod)
 	log_abc("Finalizing method trait: kind %s", _kind);
 	switch (_kind)
 	{
-	case KIND_SLOT:
-	case KIND_CONST:
-	{
-		// Validate the type.
-		abc::Class *type;
-		if (_typeIndex) {
-			type = block->locateClass(block->_multinamePool[_typeIndex]);
-        }
-		else {
-			type = block->mTheObject;
-        }
+        case KIND_SLOT:
+        case KIND_CONST:
+        {
+            // Validate the type.
+            abc::Class *type;
+            if (_typeIndex) {
+                type = block->locateClass(block->_multinamePool[_typeIndex]);
+            }
+            else {
+                type = block->mTheObject;
+            }
 
-		if (!type) {
-			log_error(_("ABC: Finalizing trait yielded bad type for slot."));
-			return false;
-		}
+            if (!type) {
+                log_error(_("ABC: Finalizing trait yielded bad type for slot."));
+                return false;
+            }
 
-		// The name has been validated in read.
-		// TODO: Find a better way to initialize trait values.
-		if (!_hasValue) {
-			_value = as_value((as_object*)0); // NULL value, right ?
-		}
-		log_abc("Adding property=%s with value=%s slot=%u",
-                block->_stringPool[_name], _value.toDebugString(), _slotID);
-		pMethod->addValue(_globalName, _namespace, _slotID, type, 
-			_value, _kind == KIND_CONST);
-		break;
-	}
-	case KIND_METHOD:
-	{
-		pMethod->addMethod(_name, _namespace, _method);
-		break;
-	}
-	case KIND_GETTER:
-	{
-		pMethod->addGetter(_name, _namespace, _method);
-		break;
-	}
-	case KIND_SETTER:
-	{
-		pMethod->addSetter(_name, _namespace, _method);
-		break;
-	}
-	case KIND_CLASS:
-	{
-		pMethod->addMemberScript(_name, _namespace, _slotID, 
-			block->_classes[_classInfoIndex]);
-		break;
-	}
-	case KIND_FUNCTION:
-	{
-		pMethod->addSlotFunction(_name, _namespace, _slotID, _method);
-		break;
-	}
-	default:
-		// Not here -- validated already in read.
-		return false;
+            // The name has been validated in read.
+            // TODO: Find a better way to initialize trait values.
+            if (!_hasValue) {
+                _value = as_value((as_object*)0); // NULL value, right ?
+            }
+            log_abc("Adding property=%s with value=%s slot=%u",
+                    block->_stringPool[_name], _value.toDebugString(), _slotID);
+            pMethod->addValue(_globalName, _namespace, _slotID, type, 
+                _value, _kind == KIND_CONST);
+            break;
+        }
+        case KIND_METHOD:
+        {
+            pMethod->addMethod(_name, _namespace, _method);
+            break;
+        }
+        case KIND_GETTER:
+        {
+            pMethod->addGetter(_name, _namespace, _method);
+            break;
+        }
+        case KIND_SETTER:
+        {
+            pMethod->addSetter(_name, _namespace, _method);
+            break;
+        }
+        case KIND_CLASS:
+        {
+            pMethod->addMemberScript(_name, _namespace, _slotID, 
+                block->_classes[_classInfoIndex]);
+            break;
+        }
+        case KIND_FUNCTION:
+        {
+            pMethod->addSlotFunction(_name, _namespace, _slotID, _method);
+            break;
+        }
+        default:
+            // Not here -- validated already in read.
+            return false;
 	} 
 	return true;
 }
@@ -275,16 +269,13 @@ Trait::read(SWFStream* in, AbcBlock *block)
         default:
         {
             log_error(_("ABC: Unknown type of trait."));
-    //		return false;
         }
-	} // end of switch statement
+	}
 
 	// Ignore the metadata, but it must be read to know how to ignore it.
-	if ((kind >> 4) & 0x04) // has metadata
-	{
+	if ((kind >> 4) & 0x04) {
 		boost::uint32_t mcount = in->read_V32();
-		for (unsigned int i = 0; i < mcount; ++i)
-		{
+		for (size_t i = 0; i < mcount; ++i) {
 			in->skip_V32();
 		}
 	}
