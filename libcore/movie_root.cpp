@@ -271,7 +271,7 @@ movie_root::cleanupAndCollect()
 
 	cleanupUnloadedListeners();
 	cleanupDisplayList();
-	GC::get().collect();
+	GC::get().fuzzyCollect();
 }
 
 /* private */
@@ -531,7 +531,7 @@ movie_root::clear()
 
 #ifdef GNASH_USE_GC
 	// Run the garbage collector again
-	GC::get().collect();
+	GC::get().fuzzyCollect();
 #endif
 
 	setInvalidated();

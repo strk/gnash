@@ -245,12 +245,54 @@ public:
 #endif
     }
 
+    /// Run the collector, if worth it
+    void fuzzyCollect()
+    {
+        // Heuristic to decide wheter or not to run the collection cycle
+        //
+        //
+        // Things to consider:
+        //
+        //  - Cost 
+        //      - Depends on the number of reachable collectables
+        //      - Depends on the frequency of runs
+        //
+        //  - Advantages 
+        //      - Depends on the number of unreachable collectables
+        //
+        //  - Cheaply computable informations
+        //      - Number of collectables (currently O(n) but can be optimized)
+        //      - Total heap-allocated memory (currently unavailable)
+        //
+        // Current heuristic:
+        //
+        //  - We run the cycle again if X new collectables were allocated
+        //    since last cycle run. X defaults to maxNewCollectablesCount
+        //    and can be changed by user (GNASH_GC_TRIGGER_THRESHOLD env
+        //    variable).
+        //
+        // Possible improvements:
+        //
+        //  - Adapt X (maxNewCollectablesCount) based on cost/advantage
+        //    runtime analisys
+        //
 
-    /// Run the collector
+        if ( _resListSize <  _lastResCount + maxNewCollectablesCount )
+        {
+#if GNASH_GC_DEBUG  > 1
+            log_debug(_("GC: collection cycle skipped - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, maxNewCollectablesCount, _lastResCount, _resListSize);
+#endif // GNASH_GC_DEBUG
+            return;
+        }
+
+        runCycle();
+    }
+
+    /// Run the collection cycle
     //
     /// Find all reachable collectables, destroy all the others.
     ///
-    void collect();
+    void runCycle();
 
     typedef std::map<std::string, unsigned int> CollectablesCount;
 

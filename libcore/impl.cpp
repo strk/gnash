@@ -80,7 +80,7 @@ void  clear()
     fontlib::clear();
 
 #ifdef GNASH_USE_GC 
-    GC::get().collect();
+    GC::get().fuzzyCollect(); // why would this be needed ?
 
     GC::cleanup();
 #endif
