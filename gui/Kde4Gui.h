@@ -127,6 +127,7 @@ public:
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(const char* windowtitle, int width, int height,
                               int xPosition = 0, int yPosition = 0);
+    virtual void resizeWindow(int width, int height);
     virtual bool run();
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);

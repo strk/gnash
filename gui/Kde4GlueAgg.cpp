@@ -95,16 +95,10 @@ Kde4AggGlue::render()
 void
 Kde4AggGlue::render(const QRect& updateRect)
 {
-
-// log_debug("Render region: %d, %d, %d, %d", updateRect.topLeft().x(),
-//updateRect.topLeft().y(), updateRect.bottomRight().x(),
-//updateRect.bottomRight().y());
-
     QPainter p(_drawing_area);
    
     p.drawImage(updateRect, *_image, updateRect);
     p.end();
-
 }
 
 

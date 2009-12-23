@@ -164,15 +164,24 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height,
     _validbounds.setTo(0, 0, _width, _height);
     _glue.initBuffer(_width, _height);
     
-    log_debug(_q("Setting renderer"));
+    log_debug(_("Setting renderer"));
 
     _runResources.setRenderer(_renderer);
     
-    log_debug(_q("Set renderer"));
+    log_debug(_("Set renderer"));
    
     return true;
 }
 
+
+void
+Kde4Gui::resizeWindow(int width, int height)
+{
+    _width = width;
+    _height = height;
+
+    _drawingWidget->setMinimumSize(_width, _height);
+}
 
 void
 Kde4Gui::popupMenu(const QPoint& point)
