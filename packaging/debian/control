@@ -16,9 +16,8 @@ Package: gnash-common
 Section: libs
 Architecture: any
 Depends: ${misc:Depends}, libgstreamer-plugins-base0.10-0, libgstreamer0.10-0, libxml2, libgif4, libfreetype6, zlib1g, libstdc++6, libcairo2, libexpat1, libfontconfig1, libx11-6, libbz2-1.0, libboost-thread1.40.0 | libboost-thread1.39 | libboost-thread1.38.0 | libboost-thread1.37 | libboost-thread1.36 | libboost-thread1.35.0 | libboost-thread1.34.1 | libboost-thread, libboost-date-time1.40.0 | libboost-date-time1.39 | libboost-date-time1.38.0 | libboost-date-time1.37 | libboost-date-time1.36 | libboost-date-time1.35.0 |  libboost-date-time1.34.1 | libboost-date-time
-#Suggests: gstreamer0.10-fluendo-mp3  gstreamer0.10-alsa gstreamer0.10-ffmpeg
-Conflicts: libgnash0 (<< 0.8.5~), gnash (<< 0.8.5~), libklash0 (<< 0.8.5~)
-Replaces: libgnash0 (<< 0.8.5~), gnash (<< 0.8.5~), libklash0 (<< 0.8.5~)
+Suggests: gstreamer0.10-fluendo-mp3, gstreamer0.10-alsa, gstreamer0.10-ffmpeg
+Replaces: gnash-common (<< 0.8.5~)
 Description: free SWF movie player - common files/libraries
  Gnash is a free Flash movie player, which works either standalone, or as
  plugin for Firefox/Mozilla or Konqueror.
@@ -30,6 +29,7 @@ Description: free SWF movie player - common files/libraries
 Package: gnash
 Section: utils
 Architecture: any
+Replaces: gnash (<< 0.8.5~)
 Depends: gnash-common (= ${binary:Version}), libgtk2.0-0, libpango1.0-0, libatk1.0-0
 Description: free SWF movie player
  Gnash is a free Flash movie player, which works either standalone, or as
@@ -49,6 +49,7 @@ Package: klash
 Section: utils
 Architecture: any
 Depends: gnash-common (= ${binary:Version}), ${misc:Depends}, kdelibs5
+Replaces: klash (<< 0.8.5~)
 Description: free SWF movie player - standalone player for KDE
  Gnash is a free Flash movie player, which works either standalone, or as
  plugin for Firefox/Mozilla or Konqueror. Currently it is in a alpha state.
@@ -72,6 +73,7 @@ Package: gnash-tools
 Section: utils
 Architecture: any
 Depends: gnash-common (= ${binary:Version}), ${misc:Depends}
+Replaces: gnash-tools (<< 0.8.5~)
 Description: free SWF movie player - Command-line Tools
  Gnash is a free Flash movie player, which works either standalone, or as
  plugin for Firefox/Mozilla or Konqueror. Currently it is in a alpha state.
@@ -94,6 +96,7 @@ Description: free SWF movie player - Command-line Tools
 Package: gnash-cygnal
 Section: utils
 Architecture: any
+Replaces: gnash-cygnal (<< 0.8.5~)
 Depends: gnash-common (= ${binary:Version}), ${misc:Depends}, 
 Description: free SWF movie player - Media server
  Gnash is a free Flash movie player, which works either standalone, or as
@@ -117,6 +120,7 @@ Description: free SWF movie player - Media server
 Package: mozilla-plugin-gnash
 Section: utils
 Architecture: any
+Replaces: mozilla-plugin-gnash (<< 0.8.5~)
 Depends: gnash-common (= ${binary:Version}), , gnash (= ${binary:Version}), ${misc:Depends}, libgtk2.0-0, libpango1.0-0, libatk1.0-0
 Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384,92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a,aa5ca914-c309-495d-91cf-3141bbb04115
 Xb-Npp-MimeType: application/x-shockwave-flash
@@ -132,6 +136,7 @@ Description: free SWF movie player - Plugin for Mozilla and derivatives
 Package: konqueror-plugin-gnash
 Section: utils
 Architecture: any
+Replaces: konqueror-plugin-gnash (<< 0.8.5~)
 Depends: gnash-common (= ${binary:Version}), klash (= ${binary:Version}), ${misc:Depends}, kdelibs5
 Description: free SWF movie player - Plugin for Konqueror
  Gnash is a free Flash movie player, which works either standalone, or as
@@ -144,6 +149,7 @@ Description: free SWF movie player - Plugin for Konqueror
 Package: gtk-plugin-gnash
 Section: libs
 Architecture: any
+Replaces: gtk-plugin-gnash (<< 0.8.5~)
 Depends: gnash-common (= ${binary:Version}), ${misc:Depends}, python2.6-dev | python2.5-dev | python2.4-dev
 Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384,92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a,aa5ca914-c309-495d-91cf-3141bbb04115
 Xb-Npp-MimeType: application/x-shockwave-flash
