@@ -27,7 +27,7 @@ IPKG_TMP=/tmp/$(host_alias)-gnash
 # this is where the gnash gets compiled
 IPKG_BUILD=gnash-${VERSION}
 
-CLEANFILES = ipkg-*
+CLEANFILES += ipkg-*
 
 ipkg-configure: ipkg-unpack $(IPKG_BUILD)
 	-@rm -f ipkg-configure
