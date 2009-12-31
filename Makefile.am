@@ -41,7 +41,6 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-testsuite
 #--enable-cygnal
 
-
 STD_DIRS = \
 	libbase \
 	libamf \
@@ -99,6 +98,8 @@ EXTRA_DIST =  \
 # dist-hook:
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
 # 	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
+
+CLEANFILES =
 
 #
 # Build an RPM package
