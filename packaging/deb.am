@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@ snapshot-deb:
 	  mv -f $${snapshot_dir}/debian/changelog $${snapshot_dir}/debian/changelog.orig; \
 	  sed -e "s:trunk:$(BRANCH_REVNO)$(BRANCH_NICK):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
 	fi; \
-	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot)
+	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot -nc -j4)
+
+# these files are created when building packages
+CLEANFILES += *trunk*.deb *trunk*.gz *trunk*.bz2 *trunk*.changes
 
 .PHONY : deb debian snapshot-deb

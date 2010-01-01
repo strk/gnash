@@ -1,6 +1,6 @@
 // gtk.cpp: Gnome ToolKit graphical user interface, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1854,7 +1854,7 @@ GtkGui::showAboutDialog()
     gtk_about_dialog_set_name (about, "Gnash");
     gtk_about_dialog_set_version(about, VERSION);
     gtk_about_dialog_set_copyright(about, "Copyright (C) 2005, 2006, 2007, "
-            "2008, 2009 The Free Software Foundation");
+            "2008, 2009, 2010 The Free Software Foundation");
     gtk_about_dialog_set_comments (about, comments.c_str());
     gtk_about_dialog_set_authors(about, authors);
     gtk_about_dialog_set_documenters(about, documentors);
@@ -1890,7 +1890,7 @@ GtkGui::showAboutDialog()
         NULL,
         "program-name", _("Gnash"), 
         "version", VERSION,
-        "copyright", "Copyright (C) 2005, 2006, 2007, 2008, 2009 "
+        "copyright", "Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 "
                      "The Free Software Foundation",
         "comments", comments.c_str(),
         "authors", authors,

@@ -1,5 +1,5 @@
 # Czech translation of gnash.
-# Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
+# Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gnash package.
 # Petr Pisar <petr.pisar@atlas.cz>, 2007, 2008, 2009.
 #
@@ -6798,12 +6798,12 @@ msgstr "  CTRL-L                   Vynutí okamžité překreslení"
 
 #: gui/gnash.cpp:157
 msgid ""
-"Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.\n"
+"Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.\n"
 "Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute copies of Gnash under the terms of the GNU General\n"
 "Public License.  For more information, see the file named COPYING.\n"
 msgstr ""
-"Copyright © 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.\n"
+"Copyright © 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.\n"
 "Na Gnash se nevztahuje ŽÁDNÁ ZÁRUKA, jak jen zákon dovoluje.\n"
 "Kopie Gnashe smíte šířit podle podmínek GNU General Public Licence.\n"
 "Podrobnosti naleznete v souboru pojmenovaném COPYING.\n"

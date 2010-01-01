@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ noinst_HEADERS = \
 # bin_PROGRAMS = gnash
 
 noinst_LTLIBRARIES =		# set later on by conditionals
+pkglib_LTLIBRARIES =		# set later on by conditionals
 
 if  BUILD_OGL_RENDERER
 if HAVE_OPENGL
@@ -80,8 +81,8 @@ endif
 
 if  BUILD_AGG_RENDERER
 if HAVE_AGG
-noinst_LTLIBRARIES += libgnashagg.la
-#plugins_LTLIBRARIES += libgnashagg.la
+#noinst_LTLIBRARIES += libgnashagg.la
+pkglib_LTLIBRARIES += libgnashagg.la
 libgnashagg_la_SOURCES = Renderer_agg.cpp 
 #libgnashagg_la_LDFLAGS = -module -avoid-version -no-undefined
 libgnashagg_la_LIBADD = $(AGG_LIBS)

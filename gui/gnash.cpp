@@ -1,6 +1,6 @@
 // gnash.cpp:  Main routine for top-level SWF player, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ version_and_copyright()
 {
     cout << "Gnash " << VERSION << endl
         << endl
-        << _("Copyright (C) 2005, 2006, 2007, 2008, 2009 "
+        << _("Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 "
                 "Free Software Foundation, Inc.\n"
                 "Gnash comes with NO WARRANTY, to the extent permitted "
                 "by law.\nYou may redistribute copies of Gnash under the "
