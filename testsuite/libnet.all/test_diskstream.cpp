@@ -55,7 +55,7 @@ static void test_mem();
 static void create_file(const std::string &, size_t);
 
 // Enable the display of memory allocation and timing data
-static bool memdebug = false;
+// static bool memdebug = false;
 
 TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -170,8 +170,8 @@ test()
     if ((ds2.get() == MAP_FAILED) || (ds2.get() == 0)) {
         runtest.unresolved("loadToMem(6789)");
     } else {
-        if ((memcmp(ds2.get(), buf+4, range-4) == 0)
-            && (memcmp(ptr, buf+4, range-4) == 0)) {
+        if ((memcmp(ds2.get(), buf, range-4) == 0)
+            && (memcmp(ptr, buf, range-4) == 0)) {
             runtest.pass("loadToMem(6789)");
         } else {
             runtest.fail("loadToMem(6789)");
@@ -183,8 +183,8 @@ test()
     if ((ds2.get() == MAP_FAILED) || (ds2.get() == 0)) {
         runtest.unresolved("seek(5100)");
     } else {
-        if ((memcmp(ds2.get(), buf+4, range-4) == 0)
-            && (memcmp(ptr, buf+82, range-82) == 0)) {
+        if ((memcmp(ds2.get(), buf, range-4) == 0)
+            && (memcmp(ptr, buf+78, range-78) == 0)) {
             runtest.pass("seek(5100)");
         } else {
             runtest.fail("seek(5100)");
@@ -220,7 +220,7 @@ test_mem()
         runtest.pass("DiskStream::writeToDisk()");
     } else {
         runtest.fail("DiskStream::writeToDisk()");
-    }   
+    }
 }
 
 /// \brief create a test file to read in later. This lets us create
@@ -237,15 +237,15 @@ create_file(const std::string &filespec, size_t size)
     }
 
     // Create an array of printable ASCII characters
-    int range = '~' - '!';
+    size_t range = '~' - '!';
     char *buf = new char[range];
-    for (int j=0; j<range; j++) {
+    for (size_t j=0; j<range; j++) {
         buf[j] = '!' + j;
     }
 
     // Write the false data to disk
-    int total = 0;
-    int ret = 0;
+    size_t total = 0;
+    size_t ret = 0;
     for (size_t i=0; i<size; i+=range) {
         if ((size - total) < range) {
             ret = write(fd, buf, (size - total));

@@ -46,15 +46,16 @@ public:
     ~HTTPServer();
 
     // These are for the protocol itself
-    boost::shared_ptr<amf::Buffer> processClientRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processGetRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processPostRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processPutRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processDeleteRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processConnectRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processOptionsRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processHeadRequest(int fd);
-    boost::shared_ptr<amf::Buffer> processTraceRequest(int fd);
+    http_method_e processClientRequest(int fd);
+    http_method_e processClientRequest(Handler *hand, int fd, amf::Buffer *buf);
+    amf::Buffer &processGetRequest(Handler *hand, int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processPostRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processPutRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processDeleteRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processConnectRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processOptionsRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processHeadRequest(int fd, amf::Buffer *buf);
+    boost::shared_ptr<amf::Buffer> processTraceRequest(int fd, amf::Buffer *buf);
 
     // Handle the response for the request.
     boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
@@ -95,16 +96,13 @@ public:
     gnash::amf::Buffer &formatEchoResponse(const std::string &num, uint8_t *data, size_t size);
 #endif
 
-    void dump();
-    
-private:
-    
-};
+    bool http_handler(Handler *hand, int netfd, amf::Buffer *buf);
+    boost::shared_ptr<gnash::DiskStream> getDiskStream() { return _diskstream; };
 
-// This is the thread for all incoming HTTP connections
-extern "C" {
-    DSOEXPORT bool http_handler(gnash::Network::thread_params_t *args);
-}
+    void dump();    
+private:
+    boost::shared_ptr<gnash::DiskStream> _diskstream;
+};
 
 } // end of gnash namespace
 

@@ -24,10 +24,14 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <cstdlib>
+#include <cstdio>
+
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/random/uniform_real.hpp>
+#include <boost/random/uniform_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -36,6 +40,7 @@
 #endif
 
 #include "log.h"
+#include "URL.h"
 #include "amf.h"
 #include "rtmp.h"
 #include "rtmp_server.h"
@@ -48,7 +53,9 @@
 #include "crc.h"
 #include "cache.h"
 #include "diskstream.h"
-
+#ifdef HAVE_SYS_TIME_H
+# include <sys/time.h>
+#endif 
 using namespace gnash;
 using namespace std;
 using namespace amf;
@@ -220,7 +227,7 @@ RTMPServer::processClientHandShake(int fd)
     if (!encoding) {
 	// Send a onBWDone to the client to start the new NetConnection,
 	boost::shared_ptr<amf::Buffer> bwdone = encodeBWDone(2.0);
-	if (RTMP::sendMsg(fd, qhead->channel, RTMP::HEADER_12,
+	if (RTMP::sendMsg(fd, qhead->channel, RTMP::HEADER_8,
 			  bwdone->size(), RTMP::INVOKE, RTMPMsg::FROM_SERVER, *bwdone)) {
 	    log_network("Sent onBWDone to client");
 	} else {
@@ -618,15 +625,15 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 }
 
 boost::shared_ptr<amf::Buffer> 
-RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &streamid)
+RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &transid)
 {
 //    GNASH_REPORT_FUNCTION;
     double clientid = 0.0;
-    return encodeResult(status, "", streamid, clientid);
+    return encodeResult(status, "", transid, clientid);
 }
 
 boost::shared_ptr<amf::Buffer> 
-RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &streamid, double &clientid)
+RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid, double &clientid)
 {
 //    GNASH_REPORT_FUNCTION;
 //    Buffer *buf = new Buffer;
@@ -643,8 +650,8 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
     str->makeString("_result");
 
     Element *number = new Element;
-    // add The server ID
-    number->makeNumber(streamid);
+    // add the transaction ID
+    number->makeNumber(transid);
 
     Element top;
 //    top.makeObject("application");
@@ -718,7 +725,38 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       case RTMPMsg::NS_DATA_START:
       case RTMPMsg::NS_FAILED:
       case RTMPMsg::NS_INVALID_ARGUMENT:
+	  // The response to a successful pauseStream command is this
+	  // message.
       case RTMPMsg::NS_PAUSE_NOTIFY:
+      {
+	  str->makeString("onStatus");
+
+	  boost::shared_ptr<amf::Element> level(new Element);
+	  level->makeString("level", "status");
+	  top.addProperty(level);
+
+	  boost::shared_ptr<amf::Element> code(new Element);
+	  code->makeString("code", "NetStream.Pause.Notify");
+	  top.addProperty(code);
+
+	  boost::shared_ptr<amf::Element> description(new Element);
+	  string field = "Pausing ";
+	  if (!filename.empty()) {
+	      field += filename;
+	  }
+	  description->makeString("description", field);
+	  top.addProperty(description);
+	  
+	  boost::shared_ptr<amf::Element> details(new Element);
+	  details->makeString("details", filename);
+	  top.addProperty(details);
+  
+	  boost::shared_ptr<amf::Element> cid(new Element);
+	  cid->makeNumber("clientid", clientid);
+	  top.addProperty(cid);
+
+	  break;
+      }
       case RTMPMsg::NS_PLAY_COMPLETE:
       case RTMPMsg::NS_PLAY_FAILED:
       case RTMPMsg::NS_PLAY_FILE_STRUCTURE_INVALID:
@@ -753,7 +791,19 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  top.addProperty(details);
 	  
 	  boost::shared_ptr<amf::Element> cid(new Element);
+#ifdef CLIENT_ID_NUMERIC
+	  double clientid = createClientID();
 	  cid->makeNumber("clientid", clientid);
+#else
+	  string clientid;
+	  if (!_clientids[transid].empty()) {
+	      clientid =_clientids[transid].c_str();
+	  } else {
+	      clientid = createClientID();
+	      _clientids[transid] = clientid;
+	  }
+	  cid->makeString("clientid", _clientids[transid]);
+#endif
 	  top.addProperty(cid);
 
 	  break;
@@ -783,13 +833,39 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  top.addProperty(details);
   
 	  boost::shared_ptr<amf::Element> cid(new Element);
+#ifdef CLIENT_ID_NUMERIC
+	  double clientid = createClientID();
 	  cid->makeNumber("clientid", clientid);
+#else
+	  string clientid;
+	  if (!_clientids[transid].empty()) {
+	      clientid =_clientids[transid].c_str();
+	  } else {
+	      clientid = createClientID();
+	      _clientids[transid] = clientid;
+	  }
+	  cid->makeString("clientid", _clientids[transid]);
+#endif
 	  top.addProperty(cid);
 
 	  break;
       }
       case RTMPMsg::NS_PLAY_STOP:
       case RTMPMsg::NS_PLAY_STREAMNOTFOUND:
+      {
+	  boost::shared_ptr<amf::Element> level(new Element);
+	  level->makeString("level", "error");
+	  top.addProperty(level);
+
+	  boost::shared_ptr<amf::Element> description(new Element);
+	  description->makeString("description", "NetStream.Play.StreamNotFound.");
+	  top.addProperty(description);
+	  
+	  boost::shared_ptr<amf::Element> code(new Element);
+	  code->makeString("code", "NetStream.Play.StreamNotFound");
+	  top.addProperty(code);
+	  break;
+      }
       case RTMPMsg::NS_PLAY_SWITCH:
       case RTMPMsg::NS_PLAY_UNPUBLISHNOTIFY:
       case RTMPMsg::NS_PUBLISH_BADNAME:
@@ -798,8 +874,13 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       case RTMPMsg::NS_RECORD_NOACCESS:
       case RTMPMsg::NS_RECORD_START:
       case RTMPMsg::NS_RECORD_STOP:
+	  // The reponse to a failed seekStream is this message.
       case RTMPMsg::NS_SEEK_FAILED:
+	  // The reponse to a successful seekStream is this message.
       case RTMPMsg::NS_SEEK_NOTIFY:
+	  break;
+	  // The response to a successful pauseStream command is this
+	  // message when the stream is started again.
       case RTMPMsg::NS_UNPAUSE_NOTIFY:
       case RTMPMsg::NS_UNPUBLISHED_SUCCESS:
       case RTMPMsg::SO_CREATION_FAILED:
@@ -807,19 +888,24 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       case RTMPMsg::SO_NO_WRITE_ACCESS:
       case RTMPMsg::SO_PERSISTENCE_MISMATCH:
 	  break;
-      // Anything below here is specific to Gnash's implementation
+	  // The response for a createStream message is the
+	  // transaction ID, followed by the command object (usually a
+	  // NULL object), and the Stream ID. The Stream ID is just a
+	  // simple incrementing counter of streams.
       case RTMPMsg::NS_CREATE_STREAM:
       {
 	  // Don't encode as an object, just the properties
 	  notobject = true;
 
 	  boost::shared_ptr<amf::Element> id2(new Element);
+	  
 	  double sid = createStreamID();
 	  id2->makeNumber(sid);
 	  top.addProperty(id2);
 	  
 	  break;
       }
+      // There is no response to a deleteStream request.
       case RTMPMsg::NS_DELETE_STREAM:
       default:
 	  break;
@@ -960,6 +1046,30 @@ RTMPServer::encodeBWDone(double id)
     return buf;
 }
 
+boost::shared_ptr<amf::Buffer>
+RTMPServer::encodeAudio(boost::uint8_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    boost::shared_ptr<amf::Buffer> buf;
+    
+    if (size) {
+	if (data) {
+	    buf.reset(new amf::Buffer(size));
+	    buf->copy(data, size);
+	}
+    }
+
+    return buf;
+}
+
+boost::shared_ptr<amf::Buffer>
+RTMPServer::encodeVideo(boost::uint8_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+#if 0
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
 vector<boost::shared_ptr<amf::Element > >
@@ -1044,12 +1154,17 @@ RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
 
     return buf;
 }
+#endif
 
-// Create a new client ID, which appears to be a random double.
+// Create a new client ID, which appears to be a random double,
+// although I also see a temporary 8 character string used often as
+// well.
+#ifdef CLIENT_ID_NUMERIC
 double 
 RTMPServer::createClientID()
 {
 //    GNASH_REPORT_FUNCTION;
+    
     boost::mt19937 seed;
     // Pick the number of errors to create based on the Buffer's data size
     boost::uniform_real<> numbers(1, 65535);
@@ -1059,6 +1174,54 @@ RTMPServer::createClientID()
 
     return id;
 }
+#else
+std::string
+RTMPServer::createClientID()
+{
+//    GNASH_REPORT_FUNCTION;
+    string id;
+
+// FIXME: This turns out to be a crappy random number generator,
+    // and should be replaced with something less repititous.
+#if 0
+    boost::mt19937 seed;
+    for (size_t i=0; i < 8; i++) {
+	boost::uniform_int<> numbers(0x30, 0x7a);
+	id += numbers(seed);
+    }
+#else
+    char letters[] =
+	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    boost::uint64_t random_time_bits = 0;
+    boost::uint64_t value = 0;
+# ifdef HAVE_GETTIMEOFDAY
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    random_time_bits = ((uint64_t)tv.tv_usec << 16) ^ tv.tv_sec;
+# else
+    random_time_bits = time(NULL);
+# endif
+    value += random_time_bits ^ getpid();
+    boost::uint64_t v = value; 
+    id = letters[v % 62];
+    v /= 62;
+    id += letters[v % 62];
+    v /= 62;
+    id += letters[v % 62];
+    v /= 62;
+    id += letters[v % 62];
+    v /= 62;
+    id += letters[v % 62];
+    v /= 62;
+    id += letters[v % 62];
+    v /= 62;
+    id += letters[v % 62];
+    v /= 62;
+#endif
+    
+    return id;
+}
+#endif
 
 // Get the next streamID
 double 
@@ -1082,7 +1245,7 @@ RTMPServer::sendFile(int fd, const std::string &filespec)
 	
 //	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
 	
-	// Oopen the file and read the first chunk into memory
+	// Open the file and read the first chunk into memory
 	if (!filestream->open(filespec)) {
 	    return false;
 	} else {
@@ -1191,7 +1354,7 @@ rtmp_handler(Network::thread_params_t *args)
     static bool initialize = true;
 //     bool sendfile = false;
     log_network(_("Starting RTMP Handler for fd #%d, cgi-bin is \"%s\""),
-	      args->netfd, args->filespec);
+		args->netfd, args->filespec);
     
 #ifdef USE_STATISTICS
     struct timespec start;
@@ -1206,10 +1369,6 @@ rtmp_handler(Network::thread_params_t *args)
     boost::shared_ptr<amf::Element> swfurl;
     boost::shared_ptr<amf::Buffer> response;
 
-    string basepath = docroot;
-
-//     RTMP::rtmp_headersize_e response_head_size = RTMP::HEADER_12;
-    
     // Keep track of the network statistics
     // See if we have any messages waiting. After the initial connect, this is
     // the main loop for processing messages.
@@ -1217,9 +1376,29 @@ rtmp_handler(Network::thread_params_t *args)
     // Adjust the timeout
     rtmp->setTimeout(30);
 //    boost::shared_ptr<amf::Buffer> buf;
- 
-    // This is the main message processing loop for rtmp. All message
-    // received require a response.
+
+    // If we have active disk streams, send those packets first.
+    // 0 is a reserved stream, so we start with 1, as the reserved
+    // stream isn't one we care about here.
+    log_network("%d active disk streams", hand->getActiveDiskStreams());
+    for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
+	hand->getDiskStream(i)->dump();
+	if (hand->getDiskStream(i)->getState() == DiskStream::PLAY) {
+	    boost::uint8_t *ptr = hand->getDiskStream(i)->get();
+	    if (ptr) {
+		if (rtmp->sendMsg(hand->getClient(i), 8,
+			RTMP::HEADER_8, 4096,
+			RTMP::NOTIFY, RTMPMsg::FROM_SERVER,
+			ptr, 4096)) {
+		}
+	    } else {
+		log_network("ERROR: No stream for client %d", i);
+	    }
+	}
+    }
+    
+    // This is the main message processing loop for rtmp. Most
+    // messages received require a response.
     do {
 	// If there is no data left from the previous chunk, process
 	// that before reading more data.
@@ -1252,7 +1431,7 @@ rtmp_handler(Network::thread_params_t *args)
 			if (qhead->channel == RTMP_SYSTEM_CHANNEL) {
 			    if (qhead->type == RTMP::USER) {
 				boost::shared_ptr<RTMP::user_event_t> user
-				    = rtmp->decodeUser(tmpptr);
+				    = rtmp->decodeUserControl(tmpptr);
 				switch (user->type) {
 				  case RTMP::STREAM_START:
 				      log_unimpl("Stream Start");
@@ -1295,119 +1474,13 @@ rtmp_handler(Network::thread_params_t *args)
 			    }
 			}
 		    }
-// 		    boost::shared_ptr<amf::Buffer> bufptr = que->at(i)->pop();
-// //			que->at(i)->dump();
-// 		    if (bufptr) {
-// 			bufptr->dump();
-// 			qhead = rtmp->decodeHeader(bufptr->reference());
-// 			log_network("Message for channel #%d", qhead->channel);
-// //			tmpptr = bufptr->reference();
-// 			tmpptr = bufptr->reference() + qhead->head_size;
-// 			if (qhead->channel == RTMP_SYSTEM_CHANNEL) {
-// 			    boost::shared_ptr<RTMP::rtmp_ping_t> ping = rtmp->decodePing(tmpptr);
-// 			    log_network("Processed Ping message from client, type %d", ping->type);
-// 			} else {
-// 			    if (echo) {
-// 				log_network("Got an echo request");
-// 				// process the echo test request
-// 				vector<boost::shared_ptr<amf::Element> > request = rtmp->parseEchoRequest(
-// 								  bufptr->reference() + qhead->head_size, bufptr->allocated() - qhead->head_size);
-// 				if (request[3]) {
-// 				    boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[3]);
-// 				    if (rtmp->sendMsg(args->netfd, qhead->channel, RTMP::HEADER_8, result->allocated(),
-// 						      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
-// 					// If we're in single threaded mode, we Just want to stay in
-// 					// this thread for now and do everything all at once. Otherwise
-// 					// we're done, so we return to the dispatch handler waiting for
-// 					// the next packet. Single threaded mode is primarily used by
-// 					// developers for debugging protocols.
-// 					log_network("Sent echo test response response to client.");
-// 				    }
-// 				} else {
-// 				    log_error("Couldn't send echo test response to client!");
-// 				    done = true;
-// 				}
-// 			    } else {
-// 				body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
-// 				if (body) {
-// 				    body->setChannel(qhead->channel);
-// 				    // Invoke the NetConnection::connect() method
-// 				    if (body->getMethodName() == "connect") {
-// 					response_head_size = RTMP::HEADER_12;
-// 					tcurl  = body->findProperty("tcUrl");
-// 					if (tcurl) {
-// 					    log_network("Client request for remote file is: %s", tcurl->to_string());
-// 					    string path = tcurl->to_string();
-// 					    string::size_type start = path.find("://", 0) + 4;
-// 					    if (start != string::npos) {
-// 						string::size_type end = path.find("/", start);
-// 						if (end != string::npos) {
-// 						    basepath += path.substr(end, path.size());
-// 						}
-// 					    }
-// 					    log_network("Base path to files from connect is: %s", basepath);
-										
-// 					}
-					
-// 				    }
-// 				    // Invoke the NetStream::createStream() method
-// 				    if (body->getMethodName() == "createStream") {
-// 					double streamid  = body->getStreamID();
-// 					log_network("The streamID from NetStream::createStream() is: %d", streamid);
-// 					response_head_size = RTMP::HEADER_8;
-// 					response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, streamid);
-// //					body->dump();
-// 				    }
-// 				    if (body->getMethodName() == "deleteStream") {
-// 					double streamid  = body->getStreamID();
-// 					log_network("The streamID from NetStream::deleyeStream() is: %d", streamid);
-// 					response_head_size = RTMP::HEADER_8;
-// 					response = rtmp->encodeResult(RTMPMsg::NS_DELETE_STREAM, streamid);
-// 					body->dump();
-// 				    }
-// 				    // Invoke the NetStream::play() method
-// 				    if (body->getMethodName() == "play") {
-// 					double streamid  = body->getStreamID();
-// 					log_network("The streamID from NetStream::plays: %d", streamid);
-// 					filespec = body->at(1)->to_string();
-// 					response_head_size = RTMP::HEADER_8;
-// 					double clientid = rtmp->createClientID();
-// //  					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_RESET, filespec);
-// 					body->setChannel(4);
-// //  					rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
-// //  							  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response);
-// //  					response.reset();
-// // 					rtmp->setChannel(4);
-// //  					rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
-// 					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_START, filespec, clientid);
-// //					body->dump();
-// 					sendfile = true;
-// 				    }
-// 				    if (body->getMethodName() == "recData") {
-// 				    }
-// 				    if (body->getMethodName() == "onEchoonServ") {
-// 				    }
-// 				    if (rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
-// 						      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
-// 					log_error("Sent response to client.");
-// 				    } else {
-// 					log_error("Couldn't send response to client!");
-// 				    }
-// 				    if (sendfile) {
-// 					string fullspec = basepath;
-// 					fullspec += filespec;
-// 					rtmp->sendFile(args->netfd, fullspec);
-// 					sendfile = false;
-// 				    } 
-// 				}
-// 			    }
-// 			}
-// 		    } else {
-// 			log_error("Message contains no data!");
-// 		    }
 		    switch (qhead->type) {
 		      case RTMP::CHUNK_SIZE:
+			  log_unimpl("Set Chunk Size");
+			  break;
 		      case RTMP::BYTES_READ:
+			  log_unimpl("Bytes Read");
+			  break;
 		      case RTMP::ABORT:
 		      case RTMP::USER:
 			  // already handled as this is a system channel message
@@ -1439,6 +1512,7 @@ rtmp_handler(Network::thread_params_t *args)
 			  log_unimpl("RTMP type %d", qhead->type);
 			  break;
 		      case RTMP::INVOKE:
+		      {
 			  body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
 			  if (!body) {
 			      log_error("Error INVOKING method \"%s\"!", body->getMethodName());
@@ -1451,30 +1525,114 @@ rtmp_handler(Network::thread_params_t *args)
 			  // NetStream class, which like NetConnection,
 			  // is a speacial one handled directly by the
 			  // server instead of any cgi-bin plugins.
+			  double transid  = body->getTransactionID();
+			  log_network("The Transaction ID from the client is: %g", transid);
 			  if (body->getMethodName() == "createStream") {
-			      /* int streamid = */ hand->createStream();
-			      double streamid  = body->getStreamID();
-			      log_network("StreamID is: %g", streamid);
-			      response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, streamid);
+			      hand->createStream(transid);
+			      response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, transid);
 			      if (rtmp->sendMsg(args->netfd, qhead->channel,
-						RTMP::HEADER_8, response->allocated(),
-						RTMP::INVOKE, RTMPMsg::FROM_SERVER,
-						*response)) {
-				  }
+					RTMP::HEADER_8, response->allocated(),
+					RTMP::INVOKE, RTMPMsg::FROM_SERVER,
+					*response)) {
+			      }
 			  } else if (body->getMethodName() == "play") {
-			      hand->playStream();
+			      string filespec;
+			      boost::shared_ptr<gnash::RTMPMsg> nc = rtmp->getNetConnection();
+			      boost::shared_ptr<amf::Element> tcurl = nc->findProperty("tcUrl");
+			      URL url(tcurl->to_string());
+			      filespec += url.hostname() + url.path();
+			      filespec += '/';
+			      filespec += body->at(1)->to_string();
+
+			      if (hand->playStream(filespec)) {
+				  // Send the Set Chunk Size response
+#if 1
+				  response = rtmp->encodeChunkSize(4096);
+				  if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
+					RTMP::HEADER_12, response->allocated(),
+					RTMP::CHUNK_SIZE, RTMPMsg::FROM_SERVER,
+					*response)) {
+				  }
+#endif
+			      // Send the Play.Resetting response
+				  response = rtmp->encodeResult(RTMPMsg::NS_PLAY_RESET, body->at(1)->to_string(), transid);
+				  if (rtmp->sendMsg(args->netfd, qhead->channel,
+					RTMP::HEADER_8, response->allocated(),
+					RTMP::INVOKE, RTMPMsg::FROM_SERVER,
+					*response)) {
+				  }
+				  // Send the Play.Start response
+				  response = rtmp->encodeResult(RTMPMsg::NS_PLAY_START, body->at(1)->to_string(), transid);
+				  if (rtmp->sendMsg(args->netfd, qhead->channel,
+					RTMP::HEADER_8, response->allocated(),
+					RTMP::INVOKE, RTMPMsg::FROM_SERVER,
+					*response)) {
+				  }
+			      } else {
+				  response = rtmp->encodeResult(RTMPMsg::NS_PLAY_STREAMNOTFOUND, body->at(1)->to_string(), transid);
+				  if (rtmp->sendMsg(args->netfd, qhead->channel,
+					RTMP::HEADER_8, response->allocated(),
+					RTMP::INVOKE, RTMPMsg::FROM_SERVER,
+					*response)) {
+				  }
+			      }
+			      sleep(1); // FIXME: debugging crap
+			      // Send the User Control - Stream Live
+			      response = rtmp->encodeUserControl(RTMP::STREAM_LIVE, 1);
+			      if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
+					RTMP::HEADER_12, response->allocated(),
+					RTMP::USER, RTMPMsg::FROM_SERVER,
+					*response)) {
+			      }
+			      sleep(1); // FIXME: debugging crap
+			      // Send an empty Audio packet to get
+			      // things started.
+			      if (rtmp->sendMsg(args->netfd, 6,
+					RTMP::HEADER_12, 0,
+					RTMP::AUDIO_DATA, RTMPMsg::FROM_SERVER,
+					0, 0)) {
+			      }
+			      // Send an empty Video packet to get
+			      // things started.
+			      if (rtmp->sendMsg(args->netfd, 5,
+					RTMP::HEADER_12, 0,
+					RTMP::VIDEO_DATA, RTMPMsg::FROM_SERVER,
+					0, 0)) {
+			      }
+			      sleep(1); // FIXME: debugging crap
+			      // Send the User Control - Stream Start
+			      response = rtmp->encodeUserControl(RTMP::STREAM_START, 1);
+			      if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
+					RTMP::HEADER_12, response->allocated(),
+					RTMP::USER, RTMPMsg::FROM_SERVER,
+					*response)) {
+			      }			      
+			      int active_stream = hand->getActiveDiskStreams();
+			      boost::uint8_t *ptr = hand->getDiskStream(active_stream)->get();
+			      if (ptr) {
+				  log_network("Sending %s to client",
+					      hand->getDiskStream(active_stream)->getFilespec());
+				  if (rtmp->sendMsg(args->netfd, 5,
+					RTMP::HEADER_12, 400,
+					RTMP::NOTIFY, RTMPMsg::FROM_SERVER,
+					ptr, 400)) {
+				      log_network("Sent first page to client");
+				  }
+			      }  
 			  } else if (body->getMethodName() == "seek") {
 			      hand->seekStream();
 			  } else if (body->getMethodName() == "pause") {
-			      hand->pauseStream();
+			      hand->pauseStream(transid);
 			  } else if (body->getMethodName() == "close") {
-			      hand->closeStream();
+			      hand->closeStream(transid);
 			  } else if (body->getMethodName() == "resume") {
-			      hand->resumeStream();
+			      hand->resumeStream(transid);
+			  } else if (body->getMethodName() == "delete") {
+			      hand->deleteStream(transid);
 			  } else if (body->getMethodName() == "publish") {
 			      hand->publishStream();
 			  } else if (body->getMethodName() == "togglePause") {
-			      hand->togglePause();
+			      hand->togglePause(transid);
 			      // This is a server installation specific  method.
 			  } else if (body->getMethodName() == "FCSubscribe") {
 			      hand->setFCSubscribe(body->at(0)->to_string());
@@ -1494,6 +1652,7 @@ rtmp_handler(Network::thread_params_t *args)
 			      done = true;
 			  }
 			  break;
+		      }
 		      case RTMP::FLV_DATA:
 			  log_unimpl("RTMP type %d", qhead->type);
 			  break;
@@ -1539,7 +1698,7 @@ rtmp_handler(Network::thread_params_t *args)
 		return true;
 	    }
 	} else {
-	    log_error("Communication error with client using fd #%d", args->netfd);
+	    // log_error("Communication error with client using fd #%d", args->netfd);
 	    rtmp->closeNet(args->netfd);
 	    initialize = true;
 	    return false;

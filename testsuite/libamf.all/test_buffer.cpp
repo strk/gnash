@@ -337,7 +337,9 @@ test_find()
     }
 
     const char *sub = "fgh";
+#if 0
     Network::byte_t *ptr2 = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(sub));
+#endif
     fptr = std::search(buf1.begin(), buf1.end(), sub, sub+3);
     if (fptr == (ptr1 + 5)) {
          runtest.pass ("Buffer::find(Network::byte_t *, size_t)");
@@ -432,8 +434,8 @@ test_append()
     }
 
     buf7 += buf6;
-    Network::byte_t *ptr1 = buf7.reference() + 10 + sizeof(boost::uint16_t);
-    Network::byte_t *ptr2 = buf6.reference();
+    // Network::byte_t *ptr1 = buf7.reference() + 10 + sizeof(boost::uint16_t);
+    // Network::byte_t *ptr2 = buf6.reference();
     if (memcmp(buf7.reference() + 10 + sizeof(boost::uint16_t), buf6.reference(), 30) == 0) {
         runtest.pass ("Buffer::operator+=(Buffer &)");
     } else {

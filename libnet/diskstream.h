@@ -28,6 +28,7 @@
 
 #include "amf.h"
 #include "buffer.h"
+#include "flv.h"
 #include "cque.h"
 #include "statistics.h"
 #include "getclocktime.hpp"
@@ -49,6 +50,7 @@ public:
     ///		This represents the state of the current stream.
     typedef enum {
         NO_STATE,
+	CREATED,
 	CLOSED,
         OPEN,
         PLAY,
@@ -112,9 +114,12 @@ public:
     ///
     /// @param netfd An optional file descriptor to read data from
     ///
+    /// @param flag True to play the entire file, false to play part.
+    ///
     /// @return True if the data was streamed sucessfully, false if not.
     bool play();
-    bool play(int netfd);
+    bool play(bool flag);
+    bool play(int netfd, bool flag);
     
     /// \brief Stream a preview of the file.
     ///		A preview is a series of video frames from
@@ -201,7 +206,7 @@ public:
     /// \brief Write the existing data to the Network.
     ///
     /// @return true is the write suceeded, false if it failed.
-    bool writeToNet();
+    bool writeToNet(int start, int bytes);
 
     /// \brief Get the memory page size
     ///		This is a cached value of the system configuration
@@ -218,7 +223,11 @@ public:
     ///
     /// @return nothing.
     void setPagesize(size_t size) { _pagesize = size; };
-    
+
+    /// \brief copy another DiskStream into ourselves, so they share data
+    ///		in memory.
+    DiskStream &operator=(DiskStream *stream);
+
     /// \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
      void dump();
@@ -226,8 +235,11 @@ public:
 
     /// \brief Get the base address for the memory page.
     ///
-    /// @return A real pointer to the base address.
+    /// @return A real pointer to the base address data in the file, but after
+    /// the header bytes.
     boost::uint8_t *get() { return _dataptr; };
+    bool fullyPopulated();
+//    bool fullyPopulated() { return ((_seekptr - _filesize) == _dataptr); };
     
     /// \brief Get the size of the file.
     ///
@@ -237,6 +249,7 @@ public:
     DiskStream::filetype_e getFileType() { return _filetype; };
 
     std::string &getFilespec() { return _filespec; }
+    void setFilespec(std::string filespec) { _filespec = filespec; }
 
     /// \brief Get the time of the last access.
     ///
@@ -244,6 +257,10 @@ public:
     struct timespec *getLastAccessTime() { return &_last_access; };
 
     state_e getState() { return _state; };
+    void setState(state_e state) { _state = state; };
+
+    int getFileFd() { return _filefd; };
+    int getNetFd() { return _netfd; };
     
 #ifdef USE_STATS_CACHE
     /// \brief Get the time of the first access.
@@ -292,7 +309,8 @@ private:
     size_t	_max_memload;
     
     /// \var DiskStream::_seekptr
-    ///		The current location within the current memory page.
+    ///		The current location within the current memory page where
+    ///		the data ends, which is in increments of the empry page size.
     boost::uint8_t *_seekptr;
 
     /// \var DiskStream::_filesize
@@ -320,8 +338,6 @@ private:
     // Get the file stats, so we know how to set the
     // Content-Length in the header.
     bool getFileStats(const std::string &filespec);
-
-
     DiskStream::filetype_e _filetype;
 
     struct timespec _last_access;
@@ -334,6 +350,9 @@ private:
 #ifdef USE_STATS_FILE
     int         _bytes;
 #endif
+
+    // The header, tag, and onMetaData from the FLV file.
+    boost::shared_ptr<amf::Flv>    _flv;
 };
 
 /// \brief Dump to the specified output stream.

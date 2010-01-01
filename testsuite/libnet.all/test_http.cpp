@@ -57,7 +57,7 @@ using namespace std;
 static void usage (void);
 static void tests (void);
 static void test_post (void);
-static void test_rtmpt (void);
+// static void test_rtmpt (void);
 
 static TestState runtest;
 
@@ -349,6 +349,7 @@ tests()
     // Decoding tests for HTTP
     //
     http.clearHeader();
+#if 0
     boost::uint8_t *buffer = (boost::uint8_t *)"GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n"
 "User-Agent: Gnash/0.8.1-cvs (X11; Linux i686; U; en)\r\n"
 "Host: localhost:4080\r\n"
@@ -362,7 +363,8 @@ tests()
 "Referer: http://localhost/software/gnash/tests/index.html\r\n"
 "TE: deflate, gzip, chunked, identity, trailers\r\n"
 "\r\n";
-
+#endif
+    
 // GET /software/gnash/tests/ HTTP/1.1
 // Host: localhost:4080
 // User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.5) Gecko/20070718 Fedora/2.0.0.5-1.fc7 Firefox/2.0.0.5
@@ -601,7 +603,7 @@ test_post()
     // FIXME: should be moved to server side only test case
     // Check the Server field
     AMF amf;
-    boost::uint8_t *data1 = http.processHeaderFields(ptr1);
+    boost::uint8_t *data1 = http.processHeaderFields(&ptr1);
     boost::shared_ptr<amf::Element> el1 = amf.extractAMF(data1, data1 + 15);
     string str1 = el1->to_string();
 
@@ -630,7 +632,7 @@ test_post()
     ptr2 += *encnum;
     ptr2.resize();              // shrink the buffer to be the exact size of the data
 
-    boost::uint8_t *data2 = http.processHeaderFields(ptr2);
+    boost::uint8_t *data2 = http.processHeaderFields(&ptr2);
     boost::shared_ptr<amf::Element> el2 = amf.extractAMF(data2, data2 + 15);
     if ((http.getField("host") == "localhost:5080")
         && (el2->to_number() == 1.2345)

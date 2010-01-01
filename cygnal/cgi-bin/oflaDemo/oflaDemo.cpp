@@ -525,7 +525,7 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
 #endif
         }
     } else {
-        log_error("Unknown oflaDemp method \"%s\" to INVOKE!", el1->getName());
+        log_error("Unknown oflaDemo method \"%s\" to INVOKE!", el1->getName());
     }
 
     return headers;

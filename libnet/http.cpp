@@ -84,7 +84,8 @@ HTTP::HTTP()
 //       _handler(0),
       _clientid(0),
       _index(0),
-      _max_requests(0)
+      _max_requests(0),
+      _close(false)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct status_codes *status = new struct status_codes;
@@ -101,7 +102,9 @@ HTTP::HTTP(Handler *hand)
       _keepalive(false),
       _clientid(0),
       _index(0),
-      _max_requests(0)
+      _max_requests(0),
+      _close(false)
+
 {
 //    GNASH_REPORT_FUNCTION;
 //     _handler = hand;
@@ -137,10 +140,10 @@ HTTP::operator = (HTTP& /*obj*/)
 
 
 boost::uint8_t *
-HTTP::processHeaderFields(amf::Buffer &buf)
+HTTP::processHeaderFields(amf::Buffer *buf)
 {
   //    GNASH_REPORT_FUNCTION;
-    string head(reinterpret_cast<const char *>(buf.reference()));
+    string head(reinterpret_cast<const char *>(buf->reference()));
 
     // The end of the header block is always followed by a blank line
     string::size_type end = head.find("\r\n\r\n", 0);
@@ -160,7 +163,7 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 		_keepalive = true;
 		if ((value != "on") && (value != "off")) {
 		    _max_requests = strtol(value.c_str(), NULL, 0);
-		    log_debug("Setting Max Requests for Keep-Alive to %d", _max_requests);
+		    // log_debug("Setting Max Requests for Keep-Alive to %d", _max_requests);
 		}
 	    }
 	    if (name == "connection") {
@@ -204,7 +207,7 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 		    // in it. It's actually two separate integers.
 		    _version.major = i->at(pos+5) - '0';
 		    _version.minor = i->at(pos+7) - '0';
-		    log_debug (_("Version: %d.%d"), _version.major, _version.minor);
+		    // log_debug (_("Version: %d.%d"), _version.major, _version.minor);
 		    // the filespec in the request is the middle field, deliminated
 		    // by a space on each end.
 		    if (params != string::npos) {
@@ -228,7 +231,7 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 	}
     }
     
-    return buf.reference() + end + 4;
+    return buf->reference() + end + 4;
 }
 
 // // Parse an Echo Request message coming from the Red5 echo_test. This
@@ -388,11 +391,7 @@ HTTP::processClientRequest(int fd)
 	}
     }
 
-    if (result) {
-	return _cmd;
-    } else {
-	return HTTP::HTTP_NONE;
-   }
+    return _cmd;
 }
 
 // A GET request asks the server to send a file to the client
@@ -941,10 +940,14 @@ HTTP::formatHeader(DiskStream::filetype_e type, size_t size, http_status_e code)
     formatLastModified();
     formatAcceptRanges("bytes");
     formatContentLength(size);
+
     // Apache closes the connection on GET requests, so we do the same.
     // This is a bit silly, because if we close after every GET request,
     // we're not really handling the persistance of HTTP 1.1 at all.
-    formatConnection("close");
+    if (_close) {
+	formatConnection("close");
+	_keepalive = false;
+    }
     formatContentType(type);
 
     // All HTTP messages are followed by a blank line.
@@ -1125,7 +1128,6 @@ HTTP::formatLastModified()
     return formatLastModified(date.str());
 }
 
-
 amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Buffer &data)
 {
@@ -1247,7 +1249,7 @@ HTTP::formatRequest(const string &url, http_method_e cmd)
 HTTP::http_method_e
 HTTP::extractCommand(boost::uint8_t *data)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
 //    string body = reinterpret_cast<const char *>(data);
     HTTP::http_method_e cmd = HTTP::HTTP_NONE;
@@ -1291,7 +1293,7 @@ HTTP::extractCommand(boost::uint8_t *data)
 	    // This is fine as long as end is within the buffer.
 	    _filespec = std::string(start, end);
 	}
-	log_debug("Requesting file: \"%s\"", _filespec);
+	// log_debug("Requesting file: \"%s\"", _filespec);
 
 	// The third field is always the HTTP version
 	// The version is the last field and is the protocol name
@@ -1300,7 +1302,7 @@ HTTP::extractCommand(boost::uint8_t *data)
 	// in it. It's actually two separate integers.
 	_version.major = *(end+6) - '0';
 	_version.minor = *(end+8) - '0';
-	log_debug (_("Version: %d.%d"), _version.major, _version.minor);
+	// log_debug (_("Version: %d.%d"), _version.major, _version.minor);
     }
 
     return cmd;
@@ -1484,7 +1486,8 @@ HTTP::recvMsg(int fd)
 int
 HTTP::recvMsg(int fd, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     size_t ret = 0;
 
     if (size == 0) {
@@ -1537,7 +1540,7 @@ HTTP::recvMsg(int fd, size_t size)
     } while (ret);
     
     // We're done. Notify the other threads the socket is closed, and tell them to die.
-    log_debug("Handler done for fd #%d...", fd);
+    log_debug("Done receiving data for fd #%d...", fd);
 
     return ret;
 }

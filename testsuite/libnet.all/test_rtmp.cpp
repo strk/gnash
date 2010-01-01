@@ -635,7 +635,6 @@ test_results()
 //                props[3]->getName(), props[3]->to_string());
         if ((msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS)
             && (msg1->getMethodName() == "_result")
-            && (msg1->getStreamID() == 1)
             && (msg1->size() >= 1)) { // the msg has one element, which has 4 properties
             runtest.pass("Decoded RTMP Result(NC_CONNECT_SUCCESS) message");
         } else {
@@ -666,7 +665,6 @@ test_results()
     if (msg2) {
         if ((msg2->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED)
             && (msg2->getMethodName() == "_result")
-            && (msg2->getStreamID() == 1)
             && (msg2->size() >= 1)) {
             runtest.pass("Decoded RTMP result(NC_CONNECT_FAILED(as result)");
         } else {
@@ -700,7 +698,6 @@ test_results()
 //    std::vector<amf::Element *> hell4 = msg4->getElements();
     if ((msg4->getStatus() ==  RTMPMsg::NS_PLAY_RESET)
         && (msg4->getMethodName() == "onStatus")
-        && (msg4->getStreamID() == 0)
         && (msg4->size() >= 1)) {
         runtest.pass("Encoded/Decoded RTMP onStatus(Play Reset)");
     } else {
@@ -715,7 +712,6 @@ test_results()
     boost::shared_ptr<RTMPMsg> msg5 = rtmp.decodeMsgBody(*hex5);
     if ((msg5->getStatus() ==  RTMPMsg::NS_DATA_START)
         && (msg5->getMethodName() == "onStatus")
-        && (msg5->getStreamID() == -1)
         && (msg5->size() == 1)) {
         runtest.pass("Encoded/Decoded RTMP onStatus(Data Start)");
     } else {
@@ -735,7 +731,6 @@ test_results()
     boost::shared_ptr<RTMPMsg> msg6 = rtmp.decodeMsgBody(*hex6);
     if ((msg6->getStatus() ==  RTMPMsg::NS_PLAY_START)
         && (msg6->getMethodName() == "onStatus")
-        && (msg6->getStreamID() == 0)
         && (msg6->size() >= 1)) {
         runtest.pass("Encoded/Decoded RTMP onStatus(Play Start)");
     } else {

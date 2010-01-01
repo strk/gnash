@@ -89,14 +89,17 @@ Cache::addResponse(const std::string &name, const std::string &response)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(cache_mutex);
+
     _responses[name] = response;
 }
 
 void
 Cache::addFile(const std::string &name, boost::shared_ptr<DiskStream> &file)
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     boost::mutex::scoped_lock lock(cache_mutex);
+    log_network("Adding file %s to cache.", name);
     _files[name] = file;
 }
 
@@ -134,10 +137,12 @@ Cache::findResponse(const std::string &name)
     return _responses[name];
 }
 
-boost::shared_ptr<DiskStream> 
+boost::shared_ptr<DiskStream> &
 Cache::findFile(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
+
+    log_network("Trying to find %s in the cache.", name);
     boost::mutex::scoped_lock lock(cache_mutex);
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
@@ -247,28 +252,31 @@ Cache::stats(bool xml) const
 void
 Cache::dump(std::ostream& os) const
 {    
-//    GNASH_REPORT_FUNCTION;    
+    GNASH_REPORT_FUNCTION;    
     boost::mutex::scoped_lock lock(cache_mutex);
 
     // Dump all the pathnames
+    os << "Pathname cache has " << _pathnames.size() << " files." << endl;
     map<string, string>::const_iterator name;
     for (name = _pathnames.begin(); name != _pathnames.end(); name++) {
         os << "Full path for \"" << name->first << "\" is: " << name->second << endl;
     }
 
     // Dump the responses
+    os << "Responses cache has " << _responses.size() << " files." << endl;
     for (name = _responses.begin(); name != _responses.end(); name++) {
         os << "Response for \"" << name->first << "\" is: " << name->second << endl;
     }
-
-#if 1
+    
+    os << "DiskStream cache has " << _files.size() << " files." << endl;
+    
     map<std::string, boost::shared_ptr<DiskStream> >::const_iterator data;
     for (data = _files.begin(); data != _files.end(); data++) {
         boost::shared_ptr<DiskStream> filedata = data->second;
-        os << "File info for \"" << data->first << "\" is: ";
-//        filedata.dump(os) << endl;
+        os << "file info for \"" << data->first << "\" is: " << endl;
+        filedata->dump();
+        os << "-----------------------------" << endl;
     }
-#endif
 
 #ifdef USE_STATS_CACHE
     this->stats(false);

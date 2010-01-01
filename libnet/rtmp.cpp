@@ -170,17 +170,16 @@ const char *response_str[] = {
 int
 RTMP::headerSize(boost::uint8_t header)
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;    
+    int headersize = header & RTMP_HEADSIZE_MASK;
     
-    int headersize = -1;
-
-    if ((header & RTMP_HEADSIZE_MASK) == 0) {
+    if (headersize == 0) {
 	headersize = 12;
-    } else if (header & 0x80) {
+    } else if (headersize == 0x80) {
 	headersize = 4;
-    } else if (header & 0x40) {
+    } else if (headersize == 0x40) {
 	headersize = 8;
-    } else if (header & 0xc0) {
+    } else if (headersize == 0xc0) {
 	headersize = 1;
     } else {
 	log_error(_("AMF Header size bits (0x%X) out of range"),
@@ -277,7 +276,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
     // log_network (_("The header size is %d"), head->head_size);
 
     // cerr << "FIXME(" << __FUNCTION__ << "): " << hexify(in,
-    // 				head->head_size, false) << endl; 
+    // 				head->head_size, false) << endl;
 
     // Make sure the header size is in range, it has to be between
     // 1-12 bytes.
@@ -287,7 +286,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
 	head.reset();
 	return head;
     } else if (head->head_size == 0) {
-	log_error("RTMP Header size can't be zaero!");
+	log_error("RTMP Header size can't be zero!");
 	head.reset();
 	return head;
     }
@@ -296,11 +295,10 @@ RTMP::decodeHeader(boost::uint8_t *in)
         _mystery_word = *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
-//         log_network(_("The mystery word is: %d"), _mystery_word);
+	// log_network(_("The mystery word is: %d"), _mystery_word);
     } else {
 	_mystery_word = 0;
     }
-
 
     if (head->head_size >= 8) {
         head->bodysize = *tmpptr++;
@@ -345,7 +343,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
 	}
 #endif
     } else {
-	if ((_type[head->channel] >= RTMP::NONE) && (_type[head->channel] <= RTMP::FLV_DATA)) {
+	if (_type[head->channel] <= RTMP::FLV_DATA) {
 	    log_network("Using previous type of %d for channel %d",
 			head->type, head->channel);
 	    head->type = _type[head->channel];
@@ -380,6 +378,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf(new Buffer(1));
+    buf->clear();
     boost::uint8_t *ptr = buf->reference();
     
     // Make the channel index & header size byte
@@ -437,17 +436,26 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 	// The type is a one byte field
 	*ptr = type;
 	ptr++;
-    }
-    
-    // Add the routing of the message if the header size is 12, the maximum.
-    if (head_size == HEADER_12) {
-        boost::uint32_t swapped = htonl(routing);
-        memcpy(ptr, &swapped, 4);
-        ptr += 4;
+	
+	// Add the routing of the message if the header size is 12, the maximum.
+	if (head_size == HEADER_12 && type != RTMP::USER) {
+	    if (type != RTMP::AUDIO_DATA && type != RTMP::VIDEO_DATA) {
+		// log_network(_("The routing is: 0x%x"), routing);
+		boost::uint32_t swapped = htonl(routing);
+		memcpy(ptr, &swapped, 4);
+	    } else {
+		// FIXME: I have no idea why these two empty messages
+		// don't handle the routing field for 12 byte headers
+		// the same as all the other types.
+		boost::uint8_t swapped = 0x1;
+		*ptr = swapped;
+	    }
+	    ptr += 4;
+	}
     }
     
     // Manually adjust the seek pointer since we added the data by
-    // walking ou own temporary pointer, so none of the regular ways
+    // walking our own temporary pointer, so none of the regular ways
     // of setting the seek pointer are appropriate.
     buf->setSeekPointer(buf->reference() + buf->size());
     
@@ -615,7 +623,14 @@ RTMP::decodePing(amf::Buffer &buf)
 }
 
 boost::shared_ptr<RTMP::user_event_t>
-RTMP::decodeUser(boost::uint8_t *data)
+RTMP::decodeUserControl(amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    return decodeUserControl(buf.reference());
+}
+
+boost::shared_ptr<RTMP::user_event_t>
+RTMP::decodeUserControl(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -659,11 +674,55 @@ RTMP::decodeUser(boost::uint8_t *data)
 
     return user;
 }
-boost::shared_ptr<RTMP::user_event_t>
-RTMP::decodeUser(amf::Buffer &buf)
+
+// Stream Live -
+//   02 00 00 00 00 00 06 04 00 00 00 00   00 04 00 00 00 01
+// Stream Start -
+//   02 00 00 00 00 00 06 04 00 00 00 00   00 00 00 00 00 01
+boost::shared_ptr<amf::Buffer>
+RTMP::encodeUserControl(user_control_e eventid, boost::uint32_t data)
 {
 //    GNASH_REPORT_FUNCTION;
-    return decodeUser(buf.reference());
+
+    boost::uint32_t swapped = 0;
+    boost::shared_ptr<amf::Buffer> buf;
+    if (eventid == STREAM_BUFFER) {
+	buf.reset(new Buffer(sizeof(boost::uint16_t) * 5));
+    } else {
+	buf.reset(new Buffer(sizeof(boost::uint16_t) * 3));
+    }
+
+    // Set the type of this ping message
+    boost::uint16_t typefield = htons(eventid);
+    *buf = typefield;
+    
+    // All events have only 4 bytes of data, except Set Buffer, which
+    // uses 8 bytes. The 4 bytes is usually the Stream ID except for
+    // Ping and Pong events, which carry a time stamp instead. We
+    // don't actually do anything here, we just parse the data.
+    switch (eventid) {
+      case STREAM_START:
+      case STREAM_EOF:
+      case STREAM_NODATA:
+	  swapped = data;
+	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  *buf += swapped;
+	  break;
+      case STREAM_BUFFER:
+	  buf.reset(new Buffer(sizeof(boost::uint16_t) * 5));
+	  break;
+      case STREAM_LIVE:
+      case STREAM_PING:
+      case STREAM_PONG:
+	  swapped = data;
+	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  *buf += swapped;
+	  break;
+      default:
+	  break;
+    };
+
+    return buf;
 }
 
 boost::shared_ptr<RTMPMsg>
@@ -708,7 +767,7 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
     
     double swapped = streamid->to_number();
 //     swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
-    msg->setStreamID(swapped);
+    msg->setTransactionID(swapped);
 
     if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "_error") || (msg->getMethodName() == "onStatus")) {
  	status = true;
@@ -740,18 +799,27 @@ RTMP::decodeMsgBody(amf::Buffer &buf)
     return decodeMsgBody(buf.reference(), buf.allocated());
 }
 
+// 02 00 00 00 00 00 04 01 00 00 00 00 00 00 10 00
+// id=2 timestamp=0 body_size=4 content_type=0x01 dest=0 	
+// Set chunk size 4096
 boost::shared_ptr<amf::Buffer> 
-RTMP::encodeChunkSize()
+RTMP::encodeChunkSize(int size)
 {
     GNASH_REPORT_FUNCTION;
-    log_unimpl(__PRETTY_FUNCTION__);
-    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
+
+    boost::uint32_t swapped = htonl(size);
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(sizeof(boost::uint32_t)));
+    *buf += swapped;
+
+    return buf;
 }
 
 void
 RTMP::decodeChunkSize()
 {
     GNASH_REPORT_FUNCTION;
+    // _chunksize[rthead->channel] = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr + rthead->head_size));
+    // log_network("Setting packet chunk size to %d.", _chunksize);
     log_unimpl(__PRETTY_FUNCTION__);
 }
     
@@ -913,13 +981,15 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 {
 // GNASH_REPORT_FUNCTION;
     int ret = 0;
-    
+
+#if 0
     // We got some bogus parameters
-    if (total_size == 0) {
+    if (total_size || size 0) {
 	log_error("Bogus size parameter in %s!", __PRETTY_FUNCTION__);
 	return false;
     }
-
+#endif
+    
     // FIXME: This is a temporary hack to make it easier to read hex
     // dumps from network packet sniffing so all the data is in one
     // buffer. This matches the Adobe behaviour, but for Gnash/Cygnal,
@@ -961,6 +1031,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
     *bigbuf = head;
 #endif
 
+    // if (data && size) {
     // now send the data
     while (nbytes <= size) {
 	// The last bit of data is usually less than the packet size,
@@ -983,6 +1054,8 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	    *bigbuf += cont_head;
 #endif
 	}
+        // }
+    
 	// write the data to the client
 #if 0
 	ret = writeNet(fd, data + nbytes, partial);
@@ -994,7 +1067,9 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 			ret, size-nbytes);
 	}
 #else
-	bigbuf->append(data + nbytes, partial);
+	if (data != 0) {
+	    bigbuf->append(data + nbytes, partial);
+	}
 #endif
 	// adjust the accumulator.
 	nbytes += _chunksize[channel];
@@ -1272,6 +1347,11 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	if (rthead->channel == RTMP_SYSTEM_CHANNEL) {
  	    log_network("Got a message on the system channel!", __FUNCTION__);
 	}
+	// If the header size is 4 bytes or less, then reuse the body size
+	// of the last message for this channel.
+	if (rthead->head_size <= 4) {
+	    rthead->bodysize = _lastsize[rthead->channel];
+	}
 	// Make sure the header size we just got is in range. We can
 	// proceed as long as it is in range, but if it is out of
 	// range, we can't really continue.
@@ -1279,10 +1359,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	    // Any packet with a header size greater than 1 is a
 	    // always a new RTMP message, so create a new Buffer to
 	    // hold all the data.
-	    if (rthead->head_size <= 4) {
-		rthead->bodysize = _lastsize[rthead->channel];
-	    }
-	    if ((rthead->head_size > 1) || (ptr == data)) {
+	    if ((rthead->head_size >= 1) || (ptr == data)) {
   		// cerr << "New packet for channel #" << rthead->channel << " of size "
   		//      << (rthead->head_size + rthead->bodysize) << endl;
 		// give it some memory to store data in. We store

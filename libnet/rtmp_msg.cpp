@@ -49,7 +49,7 @@ namespace gnash
 RTMPMsg::RTMPMsg()
     : _routing(FROM_SERVER),
       _status(APP_SHUTDOWN),
-      _streamid(0),
+      _transid(0),
       _channel(0)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -211,8 +211,8 @@ RTMPMsg::dump()
 //     cerr << "Length: " << _header.length << endl;
     
     cerr << "Method Name:\t" << _method << endl;
-//    cerr << "Stream ID:\t" << hexify((const unsigned char *)&_streamid, 8, false) << endl;
-    cerr << "Stream ID:\t" << _streamid << endl;
+//    cerr << "Transaction ID:\t" << hexify((const unsigned char *)&_transid, 8, false) << endl;
+    cerr << "Transaction ID:\t" << _transid << endl;
 
     vector<boost::shared_ptr<amf::Element> >::iterator ait;
     cerr << "# of Elements in file: " << _amfobjs.size() << endl;

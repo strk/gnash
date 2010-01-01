@@ -91,6 +91,7 @@ main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     
+#ifdef USE_SSL
     bool servermode = false;
 
     for( int i = 0; i < parser.arguments(); ++i ) {
@@ -164,14 +165,16 @@ main(int argc, char *argv[])
             cerr << _("This is a Gnash bug.") << endl;
         }
     }
-    
+
     if (servermode) {
 	test_server();
     } else {
 	test_client();
     }
+#endif
 }
 
+#ifdef USE_SSL
 static void test_client()
 {
     size_t ret;
@@ -265,6 +268,7 @@ static void test_server()
     server.sslAccept(net.getFileFd());
 
 }
+#endif
 
 static void
 usage (void)

@@ -170,19 +170,21 @@
 	  </entry>
 	</row>
     
-    <entry>webcamDevice</entry>
+	<row>
+	  <entry>webcamDevice</entry>
 	  <entry>integer</entry>
 	  <entry>The integer value (index into vector of video devices) that represents the default webcam.
       To easily get this entry run utilities/findwebcams (only works with Gstreamer right now)</entry>
-	</row>
+    </row>
     
-    <entry>microphoneDevice</entry>
-	  <entry>integer</entry>
-	  <entry>The integer value (index into vector of microphone devices) that represents the default microphone.
+    <row>
+      <entry>microphoneDevice</entry>
+      <entry>integer</entry>
+      <entry>The integer value (index into vector of microphone devices) that represents the default microphone.
       To easily get this entry run utilities/findmicrophones (only works with Gstreamer right now)</entry>
-	</row>
+    </row>
     
-	<row>
+    <row>
 	  <entry>flashVersionString</entry>
 	  <entry>string</entry>
 	  <entry>Set the string returned by $version and System.capabilities.version.

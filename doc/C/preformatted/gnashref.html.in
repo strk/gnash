@@ -1,6 +1,6 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash Reference Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.74.3"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash Reference Manual</h1></div><div><p class="releaseinfo">
-      This manual describes version 0.8.5 of Gnash.
-    </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash Reference Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div lang="en" class="book" title="Gnash Reference Manual"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash Reference Manual</h1></div><div><p class="releaseinfo">
+      This manual describes version 0.8.6 of Gnash.
+    </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation</p></div><div><div class="legalnotice" title="Legal Notice"><a name="legalnotice"></a><p>
     Permission is granted to copy, distribute and/or modify this document
     under the terms of the <a class="link" href="#fdl" title="Appendix A. GNU Free Documentation License"><em class="citetitle">GNU
     Free Documentation License</em></a>, Version 1.1 or any later
@@ -18,7 +18,7 @@
       </p>
       
       <p class="publisher">Open Media Now! Foundation</p>
-    </td></tr></table></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#intro">1. Introduction</a></span></dt><dd><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#build">2. Building from Source</a></span></dt><dd><dl><dt><span class="sect1"><a href="#building_overview">Overview</a></span></dt><dt><span class="sect1"><a href="#gettingsource">Getting The Source</a></span></dt><dd><dl><dt><span class="sect2"><a href="#sourcereleases">Releases</a></span></dt><dt><span class="sect2"><a href="#sourcecvs">Bzr Access</a></span></dt></dl></dd><dt><span class="sect1"><a href="#dependencies">Code Dependencies</a></span></dt><dt><span class="sect1"><a href="#testdep">Testing Dependencies</a></span></dt><dt><span class="sect1"><a href="#docdepend">Documentation Dependencies</a></span></dt><dt><span class="sect1"><a href="#configure">Configuring Gnash</a></span></dt><dt><span class="sect1"><a href="#compile">Compiling the Code</a></span></dt><dt><span class="sect1"><a href="#processdoc">Creating the Documentation</a></span></dt><dt><span class="sect1"><a href="#runtests">Running the Tests</a></span></dt><dd><dl><dt><span class="sect2"><a href="#dejagnu">Using DejaGnu</a></span></dt><dt><span class="sect2"><a href="#manually">Running The Tests Manually</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#internals">3. Software Internals</a></span></dt><dd><dl><dt><span class="sect1"><a href="#tour">A Tour of Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#The%20Libraries">The Libraries</a></span></dt><dt><span class="sect2"><a href="#apps">The Applications</a></span></dt><dt><span class="sect2"><a href="#plugin">The Plugin</a></span></dt><dt><span class="sect2"><a href="#logging">The Message Logging System</a></span></dt></dl></dd><dt><span class="sect1"><a href="#soundhandlers">Sound handling in Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#soundtypes">Sound types</a></span></dt><dt><span class="sect2"><a href="#soundparsing">Sound parsing</a></span></dt><dt><span class="sect2"><a href="#soundplayback">Sound playback</a></span></dt><dt><span class="sect2"><a href="#sdlsound">The SDL sound backend</a></span></dt><dt><span class="sect2"><a href="#gstreamer">The Gstreamer backend</a></span></dt><dt><span class="sect2"><a href="#audio-future">Future audio backends</a></span></dt><dt><span class="sect2"><a href="#gstreamer-details">Detailed description of the Gstreamer backend</a></span></dt></dl></dd><dt><span class="sect1"><a href="#testing">Testing </a></span></dt><dd><dl><dt><span class="sect2"><a href="#testtools">Testing Tools</a></span></dt><dt><span class="sect2"><a href="#testcases">Test Cases</a></span></dt><dt><span class="sect2"><a href="#writeastests">Writing ActionScript Tests</a></span></dt><dt><span class="sect2"><a href="#writemingtests">Writing Ming-based self-contained SWF tests</a></span></dt><dt><span class="sect2"><a href="#writing_dejagnu_so_tests">Writing self-contained SWF tests with other compilers</a></span></dt><dt><span class="sect2"><a href="#writing_test_runners">Writing Test Runners</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#bugreport">5. Reporting Bugs</a></span></dt><dd><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></dd><dt><span class="chapter"><a href="#extensions">6. Gnash Extensions</a></span></dt><dd><dl><dt><span class="sect1"><a href="#newext">Creating A New Extension</a></span></dt><dd><dl><dt><span class="sect2"><a href="#craftext">Crafting an Extension</a></span></dt></dl></dd><dt><span class="sect1"><a href="#debuext">Debugging An Extension</a></span></dt><dt><span class="sect1"><a href="#inclext">Included Extensions</a></span></dt></dl></dd><dt><span class="chapter"><a href="#rtmp">7. RTMP Protocol</a></span></dt><dd><dl><dt><span class="sect1"><a href="#amf">AMF Format</a></span></dt></dl></dd><dt><span class="chapter"><a href="#nsapi">8. Mozilla/Firefox NPAPI Plugin</a></span></dt><dd><dl><dt><span class="sect1"><a href="#plugincapi">Plugin C API</a></span></dt><dt><span class="sect1"><a href="#plugincppapi">Plugin C++ API</a></span></dt><dt><span class="sect1"><a href="#glthread">OpenGL and Threads</a></span></dt><dt><span class="sect1"><a href="#eventhandle">Plugin Event Handling</a></span></dt></dl></dd><dt><span class="chapter"><a href="#authors">9. Authors</a></span></dt><dt><span class="appendix"><a href="#fdl">A. GNU Free Documentation License</a></span></dt><dd><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></dd></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>2.1. <a href="#codedeps">Code Dependency Table</a></dt><dt>2.2. <a href="#testdeps">Testing Dependency Table</a></dt><dt>2.3. <a href="#docdeps">Documentation Dependency Table</a></dt><dt>2.4. <a href="#tb-config-features">Configuration Options - Features</a></dt><dt>2.5. <a href="#tb-configure-paths">Custom Path Options</a></dt></dl></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="intro"></a>Chapter 1. Introduction</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></div><p>
+    </td></tr></table></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#intro">1. Introduction</a></span></dt><dd><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#build">2. Building from Source</a></span></dt><dd><dl><dt><span class="sect1"><a href="#building_overview">Overview</a></span></dt><dt><span class="sect1"><a href="#gettingsource">Getting The Source</a></span></dt><dd><dl><dt><span class="sect2"><a href="#sourcereleases">Releases</a></span></dt><dt><span class="sect2"><a href="#sourcecvs">Bzr Access</a></span></dt></dl></dd><dt><span class="sect1"><a href="#dependencies">Code Dependencies</a></span></dt><dt><span class="sect1"><a href="#testdep">Testing Dependencies</a></span></dt><dt><span class="sect1"><a href="#docdepend">Documentation Dependencies</a></span></dt><dt><span class="sect1"><a href="#configure">Configuring Gnash</a></span></dt><dt><span class="sect1"><a href="#compile">Compiling the Code</a></span></dt><dt><span class="sect1"><a href="#processdoc">Creating the Documentation</a></span></dt><dt><span class="sect1"><a href="#runtests">Running the Tests</a></span></dt><dd><dl><dt><span class="sect2"><a href="#dejagnu">Using DejaGnu</a></span></dt><dt><span class="sect2"><a href="#manually">Running The Tests Manually</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#internals">3. Software Internals</a></span></dt><dd><dl><dt><span class="sect1"><a href="#tour">A Tour of Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#The%20Libraries">The Libraries</a></span></dt><dt><span class="sect2"><a href="#apps">The Applications</a></span></dt><dt><span class="sect2"><a href="#plugin">The Plugin</a></span></dt><dt><span class="sect2"><a href="#logging">The Message Logging System</a></span></dt></dl></dd><dt><span class="sect1"><a href="#soundhandlers">Sound handling in Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#soundtypes">Sound types</a></span></dt><dt><span class="sect2"><a href="#soundparsing">Sound parsing</a></span></dt><dt><span class="sect2"><a href="#soundplayback">Sound playback</a></span></dt><dt><span class="sect2"><a href="#sdlsound">The SDL sound backend</a></span></dt><dt><span class="sect2"><a href="#gstreamer">The Gstreamer backend</a></span></dt><dt><span class="sect2"><a href="#audio-future">Future audio backends</a></span></dt><dt><span class="sect2"><a href="#gstreamer-details">Detailed description of the Gstreamer backend</a></span></dt></dl></dd><dt><span class="sect1"><a href="#testing">Testing </a></span></dt><dd><dl><dt><span class="sect2"><a href="#testtools">Testing Tools</a></span></dt><dt><span class="sect2"><a href="#testcases">Test Cases</a></span></dt><dt><span class="sect2"><a href="#writeastests">Writing ActionScript Tests</a></span></dt><dt><span class="sect2"><a href="#writemingtests">Writing Ming-based self-contained SWF tests</a></span></dt><dt><span class="sect2"><a href="#writing_dejagnu_so_tests">Writing self-contained SWF tests with other compilers</a></span></dt><dt><span class="sect2"><a href="#writing_test_runners">Writing Test Runners</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#bugreport">5. Reporting Bugs</a></span></dt><dd><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></dd><dt><span class="chapter"><a href="#extensions">6. Gnash Extensions</a></span></dt><dd><dl><dt><span class="sect1"><a href="#newext">Creating A New Extension</a></span></dt><dd><dl><dt><span class="sect2"><a href="#craftext">Crafting an Extension</a></span></dt></dl></dd><dt><span class="sect1"><a href="#debuext">Debugging An Extension</a></span></dt><dt><span class="sect1"><a href="#inclext">Included Extensions</a></span></dt></dl></dd><dt><span class="chapter"><a href="#rtmp">7. RTMP Protocol</a></span></dt><dd><dl><dt><span class="sect1"><a href="#amf">AMF Format</a></span></dt></dl></dd><dt><span class="chapter"><a href="#nsapi">8. Mozilla/Firefox NPAPI Plugin</a></span></dt><dd><dl><dt><span class="sect1"><a href="#plugincapi">Plugin C API</a></span></dt><dt><span class="sect1"><a href="#plugincppapi">Plugin C++ API</a></span></dt><dt><span class="sect1"><a href="#glthread">OpenGL and Threads</a></span></dt><dt><span class="sect1"><a href="#eventhandle">Plugin Event Handling</a></span></dt></dl></dd><dt><span class="chapter"><a href="#authors">9. Authors</a></span></dt><dt><span class="appendix"><a href="#fdl">A. GNU Free Documentation License</a></span></dt><dd><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></dd></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>2.1. <a href="#codedeps">Code Dependency Table</a></dt><dt>2.2. <a href="#testdeps">Testing Dependency Table</a></dt><dt>2.3. <a href="#docdeps">Documentation Dependency Table</a></dt><dt>2.4. <a href="#tb-config-features">Configuration Options - Features</a></dt><dt>2.5. <a href="#tb-configure-paths">Custom Path Options</a></dt></dl></div><div class="chapter" title="Chapter 1. Introduction"><div class="titlepage"><div><div><h2 class="title"><a name="intro"></a>Chapter 1. Introduction</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></div><p>
     <span class="application">Gnash</span> is a free SWF movie player.  It is available as a
     stand-alone application or as a plugin for several popular
     web browsers. It supports playing media from a disk or streaming
@@ -31,12 +31,12 @@
     extending ActionScript by creating your own classes. You can write
     wrappers for any development library, and import them into the
     player much like Perl or Python does.
-  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="audience"></a>Audience</h2></div></div></div><p>
+  </p><div class="sect1" title="Audience"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="audience"></a>Audience</h2></div></div></div><p>
       This manual is primarily focused on users interested in how to
       get Gnash installed from a package, and basic usage as a web
       browser plugin. For more technical details, please refer to the
       Gnash Reference manual.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="runs-on"></a>What Is Supported?</h2></div></div></div><p>
+    </p></div><div class="sect1" title="What Is Supported?"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="runs-on"></a>What Is Supported?</h2></div></div></div><p>
       Gnash is known to compile for most any POSIX and ANSI C++
       conforming system if you have all the dependent libraries
       installed. Systems we test on, and which Gnash is known to
@@ -84,7 +84,7 @@
       while work is being done to support these codecs when embedded
       in a SWF file. FFmpeg contains the codecs used by the current
       SWF defintion, FLV, VP6 (ON2), H.263, H.264, and MP3.
-    </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="build"></a>Chapter 2. Building from Source</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#building_overview">Overview</a></span></dt><dt><span class="sect1"><a href="#gettingsource">Getting The Source</a></span></dt><dd><dl><dt><span class="sect2"><a href="#sourcereleases">Releases</a></span></dt><dt><span class="sect2"><a href="#sourcecvs">Bzr Access</a></span></dt></dl></dd><dt><span class="sect1"><a href="#dependencies">Code Dependencies</a></span></dt><dt><span class="sect1"><a href="#testdep">Testing Dependencies</a></span></dt><dt><span class="sect1"><a href="#docdepend">Documentation Dependencies</a></span></dt><dt><span class="sect1"><a href="#configure">Configuring Gnash</a></span></dt><dt><span class="sect1"><a href="#compile">Compiling the Code</a></span></dt><dt><span class="sect1"><a href="#processdoc">Creating the Documentation</a></span></dt><dt><span class="sect1"><a href="#runtests">Running the Tests</a></span></dt><dd><dl><dt><span class="sect2"><a href="#dejagnu">Using DejaGnu</a></span></dt><dt><span class="sect2"><a href="#manually">Running The Tests Manually</a></span></dt></dl></dd></dl></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="building_overview"></a>Overview</h2></div></div></div><p>
+    </p></div></div><div class="chapter" title="Chapter 2. Building from Source"><div class="titlepage"><div><div><h2 class="title"><a name="build"></a>Chapter 2. Building from Source</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#building_overview">Overview</a></span></dt><dt><span class="sect1"><a href="#gettingsource">Getting The Source</a></span></dt><dd><dl><dt><span class="sect2"><a href="#sourcereleases">Releases</a></span></dt><dt><span class="sect2"><a href="#sourcecvs">Bzr Access</a></span></dt></dl></dd><dt><span class="sect1"><a href="#dependencies">Code Dependencies</a></span></dt><dt><span class="sect1"><a href="#testdep">Testing Dependencies</a></span></dt><dt><span class="sect1"><a href="#docdepend">Documentation Dependencies</a></span></dt><dt><span class="sect1"><a href="#configure">Configuring Gnash</a></span></dt><dt><span class="sect1"><a href="#compile">Compiling the Code</a></span></dt><dt><span class="sect1"><a href="#processdoc">Creating the Documentation</a></span></dt><dt><span class="sect1"><a href="#runtests">Running the Tests</a></span></dt><dd><dl><dt><span class="sect2"><a href="#dejagnu">Using DejaGnu</a></span></dt><dt><span class="sect2"><a href="#manually">Running The Tests Manually</a></span></dt></dl></dd></dl></div><div class="sect1" title="Overview"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="building_overview"></a>Overview</h2></div></div></div><p>
       The typical process of building from source will involve 
       <a class="link" href="#gettingsource" title="Getting The Source">getting the source</a>,
       <a class="link" href="#dependencies" title="Code Dependencies">build dependencies</a>,
@@ -112,7 +112,7 @@
     </p><p>
       Continue reading for detailed step-by-step instructions 
       of the entire procedure.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="gettingsource"></a>Getting The Source</h2></div></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sourcereleases"></a>Releases</h3></div></div></div><p>
+    </p></div><div class="sect1" title="Getting The Source"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="gettingsource"></a>Getting The Source</h2></div></div></div><div class="sect2" title="Releases"><div class="titlepage"><div><div><h3 class="title"><a name="sourcereleases"></a>Releases</h3></div></div></div><p>
 	Tarballs of official releases can be found in the download area
 	of the project's GNU Savannah page at
 	<a class="ulink" href="http://savannah.gnu.org/projects/gnash" target="_top">
@@ -122,7 +122,7 @@
 	<a class="ulink" href="http://ftp.gnu.org/gnu/gnash" target="_top">
 		    http://ftp.gnu.org/gnu/gnash
 	</a> 
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sourcecvs"></a>Bzr Access</h3></div></div></div><p>
+      </p></div><div class="sect2" title="Bzr Access"><div class="titlepage"><div><div><h3 class="title"><a name="sourcecvs"></a>Bzr Access</h3></div></div></div><p>
 	The latest <span class="application">Gnash</span> development sources are available via bzr.
 	Use the following commands to check them out:
 	</p><pre class="programlisting">
@@ -145,7 +145,7 @@
 	<a class="ulink" href="http://www.gnashdev.org/dev_snapshots/" target="_top">
 		    http://www.gnashdev.org/dev_snapshots
 	</a> 
-      </p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="dependencies"></a>Code Dependencies</h2></div></div></div><p>
+      </p></div></div><div class="sect1" title="Code Dependencies"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="dependencies"></a>Code Dependencies</h2></div></div></div><p>
     <span class="application">Gnash</span> has a number of dependencies on other packages.
     If you install the dependencies using a package
     manager, be certain to install the development versions
@@ -332,7 +332,7 @@
 	    This package is required to run
 	    <span class="emphasis"><em>autogen.sh</em></span>, which is a requirement
 	    if you are using the development source from CVS.
-	  </td><td align="left"><code class="filename">libltdl3-dev</code></td><td align="left"><code class="filename">libtool</code></td><td align="left"><code class="filename">libtool</code></td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="testdep"></a>Testing Dependencies</h2></div></div></div><p>
+	  </td><td align="left"><code class="filename">libltdl3-dev</code></td><td align="left"><code class="filename">libtool</code></td><td align="left"><code class="filename">libtool</code></td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" title="Testing Dependencies"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="testdep"></a>Testing Dependencies</h2></div></div></div><p>
     <span class="application">Gnash</span> tries to run as many tests as possible, but will
     silentl skip tests if the tools to run them are unavailable.
   </p><div class="table"><a name="testdeps"></a><p class="title"><b>Table 2.2. Testing Dependency Table</b></p><div class="table-contents"><table summary="Testing Dependency Table" border="1"><colgroup><col><col><col><col><col><col><col></colgroup><thead><tr><th align="left">Name</th><th align="left">Level</th><th align="left">Version</th><th align="left">Description</th><th align="left">Explanation</th><th align="left">apt-get package</th><th align="left">RPM/Yum package</th><th align="left">BSD package</th></tr></thead><tbody><tr><td align="left">Ming</td><td align="left">Optional</td><td align="left">0.4.0_beta4 or higher</td><td align="left">
@@ -360,7 +360,7 @@
 	  </td><td align="left">
 	    DejaGnu is used to run multiple tests in an
 	    automated fashion.
-	  </td><td align="left"><code class="filename">dejagnu</code></td><td align="left"><code class="filename">dejagnu</code></td><td align="left"><code class="filename">dejagnu</code></td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="docdepend"></a>Documentation Dependencies</h2></div></div></div><p>
+	  </td><td align="left"><code class="filename">dejagnu</code></td><td align="left"><code class="filename">dejagnu</code></td><td align="left"><code class="filename">dejagnu</code></td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" title="Documentation Dependencies"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="docdepend"></a>Documentation Dependencies</h2></div></div></div><p>
     The following packages are used to build <span class="application">Gnash</span>'s documentation.
   </p><div class="table"><a name="docdeps"></a><p class="title"><b>Table 2.3. Documentation Dependency Table</b></p><div class="table-contents"><table summary="Documentation Dependency Table" border="1"><colgroup><col><col><col><col><col><col><col></colgroup><thead><tr><th align="left">Name</th><th align="left">Level</th><th align="left">Version</th><th align="left">Description</th><th align="left">Explanation</th><th align="left">apt-get package</th><th align="left">RPM/Yum package</th><th align="left">BSD package</th></tr></thead><tbody><tr><td align="left">Docbook</td><td align="left">Required</td><td align="left"> </td><td align="left">
 	    <a class="ulink" href="http://http://docbook.sourceforge.net/" target="_top">Docbook</a> is
@@ -430,7 +430,7 @@
     installation.  If you encounter problems with the Java
     installation, you may also need to add this path to the
     <span class="emphasis"><em>CLASSPATH</em></span> environment variable.
-  </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="configure"></a>Configuring Gnash</h2></div></div></div><p>
+  </p></div><div class="sect1" title="Configuring Gnash"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="configure"></a>Configuring Gnash</h2></div></div></div><p>
     <span class="application">Gnash</span>, like most GNU projects, allows a user to select various
     options before compiling its source code. These options include
     selecting from the available features, specifying custom paths for
@@ -486,17 +486,17 @@
     available, and not all are supposed to work together. A common
     mistake when configuring <span class="application">Gnash</span> is to supply too many options,
     overdriving <span class="application">Gnash</span>'s ability to do the right thing.
-  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="configfeatures"></a>Features</h2></div></div></div><p>
+  </p><div class="sect1" title="Features"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="configfeatures"></a>Features</h2></div></div></div><p>
     Some switches can be used during configuration to enable or disable
     features of <span class="application">Gnash</span>. Some of the most important configuration options
     are:
-  </p><div class="itemizedlist"><ul type="opencircle"><li style="list-style-type: circle"><p>
+  </p><div class="itemizedlist"><ul class="itemizedlist" type="opencircle"><li class="listitem" style="list-style-type: circle"><p>
 	<code class="option">--enable-gui</code> lets you specify your GUI of choice.
 	The default option is GTK.
-      </p></li><li style="list-style-type: circle"><p>
+      </p></li><li class="listitem" style="list-style-type: circle"><p>
 	<code class="option">--enable-renderer</code> allows a renderer to be
 	chosen.  The default renderer is AGG.
-      </p></li><li style="list-style-type: circle"><p>
+      </p></li><li class="listitem" style="list-style-type: circle"><p>
 	<code class="option">--enable-media</code> permits a media handler to be
 	selected.  The default is Gstreamer. 
       </p></li></ul></div><p>
@@ -599,7 +599,7 @@
 	  Currently support is only available using GTK gui and AGG renderer.
 	  Keeping it enabled is not a problem as it will not be used if not
 	  available in the current X session.
-	  </td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="custompath"></a>Specifying Custom Paths</h2></div></div></div><p>
+	  </td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" title="Specifying Custom Paths"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="custompath"></a>Specifying Custom Paths</h2></div></div></div><p>
     By default, none of these options should be required
     unless you want <span class="application">Gnash</span> to use a specific version of a
     development package, or if the configure test fails to
@@ -851,7 +851,7 @@
 	  </td></tr></tbody></table></div></div><br class="table-break"></div></div><p>
     Once you have <span class="application">Gnash</span> configured, you are ready to build the code.  <span class="application">Gnash</span> is built using
     <span class="emphasis"><em>GNU make</em></span>.
-  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="compile"></a>Compiling the Code</h2></div></div></div><p>
+  </p><div class="sect1" title="Compiling the Code"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="compile"></a>Compiling the Code</h2></div></div></div><p>
       The most basic way to compile code is simply:
       </p><pre class="programlisting">
 	make
@@ -870,7 +870,7 @@
     </p><pre class="programlisting">./configure --help</pre><p>
       In the following example, debugging is enabled and optimization is
       disabled:
-    </p><pre class="programlisting">make CFLAGS=-g CXXFLAGS=-g</pre></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="processdoc"></a>Creating the Documentation</h2></div></div></div><p>
+    </p><pre class="programlisting">make CFLAGS=-g CXXFLAGS=-g</pre></div><div class="sect1" title="Creating the Documentation"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="processdoc"></a>Creating the Documentation</h2></div></div></div><p>
       By default, documentation is not built when you
       <a class="link" href="#install" title="Installation">install</a> <span class="application">Gnash</span>.  This is because
       there are a number of <a class="link" href="#docdepend" title="Documentation Dependencies">dependencies 
@@ -902,12 +902,12 @@
       </p><pre class="programlisting">
 	make apidoc
       </pre><p>
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="runtests"></a>Running the Tests</h2></div></div></div><p>
+    </p></div><div class="sect1" title="Running the Tests"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="runtests"></a>Running the Tests</h2></div></div></div><p>
       Before beginning the potentially lengthy install, it is wise to
       test the installation.  If a test fails, please report it by
       following the <a class="link" href="#bugreport" title="Chapter 5. Reporting Bugs">instructions for
       reporting a bug</a>. 
-    </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="dejagnu"></a>Using DejaGnu</h3></div></div></div><p>
+    </p><div class="sect2" title="Using DejaGnu"><div class="titlepage"><div><div><h3 class="title"><a name="dejagnu"></a>Using DejaGnu</h3></div></div></div><p>
 	
 	The easiest way to run <span class="application">Gnash</span>'s test suite is to install
 	<span class="emphasis"><em><a class="ulink" href="http://www.gnu.org/software/dejagnu" target="_top">DejaGnu</a></em></span>.
@@ -915,7 +915,7 @@
 	</p><pre class="programlisting">
 	  make check
 	</pre><p>
-      </p><div class="sect4" lang="en"><div class="titlepage"><div><div><h5 class="title"><a name="testing_verbosity"></a>Increasing Verbosity</h5></div></div></div><p>
+      </p><div class="sect4" title="Increasing Verbosity"><div class="titlepage"><div><div><h5 class="title"><a name="testing_verbosity"></a>Increasing Verbosity</h5></div></div></div><p>
 	  If you encounter a problem with a test, increasing the
 	  verbosity may make the issue easier to spot.
 	  Additional details are visible when 
@@ -926,7 +926,7 @@
 	  </p><pre class="programlisting">
 	    make check RUNTESTFLAGS="-v -a"
 	  </pre><p>
-	</p></div><div class="sect4" lang="en"><div class="titlepage"><div><div><h5 class="title"><a name="running_some_tests"></a>Running Some Tests</h5></div></div></div><p>
+	</p></div><div class="sect4" title="Running Some Tests"><div class="titlepage"><div><div><h5 class="title"><a name="running_some_tests"></a>Running Some Tests</h5></div></div></div><p>
 	  It is possible to run just a single test, or 
 	  a subdirectory of tests, by specifying the directory or 
 	  compiled test file.
@@ -950,7 +950,7 @@
 	  </p><pre class="programlisting">
 	    make -C testsuite/movies.all check
 	  </pre><p>
-	</p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="manually"></a>Running The Tests Manually</h3></div></div></div><p>
+	</p></div></div><div class="sect2" title="Running The Tests Manually"><div class="titlepage"><div><div><h3 class="title"><a name="manually"></a>Running The Tests Manually</h3></div></div></div><p>
 	You may also run test cases by hand, which can be useful if you
 	want to see all the debugging output from the test case.  Often
 	the messages which come from deep within <span class="application">Gnash</span> are most useful for
@@ -963,20 +963,20 @@
 	</p><pre class="programlisting">
 	  make XML-v{5,6,7,8}.swf
 	</pre><p>
-      </p><div class="sect4" lang="en"><div class="titlepage"><div><div><h5 class="title"><a name="manual_compiled_tests"></a>Movie tests</h5></div></div></div><p>
+      </p><div class="sect4" title="Movie tests"><div class="titlepage"><div><div><h5 class="title"><a name="manual_compiled_tests"></a>Movie tests</h5></div></div></div><p>
 	  This creates a SWF movie version of the test case, which
 	  can be run with a standalone SWF player.  For instance,
 	  the target for SWF version 6 could be run with <span class="application">Gnash</span>:
 	  </p><pre class="programlisting">
 	    gnash -v XML-v6.swf
 	  </pre><p>
-	</p></div><div class="sect4" lang="en"><div class="titlepage"><div><div><h5 class="title"><a name="manual_actionscript_tests"></a>ActionScript Unit Tests</h5></div></div></div><p>
+	</p></div><div class="sect4" title="ActionScript Unit Tests"><div class="titlepage"><div><div><h5 class="title"><a name="manual_actionscript_tests"></a>ActionScript Unit Tests</h5></div></div></div><p>
 	  Unit tests for ActionScript classes in <span class="command"><strong>testsuite/actionscript.all</strong></span>
 	  are run without a graphical display:
 	  </p><pre class="programlisting">
 	    gprocessor -v XML-v6.swf
 	  </pre><p>
-	</p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="install"></a>Installation</h2></div></div></div><p>
+	</p></div></div><div class="sect1" title="Installation"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="install"></a>Installation</h2></div></div></div><p>
     Now that <span class="application">Gnash</span> has been compiled and tested, use the following command to install it:
     </p><pre class="programlisting">
       make install
@@ -1005,7 +1005,7 @@
     <a class="link" href="#custompath" title="Specifying Custom Paths">configuration option</a> 
     <span class="emphasis"><em>--exec-prefix</em></span> may be used to specify where
     platform-dependent executables and libraries are installed.
-  </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="libinstall"></a>Libraries</h3></div></div></div><p>
+  </p><div class="sect2" title="Libraries"><div class="titlepage"><div><div><h3 class="title"><a name="libinstall"></a>Libraries</h3></div></div></div><p>
       Installed libraries are located in 
       <code class="filename">/usr/local/lib</code> by default.
       If the <span class="emphasis"><em>--prefix</em></span> option was used during the
@@ -1026,7 +1026,7 @@
       <code class="filename">/etc/ld.so.conf</code>.  After adding the path,
       run <span class="emphasis"><em>ldconfig</em></span> as root to update the runtime
       cache.
-    </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="appinstall"></a>Executables</h3></div></div></div><p>
+    </p></div><div class="sect2" title="Executables"><div class="titlepage"><div><div><h3 class="title"><a name="appinstall"></a>Executables</h3></div></div></div><p>
       The Mozilla plugin is built from headers (the Mozilla SDK) provided with Gnash and
       does not need extra development packages to be installed. By default, the
       plugin is installed to <code class="filename">~/.mozilla/plugins/</code>. To enable
@@ -1042,7 +1042,7 @@
       subdirectory of the directory specified by during configuration.
       If no path was specified, the default is 
       <code class="filename">/usr/local/bin</code>.
-    </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="docinstall"></a>Documentation</h3></div></div></div><p>
+    </p></div><div class="sect2" title="Documentation"><div class="titlepage"><div><div><h3 class="title"><a name="docinstall"></a>Documentation</h3></div></div></div><p>
       Documentation is not built by default; please refer to the 
       <a class="link" href="#processdoc" title="Creating the Documentation">section on documentation</a> for
       more information on building documentation.
@@ -1059,7 +1059,7 @@
       <code class="filename">doc/C/gnash.omf</code> is used to specify under
       which menu item <span class="application">Gnash</span> appears in the <span class="emphasis"><em>GNOME help</em></span>
       system.
-    </p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="cross"></a>Cross Configuring</h2></div></div></div><p>
+    </p></div></div><div class="sect1" title="Cross Configuring"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="cross"></a>Cross Configuring</h2></div></div></div><p>
     To cross configure and compile <span class="application">Gnash</span>, begin by building a target system
     on your workstation.  This includes cross compilers for the target
     architecture, and some system headers. 
@@ -1127,7 +1127,7 @@
       ./configure -target=arm-unknown-linux-gnu --prefix=/usr/arm \
       --host=arm-unknown-linux-gnu --build=i686-pc-linux-gnu --disable-plugin
     </pre><p>
-  </p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="internals"></a>Chapter 3. Software Internals</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#tour">A Tour of Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#The%20Libraries">The Libraries</a></span></dt><dt><span class="sect2"><a href="#apps">The Applications</a></span></dt><dt><span class="sect2"><a href="#plugin">The Plugin</a></span></dt><dt><span class="sect2"><a href="#logging">The Message Logging System</a></span></dt></dl></dd><dt><span class="sect1"><a href="#soundhandlers">Sound handling in Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#soundtypes">Sound types</a></span></dt><dt><span class="sect2"><a href="#soundparsing">Sound parsing</a></span></dt><dt><span class="sect2"><a href="#soundplayback">Sound playback</a></span></dt><dt><span class="sect2"><a href="#sdlsound">The SDL sound backend</a></span></dt><dt><span class="sect2"><a href="#gstreamer">The Gstreamer backend</a></span></dt><dt><span class="sect2"><a href="#audio-future">Future audio backends</a></span></dt><dt><span class="sect2"><a href="#gstreamer-details">Detailed description of the Gstreamer backend</a></span></dt></dl></dd><dt><span class="sect1"><a href="#testing">Testing </a></span></dt><dd><dl><dt><span class="sect2"><a href="#testtools">Testing Tools</a></span></dt><dt><span class="sect2"><a href="#testcases">Test Cases</a></span></dt><dt><span class="sect2"><a href="#writeastests">Writing ActionScript Tests</a></span></dt><dt><span class="sect2"><a href="#writemingtests">Writing Ming-based self-contained SWF tests</a></span></dt><dt><span class="sect2"><a href="#writing_dejagnu_so_tests">Writing self-contained SWF tests with other compilers</a></span></dt><dt><span class="sect2"><a href="#writing_test_runners">Writing Test Runners</a></span></dt></dl></dd></dl></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="tour"></a>A Tour of Gnash</h2></div></div></div><p>
+  </p></div></div></div><div class="chapter" title="Chapter 3. Software Internals"><div class="titlepage"><div><div><h2 class="title"><a name="internals"></a>Chapter 3. Software Internals</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#tour">A Tour of Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#The%20Libraries">The Libraries</a></span></dt><dt><span class="sect2"><a href="#apps">The Applications</a></span></dt><dt><span class="sect2"><a href="#plugin">The Plugin</a></span></dt><dt><span class="sect2"><a href="#logging">The Message Logging System</a></span></dt></dl></dd><dt><span class="sect1"><a href="#soundhandlers">Sound handling in Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#soundtypes">Sound types</a></span></dt><dt><span class="sect2"><a href="#soundparsing">Sound parsing</a></span></dt><dt><span class="sect2"><a href="#soundplayback">Sound playback</a></span></dt><dt><span class="sect2"><a href="#sdlsound">The SDL sound backend</a></span></dt><dt><span class="sect2"><a href="#gstreamer">The Gstreamer backend</a></span></dt><dt><span class="sect2"><a href="#audio-future">Future audio backends</a></span></dt><dt><span class="sect2"><a href="#gstreamer-details">Detailed description of the Gstreamer backend</a></span></dt></dl></dd><dt><span class="sect1"><a href="#testing">Testing </a></span></dt><dd><dl><dt><span class="sect2"><a href="#testtools">Testing Tools</a></span></dt><dt><span class="sect2"><a href="#testcases">Test Cases</a></span></dt><dt><span class="sect2"><a href="#writeastests">Writing ActionScript Tests</a></span></dt><dt><span class="sect2"><a href="#writemingtests">Writing Ming-based self-contained SWF tests</a></span></dt><dt><span class="sect2"><a href="#writing_dejagnu_so_tests">Writing self-contained SWF tests with other compilers</a></span></dt><dt><span class="sect2"><a href="#writing_test_runners">Writing Test Runners</a></span></dt></dl></dd></dl></div><div class="sect1" title="A Tour of Gnash"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="tour"></a>A Tour of Gnash</h2></div></div></div><p>
       The top level of Gnash has several libraries, <span class="emphasis"><em>libgnashbase</em></span>,
       <span class="emphasis"><em>libgnashserver</em></span>,
       <span class="emphasis"><em>libgnashmedia</em></span>,
@@ -1136,7 +1136,7 @@
       included for debug parsing and processing of SWF movie files,
       and other useful utilities for examining local Shared Objects and
       sniffing LocalConnections.
-    </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="The%20Libraries"></a>The Libraries</h3></div></div></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libbase"></a>libgnashbase</h4></div></div></div><p>
+    </p><div class="sect2" title="The Libraries"><div class="titlepage"><div><div><h3 class="title"><a name="The%20Libraries"></a>The Libraries</h3></div></div></div><div class="sect3" title="libgnashbase"><div class="titlepage"><div><div><h4 class="title"><a name="libbase"></a>libgnashbase</h4></div></div></div><p>
 	  Libgnashbase contains support classes used by the rest of the
 	  code.This library has no dependencies on any of the other
 	  <span class="application">Gnash</span> libraries.
@@ -1144,60 +1144,60 @@
 	  <span class="application">Gnash</span> makes heavy use of smart pointers, so memory allocations
 	  are freed up automatically by the interpreter. Both STL and
 	  Boost smart pointers are used.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashserver"></a>libgnashserver</h4></div></div></div><p>
+	</p></div><div class="sect3" title="libgnashserver"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashserver"></a>libgnashserver</h4></div></div></div><p>
 	  Libgnashserver is the guts of the interpreter itself. This is where
 	  the main code for the interpreter lives. Includes in
 	  libserver are the two support libraries for the parser and
 	  the core of the virtual machine.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashmedia"></a>libgnashmedia</h4></div></div></div><p>
+	</p></div><div class="sect3" title="libgnashmedia"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashmedia"></a>libgnashmedia</h4></div></div></div><p>
 		Libgnashmedia handles Gnash's audio and video capabilities,
 		dealing with streamed video and sound as well as decoding
 		embedded media frames. Besides the standard SWF formats
 		FLV, MPEG4, Nellymoser, ADPCM, MP3 and RAW, <span class="application">Gnash</span> can 
 		decode other formats supports by Gstreamer or FFmpeg, 
 		including the free OGG container and free codecs.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashamf"></a>libgnashamf</h4></div></div></div><p>
+	</p></div><div class="sect3" title="libgnashamf"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashamf"></a>libgnashamf</h4></div></div></div><p>
 	  AMF is the data format used internally by SWF files. This is
 	  Gnash's support library to handle AMF data. This is used by
 	  the ActionScript classes SharedObject and
 	  LocalConnection. This is also used by the NetStream class
 	  when using thre RTMP streaming network protocol.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashbackend"></a>libgnashbackend</h4></div></div></div><p>
+	</p></div><div class="sect3" title="libgnashbackend"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashbackend"></a>libgnashbackend</h4></div></div></div><p>
 	  Libgnashbackend is a library containing the rendering
 	  code that glues this display to the Gnash. Supported
 	  rendering backends are OpenGL, Cairo, and AGG.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashpluin"></a>libgnashplugin</h4></div></div></div><p>
+	</p></div><div class="sect3" title="libgnashplugin"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashpluin"></a>libgnashplugin</h4></div></div></div><p>
 	  Libgnashplugin is the Mozilla/Firefox plugin.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libklashpart"></a>libklashpart</h4></div></div></div><p>
+	</p></div><div class="sect3" title="libklashpart"><div class="titlepage"><div><div><h4 class="title"><a name="libklashpart"></a>libklashpart</h4></div></div></div><p>
 	  Libklashpart is the Konqueror plugin.
-	</p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="apps"></a>The Applications</h3></div></div></div><p>
+	</p></div></div><div class="sect2" title="The Applications"><div class="titlepage"><div><div><h3 class="title"><a name="apps"></a>The Applications</h3></div></div></div><p>
 	    There are currently a few standalone programs in Gnash,
         which serve either to assist with Gnash development or to play SWF
         movies.
-      </p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="Gnash"></a>The Standalone Player</h4></div></div></div><p>
+      </p><div class="sect3" title="The Standalone Player"><div class="titlepage"><div><div><h4 class="title"><a name="Gnash"></a>The Standalone Player</h4></div></div></div><p>
 	  This is the standalone OpenGL backend used to play
 	  movies. There are several command line options and keyboard
 	  control keys used by Gnash.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="processor"></a>Gprocessor</h4></div></div></div><p>
+	</p></div><div class="sect3" title="Gprocessor"><div class="titlepage"><div><div><h4 class="title"><a name="processor"></a>Gprocessor</h4></div></div></div><p>
 	  Gprocessor is used to print out the actions (using the -va
 	  option) or the parsing (using the -vp option) of a SWF
 	  movie. It is also used to produce the <span class="emphasis"><em>.gsc</em></span>
 	  files that Gnash uses to cache data, thereby speeding up the
 	  loading of files.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="soldumper"></a>SOLdumper</h4></div></div></div><p>
+	</p></div><div class="sect3" title="SOLdumper"><div class="titlepage"><div><div><h4 class="title"><a name="soldumper"></a>SOLdumper</h4></div></div></div><p>
 	  SOLDumper is a utility program used to find and dump the
 	  content of <span class="emphasis"><em>Local Shared Objects</em></span>, also
 	  called "Flash Cookies" by some.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="dumpshm"></a>Dumpshm</h4></div></div></div><p>
+	</p></div><div class="sect3" title="Dumpshm"><div class="titlepage"><div><div><h4 class="title"><a name="dumpshm"></a>Dumpshm</h4></div></div></div><p>
 	  Dumpshm is a program used to find and dump the contents of
 	  the <span class="emphasis"><em>LocalConnection</em></span> shared memory segment.
-	</p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="plugin"></a>The Plugin</h3></div></div></div><p>
+	</p></div></div><div class="sect2" title="The Plugin"><div class="titlepage"><div><div><h3 class="title"><a name="plugin"></a>The Plugin</h3></div></div></div><p>
 	The plugin is designed to work within Mozilla or Firefox,
 	although there is Konqueror support as well. The plugin uses
 	the Mozilla plugin API (NPAPI) to be cross platform, and is
 	portable, as well as being well integrated into Mozilla based
 	browsers.
-      </p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="pluginstatus"></a>Current Implementation</h4></div></div></div><p>
+      </p><div class="sect3" title="Current Implementation"><div class="titlepage"><div><div><h4 class="title"><a name="pluginstatus"></a>Current Implementation</h4></div></div></div><p>
 	  The plugin works in a
 	  fashion similar to MozPlugger: the standalone player
 	  is used instead of using a thread. This gets around the
@@ -1207,7 +1207,7 @@
 	</p><p>
 	  As of Jan, 2007, streaming video, ala "YouTube"
 	  works, along with other video sharing sites.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="gui"></a>GUI Support</h4></div></div></div><p>
+	</p></div><div class="sect3" title="GUI Support"><div class="titlepage"><div><div><h4 class="title"><a name="gui"></a>GUI Support</h4></div></div></div><p>
 	  Any plugin that wants to display in a browser window needs
 	  to be tied into the windowing system of the platform being
 	  used. On GNU/Linux systems, Firefox is a GTK2+ application.
@@ -1242,7 +1242,7 @@
 	  fashion for now. There is a right mouse button menu that
 	  allows the user to control the movie being player the same
 	  way the existing keyboard commands do.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="mozplugger"></a>Mozplugger</h4></div></div></div><p>
+	</p></div><div class="sect3" title="Mozplugger"><div class="titlepage"><div><div><h4 class="title"><a name="mozplugger"></a>Mozplugger</h4></div></div></div><p>
 	  <a class="ulink" href="http://mozplugger.mozdev.org/" target="_top">Mozplugger</a> is a
 	  <span class="emphasis"><em>Mozilla/Firefox</em></span> plugin that uses external
 	  programs to play video, audio, and other multimedia content
@@ -1284,7 +1284,7 @@
 	  <span class="emphasis"><em>about:plugins</em></span> into the URL entry of the browser
 	  window. The output will also contain information about the
 	  mozplugger. You should see an entry for Gnash now.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="Klash"></a>Klash</h4></div></div></div><p>
+	</p></div><div class="sect3" title="Klash"><div class="titlepage"><div><div><h4 class="title"><a name="Klash"></a>Klash</h4></div></div></div><p>
 	  Klash is MozPlugger type support for KDE's Konqueror web
 	  browser. Klash makes Gnash a <span class="emphasis"><em>kpart</em></span>, so it's
 	  integrated into KDE better than when using MozPlugger. Klash
@@ -1295,7 +1295,7 @@
 	  use the <span class="emphasis"><em>--enable-klash</em></span> option when
 	  configuring. Other than installing, there is nothing else
 	  that needs to be done to install Klash.
-	</p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="logging"></a>The Message Logging System</h3></div></div></div><p>
+	</p></div></div><div class="sect2" title="The Message Logging System"><div class="titlepage"><div><div><h3 class="title"><a name="logging"></a>The Message Logging System</h3></div></div></div><p>
     <span class="application">Gnash</span>'s common message logging system uses a <span class="emphasis"><em>printf()</em></span>
     style format. Despite the C-like appearance, however, <span class="application">Gnash</span>'s LogFile class
     by default does not use <span class="emphasis"><em>printf()</em></span> for formatting the
@@ -1321,7 +1321,7 @@
     home directory, since that's considered the current directory. A file name
     can be specified using either <span class="emphasis"><em>gnashrc</em></span> or a 
     call to the LogFile instance itself.
-  </p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="api"></a>Logging System API</h4></div></div></div><p>
+  </p><div class="sect3" title="Logging System API"><div class="titlepage"><div><div><h4 class="title"><a name="api"></a>Logging System API</h4></div></div></div><p>
         <span class="application">Gnash</span> provides 9 specialized logging calls, each using the <span class="emphasis"><em>printf()</em></span>-style
         call similar to this:
         </p><pre class="programlisting">log_error(const char* fmt, ...)</pre><p>
@@ -1378,7 +1378,7 @@
 	    This is printed at a
 	    verbosity level of 1 or more
 	    only if AS coding error logging is enabled.
-	  </p></dd></dl></div></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="logfileinstance"></a>The LogFile Instance</h4></div></div></div><p>
+	  </p></dd></dl></div></div><div class="sect3" title="The LogFile Instance"><div class="titlepage"><div><div><h4 class="title"><a name="logfileinstance"></a>The LogFile Instance</h4></div></div></div><p>
       This is the main API for initializing and manipulating the logging output.
       By default, the log will be written to <span class="emphasis"><em>gnash-dbg.log</em></span>
       file whenever a verbose option is
@@ -1410,7 +1410,7 @@
 	    If <span class="emphasis"><em>flag</em></span> is <span class="emphasis"><em>true</em></span>, then create the
 	    disk file. If <span class="emphasis"><em>flag</em></span> is <span class="emphasis"><em>false</em></span>,
 	    then don't create the disk file.
-	  </p></dd></dl></div></div></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="soundhandlers"></a>Sound handling in Gnash</h2></div></div></div><p>
+	  </p></dd></dl></div></div></div></div><div class="sect1" title="Sound handling in Gnash"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="soundhandlers"></a>Sound handling in Gnash</h2></div></div></div><p>
       When a SWF-file contains audio Gnash uses its sound handlers to play it.
       At the moment there are two sound handlers, but it is likely that more 
       will be made.
@@ -1419,28 +1419,28 @@
       <span class="emphasis"><em>pluginsound</em></span> and <span class="emphasis"><em>sound</em></span>. 
       This was done in order to allow the plugin to be independently 
       configured, for instance to block sound from advertisements.
-    </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="soundtypes"></a>Sound types</h3></div></div></div><p>
+    </p><div class="sect2" title="Sound types"><div class="titlepage"><div><div><h3 class="title"><a name="soundtypes"></a>Sound types</h3></div></div></div><p>
         Sounds can be divided into two groups: event-sounds and soundstreams.
 	Event-sounds are contained in a single SWF frame, but the playtime can
 	span multiple frames. Soundstreams can be (and normally are) divided
 	between the SWF frames the soundstreams spans. This means that if a
 	gotoframe-action jumps to a frame which contains data for a soundstream,
 	playback of the stream can be picked up from there. 
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="soundparsing"></a>Sound parsing</h3></div></div></div><p>
+      </p></div><div class="sect2" title="Sound parsing"><div class="titlepage"><div><div><h3 class="title"><a name="soundparsing"></a>Sound parsing</h3></div></div></div><p>
         When Gnash parses a SWF-file, it creates a sound handler if possible
 	and hands over the sounds to it. Since the event-sounds are contained 
 	in one frame, the entire event-sound is retrieved at once, while a 
 	soundstream maybe not be completely retrieved before the entire 
 	SWF-file has been parsed. But since the entire soundstream doesn't need
 	to be present when playback starts, it is not necessary to wait. 
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="soundplayback"></a>Sound playback</h3></div></div></div><p>
+      </p></div><div class="sect2" title="Sound playback"><div class="titlepage"><div><div><h3 class="title"><a name="soundplayback"></a>Sound playback</h3></div></div></div><p>
 	When a sound is about to be played Gnash calls the sound handler, which
 	then starts to play the sound and return. All the playing is done by
 	threads (in both SDL and Gstreamer), so once 
 	started the audio and graphics are not sync'ed with each other, which
 	means that we have to trust both the graphic backend and the audio
 	backend to play at correct speed. 
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sdlsound"></a>The SDL sound backend</h3></div></div></div><p>
+      </p></div><div class="sect2" title="The SDL sound backend"><div class="titlepage"><div><div><h3 class="title"><a name="sdlsound"></a>The SDL sound backend</h3></div></div></div><p>
 	The current SDL sound backend has replaced the original sound 
 	handler, based on SDL_mixer, which by design had some limitations, 
 	making it difficult to implement needed features such as support 
@@ -1459,7 +1459,7 @@
 	The advantages of the SDL sound handler is speed, and ease of use,
 	while its only real disadvantage is that it has to be compiled with
 	MP3 support, which some Linux distributions will probably not like...
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="gstreamer"></a>The Gstreamer backend</h3></div></div></div><p>
+      </p></div><div class="sect2" title="The Gstreamer backend"><div class="titlepage"><div><div><h3 class="title"><a name="gstreamer"></a>The Gstreamer backend</h3></div></div></div><p>
 	The Gstreamer backend, though not complete, supports both soundstreams
 	and event-sounds. When receiving sound data it stores it compressed,
 	unless if it's ADPCM event-sounds, which it decodes by the parser.
@@ -1472,12 +1472,12 @@
 	should be relatively easy to add VORBIS support. The drawbacks are that
 	it has longer "reply delay" when starting the playback of a sound, and
 	it suffers under some bugs in Gstreamer that are yet to be fixed. 
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="audio-future"></a>Future audio backends</h3></div></div></div><p>
+      </p></div><div class="sect2" title="Future audio backends"><div class="titlepage"><div><div><h3 class="title"><a name="audio-future"></a>Future audio backends</h3></div></div></div><p>
 	It would probably be desirable to make more backends in the future,
 	either because other and better backend systems are brought to our
 	attention, or perhaps because an internal sound handling is better
 	suited for embedded platform with limited software installed. 
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="gstreamer-details"></a>Detailed description of the Gstreamer backend</h3></div></div></div><p>
+      </p></div><div class="sect2" title="Detailed description of the Gstreamer backend"><div class="titlepage"><div><div><h3 class="title"><a name="gstreamer-details"></a>Detailed description of the Gstreamer backend</h3></div></div></div><p>
 	Gstreamer uses pipelines, bins and elements. Pipelines are the
 	main bin, where all other bins or elements are places. Visually the
 	audio pipeline in Gnash looks like this: 
@@ -1525,10 +1525,10 @@
 	Gstreamer also contains a bug concerning linking multiple elements to
 	the adder in rapid succession, which causes to adder to "die" and stop
 	the playback. 
-      </p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="testing"></a>Testing </h2></div></div></div><p>
+      </p></div></div><div class="sect1" title="Testing"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="testing"></a>Testing </h2></div></div></div><p>
        <a class="link" href="#runtests" title="Running the Tests">Instructions on running tests</a>
        can be found in the section on building Gnash.
-     </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="testtools"></a>Testing Tools</h3></div></div></div><p>
+     </p><div class="sect2" title="Testing Tools"><div class="titlepage"><div><div><h3 class="title"><a name="testtools"></a>Testing Tools</h3></div></div></div><p>
 	Currently Gnash uses three other tools to help with
 	testing. Two of these are free compilers for the SWF
 	format. This lets us write simple test cases for Gnash to test
@@ -1545,7 +1545,7 @@
 	manner. <span class="emphasis"><em>DejaGnu</em></span> is used by many other <a class="ulink" href="http://www.gnu.org" target="_top">GNU</a> projects like 
 	<a class="ulink" href="http://gcc.gnu.org" target="_top">GCC</a> and 
 	<a class="ulink" href="http://www.samba.org" target="_top">Samba</a>.
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="testcases"></a>Test Cases</h3></div></div></div><p>
+      </p></div><div class="sect2" title="Test Cases"><div class="titlepage"><div><div><h3 class="title"><a name="testcases"></a>Test Cases</h3></div></div></div><p>
 	ActionScript test cases are located under testsuite/actionscript.all/;
 	these are organized in one file for the ActionScript class.
 	Other Ming-generated tests are under testsuite/ming-misc.all/;
@@ -1554,7 +1554,7 @@
 	sample movies are found in testsuite/samples/.
 	Other directories in testsuite/ are (or shall be) used for other
 	kind of tests.
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="writeastests"></a>Writing ActionScript Tests</h3></div></div></div><p>
+      </p></div><div class="sect2" title="Writing ActionScript Tests"><div class="titlepage"><div><div><h3 class="title"><a name="writeastests"></a>Writing ActionScript Tests</h3></div></div></div><p>
 	Writing ActionScript tests is very simple. The
 	<span class="emphasis"><em>makeswf</em></span> compiler makes use of the C preprocessor,
 	thus allowing the inclusion of definitions for macros and external 
@@ -1621,7 +1621,7 @@
 	  #endif
 	  
 	</pre><p>
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="writemingtests"></a>Writing Ming-based self-contained SWF tests</h3></div></div></div><p>
+      </p></div><div class="sect2" title="Writing Ming-based self-contained SWF tests"><div class="titlepage"><div><div><h3 class="title"><a name="writemingtests"></a>Writing Ming-based self-contained SWF tests</h3></div></div></div><p>
 	Ming-based test cases are located in testsuite/misc-ming.all
 	and contain a test generator and a test runner.
 	The test generator (usually a C program) is used to produce the SWF 
@@ -1637,7 +1637,7 @@
 	provided by the Gnash testing framework to easily run tests.
       </p><p>
 	For generic Ming API documentation, see <a class="ulink" href="http://www.libming.org/" target="_top">http://www.libming.org</a>. 
-      </p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="ming_testgenerator_facilities"></a>Using Ming-based test generators facilities</h4></div></div></div><p>
+      </p><div class="sect3" title="Using Ming-based test generators facilities"><div class="titlepage"><div><div><h4 class="title"><a name="ming_testgenerator_facilities"></a>Using Ming-based test generators facilities</h4></div></div></div><p>
 	Ming-based test generator facilities, which might be moved into
 	a loadable SWF in the future, can be currently used by your test
 	generator by including the ming_utils.h file and calling the
@@ -1693,7 +1693,7 @@
       </p><p>
 	See section <a class="link" href="#writing_test_runners" title="Writing Test Runners">Writing Test Runners</a>
 	for information about writing SWF test runners.
-      </p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="writing_dejagnu_so_tests"></a>Writing self-contained SWF tests with other compilers</h3></div></div></div><p>
+      </p></div></div><div class="sect2" title="Writing self-contained SWF tests with other compilers"><div class="titlepage"><div><div><h3 class="title"><a name="writing_dejagnu_so_tests"></a>Writing self-contained SWF tests with other compilers</h3></div></div></div><p>
 	If you want/need to use a different compiler for your test cases (there's
 	plenty of open source tools for generating SWF out there), you can still
 	make use of a loadable SWF utility provided as part of the Gnash testsuite
@@ -1763,7 +1763,7 @@
       </p><p>
 	See section <a class="link" href="#writing_test_runners" title="Writing Test Runners">Writing Test Runners</a>
 	for information about writing a test runners for your self-contained tests.
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="writing_test_runners"></a>Writing Test Runners</h3></div></div></div><p>
+      </p></div><div class="sect2" title="Writing Test Runners"><div class="titlepage"><div><div><h3 class="title"><a name="writing_test_runners"></a>Writing Test Runners</h3></div></div></div><p>
 	Test runners are executables that run one or more tests,
 	writing results in Dejagnu form to standard output.
       </p><p>
@@ -1825,7 +1825,7 @@
 		  <p>There was some additional information given about
 		  the test.</p>
 		</td></tr></tbody></table></div><p>
-      </p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="generic_test_runner"></a>Using the generic test runner for self-contained SWF tests</h4></div></div></div><p>
+      </p><div class="sect3" title="Using the generic test runner for self-contained SWF tests"><div class="titlepage"><div><div><h4 class="title"><a name="generic_test_runner"></a>Using the generic test runner for self-contained SWF tests</h4></div></div></div><p>
 	  The simplest test runner is one that simply invokes Gnash
 	  in verbose mode against a self-contained SWF test movie.
 	  Self-contained SWF test movies are the ones that print
@@ -1866,7 +1866,7 @@
 	    chmod +x $@
 	  </pre><p>
 	  When both -f and -r are given, the first exit condition reached will take effect.
-	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="writing_movie_testers"></a>Writing Movie testers</h4></div></div></div><p>
+	</p></div><div class="sect3" title="Writing Movie testers"><div class="titlepage"><div><div><h4 class="title"><a name="writing_movie_testers"></a>Writing Movie testers</h4></div></div></div><p>
 	  There are some parts of Gnash that can NOT be tested
 	  by only using ActionScript tests. Examples include: frame
 	  advancements, actual actions execution, gui events and so on.
@@ -1898,7 +1898,7 @@
 	  Note that you do NOT need access to the SWF source code in order
 	  to implement a Movie tester for it.  Some knowledge about the 
 	  expected behavior suffices.
-	</p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="newclass"></a>Chapter 4. Adding New ActionScript Class</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#prototype">Prototype</a></span></dt><dt><span class="sect1"><a href="#declaration">Declaration</a></span></dt><dt><span class="sect1"><a href="#instantiation">Instantiation</a></span></dt><dt><span class="sect1"><a href="#methods">Methods</a></span></dt><dt><span class="sect1"><a href="#properties">Dynamic Properties</a></span></dt><dt><span class="sect1"><a href="#as_value">The as_value Object Type</a></span></dt><dd><dl><dt><span class="sect2"><a href="#data_types">Data Types</a></span></dt><dt><span class="sect2"><a href="#is_methods">Determining the Type</a></span></dt><dt><span class="sect2"><a href="#to_methods">Fetching the Value</a></span></dt><dt><span class="sect2"><a href="#set_methods">Setting the Value and Type</a></span></dt><dt><span class="sect2"><a href="#further_as_value_reading">Further Reading</a></span></dt></dl></dd><dt><span class="sect1"><a href="#asobject">Object ActionScript Class</a></span></dt><dd><dl><dt><span class="sect2"><a href="#objectmethods">The Methods of the  Class</a></span></dt><dt><span class="sect2"><a href="#objectprops">The Properties of the Object Class</a></span></dt><dt><span class="sect2"><a href="#objectconf">Object Class Conformance</a></span></dt></dl></dd></dl></div><p>
+	</p></div></div></div><div class="chapter" title="Chapter 4. Adding New ActionScript Class"><div class="titlepage"><div><div><h2 class="title"><a name="newclass"></a>Chapter 4. Adding New ActionScript Class</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#prototype">Prototype</a></span></dt><dt><span class="sect1"><a href="#declaration">Declaration</a></span></dt><dt><span class="sect1"><a href="#instantiation">Instantiation</a></span></dt><dt><span class="sect1"><a href="#methods">Methods</a></span></dt><dt><span class="sect1"><a href="#properties">Dynamic Properties</a></span></dt><dt><span class="sect1"><a href="#as_value">The <span class="emphasis"><em>as_value</em></span> Object Type</a></span></dt><dd><dl><dt><span class="sect2"><a href="#data_types">Data Types</a></span></dt><dt><span class="sect2"><a href="#is_methods">Determining the Type</a></span></dt><dt><span class="sect2"><a href="#to_methods">Fetching the Value</a></span></dt><dt><span class="sect2"><a href="#set_methods">Setting the Value and Type</a></span></dt><dt><span class="sect2"><a href="#further_as_value_reading">Further Reading</a></span></dt></dl></dd><dt><span class="sect1"><a href="#asobject">Object ActionScript Class</a></span></dt><dd><dl><dt><span class="sect2"><a href="#objectmethods">The Methods of the  Class</a></span></dt><dt><span class="sect2"><a href="#objectprops">The Properties of the Object Class</a></span></dt><dt><span class="sect2"><a href="#objectconf">Object Class Conformance</a></span></dt></dl></dd></dl></div><p>
     In this document, the term 'ActionScript class' refers to the
     C++ class which is instantiated by Gnash when some ActionScript
     code instantiates a corresponding class.  The C++ class
@@ -1916,7 +1916,7 @@
     implementation.  The name is usually the name of the
     class as it is called in the ActionScript specifications;
     for instance <span class="emphasis"><em>Boolean.cpp</em></span> for the Boolean class.
-  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="prototype"></a>Prototype</h2></div></div></div><p>
+  </p><div class="sect1" title="Prototype"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="prototype"></a>Prototype</h2></div></div></div><p>
       In ActionScript, a prototype is a base object which contains
       all the methods that an instantiated object will contain.
       In short, it contains every part of the class except for
@@ -1952,10 +1952,10 @@
 	  trace("MATCHED");
 	}
       </pre><p>
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="declaration"></a>Declaration</h2></div></div></div><p>
+    </p></div><div class="sect1" title="Declaration"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="declaration"></a>Declaration</h2></div></div></div><p>
       A new class should derive from <span class="emphasis"><em>as_object</em></span>,
       which is the base class of every ActionScript object in Gnash.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="instantiation"></a>Instantiation</h2></div></div></div><p>
+    </p></div><div class="sect1" title="Instantiation"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="instantiation"></a>Instantiation</h2></div></div></div><p>
       When a new object is needed, instance data is added to
       the methods and properties inherited from the prototype.
     </p><p>
@@ -1966,11 +1966,11 @@
       <span class="emphasis"><em>as_object</em></span>.  In addition, the method 
       registers the constructor to be used for future object creation,
       and attaches methods and properties to the prototype.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="methods"></a>Methods</h2></div></div></div><p>
+    </p></div><div class="sect1" title="Methods"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="methods"></a>Methods</h2></div></div></div><p>
       Every method you implement and 
       <a class="link" href="#prototype" title="Prototype">attach</a> will receive an
       <span class="emphasis"><em>fn_call</em></span> data structure as an argument when it is called.
-    </p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="arguments"></a>Accessing Arguments</h4></div></div></div><p>
+    </p><div class="sect3" title="Accessing Arguments"><div class="titlepage"><div><div><h4 class="title"><a name="arguments"></a>Accessing Arguments</h4></div></div></div><p>
 	The arguments stored in <span class="emphasis"><em>fn_call</em></span>
 	should be accessed using <span class="emphasis"><em>arg()</em></span>.  For
 	instance, the first element can be popped with
@@ -1979,14 +1979,14 @@
 	The element popped off the stack is an 
 	<a class="link" href="#as_value" title="The as_value Object Type"><span class="emphasis"><em>as_value</em></span>
 	object</a>.
-      </p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="return"></a>Returning a Value to ActionScript</h4></div></div></div><p>
+      </p></div><div class="sect3" title="Returning a Value to ActionScript"><div class="titlepage"><div><div><h4 class="title"><a name="return"></a>Returning a Value to ActionScript</h4></div></div></div><p>
 	The return value should be an
 	<a class="link" href="#as_value" title="The as_value Object Type"><span class="emphasis"><em>as_value</em></span> 
 	object</a>.  For example:
 	</p><pre class="programlisting">
 	  return as_value('Goodbye, cruel world.');
 	</pre><p>
-      </p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="additional_fn_call"></a>Additional <span class="emphasis"><em>fn_call</em></span> Members</h4></div></div></div><p>
+      </p></div><div class="sect3" title="Additional fn_call Members"><div class="titlepage"><div><div><h4 class="title"><a name="additional_fn_call"></a>Additional <span class="emphasis"><em>fn_call</em></span> Members</h4></div></div></div><p>
 	There are two other useful members of the <span class="emphasis"><em>fn_call</em></span>
 	structure, namely <span class="emphasis"><em>this_ptr</em></span> and
 	<span class="emphasis"><em>nargs</em></span>.  The former points to the
@@ -2005,7 +2005,7 @@
 	is one method of note.  <span class="emphasis"><em>dump_args()</em></span>
 	can be used in debugging to output the entire argument
 	stack.
-      </p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="properties"></a>Dynamic Properties</h2></div></div></div><p>
+      </p></div></div><div class="sect1" title="Dynamic Properties"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="properties"></a>Dynamic Properties</h2></div></div></div><p>
       This section describes accessors to dynamic properties.
       Read-only properties are described
       in the <a class="link" href="#prototype" title="Prototype">prototype</a> section.
@@ -2047,10 +2047,10 @@
 	gettersetter = new builtin_function(&amp;MyClass::myProperty_getset, NULL);
 	o.init_property("myProperty", *gettersetter, *gettersetter);
       </pre><p>
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="as_value"></a>The <span class="emphasis"><em>as_value</em></span> Object Type</h2></div></div></div><p>
+    </p></div><div class="sect1" title="The as_value Object Type"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="as_value"></a>The <span class="emphasis"><em>as_value</em></span> Object Type</h2></div></div></div><p>
     The <span class="emphasis"><em>as_value</em></span> class is used throughout
     the interpreter to create generic objects to hold data.
-  </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="data_types"></a>Data Types</h3></div></div></div><p>
+  </p><div class="sect2" title="Data Types"><div class="titlepage"><div><div><h3 class="title"><a name="data_types"></a>Data Types</h3></div></div></div><p>
       The following data types are supported:
       <span class="emphasis"><em>NULLTYPE</em></span>,
       <span class="emphasis"><em>BOOLEAN</em></span>, <span class="emphasis"><em>STRING</em></span>,
@@ -2058,7 +2058,7 @@
       <span class="emphasis"><em>AS_FUNCTION</em></span>, and 
       <span class="emphasis"><em>MOVIECLIP</em></span> (sprite).  
       The type <span class="emphasis"><em>C_FUNCTION</em></span> is being deprecated.
-    </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="is_methods"></a>Determining the Type</h3></div></div></div><p>
+    </p></div><div class="sect2" title="Determining the Type"><div class="titlepage"><div><div><h3 class="title"><a name="is_methods"></a>Determining the Type</h3></div></div></div><p>
       Several methods allow you to determine if a value stored in
       <span class="emphasis"><em>as_value</em></span> is of a specific type.  These
       follow the form of <span class="emphasis"><em>is_TYPE</em></span>, for example
@@ -2067,7 +2067,7 @@
       match the <a class="link" href="#data_types" title="Data Types">data types</a> listed
       above, with the exception of the type <span class="emphasis"><em>MOVIECLIP</em></span>
       which has a method <span class="emphasis"><em>is_sprite()</em></span>.
-    </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="to_methods"></a>Fetching the Value</h3></div></div></div><p>
+    </p></div><div class="sect2" title="Fetching the Value"><div class="titlepage"><div><div><h3 class="title"><a name="to_methods"></a>Fetching the Value</h3></div></div></div><p>
       Another set of methods will return a representation of
       the value as a particular type.  They follow the
       <span class="emphasis"><em>to_TYPE</em></span> naming convention.  Examples
@@ -2076,7 +2076,7 @@
       <a class="link" href="#data_types" title="Data Types">listed</a> earlier, except for
       <span class="emphasis"><em>MOVIECLIP</em></span>, which uses 
       <span class="emphasis"><em>to_sprite()</em></span>.
-    </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="set_methods"></a>Setting the Value and Type</h3></div></div></div><p>
+    </p></div><div class="sect2" title="Setting the Value and Type"><div class="titlepage"><div><div><h3 class="title"><a name="set_methods"></a>Setting the Value and Type</h3></div></div></div><p>
       Finally, there is the <span class="emphasis"><em>set_TYPE</em></span> series
       of methods.  They change the type to the type specified in
       the method name, and set the value to the one given as an
@@ -2085,16 +2085,16 @@
       match those <a class="link" href="#data_types" title="Data Types">named earlier</a>,
       except in the case of <span class="emphasis"><em>MOVIECLASS</em></span>.  Its
       method is called <span class="emphasis"><em>set_sprite()</em></span>.
-    </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="further_as_value_reading"></a>Further Reading</h3></div></div></div><p>
+    </p></div><div class="sect2" title="Further Reading"><div class="titlepage"><div><div><h3 class="title"><a name="further_as_value_reading"></a>Further Reading</h3></div></div></div><p>
       Please refer to <span class="emphasis"><em>as_value.h</em></span> or the
       Doxygen documentation (see 'Processing The Documentation'
       in the Gnash manual for instructions on generating
       documents with Doxygen) for more information
       about which methods are available for the
       <span class="emphasis"><em>as_value</em></span> object.
-    </p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="asobject"></a>Object ActionScript Class</h2></div></div></div><p>
+    </p></div></div><div class="sect1" title="Object ActionScript Class"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="asobject"></a>Object ActionScript Class</h2></div></div></div><p>
     This class implements an Object object.
-  </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="objectmethods"></a>The Methods of the  Class</h3></div></div></div><p>
+  </p><div class="sect2" title="The Methods of the Class"><div class="titlepage"><div><div><h3 class="title"><a name="objectmethods"></a>The Methods of the  Class</h3></div></div></div><p>
       </p><div class="variablelist"><dl><dt><span class="term">addProperty()</span></dt><dd><p>
 	    </p></dd><dt><span class="term">registerClass()</span></dt><dd><p>
 	    </p></dd><dt><span class="term">toString()</span></dt><dd><p>
@@ -2106,14 +2106,14 @@
 	    </p></dd><dt><span class="term">SharedgetLocal()</span></dt><dd><p>
 	    </p></dd><dt><span class="term">SharedgetSize()</span></dt><dd><p>
 	    </p></dd></dl></div><p>
-    </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="objectprops"></a>The Properties of the Object Class</h3></div></div></div><p>
+    </p></div><div class="sect2" title="The Properties of the Object Class"><div class="titlepage"><div><div><h3 class="title"><a name="objectprops"></a>The Properties of the Object Class</h3></div></div></div><p>
       </p><div class="variablelist"><dl><dt><span class="term">constructor</span></dt><dd><p>
 	    </p></dd><dt><span class="term">__proto__</span></dt><dd><p>
 	    </p></dd><dt><span class="term">__resolve</span></dt><dd><p>
 	    </p></dd><dt><span class="term">Shareddata</span></dt><dd><p>
 	    </p></dd><dt><span class="term">SharedonStatus</span></dt><dd><p>
 	    </p></dd></dl></div><p>
-    </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="objectconf"></a>Object Class Conformance</h3></div></div></div><p>
+    </p></div><div class="sect2" title="Object Class Conformance"><div class="titlepage"><div><div><h3 class="title"><a name="objectconf"></a>Object Class Conformance</h3></div></div></div><p>
       </p><div class="informaltable"><table border="1" width="75%"><colgroup><col><col></colgroup><thead><tr><th valign="top">
 		<p>Class Name</p>
 	      </th><th valign="top">
@@ -2209,7 +2209,7 @@
 		  This property has an unknown status.
 		</p>
 	      </td></tr></tbody></table></div><p>
-    </p></div></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="bugreport"></a>Chapter 5. Reporting Bugs</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></div><p>
+    </p></div></div></div></div><div class="chapter" title="Chapter 5. Reporting Bugs"><div class="titlepage"><div><div><h2 class="title"><a name="bugreport"></a>Chapter 5. Reporting Bugs</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></div><p>
     The Gnash project relies on the community of Gnash users to test
     the player.  Feedback is critical to any successful project.  Not
     only does it let us know that people use Gnash, but it helps us  
@@ -2222,7 +2222,7 @@
     be asked to provide this information anyway. Adding
     critical details, like the Operating System you are on, its
     version, and any relevant error messages from Gnash that you get.
-  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_package"></a>Get a Fresh Binary Package</h2></div></div></div><p>
+  </p><div class="sect1" title="Get a Fresh Binary Package"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_package"></a>Get a Fresh Binary Package</h2></div></div></div><p>
       For starters, it's a good idea to obtain a copy of the latest
       snapshot. Although Gnash is primarily released as source, the
       Gnash build infrastructure allows the automated building of
@@ -2236,7 +2236,7 @@
       <a class="ulink" href="http://www.getgnash.org/packages/" target="_top">
 	http://www.getgnash.org/packages
       </a>. 
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_search"></a>Determine if the bug was previously reported</h2></div></div></div><p>
+    </p></div><div class="sect1" title="Determine if the bug was previously reported"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_search"></a>Determine if the bug was previously reported</h2></div></div></div><p>
       Search the <a class="ulink" href="https://savannah.gnu.org/bugs/?group=gnash" target="_top">Gnash
       bug tracker</a> to see if the bug has already been identified.
     </p><p>
@@ -2247,35 +2247,35 @@
       on Ubuntu GNU/Linux, and you noticed the same problem on OpenBSD,
       your stacktrace would be useful.  Conversely, adding a "me too"
       note to a feature request is not helpful.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_guidelines"></a>Review the bug writing guidelines</h2></div></div></div><p>
+    </p></div><div class="sect1" title="Review the bug writing guidelines"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_guidelines"></a>Review the bug writing guidelines</h2></div></div></div><p>
       A good bug report should be precise, explicit, and discrete.
       This means that there should be just one bug per ticket, and
       that a ticket should contain the following information:
-    </p><div class="itemizedlist"><ul type="opencircle"><li style="list-style-type: circle"><p>
+    </p><div class="itemizedlist"><ul class="itemizedlist" type="opencircle"><li class="listitem" style="list-style-type: circle"><p>
 	  An overview of the problem;
-	</p></li><li style="list-style-type: circle"><p>
+	</p></li><li class="listitem" style="list-style-type: circle"><p>
 	  Instructions on how to replicate the bug;
-	</p></li><li style="list-style-type: circle"><p>
+	</p></li><li class="listitem" style="list-style-type: circle"><p>
 	  A description of what happened when you performed the steps
 	  to replicate the bug, and what you expected to happen;
-	</p></li><li style="list-style-type: circle"><p>
+	</p></li><li class="listitem" style="list-style-type: circle"><p>
 	  Your system information: operating system name and version, as
 	  well as the versions of major development dependencies;
-	</p></li><li style="list-style-type: circle"><p>
+	</p></li><li class="listitem" style="list-style-type: circle"><p>
 	  The release number or checkout timestamp for the version of Gnash
 	  where you observe the problem;
-	</p></li><li style="list-style-type: circle"><p>
+	</p></li><li class="listitem" style="list-style-type: circle"><p>
 	  The file <code class="filename">config.log</code>, which should be
 	  attached as a file;
-	</p></li><li style="list-style-type: circle"><p>
+	</p></li><li class="listitem" style="list-style-type: circle"><p>
 	  A descriptive title.
 	</p></li></ul></div><p>
       Include any additional information that you feel might be useful
       to the developers.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_file"></a>Filing a bug report</h2></div></div></div><p>
+    </p></div><div class="sect1" title="Filing a bug report"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_file"></a>Filing a bug report</h2></div></div></div><p>
       After following the steps described above, you can file a bug report at 
       <a class="ulink" href="https://savannah.gnu.org/bugs/?group=gnash" target="_top">https://savannah.gnu.org/bugs/?group=gnash</a>.
-    </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="extensions"></a>Chapter 6. Gnash Extensions</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#newext">Creating A New Extension</a></span></dt><dd><dl><dt><span class="sect2"><a href="#craftext">Crafting an Extension</a></span></dt></dl></dd><dt><span class="sect1"><a href="#debuext">Debugging An Extension</a></span></dt><dt><span class="sect1"><a href="#inclext">Included Extensions</a></span></dt></dl></div><p>
+    </p></div></div><div class="chapter" title="Chapter 6. Gnash Extensions"><div class="titlepage"><div><div><h2 class="title"><a name="extensions"></a>Chapter 6. Gnash Extensions</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#newext">Creating A New Extension</a></span></dt><dd><dl><dt><span class="sect2"><a href="#craftext">Crafting an Extension</a></span></dt></dl></dd><dt><span class="sect1"><a href="#debuext">Debugging An Extension</a></span></dt><dt><span class="sect1"><a href="#inclext">Included Extensions</a></span></dt></dl></div><p>
     Gnash supports extending the SWF specification by creating
     custom ActionScript classes that are compiled code, as opposed to
     the existing method of defining custom classes as
@@ -2315,7 +2315,7 @@
     advantage is the class itself is compiled code, and runs much
     faster than the equivalent byte codes which all have to be
     interpreted..
-  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="newext"></a>Creating A New Extension</h2></div></div></div><p>
+  </p><div class="sect1" title="Creating A New Extension"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="newext"></a>Creating A New Extension</h2></div></div></div><p>
       Each new extension should live in it's own directory. The
       extensions included in Gnash are all in the
       <span class="emphasis"><em>gnash/extensions</em></span> directory. Creating an extension
@@ -2345,7 +2345,7 @@
       abstractions. Higher-level classes that offer a lot of new
       functionality are fine, but is different than wrapping a library
       so it can be used from within Gnash.
-    </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="craftext"></a>Crafting an Extension</h3></div></div></div><p>
+    </p><div class="sect2" title="Crafting an Extension"><div class="titlepage"><div><div><h3 class="title"><a name="craftext"></a>Crafting an Extension</h3></div></div></div><p>
 	All extensions have the same requirements, namely setting up a
 	few defined function callbacks, which the Gnash VM then uses
 	to do the right thing. The initial two function callbacks are
@@ -2459,7 +2459,7 @@
 		return as_value(ret);
 	    }
 	}
-      </pre></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="debuext"></a>Debugging An Extension</h2></div></div></div><p>
+      </pre></div></div><div class="sect1" title="Debugging An Extension"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="debuext"></a>Debugging An Extension</h2></div></div></div><p>
       As extensions are loaded dynamically at runtime, debugging one
       can be difficult. You can use GDB, but you have the problem of
       not being able to set a breakpoint in Gnash until
@@ -2498,12 +2498,12 @@
     </p><pre class="programlisting">
       (gdb) set variable stall = false;
       continue
-    </pre></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="inclext"></a>Included Extensions</h2></div></div></div><p>
+    </pre></div><div class="sect1" title="Included Extensions"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="inclext"></a>Included Extensions</h2></div></div></div><p>
       Gnash has some extensions included in the distribution. This is
       mostly because they were written by the Gnash team. Extensions
       can be external to gnash, Gnash needs no compiled in knowledge
       to load an extension file.
-    </p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="gtkext"></a>Gtk Extension</h4></div></div></div><p>
+    </p><div class="sect3" title="Gtk Extension"><div class="titlepage"><div><div><h4 class="title"><a name="gtkext"></a>Gtk Extension</h4></div></div></div><p>
     The GTK ActionScript class follows the same API as Gtk2, even down
     to the same arguments to the same function names. This means
     you're actually programming GTK,you're just using ActionScript
@@ -2526,7 +2526,7 @@
 	  Display the widget on the screen.
 	</p></dd><dt><span class="term">main</span></dt><dd><p>
 	  Start the main GTK event loop. This function does not return.
-	</p></dd></dl></div></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="fileioext"></a>File I/O Extension</h4></div></div></div><p>
+	</p></dd></dl></div></div><div class="sect3" title="File I/O Extension"><div class="titlepage"><div><div><h4 class="title"><a name="fileioext"></a>File I/O Extension</h4></div></div></div><p>
     Flash movies are traditionally forbidden from accessing the
     filesystem, but this may be necessary for some embedded
     applications. Especially in the case of a user console, currently
@@ -2561,7 +2561,7 @@
 	  Report the current position within the opened file.
 	</p></dd><dt><span class="term">fclose</span></dt><dd><p>
 	  Close the opened file.
-	</p></dd></dl></div></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="mysqlext"></a>MySQL Extension</h4></div></div></div><p>
+	</p></dd></dl></div></div><div class="sect3" title="MySQL Extension"><div class="titlepage"><div><div><h4 class="title"><a name="mysqlext"></a>MySQL Extension</h4></div></div></div><p>
     The MySQL ActionScript class follows the same API as MySQL, even down
     to the same arguments to the same function names. This enables a
     Flash movie to have direct access to a MySQL
@@ -2583,7 +2583,7 @@
 	  Free the results of a query.
 	</p></dd><dt><span class="term">store_results</span></dt><dd><p>
 	  Store the results of a query.
-	</p></dd></dl></div></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="rtmp"></a>Chapter 7. RTMP Protocol</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#amf">AMF Format</a></span></dt></dl></div><p>
+	</p></dd></dl></div></div></div></div><div class="chapter" title="Chapter 7. RTMP Protocol"><div class="titlepage"><div><div><h2 class="title"><a name="rtmp"></a>Chapter 7. RTMP Protocol</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#amf">AMF Format</a></span></dt></dl></div><p>
     This document is based mostly on my own reverse engineering of the
     RTMP protocol and AMF format. <span class="emphasis"><em>tcpdump</em></span> and
     <span class="emphasis"><em>ethereal</em></span> are your friend. Some additional info that got
@@ -2844,7 +2844,7 @@
 	    connection.
 	  </p></dd></dl></div><p>
 
-  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="amf"></a>AMF Format</h2></div></div></div><p>
+  </p><div class="sect1" title="AMF Format"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="amf"></a>AMF Format</h2></div></div></div><p>
     The AMF format is used in the LocalConnection, SharedObject,
     NetConnection, and NetStream ActionScript classes. This is a means
     of binary data interchange between SWF movies, or between a
@@ -2872,7 +2872,7 @@
 	    since the length is specified.
 	  </p></dd></dl></div><p>
 
-  </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="nsapi"></a>Chapter 8. Mozilla/Firefox NPAPI Plugin</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#plugincapi">Plugin C API</a></span></dt><dt><span class="sect1"><a href="#plugincppapi">Plugin C++ API</a></span></dt><dt><span class="sect1"><a href="#glthread">OpenGL and Threads</a></span></dt><dt><span class="sect1"><a href="#eventhandle">Plugin Event Handling</a></span></dt></dl></div><p>
+  </p></div></div><div class="chapter" title="Chapter 8. Mozilla/Firefox NPAPI Plugin"><div class="titlepage"><div><div><h2 class="title"><a name="nsapi"></a>Chapter 8. Mozilla/Firefox NPAPI Plugin</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#plugincapi">Plugin C API</a></span></dt><dt><span class="sect1"><a href="#plugincppapi">Plugin C++ API</a></span></dt><dt><span class="sect1"><a href="#glthread">OpenGL and Threads</a></span></dt><dt><span class="sect1"><a href="#eventhandle">Plugin Event Handling</a></span></dt></dl></div><p>
     The Mozilla SDK has two API layers for plugins. The older layer is
     documented in the <a class="ulink" href="http://www.gnu.org/software/gnash/manual/plugin.pdf" target="_top">
     Geeko Plugin API Reference</a>, and the newer layer doesn't
@@ -2888,7 +2888,7 @@
     When initializing or destroying a plugin, no matter how many
     instances are being used, the C API is used. These functions are
     typically called once for each plugin that is loaded.
-  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="plugincapi"></a>Plugin C API</h2></div></div></div><p>
+  </p><div class="sect1" title="Plugin C API"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="plugincapi"></a>Plugin C API</h2></div></div></div><p>
       The lower layer is a C based API which is used by Firefox to
       initialize and destroy a plugin. This is so a plugin can be
       portable across multiple systems, since C++ emphasis is not portable
@@ -2926,7 +2926,7 @@
 	    This is used by Firefox to query information from the
 	    plugin, like the supported MIME type, the version number,
 	    and a description.
-	  </p></dd></dl></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="plugincppapi"></a>Plugin C++ API</h2></div></div></div><p>
+	  </p></dd></dl></div></div><div class="sect1" title="Plugin C++ API"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="plugincppapi"></a>Plugin C++ API</h2></div></div></div><p>
       The higher level layer is the one we are most concerned
       with. This is an instantiation of the
       <span class="emphasis"><em>nsPluginInstanceBase</em></span> class, as defined by the
@@ -2988,7 +2988,7 @@
 	    This returns information to the browser about the plugin's
 	    name and description.
 	  </p></dd><dt><span class="term">nsPluginInstance::URLNotify</span></dt><dd><p>
-	  </p></dd></dl></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="glthread"></a>OpenGL and Threads</h2></div></div></div><p>
+	  </p></dd></dl></div></div><div class="sect1" title="OpenGL and Threads"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="glthread"></a>OpenGL and Threads</h2></div></div></div><p>
       Neither OpenGL nor X11 has any built-in support for threads. Most
       actions aren't even atomic, so care has to be made to not corrupt
       any internal data. While it is difficult to render OpenGL from
@@ -3014,7 +3014,7 @@
     </p><p>
       All the emphasis that directly accesses a GLX context or the X11
       display must be wrapped with a mutex.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="eventhandle"></a>Plugin Event Handling</h2></div></div></div><p>
+    </p></div><div class="sect1" title="Plugin Event Handling"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="eventhandle"></a>Plugin Event Handling</h2></div></div></div><p>
       Firefox on most UNIX systems is a GTK+ application, so it is
       possible to have the plugin hook into the X11 event handling via
       GLX or GTK. Since Firefox uses GTK, so does Gnash. This also
@@ -3032,7 +3032,7 @@
       <span class="emphasis"><em>--disable-glext</em></span>
     </p><p>
       
-    </p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="appendix"></a>Appendix</h2></div></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="codestyle"></a>Code Style</h3></div></div></div><p>
+    </p></div></div><div class="sect1" title="Appendix"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="appendix"></a>Appendix</h2></div></div></div><div class="sect2" title="Code Style"><div class="titlepage"><div><div><h3 class="title"><a name="codestyle"></a>Code Style</h3></div></div></div><p>
       I know any discussion of coding styles leads to strong opinions,
       so I'll state simply I follow the <a class="ulink" href="http://www.gnu.org/prep/standards/standards.html" target="_top">GNU
       Coding Standards</a>. Where there is some flexibility as to
@@ -3137,7 +3137,7 @@
       when listing all the classes on the generated web pages. The
       text after the blank link becomes the detailed description which
       appears on the generated web page for that class and method.
-    </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="authors"></a>Chapter 9. Authors</h2></div></div></div><p>
+    </p></div></div><div class="chapter" title="Chapter 9. Authors"><div class="titlepage"><div><div><h2 class="title"><a name="authors"></a>Chapter 9. Authors</h2></div></div></div><p>
         <span class="application">Gnash</span> is maintained by Rob Savoye. Other active developers
 	are: Sandro Santilli, Bastiaan Jacques, Udo Giacomozzi, Chad
 	Musick, Benjamin Wolsey, Zou Lunkai, and Russ Nelson. Please
@@ -3152,15 +3152,15 @@
         Mike Shaver, Thierry Berger-Perrin,
 	Ignacio Castaño, Willem Kokke, Vitaly Alexeev, Alexander Streit, 
         and Rob Savoye.
-    </p></div><div class="appendix" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="fdl"></a>Appendix A. GNU Free Documentation License</h2></div><div><p class="releaseinfo">
+    </p></div><div class="appendix" title="Appendix A. GNU Free Documentation License"><div class="titlepage"><div><div><h2 class="title"><a name="fdl"></a>Appendix A. GNU Free Documentation License</h2></div><div><p class="releaseinfo">
       Version 1.1, March 2000
-    </p></div><div><p class="copyright">Copyright © 2000 Free Software Foundation, Inc.</p></div><div><div class="legalnotice"><a name="fdl-legalnotice"></a><p>
+    </p></div><div><p class="copyright">Copyright © 2000 Free Software Foundation, Inc.</p></div><div><div class="legalnotice" title="Legal Notice"><a name="fdl-legalnotice"></a><p>
 	</p><div class="address"><p>Free Software Foundation, Inc. <span class="street">59 Temple Place, <br>
         Suite 330</span>, <span class="city">Boston</span>, <span class="state">MA</span>  <br>
         <span class="postcode">02111-1307</span>  <span class="country">USA</span></p></div><p> 
 	Everyone is permitted to copy and distribute verbatim copies of this 
         license document, but changing it is not allowed.
-      </p></div></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-preamble"></a>0. PREAMBLE</h2></div></div></div><p>
+      </p></div></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></div><div class="sect1" title="0. PREAMBLE"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-preamble"></a>0. PREAMBLE</h2></div></div></div><p>
       The purpose of this License is to make a manual, textbook, or
       other written document "free" in the sense of
       freedom: to assure everyone the effective freedom to copy and
@@ -3183,7 +3183,7 @@
       regardless of subject matter or whether it is published as a
       printed book. We recommend this License principally for works
       whose purpose is instruction or reference.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section1"></a>1. APPLICABILITY AND DEFINITIONS</h2></div></div></div><p><a name="fdl-document"></a>
+    </p></div><div class="sect1" title="1. APPLICABILITY AND DEFINITIONS"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section1"></a>1. APPLICABILITY AND DEFINITIONS</h2></div></div></div><p><a name="fdl-document"></a>
       This License applies to any manual or other work that contains a
       notice placed by the copyright holder saying it can be
       distributed under the terms of this License. The
@@ -3249,7 +3249,7 @@
       page as such, "Title Page" means the text near the
       most prominent appearance of the work's title, preceding the
       beginning of the body of the text.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section2"></a>2. VERBATIM COPYING</h2></div></div></div><p>
+    </p></div><div class="sect1" title="2. VERBATIM COPYING"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section2"></a>2. VERBATIM COPYING</h2></div></div></div><p>
       You may copy and distribute the <a class="link" href="#fdl-document">Document</a> in any medium, either
       commercially or noncommercially, provided that this License, the
       copyright notices, and the license notice saying this License
@@ -3263,7 +3263,7 @@
     </p><p>
       You may also lend copies, under the same conditions stated
       above, and you may publicly display copies.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section3"></a>3. COPYING IN QUANTITY</h2></div></div></div><p>
+    </p></div><div class="sect1" title="3. COPYING IN QUANTITY"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section3"></a>3. COPYING IN QUANTITY</h2></div></div></div><p>
       If you publish printed copies of the <a class="link" href="#fdl-document">Document</a> numbering more than 100,
       and the Document's license notice requires <a class="link" href="#fdl-cover-texts">Cover Texts</a>, you must enclose
       the copies in covers that carry, clearly and legibly, all these
@@ -3302,7 +3302,7 @@
       of the <a class="link" href="#fdl-document">Document</a> well before
       redistributing any large number of copies, to give them a chance
       to provide you with an updated version of the Document.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section4"></a>4. MODIFICATIONS</h2></div></div></div><p>
+    </p></div><div class="sect1" title="4. MODIFICATIONS"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section4"></a>4. MODIFICATIONS</h2></div></div></div><p>
       You may copy and distribute a <a class="link" href="#fdl-modified">Modified Version</a> of the <a class="link" href="#fdl-document">Document</a> under the conditions of
       sections <a class="link" href="#fdl-section2" title="2. VERBATIM COPYING">2</a> and <a class="link" href="#fdl-section3" title="3. COPYING IN QUANTITY">3</a> above, provided that you release
       the Modified Version under precisely this License, with the
@@ -3310,7 +3310,7 @@
       licensing distribution and modification of the Modified Version
       to whoever possesses a copy of it. In addition, you must do
       these things in the Modified Version:
-    </p><div class="itemizedlist"><ul type="opencircle"><li style="list-style-type: circle"><p><b>A. </b>
+    </p><div class="itemizedlist"><ul class="itemizedlist" type="opencircle"><li class="listitem" style="list-style-type: circle"><p title="A"><b>A. </b>
 	    Use in the <a class="link" href="#fdl-title-page">Title
 	    Page</a> (and on the covers, if any) a title distinct
 	    from that of the <a class="link" href="#fdl-document">Document</a>, and from those of
@@ -3318,7 +3318,7 @@
 	    listed in the History section of the Document). You may
 	    use the same title as a previous version if the original
 	    publisher of that version gives permission.
-	  </p></li><li style="list-style-type: circle"><p><b>B. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="B"><b>B. </b>
 	    List on the <a class="link" href="#fdl-title-page">Title
 	    Page</a>, as authors, one or more persons or entities
 	    responsible for authorship of the modifications in the
@@ -3326,28 +3326,28 @@
 	    together with at least five of the principal authors of
 	    the <a class="link" href="#fdl-document">Document</a> (all of
 	    its principal authors, if it has less than five).
-	  </p></li><li style="list-style-type: circle"><p><b>C. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="C"><b>C. </b>
 	    State on the <a class="link" href="#fdl-title-page">Title
 	    Page</a> the name of the publisher of the <a class="link" href="#fdl-modified">Modified Version</a>, as the
 	    publisher.
-	  </p></li><li style="list-style-type: circle"><p><b>D. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="D"><b>D. </b>
 	    Preserve all the copyright notices of the <a class="link" href="#fdl-document">Document</a>.
-	  </p></li><li style="list-style-type: circle"><p><b>E. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="E"><b>E. </b>
 	    Add an appropriate copyright notice for your modifications
 	    adjacent to the other copyright notices.
-	  </p></li><li style="list-style-type: circle"><p><b>F. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="F"><b>F. </b>
 	    Include, immediately after the copyright notices, a
 	    license notice giving the public permission to use the
 	    <a class="link" href="#fdl-modified">Modified Version</a> under
 	    the terms of this License, in the form shown in the
 	    Addendum below.
-	  </p></li><li style="list-style-type: circle"><p><b>G. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="G"><b>G. </b>
 	    Preserve in that license notice the full lists of <a class="link" href="#fdl-invariant"> Invariant Sections</a> and
 	    required <a class="link" href="#fdl-cover-texts">Cover
 	    Texts</a> given in the <a class="link" href="#fdl-document">Document's</a> license notice.
-	  </p></li><li style="list-style-type: circle"><p><b>H. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="H"><b>H. </b>
 	    Include an unaltered copy of this License.
-	  </p></li><li style="list-style-type: circle"><p><b>I. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="I"><b>I. </b>
 	    Preserve the section entitled "History", and
 	    its title, and add to it an item stating at least the
 	    title, year, new authors, and publisher of the <a class="link" href="#fdl-modified">Modified Version </a>as given on
@@ -3358,7 +3358,7 @@
 	    Document as given on its Title Page, then add an item
 	    describing the Modified Version as stated in the previous
 	    sentence.
-	  </p></li><li style="list-style-type: circle"><p><b>J. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="J"><b>J. </b>
 	    Preserve the network location, if any, given in the <a class="link" href="#fdl-document">Document</a> for public access
 	    to a <a class="link" href="#fdl-transparent">Transparent</a>
 	    copy of the Document, and likewise the network locations
@@ -3368,23 +3368,23 @@
 	    was published at least four years before the Document
 	    itself, or if the original publisher of the version it
 	    refers to gives permission.
-	  </p></li><li style="list-style-type: circle"><p><b>K. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="K"><b>K. </b>
 	    In any section entitled "Acknowledgements" or
 	    "Dedications", preserve the section's title,
 	    and preserve in the section all the substance and tone of
 	    each of the contributor acknowledgements and/or
 	    dedications given therein.
-	  </p></li><li style="list-style-type: circle"><p><b>L. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="L"><b>L. </b>
 	    Preserve all the <a class="link" href="#fdl-invariant">Invariant
 	    Sections</a> of the <a class="link" href="#fdl-document">Document</a>, unaltered in their
 	    text and in their titles.  Section numbers or the
 	    equivalent are not considered part of the section titles.
-	  </p></li><li style="list-style-type: circle"><p><b>M. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="M"><b>M. </b>
 	    Delete any section entitled
 	    "Endorsements". Such a section may not be
 	    included in the <a class="link" href="#fdl-modified">Modified
 	    Version</a>.
-	  </p></li><li style="list-style-type: circle"><p><b>N. </b>
+	  </p></li><li class="listitem" style="list-style-type: circle"><p title="N"><b>N. </b>
 	    Do not retitle any existing section as
 	    "Endorsements" or to conflict in title with
 	    any <a class="link" href="#fdl-invariant">Invariant
@@ -3421,7 +3421,7 @@
       The author(s) and publisher(s) of the <a class="link" href="#fdl-document">Document</a> do not by this License
       give permission to use their names for publicity for or to
       assert or imply endorsement of any <a class="link" href="#fdl-modified">Modified Version </a>.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section5"></a>5. COMBINING DOCUMENTS</h2></div></div></div><p>
+    </p></div><div class="sect1" title="5. COMBINING DOCUMENTS"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section5"></a>5. COMBINING DOCUMENTS</h2></div></div></div><p>
       You may combine the <a class="link" href="#fdl-document">Document</a>
       with other documents released under this License, under the
       terms defined in <a class="link" href="#fdl-section4" title="4. MODIFICATIONS">section 4</a>
@@ -3448,7 +3448,7 @@
       combine any sections entitled "Acknowledgements",
       and any sections entitled "Dedications".  You must
       delete all sections entitled "Endorsements."
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section6"></a>6. COLLECTIONS OF DOCUMENTS</h2></div></div></div><p>
+    </p></div><div class="sect1" title="6. COLLECTIONS OF DOCUMENTS"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section6"></a>6. COLLECTIONS OF DOCUMENTS</h2></div></div></div><p>
       You may make a collection consisting of the <a class="link" href="#fdl-document">Document</a> and other documents
       released under this License, and replace the individual copies
       of this License in the various documents with a single copy that
@@ -3461,7 +3461,7 @@
       insert a copy of this License into the extracted document, and
       follow this License in all other respects regarding verbatim
       copying of that document.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section7"></a>7. AGGREGATION WITH INDEPENDENT WORKS</h2></div></div></div><p>
+    </p></div><div class="sect1" title="7. AGGREGATION WITH INDEPENDENT WORKS"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section7"></a>7. AGGREGATION WITH INDEPENDENT WORKS</h2></div></div></div><p>
       A compilation of the <a class="link" href="#fdl-document">Document</a> or its derivatives with
       other separate and independent documents or works, in or on a
       volume of a storage or distribution medium, does not as a whole
@@ -3477,7 +3477,7 @@
       be placed on covers that surround only the Document within the
       aggregate. Otherwise they must appear on covers around the whole
       aggregate.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section8"></a>8. TRANSLATION</h2></div></div></div><p>
+    </p></div><div class="sect1" title="8. TRANSLATION"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section8"></a>8. TRANSLATION</h2></div></div></div><p>
       Translation is considered a kind of modification, so you may
       distribute translations of the <a class="link" href="#fdl-document">Document</a> under the terms of <a class="link" href="#fdl-section4" title="4. MODIFICATIONS">section 4</a>. Replacing <a class="link" href="#fdl-invariant"> Invariant Sections</a> with
       translations requires special permission from their copyright
@@ -3488,7 +3488,7 @@
       version of this License. In case of a disagreement between the
       translation and the original English version of this License,
       the original English version will prevail.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section9"></a>9. TERMINATION</h2></div></div></div><p>
+    </p></div><div class="sect1" title="9. TERMINATION"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section9"></a>9. TERMINATION</h2></div></div></div><p>
       You may not copy, modify, sublicense, or distribute the <a class="link" href="#fdl-document">Document</a> except as expressly
       provided for under this License. Any other attempt to copy,
       modify, sublicense or distribute the Document is void, and will
@@ -3496,7 +3496,7 @@
       parties who have received copies, or rights, from you under this
       License will not have their licenses terminated so long as such
       parties remain in full compliance.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section10"></a>10. FUTURE REVISIONS OF THIS LICENSE</h2></div></div></div><p>
+    </p></div><div class="sect1" title="10. FUTURE REVISIONS OF THIS LICENSE"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section10"></a>10. FUTURE REVISIONS OF THIS LICENSE</h2></div></div></div><p>
       The <a class="ulink" href="http://www.gnu.org/fsf/fsf.html" target="_top">Free Software
       Foundation</a> may publish new, revised versions of the GNU
       Free Documentation License from time to time. Such new versions
@@ -3513,7 +3513,7 @@
       the Document does not specify a version number of this License,
       you may choose any version ever published (not as a draft) by
       the Free Software Foundation.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-using"></a>Addendum</h2></div></div></div><p>
+    </p></div><div class="sect1" title="Addendum"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-using"></a>Addendum</h2></div></div></div><p>
       To use this License in a document you have written, include a copy of
       the License in the document and put the following copyright and
       license notices just after the title page:

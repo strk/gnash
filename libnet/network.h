@@ -137,6 +137,7 @@ public:
 	int netfd;
 	void *entry;
 	void *handler;
+	amf::Buffer *buffer;
 	std::string filespec;
 	protocols_supported_e protocol;
     } thread_params_t;
@@ -205,6 +206,7 @@ public:
     boost::shared_ptr<amf::Buffer> readNet();
     int readNet(amf::Buffer &buffer);
     int readNet(int fd, amf::Buffer &buffer);
+    int readNet(int fd, amf::Buffer *buffer);
     int readNet(amf::Buffer &buffer, int timeout);
     int readNet(int fd, amf::Buffer &buffer, int timeout);
     int readNet(byte_t *data, int nbytes);
@@ -320,6 +322,9 @@ public:
 		 std::string &keyfile, std::string &calist,
 		 std::string &rootpath, bool auth);
 #endif
+
+    // Use an ioctl() to see how many bytes are in the network buffers.
+    size_t sniffBytesReady(int fd);
     
  protected:
     in_addr_t   _ipaddr;

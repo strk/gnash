@@ -182,11 +182,14 @@ AMF::encodeObject(const amf::Element &data)
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
     length = data.propertySize();
-    //    log_debug("Encoded data size has %d properties", length);
+    log_debug("Encoded data size has %d properties", length);
     boost::shared_ptr<amf::Buffer> buf;
     if (length) {
 	buf.reset(new amf::Buffer);
+    } else {
+	return buf;
     }
+    
     *buf = Element::OBJECT_AMF0;
     if (data.propertySize() > 0) {
 	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;
@@ -1242,7 +1245,7 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
 	length = tooFar - tmpptr;
     }    
 #else
-    if (length > SANE_STR_SIZE) {
+    if (length >= SANE_STR_SIZE) {
 	log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
     }    
 #endif

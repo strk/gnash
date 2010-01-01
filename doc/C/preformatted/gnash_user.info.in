@@ -1,4 +1,4 @@
-This is gnash_user.info, produced by makeinfo version 4.11 from stdin.
+This is gnash_user.info, produced by makeinfo version 4.13 from stdin.
 
 START-INFO-DIR-ENTRY
 * Gnash User Manual: (gnash_user).   [MISSING TEXT]
@@ -137,10 +137,10 @@ doesn't. You can find daily snapshots of the latest CVS tree at:
 http://www.gnashdev.org/dev_snapshots
 (http://www.gnashdev.org/dev_snapshots/).
 
-   Gnash uses ffmpeg for codecs, so any file supported by Mplayer
+   Gnash uses FFmpeg for codecs, so any file supported by Mplayer
 should work with Gnash. Gnash supports the loading of patent free
 codecs like Ogg Vorbis or Theora from disk based files, while work is
-being done to support these codecs when embedded in a SWF file. Ffmpeg
+being done to support these codecs when embedded in a SWF file. FFmpeg
 contains the codecs used by the current SWF defintion, FLV, VP6 (ON2),
 H.263, H.264, and MP3.
 
@@ -526,6 +526,25 @@ StartStopped             on/off                   Set to _on_ to have the
                                                   movie on a webpage.
                                                   This option is _off_ by
                                                   default.
+webcamDevice             integer                  The integer value
+                                                  (index into vector of
+                                                  video devices) that
+                                                  represents the default
+                                                  webcam.  To easily get
+                                                  this entry run
+                                                  utilities/findwebcams
+                                                  (only works with
+                                                  Gstreamer right now)
+microphoneDevice         integer                  The integer value
+                                                  (index into vector of
+                                                  microphone devices)
+                                                  that represents the
+                                                  default microphone.  To
+                                                  easily get this entry
+                                                  run
+                                                  utilities/findmicrophones
+                                                  (only works with
+                                                  Gstreamer right now)
 flashVersionString       string                   Set the string returned
                                                   by $version and
                                                   System.capabilities.version.
@@ -579,6 +598,10 @@ SOLsafedir               Absolute path            The full path to a
                                                   Object files ("flash
                                                   cookies") if they are
                                                   enabled.
+solLocalDomain           on/off                   If set to _on_, allow
+                                                  the loading of Shared
+                                                  Objects only on the
+                                                  localhost.
 SOLreadonly              on/off                   If set to _on_, Gnash
                                                   will not write Shared
                                                   Object files.
@@ -766,7 +789,7 @@ File: gnash_user.info,  Node: Software Requirements,  Prev: Hardware Requirement
 3.1.2 Software Requirements
 ---------------------------
 
-The 0.8.5 release of Gnash has been designed to run on UNIX/Linux
+The 0.8.6 release of Gnash has been designed to run on UNIX/Linux
 variants, and has been run on most of the free ones.  However, Gnash
 has successfully run on Windows, Darwin (Mac OS X), Irix, Solaris,
 BeOs, OS/2, and Haiku.  Gnash has also run on the following 64-bit
@@ -1055,8 +1078,8 @@ extensions
 F
 =
 
-ffmpeg
-     ffmpeg is an audio and video decoding library which can be used by
+FFmpeg
+     FFmpeg is an audio and video decoding library which can be used by
      Gnash to decode mp3, FLV and other media types.
 
 Flash
@@ -1222,7 +1245,7 @@ SDL
      independent of each other: you can use it for a task and not for
      the other if you wish.  This version of Gnash does not implement
      menus in the SDL GUI; the SDL sound handler is the most feature
-     rich, supporting video through ffmpeg.
+     rich, supporting video through FFmpeg.
 
 sound handler
      The _sound handler_ is the part of Gnash which handles both event
@@ -1230,7 +1253,7 @@ sound handler
      through the sound handler when SDL is used.  The sound handler
      must be selected during configuration of Gnash when compiling.
 
-     There are currently two sound handlers available in Gnash: ffmpeg
+     There are currently two sound handlers available in Gnash: FFmpeg
      and Gstreamer.  The ffmpeg sound handler uses SDL for mixing.  The
      Gstreamer-sound handler uses the available plugins to decode the
      audio, so it might not work if some important plugins are missing.
@@ -1752,60 +1775,60 @@ Node: Gnash Interactive Control Keys12934
 Ref: Gnash Interactive Control Keys <1>13301
 Node: User Configuration File14050
 Ref: User Configuration Variables14835
-Node: Installing and Configuring Gnash35967
-Node: Requirements36328
-Node: Hardware Requirements36649
-Ref: Build Matrix37426
-Node: Software Requirements38656
-Node: Downloading Gnash39489
-Node: Getting the Source40124
-Node: Releases40484
-Node: Snapshot41042
-Node: Repository41513
-Node: Getting Codec Support42334
-Node: Reporting Bugs43051
-Node: Get a Fresh Binary Package44041
-Node: Determine if the bug was previously reported44828
-Node: Review the bug writing guidelines45647
-Node: Filing a bug report46699
-Node: Glossary46983
-Ref: A47097
-Ref: C47917
-Ref: D48203
-Ref: E48615
-Ref: F48857
-Ref: G49742
-Ref: K50727
-Ref: M51087
-Ref: N51438
-Ref: O51595
-Ref: P52210
-Ref: Q52497
-Ref: R52681
-Ref: S53922
-Ref: T55409
-Ref: X56117
-Node: Authors56210
-Node: GNU Free Documentation License56920
-Node: 0_ PREAMBLE57684
-Node: 1_ APPLICABILITY AND DEFINITIONS58991
-Ref: fdl-document59217
-Ref: fdl-modified59508
-Ref: fdl-secondary59695
-Ref: fdl-invariant60340
-Ref: fdl-cover-texts60589
-Ref: fdl-transparent60802
-Ref: fdl-title-page62092
-Node: 2_ VERBATIM COPYING62481
-Node: 3_ COPYING IN QUANTITY63462
-Node: 4_ MODIFICATIONS65820
-Node: 5_ COMBINING DOCUMENTS71881
-Node: 6_ COLLECTIONS OF DOCUMENTS73379
-Node: 7_ AGGREGATION WITH INDEPENDENT WORKS74271
-Node: 8_ TRANSLATION75500
-Node: 9_ TERMINATION76404
-Node: 10_ FUTURE REVISIONS OF THIS LICENSE77060
-Node: Addendum78201
+Node: Installing and Configuring Gnash37567
+Node: Requirements37928
+Node: Hardware Requirements38249
+Ref: Build Matrix39026
+Node: Software Requirements40256
+Node: Downloading Gnash41089
+Node: Getting the Source41724
+Node: Releases42084
+Node: Snapshot42642
+Node: Repository43113
+Node: Getting Codec Support43934
+Node: Reporting Bugs44651
+Node: Get a Fresh Binary Package45641
+Node: Determine if the bug was previously reported46428
+Node: Review the bug writing guidelines47247
+Node: Filing a bug report48299
+Node: Glossary48583
+Ref: A48697
+Ref: C49517
+Ref: D49803
+Ref: E50215
+Ref: F50457
+Ref: G51342
+Ref: K52327
+Ref: M52687
+Ref: N53038
+Ref: O53195
+Ref: P53810
+Ref: Q54097
+Ref: R54281
+Ref: S55522
+Ref: T57009
+Ref: X57717
+Node: Authors57810
+Node: GNU Free Documentation License58520
+Node: 0_ PREAMBLE59284
+Node: 1_ APPLICABILITY AND DEFINITIONS60591
+Ref: fdl-document60817
+Ref: fdl-modified61108
+Ref: fdl-secondary61295
+Ref: fdl-invariant61940
+Ref: fdl-cover-texts62189
+Ref: fdl-transparent62402
+Ref: fdl-title-page63692
+Node: 2_ VERBATIM COPYING64081
+Node: 3_ COPYING IN QUANTITY65062
+Node: 4_ MODIFICATIONS67420
+Node: 5_ COMBINING DOCUMENTS73481
+Node: 6_ COLLECTIONS OF DOCUMENTS74979
+Node: 7_ AGGREGATION WITH INDEPENDENT WORKS75871
+Node: 8_ TRANSLATION77100
+Node: 9_ TERMINATION78004
+Node: 10_ FUTURE REVISIONS OF THIS LICENSE78660
+Node: Addendum79801
 
 End Tag Table
 

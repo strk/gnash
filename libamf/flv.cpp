@@ -85,11 +85,11 @@ Flv::encodeHeader(boost::uint8_t type)
 
 // Decode a Buffer into a header
 boost::shared_ptr<Flv::flv_header_t>
-Flv::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
+Flv::decodeHeader(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<flv_header_t> header(new flv_header_t);
-    memcpy(header.get(), buf->reference(), sizeof(flv_header_t));
+    memcpy(header.get(), data, sizeof(flv_header_t));
 //    std::copy(buf->begin(), buf->begin() + sizeof(flv_header_t), header.get());
 
     // test the magic number
@@ -164,13 +164,13 @@ Flv::decodeMetaData(boost::uint8_t *buf, size_t size)
     ptr += length;
     
     // Extract the properties for this metadata object.
-    boost::shared_ptr<amf::Element> el = amf.extractAMF(ptr, tooFar);
-    if (el.get()) {
-	ptr += amf.totalsize();
-	el->setName(name.c_str(), length);
+    _metadata = amf.extractAMF(ptr, tooFar);
+    if (_metadata.get()) {
+    	ptr += amf.totalsize();
+	    _metadata->setName(name.c_str(), length);
     }
 
-    return el;
+    return _metadata;
 }
 
 boost::shared_ptr<Flv::flv_audio_t>
@@ -292,10 +292,10 @@ Flv::convert24(boost::uint8_t *num)
 
 // Decode the tag header
 boost::shared_ptr<Flv::flv_tag_t>
-Flv::decodeTagHeader(boost::shared_ptr<amf::Buffer> &buf)
+Flv::decodeTagHeader(boost::uint8_t *buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    flv_tag_t *data = reinterpret_cast<flv_tag_t *>(buf->reference());
+    flv_tag_t *data = reinterpret_cast<flv_tag_t *>(buf);
     boost::shared_ptr<flv_tag_t> tag(new flv_tag_t);
     memcpy(tag.get(), data, sizeof(flv_tag_t));
 

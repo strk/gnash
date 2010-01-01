@@ -54,6 +54,7 @@
 
 #include <boost/thread/mutex.hpp>
 static boost::mutex io_mutex;
+static boost::mutex mem_mutex;
 
 using namespace gnash;
 using namespace std;
@@ -301,7 +302,9 @@ DiskStream::DiskStream(const string &str, int netfd)
 
 DiskStream::~DiskStream()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+    log_debug("Deleting %s on fd #%d", _filespec, _filefd);
+
     if (_filefd) {
         ::close(_filefd);
     }
@@ -310,21 +313,54 @@ DiskStream::~DiskStream()
     }
 }
 
-/// \brief Close the open disk file and it's associated stream.
+/// \brief copy another DiskStream into ourselves, so they share data
+///		in memory.
+DiskStream &
+DiskStream::operator=(DiskStream *stream)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    _filespec = stream->getFilespec();
+    _filetype = stream->getFileType();
+    _filefd = stream->getFileFd();
+    _netfd = stream->getNetFd();
+    _dataptr = stream->get();
+    _state = stream->getState();
+
+    return *this;
+}
+
+bool
+DiskStream::fullyPopulated()
+{
+    // GNASH_REPORT_FUNCTION;
+    
+    if ((_filesize < _max_memload) && (_dataptr != 0)) {
+	return true;
+    }
+    return false;
+};
+
+/// \brief Close the open disk file, but stay resident in memory.
 void
 DiskStream::close()
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     log_debug("Closing %s on fd #%d", _filespec, _filefd);
 
     if (_filefd) {
         ::close(_filefd);
     }
-    
-    _filesize = 0;
+
+    // reset everything in case we get reopened.
+    _filefd = 0;
+    _netfd = 0;
     _offset = 0;
-    
+    _seekptr = _dataptr + _pagesize;
+    _state = CLOSED;
+
+#if 0				// FIXME: don't unmap the memory for debugging
 #ifdef _WIN32
     UnmapViewOfFile(_dataptr);
 #elif defined(__amigaos4__)
@@ -332,14 +368,10 @@ DiskStream::close()
 #else
     if ((_dataptr != MAP_FAILED) && (_dataptr != 0)) {
 	munmap(_dataptr, _pagesize);
-//  	delete[] _dataptr;
     }
 #endif
+#endif
     
-    _dataptr = 0; 
-    _filefd = 0;
-    _state = CLOSED;
-//    _filespec.clear();
 }
 
 /// \brief Load a chunk (pagesize) of the file into memory.
@@ -358,13 +390,15 @@ DiskStream::close()
 boost::uint8_t *
 DiskStream::loadToMem(off_t offset)
 {
+    // GNASH_REPORT_FUNCTION;
+
     return loadToMem(_filesize, offset);
 }
 
 boost::uint8_t *
 DiskStream::loadToMem(size_t filesize, off_t offset)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     log_debug("%s: offset is: %d", __FUNCTION__, offset);
 
@@ -432,6 +466,10 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 // 	    size = _filesize;
 // 	}
 
+	// lock in case two threads try to load the same file at the
+	// same time.
+	boost::mutex::scoped_lock lock(mem_mutex);
+	
 #ifdef _WIN32
 	HANDLE handle = CreateFileMapping((HANDLE)_get_osfhandle(_filefd), NULL,
 					  PAGE_WRITECOPY, 0, 0, NULL);
@@ -460,12 +498,49 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	log_debug (_("File %s a offset %d mapped to: %p"), _filespec, offset, (void *)dataptr);
 	clock_gettime (CLOCK_REALTIME, &_last_access);
 	_dataptr = dataptr;
-	_seekptr = _dataptr + offset;
+	// map the seekptr to the end of data
+	_seekptr = _dataptr + _pagesize;
 	_state = OPEN;
+	_offset = 0;
+    }
+
+    boost::uint8_t *ptr = dataptr;
+    if (_filetype == FILETYPE_FLV) {
+	// FIXME: for now, assume all media files are in FLV format
+	_flv.reset(new amf::Flv);
+	boost::shared_ptr<amf::Flv::flv_header_t> head = _flv->decodeHeader(ptr);
+	ptr += sizeof(amf::Flv::flv_header_t);
+	ptr += sizeof(amf::Flv::previous_size_t);
+	boost::shared_ptr<amf::Flv::flv_tag_t> tag  = _flv->decodeTagHeader(ptr);
+	ptr += sizeof(amf::Flv::flv_tag_t);
+	size_t bodysize = _flv->convert24(tag->bodysize);	    
+	if (tag->type == amf::Flv::TAG_METADATA) {
+	    boost::shared_ptr<amf::Element> metadata = _flv->decodeMetaData(ptr, bodysize);
+	    if (metadata) {
+		metadata->dump();
+	    }
+	}
+    }
+
+    if (filesize < _max_memload) {
+	close();
     }
     
-    return _seekptr;
-    
+    // The data pointer points to the real data past all the header bytes.
+    _dataptr = ptr;
+
+    return _seekptr;    
+}
+
+/// \brief Write the existing data to the Network.
+///
+/// @return true is the write suceeded, false if it failed.
+bool
+DiskStream::writeToNet(int /* start */, int /* bytes */)
+{
+    GNASH_REPORT_FUNCTION;
+
+    return false;
 }
 
 /// \brief Write the data in memory to disk
@@ -557,13 +632,20 @@ DiskStream::open(const string &filespec, int /*netfd*/)
 bool
 DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     // the file is already open
     if (_state == OPEN) {
 #ifdef USE_STATS_CACHE
 	_accesses++;
 #endif
+	return true;
+    }
+
+    // If DONE, then we were previously open, but not closed, so we
+    // just reopen the same stream.
+    if ((_state == DONE) || (_state == CLOSED)) {
+	_state = OPEN;
 	return true;
     }
     
@@ -579,20 +661,18 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 	log_debug (_("Opening file %s (fd #%d), %lld bytes in size."),
 		   _filespec, _filefd,
 		 (long long int) _filesize);
+	_state = OPEN;
+	_filetype = determineFileType(filespec);
+	loadToMem(0); // load the first page into memory
     } else {
 	log_error (_("File %s doesn't exist"), _filespec);
+	_state = DONE;
 	return false;
     }
     
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_first_access);
 #endif
-    
-//     // The pagesize is how much of the file to load. As all memory is
-//     // only mapped in multiples of pages, we use that for the default size.
-//     if (_pagesize == 0) {
-// 	_pagesize = pageSize;
-//     }
     
     return true;
 }
@@ -605,29 +685,100 @@ DiskStream::play()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    return play(_netfd);
+    return play(_netfd, true);
+}
+
+bool
+DiskStream::play(bool flag)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    return play(_netfd, flag);
 }
 
 /// \brief Stream the file that has been loaded,
 ///
-/// @param netfd An optional file descriptor to read data from
+/// @param netfd The file descriptor to use for operations
+///
+/// @param flag True to only send the first packet, False plays entire file.
 ///
 /// @return True if the data was streamed sucessfully, false if not.
 bool
-DiskStream::play(int netfd)
+DiskStream::play(int netfd, bool flag)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    _netfd = netfd;
-    _state = PLAY;
-
-    log_unimpl("%s", __PRETTY_FUNCTION__);
+    bool done = false;
+//     dump();
     
-    while (_state != DONE) {
+    _netfd = netfd;
+
+    while (!done) {
+	// If flag is false, only play the one page of the file.
+	if (!flag) {
+	    done = true;
+	}
         switch (_state) {
+	  case NO_STATE:
+	      log_network("No Diskstream open %s for net fd #%d", _filespec, netfd);
+	      break;
+          case CREATED:
+          case CLOSED:
+	      if (_dataptr) {
+		  log_network("Diskstream %s is closed on net fd #%d.", _filespec, netfd);
+	      }
+	      done = true;
+	      continue;
+          case OPEN:
+	      loadToMem(0);
+	      _offset = 0;
+	      _state = PLAY;
+	      // continue;
           case PLAY:
-              _state = DONE;
-              break;
+	  {
+	      size_t ret;
+	      Network net;
+	      if ((_filesize - _offset) < _pagesize) {
+#ifdef HAVE_SENDFILE_XX
+		  ret = sendfile(netfd, _filefd, &_offset, _filesize - _offset);
+#else
+		  ret = net.writeNet(netfd, (_dataptr + _offset), (_filesize - _offset));
+		  if (ret != (_filesize - _offset)) {
+		      log_error("In %s(%d): couldn't write %d bytes to net fd #%d! %s",
+				__FUNCTION__, __LINE__, (_filesize - _offset),
+				netfd, strerror(errno));
+		  }
+#endif
+		  log_debug("Done playing file %s, size was: %d", _filespec, _filesize);
+ 		  close();
+		  done = true;
+		  // reset to the beginning of the file
+		  _offset = 0;
+	      } else {
+		  log_debug("\tPlaying part of file %s, offset is: %d", _filespec, _offset);
+#ifdef HAVE_SENDFILE_XX
+		  ret = sendfile(netfd, _filefd, &_offset, _pagesize);
+#else
+		  ret = net.writeNet(netfd, (_dataptr + _offset), _pagesize);
+		  if (ret != _pagesize) {
+		      log_error("In %s(%d): couldn't write %d of bytes of data to net fd #%d! Got %d, %s",
+				__FUNCTION__, __LINE__, _pagesize, netfd,
+				ret, strerror(errno));
+		  }
+		  _offset += _pagesize;
+#endif
+	      }
+	      switch (errno) {
+		case EINVAL:
+		case ENOSYS:
+		case EFAULT:
+		    log_network("ERROR: %s", strerror(errno));
+		    break;
+		default:
+		    break;
+	      }
+	      break;
+	  }
           case PREVIEW:
               break;
           case THUMBNAIL:
@@ -641,7 +792,13 @@ DiskStream::play(int netfd)
           case MULTICAST:
               break;
           case DONE:
-              break;
+	      log_debug("Restarting Disk Stream from the beginning");
+	      _offset = 0;
+	      _filefd = 0;
+	      _state = PLAY;
+	      _seekptr = _dataptr + _pagesize;
+	      _netfd = netfd;
+              continue;
           default:
               break;
         }
@@ -657,20 +814,8 @@ DiskStream::play(int netfd)
 #ifdef USE_STATS_FILE
     _statistics->addBytes(nbytes);
     _bytes += nbytes;
-    _seekptr += nbytes;
+    // _seekptr += nbytes;
 #endif
-    
-    log_debug("Done...");
-	   
-#ifdef _WIN32
-    UnmapViewOfFile(_dataptr);
-#elif defined(__amigaos4__)
-	if (_dataptr) free(_dataptr);
-#else
-    munmap(_dataptr, _filesize);
-#endif
-    
-    _seekptr = 0;
 
     return true;
 }
@@ -783,9 +928,6 @@ DiskStream::determineFileType()
   return(determineFileType(_filespec));
 }
 
-
-
-
 // Get the file type, so we know how to set the
 // Content-type in the header.
 bool
@@ -843,9 +985,13 @@ DiskStream::determineFileType(const string &filespec)
   if (pos != string::npos) {
     string suffix = filespec.substr(pos+1, filespec.size());
     _filetype = FILETYPE_NONE;
-    if (suffix == "html") {
+    if (suffix == "htm") {
+      _filetype = FILETYPE_HTML;
+    } else if (suffix == "html") {
       _filetype = FILETYPE_HTML;
     } else if (suffix == "ogg") {
+      _filetype = FILETYPE_OGG;
+    } else if (suffix == "ogv") {
       _filetype = FILETYPE_OGG;
     } else if (suffix == "swf") {
       _filetype = FILETYPE_SWF;
@@ -864,6 +1010,8 @@ DiskStream::determineFileType(const string &filespec)
     } else if (suffix == "xml") {
       _filetype = FILETYPE_XML;
     } else if (suffix == "mp4") {
+      _filetype = FILETYPE_MP4;
+    } else if (suffix == "mpeg") {
       _filetype = FILETYPE_MP4;
     } else if (suffix == "png") {
       _filetype = FILETYPE_PNG;
@@ -942,9 +1090,11 @@ void
 DiskStream::dump()
 {
 //    GNASH_REPORT_FUNCTION;
-	//state_e     _state;
     const char *state_str[] = {
 	"NO_STATE",
+	"CREATED",
+	"CLOSED",
+        "OPEN",	
 	"PLAY",
 	"PREVIEW",
 	"THUMBNAIL",
@@ -954,14 +1104,39 @@ DiskStream::dump()
 	"MULTICAST",
 	"DONE"
     };
+
+    const char *type_str[] = {
+        "NONE",
+	"AMF",
+	"SWF",
+	"HTML",
+	"PNG",
+	"JPEG",
+	"GIF",
+	"MP3",
+	"MP4",
+	"OGG",
+	"VORBIS",
+	"THEORA",
+	"DIRAC",
+	"TEXT",
+	"FLV",
+	"VP6",
+	"XML",
+	"FLAC",
+	"ENCODED"
+    };	
     
     cerr << "State is \"" << state_str[_state] << "\"" << endl;
+    cerr << "File type is \"" << type_str[_filetype] << "\"" << endl;
     cerr << "Filespec is \"" << _filespec << "\"" << endl;
     cerr << "Disk file descriptor is fd #" << _filefd << endl;
-    cerr << "Network file descritor is fd #" << _netfd << endl;
+    cerr << "Network file descriptor is fd #" << _netfd << endl;
     cerr << "File size is " <<  _filesize << endl;
     cerr << "Memory Page size is " << _pagesize << endl;
     cerr << "Memory Offset is " << _offset << endl;
+    cerr << "Base Memory Address is " << (void *)_dataptr << endl;
+    cerr << "Seek Pointer Memory Address is " << (void *)_seekptr << endl;
     
     // dump timing related data
     struct timespec now;

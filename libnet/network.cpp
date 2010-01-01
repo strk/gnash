@@ -40,6 +40,7 @@
 # include <io.h>
 # include <ws2tcpip.h>
 #else
+# include <sys/ioctl.h>
 # include <sys/time.h>
 # include <unistd.h>
 # include <sys/select.h>
@@ -65,6 +66,10 @@
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
+#endif
+
+#ifndef FIONREAD
+#define FIONREAD 0
 #endif
 
 using namespace std;
@@ -788,6 +793,18 @@ Network::readNet(int fd, amf::Buffer &buffer)
 }
 
 int
+Network::readNet(int fd, amf::Buffer *buffer)
+{
+//    GNASH_REPORT_FUNCTION;
+    int ret = readNet(fd, buffer->reference(), buffer->size(), _timeout);
+    if (ret > 0) {
+	buffer->setSeekPointer(buffer->reference() + ret);
+    }
+
+    return ret;
+}
+
+int
 Network::readNet(amf::Buffer &buffer)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1251,7 +1268,7 @@ Network::getEntry(int fd)
 boost::shared_ptr<std::vector<struct pollfd> >
 Network::waitForNetData(int limit, struct pollfd *fds)
 {
-  //    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     boost::shared_ptr<vector<struct pollfd> > hits(new vector<struct pollfd>);
 
@@ -1366,19 +1383,22 @@ Network::waitForNetData(vector<int> &data)
 {
     // GNASH_REPORT_FUNCTION;
 
-    int max = 0;
-    
     fd_set fdset;
     FD_ZERO(&fdset);
-    
-    for (size_t i = 0; i<data.size(); i++) {
-	FD_SET(data[i], &fdset);
-	if (data[i] > max) {
-	    max = data[i];
+	
+    if (data.size()) {
+	int max = 0;
+	
+	for (size_t i = 0; i<data.size(); i++) {
+	    FD_SET(data[i], &fdset);
+	    if (data[i] > max) {
+		max = data[i];
+	    }
 	}
+	return waitForNetData(max+1, fdset);
     }
 
-    return waitForNetData(max+1, fdset);
+    return fdset;
 }
 
 fd_set
@@ -1428,14 +1448,23 @@ Network::waitForNetData(int limit, fd_set files)
     
     if (ret == -1) {
 	log_error (_("Waiting for data for fdset, was never available for reading"));
+	FD_ZERO(&fdset);
+	FD_SET(0, &fdset);
+	return fdset;
     }
     
     if (ret == 0) {
 	// log_debug (_("Waiting for data for fdset, timed out waiting for data"));
 	FD_ZERO(&fdset);
+	FD_SET(0, &fdset);
+	return fdset;
     }
 
-    if (ret) {
+    if (ret < 0) {
+	log_error("select() got an error: %s.", strerror(errno));
+	FD_ZERO(&fdset);
+	FD_SET(0, &fdset);
+    } else {
 	log_network("select() saw activity on %d file descriptors.", ret);
     }
 
@@ -1561,10 +1590,26 @@ Network::initSSL(std::string &hostname, std::string &passwd,
 }
 #endif
 
+// Use an ioctl() to see how many bytes are in the network buffers.
+size_t
+Network::sniffBytesReady(int fd)
+{
+    // GNASH_REPORT_FUNCTION;
+
+    int bytes;
+    
+    ioctl(fd, FIONREAD, &bytes);
+    
+    log_network("#%d bytes waiting in kernel network buffer.", bytes);
+    
+    return bytes;
+}
+
 // Trap Control-C so we can cleanly exit
 static void
 cntrlc_handler (int sig)
 {
+    GNASH_REPORT_FUNCTION;
     sig_number = sig;
     log_debug(_("Got an %d interrupt while blocked on pselect()"), sig);
     exit(EXIT_FAILURE);

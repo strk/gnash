@@ -52,9 +52,9 @@ static void usage (void);
 
 // Prototypes for test cases
 static void test_encoding();
-static void test_string();
+// static void test_string();
 static void test_object();
-static void test_boolean();
+// static void test_boolean();
 static void test_array();
 
 // Enable the display of memory allocation and timing data

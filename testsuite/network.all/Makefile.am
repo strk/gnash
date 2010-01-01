@@ -61,14 +61,21 @@ AM_LDFLAGS =
 	$(OPENGL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
+	$(MING_LIBS) \
 	$(NULL)
 
+if BUILD_SSL
+TEST_SSL = test_ssl
+endif
+if BUILD_SSH
+TEST_SSH = test_ssh
+endif
 check_PROGRAMS = \
 	Dejagnu \
 	Dejagnu.swf \
-	test_ssl \
 	test_allowDomain \
-	test_ssh \
+	$(TEST_SSL) \
+	$(TEST_SSH) \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -85,6 +92,7 @@ check_LTLIBRARIES = libgnashmingutils.la
 libgnashmingutils_la_SOURCES = \
 	$(top_srcdir)/testsuite/misc-ming.all/ming_utils.h \
 	$(top_srcdir)/testsuite/misc-ming.all/ming_utils.c
+libgnashmingutils_la_LIBADD = $(MING_LIBS)
 
 http.swf: $(srcdir)/http.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/http.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
@@ -115,20 +123,23 @@ Dejagnu_LDADD = libgnashmingutils.la
 Dejagnu.swf: Dejagnu
 	./Dejagnu $(top_srcdir)/testsuite/media
 
+if BUILD_SSL
 test_ssl_SOURCES = test_ssl.cpp
 test_ssl_LDADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la
+test_ssl_DEPENDENCIES = site-update
+endif
 
+if BUILD_SSH
 test_ssh_SOURCES = test_ssh.cpp
 test_ssh_LDADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la
-
-test_ssl_DEPENDENCIES = site-update
-
+test_ssh_DEPENDENCIES = site-update
+endif
 
 test_allowDomain_SOURCES = test_allowDomain.cpp
 test_allowDomain_LDADD = \

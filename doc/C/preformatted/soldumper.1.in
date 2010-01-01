@@ -1,11 +1,11 @@
-'\" -*- coding: us-ascii -*-
+.\" -*- coding: us-ascii -*-
 .if \n(.g .ds T< \\FC
 .if \n(.g .ds T> \\F[\n[.fam]]
 .de URL
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH soldumper 1 "20 June 2008" "" ""
+.TH soldumper 1 "20 December 2009" "" ""
 .SH NAME
 soldumper \- Gnash Local Shared Object (LSO) File Dumper
 .SH Synopsis
@@ -17,12 +17,12 @@ soldumper (options)... (file)...
 Dump information about the .sol files used by the SharedObject
 ActionScript class.
 .PP
-When a Flash player, including the Gnash player, plays a Flash "movie",
+When a SWF player, including Gnash, plays a SWF "movie",
 the movie can contain
 scripts. These scripts can call ActionScript classes. One such class
 is SharedObject. SharedObject creates shared objects, which end up
-stored in your computer's file system. For example, a Flash game might
-store its score file in a SharedObject; or a privacy-invading Flash
+stored in your computer's file system. For example, a SWF game might
+store its score file in a SharedObject; or a privacy-invading SWF
 movie might store "cookies" in a SharedObject. Before soldumper was
 written, these bits of stored information were hard for users to 
 notice or investigate.

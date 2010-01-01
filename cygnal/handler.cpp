@@ -23,6 +23,8 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
 #include <algorithm>
 #include <string>
@@ -46,10 +48,16 @@
 #include "buffer.h"
 #include "utility.h"
 #include "dsodefs.h" //For DSOEXPORT.
+#include "URL.h"
 #include "handler.h"
-
+#include "diskstream.h"
 #include "rtmp.h"
 #include "http.h"
+#include "crc.h"
+#include "flv.h"
+
+#include "rtmp_server.h"
+#include "http_server.h"
 
 using namespace gnash;
 using namespace std;
@@ -60,12 +68,17 @@ namespace cygnal
 
 map<int, Handler *> DSOEXPORT handlers;
 
+// The user config for Cygnal is loaded and parsed here:
+static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
+
 Handler::Handler()
-    : _streams(2),		// streams 0 and 1 appear to be
-				// reserved by the system.      
-      _in_fd(0)
+    :_streams(1),	// note that stream 0 is reserved by the system.
+     // _diskstreams(new gnash::DiskStream[STREAMS_BLOCK]),     
+     _in_fd(0)
 {
 //    GNASH_REPORT_FUNCTION;
+    // reserve memory for the vector as it makes vector operations
+    // must faster.
 }
 
 Handler::~Handler()
@@ -82,22 +95,171 @@ Handler::sync(int /* in_fd */)
 }
 
 size_t
-Handler::addClient(int x, Network::protocols_supported_e proto)
+Handler::addClient(int fd, Network::protocols_supported_e proto)
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     boost::mutex::scoped_lock lock(_mutex);
-    _clients.push_back(x);
-    _protocol[x] = proto;
+    
+    log_debug("Adding %d to the client array.", fd);
+    switch (proto) {
+      case Network::NONE:
+	  break;
+      case Network::HTTP:
+      {
+	  boost::shared_ptr<HTTPServer> http(new HTTPServer);
+	  _http[fd] = http;
+	  break;
+      }
+      case Network::HTTPS:
+	  break;
+      case Network::RTMP:
+      {
+	  boost::shared_ptr<RTMPServer> rtmp(new RTMPServer);
+	  _rtmp[fd] = rtmp;
+	  break;
+      }
+      case Network::RTMPT:
+      case Network::RTMPTS:
+      case Network::RTMPE:
+      case Network::RTMPS:
+      case Network::DTN:
+      default:
+	  log_unimpl("Protocol %d for Handler::AddClient()", proto);
+	  break;
+    }
+
+    _clients.push_back(fd);
+    _protocol[fd] = proto;
     
     return _clients.size();
+}
+
+// Parse the first nessages when starting a new message handler,
+// which is used to determine the name of the resource to
+// initialize, or load from the cache.
+amf::Buffer *
+Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
+{
+    GNASH_REPORT_FUNCTION;
+    string key;
+    Network net;
+    amf::Buffer *buf = 0;
+    boost::mutex::scoped_lock lock(_mutex);
+    
+    switch (proto) {
+      case Network::NONE:
+	  break;
+      case Network::HTTP:
+      {
+#if 0
+	  int ret = _http[fd]->readNet(fd, buf);
+	  if (ret) {
+	      _http[fd]->processHeaderFields(buf);
+	      string hostname, path;
+	      string::size_type pos = _http[fd]->getField("host").find(":", 0);
+	      if (pos != string::npos) {
+		  hostname += _http[fd]->getField("host").substr(0, pos);
+	      } else {
+		  hostname += "localhost";
+	      }
+	      path = _http[fd]->getFilespec();
+	      key = hostname + path;
+	      log_debug("HTTP key is: %s", key);
+	      _keys[fd] = key;
+	  } else {
+	      log_error("HTTP key couldn't be read!");
+	  }
+#else
+	  HTTPServer http;
+	  size_t bytes = http.sniffBytesReady(fd);
+	  if (bytes) {
+	      buf = new amf::Buffer(bytes);
+	  } else {
+	      return 0;
+	  }
+	  int ret = http.readNet(fd, buf);
+	  if (ret) {
+	      http.processHeaderFields(buf);
+	      string hostname, path;
+	      string::size_type pos = http.getField("host").find(":", 0);
+	      if (pos != string::npos) {
+		  hostname += http.getField("host").substr(0, pos);
+	      } else {
+		  hostname += "localhost";
+	      }
+	      path = http.getFilespec();
+	      key = hostname + path;
+	      log_debug("HTTP key is: %s", key);
+	      _keys[fd] = key;
+	  } else {
+	      log_error("HTTP key couldn't be read!");
+	  }	  
+#endif
+	  break;
+      }
+      case Network::HTTPS:
+	  break;
+      case Network::RTMP:
+      {
+	  // _rtmp[fd]->recvMsg(fd);
+	  break;
+      }
+      case Network::RTMPT:
+      case Network::RTMPTS:
+      case Network::RTMPE:
+      case Network::RTMPS:
+      case Network::DTN:
+      default:
+	  log_error("FD #%d has no protocol handler registered", fd);
+	  break;
+    };
+
+    return buf;
+}
+
+int
+Handler::recvMsg(int fd)
+{
+    // GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_mutex);
+
+    switch (_protocol[fd]) {
+      case Network::NONE:
+	  break;
+      case Network::HTTP:
+      {
+	  return _http[fd]->recvMsg(fd);
+	  break;
+      }
+      case Network::HTTPS:
+	  break;
+      case Network::RTMP:
+      case Network::RTMPT:
+      case Network::RTMPTS:
+      case Network::RTMPE:
+      case Network::RTMPS:
+      case Network::DTN:
+      default:
+	  log_error("FD #%d has no protocol handler registered", fd);
+	  break;
+    }
 };
 
 void
 Handler::removeClient(int x)
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     boost::mutex::scoped_lock lock(_mutex);
-    _clients.erase(_clients.begin()+x);
+
+    vector<int>::iterator it;
+    for (it = _clients.begin(); it < _clients.end(); ++it) {
+	if (*it == x) {
+	    log_debug("Removing %d from the client array.", *it);
+	    _clients.erase(it);
+	}
+    }
 }
 
 void 
@@ -108,7 +270,7 @@ Handler::setPlugin(boost::shared_ptr<Handler::cygnal_init_t> &/* init */)
 }
 
 void
-Handler::setPlugin(Handler::cygnal_io_t /* read_ptr */, Handler::cygnal_io_t /* write_ptr */)
+Handler::setPlugin(Handler::cygnal_io_read_t /* read_ptr */, Handler::cygnal_io_write_t /* write_ptr */)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -118,7 +280,7 @@ Handler::setPlugin(Handler::cygnal_io_t /* read_ptr */, Handler::cygnal_io_t /* 
 boost::shared_ptr<Handler::cygnal_init_t>
 Handler::initModule(const std::string& module)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     SharedLib *sl;
     std::string symbol(module);
@@ -170,7 +332,7 @@ Handler::initModule(const std::string& module)
      // to the cgi-bin as a dynamically loadable plugin.
      symbol = module;
      symbol.append("_write_func");
-     Handler::cygnal_io_t write_symptr = reinterpret_cast<Handler::cygnal_io_t>
+     Handler::cygnal_io_write_t write_symptr = reinterpret_cast<Handler::cygnal_io_write_t>
 	(sl->getInitEntry(symbol));
 
      if (!write_symptr) {    
@@ -187,8 +349,7 @@ Handler::initModule(const std::string& module)
 size_t
 Handler::writeToPlugin(boost::uint8_t *data, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
-
+    // GNASH_REPORT_FUNCTION;
     size_t ret = 0;
     if (_plugin) {
 	ret = _plugin->write_func(data, size);
@@ -200,7 +361,8 @@ Handler::writeToPlugin(boost::uint8_t *data, size_t size)
 boost::shared_ptr<amf::Buffer>
 Handler::readFromPlugin()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     boost::shared_ptr<amf::Buffer> buf;
     if (_plugin) {
 	buf = _plugin->read_func();
@@ -212,7 +374,7 @@ Handler::readFromPlugin()
 bool 
 Handler::initialized()
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     if (_files.empty()
 	&& (_clients.size() == 1)
 	&& !_local
@@ -224,48 +386,88 @@ Handler::initialized()
     return true;
 }
 
-int 
-Handler::createStream()
+// Find a stream in the vector or Disk Streams
+boost::shared_ptr<gnash::DiskStream>
+Handler::findStream(const std::string &filespec)
 {
-    // GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
+    
+    for (int i; i < _streams; i++) {
+	if (_diskstreams[i]->getFilespec() == filespec) {
+	    return _diskstreams[i];
+	}
+    }
 
-    return createStream("");
+    return _diskstreams[0];
 }
 
-int
-Handler::createStream(const std::string &filespec)
+// Create a new DiskStream
+double
+Handler::createStream(double /* transid */)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    int streamid = _streams;
+    _diskstreams[_streams]->setState(DiskStream::CREATED);
+
+    return _streams;
+}
+
+// Create a new DiskStream
+double
+Handler::createStream(double /* transid */, const std::string &filespec)
+{
+    GNASH_REPORT_FUNCTION;
 
     if (filespec.empty()) {
 	return -1;
     }
-    _streams++;
-    return streamid;
+    
+    _diskstreams[_streams]->setState(DiskStream::CREATED);
+    _diskstreams[_streams]->setFilespec(filespec);
+    
+    return _streams;
 }
 
-int
+bool
 Handler::playStream()
 {
     GNASH_REPORT_FUNCTION;
 
-    return -1;
+    // _diskstreams[int(streamid)]->setState(DiskStream::PLAY);
+
+    return false;
 }
 
-int
-Handler::playStream(const std::string &/* filespec */)
+bool
+Handler::playStream(const std::string &filespec)
 {
     GNASH_REPORT_FUNCTION;
-    return -1;
+
+    boost::shared_ptr<gnash::DiskStream> ds = _diskstreams[_streams];
+
+    string fullpath = crcfile.getDocumentRoot();
+    fullpath += "/";
+    fullpath += filespec;
+    log_debug("FILENAME: %s", fullpath);
+
+    // gnash::DiskStream &ds = findStream(filespec);
+    if (ds->getState() == DiskStream::CREATED) {
+	if (ds->open(fullpath)) {
+	    ds->loadToMem(0); // FIXME: load only part of the whole file for now
+	    ds->setState(DiskStream::PLAY);
+	    return true;
+	}
+    }
+    
+    return false;
 }
 
-// Publish a live RTMP stream
+// Publish a live stream
 int
 Handler::publishStream()
 {
     GNASH_REPORT_FUNCTION;
+    
     return publishStream("", Handler::LIVE);
 }
 
@@ -274,6 +476,9 @@ Handler::publishStream(const std::string &/*filespec */, Handler::pub_stream_e /
 									   */)
 {
     GNASH_REPORT_FUNCTION;
+
+    // _diskstreams[int(streamid)]->setState(DiskStream::PUBLISH);
+
     return -1;
 }
 
@@ -282,6 +487,8 @@ int
 Handler::seekStream()
 {
     GNASH_REPORT_FUNCTION;
+    // _diskstreams[int(streamid)]->setState(DiskStream::SEEK);
+    
     return -1;
 }
 
@@ -289,39 +496,70 @@ int
 Handler::seekStream(int /* offset */)
 {
     GNASH_REPORT_FUNCTION;
+    // _diskstreams[int(streamid)]->setState(DiskStream::SEEK);
+
     return -1;
 }
 
 // Pause the RTMP stream
 int
-Handler::pauseStream()
+Handler::pauseStream(double streamid)
 {
     GNASH_REPORT_FUNCTION;
+
+    _diskstreams[int(streamid)]->setState(DiskStream::PAUSE);
+
     return -1;
 }
 
 // Pause the RTMP stream
 int
-Handler::togglePause()
+Handler::togglePause(double streamid)
 {
     GNASH_REPORT_FUNCTION;
+
+    if (_diskstreams[int(streamid)]->getState() == DiskStream::PAUSE) {
+	_diskstreams[int(streamid)]->setState(DiskStream::PLAY);
+    } if (_diskstreams[int(streamid)]->getState() == DiskStream::PLAY) {
+	_diskstreams[int(streamid)]->setState(DiskStream::PAUSE);
+    }
+
     return -1;
 }
 
 // Resume the paused RTMP stream
-int
-Handler::resumeStream()
+double
+Handler::resumeStream(double streamid)
 {
     GNASH_REPORT_FUNCTION;
+
+    togglePause(streamid);
+    
     return -1;
 }
 
 // Close the RTMP stream
-int
-Handler::closeStream()
+double
+Handler::closeStream(double streamid)
 {
     GNASH_REPORT_FUNCTION;
+
+    _diskstreams[int(streamid)]->setState(DiskStream::CLOSED);
+
     return -1;
+}
+
+// Delete the RTMP stream
+double
+Handler::deleteStream(double streamid)
+{
+    GNASH_REPORT_FUNCTION;
+
+    _diskstreams[int(streamid)]->setState(DiskStream::NO_STATE);
+
+    _streams++;
+
+    return _streams;
 }
 
 // Dump internal data.
@@ -341,10 +579,23 @@ Handler::dump()
     };
 
 //    GNASH_REPORT_FUNCTION;
+    cerr << "Currently there are " <<_clients.size() << " clients connected."
+	 << endl;
     for (size_t i = 0; i < _clients.size(); i++) {
 	cerr << "Client on fd #" << _clients[i] << " is using  "
 	     << proto_str[_protocol[i]] << endl;
     }
+
+    cerr << "Currently there are " << dec <<_diskstreams.size() << " DiskStreams."
+	 << endl;
+    map<int, boost::shared_ptr<DiskStream> >::iterator it;
+    for (it = _diskstreams.begin(); it != _diskstreams.end(); ++it) {
+	if (it->second) {
+	    cerr << "DiskStream for fd #" << dec << it->first << endl;
+	    it->second->dump();
+	}
+    }
+    
 }
 
 } // end of gnash namespace
