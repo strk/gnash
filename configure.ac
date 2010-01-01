@@ -1384,18 +1384,20 @@ AC_ARG_ENABLE(kparts4,
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kparts4 option]) ;;
 esac],build_kparts4=$build_kde4)
 
-dnl ----------------------------------------------------
-dnl Add NPAPI support, if specified or GTK gui is built
-dnl ----------------------------------------------------
+dnl -----------------------------------------------------------
+dnl Add NPAPI support, if specified or GTK or KDE4 gui is built
+dnl -----------------------------------------------------------
 
 AC_ARG_ENABLE(npapi,
-  AC_HELP_STRING([--disable-npapi], [Disable NPAPI plugin build (default: enabled if gtk gui is)]),
+  AC_HELP_STRING([--disable-npapi], [Disable NPAPI plugin build (default: enabled if gtk or kde4 gui is)]),
   [case "${enableval}" in
     yes) npapi=yes ;;
     no)  npapi=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for disable-npapi option]) ;;
   esac],
-  npapi=$build_gtk
+  if test x$build_gtk = xyes -o x$build_kde4 = xyes; then
+    npapi=yes
+  fi
 )
 
 dnl -----------------------------------------------------------------
@@ -1868,8 +1870,10 @@ fi
 
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 
-if test x$build_gtk = xno -a x$npapi = xyes; then
-  AC_MSG_WARN(["Enabled NPAPI plugin, but you aren't building a GTK based GUI!"])
+if test x$build_gtk = xno -o x$build_kde4 = xno; then
+  if test x$npapi =xyes; then
+    AC_MSG_WARN(["Enabled NPAPI plugin, but it's not supported by the selected GUI"])
+  fi
 fi
 
 if test x$windows = xyes -a x$npapi = xyes; then
@@ -1879,6 +1883,11 @@ if test x$windows = xyes -a x$npapi = xyes; then
   if test "x$WINDRES" = x; then
     AC_MSG_ERROR(["On Win32, NPAPI plugin requires windres."])
   fi
+fi
+
+dnl Need GLIB for NPAPI plugin
+if test x$npapi = xyes; then
+  GNASH_PATH_GLIB
 fi
 
 dnl if kde isn't installed, even if it's specified, don't try to build

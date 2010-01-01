@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@
 #include <X11/cursorfont.h>
 #ifdef HAVE_GTK2
 #include <gtk/gtk.h>
+#else
+#include <glib.h>
 #endif
 #include <string>
 #include <map>

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1108,17 +1108,47 @@ void
 nsPluginInstance::startProc(Window win)
 {
     std::string procname;
+    bool process_found = false;
+    struct stat procstats;
+
     char *gnash_env = std::getenv("GNASH_PLAYER");
+
 #ifdef GNASH_XPI_PLUGIN
     if (getHome(procname) >= 0)
-        ;
+        process_found = true;
     else
 #endif // def GNASH_XPI_PLUGIN
-    if (gnash_env == NULL) {
-        procname = GNASHBINDIR;
-        procname += "/gtk-gnash";
-    } else {
+    if (gnash_env)
+    {
         procname = gnash_env;
+        process_found = (0 == stat(procname.c_str(), &procstats));
+        if (!process_found)
+        {
+#ifdef GNASH_PLUGIN_DEBUG
+            std::cout << "Invalid path to gnash executable: " << 
+                procname << std::endl;
+#endif
+            return;
+        }
+    }
+
+    if (!process_found)
+    {
+        procname = GNASHBINDIR "/gtk-gnash";
+        process_found = (0 == stat(procname.c_str(), &procstats));
+    }
+    if (!process_found)
+    {
+        procname = GNASHBINDIR "/kde4-gnash";
+        process_found = (0 == stat(procname.c_str(), &procstats));
+    }
+
+    if (!process_found)
+    {
+#ifdef GNASH_PLUGIN_DEBUG
+        std::cout << "Unable to find Gnash in " GNASHBINDIR << std::endl;
+#endif
+        return;
     }
 
     const char* pageurl = getCurrentPageURL();
@@ -1127,17 +1157,6 @@ nsPluginInstance::startProc(Window win)
 #ifdef GNASH_PLUGIN_DEBUG
         std::cout << "Could not get current page URL!" << std::endl;
 #endif
-    }
-
-    struct stat procstats;
-
-    // See if the file actually exists, otherwise we can't spawn it
-    if (stat(procname.c_str(), &procstats) == -1) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "Invalid path to standalone executable: " << 
-            procname << std::endl;
-#endif
-        return;
     }
 
     dumpCookies();
