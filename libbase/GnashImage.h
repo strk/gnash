@@ -142,7 +142,7 @@ public:
     ///
     /// @param data buffer to copy data from.
     ///
-    void update(boost::uint8_t* data);
+    void update(const boost::uint8_t* data);
 
     /// Copy image data from another image data
     //
