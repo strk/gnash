@@ -597,8 +597,15 @@ public:
     virtual void renderToImage(boost::shared_ptr<IOChannel> io,
             FileType type) const
     {
+        log_debug("New image: %sx%s", xres, yres);
         ImageRGBA im(xres, yres);
-        im.update(reinterpret_cast<const boost::uint8_t*>(m_rbuf.buf()));
+        for (int x = 0; x < xres; ++x) {
+            for (int y = 0; y < yres; ++y) {
+                typename PixelFormat::color_type t = m_pixf->pixel(x, y);
+                im.setPixel(x, y, t.r, t.g, t.b, t.a);
+            }
+        }
+        
         ImageOutput::writeImageData(type, io, im, 100);
     }
 
