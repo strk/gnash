@@ -594,6 +594,14 @@ public:
         return new agg_bitmap_info(im);
     }
 
+    virtual void renderToImage(boost::shared_ptr<IOChannel> io,
+            FileType type) const
+    {
+        ImageRGBA im(xres, yres);
+        im.update(reinterpret_cast<const boost::uint8_t*>(m_rbuf.buf()));
+        ImageOutput::writeImageData(type, io, im, 100);
+    }
+
     template<typename SourceFormat, typename Matrix>
     void renderVideo(GnashImage& frame, Matrix& img_mtx,
             agg::path_storage path, bool smooth)
