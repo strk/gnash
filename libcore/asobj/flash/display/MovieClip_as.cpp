@@ -2088,6 +2088,7 @@ movieclip_beginGradientFill(const fn_call& fn)
     // ----------------------------
 
     size_t ngradients = toInt(colors->getMember(NSV::PROP_LENGTH));
+
     // Check length compatibility of all args
     if (ngradients != (size_t)toInt(alphas->getMember(NSV::PROP_LENGTH)) ||
         ngradients != (size_t)toInt(ratios->getMember(NSV::PROP_LENGTH)))
@@ -2102,8 +2103,7 @@ movieclip_beginGradientFill(const fn_call& fn)
     }
 
     // TODO: limit ngradients to a max ?
-    if ( ngradients > 8 )
-    {
+    if (ngradients > 8) {
         std::stringstream ss; fn.dump_args(ss);
         log_debug(_("%s.beginGradientFill(%s) : too many array elements"
             " for colors and ratios (%d), will trim to 8"), 
