@@ -117,4 +117,35 @@ tf.tabStops = a;
 check_equals(a.toString(), "string");
 xcheck_equals(tf.tabStops.toString(), "6");
 
-check_totals(65);
+tf2 = new TextFormat("Arial", 12);
+te = tf2.getTextExtent("Hello");
+
+// The object is a bare object
+te.hasOwnProperty = Object.prototype.hasOwnProperty;
+
+check(te.hasOwnProperty("ascent"));
+check(te.hasOwnProperty("descent"));
+check(te.hasOwnProperty("textFieldWidth"));
+check(te.hasOwnProperty("textFieldHeight"));
+check(te.hasOwnProperty("width"));
+check(te.hasOwnProperty("height"));
+
+xcheck_equals(Math.round(te.textFieldHeight), 18);
+xcheck_equals(Math.round(te.textFieldWidth), 33);
+
+te = tf2.getTextExtent("Hello", 10);
+xcheck_equals(Math.round(te.textFieldHeight), 60);
+xcheck_equals(te.textFieldWidth, 10);
+xcheck_equals(Math.round(te.width), 9);
+
+te = tf2.getTextExtent("Hello", 5);
+xcheck_equals(Math.round(te.textFieldHeight), 74);
+xcheck_equals(te.textFieldWidth, 5);
+// Width of largest character?
+xcheck_equals(Math.round(te.width), 9);
+
+te = tf2.getTextExtent("Longer sentence with more words.", 30);
+xcheck_equals(te.textFieldWidth, 30);
+xcheck_equals(Math.round(te.width), 25);
+
+check_totals(81);
