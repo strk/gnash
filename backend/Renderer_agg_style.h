@@ -64,9 +64,9 @@ public:
 private:
 
   // for solid styles:
-  bool _solid;
+  const bool _solid;
 
-  agg::rgba8 _color; 
+  const agg::rgba8 _color; 
   
 };
 
@@ -81,9 +81,6 @@ public:
     :
     agg_style_base(true, color)
   {
-#ifdef DEBUG_LIMIT_COLOR_ALPHA
-    m_color.a = m_color.a>127 ? 127 : m_color.a;
-#endif    
   }
 
   void generate_span(agg::rgba8* /*span*/, int /*x*/, int /*y*/,
