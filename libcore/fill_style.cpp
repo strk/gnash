@@ -182,15 +182,14 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         }
     
         uint8_t num_gradients = grad_props & 0xF;
-        if ( ! num_gradients )
-        {
+        if (!num_gradients) {
             IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("num gradients 0"));
             );
             return;
         }
     
-        if ( num_gradients > 8 + ((t == SWF::DEFINESHAPE4 ||
+        if (num_gradients > 8 + ((t == SWF::DEFINESHAPE4 ||
             t == SWF::DEFINESHAPE4_) ? 7 : 0))
         {
            // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
@@ -371,8 +370,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
         || m_type == SWF::FILL_RADIAL_GRADIENT
         || m_type == SWF::FILL_FOCAL_GRADIENT);
 
-    if ( m_gradients.empty() )
-    {
+    if (m_gradients.empty()) {
         static const rgba black;
         return black;
     }
@@ -395,7 +393,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
         return m_gradients[0].m_color;
     }
 
-    if ( ratio >= m_gradients.back().m_ratio )
+    if (ratio >= m_gradients.back().m_ratio)
     {
         return m_gradients.back().m_color;
     }
@@ -616,8 +614,21 @@ void
 fill_style::setLinearGradient(const std::vector<gradient_record>& gradients,
         const SWFMatrix& mat)
 {
-    m_type = SWF::FILL_LINEAR_GRADIENT;
-    m_gradients = gradients;
+
+    assert(!gradients.empty());
+    
+    // We must ensure that all gradients have more than one colour stop
+    // because asking the renderer to render a gradient with one colour
+    // leads to problems.
+    if (gradients.size() > 1) {
+        m_type = SWF::FILL_LINEAR_GRADIENT;
+        m_gradients = gradients;
+    }
+    else {
+        m_type = SWF::FILL_SOLID;
+        m_color = gradients[0].m_color;
+    }
+
     _matrix = mat;
     _bitmapInfo = 0;
 }
@@ -626,8 +637,20 @@ void
 fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
         const SWFMatrix& mat)
 {
-    m_type = SWF::FILL_RADIAL_GRADIENT;
-    m_gradients = gradients;
+    assert(!gradients.empty());
+    
+    // We must ensure that all gradients have more than one colour stop
+    // because asking the renderer to render a gradient with one colour
+    // leads to problems.
+    if (gradients.size() > 1) {
+        m_type = SWF::FILL_RADIAL_GRADIENT;
+        m_gradients = gradients;
+    }
+    else {
+        m_type = SWF::FILL_SOLID;
+        m_color = gradients[0].m_color;
+    }
+    
     _matrix = mat;
     _bitmapInfo = 0;
 }
