@@ -39,7 +39,6 @@ namespace gnash {
 namespace {
     
     as_value textformat_new(const fn_call& fn);
-    as_object* getTextFormatInterface();
     void attachTextFormatInterface(as_object& o);
     const char* getAlignString(TextField::TextAlignment a);
 	const char* getDisplayString(TextField::TextFormatDisplay a);
