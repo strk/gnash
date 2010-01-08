@@ -912,9 +912,9 @@ myxml.onLoad = function(success)
 		check_totals(429);
 #else
 # if OUTPUT_VERSION < 8
-		check_totals(464);
+		check_totals(466);
 # else
-		check_totals(445);
+		check_totals(447);
 # endif
 #endif
 		play();
@@ -1083,5 +1083,17 @@ h.docTypeDecl = 98;
 check_equals(typeof(h.docTypeDecl), "string");
 check_equals(h.docTypeDecl, "98");
 check_equals(h.toString(), "798<tag />");
+
+#if OUTPUT_VERSION > 5
+
+/// Check special characters
+r = new XML("1: &#229; 2: &#228; 3: &#1025; 4: &#02312; 5: &#0228;");
+xcheck_equals(r.toString(), "1: å 2: ä 3: Ё 4: ई 5: ä");
+
+r = new XML("1: &#229e2; 2: &#76e9; 3: &#ee229; 4: &#fee; 5: &#97;");
+xcheck_equals(r.toString(), "1: å 2: L 3: &amp;#ee229; 4: &amp;#fee; 5: a");
+
+#endif
+
 stop();
 
