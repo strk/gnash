@@ -378,114 +378,64 @@ public:
         as_c_function_ptr setter, int flags = DefaultFlags,
         string_table::key nsname = 0);
 
-    /// \brief
     /// Initialize a getter/setter property by key
     //
     /// This method has to be used by built-in classes initialization
     /// (VM initialization in general) as will avoid to scan the
     /// inheritance chain.
-    ///
-    /// @param key
-    ///     Key of the property.
-    ///
-    /// @param getter
-    ///    A function to invoke when this property value is requested.
-    ///    add_ref will be called on the function.
-    ///
-    /// @param setter
-    ///    A function to invoke when setting this property's value.
-    ///    add_ref will be called on the function.
-    ///
-    /// @param flags
-    ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See PropFlags::Flags.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
+    //
+    /// @param uri      Name/namespace property identifier.
+    /// @param getter   A function to invoke when this property value is
+    ///                 requested.
+    /// @param setter   A function to invoke when this property value is
+    ///                 set.
+    /// @param flags    Flags for the new member. By default dontEnum and
+    ///                 dontDelete.
     void init_property(const ObjectURI& uri, as_function& getter,
         as_function& setter, int flags = DefaultFlags);
 
-    /// \brief
     /// Initialize a getter/setter property by key
     //
     /// This method has to be used by built-in classes initialization
     /// (VM initialization in general) as will avoid to scan the
     /// inheritance chain.
     ///
-    /// @param key
-    ///     Key of the property.
-    ///
-    /// @param getter
-    ///    A function to invoke when this property value is requested.
-    ///    add_ref will be called on the function.
-    ///
-    /// @param setter
-    ///    A function to invoke when setting this property's value.
-    ///    add_ref will be called on the function.
-    ///
-    /// @param flags
-    ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See PropFlags::Flags.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
+    /// @param uri      Name/namespace property identifier.
+    /// @param getter   A function to invoke when this property value is
+    ///                 requested.
+    /// @param setter   A function to invoke when this property value is
+    ///                 set.
+    /// @param flags    Flags for the new member. By default dontEnum and
+    ///                 dontDelete.
     void init_property(const ObjectURI& uri, as_c_function_ptr getter,
         as_c_function_ptr setter, int flags = DefaultFlags);
 
 
-    /// \brief
     /// Initialize a destructive getter property
-    ///
+    //
     /// A destructive getter can be used as a place holder for the real
     /// value of a property.  As soon as getValue is invoked on the getter,
     /// it destroys itself after setting its property to the return value of
     /// getValue.
-    ///
-    /// @param key
-    ///     Name of the property.
-    ///    Will be converted to lowercase if VM is initialized for SWF6 or lower.
-    ///
-    /// @param getter
-    ///    A function to invoke when this property value is requested.
-    ///    add_ref will be called on the function.
-    ///
-    /// @param flags
-    ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See PropFlags::Flags.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
-    ///
+    //
+    /// @param uri      Name/namespace property identifier.
+    /// @param getter   A function to invoke when this property value is
+    ///                 requested.
+    /// @param flags    Flags for the new member. By default dontEnum.
     bool init_destructive_property(const ObjectURI& uri, as_function& getter,
             int flags = PropFlags::dontEnum);
 
-    /// \brief
     /// Initialize a destructive getter property
-    ///
+    //
     /// A destructive getter can be used as a place holder for the real
     /// value of a property.  As soon as getValue is invoked on the getter,
     /// it destroys itself after setting its property to the return value of
     /// getValue.
-    ///
-    /// @param key
-    ///     Name of the property.
-    ///    Will be converted to lowercase if VM is initialized for SWF6 or lower.
-    ///
-    /// @param getter
-    ///    A function to invoke when this property value is requested.
-    ///    add_ref will be called on the function.
-    ///
-    /// @param flags
-    ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See PropFlags::Flags.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
-    ///
+    //
+    /// @param uri      name/namespace property identifier.
+    /// @param getter   A function to invoke when this property value is
+    ///                 requested.
+    /// @param flags    Flags for the new member. By default dontEnum.
     bool init_destructive_property(const ObjectURI& uri, 
             as_c_function_ptr getter, int flags = PropFlags::dontEnum);
 
@@ -497,25 +447,16 @@ public:
     /// Additionally, it sets the property as read-only so that a default
     /// handler will be triggered when ActionScript attempts to set the
     /// property.
-    /// 
+    // 
     /// The arguments are the same as the above init_property arguments,
     /// although the setter argument is omitted.
-    ///
-    /// @param key
-    ///     Property name id
-    ///
-    /// @param getter
-    ///     The getter function
-    ///
-    /// @param flags
-    ///     Property flags
-    ///
-    /// @param nsname
-    ///     The id of the namespace to which this member belongs.
-    ///     0 is a wildcard and will be matched by anything not asking
-    ///     for a specific namespace.
-    ///
-    ///
+    //
+    /// @param key      Property name id
+    /// @param getter   The getter function
+    /// @param flags    Property flags
+    /// @param nsname   The id of the namespace to which this member belongs.
+    ///                 0 is a wildcard and will be matched by anything not
+    ///                 asking for a specific namespace.
     void init_readonly_property(const std::string& key, as_function& getter,
             int flags = DefaultFlags, string_table::key nsname = 0);
 
@@ -532,27 +473,18 @@ public:
     /// The arguments are the same as the above init_property arguments,
     /// although the setter argument is omitted.
     ///
-    /// @param key
-    ///     Property name id
-    ///
-    /// @param getter
-    ///     The getter function
-    ///
-    /// @param flags
-    ///     Property flags
-    ///
-    /// @param nsname
-    ///     The id of the namespace to which this member belongs.
-    ///     0 is a wildcard and will be matched by anything not asking
-    ///     for a specific namespace.
-    ///
+    /// @param key      Property name id
+    /// @param getter   The getter function
+    /// @param flags    Property flags
+    /// @param nsname   The id of the namespace to which this member belongs.
+    ///                 0 is a wildcard and will be matched by anything not
+    ///                 asking for a specific namespace.
     void init_readonly_property(const std::string& key,
             as_c_function_ptr getter, int flags = DefaultFlags,
             string_table::key nsname = 0);
 
     void init_readonly_property(const ObjectURI& uri,
             as_c_function_ptr getter, int flags = DefaultFlags);
-
 
     /// Enumerate all non-hidden property keys to the given as_environment.
     //
@@ -565,65 +497,35 @@ public:
     /// this case.
     void enumeratePropertyKeys(as_environment& env) const;
 
-    /// \brief
     /// Add a watch trigger, overriding any other defined for same name.
     //
-    /// @param key
-    ///    property name (key)
-    ///
-    /// @param ns
-    ///    property namespace.
-    ///
-    /// @param trig
-    ///    A function to invoke when this property value is assigned to.
-    ///    The function will be called with old val, new val and the custom
-    ///    value below. It's return code will be used to set actual value
-    ///
-    /// @param cust
-    ///    Custom value to always pass to the trigger as third arg
-    ///
-    /// @return true if the trigger was successfully added, false
-    ///         otherwise (error? should always be possible to add...)
-    ///
+    /// @param uri      property namespace.
+    /// @param trig     A function to invoke when this property value is
+    ///                 assigned to. The function will be called with old
+    ///                 val, new val and the custom value below. Its
+    ///                 return code will be used to set actual value
+    /// @param cust     Custom value to always pass to the trigger as third arg
+    /// @return         true if the trigger was successfully added, false
+    ///                 otherwise.
     bool watch(const ObjectURI& uri, as_function& trig, const as_value& cust);
 
-    /// \brief
     /// Remove a watch trigger.
     //
-    /// @param key
-    ///    property name (key)
-    ///
-    /// @param ns
-    ///    property namespace.
-    ///
-    /// @return true if the trigger was successfully removed, false
-    ///         otherwise (no such trigger...)
-    ///
+    /// @param uri      Name/namespace pair.
+    /// @return         true if the trigger was successfully removed, false
+    ///                 otherwise (no such trigger exists).
     bool unwatch(const ObjectURI& uri);
 
     /// Get a member as_value by name
-    ///
-    /// NOTE that this method is non-const becase a property
-    ///      could also be a getter/setter and we can't promise
-    ///      that the 'getter' won't change this object trough
-    ///     use of the 'this' reference. 
-    ///
-    /// @param name
-    ///    Name of the property. Must be all lowercase
-    ///    if the current VM is initialized for a  target
-    ///    up to SWF6.
-    ///
-    /// @param val
-    ///    Variable to assign an existing value to.
-    ///    Will be untouched if no property with the given name
-    ///    was found.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
-    ///
-    /// @return true of the named property was found, false otherwise.
-    ///
+    //
+    /// NOTE that this method is non-const because accessing a getter/setter
+    ///      property may modify the object.
+    //
+    /// @param uri      Name of the property. 
+    /// @param val      Variable to assign an existing value to.
+    ///                 Will be untouched if no property with the given name
+    ///                 was found.
+    /// @return         true if the named property was found, false otherwise.
     virtual bool get_member(const ObjectURI& uri, as_value* val);
 
     /// Resolve the given relative path component
@@ -633,8 +535,6 @@ public:
     ///
     /// Main use if for getvariable and settarget resolution,
     /// currently implemented in as_environment.
-    ///
-    ///
     virtual as_object* get_path_element(string_table::key key);
 
     /// Get the super object of this object.
@@ -664,7 +564,7 @@ public:
     ///
     /// @return value of the member (possibly undefined),
     ///    or undefined if not found. Use get_member if you
-    ///    need to know wheter it was found or not.
+    ///    need to know whether it was found or not.
     ///
     as_value getMember(const ObjectURI& uri);
 
@@ -703,9 +603,7 @@ public:
     ///                 if you do not care about the namespace (AS2 does not),
     ///                 you can call this function with the name key only.
     ///
-    /// @return
-    ///    true if the object has the property, false otherwise.
-    ///
+    /// @return         true if the object has the property, false otherwise.
     bool hasOwnProperty(const ObjectURI& uri);
 
     /// Get a property from this object (or a prototype) by ordering index.
