@@ -139,13 +139,29 @@ private:
 
 };
 
-
-/// \brief
-/// A generic bag of attributes. Base class for all ActionScript-able objects.
+/// The base class for all ActionScript objects
 //
-/// Base-class for ActionScript script-defined objects.
-/// This would likely be ActionScript's 'Object' class.
-///
+/// Everything in ActionScript is an object or convertible to an object. This
+/// class is the base class for all object types and the implementation of the
+/// ActionScript Object type itself. See asobj/Object.cpp for the ActionScript
+/// Object interface.
+//
+/// ActionScript has two different levels of object typing:
+//
+/// Dynamic Typing
+//
+/// 1. Native type information, stored in a Relay and inaccessible
+///    to ActionScript.
+/// 2. Link to a DisplayObject.
+//
+/// Both these dynamic types can be changed independently at runtime using
+/// native functions (often, but not always, constructor functions).
+//
+/// Static Typing
+//
+/// Functions (as_function), Super objects (as_super) and AS3 Class types
+/// (as_class) have a static type, that is, they are not convertible to each
+/// other once created.
 class as_object : public GcResource, boost::noncopyable
 {
 
