@@ -194,20 +194,13 @@ public:
     static const int DefaultFlags = PropFlags::dontDelete |
                                     PropFlags::dontEnum;
 
-    /// Find a property scanning the inheritance chain
-    ///
-    /// @param name
-    /// The string id to look for
-    ///
-    /// @param nsname
-    /// The namespace id to look for, 0 for any.
-    ///
-    /// @param owner
-    /// If not null, this is set to the object which contained the property.
-    ///
-    /// @returns a Property if found, NULL if not found
-    ///          or not visible in current VM version
-    ///
+    /// Find a property, scanning the inheritance chain
+    //
+    /// @param uri      Property identifier.
+    /// @param owner    If not null, this is set to the object which contained
+    ///                 an inherited property.
+    /// @returns        A property if found and visible, NULL if not found or
+    ///                 not visible in current VM version
     Property* findProperty(const ObjectURI& uri, as_object **owner = NULL);
 
     /// Return a reference to this as_object's global object.
@@ -217,44 +210,32 @@ public:
 
     /// Dump all properties using log_debug
     //
-    /// Note that this method is non-const
-    /// as some properties might be getter/setter
-    /// ones, thus simple read of them might execute
-    /// user code actually changing the object itsef.
-    ///
+    /// Note that it is very likely that this will result in changes to the
+    /// object, as accessing getter/setters or destructive properties can
+    /// modify properties.
+    //
+    /// Only use this function for temporary debugging!
     void dump_members();
 
     /// Dump all properties into the given container
     //
-    /// Note that this method is non-const
-    /// as some properties might be getter/setter
-    /// ones, thus simple read of them might execute
-    /// user code actually changing the object itsef.
-    ///
+    /// Note that it is very likely that this will result in changes to the
+    /// object, as accessing getter/setters or destructive properties can
+    /// modify properties.
+    //
+    /// Only use this function for temporary debugging!
     void dump_members(std::map<std::string, as_value>& to);
 
     /// Set a member value
     //
-    ///
-    /// @param key
-    ///    Id of the property. 
-    ///
-    /// @param val
-    ///    Value to assign to the named property.
-    ///
-    /// @param nsname
-    ///    Id of the namespace.
-    ///
-    /// @param ifFound
-    ///    If true, don't create a new member, but only update
-    ///    an existing one.
-    ///
-    /// @return true if the given member existed, false otherwise.
-    ///    NOTE: the return doesn't tell if the member exists after
-    ///          the call, as watch triggers might have deleted it
-    ///          after setting.
-    ///    
-    ///
+    /// @param uri      Property identifier.
+    /// @param val      Value to assign to the named property.
+    /// @param ifFound  If true, don't create a new member, but rather only
+    ///                 update an existing one.
+    /// @return         true if the given member existed, false otherwise.
+    ///                 NOTE: the return doesn't tell if the member exists
+    ///                 after the call, as watch triggers might have deleted
+    ///                 it after setting.
     virtual bool set_member(const ObjectURI& uri, const as_value& val,
         bool ifFound = false);
 
@@ -268,21 +249,14 @@ public:
     /// This is just a wrapper around the other init_member method
     /// used as a trampoline to avoid changing all classes to 
     /// use string_table::key directly.
+    //
+    /// @param name         Name of the member.
+    /// @param val          Value to assign to the member.
     ///
-    /// @param name
-    ///     Name of the member.
-    ///    Will be converted to lowercase if VM is initialized for SWF6 or lower.
-    ///
-    /// @param val
-    ///     Value to assign to the member.
-    ///
-    /// @param flags
-    ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See PropFlags::Flags.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
+    /// @param flags        Flags for the new member. By default dontDelete
+    ///                     and dontEnum.
+    /// @param nsname       The id of the namespace to which this member
+    ///                     belongs.
     void init_member(const std::string& name, const as_value& val, 
         int flags = DefaultFlags, string_table::key nsname = 0);
 
@@ -295,26 +269,15 @@ public:
     /// By default, members initialized by calling this function will
     /// be protected from deletion and not shown in enumeration.
     /// These flags can be explicitly set using the third argument.
+    //
+    /// @param uri      Property identifier.
+    /// @param val      Value to assign to the member.
     ///
-    /// @param key
-    ///     Member key.
-    ///
-    /// @param val
-    ///     Value to assign to the member.
-    ///
-    /// @param flags
-    ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See PropFlags::Flags.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
-    ///
-    /// @param slotId
-    /// If this is a non-negative value which will fit in an unsigned short,
-    /// this is used as the slotId and can be subsequently found with
-    /// get_slot
-    ///
+    /// @param flags    Flags for the new member. By default dontDelete
+    ///                 and dontEnum.
+    /// @param slotId   If this is a non-negative value which will fit in
+    ///                 an unsigned short, this is used as the slotId and
+    ///                 can be subsequently found with get_slot
     void init_member(const ObjectURI& uri, const as_value& val, 
         int flags = DefaultFlags, int slotId = -1);
 
@@ -348,7 +311,6 @@ public:
         as_function& setter, int flags = DefaultFlags,
         string_table::key nsname = 0);
 
-    /// \brief
     /// Initialize a getter/setter property by name
     //
     /// This is just a wrapper around the other init_property method
@@ -384,7 +346,7 @@ public:
     /// (VM initialization in general) as will avoid to scan the
     /// inheritance chain.
     //
-    /// @param uri      Name/namespace property identifier.
+    /// @param uri      Property identifier.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param setter   A function to invoke when this property value is
@@ -400,7 +362,7 @@ public:
     /// (VM initialization in general) as will avoid to scan the
     /// inheritance chain.
     ///
-    /// @param uri      Name/namespace property identifier.
+    /// @param uri      Property identifier.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param setter   A function to invoke when this property value is
@@ -418,7 +380,7 @@ public:
     /// it destroys itself after setting its property to the return value of
     /// getValue.
     //
-    /// @param uri      Name/namespace property identifier.
+    /// @param uri      Property identifier.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param flags    Flags for the new member. By default dontEnum.
@@ -511,7 +473,7 @@ public:
 
     /// Remove a watch trigger.
     //
-    /// @param uri      Name/namespace pair.
+    /// @param uri      Property identifier.
     /// @return         true if the trigger was successfully removed, false
     ///                 otherwise (no such trigger exists).
     bool unwatch(const ObjectURI& uri);
@@ -521,7 +483,7 @@ public:
     /// NOTE that this method is non-const because accessing a getter/setter
     ///      property may modify the object.
     //
-    /// @param uri      Name of the property. 
+    /// @param uri      Property identifier.
     /// @param val      Variable to assign an existing value to.
     ///                 Will be untouched if no property with the given name
     ///                 was found.
@@ -545,45 +507,35 @@ public:
     /// convoluted to obtain the actual super.
     virtual as_object* get_super(string_table::key fname = 0);
 
-    /// Get the constructor for this object.
-    ///
-    /// This is the AS constructor for this object. When invoked, it
-    /// should initialize the object passed as 'this'
-    as_function* get_constructor();
-
     /// Get a member as_value by name in an AS-compatible way
     //
     /// NOTE that this method is non-const becase a property
     ///      could also be a getter/setter and we can't promise
     ///      that the 'getter' won't change this object trough
-    ///     use of the 'this' reference. 
-    ///
-    /// @param uri      Name and namespace of the property. Note that
+    ///      use of the 'this' reference. 
+    //
+    /// @param uri      Property identifier. Note that
     ///                 if you do not care about the namespace (AS2 does not),
     ///                 you can call this function with the name key only.
-    ///
-    /// @return value of the member (possibly undefined),
-    ///    or undefined if not found. Use get_member if you
-    ///    need to know whether it was found or not.
-    ///
+    /// @return         Value of the member (possibly undefined),
+    ///                 or undefined if not found. Use get_member if you
+    ///                 need to know whether it was found or not.
     as_value getMember(const ObjectURI& uri);
 
     /// Delete a property of this object, unless protected from deletion.
     //
     /// This function does *not* recurse in this object's prototype.
     //
-    /// @param uri      Name and namespace of the property. Note that
+    /// @param uri      Property identifier. Note that
     ///                 if you do not care about the namespace (AS2 does not),
     ///                 you can call this function with the name key only.
-    ///
-    /// @return a pair of boolean values expressing whether the property
-    ///    was found (first) and whether it was deleted (second).
-    ///    Of course a pair(false, true) would be invalid (deleted
-    ///    a non-found property!?). Valid returns are:
-    ///    - (false, false) : property not found
-    ///    - (true, false) : property protected from deletion
-    ///    - (true, true) : property successfully deleted
-    ///
+    /// @return         a pair of boolean values expressing whether the property
+    ///                 was found (first) and whether it was deleted (second).
+    ///                 Of course a pair(false, true) would be invalid (deleted
+    ///                 a non-found property!). Valid returns are:
+    ///                 - (false, false) : property not found
+    ///                 - (true, false) : property protected from deletion
+    ///                 - (true, true) : property successfully deleted
     std::pair<bool,bool> delProperty(const ObjectURI& uri);
 
     /// Get this object's own named property, if existing.
