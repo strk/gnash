@@ -602,11 +602,10 @@ public:
     ///
     /// @return true on success, false on failure
     ///    (non-existent or protected member)
-    ///
     bool set_member_flags(const ObjectURI& uri, int setTrue, int setFalse = 0);
 
     /// Cast to a as_function, or return NULL
-    virtual as_function* to_function() { return NULL; }
+    virtual as_function* to_function() { return 0; }
 
     /// Return true if this is a 'super' object
     virtual bool isSuper() const { return false; }
@@ -618,26 +617,46 @@ public:
     /// otherwise unrelated interface class. The only use in AVM1 is to
     /// allow instanceOf to return true when a class implements another
     /// class.
+    //
+    /// @param ctor     An as_object to specify as an interface implemented
+    ///                 by this object.
     void addInterface(as_object* ctor);
 
     /// Check whether this object is an instance of the given constructor
+    //
+    /// An object is an instance of a constructor if constructor.prototype is
+    /// found anywhere in the object's prototype chain (e.g. if
+    /// object.__proto__ == constructor.prototype).
+    //
+    /// It is also an instance of a constructor if the constructor is
+    /// listed in the object's interfaces (this is a compile-time promise
+    /// and has no runtime effects other than for instanceOf).
+    //
+    /// @param ctor     The as_object to compare this object to. For more
+    ///                 ActionScript-like syntax it can be any object
+    ///                 or null.
+    /// @return         true if this object is an instance of ctor. The return
+    ///                 is always false if ctor is null.
     bool instanceOf(as_object* ctor);
 
-    /// Check whether this object is a 'prototype' object's inheritance chain.
+    /// Check whether this object is in another object's inheritance chain.
+    //
+    /// This is roughly the inverse of instanceOf().
+    //
+    /// @param instance     The instance object to check for inheritance from
+    ///                     this object.
+    /// @return             true if instance inherits from this object.
     bool prototypeOf(as_object& instance);
 
     /// Set property flags
     //
-    /// @param props
-    ///    A comma-delimited list of property names as a string,
-    ///    a NULL value, or an array? (need to check/test, probably
-    ///     somehting is broken).
-    ///    Property strings are case insensitive up to SWF6,
-    ///    case *sensitive* from SWF7 up.
-    ///
-    /// @param set_false
-    /// @param set_true
-    ///
+    /// @param props    A comma-delimited list of property names as a string,
+    ///                 a NULL value. This is in fact a string, which should
+    ///                 be split on the ',' to an array then processed.
+    ///                 TODO: this would be much better as a free function.
+    //
+    /// @param set_false    A mask of flags to set to false.
+    /// @param set_true     A mask of flags to set to true.
     void setPropFlags(const as_value& props, int set_false, int set_true);
 
 #ifdef USE_DEBUGGER
@@ -648,53 +667,42 @@ public:
     /// Copy properties from the given object
     //
     /// NOTE: the __proto__ member will NOT be copied.
-    ///
+    //
+    /// @param o    The object to copy properties from.
     void copyProperties(const as_object& o);
 
     /// Drop all properties from this object
-    void clearProperties()
-    {
+    void clearProperties() {
         _members.clear();
     }
 
     /// Visit the properties of this object by key/as_value pairs
     //
-    /// The method will invoke the given visitor method
-    /// passing it two arguments: key of the property and
-    /// value of it.
-    ///
-    /// @param visitor
-    ///    The visitor function. Will be invoked for each property
-    ///    of this object with a string_table::key
-    ///    reference as first argument and a const as_value reference
-    ///    as second argument.
-    ///
+    /// The method will invoke the given visitor method with the identifier
+    /// and value of the property. Note that this access values, which may
+    /// change the object.
+    //
+    /// @param visitor  The visitor function. Will be invoked for each property
+    ///                 of this object with a string_table::key
+    ///                 reference as first argument and a const as_value
+    ///                 reference as second argument.
     template<typename T>
     void visitProperties(AbstractPropertyVisitor& visitor) const {
         _members.visitValues<T>(visitor);
     }
 
-    /// \brief
-    /// Add a getter/setter property, if no member already has
-    /// that name (or should we allow override ? TODO: check this)
+    /// Add a getter/setter property if no member already has that name.
     //
-    /// @param key
-    ///     Name of the property.
-    ///    Case insensitive up to SWF6,
-    ///    case *sensitive* from SWF7 up.
-    ///
-    /// @param getter
-    ///    A function to invoke when this property value is requested.
-    ///    add_ref will be called on the function.
-    ///
-    /// @param setter
-    ///    A function to invoke when setting this property's value.
-    ///    By passing NULL, the property will have no setter
-    ///    (valid ActionScript - see actionscript.all/Object.as)
+    /// @param key      Property identifier.
+    /// @param getter   A function to invoke when this property value
+    ///                 is requested.
+    /// @param setter   A function to invoke when setting this property's
+    ///                 value. By passing null, the property will have no
+    ///                 setter. This is valid.
     void add_property(const std::string& key, as_function& getter,
         as_function* setter);
 
-    /// Return this object '__proto__' member.
+    /// Return this object's '__proto__' member.
     //
     /// The __proto__ member is the exported interface ('prototype')
     /// of the class this object is an instance of.
