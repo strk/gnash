@@ -27,15 +27,15 @@
 #include "string_table.h"
 #include "GC.h" // for inheritance from GcResource (to complete)
 #include "PropertyList.h"
-#include "as_value.h" // for return of get_primitive_value
+#include "as_value.h" 
 #include "smart_ptr.h"
-#include "PropFlags.h" // for enum
+#include "PropFlags.h"
 #include "GnashException.h"
 #include "Relay.h"
 #include "ObjectURI.h"
 
 #include <cmath>
-#include <utility> // for std::pair
+#include <utility> 
 #include <set>
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
@@ -146,13 +146,25 @@ private:
 /// ActionScript Object type itself. See asobj/Object.cpp for the ActionScript
 /// Object interface.
 //
-/// ActionScript has two different levels of object typing:
+/// An AS2 object has 3 principle tasks:
+//
+/// 1. to store a set of ActionScript properties and to control dynamic access
+///    to them.
+/// 2. to store native type information.
+/// 3. to store 'watches' that report on changes to any member property.
+//
+/// A fourth but relatively minor task is to store a list of implemented
+/// interfaces (see as_object::instanceOf()).
+//
+/// ActionScript has two different levels of Object typing:
 //
 /// Dynamic Typing
 //
-/// 1. Native type information, stored in a Relay and inaccessible
-///    to ActionScript.
-/// 2. Link to a DisplayObject.
+/// 1a. Native type information, stored in a Relay and inaccessible
+///     to ActionScript.
+/// 1b. Array type information. This is very similar (and possibly identical
+///     to) Relays.
+/// 2.  Link to a DisplayObject.
 //
 /// Both these dynamic types can be changed independently at runtime using
 /// native functions (often, but not always, constructor functions).
