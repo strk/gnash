@@ -1029,7 +1029,8 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
         }
 
         // set_member_flags will take care of case conversion
-        if (!set_member_flags(getStringTable(*this).find(prop), set_true, set_false) )
+        if (!set_member_flags(getStringTable(*this).find(prop), set_true,
+                    set_false) )
         {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Can't set propflags on object "
