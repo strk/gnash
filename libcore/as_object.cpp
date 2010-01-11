@@ -112,6 +112,16 @@ private:
 // Anonymous namespace used for module-static defs
 namespace {
 
+as_function*
+getConstructor(as_object& o)
+{
+	as_value ctorVal;
+	if (!o.get_member(NSV::PROP_uuCONSTRUCTORuu, &ctorVal)) {
+		return 0;
+	}
+	return ctorVal.to_function();
+}
+
 /// 'super' is a special kind of object
 //
 /// See http://wiki.gnashdev.org/wiki/index.php/ActionScriptSuper
@@ -180,7 +190,7 @@ private:
     }
 
     as_function* constructor() {
-        return _super ? _super->get_constructor() : 0;
+        return _super ? getConstructor(*_super) : 0;
     }
 
 	as_object* _super;
@@ -480,19 +490,6 @@ as_object::get_super(string_table::key fname)
 	as_object* super = new as_super(getGlobal(*this), proto);
 
 	return super;
-}
-
-as_function*
-as_object::get_constructor()
-{
-	as_value ctorVal;
-	if ( ! get_member(NSV::PROP_uuCONSTRUCTORuu, &ctorVal) )
-	{
-		//log_debug("Object %p has no __constructor__ member");
-		return NULL;
-	}
-	//log_debug("%p.__constructor__ is %s", ctorVal);
-	return ctorVal.to_function();
 }
 
 int
