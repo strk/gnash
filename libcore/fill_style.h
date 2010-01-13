@@ -123,41 +123,29 @@ public:
 
     /// Turn this fill style into a linear gradient
     //
-    /// @param gradients
-    ///    Gradient records.
-    ///
-    /// @param mat
-    ///    Gradient SWFMatrix.
-    ///
-    ///
+    /// This is used for dynamic gradient generation.
+    //
+    /// Note: passing only one gradient record will result in a solid fill
+    /// style, not a gradient. This is for compatibility with dynamic
+    /// fill style generation.
+    //
+    /// @param gradients    Gradient records.
+    /// @param mat          Gradient SWFMatrix.
     void setLinearGradient(const std::vector<gradient_record>& gradients, 
             const SWFMatrix& mat);
 
     /// Turn this fill style into a radial gradient
     //
-    /// @param gradients
-    ///    Gradient records.
-    ///
-    /// @param mat
-    ///    Gradient SWFMatrix.
-    ///
-    ///
+    /// This is used for dynamic gradient generation.
+    //
+    /// Note: passing only one gradient record will result in a solid fill
+    /// style, not a gradient. This is for compatibility with dynamic
+    /// fill style generation.
+    //
+    /// @param gradients    Gradient records.
+    /// @param mat          Gradient SWFMatrix.
     void setRadialGradient(const std::vector<gradient_record>& gradients,
             const SWFMatrix& mat);
-
-    /// Turn this fill style into a focal gradient
-    //
-    /// @param gradients
-    ///    Gradient records.
-    ///
-    /// @param mat
-    ///    Gradient SWFMatrix.
-    ///
-    /// @param fpoint
-    ///    Focal point.
-    ///
-    void setRadialGradient(const std::vector<gradient_record>& gradients,
-            const SWFMatrix& mat, float fpoint);
 
     ~fill_style() {}
     
@@ -167,7 +155,6 @@ public:
     ///
     /// Throw a ParserException if there's no enough bytes in the
     /// currently opened tag for reading. See stream::ensureBytes()
-    ///
     void read(SWFStream& in, SWF::TagType t, movie_definition& m,
             const RunResources& r, fill_style *pOther = 0);
 
@@ -181,18 +168,26 @@ public:
     /// create_gradient_bitmap() if necessary and returns _gradientBitmapInfo.
     const BitmapInfo* need_gradient_bitmap(Renderer& renderer) const; 
     
-    rgba    get_color() const { return m_color; }
+    rgba get_color() const {
+        return m_color;
+    }
 
-    void    set_color(rgba new_color) { m_color = new_color; }
+    void set_color(rgba new_color) {
+        m_color = new_color;
+    }
 
     /// Get fill type, see SWF::fill_style_type
-    uint8_t    get_type() const { return m_type; }
+    uint8_t get_type() const {
+        return m_type;
+    }
 
-    SWF::gradient_spread_mode get_gradient_spread_mode()
-    { return m_spread_mode; }
+    SWF::gradient_spread_mode get_gradient_spread_mode() const {
+        return m_spread_mode;
+    }
 
-    SWF::gradient_interpolation_mode get_gradient_interpolation_mode()
-    { return m_interpolation; }
+    SWF::gradient_interpolation_mode get_gradient_interpolation_mode() const {
+        return m_interpolation;
+    }
     
     /// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
     void    set_lerp(const fill_style& a, const fill_style& b, float t);
@@ -237,17 +232,16 @@ private:
     //
     /// @param ratio
     ///    Ratio is in the range [0, 255].
-    ///
     rgba sample_gradient(boost::uint8_t ratio) const;
 
     // For BITMAP or GRADIENT types 
-    SWFMatrix    _matrix;
+    SWFMatrix _matrix;
 
     // For BITMAP or GRADIENT types
     boost::intrusive_ptr<const BitmapInfo> _bitmapInfo;
 
     // For SOLID type (and arguably GRADIENT too)
-    rgba    m_color;
+    rgba m_color;
 
     // Only for GRADIENT type
     float m_focal_point; // For focal fill gradients.
@@ -256,7 +250,7 @@ private:
     SWF::gradient_interpolation_mode m_interpolation;
 
     /// Fill type, see SWF::fill_style_type
-    uint8_t    m_type;
+    uint8_t m_type;
 
     // Only for BITMAP type
     //
