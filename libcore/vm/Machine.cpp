@@ -2095,6 +2095,9 @@ Machine::execute()
                 /// Stack Out:
                 ///  .
                 /// Do: obj.slots[slot_index] = value
+                //
+                /// Slot index must be greater than 0 and less than or
+                /// equal to the number of slots (so one-based index?).
                 case SWF::ABC_ACTION_SETSLOT:
                 {
                     boost::uint32_t sindex = mStream->read_V32();
