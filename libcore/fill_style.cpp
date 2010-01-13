@@ -182,15 +182,14 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         }
     
         uint8_t num_gradients = grad_props & 0xF;
-        if ( ! num_gradients )
-        {
+        if (!num_gradients) {
             IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("num gradients 0"));
             );
             return;
         }
     
-        if ( num_gradients > 8 + ((t == SWF::DEFINESHAPE4 ||
+        if (num_gradients > 8 + ((t == SWF::DEFINESHAPE4 ||
             t == SWF::DEFINESHAPE4_) ? 7 : 0))
         {
            // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
@@ -371,8 +370,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
         || m_type == SWF::FILL_RADIAL_GRADIENT
         || m_type == SWF::FILL_FOCAL_GRADIENT);
 
-    if ( m_gradients.empty() )
-    {
+    if (m_gradients.empty()) {
         static const rgba black;
         return black;
     }
@@ -395,7 +393,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
         return m_gradients[0].m_color;
     }
 
-    if ( ratio >= m_gradients.back().m_ratio )
+    if (ratio >= m_gradients.back().m_ratio)
     {
         return m_gradients.back().m_color;
     }
@@ -580,20 +578,21 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     }
 
     // fill style bitmap or gradient SWFMatrix
-    if ( usesMatrix ) _matrix.set_lerp(a._matrix, b._matrix, t);
+    if (usesMatrix) _matrix.set_lerp(a._matrix, b._matrix, t);
 }
 
 
-int 
+size_t
 fill_style::get_color_stop_count() const 
 {
-  return m_gradients.size();
+    return m_gradients.size();
 }
 
 const gradient_record& 
-fill_style::get_color_stop(int index) const
+fill_style::get_color_stop(size_t index) const
 {
-  return m_gradients[index];
+    assert(index < m_gradients.size());
+    return m_gradients[index];
 }
 
 fill_style::fill_style(const BitmapInfo* const bitmap, const SWFMatrix& mat)
@@ -610,14 +609,27 @@ fill_style::setSolid(const rgba& color)
 {
     m_type = SWF::FILL_SOLID;
     m_color = color;
+    _bitmapInfo = 0;
 }
 
 void
 fill_style::setLinearGradient(const std::vector<gradient_record>& gradients,
         const SWFMatrix& mat)
 {
+
+    assert(!gradients.empty());
+    
+    // We must ensure that all gradients have more than one colour stop
+    // because asking the renderer to render a gradient with one colour
+    // leads to problems.
+    if (gradients.size() < 2) {
+        setSolid(gradients[0].m_color);
+        return;
+    }
+
     m_type = SWF::FILL_LINEAR_GRADIENT;
     m_gradients = gradients;
+
     _matrix = mat;
     _bitmapInfo = 0;
 }
@@ -626,8 +638,16 @@ void
 fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
         const SWFMatrix& mat)
 {
-    m_type = SWF::FILL_RADIAL_GRADIENT;
-    m_gradients = gradients;
+    assert(!gradients.empty());
+    
+    // We must ensure that all gradients have more than one colour stop
+    // because asking the renderer to render a gradient with one colour
+    // leads to problems.
+    if (gradients.size() < 2) {
+        setSolid(gradients[0].m_color);
+        return;
+    }
+    
     _matrix = mat;
     _bitmapInfo = 0;
 }

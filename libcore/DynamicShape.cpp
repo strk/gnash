@@ -107,7 +107,8 @@ void
 DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
 {
 	// Add the new fill style and set as current
-	fill_style style; style.setLinearGradient(grad, mat);
+	fill_style style;
+    style.setLinearGradient(grad, mat);
 
 	endFill();
 

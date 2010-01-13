@@ -1212,6 +1212,10 @@ AbcBlock::read_method_bodies()
 		method.setBody(new CodeStream(body));
 		
         // Exception count and exceptions
+        
+        // Note: catch type and variable name are documented to be
+        // indices in the string pool, but they are in fact indices
+        // in the multiname pool.
 		const boost::uint32_t ecount = _stream->read_V32();
 		for (unsigned int j = 0; j < ecount; ++j) {
 			asException *ex = mCH->newException();

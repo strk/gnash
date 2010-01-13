@@ -324,19 +324,12 @@ newAdd(as_value& op1, const as_value& op2, VM& vm)
     // The order of the operations is important: op2 is converted to
     // primitive before op1.
 
+    /// It doesn't matter if either of these fail.
 	try { convertToPrimitive(r, vm); }
-	catch (ActionTypeError& e)
-	{
-        log_debug(_("%s.to_primitive() threw an error during "
-                "ActionNewAdd"), r);
-	}
+	catch (ActionTypeError& e) {}
 	
     try { convertToPrimitive(op1, vm); }
-	catch (ActionTypeError& e)
-	{
-        log_debug(_("%s.to_primitive() threw an error during "
-                "ActionNewAdd"), op1);
-	}
+	catch (ActionTypeError& e) {}
 
 #if GNASH_DEBUG
 	log_debug(_("(%s + %s) [primitive conversion done]"), op1, r);
