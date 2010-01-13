@@ -37,6 +37,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
 #include "Bitmap.h"
+#include "Array_as.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -1900,13 +1901,22 @@ movieclip_beginFill(const fn_call& fn)
     return as_value();
 }
 
+
+/// Create a dynamic gradient fill.
+//
+/// fillType, colors, alphas, ratios, matrix, [spreadMethod,
+/// [interpolationMethod, [focalPointRatio]]]
+//
+/// Colors, alphas and ratios must be (possibly fake) arrays, and must have
+/// the same size. This applies even when there are more gradients than
+/// allowed.
 as_value
 movieclip_beginGradientFill(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    if ( fn.nargs < 5 )
-    {
+    // The arguments up to and including matrix must be present.
+    if (fn.nargs < 5) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): invalid call: 5 arguments "
@@ -1916,22 +1926,20 @@ movieclip_beginGradientFill(const fn_call& fn)
         return as_value();
     }
 
-    IF_VERBOSE_ASCODING_ERRORS(
-    if ( fn.nargs > 5 )
-    {
+    // There are optional arguments that we do not implement!
+    if (fn.nargs > 5) {
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.beginGradientFill(%s): args after "
-                        "the first five will be discarded"), ss.str());
+        LOG_ONCE(log_unimpl(_("MovieClip.beginGradientFill(%s): args after "
+                        "the first five will be discarded"), ss.str()));
     }
-    );
 
     bool radial = false;
     std::string typeStr = fn.arg(0).to_string();
+
     // Case-sensitive comparison needed for this ...
-    if ( typeStr == "radial" ) radial = true;
-    else if ( typeStr == "linear" ) radial = false;
-    else
-    {
+    if (typeStr == "radial") radial = true;
+    else if (typeStr == "linear") radial = false;
+    else {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): first arg must be "
@@ -1948,8 +1956,7 @@ movieclip_beginGradientFill(const fn_call& fn)
     ObjPtr ratios = fn.arg(3).to_object(getGlobal(fn));
     ObjPtr matrixArg = fn.arg(4).to_object(getGlobal(fn));
 
-    if ( ! colors || ! alphas || ! ratios || ! matrixArg )
-    {
+    if (!colors || !alphas || !ratios || !matrixArg ) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): one or more of the "
@@ -1958,6 +1965,32 @@ movieclip_beginGradientFill(const fn_call& fn)
         );
         return as_value();
     }
+
+    size_t stops = arrayLength(*colors);
+
+    // Check that the arrays are all the same size.
+    if (stops != arrayLength(*alphas) || stops != arrayLength(*ratios)) {
+
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("%s.beginGradientFill(%s): colors, alphas and "
+                "ratios args don't have same length"),
+                movieclip->getTarget(), ss.str());
+        );
+        return as_value();
+    }
+    
+    // Then limit gradients. It's documented to be a maximum of 15, though
+    // this isn't tested. The arrays must be the same size regardless of
+    // this limit.
+    if (stops > 15) {
+        std::stringstream ss; fn.dump_args(ss);
+        log_debug(_("%s.beginGradientFill(%s) : too many array elements"
+            " for colors and ratios (%d), will trim to 8"), 
+            movieclip->getTarget(), ss.str(), stops); 
+        stops = 15;
+    }
+
 
     // ----------------------------
     // Parse SWFMatrix
@@ -1974,16 +2007,13 @@ movieclip_beginGradientFill(const fn_call& fn)
     //             always transforming the gnash gradients to the
     //             expected gradients and subsequently applying
     //             user-specified SWFMatrix; for 'boxed' SWFMatrixType
-    //             this simplification would increas cost, but
+    //             this simplification would increase cost, but
     //             it's too early to apply optimizations to the
     //             code (correctness first!!).
-    //
-
     SWFMatrix mat;
     SWFMatrix input_matrix;
 
-    if ( matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
-    {
+    if (matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
         
         boost::int32_t valX = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_X).to_number()); 
@@ -1995,8 +2025,7 @@ movieclip_beginGradientFill(const fn_call& fn)
                 matrixArg->getMember(NSV::PROP_H).to_number()); 
         float valR = matrixArg->getMember(NSV::PROP_R).to_number(); 
 
-        if ( radial )
-        {
+        if (radial) {
             // Radial gradient is 64x64 twips.
             input_matrix.set_scale(64.0/valW, 64.0/valH);
 
@@ -2008,8 +2037,7 @@ movieclip_beginGradientFill(const fn_call& fn)
             //             fill is at 0,0 making any rotation meaningless).
 
         }
-        else
-        {
+        else {
             // Linear gradient is 256x1 twips.
             //
             // No idea why we should use the 256 value for Y scale, but 
@@ -2024,8 +2052,7 @@ movieclip_beginGradientFill(const fn_call& fn)
 
         mat.concatenate(input_matrix);
     }
-    else
-    {
+    else {
         float valA = matrixArg->getMember(NSV::PROP_A).to_number() ; // xx
         float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
         float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
@@ -2048,8 +2075,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         // gradient for Gnash (in flash they should be the same)
         SWFMatrix gnashToFlash;
 
-        if ( radial )
-        {
+        if (radial) {
 
             // Gnash radial gradients are 64x64 with center at 32,32
             // Should be 20x20 with center at 0,0
@@ -2058,8 +2084,7 @@ movieclip_beginGradientFill(const fn_call& fn)
             gnashToFlash.concatenate_translation(-32, -32);
 
         }
-        else
-        {
+        else {
             // First define a SWFMatrix that would transform
             // the gnash gradient to the expected flash gradient:
             // this means translating our gradient to put the
@@ -2087,45 +2112,22 @@ movieclip_beginGradientFill(const fn_call& fn)
     // Create the gradients vector
     // ----------------------------
 
-    size_t ngradients = toInt(colors->getMember(NSV::PROP_LENGTH));
-    // Check length compatibility of all args
-    if (ngradients != (size_t)toInt(alphas->getMember(NSV::PROP_LENGTH)) ||
-        ngradients != (size_t)toInt(ratios->getMember(NSV::PROP_LENGTH)))
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.beginGradientFill(%s): colors, alphas and "
-            "ratios args don't have same length"),
-            movieclip->getTarget(), ss.str());
-        );
-        return as_value();
-    }
-
-    // TODO: limit ngradients to a max ?
-    if ( ngradients > 8 )
-    {
-        std::stringstream ss; fn.dump_args(ss);
-        log_debug(_("%s.beginGradientFill(%s) : too many array elements"
-            " for colors and ratios (%d), will trim to 8"), 
-            movieclip->getTarget(), ss.str(), ngradients); 
-        ngradients = 8;
-    }
-
     string_table& st = getStringTable(fn);
 
     std::vector<gradient_record> gradients;
-    gradients.reserve(ngradients);
-    for (size_t i=0; i<ngradients; ++i)
-    {
+    gradients.reserve(stops);
+    for (size_t i=0; i < stops; ++i) {
 
         string_table::key key = st.find(boost::lexical_cast<std::string>(i));
 
         as_value colVal = colors->getMember(key);
         boost::uint32_t col = colVal.is_number() ? toInt(colVal) : 0;
 
+        /// Alpha is the range 0..100.
         as_value alpVal = alphas->getMember(key);
-        boost::uint8_t alp = alpVal.is_number() ? 
-            clamp<int>(toInt(alpVal), 0, 255) : 0;
+        const double a = alpVal.is_number() ?
+            clamp<double>(alpVal.to_number(), 0, 100) : 0;
+        const boost::uint8_t alp = 0xff * (a / 100);
 
         as_value ratVal = ratios->getMember(key);
         boost::uint8_t rat = ratVal.is_number() ? 
@@ -2138,12 +2140,10 @@ movieclip_beginGradientFill(const fn_call& fn)
         gradients.push_back(gradient_record(rat, color));
     }
 
-    if ( radial )
-    {
+    if (radial) {
         movieclip->beginRadialGradientFill(gradients, mat);
     }
-    else
-    {
+    else {
         movieclip->beginLinearGradientFill(gradients, mat);
     }
 

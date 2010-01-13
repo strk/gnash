@@ -65,9 +65,9 @@ public:
 private:
 
   // for solid styles:
-  bool _solid;
+  const bool _solid;
 
-  agg::rgba8 _color; 
+  const agg::rgba8 _color; 
   
 };
 
@@ -82,9 +82,6 @@ public:
     :
     agg_style_base(true, color)
   {
-#ifdef DEBUG_LIMIT_COLOR_ALPHA
-    m_color.a = m_color.a>127 ? 127 : m_color.a;
-#endif    
   }
 
   void generate_span(agg::rgba8* /*span*/, int /*x*/, int /*y*/,
@@ -199,15 +196,16 @@ public:
     // Build gradient lookup table
     m_gradient_lut.remove_all(); 
     
-    for (int i = 0, e = fs.get_color_stop_count(); i != e; ++i) {
+    const size_t size = fs.get_color_stop_count();
+    
+    // It is essential that at least two colours are added; otherwise agg
+    // will use uninitialized values.
+    assert(size > 1);
+
+    for (int i = 0; i != size; ++i) {
     
       const gradient_record& gr = fs.get_color_stop(i); 
       rgba trans_color = m_cx.transform(gr.m_color);
-      
-#ifdef DEBUG_LIMIT_COLOR_ALPHA
-      trans_color.m_a = trans_color.m_a>127 ? 127 : trans_color.m_a;
-#endif
-
       if (trans_color.m_a < 255) m_need_premultiply = true;    
       
       m_gradient_lut.add_color(gr.m_ratio/255.0, agg::rgba8(trans_color.m_r, 
