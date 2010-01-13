@@ -119,6 +119,12 @@ public:
     ///
     fill_style(const BitmapInfo* const bitmap, const SWFMatrix& mat);
 
+    ~fill_style() {}
+
+    /// Turn this fill style into a solid fill.
+    //
+    /// This is used for dynamic gradient generation.
+    //
     void setSolid(const rgba& color);
 
     /// Turn this fill style into a linear gradient
@@ -146,8 +152,6 @@ public:
     /// @param mat          Gradient SWFMatrix.
     void setRadialGradient(const std::vector<gradient_record>& gradients,
             const SWFMatrix& mat);
-
-    ~fill_style() {}
     
     /// Read the fill style from a stream
     //
@@ -190,7 +194,7 @@ public:
     }
     
     /// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
-    void    set_lerp(const fill_style& a, const fill_style& b, float t);
+    void set_lerp(const fill_style& a, const fill_style& b, float t);
     
     /// Returns the bitmap info for all styles except solid fills
     //
@@ -215,10 +219,10 @@ public:
     const SWFMatrix& getGradientMatrix() const; 
     
     /// Returns the number of color stops in the gradient
-    int get_color_stop_count() const;
+    size_t get_color_stop_count() const;
     
     /// Returns the color stop value at a specified index
-    const gradient_record& get_color_stop(int index) const;
+    const gradient_record& get_color_stop(size_t index) const;
 
     /// Get and set the focal point for gradient focal fills.
     /// This should be from -1.0 to 1.0, representing the left

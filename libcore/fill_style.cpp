@@ -578,20 +578,21 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     }
 
     // fill style bitmap or gradient SWFMatrix
-    if ( usesMatrix ) _matrix.set_lerp(a._matrix, b._matrix, t);
+    if (usesMatrix) _matrix.set_lerp(a._matrix, b._matrix, t);
 }
 
 
-int 
+size_t
 fill_style::get_color_stop_count() const 
 {
-  return m_gradients.size();
+    return m_gradients.size();
 }
 
 const gradient_record& 
-fill_style::get_color_stop(int index) const
+fill_style::get_color_stop(size_t index) const
 {
-  return m_gradients[index];
+    assert(index < m_gradients.size());
+    return m_gradients[index];
 }
 
 fill_style::fill_style(const BitmapInfo* const bitmap, const SWFMatrix& mat)
@@ -608,6 +609,7 @@ fill_style::setSolid(const rgba& color)
 {
     m_type = SWF::FILL_SOLID;
     m_color = color;
+    _bitmapInfo = 0;
 }
 
 void
@@ -620,14 +622,13 @@ fill_style::setLinearGradient(const std::vector<gradient_record>& gradients,
     // We must ensure that all gradients have more than one colour stop
     // because asking the renderer to render a gradient with one colour
     // leads to problems.
-    if (gradients.size() > 1) {
-        m_type = SWF::FILL_LINEAR_GRADIENT;
-        m_gradients = gradients;
+    if (gradients.size() < 2) {
+        setSolid(gradients[0].m_color);
+        return;
     }
-    else {
-        m_type = SWF::FILL_SOLID;
-        m_color = gradients[0].m_color;
-    }
+
+    m_type = SWF::FILL_LINEAR_GRADIENT;
+    m_gradients = gradients;
 
     _matrix = mat;
     _bitmapInfo = 0;
@@ -642,13 +643,9 @@ fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
     // We must ensure that all gradients have more than one colour stop
     // because asking the renderer to render a gradient with one colour
     // leads to problems.
-    if (gradients.size() > 1) {
-        m_type = SWF::FILL_RADIAL_GRADIENT;
-        m_gradients = gradients;
-    }
-    else {
-        m_type = SWF::FILL_SOLID;
-        m_color = gradients[0].m_color;
+    if (gradients.size() < 2) {
+        setSolid(gradients[0].m_color);
+        return;
     }
     
     _matrix = mat;
