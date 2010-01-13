@@ -123,12 +123,12 @@ te = tf2.getTextExtent("Hello");
 // The object is a bare object
 te.hasOwnProperty = Object.prototype.hasOwnProperty;
 
-check(te.hasOwnProperty("ascent"));
-check(te.hasOwnProperty("descent"));
-check(te.hasOwnProperty("textFieldWidth"));
-check(te.hasOwnProperty("textFieldHeight"));
-check(te.hasOwnProperty("width"));
-check(te.hasOwnProperty("height"));
+xcheck(te.hasOwnProperty("ascent"));
+xcheck(te.hasOwnProperty("descent"));
+xcheck(te.hasOwnProperty("textFieldWidth"));
+xcheck(te.hasOwnProperty("textFieldHeight"));
+xcheck(te.hasOwnProperty("width"));
+xcheck(te.hasOwnProperty("height"));
 
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 xcheck_equals(Math.round(te.textFieldWidth), 33);
