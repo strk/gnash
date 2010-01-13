@@ -6,7 +6,7 @@ Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
 plugin, or as a library used by other programs.  It is not yet complete;
 it does not correctly handle every SWF file.
 
-This is the README file for the Gnash-0.8.4 release (or bzr snapshot).
+This is the README file for the Gnash-0.8.7 release (or bzr snapshot).
 
 Gnash is originally based on the code of GameSWF, by Thatcher Ulrich.
 GameSWF was the most advanced among free SWF players; it implemented a
@@ -31,18 +31,14 @@ SWF-based web-site navigation should work.
 
 Gnash supports practically all SWF opcodes and most ActionScript classes up
 to SWF version 7. Gnash also supports some of the most important SWF
-version 8 ActionScript classes. There is no support yet for ActionScript
-3 (ABC blocks) or AVM2, which were introduced in SWF version 9. Despite
-this, Gnash can play most SWF8 and many SWF9 movies, because not all rely on
-unimplemented features.
+version 8 ActionScript classes. There is currently no real support for
+ActionScript 3 (ABC blocks) and AVM2, which were introduced in SWF version 9.
+Despite this, Gnash can play most SWF8 and many SWF9 movies, because not all
+rely on unimplemented features.
 
 All unimplemented opcodes and ActionScript methods should print a warning
-when using -v with gnash or gprocessor.  Running gprocessor -v is often an
+when using -v with gnash or gprocessor. Running gprocessor -v is often an
 easy way to see why a movie isn't playing correctly.
-
-Currently streaming video for some video sharing sites like Lulu.tv,
-or YouTube.com, does work. Your mileage with other sites may vary, but
-work continues on improving Gnash.
 
 
 Plugin:	
@@ -148,22 +144,22 @@ executables:
    --enable-gui=kde
 or --enable-gui=gtk,kde (default)
 
-Other guis: dump, fb, fltk, kde, gtk, sdl, qtopia, hildon, alp, riscos, aqua.
-Some guis are very specialized (dump writes out raw frames to a disk file).
-Other guis are not very well supported and may not even compile (aqua).
+Other guis: dump, fb, fltk, kde3, kde4, gtk, sdl, qtopia, hildon, alp, riscos,
+aqua. Some guis are very specialized (dump writes out raw frames to a disk
+file). Other guis are not very well supported and may not even compile (aqua).
 
 Different options will cause gnash to require different libraries.  The
 configure script does a good job of telling you how to get these libraries.
 
-The GTK support is more developed and featureful, while the SDL
+The GTK support is the most developed and featureful, while the SDL
 support has fewer dependencies on other packages. The AGG backend
 gives better quality results, and works on devices with only a
 framebuffer.  Performance is better with the OpenGL backend, but
-it depends on having an accelerated graphics driver installed.
-This may require the use of a binary-only driver, so it's not
-for everyone.
+only if an accelerated graphics driver installed. This may require the
+use of a non-free driver, so it's not for everyone.
 
-Other required packages are libxml2, libpng, and libjpeg.
+Other required packages are libjpeg.
+
 If gettext support is installed, or is present in the standard C library,
 gnash will support translation of its messages into other
 languages. Boost is also required, as Gnash uses it for portable
@@ -203,18 +199,17 @@ lists are stored at http://mail.gnu.org/pipermail/:
     * gnash-dev@gnu.org is for discussion of gnash development,
       porting to new platforms, ideas for the future. This is where
       the nitty-gritty gets discussed about Gnash, and is the best
-      list for technical questions. To subscribe, go the
+      list for technical questions. To subscribe, go to
       http://mail.gnu.org/mailman/listinfo/gnash-dev 
-    * gnash@gnu.org is for discussion of Gnash. Ideas for the future,
-      general gnash usage or problems, etc... New alpha and stable
-      releases are announced here. To subscribe, go the
-      http://mail.gnu.org/mailman/listinfo/gnash. Volume is typically
-      low.
+    * gnash@gnu.org is a moderated list for announcements. New releases are
+      announced here. To subscribe, go to
+      http://mail.gnu.org/mailman/listinfo/gnash and register. Volume is
+      typically very low.
     * gnash-commit@gnu.org is where summaries of changes commited to
-      the bzr repository are automatically posted. If you wish to see
-      these changes as they happen,
-      http://mail.gnu.org/mailman/listinfo/gnash-commit Volume is
-      sporadic, but typically low.
+      the bzr repository are automatically posted. Register at
+      http://mail.gnu.org/mailman/listinfo/gnash-commit to be informed of
+      these changes as they happen. Volume may be high.
+      
 
 IRC:
     * #gnash on irc.freenode.net The #gnash channel on irc.freenode.net is 
