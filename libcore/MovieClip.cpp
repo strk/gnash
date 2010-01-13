@@ -1740,8 +1740,8 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 }
 
 
-/// register DisplayObjects as key listeners if they have clip key events defined.
-/// Don't call twice for the same chracter.
+/// Register DisplayObjects as key listeners if they have clip key events
+/// defined. Don't call twice for the same chracter.
 void
 MovieClip::registerAsListener()
 {
