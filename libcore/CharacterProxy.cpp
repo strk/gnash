@@ -23,11 +23,10 @@
 #endif
 
 #include "CharacterProxy.h"
-
-#include "utility.h" // for typeName
-#include "DisplayObject.h" // for isDestroyed, getOrigTarget, ...
-#include "VM.h" // for VM::getRoot()
-#include "movie_root.h" // for findCharacterByTarget
+#include "utility.h"
+#include "DisplayObject.h" 
+#include "VM.h" 
+#include "movie_root.h" 
 
 #include <string>
 
