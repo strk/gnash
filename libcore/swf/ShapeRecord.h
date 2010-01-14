@@ -53,7 +53,7 @@ class ShapeRecord
 public:
 
     typedef std::vector<fill_style> FillStyles;
-    typedef std::vector<line_style> LineStyles;
+    typedef std::vector<LineStyle> LineStyles;
     typedef std::vector<Path> Paths;
 
     /// Construct a ShapeRecord.
@@ -129,7 +129,7 @@ public:
         _paths.push_back(path);
     }
 
-    void addLineStyle(const line_style& ls) {
+    void addLineStyle(const LineStyle& ls) {
         _lineStyles.push_back(ls);
     }
 

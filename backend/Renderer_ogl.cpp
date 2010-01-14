@@ -1019,7 +1019,7 @@ public:
     
     dummy_fs.push_back(coloring);
     
-    std::vector<line_style> dummy_ls;
+    std::vector<LineStyle> dummy_ls;
     
     draw_subshape(path_vec, SWFMatrix(), dummy_cx, dummy_fs, dummy_ls);
   }
@@ -1278,7 +1278,7 @@ public:
   
   
   
-  bool apply_line_style(const line_style& style, const cxform& cx, const SWFMatrix& mat)
+  bool apply_line_style(const LineStyle& style, const cxform& cx, const SWFMatrix& mat)
   {
   //  GNASH_REPORT_FUNCTION;
      
@@ -1380,7 +1380,7 @@ public:
   void
   draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints, const SWFMatrix& mat,
                 const cxform& cx, const std::vector<fill_style>& fill_styles,
-                const std::vector<line_style>& line_styles)
+                const std::vector<LineStyle>& line_styles)
   {
   
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
@@ -1544,7 +1544,7 @@ public:
     const SWFMatrix& mat,
     const cxform& cx,
     const std::vector<fill_style>& fill_styles,
-    const std::vector<line_style>& line_styles)
+    const std::vector<LineStyle>& line_styles)
   {
     PathVec normalized = normalize_paths(path_vec);
     PathPointMap pathpoints = getPathPoints(normalized);
@@ -1649,7 +1649,7 @@ public:
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
     const std::vector<fill_style>& fill_styles = shape.fillStyles();
-    const std::vector<line_style>& line_styles = shape.lineStyles();
+    const std::vector<LineStyle>& line_styles = shape.lineStyles();
     
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
       PathVec subshape_paths;
@@ -1677,7 +1677,7 @@ public:
     
     glyph_fs.push_back(coloring);
     
-    std::vector<line_style> dummy_ls;
+    std::vector<LineStyle> dummy_ls;
     
     oglScopeMatrix scope_mat(mat);
     

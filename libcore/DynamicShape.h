@@ -138,7 +138,7 @@ public:
 	///	This offset is the one required to properly
 	///	reference it in gnash::path instances.
 	///
-	size_t add_line_style(const line_style& stl);
+	size_t add_line_style(const LineStyle& stl);
 
 	// Override from DefineShapeTag to call ::finalize
 	// NOTE: this is not correct in that a call to hitTest should

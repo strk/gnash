@@ -524,10 +524,10 @@ public:
     /// Set the line style to use for this path
     //
     /// @param f
-    ///    The line_style index (1-based).
+    ///    The LineStyle index (1-based).
     ///    When this path is added to a DefineShapeTag,
     ///    the index (decremented by 1) will reference an element
-    ///    in the line_style vector defined for that shape.
+    ///    in the LineStyle vector defined for that shape.
     ///    If zero, no fill will be active.
     ///
     void setLineStyle(unsigned i)
@@ -570,7 +570,7 @@ namespace geometry
 {
 
 bool pointTest(const std::vector<Path>& paths,
-    const std::vector<line_style>& lineStyles, boost::int32_t x,
+    const std::vector<LineStyle>& lineStyles, boost::int32_t x,
     boost::int32_t y, const SWFMatrix& wm);
 
 } // namespace geometry

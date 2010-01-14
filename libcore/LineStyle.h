@@ -33,12 +33,12 @@ enum JoinStyle {
 };
   
 /// For the outside of outline shapes, or just bare lines.
-class line_style 
+class LineStyle 
 {
 public:
 
     /// Construct a default LineStyle.
-    line_style();
+    LineStyle();
 
     /// Construct a line style with explicit values
     ///
@@ -53,7 +53,7 @@ public:
     /// @param endCapStyle
     /// @param joinStyle
     /// @param miterLimitFactor
-    line_style(boost::uint16_t width, const rgba& color,
+    LineStyle(boost::uint16_t width, const rgba& color,
             bool scaleThicknessVertically=true,
             bool scaleThicknessHorizontally=true,
             bool pixelHinting=false,
@@ -90,7 +90,7 @@ public:
     /// Read two lines styles from the SWF stream
     /// at the same time -- this is used in morphing.
     void read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
-            const RunResources& r, line_style *pOther);
+            const RunResources& r, LineStyle *pOther);
 
     /// Return thickness of the line, in TWIPS
     boost::uint16_t getThickness() const {
@@ -143,14 +143,14 @@ public:
 
     /// Set this style to the interpolation of the given one
     //
-    /// @param ls1      First line_style to interpolate.
+    /// @param ls1      First LineStyle to interpolate.
     ///
-    /// @param ls2      Second line_style to interpolate.
+    /// @param ls2      Second LineStyle to interpolate.
     ///
     /// @ratio          The interpolation factor (0..1).
     ///                 When 0, this will be equal to ls1, when 1
     ///                 this will be equal to ls2.
-    void set_lerp(const line_style& ls1, const line_style& ls2, float ratio);
+    void set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio);
     
 private:
     

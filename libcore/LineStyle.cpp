@@ -19,11 +19,11 @@ namespace gnash {
 
 
 //
-// line_style
+// LineStyle
 //
 
     
-line_style::line_style()
+LineStyle::LineStyle()
     :
     m_width(0),
     m_color(),
@@ -39,8 +39,8 @@ line_style::line_style()
 }
 
 void
-line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
-    const RunResources& r, line_style *pOther)
+LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
+    const RunResources& r, LineStyle *pOther)
 {
     if (t == SWF::DEFINEMORPHSHAPE)
     {
@@ -91,7 +91,7 @@ line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
 }
 
 void
-line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
+LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         const RunResources& r)
 {
     if (!(t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_))
@@ -138,7 +138,7 @@ line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 }
 
 void
-line_style::set_lerp(const line_style& ls1, const line_style& ls2, float ratio)
+LineStyle::set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio)
 {
     m_width = static_cast<boost::uint16_t>(
         frnd(flerp(ls1.getThickness(), ls2.getThickness(), ratio)));

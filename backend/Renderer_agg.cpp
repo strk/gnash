@@ -993,7 +993,7 @@ public:
     }
 
     void drawShape(const std::vector<fill_style>& fill_styles,
-        const std::vector<line_style>& line_styles,
+        const std::vector<LineStyle>& line_styles,
         const std::vector<Path>& objpaths, const SWFMatrix& mat,
         const cxform& cx)
     {
@@ -1122,7 +1122,7 @@ public:
   // TODO: Flash never aligns lines that are wider than 1 pixel on *screen*,
   // but we currently don't check the width.  
   void buildPaths_rounded(AggPaths& dest, 
-    const GnashPaths& paths, const std::vector<line_style>& line_styles)
+    const GnashPaths& paths, const std::vector<LineStyle>& line_styles)
   {
 
     const float subpixel_offset = 0.5f;
@@ -1139,7 +1139,7 @@ public:
       bool hinting=false, closed=false, hairline=false;
       
       if (this_path.m_line) {
-        const line_style& lstyle = line_styles[this_path.m_line-1];
+        const LineStyle& lstyle = line_styles[this_path.m_line-1];
         
         hinting = lstyle.doPixelHinting();
         closed = this_path.isClosed() && !lstyle.noClose();
@@ -1619,7 +1619,7 @@ public:
   /// Just like draw_shapes() except that it draws an outline.
   void draw_outlines(int subshape_id, const GnashPaths &paths,
     const AggPaths& agg_paths,
-    const std::vector<line_style> &line_styles, const cxform& cx,
+    const std::vector<LineStyle> &line_styles, const cxform& cx,
     const SWFMatrix& linestyle_matrix) {
     
     if (_alphaMasks.empty()) {
@@ -1653,7 +1653,7 @@ public:
   template <class scanline_type>
   void draw_outlines_impl(int subshape_id, const GnashPaths &paths,
     const AggPaths& agg_paths,
-    const std::vector<line_style> &line_styles, const cxform& cx, 
+    const std::vector<LineStyle> &line_styles, const cxform& cx, 
     const SWFMatrix& linestyle_matrix, scanline_type& sl) {
     
     assert(m_pixf.get());
@@ -1714,7 +1714,7 @@ public:
         agg::conv_stroke< agg::conv_curve < agg::path_storage > > 
           stroke(curve);  // to get an outline
         
-        const line_style& lstyle = line_styles[this_path_gnash.m_line-1];
+        const LineStyle& lstyle = line_styles[this_path_gnash.m_line-1];
           
         int thickness = lstyle.getThickness();
         if (!thickness) stroke.width(1); // hairline
