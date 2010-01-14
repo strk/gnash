@@ -842,8 +842,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 
     if (!visible()) return 0;
     
-    // shouldn't this be !can_handle_mouse_event() instead ?
-    // not selectable, so don't catch mouse events!
+    // Not selectable, so don't catch mouse events!
     if (!_selectable) return 0;
 
     SWFMatrix m = getMatrix();
