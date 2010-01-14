@@ -36,21 +36,39 @@
 #include <sstream>
 #include <csetjmp>
 
+/// \brief A namespace solely for avoiding name 
+/// conflicts with other external headers.
+namespace jpeg {
+
+// jpeglib.h redefines HAVE_STDLIB_H. This silences
+// the warnings, but it's not good.
+#undef HAVE_STDLIB_H
+#include <jpeglib.h>
+#undef HAVE_STDLIB_H
+
+}
+
 // jpeglib.h is included in the namespace jpeg because otherwise it
 // causes horrible conflicts with qt includes. How do C coders sustain
 // the will to live?
 using namespace jpeg;
 
+#ifdef _WIN32
+typedef jpeg_boolean jpeg_bool_t;
+#else
+typedef jpeg::boolean jpeg_bool_t;
+#endif
 
 namespace gnash
 {
 
-static void	jpeg_error_exit(j_common_ptr cinfo)
+static void
+jpeg_error_exit(j_common_ptr cinfo)
 {
 
 	// Set a flag to stop parsing 
 	JpegImageInput* in = static_cast<JpegImageInput*>(cinfo->client_data);
-
+	
 	in->errorOccurred(cinfo->err->jpeg_message_table[cinfo->err->msg_code]); 
 
 	//log_error("failing to abort jpeg parser here (would need a long-jump call)");
@@ -58,7 +76,8 @@ static void	jpeg_error_exit(j_common_ptr cinfo)
 
 
 // Set up some error handlers for the jpeg lib.
-static void	setup_jpeg_err(jpeg_error_mgr* jerr)
+static void
+setup_jpeg_err(jpeg_error_mgr* jerr)
 {
 	// Set up defaults.
 	jpeg_std_error(jerr);
@@ -67,7 +86,7 @@ static void	setup_jpeg_err(jpeg_error_mgr* jerr)
 }
 
 // Helper object for reading jpeg image data.  Basically a thin
-static const int	IO_BUF_SIZE = 4096;
+static const int IO_BUF_SIZE = 4096;
 
 // A jpeglib source manager that reads from a IOChannel.  Paraphrased
 // from IJG jpeglib jdatasrc.c.
@@ -98,7 +117,7 @@ public:
 
 	// Read data into our input buffer.  Client calls this
 	// when it needs more data from the file.
-	static jpeg::boolean fill_input_buffer(j_decompress_ptr cinfo)
+	static jpeg_bool_t fill_input_buffer(j_decompress_ptr cinfo)
 	{
 		rw_source_IOChannel*	src = (rw_source_IOChannel*) cinfo->src;
 
@@ -508,7 +527,7 @@ public:
 	}
 
 	/// Write the output buffer into the stream.
-	static jpeg::boolean empty_output_buffer(j_compress_ptr cinfo)
+	static jpeg_bool_t empty_output_buffer(j_compress_ptr cinfo)
 	{
 		rw_dest_IOChannel*	dest = (rw_dest_IOChannel*) cinfo->dest;
 		assert(dest);
