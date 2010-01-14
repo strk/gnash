@@ -11,11 +11,10 @@
 #include "SWF.h"
 
 #include <string>
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <boost/cstdint.hpp> 
 
 namespace gnash {
-
-    class SWFStream;    // forward declaration
+    class SWFStream;
 }
 
 namespace gnash {
@@ -28,12 +27,16 @@ class rgba
 {
 public:
 
-    friend std::ostream& operator<< (std::ostream& os, const rgba& r);
-
-    boost::uint8_t m_r, m_g, m_b, m_a;
-
-    /// Default RGBA value is FF.FF.FF.FF
-    rgba() : m_r(255), m_g(255), m_b(255), m_a(255) {}
+    /// Construct default RGBA value.
+    //
+    /// Default value is 0xffffffff (solid white).
+    rgba()
+        :
+        m_r(255),
+        m_g(255),
+        m_b(255),
+        m_a(255)
+    {}
 
     /// Construct an RGBA with the provided values
     //
@@ -66,37 +69,35 @@ public:
 
     /// Return a 32-bit unsigned integer as four packed R,G,B bytes.
     //
-    /// Blue is the least significant byte.
+    /// Blue is the least significant byte. The most significant (alpha)
+    /// byte is unused.
     ///
-    /// This function is meant to be used to
-    /// output ActionScript colors in numeric format.
+    /// This function is meant to be used to output ActionScript colors
+    /// in numeric format.
     boost::uint32_t toRGB() const {
         return (m_r << 16) + (m_g << 8) + m_b;
     }
 
+    /// Return a 32-bit unsigned integer as four packed A,R,G,B bytes.
+    //
+    /// Blue is the least significant byte.
+    ///
+    /// This function is meant to be used to output ActionScript colors
+    /// in numeric format.
     boost::uint32_t toRGBA() const {
         return toRGB() + (m_a << 24);
     }
 
     /// Initialize from input stream.
     //
-    /// @param in   The input (SWF) stream
+    /// @param in   The input SWFStream
     ///
-    /// @param t    I don't know by which logic but a value <= 22 makes it
-    ///             read RGB and value > 22 makes it read RGBA
-    ///
+    /// @param t    The tag type, used to determine whether to read an RGB
+    ///             or RGBA record.
+    //
     /// Throw a ParserException if there are not enough bytes in the
     /// currently opened tag for reading. See SWFStream::ensureBytes()
     void read(SWFStream& in, SWF::TagType t);
-
-    /// Initialize from input stream (reads RGBA)
-    //
-    /// Throw a ParserException if there's no enough bytes in the
-    /// currently opened tag for reading. See SWFStream::ensureBytes()
-    void read_rgba(SWFStream& in);
-
-    /// Initialize from intput stream (reads RGB)
-    void read_rgb(SWFStream& in);
 
     /// Set r, g, b, a values
     void set(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b,
@@ -110,14 +111,18 @@ public:
     /// Used for morphing.
     void set_lerp(const rgba& a, const rgba& b, float f);
 
-    /// Debug log.
-    void print() const;
-
-    /// Debug print.
-    std::string toString() const;
-
     /// Neater string output (example: "0,0,0,255")
     std::string toShortString() const;
+
+    /// Initialize from input stream (reads RGBA)
+    //
+    /// Throw a ParserException if there's no enough bytes in the
+    /// currently opened tag for reading. See SWFStream::ensureBytes()
+    void read_rgba(SWFStream& in);
+
+    /// Initialize from intput stream (reads RGB)
+    void read_rgb(SWFStream& in);
+    friend std::ostream& operator<< (std::ostream& os, const rgba& r);
 
     bool operator==(const rgba& o) const {
         return m_r == o.m_r && 
@@ -129,6 +134,9 @@ public:
     bool operator!=(const rgba& o) const {
         return !(*this == o);
     }
+
+    boost::uint8_t m_r, m_g, m_b, m_a;
+
 };
 
 std::ostream& operator<< (std::ostream& os, const rgba& r);

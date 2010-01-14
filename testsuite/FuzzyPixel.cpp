@@ -40,7 +40,7 @@ FuzzyPixel::operator==(const FuzzyPixel& o) const
 std::ostream&
 operator<< (std::ostream& o, const FuzzyPixel& p)
 {
-	return o << "FuzzyPixel(" << p._col.toString() << ") [tol:" << p._tol << "]";
+	return o << "FuzzyPixel(" << p._col << ") [tol:" << p._tol << "]";
 }
 
 } // namespace gnash

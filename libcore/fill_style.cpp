@@ -81,23 +81,20 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     if (m_type == SWF::FILL_SOLID)
     {
         // 0x00: solid fill
-        if ( t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4
-            || t == SWF::DEFINESHAPE4_ || is_morph)
-        {
+        if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4
+            || t == SWF::DEFINESHAPE4_ || is_morph) {
+
             m_color.read_rgba(in);
             if (is_morph)   pOther->m_color.read_rgba(in);
         }
-        else 
-        {
+        else {
             // For DefineMorphShape tags we should use morph_fill_style 
-            assert( t == SWF::DEFINESHAPE ||
-                    t == SWF::DEFINESHAPE2 );
+            assert(t == SWF::DEFINESHAPE || t == SWF::DEFINESHAPE2);
             m_color.read_rgb(in);
         }
 
-        IF_VERBOSE_PARSE
-        (
-            log_parse("  color: %s", m_color.toString());
+        IF_VERBOSE_PARSE(
+            log_parse("  color: %s", m_color);
         );
     }
     else if (m_type == SWF::FILL_LINEAR_GRADIENT
