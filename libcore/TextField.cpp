@@ -1023,9 +1023,8 @@ TextField::align_line(TextAlignment align,
     float right_margin = getRightMargin();
 
     float extra_space = (width - right_margin) - x - PADDING_TWIPS;
-    //assert(extra_space >= 0.0f);
-    if (extra_space <= 0.0f)
-    {
+
+    if (extra_space <= 0.0f) {
 #ifdef GNASH_DEBUG_TEXTFIELDS
         log_debug(_("TextField text doesn't fit in its boundaries: "
                 "width %g, margin %g - nothing to align"),
@@ -1036,28 +1035,24 @@ TextField::align_line(TextAlignment align,
 
     float shift_right = 0.0f;
 
-    if (align == ALIGN_LEFT)
-    {
-        // Nothing to do; already aligned left.
-        return 0.0f;
+    switch (align) {
+        case ALIGN_LEFT:
+            // Nothing to do; already aligned left.
+            return 0.0f;
+        case ALIGN_CENTER:
+            // Distribute the space evenly on both sides.
+            shift_right = extra_space / 2;
+            break;
+        case ALIGN_RIGHT:
+            // Shift all the way to the right.
+            shift_right = extra_space;
+            break;
     }
-    else if (align == ALIGN_CENTER)
-    {
-        // Distribute the space evenly on both sides.
-        shift_right = extra_space / 2;
-    }
-    else if (align == ALIGN_RIGHT)
-    {
-        // Shift all the way to the right.
-        shift_right = extra_space;
-    }
-    // Shift the beginnings of the records on this line.
-    for (unsigned int i = last_line_start_record; i < _textRecords.size(); ++i)
-    {
-        SWF::TextRecord& rec = _textRecords[i];
 
-        //if ( rec.hasXOffset() ) // why?
-            rec.setXOffset(rec.xOffset() + shift_right); 
+    // Shift the beginnings of the records on this line.
+    for (size_t i = last_line_start_record; i < _textRecords.size(); ++i) {
+        SWF::TextRecord& rec = _textRecords[i];
+        rec.setXOffset(rec.xOffset() + shift_right); 
     }
     return shift_right;
 }
