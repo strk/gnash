@@ -60,14 +60,14 @@ line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
 
     int flags1 = in.read_u8();
     int flags2 = in.read_u8();
-    _startCapStyle =  (cap_style_e)((flags1 & 0xC0) >> 6);
-    _joinStyle     = (join_style_e)((flags1 & 0x30) >> 4);
+    _startCapStyle =  (CapStyle)((flags1 & 0xC0) >> 6);
+    _joinStyle     = (JoinStyle)((flags1 & 0x30) >> 4);
     bool has_fill      =   flags1 & (1 << 3);
     _scaleHorizontally = !(flags1 & (1 << 2));
     _scaleVertically   = !(flags1 & (1 << 1));
     _pixelHinting      =   flags1 & (1 << 0);
     _noClose = flags2 & (1 << 2);
-    _endCapStyle = (cap_style_e) (flags2 & 0x03); 
+    _endCapStyle = (CapStyle) (flags2 & 0x03); 
 
     if (_joinStyle == JOIN_MITER)  
     {
@@ -109,14 +109,14 @@ line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
     int flags1 = in.read_u8();
     int flags2 = in.read_u8();
-    _startCapStyle =  (cap_style_e)((flags1 & 0xC0) >> 6);
-    _joinStyle     = (join_style_e)((flags1 & 0x30) >> 4);
+    _startCapStyle =  (CapStyle)((flags1 & 0xC0) >> 6);
+    _joinStyle     = (JoinStyle)((flags1 & 0x30) >> 4);
     bool has_fill      =   flags1 & (1 << 3);
     _scaleHorizontally = !(flags1 & (1 << 2));
     _scaleVertically   = !(flags1 & (1 << 1));
     _pixelHinting      =   flags1 & (1 << 0);
     _noClose = flags2 & (1 << 2);
-    _endCapStyle = (cap_style_e) (flags2 & 0x03); 
+    _endCapStyle = (CapStyle) (flags2 & 0x03); 
 
     if (_joinStyle == JOIN_MITER) 
     {

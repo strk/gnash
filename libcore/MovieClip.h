@@ -616,9 +616,9 @@ public:
         bool vScale=true, bool hScale=true,
         bool pixelHinting=false,
         bool noClose=false,
-        cap_style_e startCapStyle=CAP_ROUND,
-        cap_style_e endCapStyle=CAP_ROUND,
-        join_style_e joinStyle=JOIN_ROUND,
+        CapStyle startCapStyle=CAP_ROUND,
+        CapStyle endCapStyle=CAP_ROUND,
+        JoinStyle joinStyle=JOIN_ROUND,
         float miterLimitFactor=1.0f)
     {
         _drawable.lineStyle(thickness, color, vScale, hScale,

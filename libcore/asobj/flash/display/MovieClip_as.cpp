@@ -1619,8 +1619,8 @@ movieclip_lineStyle(const fn_call& fn)
     bool scaleThicknessHorizontally = true;
     bool pixelHinting = false;
     bool noClose = false;
-    cap_style_e capStyle = CAP_ROUND;
-    join_style_e joinStyle = JOIN_ROUND;
+    CapStyle capStyle = CAP_ROUND;
+    JoinStyle joinStyle = JOIN_ROUND;
     float miterLimitFactor = 1.0f;
 
     int arguments = fn.nargs;

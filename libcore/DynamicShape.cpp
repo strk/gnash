@@ -179,8 +179,8 @@ DynamicShape::finalize() const
 void
 DynamicShape::lineStyle(boost::uint16_t thickness, const rgba& color,
 	bool vScale, bool hScale, bool pixelHinting, bool noClose,
-	cap_style_e startCapStyle, cap_style_e endCapStyle,
-	join_style_e joinStyle, float miterLimitFactor)
+	CapStyle startCapStyle, CapStyle endCapStyle,
+	JoinStyle joinStyle, float miterLimitFactor)
 {
 	line_style style(thickness, color, vScale, hScale, pixelHinting,
 		noClose, startCapStyle, endCapStyle, joinStyle,

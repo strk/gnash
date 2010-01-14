@@ -127,7 +127,7 @@ libgnashcore_la_SOURCES = \
 	impl.cpp \
 	LoadVariablesThread.cpp \
 	SWFStream.cpp \
-	LineStyles.cpp \
+	LineStyle.cpp \
 	Timers.cpp \
 	RGBA.cpp 	\
 	MovieFactory.cpp \
