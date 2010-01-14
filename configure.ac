@@ -220,7 +220,7 @@ AC_ARG_ENABLE(avm2,
     yes) avm2=yes ;;
     no)  avm2=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for enable-avm2 option]) ;;
-  esac], avm2=no
+  esac], avm2=yes
 )
 AM_CONDITIONAL(ENABLE_AVM2, [test x"$avm2" = xyes])
 if test x$avm2 = xyes; then
@@ -267,7 +267,7 @@ AC_ARG_ENABLE(jemalloc,
 esac],jemalloc=yes)
 
 dnl There is some weird stuff going on with NetBSD and jemalloc, so don't build it for now.
-if test x"${netbsd}" = x"yes"; then
+if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes"; then
   jemalloc=no
 fi
 dnl If the compiler doesn't have local thread storage enabled, don't try to
@@ -921,8 +921,6 @@ dnl fi
 fi
 AC_PROG_LIBTOOL
 
-dnl Don't ever install libltdl
-AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" = xyes)
 AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
 
 AC_C_CONST
