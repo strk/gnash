@@ -374,7 +374,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   dnl       from pkg-config, as it would likely bring all
   dnl       required libs in. 
   dnl
-  if test x"${ac_cv_path_ffmpeg_lib}" != x; then
+  if test x"${libavcodec}" != x; then
 
     dnl Look for the DTS library, which is required on some systems. {
     dnl
