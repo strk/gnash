@@ -12,7 +12,7 @@
 #include "Font.h"
 #include "log.h"
 #include "DefineShapeTag.h"
-#include "styles.h"
+#include "LineStyle.h"
 #include "movie_definition.h"
 
 // Define to the name of a default font.

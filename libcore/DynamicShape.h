@@ -20,7 +20,7 @@
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
 
-#include "styles.h" 
+#include "LineStyle.h" 
 #include "ShapeRecord.h"
 
 namespace gnash {

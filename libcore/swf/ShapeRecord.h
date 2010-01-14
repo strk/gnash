@@ -21,7 +21,7 @@
 
 #include "Geometry.h"
 #include "fill_style.h"
-#include "styles.h"
+#include "LineStyle.h"
 #include "SWFRect.h"
 
 #include <vector>

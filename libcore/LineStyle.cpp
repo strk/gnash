@@ -6,7 +6,7 @@
 // Fill and line style types.
 
 
-#include "styles.h"
+#include "LineStyle.h"
 #include "log.h"
 #include "SWFStream.h"
 #include "movie_definition.h"

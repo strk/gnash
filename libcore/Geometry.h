@@ -21,7 +21,7 @@
 
 #include "dsodefs.h"
 #include "SWFMatrix.h" 
-#include "styles.h"
+#include "LineStyle.h"
 #include "log.h"
 
 #include <vector> // for path composition
