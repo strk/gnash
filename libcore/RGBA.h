@@ -1,4 +1,4 @@
-// types.h	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// types.h    -- Thatcher Ulrich <tu@tulrich.com> 2003
 
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
@@ -14,143 +14,134 @@
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 
 namespace gnash {
-	class SWFStream;	// forward declaration
 
-	/// RGBA record
-	class rgba
-	{
-	public:
+    class SWFStream;    // forward declaration
+}
 
-		friend std::ostream& operator<< (std::ostream& os, const rgba& r);
+namespace gnash {
 
-		boost::uint8_t	m_r, m_g, m_b, m_a;
+/// A basic RGBA type
+//
+/// This both represents a SWF RGBA record and is a basic Gnash type for
+/// color values.
+class rgba
+{
+public:
 
-		/// Default RGBA value is FF.FF.FF.FF
-		rgba() : m_r(255), m_g(255), m_b(255), m_a(255) {}
+    friend std::ostream& operator<< (std::ostream& os, const rgba& r);
 
-		/// Construct an RGBA with the provided values
-		//
-		/// @param r Red
-		/// @param g Green
-		/// @param b Blue
-		/// @param a Alpha (transparency)
-		///
-		rgba(boost::uint8_t r, boost::uint8_t g, 
-                boost::uint8_t b, boost::uint8_t a)
-			:
-			m_r(r), m_g(g), m_b(b), m_a(a)
-		{
-		}
+    boost::uint8_t m_r, m_g, m_b, m_a;
 
-		/// \brief
-		/// Parse a 32-bit unsigned integer
-		/// as three packed R,G,B bytes.
-		//
-		/// Alpha will be untouched.
-		/// Blue is the least significant byte.
-		///
-		/// This function is meant to be used to
-		/// parse ActionScript colors in numeric format.
-		///
-		void parseRGB(boost::uint32_t rgbCol)
-		{
-			m_r = static_cast<boost::uint8_t>(rgbCol>>16);
-			m_g = static_cast<boost::uint8_t>(rgbCol>>8);
-			m_b = static_cast<boost::uint8_t>(rgbCol);
-		}
+    /// Default RGBA value is FF.FF.FF.FF
+    rgba() : m_r(255), m_g(255), m_b(255), m_a(255) {}
 
-		/// \brief
-		/// Return a 32-bit unsigned integer
-		/// as four packed R,G,B bytes.
-		//
-		/// Blue is the least significant byte.
-		///
-		/// This function is meant to be used to
-		/// output ActionScript colors in numeric format.
-		///
-		boost::uint32_t toRGB() const
-		{
-			return (m_r<<16) + (m_g<<8) + m_b;
-		}
+    /// Construct an RGBA with the provided values
+    //
+    /// @param r Red
+    /// @param g Green
+    /// @param b Blue
+    /// @param a Alpha (transparency)
+    rgba(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, 
+            boost::uint8_t a)
+        :
+        m_r(r),
+        m_g(g),
+        m_b(b),
+        m_a(a)
+    {
+    }
 
-        boost::uint32_t toRGBA() const
-        {
-            return toRGB() + (m_a << 24);
-        }
+    /// Parse a 32-bit unsigned integer as three packed R,G,B bytes.
+    //
+    /// Alpha will be untouched.
+    /// Blue is the least significant byte.
+    ///
+    /// This function is meant to be used to
+    /// parse ActionScript colors in numeric format.
+    void parseRGB(boost::uint32_t rgbCol) {
+        m_r = static_cast<boost::uint8_t>(rgbCol >> 16);
+        m_g = static_cast<boost::uint8_t>(rgbCol >> 8);
+        m_b = static_cast<boost::uint8_t>(rgbCol);
+    }
 
-		/// Initialize from input stream.
-		//
-		///
-		/// @param in
-		///	The input (SWF) stream
-		///
-		/// @param t 
-		///	I don't know by which logic but
-		///	a value <= 22 makes it read RGB
-		///	and value > 22 makes it read RGBA
-		///
-		/// Throw a ParserException if there's no enough bytes in the
-		/// currently opened tag for reading. See stream::ensureBytes()
-		///
-		void read(SWFStream& in, SWF::TagType t);
+    /// Return a 32-bit unsigned integer as four packed R,G,B bytes.
+    //
+    /// Blue is the least significant byte.
+    ///
+    /// This function is meant to be used to
+    /// output ActionScript colors in numeric format.
+    boost::uint32_t toRGB() const {
+        return (m_r << 16) + (m_g << 8) + m_b;
+    }
 
-		/// Initialize from input stream (reads RGBA)
-		//
-		/// Throw a ParserException if there's no enough bytes in the
-		/// currently opened tag for reading. See stream::ensureBytes()
-		///
-		void read_rgba(SWFStream& in);
+    boost::uint32_t toRGBA() const {
+        return toRGB() + (m_a << 24);
+    }
 
-		/// Initialize from intput stream (reads RGB)
-		void read_rgb(SWFStream& in);
+    /// Initialize from input stream.
+    //
+    /// @param in   The input (SWF) stream
+    ///
+    /// @param t    I don't know by which logic but a value <= 22 makes it
+    ///             read RGB and value > 22 makes it read RGBA
+    ///
+    /// Throw a ParserException if there are not enough bytes in the
+    /// currently opened tag for reading. See SWFStream::ensureBytes()
+    void read(SWFStream& in, SWF::TagType t);
 
-		/// Set r,g,b.a values
-		void set(boost::uint8_t r, boost::uint8_t g,
-                boost::uint8_t b, boost::uint8_t a)
-		{
-			m_r = r;
-			m_g = g;
-			m_b = b;
-			m_a = a;
-		}
+    /// Initialize from input stream (reads RGBA)
+    //
+    /// Throw a ParserException if there's no enough bytes in the
+    /// currently opened tag for reading. See SWFStream::ensureBytes()
+    void read_rgba(SWFStream& in);
 
-		void set_lerp(const rgba& a, const rgba& b, float f);
+    /// Initialize from intput stream (reads RGB)
+    void read_rgb(SWFStream& in);
 
-		/// Debug log.
-		void print() const;
+    /// Set r, g, b, a values
+    void set(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b,
+            boost::uint8_t a) {
+        m_r = r;
+        m_g = g;
+        m_b = b;
+        m_a = a;
+    }
 
-		/// Debug print.
-		std::string toString() const;
+    /// Used for morphing.
+    void set_lerp(const rgba& a, const rgba& b, float f);
 
-		// neater string output (example: "0,0,0,255")
-		std::string toShortString() const;
+    /// Debug log.
+    void print() const;
 
-		/// Set values from string (eg. #FF0000)
-		//
-		/// @param color Hex String in '#xxxxxx' format
-		void fromShortString(std::string color);
+    /// Debug print.
+    std::string toString() const;
 
-		bool operator== (const rgba& o) const
-		{
-			return m_r == o.m_r && 
-				m_g == o.m_g && 
-				m_b == o.m_b && 
-				m_a == o.m_a;
-		}
+    /// Neater string output (example: "0,0,0,255")
+    std::string toShortString() const;
 
-		bool operator!= (const rgba& o) const
-		{
-			return ! ( *this == o );
-		}
-	};
+    /// Set values from string (eg. #FF0000)
+    //
+    /// @param color Hex String in '#xxxxxx' format
+    void fromShortString(std::string color);
 
-	std::ostream& operator<< (std::ostream& os, const rgba& r);
+    bool operator==(const rgba& o) const {
+        return m_r == o.m_r && 
+               m_g == o.m_g && 
+               m_b == o.m_b && 
+               m_a == o.m_a;
+    }
+
+    bool operator!=(const rgba& o) const {
+        return !(*this == o);
+    }
+};
+
+std::ostream& operator<< (std::ostream& os, const rgba& r);
 
 
-}	// end namespace gnash
+} // namespace gnash
 
-
-#endif // GNASH_TYPES_H
+#endif 
 
 
 // Local Variables:
