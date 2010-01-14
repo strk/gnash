@@ -975,7 +975,7 @@ TextField::get_text_value() const
     // with a pre-existing value.
     const_cast<TextField*>(this)->registerTextVariable();
 
-    int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
+    const int version = getSWFVersion(*getObject(this));
 
     return utf8::encodeCanonicalString(_text, version);
 }
@@ -1046,6 +1046,9 @@ TextField::align_line(TextAlignment align,
         case ALIGN_RIGHT:
             // Shift all the way to the right.
             shift_right = extra_space;
+            break;
+        case ALIGN_JUSTIFY:
+            // What should we do here?
             break;
     }
 
