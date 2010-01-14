@@ -122,6 +122,7 @@ public:
 
     /// Initialize from intput stream (reads RGB)
     void read_rgb(SWFStream& in);
+
     friend std::ostream& operator<< (std::ostream& os, const rgba& r);
 
     bool operator==(const rgba& o) const {

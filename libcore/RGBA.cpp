@@ -11,7 +11,6 @@
 
 namespace gnash {
 
-/// Can throw ParserException on premature end of input stream
 void
 rgba::read(SWFStream& in, SWF::TagType tag)
 {
@@ -28,7 +27,6 @@ rgba::read(SWFStream& in, SWF::TagType tag)
     }
 }
 
-/// Can throw ParserException on premature end of input stream
 void
 rgba::read_rgba(SWFStream& in)
 {
