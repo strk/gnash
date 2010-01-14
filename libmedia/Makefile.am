@@ -44,7 +44,6 @@ libgnashmedia_la_CPPFLAGS = \
 	$(JPEG_CFLAGS) \
 	$(GIF_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(INCLTDL) \
 	$(NULL)
 
 # These headers get installed
@@ -57,8 +56,6 @@ libgnashmedia_la_LIBADD = \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
-	$(LIBLTDL) \
-	$(LIBLTDLHEAD) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -87,81 +84,80 @@ noinst_HEADERS = \
 	VideoInput.h \
 	$(NULL)
 
-
 if USE_GST_ENGINE
    libgnashmedia_la_SOURCES += \
-		gst/MediaHandlerGst.cpp \
-		gst/VideoDecoderGst.cpp \
-		gst/AudioDecoderGst.cpp \
-		gst/MediaParserGst.cpp \
-		gst/VideoConverterGst.cpp \
-		gst/GstUtil.cpp \
-		gst/swfdec_codec_gst.c \
-		gst/VideoInputGst.cpp \
-		gst/AudioInputGst.cpp \
-		$(NULL)
+	gst/MediaHandlerGst.cpp \
+	gst/VideoDecoderGst.cpp \
+	gst/AudioDecoderGst.cpp \
+	gst/MediaParserGst.cpp \
+	gst/VideoConverterGst.cpp \
+	gst/GstUtil.cpp \
+	gst/swfdec_codec_gst.c \
+	gst/VideoInputGst.cpp \
+	gst/AudioInputGst.cpp \
+	$(NULL)
 
    noinst_HEADERS += \
-		gst/MediaHandlerGst.h \
-		gst/AudioDecoderGst.h \
-		gst/VideoDecoderGst.h \
-		gst/MediaParserGst.h \
-		gst/VideoConverterGst.h \
-		gst/GstUtil.h \
-		gst/swfdec_codec_gst.h \
-		gst/gnash_gst_version.h \
-		gst/VideoInputGst.h \
-		gst/AudioInputGst.h \
-		$(NULL)
+	gst/MediaHandlerGst.h \
+	gst/AudioDecoderGst.h \
+	gst/VideoDecoderGst.h \
+	gst/MediaParserGst.h \
+	gst/VideoConverterGst.h \
+	gst/GstUtil.h \
+	gst/swfdec_codec_gst.h \
+	gst/gnash_gst_version.h \
+	gst/VideoInputGst.h \
+	gst/AudioInputGst.h \
+	$(NULL)
 
    libgnashmedia_la_CPPFLAGS += \
-		-I$(top_srcdir)/libmedia/gst \
-		$(GSTREAMER_CFLAGS) \
-		$(GSTAPP_CFLAGS) \
-		$(GSTPBUTILS_CFLAGS) \
-		$(NULL)
+	-I$(top_srcdir)/libmedia/gst \
+	$(GSTREAMER_CFLAGS) \
+	$(GSTAPP_CFLAGS) \
+	$(GSTPBUTILS_CFLAGS) \
+	$(NULL)
 
    libgnashmedia_la_LIBADD += \
-		-lgstbase-0.10 \
-                $(GSTREAMER_APP_LIBS) \
-		$(GSTPBUTILS_LIBS) \
-		$(GSTREAMER_PLUGINS_BASE_LIBS) \
-		$(GSTREAMER_LIBS) \
-		$(NULL)
+	-lgstbase-0.10 \
+        $(GSTREAMER_APP_LIBS) \
+	$(GSTPBUTILS_LIBS) \
+	$(GSTREAMER_PLUGINS_BASE_LIBS) \
+	$(GSTREAMER_LIBS) \
+	$(NULL)
 
 endif
 
 if USE_FFMPEG_ENGINE
    libgnashmedia_la_SOURCES += \
-		ffmpeg/MediaHandlerFfmpeg.cpp \
-		ffmpeg/MediaParserFfmpeg.cpp \
-		ffmpeg/AudioDecoderFfmpeg.cpp \
-		ffmpeg/VideoDecoderFfmpeg.cpp \
-		ffmpeg/AudioResamplerFfmpeg.cpp \
-		ffmpeg/VideoConverterFfmpeg.cpp \
-		ffmpeg/VideoInputFfmpeg.cpp \
-		ffmpeg/AudioInputFfmpeg.cpp \
-		$(NULL)
+	ffmpeg/MediaHandlerFfmpeg.cpp \
+	ffmpeg/MediaParserFfmpeg.cpp \
+	ffmpeg/AudioDecoderFfmpeg.cpp \
+	ffmpeg/VideoDecoderFfmpeg.cpp \
+	ffmpeg/AudioResamplerFfmpeg.cpp \
+	ffmpeg/VideoConverterFfmpeg.cpp \
+	ffmpeg/VideoInputFfmpeg.cpp \
+	ffmpeg/AudioInputFfmpeg.cpp \
+	$(NULL)
 
    noinst_HEADERS += \
-		ffmpeg/MediaHandlerFfmpeg.h \
-		ffmpeg/MediaParserFfmpeg.h \
-		ffmpeg/AudioDecoderFfmpeg.h \
-		ffmpeg/VideoDecoderFfmpeg.h \
-		ffmpeg/AudioResamplerFfmpeg.h \
-		ffmpeg/ffmpegHeaders.h \
-		ffmpeg/VideoConverterFfmpeg.h \
-		ffmpeg/VideoInputFfmpeg.h \
-		ffmpeg/AudioInputFfmpeg.h \
-		$(NULL)
+	ffmpeg/MediaHandlerFfmpeg.h \
+	ffmpeg/MediaParserFfmpeg.h \
+	ffmpeg/AudioDecoderFfmpeg.h \
+	ffmpeg/VideoDecoderFfmpeg.h \
+	ffmpeg/AudioResamplerFfmpeg.h \
+	ffmpeg/ffmpegHeaders.h \
+	ffmpeg/VideoConverterFfmpeg.h \
+	ffmpeg/VideoInputFfmpeg.h \
+	ffmpeg/AudioInputFfmpeg.h \
+	$(NULL)
 
    libgnashmedia_la_LIBADD += \
-		$(FFMPEG_LIBS) \
-		$(NULL)
+	$(FFMPEG_LIBS) \
+	$(NULL)
 
    libgnashmedia_la_CPPFLAGS += \
-		$(FFMPEG_CFLAGS) \
-		$(NULL)
+	$(FFMPEG_CFLAGS) \
+	$(NULL)
 endif
 
 if HAVE_SPEEX
@@ -185,17 +181,6 @@ if WIN32
 	$(top_builddir)/libbase/libgnashbase.la
 	-lintl
 endif
-
-#libltdlc_la_CPPFLAGS = $(LTDLINCL)
-#if CONVENIENCE_LTDL
-#noinst_LTLIBRARIES = libltdlc.la
-#libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-#endif
-#CLEANFILES = libltdl.la libltdlc.la
-
-#libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-#libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
-#libltdl_la_LIBADD = $(LIBADD_DL)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
