@@ -144,9 +144,7 @@ public:
     /// Set this style to the interpolation of the given one
     //
     /// @param ls1      First LineStyle to interpolate.
-    ///
     /// @param ls2      Second LineStyle to interpolate.
-    ///
     /// @ratio          The interpolation factor (0..1).
     ///                 When 0, this will be equal to ls1, when 1
     ///                 this will be equal to ls2.
@@ -178,9 +176,7 @@ private:
 
 } // namespace gnash
 
-
-#endif // GNASH_STYLES_H
-
+#endif
 
 // Local Variables:
 // mode: C++
