@@ -127,7 +127,7 @@ libgnashcore_la_SOURCES = \
 	impl.cpp \
 	LoadVariablesThread.cpp \
 	SWFStream.cpp \
-	styles.cpp \
+	LineStyles.cpp \
 	Timers.cpp \
 	RGBA.cpp 	\
 	MovieFactory.cpp \
@@ -268,7 +268,7 @@ EXTENSIONS_API = \
 	swf/SWF.h \
 	MovieFactory.h \
 	fill_style.h \
-	styles.h \
+	LineStyle.h \
 	ExportableResource.h \
 	BitmapInfo.h \
 	RGBA.h	\
