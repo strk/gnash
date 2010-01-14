@@ -82,14 +82,21 @@ rgba::toShortString() const
     return ss.str();
 }
 
-void
-rgba::fromShortString(std::string color)
+rgba
+colorFromHexString(const std::string& color)
 {
     std::stringstream ss(color);
-    int hexnumber;
-    ss.ignore();
-    ss >> std::hex >> hexnumber;
-    parseRGB(hexnumber);
+    boost::uint32_t hexnumber;
+    
+    if (!(ss >> std::hex >> hexnumber)) {
+        log_error("Failed to convert string to RGBA value! This is a "
+                "Gnash bug");
+        return rgba();
+    }
+
+    rgba ret;
+    ret.parseRGB(hexnumber);
+    return ret;
 }
 
 void

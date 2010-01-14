@@ -336,7 +336,7 @@ TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
         (point(x, y))
         (point(x, y + h));
     
-    renderer.drawLine(box, rgba(0,0,0,255), mat);
+    renderer.drawLine(box, rgba(0, 0, 0, 255), mat);
 }
 
 size_t
@@ -1534,9 +1534,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
                         } else if (s == "A") {
-                            //anchor
-							rgba color;
-							color.fromShortString("#0000FF");
+                            // anchor (blue text).
+							rgba color(0, 0, 0xff, 0xff);
 							newrec.setColor(color);
 							newrec.setUnderline(true);
 							attloc = attributes.find("HREF");
@@ -1561,10 +1560,17 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             boost::uint16_t originalsize = _fontHeight;
                             attloc = attributes.find("COLOR");
                             if (attloc != attributes.end()) {
-                                //font COLOR attribute
-                                rgba color;
-                                color.fromShortString(attloc->second);
-                                newrec.setColor(color);
+                                std::string hexval(attloc->second);
+                                if (hexval.empty() || hexval[0] != '#') {
+                                    log_error("Unexpected color value");
+                                }
+                                else {
+                                    hexval.erase(0, 1);
+                                    // font COLOR attribute
+                                    rgba color =
+                                        colorFromHexString(attloc->second);
+                                    newrec.setColor(color);
+                                }
                             }
                             attloc = attributes.find("FACE");
                             if (attloc != attributes.end()) {
