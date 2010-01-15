@@ -1597,11 +1597,13 @@ Network::sniffBytesReady(int fd)
 {
     // GNASH_REPORT_FUNCTION;
 
-    int bytes;
-    
+    int bytes = 0;
+#ifndef _WIN32
     ioctl(fd, FIONREAD, &bytes);
-    
     log_network("#%d bytes waiting in kernel network buffer.", bytes);
+#else
+    log_unimpl("Network::sniffBytesReady(win32 equivalant)");
+#endif
     
     return bytes;
 }
