@@ -336,7 +336,7 @@ TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
         (point(x, y))
         (point(x, y + h));
     
-    renderer.drawLine(box, rgba(0,0,0,255), mat);
+    renderer.drawLine(box, rgba(0, 0, 0, 255), mat);
 }
 
 size_t
@@ -842,8 +842,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 
     if (!visible()) return 0;
     
-    // shouldn't this be !can_handle_mouse_event() instead ?
-    // not selectable, so don't catch mouse events!
+    // Not selectable, so don't catch mouse events!
     if (!_selectable) return 0;
 
     SWFMatrix m = getMatrix();
@@ -976,7 +975,7 @@ TextField::get_text_value() const
     // with a pre-existing value.
     const_cast<TextField*>(this)->registerTextVariable();
 
-    int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
+    const int version = getSWFVersion(*getObject(this));
 
     return utf8::encodeCanonicalString(_text, version);
 }
@@ -1024,9 +1023,8 @@ TextField::align_line(TextAlignment align,
     float right_margin = getRightMargin();
 
     float extra_space = (width - right_margin) - x - PADDING_TWIPS;
-    //assert(extra_space >= 0.0f);
-    if (extra_space <= 0.0f)
-    {
+
+    if (extra_space <= 0.0f) {
 #ifdef GNASH_DEBUG_TEXTFIELDS
         log_debug(_("TextField text doesn't fit in its boundaries: "
                 "width %g, margin %g - nothing to align"),
@@ -1037,28 +1035,27 @@ TextField::align_line(TextAlignment align,
 
     float shift_right = 0.0f;
 
-    if (align == ALIGN_LEFT)
-    {
-        // Nothing to do; already aligned left.
-        return 0.0f;
+    switch (align) {
+        case ALIGN_LEFT:
+            // Nothing to do; already aligned left.
+            return 0.0f;
+        case ALIGN_CENTER:
+            // Distribute the space evenly on both sides.
+            shift_right = extra_space / 2;
+            break;
+        case ALIGN_RIGHT:
+            // Shift all the way to the right.
+            shift_right = extra_space;
+            break;
+        case ALIGN_JUSTIFY:
+            // What should we do here?
+            break;
     }
-    else if (align == ALIGN_CENTER)
-    {
-        // Distribute the space evenly on both sides.
-        shift_right = extra_space / 2;
-    }
-    else if (align == ALIGN_RIGHT)
-    {
-        // Shift all the way to the right.
-        shift_right = extra_space;
-    }
-    // Shift the beginnings of the records on this line.
-    for (unsigned int i = last_line_start_record; i < _textRecords.size(); ++i)
-    {
-        SWF::TextRecord& rec = _textRecords[i];
 
-        //if ( rec.hasXOffset() ) // why?
-            rec.setXOffset(rec.xOffset() + shift_right); 
+    // Shift the beginnings of the records on this line.
+    for (size_t i = last_line_start_record; i < _textRecords.size(); ++i) {
+        SWF::TextRecord& rec = _textRecords[i];
+        rec.setXOffset(rec.xOffset() + shift_right); 
     }
     return shift_right;
 }
@@ -1534,9 +1531,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
                         } else if (s == "A") {
-                            //anchor
-							rgba color;
-							color.fromShortString("#0000FF");
+                            // anchor (blue text).
+							rgba color(0, 0, 0xff, 0xff);
 							newrec.setColor(color);
 							newrec.setUnderline(true);
 							attloc = attributes.find("HREF");
@@ -1561,10 +1557,17 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             boost::uint16_t originalsize = _fontHeight;
                             attloc = attributes.find("COLOR");
                             if (attloc != attributes.end()) {
-                                //font COLOR attribute
-                                rgba color;
-                                color.fromShortString(attloc->second);
-                                newrec.setColor(color);
+                                std::string hexval(attloc->second);
+                                if (hexval.empty() || hexval[0] != '#') {
+                                    log_error("Unexpected color value");
+                                }
+                                else {
+                                    hexval.erase(0, 1);
+                                    // font COLOR attribute
+                                    rgba color =
+                                        colorFromHexString(attloc->second);
+                                    newrec.setColor(color);
+                                }
                             }
                             attloc = attributes.find("FACE");
                             if (attloc != attributes.end()) {

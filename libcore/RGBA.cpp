@@ -1,23 +1,16 @@
-// types.h	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// types.h    -- Thatcher Ulrich <tu@tulrich.com> 2003
 
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
-
-#include <boost/thread.hpp>
 
 #include "RGBA.h"
 #include "GnashNumeric.h"
 #include "log.h"
 #include "SWFStream.h"
-#include <sstream> // for ::print and ::toString
+#include <sstream> 
 
 namespace gnash {
 
-//
-// rgba
-//
-
-/// Can throw ParserException on premature end of input stream
 void
 rgba::read(SWFStream& in, SWF::TagType tag)
 {
@@ -34,12 +27,11 @@ rgba::read(SWFStream& in, SWF::TagType tag)
     }
 }
 
-/// Can throw ParserException on premature end of input stream
 void
 rgba::read_rgba(SWFStream& in)
 {
     read_rgb(in);
-        in.ensureBytes(1);
+    in.ensureBytes(1);
     m_a = in.read_u8();
 }
 
@@ -54,25 +46,8 @@ rgba::read_rgb(SWFStream& in)
     m_a = 0x0FF;
 }
 
-void
-rgba::print() const
-// For debugging.
-{
-    log_parse("rgba: %d %d %d %d", m_r, m_g, m_b, m_a);
-}
-
-std::string
-rgba::toString() const
-// For debugging.
-{
-    std::stringstream ss;
-    ss << *this;
-    return ss.str();
-}
-
 std::string
 rgba::toShortString() const
-// For debugging.
 {
     std::stringstream ss;
     ss << (unsigned)m_r << ","
@@ -80,16 +55,6 @@ rgba::toShortString() const
         << (unsigned)m_b << ","
         << (unsigned)m_a;
     return ss.str();
-}
-
-void
-rgba::fromShortString(std::string color)
-{
-    std::stringstream ss(color);
-    int hexnumber;
-    ss.ignore();
-    ss >> std::hex >> hexnumber;
-    parseRGB(hexnumber);
 }
 
 void
@@ -101,17 +66,34 @@ rgba::set_lerp(const rgba& a, const rgba& b, float f)
     m_a = static_cast<boost::uint8_t>(frnd(flerp(a.m_a, b.m_a, f)));
 }
 
-std::ostream&
-operator<< (std::ostream& os, const rgba& r)
+rgba
+colorFromHexString(const std::string& color)
 {
-	return os << "rgba: "
-		<< (unsigned)r.m_r << ", "
-		<< (unsigned)r.m_g << ", "
-		<< (unsigned)r.m_b << ", "
-		<< (unsigned)r.m_a;
+    std::stringstream ss(color);
+    boost::uint32_t hexnumber;
+    
+    if (!(ss >> std::hex >> hexnumber)) {
+        log_error("Failed to convert string to RGBA value! This is a "
+                "Gnash bug");
+        return rgba();
+    }
+
+    rgba ret;
+    ret.parseRGB(hexnumber);
+    return ret;
 }
 
-}	// end namespace gnash
+std::ostream&
+operator<<(std::ostream& os, const rgba& r)
+{
+    return os << "rgba: "
+        << static_cast<unsigned>(r.m_r) << ","
+        << static_cast<unsigned>(r.m_g) << ","
+        << static_cast<unsigned>(r.m_b) << ","
+        << static_cast<unsigned>(r.m_a);
+}
+
+} // namespace gnash
 
 
 // Local Variables:

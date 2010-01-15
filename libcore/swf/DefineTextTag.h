@@ -20,7 +20,7 @@
 #define GNASH_SWF_DEFINETEXTTAG_H
 
 #include "DefinitionTag.h" // for inheritance
-#include "styles.h" 
+#include "LineStyle.h" 
 #include "SWFRect.h" // for composition
 #include "SWF.h"
 #include "movie_definition.h"

@@ -788,7 +788,7 @@ Renderer_cairo::add_path(cairo_t* cr, const Path& cur_path)
 }
 
 void
-Renderer_cairo::apply_line_style(const line_style& style, const cxform& cx)
+Renderer_cairo::apply_line_style(const LineStyle& style, const cxform& cx)
 {
     cairo_line_join_t join_style = CAIRO_LINE_JOIN_MITER;
     switch(style.joinStyle()) {
@@ -854,7 +854,7 @@ Renderer_cairo::apply_line_style(const line_style& style, const cxform& cx)
   
 void
 Renderer_cairo::draw_outlines(const PathVec& path_vec,
-                              const std::vector<line_style>& line_styles,
+                              const std::vector<LineStyle>& line_styles,
                               const cxform& cx)
 {
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
@@ -875,7 +875,7 @@ void
 Renderer_cairo::draw_subshape(const PathVec& path_vec, const SWFMatrix& mat,
                               const cxform& cx,
                               const std::vector<fill_style>& fill_styles,
-                              const std::vector<line_style>& line_styles)
+                              const std::vector<LineStyle>& line_styles)
 { 
     CairoPathRunner runner(*this, path_vec, fill_styles, _cr);
     runner.run(cx, mat);
@@ -966,7 +966,7 @@ Renderer_cairo::drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
     const std::vector<fill_style>& fill_styles = shape.fillStyles();
-    const std::vector<line_style>& line_styles = shape.lineStyles();
+    const std::vector<LineStyle>& line_styles = shape.lineStyles();
 
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
         PathVec subshape_paths;
@@ -996,7 +996,7 @@ Renderer_cairo::drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
     
     const PathVec& path_vec = rec.paths();
     
-    std::vector<line_style> dummy_ls;
+    std::vector<LineStyle> dummy_ls;
     
     CairoScopeMatrix mat_transformer(_cr, mat);
     

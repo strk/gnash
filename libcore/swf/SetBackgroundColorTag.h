@@ -61,8 +61,8 @@ private:
 		// may throw ParserException
 		m_color.read_rgb(in);
 
-		IF_VERBOSE_PARSE (
-		log_parse(_("  SetBackgroundColor: %s"), m_color.toString());
+		IF_VERBOSE_PARSE(
+            log_parse(_("  SetBackgroundColor: %s"), m_color);
 		);
 	}
 

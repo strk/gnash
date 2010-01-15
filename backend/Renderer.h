@@ -159,7 +159,7 @@ namespace gnash {
     class SWFMatrix;
     class cxform;
     class fill_style;
-    class line_style;
+    class LineStyle;
 
     namespace SWF {
         class ShapeRecord;

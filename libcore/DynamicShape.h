@@ -20,7 +20,7 @@
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
 
-#include "styles.h" 
+#include "LineStyle.h" 
 #include "ShapeRecord.h"
 
 namespace gnash {
@@ -110,9 +110,9 @@ public:
 		bool vScale=true, bool hScale=true,
 		bool pixelHinting=false,
 		bool noClose=false,
-		cap_style_e startCapStyle=CAP_ROUND,
-		cap_style_e endCapStyle=CAP_ROUND,
-		join_style_e joinStyle=JOIN_ROUND,
+		CapStyle startCapStyle=CAP_ROUND,
+		CapStyle endCapStyle=CAP_ROUND,
+		JoinStyle joinStyle=JOIN_ROUND,
 		float miterLimitFactor=1.0f);
 
 	/// Reset line style to no style and start a new path.
@@ -138,7 +138,7 @@ public:
 	///	This offset is the one required to properly
 	///	reference it in gnash::path instances.
 	///
-	size_t add_line_style(const line_style& stl);
+	size_t add_line_style(const LineStyle& stl);
 
 	// Override from DefineShapeTag to call ::finalize
 	// NOTE: this is not correct in that a call to hitTest should

@@ -122,7 +122,7 @@ int curve_x_crossings(float x0, float y0, float x1, float y1,
 
 bool
 pointTest(const std::vector<Path>& paths,
-        const std::vector<line_style>& lineStyles, boost::int32_t x,
+        const std::vector<LineStyle>& lineStyles, boost::int32_t x,
         boost::int32_t y, const SWFMatrix& wm)
 {
 
@@ -177,7 +177,7 @@ pointTest(const std::vector<Path>& paths,
         if (pth.m_line != 0 )
         {
             assert(lineStyles.size() >= pth.m_line);
-            const line_style& ls = lineStyles[pth.m_line-1];
+            const LineStyle& ls = lineStyles[pth.m_line-1];
             double thickness = ls.getThickness();
             if (! thickness )
             {

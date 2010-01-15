@@ -111,7 +111,7 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
     }
 
     const boost::uint16_t lineCount = in.read_variable_count();
-    line_style ls1, ls2;
+    LineStyle ls1, ls2;
     for (size_t i = 0; i < lineCount; ++i) {
         ls1.read_morph(in, tag, md, r, &ls2);
         _shape1.addLineStyle(ls1);

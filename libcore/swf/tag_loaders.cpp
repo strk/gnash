@@ -30,7 +30,7 @@
 #include "log.h"
 #include "Geometry.h"
 #include "SWFStream.h"
-#include "styles.h"
+#include "LineStyle.h"
 #include "GnashImage.h"
 #include "zlib_adapter.h"
 #include "sprite_definition.h"

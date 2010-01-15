@@ -6,7 +6,7 @@
 // Fill and line style types.
 
 
-#include "styles.h"
+#include "LineStyle.h"
 #include "log.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
@@ -19,11 +19,11 @@ namespace gnash {
 
 
 //
-// line_style
+// LineStyle
 //
 
     
-line_style::line_style()
+LineStyle::LineStyle()
     :
     m_width(0),
     m_color(),
@@ -39,8 +39,8 @@ line_style::line_style()
 }
 
 void
-line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
-    const RunResources& r, line_style *pOther)
+LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
+    const RunResources& r, LineStyle *pOther)
 {
     if (t == SWF::DEFINEMORPHSHAPE)
     {
@@ -60,14 +60,14 @@ line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
 
     int flags1 = in.read_u8();
     int flags2 = in.read_u8();
-    _startCapStyle =  (cap_style_e)((flags1 & 0xC0) >> 6);
-    _joinStyle     = (join_style_e)((flags1 & 0x30) >> 4);
+    _startCapStyle =  (CapStyle)((flags1 & 0xC0) >> 6);
+    _joinStyle     = (JoinStyle)((flags1 & 0x30) >> 4);
     bool has_fill      =   flags1 & (1 << 3);
     _scaleHorizontally = !(flags1 & (1 << 2));
     _scaleVertically   = !(flags1 & (1 << 1));
     _pixelHinting      =   flags1 & (1 << 0);
     _noClose = flags2 & (1 << 2);
-    _endCapStyle = (cap_style_e) (flags2 & 0x03); 
+    _endCapStyle = (CapStyle) (flags2 & 0x03); 
 
     if (_joinStyle == JOIN_MITER)  
     {
@@ -91,7 +91,7 @@ line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
 }
 
 void
-line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
+LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         const RunResources& r)
 {
     if (!(t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_))
@@ -109,14 +109,14 @@ line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
     int flags1 = in.read_u8();
     int flags2 = in.read_u8();
-    _startCapStyle =  (cap_style_e)((flags1 & 0xC0) >> 6);
-    _joinStyle     = (join_style_e)((flags1 & 0x30) >> 4);
+    _startCapStyle =  (CapStyle)((flags1 & 0xC0) >> 6);
+    _joinStyle     = (JoinStyle)((flags1 & 0x30) >> 4);
     bool has_fill      =   flags1 & (1 << 3);
     _scaleHorizontally = !(flags1 & (1 << 2));
     _scaleVertically   = !(flags1 & (1 << 1));
     _pixelHinting      =   flags1 & (1 << 0);
     _noClose = flags2 & (1 << 2);
-    _endCapStyle = (cap_style_e) (flags2 & 0x03); 
+    _endCapStyle = (CapStyle) (flags2 & 0x03); 
 
     if (_joinStyle == JOIN_MITER) 
     {
@@ -138,7 +138,7 @@ line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 }
 
 void
-line_style::set_lerp(const line_style& ls1, const line_style& ls2, float ratio)
+LineStyle::set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio)
 {
     m_width = static_cast<boost::uint16_t>(
         frnd(flerp(ls1.getThickness(), ls2.getThickness(), ratio)));

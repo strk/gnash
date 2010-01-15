@@ -54,7 +54,8 @@ DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
            tag == DEFINESHAPE4_);
 
     in.ensureBytes(2);
-    boost::uint16_t id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
+
     IF_VERBOSE_PARSE(
         log_parse(_("DefineShapeTag(%s): id = %d"), tag, id);
     );
@@ -65,8 +66,7 @@ DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 DisplayObject*
-DefineShapeTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
-    const
+DefineShapeTag::createDisplayObject(Global_as& gl, DisplayObject* parent) const
 {
 	return new Shape(getRoot(gl), 0, this, parent);
 }
