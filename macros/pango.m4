@@ -101,7 +101,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
 
   if test x"${ac_cv_path_pango_lib}" = x; then
     for i in $libslist; do
-      if test -f $i/libpango-${gnash_pango_version}.a -o -f $i/libpango-${gnash_pango_version}.${shlibext}; then
+      if test -f $i/libpango-${gnash_pango_version}.a -o -f $i/libpango-${gnash_pango_version}.${shlibext} -o -f $i/libpango-${gnash_pango_version}.${shlibext}.a; then
         if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
 	  ac_cv_path_pango_lib="-L$i -lpango-${gnash_pango_version}"
 	  break

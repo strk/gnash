@@ -345,13 +345,12 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
         if test x${top_lib_dir} = x; then top_lib_dir=$i; fi
         AC_MSG_RESULT(${top_lib_dir}/libavcodec)
 	    if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
-          libavcodec="-L$i -lavcodec"
+          ac_cv_path_ffmpeg_lib="-L$i -lavcodec"
        	  break
         else
-          libavcodec="-lavcodec"
+          ac_cv_path_ffmpeg_lib="-lavcodec"
 	      break
         fi
-	    ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavcodec}"
       fi
     done
 
@@ -374,7 +373,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   dnl       from pkg-config, as it would likely bring all
   dnl       required libs in. 
   dnl
-  if test x"${libavcodec}" != x; then
+  if test x"${ac_cv_path_ffmpeg_lib}" != x; then
 
     dnl Look for the DTS library, which is required on some systems. {
     dnl
