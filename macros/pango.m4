@@ -85,7 +85,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   AC_ARG_WITH(pango_lib, AC_HELP_STRING([--with-pango-lib], [directory where pango library is]), with_pango_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_pango_lib,[
     if test x"${with_pango_lib}" != x ; then
-      if test -f ${with_pango_lib}/libpangox-${gnash_pango_version}.a -o -f ${with_pango_lib}/libpango-x11-${gnash_pango_version}.${shlibext} -o -f ${with_pango_lib}/libpangox-${gnash_pango_version}.${shlibext}.a; then
+      if test -f ${with_pango_lib}/libpangox-${gnash_pango_version}.a -o -f ${with_pango_lib}/libpangox-${gnash_pango_version}.${shlibext} -o -f ${with_pango_lib}/libpangox-${gnash_pango_version}.${shlibext}.a; then
 	ac_cv_path_pango_lib=-L`(cd ${with_pango_lib}; pwd)`
       else
 	AC_MSG_ERROR([${with_pango_lib} directory doesn't contain libpango.])
