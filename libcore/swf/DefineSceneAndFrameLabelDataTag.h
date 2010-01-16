@@ -78,13 +78,13 @@ private:
         
         boost::uint32_t scenes = in.read_V32();
 
-        log_parse("Scene count: %d", scenes);
+        IF_VERBOSE_PARSE(log_parse("Scene count: %d", scenes));
 
         for (size_t i = 0; i < scenes; ++i) {
             boost::uint32_t offset = in.read_V32();
             std::string name;
             in.read_string(name);
-            log_parse("Offset %d name: %s", offset, name);
+            IF_VERBOSE_PARSE(log_parse("Offset %d name: %s", offset, name));
             _scenes[offset] = name;
         }
 
@@ -94,7 +94,7 @@ private:
             boost::uint32_t num = in.read_V32();
             std::string label;
             in.read_string(label);
-            log_parse("Frame %d label: %s", num, label);
+            IF_VERBOSE_PARSE(log_parse("Frame %d label: %s", num, label));
             _frames[num] = label;
         }
 

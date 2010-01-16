@@ -77,7 +77,9 @@ public:
 			boost::uint16_t id = in.read_u16();
 			std::string name;
 			in.read_string(name);
+			IF_VERBOSE_PARSE(
 			log_parse("Symbol %u name %s, character %u", i, name, id);
+			);
             
             SymbolClassTag* st = new SymbolClassTag(name);
 			
