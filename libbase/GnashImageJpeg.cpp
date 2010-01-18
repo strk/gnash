@@ -96,7 +96,7 @@ public:
 	jpeg_source_mgr	m_pub;		/* public fields */
 
 	// Constructor.
-	rw_source_IOChannel(boost::shared_ptr<IOChannel> in)
+	explicit rw_source_IOChannel(boost::shared_ptr<IOChannel> in)
 		:
 		_ownSourceStream(false),
 		m_in_stream(in),

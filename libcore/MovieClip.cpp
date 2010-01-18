@@ -97,7 +97,7 @@ class ConstructEvent: public ExecutableCode {
 
 public:
 
-    ConstructEvent(MovieClip* nTarget)
+    explicit ConstructEvent(MovieClip* nTarget)
         :
         _target(nTarget)
     {}
@@ -355,7 +355,7 @@ private:
 class BoundsFinder
 {
 public:
-    BoundsFinder(SWFRect& b) : _bounds(b) {}
+    explicit BoundsFinder(SWFRect& b) : _bounds(b) {}
 
     void operator() (DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
@@ -2123,7 +2123,7 @@ class EnumerateVisitor {
     as_environment& _env;
 
 public:
-    EnumerateVisitor(as_environment& env)
+    explicit EnumerateVisitor(as_environment& env)
         :
         _env(env)
     {}
