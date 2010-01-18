@@ -1,4 +1,4 @@
-// GnashAlgorithm.h:  Moderately useful functors for generic algorithms
+// GnashAlgorithm.h: useful templates and functors for generic algorithms
 //
 //   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 //
@@ -163,7 +163,7 @@ void
 deleteChecked(T begin, T end)
 {
     typedef typename std::iterator_traits<T>::value_type value_type;
-    std::for_each(begin, end, CheckedDeleter<typename T::value_type>());
+    std::for_each(begin, end, CheckedDeleter<value_type>());
 }
 
 /// Safely call delete on each second element in a range of pairs.
@@ -179,8 +179,7 @@ void
 deleteSecondElements(T begin, T end)
 {
     typedef SecondElement<typename std::iterator_traits<T>::value_type> S;
-    CheckedDeleter<typename S::result_type> op;
-    foreachSecond(begin, end, op);
+    foreachSecond(begin, end, CheckedDeleter<typename S::result_type>());
 }
 
             
