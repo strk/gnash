@@ -139,8 +139,9 @@ ImageRGBA::~ImageRGBA()
 }
 
 
-void ImageRGBA::setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
-// Set the pixel at the given position.
+void
+ImageRGBA::setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g,
+        boost::uint8_t b, boost::uint8_t a)
 {
     assert(x < _width);
     assert(y < _height);
