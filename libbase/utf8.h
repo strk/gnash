@@ -57,89 +57,89 @@ namespace utf8
 {
     static const boost::uint32_t invalid = std::numeric_limits<boost::uint32_t>::max();
 
-	/// Converts a std::string with multibyte characters into a std::wstring.
-	//
-	/// @return a version-dependent wstring.
-	/// @param str the canonical string to convert.
-	/// @param version the SWF version, used to decide how to decode the string.
-	//
-	/// For SWF5, UTF-8 (or any other) multibyte encoded characters are
-	/// converted char by char, mangling the string. 
-	DSOEXPORT std::wstring decodeCanonicalString(const std::string& str, int version);
+    /// Converts a std::string with multibyte characters into a std::wstring.
+    //
+    /// @return a version-dependent wstring.
+    /// @param str the canonical string to convert.
+    /// @param version the SWF version, used to decide how to decode the string.
+    //
+    /// For SWF5, UTF-8 (or any other) multibyte encoded characters are
+    /// converted char by char, mangling the string. 
+    DSOEXPORT std::wstring decodeCanonicalString(const std::string& str, int version);
 
-	/// Converts a std::wstring into canonical std::string.
-	//
-	/// @return a version-dependent encoded std::string.
-	/// @param wstr the wide string to convert.
-	/// @param version the SWF version, used to decide how to encode the string.
-	///
-	/// For SWF 5, each character is stored as an 8-bit (at least) char, rather
-	/// than converting it to a canonical UTF-8 byte sequence. Gnash can then
-	/// distinguish between 8-bit characters, which it handles correctly, and 
-	/// multi-byte characters, which are regarded as multiple characters for
-	/// string methods. 
-	DSOEXPORT std::string encodeCanonicalString(const std::wstring& wstr, int version);
+    /// Converts a std::wstring into canonical std::string.
+    //
+    /// @return a version-dependent encoded std::string.
+    /// @param wstr the wide string to convert.
+    /// @param version the SWF version, used to decide how to encode the string.
+    ///
+    /// For SWF 5, each character is stored as an 8-bit (at least) char, rather
+    /// than converting it to a canonical UTF-8 byte sequence. Gnash can then
+    /// distinguish between 8-bit characters, which it handles correctly, and 
+    /// multi-byte characters, which are regarded as multiple characters for
+    /// string methods. 
+    DSOEXPORT std::string encodeCanonicalString(const std::wstring& wstr, int version);
 
-	/// Return the next Unicode character in the UTF-8 encoded string.
-	//
-	/// Invalid UTF-8 sequences produce a U+FFFD character
-	/// as output.  Advances string iterator past the character
-	/// returned, unless the returned character is '\0', in which
-	/// case the iterator does not advance.
-	DSOEXPORT boost::uint32_t decodeNextUnicodeCharacter(std::string::const_iterator& it,
-	                                                     const std::string::const_iterator& e);
+    /// Return the next Unicode character in the UTF-8 encoded string.
+    //
+    /// Invalid UTF-8 sequences produce a U+FFFD character
+    /// as output.  Advances string iterator past the character
+    /// returned, unless the returned character is '\0', in which
+    /// case the iterator does not advance.
+    DSOEXPORT boost::uint32_t decodeNextUnicodeCharacter(std::string::const_iterator& it,
+                                                         const std::string::const_iterator& e);
 
-	/// \brief Encodes the given wide character into a canonical
-	/// string, theoretically up to 6 chars in length.
-	DSOEXPORT std::string encodeUnicodeCharacter(boost::uint32_t ucs_character);
-	
-	/// Encodes the given wide character into an at least 8-bit character.
-	//
-	/// Allows storage of Latin1 (ISO-8859-1) characters. This
-	/// is the format of SWF5 and below.
-	DSOEXPORT std::string encodeLatin1Character(boost::uint32_t ucsCharacter);
+    /// \brief Encodes the given wide character into a canonical
+    /// string, theoretically up to 6 chars in length.
+    DSOEXPORT std::string encodeUnicodeCharacter(boost::uint32_t ucs_character);
+    
+    /// Encodes the given wide character into an at least 8-bit character.
+    //
+    /// Allows storage of Latin1 (ISO-8859-1) characters. This
+    /// is the format of SWF5 and below.
+    DSOEXPORT std::string encodeLatin1Character(boost::uint32_t ucsCharacter);
 
-	enum TextEncoding {
-		encUNSPECIFIED,
-		encUTF8,
-		encUTF16BE,
-		encUTF16LE,
-		encUTF32BE,
-		encUTF32LE,
-		encSCSU,
-		encUTF7,
-		encUTFEBCDIC,
-		encBOCU1
-	};
+    enum TextEncoding {
+        encUNSPECIFIED,
+        encUTF8,
+        encUTF16BE,
+        encUTF16LE,
+        encUTF32BE,
+        encUTF32LE,
+        encSCSU,
+        encUTF7,
+        encUTFEBCDIC,
+        encBOCU1
+    };
 
-	/// Interpret (and skip) Byte Order Mark in input stream
-	//
-	/// This function takes a pointer to a buffer and returns
-	/// the start of actual data after an eventual BOM.
-	/// No conversion is performed, no bytes copy, just skipping of
-	/// the BOM snippet and interpretation of it returned to the
-	/// encoding input parameter.
-	///
-	/// See http://en.wikipedia.org/wiki/Byte-order_mark
-	///
-	/// @param in
-	///	The input buffer.
-	///
-	/// @param size
-	///	Size of the input buffer, will be decremented by the
-	///	size of the BOM, if any.
-	///
-	/// @param encoding
-	///	Output parameter, will always be set.
-	///	encUNSPECIFIED if no BOM is found.
-	///
-	/// @returns
-	///	A pointer either equal to 'in' or some bytes inside it.
-	///
-	DSOEXPORT char* stripBOM(char* in, size_t& size, TextEncoding& encoding);
+    /// Interpret (and skip) Byte Order Mark in input stream
+    //
+    /// This function takes a pointer to a buffer and returns
+    /// the start of actual data after an eventual BOM.
+    /// No conversion is performed, no bytes copy, just skipping of
+    /// the BOM snippet and interpretation of it returned to the
+    /// encoding input parameter.
+    ///
+    /// See http://en.wikipedia.org/wiki/Byte-order_mark
+    ///
+    /// @param in
+    ///    The input buffer.
+    ///
+    /// @param size
+    ///    Size of the input buffer, will be decremented by the
+    ///    size of the BOM, if any.
+    ///
+    /// @param encoding
+    ///    Output parameter, will always be set.
+    ///    encUNSPECIFIED if no BOM is found.
+    ///
+    /// @returns
+    ///    A pointer either equal to 'in' or some bytes inside it.
+    ///
+    DSOEXPORT char* stripBOM(char* in, size_t& size, TextEncoding& encoding);
 
-	/// Return name of a text encoding
-	DSOEXPORT const char* textEncodingName(TextEncoding enc);
+    /// Return name of a text encoding
+    DSOEXPORT const char* textEncodingName(TextEncoding enc);
 }
 
 
