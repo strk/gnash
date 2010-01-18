@@ -44,8 +44,51 @@ namespace gnash {
 class PngImageInput : public ImageInput
 {
 
+public:
+
+    /// Construct a PngImageInput object to read from an IOChannel.
+    //
+    /// @param in   The stream to read PNG data from. Ownership is shared
+    ///             between caller and JpegImageInput, so it is freed
+    ///             automatically when the last owner is destroyed.
+    PngImageInput(boost::shared_ptr<IOChannel> in);
+    
+    ~PngImageInput();
+    
+    /// Begin processing the image data.
+    void read();
+
+    /// Get the image's height in pixels.
+    //
+    /// @return     The height of the image in pixels.
+    size_t getHeight() const;
+
+    /// Get the image's width in pixels.
+    //
+    /// @return     The width of the image in pixels.
+    size_t getWidth() const;
+
+    /// Read a scanline's worth of image data into the given buffer.
+    //
+    /// The amount of data read is getWidth() * getComponents().
+    ///
+    /// @param rgbData  The buffer for writing raw RGB data to.
+    void readScanline(unsigned char* imageData);
+
+    /// Create a PngImageInput and transfer ownership to the caller.
+    //
+    /// @param in   The IOChannel to read PNG data from.
+    DSOEXPORT static std::auto_ptr<ImageInput> create(
+            boost::shared_ptr<IOChannel> in)
+    {
+        std::auto_ptr<ImageInput> ret ( new PngImageInput(in) );
+        if (ret.get()) ret->read();
+        return ret;
+    }
+
 private:
-	// State needed for input.
+
+    // State needed for input.
     png_structp _pngPtr;
     png_infop _infoPtr;
     boost::scoped_array<png_bytep> _rowPtrs;
@@ -56,51 +99,9 @@ private:
 
     void init();
 
-	// Return number of components (i.e. == 3 for RGB
-	// data).
+    // Return number of components (i.e. == 3 for RGB
+    // data).
     size_t getComponents() const;
-
-public:
-
-	/// Construct a PngImageInput object to read from an IOChannel.
-	//
-	/// @param in   The stream to read PNG data from. Ownership is shared
-    ///             between caller and JpegImageInput, so it is freed
-    ///             automatically when the last owner is destroyed.
-	PngImageInput(boost::shared_ptr<IOChannel> in);
-	
-	~PngImageInput();
-	
-    /// Begin processing the image data.
-    void read();
-
-	/// Get the image's height in pixels.
-    //
-    /// @return     The height of the image in pixels.
-	size_t getHeight() const;
-
-	/// Get the image's width in pixels.
-    //
-    /// @return     The width of the image in pixels.
-	size_t getWidth() const;
-
-	/// Read a scanline's worth of image data into the given buffer.
-    //
-    /// The amount of data read is getWidth() * getComponents().
-	///
-    /// @param rgbData  The buffer for writing raw RGB data to.
-	void readScanline(unsigned char* imageData);
-
-
-    /// Create a PngImageInput and transfer ownership to the caller.
-    //
-    /// @param in   The IOChannel to read PNG data from.
-    DSOEXPORT static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
-    {
-        std::auto_ptr<ImageInput> ret ( new PngImageInput(in) );
-        if (ret.get()) ret->read();
-        return ret;
-    }
 
 };
 
@@ -112,20 +113,21 @@ public:
 
     /// Create an output object bound to a gnash::IOChannel
     //
-    /// @param out     The IOChannel used for output. Must be kept alive throughout
-    ///
+    /// @param out      The IOChannel used for output. Must be kept alive
+    ///                 throughout
     /// @param quality Unused in PNG output
-    PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality);
-	
+    PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width,
+            size_t height, int quality);
+    
     ~PngImageOutput();
 
     void writeImageRGB(const unsigned char* rgbData);
-	
+    
     void writeImageRGBA(const unsigned char* rgbaData);
 
     static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out,
             size_t width, size_t height, int quality);
-	
+    
 private:
 
     /// Initialize libpng.
@@ -134,7 +136,7 @@ private:
     /// Libpng structures for image and output state.
     png_structp _pngPtr;
     png_infop _infoPtr;
-	
+    
 };
 
 } // namespace gnash
