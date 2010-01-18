@@ -636,7 +636,7 @@ MovieClip::notifyEvent(const event_id& id)
         return;
     }
 
-    if (id.is_button_event() && ! isEnabled()) {
+    if (isButtonEvent(id) && !isEnabled()) {
 #ifdef GNASH_DEBUG
         log_debug(_("Sprite %s ignored button-like event %s as not 'enabled'"),
             getTarget(), id);
@@ -706,14 +706,14 @@ MovieClip::notifyEvent(const event_id& id)
     }
 
     // Check for member function.
-    if (!id.is_key_event()) {
+    if (isKeyEvent(id)) {
         callMethod(getObject(this), id.functionKey());
     }
 
     // TODO: if this was UNLOAD release as much memory as possible ?
-    //             Verify if this is possible, in particular check order in
-    //             which unload handlers of parent and childs is performed
-    //             and wheter unload of child can access members of parent.
+    // Verify if this is possible, in particular check order in
+    // which unload handlers of parent and childs is performed
+    // and whether unload of child can access members of parent.
 
 }
 

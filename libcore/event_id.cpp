@@ -1,4 +1,4 @@
-// action.cpp:  ActionScript execution, for Gnash.
+// event_id.cpp:  static ActionScript events for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
@@ -31,10 +31,6 @@
 #include <boost/assign/list_of.hpp>
 
 namespace gnash {
-
-//
-// event_id
-//
 
 const std::string&
 event_id::functionName() const
@@ -98,29 +94,9 @@ event_id::functionKey() const
 }
 
 bool
-event_id::is_mouse_event() const
+isKeyEvent(const event_id& e) 
 {
-	switch (_id)
-	{
-		case event_id::PRESS:
-		case event_id::RELEASE:
-		case event_id::RELEASE_OUTSIDE:
-		case event_id::MOUSE_UP:
-		case event_id::MOUSE_DOWN:
-		case event_id::ROLL_OVER:
-		case event_id::ROLL_OUT:
-		case event_id::DRAG_OVER:
-		case event_id::DRAG_OUT:
-			return true;
-		default:
-			return false;
-	}
-}
-
-bool
-event_id::is_key_event() const
-{
-	switch (_id)
+	switch (e.id())
 	{
 		case event_id::KEY_DOWN:
 		case event_id::KEY_PRESS:
@@ -132,9 +108,9 @@ event_id::is_key_event() const
 }
 
 bool
-event_id::is_button_event() const
+isButtonEvent(const event_id& e)
 {
-	switch (_id)
+	switch (e.id())
 	{
 		case event_id::PRESS:
 		case event_id::RELEASE:
