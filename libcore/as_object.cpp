@@ -641,11 +641,6 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     // TODO: in this case, return the underlying value !
     as_value curVal = prop ? prop->getCache() : as_value(); 
 
-    log_debug("Existing property %s is being watched: "
-            "firing trigger on update (current val:%s, "
-            "new val:%s)",
-            getStringTable(*this).value(getName(uri)), curVal, val);
-
     as_value newVal = trig.call(curVal, val, *this);
     
     // This is a particularly clear and concise way of removing dead triggers.
@@ -656,12 +651,8 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     // so we check for its existence again, and do NOT put
     // it back in if it was deleted
     prop = findUpdatableProperty(uri);
-    if (!prop) {
-        log_debug("Property %s deleted by trigger on update",
-                getStringTable(*this).value(getName(uri)));
-        // Return true?
-        return;
-    }
+    if (!prop) return;
+
     prop->setValue(*this, newVal); 
     prop->clearVisible(getSWFVersion(*this));
     
