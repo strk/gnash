@@ -477,8 +477,12 @@ Machine::execute()
 
                     ENSURE_OBJECT(_stack.top(0));
                     
-                    as_object* super = _stack.pop().to_object(*_global)->
-                        get_prototype();
+                    // This is all wrong. It needs fixing once supers are
+                    // correctly implemented.
+                    as_object* obj = _stack.pop().to_object(*_global);
+                    if (!obj) throw ASReferenceError();
+
+                    as_object* super = obj->get_prototype();
                     if (!super) throw ASReferenceError();
 
                     const ObjectURI uri(a.getGlobalName(),
