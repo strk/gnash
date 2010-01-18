@@ -45,9 +45,9 @@ std::auto_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& /*url*/, 
         const std::string& /*cachefile*/)
 {
-	log_error(_("libcurl is not available, but "
-	            "Gnash has attempted to use the curl adapter"));
-	return std::auto_ptr<IOChannel>();
+    log_error(_("libcurl is not available, but "
+                "Gnash has attempted to use the curl adapter"));
+    return std::auto_ptr<IOChannel>();
 }
 
 std::auto_ptr<IOChannel>
@@ -107,121 +107,121 @@ class CurlSession {
 
 public:
 
-	/// Get CurlSession singleton
-	static CurlSession& get();
+    /// Get CurlSession singleton
+    static CurlSession& get();
 
-	/// Get the shared handle
-	CURLSH* getSharedHandle() { return _shandle; }
+    /// Get the shared handle
+    CURLSH* getSharedHandle() { return _shandle; }
 
 private:
 
-	/// Initialize a libcurl session
-	//
-	/// A libcurl session consists in a shared handle
-	/// sharing DNS cache and COOKIES.
-	///
-	/// Also, global libcurl initialization function will
-	/// be invoked, so MAKE SURE NOT TO CONSTRUCT multiple
-	/// CurlSession instances in a multithreaded environment!
-	///
-	/// AGAIN: this is NOT thread-safe !
-	///
-	CurlSession();
+    /// Initialize a libcurl session
+    //
+    /// A libcurl session consists in a shared handle
+    /// sharing DNS cache and COOKIES.
+    ///
+    /// Also, global libcurl initialization function will
+    /// be invoked, so MAKE SURE NOT TO CONSTRUCT multiple
+    /// CurlSession instances in a multithreaded environment!
+    ///
+    /// AGAIN: this is NOT thread-safe !
+    ///
+    CurlSession();
 
-	/// Cleanup curl session stuff (including global lib init)
-	~CurlSession();
+    /// Cleanup curl session stuff (including global lib init)
+    ~CurlSession();
 
 
-	// the libcurl share handle, for sharing cookies
-	CURLSH* _shandle;
+    // the libcurl share handle, for sharing cookies
+    CURLSH* _shandle;
 
-	// mutex protecting share state
-	boost::mutex _shareMutex;
-	boost::mutex::scoped_lock _shareMutexLock;
+    // mutex protecting share state
+    boost::mutex _shareMutex;
+    boost::mutex::scoped_lock _shareMutexLock;
 
-	// mutex protecting shared cookies
-	boost::mutex _cookieMutex;
-	boost::mutex::scoped_lock _cookieMutexLock;
+    // mutex protecting shared cookies
+    boost::mutex _cookieMutex;
+    boost::mutex::scoped_lock _cookieMutexLock;
 
-	// mutex protecting shared dns cache
-	boost::mutex _dnscacheMutex;
-	boost::mutex::scoped_lock _dnscacheMutexLock;
+    // mutex protecting shared dns cache
+    boost::mutex _dnscacheMutex;
+    boost::mutex::scoped_lock _dnscacheMutexLock;
 
-	/// Import cookies, if requested
-	//
-	/// This method will lookup GNASH_COOKIES_IN
-	/// in the environment, and if existing, will
-	/// parse the file sending each line to a fake
-	/// easy handle created ad-hoc
-	///
-	void importCookies();
+    /// Import cookies, if requested
+    //
+    /// This method will lookup GNASH_COOKIES_IN
+    /// in the environment, and if existing, will
+    /// parse the file sending each line to a fake
+    /// easy handle created ad-hoc
+    ///
+    void importCookies();
 
-	/// Export cookies, if requested
-	//
-	/// This method will lookup GNASH_COOKIES_OUT
-	/// in the environment, and if existing, will
-	/// create the file writing any cookie currently
-	/// in the jar
-	///
-	void exportCookies();
+    /// Export cookies, if requested
+    //
+    /// This method will lookup GNASH_COOKIES_OUT
+    /// in the environment, and if existing, will
+    /// create the file writing any cookie currently
+    /// in the jar
+    ///
+    void exportCookies();
 
-	/// Shared handle data locking function
-	void lockSharedHandle(CURL* handle, curl_lock_data data,
+    /// Shared handle data locking function
+    void lockSharedHandle(CURL* handle, curl_lock_data data,
             curl_lock_access access);
 
-	/// Shared handle data unlocking function
-	void unlockSharedHandle(CURL* handle, curl_lock_data data);
+    /// Shared handle data unlocking function
+    void unlockSharedHandle(CURL* handle, curl_lock_data data);
 
-	/// Shared handle locking function
-	static void lockSharedHandleWrapper(CURL* handle, curl_lock_data data,
+    /// Shared handle locking function
+    static void lockSharedHandleWrapper(CURL* handle, curl_lock_data data,
             curl_lock_access access, void* userptr)
-	{
-		CurlSession* ci = static_cast<CurlSession*>(userptr);
-		ci->lockSharedHandle(handle, data, access);
-	}
+    {
+        CurlSession* ci = static_cast<CurlSession*>(userptr);
+        ci->lockSharedHandle(handle, data, access);
+    }
 
-	/// Shared handle unlocking function
-	static void unlockSharedHandleWrapper(CURL* handle, curl_lock_data data,
+    /// Shared handle unlocking function
+    static void unlockSharedHandleWrapper(CURL* handle, curl_lock_data data,
             void* userptr)
-	{
-		// data defines what data libcurl wants to unlock, and you must
+    {
+        // data defines what data libcurl wants to unlock, and you must
         // make sure that only one lock is given at any time for each kind
         // of data.
-		// userptr is the pointer you set with CURLSHOPT_USERDATA. 
-		CurlSession* ci = static_cast<CurlSession*>(userptr);
-		ci->unlockSharedHandle(handle, data);
-	}
+        // userptr is the pointer you set with CURLSHOPT_USERDATA. 
+        CurlSession* ci = static_cast<CurlSession*>(userptr);
+        ci->unlockSharedHandle(handle, data);
+    }
 
 };
 
 CurlSession&
 CurlSession::get()
 {
-	static CurlSession cs;
-	return cs;
+    static CurlSession cs;
+    return cs;
 }
 
 CurlSession::~CurlSession()
 {
-	log_debug("~CurlSession");
-	exportCookies();
+    log_debug("~CurlSession");
+    exportCookies();
 
-	CURLSHcode code;
-	int retries=0;
-	while ( (code=curl_share_cleanup(_shandle)) != CURLSHE_OK )
-	{
-		if ( ++retries > 10 )
-		{
-			log_error("Failed cleaning up share handle: %s. Giving up after "
+    CURLSHcode code;
+    int retries=0;
+    while ( (code=curl_share_cleanup(_shandle)) != CURLSHE_OK )
+    {
+        if ( ++retries > 10 )
+        {
+            log_error("Failed cleaning up share handle: %s. Giving up after "
                     "%d retries.", curl_share_strerror(code), retries);
-			break;
-		}
-		log_error("Failed cleaning up share handle: %s. Will try again in "
+            break;
+        }
+        log_error("Failed cleaning up share handle: %s. Will try again in "
                 "a second.", curl_share_strerror(code));
-		gnashSleep(1000000);
-	}
-	_shandle = 0;
-	curl_global_cleanup();
+        gnashSleep(1000000);
+    }
+    _shandle = 0;
+    curl_global_cleanup();
 }
 
 #if BOOST_VERSION < 103500
@@ -231,142 +231,142 @@ CurlSession::~CurlSession()
 #endif
 
 CurlSession::CurlSession()
-	:
-	_shandle(0),
-	_shareMutex(),
-	_shareMutexLock(_shareMutex, GNASH_DEFER_LOCK), // start unlocked
-	_cookieMutex(),
-	_cookieMutexLock(_cookieMutex, GNASH_DEFER_LOCK), // start unlocked
-	_dnscacheMutex(),
-	_dnscacheMutexLock(_dnscacheMutex, GNASH_DEFER_LOCK) // start unlocked
+    :
+    _shandle(0),
+    _shareMutex(),
+    _shareMutexLock(_shareMutex, GNASH_DEFER_LOCK), // start unlocked
+    _cookieMutex(),
+    _cookieMutexLock(_cookieMutex, GNASH_DEFER_LOCK), // start unlocked
+    _dnscacheMutex(),
+    _dnscacheMutexLock(_dnscacheMutex, GNASH_DEFER_LOCK) // start unlocked
 {
-	// TODO: handle an error here (throw an exception)
-	curl_global_init(CURL_GLOBAL_ALL);
+    // TODO: handle an error here (throw an exception)
+    curl_global_init(CURL_GLOBAL_ALL);
 
-	_shandle = curl_share_init();
-	if (! _shandle) {
-		throw GnashException("Failure initializing curl share handle");
+    _shandle = curl_share_init();
+    if (! _shandle) {
+        throw GnashException("Failure initializing curl share handle");
     }
 
-	CURLSHcode ccode;
+    CURLSHcode ccode;
 
-	// Register share locking function
-	ccode = curl_share_setopt(_shandle, CURLSHOPT_LOCKFUNC,
+    // Register share locking function
+    ccode = curl_share_setopt(_shandle, CURLSHOPT_LOCKFUNC,
             lockSharedHandleWrapper);
-	if ( ccode != CURLSHE_OK ) {
-		throw GnashException(curl_share_strerror(ccode));
-	}
+    if ( ccode != CURLSHE_OK ) {
+        throw GnashException(curl_share_strerror(ccode));
+    }
 
-	// Register share unlocking function
-	ccode = curl_share_setopt(_shandle, CURLSHOPT_UNLOCKFUNC,
+    // Register share unlocking function
+    ccode = curl_share_setopt(_shandle, CURLSHOPT_UNLOCKFUNC,
             unlockSharedHandleWrapper);
-	if ( ccode != CURLSHE_OK ) {
-		throw GnashException(curl_share_strerror(ccode));
-	}
+    if ( ccode != CURLSHE_OK ) {
+        throw GnashException(curl_share_strerror(ccode));
+    }
 
-	// Activate sharing of cookies and DNS cache
-	ccode = curl_share_setopt(_shandle, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
-	if ( ccode != CURLSHE_OK ) {
-		throw GnashException(curl_share_strerror(ccode));
-	}
+    // Activate sharing of cookies and DNS cache
+    ccode = curl_share_setopt(_shandle, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
+    if ( ccode != CURLSHE_OK ) {
+        throw GnashException(curl_share_strerror(ccode));
+    }
 
-	// Activate sharing of DNS cache (since we're there..)
-	ccode = curl_share_setopt(_shandle, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
-	if ( ccode != CURLSHE_OK ) {
-		throw GnashException(curl_share_strerror(ccode));
-	}
+    // Activate sharing of DNS cache (since we're there..)
+    ccode = curl_share_setopt(_shandle, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
+    if ( ccode != CURLSHE_OK ) {
+        throw GnashException(curl_share_strerror(ccode));
+    }
 
-	// Pass ourselves as the userdata
-	ccode = curl_share_setopt(_shandle, CURLSHOPT_USERDATA, this);
-	if ( ccode != CURLSHE_OK ) {
-		throw GnashException(curl_share_strerror(ccode));
-	}
+    // Pass ourselves as the userdata
+    ccode = curl_share_setopt(_shandle, CURLSHOPT_USERDATA, this);
+    if ( ccode != CURLSHE_OK ) {
+        throw GnashException(curl_share_strerror(ccode));
+    }
 
-	importCookies();
+    importCookies();
 }
 
 void
 CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data,
         curl_lock_access access)
 {
-	UNUSED(handle); // possibly being the 'easy' handle triggering the request ?
+    UNUSED(handle); // possibly being the 'easy' handle triggering the request ?
 
-	// data defines what data libcurl wants to lock, and you must make
+    // data defines what data libcurl wants to lock, and you must make
     // sure that only one lock is given at any time for each kind of data.
-	// access defines what access type libcurl wants, shared or single.
+    // access defines what access type libcurl wants, shared or single.
 
-	// TODO: see if we may make use of the 'access' parameter
-	UNUSED(access);
+    // TODO: see if we may make use of the 'access' parameter
+    UNUSED(access);
 
-	switch (data)
-	{
-		case CURL_LOCK_DATA_DNS:
-			//log_debug("Locking DNS cache mutex");
-			_dnscacheMutexLock.lock();
-			//log_debug("DNS cache mutex locked");
-			break;
-		case CURL_LOCK_DATA_COOKIE:
-			//log_debug("Locking cookies mutex");
-			_cookieMutexLock.lock(); 
-			//log_debug("Cookies mutex locked");
-			break;
-		case CURL_LOCK_DATA_SHARE:
-			//log_debug("Locking share mutex");
-			_shareMutexLock.lock(); 
-			//log_debug("Share mutex locked");
-			break;
-		case CURL_LOCK_DATA_SSL_SESSION:
-			log_error("lockSharedHandle: SSL session locking "
+    switch (data)
+    {
+        case CURL_LOCK_DATA_DNS:
+            //log_debug("Locking DNS cache mutex");
+            _dnscacheMutexLock.lock();
+            //log_debug("DNS cache mutex locked");
+            break;
+        case CURL_LOCK_DATA_COOKIE:
+            //log_debug("Locking cookies mutex");
+            _cookieMutexLock.lock(); 
+            //log_debug("Cookies mutex locked");
+            break;
+        case CURL_LOCK_DATA_SHARE:
+            //log_debug("Locking share mutex");
+            _shareMutexLock.lock(); 
+            //log_debug("Share mutex locked");
+            break;
+        case CURL_LOCK_DATA_SSL_SESSION:
+            log_error("lockSharedHandle: SSL session locking "
                     "unsupported");
-			break;
-		case CURL_LOCK_DATA_CONNECT:
-			log_error("lockSharedHandle: connect locking unsupported");
-			break;
-		case CURL_LOCK_DATA_LAST:
-			log_error("lockSharedHandle: last locking unsupported ?!");
-			break;
-		default:
-			log_error("lockSharedHandle: unknown shared data %d", data);
-			break;
-	}
+            break;
+        case CURL_LOCK_DATA_CONNECT:
+            log_error("lockSharedHandle: connect locking unsupported");
+            break;
+        case CURL_LOCK_DATA_LAST:
+            log_error("lockSharedHandle: last locking unsupported ?!");
+            break;
+        default:
+            log_error("lockSharedHandle: unknown shared data %d", data);
+            break;
+    }
 }
 
 void
 CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
 {
-	UNUSED(handle); // possibly being the 'easy' handle triggering the request ?
+    UNUSED(handle); // possibly being the 'easy' handle triggering the request ?
 
-	// data defines what data libcurl wants to lock, and you must make
+    // data defines what data libcurl wants to lock, and you must make
     // sure that only one lock is given at any time for each kind of data.
-	switch (data)
-	{
-		case CURL_LOCK_DATA_DNS:
-			//log_debug("Unlocking DNS cache mutex");
-			_dnscacheMutexLock.unlock();
-			break;
-		case CURL_LOCK_DATA_COOKIE:
-			//log_debug("Unlocking cookies mutex");
-			_cookieMutexLock.unlock();
-			break;
-		case CURL_LOCK_DATA_SHARE:
-			//log_debug("Unlocking share mutex");
-			_shareMutexLock.unlock();
-			break;
-		case CURL_LOCK_DATA_SSL_SESSION:
-			log_error("unlockSharedHandle: SSL session locking "
+    switch (data)
+    {
+        case CURL_LOCK_DATA_DNS:
+            //log_debug("Unlocking DNS cache mutex");
+            _dnscacheMutexLock.unlock();
+            break;
+        case CURL_LOCK_DATA_COOKIE:
+            //log_debug("Unlocking cookies mutex");
+            _cookieMutexLock.unlock();
+            break;
+        case CURL_LOCK_DATA_SHARE:
+            //log_debug("Unlocking share mutex");
+            _shareMutexLock.unlock();
+            break;
+        case CURL_LOCK_DATA_SSL_SESSION:
+            log_error("unlockSharedHandle: SSL session locking "
                     "unsupported");
-			break;
-		case CURL_LOCK_DATA_CONNECT:
-			log_error("unlockSharedHandle: connect locking unsupported");
-			break;
-		case CURL_LOCK_DATA_LAST:
-			log_error("unlockSharedHandle: last locking unsupported ?!");
-			break;
-		default:
-			std::cerr << "unlockSharedHandle: unknown shared data " <<
+            break;
+        case CURL_LOCK_DATA_CONNECT:
+            log_error("unlockSharedHandle: connect locking unsupported");
+            break;
+        case CURL_LOCK_DATA_LAST:
+            log_error("unlockSharedHandle: last locking unsupported ?!");
+            break;
+        default:
+            std::cerr << "unlockSharedHandle: unknown shared data " <<
                 data << std::endl;
-			break;
-	}
+            break;
+    }
 }
 
 
@@ -382,122 +382,122 @@ class CurlStreamFile : public IOChannel
 
 public:
 
-	typedef std::map<std::string, std::string> PostData;
+    typedef std::map<std::string, std::string> PostData;
 
-	/// Open a stream from the specified URL
-	CurlStreamFile(const std::string& url, const std::string& cachefile);
+    /// Open a stream from the specified URL
+    CurlStreamFile(const std::string& url, const std::string& cachefile);
 
-	/// Open a stream from the specified URL posting the specified variables
-	//
-	/// @param url
-	///	The url to post to.
-	///
-	/// @param vars
-	///	The url-encoded post data.
-	///
-	CurlStreamFile(const std::string& url, const std::string& vars,
+    /// Open a stream from the specified URL posting the specified variables
+    //
+    /// @param url
+    ///    The url to post to.
+    ///
+    /// @param vars
+    ///    The url-encoded post data.
+    ///
+    CurlStreamFile(const std::string& url, const std::string& vars,
             const std::string& cachefile);
-	
-	CurlStreamFile(const std::string& url, const std::string& vars,
-	               const NetworkAdapter::RequestHeaders& headers,
+    
+    CurlStreamFile(const std::string& url, const std::string& vars,
+                   const NetworkAdapter::RequestHeaders& headers,
                    const std::string& cachefile);
 
-	~CurlStreamFile();
+    ~CurlStreamFile();
 
-	// See dox in IOChannel.h
-	virtual std::streamsize read(void *dst, std::streamsize bytes);
+    // See dox in IOChannel.h
+    virtual std::streamsize read(void *dst, std::streamsize bytes);
 
-	// See dox in IOChannel.h
-	virtual std::streamsize readNonBlocking(void *dst, std::streamsize bytes);
+    // See dox in IOChannel.h
+    virtual std::streamsize readNonBlocking(void *dst, std::streamsize bytes);
 
-	// See dox in IOChannel.h
-	virtual bool eof() const;
+    // See dox in IOChannel.h
+    virtual bool eof() const;
 
-	// See dox in IOChannel.h
-	virtual bool bad() const {
-		return _error;
-	}
+    // See dox in IOChannel.h
+    virtual bool bad() const {
+        return _error;
+    }
 
-	/// Report global position within the file
-	virtual std::streampos tell() const;
+    /// Report global position within the file
+    virtual std::streampos tell() const;
 
-	/// Put read pointer at given position
-	virtual bool seek(std::streampos pos);
+    /// Put read pointer at given position
+    virtual bool seek(std::streampos pos);
 
-	/// Put read pointer at eof
-	virtual void go_to_end();
+    /// Put read pointer at eof
+    virtual void go_to_end();
 
-	/// Returns the size of the stream
-	//
-	/// If size of the stream is unknown, 0 is returned.
-	/// In that case you might try calling this function
-	/// again after filling the cache a bit...
-	///
-	/// Another approach might be filling the cache ourselves
-	/// aiming at obtaining a useful value.
-	///
-	virtual size_t size() const;
+    /// Returns the size of the stream
+    //
+    /// If size of the stream is unknown, 0 is returned.
+    /// In that case you might try calling this function
+    /// again after filling the cache a bit...
+    ///
+    /// Another approach might be filling the cache ourselves
+    /// aiming at obtaining a useful value.
+    ///
+    virtual size_t size() const;
 
 private:
 
-	void init(const std::string& url, const std::string& cachefile);
+    void init(const std::string& url, const std::string& cachefile);
 
-	// Use this file to cache data
-	FILE* _cache;
+    // Use this file to cache data
+    FILE* _cache;
 
-	// _cache file descriptor
-	int _cachefd;
+    // _cache file descriptor
+    int _cachefd;
 
-	// we keep a copy here to be sure the char*
-	// is alive for the whole CurlStreamFile lifetime
-	// TODO: don't really do this :)
-	std::string _url;
+    // we keep a copy here to be sure the char*
+    // is alive for the whole CurlStreamFile lifetime
+    // TODO: don't really do this :)
+    std::string _url;
 
-	// the libcurl easy handle
-	CURL *_handle;
+    // the libcurl easy handle
+    CURL *_handle;
 
-	// the libcurl multi handle
-	CURLM *_mhandle;
+    // the libcurl multi handle
+    CURLM *_mhandle;
 
-	// transfer in progress
-	int _running;
+    // transfer in progress
+    int _running;
 
-	// stream error
-	// false on no error.
-	// Example of errors would be:
-	//	404 - file not found
-	//	timeout occurred
-	bool _error;
+    // stream error
+    // false on no error.
+    // Example of errors would be:
+    //    404 - file not found
+    //    timeout occurred
+    bool _error;
 
-	// Post data. Empty if no POST has been requested
-	std::string _postdata;
+    // Post data. Empty if no POST has been requested
+    std::string _postdata;
 
-	// Current size of cached data
+    // Current size of cached data
     size_t _cached;
 
-	/// Total stream size.
-	//
-	/// This will be 0 until known
-	///
-	mutable size_t _size;
+    /// Total stream size.
+    //
+    /// This will be 0 until known
+    ///
+    mutable size_t _size;
 
-	// Attempt at filling the cache up to the given size.
-	// Will call libcurl routines to fetch data.
-	void fillCache(std::streamsize size);
+    // Attempt at filling the cache up to the given size.
+    // Will call libcurl routines to fetch data.
+    void fillCache(std::streamsize size);
 
-	// Process pending curl messages (handles 404)
-	void processMessages();
+    // Process pending curl messages (handles 404)
+    void processMessages();
 
-	// Filling the cache as much as possible w/out blocking.
-	// Will call libcurl routines to fetch data.
-	void fillCacheNonBlocking();
+    // Filling the cache as much as possible w/out blocking.
+    // Will call libcurl routines to fetch data.
+    void fillCacheNonBlocking();
 
-	// Append sz bytes to the cache
+    // Append sz bytes to the cache
     std::streamsize cache(void *from, std::streamsize sz);
 
-	// Callback for libcurl, will be called
-	// by fillCache() and will call cache()
-	static size_t recv(void *buf, size_t size, size_t nmemb, void *userp);
+    // Callback for libcurl, will be called
+    // by fillCache() and will call cache()
+    static size_t recv(void *buf, size_t size, size_t nmemb, void *userp);
 
     // List of custom headers for this stream.
     struct curl_slist *_customHeaders;
@@ -515,11 +515,11 @@ size_t
 CurlStreamFile::recv(void *buf, size_t size, size_t nmemb, void *userp)
 {
 #ifdef GNASH_CURL_VERBOSE
-	log_debug("curl write callback called for (%d) bytes",
-		size * nmemb);
+    log_debug("curl write callback called for (%d) bytes",
+        size * nmemb);
 #endif
-	CurlStreamFile* stream = static_cast<CurlStreamFile*>(userp);
-	return stream->cache(buf, size * nmemb);
+    CurlStreamFile* stream = static_cast<CurlStreamFile*>(userp);
+    return stream->cache(buf, size * nmemb);
 }
 
 
@@ -527,57 +527,57 @@ CurlStreamFile::recv(void *buf, size_t size, size_t nmemb, void *userp)
 std::streamsize
 CurlStreamFile::cache(void *from, std::streamsize size)
 {
-	// take note of current position
-	long curr_pos = std::ftell(_cache);
+    // take note of current position
+    long curr_pos = std::ftell(_cache);
 
-	// seek to the end
-	std::fseek(_cache, 0, SEEK_END);
+    // seek to the end
+    std::fseek(_cache, 0, SEEK_END);
 
     std::streamsize wrote = std::fwrite(from, 1, size, _cache);
-	if ( wrote < 1 )
-	{
+    if ( wrote < 1 )
+    {
 
         boost::format fmt = boost::format("writing to cache file: requested "
                                           "%d, wrote %d (%s)") %
                                           size % wrote % std::strerror(errno);
-		throw GnashException(fmt.str());
-	}
+        throw GnashException(fmt.str());
+    }
 
-	// Set the size of cached data
-	_cached = std::ftell(_cache);
+    // Set the size of cached data
+    _cached = std::ftell(_cache);
 
-	// reset position for next read
-	std::fseek(_cache, curr_pos, SEEK_SET);
+    // reset position for next read
+    std::fseek(_cache, curr_pos, SEEK_SET);
 
-	return wrote;
+    return wrote;
 }
 
 /*private*/
 void
 CurlStreamFile::fillCacheNonBlocking()
 {
-	if ( ! _running )
-	{
+    if ( ! _running )
+    {
 #if GNASH_CURL_VERBOSE
-		log_debug("Not running: fillCacheNonBlocking returning");
+        log_debug("Not running: fillCacheNonBlocking returning");
 #endif
-		return;
-	}
+        return;
+    }
 
-	CURLMcode mcode;
+    CURLMcode mcode;
 
-	do
-	{
-		mcode = curl_multi_perform(_mhandle, &_running);
-	} while (mcode == CURLM_CALL_MULTI_PERFORM); // && _running ?
+    do
+    {
+        mcode = curl_multi_perform(_mhandle, &_running);
+    } while (mcode == CURLM_CALL_MULTI_PERFORM); // && _running ?
 
-	if (mcode != CURLM_OK)
-	{
-		throw GnashException(curl_multi_strerror(mcode));
-	}
+    if (mcode != CURLM_OK)
+    {
+        throw GnashException(curl_multi_strerror(mcode));
+    }
 
-	// handle 404
-	processMessages();
+    // handle 404
+    processMessages();
 }
 
 
@@ -592,87 +592,87 @@ CurlStreamFile::fillCache(std::streamsize size)
 
     assert(size >= 0);
 
-	if ( ! _running || _cached >= static_cast<size_t>(size)) {
+    if ( ! _running || _cached >= static_cast<size_t>(size)) {
 #if GNASH_CURL_VERBOSE
         if (!_running) log_debug("Not running: returning");
         else log_debug("Already enough bytes cached: returning");
 #endif
-	    return;
-	}
+        return;
+    }
 
-	fd_set readfd, writefd, exceptfd;
-	int maxfd;
-	CURLMcode mcode;
-	timeval tv;
+    fd_set readfd, writefd, exceptfd;
+    int maxfd;
+    CURLMcode mcode;
+    timeval tv;
 
-	// Hard-coded slect timeout.
-	// This number is kept low to give more thread switch
-	// opportunities while waiting for a load.
-	const long maxSleepUsec = 10000;  // 1/100 of a second
+    // Hard-coded slect timeout.
+    // This number is kept low to give more thread switch
+    // opportunities while waiting for a load.
+    const long maxSleepUsec = 10000;  // 1/100 of a second
 
-	const unsigned int userTimeout = static_cast<unsigned int>(
-			RcInitFile::getDefaultInstance().getStreamsTimeout()*1000);
+    const unsigned int userTimeout = static_cast<unsigned int>(
+            RcInitFile::getDefaultInstance().getStreamsTimeout()*1000);
 
 #ifdef GNASH_CURL_VERBOSE
         log_debug("User timeout is %u milliseconds", userTimeout);
 #endif
 
-	WallClockTimer lastProgress; // timer since last progress
-	while (_running)
-	{
+    WallClockTimer lastProgress; // timer since last progress
+    while (_running)
+    {
 
-		fillCacheNonBlocking(); // NOTE: will handle 404
+        fillCacheNonBlocking(); // NOTE: will handle 404
 
-		// Do this here to avoid calling select()
-		// when we have enough bytes anyway, or
-		// we reached EOF
-		if (_cached >= static_cast<size_t>(size) || !_running) break; 
+        // Do this here to avoid calling select()
+        // when we have enough bytes anyway, or
+        // we reached EOF
+        if (_cached >= static_cast<size_t>(size) || !_running) break; 
 
 #if GNASH_CURL_VERBOSE
-		//log_debug("cached: %d, size: %d", _cached, size);
+        //log_debug("cached: %d, size: %d", _cached, size);
 #endif
 
-		mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, 
+        mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, 
                 &exceptfd, &maxfd);
 
-		if (mcode != CURLM_OK) {
-			// This is a serious error, not just a failure to add any
-			// fds.
-			throw GnashException(curl_multi_strerror(mcode));
-		}
+        if (mcode != CURLM_OK) {
+            // This is a serious error, not just a failure to add any
+            // fds.
+            throw GnashException(curl_multi_strerror(mcode));
+        }
 
 #ifdef GNASH_CURL_VERBOSE
-		log_debug("Max fd: %d", maxfd);
+        log_debug("Max fd: %d", maxfd);
 #endif
 
-		// A value of -1 means no file descriptors were added.
-		if (maxfd < 0) {
+        // A value of -1 means no file descriptors were added.
+        if (maxfd < 0) {
 #if GNASH_CURL_VERBOSE
-			log_debug("No filedescriptors; breaking");
+            log_debug("No filedescriptors; breaking");
 #endif
-			break;
-		}
+            break;
+        }
 
-		FD_ZERO(&readfd);
-		FD_ZERO(&writefd);
-		FD_ZERO(&exceptfd);
+        FD_ZERO(&readfd);
+        FD_ZERO(&writefd);
+        FD_ZERO(&exceptfd);
 
-		tv.tv_sec = 0;
-		tv.tv_usec = maxSleepUsec;
+        tv.tv_sec = 0;
+        tv.tv_usec = maxSleepUsec;
 
 #ifdef GNASH_CURL_VERBOSE
-		log_debug("select() with %d milliseconds timeout", maxSleepUsec*1000);
+        log_debug("select() with %d milliseconds timeout", maxSleepUsec*1000);
 #endif
 
-		// Wait for data on the filedescriptors until a timeout set
-		// in gnashrc.
-		int ret = select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
+        // Wait for data on the filedescriptors until a timeout set
+        // in gnashrc.
+        int ret = select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
 
 // select() will always fail on OS/2 and AmigaOS4 as we can't select
 // on file descriptors, only on sockets
 #if !defined(__OS2__) && !defined(__amigaos4__)
-		if ( ret == -1 )
-		{
+        if ( ret == -1 )
+        {
             if ( errno == EINTR )
             {
                 // we got interupted by a signal
@@ -690,11 +690,11 @@ CurlStreamFile::fillCache(std::streamsize size)
                     % _url % strerror(errno);
                 throw GnashException(fmt.str());
             }
-		}
+        }
 #endif
-		if ( ! ret )
-		{
-			// timeout
+        if ( ! ret )
+        {
+            // timeout
 #ifdef GNASH_CURL_VERBOSE
             log_debug("select() timed out, elapsed is %u",
                     lastProgress.elapsed());
@@ -703,29 +703,29 @@ CurlStreamFile::fillCache(std::streamsize size)
             {
                 log_error(_("Timeout (%u milliseconds) while loading "
                             "from url %s"), userTimeout, _url);
-				// TODO: should we set _error here ?
+                // TODO: should we set _error here ?
                 return;
             }
-		}
-		else
-		{
+        }
+        else
+        {
 #ifdef GNASH_CURL_VERBOSE
             log_debug("FD activity, resetting progress timer");
 #endif
             lastProgress.restart();
-		}
+        }
 
 
-		// TODO: check if we timedout or got some data
-		//       if we did timeout, check the clock to see
-		//       if we expired the user Timeout, otherwise
-		//       reset the timer...
+        // TODO: check if we timedout or got some data
+        //       if we did timeout, check the clock to see
+        //       if we expired the user Timeout, otherwise
+        //       reset the timer...
 
-	}
+    }
 
-	// Processing messages is already done by fillCacheNonBlocking,
-	// so we might likely avoid it here.
-	processMessages();
+    // Processing messages is already done by fillCacheNonBlocking,
+    // so we might likely avoid it here.
+    processMessages();
 
 }
 
@@ -733,48 +733,48 @@ CurlStreamFile::fillCache(std::streamsize size)
 void
 CurlStreamFile::processMessages()
 {
-	CURLMsg *curl_msg;
-	
-	// The number of messages left in the queue (not used by us).
-	int msgs;
-	while ((curl_msg = curl_multi_info_read(_mhandle, &msgs)))
-	{
+    CURLMsg *curl_msg;
+    
+    // The number of messages left in the queue (not used by us).
+    int msgs;
+    while ((curl_msg = curl_multi_info_read(_mhandle, &msgs)))
+    {
 
-		// Only for completed transactions
-		if (curl_msg->msg == CURLMSG_DONE) {
+        // Only for completed transactions
+        if (curl_msg->msg == CURLMSG_DONE) {
 
-			// HTTP transaction succeeded
-			if (curl_msg->data.result == CURLE_OK) {
+            // HTTP transaction succeeded
+            if (curl_msg->data.result == CURLE_OK) {
 
-				long code;
+                long code;
 
-				// Check HTTP response
-				curl_easy_getinfo(curl_msg->easy_handle,
-						  CURLINFO_RESPONSE_CODE, &code);
+                // Check HTTP response
+                curl_easy_getinfo(curl_msg->easy_handle,
+                          CURLINFO_RESPONSE_CODE, &code);
 
-				if ( code >= 400 ) {
-					log_error ("HTTP response %ld from url %s",
-							            code, _url);
-					_error = true;
-					_running = false;
-				}
-				else {
-					log_debug ("HTTP response %ld from url %s",
-							            code, _url);
-				}
+                if ( code >= 400 ) {
+                    log_error ("HTTP response %ld from url %s",
+                                        code, _url);
+                    _error = true;
+                    _running = false;
+                }
+                else {
+                    log_debug ("HTTP response %ld from url %s",
+                                        code, _url);
+                }
 
-			}
-			else {
+            }
+            else {
 
-				// Transaction failed, pass on curl error.
-				log_error("CURL: %s", curl_easy_strerror(
-						            curl_msg->data.result));
-				_error = true;
-			}
+                // Transaction failed, pass on curl error.
+                log_error("CURL: %s", curl_easy_strerror(
+                                    curl_msg->data.result));
+                _error = true;
+            }
 
-		}
+        }
 
-	}
+    }
 }
 
 
@@ -784,18 +784,18 @@ CurlStreamFile::init(const std::string& url, const std::string& cachefile)
 {
     _customHeaders = 0;
 
-	_url = url;
-	_running = 1;
-	_error = false;
+    _url = url;
+    _running = 1;
+    _error = false;
 
-	_cached = 0;
-	_size = 0;
+    _cached = 0;
+    _size = 0;
 
-	_handle = curl_easy_init();
-	_mhandle = curl_multi_init();
+    _handle = curl_easy_init();
+    _mhandle = curl_multi_init();
 
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-	
+    
     if (!cachefile.empty()) {
         _cache = std::fopen(cachefile.c_str(), "w+b");
         if (!_cache) {
@@ -807,64 +807,64 @@ CurlStreamFile::init(const std::string& url, const std::string& cachefile)
     }
     else _cache = std::tmpfile();
 
-	if ( ! _cache ) {
-		throw GnashException("Could not create temporary cache file");
-	}
-	_cachefd = fileno(_cache);
+    if ( ! _cache ) {
+        throw GnashException("Could not create temporary cache file");
+    }
+    _cachefd = fileno(_cache);
 
-	CURLcode ccode;
+    CURLcode ccode;
 
-	// Override cURL's default verification of SSL certificates
-	// This is insecure, so log security warning.
-	// Equivalent to curl -k or curl --insecure.
-	if (rcfile.insecureSSL())
-	{
+    // Override cURL's default verification of SSL certificates
+    // This is insecure, so log security warning.
+    // Equivalent to curl -k or curl --insecure.
+    if (rcfile.insecureSSL())
+    {
         log_security(_("Allowing connections to SSL sites with invalid "
-         "certificates"));		
+         "certificates"));        
 
-		ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYPEER, 0);
-		if ( ccode != CURLE_OK ) {
-			throw GnashException(curl_easy_strerror(ccode));
-		}
+        ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYPEER, 0);
+        if ( ccode != CURLE_OK ) {
+            throw GnashException(curl_easy_strerror(ccode));
+        }
 
-		ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYHOST, 0);
-		if ( ccode != CURLE_OK ) {
-			throw GnashException(curl_easy_strerror(ccode));
-		}
-	}
+        ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYHOST, 0);
+        if ( ccode != CURLE_OK ) {
+            throw GnashException(curl_easy_strerror(ccode));
+        }
+    }
 
-	// Get shared data
-	ccode = curl_easy_setopt(_handle, CURLOPT_SHARE,
+    // Get shared data
+    ccode = curl_easy_setopt(_handle, CURLOPT_SHARE,
             CurlSession::get().getSharedHandle());
 
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// Set expiration time for DNS cache entries, in seconds
-	// 0 disables caching
-	// -1 makes cache entries never expire
-	// default is 60
-	//
-	// NOTE: this snippet is here just as a placeholder for whoever
-	//       will feel a need to make this parametrizable
-	//
-	ccode = curl_easy_setopt(_handle, CURLOPT_DNS_CACHE_TIMEOUT, 60);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // Set expiration time for DNS cache entries, in seconds
+    // 0 disables caching
+    // -1 makes cache entries never expire
+    // default is 60
+    //
+    // NOTE: this snippet is here just as a placeholder for whoever
+    //       will feel a need to make this parametrizable
+    //
+    ccode = curl_easy_setopt(_handle, CURLOPT_DNS_CACHE_TIMEOUT, 60);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	ccode = curl_easy_setopt(_handle, CURLOPT_USERAGENT, "Gnash-" VERSION);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    ccode = curl_easy_setopt(_handle, CURLOPT_USERAGENT, "Gnash-" VERSION);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
 #ifdef GNASH_CURL_VERBOSE
-	// for verbose operations
-	ccode = curl_easy_setopt(_handle, CURLOPT_VERBOSE, 1);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // for verbose operations
+    ccode = curl_easy_setopt(_handle, CURLOPT_VERBOSE, 1);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 #endif
 
 /* from libcurl-tutorial(3)
@@ -872,88 +872,88 @@ When using multiple threads you should set the CURLOPT_NOSIGNAL  option
 to TRUE for all handles. Everything will work fine except that timeouts
 are not honored during the DNS lookup - which you can  work  around  by
 */
-	ccode = curl_easy_setopt(_handle, CURLOPT_NOSIGNAL, true);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    ccode = curl_easy_setopt(_handle, CURLOPT_NOSIGNAL, true);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// set url
-	ccode = curl_easy_setopt(_handle, CURLOPT_URL, _url.c_str());
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // set url
+    ccode = curl_easy_setopt(_handle, CURLOPT_URL, _url.c_str());
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	//curl_easy_setopt(_handle, CURLOPT_NOPROGRESS, false);
+    //curl_easy_setopt(_handle, CURLOPT_NOPROGRESS, false);
 
 
-	// set write data and function
-	ccode = curl_easy_setopt(_handle, CURLOPT_WRITEDATA, this);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // set write data and function
+    ccode = curl_easy_setopt(_handle, CURLOPT_WRITEDATA, this);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	ccode = curl_easy_setopt(_handle, CURLOPT_WRITEFUNCTION,
-		CurlStreamFile::recv);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    ccode = curl_easy_setopt(_handle, CURLOPT_WRITEFUNCTION,
+        CurlStreamFile::recv);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	ccode = curl_easy_setopt(_handle, CURLOPT_FOLLOWLOCATION, 1);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    ccode = curl_easy_setopt(_handle, CURLOPT_FOLLOWLOCATION, 1);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	//fillCache(32); // pre-cache 32 bytes
-	//curl_multi_perform(_mhandle, &_running);
+    //fillCache(32); // pre-cache 32 bytes
+    //curl_multi_perform(_mhandle, &_running);
 }
 
 /*public*/
 CurlStreamFile::CurlStreamFile(const std::string& url,
         const std::string& cachefile)
 {
-	log_debug("CurlStreamFile %p created", this);
-	init(url, cachefile);
+    log_debug("CurlStreamFile %p created", this);
+    init(url, cachefile);
 
-	// CURLMcode ret =
-	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
-	if ( mcode != CURLM_OK ) {
-		throw GnashException(curl_multi_strerror(mcode));
-	}
+    // CURLMcode ret =
+    CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
+    if ( mcode != CURLM_OK ) {
+        throw GnashException(curl_multi_strerror(mcode));
+    }
 }
 
 /*public*/
 CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
        const std::string& cachefile)
 {
-	log_debug("CurlStreamFile %p created", this);
-	init(url, cachefile);
+    log_debug("CurlStreamFile %p created", this);
+    init(url, cachefile);
 
-	_postdata = vars;
+    _postdata = vars;
 
-	CURLcode ccode;
+    CURLcode ccode;
 
-	ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// libcurl needs to access the POSTFIELDS during 'perform' operations,
-	// so we must use a string whose lifetime is ensured to be longer then
-	// the multihandle itself.
-	// The _postdata member should meet this requirement
-	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, _postdata.c_str());
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // libcurl needs to access the POSTFIELDS during 'perform' operations,
+    // so we must use a string whose lifetime is ensured to be longer then
+    // the multihandle itself.
+    // The _postdata member should meet this requirement
+    ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, _postdata.c_str());
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// This is to support binary strings as postdata
-	// NOTE: in version 7.11.1 CURLOPT_POSTFIELDSIZE_LARGE was added
-	//       this one takes a long, that one takes a curl_off_t
-	//
-	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // This is to support binary strings as postdata
+    // NOTE: in version 7.11.1 CURLOPT_POSTFIELDSIZE_LARGE was added
+    //       this one takes a long, that one takes a curl_off_t
+    //
+    ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
     // Disable sending an Expect: header, as some older HTTP/1.1
     // don't implement them, and some (namely lighttpd/1.4.19,
@@ -966,10 +966,10 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
         throw GnashException(curl_easy_strerror(ccode));
     }
 
-	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
-	if ( mcode != CURLM_OK ) {
-		throw GnashException(curl_multi_strerror(mcode));
-	}
+    CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
+    if ( mcode != CURLM_OK ) {
+        throw GnashException(curl_multi_strerror(mcode));
+    }
 
 }
 
@@ -978,10 +978,10 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
         const NetworkAdapter::RequestHeaders& headers,
         const std::string& cachefile)
 {
-	log_debug("CurlStreamFile %p created", this);
-	init(url, cachefile);
+    log_debug("CurlStreamFile %p created", this);
+    init(url, cachefile);
 
-	_postdata = vars;
+    _postdata = vars;
 
     // Disable sending an Expect: header, as some older HTTP/1.1
     // don't implement them, and some (namely lighttpd/1.4.19,
@@ -1004,40 +1004,40 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
         _customHeaders = curl_slist_append(_customHeaders, os.str().c_str());
     }
 
-	CURLcode ccode;
+    CURLcode ccode;
 
     ccode = curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, _customHeaders);
     if ( ccode != CURLE_OK ) {
         throw GnashException(curl_easy_strerror(ccode));
     }
 
-	ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// libcurl needs to access the POSTFIELDS during 'perform' operations,
-	// so we must use a string whose lifetime is ensured to be longer then
-	// the multihandle itself.
-	// The _postdata member should meet this requirement
-	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, _postdata.c_str());
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // libcurl needs to access the POSTFIELDS during 'perform' operations,
+    // so we must use a string whose lifetime is ensured to be longer then
+    // the multihandle itself.
+    // The _postdata member should meet this requirement
+    ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, _postdata.c_str());
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// This is to support binary strings as postdata
-	// NOTE: in version 7.11.1 CURLOPT_POSTFIELDSIZE_LARGE was added
-	//       this one takes a long, that one takes a curl_off_t
-	//
-	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // This is to support binary strings as postdata
+    // NOTE: in version 7.11.1 CURLOPT_POSTFIELDSIZE_LARGE was added
+    //       this one takes a long, that one takes a curl_off_t
+    //
+    ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
-	if ( mcode != CURLM_OK ) {
-		throw GnashException(curl_multi_strerror(mcode));
-	}
+    CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
+    if ( mcode != CURLM_OK ) {
+        throw GnashException(curl_multi_strerror(mcode));
+    }
 
 }
 
@@ -1045,11 +1045,11 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
 /*public*/
 CurlStreamFile::~CurlStreamFile()
 {
-	log_debug("CurlStreamFile %p deleted", this);
-	curl_multi_remove_handle(_mhandle, _handle);
-	curl_easy_cleanup(_handle);
-	curl_multi_cleanup(_mhandle);
-	std::fclose(_cache);
+    log_debug("CurlStreamFile %p deleted", this);
+    curl_multi_remove_handle(_mhandle, _handle);
+    curl_easy_cleanup(_handle);
+    curl_multi_cleanup(_mhandle);
+    std::fclose(_cache);
     if ( _customHeaders ) curl_slist_free_all(_customHeaders); 
 }
 
@@ -1057,20 +1057,20 @@ CurlStreamFile::~CurlStreamFile()
 std::streamsize
 CurlStreamFile::read(void *dst, std::streamsize bytes)
 {
-	if ( eof() || _error ) return 0;
+    if ( eof() || _error ) return 0;
 
 #ifdef GNASH_CURL_VERBOSE
-	log_debug ("read(%d) called", bytes);
+    log_debug ("read(%d) called", bytes);
 #endif
 
-	fillCache(bytes + tell());
-	if ( _error ) return 0; // error can be set by fillCache
+    fillCache(bytes + tell());
+    if ( _error ) return 0; // error can be set by fillCache
 
 #ifdef GNASH_CURL_VERBOSE
-	log_debug("_cache.tell = %d", tell());
+    log_debug("_cache.tell = %d", tell());
 #endif
 
-	return std::fread(dst, 1, bytes, _cache);
+    return std::fread(dst, 1, bytes, _cache);
 
 }
 
@@ -1079,29 +1079,29 @@ std::streamsize
 CurlStreamFile::readNonBlocking(void *dst, std::streamsize bytes)
 {
 #ifdef GNASH_CURL_VERBOSE
-	log_debug ("readNonBlocking(%d) called", bytes);
+    log_debug ("readNonBlocking(%d) called", bytes);
 #endif
 
-	if ( eof() || _error ) return 0;
+    if ( eof() || _error ) return 0;
 
-	fillCacheNonBlocking();
-	if ( _error )
-	{
-		// I guess an exception would be thrown in this case ?
-		log_error("curl adaptor's fillCacheNonBlocking set _error "
+    fillCacheNonBlocking();
+    if ( _error )
+    {
+        // I guess an exception would be thrown in this case ?
+        log_error("curl adaptor's fillCacheNonBlocking set _error "
                 "rather then throwing an exception");
-		return 0; 
-	}
+        return 0; 
+    }
 
     std::streamsize actuallyRead = std::fread(dst, 1, bytes, _cache);
-	if ( _running )
-	{
-		// if we're still running drop any eof flag
-		// on the cache
-		clearerr(_cache);
-	}
+    if ( _running )
+    {
+        // if we're still running drop any eof flag
+        // on the cache
+        clearerr(_cache);
+    }
 
-	return actuallyRead;
+    return actuallyRead;
 
 }
 
@@ -1109,12 +1109,12 @@ CurlStreamFile::readNonBlocking(void *dst, std::streamsize bytes)
 bool
 CurlStreamFile::eof() const
 {
-	bool ret = ( ! _running && feof(_cache) );
+    bool ret = ( ! _running && feof(_cache) );
 
 #ifdef GNASH_CURL_VERBOSE
-	log_debug("eof() returning %d", ret);
+    log_debug("eof() returning %d", ret);
 #endif
-	return ret;
+    return ret;
 
 }
 
@@ -1125,10 +1125,10 @@ CurlStreamFile::tell() const
     std::streampos ret = std::ftell(_cache);
 
 #ifdef GNASH_CURL_VERBOSE
-	log_debug("tell() returning %ld", ret);
+    log_debug("tell() returning %ld", ret);
 #endif
 
-	return ret;
+    return ret;
 
 }
 
@@ -1140,26 +1140,26 @@ CurlStreamFile::seek(std::streampos pos)
     assert(pos >= 0);
 
 #ifdef GNASH_CURL_WARN_SEEKSBACK
-	if ( pos < tell() ) {
-		log_debug("Warning: seek backward requested (%ld from %ld)",
-			pos, tell());
-	}
+    if ( pos < tell() ) {
+        log_debug("Warning: seek backward requested (%ld from %ld)",
+            pos, tell());
+    }
 #endif
 
-	fillCache(pos);
-	if (_error) return false; // error can be set by fillCache
+    fillCache(pos);
+    if (_error) return false; // error can be set by fillCache
 
-	if (_cached < static_cast<size_t>(pos))
-	{
-		log_error ("Warning: could not cache anough bytes on seek: %d "
+    if (_cached < static_cast<size_t>(pos))
+    {
+        log_error ("Warning: could not cache anough bytes on seek: %d "
                 "requested, %d cached", pos, _cached);
-		return false; 
-	}
+        return false; 
+    }
 
-	if (std::fseek(_cache, pos, SEEK_SET) == -1) {
-		log_error("Warning: fseek failed");
-		return false;
-	}
+    if (std::fseek(_cache, pos, SEEK_SET) == -1) {
+        log_error("Warning: fseek failed");
+        return false;
+    }
    
     return true;
 
@@ -1169,18 +1169,18 @@ CurlStreamFile::seek(std::streampos pos)
 void
 CurlStreamFile::go_to_end()
 {
-	CURLMcode mcode;
-	while (_running > 0)
-	{
-		do
-		{
-			mcode=curl_multi_perform(_mhandle, &_running);
-		} while ( mcode == CURLM_CALL_MULTI_PERFORM );
+    CURLMcode mcode;
+    while (_running > 0)
+    {
+        do
+        {
+            mcode=curl_multi_perform(_mhandle, &_running);
+        } while ( mcode == CURLM_CALL_MULTI_PERFORM );
 
-		if ( mcode != CURLM_OK )
-		{
-			throw IOException(curl_multi_strerror(mcode));
-		}
+        if ( mcode != CURLM_OK )
+        {
+            throw IOException(curl_multi_strerror(mcode));
+        }
 
         long code;
         curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
@@ -1189,136 +1189,136 @@ CurlStreamFile::go_to_end()
             throw IOException("File not found");
         }
 
-	}
+    }
 
-	if (std::fseek(_cache, 0, SEEK_END) == -1) {
-		throw IOException("NetworkAdapter: fseek to end failed");
-	} 
+    if (std::fseek(_cache, 0, SEEK_END) == -1) {
+        throw IOException("NetworkAdapter: fseek to end failed");
+    } 
 }
 
 /*public*/
 size_t
 CurlStreamFile::size() const
 {
-	if ( ! _size )
-	{
-		double size;
-		CURLcode ret = curl_easy_getinfo(_handle,
+    if ( ! _size )
+    {
+        double size;
+        CURLcode ret = curl_easy_getinfo(_handle,
                 CURLINFO_CONTENT_LENGTH_DOWNLOAD, &size);
-		if (ret == CURLE_OK) {
+        if (ret == CURLE_OK) {
             assert(size <= std::numeric_limits<size_t>::max());
             _size = static_cast<size_t>(size);
         }
-	}
+    }
 
 #ifdef GNASH_CURL_VERBOSE
-	log_debug("get_stream_size() returning %lu", _size);
+    log_debug("get_stream_size() returning %lu", _size);
 #endif
 
-	return _size;
+    return _size;
 
 }
 
 void
 CurlSession::importCookies()
 {
-	const char* cookiesIn = std::getenv("GNASH_COOKIES_IN");
-	if ( ! cookiesIn ) return; // nothing to do
+    const char* cookiesIn = std::getenv("GNASH_COOKIES_IN");
+    if ( ! cookiesIn ) return; // nothing to do
 
-	////////////////////////////////////////////////////////////////
-	//
-	// WARNING: what we're doing here is an ugly hack
-	//
-	// We'll be creating a fake easy handle for the sole purpos
-	// of importing cookies. Tests conducted against 7.15.5-CVS
-	// resulted in this working if a CURLOPT_URL is given, even
-	// if invalid (but non-0!), while wouldn't if NO CURLOPT_URL
-	// is given, with both cases returning the same CURLcode on
-	// _perform (URL using bad/illegal format or missing URL)
-	//
-	// TODO: instead, we should be reading the input file
-	//       ourselves and use CURLOPT_COOKIELIST to send
-	//       each line. Doing so should not require a
-	//       _perform call.
-	//
-	////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    //
+    // WARNING: what we're doing here is an ugly hack
+    //
+    // We'll be creating a fake easy handle for the sole purpos
+    // of importing cookies. Tests conducted against 7.15.5-CVS
+    // resulted in this working if a CURLOPT_URL is given, even
+    // if invalid (but non-0!), while wouldn't if NO CURLOPT_URL
+    // is given, with both cases returning the same CURLcode on
+    // _perform (URL using bad/illegal format or missing URL)
+    //
+    // TODO: instead, we should be reading the input file
+    //       ourselves and use CURLOPT_COOKIELIST to send
+    //       each line. Doing so should not require a
+    //       _perform call.
+    //
+    ////////////////////////////////////////////////////////////////
 
-	// Create a fake handle for purpose of importing data
-	CURL* fakeHandle = curl_easy_init(); // errors to handle here ?
-	CURLcode ccode;
+    // Create a fake handle for purpose of importing data
+    CURL* fakeHandle = curl_easy_init(); // errors to handle here ?
+    CURLcode ccode;
 
-	// Configure the fake handle to use the share (shared cookies in particular..)
-	ccode = curl_easy_setopt(fakeHandle, CURLOPT_SHARE, getSharedHandle());
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // Configure the fake handle to use the share (shared cookies in particular..)
+    ccode = curl_easy_setopt(fakeHandle, CURLOPT_SHARE, getSharedHandle());
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// Configure the fake handle to read cookies from the specified file
-	ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEFILE, cookiesIn);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // Configure the fake handle to read cookies from the specified file
+    ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEFILE, cookiesIn);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// need to pass a non-zero URL string for COOKIEFILE to
-	// be really parsed
-	ccode = curl_easy_setopt(fakeHandle, CURLOPT_URL, "");
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // need to pass a non-zero URL string for COOKIEFILE to
+    // be really parsed
+    ccode = curl_easy_setopt(fakeHandle, CURLOPT_URL, "");
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// perform, to activate actual cookie file parsing
-	//
-	// NOTE: curl_easy_perform is expected to return an
-	//       "URL using bad/illegal format or missing URL" error,
-	//       there's no way to detect actual cookies import errors
-	//       other then using curl debugging output routines
-	//
-	log_debug("Importing cookies from file '%s'", cookiesIn);
-	curl_easy_perform(fakeHandle);
+    // perform, to activate actual cookie file parsing
+    //
+    // NOTE: curl_easy_perform is expected to return an
+    //       "URL using bad/illegal format or missing URL" error,
+    //       there's no way to detect actual cookies import errors
+    //       other then using curl debugging output routines
+    //
+    log_debug("Importing cookies from file '%s'", cookiesIn);
+    curl_easy_perform(fakeHandle);
 
-	curl_easy_cleanup(fakeHandle);
+    curl_easy_cleanup(fakeHandle);
 
 }
 
 void
 CurlSession::exportCookies()
 {
-	const char* cookiesOut = std::getenv("GNASH_COOKIES_OUT");
-	if ( ! cookiesOut ) return; // nothing to do
+    const char* cookiesOut = std::getenv("GNASH_COOKIES_OUT");
+    if ( ! cookiesOut ) return; // nothing to do
 
-	////////////////////////////////////////////////////////////////
-	//
-	// WARNING: what we're doing here is an ugly hack
-	//
-	// We'll be creating a fake easy handle for the sole purpose
-	// of exporting cookies. Tests conducted against 7.15.5-CVS
-	// resulted in this working w/out a CURLOPT_URL and w/out a
-	// curl_easy_perform.
-	// 
-	// NOTE: the "correct" way would be to use CURLOPT_COOKIELIST
-	//       with the "FLUSH" special string as value, but that'd
-	//       be only supported by version 7.17.1
-	//
-	////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    //
+    // WARNING: what we're doing here is an ugly hack
+    //
+    // We'll be creating a fake easy handle for the sole purpose
+    // of exporting cookies. Tests conducted against 7.15.5-CVS
+    // resulted in this working w/out a CURLOPT_URL and w/out a
+    // curl_easy_perform.
+    // 
+    // NOTE: the "correct" way would be to use CURLOPT_COOKIELIST
+    //       with the "FLUSH" special string as value, but that'd
+    //       be only supported by version 7.17.1
+    //
+    ////////////////////////////////////////////////////////////////
 
-	CURL* fakeHandle = curl_easy_init(); // errors to handle here ?
-	CURLcode ccode;
+    CURL* fakeHandle = curl_easy_init(); // errors to handle here ?
+    CURLcode ccode;
 
-	// Configure the fake handle to use the share (shared cookies in particular..)
-	ccode = curl_easy_setopt(fakeHandle, CURLOPT_SHARE, getSharedHandle());
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // Configure the fake handle to use the share (shared cookies in particular..)
+    ccode = curl_easy_setopt(fakeHandle, CURLOPT_SHARE, getSharedHandle());
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// Configure the fake handle to write cookies to the specified file
-	ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEJAR , cookiesOut);
-	if ( ccode != CURLE_OK ) {
-		throw GnashException(curl_easy_strerror(ccode));
-	}
+    // Configure the fake handle to write cookies to the specified file
+    ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEJAR , cookiesOut);
+    if ( ccode != CURLE_OK ) {
+        throw GnashException(curl_easy_strerror(ccode));
+    }
 
-	// Cleanup, to trigger actual cookie file flushing
-	log_debug("Exporting cookies file '%s'", cookiesOut);
-	curl_easy_cleanup(fakeHandle);
+    // Cleanup, to trigger actual cookie file flushing
+    log_debug("Exporting cookies file '%s'", cookiesOut);
+    curl_easy_cleanup(fakeHandle);
 
 }
 
@@ -1333,18 +1333,18 @@ std::auto_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& url, const std::string& cachefile)
 {
 #ifdef GNASH_CURL_VERBOSE
-	log_debug("making curl stream for %s", url);
+    log_debug("making curl stream for %s", url);
 #endif
 
-	std::auto_ptr<IOChannel> stream;
+    std::auto_ptr<IOChannel> stream;
 
-	try {
-		stream.reset(new CurlStreamFile(url, cachefile));
-	}
-	catch (const std::exception& ex) {
-		log_error("curl stream: %s", ex.what());
-	}
-	return stream;
+    try {
+        stream.reset(new CurlStreamFile(url, cachefile));
+    }
+    catch (const std::exception& ex) {
+        log_error("curl stream: %s", ex.what());
+    }
+    return stream;
 }
 
 std::auto_ptr<IOChannel>
@@ -1352,18 +1352,18 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
         const std::string& cachefile)
 {
 #ifdef GNASH_CURL_VERBOSE
-	log_debug("making curl stream for %s", url);
+    log_debug("making curl stream for %s", url);
 #endif
 
-	std::auto_ptr<IOChannel> stream;
+    std::auto_ptr<IOChannel> stream;
 
-	try {
-		stream.reset(new CurlStreamFile(url, postdata, cachefile));
-	}
-	catch (const std::exception& ex) {
-		log_error("curl stream: %s", ex.what());
-	}
-	return stream;
+    try {
+        stream.reset(new CurlStreamFile(url, postdata, cachefile));
+    }
+    catch (const std::exception& ex) {
+        log_error("curl stream: %s", ex.what());
+    }
+    return stream;
 }
 
 std::auto_ptr<IOChannel>
@@ -1371,14 +1371,14 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
         const RequestHeaders& headers, const std::string& cachefile)
 {
 
-	std::auto_ptr<IOChannel> stream;
+    std::auto_ptr<IOChannel> stream;
 
-	try {
-		stream.reset(new CurlStreamFile(url, postdata, headers, cachefile));
-	}
-	catch (const std::exception& ex) {
-		log_error("curl stream: %s", ex.what());
-	}
+    try {
+        stream.reset(new CurlStreamFile(url, postdata, headers, cachefile));
+    }
+    catch (const std::exception& ex) {
+        log_error("curl stream: %s", ex.what());
+    }
 
     return stream;
 
