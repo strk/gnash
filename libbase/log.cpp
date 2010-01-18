@@ -54,29 +54,29 @@ std::string
 hexify(const unsigned char *p, size_t length, bool ascii)
 {
 
-	const std::vector<unsigned char> bytes(p, p + length);
+    const std::vector<unsigned char> bytes(p, p + length);
 
-	std::ostringstream ss;
-	
-	// For hex output, fill single-digit numbers with a leading 0.
-	if (!ascii) ss << std::hex << std::setfill('0');
-	
-	for (std::vector<unsigned char>::const_iterator i = bytes.begin(),
+    std::ostringstream ss;
+    
+    // For hex output, fill single-digit numbers with a leading 0.
+    if (!ascii) ss << std::hex << std::setfill('0');
+    
+    for (std::vector<unsigned char>::const_iterator i = bytes.begin(),
             e = bytes.end(); i != e; ++i)
-	    {
-		if (ascii) {
-		    if (std::isprint(*i) || *i == 0xd) {
-				ss << *i;
-		    }
-		    else ss << ".";
-		}
-		else  {
-		    // Not ascii
-		    ss << std::setw(2) << static_cast<int>(*i) << " ";	
-		}
-	}	
-	
-	return ss.str();
+        {
+        if (ascii) {
+            if (std::isprint(*i) || *i == 0xd) {
+                ss << *i;
+            }
+            else ss << ".";
+        }
+        else  {
+            // Not ascii
+            ss << std::setw(2) << static_cast<int>(*i) << " ";    
+        }
+    }    
+    
+    return ss.str();
 
 }
 
@@ -86,11 +86,11 @@ timestamp(std::ostream& o)
 
     const char fmt[] = "%H:%M:%S";
 
-	time_t t;
-	char buf[sizeof(fmt)];
+    time_t t;
+    char buf[sizeof(fmt)];
 
-	std::time(&t);
-	std::strftime(buf, sizeof(buf), fmt, std::localtime(&t));
+    std::time(&t);
+    std::strftime(buf, sizeof(buf), fmt, std::localtime(&t));
 
     static std::map<int, int> threadMap;
     int tid = get_thread_id();
@@ -101,20 +101,20 @@ timestamp(std::ostream& o)
         // TODO: notify actual thread id for index
     }
 
-	o << getpid() << ":" << htid << "] " << buf;
-	return o;
+    o << getpid() << ":" << htid << "] " << buf;
+    return o;
 
 }
 
 LogFile&
 LogFile::getDefaultInstance()
 {
-	static LogFile o;
-	return o;
+    static LogFile o;
+    return o;
 }
 
 namespace {
-	LogFile& dbglogfile = LogFile::getDefaultInstance();
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
 }
 
 // boost format functions to process the objects
@@ -123,147 +123,147 @@ namespace {
 void
 processLog_trace(const boost::format& fmt)
 {
-	dbglogfile.log(N_("TRACE"), fmt.str());
+    dbglogfile.log(N_("TRACE"), fmt.str());
 }
 
 void
 processLog_debug(const boost::format& fmt)
 {
-	if (dbglogfile.getVerbosity() < LogFile::LOG_DEBUG) return;
-	dbglogfile.log(N_("DEBUG"), fmt.str());
+    if (dbglogfile.getVerbosity() < LogFile::LOG_DEBUG) return;
+    dbglogfile.log(N_("DEBUG"), fmt.str());
 }
 
 void
 processLog_abc(const boost::format& fmt)
 {
-	if (dbglogfile.getVerbosity() < LogFile::LOG_EXTRA) return;
-	dbglogfile.log(N_("ABC"), fmt.str());
+    if (dbglogfile.getVerbosity() < LogFile::LOG_EXTRA) return;
+    dbglogfile.log(N_("ABC"), fmt.str());
 }
 
 void
 processLog_parse(const boost::format& fmt)
 {
-	dbglogfile.log(fmt.str());
+    dbglogfile.log(fmt.str());
 }
 
 void
 processLog_network(const boost::format& fmt)
 {
-	dbglogfile.log(N_("NETWORK"), fmt.str());
+    dbglogfile.log(N_("NETWORK"), fmt.str());
 }
 
 void
 processLog_error(const boost::format& fmt)
 {
-	dbglogfile.log(N_("ERROR"), fmt.str());
+    dbglogfile.log(N_("ERROR"), fmt.str());
 }
 
 void
 processLog_unimpl(const boost::format& fmt)
 {
-	dbglogfile.log(N_("UNIMPLEMENTED"), fmt.str());
+    dbglogfile.log(N_("UNIMPLEMENTED"), fmt.str());
 }
 
 void
 processLog_security(const boost::format& fmt)
 {
-	dbglogfile.log(N_("SECURITY"), fmt.str());
+    dbglogfile.log(N_("SECURITY"), fmt.str());
 }
 
 void
 processLog_swferror(const boost::format& fmt)
 {
-	dbglogfile.log(N_("MALFORMED SWF"), fmt.str());
+    dbglogfile.log(N_("MALFORMED SWF"), fmt.str());
 }
 
 void
 processLog_amferror(const boost::format& fmt)
 {
-	dbglogfile.log(N_("MALFORMED AMF"), fmt.str());
+    dbglogfile.log(N_("MALFORMED AMF"), fmt.str());
 }
 
 void
 processLog_aserror(const boost::format& fmt)
 {
-	dbglogfile.log(N_("ACTIONSCRIPT ERROR"), fmt.str());
+    dbglogfile.log(N_("ACTIONSCRIPT ERROR"), fmt.str());
 }
 
 void
 processLog_action(const boost::format& fmt)
 {
-	bool stamp = dbglogfile.getStamp();
-	dbglogfile.setStamp(false);
-	dbglogfile.log(fmt.str());
-	dbglogfile.setStamp(stamp);
+    bool stamp = dbglogfile.getStamp();
+    dbglogfile.setStamp(false);
+    dbglogfile.log(fmt.str());
+    dbglogfile.setStamp(stamp);
 }
 
 void
 LogFile::log(const std::string& msg)
 {
 
-	boost::mutex::scoped_lock lock(_ioMutex);
+    boost::mutex::scoped_lock lock(_ioMutex);
 
-	if ( !_verbose ) return; // nothing to do if not verbose
+    if ( !_verbose ) return; // nothing to do if not verbose
 
-	if (openLogIfNeeded())
-	{
-		if (_stamp) {
-			_outstream << timestamp << ": " << msg << "\n";
-		} else {
-			_outstream << msg << "\n";
-		}
-	}
-	else // log to stdout
-	{
-		if (_stamp) {
-			cout << timestamp << " " << msg << endl;
-		} else {
-			cout << msg << endl;
-		}
-	}
-	
-	if (_listener)
-	{
-	    (*_listener)(msg);
-	}
+    if (openLogIfNeeded())
+    {
+        if (_stamp) {
+            _outstream << timestamp << ": " << msg << "\n";
+        } else {
+            _outstream << msg << "\n";
+        }
+    }
+    else // log to stdout
+    {
+        if (_stamp) {
+            cout << timestamp << " " << msg << endl;
+        } else {
+            cout << msg << endl;
+        }
+    }
+    
+    if (_listener)
+    {
+        (*_listener)(msg);
+    }
 }
 
 inline void
 LogFile::log(const std::string& label, const std::string& msg)
 {
-	log(label + ": " + msg);
+    log(label + ": " + msg);
 }
 
 void
 LogFile::setLogFilename(const std::string& fname)
 {
-	closeLog();
-	_logFilename = fname;
+    closeLog();
+    _logFilename = fname;
 }
 
 void
 LogFile::setWriteDisk(bool use)
 {
-	if (!use) closeLog();
-	_write = use;
+    if (!use) closeLog();
+    _write = use;
 }
 
 // Default constructor
 LogFile::LogFile()
-	:
-	_verbose(0),
-	_actiondump(false),
-	_parserdump(false),
-	_state(CLOSED),
-	_stamp(true),
-	_write(false),
-	_listener(NULL)
+    :
+    _verbose(0),
+    _actiondump(false),
+    _parserdump(false),
+    _state(CLOSED),
+    _stamp(true),
+    _write(false),
+    _listener(NULL)
 {
 }
 
 LogFile::~LogFile()
 {
-	if (_state == OPEN) closeLog();
+    if (_state == OPEN) closeLog();
 }
 
 bool
@@ -290,7 +290,7 @@ LogFile::openLog(const std::string& filespec)
     // by the public log_xxx functions that log themselves
 
     if (_state != CLOSED) {
-	cout << "Closing previously opened stream" << endl;
+    cout << "Closing previously opened stream" << endl;
         _outstream.close();
         _state = CLOSED;
     }
@@ -298,14 +298,14 @@ LogFile::openLog(const std::string& filespec)
     // Append, don't truncate, the log file
     _outstream.open(filespec.c_str(), std::ios::app|std::ios::out); // ios::out
     if( _outstream.fail() ) {
-	// Can't use log_error here...
+    // Can't use log_error here...
         cout << "ERROR: can't open debug log file " << filespec << 
             " for appending." << endl;
         return false;
     }       
 
-	_filespec = filespec;
-	_state = OPEN;
+    _filespec = filespec;
+    _state = OPEN;
 
     return true;
 }
@@ -313,28 +313,28 @@ LogFile::openLog(const std::string& filespec)
 bool
 LogFile::closeLog()
 {
-	boost::mutex::scoped_lock lock(_ioMutex);
-	if (_state == OPEN) {
-		_outstream.flush();
-		_outstream.close();
-	}
-	_state = CLOSED;
+    boost::mutex::scoped_lock lock(_ioMutex);
+    if (_state == OPEN) {
+        _outstream.flush();
+        _outstream.close();
+    }
+    _state = CLOSED;
 
-	return true;
+    return true;
 }
 
 bool
 LogFile::removeLog()
 {
-	if (_state == OPEN) {
-		_outstream.close();
-	}
+    if (_state == OPEN) {
+        _outstream.close();
+    }
 
     // Ignore the error, we don't care
     unlink(_filespec.c_str());
     _filespec.clear();
 
-	return true;
+    return true;
 }
 
 } // end of gnash namespace
