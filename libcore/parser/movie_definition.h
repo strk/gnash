@@ -102,10 +102,10 @@ public:
 	typedef std::vector<SWF::ControlTag*> PlayList;
 
 	virtual int	get_version() const = 0;
-	virtual float	get_width_pixels() const = 0;
-	virtual float	get_height_pixels() const = 0;
-	virtual size_t	get_frame_count() const = 0;
-	virtual float	get_frame_rate() const = 0;
+	virtual float get_width_pixels() const = 0;
+	virtual float get_height_pixels() const = 0;
+	virtual size_t get_frame_count() const = 0;
+	virtual float get_frame_rate() const = 0;
 
 	/// Return size of frame, in TWIPS 
 	virtual const SWFRect& get_frame_size() const = 0;

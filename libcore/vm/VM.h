@@ -168,6 +168,10 @@ public:
 	/// Set SWF version of the currently executing code
 	void setSWFVersion(int v);
 
+    /// Get the version of the currently executing VM
+    //
+    /// Note: this value changes according to the current execution context;
+    /// do not use it to determine what VM version a particular SWF uses.
     AVMVersion getAVMVersion() const {
         return _avmVersion;
     }

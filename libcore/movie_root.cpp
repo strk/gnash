@@ -2107,9 +2107,12 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 
     it = tr.insert(it, StringPair("Stage Properties", ""));
 
+    localIter = tr.append_child(it, StringPair("Root VM version",
+                def->isAS3() ? "AVM2 (unsupported)" : "AVM1"));
+    
     std::ostringstream os;
     os << "SWF " << def->get_version();
-    localIter = tr.append_child(it, StringPair("SWF version", os.str()));
+    localIter = tr.append_child(it, StringPair("Root SWF version", os.str()));
     localIter = tr.append_child(it, StringPair("URL", def->get_url()));
 
     // TODO: format this better?
