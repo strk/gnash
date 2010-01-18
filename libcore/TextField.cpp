@@ -1564,8 +1564,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                 else {
                                     hexval.erase(0, 1);
                                     // font COLOR attribute
-                                    rgba color =
-                                        colorFromHexString(attloc->second);
+                                    const rgba color =
+                                        colorFromHexString(hexval);
                                     newrec.setColor(color);
                                 }
                             }
