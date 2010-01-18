@@ -19,11 +19,11 @@
 #ifndef GNASH_MOVIE_LOADER_H
 #define GNASH_MOVIE_LOADER_H
 
-#include "URL.h" // for Request composition
-#include "as_object.h" // for setReachable inline
-#include "movie_definition.h" // for use in intrusive_ptr (inline)
-#include "MovieClip.h" // for MovieClip::VariablesMethod type
-#include "smart_ptr.h" // for intrusive_ptr
+#include "URL.h"
+#include "as_object.h" 
+#include "movie_definition.h" 
+#include "MovieClip.h" 
+#include "smart_ptr.h"
 
 #include <list>
 #include <string>
