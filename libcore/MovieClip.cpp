@@ -401,7 +401,7 @@ MovieClip::~MovieClip()
     stage().remove_key_listener(this);
     stage().remove_mouse_listener(this);
 
-    deleteAllChecked(_loadVariableRequests);
+    deleteChecked(_loadVariableRequests.begin(), _loadVariableRequests.end());
 }
 
 int

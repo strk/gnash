@@ -68,7 +68,7 @@ DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
 
 DefineButtonTag::~DefineButtonTag()
 {
-    deleteAllChecked(_buttonActions);
+    deleteChecked(_buttonActions.begin(), _buttonActions.end());
 }
 
 

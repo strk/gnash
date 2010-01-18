@@ -681,7 +681,7 @@ NetConnection_as::NetConnection_as(as_object* owner)
 // here to have HTTPRemotingHandler definition available
 NetConnection_as::~NetConnection_as()
 {
-    deleteAllChecked(_queuedConnections);
+    deleteChecked(_queuedConnections.begin(), _queuedConnections.end());
 }
 
 // extern (used by Global.cpp)
