@@ -29,26 +29,26 @@
 namespace gnash {
 
 WallClockTimer::WallClockTimer()
-	:
-	startTimer(clocktime::getTicks())
+    :
+    startTimer(clocktime::getTicks())
 {
 }
 
 void
 WallClockTimer::restart()
 {
-	startTimer = clocktime::getTicks();
+    startTimer = clocktime::getTicks();
 }
 
 boost::uint32_t
 WallClockTimer::elapsed() const
 {
-	boost::uint64_t currTime = clocktime::getTicks();
-	
-	// be aware of time glitches
-	if ( currTime <= startTimer ) return 0;
+    boost::uint64_t currTime = clocktime::getTicks();
+    
+    // be aware of time glitches
+    if ( currTime <= startTimer ) return 0;
 
-	return currTime - startTimer;
+    return currTime - startTimer;
 
 }
 
