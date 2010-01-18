@@ -18,6 +18,15 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
+
+if test x"$windows" = x"yes"; then
+  gtklib="libgtk-win32-2.0"
+  gdklib="libgdk-win32-2.0"
+else
+  gtklib="libgtk-x11-2.0"
+  gdklib="libgdk-x11-2.0"
+fi
+
   dnl Look for the header
   AC_ARG_WITH(gtk2_incl, AC_HELP_STRING([--with-gtk2-incl], [directory where libgtk2 header is]), with_gtk2_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_gtk2_incl,[
@@ -74,14 +83,14 @@ AC_DEFUN([GNASH_PATH_GTK2],
 
     AC_CACHE_VAL(ac_cv_path_gtk2_lib,[
     if test x"${with_gtk2_lib}" != x ; then
-      if test -f ${with_gtk2_lib}/libgtk-x11-2.0.${shlibext}; then
-        if test -f ${with_gtk2_lib}/libgdk-x11-2.0; then
+      if test -f ${with_gtk2_lib}/${gtklib}.${shlibext} -o -f ${with_gtk2_lib}/${gtklib}.a; then
+        if test -f ${with_gtk2_lib}/${gdklib}.${shlibext} -o -f ${with_gtk2_lib}/${gdklib}.a; then
         	ac_cv_path_gtk2_lib="-I`(cd ${with_gtk2_lib}; pwd)`"
         else
-        	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgdk-x11-2.0])
+        	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain ${gdklib}.${shlibext}])
         fi
       else
-      	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgtk-x11-2.0.${shlibext}])
+      	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain ${gtklib}.${shlibext}])
       fi
     fi
   ])
@@ -97,12 +106,20 @@ dnl the library.
   AC_MSG_CHECKING([for libgtk2 library])
   if test x"${ac_cv_path_gtk2_incl}" != x -a x"${ac_cv_path_gtk2_lib}" = x; then
     for i in $libslist; do
-      if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.${shlibext}; then
+      if test -f $i/${gtklib}.a -o -f $i/${gtklib}.${shlibext}; then
         if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
-          ac_cv_path_gtk2_lib="-L$i -lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0"
+          if test x"$windows" = x"yes"; then
+            ac_cv_path_gtk2_lib="-L$i -lgtk-win32-2.0 -lgdk-win32-2.0 -lgobject-2.0 -lgmodule-2.0"
+          else
+            ac_cv_path_gtk2_lib="-L$i -lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0"
+          fi
           break
         else
-          ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0 "
+          if test x"$windows" = x"yes"; then
+            ac_cv_path_gtk2_lib="-lgtk-win32-2.0 -lgdk-win32-2.0 -lgobject-2.0 -lgmodule-2.0 "
+          else
+            ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0 "
+          fi
           break
         fi
       fi
@@ -110,7 +127,11 @@ dnl the library.
   fi
 
   if test x"${ac_cv_path_gtk2_lib}" = x; then
-    AC_CHECK_LIB([gtk-x11-2.0], [gtk_init], [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0"])
+    if test x"$windows" = x"yes"; then
+      AC_CHECK_LIB([gtk-win32-2.0], [gtk_init], [ac_cv_path_gtk2_lib="-lgtk-win32-2.0 -lgdk-win32-2.0 -lgobject-2.0 -lgmodule-2.0"])
+    else
+      AC_CHECK_LIB([gtk-x11-2.0], [gtk_init], [ac_cv_path_gtk2_lib="-lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0"])
+    fi
   fi
   AC_MSG_RESULT($ac_cv_path_gtk2_lib)
  
