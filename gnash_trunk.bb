@@ -7,7 +7,8 @@ DEPENDS = "libtool gtk+ pango atk glib agg libsdl-mixer zlib boost \
           
 PR = "r0"
 
-SRC_URI = "http:/gnash/${PV}/gnash-${PV}.tar.bz2
+SRC_URI = "http://www.getgnash.org/packages/snapshots/gnash-${PV}.tar.bz2"
+#SRC_URI[tarball.md5sum] = "2e9f7464bc2b9246aa0a24facf2b88b1"
 
 acpaths = " -Imacros"
 inherit autotools pkgconfig
