@@ -828,7 +828,6 @@ dateToGnashTime(Date_as& date, GnashTime& gt, bool utc)
 //
 // Heaven knows what happens if it is 1.30 localtime and you change the date
 // to the day the clocks go forward.
-
 template<bool utc>
 as_value
 date_setfullyear(const fn_call& fn)
@@ -846,22 +845,10 @@ date_setfullyear(const fn_call& fn)
     }
     else {
         GnashTime gt;
-
         dateToGnashTime(*date, gt, utc);
         gt.year = toInt(fn.arg(0)) - 1900;
-        switch (fn.nargs)
-        {
-            default:
-                IF_VERBOSE_ASCODING_ERRORS(
-                    log_aserror(_("Date.set%sFullYear was called with "
-                        "more than three arguments"), utc ? "UTC" : "");
-                );
-    
-            case 3:
-                gt.monthday = toInt(fn.arg(2));
-            case 2:
-                gt.month = toInt(fn.arg(1));
-        }
+        if (fn.nargs >= 2) gt.month = toInt(fn.arg(1));
+        if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2));
         gnashTimeToDate(gt, *date, utc);
   }
   return as_value(date->getTimeValue());
