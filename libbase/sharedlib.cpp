@@ -60,8 +60,6 @@ lt_dlhandle lt_dlopenext       (const char *filename);
 # define PLUGINSDIR "./"
 #endif
 
-using namespace std;
-
 namespace gnash {
 
 SharedLib::SharedLib(const std::string& filespec)
@@ -80,7 +78,7 @@ SharedLib::SharedLib(const std::string& filespec, const std::string& envvar)
         log_error (_("Couldn't initialize ltdl: %s"), lt_dlerror());
     }
     
-    string pluginsdir;
+    std::string pluginsdir;
     char *env = std::getenv (envvar.c_str());
     if (env) {
         pluginsdir = env;
