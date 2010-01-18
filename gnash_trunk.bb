@@ -10,7 +10,6 @@ PR = "r0"
 SRC_URI = "http://www.getgnash.org/packages/snapshots/gnash-${PV}.tar.bz2"
 #SRC_URI[tarball.md5sum] = "2e9f7464bc2b9246aa0a24facf2b88b1"
 
-acpaths = " -Imacros"
 inherit autotools pkgconfig
 
 DEFAULT_PREFERENCE = "-1"
@@ -18,6 +17,11 @@ DEFAULT_PREFERENCE_angstrom = "1"
 
 # Boost lacks defines for lots of archs
 TARGET_CC_ARCH_append = "-DHAVE_POLL_H ${@[' -D_BIG_ENDIAN', ' -D_LITTLE_ENDIAN'][bb.data.getVar('SITEINFO_ENDIANESS', d, 1) == 'le']}"
+
+do_configure() {
+    ./autogen.sh
+    oe_runconf
+}
 
 do_install_append() {
 	oe_runmake DESTDIR=${D} install-plugin
