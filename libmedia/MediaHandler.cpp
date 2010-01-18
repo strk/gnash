@@ -41,25 +41,25 @@ std::auto_ptr<MediaHandler> MediaHandler::_handler;
 bool
 MediaHandler::isFLV(IOChannel& stream) throw (IOException)
 {
-	char head[4] = {0, 0, 0, 0};
-	stream.seek(0);
-	size_t actuallyRead = stream.read(head, 3);
-	stream.seek(0);
+    char head[4] = {0, 0, 0, 0};
+    stream.seek(0);
+    size_t actuallyRead = stream.read(head, 3);
+    stream.seek(0);
 
-	if (actuallyRead < 3)
-	{
-		throw IOException(_("MediaHandler::isFLV: Could not read 3 bytes "
+    if (actuallyRead < 3)
+    {
+        throw IOException(_("MediaHandler::isFLV: Could not read 3 bytes "
                     "from input stream"));
-	}
+    }
 
     if (!std::equal(head, head + 3, "FLV")) return false;
-	return true;
+    return true;
 }
 
 std::auto_ptr<MediaParser>
 MediaHandler::createMediaParser(std::auto_ptr<IOChannel> stream)
 {
-	std::auto_ptr<MediaParser> parser;
+    std::auto_ptr<MediaParser> parser;
 
     try {
         if (!isFLV(*stream))
@@ -74,10 +74,10 @@ MediaHandler::createMediaParser(std::auto_ptr<IOChannel> stream)
         return parser;
     }
 
-	parser.reset( new FLVParser(stream) );
-	assert(! stream.get() ); // TODO: when ownership will be transferred...
+    parser.reset( new FLVParser(stream) );
+    assert(!stream.get()); // TODO: when ownership will be transferred...
 
-	return parser;
+    return parser;
 }
 
 std::auto_ptr<AudioDecoder>

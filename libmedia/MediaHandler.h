@@ -32,15 +32,15 @@
 
 // Forward declarations
 namespace gnash {
-	class IOChannel;
-	namespace media {
-		class VideoDecoder;
-		class AudioDecoder;
-		class AudioInfo;
-		class VideoInfo;
+    class IOChannel;
+    namespace media {
+        class VideoDecoder;
+        class AudioDecoder;
+        class AudioInfo;
+        class VideoInfo;
         class VideoInput;
         class AudioInput;
-	}
+    }
 }
 
 namespace gnash {
@@ -66,49 +66,49 @@ class DSOEXPORT MediaHandler
 {
 public:
 
-	virtual ~MediaHandler() {}
+    virtual ~MediaHandler() {}
 
-	/// Return currently registered MediaHandler, possibly null.
-	static MediaHandler* get()
-	{
-		return _handler.get();
-	}
+    /// Return currently registered MediaHandler, possibly null.
+    static MediaHandler* get()
+    {
+        return _handler.get();
+    }
 
-	/// Register a MediaHandler to use
-	static void set(std::auto_ptr<MediaHandler> mh)
-	{
-		_handler = mh;
-	}
+    /// Register a MediaHandler to use
+    static void set(std::auto_ptr<MediaHandler> mh)
+    {
+        _handler = mh;
+    }
 
-	/// Return an appropriate MediaParser for given input
-	//
-	/// @param stream
-	///	Input stream, ownership transferred
-	///
-	/// @return 0 if no parser could be created for the input
-	///
-	/// NOTE: the default implementation returns an FLVParser for FLV input
-	///       or 0 for others.
-	///
-	virtual std::auto_ptr<MediaParser>
+    /// Return an appropriate MediaParser for given input
+    //
+    /// @param stream
+    ///    Input stream, ownership transferred
+    ///
+    /// @return 0 if no parser could be created for the input
+    ///
+    /// NOTE: the default implementation returns an FLVParser for FLV input
+    ///       or 0 for others.
+    ///
+    virtual std::auto_ptr<MediaParser>
         createMediaParser(std::auto_ptr<IOChannel> stream);
 
-	/// Create a VideoDecoder for decoding what's specified in the VideoInfo
-	//
-	/// @param info VideoInfo class with all the info needed to decode
-	///             the sound correctly.
+    /// Create a VideoDecoder for decoding what's specified in the VideoInfo
+    //
+    /// @param info VideoInfo class with all the info needed to decode
+    ///             the sound correctly.
     /// @return     Will always return a valid VideoDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-	virtual std::auto_ptr<VideoDecoder>
+    virtual std::auto_ptr<VideoDecoder>
         createVideoDecoder(const VideoInfo& info)=0;
 
-	/// Create an AudioDecoder for decoding what's specified in the AudioInfo
-	//
-	/// @param info AudioInfo class with all the info needed to decode
-	///             the sound correctly.
+    /// Create an AudioDecoder for decoding what's specified in the AudioInfo
+    //
+    /// @param info AudioInfo class with all the info needed to decode
+    ///             the sound correctly.
     /// @return     Will always return a valid AudioDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-	virtual std::auto_ptr<AudioDecoder>
+    virtual std::auto_ptr<AudioDecoder>
         createAudioDecoder(const AudioInfo& info)=0;
 
     /// Create an VideoConverter for converting between color spaces.
@@ -162,16 +162,16 @@ protected:
     ///
     std::auto_ptr<AudioDecoder> createFlashAudioDecoder(const AudioInfo& info);
 
-	/// Return true if input stream is an FLV
+    /// Return true if input stream is an FLV
     //
     /// If this cannot read the necessary 3 bytes, it throws an IOException.
-	bool isFLV(IOChannel& stream) throw (IOException);
+    bool isFLV(IOChannel& stream) throw (IOException);
 
-	MediaHandler() {}
+    MediaHandler() {}
 
 private:
 
-	static std::auto_ptr<MediaHandler> _handler;
+    static std::auto_ptr<MediaHandler> _handler;
 };
 
 
