@@ -274,21 +274,24 @@ utf8::stripBOM(char* in, size_t& size, TextEncoding& encoding)
             in+=2;
             size-=2;
         }
-        else if ( size > 3 && *ptr == 0xEF && *(ptr+1) == 0xBB && *(ptr+2) == 0xBF )
+        else if (size > 3 && *ptr == 0xEF && *(ptr+1) == 0xBB &&
+                *(ptr+2) == 0xBF )
         {
             // Text is UTF-8
             encoding = encUTF8;
             in+=3;
             size-=3;
         }
-        else if ( size > 4 && *ptr == 0x00 && *(ptr+1) == 0x00 && *(ptr+2) == 0xFE && *(ptr+3) == 0xFF )
+        else if ( size > 4 && *ptr == 0x00 && *(ptr+1) == 0x00 &&
+                *(ptr+2) == 0xFE && *(ptr+3) == 0xFF )
         {
             // Text is UTF-32 BE
             encoding = encUTF32BE;
             in+=4;
             size-=4;
         }
-        else if ( size > 4 && *ptr == 0xFF && *(ptr+1) == 0xFE && *(ptr+2) == 0x00 && *(ptr+3) == 0x00 )
+        else if ( size > 4 && *ptr == 0xFF && *(ptr+1) == 0xFE &&
+                *(ptr+2) == 0x00 && *(ptr+3) == 0x00 )
         {
             // Text is UTF-32 LE
             encoding = encUTF32LE;
