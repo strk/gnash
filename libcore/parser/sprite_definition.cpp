@@ -66,7 +66,7 @@ sprite_definition::~sprite_definition()
             i != e; ++i)
 	{
 		PlayList& pl = i->second;
-        deleteAllChecked(pl);
+        deleteChecked(pl.begin(), pl.end());
     }
 }
 

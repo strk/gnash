@@ -67,7 +67,7 @@ DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, boost::uint16_t id)
 
 DefineVideoStreamTag::~DefineVideoStreamTag()
 {
-    deleteAllChecked(_video_frames);
+    deleteChecked(_video_frames.begin(), _video_frames.end());
 }
 
 

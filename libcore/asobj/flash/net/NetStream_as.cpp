@@ -1622,7 +1622,7 @@ BufferedAudioStreamer::cleanAudioQueue()
 {
     boost::mutex::scoped_lock lock(_audioQueueMutex);
 
-    deleteAllChecked(_audioQueue);
+    deleteChecked(_audioQueue.begin(), _audioQueue.end());
 
     _audioQueue.clear();
 }

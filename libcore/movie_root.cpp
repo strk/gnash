@@ -171,7 +171,7 @@ movie_root::clearActionQueue()
     {
         ActionQueue& q = _actionQueue[lvl];
 
-        deleteAllChecked(q);
+        deleteChecked(q.begin(), q.end());
 	    q.clear();
     }
 }
@@ -179,12 +179,7 @@ movie_root::clearActionQueue()
 void
 movie_root::clearIntervalTimers()
 {
-	for (TimerMap::iterator it=_intervalTimers.begin(),
-			itE=_intervalTimers.end();
-			it != itE; ++it)
-	{
-		delete it->second;
-	}
+    deleteSecondElements(_intervalTimers.begin(), _intervalTimers.end());
 	_intervalTimers.clear();
 }
 
@@ -1620,28 +1615,23 @@ movie_root::executeTimers()
 
 		Timer* timer = it->second;
 
-		if ( timer->cleared() )
-		{
+		if (timer->cleared()) {
 			// this timer was cleared, erase it
 			delete timer;
 			_intervalTimers.erase(it);
 		}
-		else
-		{
+		else {
 			unsigned long elapsed;
-			if (timer->expired(now, elapsed))
-			{
-				expiredTimers.insert( std::make_pair(elapsed, timer) );
+			if (timer->expired(now, elapsed)) {
+				expiredTimers.insert(std::make_pair(elapsed, timer));
 			}
 		}
 
 		it = nextIterator;
 	}
 
-	for (ExpiredTimers::iterator it=expiredTimers.begin(),
-            itEnd=expiredTimers.end(); it != itEnd; ++it) {
-		it->second->executeAndReset();
-	}
+    foreachSecond(expiredTimers.begin(), expiredTimers.end(),
+            std::mem_fun(&Timer::executeAndReset));
 
     if (!expiredTimers.empty()) processActionQueue();
 

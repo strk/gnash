@@ -177,7 +177,7 @@ SWFMovieDefinition::~SWFMovieDefinition()
             e = m_playlist.end(); i != e; ++i)
 	{
 		PlayList& pl = i->second;
-        deleteAllChecked(pl);
+        deleteChecked(pl.begin(), pl.end());
     }
 
 }

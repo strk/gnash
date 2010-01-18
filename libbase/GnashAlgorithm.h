@@ -20,6 +20,7 @@
 #ifndef GNASH_ALGORITHM_H
 #define GNASH_ALGORITHM_H
 
+#include <iterator>
 #include <algorithm>
 #include <boost/checked_delete.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -113,6 +114,9 @@ struct CheckedDeleter
 template<typename T>
 struct CheckedDeleter<T**>
 {
+    /// Typedef for use in boost::bind.
+    typedef typename CheckedDeleter<T*>::result_type result_type;
+
     void operator()(T** p) const {
         CheckedDeleter<T*>()(*p);
     }
@@ -121,19 +125,65 @@ struct CheckedDeleter<T**>
 template<typename T>
 struct CheckedDeleter<T*>
 {
+    /// Typedef for use in boost::bind.
+    typedef void result_type;
+
     void operator()(T* p) const {
         boost::checked_delete<T>(p);
     }
 };
 
-template<typename T>
+
+/// Call a functor on the second element of each element in a range.
+//
+/// @tparam T           An iterator type satisfying the requirements of a
+///                     forward iterator
+/// @tparam U           The type of the functor op.
+/// @param begin        The start of the range to call op on.
+/// @param end          The end of the range to call op on.
+/// @param op           The function to call on each second element.
+template<typename T, typename U>
 void
-deleteAllChecked(const T& c)
+foreachSecond(T begin, T end, U op)
 {
-    std::for_each(c.begin(), c.end(),
-            CheckedDeleter<typename T::value_type>());
+    typedef SecondElement<typename std::iterator_traits<T>::value_type> S;
+    std::for_each(begin, end, boost::bind(op, boost::bind(S(), _1)));
 }
 
+/// Safely call delete on each element in a range.
+//
+/// This checks that the type is fully known, but cannot check whether the
+/// pointer was allocated with new. Pointers allocated with new[] or any other
+/// allocation function should never be passed to this function.
+//
+/// @param begin        The start of the range to call delete on.
+/// @param end          The end of the range to call delete on.
+template<typename T>
+void
+deleteChecked(T begin, T end)
+{
+    typedef typename std::iterator_traits<T>::value_type value_type;
+    std::for_each(begin, end, CheckedDeleter<typename T::value_type>());
+}
+
+/// Safely call delete on each second element in a range of pairs.
+//
+/// This checks that the type is fully known, but cannot check whether the
+/// pointer was allocated with new. Pointers allocated with new[] or any other
+/// allocation function should never be passed to this function.
+//
+/// @param begin        The start of the range to call delete on.
+/// @param end          The end of the range to call delete on.
+template<typename T>
+void
+deleteSecondElements(T begin, T end)
+{
+    typedef SecondElement<typename std::iterator_traits<T>::value_type> S;
+    CheckedDeleter<typename S::result_type> op;
+    foreachSecond(begin, end, op);
+}
+
+            
 } // namespace gnash
 
 #endif

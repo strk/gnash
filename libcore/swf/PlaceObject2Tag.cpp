@@ -479,8 +479,8 @@ PlaceObject2Tag::execute(MovieClip* m, DisplayList& dlist) const
 
 PlaceObject2Tag::~PlaceObject2Tag()
 {
-    deleteAllChecked(_eventHandlers);
-    deleteAllChecked(_actionBuffers);
+    deleteChecked(_eventHandlers.begin(), _eventHandlers.end());
+    deleteChecked(_actionBuffers.begin(), _actionBuffers.end());
 }
 
 /* public static */
