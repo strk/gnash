@@ -1387,9 +1387,10 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
         return;
     }
 
-    // Call add_invalidated_bounds on each MovieClip.
-    foreachSecond(_movies.rbegin(), _movies.rend(), boost::bind(
-        boost::mem_fn(&MovieClip::add_invalidated_bounds), _1, ranges, force));
+    for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e;
+                        ++i) {
+        i->second->add_invalidated_bounds(ranges, force);
+    }
 
 }
 
