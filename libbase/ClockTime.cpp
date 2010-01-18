@@ -25,8 +25,8 @@
 ///
 /// Namespace clocktime contains a unified source for wall clock time: this
 /// is used mainly for the timing of movie advances and in the ActionScript
-/// Date class. FPS profiling also uses clocktime:: for a relatively high resolution,
-/// robust timer.
+/// Date class. FPS profiling also uses clocktime:: for a relatively high
+/// resolution, robust timer.
 ///
 /// The boost::date_time has the great advantage of handling portability itself,
 /// as well as being able to handle a much larger range of true dates. Its
@@ -64,7 +64,7 @@ clocktime::getTicks()
     // Divisor to convert ticks to milliseconds
     const int denominator = time_duration::ticks_per_second() / 1000.0;
     
-	return elapsed.ticks() / denominator;
+    return elapsed.ticks() / denominator;
 }
 
 boost::int32_t
@@ -109,7 +109,7 @@ boost::uint64_t
 clocktime::getTicks()
 {
     // This needs to return milliseconds. Does it?
-	return timeGetTime();
+    return timeGetTime();
 }
 
 # else // not _WIN32
@@ -119,16 +119,16 @@ boost::uint64_t
 clocktime::getTicks()
 {
 
-	struct timeval tv;
-	
-	gettimeofday(&tv, 0);
+    struct timeval tv;
+    
+    gettimeofday(&tv, 0);
 
-	boost::uint64_t result = static_cast<boost::uint64_t>(tv.tv_sec) * 1000000L;
+    boost::uint64_t result = static_cast<boost::uint64_t>(tv.tv_sec) * 1000000L;
 
-	// Time Unit: microsecond
-	result += tv.tv_usec;
+    // Time Unit: microsecond
+    result += tv.tv_usec;
 
-	return static_cast<boost::uint64_t>(result / 1000.0);
+    return static_cast<boost::uint64_t>(result / 1000.0);
 }
 
 # endif // not WIN32
@@ -222,12 +222,11 @@ clocktime::getTimeZoneOffset(double time)
     // should normally be specified as NULL. The tz_dsttime field has
     // never been used under Linux; it has not been and will not be
     // supported by libc or glibc."
-    // Still, mancansa d'asu, t'acuma i buoi (Mangels Esel, Ochsen einspannen...)
     //
     // In practice this appears to return the present time offset including dst,
-    // so adding the dst of the time specified (we do this a couple of lines down)
-    // gives the correct result when it's not presently dst, the wrong one when
-    // it is.
+    // so adding the dst of the time specified (we do this a couple of lines
+    // down) gives the correct result when it's not presently dst, the wrong
+    // one when it is.
     struct timeval tv;
     struct timezone tz;
     gettimeofday(&tv, &tz);
@@ -241,15 +240,14 @@ clocktime::getTimeZoneOffset(double time)
     // The problem here as for gettimeofday: the offset also includes dst.
     struct timeb tb;
     
-    ftime (&tb);
+    ftime(&tb);
+
     // tb.timezone is number of minutes west of GMT
     offset = -tb.timezone;
-    //gnash::log_debug("Using ftime. Offset is %d", offset);
 
 # else
 
     offset = 0; // No idea.
-    //gnash::log_debug("Cannot find offset. Offset is %d", offset);
 
 # endif
 
