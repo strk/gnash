@@ -706,7 +706,7 @@ MovieClip::notifyEvent(const event_id& id)
     }
 
     // Check for member function.
-    if (isKeyEvent(id)) {
+    if (!isKeyEvent(id)) {
         callMethod(getObject(this), id.functionKey());
     }
 
