@@ -42,39 +42,39 @@ class GifImageInput : public ImageInput
 
 public:
 
-	/// Construct a GifImageInput object to read from an IOChannel.
-	//
-	/// @param in   The stream to read GIF data from. Ownership is shared
+    /// Construct a GifImageInput object to read from an IOChannel.
+    //
+    /// @param in   The stream to read GIF data from. Ownership is shared
     ///             between caller and GifImageInput, so it is freed
     ///             automatically when the last owner is destroyed.
-	GifImageInput(boost::shared_ptr<IOChannel> in);
-	
-	~GifImageInput();
+    GifImageInput(boost::shared_ptr<IOChannel> in);
+    
+    ~GifImageInput();
 
     /// Begin processing the image data.
     void read();
 
-	/// Get the image's height in pixels.
+    /// Get the image's height in pixels.
     //
     /// @return     The height of the image in pixels.
-	size_t getHeight() const;
+    size_t getHeight() const;
 
-	/// Get the image's width in pixels.
+    /// Get the image's width in pixels.
     //
     /// @return     The width of the image in pixels.
-	size_t getWidth() const;
+    size_t getWidth() const;
 
-	/// Get number of components (channels)
+    /// Get number of components (channels)
     //
-	/// @return     The number of components, e.g. 3 for RGB
-	size_t getComponents() const { return 3; }
+    /// @return     The number of components, e.g. 3 for RGB
+    size_t getComponents() const { return 3; }
 
-	/// Read a scanline's worth of image data into the given buffer.
+    /// Read a scanline's worth of image data into the given buffer.
     //
     /// The amount of data read is getWidth() * getComponents().
-	///
+    ///
     /// @param rgbData  The buffer for writing raw RGB data to.
-	void readScanline(unsigned char* rgb_data);
+    void readScanline(unsigned char* rgb_data);
 
 
     /// Create a GifImageInput and transfer ownership to the caller.
@@ -89,12 +89,12 @@ public:
     }
 
 private:
-	
+    
     /// Initialize gif_lib
     void init();
 
-	// State needed for input.
-	GifFileType* _gif;
+    // State needed for input.
+    GifFileType* _gif;
     
     // A counter for keeping track of the last row copied.
     size_t _currentRow;

@@ -586,36 +586,32 @@ RcInitFile::parseFile(const std::string& filespec)
                              % variable % filespec % lineno << endl;
             }
         }
-        else if (noCaseCompare(action, "include") )
-        {
+        else if (noCaseCompare(action, "include")) {
             //cout << "Include directive in " << filespec << endl; 
             // TODO: resolve relative paths ?
             // TODO: skip parsing if already parsed ?
             //       (would mess up user-requested parsing order, but
             //       would be safe in case of circular includes)
             //
-            if ( variable.empty() )
-            {
-                cerr << boost::format(_("Warning: empty include specification in rcfile %s, line %d"))
-                    % filespec % lineno << endl;
+            if (variable.empty()) {
+                cerr << boost::format(_("Warning: empty include "
+                            "specification in rcfile %s, line %d"))
+                            % filespec % lineno << endl;
             }
-            else
-            {
-                if ( variable[0] != '/' )
-                {
-                    cerr << boost::format(_("Warning: include specification must be an absolute path"
-                        "in rcfile %s, line %d")) % filespec % lineno << endl;
+            else {
+                if ( variable[0] != '/' ) {
+                    cerr << boost::format(_("Warning: include specification "
+                                "must be an absolute path in rcfile %s, "
+                                "line %d")) % filespec % lineno << endl;
                 }
-                else
-                {
+                else {
                     parseFile(variable);
                 }
             }
         }
-        else
-        {
-            cerr << boost::format(_("Warning: unrecognized action \"%s\" in rcfile %s, "
-                "line %d")) % action % filespec % lineno << endl;
+        else {
+            cerr << boost::format(_("Warning: unrecognized action \"%s\" in "
+                "rcfile %s, line %d")) % action % filespec % lineno << endl;
         }
     }
 

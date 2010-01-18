@@ -32,8 +32,8 @@ namespace gnash {
 /// Exception signalling an IO error
 class DSOEXPORT IOException : public GnashException {
 public:
-	IOException(const std::string& s) : GnashException(s) {}
-	IOException() : GnashException("IO error") {}
+    IOException(const std::string& s) : GnashException(s) {}
+    IOException() : GnashException("IO error") {}
 };
 
 /// A virtual IO channel
@@ -41,167 +41,167 @@ class DSOEXPORT IOChannel
 {
 public:
 
-	virtual ~IOChannel() {}
+    virtual ~IOChannel() {}
 
-	/// \brief Read a 32-bit word from a little-endian stream.
-	///	returning it as a native-endian word.
-	//
-	/// Throw IOException on error
-	///
-	boost::uint32_t read_le32();
+    /// \brief Read a 32-bit word from a little-endian stream.
+    ///    returning it as a native-endian word.
+    //
+    /// Throw IOException on error
+    ///
+    boost::uint32_t read_le32();
 
-	/// \brief Read a 64-bit word from a little-ending stream,
-	/// returning it as a native-endian word.
-	//
-	/// Throw IOException on premature EOF
-	///
-	/// TODO: define a platform-neutral type for 64 bits.
-	///
-	long double read_le_double64();
+    /// \brief Read a 64-bit word from a little-ending stream,
+    /// returning it as a native-endian word.
+    //
+    /// Throw IOException on premature EOF
+    ///
+    /// TODO: define a platform-neutral type for 64 bits.
+    ///
+    long double read_le_double64();
 
-	/// Read a 16-bit word from a little-endian stream.
-	//
-	/// Throw IOException on error
-	///
-	boost::uint16_t read_le16();
+    /// Read a 16-bit word from a little-endian stream.
+    //
+    /// Throw IOException on error
+    ///
+    boost::uint16_t read_le16();
 
-	/// Write a 32-bit word to a little-endian stream.
-	//
-	/// Throw IOException on error
-	///
-	void write_le32(boost::uint32_t u);
+    /// Write a 32-bit word to a little-endian stream.
+    //
+    /// Throw IOException on error
+    ///
+    void write_le32(boost::uint32_t u);
 
-	/// \brief Write a 16-bit word to a little-endian stream.
-	//
-	/// Throw IOException on error
-	///
-	void write_le16(boost::uint16_t u);
+    /// \brief Write a 16-bit word to a little-endian stream.
+    //
+    /// Throw IOException on error
+    ///
+    void write_le16(boost::uint16_t u);
 
-	/// Read a single byte from the stream
-	//
-	/// Throw IOException on error
-	///
-	boost::uint8_t read_byte();
+    /// Read a single byte from the stream
+    //
+    /// Throw IOException on error
+    ///
+    boost::uint8_t read_byte();
 
-	/// write a single byte to the stream
-	//
-	/// Throw IOException on error
-	///
-	void write_byte(boost::uint8_t u);
+    /// write a single byte to the stream
+    //
+    /// Throw IOException on error
+    ///
+    void write_byte(boost::uint8_t u);
 
-	/// Read the given number of bytes from the stream
-	//
-	/// Return the number of bytes actually read. 
-	/// EOF might cause it to be < num.
-	///
-	/// Throw IOException on error
-	///
-	virtual std::streamsize read(void* dst, std::streamsize num)=0;
+    /// Read the given number of bytes from the stream
+    //
+    /// Return the number of bytes actually read. 
+    /// EOF might cause it to be < num.
+    ///
+    /// Throw IOException on error
+    ///
+    virtual std::streamsize read(void* dst, std::streamsize num)=0;
 
-	/// Read at most the given number of bytes w/out blocking
-	//
-	/// Throw IOException on error
-	///
-	/// @return The number of bytes actually read.
-	///         A short count may mean EOF was hit or 
-	///         data didn't arrive yet.
-	///
-	/// Default implementation proxies the call to the
-	/// blocking version.
-	///
-	virtual std::streamsize readNonBlocking(void* dst, std::streamsize num)
-	{
-		return read(dst, num);
-	}
+    /// Read at most the given number of bytes w/out blocking
+    //
+    /// Throw IOException on error
+    ///
+    /// @return The number of bytes actually read.
+    ///         A short count may mean EOF was hit or 
+    ///         data didn't arrive yet.
+    ///
+    /// Default implementation proxies the call to the
+    /// blocking version.
+    ///
+    virtual std::streamsize readNonBlocking(void* dst, std::streamsize num)
+    {
+        return read(dst, num);
+    }
 
-	/// Write the given number of bytes to the stream
-	//
-	/// Throw IOException on error/unsupported op.
-	///
-	virtual std::streamsize write(const void* src, std::streamsize num);
+    /// Write the given number of bytes to the stream
+    //
+    /// Throw IOException on error/unsupported op.
+    ///
+    virtual std::streamsize write(const void* src, std::streamsize num);
 
-	/// \brief Write a 0-terminated string to a stream.
-	//
-	/// Throw IOException on error
-	///
-	void write_string(const char* src);
+    /// \brief Write a 0-terminated string to a stream.
+    //
+    /// Throw IOException on error
+    ///
+    void write_string(const char* src);
 
-	/// \brief
-	/// Read up to max_length characters, returns the number of characters 
-	/// read, or -1 if the string length is longer than max_length.
-	//
-	/// Stops at the first \0 character if it comes before max_length.
-	///
-	/// Guarantees termination of the string.
-	///
-	/// @return the number of characters read, or -1 no null-termination
-	///         was found within max_length
-	///
-	/// Throw IOException on error
-	///
-	int	read_string(char* dst, int max_length);
+    /// \brief
+    /// Read up to max_length characters, returns the number of characters 
+    /// read, or -1 if the string length is longer than max_length.
+    //
+    /// Stops at the first \0 character if it comes before max_length.
+    ///
+    /// Guarantees termination of the string.
+    ///
+    /// @return the number of characters read, or -1 no null-termination
+    ///         was found within max_length
+    ///
+    /// Throw IOException on error
+    ///
+    int    read_string(char* dst, int max_length);
 
-	/// Write a 32-bit float to a stream in little-endian order.
-	//
-	/// NOTE: this currently relies on host FP format being the same
-    	///       as the Flash one (presumably IEEE 754).
-	///
-	/// Throw IOException on error
-	///
-	void write_float32(float value);
+    /// Write a 32-bit float to a stream in little-endian order.
+    //
+    /// NOTE: this currently relies on host FP format being the same
+        ///       as the Flash one (presumably IEEE 754).
+    ///
+    /// Throw IOException on error
+    ///
+    void write_float32(float value);
 
-	/// Read a 32-bit float from a little-endian stream.
-	//
-	/// NOTE: this currently relies on host FP format being the
-    	///       same as the Flash one (presumably IEEE 754).
-	///
-	/// Throw IOException on error
-	///
-	float read_float32();
+    /// Read a 32-bit float from a little-endian stream.
+    //
+    /// NOTE: this currently relies on host FP format being the
+        ///       same as the Flash one (presumably IEEE 754).
+    ///
+    /// Throw IOException on error
+    ///
+    float read_float32();
 
-	/// Return current stream position
-	//
-	/// Throw IOException on error
-	///
-	virtual std::streampos tell() const = 0;
+    /// Return current stream position
+    //
+    /// Throw IOException on error
+    ///
+    virtual std::streampos tell() const = 0;
 
-	/// Seek to the specified position
-	//
-	/// 
-	/// Throw IOException on error
-	///
-	/// @return true on success, or false on failure.
-	///
-	virtual bool seek(std::streampos p) = 0;
+    /// Seek to the specified position
+    //
+    /// 
+    /// Throw IOException on error
+    ///
+    /// @return true on success, or false on failure.
+    ///
+    virtual bool seek(std::streampos p) = 0;
 
-	/// Seek to the end of the stream
-	//
-	/// Throw IOException on error
-	///
-	virtual void go_to_end() = 0;
+    /// Seek to the end of the stream
+    //
+    /// Throw IOException on error
+    ///
+    virtual void go_to_end() = 0;
 
-	/// Return true if the end of the stream has been reached.
-	//
-	/// Throw IOException on error
-	///
-	virtual bool eof() const = 0;
+    /// Return true if the end of the stream has been reached.
+    //
+    /// Throw IOException on error
+    ///
+    virtual bool eof() const = 0;
     
-	/// Return true if the stream is in an error state
-	//
-	/// When the stream is in an error state there's nothing
-	/// you can do about it, just delete it and log the error.
-	virtual bool bad() const = 0;
+    /// Return true if the stream is in an error state
+    //
+    /// When the stream is in an error state there's nothing
+    /// you can do about it, just delete it and log the error.
+    virtual bool bad() const = 0;
     
-	/// Get the size of the stream (unreliably).
-	//
-	/// Size of stream is unreliable as not all input
-	/// channels have a mechanism to advertise size,
-	/// and some have one but isn't necessarely truthful
-	/// (a few HTTP severs are bogus in this reguard).
-	///
-	/// @return unreliable input size, (size_t)-1 if not known. 
-	///
-	virtual size_t size() const { return static_cast<size_t>(-1); }
+    /// Get the size of the stream (unreliably).
+    //
+    /// Size of stream is unreliable as not all input
+    /// channels have a mechanism to advertise size,
+    /// and some have one but isn't necessarely truthful
+    /// (a few HTTP severs are bogus in this reguard).
+    ///
+    /// @return unreliable input size, (size_t)-1 if not known. 
+    ///
+    virtual size_t size() const { return static_cast<size_t>(-1); }
    
 };
 

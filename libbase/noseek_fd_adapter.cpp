@@ -55,75 +55,75 @@ class NoSeekFile : public IOChannel
 
 public:
 
-	/// Open a stream for the specified filedes
-	//
-	/// @param fd
-	///	A filedescriptor for a stream opened for reading
-	///
-	/// @param filename
-	///	An optional filename to use for storing the cache.
-	///	If NULL the cache would be an unnamed file and
-	///	would not be accessible after destruction of this 
-	///	instance.
-	///
-	NoSeekFile(int fd, const char* filename=NULL);
+    /// Open a stream for the specified filedes
+    //
+    /// @param fd
+    ///    A filedescriptor for a stream opened for reading
+    ///
+    /// @param filename
+    ///    An optional filename to use for storing the cache.
+    ///    If NULL the cache would be an unnamed file and
+    ///    would not be accessible after destruction of this 
+    ///    instance.
+    ///
+    NoSeekFile(int fd, const char* filename=NULL);
 
-	~NoSeekFile();
+    ~NoSeekFile();
 
-	// See IOChannel.h for description
-	virtual std::streamsize read(void *dst, std::streamsize bytes);
+    // See IOChannel.h for description
+    virtual std::streamsize read(void *dst, std::streamsize bytes);
 
-	// See IOChannel for description
-	virtual bool eof() const;
+    // See IOChannel for description
+    virtual bool eof() const;
 
-	// See IOChannel for description
-	virtual bool bad() const { return false; }
+    // See IOChannel for description
+    virtual bool bad() const { return false; }
 
-	// See IOChannel for description
-	virtual std::streampos tell() const;
+    // See IOChannel for description
+    virtual std::streampos tell() const;
 
-	// See IOChannel for description
-	virtual bool seek(std::streampos pos);
+    // See IOChannel for description
+    virtual bool seek(std::streampos pos);
 
-	// See IOChannel for description
-	virtual void go_to_end() {
-		throw IOException("noseek_fd_adapter doesn't support seek to end");
-	}
+    // See IOChannel for description
+    virtual void go_to_end() {
+        throw IOException("noseek_fd_adapter doesn't support seek to end");
+    }
 
 private:
 
-	/// Read buffer size
-	static const std::streamsize chunkSize = 512;
+    /// Read buffer size
+    static const std::streamsize chunkSize = 512;
 
-	// Open either a temporary file or a named file
-	// (depending on value of _cachefilename)
-	void openCacheFile();
+    // Open either a temporary file or a named file
+    // (depending on value of _cachefilename)
+    void openCacheFile();
 
-	// Use this file to cache data
-	FILE* _cache;
+    // Use this file to cache data
+    FILE* _cache;
 
-	// the input file descriptor
-	int _fd;
+    // the input file descriptor
+    int _fd;
 
-	// transfer in progress
-	int _running;
+    // transfer in progress
+    int _running;
 
-	// cache filename
-	const char* _cachefilename;
+    // cache filename
+    const char* _cachefilename;
 
-	// Current size of cached data
+    // Current size of cached data
     size_t _cached;
 
-	// Current read buffer
-	char _buf[chunkSize];
+    // Current read buffer
+    char _buf[chunkSize];
 
-	// Attempt at filling the cache up to the given size.
-	void fill_cache(std::streamsize size);
+    // Attempt at filling the cache up to the given size.
+    void fill_cache(std::streamsize size);
 
-	// Append sz bytes to the cache
+    // Append sz bytes to the cache
     std::streamsize cache(void *from, std::streamsize sz);
 
-	void printInfo();
+    void printInfo();
 
 };
 
@@ -143,20 +143,20 @@ NoSeekFile::cache(void *from, std::streamsize sz)
 {
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	std::cerr << boost::format("cache(%p, %d) called") % from % sz << std::endl;
+    std::cerr << boost::format("cache(%p, %d) called") % from % sz << std::endl;
 #endif
-	// take note of current position
+    // take note of current position
     std::streampos curr_pos = std::ftell(_cache);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	std::cerr << boost::format(" current position: %ld)") % curr_pos << std::endl;
+    std::cerr << boost::format(" current position: %ld)") % curr_pos << std::endl;
 #endif
 
-	// seek to the end
+    // seek to the end
     std::fseek(_cache, 0, SEEK_END);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	std::cerr << boost::format(" after SEEK_END, position: %ld") %
+    std::cerr << boost::format(" after SEEK_END, position: %ld") %
         std::ftell(_cache) << std::endl;
 #endif
 
@@ -164,24 +164,24 @@ NoSeekFile::cache(void *from, std::streamsize sz)
 #ifdef GNASH_NOSEEK_FD_VERBOSE
     std::cerr << boost::format(" write %d bytes") % wrote;
 #endif
-	if ( wrote < 1 )
-	{
+    if ( wrote < 1 )
+    {
         boost::format err = boost::format("writing to cache file: "
                 "requested %d, wrote %d (%s)")
             % sz % wrote % std::strerror(errno);
-			
-		std::cerr << err << std::endl;
-		throw IOException(err.str());
-	}
+            
+        std::cerr << err << std::endl;
+        throw IOException(err.str());
+    }
 
-	_cached += sz;
+    _cached += sz;
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
     std::cerr << boost::format(" after write, position: %ld") % 
         std::ftell(_cache) << std::endl;
 #endif
 
-	// reset position for next read
+    // reset position for next read
     std::fseek(_cache, curr_pos, SEEK_SET);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
@@ -191,7 +191,7 @@ NoSeekFile::cache(void *from, std::streamsize sz)
 
     std::clearerr(_cache);
 
-	return wrote;
+    return wrote;
 }
 
 
@@ -203,84 +203,84 @@ NoSeekFile::fill_cache(std::streamsize size)
     std::cerr << boost::format(" fill_cache(%d) called") % size << std::endl;
 #endif
 
-	assert(size >= 0);
+    assert(size >= 0);
 
-	// See how big is the cache
-	while (_cached < static_cast<size_t>(size))
-	{
+    // See how big is the cache
+    while (_cached < static_cast<size_t>(size))
+    {
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
         size_t bytesNeeded = size - _cached;
-		bytesNeeded = std::min<size_t>(bytesNeeded, chunkSize);
+        bytesNeeded = std::min<size_t>(bytesNeeded, chunkSize);
         std::cerr << boost::format(" bytes needed = %d") % bytesNeeded <<
             std::endl;
 #endif
 
         std::streamsize bytesRead = ::read(_fd, (void*)_buf, chunkSize);
-		if (bytesRead < 0)
-		{
-			std::cerr << boost::format(_("Error reading %d bytes from "
+        if (bytesRead < 0)
+        {
+            std::cerr << boost::format(_("Error reading %d bytes from "
                         "input stream")) % chunkSize << std::endl;
-			_running = false;
-			// this looks like a CRITICAL error (since we don't handle it..)
-			throw IOException("Error reading from input stream");
-		}
+            _running = false;
+            // this looks like a CRITICAL error (since we don't handle it..)
+            throw IOException("Error reading from input stream");
+        }
 
-		if (bytesRead < chunkSize)
-		{
-			if (bytesRead == 0)
-			{
+        if (bytesRead < chunkSize)
+        {
+            if (bytesRead == 0)
+            {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
                 std::cerr << "EOF reached" << std::endl;
 #endif
-				_running = false;
-				return;
-			}
-		}
-		cache(_buf, bytesRead);
-	}
+                _running = false;
+                return;
+            }
+        }
+        cache(_buf, bytesRead);
+    }
 }
 
 /*private*/
 void
 NoSeekFile::printInfo()
 {
-	std::cerr << "_cache.tell = " << tell() << std::endl;
+    std::cerr << "_cache.tell = " << tell() << std::endl;
 }
 
 /*private*/
 void
 NoSeekFile::openCacheFile()
 {
-	if ( _cachefilename )
-	{
-		_cache = fopen(_cachefilename, "w+b");
-		if ( ! _cache )
-		{
-			throw IOException("Could not create cache file " + 
+    if ( _cachefilename )
+    {
+        _cache = fopen(_cachefilename, "w+b");
+        if ( ! _cache )
+        {
+            throw IOException("Could not create cache file " + 
                     std::string(_cachefilename));
-		}
-	}
-	else
-	{
-		_cache = tmpfile();
-		if ( ! _cache ) {
-			throw IOException("Could not create temporary cache file");
-		}
-	}
+        }
+    }
+    else
+    {
+        _cache = tmpfile();
+        if ( ! _cache ) {
+            throw IOException("Could not create temporary cache file");
+        }
+    }
 
 }
 
 /*public*/
 NoSeekFile::NoSeekFile(int fd, const char* filename)
-	:
-	_fd(fd),
-	_running(1),
-	_cachefilename(filename),
-	_cached(0)
+    :
+    _fd(fd),
+    _running(1),
+    _cachefilename(filename),
+    _cached(0)
 {
-	// might throw an exception
-	openCacheFile();
+    // might throw an exception
+    openCacheFile();
 }
 
 /*public*/
@@ -294,46 +294,46 @@ std::streamsize
 NoSeekFile::read(void *dst, std::streamsize bytes)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	std::cerr << boost::format("read_cache(%d) called") % bytes << std::endl;
+    std::cerr << boost::format("read_cache(%d) called") % bytes << std::endl;
 #endif
 
-	if (eof())
-	{
+    if (eof())
+    {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	    std::cerr << "read_cache: at eof!" << std::endl;
+        std::cerr << "read_cache: at eof!" << std::endl;
 #endif
-		return 0;
-	}
+        return 0;
+    }
 
-	fill_cache(bytes + tell());
+    fill_cache(bytes + tell());
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	printInfo();
+    printInfo();
 #endif
 
     std::streamsize ret = std::fread(dst, 1, bytes, _cache);
 
-	if (ret == 0)
-	{
-		if (std::ferror(_cache))
-		{
+    if (ret == 0)
+    {
+        if (std::ferror(_cache))
+        {
             std::cerr << "an error occurred while reading from cache" <<
                 std::endl;
-		}
+        }
 #if GNASH_NOSEEK_FD_VERBOSE
-		if (std::feof(_cache))
-		{
+        if (std::feof(_cache))
+        {
             std::cerr << "EOF reached while reading from cache" << std::endl;
-		}
+        }
 #endif
-	}
+    }
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
     std::cerr << boost::format("fread from _cache returned %d") % ret <<
         std::endl;
 #endif
 
-	return ret;
+    return ret;
 
 }
 
@@ -341,12 +341,12 @@ NoSeekFile::read(void *dst, std::streamsize bytes)
 bool
 NoSeekFile::eof() const
 {
-	bool ret = ( ! _running && std::feof(_cache) );
-	
+    bool ret = ( ! _running && std::feof(_cache) );
+    
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	std::cerr << boost::format("eof() returning %d") % ret << std::endl;
+    std::cerr << boost::format("eof() returning %d") % ret << std::endl;
 #endif
-	return ret;
+    return ret;
 
 }
 
@@ -357,10 +357,10 @@ NoSeekFile::tell() const
     std::streampos ret = std::ftell(_cache);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	std::cerr << boost::format("tell() returning %ld") % ret << std::endl;
+    std::cerr << boost::format("tell() returning %ld") % ret << std::endl;
 #endif
 
-	return ret;
+    return ret;
 
 }
 
@@ -369,18 +369,18 @@ bool
 NoSeekFile::seek(std::streampos pos)
 {
 #ifdef GNASH_NOSEEK_FD_WARN_SEEKSBACK
-	if (pos < tell()) {
-		std::cerr << boost::format("Warning: seek backward requested "
-		                "(%ld from %ld)") % pos % tell() << std::endl;
-	}
+    if (pos < tell()) {
+        std::cerr << boost::format("Warning: seek backward requested "
+                        "(%ld from %ld)") % pos % tell() << std::endl;
+    }
 #endif
 
-	fill_cache(pos);
+    fill_cache(pos);
 
-	if (std::fseek(_cache, pos, SEEK_SET) == -1) {
-		std::cerr << "Warning: fseek failed" << std::endl;
-		return false;
-	} 
+    if (std::fseek(_cache, pos, SEEK_SET) == -1) {
+        std::cerr << "Warning: fseek failed" << std::endl;
+        return false;
+    } 
     
     return true;
 
@@ -397,20 +397,20 @@ IOChannel*
 make_stream(int fd, const char* cachefilename)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	std::cerr << boost::format("making NoSeekFile stream for fd %d") % fd << std::endl;
+    std::cerr << boost::format("making NoSeekFile stream for fd %d") % fd << std::endl;
 #endif
 
-	NoSeekFile* stream = NULL;
+    NoSeekFile* stream = NULL;
 
-	try {
-		stream = new NoSeekFile(fd, cachefilename);
-	} catch (const std::exception& ex) {
-		std::cerr << boost::format("NoSeekFile stream: %s") % ex.what() << std::endl;
-		delete stream;
-		return NULL;
-	}
+    try {
+        stream = new NoSeekFile(fd, cachefilename);
+    } catch (const std::exception& ex) {
+        std::cerr << boost::format("NoSeekFile stream: %s") % ex.what() << std::endl;
+        delete stream;
+        return NULL;
+    }
 
-	return stream;
+    return stream;
 }
 
 } // namespace gnash::noseek_fd_adapter

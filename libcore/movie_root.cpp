@@ -2252,7 +2252,7 @@ movie_root::LoadCallback::processLoad()
     }
 
     const size_t chunksize = 65535;
-    uint8_t chunk[chunksize];
+    boost::uint8_t chunk[chunksize];
 
     size_t actuallyRead = _stream->readNonBlocking(chunk, chunksize);
 

@@ -22,24 +22,38 @@
 #define GNASH_EVENT_ID_H
 
 #include "string_table.h"
-
-#include "GnashKey.h" // for gnash::key::code
+#include "GnashKey.h"
 
 namespace gnash {
 
-/// For keyDown and stuff like that.
+
+/// A class to identify 'static' SWF events (system events).
 //
-/// Implementation is currently in action.cpp
-///
+/// The event process in a SWF comprises the raising of the event itself and
+/// its receipt by a handler. Events may be either dynamically or statically
+/// defined. A dynamic event is handled in ActionScript: an AS-defined
+/// function is called when the event is raised. Dynamic events do not need
+/// event_id.
+//
+/// Event handlers may also be defined statically, for instance in a
+/// PlaceObject2 tag, or by default. System events such as mouse handling,
+/// load milestones, or keyboard events should be sent to appropriate
+/// DisplayObjects. This process uses event_id.
+//
+/// Static events may additionally be handled dynamically (using ActionScript).
+//
+/// The event_id class is used as an identifier for actual events and
+/// and for the signature of an expected event.
 class event_id
 {
 public:
 
+    /// The types of events that are handled by DisplayObjects.
     enum EventCode
     {
         INVALID,
 
-        // These are for buttons & sprites.
+        // These are for buttons and sprites.
         PRESS,
         RELEASE,
         RELEASE_OUTSIDE,
@@ -60,29 +74,37 @@ public:
         KEY_DOWN,
         KEY_UP,
         DATA,
-        
-        CONSTRUCT,
-
-        EVENT_COUNT
+        CONSTRUCT
     };
     
-    event_id() : _id(INVALID), _keyCode(key::INVALID) {}
+    /// Construct an invalid event_id.
+    //
+    /// This is not useful until its values have been set.
+    event_id()
+        :
+        _id(INVALID),
+        _keyCode(key::INVALID)
+    {}
 
+    /// Construct an event_id.
+    //
+    /// @param id       The type of event
+    /// @param c        The key associated with an event (only if this
+    ///                 is a keyboard event).
     event_id(EventCode id, key::code c = key::INVALID)
         :
         _id(id),
         _keyCode(c)
     {
-        // you must supply a key code for KEY_PRESS event
-        // 
-        // we do have a testcase with _id == KEY_PRESS,
+        // We do have a testcase with _id == KEY_PRESS,
         // and keyCode==0(KEY_INVALID)
         // see key_event_test.swf(produced by Ming)
     }
 
-    ///
-    /// @param SWFKey The SWF code matched to the event. This
-    /// must be converted to a unique gnash::key::code.
+    /// Set the key associated with this event.
+    //
+    /// @param SWFKey   The SWF code matched to the event. This
+    ///                 must be converted to a unique gnash::key::code.
     void setKeyCode(boost::uint8_t SWFkey)
     {
         // Lookup the SWFcode in the gnash::key::code table.
@@ -97,13 +119,17 @@ public:
         else _keyCode = static_cast<key::code>(i);
     }
 
-    bool operator==(const event_id& id) const
-    {
+    /// Return whether two event_ids are equal
+    //
+    /// event_ids are equal if both id and keycode match. Keycode is only
+    /// relevant for keyboard events, and must be key::INVALID for other
+    /// event types.
+    bool operator==(const event_id& id) const {
         return _id == id._id && _keyCode == id._keyCode;
     }
 
-    bool operator< (const event_id& id) const
-    {
+    /// Comparator for use in stdlib containers.
+    bool operator< (const event_id& id) const {
         if ( _id < id._id ) return true;
         if ( _id > id._id ) return false;
 
@@ -119,32 +145,14 @@ public:
     /// Return the string_table key of a method-handler function
     /// corresponding to this event.
     string_table::key functionKey() const;
-
-    /// \brief
-    /// Return true if this is a mouse event
-    /// (triggerable with a mouse activity)
-    bool is_mouse_event() const;
-  
-    /// Return true if this is a key event
-    bool is_key_event() const;
-
-    /// Return true if this is a button-like event
+    
+    /// Return the keycode associated with this event_id.
     //
-    /// Button-like events are: PRESS, RELEASE, RELEASE_OUTSIDE,
-    ///                         ROLL_OVER, ROLL_OUT,
-    ///                         DRAG_OVER, DRAG_OUT,
-    ///                         KEY_PRESS
-    ///
-    /// TODO: check if we need anything more
-    ///       The way to test is using the 'enabled'
-    ///       property to see which ones are disabled
-    ///       by setting it to false.
-    ///
-    bool is_button_event() const;
-
-    EventCode id() const { return _id; }
-
+    /// This should be key::INVALID if the event_id is not a keyboard event.
     key::code keyCode() const { return _keyCode; }
+
+    /// Return the identifier for this event type.
+    EventCode id() const { return _id; }
 
 private:
 
@@ -160,12 +168,25 @@ private:
 
 };
 
+
+/// Check whether an event is a button-like event.
+//
+/// @param e        The event to check
+/// @return         True if it is
+bool isButtonEvent(const event_id& e);
+
+/// Check whether an event is a keyboard event.
+//
+/// @param e        The event to check
+/// @return         True if it is
+bool isKeyEvent(const event_id& e);
+
 std::ostream& operator<< (std::ostream& o, const event_id& ev);
 
 } // namespace gnash
 
 
-#endif // GNASH_EVENT_ID_H
+#endif 
 
 
 // Local Variables:

@@ -36,7 +36,7 @@
 
 // Support compilation with (or without) native language support
 #include "gettext.h"
-#define	_(String) gettext (String)
+#define    _(String) gettext (String)
 #define N_(String) gettext_noop (String)
 
 // Macro to prevent repeated logging calls for the same
@@ -86,17 +86,17 @@ public:
     /// Intended for use by log_*(). Thread-safe (locks _ioMutex)
     //
     /// @param label
-    ///		The label string ie: "ERROR" for "ERROR: <msg>"
+    ///        The label string ie: "ERROR" for "ERROR: <msg>"
     ///
     /// @param msg
-    ///		The message string ie: "bah" for "ERROR: bah"
+    ///        The message string ie: "bah" for "ERROR: bah"
     ///
     void log(const std::string& label, const std::string& msg);
 
     /// Intended for use by log_*(). Thread-safe (locks _ioMutex)
     //
     /// @param msg
-    ///		The message to print
+    ///        The message to print
     ///
     void log(const std::string& msg);
     
@@ -407,43 +407,43 @@ public:
     // Only print function tracing messages when multiple -v
     // options have been supplied. 
     __Host_Function_Report__(void) {
-	log_debug("entering");
+    log_debug("entering");
     }
 
     __Host_Function_Report__(char *_func) {
-	func = _func;
-	log_debug("%s enter", func);
+    func = _func;
+    log_debug("%s enter", func);
     }
 
     __Host_Function_Report__(const char *_func) {
-	func = _func;
-	log_debug("%s enter", func);
+    func = _func;
+    log_debug("%s enter", func);
     }
 
     ~__Host_Function_Report__(void) {
-	if (LogFile::getDefaultInstance().getVerbosity() > LogFile::LOG_DEBUG) {
-	    log_debug("%s returning", func);
-	}
+    if (LogFile::getDefaultInstance().getVerbosity() > LogFile::LOG_DEBUG) {
+        log_debug("%s returning", func);
+    }
     }
 };
 
 #ifndef HAVE_FUNCTION
-	#ifndef HAVE_func
-		#define dummystr(x) # x
-		#define dummyestr(x) dummystr(x)
-		#define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
-	#else
-		#define __FUNCTION__ __func__	
-	#endif
+    #ifndef HAVE_func
+        #define dummystr(x) # x
+        #define dummyestr(x) dummystr(x)
+        #define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
+    #else
+        #define __FUNCTION__ __func__    
+    #endif
 #endif
 
 #ifndef HAVE_PRETTY_FUNCTION
-	#define __PRETTY_FUNCTION__ __FUNCTION__
+    #define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
 #if defined(__cplusplus) && defined(__GNUC__)
 #define GNASH_REPORT_FUNCTION   \
-	gnash::__Host_Function_Report__ __host_function_report__( __PRETTY_FUNCTION__)
+    gnash::__Host_Function_Report__ __host_function_report__( __PRETTY_FUNCTION__)
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \

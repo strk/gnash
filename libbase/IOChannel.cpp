@@ -29,29 +29,29 @@ namespace gnash
 boost::uint32_t
 IOChannel::read_le32() 
 {
-	// read_byte() is boost::uint8_t, so no masks with 0xff are required.
-	boost::uint32_t result = static_cast<boost::uint32_t>(read_byte());
-	result |= static_cast<boost::uint32_t>(read_byte()) << 8;
-	result |= static_cast<boost::uint32_t>(read_byte()) << 16;
-	result |= static_cast<boost::uint32_t>(read_byte()) << 24;
-	return(result);
+    // read_byte() is boost::uint8_t, so no masks with 0xff are required.
+    boost::uint32_t result = static_cast<boost::uint32_t>(read_byte());
+    result |= static_cast<boost::uint32_t>(read_byte()) << 8;
+    result |= static_cast<boost::uint32_t>(read_byte()) << 16;
+    result |= static_cast<boost::uint32_t>(read_byte()) << 24;
+    return(result);
 }
 
 long double
 IOChannel::read_le_double64() 
 {
-	return static_cast<long double> (
-		static_cast<boost::int64_t> (read_le32()) |
-		static_cast<boost::int64_t> (read_le32()) << 32
-	);
+    return static_cast<long double> (
+        static_cast<boost::int64_t> (read_le32()) |
+        static_cast<boost::int64_t> (read_le32()) << 32
+    );
 }
 
 boost::uint16_t
 IOChannel::read_le16()
 {
-	boost::uint16_t result = static_cast<boost::uint16_t>(read_byte());
-	result |= static_cast<boost::uint16_t>(read_byte()) << 8;
-	return(result);
+    boost::uint16_t result = static_cast<boost::uint16_t>(read_byte());
+    result |= static_cast<boost::uint16_t>(read_byte()) << 8;
+    return(result);
 }
 
 void
@@ -66,43 +66,43 @@ IOChannel::write_le32(boost::uint32_t u)
 void
 IOChannel::write_le16(boost::uint16_t u)
 {
-	write_byte(static_cast<boost::int8_t>(u));
-	write_byte(static_cast<boost::int8_t>(u>>8));
+    write_byte(static_cast<boost::int8_t>(u));
+    write_byte(static_cast<boost::int8_t>(u>>8));
 }
 
 void
 IOChannel::write_string(const char* src)
 {
-	for (;;)
-	{
-		write_byte(*src);
-		if (*src == 0) break;
-		src++;
-    	}
+    for (;;)
+    {
+        write_byte(*src);
+        if (*src == 0) break;
+        src++;
+        }
 }
 
 int
 IOChannel::read_string(char* dst, int max_length) 
 {
-	int i = 0;
-	while (i<max_length)
-	{
-		dst[i] = read_byte();
-		if (dst[i]=='\0') return i;
-		i++;
-	}
+    int i = 0;
+    while (i<max_length)
+    {
+        dst[i] = read_byte();
+        if (dst[i]=='\0') return i;
+        i++;
+    }
     
-	dst[max_length - 1] = '\0';	// force termination.
+    dst[max_length - 1] = '\0';    // force termination.
     
-	return -1;
+    return -1;
 }
 
 void
 IOChannel::write_float32(float value)
 {
     union alias {
-        float	f;
-        boost::uint32_t	i;
+        float    f;
+        boost::uint32_t    i;
     } u;
 
     BOOST_STATIC_ASSERT(sizeof(alias) == sizeof(boost::uint32_t));
@@ -115,8 +115,8 @@ float
 IOChannel::read_float32()
 {
     union {
-        float	f;
-        boost::uint32_t	i;
+        float    f;
+        boost::uint32_t    i;
     } u;
 
     BOOST_STATIC_ASSERT(sizeof(u) == sizeof(u.i));
@@ -128,24 +128,24 @@ IOChannel::read_float32()
 boost::uint8_t
 IOChannel::read_byte()
 {
-	boost::uint8_t u;
-	if ( read(&u, 1) == -1 )
-	{
-		throw IOException("Could not read a single byte from input");
-	}
-	return u;
+    boost::uint8_t u;
+    if ( read(&u, 1) == -1 )
+    {
+        throw IOException("Could not read a single byte from input");
+    }
+    return u;
 }
 
 void
 IOChannel::write_byte(boost::uint8_t u)
 {
-	write(&u, 1); // will trhow on error it seems
+    write(&u, 1); // will trhow on error it seems
 }
 
 std::streamsize
 IOChannel::write(const void* /*src*/, std::streamsize /*num*/)
 {
-	throw IOException("This IOChannel implementation doesn't support output");
+    throw IOException("This IOChannel implementation doesn't support output");
 }
 
 } // namespace gnash

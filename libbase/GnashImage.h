@@ -51,10 +51,10 @@ namespace gnash
 /// The types of images handled in Gnash.
 enum ImageType
 {
-	GNASH_IMAGE_INVALID,
-	GNASH_IMAGE_RGB,
-	GNASH_IMAGE_RGBA,
-	GNASH_IMAGE_ALPHA
+    GNASH_IMAGE_INVALID,
+    GNASH_IMAGE_RGB,
+    GNASH_IMAGE_RGBA,
+    GNASH_IMAGE_ALPHA
 };
 
 
@@ -298,39 +298,39 @@ class ImageInput : boost::noncopyable
 public:
 
     /// Construct an ImageInput object to read from an IOChannel.
-	//
-	/// @param in   The stream to read data from. Ownership is shared
+    //
+    /// @param in   The stream to read data from. Ownership is shared
     ///             between caller and ImageInput, so it is freed
     ///             automatically when the last owner is destroyed.
-	ImageInput(boost::shared_ptr<IOChannel> in) :
-	    _inStream(in),
-	    _type(GNASH_IMAGE_INVALID)
-	{}
+    ImageInput(boost::shared_ptr<IOChannel> in) :
+        _inStream(in),
+        _type(GNASH_IMAGE_INVALID)
+    {}
 
-	virtual ~ImageInput() {}
+    virtual ~ImageInput() {}
 
     /// Begin processing the image data.
     virtual void read() = 0;
 
-	/// Get the image's height in pixels.
+    /// Get the image's height in pixels.
     //
     /// @return     The height of the image in pixels.
-	virtual size_t getHeight() const = 0;
+    virtual size_t getHeight() const = 0;
 
-	/// Get the image's width in pixels.
+    /// Get the image's width in pixels.
     //
     /// @return     The width of the image in pixels.
-	virtual size_t getWidth() const = 0;
+    virtual size_t getWidth() const = 0;
 
-	/// Get number of components (channels)
+    /// Get number of components (channels)
     //
-	/// @return     The number of components, e.g. 3 for RGB
-	virtual size_t getComponents() const = 0;
+    /// @return     The number of components, e.g. 3 for RGB
+    virtual size_t getComponents() const = 0;
 
-	/// Read a scanline's worth of image data into the given buffer.
+    /// Read a scanline's worth of image data into the given buffer.
     //
     /// @param rgbData  The buffer for writing raw RGB data to.
-	virtual void readScanline(unsigned char* rgbData) = 0;
+    virtual void readScanline(unsigned char* rgbData) = 0;
 
     /// Get the ImageType of the image.
     //

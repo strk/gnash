@@ -110,21 +110,20 @@ GifImageInput::read()
     // Is there a multi-dimensional smart array? It's silly to
     // have to allocate each row separately and can mean a lot
     // of reallocation.
-    do
-    {
-        if (DGifGetRecordType(_gif, &record) != GIF_OK)
-        {
+    do {
+
+        if (DGifGetRecordType(_gif, &record) != GIF_OK) {
             throw ParserException(_("GIF: Error retrieving record type"));
         }
         
-        switch (record)
-        {
+        switch (record) {
+
             case IMAGE_DESC_RECORD_TYPE:
             {
                 // Fill the _gif->Image fields 
-                if (DGifGetImageDesc(_gif) != GIF_OK)
-                {
-                    throw ParserException(_("GIF: Error retrieving image description"));
+                if (DGifGetImageDesc(_gif) != GIF_OK) {
+                    throw ParserException(_("GIF: Error retrieving image "
+                                "description"));
                 }
                 const int backgroundColor = _gif->SBackGroundColor;
 
@@ -136,12 +135,12 @@ GifImageInput::read()
                 const size_t screenHeight = getHeight();
 
                 // Set all the pixels to the background colour.
-                for (size_t i = 0; i < screenHeight; ++i)
-                {
+                for (size_t i = 0; i < screenHeight; ++i) {
                     // Set the width dimension of the array
                     _gifData[i].reset(new GifPixelType[screenWidth]);
                     // Fill all the pixels with the background color.
-                    std::memset(_gifData[i].get(), backgroundColor, screenWidth);
+                    std::memset(_gifData[i].get(), backgroundColor,
+                            screenWidth);
                 }
                 
                 // The position of the image on the GIF 'screen'
@@ -151,15 +150,15 @@ GifImageInput::read()
                 const size_t imageLeft = _gif->Image.Left;
                 
                 if (imageHeight + imageTop > screenHeight ||
-                    imageWidth + imageLeft > screenWidth)
-                {
-                    throw ParserException(_("GIF: invalid image data (bounds outside GIF screen)"));
+                    imageWidth + imageLeft > screenWidth) {
+                    throw ParserException(_("GIF: invalid image data "
+                                "(bounds outside GIF screen)"));
                 }
 
                 // Handle interlaced data in four passes.
-                if (_gif->Image.Interlace)
-                {
-                    log_debug(_("Found interlaced GIF (%d x %d)"), screenWidth, screenHeight);
+                if (_gif->Image.Interlace) {
+                    log_debug(_("Found interlaced GIF (%d x %d)"),
+                            screenWidth, screenHeight);
 
                     // The order of interlaced GIFs.
                     static const int interlacedOffsets[] =
@@ -167,15 +166,18 @@ GifImageInput::read()
                     static const int interlacedJumps[] =
                                             { 8, 8, 4, 2 };
 
-                    for (size_t i = 0; i < 4; ++i)
-                    {
-			            for (size_t j = imageTop + interlacedOffsets[i];
-			                        j < imageTop + imageHeight;
-			                        j += interlacedJumps[i])
-			            {
-                            if (DGifGetLine(_gif, &_gifData[j][imageLeft], imageWidth) != GIF_OK)
-                            {
-                                throw ParserException(_("GIF: failed reading pixel data"));
+                    for (size_t i = 0; i < 4; ++i) {
+
+                        for (size_t j = imageTop + interlacedOffsets[i];
+                                    j < imageTop + imageHeight;
+                                    j += interlacedJumps[i]) {
+
+                            if (DGifGetLine(_gif, &_gifData[j][imageLeft],
+                                        imageWidth) != GIF_OK) {
+
+                                throw ParserException(_("GIF: failed reading "
+                                            "pixel data"));
+
                             }
                         }
                     }
@@ -183,13 +185,15 @@ GifImageInput::read()
                 }
 
                 // Non-interlaced data.
-                log_debug(_("Found non-interlaced GIF (%d x %d)"), screenWidth, screenHeight);
-                for (size_t i = imageTop; i < imageHeight; ++i)
-                {
+                log_debug(_("Found non-interlaced GIF (%d x %d)"),
+                        screenWidth, screenHeight);
+
+                for (size_t i = imageTop; i < imageHeight; ++i) {
                     // Read the gif data into the gif array.
-                    if (DGifGetLine(_gif, &_gifData[i][imageLeft], imageWidth) != GIF_OK)
-                    {
-                        throw ParserException(_("GIF: failed reading pixel data"));
+                    if (DGifGetLine(_gif, &_gifData[i][imageLeft], imageWidth)
+                            != GIF_OK) {
+                        throw ParserException(_("GIF: failed reading "
+                                    "pixel data"));
                     }                    
                 }
                 break;
@@ -198,13 +202,11 @@ GifImageInput::read()
                 // Skip all extension records.
                 GifByteType* extension;
                 int extCode;
-		        DGifGetExtension(_gif, &extCode, &extension);
-	            while (extension)
-	            {
-	                if (DGifGetExtensionNext(_gif, &extension) == GIF_ERROR)
-	                {
-	                    break;
-	                }
+                DGifGetExtension(_gif, &extCode, &extension);
+                while (extension) {
+                    if (DGifGetExtensionNext(_gif, &extension) == GIF_ERROR) {
+                        break;
+                    }
                 }
                 break;         
             default:
