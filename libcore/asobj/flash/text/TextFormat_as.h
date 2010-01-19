@@ -97,7 +97,7 @@ public:
 
     const Optional<bool>& bullet() const { return _bullet; }
 
-    const Optional<TextField::TextFormatDisplay> display() const {
+    TextField::TextFormatDisplay display() const {
         return _display;
     }
 
@@ -190,7 +190,7 @@ private:
     // 
     Optional<bool> _bullet;
     
-    Optional<TextField::TextFormatDisplay> _display;
+    TextField::TextFormatDisplay _display;
   
     /// The alignment of the paragraph, represented as a string.
     //

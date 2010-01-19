@@ -1004,7 +1004,7 @@ TextField::setTextFormat(TextFormat_as& tf)
     if (tf.color()) setTextColor(*tf.color());
     if (tf.underlined()) setUnderlined(*tf.underlined());
     if (tf.bullet()) setBullet(*tf.bullet());
-    if (tf.display()) setDisplay(*tf.display());
+    setDisplay(tf.display());
 	if (tf.tabStops()) setTabStops(*tf.tabStops());
 	
 	// NEED TO IMPLEMENT THESE TWO

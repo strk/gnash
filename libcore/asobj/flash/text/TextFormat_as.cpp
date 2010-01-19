@@ -67,6 +67,14 @@ namespace {
 
 }
 
+TextFormat_as::TextFormat_as()
+    :
+    _display(TextField::TEXTFORMAT_BLOCK)
+{
+}
+
+
+
 void
 TextFormat_as::alignSet(const std::string& align) 
 {
@@ -122,12 +130,6 @@ registerTextFormatNative(as_object& o)
     vm.registerNative(textformat_bullet, 110, 32);
     vm.registerNative(textformat_getTextExtent, 110, 33);
 }
-
-TextFormat_as::TextFormat_as()
-{
-}
-
-
 
 // extern (used by Global.cpp)
 void
@@ -226,10 +228,7 @@ textformat_display(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if (relay->display()) {
-            ret.set_string(getDisplayString(*relay->display()));
-        }
-        else ret.set_null();
+        ret.set_string(getDisplayString(relay->display()));
 	}
 	else // setter
 	{
