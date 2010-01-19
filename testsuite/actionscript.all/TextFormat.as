@@ -58,8 +58,8 @@ check(tfObj.hasOwnProperty('getTextExtent'));
 // When you construct a TextFormat w/out args all members
 // are of the 'null' type. In general, uninitialized members
 // are all of the 'null' type.
-xcheck_equals(typeof(tfObj.display), 'string');
-xcheck_equals(tfObj.display, 'block');
+check_equals(typeof(tfObj.display), 'string');
+check_equals(tfObj.display, 'block');
 check_equals(typeof(tfObj.bullet), 'null');
 check_equals(typeof(tfObj.tabStops), 'null');
 check_equals(typeof(tfObj.blockIndent), 'null');
@@ -80,8 +80,8 @@ check_equals(typeof(tfObj.getTextExtent), 'function');
 
 // new TextFormat([font, [size, [color, [bold, [italic, [underline, [url, [target, [align,[leftMargin, [rightMargin, [indent, [leading]]]]]]]]]]]]])
 tfObj = new TextFormat("fname", 2, 30, true, false, true, 'http', 'tgt', 'cEnter', '23', '32', 12, 4);
-xcheck_equals(typeof(tfObj.display), 'string');
-xcheck_equals(tfObj.display, 'block');
+check_equals(typeof(tfObj.display), 'string');
+check_equals(tfObj.display, 'block');
 check_equals(typeof(tfObj.bullet), 'null');
 check_equals(typeof(tfObj.tabStops), 'null');
 check_equals(typeof(tfObj.blockIndent), 'null');
@@ -102,6 +102,27 @@ check_equals(tfObj.color, 30);
 check_equals(tfObj.size, 2);
 check_equals(tfObj.font, 'fname');
 
+/// Bold
+
+// The boolean conversion of a string is version dependent.
+stringbool = "string" ? true : false;
+
+tf = new TextFormat();
+check_equals(tf.bold, null);
+tf.bold = true;
+check_equals(tf.bold, true);
+tf.bold = false;
+check_equals(tf.bold, false);
+tf.bold = "string";
+check_equals(tf.bold, stringbool);
+tf.bold = null;
+check_equals(tf.bold, null);
+tf.bold = "string";
+check_equals(tf.bold, stringbool);
+tf.bold = undefined;
+check_equals(tf.bold, null);
+
+
 
 // Check tabStops property.
 // The passed array is processed before assignment, not simply stored.
@@ -118,6 +139,10 @@ check_equals(a.toString(), "string");
 xcheck_equals(tf.tabStops.toString(), "6");
 
 tf2 = new TextFormat("Arial", 12);
+
+// Different behaviour.
+#if OUTPUT_VERSION > 6
+
 te = tf2.getTextExtent("Hello");
 
 // The object is a bare object
@@ -134,18 +159,47 @@ xcheck_equals(Math.round(te.textFieldHeight), 18);
 xcheck_equals(Math.round(te.textFieldWidth), 33);
 
 te = tf2.getTextExtent("Hello", 10);
+#if OUTPUT_VERSION > 7
 xcheck_equals(Math.round(te.textFieldHeight), 60);
+#else
+xcheck_equals(Math.round(te.textFieldHeight), 18);
+#endif
+
 xcheck_equals(te.textFieldWidth, 10);
+
+#if OUTPUT_VERSION > 7
 xcheck_equals(Math.round(te.width), 9);
+#else
+xcheck_equals(Math.round(te.width), 29);
+#endif
+
 
 te = tf2.getTextExtent("Hello", 5);
+#if OUTPUT_VERSION > 7
 xcheck_equals(Math.round(te.textFieldHeight), 74);
+#else
+xcheck_equals(Math.round(te.textFieldHeight), 18);
+#endif
 xcheck_equals(te.textFieldWidth, 5);
-// Width of largest character?
+
+
+#if OUTPUT_VERSION > 7
+// Width of largest character in version 8?
 xcheck_equals(Math.round(te.width), 9);
+#else
+xcheck_equals(Math.round(te.width), 29);
+#endif
 
 te = tf2.getTextExtent("Longer sentence with more words.", 30);
 xcheck_equals(te.textFieldWidth, 30);
 xcheck_equals(Math.round(te.width), 25);
 
-check_totals(81);
+#endif
+
+#if OUTPUT_VERSION < 7
+    check_totals(72);
+#elif OUTPUT_VERSION == 7
+    check_totals(88);
+#else 
+    check_totals(88);
+#endif
