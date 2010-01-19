@@ -1076,7 +1076,6 @@ event_handler(Network::thread_params_t *args)
 		      break;
 		  case Network::HTTP:
 		  {
-		      net.setTimeout(30);
 		      largs.netfd = i;
 		      // largs.filespec = fullpath;
 		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
@@ -1142,8 +1141,10 @@ event_handler(Network::thread_params_t *args)
 	// args->buffer->clear();
 	// largs.buffer->clear();
 	
-	// Wait for something from one of the file descriptors
-	net.setTimeout(30);
+	// Wait for something from one of the file descriptors. This timeout
+	// is the time between sending packets to the client when there is
+	// no client input, which effects the streaming speed of big files.
+	net.setTimeout(10);
 	hits = net.waitForNetData(hand->getClients());
 	if (FD_ISSET(0, &hits)) {
 	    FD_CLR(0, &hits);
@@ -1152,8 +1153,8 @@ event_handler(Network::thread_params_t *args)
 	    // hand->removeClient(args->netfd);
 	    // done = true;
 	}
-#if 0
 	retries++;
+#if 0
 	if (retries >= 10) {
 	    net.closeNet(args->netfd);
 	    hand->removeClient(args->netfd);

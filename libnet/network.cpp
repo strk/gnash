@@ -1414,15 +1414,15 @@ Network::waitForNetData(int limit, fd_set files)
     // Reset the timeout value, since select modifies it on return
     int timeout = _timeout;
     if (timeout <= 0) {
-	timeout = 5;
+	timeout = 30;
     }
-#ifdef HAVE_PSELECT
+#ifdef HAVE_PSELECT_XX
     struct timespec tval;
     sigset_t pending, sigmask;
     sigprocmask(SIG_BLOCK, &sigmask, NULL);
 
     tval.tv_sec = 0;
-    tval.tv_nsec = timeout * 1000;
+    tval.tv_nsec = timeout * 1000000000;
     int ret = pselect(limit+1, &fdset, NULL, NULL, &tval, &sigmask);
     sigpending(&pending);
     if (sigismember(&pending, SIGINT)) {
@@ -1438,7 +1438,7 @@ Network::waitForNetData(int limit, fd_set files)
 #else
     struct timeval tval;
     tval.tv_sec = 0;
-    tval.tv_usec = timeout;
+    tval.tv_usec = timeout * 1000; // was 1000000
     int ret = select(limit+1, &fdset, NULL, NULL, &tval);
     FD_ZERO(&fdset);
 #endif

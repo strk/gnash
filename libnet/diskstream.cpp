@@ -528,7 +528,7 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
     }
     
     // The data pointer points to the real data past all the header bytes.
-    _dataptr = ptr;
+//    _dataptr = ptr;
 
     return _seekptr;    
 }
