@@ -1034,6 +1034,7 @@ HTTPServer::http_handler(Handler *hand, int netfd, amf::Buffer *buf)
 	    hand->setDiskStream(netfd, _diskstream);
  	    cache.addFile(_filespec, _diskstream);
 // Send the first chunk of the file to the client.
+	    // log_network("Sending first chunk of %s", _filespec);
 	    _diskstream->play(netfd, false);
 	}
     }
