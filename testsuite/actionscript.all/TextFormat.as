@@ -156,6 +156,103 @@ check_equals(tf.leftMargin, 0);
 tf.leftMargin = undefined;
 check_equals(tf.leftMargin, null);
 
+// blockIndent
+tf = new TextFormat();
+check_equals(tf.blockIndent, null);
+tf.blockIndent = 10;
+check_equals(tf.blockIndent, 10);
+tf.blockIndent = -10;
+
+#if OUTPUT_VERSION < 8
+check_equals(tf.blockIndent, 0);
+#else
+check_equals(tf.blockIndent, -10);
+#endif
+
+tf.blockIndent = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.blockIndent, 0);
+#else
+check_equals(tf.blockIndent, -2147483648);
+#endif
+
+tf.blockIndent = null;
+check_equals(tf.blockIndent, null);
+
+tf.blockIndent = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.blockIndent, 0);
+#else
+check_equals(tf.blockIndent, -2147483648);
+#endif
+tf.blockIndent = undefined;
+check_equals(tf.blockIndent, null);
+
+// leading
+tf = new TextFormat();
+check_equals(tf.leading, null);
+tf.leading = 10;
+check_equals(tf.leading, 10);
+tf.leading = -10;
+
+#if OUTPUT_VERSION < 8
+check_equals(tf.leading, 0);
+#else
+check_equals(tf.leading, -10);
+#endif
+
+tf.leading = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.leading, 0);
+#else
+check_equals(tf.leading, -2147483648);
+#endif
+
+tf.leading = null;
+check_equals(tf.leading, null);
+
+tf.leading = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.leading, 0);
+#else
+check_equals(tf.leading, -2147483648);
+#endif
+tf.leading = undefined;
+check_equals(tf.leading, null);
+
+// indent
+tf = new TextFormat();
+check_equals(tf.indent, null);
+tf.indent = 10;
+check_equals(tf.indent, 10);
+tf.indent = -10;
+
+#if OUTPUT_VERSION < 8
+check_equals(tf.indent, 0);
+#else
+check_equals(tf.indent, -10);
+#endif
+
+tf.indent = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.indent, 0);
+#else
+check_equals(tf.indent, -2147483648);
+#endif
+
+tf.indent = null;
+check_equals(tf.indent, null);
+
+tf.indent = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.indent, 0);
+#else
+check_equals(tf.indent, -2147483648);
+#endif
+tf.indent = undefined;
+check_equals(tf.indent, null);
+
+
 // Check tabStops property.
 // The passed array is processed before assignment, not simply stored.
 tf = new TextFormat();
@@ -229,9 +326,9 @@ xcheck_equals(Math.round(te.width), 25);
 #endif
 
 #if OUTPUT_VERSION < 7
-    check_totals(86);
+    check_totals(107);
 #elif OUTPUT_VERSION == 7
-    check_totals(102);
+    check_totals(123);
 #else 
-    check_totals(102);
+    check_totals(123);
 #endif
