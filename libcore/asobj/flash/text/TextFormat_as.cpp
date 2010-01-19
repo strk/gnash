@@ -47,7 +47,7 @@ PositiveTwips
 };
 
 struct
-PixelsToTwips
+TwipsToPixels
 {
     template<typename T> double operator()(const T& t) const {
         return twipsToPixels(t);
@@ -66,7 +66,7 @@ ToBool
 struct
 Nothing
 {
-    const as_value& operator()(const as_value& val) const {
+    template<typename T> const T& operator()(const T& val) const {
         return val;
     }
 };
@@ -117,13 +117,27 @@ struct Get
     static as_value get(const fn_call& fn) {
         T* relay = ensure<ThisIsNative<T> >(fn);
         const Optional<U>& opt = (relay->*F)();
-		if (opt) return as_value(*opt);
+		if (opt) return as_value(P()(*opt));
 		
         as_value null;
         null.set_null();
         return null;
     }
 };
+
+/// Function object for Array handling.
+class
+PushToVector
+{
+public:
+    PushToVector(std::vector<int>& v) : _v(v) {}
+    void operator()(const as_value& val) {
+        _v.push_back(val.to_number());
+    }
+private:
+    std::vector<int>& _v;
+};
+
 
 }
 
@@ -141,8 +155,6 @@ namespace {
 	as_value textformat_blockIndent(const fn_call& fn);
 	as_value textformat_leading(const fn_call& fn);
 	as_value textformat_indent(const fn_call& fn);
-	as_value textformat_rightMargin(const fn_call& fn);
-	as_value textformat_leftMargin(const fn_call& fn);
 	as_value textformat_align(const fn_call& fn);
 	as_value textformat_target(const fn_call& fn);
 	as_value textformat_url(const fn_call& fn);
@@ -229,13 +241,19 @@ registerTextFormatNative(as_object& o)
     vm.registerNative(textformat_align, 110, 17);
     vm.registerNative(textformat_align, 110, 18);
 
-    vm.registerNative(textformat_leftMargin, 110, 19);
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint16_t,
+            &TextFormat_as::leftMargin, TwipsToPixels>::get,
+            110, 19);
     vm.registerNative(
             Set<TextFormat_as, boost::uint16_t, &TextFormat_as::leftMarginSet,
             PositiveTwips>::set, 
             110, 20);
 
-    vm.registerNative(textformat_rightMargin, 110, 21);
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint16_t,
+            &TextFormat_as::rightMargin, TwipsToPixels>::get,
+            110, 21);
     vm.registerNative(
             Set<TextFormat_as, boost::uint16_t, &TextFormat_as::rightMarginSet,
             PositiveTwips>::set, 
@@ -254,6 +272,9 @@ registerTextFormatNative(as_object& o)
             110, 26);
 
     vm.registerNative(textformat_blockIndent, 110, 27);
+
+    // Note: this behaves differently in SWF8, so perhaps best not to use
+    // the template.
     vm.registerNative(
             Set<TextFormat_as, boost::uint32_t, &TextFormat_as::blockIndentSet,
             PositiveTwips>::set,
@@ -380,17 +401,6 @@ textformat_display(const fn_call& fn)
 	return ret;
 }
 
-class PushToVector
-{
-public:
-    PushToVector(std::vector<int>& v) : _v(v) {}
-    void operator()(const as_value& val) {
-        _v.push_back(val.to_number());
-    }
-private:
-    std::vector<int>& _v;
-};
-
 as_value
 textformat_tabStops(const fn_call& fn)
 {
@@ -465,44 +475,6 @@ textformat_indent(const fn_call& fn)
 	{
 		if (relay->indent()) ret.set_double(twipsToPixels(*relay->indent()));
 		else ret.set_null();
-	}
-
-	return ret;
-}
-
-as_value
-textformat_rightMargin(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if (fn.nargs == 0 ) // getter
-	{
-		if (relay->rightMargin()) ret.set_double(twipsToPixels(*relay->rightMargin()));
-		else ret.set_null();
-	}
-
-	return ret;
-}
-
-as_value
-textformat_leftMargin(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->leftMargin()) {
-            ret.set_double(twipsToPixels(*relay->leftMargin()));
-        }
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->leftMarginSet(pixelsToTwips(toInt(fn.arg(0))));
 	}
 
 	return ret;

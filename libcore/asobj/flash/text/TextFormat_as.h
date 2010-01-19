@@ -128,40 +128,42 @@ public:
         return _display;
     }
 
-    const Optional<std::vector<int> > tabStops() const {
+    const Optional<std::vector<int> >& tabStops() const {
         return _tabStops;
     }
 
     /// Indentation from left margin to the first character in the paragraph
-    const Optional<boost::uint16_t> indent() const { return _indent; }
+    const Optional<boost::uint16_t>& indent() const { return _indent; }
     
     /// Paragraph alignment
-    const Optional<TextField::TextAlignment> align() const { return _align; }
+    const Optional<TextField::TextAlignment>& align() const { return _align; }
 
     /// Font name.
-    const Optional<std::string> font() const { return _font; }
+    const Optional<std::string>& font() const { return _font; }
 
     // See doc for _target member
-    const Optional<std::string> target() const { return _target; }
+    const Optional<std::string>& target() const { return _target; }
 
     // See doc for _url member
-    const Optional<std::string> url() const { return _url; }
+    const Optional<std::string>& url() const { return _url; }
 
     /// The block indent.
-    const Optional<boost::uint32_t> blockIndent() { return _blockIndent; }
+    const Optional<boost::uint32_t>& blockIndent() { return _blockIndent; }
 
     /// Return a number that indicates the amount of leading vertical
     /// space between lines.
-    const Optional<boost::uint16_t> leading() const { return _leading; }
+    const Optional<boost::uint16_t>& leading() const { return _leading; }
 
     /// Indicates the left margin of the paragraph, in points.
-    const Optional<boost::uint16_t> leftMargin() const { return _leftMargin; }
+    const Optional<boost::uint16_t>& leftMargin() const { return _leftMargin; }
 
-    /// Indicates the right margin of the paragraph, in points.
-    const Optional<boost::uint16_t> rightMargin() const { return _rightMargin; }
+    /// Indicates the right margin of the paragraph in twips
+    const Optional<boost::uint16_t>& rightMargin() const {
+        return _rightMargin;
+    }
 
     /// Return a float that indicates the point size in twips.
-    const Optional<boost::uint16_t> size() const { return _pointSize; }
+    const Optional<boost::uint16_t>& size() const { return _pointSize; }
 
     /// Setters
 
