@@ -166,14 +166,14 @@ tf.blockIndent = -10;
 #if OUTPUT_VERSION < 8
 check_equals(tf.blockIndent, 0);
 #else
-check_equals(tf.blockIndent, -10);
+xcheck_equals(tf.blockIndent, -10);
 #endif
 
 tf.blockIndent = "string";
 #if OUTPUT_VERSION < 8
 check_equals(tf.blockIndent, 0);
 #else
-check_equals(tf.blockIndent, -2147483648);
+xcheck_equals(tf.blockIndent, -2147483648);
 #endif
 
 tf.blockIndent = null;
@@ -183,7 +183,7 @@ tf.blockIndent = "string";
 #if OUTPUT_VERSION < 8
 check_equals(tf.blockIndent, 0);
 #else
-check_equals(tf.blockIndent, -2147483648);
+xcheck_equals(tf.blockIndent, -2147483648);
 #endif
 tf.blockIndent = undefined;
 check_equals(tf.blockIndent, null);
@@ -198,14 +198,14 @@ tf.leading = -10;
 #if OUTPUT_VERSION < 8
 check_equals(tf.leading, 0);
 #else
-check_equals(tf.leading, -10);
+xcheck_equals(tf.leading, -10);
 #endif
 
 tf.leading = "string";
 #if OUTPUT_VERSION < 8
 check_equals(tf.leading, 0);
 #else
-check_equals(tf.leading, -2147483648);
+xcheck_equals(tf.leading, -2147483648);
 #endif
 
 tf.leading = null;
@@ -215,7 +215,7 @@ tf.leading = "string";
 #if OUTPUT_VERSION < 8
 check_equals(tf.leading, 0);
 #else
-check_equals(tf.leading, -2147483648);
+xcheck_equals(tf.leading, -2147483648);
 #endif
 tf.leading = undefined;
 check_equals(tf.leading, null);
@@ -230,14 +230,14 @@ tf.indent = -10;
 #if OUTPUT_VERSION < 8
 check_equals(tf.indent, 0);
 #else
-check_equals(tf.indent, -10);
+xcheck_equals(tf.indent, -10);
 #endif
 
 tf.indent = "string";
 #if OUTPUT_VERSION < 8
 check_equals(tf.indent, 0);
 #else
-check_equals(tf.indent, -2147483648);
+xcheck_equals(tf.indent, -2147483648);
 #endif
 
 tf.indent = null;
@@ -247,7 +247,7 @@ tf.indent = "string";
 #if OUTPUT_VERSION < 8
 check_equals(tf.indent, 0);
 #else
-check_equals(tf.indent, -2147483648);
+xcheck_equals(tf.indent, -2147483648);
 #endif
 tf.indent = undefined;
 check_equals(tf.indent, null);
