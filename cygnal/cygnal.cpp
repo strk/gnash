@@ -1040,13 +1040,20 @@ event_handler(Network::thread_params_t *args)
 // #else
 //      	cache.dump();
 #endif
-	hand->dump();
+	//hand->dump();
+	boost::shared_ptr<DiskStream> ds;
 	for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
-	    boost::shared_ptr<DiskStream> ds = hand->getDiskStream(i);
+	    ds = hand->getDiskStream(i);
 	    if (ds) {
-//   		ds->dump();
+   		//ds->dump();
 		// Only play the next chunk of the file.
-		ds->play(i, true);
+//log_network("Sending following chunk of %s", ds->getFilespec());
+		ds->play(i, false);
+		if (ds->getState() == DiskStream::CLOSED) {
+		    net.closeNet(args->netfd);
+		    hand->removeClient(args->netfd);
+		    done = true;
+		}
 	    }
 	}
     
@@ -1140,11 +1147,11 @@ event_handler(Network::thread_params_t *args)
 	    // done = true;
 	}
 	retries++;
-	if (retries >= 10) {
-	    net.closeNet(args->netfd);
-	    hand->removeClient(args->netfd);
-	    done = true;
-	}
+	// if (retries >= 10) {
+	//     net.closeNet(args->netfd);
+	//     hand->removeClient(args->netfd);
+	//     done = true;
+	// }
     } while (!done);
 
     tids.decrement();
