@@ -124,6 +124,37 @@ tf.bold = undefined;
 check_equals(tf.bold, null);
 
 
+// rightMargin
+tf = new TextFormat();
+check_equals(tf.rightMargin, null);
+tf.rightMargin = 10;
+check_equals(tf.rightMargin, 10);
+tf.rightMargin = -10;
+check_equals(tf.rightMargin, 0);
+tf.rightMargin = "string";
+check_equals(tf.rightMargin, 0);
+tf.rightMargin = null;
+check_equals(tf.rightMargin, null);
+tf.rightMargin = "string";
+check_equals(tf.rightMargin, 0);
+tf.rightMargin = undefined;
+check_equals(tf.rightMargin, null);
+
+// leftMargin
+tf = new TextFormat();
+check_equals(tf.leftMargin, null);
+tf.leftMargin = 10;
+check_equals(tf.leftMargin, 10);
+tf.leftMargin = -10;
+check_equals(tf.leftMargin, 0);
+tf.leftMargin = "string";
+check_equals(tf.leftMargin, 0);
+tf.leftMargin = null;
+check_equals(tf.leftMargin, null);
+tf.leftMargin = "string";
+check_equals(tf.leftMargin, 0);
+tf.leftMargin = undefined;
+check_equals(tf.leftMargin, null);
 
 // Check tabStops property.
 // The passed array is processed before assignment, not simply stored.
@@ -198,9 +229,9 @@ xcheck_equals(Math.round(te.width), 25);
 #endif
 
 #if OUTPUT_VERSION < 7
-    check_totals(72);
+    check_totals(86);
 #elif OUTPUT_VERSION == 7
-    check_totals(88);
+    check_totals(102);
 #else 
-    check_totals(88);
+    check_totals(102);
 #endif
