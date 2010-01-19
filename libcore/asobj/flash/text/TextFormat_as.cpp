@@ -38,17 +38,36 @@ namespace gnash {
 // Functions and templates for reducing code duplication.
 namespace {
 
-struct PositiveTwips
+struct
+PositiveTwips
 {
     int operator()(const as_value& val) const {
-        return twipsToPixels(std::max<int>(toInt(val), 0));
+        return pixelsToTwips(std::max<int>(toInt(val), 0));
     }
 };
 
-struct ToBool
+struct
+PixelsToTwips
+{
+    template<typename T> double operator()(const T& t) const {
+        return twipsToPixels(t);
+    }
+};
+
+
+struct
+ToBool
 {
     bool operator()(const as_value& val) const {
         return val.to_bool();
+    }
+};
+
+struct
+Nothing
+{
+    const as_value& operator()(const as_value& val) const {
+        return val;
     }
 };
 
@@ -91,7 +110,8 @@ struct Set
 /// @tparam F       The function to call to retrieve the value.
 /// @tparam P       A function object to be applied to the argument before
 ///                 returning the value.
-template<typename T, typename U, const Optional<U>&(T::*F)(), typename P>
+template<typename T, typename U, const Optional<U>&(T::*F)(),
+    typename P = Nothing>
 struct Get
 {
     static as_value get(const fn_call& fn) {
@@ -117,7 +137,6 @@ namespace {
 	TextField::TextFormatDisplay parseDisplayString(const std::string& display);
 
 	as_value textformat_display(const fn_call& fn);
-	as_value textformat_bullet(const fn_call& fn);
 	as_value textformat_tabStops(const fn_call& fn);
 	as_value textformat_blockIndent(const fn_call& fn);
 	as_value textformat_leading(const fn_call& fn);
@@ -184,24 +203,24 @@ registerTextFormatNative(as_object& o)
     vm.registerNative(textformat_target, 110, 10);
     
     vm.registerNative(
-            Get<const TextFormat_as, bool, &TextFormat_as::bold,
-            ToBool>::get, 110, 11);
+            Get<const TextFormat_as, bool, &TextFormat_as::bold>::get,
+            110, 11);
     vm.registerNative(
             Set<TextFormat_as, bool, &TextFormat_as::boldSet,
             ToBool>::set, 
             110, 12);
     
     vm.registerNative(
-            Get<const TextFormat_as, bool, &TextFormat_as::italic,
-            ToBool>::get, 110, 13);
+            Get<const TextFormat_as, bool, &TextFormat_as::italic>::get,
+            110, 13);
     vm.registerNative(
             Set<TextFormat_as, bool, &TextFormat_as::italicSet,
             ToBool>::set, 
             110, 14);
     
     vm.registerNative(
-            Get<const TextFormat_as, bool, &TextFormat_as::underlined,
-            ToBool>::get, 110, 15);
+            Get<const TextFormat_as, bool, &TextFormat_as::underlined>::get,
+            110, 15);
     vm.registerNative(
             Set<TextFormat_as, bool, &TextFormat_as::underlinedSet,
             ToBool>::set, 
@@ -242,7 +261,10 @@ registerTextFormatNative(as_object& o)
 
     vm.registerNative(textformat_tabStops, 110, 29);
     vm.registerNative(textformat_tabStops, 110, 30);
-    vm.registerNative(textformat_bullet, 110, 31);
+
+    vm.registerNative(
+            Get<const TextFormat_as, bool, &TextFormat_as::bullet,
+            ToBool>::get, 110, 31);
     vm.registerNative(
             Set<TextFormat_as, bool, &TextFormat_as::bulletSet,
             ToBool>::set, 
@@ -353,27 +375,6 @@ textformat_display(const fn_call& fn)
 	else // setter
 	{
 		relay->displaySet(fn.arg(0).to_string());
-	}
-
-	return ret;
-}
-
-as_value
-textformat_bullet(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->bullet()) ret.set_bool(*relay->bullet());
-		else ret.set_null();
-	}
-	else // setter
-	{
-	    // Boolean
-		relay->bulletSet(fn.arg(0).to_bool());
 	}
 
 	return ret;
