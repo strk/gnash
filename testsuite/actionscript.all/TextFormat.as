@@ -102,6 +102,7 @@ check_equals(tfObj.color, 30);
 check_equals(tfObj.size, 2);
 check_equals(tfObj.font, 'fname');
 
+
 /// Bold
 
 // The boolean conversion of a string is version dependent.
