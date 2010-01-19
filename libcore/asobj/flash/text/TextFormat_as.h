@@ -36,36 +36,45 @@ namespace gnash {
 /// Most TextFormat values can be 'uninitialized', meaning they are not
 /// taken into account when applying formatting. These values return null
 /// in ActionScript.
-//
-/// Currently values cannot be unset once they have been set. This requirement
-/// hasn't been tested.
 template<typename T>
 class
 Optional
 {
 public:
+
+    /// Construct an Optional<T> with no value set.
     Optional()
         :
         _t(),
         _set(false)
     {}
 
+    /// Construct an Optional<T> with an initial value.
+    //
+    /// Implicit construction is allowed.
     Optional(const T& t)
         :
         _t(t),
         _set(true)
     {}
 
+    /// Unset this value.
+    void unset() {
+        _set = false;
+    }
+
     /// Relatively safe conversion to bool via void*.
     operator const void*() const {
         return _set ? this : 0;
     }
 
+    /// Access to value using operator->().
     const T* operator->() const {
         assert(_set);
         return &_t;
     }
 
+    /// Assign a T to this Optional<T>.
     Optional<T>& operator=(const T& t) {
         _t = t;
         _set = true;
@@ -139,7 +148,7 @@ public:
     const Optional<std::string> url() const { return _url; }
 
     /// The block indent.
-    const Optional<boost::uint16_t> blockIndent() { return _blockIndent; }
+    const Optional<boost::uint32_t> blockIndent() { return _blockIndent; }
 
     /// Return a number that indicates the amount of leading vertical
     /// space between lines.
@@ -154,26 +163,49 @@ public:
     /// Return a float that indicates the point size in twips.
     const Optional<boost::uint16_t> size() const { return _pointSize; }
 
-    void targetSet(const std::string& s) { _target=s; }
-    void urlSet(const std::string& s) { _url=s; }
-    void underlinedSet(bool x) { _underline = x; }
-    void italicedSet(bool x) { _italic = x; }
-    void boldSet(bool x) { _bold = x; }
-    void bulletSet(bool x) { _bullet = x; }
-    void colorSet(const rgba& x) { _color = x; }
-    void indentSet(boost::uint16_t x) { _indent = x; }
-    void fontSet(const std::string& font) { _font=font; }
-    void displaySet(TextField::TextFormatDisplay x) { _display = x; }
-    void displaySet(const std::string& display);
-    void alignSet(TextField::TextAlignment x) { _align = x; }
+    /// Setters
+
+    void targetSet(const Optional<std::string>& s) { _target=s; }
+
+    void urlSet(const Optional<std::string>& s) { _url=s; }
+
+    void underlinedSet(const Optional<bool>& x) { _underline = x; }
+
+    void italicSet(const Optional<bool>& x) { _italic = x; }
+
+    void boldSet(const Optional<bool>& x) { _bold = x; }
+
+    void bulletSet(const Optional<bool>& x) { _bullet = x; }
+
+    void colorSet(const Optional<rgba>& x) { _color = x; }
+
+    void indentSet(const Optional<boost::uint16_t>& x) { _indent = x; }
+
+    void fontSet(const Optional<std::string>& font) { _font=font; }
+    
+    void alignSet(const Optional<TextField::TextAlignment>& x) { _align = x; }
+    
     void alignSet(const std::string& align);
-    void blockIndentSet(boost::uint16_t x) { _blockIndent = x; }
-    void leadingSet(boost::uint16_t x) { _leading = x; }
-    void leftMarginSet(boost::uint16_t x) { _leftMargin = x; }
-    void rightMarginSet(boost::uint16_t x) { _rightMargin = x; }
-    void sizeSet(boost::uint16_t x) { _pointSize = x; }
+    
+    void blockIndentSet(const Optional<boost::uint32_t>& x) {
+        _blockIndent = x;
+    }
+    
+    void leadingSet(const Optional<boost::uint16_t>& x) { _leading = x; }
+
+    void leftMarginSet(const Optional<boost::uint16_t>& x) { _leftMargin = x; }
+
+    void rightMarginSet(const Optional<boost::uint16_t>& x) {
+        _rightMargin = x;
+    }
+
+    void sizeSet(const Optional<boost::uint16_t>& x) { _pointSize = x; }
+
     void tabStopsSet(const std::vector<int>& tabStops) { _tabStops = tabStops; }
 
+    /// These are not optional!
+    void displaySet(TextField::TextFormatDisplay x) { _display = x; }
+    void displaySet(const std::string& display);
 private:
 
     /// A Boolean value that indicates whether the text is underlined.
@@ -199,7 +231,7 @@ private:
     Optional<TextField::TextAlignment> _align;
 
     // 
-    Optional<boost::uint16_t> _blockIndent;
+    Optional<boost::uint32_t> _blockIndent;
 
     /// The color of text using this text format.
     //

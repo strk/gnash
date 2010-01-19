@@ -3300,7 +3300,7 @@ textfield_getTextFormat(const fn_call& fn)
     if (font)
     {
         tf->fontSet(font->name());
-        tf->italicedSet(font->isItalic());
+        tf->italicSet(font->isItalic());
         tf->boldSet(font->isBold());
     }
 

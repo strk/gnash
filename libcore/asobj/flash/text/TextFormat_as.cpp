@@ -22,23 +22,93 @@
 #include "TextFormat_as.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "builtin_function.h" // for getter/setter properties
-#include "NativeFunction.h" // for getter/setter properties
+#include "builtin_function.h" 
+#include "NativeFunction.h" 
 #include "namedStrings.h"
 #include "VM.h"
-#include "RGBA.h" // for rgba type
-#include "StringPredicates.h" // for parseAlignString
-#include "smart_ptr.h" // intrusive_ptr
+#include "RGBA.h" 
+#include "StringPredicates.h"
+#include "smart_ptr.h" 
 #include "GnashNumeric.h"
 #include "Array_as.h"
 
 
 namespace gnash {
 
-// Forward declarations
+// Functions and templates for reducing code duplication.
+namespace {
+
+struct PositiveTwips
+{
+    int operator()(const as_value& val) const {
+        return twipsToPixels(std::max<int>(toInt(val), 0));
+    }
+};
+
+struct ToBool
+{
+    bool operator()(const as_value& val) const {
+        return val.to_bool();
+    }
+};
+
+/// Produce a function to set a TextFormat property
+//
+/// @tparam T       The type of the Relay (should be TextFormat_as)
+/// @tparam U       The return type of the function to be called (as C++ can't
+///                 yet work out what it is)
+/// @tparam F       The function to call to store the value.
+/// @tparam P       A function object to be applied to the argument before
+///                 storing the value.
+template<typename T, typename U, void(T::*F)(const Optional<U>&), typename P>
+struct Set
+{
+    static as_value set(const fn_call& fn) {
+
+        T* relay = ensure<ThisIsNative<T> >(fn);
+
+        if (!fn.nargs) return as_value();
+
+        const as_value& arg = fn.arg(0);
+        // Undefined doesn't do anything.
+
+        if (arg.is_undefined() || arg.is_null()) {
+            (relay->*F)(Optional<U>());
+            return as_value();
+        }
+
+        (relay->*F)(P()(arg));
+        return as_value();
+    }
+
+};
+
+/// Produce a function to get a TextFormat property
+//
+/// @tparam T       The type of the Relay (should be TextFormat_as)
+/// @tparam U       The return type of the function to be called (as C++ can't
+///                 yet work out what it is)
+/// @tparam F       The function to call to retrieve the value.
+/// @tparam P       A function object to be applied to the argument before
+///                 returning the value.
+template<typename T, typename U, const Optional<U>&(T::*F)(), typename P>
+struct Get
+{
+    static as_value get(const fn_call& fn) {
+        T* relay = ensure<ThisIsNative<T> >(fn);
+        const Optional<U>& opt = (relay->*F)();
+		if (opt) return as_value(*opt);
+		
+        as_value null;
+        null.set_null();
+        return null;
+    }
+};
+
+}
 
 namespace {
-    
+
     as_value textformat_new(const fn_call& fn);
     void attachTextFormatInterface(as_object& o);
     const char* getAlignString(TextField::TextAlignment a);
@@ -55,9 +125,6 @@ namespace {
 	as_value textformat_rightMargin(const fn_call& fn);
 	as_value textformat_leftMargin(const fn_call& fn);
 	as_value textformat_align(const fn_call& fn);
-	as_value textformat_underline(const fn_call& fn);
-	as_value textformat_italic(const fn_call& fn);
-	as_value textformat_bold(const fn_call& fn);
 	as_value textformat_target(const fn_call& fn);
 	as_value textformat_url(const fn_call& fn);
 	as_value textformat_color(const fn_call& fn);
@@ -78,7 +145,11 @@ TextFormat_as::TextFormat_as()
 void
 TextFormat_as::alignSet(const std::string& align) 
 {
-    alignSet(parseAlignString(align));
+    StringNoCaseEqual cmp;
+    if (cmp(align, "left")) alignSet(TextField::ALIGN_LEFT);
+    if (cmp(align, "center")) alignSet(TextField::ALIGN_CENTER);
+    if (cmp(align, "right")) alignSet(TextField::ALIGN_RIGHT);
+    if (cmp(align, "justify")) alignSet(TextField::ALIGN_JUSTIFY);
 }
 
 void
@@ -96,38 +167,87 @@ registerTextFormatNative(as_object& o)
     // TODO: these functions are probably split into getters and setters
     // instead of one function for both. Needs testing.
     vm.registerNative(textformat_new, 110, 0);
+    
     vm.registerNative(textformat_font, 110, 1);
     vm.registerNative(textformat_font, 110, 2);
+    
     vm.registerNative(textformat_size, 110, 3);
     vm.registerNative(textformat_size, 110, 4);
+    
     vm.registerNative(textformat_color, 110, 5);
     vm.registerNative(textformat_color, 110, 6);
+    
     vm.registerNative(textformat_url, 110, 7);
     vm.registerNative(textformat_url, 110, 8);
+    
     vm.registerNative(textformat_target, 110, 9);
     vm.registerNative(textformat_target, 110, 10);
-    vm.registerNative(textformat_bold, 110, 11);
-    vm.registerNative(textformat_bold, 110, 12);
-    vm.registerNative(textformat_italic, 110, 13);
-    vm.registerNative(textformat_italic, 110, 14);
-    vm.registerNative(textformat_underline, 110, 15);
-    vm.registerNative(textformat_underline, 110, 16);
+    
+    vm.registerNative(
+            Get<const TextFormat_as, bool, &TextFormat_as::bold,
+            ToBool>::get, 110, 11);
+    vm.registerNative(
+            Set<TextFormat_as, bool, &TextFormat_as::boldSet,
+            ToBool>::set, 
+            110, 12);
+    
+    vm.registerNative(
+            Get<const TextFormat_as, bool, &TextFormat_as::italic,
+            ToBool>::get, 110, 13);
+    vm.registerNative(
+            Set<TextFormat_as, bool, &TextFormat_as::italicSet,
+            ToBool>::set, 
+            110, 14);
+    
+    vm.registerNative(
+            Get<const TextFormat_as, bool, &TextFormat_as::underlined,
+            ToBool>::get, 110, 15);
+    vm.registerNative(
+            Set<TextFormat_as, bool, &TextFormat_as::underlinedSet,
+            ToBool>::set, 
+            110, 16);
+    
     vm.registerNative(textformat_align, 110, 17);
     vm.registerNative(textformat_align, 110, 18);
+
     vm.registerNative(textformat_leftMargin, 110, 19);
-    vm.registerNative(textformat_leftMargin, 110, 20);
+    vm.registerNative(
+            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::leftMarginSet,
+            PositiveTwips>::set, 
+            110, 20);
+
     vm.registerNative(textformat_rightMargin, 110, 21);
-    vm.registerNative(textformat_rightMargin, 110, 22);
+    vm.registerNative(
+            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::rightMarginSet,
+            PositiveTwips>::set, 
+            110, 22);
+
     vm.registerNative(textformat_indent, 110, 23);
-    vm.registerNative(textformat_indent, 110, 24);
+    vm.registerNative(
+            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::indentSet,
+            PositiveTwips>::set, 
+            110, 24);
+    
     vm.registerNative(textformat_leading, 110, 25);
-    vm.registerNative(textformat_leading, 110, 26);
+    vm.registerNative(
+            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::leadingSet,
+            PositiveTwips>::set, 
+            110, 26);
+
     vm.registerNative(textformat_blockIndent, 110, 27);
-    vm.registerNative(textformat_blockIndent, 110, 28);
+    vm.registerNative(
+            Set<TextFormat_as, boost::uint32_t, &TextFormat_as::blockIndentSet,
+            PositiveTwips>::set,
+            110, 28);
+
     vm.registerNative(textformat_tabStops, 110, 29);
     vm.registerNative(textformat_tabStops, 110, 30);
     vm.registerNative(textformat_bullet, 110, 31);
-    vm.registerNative(textformat_bullet, 110, 32);
+    vm.registerNative(
+            Set<TextFormat_as, bool, &TextFormat_as::bulletSet,
+            ToBool>::set, 
+            110, 32);
+
     vm.registerNative(textformat_getTextExtent, 110, 33);
 }
 
@@ -185,7 +305,7 @@ textformat_new(const fn_call& fn)
 	    case 6:
 	        tf->underlinedSet(fn.arg(5).to_bool());
 	    case 5:
-	        tf->italicedSet(fn.arg(4).to_bool());
+	        tf->italicSet(fn.arg(4).to_bool());
 	    case 4:
 	        tf->boldSet(fn.arg(3).to_bool());
 	    case 3:
@@ -302,16 +422,12 @@ textformat_blockIndent(const fn_call& fn)
 
 	as_value ret;
 
-	if ( fn.nargs == 0 ) // getter
+	if (fn.nargs == 0) 
 	{
 		if (relay->blockIndent()) {
             ret.set_double(twipsToPixels(*relay->blockIndent()));
         }
 		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->blockIndentSet(pixelsToTwips(toInt(fn.arg(0))));
 	}
 
 	return ret;
@@ -349,10 +465,6 @@ textformat_indent(const fn_call& fn)
 		if (relay->indent()) ret.set_double(twipsToPixels(*relay->indent()));
 		else ret.set_null();
 	}
-	else // setter
-	{
-		relay->indentSet(pixelsToTwips(toInt(fn.arg(0))));
-	}
 
 	return ret;
 }
@@ -368,10 +480,6 @@ textformat_rightMargin(const fn_call& fn)
 	{
 		if (relay->rightMargin()) ret.set_double(twipsToPixels(*relay->rightMargin()));
 		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->rightMarginSet(pixelsToTwips(toInt(fn.arg(0))));
 	}
 
 	return ret;
@@ -416,66 +524,6 @@ textformat_align(const fn_call& fn)
 	else // setter
 	{
 		relay->alignSet(fn.arg(0).to_string());
-	}
-
-	return ret;
-}
-
-as_value
-textformat_underline(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->underlined()) ret.set_bool(*relay->underlined());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->underlinedSet(fn.arg(0).to_bool());
-	}
-
-	return ret;
-}
-
-as_value
-textformat_italic(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->italic()) ret.set_bool(*relay->italic());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->italicedSet(fn.arg(0).to_bool());
-	}
-
-	return ret;
-}
-
-as_value
-textformat_bold(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->bold()) ret.set_bool(*relay->bold());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->boldSet(fn.arg(0).to_bool());
 	}
 
 	return ret;
@@ -656,19 +704,6 @@ attachTextFormatInterface(as_object& o)
     o.init_property("display", textformat_display, textformat_display, flags);
 }
 
-
-TextField::TextAlignment
-parseAlignString(const std::string& align)
-{
-	StringNoCaseEqual cmp;
-	if ( cmp(align, "left") ) return TextField::ALIGN_LEFT;
-    if ( cmp(align, "center") ) return TextField::ALIGN_CENTER;
-	if ( cmp(align, "right") ) return TextField::ALIGN_RIGHT;
-	if ( cmp(align, "justify") ) return TextField::ALIGN_JUSTIFY;
-	
-	log_debug("Invalid align string %s, taking as left", align);
-	return TextField::ALIGN_LEFT;
-}
 
 TextField::TextFormatDisplay
 parseDisplayString(const std::string& display)
