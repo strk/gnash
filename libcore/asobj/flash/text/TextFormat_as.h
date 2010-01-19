@@ -31,231 +31,217 @@
 
 namespace gnash {  
 
+template<typename T>
+class
+Optional
+{
+public:
+    Optional()
+        :
+        _t(),
+        _set(false)
+    {}
+
+    Optional(const T& t)
+        :
+        _t(t),
+        _set(true)
+    {}
+
+    /// Relatively safe conversion to bool via void*.
+    operator const void*() const {
+        return _set ? this : 0;
+    }
+
+    const T* operator->() const {
+        assert(_set);
+        return &_t;
+    }
+
+    Optional<T>& operator=(const T& t) {
+        _t = t;
+        _set = true;
+        return *this;
+    }
+
+    /// Retrieve type only if set (converts to true).
+    const T& operator*() const {
+        assert(_set);
+        return _t;
+    }
+
+private:
+    T _t;
+    bool _set;
+};
+
 /// TODO: SWF8 has two additional members: kerning and letterSpacing.
 class TextFormat_as : public Relay
 {
 public:
   
-	TextFormat_as();
-	~TextFormat_as() {}
+    TextFormat_as();
+    ~TextFormat_as() {}
 
-	/// Return a Boolean value that indicates whether the text is underlined.
-	bool underlined() const { return _underline; }
-	bool underlinedDefined() const { return _flags&DEFunderline; }
+    /// Return a Boolean value that indicates whether the text is underlined.
+    const Optional<bool>& underlined() const { return _underline; }
+    
+    /// Return a Boolean value that indicates whether the text is boldface.
+    const Optional<bool>& bold() const { return _bold; }
 
-	/// Return a Boolean value that indicates whether the text is italicized.
-	bool italiced() const { return _italic; }
-	bool italicedDefined() const { return _flags&DEFitalic; }
+    /// Return a Boolean value that indicates whether the text is italicized.
+    const Optional<bool>& italic() const { return _italic; }
 
-	/// Return a Boolean value that indicates whether the text is boldface.
-	bool bold() const { return _bold; }
-	bool boldDefined() const { return _flags&DEFbold; }
+    /// Return the color of text using this text format.
+    const Optional<rgba>& color() const { return _color; }
 
-	bool bullet() const { return _bullet; }
-	bool bulletDefined() const { return _flags&DEFbullet; }
+    const Optional<bool>& bullet() const { return _bullet; }
 
-	/// Return the color of text using this text format.
-	const rgba& color() const { return _color; }
-	bool colorDefined() const { return _flags&DEFcolor; }
+    const Optional<TextField::TextFormatDisplay> display() const {
+        return _display;
+    }
 
-	TextField::TextFormatDisplay display() const {return _display; }
-	bool displayDefined() const { return _flags&DEFdisplay; }
-	
-	std::vector<int> tabStops() const { return _tabStops; }
-	bool tabStopsDefined() const { return _flags&DEFtabStops; }
-	
+    const Optional<std::vector<int> > tabStops() const {
+        return _tabStops;
+    }
+    
     void tabStopsSet(const std::vector<int>& tabStops) { 
         _tabStops = tabStops;
-		_flags |= DEFtabStops; 
-	}
+    }
 
-	/// \brief
-	/// Return an integer that indicates the indentation from the left
+    /// \brief
+    /// Return an integer that indicates the indentation from the left
     /// margin to the first DisplayObject in the paragraph
-	boost::uint16_t indent() const { return _indent; }
-	bool indentDefined() const { return _flags&DEFindent; }
-
-	/// Return the alignment of the paragraph.
-	TextField::TextAlignment align() const { return _align; }
-	bool alignDefined() const { return _flags&DEFalign; }
-
-	/// Return the name of a font for text as a string.
-	const std::string& font() const { return _font; }
-	bool fontDefined() const { return _flags&DEFfont; }
-
-	// See doc for _target member
-	const std::string& target() const { return _target; }
-	bool targetDefined() const { return _flags&DEFtarget; }
-
-	// See doc for _target member
-	void targetSet(const std::string& s) { _target=s; _flags |= DEFtarget; }
-
-	// See doc for _url member
-	const std::string& url() const { return _url; }
-	bool urlDefined() const { return _flags&DEFurl; }
-
-	// See doc for _url member
-	void urlSet(const std::string& s) { _url=s; _flags |= DEFurl; }
-
-	///
-	boost::uint16_t blockIndent() { return _blockIndent; }
-	bool blockIndentDefined() const { return _flags&DEFblockIndent; }
-
-	/// Return a number that indicates the amount of leading vertical
-	/// space between lines.
-	boost::uint16_t leading()     { return _leading; }
-	bool leadingDefined() const { return _flags&DEFleading; }
-
-	/// Indicates the left margin of the paragraph, in points.
-	boost::uint16_t leftMargin()  { return _leftMargin; }
-	bool leftMarginDefined() const { return _flags&DEFleftMargin; }
-
-	/// Indicates the right margin of the paragraph, in points.
-	boost::uint16_t rightMargin() { return _rightMargin; }
-	bool rightMarginDefined() const { return _flags&DEFrightMargin; }
-
-	/// Return a float that indicates the point size in twips.
-	boost::uint16_t size()        { return _pointSize; }
-	bool sizeDefined() const { return _flags&DEFsize; }
-
-	void underlinedSet(bool x)   { _underline = x; _flags |= DEFunderline; }
-	void italicedSet(bool x)     { _italic = x; _flags |= DEFitalic; }
-	void boldSet(bool x)         { _bold = x; _flags |= DEFbold; }
-	void bulletSet(bool x)       { _bullet = x; _flags |= DEFbullet; }
-	void colorSet(const rgba& x)      { _color = x; _flags |= DEFcolor; }
-	void indentSet(boost::uint16_t x)      { _indent = x; _flags |= DEFindent; }
-	void fontSet(const std::string& font) { _font=font; _flags |= DEFfont; }
-	void displaySet(TextField::TextFormatDisplay x) {
-		_display = x;
-		_flags |= DEFdisplay;
-	}
-	
-	void displaySet(const std::string& display);
-	
-    void alignSet(TextField::TextAlignment x) {
-        _align = x;
-        _flags |= DEFalign;
+    const Optional<boost::uint16_t> indent() const {
+        return _indent;
     }
+    
+    /// Return the alignment of the paragraph.
+    const Optional<TextField::TextAlignment> align() const { return _align; }
 
-	void alignSet(const std::string& align);
+    /// Return the name of a font for text as a string.
+    const Optional<std::string> font() const { return _font; }
 
-	void blockIndentSet(boost::uint16_t x)   { 
-        _blockIndent = x;
-        _flags |= DEFblockIndent;
-    }
+    // See doc for _target member
+    const Optional<std::string> target() const { return _target; }
 
-	void leadingSet(boost::uint16_t x) {
-        _leading = x;
-        _flags |= DEFleading;
-    }
+    // See doc for _target member
+    void targetSet(const std::string& s) { _target=s; }
 
-	void leftMarginSet(boost::uint16_t x) {
-        _leftMargin = x;
-        _flags |= DEFleftMargin;
-    }
-	
-    void rightMarginSet(boost::uint16_t x) {
-        _rightMargin = x;
-        _flags |= DEFrightMargin;
-    }
+    // See doc for _url member
+    const Optional<std::string> url() const { return _url; }
 
-	/// Set font point size in twips
-	void sizeSet(boost::uint16_t x) {
-        _pointSize = x;
-        _flags |= DEFsize;
-    }
+    // See doc for _url member
+    void urlSet(const std::string& s) { _url=s; }
+
+    ///
+    const Optional<boost::uint16_t> blockIndent() { return _blockIndent; }
+
+    /// Return a number that indicates the amount of leading vertical
+    /// space between lines.
+    const Optional<boost::uint16_t> leading() const { return _leading; }
+
+    /// Indicates the left margin of the paragraph, in points.
+    const Optional<boost::uint16_t> leftMargin() const { return _leftMargin; }
+
+    /// Indicates the right margin of the paragraph, in points.
+    const Optional<boost::uint16_t> rightMargin() const { return _rightMargin; }
+
+    /// Return a float that indicates the point size in twips.
+    const Optional<boost::uint16_t> size() const { return _pointSize; }
+
+    void underlinedSet(bool x) { _underline = x; }
+    void italicedSet(bool x) { _italic = x; }
+    void boldSet(bool x) { _bold = x; }
+    void bulletSet(bool x) { _bullet = x; }
+    void colorSet(const rgba& x) { _color = x; }
+    void indentSet(boost::uint16_t x) { _indent = x; }
+    void fontSet(const std::string& font) { _font=font; }
+    void displaySet(TextField::TextFormatDisplay x) { _display = x; }
+    
+    void displaySet(const std::string& display);
+    
+    void alignSet(TextField::TextAlignment x) { _align = x; }
+
+    void alignSet(const std::string& align);
+
+    void blockIndentSet(boost::uint16_t x) { _blockIndent = x; }
+
+    void leadingSet(boost::uint16_t x) { _leading = x; }
+
+    void leftMarginSet(boost::uint16_t x) { _leftMargin = x; }
+    
+    void rightMarginSet(boost::uint16_t x) { _rightMargin = x; }
+
+    /// Set font point size in twips
+    void sizeSet(boost::uint16_t x) { _pointSize = x; }
 
 private:
 
-    enum {
-		DEFunderline	=1<<0,
-		DEFbold		=1<<1,
-		DEFitalic	=1<<2,
-		DEFbullet	=1<<3,
-		DEFalign	=1<<4,
-		DEFblockIndent	=1<<5,
-		DEFcolor	=1<<6,
-		DEFfont		=1<<7,
-		DEFindent	=1<<8,
-		DEFleading	=1<<9,
-		DEFleftMargin	=1<<10,
-		DEFrightMargin	=1<<11,
-		DEFpointSize	=1<<12,
-		DEFtabStops	=1<<13,
-		DEFtarget	=1<<14,
-		DEFurl		=1<<15,
-		DEFsize		=1<<16,
-		DEFdisplay  =1<<17
-	};
+    /// A Boolean value that indicates whether the text is underlined.
+    Optional<bool> _underline;
 
-    // need at least 17 bit here... (1<<16)
-	boost::uint64_t _flags;
-    //boost::uint32_t _flags; 
+    /// A Boolean value that indicates whether the text is boldface.
+    Optional<bool> _bold;
 
-	/// A Boolean value that indicates whether the text is underlined.
-	bool _underline;
+    /// A Boolean value that indicates whether the text is italicized.
+    Optional<bool> _italic;
 
-	/// A Boolean value that indicates whether the text is boldface.
-	bool _bold;
-
-	/// A Boolean value that indicates whether the text is italicized.
-	bool _italic;
-
-	// 
-	bool _bullet;
-	
-	TextField::TextFormatDisplay _display;
+    // 
+    Optional<bool> _bullet;
+    
+    Optional<TextField::TextFormatDisplay> _display;
   
-	/// The alignment of the paragraph, represented as a string.
-	//
-	/// If "left", the paragraph is left-aligned. If "center", the
-	/// paragraph is centered. If "right", the paragraph is
-	/// right-aligned. If "justify", the paragraph is justified.
-	///
-	TextField::TextAlignment _align;
+    /// The alignment of the paragraph, represented as a string.
+    //
+    /// If "left", the paragraph is left-aligned. If "center", the
+    /// paragraph is centered. If "right", the paragraph is
+    /// right-aligned. If "justify", the paragraph is justified.
+    ///
+    Optional<TextField::TextAlignment> _align;
 
-	// 
-	boost::uint16_t _blockIndent;
+    // 
+    Optional<boost::uint16_t> _blockIndent;
 
-	/// The color of text using this text format.
-	//
-	/// A number containing three 8-bit RGB components; for example,
+    /// The color of text using this text format.
+    //
+    /// A number containing three 8-bit RGB components; for example,
         /// 0xFF0000 is red, 0x00FF00 is green.
-	rgba _color;	
+    Optional<rgba> _color;    
 
-	// The name of a font for text as a string.
-	std::string _font;	
+    // The name of a font for text as a string.
+    Optional<std::string> _font;    
 
-	/// An integer that indicates the indentation from the left
+    /// An integer that indicates the indentation from the left
     /// margin to the first DisplayObject in the paragraph (twips)
-	boost::uint16_t _indent;
+    Optional<boost::uint16_t> _indent;
 
-	/// A number that indicates the amount of leading vertical
-	/// space between lines (twips)
-	boost::uint16_t _leading;
+    /// A number that indicates the amount of leading vertical
+    /// space between lines (twips)
+    Optional<boost::uint16_t> _leading;
 
-	/// Indicates the left margin of the paragraph, in points (twips)
-	boost::uint16_t _leftMargin;
+    /// Indicates the left margin of the paragraph, in points (twips)
+    Optional<boost::uint16_t> _leftMargin;
 
-	/// Indicates the right margin of the paragraph, in points (twips).
-	boost::uint16_t _rightMargin;
+    /// Indicates the right margin of the paragraph, in points (twips).
+    Optional<boost::uint16_t> _rightMargin;
 
-	/// Point size in twips.
-	boost::uint16_t	_pointSize;
+    /// Point size in twips.
+    Optional<boost::uint16_t> _pointSize;
 
-	///
-	std::vector<int> _tabStops;
+    ///
+    Optional<std::vector<int> > _tabStops;
 
-	/// The target window where the hyperlink is displayed. 
+    /// The target window where the hyperlink is displayed. 
         /// If the target window is an empty string, the text is displayed in
         /// the default target window _self. If the url parameter is
         /// set to an empty string or to the value null, you can get
         /// or set this property, but the property will have no effect.
-	std::string	_target;
+    Optional<std::string> _target;
 
-	/// The URL to which the text in this text format hyperlinks.
-	/// If url is an empty string, the text does not have a hyperlink
-	std::string	 _url;	
+    /// The URL to which the text in this text format hyperlinks.
+    /// If url is an empty string, the text does not have a hyperlink
+    Optional<std::string> _url;    
 };
 
 void textformat_class_init(as_object& global, const ObjectURI& uri);

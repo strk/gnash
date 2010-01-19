@@ -994,22 +994,22 @@ TextField::setTextFormat(TextFormat_as& tf)
     //TODO: this is lazy. we should set all the TextFormat variables HERE, i think
     //This is just so we can set individual variables without having to call format_text()
     //This calls format_text() at the end of setting TextFormat
-    if ( tf.alignDefined() ) setAlignment(tf.align());
-    if ( tf.sizeDefined() ) setFontHeight(tf.size()); // keep twips
-    if ( tf.indentDefined() ) setIndent(tf.indent());
-    if ( tf.blockIndentDefined() ) setBlockIndent(tf.blockIndent());
-    if ( tf.leadingDefined() ) setLeading(tf.leading());
-    if ( tf.leftMarginDefined() ) setLeftMargin(tf.leftMargin());
-    if ( tf.rightMarginDefined() ) setRightMargin(tf.rightMargin());
-    if ( tf.colorDefined() ) setTextColor(tf.color());
-    if ( tf.underlinedDefined() ) setUnderlined(tf.underlined());
-    if ( tf.bulletDefined() ) setBullet(tf.bullet());
-    if ( tf.displayDefined() ) setDisplay(tf.display());
-	if ( tf.tabStopsDefined() ) setTabStops(tf.tabStops());
+    if (tf.align()) setAlignment(*tf.align());
+    if (tf.size()) setFontHeight(*tf.size()); // keep twips
+    if (tf.indent()) setIndent(*tf.indent());
+    if (tf.blockIndent()) setBlockIndent(*tf.blockIndent());
+    if (tf.leading()) setLeading(*tf.leading());
+    if (tf.leftMargin()) setLeftMargin(*tf.leftMargin());
+    if (tf.rightMargin()) setRightMargin(*tf.rightMargin());
+    if (tf.color()) setTextColor(*tf.color());
+    if (tf.underlined()) setUnderlined(*tf.underlined());
+    if (tf.bullet()) setBullet(*tf.bullet());
+    if (tf.display()) setDisplay(*tf.display());
+	if (tf.tabStops()) setTabStops(*tf.tabStops());
 	
 	// NEED TO IMPLEMENT THESE TWO
-	if ( tf.urlDefined() ) setURL(tf.url());
-	if ( tf.targetDefined() ) setTarget(tf.target());
+	if (tf.url()) setURL(*tf.url());
+	if (tf.target()) setTarget(*tf.target());
     
     format_text();
 }
@@ -3355,13 +3355,13 @@ textfield_setTextFormat(const fn_call& fn)
         return as_value();
     }
 
-    if ( tf->fontDefined() )
+    if (tf->font())
     {
-        const std::string& fontName = tf->font();
+        const std::string& fontName = *tf->font();
         if ( ! fontName.empty() )
         {
-            bool bold = tf->bold();
-            bool italic = tf->italiced();
+            bool bold = tf->bold() ? *tf->bold() : false;
+            bool italic = tf->italic() ? *tf->italic() : false;
 
             // NOTE: should query movie-private font lib, not global-shared one
             Movie* mi = text->get_root();

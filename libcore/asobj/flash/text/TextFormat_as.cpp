@@ -124,24 +124,6 @@ registerTextFormatNative(as_object& o)
 }
 
 TextFormat_as::TextFormat_as()
-	:
-	_flags(0),
-	_underline(false),
-	_bold(false),
-	_italic(false),
-	_bullet(false),
-    _display(),
-	_align(TextField::ALIGN_LEFT),
-	_blockIndent(-1),
-	_color(),
-	_indent(-1),
-	_leading(-1),
-	_leftMargin(-1),
-	_rightMargin(-1),
-	_pointSize(-1),
-	_tabStops(),
-	_target(),
-	_url()
 {
 }
 
@@ -244,8 +226,8 @@ textformat_display(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->displayDefined() ) {
-            ret.set_string(getDisplayString(relay->display()));
+		if (relay->display()) {
+            ret.set_string(getDisplayString(*relay->display()));
         }
         else ret.set_null();
 	}
@@ -266,7 +248,7 @@ textformat_bullet(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->bulletDefined() ) ret.set_bool(relay->bullet());
+		if (relay->bullet()) ret.set_bool(*relay->bullet());
 		else ret.set_null();
 	}
 	else // setter
@@ -323,8 +305,8 @@ textformat_blockIndent(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if (relay->blockIndentDefined()) {
-            ret.set_double(twipsToPixels(relay->blockIndent()));
+		if (relay->blockIndent()) {
+            ret.set_double(twipsToPixels(*relay->blockIndent()));
         }
 		else ret.set_null();
 	}
@@ -345,7 +327,7 @@ textformat_leading(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->leadingDefined() ) ret.set_double(twipsToPixels(relay->leading()));
+		if (relay->leading()) ret.set_double(twipsToPixels(*relay->leading()));
 		else ret.set_null();
 	}
 	else // setter
@@ -365,7 +347,7 @@ textformat_indent(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->indentDefined() ) ret.set_double(twipsToPixels(relay->indent()));
+		if (relay->indent()) ret.set_double(twipsToPixels(*relay->indent()));
 		else ret.set_null();
 	}
 	else // setter
@@ -383,9 +365,9 @@ textformat_rightMargin(const fn_call& fn)
 
 	as_value ret;
 
-	if ( fn.nargs == 0 ) // getter
+	if (fn.nargs == 0 ) // getter
 	{
-		if ( relay->rightMarginDefined() ) ret.set_double(twipsToPixels(relay->rightMargin()));
+		if (relay->rightMargin()) ret.set_double(twipsToPixels(*relay->rightMargin()));
 		else ret.set_null();
 	}
 	else // setter
@@ -405,8 +387,8 @@ textformat_leftMargin(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if (relay->leftMarginDefined()) {
-            ret.set_double(twipsToPixels(relay->leftMargin()));
+		if (relay->leftMargin()) {
+            ret.set_double(twipsToPixels(*relay->leftMargin()));
         }
 		else ret.set_null();
 	}
@@ -427,8 +409,8 @@ textformat_align(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->alignDefined() ) {
-            ret.set_string(getAlignString(relay->align()));
+		if (relay->align()) {
+            ret.set_string(getAlignString(*relay->align()));
         }
         else ret.set_null();
 	}
@@ -449,7 +431,7 @@ textformat_underline(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->underlinedDefined() ) ret.set_bool(relay->underlined());
+		if (relay->underlined()) ret.set_bool(*relay->underlined());
 		else ret.set_null();
 	}
 	else // setter
@@ -469,7 +451,7 @@ textformat_italic(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->italicedDefined() ) ret.set_bool(relay->italiced());
+		if (relay->italic()) ret.set_bool(*relay->italic());
 		else ret.set_null();
 	}
 	else // setter
@@ -489,7 +471,7 @@ textformat_bold(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->boldDefined() ) ret.set_bool(relay->bold());
+		if (relay->bold()) ret.set_bool(*relay->bold());
 		else ret.set_null();
 	}
 	else // setter
@@ -509,7 +491,7 @@ textformat_target(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->targetDefined() ) ret.set_string(relay->target());
+		if (relay->target()) ret.set_string(*relay->target());
 		else ret.set_null();
 	}
 	else // setter
@@ -529,7 +511,7 @@ textformat_url(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->urlDefined() ) ret.set_string(relay->url());
+		if (relay->url()) ret.set_string(*relay->url());
 		else ret.set_null();
 	}
 	else // setter
@@ -549,7 +531,7 @@ textformat_color(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->colorDefined() )  ret.set_double(relay->color().toRGB());
+		if (relay->color()) ret.set_double(relay->color()->toRGB());
 		else ret.set_null();
 	}
 	else // setter
@@ -571,7 +553,7 @@ textformat_size(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( relay->sizeDefined() ) ret.set_double(twipsToPixels(relay->size()));
+		if (relay->size()) ret.set_double(twipsToPixels(*relay->size()));
 		else ret.set_null();
 	}
 	else // setter
@@ -591,7 +573,7 @@ textformat_font(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if (relay->fontDefined()) ret.set_string(relay->font());
+		if (relay->font()) ret.set_string(*relay->font());
 		else ret.set_null();
 	}
 	else // setter
