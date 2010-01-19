@@ -750,13 +750,13 @@ DiskStream::play(int netfd, bool flag)
 				netfd, strerror(errno));
 		  }
 #endif
-		  log_debug("Done playing file %s, size was: %d", _filespec, _filesize);
+		  log_network("Done playing file %s, size was: %d", _filespec, _filesize);
  		  close();
 		  done = true;
 		  // reset to the beginning of the file
 		  _offset = 0;
 	      } else {
-		  log_debug("\tPlaying part of file %s, offset is: %d", _filespec, _offset);
+		  log_network("\tPlaying part of file %s, offset is: %d out of %d bytes.", _filespec, _offset, _filesize);
 #ifdef HAVE_SENDFILE_XX
 		  ret = sendfile(netfd, _filefd, &_offset, _pagesize);
 #else
@@ -765,6 +765,7 @@ DiskStream::play(int netfd, bool flag)
 		      log_error("In %s(%d): couldn't write %d of bytes of data to net fd #%d! Got %d, %s",
 				__FUNCTION__, __LINE__, _pagesize, netfd,
 				ret, strerror(errno));
+		      return false;
 		  }
 		  _offset += _pagesize;
 #endif

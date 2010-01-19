@@ -1048,8 +1048,14 @@ event_handler(Network::thread_params_t *args)
    		//ds->dump();
 		// Only play the next chunk of the file.
 //log_network("Sending following chunk of %s", ds->getFilespec());
-		ds->play(i, false);
-		if (ds->getState() == DiskStream::CLOSED) {
+		if (ds->play(i, false)) {
+		    if (ds->getState() == DiskStream::CLOSED) {
+			net.closeNet(args->netfd);
+			hand->removeClient(args->netfd);
+			done = true;
+		    }
+		} else {
+		    // something went wrong, the stream failed
 		    net.closeNet(args->netfd);
 		    hand->removeClient(args->netfd);
 		    done = true;
@@ -1146,12 +1152,14 @@ event_handler(Network::thread_params_t *args)
 	    // hand->removeClient(args->netfd);
 	    // done = true;
 	}
+#if 0
 	retries++;
-	// if (retries >= 10) {
-	//     net.closeNet(args->netfd);
-	//     hand->removeClient(args->netfd);
-	//     done = true;
-	// }
+	if (retries >= 10) {
+	    net.closeNet(args->netfd);
+	    hand->removeClient(args->netfd);
+	    done = true;
+	}
+#endif
     } while (!done);
 
     tids.decrement();
