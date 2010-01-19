@@ -898,7 +898,7 @@ public:
 
     // prepare style handler
     agg_style_handler sh;
-    build_agg_styles(sh, m_single_fill_styles, mat, m_neutral_cxform);
+    build_agg_styles(sh, m_single_fill_styles, mat, cxform());
     
     draw_shape(-1, paths, agg_paths, sh, false);
     
