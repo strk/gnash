@@ -31,6 +31,14 @@
 
 namespace gnash {  
 
+/// A type to hold a simple value but with an additional 'unset' state.
+//
+/// Most TextFormat values can be 'uninitialized', meaning they are not
+/// taken into account when applying formatting. These values return null
+/// in ActionScript.
+//
+/// Currently values cannot be unset once they have been set. This requirement
+/// hasn't been tested.
 template<typename T>
 class
 Optional
@@ -75,12 +83,18 @@ private:
     bool _set;
 };
 
+
+/// The TextFormat_as Relay type stores text properties.
+//
+/// Most properties can either have a value or be null.
+//
 /// TODO: SWF8 has two additional members: kerning and letterSpacing.
 class TextFormat_as : public Relay
 {
 public:
   
     TextFormat_as();
+
     ~TextFormat_as() {}
 
     /// Return a Boolean value that indicates whether the text is underlined.
@@ -95,8 +109,12 @@ public:
     /// Return the color of text using this text format.
     const Optional<rgba>& color() const { return _color; }
 
+    /// Whether the text should have a bullet.
     const Optional<bool>& bullet() const { return _bullet; }
 
+    /// The display type (block or inline).
+    //
+    /// Note this is not an optional parameter.
     TextField::TextFormatDisplay display() const {
         return _display;
     }
@@ -104,37 +122,23 @@ public:
     const Optional<std::vector<int> > tabStops() const {
         return _tabStops;
     }
-    
-    void tabStopsSet(const std::vector<int>& tabStops) { 
-        _tabStops = tabStops;
-    }
 
-    /// \brief
-    /// Return an integer that indicates the indentation from the left
-    /// margin to the first DisplayObject in the paragraph
-    const Optional<boost::uint16_t> indent() const {
-        return _indent;
-    }
+    /// Indentation from left margin to the first character in the paragraph
+    const Optional<boost::uint16_t> indent() const { return _indent; }
     
-    /// Return the alignment of the paragraph.
+    /// Paragraph alignment
     const Optional<TextField::TextAlignment> align() const { return _align; }
 
-    /// Return the name of a font for text as a string.
+    /// Font name.
     const Optional<std::string> font() const { return _font; }
 
     // See doc for _target member
     const Optional<std::string> target() const { return _target; }
 
-    // See doc for _target member
-    void targetSet(const std::string& s) { _target=s; }
-
     // See doc for _url member
     const Optional<std::string> url() const { return _url; }
 
-    // See doc for _url member
-    void urlSet(const std::string& s) { _url=s; }
-
-    ///
+    /// The block indent.
     const Optional<boost::uint16_t> blockIndent() { return _blockIndent; }
 
     /// Return a number that indicates the amount of leading vertical
@@ -150,6 +154,8 @@ public:
     /// Return a float that indicates the point size in twips.
     const Optional<boost::uint16_t> size() const { return _pointSize; }
 
+    void targetSet(const std::string& s) { _target=s; }
+    void urlSet(const std::string& s) { _url=s; }
     void underlinedSet(bool x) { _underline = x; }
     void italicedSet(bool x) { _italic = x; }
     void boldSet(bool x) { _bold = x; }
@@ -158,23 +164,15 @@ public:
     void indentSet(boost::uint16_t x) { _indent = x; }
     void fontSet(const std::string& font) { _font=font; }
     void displaySet(TextField::TextFormatDisplay x) { _display = x; }
-    
     void displaySet(const std::string& display);
-    
     void alignSet(TextField::TextAlignment x) { _align = x; }
-
     void alignSet(const std::string& align);
-
     void blockIndentSet(boost::uint16_t x) { _blockIndent = x; }
-
     void leadingSet(boost::uint16_t x) { _leading = x; }
-
     void leftMarginSet(boost::uint16_t x) { _leftMargin = x; }
-    
     void rightMarginSet(boost::uint16_t x) { _rightMargin = x; }
-
-    /// Set font point size in twips
     void sizeSet(boost::uint16_t x) { _pointSize = x; }
+    void tabStopsSet(const std::vector<int>& tabStops) { _tabStops = tabStops; }
 
 private:
 
