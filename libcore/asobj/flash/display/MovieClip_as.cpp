@@ -1996,7 +1996,7 @@ movieclip_beginGradientFill(const fn_call& fn)
     if (radial) {
         // A gradient box extends from (-16384, -16384) to (16384, 16384),
         // so we have set scale and translation to convert our radial
-        // (0, 0) - (64, 64) range to -16384 - 16384.
+        // (0, 0)-(64, 64) range to a -16384 - 16384 square.
         mat.concatenate_translation(32, 32);
         mat.set_scale(1 / 512., 1 / 512.);
     }
@@ -2099,7 +2099,6 @@ movieclip_beginGradientFill(const fn_call& fn)
         movieclip->beginLinearGradientFill(gradients, mat);
     }
 
-    LOG_ONCE( log_debug("MovieClip.beginGradientFill() TESTING") );
     return as_value();
 }
 
