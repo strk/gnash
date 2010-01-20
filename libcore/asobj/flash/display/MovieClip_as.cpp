@@ -1956,7 +1956,7 @@ movieclip_beginGradientFill(const fn_call& fn)
     ObjPtr ratios = fn.arg(3).to_object(getGlobal(fn));
     ObjPtr matrixArg = fn.arg(4).to_object(getGlobal(fn));
 
-    if (!colors || !alphas || !ratios || !matrixArg ) {
+    if (!colors || !alphas || !ratios || !matrixArg) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): one or more of the "
@@ -2030,7 +2030,7 @@ movieclip_beginGradientFill(const fn_call& fn)
             input_matrix.set_scale(64.0/valW, 64.0/valH);
 
             // For radial gradients, dunno why translation must be negative...
-            input_matrix.concatenate_translation( -valX, -valY );
+            input_matrix.concatenate_translation(-valX, -valY);
 
             // NOTE: rotation is intentionally discarded as it would
             //             have no effect (theoretically origin of the radial
@@ -2062,12 +2062,12 @@ movieclip_beginGradientFill(const fn_call& fn)
         boost::int32_t valH = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
-        input_matrix.sx    = valA * 65536; // sx
-        input_matrix.shx = valB * 65536; // shy
-        input_matrix.shy = valD * 65536; // shx
-        input_matrix.sy    = valE * 65536; // sy
-        input_matrix.tx = valG; // x0
-        input_matrix.ty = valH; // y0
+        input_matrix.sx = valA * 65536; 
+        input_matrix.shx = valB * 65536;
+        input_matrix.shy = valD * 65536;
+        input_matrix.sy = valE * 65536; 
+        input_matrix.tx = valG; 
+        input_matrix.ty = valH;
 
         // This is the SWFMatrix that would transform the gnash
         // gradient to the expected flash gradient.
