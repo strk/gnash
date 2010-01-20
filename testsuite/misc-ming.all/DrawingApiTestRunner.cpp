@@ -866,6 +866,12 @@ main(int /*argc*/, char** /*argv*/)
     // Top right corner (yellow line)
     check_pixel(x + w, y, 2, yellow, 2);
 
+    // Test picture 4
+	tester.pressKey(gnash::key::_4); tester.advance();
+
+
+
+
     //----------------------------------------------------------
 	// TODO: check startDrag/stopDrag on the hit detector
 	// (hit 'd' key to toggle)

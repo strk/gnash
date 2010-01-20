@@ -10,8 +10,8 @@
 //
 // Click the mouse button to turn the cursor shape into a mask and back.
 // Press a number on the keyboard to switch between "pages" of the drawing.
-// We currently have two pages: 1 and 2.
-// Only page 1 have automatic testing so far.
+// We currently have pages 1, 2, 3, 4.
+// All pages are tested automatically.
 //
 // '-' and '+' decrement and increment _alpha
 // 'h' toggles _visible
@@ -19,6 +19,9 @@
 
 
 #include "../actionscript.all/check.as"
+
+// Make Matrix visible for easier gradient tests.
+ASSetPropFlags(_global, "flash", 0, 5248);
 
 printBounds = function(b)
 {
@@ -741,6 +744,155 @@ xcheck(line.hitTest(270, 40, true));
 check(line.hitTest(230, 80, true));
 
 
+// Page 4 ( page[3] )
+
+draw100x100Box = function(x, y, mc) {
+    s = 90;
+    with (mc) {
+        moveTo(x, y);
+        lineTo(x + s, y);
+        lineTo(x + s, y + s);
+        lineTo(x, y + s);
+        lineTo(x, y);
+        endFill();
+    };
+};
+    
+
+createEmptyMovieClip("grad", 150);
+
+// Test gradients.
+// The beginGradientFill function works with fake Matrices, but there is no
+// point making more work for ourselves as that testing is already done for
+// the Matrix class.
+// Only the "box" matrixType gets special handling.
+
+with(grad) {
+
+    // Linear gradients
+    fillType = "linear";
+
+    x = 0;
+    y = 0;
+
+    // shape 1
+    colors = [0x0000ff, 0xffffff];
+    alphas = [100, 100];
+    ratios = [0, 0xff];
+    matrix = new flash.geom.Matrix();
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+    
+    // shape 2
+    x += 100;
+    colors = [0x0000ff, 0xffffff];
+    alphas = [100, 100];
+    ratios = [0, 0xff];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+    
+    // shape 3
+    x += 100;
+    colors = [0x0000ff, 0xffffff, 0xff00ff];
+    alphas = [100, 100, 100];
+    ratios = [0, 0xff / 2, 0xff];
+    matrix.createGradientBox(90, 90, Math.PI / 4, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+
+    // shape 4
+    x += 100;
+    colors = [0x0000ff, 0xffffff, 0xff00ff];
+    alphas = [100, 100, 100];
+    ratios = [0, 0xff / 2, 0xff];
+    matrix.createGradientBox(180, 180, Math.PI / 4, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+
+    // shape 5
+    x += 100;
+    colors = [0x0000ff, 0xffffff, 0x00ff00];
+    alphas = [100, 100, 100];
+    ratios = [0, 0xff / 2, 0xff];
+    matrix.createGradientBox(180, 180, Math.PI / 4 * 3, x - 90, y - 90);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+
+    // shape 6
+    x += 100;
+    colors = [0x0000ff, 0xffffff, 0x00ff00, 0xff00ff, 0x00ffff, 0xffff00 ];
+    alphas = [100, 100, 100, 50, 25, 100];
+    ratios = [0, 0xff / 5, 0xff / 5 * 2, 0xff / 5 * 3, 0xff / 5 * 4, 0xff];
+    matrix.createGradientBox(90, 90, Math.PI / 2, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+ 
+    // Radial gradients
+    fillType = "radial";
+
+    x = 0;
+    y += 100;
+
+    // shape 1
+    colors = [0x0000ff, 0xffffff];
+    alphas = [100, 100];
+    ratios = [0, 0xff];
+    matrix = new flash.geom.Matrix();
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+    
+    // shape 2
+    x += 100;
+    colors = [0x0000ff, 0xffffff];
+    alphas = [100, 100];
+    ratios = [0, 0xff];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+    
+    // shape 3
+    x += 100;
+    colors = [0x0000ff, 0xffffff, 0xff00ff];
+    alphas = [100, 100, 100];
+    ratios = [0, 0xff / 2, 0xff];
+    matrix.createGradientBox(90, 90, Math.PI / 4, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+
+    // shape 4
+    x += 100;
+    colors = [0x0000ff, 0xffffff, 0xff00ff];
+    alphas = [100, 100, 100];
+    ratios = [0, 0xff / 2, 0xff];
+    matrix.createGradientBox(180, 180, Math.PI / 4, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+
+    // shape 5
+    x += 100;
+    colors = [0x0000ff, 0xffffff, 0x00ff00];
+    alphas = [100, 100, 100];
+    ratios = [0, 0xff / 2, 0xff];
+    matrix.createGradientBox(180, 180, Math.PI / 4 * 3, x - 90, y - 90);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+
+    // shape 6
+    x += 100;
+    colors = [0x0000ff, 0xffffff, 0x00ff00, 0xff00ff, 0x00ffff, 0xffff00 ];
+    alphas = [100, 100, 100, 50, 25, 100];
+    ratios = [0, 0xff / 5, 0xff / 5 * 2, 0xff / 5 * 3, 0xff / 5 * 4, 0xff];
+    matrix.createGradientBox(90, 90, Math.PI / 2, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+
+   
+    _visible = false;
+
+};
+grad.onRollOver = function() {};
+
 //---------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------
@@ -874,6 +1026,8 @@ page = new Array;
 page[0] = a;
 page[1] = inv;
 page[2] = line;
+page[3] = grad;
+
 onKeyDown = function()
 {
 	var ascii = Key.getAscii();
