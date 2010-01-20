@@ -55,13 +55,12 @@ public:
     void read(SWFStream& in, SWF::TagType tag);
     
     //data:
-    boost::uint8_t    m_ratio;
-    rgba    m_color;
+    boost::uint8_t m_ratio;
+    rgba m_color;
 };
 
 
 /// For the interior of outline shapes.
-//
 class DSOEXPORT fill_style 
 {
 public:
