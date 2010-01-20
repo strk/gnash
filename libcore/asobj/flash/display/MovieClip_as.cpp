@@ -1968,8 +1968,6 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     size_t stops = arrayLength(*colors);
 
-    log_debug("Stops: %s", stops);
-
     // Check that the arrays are all the same size.
     if (stops != arrayLength(*alphas) || stops != arrayLength(*ratios)) {
 
@@ -2006,8 +2004,6 @@ movieclip_beginGradientFill(const fn_call& fn)
     // This is case sensitive.
     if (matrix->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
         
-        log_debug("Box gradient");
-
         const double valX = pixelsToTwips(
                 matrix->getMember(NSV::PROP_X).to_number()); 
         const double valY = pixelsToTwips(
@@ -2030,9 +2026,6 @@ movieclip_beginGradientFill(const fn_call& fn)
         input_matrix.tx = valX + valW / 2.0;
         input_matrix.ty = valY + valH / 2.0;
         
-        log_debug("Matrix: %s", input_matrix);
-
-        mat.concatenate(input_matrix.invert());
     }
     else {
 
@@ -2056,13 +2049,9 @@ movieclip_beginGradientFill(const fn_call& fn)
         input_matrix.sy = valD; 
         input_matrix.tx = valTX; 
         input_matrix.ty = valTY;
-
-        mat.concatenate(input_matrix.invert());
-
     }
-
-
-    // Matrix untouched after here.
+    
+    mat.concatenate(input_matrix.invert());
 
     // ----------------------------
     // Create the gradients vector
