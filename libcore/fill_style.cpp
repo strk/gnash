@@ -424,22 +424,22 @@ fill_style::create_gradient_bitmap(Renderer& renderer) const
             // Linear gradient.
             im.reset(new ImageRGBA(256, 1));
 
-            for (size_t i = 0; i < im->width(); i++)
-            {
+            for (size_t i = 0; i < im->width(); i++) {
                 rgba sample = sample_gradient(i);
                 im->setPixel(i, 0, sample.m_r, sample.m_g,
                         sample.m_b, sample.m_a);
             }
             break;
+
         case SWF::FILL_RADIAL_GRADIENT:
             // Radial gradient.
             im.reset(new ImageRGBA(64, 64));
 
             for (size_t j = 0; j < im->height(); j++) {
                 for (size_t i = 0; i < im->width(); i++) {
-                    float   radius = (im->height() - 1) / 2.0f;
-                    float   y = (j - radius) / radius;
-                    float   x = (i - radius) / radius;
+                    float radius = (im->height() - 1) / 2.0f;
+                    float y = (j - radius) / radius;
+                    float x = (i - radius) / radius;
                     int ratio = static_cast<int>(
                             std::floor(255.5f * std::sqrt(x * x + y * y)));
                     if (ratio > 255) {
@@ -451,6 +451,7 @@ fill_style::create_gradient_bitmap(Renderer& renderer) const
                 }
             }
             break;
+
         case SWF::FILL_FOCAL_GRADIENT:
             // Focal gradient.
             im.reset(new ImageRGBA(64, 64));
