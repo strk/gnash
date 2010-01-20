@@ -1991,13 +1991,22 @@ movieclip_beginGradientFill(const fn_call& fn)
         stops = 15;
     }
 
-
     SWFMatrix mat;
-    // A gradient box extends from (-16384, -16384) to (16384, 16384),
-    // so we have set scale and translation to convert our linear 0-256
-    // range to -16384 - 16384.
-    mat.concatenate_translation(128, 0);
-    mat.set_scale(1 / 128., 1 / 128.);
+
+    if (radial) {
+        // A gradient box extends from (-16384, -16384) to (16384, 16384),
+        // so we have set scale and translation to convert our radial
+        // (0, 0) - (64, 64) range to -16384 - 16384.
+        mat.concatenate_translation(32, 32);
+        mat.set_scale(1 / 512., 1 / 512.);
+    }
+    else {
+        // A gradient box extends from (-16384, -16384) to (16384, 16384),
+        // so we have set scale and translation to convert our linear 0-256
+        // range to -16384 - 16384.
+        mat.concatenate_translation(128, 0);
+        mat.set_scale(1 / 128., 1 / 128.);
+    }
 
     SWFMatrix input_matrix;
 
@@ -2030,9 +2039,7 @@ movieclip_beginGradientFill(const fn_call& fn)
     else {
 
         // Convert input matrix to SWFMatrix.
-
         const double factor = 65536.0;
-
         const double valA = matrix->getMember(NSV::PROP_A).to_number() * factor;
         const double valB = matrix->getMember(NSV::PROP_B).to_number() * factor;
         const double valC = matrix->getMember(NSV::PROP_C).to_number() * factor;

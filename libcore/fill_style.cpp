@@ -625,6 +625,9 @@ fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
         return;
     }
     
+    m_type = SWF::FILL_RADIAL_GRADIENT;
+    m_gradients = gradients;
+
     _matrix = mat;
     _bitmapInfo = 0;
 }
