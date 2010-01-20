@@ -597,8 +597,8 @@ fill_style::setLinearGradient(const std::vector<gradient_record>& gradients,
     assert(!gradients.empty());
     
     // We must ensure that all gradients have more than one colour stop
-    // because asking the renderer to render a gradient with one colour
-    // leads to problems.
+    // because asking renderers to render a gradient with one colour
+    // can cause them to invoke UB.
     if (gradients.size() < 2) {
         setSolid(gradients[0].m_color);
         return;
@@ -618,8 +618,8 @@ fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
     assert(!gradients.empty());
     
     // We must ensure that all gradients have more than one colour stop
-    // because asking the renderer to render a gradient with one colour
-    // leads to problems.
+    // because asking renderers to render a gradient with one colour
+    // can cause them to invoke UB.
     if (gradients.size() < 2) {
         setSolid(gradients[0].m_color);
         return;
