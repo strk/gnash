@@ -462,8 +462,7 @@ public:
     /// the nearest pixel is returned.
     /// The function returns false when the coordinates are outside the 
     /// main frame buffer.
-    virtual bool getPixel(rgba& /*color_return*/, int /*x*/, int /*y*/) const
-    {
+    virtual bool getPixel(rgba& /*color_return*/, int /*x*/, int /*y*/) const {
 
         log_debug("getPixel() not implemented for this renderer");
         abort();        
@@ -542,8 +541,7 @@ public:
     /// @param width stage width in pixels
     ///
     /// @param height stage height in pixels
-    virtual bool initTestBuffer(unsigned /*width*/, unsigned /*height*/)
-    {
+    virtual bool initTestBuffer(unsigned /*width*/, unsigned /*height*/) {
         return false;
     }
 
@@ -554,9 +552,7 @@ public:
     /// TODO: this should be a pure abstract function, just don't want
     ///     to scan ogl and cairo backend for an implementation *now*
     ///     but would be needed for automated testing... Quinn, can you help ?
-    ///
-    virtual unsigned int getBitsPerPixel() const
-    {
+    virtual unsigned int getBitsPerPixel() const {
         return 0;
     }
     
@@ -564,20 +560,14 @@ public:
 
 protected:
 
-
-    /// Dummy, neutral color transformation (do not change!!)
-    const cxform m_neutral_cxform;
-
     /// Kept in parallel with movie_root's setting.
     Quality _quality;
 
-}; // class Renderer
-
-
+}; 
 
 } // namespace gnash
 
-#endif // RENDER_HANDLER_H
+#endif 
 
 
 // Local Variables:

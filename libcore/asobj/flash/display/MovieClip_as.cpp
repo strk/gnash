@@ -1954,9 +1954,9 @@ movieclip_beginGradientFill(const fn_call& fn)
     ObjPtr colors = fn.arg(1).to_object(getGlobal(fn));
     ObjPtr alphas = fn.arg(2).to_object(getGlobal(fn));
     ObjPtr ratios = fn.arg(3).to_object(getGlobal(fn));
-    ObjPtr matrixArg = fn.arg(4).to_object(getGlobal(fn));
+    ObjPtr matrix = fn.arg(4).to_object(getGlobal(fn));
 
-    if (!colors || !alphas || !ratios || !matrixArg ) {
+    if (!colors || !alphas || !ratios || !matrix) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): one or more of the "
@@ -1991,122 +1991,74 @@ movieclip_beginGradientFill(const fn_call& fn)
         stops = 15;
     }
 
-
-    // ----------------------------
-    // Parse SWFMatrix
-    // ----------------------------
-    
-    //
-    // TODO: fix the SWFMatrix build-up, it is NOT correct for
-    //             rotation.
-    //             For the "boxed" SWFMatrixType and radial fills this
-    //             is not a problem as this code just discards the
-    //             rotation (which doesn't make sense), but for
-    //             the explicit SWFMatrix type (a..i) it is a problem.
-    //             The whole code can likely be simplified by 
-    //             always transforming the gnash gradients to the
-    //             expected gradients and subsequently applying
-    //             user-specified SWFMatrix; for 'boxed' SWFMatrixType
-    //             this simplification would increase cost, but
-    //             it's too early to apply optimizations to the
-    //             code (correctness first!!).
     SWFMatrix mat;
-    SWFMatrix input_matrix;
 
-    if (matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
-        
-        boost::int32_t valX = pixelsToTwips(
-                matrixArg->getMember(NSV::PROP_X).to_number()); 
-        boost::int32_t valY = pixelsToTwips(
-                matrixArg->getMember(NSV::PROP_Y).to_number()); 
-        boost::int32_t valW = pixelsToTwips(
-                matrixArg->getMember(NSV::PROP_W).to_number()); 
-        boost::int32_t valH = pixelsToTwips(
-                matrixArg->getMember(NSV::PROP_H).to_number()); 
-        float valR = matrixArg->getMember(NSV::PROP_R).to_number(); 
-
-        if (radial) {
-            // Radial gradient is 64x64 twips.
-            input_matrix.set_scale(64.0/valW, 64.0/valH);
-
-            // For radial gradients, dunno why translation must be negative...
-            input_matrix.concatenate_translation( -valX, -valY );
-
-            // NOTE: rotation is intentionally discarded as it would
-            //             have no effect (theoretically origin of the radial
-            //             fill is at 0,0 making any rotation meaningless).
-
-        }
-        else {
-            // Linear gradient is 256x1 twips.
-            //
-            // No idea why we should use the 256 value for Y scale, but 
-            // empirically seems to give closer results. Note that it only
-            // influences rotation, which is still not correct...
-            // TODO: fix it !
-            input_matrix.set_scale_rotation(256.0/valW, 256.0/valH, -valR);
-
-            // For linear gradients, dunno why translation must be negative...
-            input_matrix.concatenate_translation( -valX, -valY );
-        }
-
-        mat.concatenate(input_matrix);
+    if (radial) {
+        // A gradient box extends from (-16384, -16384) to (16384, 16384),
+        // so we have set scale and translation to convert our radial
+        // (0, 0)-(64, 64) range to a -16384 - 16384 square.
+        mat.concatenate_translation(32, 32);
+        mat.set_scale(1 / 512., 1 / 512.);
     }
     else {
-        float valA = matrixArg->getMember(NSV::PROP_A).to_number() ; // xx
-        float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
-        float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
-        float valE = matrixArg->getMember(NSV::PROP_E).to_number() ; // yy
-        boost::int32_t valG = pixelsToTwips(
-                matrixArg->getMember(NSV::PROP_G).to_number()); // x0
-        boost::int32_t valH = pixelsToTwips(
-                matrixArg->getMember(NSV::PROP_H).to_number()); // y0
-
-        input_matrix.sx    = valA * 65536; // sx
-        input_matrix.shx = valB * 65536; // shy
-        input_matrix.shy = valD * 65536; // shx
-        input_matrix.sy    = valE * 65536; // sy
-        input_matrix.tx = valG; // x0
-        input_matrix.ty = valH; // y0
-
-        // This is the SWFMatrix that would transform the gnash
-        // gradient to the expected flash gradient.
-        // Transformation is different for linear and radial
-        // gradient for Gnash (in flash they should be the same)
-        SWFMatrix gnashToFlash;
-
-        if (radial) {
-
-            // Gnash radial gradients are 64x64 with center at 32,32
-            // Should be 20x20 with center at 0,0
-            const double g2fs = 20.0/64.0; // gnash to flash scale
-            gnashToFlash.set_scale(g2fs, g2fs);
-            gnashToFlash.concatenate_translation(-32, -32);
-
-        }
-        else {
-            // First define a SWFMatrix that would transform
-            // the gnash gradient to the expected flash gradient:
-            // this means translating our gradient to put the
-            // center of gradient at 0,0 and then scale it to
-            // have a size of 20x20 instead of 256x1 as it is
-            //
-            // Gnash linear gradients are 256x1 with center at 128,0
-            // Should be 20x20 with center at 0,0
-            gnashToFlash.set_scale(20.0/256.0, 20.0/1);
-            gnashToFlash.concatenate_translation(-128, 0);
-
-        }
-
-        // Apply gnash to flash SWFMatrix before user-defined one
-        input_matrix.concatenate(gnashToFlash);
-
-        // Finally, and don't know why, take
-        // the inverse of the resulting SWFMatrix as
-        // the one which would be used.
-        mat = input_matrix;
-        mat.invert();
+        // A gradient box extends from (-16384, -16384) to (16384, 16384),
+        // so we have set scale and translation to convert our linear 0-256
+        // range to -16384 - 16384.
+        mat.concatenate_translation(128, 0);
+        mat.set_scale(1 / 128., 1 / 128.);
     }
+
+    SWFMatrix input_matrix;
+
+    // This is case sensitive.
+    if (matrix->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
+        
+        const double valX = pixelsToTwips(
+                matrix->getMember(NSV::PROP_X).to_number()); 
+        const double valY = pixelsToTwips(
+                matrix->getMember(NSV::PROP_Y).to_number()); 
+        const double valW = pixelsToTwips(
+                matrix->getMember(NSV::PROP_W).to_number()); 
+        const double valH = pixelsToTwips(
+                matrix->getMember(NSV::PROP_H).to_number()); 
+        const double rot = matrix->getMember(NSV::PROP_R).to_number(); 
+
+        const double a = std::cos(rot) * valW * 2;
+        const double b = std::sin(rot) * valH * 2;
+        const double c = -std::sin(rot) * valW * 2;
+        const double d = std::cos(rot) * valH * 2;
+
+        input_matrix.sx = a; 
+        input_matrix.shx = b;
+        input_matrix.shy = c;
+        input_matrix.sy = d; 
+        input_matrix.tx = valX + valW / 2.0;
+        input_matrix.ty = valY + valH / 2.0;
+        
+    }
+    else {
+
+        // Convert input matrix to SWFMatrix.
+        const double factor = 65536.0;
+        const double valA = matrix->getMember(NSV::PROP_A).to_number() * factor;
+        const double valB = matrix->getMember(NSV::PROP_B).to_number() * factor;
+        const double valC = matrix->getMember(NSV::PROP_C).to_number() * factor;
+        const double valD = matrix->getMember(NSV::PROP_D).to_number() * factor;
+
+        const boost::int32_t valTX = pixelsToTwips(
+                matrix->getMember(NSV::PROP_TX).to_number());
+        const boost::int32_t valTY = pixelsToTwips(
+                matrix->getMember(NSV::PROP_TY).to_number());
+
+        input_matrix.sx = valA; 
+        input_matrix.shx = valB;
+        input_matrix.shy = valC;
+        input_matrix.sy = valD; 
+        input_matrix.tx = valTX; 
+        input_matrix.ty = valTY;
+    }
+    
+    mat.concatenate(input_matrix.invert());
 
     // ----------------------------
     // Create the gradients vector
@@ -2147,7 +2099,6 @@ movieclip_beginGradientFill(const fn_call& fn)
         movieclip->beginLinearGradientFill(gradients, mat);
     }
 
-    LOG_ONCE( log_debug("MovieClip.beginGradientFill() TESTING") );
     return as_value();
 }
 
