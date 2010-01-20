@@ -1995,32 +1995,50 @@ movieclip_beginGradientFill(const fn_call& fn)
 
 
     SWFMatrix mat;
+    // A gradient box extends from (-16384, -16384) to (16384, 16384),
+    // so we have set scale and translation to convert our linear 0-256
+    // range to -16384 - 16384.
+    mat.concatenate_translation(128, 0);
+    mat.set_scale(1 / 128., 1 / 128.);
+
     SWFMatrix input_matrix;
 
+    // This is case sensitive.
     if (matrix->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
         
         log_debug("Box gradient");
 
-        boost::int32_t valX = pixelsToTwips(
+        const double valX = pixelsToTwips(
                 matrix->getMember(NSV::PROP_X).to_number()); 
-        boost::int32_t valY = pixelsToTwips(
+        const double valY = pixelsToTwips(
                 matrix->getMember(NSV::PROP_Y).to_number()); 
-        boost::int32_t valW = pixelsToTwips(
+        const double valW = pixelsToTwips(
                 matrix->getMember(NSV::PROP_W).to_number()); 
-        boost::int32_t valH = pixelsToTwips(
+        const double valH = pixelsToTwips(
                 matrix->getMember(NSV::PROP_H).to_number()); 
-        float valR = matrix->getMember(NSV::PROP_R).to_number(); 
+        const double rot = matrix->getMember(NSV::PROP_R).to_number(); 
 
-        input_matrix.set_scale_rotation(256.0/valW, 256.0/valH, -valR);
-        input_matrix.concatenate_translation(valX, valY);
+        const double a = std::cos(rot) * valW * 2;
+        const double b = std::sin(rot) * valH * 2;
+        const double c = -std::sin(rot) * valW * 2;
+        const double d = std::cos(rot) * valH * 2;
+
+        input_matrix.sx = a; 
+        input_matrix.shx = b;
+        input_matrix.shy = c;
+        input_matrix.sy = d; 
+        input_matrix.tx = valX + valW / 2.0;
+        input_matrix.ty = valY + valH / 2.0;
         
-        mat.concatenate(input_matrix);
+        log_debug("Matrix: %s", input_matrix);
+
+        mat.concatenate(input_matrix.invert());
     }
     else {
 
         // Convert input matrix to SWFMatrix.
 
-        const double factor = 65535.0;
+        const double factor = 65536.0;
 
         const double valA = matrix->getMember(NSV::PROP_A).to_number() * factor;
         const double valB = matrix->getMember(NSV::PROP_B).to_number() * factor;
@@ -2039,11 +2057,6 @@ movieclip_beginGradientFill(const fn_call& fn)
         input_matrix.tx = valTX; 
         input_matrix.ty = valTY;
 
-        // A gradient box extends from (-16384, -16384) to (16384, 16384),
-        // so we have set scale and translation to convert our linear 0-256
-        // range to -16384 - 16384.
-        mat.concatenate_translation(128, 0);
-        mat.set_scale(1 / 128., 1 / 128.);
         mat.concatenate(input_matrix.invert());
 
     }
