@@ -869,7 +869,133 @@ main(int /*argc*/, char** /*argv*/)
     // Test picture 4
 	tester.pressKey(gnash::key::_4); tester.advance();
 
+    // The shapes are 90x90, spaced in a 100x100 pixel grid with 6 shapes in
+    // each row.
 
+    x = 0;
+    y = 0;
+
+    // Shape 1
+    // Check each corner. The gradient is much too spread out, so should be
+    // practically the same blue-white everywhere.
+    rgba lightblue(120, 129, 248, 255);
+    check_pixel(x + 2, y + 2, 2, lightblue, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, lightblue, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, lightblue, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, lightblue, 2);
+
+    // Shape 2
+    // Check each corner
+    x += 100;
+    check_pixel(x + 2, y + 2, 2, blue, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, blue, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, white, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, white, 2);
+    
+    // Shape 3
+    // Check each corner
+    x += 100;
+    check_pixel(x + 2, y + 2, 2, blue, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, white, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, white, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, violet, 2);
+    
+    // Shape 4
+    // Check each corner
+    x += 100;
+    rgba whiteblue(70,70,248,255);
+    check_pixel(x + 2, y + 2, 2, blue, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, whiteblue, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, whiteblue, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, white, 2);
+
+    // Shape 5
+    // Check each corner
+    x += 100;
+    rgba whitegreen(80,248,80,255);
+    check_pixel(x + 2, y + 2, 2, white, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, whitegreen, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, whiteblue, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, white, 2);
+
+    // Shape 6
+    // Check each row
+    x += 100;
+    int row = 90 / 5;
+    check_pixel(x + 45, y + 1, 2, blue, 2);
+    check_pixel(x + 45, y + row, 2, white, 2);
+    check_pixel(x + 45, y + row * 2, 2, green, 2);
+
+    // Note that these two have a lower alpha value and the rgba value we
+    // expect is that combined with the white background and surrounding
+    // fill colours..
+    check_pixel(x + 45, y + row * 3, 2, rgba(240,120,244,255), 2);
+    check_pixel(x + 45, y + row * 4 , 2, rgba(184,240,240,255), 2);
+    
+    // I'm fairly sure this should be plain yellow, but we render it with
+    // alpha.
+    xcheck_pixel(x + 45, y + 89, 2, yellow, 2);
+
+    y += 100;
+    x = 0;
+
+    // Shape 7
+    // Check each corner and centre. The gradient is much too spread out,
+    // so should be almost the same blue-white everywhere.
+    rgba otherblue(24,24,248,255);
+    rgba otherblue2(56,56,248,255);
+    check_pixel(x + 2, y + 2, 2, otherblue, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, otherblue2, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, otherblue, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, otherblue2, 2);
+    check_pixel(x + 45, y + 45, 2, otherblue, 2);
+
+    // Shape 8
+    x += 100;
+    check_pixel(x + 2, y + 2, 2, white, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, white, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, white, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, white, 2);
+    check_pixel(x + 45, y + 45, 2, blue, 2);
+    
+    // Shape 9
+    x += 100;
+    check_pixel(x + 2, y + 2, 2, violet, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, violet, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, violet, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, violet, 2);
+    check_pixel(x + 45, y + 45, 2, blue, 2);
+    // Inner white circle
+    check_pixel(x + 45, y + 45 / 2, 2, white, 2)
+
+    // Shape 10
+    x += 100;
+    check_pixel(x + 2, y + 2, 2, violet, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, violet, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, violet, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, blue, 2);
+    
+    check_pixel(x + 90, y + 45, 2, white, 2);
+    check_pixel(x + 45, y + 90, 2, white, 2);
+
+    
+    // Shape 11
+    x += 100;
+    check_pixel(x + 2, y + 2, 2, blue, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, green, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, green, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, green, 2);
+    
+    check_pixel(x + 45, y + 1, 2, white, 2);
+    check_pixel(x + 1, y + 45, 2, white, 2);
+    
+    // Shape 12
+    x += 100;
+    check_pixel(x + 2, y + 2, 2, yellow, 2);
+    check_pixel(x + 2, y + 90 - 2, 2, yellow, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, yellow, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, yellow, 2);
+    check_pixel(x + 45, y + 45, 2, blue, 2);
 
 
     //----------------------------------------------------------
