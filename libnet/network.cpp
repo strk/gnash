@@ -53,6 +53,10 @@
 # include <sys/param.h>
 # include <sys/select.h>
 #include <csignal>
+
+// This is for non-standard signal functions such as sigemptyset.
+#include <signal.h>
+
 #ifdef HAVE_POLL_H
 # include <poll.h>
 #else 
