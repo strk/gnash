@@ -444,11 +444,10 @@ MovieLoader::loadMovie(const std::string& urlstr,
     /// If the method is MovieClip::METHOD_NONE, we send no data.
     if (method == MovieClip::METHOD_GET)
     {
-        std::string varsToSend(urlstr);
         /// GET: append data to query string.
-        std::string qs = url.querystring();
-        if ( qs.empty() ) varsToSend.insert(0, 1, '?');
-        else varsToSend.insert(0, 1, '&');
+        const std::string& qs = url.querystring();
+        std::string varsToSend(qs.empty() ? "?" : "&");
+        varsToSend.append(urlstr);
         url.set_querystring(qs + varsToSend);
     }
 

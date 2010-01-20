@@ -51,7 +51,7 @@ namespace {
 }
 
 void
-attachLoadableInterface(as_object& o, const int flags)
+attachLoadableInterface(as_object& o, int flags)
 {
     Global_as& gl = getGlobal(o);
 

@@ -115,8 +115,8 @@ main(int argc, char *argv[])
 {
     int                   c;
     bool                  listfiles  = false;
-    bool		  sysv = false;
-    bool		  convert = false;
+    bool          sysv = false;
+    bool          convert = false;
     int                   size  = 0;
     string                filespec, realname, tmpname;
     vector<const char *>  dirlist;
@@ -130,45 +130,45 @@ main(int argc, char *argv[])
     // scan for the two main standard GNU options
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
-	  usage();
-	  exit(EXIT_SUCCESS);
+      usage();
+      exit(EXIT_SUCCESS);
       }
       if (strcmp("--version", argv[c]) == 0) {
-	  printf (_("Gnash dumpshm version: %s, Gnash version: %s\n"),
-		  DUMPSHM_VERSION, VERSION);
-	  exit(EXIT_SUCCESS);
+      printf (_("Gnash dumpshm version: %s, Gnash version: %s\n"),
+          DUMPSHM_VERSION, VERSION);
+      exit(EXIT_SUCCESS);
       }
     }
     
     while ((c = getopt (argc, argv, "hircv")) != -1) {
         switch (c) {
           case 'h':
-	      usage ();
-	      break;
-	      
+          usage ();
+          break;
+          
           case 'r':
-	      sysv = true;
-	      convert = false;
-	      break;
-	      
+          sysv = true;
+          convert = false;
+          break;
+          
           case 'c':
-	      sysv = true;
-	      convert = true;
-	      break;
-	      
+          sysv = true;
+          convert = true;
+          break;
+          
           case 'i':
-	      sysv = true;
-	      listfiles = true;
-	      break;
-	      
+          sysv = true;
+          listfiles = true;
+          break;
+          
           case 'v':
-	      // turn on verbosity for the libraries
-	      dbglogfile.setVerbosity();
-	      break;
-	      
+          // turn on verbosity for the libraries
+          dbglogfile.setVerbosity();
+          break;
+          
           default:
-	      usage ();
-	      break;
+          usage ();
+          break;
         }
     }
     
@@ -183,25 +183,25 @@ main(int argc, char *argv[])
 #if defined(USE_SYSV_SHM) && defined(HAVE_IPC_INFO)
     // Just list the shared memory segments
     if (listfiles && sysv) {
-	list_lcs();
+    list_lcs();
         exit(EXIT_SUCCESS);
     }
 #endif
     
     if (optind <= argc - 1) {
-	if (*argv[optind] == '-') {
-	    filespec = '-';
-	}
+    if (*argv[optind] == '-') {
+        filespec = '-';
+    }
     }
     
     if (sysv) {
-	if (filespec == "-") {
-	    dump_shm(convert, true);
-	} else {
-	    dump_shm(convert, false);
-	}
-	
-	    exit(EXIT_SUCCESS);
+    if (filespec == "-") {
+        dump_shm(convert, true);
+    } else {
+        dump_shm(convert, false);
+    }
+    
+        exit(EXIT_SUCCESS);
     }    
     
     if (size == 0) {
@@ -211,9 +211,9 @@ main(int argc, char *argv[])
     // get the file name from the command line
     if (optind < argc) {
         filespec = argv[optind];
-	if (!convert) {
-	    log_debug(_("Will use \"%s\" for memory segment file"), filespec);
-	}
+    if (!convert) {
+        log_debug(_("Will use \"%s\" for memory segment file"), filespec);
+    }
     }
     
 }
@@ -228,20 +228,21 @@ dump_shm(bool convert, bool out)
     key_t key = rcfile.getLCShmKey();
 
     if (key == 0) {
-	log_debug(_("No LcShmKey set in ~/.gnashrc, trying to find it ourselves"));
+    log_debug(_("No LcShmKey set in ~/.gnashrc, trying to find it ourselves"));
 #if defined(USE_SYSV_SHM) && defined(HAVE_IPC_INFO)
-	key = list_lcs();
+    key = list_lcs();
 #endif
     }
     
-    int size = 64528;			// 1007 bytes less than unsigned
+    int size = 64528;            // 1007 bytes less than unsigned
 
     if (key == 0) {
-	log_debug(_("No shared memory segments found!"));
-	return;
+        log_debug(_("No shared memory segments found!"));
+        return;
     }
     if (dbglogfile.getVerbosity()) {
-	log_debug(_("Existing SHM Key is: 0x %s %s, Size is: %s %s"), hex, key, dec, size);
+        log_debug(_("Existing SHM Key is: %s, Size is: %s"),
+                boost::io::group(hex, showbase, key), size);
     }
     
     amf::LcShm lc;
@@ -251,20 +252,20 @@ dump_shm(bool convert, bool out)
     // If the -c convert options was specified, dump the memory segment to disk.
     // This makes it easy to store them as well as to examine them in great detail.
     if (convert) {
-	int fd = open("segment.raw",O_WRONLY|O_CREAT, S_IRWXU);
-	if (fd == -1) {
-	    perror("open");
-	}
-	log_debug(_("Writing memory segment to disk: \"segment.raw\""));
-	shmaddr = lc.getAddr();
-	write(fd, shmaddr, size);
-	if (out) {
+        int fd = open("segment.raw",O_WRONLY|O_CREAT, S_IRWXU);
+        if (fd == -1) {
+            perror("open");
+        }
+        log_debug(_("Writing memory segment to disk: \"segment.raw\""));
+        shmaddr = lc.getAddr();
+        write(fd, shmaddr, size);
+        if (out) {
 #if 0
-	    log_debug(_("The data is: 0x%s"), hexify((uint8_t *)shmaddr, size, false));
+            log_debug(_("The data is: 0x%s"), hexify((uint8_t *)shmaddr, size, false));
 #endif
-	}
-	
-	close(fd);
+        }
+        
+        close(fd);
     }
     
     exit (EXIT_SUCCESS);
@@ -279,15 +280,15 @@ list_lcs()
     
 // #ifdef USE_POSIX_SHM
 //     if (library_dir != NULL) {
-// 	for (i=0; entry>0; i++) {
-// 	    entry = readdir(library_dir);
-// 	    if (entry != NULL) {
+//     for (i=0; entry>0; i++) {
+//         entry = readdir(library_dir);
+//         if (entry != NULL) {
 //                     cout << "Found segment: " << entry->d_name << endl;
 //                 }
 //             }
 //         } else {
-// 	cout << _("Sorry, we can only list the files on systems with"
-// 		  " disk based shared memory") << endl;
+//     cout << _("Sorry, we can only list the files on systems with"
+//           " disk based shared memory") << endl;
 //     }
 // #eendif
     
@@ -300,37 +301,39 @@ list_lcs()
     struct shmid_ds shm_info;
     maxid = shmctl(0, SHM_INFO, &shm_info);
     if (maxid < 0) {
-	log_debug(_("kernel not configured for shared memory"));
-	return 0;
+    log_debug(_("kernel not configured for shared memory"));
+    return 0;
     }
     
 //    struct shminfo shminfo;
     if ((shmctl(0, IPC_INFO, &shm_info)) < 0) {
-	return 0;
+        return 0;
     }
     for (id = 0; id <= maxid; id++) {
-	shmid = shmctl(id, SHM_STAT, &shmseg);
-	if (shmid < 0) {
-	    continue;
-	}
+        shmid = shmctl(id, SHM_STAT, &shmseg);
+        if (shmid < 0) {
+            continue;
+        }
 #ifdef IPC_PERM_KEY
-	if (shmseg.shm_segsz == 64528) {
-	    log_debug(_("Found it! \"set LCShmKey 0x %s %s \" in your ~/.gnashrc", hex, shmseg.shm_perm.IPC_PERM_KEY));
-	    log_debug(_("Last changed on: %s", ctime(&shmseg.shm_ctime)));
-	    log_debug(_("Last attached on: %s", ctime(&shmseg.shm_atime)));
-	    log_debug(_("Last detached on: %s", ctime(&shmseg.shm_dtime)));
-	    return shmseg.shm_perm.IPC_PERM_KEY;
-	}
-#endif	// end of IPC_PERM_KEY
+        if (shmseg.shm_segsz == 64528) {
+            log_debug(_("Found it! \"set LCShmKey %s\" in your ~/.gnashrc",
+                        boost::io::group(hex, showbase,
+                            shmseg.shm_perm.IPC_PERM_KEY)));
+            log_debug(_("Last changed on: %s", ctime(&shmseg.shm_ctime)));
+            log_debug(_("Last attached on: %s", ctime(&shmseg.shm_atime)));
+            log_debug(_("Last detached on: %s", ctime(&shmseg.shm_dtime)));
+            return shmseg.shm_perm.IPC_PERM_KEY;
+        }
+#endif    // end of IPC_PERM_KEY
     }
 // #else
 // # error "No supported shared memory type for this platform"
-//#endif	// end of USE_POSIX_SHM
+//#endif    // end of USE_POSIX_SHM
     
     // Didn't find any segments of the right size
     return static_cast<key_t>(0);
 }
-#endif	// end of USE_SYSV_SHM & HAVE_IPC_INFO
+#endif    // end of USE_SYSV_SHM & HAVE_IPC_INFO
 
 /// \brief  Display the command line arguments
 static void
