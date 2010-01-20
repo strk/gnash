@@ -834,7 +834,7 @@ with(grad) {
     x = 0;
     y += 100;
 
-    // shape 1
+    // shape 7
     colors = [0x0000ff, 0xffffff];
     alphas = [100, 100];
     ratios = [0, 0xff];
@@ -842,7 +842,7 @@ with(grad) {
     beginGradientFill(fillType, colors, alphas, ratios, matrix);
     draw100x100Box(x, y, grad);
     
-    // shape 2
+    // shape 8
     x += 100;
     colors = [0x0000ff, 0xffffff];
     alphas = [100, 100];
@@ -851,7 +851,7 @@ with(grad) {
     beginGradientFill(fillType, colors, alphas, ratios, matrix);
     draw100x100Box(x, y, grad);
     
-    // shape 3
+    // shape 9
     x += 100;
     colors = [0x0000ff, 0xffffff, 0xff00ff];
     alphas = [100, 100, 100];
@@ -860,7 +860,7 @@ with(grad) {
     beginGradientFill(fillType, colors, alphas, ratios, matrix);
     draw100x100Box(x, y, grad);
 
-    // shape 4
+    // shape 10
     x += 100;
     colors = [0x0000ff, 0xffffff, 0xff00ff];
     alphas = [100, 100, 100];
@@ -869,7 +869,7 @@ with(grad) {
     beginGradientFill(fillType, colors, alphas, ratios, matrix);
     draw100x100Box(x, y, grad);
 
-    // shape 5
+    // shape 11
     x += 100;
     colors = [0x0000ff, 0xffffff, 0x00ff00];
     alphas = [100, 100, 100];
@@ -878,7 +878,7 @@ with(grad) {
     beginGradientFill(fillType, colors, alphas, ratios, matrix);
     draw100x100Box(x, y, grad);
 
-    // shape 6
+    // shape 12
     x += 100;
     colors = [0x0000ff, 0xffffff, 0x00ff00, 0xff00ff, 0x00ffff, 0xffff00 ];
     alphas = [100, 100, 100, 50, 25, 100];
