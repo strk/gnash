@@ -213,8 +213,8 @@ pointTest(const std::vector<Path>& paths,
             next_pen_x = edg.ap.x;
             next_pen_y = edg.ap.y;
 
-            float cross1, cross2;
-            int dir1, dir2 = 0; // +1 = downward, -1 = upward
+            float cross1 = 0.0, cross2 = 0.0;
+            int dir1 = 0, dir2 = 0; // +1 = downward, -1 = upward
             int crosscount = 0;
 
             if (edg.straight())
