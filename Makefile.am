@@ -450,6 +450,16 @@ if USE_PYTHON
 else
 	@echo "	PYTHON support disabled"
 endif
+if USE_VAAPI
+	@echo "	Hardware Acceleration support via libVA API enabled"
+else
+	@echo "	Hardware Acceleration support via libVA API disabled"
+endif
+if USE_VAAPI_GLX
+	@echo "	Hardware Acceleration support via libVA API and OpenGL enabled"
+else
+	@echo "	Hardware Acceleration support via libVA API and OpenGL disabled"
+endif
 
 if TESTSUITE
 check-local:

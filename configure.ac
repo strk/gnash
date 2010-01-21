@@ -33,6 +33,13 @@ AC_PROG_CXX
 AC_EXEEXT
 AC_PROG_INSTALL
 AM_COMPILER_LIB
+AC_C_BIGENDIAN
+
+dnl Often the headers and libraries we need aren't in the default
+dnl location, but where gnash will get installed. So add the paths
+dnl in the prefix to speed up configuring.
+CPPFLAGS = $CPPFLAGS -I$prefix/include
+LDFLAGS = $LDFLAGS -L$prefix/lib
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
@@ -1114,6 +1121,30 @@ if test x$build_agg = xyes; then
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
 fi
 
+dnl Check for VA API
+AC_ARG_ENABLE(vaapi, [Enable Video Acceleration support (default=no)],
+[case "${enableval}" in
+  yes) enable_vaapi=yes ;;
+  no)  enable_vaapi=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable_vaapi option]) ;;
+esac],enable_vaapi=yes)
+
+dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
+dnl restrict using HW Accel to using ffmpeg directly.
+if test x"${media_handler}" = x"gst" -a x"${enable_vaapi}" = x"yes"; then
+  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
+fi
+
+if test x"${enable_vaapi}" = x"yes"; then
+  AC_DEFINE([USE_VAAPI], [1], [Enable libVA API])
+  if test x$build_ogl = xyes; then
+    AC_DEFINE([USE_VAAPI_GLX], [1], [Enable libVA API with GLX extensions])
+  fi
+fi
+
+AM_CONDITIONAL(USE_VAAPI, test x"${USE_VAAPI_TRUE}" != x)
+AM_CONDITIONAL(USE_VAAPI_GLX, test x"${USE_VAAPI_GLX_TRUE}" != x)
+
 DLOPEN="-dlopen"
 DLPREOPEN="-dlpreopen"
 AC_SUBST(DLOPEN)
@@ -1443,6 +1474,28 @@ AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes -a x$has_nspr = xyes)
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
+if test x"${enable_vaapi}" = x"yes"; then
+  GNASH_PKG_FIND([libva],
+    [va/va.h],
+    [Video Acceleration API],
+    vaInitialize
+  )
+  GNASH_PKG_FIND([libva_x11],
+    [va/va_x11.h],
+    [VA API (X11 display)],
+    vaGetDisplay,
+    [], [-lva-x11]
+  )
+
+  if test x$build_ogl = xyes; then
+    GNASH_PKG_FIND([libva_glx],
+      [va/va_glx.h],
+      [VA API (GLX display)],
+      vaGetDisplayGLX,
+      [], [-lva-glx]
+    )
+  fi
+fi
 
 dnl IRIX-hack.
 case $host in
@@ -2547,6 +2600,16 @@ fi
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
+if test x"${enable_vaapi}" != x"yes"; then
+  echo "        Video Acceleration via libVA API support: yes"
+  if test x$build_ogl = xyes; then
+    echo "        Video Acceleration via libVA API support: yes"
+  else
+    echo "        Video Acceleration via libVA API support: no"
+  fi
+else
+  echo "        Video Acceleration via libVA API support: no"
+fi
 echo "        Using ${add_sound} for sound handling"
 echo "        Using $with_shm mode for shared memory"
 echo ""
@@ -3433,6 +3496,29 @@ if test x"$WGET" != x; then
     echo "        You have wget installed, which is only used for testing"
 else
     echo "        Install wget for networking test support"
+fi
+
+if test x"${enable_vaapi}" != x"yes"; then
+  if test x"${LIBVA_CFLAGS}" = xyes; then
+      echo "        LIBVA flags are: default"
+    else
+      echo "        LIBVA flags are: $LIBVA_CFLAGS"
+      echo "        LIBVA libraries are: $LIBVA_LIBS"
+  fi
+  if test x"${LIBVA_X11_CFLAGS}" = xyes; then
+      echo "        LIBVA X11 flags are: default"
+    else
+      echo "        LIBVA X11 flags are: $LIBVA_X11_CFLAGS"
+      echo "        LIBVA X11 libraries are: $LIBVA_X11_LIBS"
+  fi
+  if test x$build_ogl = xyes; then
+    if test x"${LIBVA_GLX_CFLAGS}" = xyes; then
+      echo "        LIBVA GLXflags are: default"
+    else
+      echo "        LIBVA GLX flags are: $LIBVA_GLX_CFLAGS"
+      echo "        LIBVA GLX libraries are: $LIBVA_GLX_LIBS"
+    fi
+  fi
 fi
 
 if test x$cross_compiling = xyes; then
