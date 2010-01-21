@@ -1,7 +1,7 @@
 Name:           gnash
-Version:        20090907
+Version:        20100117
 Release:        1
-Distribution:	fc11
+Distribution:	fc12
 #Distribution:	ydl6
 Summary:        GNU SWF player
 
@@ -24,7 +24,7 @@ BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
 BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
 
 # Mandriva uses different names for the X11 library packages
-%if %{distribution} != "fc11"
+%if %{distribution} != "fc12"
 BuildRequires:  libx11_6-devel libxt_6-devel
 %else
 BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel 
@@ -52,7 +52,8 @@ Requires(postun): /sbin/ldconfig
 #Requires(preun): /sbin/install-info
 
 %description
-Gnash is a GNU SWF movie player that supports many SWF v7 features, with growing support for swf v8, v9, and v10.
+Gnash is a GNU SWF movie player that supports many SWF v7 features,
+with growing support for swf v8, v9, and v10.
 
 %package plugin
 Summary:   Web-client SWF player plugin 
@@ -155,7 +156,7 @@ RPM_TARGET=%{_target}
   SOUND="--enable-media=gst" 
 %endif
 
-# we disable the testuites by default, as when building packages we
+# we disable the testsuites by default, as when building packages we
 # should have already been running the testsuites as part of the 
 # normal build & test development cycle.
 
