@@ -144,7 +144,7 @@ boost::uint8_t *
 HTTP::processHeaderFields(amf::Buffer *buf)
 {
   //    GNASH_REPORT_FUNCTION;
-    string head(reinterpret_cast<const char *>(buf->reference()), buf->size() + 1);
+    string head(reinterpret_cast<const char *>(buf->reference()), buf->size());
 
     // The end of the header block is always followed by a blank line
     string::size_type end = head.find("\r\n\r\n", 0);
