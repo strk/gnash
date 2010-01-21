@@ -1,0 +1,72 @@
+// GnashVaapiImage.h: GnashImage class used with VA API
+// 
+//   Copyright (C) 2009 Splitted-Desktop Systems
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
+#ifndef GNASH_GNASHVAAPIIMAGE_H
+#define GNASH_GNASHVAAPIIMAGE_H
+
+#include "GnashImage.h"
+#include <boost/shared_ptr.hpp>
+
+namespace gnash {
+
+// Forward declarations
+class VaapiSurface;
+class VaapiSurfaceProxy;
+
+/// GnashImage implementation using a VA surface
+class DSOEXPORT GnashVaapiImage : public GnashImage
+{
+    boost::shared_ptr<VaapiSurface> _surface;
+    boost::uint64_t _creation_time;
+
+    /// Transfer (and convert) VA surface to CPU image data
+    bool transfer();
+
+public:
+    GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface, ImageType type);
+    GnashVaapiImage(const GnashVaapiImage& o);
+    ~GnashVaapiImage();
+
+    virtual std::auto_ptr<GnashImage> clone();
+    virtual void update(boost::shared_ptr<VaapiSurface> surface);
+    virtual void update(boost::uint8_t* data);
+    virtual void update(const GnashImage& from);
+
+    /// Get access to the underlying surface
+    //
+    /// @return     A pointer to the VA surface.
+    boost::shared_ptr<VaapiSurface> surface() const
+	{ return _surface; }
+
+    /// Get access to the underlying data
+    //
+    /// NOTE: This function shall not be used
+    //
+    /// @return     NULL.
+    virtual boost::uint8_t* data();
+
+    /// Get read-only access to the underlying data
+    //
+    /// @return     A read-only pointer to the raw image data.
+    virtual const boost::uint8_t* data() const;
+};
+
+} // gnash namespace
+
+#endif /* GNASH_GNASHVAAPIIMAGE_H */
