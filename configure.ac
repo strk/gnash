@@ -38,8 +38,8 @@ AC_C_BIGENDIAN
 dnl Often the headers and libraries we need aren't in the default
 dnl location, but where gnash will get installed. So add the paths
 dnl in the prefix to speed up configuring.
-CPPFLAGS = $CPPFLAGS -I$prefix/include
-LDFLAGS = $LDFLAGS -L$prefix/lib
+CPPFLAGS="$CPPFLAGS -I$prefix/include"
+LDFLAGS="$LDFLAGS -L$prefix/lib"
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
@@ -1471,6 +1471,19 @@ AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes -a x$has_nspr = xyes)
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
+
+dnl VA API is used by default for all H.264 videos. HW requirements:
+dnl     * AMD GPUs with UVD2 and xvba-video VA driver
+dnl     * NVIDIA GPUs with vdpau-video VA driver
+dnl     * All HW with a VA driver supporting the VA/GLX extensions or
+dnl     vaPutSurface(Pixmap,...). This may include the Intel
+dnl     Moorestown platform and future G45 VA driver.
+dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
+dnl GMA500 but you currently will have to build the AGG renderer
+dnl instead of the OGL (OpenGL) one. 
+
+has_xvba=no
+has_vdpau=no
 use_vaapi=no
 use_vaapi_x11=no
 use_vaapi_glx=no
@@ -1498,10 +1511,37 @@ if test x"${enable_vaapi}" = x"yes"; then
       [], [-lva-glx]
     )
   fi
+  dnl Nvidia cards have their own library for hardware video
+  dnl decoding, which is handed by libva, which can be layered
+  dnl on top of libvdpau.
+  GNASH_PKG_FIND([vdpau],
+    [vdpau/vdpau.h],
+    [Video Acceleration API for Nvidia],
+    vdp_device_create_x11
+  )
+  dnl if test x"${ac_cv_path_vdpau_lib}" != x; then
+  dnl   has_vdpau=yes
+  dnl fi
+  dnl Nvidia cards have their own library for hardware video
+  dnl decoding, which is handed by libva, which can be layered
+  dnl on top of libxvba.
+  GNASH_PKG_FIND([xvba],
+    [xvba/xvba.h],
+    [Video Acceleration API for AMD],
+    vaInitialize                dnl FIXME: find a real symbol
+  )
+  dnl if test x"${ac_cv_path_xvba_lib}" != x; then
+  dnl   has_xvba=yes
+  dnl fi
 fi
+
+dnl libVA drivers
 AM_CONDITIONAL(USE_VAAPI, test x"${use_vaapi}" != x)
 AM_CONDITIONAL(USE_VAAPI_X11, test x"${use_vaapi_x11}" != x)
 AM_CONDITIONAL(USE_VAAPI_GLX, test x"${use_vaapi_glx}" != x)
+dnl vendor specific drivers
+AM_CONDITIONAL(USE_VDPAU, test x"${has_vdapu}" = xyes)
+AM_CONDITIONAL(USE_XVBA, test x"${has_xvba}" = xyes)
 
 dnl IRIX-hack.
 case $host in
@@ -2606,7 +2646,7 @@ fi
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
-if test x"${enable_vaapi}" != x"yes"; then
+if test x"${enable_vaapi}" = x"yes"; then
   echo "        Video Acceleration via libVA API support: yes"
   if test x$use_vaapi_x11 = xyes; then
     echo "        Video Acceleration via libVA X11 API support: yes"
@@ -3434,8 +3474,26 @@ if test x"${enable_vaapi}" = x"yes"; then
       echo "        LIBVA GLXflags are: default"
     else
       echo "        LIBVA GLX flags are: $LIBVA_GLX_CFLAGS"
-      echo "        LIBVA GLX libraries are: $LIBVA_GLX_LIBS"
     fi
+    echo "        LIBVA GLX libraries are: $LIBVA_GLX_LIBS"
+  fi
+  dnl VDPAU is Nvidia's hardware video decoding API, suppoorted by libVA
+  if test x$has_vdpau = xyes; then
+    if test x"${VDPAU_CFLAGS}" = xyes; then
+      echo "        VDPAU flags are: default"
+    else
+      echo "        VDPAU flags are: $VDPAU_CFLAGS"
+    fi
+    echo "        VDPAU libraries are: $VDPAU_LIBS"
+  fi
+  dnl XVBA is AMD's hardware video decoding API, suppoorted by libVA
+  if test x$has_xvba = xyes; then
+    if test x"${XVBA_CFLAGS}" = xyes; then
+      echo "        XVBA flags are: default"
+    else
+      echo "        XVBA flags are: $XVBA_CFLAGS"
+    fi
+    echo "        XVBA libraries are: $XVBA_LIBS"
   fi
 fi
 
