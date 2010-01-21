@@ -21,7 +21,6 @@ AUTOMAKE_OPTIONS = dejagnu
 AM_LDFLAGS = \
 	../../libbase/libgnashbase.la \
 	../../libamf/libgnashamf.la \
-	$(LIBLTDL) \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \

@@ -59,7 +59,7 @@ AM_LDFLAGS =  \
 
 gtkext_la_SOURCES = gtkext.cpp gtkext.h
 gtkext_la_LDFLAGS = -module -avoid-version # -no-undefined
-gtkext_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) $(AM_LDFLAGS)
+gtkext_la_LIBDADD = $(LIBADD_DL) $(AM_LDFLAGS)
 
 # check_PROGRAMS = hello
 CLEANFILES = \

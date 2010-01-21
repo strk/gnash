@@ -23,17 +23,14 @@ pkglib_LTLIBRARIES =  libgnashsound.la
 libgnashsound_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/libcore	\
-    -I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libmedia \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(INCLTDL) \
 	$(SDL_CFLAGS) \
 	$(NULL)
 
 libgnashsound_la_LIBADD = \
-	$(LIBLTDL) \
-	$(LIBLTDLHEAD) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(SDL_LIBS) \
@@ -52,7 +49,7 @@ noinst_HEADERS = \
 	InputStream.h \
 	EmbedSound.h \
 	EmbedSoundInst.h \
-    AuxStream.h
+        AuxStream.h
 	$(NULL)
 
 if USE_SOUND_SDL

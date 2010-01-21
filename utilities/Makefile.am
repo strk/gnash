@@ -32,6 +32,10 @@ GNASH_LIBS = \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(NULL)
 
+if LIBLTDL2
+GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
+endif
+
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
@@ -42,8 +46,12 @@ AM_LDFLAGS = \
 	$(BOOST_LIBS) \
 	$(PYTHON_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(LIBLTDL) \
 	$(NULL)
+
+# bzip2 is a dependency of some libraries with mingw32
+if WIN32
+AM_LDFLAGS += $(BZ2_LIBS)
+endif
 
 localedir = $(datadir)/locale
 
@@ -104,7 +112,6 @@ gprocessor_SOURCES = processor.cpp
 # export our symbols so they can be used by Gnash plugins
 gprocessor_LDFLAGS = -export-dynamic
 gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
-gprocessor_DEPENDENCIES = $(LTDLDEPS)
 
 dumpshm_SOURCES = dumpshm.cpp
 dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)

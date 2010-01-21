@@ -47,15 +47,20 @@ pluginsdir = $(libdir)/cygnal/plugins
 AM_CPPFLAGS = 	-DPLUGINSDIR=\"$(pluginsdir)\"
 
 AM_LDFLAGS = \
-	../libbase/libgnashbase.la \
-	../libcore/libgnashcore.la \
-	../libnet/libgnashnet.la \
-	../libamf/libgnashamf.la \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libcore/libgnashcore.la \
+	$(top_builddir)/libnet/libgnashnet.la \
+	$(top_builddir)/libamf/libgnashamf.la \
 	$(GLIB_LIBS) \
+	$(LIBINTL) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
-	$(LIBINTL) \
-	$(PTHREAD_LIBS)
+	$(PTHREAD_LIBS) \
+	$(NULL)
+
+if LIBLTDL2
+AM_LDFLAGS += $(top_builddir)/libltdl/libltdlc.la
+endif
 
 localedir = $(datadir)/locale
 

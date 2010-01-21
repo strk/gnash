@@ -33,7 +33,7 @@ INCLUDES =  \
 
 dbus_la_SOURCES = dbus_ext.cpp dbus_ext.h
 dbus_la_LDFLAGS = -module -avoid-version -no-undefined
-dbus_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) \
+dbus_la_LIBDADD = $(LIBADD_DL) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(PTHREAD_LIBS) \

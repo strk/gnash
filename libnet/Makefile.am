@@ -25,14 +25,14 @@ pkglib_LTLIBRARIES = libgnashnet.la
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
 	../libamf/libgnashamf.la \
-	$(LIBLTDL) \
 	$(SSH_LIBS) \
 	$(SSL_LIBS) \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
 	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS)
+	$(PTHREAD_LIBS) \
+	$(NULL)
 
 localedir = $(datadir)/locale
 
@@ -45,7 +45,8 @@ INCLUDES = \
 	$(SSH_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(PTHREAD_CFLAGS)
+	$(PTHREAD_CFLAGS) \
+	$(NULL)
 
 noinst_HEADERS = \
 	cque.h \

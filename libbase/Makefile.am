@@ -24,14 +24,15 @@ pluginsdir = $(prefix)/lib/gnash/plugins
 
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.
-pkglib_LTLIBRARIES =  $(LIBLTDLLIB) libgnashbase.la
+pkglib_LTLIBRARIES = libgnashbase.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
-	-I$(top_srcdir)/libnet	\
-	-I$(top_srcdir)/libamf	\
+	-I$(top_srcdir)/libnet \
+	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libcore	\
-	-I$(top_srcdir)/libcore/swf	\
+	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libltdl \
 	$(PTHREAD_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(GIF_CFLAGS) \
@@ -57,8 +58,6 @@ libgnashbase_la_LIBADD = \
 	$(LIBINTL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(LIBLTDL) \
-	$(LIBADD_DL) \
 	$(NULL)
 
 libgnashbase_la_SOURCES = \
@@ -114,9 +113,6 @@ if LIBLTDL1
 noinst_LTLIBRARIES = libltdlc.la
 libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
 libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-# if WIN32
-# libltdlc_la_LDFLAGS = -static
-# endif
 endif
 
 if WIN32

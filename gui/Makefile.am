@@ -96,9 +96,7 @@ GUI_CPPFLAGS =
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
-	$(LIBLTDL) \
 	$(CURL_LIBS) \
-	$(INCLTDL) \
 	$(LIRC_LIBS) \
 	$(MYSQL_LIBS) \
 	$(BOOST_LIBS) \
@@ -112,6 +110,10 @@ GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libbase/libgnashbase.la
+
+if LIBLTDL2
+GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
+endif
 
 # Only build loadable modules unless statically linking
 # if DYNAMIC_GUI # make shared libraries suitable for dlopen().

@@ -36,7 +36,7 @@ INCLUDES =  \
 
 launcher_ext_la_SOURCES = launcher_ext.cpp launcher_ext.h
 launcher_ext_la_LDFLAGS = -module -avoid-version -no-undefined
-launcher_ext_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) \
+launcher_ext_la_LIBDADD = $(LIBADD_DL) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(PTHREAD_LIBS) \

@@ -35,7 +35,7 @@ INCLUDES = \
 
 lirc_la_SOURCES = lirc_ext.cpp lirc_ext.h
 lirc_la_LDFLAGS = -module -avoid-version -no-undefined
-lirc_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) \
+lirc_la_LIBDADD = $(LIBADD_DL) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(PTHREAD_LIBS) \
