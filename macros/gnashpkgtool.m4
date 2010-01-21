@@ -134,6 +134,7 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
 
   popdef([UP])
   popdef([DOWN])
+  popdef([DASHDOWN])
   popdef([UPHEADER])
 ])
 
@@ -225,9 +226,11 @@ AC_SUBST(UP[]_LIBS)
 
 popdef([UP])
 popdef([DOWN])
+popdef([DASHDOWN])
 ])
 
-AC_DEFUN([GNASH_PKG_FIND], dnl GNASH_PKG_FIND(fltk, [FL_API.h], [fltk gui], fl_xmap, [], [-lfltk_gl])
+dnl Example: GNASH_PKG_FIND(fltk, [FL_API.h], [fltk gui], fl_xmap, [], [-lfltk_gl])
+AC_DEFUN([GNASH_PKG_FIND],
 [
 GNASH_PKG_INCLUDES($1, $2, $3, $5)
 GNASH_PKG_LIBS($1, $4, $3, $5, $6)

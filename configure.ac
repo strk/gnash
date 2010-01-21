@@ -1142,9 +1142,6 @@ if test x"${enable_vaapi}" = x"yes"; then
   fi
 fi
 
-AM_CONDITIONAL(USE_VAAPI, test x"${USE_VAAPI_TRUE}" != x)
-AM_CONDITIONAL(USE_VAAPI_GLX, test x"${USE_VAAPI_GLX_TRUE}" != x)
-
 DLOPEN="-dlopen"
 DLPREOPEN="-dlpreopen"
 AC_SUBST(DLOPEN)
@@ -1474,12 +1471,17 @@ AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes -a x$has_nspr = xyes)
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
+use_vaapi=no
+use_vaapi_x11=no
+use_vaapi_glx=no
 if test x"${enable_vaapi}" = x"yes"; then
+  use_vaapi=yes
   GNASH_PKG_FIND([libva],
     [va/va.h],
     [Video Acceleration API],
     vaInitialize
   )
+  use_vaapi_x11=yes
   GNASH_PKG_FIND([libva_x11],
     [va/va_x11.h],
     [VA API (X11 display)],
@@ -1488,6 +1490,7 @@ if test x"${enable_vaapi}" = x"yes"; then
   )
 
   if test x$build_ogl = xyes; then
+    use_vaapi_glx=yes
     GNASH_PKG_FIND([libva_glx],
       [va/va_glx.h],
       [VA API (GLX display)],
@@ -1496,6 +1499,9 @@ if test x"${enable_vaapi}" = x"yes"; then
     )
   fi
 fi
+AM_CONDITIONAL(USE_VAAPI, test x"${use_vaapi}" != x)
+AM_CONDITIONAL(USE_VAAPI_X11, test x"${use_vaapi_x11}" != x)
+AM_CONDITIONAL(USE_VAAPI_GLX, test x"${use_vaapi_glx}" != x)
 
 dnl IRIX-hack.
 case $host in
@@ -2602,10 +2608,15 @@ echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
 if test x"${enable_vaapi}" != x"yes"; then
   echo "        Video Acceleration via libVA API support: yes"
-  if test x$build_ogl = xyes; then
-    echo "        Video Acceleration via libVA API support: yes"
+  if test x$use_vaapi_x11 = xyes; then
+    echo "        Video Acceleration via libVA X11 API support: yes"
   else
-    echo "        Video Acceleration via libVA API support: no"
+    echo "        Video Acceleration via libVA X11 API support: no"
+  fi
+  if test x$use_vaapi_glx = xyes; then
+    echo "        Video Acceleration via libVA OpenGL API support: yes"
+  else
+    echo "        Video Acceleration via libVA OpenGL API support: no"
   fi
 else
   echo "        Video Acceleration via libVA API support: no"
@@ -3403,6 +3414,31 @@ if test "$GMSGFMT" = ":"; then
   echo "                 or .rpm users: yum install gettext" >&4
 fi
 
+if test x"${enable_vaapi}" = x"yes"; then
+  if test x"${LIBVA_CFLAGS}" = xyes; then
+      echo "        LIBVA flags are: default"
+    else
+      echo "        LIBVA flags are: $LIBVA_CFLAGS"
+      echo "        LIBVA libraries are: $LIBVA_LIBS"
+  fi
+  if test x$use_vaapi_x11 = xyes; then
+    if test x"${LIBVA_X11_CFLAGS}" = xyes; then
+      echo "        LIBVA X11 flags are: default"
+    else
+      echo "        LIBVA X11 flags are: $LIBVA_X11_CFLAGS"
+      echo "        LIBVA X11 libraries are: $LIBVA_X11_LIBS"
+    fi
+  fi
+  if test x$use_vaapi_glx = xyes; then
+    if test x"${LIBVA_GLX_CFLAGS}" = xyes; then
+      echo "        LIBVA GLXflags are: default"
+    else
+      echo "        LIBVA GLX flags are: $LIBVA_GLX_CFLAGS"
+      echo "        LIBVA GLX libraries are: $LIBVA_GLX_LIBS"
+    fi
+  fi
+fi
+
 if test x"${DEJAGNU}" != x""; then
   echo "        DEJAGNU's runtest is $DEJAGNU"
 else
@@ -3496,29 +3532,6 @@ if test x"$WGET" != x; then
     echo "        You have wget installed, which is only used for testing"
 else
     echo "        Install wget for networking test support"
-fi
-
-if test x"${enable_vaapi}" != x"yes"; then
-  if test x"${LIBVA_CFLAGS}" = xyes; then
-      echo "        LIBVA flags are: default"
-    else
-      echo "        LIBVA flags are: $LIBVA_CFLAGS"
-      echo "        LIBVA libraries are: $LIBVA_LIBS"
-  fi
-  if test x"${LIBVA_X11_CFLAGS}" = xyes; then
-      echo "        LIBVA X11 flags are: default"
-    else
-      echo "        LIBVA X11 flags are: $LIBVA_X11_CFLAGS"
-      echo "        LIBVA X11 libraries are: $LIBVA_X11_LIBS"
-  fi
-  if test x$build_ogl = xyes; then
-    if test x"${LIBVA_GLX_CFLAGS}" = xyes; then
-      echo "        LIBVA GLXflags are: default"
-    else
-      echo "        LIBVA GLX flags are: $LIBVA_GLX_CFLAGS"
-      echo "        LIBVA GLX libraries are: $LIBVA_GLX_LIBS"
-    fi
-  fi
 fi
 
 if test x$cross_compiling = xyes; then

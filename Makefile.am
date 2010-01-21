@@ -455,10 +455,15 @@ if USE_VAAPI
 else
 	@echo "	Hardware Acceleration support via libVA API disabled"
 endif
-if USE_VAAPI_GLX
-	@echo "	Hardware Acceleration support via libVA API and OpenGL enabled"
+if USE_VAAPI_X11
+	@echo "	Hardware Acceleration support via libVA X11 display enabled"
 else
-	@echo "	Hardware Acceleration support via libVA API and OpenGL disabled"
+	@echo "	Hardware Acceleration support via libVA X11 display disabled"
+endif
+if USE_VAAPI_GLX
+	@echo "	Hardware Acceleration support via libVA OpenGL renderer enabled"
+else
+	@echo "	Hardware Acceleration support via libVA OpenGL renderer disabled"
 endif
 
 if TESTSUITE
