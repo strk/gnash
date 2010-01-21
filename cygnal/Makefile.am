@@ -61,6 +61,9 @@ AM_LDFLAGS = \
 if LIBLTDL2
 AM_LDFLAGS += $(top_builddir)/libltdl/libltdlc.la
 endif
+if LIBLTDL1
+GNASH_LIBS += $(top_builddir)/libbase/libltdlc.la
+endif
 
 localedir = $(datadir)/locale
 
