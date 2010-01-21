@@ -35,12 +35,6 @@ AC_PROG_INSTALL
 AM_COMPILER_LIB
 AC_C_BIGENDIAN
 
-dnl Often the headers and libraries we need aren't in the default
-dnl location, but where gnash will get installed. So add the paths
-dnl in the prefix to speed up configuring.
-CPPFLAGS="$CPPFLAGS -I$prefix/include"
-LDFLAGS="$LDFLAGS -L$prefix/lib"
-
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
 dnl recognize Gnash as a SWF Player.
