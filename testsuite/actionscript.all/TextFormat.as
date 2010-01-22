@@ -252,6 +252,33 @@ xcheck_equals(tf.indent, -2147483648);
 tf.indent = undefined;
 check_equals(tf.indent, null);
 
+// size
+tf = new TextFormat();
+check_equals(tf.size, null);
+tf.size = 10;
+check_equals(tf.size, 10);
+
+tf.size = -10;
+xcheck_equals(tf.size, -10);
+
+tf.size = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.size, 0);
+#else
+xcheck_equals(tf.size, -2147483648);
+#endif
+
+tf.size = null;
+check_equals(tf.size, null);
+
+tf.size = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.size, 0);
+#else
+xcheck_equals(tf.size, -2147483648);
+#endif
+tf.size = undefined;
+check_equals(tf.size, null);
 
 // Check tabStops property.
 // The passed array is processed before assignment, not simply stored.
@@ -277,12 +304,12 @@ te = tf2.getTextExtent("Hello");
 // The object is a bare object
 te.hasOwnProperty = Object.prototype.hasOwnProperty;
 
-xcheck(te.hasOwnProperty("ascent"));
-xcheck(te.hasOwnProperty("descent"));
-xcheck(te.hasOwnProperty("textFieldWidth"));
-xcheck(te.hasOwnProperty("textFieldHeight"));
-xcheck(te.hasOwnProperty("width"));
-xcheck(te.hasOwnProperty("height"));
+check(te.hasOwnProperty("ascent"));
+check(te.hasOwnProperty("descent"));
+check(te.hasOwnProperty("textFieldWidth"));
+check(te.hasOwnProperty("textFieldHeight"));
+check(te.hasOwnProperty("width"));
+check(te.hasOwnProperty("height"));
 
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 xcheck_equals(Math.round(te.textFieldWidth), 33);
@@ -294,7 +321,7 @@ xcheck_equals(Math.round(te.textFieldHeight), 60);
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 #endif
 
-xcheck_equals(te.textFieldWidth, 10);
+check_equals(te.textFieldWidth, 10);
 
 #if OUTPUT_VERSION > 7
 xcheck_equals(Math.round(te.width), 9);
@@ -309,7 +336,7 @@ xcheck_equals(Math.round(te.textFieldHeight), 74);
 #else
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 #endif
-xcheck_equals(te.textFieldWidth, 5);
+check_equals(te.textFieldWidth, 5);
 
 
 #if OUTPUT_VERSION > 7
@@ -320,15 +347,15 @@ xcheck_equals(Math.round(te.width), 29);
 #endif
 
 te = tf2.getTextExtent("Longer sentence with more words.", 30);
-xcheck_equals(te.textFieldWidth, 30);
+check_equals(te.textFieldWidth, 30);
 xcheck_equals(Math.round(te.width), 25);
 
 #endif
 
 #if OUTPUT_VERSION < 7
-    check_totals(107);
+    check_totals(114);
 #elif OUTPUT_VERSION == 7
-    check_totals(123);
+    check_totals(130);
 #else 
-    check_totals(123);
+    check_totals(130);
 #endif
