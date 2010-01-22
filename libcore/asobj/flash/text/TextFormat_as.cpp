@@ -54,6 +54,13 @@ TwipsToPixels
     }
 };
 
+struct
+PixelsToTwips
+{
+    boost::int32_t operator()(const as_value& val) const {
+        return pixelsToTwips(val.to_number());
+    }
+};
 
 struct
 ToBool
@@ -150,16 +157,12 @@ namespace {
 	TextField::TextAlignment parseAlignString(const std::string& align);
 	TextField::TextFormatDisplay parseDisplayString(const std::string& display);
 
+    as_value textformat_align(const fn_call& fn);
 	as_value textformat_display(const fn_call& fn);
 	as_value textformat_tabStops(const fn_call& fn);
-	as_value textformat_blockIndent(const fn_call& fn);
-	as_value textformat_leading(const fn_call& fn);
-	as_value textformat_indent(const fn_call& fn);
-	as_value textformat_align(const fn_call& fn);
 	as_value textformat_target(const fn_call& fn);
 	as_value textformat_url(const fn_call& fn);
 	as_value textformat_color(const fn_call& fn);
-	as_value textformat_size(const fn_call& fn);
 	as_value textformat_font(const fn_call& fn);
 	as_value textformat_getTextExtent(const fn_call& fn);
 
@@ -202,8 +205,14 @@ registerTextFormatNative(as_object& o)
     vm.registerNative(textformat_font, 110, 1);
     vm.registerNative(textformat_font, 110, 2);
     
-    vm.registerNative(textformat_size, 110, 3);
-    vm.registerNative(textformat_size, 110, 4);
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint16_t,
+            &TextFormat_as::size, TwipsToPixels>::get,
+            110, 3);
+    vm.registerNative(
+            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::sizeSet,
+            PixelsToTwips>::set, 
+            110, 4);
     
     vm.registerNative(textformat_color, 110, 5);
     vm.registerNative(textformat_color, 110, 6);
@@ -259,22 +268,28 @@ registerTextFormatNative(as_object& o)
             PositiveTwips>::set, 
             110, 22);
 
-    vm.registerNative(textformat_indent, 110, 23);
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint16_t,
+            &TextFormat_as::indent,
+            TwipsToPixels>::get, 110, 23);
     vm.registerNative(
             Set<TextFormat_as, boost::uint16_t, &TextFormat_as::indentSet,
             PositiveTwips>::set, 
             110, 24);
     
-    vm.registerNative(textformat_leading, 110, 25);
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint16_t,
+            &TextFormat_as::leading,
+            TwipsToPixels>::get, 110, 25);
     vm.registerNative(
             Set<TextFormat_as, boost::uint16_t, &TextFormat_as::leadingSet,
             PositiveTwips>::set, 
             110, 26);
 
-    vm.registerNative(textformat_blockIndent, 110, 27);
-
-    // Note: this behaves differently in SWF8, so perhaps best not to use
-    // the template.
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint32_t,
+            &TextFormat_as::blockIndent,
+            TwipsToPixels>::get, 110, 27);
     vm.registerNative(
             Set<TextFormat_as, boost::uint32_t, &TextFormat_as::blockIndentSet,
             PositiveTwips>::set,
@@ -427,82 +442,6 @@ textformat_tabStops(const fn_call& fn)
 }
 
 as_value
-textformat_blockIndent(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if (fn.nargs == 0) 
-	{
-		if (relay->blockIndent()) {
-            ret.set_double(twipsToPixels(*relay->blockIndent()));
-        }
-		else ret.set_null();
-	}
-
-	return ret;
-}
-
-as_value
-textformat_leading(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->leading()) ret.set_double(twipsToPixels(*relay->leading()));
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->leadingSet(pixelsToTwips(toInt(fn.arg(0))));
-	}
-
-	return ret;
-}
-
-as_value
-textformat_indent(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->indent()) ret.set_double(twipsToPixels(*relay->indent()));
-		else ret.set_null();
-	}
-
-	return ret;
-}
-
-as_value
-textformat_align(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->align()) {
-            ret.set_string(getAlignString(*relay->align()));
-        }
-        else ret.set_null();
-	}
-	else // setter
-	{
-		relay->alignSet(fn.arg(0).to_string());
-	}
-
-	return ret;
-}
-
-as_value
 textformat_target(const fn_call& fn)
 {
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
@@ -565,26 +504,6 @@ textformat_color(const fn_call& fn)
 }
 
 as_value
-textformat_size(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->size()) ret.set_double(twipsToPixels(*relay->size()));
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->sizeSet(pixelsToTwips(toInt(fn.arg(0))));
-	}
-
-	return ret;
-}
-
-as_value
 textformat_font(const fn_call& fn)
 {
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
@@ -602,6 +521,28 @@ textformat_font(const fn_call& fn)
 	}
 
 	return ret;
+}
+
+as_value
+textformat_align(const fn_call& fn)
+{
+    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
+
+   as_value ret;
+
+   if ( fn.nargs == 0 ) // getter
+   {
+       if (relay->align()) {
+            ret.set_string(getAlignString(*relay->align()));
+        }
+        else ret.set_null();
+   }
+   else // setter
+   {
+       relay->alignSet(fn.arg(0).to_string());
+   }
+
+   return ret;
 }
 
 
@@ -626,7 +567,7 @@ textformat_getTextExtent(const fn_call& fn)
 
     const int version = getSWFVersion(fn);
 
-    const std::string& s = fn.arg(0).to_string(version);
+    //const std::string& s = fn.arg(0).to_string(version);
 
     double tfw;
     if (fn.nargs > 1) {

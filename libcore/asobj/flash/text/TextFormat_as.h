@@ -148,7 +148,9 @@ public:
     const Optional<std::string>& url() const { return _url; }
 
     /// The block indent.
-    const Optional<boost::uint32_t>& blockIndent() { return _blockIndent; }
+    const Optional<boost::uint32_t>& blockIndent() const {
+        return _blockIndent;
+    }
 
     /// Return a number that indicates the amount of leading vertical
     /// space between lines.
