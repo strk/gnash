@@ -605,13 +605,49 @@ textformat_font(const fn_call& fn)
 }
 
 
+/// Return various dimensions of a theoretical run of text
+//
+/// The TextFormat's format values are used to calculate what the dimensions
+/// of a TextField would be if it contained the given text.
 as_value
 textformat_getTextExtent(const fn_call& fn)
 {
+
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-    UNUSED(relay);
-	LOG_ONCE( log_unimpl("TextFormat.getTextExtent") );
-	return as_value();
+    UNUSED(relay);    
+    
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("TextFormat.getTextExtent requires at least one"
+                "argument");
+        );
+        return as_value();
+    }
+
+    const int version = getSWFVersion(fn);
+
+    const std::string& s = fn.arg(0).to_string(version);
+
+    double tfw;
+    if (fn.nargs > 1) {
+        tfw = fn.arg(1).to_number();       
+    }
+    else {
+        tfw = 0;
+    }
+
+    Global_as& gl = getGlobal(fn);
+    as_object* obj = new as_object(gl);
+
+    obj->init_member("textFieldHeight", 0.0);
+    obj->init_member("textFieldWidth", tfw);
+    obj->init_member("width", 0.0);
+    obj->init_member("height", 0.0);
+    obj->init_member("ascent", 0.0);
+    obj->init_member("descent", 0.0);
+
+    return as_value(obj);
+
 }
 
 
