@@ -64,7 +64,11 @@ if CYGNAL
 CYGNAL_DIR = cygnal
 endif
 
-SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) $(CYGNAL_DIR)
+if USE_VAAPI
+VAAPI_DIR = libvaapi
+endif
+
+SUBDIRS = $(LIBLTDLDIR) $(VAAPI_DIR) $(STD_DIRS) $(CYGNAL_DIR)
 
 if TESTSUITE
 SUBDIRS += testsuite

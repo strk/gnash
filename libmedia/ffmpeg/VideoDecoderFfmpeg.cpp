@@ -45,6 +45,11 @@ extern "C" {
 
 #include "FLVParser.h"
 
+#ifdef USE_VAAPI
+#  include "vaapi.h"
+#  include "GnashVaapiImage.h"
+#endif
+
 namespace gnash {
 namespace media {
 namespace ffmpeg {
@@ -74,6 +79,33 @@ private:
 };
 #endif
 
+class VaapiContextFfmpeg;
+
+static inline VaapiContextFfmpeg *
+get_vaapi_context(AVCodecContext *avctx)
+{
+    return static_cast<VaapiContextFfmpeg *>(avctx->hwaccel_context);
+}
+
+static inline void
+set_vaapi_context(AVCodecContext *avctx, VaapiContextFfmpeg *vactx)
+{
+    avctx->hwaccel_context = vactx;
+}
+
+static inline void
+clear_vaapi_context(AVCodecContext *avctx)
+{
+#if USE_VAAPI
+    VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
+    if (!vactx)
+	return;
+
+    delete vactx;
+    set_vaapi_context(avctx, NULL);
+#endif
+}
+
 // A Wrapper ensuring an AVCodecContext is closed and freed
 // on destruction.
 class CodecContextWrapper
@@ -89,6 +121,7 @@ public:
         if (_codecCtx)
         {
             avcodec_close(_codecCtx);
+            clear_vaapi_context(_codecCtx);
             av_free(_codecCtx);
         }
     }
@@ -99,6 +132,101 @@ private:
     AVCodecContext* _codecCtx;
 };
 
+/// (Re)set AVCodecContext to sane values 
+static void
+reset_context(AVCodecContext *avctx, VaapiContextFfmpeg *vactx = NULL)
+{
+    clear_vaapi_context(avctx);
+    set_vaapi_context(avctx, vactx);
+
+    avctx->thread_count = 1;
+    avctx->draw_horiz_band = NULL;
+    if (vactx)
+	avctx->slice_flags = SLICE_FLAG_CODED_ORDER|SLICE_FLAG_ALLOW_FIELD;
+    else
+	avctx->slice_flags = 0;
+}
+
+/// AVCodecContext.get_format() implementation
+static enum PixelFormat
+get_format(AVCodecContext *avctx, const enum PixelFormat *fmt)
+{
+#if USE_VAAPI
+    VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
+
+    if (vactx) {
+	for (int i = 0; fmt[i] != PIX_FMT_NONE; i++) {
+	    if (fmt[i] != PIX_FMT_VAAPI_VLD)
+		continue;
+	    if (vactx->initDecoder(avctx->width, avctx->height))
+		return fmt[i];
+	}
+    }
+#endif
+
+    reset_context(avctx);
+    return avcodec_default_get_format(avctx, fmt);
+}
+
+/// AVCodecContext.get_buffer() implementation
+static int
+get_buffer(AVCodecContext *avctx, AVFrame *pic)
+{
+    VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
+    if (!vactx)
+	return avcodec_default_get_buffer(avctx, pic);
+
+#if USE_VAAPI
+    if (!vactx->initDecoder(avctx->width, avctx->height))
+	return -1;
+
+    VaapiSurfaceFfmpeg * const surface = vactx->getSurface();
+    if (!surface)
+	return -1;
+    vaapi_set_surface(pic, surface);
+
+    static unsigned int pic_num = 0;
+    pic->type = FF_BUFFER_TYPE_USER;
+    pic->age  = ++pic_num - surface->getPicNum();
+    surface->setPicNum(pic_num);
+    return 0;
+#endif
+    return -1;
+}
+
+/// AVCodecContext.reget_buffer() implementation
+static int
+reget_buffer(AVCodecContext *avctx, AVFrame *pic)
+{
+    VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
+
+    if (!vactx)
+	return avcodec_default_reget_buffer(avctx, pic);
+
+    return get_buffer(avctx, pic);
+}
+
+/// AVCodecContext.release_buffer() implementation
+static void
+release_buffer(AVCodecContext *avctx, AVFrame *pic)
+{
+    VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
+    if (!vactx) {
+	avcodec_default_release_buffer(avctx, pic);
+	return;
+    }
+
+#if USE_VAAPI
+    VaapiSurfaceFfmpeg * const surface = vaapi_get_surface(pic);
+    if (surface)
+	delete surface;
+
+    pic->data[0] = NULL;
+    pic->data[1] = NULL;
+    pic->data[2] = NULL;
+    pic->data[3] = NULL;
+#endif
+}
 
 VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int height)
     :
@@ -178,6 +306,17 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
     ctx->extradata = extradata;
     ctx->extradata_size = extradataSize;
 
+    ctx->get_format	= get_format;
+    ctx->get_buffer	= get_buffer;
+    ctx->reget_buffer	= reget_buffer;
+    ctx->release_buffer	= release_buffer;
+
+#if USE_VAAPI
+    VaapiContextFfmpeg *vactx = VaapiContextFfmpeg::create(codecId);
+    if (vactx)
+	reset_context(ctx, vactx);
+#endif
+
     int ret = avcodec_open(ctx, _videoCodec);
     if (ret < 0) {
         boost::format msg = boost::format(_("libavcodec"
@@ -213,8 +352,10 @@ VideoDecoderFfmpeg::height() const
 
 std::auto_ptr<GnashImage>
 VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
-                                 const AVFrame& srcFrame)
+                                 const AVFrame& srcFrameRef)
 {
+    const AVFrame *srcFrame = &srcFrameRef;
+    PixelFormat srcPixFmt = srcCtx->pix_fmt;
 
     const int width = srcCtx->width;
     const int height = srcCtx->height;
@@ -228,13 +369,26 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 
     std::auto_ptr<GnashImage> im;
 
+#if USE_VAAPI
+    VaapiContextFfmpeg * const vactx = get_vaapi_context(srcCtx);
+    if (vactx) {
+	VaapiSurfaceFfmpeg * const vaSurface = vaapi_get_surface(&srcFrameRef);
+	if (!vaSurface) {
+	    im.reset();
+	    return im;
+	}
+	im.reset(new GnashVaapiImage(vaSurface->get(), GNASH_IMAGE_RGBA));
+	return im;
+    }
+#endif
+
 #ifdef HAVE_SWSCALE_H
     // Check whether the context wrapper exists
     // already.
     if (!_swsContext.get()) {
 
         _swsContext.reset(new SwsContextWrapper(
-            sws_getContext(width, height, srcCtx->pix_fmt, width, height,
+            sws_getContext(width, height, srcPixFmt, width, height,
                 pixFmt, SWS_BILINEAR, NULL, NULL, NULL)
         ));
         
@@ -279,8 +433,8 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     avpicture_fill(&picture, im->data(), pixFmt, width, height);
 
 #ifndef HAVE_SWSCALE_H
-    img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) &srcFrame,
-            srcCtx->pix_fmt, width, height);
+    img_convert(&picture, PIX_FMT_RGB24, (AVPicture*)srcFrame,
+            srcPixFmt, width, height);
 #else
 
     // Is it possible for the context to be reset
@@ -288,8 +442,8 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     assert(_swsContext->getContext());
 
     int rv = sws_scale(_swsContext->getContext(), 
-            const_cast<uint8_t**>(srcFrame.data),
-            const_cast<int*>(srcFrame.linesize), 0, height, picture.data,
+            const_cast<uint8_t**>(srcFrame->data),
+            const_cast<int*>(srcFrame->linesize), 0, height, picture.data,
             picture.linesize);
 
     if (rv == -1) {

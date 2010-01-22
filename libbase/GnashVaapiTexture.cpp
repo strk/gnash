@@ -18,8 +18,8 @@
 //
 
 #include "GnashVaapiTexture.h"
-#include "libvaapi/VaapiSurface.h"
-#include "libvaapi/VaapiSurfaceGLX.h"
+#include "VaapiSurface.h"
+#include "VaapiSurfaceGLX.h"
 #include <GL/gl.h>
 
 namespace gnash {

@@ -29,7 +29,7 @@ pluginsdir = $(prefix)/lib/gnash/plugins
 # before libgnash, as libgnash depends on it for extensions.
 pkglib_LTLIBRARIES =  libgnashmedia.la
 
-libgnashmedia_la_CPPFLAGS = \
+libgnashmedia_la_CPPFLAGS = -I$(top_srcdir) \
 	-I$(top_srcdir)/libamf	\
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/libbase	\
@@ -44,6 +44,7 @@ libgnashmedia_la_CPPFLAGS = \
 	$(JPEG_CFLAGS) \
 	$(GIF_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(LIBVA_CFLAGS) \
 	$(NULL)
 
 # These headers get installed
@@ -158,6 +159,12 @@ if USE_FFMPEG_ENGINE
    libgnashmedia_la_CPPFLAGS += \
 	$(FFMPEG_CFLAGS) \
 	$(NULL)
+
+if USE_VAAPI
+   libgnashmedia_la_SOURCES += ffmpeg/vaapi.cpp
+   noinst_HEADERS += ffmpeg/vaapi.h
+endif
+
 endif
 
 if HAVE_SPEEX
@@ -174,6 +181,16 @@ if HAVE_SPEEX
 endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
+
+if USE_VAAPI
+   libgnashmedia_la_CPPFLAGS += \
+	-I$(top_srcdir)/libvaapi \
+	$(NULL)
+
+   libgnashmedia_la_LIBADD += \
+	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(NULL)
+endif
 
 if WIN32
   libgnashmedia_la_LDFLAGS += -no-undefined

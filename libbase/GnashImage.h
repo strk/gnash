@@ -57,6 +57,13 @@ enum ImageType
     GNASH_IMAGE_ALPHA
 };
 
+/// The locations of images handled in Gnash.
+enum ImageLocation
+{
+    GNASH_IMAGE_CPU = 1,
+    GNASH_IMAGE_GPU
+};
+
 
 /// Base class for different types of bitmaps
 //
@@ -71,6 +78,7 @@ public:
     GnashImage(const GnashImage& o) throw (std::bad_alloc)
         :
         _type(o._type),
+        _location(o._location),
         _size(o.size()),
         _width(o.width()),
         _height(o.height()),
@@ -89,7 +97,8 @@ public:
     /// @param pitch    The pitch (rowstride) of the image in bytes.
     /// @param type     The ImageType of the image.
     GnashImage(boost::uint8_t *data, int width, int height,
-            int pitch, ImageType type);
+               int pitch, ImageType type,
+               ImageLocation location = GNASH_IMAGE_CPU);
 
     /// Construct an empty GnashImage
     //
@@ -100,12 +109,18 @@ public:
     /// @param height   The height of the image in pixels.
     /// @param pitch    The pitch (rowstride) of the image in bytes.
     /// @param type     The ImageType of the image.
-    GnashImage(int width, int height, int pitch, ImageType type);
+    GnashImage(int width, int height, int pitch, ImageType type,
+               ImageLocation location = GNASH_IMAGE_CPU);
 
     /// Return the ImageType of the image.
     //
     /// This saves guessing when dynamic_cast is used.
     ImageType type() const { return _type; }
+
+    /// Return the ImageLocation of the image.
+    //
+    /// This saves guessing when dynamic_cast is used.
+    ImageLocation location() const { return _location; }
 
     /// Get the size of the image buffer
     //
@@ -187,6 +202,9 @@ public:
 protected:
 
     const ImageType _type;
+
+    /// Image data location (CPU or GPU)
+    const ImageLocation _location;
 
     /// Size of image buffer in bytes.
     const size_t _size;

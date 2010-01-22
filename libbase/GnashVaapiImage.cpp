@@ -18,6 +18,7 @@
 //
 
 #include "GnashVaapiImage.h"
+#include "VaapiImage.h"
 #include "vaapi.h"
 #include <time.h>
 

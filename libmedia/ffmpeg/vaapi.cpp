@@ -171,7 +171,7 @@ VaapiContextFfmpeg *VaapiContextFfmpeg::create(enum CodecID codec_id)
 {
     if (!vaapi_is_enabled())
 	return NULL;
-
+    
     VaapiContextFfmpeg *vactx;
     try {
 	vactx = new VaapiContextFfmpeg(codec_id);

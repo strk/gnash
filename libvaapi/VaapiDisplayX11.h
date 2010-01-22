@@ -1,6 +1,6 @@
 // VaapiDisplayX11.h: VA/X11 display representation
 // 
-//   Copyright (C) 2009 Splitted-Desktop Systems
+// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

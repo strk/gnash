@@ -50,9 +50,10 @@ namespace {
 
 /// Create an image taking ownership of the given buffer height*pitch bytes
 GnashImage::GnashImage(boost::uint8_t* data, int width,
-        int height, int pitch, ImageType type)
+        int height, int pitch, ImageType type, ImageLocation location)
     :
     _type(type),
+    _location(location),
     _size(height*pitch),
     _width(width),
     _height(height),
@@ -63,9 +64,10 @@ GnashImage::GnashImage(boost::uint8_t* data, int width,
 
 /// Create an image allocating a buffer of height*pitch bytes
 GnashImage::GnashImage(int width, int height,
-        int pitch, ImageType type)
+        int pitch, ImageType type, ImageLocation location)
     :
     _type(type),
+    _location(location),
     _size(height*pitch),
     _width(width),
     _height(height),
@@ -85,6 +87,7 @@ void GnashImage::update(const GnashImage& from)
     assert(from._pitch == _pitch);
     assert(_size <= from._size);
     assert(_type == from._type);
+    assert(_location == from._location);
     std::memcpy(data(), from.data(), _size);
 }
 

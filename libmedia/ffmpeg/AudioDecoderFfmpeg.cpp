@@ -29,6 +29,10 @@
 
 //#define GNASH_DEBUG_AUDIO_DECODING
 
+/* SIMD versions of DSPContext.float_to_int16_interleave() needs input
+   and output buffers aligned to 16-byte boundaries */
+#define NEEDS_ALIGNED_MEMORY 1
+
 #ifdef FFMPEG_AUDIO2
 # define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
 #else
@@ -525,7 +529,23 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     static const unsigned int bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
 	// TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
-	boost::uint8_t* output = new boost::uint8_t[bufsize];
+    boost::uint8_t* output;
+
+    if (NEEDS_ALIGNED_MEMORY)
+    {
+	output = reinterpret_cast<boost::uint8_t*>(av_malloc(bufsize));
+	if (output == NULL)
+	{
+	    log_error(_("failed to allocate audio buffer."));
+	    outputSize = 0;
+	    return NULL;
+	}
+    }
+    else
+    {
+	output = new boost::uint8_t[bufsize];
+    }
+
     boost::int16_t* outPtr = reinterpret_cast<boost::int16_t*>(output);
 
 	// We initialize output size to the full size
@@ -554,7 +574,11 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 		log_error(_("avcodec_decode_audio returned %d. Upgrading "
                     "ffmpeg/libavcodec might fix this issue."), tmp);
 		outputSize = 0;
-		delete [] output;
+
+		if (output)
+		    av_free(output);
+		else
+		    delete [] output;
 		return NULL;
 	}
 
@@ -564,7 +588,11 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
                     "data. Upgrading ffmpeg/libavcodec might fix this issue."),
 			        outputSize, inputSize);
 		outputSize = 0;
-		delete [] output;
+
+		if (output)
+		    av_free(output);
+		else
+		    delete [] output;
 		return NULL;
 	}
 
@@ -606,7 +634,11 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
 		// make sure to set outPtr *after* we use it as input to the resampler
         	outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
-		delete [] output;
+
+		if (NEEDS_ALIGNED_MEMORY)
+		    av_free(output);
+		else
+		    delete [] output;
 
 		if (expectedMaxOutSamples < outSamples)
 		{
@@ -631,6 +663,12 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 		// stereo?
 		outSize = outSamples * 2 * 2;
 
+	}
+	else if (NEEDS_ALIGNED_MEMORY)
+	{
+	    boost::uint8_t* newOutput = new boost::uint8_t[outSize];
+	    memcpy(newOutput, output, outSize);
+	    outPtr = reinterpret_cast<boost::int16_t*>(newOutput);
 	}
 
 	outputSize = outSize;

@@ -2471,6 +2471,7 @@ libcore/vm/Makefile
 libcore/parser/Makefile
 libnet/Makefile
 libamf/Makefile
+libvaapi/Makefile
 backend/Makefile
 utilities/Makefile
 doc/Makefile
