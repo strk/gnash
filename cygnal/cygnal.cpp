@@ -34,6 +34,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "GnashSleep.h"
 #include "bzrversion.h"
 
 //#include "cvm.h"
@@ -856,11 +857,12 @@ connection_handler(Network::thread_params_t *args)
 	    if (!hand) {
 		hand = new Handler;
 		hand->addClient(args->netfd, Network::HTTP);
-		int retries = 3;
+		int retries = 10;
 		amf::Buffer *buf = 0;
 		do {
 		    buf = hand->parseFirstRequest(args->netfd, Network::HTTP);
 		    if (!buf) {
+			gnashSleep(10);
 			retries--;
 			continue;
 		    } else {
