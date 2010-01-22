@@ -611,8 +611,8 @@ textformat_getTextExtent(const fn_call& fn)
             it != e; ++it) {
 
         int index = f->get_glyph_index(*it, false);
-        const double advance = f->get_advance(index, false) ;
-        if (limitWidth && curr + advance > width) {
+        const double advance = f->get_advance(index, false) * scale;
+        if (limitWidth && (curr + advance > width)) {
             curr = 0;
             height += size + (f->ascent() * scale);
         }
