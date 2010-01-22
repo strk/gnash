@@ -107,9 +107,11 @@ public:
     std::auto_ptr<SWF::ShapeRecord> getGlyph(boost::uint16_t code,
             float& advance);
 
-    size_t ascent() const;
+    /// Return the font's ascender in terms of its EM own square.
+    float ascent() const;
     
-    size_t descent() const;
+    /// Return the font's descender in terms of its own EM square.
+    float descent() const;
 
     /// Return the number of units of glyphs EM
     //
@@ -167,7 +169,7 @@ private:
     /// FreeType library
     static FT_Library    m_lib;
 
-    FT_Face    m_face;
+    FT_Face    _face;
 
 #endif // USE_FREETYPE
 

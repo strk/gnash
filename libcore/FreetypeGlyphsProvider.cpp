@@ -385,30 +385,29 @@ FreetypeGlyphsProvider::createFace(const std::string&, bool, bool)
 unsigned short
 FreetypeGlyphsProvider::unitsPerEM() const
 {
-    assert(m_face);
-    return m_face->units_per_EM;
+    assert(_face);
+    return _face->units_per_EM;
 }
 
-size_t
+float
 FreetypeGlyphsProvider::descent() const
 {
-    assert(m_face);
-    log_debug("Descent: %s", m_face->descender);
-    return std::abs(m_face->descender);
+    assert(_face);
+    return std::abs(_face->descender);
 }
 
-size_t
+float
 FreetypeGlyphsProvider::ascent() const
 {
-    assert(m_face);
-    log_debug("Ascent: %s", m_face->ascender);
-    return m_face->ascender;
+    assert(_face);
+    return _face->ascender;
 }
 
 #ifdef USE_FREETYPE 
-FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bold, bool italic)
+FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name,
+        bool bold, bool italic)
     :
-    m_face(NULL)
+    _face(NULL)
 {
 
     if (m_lib == NULL)
@@ -424,7 +423,7 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
         throw GnashException(msg.str());
     }
 
-    int error = FT_New_Face(m_lib, filename.c_str(), 0, &m_face);
+    int error = FT_New_Face(m_lib, filename.c_str(), 0, &_face);
     switch (error)
     {
         case 0:
@@ -451,10 +450,10 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 
     // We want an EM of unitsPerEM, so if units_per_EM is different
     // we will scale 
-    scale = (float)unitsPerEM()/m_face->units_per_EM;
+    scale = (float)unitsPerEM()/_face->units_per_EM;
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
-    log_debug("EM square for font '%s' is %d, scale is thus %g", name, m_face->units_per_EM, scale);
+    log_debug("EM square for font '%s' is %d, scale is thus %g", name, _face->units_per_EM, scale);
 #endif
 }
 #else // ndef(USE_FREETYPE)
@@ -470,7 +469,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 {
     std::auto_ptr<SWF::ShapeRecord> glyph;
 
-    FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP | 
+    FT_Error error = FT_Load_Char(_face, code, FT_LOAD_NO_BITMAP | 
                                                 FT_LOAD_NO_SCALE);
 
     if (error) {
@@ -480,16 +479,16 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
     }
 
     // Scale advance by current scale, to match expected output coordinate space
-    advance = m_face->glyph->metrics.horiAdvance * scale;
+    advance = _face->glyph->metrics.horiAdvance * scale;
 #ifdef GNASH_DEBUG_DEVICEFONTS 
     log_debug("Advance value for glyph '%c' is %g (horiAdvance:%ld, "
             "scale:%g)", code, advance, 
-            m_face->glyph->metrics.horiAdvance, scale);
+            _face->glyph->metrics.horiAdvance, scale);
 #endif
 
-    if ( m_face->glyph->format != FT_GLYPH_FORMAT_OUTLINE )
+    if ( _face->glyph->format != FT_GLYPH_FORMAT_OUTLINE )
     {
-        unsigned long gf = m_face->glyph->format;
+        unsigned long gf = _face->glyph->format;
         log_unimpl("FT_Load_Char() returned a glyph format != "
             "FT_GLYPH_FORMAT_OUTLINE (%c%c%c%c)",
             static_cast<char>((gf>>24)&0xff),
@@ -499,7 +498,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
         return glyph;
     }
 
-    FT_Outline* outline = &(m_face->glyph->outline);
+    FT_Outline* outline = &(_face->glyph->outline);
 
     FT_Outline_Funcs walk;
     walk.move_to = OutlineWalker::walkMoveTo;
@@ -540,8 +539,8 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t, float& advance)
 FreetypeGlyphsProvider::~FreetypeGlyphsProvider()
 {
 #ifdef USE_FREETYPE 
-    if (m_face) {
-        if (FT_Done_Face(m_face) != 0) {
+    if (_face) {
+        if (FT_Done_Face(_face) != 0) {
             log_error("Could not release FT face resources");
         }
     }
