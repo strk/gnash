@@ -43,6 +43,10 @@ VaapiGlobalContext::init()
     VAStatus status;
 
     int num_profiles = 0;
+    if (vaMaxNumProfiles(dpy) == 0) {
+        return false;
+    }
+    
     _profiles.resize(vaMaxNumProfiles(dpy));
     status = vaQueryConfigProfiles(dpy, &_profiles[0], &num_profiles);
     if (!vaapi_check_status(status, "vaQueryConfigProfiles()"))

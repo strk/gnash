@@ -155,8 +155,8 @@ if USE_FFMPEG_ENGINE
 	$(NULL)
 
 if USE_VAAPI
-   libgnashmedia_la_SOURCES += ffmpeg/vaapi.cpp
-   noinst_HEADERS += ffmpeg/vaapi.h
+   libgnashmedia_la_SOURCES += ffmpeg/fvaapi.cpp
+   noinst_HEADERS += ffmpeg/fvaapi.h
 endif
 
 endif

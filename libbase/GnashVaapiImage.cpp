@@ -19,7 +19,7 @@
 
 #include "GnashVaapiImage.h"
 #include "VaapiImage.h"
-#include "vaapi.h"
+#include "fvaapi.h"
 #include <time.h>
 
 #define DEBUG 0

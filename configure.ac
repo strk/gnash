@@ -1519,7 +1519,7 @@ if test x"${enable_vaapi}" = x"yes"; then
   dnl Nvidia cards have their own library for hardware video
   dnl decoding, which is handed by libva, which can be layered
   dnl on top of libxvba.
-  GNASH_PKG_FIND([xvba],
+  GNASH_PKG_FIND([AMDXvBA],
     [xvba/xvba.h],
     [Video Acceleration API for AMD],
     vaInitialize                dnl FIXME: find a real symbol
