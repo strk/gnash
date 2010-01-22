@@ -296,8 +296,11 @@ xcheck_equals(tf.tabStops.toString(), "6");
 
 tf2 = new TextFormat("Arial", 12);
 
-// Different behaviour.
+// getTextExtent has different behaviour for SWF6.
 #if OUTPUT_VERSION > 6
+
+// I don't know how to test this properly, as we can only test device fonts
+// here, and the pp uses a different font from Gnash.
 
 te = tf2.getTextExtent("Hello");
 
@@ -313,8 +316,8 @@ check(te.hasOwnProperty("height"));
 
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 xcheck_equals(Math.round(te.textFieldWidth), 33);
-xcheck_equals(Math.round(te.ascent), 11);
-xcheck_equals(Math.round(te.descent), 3);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
 
 te = tf2.getTextExtent("Hello", 10);
 #if OUTPUT_VERSION > 7
@@ -339,8 +342,8 @@ xcheck_equals(Math.round(te.textFieldHeight), 74);
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 #endif
 check_equals(te.textFieldWidth, 5);
-xcheck_equals(Math.round(te.ascent), 11);
-xcheck_equals(Math.round(te.descent), 3);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
 
 #if OUTPUT_VERSION > 7
 // Width of largest character in version 8?
@@ -357,20 +360,20 @@ xcheck_equals(Math.round(te.width), 25);
 te = tf2.getTextExtent("o");
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 xcheck_equals(Math.round(te.textFieldWidth), 11);
-xcheck_equals(Math.round(te.ascent), 11);
-xcheck_equals(Math.round(te.descent), 3);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
 
 te = tf2.getTextExtent("oo");
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 xcheck_equals(Math.round(te.textFieldWidth), 18);
-xcheck_equals(Math.round(te.ascent), 11);
-xcheck_equals(Math.round(te.descent), 3);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
 
 te = tf2.getTextExtent("ool");
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 xcheck_equals(Math.round(te.textFieldWidth), 21);
-xcheck_equals(Math.round(te.ascent), 11);
-xcheck_equals(Math.round(te.descent), 3);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
 
 tf2.size = 20;
 te = tf2.getTextExtent("ool");
