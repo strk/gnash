@@ -197,9 +197,18 @@ dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
 
+dnl I want to depreciate this option for the new sysroot name to be
+dnl consistant with other tools. This will be left for a while as 
+dnl a transistion.
 AC_ARG_WITH(top_level,
   AC_HELP_STRING([--with-top-level],
   [top level directory for cross compiling files]),
+  with_top_level=${withval} ;
+  cross_compiling=yes)
+
+AC_ARG_WITH(sysroot,
+  AC_HELP_STRING([--sysroot],
+  [system root directory for cross compiling]),
   with_top_level=${withval} ;
   cross_compiling=yes)
 
@@ -1708,7 +1717,9 @@ if test x"${GIF_LIBS}" = x ; then
  GIF_LIBS=${UNGIF_LIBS}
  GIF_CFLAGS=${UNGIF_CFLAGS}
 fi
-GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
+if test x"$testsuite" = x"yes"; then
+  GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
+fi
 
 GNASH_PKG_FIND(speex, [speex.h], [speex audio codec], speex_decode_int)
 AM_CONDITIONAL(HAVE_SPEEX, [ test x$has_speex = xyes ])
@@ -3340,16 +3351,17 @@ if test "$GMSGFMT" = ":"; then
   echo "                 or .rpm users: yum install gettext" >&4
 fi
 
-if test x"${DEJAGNU}" != x""; then
-  echo "        DEJAGNU's runtest is $DEJAGNU"
-else
-  echo "        WARNING: You need the dejagnu package installed to get a summary" >&4
-  echo "                 report after running ''make check''" >&4
-  echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
-  echo "                 or .deb users: apt-get install dejagnu" >&4
-  echo "                 or .rpm users: yum install dejagnu" >&4
+if test x"$testsuite" = x"yes"; then
+  if test x"${DEJAGNU}" != x""; then
+    echo "        DEJAGNU's runtest is $DEJAGNU"
+  else
+    echo "        WARNING: You need the dejagnu package installed to get a summary" >&4
+    echo "                 report after running ''make check''" >&4
+    echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
+    echo "                 or .deb users: apt-get install dejagnu" >&4
+    echo "                 or .rpm users: yum install dejagnu" >&4
+  fi
 fi
-
 
 dnl Access Linux Platform
 if test x"${build_alp}" = xyes; then
