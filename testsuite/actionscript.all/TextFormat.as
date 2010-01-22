@@ -384,7 +384,7 @@ xcheck_equals(Math.round(te.descent), 5);
 #if OUTPUT_VERSION < 7
     check_totals(114);
 #elif OUTPUT_VERSION == 7
-    check_totals(130);
+    check_totals(150);
 #else 
-    check_totals(130);
+    check_totals(150);
 #endif
