@@ -19,7 +19,7 @@
 #ifndef GNASH_MEDIA_VAAPI_H
 #define GNASH_MEDIA_VAAPI_H
 
-#include "libvaapi/vaapi.h"
+#include "gvaapi.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
