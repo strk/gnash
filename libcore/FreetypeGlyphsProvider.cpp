@@ -75,23 +75,23 @@ class OutlineWalker
 
 public:
 
-	/// Create an outline walker drawing to the given DynamiShape
-	//
-	/// @param sh
-	///	The DynamicShape to draw to. Externally owned.
-	///
-	/// @param scale
-	///	The scale to apply to coordinates.
-	///	This is to match an arbitrary EM 
-	///
-	OutlineWalker(SWF::ShapeRecord& sh, float scale)
-		:
-		_shape(sh),
-		_scale(scale),
+    /// Create an outline walker drawing to the given DynamiShape
+    //
+    /// @param sh
+    ///    The DynamicShape to draw to. Externally owned.
+    ///
+    /// @param scale
+    ///    The scale to apply to coordinates.
+    ///    This is to match an arbitrary EM 
+    ///
+    OutlineWalker(SWF::ShapeRecord& sh, float scale)
+        :
+        _shape(sh),
+        _scale(scale),
         _currPath(0),
         _x(0),
         _y(0)
-	{
+    {
         fill_style f;
         f.setSolid(rgba(255, 255, 255, 255));
         _shape.addFillStyle(f);
@@ -104,104 +104,104 @@ public:
         _currPath->close();
     }
 
-	~OutlineWalker() {}
+    ~OutlineWalker() {}
 
-	/// Callback function for the move_to member of FT_Outline_Funcs
-	static int
-	walkMoveTo(FT_CONST FT_Vector* to, void* ptr)
-	{
-		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
-		return walker->moveTo(to);
-	}
+    /// Callback function for the move_to member of FT_Outline_Funcs
+    static int
+    walkMoveTo(FT_CONST FT_Vector* to, void* ptr)
+    {
+        OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
+        return walker->moveTo(to);
+    }
 
-	/// Callback function for the line_to member of FT_Outline_Funcs
-	static int
-	walkLineTo(FT_CONST FT_Vector* to, void* ptr)
-	{
-		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
-		return walker->lineTo(to);
-	}
+    /// Callback function for the line_to member of FT_Outline_Funcs
+    static int
+    walkLineTo(FT_CONST FT_Vector* to, void* ptr)
+    {
+        OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
+        return walker->lineTo(to);
+    }
 
-	/// Callback function for the conic_to member of FT_Outline_Funcs
-	static int
-	walkConicTo(FT_CONST FT_Vector* ctrl, FT_CONST FT_Vector* to, void* ptr)
-	{
-		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
-		return walker->conicTo(ctrl, to);
-	}
+    /// Callback function for the conic_to member of FT_Outline_Funcs
+    static int
+    walkConicTo(FT_CONST FT_Vector* ctrl, FT_CONST FT_Vector* to, void* ptr)
+    {
+        OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
+        return walker->conicTo(ctrl, to);
+    }
 
-	/// Callback function for the cubic_to member of FT_Outline_Funcs
-	//
-	/// Transform the cubic curve into a quadratic one an interpolated point
-	/// falling in the middle of the two control points.
-	///
-	static int
-	walkCubicTo(FT_CONST FT_Vector* ctrl1, FT_CONST FT_Vector* ctrl2,
+    /// Callback function for the cubic_to member of FT_Outline_Funcs
+    //
+    /// Transform the cubic curve into a quadratic one an interpolated point
+    /// falling in the middle of the two control points.
+    ///
+    static int
+    walkCubicTo(FT_CONST FT_Vector* ctrl1, FT_CONST FT_Vector* ctrl2,
             FT_CONST FT_Vector* to, void* ptr)
-	{
-		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
-		return walker->cubicTo(ctrl1, ctrl2, to);
-	}
+    {
+        OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
+        return walker->cubicTo(ctrl1, ctrl2, to);
+    }
 
 private:
-	
+    
     int moveTo(const FT_Vector* to)
-	{
+    {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-		log_debug("moveTo: %ld,%ld", to->x, to->y);
+        log_debug("moveTo: %ld,%ld", to->x, to->y);
 #endif
         _x = static_cast<boost::int32_t>(to->x * _scale);
         _y = - static_cast<boost::int32_t>(to->y * _scale);
         _currPath->close();
         _shape.addPath(Path(_x, _y, 1, 0, 0, false));
         _currPath = &_shape.currentPath();
-		return 0;
-	}
+        return 0;
+    }
 
-	int lineTo(const FT_Vector* to)
-	{
+    int lineTo(const FT_Vector* to)
+    {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-		log_debug("lineTo: %ld,%ld", to->x, to->y);
+        log_debug("lineTo: %ld,%ld", to->x, to->y);
 #endif
         _x = static_cast<boost::int32_t>(to->x * _scale);
         _y = - static_cast<boost::int32_t>(to->y * _scale);
-		_currPath->drawLineTo(_x, _y);
+        _currPath->drawLineTo(_x, _y);
         expandBounds(_x, _y);
-		return 0;
-	}
+        return 0;
+    }
 
-	int conicTo(const FT_Vector* ctrl, const FT_Vector* to)
-	{
+    int conicTo(const FT_Vector* ctrl, const FT_Vector* to)
+    {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-		log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
+        log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
 #endif
         boost::int32_t x1 = static_cast<boost::int32_t>(ctrl->x * _scale);
         boost::int32_t y1 = static_cast<boost::int32_t>(ctrl->y * _scale);
         _x = static_cast<boost::int32_t>(to->x * _scale);
         _y = - static_cast<boost::int32_t>(to->y * _scale);
-		_currPath->drawCurveTo(x1, -y1, _x, _y);
-		expandBounds(x1, -y1, _x, _y);
-		return 0;
-	}
+        _currPath->drawCurveTo(x1, -y1, _x, _y);
+        expandBounds(x1, -y1, _x, _y);
+        return 0;
+    }
 
-	int
-	cubicTo(const FT_Vector* ctrl1, const FT_Vector* ctrl2, const FT_Vector* to)
-	{
+    int
+    cubicTo(const FT_Vector* ctrl1, const FT_Vector* ctrl2, const FT_Vector* to)
+    {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-		log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x,
+        log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x,
                 ctrl1->y, ctrl2->x, ctrl2->y, to->x, to->y);
 #endif
-		float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
-		float y = ctrl1->y + ( (ctrl2->y - ctrl1->y) * 0.5 );
+        float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
+        float y = ctrl1->y + ( (ctrl2->y - ctrl1->y) * 0.5 );
         boost::int32_t x1 = static_cast<boost::int32_t>(x * _scale);
         boost::int32_t y1 = static_cast<boost::int32_t>(y * _scale);
         _x = static_cast<boost::int32_t>(to->x * _scale);
         _y = - static_cast<boost::int32_t>(to->y * _scale);
         
-		_currPath->drawCurveTo(x1, -y1, _x, _y);
-		expandBounds(x1, -y1, _x, _y);
+        _currPath->drawCurveTo(x1, -y1, _x, _y);
+        expandBounds(x1, -y1, _x, _y);
         return 0;
-	}
+    }
     
     void expandBounds(int x, int y) {
         SWFRect bounds = _shape.getBounds();
@@ -224,7 +224,7 @@ private:
 
     SWF::ShapeRecord& _shape;
 
-	const float _scale;
+    const float _scale;
 
     Path* _currPath;
 
@@ -237,119 +237,119 @@ FT_Library FreetypeGlyphsProvider::m_lib = 0;
 boost::mutex FreetypeGlyphsProvider::m_lib_mutex;
 
 // static private
-void FreetypeGlyphsProvider::init()
+void
+FreetypeGlyphsProvider::init()
 {
-	boost::mutex::scoped_lock lock(m_lib_mutex);
+    boost::mutex::scoped_lock lock(m_lib_mutex);
 
-	if ( m_lib ) return; // nothing to do
+    if (m_lib) return; 
 
-	int	error = FT_Init_FreeType(&m_lib);
-	if (error)
-	{
-		std::cerr << boost::format(_("Can't init FreeType! Error "
-					"= %d")) % error << std::endl;
-		exit(EXIT_FAILURE);
-	}
+    int    error = FT_Init_FreeType(&m_lib);
+    if (error) {
+        std::cerr << boost::format(_("Can't init FreeType! Error "
+                    "= %d")) % error << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 // static private
 void FreetypeGlyphsProvider::close()
 {
-	int error = FT_Done_FreeType(m_lib);
-	if (error)
-	{
-		std::cerr << boost::format(_("Can't close FreeType! Error "
-				"= %d")) % error << std::endl;
-	}
+    int error = FT_Done_FreeType(m_lib);
+    if (error)
+    {
+        std::cerr << boost::format(_("Can't close FreeType! Error "
+                "= %d")) % error << std::endl;
+    }
 }
 
 
 // private
 bool
 FreetypeGlyphsProvider::getFontFilename(const std::string &name,
-		bool bold, bool italic, std::string& filename)
+        bool bold, bool italic, std::string& filename)
 {
 
 #ifdef HAVE_FONTCONFIG
 
-	if (!FcInit ())
-	{
+    if (!FcInit ())
+    {
 
-		log_error("Can't init fontconfig library, using hard-"
-				"coded font filename");
-		filename = DEFAULT_FONTFILE;
-		return true;
-		//return false;
-	}
-	
-	FcResult    result;
+        log_error("Can't init fontconfig library, using hard-"
+                "coded font filename");
+        filename = DEFAULT_FONTFILE;
+        return true;
+        //return false;
+    }
+    
+    FcResult result;
 
-	FcPattern* pat = FcNameParse((const FcChar8*)name.c_str());
-	
-	FcConfigSubstitute (0, pat, FcMatchPattern);
+    FcPattern* pat = FcNameParse((const FcChar8*)name.c_str());
+    
+    FcConfigSubstitute (0, pat, FcMatchPattern);
 
-	if (italic) {
-		FcPatternAddInteger (pat, FC_SLANT, FC_SLANT_ITALIC);
-	}
+    if (italic) {
+        FcPatternAddInteger (pat, FC_SLANT, FC_SLANT_ITALIC);
+    }
 
-	if (bold) {
-		FcPatternAddInteger (pat, FC_WEIGHT, FC_WEIGHT_BOLD);
-	}
+    if (bold) {
+        FcPatternAddInteger (pat, FC_WEIGHT, FC_WEIGHT_BOLD);
+    }
 
-	FcDefaultSubstitute (pat);
+    FcDefaultSubstitute (pat);
 
-	FcPattern   *match;
-	match = FcFontMatch (0, pat, &result);
-	FcPatternDestroy (pat);
+    FcPattern   *match;
+    match = FcFontMatch (0, pat, &result);
+    FcPatternDestroy (pat);
 
-	FcFontSet* fs = NULL;
-	if (match)
-	{
-		fs = FcFontSetCreate ();
-		FcFontSetAdd (fs, match);
-	}
+    FcFontSet* fs = NULL;
+    if (match)
+    {
+        fs = FcFontSetCreate ();
+        FcFontSetAdd (fs, match);
+    }
 
-	if ( fs )
-	{
+    if ( fs )
+    {
 #ifdef GNASH_DEBUG_DEVICEFONTS
-		log_debug("Found %d fonts matching the family %s (using "
-				"first)", fs->nfont, name);
+        log_debug("Found %d fonts matching the family %s (using "
+                "first)", fs->nfont, name);
 #endif
 
-		for (int j = 0; j < fs->nfont; j++)
-		{
-			FcChar8 *file;
-			if (FcPatternGetString (fs->fonts[j], FC_FILE, 0, &file) != FcResultMatch)
-			{
+        for (int j = 0; j < fs->nfont; j++)
+        {
+            FcChar8 *file;
+            if (FcPatternGetString (fs->fonts[j], FC_FILE, 0, &file) != FcResultMatch)
+            {
 #ifdef GNASH_DEBUG_DEVICEFONTS
-		log_debug("Matching font %d has unknown filename, skipping", j);
+        log_debug("Matching font %d has unknown filename, skipping", j);
 #endif
-		continue;
-			}
+        continue;
+            }
 
-			filename = (char *)file;
-			FcFontSetDestroy(fs);
+            filename = (char *)file;
+            FcFontSetDestroy(fs);
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
-		    log_debug("Loading font from file %d", filename);
+            log_debug("Loading font from file %d", filename);
 #endif
-			return true;
+            return true;
 
-		}
+        }
 
-		FcFontSetDestroy(fs);
-	}
+        FcFontSetDestroy(fs);
+    }
 
-	log_error("No device font matches the name '%s', using hard-coded"
-			" font filename", name);
-	filename = DEFAULT_FONTFILE;
-	return true;
+    log_error("No device font matches the name '%s', using hard-coded"
+            " font filename", name);
+    filename = DEFAULT_FONTFILE;
+    return true;
 #else
-	log_error("Font filename matching not implemented (no fontconfig"
-			" support built-in), using hard-coded font filename",
-			name);
-	filename = DEFAULT_FONTFILE;
-	return true;
+    log_error("Font filename matching not implemented (no fontconfig"
+            " support built-in), using hard-coded font filename",
+            name);
+    filename = DEFAULT_FONTFILE;
+    return true;
 #endif
 }
 
@@ -361,83 +361,106 @@ std::auto_ptr<FreetypeGlyphsProvider>
 FreetypeGlyphsProvider::createFace(const std::string& name, bool bold, bool italic)
 {
 
-	std::auto_ptr<FreetypeGlyphsProvider> ret;
+    std::auto_ptr<FreetypeGlyphsProvider> ret;
 
-	try { 
-		ret.reset( new FreetypeGlyphsProvider(name, bold, italic) );
-	} catch (GnashException& ge) {
-		log_error(ge.what());
-		assert(! ret.get());
-	}
+    try { 
+        ret.reset( new FreetypeGlyphsProvider(name, bold, italic) );
+    } catch (GnashException& ge) {
+        log_error(ge.what());
+        assert(! ret.get());
+    }
 
-	return ret;
+    return ret;
 
 }
 #else // ndef USE_FREETYPE 
 std::auto_ptr<FreetypeGlyphsProvider>
 FreetypeGlyphsProvider::createFace(const std::string&, bool, bool)
 {
-	log_error("Freetype not supported");
-	return std::auto_ptr<FreetypeGlyphsProvider>(NULL);
+    log_error("Freetype not supported");
+    return std::auto_ptr<FreetypeGlyphsProvider>(NULL);
 }
-#endif // ndef USE_FREETYPE 
+#endif 
+	
+unsigned short
+FreetypeGlyphsProvider::unitsPerEM() const
+{
+    assert(m_face);
+    return m_face->units_per_EM;
+}
+
+size_t
+FreetypeGlyphsProvider::descent() const
+{
+    assert(m_face);
+    log_debug("Descent: %s", m_face->descender);
+    return std::abs(m_face->descender);
+}
+
+size_t
+FreetypeGlyphsProvider::ascent() const
+{
+    assert(m_face);
+    log_debug("Ascent: %s", m_face->ascender);
+    return m_face->ascender;
+}
 
 #ifdef USE_FREETYPE 
 FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bold, bool italic)
-	:
-	m_face(NULL)
+    :
+    m_face(NULL)
 {
 
-	if (m_lib == NULL)
-	{
-		init();
-	}
+    if (m_lib == NULL)
+    {
+        init();
+    }
 
-	std::string filename;
-	if (getFontFilename(name, bold, italic, filename) == false)
-	{
-		boost::format msg = boost::format(_("Can't find font file "
-				       "for font '%s'")) % name;
-		throw GnashException(msg.str());
-	}
+    std::string filename;
+    if (getFontFilename(name, bold, italic, filename) == false)
+    {
+        boost::format msg = boost::format(_("Can't find font file "
+                       "for font '%s'")) % name;
+        throw GnashException(msg.str());
+    }
 
-	int error = FT_New_Face(m_lib, filename.c_str(), 0, &m_face);
-	switch (error)
-	{
-		case 0:
-			break;
+    int error = FT_New_Face(m_lib, filename.c_str(), 0, &m_face);
+    switch (error)
+    {
+        case 0:
+            break;
 
-		case FT_Err_Unknown_File_Format:
-		{
-			boost::format msg = boost::format(_("Font file '%s' "
-						"has bad format")) % filename;
-			throw GnashException(msg.str());
-			break;
-		}
+        case FT_Err_Unknown_File_Format:
+        {
+            boost::format msg = boost::format(_("Font file '%s' "
+                        "has bad format")) % filename;
+            throw GnashException(msg.str());
+            break;
+        }
 
-		default:
-		{
-			// TODO: return a better error message !
-			boost::format msg = boost::format(_("Some error "
-						"opening font '%s'"))
-			       			% filename;
-			throw GnashException(msg.str());
-			break;
-		}
-	}
+        default:
+        {
+            // TODO: return a better error message !
+            boost::format msg = boost::format(_("Some error "
+                        "opening font '%s'"))
+                               % filename;
+            throw GnashException(msg.str());
+            break;
+        }
+    }
 
-	// We want an EM of unitsPerEM, so if units_per_EM is different
-	// we will scale 
-	scale = (float)unitsPerEM()/m_face->units_per_EM;
+    // We want an EM of unitsPerEM, so if units_per_EM is different
+    // we will scale 
+    scale = (float)unitsPerEM()/m_face->units_per_EM;
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
-	log_debug("EM square for font '%s' is %d, scale is thus %g", name, m_face->units_per_EM, scale);
+    log_debug("EM square for font '%s' is %d, scale is thus %g", name, m_face->units_per_EM, scale);
 #endif
 }
 #else // ndef(USE_FREETYPE)
 FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 {
-	abort(); // should never be called
+    abort(); // should never be called
 }
 #endif // ndef USE_FREETYPE 
 
@@ -447,84 +470,82 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 {
     std::auto_ptr<SWF::ShapeRecord> glyph;
 
-	FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP | 
+    FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP | 
                                                 FT_LOAD_NO_SCALE);
 
-	if (error) {
-		log_error("Error loading freetype outline glyph for char '%c' "
+    if (error) {
+        log_error("Error loading freetype outline glyph for char '%c' "
                 "(error: %d)", code, error);
-		return glyph;
-	}
+        return glyph;
+    }
 
-	// Scale advance by current scale, to match expected output coordinate space
-	advance = m_face->glyph->metrics.horiAdvance * scale;
+    // Scale advance by current scale, to match expected output coordinate space
+    advance = m_face->glyph->metrics.horiAdvance * scale;
 #ifdef GNASH_DEBUG_DEVICEFONTS 
-	log_debug("Advance value for glyph '%c' is %g (horiAdvance:%ld, "
-			"scale:%g)", code, advance, 
-			m_face->glyph->metrics.horiAdvance, scale);
+    log_debug("Advance value for glyph '%c' is %g (horiAdvance:%ld, "
+            "scale:%g)", code, advance, 
+            m_face->glyph->metrics.horiAdvance, scale);
 #endif
 
-	if ( m_face->glyph->format != FT_GLYPH_FORMAT_OUTLINE )
-	{
-		unsigned long gf = m_face->glyph->format;
-		log_unimpl("FT_Load_Char() returned a glyph format != "
-			"FT_GLYPH_FORMAT_OUTLINE (%c%c%c%c)",
-			static_cast<char>((gf>>24)&0xff),
-			static_cast<char>((gf>>16)&0xff),
-			static_cast<char>((gf>>8)&0xff),
-			static_cast<char>(gf&0xff));
-		return glyph;
-	}
+    if ( m_face->glyph->format != FT_GLYPH_FORMAT_OUTLINE )
+    {
+        unsigned long gf = m_face->glyph->format;
+        log_unimpl("FT_Load_Char() returned a glyph format != "
+            "FT_GLYPH_FORMAT_OUTLINE (%c%c%c%c)",
+            static_cast<char>((gf>>24)&0xff),
+            static_cast<char>((gf>>16)&0xff),
+            static_cast<char>((gf>>8)&0xff),
+            static_cast<char>(gf&0xff));
+        return glyph;
+    }
 
-	FT_Outline* outline = &(m_face->glyph->outline);
+    FT_Outline* outline = &(m_face->glyph->outline);
 
-	FT_Outline_Funcs walk;
+    FT_Outline_Funcs walk;
     walk.move_to = OutlineWalker::walkMoveTo;
-	walk.line_to = OutlineWalker::walkLineTo;
-	walk.conic_to = OutlineWalker::walkConicTo;
-	walk.cubic_to = OutlineWalker::walkCubicTo;
-	walk.shift = 0; // ?
-	walk.delta = 0; // ?
+    walk.line_to = OutlineWalker::walkLineTo;
+    walk.conic_to = OutlineWalker::walkConicTo;
+    walk.cubic_to = OutlineWalker::walkCubicTo;
+    walk.shift = 0; // ?
+    walk.delta = 0; // ?
 
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	log_debug("Decomposing glyph outline for DisplayObject %u", code);
+    log_debug("Decomposing glyph outline for DisplayObject %u", code);
 #endif
     
     glyph.reset(new SWF::ShapeRecord);
 
-	OutlineWalker walker(*glyph, scale);
+    OutlineWalker walker(*glyph, scale);
 
-	FT_Outline_Decompose(outline, &walk, &walker);
+    FT_Outline_Decompose(outline, &walk, &walker);
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	SWFRect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
-	log_debug("Decomposed glyph for DisplayObject '%c' has bounds %s",
-			code, bound.toString());
+    SWFRect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
+    log_debug("Decomposed glyph for DisplayObject '%c' has bounds %s",
+            code, bound.toString());
 #endif
 
     walker.finish();
 
-	return glyph;
+    return glyph;
 }
 #else // ndef(USE_FREETYPE)
 
 std::auto_ptr<SWF::ShapeRecord>
 FreetypeGlyphsProvider::getGlyph(boost::uint16_t, float& advance)
 {
-	abort(); // should never be called... 
+    abort(); // should never be called... 
 }
-#endif // ndef(USE_FREETYPE)
+#endif
 
 FreetypeGlyphsProvider::~FreetypeGlyphsProvider()
 {
 #ifdef USE_FREETYPE 
-	if ( m_face )
-	{
-		if ( FT_Done_Face(m_face) != 0 )
-		{
-			log_error("Could not release FT face resources");
-		}
-	}
-#endif // ndef(USE_FREETYPE)
+    if (m_face) {
+        if (FT_Done_Face(m_face) != 0) {
+            log_error("Could not release FT face resources");
+        }
+    }
+#endif
 }
 
 } // namespace gnash

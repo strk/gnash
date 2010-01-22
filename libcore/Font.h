@@ -149,8 +149,8 @@ public:
 	/// glyph results in a return of -1
 	///
 	/// @return -1 if there is no glyph for the specified code or a valid
-	///         positive index to use in subsequent calls to other glyph-index-based
-	///	    methods.
+	///         positive index to use in subsequent calls to other
+    ///         glyph-index-based methods.
 	///
 	int	get_glyph_index(boost::uint16_t code, bool embedded) const;
 
