@@ -70,6 +70,13 @@ GNASH_LIBS = \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(NULL)
 
+if LIBLTDL2
+GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
+endif
+if LIBLTDL1
+GNASH_LIBS += $(top_builddir)/libbase/libltdlc.la
+endif
+
 if USE_FFMPEG_ENGINE
 	GNASH_LIBS += $(FFMPEG_LIBS)
 endif

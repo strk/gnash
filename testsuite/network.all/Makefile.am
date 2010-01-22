@@ -58,8 +58,6 @@ AM_LDFLAGS =
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/libsound/libgnashsound.la \
 	$(OPENGL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)

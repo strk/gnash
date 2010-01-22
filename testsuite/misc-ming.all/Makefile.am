@@ -71,6 +71,12 @@ AM_LDFLAGS = \
 	$(GIF_LIBS) \
 	$(NULL)
 
+if LIBLTDL2
+AM_LDFLAGS  += $(top_builddir)/libltdl/libltdlc.la
+endif
+if LIBLTDL1
+AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
+endif
 
 check_PROGRAMS = \
 	SpriteButtonEventsTest \
