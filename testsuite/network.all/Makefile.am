@@ -58,11 +58,20 @@ AM_LDFLAGS =
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libsound/libgnashsound.la \
 	$(OPENGL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 	$(MING_LIBS) \
 	$(NULL)
+
+if LIBLTDL2
+AM_LDFLAGS  += $(top_builddir)/libltdl/libltdlc.la
+endif
+if LIBLTDL1
+AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
+endif
 
 if BUILD_SSL
 TEST_SSL = test_ssl

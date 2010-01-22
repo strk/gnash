@@ -26,9 +26,18 @@ AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libsound/libgnashsound.la \
 	$(BOOST_LIBS) \
 	$(DEJAGNU_CFLAGS) \
 	$(PTHREAD_LIBS)
+
+if LIBLTDL2
+AM_LDFLAGS  += $(top_builddir)/libltdl/libltdlc.la
+endif
+if LIBLTDL1
+AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
+endif
 
 localedir = $(datadir)/locale
 
