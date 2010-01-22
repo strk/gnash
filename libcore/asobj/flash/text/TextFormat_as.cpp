@@ -552,7 +552,9 @@ textformat_align(const fn_call& fn)
 /// The TextFormat's format values are used to calculate what the dimensions
 /// of a TextField would be if it contained the given text.
 //
-/// Device / Embedded fonts?
+/// This may never apply to embedded fonts. There is no way to instruct the
+/// function to use embedded fonts, so it makes sense if it always chooses
+/// the device font.
 as_value
 textformat_getTextExtent(const fn_call& fn)
 {
@@ -591,9 +593,15 @@ textformat_getTextExtent(const fn_call& fn)
         fontlib::get_font(*relay->font(), bold, italic) :
         fontlib::get_default_font().get();
     
-    const double scale = size / pixelsToTwips(f->unitsPerEM(false));
+    /// Advance, descent, ascent given according to square of 1024.
+    //
+    /// An ascent of 1024 is equal to the whole size of the character, so
+    /// 240 twips for a size 12.
+    const double scale = size / static_cast<double>(f->unitsPerEM(false));
 
-    double height = size + f->ascent() * scale + leading;
+    log_debug("Size: %s, scale: %s, ascent: %s", size, scale, f->ascent());
+
+    double height = size;
     double width = 0;
 
     double curr = 0;
@@ -603,7 +611,7 @@ textformat_getTextExtent(const fn_call& fn)
             it != e; ++it) {
 
         int index = f->get_glyph_index(*it, false);
-        const double advance = f->get_advance(index, false) * scale;
+        const double advance = f->get_advance(index, false) ;
         if (limitWidth && curr + advance > width) {
             curr = 0;
             height += size + (f->ascent() * scale);
@@ -613,8 +621,8 @@ textformat_getTextExtent(const fn_call& fn)
 
     }
 
-    const double ascent = twipsToPixels(f->ascent() * scale * size);
-    const double descent = twipsToPixels(f->descent() * scale * size);
+    const double ascent = twipsToPixels(f->ascent() * scale);
+    const double descent = twipsToPixels(f->descent() * scale);
 
     Global_as& gl = getGlobal(fn);
     as_object* obj = new as_object(gl);
