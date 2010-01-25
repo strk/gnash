@@ -39,43 +39,81 @@ namespace gnash {
 // Functions and templates for reducing code duplication.
 namespace {
 
-struct
-PositiveTwips
+/// Set functors may need access to fn_call resources, e.g. SWF version.
+//
+/// Currently only as_value::to_string() needs this, but in future other
+/// conversions may follow.
+struct SetBase
 {
+    SetBase(const fn_call& fn) : _fn(fn) {}
+    const fn_call& fn() const {
+        return _fn;
+    }
+private:
+    const fn_call& _fn;
+};
+
+/// Convert pixels to twips, treating negative values as 0.
+struct
+PositiveTwips : SetBase
+{
+    PositiveTwips(const fn_call& fn) : SetBase(fn) {}
     int operator()(const as_value& val) const {
         return pixelsToTwips(std::max<int>(toInt(val), 0));
     }
 };
 
+/// Convert an argument from a number of pixels into twips.
 struct
-TwipsToPixels
+PixelsToTwips : SetBase
 {
-    template<typename T> double operator()(const T& t) const {
-        return twipsToPixels(t);
-    }
-};
-
-struct
-PixelsToTwips
-{
+    PixelsToTwips(const fn_call& fn) : SetBase(fn) {}
     boost::int32_t operator()(const as_value& val) const {
         return pixelsToTwips(val.to_number());
     }
 };
 
+/// Convert the as_value to a boolean.
 struct
-ToBool
+ToBool : SetBase
 {
+    ToBool(const fn_call& fn) : SetBase(fn) {}
     bool operator()(const as_value& val) const {
         return val.to_bool();
     }
 };
 
+/// Convert the as_value to a string.
+struct
+ToString : SetBase
+{
+    ToString(const fn_call& fn) : SetBase(fn) {}
+    std::string operator()(const as_value& val) const {
+        return val.to_string(getSWFVersion(fn()));
+    }
+};
+
+
+/// Get functors.
+//
+/// Conversions and processing are done when setting, so these functors should
+/// be relatively simple.
+
+/// Do nothing, i.e. return exactly the same argument that was passed.
 struct
 Nothing
 {
     template<typename T> const T& operator()(const T& val) const {
         return val;
+    }
+};
+
+/// Convert internal twip values to pixel values for ActionScript.
+struct
+TwipsToPixels
+{
+    template<typename T> double operator()(const T& t) const {
+        return twipsToPixels(t);
     }
 };
 
@@ -104,7 +142,9 @@ struct Set
             return as_value();
         }
 
-        (relay->*F)(P()(arg));
+        // The function P takes care of converting the argument to the
+        // required type.
+        (relay->*F)(P(fn)(arg));
         return as_value();
     }
 
@@ -158,13 +198,13 @@ namespace {
 	TextField::TextAlignment parseAlignString(const std::string& align);
 	TextField::TextFormatDisplay parseDisplayString(const std::string& display);
 
+    /// Align works a bit differently, so is currently not a template.
     as_value textformat_align(const fn_call& fn);
+
+    /// Display is never null, so not a template.
 	as_value textformat_display(const fn_call& fn);
 	as_value textformat_tabStops(const fn_call& fn);
-	as_value textformat_target(const fn_call& fn);
-	as_value textformat_url(const fn_call& fn);
 	as_value textformat_color(const fn_call& fn);
-	as_value textformat_font(const fn_call& fn);
 	as_value textformat_getTextExtent(const fn_call& fn);
 
 }
@@ -203,8 +243,13 @@ registerTextFormatNative(as_object& o)
     // instead of one function for both. Needs testing.
     vm.registerNative(textformat_new, 110, 0);
     
-    vm.registerNative(textformat_font, 110, 1);
-    vm.registerNative(textformat_font, 110, 2);
+    vm.registerNative(
+            Get<const TextFormat_as, std::string, &TextFormat_as::font>::get,
+            110, 1);
+    vm.registerNative(
+            Set<TextFormat_as, std::string, &TextFormat_as::fontSet,
+            ToString>::set, 
+            110, 2);
     
     vm.registerNative(
             Get<const TextFormat_as, boost::uint16_t,
@@ -218,11 +263,21 @@ registerTextFormatNative(as_object& o)
     vm.registerNative(textformat_color, 110, 5);
     vm.registerNative(textformat_color, 110, 6);
     
-    vm.registerNative(textformat_url, 110, 7);
-    vm.registerNative(textformat_url, 110, 8);
+    vm.registerNative(
+            Get<const TextFormat_as, std::string, &TextFormat_as::url>::get,
+            110, 7);
+    vm.registerNative(
+            Set<TextFormat_as, std::string, &TextFormat_as::urlSet,
+            ToString>::set, 
+            110, 8);
     
-    vm.registerNative(textformat_target, 110, 9);
-    vm.registerNative(textformat_target, 110, 10);
+    vm.registerNative(
+            Get<const TextFormat_as, std::string, &TextFormat_as::target>::get,
+            110, 9);
+    vm.registerNative(
+            Set<TextFormat_as, std::string, &TextFormat_as::targetSet,
+            ToString>::set, 
+            110, 10);
     
     vm.registerNative(
             Get<const TextFormat_as, bool, &TextFormat_as::bold>::get,
@@ -301,7 +356,7 @@ registerTextFormatNative(as_object& o)
 
     vm.registerNative(
             Get<const TextFormat_as, bool, &TextFormat_as::bullet,
-            ToBool>::get, 110, 31);
+            Nothing>::get, 110, 31);
     vm.registerNative(
             Set<TextFormat_as, bool, &TextFormat_as::bulletSet,
             ToBool>::set, 
@@ -443,82 +498,20 @@ textformat_tabStops(const fn_call& fn)
 }
 
 as_value
-textformat_target(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->target()) ret.set_string(*relay->target());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->targetSet(fn.arg(0).to_string());
-	}
-
-	return ret;
-}
-
-as_value
-textformat_url(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->url()) ret.set_string(*relay->url());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->urlSet(fn.arg(0).to_string());
-	}
-
-	return ret;
-}
-
-as_value
 textformat_color(const fn_call& fn)
 {
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
-	if ( fn.nargs == 0 ) // getter
-	{
+	if (fn.nargs == 0) {
 		if (relay->color()) ret.set_double(relay->color()->toRGB());
 		else ret.set_null();
 	}
-	else // setter
-	{
+	else {
 		rgba newcolor;
 		newcolor.parseRGB(toInt(fn.arg(0)));
 		relay->colorSet(newcolor);
-	}
-
-	return ret;
-}
-
-as_value
-textformat_font(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->font()) ret.set_string(*relay->font());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->fontSet(fn.arg(0).to_string());
 	}
 
 	return ret;
@@ -529,21 +522,20 @@ textformat_align(const fn_call& fn)
 {
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
-   as_value ret;
+    as_value ret;
 
-   if ( fn.nargs == 0 ) // getter
-   {
-       if (relay->align()) {
+    if (fn.nargs == 0) {
+        if (relay->align()) {
             ret.set_string(getAlignString(*relay->align()));
         }
         else ret.set_null();
-   }
-   else // setter
-   {
-       relay->alignSet(fn.arg(0).to_string());
-   }
+    }
+    else // setter
+    {
+        relay->alignSet(fn.arg(0).to_string());
+    }
 
-   return ret;
+    return ret;
 }
 
 
