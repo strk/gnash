@@ -31,6 +31,7 @@
 #include "smart_ptr.h" 
 #include "GnashNumeric.h"
 #include "Array_as.h"
+#include "fontlib.h"
 
 
 namespace gnash {
@@ -550,12 +551,15 @@ textformat_align(const fn_call& fn)
 //
 /// The TextFormat's format values are used to calculate what the dimensions
 /// of a TextField would be if it contained the given text.
+//
+/// This may never apply to embedded fonts. There is no way to instruct the
+/// function to use embedded fonts, so it makes sense if it always chooses
+/// the device font.
 as_value
 textformat_getTextExtent(const fn_call& fn)
 {
 
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-    UNUSED(relay);    
     
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -566,26 +570,70 @@ textformat_getTextExtent(const fn_call& fn)
     }
 
     const int version = getSWFVersion(fn);
+    const std::string& s = fn.arg(0).to_string(version);
 
-    //const std::string& s = fn.arg(0).to_string(version);
+    // Everything must be in twips here.
 
     double tfw;
+    bool limitWidth = false;
     if (fn.nargs > 1) {
-        tfw = fn.arg(1).to_number();       
+        limitWidth = true;
+        tfw = pixelsToTwips(fn.arg(1).to_number());       
     }
     else {
         tfw = 0;
     }
 
+    const bool bold = relay->bold() ? *relay->bold() : false;
+    const bool italic = relay->italic() ? *relay->italic() : false;
+    const double size = relay->size() ? *relay->size() : 240;
+    const double leading = relay->leading() ? *relay->leading() : 0;
+
+    Font* f = relay->font() ?
+        fontlib::get_font(*relay->font(), bold, italic) :
+        fontlib::get_default_font().get();
+    
+    /// Advance, descent, ascent given according to square of 1024.
+    //
+    /// An ascent of 1024 is equal to the whole size of the character, so
+    /// 240 twips for a size 12.
+    const double scale = size / static_cast<double>(f->unitsPerEM(false));
+
+    log_debug("Size: %s, scale: %s, ascent: %s", size, scale, f->ascent());
+
+    double height = size;
+    double width = 0;
+
+    double curr = 0;
+
+
+    for (std::string::const_iterator it = s.begin(), e = s.end();
+            it != e; ++it) {
+
+        int index = f->get_glyph_index(*it, false);
+        const double advance = f->get_advance(index, false) * scale;
+        if (limitWidth && (curr + advance > width)) {
+            curr = 0;
+            height += size + (f->ascent() * scale);
+        }
+        curr += advance;
+        width = std::max(width, curr);
+
+    }
+
+    const double ascent = twipsToPixels(f->ascent() * scale);
+    const double descent = twipsToPixels(f->descent() * scale);
+
     Global_as& gl = getGlobal(fn);
     as_object* obj = new as_object(gl);
 
-    obj->init_member("textFieldHeight", 0.0);
-    obj->init_member("textFieldWidth", tfw);
-    obj->init_member("width", 0.0);
-    obj->init_member("height", 0.0);
-    obj->init_member("ascent", 0.0);
-    obj->init_member("descent", 0.0);
+    obj->init_member("textFieldHeight", twipsToPixels(height) + 4);
+    obj->init_member("textFieldWidth",
+            limitWidth ? twipsToPixels(tfw) : twipsToPixels(width) + 4);
+    obj->init_member("width", twipsToPixels(width));
+    obj->init_member("height", twipsToPixels(height));
+    obj->init_member("ascent", ascent);
+    obj->init_member("descent", descent);
 
     return as_value(obj);
 

@@ -1290,7 +1290,7 @@ TextField::scrollLines()
 {
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight /
-    static_cast<float>(_font->unitsPerEM(_embedFonts));
+        static_cast<float>(_font->unitsPerEM(_embedFonts));
     float fontLeading = _font->leading() * scale;
     _linesindisplay = _bounds.height() / (fontHeight + fontLeading + PADDING_TWIPS);
     if (_linesindisplay > 0) { //no need to place lines if we can't fit any
@@ -1338,7 +1338,7 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     LineStarts::const_iterator linestartend = _line_starts.end();
     
     float scale = _fontHeight /
-    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
+        static_cast<float>(_font->unitsPerEM(_embedFonts)); 
     float fontLeading = _font->leading() * scale;
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...

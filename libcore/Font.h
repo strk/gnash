@@ -51,153 +51,160 @@ namespace gnash {
 class kerning_pair
 {
 public:
-	boost::uint16_t	m_char0, m_char1;
+    boost::uint16_t    m_char0, m_char1;
 
-	bool operator==(const kerning_pair& k) const
-	{
-		return m_char0 == k.m_char0 && m_char1 == k.m_char1;
-	}
+    bool operator==(const kerning_pair& k) const
+    {
+        return m_char0 == k.m_char0 && m_char1 == k.m_char1;
+    }
 };
 
 // for use in standard algorithms
 inline bool
 operator< (const kerning_pair& p1, const kerning_pair& p2)
 {
-	if (p1.m_char0 < p2.m_char0) return true;
-	if (p1.m_char0 == p2.m_char0) {
-		if (p1.m_char1 < p2.m_char1) return true;
+    if (p1.m_char0 < p2.m_char0) return true;
+    if (p1.m_char0 == p2.m_char0) {
+        if (p1.m_char1 < p2.m_char1) return true;
     }
     
     return false;
 }
 
-/// \brief
-/// A 'Font' definition as read from SWF::DefineFont,
-/// SWF::DefineFont2 or SWF::DefineFont3 tags.
-/// Includes definitions from SWF::DefineFontInfo tags
-///
+
+/// A Font resource.
+//
+/// All fonts used in the course of rendering a SWF are represented by this
+/// class. Fonts may be either embedded or device fonts.
 class Font : public ExportableResource
 {
 public:
 
     // This table maps from Unicode DisplayObject number to glyph index.
-	typedef std::map<boost::uint16_t, int> CodeTable;
+    typedef std::map<boost::uint16_t, int> CodeTable;
 
-	Font(std::auto_ptr<SWF::DefineFontTag> ft);
+    Font(std::auto_ptr<SWF::DefineFontTag> ft);
 
-	/// Create a device-font only font, using the given name to find it
-	//
-	/// @param name
-	///	Name of the font face to look for.
-	///
-	/// @param bold
-	///	Whether to use the bold variant of the font.
-	///
-	/// @param italic
-	///	Whether to use the italic variant of the font.
-	Font(const std::string& name, bool bold=false, bool italic=false);
+    /// Create a device-font only font, using the given name to find it
+    //
+    /// @param name
+    ///    Name of the font face to look for.
+    ///
+    /// @param bold
+    ///    Whether to use the bold variant of the font.
+    ///
+    /// @param italic
+    ///    Whether to use the italic variant of the font.
+    Font(const std::string& name, bool bold=false, bool italic=false);
 
-	~Font();
+    ~Font();
 
     boost::uint16_t codeTableLookup(int glyph, bool embedded) const;
 
-	/// Return true if this font matches given name and flags
-	//
-	/// @param name
-	///	Font name
-	///
-	/// @param bold
-	///	Bold flag
-	///
-	/// @param italic
-	///	Italic flag
-	bool matches(const std::string& name, bool bold, bool italic) const;
+    /// Return true if this font matches given name and flags
+    //
+    /// @param name
+    ///    Font name
+    ///
+    /// @param bold
+    ///    Bold flag
+    ///
+    /// @param italic
+    ///    Italic flag
+    bool matches(const std::string& name, bool bold, bool italic) const;
 
-	void testInvariant()
-	{
-	}
-
-	/// Get glyph by index.
-	//
-	/// @param glyph_index
-	///	Index of the glyph. See get_glyph_index() to obtain by character code.
-	///
-	/// @param embedded
-	///	If true, queries the 'embedded' glyphs table, 
-	///	otherwise, looks in the 'device' font table.
-	///
-	/// @return
-	///	The glyph outline, or NULL if out of range. (would be a
+    /// Get glyph by index.
+    //
+    /// @param glyph_index
+    ///   Index of the glyph. See get_glyph_index() to obtain by character code.
+    ///
+    /// @param embedded
+    ///    If true, queries the 'embedded' glyphs table, 
+    ///    otherwise, looks in the 'device' font table.
+    ///
+    /// @return
+    ///    The glyph outline, or NULL if out of range. (would be a
     /// programming error most likely). The ShapeRecord is owned by
     /// the Font class.
     SWF::ShapeRecord* get_glyph(int glyph_index, bool embedded) const;
 
-	/// Get name of this font. 
-	const std::string& name() const { return _name; }
+    /// Get name of this font. 
+    const std::string& name() const { return _name; }
 
-	/// Return the glyph index for a given character code
-	//
-	/// @param code
-	///	Character code to fetch the corresponding glyph index of.
-	///
-	/// @param embedded
-	///	If true, queries the 'embedded' glyphs table, 
-	///	otherwise, looks in the 'device' font table.
-	///
-	/// Note, when querying device fonts, glyphs are created on demand,
-	/// this never happens for embedded fonts, in which case an unexistent
-	/// glyph results in a return of -1
-	///
-	/// @return -1 if there is no glyph for the specified code or a valid
-	///         positive index to use in subsequent calls to other glyph-index-based
-	///	    methods.
-	///
-	int	get_glyph_index(boost::uint16_t code, bool embedded) const;
+    /// Return the glyph index for a given character code
+    //
+    /// @param code
+    ///    Character code to fetch the corresponding glyph index of.
+    ///
+    /// @param embedded
+    ///    If true, queries the 'embedded' glyphs table, 
+    ///    otherwise, looks in the 'device' font table.
+    ///
+    /// Note, when querying device fonts, glyphs are created on demand,
+    /// this never happens for embedded fonts, in which case an unexistent
+    /// glyph results in a return of -1
+    ///
+    /// @return -1 if there is no glyph for the specified code or a valid
+    ///         positive index to use in subsequent calls to other
+    ///         glyph-index-based methods.
+    ///
+    int get_glyph_index(boost::uint16_t code, bool embedded) const;
 
-	/// Return the advance value for the given glyph index
-	//
-	/// @param glyph_index
-	///	Index of the glyph. See get_glyph_index() to obtain by character code.
-	///
-	/// @param embedded
-	///	If true, queries the 'embedded' glyphs table, 
-	///	otherwise, looks in the 'device' font table.
-	///
-	float get_advance(int glyph_index, bool embedded) const;
+    /// Return the advance value for the given glyph index
+    //
+    /// Note: use unitsPerEM() to get the EM square.
+    //
+    /// @param glyph_index      Index of the glyph. See get_glyph_index()
+    ///                         to obtain by character code.
+    ///
+    /// @param embedded         If true, queries the 'embedded' glyphs table, 
+    ///                         otherwise, looks in the 'device' font table.
+    float get_advance(int glyph_index, bool embedded) const;
 
-	/// \brief
-	/// Return the adjustment in advance between the given two
-	/// DisplayObjects (makes sense for embedded glyphs only)
-	//
-	/// Normally this will be 0
-	///
-	/// NOTE: don't call this method when willing to work with device
-	///       fonts, or you'll end up mixing information from device fonts
-	///	  with information from embedded fonts.
-	///
-	float get_kerning_adjustment(int last_code, int this_code) const;
+    /// Return the adjustment in advance between the given two
+    /// DisplayObjects (makes sense for embedded glyphs only)
+    //
+    /// Normally this will be 0
+    ///
+    /// NOTE: don't call this method when willing to work with device
+    ///       fonts, or you'll end up mixing information from device fonts
+    ///      with information from embedded fonts.
+    ///
+    float get_kerning_adjustment(int last_code, int this_code) const;
 
-	/// Return height of the EM square used for glyphs definition
-	//
-	/// @param embedded
-	///	If true, return is based on the SWF tag the font
-	///	was read from, otherwise will query the FreeTypeGlyphsProvider
-	///
-	unsigned short int unitsPerEM(bool embedded) const;
+    /// Return height of the EM square used for glyphs definition
+    //
+    /// @param embedded     If true, return is based on the SWF tag the font
+    ///                     was read from, otherwise will query the
+    ///                     FreeTypeGlyphsProvider
+    size_t unitsPerEM(bool embedded) const;
 
-    // TODO: what about device fonts?
+    /// Return the ascent value of the font.
+    //
+    /// Note: use unitsPerEM() to get the EM square.
     float ascent() const;
         
-    // TODO: what about device fonts?
-	float leading() const;
+    /// Return the leading value of the font.
+    //
+    /// Note: use unitsPerEM() to get the EM square.
+    float leading() const;
  
-    // TODO: what about device fonts?
+    /// Return the descent value of the font in EM units.
+    //
+    /// Note: use unitsPerEM() to get the EM square.
     float descent() const;
         
-	bool is_subpixel_font() const;
+    bool is_subpixel_font() const;
 
-	bool isBold() const { return _bold; }
-	bool isItalic() const { return _italic; }
+    /// Return true if the font is bold.
+    bool isBold() const {
+        return _bold;
+    }
+    
+    /// Return true if the font is italic.
+    bool isItalic() const {
+        return _italic;
+    }
 
     /// A pair of strings describing the font.
     //
@@ -226,7 +233,7 @@ public:
         float advance;
     };
 
-	typedef std::vector<GlyphInfo> GlyphInfoRecords;
+    typedef std::vector<GlyphInfo> GlyphInfoRecords;
 
     /// Add display name and copyright name for an embedded font.
     //
@@ -256,41 +263,41 @@ public:
 
 private:
 
-	/// Add a glyph from the os font into the device glyphs table
-	//
-	/// It is assumed that the glyph tables do NOT contain
-	/// an entry for the given code.
-	/// Initializes the rasterizer if not already done so.
-	///
-	/// @return index of the newly added glyph, or -1 on error.
-	///
-	int add_os_glyph(boost::uint16_t code);
+    /// Add a glyph from the os font into the device glyphs table
+    //
+    /// It is assumed that the glyph tables do NOT contain
+    /// an entry for the given code.
+    /// Initializes the rasterizer if not already done so.
+    ///
+    /// @return index of the newly added glyph, or -1 on error.
+    ///
+    int add_os_glyph(boost::uint16_t code);
 
-	/// Initialize the freetype rasterizer
-	//
-	/// NOTE: this is 'const' for lazy initialization.
-	///
-	/// Return true on success, false on error
-	///
-	bool initDeviceFontProvider() const;
+    /// Initialize the freetype rasterizer
+    //
+    /// NOTE: this is 'const' for lazy initialization.
+    ///
+    /// Return true on success, false on error
+    ///
+    bool initDeviceFontProvider() const;
 
     /// If we were constructed from a definition, this is not NULL.
     boost::scoped_ptr<SWF::DefineFontTag> _fontTag;
 
-	// Device glyphs
-	GlyphInfoRecords _deviceGlyphTable;
+    // Device glyphs
+    GlyphInfoRecords _deviceGlyphTable;
 
-	std::string	_name;
+    std::string    _name;
     std::string _displayName;
     std::string _copyrightName;
 
-	bool	_unicodeChars;
-	bool	_shiftJISChars;
-	bool	_ansiChars;
-	bool	_italic;
-	bool	_bold;
+    bool    _unicodeChars;
+    bool    _shiftJISChars;
+    bool    _ansiChars;
+    bool    _italic;
+    bool    _bold;
 
-	/// Code to index table for embedded glyphs
+    /// Code to index table for embedded glyphs
     //
     /// This can be NULL if an embedded font should not be
     /// substituted by a device font. This can arise with
@@ -303,18 +310,18 @@ private:
     /// of CodeTables from a DefineFontInfo tag.
     boost::shared_ptr<const CodeTable> _embeddedCodeTable; 
 
-	/// Code to index table for device glyphs
-	CodeTable _deviceCodeTable; 
+    /// Code to index table for device glyphs
+    CodeTable _deviceCodeTable; 
 
-	typedef std::map<kerning_pair, float> kernings_table;
-	kernings_table m_kerning_pairs;
+    typedef std::map<kerning_pair, float> kernings_table;
+    kernings_table m_kerning_pairs;
 
-	mutable std::auto_ptr<FreetypeGlyphsProvider> _ftProvider;
+    mutable std::auto_ptr<FreetypeGlyphsProvider> _ftProvider;
 
 };
 
 
-}	// end namespace gnash
+}    // end namespace gnash
 
 
 
