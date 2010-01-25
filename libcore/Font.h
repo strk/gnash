@@ -269,6 +269,9 @@ public:
     GlyphInfoRecords::size_type glyphCount() const;
 
     /// Retrieve the FreetypeGlyphsProvider, initializing it if necessary.
+    //
+    /// Always use this method rather than directly accessing the _ftProvider
+    /// member to ensure that the provider is initialized. May return null.
     FreetypeGlyphsProvider* ftProvider() const;
 
 private:
