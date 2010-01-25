@@ -605,6 +605,9 @@ textformat_getTextExtent(const fn_call& fn)
     double height = size;
     double width = 0;
     double curr = 0;
+    
+    const double ascent = f->ascent(false) * scale;
+    const double descent = f->descent(false) * scale;
 
     for (std::string::const_iterator it = s.begin(), e = s.end();
             it != e; ++it) {
@@ -613,15 +616,12 @@ textformat_getTextExtent(const fn_call& fn)
         const double advance = f->get_advance(index, false) * scale;
         if (limitWidth && (curr + advance > width)) {
             curr = 0;
-            height += size + (f->ascent() * scale);
+            height += size;
         }
         curr += advance;
         width = std::max(width, curr);
 
     }
-
-    const double ascent = twipsToPixels(f->ascent() * scale);
-    const double descent = twipsToPixels(f->descent() * scale);
 
     Global_as& gl = getGlobal(fn);
     as_object* obj = new as_object(gl);
@@ -631,8 +631,8 @@ textformat_getTextExtent(const fn_call& fn)
             limitWidth ? twipsToPixels(tfw) : twipsToPixels(width) + 4);
     obj->init_member("width", twipsToPixels(width));
     obj->init_member("height", twipsToPixels(height));
-    obj->init_member("ascent", ascent);
-    obj->init_member("descent", descent);
+    obj->init_member("ascent", twipsToPixels(ascent));
+    obj->init_member("descent", twipsToPixels(descent));
 
     return as_value(obj);
 

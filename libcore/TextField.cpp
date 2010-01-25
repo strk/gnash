@@ -1015,8 +1015,7 @@ TextField::setTextFormat(TextFormat_as& tf)
 }
 
 float
-TextField::align_line(TextAlignment align,
-        int last_line_start_record, float x)
+TextField::align_line(TextAlignment align, int last_line_start_record, float x)
 {
 
     float width = _bounds.width(); 
@@ -1186,13 +1185,13 @@ TextField::format_text()
 
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight /
-    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
-    float fontDescent = _font->descent() * scale; 
-    float fontLeading = _font->leading() * scale;
-    boost::uint16_t leftMargin = getLeftMargin();
-    boost::uint16_t indent = getIndent();
-    boost::uint16_t blockIndent = getBlockIndent();
-    bool underlined = getUnderlined();
+        static_cast<float>(_font->unitsPerEM(_embedFonts)); 
+    const float fontDescent = _font->descent(_embedFonts) * scale; 
+    const float fontLeading = _font->leading() * scale;
+    const boost::uint16_t leftMargin = getLeftMargin();
+    const boost::uint16_t indent = getIndent();
+    const boost::uint16_t blockIndent = getBlockIndent();
+    const bool underlined = getUnderlined();
 
     //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
     //  getTarget(), fontDescent, fontLeading, fontHeight, scale);
@@ -1203,7 +1202,7 @@ TextField::format_text()
     rec.setColor(getTextColor()); 
     rec.setXOffset(PADDING_TWIPS + 
             std::max(0, leftMargin + indent + blockIndent));
-    rec.setYOffset(PADDING_TWIPS + fontHeight + (fontLeading - fontDescent));
+    rec.setYOffset(PADDING_TWIPS + fontHeight + fontLeading);
     rec.setTextHeight(fontHeight);
 	
 	// create in textrecord.h
@@ -1243,7 +1242,7 @@ TextField::format_text()
     boost::int32_t y = static_cast<boost::int32_t>(rec.yOffset());
 
     // Start the bbox at the upper-left corner of the first glyph.
-    reset_bounding_box(x, y - fontDescent + fontHeight); 
+    reset_bounding_box(x, y + fontHeight); 
     
     int last_code = -1; // only used if _embedFonts
     int last_space_glyph = -1;
@@ -1424,8 +1423,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
     LineStarts::const_iterator linestartend = _line_starts.end();
     
     float scale = _fontHeight /
-    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
-    float fontDescent = _font->descent() * scale; 
+        static_cast<float>(_font->unitsPerEM(_embedFonts)); 
+    float fontDescent = _font->descent(_embedFonts) * scale; 
     float fontLeading = _font->leading() * scale;
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...

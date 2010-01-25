@@ -75,7 +75,15 @@ operator< (const kerning_pair& p1, const kerning_pair& p2)
 /// A Font resource.
 //
 /// All fonts used in the course of rendering a SWF are represented by this
-/// class. Fonts may be either embedded or device fonts.
+/// class. There are two types of Font object: device fonts and glyph fonts
+/// (also called embedded fonts). Device fonts contain no embedded glyphs,
+/// but glyph fonts may be rendered using device fonts if requested during
+/// runtime.
+//
+/// The fact that one Font object may represent an embedded and a device
+/// font simultaneously means that callers must themselves ensure they
+/// specify which font they require. Failure to do this consistently may mean
+/// callers end up with the wrong information about a font.
 class Font : public ExportableResource
 {
 public:
@@ -182,17 +190,17 @@ public:
     /// Return the ascent value of the font.
     //
     /// Note: use unitsPerEM() to get the EM square.
-    float ascent() const;
+    float ascent(bool embedded) const;
         
+    /// Return the descent value of the font in EM units.
+    //
+    /// Note: use unitsPerEM() to get the EM square.
+    float descent(bool embedded) const;
+
     /// Return the leading value of the font.
     //
     /// Note: use unitsPerEM() to get the EM square.
     float leading() const;
- 
-    /// Return the descent value of the font in EM units.
-    //
-    /// Note: use unitsPerEM() to get the EM square.
-    float descent() const;
         
     bool is_subpixel_font() const;
 

@@ -338,13 +338,13 @@ Font::leading() const {
 }
 
 float
-Font::ascent() const {
-    return _fontTag ? _fontTag->ascent() : _ftProvider->ascent();
+Font::ascent(bool embedded) const {
+    return (embedded && _fontTag) ? _fontTag->ascent() : _ftProvider->ascent();
 }
-    
+
 float
-Font::descent() const {
-    return _fontTag ? _fontTag->descent() : _ftProvider->descent();
+Font::descent(bool embedded) const {
+    return (embedded && _fontTag) ? _fontTag->ascent() : _ftProvider->ascent();
 }
     
 bool
