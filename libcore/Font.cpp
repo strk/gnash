@@ -344,7 +344,8 @@ Font::ascent(bool embedded) const {
 
 float
 Font::descent(bool embedded) const {
-    return (embedded && _fontTag) ? _fontTag->ascent() : _ftProvider->ascent();
+    return (embedded && _fontTag) ? _fontTag->descent() :
+                                    _ftProvider->descent();
 }
     
 bool
