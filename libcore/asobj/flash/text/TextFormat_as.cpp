@@ -117,7 +117,7 @@ struct Set
 /// @tparam F       The function to call to retrieve the value.
 /// @tparam P       A function object to be applied to the argument before
 ///                 returning the value.
-template<typename T, typename U, const Optional<U>&(T::*F)(),
+template<typename T, typename U, const Optional<U>&(T::*F)() const,
     typename P = Nothing>
 struct Get
 {
