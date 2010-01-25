@@ -35,7 +35,9 @@ namespace jpeg {
 // jpeglib.h redefines HAVE_STDLIB_H. This silences
 // the warnings, but it's not good.
 #undef HAVE_STDLIB_H
+extern "C" {
 #include <jpeglib.h>
+}
 #undef HAVE_STDLIB_H
 
 }

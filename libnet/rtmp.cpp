@@ -1474,6 +1474,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 
 } // end of gnash namespace
 
+
 // local Variables:
 // mode: C++
 // indent-tabs-mode: t

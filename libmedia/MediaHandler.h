@@ -20,10 +20,6 @@
 #ifndef GNASH_MEDIAHANDLER_H
 #define GNASH_MEDIAHANDLER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "MediaParser.h" // for videoCodecType and audioCodecType enums
 #include "dsodefs.h" // DSOEXPORT
 #include "VideoConverter.h"

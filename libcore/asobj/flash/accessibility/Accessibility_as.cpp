@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "Accessibility_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"

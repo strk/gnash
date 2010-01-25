@@ -18,10 +18,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "GnashSystemNetHeaders.h"
 #include "log.h"
 #include "GnashException.h"

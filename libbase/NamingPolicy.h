@@ -20,10 +20,6 @@
 #ifndef GNASH_NAMINGPOLICY_H
 #define GNASH_NAMINGPOLICY_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "URL.h"
 #include "dsodefs.h"
 

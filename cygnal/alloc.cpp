@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 /// This defines thread safe new/delete operators
 #include <new>
 #include <boost/thread/mutex.hpp>

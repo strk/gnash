@@ -20,9 +20,6 @@
 #ifndef GNASH_ASOBJ3_FONT_H
 #define GNASH_ASOBJ3_FONT_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 
 namespace gnash {

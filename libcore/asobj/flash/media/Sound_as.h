@@ -20,9 +20,6 @@
 #ifndef GNASH_ASOBJ3_SOUND_H
 #define GNASH_ASOBJ3_SOUND_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include "smart_ptr.h" //GNASH_USE_GC
 #include "as_object.h"

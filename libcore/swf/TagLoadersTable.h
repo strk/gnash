@@ -19,10 +19,6 @@
 #ifndef GNASH_SWF_TAGLOADERSTABLE_H
 #define GNASH_SWF_TAGLOADERSTABLE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "SWF.h"
 
 #include <map>

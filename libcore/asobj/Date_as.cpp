@@ -64,10 +64,6 @@
 //    not to use it for time and date functions (though for portable
 //    timing it might well be useful).
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "log.h"
 #include "GnashNumeric.h"
 #include "Date_as.h"

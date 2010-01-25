@@ -19,10 +19,6 @@
 #ifndef GNASH_FN_CALL_H
 #define GNASH_FN_CALL_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "as_environment.h" 
 #include "as_object.h"
 #include "smart_ptr.h"

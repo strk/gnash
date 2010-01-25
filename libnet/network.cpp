@@ -1612,13 +1612,14 @@ Network::sniffBytesReady(int fd)
     if (select(fd+1, &fdset, NULL, NULL, &tval)) {
  	if (FD_ISSET(fd, &fdset)) {
 #ifndef _WIN32
- 	    ioctl(fd, FIONREAD, &bytes);
+	    ioctl(fd, FIONREAD, &bytes);
 #else
- 	    ioctlSocket(fd, FIONREAD, &bytes);
+	    ioctlSocket(fd, FIONREAD, &bytes);
 #endif
- 	    log_network("#%d bytes waiting in kernel network buffer.", bytes);
- 	}
+	}
     }
+
+    log_network("#%d bytes waiting in kernel network buffer.", bytes);
     
     return bytes;
 }

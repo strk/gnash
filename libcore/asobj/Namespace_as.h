@@ -21,10 +21,6 @@
 #ifndef GNASH_ASOBJ_NAMESPACE_H
 #define GNASH_ASOBJ_NAMESPACE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 namespace gnash {
 
 class as_object;

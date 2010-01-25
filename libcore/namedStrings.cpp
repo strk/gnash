@@ -18,10 +18,6 @@
 // A file to contain all of the different strings for which we want compile time
 // known string table keys.
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "namedStrings.h"
 #include "string_table.h"
 #include "GnashAlgorithm.h"

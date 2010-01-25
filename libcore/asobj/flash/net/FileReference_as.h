@@ -21,9 +21,6 @@
 #ifndef __GNASH_ASOBJ_FILEREFERENCE_H__
 #define __GNASH_ASOBJ_FILEREFERENCE_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 //#include <memory> // for auto_ptr
 

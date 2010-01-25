@@ -19,10 +19,6 @@
 #ifndef GNASH_SWF_FUNCTION_H
 #define GNASH_SWF_FUNCTION_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC
-#endif
-
 #include "as_function.h" // for inheritance
 #include "as_object.h" // for composition (vector element)
 #include "VM.h" //fow SWF version

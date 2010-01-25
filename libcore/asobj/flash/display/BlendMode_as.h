@@ -20,10 +20,6 @@
 #ifndef GNASH_ASOBJ3_BLENDMODE_H
 #define GNASH_ASOBJ3_BLENDMODE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 
 // Forward declarations
 class as_object;

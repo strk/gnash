@@ -19,10 +19,6 @@
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_function.h"
 #include "ActionExec.h"

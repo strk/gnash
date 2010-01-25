@@ -17,9 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include "xml/XMLNode_as.h"
 #include "xml/XMLDocument_as.h"

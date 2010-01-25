@@ -21,9 +21,6 @@
 #ifndef GNASH_ASOBJ_EXTERNALINTERFACE_H
 #define GNASH_ASOBJ_EXTERNALINTERFACE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 //#include <memory> // for auto_ptr
 

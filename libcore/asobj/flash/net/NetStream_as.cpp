@@ -19,9 +19,6 @@
 //
 
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include "NetStream_as.h"
 #include "CharacterProxy.h"

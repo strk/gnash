@@ -28,10 +28,6 @@
 //	  change the mouse cursor to the hand cursor standard for linkable 
 //    text
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "utf8.h"
 #include "log.h"
 #include "swf/DefineEditTextTag.h"

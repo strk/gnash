@@ -20,10 +20,6 @@
 #ifndef GNASH_ASOBJ3_IOERROR_H
 #define GNASH_ASOBJ3_IOERROR_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 
 namespace gnash {
 

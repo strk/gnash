@@ -20,9 +20,6 @@
 #ifndef GNASH_ASOBJ3_URLLOADER_H
 #define GNASH_ASOBJ3_URLLOADER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 
 namespace gnash {

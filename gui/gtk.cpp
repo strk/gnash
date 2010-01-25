@@ -173,7 +173,11 @@ GtkGui::init(int argc, char **argv[])
     addPixmapDirectory (PKGDATADIR);
 
     if (_xid) {
+#ifdef _WIN32
+        _window = gtk_plug_new((void *)_xid);
+#else
         _window = gtk_plug_new(_xid);
+#endif
         log_debug (_("Created XEmbedded window"));
     } else {
 #ifdef GUI_HILDON

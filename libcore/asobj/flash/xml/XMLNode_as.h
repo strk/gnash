@@ -20,9 +20,6 @@
 #ifndef GNASH_ASOBJ3_XMLNODE_H
 #define GNASH_ASOBJ3_XMLNODE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include "as_object.h"
 #include "smart_ptr.h" // GNASH_USE_GC

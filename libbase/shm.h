@@ -19,10 +19,6 @@
 #ifndef __SHM_H__
 #define __SHM_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <string>
 
 #include <sys/types.h>

@@ -21,10 +21,6 @@
 #ifndef GNASH_ASOBJ_BITMAPDATA_H
 #define GNASH_ASOBJ_BITMAPDATA_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "smart_ptr.h"
 #include "as_object.h"
 

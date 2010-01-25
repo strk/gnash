@@ -20,9 +20,6 @@
 #ifndef GNASH_NETSTREAM_H
 #define GNASH_NETSTREAM_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS

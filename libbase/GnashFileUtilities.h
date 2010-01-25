@@ -28,7 +28,6 @@
 #ifndef GNASH_FILE_UTILITIES_H
 #define GNASH_FILE_UTILITIES_H
 
-#include "gnashconfig.h"
 #include "dsodefs.h"
 
 #if !defined(_MSC_VER)

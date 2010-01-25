@@ -21,10 +21,6 @@
 #ifndef NULL_SOUND_HANDLER_H
 #define NULL_SOUND_HANDLER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "sound_handler.h" // for inheritance
 #include "SoundInfo.h" 
 #include "dsodefs.h" // for DSOEXPORT

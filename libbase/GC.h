@@ -20,10 +20,6 @@
 #ifndef GNASH_GC_H
 #define GNASH_GC_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <list>
 #include <map>
 #include <string>

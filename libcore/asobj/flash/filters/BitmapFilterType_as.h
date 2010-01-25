@@ -20,9 +20,6 @@
 #ifndef GNASH_ASOBJ3_BITMAPFILTERTYPE_H
 #define GNASH_ASOBJ3_BITMAPFILTERTYPE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 
 namespace gnash {
