@@ -280,6 +280,24 @@ xcheck_equals(tf.size, -2147483648);
 tf.size = undefined;
 check_equals(tf.size, null);
 
+// align
+tf.align = "hi";
+check_equals(tf.align, null);
+tf.align = "Left";
+check_equals(tf.align, "left");
+tf.align = "o";
+check_equals(tf.align, "left");
+tf.align = "righto";
+check_equals(tf.align, "left");
+tf.align = "center";
+check_equals(tf.align, "center");
+tf.align = "right";
+check_equals(tf.align, "right");
+tf.align = undefined;
+check_equals(tf.align, "right");
+tf.align = null;
+check_equals(tf.align, "right");
+
 // Check tabStops property.
 // The passed array is processed before assignment, not simply stored.
 tf = new TextFormat();
@@ -385,9 +403,9 @@ xcheck_equals(Math.round(te.descent), 5);
 #endif
 
 #if OUTPUT_VERSION < 7
-    check_totals(114);
+    check_totals(122);
 #elif OUTPUT_VERSION == 7
-    check_totals(150);
+    check_totals(158);
 #else 
-    check_totals(150);
+    check_totals(158);
 #endif
