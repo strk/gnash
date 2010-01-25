@@ -16,6 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
+
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
@@ -775,7 +776,7 @@ public:
     case GNASH_IMAGE_CPU:
 	texture->update(frame->data());
 	break;
-#ifdef USE_VAAPI_GLX
+#if USE_VAAPI_GLX
     case GNASH_IMAGE_GPU:
 	dynamic_cast<GnashVaapiTexture *>(texture.get())->update(dynamic_cast<GnashVaapiImage *>(frame)->surface());
 	break;
@@ -802,12 +803,12 @@ public:
     glNewList(index, GL_COMPILE);
     _render_indices.push_back(index);
   }
-  
 
 private:  
   void reallyDrawVideoFrame(boost::shared_ptr<GnashTexture> texture, const SWFMatrix* m, const SWFRect* bounds)
   {
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
+    glPushMatrix();
 
     gnash::point l, u;
     m->transform(&l, point(bounds->get_x_min(), bounds->get_y_min()));
@@ -820,16 +821,15 @@ private:
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glBegin(GL_QUADS);
     {
-       glTexCoord2f(0.0f, 0.0f); glVertex2i(0, 0);
-       glTexCoord2f(0.0f, 1.0f); glVertex2i(0, h);
-       glTexCoord2f(1.0f, 1.0f); glVertex2i(w, h);
-       glTexCoord2f(1.0f, 0.0f); glVertex2i(w, 0);
+	glTexCoord2f(0.0f, 0.0f); glVertex2i(0, 0);
+	glTexCoord2f(0.0f, 1.0f); glVertex2i(0, h);
+	glTexCoord2f(1.0f, 1.0f); glVertex2i(w, h);
+	glTexCoord2f(1.0f, 0.0f); glVertex2i(w, 0);
     }
     glEnd();
     texture->release();
- 
-    glPopMatrix();
 
+    glPopMatrix();
     glPopAttrib();
   }
 

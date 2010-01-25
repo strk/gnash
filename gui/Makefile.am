@@ -41,6 +41,7 @@ SUBDIRS += pythonmod
 endif
 DIST_SUBDIRS = pythonmod
 
+noinst_HEADERS =
 noinst_LTLIBRARIES = #libgnashgui.la
 AM_CPPFLAGS = \
         -I../.. \

@@ -161,6 +161,9 @@ namespace gnash {
     class fill_style;
     class LineStyle;
 
+    // XXX: GnashImageProxy (delayed image rendering)
+    class GnashVaapiImageProxy;
+
     namespace SWF {
         class ShapeRecord;
     }
@@ -355,6 +358,24 @@ public:
                     float x0, float x1, float y0, float y1) = 0;
 
     virtual void end_display() = 0;
+
+    /// ==================================================================
+    /// Machinery for delayed images rendering (e.g. Xv with YV12 or VAAPI)
+    /// ==================================================================
+
+    ///@{
+    typedef boost::shared_ptr<GnashVaapiImageProxy> RenderImage;
+    typedef std::vector<RenderImage> RenderImages;
+
+    virtual RenderImages::iterator getFirstRenderImage()
+      { return RenderImages::iterator(0); }
+    virtual RenderImages::const_iterator getFirstRenderImage() const
+      { return RenderImages::const_iterator(0); }
+    virtual RenderImages::iterator getLastRenderImage()
+      { return RenderImages::iterator(0); }
+    virtual RenderImages::const_iterator getLastRenderImage() const
+      { return RenderImages::const_iterator(0); }
+    ///@}
         
     ///@{ Masks
     ///

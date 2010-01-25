@@ -163,6 +163,10 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, RunResources& r)
 bool
 GtkGui::init(int argc, char **argv[])
 {
+    if (!XInitThreads()) {
+	log_debug("Failed to initialize X threading support\n");
+	return false;
+    }
 
     gtk_init(&argc, argv);
 

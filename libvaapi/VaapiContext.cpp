@@ -19,9 +19,11 @@
 
 #include "VaapiContext.h"
 #include "VaapiGlobalContext.h"
+#include "VaapiException.h"
 #include "VaapiDisplay.h"
 #include "VaapiSurface.h"
 #include "vaapi_utils.h"
+#include <boost/format.hpp>
 
 #define DEBUG 0
 #include "vaapi_debug.h"
@@ -34,23 +36,22 @@ static VaapiCodec get_codec(VAProfile profile)
     switch (profile) {
     case VAProfileMPEG2Simple:
     case VAProfileMPEG2Main:
-	return VAAPI_CODEC_MPEG2;
+        return VAAPI_CODEC_MPEG2;
     case VAProfileMPEG4Simple:
     case VAProfileMPEG4AdvancedSimple:
     case VAProfileMPEG4Main:
-	return VAAPI_CODEC_MPEG4;
+        return VAAPI_CODEC_MPEG4;
     case VAProfileH264Baseline:
     case VAProfileH264Main:
     case VAProfileH264High:
-	return VAAPI_CODEC_H264;
+        return VAAPI_CODEC_H264;
     case VAProfileVC1Simple:
     case VAProfileVC1Main:
     case VAProfileVC1Advanced:
-	return VAAPI_CODEC_VC1;
+        return VAAPI_CODEC_VC1;
     default:
-	break;
+        break;
     }
-    abort();
     return VAAPI_CODEC_UNKNOWN;
 }
 
@@ -68,7 +69,7 @@ static unsigned int get_max_surfaces(VaapiCodec codec)
     unsigned int max_surfaces;
     max_surfaces = (codec == VAAPI_CODEC_H264 ? 16 : 2) + SCRATCH_SURFACES_COUNT;
     if (max_surfaces > MAX_SURFACES_COUNT)
-	max_surfaces = MAX_SURFACES_COUNT;
+        max_surfaces = MAX_SURFACES_COUNT;
 
     return max_surfaces;
 }
@@ -82,12 +83,19 @@ VaapiContext::VaapiContext(VAProfile profile, VAEntrypoint entrypoint)
     , _picture_width(0), _picture_height(0)
 {
     D(bug("VaapiContext::VaapiContext(): profile %d, entrypoint %d\n", profile, entrypoint));
-    construct();
+
+    if (!construct()) {
+        boost::format msg;
+        msg = boost::format("Could not create VA API context for profile %s")
+            % string_of_VAProfile(profile);
+        throw VaapiException(msg.str());
+    }
 }
 
 VaapiContext::~VaapiContext()
 {
     D(bug("VaapiContext::~VaapiContext(): context 0x%08x\n", _context));
+
     destruct();
 }
 
@@ -95,11 +103,14 @@ bool VaapiContext::construct()
 {
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
     if (!gvactx)
-	return false;
+        return false;
 
     _display = gvactx->display();
     if (!_display)
-	return false;
+        return false;
+
+    if (_codec == VAAPI_CODEC_UNKNOWN)
+        return false;
 
     VAStatus status;
     VAConfigAttrib attrib;
@@ -113,7 +124,7 @@ bool VaapiContext::construct()
     VAConfigID config;
     status = vaCreateConfig(_display, _profile, _entrypoint, &attrib, 1, &config);
     if (!vaapi_check_status(status, "vaCreateConfig()"))
-	return false;
+        return false;
 
     _config = config;
     return true;
@@ -124,39 +135,39 @@ void VaapiContext::destruct()
     destroyContext();
 
     if (_config != VA_INVALID_ID) {
-	VAStatus status = vaDestroyConfig(_display, _config);
-	vaapi_check_status(status, "vaDestroyConfig()");
+        VAStatus status = vaDestroyConfig(_display, _config);
+        vaapi_check_status(status, "vaDestroyConfig()");
     }
 }
 
 bool VaapiContext::createContext(unsigned int width, unsigned int height)
 {
     if (_config == VA_INVALID_ID)
-	return false;
+        return false;
 
     const unsigned int num_surfaces = get_max_surfaces(_codec);
     std::vector<VASurfaceID> surface_ids;
     surface_ids.reserve(num_surfaces);
     for (unsigned int i = 0; i < num_surfaces; i++) {
-	VaapiSurfaceSP surface(new VaapiSurface(width, height));
-	_surfaces.push(surface);
-	surface_ids.push_back(surface->get());
+        VaapiSurfaceSP surface(new VaapiSurface(width, height));
+        _surfaces.push(surface);
+        surface_ids.push_back(surface->get());
     }
 
     VAStatus status;
     VAContextID context;
     status = vaCreateContext(_display,
-			     _config,
-			     width, height,
-			     VA_PROGRESSIVE,
-			     &surface_ids[0], surface_ids.size(),
-			     &context);
+                             _config,
+                             width, height,
+                             VA_PROGRESSIVE,
+                             &surface_ids[0], surface_ids.size(),
+                             &context);
     if (!vaapi_check_status(status, "vaCreateContext()"))
-	return false;
+        return false;
 
-    _context		= context;
-    _picture_width	= width;
-    _picture_height	= height;
+    _context            = context;
+    _picture_width      = width;
+    _picture_height     = height;
     D(bug("  -> context 0x%08x\n", _context));
     return true;
 }
@@ -166,14 +177,14 @@ void VaapiContext::destroyContext()
     VAStatus status;
 
     if (_context != VA_INVALID_ID) {
-	status = vaDestroyContext(_display,_context);
-	if (!vaapi_check_status(status, "vaDestroyContext()"))
-	    return;
-	_context = VA_INVALID_ID;
+        status = vaDestroyContext(_display,_context);
+        if (!vaapi_check_status(status, "vaDestroyContext()"))
+            return;
+        _context = VA_INVALID_ID;
     }
 
     for (unsigned int i = 0; i < _surfaces.size(); i++)
-	_surfaces.pop();
+        _surfaces.pop();
     _picture_width  = 0;
     _picture_height = 0;
 }
@@ -181,7 +192,7 @@ void VaapiContext::destroyContext()
 bool VaapiContext::initDecoder(unsigned int width, unsigned int height)
 {
     if (_picture_width == width && _picture_height == height)
-	return true;
+        return true;
 
     destroyContext();
     return createContext(width, height);

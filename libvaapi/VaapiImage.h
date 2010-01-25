@@ -21,39 +21,67 @@
 #define GNASH_VAAPIIMAGE_H
 
 #include "vaapi_common.h"
+#include "VaapiImageFormat.h"
+#include <boost/scoped_array.hpp>
+#include <memory>
+
+// Forward declarations
+struct SwsContext;
 
 namespace gnash {
 
 // Forward declarations
 class VaapiSurface;
+class VAImageWrapper;
+class SwsContextWrapper;
 
-/// VA image data
+/// VA image abstraction
 class VaapiImage {
-    VAImage		_image;
-    boost::uint8_t *	_data;
+    VaapiImageFormat    _format;
+    VAImage             _image;
+    boost::uint8_t *    _image_data;
 
-    bool map();
-    bool unmap();
+    /// Create VA image
+    bool create(unsigned int width, unsigned int height);
+
+    /// Destroy VA image
     void destroy();
 
 public:
-    VaapiImage(const VaapiSurface *surface);
+    VaapiImage(unsigned int     width,
+               unsigned int     height,
+               VaapiImageFormat format = VAAPI_IMAGE_RGB32);
     ~VaapiImage();
 
-    /// Update VA image with surface
-    bool update(const VaapiSurface *surface);
+    /// Get VA image ID
+    VAImageID get() const
+        { return _image.image_id; }
 
-    /// Get image type (FOURCC)
-    boost::uint32_t fourcc() const
-	{ return _image.format.fourcc; }
+    /// Get image format
+    VaapiImageFormat format() const
+        { return _format; }
 
-    /// Get VA image format
-    const VAImageFormat &format() const
-	{ return _image.format; }
+    /// Get image width
+    unsigned int width() const
+        { return _image.width; }
+
+    /// Get image height
+    unsigned int height() const
+        { return _image.height; }
+
+    /// Check whether the VA image is mapped
+    bool isMapped() const
+        { return _image_data != NULL; }
+
+    /// Map image data
+    bool map();
+
+    /// Unmap image data
+    bool unmap();
 
     /// Get number of planes
     unsigned int getPlaneCount() const
-	{ return _image.num_planes; }
+        { return _image.num_planes; }
 
     /// Get pixels for the specified plane
     boost::uint8_t *getPlane(int plane) const;

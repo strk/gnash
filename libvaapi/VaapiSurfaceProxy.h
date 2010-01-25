@@ -36,19 +36,16 @@ class VaapiSurfaceProxy {
 
 public:
     VaapiSurfaceProxy(boost::shared_ptr<VaapiSurface> surface,
-		      boost::shared_ptr<VaapiContext> context);
+                      boost::shared_ptr<VaapiContext> context);
     ~VaapiSurfaceProxy();
 
     /// Return VA surface
     boost::shared_ptr<VaapiSurface> get() const
-	{ return _surface; }
+        { return _surface; }
 
     /// Return VA context
     boost::shared_ptr<VaapiContext> getContext() const
-	{ return _context; }
-
-    /// Return VA image
-    std::auto_ptr<VaapiImage> getImage() const;
+        { return _context; }
 };
 
 } // gnash namespace

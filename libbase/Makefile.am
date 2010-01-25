@@ -33,7 +33,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I$(top_srcdir)/libcore	\
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libltdl \
-	-I$(top_srcdir)/libvaapi \
 	$(PTHREAD_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(GIF_CFLAGS) \
@@ -41,7 +40,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(GSTREAMER_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(Z_CFLAGS) \
-	$(LIBVA_CFLAGS) \
 	$(JPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(INCLTDL) \
@@ -49,12 +47,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
-if USE_FFMPEG_ENGINE
-libgnashbase_la_CPPFLAGS += -I$(top_srcdir)/libmedia/ffmpeg
-endif
-if USE_GST_ENGINE
-libgnashbase_la_CPPFLAGS += -I$(top_srcdir)/libmedia/gst
-endif
 
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
@@ -206,21 +198,46 @@ libgnashbase_la_LDFLAGS = -release $(VERSION)
 libgnashbase_la_DEPENDENCIES = $(LIBLTDLLIB)
 
 if BUILD_OGL_RENDERER
-   libgnashbase_la_SOURCES += GnashTexture.cpp
-   noinst_HEADERS += GnashTexture.h
+   libgnashbase_la_SOURCES += \
+	GnashTexture.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashTexture.h \
+	$(NULL)
 endif
 
 if USE_VAAPI
-   libgnashbase_la_SOURCES += GnashVaapiImage.cpp
-   noinst_HEADERS += GnashVaapiImage.h
+   libgnashbase_la_SOURCES += \
+	GnashVaapiImage.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashVaapiImage.h \
+	GnashVaapiImageProxy.h \
+	$(NULL)
 
 if USE_VAAPI_GLX
-   libgnashbase_la_SOURCES += GnashVaapiTexture.cpp
-   noinst_HEADERS += GnashVaapiTexture.h
+   libgnashbase_la_SOURCES += \
+	GnashVaapiTexture.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashVaapiTexture.h \
+	$(NULL)
 endif
 
-   libgnashbase_la_LIBADD += $(top_builddir)/libvaapi/libgnashvaapi.la
-   libgnashbase_la_DEPENDENCIES += $(top_builddir)/libvaapi/libgnashvaapi.la
+   libgnashbase_la_CPPFLAGS += \
+	-I$(top_srcdir)/libvaapi \
+	$(NULL)
+
+   libgnashbase_la_LIBADD += \
+	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(NULL)
+
+   libgnashbase_la_DEPENDENCIES += \
+	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(NULL)
 endif
 
 if WIN32

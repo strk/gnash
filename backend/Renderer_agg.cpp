@@ -129,6 +129,11 @@ AGG resources
 #include "Shape.h"
 #include "GnashNumeric.h"
 
+#if USE_VAAPI
+#include "GnashVaapiImage.h"
+#include "GnashVaapiImageProxy.h"
+#endif
+
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
 #include <agg_pixfmt_rgb.h>
@@ -645,7 +650,18 @@ public:
         mat.transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
         mat.transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
         mat.transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
-        
+
+#if USE_VAAPI
+	if (frame->location() == GNASH_IMAGE_GPU) {
+	    RenderImage image;
+	    image.reset(new GnashVaapiImageProxy(
+			    static_cast<GnashVaapiImage *>(frame),
+			    a.x, a.y, c.x - a.x, c.y - a.y));
+	    _render_images.push_back(image);
+	    return;
+	}
+#endif
+
         agg::path_storage path;
         path.move_to(a.x, a.y);
         path.line_to(b.x, b.y);
@@ -726,6 +742,10 @@ public:
     
     assert(scale_set);
 
+    // Render images list is cleared here because the GUI may want
+    // them for display after ::end_display()
+    _render_images.clear();
+
     // clear the stage using the background color
     if ( ! _clipbounds.empty() )
     {
@@ -782,6 +802,17 @@ public:
         }
     }
 
+    // Get first render image
+    virtual RenderImages::iterator getFirstRenderImage()
+	{ return _render_images.begin(); }
+    virtual RenderImages::const_iterator getFirstRenderImage() const
+	{ return _render_images.begin(); }
+
+    // Get last render image
+    virtual RenderImages::iterator getLastRenderImage()
+	{ return _render_images.end(); }
+    virtual RenderImages::const_iterator getLastRenderImage() const
+	{ return _render_images.end(); }
   
 
     // Draw the line strip formed by the sequence of points.
@@ -2045,6 +2076,9 @@ private:  // private variables
 
     // renderer base
     std::auto_ptr<renderer_base> m_rbase;
+
+    // Delayed imaged to render
+    RenderImages _render_images;
 
     int xres;
     int yres;

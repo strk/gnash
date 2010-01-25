@@ -42,14 +42,14 @@ class VaapiContext {
     typedef boost::shared_ptr<VaapiSurface> VaapiSurfaceSP;
 
     VADisplay                   _display;
-    VAConfigID			_config;
-    VAContextID			_context;
-    VaapiCodec			_codec;
-    VAProfile			_profile;
-    VAEntrypoint		_entrypoint;
-    std::queue<VaapiSurfaceSP>	_surfaces;
-    unsigned int		_picture_width;
-    unsigned int		_picture_height;
+    VAConfigID                  _config;
+    VAContextID                 _context;
+    VaapiCodec                  _codec;
+    VAProfile                   _profile;
+    VAEntrypoint                _entrypoint;
+    std::queue<VaapiSurfaceSP>  _surfaces;
+    unsigned int                _picture_width;
+    unsigned int                _picture_height;
 
     bool construct();
     void destruct();

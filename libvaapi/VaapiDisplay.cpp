@@ -31,7 +31,7 @@ VaapiDisplay::VaapiDisplay(VADisplay display)
 VaapiDisplay::~VaapiDisplay()
 {
     if (_display)
-	vaTerminate(_display);
+        vaTerminate(_display);
 }
 
 bool VaapiDisplay::init()
@@ -40,7 +40,7 @@ bool VaapiDisplay::init()
     int major_version, minor_version;
 
     if (!_display)
-	return false;
+        return false;
 
     status = vaInitialize(_display, &major_version, &minor_version);
     if (!vaapi_check_status(status, "vaInitialize()"))

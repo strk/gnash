@@ -21,9 +21,15 @@ EXTRA_DIST =
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
+#if INSTALL_LTDL
+#LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
+#endif
+
+# If we are using an installable libltdl, then it needs to be built
+# before libgnash, as libgnash depends on it for extensions.
 pkglib_LTLIBRARIES =  libgnashmedia.la
 
-libgnashmedia_la_CPPFLAGS = -I$(top_srcdir) \
+libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libamf	\
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/libbase	\
@@ -38,7 +44,6 @@ libgnashmedia_la_CPPFLAGS = -I$(top_srcdir) \
 	$(JPEG_CFLAGS) \
 	$(GIF_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(LIBVA_CFLAGS) \
 	$(NULL)
 
 # These headers get installed
@@ -155,10 +160,14 @@ if USE_FFMPEG_ENGINE
 	$(NULL)
 
 if USE_VAAPI
-   libgnashmedia_la_SOURCES += ffmpeg/fvaapi.cpp
-   noinst_HEADERS += ffmpeg/fvaapi.h
-endif
+   libgnashmedia_la_SOURCES += \
+		ffmpeg/VideoDecoderFfmpegVaapi.cpp \
+		$(NULL)
 
+   noinst_HEADERS += \
+		ffmpeg/VideoDecoderFfmpegVaapi.h \
+		$(NULL)
+endif
 endif
 
 if HAVE_SPEEX

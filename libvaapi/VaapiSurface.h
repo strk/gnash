@@ -21,21 +21,31 @@
 #define GNASH_VAAPISURFACE_H
 
 #include "vaapi_common.h"
+#include <vector>
 
 namespace gnash {
 
 // Forward declarations
-class VaapiImage;
+class VaapiSubpicture;
+
+/// VA rectangle abstraction
+struct VaapiRectangle : public VARectangle {
+    VaapiRectangle(unsigned int w, unsigned int h)
+        { x = 0; y = 0; width = w; height = h; }
+
+    VaapiRectangle(int x_, int y_, unsigned int w, unsigned int h)
+        { x = x_; y = y_; width = w; height = h; }
+};
 
 /// VA surface base representation
 class VaapiSurfaceImplBase {
-    uintptr_t		_surface;
-    unsigned int	_width;
-    unsigned int	_height;
+    uintptr_t           _surface;
+    unsigned int        _width;
+    unsigned int        _height;
 
 protected:
     void reset(uintptr_t surface)
-	{ _surface = surface; }
+        { _surface = surface; }
 
 public:
     VaapiSurfaceImplBase(unsigned int width, unsigned int height);
@@ -52,17 +62,12 @@ public:
     /// Get surface height
     unsigned int height() const
         { return _height; }
-
-    /// Get surface pixels in RGB or RGBA format
-    //
-    /// NOTE: data array is allocated with new[] and shall be freed
-    virtual boost::uint8_t *getPixels(bool rgba = true)
-	{ return NULL; }
 };
 
 /// VA surface abstraction
 class VaapiSurface {
     std::auto_ptr<VaapiSurfaceImplBase> _impl;
+    std::vector< boost::shared_ptr<VaapiSubpicture> > _subpictures;
 
 public:
     VaapiSurface(unsigned int width, unsigned int height);
@@ -79,17 +84,16 @@ public:
     unsigned int height() const
         { return _impl->height(); }
 
-    /// Get surface pixels in RGB format
-    //
-    /// NOTE: data array is allocated with new[] and shall be freed
-    boost::uint8_t *getPixelsRGB()
-	{ return _impl->getPixels(false); }
+    /// Clear surface with black color
+    void clear();
 
-    /// Get surface pixels in RGBA format
-    //
-    /// NOTE: data array is allocated with new[] and shall be freed
-    boost::uint8_t *getPixelsRGBA()
-	{ return _impl->getPixels(true); }
+    /// Associate subpicture to the surface
+    bool associateSubpicture(boost::shared_ptr<VaapiSubpicture> subpicture,
+                             VaapiRectangle const & src_rect,
+                             VaapiRectangle const & dst_rect);
+
+    /// Deassociate subpicture from the surface
+    bool deassociateSubpicture(boost::shared_ptr<VaapiSubpicture> subpicture);
 };
 
 } // gnash namespace

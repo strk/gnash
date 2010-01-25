@@ -49,6 +49,21 @@ if HAVE_XV
 gtk_gnash_SOURCES += gtk_glue_agg_xv.cpp gtk_glue_agg_xv.h
 gtk_gnash_LDADD += $(X11_LIBS)
 endif               # HAVE_XV
+
+if USE_VAAPI
+noinst_HEADERS		+= gtk_glue_agg_vaapi.h
+gtk_gnash_SOURCES	+= gtk_glue_agg_vaapi.cpp
+gtk_gnash_CPPFLAGS	+=				\
+	$(X11_CFLAGS)					\
+	$(LIBVA_X11_CFLAGS)				\
+	-I$(top_srcdir)/libvaapi			\
+	$(NULL)
+gtk_gnash_LDADD +=					\
+	$(X11_LIBS)					\
+	$(LIBVA_X11_LIBS)				\
+	$(top_builddir)/libvaapi/libgnashvaapi.la	\
+	$(NULL)
+endif               # USE_VAAPI
 endif				# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)

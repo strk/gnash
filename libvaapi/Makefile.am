@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2009 Splitted-Desktop Systems
+# Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,52 +18,56 @@ AUTOMAKE_OPTIONS = foreign
 
 pkglib_LTLIBRARIES = libgnashvaapi.la
 
-libgnashvaapi_la_CPPFLAGS = \
-	-I$(top_srcdir)/libbase \
-	$(BOOST_CFLAGS)	\
-	$(LIBSWSCALE_CFLAGS) \
-	$(LIBVA_CFLAGS)	\
-	$(LIBVA_X11_CFLAGS)\
+libgnashvaapi_la_CPPFLAGS =	\
+	-I$(top_srcdir)/libbase	\
+	$(BOOST_CFLAGS)		\
+	$(LIBSWSCALE_CFLAGS)	\
+	$(LIBVA_CFLAGS)		\
+	$(LIBVA_X11_CFLAGS)	\
 	$(NULL)
 
-libgnashvaapi_la_LIBADD = \
-	$(BOOST_LIBS) \
-	$(LIBSWSCALE_LIBS) \
-	$(LIBVA_LIBS) \
-	$(LIBVA_X11_LIBS) \
+libgnashvaapi_la_LIBADD =	\
+	$(BOOST_LIBS)		\
+	$(LIBSWSCALE_LIBS)	\
+	$(LIBVA_LIBS)		\
+	$(LIBVA_X11_LIBS)	\
 	$(NULL)
 
-libgnashvaapi_la_SOURCES = \
-	gvaapi.cpp \
-	vaapi_utils.cpp \
-	VaapiContext.cpp \
-	VaapiDisplay.cpp \
-	VaapiGlobalContext.cpp\
-	VaapiImage.cpp \
-	VaapiSurface.cpp \
-	VaapiSurfaceProxy.cpp \
+libgnashvaapi_la_SOURCES =	\
+	vaapi.cpp		\
+	vaapi_utils.cpp		\
+	VaapiContext.cpp	\
+	VaapiDisplay.cpp	\
+	VaapiGlobalContext.cpp	\
+	VaapiImage.cpp		\
+	VaapiImageFormat.cpp	\
+	VaapiSubpicture.cpp	\
+	VaapiSurface.cpp	\
+	VaapiSurfaceProxy.cpp	\
 	$(NULL)
 
-noinst_HEADERS = \
-	gvaapi.h	\
-	vaapi_common.h \
-	vaapi_debug.h \
-	vaapi_utils.h \
-	VaapiContext.h \
-	VaapiDisplay.h \
-	VaapiDisplayX11.h \
-	VaapiDisplayGLX.h \
-	VaapiException.h \
-	VaapiGlobalContext.h \
-	VaapiImage.h \
-	VaapiSurface.h \
-	VaapiSurfaceGLX.h \
-	VaapiSurfaceProxy.h \
+noinst_HEADERS =		\
+	vaapi.h			\
+	vaapi_common.h		\
+	vaapi_debug.h		\
+	vaapi_utils.h		\
+	VaapiContext.h		\
+	VaapiDisplay.h		\
+	VaapiDisplayX11.h	\
+	VaapiDisplayGLX.h	\
+	VaapiException.h	\
+	VaapiGlobalContext.h	\
+	VaapiImage.h		\
+	VaapiImageFormat.h	\
+	VaapiSubpicture.h	\
+	VaapiSurface.h		\
+	VaapiSurfaceGLX.h	\
+	VaapiSurfaceProxy.h	\
 	$(NULL)
 
 if USE_VAAPI_GLX
-libgnashvaapi_la_CPPFLAGS += \
-	$(LIBVA_GLX_CFLAGS) \
+libgnashvaapi_la_CPPFLAGS +=	\
+	$(LIBVA_GLX_CFLAGS)	\
 	$(NULL)
 
 libgnashvaapi_la_LIBADD +=	\

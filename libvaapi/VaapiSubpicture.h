@@ -1,4 +1,4 @@
-// vaapi_utils.h: VA API utilities
+// VaapiSubpicture.h: VA subpicture abstraction
 // 
 // Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
@@ -17,28 +17,38 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_VAAPI_UTILS_H
-#define GNASH_VAAPI_UTILS_H
+#ifndef GNASH_VAAPISUBPICTURE_H
+#define GNASH_VAAPISUBPICTURE_H
 
 #include "vaapi_common.h"
+#include "VaapiImageFormat.h"
+#include <vector>
 
 namespace gnash {
 
-/// Debug output
-void DSOEXPORT vaapi_dprintf(const char *format, ...);
+// Forward declarations
+class VaapiImage;
 
-/// Check VA status for success or print out an error
-bool DSOEXPORT vaapi_check_status(VAStatus status, const char *msg);
+/// VA subpicture abstraction
+class VaapiSubpicture {
+    boost::shared_ptr<VaapiImage>       _image;
+    VASubpictureID                      _subpicture;
 
-/// Return a string representation of a FOURCC
-const char *string_of_FOURCC(boost::uint32_t fourcc);
+    /// Create VA subpicture
+    bool create();
 
-/// Return a string representation of a VAProfile
-const char *string_of_VAProfile(VAProfile profile);
+    /// Destroy VA subpicture
+    void destroy();
 
-/// Return a string representation of a VAEntrypoint
-const char *string_of_VAEntrypoint(VAEntrypoint entrypoint);
+public:
+    VaapiSubpicture(boost::shared_ptr<VaapiImage> image);
+    ~VaapiSubpicture();
 
-} // gnash namespace
+    /// Return VA subpicture id
+    VASubpictureID get() const
+        { return _subpicture; }
+};
 
-#endif /* GNASH_VAAPI_UTILS_H */
+ } // gnash namespace
+
+ #endif /* GNASH_VAAPISUBPICTURE_H */

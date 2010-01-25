@@ -28,8 +28,8 @@ namespace gnash {
 /// VA/GLX display representation
 struct VaapiDisplayGLX : public X11Display, VaapiDisplay {
     VaapiDisplayGLX()
-	: VaapiDisplay(vaGetDisplayGLX(X11Display::get()))
-	{ }
+        : VaapiDisplay(vaGetDisplayGLX(X11Display::get()))
+        { }
 };
 
 } // gnash namespace

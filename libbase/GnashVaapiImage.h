@@ -1,6 +1,6 @@
 // GnashVaapiImage.h: GnashImage class used with VA API
 // 
-//   Copyright (C) 2009 Splitted-Desktop Systems
+// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ public:
     //
     /// @return     A pointer to the VA surface.
     boost::shared_ptr<VaapiSurface> surface() const
-	{ return _surface; }
+        { return _surface; }
 
     /// Get access to the underlying data
     //

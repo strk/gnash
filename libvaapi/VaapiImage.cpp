@@ -22,22 +22,31 @@
 #include "VaapiGlobalContext.h"
 #include "VaapiException.h"
 #include "vaapi_utils.h"
-#include <string.h>
+#include <boost/format.hpp>
+#include <cstring>
 
 #define DEBUG 0
 #include "vaapi_debug.h"
 
 namespace gnash {
 
-VaapiImage::VaapiImage(const VaapiSurface *surface)
-    : _data(NULL)
+VaapiImage::VaapiImage(unsigned int     width,
+                       unsigned int     height,
+                       VaapiImageFormat format)
+    : _format(format)
+    , _image_data(NULL)
 {
-    D(bug("VaapiImage::VaapiImage(): surface 0x%08x\n", surface.get()));
+    D(bug("VaapiImage::VaapiImage(): format '%s'\n", string_of_FOURCC(format)));
 
     memset(&_image, 0, sizeof(_image));
     _image.image_id = VA_INVALID_ID;
 
-    update(surface);
+    if (!create(width, height)) {
+        boost::format msg;
+        msg = boost::format("Could not create %s image")
+            % string_of_FOURCC(_format);
+        throw VaapiException(msg.str());
+    }
 }
 
 VaapiImage::~VaapiImage()
@@ -47,120 +56,104 @@ VaapiImage::~VaapiImage()
     destroy();
 }
 
-bool VaapiImage::map()
+// Create VA image
+bool VaapiImage::create(unsigned int width, unsigned int height)
 {
-    VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
-	return false;
-
-    VAStatus status;
-    status = vaMapBuffer(gvactx->display(), _image.buf, (void **)&_data);
-    return vaapi_check_status(status, "vaMapBuffer()");
-}
-
-bool VaapiImage::unmap()
-{
-    if (!_data)
-	return true;
-
-    _data = NULL;
+    D(bug("VaapiImage::create()\n"));
 
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
     if (!gvactx)
-	return false;
+        return false;
+
+    const VAImageFormat *va_format = gvactx->getImageFormat(_format);
+    if (!va_format)
+        return false;
 
     VAStatus status;
-    status = vaUnmapBuffer(gvactx->display(), _image.buf);
-    return vaapi_check_status(status, "vaUnmapBuffer()");
+    _image.image_id = VA_INVALID_ID;
+    status = vaCreateImage(gvactx->display(),
+                           const_cast<VAImageFormat *>(va_format),
+                           width, height,
+                           &_image);
+    if (!vaapi_check_status(status, "vaCreateImage()"))
+        return false;
+
+    D(bug("  image 0x%08x, format '%s'\n", get(), string_of_FOURCC(_format)));
+    return true;
 }
 
+// Destroy VA image
 void VaapiImage::destroy()
 {
     unmap();
 
     if (_image.image_id == VA_INVALID_ID)
-	return;
+        return;
 
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
     if (!gvactx)
-	return;
+        return;
 
     VAStatus status;
     status = vaDestroyImage(gvactx->display(), _image.image_id);
     if (!vaapi_check_status(status, "vaDestroyImage()"))
-	return;
-
-    _image.image_id = VA_INVALID_ID;
+        return;
 }
 
-bool VaapiImage::update(const VaapiSurface *surface)
+// Map image data
+bool VaapiImage::map()
 {
+    if (isMapped())
+        return true;
+
+    if (_image.image_id == VA_INVALID_ID)
+        return false;
+
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
     if (!gvactx)
-	return false;
+        return false;
 
     VAStatus status;
-    status = vaSyncSurface(gvactx->display(), surface->get());
-    if (!vaapi_check_status(status, "vaSyncSurface()"))
-	return false;
+    status = vaMapBuffer(gvactx->display(), _image.buf, (void **)&_image_data);
+    if (!vaapi_check_status(status, "vaMapBuffer()"))
+        return false;
+    return true;
+}
 
-    static const boost::uint32_t image_formats[] = {
-	VA_FOURCC('N','V','1','2'),
-	VA_FOURCC('Y','V','1','2'),
-	VA_FOURCC('U','Y','V','Y'),
-	VA_FOURCC('Y','U','Y','V'),
-	VA_FOURCC('R','G','B','A'),
-	0
-    };
+// Unmap image data
+bool VaapiImage::unmap()
+{
+    if (!isMapped())
+        return true;
 
-    const VAImageFormat *image_format = NULL;
-    for (int i = 0; image_formats[i] != 0; i++) {
-	const VAImageFormat *m = gvactx->getImageFormat(image_formats[i]);
-	if (m) {
-	    image_format = m;
-	    break;
-	}
-    }
-    if (!image_format)
-	return false;
+    _image_data = NULL;
 
-    unmap();
+    VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
+    if (!gvactx)
+        return false;
 
-    if (_image.width != surface->width() ||
-	_image.height != surface->height() ||
-	_image.format.fourcc != image_format->fourcc) {
-	/* XXX: check RGBA formats further */
-
-	destroy();
-
-	status = vaCreateImage(gvactx->display(),
-			       const_cast<VAImageFormat *>(image_format),
-			       surface->width(), surface->height(),
-			       &_image);
-	if (!vaapi_check_status(status, "vaCreateImage()"))
-	    return false;
-    }
-
-    status = vaGetImage(gvactx->display(), surface->get(),
-			0, 0, surface->width(), surface->height(),
-			_image.image_id);
-    if (!vaapi_check_status(status, "vaGetImage()"))
-	return false;
-
-    return map();
+    VAStatus status;
+    status = vaUnmapBuffer(gvactx->display(), _image.buf);
+    if (!vaapi_check_status(status, "vaUnmapBuffer()"))
+        return false;
+    return true;
 }
 
 // Get pixels for the specified plane
 boost::uint8_t *VaapiImage::getPlane(int plane) const
 {
-    assert(_image.image_id != VA_INVALID_ID);
-    return _data ? &_data[_image.offsets[plane]] : NULL;
+    if (!isMapped())
+        throw VaapiException("VaapiImage::getPixels(): unmapped image");
+
+    return _image_data + _image.offsets[plane];
 }
 
 // Get scanline pitch for the specified plane
 unsigned int VaapiImage::getPitch(int plane) const
 {   
-    assert(_image.image_id != VA_INVALID_ID);
+    if (!isMapped())
+        throw VaapiException("VaapiImage::getPitch(): unmapped image");
+
     return _image.pitches[plane];
 }
 

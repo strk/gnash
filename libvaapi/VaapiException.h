@@ -28,15 +28,15 @@ namespace gnash {
 /// VA exception abstraction
 struct VaapiException: public std::runtime_error {
     VaapiException(const std::string & str)
-	: std::runtime_error(str)
-	{ }
+        : std::runtime_error(str)
+        { }
 
     VaapiException()
-	: std::runtime_error("Video Acceleration error")
-	{ }
+        : std::runtime_error("Video Acceleration error")
+        { }
 
     virtual ~VaapiException() throw()
-	{ }
+        { }
 };
 
 } // gnash namespace

@@ -130,7 +130,7 @@ static bool bind_texture(TextureState *ts, GLenum target, GLuint texture)
     if (!ts->was_enabled)
         glEnable(target);
     else if (gl_get_param(texture_binding, &ts->old_texture))
-	ts->was_bound = texture == ts->old_texture;
+        ts->was_bound = texture == ts->old_texture;
     else
         return false;
 
@@ -149,13 +149,13 @@ static void unbind_texture(TextureState *ts)
     if (!ts->was_bound && ts->old_texture)
         glBindTexture(ts->target, ts->old_texture);
     if (!ts->was_enabled)
-	glDisable(ts->target);
+        glDisable(ts->target);
     gl_check_error();
 }
 
 class VaapiSurfaceGLXImpl: public VaapiSurfaceImplBase {
     void *surface() const
-	{ return reinterpret_cast<void *>(VaapiSurfaceImplBase::surface()); }
+        { return reinterpret_cast<void *>(VaapiSurfaceImplBase::surface()); }
 
 public:
     VaapiSurfaceGLXImpl(GLenum target, GLuint texture);
@@ -172,17 +172,17 @@ VaapiSurfaceGLXImpl::VaapiSurfaceGLXImpl(GLenum target, GLuint texture)
     reset(0);
 
     if (target == 0 || texture == 0)
-	return;
+        return;
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
     if (!gvactx)
-	return;
+        return;
 
     VAStatus status;
     void *surface = NULL;
     status = vaCreateSurfaceGLX(gvactx->display(), target, texture, &surface);
     if (!vaapi_check_status(status, "vaCreateSurfaceGLX()"))
-	return;
+        return;
 
     reset(reinterpret_cast<uintptr_t>(surface));
     D(bug("  -> surface %p\n", this->surface()));
@@ -193,16 +193,16 @@ VaapiSurfaceGLXImpl::~VaapiSurfaceGLXImpl()
     D(bug("VaapiSurface::~VaapiSurface(): surface %p\n", surface()));
 
     if (!surface())
-	return;
+        return;
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
     if (!gvactx)
-	return;
+        return;
 
     VAStatus status;
     status = vaDestroySurfaceGLX(gvactx->display(), surface());
     if (!vaapi_check_status(status, "vaDestroySurfaceGLX()"))
-	return;
+        return;
 
     reset(0);
 }
@@ -210,21 +210,21 @@ VaapiSurfaceGLXImpl::~VaapiSurfaceGLXImpl()
 bool VaapiSurfaceGLXImpl::update(boost::shared_ptr<VaapiSurface> surface)
 {
     if (!this->surface())
-	return false;
+        return false;
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
     if (!gvactx)
-	return false;
+        return false;
 
     VAStatus status;
     status = vaSyncSurface(gvactx->display(), surface->get());
     if (!vaapi_check_status(status, "vaSyncSurface()"))
-	return false;
+        return false;
 
     status = vaCopySurfaceGLX(gvactx->display(), this->surface(),
-			      surface->get(), VA_FRAME_PICTURE);
+                              surface->get(), VA_FRAME_PICTURE);
     if (!vaapi_check_status(status, "vaCopySurfaceGLX()"))
-	return false;
+        return false;
 
     return true;
 }

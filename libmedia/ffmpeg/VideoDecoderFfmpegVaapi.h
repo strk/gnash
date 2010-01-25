@@ -16,10 +16,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA    02110-1301    USA
 
-#ifndef GNASH_MEDIA_VAAPI_H
-#define GNASH_MEDIA_VAAPI_H
+#ifndef GNASH_MEDIA_VIDEODECODERFFMPEGVAAPI_H
+#define GNASH_MEDIA_VIDEODECODERFFMPEGVAAPI_H
 
-#include "gvaapi.h"
+#include "VaapiContext.h"
+#include "VaapiSurface.h"
+#include "VaapiSurfaceProxy.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -30,37 +32,21 @@ namespace gnash {
 namespace media {
 namespace ffmpeg {
 
-/// VA image implementation for FFmpeg
-class VaapiImageFfmpeg {
-    std::auto_ptr<VaapiImage>	_image;
-    AVFrame			_frame;
-    PixelFormat			_pixel_format;
-
-public:
-    VaapiImageFfmpeg(std::auto_ptr<VaapiImage> image);
-
-    const AVFrame *getFrame() const
-	{ return _image->getPlane(0) ? &_frame : NULL; }
-
-    PixelFormat getPixelFormat() const
-	{ return _image->getPlane(0) ? _pixel_format : PIX_FMT_NONE; }
-};
-
 /// VA surface implementation for FFmpeg
 class VaapiSurfaceFfmpeg : public VaapiSurfaceProxy {
     unsigned int _pic_num;
 
 public:
     VaapiSurfaceFfmpeg(boost::shared_ptr<VaapiSurface> surface,
-		       boost::shared_ptr<VaapiContext> context)
-	: VaapiSurfaceProxy(surface, context), _pic_num(0)
-	{ }
+                       boost::shared_ptr<VaapiContext> context)
+        : VaapiSurfaceProxy(surface, context), _pic_num(0)
+        { }
 
     unsigned int getPicNum() const
-	{ return _pic_num; }
+        { return _pic_num; }
 
     void setPicNum(unsigned int pic_num)
-	{ _pic_num = pic_num; }
+        { _pic_num = pic_num; }
 };
 
 void vaapi_set_surface(AVFrame *pic, VaapiSurfaceFfmpeg *surface);
@@ -80,7 +66,7 @@ public:
     bool initDecoder(unsigned int width, unsigned int height);
 
     VaapiSurfaceFfmpeg *getSurface()
-	{ return new VaapiSurfaceFfmpeg(_context->acquireSurface(), _context); }
+        { return new VaapiSurfaceFfmpeg(_context->acquireSurface(), _context); }
 
     static VaapiContextFfmpeg *create(enum CodecID codec_id);
 };
@@ -89,4 +75,4 @@ public:
 } // gnash.media namespace 
 } // gnash namespace
 
-#endif /* GNASH_MEDIA_VAAPI_H */
+#endif /* GNASH_MEDIA_VIDEODECODERFFMPEGVAAPI_H */

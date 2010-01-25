@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "gvaapi.h"
+#include "vaapi.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -29,18 +29,18 @@ getenv_yesno(const char *env, int *pval)
 {
     const char *env_str = getenv(env);
     if (!env_str)
-	return false;
+        return false;
 
     int val;
     if (strcmp(env_str, "1") == 0 || strcmp(env_str, "yes") == 0)
-	val = 1;
+        val = 1;
     else if (strcmp(env_str, "0") == 0 || strcmp(env_str, "no") == 0)
-	val = 0;
+        val = 0;
     else
-	return false;
+        return false;
 
     if (pval)
-	*pval = val;
+        *pval = val;
     return true;
 }
 
@@ -62,8 +62,8 @@ void vaapi_disable()
 bool vaapi_is_enabled()
 {
     if (g_vaapi_is_enabled < 0) {
-	if (!getenv_yesno("GNASH_VAAPI", &g_vaapi_is_enabled))
-	    g_vaapi_is_enabled = 1;
+        if (!getenv_yesno("GNASH_VAAPI", &g_vaapi_is_enabled))
+            g_vaapi_is_enabled = 1;
     }
     return g_vaapi_is_enabled;
 }

@@ -23,14 +23,16 @@
 #include "vaapi_common.h"
 #include <vector>
 #include "VaapiDisplay.h"
+#include "VaapiImageFormat.h"
 
 namespace gnash {
 
 /// VA API global context
 class DSOEXPORT VaapiGlobalContext {
-    std::auto_ptr<VaapiDisplay>	_display;
-    std::vector<VAProfile>	_profiles;
-    std::vector<VAImageFormat>	_image_formats;
+    std::auto_ptr<VaapiDisplay> _display;
+    std::vector<VAProfile>      _profiles;
+    std::vector<VAImageFormat>  _image_formats;
+    std::vector<VAImageFormat>  _subpicture_formats;
 
     bool init();
 
@@ -46,16 +48,26 @@ public:
     /// Check VA profile is supported
     bool hasProfile(VAProfile profile) const;
 
-    /// Get the VA image format matching FOURCC
+    /// Get the VA image format matching format
     //
     /// @return     The VA image format
-    const VAImageFormat *getImageFormat(boost::uint32_t fourcc) const;
+    const VAImageFormat *getImageFormat(VaapiImageFormat format) const;
+
+    /// Get the list of supported image formats
+    //
+    /// @return     The list of image formats
+    std::vector<VaapiImageFormat> getImageFormats() const;
+
+    /// Get the list of supported subpicture formats
+    //
+    /// @return     The list of subpicture formats
+    std::vector<VaapiImageFormat> getSubpictureFormats() const;
 
     /// Get the VA display
     //
     /// @return     The VA display
     VADisplay display() const
-	{ return _display->get(); }
+        { return _display->get(); }
 };
 
 } // gnash namespace

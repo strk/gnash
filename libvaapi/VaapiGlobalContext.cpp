@@ -43,22 +43,27 @@ VaapiGlobalContext::init()
     VAStatus status;
 
     int num_profiles = 0;
-    if (vaMaxNumProfiles(dpy) == 0) {
-        return false;
-    }
-    
     _profiles.resize(vaMaxNumProfiles(dpy));
     status = vaQueryConfigProfiles(dpy, &_profiles[0], &num_profiles);
     if (!vaapi_check_status(status, "vaQueryConfigProfiles()"))
-	return false;
+        return false;
     _profiles.resize(num_profiles);
 
     int num_image_formats = 0;
     _image_formats.resize(vaMaxNumImageFormats(dpy));
     status = vaQueryImageFormats(dpy, &_image_formats[0], &num_image_formats);
     if (!vaapi_check_status(status, "vaQueryImageFormats()"))
-	return false;
+        return false;
     _image_formats.resize(num_image_formats);
+
+    unsigned int num_subpicture_formats = 0;
+    std::vector<unsigned int> flags;
+    flags.resize(vaMaxNumSubpictureFormats(dpy));
+    _subpicture_formats.resize(vaMaxNumSubpictureFormats(dpy));
+    status = vaQuerySubpictureFormats(dpy, &_subpicture_formats[0], &flags[0], &num_subpicture_formats);
+    if (!vaapi_check_status(status, "vaQuerySubpictureFormats()"))
+        return false;
+    _subpicture_formats.resize(num_subpicture_formats);
     return true;
 }
 
@@ -66,20 +71,44 @@ bool
 VaapiGlobalContext::hasProfile(VAProfile profile) const
 {
     for (unsigned int i = 0; i < _profiles.size(); i++) {
-	if (_profiles[i] == profile)
-	    return true;
+        if (_profiles[i] == profile)
+            return true;
     }
     return false;
 }
 
 const VAImageFormat *
-VaapiGlobalContext::getImageFormat(boost::uint32_t fourcc) const
+VaapiGlobalContext::getImageFormat(VaapiImageFormat format) const
 {
     for (unsigned int i = 0; i < _image_formats.size(); i++) {
-	if (_image_formats[i].fourcc == fourcc)
-	    return &_image_formats[i];
+        if (vaapi_get_image_format(_image_formats[i]) == format)
+            return &_image_formats[i];
     }
     return NULL;
+}
+
+static std::vector<VaapiImageFormat>
+get_formats(std::vector<VAImageFormat> const &vaFormats)
+{
+    std::vector<VaapiImageFormat> formats;
+    for (unsigned int i = 0; i < vaFormats.size(); i++) {
+	VaapiImageFormat format = vaapi_get_image_format(vaFormats[i]);
+	if (format != VAAPI_IMAGE_NONE)
+	    formats.push_back(format);
+    }
+    return formats;
+}
+
+std::vector<VaapiImageFormat>
+VaapiGlobalContext::getImageFormats() const
+{
+    return get_formats(_image_formats);
+}
+
+std::vector<VaapiImageFormat>
+VaapiGlobalContext::getSubpictureFormats() const
+{
+    return get_formats(_subpicture_formats);
 }
 
 /// A wrapper around a VaapiGlobalContext to ensure it's free'd on destruction.
@@ -88,16 +117,16 @@ VaapiGlobalContext *VaapiGlobalContext::get()
     static std::auto_ptr<VaapiGlobalContext> vaapi_global_context;
 
     if (!vaapi_global_context.get()) {
-	std::auto_ptr<VaapiDisplay> dpy;
-	/* XXX: this won't work with multiple renders built-in */
+        std::auto_ptr<VaapiDisplay> dpy;
+        /* XXX: this won't work with multiple renders built-in */
 #if USE_VAAPI_GLX
-	dpy.reset(new VaapiDisplayGLX());
+        dpy.reset(new VaapiDisplayGLX());
 #else
-	dpy.reset(new VaapiDisplayX11());
+        dpy.reset(new VaapiDisplayX11());
 #endif
-	if (!dpy.get())
-	    return NULL;
-	vaapi_global_context.reset(new VaapiGlobalContext(dpy));
+        if (!dpy.get())
+            return NULL;
+        vaapi_global_context.reset(new VaapiGlobalContext(dpy));
     }
     return vaapi_global_context.get();
 }

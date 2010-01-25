@@ -41,6 +41,9 @@
 #ifdef HAVE_XV
 #include "gtk_glue_agg_xv.h"
 #endif // HAVE_XV
+#if USE_VAAPI
+#include "gtk_glue_agg_vaapi.h"
+#endif // USE_VAAPI
 #endif
 
 struct _GnashCanvas {
@@ -204,6 +207,13 @@ gnash_canvas_setup(GnashCanvas *canvas, int argc, char **argv[])
     canvas->glue.reset(new gnash::GtkCairoGlue);
 #elif defined(RENDERER_OPENGL)
     canvas->glue.reset(new gnash::GtkGlExtGlue);
+#elif defined(RENDERER_AGG) && USE_VAAPI
+    // TODO: improve checks for the AGG backend. Order should be VAAPI, Xv, X11
+    canvas->glue.reset(new gnash::GtkAggVaapiGlue);
+    if (!canvas->glue->init(argc, argv)) {
+        canvas->glue.reset(new gnash::GtkAggGlue);
+        canvas->glue->init(argc, argv);
+    }
 #elif defined(RENDERER_AGG) && !defined(HAVE_XV)
     canvas->glue.reset(new gnash::GtkAggGlue);
 #elif defined(RENDERER_AGG) && defined(HAVE_XV)
@@ -221,7 +231,7 @@ gnash_canvas_setup(GnashCanvas *canvas, int argc, char **argv[])
     }
 #endif
 
-#if ! (defined(HAVE_XV) && defined(RENDERER_AGG))
+#if ! ((USE_VAAPI || defined(HAVE_XV)) && defined(RENDERER_AGG))
     canvas->glue->init (argc, argv);
 #endif
 

@@ -45,8 +45,8 @@ extern "C" {
 
 #include "FLVParser.h"
 
-#ifdef USE_VAAPI
-#  include "fvaapi.h"
+#if USE_VAAPI
+#  include "VideoDecoderFfmpegVaapi.h"
 #  include "GnashVaapiImage.h"
 #endif
 

@@ -31,20 +31,20 @@ class X11Display {
 
 public:
     X11Display()
-	{ _x_display = XOpenDisplay(NULL); }
+        { _x_display = XOpenDisplay(NULL); }
 
     ~X11Display()
-	{ if (_x_display) XCloseDisplay(_x_display); }
+        { if (_x_display) XCloseDisplay(_x_display); }
 
     Display *get() const
-	{ return _x_display; }
+        { return _x_display; }
 };
 
 /// VA/X11 display representation
 struct VaapiDisplayX11 : public X11Display, VaapiDisplay {
     VaapiDisplayX11()
-	: VaapiDisplay(vaGetDisplay(X11Display::get()))
-	{ }
+        : VaapiDisplay(vaGetDisplay(X11Display::get()))
+        { }
 };
 
 } // gnash namespace
