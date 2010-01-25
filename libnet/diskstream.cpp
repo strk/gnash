@@ -28,6 +28,7 @@
 #include <iostream>
 #include <string>
 #include <cerrno>
+#include <algorithm>
 #if !defined(_WIN32) && !defined(__amigaos4__)
 #include <sys/mman.h>
 #elif defined(__amigaos4__)
@@ -983,9 +984,17 @@ DiskStream::determineFileType(const string &filespec)
   }
 
   string::size_type pos;
-  pos = filespec.rfind(".");
+
+  string name = filespec;
+
+  // transform to lower case so we match filenames which may
+  // have the suffix in upper case, or this test fails.
+  std::transform(name.begin(), name.end(), name.begin(), 
+		 (int(*)(int)) tolower);
+
+  pos = name.rfind(".");
   if (pos != string::npos) {
-    string suffix = filespec.substr(pos+1, filespec.size());
+    string suffix = name.substr(pos+1, name.size());
     _filetype = FILETYPE_NONE;
     if (suffix == "htm") {
       _filetype = FILETYPE_HTML;

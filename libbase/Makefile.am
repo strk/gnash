@@ -197,6 +197,14 @@ endif
 libgnashbase_la_LDFLAGS = -release $(VERSION) 
 libgnashbase_la_DEPENDENCIES = $(LIBLTDLLIB)
 
+if LIBLTDL2
+libgnashbase_la_LIBADD += $(top_builddir)/libltdl/libltdlc.la
+endif
+if LIBLTDL1
+libgnashbase_la_LIBADD += $(top_builddir)/libbase/libltdlc.la
+endif
+
+
 if WIN32
   libgnashbase_la_LDFLAGS += -no-undefined
   libgnashbase_la_LIBADD += -lws2_32 -lwinmm

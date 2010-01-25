@@ -862,7 +862,6 @@ connection_handler(Network::thread_params_t *args)
 		do {
 		    buf = hand->parseFirstRequest(args->netfd, Network::HTTP);
 		    if (!buf) {
-			gnashSleep(10);
 			retries--;
 			continue;
 		    } else {
@@ -1146,7 +1145,7 @@ event_handler(Network::thread_params_t *args)
 	// Wait for something from one of the file descriptors. This timeout
 	// is the time between sending packets to the client when there is
 	// no client input, which effects the streaming speed of big files.
-	net.setTimeout(15);
+	net.setTimeout(5);
 	hits = net.waitForNetData(hand->getClients());
 	if (FD_ISSET(0, &hits)) {
 	    FD_CLR(0, &hits);
