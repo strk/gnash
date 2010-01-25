@@ -261,40 +261,33 @@ Font::unitsPerEM(bool embed) const
         else return 1024;
     }
     
-    if (!_ftProvider.get()) {
-        if (!initDeviceFontProvider()) {
-            log_error("Device font provider was not initialized, "
+    FreetypeGlyphsProvider* ft = ftProvider();
+    if (!ft) {
+        log_error("Device font provider was not initialized, "
                     "can't get unitsPerEM");
-            return 0; 
-        }
+        return 0; 
     }
 
-    return _ftProvider->unitsPerEM();
+    return ft->unitsPerEM();
 }
 
 int
 Font::add_os_glyph(boost::uint16_t code)
 {
-    if (!_ftProvider.get()) {
-        if (!initDeviceFontProvider()) {
-            log_error("Device font provider was not initialized, can't "
-                    "get unitsPerEM");
-            return -1; // can't provide it...
-        }
-    }
+    FreetypeGlyphsProvider* ft = ftProvider();
+    if (!ft) return -1;
 
     assert(_deviceCodeTable.find(code) == _deviceCodeTable.end());
 
     float advance;
 
     // Get the vectorial glyph
-    std::auto_ptr<SWF::ShapeRecord> sh = _ftProvider->getGlyph(code, advance);
+    std::auto_ptr<SWF::ShapeRecord> sh = ft->getGlyph(code, advance);
 
     if (!sh.get()) {
         log_error("Could not create shape "
                 "glyph for DisplayObject code %u (%c) with "
-                "device font %s (%p)", code, code, _name,
-                _ftProvider.get());
+                "device font %s (%p)", code, code, _name, ft);
         return -1;
     }
 
@@ -310,23 +303,6 @@ Font::add_os_glyph(boost::uint16_t code)
 }
 
 bool
-Font::initDeviceFontProvider() const
-{
-    if (_name.empty()) {
-        log_error("No name associated with this font, can't use device "
-                "fonts (should I use a default one?)");
-        return false;
-    }
-
-    _ftProvider = FreetypeGlyphsProvider::createFace(_name, _bold, _italic);
-    if (!_ftProvider.get()) {
-        log_error("Could not create a freetype face %s", _name);
-        return false;
-    }
-    return true;
-}
-
-bool
 Font::matches(const std::string& name, bool bold, bool italic) const
 {
     return (_bold == bold && _italic == italic && name ==_name);
@@ -337,15 +313,43 @@ Font::leading() const {
     return _fontTag ? _fontTag->leading() : 0.0f;
 }
 
-float
-Font::ascent(bool embedded) const {
-    return (embedded && _fontTag) ? _fontTag->ascent() : _ftProvider->ascent();
+FreetypeGlyphsProvider*
+Font::ftProvider() const 
+{
+    if (_ftProvider.get()) return _ftProvider.get();
+
+    if (_name.empty()) {
+        log_error("No name associated with this font, can't use device "
+                "fonts (should I use a default one?)");
+        return 0;
+    }
+
+    _ftProvider = FreetypeGlyphsProvider::createFace(_name, _bold, _italic);
+    
+    if (!_ftProvider.get()) {
+        log_error("Could not create a freetype face %s", _name);
+        return 0;
+    }
+    
+    return _ftProvider.get();
 }
 
 float
-Font::descent(bool embedded) const {
-    return (embedded && _fontTag) ? _fontTag->descent() :
-                                    _ftProvider->descent();
+Font::ascent(bool embedded) const
+{
+    if (embedded && _fontTag) return _fontTag->ascent();
+    FreetypeGlyphsProvider* ft = ftProvider();
+    if (ft) return ft->ascent();
+    return 0;
+}
+
+float
+Font::descent(bool embedded) const
+{
+    if (embedded && _fontTag) return _fontTag->descent();
+    FreetypeGlyphsProvider* ft = ftProvider();
+    if (ft) return ft->descent();
+    return 0;
 }
     
 bool
