@@ -35,11 +35,11 @@ AM_CPPFLAGS = \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
-#	MatrixTest 
 check_PROGRAMS = \
 	StreamTest \
 	BitsReaderTest \
 	PointTest \
+	MatrixTest \
 	EdgeTest \
 	PropertyListTest \
 	PropFlagsTest \
