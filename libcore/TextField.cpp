@@ -411,7 +411,7 @@ TextField::display(Renderer& renderer)
 
     _displayRecords.clear();
     float scale = getFontHeight() /
-    static_cast<float>(_font->unitsPerEM(_embedFonts));
+        static_cast<float>(_font->unitsPerEM(_embedFonts));
     float fontLeading = _font->leading() * scale;
 
     //offset the lines
@@ -1160,15 +1160,10 @@ TextField::format_text()
     LineStarts::const_iterator linestartend = _line_starts.end();
 
     AutoSizeValue autoSize = getAutoSize();
-    if ( autoSize != autoSizeNone )
-    {
-        // define GNASH_DEBUG_TEXT_FORMATTING on top to get useful info
-        //LOG_ONCE( log_debug(_("TextField.autoSize != 'none' TESTING")) );
-
+    if (autoSize != autoSizeNone) {
         // When doing WordWrap we don't want to change
         // the boundaries. See bug #24348
-        if (!  doWordWrap() )
-        {
+        if (!doWordWrap()) {
             _bounds.set_to_rect(0, 0, 0, 0); // this is correct for 'true'
         }
     }
@@ -1177,8 +1172,7 @@ TextField::format_text()
     // to find the appropriate font to use, as ActionScript
     // code should be able to change the font of a TextField
     //
-    if (!_font)
-    {
+    if (!_font) {
         log_error(_("No font for TextField!"));
         return;
     }
@@ -1195,6 +1189,9 @@ TextField::format_text()
 
     //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
     //  getTarget(), fontDescent, fontLeading, fontHeight, scale);
+
+    /// Remember the current bounds for autosize.
+    SWFRect oldBounds(_bounds);
 
     SWF::TextRecord rec;    // one to work on
     rec.setFont(_font.get());
@@ -1242,7 +1239,7 @@ TextField::format_text()
     boost::int32_t y = static_cast<boost::int32_t>(rec.yOffset());
 
     // Start the bbox at the upper-left corner of the first glyph.
-    reset_bounding_box(x, y + fontHeight); 
+    //reset_bounding_box(x, y + fontHeight); 
     
     int last_code = -1; // only used if _embedFonts
     int last_space_glyph = -1;
@@ -1265,10 +1262,28 @@ TextField::format_text()
     handleChar(it, e, x, y, rec, last_code, last_space_glyph,
             last_line_start_record);
                 
-    // Expand bounding box to include the whole text (if autoSize)
-    if (_autoSize != autoSizeNone)
+    // Expand bounding box to include the whole text (if autoSize and wordWrap
+    // is not in operation.
+    if (_autoSize != autoSizeNone && !doWordWrap())
     {
         _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
+
+        if (_autoSize == autoSizeRight) {
+            /// Autosize right expands from the previous right margin.
+            SWFMatrix m;
+
+            m.tx = oldBounds.get_x_max() - _bounds.width();
+            m.transform(_bounds);
+        }
+        else if (_autoSize == autoSizeCenter) {
+            // Autosize center expands from the previous center.
+            SWFMatrix m;
+            log_debug("_bounds.width() before: %s", _bounds.width());
+            m.tx = oldBounds.get_x_min() + oldBounds.width() / 2.0 - 
+                _bounds.width() / 2.0;
+            m.transform(_bounds);
+            log_debug("_bounds.width() after: %s", _bounds.width());
+        }
     }
 
     // Add the last line to our output.
@@ -1349,13 +1364,13 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     align_line(getTextAlignment(), last_line_start_record, x);
 
     // Expand bounding box to include last column of text ...
-    if ( _autoSize != autoSizeNone ) 
-    {
+    if (!doWordWrap() && _autoSize != autoSizeNone) {
         _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
     }
 
     // new paragraphs get the indent.
-    x = std::max(0, getLeftMargin() + getIndent() + getBlockIndent()) + PADDING_TWIPS;
+    x = std::max(0, getLeftMargin() + getIndent() + getBlockIndent()) +
+        PADDING_TWIPS;
     y += div * (getFontHeight() + leading);
     if (y >= _bounds.height()) {
         ++_maxScroll;
