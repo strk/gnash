@@ -400,8 +400,9 @@ DefineTextTest_Runner_SOURCES = \
 DefineTextTest_Runner_CXXFLAGS = \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
-DefineTextTest_Runner_LDADD = \
+DefineTextTest_Runner_LDADD =  \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 DefineTextTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -447,6 +448,7 @@ DefineEditTextTest_Runner_CXXFLAGS = \
 	$(NULL)
 DefineEditTextTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	 $(AM_LDFLAGS) \
 	$(NULL)
 DefineEditTextTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -522,6 +524,7 @@ eventSoundTest1_Runner_CXXFLAGS = \
 	$(NULL)
 eventSoundTest1_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 eventSoundTest1_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -542,6 +545,7 @@ streamingSoundTest1_Runner_CXXFLAGS = \
 	$(NULL)
 streamingSoundTest1_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 streamingSoundTest1_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -562,6 +566,7 @@ DefineEditTextVariableNameTest_Runner_SOURCES = \
 	$(NULL)
 DefineEditTextVariableNameTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 DefineEditTextVariableNameTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -604,6 +609,7 @@ root_stop_testrunner_SOURCES = \
 	$(NULL)
 root_stop_testrunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 root_stop_testrunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -620,7 +626,10 @@ loop_test.swf: loop_test
 	./loop_test $(top_srcdir)/testsuite/media
 
 loop_test_Runner_SOURCES = loop_test-Runner.cpp 
-loop_test_Runner_LDADD = $(top_builddir)/testsuite/libtestsuite.la 
+loop_test_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
 
 loop_test_Runner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -646,6 +655,7 @@ loop_test2runner_CXXFLAGS = \
 	$(NULL)
 loop_test2runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 loop_test2runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -754,6 +764,7 @@ morph_test1runner_SOURCES = \
 	$(NULL)
 morph_test1runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 morph_test1runner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -775,6 +786,7 @@ key_event_testrunner_SOURCES = \
 	$(NULL)
 key_event_testrunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 key_event_testrunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -1011,6 +1023,7 @@ replace_shapes1test_runner_CXXFLAGS = \
 	$(NULL)
 replace_shapes1test_runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 replace_shapes1test_runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1031,6 +1044,7 @@ replace_sprites1test_runner_CXXFLAGS = \
 	$(NULL)
 replace_sprites1test_runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 replace_sprites1test_runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1051,6 +1065,7 @@ replace_buttons1test_runner_CXXFLAGS = \
 	$(NULL)
 replace_buttons1test_runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 replace_buttons1test_runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1074,6 +1089,7 @@ masks_testrunner_CXXFLAGS = \
 	$(NULL)
 masks_testrunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 masks_testrunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1097,6 +1113,7 @@ masks_test2runner_CXXFLAGS = \
 	$(NULL)
 masks_test2runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 masks_test2runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1214,6 +1231,7 @@ attachMovieTestRunner_SOURCES = \
 	$(NULL)
 attachMovieTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 attachMovieTestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -1237,6 +1255,7 @@ attachMovieLoopingTestRunner_SOURCES = \
 	$(NULL)
 attachMovieLoopingTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 attachMovieLoopingTestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -1276,6 +1295,7 @@ simple_loop_testrunner_SOURCES = \
 	$(NULL)
 simple_loop_testrunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 simple_loop_testrunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -1539,6 +1559,7 @@ EmbeddedSoundTest_Runner_CXXFLAGS = \
 
 EmbeddedSoundTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 
 EmbeddedSoundTest_Runner_DEPENDENCIES = \
@@ -1575,6 +1596,7 @@ registerClassTestRunner_SOURCES = \
 	$(NULL)
 registerClassTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 registerClassTestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -1614,6 +1636,7 @@ RollOverOutTest_Runner_SOURCES = \
 	$(NULL)
 RollOverOutTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 RollOverOutTest_Runner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -1634,6 +1657,7 @@ ButtonEventsTest_Runner_SOURCES = \
 	$(NULL)
 ButtonEventsTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 ButtonEventsTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1654,6 +1678,7 @@ SpriteButtonEventsTest_Runner_SOURCES = \
 	$(NULL)
 SpriteButtonEventsTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 SpriteButtonEventsTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1681,6 +1706,7 @@ loadMovieTestRunner_SOURCES = \
 	$(NULL)
 loadMovieTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 loadMovieTestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
@@ -1739,6 +1765,7 @@ ButtonPropertiesTestRunner_SOURCES = \
 	$(NULL)
 ButtonPropertiesTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 ButtonPropertiesTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1772,6 +1799,7 @@ intervalTestRunner_CXXFLAGS = \
 	$(NULL)
 intervalTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 intervalTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1799,6 +1827,7 @@ DrawingApiTestRunner_CXXFLAGS = \
 	$(NULL)
 DrawingApiTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 DrawingApiTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1818,6 +1847,7 @@ PrototypeEventListenersTestRunner_CXXFLAGS = \
 	$(NULL)
 PrototypeEventListenersTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 PrototypeEventListenersTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1846,6 +1876,7 @@ DragDropTestRunner_CXXFLAGS = \
 	$(NULL)
 DragDropTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 DragDropTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -1914,6 +1945,7 @@ NetStream_SquareTestRunner_CXXFLAGS = \
 
 NetStream_SquareTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 
 NetStream_SquareTestRunner_DEPENDENCIES = \
@@ -1941,6 +1973,7 @@ Video_EmbedSquareTestRunner_CXXFLAGS = \
 
 Video_EmbedSquareTestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 
 Video_EmbedSquareTestRunner_DEPENDENCIES = \
