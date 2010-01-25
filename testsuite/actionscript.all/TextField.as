@@ -961,9 +961,18 @@ check_equals(tf._width, 10);
 // test that adding a newline doesn't change the bounds width
 // see bug #22216
 tf.autoSize = 'center';
+
+// Word wrap is still true, so nothing should happen!
+check_equals(tf._width, 10);
 tf.text = "single line";
+
+// Changing text should also not change width.
+check_equals(tf._width, 10);
+
 linewidth = tf._width;
 tf.text = "single line\n";
+
+check_equals(tf._width, 10);
 check_equals(tf._width, linewidth); 
 
 // Test that setting autoSize = none
@@ -1278,11 +1287,11 @@ o = new CTF();
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(522);
+     check_totals(525);
 #elif OUTPUT_VERSION == 7
- check_totals(546);
+ check_totals(549);
 #elif OUTPUT_VERSION == 8
- check_totals(547);
+ check_totals(550);
 #endif
 
 #endif

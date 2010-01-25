@@ -55,21 +55,21 @@ private:
 }
 
 Font::GlyphInfo::GlyphInfo()
-	:
-	advance(0)
+    :
+    advance(0)
 {}
 
 Font::GlyphInfo::GlyphInfo(std::auto_ptr<SWF::ShapeRecord> glyph,
         float advance)
-	:
-	glyph(glyph.release()),
-	advance(advance)
+    :
+    glyph(glyph.release()),
+    advance(advance)
 {}
 
 Font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
-	:
-	glyph(o.glyph),
-	advance(o.advance)
+    :
+    glyph(o.glyph),
+    advance(o.advance)
 {}
 
 
@@ -240,7 +240,7 @@ Font::get_advance(int glyph_index, bool embedded) const
 float
 Font::get_kerning_adjustment(int last_code, int code) const
 {
-    kerning_pair	k;
+    kerning_pair k;
     k.m_char0 = last_code;
     k.m_char1 = code;
     kernings_table::const_iterator it = m_kerning_pairs.find(k);
@@ -251,15 +251,13 @@ Font::get_kerning_adjustment(int last_code, int code) const
     return 0;
 }
 
-unsigned short int
+size_t
 Font::unitsPerEM(bool embed) const
 {
     // the EM square is 1024 x 1024 for DefineFont up to 2
     // and 20 as much for DefineFont3 up
     if (embed) {
-        // If this is not an embedded font, what should we do
-        // here?
-        if ( _fontTag && _fontTag->subpixelFont() ) return 1024 * 20;
+        if ( _fontTag && _fontTag->subpixelFont() ) return 1024 * 20.0;
         else return 1024;
     }
     
@@ -267,7 +265,7 @@ Font::unitsPerEM(bool embed) const
         if (!initDeviceFontProvider()) {
             log_error("Device font provider was not initialized, "
                     "can't get unitsPerEM");
-            return 0; // can't query it..
+            return 0; 
         }
     }
 
@@ -308,8 +306,6 @@ Font::add_os_glyph(boost::uint16_t code)
 
     _deviceGlyphTable.push_back(GlyphInfo(sh, advance));
 
-    testInvariant();
-
     return newOffset;
 }
 
@@ -333,35 +329,32 @@ Font::initDeviceFontProvider() const
 bool
 Font::matches(const std::string& name, bool bold, bool italic) const
 {
-	return (_bold == bold && _italic == italic && name ==_name);
+    return (_bold == bold && _italic == italic && name ==_name);
 }
 
-// TODO: what about device fonts?
 float
 Font::leading() const {
     return _fontTag ? _fontTag->leading() : 0.0f;
 }
 
-// TODO: what about device fonts?
 float
-Font::ascent() const {
-    return _fontTag ? _fontTag->ascent() : 0.0f;
+Font::ascent(bool embedded) const {
+    return (embedded && _fontTag) ? _fontTag->ascent() : _ftProvider->ascent();
+}
+
+float
+Font::descent(bool embedded) const {
+    return (embedded && _fontTag) ? _fontTag->descent() :
+                                    _ftProvider->descent();
 }
     
-// TODO: what about device fonts?
-float
-Font::descent() const {
-    return _fontTag ? _fontTag->descent() : 0.0f;
-}
-    
-// TODO: what about device fonts?
 bool
 Font::is_subpixel_font() const {
     return _fontTag ? _fontTag->subpixelFont() : false;
 }
 
 
-}	// end namespace gnash
+} // namespace gnash
 
 
 // Local Variables:
