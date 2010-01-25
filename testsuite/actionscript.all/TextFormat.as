@@ -329,7 +329,7 @@ xcheck_equals(Math.round(te.textFieldHeight), 18);
 check_equals(te.textFieldWidth, 10);
 
 #if OUTPUT_VERSION > 7
-xcheck_equals(Math.round(te.width), 9);
+check_equals(Math.round(te.width), 9);
 #else
 xcheck_equals(Math.round(te.width), 29);
 #endif
@@ -347,7 +347,7 @@ check_equals(Math.round(te.descent), 3);
 
 #if OUTPUT_VERSION > 7
 // Width of largest character in version 8?
-xcheck_equals(Math.round(te.width), 9);
+check_equals(Math.round(te.width), 9);
 #else
 xcheck_equals(Math.round(te.width), 29);
 #endif
@@ -359,7 +359,7 @@ xcheck_equals(Math.round(te.width), 25);
 
 te = tf2.getTextExtent("o");
 xcheck_equals(Math.round(te.textFieldHeight), 18);
-xcheck_equals(Math.round(te.textFieldWidth), 11);
+check_equals(Math.round(te.textFieldWidth), 11);
 check_equals(Math.round(te.ascent), 11);
 check_equals(Math.round(te.descent), 3);
 
