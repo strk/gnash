@@ -555,6 +555,9 @@ textformat_align(const fn_call& fn)
 /// This may never apply to embedded fonts. There is no way to instruct the
 /// function to use embedded fonts, so it makes sense if it always chooses
 /// the device font.
+//
+/// TODO: this duplicates other functionality in TextField; ideally both
+/// should be fixed, tested, and merged.
 as_value
 textformat_getTextExtent(const fn_call& fn)
 {
@@ -599,13 +602,9 @@ textformat_getTextExtent(const fn_call& fn)
     /// 240 twips for a size 12.
     const double scale = size / static_cast<double>(f->unitsPerEM(false));
 
-    log_debug("Size: %s, scale: %s, ascent: %s", size, scale, f->ascent());
-
     double height = size;
     double width = 0;
-
     double curr = 0;
-
 
     for (std::string::const_iterator it = s.begin(), e = s.end();
             it != e; ++it) {
