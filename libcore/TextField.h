@@ -63,19 +63,19 @@ public:
 	};
 	
 	/// Possible autoSize values
-	enum AutoSizeValue {
+	enum AutoSize {
 
 		/// Do not automatically resize TextField as text grow/shrink
-		autoSizeNone,
+		AUTOSIZE_NONE,
 
 		/// Expand TextField, anchor the top-left side
-		autoSizeLeft,
+		AUTOSIZE_LEFT,
 
 		/// Expand TextField, anchor the horizontal center
-		autoSizeCenter,
+		AUTOSIZE_CENTER,
 
 		/// Expand TextField, anchor the top-right side
-		autoSizeRight
+		AUTOSIZE_RIGHT
 	};
 
 	/// Possible type values
@@ -307,7 +307,7 @@ public:
 	void setEmbedFonts(bool use);
 
 	/// Get autoSize value 
-	AutoSizeValue getAutoSize() const
+	AutoSize getAutoSize() const
 	{
 		return _autoSize;
 	}
@@ -318,28 +318,9 @@ public:
 	/// Set autoSize value 
 	//
 	/// @param val
-	/// 	The AutoSizeValue to use
+	/// 	The AutoSize to use
 	///
-	void setAutoSize(AutoSizeValue val);
-
-	/// Parse autoSize string value
-	//
-	/// @param val
-	/// 	Auto size value as a string (one of none, left, center, right)
-	///
-	/// @return an AutoSizeValue identifier. autoSizeNone if invalid
-	///
-	static AutoSizeValue parseAutoSizeValue(const std::string& val);
-
-	/// Return autoSize value as a string
-	//
-	/// @param val
-	/// 	Auto size value 
-	///
-	/// @return a C-string representation of the autoSize value.
-	///	The returns is *never* NULL.
-	///
-	static const char* autoSizeValueName(AutoSizeValue val);
+	void setAutoSize(AutoSize val);
 
 	/// Set type (input or dynamic)
 	//
@@ -839,7 +820,7 @@ private:
 
 	bool _selectable;
 
-	AutoSizeValue _autoSize;
+	AutoSize _autoSize;
 
 	TypeValue _type;
 

@@ -82,6 +82,9 @@ namespace gnash {
 
 // Forward declarations
 namespace {
+    const char* autoSizeValueName(TextField::AutoSize val);
+    TextField::AutoSize parseAutoSize(const std::string& val);
+
     void attachPrototypeProperties(as_object& proto);
     void attachTextFieldStaticMembers(as_object& o);
     void attachTextFieldInterface(as_object& o);
@@ -183,7 +186,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _wordWrap(def.wordWrap()),
     _html(def.html()),
     _selectable(!def.noSelect()),
-    _autoSize(def.autoSize() ? autoSizeLeft : autoSizeNone),
+    _autoSize(def.autoSize() ? AUTOSIZE_LEFT : AUTOSIZE_NONE),
     _type(def.readOnly() ? typeDynamic : typeInput),
     _bounds(def.bounds()),
     _selection(0, 0)
@@ -253,7 +256,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _wordWrap(false),
     _html(false),
     _selectable(true),
-    _autoSize(autoSizeNone),
+    _autoSize(AUTOSIZE_NONE),
     _type(typeDynamic),
     _bounds(bounds),
     _selection(0, 0)
@@ -1150,7 +1153,7 @@ TextField::format_text()
     // nothing more to do if text is empty
     if ( _text.empty() )
     {
-        // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
+        // TODO: should we still reset _bounds if autoSize != AUTOSIZE_NONE ?
         //       not sure we should...
         reset_bounding_box(0, 0);
         return;
@@ -1159,8 +1162,8 @@ TextField::format_text()
     LineStarts::iterator linestartit = _line_starts.begin();
     LineStarts::const_iterator linestartend = _line_starts.end();
 
-    AutoSizeValue autoSize = getAutoSize();
-    if (autoSize != autoSizeNone) {
+    AutoSize autoSize = getAutoSize();
+    if (autoSize != AUTOSIZE_NONE) {
         // When doing WordWrap we don't want to change
         // the boundaries. See bug #24348
         if (!doWordWrap()) {
@@ -1264,18 +1267,18 @@ TextField::format_text()
                 
     // Expand bounding box to include the whole text (if autoSize and wordWrap
     // is not in operation.
-    if (_autoSize != autoSizeNone && !doWordWrap())
+    if (_autoSize != AUTOSIZE_NONE && !doWordWrap())
     {
         _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
 
-        if (_autoSize == autoSizeRight) {
+        if (_autoSize == AUTOSIZE_RIGHT) {
             /// Autosize right expands from the previous right margin.
             SWFMatrix m;
 
             m.tx = oldBounds.get_x_max() - _bounds.width();
             m.transform(_bounds);
         }
-        else if (_autoSize == autoSizeCenter) {
+        else if (_autoSize == AUTOSIZE_CENTER) {
             // Autosize center expands from the previous center.
             SWFMatrix m;
             log_debug("_bounds.width() before: %s", _bounds.width());
@@ -1364,7 +1367,7 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     align_line(getTextAlignment(), last_line_start_record, x);
 
     // Expand bounding box to include last column of text ...
-    if (!doWordWrap() && _autoSize != autoSizeNone) {
+    if (!doWordWrap() && _autoSize != AUTOSIZE_NONE) {
         _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
     }
 
@@ -1864,7 +1867,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
 #endif
 
             // No wrap and no resize: truncate
-            if (!doWordWrap() && getAutoSize() == autoSizeNone)
+            if (!doWordWrap() && getAutoSize() == AUTOSIZE_NONE)
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
                 log_debug(" wordWrap=false, autoSize=none");
@@ -2629,47 +2632,6 @@ TextField::setFontHeight(boost::uint16_t h)
 }
 
 
-TextField::AutoSizeValue
-TextField::parseAutoSizeValue(const std::string& val)
-{
-    StringNoCaseEqual cmp;
-
-    if ( cmp(val, "left") )
-    {
-        return autoSizeLeft;
-    }
-    if ( cmp(val, "right") )
-    {
-        return autoSizeRight;
-    }
-    if ( cmp(val, "center") )
-    {
-        return autoSizeCenter;
-    }
-    return autoSizeNone;
-
-}
-
-
-const char*
-TextField::autoSizeValueName(AutoSizeValue val)
-{
-    switch (val)
-    {
-        case autoSizeLeft:
-            return "left";
-        case autoSizeRight:
-            return "right";
-        case autoSizeCenter:
-            return "center";
-        case autoSizeNone:
-        default:
-            return "none";
-    }
-
-}
-
-
 TextField::TypeValue
 TextField::parseTypeValue(const std::string& val)
 {
@@ -2701,7 +2663,7 @@ TextField::typeValueName(TypeValue val)
 }
 
 void
-TextField::setAutoSize(AutoSizeValue val)
+TextField::setAutoSize(AutoSize val)
 {
     if ( val == _autoSize ) return;
 
@@ -2715,9 +2677,21 @@ TextField::TextAlignment
 TextField::getTextAlignment()
 {
     TextAlignment textAlignment = getAlignment(); 
-    if ( _autoSize == autoSizeCenter ) textAlignment = ALIGN_CENTER;
-    else if ( _autoSize == autoSizeLeft ) textAlignment = ALIGN_LEFT;
-    else if ( _autoSize == autoSizeRight ) textAlignment = ALIGN_RIGHT;
+
+    switch (_autoSize) {
+        case AUTOSIZE_CENTER:
+            textAlignment = ALIGN_CENTER;
+            break;
+        case AUTOSIZE_LEFT:
+            textAlignment = ALIGN_LEFT;
+            break;
+        case AUTOSIZE_RIGHT:
+            textAlignment = ALIGN_RIGHT;
+            break;
+        default:
+            // Leave it as it was.
+            break;
+    }
 
     return textAlignment;
 }
@@ -3161,27 +3135,24 @@ textfield_autoSize(const fn_call& fn)
 
     if ( fn.nargs == 0 ) // getter
     {
-        return ptr->autoSizeValueName(ptr->getAutoSize());
+        return autoSizeValueName(ptr->getAutoSize());
     }
     else // setter
     {
         const as_value& arg = fn.arg(0);
-        if ( arg.is_bool() )
-        {
-            if ( arg.to_bool() ) // true == left
-            {
-                ptr->setAutoSize( TextField::autoSizeLeft );
+        if (arg.is_bool()) {
+            if (arg.to_bool()) {
+                // True equates to left, every other bool to none.
+                ptr->setAutoSize(TextField::AUTOSIZE_LEFT);
             }
-            else
-            {
-                ptr->setAutoSize( TextField::autoSizeNone );
+            else {
+                ptr->setAutoSize(TextField::AUTOSIZE_NONE);
             }
         }
-        else
-        {
+        else {
             std::string strval = arg.to_string();
-            TextField::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
-            ptr->setAutoSize( val );
+            TextField::AutoSize val = parseAutoSize(strval);
+            ptr->setAutoSize(val);
         }
     }
 
@@ -3193,8 +3164,7 @@ textfield_type(const fn_call& fn)
 {
     TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // getter
         return ptr->typeValueName(ptr->getType());
     }
@@ -3205,8 +3175,7 @@ textfield_type(const fn_call& fn)
     TextField::TypeValue val = ptr->parseTypeValue(strval);
 
     IF_VERBOSE_ASCODING_ERRORS(
-        if ( val == TextField::typeInvalid )
-        {
+        if (val == TextField::typeInvalid) {
             log_aserror(_("Invalid value given to TextField.type: %s"), strval);
         }
     );
@@ -3817,6 +3786,47 @@ attachTextFieldStaticMembers(as_object& o)
     VM& vm = getVM(o);
     o.init_member("getFontList", vm.getNative(104, 201), swf6Flags);
 }
+
+
+/// Return autoSize value as a string
+//
+/// @param val      AutoSize value 
+/// @return         a C-string representation of the autoSize value.
+///	                The return is *never* NULL.
+const char*
+autoSizeValueName(TextField::AutoSize val)
+{
+    switch (val) {
+        case TextField::AUTOSIZE_LEFT:
+            return "left";
+        case TextField::AUTOSIZE_RIGHT:
+            return "right";
+        case TextField::AUTOSIZE_CENTER:
+            return "center";
+        case TextField::AUTOSIZE_NONE:
+        default:
+            return "none";
+    }
+
+}
+
+TextField::AutoSize
+parseAutoSize(const std::string& val)
+{
+    StringNoCaseEqual cmp;
+
+    if (cmp(val, "left")) {
+        return TextField::AUTOSIZE_LEFT;
+    }
+    if (cmp(val, "right")) {
+        return TextField::AUTOSIZE_RIGHT;
+    }
+    if (cmp(val, "center")) {
+        return TextField::AUTOSIZE_CENTER;
+    }
+    return TextField::AUTOSIZE_NONE;
+}
+
 
 } // anonymous namespace
 
