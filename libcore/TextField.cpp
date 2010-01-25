@@ -1183,15 +1183,11 @@ TextField::format_text()
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight /
         static_cast<float>(_font->unitsPerEM(_embedFonts)); 
-    const float fontDescent = _font->descent(_embedFonts) * scale; 
     const float fontLeading = _font->leading() * scale;
     const boost::uint16_t leftMargin = getLeftMargin();
     const boost::uint16_t indent = getIndent();
     const boost::uint16_t blockIndent = getBlockIndent();
     const bool underlined = getUnderlined();
-
-    //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
-    //  getTarget(), fontDescent, fontLeading, fontHeight, scale);
 
     /// Remember the current bounds for autosize.
     SWFRect oldBounds(_bounds);

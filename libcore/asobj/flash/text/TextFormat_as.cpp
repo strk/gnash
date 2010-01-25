@@ -590,7 +590,10 @@ textformat_getTextExtent(const fn_call& fn)
     const bool bold = relay->bold() ? *relay->bold() : false;
     const bool italic = relay->italic() ? *relay->italic() : false;
     const double size = relay->size() ? *relay->size() : 240;
-    const double leading = relay->leading() ? *relay->leading() : 0;
+
+    // Note: currently leading is never defined for device fonts, and since
+    // getTextExtent currently only takes account of device fonts we don't
+    // need it.
 
     Font* f = relay->font() ?
         fontlib::get_font(*relay->font(), bold, italic) :
