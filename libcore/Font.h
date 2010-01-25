@@ -266,8 +266,10 @@ public:
     void setCodeTable(std::auto_ptr<CodeTable> table);
 
     /// Retrieve the number of embedded glyphs in this font.
-    //
     GlyphInfoRecords::size_type glyphCount() const;
+
+    /// Retrieve the FreetypeGlyphsProvider, initializing it if necessary.
+    FreetypeGlyphsProvider* ftProvider() const;
 
 private:
 
@@ -281,14 +283,6 @@ private:
     ///
     int add_os_glyph(boost::uint16_t code);
 
-    /// Initialize the freetype rasterizer
-    //
-    /// NOTE: this is 'const' for lazy initialization.
-    ///
-    /// Return true on success, false on error
-    ///
-    bool initDeviceFontProvider() const;
-
     /// If we were constructed from a definition, this is not NULL.
     boost::scoped_ptr<SWF::DefineFontTag> _fontTag;
 
@@ -299,11 +293,11 @@ private:
     std::string _displayName;
     std::string _copyrightName;
 
-    bool    _unicodeChars;
-    bool    _shiftJISChars;
-    bool    _ansiChars;
-    bool    _italic;
-    bool    _bold;
+    bool _unicodeChars;
+    bool _shiftJISChars;
+    bool _ansiChars;
+    bool _italic;
+    bool _bold;
 
     /// Code to index table for embedded glyphs
     //
