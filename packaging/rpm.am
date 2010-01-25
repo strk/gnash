@@ -26,7 +26,7 @@ RPMBUILD_FLAGS = # --clean --rmsource --rmspec
 
 gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
 	@echo "Editing the version in the spec file ..."
-	sed -e "s/Version.*/Version:	$(BRANCH_REVNO)_$(BRANCH_NICK)/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec;
+	sed -e "s/Version.*/Version:	$(BRANCH_NICK)$(BRANCH_REVNO)/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec;
 
 # Build an Redhat/Fedora .rpm package
 # We do this by using the source snapshot that we know is 'distclean'.
