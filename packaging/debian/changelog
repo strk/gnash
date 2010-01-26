@@ -2,7 +2,7 @@ gnash (trunk) snapshot; urgency=low
 
   * Add -dbg package so oprofile works out of the box.
 
- -- Rob Savoye <rob@welcomehome.org>  Thu, 15 Oct 2009 04:20:00 +0100
+ -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Thu, 15 Oct 2009 04:20:00 +0100
 
 gnash (0.8.2~cvs20080302t0056-0cvs) snapshot; urgency=low
 
