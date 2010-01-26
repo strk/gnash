@@ -887,6 +887,19 @@ with(grad) {
     beginGradientFill(fillType, colors, alphas, ratios, matrix);
     draw100x100Box(x, y, grad);
 
+    y += 100;
+    x = 0;
+
+    // Shape 13
+
+    // Check that ratios are adjusted if they do not get successively larger.
+    fillType = "linear";
+    colors = [0x0000ff, 0xffffff, 0x00ff00];
+    alphas = [100, 100, 100];
+    ratios = [0, 0x10, 0x05];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
    
     _visible = false;
 

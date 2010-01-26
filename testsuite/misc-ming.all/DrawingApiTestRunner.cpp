@@ -997,6 +997,13 @@ main(int /*argc*/, char** /*argv*/)
     check_pixel(x + 90 - 2, y + 90 - 2, 2, yellow, 2);
     check_pixel(x + 45, y + 45, 2, blue, 2);
 
+    // Shape 13
+    y += 100;
+    x = 0;
+    check_pixel(x + 7, y + 2, 2, green, 2);
+    check_pixel(x + 7, y + 90 - 2, 2, green, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, green, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, green, 2);
 
     //----------------------------------------------------------
 	// TODO: check startDrag/stopDrag on the hit detector
