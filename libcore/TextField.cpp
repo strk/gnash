@@ -1273,11 +1273,9 @@ TextField::format_text()
         else if (_autoSize == AUTOSIZE_CENTER) {
             // Autosize center expands from the previous center.
             SWFMatrix m;
-            log_debug("_bounds.width() before: %s", _bounds.width());
             m.tx = oldBounds.get_x_min() + oldBounds.width() / 2.0 - 
                 _bounds.width() / 2.0;
             m.transform(_bounds);
-            log_debug("_bounds.width() after: %s", _bounds.width());
         }
     }
 
