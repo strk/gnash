@@ -17,8 +17,8 @@ dnl
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, trunk)
-AC_CONFIG_SRCDIR(libcore/gnash.h)
-AM_CONFIG_HEADER(gnashconfig.h)
+AC_CONFIG_SRCDIR([libcore/gnash.h])
+AC_CONFIG_HEADERS([gnashconfig.h])
 
 dnl AC_CONFIG_SUBDIRS(libltdl)
 AC_CANONICAL_BUILD
@@ -931,6 +931,7 @@ fi
 AC_PROG_LIBTOOL
 
 AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
+AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
 
 AC_C_CONST
 AC_C_INLINE
