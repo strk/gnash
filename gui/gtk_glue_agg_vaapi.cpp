@@ -176,17 +176,17 @@ GtkAggVaapiGlue::createRenderHandler()
 
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
     if (!gvactx)
-	return NULL;
+        return NULL;
 
     std::vector<VaapiImageFormat> formats = gvactx->getSubpictureFormats();
     for (unsigned int i = 0; i < formats.size(); i++) {
-	if (vaapi_image_format_is_rgb(formats[i])) {
-	    _vaapi_image_format = formats[i];
-	    break;
-	}
+        if (vaapi_image_format_is_rgb(formats[i])) {
+            _vaapi_image_format = formats[i];
+            break;
+        }
     }
     if (_vaapi_image_format == VAAPI_IMAGE_NONE)
-	return NULL;
+        return NULL;
 
     const char *agg_pixel_format;
     agg_pixel_format = find_pixel_format(_vaapi_image_format);
@@ -194,7 +194,7 @@ GtkAggVaapiGlue::createRenderHandler()
         log_debug("GTK-AGG: Unknown RGB format %s reported by VA-API."
                   "  Please report this to the gnash-dev "
                   "mailing list.", string_of_FOURCC(_vaapi_image_format));
-	return NULL;
+        return NULL;
     }
 
     Renderer * const renderer = create_Renderer_agg(agg_pixel_format);
@@ -218,22 +218,25 @@ GtkAggVaapiGlue::beforeRendering()
     if (first && VM::isInitialized()) {
         first = false;
 
-	Movie const & mi = VM::get().getRoot().getRootMovie();
-	_movie_width  = mi.widthPixels();
-	_movie_height = mi.heightPixels();
-	dprintf("GtkAggVaapiGlue::beforeRendering(): movie size %dx%d\n",
+        Movie const & mi = VM::get().getRoot().getRootMovie();
+        _movie_width  = mi.widthPixels();
+        _movie_height = mi.heightPixels();
+        dprintf("GtkAggVaapiGlue::beforeRendering(): movie size %dx%d\n",
                 _movie_width, _movie_height);
 
-	_vaapi_surface.reset(new VaapiSurface(_movie_width, _movie_height));
-	_vaapi_image.reset(new VaapiImage(_movie_width,
-                                          _movie_height,
+        /* XXX: round up to 128-byte boundaries to workaround GMA500 bugs */
+        const unsigned int image_width  = (_movie_width + 31) & -32U;
+        const unsigned int image_height = _movie_height;
+
+        _vaapi_surface.reset(new VaapiSurface(_movie_width, _movie_height));
+        _vaapi_image.reset(new VaapiImage(image_width, image_height,
                                           _vaapi_image_format));
         _vaapi_subpicture.reset(new VaapiSubpicture(_vaapi_image));
 
-	if (!_vaapi_image->map()) {
-	    log_debug(_("ERROR: failed to map VA-API image."));
-	    return;
-	}
+        if (!_vaapi_image->map()) {
+            log_debug(_("ERROR: failed to map VA-API image."));
+            return;
+        }
 
         VaapiRectangle r(_movie_width, _movie_height);
         if (!_vaapi_surface->associateSubpicture(_vaapi_subpicture, r, r)) {
@@ -242,17 +245,17 @@ GtkAggVaapiGlue::beforeRendering()
         }
         _vaapi_surface->clear();
 
-	_agg_renderer->init_buffer(
-	    static_cast<unsigned char*>(_vaapi_image->getPlane(0)),
-	    _vaapi_image->getPitch(0) * _vaapi_image->height(),
-	    _vaapi_image->width(),
-	    _vaapi_image->height(),
-	    _vaapi_image->getPitch(0));
+        _agg_renderer->init_buffer(
+            static_cast<unsigned char*>(_vaapi_image->getPlane(0)),
+            _vaapi_image->getPitch(0) * _movie_height,
+            _movie_width,
+            _movie_height,
+            _vaapi_image->getPitch(0));
     }
 
     if (!_vaapi_image->map()) {
-	log_debug(_("ERROR: failed to map VA-API image."));
-	return;
+        log_debug(_("ERROR: failed to map VA-API image."));
+        return;
     }
 
     // Process all GDK pending operations
@@ -294,61 +297,77 @@ GtkAggVaapiGlue::render()
          return;
 
      if (!_vaapi_image.get() || !_vaapi_surface.get())
-	 return;
+         return;
 
      if (!_vaapi_image->unmap()) {
-	 printf("ERROR: failed to unmap VA-API image\n");
-	 return;
+         printf("ERROR: failed to unmap VA-API image\n");
+         return;
      }
 
      VAStatus status;
      status = vaPutSurface(gvactx->display(),
-			   _vaapi_surface->get(),
-			   GDK_DRAWABLE_XID(_drawing_area->window),
-			   0, 0,
-			   _vaapi_surface->width(),
-			   _vaapi_surface->height(),
-			   0, 0,
-			   _window_width,
-			   _window_height,
-			   NULL, 0,
-			   VA_FRAME_PICTURE);
-     if (!vaapi_check_status(status, "vaPutSurface()"))
-	 return;
+                           _vaapi_surface->get(),
+                           GDK_DRAWABLE_XID(_drawing_area->window),
+                           0, 0,
+                           _vaapi_surface->width(),
+                           _vaapi_surface->height(),
+                           0, 0,
+                           _window_width,
+                           _window_height,
+                           NULL, 0,
+                           VA_FRAME_PICTURE);
+     if (!vaapi_check_status(status, "vaPutSurface() canvas"))
+         return;
 
-#if 0
      Renderer_agg_base::RenderImages::const_iterator img, first_img, last_img;
      first_img = _agg_renderer->getFirstRenderImage();
      last_img  = _agg_renderer->getLastRenderImage();
 
      if (first_img != last_img) {
-	 for (img = first_img; img != last_img; ++img) {
-	     boost::shared_ptr<VaapiSurface> surface = (*img)->surface();
+         for (img = first_img; img != last_img; ++img) {
+             boost::shared_ptr<VaapiSurface> surface = (*img)->surface();
 
-	     VARectangle rect;
-	     rect.x      = (*img)->x();
-	     rect.y      = (*img)->y();
-	     rect.width  = (*img)->width();
-	     rect.height = (*img)->height();
+             VaapiRectangle rect;
+             rect.x      = (*img)->x();
+             rect.y      = (*img)->y();
+             rect.width  = (*img)->width();
+             rect.height = (*img)->height();
 
-	     VAStatus status;
-         VaapiRectangle dst_rect(surface->width(), surface->height());
-         if (!surface->associateSubpicture(_vaapi_subpicture, rect, dst_rect)) {
-             log_debug(_("ERROR: failed to associate subpicture to surface 0x%08x."), surface->get());
-             continue;
-          }
+             VaapiVideoWindow *videoWindow;
+             videoWindow = getVideoWindow(surface, _drawing_area->window, rect);
+             if (!videoWindow) {
+                 log_debug(_("ERROR: failed to setup video window for surface 0x%08x."), surface->get());
+                 continue;
+             }
+             videoWindow->moveResize(rect);
 
-	     status = vaPutSurface(gvactx->display(),
-				   surface->get(),
-				   GDK_DRAWABLE_XID(_drawing_area->window),
-				   0, 0, surface->width(), surface->height(),
-				   rect.x, rect.y, rect.width, rect.height,
-				   NULL, 0,
-				   VA_FRAME_PICTURE);
-	     assert(status == VA_STATUS_SUCCESS);
-	 }
+             VaapiRectangle dst_rect(surface->width(), surface->height());
+             if (!surface->associateSubpicture(_vaapi_subpicture, rect, dst_rect)) {
+                 log_debug(_("ERROR: failed to associate subpicture to surface 0x%08x."), surface->get());
+                 continue;
+             }
+
+             status = vaPutSurface(gvactx->display(),
+                                   surface->get(),
+                                   videoWindow->xid(),
+                                   0, 0, surface->width(), surface->height(),
+                                   0, 0, rect.width, rect.height,
+                                   NULL, 0,
+                                   VA_FRAME_PICTURE);
+             if (!vaapi_check_status(status, "vaPutSurface() video"))
+                 continue;
+
+             surface->deassociateSubpicture(_vaapi_subpicture);
+         }
+
+         for (img = first_img; img != last_img; ++img) {
+             boost::shared_ptr<VaapiSurface> surface = (*img)->surface();
+
+             status = vaSyncSurface(gvactx->display(), surface->get());
+             if (!vaapi_check_status(status, "vaSyncSurface() video"))
+                 continue;
+         }
      }
-#endif
 }
 
 void
@@ -363,7 +382,7 @@ GtkAggVaapiGlue::configure(GtkWidget *const /*widget*/, GdkEventConfigure *const
     dprintf("GtkAggVaapiGlue::configure()\n");
 
     if (_agg_renderer)
-	setRenderHandlerSize(event->width, event->height);
+        setRenderHandlerSize(event->width, event->height);
 
     _window_is_setup = true;
 }
