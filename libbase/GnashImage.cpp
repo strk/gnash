@@ -75,7 +75,7 @@ GnashImage::GnashImage(int width, int height,
     assert(pitch >= width);
 }
 
-void GnashImage::update(boost::uint8_t* data)
+void GnashImage::update(const boost::uint8_t* data)
 {
     std::memcpy(this->data(), data, _size);
 }
