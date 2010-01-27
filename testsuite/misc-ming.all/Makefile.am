@@ -165,8 +165,6 @@ check_PROGRAMS = \
 	loadImageTest \
 	loadMovieTest \
 	loadMovieTestRunner \
-	eventSoundTest1 \
-	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
 	frame_label_test \
 	path_format_test \
@@ -198,6 +196,8 @@ check_PROGRAMS = \
 if MING_VERSION_0_4_3
 check_PROGRAMS += \
 	EmbeddedSoundTest \
+	eventSoundTest1 \
+	eventSoundTest1-Runner \
 	$(NULL)
 endif
 
@@ -2048,7 +2048,6 @@ TEST_CASES = \
 	action_execution_order_extend_testrunner \
 	simple_loop_testrunner \
 	loadMovieTestRunner \
-	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
 	TextSnapshotTest-Runner \
 	action_execution_order_test1runner \
@@ -2106,7 +2105,10 @@ TEST_CASES = \
 	$(NULL)
 
 if MING_VERSION_0_4_3
-TEST_CASES += EmbeddedSoundTest-Runner
+TEST_CASES += \
+    EmbeddedSoundTest-Runner \
+	eventSoundTest1-Runner \
+    $(NULL)
 endif
 
 if MING_VERSION_0_4
