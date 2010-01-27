@@ -227,6 +227,7 @@ if USE_VAAPI_GLX
 	$(NULL)
 endif
 
+if USE_VAAPI
    libgnashbase_la_CPPFLAGS += \
 	-I$(top_srcdir)/libvaapi \
 	$(NULL)
@@ -238,6 +239,7 @@ endif
    libgnashbase_la_DEPENDENCIES += \
 	$(top_builddir)/libvaapi/libgnashvaapi.la \
 	$(NULL)
+endif
 endif
 
 if WIN32
