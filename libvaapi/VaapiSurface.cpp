@@ -89,8 +89,9 @@ VaapiSurfaceImpl::~VaapiSurfaceImpl()
     reset(VA_INVALID_SURFACE);
 }
 
-VaapiSurface::VaapiSurface(unsigned width, unsigned int height)
+VaapiSurface::VaapiSurface(unsigned int width, unsigned int height)
     : _impl(new VaapiSurfaceImpl(this, width, height))
+    , _context(NULL)
 {
 }
 

@@ -121,22 +121,11 @@ static gboolean
 gnash_canvas_expose_event(GtkWidget *widget, GdkEventExpose *event)
 {
     GnashCanvas *canvas = GNASH_CANVAS(widget);
-    gint num_rects;
-    GdkRectangle* rects;
 
     // In some versions of GTK this can't be const...
     GdkRegion* nonconst_region = const_cast<GdkRegion*>(event->region);
 
-    gdk_region_get_rectangles (nonconst_region, &rects, &num_rects);
-    assert(num_rects);
-
-    for (int i=0; i<num_rects; ++i) {
-      const GdkRectangle& cur_rect = rects[i];
-      canvas->glue->render(cur_rect.x, cur_rect.y, cur_rect.x + cur_rect.width,
-                    cur_rect.y + cur_rect.height);
-    }
-
-    g_free(rects);
+    canvas->glue->render(nonconst_region);
 
     return TRUE;
 }

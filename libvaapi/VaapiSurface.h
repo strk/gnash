@@ -26,11 +26,12 @@
 namespace gnash {
 
 // Forward declarations
+class VaapiContext;
 class VaapiSubpicture;
 
 /// VA rectangle abstraction
 struct VaapiRectangle : public VARectangle {
-    VaapiRectangle(unsigned int w, unsigned int h)
+    VaapiRectangle(unsigned int w = 0, unsigned int h = 0)
         { x = 0; y = 0; width = w; height = h; }
 
     VaapiRectangle(int x_, int y_, unsigned int w, unsigned int h)
@@ -69,8 +70,19 @@ class VaapiSurface {
     std::auto_ptr<VaapiSurfaceImplBase> _impl;
     std::vector< boost::shared_ptr<VaapiSubpicture> > _subpictures;
 
+    friend class VaapiContext;
+    VaapiContext *_context;
+
+    /// Set parent VA context
+    void setContext(VaapiContext *context)
+        { _context = context; }
+
 public:
     VaapiSurface(unsigned int width, unsigned int height);
+
+    /// Return parent VA context
+    VaapiContext *getContext() const
+        { return _context; }
 
     /// Return VA surface id
     VASurfaceID get() const

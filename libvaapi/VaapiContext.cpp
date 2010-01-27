@@ -150,6 +150,7 @@ bool VaapiContext::createContext(unsigned int width, unsigned int height)
     surface_ids.reserve(num_surfaces);
     for (unsigned int i = 0; i < num_surfaces; i++) {
         VaapiSurfaceSP surface(new VaapiSurface(width, height));
+        surface->setContext(this);
         _surfaces.push(surface);
         surface_ids.push_back(surface->get());
     }

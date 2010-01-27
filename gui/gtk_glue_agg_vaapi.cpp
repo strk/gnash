@@ -32,6 +32,8 @@
 
 #include "VaapiDisplayX11.h"
 #include "VaapiGlobalContext.h"
+#include "VaapiContext.h"
+#include "VaapiException.h"
 #include "VaapiSurface.h"
 #include "VaapiImage.h"
 #include "VaapiSubpicture.h"
@@ -55,6 +57,77 @@ find_pixel_format(VaapiImageFormat format)
     default:;
     }
     return NULL;
+}
+
+class VaapiVideoWindow : public VaapiContextData {
+    GdkWindow          *_window;
+    VaapiRectangle      _rect;
+
+public:
+    VaapiVideoWindow(GdkWindow *parent_window, VaapiRectangle const & rect);
+    ~VaapiVideoWindow();
+
+    /// Move and resize window
+    void moveResize(VaapiRectangle const & rect);
+
+    /// Return GDK window XID
+    XID xid() const
+        { return GDK_DRAWABLE_XID(_window); }
+
+    /// Return GDK window X coordinate
+    int x() const
+        { return _rect.x; }
+
+    /// Return GDK window Y coordinate
+    int y() const
+        { return _rect.y; }
+
+    /// Return GDK window width
+    unsigned int width() const
+        { return _rect.width; }
+
+    /// Return GDK window height
+    unsigned int height() const
+        { return _rect.height; }
+};
+
+VaapiVideoWindow::VaapiVideoWindow(GdkWindow *parent_window, VaapiRectangle const & rect)
+{
+    GdkWindowAttr wattr;
+    wattr.event_mask  = 0;
+    wattr.x           = rect.x;
+    wattr.y           = rect.y;
+    wattr.width       = rect.width;
+    wattr.height      = rect.height;
+    wattr.wclass      = GDK_INPUT_OUTPUT;
+    wattr.window_type = GDK_WINDOW_CHILD;
+    _window = gdk_window_new(parent_window, &wattr, GDK_WA_X|GDK_WA_Y);
+    if (!_window)
+        throw VaapiException("Could not create video child window");
+
+    gdk_window_show(_window);
+    gdk_window_raise(_window);
+    gdk_flush();
+    _rect = rect;
+}
+
+VaapiVideoWindow::~VaapiVideoWindow()
+{
+    if (_window) {
+        gdk_window_destroy(_window);
+        _window = NULL;
+    }
+}
+
+void
+VaapiVideoWindow::moveResize(VaapiRectangle const & rect)
+{
+    if (!_window)
+        return;
+
+    gdk_window_move_resize(_window, rect.x, rect.y, rect.width, rect.height);
+    gdk_flush();
+    _rect = rect;
 }
 
 GtkAggVaapiGlue::GtkAggVaapiGlue()
@@ -191,14 +264,27 @@ GtkAggVaapiGlue::beforeRendering()
     _agg_renderer->set_scale(1.0, 1.0);
 }
 
-void
-GtkAggVaapiGlue::render()
+VaapiVideoWindow *
+GtkAggVaapiGlue::getVideoWindow(boost::shared_ptr<VaapiSurface> surface,
+                                GdkWindow *parent_window,
+                                VaapiRectangle const & rect)
 {
-    render(0, 0, _window_width, _window_height);
+    VaapiContext * const context = surface->getContext();
+    if (!context)
+        return NULL;
+
+    if (!context->getData()) {
+        std::auto_ptr<VaapiContextData> contextData;
+        contextData.reset(new VaapiVideoWindow(parent_window, rect));
+        if (!contextData.get())
+            return NULL;
+        context->setData(contextData);
+    }
+    return dynamic_cast<VaapiVideoWindow *>(context->getData());
 }
 
 void
-GtkAggVaapiGlue::render(int minx, int miny, int maxx, int maxy)
+GtkAggVaapiGlue::render()
 {
      VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
      if (!gvactx)
@@ -209,17 +295,6 @@ GtkAggVaapiGlue::render(int minx, int miny, int maxx, int maxy)
 
      if (!_vaapi_image.get() || !_vaapi_surface.get())
 	 return;
-
-     GdkRectangle bounding_box;
-     bounding_box.x      = minx;
-     bounding_box.y      = miny;
-     bounding_box.width  = std::min(maxx - minx, (gint)_window_width);
-     bounding_box.height = std::min(maxy - miny, (gint)_window_height);
-     dprintf("GtkAggVaapiGlue::render(): location (%d,%d), size %zux%zu\n",
-             bounding_box.x,
-             bounding_box.y,
-             bounding_box.width,
-             bounding_box.height);
 
      if (!_vaapi_image->unmap()) {
 	 printf("ERROR: failed to unmap VA-API image\n");
@@ -257,6 +332,12 @@ GtkAggVaapiGlue::render(int minx, int miny, int maxx, int maxy)
 	     rect.height = (*img)->height();
 
 	     VAStatus status;
+         VaapiRectangle dst_rect(surface->width(), surface->height());
+         if (!surface->associateSubpicture(_vaapi_subpicture, rect, dst_rect)) {
+             log_debug(_("ERROR: failed to associate subpicture to surface 0x%08x."), surface->get());
+             continue;
+          }
+
 	     status = vaPutSurface(gvactx->display(),
 				   surface->get(),
 				   GDK_DRAWABLE_XID(_drawing_area->window),
@@ -268,6 +349,12 @@ GtkAggVaapiGlue::render(int minx, int miny, int maxx, int maxy)
 	 }
      }
 #endif
+}
+
+void
+GtkAggVaapiGlue::render(GdkRegion * const /*region*/)
+{
+    render();
 }
 
 void

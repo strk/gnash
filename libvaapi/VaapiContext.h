@@ -37,19 +37,27 @@ enum VaapiCodec {
     VAAPI_CODEC_VC1
 };
 
+/// VA context user-data
+class VaapiContextData {
+public:
+    virtual ~VaapiContextData()
+        { }
+};
+
 /// VA context abstraction
 class VaapiContext {
     typedef boost::shared_ptr<VaapiSurface> VaapiSurfaceSP;
 
-    VADisplay                   _display;
-    VAConfigID                  _config;
-    VAContextID                 _context;
-    VaapiCodec                  _codec;
-    VAProfile                   _profile;
-    VAEntrypoint                _entrypoint;
-    std::queue<VaapiSurfaceSP>  _surfaces;
-    unsigned int                _picture_width;
-    unsigned int                _picture_height;
+    VADisplay                           _display;
+    VAConfigID                          _config;
+    VAContextID                         _context;
+    VaapiCodec                          _codec;
+    VAProfile                           _profile;
+    VAEntrypoint                        _entrypoint;
+    std::queue<VaapiSurfaceSP>          _surfaces;
+    unsigned int                        _picture_width;
+    unsigned int                        _picture_height;
+    std::auto_ptr<VaapiContextData>     _user_data;
 
     bool construct();
     void destruct();
@@ -72,6 +80,14 @@ public:
 
     /// Release surface
     void releaseSurface(boost::shared_ptr<VaapiSurface> surface);
+
+    /// Set user data
+    void setData(std::auto_ptr<VaapiContextData> user_data)
+        { _user_data = user_data; }
+
+    /// Get user data
+    VaapiContextData *getData() const
+        { return _user_data.get(); }
 };
 
 } // gnash namespace

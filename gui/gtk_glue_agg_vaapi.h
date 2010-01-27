@@ -36,6 +36,8 @@ namespace gnash
 class VaapiImage;
 class VaapiSurface;
 class VaapiSubpicture;
+class VaapiRectangle;
+class VaapiVideoWindow;
 class Renderer_agg_base;
 
 class GtkAggVaapiGlue : public GtkGlue
@@ -50,8 +52,13 @@ public:
     void setRenderHandlerSize(int width, int height);
     void beforeRendering();
     void render();
-    void render(int minx, int miny, int maxx, int maxy);
+    void render(GdkRegion * const);
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
+
+private:
+    VaapiVideoWindow *getVideoWindow(boost::shared_ptr<VaapiSurface> surface,
+                                     GdkWindow *parent_window,
+                                     VaapiRectangle const & rect);
 
 private:
     Renderer_agg_base                  *_agg_renderer;

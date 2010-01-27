@@ -445,6 +445,98 @@ private:
 
 };
 
+/// Class for rendering empty video frames.
+//
+/// Templated functions are used to allow using different types,
+/// particularly for high and low quality rendering. 
+//
+/// At present, this is bound to the renderer's ClipBounds. In future it
+/// may be useful to pass BlendMode, Cxform, and custom clipbounds as well
+/// as a caller-provided rendering buffer. This also applies to the 
+/// rest of the renderer API.
+//
+/// @param PixelFormat The format to render to.
+template <typename PixelFormat>
+class EmptyVideoRenderer
+{
+
+public:
+
+    /// Render the pixels using this renderer
+    typedef typename agg::renderer_base<PixelFormat>    Renderer;
+    typedef agg::rasterizer_scanline_aa<>               Rasterizer;
+
+    EmptyVideoRenderer(const ClipBounds& clipbounds)
+        : _clipbounds(clipbounds)
+        {}
+
+    void render(agg::path_storage& path, Renderer& rbase,
+        const AlphaMasks& masks)
+    {
+        if (masks.empty()) {
+            // No mask active
+            agg::scanline_p8 sl;
+            renderScanlines(path, rbase, sl);
+        }
+        else {
+            // Untested.
+            typedef agg::scanline_u8_am<agg::alpha_mask_gray8> Scanline;
+            Scanline sl(masks.back()->getMask());
+            renderScanlines(path, rbase, sl);
+        }
+    } 
+
+private:
+
+    template<typename Scanline>
+    void renderScanlines(agg::path_storage& path, Renderer& rbase,
+            Scanline& sl)
+    {
+        Rasterizer ras;
+        agg::renderer_scanline_aa_solid<Renderer> ren_sl(rbase);
+
+        for (ClipBounds::const_iterator i = _clipbounds.begin(),
+            e = _clipbounds.end(); i != e; ++i)
+        {
+            const ClipBounds::value_type& cb = *i;
+            applyClipBox<Rasterizer>(ras, cb);
+            ras.add_path(path);
+
+            const agg::rgba8 col(agg::argb8_packed(0));
+            ren_sl.color(col);
+
+            // we don't want premultiplied alpha (so, don't use blend functions)
+            //agg::render_scanlines(ras, sl, ren_sl);
+            if (ras.rewind_scanlines()) {
+                sl.reset(ras.min_x(), ras.max_x());
+                ren_sl.prepare();
+                while (ras.sweep_scanline(sl)) {
+                    //ren_sl.render(sl);
+                    const int y = sl.y();
+                    unsigned int num_spans = sl.num_spans();
+                    typename Scanline::const_iterator span = sl.begin();
+
+                    for (;;) {
+                        const int x = span->x;
+                        assert(span->len > 0); // XXX: check span->len < 0 case!
+                        if (span->len > 0)
+                            rbase.copy_hline(x, y, (unsigned)span->len, col);
+                        else
+                            rbase.copy_hline(x, y,
+                                             (unsigned)(x - span->len - 1),
+                                             col);
+                        if (--num_spans == 0)
+                            break;
+                        ++span;
+                    }
+                }
+            }
+        }
+    }
+
+    const ClipBounds& _clipbounds;
+};    
+
 /// Class for rendering video frames.
 //
 /// Templated functions are used to allow using different types,
@@ -616,6 +708,15 @@ public:
         vr.render(path, rbase, _alphaMasks);
     }
 
+    void renderEmptyVideo(agg::path_storage path)
+    {
+        // renderer base for the stage buffer (not the frame image!)
+        renderer_base& rbase = *m_rbase;
+
+        EmptyVideoRenderer<PixelFormat> vr(_clipbounds);
+        vr.render(path, rbase, _alphaMasks);
+    }
+
     void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
         const SWFRect* bounds, bool smooth)
     {
@@ -651,6 +752,13 @@ public:
         mat.transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
         mat.transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
 
+        agg::path_storage path;
+        path.move_to(a.x, a.y);
+        path.line_to(b.x, b.y);
+        path.line_to(c.x, c.y);
+        path.line_to(d.x, d.y);
+        path.line_to(a.x, a.y);
+
 #if USE_VAAPI
 	if (frame->location() == GNASH_IMAGE_GPU) {
 	    RenderImage image;
@@ -658,16 +766,11 @@ public:
 			    static_cast<GnashVaapiImage *>(frame),
 			    a.x, a.y, c.x - a.x, c.y - a.y));
 	    _render_images.push_back(image);
+            // clear video region with transparent color
+            renderEmptyVideo(path);
 	    return;
 	}
 #endif
-
-        agg::path_storage path;
-        path.move_to(a.x, a.y);
-        path.line_to(b.x, b.y);
-        path.line_to(c.x, c.y);
-        path.line_to(d.x, d.y);
-        path.line_to(a.x, a.y);
 
         switch (frame->type())
         {
