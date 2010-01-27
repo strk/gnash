@@ -33,6 +33,10 @@ SNAPSHOT_TAR = gnash-$(BRANCH_NICK)$(BRANCH_REVNO).tar.gz
 # this is the temporary directory used for DESTDIR
 SNAPSHOT_TMP = /tmp/$(SNAPSHOT_DIR)
 
+#
+PREVIOUS_RELEASE = 0.8.6
+SNAPSHOT_VERSION = $(PREVIOUS_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
+
 # extract info from bazar
 
 #

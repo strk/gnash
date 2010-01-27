@@ -29,9 +29,9 @@ snapshot-deb:
 	cp -rfp $(srcdir)/packaging/debian/* $${snapshot_dir}/debian/; \
 	if test -e $${snapshot_dir}/debian/changelog; then \
 	  mv -f $${snapshot_dir}/debian/changelog $${snapshot_dir}/debian/changelog.orig; \
-	  sed -e "s:trunk:$(BRANCH_NICK)$(BRANCH_REVNO):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
+	  sed -e "s:trunk:$(SNAPSHOT_VERSION):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
 	fi; \
-	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot -nc -j4)
+	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot -j4)
 
 # these files are created when building packages
 CLEANFILES += *trunk*.deb *trunk*.gz *trunk*.bz2 *trunk*.changes
