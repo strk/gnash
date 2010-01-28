@@ -31,6 +31,8 @@
 #include "Machine.h"
 #include "Global_as.h"
 
+#include <boost/bind.hpp>
+
 namespace gnash {
 
 namespace abc {
