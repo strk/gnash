@@ -11,7 +11,6 @@ DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 MAIN_VERSION = $(shell head -n 1 debian/changelog | cut '-d ' -f 2 | sed 's/[()]//g')
-
 CFLAGS = -Wall -g -Werror-implicit-function-declaration
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
@@ -19,6 +18,8 @@ ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 else
 	CFLAGS += -O2
 endif
+
+DEB_DH_SHLIBDEPS_ARGS_ALL := -X* /usr/lib/gnash
 
 # shared library versions, option 1
 #version=2.0.5
@@ -46,9 +47,9 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
 
-	@printf "\n == AUTOGEN ===================================================== \n\n"
-	./autogen.sh
-	@printf "\n -------------------------------------------- End of AUTOGEN ---- \n\n"
+#	@printf "\n == AUTOGEN ===================================================== \n\n"
+#	./autogen.sh
+#	@printf "\n -------------------------------------------- End of AUTOGEN ---- \n\n"
 
 	# for now, only build the kde4 support,as kde3 is being depreciated.
 
@@ -97,33 +98,11 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp 
-
-ifeq (Makefile,$(wildcard Makefile))
-	-$(MAKE) maintainer-clean
-	-$(MAKE) distclean
-endif
-
-ifneq ($(wildcard ${AUTO_JUNK}),)
-	rm $(wildcard ${AUTO_JUNK})
-endif
-
-	rm -f config.{sub,guess,log,status}
-	rm -f libtool
 	rm -f `find . -name "Makefile"| grep -v "debian/"`
 	rm -f `find . -name "*.o"`
 	rm -rf `find . -name ".libs"`
 	rm -rf `find . -name ".deps"`
-
-	rm -f configure aclocal.m4 config.h.in
-	#-find . -name Makefile.in -exec rm {} \;
-	-rm `find . -name Makefile.in`
-
-	-rm -rf libltdl/autom4te.cache
-	-rm -f libltdl/* ltmain.sh
-
-	#cd debian/h2m; $(MAKE) clean
-
-	-rm -f README.amf
+	rm -f config.h.in
 
 	@printf "\n == CLEANING PATCHES ============================================ \n\n"
 	# we have no patches, we're the developers!
@@ -151,8 +130,6 @@ install: build
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	$(MAKE) install-plugins DESTDIR=$(CURDIR)/debian/tmp
 	@printf "\n -------------------------------------------- End of INSTALL ---- \n\n"
-
-	#cd debian/h2m; $(MAKE)
 
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
 	cp libbase/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
@@ -191,13 +168,14 @@ binary-arch: build install
 #	dh_installmenu
 #	dh_installmime
 	dh_installman
+	dh_desktop
 	dh_link
 	dh_strip --dbg-package=gnash-dbg
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs
 	dh_installdeb
-#	dh_shlibdeps debian/tmp/usr/bin/* debian/tmp/usr/sbin/* debian/tmp/usr/lib/*
+	dh_shlibdeps debian/tmp/usr/bin/* debian/tmp/usr/lib/gnash/*
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

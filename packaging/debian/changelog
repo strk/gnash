@@ -1,16 +1,16 @@
-gnash (trunk) snapshot; urgency=low
+gnash (trunk) unstable; urgency=low
 
   * Add -dbg package so oprofile works out of the box.
 
  -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Thu, 15 Oct 2009 04:20:00 +0100
 
-gnash (0.8.2~cvs20080302t0056-0cvs) snapshot; urgency=low
+gnash (0.8.2~cvs20080302t0056-0cvs) unstable; urgency=low
 
   * be able to make our own deb packages.
 
  -- Rob Savoye <rob@welcomehome.org>  Sun, 3 March 2008 04:20:00 +0100
 
-gnash (0.8.2~cvs20080223t0056-0ubuntu1) UNRELEASED; urgency=low
+gnash (0.8.2~cvs20080223t0056-0ubuntu1) unstable; urgency=low
 
   * package 0.8.2 preview
   * drop pkglibs that don't exist anymore from gnash-common.install
@@ -30,19 +30,19 @@ gnash (0.8.2~cvs20080223t0056-0ubuntu1) UNRELEASED; urgency=low
 
  -- Alexander Sack <asac@ubuntu.com>  Sat, 23 Feb 2008 01:58:44 +0100
 
-gnash (0.8.1-0ubuntu3) gutsy; urgency=low
+gnash (0.8.1-0ubuntu3) unstable; urgency=low
 
   * fix package description and use SWF instead of Flash
 
  -- Michael Vogt <michael.vogt@ubuntu.com>  Wed, 10 Oct 2007 14:25:42 +0200
 
-gnash (0.8.1-0ubuntu2) gutsy; urgency=low
+gnash (0.8.1-0ubuntu2) unstable; urgency=low
 
   * update gnash license to GPLv3 in debian/copyright. (LP: #147913)
 
  -- Alexander Sack <asac@ubuntu.com>  Thu, 04 Oct 2007 11:22:21 +0200
 
-gnash (0.8.1-0ubuntu1) gutsy; urgency=low
+gnash (0.8.1-0ubuntu1) unstable; urgency=low
 
   * New upstream version 0.8.1 final - UVFe acked in LP: #144396
 
@@ -67,19 +67,19 @@ gnash (0.8.1-0ubuntu1) gutsy; urgency=low
 
  -- Alexander Sack <asac@ubuntu.com>  Thu, 13 Sep 2007 10:10:38 +0200
 
-gnash (0.8.1~trunk.070802-0ubuntu5) gutsy; urgency=low
+gnash (0.8.1~trunk.070802-0ubuntu5) unstable; urgency=low
 
   * Rebuild for boost 1.34.0 -> 1.34.1 transistion.
 
  -- Steve Kowalik <stevenk@ubuntu.com>  Thu, 13 Sep 2007 11:05:21 +1000
 
-gnash (0.8.1~trunk.070802-0ubuntu4) gutsy; urgency=low
+gnash (0.8.1~trunk.070802-0ubuntu4) unstable; urgency=low
 
   * Fixed postinst and prerm procedures 
 
  -- Mario Danic <mario.danic@gmail.com>  Sun, 12 Aug 2007 00:56:48 +0200
 
-gnash (0.8.1~trunk.070802-0ubuntu3) gutsy; urgency=low
+gnash (0.8.1~trunk.070802-0ubuntu3) unstable; urgency=low
 
   * debian/control: Addeed browsers ID's to mozilla-plugin-gnash
   * debian/mozilla-plugin-gnash.postinst: cleanup of update-alternative
@@ -89,14 +89,14 @@ gnash (0.8.1~trunk.070802-0ubuntu3) gutsy; urgency=low
 
  -- Mario Danic <mario.danic@gmail.com>  Sat, 11 Aug 2007 15:29:52 +0200
 
-gnash (0.8.1~trunk.070802-0ubuntu2) gutsy; urgency=low
+gnash (0.8.1~trunk.070802-0ubuntu2) unstable; urgency=low
 
   * debian/mozilla-plugin-gnash.postinst: use right path for alternative
   * debian/mozilla-plugin-gnash.prerm: fix wrong path for alternatives
 
  -- Alexander Sack <asac@ubuntu.com>  Fri,  3 Aug 2007 04:08:28 +0200
 
-gnash (0.8.1~trunk.070802-0ubuntu1) gutsy; urgency=low
+gnash (0.8.1~trunk.070802-0ubuntu1) unstable; urgency=low
 
   Update source for trunk build 070802 aka preview 0.8.1:
       bzr repo: https://code.launchpad.net/~vcs-imports/gnash/trunk
@@ -147,25 +147,25 @@ gnash (0.8.1~trunk.070802-0ubuntu1) gutsy; urgency=low
 
  -- Alexander Sack <asac@ubuntu.com>  Thu, 02 Aug 2007 16:49:57 +0000
 
-gnash (0.8.0~cvs20070611.1016-1ubuntu3) gutsy; urgency=low
+gnash (0.8.0~cvs20070611.1016-1ubuntu3) unstable; urgency=low
 
   * Rebuild for the libcurl transition mess.
 
  -- Steve Kowalik <stevenk@ubuntu.com>  Thu,  5 Jul 2007 01:35:59 +1000
 
-gnash (0.8.0~cvs20070611.1016-1ubuntu2~mt1) feisty; urgency=low
+gnash (0.8.0~cvs20070611.1016-1ubuntu2~mt1) unstable; urgency=low
 
-  * feisty backport for mozillateam preview archive
+  * unstable backport for mozillateam preview archive
 
  -- Alexander Sack <asac@ubuntu.com>  Sun, 17 Jun 2007 17:37:00 +0200
 
-gnash (0.8.0~cvs20070611.1016-1ubuntu2) gutsy; urgency=low
+gnash (0.8.0~cvs20070611.1016-1ubuntu2) unstable; urgency=low
 
   * debian/control: add libgstreamer-plugins-base0.10-dev to fix ftbfs
 
  -- Alexander Sack <asac@ubuntu.com>  Wed, 13 Jun 2007 09:41:59 +0200
 
-gnash (0.8.0~cvs20070611.1016-1ubuntu1) gutsy; urgency=low
+gnash (0.8.0~cvs20070611.1016-1ubuntu1) unstable; urgency=low
 
   * debian/patches/gnash_easy_codec_install: initial version of easy codec
     install patch for gnash
