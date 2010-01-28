@@ -914,7 +914,11 @@ if test $ltmajor -eq 1; then
 	AC_LIBLTDL_CONVENIENCE
 	AC_LIBTOOL_DLOPEN
 	AC_LIBTOOL_WIN32_DLL
+if test x$windows = xyes; then
+	AC_DISABLE_SHARED
+else
 	AC_DISABLE_STATIC
+fi
 else
 dnl if test x$build_aqua = xyes; then
 	dnl the Aqua-binary is always static.
@@ -924,7 +928,6 @@ dnl else
 dnl	AC_DISABLE_STATIC
 dnl fi	
 	LT_INIT([dlopen win32-dll disable-static])
-	dnl lt_ltdl_dir=libbase/libltdl
 	LTDL_INIT([convenience recursive])
 	AC_CONFIG_FILES([libltdl/Makefile])
 fi
