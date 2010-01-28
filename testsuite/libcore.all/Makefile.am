@@ -75,9 +75,9 @@ if LIBLTDL1
 AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
 endif
 
-if USE_FFMPEG_ENGINE
-AM_LDFLAGS += $(FFMPEG_LIBS)
-endif
+#if USE_FFMPEG_ENGINE
+#AM_LDFLAGS += $(FFMPEG_LIBS)
+#endif
 
 BitsReaderTest_SOURCES = BitsReaderTest.cpp
 BitsReaderTest_LDADD = $(AM_LDFLAGS)
