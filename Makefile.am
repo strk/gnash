@@ -46,8 +46,8 @@ STD_DIRS = \
 	libamf \
 	libnet \
 	libmedia \
-	libsound \
 	libcore \
+	libsound \
 	backend \
 	utilities \
 	gui \
@@ -76,7 +76,7 @@ endif
 
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
-DIST_SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) cygnal extensions testsuite
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl
 
 EXTRA_DIST =  \
 	autogen.sh \

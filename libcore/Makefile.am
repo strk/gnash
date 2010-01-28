@@ -294,7 +294,6 @@ libgnashcore_la_LIBADD = \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
-	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
