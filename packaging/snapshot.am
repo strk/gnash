@@ -33,7 +33,7 @@ SNAPSHOT_TAR = gnash-$(BRANCH_NICK)$(BRANCH_REVNO).tar.gz
 # this is the temporary directory used for DESTDIR
 SNAPSHOT_TMP = /tmp/$(SNAPSHOT_DIR)
 
-#
+# this is used for Debian style naming conventions
 PREVIOUS_RELEASE = 0.8.6
 SNAPSHOT_VERSION = $(PREVIOUS_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
 
@@ -62,11 +62,10 @@ snapshot-src: distdir  force
 	  mv -f $${snapshot_dir}/configure.ac $${snapshot_dir}/configure.ac.orig; \
 	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $(BRANCH_NICK)$(BRANCH_REVNO))/" \
 	    $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
-	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;\
 	fi; \
 	tar zcvf $${snapshot_tar} --exclude=$${snapshot_dir}/autom4te.cache \
 	  --exclude=$${snapshot_dir}/configure.ac.orig $${snapshot_dir}
-#	$(RM) -fr $${snapshot_dir}
+#	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;
 
 snapshot-configure: force
 	-@now=`date "+%Y%m%d"`; \
