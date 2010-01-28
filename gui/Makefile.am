@@ -83,7 +83,8 @@ GTK_LIBS =  \
 	$(PANGO_LIBS) \
 	$(ATK_LIBS) \
 	$(GLIB_LIBS) \
-	$(EXPAT_LIBS)
+	$(EXPAT_LIBS) \
+	$(Z_LIBS)
 
 DUMP_CFLAGS =
 
