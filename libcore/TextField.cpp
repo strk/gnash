@@ -1529,15 +1529,17 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         //parsing went wrong
                         continue;
                     } else {
-                        //Don't think this is the best way to match with tags...
-                        //Also, assumes tags are properly nested. This is acceptable
-                        //assumption
+                        // Don't think this is the best way to match with
+                        // tags...
+                        // TODO: assumes tags are properly nested. This isn't
+                        // correct.
                         if (s == "U") {
                             //underline
                             newrec.setUnderline(true);
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "A") {
+                        }
+                        else if (s == "A") {
                             // anchor (blue text).
 							rgba color(0, 0, 0xff, 0xff);
 							newrec.setColor(color);
@@ -1552,14 +1554,16 @@ TextField::handleChar(std::wstring::const_iterator& it,
 							}
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "B") {
+                        }
+                        else if (s == "B") {
                             //bold
                             Font* boldfont = new Font(rec.getFont()->name(),
                                     true, rec.getFont()->isItalic());
                             newrec.setFont(boldfont);
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "FONT") {
+                        }
+                        else if (s == "FONT") {
                             //font
                             boost::uint16_t originalsize = _fontHeight;
                             attloc = attributes.find("COLOR");
@@ -1623,12 +1627,14 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
                             _fontHeight = originalsize;
                             y = newrec.yOffset();
-                        } else if (s == "IMG") {
+                        }
+                        else if (s == "IMG") {
                             //image
                             log_unimpl("<img> html tag in TextField");
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "I") {
+                        }
+                        else if (s == "I") {
                             //italic
                             Font* italicfont = new Font(rec.getFont()->name(),
                                     rec.getFont()->isBold(), true);
@@ -1658,12 +1664,14 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
 							newLine(x, y, newrec, last_space_glyph,
                                     last_line_start_record, 1.0);
-                        } else if (s == "SPAN") {
+                        }
+                        else if (s == "SPAN") {
                             //span
                             log_unimpl("<span> html tag in TextField");
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "TEXTFORMAT") {
+                        }
+                        else if (s == "TEXTFORMAT") {
                             log_debug("in textformat");
                             //textformat
                             boost::uint16_t originalblockindent = getBlockIndent();
@@ -1741,10 +1749,10 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             setLeftMargin(originalleftmargin);
                             setRightMargin(originalrightmargin);
                             setTabStops(originaltabstops);
-                        } else if (s == "P") {
+                        }
+                        else if (s == "P") {
                             //paragraph
-                            if (_display == TEXTFORMAT_BLOCK)
-                            {
+                            if (_display == TEXTFORMAT_BLOCK) {
                                 handleChar(it, e, x, y, newrec, last_code,
                                         last_space_glyph,
                                         last_line_start_record);
@@ -1753,17 +1761,18 @@ TextField::handleChar(std::wstring::const_iterator& it,
 								newLine(x, y, rec, last_space_glyph,
                                         last_line_start_record, 1.5);
                             }
-                            else
-                            {
+                            else {
                                 handleChar(it, e, x, y, newrec, last_code,
                                         last_space_glyph,
                                         last_line_start_record);
                             }
-                        } else if (s == "BR") {
+                        }
+                        else if (s == "BR" || s == "SBR") {
                             //line break
 							newLine(x, y, rec, last_space_glyph,
 										last_line_start_record, 1.0);
-                        } else {
+                        }
+                        else {
                             log_debug("<%s> tag is unsupported", s);
                             if (!selfclosing) { //then recurse, look for closing tag
                             handleChar(it, e, x, y, newrec, last_code,
