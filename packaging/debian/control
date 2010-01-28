@@ -25,7 +25,6 @@ Description: Debug symbols for Gnash.
  the Flash specification. This lets a flash movie communicate over a TCP/IP
  socket, and parse the incoming XML message. This lets a movie be a remote
  control for other devices or applications.
- .
 
 Package: gnash-common
 Section: libs
@@ -37,7 +36,6 @@ Description: free SWF movie player - common files/libraries
  plugin for Firefox/Mozilla or Konqueror.
  .
  This package includes the common, gui-independent files/libraries
- .
 
 Package: gnash
 Section: utils
@@ -55,7 +53,6 @@ Description: free SWF movie player
  .
  This package includes the standalone GTK+-based player that uses software
  rendering.
- .
 
 Package: klash
 Section: utils
@@ -77,7 +74,6 @@ Description: free SWF movie player - standalone player for KDE
  control for other devices or applications.
  .
  Klash is a free standalone Flash movie player for KDE.
- .
 
 Package: gnash-tools
 Section: utils
@@ -99,7 +95,6 @@ Description: free SWF movie player - Command-line Tools
  control for other devices or applications.
  .
  This package includes command-line utilities based in gnash.
- .
 
 Package: gnash-cygnal
 Section: utils
@@ -121,7 +116,6 @@ Description: free SWF movie player - Media server
  control for other devices or applications.
  .
  Cygnal is Gnash's media server.
- .
 
 Package: mozilla-plugin-gnash
 Section: utils
@@ -135,7 +129,6 @@ Description: free SWF movie player - Plugin for Mozilla and derivatives
  plugin for Firefox/Mozilla or Konqueror.
  .
  This package includes the plugin for Firefox/Mozilla Web Browser.
- .
 
 Package: konqueror-plugin-gnash
 Section: utils
@@ -146,7 +139,6 @@ Description: free SWF movie player - Plugin for Konqueror
  plugin for Firefox/Mozilla or Konqueror.
  .
  This package includes the plugin for Konqueror.
- .
 
 Package: gtk-plugin-gnash
 Section: libs
@@ -159,4 +151,3 @@ Description: free SWF movie player - Plugin for Gtk and PyGtk donated by
  Sugar Labs.
  .
  This package includes the plugin for Gtk and PyGtk..
- .

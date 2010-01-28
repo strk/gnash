@@ -32,7 +32,7 @@ DEB_DH_SHLIBDEPS_ARGS_ALL := -X* /usr/lib/gnash
 
 # CONFIGURE
 
-config.status: configure.ac
+config.status: configure
 	dh_testdir
 
 	@printf "\n == APPLYING PATCHES ============================================ \n\n"
@@ -98,11 +98,9 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp 
-	rm -f `find . -name "Makefile"| grep -v "debian/"`
 	rm -f `find . -name "*.o"`
 	rm -rf `find . -name ".libs"`
 	rm -rf `find . -name ".deps"`
-	rm -f config.h.in
 
 	@printf "\n == CLEANING PATCHES ============================================ \n\n"
 	# we have no patches, we're the developers!
