@@ -27,6 +27,8 @@
 #include "Global_as.h"
 #include "extension.h"
 
+#include <boost/bind.hpp>
+
 namespace gnash {
 
 // anonymous namespace
