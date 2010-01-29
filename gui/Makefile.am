@@ -98,6 +98,8 @@ GUI_CPPFLAGS =
 AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
+	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
 	$(LIRC_LIBS) \
 	$(MYSQL_LIBS) \
 	$(BOOST_LIBS) \

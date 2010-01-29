@@ -46,6 +46,8 @@ AM_LDFLAGS = \
 	$(LIBADD_DL) \
 	$(MYSQL_LIBS) \
 	$(CURL_LIBS) \
+	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
 	$(BOOST_LIBS) \
 	$(PYTHON_LIBS) \
 	$(PTHREAD_LIBS) \

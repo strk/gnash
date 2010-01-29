@@ -49,9 +49,9 @@ STD_DIRS = \
 	libcore \
 	libsound \
 	backend \
-	utilities \
 	gui \
 	plugin \
+	utilities \
 	doc \
 	po \
 	$(NULL)
