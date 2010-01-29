@@ -162,7 +162,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
       dnl Look for the kdecore library, which is required
       if test x"${ac_cv_path_kde4_lib}" != x; then
         AC_MSG_CHECKING([for kdecore library])
-        if test -f ${kde4_topdir}/libkdecore.la; then
+        if test -f ${kde4_topdir}/libkdecore.so; then
           ac_cv_path_kde4_lib="${ac_cv_path_kde4_lib} -lkdecore"
           AC_MSG_RESULT(${kde4_topdir}/libkdecore)
         else
