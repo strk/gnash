@@ -902,21 +902,22 @@ AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_MSG_CHECKING([For the version of libtool])
 if test -d ${srcdir}/libltdl/libltdl; then
-ltver=2.x
+  ltver=2.x
 else
-ltver=1.x
+  ltver=1.x
 fi
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
 AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
 if test $ltmajor -eq 1; then
-	AC_LIBLTDL_CONVENIENCE
-	AC_LIBTOOL_DLOPEN
+  AC_LIBLTDL_CONVENIENCE
+  AC_LIBTOOL_DLOPEN
   if test x"${windows}" = x"yes"; then
-	  AC_LIBTOOL_WIN32_DLL
+    AC_LIBTOOL_WIN32_DLL
+    :
   fi
-	AC_DISABLE_STATIC
+  AC_DISABLE_STATIC
 else
 dnl if test x$build_aqua = xyes; then
 	dnl the Aqua-binary is always static.
@@ -925,8 +926,8 @@ dnl	AC_DISABLE_SHARED
 dnl else
 dnl	AC_DISABLE_STATIC
 dnl fi	
-	LT_INIT([dlopen win32-dll disable-static])
-	LTDL_INIT([convenience recursive])
+  LT_INIT([dlopen win32-dll disable-static])
+  LTDL_INIT([convenience recursive])
   AC_CONFIG_FILES([libltdl/Makefile])
 fi
 AC_PROG_LIBTOOL
