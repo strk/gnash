@@ -276,7 +276,7 @@ AC_ARG_ENABLE(jemalloc,
 esac],jemalloc=yes)
 
 dnl There is some weird stuff going on with NetBSD and jemalloc, so don't build it for now.
-if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes"; then
+if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes"; then
   jemalloc=no
 fi
 dnl If the compiler doesn't have local thread storage enabled, don't try to
@@ -913,12 +913,10 @@ AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
 if test $ltmajor -eq 1; then
 	AC_LIBLTDL_CONVENIENCE
 	AC_LIBTOOL_DLOPEN
-	AC_LIBTOOL_WIN32_DLL
-if test x$windows = xyes; then
-	AC_DISABLE_SHARED
-else
+  if test x"${windows}" = x"yes"; then
+	  AC_LIBTOOL_WIN32_DLL
+  fi
 	AC_DISABLE_STATIC
-fi
 else
 dnl if test x$build_aqua = xyes; then
 	dnl the Aqua-binary is always static.
@@ -929,7 +927,7 @@ dnl	AC_DISABLE_STATIC
 dnl fi	
 	LT_INIT([dlopen win32-dll disable-static])
 	LTDL_INIT([convenience recursive])
-	AC_CONFIG_FILES([libltdl/Makefile])
+  AC_CONFIG_FILES([libltdl/Makefile])
 fi
 AC_PROG_LIBTOOL
 
@@ -1321,7 +1319,7 @@ if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
       GNASH_PATH_GLEXT
    fi
 
-  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+   GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 fi
 if test x$build_hildon = xyes; then
   GNASH_PATH_HILDON
