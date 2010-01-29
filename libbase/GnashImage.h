@@ -399,7 +399,7 @@ public:
     /// @param image    The image to write.
     /// @param quality  The quality of the image output (not used for all
     ///                 formats)
-    static void writeImageData(FileType type,
+    DSOEXPORT static void writeImageData(FileType type,
             boost::shared_ptr<gnash::IOChannel> out, const GnashImage& image,
             int quality);
 
