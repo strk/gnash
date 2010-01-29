@@ -83,11 +83,11 @@ build-stamp:  config.status
 	dh_testdir
 
 	@printf "\n == MAKE ======================================================== \n\n"
-	$(MAKE) 
+	$(MAKE)
 	@printf "\n ----------------------------------------------- End of MAKE ---- \n\n"
 
 #	@printf "\n == CHECK ======================================================= \n\n"
-#	$(MAKE) check
+#	$(MAKE) -C debuild check
 #	@printf "\n ---------------------------------------------- End of CHECK ---- \n\n"
 
 	touch build-stamp
@@ -109,6 +109,7 @@ clean:
 	# we have no patches, we're the developers!
 #	$(MAKE) -f /usr/share/quilt/quilt.make unpatch
 	@printf "\n ----------------------------------- End of CLEANING PATCHES ---- \n\n"
+	# rm -rf debuild
 
 	dh_clean 
 

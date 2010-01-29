@@ -59,7 +59,7 @@ rpm-install:
 	rpmbuild -bi --short-circuit $(RPMBUILD_FLAGS) gnash.spec
 
 rpm-setup: 
-	cp $(SNAPSHOT_TAR) $${HOME}/rpmbuild/SOURCES/
+	cp $(SNAPSHOT_TAR) $${HOME}/rpmbuild/SOURCES/$(SNAPSHOT_DIR).tar.gz
 
 # build klash and the konqueror plugin as a sepaate step.
 rpm-klash:

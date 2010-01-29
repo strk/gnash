@@ -24,7 +24,10 @@ deb: snapshot-src setup-deb snapshot-deb
 # all the right places. This involves editing the debian/changelog
 # file. Configure.ac is edited by the snapshot target.
 setup-deb: 
-	snapshot_dir="$(SNAPSHOT_DIR)"; \
+	snapshot_dir="gnash-$(SNAPSHOT_VERSION)"; \
+	if test -d $(SNAPSHOT_DIR); then \
+	  mv $(SNAPSHOT_DIR) $${snapshot_dir}; \
+	fi; \
 	mkdir -p $${snapshot_dir}/debian; \
 	cp -rfp $(srcdir)/packaging/debian/* $${snapshot_dir}/debian/; \
 	if test -e $${snapshot_dir}/debian/changelog; then \
@@ -33,7 +36,7 @@ setup-deb:
 	fi;
 
 snapshot-deb:
-	snapshot_dir="$(SNAPSHOT_DIR)"; \
+	snapshot_dir="gnash-$(SNAPSHOT_VERSION)"; \
 	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot -j4)
 
 # these files are created when building packages
