@@ -914,6 +914,8 @@ if test $ltmajor -eq 1; then
   AC_LIBLTDL_CONVENIENCE
   AC_LIBTOOL_DLOPEN
   if test x"${windows}" = x"yes"; then
+    dnl The following macro may be empty; the colon is necessary
+    dnl in this case to avoid an empty if statement (which is a syntax error).
     AC_LIBTOOL_WIN32_DLL
     :
   fi
