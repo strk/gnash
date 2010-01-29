@@ -2088,7 +2088,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         const as_value& ratVal = ratios->getMember(key);
         const boost::uint32_t minRatio =
             gradients.empty() ? 0 :
-            std::min<boost::uint32_t>(gradients[i - 1].m_ratio + 2, 0xff);
+            std::min<boost::uint32_t>(gradients[i - 1].m_ratio + step, 0xff);
 
         boost::uint8_t rat = ratVal.is_number() ? 
             clamp<boost::uint32_t>(toInt(ratVal), minRatio, 0xff) : minRatio;
