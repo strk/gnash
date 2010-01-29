@@ -64,6 +64,7 @@ if CYGNAL
 CYGNAL_DIR = cygnal
 endif
 
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl
 SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) $(CYGNAL_DIR)
 
 if TESTSUITE
@@ -75,8 +76,6 @@ SUBDIRS += extensions
 endif
 
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
-
-DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl
 
 EXTRA_DIST =  \
 	autogen.sh \

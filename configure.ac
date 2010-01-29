@@ -921,16 +921,8 @@ if test $ltmajor -eq 1; then
   fi
   AC_DISABLE_STATIC
 else
-dnl if test x$build_aqua = xyes; then
-	dnl the Aqua-binary is always static.
-dnl	AC_ENABLE_STATIC
-dnl	AC_DISABLE_SHARED
-dnl else
-dnl	AC_DISABLE_STATIC
-dnl fi	
   LT_INIT([dlopen win32-dll disable-static])
   LTDL_INIT([convenience recursive])
-  AC_CONFIG_FILES([libltdl/Makefile])
 fi
 AC_PROG_LIBTOOL
 
@@ -2386,6 +2378,7 @@ AC_CONFIG_FILES(gnash.pc:gnash.pc.in)
 
 AC_OUTPUT(Makefile
 po/Makefile
+libltdl/Makefile
 libmedia/Makefile
 libsound/Makefile
 libbase/Makefile
