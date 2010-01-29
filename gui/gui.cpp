@@ -29,6 +29,8 @@
 #include "movie_root.h"
 #include "VM.h"
 #include "DisplayObject.h"
+#include "tu_file.h"
+#include "gnash.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
@@ -215,13 +217,12 @@ Gui::showMenu(bool /* show */)
 void
 Gui::allowScale(bool allow)
 {
-	if ( ! _stage )
-	{
+	if (!_stage) {
 		log_error("Gui::allowScale called before a movie_root was available");
 		return;
 	}
 
-	if ( allow ) _stage->setStageScaleMode(movie_root::showAll);
+	if (allow) _stage->setStageScaleMode(movie_root::showAll);
 	else _stage->setStageScaleMode(movie_root::noScale);
 }
 
@@ -550,10 +551,13 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 			}
 		}
 		
-		if (modifier & gnash::key::GNASH_MOD_CONTROL)
-		{
-			switch(k)
+		if (modifier & gnash::key::GNASH_MOD_CONTROL) {
+			switch (k)
 			{
+                case gnash::key::o:
+                case gnash::key::O:
+                    screenShot();
+                    break;
 				case gnash::key::r:
 				case gnash::key::R:
 					restart();
@@ -583,28 +587,27 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				case gnash::key::MINUS:
 				{
 					// Max interval allowed: 1 second (1FPS)
-					unsigned int ni = std::min(_interval+2, 1000u);
+					const size_t ni = std::min<size_t>(_interval + 2, 1000u);
 					setInterval(ni);
 					break;
                 }
 				case gnash::key::PLUS:
 				{
 					// Min interval allowed: 1/100 second (100FPS)
-					unsigned int ni = std::max(_interval-2, 10u);
+					const size_t ni = std::max<size_t>(_interval - 2, 10u);
 					setInterval(ni);
 					break;
                                 }
 				case gnash::key::EQUALS:
 				{
-					if ( _stage )
-					{
-						float fps = _stage->frameRate();
+					if (_stage) {
+						const float fps = _stage->frameRate();
 						// Min interval allowed: 1/100 second (100FPS)
-						unsigned int ni = 1000.0/fps;
+						const size_t ni = 1000.0/fps;
 						setInterval(ni);
 					}
 					break;
-                                }
+                }
 				default:
 					break;
 			}
@@ -613,16 +616,15 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 			if ( _keyboardMouseMovements )
 			{
 				int step = _keyboardMouseMovementsStep; 
-				if (modifier & gnash::key::GNASH_MOD_SHIFT) step*=5; // x5 if SHIFT is pressed
-				switch(k)
+                // x5 if SHIFT is pressed
+				if (modifier & gnash::key::GNASH_MOD_SHIFT) step *= 5; 
+				switch (k)
 				{
 					case gnash::key::UP:
 					{
 						int newx = _xpointer;
 						int newy = _ypointer-step;
-						//log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
 						if ( newy < 0 ) newy=0;
-						//log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
 						notify_mouse_moved(newx, newy);
 						break;
 					}
@@ -630,9 +632,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 					{
 						int newx = _xpointer;
 						int newy = _ypointer+step;
-						//log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
 						if ( newy >= _height ) newy = _height-1;
-						//log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
 						notify_mouse_moved(newx, newy);
 						break;
 					}
@@ -640,19 +640,15 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 					{
 						int newx = _xpointer-step;
 						int newy = _ypointer;
-						//log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
 						if ( newx < 0 ) newx = 0;
-						//log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
 						notify_mouse_moved(newx, newy);
 						break;
 					}
 					case gnash::key::RIGHT:
 					{
-						int newy = _ypointer;
-						int newx = _xpointer+step;
-						//log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
+						const int newy = _ypointer;
+						int newx = _xpointer + step;
 						if ( newx >= _width ) newx = _width-1;
-						//log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
 						notify_mouse_moved(newx, newy);
 						break;
 					}
@@ -664,12 +660,11 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 		}
 	}
 
-    if ( ! _started ) return;
+    if (!_started) return;
 
-    if ( _stopped ) return;
+    if (_stopped) return;
 
-	if ( _stage->notify_key_event(k, pressed) )
-	{
+	if (_stage->notify_key_event(k, pressed)) {
 		// any action triggered by the
 		// event required screen refresh
 		display(_stage);
@@ -872,27 +867,25 @@ Gui::stop()
 void
 Gui::pause()
 {
-    if ( _stopped )
-    {
+    if (_stopped) {
         play();
+        return;
     }
-    else
-    {
-        // TODO: call stop() instead ?
-        // The only thing I see is that ::stop exits full-screen,
-        // but I'm not sure that's intended behaviour
 
-        // @todo since we registered the sound handler, shouldn't we know
-        //       already what it is ?!
-    	sound::sound_handler* s = _stage->runResources().soundHandler();
-    	if ( s ) s->pause();
-        _stopped = true;
+    // TODO: call stop() instead ?
+    // The only thing I see is that ::stop exits full-screen,
+    // but I'm not sure that's intended behaviour
 
-        log_debug("Pausing virtual clock");
-        _virtualClock.pause();
+    // @todo since we registered the sound handler, shouldn't we know
+    //       already what it is ?!
+    sound::sound_handler* s = _stage->runResources().soundHandler();
+    if (s) s->pause();
+    _stopped = true;
 
-        stopHook();
-    }
+    log_debug("Pausing virtual clock");
+    _virtualClock.pause();
+
+    stopHook();
 }
 
 void
@@ -929,33 +922,34 @@ bool
 Gui::advanceMovie()
 {
 
-	if ( isStopped() ) return true;
+	if (isStopped()) return true;
 
-    if ( ! _started ) start();
-  
-
+    if (!_started) start();
 
 	gnash::movie_root* m = _stage;
 	
 // Define REVIEW_ALL_FRAMES to have *all* frames
-// consequencially displaied. Useful for debugging.
+// consequentially displayed. Useful for debugging.
 //#define REVIEW_ALL_FRAMES 1
 
 #ifndef REVIEW_ALL_FRAMES
 	// Advance movie by one frame
 	bool advanced = m->advance();
 #else
-	size_t cur_frame = m->getRootMovie()->get_current_frame();
-	size_t tot_frames = m->getRootMovie()->get_frame_count();
-	bool advanced = m->advance();
-	m->getRootMovie.ensureFrameLoaded(tot_frames);
-	m->goto_frame(cur_frame+1);
+	const size_t cur_frame = m->getRootMovie()->get_current_frame();
+	const size_t tot_frames = m->getRootMovie()->get_frame_count();
+	const bool advanced = m->advance();
+	
+    m->getRootMovie.ensureFrameLoaded(tot_frames);
+	m->goto_frame(cur_frame + 1);
     m->set_play_state(gnash::MovieClip::PLAYSTATE_PLAY);
 	log_debug(_("Frame %d"), m->get_current_frame());
 #endif
+    
 
 #ifdef GNASH_FPS_DEBUG
-	if ( advanced ) fpsCounterTick(); // will be a no-op if fps_timer_interval is zero
+    // will be a no-op if fps_timer_interval is zero
+	if (advanced) fpsCounterTick(); 
 #endif
 
 
@@ -983,23 +977,40 @@ Gui::advanceMovie()
 
 	if (doDisplay) display(m);
 
-	if ( ! loops() )
-	{
+	if (!loops()) {
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
 		const gnash::MovieClip& si = m->getRootMovie();
-		if (curframe + 1 >= si.get_frame_count())
-		{
+		if (curframe + 1 >= si.get_frame_count()) {
 			quit(); 
 		}
 	}
 
-    /// Quit if we've reached the advance limit.
-    if (_maxAdvances && advanced && (_advances++ > _maxAdvances))
-    {
+    if (_screenShotter.get()) {
+        _screenShotter->screenShot();
+    }
+
+    /// Quit if we've reached the frame advance limit.
+    if (_maxAdvances && advanced && (_advances++ > _maxAdvances)) {
         quit();
     }
 
 	return true;
+}
+
+void
+Gui::screenShot()
+{
+    if (!_screenShotter.get()) {
+        // If no ScreenShotter exists, none was requested at startup.
+        URL url(_runResources.baseURL());
+        std::string::size_type p = url.path().rfind('/');
+        const std::string& name = (p == std::string::npos) ? url.path() :
+            url.path().substr(p + 1);
+        const std::string& filename = "screenshot-" + name;
+        _screenShotter.reset(new ScreenShotter(_renderer, filename));
+    }
+    assert (_screenShotter.get());
+    _screenShotter->now();
 }
 
 void
@@ -1243,15 +1254,15 @@ Gui::setStage(movie_root* stage)
 bool
 Gui::yesno(const std::string& question)
 {
-    log_error("This gui didn't override 'yesno', assuming 'yes' answer to question: %s", question);
+    log_error("This gui didn't override 'yesno', assuming 'yes' answer to "
+            "question: %s", question);
     return true;
 }
 
 void
 Gui::setQuality(Quality q)
 {
-	if ( ! _stage )
-	{
+	if (!_stage) {
 		log_error("Gui::setQuality called before a movie_root was available");
 		return;
 	}
@@ -1261,12 +1272,28 @@ Gui::setQuality(Quality q)
 Quality
 Gui::getQuality() const
 {
-	if ( ! _stage )
-	{
+	if (!_stage) {
 		log_error("Gui::getQuality called before a movie_root was available");
-		return QUALITY_HIGH; // just a guess..
+        // just a guess..
+		return QUALITY_HIGH;
 	}
     return _stage->getQuality();
+}
+
+void
+ScreenShotter::screenShot()
+{
+    if (_immediate) {
+        FILE* f = std::fopen(_fileName.c_str(), "wb");
+        if (f) {
+            boost::shared_ptr<IOChannel> t(new tu_file(f, true));
+            _renderer->renderToImage(t, GNASH_FILETYPE_PNG);
+        }
+        else {
+            log_error("Failed to open screenshot file \"%s\"!", _fileName);
+        }
+        _immediate = false;
+    }
 }
 
 // end of namespace
