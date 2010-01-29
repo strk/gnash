@@ -921,7 +921,6 @@ Gui::start()
 bool
 Gui::advanceMovie()
 {
-
 	if (isStopped()) return true;
 
     if (!_started) start();
@@ -961,10 +960,10 @@ Gui::advanceMovie()
 #ifdef SKIP_RENDERING_IF_LATE
     // We want to skip rendering IFF it's time to advance again.
     // We'll ask the stage about it
-    if ( _stage->timeToNextFrame() <= 0 )
-    {
-        if ( doDisplay ) // or should it be if advanced ?
-        {
+    if (_stage->timeToNextFrame() <= 0) {
+
+        // or should it be if advanced ?
+        if (doDisplay) {
             // TODO: take note of a frame drop (count them)
             //log_debug("Frame rendering dropped due to being late");
 #ifdef GNASH_FPS_DEBUG
@@ -986,12 +985,19 @@ Gui::advanceMovie()
 	}
 
     if (_screenShotter.get()) {
-        _screenShotter->screenShot();
+        _screenShotter->screenShot(_advances);
     }
 
-    /// Quit if we've reached the frame advance limit.
-    if (_maxAdvances && advanced && (_advances++ > _maxAdvances)) {
-        quit();
+
+    // Only increment advances and check for exit condition when we've
+    // really changed frame.
+    if (advanced) {
+
+        /// Quit if we've reached the frame advance limit.
+        if (_maxAdvances && (_advances > _maxAdvances)) {
+            quit();
+        }
+        ++_advances;
     }
 
 	return true;
@@ -1281,10 +1287,13 @@ Gui::getQuality() const
 }
 
 void
-ScreenShotter::screenShot()
+ScreenShotter::screenShot(size_t frameAdvance)
 {
     if (_immediate) {
-        FILE* f = std::fopen(_fileName.c_str(), "wb");
+        // Spontaneous screenshots always have the frame number appended.
+        std::ostringstream ss;
+        ss << _fileName << "-" << frameAdvance;
+        FILE* f = std::fopen(ss.str().c_str(), "wb");
         if (f) {
             boost::shared_ptr<IOChannel> t(new tu_file(f, true));
             _renderer->renderToImage(t, GNASH_FILETYPE_PNG);

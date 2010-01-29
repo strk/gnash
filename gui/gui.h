@@ -81,6 +81,8 @@ enum gnash_cursor_type {
 class ScreenShotter
 {
 public:
+
+    /// Create a ScreenShotter with renderer and output name.
     ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName)
         :
         _renderer(r),
@@ -96,7 +98,10 @@ public:
     /// Takes a screenshot if required.
     //
     /// Called on each advance.
-    void screenShot();
+    //
+    /// @param frameAdvance     used to check whether a screenshot is required
+    ///                         as well as to construct the filename.
+    void screenShot(size_t frameAdvance);
 
 private:
 
