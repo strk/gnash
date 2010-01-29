@@ -68,15 +68,51 @@ namespace gnash
     class movie_definition;
 }
 
-namespace gnash
-{
-
+namespace gnash {
 
 /// Enumerates mouse cursor types.
 enum gnash_cursor_type {
   CURSOR_HAND,
   CURSOR_NORMAL,
   CURSOR_INPUT
+};
+
+/// Handles screen dumps.
+class ScreenShotter
+{
+public:
+
+    /// Create a ScreenShotter with renderer and output name.
+    ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName)
+        :
+        _renderer(r),
+        _immediate(false),
+        _fileName(fileName)
+    {}
+
+    /// Take a screenshot at the next possible moment.
+    void now() {
+        _immediate = true;
+    }
+
+    /// Takes a screenshot if required.
+    //
+    /// Called on each advance.
+    //
+    /// @param frameAdvance     used to check whether a screenshot is required
+    ///                         as well as to construct the filename.
+    void screenShot(size_t frameAdvance);
+
+private:
+
+    boost::shared_ptr<Renderer> _renderer;
+
+    /// If true, the next call to screenshot will take a screenshot
+    bool _immediate;
+
+    /// Name used to generate output file.
+    const std::string _fileName;
+
 };
 
 /// Parent class from which all GUI implementations will depend.
@@ -243,8 +279,7 @@ public:
     bool advanceMovie();
 
     /// Convenience static wrapper around advanceMovie for callbacks happiness.
-    static bool advance_movie(Gui* gui)
-    {
+    static bool advance_movie(Gui* gui) {
         return gui->advanceMovie();
     }
 
@@ -317,13 +352,16 @@ public:
     bool isStopped() const { return _stopped; }
     
     /// Whether gnash is is running as a plugin
-    bool isPlugin() const { return (( _xid )); }
+    bool isPlugin() const { return ((_xid)); }
+
+    /// Take a screenshot now!
+    void takeScreenShot();
 
     /// Set the maximum number of frame advances before Gnash exits.
     void setMaxAdvances(unsigned long ul) { if (ul) _maxAdvances = ul; }
     
     void showUpdatedRegions(bool x) { _showUpdatedRegions = x; }
-    bool showUpdatedRegions() { return _showUpdatedRegions; }
+    bool showUpdatedRegions() const { return _showUpdatedRegions; }
 
     /// Instruct the core to restart the movie and
     /// set state to play(). This does not change pause
@@ -468,16 +506,16 @@ protected:
 private:
 
     /// Width of a window pixel, in stage pseudopixel units.
-    float           _xscale;
+    float _xscale;
 
     /// Height of a window pixel, in stage pseudopixel units.
-    float           _yscale;
+    float _yscale;
 
     /// Window pixel X offset of stage origin
-    boost::int32_t   _xoffset;
+    boost::int32_t _xoffset;
 
     /// Window pixel Y offset of stage origin
-    boost::int32_t   _yoffset;
+    boost::int32_t _yoffset;
 
     bool display(movie_root* m);
     
@@ -519,10 +557,10 @@ private:
     movie_root* _stage;
 
     /// True if the application has been put into "stop" mode
-    bool            _stopped;
+    bool _stopped;
 
     /// True if the application didn't start yet
-    bool            _started;
+    bool _started;
 
     /// If true, updated regions (invalidated ranges) are visibly outlined.
     bool _showUpdatedRegions;
@@ -530,6 +568,9 @@ private:
     SystemClock _systemClock;
     InterruptableVirtualClock _virtualClock;
     
+    /// Checked on each advance for screenshot activity if it exists.
+    boost::scoped_ptr<ScreenShotter> _screenShotter;
+
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
 	int _xpointer;
 	int _ypointer;
