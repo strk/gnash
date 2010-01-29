@@ -556,7 +556,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 			{
                 case gnash::key::o:
                 case gnash::key::O:
-                    screenShot();
+                    takeScreenShot();
                     break;
 				case gnash::key::r:
 				case gnash::key::R:
@@ -988,7 +988,6 @@ Gui::advanceMovie()
         _screenShotter->screenShot(_advances);
     }
 
-
     // Only increment advances and check for exit condition when we've
     // really changed frame.
     if (advanced) {
@@ -1004,7 +1003,7 @@ Gui::advanceMovie()
 }
 
 void
-Gui::screenShot()
+Gui::takeScreenShot()
 {
     if (!_screenShotter.get()) {
         // If no ScreenShotter exists, none was requested at startup.

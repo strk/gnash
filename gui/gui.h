@@ -355,7 +355,7 @@ public:
     bool isPlugin() const { return ((_xid)); }
 
     /// Take a screenshot now!
-    void screenShot();
+    void takeScreenShot();
 
     /// Set the maximum number of frame advances before Gnash exits.
     void setMaxAdvances(unsigned long ul) { if (ul) _maxAdvances = ul; }
