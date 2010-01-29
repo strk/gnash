@@ -22,20 +22,20 @@ NOW = `date "+%Y%m%d"`
 
 #bzr version-info --custom --template='#define BRANCH_REVNO {revno}\n#define BRANCH_NICK {branch_nick}\n'
 
+# this is used for Debian style naming conventions
+PREVIOUS_RELEASE = 0.8.6
+SNAPSHOT_VERSION = $(PREVIOUS_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
+
 # these is the directories where the snapshot gets built. Sources are
 # in the top level, the build goes in a _build subdirectory
-SNAPSHOT_DIR = gnash-$(BRANCH_NICK)${BRANCH_REVNO}
+SNAPSHOT_DIR = gnash-$(SNAPSHOT_VERSION}
 SNAPSHOT_BUILD = $(SNAPSHOT_DIR)/_build
 SNAPSHOT_NAME = $(SNAPSHOT_DIR)
 
 # this is the name of the actual tarball
-SNAPSHOT_TAR = gnash-$(BRANCH_NICK)$(BRANCH_REVNO).tar.gz
+SNAPSHOT_TAR = gnash-$(SNAPSHOT_VERSION).tar.gz
 # this is the temporary directory used for DESTDIR
 SNAPSHOT_TMP = /tmp/$(SNAPSHOT_DIR)
-
-# this is used for Debian style naming conventions
-PREVIOUS_RELEASE = 0.8.6
-SNAPSHOT_VERSION = $(PREVIOUS_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
 
 # extract info from bazar
 
@@ -53,7 +53,7 @@ snapshot: snapshot-src snapshot-configure snapshot-build snapshot-install snapsh
 # version from 'trunk' to a date stamped version of trunk.
 snapshot-src: distdir  force
 	snapshot_tar="$(SNAPSHOT_TAR)"; \
-	snapshot_dir=$(SNAPSHOT_DIR); \
+	snapshot_dir="$(SNAPSHOT_DIR)"; \
 	if test -d $${snapshot_dir}; then \
 	  rm -fr $${snapshot_dir}; \
 	fi; \
