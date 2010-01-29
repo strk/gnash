@@ -98,7 +98,10 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp 
+	rm -f `find . -name "*.lo"`
 	rm -f `find . -name "*.o"`
+	rm -f `find . -name "*.a"`
+	rm -f `find . -name "*.la"`
 	rm -rf `find . -name ".libs"`
 	rm -rf `find . -name ".deps"`
 
