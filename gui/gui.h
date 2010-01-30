@@ -88,7 +88,7 @@ public:
         _renderer(r),
         _immediate(false),
         _fileName(fileName),
-        _last(true)
+        _last(false)
     {}
 
     /// Take a screenshot at the next possible moment.
