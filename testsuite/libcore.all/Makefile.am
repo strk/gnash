@@ -65,8 +65,8 @@ AM_LDFLAGS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libsound/libgnashsound.la \
-	$(top_builddir)/libmedia/libgnashmedia.la
+	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libsound/libgnashsound.la
 
 if LIBLTDL2
 AM_LDFLAGS += $(top_builddir)/libltdl/libltdlc.la
