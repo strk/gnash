@@ -129,7 +129,7 @@ esac
 # for libtool 2.x there is an #define for the config file name, but
 # for libtool 1.5 it expects config.h always, so we change this to
 # gnashconfig.h.
-ltdlver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
+ltdlver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | sed -e 's/(.*) //' | cut -d ' ' -f 2`
 ltdlmajor=`echo $ltdlver | cut -d '.' -f 1`
 if test -z "$NO_LIBTOOLIZE" ; then
   ltbasedir="libltdl"
