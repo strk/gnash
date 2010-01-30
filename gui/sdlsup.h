@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __SDLSUP_H__
-#define __SDLSUP_H__
+#ifndef SDLSUP_H
+#define SDLSUP_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
