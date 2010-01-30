@@ -196,6 +196,15 @@ Gui::unsetFullscreen()
 }
 
 void
+Gui::quit() {
+    // Take a screenshot of the last frame if required.
+    if (_screenShotter.get()) {
+        _screenShotter->last();
+    }
+    quitUI();
+}
+
+void
 Gui::hideMenu()
 {
     log_unimpl(_("Menu hiding not yet supported in this GUI"));

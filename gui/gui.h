@@ -88,7 +88,7 @@ public:
         _renderer(r),
         _immediate(false),
         _fileName(fileName),
-        _last(false)
+        _last(true)
     {}
 
     /// Take a screenshot at the next possible moment.
@@ -186,13 +186,7 @@ public:
     /// Always called on exit.
     //
     /// Handles any common functions, then calls virtual quitUI().
-    void quit() {
-        // Take a screenshot of the last frame if required.
-        if (_screenShotter.get()) {
-            _screenShotter->last();
-        }
-        quitUI();
-    }
+    void quit();
 
     /// End main rendering loop calling GUI-specific exit functions.
     //
