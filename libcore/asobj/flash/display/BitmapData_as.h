@@ -80,11 +80,10 @@ public:
         _bitmapData[x * _width + y] = _transparent ? color : color | 0xff000000;
     }
 
-
     /// Returns the value of the pixel at (x, y) optionally with transparency.
     //
-    /// Callers must make sure x and y are within range, and that
-    /// dispose() has not been called.
+    /// Callers must make that dispose() has not been called.
+    /// Returns 0 if the pixel is out of range.
     boost::int32_t getPixel(int x, int y, bool transparency) const;
 
     void update(const boost::uint8_t* data);
