@@ -46,7 +46,7 @@ class DSOEXPORT DumpGui : public Gui
             int /*x*/, int /*y*/)
         { return createWindow(width, height); }
     bool init(int argc, char **argv[]);
-    void quit();
+    virtual void quitUI();
     void renderBuffer() {return; }
     void render() { return; }
     void render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/)
