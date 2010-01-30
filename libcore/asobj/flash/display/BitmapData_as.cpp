@@ -124,6 +124,7 @@ BitmapData_as::updateAttachedBitmaps()
 boost::int32_t
 BitmapData_as::getPixel(int x, int y, bool transparency) const
 {
+    assert(!_bitmapData.empty());
 
     // A value of 0, 0 is inside the bitmap.
     if (x < 0 || y < 0) return 0;
@@ -153,11 +154,8 @@ void
 BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 {
 
-    GNASH_REPORT_FUNCTION;
-
-    // The bitmap has been "disposed".
-    if (_bitmapData.empty()) return;
-    assert (_bitmapData.size() == _width * _height);
+    // This also catches disposed BitmapDatas.
+    assert(_bitmapData.size() == _width * _height);
 
     if (w < 0 || h < 0) return;
 
@@ -168,14 +166,12 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 
     // If x or y is less than 0, make a rectangle of the
     // intersection with the bitmap.    
-    if (x < 0)
-    {
+    if (x < 0) {
         w += x;
         x = 0;
     }
 
-    if (y < 0)
-    {
+    if (y < 0) {
         h += y;
         y = 0;
     }
@@ -197,15 +193,11 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     // Make colour non-transparent if the image doesn't support it.
     if (!_transparent) color |= 0xff000000;
     
-    while (it != e)
-    {
-
+    while (it != e) {
         // Fill from x for the width of the rectangle.
         std::fill_n(it + x, w, color);
-
         // Move to the next line
         std::advance(it, _width);
-
     }
 
     updateAttachedBitmaps();
@@ -336,10 +328,15 @@ bitmapdata_fillRect(const fn_call& fn)
 
     if (fn.nargs < 2) return as_value();
     
+    if (disposed(*ptr)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("fillRect called on disposed BitmapData!");
+        );
+    }
+    
     const as_value& arg = fn.arg(0);
     
-    if ( ! arg.is_object() )
-    {
+    if (!arg.is_object()) {
         /// Isn't an object...
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
@@ -402,9 +399,14 @@ bitmapdata_getPixel(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
-    if (fn.nargs < 2)
-    {
+    if (fn.nargs < 2) {
         return as_value();
+    }
+
+    if (disposed(*ptr)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("getPixel called on disposed BitmapData!");
+        );
     }
     
     // TODO: what happens when the pixel is outside the image?
@@ -419,9 +421,14 @@ bitmapdata_getPixel32(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
-    if (fn.nargs < 2)
-    {
+    if (fn.nargs < 2) {
         return as_value();
+    }
+
+    if (disposed(*ptr)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("getPixel32 called on disposed BitmapData!");
+        );
     }
     
     // TODO: what happens when the pixel is outside the image?
@@ -504,6 +511,12 @@ bitmapdata_setPixel(const fn_call& fn)
         return as_value();
     }
 
+    if (disposed(*ptr)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("setPixel called on disposed BitmapData!");
+        );
+    }
+
     double x = fn.arg(0).to_number();
     double y = fn.arg(1).to_number();
     if (x < 0 || y < 0) return as_value();
@@ -528,12 +541,21 @@ bitmapdata_setPixel32(const fn_call& fn)
         return as_value();
     }
 
+    if (disposed(*ptr)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("setPixel32 called on disposed BitmapData!");
+        );
+    }
+
     double x = fn.arg(0).to_number();
     double y = fn.arg(1).to_number();
     if (x < 0 || y < 0) return as_value();
     if (x >= ptr->getWidth() || y >= ptr->getHeight()) {
         return as_value();
     }
+
+    log_debug("SetPixel32. x: %s, y: %s, width: %s, height: %s",
+            x, y, ptr->getWidth(), ptr->getHeight());
 
     // TODO: multiply.
     const boost::uint32_t color = toInt(fn.arg(2));
@@ -562,7 +584,7 @@ bitmapdata_height(const fn_call& fn)
     
     // Returns the immutable height of the bitmap or -1 if dispose() has
     // been called.
-    if (ptr->getBitmapData().empty()) return -1;
+    if (disposed(*ptr)) return -1;
 	return as_value(ptr->getHeight());
 }
 
@@ -573,7 +595,7 @@ bitmapdata_rectangle(const fn_call& fn)
 
     // Returns the immutable rectangle of the bitmap or -1 if dispose()
     // has been called.
-    if (ptr->getBitmapData().empty()) return -1;
+    if (disposed(*ptr)) return -1;
 
     // If it's not found construction will fail.
     as_value rectangle(fn.env().find_object("flash.geom.Rectangle"));
@@ -602,7 +624,7 @@ bitmapdata_transparent(const fn_call& fn)
     if (fn.nargs) return as_value();
     
     // Returns whether bitmap is transparent or -1 if dispose() has been called.
-    if (ptr->getBitmapData().empty()) return -1;
+    if (disposed(*ptr)) return -1;
 	return as_value(ptr->isTransparent());
 }
 
@@ -616,7 +638,7 @@ bitmapdata_width(const fn_call& fn)
     
     // Returns the immutable width of the bitmap or -1 if dispose() has
     // been called.
-    if (ptr->getBitmapData().empty()) return -1;
+    if (disposed(*ptr)) return -1;
 	return as_value(ptr->getWidth());
 }
 
