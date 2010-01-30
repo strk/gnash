@@ -521,9 +521,9 @@ bitmapdata_setPixel(const fn_call& fn)
         return as_value();
     }
 
-    double x = fn.arg(0).to_number();
-    double y = fn.arg(1).to_number();
-    if (x < 0 || y < 0) return as_value();
+    const double x = fn.arg(0).to_number();
+    const double y = fn.arg(1).to_number();
+    if (isNaN(x) || isNaN(y) || x < 0 || y < 0) return as_value();
     if (x >= ptr->getWidth() || y >= ptr->getHeight()) {
         return as_value();
     }
@@ -552,9 +552,9 @@ bitmapdata_setPixel32(const fn_call& fn)
         return as_value();
     }
 
-    double x = fn.arg(0).to_number();
-    double y = fn.arg(1).to_number();
-    if (x < 0 || y < 0) return as_value();
+    const double x = fn.arg(0).to_number();
+    const double y = fn.arg(1).to_number();
+    if (isNaN(x) || isNaN(y) || x < 0 || y < 0) return as_value();
     if (x >= ptr->getWidth() || y >= ptr->getHeight()) {
         return as_value();
     }
