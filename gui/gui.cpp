@@ -1286,21 +1286,35 @@ Gui::getQuality() const
 }
 
 void
+ScreenShotter::saveImage(const std::string& filename) const
+{
+    FILE* f = std::fopen(filename.c_str(), "wb");
+    if (f) {
+        boost::shared_ptr<IOChannel> t(new tu_file(f, true));
+        _renderer->renderToImage(t, GNASH_FILETYPE_PNG);
+    }
+    else {
+        log_error("Failed to open screenshot file \"%s\"!", filename);
+    }
+}
+
+void
 ScreenShotter::screenShot(size_t frameAdvance)
 {
     if (_immediate) {
         // Spontaneous screenshots always have the frame number appended.
         std::ostringstream ss;
         ss << _fileName << "-" << frameAdvance;
-        FILE* f = std::fopen(ss.str().c_str(), "wb");
-        if (f) {
-            boost::shared_ptr<IOChannel> t(new tu_file(f, true));
-            _renderer->renderToImage(t, GNASH_FILETYPE_PNG);
-        }
-        else {
-            log_error("Failed to open screenshot file \"%s\"!", _fileName);
-        }
+        saveImage(ss.str());
         _immediate = false;
+    }
+}
+
+void
+ScreenShotter::last() const
+{
+    if (_last) {
+        saveImage(_fileName + "-last");
     }
 }
 

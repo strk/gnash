@@ -87,13 +87,27 @@ public:
         :
         _renderer(r),
         _immediate(false),
-        _fileName(fileName)
+        _fileName(fileName),
+        _last(false)
     {}
 
     /// Take a screenshot at the next possible moment.
     void now() {
         _immediate = true;
     }
+
+    /// Take a screenshot when the last frame is reached.
+    void lastFrame() {
+        _last = true;
+    }
+
+    /// Called on the last frame before exit.
+    //
+    /// Which frame is last depends on the execution path of the SWF, whether
+    /// the SWF loops, whether a timeout was requested or a maximum number of
+    /// advances set. Those conditions are not knowable in advance, so
+    /// the last frame is a special case.
+    void last() const;
 
     /// Takes a screenshot if required.
     //
@@ -105,6 +119,9 @@ public:
 
 private:
 
+    /// Take the screenshot.
+    void saveImage(const std::string& filename) const;
+
     boost::shared_ptr<Renderer> _renderer;
 
     /// If true, the next call to screenshot will take a screenshot
@@ -112,6 +129,9 @@ private:
 
     /// Name used to generate output file.
     const std::string _fileName;
+
+    /// Whether to take a screenshot on the last frame.
+    bool _last;
 
 };
 
@@ -163,12 +183,24 @@ public:
     /// Start main rendering loop.
     virtual bool run() = 0;
 
-    /// End main rendering loop, making the call to run() return.
+    /// Always called on exit.
+    //
+    /// Handles any common functions, then calls virtual quitUI().
+    void quit() {
+        // Take a screenshot of the last frame if required.
+        if (_screenShotter.get()) {
+            _screenShotter->last();
+        }
+        quitUI();
+    }
+
+    /// End main rendering loop calling GUI-specific exit functions.
     //
     /// The default implementation calls exit(EXIT_SUCCESS), which isn't nice.
     /// Please implement the proper main loop quitter in the subclasses.
-    ///
-    virtual void quit()  { std::exit(EXIT_SUCCESS); }
+    virtual void quitUI() {
+        std::exit(EXIT_SUCCESS);
+    }
 
     /// Render the current buffer.
     /// For OpenGL, this means that the front and back buffers are swapped.

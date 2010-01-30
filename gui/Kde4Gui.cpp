@@ -504,7 +504,7 @@ Kde4Gui::showPreferences()
 
 
 void
-Kde4Gui::quit()
+Kde4Gui::quitUI()
 {
     _application->quit();
 }

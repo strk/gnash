@@ -605,7 +605,7 @@ GtkGui::grabFocus()
 }
 
 void
-GtkGui::quit()
+GtkGui::quitUI() 
 {
     gtk_main_quit();
 }

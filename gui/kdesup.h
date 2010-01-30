@@ -100,7 +100,7 @@ public:
     virtual void setCursor(gnash_cursor_type newcursor);
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);
-    void quit();
+    void quitUI();
  private:
     std::auto_ptr<QApplication>  _qapp;
     std::auto_ptr<qwidget>       _qwidget;
