@@ -559,9 +559,6 @@ bitmapdata_setPixel32(const fn_call& fn)
         return as_value();
     }
 
-    log_debug("SetPixel32. x: %s, y: %s, width: %s, height: %s",
-            x, y, ptr->getWidth(), ptr->getHeight());
-
     // TODO: multiply.
     const boost::uint32_t color = toInt(fn.arg(2));
 
