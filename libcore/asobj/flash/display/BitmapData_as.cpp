@@ -332,6 +332,7 @@ bitmapdata_fillRect(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("fillRect called on disposed BitmapData!");
         );
+        return as_value();
     }
     
     const as_value& arg = fn.arg(0);
@@ -407,6 +408,7 @@ bitmapdata_getPixel(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("getPixel called on disposed BitmapData!");
         );
+        return as_value();
     }
     
     // TODO: what happens when the pixel is outside the image?
@@ -429,6 +431,7 @@ bitmapdata_getPixel32(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("getPixel32 called on disposed BitmapData!");
         );
+        return as_value();
     }
     
     // TODO: what happens when the pixel is outside the image?
@@ -515,6 +518,7 @@ bitmapdata_setPixel(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("setPixel called on disposed BitmapData!");
         );
+        return as_value();
     }
 
     double x = fn.arg(0).to_number();
@@ -545,6 +549,7 @@ bitmapdata_setPixel32(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("setPixel32 called on disposed BitmapData!");
         );
+        return as_value();
     }
 
     double x = fn.arg(0).to_number();
