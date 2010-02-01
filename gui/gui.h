@@ -83,6 +83,8 @@ class ScreenShotter
 {
 public:
 
+    typedef std::vector<size_t> FrameList;
+
     /// Create a ScreenShotter with renderer and output name.
     ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName)
         :
@@ -119,7 +121,7 @@ public:
     void screenShot(size_t frameAdvance);
 
     /// Request a list of frames to be rendered to image files.
-    void setFrames(const std::vector<size_t> frames);
+    void setFrames(const FrameList& frames);
 
 private:
 
@@ -137,7 +139,7 @@ private:
     /// Whether to take a screenshot on the last frame.
     bool _last;
 
-    std::vector<size_t> _frames;
+    FrameList _frames;
 
 };
 
@@ -177,7 +179,7 @@ public:
     /// @param l        A list of frames to render to an image file
     /// @param last     Whether to render the last frame before exist
     /// @param filename The filename pattern to save images as.
-    void requestScreenShots(const std::vector<size_t>& l, bool last,
+    void requestScreenShots(const ScreenShotter::FrameList& l, bool last,
             const std::string& filename);
 
     /** \brief

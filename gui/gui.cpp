@@ -1032,7 +1032,7 @@ Gui::takeScreenShot()
 }
 
 void
-Gui::requestScreenShots(const std::vector<size_t>& l, bool last,
+Gui::requestScreenShots(const ScreenShotter::FrameList& l, bool last,
         const std::string& filename)
 {
     // Nothing to do if there is no renderer or if no frames should be
@@ -1348,7 +1348,7 @@ ScreenShotter::last() const
 }
 
 void
-ScreenShotter::setFrames(const std::vector<size_t> frames)
+ScreenShotter::setFrames(const FrameList& frames)
 {
     _frames = frames;
     std::sort(_frames.begin(), _frames.end());

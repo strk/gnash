@@ -493,7 +493,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
         std::string arg;
 
         bool last = false;
-        std::vector<size_t> v;
+        ScreenShotter::FrameList v;
 
         while (std::getline(is, arg, ',')) {
             if (arg == "last") last = true;
