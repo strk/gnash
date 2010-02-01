@@ -84,6 +84,7 @@ void terminate_signal(int /*signo*/) {
 // TODO:  let user decide colorspace (see also _bpp above!)
 DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
     Gui(xid, scale, loop, r),
+    _agg_renderer(0),
     _offscreenbuf(NULL),
     _offscreenbuf_size(-1),
     _timeout(0),
