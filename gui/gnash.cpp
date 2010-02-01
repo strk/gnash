@@ -111,7 +111,7 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("  -j,  --width <width>     Set window width\n") 
     << _("  -k,  --height <height>   Set window height\n") 
     << _("  -X,  --x-pos <x-pos>     Set window x position\n") 
-    << _("  -Y,  --y-pos <y-pos>     Set window y position") 
+    << _("  -Y,  --y-pos <y-pos>     Set window y position\n") 
     << _("  -1,  --once              Exit when/if movie reaches the last "
             "frame\n") 
     << _("  -g,  --debugger          Turn on the SWF debugger\n") 
