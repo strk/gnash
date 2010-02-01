@@ -59,6 +59,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <boost/lexical_cast.hpp>
 
 using namespace gnash;
 
