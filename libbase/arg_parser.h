@@ -103,7 +103,7 @@ public:
   const std::string & error() const throw() { return _error; }
 
       // The number of arguments parsed (may be different from argc)
-  int arguments() const throw() { return data.size(); }
+  size_t arguments() const throw() { return data.size(); }
 
       // If code( i ) is 0, argument( i ) is a non-option.
       // Else argument( i ) is the option's argument (or empty).

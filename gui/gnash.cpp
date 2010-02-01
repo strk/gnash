@@ -198,40 +198,41 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 
     const Arg_parser::Option opts[] =
         {
-        { 'h', "help",          Arg_parser::no  },
-        { 'v', "verbose",       Arg_parser::no  },
-        { 'a', 0,               Arg_parser::no  },
-        { 'p', 0,               Arg_parser::no  },
-        { 's', "scale",         Arg_parser::yes },
-        { 256, "max-advances",  Arg_parser::yes },
-        { 257, "fullscreen",    Arg_parser::no  },
-        { 258, "hide-menubar",  Arg_parser::no  },                
-        { 'c', 0,               Arg_parser::no  },
-        { 'd', "delay",         Arg_parser::yes },
-        { 'x', "xid",           Arg_parser::yes },
-        { 'r', "render-mode",   Arg_parser::yes },
-        { 't', "timeout",       Arg_parser::yes },        
-        { '1', "once",          Arg_parser::no  },        
-        { 'w', "writelog",      Arg_parser::no  },
-        { 'j', "width",         Arg_parser::yes },
-        { 'k', "height",        Arg_parser::yes },
-        { 'X', "x-position",    Arg_parser::yes },
-        { 'Y', "y-position",    Arg_parser::yes },
-        { 'u', "real-url",      Arg_parser::yes },
-        { 'P', "param",         Arg_parser::yes },
-        { 'U', "base-url",      Arg_parser::yes },  
-        { 'g', "debugger",      Arg_parser::no  },
-        { 'V', "version",       Arg_parser::no  },        
-        { 'f', "debug-fps",     Arg_parser::yes },        
-        { 'F', "fd",            Arg_parser::yes },
-        { 'A', "dump",          Arg_parser::yes },
-        { 'D', 0,               Arg_parser::yes }, // Handled in dump gui
-        {   0, 0,               Arg_parser::no  }
+        { 'h', "help",              Arg_parser::no  },
+        { 'v', "verbose",           Arg_parser::no  },
+        { 'a', 0,                   Arg_parser::no  },
+        { 'p', 0,                   Arg_parser::no  },
+        { 's', "scale",             Arg_parser::yes },
+        { 256, "max-advances",      Arg_parser::yes },
+        { 257, "fullscreen",        Arg_parser::no  },
+        { 258, "hide-menubar",      Arg_parser::no  },                
+        { 'c', 0,                   Arg_parser::no  },
+        { 'd', "delay",             Arg_parser::yes },
+        { 'x', "xid",               Arg_parser::yes },
+        { 'r', "render-mode",       Arg_parser::yes },
+        { 't', "timeout",           Arg_parser::yes },        
+        { '1', "once",              Arg_parser::no  },        
+        { 'w', "writelog",          Arg_parser::no  },
+        { 'j', "width",             Arg_parser::yes },
+        { 'k', "height",            Arg_parser::yes },
+        { 'X', "x-position",        Arg_parser::yes },
+        { 'Y', "y-position",        Arg_parser::yes },
+        { 'u', "real-url",          Arg_parser::yes },
+        { 'P', "param",             Arg_parser::yes },
+        { 'U', "base-url",          Arg_parser::yes },  
+        { 'g', "debugger",          Arg_parser::no  },
+        { 'V', "version",           Arg_parser::no  },        
+        { 'f', "debug-fps",         Arg_parser::yes },        
+        { 'F', "fd",                Arg_parser::yes },
+        { 'A', "dump",              Arg_parser::yes },
+        { 259, "screenshot",        Arg_parser::yes },
+        { 260, "screenshot-file",   Arg_parser::yes },
+        { 'D', 0,                   Arg_parser::yes }, // Handled in dump gui
+        {   0, 0,                   Arg_parser::no  }
     };
 
     Arg_parser parser(argc, argv, opts);
-    if( ! parser.error().empty() )    
-    {
+    if (!parser.error().empty()) {
         cout << parser.error() << endl;
         exit(EXIT_FAILURE);
     }
@@ -243,13 +244,11 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     bool xPosGiven = false, yPosGiven = false;
 
 
-    for( int i = 0; i < parser.arguments(); ++i )
-    {
+    for (size_t i = 0; i < parser.arguments(); ++i) {
+
         const int code = parser.code(i);
-        try
-        {
-            switch( code )
-            {
+        try {
+            switch (code) {
                 case 'h':
                     version_and_copyright();
                     usage ();
@@ -296,7 +295,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                                     0.01f, 100.f));
                     break;
                 case 'd':
-                    player.setDelay( parser.argument<long>(i) );
+                    player.setDelay(parser.argument<long>(i));
                     break;
                 case 'u':
                     url = parser.argument(i);
@@ -310,9 +309,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     break;
                 case 'F':
                 {
-                    int fd = parser.argument<long>(i);
-                    if ( fd < 1 )
-                    {
+                    const int fd = parser.argument<long>(i);
+                    if (fd < 1) {
                         cerr << boost::format(_("Invalid host communication "
                                     "filedescriptor %d\n")) % fd << endl;
                         exit(EXIT_FAILURE);
@@ -361,8 +359,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setWindowId(parser.argument<long>(i));
                     break;
                 case '1':
-                      player.setDoLoop(false);
-                      break;
+                    player.setDoLoop(false);
+                    break;
                 case 'r':
                     renderflag = true;
                     switch (parser.argument<char>(i))
@@ -403,30 +401,27 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     cout << _("FPS debugging disabled at compile time, -f "
                             "is invalid") << endl;
                     exit(EXIT_FAILURE);
-#endif // ndef GNASH_FPS_DEBUG
+#endif 
                     break;
                 case 'P':
                 {
-                    std::string param = parser.argument(i);
-                    size_t eq = param.find("=");
+                    const std::string& param = parser.argument(i);
+                    const size_t eq = param.find("=");
                     std::string name, value;
-                    if ( eq == std::string::npos )
-                    {
+                    if (eq == std::string::npos) {
                         name = param;
                         value = "true";
                     }
-                    else
-                    {
+                    else {
                         name = param.substr(0, eq);
                         value = param.substr(eq + 1);
                     }
-                      player.setParam(name, value);
+                    player.setParam(name, value);
                     break;
                 }
                 case 'A':
                 {
-                    std::string fn = parser.argument(i);
-                    player.setAudioDumpfile(fn);
+                    player.setAudioDumpfile(parser.argument(i));
                     break;
                 }
                 case 0:
@@ -434,25 +429,25 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     break;
             }
         }
-        catch (Arg_parser::ArgParserException &e)
-        {
+        catch (Arg_parser::ArgParserException &e) {
             cerr << _("Error parsing command line options: ") << e.what() 
                 << endl;
             cerr << _("This is a Gnash bug.") << endl;
         }
     }
 
-    if ( ! renderflag ) {
+    if (!renderflag) {
         gnash::log_debug (_("No rendering flags specified, using rcfile"));
-        if ( plugin ) {
-            player.setDoSound( rcfile.usePluginSound() );
-        } else {
-            player.setDoSound( rcfile.useSound() );
+        if (plugin) {
+            player.setDoSound(rcfile.usePluginSound());
+        }
+        else {
+            player.setDoSound(rcfile.useSound());
         }
     }
 
-    if (plugin && heightGiven && widthGiven
-    && !player.getHeight() && !player.getWidth()) {
+    if (plugin && heightGiven && widthGiven && !player.getHeight() &&
+            !player.getWidth()) {
             // We were given dimensions of 0x0 to render to (probably the plugin
             // is playing an "invisible" movie. Disable video rendering.
             player.setDoRender(false);
