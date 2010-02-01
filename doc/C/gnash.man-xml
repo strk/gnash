@@ -343,8 +343,10 @@ gnash (options)... (file)...
     <term>CTRL-O </term>
     <listitem>
       <para>
-        Save a screenshot. If no screenshot filename was requested at startup, a
-        default filename is used. Otherwise the specified filename is used.
+        Save a spontaneous screenshot. If no screenshots were requested
+        from the command line, a default filename is used. Otherwise, the
+        same filename pattern is used for requested and spontaneous
+        screenshots.
       </para>
     </listitem>
   </varlistentry>
