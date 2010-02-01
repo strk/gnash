@@ -166,6 +166,14 @@ public:
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
 
+    /// Request a list of screenshots
+    //
+    /// @param l        A list of frames to render to an image file
+    /// @param last     Whether to render the last frame before exist
+    /// @param filename The filename pattern to save images as.
+    void requestScreenShots(const std::vector<size_t>& l, bool last,
+            const std::string& filename);
+
     /** \brief
      * Create and display our window.
      *
@@ -187,14 +195,6 @@ public:
     //
     /// Handles any common functions, then calls virtual quitUI().
     void quit();
-
-    /// End main rendering loop calling GUI-specific exit functions.
-    //
-    /// The default implementation calls exit(EXIT_SUCCESS), which isn't nice.
-    /// Please implement the proper main loop quitter in the subclasses.
-    virtual void quitUI() {
-        std::exit(EXIT_SUCCESS);
-    }
 
     /// Render the current buffer.
     /// For OpenGL, this means that the front and back buffers are swapped.
@@ -478,6 +478,17 @@ protected:
      * @param depth Colour depth to be used in the client area of our window.
      */
     Gui(unsigned long xid, float scale, bool loop, RunResources& r);
+    
+    /// End main rendering loop calling GUI-specific exit functions.
+    //
+    /// Do not call this directly. Call quit() instead.
+    //
+    /// The default implementation calls exit(EXIT_SUCCESS), which isn't nice.
+    /// Please implement the proper main loop quitter in the subclasses.
+    virtual void quitUI() {
+        std::exit(EXIT_SUCCESS);
+    }
+
 
     /// Determines if playback should restart after the movie ends.
     bool            _loop;
@@ -501,14 +512,14 @@ protected:
     RunResources& _runResources;
 
     /// Main loop interval: the time between successive advance_movie calls.
-    unsigned int    _interval;
+    unsigned int _interval;
 
     /// The handler which is called to update the client area of our window.
     boost::shared_ptr<Renderer> _renderer;
 
     /// Signals that the next frame must be re-rendered completely because the
     /// window size did change.
-    bool            _redraw_flag;
+    bool _redraw_flag;
 
     // True if Gnash is running in fullscreen
     bool _fullscreen;

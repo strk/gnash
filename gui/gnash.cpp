@@ -243,8 +243,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     bool widthGiven = false, heightGiven = false;
     bool xPosGiven = false, yPosGiven = false;
 
-
-    for (size_t i = 0; i < parser.arguments(); ++i) {
+    for (int i = 0; i < parser.arguments(); ++i) {
 
         const int code = parser.code(i);
         try {
@@ -424,6 +423,13 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setAudioDumpfile(parser.argument(i));
                     break;
                 }
+                case 259:
+                    // The player takes care of parsing the list.
+                    player.setScreenShots(parser.argument(i));
+                    break;
+                case 260:
+                    player.setScreenShotFile(parser.argument(i));
+                    break;
                 case 0:
                     infiles.push_back(parser.argument(i));
                     break;
