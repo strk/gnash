@@ -178,16 +178,6 @@ gnash (options)... (file)...
     </listitem>
   </varlistentry>
 
-<!--
-  <varlistentry>
-    <term>-e</term>
-    <listitem>
-      <para>
-          Use SDL Event thread
-      </para>
-    </listitem>
-  </varlistentry>
--->
   <varlistentry>
     <term>-1</term>
     <listitem>
@@ -266,6 +256,34 @@ gnash (options)... (file)...
 	Print the version number, and the configuration, of the
 	Gnash player. Please provide this information when submitting bug
 	reports.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--screenshot <list></term>
+    <listitem>
+      <para>
+        Set a list of frame advances to be saved as screenshots. The list
+        must be comma-separated. Valid values are integers and the phrase
+        &quot;last&quot;. If &quot;last&quot; is specified, the final
+        frame before exit is saved. Invalid values are ignored. Frame numbers
+        apply to the sequence of frames as the SWF is executed, not the
+        frame sequence defined in the SWF. Use in combination with
+        --screenshot-file to specify output filename.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--screenshot-file <file></term>
+    <listitem>
+      <para>
+        Specify the output pattern for screenshot filenames. The token %f
+        in a pattern will be replaced with a frame identifier. If you specify
+        multiple frames and do not use %f, the file will be overwritten for
+        each screenshot. If this option is not specified but screenshots
+        are requested, a default filename will be used.
       </para>
     </listitem>
   </varlistentry>
