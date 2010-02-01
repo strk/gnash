@@ -253,7 +253,9 @@ Kde4Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 void
 Kde4Gui::setTimeout(unsigned int timeout)
 {
-    QTimer::singleShot(timeout, _application.get(), SLOT(quit()));
+    // This must go through Gui::quit() to make sure screenshots are
+    // handled if necessary.
+    QTimer::singleShot(timeout, _drawingWidget, SLOT(quit()));
 }
 
 
@@ -520,9 +522,10 @@ Kde4Gui::setupActions()
                      _drawingWidget, SLOT(properties()));
 
     quitAction = new QAction(_q("Quit Gnash"), _window.get());
-    // This is connected directly to the QApplication's quit() slot
+    // This must go through Gui::quit() to make sure we don't exit
+    // before doing whatever the Gui wants to do on exit.
     _drawingWidget->connect(quitAction, SIGNAL(triggered()),
-                     _application.get(), SLOT(quit()));
+                     _drawingWidget, SLOT(quit()));
 
     // Edit Menu actions
     preferencesAction = new QAction(_q("Preferences"), _window.get());
@@ -805,6 +808,12 @@ void
 DrawingWidget::refresh()
 {
     _gui.refreshView();
+}
+
+void
+DrawingWidget::quit()
+{
+    _gui.quit();
 }
 
 void

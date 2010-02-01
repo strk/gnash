@@ -80,6 +80,7 @@ public slots:
     void restart();
     void refresh();
     void fullscreen(bool isFull);
+    void quit();
 
 protected:
     void paintEvent(QPaintEvent*);
