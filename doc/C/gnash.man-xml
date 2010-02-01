@@ -312,19 +312,10 @@ gnash (options)... (file)...
   </varlistentry>
 
   <varlistentry>
-    <term>ESC</term>
-    <listitem>
-      <para>
-             Quit/Exit.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
     <term>CTRL-P</term>
     <listitem>
       <para>
-          Toggle Pause.
+          Toggle pause.
       </para>
     </listitem>
   </varlistentry>
@@ -339,71 +330,24 @@ gnash (options)... (file)...
   </varlistentry>
 
   <varlistentry>
-    <term>CTRL-[ or kp-</term>
+    <term>CTRL-F   </term>
     <listitem>
       <para>
-	Step back one frame.
+        Toggle fullscreen. ESC also exits fullscreen.
       </para>
     </listitem>
   </varlistentry>
+
 
   <varlistentry>
-    <term>CTRL-] or kp+</term>
+    <term>CTRL-O </term>
     <listitem>
       <para>
-	Step forward one frame.
+        Save a screenshot. If no screenshot filename was requested at startup, a
+        default filename is used. Otherwise the specified filename is used.
       </para>
     </listitem>
   </varlistentry>
-
-<!--
-  <varlistentry>
-    <term>CTRL-A</term>
-    <listitem>
-      <para>
-          Toggle anti-aliasing (doesn't work).
-      </para>
-    </listitem>
-  </varlistentry>
--->
-
-  <varlistentry>
-    <term>CTRL-T</term>
-    <listitem>
-      <para>
-          Debug.  Test the set_variable() function.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>CTRL-G</term>
-    <listitem>
-      <para>
-          Debug.  Test the get_variable() function.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>CTRL-M</term>
-    <listitem>
-      <para>
-          Debug.  Test the call_method() function.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>CTRL-B</term>
-    <listitem>
-      <para>
-          Toggle background color.
-      </para>
-    </listitem>
-  </varlistentry>
-  </variablelist>
-
 <para>
 Flash is a registered trademark of Adobe Corporation.
 </para>
