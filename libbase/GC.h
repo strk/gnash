@@ -38,7 +38,7 @@
 //   2 - print a message for every GcResource being registered and being deleted
 //   3 - print info about the mark scan 
 //   
-#define GNASH_GC_DEBUG 1
+//#define GNASH_GC_DEBUG 1
 
 #ifdef GNASH_GC_DEBUG
 # include "log.h"
