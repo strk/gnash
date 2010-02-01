@@ -37,6 +37,7 @@
 #include <boost/format.hpp>
 #endif
 
+#include <vector>
 #include <cstdio>
 #include <cstring>
 #include <algorithm> 
@@ -1040,6 +1041,7 @@ Gui::requestScreenShots(const std::vector<size_t>& l, bool last,
 
     _screenShotter.reset(new ScreenShotter(_renderer, filename));
     if (last) _screenShotter->lastFrame();
+    _screenShotter->setFrames(l);
 
 }
 
@@ -1330,7 +1332,10 @@ ScreenShotter::saveImage(const std::string& id) const
 void
 ScreenShotter::screenShot(size_t frameAdvance)
 {
-    if (_immediate) {
+    // Save an image if an spontaneous screenshot was requested or the
+    // frame is in the list of requested frames.
+    if (_immediate || std::binary_search(_frames.begin(), _frames.end(),
+                frameAdvance)) {
         saveImage(boost::lexical_cast<std::string>(frameAdvance));
         _immediate = false;
     }
@@ -1340,6 +1345,13 @@ void
 ScreenShotter::last() const
 {
     if (_last) saveImage("last");
+}
+
+void
+ScreenShotter::setFrames(const std::vector<size_t> frames)
+{
+    _frames = frames;
+    std::sort(_frames.begin(), _frames.end());
 }
 
 // end of namespace

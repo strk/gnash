@@ -36,7 +36,8 @@
 #include "tree.hh" // for tree
 #endif
 
-#include <cstdlib> // exit
+#include <vector>
+#include <cstdlib> 
 #include <string>
 #include <map>
 
@@ -117,6 +118,9 @@ public:
     ///                         as well as to construct the filename.
     void screenShot(size_t frameAdvance);
 
+    /// Request a list of frames to be rendered to image files.
+    void setFrames(const std::vector<size_t> frames);
+
 private:
 
     /// Take the screenshot.
@@ -132,6 +136,8 @@ private:
 
     /// Whether to take a screenshot on the last frame.
     bool _last;
+
+    std::vector<size_t> _frames;
 
 };
 
@@ -503,10 +509,10 @@ protected:
     geometry::Range2d<int> _validbounds;
 
     /// Desired window width.
-    int             _width;
+    int _width;
 
     /// Desired window height.
-    int             _height;
+    int _height;
 
     /// Desired colour depth in bits.
     RunResources& _runResources;
