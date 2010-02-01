@@ -161,6 +161,7 @@ public:
     /// This should be a comma-separated list of frames.
     //
     /// Only numbers and the word "last" are valid.
+    //
     /// We parse the string here rather than in gnash.cpp to avoid making
     /// the interface to Player more complicated than it is already.
     void setScreenShots(const std::string& screenshots) {

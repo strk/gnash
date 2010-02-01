@@ -391,10 +391,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
     int movie_height = static_cast<int>(_movieDef->get_height_pixels());
 
     if (! _width) {
-      _width = static_cast<size_t>(movie_width * _scale);
+        _width = static_cast<size_t>(movie_width * _scale);
     }
     if (! _height) {
-      _height = static_cast<size_t>(movie_height * _scale);
+        _height = static_cast<size_t>(movie_height * _scale);
     }
 
     if (! _width || ! _height) {
