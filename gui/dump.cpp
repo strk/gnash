@@ -339,7 +339,7 @@ DumpGui::beforeRendering()
 }
 
 void
-DumpGui::quit()
+DumpGui::quitUI()
 {
     _terminate_request = true;
 }

@@ -37,9 +37,12 @@
 #include <boost/format.hpp>
 #endif
 
+#include <vector>
 #include <cstdio>
 #include <cstring>
-#include <algorithm> // std::max, std::min
+#include <algorithm> 
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/lexical_cast.hpp>
 
 /// Define this to make sure each frame is fully rendered from ground up
 /// even if no motion has been detected in the movie.
@@ -193,6 +196,15 @@ void
 Gui::unsetFullscreen()
 {
     log_unimpl(_("Fullscreen not yet supported in this GUI"));
+}
+
+void
+Gui::quit() {
+    // Take a screenshot of the last frame if required.
+    if (_screenShotter.get()) {
+        _screenShotter->last();
+    }
+    quitUI();
 }
 
 void
@@ -1007,15 +1019,30 @@ Gui::takeScreenShot()
 {
     if (!_screenShotter.get()) {
         // If no ScreenShotter exists, none was requested at startup.
+        // We use a default filename pattern.
         URL url(_runResources.baseURL());
         std::string::size_type p = url.path().rfind('/');
         const std::string& name = (p == std::string::npos) ? url.path() :
             url.path().substr(p + 1);
-        const std::string& filename = "screenshot-" + name;
+        const std::string& filename = "screenshot-" + name + "-%f";
         _screenShotter.reset(new ScreenShotter(_renderer, filename));
     }
     assert (_screenShotter.get());
     _screenShotter->now();
+}
+
+void
+Gui::requestScreenShots(const ScreenShotter::FrameList& l, bool last,
+        const std::string& filename)
+{
+    // Nothing to do if there is no renderer or if no frames should be
+    // saved.
+    if (!_renderer.get() || (l.empty() && !last)) return;
+
+    _screenShotter.reset(new ScreenShotter(_renderer, filename));
+    if (last) _screenShotter->lastFrame();
+    _screenShotter->setFrames(l);
+
 }
 
 void
@@ -1286,22 +1313,45 @@ Gui::getQuality() const
 }
 
 void
+ScreenShotter::saveImage(const std::string& id) const
+{
+    // Replace all "%f" in the filename with the frameAdvance.
+    std::string outfile(_fileName);
+    boost::replace_all(outfile, "%f", id);
+
+    FILE* f = std::fopen(outfile.c_str(), "wb");
+    if (f) {
+        boost::shared_ptr<IOChannel> t(new tu_file(f, true));
+        _renderer->renderToImage(t, GNASH_FILETYPE_PNG);
+    }
+    else {
+        log_error("Failed to open screenshot file \"%s\"!", outfile);
+    }
+}
+
+void
 ScreenShotter::screenShot(size_t frameAdvance)
 {
-    if (_immediate) {
-        // Spontaneous screenshots always have the frame number appended.
-        std::ostringstream ss;
-        ss << _fileName << "-" << frameAdvance;
-        FILE* f = std::fopen(ss.str().c_str(), "wb");
-        if (f) {
-            boost::shared_ptr<IOChannel> t(new tu_file(f, true));
-            _renderer->renderToImage(t, GNASH_FILETYPE_PNG);
-        }
-        else {
-            log_error("Failed to open screenshot file \"%s\"!", _fileName);
-        }
+    // Save an image if an spontaneous screenshot was requested or the
+    // frame is in the list of requested frames.
+    if (_immediate || std::binary_search(_frames.begin(), _frames.end(),
+                frameAdvance)) {
+        saveImage(boost::lexical_cast<std::string>(frameAdvance));
         _immediate = false;
     }
+}
+
+void
+ScreenShotter::last() const
+{
+    if (_last) saveImage("last");
+}
+
+void
+ScreenShotter::setFrames(const FrameList& frames)
+{
+    _frames = frames;
+    std::sort(_frames.begin(), _frames.end());
 }
 
 // end of namespace

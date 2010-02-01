@@ -26,7 +26,7 @@
 
 <refsynopsisdiv><title>Synopsis</title>
 <synopsis>
-gnash (options)... (file)...
+gnash [option]... [URL]
 </synopsis>
 </refsynopsisdiv>
 
@@ -49,16 +49,7 @@ gnash (options)... (file)...
     <term>-s factor</term>
     <listitem>
       <para>
-	Scale the movie up/down by the specified factor.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>-c</term>
-    <listitem>
-      <para>
-	Severe errors produce a core file instead of letting SDL trap them.
+	    Scale the movie up/down by the specified factor.
       </para>
     </listitem>
   </varlistentry>
@@ -67,7 +58,7 @@ gnash (options)... (file)...
     <term>-d num</term>
     <listitem>
       <para>
-      Number of milliseconds to delay in main loop.
+        Number of milliseconds to delay in main loop.
       </para>
     </listitem>
   </varlistentry>
@@ -76,34 +67,47 @@ gnash (options)... (file)...
     <term>-a</term>
     <listitem>
       <para>
-          Enable ActionScript debugging.
+        Be very verbose about movie action execution. Must be used in
+        conjunction with -v.
       </para>
     </listitem>
   </varlistentry>
-
+  
   <varlistentry>
-    <term>-x</term>
+    <term>-p</term>
     <listitem>
       <para>
-	The XID of the parent window Gnash should use instead of
-	creating a new one.  This is only used when embedding the player
-	into another window.
+        Be very verbose about parsing. Must be used in conjunction with -v.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>-j</term>
+    <term>-x xid</term>
+    <term>--xid xid</term>
     <listitem>
       <para>
-	Set the width of the window. This is only used when embedding
-	the player into another window.
+	    The XID of the parent window Gnash should use instead of
+	    creating a new one.  This is only used when embedding the player
+	    into another window.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>-k</term>
+    <term>-j width</term>
+    <term>--width width</term>
+    <listitem>
+      <para>
+	    Set the width of the window. This is only used when embedding
+	    the player into another window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-k height</term>
+    <term>--height height</term>
     <listitem>
       <para>
 	Set the height of the window. This is only used when embedding
@@ -117,42 +121,6 @@ gnash (options)... (file)...
     <listitem>
       <para>
           Be verbose; i.e. print log messages to stdout.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>-va</term>
-    <listitem>
-      <para>
-         Be verbose about movie Actions.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>-vp</term>
-    <listitem>
-      <para>
-         Be verbose about parsing the movie.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>-ml bias</term>
-    <listitem>
-      <para>
-  Specify the texture LOD bias (float, default is -1).
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>-p</term>
-    <listitem>
-      <para>
-          Run full speed (without sleeping), and log the frame rate.
       </para>
     </listitem>
   </varlistentry>
@@ -178,21 +146,12 @@ gnash (options)... (file)...
     </listitem>
   </varlistentry>
 
-<!--
-  <varlistentry>
-    <term>-e</term>
-    <listitem>
-      <para>
-          Use SDL Event thread
-      </para>
-    </listitem>
-  </varlistentry>
--->
   <varlistentry>
     <term>-1</term>
+    <term>--once</term>
     <listitem>
       <para>
-	Play once; exit when/if movie reaches the last frame.
+        Play once; exit when/if movie reaches the last frame.
       </para>
     </listitem>
   </varlistentry>
@@ -214,15 +173,17 @@ gnash (options)... (file)...
 
   <varlistentry>
     <term>-t sec</term>
+    <term>--timeout sec</term>
     <listitem>
       <para>
-	Timeout and exit after the specified number of seconds.
+        Timeout and exit after the specified number of seconds.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
     <term>-u</term>
+    <term>--real-url</term>
     <listitem>
       <para>
 	Set "real" url of the movie (useful for downloaded movies).
@@ -232,6 +193,7 @@ gnash (options)... (file)...
 
   <varlistentry>
     <term>-U</term>
+    <term>--base-url</term>
     <listitem>
       <para>
 	Set "base" url for this run (used to resolve relative urls,
@@ -242,16 +204,18 @@ gnash (options)... (file)...
   </varlistentry>
 
   <varlistentry>
-    <term>-P</term>
+    <term>-P param</term>
+    <term>--param param</term>
     <listitem>
       <para>
-	Set parameter (ie. "FlashVars=A=1&amp;b=2")
+        Set parameter (ie. "FlashVars=A=1&amp;b=2")
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
     <term>-F</term>
+    <term>--fd</term>
     <listitem>
       <para>
 	Set filedescriptor to use for external communications.
@@ -266,6 +230,34 @@ gnash (options)... (file)...
 	Print the version number, and the configuration, of the
 	Gnash player. Please provide this information when submitting bug
 	reports.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--screenshot list</term>
+    <listitem>
+      <para>
+        Set a list of frame advances to be saved as screenshots. The list
+        must be comma-separated. Valid values are integers and the phrase
+        &quot;last&quot;. If &quot;last&quot; is specified, the final
+        frame before exit is saved. Invalid values are ignored. Frame numbers
+        apply to the sequence of frames as the SWF is executed, not the
+        frame sequence defined in the SWF. Use in combination with
+        --screenshot-file to specify output filename.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--screenshot-file file</term>
+    <listitem>
+      <para>
+        Specify the output pattern for screenshot filenames. The token %f
+        in a pattern will be replaced with a frame identifier. If you specify
+        multiple frames and do not use %f, the file will be overwritten for
+        each screenshot. If this option is not specified but screenshots
+        are requested, a default filename will be used.
       </para>
     </listitem>
   </varlistentry>
@@ -294,19 +286,10 @@ gnash (options)... (file)...
   </varlistentry>
 
   <varlistentry>
-    <term>ESC</term>
-    <listitem>
-      <para>
-             Quit/Exit.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
     <term>CTRL-P</term>
     <listitem>
       <para>
-          Toggle Pause.
+          Toggle pause.
       </para>
     </listitem>
   </varlistentry>
@@ -321,71 +304,26 @@ gnash (options)... (file)...
   </varlistentry>
 
   <varlistentry>
-    <term>CTRL-[ or kp-</term>
+    <term>CTRL-F   </term>
     <listitem>
       <para>
-	Step back one frame.
+        Toggle fullscreen. ESC also exits fullscreen.
       </para>
     </listitem>
   </varlistentry>
+
 
   <varlistentry>
-    <term>CTRL-] or kp+</term>
+    <term>CTRL-O </term>
     <listitem>
       <para>
-	Step forward one frame.
+        Save a spontaneous screenshot. If no screenshots were requested
+        from the command line, a default filename is used. Otherwise, the
+        same filename pattern is used for requested and spontaneous
+        screenshots.
       </para>
     </listitem>
   </varlistentry>
-
-<!--
-  <varlistentry>
-    <term>CTRL-A</term>
-    <listitem>
-      <para>
-          Toggle anti-aliasing (doesn't work).
-      </para>
-    </listitem>
-  </varlistentry>
--->
-
-  <varlistentry>
-    <term>CTRL-T</term>
-    <listitem>
-      <para>
-          Debug.  Test the set_variable() function.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>CTRL-G</term>
-    <listitem>
-      <para>
-          Debug.  Test the get_variable() function.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>CTRL-M</term>
-    <listitem>
-      <para>
-          Debug.  Test the call_method() function.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>CTRL-B</term>
-    <listitem>
-      <para>
-          Toggle background color.
-      </para>
-    </listitem>
-  </varlistentry>
-  </variablelist>
-
 <para>
 Flash is a registered trademark of Adobe Corporation.
 </para>

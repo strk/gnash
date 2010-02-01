@@ -333,7 +333,7 @@ KdeGui::resize(int width, int height)
 }
 
 void
-KdeGui::quit()
+KdeGui::quitUI()
 {
 #if 1
     _qapp->exit();

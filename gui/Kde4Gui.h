@@ -80,6 +80,7 @@ public slots:
     void restart();
     void refresh();
     void fullscreen(bool isFull);
+    void quit();
 
 protected:
     void paintEvent(QPaintEvent*);
@@ -142,7 +143,7 @@ public:
     void resize(int width, int height);
     void showProperties();
     void showPreferences();
-    void quit();
+    void quitUI();
 
     bool want_multiple_regions() { return true; }
 

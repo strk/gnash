@@ -158,6 +158,23 @@ public:
         _audioDump = filespec;
     }
 	
+    /// This should be a comma-separated list of frames.
+    //
+    /// Only numbers and the word "last" are valid.
+    //
+    /// We parse the string here rather than in gnash.cpp to avoid making
+    /// the interface to Player more complicated than it is already.
+    void setScreenShots(const std::string& screenshots) {
+        _screenshots = screenshots;
+    }
+
+    /// Set the filename for screenshot output.
+    //
+    /// A %f in the filename will be replaced with the frame number.
+    void setScreenShotFile(const std::string& file) {
+        _screenshotFile = file;
+    }
+
 private:
 
 	class CallbacksHandler : public movie_root::AbstractIfaceCallback,
@@ -259,7 +276,6 @@ private:
 
 	std::string _baseurl;
 
-
     /// Initialization / destruction order is important here.
     //
     /// some sound_samples are destroyed in the dtor of SWFMovieDefinition,
@@ -316,8 +332,18 @@ private:
 	bool _startFullscreen;
 	bool _hideMenu;
 
-    // The filename to use for dumping audio.
+    /// The filename to use for dumping audio.
     std::string _audioDump;
+
+    /// A comma-separated list of frames to output as screenshots.
+    //
+    /// If empty, no screenshots are required.
+    std::string _screenshots;
+
+    /// The filename to save screenshots to.
+    //
+    /// If empty, a default is used.
+    std::string _screenshotFile;
 
 };
 
