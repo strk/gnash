@@ -137,8 +137,8 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
             "advances\n") 
     << _("  --fullscreen             Start in fullscreen mode\n") 
     << _("  --hide-menubar           Start without displaying the menu bar\n") 
-    << _("  --screenshot             List of frames to save as screenshots\n") 
-    << _("  --screenshot-file        Filename pattern for screenshot images.\n")
+    << _("  --screenshot <list>      List of frames to save as screenshots\n") 
+    << _("  --screenshot-file <file> Filename pattern for screenshot images.\n")
     << "\n"
     << _("Keys:\n") 
     << "\n"
