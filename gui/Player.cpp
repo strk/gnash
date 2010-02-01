@@ -328,20 +328,15 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _infile = infile;
 
     // Work out base url
-    if ( _baseurl.empty() )
-    {
-        if (! url.empty() ) _baseurl = url;
-        else if ( infile == "-" ) _baseurl = URL("./").str();
+    if (_baseurl.empty()) {
+        if (!url.empty()) _baseurl = url;
+        else if (infile == "-") _baseurl = URL("./").str();
         else _baseurl = infile;
     }
 
     // Set _root._url (either explicit of from infile)
-    if (! url.empty() ) {
-        _url = url;
-    }  else {
-        _url = infile;
-    }
-
+    if (!url.empty()) _url = url;
+    else _url = infile;
 
     // Parse player parameters. These are not passed to the SWF, but rather
     // control stage properties etc.
