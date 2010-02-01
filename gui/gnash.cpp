@@ -86,69 +86,69 @@ static void
 usage()
 {
 
-cout << _("Usage: gnash [options] movie_file.swf") << endl
-    << endl
-    << _("Plays a SWF (Shockwave Flash) movie") << endl
-    << _("Options:") << endl
-    << endl
-    << _("  -h,  --help              Print this help and exit") << endl
-    << _("  -V,  --version           Print version information and exit") << endl
-    << _("  -s,  --scale <factor>    Scale the movie by the specified factor") << endl
-    << _("  -c                       Produce a core file instead of letting SDL trap it") << endl
-    << _("  -d,  --delay num         Number of milliseconds to delay in main loop") << endl
-    << _("  -v,  --verbose           Produce verbose output") << endl
+cout << _("Usage: gnash [options] movie_file.swf\n")
+    << "\n"
+    << _("Plays a SWF (Shockwave Flash) movie\n")
+    << _("Options:\n")
+    << "\n"
+    << _("  -h,  --help              Print this help and exit\n")
+    << _("  -V,  --version           Print version information and exit\n") 
+    << _("  -s,  --scale <factor>    Scale the movie by the specified factor\n") 
+    << _("  -c                       Produce a core file instead of letting SDL trap it\n") 
+    << _("  -d,  --delay num         Number of milliseconds to delay in main loop\n") 
+    << _("  -v,  --verbose           Produce verbose output\n") 
 #if VERBOSE_ACTION
-    << _("  -va                      Be (very) verbose about action execution") << endl
+    << _("  -va                      Be (very) verbose about action execution\n") 
 #endif
 #if VERBOSE_PARSE
-    << _("  -vp                      Be (very) verbose about parsing") << endl
+    << _("  -vp                      Be (very) verbose about parsing\n") 
 #endif
-    << _("  -A <file>                Audio dump file (wave format)") << endl
-    << _("  -D <file>                Video dump file (only valid with dump-gnash)") << endl
-    << _("  -x,  --xid <ID>          X11 Window ID for display") << endl
-    << _("  -w,  --writelog          Produce the disk based debug log") << endl
-    << _("  -j,  --width <width>     Set window width") << endl
-    << _("  -k,  --height <height>   Set window height") << endl
-    << _("  -X,  --x-pos <x-pos>     Set window x position") << endl
-    << _("  -Y,  --y-pos <y-pos>     Set window y position") << endl
-    << _("  -1,  --once              Exit when/if movie reaches the last frame") << endl
-    << _("  -g,  --debugger          Turn on the SWF debugger") << endl
-    << _("  -r,  --render-mode <0|1|2|3>") << endl
-    << _("                           0 disable rendering and sound") << endl
-    << _("                           1 enable rendering, disable sound") << endl
-    << _("                           2 enable sound, disable rendering") << endl
-    << _("                           3 enable rendering and sound (default)") << endl
-    << _("  -t,  --timeout <sec>     Exit after the specified number of seconds") << endl
-    << _("  -u,  --real-url <url>    Set \"real\" URL of the movie") << endl
-    << _("  -U,  --base-url <url>    Set \"base\" URL for resolving relative URLs") << endl
-    << _("  -P,  --param <param>     Set parameter (e.g. \"FlashVars=A=1&b=2\")") << endl
-    << _("  -F,  --fd <fd>           Filedescriptor to use for external communications") << endl
+    << _("  -A <file>                Audio dump file (wave format)\n") 
+    << _("  -D <file>                Video dump file (only valid with "
+            "dump-gnash)\n") 
+    << _("  -x,  --xid <ID>          X11 Window ID for display\n") 
+    << _("  -w,  --writelog          Produce the disk based debug log\n") 
+    << _("  -j,  --width <width>     Set window width\n") 
+    << _("  -k,  --height <height>   Set window height\n") 
+    << _("  -X,  --x-pos <x-pos>     Set window x position\n") 
+    << _("  -Y,  --y-pos <y-pos>     Set window y position") 
+    << _("  -1,  --once              Exit when/if movie reaches the last "
+            "frame\n") 
+    << _("  -g,  --debugger          Turn on the SWF debugger\n") 
+    << _("  -r,  --render-mode <0|1|2|3>\n") 
+    << _("                           0 disable rendering and sound\n") 
+    << _("                           1 enable rendering, disable sound\n") 
+    << _("                           2 enable sound, disable rendering\n") 
+    << _("                           3 enable rendering and sound (default)\n") 
+    << _("  -t,  --timeout <sec>     Exit after the specified number of "
+            "seconds\n") 
+    << _("  -u,  --real-url <url>    Set \"real\" URL of the movie\n") 
+    << _("  -U,  --base-url <url>    Set \"base\" URL for resolving relative "
+            "URLs\n") 
+    << _("  -P,  --param <param>     Set parameter (e.g. "
+            "\"FlashVars=A=1&b=2\")\n") 
+    << _("  -F,  --fd <fd>           Filedescriptor to use for external "
+            "communications\n") 
 #ifdef GNASH_FPS_DEBUG
-    << _("  -f,  --debug-fps num     Print FPS every num seconds (float).") << endl
+    << _("  -f,  --debug-fps num     Print FPS every num seconds (float)\n") 
 #endif // def GNASH_FPS_DEBUG
-    << endl
-    << _("  --max-advances num       Exit after specified number of advances") << endl
-    << _("  --fullscreen             Start in fullscreen mode") << endl
-    << _("  --hide-menubar           Start without displaying the menu bar ") << endl
-    << endl
-    << _("Keys:") << endl
-    << endl
-    << _("  CTRL-Q, CTRL-W           Quit/Exit") << endl
-    << _("  CTRL-P                   Toggle Pause") << endl
-    << _("  CTRL-R                   Restart the movie") << endl
-
-#if 0 // Currently disabled
-    << _("  CTRL-[ or kp-   Step back one frame") << endl
-    << _("  CTRL-] or kp+   Step forward one frame") << endl
-#endif
-
-    << _("  CTRL-L                   Force immediate redraw") << endl
-
-//    << _("  CTRL-A          Toggle antialiasing (doesn't work)") << endl
-//    << _("  CTRL-T          Debug.  Test the set_variable() function") << endl
-//    << _("  CTRL-G          Debug.  Test the get_variable() function") << endl
-//    << _("  CTRL-M          Debug.  Test the invoke() function") << endl
-
+    
+    << _("  --max-advances num       Exit after specified number of frame "
+            "advances\n") 
+    << _("  --fullscreen             Start in fullscreen mode\n") 
+    << _("  --hide-menubar           Start without displaying the menu bar\n") 
+    << _("  --screenshot             List of frames to save as screenshots\n") 
+    << _("  --screenshot-file        Filename pattern for screenshot images.\n")
+    << "\n"
+    
+    << _("Keys:") 
+    
+    << _("  CTRL-Q, CTRL-W           Quit\n") 
+    << _("  CTRL-F                   Toggle fullscreen\n") 
+    << _("  CTRL-P                   Toggle pause\n") 
+    << _("  CTRL-R                   Restart the movie\n") 
+    << _("  CTRL-O                   Take a screenshot\n") 
+    << _("  CTRL-L                   Force immediate redraw\n") 
     << endl;
 }
 
