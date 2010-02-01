@@ -140,9 +140,8 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("  --screenshot             List of frames to save as screenshots\n") 
     << _("  --screenshot-file        Filename pattern for screenshot images.\n")
     << "\n"
-    
-    << _("Keys:") 
-    
+    << _("Keys:\n") 
+    << "\n"
     << _("  CTRL-Q, CTRL-W           Quit\n") 
     << _("  CTRL-F                   Toggle fullscreen\n") 
     << _("  CTRL-P                   Toggle pause\n") 
