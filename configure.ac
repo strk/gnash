@@ -3060,7 +3060,7 @@ else
   echo "        RECOMMENDED: If you install the CURL library, Gnash will be able to" >&4
   echo "                     display remote content (streaming from URLs) using CURL." >&4
   echo "                     Install libcurl from http://curl.haxx.se/libcurl" >&4
-  echo "                     or .deb users: apt-get install libcurl3-dev" >&4
+  echo "                     or .deb users: apt-get install libcurl-dev" >&4
   echo "                     or .rpm users: yum install curl-devel" >&4
 fi
 
