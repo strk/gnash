@@ -1,0 +1,91 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+                   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+[
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY appversion "0.8">
+  <!ENTITY manrevision "0.1">
+  <!ENTITY date "Feb 2010">
+  <!ENTITY app "<application>findwebcams</application>">
+  <!ENTITY appname "findwebcams">
+  <!ENTITY version "0.8">
+]
+>
+
+<refentry id="findwebcams">
+<refmeta>
+<refentrytitle>findwebcams</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<!-- the refname becomes the output name of the man page -->
+<refnamediv>
+<refname>findwebcams</refname>
+<refpurpose>Gnash Utility For finding webcams on computer.</refpurpose>
+</refnamediv>
+
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+findwebcams
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+  Findwebcams is a utility that uses Gstreamer to identify what types
+  of webcams you have installed on your computer, so that you can
+  properly configure Gnash on which one to use.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term>-h</term>
+    <listitem>
+      <para>
+	Print usage info.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-V</term>
+    <listitem>
+      <para>
+	Print version information.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-d</term>
+    <listitem>
+      <para>
+	Display init file to the terminal.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-n</term>
+    <listitem>
+      <para>
+	Verbose networking debug info.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-v</term>
+    <listitem>
+      <para>
+	Verbose output.
+      </para>
+    </listitem>
+  </varlistentry>
+
+
+</variablelist>
+
+</refsect1>
+</refentry>
+
