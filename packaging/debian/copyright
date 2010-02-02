@@ -11,7 +11,7 @@ Authors of Gameswf, which was the original code base for Gnash:
         Thatcher Ulrich <tu@tulrich.com>
         Mike Shaver
         Thierry Berger-Perrin
-        Ignacio Castaño
+        Ignacio CastaÃ±o
         Willem Kokke
         Vitaly Alexeev
         Alexander Streit
@@ -70,7 +70,7 @@ Other licenses:
 
 ** plugin/mozilla-sdk/include/npruntime.h:
 
-   Copyright © 2004, Apple Computer, Inc. and The Mozilla Foundation. 
+   Copyright Â© 2004, Apple Computer, Inc. and The Mozilla Foundation. 
    All rights reserved.
    
    Redistribution and use in source and binary forms, with or without
