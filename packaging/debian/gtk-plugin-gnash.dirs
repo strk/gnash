@@ -1,4 +1,2 @@
-usr/lib/python2.6/site-packages/gtk-2.6
-usr/lib/python2.6/site-packages/gtk-2.5
-usr/lib/python2.6/site-packages/gtk-2.4
+usr/lib/python2.*/site-packages/gtk-2.*
 

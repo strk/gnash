@@ -1,5 +1,11 @@
 gnash (trunk) unstable; urgency=low
 
+  * local package, many tweaks to be more standards compliant.
+
+ -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Tue, 2 Feb 2010 04:20:00 +0100
+
+gnash (0.8.6~bzr.11700) unstable; urgency=low
+
   * Add -dbg package so oprofile works out of the box.
 
  -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Thu, 15 Oct 2009 04:20:00 +0100
