@@ -332,8 +332,6 @@ localconnection_send(const fn_call& fn)
     LocalConnection_as* relay = ensure<ThisIsNative<LocalConnection_as> >(fn);
     // At least 2 args (connection name, function) required.
 
-   log_debug(_("The number of args is %d \n"), fn.nargs) ;
-     
     if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream os;
