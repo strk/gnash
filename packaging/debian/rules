@@ -153,8 +153,6 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/share/applications/
 	cp debian/*.desktop $(CURDIR)/debian/tmp/usr/share/applications/
 
-	ln -s debian/tmp/usr/share/man/man1/gnash.1 debian/tmp/usr/share/man/man1/kde4-gnash.1
-
 # CREATE PACKAGES
 
 # Build architecture-independent files here.
