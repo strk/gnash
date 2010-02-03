@@ -150,35 +150,44 @@ struct
 NonNumericDigit
 {
    bool operator()(char c) {
-       return (!std::isdigit(c) && c != '.');
+       return (!std::isdigit(c) && c != '.' && c != '-');
    }
 };
 
+
+/// Convert a string to a double if the complete string can be converted.
+//
+/// This follows the conditions of the standard C locale for numbers except
+/// that an exponent signifier with no following digit (e.g. "2e") is
+/// considered valid. Moreover, "2e-" is also considered valid.
+//
+/// This function scans the string twice (once for verification, once for
+/// extraction) and copies it once (for extraction).
 double
-parseDecimalNumber(const std::string& st)
+parseDecimalNumber(std::string::const_iterator start,
+        std::string::const_iterator end)
 {
-
-    assert(!st.empty());
+    assert(start != end);
     
-    std::string s(st);
+    std::string::const_iterator si =
+        std::find_if(start, end, NonNumericDigit());
 
-    std::string::iterator start = s.begin();
-    const std::string::iterator end = s.end();
-
-    // Safe incrementation because the string is not empty.
-    if (*start == '-') ++start;
-
-    std::string::iterator si = std::find_if(start, end, NonNumericDigit());
-    if (si == end) return boost::lexical_cast<double>(s);
-
-    if (*si == 'e' || *si == 'E') {
-        if ((si + 1) == end) {
-            s.erase(si);
-            return boost::lexical_cast<double>(s);
+    // Check for exponent with no following character. Depending on the
+    // version of gcc, extraction may be rejected (probably more correct) or
+    // accepted as a valid exponent (what ActionScript wants).
+    // In this case we remove the exponent to get the correct behaviour
+    // on all compilers.
+    //
+    // Exponents with a following '-' are also valid. It's unlikely that
+    // any version of gcc allowed this.
+    if (si != end && (*si == 'e' || *si == 'E')) {
+        if ((si + 1) == end) --end;
+        else if (*(si + 1) == '-' && si + 2 == end) {
+            end -= 2;
         }
     }
 
-    return boost::lexical_cast<double>(s);
+    return boost::lexical_cast<double>(std::string(start, end));
 }
 
 
@@ -509,8 +518,7 @@ as_value::to_number() const
 
             try {
 
-                if (swfversion > 5)
-                {
+                if (swfversion > 5) {
                     double d;
                     // Will throw if invalid.
                     if (parseNonDecimalInt(s, d)) return d;
@@ -520,13 +528,13 @@ as_value::to_number() const
                 // string is a valid float literal, then it
                 // gets converted; otherwise it is set to NaN.
                 // Valid for SWF5 and above.
-                std::string::size_type pos;
-                if ((pos = s.find_first_not_of(" \r\n\t")) 
-                        == std::string::npos) {
-                    return NaN;
-                }
+                const std::string::size_type pos =
+                    s.find_first_not_of(" \r\n\t");
 
-                return parseDecimalNumber(s.substr(pos));
+                if (pos == std::string::npos) return NaN;
+                
+                // Will throw a boost::bad_lexical_cast if it fails.
+                return parseDecimalNumber(s.begin() + pos, s.end());
  
             }
             catch (boost::bad_lexical_cast&) {
