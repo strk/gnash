@@ -49,6 +49,7 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <algorithm>
 
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY 1
@@ -136,7 +137,7 @@ parsePositiveInt(const std::string& s, Base base, bool whole = true)
 
     char c;
 
-    // If the cast fails, or if the whole string must be convertible and
+    // If the conversion fails, or if the whole string must be convertible and
     // some DisplayObjects are left, throw an exception.
     if (!(is >> target) || (whole && is.get(c))) {
         throw boost::bad_lexical_cast();
@@ -144,6 +145,42 @@ parsePositiveInt(const std::string& s, Base base, bool whole = true)
 
     return target;
 }
+
+struct
+NonNumericDigit
+{
+   bool operator()(char c) {
+       return (!std::isdigit(c) && c != '.');
+   }
+};
+
+double
+parseDecimalNumber(const std::string& st)
+{
+
+    assert(!st.empty());
+    
+    std::string s(st);
+
+    std::string::iterator start = s.begin();
+    const std::string::iterator end = s.end();
+
+    // Safe incrementation because the string is not empty.
+    if (*start == '-') ++start;
+
+    std::string::iterator si = std::find_if(start, end, NonNumericDigit());
+    if (si == end) return boost::lexical_cast<double>(s);
+
+    if (*si == 'e' || *si == 'E') {
+        if ((si + 1) == end) {
+            s.erase(si);
+            return boost::lexical_cast<double>(s);
+        }
+    }
+
+    return boost::lexical_cast<double>(s);
+}
+
 
 // This class is used to iterate through all the properties of an AS object,
 // so we can change them to children of an AMF0 element.
@@ -483,17 +520,13 @@ as_value::to_number() const
                 // string is a valid float literal, then it
                 // gets converted; otherwise it is set to NaN.
                 // Valid for SWF5 and above.
-                //
-                // boost::lexical_cast is remarkably inflexible and 
-                // fails for anything that has non-numerical DisplayObjects.
-                // Fortunately, actionscript is equally inflexible.
                 std::string::size_type pos;
                 if ((pos = s.find_first_not_of(" \r\n\t")) 
                         == std::string::npos) {
                     return NaN;
                 }
 
-                return boost::lexical_cast<double>(s.substr(pos));
+                return parseDecimalNumber(s.substr(pos));
  
             }
             catch (boost::bad_lexical_cast&) {
