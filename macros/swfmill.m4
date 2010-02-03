@@ -40,7 +40,7 @@ AC_DEFUN([AC_PATH_SWFMILL], [
 
   if test x"$SWFMILL" != "x"; then
     sm=`$SWFMILL -h 2>&1 | head -n 4`
-    version=`echo $sm | grep 'swfmill [[0-9]]\{1,2\}\(\.[[0-9]]\{1,2\}\)\{2,3\}' | cut -d' ' -f2`
+    version=`echo "$sm" | grep 'swfmill [[0-9]]\{1,2\}\(\.[[0-9]]\{1,2\}\)\{2,3\}' | cut -d' ' -f2`
     major=`echo $version | cut -d'.' -f1`
     minor=`echo $version | cut -d'.' -f2`
     micro=`echo $version | cut -d'.' -f3`
