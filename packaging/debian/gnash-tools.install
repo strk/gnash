@@ -7,4 +7,6 @@ usr/share/man/man1/dumpshm.1
 usr/bin/flvdumper
 usr/share/man/man1/flvdumper.1
 usr/bin/findwebcams
+usr/share/man/man1/findwebcams.1
 usr/bin/findmicrophones
+usr/share/man/man1/findmicrophones.1
