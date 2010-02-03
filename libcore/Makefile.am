@@ -236,7 +236,6 @@ EXTENSIONS_API = \
 	as_value.h \
 	PropFlags.h	\
 	CharacterProxy.h \
-	StringPredicates.h \
 	builtin_function.h \
 	NativeFunction.h \
 	as_function.h \

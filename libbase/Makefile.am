@@ -28,10 +28,6 @@ pkglib_LTLIBRARIES = libgnashbase.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
-	-I$(top_srcdir)/libnet \
-	-I$(top_srcdir)/libamf \
-	-I$(top_srcdir)/libcore	\
-	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libltdl \
 	$(PTHREAD_CFLAGS) \
 	$(PNG_CFLAGS) \
@@ -46,7 +42,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(NULL)
 
 # These headers get installed
-# include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
@@ -167,6 +162,8 @@ noinst_HEADERS += GnashImageGif.h
 endif
 
 EXTENSIONS_API = \
+	StringPredicates.h \
+	FileTypes.h \
 	smart_ptr.h \
 	string_table.h \
 	ref_counted.h \

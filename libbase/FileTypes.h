@@ -16,58 +16,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-#ifndef GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
-#define GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
-
-// Forward declarations
-namespace gnash {
-	class movie_definition;
-	class SWFStream;
-	class RunResources;
-}
+#ifndef GNASH_FILETYPES_H
+#define GNASH_FILETYPES_H
 
 namespace gnash {
-namespace SWF {
 
-class DefineFontAlignZonesTag {
-public:
-
-	enum {
-		THIN = 0,
-		MEDIUM = 1,
-		THICK = 2
-	};
-
-
-	static void loader(SWFStream& in, TagType tag, movie_definition& m,
-            const RunResources& r);
-
-private:
-
-    /// Construct a DefineFoneAlignZonesTag
-    //
-    /// This should only be called from the loader() function.
-	DefineFontAlignZonesTag(movie_definition& m, SWFStream& in);
-
-	unsigned short _font2_id_ref;
-
-	unsigned _csm_table_int;
-
+// The file types that Gnash can handle
+enum FileType {
+    GNASH_FILETYPE_JPEG,
+    GNASH_FILETYPE_PNG,
+    GNASH_FILETYPE_GIF,
+    GNASH_FILETYPE_SWF,
+    GNASH_FILETYPE_FLV,
+    GNASH_FILETYPE_UNKNOWN
 };
 
+}
 
-
-
-
-} // namespace gnash::SWF
-} // namespace gnash
-
-
-#endif // GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
-
-
-// Local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
+#endif

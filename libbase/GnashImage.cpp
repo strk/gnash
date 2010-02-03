@@ -25,7 +25,7 @@
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "gnash.h" // for image file types
+#include "FileTypes.h"
 #include "GnashImage.h"
 #ifdef USE_PNG
 # include "GnashImagePng.h"

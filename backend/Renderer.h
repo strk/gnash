@@ -146,6 +146,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
+#include "FileTypes.h"
 #include "gnash.h" // Quality
 #include "DisplayObject.h"
 #include "Range2d.h"
