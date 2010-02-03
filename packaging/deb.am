@@ -33,6 +33,17 @@ setup-deb:
 	if test -e $${snapshot_dir}/debian/changelog; then \
 	  mv -f $${snapshot_dir}/debian/changelog $${snapshot_dir}/debian/changelog.orig; \
 	  sed -e "s:trunk:$(SNAPSHOT_VERSION):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
+	fi; \
+	ubuntu=`uname -a | grep -ci ubuntu`; \
+	if test $$ubuntu -eq 1; then \
+	  if test -e $${snapshot_dir}/debian/gtk-plugin-gnash.dirs; then \
+	    mv -f $${snapshot_dir}/debian/gtk-plugin-gnash.dirs $${snapshot_dir}/debian/gtk-plugin-gnash.dirs.orig; \
+	  fi; \
+	  sed -e "s:python2.5/site:python2.6/dist:" $${snapshot_dir}/debian/gtk-plugin-gnash.dirs.orig > $${snapshot_dir}/debian/gtk-plugin-gnash.dirs; \
+	  if test -e $${snapshot_dir}/debian/gtk-plugin-gnash.install; then \
+	    mv -f $${snapshot_dir}/debian/gtk-plugin-gnash.install $${snapshot_dir}/debian/gtk-plugin-gnash.install.orig; \
+	  fi; \
+	  sed -e 's:python2.5/site:python2.6/dist:' $${snapshot_dir}/debian/gtk-plugin-gnash.install.orig > $${snapshot_dir}/debian/gtk-plugin-gnash.install; \
 	fi;
 
 snapshot-deb:
