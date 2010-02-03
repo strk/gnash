@@ -30,7 +30,7 @@
 #include <boost/scoped_array.hpp>
 #include <memory> // for auto_ptr
 
-#include "gnash.h" // for image file types
+#include "FileTypes.h"
 #include "log.h"
 #include "dsodefs.h"
 

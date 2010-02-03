@@ -20,7 +20,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "gnash.h" // for point !!
 #include "Geometry.h" // for edge
 #include <iostream>
 #include <sstream>
