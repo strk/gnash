@@ -42,6 +42,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <cmath> 
+#include <cctype> 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
@@ -147,13 +148,57 @@ parsePositiveInt(const std::string& s, Base base, bool whole = true)
 }
 
 struct
-NonNumericDigit
+NonNumericChar
 {
    bool operator()(char c) {
-       return (!std::isdigit(c) && c != '.' && c != '-');
+       return (!std::isdigit(c) && c != '.' && c != '-' && c != '+');
    }
 };
 
+/// Omit an empty exponent that is valid in ActionScript but not in C++.
+//
+/// This function throws a boost::bad_lexical_cast if it finds an invalid
+/// exponent to avoid attempting an extraction when it will definitely fail.
+//
+/// A successful return from this function does not mean the exponent is
+/// valid, only that the result of stringstream's conversion will mirror
+/// AS behaviour.
+//
+/// @param si       An iterator pointing to the position after an exponent sign.
+/// @param last     The end of the string to extract. If we have an exponent
+///                 with no following digit, this iterator is moved to
+///                 a position before the exponent sign.
+void
+validateExponent(std::string::const_iterator si,
+        std::string::const_iterator& last)
+{
+
+    // Check for exponent with no following character. Depending on the
+    // version of gcc, extraction may be rejected (probably more correct) or
+    // accepted as a valid exponent (what ActionScript wants).
+    // In this case we remove the exponent to get the correct behaviour
+    // on all compilers.
+    if (si == last) {
+        --last;
+        return;
+    }
+
+    // Exponents with a following '-' or '+' are also valid if they end the
+    // string. It's unlikely that any version of gcc allowed this.
+    if (*si == '-' || *si == '+') {
+        ++si;
+        if (si == last) {
+            last -= 2;
+            return;
+        }
+    }
+
+    // An exponent ("e", "e-", or "e+") followed by a non digit is invalid.
+    if (!std::isdigit(*si)) {
+        throw boost::bad_lexical_cast();
+    }
+
+}
 
 /// Convert a string to a double if the complete string can be converted.
 //
@@ -165,29 +210,24 @@ NonNumericDigit
 /// extraction) and copies it once (for extraction).
 double
 parseDecimalNumber(std::string::const_iterator start,
-        std::string::const_iterator end)
+        std::string::const_iterator last)
 {
-    assert(start != end);
-    
+    assert(start != last);
+ 
+    // Find the first position that is not a numeric character ('e' or 'E' not
+    // included). Even if no invalid character is found, it does not mean
+    // that the number is valid ("++++---" would pass the test).
     std::string::const_iterator si =
-        std::find_if(start, end, NonNumericDigit());
+        std::find_if(start, last, NonNumericChar());
 
-    // Check for exponent with no following character. Depending on the
-    // version of gcc, extraction may be rejected (probably more correct) or
-    // accepted as a valid exponent (what ActionScript wants).
-    // In this case we remove the exponent to get the correct behaviour
-    // on all compilers.
-    //
-    // Exponents with a following '-' are also valid. It's unlikely that
-    // any version of gcc allowed this.
-    if (si != end && (*si == 'e' || *si == 'E')) {
-        if ((si + 1) == end) --end;
-        else if (*(si + 1) == '-' && si + 2 == end) {
-            end -= 2;
-        }
+    if (si != last) {
+        // If this character is not an exponent sign, the number is malformed.
+        if (*si != 'e' && *si != 'E') throw boost::bad_lexical_cast(); 
+        /// Move the last iterator to point before empty exponents.
+        else validateExponent(si + 1, last);
     }
 
-    return boost::lexical_cast<double>(std::string(start, end));
+    return boost::lexical_cast<double>(std::string(start, last));
 }
 
 

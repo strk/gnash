@@ -612,6 +612,9 @@ check_equals(a.toString(), "NaN");
 a=new Number(new String("-56e-"));
 check_equals(a, -56); 
 
+a=new Number(new String("-56e+"));
+check_equals(a, -56); 
+
 
 a=new Number("0x2");
 #if OUTPUT_VERSION < 6
@@ -676,11 +679,11 @@ check( isNaN(0/0) );
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(236);
+ check_totals(237);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(231);
+ check_totals(232);
 #else
- check_totals(229);
+ check_totals(230);
 #endif
 #endif
