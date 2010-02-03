@@ -165,7 +165,7 @@ if test x"${$1}" = x"yes"; then
   dnl If the header doesn't exist, there is no point looking for the library.
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_lib}" = x; then
-      $PKG_CONFIG --exists [lib]DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l libDOWN[]`"
+      $PKG_CONFIG --exists [lib]DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l [lib]DASHDOWN`"
       $PKG_CONFIG --exists DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l DASHDOWN`"
       $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l lib$name`"
       $PKG_CONFIG --exists $name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l $name`"
