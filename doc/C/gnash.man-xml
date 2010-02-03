@@ -20,6 +20,8 @@
 <!-- the refname becomes the output name of the man page -->
 <refnamediv>
 <refname>gnash</refname>
+<refname>gtk-gnash</refname>
+<refname>kde4-gnash</refname>
 <refpurpose>GNU Flash (SWF) Player</refpurpose>
 </refnamediv>
 
@@ -324,6 +326,7 @@ gnash [option]... [URL]
       </para>
     </listitem>
   </varlistentry>
+</variablelist>
 <para>
 Flash is a registered trademark of Adobe Corporation.
 </para>
