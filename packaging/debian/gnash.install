@@ -1,2 +1,3 @@
 usr/bin/gtk-gnash
+usr/share/man/man1/gtk-gnash.1
 usr/share/applications/gnash.desktop
