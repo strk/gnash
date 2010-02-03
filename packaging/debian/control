@@ -134,7 +134,7 @@ Description: free SWF movie player - Plugin for Mozilla and derivatives
 Package: konqueror-plugin-gnash
 Section: utils
 Architecture: any
-Depends: gnash-common (= ${binary:Version}), klash (= ${binary:Version}), ${misc:Depends}, kdelibs5
+Depends: gnash-common (= ${binary:Version}), klash (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}, kdelibs5
 Description: free SWF movie player - Plugin for Konqueror
  Gnash is a free Flash movie player, which works either standalone, or as
  plugin for Firefox/Mozilla or Konqueror.
