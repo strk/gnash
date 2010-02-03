@@ -179,7 +179,7 @@ if ENABLE_MAN
 	  $(DB2X_MAN) $?; \
         else \
 	  $(DB2X_XSLTPROC) -s man $? -o $*.mxml; \
-	  $(DB2X_MANXML) $*.mxml; \
+	  $(DB2X_MANXML) -solinks $*.mxml; \
 	  $(RM) $*.mxml; \
 	fi
 else
@@ -303,9 +303,6 @@ uninstall-html-hook:
 # uninstall-local: uninstall-local-doc uninstall-local-omf
 
 install-data-hook: install-info-hook install-html-hook 
-	$(LN_S) -f $(DESTDIR)$(man1dir)/gnash.1 $(DESTDIR)$(man1dir)/gtk-gnash.1
-	$(LN_S) -f $(DESTDIR)$(man1dir)/gnash.1 $(DESTDIR)$(man1dir)/kde4-gnash.1
-
 uninstall-hook: uninstall-info-hook uninstall-html-hook
 
 #
