@@ -57,19 +57,31 @@ USERMAN = \
 # These are the files needed to build the Gnash reference
 # manual.
 REFMAN = \
+	refmanual/amf.xml \
+	refmanual/as_value.xml \
+	refmanual/building.xml \
 	refmanual/code_dependencies.xml \
+	refmanual/codestyle.xml \
 	refmanual/configuration.xml \
+	refmanual/cross_compiling.xml \
 	refmanual/custompath_configuration.xml \
 	refmanual/documentation_dependencies.xml \
 	refmanual/feature_configuration.xml \
+	refmanual/install.xml \
+	refmanual/internals.xml \
+	refmanual/logging.xml \
+	refmanual/memory.xml \
+	refmanual/new_as_class.xml \
+	refmanual/object.xml \
+	refmanual/plugin.xml \
+	refmanual/revisions.xml \
+	refmanual/rtmp.xml \
 	refmanual/sources.xml \
 	refmanual/testing_dependencies.xml \
-	refmanual/cross_compiling.xml	\
-	refmanual/building.xml \
-	refmanual/install.xml \
-	refmanual/codestyle.xml
-#	refmanual/packagemanager.xml
-
+	refmanual/extensions/extensions.xml \
+	refmanual/extensions/fileext.xml \
+	refmanual/extensions/gtkext.xml \
+	refmanual/extensions/mysqlext.xml
 
 EXTRA_DIST = \
 	$(USERMAN) \
@@ -295,7 +307,7 @@ if ENABLE_INFO
 	-for i in *.info; do \
 	  $(INSTALL_DATA) "$$i" $(DESTDIR)$(infodir)/"$$i"; \
 	done; \
-	type="`file $(INSTALL_INFO) | grep -ic " perl " 2>&1`"; \
+	type="`file $(INSTALL_INFO) | grep -ic "perl " 2>&1`"; \
 	if test $${type} -gt 0; then \
 	  $(INSTALL_INFO) --menuentry="\"Gnash User Manual\"" --quiet --description="\"Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info; \
 	  $(INSTALL_INFO) --menuentry="\"Gnash Reference Manual\"" --quiet --description="\"Gnash Reference Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info; \
