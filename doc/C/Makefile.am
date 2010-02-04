@@ -48,6 +48,8 @@ USERMAN = \
 	usermanual/installation.xml \
 	usermanual/revisions.xml \
 	usermanual/usage.xml \
+	usermanual/glossary.xml \
+	usermanual/specification.xml \
 	usermanual/gnashrc.xml \
 	usermanual/acknowledgments.xml \
 	usermanual/conventions.xml
