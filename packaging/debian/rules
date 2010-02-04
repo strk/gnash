@@ -68,6 +68,7 @@ endif
 		--enable-sdkinstall \
 		--disable-testsuite \
 		--enable-media=gst \
+		--enable-docbook \
 		--enable-gui=gtk,kde4 \
 		--enable-renderer=agg \
 		--with-plugins-install=system

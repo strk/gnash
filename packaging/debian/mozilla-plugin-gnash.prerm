@@ -3,29 +3,31 @@
 set -e
 
 case "$1" in
-        remove|upgrade|deconfigure)
-                for p in iceweasel mozilla firefox xulrunner midbrowser; do 
-                       update-alternatives --remove "$p-flashplugin" /usr/lib/mozilla/plugins/libgnashplugin.so;
-                done
-                ;;
-        failed-upgrade)
-		if dpkg --compare-versions "$2" ">>"  0.8.1~trunk.070802-0ubuntu3 &&
-	           dpkg --compare-versions "$2" "<<" 0.8.1~trunk.070802-0ubuntu5
-		then 
-		   for p in arora iceweasel mozilla firefox xulrunner midbrowser; do 
-                        update-alternatives --remove "$p-flashplugin" /usr/lib/mozilla/plugins/libgnashplugin.so;
-                        [ `update-alternatives --list "$p-flashplugin" | wc -l` = 0 ]  && \
-                                update-alternatives --remove-all "$p-flashplugin"
-		   done
-		else 		
-		  echo "prerm called with argument \`$1'" >&2
-                  exit 1
-		fi                
-		;;
-        *)
-                echo "prerm called with unknown argument \`$1'" >&2
-                exit 1
-                ;;
+    remove|upgrade|deconfigure)
+        for p in mozilla firefox iceweasel xulrunner midbrowser; do 
+	    if test -d "/usr/lib/$p/plugins"; then
+                update-alternatives --remove "$p-flashplugin" /usr/lib/mozilla/plugins/libgnashplugin.so;
+	    fi
+        done
+        ;;
+    failed-upgrade)
+	if dpkg --compare-versions "$2" ">>"  0.8.5~trunk.070802-0ubuntu3 &&
+	    dpkg --compare-versions "$2" "<<" 0.8.5~trunk.070802-0ubuntu5
+	then 
+	    for p in mozilla firefox arora iceweasel xulrunner midbrowser; do 
+                update-alternatives --remove "$p-flashplugin" /usr/lib/mozilla/plugins/libgnashplugin.so;
+                [ `update-alternatives --list "$p-flashplugin" | wc -l` = 0 ]  && \
+                    update-alternatives --remove-all "$p-flashplugin"
+	    done
+	else 		
+	    echo "prerm called with argument \`$1'" >&2
+            exit 1
+	fi                
+	;;
+    *)
+        echo "prerm called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
 esac
 
 #DEBHELPER#
