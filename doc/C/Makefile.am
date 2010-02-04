@@ -75,7 +75,7 @@ EXTRA_DIST = \
 	$(COMMON) \
 	$(XML_MAIN) \
 	$(MANSRC)  \
-	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/flvdumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in preformatted/rtmpget.1.in
+	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/flvdumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in preformatted/rtmpget.1.in preformatted/gtk-gnash.1.in preformatted/kde-gnash.1.in
 
 #noinst_SCRIPT = gen-doc.sh
 # We list the texi and info pages twice, as differing versions of the 
@@ -87,7 +87,7 @@ MANSRC = $(dist_man_MANS:.1=.man-xml)
 INFOS  = gnash_user.info gnash_ref.info
 HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
-TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi rtmpget.texi findmicrophones.1 findwebcams.1
+TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
 
 all-local: info html man
 
@@ -186,6 +186,10 @@ else
 	@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/$@.in ./$@; \
+	  if test x"$@" = x"gnash.1"; then \
+	    $(LN_S) -f $(srcdir)/preformatted/gtk-gnash.1.in gtk-gnash.1; \
+	    $(LN_S) -f $(srcdir)/preformatted/kde4-gnash.1.in kde4-gnash.1; \
+	  fi; \
 	else \
 	  touch $@; \
 	fi; 
