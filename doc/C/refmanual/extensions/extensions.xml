@@ -1,23 +1,23 @@
 <chapter id="extensions">
-  <title>Gnash Extensions</title>
+  <title>&app; Extensions</title>
   
   <para>
-    Gnash supports the creation of custom extensions to ActionScript. This
+    &app; supports the creation of custom extensions to ActionScript. This
     allows you to integrate any conceivable system or library function into
     ActionScript execution.
   </para>
   <para>
       Extensions do not represent a general alteration of the ActionScript
-      language. They are designed to allow Gnash to be more
+      language. They are designed to allow &app; to be more
       flexible and powerful where it is required. They allow you to
-      customize Gnash for your own purposes and to distribute those changes
+      customize &app; for your own purposes and to distribute those changes
       to other users who need them. They are not intended for use in
       normal SWF execution or internet browsing, but rather for
       executing SWFs designed to use those extensions under controlled
       conditions.
   </para>
   <para>
-      Some extensions are distributed with Gnash, mainly to serve
+      Some extensions are distributed with &app;, mainly to serve
       as an example. Extensions are not enabled by default, both for
       security and compatibility reasons.
   </para>
@@ -27,20 +27,20 @@
 
     <para>
       Each new extension should live in its own directory. The
-      extensions included in Gnash are all in the
+      extensions included in &app; are all in the
       <emphasis>gnash/extensions</emphasis> directory. Creating an extension
       requires a Makefile.am,
     </para>
 
     <para>
-      If you are adding this extension to the Gnash source tree
+      If you are adding this extension to the &app; source tree
       itself, then you need to make two changes to add the new
       extension.  The first change is to add the directory to the list in
       extensions/Makefile.am. This can be done either by adding the
       new directory to the SUBDIRS setting, or by wrapping it in a
       conditional test.  The other change is to add it to the AC_OUTPUT list in
       <emphasis>configure.ac</emphasis> so the new directory will be
-      configured along with the rest of Gnash.
+      configured along with the rest of &app;.
     </para>
 
     <para>
@@ -56,7 +56,7 @@
       layer than to get carried away with creating beautiful
       abstractions. Higher-level classes that offer a lot of new
       functionality are fine, but this is different from wrapping a library
-      so it can be used from within Gnash.
+      so it can be used from within &app;.
     </para>
 
     <sect1 id="craftext">
@@ -118,7 +118,7 @@
           You will notice three functions in the example above that need
           definition. The first two are attachInterface() and
           attachStaticInterface(). This is a convention
-          in Gnash to separate ActionScript interface creation from the
+          in &app; to separate ActionScript interface creation from the
           registration of our Extension class. We will see why this is
           useful later. The attachInterface function may be defined
           as follows:
@@ -133,7 +133,7 @@
       </programlisting> 
       <para>
           This attaches a function called ext1 to the Extension class
-          prototype. When ext1 is called in ActionScript, Gnash will
+          prototype. When ext1 is called in ActionScript, &app; will
           execute the C++ function named extension_ext1. This is known as
           a ActionScript callback function and must have the correct signature.
           We will deal with this next. The member function function will be
@@ -268,7 +268,7 @@
       </programlisting>
       <para>
           If you have defined all the callback functions in the way
-          described above, you can simplify the class registration. Gnash
+          described above, you can simplify the class registration. &app;
           provides a convenience function to register a built-in class. In
           this case, your entry function would look like this:
       </para>
@@ -339,7 +339,7 @@
     
     <para>
       You can resort to the time honored technique of creating a
-      loop before the point you want to set a breakpoint for. Gnash
+      loop before the point you want to set a breakpoint for. &app;
       will stop playing the movie at this point, and then you can
       externally attach GDB to the running process, or type
       <emphasis>^C</emphasis> to drop into the GDB command console.
@@ -367,9 +367,9 @@
     <title>Included Extensions</title>
 
     <para>
-      Gnash has some extensions included in the distribution. This is
-      mostly because they were written by the Gnash team. Extensions
-      can be external to gnash, Gnash needs no compiled in knowledge
+      &app; has some extensions included in the distribution. This is
+      mostly because they were written by the &app; team. Extensions
+      can be external to gnash, &app; needs no compiled in knowledge
       to load an extension file.
     </para>
     
