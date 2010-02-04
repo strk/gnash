@@ -23,6 +23,12 @@ deb: snapshot-src setup-deb snapshot-deb
 # into the proper files to build a package with the version in
 # all the right places. This involves editing the debian/changelog
 # file. Configure.ac is edited by the snapshot target.
+# We also edit the gtk-plugin-gnash paths, as these differ between
+# python versions and GNU/Linux distributions. Also if configured
+# with the plugin not going into the standard directory of
+# /usr/lib/mozilla/plugins or $HOME/.mozilla/plugins, we also
+# have to change the path to the NPAPI plugin so it gets installed
+# for the correct browser.
 setup-deb: 
 	snapshot_dir="gnash-$(SNAPSHOT_VERSION)"; \
 	if test -d $(SNAPSHOT_DIR); then \
@@ -44,6 +50,12 @@ setup-deb:
 	    mv -f $${snapshot_dir}/debian/gtk-plugin-gnash.install $${snapshot_dir}/debian/gtk-plugin-gnash.install.orig; \
 	  fi; \
 	  sed -e 's:python2.5/site:python2.6/dist:' $${snapshot_dir}/debian/gtk-plugin-gnash.install.orig > $${snapshot_dir}/debian/gtk-plugin-gnash.install; \
+	  if test `echo $(FIREFOX_PLUGINS) | grep -c mozilla` -eq 0; then \
+	    if test -e $${snapshot_dir}/debian/mozilla-plugin-gnash.dirs; then \
+	      mv -f $${snapshot_dir}/debian/mozilla-plugin-gnash.dirs $${snapshot_dir}/debian/gtk-plugin-gnash.install.orig; \
+	    fi; \
+	    echo $(FIREFOX_PLUGINS) | sed -e 's:/::' > $${snapshot_dir}/debian/mozilla-plugin-gnash.dirs; \
+	  fi; \
 	fi;
 
 snapshot-deb:
