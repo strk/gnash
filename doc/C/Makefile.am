@@ -311,7 +311,11 @@ uninstall-html-hook:
 # install-data-hook: install-data-hook-omf
 # uninstall-local: uninstall-local-doc uninstall-local-omf
 
+# gtk-gnash.1 and kde4-gnash.1 are special, as they are created by
+# the --solinks option to the docbook2 tools for creating man pages.
 install-data-hook: install-info-hook install-html-hook 
+	-$(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)
+	-$(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)
 uninstall-hook: uninstall-info-hook uninstall-html-hook
 
 #
