@@ -230,31 +230,6 @@
 
       </sect3>
       
-      <sect3 id="mozplugger">
-	<title>Mozplugger</title>
-
-	<para>
-	  <ulink type="http"
-	 url="http://mozplugger.mozdev.org/">Mozplugger</ulink> is a
-	  <emphasis>Mozilla/Firefox</emphasis> plugin that uses external
-	  programs to play video, audio, and other multimedia content
-	  in the browser. With some support added to the external
-	  application, it's possible to force the external program to
-	  use the internal window in the browser where this plugin is
-	  supposed to display. This enables one to then run the
-	  standalone player and display its output in the browser.
-	</para>
-
-	<para>
-	  While this is not an optimal solution, it does enable one to
-	  use &app; as the SWF player when browsing. The main issue
-	  appears to be that the SWF movie being played doesn't get
-	  any mouse or keyboard input. That may be a mozplugger
-	  configuration issue, however.
-	</para>
-
-      </sect3>
-
       <sect3 id="Klash">
 	<title>Klash</title>
 	<para>
