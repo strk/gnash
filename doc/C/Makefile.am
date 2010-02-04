@@ -75,7 +75,7 @@ EXTRA_DIST = \
 	$(COMMON) \
 	$(XML_MAIN) \
 	$(MANSRC)  \
-	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/flvdumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in preformatted/rtmpget.1.in preformatted/gtk-gnash.1.in preformatted/kde4-gnash.1.in
+	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/flvdumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in preformatted/rtmpget.1.in preformatted/gtk-gnash.1.in preformatted/kde4-gnash.1.in preformatted/findmicrophones.1.in reformatted/findwebcams.1.in 
 
 #noinst_SCRIPT = gen-doc.sh
 # We list the texi and info pages twice, as differing versions of the 
@@ -241,7 +241,7 @@ lint-ref:
 # distdir is a built in target for Automake.
 dist-hook:
 	test -d "$(distdir)/images" || $(mkinstalldirs) "$(distdir)/images"
-	for file in $(srcdir)/images/*.png $(srcdir)/images/*.txt; do \
+	-for file in $(srcdir)/images/*.png $(srcdir)/images/*.txt; do \
 	  basefile="`basename $${file}`"; \
 	  if test ! -e $(distdir)/images/$${basefile}; then \
 	    $(INSTALL_DATA) $$file $(distdir)/images/; \
@@ -265,7 +265,7 @@ install-html-hook: $(HTMLS)
 	-$(INSTALL_DATA) gnashuser.html $(DESTDIR)$(htmldir)
 	-$(INSTALL_DATA) gnashref.html $(DESTDIR)$(htmldir)
 	@test -d "$(DESTDIR)$(htmldir)/images" || $(mkinstalldirs) "$(DESTDIR)$(htmldir)/images"
-	for file in $(srcdir)/images/*.png; do \
+	-for file in $(srcdir)/images/*.png; do \
 	  basefile=`echo $$file | sed -e  's,^.*/,,'`; \
 	  $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir)/images/$$basefile; \
 	done
@@ -289,10 +289,10 @@ if ENABLE_INFO
 	fi
 else
 	echo "Using preformtted output file,"
-	$(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in gnash_user.info
-	$(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in gnash_ref.info
-        $(INSTALL_INFO) --entry="\"Gnash User Manual: (gnash_user)	Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info
-	$(INSTALL_INFO) --entry="\"Gnash Reference Manual (gnash_ref)	Gnash Reference Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info
+	-$(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in gnash_user.info
+	-$(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in gnash_ref.info
+        -$(INSTALL_INFO) --entry="\"Gnash User Manual: (gnash_user)	Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info
+	-$(INSTALL_INFO) --entry="\"Gnash Reference Manual (gnash_ref)	Gnash Reference Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info
 endif
 
 uninstall-info-hook:
