@@ -283,9 +283,8 @@
     <title>Sound handling in &app;</title>
 
     <para>
-      When a SWF-file contains audio &app; uses its sound handlers to play it.
-      At the moment there are two sound handlers, but it is likely that more 
-      will be made.
+        Sound in &app; is handled by libgnashsound. This library takes
+        care of interfacing with a sound handler.
     </para>
 
     <para>
@@ -370,16 +369,6 @@
 	should be relatively easy to add VORBIS support. The drawbacks are that
 	it has longer "reply delay" when starting the playback of a sound, and
 	it suffers under some bugs in Gstreamer that are yet to be fixed. 
-      </para>
-    </sect2>
-
-    <sect2 id="audio-future">
-      <title>Future audio backends</title>
-      <para>
-	It would probably be desirable to make more backends in the future,
-	either because other and better backend systems are brought to our
-	attention, or perhaps because an internal sound handling is better
-	suited for embedded platform with limited software installed. 
       </para>
     </sect2>
 
