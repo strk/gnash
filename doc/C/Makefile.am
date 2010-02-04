@@ -179,7 +179,7 @@ if ENABLE_MAN
 	  $(DB2X_MAN) $?; \
         else \
 	  $(DB2X_XSLTPROC) -s man $? -o $*.mxml; \
-	  $(DB2X_MANXML) -solinks $*.mxml; \
+	  $(DB2X_MANXML) --solinks $*.mxml; \
 	  $(RM) $*.mxml; \
 	fi
 else
@@ -194,7 +194,7 @@ endif
 if DOCBOOK
 gnash_user.info: gnashuser.texi
 gnash_ref.info: gnashref.texi
-gnashuser.texi gnash_user.texi: gnashuser.xml
+gnashuser.texi gnash_user.texi: images gnashuser.xml
 gnashref.texi gnash_user.texi: gnashref.xml
 else
 gnash_user.info: gnashuser.xml
@@ -236,13 +236,18 @@ lint-ref:
 # produced by the dist-bzip2, dist-gzip, or snapshot targets.
 # distdir is a built in target for Automake.
 dist-hook:
-	test -d "$(distdir)/images/images" || $(mkinstalldirs) "$(distdir)/images"
+	test -d "$(distdir)/images" || $(mkinstalldirs) "$(distdir)/images"
 	for file in $(srcdir)/images/*.png $(srcdir)/images/*.txt; do \
 	  basefile="`basename $${file}`"; \
 	  if test ! -e $(distdir)/images/$${basefile}; then \
 	    $(INSTALL_DATA) $$file $(distdir)/images/; \
 	  fi; \
 	done
+
+images:
+	if test ! -e images; then \
+	  $(LN_S) -f $(srcdir)/images images; \
+	fi;
 
 #
 # Installing documentation can be a complex process, as we build
@@ -356,9 +361,11 @@ CLEANFILES = \
 	gnashuser.mxml \
 	gnashref.txml \
 	gnashref.mxml \
-	omf_timestamp
-
+	omf_timestamp \
+	images \
+	gtk-gnash.1 \
+	kde4-gnash.1
 
 # Always execute these targets as they have no real dependencies.
-.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook
+.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook images
 
