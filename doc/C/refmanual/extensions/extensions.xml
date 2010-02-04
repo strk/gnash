@@ -59,7 +59,7 @@
       so it can be used from within Gnash.
     </para>
 
-    <sect2 id="craftext">
+    <sect1 id="craftext">
       <title>Crafting an Extension</title>
 
       <para>
@@ -242,7 +242,8 @@
           attached here belong directly to the new object.
       </para>
       <programlisting>
-          as_value extension_ctor(const fn_call&amp; fn)
+          as_value
+          extension_ctor(const fn_call&amp; fn)
           {
               // When called as a constructor, there is always a "this" object
               as_object* this_ptr = ensure&lt;ValidThis&gt;(fn);
@@ -329,7 +330,7 @@
               return as_value(s.str());
           }
       </programlisting>
-    </sect2>
+    </sect1>
 
   </sect1>
 
