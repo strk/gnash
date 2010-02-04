@@ -47,7 +47,7 @@
       Each extension should have an ActionScript source file included
       that tests the new class, and this file should be referenced in
       the new Makefile.am in the <emphasis>check_PROGRAMS</emphasis>
-      variable so that "make check" works.
+      variable so that &quot;make check&quot; works.
     </para>
 
     <para>
@@ -111,7 +111,7 @@
               attachStaticInterface(*cl);
 
               // Attach the class to the passed object.
-              where.init_member("Extension", cl);
+              where.init_member(&quot;Extension&quot;, cl);
           }
       </programlisting>
       <para>
@@ -128,7 +128,7 @@
           attachInterface(as_object&amp; obj)
           {
               Global_as&amp; gl = getGlobal(obj);
-              obj.init_member("ext1", gl.createFunction(&amp;extension_ext1));
+              obj.init_member(&quot;ext1&quot;, gl.createFunction(&amp;extension_ext1));
           }
       </programlisting> 
       <para>
@@ -147,12 +147,12 @@
           attachStaticInterface(as_object&amp; obj)
           {
               Global_as&amp; gl = getGlobal(obj);
-              obj.init_member("static1", gl.createFunction(&amp;extension_static1));
+              obj.init_member(&quot;static1&quot;, gl.createFunction(&amp;extension_static1));
           }
       </programlisting> 
       <para>
           This does exactly the same as the previous function, but it
-          attaches "static" properties to the class. Such functions can
+          attaches &quot;static&quot; properties to the class. Such functions can
           be called directly, that is, without requiring an instance of
           Extension:
       </para>
@@ -169,7 +169,8 @@
       </programlisting>
       <para>
           The fn_call type contains information about the ActionScript function
-          call, including the number of arguments, the 'this' pointer (if
+          call, including the number of arguments, the &quot;this&quot; object
+          (if
           present), the VM and the Global object. With one small exception,
           the constructor function extension_ctor, and the ext1 function 
           implementation, extension_ext1, do the same thing.
@@ -214,12 +215,12 @@
               // by their index in the table.
               string_table&amp; st = getStringTable(fn);
 
-              // Set a member named "property" on the object to the value of
+              // Set a member named &quot;property&quot; on the object to the value of
               // the first argument.
-              this_ptr->set_member(st.find("property"), arg0);
+              this_ptr->set_member(st.find(&quot;property&quot;), arg0);
 
               // This is the return value of the function.
-              return as_value("return value");
+              return as_value(&quot;return value&quot;);
           }
       </programlisting>
       <para>
@@ -229,15 +230,15 @@
       <programlisting>
           var e = new Extension();
           var i = e.ext1(8);
-          trace(e.property) // traces "8"
-          trace(i) // traces "return value"
+          trace(e.property) // traces &quot;8&quot;
+          trace(i) // traces &quot;return value&quot;
       </programlisting>
       <para>
           The constructor function is very similar, but has a different
-          purpose. When the actionscript "new Extension" is called,
+          purpose. When the actionscript &quot;new Extension&quot; is called,
           this extension_ctor function will be called with a newly-created
-          object as the "this" object. Its job is to attach properties
-          to the "this" object. Unlike the class prototype's propertes
+          object as the &quot;this&quot; object. Its job is to attach properties
+          to the &quot;this&quot; object. Unlike the class prototype's propertes
           that we attached in the attachInterface function, any properties
           attached here belong directly to the new object.
       </para>
@@ -245,12 +246,12 @@
           as_value
           extension_ctor(const fn_call&amp; fn)
           {
-              // When called as a constructor, there is always a "this" object
+              // When called as a constructor, there is always a &quot;this&quot; object
               as_object* this_ptr = ensure&lt;ValidThis&gt;(fn);
 
               // The init_member function will never replace an existing
               // property.
-              this_ptr->init_member("myProperty", true);
+              this_ptr->init_member(&quot;myProperty&quot;, true);
 
               // A constructor function must not return anything.
               return as_value();
@@ -278,7 +279,7 @@
           {
               string_table&amp; st = getStringTable(where);
               registerBuiltinClass(where, extension_ctor, attachInterface,
-                  0, st.find("Extension"));
+                  0, st.find(&quot;Extension&quot;));
           }
       </programlisting>
       <para>
@@ -288,7 +289,7 @@
           a C++ class that could look like this:
       </para>
       <programlisting>
-          #include "Relay.h"
+          #include &quot;Relay.h&quot;
           #include &lt;complex&gt;
 
           class Complex : public Relay
@@ -325,7 +326,7 @@
               Complex* c = ensure&lt;IsNativeType&lt;Complex&gt; &gt;(fn);
 
               std::ostringstream s;
-              s &lt;&lt; "real:" &lt;&lt; c.real() &lt;&lt; ",imag: &lt;&lt; c.imag();
+              s &lt;&lt; &quot;real:&quot; &lt;&lt; c.real() &lt;&lt; &quot;,imag: &lt;&lt; c.imag();
               // This is the return value of the function.
               return as_value(s.str());
           }
