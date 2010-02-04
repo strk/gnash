@@ -23,7 +23,7 @@ NOW = `date "+%Y%m%d"`
 #bzr version-info --custom --template='#define BRANCH_REVNO {revno}\n#define BRANCH_NICK {branch_nick}\n'
 
 # this is used for Debian style naming conventions
-PREVIOUS_RELEASE = 0.8.6
+PREVIOUS_RELEASE = 0.8.7
 SNAPSHOT_VERSION = $(PREVIOUS_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
 
 # these is the directories where the snapshot gets built. Sources are
