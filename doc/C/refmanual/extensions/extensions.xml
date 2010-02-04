@@ -55,7 +55,7 @@
     <title>Creating A New Extension</title>
 
     <para>
-      Each new extension should live in it's own directory. The
+      Each new extension should live in its own directory. The
       extensions included in Gnash are all in the
       <emphasis>gnash/extensions</emphasis> directory. Creating an extension
       requires a Makefile.am,
