@@ -75,7 +75,21 @@ EXTRA_DIST = \
 	$(COMMON) \
 	$(XML_MAIN) \
 	$(MANSRC)  \
-	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/flvdumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in preformatted/rtmpget.1.in preformatted/gtk-gnash.1.in preformatted/kde4-gnash.1.in preformatted/findmicrophones.1.in preformatted/findwebcams.1.in 
+	preformatted/gnashuser.html.in \
+	preformatted/gprocessor.1.in \
+	preformatted/cygnal.1.in \
+	preformatted/gnash.1.in \
+	preformatted/gnash_ref.info.in \
+	preformatted/soldumper.1.in \
+	preformatted/flvdumper.1.in \
+	preformatted/dumpshm.1.in \
+	preformatted/gnashref.html.in \
+	preformatted/gnash_user.info.in \
+	preformatted/rtmpget.1.in \
+	preformatted/findmicrophones.1.in \
+	preformatted/findwebcams.1.in \
+	preformatted/gtk-gnash.1.in \
+	preformatted/kde4-gnash.1.in
 
 #noinst_SCRIPT = gen-doc.sh
 # We list the texi and info pages twice, as differing versions of the 
@@ -317,6 +331,8 @@ install-data-hook: install-info-hook install-html-hook
 	-$(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)
 	-$(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)
 uninstall-hook: uninstall-info-hook uninstall-html-hook
+	-$(RM) -f $(DESTDIR)$(man1dir)/gtk-gnash.1 
+	-$(RM) -f $(DESTDIR)$(man1dir)/kde4-gnash.1
 
 #
 # GNOME Help support, which currently isn't supported
