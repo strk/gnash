@@ -46,8 +46,8 @@ STD_DIRS = \
 	libamf \
 	libnet \
 	libmedia \
-	libcore \
 	libsound \
+	libcore \
 	backend \
 	gui \
 	plugin \
