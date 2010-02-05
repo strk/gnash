@@ -21,7 +21,6 @@ ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CXXFLAGS += -O0
 else
 	CFLAGS += -O2
-	CXXFLAGS += -O2
 endif
 
 DEB_DH_SHLIBDEPS_ARGS_ALL := -X* /usr/lib/gnash
@@ -52,12 +51,13 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
 
-	# for now, only build the kde4 support,as kde3 is being depreciated.
+	# for now, build the kde4 support, as kde3 is being depreciated.
 
 	@printf "\n == CONFIGURE == \n\n"
 	./configure CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr \
+		--sysconfdir=/etc \
 		--mandir=/usr/share/man \
 		--infodir=/usr/share/info \
 		--disable-dependency-tracking \
@@ -69,7 +69,6 @@ endif
 		--enable-sdkinstall \
 		--disable-testsuite \
 		--enable-media=gst \
-		--enable-docbook \
 		--enable-gui=gtk,kde4 \
 		--enable-renderer=agg \
 		--with-plugins-install=system
@@ -175,6 +174,7 @@ binary-arch: build install
 #	dh_installmime
 	dh_installman
 	dh_desktop
+	dh_lintian
 	dh_link
 	dh_strip --dbg-package=gnash-dbg
 	dh_compress
