@@ -1879,7 +1879,7 @@ fi
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 
 if test x$build_gtk = xno -o x$build_kde4 = xno; then
-  if test x$npapi =xyes; then
+  if test x$npapi = xyes; then
     AC_MSG_WARN(["Enabled NPAPI plugin, but it's not supported by the selected GUI"])
   fi
 fi
