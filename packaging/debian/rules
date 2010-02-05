@@ -1,6 +1,9 @@
 #!/usr/bin/make -f
-# The template for this file was originally written by Joey Hess and Craig Small.
-# Developed for Gnash by Miriam Ruiz
+# The template for this file was originally written by Joey Hess and
+# Craig Small. Then further work was done by Miriam Ruiz for Debian, and
+# Alexander Sack for Ubuntu.
+# Many more modifications were made by Rob Savoye for Gnash and Petter
+# Reinholdtsen for Debian Edu.
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
@@ -15,8 +18,10 @@ CFLAGS = -Wall -g -Werror-implicit-function-declaration
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
+	CXXFLAGS += -O0
 else
 	CFLAGS += -O2
+	CXXFLAGS += -O2
 endif
 
 DEB_DH_SHLIBDEPS_ARGS_ALL := -X* /usr/lib/gnash
@@ -35,10 +40,10 @@ DEB_DH_SHLIBDEPS_ARGS_ALL := -X* /usr/lib/gnash
 config.status: configure
 	dh_testdir
 
-	@printf "\n == APPLYING PATCHES ============================================ \n\n"
+	@printf "\n == APPLYING PATCHES == \n\n"
 	# we have no patches, we're the developers!
 #	$(MAKE) -f /usr/share/quilt/quilt.make patch
-	@printf "\n ----------------------------------- End of APPLYING PATCHES ---- \n\n"
+	@printf "\n ---- End of APPLYING PATCHES ---- \n\n"
 
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
 	cp -f /usr/share/misc/config.sub config.sub
@@ -47,13 +52,9 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
 
-#	@printf "\n == AUTOGEN ===================================================== \n\n"
-#	./autogen.sh
-#	@printf "\n -------------------------------------------- End of AUTOGEN ---- \n\n"
-
 	# for now, only build the kde4 support,as kde3 is being depreciated.
 
-	@printf "\n == CONFIGURE =================================================== \n\n"
+	@printf "\n == CONFIGURE == \n\n"
 	./configure CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr \
@@ -73,7 +74,7 @@ endif
 		--enable-renderer=agg \
 		--with-plugins-install=system
 
-	@printf "\n ------------------------------------------- End of CONFIGURE ---- \n\n"
+	@printf "\n ---- End of CONFIGURE ---- \n\n"
 
 	cp libamf/README README.amf
 
@@ -83,13 +84,13 @@ build: build-stamp
 build-stamp:  config.status
 	dh_testdir
 
-	@printf "\n == MAKE ======================================================== \n\n"
+	@printf "\n == MAKE == \n\n"
 	$(MAKE)
-	@printf "\n ----------------------------------------------- End of MAKE ---- \n\n"
+	@printf "\n ---- End of MAKE ---- \n\n"
 
-#	@printf "\n == CHECK ======================================================= \n\n"
+#	@printf "\n == CHECK ==\n\n"
 #	$(MAKE) -C debuild check
-#	@printf "\n ---------------------------------------------- End of CHECK ---- \n\n"
+#	@printf "\n ---- End of CHECK ---- \n\n"
 
 	touch build-stamp
 
@@ -106,10 +107,10 @@ clean:
 	rm -rf `find . -name ".libs"`
 	rm -rf `find . -name ".deps"`
 
-	@printf "\n == CLEANING PATCHES ============================================ \n\n"
+	@printf "\n == CLEANING PATCHES ==\n\n"
 	# we have no patches, we're the developers!
 #	$(MAKE) -f /usr/share/quilt/quilt.make unpatch
-	@printf "\n ----------------------------------- End of CLEANING PATCHES ---- \n\n"
+	@printf "\n ---- End of CLEANING PATCHES ---- \n\n"
 	# rm -rf debuild
 
 	dh_clean 
@@ -129,10 +130,10 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/lib/firefox/plugins/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash
 
-	@printf "\n == INSTALL ===================================================== \n\n"
+	@printf "\n == INSTALL ==\n\n"
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	$(MAKE) install-plugins DESTDIR=$(CURDIR)/debian/tmp
-	@printf "\n -------------------------------------------- End of INSTALL ---- \n\n"
+	@printf "\n ---- End of INSTALL ---- \n\n"
 
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
 	cp libbase/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
@@ -153,6 +154,8 @@ install: build
 	cp packaging/*.xpm $(CURDIR)/debian/tmp/usr/share/pixmaps/
 	install -d $(CURDIR)/debian/tmp/usr/share/applications/
 	cp debian/*.desktop $(CURDIR)/debian/tmp/usr/share/applications/
+	gzip -9 $(CURDIR)/debian/tmp/usr/share/man/man1/gtk-gnash.1
+	gzip -9 $(CURDIR)/debian/tmp/usr/share/man/man1/kde4-gnash.1
 
 # CREATE PACKAGES
 

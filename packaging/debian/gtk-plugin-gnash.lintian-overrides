@@ -1,0 +1,1 @@
+gtk-plugin-gnash: binary-or-shlib-defines-rpath ./usr/lib/python2.5/site-packages/gtk-2.0/gnash.so /usr/lib/gnash
