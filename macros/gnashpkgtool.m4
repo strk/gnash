@@ -40,17 +40,20 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
     else
       name=DASHDOWN-$4
     fi
-
+    	    
     dnl Look for the header
     if test x"${$1}" = x"yes"; then
       AC_ARG_WITH($1_incl, AC_HELP_STRING([--with-$1-incl], [directory where $2 is]), with_$1_incl=${withval})
       AC_CACHE_VAL(ac_cv_path_$1_incl, [
       if test x"${with_$1_incl}" != x ; then
+        AC_MSG_CHECKING([for $2 header in specified directory])
         if test -f ${with_$1_incl}/$2 ; then
           ac_cv_path_$1_incl="-I`(cd ${with_$1_incl}; pwd)`"
           found_$1_incl="yes"
+          AC_MSG_RESULT([yes])
         else
           AC_MSG_ERROR([${with_$1_incl} directory doesn't contain $2.])
+          AC_MSG_RESULT([no])
         fi
       fi
     ])
@@ -64,7 +67,7 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
         AC_MSG_RESULT(${ac_cv_path_$1_incl})
         found_$1_incl="yes"
       else
-        AC_MSG_RESULT(not found)
+        AC_MSG_RESULT([not found])
       fi
     fi
     if test x"${ac_cv_path_$1_incl}" = x; then
@@ -75,8 +78,12 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
         if test x"${ac_cv_path_$1_incl}" = x; then
           ac_cv_path_$1_incl="`${UP[]_CONFIG} --cflags 2>/dev/null`"
         fi
-        AC_MSG_RESULT(${ac_cv_path_$1_incl})
-        found_$1_incl="yes"
+        if test x"${ac_cv_path_$1_incl}" != x; then
+        	AC_MSG_RESULT(${ac_cv_path_$1_incl})
+        	found_$1_incl="yes"
+      	else
+        	AC_MSG_RESULT([not found])
+      	fi
       fi
     fi
   fi
@@ -115,19 +122,21 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
     ])
   ])
   fi
-
+  
+  AC_MSG_CHECKING([for $2 header]) 
   if test x"${found_$1_incl}" = "xyes"; then
 
       dnl It seems we need to explicitly call AC_DEFINE as AC_CHECK_HEADER doesn't
       dnl do this automatically. AC_CHECK_HEADERS (not the final S) would do it.
       AC_DEFINE([HAVE_]UPHEADER, 1, [Define if you have the $2 header])
-
+	  AC_MSG_RESULT(${ac_cv_path_$1_incl})
       if test x"${ac_cv_path_$1_incl}" != x -a x"${ac_cv_path_$1_incl}" != x"-I/usr/include"; then
         UP[]_CFLAGS="${ac_cv_path_$1_incl}"
       else
         UP[]_CFLAGS=""
       fi
-
+  else
+  	AC_MSG_RESULT([not found])
     fi
   fi
   AC_SUBST(UP[]_CFLAGS)
@@ -144,6 +153,7 @@ pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
 pushdef([DASHDOWN], translit([$1], [A-Z_], [a-z-]))dnl Lowercase
 
 has_$1=no
+ac_manual=yes
 
 if test x"${$1}" = x"yes"; then
   dnl Look for the library
@@ -169,8 +179,13 @@ if test x"${$1}" = x"yes"; then
       $PKG_CONFIG --exists DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l DASHDOWN`"
       $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l lib$name`"
       $PKG_CONFIG --exists $name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l $name`"
-      AC_MSG_CHECKING([for lib$1 library])      
-      AC_MSG_RESULT(${ac_cv_path_$1_lib})
+      AC_MSG_CHECKING([for lib$1 library])
+      if test x"${ac_cv_path_$1_lib}" != x; then
+        AC_MSG_RESULT(${ac_cv_path_$1_lib})
+        ac_manual=no
+      else
+        AC_MSG_RESULT([not found])
+      fi
     fi
     if test x"${ac_cv_path_$1_lib}" = x; then
       AC_PATH_PROG(UP[]_CONFIG, $1-config)
@@ -179,9 +194,17 @@ if test x"${$1}" = x"yes"; then
         ac_cv_path_$1_lib="`${UP[]_CONFIG} --libs`"
         AC_MSG_RESULT(${ac_cv_path_$1_lib})
       fi
+      if test x"${ac_cv_path_$1_lib}" = x; then
+      		ac_manual=no
+      fi
     fi
   fi
-
+  
+  if test x"${ac_manual}" != xyes -a x"${ac_cv_path_$1_lib}" = x; then
+	AC_MSG_CHECKING([for lib$1 library]) 
+	ac_manual=yes
+  fi  
+  
   if test x"${ac_cv_path_$1_lib}" = x; then
     ac_save_LIBS=$LIBS
     LIBS=""
@@ -212,7 +235,11 @@ if test x"${$1}" = x"yes"; then
   if test x"${ac_cv_path_$1_lib}" = x ; then
     AC_SEARCH_LIBS($2, $1 $name, [ac_cv_path_$1_lib="$LIBS $5"])
   fi
-
+  
+  if test x"${ac_manual}" = xyes ; then
+  	AC_MSG_RESULT(${ac_cv_path_$1_lib})
+  fi
+  
   if test x"${ac_cv_path_$1_lib}" != x ; then
     UP[]_LIBS="${ac_cv_path_$1_lib}"
     has_$1=yes
