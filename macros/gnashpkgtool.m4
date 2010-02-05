@@ -123,20 +123,20 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
   ])
   fi
   
-  AC_MSG_CHECKING([for $2 header]) 
+  dnl AC_MSG_CHECKING([for $2 header]) 
   if test x"${found_$1_incl}" = "xyes"; then
 
       dnl It seems we need to explicitly call AC_DEFINE as AC_CHECK_HEADER doesn't
       dnl do this automatically. AC_CHECK_HEADERS (not the final S) would do it.
       AC_DEFINE([HAVE_]UPHEADER, 1, [Define if you have the $2 header])
-      AC_MSG_RESULT(${ac_cv_path_$1_incl})
+      dnl AC_MSG_RESULT(${ac_cv_path_$1_incl})
       if test x"${ac_cv_path_$1_incl}" != x -a x"${ac_cv_path_$1_incl}" != x"-I/usr/include"; then
         UP[]_CFLAGS="${ac_cv_path_$1_incl}"        
       else
         UP[]_CFLAGS=""
       fi
-  else
-  	AC_MSG_RESULT([not found])
+  dnl else
+  	dnl AC_MSG_RESULT([not found])
     fi
   fi
   AC_SUBST(UP[]_CFLAGS)
