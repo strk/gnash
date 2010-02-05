@@ -3,23 +3,25 @@
 set -e
 
 case "$1" in
-        configure)
-	  for p in iceweasel mozilla firefox xulrunner midbrowser; do 
-	    update-alternatives --install "/usr/lib/$p/plugins/flashplugin-alternative.so" "$p-flashplugin" /usr/lib/mozilla/plugins/libgnashplugin.so 50;
-	   done
+    configure)
+	for p in mozilla firefox iceweasel xulrunner midbrowser; do 
+	    if test -d "/usr/lib/$p/plugins"; then
+		update-alternatives --install "/usr/lib/$p/plugins/flashplugin-alternative.so" "$p-flashplugin" /usr/lib/mozilla/plugins/libgnashplugin.so 50;
+	    fi
+	done
         ;;
-        abort-upgrade|abort-remove|abort-deconfigure)
-            echo "postinst called with argument \`$1'" >&2
-            exit 1
+    abort-upgrade|abort-remove|abort-deconfigure)
+        echo "postinst called with argument \`$1'" >&2
+        exit 1
         ;;
-
-        *)
-            echo "postinst called with unknown argument \`$1'" >&2
-            exit 1
+    
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
         ;;
 esac
 
-#DEBHELPER
+#DEBHELPER#
 
 exit 0
 

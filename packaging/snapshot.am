@@ -22,14 +22,18 @@ NOW = `date "+%Y%m%d"`
 
 #bzr version-info --custom --template='#define BRANCH_REVNO {revno}\n#define BRANCH_NICK {branch_nick}\n'
 
+# this is used for Debian style naming conventions
+PREVIOUS_RELEASE = 0.8.7
+SNAPSHOT_VERSION = $(PREVIOUS_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
+
 # these is the directories where the snapshot gets built. Sources are
 # in the top level, the build goes in a _build subdirectory
-SNAPSHOT_DIR = gnash-${BRANCH_REVNO}_$(BRANCH_NICK)
+SNAPSHOT_DIR = gnash-$(BRANCH_NICK)$(BRANCH_REVNO)
 SNAPSHOT_BUILD = $(SNAPSHOT_DIR)/_build
 SNAPSHOT_NAME = $(SNAPSHOT_DIR)
 
 # this is the name of the actual tarball
-SNAPSHOT_TAR = gnash-$(BRANCH_REVNO)_$(BRANCH_NICK).tar.gz
+SNAPSHOT_TAR = gnash-$(SNAPSHOT_VERSION).tar.gz
 # this is the temporary directory used for DESTDIR
 SNAPSHOT_TMP = /tmp/$(SNAPSHOT_DIR)
 
@@ -48,25 +52,24 @@ snapshot: snapshot-src snapshot-configure snapshot-build snapshot-install snapsh
 # rename it to the dir we want to stay clear. Then we change the default
 # version from 'trunk' to a date stamped version of trunk.
 snapshot-src: distdir  force
-	snapshot_tar="$(SNAPSHOT_NAME).tar.gz"; \
-	snapshot_dir=$(SNAPSHOT_DIR); \
+	snapshot_tar="$(SNAPSHOT_TAR)"; \
+	snapshot_dir="$(SNAPSHOT_DIR)"; \
 	if test -d $${snapshot_dir}; then \
 	  rm -fr $${snapshot_dir}; \
 	fi; \
 	mv -f gnash-trunk $${snapshot_dir}; \
 	if test ! -f $${snapshot_dir}/configure.ac.orig; then \
 	  mv -f $${snapshot_dir}/configure.ac $${snapshot_dir}/configure.ac.orig; \
-	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $(BRANCH_REVNO)-$(BRANCH_NICK))/" \
+	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $(BRANCH_NICK)$(BRANCH_REVNO))/" \
 	    $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
-	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;\
 	fi; \
 	tar zcvf $${snapshot_tar} --exclude=$${snapshot_dir}/autom4te.cache \
 	  --exclude=$${snapshot_dir}/configure.ac.orig $${snapshot_dir}
-#	$(RM) -fr $${snapshot_dir}
+#	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;
 
 snapshot-configure: force
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-${BRANCH_REVNO}-$(BRANCH_NICK)"; \
+	pkgname="gnash-$(BRANCH_NICK)-${BRANCH_REVNO}"; \
 	snapshot_dir=$(SNAPSHOT_DIR); \
 	snapshot_build="$(SNAPSHOT_BUILD)"; \
 	if test ! -d $(snapshot_build); then \

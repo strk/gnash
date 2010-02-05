@@ -18,10 +18,6 @@
 #ifndef GNASH_SWF_DEFINEEDITTEXTTAG_H
 #define GNASH_SWF_DEFINEEDITTEXTTAG_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "SWFRect.h"
 #include "DefinitionTag.h"
 #include "SWF.h" // for TagType definition

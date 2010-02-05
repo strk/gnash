@@ -68,7 +68,7 @@ public:
 
     virtual bool run();
 
-    virtual void quit();
+    virtual void quitUI();
 
     virtual bool createMenu();
 

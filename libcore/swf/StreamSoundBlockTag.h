@@ -18,10 +18,6 @@
 #ifndef GNASH_SWF_STREAMSOUNDBLOCK_TAG_H
 #define GNASH_SWF_STREAMSOUNDBLOCK_TAG_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "ControlTag.h" // for inheritance
 #include "SWF.h" // for TagType definition
 #include "sound_handler.h" // for StreamBlockId identifier

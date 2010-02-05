@@ -252,6 +252,51 @@ xcheck_equals(tf.indent, -2147483648);
 tf.indent = undefined;
 check_equals(tf.indent, null);
 
+// size
+tf = new TextFormat();
+check_equals(tf.size, null);
+tf.size = 10;
+check_equals(tf.size, 10);
+
+tf.size = -10;
+xcheck_equals(tf.size, -10);
+
+tf.size = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.size, 0);
+#else
+xcheck_equals(tf.size, -2147483648);
+#endif
+
+tf.size = null;
+check_equals(tf.size, null);
+
+tf.size = "string";
+#if OUTPUT_VERSION < 8
+check_equals(tf.size, 0);
+#else
+xcheck_equals(tf.size, -2147483648);
+#endif
+tf.size = undefined;
+check_equals(tf.size, null);
+
+// align
+tf.align = "hi";
+check_equals(tf.align, null);
+tf.align = "Left";
+check_equals(tf.align, "left");
+tf.align = "o";
+check_equals(tf.align, "left");
+tf.align = "righto";
+check_equals(tf.align, "left");
+tf.align = "center";
+check_equals(tf.align, "center");
+tf.align = "right";
+check_equals(tf.align, "right");
+tf.align = undefined;
+check_equals(tf.align, "right");
+tf.align = null;
+check_equals(tf.align, "right");
 
 // Check tabStops property.
 // The passed array is processed before assignment, not simply stored.
@@ -269,23 +314,28 @@ xcheck_equals(tf.tabStops.toString(), "6");
 
 tf2 = new TextFormat("Arial", 12);
 
-// Different behaviour.
+// getTextExtent has different behaviour for SWF6.
 #if OUTPUT_VERSION > 6
+
+// I don't know how to test this properly, as we can only test device fonts
+// here, and the pp uses a different font from Gnash.
 
 te = tf2.getTextExtent("Hello");
 
 // The object is a bare object
 te.hasOwnProperty = Object.prototype.hasOwnProperty;
 
-xcheck(te.hasOwnProperty("ascent"));
-xcheck(te.hasOwnProperty("descent"));
-xcheck(te.hasOwnProperty("textFieldWidth"));
-xcheck(te.hasOwnProperty("textFieldHeight"));
-xcheck(te.hasOwnProperty("width"));
-xcheck(te.hasOwnProperty("height"));
+check(te.hasOwnProperty("ascent"));
+check(te.hasOwnProperty("descent"));
+check(te.hasOwnProperty("textFieldWidth"));
+check(te.hasOwnProperty("textFieldHeight"));
+check(te.hasOwnProperty("width"));
+check(te.hasOwnProperty("height"));
 
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 xcheck_equals(Math.round(te.textFieldWidth), 33);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
 
 te = tf2.getTextExtent("Hello", 10);
 #if OUTPUT_VERSION > 7
@@ -294,10 +344,10 @@ xcheck_equals(Math.round(te.textFieldHeight), 60);
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 #endif
 
-xcheck_equals(te.textFieldWidth, 10);
+check_equals(te.textFieldWidth, 10);
 
 #if OUTPUT_VERSION > 7
-xcheck_equals(Math.round(te.width), 9);
+check_equals(Math.round(te.width), 9);
 #else
 xcheck_equals(Math.round(te.width), 29);
 #endif
@@ -309,26 +359,53 @@ xcheck_equals(Math.round(te.textFieldHeight), 74);
 #else
 xcheck_equals(Math.round(te.textFieldHeight), 18);
 #endif
-xcheck_equals(te.textFieldWidth, 5);
-
+check_equals(te.textFieldWidth, 5);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
 
 #if OUTPUT_VERSION > 7
 // Width of largest character in version 8?
-xcheck_equals(Math.round(te.width), 9);
+check_equals(Math.round(te.width), 9);
 #else
 xcheck_equals(Math.round(te.width), 29);
 #endif
 
+
 te = tf2.getTextExtent("Longer sentence with more words.", 30);
-xcheck_equals(te.textFieldWidth, 30);
+check_equals(te.textFieldWidth, 30);
 xcheck_equals(Math.round(te.width), 25);
+
+te = tf2.getTextExtent("o");
+xcheck_equals(Math.round(te.textFieldHeight), 18);
+check_equals(Math.round(te.textFieldWidth), 11);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
+
+te = tf2.getTextExtent("oo");
+xcheck_equals(Math.round(te.textFieldHeight), 18);
+xcheck_equals(Math.round(te.textFieldWidth), 18);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
+
+te = tf2.getTextExtent("ool");
+xcheck_equals(Math.round(te.textFieldHeight), 18);
+xcheck_equals(Math.round(te.textFieldWidth), 21);
+check_equals(Math.round(te.ascent), 11);
+check_equals(Math.round(te.descent), 3);
+
+tf2.size = 20;
+te = tf2.getTextExtent("ool");
+xcheck_equals(Math.round(te.textFieldHeight), 28);
+xcheck_equals(Math.round(te.textFieldWidth), 32);
+xcheck_equals(Math.round(te.ascent), 19);
+xcheck_equals(Math.round(te.descent), 5);
 
 #endif
 
 #if OUTPUT_VERSION < 7
-    check_totals(107);
+    check_totals(122);
 #elif OUTPUT_VERSION == 7
-    check_totals(123);
+    check_totals(158);
 #else 
-    check_totals(123);
+    check_totals(158);
 #endif

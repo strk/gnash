@@ -60,14 +60,15 @@ AC_DEFUN([GNASH_PATH_FIREFOX],
 
        elif test "x${NPAPI_INSTALL_POLICY}" = "xsystem"; then
 
-          for dir in /usr/lib64/mozilla/plugins /usr/lib/mozilla/plugins /usr/lib64/firefox/plugins /usr/lib/firefox/plugins /usr/lib64/iceweasel/plugins /usr/lib/iceweasel/plugins ; do
+          for dir in /usr/lib64/mozilla/plugins /usr/lib/mozilla/plugins /usr/lib64/firefox/plugins /usr/lib/firefox/plugins /usr/lib/mozilla-firefox/plugins /usr/lib64/iceweasel/plugins /usr/lib/iceweasel/plugins ; do
              if test -d $dir; then
                 FIREFOX_PLUGINS=$dir
                 break
              fi
           done
           if test "x${FIREFOX_PLUGINS}" = x; then
-             AC_MSG_ERROR([Could not find system mozilla plugin dir, use --with-npapi-plugindir.]);
+             FIREFOX_PLUGINS=/usr/lib/mozilla/plugins
+             AC_MSG_WARN([Could not find system mozilla plugin dir, use --with-npapi-plugindir. Defaulting to ${FIREFOX_PLUGINS}]);
           fi
 
        elif test "x${NPAPI_INSTALL_POLICY}" = "xprefix"; then

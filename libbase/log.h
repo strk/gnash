@@ -407,23 +407,27 @@ public:
     // Only print function tracing messages when multiple -v
     // options have been supplied. 
     __Host_Function_Report__(void) {
-    log_debug("entering");
+	log_debug("entering");
     }
 
     __Host_Function_Report__(char *_func) {
-    func = _func;
-    log_debug("%s enter", func);
+	func = _func;
+	log_debug("%s enter", func);
     }
 
     __Host_Function_Report__(const char *_func) {
-    func = _func;
-    log_debug("%s enter", func);
+	func = _func;
+	if (func) {
+	    log_debug("%s enter", func);
+	} else {
+	    log_debug("No Function Name! enter");
+	}
     }
 
     ~__Host_Function_Report__(void) {
-    if (LogFile::getDefaultInstance().getVerbosity() > LogFile::LOG_DEBUG) {
-        log_debug("%s returning", func);
-    }
+	if (LogFile::getDefaultInstance().getVerbosity() > LogFile::LOG_DEBUG) {
+	    log_debug("%s returning", func);
+	}
     }
 };
 

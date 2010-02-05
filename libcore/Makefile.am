@@ -50,7 +50,6 @@ AM_CPPFLAGS = \
 	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
 
-
 libgnashcore_la_SOURCES = \
 	BitmapMovie.cpp \
 	Property.cpp \
@@ -237,7 +236,6 @@ EXTENSIONS_API = \
 	as_value.h \
 	PropFlags.h	\
 	CharacterProxy.h \
-	StringPredicates.h \
 	builtin_function.h \
 	NativeFunction.h \
 	as_function.h \
@@ -295,6 +293,8 @@ libgnashcore_la_LIBADD = \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libsound/libgnashsound.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(FREETYPE2_LIBS) \

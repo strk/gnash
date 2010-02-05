@@ -1,0 +1,6 @@
+gnash-tools: binary-or-shlib-defines-rpath ./usr/bin/dumpshm /usr/lib/gnash
+gnash-tools: binary-or-shlib-defines-rpath ./usr/bin/findmicrophones /usr/lib/gnash
+gnash-tools: binary-or-shlib-defines-rpath ./usr/bin/findwebcams /usr/lib/gnash
+gnash-tools: binary-or-shlib-defines-rpath ./usr/bin/flvdumper /usr/lib/gnash
+gnash-tools: binary-or-shlib-defines-rpath ./usr/bin/gprocessor /usr/lib/gnash
+gnash-tools: binary-or-shlib-defines-rpath ./usr/bin/soldumper /usr/lib/gnash

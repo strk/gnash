@@ -16,15 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-//
-
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include "SWFMatrix.h"
 #include "SWFStream.h" // for reading from SWF

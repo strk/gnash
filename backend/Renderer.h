@@ -146,6 +146,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
+#include "FileTypes.h"
 #include "gnash.h" // Quality
 #include "DisplayObject.h"
 #include "Range2d.h"
@@ -194,11 +195,9 @@ public:
 /// Base class for render handlers.
 //
 /// You must define a subclass of Renderer, and pass an
-/// instance to set_Renderer() *before* any SWF parsing begins.
+/// instance to the core (RunResources) *before* any SWF parsing begins.
 ///
 /// For more info see page \ref Renderer_intro.
-/// 
-///
 class DSOEXPORT Renderer
 {
 public:
@@ -314,6 +313,24 @@ public:
     virtual void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
            const SWFMatrix& mat) = 0;
 
+
+    /// Draw the current rendering buffer to an image file.
+    //
+    /// Although this can be done at any time during the rendering cycle
+    /// without harmful side effects, it's advisable only to do it when 
+    /// between advance() calls, when the frame is fully renderered.
+    //
+    /// @param io       The IOChannel to write to.
+    /// @param type     The type of image output required (PNG, JPEG, GIF).
+    ///                 Note that not all FileTypes are images: rendering
+    ///                 to an FLV will not work.
+    virtual void renderToImage(boost::shared_ptr<IOChannel> /*io*/,
+        FileType /*type*/) const {
+
+        log_debug(_("Rendering to image not implemented for this "
+            "renderer"));
+    }
+        
 
     /// ==================================================================
     /// Prepare drawing area and other utilities

@@ -115,15 +115,6 @@
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>log_security</term>
-	<listitem>
-	  <para>
-	    Display a message with security related information. This is always
-	    printed at a verbosity level of 1 or more.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
 	<term>log_swferror</term>
 	<listitem>
 	  <para>
@@ -140,7 +131,7 @@
       </varlistentry>
 
       <varlistentry>
-	<term>void log_aserror</term>
+	<term>log_aserror</term>
 	<listitem>
 	  <para>
 	    This indicates an erroneous actionscript request such as
@@ -152,6 +143,15 @@
 	    This is printed at a
 	    verbosity level of 1 or more
 	    only if AS coding error logging is enabled.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>log_abc</term>
+	<listitem>
+	<para>
+		Extremely verbose logging related to AVM2/ABC execution.
+		This is printed at verbosity level 3.
 	  </para>
 	</listitem>
       </varlistentry>

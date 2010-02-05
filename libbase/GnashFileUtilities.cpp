@@ -20,7 +20,6 @@
 #ifndef GNASH_FILE_HEADERS_H
 #define GNASH_FILE_HEADERS_H
 
-#include "gnashconfig.h"
 #include "GnashFileUtilities.h"
 
 #include <string>

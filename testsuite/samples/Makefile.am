@@ -52,6 +52,13 @@ GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(NULL)
 
+if LIBLTDL2
+GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
+endif
+if LIBLTDL1
+GNASH_LIBS += $(top_builddir)/libbase/libltdlc.la
+endif
+
 check_PROGRAMS = \
 	clip_as_button2-TestRunner \
 	subshapes-TestRunner \
@@ -67,6 +74,7 @@ clip_as_button2_TestRunner_SOURCES = \
 	$(NULL)
 clip_as_button2_TestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(GNASH_LIBS) \
 	$(NULL)
 clip_as_button2_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(abs_srcdir)\" \
@@ -80,6 +88,7 @@ subshapes_TestRunner_SOURCES = \
 	$(NULL)
 subshapes_TestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(GNASH_LIBS) \
 	$(NULL)
 subshapes_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(abs_srcdir)\" \
@@ -93,12 +102,14 @@ gotoFrameOnKeyEvent_TestRunner_SOURCES = \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(GNASH_LIBS) \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(abs_srcdir)\" \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_DEPENDENCIES = \
 	gotoFrameOnKeyEvent.swf \
+	$(GNASH_LIBS) \
 	$(NULL)
 
 GotoAndPlayTestRunner: $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf

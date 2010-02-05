@@ -86,69 +86,68 @@ static void
 usage()
 {
 
-cout << _("Usage: gnash [options] movie_file.swf") << endl
-    << endl
-    << _("Plays a SWF (Shockwave Flash) movie") << endl
-    << _("Options:") << endl
-    << endl
-    << _("  -h,  --help              Print this help and exit") << endl
-    << _("  -V,  --version           Print version information and exit") << endl
-    << _("  -s,  --scale <factor>    Scale the movie by the specified factor") << endl
-    << _("  -c                       Produce a core file instead of letting SDL trap it") << endl
-    << _("  -d,  --delay num         Number of milliseconds to delay in main loop") << endl
-    << _("  -v,  --verbose           Produce verbose output") << endl
+cout << _("Usage: gnash [options] movie_file.swf\n")
+    << "\n"
+    << _("Plays a SWF (Shockwave Flash) movie\n")
+    << _("Options:\n")
+    << "\n"
+    << _("  -h,  --help              Print this help and exit\n")
+    << _("  -V,  --version           Print version information and exit\n") 
+    << _("  -s,  --scale <factor>    Scale the movie by the specified factor\n") 
+    << _("  -c                       Produce a core file instead of letting SDL trap it\n") 
+    << _("  -d,  --delay num         Number of milliseconds to delay in main loop\n") 
+    << _("  -v,  --verbose           Produce verbose output\n") 
 #if VERBOSE_ACTION
-    << _("  -va                      Be (very) verbose about action execution") << endl
+    << _("  -va                      Be (very) verbose about action execution\n") 
 #endif
 #if VERBOSE_PARSE
-    << _("  -vp                      Be (very) verbose about parsing") << endl
+    << _("  -vp                      Be (very) verbose about parsing\n") 
 #endif
-    << _("  -A <file>                Audio dump file (wave format)") << endl
-    << _("  -D <file>                Video dump file (only valid with dump-gnash)") << endl
-    << _("  -x,  --xid <ID>          X11 Window ID for display") << endl
-    << _("  -w,  --writelog          Produce the disk based debug log") << endl
-    << _("  -j,  --width <width>     Set window width") << endl
-    << _("  -k,  --height <height>   Set window height") << endl
-    << _("  -X,  --x-pos <x-pos>     Set window x position") << endl
-    << _("  -Y,  --y-pos <y-pos>     Set window y position") << endl
-    << _("  -1,  --once              Exit when/if movie reaches the last frame") << endl
-    << _("  -g,  --debugger          Turn on the SWF debugger") << endl
-    << _("  -r,  --render-mode <0|1|2|3>") << endl
-    << _("                           0 disable rendering and sound") << endl
-    << _("                           1 enable rendering, disable sound") << endl
-    << _("                           2 enable sound, disable rendering") << endl
-    << _("                           3 enable rendering and sound (default)") << endl
-    << _("  -t,  --timeout <sec>     Exit after the specified number of seconds") << endl
-    << _("  -u,  --real-url <url>    Set \"real\" URL of the movie") << endl
-    << _("  -U,  --base-url <url>    Set \"base\" URL for resolving relative URLs") << endl
-    << _("  -P,  --param <param>     Set parameter (e.g. \"FlashVars=A=1&b=2\")") << endl
-    << _("  -F,  --fd <fd>           Filedescriptor to use for external communications") << endl
+    << _("  -A <file>                Audio dump file (wave format)\n") 
+    << _("  -D <file>                Video dump file (only valid with "
+            "dump-gnash)\n") 
+    << _("  -x,  --xid <ID>          X11 Window ID for display\n") 
+    << _("  -w,  --writelog          Produce the disk based debug log\n") 
+    << _("  -j,  --width <width>     Set window width\n") 
+    << _("  -k,  --height <height>   Set window height\n") 
+    << _("  -X,  --x-pos <x-pos>     Set window x position\n") 
+    << _("  -Y,  --y-pos <y-pos>     Set window y position\n") 
+    << _("  -1,  --once              Exit when/if movie reaches the last "
+            "frame\n") 
+    << _("  -g,  --debugger          Turn on the SWF debugger\n") 
+    << _("  -r,  --render-mode <0|1|2|3>\n") 
+    << _("                           0 disable rendering and sound\n") 
+    << _("                           1 enable rendering, disable sound\n") 
+    << _("                           2 enable sound, disable rendering\n") 
+    << _("                           3 enable rendering and sound (default)\n") 
+    << _("  -t,  --timeout <sec>     Exit after the specified number of "
+            "seconds\n") 
+    << _("  -u,  --real-url <url>    Set \"real\" URL of the movie\n") 
+    << _("  -U,  --base-url <url>    Set \"base\" URL for resolving relative "
+            "URLs\n") 
+    << _("  -P,  --param <param>     Set parameter (e.g. "
+            "\"FlashVars=A=1&b=2\")\n") 
+    << _("  -F,  --fd <fd>           Filedescriptor to use for external "
+            "communications\n") 
 #ifdef GNASH_FPS_DEBUG
-    << _("  -f,  --debug-fps num     Print FPS every num seconds (float).") << endl
+    << _("  -f,  --debug-fps num     Print FPS every num seconds (float)\n") 
 #endif // def GNASH_FPS_DEBUG
-    << endl
-    << _("  --max-advances num       Exit after specified number of advances") << endl
-    << _("  --fullscreen             Start in fullscreen mode") << endl
-    << _("  --hide-menubar           Start without displaying the menu bar ") << endl
-    << endl
-    << _("Keys:") << endl
-    << endl
-    << _("  CTRL-Q, CTRL-W           Quit/Exit") << endl
-    << _("  CTRL-P                   Toggle Pause") << endl
-    << _("  CTRL-R                   Restart the movie") << endl
-
-#if 0 // Currently disabled
-    << _("  CTRL-[ or kp-   Step back one frame") << endl
-    << _("  CTRL-] or kp+   Step forward one frame") << endl
-#endif
-
-    << _("  CTRL-L                   Force immediate redraw") << endl
-
-//    << _("  CTRL-A          Toggle antialiasing (doesn't work)") << endl
-//    << _("  CTRL-T          Debug.  Test the set_variable() function") << endl
-//    << _("  CTRL-G          Debug.  Test the get_variable() function") << endl
-//    << _("  CTRL-M          Debug.  Test the invoke() function") << endl
-
+    
+    << _("  --max-advances num       Exit after specified number of frame "
+            "advances\n") 
+    << _("  --fullscreen             Start in fullscreen mode\n") 
+    << _("  --hide-menubar           Start without displaying the menu bar\n") 
+    << _("  --screenshot <list>      List of frames to save as screenshots\n") 
+    << _("  --screenshot-file <file> Filename pattern for screenshot images.\n")
+    << "\n"
+    << _("Keys:\n") 
+    << "\n"
+    << _("  CTRL-Q, CTRL-W           Quit\n") 
+    << _("  CTRL-F                   Toggle fullscreen\n") 
+    << _("  CTRL-P                   Toggle pause\n") 
+    << _("  CTRL-R                   Restart the movie\n") 
+    << _("  CTRL-O                   Take a screenshot\n") 
+    << _("  CTRL-L                   Force immediate redraw\n") 
     << endl;
 }
 
@@ -198,40 +197,41 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 
     const Arg_parser::Option opts[] =
         {
-        { 'h', "help",          Arg_parser::no  },
-        { 'v', "verbose",       Arg_parser::no  },
-        { 'a', 0,               Arg_parser::no  },
-        { 'p', 0,               Arg_parser::no  },
-        { 's', "scale",         Arg_parser::yes },
-        { 256, "max-advances",  Arg_parser::yes },
-        { 257, "fullscreen",    Arg_parser::no  },
-        { 258, "hide-menubar",  Arg_parser::no  },                
-        { 'c', 0,               Arg_parser::no  },
-        { 'd', "delay",         Arg_parser::yes },
-        { 'x', "xid",           Arg_parser::yes },
-        { 'r', "render-mode",   Arg_parser::yes },
-        { 't', "timeout",       Arg_parser::yes },        
-        { '1', "once",          Arg_parser::no  },        
-        { 'w', "writelog",      Arg_parser::no  },
-        { 'j', "width",         Arg_parser::yes },
-        { 'k', "height",        Arg_parser::yes },
-        { 'X', "x-position",    Arg_parser::yes },
-        { 'Y', "y-position",    Arg_parser::yes },
-        { 'u', "real-url",      Arg_parser::yes },
-        { 'P', "param",         Arg_parser::yes },
-        { 'U', "base-url",      Arg_parser::yes },  
-        { 'g', "debugger",      Arg_parser::no  },
-        { 'V', "version",       Arg_parser::no  },        
-        { 'f', "debug-fps",     Arg_parser::yes },        
-        { 'F', "fd",            Arg_parser::yes },
-        { 'A', "dump",          Arg_parser::yes },
-        { 'D', 0,               Arg_parser::yes }, // Handled in dump gui
-        {   0, 0,               Arg_parser::no  }
+        { 'h', "help",              Arg_parser::no  },
+        { 'v', "verbose",           Arg_parser::no  },
+        { 'a', 0,                   Arg_parser::no  },
+        { 'p', 0,                   Arg_parser::no  },
+        { 's', "scale",             Arg_parser::yes },
+        { 256, "max-advances",      Arg_parser::yes },
+        { 257, "fullscreen",        Arg_parser::no  },
+        { 258, "hide-menubar",      Arg_parser::no  },                
+        { 'c', 0,                   Arg_parser::no  },
+        { 'd', "delay",             Arg_parser::yes },
+        { 'x', "xid",               Arg_parser::yes },
+        { 'r', "render-mode",       Arg_parser::yes },
+        { 't', "timeout",           Arg_parser::yes },        
+        { '1', "once",              Arg_parser::no  },        
+        { 'w', "writelog",          Arg_parser::no  },
+        { 'j', "width",             Arg_parser::yes },
+        { 'k', "height",            Arg_parser::yes },
+        { 'X', "x-position",        Arg_parser::yes },
+        { 'Y', "y-position",        Arg_parser::yes },
+        { 'u', "real-url",          Arg_parser::yes },
+        { 'P', "param",             Arg_parser::yes },
+        { 'U', "base-url",          Arg_parser::yes },  
+        { 'g', "debugger",          Arg_parser::no  },
+        { 'V', "version",           Arg_parser::no  },        
+        { 'f', "debug-fps",         Arg_parser::yes },        
+        { 'F', "fd",                Arg_parser::yes },
+        { 'A', "dump",              Arg_parser::yes },
+        { 259, "screenshot",        Arg_parser::yes },
+        { 260, "screenshot-file",   Arg_parser::yes },
+        { 'D', 0,                   Arg_parser::yes }, // Handled in dump gui
+        {   0, 0,                   Arg_parser::no  }
     };
 
     Arg_parser parser(argc, argv, opts);
-    if( ! parser.error().empty() )    
-    {
+    if (!parser.error().empty()) {
         cout << parser.error() << endl;
         exit(EXIT_FAILURE);
     }
@@ -242,14 +242,11 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     bool widthGiven = false, heightGiven = false;
     bool xPosGiven = false, yPosGiven = false;
 
+    for (int i = 0; i < parser.arguments(); ++i) {
 
-    for( int i = 0; i < parser.arguments(); ++i )
-    {
         const int code = parser.code(i);
-        try
-        {
-            switch( code )
-            {
+        try {
+            switch (code) {
                 case 'h':
                     version_and_copyright();
                     usage ();
@@ -296,7 +293,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                                     0.01f, 100.f));
                     break;
                 case 'd':
-                    player.setDelay( parser.argument<long>(i) );
+                    player.setDelay(parser.argument<long>(i));
                     break;
                 case 'u':
                     url = parser.argument(i);
@@ -310,9 +307,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     break;
                 case 'F':
                 {
-                    int fd = parser.argument<long>(i);
-                    if ( fd < 1 )
-                    {
+                    const int fd = parser.argument<long>(i);
+                    if (fd < 1) {
                         cerr << boost::format(_("Invalid host communication "
                                     "filedescriptor %d\n")) % fd << endl;
                         exit(EXIT_FAILURE);
@@ -361,8 +357,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setWindowId(parser.argument<long>(i));
                     break;
                 case '1':
-                      player.setDoLoop(false);
-                      break;
+                    player.setDoLoop(false);
+                    break;
                 case 'r':
                     renderflag = true;
                     switch (parser.argument<char>(i))
@@ -403,56 +399,60 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     cout << _("FPS debugging disabled at compile time, -f "
                             "is invalid") << endl;
                     exit(EXIT_FAILURE);
-#endif // ndef GNASH_FPS_DEBUG
+#endif 
                     break;
                 case 'P':
                 {
-                    std::string param = parser.argument(i);
-                    size_t eq = param.find("=");
+                    const std::string& param = parser.argument(i);
+                    const size_t eq = param.find("=");
                     std::string name, value;
-                    if ( eq == std::string::npos )
-                    {
+                    if (eq == std::string::npos) {
                         name = param;
                         value = "true";
                     }
-                    else
-                    {
+                    else {
                         name = param.substr(0, eq);
                         value = param.substr(eq + 1);
                     }
-                      player.setParam(name, value);
+                    player.setParam(name, value);
                     break;
                 }
                 case 'A':
                 {
-                    std::string fn = parser.argument(i);
-                    player.setAudioDumpfile(fn);
+                    player.setAudioDumpfile(parser.argument(i));
                     break;
                 }
+                case 259:
+                    // The player takes care of parsing the list.
+                    player.setScreenShots(parser.argument(i));
+                    break;
+                case 260:
+                    player.setScreenShotFile(parser.argument(i));
+                    break;
                 case 0:
                     infiles.push_back(parser.argument(i));
                     break;
             }
         }
-        catch (Arg_parser::ArgParserException &e)
-        {
+        catch (Arg_parser::ArgParserException &e) {
             cerr << _("Error parsing command line options: ") << e.what() 
                 << endl;
             cerr << _("This is a Gnash bug.") << endl;
         }
     }
 
-    if ( ! renderflag ) {
+    if (!renderflag) {
         gnash::log_debug (_("No rendering flags specified, using rcfile"));
-        if ( plugin ) {
-            player.setDoSound( rcfile.usePluginSound() );
-        } else {
-            player.setDoSound( rcfile.useSound() );
+        if (plugin) {
+            player.setDoSound(rcfile.usePluginSound());
+        }
+        else {
+            player.setDoSound(rcfile.useSound());
         }
     }
 
-    if (plugin && heightGiven && widthGiven
-    && !player.getHeight() && !player.getWidth()) {
+    if (plugin && heightGiven && widthGiven && !player.getHeight() &&
+            !player.getWidth()) {
             // We were given dimensions of 0x0 to render to (probably the plugin
             // is playing an "invisible" movie. Disable video rendering.
             player.setDoRender(false);

@@ -18,10 +18,6 @@
 #ifndef GNASH_SWF_STARTSOUND_TAG_H
 #define GNASH_SWF_STARTSOUND_TAG_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "ControlTag.h" // for inheritance
 #include "sound_handler.h" // for sound_envelope (composition)
 #include "VM.h" // We only need this to get movie_root

@@ -19,10 +19,6 @@
 #ifndef GNASH_RESOURCE_H
 #define GNASH_RESOURCE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "ref_counted.h" // for inheritance
 #include "smart_ptr.h"
 

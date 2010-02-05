@@ -20,11 +20,6 @@
 #ifndef GNASH_VIRTUAL_CLOCK_H
 #define GNASH_VIRTUAL_CLOCK_H
 
-// What's the policy for when to include config.h ? --strk Dec 7 2007;
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <memory> // for InterruptableVirtualClock
 #include <cassert> // for InterruptableVirtualClock
 

@@ -25,7 +25,7 @@
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "gnash.h" // for image file types
+#include "FileTypes.h"
 #include "GnashImage.h"
 #ifdef USE_PNG
 # include "GnashImagePng.h"
@@ -77,7 +77,7 @@ GnashImage::GnashImage(int width, int height,
     assert(pitch >= width);
 }
 
-void GnashImage::update(boost::uint8_t* data)
+void GnashImage::update(const boost::uint8_t* data)
 {
     std::memcpy(this->data(), data, _size);
 }

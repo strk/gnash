@@ -66,7 +66,7 @@ public:
     /// @param size Will contain the number of DisplayObjects in this
     ///             StaticText definition.
     bool extractStaticText(std::vector<const TextRecord*>& to, size_t& size)
-        const;
+      const;
 
     virtual DisplayObject* createDisplayObject(Global_as& gl,
             DisplayObject* parent) const;
@@ -86,7 +86,7 @@ private:
 
 	SWFRect _rect;
 
-    SWFMatrix _matrix;
+        SWFMatrix _matrix;
 
 	void read(SWFStream& in, movie_definition& m, TagType tag);
 	

@@ -49,9 +49,9 @@ STD_DIRS = \
 	libsound \
 	libcore \
 	backend \
-	utilities \
 	gui \
 	plugin \
+	utilities \
 	doc \
 	po \
 	$(NULL)
@@ -69,6 +69,7 @@ VAAPI_DIR = libvaapi
 endif
 
 SUBDIRS = $(LIBLTDLDIR) $(VAAPI_DIR) $(STD_DIRS) $(CYGNAL_DIR)
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl
 
 if TESTSUITE
 SUBDIRS += testsuite
@@ -80,13 +81,14 @@ endif
 
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
-DIST_SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) cygnal extensions testsuite
-
 EXTRA_DIST =  \
 	autogen.sh \
 	config.rpath \
 	macros/incllist macros/libslist \
-	ChangeLog-0.8.0 ChangeLog-0.8.1 ChangeLog-0.8.2 ChangeLog-0.8.3 \
+	ChangeLog-0.8.0 \
+	ChangeLog-0.8.1 \
+	ChangeLog-0.8.2 \
+	ChangeLog-0.8.3 \
 	ChangeLog-0.8.4 \
 	packaging/deb.am \
 	packaging/snapshot.am \

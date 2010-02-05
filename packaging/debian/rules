@@ -1,6 +1,9 @@
 #!/usr/bin/make -f
-# The template for this file was originally written by Joey Hess and Craig Small.
-# Developed for Gnash by Miriam Ruiz
+# The template for this file was originally written by Joey Hess and
+# Craig Small. Then further work was done by Miriam Ruiz for Debian, and
+# Alexander Sack for Ubuntu.
+# Many more modifications were made by Rob Savoye for Gnash and Petter
+# Reinholdtsen for Debian Edu.
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
@@ -11,14 +14,16 @@ DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 MAIN_VERSION = $(shell head -n 1 debian/changelog | cut '-d ' -f 2 | sed 's/[()]//g')
-
 CFLAGS = -Wall -g -Werror-implicit-function-declaration
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
+	CXXFLAGS += -O0
 else
 	CFLAGS += -O2
 endif
+
+DEB_DH_SHLIBDEPS_ARGS_ALL := -X* /usr/lib/gnash
 
 # shared library versions, option 1
 #version=2.0.5
@@ -31,13 +36,13 @@ endif
 
 # CONFIGURE
 
-config.status: configure.ac
+config.status: configure
 	dh_testdir
 
-	@printf "\n == APPLYING PATCHES ============================================ \n\n"
+	@printf "\n == APPLYING PATCHES == \n\n"
 	# we have no patches, we're the developers!
 #	$(MAKE) -f /usr/share/quilt/quilt.make patch
-	@printf "\n ----------------------------------- End of APPLYING PATCHES ---- \n\n"
+	@printf "\n ---- End of APPLYING PATCHES ---- \n\n"
 
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
 	cp -f /usr/share/misc/config.sub config.sub
@@ -46,16 +51,13 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
 
-	@printf "\n == AUTOGEN ===================================================== \n\n"
-	./autogen.sh
-	@printf "\n -------------------------------------------- End of AUTOGEN ---- \n\n"
+	# for now, build the kde4 support, as kde3 is being depreciated.
 
-	# for now, only build the kde4 support,as kde3 is being depreciated.
-
-	@printf "\n == CONFIGURE =================================================== \n\n"
+	@printf "\n == CONFIGURE == \n\n"
 	./configure CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr \
+		--sysconfdir=/etc \
 		--mandir=/usr/share/man \
 		--infodir=/usr/share/info \
 		--disable-dependency-tracking \
@@ -71,7 +73,7 @@ endif
 		--enable-renderer=agg \
 		--with-plugins-install=system
 
-	@printf "\n ------------------------------------------- End of CONFIGURE ---- \n\n"
+	@printf "\n ---- End of CONFIGURE ---- \n\n"
 
 	cp libamf/README README.amf
 
@@ -81,13 +83,13 @@ build: build-stamp
 build-stamp:  config.status
 	dh_testdir
 
-	@printf "\n == MAKE ======================================================== \n\n"
-	$(MAKE) 
-	@printf "\n ----------------------------------------------- End of MAKE ---- \n\n"
+	@printf "\n == MAKE == \n\n"
+	$(MAKE)
+	@printf "\n ---- End of MAKE ---- \n\n"
 
-#	@printf "\n == CHECK ======================================================= \n\n"
-#	$(MAKE) check
-#	@printf "\n ---------------------------------------------- End of CHECK ---- \n\n"
+#	@printf "\n == CHECK ==\n\n"
+#	$(MAKE) -C debuild check
+#	@printf "\n ---- End of CHECK ---- \n\n"
 
 	touch build-stamp
 
@@ -97,38 +99,18 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp 
-
-ifeq (Makefile,$(wildcard Makefile))
-	-$(MAKE) maintainer-clean
-	-$(MAKE) distclean
-endif
-
-ifneq ($(wildcard ${AUTO_JUNK}),)
-	rm $(wildcard ${AUTO_JUNK})
-endif
-
-	rm -f config.{sub,guess,log,status}
-	rm -f libtool
-	rm -f `find . -name "Makefile"| grep -v "debian/"`
+	rm -f `find . -name "*.lo"`
 	rm -f `find . -name "*.o"`
+	rm -f `find . -name "*.a"`
+	rm -f `find . -name "*.la"`
 	rm -rf `find . -name ".libs"`
 	rm -rf `find . -name ".deps"`
 
-	rm -f configure aclocal.m4 config.h.in
-	#-find . -name Makefile.in -exec rm {} \;
-	-rm `find . -name Makefile.in`
-
-	-rm -rf libltdl/autom4te.cache
-	-rm -f libltdl/* ltmain.sh
-
-	#cd debian/h2m; $(MAKE) clean
-
-	-rm -f README.amf
-
-	@printf "\n == CLEANING PATCHES ============================================ \n\n"
+	@printf "\n == CLEANING PATCHES ==\n\n"
 	# we have no patches, we're the developers!
 #	$(MAKE) -f /usr/share/quilt/quilt.make unpatch
-	@printf "\n ----------------------------------- End of CLEANING PATCHES ---- \n\n"
+	@printf "\n ---- End of CLEANING PATCHES ---- \n\n"
+	# rm -rf debuild
 
 	dh_clean 
 
@@ -147,12 +129,10 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/lib/firefox/plugins/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash
 
-	@printf "\n == INSTALL ===================================================== \n\n"
+	@printf "\n == INSTALL ==\n\n"
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	$(MAKE) install-plugins DESTDIR=$(CURDIR)/debian/tmp
-	@printf "\n -------------------------------------------- End of INSTALL ---- \n\n"
-
-	#cd debian/h2m; $(MAKE)
+	@printf "\n ---- End of INSTALL ---- \n\n"
 
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
 	cp libbase/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
@@ -173,6 +153,8 @@ install: build
 	cp packaging/*.xpm $(CURDIR)/debian/tmp/usr/share/pixmaps/
 	install -d $(CURDIR)/debian/tmp/usr/share/applications/
 	cp debian/*.desktop $(CURDIR)/debian/tmp/usr/share/applications/
+	gzip -9 $(CURDIR)/debian/tmp/usr/share/man/man1/gtk-gnash.1
+	gzip -9 $(CURDIR)/debian/tmp/usr/share/man/man1/kde4-gnash.1
 
 # CREATE PACKAGES
 
@@ -184,20 +166,22 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs ChangeLog
+	dh_installchangelogs -XChangeLog
 	dh_installdocs
 	dh_installexamples
 	dh_install --sourcedir=$(CURDIR)/debian/tmp
 #	dh_installmenu
 #	dh_installmime
 	dh_installman
+	dh_desktop
+	dh_lintian
 	dh_link
 	dh_strip --dbg-package=gnash-dbg
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs
 	dh_installdeb
-#	dh_shlibdeps debian/tmp/usr/bin/* debian/tmp/usr/sbin/* debian/tmp/usr/lib/*
+	dh_shlibdeps debian/tmp/usr/bin/* debian/tmp/usr/lib/gnash/*
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

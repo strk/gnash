@@ -95,6 +95,8 @@ namespace {
     void menuQualityHigh(GtkMenuItem *menuitem, gpointer instance); 
     void menuQualityBest(GtkMenuItem *menuitem, gpointer instance); 
 
+    void timeoutQuit(gpointer data);
+
     // Event handlers
     gboolean realizeEvent(GtkWidget *widget, GdkEvent *event, gpointer data);
     gboolean deleteEvent(GtkWidget *widget, GdkEvent *event, gpointer data);
@@ -177,7 +179,11 @@ GtkGui::init(int argc, char **argv[])
     addPixmapDirectory (PKGDATADIR);
 
     if (_xid) {
+#ifdef _WIN32
+        _window = gtk_plug_new((void *)_xid);
+#else
         _window = gtk_plug_new(_xid);
+#endif
         log_debug (_("Created XEmbedded window"));
     } else {
 #ifdef GUI_HILDON
@@ -285,7 +291,7 @@ GtkGui::run()
 void
 GtkGui::setTimeout(unsigned int timeout)
 {
-    g_timeout_add(timeout, (GSourceFunc)gtk_main_quit, NULL);
+    g_timeout_add(timeout, (GSourceFunc)timeoutQuit, this);
 }
 
 bool
@@ -605,7 +611,7 @@ GtkGui::grabFocus()
 }
 
 void
-GtkGui::quit()
+GtkGui::quitUI() 
 {
     gtk_main_quit();
 }
@@ -2398,23 +2404,22 @@ configureEvent(GtkWidget *const /*widget*/, GdkEventConfigure *const event,
     GtkGui* obj = static_cast<GtkGui*>(data);
     obj->resize_view(event->width, event->height);
 
-    return FALSE;
+    return false;
 }
 
 gboolean
 realizeEvent(GtkWidget* /*widget*/, GdkEvent* /*event*/, gpointer /*data*/)
 {
-    return TRUE;
+    return true;
 }
 
 // Shut everything down and exit when we're destroyed as a window
 gboolean
-deleteEvent(GtkWidget* /*widget*/, GdkEvent* /*event*/, gpointer /*data*/)
+deleteEvent(GtkWidget* /*widget*/, GdkEvent* /*event*/, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
-
-    gtk_main_quit();
-    return TRUE;
+    Gui* gui = static_cast<Gui*>(data);
+    gui->quit();
+    return true;
 }
 
 
@@ -2655,6 +2660,13 @@ menuFullscreen(GtkMenuItem* /*menuitem*/, gpointer data)
     gui->toggleFullscreen();
 }
 
+void
+timeoutQuit(gpointer data)
+{
+    Gui* gui = static_cast<Gui*>(data);
+    gui->quit();
+}
+
 
 /// \brief restart the movie from the beginning
 void
@@ -2664,11 +2676,11 @@ menuRestart(GtkMenuItem* /*menuitem*/, gpointer data)
     gui->restart();
 }
 
-/// \brief quit complete, and close the application
 void
-menuQuit(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+menuQuit(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-    gtk_main_quit();
+    Gui* gui = static_cast<Gui*>(data);
+    gui->quit();
 }
 
 /// \brief Start the movie playing from the current frame.

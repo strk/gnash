@@ -21,10 +21,6 @@
 #ifndef GNASH_ASOBJ_BITMAPDATA_H
 #define GNASH_ASOBJ_BITMAPDATA_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "smart_ptr.h"
 #include "as_object.h"
 
@@ -36,6 +32,12 @@ class ObjectURI;
 class Bitmap;
 
 
+/// Implements the BitmapData native type.
+//
+/// This holds a vector of bitmap data. The vector's size does not change
+/// from construction until disposal. Disposal is signified by the clearing
+/// of the vector. All callers should check whether the BitmapData has been
+/// disposed before attempting to access any stored pixel data.
 class BitmapData_as : public Relay
 {
 
@@ -53,36 +55,43 @@ public:
     size_t getHeight() const { return _height; }
     bool isTransparent() const { return _transparent; }
     
-    const BitmapArray& getBitmapData() const
-    {
+    const BitmapArray& getBitmapData() const {
         return _bitmapData;
     }
  
     /// Set a specified pixel to the specified color.
     //
-    /// Callers must make sure the pixel is in range. Retains transparency
+    /// Callers must make sure the pixel is in range and that the
+    /// BitmapData has not been disposed. Retains transparency
     /// (which is opaque, for non-transparent BitmapData objects).
     void setPixel(int x, int y, boost::uint32_t color) {
+        assert(!_bitmapData.empty());
         const BitmapArray::size_type index = x * _width + y;
         _bitmapData[index] = (_bitmapData[index] & 0xff000000) | color;
     }
 
     /// Set a specified pixel to the specified color.
     //
-    /// Callers must make sure the pixel is in range. Set to opaque for
-    /// non-transparent BitmapData objects
+    /// Callers must make sure the pixel is in range and that the BitmapData
+    /// has not been disposed. Set to opaque for non-transparent BitmapData
+    /// objects
     void setPixel32(int x, int y, boost::uint32_t color) {
+        assert(!_bitmapData.empty());
         _bitmapData[x * _width + y] = _transparent ? color : color | 0xff000000;
     }
 
-
-    /// Returns an unsigned int representation of the pixel
-    /// at (x, y) either with or without transparency.
+    /// Returns the value of the pixel at (x, y) optionally with transparency.
+    //
+    /// Callers must make that dispose() has not been called.
+    /// Returns 0 if the pixel is out of range.
     boost::int32_t getPixel(int x, int y, bool transparency) const;
 
     void update(const boost::uint8_t* data);
 
-    // Fill the bitmap with a colour starting at x, y
+    /// Fill the bitmap with a colour starting at x, y
+    //
+    /// Callers must check that arguments are within the BitmapData's range
+    /// and that dispose() has not been called.
     void fillRect(int x, int y, int w, int h, boost::uint32_t color);
     
     // Free the bitmap data (clear the array)
@@ -118,6 +127,12 @@ private:
     std::list<Bitmap*> _attachedBitmaps;
 
 };
+
+inline bool
+disposed(const BitmapData_as& bm)
+{
+    return bm.getBitmapData().empty();
+}
 
 
 /// Initialize the global BitmapData class

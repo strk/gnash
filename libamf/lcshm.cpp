@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <cerrno>
 #include <vector>
 #include <string>
@@ -595,23 +591,11 @@ LcShm::send(const string&  name , const string&  domainname ,
 	
 	std::vector<amf::Element* >::iterator iter;
 		   
-    log_debug(_(" ***** The send function is called *****") ); 
-//     log_debug("Base address in 'send' is: 0x%x, 0x%x",(unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
-			   
-	if ( Listener::getBaseAddress() == 0x0 )
-	       {
-		   log_debug("STOP! No memory allocated!! ");
-		   return;
-	   }
+	if (!Listener::getBaseAddress()) return;
 
-//The base address
+    //The base address
      boost::uint8_t *baseptr = Listener::getBaseAddress();  	   
      boost::uint8_t *ptr = baseptr;     
-
-// Check if the base address exists
-    if (baseptr == reinterpret_cast<boost::uint8_t *>(0)) {
-        log_error("***** Base address in 'send' is not set! *****");
-	}
 
 // Compute the time
 // Please check before use.

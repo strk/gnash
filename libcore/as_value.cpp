@@ -42,6 +42,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <cmath> 
+#include <cctype> 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
@@ -49,6 +50,7 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <algorithm>
 
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY 1
@@ -136,7 +138,7 @@ parsePositiveInt(const std::string& s, Base base, bool whole = true)
 
     char c;
 
-    // If the cast fails, or if the whole string must be convertible and
+    // If the conversion fails, or if the whole string must be convertible and
     // some DisplayObjects are left, throw an exception.
     if (!(is >> target) || (whole && is.get(c))) {
         throw boost::bad_lexical_cast();
@@ -144,6 +146,90 @@ parsePositiveInt(const std::string& s, Base base, bool whole = true)
 
     return target;
 }
+
+struct
+NonNumericChar
+{
+   bool operator()(char c) {
+       return (!std::isdigit(c) && c != '.' && c != '-' && c != '+');
+   }
+};
+
+/// Omit an empty exponent that is valid in ActionScript but not in C++.
+//
+/// This function throws a boost::bad_lexical_cast if it finds an invalid
+/// exponent to avoid attempting an extraction when it will definitely fail.
+//
+/// A successful return from this function does not mean the exponent is
+/// valid, only that the result of stringstream's conversion will mirror
+/// AS behaviour.
+//
+/// @param si       An iterator pointing to the position after an exponent sign.
+/// @param last     The end of the string to extract. If we have an exponent
+///                 with no following digit, this iterator is moved to
+///                 a position before the exponent sign.
+void
+validateExponent(std::string::const_iterator si,
+        std::string::const_iterator& last)
+{
+
+    // Check for exponent with no following character. Depending on the
+    // version of gcc, extraction may be rejected (probably more correct) or
+    // accepted as a valid exponent (what ActionScript wants).
+    // In this case we remove the exponent to get the correct behaviour
+    // on all compilers.
+    if (si == last) {
+        --last;
+        return;
+    }
+
+    // Exponents with a following '-' or '+' are also valid if they end the
+    // string. It's unlikely that any version of gcc allowed this.
+    if (*si == '-' || *si == '+') {
+        ++si;
+        if (si == last) {
+            last -= 2;
+            return;
+        }
+    }
+
+    // An exponent ("e", "e-", or "e+") followed by a non digit is invalid.
+    if (!std::isdigit(*si)) {
+        throw boost::bad_lexical_cast();
+    }
+
+}
+
+/// Convert a string to a double if the complete string can be converted.
+//
+/// This follows the conditions of the standard C locale for numbers except
+/// that an exponent signifier with no following digit (e.g. "2e") is
+/// considered valid. Moreover, "2e-" is also considered valid.
+//
+/// This function scans the string twice (once for verification, once for
+/// extraction) and copies it once (for extraction).
+double
+parseDecimalNumber(std::string::const_iterator start,
+        std::string::const_iterator last)
+{
+    assert(start != last);
+ 
+    // Find the first position that is not a numeric character ('e' or 'E' not
+    // included). Even if no invalid character is found, it does not mean
+    // that the number is valid ("++++---" would pass the test).
+    std::string::const_iterator si =
+        std::find_if(start, last, NonNumericChar());
+
+    if (si != last) {
+        // If this character is not an exponent sign, the number is malformed.
+        if (*si != 'e' && *si != 'E') throw boost::bad_lexical_cast(); 
+        /// Move the last iterator to point before empty exponents.
+        else validateExponent(si + 1, last);
+    }
+
+    return boost::lexical_cast<double>(std::string(start, last));
+}
+
 
 // This class is used to iterate through all the properties of an AS object,
 // so we can change them to children of an AMF0 element.
@@ -472,8 +558,7 @@ as_value::to_number() const
 
             try {
 
-                if (swfversion > 5)
-                {
+                if (swfversion > 5) {
                     double d;
                     // Will throw if invalid.
                     if (parseNonDecimalInt(s, d)) return d;
@@ -483,17 +568,13 @@ as_value::to_number() const
                 // string is a valid float literal, then it
                 // gets converted; otherwise it is set to NaN.
                 // Valid for SWF5 and above.
-                //
-                // boost::lexical_cast is remarkably inflexible and 
-                // fails for anything that has non-numerical DisplayObjects.
-                // Fortunately, actionscript is equally inflexible.
-                std::string::size_type pos;
-                if ((pos = s.find_first_not_of(" \r\n\t")) 
-                        == std::string::npos) {
-                    return NaN;
-                }
+                const std::string::size_type pos =
+                    s.find_first_not_of(" \r\n\t");
 
-                return boost::lexical_cast<double>(s.substr(pos));
+                if (pos == std::string::npos) return NaN;
+                
+                // Will throw a boost::bad_lexical_cast if it fails.
+                return parseDecimalNumber(s.begin() + pos, s.end());
  
             }
             catch (boost::bad_lexical_cast&) {

@@ -61,7 +61,7 @@ public:
 	bool setupEvents()  { return true; }
 	void renderBuffer()  { }
 
-	void quit() { _quit = true; }
+	void quitUI() { _quit = true; }
 
 private:
 

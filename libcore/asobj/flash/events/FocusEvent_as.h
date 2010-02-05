@@ -20,9 +20,6 @@
 #ifndef GNASH_ASOBJ3_FOCUSEVENT_H
 #define GNASH_ASOBJ3_FOCUSEVENT_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 
 namespace gnash {

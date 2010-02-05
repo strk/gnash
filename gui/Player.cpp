@@ -59,6 +59,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <boost/lexical_cast.hpp>
 
 using namespace gnash;
 
@@ -233,24 +234,18 @@ Player::init_media()
 void
 Player::init_gui()
 {
-    if ( _doRender )
-    {
-        _gui = getGui(); 
-    }
-    else
-    {
-        _gui.reset(new NullGui(_doLoop, *_runResources));
-    }
+    if (_doRender) _gui = getGui(); 
+    else _gui.reset(new NullGui(_doLoop, *_runResources));
 
     _gui->setMaxAdvances(_maxAdvances);
 
 #ifdef GNASH_FPS_DEBUG
-    if ( _fpsDebugTime )
-    {
-        log_debug(_("Activating FPS debugging every %g seconds"), _fpsDebugTime);
+    if (_fpsDebugTime) {
+        log_debug(_("Activating FPS debugging every %g seconds"),
+                _fpsDebugTime);
         _gui->setFpsTimerInterval(_fpsDebugTime);
     }
-#endif // def GNASH_FPS_DEBUG
+#endif
 }
 
 boost::intrusive_ptr<movie_definition>
@@ -265,8 +260,7 @@ Player::load_movie()
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     URL vurl(_url);
 
-    if ( vurl.protocol() == "file" )
-    {
+    if (vurl.protocol() == "file") {
         const std::string& path = vurl.path();
         size_t lastSlash = path.find_last_of('/');
         std::string dir = path.substr(0, lastSlash+1);
@@ -335,20 +329,15 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _infile = infile;
 
     // Work out base url
-    if ( _baseurl.empty() )
-    {
-        if (! url.empty() ) _baseurl = url;
-        else if ( infile == "-" ) _baseurl = URL("./").str();
+    if (_baseurl.empty()) {
+        if (!url.empty()) _baseurl = url;
+        else if (infile == "-") _baseurl = URL("./").str();
         else _baseurl = infile;
     }
 
     // Set _root._url (either explicit of from infile)
-    if (! url.empty() ) {
-        _url = url;
-    }  else {
-        _url = infile;
-    }
-
+    if (!url.empty()) _url = url;
+    else _url = infile;
 
     // Parse player parameters. These are not passed to the SWF, but rather
     // control stage properties etc.
@@ -374,12 +363,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Initialize gui (we need argc/argv for this)
     // note that this will also initialize the renderer
     // which is *required* during movie loading
-    if (!_gui->init(argc, &argv))
-    {
+    if (!_gui->init(argc, &argv)) {
         std::cerr << "Could not initialize gui." << std::endl;
         return EXIT_FAILURE;
     }
-    
 
     // Parse querystring (before FlashVars, see
     // testsuite/misc-ming.all/FlashVarsTest*)
@@ -391,30 +378,27 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     // Load the actual movie.
     _movieDef = load_movie();
-    if ( ! _movieDef )
-    {
+    if (!_movieDef) {
         return EXIT_FAILURE;
     }
-
 
     // Get info about the width & height of the movie.
     int movie_width = static_cast<int>(_movieDef->get_width_pixels());
     int movie_height = static_cast<int>(_movieDef->get_height_pixels());
 
     if (! _width) {
-      _width = static_cast<size_t>(movie_width * _scale);
+        _width = static_cast<size_t>(movie_width * _scale);
     }
     if (! _height) {
-      _height = static_cast<size_t>(movie_height * _scale);
+        _height = static_cast<size_t>(movie_height * _scale);
     }
 
-    if ( ! _width || ! _height )
-    {
+    if (! _width || ! _height) {
         log_debug(_("Input movie has collapsed dimensions "
                     "%d/%d. Setting to 1/1 and going on."),
                      _width, _height);
-        if ( ! _width ) _width = 1;
-        if ( ! _height ) _height = 1;
+        if (!_width) _width = 1;
+        if (!_height) _height = 1;
     }
 
     // Register movie definition before creating the window
@@ -439,7 +423,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     _gui->setStage(&root);
     
-
     // When startStopped is true, stop here after the stage has been 
     // registered, but before the movie has started. Initial loading
     // and VM initialization have been done by this stage, but not
@@ -447,10 +430,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // the Gui accesses movie_root to get the sound_handler, but also
     // because the gui window should be properly set up by this point.
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-    if ( rcfile.startStopped() )
-    {
-        _gui->stop();
-    }
+
+    if (rcfile.startStopped()) _gui->stop();
 
     // Start loader thread
     // NOTE: the loader thread might (in IMPORT tag parsing)
@@ -463,9 +444,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _movieDef->completeLoad();
 
     if (! _delay) {
-      //float movie_fps = _movieDef->get_frame_rate();
-      //_delay = static_cast<unsigned int>(1000 / movie_fps) ; // milliseconds per frame
-      _delay = 10; // 10ms per heart beat
+        // 10ms per heart beat
+        _delay = 10; 
     }
     _gui->setInterval(_delay);
 
@@ -507,6 +487,35 @@ Player::run(int argc, char* argv[], const std::string& infile,
 	    root.setStageScaleMode(mode);
     }
 
+    // Set up screenshots. 
+    if (!_screenshots.empty()) {
+
+        std::istringstream is(_screenshots);
+        std::string arg;
+
+        bool last = false;
+        ScreenShotter::FrameList v;
+
+        while (std::getline(is, arg, ',')) {
+            if (arg == "last") last = true;
+            else try {
+                const size_t frame = boost::lexical_cast<size_t>(arg);
+                v.push_back(frame);
+            }
+            catch (boost::bad_lexical_cast&) {}
+        }
+
+        // Use default if filename is empty.
+        if (_screenshotFile.empty()) {
+            URL url(_runResources->baseURL());
+            std::string::size_type p = url.path().rfind('/');
+            const std::string& name = (p == std::string::npos) ? url.path() :
+                url.path().substr(p + 1);
+            _screenshotFile = "screenshot-" + name + "-%f";
+        }
+
+        _gui->requestScreenShots(v, last, _screenshotFile);
+    }
     
     _gui->run();
 

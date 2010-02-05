@@ -84,7 +84,7 @@ void terminate_signal(int /*signo*/) {
 // TODO:  let user decide colorspace (see also _bpp above!)
 DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
     Gui(xid, scale, loop, r),
-    _agg_renderer(NULL),
+    _agg_renderer(0),
     _offscreenbuf(NULL),
     _offscreenbuf_size(-1),
     _timeout(0),
@@ -93,10 +93,10 @@ DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
     _pixelformat("BGRA32")
 {
     if (loop) {
-        std::cerr << "# WARNING:  Gnash was told to loop the movie" << std::endl;
+        std::cerr << "# WARNING:  Gnash was told to loop the movie\n";
     }
     if (_xid) {
-        std::cerr << "# WARNING:  Ignoring request to display in X11 window" << std::endl;
+        std::cerr << "# WARNING:  Ignoring request to display in X11 window\n";
     }
 }
 
@@ -109,21 +109,22 @@ bool
 DumpGui::init(int argc, char **argv[])
 {
 
-    char c;
     int origopterr = opterr;
 
     if (_xid) {
-        log_error (_("Ignoring request to display in X11 window"));
+        log_error(_("Ignoring request to display in X11 window"));
     }
 
     optind = 0;
     opterr = 0;
+    char c;
     while ((c = getopt (argc, *argv, "D:")) != -1) {
         if (c == 'D') {
             // Terminate if no filename is given.
             if (!optarg) {
                 std::cout << 
-                    _("# FATAL:  No filename given with -D argument.") << std::endl;      
+                    _("# FATAL:  No filename given with -D argument.") <<
+                    std::endl;      
                 return false;
             }      
             _fileOutput = optarg;
@@ -131,20 +132,19 @@ DumpGui::init(int argc, char **argv[])
     }
     opterr = origopterr;
 
-    if (_fileOutput.empty()) {
-        // Terminate if filename is empty.
-        return false;
-    }
-
 #ifdef HAVE_SIGNAL_H
     signal(SIGINT, terminate_signal);
     signal(SIGTERM, terminate_signal);
 #endif
 
     init_dumpfile();
-    _agg_renderer = create_Renderer_agg(_pixelformat.c_str());
-    _runResources.setRenderer(boost::shared_ptr<Renderer>(_agg_renderer));
 
+    _renderer.reset(create_Renderer_agg(_pixelformat.c_str()));
+    _runResources.setRenderer(_renderer);
+
+    // We know what type of renderer it is.
+    _agg_renderer = static_cast<Renderer_agg_base*>(_renderer.get());
+    
     return true;
 }
 
@@ -217,6 +217,10 @@ DumpGui::run()
         std::cout << "FPS_ACTUAL=" << 
             (static_cast<double>((_framecount-1)) / (timer_current - timer_start)) << std::endl;
     }
+    
+    // In this Gui, quit() does not exit, but it is necessary to catch the
+    // last frame for screenshots.
+    quit();
     return true;
 }
 
@@ -248,23 +252,21 @@ DumpGui::createWindow(int width, int height)
 void
 DumpGui::writeFrame()
 {
-    assert(_fileStream);
-    if (_fileStream.is_open()) {
-        _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()), _offscreenbuf_size);
-        _framecount++;
-    }
-    else {
-        std::cout << _("# FATAL:  Unable to write to closed output file.") << "" << std::endl;
-        log_error(_("Unable to write to closed output file."));
-        quit();
-    }
+    if (!_fileStream) return;
+
+    _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()),
+            _offscreenbuf_size);
+    ++_framecount;
 }
 
 void
 DumpGui::init_dumpfile()
 {
-    // This should never be empty.
-    assert (!_fileOutput.empty());
+    // May be empty if only screenshots are required.
+    if (_fileOutput.empty()) {
+        std::cerr << "No video dump requested.\n";
+        return;
+    }
 
     _fileStream.open(_fileOutput.c_str());
     
@@ -289,7 +291,7 @@ DumpGui::setRenderHandlerSize(int width, int height)
 {
     assert(width > 0);
     assert(height > 0);
-    assert(_agg_renderer != NULL);
+    assert(_agg_renderer);
     
     if (_offscreenbuf.get() && (width == _width) && (height == _height)) {
         return;
@@ -324,8 +326,7 @@ DumpGui::setRenderHandlerSize(int width, int height)
 
     }
 
-    static_cast<Renderer_agg_base *> (_agg_renderer)->init_buffer
-        (_offscreenbuf.get(),
+    _agg_renderer->init_buffer(_offscreenbuf.get(),
          _offscreenbuf_size,
          _width,
          _height,
@@ -339,7 +340,7 @@ DumpGui::beforeRendering()
 }
 
 void
-DumpGui::quit()
+DumpGui::quitUI()
 {
     _terminate_request = true;
 }

@@ -19,9 +19,6 @@
 #ifndef GNASH_ASOBJ_BITMAPFILTER_H
 #define GNASH_ASOBJ_BITMAPFILTER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include "Global_as.h"
 

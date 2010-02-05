@@ -24,17 +24,13 @@
 #ifndef GNASH_GNASHIMAGE_H
 #define GNASH_GNASHIMAGE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
 #include <memory> // for auto_ptr
 
-#include "gnash.h" // for image file types
+#include "FileTypes.h"
 #include "log.h"
 #include "dsodefs.h"
 
@@ -158,7 +154,7 @@ public:
     ///
     /// @param data buffer to copy data from.
     ///
-    void update(boost::uint8_t* data);
+    void update(const boost::uint8_t* data);
 
     /// Copy image data from another image data
     //
@@ -421,7 +417,7 @@ public:
     /// @param image    The image to write.
     /// @param quality  The quality of the image output (not used for all
     ///                 formats)
-    static void writeImageData(FileType type,
+    DSOEXPORT static void writeImageData(FileType type,
             boost::shared_ptr<gnash::IOChannel> out, const GnashImage& image,
             int quality);
 

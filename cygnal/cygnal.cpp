@@ -34,6 +34,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "GnashSleep.h"
 #include "bzrversion.h"
 
 //#include "cvm.h"
@@ -856,7 +857,7 @@ connection_handler(Network::thread_params_t *args)
 	    if (!hand) {
 		hand = new Handler;
 		hand->addClient(args->netfd, Network::HTTP);
-		int retries = 3;
+		int retries = 10;
 		amf::Buffer *buf = 0;
 		do {
 		    buf = hand->parseFirstRequest(args->netfd, Network::HTTP);
@@ -1144,7 +1145,7 @@ event_handler(Network::thread_params_t *args)
 	// Wait for something from one of the file descriptors. This timeout
 	// is the time between sending packets to the client when there is
 	// no client input, which effects the streaming speed of big files.
-	net.setTimeout(15);
+	net.setTimeout(5);
 	hits = net.waitForNetData(hand->getClients());
 	if (FD_ISSET(0, &hits)) {
 	    FD_CLR(0, &hits);

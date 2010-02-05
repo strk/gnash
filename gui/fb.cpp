@@ -1356,7 +1356,7 @@ gnash::key::code FBGui::scancode_to_gnash_key(int code, bool shift) {
     case KEY_KPMINUS       : return gnash::key::KP_SUBTRACT;
     case KEY_KPPLUS        : return gnash::key::KP_ADD;
     case KEY_KPDOT         : return gnash::key::KP_DECIMAL;
-    case KEY_KPASTERISK    : return gnash::key::KP_MULITPLY;  // typo in GnashKey.h
+    case KEY_KPASTERISK    : return gnash::key::KP_MULTIPLY;
     case KEY_KPENTER       : return gnash::key::KP_ENTER;
     
     case KEY_ESC           : return gnash::key::ESCAPE;

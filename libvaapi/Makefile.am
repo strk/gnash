@@ -27,7 +27,9 @@ libgnashvaapi_la_CPPFLAGS =	\
 	$(NULL)
 
 libgnashvaapi_la_LIBADD =	\
-	$(BOOST_LIBS)		\
+    $(X11_LIBS) \
+	$(BOOST_LIBS) \
+	$(PTHREAD_LIBS) \
 	$(LIBSWSCALE_LIBS)	\
 	$(LIBVA_LIBS)		\
 	$(LIBVA_X11_LIBS)	\

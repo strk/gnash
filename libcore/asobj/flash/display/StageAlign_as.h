@@ -20,10 +20,6 @@
 #ifndef GNASH_ASOBJ3_STAGEALIGN_H
 #define GNASH_ASOBJ3_STAGEALIGN_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 namespace gnash {
 
 // Forward declarations

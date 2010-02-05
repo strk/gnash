@@ -21,9 +21,6 @@
 #ifndef GNASH_ASOBJ_TRANSFORM_H
 #define GNASH_ASOBJ_TRANSFORM_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 namespace gnash {
 

@@ -19,10 +19,6 @@
 #ifndef __HANDLER_H__
 #define __HANDLER_H__ 1
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>

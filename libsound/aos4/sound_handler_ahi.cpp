@@ -21,11 +21,6 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "sound_handler_ahi.h"
 #include "SoundInfo.h"
 #include "EmbedSound.h"

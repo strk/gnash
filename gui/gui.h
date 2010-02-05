@@ -36,7 +36,8 @@
 #include "tree.hh" // for tree
 #endif
 
-#include <cstdlib> // exit
+#include <vector>
+#include <cstdlib> 
 #include <string>
 #include <map>
 
@@ -68,15 +69,78 @@ namespace gnash
     class movie_definition;
 }
 
-namespace gnash
-{
-
+namespace gnash {
 
 /// Enumerates mouse cursor types.
 enum gnash_cursor_type {
   CURSOR_HAND,
   CURSOR_NORMAL,
   CURSOR_INPUT
+};
+
+/// Handles screen dumps.
+class ScreenShotter
+{
+public:
+
+    typedef std::vector<size_t> FrameList;
+
+    /// Create a ScreenShotter with renderer and output name.
+    ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName)
+        :
+        _renderer(r),
+        _immediate(false),
+        _fileName(fileName),
+        _last(false)
+    {}
+
+    /// Take a screenshot at the next possible moment.
+    void now() {
+        _immediate = true;
+    }
+
+    /// Take a screenshot when the last frame is reached.
+    void lastFrame() {
+        _last = true;
+    }
+
+    /// Called on the last frame before exit.
+    //
+    /// Which frame is last depends on the execution path of the SWF, whether
+    /// the SWF loops, whether a timeout was requested or a maximum number of
+    /// advances set. Those conditions are not knowable in advance, so
+    /// the last frame is a special case.
+    void last() const;
+
+    /// Takes a screenshot if required.
+    //
+    /// Called on each advance.
+    //
+    /// @param frameAdvance     used to check whether a screenshot is required
+    ///                         as well as to construct the filename.
+    void screenShot(size_t frameAdvance);
+
+    /// Request a list of frames to be rendered to image files.
+    void setFrames(const FrameList& frames);
+
+private:
+
+    /// Take the screenshot.
+    void saveImage(const std::string& filename) const;
+
+    boost::shared_ptr<Renderer> _renderer;
+
+    /// If true, the next call to screenshot will take a screenshot
+    bool _immediate;
+
+    /// Name used to generate output file.
+    const std::string _fileName;
+
+    /// Whether to take a screenshot on the last frame.
+    bool _last;
+
+    FrameList _frames;
+
 };
 
 /// Parent class from which all GUI implementations will depend.
@@ -110,6 +174,14 @@ public:
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
 
+    /// Request a list of screenshots
+    //
+    /// @param l        A list of frames to render to an image file
+    /// @param last     Whether to render the last frame before exist
+    /// @param filename The filename pattern to save images as.
+    void requestScreenShots(const ScreenShotter::FrameList& l, bool last,
+            const std::string& filename);
+
     /** \brief
      * Create and display our window.
      *
@@ -127,12 +199,10 @@ public:
     /// Start main rendering loop.
     virtual bool run() = 0;
 
-    /// End main rendering loop, making the call to run() return.
+    /// Always called on exit.
     //
-    /// The default implementation calls exit(EXIT_SUCCESS), which isn't nice.
-    /// Please implement the proper main loop quitter in the subclasses.
-    ///
-    virtual void quit()  { std::exit(EXIT_SUCCESS); }
+    /// Handles any common functions, then calls virtual quitUI().
+    void quit();
 
     /// Render the current buffer.
     /// For OpenGL, this means that the front and back buffers are swapped.
@@ -243,8 +313,7 @@ public:
     bool advanceMovie();
 
     /// Convenience static wrapper around advanceMovie for callbacks happiness.
-    static bool advance_movie(Gui* gui)
-    {
+    static bool advance_movie(Gui* gui) {
         return gui->advanceMovie();
     }
 
@@ -317,13 +386,16 @@ public:
     bool isStopped() const { return _stopped; }
     
     /// Whether gnash is is running as a plugin
-    bool isPlugin() const { return (( _xid )); }
+    bool isPlugin() const { return ((_xid)); }
+
+    /// Take a screenshot now!
+    void takeScreenShot();
 
     /// Set the maximum number of frame advances before Gnash exits.
     void setMaxAdvances(unsigned long ul) { if (ul) _maxAdvances = ul; }
     
     void showUpdatedRegions(bool x) { _showUpdatedRegions = x; }
-    bool showUpdatedRegions() { return _showUpdatedRegions; }
+    bool showUpdatedRegions() const { return _showUpdatedRegions; }
 
     /// Instruct the core to restart the movie and
     /// set state to play(). This does not change pause
@@ -414,6 +486,17 @@ protected:
      * @param depth Colour depth to be used in the client area of our window.
      */
     Gui(unsigned long xid, float scale, bool loop, RunResources& r);
+    
+    /// End main rendering loop calling GUI-specific exit functions.
+    //
+    /// Do not call this directly. Call quit() instead.
+    //
+    /// The default implementation calls exit(EXIT_SUCCESS), which isn't nice.
+    /// Please implement the proper main loop quitter in the subclasses.
+    virtual void quitUI() {
+        std::exit(EXIT_SUCCESS);
+    }
+
 
     /// Determines if playback should restart after the movie ends.
     bool            _loop;
@@ -428,23 +511,23 @@ protected:
     geometry::Range2d<int> _validbounds;
 
     /// Desired window width.
-    int             _width;
+    int _width;
 
     /// Desired window height.
-    int             _height;
+    int _height;
 
     /// Desired colour depth in bits.
     RunResources& _runResources;
 
     /// Main loop interval: the time between successive advance_movie calls.
-    unsigned int    _interval;
+    unsigned int _interval;
 
     /// The handler which is called to update the client area of our window.
     boost::shared_ptr<Renderer> _renderer;
 
     /// Signals that the next frame must be re-rendered completely because the
     /// window size did change.
-    bool            _redraw_flag;
+    bool _redraw_flag;
 
     // True if Gnash is running in fullscreen
     bool _fullscreen;
@@ -468,16 +551,16 @@ protected:
 private:
 
     /// Width of a window pixel, in stage pseudopixel units.
-    float           _xscale;
+    float _xscale;
 
     /// Height of a window pixel, in stage pseudopixel units.
-    float           _yscale;
+    float _yscale;
 
     /// Window pixel X offset of stage origin
-    boost::int32_t   _xoffset;
+    boost::int32_t _xoffset;
 
     /// Window pixel Y offset of stage origin
-    boost::int32_t   _yoffset;
+    boost::int32_t _yoffset;
 
     bool display(movie_root* m);
     
@@ -519,10 +602,10 @@ private:
     movie_root* _stage;
 
     /// True if the application has been put into "stop" mode
-    bool            _stopped;
+    bool _stopped;
 
     /// True if the application didn't start yet
-    bool            _started;
+    bool _started;
 
     /// If true, updated regions (invalidated ranges) are visibly outlined.
     bool _showUpdatedRegions;
@@ -530,6 +613,9 @@ private:
     SystemClock _systemClock;
     InterruptableVirtualClock _virtualClock;
     
+    /// Checked on each advance for screenshot activity if it exists.
+    boost::scoped_ptr<ScreenShotter> _screenShotter;
+
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
 	int _xpointer;
 	int _ypointer;

@@ -31,6 +31,8 @@
 namespace gnash
 {
 
+class Renderer_agg_base;
+
 typedef bool (*callback_t)(void*, int, void *data);
 
 class DSOEXPORT DumpGui : public Gui
@@ -46,7 +48,7 @@ class DSOEXPORT DumpGui : public Gui
             int /*x*/, int /*y*/)
         { return createWindow(width, height); }
     bool init(int argc, char **argv[]);
-    void quit();
+    virtual void quitUI();
     void renderBuffer() {return; }
     void render() { return; }
     void render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/)
@@ -66,7 +68,8 @@ class DSOEXPORT DumpGui : public Gui
     void writeFrame();
 
 private:
-    Renderer *_agg_renderer;      /* pointer to AGG renderer */
+    
+    Renderer_agg_base* _agg_renderer;
 
     // A buffer to hold the actual image data. A boost::scoped_array
     // is destroyed on reset and when it goes out of scope (including on

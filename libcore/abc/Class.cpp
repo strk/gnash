@@ -32,6 +32,8 @@
 #include "Method.h"
 #include "abc_function.h"
 
+#include <boost/bind.hpp>
+
 namespace gnash {
 namespace abc {
 

@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "MovieClip.h"
 #include "Movie.h"
 #include "display/MovieClip_as.h"
@@ -2081,9 +2077,28 @@ movieclip_beginGradientFill(const fn_call& fn)
             clamp<double>(alpVal.to_number(), 0, 100) : 0;
         const boost::uint8_t alp = 0xff * (a / 100);
 
-        as_value ratVal = ratios->getMember(key);
+        // Ratio is the range 0..255, but a ratio may never be smaller than
+        // the previous value. The pp adjusts it to be greater than the
+        // last value if it is smaller. But we must be careful not to exceed
+        // 0xff.
+
+        // From looking it looks like the minimum adjustment is 2. Even 
+        // steps of 1 appear to be adjusted.
+        const int step = 2;
+        const as_value& ratVal = ratios->getMember(key);
+        const boost::uint32_t minRatio =
+            gradients.empty() ? 0 :
+            std::min<boost::uint32_t>(gradients[i - 1].m_ratio + step, 0xff);
+
         boost::uint8_t rat = ratVal.is_number() ? 
-            clamp<int>(toInt(ratVal), 0, 255) : 0;
+            clamp<boost::uint32_t>(toInt(ratVal), minRatio, 0xff) : minRatio;
+
+        // The renderer may expect successively larger ratios; failure to
+        // do this can lead to memory errors.
+        if (!gradients.empty()) {
+            assert((rat != 0xff && rat > gradients[i - 1].m_ratio) ||
+                    (rat >= gradients[i - 1].m_ratio));
+        }
 
         rgba color;
         color.parseRGB(col);

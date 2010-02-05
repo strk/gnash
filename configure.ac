@@ -17,8 +17,8 @@ dnl
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, trunk)
-AC_CONFIG_SRCDIR(libcore/gnash.h)
-AM_CONFIG_HEADER(gnashconfig.h)
+AC_CONFIG_SRCDIR([libcore/gnash.h])
+AC_CONFIG_HEADERS([gnashconfig.h])
 
 dnl AC_CONFIG_SUBDIRS(libltdl)
 AC_CANONICAL_BUILD
@@ -197,9 +197,18 @@ dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
 
+dnl I want to depreciate this option for the new sysroot name to be
+dnl consistant with other tools. This will be left for a while as 
+dnl a transistion.
 AC_ARG_WITH(top_level,
   AC_HELP_STRING([--with-top-level],
   [top level directory for cross compiling files]),
+  with_top_level=${withval} ;
+  cross_compiling=yes)
+
+AC_ARG_WITH(sysroot,
+  AC_HELP_STRING([--sysroot],
+  [system root directory for cross compiling]),
   with_top_level=${withval} ;
   cross_compiling=yes)
 
@@ -267,7 +276,7 @@ AC_ARG_ENABLE(jemalloc,
 esac],jemalloc=yes)
 
 dnl There is some weird stuff going on with NetBSD and jemalloc, so don't build it for now.
-if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes"; then
+if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes"; then
   jemalloc=no
 fi
 dnl If the compiler doesn't have local thread storage enabled, don't try to
@@ -893,35 +902,32 @@ AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_MSG_CHECKING([For the version of libtool])
 if test -d ${srcdir}/libltdl/libltdl; then
-ltver=2.x
+  ltver=2.x
 else
-ltver=1.x
+  ltver=1.x
 fi
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
 AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
 if test $ltmajor -eq 1; then
-	AC_LIBLTDL_CONVENIENCE
-	AC_LIBTOOL_DLOPEN
-	AC_LIBTOOL_WIN32_DLL
-	AC_DISABLE_STATIC
+  AC_LIBLTDL_CONVENIENCE
+  AC_LIBTOOL_DLOPEN
+  if test x"${windows}" = x"yes"; then
+    dnl The following macro may be empty; the colon is necessary
+    dnl in this case to avoid an empty if statement (which is a syntax error).
+    AC_LIBTOOL_WIN32_DLL
+    :
+  fi
+  AC_DISABLE_STATIC
 else
-dnl if test x$build_aqua = xyes; then
-	dnl the Aqua-binary is always static.
-dnl	AC_ENABLE_STATIC
-dnl	AC_DISABLE_SHARED
-dnl else
-dnl	AC_DISABLE_STATIC
-dnl fi	
-	LT_INIT([dlopen win32-dll disable-static])
-	dnl lt_ltdl_dir=libbase/libltdl
-	LTDL_INIT([convenience recursive])
-	AC_CONFIG_FILES([libltdl/Makefile])
+  LT_INIT([dlopen win32-dll disable-static])
+  LTDL_INIT([convenience recursive])
 fi
 AC_PROG_LIBTOOL
 
 AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
+AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
 
 AC_C_BIGENDIAN
 AC_C_CONST
@@ -1330,7 +1336,7 @@ if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
       GNASH_PATH_GLEXT
    fi
 
-  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+   GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 fi
 if test x$build_hildon = xyes; then
   GNASH_PATH_HILDON
@@ -1532,8 +1538,8 @@ esac
 
 AM_CONDITIONAL(LIRC, [test x$lirc_ext = xyes])
 
-AC_CHECK_HEADERS(endian.h)
-AC_CHECK_HEADERS(malloc.h)
+AC_CHECK_HEADERS(endian.h machine/endian.h)
+AC_CHECK_HEADERS(malloc.h malloc/malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
 AC_CHECK_HEADERS(pwd.h)
@@ -1774,7 +1780,9 @@ if test x"${GIF_LIBS}" = x ; then
  GIF_LIBS=${UNGIF_LIBS}
  GIF_CFLAGS=${UNGIF_CFLAGS}
 fi
-GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
+if test x"$testsuite" = x"yes"; then
+  GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
+fi
 
 GNASH_PKG_FIND(speex, [speex.h], [speex audio codec], speex_decode_int)
 AM_CONDITIONAL(HAVE_SPEEX, [ test x$has_speex = xyes ])
@@ -1853,15 +1861,17 @@ fi
 AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_HOST" != x ])
 
 dnl The name might differ between systems.
+if test x"$testsuite" = x"yes"; then
 AC_PATH_PROGS(NETCAT, [nc netcat])
-AM_CONDITIONAL(HAS_NETCAT, [ test x"$NETCAT" != x ])
 AC_PATH_PROG(WGET, wget)
+fi
+AM_CONDITIONAL(HAS_NETCAT, [ test x"$NETCAT" != x ])
 AM_CONDITIONAL(HAS_WGET, [ test x"$WGET" != x ])
 
 dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
-if test x$cross_compiling = xno; then
+if test x"$testsuite" = x"yes" -a x$cross_compiling = xno; then
   AC_PATH_PROG(AS3COMPILE, as3compile)
   AC_PATH_PROG(SWFC, swfc)
   AC_PATH_SWFMILL
@@ -1935,7 +1945,7 @@ fi
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 
 if test x$build_gtk = xno -o x$build_kde4 = xno; then
-  if test x$npapi =xyes; then
+  if test x$npapi = xyes; then
     AC_MSG_WARN(["Enabled NPAPI plugin, but it's not supported by the selected GUI"])
   fi
 fi
@@ -2436,6 +2446,7 @@ AC_CONFIG_FILES(gnash.pc:gnash.pc.in)
 
 AC_OUTPUT(Makefile
 po/Makefile
+libltdl/Makefile
 libmedia/Makefile
 libsound/Makefile
 libbase/Makefile
@@ -3133,7 +3144,7 @@ else
   echo "        RECOMMENDED: If you install the CURL library, Gnash will be able to" >&4
   echo "                     display remote content (streaming from URLs) using CURL." >&4
   echo "                     Install libcurl from http://curl.haxx.se/libcurl" >&4
-  echo "                     or .deb users: apt-get install libcurl3-dev" >&4
+  echo "                     or .deb users: apt-get install libcurl-dev" >&4
   echo "                     or .rpm users: yum install curl-devel" >&4
 fi
 
@@ -3457,7 +3468,6 @@ else
   echo "                 or .rpm users: yum install dejagnu" >&4
 fi
 
-
 dnl Access Linux Platform
 if test x"${build_alp}" = xyes; then
   if test x"${ALP_CFLAGS}" != x; then
@@ -3531,15 +3541,17 @@ else
   echo "     ${classlist}"
 fi
 
-if test x"$NETCAT" != x; then
+if test x"$testsuite" = x"yes"; then
+  if test x"$NETCAT" != x; then
     echo "        You have netcat installed, which is only used for testing"
-else
+  else
     echo "        Install netcat for networking test support"
-fi
-if test x"$WGET" != x; then
+  fi
+  if test x"$WGET" != x; then
     echo "        You have wget installed, which is only used for testing"
-else
+  else
     echo "        Install wget for networking test support"
+  fi
 fi
 
 if test x$cross_compiling = xyes; then

@@ -1,0 +1,3 @@
+gnash-cygnal: binary-or-shlib-defines-rpath ./usr/bin/cygnal /usr/lib/gnash
+gnash-cygnal: binary-or-shlib-defines-rpath ./usr/lib/cygnal/plugins/echo.so /usr/lib/gnash
+gnash-cygnal: binary-or-shlib-defines-rpath ./usr/lib/cygnal/plugins/oflaDemo.so /usr/lib/gnash

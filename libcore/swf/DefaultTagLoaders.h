@@ -19,10 +19,6 @@
 #ifndef GNASH_SWF_DEFAULTLOADERS_H
 #define GNASH_SWF_DEFAULTLOADERS_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "dsodefs.h" //DSOEXPORT
 #include "SWF.h"
 #include "TagLoadersTable.h"

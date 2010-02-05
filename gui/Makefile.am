@@ -84,7 +84,8 @@ GTK_LIBS =  \
 	$(PANGO_LIBS) \
 	$(ATK_LIBS) \
 	$(GLIB_LIBS) \
-	$(EXPAT_LIBS)
+	$(EXPAT_LIBS) \
+	$(Z_LIBS)
 
 DUMP_CFLAGS =
 
@@ -98,6 +99,8 @@ GUI_CPPFLAGS =
 AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
+	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
 	$(LIRC_LIBS) \
 	$(MYSQL_LIBS) \
 	$(BOOST_LIBS) \

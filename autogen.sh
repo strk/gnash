@@ -110,23 +110,26 @@ xlc )
   am_opt=--include-deps;;
 esac
 
-# Rather than have libltdl run it's own configure, the few tests libltdl needed
-# were added to the main configure.ac. As we need to look at config.h in header
-# files, which may conflict with other versions of config.h, this has been
-# renamed to gnashconfig,h to be unique. As the files libtoolize copies insist
-# on using config.h, we just edit the name, rather than adding a fixed copy to
-# Gnash.
+# Rather than have libltdl run it's own configure, the few tests
+# libltdl needed were added to the main configure.ac. As we need to
+# look at config.h in header files, which may conflict with other
+# versions of config.h, this has been renamed to gnashconfig,h to be
+# unique. As the files libtoolize copies insist on using config.h, we
+# just edit the name, rather than adding a fixed copy to Gnash.
 #
-# This gets more interesting with libtool 2.x, which heavily changed how everything
-# worked. Where libtool 1.5 installed only a header and had a single source file,
-# libtool 2.x has an entire sub directory tree of headers and source files.
-# So for libtool 1.5.x, we do everything the way this has always worked for Gnash.
-# For libtool 2.x, we install in a subdirectory of libbase, because we have to
-# hack the build directory, and everything configures tottally differernt than 1.5.x
-# used to. For more fun, libtoolize has different command line arguments, but one thing
-# that got fixed is for libtool 2.x there is an #define for the config file name, but
-# for libtool 1.5 it expects config.h always, so we change this to gnashconfig.h.
-ltdlver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
+# This gets more interesting with libtool 2.x, which heavily changed
+# how everything worked. Where libtool 1.5 installed only a header and
+# had a single source file, libtool 2.x has an entire sub directory
+# tree of headers and source files. So for libtool 1.5.x, we do
+# everything the way this has always worked for Gnash. For libtool
+# 2.x, we install in a subdirectory of libbase, because we have to
+# hack the build directory, and everything configures tottally
+# differernt than 1.5.x used to. For more fun, libtoolize has
+# different command line arguments, but one thing that got fixed is
+# for libtool 2.x there is an #define for the config file name, but
+# for libtool 1.5 it expects config.h always, so we change this to
+# gnashconfig.h.
+ltdlver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | sed -e 's/(.*) //' | cut -d ' ' -f 2`
 ltdlmajor=`echo $ltdlver | cut -d '.' -f 1`
 if test -z "$NO_LIBTOOLIZE" ; then
   ltbasedir="libltdl"
@@ -135,6 +138,10 @@ if test -z "$NO_LIBTOOLIZE" ; then
     libtoolflags="${libtoolflags} ${ltbasedir} --quiet --recursive"
   fi
   echo "Running libtoolize $ltdlver ${libtoolflags} ..."
+  # We have to remove the old libltdl sources, as it's entirely
+  # possible these files are being regenerated on a machine with a
+  # different version of libtoolize.
+  rm -fr libltdl
   if ${LIBTOOLIZE:-libtoolize} ${libtoolflags}; then
     # libtool insists on including config.h, but we use gnashconfig.h
     # to avoid any problems, so we have to change this include

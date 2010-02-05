@@ -1,3 +1,4 @@
 usr/bin/gtk-gnash
-usr/share/pixmaps/gnash.xpm
+usr/share/man/man1/gtk-gnash.1*
 usr/share/applications/gnash.desktop
+etc/gnashrc

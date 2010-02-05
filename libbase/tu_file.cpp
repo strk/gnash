@@ -5,10 +5,6 @@
 
 // A file class that can be customized with callbacks.
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "tu_file.h"
 #include "log.h"
 

@@ -21,9 +21,6 @@
 #ifndef GNASH_ASOBJ_RECTANGLE_H
 #define GNASH_ASOBJ_RECTANGLE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include "smart_ptr.h" // boost::intrusive_ptr
 

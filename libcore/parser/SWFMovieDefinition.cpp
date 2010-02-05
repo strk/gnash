@@ -47,6 +47,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
+#include <boost/thread.hpp>
 #include <iomanip>
 #include <memory>
 #include <string>

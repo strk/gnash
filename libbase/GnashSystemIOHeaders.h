@@ -35,7 +35,6 @@
 /// @todo A configure 'test' (a #define in gnashconfig.h) might be a better
 ///       way of checking for compiler.
 
-#include "gnashconfig.h"
 #if !defined(_MSC_VER)
 # include <unistd.h>
 #else

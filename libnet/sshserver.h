@@ -19,10 +19,6 @@
 #ifndef GNASH_SSH_SERVER_H
 #define GNASH_SSH_SERVER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <string>
 #include <boost/array.hpp>
 #include <map>

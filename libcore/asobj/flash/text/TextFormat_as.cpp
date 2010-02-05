@@ -31,6 +31,7 @@
 #include "smart_ptr.h" 
 #include "GnashNumeric.h"
 #include "Array_as.h"
+#include "fontlib.h"
 
 
 namespace gnash {
@@ -38,36 +39,81 @@ namespace gnash {
 // Functions and templates for reducing code duplication.
 namespace {
 
-struct
-PositiveTwips
+/// Set functors may need access to fn_call resources, e.g. SWF version.
+//
+/// Currently only as_value::to_string() needs this, but in future other
+/// conversions may follow.
+struct SetBase
 {
+    SetBase(const fn_call& fn) : _fn(fn) {}
+    const fn_call& fn() const {
+        return _fn;
+    }
+private:
+    const fn_call& _fn;
+};
+
+/// Convert pixels to twips, treating negative values as 0.
+struct
+PositiveTwips : SetBase
+{
+    PositiveTwips(const fn_call& fn) : SetBase(fn) {}
     int operator()(const as_value& val) const {
         return pixelsToTwips(std::max<int>(toInt(val), 0));
     }
 };
 
+/// Convert an argument from a number of pixels into twips.
 struct
-TwipsToPixels
+PixelsToTwips : SetBase
 {
-    template<typename T> double operator()(const T& t) const {
-        return twipsToPixels(t);
+    PixelsToTwips(const fn_call& fn) : SetBase(fn) {}
+    boost::int32_t operator()(const as_value& val) const {
+        return pixelsToTwips(val.to_number());
     }
 };
 
-
+/// Convert the as_value to a boolean.
 struct
-ToBool
+ToBool : SetBase
 {
+    ToBool(const fn_call& fn) : SetBase(fn) {}
     bool operator()(const as_value& val) const {
         return val.to_bool();
     }
 };
 
+/// Convert the as_value to a string.
+struct
+ToString : SetBase
+{
+    ToString(const fn_call& fn) : SetBase(fn) {}
+    std::string operator()(const as_value& val) const {
+        return val.to_string(getSWFVersion(fn()));
+    }
+};
+
+
+/// Get functors.
+//
+/// Conversions and processing are done when setting, so these functors should
+/// be relatively simple.
+
+/// Do nothing, i.e. return exactly the same argument that was passed.
 struct
 Nothing
 {
     template<typename T> const T& operator()(const T& val) const {
         return val;
+    }
+};
+
+/// Convert internal twip values to pixel values for ActionScript.
+struct
+TwipsToPixels
+{
+    template<typename T> double operator()(const T& t) const {
+        return twipsToPixels(t);
     }
 };
 
@@ -96,7 +142,9 @@ struct Set
             return as_value();
         }
 
-        (relay->*F)(P()(arg));
+        // The function P takes care of converting the argument to the
+        // required type.
+        (relay->*F)(P(fn)(arg));
         return as_value();
     }
 
@@ -110,7 +158,7 @@ struct Set
 /// @tparam F       The function to call to retrieve the value.
 /// @tparam P       A function object to be applied to the argument before
 ///                 returning the value.
-template<typename T, typename U, const Optional<U>&(T::*F)(),
+template<typename T, typename U, const Optional<U>&(T::*F)() const,
     typename P = Nothing>
 struct Get
 {
@@ -150,17 +198,13 @@ namespace {
 	TextField::TextAlignment parseAlignString(const std::string& align);
 	TextField::TextFormatDisplay parseDisplayString(const std::string& display);
 
+    /// Align works a bit differently, so is currently not a template.
+    as_value textformat_align(const fn_call& fn);
+
+    /// Display is never null, so not a template.
 	as_value textformat_display(const fn_call& fn);
 	as_value textformat_tabStops(const fn_call& fn);
-	as_value textformat_blockIndent(const fn_call& fn);
-	as_value textformat_leading(const fn_call& fn);
-	as_value textformat_indent(const fn_call& fn);
-	as_value textformat_align(const fn_call& fn);
-	as_value textformat_target(const fn_call& fn);
-	as_value textformat_url(const fn_call& fn);
 	as_value textformat_color(const fn_call& fn);
-	as_value textformat_size(const fn_call& fn);
-	as_value textformat_font(const fn_call& fn);
 	as_value textformat_getTextExtent(const fn_call& fn);
 
 }
@@ -199,20 +243,41 @@ registerTextFormatNative(as_object& o)
     // instead of one function for both. Needs testing.
     vm.registerNative(textformat_new, 110, 0);
     
-    vm.registerNative(textformat_font, 110, 1);
-    vm.registerNative(textformat_font, 110, 2);
+    vm.registerNative(
+            Get<const TextFormat_as, std::string, &TextFormat_as::font>::get,
+            110, 1);
+    vm.registerNative(
+            Set<TextFormat_as, std::string, &TextFormat_as::fontSet,
+            ToString>::set, 
+            110, 2);
     
-    vm.registerNative(textformat_size, 110, 3);
-    vm.registerNative(textformat_size, 110, 4);
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint16_t,
+            &TextFormat_as::size, TwipsToPixels>::get,
+            110, 3);
+    vm.registerNative(
+            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::sizeSet,
+            PixelsToTwips>::set, 
+            110, 4);
     
     vm.registerNative(textformat_color, 110, 5);
     vm.registerNative(textformat_color, 110, 6);
     
-    vm.registerNative(textformat_url, 110, 7);
-    vm.registerNative(textformat_url, 110, 8);
+    vm.registerNative(
+            Get<const TextFormat_as, std::string, &TextFormat_as::url>::get,
+            110, 7);
+    vm.registerNative(
+            Set<TextFormat_as, std::string, &TextFormat_as::urlSet,
+            ToString>::set, 
+            110, 8);
     
-    vm.registerNative(textformat_target, 110, 9);
-    vm.registerNative(textformat_target, 110, 10);
+    vm.registerNative(
+            Get<const TextFormat_as, std::string, &TextFormat_as::target>::get,
+            110, 9);
+    vm.registerNative(
+            Set<TextFormat_as, std::string, &TextFormat_as::targetSet,
+            ToString>::set, 
+            110, 10);
     
     vm.registerNative(
             Get<const TextFormat_as, bool, &TextFormat_as::bold>::get,
@@ -259,22 +324,28 @@ registerTextFormatNative(as_object& o)
             PositiveTwips>::set, 
             110, 22);
 
-    vm.registerNative(textformat_indent, 110, 23);
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint16_t,
+            &TextFormat_as::indent,
+            TwipsToPixels>::get, 110, 23);
     vm.registerNative(
             Set<TextFormat_as, boost::uint16_t, &TextFormat_as::indentSet,
             PositiveTwips>::set, 
             110, 24);
     
-    vm.registerNative(textformat_leading, 110, 25);
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint16_t,
+            &TextFormat_as::leading,
+            TwipsToPixels>::get, 110, 25);
     vm.registerNative(
             Set<TextFormat_as, boost::uint16_t, &TextFormat_as::leadingSet,
             PositiveTwips>::set, 
             110, 26);
 
-    vm.registerNative(textformat_blockIndent, 110, 27);
-
-    // Note: this behaves differently in SWF8, so perhaps best not to use
-    // the template.
+    vm.registerNative(
+            Get<const TextFormat_as, boost::uint32_t,
+            &TextFormat_as::blockIndent,
+            TwipsToPixels>::get, 110, 27);
     vm.registerNative(
             Set<TextFormat_as, boost::uint32_t, &TextFormat_as::blockIndentSet,
             PositiveTwips>::set,
@@ -285,7 +356,7 @@ registerTextFormatNative(as_object& o)
 
     vm.registerNative(
             Get<const TextFormat_as, bool, &TextFormat_as::bullet,
-            ToBool>::get, 110, 31);
+            Nothing>::get, 110, 31);
     vm.registerNative(
             Set<TextFormat_as, bool, &TextFormat_as::bulletSet,
             ToBool>::set, 
@@ -427,54 +498,20 @@ textformat_tabStops(const fn_call& fn)
 }
 
 as_value
-textformat_blockIndent(const fn_call& fn)
+textformat_color(const fn_call& fn)
 {
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
 	as_value ret;
 
-	if (fn.nargs == 0) 
-	{
-		if (relay->blockIndent()) {
-            ret.set_double(twipsToPixels(*relay->blockIndent()));
-        }
+	if (fn.nargs == 0) {
+		if (relay->color()) ret.set_double(relay->color()->toRGB());
 		else ret.set_null();
 	}
-
-	return ret;
-}
-
-as_value
-textformat_leading(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->leading()) ret.set_double(twipsToPixels(*relay->leading()));
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->leadingSet(pixelsToTwips(toInt(fn.arg(0))));
-	}
-
-	return ret;
-}
-
-as_value
-textformat_indent(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->indent()) ret.set_double(twipsToPixels(*relay->indent()));
-		else ret.set_null();
+	else {
+		rgba newcolor;
+		newcolor.parseRGB(toInt(fn.arg(0)));
+		relay->colorSet(newcolor);
 	}
 
 	return ret;
@@ -485,133 +522,115 @@ textformat_align(const fn_call& fn)
 {
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 
-	as_value ret;
+    as_value ret;
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->align()) {
+    if (fn.nargs == 0) {
+        if (relay->align()) {
             ret.set_string(getAlignString(*relay->align()));
         }
         else ret.set_null();
-	}
-	else // setter
-	{
-		relay->alignSet(fn.arg(0).to_string());
-	}
+    }
+    else // setter
+    {
+        relay->alignSet(fn.arg(0).to_string());
+    }
 
-	return ret;
-}
-
-as_value
-textformat_target(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->target()) ret.set_string(*relay->target());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->targetSet(fn.arg(0).to_string());
-	}
-
-	return ret;
-}
-
-as_value
-textformat_url(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->url()) ret.set_string(*relay->url());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->urlSet(fn.arg(0).to_string());
-	}
-
-	return ret;
-}
-
-as_value
-textformat_color(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->color()) ret.set_double(relay->color()->toRGB());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		rgba newcolor;
-		newcolor.parseRGB(toInt(fn.arg(0)));
-		relay->colorSet(newcolor);
-	}
-
-	return ret;
-}
-
-as_value
-textformat_size(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->size()) ret.set_double(twipsToPixels(*relay->size()));
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->sizeSet(pixelsToTwips(toInt(fn.arg(0))));
-	}
-
-	return ret;
-}
-
-as_value
-textformat_font(const fn_call& fn)
-{
-    TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-
-	as_value ret;
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		if (relay->font()) ret.set_string(*relay->font());
-		else ret.set_null();
-	}
-	else // setter
-	{
-		relay->fontSet(fn.arg(0).to_string());
-	}
-
-	return ret;
+    return ret;
 }
 
 
+/// Return various dimensions of a theoretical run of text
+//
+/// The TextFormat's format values are used to calculate what the dimensions
+/// of a TextField would be if it contained the given text.
+//
+/// This may never apply to embedded fonts. There is no way to instruct the
+/// function to use embedded fonts, so it makes sense if it always chooses
+/// the device font.
+//
+/// TODO: this duplicates other functionality in TextField; ideally both
+/// should be fixed, tested, and merged.
 as_value
 textformat_getTextExtent(const fn_call& fn)
 {
+
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
-    UNUSED(relay);
-	LOG_ONCE( log_unimpl("TextFormat.getTextExtent") );
-	return as_value();
+    
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("TextFormat.getTextExtent requires at least one"
+                "argument");
+        );
+        return as_value();
+    }
+
+    const int version = getSWFVersion(fn);
+    const std::string& s = fn.arg(0).to_string(version);
+
+    // Everything must be in twips here.
+
+    double tfw;
+    bool limitWidth = false;
+    if (fn.nargs > 1) {
+        limitWidth = true;
+        tfw = pixelsToTwips(fn.arg(1).to_number());       
+    }
+    else {
+        tfw = 0;
+    }
+
+    const bool bold = relay->bold() ? *relay->bold() : false;
+    const bool italic = relay->italic() ? *relay->italic() : false;
+    const double size = relay->size() ? *relay->size() : 240;
+
+    // Note: currently leading is never defined for device fonts, and since
+    // getTextExtent currently only takes account of device fonts we don't
+    // need it.
+
+    Font* f = relay->font() ?
+        fontlib::get_font(*relay->font(), bold, italic) :
+        fontlib::get_default_font().get();
+    
+    /// Advance, descent, ascent given according to square of 1024.
+    //
+    /// An ascent of 1024 is equal to the whole size of the character, so
+    /// 240 twips for a size 12.
+    const double scale = size / static_cast<double>(f->unitsPerEM(false));
+
+    double height = size;
+    double width = 0;
+    double curr = 0;
+    
+    const double ascent = f->ascent(false) * scale;
+    const double descent = f->descent(false) * scale;
+
+    for (std::string::const_iterator it = s.begin(), e = s.end();
+            it != e; ++it) {
+
+        int index = f->get_glyph_index(*it, false);
+        const double advance = f->get_advance(index, false) * scale;
+        if (limitWidth && (curr + advance > width)) {
+            curr = 0;
+            height += size;
+        }
+        curr += advance;
+        width = std::max(width, curr);
+
+    }
+
+    Global_as& gl = getGlobal(fn);
+    as_object* obj = new as_object(gl);
+
+    obj->init_member("textFieldHeight", twipsToPixels(height) + 4);
+    obj->init_member("textFieldWidth",
+            limitWidth ? twipsToPixels(tfw) : twipsToPixels(width) + 4);
+    obj->init_member("width", twipsToPixels(width));
+    obj->init_member("height", twipsToPixels(height));
+    obj->init_member("ascent", twipsToPixels(ascent));
+    obj->init_member("descent", twipsToPixels(descent));
+
+    return as_value(obj);
+
 }
 
 

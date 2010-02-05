@@ -22,7 +22,6 @@ pkglib_LTLIBRARIES =  libgnashsound.la
 
 libgnashsound_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
-	-I$(top_srcdir)/libcore	\
 	-I$(top_srcdir)/libmedia \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
@@ -67,7 +66,7 @@ if WIN32
   libgnashsound_la_LDFLAGS += -no-undefined
   libgnashsound_la_LIBADD += \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libcore/libgnashcore.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	-lintl
 endif
 

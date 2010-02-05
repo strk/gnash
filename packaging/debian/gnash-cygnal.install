@@ -1,2 +1,4 @@
+/etc/cygnalrc
 usr/bin/cygnal
 usr/lib/cygnal/plugins/*.so
+usr/share/man/man1/cygnal.1

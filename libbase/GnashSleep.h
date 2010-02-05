@@ -20,10 +20,6 @@
 #ifndef GNASH_SLEEP_H
 #define GNASH_SLEEP_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 // Headers for sleep
 #if defined(_WIN32) || defined(WIN32)
 # include <windows.h>

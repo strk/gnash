@@ -2,11 +2,11 @@
   <title>Software Internals</title>
   
   <sect1 id="tour">
-    <title>A Tour of Gnash</title>
+    <title>A Tour of &app;</title>
     
     <para>
-      The top level of Gnash has several libraries, <emphasis>libgnashbase</emphasis>,
-      <emphasis>libgnashserver</emphasis>,
+      The top level of &app; has several libraries, <emphasis>libgnashbase</emphasis>,
+      <emphasis>libgnashcore</emphasis>,
       <emphasis>libgnashmedia</emphasis>,
       <emphasis>libgnashamf</emphasis> and
       <emphasis>libgnashbackend</emphasis>. There are several utility programs 
@@ -34,12 +34,12 @@
 	</para>	
       </sect3>
       
-      <sect3 id="libgnashserver">
-	<title>libgnashserver</title>
+      <sect3 id="libgnashcore">
+	<title>libgnashcore</title>
 	<para>
-	  Libgnashserver is the guts of the interpreter itself. This is where
-	  the main code for the interpreter lives. Includes in
-	  libserver are the two support libraries for the parser and
+	  Libgnashcore is the guts of the interpreter itself. This is where
+	  the main code for the interpreter lives. Included in
+	  libcore are the two support libraries for the parser and
 	  the core of the virtual machine.
 	</para>
       </sect3>
@@ -47,12 +47,19 @@
       <sect3 id="libgnashmedia">
 	<title>libgnashmedia</title>
 	<para>
-		Libgnashmedia handles Gnash's audio and video capabilities,
-		dealing with streamed video and sound as well as decoding
-		embedded media frames. Besides the standard SWF formats
+        Libgnashmedia handles &app;'s decoding of video and audio,
+        including both streamed and embedded media.
+		Besides the standard SWF formats
 		FLV, MPEG4, Nellymoser, ADPCM, MP3 and RAW, &app; can 
 		decode other formats supports by Gstreamer or FFmpeg, 
 		including the free OGG container and free codecs.
+	</para>
+</sect3>
+
+      <sect3 id="libgnashsound">
+	<title>libgnashsound</title>
+    <para>
+        This library handles sound output and manages sound objects.
 	</para>
       </sect3>
 
@@ -60,7 +67,7 @@
 	<title>libgnashamf</title>
 	<para>
 	  AMF is the data format used internally by SWF files. This is
-	  Gnash's support library to handle AMF data. This is used by
+	  &app;'s support library to handle AMF data. This is used by
 	  the ActionScript classes SharedObject and
 	  LocalConnection. This is also used by the NetStream class
 	  when using thre RTMP streaming network protocol.
@@ -72,7 +79,7 @@
 	
 	<para>
 	  Libgnashbackend is a library containing the rendering
-	  code that glues this display to the Gnash. Supported
+	  code that glues this display to the &app;. Supported
 	  rendering backends are OpenGL, Cairo, and AGG.
 	</para>
       </sect3>
@@ -99,8 +106,8 @@
       <title>The Applications</title>
       
       <para>
-	    There are currently a few standalone programs in Gnash,
-        which serve either to assist with Gnash development or to play SWF
+	    There are currently a few standalone programs in &app;,
+        which serve either to assist with &app; development or to play SWF
         movies.
       </para>
 
@@ -110,7 +117,7 @@
 	<para>
 	  This is the standalone OpenGL backend used to play
 	  movies. There are several command line options and keyboard
-	  control keys used by Gnash.
+	  control keys used by &app;.
 	</para>
 
       </sect3>
@@ -122,7 +129,7 @@
 	  Gprocessor is used to print out the actions (using the -va
 	  option) or the parsing (using the -vp option) of a SWF
 	  movie. It is also used to produce the <emphasis>.gsc</emphasis>
-	  files that Gnash uses to cache data, thereby speeding up the
+	  files that &app; uses to cache data, thereby speeding up the
 	  loading of files.
 	</para>
 
@@ -166,12 +173,8 @@
 	  fashion similar to MozPlugger: the standalone player
 	  is used instead of using a thread. This gets around the
 	  issue of having to maintain a separate player to support the
-	  plugin. It also gets around the other issues that Gnash
+	  plugin. It also gets around the other issues that &app;
 	  itself is not thread safe at this time.
-	</para>
-	<para>
-	  As of Jan, 2007, streaming video, ala &quot;YouTube&quot;
-	  works, along with other video sharing sites.
 	</para>
       </sect3>
 
@@ -187,7 +190,7 @@
 	</para>
 
 	<para>
-	  Gnash can use either several different GUI toolkits to create the window,
+	  &app; can use either several different GUI toolkits to create the window,
 	  and to handle events for the standalone player.
 	</para>
 	
@@ -196,7 +199,7 @@
 	  platforms, including win32. It has no support for event
 	  handling, which means mouse clicks, keyboard presses, and
 	  window resizing doesn't work. I personally find the default
-	  event handler slow and unresponsive. Gnash has support to
+	  event handler slow and unresponsive. &app; has support to
 	  use fast events, (currently not enabled) which is an SDL
 	  hack using a background thread to pump events into the SDL
 	  event queue at a much higher rate.
@@ -218,7 +221,7 @@
 	</para>
 
 	<para>
-	  GTK also allows Gnash to have menus and dialog
+	  GTK also allows &app; to have menus and dialog
 	  boxes. Currently this is only being utilized in a limited
 	  fashion for now. There is a right mouse button menu that
 	  allows the user to control the movie being player the same
@@ -227,73 +230,13 @@
 
       </sect3>
       
-      <sect3 id="mozplugger">
-	<title>Mozplugger</title>
-
-	<para>
-	  <ulink type="http"
-	 url="http://mozplugger.mozdev.org/">Mozplugger</ulink> is a
-	  <emphasis>Mozilla/Firefox</emphasis> plugin that uses external
-	  programs to play video, audio, and other multimedia content
-	  in the browser. With some support added to the external
-	  application, it's possible to force the external program to
-	  use the internal window in the browser where this plugin is
-	  supposed to display. This enables one to then run the
-	  standalone player and display its output in the browser.
-	</para>
-
-	<para>
-	  While this is not an optimal solution, it does enable one to
-	  use Gnash as the SWF player when browsing. The main issue
-	  appears to be that the SWF movie being played doesn't get
-	  any mouse or keyboard input. That may be a mozplugger
-	  configuration issue, however.
-	</para>
-
-	<para>
-	  Use of MozPlugger is obsolete now that the Gnash plugin
-	  works. Still, this may be useful still on some platforms.
-	</para>
-
-	<para>
-	  Add this to your <emphasis>$(HOME)/.mozilla/mozpluggerrc</emphasis>
-	  file to enable this:
-
-	  <programlisting>
-	    application/x-shockwave-flash:swf:Shockwave Gnash
-        nokill embed noisy ignore_errors hidden fill swallow(Gnash) loop: gnash -v "$file" -x $window
-        : gnash -v "$file" -x $window
-	  </programlisting>
-	</para>
-
-	<para>
-	  Once this is added, you must delete the
-	  <emphasis>$(HOME)/.mozilla/firefox/pluginreg.dat</emphasis> file to
-	  force Firefox to register the plugins again. This is an
-	  ASCII text file, so if the patch has been added correctly,
-	  you'll see an entry for <emphasis>swf</emphasis> files after it is
-	  recreated. You will need to restart Firefox to recreate this
-	  file.
-	</para>
-
-	<para>
-	  This file is not recreated immediately when restarting
-	  Firefox, but waits till the first time a plugin is used. You
-	  can force creation of this file by typing
-	  <emphasis>about:plugins</emphasis> into the URL entry of the browser
-	  window. The output will also contain information about the
-	  mozplugger. You should see an entry for Gnash now.
-	</para>
-	
-      </sect3>
-
       <sect3 id="Klash">
 	<title>Klash</title>
 	<para>
 	  Klash is MozPlugger type support for KDE's Konqueror web
-	  browser. Klash makes Gnash a <emphasis>kpart</emphasis>, so it's
+	  browser. Klash makes &app; a <emphasis>kpart</emphasis>, so it's
 	  integrated into KDE better than when using MozPlugger. Klash
-	  uses the standalone player, utilizing Gnash's "-x" window
+	  uses the standalone player, utilizing &app;'s "-x" window
 	  plugin command line option.
 	</para>
 
@@ -312,12 +255,11 @@
   </sect1>
 
   <sect1 id="soundhandlers">
-    <title>Sound handling in Gnash</title>
+    <title>Sound handling in &app;</title>
 
     <para>
-      When a SWF-file contains audio Gnash uses its sound handlers to play it.
-      At the moment there are two sound handlers, but it is likely that more 
-      will be made.
+        Sound in &app; is handled by libgnashsound. This library takes
+        care of interfacing with a sound handler.
     </para>
 
     <para>
@@ -342,7 +284,7 @@
      <sect2 id="soundparsing">
       <title>Sound parsing</title>
       <para>
-        When Gnash parses a SWF-file, it creates a sound handler if possible
+        When &app; parses a SWF-file, it creates a sound handler if possible
 	and hands over the sounds to it. Since the event-sounds are contained 
 	in one frame, the entire event-sound is retrieved at once, while a 
 	soundstream maybe not be completely retrieved before the entire 
@@ -354,7 +296,7 @@
     <sect2 id="soundplayback">
       <title>Sound playback</title>
       <para>
-	When a sound is about to be played Gnash calls the sound handler, which
+	When a sound is about to be played &app; calls the sound handler, which
 	then starts to play the sound and return. All the playing is done by
 	threads (in both SDL and Gstreamer), so once 
 	started the audio and graphics are not sync'ed with each other, which
@@ -371,13 +313,13 @@
 	making it difficult to implement needed features such as support 
 	for soundstreams. 
 	The SDL sound backend supports both event-sounds and soundstreams,
-	using Gnash's internal ADPCM, and optionally MP3 support, using
+	using &app;'s internal ADPCM, and optionally MP3 support, using
 	FFMPEG.
 	When it receives sound data it is stored without being decoded, unless
 	it is ADPCM, which is decoded in the parser. When playing, backend
 	relies on a function callback for retrieving output sound, which is 
 	decoded and re-sampled if needed, and all sound output is mixed together.
-	The current SDL sound backend was made since Gnash needed a working
+	The current SDL sound backend was made since &app; needed a working
 	sound backend as soon as possible, and since the gstreamer backend at
 	the time suffered from bugs and/or lack of features in gstreamer. The
 	result was the most complete and best sound handler so far.
@@ -405,22 +347,12 @@
       </para>
     </sect2>
 
-    <sect2 id="audio-future">
-      <title>Future audio backends</title>
-      <para>
-	It would probably be desirable to make more backends in the future,
-	either because other and better backend systems are brought to our
-	attention, or perhaps because an internal sound handling is better
-	suited for embedded platform with limited software installed. 
-      </para>
-    </sect2>
-
     <sect2 id="gstreamer-details">
       <title>Detailed description of the Gstreamer backend</title>
       <para>
 	Gstreamer uses pipelines, bins and elements. Pipelines are the
 	main bin, where all other bins or elements are places. Visually the
-	audio pipeline in Gnash looks like this: 
+	audio pipeline in &app; looks like this: 
       </para>
 
       <programlisting>
@@ -465,7 +397,7 @@
 	When a sound is done being played it emits a End-Of-Stream-signal
 	(EOS), which is caught by an event-handler-callback, which then makes
 	sure that the bin in question is removed from the pipeline. When a
-	sound is told by Gnash to stop playback before it has ended playback,
+	sound is told by &app; to stop playback before it has ended playback,
 	we do something (not yet finally implemented), which makes the bin emit
 	an EOS, and the event-handler-callback will remove the sound from the
 	pipeline. Unfortunately Gstreamer currently has a bug which causes the
@@ -488,16 +420,16 @@
 
      <para>
        <link linkend="runtests">Instructions on running tests</link>
-       can be found in the section on building Gnash.
+       can be found in the section on building &app;.
      </para>
 
     <sect2 id="testtools">
       <title>Testing Tools</title>
 
       <para>
-	Currently Gnash uses three other tools to help with
+	Currently &app; uses three other tools to help with
 	testing. Two of these are free compilers for the SWF
-	format. This lets us write simple test cases for Gnash to test
+	format. This lets us write simple test cases for &app; to test
 	specific features, and to see how the features operate.
       </para>
 
@@ -643,7 +575,7 @@
 	Producing tests using Ming has the advantage that you can easily see
 	and modify the full source code for the SWF movie, and you can use
 	some <link linkend="ming_testgenerator_facilities">facilities</link>
-	provided by the Gnash testing framework to easily run tests.
+	provided by the &app; testing framework to easily run tests.
       </para>
 
       <para>
@@ -712,7 +644,7 @@
 	by simply running them with whatever Player you might have.
 	Any 'check' or 'check_equals' result will be both traced and
 	printed in a textfield. You can use 'gprocessor -v' to have
-	Gnash use them as tests.
+	&app; use them as tests.
       </para>
       
       <para>
@@ -728,7 +660,7 @@
       <para>
 	If you want/need to use a different compiler for your test cases (there's
 	plenty of open source tools for generating SWF out there), you can still
-	make use of a loadable SWF utility provided as part of the Gnash testsuite
+	make use of a loadable SWF utility provided as part of the &app; testsuite
 	to let your test consistent with the rest of the suite.
       </para>
       
@@ -946,11 +878,11 @@
 	<title>Using the generic test runner for self-contained SWF tests</title>
 	
 	<para>
-	  The simplest test runner is one that simply invokes Gnash
+	  The simplest test runner is one that simply invokes &app;
 	  in verbose mode against a self-contained SWF test movie.
 	  Self-contained SWF test movies are the ones that print
 	  the PASSED/FAILED etc. lines using ActionScript (traces).
-	  By invoking Gnash in verbose mode this movie will behave
+	  By invoking &app; in verbose mode this movie will behave
 	  as a compliant "Test Runner".
 	</para>
 	
@@ -1000,7 +932,7 @@
 	<title>Writing Movie testers</title>
 	
 	<para>
-	  There are some parts of Gnash that can NOT be tested
+	  There are some parts of &app; that can NOT be tested
 	  by only using ActionScript tests. Examples include: frame
 	  advancements, actual actions execution, gui events and so on.
 	</para>

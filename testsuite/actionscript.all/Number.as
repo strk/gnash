@@ -594,6 +594,28 @@ check_equals(a, 2);
 a=new Number(new String(" 2"));
 check_equals(a, 2); 
 
+a=new Number(new String(" -2"));
+check_equals(a, -2); 
+
+a=new Number(new String(" -2e-5"));
+check_equals(a, -0.00002); 
+
+a=new Number(new String(" -2e5"));
+check_equals(a, -200000); 
+
+a=new Number(new String("-56e"));
+check_equals(a, -56); 
+
+a=new Number(new String("-56eu"));
+check_equals(a.toString(), "NaN"); 
+
+a=new Number(new String("-56e-"));
+check_equals(a, -56); 
+
+a=new Number(new String("-56e+"));
+check_equals(a, -56); 
+
+
 a=new Number("0x2");
 #if OUTPUT_VERSION < 6
  check(isNaN(a));
@@ -657,11 +679,11 @@ check( isNaN(0/0) );
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(230);
+ check_totals(237);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(225);
+ check_totals(232);
 #else
- check_totals(223);
+ check_totals(230);
 #endif
 #endif

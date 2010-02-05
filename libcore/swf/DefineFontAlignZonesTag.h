@@ -20,14 +20,11 @@
 #ifndef GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
 #define GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 // Forward declarations
 namespace gnash {
 	class movie_definition;
 	class SWFStream;
+	class RunResources;
 }
 
 namespace gnash {

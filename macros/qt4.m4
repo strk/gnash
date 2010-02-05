@@ -60,7 +60,7 @@ dnl     fi
      AC_MSG_CHECKING([for QT 4.x headers])
     if test x$cross_compiling = xno; then
       if test x"${PKG_CONFIG}" != x -a x"${ac_cv_path_qt4_incl}" = x; then
-        ${PKG_CONFIG} --exists QtCore QtGui && ac_cv_path_qt4_incl="`$PKG_CONFIG --cflags-only-I QtCore QtGui`"
+        ${PKG_CONFIG} --exists  QtOpenGL QtCore QtGui && ac_cv_path_qt4_incl="`$PKG_CONFIG --cflags-only-I QtOpenGL QtCore QtGui`"
 	gnash_qt4_topdir=`echo "${ac_cv_path_qt4_incl}" | sed -e 's/-I//g' | cut -d ' ' -f 1`
       fi
     fi
@@ -89,7 +89,7 @@ dnl     fi
     dnl this is a list of al the libraries supported by QT 4.x, but we don't need all of
     dnl then, but we might as well get all the paths, as header files ofteninclude other
     dnl header files.
-    all_qt4_libs="QtCore QtGui QtXml QtDBus QtNetwork QtOpenGL QtScript QtSql QtTest QtSvg QtWebKit"
+    all_qt4_libs="QtCore QtGui QtOpenGL QtXml QtDBus QtNetwork QtScript QtSql QtTest QtSvg QtWebKit"
     for i in ${all_qt4_libs}; do
       dnl Darwin is easy, everything is in the same location on all machines.
       if test x"${darwin}" = xyes; then

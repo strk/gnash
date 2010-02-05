@@ -28,10 +28,6 @@
 //	  change the mouse cursor to the hand cursor standard for linkable 
 //    text
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "utf8.h"
 #include "log.h"
 #include "swf/DefineEditTextTag.h"
@@ -82,6 +78,9 @@ namespace gnash {
 
 // Forward declarations
 namespace {
+    const char* autoSizeValueName(TextField::AutoSize val);
+    TextField::AutoSize parseAutoSize(const std::string& val);
+
     void attachPrototypeProperties(as_object& proto);
     void attachTextFieldStaticMembers(as_object& o);
     void attachTextFieldInterface(as_object& o);
@@ -183,7 +182,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _wordWrap(def.wordWrap()),
     _html(def.html()),
     _selectable(!def.noSelect()),
-    _autoSize(def.autoSize() ? autoSizeLeft : autoSizeNone),
+    _autoSize(def.autoSize() ? AUTOSIZE_LEFT : AUTOSIZE_NONE),
     _type(def.readOnly() ? typeDynamic : typeInput),
     _bounds(def.bounds()),
     _selection(0, 0)
@@ -253,7 +252,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _wordWrap(false),
     _html(false),
     _selectable(true),
-    _autoSize(autoSizeNone),
+    _autoSize(AUTOSIZE_NONE),
     _type(typeDynamic),
     _bounds(bounds),
     _selection(0, 0)
@@ -411,7 +410,7 @@ TextField::display(Renderer& renderer)
 
     _displayRecords.clear();
     float scale = getFontHeight() /
-    static_cast<float>(_font->unitsPerEM(_embedFonts));
+        static_cast<float>(_font->unitsPerEM(_embedFonts));
     float fontLeading = _font->leading() * scale;
 
     //offset the lines
@@ -1015,8 +1014,7 @@ TextField::setTextFormat(TextFormat_as& tf)
 }
 
 float
-TextField::align_line(TextAlignment align,
-        int last_line_start_record, float x)
+TextField::align_line(TextAlignment align, int last_line_start_record, float x)
 {
 
     float width = _bounds.width(); 
@@ -1151,7 +1149,7 @@ TextField::format_text()
     // nothing more to do if text is empty
     if ( _text.empty() )
     {
-        // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
+        // TODO: should we still reset _bounds if autoSize != AUTOSIZE_NONE ?
         //       not sure we should...
         reset_bounding_box(0, 0);
         return;
@@ -1160,16 +1158,11 @@ TextField::format_text()
     LineStarts::iterator linestartit = _line_starts.begin();
     LineStarts::const_iterator linestartend = _line_starts.end();
 
-    AutoSizeValue autoSize = getAutoSize();
-    if ( autoSize != autoSizeNone )
-    {
-        // define GNASH_DEBUG_TEXT_FORMATTING on top to get useful info
-        //LOG_ONCE( log_debug(_("TextField.autoSize != 'none' TESTING")) );
-
+    AutoSize autoSize = getAutoSize();
+    if (autoSize != AUTOSIZE_NONE) {
         // When doing WordWrap we don't want to change
         // the boundaries. See bug #24348
-        if (!  doWordWrap() )
-        {
+        if (!doWordWrap()) {
             _bounds.set_to_rect(0, 0, 0, 0); // this is correct for 'true'
         }
     }
@@ -1178,24 +1171,22 @@ TextField::format_text()
     // to find the appropriate font to use, as ActionScript
     // code should be able to change the font of a TextField
     //
-    if (!_font)
-    {
+    if (!_font) {
         log_error(_("No font for TextField!"));
         return;
     }
 
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight /
-    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
-    float fontDescent = _font->descent() * scale; 
-    float fontLeading = _font->leading() * scale;
-    boost::uint16_t leftMargin = getLeftMargin();
-    boost::uint16_t indent = getIndent();
-    boost::uint16_t blockIndent = getBlockIndent();
-    bool underlined = getUnderlined();
+        static_cast<float>(_font->unitsPerEM(_embedFonts)); 
+    const float fontLeading = _font->leading() * scale;
+    const boost::uint16_t leftMargin = getLeftMargin();
+    const boost::uint16_t indent = getIndent();
+    const boost::uint16_t blockIndent = getBlockIndent();
+    const bool underlined = getUnderlined();
 
-    //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
-    //  getTarget(), fontDescent, fontLeading, fontHeight, scale);
+    /// Remember the current bounds for autosize.
+    SWFRect oldBounds(_bounds);
 
     SWF::TextRecord rec;    // one to work on
     rec.setFont(_font.get());
@@ -1203,7 +1194,7 @@ TextField::format_text()
     rec.setColor(getTextColor()); 
     rec.setXOffset(PADDING_TWIPS + 
             std::max(0, leftMargin + indent + blockIndent));
-    rec.setYOffset(PADDING_TWIPS + fontHeight + (fontLeading - fontDescent));
+    rec.setYOffset(PADDING_TWIPS + fontHeight + fontLeading);
     rec.setTextHeight(fontHeight);
 	
 	// create in textrecord.h
@@ -1243,7 +1234,7 @@ TextField::format_text()
     boost::int32_t y = static_cast<boost::int32_t>(rec.yOffset());
 
     // Start the bbox at the upper-left corner of the first glyph.
-    reset_bounding_box(x, y - fontDescent + fontHeight); 
+    //reset_bounding_box(x, y + fontHeight); 
     
     int last_code = -1; // only used if _embedFonts
     int last_space_glyph = -1;
@@ -1266,10 +1257,26 @@ TextField::format_text()
     handleChar(it, e, x, y, rec, last_code, last_space_glyph,
             last_line_start_record);
                 
-    // Expand bounding box to include the whole text (if autoSize)
-    if (_autoSize != autoSizeNone)
+    // Expand bounding box to include the whole text (if autoSize and wordWrap
+    // is not in operation.
+    if (_autoSize != AUTOSIZE_NONE && !doWordWrap())
     {
         _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
+
+        if (_autoSize == AUTOSIZE_RIGHT) {
+            /// Autosize right expands from the previous right margin.
+            SWFMatrix m;
+
+            m.tx = oldBounds.get_x_max() - _bounds.width();
+            m.transform(_bounds);
+        }
+        else if (_autoSize == AUTOSIZE_CENTER) {
+            // Autosize center expands from the previous center.
+            SWFMatrix m;
+            m.tx = oldBounds.get_x_min() + oldBounds.width() / 2.0 - 
+                _bounds.width() / 2.0;
+            m.transform(_bounds);
+        }
     }
 
     // Add the last line to our output.
@@ -1290,7 +1297,7 @@ TextField::scrollLines()
 {
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight /
-    static_cast<float>(_font->unitsPerEM(_embedFonts));
+        static_cast<float>(_font->unitsPerEM(_embedFonts));
     float fontLeading = _font->leading() * scale;
     _linesindisplay = _bounds.height() / (fontHeight + fontLeading + PADDING_TWIPS);
     if (_linesindisplay > 0) { //no need to place lines if we can't fit any
@@ -1338,7 +1345,7 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     LineStarts::const_iterator linestartend = _line_starts.end();
     
     float scale = _fontHeight /
-    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
+        static_cast<float>(_font->unitsPerEM(_embedFonts)); 
     float fontLeading = _font->leading() * scale;
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
@@ -1350,13 +1357,13 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     align_line(getTextAlignment(), last_line_start_record, x);
 
     // Expand bounding box to include last column of text ...
-    if ( _autoSize != autoSizeNone ) 
-    {
+    if (!doWordWrap() && _autoSize != AUTOSIZE_NONE) {
         _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
     }
 
     // new paragraphs get the indent.
-    x = std::max(0, getLeftMargin() + getIndent() + getBlockIndent()) + PADDING_TWIPS;
+    x = std::max(0, getLeftMargin() + getIndent() + getBlockIndent()) +
+        PADDING_TWIPS;
     y += div * (getFontHeight() + leading);
     if (y >= _bounds.height()) {
         ++_maxScroll;
@@ -1424,8 +1431,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
     LineStarts::const_iterator linestartend = _line_starts.end();
     
     float scale = _fontHeight /
-    static_cast<float>(_font->unitsPerEM(_embedFonts)); 
-    float fontDescent = _font->descent() * scale; 
+        static_cast<float>(_font->unitsPerEM(_embedFonts)); 
+    float fontDescent = _font->descent(_embedFonts) * scale; 
     float fontLeading = _font->leading() * scale;
     float leading = getLeading();
     leading += fontLeading * scale; // not sure this is correct...
@@ -1522,15 +1529,17 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         //parsing went wrong
                         continue;
                     } else {
-                        //Don't think this is the best way to match with tags...
-                        //Also, assumes tags are properly nested. This is acceptable
-                        //assumption
+                        // Don't think this is the best way to match with
+                        // tags...
+                        // TODO: assumes tags are properly nested. This isn't
+                        // correct.
                         if (s == "U") {
                             //underline
                             newrec.setUnderline(true);
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "A") {
+                        }
+                        else if (s == "A") {
                             // anchor (blue text).
 							rgba color(0, 0, 0xff, 0xff);
 							newrec.setColor(color);
@@ -1545,14 +1554,16 @@ TextField::handleChar(std::wstring::const_iterator& it,
 							}
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "B") {
+                        }
+                        else if (s == "B") {
                             //bold
                             Font* boldfont = new Font(rec.getFont()->name(),
                                     true, rec.getFont()->isItalic());
                             newrec.setFont(boldfont);
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "FONT") {
+                        }
+                        else if (s == "FONT") {
                             //font
                             boost::uint16_t originalsize = _fontHeight;
                             attloc = attributes.find("COLOR");
@@ -1616,12 +1627,14 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
                             _fontHeight = originalsize;
                             y = newrec.yOffset();
-                        } else if (s == "IMG") {
+                        }
+                        else if (s == "IMG") {
                             //image
                             log_unimpl("<img> html tag in TextField");
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "I") {
+                        }
+                        else if (s == "I") {
                             //italic
                             Font* italicfont = new Font(rec.getFont()->name(),
                                     rec.getFont()->isBold(), true);
@@ -1651,12 +1664,14 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
 							newLine(x, y, newrec, last_space_glyph,
                                     last_line_start_record, 1.0);
-                        } else if (s == "SPAN") {
+                        }
+                        else if (s == "SPAN") {
                             //span
                             log_unimpl("<span> html tag in TextField");
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
-                        } else if (s == "TEXTFORMAT") {
+                        }
+                        else if (s == "TEXTFORMAT") {
                             log_debug("in textformat");
                             //textformat
                             boost::uint16_t originalblockindent = getBlockIndent();
@@ -1734,10 +1749,10 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             setLeftMargin(originalleftmargin);
                             setRightMargin(originalrightmargin);
                             setTabStops(originaltabstops);
-                        } else if (s == "P") {
+                        }
+                        else if (s == "P") {
                             //paragraph
-                            if (_display == TEXTFORMAT_BLOCK)
-                            {
+                            if (_display == TEXTFORMAT_BLOCK) {
                                 handleChar(it, e, x, y, newrec, last_code,
                                         last_space_glyph,
                                         last_line_start_record);
@@ -1746,17 +1761,18 @@ TextField::handleChar(std::wstring::const_iterator& it,
 								newLine(x, y, rec, last_space_glyph,
                                         last_line_start_record, 1.5);
                             }
-                            else
-                            {
+                            else {
                                 handleChar(it, e, x, y, newrec, last_code,
                                         last_space_glyph,
                                         last_line_start_record);
                             }
-                        } else if (s == "BR") {
+                        }
+                        else if (s == "BR" || s == "SBR") {
                             //line break
 							newLine(x, y, rec, last_space_glyph,
 										last_line_start_record, 1.0);
-                        } else {
+                        }
+                        else {
                             log_debug("<%s> tag is unsupported", s);
                             if (!selfclosing) { //then recurse, look for closing tag
                             handleChar(it, e, x, y, newrec, last_code,
@@ -1850,7 +1866,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
 #endif
 
             // No wrap and no resize: truncate
-            if (!doWordWrap() && getAutoSize() == autoSizeNone)
+            if (!doWordWrap() && getAutoSize() == AUTOSIZE_NONE)
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
                 log_debug(" wordWrap=false, autoSize=none");
@@ -2615,47 +2631,6 @@ TextField::setFontHeight(boost::uint16_t h)
 }
 
 
-TextField::AutoSizeValue
-TextField::parseAutoSizeValue(const std::string& val)
-{
-    StringNoCaseEqual cmp;
-
-    if ( cmp(val, "left") )
-    {
-        return autoSizeLeft;
-    }
-    if ( cmp(val, "right") )
-    {
-        return autoSizeRight;
-    }
-    if ( cmp(val, "center") )
-    {
-        return autoSizeCenter;
-    }
-    return autoSizeNone;
-
-}
-
-
-const char*
-TextField::autoSizeValueName(AutoSizeValue val)
-{
-    switch (val)
-    {
-        case autoSizeLeft:
-            return "left";
-        case autoSizeRight:
-            return "right";
-        case autoSizeCenter:
-            return "center";
-        case autoSizeNone:
-        default:
-            return "none";
-    }
-
-}
-
-
 TextField::TypeValue
 TextField::parseTypeValue(const std::string& val)
 {
@@ -2687,7 +2662,7 @@ TextField::typeValueName(TypeValue val)
 }
 
 void
-TextField::setAutoSize(AutoSizeValue val)
+TextField::setAutoSize(AutoSize val)
 {
     if ( val == _autoSize ) return;
 
@@ -2701,9 +2676,21 @@ TextField::TextAlignment
 TextField::getTextAlignment()
 {
     TextAlignment textAlignment = getAlignment(); 
-    if ( _autoSize == autoSizeCenter ) textAlignment = ALIGN_CENTER;
-    else if ( _autoSize == autoSizeLeft ) textAlignment = ALIGN_LEFT;
-    else if ( _autoSize == autoSizeRight ) textAlignment = ALIGN_RIGHT;
+
+    switch (_autoSize) {
+        case AUTOSIZE_CENTER:
+            textAlignment = ALIGN_CENTER;
+            break;
+        case AUTOSIZE_LEFT:
+            textAlignment = ALIGN_LEFT;
+            break;
+        case AUTOSIZE_RIGHT:
+            textAlignment = ALIGN_RIGHT;
+            break;
+        default:
+            // Leave it as it was.
+            break;
+    }
 
     return textAlignment;
 }
@@ -3147,27 +3134,24 @@ textfield_autoSize(const fn_call& fn)
 
     if ( fn.nargs == 0 ) // getter
     {
-        return ptr->autoSizeValueName(ptr->getAutoSize());
+        return autoSizeValueName(ptr->getAutoSize());
     }
     else // setter
     {
         const as_value& arg = fn.arg(0);
-        if ( arg.is_bool() )
-        {
-            if ( arg.to_bool() ) // true == left
-            {
-                ptr->setAutoSize( TextField::autoSizeLeft );
+        if (arg.is_bool()) {
+            if (arg.to_bool()) {
+                // True equates to left, every other bool to none.
+                ptr->setAutoSize(TextField::AUTOSIZE_LEFT);
             }
-            else
-            {
-                ptr->setAutoSize( TextField::autoSizeNone );
+            else {
+                ptr->setAutoSize(TextField::AUTOSIZE_NONE);
             }
         }
-        else
-        {
+        else {
             std::string strval = arg.to_string();
-            TextField::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
-            ptr->setAutoSize( val );
+            TextField::AutoSize val = parseAutoSize(strval);
+            ptr->setAutoSize(val);
         }
     }
 
@@ -3179,8 +3163,7 @@ textfield_type(const fn_call& fn)
 {
     TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // getter
         return ptr->typeValueName(ptr->getType());
     }
@@ -3191,8 +3174,7 @@ textfield_type(const fn_call& fn)
     TextField::TypeValue val = ptr->parseTypeValue(strval);
 
     IF_VERBOSE_ASCODING_ERRORS(
-        if ( val == TextField::typeInvalid )
-        {
+        if (val == TextField::typeInvalid) {
             log_aserror(_("Invalid value given to TextField.type: %s"), strval);
         }
     );
@@ -3803,6 +3785,47 @@ attachTextFieldStaticMembers(as_object& o)
     VM& vm = getVM(o);
     o.init_member("getFontList", vm.getNative(104, 201), swf6Flags);
 }
+
+
+/// Return autoSize value as a string
+//
+/// @param val      AutoSize value 
+/// @return         a C-string representation of the autoSize value.
+///	                The return is *never* NULL.
+const char*
+autoSizeValueName(TextField::AutoSize val)
+{
+    switch (val) {
+        case TextField::AUTOSIZE_LEFT:
+            return "left";
+        case TextField::AUTOSIZE_RIGHT:
+            return "right";
+        case TextField::AUTOSIZE_CENTER:
+            return "center";
+        case TextField::AUTOSIZE_NONE:
+        default:
+            return "none";
+    }
+
+}
+
+TextField::AutoSize
+parseAutoSize(const std::string& val)
+{
+    StringNoCaseEqual cmp;
+
+    if (cmp(val, "left")) {
+        return TextField::AUTOSIZE_LEFT;
+    }
+    if (cmp(val, "right")) {
+        return TextField::AUTOSIZE_RIGHT;
+    }
+    if (cmp(val, "center")) {
+        return TextField::AUTOSIZE_CENTER;
+    }
+    return TextField::AUTOSIZE_NONE;
+}
+
 
 } // anonymous namespace
 

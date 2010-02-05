@@ -18,11 +18,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "WallClockTimer.h"
 #include "ClockTime.h" // for "portable" get_ticks (contains implementation for win32)
 

@@ -48,6 +48,8 @@ USERMAN = \
 	usermanual/installation.xml \
 	usermanual/revisions.xml \
 	usermanual/usage.xml \
+	usermanual/glossary.xml \
+	usermanual/specification.xml \
 	usermanual/gnashrc.xml \
 	usermanual/acknowledgments.xml \
 	usermanual/conventions.xml
@@ -55,19 +57,31 @@ USERMAN = \
 # These are the files needed to build the Gnash reference
 # manual.
 REFMAN = \
+	refmanual/amf.xml \
+	refmanual/as_value.xml \
+	refmanual/building.xml \
 	refmanual/code_dependencies.xml \
+	refmanual/codestyle.xml \
 	refmanual/configuration.xml \
+	refmanual/cross_compiling.xml \
 	refmanual/custompath_configuration.xml \
 	refmanual/documentation_dependencies.xml \
 	refmanual/feature_configuration.xml \
+	refmanual/install.xml \
+	refmanual/internals.xml \
+	refmanual/logging.xml \
+	refmanual/memory.xml \
+	refmanual/new_as_class.xml \
+	refmanual/object.xml \
+	refmanual/plugin.xml \
+	refmanual/revisions.xml \
+	refmanual/rtmp.xml \
 	refmanual/sources.xml \
 	refmanual/testing_dependencies.xml \
-	refmanual/cross_compiling.xml	\
-	refmanual/building.xml \
-	refmanual/install.xml \
-	refmanual/codestyle.xml
-#	refmanual/packagemanager.xml
-
+	refmanual/extensions/extensions.xml \
+	refmanual/extensions/fileext.xml \
+	refmanual/extensions/gtkext.xml \
+	refmanual/extensions/mysqlext.xml
 
 EXTRA_DIST = \
 	$(USERMAN) \
@@ -75,19 +89,33 @@ EXTRA_DIST = \
 	$(COMMON) \
 	$(XML_MAIN) \
 	$(MANSRC)  \
-	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/flvdumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in preformatted/rtmpget.1.in
+	preformatted/gnashuser.html.in \
+	preformatted/gprocessor.1.in \
+	preformatted/cygnal.1.in \
+	preformatted/gnash.1.in \
+	preformatted/gnash_ref.info.in \
+	preformatted/soldumper.1.in \
+	preformatted/flvdumper.1.in \
+	preformatted/dumpshm.1.in \
+	preformatted/gnashref.html.in \
+	preformatted/gnash_user.info.in \
+	preformatted/rtmpget.1.in \
+	preformatted/findmicrophones.1.in \
+	preformatted/findwebcams.1.in \
+	preformatted/gtk-gnash.1.in \
+	preformatted/kde4-gnash.1.in
 
 #noinst_SCRIPT = gen-doc.sh
 # We list the texi and info pages twice, as differing versions of the 
 # docbook-utils transform the name at different steps in the process.
 # This is an easy way to handle it either way, since we only need it as
 # dependency anyway.
-dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 flvdumper.1 cygnal.1 rtmpget.1
+dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 flvdumper.1 cygnal.1 rtmpget.1 findmicrophones.1 findwebcams.1
 MANSRC = $(dist_man_MANS:.1=.man-xml)
 INFOS  = gnash_user.info gnash_ref.info
 HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
-TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi rtmpget.texi
+TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
 
 all-local: info html man
 
@@ -175,56 +203,53 @@ endif
 
 .man-xml.1:
 if ENABLE_MAN
-	-@if test x$(DB2X_MAN) != x; then \
+	-if test x$(DB2X_MAN) != x; then \
 	  $(DB2X_MAN) $?; \
         else \
 	  $(DB2X_XSLTPROC) -s man $? -o $*.mxml; \
-	  $(DB2X_MANXML) $*.mxml; \
+	  $(DB2X_MANXML) --solinks $*.mxml; \
 	  $(RM) $*.mxml; \
 	fi
 else
 	@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/$@.in ./$@; \
+	  if test x"$@" = x"gnash.1"; then \
+	    $(LN_S) -f $(srcdir)/preformatted/gtk-gnash.1.in gtk-gnash.1; \
+	    $(LN_S) -f $(srcdir)/preformatted/kde4-gnash.1.in kde4-gnash.1; \
+	  fi; \
 	else \
 	  touch $@; \
-	fi
+	fi; 
 endif
 
 if DOCBOOK
 gnash_user.info: gnashuser.texi
 gnash_ref.info: gnashref.texi
-gnashuser.texi gnash_user.texi: gnashuser.xml
+gnashuser.texi gnash_user.texi: images gnashuser.xml
 gnashref.texi gnash_user.texi: gnashref.xml
 else
 gnash_user.info: gnashuser.xml
-	@if test -d $(srcdir)/preformatted; then \
+	-@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in ./gnash_user.info; \
 	fi
 gnash_ref.info: gnashref.xml
-	@if test -d $(srcdir)/preformatted; then \
+	-@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in ./gnash_ref.info; \
 	fi
 gnashref.html: gnashref.xml
-	@if test -d $(srcdir)/preformatted; then \
+	-@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnashref.html.in ./gnashref.html; \
 	fi
 gnashuser.html: gnashref.xml
-	@if test -d $(srcdir)/preformatted; then \
+	-@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnashuser.html.in ./gnashuser.html; \
 	fi
 endif
-
-# When we build in a seperate build tree, we need links to the images
-# subdirectory to have them be included in the final output.
-# images:
-# 	@if test ! -d images; then \
-# 	   $(LN_S) -f $(top_srcdir)/doc/C/images images; \
-# 	fi
 
 lint-user:
 	@xmllint $(srcdir)/gnashuser.xml
@@ -236,13 +261,20 @@ lint-ref:
 # produced by the dist-bzip2, dist-gzip, or snapshot targets.
 # distdir is a built in target for Automake.
 dist-hook:
-	test -d "$(distdir)/images/images" || $(mkinstalldirs) "$(distdir)/images"
-	for file in $(srcdir)/images/*.png $(srcdir)/images/*.txt; do \
+	test -d "$(distdir)/images" || $(mkinstalldirs) "$(distdir)/images"
+	-@for file in $(srcdir)/images/*.png $(srcdir)/images/*.txt; do \
 	  basefile="`basename $${file}`"; \
 	  if test ! -e $(distdir)/images/$${basefile}; then \
 	    $(INSTALL_DATA) $$file $(distdir)/images/; \
 	  fi; \
 	done
+
+# When we build in a seperate build tree, we need links to the images
+# subdirectory to have them be included in the final output.
+images:
+	-@if test ! -e images; then \
+	  $(LN_S) -f $(srcdir)/images images; \
+	fi;
 
 #
 # Installing documentation can be a complex process, as we build
@@ -250,13 +282,12 @@ dist-hook:
 # Makefile targets that are used to install or uninstall the
 # documentation.
 #
-
 install-html-hook: $(HTMLS)
-	@test -d "$(DESTDIR)$(htmldir)" || $(mkinstalldirs) "$(DESTDIR)$(htmldir)"
+	-@test -d "$(DESTDIR)$(htmldir)" || $(mkinstalldirs) "$(DESTDIR)$(htmldir)"
 	-$(INSTALL_DATA) gnashuser.html $(DESTDIR)$(htmldir)
 	-$(INSTALL_DATA) gnashref.html $(DESTDIR)$(htmldir)
 	@test -d "$(DESTDIR)$(htmldir)/images" || $(mkinstalldirs) "$(DESTDIR)$(htmldir)/images"
-	for file in $(srcdir)/images/*.png; do \
+	-for file in $(srcdir)/images/*.png; do \
 	  basefile=`echo $$file | sed -e  's,^.*/,,'`; \
 	  $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir)/images/$$basefile; \
 	done
@@ -266,11 +297,11 @@ install-html-hook: $(HTMLS)
 # so we can switch versions at installation time.
 install-info-hook: $(INFOS)
 if ENABLE_INFO
-	@test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
+	-@test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
 	-for i in *.info; do \
 	  $(INSTALL_DATA) "$$i" $(DESTDIR)$(infodir)/"$$i"; \
 	done; \
-	type="`file $(INSTALL_INFO) | grep -ic " perl " 2>&1`"; \
+	type="`file $(INSTALL_INFO) | grep -ic "perl " 2>&1`"; \
 	if test $${type} -gt 0; then \
 	  $(INSTALL_INFO) --menuentry="\"Gnash User Manual\"" --quiet --description="\"Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info; \
 	  $(INSTALL_INFO) --menuentry="\"Gnash Reference Manual\"" --quiet --description="\"Gnash Reference Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info; \
@@ -280,10 +311,10 @@ if ENABLE_INFO
 	fi
 else
 	echo "Using preformtted output file,"
-	$(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in gnash_user.info
-	$(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in gnash_ref.info
-        $(INSTALL_INFO) --entry="\"Gnash User Manual: (gnash_user)	Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info
-	$(INSTALL_INFO) --entry="\"Gnash Reference Manual (gnash_ref)	Gnash Reference Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info
+	-$(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in gnash_user.info
+	-$(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in gnash_ref.info
+        -$(INSTALL_INFO) --entry="\"Gnash User Manual: (gnash_user)	Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info
+	-$(INSTALL_INFO) --entry="\"Gnash Reference Manual (gnash_ref)	Gnash Reference Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info
 endif
 
 uninstall-info-hook:
@@ -302,8 +333,16 @@ uninstall-html-hook:
 # install-data-hook: install-data-hook-omf
 # uninstall-local: uninstall-local-doc uninstall-local-omf
 
-install-data-hook: install-info-hook install-html-hook 
+# gtk-gnash.1 and kde4-gnash.1 are special, as they are created by
+# the --solinks option to the docbook2 tools for creating man pages.
+install-extra-man: gnash.1
+	-$(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)/gtk-gnash.1
+	-$(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)/kde4-gnash.1
+
+install-data-hook: install-extra-man install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
+	-$(RM) -f $(DESTDIR)$(man1dir)/gtk-gnash.1 
+	-$(RM) -f $(DESTDIR)$(man1dir)/kde4-gnash.1
 
 #
 # GNOME Help support, which currently isn't supported
@@ -356,9 +395,11 @@ CLEANFILES = \
 	gnashuser.mxml \
 	gnashref.txml \
 	gnashref.mxml \
-	omf_timestamp
-
+	omf_timestamp \
+	images \
+	gtk-gnash.1 \
+	kde4-gnash.1
 
 # Always execute these targets as they have no real dependencies.
-.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook
+.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook images install-extra-man
 

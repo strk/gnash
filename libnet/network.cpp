@@ -358,13 +358,13 @@ Network::newConnection(bool block, int fd)
         }
 
         if (ret == -1) {
-            log_debug(_("The accept() socket for fd #%d never was available for writing"), fd);
+            log_debug(_("The accept() socket for fd #%d never was available"), fd);
             return -1;
         }
 
         if (ret == 0) {
             if (_debug) {
-                log_debug(_("The accept() socket for fd #%d timed out waiting to write"), fd);
+                log_debug(_("The accept() socket for fd #%d timed out waitingfor data"), fd);
 		return 0;
             }
         }
@@ -1602,12 +1602,24 @@ Network::sniffBytesReady(int fd)
     // GNASH_REPORT_FUNCTION;
 
     int bytes = 0;
+    fd_set fdset;
+
+    FD_SET(fd, &fdset);
+
+    struct timeval tval;
+    tval.tv_sec = 0;
+    tval.tv_usec = 10;
+    if (select(fd+1, &fdset, NULL, NULL, &tval)) {
+ 	if (FD_ISSET(fd, &fdset)) {
 #ifndef _WIN32
-    ioctl(fd, FIONREAD, &bytes);
-    log_network("#%d bytes waiting in kernel network buffer.", bytes);
+	    ioctl(fd, FIONREAD, &bytes);
 #else
-    log_unimpl("Network::sniffBytesReady(win32 equivalant)");
+	    ioctlSocket(fd, FIONREAD, &bytes);
 #endif
+	}
+    }
+
+    log_network("#%d bytes waiting in kernel network buffer.", bytes);
     
     return bytes;
 }

@@ -19,10 +19,6 @@
 #ifndef _PROTOCOL_H_
 #define _PROTOCOL_H_
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <string>
 #include "network.h"
 

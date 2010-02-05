@@ -1,0 +1,34 @@
+.\" -*- coding: us-ascii -*-
+.if \n(.g .ds T< \\FC
+.if \n(.g .ds T> \\F[\n[.fam]]
+.de URL
+\\$2 \(la\\$1\(ra\\$3
+..
+.if \n(.g .mso www.tmac
+.TH findmicrophones 1 "2 February 2010" "" ""
+.SH NAME
+findmicrophones \- Gnash Utility For finding microphones on computer.
+.SH Synopsis
+.nf
+
+findmicrophones
+.fi
+.SH DESCRIPTION
+Findmicrophones is a utility that uses Gstreamer to identify what types
+of microphones you have installed on your computer, so that you can
+properly configure Gnash on which one to use.
+.TP 
+-h
+Print usage info.
+.TP 
+-V
+Print version information.
+.TP 
+-d
+Display init file to the terminal.
+.TP 
+-n
+Verbose networking debug info.
+.TP 
+-v
+Verbose output.

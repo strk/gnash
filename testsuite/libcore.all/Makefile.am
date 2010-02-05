@@ -38,8 +38,8 @@ AM_CPPFLAGS = \
 check_PROGRAMS = \
 	StreamTest \
 	BitsReaderTest \
-	MatrixTest \
 	PointTest \
+	MatrixTest \
 	EdgeTest \
 	PropertyListTest \
 	PropFlagsTest \
@@ -50,8 +50,7 @@ check_PROGRAMS = \
 	$(NULL)
 
 if ENABLE_AVM2
-check_PROGRAMS += \
-	CodeStreamTest
+check_PROGRAMS += CodeStreamTest
 endif
 
 CLEANFILES = \
@@ -62,80 +61,63 @@ CLEANFILES = \
 	gnash-dbg.log \
 	$(NULL)
 
-GNASH_LIBS = \
+AM_LDFLAGS = \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libcore/libgnashcore.la \
-	$(NULL)
+	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libsound/libgnashsound.la
 
-if USE_FFMPEG_ENGINE
-	GNASH_LIBS += $(FFMPEG_LIBS)
+if LIBLTDL2
+AM_LDFLAGS += $(top_builddir)/libltdl/libltdlc.la
+endif
+if LIBLTDL1
+AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
 endif
 
+#if USE_FFMPEG_ENGINE
+#AM_LDFLAGS += $(FFMPEG_LIBS)
+#endif
+
 BitsReaderTest_SOURCES = BitsReaderTest.cpp
-BitsReaderTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+BitsReaderTest_LDADD = $(AM_LDFLAGS)
 
 StreamTest_SOURCES = StreamTest.cpp
-StreamTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+StreamTest_LDADD = $(AM_LDFLAGS)
 
 MatrixTest_SOURCES = MatrixTest.cpp
-MatrixTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+MatrixTest_LDADD = $(AM_LDFLAGS)
 
 PointTest_SOURCES = PointTest.cpp
-PointTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+PointTest_LDADD = $(AM_LDFLAGS)
 
 EdgeTest_SOURCES = EdgeTest.cpp
-EdgeTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+EdgeTest_LDADD = $(AM_LDFLAGS)
 
 PropertyListTest_SOURCES = PropertyListTest.cpp
-PropertyListTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+PropertyListTest_LDADD = $(AM_LDFLAGS)
 
 PropFlagsTest_SOURCES = PropFlagsTest.cpp
-PropFlagsTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+PropFlagsTest_LDADD = $(AM_LDFLAGS)
 
 DisplayListTest_SOURCES = DisplayListTest.cpp
-DisplayListTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+DisplayListTest_LDADD = $(AM_LDFLAGS)
 
 AsValueTest_SOURCES = AsValueTest.cpp
-AsValueTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+AsValueTest_LDADD = $(AM_LDFLAGS)
 
 ClassSizes_SOURCES = ClassSizes.cpp
-ClassSizes_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+ClassSizes_LDADD = $(AM_LDFLAGS)
 
 SafeStackTest_SOURCES = SafeStackTest.cpp
-SafeStackTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+SafeStackTest_LDADD = $(AM_LDFLAGS)
 
 CodeStreamTest_SOURCES = CodeStreamTest.cpp
-CodeStreamTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
+CodeStreamTest_LDADD = $(AM_LDFLAGS)
+CodeStreamTest_DEPENDENCIES = $(AM_LDFLAGS)
 
 TEST_DRIVERS = ../simple.exp
-TEST_CASES = \
-	$(check_PROGRAMS) \
-	$(NULL)
+TEST_CASES = $(check_PROGRAMS)
 
 check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \

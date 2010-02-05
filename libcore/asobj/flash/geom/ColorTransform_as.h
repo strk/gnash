@@ -21,9 +21,6 @@
 #ifndef GNASH_ASOBJ_COLORTRANSFORM_H
 #define GNASH_ASOBJ_COLORTRANSFORM_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include "as_object.h"
 

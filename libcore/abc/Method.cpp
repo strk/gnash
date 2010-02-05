@@ -26,6 +26,8 @@
 #include "Global_as.h"
 #include "VM.h"
 
+#include <boost/bind.hpp>
+
 namespace gnash {
 namespace abc {
 
