@@ -1795,15 +1795,17 @@ fi
 AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_HOST" != x ])
 
 dnl The name might differ between systems.
+if test x"$testsuite" = x"yes"; then
 AC_PATH_PROGS(NETCAT, [nc netcat])
-AM_CONDITIONAL(HAS_NETCAT, [ test x"$NETCAT" != x ])
 AC_PATH_PROG(WGET, wget)
+fi
+AM_CONDITIONAL(HAS_NETCAT, [ test x"$NETCAT" != x ])
 AM_CONDITIONAL(HAS_WGET, [ test x"$WGET" != x ])
 
 dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
-if test x$cross_compiling = xno; then
+if test x"$testsuite" = x"yes" -a x$cross_compiling = xno; then
   AC_PATH_PROG(AS3COMPILE, as3compile)
   AC_PATH_PROG(SWFC, swfc)
   AC_PATH_SWFMILL
@@ -3434,15 +3436,17 @@ else
   echo "     ${classlist}"
 fi
 
-if test x"$NETCAT" != x; then
+if test x"$testsuite" = x"yes"; then
+  if test x"$NETCAT" != x; then
     echo "        You have netcat installed, which is only used for testing"
-else
+  else
     echo "        Install netcat for networking test support"
-fi
-if test x"$WGET" != x; then
+  fi
+  if test x"$WGET" != x; then
     echo "        You have wget installed, which is only used for testing"
-else
+  else
     echo "        Install wget for networking test support"
+  fi
 fi
 
 if test x$cross_compiling = xyes; then
