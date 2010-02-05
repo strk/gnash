@@ -203,7 +203,7 @@ endif
 
 .man-xml.1:
 if ENABLE_MAN
-	-@if test x$(DB2X_MAN) != x; then \
+	-if test x$(DB2X_MAN) != x; then \
 	  $(DB2X_MAN) $?; \
         else \
 	  $(DB2X_XSLTPROC) -s man $? -o $*.mxml; \
@@ -230,33 +230,26 @@ gnashuser.texi gnash_user.texi: images gnashuser.xml
 gnashref.texi gnash_user.texi: gnashref.xml
 else
 gnash_user.info: gnashuser.xml
-	@if test -d $(srcdir)/preformatted; then \
+	-@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in ./gnash_user.info; \
 	fi
 gnash_ref.info: gnashref.xml
-	@if test -d $(srcdir)/preformatted; then \
+	-@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in ./gnash_ref.info; \
 	fi
 gnashref.html: gnashref.xml
-	@if test -d $(srcdir)/preformatted; then \
+	-@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnashref.html.in ./gnashref.html; \
 	fi
 gnashuser.html: gnashref.xml
-	@if test -d $(srcdir)/preformatted; then \
+	-@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnashuser.html.in ./gnashuser.html; \
 	fi
 endif
-
-# When we build in a seperate build tree, we need links to the images
-# subdirectory to have them be included in the final output.
-# images:
-# 	@if test ! -d images; then \
-# 	   $(LN_S) -f $(top_srcdir)/doc/C/images images; \
-# 	fi
 
 lint-user:
 	@xmllint $(srcdir)/gnashuser.xml
@@ -269,15 +262,17 @@ lint-ref:
 # distdir is a built in target for Automake.
 dist-hook:
 	test -d "$(distdir)/images" || $(mkinstalldirs) "$(distdir)/images"
-	-for file in $(srcdir)/images/*.png $(srcdir)/images/*.txt; do \
+	-@for file in $(srcdir)/images/*.png $(srcdir)/images/*.txt; do \
 	  basefile="`basename $${file}`"; \
 	  if test ! -e $(distdir)/images/$${basefile}; then \
 	    $(INSTALL_DATA) $$file $(distdir)/images/; \
 	  fi; \
 	done
 
+# When we build in a seperate build tree, we need links to the images
+# subdirectory to have them be included in the final output.
 images:
-	if test ! -e images; then \
+	-@if test ! -e images; then \
 	  $(LN_S) -f $(srcdir)/images images; \
 	fi;
 
@@ -287,9 +282,8 @@ images:
 # Makefile targets that are used to install or uninstall the
 # documentation.
 #
-
 install-html-hook: $(HTMLS)
-	@test -d "$(DESTDIR)$(htmldir)" || $(mkinstalldirs) "$(DESTDIR)$(htmldir)"
+	-@test -d "$(DESTDIR)$(htmldir)" || $(mkinstalldirs) "$(DESTDIR)$(htmldir)"
 	-$(INSTALL_DATA) gnashuser.html $(DESTDIR)$(htmldir)
 	-$(INSTALL_DATA) gnashref.html $(DESTDIR)$(htmldir)
 	@test -d "$(DESTDIR)$(htmldir)/images" || $(mkinstalldirs) "$(DESTDIR)$(htmldir)/images"
@@ -303,7 +297,7 @@ install-html-hook: $(HTMLS)
 # so we can switch versions at installation time.
 install-info-hook: $(INFOS)
 if ENABLE_INFO
-	@test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
+	-@test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
 	-for i in *.info; do \
 	  $(INSTALL_DATA) "$$i" $(DESTDIR)$(infodir)/"$$i"; \
 	done; \
@@ -341,9 +335,11 @@ uninstall-html-hook:
 
 # gtk-gnash.1 and kde4-gnash.1 are special, as they are created by
 # the --solinks option to the docbook2 tools for creating man pages.
-install-data-hook: install-info-hook install-html-hook 
-	-$(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)
-	-$(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)
+install-extra-man: gnash.1
+	-$(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)/gtk-gnash.1
+	-$(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)/kde4-gnash.1
+
+install-data-hook: install-extra-man install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
 	-$(RM) -f $(DESTDIR)$(man1dir)/gtk-gnash.1 
 	-$(RM) -f $(DESTDIR)$(man1dir)/kde4-gnash.1
@@ -405,5 +401,5 @@ CLEANFILES = \
 	kde4-gnash.1
 
 # Always execute these targets as they have no real dependencies.
-.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook images
+.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook images install-extra-man
 
