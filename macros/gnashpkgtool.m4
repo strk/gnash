@@ -179,12 +179,12 @@ if test x"${$1}" = x"yes"; then
       $PKG_CONFIG --exists DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l DASHDOWN`"
       $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l lib$name`"
       $PKG_CONFIG --exists $name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l $name`"
-      AC_MSG_CHECKING([for lib$1 library])
+      dnl AC_MSG_CHECKING([for lib$1 library])
       if test x"${ac_cv_path_$1_lib}" != x; then
-        AC_MSG_RESULT(${ac_cv_path_$1_lib})
+        dnl AC_MSG_RESULT(${ac_cv_path_$1_lib})
         ac_manual=no
-      else
-        AC_MSG_RESULT([not found])
+      dnl else
+        dnl AC_MSG_RESULT([not found])
       fi
     fi
     if test x"${ac_cv_path_$1_lib}" = x; then
