@@ -36,6 +36,11 @@ DEB_DH_SHLIBDEPS_ARGS_ALL := -X* /usr/lib/gnash
 
 # CONFIGURE
 
+# Configure Gnash. We use a different set of options,as when building
+# packages, we want to enable everything that Gnash can do, like
+# python support, the SDK cygnal, etc... These are not enabled by
+# default to make it less complicated for end users building Gnash
+# from source.
 config.status: configure
 	dh_testdir
 
@@ -64,6 +69,7 @@ endif
 		--disable-rpath \
 		--enable-cygnal \
 		--enable-avm2 \
+		--enable-docbook \
 		--enable-python \
 		--enable-jemalloc \
 		--enable-sdkinstall \
@@ -79,6 +85,10 @@ endif
 
 # BUILD
 
+# We don't run make check, as the testsuite takes a long time to build
+# and run, and we just want a package. This of course requires the
+# package builder to run make check before building packages if the
+# state is unknown.
 build: build-stamp
 build-stamp:  config.status
 	dh_testdir
@@ -95,6 +105,10 @@ build-stamp:  config.status
 
 # CLEAN
 
+# Remove anything that could be left from a previous build. Basically
+# all temporary files or generated files. We also clean out the
+# manpages, as these are the preformatted ones from the tarball, so
+# they don't get rebuild by docbook unless we remove them.
 clean:
 	dh_testdir
 	dh_testroot
@@ -105,6 +119,7 @@ clean:
 	rm -f `find . -name "*.la"`
 	rm -rf `find . -name ".libs"`
 	rm -rf `find . -name ".deps"`
+	rm -f  doc/C/*.1
 
 	@printf "\n == CLEANING PATCHES ==\n\n"
 	# we have no patches, we're the developers!
@@ -116,6 +131,11 @@ clean:
 
 # INSTALL
 
+# Install gnash. This also builds the SDK, which isn't directly
+# supported by the gnash Makefiles. We also have to compress the two
+# man pages aliases, which don't get compressed as they're not part of
+# the standard make target. These get generated when building gnash.1,
+# and of course have no associated source file.
 install: build
 	dh_testdir
 	dh_testroot
@@ -130,6 +150,7 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash
 
 	@printf "\n == INSTALL ==\n\n"
+	$(MAKE) -C doc/C clean
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	$(MAKE) install-plugins DESTDIR=$(CURDIR)/debian/tmp
 	@printf "\n ---- End of INSTALL ---- \n\n"
