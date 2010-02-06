@@ -216,10 +216,9 @@ else
 	@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/$@.in ./$@; \
-	  fi; \
 	else \
 	  touch $@; \
-	fi; 
+	fi
 endif
 
 if DOCBOOK
@@ -335,18 +334,22 @@ uninstall-html-hook:
 # gtk-gnash.1 and kde4-gnash.1 are special, as they are created by
 # the --solinks option to the docbook2 tools for creating man pages.
 install-extra-man: gnash.1
-	-$(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)/gtk-gnash.1
-	-$(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)/kde4-gnash.1
+	    $(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)/gtk-gnash.1
+	    $(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)/kde4-gnash.1
 
 # the gtk-gnash.1 and kde4-gnash.1 manpages are generated as aliases
 # for the gnash.1 man page, so we can't use the suffix rules to build
 # them, but we need to install the ".so gnash.1" manpages also, or
 # they aren;t in the tarball.
 link-extra-man: gnash.1
-	@echo "WARNING: Linking to preformatted version of gtk-gnash.1, it could be out of date."
-	$(LN_S) -f $(srcdir)/preformatted/gtk-gnash.1.in gtk-gnash.1
-	@echo "WARNING: Linking to preformatted version of kde4-gnash.1, it could be out of date."; \
-	$(LN_S) -f $(srcdir)/preformatted/kde4-gnash.1.in kde4-gnash.1
+	-@if test ! -e gtk-gnash.1; then \
+	    echo "WARNING: Linking to preformatted version of gtk-gnash.1, it could be out of date."; \
+	    $(LN_S) -f $(srcdir)/preformatted/gtk-gnash.1.in gtk-gnash.1; \
+	  fi
+	-@if test ! -e kde4-gnash.1; then \
+	    echo "WARNING: Linking to preformatted version of kde4-gnash.1, it could be out of date."; \
+	    $(LN_S) -f $(srcdir)/preformatted/kde4-gnash.1.in kde4-gnash.1; \
+	  fi
 
 install-data-hook: install-extra-man install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
