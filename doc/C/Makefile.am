@@ -88,7 +88,9 @@ EXTRA_DIST = \
 	$(REFMAN) \
 	$(COMMON) \
 	$(XML_MAIN) \
-	$(MANSRC)  \
+	$(MANSRC) \
+	gtk-gnash.1 \
+	kde4-gnash.1 \
 	preformatted/gnashuser.html.in \
 	preformatted/gprocessor.1.in \
 	preformatted/cygnal.1.in \

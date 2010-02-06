@@ -139,7 +139,7 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k 
+#	dh_clean -k 
 	dh_installdirs
 
 	install -d $(CURDIR)/debian/tmp/usr/bin
@@ -150,7 +150,6 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash
 
 	@printf "\n == INSTALL ==\n\n"
-	$(MAKE) -C doc/C clean
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	$(MAKE) install-plugins DESTDIR=$(CURDIR)/debian/tmp
 	@printf "\n ---- End of INSTALL ---- \n\n"
@@ -194,7 +193,7 @@ binary-arch: build install
 #	dh_installmenu
 #	dh_installmime
 	dh_installman
-	dh_desktop
+#	dh_desktop
 	dh_lintian
 	dh_link
 	dh_strip --dbg-package=gnash-dbg
