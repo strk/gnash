@@ -117,7 +117,7 @@ HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
 TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
 
-all-local: info html man
+all-local: info html man link-extra-man
 
 gnashuser.html gnashuser.pdf gnash_user.info: gnashuser.xml $(USERMAN) $(COMMON)
 gnashref.html gnashref.pdf gnash_ref.info: gnashref.xml $(REFMAN) $(COMMON)
@@ -214,9 +214,6 @@ else
 	@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/$@.in ./$@; \
-	  if test x"$@" = x"gnash.1"; then \
-	    $(LN_S) -f $(srcdir)/preformatted/gtk-gnash.1.in gtk-gnash.1; \
-	    $(LN_S) -f $(srcdir)/preformatted/kde4-gnash.1.in kde4-gnash.1; \
 	  fi; \
 	else \
 	  touch $@; \
@@ -338,6 +335,16 @@ uninstall-html-hook:
 install-extra-man: gnash.1
 	-$(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)/gtk-gnash.1
 	-$(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)/kde4-gnash.1
+
+# the gtk-gnash.1 and kde4-gnash.1 manpages are generated as aliases
+# for the gnash.1 man page, so we can't use the suffix rules to build
+# them, but we need to install the ".so gnash.1" manpages also, or
+# they aren;t in the tarball.
+link-extra-man: gnash.1
+	@echo "WARNING: Linking to preformatted version of gtk-gnash.1, it could be out of date."
+	$(LN_S) -f $(srcdir)/preformatted/gtk-gnash.1.in gtk-gnash.1
+	@echo "WARNING: Linking to preformatted version of kde4-gnash.1, it could be out of date."; \
+	$(LN_S) -f $(srcdir)/preformatted/kde4-gnash.1.in kde4-gnash.1
 
 install-data-hook: install-extra-man install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
