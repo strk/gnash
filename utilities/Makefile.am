@@ -101,7 +101,7 @@ if CROSS_COMPILING
 endif
 endif
 
-bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper
+bin_PROGRAMS = gprocessor soldumper flvdumper
 #check_PROGRAMS = gdebug.swf
 
 if USE_GST_ENGINE

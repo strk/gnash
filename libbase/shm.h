@@ -56,20 +56,14 @@ public:
     
     // Initialize the shared memory segment
     bool attach();
-    bool DSOEXPORT attach(char const *filespec, bool nuke);
     bool DSOEXPORT attach(key_t key, bool nuke);
     
     // Resize the allocated memory segment
     bool resize(int bytes);
     bool resize();
     
-    // Allocate a memory from the shared memory segment
-    void *brk(int bytes);
-    
     // Close the memory segment. This removes it from the system.
     bool DSOEXPORT closeMem();
-    
-    Shm *cloneSelf(void);
 
     // Accessors for testing
     char *getAddr()             { return _addr; };
@@ -89,78 +83,6 @@ protected:
     HANDLE      _shmhandle;
 #endif
     int		_shmfd;
-};
-
-// Custome memory allocator for the shared memory segment
-template<typename _Tp>
-class ShmAlloc
-{
-private:
-    Shm *mmptr;
-    Shm mem;
-public:
-    typedef size_t     size_type;
-    typedef ptrdiff_t  difference_type;
-    typedef _Tp*       pointer;
-    typedef const _Tp* const_pointer;
-    typedef _Tp&       reference;
-    typedef const _Tp& const_reference;
-    typedef _Tp        value_type;
-    
-    template<typename _Tp1>
-    struct rebind
-    { typedef ShmAlloc<_Tp1> other; };
-    
-    ShmAlloc() throw() { }
-    
-    ShmAlloc(const ShmAlloc& other) throw() 
-        : mem(other.mem)
-        { }
-    
-    template<typename _Tp1>
-    ShmAlloc(const ShmAlloc<_Tp1>& other) throw() 
-        : mem(other.mem)
-        { }
-    
-    ~ShmAlloc() throw() { }
-    
-    pointer
-    address(reference __x) const        { return &__x; }
-    
-    const_pointer
-    address(const_reference __x) const { return &__x; }
-    
-    // Allocate memory
-    _Tp*
-    allocate(size_type n, const void* p = 0) {
-        // If the memory manager has no blocks, it hasn't been
-        // initialized.
-//         if (mminit == false) {
-//             mmptr = mem.initMemManager(true);
-//             mminit = true;
-//         } else {
-//             mmptr = mem.initMemManager(false);
-//         }
-        
-        _Tp* ret = 0;
-        if (n) {
-            ret = (_Tp*)mmptr->brk(n * sizeof(_Tp));
-            if (ret == 0)
-                throw std::bad_alloc();
-        }
-        return ret;
-    }
-    
-    // Deallocate memory
-    void
-    deallocate(pointer __p, size_type __n) {
-        //mmptr->free(__p);
-    }
-    
-    void construct(pointer __p, const _Tp& __val) {
-        new(__p) _Tp(__val);
-    }
-    void destroy(pointer __p)   { __p->~_Tp(); }
 };
 
 } // end of gnash namespace
