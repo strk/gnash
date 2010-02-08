@@ -117,8 +117,9 @@ gprocessor_SOURCES = processor.cpp
 gprocessor_LDFLAGS = -export-dynamic
 gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
-dumpshm_SOURCES = dumpshm.cpp
-dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+
+#dumpshm_SOURCES = dumpshm.cpp
+#dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 soldumper_SOURCES = soldumper.cpp
 soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
