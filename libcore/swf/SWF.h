@@ -33,7 +33,7 @@ enum TagType
     END                   =  0,
     SHOWFRAME             =  1,
     DEFINESHAPE           =  2,
-    FREECHARACTER	  =  3,
+    FREECHARACTER         =  3,
     PLACEOBJECT           =  4,
     REMOVEOBJECT          =  5,
     DEFINEBITS            =  6,
@@ -62,25 +62,25 @@ enum TagType
     DEFINESHAPE2          = 22,
     DEFINEBUTTONCXFORM    = 23,
     PROTECT               = 24,
-    PATHSAREPOSTSCRIPT	  = 25,
+    PATHSAREPOSTSCRIPT    = 25,
     PLACEOBJECT2          = 26,
     REMOVEOBJECT2         = 28,
-    SYNCFRAME		  = 29,
-    FREEALL		  = 31,
+    SYNCFRAME             = 29,
+    FREEALL               = 31,
     DEFINESHAPE3          = 32,
     DEFINETEXT2           = 33,
     DEFINEBUTTON2         = 34,
     DEFINEBITSJPEG3       = 35,
     DEFINELOSSLESS2       = 36,
-    DEFINEEDITTEXT	  = 37,
-    DEFINEVIDEO		  = 38,
+    DEFINEEDITTEXT        = 37,
+    DEFINEVIDEO           = 38,
 
     /// Definition of a Sprite/MovieClip
     DEFINESPRITE          = 39,
 
-    NAMECHARACTER	  = 40,
+    NAMECHARACTER         = 40,
     SERIALNUMBER          = 41,
-    DEFINETEXTFORMAT	  = 42,
+    DEFINETEXTFORMAT      = 42,
     FRAMELABEL            = 43,
     DEFINEBEHAVIOR        = 44, // SWF 9
 
@@ -89,12 +89,12 @@ enum TagType
     SOUNDSTREAMHEAD2      = 45,
 
     DEFINEMORPHSHAPE      = 46,
-    FRAMETAG		  = 47,
+    FRAMETAG              = 47,
     DEFINEFONT2           = 48,
-    GENCOMMAND		  = 49,
-    DEFINECOMMANDOBJ	  = 50,
-    CHARACTERSET	  = 51,
-    FONTREF		  = 52,
+    GENCOMMAND            = 49,
+    DEFINECOMMANDOBJ      = 50,
+    CHARACTERSET          = 51,
+    FONTREF               = 52,
     DEFINEFUNCTION        = 53, // SWF 9
     PLACEFUNCTION         = 54, // SWF 9
     GENTAGOBJECT          = 55, // SWF 9
@@ -102,13 +102,13 @@ enum TagType
     IMPORTASSETS          = 57,
 
     /// See http://sswf.sourceforge.net/SWFalexref.html#tag_protectdebug
-    ENABLEDEBUGGER	  = 58,
+    ENABLEDEBUGGER        = 58,
 
     /// For actions specified with initclip directive
-    INITACTION		  = 59,
+    INITACTION            = 59,
 
-    DEFINEVIDEOSTREAM	  = 60,
-    VIDEOFRAME		  = 61,
+    DEFINEVIDEOSTREAM     = 60,
+    VIDEOFRAME            = 61,
 
     /// DefineFontInfo2 (swf6)
     DEFINEFONTINFO2       = 62,
@@ -117,7 +117,7 @@ enum TagType
 
     /// See http://flasm.sourceforge.net/#protect
     /// See http://sswf.sourceforge.net/SWFalexref.html#tag_protectdebug
-    ENABLEDEBUGGER2	  = 64,
+    ENABLEDEBUGGER2       = 64,
 
     /// SWF_version  >= 7 
     /// See http://sswf.sourceforge.net/SWFalexref.html#tag_scriptlimits
@@ -176,7 +176,7 @@ enum TagType
     DEFINEBINARYDATA      = 87,
 
     /// http://www.m2osw.com/en/swf_alexref.html#tag_definefontname
-    DEFINEFONTNAME        = 88,	
+    DEFINEFONTNAME        = 88,    
 
     STARTSOUND2           = 89,
 
@@ -240,7 +240,6 @@ enum ActionType
     /// SWF7
     ///
     /// http://sswf.sourceforge.net/SWFalexref.html#action_throw
-    ///
     ACTION_THROW                   = 0x2A,
 
     /// SWF7
@@ -253,7 +252,6 @@ enum ActionType
     ///
     /// See:
     /// http://sswf.sourceforge.net/SWFalexref.html#action_cast_object
-    ///
     ACTION_CASTOP                  = 0x2B,
 
     /// SWF7
@@ -266,11 +264,12 @@ enum ActionType
     ///
     /// See:
     /// http://sswf.sourceforge.net/SWFalexref.html#action_implements
-    ///
     ACTION_IMPLEMENTSOP            = 0x2C,
 
     /// SWF7
-    ///
+    //
+    /// This is Flash Lite only and is ignored in the full player.
+    //
     /// This action executes an fscommand.
     /// Stack In:
     ///  i1            -- number of arguments (int)
@@ -281,7 +280,6 @@ enum ActionType
     ///
     /// See:
     /// http://sswf.sourceforge.net/SWFalexref.html#action_fscommand2
-    ///
     ACTION_FSCOMMAND2              = 0x2D,
 
     ACTION_RANDOM                  = 0x30,
@@ -292,6 +290,7 @@ enum ActionType
     ACTION_MBSUBSTRING             = 0x35,
     ACTION_MBORD                   = 0x36,
     ACTION_MBCHR                   = 0x37,
+    ACTION_STRICTMODE              = 0x89,
     ACTION_WAITFORFRAMEEXPRESSION  = 0x8D,
     ACTION_PUSHDATA                = 0x96,
     ACTION_BRANCHALWAYS            = 0x99,
@@ -412,19 +411,16 @@ enum ActionType
     /// SWF5
     ///
     /// http://sswf.sourceforge.net/SWFalexref.html#action_set_member
-    ///
     ACTION_SETMEMBER               = 0x4F,
 
     /// SWF5
     ///
     /// http://sswf.sourceforge.net/SWFalexref.html#action_increment
-    ///
     ACTION_INCREMENT               = 0x50,
 
     /// SWF5
     ///
     /// http://sswf.sourceforge.net/SWFalexref.html#action_decrement
-    ///
     ACTION_DECREMENT               = 0x51,
 
     /// SWF5
@@ -435,7 +431,6 @@ enum ActionType
     /// push the returned value on the stack.
     ///
     /// http://sswf.sourceforge.net/SWFalexref.html#action_invoke
-    ///
     ACTION_CALLMETHOD              = 0x52,
 
     /// SWF5
@@ -449,7 +444,6 @@ enum ActionType
     /// for overloaded constructors as in C++.
     ///
     /// http://sswf.sourceforge.net/SWFalexref.html#action_new_method
-    ///
     ACTION_NEWMETHOD               = 0x53, 
 
     /// SWF6
@@ -464,7 +458,6 @@ enum ActionType
     /// Null, which in many cases can be much more practical.
     ///
     /// http://sswf.sourceforge.net/SWFalexref.html#action_instance_of
-    ///
     ACTION_INSTANCEOF              = 0x54,
 
     /// SWF6
@@ -473,7 +466,6 @@ enum ActionType
     /// push the name of each member on the stack.
     ///
     /// http://sswf.sourceforge.net/SWFalexref.html#action_enumerate_object
-    ///
     ACTION_ENUM2                   = 0x55,
 
     ACTION_BITWISEAND              = 0x60,
@@ -492,7 +484,6 @@ enum ActionType
     ///
     /// See:
     /// http://sswf.sourceforge.net/SWFalexref.html#action_greater_than_typed
-    ///
     ACTION_GREATER                 = 0x67,
 
     /// SWF6
@@ -503,7 +494,6 @@ enum ActionType
     ///
     /// See:
     /// http://sswf.sourceforge.net/SWFalexref.html#action_string_greater_than
-    ///
     ACTION_STRINGGREATER           = 0x68,
 
     ///
@@ -513,7 +503,7 @@ enum ActionType
     /// which extends another object. The declaration in
     /// ActionScript is:
     ///
-    ///	class A extends B;
+    ///    class A extends B;
     ///
     /// In an SWF action script, you don't exactly declare
     /// objects, you actually instantiate them and define their
@@ -525,7 +515,6 @@ enum ActionType
     ///
     /// See:
     /// http://sswf.sourceforge.net/SWFalexref.html#action_extends
-    ///
     ACTION_EXTENDS                 = 0x69,
 
     /// See:
@@ -537,13 +526,11 @@ enum ActionType
     ///
     /// See:
     /// http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
-    ///
     ACTION_DEFINEFUNCTION2         = 0x8E,
 
     /// SWF7
     ///
     /// http://sswf.sourceforge.net/SWFalexref.html#action_try
-    ///
     ACTION_TRY                     = 0x8F,
 
     ACTION_WITH                    = 0x94,
@@ -1413,7 +1400,7 @@ enum abc_action_type
     /// b
     /// Stack Out:
     /// a + b (double if numeric)
-    ABC_ACTION_ADD		   = 0xA0,
+    ABC_ACTION_ADD           = 0xA0,
 
     /// Stack In:    /// Stack In:
     ///  a
@@ -1738,18 +1725,18 @@ std::ostream& operator<< (std::ostream& os, const abc_action_type& typ);
 /// http://sswf.sourceforge.net/SWFalexref.html#swf_fill_style
 ///
 enum fill_style_type {
-	FILL_SOLID                   = 0x00,
-	FILL_LINEAR_GRADIENT         = 0x10,
-	FILL_RADIAL_GRADIENT         = 0x12,
-	FILL_FOCAL_GRADIENT	     = 0x13,
-	FILL_TILED_BITMAP            = 0x40,
-	FILL_CLIPPED_BITMAP          = 0x41,
+    FILL_SOLID                   = 0x00,
+    FILL_LINEAR_GRADIENT         = 0x10,
+    FILL_RADIAL_GRADIENT         = 0x12,
+    FILL_FOCAL_GRADIENT          = 0x13,
+    FILL_TILED_BITMAP            = 0x40,
+    FILL_CLIPPED_BITMAP          = 0x41,
 
-	/// swf8 (alexis is wrong), non-smoothed / hard edges
-	FILL_TILED_BITMAP_HARD       = 0x42, 
+    /// swf8 (alexis is wrong), non-smoothed / hard edges
+    FILL_TILED_BITMAP_HARD       = 0x42, 
 
-	/// swf8 (alexis is wrong), non-smoothed / hard edges
-	FILL_CLIPPED_BITMAP_HARD     = 0x43
+    /// swf8 (alexis is wrong), non-smoothed / hard edges
+    FILL_CLIPPED_BITMAP_HARD     = 0x43
 
 };
 
