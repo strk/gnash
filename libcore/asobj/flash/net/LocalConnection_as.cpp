@@ -111,8 +111,8 @@ writeNetwork32(char*& ptr, boost::uint32_t i)
 }
 
 inline boost::uint32_t
-readNetworkLong(const boost::uint8_t* buf) {
-	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
+readLong(const boost::uint8_t* buf) {
+	boost::uint32_t s = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
 	return s;
 }
 
@@ -322,6 +322,12 @@ LocalConnection_as::LocalConnection_as(as_object* owner)
     log_debug("The domain for this host is: %s", _domain);
 }
 
+
+/// From observing the behaviour of the pp, the following seem to be true.
+//
+/// (Behaviour may be different on other platforms).
+//
+/// If there is no timestamp the sent sequence is ignored.
 void
 LocalConnection_as::update()
 {
@@ -329,41 +335,70 @@ LocalConnection_as::update()
 
     std::vector<as_object*> refs;
 
-    // HACK!
-    const size_t size = readNetworkLong(
+    // These are not network byte order by default, but not sure about 
+    // host byte order.
+    const boost::uint32_t timestamp = readLong(
+            reinterpret_cast<boost::uint8_t*>(_shm.getAddr() + 8));
+
+    const size_t size = readLong(
             reinterpret_cast<boost::uint8_t*>(_shm.getAddr() + 12));
 
-    log_debug("Size: %s", size);
-    std::string s(_shm.getAddr() + 16, _shm.getAddr() + 16 + size);
+
+    // This seems to be quite normal, so don't log.
+    if (!timestamp || !size) return;
+    
+#if 0
+    std::string s(_shm.getAddr(), _shm.getAddr() + 512);
+    const boost::uint8_t* sptr = reinterpret_cast<const boost::uint8_t*>(s.c_str());
+    log_debug("%s \n %s", hexify(sptr, s.size(), false),
+            hexify(sptr, s.size(), true));
+#endif
+
+
+    // Start after 16-byte header.
+    const boost::uint8_t* b = reinterpret_cast<boost::uint8_t*>(_shm.getAddr()
+            + 16);
+
+    // End at reported size of AMF sequence.
+    const boost::uint8_t* end = reinterpret_cast<const boost::uint8_t*>(b +
+            size);
+    
+    log_debug("Timestamp: %s, size: %s", timestamp, size);
 
     as_value a;
 
-    const boost::uint8_t* b = reinterpret_cast<boost::uint8_t*>(_shm.getAddr() + 16);
-    const boost::uint8_t* end = reinterpret_cast<boost::uint8_t*>(_shm.getAddr() + size + 16);
-
-    // connection
+    // Connection. If this is not for us, we don't need to do anything.
     a.readAMF0(b, end, -1, refs, getVM(owner()));
-    log_debug("Connection: %s", a);
-
-    // protocol
-    a.readAMF0(b, end, -1, refs, getVM(owner()));
+    const std::string& connection = a.to_string();
+    if (connection != _name) return;
     
-    // function name.
-
+    // Protocol
     a.readAMF0(b, end, -1, refs, getVM(owner()));
+    log_debug("Protocol: %s", a);
+    
+    // The name of the function to call.
+    a.readAMF0(b, end, -1, refs, getVM(owner()));
+    log_debug("Method: %s", a);
     const std::string& meth = a.to_string();
 
-    fn_call::Args args;
+    // These are in reverse order!
+    std::vector<as_value> d;
     while(a.readAMF0(b, end, -1, refs, getVM(owner()))) {
-        args += a;
+        d.push_back(a);
     }
   
-    std::fill(_shm.getAddr(), _shm.getAddr() + size, '\0');
+    std::reverse(d.begin(), d.end());
+
+    fn_call::Args args;
+    args.swap(d);
+
+    // Zero the bytes read (though it's not clear if this is necessary).
+    std::fill(_shm.getAddr(), _shm.getAddr() + size + 16, '\0');
 
     log_debug("Meth: %s", meth);
 
+    // Call the method on this LocalConnection object.
     string_table& st = getStringTable(owner());
-
     as_function* f = owner().getMember(st.find(meth)).to_function();
 
     invoke(f, as_environment(getVM(owner())), &owner(), args);
@@ -562,6 +597,12 @@ localconnection_domain(const fn_call& fn)
 /// LocalConnection.send()
 //
 /// Returns false only if the call was syntactically incorrect.
+///
+/// The pp only ever seems have one send sequence (at least in the first 512
+/// bytes). Subsequent sends overwrite any sequence in shared memory.
+//
+/// The pp sometimes sends calls with no timestamp and no length. These
+/// appear to be ignored, so it's not clear what the point is.
 as_value
 localconnection_send(const fn_call& fn)
 {
@@ -606,7 +647,7 @@ localconnection_send(const fn_call& fn)
     std::map<as_object*, size_t> offsets;
     SimpleBuffer buf;
     
-    for (size_t i = 2; i < fn.nargs; ++i) {
+    for (size_t i = fn.nargs; i > 1; --i) {
         fn.arg(i).writeAMF0(buf, offsets, getVM(fn), false);
     }
 
