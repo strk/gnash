@@ -12,8 +12,6 @@
 #include "Date_as.h"
 #include "Array_as.h"
 
-#include "amf.h"
-
 namespace gnash {
 
 namespace AMF {
@@ -30,7 +28,7 @@ public:
         _writer(w),
         _st(vm.getStringTable()),
         _error(false)
-	{}
+    {}
     
     bool success() const { return !_error; }
 
@@ -131,7 +129,7 @@ Writer::writeObject(as_object* obj)
         _buf.appendByte(DATE_AMF0);
 
         // This actually only swaps on little-endian machines
-        ::amf::swapBytes(&d, 8);
+        swapBytes(&d, 8);
         _buf.append(&d, 8);
 
         // This should be timezone
@@ -236,7 +234,7 @@ Writer::writeNumber(double d)
     log_debug(_("amf: serializing number '%g'"), d);
 #endif
     _buf.appendByte(NUMBER_AMF0);
-    ::amf::swapBytes(&d, 8);
+    swapBytes(&d, 8);
     _buf.append(&d, 8);
     return true;
 }
@@ -279,6 +277,33 @@ Writer::writeBoolean(bool b)
     else _buf.appendByte(0);
 
     return true;
+}
+
+void*
+swapBytes(void *word, size_t size)
+{
+    union {
+    boost::uint16_t s;
+    struct {
+        boost::uint8_t c0;
+        boost::uint8_t c1;
+    } c;
+    } u;
+       
+    u.s = 1;
+        if (u.c.c0 == 0) {
+        // Big-endian machine: do nothing
+        return word;
+    }
+
+    // Little-endian machine: byte-swap the word
+    // A conveniently-typed pointer to the source data
+    boost::uint8_t *x = static_cast<boost::uint8_t *>(word);
+
+    /// Handle odd as well as even counts of bytes
+    std::reverse(x, x + size);
+    
+    return word;
 }
 
 } // namespace AMF

@@ -28,10 +28,7 @@
 #include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
 #include "as_value.h"
-#include "amf.h"
-#include "element.h"
-#include "sol.h"
-#include "net/SharedObject_as.h"
+#include "SharedObject_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -44,20 +41,19 @@
 #include "rc.h" // for use of rcfile
 #include "URLAccessManager.h"
 #include "network.h"
-#include "rtmp_client.h"
 #include "URL.h"
 #include "NetConnection_as.h"
 #include "Object.h"
 #include "AMF.h"
+#include "sol.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace {
-gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
-using namespace amf;
 
 namespace gnash {
 
@@ -96,8 +92,6 @@ namespace {
 /// Class used to serialize properties of an object to a buffer in SOL format
 class SOLPropsBufSerializer : public AbstractPropertyVisitor
 {
-
-    typedef std::map<as_object*, size_t> PropertiesOffsetTable;
 
 public:
 
@@ -170,7 +164,7 @@ private:
 
 } // anonymous namespace
 
-class SharedObject_as : public Relay, public RTMPClient
+class SharedObject_as : public Relay
 {
 public:
 
@@ -257,7 +251,7 @@ private:
     as_object& _owner;
     as_object* _data;
     bool _persistence;
-    SOL _sol;
+    amf::SOL _sol;
     bool _connected;
     std::string	_uri;
 };
@@ -770,6 +764,7 @@ sharedobject_connect(const fn_call& fn)
     GNASH_REPORT_FUNCTION;    
 
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
+    UNUSED(obj);
 
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -798,7 +793,7 @@ sharedobject_connect(const fn_call& fn)
 
     // This is always set without validification.fooc->setURI(uriStr);
     std::string str = nc->getURI();
-    obj->setPath(str);
+    //obj->setPath(str);
     URL uri = nc->getURI();
     Network *net = new Network;
 
@@ -849,7 +844,7 @@ sharedobject_send(const fn_call& fn)
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
 
     if (!obj->isConnected()) {
-        obj->connectToServer(obj->getURI());
+        //obj->connectToServer(obj->getURI());
     }
     
     return as_value();

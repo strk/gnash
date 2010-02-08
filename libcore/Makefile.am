@@ -28,8 +28,8 @@ FREETYPE_SOURCES = FreetypeGlyphsProvider.h FreetypeGlyphsProvider.cpp
 
 # Only enable if we're configured with --enable-mp3
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libnet \
+	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/abc \
@@ -41,7 +41,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
-	-I$(top_srcdir)/libamf \
 	$(PTHREAD_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
@@ -290,7 +289,6 @@ endif
 
 libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \

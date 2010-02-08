@@ -25,6 +25,7 @@ libgnashamf_la_SOURCES = \
 	buffer.cpp \
 	element.cpp \
 	sol.cpp \
+	lcshm.cpp \
 	flv.cpp
 
 libgnashamf_la_LIBADD = \
@@ -52,6 +53,7 @@ noinst_HEADERS = \
 	amfutf8.h \
 	amf.h \
 	amf_msg.h \
+	lcshm.h \
 	buffer.h \
 	element.h \
 	flv.h \

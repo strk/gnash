@@ -33,7 +33,6 @@
 #include "URLAccessManager.h"
 #include "URL.h"
 #include "VM.h"
-#include "amf.h"
 #include "SimpleBuffer.h"
 #include "namedStrings.h"
 #include "GnashAlgorithm.h"

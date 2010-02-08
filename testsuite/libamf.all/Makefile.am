@@ -54,6 +54,7 @@ check_PROGRAMS = \
 	test_amf \
 	test_amfmsg \
 	test_buffer \
+	test_lc \
 	test_el \
 	test_sol \
 	test_flv
@@ -74,8 +75,8 @@ test_amf_LDADD = $(AM_LDFLAGS)
 test_amfmsg_SOURCES = test_amfmsg.cpp
 test_amfmsg_LDADD = $(AM_LDFLAGS)
 
-#test_lc_SOURCES = test_lc.cpp
-#test_lc_LDADD = $(AM_LDFLAGS)
+test_lc_SOURCES = test_lc.cpp
+test_lc_LDADD = $(AM_LDFLAGS)
 
 test_buffer_SOURCES = test_buffer.cpp
 test_buffer_LDADD = $(AM_LDFLAGS)

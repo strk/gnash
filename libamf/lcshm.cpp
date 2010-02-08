@@ -504,7 +504,7 @@ LcShm::connect(const string& names)
     // When using sysv shared memory segments in compatibility mode,
     // the name is ignored, and the SHMkey is specified in the user's
     // ~/.gnashrc file.
-    if (Shm::attach(names.c_str(), true) == false) {
+    if (Shm::attach(0, true) == false) {
         return false;
     }
 
