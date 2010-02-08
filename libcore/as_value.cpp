@@ -1294,7 +1294,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
         {
 			if (b + 2 > end) {
 				log_error(_("AMF0 read: premature end of input reading String "
-                            " type"));
+                            " length"));
 				return false;
 			}
             boost::uint16_t si = readNetworkShort(b); b += 2;
