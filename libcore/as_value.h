@@ -48,9 +48,6 @@ namespace gnash {
 	class DisplayObject;
     class SimpleBuffer;
 }
-namespace amf {
-	class Element;
-}
 
 namespace gnash {
 
@@ -160,11 +157,6 @@ public:
 	/// Copy constructor.
 	as_value(const as_value& value);
 
-#if 0
-	/// Construct a value from an AMF element
-	as_value(const amf::Element& el);
-#endif
-
 	/// Return the primitive type of this value as a string.
 	const char* typeOf() const;
 
@@ -265,9 +257,6 @@ public:
     /// Note that this performs no conversion, so returns 0 if the as_value
     /// is not a function.
 	as_function* to_function() const;
-
-	/// Get an AMF element representation for this value
-    boost::shared_ptr<amf::Element> to_element() const;
 
     // Used for operator<< to give useful information about an
     // as_value object.

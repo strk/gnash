@@ -32,13 +32,14 @@
 #include "namedStrings.h"
 #include "element.h"
 #include "GnashException.h"
-#include "amf.h"
 #include "Array_as.h"
 #include "Date_as.h" // for Date type (readAMF0)
 #include "SimpleBuffer.h"
 #include "StringPredicates.h"
 #include "Global_as.h"
 #include "String_as.h"
+#include "AMF.h"
+#include "amf.h"
 
 #include <boost/shared_ptr.hpp>
 #include <cmath> 
@@ -229,91 +230,6 @@ parseDecimalNumber(std::string::const_iterator start,
 
     return boost::lexical_cast<double>(std::string(start, last));
 }
-
-
-// This class is used to iterate through all the properties of an AS object,
-// so we can change them to children of an AMF0 element.
-class PropsSerializer : public AbstractPropertyVisitor
-{
-
-public:
-
-    PropsSerializer(amf::Element& el, VM& vm)
-        :
-        _obj(el),
-	    _st(vm.getStringTable())
-	{}
-    
-    bool accept(const ObjectURI& uri, const as_value& val) 
-    {
-
-        // We are not taking account of the namespace.
-        const string_table::key key = getName(uri);
-
-        // Test conducted with AMFPHP:
-        // '__proto__' and 'constructor' members
-        // of an object don't get back from an 'echo-service'.
-        // Dunno if they are not serialized or just not sent back.
-        // A '__constructor__' member gets back, but only if 
-        // not a function. Actually no function gets back.
-        // 
-        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR)
-        {
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(" skip serialization of specially-named property %s",
-                    _st.value(key));
-#endif
-            return true;
-        }
-
-        amf::AMF amf;
-        boost::shared_ptr<amf::Element> el;
-    
-        const std::string& name = _st.value(key);
-
-        if (val.is_string()) {
-            std::string str;
-            if (!val.is_undefined()) {
-                str = val.to_string();
-            }
-            el.reset(new amf::Element(name, str));
-        } else if (val.is_bool()) {
-            bool flag = val.to_bool();
-            el.reset(new amf::Element(name, flag));
-        } else if (val.is_object()) {
-//            el.reset(new amf::Element(name, flag));
-        } else if (val.is_null()) {
-	    boost::shared_ptr<amf::Element> tmpel(new amf::Element);
-	    tmpel->setName(name);
-	    tmpel->makeNull();
-            el = tmpel;
-        } else if (val.is_undefined()) {
-	    boost::shared_ptr<amf::Element> tmpel(new amf::Element);
-	    tmpel->setName(name);
-	    tmpel->makeUndefined();
-            el = tmpel;
-        } else if (val.is_number()) { 
-            double dub;
-            if (val.is_undefined()) {
-                dub = 0.0;
-            } else {
-                dub = val.to_number();
-            }
-            el.reset(new amf::Element(name, dub));
-        }
-    
-        if (el) {
-            _obj.addProperty(el);
-        }
-        return true;
-    }
-
-private:
-
-    amf::Element& _obj;
-    string_table& _st;
-
-};
 
 } // anonymous namespace
 
@@ -638,47 +554,6 @@ as_value::to_number() const
     }
 }
 
-boost::shared_ptr<amf::Element>
-as_value::to_element() const
-{
-    VM& vm = VM::get();
-    //int swfVersion = vm.getSWFVersion();
-    boost::shared_ptr<amf::Element> el ( new amf::Element );
-    as_object* ptr = to_object(*vm.getGlobal());
-
-    switch (_type) {
-      case UNDEFINED:
-	  el->makeUndefined();
-	  break;
-      case NULLTYPE:
-	  el->makeNull();
-	  break;
-      case BOOLEAN:
-	  el->makeBoolean(getBool());
-	  break;
-      case  STRING:
-	  el->makeString(getStr());
-	  break;
-      case NUMBER:
-	  el->makeNumber(getNum());
-	  break;
-      case OBJECT:
-      {
-          if (is_function()) break;
-          el->makeObject();
-          PropsSerializer props(*el, vm);
-          ptr->visitProperties<Exists>(props);
-	  break;
-      }
-      case DISPLAYOBJECT:
-	  log_unimpl("Converting a Movie Clip to an element is not supported");
-	  break;
-      default:
-	  break;
-    }
-
-    return el;
-}
 
 // Conversion to boolean 
 bool
@@ -1262,7 +1137,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 	switch (amf_type)
     {
 
-		case amf::Element::BOOLEAN_AMF0:
+		case amf::BOOLEAN_AMF0:
 		{
 			bool val = *b; b += 1;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
@@ -1272,7 +1147,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 			return true;
 		}
 
-		case amf::Element::NUMBER_AMF0:
+		case amf::NUMBER_AMF0:
         {
 			if (b + 8 > end) {
 				log_error(_("AMF0 read: premature end of input reading Number type"));
@@ -1282,7 +1157,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             // TODO: may we avoid a copy and swapBytes call
             //       by bitshifting b[0] trough b[7] ?
             std::copy(b, b+8, (char*)&dub); b+=8; 
-			amf::swapBytes(&dub, 8);
+			::amf::swapBytes(&dub, 8);
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read double: %e", dub);
 #endif
@@ -1290,7 +1165,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 			return true;
         }
 
-		case amf::Element::STRING_AMF0:
+		case amf::STRING_AMF0:
         {
 			if (b + 2 > end) {
 				log_error(_("AMF0 read: premature end of input reading String "
@@ -1316,7 +1191,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 			break;
         }
 
-		case amf::Element::LONG_STRING_AMF0:
+		case amf::LONG_STRING_AMF0:
         {
 			if (b + 4 > end) {
 				log_error(_("AMF0 read: premature end of input "
@@ -1342,7 +1217,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 			break;
         }
 
-		case amf::Element::STRICT_ARRAY_AMF0:
+		case amf::STRICT_ARRAY_AMF0:
         {
             as_object* array = gl.createArray();
             objRefs.push_back(array);
@@ -1366,7 +1241,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             return true;
         }
 
-		case amf::Element::ECMA_ARRAY_AMF0:
+		case amf::ECMA_ARRAY_AMF0:
         {
             as_object* obj = gl.createArray();
             objRefs.push_back(obj);
@@ -1406,7 +1281,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
                 // followed by an OBJECT_END_AMF0 (0x09) byte
                 if (!strlen) {
                     // expect an object terminator here
-                    if (*b++ != amf::Element::OBJECT_END_AMF0) {
+                    if (*b++ != amf::OBJECT_END_AMF0) {
                         log_error("MALFORMED SOL: empty member name not "
                                 "followed by OBJECT_END_AMF0 byte");
                     }
@@ -1428,7 +1303,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             return true;
         }
 
-		case amf::Element::OBJECT_AMF0:
+		case amf::OBJECT_AMF0:
         {
             string_table& st = vm.getStringTable();
 
@@ -1448,7 +1323,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             for(;;)
             {
                 if ( ! amf0_read_value(b, end, tmp, 
-                            amf::Element::STRING_AMF0, objRefs, vm) )
+                            amf::STRING_AMF0, objRefs, vm) )
                 {
                     return false;
                 }
@@ -1471,7 +1346,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             }
         }
 
-		case amf::Element::UNDEFINED_AMF0:
+		case amf::UNDEFINED_AMF0:
         {
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("readAMF0: undefined value");
@@ -1480,7 +1355,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 				return true;
         }
 
-		case amf::Element::NULL_AMF0:
+		case amf::NULL_AMF0:
         {
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("readAMF0: null value");
@@ -1489,7 +1364,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
 				return true;
         }
 
-		case amf::Element::REFERENCE_AMF0:
+		case amf::REFERENCE_AMF0:
         {
             boost::uint16_t si = readNetworkShort(b); b += 2;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
@@ -1504,7 +1379,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
                 return true;
         }
 
-		case amf::Element::DATE_AMF0:
+		case amf::DATE_AMF0:
         {
 			if (b + 8 > end) {
 				log_error(_("AMF0 read: premature end of input reading Date "
@@ -1515,7 +1390,7 @@ amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end,
             // TODO: may we avoid a copy and swapBytes call
             //       by bitshifting b[0] trough b[7] ?
             std::copy(b, b+8, (char*)&dub); b+=8; 
-			amf::swapBytes(&dub, 8);
+			::amf::swapBytes(&dub, 8);
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read date: %e", dub);
 #endif
@@ -1592,10 +1467,10 @@ as_value::writeAMF0(SimpleBuffer& buf,
                     log_debug(_("writeAMF0: serializing date object "
                                 "with index %d and value %g"), idx, d);
 #endif
-                    buf.appendByte(amf::Element::DATE_AMF0);
+                    buf.appendByte(amf::DATE_AMF0);
 
                     // This actually only swaps on little-endian machines
-                    amf::swapBytes(&d, 8);
+                    ::amf::swapBytes(&d, 8);
                     buf.append(&d, 8);
 
                     // This should be timezone
@@ -1619,7 +1494,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
                                         "elements as STRICT_ARRAY (index %d)"),
                                         len, idx);
 #endif
-                            buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
+                            buf.appendByte(amf::STRICT_ARRAY_AMF0);
                             buf.appendNetworkLong(len);
 
                             as_value elem;
@@ -1643,7 +1518,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
                                 "[allowStrict:%d, isStrict:%d]"),
                                 len, idx, allowStrict, isStrict);
 #endif
-                    buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
+                    buf.appendByte(amf::ECMA_ARRAY_AMF0);
                     buf.appendNetworkLong(len);
                 }
                 else {
@@ -1652,7 +1527,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
                     log_debug(_("writeAMF0: serializing object (or function) "
                                 "with index %d"), idx);
 #endif
-                    buf.appendByte(amf::Element::OBJECT_AMF0);
+                    buf.appendByte(amf::OBJECT_AMF0);
                 }
 
                 PropsBufSerializer props(buf, vm, offsetTable, allowStrict);
@@ -1662,7 +1537,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
                     return false;
                 }
                 buf.appendNetworkShort(0);
-                buf.appendByte(amf::Element::OBJECT_END_AMF0);
+                buf.appendByte(amf::OBJECT_END_AMF0);
                 return true;
             }
             size_t idx = it->second;
@@ -1670,7 +1545,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
             log_debug(_("writeAMF0: serializing object (or function) "
                         "as reference to %d"), idx);
 #endif
-            buf.appendByte(amf::Element::REFERENCE_AMF0);
+            buf.appendByte(amf::REFERENCE_AMF0);
             buf.appendNetworkShort(idx);
             return true;
         }
@@ -1684,7 +1559,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
                 log_debug(_("writeAMF0: serializing string '%s'"), str);
 #endif
-                buf.appendByte(amf::Element::STRING_AMF0);
+                buf.appendByte(amf::STRING_AMF0);
                 buf.appendNetworkShort(strlen);
                 buf.append(str.c_str(), strlen);
             }
@@ -1693,7 +1568,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
                 log_debug(_("writeAMF0: serializing long string '%s'"), str);
 #endif
-                buf.appendByte(amf::Element::LONG_STRING_AMF0);
+                buf.appendByte(amf::LONG_STRING_AMF0);
                 buf.appendNetworkLong(strlen);
                 buf.append(str.c_str(), strlen);
             }
@@ -1706,8 +1581,8 @@ as_value::writeAMF0(SimpleBuffer& buf,
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
             log_debug(_("writeAMF0: serializing number '%g'"), d);
 #endif
-            buf.appendByte(amf::Element::NUMBER_AMF0);
-            amf::swapBytes(&d, 8); // this actually only swaps on little-endian machines
+            buf.appendByte(amf::NUMBER_AMF0);
+            ::amf::swapBytes(&d, 8); // this actually only swaps on little-endian machines
             buf.append(&d, 8);
             return true;
         }
@@ -1718,7 +1593,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
             log_debug(_("writeAMF0: serializing DISPLAYOBJECT (as undefined)"));
 #endif
             // See misc-ming.all/SharedObjectTest.as
-            buf.appendByte(amf::Element::UNDEFINED_AMF0);
+            buf.appendByte(amf::UNDEFINED_AMF0);
             return true;
         }
 
@@ -1727,7 +1602,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
             log_debug(_("writeAMF0: serializing null"));
 #endif
-            buf.appendByte(amf::Element::NULL_AMF0);
+            buf.appendByte(amf::NULL_AMF0);
             return true;
         }
 
@@ -1736,7 +1611,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
             log_debug(_("writeAMF0: serializing undefined"));
 #endif
-            buf.appendByte(amf::Element::UNDEFINED_AMF0);
+            buf.appendByte(amf::UNDEFINED_AMF0);
             return true;
         }
 
@@ -1747,7 +1622,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
             log_debug(_("writeAMF0: serializing boolean '%s'"), tf);
 #endif
 
-            buf.appendByte(amf::Element::BOOLEAN_AMF0);
+            buf.appendByte(amf::BOOLEAN_AMF0);
             if (tf) buf.appendByte(1);
             else buf.appendByte(0);
 
@@ -1943,213 +1818,6 @@ convertToPrimitive(as_value& v, VM& vm)
     return v;
 }
 
-#if 0
-
-/// Instantiate this value from an AMF element 
-as_value::as_value(const amf::Element& el)
-	:
-	_type(UNDEFINED)
-{
-    
-    VM& vm = VM::get();
-    string_table& st = vm.getStringTable();
-    Global_as& gl = *vm.getGlobal();
-
-    switch (el.getType()) {
-      case amf::Element::NOTYPE:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-	  log_debug("as_value(Element&) : AMF type NO TYPE!");
-#endif
-	  break;
-      }
-      case amf::Element::NULL_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type NULL");
-#endif
-            set_null();
-            break;
-      }
-      case amf::Element::UNDEFINED_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type UNDEFINED");
-#endif
-            set_undefined();
-            break;
-      }
-      case amf::Element::MOVIECLIP_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type DISPLAYOBJECT");
-#endif
-            log_unimpl("DISPLAYOBJECT AMF0 type");
-            set_undefined();
-            //_type = DISPLAYOBJECT;
-            //_value = el.getData();
-
-            break;
-      }
-      case amf::Element::NUMBER_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type NUMBER");
-#endif
-            double num = el.to_number();
-            set_double(num);
-            break;
-      }
-      case amf::Element::BOOLEAN_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type BOOLEAN");
-#endif
-            bool flag = el.to_bool();
-            set_bool(flag);
-            break;
-      }
-
-      case amf::Element::STRING_AMF0:
-      case amf::Element::LONG_STRING_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-            log_debug("as_value(Element&) : AMF type STRING");
-#endif
-	    std::string str;
-	    // If there is data, convert it to a string for the as_value
-	    if (el.getDataSize() != 0) {
-		str = el.to_string();
-		// Element's store the property name as the name, not as data.
-	    } else if (el.getNameSize() != 0) {
-		str = el.getName();
-	    }
-	    
-	    set_string(str);
-            break;
-      }
-
-      case amf::Element::OBJECT_AMF0:
-      {
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-          log_debug("as_value(Element&) : AMF type OBJECT");
-#endif
-          as_object* obj = gl.createObject();
-          if (el.propertySize()) {
-              for (size_t i=0; i < el.propertySize(); i++) {
-		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-		  if (prop == 0) {
-		      break;
-		  } else {
-		      if (prop->getNameSize() == 0) {
-			  log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
-		      } else {
-			  obj->set_member(st.find(prop->getName()), as_value(*prop));
-		      }
-		  }
-              }
-          }
-	  set_as_object(obj);
-          break;
-      }
-
-      case amf::Element::ECMA_ARRAY_AMF0:
-      {
-          // TODO: fixme: ECMA_ARRAY has an additional fiedl, dunno
-          //              if accessible trought Element class
-          //              (the theoretic number of elements in it)
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-          log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
-#endif
-
-          as_object* obj = gl.createArray();
-
-          if (el.propertySize()) {
-              for (size_t i=0; i < el.propertySize(); i++) {
-		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-		  if (prop == 0) {
-		      break;
-		  } else {
-		      obj->set_member(st.find(prop->getName()), as_value(*prop));
-		  }
-              }
-          }
-          set_as_object(obj);
-          break;
-      }
-    
-
-      case amf::Element::STRICT_ARRAY_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-          log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
-#endif
-          as_object* obj = gl.createArray();
-          size_t len = el.propertySize();
-          obj->set_member(NSV::PROP_LENGTH, len);
-
-          for (size_t i=0; i < el.propertySize(); i++) {
-              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-              if (prop == 0) {
-                  break;
-              } else {
-		  if (prop->getNameSize() == 0) {
-		      log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
-		  } else {
-		      obj->set_member(st.find(prop->getName()), as_value(*prop));
-		  }
-              }
-          }
-          
-          set_as_object(obj);
-          break;
-      }
-
-      case amf::Element::REFERENCE_AMF0:
-      {
-        log_unimpl("REFERENCE Element to as_value");
-        break;
-      }
-
-      case amf::Element::DATE_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-	  log_debug("as_value(Element&) : AMF type DATE");
-#endif
-	  double num = el.to_number();
-	  set_double(num);
-	  break;
-      }
-      //if (swfVersion > 5) _type = STRING;
-      
-      case amf::Element::UNSUPPORTED_AMF0:
-      {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-	  log_debug("as_value(Element&) : AMF type UNSUPPORTED");
-#endif
-	  break;
-      }
-      case amf::Element::RECORD_SET_AMF0:
-          log_unimpl("Record Set data type is not supported yet");
-          break;
-      case amf::Element::XML_OBJECT_AMF0:
-          log_unimpl("XML data type is not supported yet");
-          break;
-      case amf::Element::TYPED_OBJECT_AMF0:
-          log_unimpl("Typed Object data type is not supported yet");
-          break;
-      case amf::Element::AMF3_DATA:
-          log_unimpl("AMF3 data type is not supported yet");
-          break;
-      default:
-          log_unimpl("Element to as_value - unsupported Element type %d", 
-                  el.getType());
-          break;
-    }
-}
-#endif
 } // namespace gnash
 
 
