@@ -262,25 +262,27 @@ public:
     void send(const std::string& name, const std::string& func,
             const SimpleBuffer& buf)
     {
-        char i[] = { 0x01, 0, 0, 0, 1, 0, 0, 0 };
+        char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
         _shm.attach(0, false);
         const size_t headerSize = 16;
 
-        assert(_shm.getSize() > headerSize);
         char* ptr = _shm.getAddr();
         
-        if (!findListener("localhost:" + name, ptr, ptr + _shm.getSize())) {
+        const std::string uri(_domain + ":" + name);
+
+        if (!findListener(uri, ptr, ptr + _shm.getSize())) {
             dumpListeners(ptr, ptr + _shm.getSize());
             log_error("Listener not added!");
         }
         
         std::map<as_object*, size_t> offsets;
         SimpleBuffer b;
-        as_value n("localhost:" + name), f(func), p("localhost:");
+        as_value n(uri), f(func), p("localhost");
         n.writeAMF0(b, offsets, getVM(owner()), false);
         p.writeAMF0(b, offsets, getVM(owner()), false);
         f.writeAMF0(b, offsets, getVM(owner()), false);
 
+        assert(_shm.getSize() > headerSize + b.size() + buf.size());
         
         std::copy(i, i + sizeof(i), ptr);
         ptr += 8;
@@ -431,8 +433,6 @@ LocalConnection_as::connect(const std::string& name)
 
     _name = name;
     
-    log_debug("trying to open shared memory segment: \"%s\"", _name);
-    
     if (!_shm.attach(0, true)) {
         return;
     }
@@ -443,8 +443,6 @@ LocalConnection_as::connect(const std::string& name)
         log_error("Failed to open shared memory segment: \"%s\"", _name);
         return; 
     }
-
-    //std::memset(ptr, 0, _shm.getSize());
 
     addListener(_name, ptr, ptr + _shm.getSize());
     dumpListeners(ptr, ptr + _shm.getSize());
