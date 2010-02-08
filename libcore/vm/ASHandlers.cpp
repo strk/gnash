@@ -82,19 +82,19 @@ namespace {
             unsigned int nargs);
     as_object* toObject(Global_as& gl, const as_value& val);
 
-	/// Common code for ActionGetUrl and ActionGetUrl2
-	//
-	/// @param target 	    the target window or _level1 to _level10
-	/// @param method       0:NONE, 1:GET, 2:POST
-	void commonGetURL(as_environment& env, as_value target,
+    /// Common code for ActionGetUrl and ActionGetUrl2
+    //
+    /// @param target         the target window or _level1 to _level10
+    /// @param method       0:NONE, 1:GET, 2:POST
+    void commonGetURL(as_environment& env, as_value target,
             const std::string& url, boost::uint8_t method);
-	
+    
     /// Common code for SetTarget and SetTargetExpression
-	///
-	/// @param target_name      The target name. If empty new target will
+    ///
+    /// @param target_name      The target name. If empty new target will
     ///                         be the main movie.
-	/// @param thread       	The current execution thread.
-	void commonSetTarget(ActionExec& thread, const std::string& target_name);
+    /// @param thread           The current execution thread.
+    void commonSetTarget(ActionExec& thread, const std::string& target_name);
 
 
     enum as_encoding_guess_t {
@@ -113,109 +113,109 @@ namespace {
     as_encoding_guess_t guessEncoding(const std::string& s, int& length,
             std::vector<int>& offsets);
 
-	
+    
     void ActionEnd(ActionExec& thread);
-	void ActionNextFrame(ActionExec& thread);
-	void ActionPrevFrame(ActionExec& thread);
-	void ActionPlay(ActionExec& thread);
-	void ActionStop(ActionExec& thread);
-	void ActionToggleQuality(ActionExec& thread);
-	void ActionStopSounds(ActionExec& thread);
-	void ActionGotoFrame(ActionExec& thread);
-	void ActionGetUrl(ActionExec& thread);
-	void ActionWaitForFrame(ActionExec& thread);
-	void ActionSetTarget(ActionExec& thread);
-	void ActionGotoLabel(ActionExec& thread);
-	void ActionAdd(ActionExec& thread);
-	void ActionSubtract(ActionExec& thread);
-	void ActionMultiply(ActionExec& thread);
-	void ActionDivide(ActionExec& thread);
-	void ActionEqual(ActionExec& thread);
-	void ActionLessThan(ActionExec& thread);
-	void ActionLogicalAnd(ActionExec& thread);
-	void ActionLogicalOr(ActionExec& thread);
-	void ActionLogicalNot(ActionExec& thread);
-	void ActionStringEq(ActionExec& thread);
-	void ActionStringLength(ActionExec& thread);
-	void ActionSubString(ActionExec& thread);
-	void ActionPop(ActionExec& thread);
-	void ActionInt(ActionExec& thread);
-	void ActionGetVariable(ActionExec& thread);
-	void ActionSetVariable(ActionExec& thread);
-	void ActionSetTargetExpression(ActionExec& thread);
-	void ActionStringConcat(ActionExec& thread);
-	void ActionGetProperty(ActionExec& thread);
-	void ActionSetProperty(ActionExec& thread);
-	void ActionDuplicateClip(ActionExec& thread);
-	void ActionRemoveClip(ActionExec& thread);
-	void ActionTrace(ActionExec& thread);
-	void ActionStartDragMovie(ActionExec& thread);
-	void ActionStopDragMovie(ActionExec& thread);
-	void ActionStringCompare(ActionExec& thread);
-	void ActionThrow(ActionExec& thread);
-	void ActionCastOp(ActionExec& thread);
-	void ActionImplementsOp(ActionExec& thread);
-	void ActionFscommand2(ActionExec& thread);
-	void ActionRandom(ActionExec& thread);
-	void ActionMbLength(ActionExec& thread);
-	void ActionOrd(ActionExec& thread);
-	void ActionChr(ActionExec& thread);
-	void ActionGetTimer(ActionExec& thread);
-	void ActionMbSubString(ActionExec& thread);
-	void ActionMbOrd(ActionExec& thread);
-	void ActionMbChr(ActionExec& thread);
-	void ActionStrictMode(ActionExec& thread);
-	void ActionWaitForFrameExpression(ActionExec& thread);
-	void ActionPushData(ActionExec& thread);
-	void ActionBranchAlways(ActionExec& thread);
-	void ActionGetUrl2(ActionExec& thread);
-	void ActionBranchIfTrue(ActionExec& thread);
-	void ActionCallFrame(ActionExec& thread);
-	void ActionGotoExpression(ActionExec& thread);
-	void ActionDelete(ActionExec& thread);
-	void ActionDelete2(ActionExec& thread);
-	void ActionVarEquals(ActionExec& thread);
-	void ActionCallFunction(ActionExec& thread);
-	void ActionReturn(ActionExec& thread);
-	void ActionModulo(ActionExec& thread);
-	void ActionNew(ActionExec& thread);
-	void ActionVar(ActionExec& thread);
-	void ActionInitArray(ActionExec& thread);
-	void ActionInitObject(ActionExec& thread);
-	void ActionTypeOf(ActionExec& thread);
-	void ActionTargetPath(ActionExec& thread);
-	void ActionEnumerate(ActionExec& thread);
-	void ActionNewAdd(ActionExec& thread);
-	void ActionNewLessThan(ActionExec& thread);
-	void ActionNewEquals(ActionExec& thread);
-	void ActionToNumber(ActionExec& thread);
-	void ActionToString(ActionExec& thread);
-	void ActionDup(ActionExec& thread);
-	void ActionSwap(ActionExec& thread);
-	void ActionGetMember(ActionExec& thread);
-	void ActionSetMember(ActionExec& thread);
-	void ActionIncrement(ActionExec& thread);
-	void ActionDecrement(ActionExec& thread);
-	void ActionCallMethod(ActionExec& thread);
-	void ActionNewMethod(ActionExec& thread);
-	void ActionInstanceOf(ActionExec& thread);
-	void ActionEnum2(ActionExec& thread);
-	void ActionBitwiseAnd(ActionExec& thread);
-	void ActionBitwiseOr(ActionExec& thread);
-	void ActionBitwiseXor(ActionExec& thread);
-	void ActionShiftLeft(ActionExec& thread);
-	void ActionShiftRight(ActionExec& thread);
-	void ActionShiftRight2(ActionExec& thread);
-	void ActionStrictEq(ActionExec& thread);
-	void ActionGreater(ActionExec& thread);
-	void ActionStringGreater(ActionExec& thread);
-	void ActionExtends(ActionExec& thread);
-	void ActionConstantPool(ActionExec& thread);
-	void ActionDefineFunction2(ActionExec& thread);
-	void ActionTry(ActionExec& thread);
-	void ActionWith(ActionExec& thread);
-	void ActionDefineFunction(ActionExec& thread);
-	void ActionSetRegister(ActionExec& thread);
+    void ActionNextFrame(ActionExec& thread);
+    void ActionPrevFrame(ActionExec& thread);
+    void ActionPlay(ActionExec& thread);
+    void ActionStop(ActionExec& thread);
+    void ActionToggleQuality(ActionExec& thread);
+    void ActionStopSounds(ActionExec& thread);
+    void ActionGotoFrame(ActionExec& thread);
+    void ActionGetUrl(ActionExec& thread);
+    void ActionWaitForFrame(ActionExec& thread);
+    void ActionSetTarget(ActionExec& thread);
+    void ActionGotoLabel(ActionExec& thread);
+    void ActionAdd(ActionExec& thread);
+    void ActionSubtract(ActionExec& thread);
+    void ActionMultiply(ActionExec& thread);
+    void ActionDivide(ActionExec& thread);
+    void ActionEqual(ActionExec& thread);
+    void ActionLessThan(ActionExec& thread);
+    void ActionLogicalAnd(ActionExec& thread);
+    void ActionLogicalOr(ActionExec& thread);
+    void ActionLogicalNot(ActionExec& thread);
+    void ActionStringEq(ActionExec& thread);
+    void ActionStringLength(ActionExec& thread);
+    void ActionSubString(ActionExec& thread);
+    void ActionPop(ActionExec& thread);
+    void ActionInt(ActionExec& thread);
+    void ActionGetVariable(ActionExec& thread);
+    void ActionSetVariable(ActionExec& thread);
+    void ActionSetTargetExpression(ActionExec& thread);
+    void ActionStringConcat(ActionExec& thread);
+    void ActionGetProperty(ActionExec& thread);
+    void ActionSetProperty(ActionExec& thread);
+    void ActionDuplicateClip(ActionExec& thread);
+    void ActionRemoveClip(ActionExec& thread);
+    void ActionTrace(ActionExec& thread);
+    void ActionStartDragMovie(ActionExec& thread);
+    void ActionStopDragMovie(ActionExec& thread);
+    void ActionStringCompare(ActionExec& thread);
+    void ActionThrow(ActionExec& thread);
+    void ActionCastOp(ActionExec& thread);
+    void ActionImplementsOp(ActionExec& thread);
+    void ActionFscommand2(ActionExec& thread);
+    void ActionRandom(ActionExec& thread);
+    void ActionMbLength(ActionExec& thread);
+    void ActionOrd(ActionExec& thread);
+    void ActionChr(ActionExec& thread);
+    void ActionGetTimer(ActionExec& thread);
+    void ActionMbSubString(ActionExec& thread);
+    void ActionMbOrd(ActionExec& thread);
+    void ActionMbChr(ActionExec& thread);
+    void ActionStrictMode(ActionExec& thread);
+    void ActionWaitForFrameExpression(ActionExec& thread);
+    void ActionPushData(ActionExec& thread);
+    void ActionBranchAlways(ActionExec& thread);
+    void ActionGetUrl2(ActionExec& thread);
+    void ActionBranchIfTrue(ActionExec& thread);
+    void ActionCallFrame(ActionExec& thread);
+    void ActionGotoExpression(ActionExec& thread);
+    void ActionDelete(ActionExec& thread);
+    void ActionDelete2(ActionExec& thread);
+    void ActionVarEquals(ActionExec& thread);
+    void ActionCallFunction(ActionExec& thread);
+    void ActionReturn(ActionExec& thread);
+    void ActionModulo(ActionExec& thread);
+    void ActionNew(ActionExec& thread);
+    void ActionVar(ActionExec& thread);
+    void ActionInitArray(ActionExec& thread);
+    void ActionInitObject(ActionExec& thread);
+    void ActionTypeOf(ActionExec& thread);
+    void ActionTargetPath(ActionExec& thread);
+    void ActionEnumerate(ActionExec& thread);
+    void ActionNewAdd(ActionExec& thread);
+    void ActionNewLessThan(ActionExec& thread);
+    void ActionNewEquals(ActionExec& thread);
+    void ActionToNumber(ActionExec& thread);
+    void ActionToString(ActionExec& thread);
+    void ActionDup(ActionExec& thread);
+    void ActionSwap(ActionExec& thread);
+    void ActionGetMember(ActionExec& thread);
+    void ActionSetMember(ActionExec& thread);
+    void ActionIncrement(ActionExec& thread);
+    void ActionDecrement(ActionExec& thread);
+    void ActionCallMethod(ActionExec& thread);
+    void ActionNewMethod(ActionExec& thread);
+    void ActionInstanceOf(ActionExec& thread);
+    void ActionEnum2(ActionExec& thread);
+    void ActionBitwiseAnd(ActionExec& thread);
+    void ActionBitwiseOr(ActionExec& thread);
+    void ActionBitwiseXor(ActionExec& thread);
+    void ActionShiftLeft(ActionExec& thread);
+    void ActionShiftRight(ActionExec& thread);
+    void ActionShiftRight2(ActionExec& thread);
+    void ActionStrictEq(ActionExec& thread);
+    void ActionGreater(ActionExec& thread);
+    void ActionStringGreater(ActionExec& thread);
+    void ActionExtends(ActionExec& thread);
+    void ActionConstantPool(ActionExec& thread);
+    void ActionDefineFunction2(ActionExec& thread);
+    void ActionTry(ActionExec& thread);
+    void ActionWith(ActionExec& thread);
+    void ActionDefineFunction(ActionExec& thread);
+    void ActionSetRegister(ActionExec& thread);
     void ActionUnsupported(ActionExec& thread);
 }
 
@@ -3108,7 +3108,7 @@ ActionCallMethod(ActionExec& thread)
     call.super = super;
     call.callerDef = &(thread.code.getMovieDefinition());
     as_value result;
-	try {
+    try {
         result = method_obj->call(call);
     } catch (ActionTypeError& e) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3410,16 +3410,16 @@ ActionExtends(ActionExec& thread)
     }
     env.drop(2);
 
-	as_object* newproto = new as_object(gl);
-	as_object* p = super->getMember(NSV::PROP_PROTOTYPE).to_object(gl);
-	newproto->set_prototype(p);
+    as_object* newproto = new as_object(gl);
+    as_object* p = super->getMember(NSV::PROP_PROTOTYPE).to_object(gl);
+    newproto->set_prototype(p);
 
     if (getSWFVersion(*super) > 5) {
         const int flags = PropFlags::dontEnum;
         newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, super, flags); 
     }
 
-	sub->init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
+    sub->init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
 
 }
 
