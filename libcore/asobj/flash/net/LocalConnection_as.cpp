@@ -27,8 +27,7 @@
 #include "URLAccessManager.h"
 #include "URL.h"
 #include "log.h"
-#include "net/LocalConnection_as.h"
-#include "network.h"
+#include "LocalConnection_as.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "builtin_function.h"
@@ -37,7 +36,7 @@
 #include "namedStrings.h"
 #include "StringPredicates.h"
 #include "as_value.h"
-#include "amf.h"
+#include "AMF.h"
 #include "ClockTime.h"
 
 #include <cerrno>
@@ -45,7 +44,6 @@
 #include <boost/cstdint.hpp> // for boost::?int??_t
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
-using namespace amf;
 
 /// http://www.osflash.org/localconnection
 ///
@@ -80,11 +78,10 @@ using namespace amf;
 ///     * The listeners block starts at 40k+16 = 40976 bytes,
 ///     * To add a listener, simply append its name in the listeners list
 ///     (null terminated strings)
+
 namespace {
-
-gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();    
-
-} // anonymous namespace
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();    
+} 
 
 namespace gnash {
 
@@ -239,8 +236,7 @@ public:
 
     void connect(const std::string& name);
 
-    void send(const std::string& name, const std::string& func,
-            const SimpleBuffer& buf)
+    void send(const SimpleBuffer& buf)
     {
         char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
         _shm.attach(0, false);
@@ -248,30 +244,16 @@ public:
 
         char* ptr = _shm.getAddr();
         
-        const std::string uri(_domain + ":" + name);
-
-        if (!findListener(uri, ptr, ptr + _shm.getSize())) {
-            log_error("Listener not added!");
-        }
-        
-        std::map<as_object*, size_t> offsets;
-        SimpleBuffer b;
-        as_value n(uri), f(func), p("localhost");
-        n.writeAMF0(b, offsets, getVM(owner()), false);
-        p.writeAMF0(b, offsets, getVM(owner()), false);
-        f.writeAMF0(b, offsets, getVM(owner()), false);
-
-        assert(_shm.getSize() > headerSize + b.size() + buf.size());
+        assert(_shm.getSize() > headerSize + buf.size());
         
         std::copy(i, i + sizeof(i), ptr);
         ptr += 8;
         boost::uint32_t time = clocktime::getTicks();
         writeLong(ptr, time);
-        writeLong(ptr, buf.size() + b.size());
+        writeLong(ptr, buf.size());
 
         if (!_shm.getAddr()) return;
-        std::copy(b.data(), b.data() + b.size(), ptr);
-        std::copy(buf.data(), buf.data() + buf.size(), ptr + b.size());
+        std::copy(buf.data(), buf.data() + buf.size(), ptr);
     }
 
 private:
@@ -617,12 +599,18 @@ localconnection_send(const fn_call& fn)
         );
         return as_value(false);
     }
-
-    std::map<as_object*, size_t> offsets;
-    SimpleBuffer buf;
     
+    SimpleBuffer buf;
+
+    // Don't know whether strict arrays are allowed
+    AMF::Writer w(buf, false);
+    const std::string uri(relay->domain() + ":" + name);
+    w.writeString(uri);
+    w.writeString("localhost");
+    w.writeString(func);
+
     for (size_t i = fn.nargs - 1; i > 1; --i) {
-        fn.arg(i).writeAMF0(buf, offsets, getVM(fn), false);
+        fn.arg(i).writeAMF0(w);
     }
 
     // Now we have a valid call.
@@ -634,7 +622,7 @@ localconnection_send(const fn_call& fn)
         return as_value(true);
     }
 
-    relay->send(name, func, buf);
+    relay->send(buf);
 
     return as_value(true);
 }

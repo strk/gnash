@@ -48,13 +48,10 @@
 #include "URL.h"
 #include "NetConnection_as.h"
 #include "Object.h"
+#include "AMF.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
-
-// Undefine this to use the Element-based AMF0 decoder/encoder.
-// May be useful to test libamf.
-#define BUFFERED_AMF_SOL
 
 namespace {
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -96,59 +93,6 @@ namespace {
 // Serializer helper
 namespace { 
 
-class PropsSerializer : public AbstractPropertyVisitor
-{
-public:
-
-    PropsSerializer(SOL& sol, VM& vm)
-        :
-        _sol(sol),
-        _st(vm.getStringTable())
-    {};
-
-    bool accept(const ObjectURI& uri, const as_value& val) 
-    {
-        AMF amf;
-        boost::shared_ptr<amf::Element> el;
-        
-        // We omit the namespace.
-        const std::string& name = _st.string_table::value(getName(uri));
-
-        //log_debug("Serializing SharedObject property %s:%s", name, val);
-
-        if (val.is_string()) {
-            std::string str;
-            if (!val.is_undefined()) {
-                str = val.to_string();
-            }
-            el.reset(new amf::Element(name, str));
-        }
-        if (val.is_bool()) {
-            bool flag = val.to_bool();
-            el.reset(new amf::Element(name, flag));
-        }
-        if (val.is_number()) { 
-            double dub;
-            if (val.is_undefined()) {
-                dub = 0.0;
-            } else {
-                dub = val.to_number();
-            }
-            el.reset(new amf::Element(name, dub));
-        }
-
-        if (el) {
-            _sol.addObj(el);
-        }
-        return true;
-    }
-
-private:
-
-    SOL& _sol;
-    string_table& _st;
-};
-
 /// Class used to serialize properties of an object to a buffer in SOL format
 class SOLPropsBufSerializer : public AbstractPropertyVisitor
 {
@@ -157,13 +101,11 @@ class SOLPropsBufSerializer : public AbstractPropertyVisitor
 
 public:
 
-    SOLPropsBufSerializer(SimpleBuffer& buf, VM& vm,
-            PropertiesOffsetTable& offsetTable)
+    SOLPropsBufSerializer(AMF::Writer w, VM& vm)
         :
-        _buf(buf),
+        _writer(w),
         _vm(vm),
         _st(vm.getStringTable()),
-        _offsetTable(offsetTable),
         _error(false)
 	{};
     
@@ -201,11 +143,9 @@ public:
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
         log_debug(" serializing property %s", name);
 #endif
-        boost::uint16_t namelen = name.size();
-        _buf.appendNetworkShort(namelen);
-        _buf.append(name.c_str(), namelen);
+        _writer.writePropertyName(name);
         // Strict array are never encoded in SharedObject
-        if (!val.writeAMF0(_buf, _offsetTable, _vm, false))
+        if (!val.writeAMF0(_writer))
         {
             log_error("Problems serializing an object's member %s=%s",
                     name, val);
@@ -214,17 +154,17 @@ public:
             // Stop visiting....
             return false;
         }
-        // SOL-specific
-        _buf.appendByte(0); 
+
+        boost::uint8_t end(0);
+        _writer.writeData(&end, 1);
         return true;
     }
 
 private:
 
-    SimpleBuffer& _buf;
+    AMF::Writer _writer;
     VM& _vm;
     string_table& _st;
-    PropertiesOffsetTable& _offsetTable;
     bool _error;
 };
 
@@ -364,8 +304,6 @@ SharedObject_as::flush(int space) const
         return false;
     }
     
-#ifdef BUFFERED_AMF_SOL
-
     gnash::SimpleBuffer buf;
     // see http://osflash.org/documentation/amf/envelopes/sharedobject
 
@@ -384,8 +322,10 @@ SharedObject_as::flush(int space) const
     // append properties of object
     VM& vm = getVM(_owner);
 
-    std::map<as_object*, size_t> offsetTable;
-    SOLPropsBufSerializer props(buf, vm, offsetTable);
+    // Do not encode strict arrays!
+    AMF::Writer w(buf, false);
+
+    SOLPropsBufSerializer props(w, vm);
     _data->visitProperties<Exists>(props);
     if (!props.success()) {
         log_error("Could not serialize object");
@@ -411,23 +351,6 @@ SharedObject_as::flush(int space) const
         return false;
     }
     ofs.close();
-
-#else // amf::SOL-based serialization
-
-    // append properties of object
-    VM& vm = getVM(*this)
-
-    SOL sol;
-    PropsSerializer props(sol, vm);
-    _data->visitPropertyValues(props);
-    // We only want to access files in this directory
-    bool ret = sol.writeFile(filespec, getObjectName().c_str());
-    if ( ! ret )
-    {
-        log_error("writing SharedObject file to %s", filespec);
-        return false;
-    }
-#endif
 
     log_security("SharedObject '%s' written to filesystem.", filespec);
     return true;
@@ -1127,8 +1050,6 @@ as_object*
 readSOL(VM& vm, const std::string& filespec)
 {
 
-#ifdef BUFFERED_AMF_SOL
-
     Global_as& gl = *vm.getGlobal();
 
     // The 'data' member is initialized only on getLocal() (and probably
@@ -1223,72 +1144,6 @@ readSOL(VM& vm, const std::string& filespec)
         return 0;
     }
 
-#else
-    SOL sol;
-    log_security("Opening SharedObject file: %s", filespec);
-    if (sol.readFile(filespec) == false) {
-        log_security("empty or non-existing SOL file \"%s\", will be "
-                "created on flush/exit", filespec);
-        return false;
-    }
-    
-    std::vector<boost::shared_ptr<amf::Element> >::const_iterator it, e;
-    std::vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
-    log_debug("Read %d AMF objects from %s", els.size(), filespec);
-
-    as_value as = getMember(NSV::PROP_DATA);
-    as_object* ptr = as.to_object(getGlobal(fn));
-    
-    for (it = els.begin(), e = els.end(); it != e; it++) {
-        boost::shared_ptr<amf::Element> el = *it;
-
-        switch (el->getType())
-        {
-            case Element::NUMBER_AMF0:
-            {
-                double dub =  *(reinterpret_cast<double*>(el->getData()));
-                ptr->set_member(st.string_table::find(el->getName()),
-                        as_value(dub));
-                break;
-            }
-
-            case Element::BOOLEAN_AMF0:
-                ptr->set_member(st.string_table::find(el->getName()),
-                                            as_value(el->to_bool()));
-                break;
-
-            case Element::STRING_AMF0:
-            {
-                if (el->getLength() == 0) {
-                    ptr->set_member(st.string_table::find(el->getName()), "");
-                    break;
-                }
-                
-                std::string str(reinterpret_cast<const char*>(el->getData()),
-                        el->getLength());
-                ptr->set_member(st.string_table::find(el->getName()), str);
-                break;
-            }
-
-            case Element::OBJECT_AMF0:
-                // TODO: implement!
-                log_unimpl("Reading OBJECT type from SharedObject");
-                //data.convert_to_object(getGlobal(fn));
-                //ptr->set_member(st.string_table::find(el->name), data);
-                return false;
-                break;
-
-            default:
-                // TODO: what about other types?
-                log_unimpl("Reading SOL type %d", el->getType());
-                return false;
-                break;
-        } 
-
-    }
-
-    return true;
-#endif
 }
 
 

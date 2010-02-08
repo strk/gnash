@@ -39,6 +39,7 @@
 #include "GnashAlgorithm.h"
 #include "fn_call.h"
 #include "Global_as.h"
+#include "AMF.h"
 
 #include <iostream>
 #include <string>
@@ -600,51 +601,49 @@ void
 HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args, size_t firstArg)
 {
-    boost::scoped_ptr<SimpleBuffer> buf (new SimpleBuffer(32));
+    SimpleBuffer buf(32);
 
     // method name
-    buf->appendNetworkShort(methodName.size());
-    buf->append(methodName.c_str(), methodName.size());
+    buf.appendNetworkShort(methodName.size());
+    buf.append(methodName.c_str(), methodName.size());
 
     // client id (result number) as counted string
     // the convention seems to be / followed by a unique (ascending) number
     std::ostringstream os;
     os << "/";
     // Call number is not used if the callback is undefined
-    if ( asCallback )
-    {
+    if (asCallback) {
         os << ++_numCalls; 
     }
     const std::string callNumberString = os.str();
 
-    buf->appendNetworkShort(callNumberString.size());
-    buf->append(callNumberString.c_str(), callNumberString.size());
+    buf.appendNetworkShort(callNumberString.size());
+    buf.append(callNumberString.c_str(), callNumberString.size());
 
-    size_t total_size_offset = buf->size();
-    buf->append("\000\000\000\000", 4); // total size to be filled in later
-
-    std::map<as_object*, size_t> offsetTable;
+    size_t total_size_offset = buf.size();
+    buf.append("\000\000\000\000", 4); // total size to be filled in later
 
     // encode array of arguments to remote method
-    buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
-    buf->appendNetworkLong(args.size()-firstArg);
+    buf.appendByte(AMF::STRICT_ARRAY_AMF0);
+    buf.appendNetworkLong(args.size()-firstArg);
 
     VM& vm = getVM(_nc.owner());
+    
+    // STRICT_ARRAY encoding is allowed for remoting
+    AMF::Writer w(buf, true);
 
     for (unsigned int i = firstArg; i < args.size(); ++i)
     {
         const as_value& arg = args[i];
-        // STRICT_ARRAY encoding is allowed for remoting
-        if ( ! arg.writeAMF0(*buf, offsetTable, vm, true) )
-        {
+        if (!arg.writeAMF0(w)) {
             log_error("Could not serialize NetConnection.call argument %d",
                     i);
         }
     }
 
     // Set the "total size" parameter.
-    *(reinterpret_cast<uint32_t*>(buf->data() + total_size_offset)) = 
-        htonl(buf->size() - 4 - total_size_offset);
+    *(reinterpret_cast<uint32_t*>(buf.data() + total_size_offset)) = 
+        htonl(buf.size() - 4 - total_size_offset);
 
 #ifdef GNASH_DEBUG_REMOTING
     log_debug(_("NetConnection.call(): encoded args: %s"),
@@ -655,14 +654,14 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("calling enqueue with callback");
 #endif
-        enqueue(*buf, callNumberString, asCallback);
+        enqueue(buf, callNumberString, asCallback);
     }
     
     else {
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("calling enqueue without callback");
 #endif
-        enqueue(*buf);
+        enqueue(buf);
     }
 }
 
