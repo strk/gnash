@@ -25,11 +25,10 @@
 RPMBUILD_FLAGS = # --clean --rmsource --rmspec
 
 gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
-	@nick=$(BRANCH_NICK); \
-	revno=$(BRANCH_REVNO); \
-	version=$${nick}$${revno}; \
-	echo "Editing the version in the spec file to be $${version}..."; \
-	sed -e "s/Version.*/Version:	$${version}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec;
+	snapshot_version="$(SNAPSHOT_VERSION)"; \
+	snapshot_version=`echo $${snapshot_version}|tr "~" "_"`; \
+	echo "Editing the version in the spec file to be $${snapshot_version}..."; \
+	sed -e "s/Version.*/Version:	$${snapshot_version}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec;
 
 # Build an Redhat/Fedora .rpm package
 # We do this by using the source snapshot that we know is 'distclean'.
@@ -40,7 +39,7 @@ gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
 # instead, so now you don't have to be root to build rpm packages.
 
 # Do the entire process to build an RPM package
-rpm: spec snapshot-src rpm-setup rpm-gnash
+rpm: spec snapshot-src setup-rpm rpm-gnash
 
 # build everything in one pass using rpmbuild
 rpm-gnash: 
@@ -61,13 +60,33 @@ rpm-build:
 rpm-install: 
 	rpmbuild -bi --short-circuit $(RPMBUILD_FLAGS) gnash.spec
 
-rpm-setup: 
-	cp $(SNAPSHOT_TAR) $${HOME}/rpmbuild/SOURCES/$(SNAPSHOT_DIR).tar.gz
+# After distdir is done, all we have is an empty subdirectory
+# populated from the *_DIST variables used by Automake. RPM and Deb
+# naming conventions are similar, but just different enough that the
+# source directory and tarball names are subtely different, namely
+# Debian uses a '~' character in their version names, which rpmbuild
+# doesn't like, so for an RPM we convert it to a '_' instead. Then we
+# have to rename the subdirectory to match the new version of the
+# snapshot, and edit the configure* files to have the proper version
+# name.
+# Unlike creating a deb, which build their own source tarball, rpm
+# requires we do it ourselves, and copy it to $HOME/rpmbuild/SOURCES
+# before rpmbuild will work.
+setup-rpm: 
+	snapshot_version="gnash-$(SNAPSHOT_VERSION)"; \
+	snapshot_version=`echo $${snapshot_version}|tr "~" "_"`; \
+	if test -d gnash-trunk; then \
+	  mv gnash-trunk $${snapshot_version}; \
+	  if test ! -f $${snapshot_version}/configure.ac.orig; then \
+	    mv -f $${snapshot_version}/configure.ac $${snapshot_version}/configure.ac.orig; \
+	    sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $${snapshot_version})/" \
+	      $${snapshot_version}/configure.ac.orig > $${snapshot_version}/configure.ac; \
+	  fi; \
+	fi; \
+	tar zcf $${snapshot_version}.tar.gz \
+	  --exclude=$${snapshot_version}/autom4te.cache \
+	  --exclude=$${snapshot_version}/configure.ac.orig \
+	  --exclude=$${snapshot_version}/configure.orig $${snapshot_version}; \
+	cp $${snapshot_version}.tar.gz $${HOME}/rpmbuild/SOURCES/
 
-# build klash and the konqueror plugin as a sepaate step.
-rpm-klash:
-	rpmbuild -ba $(RPMBUILD_FLAGS) glash.spec
-
-.PHONY : rpm redhat rpm-klash spec rpm-configure rpm-install rpm-build rpm-setup
-
-
+.PHONY : rpm redhat spec rpm-configure rpm-install rpm-build setup-rpm

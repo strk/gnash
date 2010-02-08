@@ -221,4 +221,4 @@ get-bzr-source:
 
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install get-bzr-source
+.PHONY: config build clean binary-indep binary-arch binary install get-bzr-source patch

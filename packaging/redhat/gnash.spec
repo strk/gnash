@@ -1,6 +1,6 @@
 Name:           gnash
-Version:        20100117
-Release:        1
+Version:        trunk
+Release:        0
 Distribution:	fc12
 #Distribution:	ydl6
 Summary:        GNU SWF player
@@ -184,7 +184,7 @@ make $MAKEFLAGS dumpconfig all
 # shell, but sometimes that's what you need to do.
 # export CONFIG_SHELL="sh -x"
 # sh -x ./configure
-./configure \
+sh ./configure \
 	$CROSS_OPTS \
 	$SOUND $GUI \
 	$RENDERER \
