@@ -1,6 +1,23 @@
 gnash (trunk) unstable; urgency=low
 
   * local package, many tweaks to be more standards compliant.
+    - Drop depend on gstreamer0.10-alsa, it is not needed as long as
+      gstreamer0.10-plugins-bad depend on it.
+    - Reorder control entries to match the ordering used in the sid package.
+    - Reorder mozilla-plugin-gnash.dirs to match the order used in the
+      sid package.
+    - Make sure mozilla-plugin-gnash.postinst do not exit with an error
+      for aborted installs.
+    - Change alternative priority used in mozilla-plugin-gnash.postinst
+      to match the sid package.
+    - Add comments from the sid package to postinst and postrm.
+    - Make sure to remove README.amf and README.cygnal during clean, they
+      are not in the source tarball.
+    - Make sure to copy config.sub and .guess to build on all the debian
+      archs.
+    - Make some print statements in the rules file match the ones in sid,
+      to make the diff between the two easier to read.
+    - Add missing phony targets.
 
  -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Tue, 2 Feb 2010 04:20:00 +0100
 

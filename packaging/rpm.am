@@ -39,7 +39,7 @@ gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
 # instead, so now you don't have to be root to build rpm packages.
 
 # Do the entire process to build an RPM package
-rpm: spec snapshot-src setup-rpm rpm-gnash
+rpm: distdir spec setup-rpm rpm-gnash
 
 # build everything in one pass using rpmbuild
 rpm-gnash: 
