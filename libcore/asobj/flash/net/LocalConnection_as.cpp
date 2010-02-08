@@ -93,9 +93,7 @@ namespace {
     as_value localconnection_close(const fn_call& fn);
 
     bool validFunctionName(const std::string& func);
-
     void attachLocalConnectionInterface(as_object& o);
-    as_object* getLocalConnectionInterface();
 }
 
 void
