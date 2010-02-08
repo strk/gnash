@@ -47,12 +47,6 @@ enum ArgumentType {
     ARG_FUNCTION2
 };
 
-enum as_encoding_guess_t {
-    ENCGUESS_UNICODE = 0,
-    ENCGUESS_JIS = 1,
-    ENCGUESS_OTHER = 2
-};
-
 
 class ActionHandler
 {
@@ -88,11 +82,6 @@ class SWFHandlers
 {
 public:
 
-	/// TODO: use a vector as we can have at most 254 actions
-	/// (127 w/out length, 127 with length, the high bit is
-	///  used to distinguish the two types)
-	//typedef std::map<ActionType, ActionHandler> container_type;
-
 	// Indexed by action id
 	typedef std::vector<ActionHandler> container_type;
 
@@ -122,130 +111,6 @@ private:
 
 	static container_type & get_handlers();
 
-	/// Common code for SetTarget and SetTargetExpression
-	//
-	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_set_target
-	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
-	///
-	/// @param target_name
-	///	The target name. If empty new target will be the main movie.
-	///
-	/// @param thread
-	///	The current execution thread.
-	///
-	static void CommonSetTarget(ActionExec& thread, 
-			const std::string& target_name);
-
-    /// Common code for guessing at the encoding of random text, between
-    // Shift-Jis, UTF8, and other. Puts the DisplayObject count in length,
-    // and the offsets to the DisplayObjects in offsets, if offsets is not NULL.
-    // If not NULL, offsets should be at least s.length().
-    // offsets are not accurate if the return value is GUESSENC_OTHER
-    static as_encoding_guess_t guessEncoding(const std::string& s, int& length,
-            std::vector<int>& offsets);
-
-	static void ActionEnd(ActionExec& thread);
-	static void ActionNextFrame(ActionExec& thread);
-	static void ActionPrevFrame(ActionExec& thread);
-	static void ActionPlay(ActionExec& thread);
-	static void ActionStop(ActionExec& thread);
-	static void ActionToggleQuality(ActionExec& thread);
-	static void ActionStopSounds(ActionExec& thread);
-	static void ActionGotoFrame(ActionExec& thread);
-	static void ActionGetUrl(ActionExec& thread);
-	static void ActionWaitForFrame(ActionExec& thread);
-	static void ActionSetTarget(ActionExec& thread);
-	static void ActionGotoLabel(ActionExec& thread);
-	static void ActionAdd(ActionExec& thread);
-	static void ActionSubtract(ActionExec& thread);
-	static void ActionMultiply(ActionExec& thread);
-	static void ActionDivide(ActionExec& thread);
-	static void ActionEqual(ActionExec& thread);
-	static void ActionLessThan(ActionExec& thread);
-	static void ActionLogicalAnd(ActionExec& thread);
-	static void ActionLogicalOr(ActionExec& thread);
-	static void ActionLogicalNot(ActionExec& thread);
-	static void ActionStringEq(ActionExec& thread);
-	static void ActionStringLength(ActionExec& thread);
-	static void ActionSubString(ActionExec& thread);
-	static void ActionPop(ActionExec& thread);
-	static void ActionInt(ActionExec& thread);
-	static void ActionGetVariable(ActionExec& thread);
-	static void ActionSetVariable(ActionExec& thread);
-	static void ActionSetTargetExpression(ActionExec& thread);
-	static void ActionStringConcat(ActionExec& thread);
-	static void ActionGetProperty(ActionExec& thread);
-	static void ActionSetProperty(ActionExec& thread);
-	static void ActionDuplicateClip(ActionExec& thread);
-	static void ActionRemoveClip(ActionExec& thread);
-	static void ActionTrace(ActionExec& thread);
-	static void ActionStartDragMovie(ActionExec& thread);
-	static void ActionStopDragMovie(ActionExec& thread);
-	static void ActionStringCompare(ActionExec& thread);
-	static void ActionThrow(ActionExec& thread);
-	static void ActionCastOp(ActionExec& thread);
-	static void ActionImplementsOp(ActionExec& thread);
-	static void ActionFscommand2(ActionExec& thread);
-	static void ActionRandom(ActionExec& thread);
-	static void ActionMbLength(ActionExec& thread);
-	static void ActionOrd(ActionExec& thread);
-	static void ActionChr(ActionExec& thread);
-	static void ActionGetTimer(ActionExec& thread);
-	static void ActionMbSubString(ActionExec& thread);
-	static void ActionMbOrd(ActionExec& thread);
-	static void ActionMbChr(ActionExec& thread);
-	static void ActionWaitForFrameExpression(ActionExec& thread);
-	static void ActionPushData(ActionExec& thread);
-	static void ActionBranchAlways(ActionExec& thread);
-	static void ActionGetUrl2(ActionExec& thread);
-	static void ActionBranchIfTrue(ActionExec& thread);
-	static void ActionCallFrame(ActionExec& thread);
-	static void ActionGotoExpression(ActionExec& thread);
-	static void ActionDelete(ActionExec& thread);
-	static void ActionDelete2(ActionExec& thread);
-	static void ActionVarEquals(ActionExec& thread);
-	static void ActionCallFunction(ActionExec& thread);
-	static void ActionReturn(ActionExec& thread);
-	static void ActionModulo(ActionExec& thread);
-	static void ActionNew(ActionExec& thread);
-	static void ActionVar(ActionExec& thread);
-	static void ActionInitArray(ActionExec& thread);
-	static void ActionInitObject(ActionExec& thread);
-	static void ActionTypeOf(ActionExec& thread);
-	static void ActionTargetPath(ActionExec& thread);
-	static void ActionEnumerate(ActionExec& thread);
-	static void ActionNewAdd(ActionExec& thread);
-	static void ActionNewLessThan(ActionExec& thread);
-	static void ActionNewEquals(ActionExec& thread);
-	static void ActionToNumber(ActionExec& thread);
-	static void ActionToString(ActionExec& thread);
-	static void ActionDup(ActionExec& thread);
-	static void ActionSwap(ActionExec& thread);
-	static void ActionGetMember(ActionExec& thread);
-	static void ActionSetMember(ActionExec& thread);
-	static void ActionIncrement(ActionExec& thread);
-	static void ActionDecrement(ActionExec& thread);
-	static void ActionCallMethod(ActionExec& thread);
-	static void ActionNewMethod(ActionExec& thread);
-	static void ActionInstanceOf(ActionExec& thread);
-	static void ActionEnum2(ActionExec& thread);
-	static void ActionBitwiseAnd(ActionExec& thread);
-	static void ActionBitwiseOr(ActionExec& thread);
-	static void ActionBitwiseXor(ActionExec& thread);
-	static void ActionShiftLeft(ActionExec& thread);
-	static void ActionShiftRight(ActionExec& thread);
-	static void ActionShiftRight2(ActionExec& thread);
-	static void ActionStrictEq(ActionExec& thread);
-	static void ActionGreater(ActionExec& thread);
-	static void ActionStringGreater(ActionExec& thread);
-	static void ActionExtends(ActionExec& thread);
-	static void ActionConstantPool(ActionExec& thread);
-	static void ActionDefineFunction2(ActionExec& thread);
-	static void ActionTry(ActionExec& thread);
-	static void ActionWith(ActionExec& thread);
-	static void ActionDefineFunction(ActionExec& thread);
-	static void ActionSetRegister(ActionExec& thread);
-
 	bool _debug;
 
 	// Use the ::instance() method to get a reference
@@ -257,8 +122,7 @@ private:
 };
 
 
-} // namespace gnash::SWF
-
+} // namespace SWF
 } // namespace gnash
 
-#endif // end of __ASHANDLERS_H__
+#endif
