@@ -29,7 +29,6 @@ namespace SWF {
 /// SWF tag types. Symbolic names copied from Ming
 enum TagType
 {
-    /// end of sprite or movie definition
     END                   =  0,
     SHOWFRAME             =  1,
     DEFINESHAPE           =  2,
@@ -45,17 +44,10 @@ enum TagType
     DOACTION              = 12,
     DEFINEFONTINFO        = 13,
     DEFINESOUND           = 14,
-
-    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_startsound
     STARTSOUND            = 15,
-
-    STOPSOUND             = 16, // SWF 9
+    STOPSOUND             = 16, 
     DEFINEBUTTONSOUND     = 17,
-
-    /// SWF2
-    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_soundstreamhead
     SOUNDSTREAMHEAD       = 18,
-
     SOUNDSTREAMBLOCK      = 19,
     DEFINELOSSLESS        = 20,
     DEFINEBITSJPEG2       = 21,
@@ -74,20 +66,13 @@ enum TagType
     DEFINELOSSLESS2       = 36,
     DEFINEEDITTEXT        = 37,
     DEFINEVIDEO           = 38,
-
-    /// Definition of a Sprite/MovieClip
     DEFINESPRITE          = 39,
-
     NAMECHARACTER         = 40,
     SERIALNUMBER          = 41,
     DEFINETEXTFORMAT      = 42,
     FRAMELABEL            = 43,
-    DEFINEBEHAVIOR        = 44, // SWF 9
-
-    /// SWF3
-    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_soundstreamhead2
+    DEFINEBEHAVIOR        = 44, 
     SOUNDSTREAMHEAD2      = 45,
-
     DEFINEMORPHSHAPE      = 46,
     FRAMETAG              = 47,
     DEFINEFONT2           = 48,
@@ -95,96 +80,41 @@ enum TagType
     DEFINECOMMANDOBJ      = 50,
     CHARACTERSET          = 51,
     FONTREF               = 52,
-    DEFINEFUNCTION        = 53, // SWF 9
-    PLACEFUNCTION         = 54, // SWF 9
-    GENTAGOBJECT          = 55, // SWF 9
+    DEFINEFUNCTION        = 53,
+    PLACEFUNCTION         = 54,
+    GENTAGOBJECT          = 55,
     EXPORTASSETS          = 56,
     IMPORTASSETS          = 57,
-
-    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_protectdebug
     ENABLEDEBUGGER        = 58,
-
-    /// For actions specified with initclip directive
     INITACTION            = 59,
-
     DEFINEVIDEOSTREAM     = 60,
     VIDEOFRAME            = 61,
-
-    /// DefineFontInfo2 (swf6)
     DEFINEFONTINFO2       = 62,
-
-    DEBUGID               = 63, // SWF 9
-
-    /// See http://flasm.sourceforge.net/#protect
-    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_protectdebug
+    DEBUGID               = 63, 
     ENABLEDEBUGGER2       = 64,
-
-    /// SWF_version  >= 7 
-    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_scriptlimits
     SCRIPTLIMITS          = 65, 
-
-    /// SWF_version  >= 7 
-    /// See http://www.m2osw.com/en/swf_alexref.html#tag_settabindex
     SETTABINDEX           = 66, 
-
-    DEFINESHAPE4_         = 67, // SWF 9
-    DEFINEMORPHSHAPE2_    = 68, // SWF 9
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_fileattributes
+    DEFINESHAPE4_         = 67,
+    DEFINEMORPHSHAPE2_    = 68,
     FILEATTRIBUTES        = 69,
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_placeobject3
     PLACEOBJECT3          = 70,
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_import2
     IMPORTASSETS2         = 71,
-
     DOABC                 = 72,
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definefontalignzones
     DEFINEALIGNZONES      = 73,
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_csmtextsettings
     CSMTEXTSETTINGS       = 74,
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definefont3
     DEFINEFONT3           = 75,
-
-    /// SWF9
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_symbolclass
     SYMBOLCLASS           = 76,
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_metadata
     METADATA              = 77,
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definescalinggrid
     DEFINESCALINGGRID     = 78,
-
-    /// SWF9
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_doabcdefine
     DOABCDEFINE           = 82,
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definemorphshape2
     DEFINESHAPE4          = 83,
-
-    /// http://sswf.sourceforge.net/SWFalexref.html#tag_definemorphshape2
     DEFINEMORPHSHAPE2     = 84,
-
     DEFINESCENEANDFRAMELABELDATA = 86,
-
-    /// http://www.m2osw.com/en/swf_alexref.html#tag_definebinarydata
     DEFINEBINARYDATA      = 87,
-
-    /// http://www.m2osw.com/en/swf_alexref.html#tag_definefontname
     DEFINEFONTNAME        = 88,    
-
     STARTSOUND2           = 89,
-
-    /// (SWF10) http://www.m2osw.com/en/swf_alexref.html#tag_definebitsjpeg4
     DEFINEBITSJPEG4       = 90,
-
     REFLEX                = 777,
-
     DEFINEBITSPTR         = 1023
 };
 
