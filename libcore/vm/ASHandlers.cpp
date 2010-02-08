@@ -155,17 +155,10 @@ ActionHandler::execute(ActionExec& thread) const
 SWFHandlers::SWFHandlers()
 {
 
-    // Just to be sure we can start using different handler
-    // based on version (would make sense)
-    if ( ! VM::isInitialized() )
-    {
-        log_error(_("FIXME: VM not initialized at SWFHandlers construction time, can't set action handlers based on SWF version"));
-    }
-
     container_type & handlers = get_handlers();
 
     handlers[ACTION_END] = ActionHandler(ACTION_END,
-             "<End>", SWFHandlers::ActionEnd);
+             "End", SWFHandlers::ActionEnd);
     handlers[ACTION_NEXTFRAME] = ActionHandler(ACTION_NEXTFRAME,
              "NextFrame", SWFHandlers::ActionNextFrame);
     handlers[ACTION_PREVFRAME] =  ActionHandler(ACTION_PREVFRAME,
@@ -264,7 +257,8 @@ SWFHandlers::SWFHandlers()
              "ActionMbOrd", SWFHandlers::ActionMbOrd);
     handlers[ACTION_MBCHR] = ActionHandler(ACTION_MBCHR,
              "ActionMbChr", SWFHandlers::ActionMbChr);
-    handlers[ACTION_WAITFORFRAMEEXPRESSION] = ActionHandler(ACTION_WAITFORFRAMEEXPRESSION,
+    handlers[ACTION_WAITFORFRAMEEXPRESSION] =
+        ActionHandler(ACTION_WAITFORFRAMEEXPRESSION,
              "ActionWaitForFrameExpression",
              SWFHandlers::ActionWaitForFrameExpression, ARG_HEX);
     handlers[ACTION_PUSHDATA] = ActionHandler(ACTION_PUSHDATA,
@@ -278,7 +272,8 @@ SWFHandlers::SWFHandlers()
     handlers[ACTION_CALLFRAME] = ActionHandler(ACTION_CALLFRAME,
              "ActionCallFrame", SWFHandlers::ActionCallFrame, ARG_HEX);
     handlers[ACTION_GOTOEXPRESSION] = ActionHandler(ACTION_GOTOEXPRESSION,
-             "ActionGotoExpression", SWFHandlers::ActionGotoExpression, ARG_HEX);
+             "ActionGotoExpression",
+             SWFHandlers::ActionGotoExpression, ARG_HEX);
     handlers[ACTION_DELETE] = ActionHandler(ACTION_DELETE,
              "ActionDelete", SWFHandlers::ActionDelete);
     handlers[ACTION_DELETE2] = ActionHandler(ACTION_DELETE2,
@@ -356,7 +351,8 @@ SWFHandlers::SWFHandlers()
     handlers[ACTION_EXTENDS] = ActionHandler(ACTION_EXTENDS,
              "ActionExtends", SWFHandlers::ActionExtends);
     handlers[ACTION_CONSTANTPOOL] = ActionHandler(ACTION_CONSTANTPOOL,
-             "ActionConstantPool", SWFHandlers::ActionConstantPool, ARG_DECL_DICT);
+             "ActionConstantPool", SWFHandlers::ActionConstantPool,
+             ARG_DECL_DICT);
     handlers[ACTION_DEFINEFUNCTION2] = ActionHandler(ACTION_DEFINEFUNCTION2,
              "ActionDefineFunction2", SWFHandlers::ActionDefineFunction2,
              ARG_FUNCTION2);
@@ -365,7 +361,8 @@ SWFHandlers::SWFHandlers()
     handlers[ACTION_WITH] = ActionHandler(ACTION_WITH,
              "ActionWith", SWFHandlers::ActionWith, ARG_U16);
     handlers[ACTION_DEFINEFUNCTION] = ActionHandler(ACTION_DEFINEFUNCTION,
-             "ActionDefineFunction", SWFHandlers::ActionDefineFunction, ARG_HEX);
+             "ActionDefineFunction", SWFHandlers::ActionDefineFunction,
+             ARG_HEX);
     handlers[ACTION_SETREGISTER] = ActionHandler(ACTION_SETREGISTER,
              "ActionSetRegister", SWFHandlers::ActionSetRegister, ARG_U8);
 }
