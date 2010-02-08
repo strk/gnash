@@ -335,7 +335,7 @@ SharedObject_as::flush(int space) const
     // fix length field
     *(reinterpret_cast<uint32_t*>(buf.data() + 2)) = htonl(buf.size() - 6);
     
-    // TODO write file
+    // Write file
     std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if (!ofs) {
         log_error("SharedObject::flush(): Failed opening file '%s' in "
@@ -384,8 +384,7 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
 
     // Check if the base dir exists here
     struct stat statbuf;
-    if ( -1 == stat(_solSafeDir.c_str(), &statbuf) )
-    {
+    if (stat(_solSafeDir.c_str(), &statbuf) == -1) {
        log_debug("Invalid SOL safe dir %s: %s. Will try to create on "
                "flush/exit.", _solSafeDir, std::strerror(errno));
     }
@@ -407,7 +406,6 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // blindly trusting the SWF publisher as base url is changed
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
-    //
     const movie_root& mr = _vm.getRoot();
     const std::string& swfURL = mr.getOriginalURL();
 
