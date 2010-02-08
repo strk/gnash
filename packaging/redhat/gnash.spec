@@ -1,6 +1,7 @@
 Name:           gnash
 Version:        trunk
 Release:        0
+Epoch: 		1
 Distribution:	fc12
 #Distribution:	ydl6
 Summary:        GNU SWF player
@@ -34,7 +35,7 @@ BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel
 Requires: libpng libjpeg libogg gtk2 glib2 atk pango
 Requires:  gstreamer gstreamer-ffmpeg gstreamer-plugins-base
 # Mandriva uses differ names for the X11 library packages
-%if %{distribution} != "fc11"
+%if %{distribution} != "fc12"
 Requires: libx11_6 libxt_6
 %else
 Requires: libX11 libXt 
