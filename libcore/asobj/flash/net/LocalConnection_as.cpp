@@ -1,5 +1,4 @@
 // LocalConnection.cpp:  Connect two SWF movies & send objects, for Gnash.
-// LocalConnection.cpp:  Connect two SWF movies & send objects, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
@@ -65,7 +64,8 @@
 ///    1. require the mutex to have exclusive access to the shared memory
 ///         - Gnash currently has no mutex.
 ///    2. access the shared memory and check that the listener is connected
-///         - It's not clear if the pp checks or not. Gnash does.
+///         - It's not clear if the pp checks or not, though it
+///           seems not to. Gnash does not.
 ///    3. if the recipient is registered, write the message
 ///    4. release the shared memory and the mutex.
 //
@@ -113,32 +113,6 @@ inline boost::uint32_t
 readLong(const boost::uint8_t* buf) {
 	boost::uint32_t s = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
 	return s;
-}
-
-bool
-findListener(const std::string& name, const char* shm, const char* end)
-{
-    // Listeners offset
-    const size_t pos = 40976;
-    assert(end - shm > static_cast<int>(pos));
-    const char* ptr = shm + pos;
-
-    const char* next;
-
-    while ((next = std::find(ptr, end, 0)) != end) {
-
-        // End of listeners.
-        if (next == ptr) break;
-
-        if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
-            return true;
-        }
-
-        ptr = next + 1;
-    }
-
-    return false;
-
 }
 
 void
