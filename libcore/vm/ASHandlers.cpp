@@ -1878,15 +1878,20 @@ ActionMbChr(ActionExec& thread)
 
 }
 
+/// Sets strict mode in the compiler.
+//
+/// This is irrelevant for execution, but included for completeness.
 void
 ActionStrictMode(ActionExec& thread)
 {
-    as_environment& env = thread.env;
     const action_buffer& code = thread.code;
     
     // off if 0, on for anything else.
     const bool on = code[thread.getCurrentPC() + 3];
-    LOG_ONCE(log_unimpl("ActionStrictMode set to %1%", on));
+    
+    IF_VERBOSE_ACTION(
+        log_action(_("ActionStrictMode set to %1%"), on);
+    );
 }
 
 
@@ -2104,18 +2109,17 @@ ActionPushData(ActionExec& thread)
             }
         }
 
-        IF_VERBOSE_ACTION (
-        if ( type == pushDict8 || type == pushDict16 )
-        {
-            log_action(_("\t%d) type=%s (%d), value=%s"),
-                count, pushType[type], id, env.top(0));
-        }
-        else
-        {
-            log_action(_("\t%d) type=%s, value=%s"),
-                count, pushType[type], env.top(0));
-        }
-        ++count;
+        IF_VERBOSE_ACTION(
+            if (type == pushDict8 || type == pushDict16) {
+                log_action(_("\t%d) type=%s (%d), value=%s"),
+                    count, pushType[type], id, env.top(0));
+            }
+            else
+            {
+                log_action(_("\t%d) type=%s, value=%s"),
+                    count, pushType[type], env.top(0));
+            }
+            ++count;
         );
     }
 }
