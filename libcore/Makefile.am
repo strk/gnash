@@ -42,7 +42,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libamf \
-	$(LIBXML2_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
