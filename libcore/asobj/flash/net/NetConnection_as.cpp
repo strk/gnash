@@ -625,10 +625,8 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
 
     // encode array of arguments to remote method
     buf.appendByte(AMF::STRICT_ARRAY_AMF0);
-    buf.appendNetworkLong(args.size()-firstArg);
+    buf.appendNetworkLong(args.size() - firstArg);
 
-    VM& vm = getVM(_nc.owner());
-    
     // STRICT_ARRAY encoding is allowed for remoting
     AMF::Writer w(buf, true);
 
