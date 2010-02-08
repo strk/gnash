@@ -33,10 +33,12 @@
 #include "Global_as.h"
 #include "builtin_function.h"
 #include "NativeFunction.h"
-#include "amf.h"
-#include "lcshm.h"
+#include "shm.h"
 #include "namedStrings.h"
 #include "StringPredicates.h"
+#include "as_value.h"
+#include "amf.h"
+#include "ClockTime.h"
 
 #include <cerrno>
 #include <cstring>
@@ -94,20 +96,152 @@ namespace {
     void attachLocalConnectionInterface(as_object& o);
     as_object* getLocalConnectionInterface();
 }
-  
-// \class LocalConnection_as
-/// \brief Open a connection between two SWF movies so they can send
+
+void
+writeNetwork32(char*& ptr, boost::uint32_t i)
+{
+    *ptr = (i & 0xff000000) >> 24;
+    ++ptr;
+    *ptr = (i & 0xff0000) >> 16;
+    ++ptr;
+    *ptr = (i & 0xff00) >> 8;
+    ++ptr;
+    *ptr = i & 0xff;
+    ++ptr;
+}
+
+inline boost::uint32_t
+readNetworkLong(const boost::uint8_t* buf) {
+	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
+	return s;
+}
+
+bool
+findListener(const std::string& name, const char* shm, const char* end)
+{
+    // Listeners offset
+    const size_t pos = 40976;
+    assert(end - shm > static_cast<int>(pos));
+    const char* ptr = shm + pos;
+
+    const char* next;
+
+    while ((next = std::find(ptr, end, 0)) != end) {
+
+        // End of listeners.
+        if (next == ptr) break;
+
+        if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
+            return true;
+        }
+
+        ptr = next + 1;
+    }
+
+    return false;
+
+}
+
+void
+dumpListeners(const char* shm, const char* end)
+{
+    // Listeners offset
+    const size_t pos = 40976;
+    assert(end - shm > static_cast<int>(pos));
+    const char* ptr = shm + pos;
+
+    const char* next;
+
+    while ((next = std::find(ptr, end, 0)) != end) {
+
+        // End of listeners.
+        if (next == ptr) break;
+        
+        log_debug("Listener: %s", std::string(ptr, next));
+
+        ptr = next + 1;
+    }
+
+}
+
+void
+removeListener(const std::string& name, char* shm, char* end)
+{
+    const size_t pos = 40976;
+    assert(end - shm > static_cast<int>(pos));
+    char* ptr = shm + pos;
+
+    char* next;
+
+    char* found = 0;
+
+    while ((next = std::find(ptr, end, 0)) != end) {
+
+        // End of listeners.
+        if (next == ptr) {
+            if (!found) return;
+
+            // Name and null terminator.
+            const ptrdiff_t size = name.size() + 1;
+
+            // Copy listeners backwards to fill in the gaps.
+            std::copy(found + size, ptr, found);
+
+            // Overwrite  removed string.
+            std::fill_n(ptr - size, size, '\0');
+            
+            return;
+        }
+
+        if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
+            found = ptr;
+        }
+
+        ptr = next + 1;
+    }
+    
+
+}
+
+void
+addListener(const std::string& list, char* shm, char* end)
+{
+
+    // Listeners offset
+    const size_t pos = 40976;
+    assert(end - shm > static_cast<int>(pos));
+    char* ptr = shm + pos;
+
+    char* next;
+
+    while ((next = std::find(ptr, end, 0)) != end) {
+
+        // End of listeners.
+        if (next == ptr) {
+            log_debug("Adding us");
+            std::copy(list.c_str(), list.c_str() + list.size() + 1, next);
+            return;
+        }
+
+        ptr = next + 1;
+    }
+
+}
+
+/// Open a connection between two SWF movies so they can send
 /// each other Flash Objects to be executed.
-///
-/// TODO: don't use multiple inheritance.
-class LocalConnection_as : public ActiveRelay, public amf::LcShm
+class LocalConnection_as : public ActiveRelay
 {
 
 public:
 
     LocalConnection_as(as_object* owner);
-    virtual ~LocalConnection_as() {}
+    
+    virtual ~LocalConnection_as() {
+        close();
+    }
 
+    /// Remove ourself as a listener (if connected).
     void close();
 
     const std::string& domain() {
@@ -116,8 +250,48 @@ public:
 
     const std::string& name() { return _name; };
 
-    // TODO: implement this to check for changes.
-    virtual void update() {}
+    /// Called on advance().
+    virtual void update();
+
+    bool connected() const {
+        return _connected;
+    }
+
+    void connect(const std::string& name);
+
+    void send(const std::string& name, const std::string& func,
+            const SimpleBuffer& buf)
+    {
+        char i[] = { 0x01, 0, 0, 0, 1, 0, 0, 0 };
+        _shm.attach(0, false);
+        const size_t headerSize = 16;
+
+        assert(_shm.getSize() > headerSize);
+        char* ptr = _shm.getAddr();
+        
+        if (!findListener("localhost:" + name, ptr, ptr + _shm.getSize())) {
+            dumpListeners(ptr, ptr + _shm.getSize());
+            log_error("Listener not added!");
+        }
+        
+        std::map<as_object*, size_t> offsets;
+        SimpleBuffer b;
+        as_value n(name), f(func), p("localhost:");
+        n.writeAMF0(b, offsets, getVM(owner()), false);
+        p.writeAMF0(b, offsets, getVM(owner()), false);
+        f.writeAMF0(b, offsets, getVM(owner()), false);
+
+        
+        std::copy(i, i + sizeof(i), ptr);
+        ptr += 8;
+        boost::uint32_t time = clocktime::getTicks();
+        writeNetwork32(ptr, time);
+        writeNetwork32(ptr, buf.size() + b.size());
+
+        if (!_shm.getAddr()) return;
+        std::copy(b.data(), b.data() + b.size(), ptr);
+        std::copy(buf.data(), buf.data() + buf.size(), ptr + b.size());
+    }
 
 private:
     
@@ -132,26 +306,80 @@ private:
     // The immutable domain of this LocalConnection_as, based on the 
     // originating SWF's domain.
     const std::string _domain;
-    
+
+    bool _connected;
+
+    Shm _shm;
+
 };
 
 LocalConnection_as::LocalConnection_as(as_object* owner)
     :
     ActiveRelay(owner),
-    _domain(getDomain())
+    _domain(getDomain()),
+    _connected(false)
 {
     log_debug("The domain for this host is: %s", _domain);
-    setconnected(false);
+}
+
+void
+LocalConnection_as::update()
+{
+    assert(_connected);
+
+    std::vector<as_object*> refs;
+
+    // HACK!
+    const size_t size = readNetworkLong(
+            reinterpret_cast<boost::uint8_t*>(_shm.getAddr() + 12));
+
+    log_debug("Size: %s", size);
+    std::string s(_shm.getAddr() + 16, _shm.getAddr() + 16 + size);
+
+    as_value a;
+
+    const boost::uint8_t* b = reinterpret_cast<boost::uint8_t*>(_shm.getAddr() + 16);
+    const boost::uint8_t* end = reinterpret_cast<boost::uint8_t*>(_shm.getAddr() + size + 16);
+
+    // connection
+    a.readAMF0(b, end, -1, refs, getVM(owner()));
+    log_debug("Connection: %s", a);
+
+    // protocol
+    a.readAMF0(b, end, -1, refs, getVM(owner()));
+    
+    // function name.
+
+    a.readAMF0(b, end, -1, refs, getVM(owner()));
+    const std::string& meth = a.to_string();
+
+    fn_call::Args args;
+    while(a.readAMF0(b, end, -1, refs, getVM(owner()))) {
+        args += a;
+    }
+  
+    std::fill(_shm.getAddr(), _shm.getAddr() + size, '\0');
+
+    log_debug("Meth: %s", meth);
+
+    string_table& st = getStringTable(owner());
+
+    as_function* f = owner().getMember(st.find(meth)).to_function();
+
+    invoke(f, as_environment(getVM(owner())), &owner(), args);
+
 }
 
 /// \brief Closes (disconnects) the LocalConnection object.
 void
 LocalConnection_as::close()
 {
-    setconnected(false);
-#ifndef NETWORK_CONN
-    closeMem();
-#endif
+    if (!_connected) return;
+
+    movie_root& mr = getRoot(owner());
+    removeListener(_name, _shm.getAddr(), _shm.getAddr() + _shm.getSize());
+    mr.removeAdvanceCallback(this);
+    _connected = false;
 }
 
 /// \brief Prepares the LocalConnection object to receive commands from a
@@ -160,7 +388,7 @@ LocalConnection_as::close()
 /// The name is a symbolic name like "lc_name", that is used by the
 /// send() command to signify which local connection to send the
 /// object to.
-/*void
+void
 LocalConnection_as::connect(const std::string& name)
 {
 
@@ -168,23 +396,31 @@ LocalConnection_as::connect(const std::string& name)
 
     _name = name;
     
-    // TODO: does this depend on success?
-    _connected = true;
-    
     log_debug("trying to open shared memory segment: \"%s\"", _name);
     
-    if (Shm::attach(_name.c_str(), true) == false) {
+    if (!_shm.attach(0, true)) {
         return;
     }
 
-    if (Shm::getAddr() <= 0) {
+    char* ptr = _shm.getAddr();
+
+    if (!ptr) {
         log_error("Failed to open shared memory segment: \"%s\"", _name);
         return; 
     }
+
+    //std::memset(ptr, 0, _shm.getSize());
+
+    addListener(_name, ptr, ptr + _shm.getSize());
+    dumpListeners(ptr, ptr + _shm.getSize());
+
+    movie_root& mr = getRoot(owner());
+    mr.addAdvanceCallback(this);
+
+    _connected = true;
     
     return;
 }
-*/
 
 /// \brief Returns a string representing the superdomain of the
 /// location of the current SWF file.
@@ -283,7 +519,7 @@ localconnection_connect(const fn_call& fn)
     LocalConnection_as* relay = ensure<ThisIsNative<LocalConnection_as> >(fn);
 
     // If already connected, don't try again until close() is called.
-    if (relay->getconnected()) return false;
+    if (relay->connected()) return false;
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -353,7 +589,8 @@ localconnection_send(const fn_call& fn)
         );
         return as_value(false);
     }
-
+    
+    const std::string& name = fn.arg(0).to_string();
     const std::string& func = fn.arg(1).to_string();
 
     if (!validFunctionName(func)) {
@@ -366,19 +603,12 @@ localconnection_send(const fn_call& fn)
         return as_value(false);
     }
 
+    std::map<as_object*, size_t> offsets;
+    SimpleBuffer buf;
     
-    const std::string& connectionName = fn.arg(0).to_string();
-    const std::string& methodName = fn.arg(1).to_string();
-        
-    std::vector<amf::Element*> argument_to_send;
-    
-    const size_t numargs = fn.nargs;
-    for (size_t i = 2; i != numargs; ++i) {
-        amf::Element* temp_ptr = fn.arg(i).to_element().get();
-        argument_to_send.push_back(temp_ptr);
+    for (size_t i = 2; i < fn.nargs; ++i) {
+        fn.arg(i).writeAMF0(buf, offsets, getVM(fn), false);
     }
-    
-    relay->amf::LcShm::send(connectionName, methodName, argument_to_send);
 
     // Now we have a valid call.
 
@@ -394,6 +624,8 @@ localconnection_send(const fn_call& fn)
         log_security("Attempting to write to disabled LocalConnection!");
         return as_value(true);
     }
+
+    relay->send(name, func, buf);
 
     return as_value(true);
 }
