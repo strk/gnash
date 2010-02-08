@@ -67,10 +67,15 @@ namespace AMF {
         /// Write a double.
         bool writeNumber(double d);
 
+        /// Write a boolean.
         bool writeBoolean(bool b);
 
+        /// Encode the name of an object's property.
+        //
+        /// You should encode the value of the property immediately afterwards.
         bool writePropertyName(const std::string& name);
 
+        /// Write custom data for special cases.
         void writeData(boost::uint8_t* data, size_t length);
 
     private:
