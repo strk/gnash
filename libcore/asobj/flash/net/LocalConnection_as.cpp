@@ -164,7 +164,7 @@ removeListener(const std::string& name, char* shm, char* end)
             if (!found) return;
 
             // Name and null terminator.
-            const ptrdiff_t size = name.size() + 1;
+            const size_t size = name.size() + 1;
 
             // Copy listeners backwards to fill in the gaps.
             std::copy(found + size, ptr, found);
@@ -251,7 +251,6 @@ public:
         const std::string uri(_domain + ":" + name);
 
         if (!findListener(uri, ptr, ptr + _shm.getSize())) {
-            dumpListeners(ptr, ptr + _shm.getSize());
             log_error("Listener not added!");
         }
         
