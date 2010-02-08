@@ -118,8 +118,8 @@ rec.close();
 result = rec.connect("lc_test");
 check_equals (rec.domain(), "localhost");
 
-// NOTE: This test will fail if a shared memory segment of the same
-// name exists. So the first time it'll pass, then it'll fail.
+// NOTE: This test will fail if already connected.
+// So the first time it'll pass, then it'll fail.
 check_equals (result, true);
 
 // Checks only for syntactical correctness, not success

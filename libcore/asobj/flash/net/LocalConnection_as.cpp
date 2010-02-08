@@ -47,35 +47,39 @@
 #include <boost/bind.hpp>
 using namespace amf;
 
-// http://www.osflash.org/localconnection
+/// http://www.osflash.org/localconnection
+///
+/// Listening
+/// To create a listening LocalConnection, you just have to set a thread to:
+///
+///    1. register the application as a valid LocalConnection listener
+///    2. require the mutex to have exclusive access to the shared memory
+///         - Gnash currently doesn't use a mutex.
+///    3. access the shared memory and check the recipient
+///    4. if you are the recipient, read the message and mark it read
+///         - in Gnash, the recipient overwrites the message when it has
+///           been read. Not established whether this is correct.
+///    5. release the shared memory and the mutex
+///    6. repeat indefinitely from step 2.
+///
+/// Sending
+/// To send a message to a LocalConnection apparently works like that:
+///    1. require the mutex to have exclusive access to the shared memory
+///         - Gnash currently has no mutex.
+///    2. access the shared memory and check that the listener is connected
+///         - It's not clear if the pp checks or not. Gnash does.
+///    3. if the recipient is registered, write the message
+///    4. release the shared memory and the mutex.
 //
-// Listening
-// To create a listening LocalConnection, you just have to set a thread to:
+/// The pp sends some messages without a timestamp and without a size. These
+/// are ignored (it's also not clear why it does it).
 //
-//    1.register the application as a valid LocalConnection listener,
-//    2.require the mutex to have exclusive access to the shared memory,
-//    3.access the shared memory and check the recipient,
-//    4.if you are the recipient, read the message and mark it read,
-//    5.release the shared memory and the mutex,
-//    6.repeat indefinitely from step 2.
-//
-// Sending
-// To send a message to a LocalConnection apparently works like that:
-//    1. require the mutex to have exclusive access to the shared memory,
-//    2. access the shared memory and check that the listener is connected,
-//    3. if the recipient is registered, write the message,
-//    4. release the shared memory and the mutex.
-//
-// The main thing you have to care about is the timestamp - simply call GetTickCount()
-//  and the message size. If your message is correctly encoded, it should be received
-// by the listening LocalConnection 
-//
-// Some facts:
-//     * The header is 16 bytes,
-//     * The message can be up to 40k,
-//     * The listeners block starts at 40k+16 = 40976 bytes,
-//     * To add a listener, simply append its name in the listeners list (null terminated strings)
-//
+/// Some facts:
+///     * The header is 16 bytes,
+///     * The message can be up to 40k,
+///     * The listeners block starts at 40k+16 = 40976 bytes,
+///     * To add a listener, simply append its name in the listeners list
+///     (null terminated strings)
 namespace {
 
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();    
@@ -139,28 +143,6 @@ findListener(const std::string& name, const char* shm, const char* end)
     }
 
     return false;
-
-}
-
-void
-dumpListeners(const char* shm, const char* end)
-{
-    // Listeners offset
-    const size_t pos = 40976;
-    assert(end - shm > static_cast<int>(pos));
-    const char* ptr = shm + pos;
-
-    const char* next;
-
-    while ((next = std::find(ptr, end, 0)) != end) {
-
-        // End of listeners.
-        if (next == ptr) break;
-        
-        log_debug("Listener: %s", std::string(ptr, next));
-
-        ptr = next + 1;
-    }
 
 }
 
@@ -247,8 +229,6 @@ public:
     const std::string& domain() {
         return _domain;
     }
-
-    const std::string& name() { return _name; };
 
     /// Called on advance().
     virtual void update();
@@ -372,7 +352,7 @@ LocalConnection_as::update()
     // Connection. If this is not for us, we don't need to do anything.
     a.readAMF0(b, end, -1, refs, getVM(owner()));
     const std::string& connection = a.to_string();
-    if (connection != _name) return;
+    if (connection != _domain + ":" + _name) return;
     
     // Protocol
     a.readAMF0(b, end, -1, refs, getVM(owner()));
@@ -414,7 +394,8 @@ LocalConnection_as::close()
     if (!_connected) return;
 
     movie_root& mr = getRoot(owner());
-    removeListener(_name, _shm.getAddr(), _shm.getAddr() + _shm.getSize());
+    removeListener(_domain + ":" + _name, _shm.getAddr(),
+            _shm.getAddr() + _shm.getSize());
     mr.removeAdvanceCallback(this);
     _connected = false;
 }
@@ -422,15 +403,13 @@ LocalConnection_as::close()
 /// \brief Prepares the LocalConnection object to receive commands from a
 /// LocalConnection.send() command.
 /// 
-/// The name is a symbolic name like "lc_name", that is used by the
+/// The name is a symbolic name like "lc1", that is used by the
 /// send() command to signify which local connection to send the
 /// object to.
 void
 LocalConnection_as::connect(const std::string& name)
 {
-
     assert(!name.empty());
-
     _name = name;
     
     if (!_shm.attach(0, true)) {
@@ -440,12 +419,12 @@ LocalConnection_as::connect(const std::string& name)
     char* ptr = _shm.getAddr();
 
     if (!ptr) {
-        log_error("Failed to open shared memory segment: \"%s\"", _name);
+        log_error("Failed to open shared memory segment: \"%s\"",
+                _domain + ":" + name);
         return; 
     }
 
-    addListener(_name, ptr, ptr + _shm.getSize());
-    dumpListeners(ptr, ptr + _shm.getSize());
+    addListener(_domain + ":" + _name, ptr, ptr + _shm.getSize());
 
     movie_root& mr = getRoot(owner());
     mr.addAdvanceCallback(this);
@@ -574,11 +553,9 @@ localconnection_connect(const fn_call& fn)
         return as_value(false);
     }
 
-    std::string connection_name = relay->domain();    
-    connection_name +=":";
-    connection_name += fn.arg(0).to_string();
+    std::string connection = fn.arg(0).to_string();
    
-    relay->connect(connection_name);
+    relay->connect(connection);
 
     // We don't care whether connected or not.
     return as_value(true);
@@ -605,8 +582,8 @@ as_value
 localconnection_send(const fn_call& fn)
 {
     LocalConnection_as* relay = ensure<ThisIsNative<LocalConnection_as> >(fn);
-    // At least 2 args (connection name, function) required.
 
+    // At least 2 args (connection name, function) required.
     if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream os;
@@ -651,15 +628,9 @@ localconnection_send(const fn_call& fn)
 
     // Now we have a valid call.
 
-    // It is useful to see what's supposed being sent, so we log
-    // this every time until implemented.
-    std::ostringstream os;
-    fn.dump_args(os);
-    log_unimpl(_("LocalConnection.send unimplemented %s"), os.str());
-
     // We'll return true if the LocalConnection is disabled too, as
     // the return value doesn't indicate success of the connection.
-    if (rcfile.getLocalConnection() ) {
+    if (rcfile.getLocalConnection()) {
         log_security("Attempting to write to disabled LocalConnection!");
         return as_value(true);
     }
