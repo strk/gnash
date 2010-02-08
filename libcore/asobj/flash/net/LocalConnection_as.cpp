@@ -98,15 +98,15 @@ namespace {
 }
 
 void
-writeNetwork32(char*& ptr, boost::uint32_t i)
+writeLong(char*& ptr, boost::uint32_t i)
 {
-    *ptr = (i & 0xff000000) >> 24;
-    ++ptr;
-    *ptr = (i & 0xff0000) >> 16;
+    *ptr = i & 0xff;
     ++ptr;
     *ptr = (i & 0xff00) >> 8;
     ++ptr;
-    *ptr = i & 0xff;
+    *ptr = (i & 0xff0000) >> 16;
+    ++ptr;
+    *ptr = (i & 0xff000000) >> 24;
     ++ptr;
 }
 
@@ -276,7 +276,7 @@ public:
         
         std::map<as_object*, size_t> offsets;
         SimpleBuffer b;
-        as_value n(name), f(func), p("localhost:");
+        as_value n("localhost:" + name), f(func), p("localhost:");
         n.writeAMF0(b, offsets, getVM(owner()), false);
         p.writeAMF0(b, offsets, getVM(owner()), false);
         f.writeAMF0(b, offsets, getVM(owner()), false);
@@ -285,8 +285,8 @@ public:
         std::copy(i, i + sizeof(i), ptr);
         ptr += 8;
         boost::uint32_t time = clocktime::getTicks();
-        writeNetwork32(ptr, time);
-        writeNetwork32(ptr, buf.size() + b.size());
+        writeLong(ptr, time);
+        writeLong(ptr, buf.size() + b.size());
 
         if (!_shm.getAddr()) return;
         std::copy(b.data(), b.data() + b.size(), ptr);
@@ -347,7 +347,7 @@ LocalConnection_as::update()
     // This seems to be quite normal, so don't log.
     if (!timestamp || !size) return;
     
-#if 0
+#if 1
     std::string s(_shm.getAddr(), _shm.getAddr() + 512);
     const boost::uint8_t* sptr = reinterpret_cast<const boost::uint8_t*>(s.c_str());
     log_debug("%s \n %s", hexify(sptr, s.size(), false),
@@ -647,7 +647,7 @@ localconnection_send(const fn_call& fn)
     std::map<as_object*, size_t> offsets;
     SimpleBuffer buf;
     
-    for (size_t i = fn.nargs; i > 1; --i) {
+    for (size_t i = fn.nargs - 1; i > 1; --i) {
         fn.arg(i).writeAMF0(buf, offsets, getVM(fn), false);
     }
 
