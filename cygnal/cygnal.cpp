@@ -925,10 +925,11 @@ connection_handler(Network::thread_params_t *args)
 		hand->addClient(args->netfd, Network::RTMP);
 		args->handler = reinterpret_cast<void *>(hand.get());
 		args->filespec = key;
+		args->entry = rtmp;
 		
 		string cgiroot;
 		char *env = std::getenv("CYGNAL_PLUGINS");
-		if (!env) {
+		if (env != 0) {
 		    cgiroot = env;
 		}
 		if (crcfile.getCgiRoot().size() > 0) {
@@ -938,12 +939,8 @@ connection_handler(Network::thread_params_t *args)
 		    cgiroot = PLUGINSDIR;
 		}
 		hand->scanDir(cgiroot);
-		string str(url.path());
-		if (str[0] == '/') {
-		    str.erase(0,1);
-		}
 		boost::shared_ptr<Handler::cygnal_init_t> init = 
-		    hand->initModule(str);
+		    hand->initModule(url.path());
 		
 		// this is where the real work gets done.
 		if (init) {
@@ -1134,7 +1131,7 @@ event_handler(Network::thread_params_t *args)
 		      done = true;
 		      break;
 		}
-		delete args->buffer;
+//		delete args->buffer;
 	    }
 	}
 
