@@ -244,8 +244,12 @@ void
 LocalConnection_as::update()
 {
 
-    // No-op if already attached.
-    _shm.attach();
+    // No-op if already attached. Nothing to do if it fails, but we
+    // should probably stop trying.
+    if (!_shm.attach()) {
+        log_error("Failed to attach shared memory segment");
+        return;
+    }
 
     // We need the lock to prevent simultaneous reads/writes from other
     // processes.
@@ -256,10 +260,9 @@ LocalConnection_as::update()
     }
 
     SharedMem::iterator ptr = _shm.begin();
-    assert(ptr);
     
 #if 0
-    std::string s(_shm.getAddr(), _shm.getAddr() + 128);
+    std::string s(_shm.begin(), _shm.begin() + 128);
     const boost::uint8_t* sptr = reinterpret_cast<const boost::uint8_t*>(s.c_str());
     log_debug("%s \n %s", hexify(sptr, 16, false),
             hexify(sptr + 16, s.size() - 16, true));
@@ -432,20 +435,15 @@ void
 LocalConnection_as::connect(const std::string& name)
 {
     assert(!name.empty());
+
     _name = name;
     
     if (!_shm.attach()) {
+        log_error("Failed to open shared memory segment");
         return;
     }
 
     SharedMem::iterator ptr = _shm.begin();
-
-    if (!ptr) {
-        log_error("Failed to open shared memory segment: \"%s\"",
-                _domain + ":" + name);
-        return; 
-    }
-
 
     // We can't connect if there is already a listener with the same name.
     if (!addListener(_domain + ":" + _name, _shm)) {
@@ -720,6 +718,7 @@ validFunctionName(const std::string& func)
 void
 removeListener(const std::string& name, SharedMem& mem)
 {
+    assert(attached(mem));
 
     log_debug("Removing listener %s", name);
 
@@ -771,6 +770,7 @@ removeListener(const std::string& name, SharedMem& mem)
 bool
 findListener(const std::string& name, SharedMem& mem)
 {
+    assert(attached(mem));
 
     SharedMem::iterator ptr = mem.begin() + LocalConnection_as::listenersOffset;
 
@@ -797,6 +797,7 @@ findListener(const std::string& name, SharedMem& mem)
 bool
 addListener(const std::string& name, SharedMem& mem)
 {
+    assert(attached(mem));
 
     SharedMem::iterator ptr = mem.begin() + LocalConnection_as::listenersOffset;
 

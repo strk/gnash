@@ -54,15 +54,25 @@ public:
 
     typedef char* iterator;
 
-    iterator begin() {
+    /// The beginning of the SharedMem section.
+    //
+    /// This is only valid after attach() has returned true. You can check
+    /// with the function attached().
+    iterator begin() const {
         return _addr;
     }
 
-    iterator end() {
+    /// The end of the SharedMem section.
+    //
+    /// This is only valid after attach() has returned true.
+    iterator end() const {
         return _addr + _size;
     }
 
+    /// Construct a SharedMem.
     DSOEXPORT SharedMem();
+
+    /// Destructor.
     DSOEXPORT ~SharedMem();
     
     /// Initialize the shared memory segment
@@ -71,6 +81,7 @@ public:
     /// is called.
     bool attach();
 
+    /// Use to get a scoped semaphore lock on the shared memory.
     class Lock
     {
     public:
@@ -96,7 +107,7 @@ private:
     /// @return     true if successful, false if not.
     bool unlock();
 
-    char* _addr;
+    iterator _addr;
 
     size_t _size;
 
@@ -113,6 +124,11 @@ private:
     HANDLE      _shmhandle;
 #endif
 };
+
+bool
+attached(const SharedMem& mem) {
+    return (mem.begin());
+}
 
 } // end of gnash namespace
 

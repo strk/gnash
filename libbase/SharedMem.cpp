@@ -125,7 +125,7 @@ SharedMem::attach()
         return false;
     }
 
-	_addr = static_cast<char*>(shmat(_shmid, 0, 0));
+	_addr = static_cast<iterator>(shmat(_shmid, 0, 0));
 
     if (!_addr) {
 	    log_debug("WARNING: shmat() failed: %s", std::strerror(errno));
@@ -140,7 +140,7 @@ SharedMem::attach()
 	log_debug("WARNING: CreateFileMapping failed: %ld\n", GetLastError());
         return false;
     }
-    _addr = static_cast<char *>(MapViewOfFile(_shmhandle, FILE_MAP_ALL_ACCESS,
+    _addr = static_cast<iterator>(MapViewOfFile(_shmhandle, FILE_MAP_ALL_ACCESS,
             0, 0, _size));
     if (_addr == NULL) {
 	log_debug("WARNING: MapViewOfFile() failed: %ld\n", GetLastError());
@@ -148,9 +148,12 @@ SharedMem::attach()
     }
 #endif
 
+    assert(_addr);
     return true;
+
+
 #else
-#error "You need SYSV Shared memory support to use this option"
+# error "You need SYSV Shared memory support to use this option"
 #endif	 // end of USE_SYSV_SHM
 }	
 
