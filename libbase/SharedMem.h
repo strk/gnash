@@ -56,11 +56,6 @@ public:
     
     // Initialize the shared memory segment
     bool attach();
-    bool DSOEXPORT attach(key_t key, bool nuke);
-    
-    // Resize the allocated memory segment
-    bool resize(int bytes);
-    bool resize();
     
     // Close the memory segment. This removes it from the system.
     bool DSOEXPORT closeMem();

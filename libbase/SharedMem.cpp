@@ -39,7 +39,7 @@
 #include <cerrno>
 
 #include "log.h"
-#include "shm.h"
+#include "SharedMem.h"
 
 namespace {
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -66,43 +66,36 @@ const int DEFAULT_SHM_SIZE = 64528;
 
 #define FLAT_ADDR_SPACE 1
 
-  Shm::Shm() :_addr(0), _alloced(0), _size(0), _shmkey(0), _shmfd(0)
+Shm::Shm()
+    :
+    _addr(0),
+    _alloced(0),
+    _size(0),
+    _shmkey(0),
+    _shmfd(0)
 {
-//    GNASH_REPORT_FUNCTION;
     memset(_filespec, 0, MAX_SHM_NAME_SIZE);
 }
 
 Shm::~Shm()
 {
-//    GNASH_REPORT_FUNCTION;
 }
 
 bool
 Shm::attach()
 {
-//    GNASH_REPORT_FUNCTION;
-    return attach(static_cast<key_t>(0), false);
-}
-
-bool
-Shm::attach(key_t key, bool /* nuke */)
-{
-//    GNASH_REPORT_FUNCTION;
     
 #if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
-    // this is the magic size of shared memory segments used by the Flash player;
+    // this is the magic size of shared memory segments used by the
+    // Flash player;
     _size = 64528;
-    // this is the magic shared memory key used by the Flash player.
-    if (key != 0) {
-	_shmkey = key;
-    }
     
-    // If there is no SYSV style shared memory key in the users ~/.gnashrc file, warn them
-    // that compatibility will be broken, and then just pick our own key so things still work
-    // finer when using just Gnash.
+    // If there is no SYSV style shared memory key in the users ~/.gnashrc
+    // file, warn them
+    // that compatibility will be broken, and then just pick our own key so
+    // things still work finer when using just Gnash.
     if (_shmkey == 0) {
-	log_error("No Shared Memory key specified in ~/.gnashrc! Please run \"dumpshm -i\" to find your key if you want to be compatible with the other swf player.");
-	_shmkey = 0xdd3adabd;
+        _shmkey = 0xdd3adabd;
     }
     
 #ifndef _WIN32
@@ -141,34 +134,6 @@ Shm::attach(key_t key, bool /* nuke */)
 #endif	 // end of USE_SYSV_SHM
 }	
 
-
-// Resize the allocated memory segment
-bool
-Shm::resize()
-{
-//    GNASH_REPORT_FUNCTION;
-    // Increase the size by 10 %
-    return resize(DEFAULT_SHM_SIZE + (DEFAULT_SHM_SIZE/10)); 
-}
-
-bool
-Shm::resize(int bytes)
-    
-{
-//    GNASH_REPORT_FUNCTION;
-#ifdef HAVE_MREMAP
-    _addr = mremap(_shmAddr, _shmSize, _shmSize + bytes, MREMAP_MAYMOVE);
-    if (_addr != 0) {
-        return true;
-    }
-#else
-    // FIXME: alloc a whole new segment, and copy this one
-    // into it. Yeuch...
-    // Get rid of the compiler warning, this will get optimized out anyway.
-    bytes += 0;
-#endif
-    return false;
-}
 
 // Close the memory segment. This removes it from the system.
 bool

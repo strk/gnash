@@ -31,7 +31,7 @@
 #include "Global_as.h"
 #include "builtin_function.h"
 #include "NativeFunction.h"
-#include "shm.h"
+#include "SharedMem.h"
 #include "namedStrings.h"
 #include "StringPredicates.h"
 #include "as_value.h"
@@ -211,7 +211,7 @@ public:
     void send(const SimpleBuffer& buf)
     {
         char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
-        _shm.attach(0, false);
+        _shm.attach();
         const size_t headerSize = 16;
 
         char* ptr = _shm.getAddr();
@@ -365,7 +365,7 @@ LocalConnection_as::connect(const std::string& name)
     assert(!name.empty());
     _name = name;
     
-    if (!_shm.attach(0, true)) {
+    if (!_shm.attach()) {
         return;
     }
 
