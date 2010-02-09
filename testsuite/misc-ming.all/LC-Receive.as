@@ -9,10 +9,14 @@ lc.ready = function() {
     lc.send("recv", "ready");
 };
 
+lc.nevercall = function()
+{
+     fail_check("Function nevercall should never be called!");
+};
+
 lc.test1 = function()
 {
-    trace("Hello");
-    pass();
+    pass_check("Function test1 called");
 };
 
 lc.test2 = function(a, b, c, d, e, f)
@@ -39,10 +43,21 @@ lc.test2 = function(a, b, c, d, e, f)
 
 };
 
-lc.endTests = function() {
-    totals();
+lc.test3 = function(f) {
+    check_equals(typeof(f), "object");
+    check_equals(f.toString(), "1,str,6");
 };
 
+// Exit in 3 seconds.
+lc.endTests = function() {
+    totals();
+    trace("Finished tests. Alerting LC-Receive and exiting in 3 seconds");
+    lc.send("recv", "finished");
+    setInterval(exit, 3000);
+};
 
+exit = function() {
+    loadMovie ("FSCommand:quit", "");
+};
 
 stop();
