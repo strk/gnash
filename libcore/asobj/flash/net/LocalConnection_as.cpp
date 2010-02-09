@@ -94,6 +94,9 @@ namespace {
 
     bool validFunctionName(const std::string& func);
     void attachLocalConnectionInterface(as_object& o);
+
+    void removeListener(const std::string& name, char* shm, char* end);
+    void addListener(const std::string& name, char* shm, char* end);
 }
 
 void
@@ -115,69 +118,21 @@ readLong(const boost::uint8_t* buf) {
 	return s;
 }
 
-void
-removeListener(const std::string& name, char* shm, char* end)
+
+/// The identifier for the end of a listener is "\0::3\0::4\0".
+//
+/// A null byte after the marker or at the beginning of the listeners
+/// signifies the end of the list.
+template<typename T, size_t N>
+std::string
+fromByteString(T(&buf)[N])
 {
-    const size_t pos = 40976;
-    assert(end - shm > static_cast<int>(pos));
-    char* ptr = shm + pos;
-
-    char* next;
-
-    char* found = 0;
-
-    while ((next = std::find(ptr, end, 0)) != end) {
-
-        // End of listeners.
-        if (next == ptr) {
-            if (!found) return;
-
-            // Name and null terminator.
-            const size_t size = name.size() + 1;
-
-            // Copy listeners backwards to fill in the gaps.
-            std::copy(found + size, ptr, found);
-
-            // Overwrite  removed string.
-            std::fill_n(ptr - size, size, '\0');
-            
-            return;
-        }
-
-        if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
-            found = ptr;
-        }
-
-        ptr = next + 1;
-    }
+	return std::string(buf, buf + N - 1);
+}
     
+static const std::string marker(fromByteString("\0::3\0::4\0"));
 
-}
 
-void
-addListener(const std::string& list, char* shm, char* end)
-{
-
-    // Listeners offset
-    const size_t pos = 40976;
-    assert(end - shm > static_cast<int>(pos));
-    char* ptr = shm + pos;
-
-    char* next;
-
-    while ((next = std::find(ptr, end, 0)) != end) {
-
-        // End of listeners.
-        if (next == ptr) {
-            log_debug("Adding us");
-            std::copy(list.c_str(), list.c_str() + list.size() + 1, next);
-            return;
-        }
-
-        ptr = next + 1;
-    }
-
-}
 
 /// Open a connection between two SWF movies so they can send
 /// each other Flash Objects to be executed.
@@ -185,6 +140,8 @@ class LocalConnection_as : public ActiveRelay
 {
 
 public:
+
+    static const size_t listenersOffset = 40976;
 
     LocalConnection_as(as_object* owner);
     
@@ -211,26 +168,23 @@ public:
     void send(const SimpleBuffer& buf)
     {
         char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
-        _shm.attach();
-
-        Shm::Lock lock(_shm);
-        if (!lock.locked()) return;
 
         const size_t headerSize = 16;
+        SimpleBuffer b(headerSize);
+        b.resize(headerSize);
 
-        char* ptr = _shm.getAddr();
-        
-        assert(_shm.getSize() > headerSize + buf.size());
-        
-        std::copy(i, i + sizeof(i), ptr);
-        ptr += 8;
+        std::copy(i, i + sizeof(i), b.data());
+        char* ptr = reinterpret_cast<char*>(b.data() + 8);
+
         boost::uint32_t time = clocktime::getTicks();
         writeLong(ptr, time);
         writeLong(ptr, buf.size());
+        b.append(buf);
+        _queue.push_back(b);
 
-        if (!_shm.getAddr()) return;
-        std::copy(buf.data(), buf.data() + buf.size(), ptr);
-        _shm.unlock();
+        // Register for sending on next advance.
+        movie_root& mr = getRoot(owner());
+        mr.addAdvanceCallback(this);
     }
 
 private:
@@ -251,7 +205,11 @@ private:
 
     Shm _shm;
 
+    std::deque<SimpleBuffer> _queue;
+
 };
+
+const size_t LocalConnection_as::listenersOffset;
 
 LocalConnection_as::LocalConnection_as(as_object* owner)
     :
@@ -268,13 +226,42 @@ LocalConnection_as::LocalConnection_as(as_object* owner)
 /// (Behaviour may be different on other platforms).
 //
 /// If there is no timestamp the sent sequence is ignored.
+//
+/// Under what circumstances is the data zeroed?
 void
 LocalConnection_as::update()
 {
-    assert(_connected);
+
+    // No-op if already attached.
+    _shm.attach();
+
+    char* ptr = _shm.getAddr();
+    assert(ptr);
     
     Shm::Lock lock(_shm);
     if (!lock.locked()) return;
+
+    // If we have data waiting to be sent, check if anything is there and
+    // send it.
+    if (!_queue.empty()) {
+        log_debug("Sending queued data (queue size %s)", _queue.size());
+        if (!*ptr) {
+            SimpleBuffer& b = _queue.front();
+            std::copy(b.data(), b.data() + b.size(), ptr);
+            _queue.pop_front();
+        }
+    }
+    
+    // If not connected there is nothing more to do.
+    if (!_connected) {
+
+        // ...except to remove the advance callback if there's no data either.
+        if (_queue.empty()) {
+            movie_root& mr = getRoot(owner());
+            mr.removeAdvanceCallback(this);
+        }
+        return;
+    }
 
     std::vector<as_object*> refs;
 
@@ -335,7 +322,7 @@ LocalConnection_as::update()
     fn_call::Args args;
     args.swap(d);
 
-    // Zero the bytes read (though it's not clear if this is necessary).
+    // Zero the bytes read.
     std::fill(_shm.getAddr(), _shm.getAddr() + size + 16, '\0');
 
     log_debug("Meth: %s", meth);
@@ -361,12 +348,16 @@ LocalConnection_as::close()
     _connected = false;
 }
 
-/// \brief Prepares the LocalConnection object to receive commands from a
-/// LocalConnection.send() command.
+/// Makes the LocalConnection object listen.
 /// 
 /// The name is a symbolic name like "lc1", that is used by the
 /// send() command to signify which local connection to send the
 /// object to.
+//
+/// When connect is called, this object adds its domain + name plus some
+/// other bits of information to the listeners portion of the shared memory.
+/// It also sets the initial bytes of the shared memory to a set
+/// patter.
 void
 LocalConnection_as::connect(const std::string& name)
 {
@@ -386,6 +377,9 @@ LocalConnection_as::connect(const std::string& name)
     }
 
     addListener(_domain + ":" + _name, ptr, ptr + _shm.getSize());
+        
+    const char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
+    std::copy(i, i + 8, ptr);
 
     movie_root& mr = getRoot(owner());
     mr.addAdvanceCallback(this);
@@ -640,6 +634,93 @@ validFunctionName(const std::string& func)
                 boost::bind(StringNoCaseEqual(), _1, func));
         
     return (it == reserved.end());
+}
+
+// When a listener is removed, subsequent listeners are copied to the
+// beginning. The byte after the marker is overwritten. If no listeners
+// are left, the first byte becomes 0.
+void
+removeListener(const std::string& name, char* shm, char* end)
+{
+    char* ptr = shm + LocalConnection_as::listenersOffset;
+
+    // No listeners if the first byte is 0.
+    if (!*ptr) return;
+
+    char* found = 0;
+
+    char* next;
+    
+    // Next should always point to the beginning of a listener.
+    while ((next = std::search(ptr, end, marker.begin(), marker.end()))
+            != end) {
+
+        // Move to beginning of next string.
+        next += marker.size();
+
+        // Found last listener (or reached the end).
+        if (next == end || !*next) {
+
+            if (!found) return;
+
+            // Name and marker.
+            const ptrdiff_t size = name.size() + marker.size();
+
+            // Copy listeners backwards to fill in the gaps.
+            std::copy(found + size, ptr, found);
+
+            // Add a 0 terminator.
+            next[-size - 1] = '\0';
+            
+            return;
+        }
+
+        if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
+            found = ptr;
+        }
+
+        ptr = next + 1;
+    }
+    
+
+}
+
+/// Two listeners with the same name are never added.
+void
+addListener(const std::string& name, char* shm, char* end)
+{
+
+    char* ptr = shm + LocalConnection_as::listenersOffset;
+
+    char* next;
+
+    if (!*ptr) {
+        next = ptr;
+    }
+    else {
+        while ((next = std::search(ptr, end, marker.begin(), marker.end()))
+                != end) {
+            next += marker.size();
+            
+            if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
+                log_debug("Not adding duplicated listener");
+                return;
+            }
+
+            // Found last listener.
+            if (!*next) break;
+            ptr = next;
+        }
+        if (next == end) {
+            log_error("No space for listener in shared memory!");
+            return;
+        }
+    }
+
+    // Copy name and marker to listeners section.
+    std::string id(name + marker);
+    std::copy(id.c_str(), id.c_str() + id.size(), next);
+
 }
 
 } // anonymous namespace
