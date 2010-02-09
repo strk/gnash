@@ -79,11 +79,6 @@ SUBDIRS = \
 	media \
 	$(DIR_AS3) \
 	$(DIR_SWFDEC_TESTSUITE) \
-	libnet.all \
-	libbase.all	\
-	libamf.all \
-	libmedia.all \
-	libcore.all \
 	samples	\
 	$(DIR_MING) \
 	$(DIR_MTASC) \
@@ -91,6 +86,11 @@ SUBDIRS = \
 	$(DIR_SWFMILL) \
 	$(DIR_SWFC) \
 	movies.all \
+	libnet.all \
+	libbase.all	\
+	libamf.all \
+	libmedia.all \
+	libcore.all \
 	$(NULL)
 
 EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp 
