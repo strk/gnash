@@ -834,7 +834,7 @@ addListener(const std::string& name, char* shm, char* end)
     std::copy(id.c_str(), id.c_str() + id.size(), next);
 
     // Always add an extra null after the final listener.
-    *(next + id.size() + 1) = '\0';
+    *(next + id.size()) = '\0';
 
     return true;
 }
