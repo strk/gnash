@@ -28,7 +28,6 @@ runtests = function() {
     
     lc.send("lc576", "test3", f);
 
-
     lc.send("lc576", "endTests");
 };
 
@@ -39,7 +38,6 @@ getit = function()
 };
 
 // Wait until receiver is ready.
-//id = setInterval(lc, "send", 1000, "lc576", "ready");
 id = setInterval(getit, 1000);
 
 lc.ready = function() {
