@@ -37,6 +37,7 @@
 #include "ClockTime.h"
 #include "GnashAlgorithm.h"
 
+#include <boost/shared_ptr.hpp>
 #include <cerrno>
 #include <cstring>
 #include <boost/cstdint.hpp> // for boost::?int??_t
@@ -155,7 +156,6 @@ public:
     
     virtual ~LocalConnection_as() {
         close();
-        deleteChecked(_queue.begin(), _queue.end());
     }
 
     /// Remove ourself as a listener (if connected).
@@ -174,15 +174,14 @@ public:
 
     void connect(const std::string& name);
 
-    void send(std::auto_ptr<ConnectionData> d)
+    void send(boost::shared_ptr<ConnectionData> d)
     {
-
         assert(d.get());
         boost::uint32_t time = clocktime::getTicks();
         d->ts = time;
-        _queue.push_back(d.release());
-        log_debug("Added send %s", _queue.size());
-        // Register for sending on next advance.
+        _queue.push_back(d);
+        
+        // Register callback so we can send the data on the next advance.
         movie_root& mr = getRoot(owner());
         mr.addAdvanceCallback(this);
     }
@@ -205,7 +204,7 @@ private:
 
     Shm _shm;
 
-    std::deque<ConnectionData*> _queue;
+    std::deque<boost::shared_ptr<ConnectionData> > _queue;
 
 };
 
@@ -245,14 +244,16 @@ void
 LocalConnection_as::update()
 {
 
+    // No-op if already attached.
+    _shm.attach();
+
+    // We need the lock to prevent simultaneous reads/writes from other
+    // processes.
     Shm::Lock lock(_shm);
     if (!lock.locked()) {
         log_debug("Failed to get shm lock");
         return;
     }
-
-    // No-op if already attached.
-    _shm.attach();
 
     char* const ptr = _shm.getAddr();
     assert(ptr);
@@ -264,7 +265,6 @@ LocalConnection_as::update()
             hexify(sptr + 16, s.size() - 16, true));
 #endif
 
-
     // First check timestamp data.
 
     // These are not network byte order by default, but not sure about 
@@ -275,18 +275,12 @@ LocalConnection_as::update()
     const size_t size = readLong(
             reinterpret_cast<boost::uint8_t*>(ptr + 12));
 
-    //log_debug("Timestamp: %s, size: %s", timestamp, size);
-    
     // If we are listening, we only care if there is a timestamp, and
     // then only if it's intended for us.
     //
     // If not, we want to remove this data if it has expired.
     if (timestamp) {
 
-        //log_debug("Data has timestamp");
-    
-        std::vector<as_object*> refs;
-        
         // Start after 16-byte header.
         const boost::uint8_t* b =
             reinterpret_cast<boost::uint8_t*>(ptr + 16);
@@ -296,24 +290,25 @@ LocalConnection_as::update()
                 size);
 
         as_value a;
+        std::vector<as_object*> refs;
 
         // Get the connection name. That's all we need to remove expired
         // data.
         a.readAMF0(b, end, -1, refs, getVM(owner()));
         const std::string& connection = a.to_string();
-        //log_debug("Connection name: %s", connection);
 
+
+        // Now check for expired data.
         const size_t timeout = 4 * 1000000;
         if (boost::uint32_t(clocktime::getTicks()) - timestamp > timeout) {
-            log_debug("Data expired. Removing its target");
+            log_debug("Data expired. Removing its target as a listener");
             removeListener(connection, ptr, ptr + _shm.getSize());
             std::fill_n(ptr + 8, 8, 0);
         }
 
-        // If we are listening and the data is for us, get the rest of it.
+        // If we are listening and the data is for us, get the rest of it
+        // and call the method.
         if (_connected && connection == _domain + ":" + _name) {
-
-            log_debug("Reading our data");
 
             // Protocol
             a.readAMF0(b, end, -1, refs, getVM(owner()));
@@ -333,7 +328,8 @@ LocalConnection_as::update()
             fn_call::Args args;
             args.swap(d);
 
-            // Zero the timestamp bytes.
+            // Zero the timestamp bytes to signal that the shared memory
+            // can be written.
             std::fill_n(ptr + 8, 8, 0);
 
             // Call the method on this LocalConnection object.
@@ -349,44 +345,47 @@ LocalConnection_as::update()
         }
 
     }
- 
 
+    // If we have no data to send, there's nothing more to do.
     if (_queue.empty()) {
+        // ...except remove the callback if we aren't connected either.
         if (!_connected) {
             movie_root& mr = getRoot(owner());
             mr.removeAdvanceCallback(this);
         }
-        //log_debug("No data to send. Returning");
         return;
     }
 
 
-    // Do we have the correct listener?
-    ConnectionData* cd = _queue.front();
-    if (!findListener(_domain + ":" + cd->name, ptr, ptr + _shm.getSize())) {
-        log_debug("Found no such listener");
-        // No.
-        delete cd;
+    // Get the next buffer.
+    boost::shared_ptr<ConnectionData> cd = _queue.front();
+    _queue.pop_front();
+
+    // If the correct listener isn't there, iterate until we find one or
+    // there aren't any left.
+    while (!findListener(_domain + ":" + cd->name, ptr, ptr + _shm.getSize())) {
+        if (_queue.empty()) {
+            // Make sure we send the empty header later.
+            cd->ts = 0;
+            break;
+        }
+        cd = _queue.front();
         _queue.pop_front();
-        return;
     }
 
-    log_debug("Calls in queue %s", _queue.size());
-
-    log_debug("Found listener %s", cd->name);
     // Yes
     const char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
     std::copy(i, i + arraySize(i), ptr);
 
+    SimpleBuffer& buf = cd->data;
+
     char* tmp = reinterpret_cast<char*>(ptr + 8);
     writeLong(tmp, cd->ts);
-    writeLong(tmp, cd->data.size());
-    std::copy(cd->data.data(), cd->data.data() + cd->data.size(), tmp);
+    writeLong(tmp, cd->ts ? buf.size() : 0);
+    std::copy(buf.data(), buf.data() + buf.size(), tmp);
 
     // Padding.
     std::fill_n(tmp + cd->data.size(), 16, 0);
-    delete cd;
-    _queue.pop_front();
     return;
 
 }
@@ -407,7 +406,8 @@ LocalConnection_as::close()
     
     Shm::Lock lock(_shm);
     if (!lock.locked()) {
-        log_error("Failed to get lock on shared memory!");
+        log_error("Failed to get lock on shared memory! Will not remove "
+                "listener");
         return;
     }
 
@@ -648,7 +648,7 @@ localconnection_send(const fn_call& fn)
         return as_value(false);
     }
     
-    std::auto_ptr<ConnectionData> cd(new ConnectionData());
+    boost::shared_ptr<ConnectionData> cd(new ConnectionData());
 
     SimpleBuffer& buf = cd->data;
 
