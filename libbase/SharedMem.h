@@ -52,7 +52,7 @@ class SharedMem
 {
 public:
 
-    typedef char* iterator;
+    typedef boost::uint8_t* iterator;
 
     /// The beginning of the SharedMem section.
     //
