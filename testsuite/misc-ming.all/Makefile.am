@@ -37,6 +37,8 @@ EXTRA_DIST = \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
+	LC-Receive.as \
+	LC-Send.as \
 	FlashVarsTest.as \
 	SharedObjectTest.as \
 	intervalTest.as \
@@ -1814,6 +1816,11 @@ gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
 	sh $< $(top_builddir) gotoFrame2Test.swf > $@
 	chmod 755 $@
 
+LC-Receive.swf: $(srcdir)/LC-Receive.as 
+	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Receive.as
+
+LC-Send.swf: $(srcdir)/LC-Send.as 
+	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Send.as
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
