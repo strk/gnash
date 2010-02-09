@@ -168,6 +168,7 @@ check_PROGRAMS = \
 	loadMovieTest \
 	loadMovieTestRunner \
 	DrawingApiTestRunner \
+	LCTestRunner \
 	frame_label_test \
 	path_format_test \
 	callFunction_test \
@@ -1821,6 +1822,10 @@ LC-Receive.swf: $(srcdir)/LC-Receive.as
 
 LC-Send.swf: $(srcdir)/LC-Send.as 
 	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Send.as
+
+LCTestRunner: $(srcdir)/../simultaneous-testrunner.sh LC-Receive.swf LC-Send.swf
+	sh $< $(top_builddir) LC-Receive.swf LC-Send.swf > $@
+	chmod 755 $@
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
