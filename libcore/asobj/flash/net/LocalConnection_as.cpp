@@ -16,8 +16,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
-
 
 #include "GnashSystemIOHeaders.h"
 
@@ -37,6 +35,7 @@
 #include "as_value.h"
 #include "AMF.h"
 #include "ClockTime.h"
+#include "GnashAlgorithm.h"
 
 #include <cerrno>
 #include <cstring>
@@ -96,7 +95,16 @@ namespace {
     void attachLocalConnectionInterface(as_object& o);
 
     void removeListener(const std::string& name, char* shm, char* end);
-    void addListener(const std::string& name, char* shm, char* end);
+    bool addListener(const std::string& name, char* shm, char* end);
+    bool findListener(const std::string& name, char* shm, char* end);
+
+    struct ConnectionData
+    {
+        std::string name;
+        std::string func;
+        boost::uint32_t ts;
+        SimpleBuffer data; 
+    };
 }
 
 void
@@ -147,6 +155,7 @@ public:
     
     virtual ~LocalConnection_as() {
         close();
+        deleteChecked(_queue.begin(), _queue.end());
     }
 
     /// Remove ourself as a listener (if connected).
@@ -165,23 +174,14 @@ public:
 
     void connect(const std::string& name);
 
-    void send(const SimpleBuffer& buf)
+    void send(std::auto_ptr<ConnectionData> d)
     {
-        char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
 
-        const size_t headerSize = 16;
-        SimpleBuffer b(headerSize);
-        b.resize(headerSize);
-
-        std::copy(i, i + sizeof(i), b.data());
-        char* ptr = reinterpret_cast<char*>(b.data() + 8);
-
+        assert(d.get());
         boost::uint32_t time = clocktime::getTicks();
-        writeLong(ptr, time);
-        writeLong(ptr, buf.size());
-        b.append(buf);
-        _queue.push_back(b);
-
+        d->ts = time;
+        _queue.push_back(d.release());
+        log_debug("Added send %s", _queue.size());
         // Register for sending on next advance.
         movie_root& mr = getRoot(owner());
         mr.addAdvanceCallback(this);
@@ -205,7 +205,7 @@ private:
 
     Shm _shm;
 
-    std::deque<SimpleBuffer> _queue;
+    std::deque<ConnectionData*> _queue;
 
 };
 
@@ -217,7 +217,6 @@ LocalConnection_as::LocalConnection_as(as_object* owner)
     _domain(getDomain()),
     _connected(false)
 {
-    log_debug("The domain for this host is: %s", _domain);
 }
 
 
@@ -227,125 +226,194 @@ LocalConnection_as::LocalConnection_as(as_object* owner)
 //
 /// If there is no timestamp the sent sequence is ignored.
 //
-/// Under what circumstances is the data zeroed?
+/// Send:
+///     Is timestamp there? If yes, check value. If it's zero, proceed. If
+///     it's not older than 3 or 4 seconds, go on to receive.
+//
+///     If it's older than 3 or 4 seconds, remove the listener from
+///     listeners, zero timestamp.
+///
+///   Else: 
+///     Check if the correct listener is present. If not, send most recent
+///     data without header. Clear queue.
+///     If correct listener is present, send first thing in buffer with
+///     timestamp.
+//
+/// Receive:
+///     Get data, zero timestamp.
 void
 LocalConnection_as::update()
 {
 
-    // No-op if already attached.
-    _shm.attach();
-
-    char* ptr = _shm.getAddr();
-    assert(ptr);
-    
     Shm::Lock lock(_shm);
-    if (!lock.locked()) return;
-
-    // If we have data waiting to be sent, check if anything is there and
-    // send it.
-    if (!_queue.empty()) {
-        log_debug("Sending queued data (queue size %s)", _queue.size());
-        if (!*ptr) {
-            SimpleBuffer& b = _queue.front();
-            std::copy(b.data(), b.data() + b.size(), ptr);
-            _queue.pop_front();
-        }
-    }
-    
-    // If not connected there is nothing more to do.
-    if (!_connected) {
-
-        // ...except to remove the advance callback if there's no data either.
-        if (_queue.empty()) {
-            movie_root& mr = getRoot(owner());
-            mr.removeAdvanceCallback(this);
-        }
+    if (!lock.locked()) {
+        log_debug("Failed to get shm lock");
         return;
     }
 
-    std::vector<as_object*> refs;
+    // No-op if already attached.
+    _shm.attach();
+
+    char* const ptr = _shm.getAddr();
+    assert(ptr);
+    
+#if 0
+    std::string s(_shm.getAddr(), _shm.getAddr() + 128);
+    const boost::uint8_t* sptr = reinterpret_cast<const boost::uint8_t*>(s.c_str());
+    log_debug("%s \n %s", hexify(sptr, 16, false),
+            hexify(sptr + 16, s.size() - 16, true));
+#endif
+
+
+    // First check timestamp data.
 
     // These are not network byte order by default, but not sure about 
     // host byte order.
     const boost::uint32_t timestamp = readLong(
-            reinterpret_cast<boost::uint8_t*>(_shm.getAddr() + 8));
+            reinterpret_cast<boost::uint8_t*>(ptr + 8));
 
     const size_t size = readLong(
-            reinterpret_cast<boost::uint8_t*>(_shm.getAddr() + 12));
+            reinterpret_cast<boost::uint8_t*>(ptr + 12));
 
-
-    // This seems to be quite normal, so don't log.
-    if (!timestamp || !size) return;
+    //log_debug("Timestamp: %s, size: %s", timestamp, size);
     
-#if 1
-    std::string s(_shm.getAddr(), _shm.getAddr() + 512);
-    const boost::uint8_t* sptr = reinterpret_cast<const boost::uint8_t*>(s.c_str());
-    log_debug("%s \n %s", hexify(sptr, s.size(), false),
-            hexify(sptr, s.size(), true));
-#endif
+    // If we are listening, we only care if there is a timestamp, and
+    // then only if it's intended for us.
+    //
+    // If not, we want to remove this data if it has expired.
+    if (timestamp) {
 
-
-    // Start after 16-byte header.
-    const boost::uint8_t* b = reinterpret_cast<boost::uint8_t*>(_shm.getAddr()
-            + 16);
-
-    // End at reported size of AMF sequence.
-    const boost::uint8_t* end = reinterpret_cast<const boost::uint8_t*>(b +
-            size);
+        //log_debug("Data has timestamp");
     
-    log_debug("Timestamp: %s, size: %s", timestamp, size);
+        std::vector<as_object*> refs;
+        
+        // Start after 16-byte header.
+        const boost::uint8_t* b =
+            reinterpret_cast<boost::uint8_t*>(ptr + 16);
 
-    as_value a;
+        // End at reported size of AMF sequence.
+        const boost::uint8_t* end = reinterpret_cast<const boost::uint8_t*>(b +
+                size);
 
-    // Connection. If this is not for us, we don't need to do anything.
-    a.readAMF0(b, end, -1, refs, getVM(owner()));
-    const std::string& connection = a.to_string();
-    if (connection != _domain + ":" + _name) return;
-    
-    // Protocol
-    a.readAMF0(b, end, -1, refs, getVM(owner()));
-    log_debug("Protocol: %s", a);
-    
-    // The name of the function to call.
-    a.readAMF0(b, end, -1, refs, getVM(owner()));
-    log_debug("Method: %s", a);
-    const std::string& meth = a.to_string();
+        as_value a;
 
-    // These are in reverse order!
-    std::vector<as_value> d;
-    while(a.readAMF0(b, end, -1, refs, getVM(owner()))) {
-        d.push_back(a);
+        // Get the connection name. That's all we need to remove expired
+        // data.
+        a.readAMF0(b, end, -1, refs, getVM(owner()));
+        const std::string& connection = a.to_string();
+        //log_debug("Connection name: %s", connection);
+
+        const size_t timeout = 4 * 1000000;
+        if (boost::uint32_t(clocktime::getTicks()) - timestamp > timeout) {
+            log_debug("Data expired. Removing its target");
+            removeListener(connection, ptr, ptr + _shm.getSize());
+            std::fill_n(ptr + 8, 8, 0);
+        }
+
+        // If we are listening and the data is for us, get the rest of it.
+        if (_connected && connection == _domain + ":" + _name) {
+
+            log_debug("Reading our data");
+
+            // Protocol
+            a.readAMF0(b, end, -1, refs, getVM(owner()));
+            log_debug("Protocol: %s", a);
+            
+            // The name of the function to call.
+            a.readAMF0(b, end, -1, refs, getVM(owner()));
+            log_debug("Method: %s", a);
+            const std::string& meth = a.to_string();
+
+            // These are in reverse order!
+            std::vector<as_value> d;
+            while(a.readAMF0(b, end, -1, refs, getVM(owner()))) {
+                d.push_back(a);
+            }
+            std::reverse(d.begin(), d.end());
+            fn_call::Args args;
+            args.swap(d);
+
+            // Zero the timestamp bytes.
+            std::fill_n(ptr + 8, 8, 0);
+
+            // Call the method on this LocalConnection object.
+            string_table& st = getStringTable(owner());
+            as_function* f = owner().getMember(st.find(meth)).to_function();
+
+            invoke(f, as_environment(getVM(owner())), &owner(), args);
+        }
+        else {
+            // The data has not expired and we didn't read it. Leave it
+            // alone until it's expired or someone else has read it.
+            return;
+        }
+
     }
-  
-    std::reverse(d.begin(), d.end());
+ 
 
-    fn_call::Args args;
-    args.swap(d);
+    if (_queue.empty()) {
+        if (!_connected) {
+            movie_root& mr = getRoot(owner());
+            mr.removeAdvanceCallback(this);
+        }
+        //log_debug("No data to send. Returning");
+        return;
+    }
 
-    // Zero the bytes read.
-    std::fill(_shm.getAddr(), _shm.getAddr() + size + 16, '\0');
 
-    log_debug("Meth: %s", meth);
+    // Do we have the correct listener?
+    ConnectionData* cd = _queue.front();
+    if (!findListener(_domain + ":" + cd->name, ptr, ptr + _shm.getSize())) {
+        log_debug("Found no such listener");
+        // No.
+        delete cd;
+        _queue.pop_front();
+        return;
+    }
 
-    // Call the method on this LocalConnection object.
-    string_table& st = getStringTable(owner());
-    as_function* f = owner().getMember(st.find(meth)).to_function();
+    log_debug("Calls in queue %s", _queue.size());
 
-    invoke(f, as_environment(getVM(owner())), &owner(), args);
+    log_debug("Found listener %s", cd->name);
+    // Yes
+    const char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
+    std::copy(i, i + arraySize(i), ptr);
+
+    char* tmp = reinterpret_cast<char*>(ptr + 8);
+    writeLong(tmp, cd->ts);
+    writeLong(tmp, cd->data.size());
+    std::copy(cd->data.data(), cd->data.data() + cd->data.size(), tmp);
+
+    // Padding.
+    std::fill_n(tmp + cd->data.size(), 16, 0);
+    delete cd;
+    _queue.pop_front();
+    return;
 
 }
 
-/// \brief Closes (disconnects) the LocalConnection object.
+/// Closes the LocalConnection object.
+//
+/// This removes the advanceCallback (so we can be removed by the GC) and
+/// removes this object as a listener from the shared memory listeners
+/// section.
 void
 LocalConnection_as::close()
 {
     if (!_connected) return;
-
+    
     movie_root& mr = getRoot(owner());
-    removeListener(_domain + ":" + _name, _shm.getAddr(),
-            _shm.getAddr() + _shm.getSize());
     mr.removeAdvanceCallback(this);
     _connected = false;
+    
+    Shm::Lock lock(_shm);
+    if (!lock.locked()) {
+        log_error("Failed to get lock on shared memory!");
+        return;
+    }
+
+    removeListener(_domain + ":" + _name, _shm.getAddr(),
+            _shm.getAddr() + _shm.getSize());
+    
 }
 
 /// Makes the LocalConnection object listen.
@@ -357,7 +425,10 @@ LocalConnection_as::close()
 /// When connect is called, this object adds its domain + name plus some
 /// other bits of information to the listeners portion of the shared memory.
 /// It also sets the initial bytes of the shared memory to a set
-/// patter.
+/// pattern.
+//
+/// The connection will fail if a listener with the same id (domain + name)
+/// already exists. ActionScript isn't informed of this failure.
 void
 LocalConnection_as::connect(const std::string& name)
 {
@@ -376,7 +447,11 @@ LocalConnection_as::connect(const std::string& name)
         return; 
     }
 
-    addListener(_domain + ":" + _name, ptr, ptr + _shm.getSize());
+
+    // We can't connect if there is already a listener with the same name.
+    if (!addListener(_domain + ":" + _name, ptr, ptr + _shm.getSize())) {
+        return;
+    }
         
     const char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
     std::copy(i, i + 8, ptr);
@@ -389,8 +464,7 @@ LocalConnection_as::connect(const std::string& name)
     return;
 }
 
-/// \brief Returns a string representing the superdomain of the
-/// location of the current SWF file.
+/// String representing the domain of the current SWF file.
 //
 /// This is set on construction, as it should be constant.
 /// The domain is either the "localhost", or the hostname from the
@@ -574,7 +648,9 @@ localconnection_send(const fn_call& fn)
         return as_value(false);
     }
     
-    SimpleBuffer buf;
+    std::auto_ptr<ConnectionData> cd(new ConnectionData());
+
+    SimpleBuffer& buf = cd->data;
 
     // Don't know whether strict arrays are allowed
     AMF::Writer w(buf, false);
@@ -596,7 +672,10 @@ localconnection_send(const fn_call& fn)
         return as_value(true);
     }
 
-    relay->send(buf);
+    cd->name = name;
+    cd->func = func;
+
+    relay->send(cd);
 
     return as_value(true);
 }
@@ -642,7 +721,12 @@ validFunctionName(const std::string& func)
 void
 removeListener(const std::string& name, char* shm, char* end)
 {
+
+    log_debug("Removing listener %s", name);
+
     char* ptr = shm + LocalConnection_as::listenersOffset;
+
+    char* orig = ptr;
 
     // No listeners if the first byte is 0.
     if (!*ptr) return;
@@ -655,8 +739,14 @@ removeListener(const std::string& name, char* shm, char* end)
     while ((next = std::search(ptr, end, marker.begin(), marker.end()))
             != end) {
 
-        // Move to beginning of next string.
+        // Move next to where it should be (beginning of next string).
         next += marker.size();
+
+        // Check whether we've found the string (should only be once).
+        if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
+            log_debug("Found name at %s", ptr - orig);
+            found = ptr;
+        }
 
         // Found last listener (or reached the end).
         if (next == end || !*next) {
@@ -667,26 +757,48 @@ removeListener(const std::string& name, char* shm, char* end)
             const ptrdiff_t size = name.size() + marker.size();
 
             // Copy listeners backwards to fill in the gaps.
-            std::copy(found + size, ptr, found);
+            std::copy(found + size, next, found);
 
             // Add a 0 terminator.
-            next[-size - 1] = '\0';
+            next[-size] = '\0';
             
             return;
         }
 
-        if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
-            found = ptr;
-        }
-
-        ptr = next + 1;
+        ptr = next;
     }
     
 
 }
 
 /// Two listeners with the same name are never added.
-void
+bool
+findListener(const std::string& name, char* shm, char* end)
+{
+
+    char* ptr = shm + LocalConnection_as::listenersOffset;
+
+    char* next;
+
+    if (!*ptr) return false;
+    while ((next = std::search(ptr, end, marker.begin(), marker.end()))
+            != end) {
+
+        next += marker.size();
+        
+        if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
+            return true;
+        }
+
+        // Found last listener.
+        if (!*next) return false;
+        ptr = next;
+    }
+    return false;
+}
+
+/// Two listeners with the same name are never added.
+bool
 addListener(const std::string& name, char* shm, char* end)
 {
 
@@ -704,7 +816,7 @@ addListener(const std::string& name, char* shm, char* end)
             
             if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
                 log_debug("Not adding duplicated listener");
-                return;
+                return false;
             }
 
             // Found last listener.
@@ -713,7 +825,7 @@ addListener(const std::string& name, char* shm, char* end)
         }
         if (next == end) {
             log_error("No space for listener in shared memory!");
-            return;
+            return false;
         }
     }
 
@@ -721,10 +833,13 @@ addListener(const std::string& name, char* shm, char* end)
     std::string id(name + marker);
     std::copy(id.c_str(), id.c_str() + id.size(), next);
 
+    // Always add an extra null after the final listener.
+    *(next + id.size() + 1) = '\0';
+
+    return true;
 }
 
 } // anonymous namespace
 
 } // end of gnash namespace
 
-//Adding for testing commit
