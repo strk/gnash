@@ -230,23 +230,22 @@ LocalConnection_as::LocalConnection_as(as_object* owner)
 //
 /// (Behaviour may be different on other platforms).
 //
-/// If there is no timestamp the sent sequence is ignored.
-//
 /// Send:
-///     Is timestamp there? If yes, check value. If it's zero, proceed. If
-///     it's not older than 3 or 4 seconds, go on to receive.
-//
+///   Is timestamp there?
+///     If yes, check value. If it's zero, proceed. If it's not older than 3
+///     or 4 seconds, leave it alone and wait.
 ///     If it's older than 3 or 4 seconds, remove the listener from
 ///     listeners, zero timestamp.
 ///
-///   Else: 
-///     Check if the correct listener is present. If not, send most recent
-///     data without header. Clear queue.
-///     If correct listener is present, send first thing in buffer with
-///     timestamp.
+///     Else: 
+///       Check if the correct listener is present. If not, send most recent
+///       data without header. Clear queue.
+///       If correct listener is present, send first thing in buffer with
+///       timestamp.
 //
 /// Receive:
-///     Get data, zero timestamp.
+///     If there is a timestamp, Check if data is for us. If it is, get it,
+///     zero timestamp, call function.
 void
 LocalConnection_as::update()
 {
@@ -349,7 +348,7 @@ LocalConnection_as::update()
 
     // If we have no data to send, there's nothing more to do.
     if (_queue.empty()) {
-        // ...except remove the callback if we aren't connected either.
+        // ...except remove the callback if we aren't listening for anything.
         if (!_connected) {
             movie_root& mr = getRoot(owner());
             mr.removeAdvanceCallback(this);
@@ -357,8 +356,7 @@ LocalConnection_as::update()
         return;
     }
 
-
-    // Get the next buffer.
+    // Get the first buffer.
     boost::shared_ptr<ConnectionData> cd = _queue.front();
     _queue.pop_front();
 
