@@ -37,17 +37,17 @@ timeout=30
 
 cat << EOF
 
-outlog1=${top_builddir}/testoutlog1.\$$
+outlog1=${top_builddir}/testoutlog.\$$
 outlog2=${top_builddir}/testoutlog2.\$$
 (
     echo "Running first process"
-    exec >\${outlog1} ${top_builddir}/gui/gnash -v -r0 ${t1} -t ${timeout}
+    ${top_builddir}/gui/gnash -v -r0 ${t1} -t ${timeout} > \${outlog1}
     cat \${outlog1}
     rm \${outlog1}
 ) &
 (
     echo "Running second process"
-    exec >\${outlog2} ${top_builddir}/gui/gnash -v -r0 ${t2} -t ${timeout}
+    ${top_builddir}/gui/gnash -v -r0 ${t2} -t ${timeout} > \${outlog2}
     cat \${outlog2}
     rm \${outlog2}
 )
