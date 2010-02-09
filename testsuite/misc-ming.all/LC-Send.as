@@ -33,7 +33,7 @@ runtests = function() {
 
 getit = function()
 {
-    trace("Waiting for LC-Send to reply.");
+    trace("Waiting for LC-Receive to reply.");
     lc.send("lc576", "ready");
 };
 
@@ -48,7 +48,7 @@ lc.ready = function() {
 
 // Called when LC-Send has finished. Exit in 3 seconds.
 lc.finished = function() {
-    trace("Received finish signal from LC-Send. Exiting in 3 seconds");
+    trace("Received finish signal from LC-Receive. Exiting in 3 seconds");
     setInterval(exit, 3000);
 };
 
