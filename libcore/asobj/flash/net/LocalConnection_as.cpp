@@ -182,7 +182,8 @@ public:
     void send(boost::shared_ptr<ConnectionData> d)
     {
         assert(d.get());
-        boost::uint32_t time = clocktime::getTicks();
+        VM& vm = getVM(owner());
+        const boost::uint32_t time = vm.getTime();
         d->ts = time;
         _queue.push_back(d);
         
@@ -211,6 +212,9 @@ private:
 
     std::deque<boost::shared_ptr<ConnectionData> > _queue;
 
+    // The timestamp of our last write to the shared memory.
+    boost::uint32_t _lastTime;
+
 };
 
 const size_t LocalConnection_as::listenersOffset;
@@ -221,7 +225,8 @@ LocalConnection_as::LocalConnection_as(as_object* owner)
     ActiveRelay(owner),
     _domain(getDomain()),
     _connected(false),
-    _shm(defaultSize)
+    _shm(defaultSize),
+    _lastTime(0)
 {
 }
 
@@ -297,13 +302,18 @@ LocalConnection_as::update()
         a.readAMF0(b, end, -1, refs, vm);
         const std::string& connection = a.to_string();
 
-
-        // Now check for expired data.
-        const size_t timeout = 4 * 1000000;
-        if (boost::uint32_t(clocktime::getTicks()) - timestamp > timeout) {
-            log_debug("Data expired. Removing its target as a listener");
-            removeListener(connection, _shm);
-            std::fill_n(ptr + 8, 8, 0);
+        // Now check if data we wrote has expired. There's no really
+        // reliable way of checking that we genuinely wrote it.
+        if (_lastTime == timestamp) {
+            const size_t timeout = 4 * 1000;
+            const boost::uint32_t timeNow = vm.getTime();
+            if (timeNow - timestamp > timeout) {
+                log_debug("Data %s expired at %s. Removing its target "
+                        "as a listener", timestamp, timeNow);
+                removeListener(connection, _shm);
+                std::fill_n(ptr + 8, 8, 0);
+            }
+            _lastTime = 0;
         }
 
         // If we are listening and the data is for us, get the rest of it
@@ -385,6 +395,8 @@ LocalConnection_as::update()
 
     // Padding.
     std::fill_n(tmp + cd->data.size(), 16, 0);
+    
+    _lastTime = cd->ts;
     return;
 
 }
