@@ -29,6 +29,7 @@
 #include <sys/mman.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
+#include <sys/sem.h>
 #elif !defined(__riscos__) && !defined(__OS2__)
 #include <windows.h>
 #include <process.h>
@@ -41,35 +42,19 @@
 #include "log.h"
 #include "SharedMem.h"
 
+
 namespace {
-gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
-using namespace std;
-
 namespace gnash {
-
-const int DEFAULT_SHM_SIZE = 64528;
-
-#ifdef darwin
-# ifndef MAP_INHERIT
-# define MAP_INHERIT 0
-#endif
-#ifndef PROT_EXEC
-# define PROT_EXEC
-# endif
-#endif
-
-#ifndef _SC_PAGESIZE
-#define _SC_PAGESIZE 8
-#endif
-
-#define FLAT_ADDR_SPACE 1
 
 Shm::Shm()
     :
     _addr(0),
     _size(0),
+    _semid(0),
+    _shmid(0),
     _shmkey(0)
 {
 }
@@ -79,9 +64,29 @@ Shm::~Shm()
 }
 
 bool
+Shm::lock()
+{
+    struct sembuf sb = { 0, -1, SEM_UNDO };
+    int ret = semop(_semid, &sb, 1);
+    return ret >= 0;
+}
+
+bool
+Shm::unlock()
+{
+    struct sembuf sb = { 0, 1, SEM_UNDO };
+    int ret = semop(_semid, &sb, 1);
+    return ret >= 0;
+}
+
+bool
 Shm::attach()
 {
-    
+   
+    // Don't try to attach twice.
+    if (_addr) return true;
+
+
 #if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
     // this is the magic size of shared memory segments used by the
     // Flash player;
@@ -96,20 +101,39 @@ Shm::attach()
     }
     
 #ifndef _WIN32
-    {
-	const int shmflg = 0660 | IPC_CREAT;
 
-	_shmfd = shmget(_shmkey, _size, shmflg);
-	if (_shmfd < 0 && errno == EEXIST) {
-	    // Get the shared memory id for this segment
-	    _shmfd = shmget(_shmkey, _size, 0);
-	}
-	_addr = static_cast<char *>(shmat(_shmfd, 0, 0));
-	if (_addr <= 0) {
-	    log_debug("WARNING: shmat() failed: %s\n", strerror(errno));
+    _semid = semget(_shmkey, 1, 0600);
+    
+    // According to POSIX.1-2001 we have to define this union (even though
+    // we don't want to use it).
+    union semun {
+        int val;
+        struct semid_ds* buf;
+        ushort* array;
+    };
+
+    semun s;
+    semctl(_semid, 0, GETVAL, &s);
+
+    _shmid = shmget(_shmkey, _size, 0600);
+
+    if (_shmid < 0) {
+        _shmid = shmget(_shmkey, _size, IPC_CREAT | 0660);
+    }
+
+    if (_shmid < 0) {
+        log_error("Unable to get shared memory segment!");
+        return false;
+    }
+
+	_addr = static_cast<char*>(shmat(_shmid, 0, 0));
+
+    if (!_addr) {
+	    log_debug("WARNING: shmat() failed: %s", std::strerror(errno));
 	    return false;
 	}
-    }
+
+
 #else
     _shmhandle = CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL,
 	    PAGE_READWRITE, 0, _size, NULL);

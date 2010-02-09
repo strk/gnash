@@ -48,34 +48,60 @@ const int MAP_HASSEMAPHORE = 0;
 
 const int MAX_SHM_NAME_SIZE = 48;
 
-class Shm {
+class Shm
+{
 public:
 
     DSOEXPORT Shm();
     DSOEXPORT ~Shm();
     
-    // Initialize the shared memory segment
+    /// Initialize the shared memory segment
+    //
+    /// This is called by LocalConnection when either connect() or send()
+    /// is called.
     bool attach();
     
+    bool lock();
+    bool unlock();
+
     // Accessors for testing
-    char *getAddr()             { return _addr; };
+    char* getAddr()             { return _addr; };
     size_t getSize()            { return _size; };
 
-protected:
-    char        *_addr;
-    size_t      _size;
+    class Lock
+    {
+    public:
+        Lock(Shm& s) : _s(s), _locked(s.lock()) {}
+        ~Lock() { if (_locked) _s.unlock(); }
+        bool locked() const {
+            return _locked;
+        }
+    private:
+        Shm& _s;
+        bool _locked;
+    };
+
+private:
+
+    char* _addr;
+    size_t _size;
+
+    // Semaphore ID.
+    int _semid;
+
+    // Shared memory ID.
+    int _shmid;
+
 #if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
     key_t	_shmkey;
 #else
     long	_shmkey;
     HANDLE      _shmhandle;
 #endif
-    int		_shmfd;
 };
 
 } // end of gnash namespace
 
-// end of __SHM_H__
 #endif
 
 // Local Variables:

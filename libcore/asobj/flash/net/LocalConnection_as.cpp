@@ -212,6 +212,10 @@ public:
     {
         char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
         _shm.attach();
+
+        Shm::Lock lock(_shm);
+        if (!lock.locked()) return;
+
         const size_t headerSize = 16;
 
         char* ptr = _shm.getAddr();
@@ -226,6 +230,7 @@ public:
 
         if (!_shm.getAddr()) return;
         std::copy(buf.data(), buf.data() + buf.size(), ptr);
+        _shm.unlock();
     }
 
 private:
@@ -267,6 +272,9 @@ void
 LocalConnection_as::update()
 {
     assert(_connected);
+    
+    Shm::Lock lock(_shm);
+    if (!lock.locked()) return;
 
     std::vector<as_object*> refs;
 
