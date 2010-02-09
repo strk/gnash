@@ -48,42 +48,56 @@ const int MAP_HASSEMAPHORE = 0;
 
 const int MAX_SHM_NAME_SIZE = 48;
 
-class Shm
+class SharedMem
 {
 public:
 
-    DSOEXPORT Shm();
-    DSOEXPORT ~Shm();
+    typedef char* iterator;
+
+    iterator begin() {
+        return _addr;
+    }
+
+    iterator end() {
+        return _addr + _size;
+    }
+
+    DSOEXPORT SharedMem();
+    DSOEXPORT ~SharedMem();
     
     /// Initialize the shared memory segment
     //
     /// This is called by LocalConnection when either connect() or send()
     /// is called.
     bool attach();
-    
-    bool lock();
-    bool unlock();
-
-    // Accessors for testing
-    char* getAddr()             { return _addr; };
-    size_t getSize()            { return _size; };
 
     class Lock
     {
     public:
-        Lock(Shm& s) : _s(s), _locked(s.lock()) {}
+        Lock(SharedMem& s) : _s(s), _locked(s.lock()) {}
         ~Lock() { if (_locked) _s.unlock(); }
         bool locked() const {
             return _locked;
         }
     private:
-        Shm& _s;
+        SharedMem& _s;
         bool _locked;
     };
 
 private:
+    
+    /// Get a semaphore lock if possible
+    //
+    /// @return     true if successful, false if not.
+    bool lock();
+    
+    /// Release a semaphore lock if possible
+    //
+    /// @return     true if successful, false if not.
+    bool unlock();
 
     char* _addr;
+
     size_t _size;
 
     // Semaphore ID.

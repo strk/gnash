@@ -95,9 +95,9 @@ namespace {
     bool validFunctionName(const std::string& func);
     void attachLocalConnectionInterface(as_object& o);
 
-    void removeListener(const std::string& name, char* shm, char* end);
-    bool addListener(const std::string& name, char* shm, char* end);
-    bool findListener(const std::string& name, char* shm, char* end);
+    void removeListener(const std::string& name, SharedMem& mem);
+    bool addListener(const std::string& name, SharedMem& mem);
+    bool findListener(const std::string& name, SharedMem& mem);
 
     struct ConnectionData
     {
@@ -202,7 +202,7 @@ private:
 
     bool _connected;
 
-    Shm _shm;
+    SharedMem _shm;
 
     std::deque<boost::shared_ptr<ConnectionData> > _queue;
 
@@ -249,13 +249,13 @@ LocalConnection_as::update()
 
     // We need the lock to prevent simultaneous reads/writes from other
     // processes.
-    Shm::Lock lock(_shm);
+    SharedMem::Lock lock(_shm);
     if (!lock.locked()) {
         log_debug("Failed to get shm lock");
         return;
     }
 
-    char* const ptr = _shm.getAddr();
+    SharedMem::iterator ptr = _shm.begin();
     assert(ptr);
     
 #if 0
@@ -302,7 +302,7 @@ LocalConnection_as::update()
         const size_t timeout = 4 * 1000000;
         if (boost::uint32_t(clocktime::getTicks()) - timestamp > timeout) {
             log_debug("Data expired. Removing its target as a listener");
-            removeListener(connection, ptr, ptr + _shm.getSize());
+            removeListener(connection, _shm);
             std::fill_n(ptr + 8, 8, 0);
         }
 
@@ -363,7 +363,7 @@ LocalConnection_as::update()
 
     // If the correct listener isn't there, iterate until we find one or
     // there aren't any left.
-    while (!findListener(_domain + ":" + cd->name, ptr, ptr + _shm.getSize())) {
+    while (!findListener(_domain + ":" + cd->name, _shm)) {
         if (_queue.empty()) {
             // Make sure we send the empty header later.
             cd->ts = 0;
@@ -404,15 +404,14 @@ LocalConnection_as::close()
     mr.removeAdvanceCallback(this);
     _connected = false;
     
-    Shm::Lock lock(_shm);
+    SharedMem::Lock lock(_shm);
     if (!lock.locked()) {
         log_error("Failed to get lock on shared memory! Will not remove "
                 "listener");
         return;
     }
 
-    removeListener(_domain + ":" + _name, _shm.getAddr(),
-            _shm.getAddr() + _shm.getSize());
+    removeListener(_domain + ":" + _name, _shm);
     
 }
 
@@ -439,7 +438,7 @@ LocalConnection_as::connect(const std::string& name)
         return;
     }
 
-    char* ptr = _shm.getAddr();
+    SharedMem::iterator ptr = _shm.begin();
 
     if (!ptr) {
         log_error("Failed to open shared memory segment: \"%s\"",
@@ -449,7 +448,7 @@ LocalConnection_as::connect(const std::string& name)
 
 
     // We can't connect if there is already a listener with the same name.
-    if (!addListener(_domain + ":" + _name, ptr, ptr + _shm.getSize())) {
+    if (!addListener(_domain + ":" + _name, _shm)) {
         return;
     }
         
@@ -719,37 +718,34 @@ validFunctionName(const std::string& func)
 // beginning. The byte after the marker is overwritten. If no listeners
 // are left, the first byte becomes 0.
 void
-removeListener(const std::string& name, char* shm, char* end)
+removeListener(const std::string& name, SharedMem& mem)
 {
 
     log_debug("Removing listener %s", name);
 
-    char* ptr = shm + LocalConnection_as::listenersOffset;
-
-    char* orig = ptr;
+    SharedMem::iterator ptr = mem.begin() + LocalConnection_as::listenersOffset;
 
     // No listeners if the first byte is 0.
     if (!*ptr) return;
 
-    char* found = 0;
+    SharedMem::iterator found = 0;
 
-    char* next;
+    SharedMem::iterator next;
     
     // Next should always point to the beginning of a listener.
-    while ((next = std::search(ptr, end, marker.begin(), marker.end()))
-            != end) {
+    while ((next = std::search(ptr, mem.end(), marker.begin(), marker.end()))
+            != mem.end()) {
 
         // Move next to where it should be (beginning of next string).
         next += marker.size();
 
         // Check whether we've found the string (should only be once).
         if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
-            log_debug("Found name at %s", ptr - orig);
             found = ptr;
         }
 
         // Found last listener (or reached the end).
-        if (next == end || !*next) {
+        if (next == mem.end() || !*next) {
 
             if (!found) return;
 
@@ -759,8 +755,8 @@ removeListener(const std::string& name, char* shm, char* end)
             // Copy listeners backwards to fill in the gaps.
             std::copy(found + size, next, found);
 
-            // Add a 0 terminator.
-            next[-size] = '\0';
+            // Add a nul terminator.
+            *(next -size) = '\0';
             
             return;
         }
@@ -773,16 +769,16 @@ removeListener(const std::string& name, char* shm, char* end)
 
 /// Two listeners with the same name are never added.
 bool
-findListener(const std::string& name, char* shm, char* end)
+findListener(const std::string& name, SharedMem& mem)
 {
 
-    char* ptr = shm + LocalConnection_as::listenersOffset;
+    SharedMem::iterator ptr = mem.begin() + LocalConnection_as::listenersOffset;
 
-    char* next;
+    SharedMem::iterator next;
 
     if (!*ptr) return false;
-    while ((next = std::search(ptr, end, marker.begin(), marker.end()))
-            != end) {
+    while ((next = std::search(ptr, mem.end(), marker.begin(), marker.end()))
+            != mem.end()) {
 
         next += marker.size();
         
@@ -799,19 +795,20 @@ findListener(const std::string& name, char* shm, char* end)
 
 /// Two listeners with the same name are never added.
 bool
-addListener(const std::string& name, char* shm, char* end)
+addListener(const std::string& name, SharedMem& mem)
 {
 
-    char* ptr = shm + LocalConnection_as::listenersOffset;
+    SharedMem::iterator ptr = mem.begin() + LocalConnection_as::listenersOffset;
 
-    char* next;
+    SharedMem::iterator next;
 
     if (!*ptr) {
         next = ptr;
     }
     else {
-        while ((next = std::search(ptr, end, marker.begin(), marker.end()))
-                != end) {
+        while ((next = std::search(ptr, mem.end(),
+                        marker.begin(), marker.end())) != mem.end()) {
+
             next += marker.size();
             
             if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
@@ -823,7 +820,7 @@ addListener(const std::string& name, char* shm, char* end)
             if (!*next) break;
             ptr = next;
         }
-        if (next == end) {
+        if (next == mem.end()) {
             log_error("No space for listener in shared memory!");
             return false;
         }

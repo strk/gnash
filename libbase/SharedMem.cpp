@@ -49,7 +49,7 @@ namespace {
 
 namespace gnash {
 
-Shm::Shm()
+SharedMem::SharedMem()
     :
     _addr(0),
     _size(0),
@@ -59,12 +59,12 @@ Shm::Shm()
 {
 }
 
-Shm::~Shm()
+SharedMem::~SharedMem()
 {
 }
 
 bool
-Shm::lock()
+SharedMem::lock()
 {
     struct sembuf sb = { 0, -1, SEM_UNDO };
     int ret = semop(_semid, &sb, 1);
@@ -72,7 +72,7 @@ Shm::lock()
 }
 
 bool
-Shm::unlock()
+SharedMem::unlock()
 {
     struct sembuf sb = { 0, 1, SEM_UNDO };
     int ret = semop(_semid, &sb, 1);
@@ -80,12 +80,11 @@ Shm::unlock()
 }
 
 bool
-Shm::attach()
+SharedMem::attach()
 {
    
     // Don't try to attach twice.
     if (_addr) return true;
-
 
 #if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
     // this is the magic size of shared memory segments used by the
