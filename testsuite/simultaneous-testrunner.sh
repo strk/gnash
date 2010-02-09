@@ -33,19 +33,21 @@ env | grep GNASH | while read REPLY; do
 	echo "export ${REPLY}"
 done
 
+timeout=30
+
 cat << EOF
 
 outlog1=${top_builddir}/testoutlog1.\$$
 outlog2=${top_builddir}/testoutlog2.\$$
 (
     echo "Running first process"
-    exec ${top_builddir}/gui/gnash -v -r0 ${t1}
+    exec >\${outlog1} ${top_builddir}/gui/gnash -v -r0 ${t1} -t ${timeout}
     cat \${outlog1}
     rm \${outlog1}
 ) &
 (
     echo "Running second process"
-    exec ${top_builddir}/gui/gnash -v -r0 ${t2}
+    exec >\${outlog2} ${top_builddir}/gui/gnash -v -r0 ${t2} -t ${timeout}
     cat \${outlog2}
     rm \${outlog2}
 )

@@ -2060,6 +2060,7 @@ TEST_CASES = \
 	action_execution_order_extend_testrunner \
 	simple_loop_testrunner \
 	loadMovieTestRunner \
+	LCTestRunner \
 	DrawingApiTestRunner \
 	TextSnapshotTest-Runner \
 	action_execution_order_test1runner \
