@@ -69,12 +69,9 @@ const int DEFAULT_SHM_SIZE = 64528;
 Shm::Shm()
     :
     _addr(0),
-    _alloced(0),
     _size(0),
-    _shmkey(0),
-    _shmfd(0)
+    _shmkey(0)
 {
-    memset(_filespec, 0, MAX_SHM_NAME_SIZE);
 }
 
 Shm::~Shm()
@@ -135,85 +132,6 @@ Shm::attach()
 }	
 
 
-// Close the memory segment. This removes it from the system.
-bool
-Shm::closeMem()
-{
-//    GNASH_REPORT_FUNCTION;
-    // Only nuke the shared memory segement if we're the last one.
-#ifdef USE_POSIX_SHM
-#ifdef HAVE_SHM_UNLINK
-    if (strlen(_filespec) != 0) {
-        shm_unlink(_filespec);
-    }
-    
-     // flush the shared memory to disk
-     if (_addr > 0) {
-         // detach memory
-         munmap(_addr, _size);
-     }
-#endif
-#ifdef USE_SYSV_SHM
-     shmctl(_shmfd, IPC_RMID, 0);
-#else
-# ifdef __riscos__
-     free(_addr);
-# else
-     CloseHandle(_shmhandle);
-#endif
-#endif
-#endif
-    
-    _addr = 0;
-    _alloced = 0;
-    memset(_filespec, 0, MAX_SHM_NAME_SIZE);
-
-    return true;    
-}
-
-bool
-Shm::exists()
-{
-//    GNASH_REPORT_FUNCTION;
-    struct stat           stats;
-    struct dirent         *entry;
-    vector<const char *>  dirlist;
-    string                realname;
-    DIR                   *library_dir = NULL;
-
-    // Solaris stores shared memory segments in /var/tmp/.SHMD and
-    // /tmp/.SHMD. Linux stores them in /dev/shm.
-    dirlist.push_back("/dev/shm");
-    dirlist.push_back("/var/tmp/.SHMD");
-    dirlist.push_back("/tmp/.SHMD");
-
-    // Open the directory where the raw POSIX shared memory files are
-    for (unsigned int i=0; i<dirlist.size(); i++)
-    {
-        library_dir = opendir (dirlist[i]);
-        if (library_dir != NULL) {
-            realname = dirlist[i];
-            
-            // By convention, the first two entries in each directory
-            // are for . and .. (``dot'' and ``dot dot''), so we
-            // ignore those. The next directory read will get a real
-            // file, if any exists.
-            entry = readdir(library_dir);
-            entry = readdir(library_dir);
-            break;
-        }
-    }
-
-    if (strlen(_filespec)) {
-	realname += _filespec;
-    
-	if (stat(realname.c_str(), &stats) == 0) {
-	    return true;
-	}
-    }
-    
-    return false;
-}
 
 } // end of gnash namespace
 

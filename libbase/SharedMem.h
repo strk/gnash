@@ -57,20 +57,13 @@ public:
     // Initialize the shared memory segment
     bool attach();
     
-    // Close the memory segment. This removes it from the system.
-    bool DSOEXPORT closeMem();
-
     // Accessors for testing
     char *getAddr()             { return _addr; };
-    char *getName()             { return _filespec; };
     size_t getSize()            { return _size; };
-    int getAllocated()          { return _alloced; };
-    bool exists();
+
 protected:
     char        *_addr;
-    long        _alloced;
     size_t      _size;
-    char        _filespec[MAX_SHM_NAME_SIZE];
 #if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
     key_t	_shmkey;
 #else
