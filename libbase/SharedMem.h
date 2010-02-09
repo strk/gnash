@@ -20,6 +20,7 @@
 #define GNASH_SHM_H
 
 #include <string>
+#include <boost/cstdint.hpp>
 
 #include <sys/types.h>
 #if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__)
@@ -69,8 +70,12 @@ public:
         return _addr + _size;
     }
 
-    /// Construct a SharedMem.
-    DSOEXPORT SharedMem();
+    /// Construct a SharedMem with the requested size.
+    //
+    /// @param size     The size of the shared memory section. If successfully
+    ///                 created, the segment will be exactly this size and
+    ///                 is not resizable.
+    DSOEXPORT SharedMem(size_t size);
 
     /// Destructor.
     DSOEXPORT ~SharedMem();
@@ -109,7 +114,7 @@ private:
 
     iterator _addr;
 
-    size_t _size;
+    const size_t _size;
 
     // Semaphore ID.
     int _semid;

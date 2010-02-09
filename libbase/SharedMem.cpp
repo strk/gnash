@@ -49,10 +49,10 @@ namespace {
 
 namespace gnash {
 
-SharedMem::SharedMem()
+SharedMem::SharedMem(size_t size)
     :
     _addr(0),
-    _size(0),
+    _size(size),
     _semid(0),
     _shmid(0),
     _shmkey(0)
@@ -87,9 +87,6 @@ SharedMem::attach()
     if (_addr) return true;
 
 #if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
-    // this is the magic size of shared memory segments used by the
-    // Flash player;
-    _size = 64528;
     
     // If there is no SYSV style shared memory key in the users ~/.gnashrc
     // file, warn them

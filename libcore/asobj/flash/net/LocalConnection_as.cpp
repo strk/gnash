@@ -109,7 +109,7 @@ namespace {
 }
 
 void
-writeLong(char*& ptr, boost::uint32_t i)
+writeLong(boost::uint8_t*& ptr, boost::uint32_t i)
 {
     *ptr = i & 0xff;
     ++ptr;
@@ -150,8 +150,13 @@ class LocalConnection_as : public ActiveRelay
 
 public:
 
+    /// The size of the shared memory segment.
+    static const size_t defaultSize = 64528;
+    
+    /// Offset of listeners in the shared memory segment.
     static const size_t listenersOffset = 40976;
 
+    /// Create a LocalConnection_as object.
     LocalConnection_as(as_object* owner);
     
     virtual ~LocalConnection_as() {
@@ -209,12 +214,14 @@ private:
 };
 
 const size_t LocalConnection_as::listenersOffset;
+const size_t LocalConnection_as::defaultSize;
 
 LocalConnection_as::LocalConnection_as(as_object* owner)
     :
     ActiveRelay(owner),
     _domain(getDomain()),
-    _connected(false)
+    _connected(false),
+    _shm(defaultSize)
 {
 }
 
@@ -261,22 +268,13 @@ LocalConnection_as::update()
 
     SharedMem::iterator ptr = _shm.begin();
     
-#if 0
-    std::string s(_shm.begin(), _shm.begin() + 128);
-    const boost::uint8_t* sptr = reinterpret_cast<const boost::uint8_t*>(s.c_str());
-    log_debug("%s \n %s", hexify(sptr, 16, false),
-            hexify(sptr + 16, s.size() - 16, true));
-#endif
-
     // First check timestamp data.
 
     // These are not network byte order by default, but not sure about 
     // host byte order.
-    const boost::uint32_t timestamp = readLong(
-            reinterpret_cast<boost::uint8_t*>(ptr + 8));
+    const boost::uint32_t timestamp = readLong(ptr + 8);
 
-    const size_t size = readLong(
-            reinterpret_cast<boost::uint8_t*>(ptr + 12));
+    const size_t size = readLong(ptr + 12);
 
     // If we are listening, we only care if there is a timestamp, and
     // then only if it's intended for us.
@@ -285,19 +283,19 @@ LocalConnection_as::update()
     if (timestamp) {
 
         // Start after 16-byte header.
-        const boost::uint8_t* b =
-            reinterpret_cast<boost::uint8_t*>(ptr + 16);
+        const boost::uint8_t* b = ptr + 16;
 
         // End at reported size of AMF sequence.
-        const boost::uint8_t* end = reinterpret_cast<const boost::uint8_t*>(b +
-                size);
+        const boost::uint8_t* end = b + size;
 
         as_value a;
         std::vector<as_object*> refs;
 
+        VM& vm = getVM(owner());
+
         // Get the connection name. That's all we need to remove expired
         // data.
-        a.readAMF0(b, end, -1, refs, getVM(owner()));
+        a.readAMF0(b, end, -1, refs, vm);
         const std::string& connection = a.to_string();
 
 
@@ -314,17 +312,17 @@ LocalConnection_as::update()
         if (_connected && connection == _domain + ":" + _name) {
 
             // Protocol
-            a.readAMF0(b, end, -1, refs, getVM(owner()));
+            a.readAMF0(b, end, -1, refs, vm);
             log_debug("Protocol: %s", a);
             
             // The name of the function to call.
-            a.readAMF0(b, end, -1, refs, getVM(owner()));
+            a.readAMF0(b, end, -1, refs, vm);
             log_debug("Method: %s", a);
             const std::string& meth = a.to_string();
 
             // These are in reverse order!
             std::vector<as_value> d;
-            while(a.readAMF0(b, end, -1, refs, getVM(owner()))) {
+            while(a.readAMF0(b, end, -1, refs, vm)) {
                 d.push_back(a);
             }
             std::reverse(d.begin(), d.end());
@@ -332,7 +330,7 @@ LocalConnection_as::update()
             args.swap(d);
 
             // Zero the timestamp bytes to signal that the shared memory
-            // can be written.
+            // can be written again.
             std::fill_n(ptr + 8, 8, 0);
 
             // Call the method on this LocalConnection object.
@@ -382,7 +380,7 @@ LocalConnection_as::update()
 
     SimpleBuffer& buf = cd->data;
 
-    char* tmp = reinterpret_cast<char*>(ptr + 8);
+    SharedMem::iterator tmp = ptr + 8;
     writeLong(tmp, cd->ts);
     writeLong(tmp, cd->ts ? buf.size() : 0);
     std::copy(buf.data(), buf.data() + buf.size(), tmp);
