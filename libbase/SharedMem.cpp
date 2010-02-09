@@ -61,6 +61,15 @@ SharedMem::SharedMem(size_t size)
 
 SharedMem::~SharedMem()
 {
+    shmdt(_addr);
+    struct shmid_ds ds;
+    shmctl(_shmid, IPC_STAT, &ds);
+
+    // Note that this isn't completely reliable.
+    if (!ds.shm_nattch) {
+        log_debug("No shared memory users left. Removing segment.");
+        shmctl(_shmid, IPC_RMID, 0);
+    }
 }
 
 bool
