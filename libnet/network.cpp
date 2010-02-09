@@ -1444,7 +1444,6 @@ Network::waitForNetData(int limit, fd_set files)
     tval.tv_sec = 0;
     tval.tv_usec = timeout * 1000; // was 1000000
     int ret = select(limit+1, &fdset, NULL, NULL, &tval);
-    FD_ZERO(&fdset);
 #endif
     // If interupted by a system call, try again
     if (ret == -1 && errno == EINTR) {
