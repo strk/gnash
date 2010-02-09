@@ -23,23 +23,13 @@ BuildRequires:  pygtk2-devel giflib-devel
 BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
 # These are for the kde4 support
 BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
-
-# Mandriva uses different names for the X11 library packages
-%if %{distribution} != "fc12"
-BuildRequires:  libx11_6-devel libxt_6-devel
-%else
-BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel 
-%endif
+BuildRequires:  libX11-devel libXt-devel
 
 # Installation requirements
 Requires: libpng libjpeg libogg gtk2 glib2 atk pango
 Requires:  gstreamer gstreamer-ffmpeg gstreamer-plugins-base
 # Mandriva uses differ names for the X11 library packages
-%if %{distribution} != "fc12"
-Requires: libx11_6 libxt_6
-%else
 Requires: libX11 libXt 
-%endif
 Requires: agg boost libcurl SDL boost-date-time boost-thread
 Requires: freetype fontconfig libstdc++
 

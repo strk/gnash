@@ -89,4 +89,12 @@ setup-rpm:
 	  --exclude=$${snapshot_version}/configure.orig $${snapshot_version}; \
 	cp $${snapshot_version}.tar.gz $${HOME}/rpmbuild/SOURCES/
 
-.PHONY : rpm redhat spec rpm-configure rpm-install rpm-build setup-rpm
+# this removes old builds from the maintainer's $HOME/rpmbuild directory.
+rpmbuild-clean:
+	rm -f  ~/rpmbuild/SOURCES/gnash*
+	rm -fr ~/rpmbuild/BUILD/gnash*
+	rm -fr ~/rpmbuild/BUILDROOT/gnash*
+	rm -fr ~/rpmbuild/SRPMS/gnash*
+	rm -fr ~/rpmbuild/RPMS/i686/gnash*
+
+.PHONY : rpm redhat spec rpm-configure rpm-install rpm-build setup-rpm rpmbuild-clean
