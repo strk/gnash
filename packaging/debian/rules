@@ -133,7 +133,6 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp 
-#	rm -f doc/C/*.1*
 	rm -f README.amf README.cygnal
 
 	rm -fr $(BUILD_DIRECTORY)

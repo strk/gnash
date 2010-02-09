@@ -144,9 +144,10 @@ Description: free SWF movie player - Plugin for Gtk and PyGtk donated by Sugar L
 
 Package: gnash-dbg
 Architecture: any
-Section: libdevel
+Section: debug
 Priority: extra
-Depends: ${shlibs:Depends}, , ${misc:Depends}, gnash-common (= ${binary:Version})
+Depends: gnash-common (= ${binary:Version}),
+ ${shlibs:Depends}, ${misc:Depends}
 Description: Debug symbols for Gnash
  Gnash is a free Flash movie player, which works either standalone, or as
  plugin for Firefox/Mozilla or Konqueror. Currently it is in a beta state.

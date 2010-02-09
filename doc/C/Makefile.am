@@ -20,6 +20,7 @@
 
 htmldir = ${prefix}/share/doc/gnash
 infodir = ${prefix}/share/info
+man1dir = ${prefix}/share/man/man1
 docname = gnash
 lang = C
 omffile = gnash-C.omf
@@ -89,8 +90,6 @@ EXTRA_DIST = \
 	$(COMMON) \
 	$(XML_MAIN) \
 	$(MANSRC) \
-	gtk-gnash.1 \
-	kde4-gnash.1 \
 	preformatted/gnashuser.html.in \
 	preformatted/gprocessor.1.in \
 	preformatted/cygnal.1.in \
@@ -112,8 +111,18 @@ EXTRA_DIST = \
 # docbook-utils transform the name at different steps in the process.
 # This is an easy way to handle it either way, since we only need it as
 # dependency anyway.
-dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 flvdumper.1 cygnal.1 rtmpget.1 findmicrophones.1 findwebcams.1
-MANSRC = $(dist_man_MANS:.1=.man-xml)
+MANPAGES = \
+	gnash.1 \
+	gprocessor.1 \
+	dumpshm.1 \
+	soldumper.1 \
+	flvdumper.1 \
+	cygnal.1 \
+	rtmpget.1 \
+	findmicrophones.1 \
+	findwebcams.1
+
+MANSRC = $(MANPAGES:.1=.man-xml)
 INFOS  = gnash_user.info gnash_ref.info
 HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
@@ -129,7 +138,7 @@ gnashref.html gnashref.pdf gnash_ref.info: gnashref.xml $(REFMAN) $(COMMON)
 # and working correctly.
 html: $(HTMLS)
 pdf:  $(PDFS)
-man:  $(dist_man_MANS)
+man:  $(MANPAGES)
 info: $(INFOS)
 texi: $(TEXIS)
 
@@ -220,6 +229,15 @@ else
 	  touch $@; \
 	fi
 endif
+
+gnash.1: $(srcdir)/gnash.man-xml
+gprocessor.1: $(srcdir)/gprocessor.man-xml
+dumpshm.1: $(srcdir)/dumpshm.man-xml
+soldumper.1: $(srcdir)/soldumper.man-xml
+flvdumper.1: $(srcdir)/flvdumper.man-xml
+cygnal.1: $(srcdir)/cygnal.man-xml
+findmicrophones.1: $(srcdir)/findmicrophones.man-xml
+findwebcams.1: $(srcdir)/findwebcams.man-xml
 
 if DOCBOOK
 gnash_user.info: gnashuser.texi
@@ -333,15 +351,19 @@ uninstall-html-hook:
 
 # gtk-gnash.1 and kde4-gnash.1 are special, as they are created by
 # the --solinks option to the docbook2 tools for creating man pages.
-install-extra-man: gnash.1
-	    $(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)/gtk-gnash.1
-	    $(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)/kde4-gnash.1
+install-man1: $(MANPAGES)
+	-test -d "$(DESTDIR)$(man1dir)/" || $(mkinstalldirs) "$(DESTDIR)$(man1dir)/"
+	-$(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)/gtk-gnash.1
+	-$(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)/kde4-gnash.1
+	-for file in $(MANPAGES); do \
+	   $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$file; \
+	done
 
 # the gtk-gnash.1 and kde4-gnash.1 manpages are generated as aliases
 # for the gnash.1 man page, so we can't use the suffix rules to build
 # them, but we need to install the ".so gnash.1" manpages also, or
 # they aren;t in the tarball.
-link-extra-man: gnash.1
+link-extra-man: 
 	-@if test ! -e gtk-gnash.1; then \
 	    echo "WARNING: Linking to preformatted version of gtk-gnash.1, it could be out of date."; \
 	    $(LN_S) -f $(srcdir)/preformatted/gtk-gnash.1.in gtk-gnash.1; \
@@ -351,7 +373,7 @@ link-extra-man: gnash.1
 	    $(LN_S) -f $(srcdir)/preformatted/kde4-gnash.1.in kde4-gnash.1; \
 	  fi
 
-install-data-hook: install-extra-man install-info-hook install-html-hook 
+install-data-hook: $(MANPAGES) install-man1 install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
 	-$(RM) -f $(DESTDIR)$(man1dir)/gtk-gnash.1 
 	-$(RM) -f $(DESTDIR)$(man1dir)/kde4-gnash.1
@@ -391,16 +413,13 @@ uninstall-omf-hook:
 
 CLEANFILES = \
         $(PDFS) \
-	$(MANS) \
+	$(MANPAGES) \
 	$(INFOS) \
         $(HTMLS) \
+	$(TEXIS) \
 	gnash-C.omf.out \
 	manpage.links  \
 	manpage.refs  \
-	gnash_ref.texi  \
-	gnashref.texi  \
-	gnash_user.texi  \
-	gnashuser.texi  \
 	gnash.fo  \
 	gnash.log  \
 	gnashuser.txml \
