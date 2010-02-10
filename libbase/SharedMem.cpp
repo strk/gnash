@@ -97,16 +97,23 @@ SharedMem::attach()
 
 #if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
     
+    _shmkey = rcfile.getLCShmKey();
+
     // If there is no SYSV style shared memory key in the users ~/.gnashrc
     // file, warn them
     // that compatibility will be broken, and then just pick our own key so
     // things still work finer when using just Gnash.
     if (_shmkey == 0) {
+        log_debug("No shared memory key specified in rcfile. Using default "
+                "for communication with other players");
         _shmkey = 0xdd3adabd;
     }
     
+    log_debug("Using shared memory key %s", _shmkey);
+
 #ifndef _WIN32
 
+    // First get semaphores.
     _semid = semget(_shmkey, 1, 0600);
 
     if (_semid < 0) {
@@ -116,19 +123,20 @@ SharedMem::attach()
     if (_semid < 0) {
         log_error("Failed to get semaphore for shared memory!");
         return false;
-   }
-    
-    // According to POSIX.1-2001 we have to define this union (even though
-    // we don't want to use it).
-    union semun {
-        int val;
-        struct semid_ds* buf;
-        ushort* array;
-    };
+    }    
 
-    semun s;
-    semctl(_semid, 0, GETVAL, &s);
+    int ret = semctl(_semid, 0, GETVAL, 0);
+    if (ret == 0) {
+        ret = semctl(_semid, 0, SETVAL, 1);
+        if (ret < 0) {
+            log_debug("Failed to set semaphore");
+            return false;
+        }
+    }
 
+    Lock lock(*this);
+
+    // Then attach shared memory.
     _shmid = shmget(_shmkey, _size, 0600);
 
     if (_shmid < 0) {
@@ -143,7 +151,8 @@ SharedMem::attach()
 	_addr = static_cast<iterator>(shmat(_shmid, 0, 0));
 
     if (!_addr) {
-	    log_debug("WARNING: shmat() failed: %s", std::strerror(errno));
+	    log_error("Unable to attach shared memory: %s",
+                std::strerror(errno));
 	    return false;
 	}
 
