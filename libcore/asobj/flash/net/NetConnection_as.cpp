@@ -292,33 +292,27 @@ HTTPRemotingHandler::advance()
 #ifdef GNASH_DEBUG_REMOTING
     log_debug("advancing HTTPRemotingHandler");
 #endif
-    if(_connection)
-    {
-
-        VM& vm = getVM(_nc.owner());
+    if (_connection) {
 
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("have connection");
 #endif
 
         // Fill last chunk before reading in the next
-        size_t toRead = reply.capacity()-reply.size();
-        if ( ! toRead ) toRead = NCCALLREPLYCHUNK;
+        size_t toRead = reply.capacity() - reply.size();
+        if (! toRead) toRead = NCCALLREPLYCHUNK;
 
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("Attempt to read %d bytes", toRead);
 #endif
 
-        //
         // See if we need to allocate more bytes for the next
         // read chunk
-        //
-        if ( reply.capacity() < reply.size()+toRead )
-        {
+        if (reply.capacity() < reply.size() + toRead) {
             // if _connection->size() >= 0, reserve for it, so
             // if HTTP Content-Length response header is correct
             // we'll be allocating only once for all.
-            size_t newCapacity = reply.size()+toRead;
+            const size_t newCapacity = reply.size() + toRead;
 
 #ifdef GNASH_DEBUG_REMOTING
             log_debug("NetConnection.call: reply buffer capacity (%d) "
@@ -334,13 +328,15 @@ HTTPRemotingHandler::advance()
 #endif
         }
 
-        int read = _connection->readNonBlocking(reply.data() + reply.size(), toRead);
-        if(read > 0) {
+        const int read =
+            _connection->readNonBlocking(reply.data() + reply.size(), toRead);
+
+        if (read > 0) {
 #ifdef GNASH_DEBUG_REMOTING
             log_debug("read '%1%' bytes: %2%", read, 
                     hexify(reply.data() + reply.size(), read, false));
 #endif
-            reply.resize(reply.size()+read);
+            reply.resize(reply.size() + read);
         }
 
         // There is no way to tell if we have a whole amf reply without
@@ -356,8 +352,7 @@ HTTPRemotingHandler::advance()
         // the buffer is full, 2) when we have a "length in bytes" value
         // thas is satisfied
 
-        if (_connection->bad())
-        {
+        if (_connection->bad()) {
             log_debug("connection is in error condition, calling "
                     "NetConnection.onStatus");
             reply.resize(0);
@@ -369,35 +364,35 @@ HTTPRemotingHandler::advance()
             // 'undefined'
             _nc.notifyStatus(NetConnection_as::CALL_FAILED);
         }
-        else if(_connection->eof() )
-        {
-            if ( reply.size() > 8)
-            {
-                std::vector<as_object*> objRefs;
+        else if (_connection->eof()) {
+
+            if (reply.size() > 8) {
+
 
 #ifdef GNASH_DEBUG_REMOTING
                 log_debug("hit eof");
 #endif
-                boost::int16_t si;
                 boost::uint16_t li;
                 const boost::uint8_t *b = reply.data() + reply_start;
                 const boost::uint8_t *end = reply.data() + reply.size();
+                
+                AMF::Reader rd(b, end, getGlobal(_nc.owner()));
 
                 // parse header
                 b += 2; // skip version indicator and client id
 
                 // NOTE: this looks much like parsing of an OBJECT_AMF0
-                si = readNetworkShort(b); b += 2; // number of headers
+                boost::int16_t si = readNetworkShort(b);
+                b += 2; // number of headers
                 uint8_t headers_ok = 1;
-                if (si != 0)
-                {
+                if (si != 0) {
+
 #ifdef GNASH_DEBUG_REMOTING
                     log_debug("NetConnection::call(): amf headers "
                             "section parsing");
 #endif
                     as_value tmp;
-                    for(int i = si; i > 0; --i)
-                    {
+                    for (size_t i = si; i > 0; --i) {
                         if(b + 2 > end) {
                             headers_ok = 0;
                             break;
@@ -417,8 +412,7 @@ HTTPRemotingHandler::advance()
                             break;
                         }
                         b += 5; // skip past bool and length long
-                        if( !tmp.readAMF0(b, end, -1, objRefs, vm) )
-                        {
+                        if(!rd(tmp)) {
                             headers_ok = 0;
                             break;
                         }
@@ -498,9 +492,8 @@ HTTPRemotingHandler::advance()
                             log_debug("about to parse amf value");
 #endif
                             // this updates b to point to the next unparsed byte
-                            as_value reply_as_value;
-                            if ( ! reply_as_value.readAMF0(b, end, -1, objRefs, vm) )
-                            {
+                            as_value replyval;
+                            if (!rd(replyval)) {
                                 log_error("parse amf failed");
                                 // this will happen if we get
                                 // bogus data, or if the data runs
@@ -516,28 +509,35 @@ HTTPRemotingHandler::advance()
                             // update variable to show how much we've parsed
                             reply_start = b - reply.data();
 
-                            // if actionscript specified a callback object, call it
+                            // if actionscript specified a callback object,
+                            // call it
                             as_object* callback = pop_callback(id);
                             if (callback) {
 
                                 string_table::key methodKey;
                                 if ( methodName == "onResult" ) {
                                     methodKey = NSV::PROP_ON_RESULT;
-                                } else if ( methodName == "onStatus" ) {
+                                }
+                                else if (methodName == "onStatus") {
                                     methodKey = NSV::PROP_ON_STATUS;
-                                } else {
-                                    // NOTE: the pp is known to actually invoke the custom
-                                    //       method, but with 7 undefined arguments (?)
-                                    //methodKey = getStringTable(_nc).find(methodName);
-                                    log_error("Unsupported HTTP Remoting response callback: '%s' (size %d)", methodName, methodName.size());
+                                }
+                                else {
+                                    // NOTE: the pp is known to actually
+                                    // invoke the custom method, but with 7
+                                    // undefined arguments (?)
+                                    log_error("Unsupported HTTP Remoting "
+                                            "response callback: '%s' "
+                                            "(size %d)", methodName,
+                                            methodName.size());
                                     continue;
                                 }
 
 #ifdef GNASH_DEBUG_REMOTING
                                 log_debug("calling onResult callback");
 #endif
-                                // FIXME check if above line can fail and we have to react
-                                callMethod(callback, methodKey, reply_as_value);
+                                // FIXME check if above line can fail and we
+                                // have to react
+                                callMethod(callback, methodKey, replyval);
 #ifdef GNASH_DEBUG_REMOTING
                                 log_debug("callback called");
 #endif
