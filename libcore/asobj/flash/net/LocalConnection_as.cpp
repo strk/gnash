@@ -98,6 +98,7 @@ namespace {
     void removeListener(const std::string& name, SharedMem& mem);
     bool addListener(const std::string& name, SharedMem& mem);
     bool findListener(const std::string& name, SharedMem& mem);
+    void getMarker(SharedMem::iterator& i, SharedMem::iterator end);
 
     struct ConnectionData
     {
@@ -106,38 +107,6 @@ namespace {
         boost::uint32_t ts;
         SimpleBuffer data; 
     };
-}
-
-/// Return listener type.
-//
-/// i is moved to point to next listener.
-bool
-getMarker(SharedMem::iterator& i, SharedMem::iterator end)
-{
-    // i points to 0 before marker.
-    assert(*i == '\0');
-    if (i == end) return false;
-
-    // Move to after null.
-    ++i;
-
-    // Then check for marker.
-    if (end - i < 8) return false;
-
-    const char m[] = "::";
-
-    if (!std::equal(i, i + 2, m)) {
-        return false;
-    }
-    if (!std::equal(i + 4, i + 6, m)) {
-        return false;
-    }
-    if (*(i + 8) != '\0') {
-        return false;
-    }
-    i += 8;
-    return true;
-
 }
 
 
@@ -891,6 +860,40 @@ addListener(const std::string& name, SharedMem& mem)
 
     return true;
 }
+
+/// Check whether there is a marker after the listener name and skip it.
+//
+/// @param i        Always moved to point to the next listener string.
+/// @param end      The end of the shared memory second to read.
+void
+getMarker(SharedMem::iterator& i, SharedMem::iterator end)
+{
+    // i points to 0 before marker.
+    assert(*i == '\0');
+    if (i == end) return false;
+
+    // Move to after null.
+    ++i;
+
+    // Then check for marker.
+    if (end - i < 8) return false;
+
+    const char m[] = "::";
+
+    if (!std::equal(i, i + 2, m)) {
+        return false;
+    }
+    if (!std::equal(i + 4, i + 6, m)) {
+        return false;
+    }
+    if (*(i + 8) != '\0') {
+        return false;
+    }
+    i += 8;
+    return true;
+
+}
+
 
 } // anonymous namespace
 
