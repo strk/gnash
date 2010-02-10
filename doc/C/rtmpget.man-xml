@@ -4,7 +4,7 @@
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY appversion "0.8">
   <!ENTITY manrevision "0.1">
-  <!ENTITY date "Jul 2009">
+  <!ENTITY date "Feb 2010">
   <!ENTITY app "<application>RTMPGet</application>">
   <!ENTITY appname "RTMPGet">
   <!ENTITY version "0.8">
