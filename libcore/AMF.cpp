@@ -351,6 +351,7 @@ Reader::operator()(as_value& val, Type t)
 
         switch (t) {
             default:
+                log_error("Unknown AMF type %s! Cannot proceed", t);
                 // A fatal error, since we don't know how much to parse
                 return false;
 
