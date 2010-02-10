@@ -357,49 +357,6 @@ public:
 	/// Object values are values stored by pointer (objects and functions)
 	void setReachable() const;
 
-	/// Read AMF0 data from the given buffer
-	//
-	/// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
-	/// encoded data. Must start with a type byte unless third parameter is set.
-	///
-	/// On success, sets the given as_value and returns true.
-	/// On error (premature end of buffer, etc.) returns false and
-    /// leaves the given as_value untouched.
-	///
-	/// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but
-    /// use what you passed instead.
-	///
-	/// The l-value you pass as the first parameter (buffer start) is updated to
-	/// point just past the last byte parsed
-	///
-	/// TODO restore first parameter on parse errors
-	///
-	/// @param b
-    ///     Pointer to buffer where to start reading.
-    ///     Will be moved as data is read.
-    ///
-	/// @param end
-    ///     Pointer to end of buffer. Reading from this would
-    ///     be invalid.
-    ///
-	/// @param inType
-    ///     Type of the AMF object to read. If -1, type will be
-    ///     read from a type byte.
-    ///
-	/// @param objRefs
-	///     A vector of already-parsed objects to properly interpret references.
-	///     Pass an empty vector on first call as it will be used internally.
-	///     On return, the vector will be filled with pointers to every
-    ///     complex object parsed from the stream.
-    ///
-	/// @param vm
-    ///     Virtual machine to use for initialization of the values
-    ///     (string_table)
-	///
-	DSOEXPORT bool readAMF0(const boost::uint8_t*& b,
-            const boost::uint8_t* const end, int inType,
-            std::vector<as_object*>& objRefs, VM& vm);
-
     /// Serialize value in AMF0 format.
     //
     /// @param buf

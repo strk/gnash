@@ -29,6 +29,13 @@
 #include "Date_as.h"
 #include "Array_as.h"
 
+
+// Define this macro to make AMF parsing verbose
+//#define GNASH_DEBUG_AMF_DESERIALIZE 1
+
+// Define this macto to make AMF writing verbose
+// #define GNASH_DEBUG_AMF_SERIALIZE 1
+
 namespace gnash {
 
 namespace AMF {

@@ -1921,7 +1921,6 @@ attachNetStreamInterface(as_object& o)
 void
 executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 {
-    VM& vm = getVM(thisPtr);
 
 	const boost::uint8_t* ptr = _buffer.data();
 	const boost::uint8_t* endptr = ptr + _buffer.size();
