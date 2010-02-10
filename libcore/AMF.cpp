@@ -36,22 +36,15 @@ namespace AMF {
 namespace {
 
     as_value readNumber(const boost::uint8_t*& pos, const boost::uint8_t* _end);
-    as_value readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end);
+    as_value readBoolean(const boost::uint8_t*& pos,
+            const boost::uint8_t* _end);
     as_value readString(const boost::uint8_t*& pos, const boost::uint8_t* _end);
     as_value readLongString(const boost::uint8_t*& pos,
             const boost::uint8_t* _end);
 
-inline boost::uint16_t
-readNetworkShort(const boost::uint8_t* buf) {
-    boost::uint16_t s = buf[0] << 8 | buf[1];
-    return s;
-}
+    inline boost::uint16_t readNetworkShort(const boost::uint8_t* buf);
+    inline boost::uint32_t readNetworkLong(const boost::uint8_t* buf);
 
-inline boost::uint32_t
-readNetworkLong(const boost::uint8_t* buf) {
-    boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
-    return s;
-}
 }
 
 namespace {
@@ -610,109 +603,6 @@ Reader::readDate()
     return date;
 }
 
-
-namespace {
-
-as_value
-readBoolean(boost::uint8_t*& pos, boost::uint8_t* _end)
-{
-    if (pos == _end) {
-        throw AMFException("Read past _end of buffer for boolean type");
-    }
-
-    const bool val = *pos;
-    ++pos;
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read bool: %d", val);
-#endif
-    return val;
-}
-
-as_value
-readNumber(boost::uint8_t*& pos, boost::uint8_t* _end)
-{
-
-    if (_end - pos < 8) {
-        throw AMFException("Read past _end of buffer for number type");
-    }
-
-    double d;
-    // TODO: may we avoid a copy and swapBytes call
-    //       by bitshifting b[0] trough b[7] ?
-    std::copy(pos, pos + 8, reinterpret_cast<char*>(&d));
-    pos += 8; 
-    swapBytes(&d, 8);
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read double: %e", dub);
-#endif
-
-    return as_value(d);
-}
-
-as_value
-readString(boost::uint8_t*& pos, boost::uint8_t* _end)
-{
-    if (_end - pos < 2) {
-        throw AMFException("Read past _end of buffer for string length");
-    }
-
-    const boost::uint16_t si = readNetworkShort(pos);
-    pos += 2;
-
-    if (_end - pos < si) {
-        throw AMFException("Read past _end of buffer for string type");
-    }
-
-    const std::string str(reinterpret_cast<const char*>(pos), si);
-    pos += si;
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read string: %s", str);
-#endif
-    return as_value(str);
-}
-
-as_value
-readLongString(boost::uint8_t*& pos, boost::uint8_t* _end)
-{
-    if (_end - pos < 4) {
-        throw AMFException("Read past _end of buffer for long string length");
-    }
-
-    const boost::uint32_t si = readNetworkLong(pos);
-    pos += 4;
-    if (_end - pos < si) {
-        throw AMFException("Read past _end of buffer for long string type");
-    }
-
-    const std::string str(reinterpret_cast<const char*>(pos), si);
-    pos += si;
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read long string: %s", str);
-#endif
-
-    return as_value(str);
-
-}
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void*
 swapBytes(void *word, size_t size)
 {
@@ -739,6 +629,108 @@ swapBytes(void *word, size_t size)
     
     return word;
 }
+
+namespace {
+
+as_value
+readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
+{
+    if (pos == _end) {
+        throw AMFException("Read past _end of buffer for boolean type");
+    }
+
+    const bool val = *pos;
+    ++pos;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 read bool: %d", val);
+#endif
+    return val;
+}
+
+as_value
+readNumber(const boost::uint8_t*& pos, const boost::uint8_t* _end)
+{
+
+    if (_end - pos < 8) {
+        throw AMFException("Read past _end of buffer for number type");
+    }
+
+    double d;
+    // TODO: may we avoid a copy and swapBytes call
+    //       by bitshifting b[0] trough b[7] ?
+    std::copy(pos, pos + 8, reinterpret_cast<char*>(&d));
+    pos += 8; 
+    swapBytes(&d, 8);
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 read double: %e", dub);
+#endif
+
+    return as_value(d);
+}
+
+as_value
+readString(const boost::uint8_t*& pos, const boost::uint8_t* _end)
+{
+    if (_end - pos < 2) {
+        throw AMFException("Read past _end of buffer for string length");
+    }
+
+    const boost::uint16_t si = readNetworkShort(pos);
+    pos += 2;
+
+    if (_end - pos < si) {
+        throw AMFException("Read past _end of buffer for string type");
+    }
+
+    const std::string str(reinterpret_cast<const char*>(pos), si);
+    pos += si;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 read string: %s", str);
+#endif
+    return as_value(str);
+}
+
+as_value
+readLongString(const boost::uint8_t*& pos, const boost::uint8_t* _end)
+{
+    if (_end - pos < 4) {
+        throw AMFException("Read past _end of buffer for long string length");
+    }
+
+    const boost::uint32_t si = readNetworkLong(pos);
+    pos += 4;
+    if (_end - pos < si) {
+        throw AMFException("Read past _end of buffer for long string type");
+    }
+
+    const std::string str(reinterpret_cast<const char*>(pos), si);
+    pos += si;
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 read long string: %s", str);
+#endif
+
+    return as_value(str);
+
+}
+
+inline boost::uint16_t
+readNetworkShort(const boost::uint8_t* buf)
+{
+    boost::uint16_t s = buf[0] << 8 | buf[1];
+    return s;
+}
+
+inline boost::uint32_t
+readNetworkLong(const boost::uint8_t* buf)
+{
+    boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
+    return s;
+}
+
+} // anonymous namespace
+
 
 } // namespace AMF
 } // namespace gnash
