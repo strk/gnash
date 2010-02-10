@@ -1,8 +1,30 @@
+Gnash 0.8.8
+YYYY/MM/DD
+
+Improvements since 0.8.7 release are:
+
 Gnash 0.8.7
+2010/02/15
 
 Improvements since 0.8.6 release are:
 
- * Asynchronous load of all resources (XML, variables, movies, bitmaps).
+ * Automatic and spontaneous screenshots support in all GUIs (Benjamin Wolsey)
+ * Significant memory savings in parsing large XML trees (Benjamin Wolsey)
+ * Significant memory savings in functions calls when super is not required
+   (Benjamin Wolsey)
+ * Enhancements in video streaming [youtube HD button and seeks]
+   (Sandro Santilli)
+ * Non blocking load of bitmaps, movies, data (Sandro Santilli)
+ * Fix use of imported library symbols (Sandro Santilli)
+ * AS2 Array handling fixed.  (Benjamin Wolsey)
+ * Refactoring to eliminate most static data and get closer to re-entrant VM.
+   (Benjamin Wolsey)
+ * SWF6 dynamic gradients tested and implemented correctly. 
+   (Benjamin Wolsey)
+ * TextFormat.getTextExtent implemented. 
+   (Benjamin Wolsey)
+ * TextField.autoSize implemented for right and center autosizing. 
+   (Benjamin Wolsey)
 
 Gnash 0.8.6
 
