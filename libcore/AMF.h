@@ -158,6 +158,9 @@ public:
 
 private:
 
+    /// Read an XML type.
+    as_value readXML();
+
     /// Read a Date object type.
     as_value readDate();
     

@@ -27,6 +27,7 @@
 #include "ObjectURI.h"
 #include "VM.h"
 #include "Date_as.h"
+#include "xml/XMLDocument_as.h"
 #include "Array_as.h"
 
 
@@ -168,25 +169,46 @@ Writer::writeObject(as_object* obj)
     const size_t idx = _offsets.size() + 1;
     _offsets[obj] = idx;
 
-    // Dates are handled specially. 
-    Date_as* date;
-    if (isNativeType(obj, date))
-    {
-        double d = date->getTimeValue(); 
+    /// Native objects are handled specially.
+    if (obj->relay()) {
+        
+        Date_as* date;
+        if (isNativeType(obj, date))
+        {
+            double d = date->getTimeValue(); 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-        log_debug(_("amf: serializing date object "
-                    "with index %d and value %g"), idx, d);
+            log_debug(_("amf: serializing date object "
+                        "with index %d and value %g"), idx, d);
 #endif
-        _buf.appendByte(DATE_AMF0);
+            _buf.appendByte(DATE_AMF0);
 
-        // This actually only swaps on little-endian machines
-        swapBytes(&d, 8);
-        _buf.append(&d, 8);
+            // This actually only swaps on little-endian machines
+            swapBytes(&d, 8);
+            _buf.append(&d, 8);
 
-        // This should be timezone
-        boost::uint16_t tz = 0; 
-        _buf.appendNetworkShort(tz);
+            // This should be timezone
+            boost::uint16_t tz = 0; 
+            _buf.appendNetworkShort(tz);
 
+            return true;
+        }
+
+        /// XML is written like a long string (but with an XML marker).
+        XMLDocument_as* xml;
+        if (isNativeType(obj, xml)) {
+            _buf.appendByte(XML_OBJECT_AMF0);
+            std::ostringstream s;
+            xml->toString(s, true);
+
+            const std::string& xmlstr = s.str();
+            _buf.appendNetworkLong(xmlstr.size());
+            _buf.append(xmlstr.c_str(), xmlstr.size());
+            return true;
+        }
+
+        // Any native objects not explicitly handled are unsupported (this
+        // is just a guess).
+        _buf.appendByte(UNSUPPORTED_AMF0);
         return true;
     }
 
@@ -350,6 +372,7 @@ Reader::operator()(as_value& val, Type t)
     try {
 
         switch (t) {
+            
             default:
                 log_error("Unknown AMF type %s! Cannot proceed", t);
                 // A fatal error, since we don't know how much to parse
@@ -359,18 +382,24 @@ Reader::operator()(as_value& val, Type t)
             case BOOLEAN_AMF0:
                 val = readBoolean(_pos, _end);
                 return true;
+            
             case STRING_AMF0:
                 val = readString(_pos, _end);
                 return true;
+            
             case LONG_STRING_AMF0:
                  val = readLongString(_pos, _end);
                  return true;
+            
             case NUMBER_AMF0:
                 val = readNumber(_pos, _end);
                 return true;
+            
+            case UNSUPPORTED_AMF0:
             case UNDEFINED_AMF0:
                 val = as_value();
                 return true;
+            
             case NULL_AMF0:
                 val = static_cast<as_object*>(0);
                 return true;
@@ -379,17 +408,25 @@ Reader::operator()(as_value& val, Type t)
             case REFERENCE_AMF0:
                 val = readReference();
                 return true;
+            
             case OBJECT_AMF0:
                 val = readObject();
                 return true;
+            
             case ECMA_ARRAY_AMF0:
                 val = readArray();
                 return true;
+            
             case STRICT_ARRAY_AMF0:
                 val = readStrictArray();
                 return true;
+            
             case DATE_AMF0:
                 val = readDate();
+                return true;
+
+            case XML_OBJECT_AMF0:
+                val = readXML();
                 return true;
         }
     }
@@ -398,6 +435,27 @@ Reader::operator()(as_value& val, Type t)
         return false;
     }
 
+}
+
+/// Construct an XML object.
+//
+/// Note that the pp seems not to call the constructor or parseXML, but
+/// rather to create it magically. It could do this by calling an ASNative
+/// function.
+as_value
+Reader::readXML()
+{
+    as_value str = readLongString(_pos, _end);
+    as_function* ctor = _global.getMember(NSV::CLASS_XML).to_function();
+    
+    as_value xml;
+    if (ctor) {
+        fn_call::Args args;
+        args += str;
+        VM& vm = getVM(_global);
+        xml = constructInstance(*ctor, as_environment(vm), args);
+    }
+    return xml;
 }
 
 as_value
