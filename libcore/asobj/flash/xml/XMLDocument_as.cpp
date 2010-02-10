@@ -1012,7 +1012,7 @@ textAfterWhitespace(xml_iterator& it, const xml_iterator end)
 ///                 the tag.
 /// @param xml      The complete XML string.
 bool
-parseNodeWithTerminator( xml_iterator& it, const xml_iterator end,
+parseNodeWithTerminator(xml_iterator& it, const xml_iterator end,
         const std::string& terminator, std::string& content)
 {
     xml_iterator ourend = std::search(it, end, terminator.begin(),
