@@ -28,6 +28,17 @@ runtests = function() {
     
     lc.send("lc576", "test3", f);
 
+    xml = new XML('<xml><t><t2 att="abob"><t3/></t2><t2><t3>hi</t3></t2></t></xml>');
+
+    lc.send("lc576", "test4", xml);
+
+    g = [];
+    for (var i = 0; i < 150; ++i) {
+       g.push("element" + i);
+    };
+    
+    lc.send("lc576", "test5", g);
+
     lc.send("lc576", "endTests");
 };
 

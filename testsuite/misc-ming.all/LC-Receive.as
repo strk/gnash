@@ -48,6 +48,18 @@ lc.test3 = function(f) {
     check_equals(f.toString(), "1,str,6");
 };
 
+lc.test4 = function(xml) {
+    xcheck_equals(xml.toString(),
+        '<xml><t><t2 att="abob"><t3 /></t2><t2><t3>hi</t3></t2></t></xml>');
+};
+
+lc.test5 = function(g) {
+    check_equals(typeof(g), "object");
+    check_equals(g.length, 150);
+    check_equals(g[50], "element50");
+    check(g instanceof Array);
+};
+
 // Exit in 3 seconds.
 lc.endTests = function() {
     totals();
