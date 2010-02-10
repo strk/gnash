@@ -1,4 +1,5 @@
 
+#include "../actionscript.all/check.as"
 
 lc = new LocalConnection;
 lc.connect("recv");
@@ -38,6 +39,21 @@ runtests = function() {
     };
     
     lc.send("lc576", "test5", g);
+
+    // Not supported, should become undefined.
+    xn = new XMLNode(1, "");
+    check_equals(typeof(xn), "object");
+    lc.send("lc576", "test6", xn);
+
+    // Not supported, should become undefined.
+    nc = new NetConnection;
+    check_equals(typeof(nc), "object");
+    lc.send("lc576", "test6", ns);
+
+    // Not native, should be fine.
+    c = new Color();
+    check_equals(typeof(c), "object");
+    lc.send("lc576", "test7", c);
 
     lc.send("lc576", "endTests");
 };

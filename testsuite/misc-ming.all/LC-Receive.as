@@ -49,8 +49,9 @@ lc.test3 = function(f) {
 };
 
 lc.test4 = function(xml) {
-    xcheck_equals(xml.toString(),
+    check_equals(xml.toString(),
         '<xml><t><t2 att="abob"><t3 /></t2><t2><t3>hi</t3></t2></t></xml>');
+    check(xml instanceof XML);
 };
 
 lc.test5 = function(g) {
@@ -58,6 +59,15 @@ lc.test5 = function(g) {
     check_equals(g.length, 150);
     check_equals(g[50], "element50");
     check(g instanceof Array);
+};
+
+// Unsupported object.
+lc.test6 = function(f) {
+    check_equals(typeof(f), "undefined");
+};
+
+lc.test7 = function(c) {
+    check_equals(typeof(c), "object");
 };
 
 // Exit in 3 seconds.
