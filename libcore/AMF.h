@@ -86,7 +86,7 @@ public:
 
     /// Write any simple Object type: not DisplayObjects.
     //
-    /// Handles functions, dates, and arrays. The object may not be null.
+    /// Handles functions, dates, XML, and arrays. The object must not be null.
     bool writeObject(as_object* obj);
 
     /// Write a string.
