@@ -399,7 +399,6 @@ Reader::operator()(as_value& val, Type t)
     }
 
 }
-/// Objects need global etc.
 
 as_value
 Reader::readStrictArray()
