@@ -292,20 +292,24 @@ LocalConnection_as::update()
         // End at reported size of AMF sequence.
         const boost::uint8_t* end = b + size;
 
-        as_value a;
-        std::vector<as_object*> refs;
 
-        VM& vm = getVM(owner());
+        AMF::Reader rd(b, end, getGlobal(owner()));
+        as_value a;
 
         // Get the connection name. That's all we need to remove expired
         // data.
-        a.readAMF0(b, end, -1, refs, vm);
+        if (!rd(a)) {
+            log_error("Invalid connection name data");
+            return;
+        }
         const std::string& connection = a.to_string();
 
         // Now check if data we wrote has expired. There's no really
         // reliable way of checking that we genuinely wrote it.
         if (_lastTime == timestamp) {
             const size_t timeout = 4 * 1000;
+
+            VM& vm = getVM(owner());
             const boost::uint32_t timeNow = vm.getTime();
             if (timeNow - timestamp > timeout) {
                 log_debug("Data %s expired at %s. Removing its target "
@@ -320,20 +324,23 @@ LocalConnection_as::update()
         // and call the method.
         if (_connected && connection == _domain + ":" + _name) {
 
-            // Protocol
-            a.readAMF0(b, end, -1, refs, vm);
+            if (!rd(a)) {
+                log_error("Invalid protocol");
+                return;
+            }
             log_debug("Protocol: %s", a);
             
+            if (!rd(a)) {
+                log_error("Invalid function name");
+                return;
+            }
             // The name of the function to call.
-            a.readAMF0(b, end, -1, refs, vm);
             log_debug("Method: %s", a);
             const std::string& meth = a.to_string();
 
             // These are in reverse order!
             std::vector<as_value> d;
-            while(a.readAMF0(b, end, -1, refs, vm)) {
-                d.push_back(a);
-            }
+            while(rd(a)) d.push_back(a);
             std::reverse(d.begin(), d.end());
             fn_call::Args args;
             args.swap(d);
