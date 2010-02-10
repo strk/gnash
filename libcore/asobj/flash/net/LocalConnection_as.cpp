@@ -108,6 +108,39 @@ namespace {
     };
 }
 
+/// Return listener type.
+//
+/// i is moved to point to next listener.
+bool
+getMarker(SharedMem::iterator& i, SharedMem::iterator end)
+{
+    // i points to 0 before marker.
+    assert(*i == '\0');
+    if (i == end) return false;
+
+    // Move to after null.
+    ++i;
+
+    // Then check for marker.
+    if (end - i < 8) return false;
+
+    const char m[] = "::";
+
+    if (!std::equal(i, i + 2, m)) {
+        return false;
+    }
+    if (!std::equal(i + 4, i + 6, m)) {
+        return false;
+    }
+    if (*(i + 8) != '\0') {
+        return false;
+    }
+    i += 8;
+    return true;
+
+}
+
+
 void
 writeLong(boost::uint8_t*& ptr, boost::uint32_t i)
 {
@@ -128,8 +161,6 @@ readLong(const boost::uint8_t* buf) {
 }
 
 
-/// The identifier for the end of a listener is "\0::3\0::4\0".
-//
 /// A null byte after the marker or at the beginning of the listeners
 /// signifies the end of the list.
 template<typename T, size_t N>
@@ -334,6 +365,18 @@ LocalConnection_as::update()
                 log_error("Invalid function name");
                 return;
             }
+
+            // If the value after the protocol is a boolean, something else is
+            // happening.
+            if (a.is_bool()) {
+                log_debug("What is going on here?");
+                if (rd(a)) log_debug("Bool: %s", a);
+                if (rd(a)) log_debug("Number: %s", a);
+                if (rd(a)) log_debug("Number: %s", a);
+                if (rd(a)) log_debug("Filename: %s", a);
+                if (!rd(a)) return;
+            }
+
             // The name of the function to call.
             log_debug("Method: %s", a);
             const std::string& meth = a.to_string();
@@ -747,11 +790,10 @@ removeListener(const std::string& name, SharedMem& mem)
     SharedMem::iterator next;
     
     // Next should always point to the beginning of a listener.
-    while ((next = std::search(ptr, mem.end(), marker.begin(), marker.end()))
-            != mem.end()) {
+    while ((next = std::find(ptr, mem.end(), '\0')) != mem.end()) {
 
         // Move next to where it should be (beginning of next string).
-        next += marker.size();
+        getMarker(next, mem.end());
 
         // Check whether we've found the string (should only be once).
         if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
@@ -792,14 +834,13 @@ findListener(const std::string& name, SharedMem& mem)
     SharedMem::iterator next;
 
     if (!*ptr) return false;
-    while ((next = std::search(ptr, mem.end(), marker.begin(), marker.end()))
-            != mem.end()) {
+    while ((next = std::find(ptr, mem.end(), '\0' != mem.end()))) {
 
-        next += marker.size();
-        
         if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
             return true;
         }
+
+        getMarker(next, mem.end());
 
         // Found last listener.
         if (!*next) return false;
@@ -822,10 +863,9 @@ addListener(const std::string& name, SharedMem& mem)
         next = ptr;
     }
     else {
-        while ((next = std::search(ptr, mem.end(),
-                        marker.begin(), marker.end())) != mem.end()) {
+        while ((next = std::find(ptr, mem.end(), '\0')) != mem.end()) {
 
-            next += marker.size();
+            getMarker(next, mem.end());
             
             if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
                 log_debug("Not adding duplicated listener");
