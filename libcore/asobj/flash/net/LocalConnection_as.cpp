@@ -311,17 +311,19 @@ LocalConnection_as::update()
         // Now check if data we wrote has expired. There's no really
         // reliable way of checking that we genuinely wrote it.
         if (_lastTime == timestamp) {
+            
             const size_t timeout = 4 * 1000;
 
             VM& vm = getVM(owner());
             const boost::uint32_t timeNow = vm.getTime();
+
             if (timeNow - timestamp > timeout) {
                 log_debug("Data %s expired at %s. Removing its target "
                         "as a listener", timestamp, timeNow);
                 removeListener(connection, _shm);
                 markRead(_shm);
+                _lastTime = 0;
             }
-            _lastTime = 0;
         }
 
         // If we are listening and the data is for us, get the rest of it
