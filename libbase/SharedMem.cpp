@@ -108,6 +108,15 @@ SharedMem::attach()
 #ifndef _WIN32
 
     _semid = semget(_shmkey, 1, 0600);
+
+    if (_semid < 0) {
+        _semid = semget(_shmkey, 1, IPC_CREAT | 0600);
+    }
+    
+    if (_semid < 0) {
+        log_error("Failed to get semaphore for shared memory!");
+        return false;
+   }
     
     // According to POSIX.1-2001 we have to define this union (even though
     // we don't want to use it).
