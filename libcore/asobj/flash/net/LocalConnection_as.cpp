@@ -295,7 +295,6 @@ LocalConnection_as::update()
         // End at reported size of AMF sequence.
         const boost::uint8_t* end = b + size;
 
-
         AMF::Reader rd(b, end, getGlobal(owner()));
         as_value a;
 
@@ -365,6 +364,7 @@ LocalConnection_as::update()
         cd = _queue.front();
         _queue.pop_front();
     }
+
 
     // Yes
     const char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
@@ -708,8 +708,6 @@ removeListener(const std::string& name, SharedMem& mem)
 {
     assert(attached(mem));
 
-    log_debug("Removing listener %s", name);
-
     SharedMem::iterator ptr = mem.begin() + LocalConnection_as::listenersOffset;
 
     // No listeners if the first byte is 0.
@@ -741,7 +739,7 @@ removeListener(const std::string& name, SharedMem& mem)
             // Copy listeners backwards to fill in the gaps.
             std::copy(found + size, next, found);
 
-            // Add a nul terminator.
+            // Add a null terminator.
             *(next -size) = '\0';
             
             return;
@@ -763,8 +761,10 @@ findListener(const std::string& name, SharedMem& mem)
 
     SharedMem::iterator next;
 
+    // No listeners at all.
     if (!*ptr) return false;
-    while ((next = std::find(ptr, mem.end(), '\0' != mem.end()))) {
+
+    while ((next = std::find(ptr, mem.end(), '\0')) != mem.end()) {
 
         if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
             return true;
@@ -790,6 +790,7 @@ addListener(const std::string& name, SharedMem& mem)
     SharedMem::iterator next;
 
     if (!*ptr) {
+        // There are no listeners.
         next = ptr;
     }
     else {
@@ -852,9 +853,7 @@ getMarker(SharedMem::iterator& i, SharedMem::iterator end)
     }
 
     // Check for terminating 0.
-    if (*(i + 8) != '\0') {
-        return;
-    }
+    if (*(i + 7) != '\0') return;
 
     i += 8;
     return;
@@ -867,13 +866,12 @@ executeAMFFunction(as_object& o, AMF::Reader& rd)
     as_value a;
 
     if (!rd(a)) {
-        log_error("Invalid protocol");
+        log_error("Invalid protocol %s", a);
         return;
     }
-    log_debug("Protocol: %s", a);
     
     if (!rd(a)) {
-        log_error("Invalid function name");
+        log_error("Invalid function name %s", a);
         return;
     }
 
@@ -888,8 +886,6 @@ executeAMFFunction(as_object& o, AMF::Reader& rd)
         if (!rd(a)) return;
     }
 
-    // The name of the function to call.
-    log_debug("Method: %s", a);
     const std::string& meth = a.to_string();
 
     // These are in reverse order!
