@@ -128,6 +128,10 @@ private:
 /// necessarily know in advance what basic type will be read from the
 /// buffer.
 //
+/// Note that callers may change the current buffer position. They must
+/// check that the read position is not past the end when a Reader object
+/// is called. This is very important!
+//
 /// For reading of basic types, there is no need to use VM resources. Object
 /// types required the construction of objects, which in turn needs a
 /// reference to a Global_as. For this reason, object reading functions

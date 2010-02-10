@@ -1090,31 +1090,41 @@ readSOL(VM& vm, const std::string& filespec)
             return data;
         }
 
-        std::vector<as_object*> objRefs;
+        AMF::Reader rd(buf, end, gl);
 
-        while (buf < end) {
+        while (buf != end) {
+
             log_debug("SharedObject::readSOL: reading property name at "
                     "byte %s", buf - sbuf.get());
             // read property name
-            boost::uint16_t len = 
+            
+            if (end - buf < 2) {
+                log_error("SharedObject: end of buffer while reading length");
+                break;
+            }
+
+            const boost::uint16_t len = 
                 ntohs(*(reinterpret_cast<const boost::uint16_t*>(buf)));
             buf += 2;
 
-            if( buf + len >= end ) {
-                log_error("SharedObject::readSOL: premature end of input");
-                break;
-            }
-            if ( ! len ) {
+            if (!len) {
                 log_error("SharedObject::readSOL: empty property name");
                 break;
             }
+
+            if (end - buf < len) {
+                log_error("SharedObject::readSOL: premature end of input");
+                break;
+            }
+
             std::string prop_name(reinterpret_cast<const char*>(buf), len);
             buf += len;
 
             // read value
             as_value as;
-            if (!as.readAMF0(buf, end, -1, objRefs, vm)) {
-                log_error("SharedObject::readSOL: Parsing SharedObject '%s'",
+
+            if (!rd(as)) {
+                log_error("SharedObject: error parsing SharedObject '%s'",
                         filespec);
                 return false;
             }
@@ -1126,6 +1136,8 @@ readSOL(VM& vm, const std::string& filespec)
             string_table& st = vm.getStringTable();
             data->set_member(st.find(prop_name), as);
             
+            if (buf == end) break;;
+
             buf += 1; // skip null byte after each property
         }
         return data;
