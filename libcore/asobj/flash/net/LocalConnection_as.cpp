@@ -107,7 +107,6 @@ namespace {
     struct ConnectionData
     {
         std::string name;
-        std::string func;
         boost::uint32_t ts;
         SimpleBuffer data; 
     };
@@ -660,7 +659,6 @@ localconnection_send(const fn_call& fn)
     }
 
     cd->name = name;
-    cd->func = func;
 
     relay->send(cd);
 
