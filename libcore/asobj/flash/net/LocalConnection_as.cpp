@@ -739,9 +739,6 @@ removeListener(const std::string& name, SharedMem& mem)
             // Copy listeners backwards to fill in the gaps.
             std::copy(found + size, next, found);
 
-            // Add a null terminator.
-            *(next -size) = '\0';
-            
             return;
         }
 
