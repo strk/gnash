@@ -136,11 +136,10 @@ private:
 class Reader
 {
 public:
-    Reader(const SimpleBuffer& buf, Global_as& gl)
+    Reader(const boost::uint8_t*& pos, const boost::uint8_t* end, Global_as& gl)
         :
-        _buf(buf),
-        _pos(buf.data()),
-        _end(_pos + buf.size()),
+        _pos(pos),
+        _end(end),
         _global(gl)
     {}
 
@@ -173,15 +172,10 @@ private:
     /// Object references.
     std::vector<as_object*> _objectRefs;
 
-    /// The AMF buffer.
-    const SimpleBuffer& _buf;
-
     /// The current position in the buffer.
-    const boost::uint8_t* _pos;
+    const boost::uint8_t*& _pos;
 
     /// The end of the buffer.
-    //
-    /// Cached for simplicity.
     const boost::uint8_t* const _end;
 
     /// For creating objects if necessary.
