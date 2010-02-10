@@ -35,6 +35,27 @@ namespace AMF {
 
 namespace {
 
+    as_value readNumber(const boost::uint8_t*& pos, const boost::uint8_t* _end);
+    as_value readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end);
+    as_value readString(const boost::uint8_t*& pos, const boost::uint8_t* _end);
+    as_value readLongString(const boost::uint8_t*& pos,
+            const boost::uint8_t* _end);
+
+inline boost::uint16_t
+readNetworkShort(const boost::uint8_t* buf) {
+    boost::uint16_t s = buf[0] << 8 | buf[1];
+    return s;
+}
+
+inline boost::uint32_t
+readNetworkLong(const boost::uint8_t* buf) {
+    boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
+    return s;
+}
+}
+
+namespace {
+
 /// Class used to serialize properties of an object to a buffer
 class PropsBufSerializer : public AbstractPropertyVisitor
 {
@@ -95,6 +116,19 @@ private:
     string_table& _st;
     mutable bool _error;
 
+};
+
+/// Exception for handling malformed buffers.
+//
+/// This exception is for internal use only! Do not throw it outside this
+/// TU.
+struct
+AMFException : public GnashException
+{
+    AMFException(const std::string& msg)
+        :
+        GnashException(msg)
+    {}
 };
 
 }
@@ -295,6 +329,389 @@ Writer::writeBoolean(bool b)
 
     return true;
 }
+
+
+bool
+Reader::operator()(as_value& val, Type t)
+{
+
+    // No more reads possible.
+    if (_pos == _end) {
+        return false;
+    }
+
+    // This may leave the read position at the _end of the buffer, but
+    // some types are complete with the type byte (null, undefined).
+    if (t == NOTYPE) {
+        t = static_cast<Type>(*_pos);
+        ++_pos;
+    }
+    
+    try {
+
+        switch (t) {
+            default:
+                // A fatal error, since we don't know how much to parse
+                return false;
+
+            // Simple types.
+            case BOOLEAN_AMF0:
+                val = readBoolean(_pos, _end);
+                return true;
+            case STRING_AMF0:
+                val = readString(_pos, _end);
+                return true;
+            case LONG_STRING_AMF0:
+                 val = readLongString(_pos, _end);
+                 return true;
+            case NUMBER_AMF0:
+                val = readNumber(_pos, _end);
+                return true;
+            case UNDEFINED_AMF0:
+                val = as_value();
+                return true;
+            case NULL_AMF0:
+                val = static_cast<as_object*>(0);
+                return true;
+            
+            // Object types need access to Global_as to create objects.
+            case REFERENCE_AMF0:
+                val = readReference();
+                return true;
+            case OBJECT_AMF0:
+                val = readObject();
+                return true;
+            case ECMA_ARRAY_AMF0:
+                val = readArray();
+                return true;
+            case STRICT_ARRAY_AMF0:
+                val = readStrictArray();
+                return true;
+            case DATE_AMF0:
+                val = readDate();
+                return true;
+        }
+    }
+    catch (const AMFException& e) {
+        log_error("AMF parsing error: %s", e.what());
+        return false;
+    }
+
+}
+/// Objects need global etc.
+
+as_value
+Reader::readStrictArray()
+{
+    if (_end - _pos < 4) {
+        throw AMFException("Read past _end of buffer for strict array length");
+    }
+
+    const boost::uint32_t li = readNetworkLong(_pos);
+    _pos += 4;
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
+#endif
+    
+    as_object* array = _global.createArray();
+    _objectRefs.push_back(array);
+
+    as_value arrayElement;
+    for (size_t i = 0; i < li; ++i) {
+
+        // Recurse.
+        if (!operator()(arrayElement)) {
+            throw AMFException("Unable to read array elements");
+        }
+
+        callMethod(array, NSV::PROP_PUSH, arrayElement);
+    }
+
+    return as_value(array);
+}
+
+// TODO: this function is inconsistent about when it interrupts parsing
+// if the AMF is truncated. If it doesn't interrupt, the next read will
+// fail.
+as_value
+Reader::readArray()
+{
+
+    if (_end - _pos < 4) {
+        throw AMFException("Read past _end of buffer for array length");
+    }
+
+    const boost::uint32_t li = readNetworkLong(_pos);
+    _pos += 4;
+    
+    as_object* array = _global.createArray();
+    _objectRefs.push_back(array);
+
+    // the count specifies array size, so to have that even if none
+    // of the members are indexed
+    // if short, will be incremented everytime an indexed member is
+    // found
+    array->set_member(NSV::PROP_LENGTH, li);
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
+#endif
+
+    as_value objectElement;
+    string_table& st = getStringTable(_global);
+    for (;;) {
+
+        // It seems we don't mind about this situation, although it means
+        // the next read will fail.
+        if (_end - _pos < 2) {
+            log_error("MALFORMED AMF: premature _end of ECMA_ARRAY "
+                    "block");
+            break;
+        }
+        const boost::uint16_t strlen = readNetworkShort(_pos);
+        _pos += 2; 
+
+        // _end of ECMA_ARRAY is signalled by an empty string
+        // followed by an OBJECT_END_AMF0 (0x09) byte
+        if (!strlen) {
+            // expect an object terminator here
+            if (*_pos != AMF::OBJECT_END_AMF0) {
+                log_error("MALFORMED AMF: empty member name not "
+                        "followed by OBJECT_END_AMF0 byte");
+            }
+            ++_pos;
+            break;
+        }
+        
+        // Throw exception instead?
+        if (_end - _pos < strlen) {
+            log_error("MALFORMED AMF: premature _end of ECMA_ARRAY "
+                    "block");
+            break;
+        }
+
+        const std::string name(reinterpret_cast<const char*>(_pos), strlen);
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+        log_debug("amf0 ECMA_ARRAY prop name is %s", name);
+#endif
+
+        _pos += strlen;
+
+        // Recurse to read element.
+        if (!operator()(objectElement)) {
+            throw AMFException("Unable to read array element");
+        }
+        array->set_member(st.find(name), objectElement);
+    }
+    return as_value(array);
+}
+
+as_value
+Reader::readObject()
+{
+
+    string_table& st = getStringTable(_global);
+    as_object* obj = _global.createObject(); 
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 starting read of OBJECT");
+#endif
+
+    _objectRefs.push_back(obj);
+
+    as_value tmp;
+    std::string keyString;
+    for(;;) {
+
+        if (!operator()(tmp, AMF::STRING_AMF0)) {
+            throw AMFException("Could not read object property name");
+        }
+        keyString = tmp.to_string();
+
+        if (keyString.empty()) {
+            if (_pos < _end) {
+                // AMF0 has a redundant "object _end" byte
+                ++_pos; 
+            }
+            else {
+                // What is the point?
+                log_error("AMF buffer terminated just before "
+                        "object _end byte. continuing anyway.");
+            }
+            return as_value(obj);
+        }
+
+        if (!operator()(tmp)) {
+            throw AMFException("Unable to read object member");
+        }
+        obj->set_member(st.find(keyString), tmp);
+    }
+}
+
+as_value
+Reader::readReference()
+{
+
+    if (_end - _pos < 2) {
+        throw AMFException("Read past _end of buffer for reference index");
+    }
+    const boost::uint16_t si = readNetworkShort(_pos);
+    _pos += 2;
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("readAMF0: reference #%d", si);
+#endif
+    if (si < 1 || si > _objectRefs.size()) {
+        log_error("readAMF0: invalid reference to object %d (%d known "
+                "objects)", si, _objectRefs.size());
+        throw AMFException("Reference to invalid object reference");
+    }
+    return as_value(_objectRefs[si - 1]);
+}
+
+as_value
+Reader::readDate()
+{
+
+    if (_end - _pos < 8) {
+        throw AMFException("Read past _end of buffer for date type");
+    }
+
+    double dub;
+
+    // TODO: may we avoid a copy and swapBytes call
+    //       by bitshifting b[0] trough b[7] ?
+    std::copy(_pos, _pos + 8, reinterpret_cast<char*>(&dub));
+    _pos += 8; 
+    swapBytes(&dub, 8);
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 read date: %e", dub);
+#endif
+
+    as_function* ctor = _global.getMember(NSV::CLASS_DATE).to_function();
+    VM& vm = getVM(_global);
+
+    as_value date;
+    if (ctor) {
+        fn_call::Args args;
+        args += dub;
+        date = constructInstance(*ctor, as_environment(vm), args);
+
+        if (_end - _pos < 2) {
+            throw AMFException("premature _end of input reading "
+                        "timezone from Date type");
+        }
+        LOG_ONCE(log_unimpl("Timezone info from AMF0 encoded Date object "
+                    "ignored"));
+        _pos += 2;
+    }
+    return date;
+}
+
+
+namespace {
+
+as_value
+readBoolean(boost::uint8_t*& pos, boost::uint8_t* _end)
+{
+    if (pos == _end) {
+        throw AMFException("Read past _end of buffer for boolean type");
+    }
+
+    const bool val = *pos;
+    ++pos;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 read bool: %d", val);
+#endif
+    return val;
+}
+
+as_value
+readNumber(boost::uint8_t*& pos, boost::uint8_t* _end)
+{
+
+    if (_end - pos < 8) {
+        throw AMFException("Read past _end of buffer for number type");
+    }
+
+    double d;
+    // TODO: may we avoid a copy and swapBytes call
+    //       by bitshifting b[0] trough b[7] ?
+    std::copy(pos, pos + 8, reinterpret_cast<char*>(&d));
+    pos += 8; 
+    swapBytes(&d, 8);
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 read double: %e", dub);
+#endif
+
+    return as_value(d);
+}
+
+as_value
+readString(boost::uint8_t*& pos, boost::uint8_t* _end)
+{
+    if (_end - pos < 2) {
+        throw AMFException("Read past _end of buffer for string length");
+    }
+
+    const boost::uint16_t si = readNetworkShort(pos);
+    pos += 2;
+
+    if (_end - pos < si) {
+        throw AMFException("Read past _end of buffer for string type");
+    }
+
+    const std::string str(reinterpret_cast<const char*>(pos), si);
+    pos += si;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 read string: %s", str);
+#endif
+    return as_value(str);
+}
+
+as_value
+readLongString(boost::uint8_t*& pos, boost::uint8_t* _end)
+{
+    if (_end - pos < 4) {
+        throw AMFException("Read past _end of buffer for long string length");
+    }
+
+    const boost::uint32_t si = readNetworkLong(pos);
+    pos += 4;
+    if (_end - pos < si) {
+        throw AMFException("Read past _end of buffer for long string type");
+    }
+
+    const std::string str(reinterpret_cast<const char*>(pos), si);
+    pos += si;
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+    log_debug("amf0 read long string: %s", str);
+#endif
+
+    return as_value(str);
+
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void*
 swapBytes(void *word, size_t size)

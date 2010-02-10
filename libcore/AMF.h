@@ -22,12 +22,15 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
+#include "as_value.h"
 #include "dsodefs.h"
 
 namespace gnash {
     class as_object;
     class SimpleBuffer;
+    class Global_as;
 }
 
 namespace gnash {
@@ -112,9 +115,78 @@ public:
     void writeData(boost::uint8_t* data, size_t length);
 
 private:
+
     OffsetTable _offsets;
     SimpleBuffer& _buf;
     bool _strictArray;
+
+};
+
+/// Deserialize an AMF buffer to as_values.
+//
+/// This class relies on the public interface of as_value because we don't
+/// necessarily know in advance what basic type will be read from the
+/// buffer.
+//
+/// For reading of basic types, there is no need to use VM resources. Object
+/// types required the construction of objects, which in turn needs a
+/// reference to a Global_as. For this reason, object reading functions
+/// are member functions, and the Reader requires a Global_as& reference
+/// in case it encounters object data.
+class Reader
+{
+public:
+    Reader(const SimpleBuffer& buf, Global_as& gl)
+        :
+        _buf(buf),
+        _pos(buf.data()),
+        _end(_pos + buf.size()),
+        _global(gl)
+    {}
+
+    /// Create a type from current position in the AMF buffer.
+    //
+    /// @param val      An as_value to be created from the AMF data.
+    /// @param type     The type of the data to read.
+    /// @return         false if this read failed for any reason.
+    ///                 The constructed as_value is then invalid. True if
+    ///                 the read succeeded and the as_value is valid.
+    bool operator()(as_value& val, Type t = NOTYPE);
+
+private:
+
+    /// Read a Date object type.
+    as_value readDate();
+    
+    /// Read a simple object type.
+    as_value readObject();
+    
+    /// Read an object reference type.
+    as_value readReference();
+    
+    /// Read an array object type.
+    as_value readArray();
+    
+    /// Read a strict array object type.
+    as_value readStrictArray();
+
+    /// Object references.
+    std::vector<as_object*> _objectRefs;
+
+    /// The AMF buffer.
+    const SimpleBuffer& _buf;
+
+    /// The current position in the buffer.
+    const boost::uint8_t* _pos;
+
+    /// The end of the buffer.
+    //
+    /// Cached for simplicity.
+    const boost::uint8_t* const _end;
+
+    /// For creating objects if necessary.
+    Global_as& _global;
+
 };
 
 /// Swap bytes in raw data.
