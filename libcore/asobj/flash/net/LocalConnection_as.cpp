@@ -233,27 +233,48 @@ LocalConnection_as::LocalConnection_as(as_object* owner)
 {
 }
 
-
 /// From observing the behaviour of the pp, the following seem to be true.
 //
 /// (Behaviour may be different on other platforms).
 //
-/// Send:
-///   Is timestamp there?
-///     If yes, check value. If it's zero, proceed. If it's not older than 3
-///     or 4 seconds, leave it alone and wait.
-///     If it's older than 3 or 4 seconds, remove the listener from
-///     listeners, zero timestamp.
+/// Sending
 ///
-///     Else: 
-///       Check if the correct listener is present. If not, send most recent
-///       data without header. Clear queue.
-///       If correct listener is present, send first thing in buffer with
-///       timestamp.
+/// A sender checks the timestamp value. If it is zero, the data may be
+/// overwritten. If it is not, we check whether we can delete it.
+///
+/// Data expires after 4 seconds. Processes only delete data they (think they)
+/// wrote. If the timestamp matches the timestamp of the last data we sent,
+/// we assume it's our data. If it's expired, mark it for overwriting and
+/// continue.
+///
+/// We continue to check whether the data has expired as long as the data
+/// is not marked for overwriting. No changes are made to the buffer by a
+/// sender as long as the timestamp is there.
+///
+/// Once the buffer is ready for writing, check if the correct listener is
+/// present. If it is, send the first message in our queue and store its
+/// timestamp. If the listener is not present, go through the queue until
+/// a message for an existing listener is found. If none is found, the
+/// last message in the buffer is sent with no timestamp. (It's not clear if
+/// there's any point in sending it, but it happens).
 //
-/// Receive:
-///     If there is a timestamp, Check if data is for us. If it is, get it,
-///     zero timestamp, call function.
+/// Receiving
+/// 
+/// A listener merely checks whether the data has a timestamp and if the
+/// data is intended for it (by reading the first string field). If it is,
+/// the data is deserialized, the encoded function called, and the data
+/// marked for deletion.
+//
+/// Notes
+/// 1. We don't know what happens when data from another process is left in
+///    the buffer with a timestamp. Does it ever get overwritten?
+/// 2. The timestamp seems to be allocated when LocalConnection.send is called,
+///    even though the message may be sent much later.
+/// 3. We can probably stop checking the data if (a) we have nothing more to
+///    send, (b) we are not connected, and (c) the last data was not written
+///    by us. Gnash doesn't do the additional check for (c), so will never
+///    remove the advance callback if data with a timestamp from another
+///    process stays in the buffer. Note 1 also relates to this.
 void
 LocalConnection_as::update()
 {
@@ -283,10 +304,15 @@ LocalConnection_as::update()
 
     const size_t size = readLong(ptr + 12);
 
-    // If we are listening, we only care if there is a timestamp, and
-    // then only if it's intended for us.
+    // As long as there is a timestamp in the shared memory, we mustn't
+    // write anything.
     //
-    // If not, we want to remove this data if it has expired.
+    // We check if this is data we are listening for. If it is, read it and
+    // mark for overwriting.
+    //
+    // If not, we keep checking until the data has been overwritten by
+    // another listener or until it's expired. If it's expired, we
+    // mark for overwriting.
     if (timestamp) {
 
         // Start after 16-byte header.
@@ -365,8 +391,7 @@ LocalConnection_as::update()
         _queue.pop_front();
     }
 
-
-    // Yes
+    // Yes, there is data to send.
     const char i[] = { 1, 0, 0, 0, 1, 0, 0, 0 };
     std::copy(i, i + arraySize(i), ptr);
 
@@ -377,8 +402,9 @@ LocalConnection_as::update()
     writeLong(tmp, cd->ts ? buf.size() : 0);
     std::copy(buf.data(), buf.data() + buf.size(), tmp);
 
+    // Note the timestamp of our last send. We will keep calling update()
+    // until the data has expired or been read.
     _lastTime = cd->ts;
-    return;
 
 }
 
