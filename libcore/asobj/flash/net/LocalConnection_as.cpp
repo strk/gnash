@@ -99,6 +99,10 @@ namespace {
     bool addListener(const std::string& name, SharedMem& mem);
     bool findListener(const std::string& name, SharedMem& mem);
     void getMarker(SharedMem::iterator& i, SharedMem::iterator end);
+    void markRead(SharedMem& m);
+
+    /// Read the AMF data and invoke the function.
+    void executeAMFFunction(as_object& owner, AMF::Reader& rd);
 
     struct ConnectionData
     {
@@ -315,7 +319,7 @@ LocalConnection_as::update()
                 log_debug("Data %s expired at %s. Removing its target "
                         "as a listener", timestamp, timeNow);
                 removeListener(connection, _shm);
-                std::fill_n(ptr + 8, 8, 0);
+                markRead(_shm);
             }
             _lastTime = 0;
         }
@@ -323,56 +327,16 @@ LocalConnection_as::update()
         // If we are listening and the data is for us, get the rest of it
         // and call the method.
         if (_connected && connection == _domain + ":" + _name) {
-
-            if (!rd(a)) {
-                log_error("Invalid protocol");
-                return;
-            }
-            log_debug("Protocol: %s", a);
-            
-            if (!rd(a)) {
-                log_error("Invalid function name");
-                return;
-            }
-
-            // If the value after the protocol is a boolean, something else is
-            // happening.
-            if (a.is_bool()) {
-                log_debug("What is going on here?");
-                if (rd(a)) log_debug("Bool: %s", a);
-                if (rd(a)) log_debug("Number: %s", a);
-                if (rd(a)) log_debug("Number: %s", a);
-                if (rd(a)) log_debug("Filename: %s", a);
-                if (!rd(a)) return;
-            }
-
-            // The name of the function to call.
-            log_debug("Method: %s", a);
-            const std::string& meth = a.to_string();
-
-            // These are in reverse order!
-            std::vector<as_value> d;
-            while(rd(a)) d.push_back(a);
-            std::reverse(d.begin(), d.end());
-            fn_call::Args args;
-            args.swap(d);
-
+            executeAMFFunction(owner(), rd);
             // Zero the timestamp bytes to signal that the shared memory
             // can be written again.
-            std::fill_n(ptr + 8, 8, 0);
-
-            // Call the method on this LocalConnection object.
-            string_table& st = getStringTable(owner());
-            as_function* f = owner().getMember(st.find(meth)).to_function();
-
-            invoke(f, as_environment(getVM(owner())), &owner(), args);
+            markRead(_shm);
         }
         else {
             // The data has not expired and we didn't read it. Leave it
             // alone until it's expired or someone else has read it.
             return;
         }
-
     }
 
     // If we have no data to send, there's nothing more to do.
@@ -412,9 +376,6 @@ LocalConnection_as::update()
     writeLong(tmp, cd->ts ? buf.size() : 0);
     std::copy(buf.data(), buf.data() + buf.size(), tmp);
 
-    // Padding.
-    std::fill_n(tmp + cd->data.size(), 16, 0);
-    
     _lastTime = cd->ts;
     return;
 
@@ -870,31 +831,81 @@ getMarker(SharedMem::iterator& i, SharedMem::iterator end)
 {
     // i points to 0 before marker.
     assert(*i == '\0');
-    if (i == end) return false;
+    if (i == end) return;
 
     // Move to after null.
     ++i;
 
     // Then check for marker.
-    if (end - i < 8) return false;
+    if (end - i < 8) return;
 
     const char m[] = "::";
 
     if (!std::equal(i, i + 2, m)) {
-        return false;
+        return;
     }
     if (!std::equal(i + 4, i + 6, m)) {
-        return false;
+        return;
     }
     if (*(i + 8) != '\0') {
-        return false;
+        return;
     }
     i += 8;
-    return true;
+    return;
 
 }
 
+void
+executeAMFFunction(as_object& o, AMF::Reader& rd)
+{
+    as_value a;
 
+    if (!rd(a)) {
+        log_error("Invalid protocol");
+        return;
+    }
+    log_debug("Protocol: %s", a);
+    
+    if (!rd(a)) {
+        log_error("Invalid function name");
+        return;
+    }
+
+    // If the value after the protocol is a boolean, there is 
+    // a set of extra data. We don't know what it's for,
+    // so log it.
+    if (a.is_bool()) {
+        if (rd(a)) log_debug("Bool: %s", a);
+        if (rd(a)) log_debug("Number: %s", a);
+        if (rd(a)) log_debug("Number: %s", a);
+        if (rd(a)) log_debug("Filename: %s", a);
+        if (!rd(a)) return;
+    }
+
+    // The name of the function to call.
+    log_debug("Method: %s", a);
+    const std::string& meth = a.to_string();
+
+    // These are in reverse order!
+    std::vector<as_value> d;
+    while(rd(a)) d.push_back(a);
+    std::reverse(d.begin(), d.end());
+    fn_call::Args args;
+    args.swap(d);
+
+    // Call the method on this LocalConnection object.
+    string_table& st = getStringTable(o);
+    as_function* f = o.getMember(st.find(meth)).to_function();
+
+    invoke(f, as_environment(getVM(o)), &o, args);
+}
+
+/// Zero timestamp and length bytes to mark the data as overwritable.
+void
+markRead(SharedMem& m)
+{
+    std::fill_n(m.begin() + 8, 8, 0);
+}
 } // anonymous namespace
 
 } // end of gnash namespace
