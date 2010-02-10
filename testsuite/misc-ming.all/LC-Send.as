@@ -49,6 +49,7 @@ lc.ready = function() {
 // Called when LC-Send has finished. Exit in 3 seconds.
 lc.finished = function() {
     trace("Received finish signal from LC-Receive. Exiting in 3 seconds");
+    trace("ENDOFTEST");
     setInterval(exit, 3000);
 };
 

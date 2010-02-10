@@ -1824,7 +1824,7 @@ LC-Send.swf: $(srcdir)/LC-Send.as
 	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Send.as
 
 LCTestRunner: $(srcdir)/../simultaneous-testrunner.sh LC-Receive.swf LC-Send.swf
-	sh $< $(top_builddir) LC-Receive.swf LC-Send.swf > $@
+	sh $< -c "ENDOFTEST" $(top_builddir) LC-Receive.swf LC-Send.swf > $@
 	chmod 755 $@
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 

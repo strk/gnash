@@ -52,6 +52,7 @@ lc.test3 = function(f) {
 lc.endTests = function() {
     totals();
     trace("Finished tests. Alerting LC-Send and exiting in 3 seconds");
+    trace("ENDOFTEST");
     lc.send("recv", "finished");
     setInterval(exit, 3000);
 };
