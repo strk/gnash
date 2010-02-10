@@ -1,3 +1,20 @@
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+//   Foundation, Inc
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 #ifndef GNASH_AMF_H
@@ -15,6 +32,11 @@ namespace gnash {
 
 namespace gnash {
 
+/// Simple functions and classes for handling AMF.
+//
+/// AMF is a simple serialization format for ActionScript objects and values,
+/// allowing them to be stored and transmitted. These classes convert between
+/// AMF buffers and the objects they contain.
 namespace AMF {
 
 enum Type {
@@ -38,6 +60,15 @@ enum Type {
     TYPED_OBJECT_AMF0 = 0x10,
 };
 
+/// A class to compose AMF buffers.
+//
+/// A single AMF::Writer class can take successive values and encode them
+/// in a single buffer. The class takes care of object references.
+//
+/// This class merely encodes basic types such as strings, numbers, and
+/// ActionScript Objects. It does not handle as_values. However, it
+/// is designed for use with as_value::writeAMF0(), which uses an
+/// instance of this class to serialize itself.
 class Writer
 {
 public:
