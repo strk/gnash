@@ -431,6 +431,24 @@ CLEANFILES = \
 	gtk-gnash.1 \
 	kde4-gnash.1
 
+# This updates the copies of the manuals that are stored preformatted
+# so not everyone needs to get Docbook working well enough to produce
+# the documentation. This should only be used by developers after
+# making changes to a documentation source file.
+if DOCBOOK
+update-preformats:
+	-@for type in 1 html info; do \
+	  for i in *.$${type}; do \
+	    name=$${i/\.$${type}/.$${type}.in}; \
+	    diff=`diff --brief $$i $(srcdir)/preformatted/$${name}`; \
+	    if test ! x"$${diff}" = x; then \
+	      echo "Updating the preformatted/$${name}"; \
+	      cp $$i $(srcdir)/preformatted/$${name}; \
+	    fi; \
+	  done; \
+	done
+endif
+
 # Always execute these targets as they have no real dependencies.
-.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook images install-extra-man
+.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook images install-man1
 
