@@ -39,6 +39,7 @@
 #include "StreamProvider.h"
 #include "sound_handler.h"
 #include "GnashSystemNetHeaders.h"
+#include "AMF.h"
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
@@ -135,22 +136,6 @@ registerNetStreamNative(as_object& global)
     //                     seek
 
 }
-
-void
-NetStream_as::processNotify(const std::string& funcname, as_object* info_obj)
-{
-    // TODO: check for System.onStatus too ! use a private
-    // getStatusHandler() method for this.
-
-#ifdef GNASH_DEBUG_METADATA
-  log_debug(" Invoking onMetaData");
-#endif
-
-    string_table::key func = getStringTable(owner()).find(funcname);
-
-    callMethod(&owner(), func, as_value(info_obj));
-}
-
 
 void
 NetStream_as::processStatusNotifications()
@@ -1941,19 +1926,19 @@ executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 	const boost::uint8_t* ptr = _buffer.data();
 	const boost::uint8_t* endptr = ptr + _buffer.size();
 
-	if ( ptr + 2 > endptr ) {
+	if (endptr - ptr < 2) {
 		log_error("Premature end of AMF in NetStream metatag");
 		return;
 	}
-	boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
+	const boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
 	ptr += 2;
 
-	if ( ptr + length > endptr ) {
+	if (endptr - ptr < length) {
 		log_error("Premature end of AMF in NetStream metatag");
 		return;
 	}
 
-	std::string funcName(reinterpret_cast<const char*>(ptr), length); 
+	const std::string funcName(reinterpret_cast<const char*>(ptr), length); 
 	ptr += length;
 
 	log_debug("funcName: %s", funcName);
@@ -1961,10 +1946,10 @@ executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 	string_table& st = getStringTable(thisPtr);
 	string_table::key funcKey = st.find(funcName);
 
+    AMF::Reader rd(ptr, endptr, getGlobal(thisPtr));
+
 	as_value arg;
-	std::vector<as_object*> objRefs;
-	if (!arg.readAMF0(ptr, endptr, -1, objRefs, vm))
-	{
+	if (!rd(arg)) {
 		log_error("Could not convert FLV metatag to as_value, but will try "
                 "passing it anyway. It's an %s", arg);
 	}
