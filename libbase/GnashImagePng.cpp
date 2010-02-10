@@ -163,7 +163,7 @@ PngImageInput::read()
     {
         log_debug("Setting grey bit depth(%d) to 8", bitDepth);
 #if PNG_LIBPNG_VER_MINOR == 4
-	png_set_expand_gray_1_2_4_to_8(_pngPtr);
+        png_set_expand_gray_1_2_4_to_8(_pngPtr);
 #else
         png_set_gray_1_2_4_to_8(_pngPtr);
 #endif
