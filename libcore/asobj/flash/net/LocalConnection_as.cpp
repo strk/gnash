@@ -826,6 +826,11 @@ addListener(const std::string& name, SharedMem& mem)
 //
 /// @param i        Always moved to point to the next listener string.
 /// @param end      The end of the shared memory second to read.
+//
+/// A marker looks like this "::3\0::4\0" or "::3\0::2\0". We don't know
+/// what the numbers mean, or which ones are valid.
+//
+/// Currently this check ignores the digits.
 void
 getMarker(SharedMem::iterator& i, SharedMem::iterator end)
 {
@@ -841,15 +846,16 @@ getMarker(SharedMem::iterator& i, SharedMem::iterator end)
 
     const char m[] = "::";
 
-    if (!std::equal(i, i + 2, m)) {
+    // Check for "::" patterns.
+    if (!std::equal(i, i + 2, m) || !std::equal(i + 4, i + 6, m)) {
         return;
     }
-    if (!std::equal(i + 4, i + 6, m)) {
-        return;
-    }
+
+    // Check for terminating 0.
     if (*(i + 8) != '\0') {
         return;
     }
+
     i += 8;
     return;
 
