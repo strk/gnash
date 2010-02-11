@@ -109,7 +109,8 @@ SharedMem::attach()
         _shmkey = 0xdd3adabd;
     }
     
-    log_debug("Using shared memory key %s", _shmkey);
+    log_debug("Using shared memory key %s",
+            boost::io::group(std::hex, std::showbase, _shmkey));
 
 #ifndef _WIN32
 
