@@ -42,6 +42,11 @@
 #include "log.h"
 #include "SharedMem.h"
 
+#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
+# define ENABLE_SHARED_MEM 1
+#else
+# undef ENABLE_SHARED_MEM
+#endif
 
 namespace {
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -61,6 +66,7 @@ SharedMem::SharedMem(size_t size)
 
 SharedMem::~SharedMem()
 {
+#ifndef _WIN32
     shmdt(_addr);
     struct shmid_ds ds;
     shmctl(_shmid, IPC_STAT, &ds);
@@ -70,32 +76,44 @@ SharedMem::~SharedMem()
         log_debug("No shared memory users left. Removing segment.");
         shmctl(_shmid, IPC_RMID, 0);
     }
+#else
+    // Windows code here.
+#endif
 }
 
 bool
 SharedMem::lock()
 {
+#ifndef _WIN32
     struct sembuf sb = { 0, -1, SEM_UNDO };
     int ret = semop(_semid, &sb, 1);
     return ret >= 0;
+#else
+    // Windows code here.
+    return false;
+#endif
 }
 
 bool
 SharedMem::unlock()
 {
+#ifndef _WIN32
     struct sembuf sb = { 0, 1, SEM_UNDO };
     int ret = semop(_semid, &sb, 1);
     return ret >= 0;
+#else
+    // Windows code here
+    return false;
+#endif
 }
 
 bool
 SharedMem::attach()
 {
-   
+#if ENABLE_SHARED_MEM
+    
     // Don't try to attach twice.
     if (_addr) return true;
-
-#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
     
     _shmkey = rcfile.getLCShmKey();
 
@@ -168,26 +186,29 @@ SharedMem::attach()
         return false;
     }
 
-	_addr = static_cast<iterator>(shmat(_shmid, 0, 0));
+    _addr = static_cast<iterator>(shmat(_shmid, 0, 0));
 
     if (!_addr) {
-	    log_error("Unable to attach shared memory: %s",
+        log_error("Unable to attach shared memory: %s",
                 std::strerror(errno));
-	    return false;
-	}
+        return false;
+    }
 
 #else
+
     _shmhandle = CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL,
-	    PAGE_READWRITE, 0, _size, NULL);
+        PAGE_READWRITE, 0, _size, NULL);
+
     if (_shmhandle == NULL) {
-	log_debug("WARNING: CreateFileMapping failed: %ld\n", GetLastError());
-        return false;
+        log_debug("WARNING: CreateFileMapping failed: %ld\n", GetLastError());
+            return false;
     }
     _addr = static_cast<iterator>(MapViewOfFile(_shmhandle, FILE_MAP_ALL_ACCESS,
             0, 0, _size));
-    if (_addr == NULL) {
-	log_debug("WARNING: MapViewOfFile() failed: %ld\n", GetLastError());
-	return false;
+
+    if (!_addr) {
+        log_debug("WARNING: MapViewOfFile() failed: %ld\n", GetLastError());
+        return false;
     }
 #endif
 
@@ -197,8 +218,8 @@ SharedMem::attach()
 
 #else
 # error "You need SYSV Shared memory support to use this option"
-#endif	 // end of USE_SYSV_SHM
-}	
+#endif
+}    
 
 
 
