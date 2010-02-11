@@ -896,6 +896,7 @@ executeAMFFunction(as_object& o, AMF::Reader& rd)
         return;
     }
     const std::string& domain = a.to_string();
+    log_debug("Domain: %s", domain);
     
     if (!rd(a)) {
         log_error("Invalid function name %s", a);
@@ -915,15 +916,23 @@ executeAMFFunction(as_object& o, AMF::Reader& rd)
         // We guess that the first number describes the number of data fields
         // after the second number, before the function name.
         if (rd(a)) log_debug("First Number: %s", a);
-        const int count = toInt(a);
+
+        // Handle negative numbers.
+        const size_t count = std::max<int>(0, toInt(a));
 
         // We don't know what the second number signifies.
         if (rd(a)) log_debug("Second Number: %s", a);
 
 
         for (size_t i = 0; i < count; ++i) {
-            if (rd(a)) log_debug("Data: %s", a);
+            if (!rd(a)) {
+                log_error("Fewer AMF fields than expected.");
+                return;
+            }
+            log_debug("Data: %s", a);
         }
+
+        // Now we expect the next field to be the method to call.
         if (!rd(a)) return;
     }
 
