@@ -77,6 +77,7 @@
 //#define SKIP_RENDERING_IF_LATE 1
 
 
+bool globalQuit = false;
 
 namespace gnash {
 
@@ -933,6 +934,8 @@ Gui::start()
 bool
 Gui::advanceMovie()
 {
+    if (globalQuit) quit();
+
 	if (isStopped()) return true;
 
     if (!_started) start();
