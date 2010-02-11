@@ -275,6 +275,14 @@ LocalConnection_as::LocalConnection_as(as_object* owner)
 void
 LocalConnection_as::update()
 {
+    // Check whether local connection is disabled(!): brilliant choice of
+    // function name.
+    if (rcfile.getLocalConnection()) {
+        log_security("Attempting to write to disabled LocalConnection!");
+        movie_root& mr = getRoot(owner());
+        mr.removeAdvanceCallback(this);
+        return;
+    }
 
     // No-op if already attached. Nothing to do if it fails, but we
     // should probably stop trying.
@@ -412,10 +420,12 @@ LocalConnection_as::update()
 void
 LocalConnection_as::close()
 {
-    if (!_connected) return;
-    
+    // We may be waiting either to send or to receive, so in both cases
+    // make sure update() isn't called again.
     movie_root& mr = getRoot(owner());
     mr.removeAdvanceCallback(this);
+    
+    if (!_connected) return;
     _connected = false;
     
     SharedMem::Lock lock(_shm);
@@ -673,13 +683,6 @@ localconnection_send(const fn_call& fn)
     }
 
     // Now we have a valid call.
-
-    // We'll return true if the LocalConnection is disabled too, as
-    // the return value doesn't indicate success of the connection.
-    if (rcfile.getLocalConnection()) {
-        log_security("Attempting to write to disabled LocalConnection!");
-        return as_value(true);
-    }
 
     cd->name = name;
 
