@@ -22,6 +22,15 @@
 #include "gnashconfig.h"
 #endif
 
+#include <string>
+#include <iostream>
+#include <ios>
+#include <csignal>
+#include <boost/format.hpp>
+#ifdef ENABLE_NLS
+# include <clocale>
+#endif
+
 #include "Player.h"
 #include "log.h"
 #include "rc.h" // for use of rcfile
@@ -47,14 +56,6 @@ extern "C" {
 # include "gst/gstversion.h"
 #endif
 
-#include <string>
-#include <iostream>
-#include <ios>
-
-#ifdef ENABLE_NLS
-# include <clocale>
-#endif
-
 #ifdef GUI_ALP
 #include <alp/title.h>
 #include <alp/menubar.h>
@@ -64,8 +65,6 @@ extern "C" {
 #else
 # define gnash_main main
 #endif
-
-#include <boost/format.hpp> // For i18n-friendly cerr
 
 using std::cerr;
 using std::endl;
@@ -460,10 +459,18 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 
 }
 
+void
+quitGnash(int)
+{
+    globalQuit = true;
+}
 
 int
 gnash_main(int argc, char *argv[])
 {
+    
+    // Handle sigterm gracefully.
+    signal(SIGTERM, quitGnash);
 
     std::ios::sync_with_stdio(false);
 

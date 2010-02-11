@@ -24,18 +24,21 @@
 #include "gnashconfig.h"
 #endif
 
-#include "gnash.h" // needed for interface and fscommand callbacks
-#include "sound_handler.h" // for visibility of sound_handler destructor
-#include "MediaHandler.h" // for visibility of MediaHandler destructor
+#include "gnash.h" 
+#include "sound_handler.h"
+#include "MediaHandler.h" 
 #include "gui.h"
-#include "movie_definition.h" // for visibility of movie_definition destructor
-#include "smart_ptr.h" // for intrusive_ptr holding of top-level movie
-#include "movie_root.h" // for Abstract callbacks
-#include "RunResources.h" // for passing handlers and other data to the core.
+#include "movie_definition.h" 
+#include "smart_ptr.h"
+#include "movie_root.h"
+#include "RunResources.h"
 
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <map>
+
+// Flag for signal handlers to allow Gnash to quit gracefully.
+extern bool globalQuit;
 
 // Forward declarations
 namespace gnash
