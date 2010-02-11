@@ -547,9 +547,6 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_lcdisabled, "LocalConnection", variable,
                            value)
             ||
-                 extractSetting(_lctrace, "LCTrace", variable,
-                           value)
-            ||
                  extractNumber(_movieLibraryLimit, "movieLibraryLimit",
                          variable, value)
             ||
@@ -728,7 +725,6 @@ RcInitFile::updateFile(const std::string& filespec)
 	cmd << "solLocalDomain " << _sollocaldomain << endl <<
     cmd << "SOLSafeDir " << _solsandbox << endl <<
     cmd << "localConnection " << _lcdisabled << endl <<
-    cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
