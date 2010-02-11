@@ -168,7 +168,6 @@ check_PROGRAMS = \
 	loadMovieTest \
 	loadMovieTestRunner \
 	DrawingApiTestRunner \
-	LCTestRunner \
 	frame_label_test \
 	path_format_test \
 	callFunction_test \
@@ -256,6 +255,7 @@ check_SCRIPTS = \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
 	TextSnapshotTest-Runner \
+	LCTestRunner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
 	place_object_test2runner \
