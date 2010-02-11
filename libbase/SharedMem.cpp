@@ -99,10 +99,7 @@ SharedMem::attach()
     
     _shmkey = rcfile.getLCShmKey();
 
-    // If there is no SYSV style shared memory key in the users ~/.gnashrc
-    // file, warn them
-    // that compatibility will be broken, and then just pick our own key so
-    // things still work finer when using just Gnash.
+    // Check rcfile for key; if there isn't one, use the Adobe key.
     if (_shmkey == 0) {
         log_debug("No shared memory key specified in rcfile. Using default "
                 "for communication with other players");
@@ -114,32 +111,54 @@ SharedMem::attach()
 
 #ifndef _WIN32
 
-    // First get semaphores.
-    _semid = semget(_shmkey, 1, 0600);
-
-    if (_semid < 0) {
-        _semid = semget(_shmkey, 1, IPC_CREAT | 0600);
-    }
+    // First get semaphore.
     
-    if (_semid < 0) {
-        log_error("Failed to get semaphore for shared memory!");
-        return false;
-    }    
+    // Struct for semctl
+    union semun {
+        int val;
+        struct semi_ds* buf;
+        unsigned short* array;
+    };
 
-    int ret = semctl(_semid, 0, GETVAL, 0);
-    if (ret == 0) {
-        ret = semctl(_semid, 0, SETVAL, 1);
+    // Check if it exists already.
+    _semid = semget(_shmkey, 1, 0600);
+    
+    semun s;
+
+    // If it does not exist, create it and set its value to 1.
+    if (_semid < 0) {
+
+        _semid = semget(_shmkey, 1, IPC_CREAT | 0600);
+        
+        if (_semid < 0) {
+            log_error("Failed to get semaphore for shared memory!");
+            return false;
+        }    
+
+        s.val = 1;
+        int ret = semctl(_semid, 0, SETVAL, s);
         if (ret < 0) {
-            log_debug("Failed to set semaphore");
+            log_error("Failed to set semaphore value");
             return false;
         }
+    }
+    
+    // The 4th argument is neither necessary nor used, but we pass it
+    // anyway for fun.
+    int semval = semctl(_semid, 0, GETVAL, s);
+
+    if (semval != 1) {
+        log_error("Need semaphore value of 1 for locking. Cannot "
+                "attach shared memory!");
+        return false;
     }
 
     Lock lock(*this);
 
-    // Then attach shared memory.
+    // Then attach shared memory. See if it exists.
     _shmid = shmget(_shmkey, _size, 0600);
 
+    // If not create it.
     if (_shmid < 0) {
         _shmid = shmget(_shmkey, _size, IPC_CREAT | 0660);
     }
@@ -156,7 +175,6 @@ SharedMem::attach()
                 std::strerror(errno));
 	    return false;
 	}
-
 
 #else
     _shmhandle = CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL,
