@@ -44,4 +44,7 @@ set urlOpenerFormat echo '%u' > /dev/null
 # Blacklist (for testing NetConnection)
 set blacklist www.blacklistedserver.org
 
+# LocalConnection must be enabled for testing.
+set localconnection false
+
 # TODO: enable extensions ?

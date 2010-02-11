@@ -44,7 +44,11 @@
 #include "element.h"
 #include "gmemory.h"
 
-using namespace amf;
+using amf::AMF;
+using amf::Element;
+using amf::Buffer;
+using amf::swapBytes;
+
 using namespace gnash;
 using namespace std;
 
@@ -140,9 +144,9 @@ main(int argc, char *argv[])
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
    if (memdebug) {
         if (mem->analyze()) {
-            runtest.pass("AMF doesn't leak memory");
+            runtest.pass("amf::AMF doesn't leak memory");
         } else {
-            runtest.fail("AMF leaks memory!");
+            runtest.fail("amf::AMF leaks memory!");
         }
     }
 #endif
@@ -168,8 +172,8 @@ test_encoding()
         mem->addStats(__LINE__);             // take a sample
     }
 #endif    
-    boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(num);
-    // A number AMF object has only one header byte, which is the type field.
+    boost::shared_ptr<Buffer> encnum = amf::AMF::encodeNumber(num);
+    // A number amf::AMF object has only one header byte, which is the type field.
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     if (memdebug) {
         mem->addStats(__LINE__);             // take a sample
@@ -177,12 +181,12 @@ test_encoding()
 #endif
     if ((*encnum->reference() == Element::NUMBER_AMF0) &&
         (memcmp(buf1->reference(), encnum->reference()+1, amf::AMF0_NUMBER_SIZE) == 0)) {
-        runtest.pass("Encoded AMF Number");
+        runtest.pass("Encoded amf::AMF Number");
     } else {
-        runtest.fail("Encoded AMF Number");
+        runtest.fail("Encoded amf::AMF Number");
     }
     
-    // Encode a boolean. Although we know a bool is only one character, for AMF,
+    // Encode a boolean. Although we know a bool is only one character, for amf::AMF,
     // it's actually a two byte short instead.
     {
         bool flag = true;
@@ -194,22 +198,22 @@ test_encoding()
             mem->addStats(__LINE__);             // take a sample
         }
 #endif
-        boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(flag);
+        boost::shared_ptr<Buffer> encbool = amf::AMF::encodeBoolean(flag);
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
         if (memdebug) {
             mem->addStats(__LINE__);             // take a sample
         }
 #endif
     
-        // A boolean AMF object has only one header byte, which is the type field.
+        // A boolean amf::AMF object has only one header byte, which is the type field.
         // AMF3 changes this to being two different type, FALSE & TRUE
         // which are finally only one byte apiece.
         if ((*encbool->reference() == Element::BOOLEAN_AMF0) &&
             (encbool->size() == 2) &&
             (memcmp(buf2->reference(), encbool->reference(), sizeof(boost::uint16_t)) == 0)) {
-            runtest.pass("Encoded AMF Boolean");
+            runtest.pass("Encoded amf::AMF Boolean");
         } else {
-            runtest.fail("Encoded AMF Boolean");
+            runtest.fail("Encoded amf::AMF Boolean");
         }
     }
     
@@ -221,23 +225,23 @@ test_encoding()
             mem->addStats(__LINE__);             // take a sample
         }
 #endif
-        boost::shared_ptr<Buffer> buf = AMF::encodeString(str);
+        boost::shared_ptr<Buffer> buf = amf::AMF::encodeString(str);
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
         if (memdebug) {
             mem->addStats(__LINE__);             // take a sample
         }
 #endif
         check_equals(*buf->reference(), Element::STRING_AMF0);
-        check_equals(buf->size(), str.size()+AMF_HEADER_SIZE);
-        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check_equals(buf->size(), str.size()+amf::AMF_HEADER_SIZE);
+        // A String amf::AMF object has a 3 bytes head, the type, and a two byte length.
         check((memcmp(buf->reference() + 3, str.c_str(), str.size()) == 0));
 
         Element el(str);
-        buf = AMF::encodeElement(el);
+        buf = amf::AMF::encodeElement(el);
         
         check_equals(*buf->reference(), Element::STRING_AMF0);
-        check_equals(buf->size(), str.size()+AMF_HEADER_SIZE);
-        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check_equals(buf->size(), str.size()+amf::AMF_HEADER_SIZE);
+        // A String amf::AMF object has a 3 bytes head, the type, and a two byte length.
         check((memcmp(buf->reference() + 3, str.c_str(), str.size()) == 0));
     }
     
@@ -248,7 +252,7 @@ test_encoding()
             mem->addStats(__LINE__);             // take a sample
         }
 #endif
-        boost::shared_ptr<Buffer> buf = AMF::encodeNullString();
+        boost::shared_ptr<Buffer> buf = amf::AMF::encodeNullString();
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
         if (memdebug) {
             mem->addStats(__LINE__);             // take a sample
@@ -256,23 +260,23 @@ test_encoding()
 #endif
         boost::uint16_t len = *(boost::uint16_t *)(buf->reference() + 1);
 
-        // A NULL String AMF object has just 3 bytes, the type, and a two byte length, which is zero.
+        // A NULL String amf::AMF object has just 3 bytes, the type, and a two byte length, which is zero.
         check_equals(*buf->reference(), Element::STRING_AMF0);
-        check_equals(buf->size(), (size_t)AMF_HEADER_SIZE);
+        check_equals(buf->size(), (size_t)amf::AMF_HEADER_SIZE);
         check_equals(len, 0);
 
         Element el;
         el.makeNullString();
-        buf = AMF::encodeElement(el);
+        buf = amf::AMF::encodeElement(el);
         len = *(boost::uint16_t *)(buf->reference() + 1);
 
-        // A NULL String AMF object has just 3 bytes, the type, and a two byte length, which is zero.
+        // A NULL String amf::AMF object has just 3 bytes, the type, and a two byte length, which is zero.
         check_equals(*buf->reference(), Element::STRING_AMF0);
-        check_equals(buf->size(), (size_t)AMF_HEADER_SIZE);
+        check_equals(buf->size(), (size_t)amf::AMF_HEADER_SIZE);
         check_equals(len, 0);
     }
 
-    AMF amf;
+    amf::AMF amf;
     Element el1;
     boost::uint16_t index = 1;
     el1.makeReference(index);
@@ -306,7 +310,7 @@ void
 test_array()
 {
     Element top;
-    AMF amf;
+    amf::AMF amf;
     top.makeObject();
 
     boost::shared_ptr<Buffer> hex1(new Buffer("08 00 00 00 0a 00 08 64 75 72 61 74 69 6f 6e 00 40 ad 04 14 7a e1 47 ae 00 05 77 69 64 74 68 00 40 74 00 00 00 00 00 00 00 06 68 65 69 67 68 74 00 40 6e 00 00 00 00 00 00 00 0d 76 69 64 65 6f 64 61 74 61 72 61 74 65 00 40 72 c0 00 00 00 00 00 00 09 66 72 61 6d 65 72 61 74 65 00 40 39 00 00 00 00 00 00 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 10 00 00 00 00 00 00 00 0d 61 75 64 69 6f 64 61 74 61 72 61 74 65 00 40 58 00 00 00 00 00 00 00 0a 61 75 64 69 6f 64 65 6c 61 79 00 3f a3 74 bc 6a 7e f9 db 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 01 00 00 09"));
@@ -382,7 +386,7 @@ test_object()
 
 //    buf1->dump();
     
-    AMF amf_obj;
+    amf::AMF amf_obj;
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     if (memdebug) {
         mem->addStats(__LINE__);             // take a sample
@@ -408,8 +412,8 @@ test_object()
 
 }
 
-// amf::AMF::extractAMF(unsigned char*)
-// amf::AMF::extractVariable(unsigned char*)
+// amf::amf::AMF::extractAMF(unsigned char*)
+// amf::amf::AMF::extractVariable(unsigned char*)
 
 static void
 usage (void)

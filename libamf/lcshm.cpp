@@ -28,7 +28,7 @@
 #include "buffer.h"
 //#include "network.h"
 #include "amf.h"
-#include "shm.h"
+#include "SharedMem.h"
 #include "element.h"
 #include "GnashException.h"
 #include "lcshm.h"
@@ -95,7 +95,9 @@ const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
 ///     each other Flash Objects, but does not initialize the memory
 ///     segment.
 LcShm::LcShm() 
-    : _baseaddr(0)
+    :
+    SharedMem(64528),
+    _baseaddr(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -104,6 +106,8 @@ LcShm::LcShm()
 ///
 /// @param addr The address to use for the memory segment.
 LcShm::LcShm(boost::uint8_t *addr)
+    :
+    SharedMem(64528)
 {
 //    GNASH_REPORT_FUNCTION;
     _baseaddr = addr;
@@ -112,10 +116,11 @@ LcShm::LcShm(boost::uint8_t *addr)
 /// \brief Construct an initialized shared memory segment.
 ///
 /// @param key The SYSV style key to use for the memory segment.
-LcShm::LcShm(key_t key)
+LcShm::LcShm(key_t /*key*/)
+    :
+    SharedMem(64528)
 {
 //    GNASH_REPORT_FUNCTION;
-    _shmkey = key;
 }
 
 /// \brief Delete the shared memory segment.
@@ -322,7 +327,6 @@ void
 LcShm::close()
 {
     GNASH_REPORT_FUNCTION;
-    closeMem();
 }
 
 /// @note
@@ -504,22 +508,22 @@ LcShm::connect(const string& names)
     // When using sysv shared memory segments in compatibility mode,
     // the name is ignored, and the SHMkey is specified in the user's
     // ~/.gnashrc file.
-    if (Shm::attach(names.c_str(), true) == false) {
+    if (SharedMem::attach() == false) {
         return false;
     }
 
-    if (Shm::getAddr() <= 0) {
+    if (SharedMem::begin() <= 0) {
         log_error("Failed to open shared memory segment: \"%s\"", names.c_str());
         return false; 
     }
     
-	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(Shm::getAddr());
+	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(SharedMem::begin());
 	
-	boost::uint8_t* tooFar = baseAddress+Shm::getSize();
+	boost::uint8_t* tooFar = SharedMem::end();
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
-//	log_debug("Base address in 'connect' is: 0x%x, 0x%x",(unsigned int) Shm::getAddr(), (unsigned int) _baseaddr);
+//	log_debug("Base address in 'connect' is: 0x%x, 0x%x",(unsigned int) SharedMem::begin(), (unsigned int) _baseaddr);
 //  vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //  log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
@@ -545,17 +549,17 @@ LcShm::connect(key_t key)
 	boost::mutex::scoped_lock lock(_localconnection_mutex);
    // GNASH_REPORT_FUNCTION;
     
-    if (Shm::attach(key, true) == false) {
+    if (SharedMem::attach() == false) {
         return false;
     }
 
-    if (Shm::getAddr() <= 0) {
+    if (SharedMem::begin() <= 0) {
         log_error("Failed to open shared memory segment: 0x%x", key);
         return false; 
     }
     
-	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(Shm::getAddr());
-	boost::uint8_t* tooFar = baseAddress+Shm::getSize();
+	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(SharedMem::begin());
+	boost::uint8_t* tooFar = SharedMem::end();
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);

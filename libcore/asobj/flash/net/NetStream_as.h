@@ -385,9 +385,6 @@ protected:
     ///
     void processStatusNotifications();
     
-    
-    void processNotify(const std::string& funcname, as_object* metadata_obj);
-
     // The size of the buffer in milliseconds
     boost::uint32_t m_bufferTime;
 

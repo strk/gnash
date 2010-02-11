@@ -898,12 +898,6 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
     _ASCodingErrorToggle->setChecked(_rcfile.showASCodingErrors());
     layout->addWidget(_ASCodingErrorToggle);
 
-    _lcTraceToggle = new QCheckBox(_q("Log Local Connection activity"),
-                                        loggingTab);
-    _lcTraceToggle->setChecked(_rcfile.getLCTrace());
-    layout->addWidget(_lcTraceToggle);
-    layout->addStretch();
-
     // Security tab
     QFrame* securityTab = new QFrame(tabs);
     tabs->addTab(securityTab, _q("Security"));
@@ -1070,7 +1064,6 @@ PreferencesDialog::savePreferences()
     _rcfile.useActionDump(_actionDumpToggle->isChecked());
     _rcfile.showMalformedSWFErrors(_malformedSWFToggle->isChecked());
     _rcfile.showASCodingErrors(_ASCodingErrorToggle->isChecked());
-    _rcfile.setLCTrace(_lcTraceToggle->isChecked());
 
     // Security tab widgets
     _rcfile.useLocalHost(_localHostToggle->isChecked());

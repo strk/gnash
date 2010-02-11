@@ -59,7 +59,7 @@ extern int optind, getopt(int, char *const *, const char *);
 #include "dejagnu.h"
 
 #include "amf.h"
-#include "shm.h"
+#include "SharedMem.h"
 #include "lcshm.h"
 
 using namespace amf;
@@ -132,12 +132,12 @@ test_listen()
     }
     
     //
-    shmaddr = lc.getAddr();
+    shmaddr = reinterpret_cast<char*>(lc.begin());
     if (shmaddr == 0) {
-        runtest.unresolved("LcShm::getAddr()");
+        runtest.unresolved("LcShm::begin()");
         return;
     } else {
-        runtest.pass("LcShm::getAddr()");
+        runtest.pass("LcShm::begin()");
     }
     
     char *addr = shmaddr + LC_LISTENERS_START;
@@ -215,7 +215,7 @@ test_data()
         runtest.fail("LcShm::connect(localhost:lc_reply)");
     }
 
-    shmaddr = lcs.getAddr();     // for gdb
+    shmaddr = reinterpret_cast<char*>(lcs.begin());     // for gdb
 
     Element *el;
     vector<amf::Element *> els;
@@ -274,7 +274,7 @@ load_data()
         exit(0);
     }
 
-    shmaddr = lc.getAddr();
+    shmaddr = reinterpret_cast<char*>(lc.begin());
 //    if (memcmp(shmaddr, con1.c_str():
     // Since this is a test case, populate the memory with known good data
     string srcdir = SRCDIR;
@@ -311,7 +311,7 @@ test_read()
         runtest.fail("LcShm::connect()");
     }
 
-    shmaddr = lc.getAddr();
+    shmaddr = reinterpret_cast<char*>(lc.begin());
 //    if (memcmp(shmaddr, con1.c_str():
     // Since this is a test case, populate the memory with known good data
     string srcdir = SRCDIR;
@@ -586,7 +586,7 @@ int main(int /*argc*/, char **/* argv[]*/)
 
 #if 0 // { // what are these Listeners ?
 
-    Listener::setBaseAddress(Shm::getAddr());
+    Listener::setBaseAddress(Shm::begin());
         
     string str1 = "HelloWorld";
     addListener(str1);

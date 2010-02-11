@@ -86,9 +86,6 @@ set webcamDevice 0
 # Disable using LocalConnection
 set LocalConnection on
 
-# Trace all object flowing gthrough LocalConnection
-set LCTrace on
-
 # This is the shared memory key for your system
 set LCShmKey 3711621821
 

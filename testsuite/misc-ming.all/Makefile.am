@@ -37,6 +37,8 @@ EXTRA_DIST = \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
+	LC-Receive.as \
+	LC-Send.as \
 	FlashVarsTest.as \
 	SharedObjectTest.as \
 	intervalTest.as \
@@ -166,6 +168,7 @@ check_PROGRAMS = \
 	loadMovieTest \
 	loadMovieTestRunner \
 	DrawingApiTestRunner \
+	LCTestRunner \
 	frame_label_test \
 	path_format_test \
 	callFunction_test \
@@ -1814,6 +1817,15 @@ gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
 	sh $< $(top_builddir) gotoFrame2Test.swf > $@
 	chmod 755 $@
 
+LC-Receive.swf: $(srcdir)/LC-Receive.as 
+	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Receive.as
+
+LC-Send.swf: $(srcdir)/LC-Send.as 
+	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Send.as
+
+LCTestRunner: $(srcdir)/../simultaneous-testrunner.sh LC-Receive.swf LC-Send.swf
+	sh $< -c "ENDOFTEST" $(top_builddir) LC-Receive.swf LC-Send.swf > $@
+	chmod 755 $@
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
@@ -2048,6 +2060,7 @@ TEST_CASES = \
 	action_execution_order_extend_testrunner \
 	simple_loop_testrunner \
 	loadMovieTestRunner \
+	LCTestRunner \
 	DrawingApiTestRunner \
 	TextSnapshotTest-Runner \
 	action_execution_order_test1runner \

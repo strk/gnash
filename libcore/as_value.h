@@ -46,10 +46,9 @@ namespace gnash {
 	class as_function;
 	class MovieClip;
 	class DisplayObject;
-    class SimpleBuffer;
-}
-namespace amf {
-	class Element;
+    namespace AMF {
+        class Writer;
+    }
 }
 
 namespace gnash {
@@ -160,11 +159,6 @@ public:
 	/// Copy constructor.
 	as_value(const as_value& value);
 
-#if 0
-	/// Construct a value from an AMF element
-	as_value(const amf::Element& el);
-#endif
-
 	/// Return the primitive type of this value as a string.
 	const char* typeOf() const;
 
@@ -266,9 +260,6 @@ public:
     /// is not a function.
 	as_function* to_function() const;
 
-	/// Get an AMF element representation for this value
-    boost::shared_ptr<amf::Element> to_element() const;
-
     // Used for operator<< to give useful information about an
     // as_value object.
 	DSOEXPORT std::string toDebugString() const;
@@ -366,49 +357,6 @@ public:
 	/// Object values are values stored by pointer (objects and functions)
 	void setReachable() const;
 
-	/// Read AMF0 data from the given buffer
-	//
-	/// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
-	/// encoded data. Must start with a type byte unless third parameter is set.
-	///
-	/// On success, sets the given as_value and returns true.
-	/// On error (premature end of buffer, etc.) returns false and
-    /// leaves the given as_value untouched.
-	///
-	/// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but
-    /// use what you passed instead.
-	///
-	/// The l-value you pass as the first parameter (buffer start) is updated to
-	/// point just past the last byte parsed
-	///
-	/// TODO restore first parameter on parse errors
-	///
-	/// @param b
-    ///     Pointer to buffer where to start reading.
-    ///     Will be moved as data is read.
-    ///
-	/// @param end
-    ///     Pointer to end of buffer. Reading from this would
-    ///     be invalid.
-    ///
-	/// @param inType
-    ///     Type of the AMF object to read. If -1, type will be
-    ///     read from a type byte.
-    ///
-	/// @param objRefs
-	///     A vector of already-parsed objects to properly interpret references.
-	///     Pass an empty vector on first call as it will be used internally.
-	///     On return, the vector will be filled with pointers to every
-    ///     complex object parsed from the stream.
-    ///
-	/// @param vm
-    ///     Virtual machine to use for initialization of the values
-    ///     (string_table)
-	///
-	DSOEXPORT bool readAMF0(const boost::uint8_t*& b,
-            const boost::uint8_t* const end, int inType,
-            std::vector<as_object*>& objRefs, VM& vm);
-
     /// Serialize value in AMF0 format.
     //
     /// @param buf
@@ -425,8 +373,7 @@ public:
 	/// @param allowStrictArray
     ///     If true strict arrays will be encoded a STRICT_ARRAY types.
     ///
-    bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable,
-                   VM& vm, bool allowStrictArray) const;
+    bool writeAMF0(AMF::Writer& w) const;
 
 private:
 

@@ -101,7 +101,7 @@ if CROSS_COMPILING
 endif
 endif
 
-bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper
+bin_PROGRAMS = gprocessor soldumper flvdumper
 #check_PROGRAMS = gdebug.swf
 
 if USE_GST_ENGINE
@@ -117,8 +117,9 @@ gprocessor_SOURCES = processor.cpp
 gprocessor_LDFLAGS = -export-dynamic
 gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
-dumpshm_SOURCES = dumpshm.cpp
-dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+
+#dumpshm_SOURCES = dumpshm.cpp
+#dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 soldumper_SOURCES = soldumper.cpp
 soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)

@@ -26,7 +26,6 @@
 #include "FLVParser.h"
 #include "IOChannel.h"
 #include "AudioDecoderSimple.h"
-#include "AudioDecoderNellymoser.h"
 #include "log.h"
 
 #ifdef DECODING_SPEEX
@@ -88,13 +87,6 @@ MediaHandler::createFlashAudioDecoder(const AudioInfo& info)
     audioCodecType codec = static_cast<audioCodecType>(info.codec);
     switch (codec)
     {
-        case AUDIO_CODEC_NELLYMOSER:
-        case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
-        {
-            std::auto_ptr<AudioDecoder> ret(new AudioDecoderNellymoser(info));
-            return ret;
-        }
-
         case media::AUDIO_CODEC_ADPCM:
         case media::AUDIO_CODEC_RAW:
         {

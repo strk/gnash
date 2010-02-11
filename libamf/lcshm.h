@@ -26,7 +26,7 @@
 
 #include "amf.h"
 #include "element.h"
-#include "shm.h"
+#include "SharedMem.h"
 #include "dsodefs.h"
 
 /// \namespace amf
@@ -111,7 +111,7 @@ protected:
 
 /// \class LcShm
 ///	This class is formanipulating the LocalConnection memory segment.
-class DSOEXPORT LcShm : public Listener, public gnash::Shm {
+class DSOEXPORT LcShm : public Listener, public gnash::SharedMem {
 public:
     /// \struct LcShm::lc_header_t
     ///		Hold the data in the memory segment's header.
