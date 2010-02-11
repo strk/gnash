@@ -44,40 +44,77 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
 
+/// From observing the behaviour of the pp, the following seem to be true.
+//
+/// (Behaviour may be different on other platforms).
+//
+/// Sending
+///
+/// A sender checks the timestamp value. If it is zero, the data may be
+/// overwritten. If it is not, we check whether we can delete it.
+///
+/// Data expires after 4 seconds. Processes only delete data they (think they)
+/// wrote. If the timestamp matches the timestamp of the last data we sent,
+/// we assume it's our data. If it's expired, mark it for overwriting and
+/// continue.
+///
+/// We continue to check whether the data has expired as long as the data
+/// is not marked for overwriting. No changes are made to the buffer by a
+/// sender as long as the timestamp is there.
+///
+/// Once the buffer is ready for writing, check if the correct listener is
+/// present. If it is, send the first message in our queue and store its
+/// timestamp. If the listener is not present, go through the queue until
+/// a message for an existing listener is found. If none is found, the
+/// last message in the buffer is sent with no timestamp. (It's not clear if
+/// there's any point in sending it, but it happens).
+//
+/// Receiving
+///
+/// A listener registers itself by adding its name to the listeners section
+/// of the shared memory. The name is null-terminated and followed by a
+/// further marker, which is of the form "::x\0::y\0". The x and y characters
+/// are always numbers, e.g. ::3::4, ::3::1, ::3::2. We do not know the
+/// significance of these numbers.
+//
+/// A listener merely checks whether the data has a timestamp and if the
+/// data is intended for it (by reading the first string field). If it is,
+/// the data is deserialized, the encoded function called, and the data
+/// marked for deletion.
+//
+/// Functions are encoded in a particular order after the timestamp and length
+/// fields:
+///     1. connection name (domain:connection) [string]
+///     2. domain [string]
+/// {
+///     3. The following optional data:
+///         [boolean] (always false?)
+///         [boolean] (always false?)
+///         [number] (e.g. 0, 1)
+///         [number] (e.g. 8, 6)
+///     4. Sometimes the filename [string]. The presence of this may depend
+///        on the first number.
+/// }
+///     5. The name of the function to call.
+///     6. The arguments in reverse(!) order.   
+//
+/// Notes
+/// 1. We don't know what happens when data from another process is left in
+///    the buffer with a timestamp. Does it ever get overwritten?
+/// 2. The timestamp seems to be allocated when LocalConnection.send is called,
+///    even though the message may be sent much later.
+/// 3. We can probably stop checking the data if (a) we have nothing more to
+///    send, (b) we are not connected, and (c) the last data was not written
+///    by us. Gnash doesn't do the additional check for (c), so will never
+///    remove the advance callback if data with a timestamp from another
+///    process stays in the buffer. Note 1 also relates to this.
+//
 /// http://www.osflash.org/localconnection
 ///
-/// Listening
-/// To create a listening LocalConnection, you just have to set a thread to:
-///
-///    1. register the application as a valid LocalConnection listener
-///    2. require the mutex to have exclusive access to the shared memory
-///         - Gnash currently doesn't use a mutex.
-///    3. access the shared memory and check the recipient
-///    4. if you are the recipient, read the message and mark it read
-///         - in Gnash, the recipient overwrites the message when it has
-///           been read. Not established whether this is correct.
-///    5. release the shared memory and the mutex
-///    6. repeat indefinitely from step 2.
-///
-/// Sending
-/// To send a message to a LocalConnection apparently works like that:
-///    1. require the mutex to have exclusive access to the shared memory
-///         - Gnash currently has no mutex.
-///    2. access the shared memory and check that the listener is connected
-///         - It's not clear if the pp checks or not, though it
-///           seems not to. Gnash does not.
-///    3. if the recipient is registered, write the message
-///    4. release the shared memory and the mutex.
-//
-/// The pp sends some messages without a timestamp and without a size. These
-/// are ignored (it's also not clear why it does it).
-//
 /// Some facts:
 ///     * The header is 16 bytes,
 ///     * The message can be up to 40k,
 ///     * The listeners block starts at 40k+16 = 40976 bytes,
-///     * To add a listener, simply append its name in the listeners list
-///     (null terminated strings)
 
 namespace {
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();    
@@ -174,6 +211,8 @@ public:
     }
 
     /// Called on advance().
+    //
+    /// Handles sending and receiving.
     virtual void update();
 
     bool connected() const {
@@ -233,48 +272,6 @@ LocalConnection_as::LocalConnection_as(as_object* owner)
 {
 }
 
-/// From observing the behaviour of the pp, the following seem to be true.
-//
-/// (Behaviour may be different on other platforms).
-//
-/// Sending
-///
-/// A sender checks the timestamp value. If it is zero, the data may be
-/// overwritten. If it is not, we check whether we can delete it.
-///
-/// Data expires after 4 seconds. Processes only delete data they (think they)
-/// wrote. If the timestamp matches the timestamp of the last data we sent,
-/// we assume it's our data. If it's expired, mark it for overwriting and
-/// continue.
-///
-/// We continue to check whether the data has expired as long as the data
-/// is not marked for overwriting. No changes are made to the buffer by a
-/// sender as long as the timestamp is there.
-///
-/// Once the buffer is ready for writing, check if the correct listener is
-/// present. If it is, send the first message in our queue and store its
-/// timestamp. If the listener is not present, go through the queue until
-/// a message for an existing listener is found. If none is found, the
-/// last message in the buffer is sent with no timestamp. (It's not clear if
-/// there's any point in sending it, but it happens).
-//
-/// Receiving
-/// 
-/// A listener merely checks whether the data has a timestamp and if the
-/// data is intended for it (by reading the first string field). If it is,
-/// the data is deserialized, the encoded function called, and the data
-/// marked for deletion.
-//
-/// Notes
-/// 1. We don't know what happens when data from another process is left in
-///    the buffer with a timestamp. Does it ever get overwritten?
-/// 2. The timestamp seems to be allocated when LocalConnection.send is called,
-///    even though the message may be sent much later.
-/// 3. We can probably stop checking the data if (a) we have nothing more to
-///    send, (b) we are not connected, and (c) the last data was not written
-///    by us. Gnash doesn't do the additional check for (c), so will never
-///    remove the advance callback if data with a timestamp from another
-///    process stays in the buffer. Note 1 also relates to this.
 void
 LocalConnection_as::update()
 {
@@ -301,8 +298,7 @@ LocalConnection_as::update()
     // These are not network byte order by default, but not sure about 
     // host byte order.
     const boost::uint32_t timestamp = readLong(ptr + 8);
-
-    const size_t size = readLong(ptr + 12);
+    const boost::uint32_t size = readLong(ptr + 12);
 
     // As long as there is a timestamp in the shared memory, we mustn't
     // write anything.
@@ -666,9 +662,10 @@ localconnection_send(const fn_call& fn)
 
     // Don't know whether strict arrays are allowed
     AMF::Writer w(buf, false);
-    const std::string uri(relay->domain() + ":" + name);
-    w.writeString(uri);
-    w.writeString("localhost");
+    const std::string& domain = relay->domain();
+    
+    w.writeString(domain + ":" + name);
+    w.writeString(domain);
     w.writeString(func);
 
     for (size_t i = fn.nargs - 1; i > 1; --i) {
@@ -883,29 +880,47 @@ getMarker(SharedMem::iterator& i, SharedMem::iterator end)
 
 }
 
+/// Read the function data, call the function.
+//
+/// This function does not mark the data for overwriting.
 void
 executeAMFFunction(as_object& o, AMF::Reader& rd)
 {
     as_value a;
 
-    if (!rd(a)) {
-        log_error("Invalid protocol %s", a);
+    if (!rd(a) || !a.is_string()) {
+        log_error("Invalid domain %s", a);
         return;
     }
+    const std::string& domain = a.to_string();
     
     if (!rd(a)) {
         log_error("Invalid function name %s", a);
         return;
     }
 
-    // If the value after the protocol is a boolean, there is 
-    // a set of extra data. We don't know what it's for,
-    // so log it.
+    // This is messy and verbose because we don't know what it means.
+    // If the value after the domain is a boolean, it appears to signify a
+    // set of extra data. It's logged so that we can find exceptions more
+    // easily.
     if (a.is_bool()) {
-        if (rd(a)) log_debug("Bool: %s", a);
-        if (rd(a)) log_debug("Number: %s", a);
-        if (rd(a)) log_debug("Number: %s", a);
-        if (rd(a)) log_debug("Filename: %s", a);
+
+        // Both bools have been false in all the examples I've seen.
+        log_debug("First bool: %s", a);
+        if (rd(a)) log_debug("Second Bool: %s", a);
+
+        // We guess that the first number describes the number of data fields
+        // after the second number, before the function name.
+        if (rd(a)) log_debug("First Number: %s", a);
+        const int count = toInt(a);
+
+        // We don't know what the second number signifies.
+        if (rd(a)) log_debug("Second Number: %s", a);
+
+
+        for (size_t i = 0; i < count; ++i) {
+            if (rd(a)) log_debug("Data: %s", a);
+        }
         if (!rd(a)) return;
     }
 
