@@ -130,7 +130,13 @@ private:
 #endif
 };
 
-bool
+/// Check if the SharedMem has been attached.
+//
+/// This only checks whether the attach operation was successful, not whether
+/// the shared memory still exists and is still attached where it was 
+/// initially. It is always possible for other processes to remove it while
+/// Gnash is using it, but there is nothing we can do about this.
+inline bool
 attached(const SharedMem& mem) {
     return (mem.begin());
 }
