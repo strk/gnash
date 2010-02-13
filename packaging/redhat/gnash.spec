@@ -17,8 +17,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 BuildRequires:  libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  gtk2-devel glib2-devel
 BuildRequires:  atk-devel pango-devel openssl-devel
-BuildRequires:  agg-devel boost-devel boost-date-time boost-thread
-BuildRequires:	curl-devel libXt-devel
+BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
 BuildRequires:  pygtk2-devel giflib-devel
 BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
 # These are for the kde4 support
@@ -32,6 +31,12 @@ Requires:  gstreamer gstreamer-ffmpeg gstreamer-plugins-base
 Requires: libX11 libXt 
 Requires: agg boost libcurl SDL boost-date-time boost-thread
 Requires: freetype fontconfig libstdc++
+
+# Fedora 12 packages the boost libraries as separate packages,
+# whereas Fedora 11 has just the one dependency on boost-devel.
+%if %{distribution} != "fc11"
+BuildRequires:   boost-date-time boost-thread
+%endif
 
 # BuildRequires:  scrollkeeper
 
@@ -181,8 +186,10 @@ sh ./configure \
 	$RENDERER \
 	$OTHER \
 	$OPTIONAL \
+	CXXFLAGS="$CXXFLAGS" \
 	--disable-dependency-tracking \
 	--disable-rpath \
+	--enable-cygnal \
 	--enable-sdkinstall \
 	--disable-testsuite \
         --prefix=/usr \
@@ -190,13 +197,7 @@ sh ./configure \
 	--infodir=%{_prefix}/share/info \
 	--with-plugins-install=system
 
-        # --with-kde4-pluginprefix=%{_prefix} \
-	# --with-kde4-plugindir=%{_libdir}/kde4/plugins \
-        # --with-kde4-servicesdir=%{_prefix}/share/kde4/services \
-        # --with-kde4-appsdatadir=%{_prefix}/share/kde4/apps/klash \
-        # --with-kde4-configdir=${_datadir}/config
-
-make $MAKEFLAGS dumpconfig all
+make $MAKEFLAGS dumpconfig all LDFLAGS="-Wl,--build-id"
 %endif
 # When testing the spec file, try setting MAKEFLAGS to
 # "CXXFLAGS-O0 -j4" to speed up getting results. Note *don't*
@@ -204,10 +205,10 @@ make $MAKEFLAGS dumpconfig all
 
 %install
 strip gui/.libs/*-gnash
-strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
+strip utilities/.libs/g* utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
-make $MAKEFLAGS install DESTDIR=$RPM_BUILD_ROOT
-make $MAKEFLAGS install-plugins DESTDIR=$RPM_BUILD_ROOT
+make $MAKEFLAGS install DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
+make $MAKEFLAGS install-plugins DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
 %if !%{cross_compile}
 
@@ -247,7 +248,7 @@ scrollkeeper-update -q || :
 %{_bindir}/flvdumper
 %{_bindir}/findmicrophones
 %{_bindir}/findwebcams
-%{_bindir}/dumpshm
+#%{_bindir}/dumpshm
 %{_libdir}/gnash/*.so*
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
