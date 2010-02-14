@@ -757,7 +757,7 @@ DiskStream::play(int netfd, bool flag)
 		  // reset to the beginning of the file
 		  _offset = 0;
 	      } else {
-		  log_network("\tPlaying part of file %s, offset is: %d out of %d bytes.", _filespec, _offset, _filesize);
+		  //log_network("\tPlaying part of file %s, offset is: %d out of %d bytes.", _filespec, _offset, _filesize);
 #ifdef HAVE_SENDFILE_XX
 		  ret = sendfile(netfd, _filefd, &_offset, _pagesize);
 #else
@@ -1006,6 +1006,8 @@ DiskStream::determineFileType(const string &filespec)
       _filetype = FILETYPE_OGG;
     } else if (suffix == "swf") {
       _filetype = FILETYPE_SWF;
+    } else if (suffix == "php") {
+      _filetype = FILETYPE_PHP;
     } else if (suffix == "flv") {
       _filetype = FILETYPE_FLV;
     }else if (suffix == "mp3") {

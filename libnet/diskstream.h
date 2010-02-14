@@ -82,7 +82,8 @@ public:
     FILETYPE_VP6,
     FILETYPE_XML,
     FILETYPE_FLAC,
-    FILETYPE_ENCODED
+    FILETYPE_ENCODED,
+    FILETYPE_PHP,
   } filetype_e;
 
     DSOEXPORT DiskStream();
