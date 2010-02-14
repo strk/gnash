@@ -26,16 +26,15 @@ BuildRequires:  libX11-devel libXt-devel
 
 # Installation requirements
 Requires: libpng libjpeg libogg gtk2 glib2 atk pango
-Requires:  gstreamer gstreamer-ffmpeg gstreamer-plugins-base
-# Mandriva uses differ names for the X11 library packages
-Requires: libX11 libXt 
-Requires: agg boost libcurl SDL boost-date-time boost-thread
+Requires: gstreamer gstreamer-ffmpeg gstreamer-plugins-base
+Requires: libX11 libXt agg boost libcurl SDL
 Requires: freetype fontconfig libstdc++
 
 # Fedora 12 packages the boost libraries as separate packages,
 # whereas Fedora 11 has just the one dependency on boost-devel.
 %if %{distribution} != "fc11"
 BuildRequires:   boost-date-time boost-thread
+Requires:   boost-date-time boost-thread
 %endif
 
 # BuildRequires:  scrollkeeper
