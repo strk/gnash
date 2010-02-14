@@ -2865,7 +2865,7 @@ ActionGetMember(ActionExec& thread)
 
     IF_VERBOSE_ACTION (
     log_action(_(" ActionGetMember: target: %s (object %p)"),
-               target, (void*)obj.get());
+               target, static_cast<void *>(obj.get()));
     );
 
     if (!thread.getObjectMember(*obj, member_name.to_string(), env.top(1)))
@@ -3416,7 +3416,7 @@ ActionExtends(ActionExec& thread)
 
     if (getSWFVersion(*super) > 5) {
         const int flags = PropFlags::dontEnum;
-        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, super, flags); 
+        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, super, flags);
     }
 
     sub->init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
@@ -3532,7 +3532,7 @@ ActionDefineFunction2(ActionExec& thread)
     //          thing into the intrusive_ptr, so the debugger
     //          will be left with a deleted object !!
     //          Rob: we don't want to use void pointers here..
-    as_object* o = toObject(getGlobal(thread.env), function_value);
+    boost::intrusive_ptr<as_object> o = toObject(getGlobal(thread.env), function_value);
     debugger.addSymbol(o.get(), name);
 #endif
 }
