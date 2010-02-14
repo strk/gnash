@@ -61,7 +61,9 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
       AC_MSG_CHECKING([for $2 header using pkg-config])
+      $PKG_CONFIG --exists [lib]DASHDOWN && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags [lib]DASHDOWN`"
       $PKG_CONFIG --exists DASHDOWN[] && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags DASHDOWN[]`"
+      $PKG_CONFIG --exists lib$name && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags lib$name`"
       $PKG_CONFIG --exists $name && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags $name`"
       if test x"${ac_cv_path_$1_incl}" != x; then
         AC_MSG_RESULT(${ac_cv_path_$1_incl})
@@ -175,16 +177,16 @@ if test x"${$1}" = x"yes"; then
   dnl If the header doesn't exist, there is no point looking for the library.
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_lib}" = x; then
-      $PKG_CONFIG --exists [lib]DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l [lib]DASHDOWN`"
-      $PKG_CONFIG --exists DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l DASHDOWN`"
-      $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l lib$name`"
-      $PKG_CONFIG --exists $name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l $name`"
-      dnl AC_MSG_CHECKING([for lib$1 library])
+      AC_MSG_CHECKING([for lib$1 library using pkg-config])
+      $PKG_CONFIG --exists [lib]DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs [lib]DASHDOWN`"
+      $PKG_CONFIG --exists DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs DASHDOWN`"
+      $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs lib$name`"
+      $PKG_CONFIG --exists $name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs $name`"
       if test x"${ac_cv_path_$1_lib}" != x; then
-        dnl AC_MSG_RESULT(${ac_cv_path_$1_lib})
+        AC_MSG_RESULT(${ac_cv_path_$1_lib})
         ac_manual=no
-      dnl else
-        dnl AC_MSG_RESULT([not found])
+      else
+        AC_MSG_RESULT([not found])
       fi
     fi
     if test x"${ac_cv_path_$1_lib}" = x; then
