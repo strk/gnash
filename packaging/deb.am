@@ -31,8 +31,8 @@ deb: snapshot-src setup-deb snapshot-deb
 # for the correct browser.
 setup-deb: 
 	snapshot_dir="gnash-$(SNAPSHOT_VERSION)"; \
-	if test -d gnash-trunk; then \
-	  mv gnash-trunk $${snapshot_dir}; \
+	if test -d gnash-$(PACKAGE_VERSION); then \
+	  mv gnash-$(PACKAGE_VERSION) $${snapshot_dir}; \
 	fi; \
 	if test ! -f $(SNAPSHOT_DIR)/configure.ac.orig; then \
 	  mv -f $(SNAPSHOT_DIR)/configure.ac $(SNAPSHOT_DIR)/configure.ac.orig; \
