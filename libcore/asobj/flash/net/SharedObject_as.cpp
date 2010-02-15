@@ -19,7 +19,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // USE_SOL_READ_ONLY
+#include "gnashconfig.h" 
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -49,6 +49,7 @@
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
+#include <cstdio>
 
 namespace {
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -110,16 +111,19 @@ public:
         _writer(w),
         _vm(vm),
         _st(vm.getStringTable()),
-        _error(false)
-	{};
+        _error(false),
+        _count(0)
+	{}
     
-    bool success() const { return !_error; }
+    // Success means that no errors were encountered and at least one
+    // property was encoded.
+    bool success() const { return !_error && _count; }
 
     virtual bool accept(const ObjectURI& uri, const as_value& val) 
     {
         assert(!_error);
 
-        if ( val.is_function()) {
+        if (val.is_function()) {
             log_debug("SOL: skip serialization of FUNCTION property");
             return true;
         }
@@ -142,8 +146,8 @@ public:
         
         _writer.writePropertyName(name);
         // Strict array are never encoded in SharedObject
-        if (!val.writeAMF0(_writer))
-        {
+        if (!val.writeAMF0(_writer)) {
+
             log_error("Problems serializing an object's member %s=%s",
                     name, val);
             _error = true;
@@ -152,8 +156,10 @@ public:
             return false;
         }
 
+        // This is SOL specific.
         boost::uint8_t end(0);
         _writer.writeData(&end, 1);
+        ++_count;
         return true;
     }
 
@@ -163,6 +169,7 @@ private:
     VM& _vm;
     string_table& _st;
     bool _error;
+    size_t _count;
 };
 
 } // anonymous namespace
@@ -185,6 +192,9 @@ public:
         return _owner;
     }
 
+    /// Write the data as a SOL file.
+    //
+    /// If there is no data to write, the file is removed.
     bool flush(int space = 0) const;
 
     const std::string& getFilespec() const {
@@ -271,6 +281,9 @@ SharedObject_as::~SharedObject_as()
 }
 
 
+/// Returns false if the data cannot be written to file.
+//
+/// If there is no data, the file is removed and the function returns true.
 bool
 SharedObject_as::flush(int space) const
 {
@@ -289,8 +302,7 @@ SharedObject_as::flush(int space) const
 
     const std::string& filespec = getFilespec();
 
-    if (!mkdirRecursive(filespec))
-    {
+    if (!mkdirRecursive(filespec)) {
         log_error("Couldn't create dir for flushing SharedObject %s", filespec);
         return false;
     }
@@ -301,7 +313,7 @@ SharedObject_as::flush(int space) const
     return false;
 #endif
 
-    if (rcfile.getSOLReadOnly() ) {
+    if (rcfile.getSOLReadOnly()) {
         log_security("Attempting to write object %s when it's SOL "
                 "Read Only is set! Refusing...", filespec);
         return false;
@@ -315,9 +327,14 @@ SharedObject_as::flush(int space) const
         return false;
     }
 
+    // Encode data part.
     SimpleBuffer buf;
-    encodeData(*_data, buf);
+    if (!encodeData(*_data, buf)) {
+        std::remove(filespec.c_str());
+        return true;
+    }
 
+    // Encode header part.
     SimpleBuffer header;
     encodeHeader(buf.size(), getObjectName(), header);
     
@@ -341,7 +358,6 @@ SharedObject_as::flush(int space) const
     return true;
 }
 
-/// Process the close() method.
 void
 SharedObject_as::close()
 {
@@ -749,6 +765,7 @@ sharedobject_send(const fn_call& fn)
     return as_value();
 }
 
+/// Returns false only if there was a failure writing data to file.
 as_value
 sharedobject_flush(const fn_call& fn)
 {    
@@ -1117,7 +1134,8 @@ encodeData(as_object& data, SimpleBuffer& buf)
 
     data.visitProperties<Exists>(props);
     if (!props.success()) {
-        log_error("Could not serialize object");
+        // There are good reasons for this to fail.
+        log_debug("Did not serialize object");
         return false;
     }
     return true;
