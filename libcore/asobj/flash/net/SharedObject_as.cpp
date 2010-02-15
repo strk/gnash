@@ -45,6 +45,7 @@
 #include "NetConnection_as.h"
 #include "Object.h"
 #include "AMF.h"
+#include "GnashAlgorithm.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -63,7 +64,7 @@ namespace {
     as_value sharedobject_send(const fn_call& fn);
     as_value sharedobject_flush(const fn_call& fn);
     as_value sharedobject_close(const fn_call& fn);
-    as_value sharedobject_getsize(const fn_call& fn);
+    as_value sharedobject_getSize(const fn_call& fn);
     as_value sharedobject_setFps(const fn_call& fn);
     as_value sharedobject_clear(const fn_call& fn);
     as_value sharedobject_deleteAll(const fn_call& fn);
@@ -74,6 +75,9 @@ namespace {
     as_value sharedobject_ctor(const fn_call& fn);
 
     as_object* readSOL(VM& vm, const std::string& filespec);
+
+    // Encode the data object to AMF format.
+    bool encodeData(as_object& data, SimpleBuffer& buf);
 
     void attachSharedObjectInterface(as_object& o);
     void attachSharedObjectStaticInterface(as_object& o);
@@ -120,20 +124,13 @@ public:
         // A '__constructor__' member gets back, but only if 
         // not a function. Actually no function gets back.
         // 
-        if ( key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR )
-        {
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(" skip serialization of specially-named property %s",
-                    _st.value(key));
-#endif
+        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR) {
             return true;
         }
 
         // write property name
         const std::string& name = _st.value(key);
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-        log_debug(" serializing property %s", name);
-#endif
+        
         _writer.writePropertyName(name);
         // Strict array are never encoded in SharedObject
         if (!val.writeAMF0(_writer))
@@ -197,8 +194,14 @@ public:
         _name = s;
     }
 
-    size_t size() const { 
-        return 0; 
+    /// Return the size of the data plus header.
+    size_t size() const {
+        if (!_data) return 0;
+        SimpleBuffer buf;
+        if (encodeData(*_data, buf)) {
+            return buf.size() + 15 + _name.size() + 2;
+        }
+        return 0;
     }
 
     void setData(as_object* data) {
@@ -292,37 +295,9 @@ SharedObject_as::flush(int space) const
         return false;
     }
     
-    gnash::SimpleBuffer buf;
-    // see http://osflash.org/documentation/amf/envelopes/sharedobject
+    SimpleBuffer buf;
+    encodeData(*_data, buf);
 
-    // length field filled in later
-    buf.append("\x00\xbf\x00\x00\x00\x00TCSO\x00\x04\x00\x00\x00\x00", 16); 
-
-    // append object name
-    std::string object_name = getObjectName();
-    boost::uint16_t len = object_name.length();
-    buf.appendNetworkShort(len);
-    buf.append(object_name.c_str(), len);
-
-    // append padding
-    buf.append("\x00\x00\x00\x00", 4);
-
-    // append properties of object
-    VM& vm = getVM(_owner);
-
-    // Do not encode strict arrays!
-    AMF::Writer w(buf, false);
-
-    SOLPropsBufSerializer props(w, vm);
-    _data->visitProperties<Exists>(props);
-    if (!props.success()) {
-        log_error("Could not serialize object");
-        return false;
-    }
-
-    // fix length field
-    *(reinterpret_cast<uint32_t*>(buf.data() + 2)) = htonl(buf.size() - 6);
-    
     // Write file
     std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if (!ofs) {
@@ -331,11 +306,33 @@ SharedObject_as::flush(int space) const
         return false;
     }
     
-    if (ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size()).fail())
-    {
+    SimpleBuffer header;
+    header.append("\x00\xbf", 2);
+    // Not sure what this includes.
+    header.appendNetworkLong(buf.size() + 10);
+    header.append("TCSO\x00\x04\x00\x00\x00\x00", 10); 
+    
+    // append SharedObject name
+    std::string object_name = getObjectName();
+    const boost::uint16_t len = object_name.length();
+    header.appendNetworkShort(len);
+    header.append(object_name.c_str(), len);
+
+    // append padding
+    header.append("\x00\x00\x00\x00", 4);
+
+    // Write header
+    ofs.write(reinterpret_cast<const char*>(header.data()), header.size());
+    if (!ofs) {
+        log_error("Error writing SOL header");
+        return false;
+    }
+
+    // Write AMF data
+    ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size());
+    if (!ofs) {
         log_error("Error writing %d bytes to output file %s",
                 buf.size(), filespec.c_str());
-        ofs.close();
         return false;
     }
     ofs.close();
@@ -539,7 +536,6 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 
     log_debug("SharedObject %s not loaded. Loading it now", key);
 
-
     // Otherwise create a new one and register to the lib
     SharedObject_as* sh = createSharedObject(*_vm.getGlobal());
     if (!sh) return 0;
@@ -589,7 +585,7 @@ registerSharedObjectNative(as_object& o)
     vm.registerNative(sharedobject_send, 2106, 1);
     vm.registerNative(sharedobject_flush, 2106, 2);
     vm.registerNative(sharedobject_close, 2106, 3);
-    vm.registerNative(sharedobject_getsize, 2106, 4);
+    vm.registerNative(sharedobject_getSize, 2106, 4);
     vm.registerNative(sharedobject_setFps, 2106, 5);
     vm.registerNative(sharedobject_clear, 2106, 6);
 
@@ -916,7 +912,7 @@ sharedobject_data(const fn_call& fn)
 }
 
 as_value
-sharedobject_getsize(const fn_call& fn)
+sharedobject_getSize(const fn_call& fn)
 {
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
     return as_value(obj->size());
@@ -965,20 +961,22 @@ readSOL(VM& vm, const std::string& filespec)
         return data;
     }
 
-    if (st.st_size < 28) {
+    const size_t size = st.st_size;
+
+    if (size < 28) {
         // A SOL file exists, but it was invalid. Count it as not existing.
-        log_error("SharedObject::readSOL: SOL file %s is too short "
+        log_error("readSOL: SOL file %s is too short "
 		  "(only %s bytes long) to be valid.", filespec, st.st_size);
         return data;
     }
-    
-    boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[st.st_size]);
+
+    boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[size]);
     const boost::uint8_t *buf = sbuf.get();
-    const boost::uint8_t *end = buf + st.st_size;
+    const boost::uint8_t *end = buf + size;
 
     try {
         std::ifstream ifs(filespec.c_str(), std::ios::binary);
-        ifs.read(reinterpret_cast<char*>(sbuf.get()), st.st_size);
+        ifs.read(reinterpret_cast<char*>(sbuf.get()), size);
 
         // TODO check initial bytes, and print warnings if they are fishy
 
@@ -992,7 +990,7 @@ readSOL(VM& vm, const std::string& filespec)
 
         if (buf >= end) {
             // In this case there is no data member.
-            log_error("SharedObject::readSOL: file ends before data segment");
+            log_error("readSOL: file ends before data segment");
             return data;
         }
 
@@ -1000,7 +998,7 @@ readSOL(VM& vm, const std::string& filespec)
 
         while (buf != end) {
 
-            log_debug("SharedObject::readSOL: reading property name at "
+            log_debug("readSOL: reading property name at "
                     "byte %s", buf - sbuf.get());
             // read property name
             
@@ -1014,7 +1012,7 @@ readSOL(VM& vm, const std::string& filespec)
             buf += 2;
 
             if (!len) {
-                log_error("SharedObject::readSOL: empty property name");
+                log_error("readSOL: empty property name");
                 break;
             }
 
@@ -1050,7 +1048,7 @@ readSOL(VM& vm, const std::string& filespec)
     }
 
     catch (std::exception& e) {
-        log_error("SharedObject::readSOL: Reading SharedObject %s: %s", 
+        log_error("readSOL: Reading SharedObject %s: %s", 
 		  filespec, e.what());
         return 0;
     }
@@ -1078,6 +1076,24 @@ createSharedObject(Global_as& gl)
 
     // We know what it is...
     return &static_cast<SharedObject_as&>(*o->relay());;
+}
+ 
+bool
+encodeData(as_object& data, SimpleBuffer& buf)
+{
+    // see http://osflash.org/documentation/amf/envelopes/sharedobject
+    // Do not encode strict arrays!
+    AMF::Writer w(buf, false);
+    
+    VM& vm = getVM(data);
+    SOLPropsBufSerializer props(w, vm);
+
+    data.visitProperties<Exists>(props);
+    if (!props.success()) {
+        log_error("Could not serialize object");
+        return false;
+    }
+    return true;
 }
 
 } // anonymous namespace
