@@ -82,12 +82,6 @@ check(so instanceof SharedObject);
 // Private data
 so.name = "Joe";
 so.age = 20;
-
-so.pet = "Horse";
-xcheck_equals (so.getSize(), 297);
-so.flush();
-xcheck_equals (so.getSize(), 297);
-
 so.pet = "Dog";
 xcheck_equals (so.getSize(), 297);
 
@@ -110,6 +104,7 @@ so.data.crossdomainAlways = true;
 so.data.allowThirdPartyLSOAccess = true;
 so.data.localSecPath = "";
 so.data.localSecPathTime = 1.19751160683e+12;
+
 
 // Verify that a new getLocal call using
 // the same "id" returns the same in-memory object.
@@ -178,6 +173,8 @@ check_equals(typeof(so2bis), 'object'); // valid path
 check(so2bis != so2); // but not recognized as the same as level1/./level2/settings
 
 delete so.data.tmp;
+
+xcheck_equals(so.getSize(), 297);
 
 // But a getLocal call using a *different* "id" returns
 // a different SharedObject...
@@ -362,7 +359,7 @@ check_equals(typeof(so9), 'null');
 // END OF TESTS
 //------------------------------------------
 
-check_totals(124);
+check_totals(123);
 
 #else
 
