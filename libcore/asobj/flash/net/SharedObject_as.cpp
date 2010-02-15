@@ -108,19 +108,28 @@ class SOLPropsBufSerializer : public AbstractPropertyVisitor
 
 public:
 
-    SOLPropsBufSerializer(AMF::Writer w, VM& vm)
+    SOLPropsBufSerializer(AMF::Writer w, string_table& st)
         :
         _writer(w),
-        _vm(vm),
-        _st(vm.getStringTable()),
+        _st(st),
         _error(false),
         _count(0)
 	{}
     
-    // Success means that no errors were encountered and at least one
-    // property was encoded.
-    bool success() const { return !_error && _count; }
+    /// Check if the object data was successfully encoded.
+    //
+    /// Success means that no encoding errors were encountered and at least one
+    /// property was encoded.
+    bool success() const {
+        return !_error && _count;
+    }
 
+    /// Visitor called for each property.
+    //
+    /// This should be called only for visible properties.
+    //
+    /// accept() returns false if the visitor should stop, true if it should
+    /// go on to the next property.
     virtual bool accept(const ObjectURI& uri, const as_value& val) 
     {
         assert(!_error);
@@ -154,7 +163,7 @@ public:
                     name, val);
             _error = true;
 
-            // Stop visiting....
+            // Stop visiting.
             return false;
         }
 
@@ -168,9 +177,14 @@ public:
 private:
 
     AMF::Writer _writer;
-    VM& _vm;
+
+    /// String table for looking up property names as strings.
     string_table& _st;
+
+    /// Whether an error has been encountered.
     bool _error;
+
+    /// How many properties have been encoded.
     size_t _count;
 };
 
@@ -828,62 +842,12 @@ sharedobject_getLocal(const fn_call& fn)
 as_value
 sharedobject_getRemote(const fn_call& /*fn*/)
 {
-#if 0
-    GNASH_REPORT_FUNCTION;
-
-    int swfVersion = getSWFVersion(fn);
-    as_value objNameVal;
-
-    if (fn.nargs > 0) {
-        objNameVal = fn.arg(0);
-    }
-    
-    std::string objName = objNameVal.to_string(swfVersion);
-    if (objName.empty()) {
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::ostringstream ss;
-            fn.dump_args(ss);
-            log_aserror("SharedObject.getRemote(%s): %s", 
-                _("missing object name"));
-        );
-        as_value ret;
-        ret.set_null();
-        return ret;
-    }
-
-    std::string root;
-
-    // TODO: this certainly shouldn't be a string. The behaviour is different
-    // according to the type:
-    // null or false    not persistent.
-    // true             persistent.
-    // string (URL)     something else.
-    // We can implement this by making the interface cope with those different
-    // cases and just checking the argument type here.
-    std::string persistence;
-    if (fn.nargs > 1) {
-        root = fn.arg(1).to_string(swfVersion);
-        persistence = fn.arg(2).to_string(swfVersion);
-    }
-
-    log_debug("SO name:%s, root:%s, persistence: %s", objName, root, persistence);
-
-    VM& vm = getVM(fn);
-
-    as_object* obj = vm.getSharedObjectLibrary().getRemote(objName, root,
-            persistence);
-
-    as_value ret(obj);
-    log_debug("SharedObject.getRemote returning %s", ret);
-    
-    return ret;
-#endif
     LOG_ONCE(log_unimpl("SharedObject.getRemote()"));
     return as_value();
 }
 
 
-/// Undocumented
+/// Officially undocumented.
 //
 /// Takes a URL argument and deletes all SharedObjects under that URL.
 as_value
@@ -1126,9 +1090,9 @@ encodeData(const std::string& name, as_object& data, SimpleBuffer& buf)
     // see http://osflash.org/documentation/amf/envelopes/sharedobject
     // Do not encode strict arrays!
     AMF::Writer w(buf, false);
-    VM& vm = getVM(data);
+    string_table& st = getStringTable(data);
 
-    SOLPropsBufSerializer props(w, vm);
+    SOLPropsBufSerializer props(w, st);
 
     data.visitProperties<Exists>(props);
     if (!props.success()) {
