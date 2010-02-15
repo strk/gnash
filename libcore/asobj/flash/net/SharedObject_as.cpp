@@ -76,8 +76,17 @@ namespace {
 
     as_object* readSOL(VM& vm, const std::string& filespec);
 
-    // Encode the data object to AMF format.
+    /// Encode the data object to AMF format.
     bool encodeData(as_object& data, SimpleBuffer& buf);
+
+    /// Encode SharedObject file header data.
+    //
+    /// @param size     The genuine size of the object data (this is not the
+    ///                 size that will be encoded).
+    /// @param name     The name of the SharedObject.
+    /// @param buf      The SimpleBuffer to encode the data to.
+    void encodeHeader(const size_t size, const std::string& name,
+            SimpleBuffer& buf);
 
     void attachSharedObjectInterface(as_object& o);
     void attachSharedObjectStaticInterface(as_object& o);
@@ -198,8 +207,11 @@ public:
     size_t size() const {
         if (!_data) return 0;
         SimpleBuffer buf;
+
+        // The header comprises 16 fixed bytes, 2 bytes of name length, the
+        // name itself, then 4 bytes of fixed padding.
         if (encodeData(*_data, buf)) {
-            return buf.size() + 15 + _name.size() + 2;
+            return buf.size() + 16 + _name.size() + 2 + 4;
         }
         return 0;
     }
@@ -295,32 +307,20 @@ SharedObject_as::flush(int space) const
         return false;
     }
     
-    SimpleBuffer buf;
-    encodeData(*_data, buf);
-
-    // Write file
+    // Open file
     std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if (!ofs) {
         log_error("SharedObject::flush(): Failed opening file '%s' in "
                 "binary mode", filespec.c_str());
         return false;
     }
-    
+
+    SimpleBuffer buf;
+    encodeData(*_data, buf);
+
     SimpleBuffer header;
-    header.append("\x00\xbf", 2);
-    // Not sure what this includes.
-    header.appendNetworkLong(buf.size() + 10);
-    header.append("TCSO\x00\x04\x00\x00\x00\x00", 10); 
+    encodeHeader(buf.size(), getObjectName(), header);
     
-    // append SharedObject name
-    std::string object_name = getObjectName();
-    const boost::uint16_t len = object_name.length();
-    header.appendNetworkShort(len);
-    header.append(object_name.c_str(), len);
-
-    // append padding
-    header.append("\x00\x00\x00\x00", 4);
-
     // Write header
     ofs.write(reinterpret_cast<const char*>(header.data()), header.size());
     if (!ofs) {
@@ -1077,7 +1077,34 @@ createSharedObject(Global_as& gl)
     // We know what it is...
     return &static_cast<SharedObject_as&>(*o->relay());;
 }
- 
+
+/// Encode header data.
+void
+encodeHeader(const size_t size, const std::string& name, SimpleBuffer& buf)
+{
+    const boost::uint8_t header[] = { 0x00, 0xbf };
+    const boost::uint8_t magic[] = { 'T', 'C', 'S', '0',
+        0x00, 0x04, 0x00, 0x00, 0x00, 0x00 };
+
+    // Initial header byters
+    buf.append(header, arraySize(header));
+
+    // Size of data plus 10 (don't know why).
+    buf.appendNetworkLong(size + 10);
+
+    // Magic SharedObject bytes.
+    buf.append(magic, arraySize(magic)); 
+    
+    // SharedObject name
+    const boost::uint16_t len = name.length();
+    buf.appendNetworkShort(len);
+    buf.append(name.c_str(), len);
+
+    // append padding
+    buf.append("\x00\x00\x00\x00", 4);
+
+}
+
 bool
 encodeData(as_object& data, SimpleBuffer& buf)
 {
