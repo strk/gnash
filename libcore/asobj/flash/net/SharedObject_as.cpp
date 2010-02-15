@@ -1096,14 +1096,14 @@ void
 encodeHeader(const size_t size, const std::string& name, SimpleBuffer& buf)
 {
     const boost::uint8_t header[] = { 0x00, 0xbf };
-    const boost::uint8_t magic[] = { 'T', 'C', 'S', '0',
+    const boost::uint8_t magic[] = { 'T', 'C', 'S', 'O',
         0x00, 0x04, 0x00, 0x00, 0x00, 0x00 };
 
     // Initial header byters
     buf.append(header, arraySize(header));
 
-    // Size of data plus 10 (don't know why).
-    buf.appendNetworkLong(size + 10);
+    // Size of data plus 14 (complete size of data after size field).
+    buf.appendNetworkLong(size + 2 + name.size() + 14);
 
     // Magic SharedObject bytes.
     buf.append(magic, arraySize(magic)); 
