@@ -77,17 +77,19 @@ namespace {
 
     as_object* readSOL(VM& vm, const std::string& filespec);
 
-    /// Encode the data object to AMF format.
-    bool encodeData(as_object& data, SimpleBuffer& buf);
-
-    /// Encode SharedObject file header data.
+    /// Encode the SharedObject data.
     //
-    /// @param size     The genuine size of the object data (this is not the
-    ///                 size that will be encoded).
     /// @param name     The name of the SharedObject.
+    /// @param data     The data object to encode.
     /// @param buf      The SimpleBuffer to encode the data to.
-    void encodeHeader(const size_t size, const std::string& name,
+    bool encodeData(const std::string& name, as_object& data,
             SimpleBuffer& buf);
+
+    /// Encode the 2 header bytes and data length field.
+    //
+    /// @param size     The genuine size of the object data.
+    /// @param buf      The SimpleBuffer to encode the data to.
+    void encodeHeader(const size_t size, SimpleBuffer& buf);
 
     void attachSharedObjectInterface(as_object& o);
     void attachSharedObjectStaticInterface(as_object& o);
@@ -205,10 +207,6 @@ public:
         _filename = s;
     }
 
-    const std::string& getObjectName() const {
-        return _name;
-    }
-
     void setObjectName(const std::string& s) {
         _name = s;
     }
@@ -218,10 +216,9 @@ public:
         if (!_data) return 0;
         SimpleBuffer buf;
 
-        // The header comprises 16 fixed bytes, 2 bytes of name length, the
-        // name itself, then 4 bytes of fixed padding.
-        if (encodeData(*_data, buf)) {
-            return buf.size() + 16 + _name.size() + 2 + 4;
+        // The header comprises 2 bytes and a length field of 4 bytes.
+        if (encodeData(_name, *_data, buf)) {
+            return buf.size() + 6;
         }
         return 0;
     }
@@ -329,14 +326,14 @@ SharedObject_as::flush(int space) const
 
     // Encode data part.
     SimpleBuffer buf;
-    if (!encodeData(*_data, buf)) {
+    if (!encodeData(_name, *_data, buf)) {
         std::remove(filespec.c_str());
         return true;
     }
 
     // Encode header part.
     SimpleBuffer header;
-    encodeHeader(buf.size(), getObjectName(), header);
+    encodeHeader(buf.size(), header);
     
     // Write header
     ofs.write(reinterpret_cast<const char*>(header.data()), header.size());
@@ -1092,40 +1089,45 @@ createSharedObject(Global_as& gl)
 }
 
 /// Encode header data.
+//
+/// Note that the separation of header and data here is arbitrary.
 void
-encodeHeader(const size_t size, const std::string& name, SimpleBuffer& buf)
+encodeHeader(const size_t size, SimpleBuffer& buf)
 {
     const boost::uint8_t header[] = { 0x00, 0xbf };
+    
+    // Initial header byters
+    buf.append(header, arraySize(header));
+    
+    // Size of data plus 14 (complete size of data after size field).
+    buf.appendNetworkLong(size);
+}
+
+/// This writes everything after the 'length' field of the SOL data.
+bool
+encodeData(const std::string& name, as_object& data, SimpleBuffer& buf)
+{
+    // Write the remaining header-like information.
     const boost::uint8_t magic[] = { 'T', 'C', 'S', 'O',
         0x00, 0x04, 0x00, 0x00, 0x00, 0x00 };
 
-    // Initial header byters
-    buf.append(header, arraySize(header));
-
-    // Size of data plus 14 (complete size of data after size field).
-    buf.appendNetworkLong(size + 2 + name.size() + 14);
-
     // Magic SharedObject bytes.
     buf.append(magic, arraySize(magic)); 
-    
+
     // SharedObject name
     const boost::uint16_t len = name.length();
     buf.appendNetworkShort(len);
     buf.append(name.c_str(), len);
 
-    // append padding
-    buf.append("\x00\x00\x00\x00", 4);
-
-}
-
-bool
-encodeData(as_object& data, SimpleBuffer& buf)
-{
+    // Padding
+    const boost::uint8_t padding[] = { 0, 0, 0, 0 };
+    buf.append(padding, arraySize(padding));
+    
     // see http://osflash.org/documentation/amf/envelopes/sharedobject
     // Do not encode strict arrays!
     AMF::Writer w(buf, false);
-    
     VM& vm = getVM(data);
+
     SOLPropsBufSerializer props(w, vm);
 
     data.visitProperties<Exists>(props);
