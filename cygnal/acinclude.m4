@@ -41,7 +41,7 @@ dnl Build the cgibins server if specified.
 AC_DEFUN([CYGNAL_PATHS],
 [
 
-AC_CHECK_HEADERS(poll.h epoll.h)
+AC_CHECK_HEADERS(poll.h sys/epoll.h)
 
 dnl AC_CHECK_HEADERS(sys/sendfile)
 AC_TRY_COMPILE([#include <sys/sendfile.h>], [
