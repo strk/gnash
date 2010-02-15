@@ -124,9 +124,10 @@ public:
         return !_error && _count;
     }
 
-    /// Visitor called for each property.
+    /// Visitor called for each property to serialize.
     //
-    /// This should be called only for visible properties.
+    /// SOL serialization calls this for all existing properties, whether
+    /// visible or not.
     //
     /// accept() returns false if the visitor should stop, true if it should
     /// go on to the next property.
@@ -142,12 +143,11 @@ public:
         const string_table::key key = getName(uri);
 
         // Test conducted with AMFPHP:
-        // '__proto__' and 'constructor' members
-        // of an object don't get back from an 'echo-service'.
+        // '__proto__' and 'constructor' members of an object are not returned
+        // from an 'echo-service'.
         // Dunno if they are not serialized or just not sent back.
-        // A '__constructor__' member gets back, but only if 
-        // not a function. Actually no function gets back.
-        // 
+        // A '__constructor__' member is returned, but only if 
+        // not a function; no functions are returned at all.
         if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR) {
             return true;
         }
@@ -156,9 +156,9 @@ public:
         const std::string& name = _st.value(key);
         
         _writer.writePropertyName(name);
+
         // Strict array are never encoded in SharedObject
         if (!val.writeAMF0(_writer)) {
-
             log_error("Problems serializing an object's member %s=%s",
                     name, val);
             _error = true;
@@ -185,6 +185,9 @@ private:
     bool _error;
 
     /// How many properties have been encoded.
+    //
+    /// A boolean would do just as nicely, but we may want to use the count
+    /// info.
     size_t _count;
 };
 
@@ -202,8 +205,9 @@ public:
     { 
     }
 
-    ~SharedObject_as();
+    virtual ~SharedObject_as();
 
+    /// The as_object that owns this Relay.
     as_object& owner() {
         return _owner;
     }
@@ -213,14 +217,17 @@ public:
     /// If there is no data to write, the file is removed.
     bool flush(int space = 0) const;
 
+    /// The filename of this SharedObject.
     const std::string& getFilespec() const {
         return _filename;
     }
 
+    /// Set the filename of the SharedObject.
     void setFilespec(const std::string& s) {
         _filename = s;
     }
 
+    /// Set the name of this SharedObject.
     void setObjectName(const std::string& s) {
         _name = s;
     }
@@ -237,6 +244,14 @@ public:
         return 0;
     }
 
+    /// Set the data object.
+    //
+    /// It seems much cleaner not to implement this as a getter/setter as it
+    /// currently is, but it is shown that flush() does not call data if
+    /// data is a getter-setter. This suggests that flush does not access
+    /// the data object directly, which in turn suggests it's not a real
+    /// property. This is the only test that fails if the data object is a
+    /// simple object property.
     void setData(as_object* data) {
 
         assert(data);
@@ -250,18 +265,15 @@ public:
 
     }
 
-    as_object* data() {
-        return _data;
-    }
-
-    const as_object* data() const {
+    /// Get the data object.
+    as_object* data() const {
         return _data;
     }
 
     /// Close the SharedObject
+    //
+    /// Note that this currently does nothing.
     void close();
-
-    void connect(NetConnection_as *obj, const std::string& uri);
 
     /// Are we connected? 
     bool connected() const { return _connected; }
@@ -371,12 +383,6 @@ SharedObject_as::flush(int space) const
 
 void
 SharedObject_as::close()
-{
-}
-
-/// Process the connect(uri) method.
-void
-SharedObject_as::connect(NetConnection_as* /*obj*/, const std::string& /*uri*/)
 {
 }
 
@@ -684,9 +690,9 @@ sharedobject_clear(const fn_call& fn)
 as_value
 sharedobject_connect(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;    
 
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
+    
     UNUSED(obj);
 
     if (fn.nargs < 1) {
@@ -697,45 +703,8 @@ sharedobject_connect(const fn_call& fn)
         return as_value();
     }
 
-    // Although the ActionScript spec says connect() takes two
-    // arguments, the HAXE implementation only supports one.
-    // So we have to make sure the NetCnnection object we get
-    // passed is already had the URI specified to connect to.
-    if (fn.nargs > 1) {
-#if 0
-        const as_value& uri = fn.arg(1);
-        const VM& vm = getVM(fn);
-        const std::string& uriStr = uri.to_string(vm.getSWFVersion());
-#endif
-    }
-    
-    NetConnection_as* nc;
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), nc)) {
-        return as_value();
-    }
+    LOG_ONCE(log_unimpl("SharedObject.connect()"));
 
-    // This is always set without validification.fooc->setURI(uriStr);
-    std::string str = nc->getURI();
-    //obj->setPath(str);
-    URL uri = nc->getURI();
-    Network *net = new Network;
-
-    net->setProtocol(uri.protocol());
-    net->setHost(uri.hostname());
-    net->setPort(strtol(uri.port().c_str(), NULL, 0) & 0xffff);
-
-    // Check first arg for validity 
-    if (getSWFVersion(fn) > 6) {
-        nc->connect();
-    } else {
-        if (fn.nargs > 0) {
-            std::stringstream ss; fn.dump_args(ss);
-            log_unimpl("SharedObject.connect(%s): args after the first are "
-                    "not supported", ss.str());
-        }
-        nc->connect();
-    }
-    
     return as_value();
 }
 
@@ -762,13 +731,9 @@ sharedobject_setFps(const fn_call& fn)
 as_value
 sharedobject_send(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
-
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
-
-    if (!obj->connected()) {
-    }
-    
+    UNUSED(obj);
+    LOG_ONCE(log_unimpl("SharedObject.send"));
     return as_value();
 }
 
@@ -1094,9 +1059,12 @@ encodeData(const std::string& name, as_object& data, SimpleBuffer& buf)
 
     SOLPropsBufSerializer props(w, st);
 
+    // Visit all existing properties.
     data.visitProperties<Exists>(props);
+
     if (!props.success()) {
-        // There are good reasons for this to fail.
+        // There are good reasons for this to fail, so it's not an error. Real
+        // errors are logged during serialization.
         log_debug("Did not serialize object");
         return false;
     }
