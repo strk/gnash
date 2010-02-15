@@ -333,7 +333,7 @@ Writer::writeNull()
 }
 
 void
-Writer::writeData(boost::uint8_t* data, size_t length)
+Writer::writeData(const boost::uint8_t* data, size_t length)
 {
     _buf.append(data, length);
 }

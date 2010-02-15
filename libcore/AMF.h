@@ -112,7 +112,7 @@ public:
     bool writePropertyName(const std::string& name);
 
     /// Write custom data for special cases.
-    void writeData(boost::uint8_t* data, size_t length);
+    void writeData(const boost::uint8_t* data, size_t length);
 
 private:
 
