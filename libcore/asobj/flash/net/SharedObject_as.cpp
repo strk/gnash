@@ -440,12 +440,8 @@ SharedObject_as::setReachable()
 void
 SharedObjectLibrary::markReachableResources() const
 {
-    for (SoLib::const_iterator it = _soLib.begin(), itE = _soLib.end();
-            it != itE; ++it)
-    {
-        SharedObject_as* sh = it->second;
-        sh->setReachable();
-    }
+    foreachSecond(_soLib.begin(), _soLib.end(),
+            std::mem_fun(&SharedObject_as::setReachable));
 }
 
 /// The SharedObjectLibrary keeps all known SharedObjects alive. They must
