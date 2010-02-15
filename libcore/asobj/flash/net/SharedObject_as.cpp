@@ -185,25 +185,23 @@ public:
     bool flush(int space = 0) const;
 
     const std::string& getFilespec() const {
-        return _sol.getFilespec();
+        return _filename;
     }
 
     void setFilespec(const std::string& s) {
-        _sol.setFilespec(s);
+        _filename = s;
     }
 
     const std::string& getObjectName() const {
-        return _sol.getObjectName();
+        return _name;
     }
 
     void setObjectName(const std::string& s) {
-        _sol.setObjectName(s);
+        _name = s;
     }
 
-    /// This isn't correct, as the default implementation doesn't use SOL
-    /// for reading.
     size_t size() const { 
-        return _sol.fileSize(); 
+        return 0; 
     }
 
     void setData(as_object* data) {
@@ -246,7 +244,9 @@ private:
     /// An object to store and access the actual data.
     as_object* _data;
 
-    amf::SOL _sol;
+    std::string _name;
+
+    std::string _filename;
 
     /// Are we connected? (No).
     bool _connected;
@@ -275,7 +275,7 @@ SharedObject_as::flush(int space) const
                 "argument (%d), which is currently ignored", space);
     }
 
-    const std::string& filespec = _sol.getFilespec();
+    const std::string& filespec = getFilespec();
 
     if (!mkdirRecursive(filespec))
     {
