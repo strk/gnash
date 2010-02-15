@@ -174,7 +174,6 @@ public:
         :
         _owner(owner),
         _data(0),
-        _persistence(0),
         _connected(false)
     { 
     }
@@ -228,32 +227,30 @@ public:
         return _data;
     }
 
-    bool getPersistence() const { return _persistence; };
-    void setPersistence(bool flag) { _persistence = flag; };
-
     /// Process the close() method.
     void close();
 
     /// Process the connect(uri) method.
     void connect(NetConnection_as *obj, const std::string& uri);
 
-    void setURI(const std::string &url) { _uri = url; }
-    const std::string& getURI() const { return _uri; }
-
-    bool isConnected() const { return _connected; };
-    void isConnected(bool x) { _connected = x; };
+    bool connected() const { return _connected; }
 
     // Override from Relay.
     virtual void setReachable(); 
 
 private:
 
+    /// The as_object to which this Relay belongs.
     as_object& _owner;
+
+    /// An object to store and access the actual data.
     as_object* _data;
-    bool _persistence;
+
     amf::SOL _sol;
+
+    /// Are we connected? (No).
     bool _connected;
-    std::string	_uri;
+
 };
 
 
@@ -574,64 +571,6 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     return &sh->owner();
 }
 
-as_object*
-SharedObjectLibrary::getRemote(const std::string& objName,
-       const std::string& uri, const std::string& persistence)
-{
-    GNASH_REPORT_FUNCTION;
-
-    assert (!objName.empty());
-
-    // Check that the name is valid; if not, return null
-    if (!validateName(objName)) {
-        return 0;
-    }
-
-    // The 'root' argument, otherwise known as localPath, specifies where
-    // in the SWF path the SOL should be stored. It cannot be outside this
-    // path.
-    std::string requestedPath;
-    std::ostringstream solPath;
-    URL url(uri);
-    
-    const std::string& key = url.path();
-
-    // If the shared object was already opened, use it.
-    SoLib::iterator it = _soLib.find(key);
-    if (it != _soLib.end()) {
-        log_debug("SharedObject %s already known, returning it", key);
-        return &it->second->owner();
-    } 
-
-    log_debug("SharedObject %s not loaded. Loading it now", key);
-
-    // Otherwise create a new one and register to the lib
-    SharedObject_as* sh = createSharedObject(*_vm.getGlobal());
-    if (!sh) return 0;
-
-    _soLib[key] = sh;
-
-    sh->setObjectName(objName);
-
-    // Not persistence on either the client or the server
-    if (persistence == "false") {
-        sh->setPersistence(false);
-    }
-    // Persistence only on the server
-    if (persistence == "true") {
-        sh->setPersistence(true);
-    }
-    
-    if (persistence[0] == '/') {
-        sh->setPersistence(true);
-        as_object* localdata = getLocal(objName, url.path());
-        if (localdata) {
-            sh->setData(localdata);
-        }
-    }
-
-    return &sh->owner();
-}
 
 void
 sharedobject_class_init(as_object& where, const ObjectURI& uri)
@@ -712,8 +651,7 @@ attachSharedObjectStaticInterface(as_object& o)
     const int flags = 0;
 
     Global_as& gl = getGlobal(o);
-    o.init_member("getLocal", 
-            gl.createFunction(sharedobject_getLocal), flags);
+    o.init_member("getLocal", gl.createFunction(sharedobject_getLocal), flags);
     o.init_member("getRemote",
             gl.createFunction(sharedobject_getRemote), flags);
 
@@ -843,8 +781,7 @@ sharedobject_send(const fn_call& fn)
 
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
 
-    if (!obj->isConnected()) {
-        //obj->connectToServer(obj->getURI());
+    if (!obj->connected()) {
     }
     
     return as_value();
@@ -883,17 +820,17 @@ sharedobject_flush(const fn_call& fn)
 as_value
 sharedobject_getLocal(const fn_call& fn)
 {
-    int swfVersion = getSWFVersion(fn);
+    const int swfVersion = getSWFVersion(fn);
 
     as_value objNameVal;
     if (fn.nargs > 0) objNameVal = fn.arg(0);
+
     const std::string objName = objNameVal.to_string(swfVersion);
     if (objName.empty()) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("SharedObject.getLocal(%s): %s", 
-                _("missing object name"));
+            log_aserror("SharedObject.getLocal(%s): missing object name");
         );
         as_value ret;
         ret.set_null();
@@ -901,8 +838,7 @@ sharedobject_getLocal(const fn_call& fn)
     }
 
     std::string root;
-    if (fn.nargs > 1)
-    {
+    if (fn.nargs > 1) {
         root = fn.arg(1).to_string(swfVersion);
     }
 
@@ -918,8 +854,9 @@ sharedobject_getLocal(const fn_call& fn)
 }
 
 as_value
-sharedobject_getRemote(const fn_call& fn)
+sharedobject_getRemote(const fn_call& /*fn*/)
 {
+#if 0
     GNASH_REPORT_FUNCTION;
 
     int swfVersion = getSWFVersion(fn);
@@ -968,6 +905,9 @@ sharedobject_getRemote(const fn_call& fn)
     log_debug("SharedObject.getRemote returning %s", ret);
     
     return ret;
+#endif
+    LOG_ONCE(log_unimpl("SharedObject.getRemote()"));
+    return as_value();
 }
 
 
