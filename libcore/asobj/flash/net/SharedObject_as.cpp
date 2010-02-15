@@ -45,7 +45,6 @@
 #include "NetConnection_as.h"
 #include "Object.h"
 #include "AMF.h"
-#include "sol.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
