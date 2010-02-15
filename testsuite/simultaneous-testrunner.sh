@@ -50,7 +50,7 @@ env | grep GNASH | while read REPLY; do
 	echo "export ${REPLY}"
 done
 
-timeout=10
+timeout=40
 cat << EOF
 
 outlog1=${top_builddir}/testoutlog.\$$

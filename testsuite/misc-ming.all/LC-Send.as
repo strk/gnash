@@ -4,6 +4,36 @@
 lc = new LocalConnection;
 lc.connect("recv");
 
+
+var i = 0;
+
+stressTest = function() {
+    var arg1 = i;
+    var arg2 = { a:5, b:"A string, not too short, but also not really long" };
+    var arg3 = new Array(i);
+    lc.send("lc576", "stress", arg1, arg2, arg3);
+};
+
+lc.stressTestCheck = function(arg1, arg2, arg3) {
+    check_equals(arg1, i);
+    check_equals(typeof(arg2), "object");
+    check_equals(arg2.a, 5);
+    check_equals(arg2.b, "A string, not too short, but also not really long");
+    check_equals(arg3.length, i);
+    if (i < 1000) {
+        ++i;
+        stressTest();
+    }
+    else {
+        endTests();
+    };
+    
+};
+
+endTests = function() {
+    lc.send("lc576", "endTests");
+};
+
 runtests = function() {
 
     // This should not result in a call.
@@ -55,7 +85,7 @@ runtests = function() {
     check_equals(typeof(c), "object");
     lc.send("lc576", "test7", c);
 
-    lc.send("lc576", "endTests");
+    stressTest();
 };
 
 getit = function()
@@ -73,11 +103,11 @@ lc.ready = function() {
     runtests();
 };
 
-// Called when LC-Send has finished. Exit in 3 seconds.
+// Called when LC-Send has finished. Exit in 2 seconds.
 lc.finished = function() {
-    trace("Received finish signal from LC-Receive. Exiting in 3 seconds");
+    trace("Received finish signal from LC-Receive. Exiting in 2 seconds");
     trace("ENDOFTEST");
-    setInterval(exit, 3000);
+    setInterval(exit, 2000);
 };
 
 exit = function() {

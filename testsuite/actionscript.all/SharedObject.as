@@ -75,14 +75,18 @@ check_equals (typeof(sharedobjectObj.clear), 'undefined');
 
 // FIXME: Test code that will soon be a formal test case.
 so = SharedObject.getLocal("level1/level2/settings", "/");
-
+#if OUTPUT_VERSION > 5
+check_equals (so.getSize(), 297);
+#endif
 check(so instanceof SharedObject);
 
 // Private data
 so.name = "Joe";
 so.age = 20;
 so.pet = "Dog";
-
+#if OUTPUT_VERSION > 5
+check_equals (so.getSize(), 297);
+#endif
 // public data that gets written
 #if OUTPUT_VERSION > 5
 check(so.hasOwnProperty("data"));
@@ -103,6 +107,7 @@ so.data.allowThirdPartyLSOAccess = true;
 so.data.localSecPath = "";
 so.data.localSecPathTime = 1.19751160683e+12;
 
+
 // Verify that a new getLocal call using
 // the same "id" returns the same in-memory object.
 so.data.tmp = "custom value";
@@ -110,6 +115,11 @@ so2 = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals(so2.data.tmp, "custom value");
 check_equals(so2.data.toString(), "[object Object]");
 check_equals(so, so2);
+
+#if OUTPUT_VERSION > 5
+check_equals (so2.getSize(), 318);
+check_equals (so.getSize(), 318);
+#endif
 
 // Check SOL names validity.
 so2bis = SharedObject.getLocal("level1//level2/settings", "/");
@@ -169,10 +179,18 @@ check(so2bis != so2); // but not recognized as the same as level1/./level2/setti
 
 delete so.data.tmp;
 
+#if OUTPUT_VERSION > 5
+check_equals(so.getSize(), 297);
+#endif 
+
 // But a getLocal call using a *different* "id" returns
 // a different SharedObject...
 so3 = SharedObject.getLocal("level1/level2/settings3", "/");
 check(so3 != so);
+
+#if OUTPUT_VERSION > 5
+check_equals (so3.getSize(), 0);
+#endif
 
 // Doesn't make much sense to test the rest for SWF5
 #if OUTPUT_VERSION > 5
@@ -185,7 +203,9 @@ check_equals(ret, true);
 newso = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals (typeof(newso), 'object');
 trace(newso.getSize());
-xcheck_equals (newso.getSize(), 297);
+#if OUTPUT_VERSION > 5
+check_equals (newso.getSize(), 297);
+#endif
 
 if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object, checking data...");
@@ -226,6 +246,7 @@ if (typeof(newso.data) != 'undefined') {
 note("Some of the following tests (all preceded by a 'checking' message) will fail when run over the network. Only the tests where an object is expected should fail");
 
 so4 = SharedObject.getLocal("Another-one", "/subdir");
+check_equals (so4.getSize(), undefined);
 check_equals(typeof(so4), "null");
 check(so4 != so3);
 check_equals(typeof(so4.data), 'undefined');
@@ -350,7 +371,7 @@ check_equals(typeof(so9), 'null');
 // END OF TESTS
 //------------------------------------------
 
-check_totals(116);
+check_totals(123);
 
 #else
 

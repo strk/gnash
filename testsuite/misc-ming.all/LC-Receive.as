@@ -70,13 +70,21 @@ lc.test7 = function(c) {
     check_equals(typeof(c), "object");
 };
 
-// Exit in 3 seconds.
+var i = 0;
+
+lc.stress = function(arg1, arg2, arg3) {
+    check_equals(arg1, i);
+    ++i;
+    lc.send("recv", "stressTestCheck", arg1, arg2, arg3);
+};
+
+// Exit in 2 seconds.
 lc.endTests = function() {
     totals();
-    trace("Finished tests. Alerting LC-Send and exiting in 3 seconds");
+    trace("Finished tests. Alerting LC-Send and exiting in 2 seconds");
     trace("ENDOFTEST");
     lc.send("recv", "finished");
-    setInterval(exit, 3000);
+    setInterval(exit, 2000);
 };
 
 exit = function() {
