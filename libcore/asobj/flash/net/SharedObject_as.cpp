@@ -72,8 +72,6 @@ namespace {
     as_value sharedobject_data(const fn_call& fn);
     as_value sharedobject_getLocal(const fn_call& fn);
     as_value sharedobject_ctor(const fn_call& fn);
-    as_value sharedobject_setdirty(const fn_call& fn);
-    as_value sharedobject_setproperty(const fn_call& fn);
 
     as_object* readSOL(VM& vm, const std::string& filespec);
 
@@ -167,8 +165,6 @@ class SharedObject_as : public Relay
 {
 public:
 
-    ~SharedObject_as();
-
     SharedObject_as(as_object& owner)
         :
         _owner(owner),
@@ -176,6 +172,8 @@ public:
         _connected(false)
     { 
     }
+
+    ~SharedObject_as();
 
     as_object& owner() {
         return _owner;
@@ -224,15 +222,15 @@ public:
         return _data;
     }
 
-    /// Process the close() method.
+    /// Close the SharedObject
     void close();
 
-    /// Process the connect(uri) method.
     void connect(NetConnection_as *obj, const std::string& uri);
 
+    /// Are we connected? 
     bool connected() const { return _connected; }
 
-    // Override from Relay.
+    /// Override from Relay.
     virtual void setReachable(); 
 
 private:
@@ -356,15 +354,12 @@ SharedObject_as::close()
 void
 SharedObject_as::connect(NetConnection_as* /*obj*/, const std::string& /*uri*/)
 {
-    GNASH_REPORT_FUNCTION;
-   
 }
 
 SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     :
     _vm(vm)
 {
-    GNASH_REPORT_FUNCTION;
 
     _solSafeDir = rcfile.getSOLSafeDir();
     if (_solSafeDir.empty()) {
@@ -611,8 +606,6 @@ registerSharedObjectNative(as_object& o)
     
     vm.registerNative(sharedobject_deleteAll, 2106, 206);
     vm.registerNative(sharedobject_getDiskUsage, 2106, 207);
-    vm.registerNative(sharedobject_setdirty, 2106, 208);
-    vm.registerNative(sharedobject_setproperty, 2106, 209);
 }
 
 
@@ -636,9 +629,6 @@ attachSharedObjectInterface(as_object& o)
     o.init_member("getSize", vm.getNative(2106, 4), flags);
     o.init_member("setFps", vm.getNative(2106, 5), flags);
     o.init_member("clear", vm.getNative(2106, 6), flags);
-
-    o.init_member("setDirty", vm.getNative(2106, 7), flags);
-    o.init_member("setProperty", vm.getNative(2106, 8), flags);
 }
 
 
@@ -664,29 +654,6 @@ attachSharedObjectStaticInterface(as_object& o)
 as_value
 sharedobject_clear(const fn_call& fn)
 {
-    SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
-    UNUSED(obj);
-    
-    LOG_ONCE(log_unimpl (__FUNCTION__));
-
-    return as_value();
-}
-
-as_value
-sharedobject_setdirty(const fn_call& fn)
-{
-    SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
-    UNUSED(obj);
-    
-    LOG_ONCE(log_unimpl (__FUNCTION__));
-
-    return as_value();
-}
-
-as_value
-sharedobject_setproperty(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;    
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
     UNUSED(obj);
     
@@ -1094,7 +1061,6 @@ readSOL(VM& vm, const std::string& filespec)
 void
 flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
 {
-//    GNASH_REPORT_FUNCTION;
     sol.second->flush();
 }
 
