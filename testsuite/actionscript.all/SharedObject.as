@@ -75,7 +75,7 @@ check_equals (typeof(sharedobjectObj.clear), 'undefined');
 
 // FIXME: Test code that will soon be a formal test case.
 so = SharedObject.getLocal("level1/level2/settings", "/");
-xcheck_equals (so.getSize(), 297);
+check_equals (so.getSize(), 297);
 
 check(so instanceof SharedObject);
 
@@ -83,7 +83,7 @@ check(so instanceof SharedObject);
 so.name = "Joe";
 so.age = 20;
 so.pet = "Dog";
-xcheck_equals (so.getSize(), 297);
+check_equals (so.getSize(), 297);
 
 // public data that gets written
 #if OUTPUT_VERSION > 5
@@ -113,8 +113,8 @@ so2 = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals(so2.data.tmp, "custom value");
 check_equals(so2.data.toString(), "[object Object]");
 check_equals(so, so2);
-xcheck_equals (so2.getSize(), 318);
-xcheck_equals (so.getSize(), 318);
+check_equals (so2.getSize(), 318);
+check_equals (so.getSize(), 318);
 
 // Check SOL names validity.
 so2bis = SharedObject.getLocal("level1//level2/settings", "/");
@@ -174,13 +174,13 @@ check(so2bis != so2); // but not recognized as the same as level1/./level2/setti
 
 delete so.data.tmp;
 
-xcheck_equals(so.getSize(), 297);
+check_equals(so.getSize(), 297);
 
 // But a getLocal call using a *different* "id" returns
 // a different SharedObject...
 so3 = SharedObject.getLocal("level1/level2/settings3", "/");
 check(so3 != so);
-xcheck_equals (so3.getSize(), 0);
+check_equals (so3.getSize(), 0);
 
 // Doesn't make much sense to test the rest for SWF5
 #if OUTPUT_VERSION > 5
@@ -193,7 +193,7 @@ check_equals(ret, true);
 newso = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals (typeof(newso), 'object');
 trace(newso.getSize());
-xcheck_equals (newso.getSize(), 297);
+check_equals (newso.getSize(), 297);
 
 if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object, checking data...");
@@ -285,7 +285,7 @@ check_equals(typeof(so4), "object");
 ourPath += "/";
 note ("checking getLocal with path: " + ourPath);
 so4 = SharedObject.getLocal("name", ourPath);
-xcheck_equals(typeof(so4), "null");
+check_equals(typeof(so4), "null");
 
 // Take the last slash off and add a bit of rubbish
 ourPath = ourPath.substr(0, ourPath.lastIndexOf("/"));
