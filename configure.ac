@@ -102,6 +102,10 @@ case "${host}" in
     DEFAULT_FLASH_PLATFORM_ID="OS4"
     DEFAULT_FLASH_SYSTEM_OS="AmigaOS4"
     ;;    
+  *-haiku*)
+    DEFAULT_FLASH_PLATFORM_ID="HAIKU"
+    DEFAULT_FLASH_SYSTEM_OS="Haiku"
+    ;;    
   *)
     DEFAULT_FLASH_PLATFORM_ID="UNK"
     DEFAULT_FLASH_SYSTEM_OS="Unknown"
@@ -171,6 +175,10 @@ case "${host}" in
   *-*amigaos*)
     amigaos4=yes
     AC_DEFINE([AMIGAOS4_HOST], [1], [this is an AmigaOS4 platform])
+    ;;
+  *-*haiku*)
+    haiku=yes
+    AC_DEFINE([HAIKU_HOST], [1], [this is an Haiku platform])
     ;;
 esac
 
@@ -516,6 +524,7 @@ GNASH_PKG_CLASSFILE
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
 
+build_haiku=no
 build_aos4=no                   dnl AmigaOS4 GUI
 build_kde3=no
 build_kde4=no
@@ -595,6 +604,9 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
       aos4|AOS4)
         build_aos4=yes
         ;;
+      haiku|HAIKU)
+        build_haiku=yes
+        ;;
       dump|DUMP)
         build_dump=yes
         ;;
@@ -628,6 +640,14 @@ else
   build_qt4=yes;
 fi
 )
+
+dnl If we're on Haiku, there is only one supported GUI.
+if test x"${haiku}" = xyes; then
+  build_haiku=yes;
+  build_gtk=no;
+  build_kde3=no;
+  build_kde4=no;
+fi
 
 add_renderer=
 build_ogl=no
@@ -664,8 +684,9 @@ dnl         ;;
 add_sound=
 build_sound_sdl=no
 build_sound_ahi=no
+build_sound_mkit=no
 AC_ARG_ENABLE(sound,
-  AC_HELP_STRING([--enable-sound=[[sdl|ahi]]], [Use the specified sound handler (default=sdl)]),
+  AC_HELP_STRING([--enable-sound=[[sdl|ahi|mkit]]], [Use the specified sound handler (default=sdl)]),
      [case "${enableval}" in
       sdl|SDL|Sdl)
         build_sound_sdl=yes
@@ -675,10 +696,21 @@ AC_ARG_ENABLE(sound,
         build_sound_ahi=yes
         add_sound="ahi"
         ;;
+      mkit|MKIT|Mkit)
+        build_sound_mkit=yes
+        add_sound="mkit"
+        ;;
      esac],
   build_sound_sdl=yes
   add_sound=sdl
 )
+
+dnl If we're on Haiku, there is only one supported sound handler.
+if test x"${build_haiku}" = xyes; then
+  build_sound_mkit=yes
+  add_sound="mkit"
+  build_sound_sdl=no
+fi
 
 if test x$build_ogl = xyes; then
   if test x$build_fb = xyes; then
@@ -787,6 +819,12 @@ AC_ARG_ENABLE(media,
   esac],
  [media_handler=gst; media_handler_specified=true]
 )
+
+dnl If we're on Haiku, there is only one supported media handler.
+if test x"${build_haiku}" = xyes; then
+     media_handler=ffmpeg
+     media_handler_specified=true
+fi
 
 AC_ARG_ENABLE(lirc, AC_HELP_STRING([--enable-lirc], [Disable support for Lirc]),
 [case "${enableval}" in
@@ -2072,9 +2110,14 @@ AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
 
 AM_CONDITIONAL(USE_SOUND_SDL, test x$build_sound_sdl = xyes)
 AM_CONDITIONAL(USE_SOUND_AHI, test x$build_sound_ahi = xyes)
+AM_CONDITIONAL(USE_SOUND_MKIT, test x$build_sound_mkit = xyes)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
 AM_CONDITIONAL(USE_GST_ENGINE, test x"$media_handler" = xgst)
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
+
+if test x$build_sound_mkit = xyes; then
+  AC_DEFINE([SOUND_MKIT],  [1], [Use Haiku's Media Kit for sound handling])
+fi
 
 if test x$build_sound_sdl = xyes; then
   AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling])
@@ -2354,6 +2397,9 @@ if test x$build_dump = xyes; then
 fi
 if test x$build_aos4 = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},aos4"
+fi
+if test x$build_haiku = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},haiku"
 fi
 SUPPORTED_GUIS="`echo ${SUPPORTED_GUIS} | sed 's/,//'`" # Strip leading comma
 AC_SUBST(SUPPORTED_GUIS)
