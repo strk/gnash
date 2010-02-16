@@ -16,8 +16,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # 
-# build gtk-gnash, kde-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash, riscos-gnash
-# and dump-gnash
+# build gtk-gnash, kde-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash,
+# riscos-gnash, haiku-gnash and dump-gnash
 #
 
 AUTOMAKE_OPTIONS = -Wno-portability
@@ -58,6 +58,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libmedia/ffmpeg \
 	-I$(top_srcdir)/libmedia/gst \
+	-I$(top_srcdir)/libmedia/haiku \
        -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
@@ -228,6 +229,11 @@ endif
 # Build the AmigaOS4 gui
 if BUILD_AMIGAOS4_GUI
 include $(srcdir)/am-frag/aos4.am
+endif
+
+# Build the Haiku gui
+if BUILD_HAIKU_GUI
+include $(srcdir)/am-frag/haiku.am
 endif
 
 # Build the FLTK gui
