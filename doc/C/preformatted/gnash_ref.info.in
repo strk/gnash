@@ -47,7 +47,7 @@ Software Internals
 * A Tour of Gnash::
 * Sound handling in Gnash::
 * Testing : Testing.
-* Adding New ActionScript Class::
+* Adding New ActionScript Classes::
 
 Reporting Bugs
 
@@ -1634,7 +1634,7 @@ File: gnash_ref.info,  Node: Software Internals,  Next: Reporting Bugs,  Prev: B
 * A Tour of Gnash::
 * Sound handling in Gnash::
 * Testing : Testing.
-* Adding New ActionScript Class::
+* Adding New ActionScript Classes::
 
 
 File: gnash_ref.info,  Node: A Tour of Gnash,  Next: Sound handling in Gnash,  Up: Software Internals
@@ -1643,7 +1643,7 @@ File: gnash_ref.info,  Node: A Tour of Gnash,  Next: Sound handling in Gnash,  U
 ===================
 
 The top level of Gnash has several libraries, _libgnashbase_,
-_libgnashserver_, _libgnashmedia_, _libgnashamf_ and _libgnashbackend_.
+_libgnashcore_, _libgnashmedia_, _libgnashamf_ and _libgnashbackend_.
 There are several utility programs included for debug parsing and
 processing of SWF movie files, and other useful utilities for examining
 local Shared Objects and sniffing LocalConnections.
@@ -1664,15 +1664,16 @@ File: gnash_ref.info,  Node: The Libraries,  Next: The Applications,  Up: A Tour
 * Menu:
 
 * libgnashbase::
-* libgnashserver::
+* libgnashcore::
 * libgnashmedia::
+* libgnashsound::
 * libgnashamf::
 * libgnashbackend::
 * libgnashplugin::
 * libklashpart::
 
 
-File: gnash_ref.info,  Node: libgnashbase,  Next: libgnashserver,  Up: The Libraries
+File: gnash_ref.info,  Node: libgnashbase,  Next: libgnashcore,  Up: The Libraries
 
 3.1.1.1 libgnashbase
 ....................
@@ -1685,31 +1686,39 @@ freed up automatically by the interpreter. Both STL and Boost smart
 pointers are used.
 
 
-File: gnash_ref.info,  Node: libgnashserver,  Next: libgnashmedia,  Prev: libgnashbase,  Up: The Libraries
+File: gnash_ref.info,  Node: libgnashcore,  Next: libgnashmedia,  Prev: libgnashbase,  Up: The Libraries
 
-3.1.1.2 libgnashserver
-......................
+3.1.1.2 libgnashcore
+....................
 
-Libgnashserver is the guts of the interpreter itself. This is where the
-main code for the interpreter lives. Includes in libserver are the two
+Libgnashcore is the guts of the interpreter itself. This is where the
+main code for the interpreter lives. Included in libcore are the two
 support libraries for the parser and the core of the virtual machine.
 
 
-File: gnash_ref.info,  Node: libgnashmedia,  Next: libgnashamf,  Prev: libgnashserver,  Up: The Libraries
+File: gnash_ref.info,  Node: libgnashmedia,  Next: libgnashsound,  Prev: libgnashcore,  Up: The Libraries
 
 3.1.1.3 libgnashmedia
 .....................
 
-Libgnashmedia handles Gnash's audio and video capabilities, dealing
-with streamed video and sound as well as decoding embedded media
-frames. Besides the standard SWF formats FLV, MPEG4, Nellymoser, ADPCM,
-MP3 and RAW, Gnash can decode other formats supports by Gstreamer or
-FFmpeg, including the free OGG container and free codecs.
+Libgnashmedia handles Gnash's decoding of video and audio, including
+both streamed and embedded media.  Besides the standard SWF formats
+FLV, MPEG4, Nellymoser, ADPCM, MP3 and RAW, Gnash can decode other
+formats supports by Gstreamer or FFmpeg, including the free OGG
+container and free codecs.
 
 
-File: gnash_ref.info,  Node: libgnashamf,  Next: libgnashbackend,  Prev: libgnashmedia,  Up: The Libraries
+File: gnash_ref.info,  Node: libgnashsound,  Next: libgnashamf,  Prev: libgnashmedia,  Up: The Libraries
 
-3.1.1.4 libgnashamf
+3.1.1.4 libgnashsound
+.....................
+
+This library handles sound output and manages sound objects.
+
+
+File: gnash_ref.info,  Node: libgnashamf,  Next: libgnashbackend,  Prev: libgnashsound,  Up: The Libraries
+
+3.1.1.5 libgnashamf
 ...................
 
 AMF is the data format used internally by SWF files. This is Gnash's
@@ -1720,7 +1729,7 @@ NetStream class when using thre RTMP streaming network protocol.
 
 File: gnash_ref.info,  Node: libgnashbackend,  Next: libgnashplugin,  Prev: libgnashamf,  Up: The Libraries
 
-3.1.1.5 libgnashbackend
+3.1.1.6 libgnashbackend
 .......................
 
 Libgnashbackend is a library containing the rendering code that glues
@@ -1730,7 +1739,7 @@ Cairo, and AGG.
 
 File: gnash_ref.info,  Node: libgnashplugin,  Next: libklashpart,  Prev: libgnashbackend,  Up: The Libraries
 
-3.1.1.6 libgnashplugin
+3.1.1.7 libgnashplugin
 ......................
 
 Libgnashplugin is the Mozilla/Firefox plugin.
@@ -1738,7 +1747,7 @@ Libgnashplugin is the Mozilla/Firefox plugin.
 
 File: gnash_ref.info,  Node: libklashpart,  Prev: libgnashplugin,  Up: The Libraries
 
-3.1.1.7 libklashpart
+3.1.1.8 libklashpart
 ....................
 
 Libklashpart is the Konqueror plugin.
@@ -1812,7 +1821,6 @@ well integrated into Mozilla based browsers.
 
 * Current Implementation::
 * GUI Support::
-* Mozplugger::
 * Klash::
 
 
@@ -1827,11 +1835,8 @@ having to maintain a separate player to support the plugin. It also
 gets around the other issues that Gnash itself is not thread safe at
 this time.
 
-   As of Jan, 2007, streaming video, ala "YouTube" works, along with
-other video sharing sites.
-
 
-File: gnash_ref.info,  Node: GUI Support,  Next: Mozplugger,  Prev: Current Implementation,  Up: The Plugin
+File: gnash_ref.info,  Node: GUI Support,  Next: Klash,  Prev: Current Implementation,  Up: The Plugin
 
 3.1.3.2 GUI Support
 ...................
@@ -1867,50 +1872,9 @@ mouse button menu that allows the user to control the movie being
 player the same way the existing keyboard commands do.
 
 
-File: gnash_ref.info,  Node: Mozplugger,  Next: Klash,  Prev: GUI Support,  Up: The Plugin
+File: gnash_ref.info,  Node: Klash,  Prev: GUI Support,  Up: The Plugin
 
-3.1.3.3 Mozplugger
-..................
-
-Mozplugger (http://mozplugger.mozdev.org/) is a _Mozilla/Firefox_
-plugin that uses external programs to play video, audio, and other
-multimedia content in the browser. With some support added to the
-external application, it's possible to force the external program to
-use the internal window in the browser where this plugin is supposed to
-display. This enables one to then run the standalone player and display
-its output in the browser.
-
-   While this is not an optimal solution, it does enable one to use
-Gnash as the SWF player when browsing. The main issue appears to be
-that the SWF movie being played doesn't get any mouse or keyboard
-input. That may be a mozplugger configuration issue, however.
-
-   Use of MozPlugger is obsolete now that the Gnash plugin works.
-Still, this may be useful still on some platforms.
-
-   Add this to your _$(HOME)/.mozilla/mozpluggerrc_ file to enable this:
-
-
-     	    application/x-shockwave-flash:swf:Shockwave Gnash
-             nokill embed noisy ignore_errors hidden fill swallow(Gnash) loop: gnash -v "$file" -x $window
-             : gnash -v "$file" -x $window
-
-   Once this is added, you must delete the
-_$(HOME)/.mozilla/firefox/pluginreg.dat_ file to force Firefox to
-register the plugins again. This is an ASCII text file, so if the patch
-has been added correctly, you'll see an entry for _swf_ files after it
-is recreated. You will need to restart Firefox to recreate this file.
-
-   This file is not recreated immediately when restarting Firefox, but
-waits till the first time a plugin is used. You can force creation of
-this file by typing _about:plugins_ into the URL entry of the browser
-window. The output will also contain information about the mozplugger.
-You should see an entry for Gnash now.
-
-
-File: gnash_ref.info,  Node: Klash,  Prev: Mozplugger,  Up: The Plugin
-
-3.1.3.4 Klash
+3.1.3.3 Klash
 .............
 
 Klash is MozPlugger type support for KDE's Konqueror web browser. Klash
@@ -2005,10 +1969,6 @@ log_parse
      at runtime. This is printed at a verbosity level of 1 or more only
      if parser logging is enabled.
 
-log_security
-     Display a message with security related information. This is always
-     printed at a verbosity level of 1 or more.
-
 log_swferror
      This indicates an error in how the binary SWF file was
      constructed, i.e.probably a bug in the tools used to build the SWF
@@ -2018,7 +1978,7 @@ log_swferror
      at runtime. This is printed at a verbosity level of 1 or more only
      if malformed SWF logging is enabled.
 
-void log_aserror
+log_aserror
      This indicates an erroneous actionscript request such as an
      incorrect number of arguments or an invalid argument.  Wrap all
      calls to this function (and other related statements) into an
@@ -2026,6 +1986,10 @@ void log_aserror
      all the overhead at compile time and reduce it at runtime.  This
      is printed at a verbosity level of 1 or more only if AS coding
      error logging is enabled.
+
+log_abc
+     Extremely verbose logging related to AVM2/ABC execution.  This is
+     printed at verbosity level 3.
 
 
 File: gnash_ref.info,  Node: The LogFile Instance,  Prev: Logging System API,  Up: The Message Logging System
@@ -2075,9 +2039,8 @@ File: gnash_ref.info,  Node: Sound handling in Gnash,  Next: Testing,  Prev: A T
 3.2 Sound handling in Gnash
 ===========================
 
-When a SWF-file contains audio Gnash uses its sound handlers to play it.
-At the moment there are two sound handlers, but it is likely that more
-will be made.
+Sound in Gnash is handled by libgnashsound. This library takes care of
+interfacing with a sound handler.
 
    There are two different settings related to sound support:
 _pluginsound_ and _sound_.  This was done in order to allow the plugin
@@ -2091,7 +2054,6 @@ advertisements.
 * Sound playback::
 * The SDL sound backend::
 * The Gstreamer backend::
-* Future audio backends::
 * Detailed description of the Gstreamer backend::
 
 
@@ -2157,7 +2119,7 @@ while its only real disadvantage is that it has to be compiled with MP3
 support, which some Linux distributions will probably not like...
 
 
-File: gnash_ref.info,  Node: The Gstreamer backend,  Next: Future audio backends,  Prev: The SDL sound backend,  Up: Sound handling in Gnash
+File: gnash_ref.info,  Node: The Gstreamer backend,  Next: Detailed description of the Gstreamer backend,  Prev: The SDL sound backend,  Up: Sound handling in Gnash
 
 3.2.5 The Gstreamer backend
 ---------------------------
@@ -2176,20 +2138,9 @@ longer "reply delay" when starting the playback of a sound, and it
 suffers under some bugs in Gstreamer that are yet to be fixed.
 
 
-File: gnash_ref.info,  Node: Future audio backends,  Next: Detailed description of the Gstreamer backend,  Prev: The Gstreamer backend,  Up: Sound handling in Gnash
+File: gnash_ref.info,  Node: Detailed description of the Gstreamer backend,  Prev: The Gstreamer backend,  Up: Sound handling in Gnash
 
-3.2.6 Future audio backends
----------------------------
-
-It would probably be desirable to make more backends in the future,
-either because other and better backend systems are brought to our
-attention, or perhaps because an internal sound handling is better
-suited for embedded platform with limited software installed.
-
-
-File: gnash_ref.info,  Node: Detailed description of the Gstreamer backend,  Prev: Future audio backends,  Up: Sound handling in Gnash
-
-3.2.7 Detailed description of the Gstreamer backend
+3.2.6 Detailed description of the Gstreamer backend
 ---------------------------------------------------
 
 Gstreamer uses pipelines, bins and elements. Pipelines are the main
@@ -2241,7 +2192,7 @@ the adder in rapid succession, which causes to adder to "die" and stop
 the playback.
 
 
-File: gnash_ref.info,  Node: Testing,  Next: Adding New ActionScript Class,  Prev: Sound handling in Gnash,  Up: Software Internals
+File: gnash_ref.info,  Node: Testing,  Next: Adding New ActionScript Classes,  Prev: Sound handling in Gnash,  Up: Software Internals
 
 3.3 Testing
 ===========
@@ -2645,363 +2596,126 @@ implement a Movie tester for it.  Some knowledge about the expected
 behavior suffices.
 
 
-File: gnash_ref.info,  Node: Adding New ActionScript Class,  Prev: Testing,  Up: Software Internals
+File: gnash_ref.info,  Node: Adding New ActionScript Classes,  Prev: Testing,  Up: Software Internals
 
-3.4 Adding New ActionScript Class
-=================================
+3.4 Adding New ActionScript Classes
+===================================
 
-In this document, the term 'ActionScript class' refers to the C++ class
-which is instantiated by Gnash when some ActionScript code instantiates
-a corresponding class.  The C++ class stores instance data and
-implements the methods which are called on the object in the
-ActionScript code.
+An ActionScript 2.0 class refers to two different kinds of objects: a
+genuine class that can be used to construct instances of that class,
+and a simple singleton object. Examples of the simple object classes
+are Mouse and Stage. This chapter is mainly concerned with genuine
+classes.
 
-   Adding a new ActionScript class is relatively simple, but the
-process is complicated by the fact that the interface has evolved over
-time and the current code base represents several different formats.
-This document describes the current interface.  The Boolean class
-should be considered the authoritative example of a modern ActionScript
-class.
-
-   ActionScript classes contain a header file and a C++ implementation.
-The name is usually the name of the class as it is called in the
-ActionScript specifications; for instance _Boolean.cpp_ for the Boolean
-class.
+   A genuine ActionScript 2.0 class comprises a constructor function
+and a prototype object. Classes may have native type information, but
+most do not.
 
 * Menu:
 
 * Prototype::
-* Declaration::
-* Instantiation::
-* Methods::
-* Dynamic Properties::
-* The as_value Object Type::
-* Object ActionScript Class::
+* Constructor::
+* : properties.
 
 
-File: gnash_ref.info,  Node: Prototype,  Next: Declaration,  Up: Adding New ActionScript Class
+File: gnash_ref.info,  Node: Prototype,  Next: Constructor,  Up: Adding New ActionScript Classes
 
 3.4.1 Prototype
 ---------------
 
-In ActionScript, a prototype is a base object which contains all the
-methods that an instantiated object will contain.  In short, it
-contains every part of the class except for the portions dealing with
-the storage of instance data.
+In ActionScript, a prototype is an object that contains all the methods
+that an instantiated object will inherit.
 
-   In Gnash, the prototype of an ActionScript object is implemented as
-an _as_object_.  At startup, the methods and properties of the
-ActionScript class are attached to the _as_object_.  The following
-example demonstrates how methods can be attached:
-
-
-     	static void
-     	attachBooleanInterface(as_object& o) {
-     	  o.init_member("toString", new builtin_function(boolean_tostring));
-     	  o.init_member("valueOf", new builtin_function(boolean_valueof));
-     	}
-
-   Static properties can also be added to the ActionScript prototype
-(dynamic properties (*note Dynamic Properties::) are addressed later).
-They are attached in a similar way:
+   In Gnash, the prototype of an ActionScript class, like all other
+objects, is implemented as an _as_object_.  When the class is
+initialized, the class interface - its inheritable properties - are
+attached to the prototype as_object.  The following example
+demonstrates how methods can be attached:
 
 
-     	o.init_member("myProperty", as_value("HelloWorld"));
+             void
+             attachBooleanInterface(as_object& o)
+             {
+                 Global_as& gl = getGlobal(o);
+                 o.init_member("toString", gl.createFunction(boolean_tostring));
+                 o.init_member("valueOf", gl.createFunction(boolean_valueof));
+             }
 
-   Properties which have been added in this manner can be directly
-accessed in ActionScript code without a function call, as this piece of
-ActionScript code compiled by Ming's _makeswf_ compiler demonstrates:
-
-
-     	// Get the value of the myProperty property
-     	if (node.myProperty == "HelloWorld") {
-     	  trace("MATCHED");
-     	}
+   Classes may also have static properties. These are functions or data
+members attached directly to the class. They do not require an instance
+of the class to be used. These are attached in exactly the same way,
+but attached to the class (that is, the constructor function), not the
+prototype object.
 
 
-File: gnash_ref.info,  Node: Declaration,  Next: Instantiation,  Prev: Prototype,  Up: Adding New ActionScript Class
+File: gnash_ref.info,  Node: Constructor,  Next: properties,  Prev: Prototype,  Up: Adding New ActionScript Classes
 
-3.4.2 Declaration
+3.4.2 Constructor
 -----------------
 
-A new class should derive from _as_object_, which is the base class of
-every ActionScript object in Gnash.
+A constructor function is an ActionScript callback function that is
+called when an instance of a class is created. The "this" object during
+the call is a new object.
+
+   Constructor functions may do tasks such as attaching properties or
+type information to the new object. They may also do absolutely
+nothing. Anything attached to the object during the constructor call is
+an "own property" of the new object, not an inherited property.
+
+   The following examples are valid constructors. A constructor should
+never return anything other than as_value() (an undefined value).
+Exceptions to this rule are the basic types String, Boolean, and
+Number. These have constructor functions that can also be called as
+conversion functions. They have a special implementation that behaves
+differently depending on the calling context.
+
+
+             as_value
+             movieclip_ctor(const fn_call& fn)
+             {
+             }
+
+             as_value
+             class_ctor(const fn_call& fn)
+             {
+                 as_object* this_ptr = ensure<ValidThis>(fn);
+
+                 if (fn.nargs) {
+                     string_table& st = getStringTable(fn);
+                     this_ptr->set_member(st.find("property"), fn.arg(0));
+                 }
+                 return as_value();
+             }
+
+   Native typing is added using a Relay subclass. This only applies to
+a small number of classes. The native typing is added during the
+constructor function using the as_object::setRelay() function. All
+Relay types must inherit from the Relay base class.
+
+   Native typing can be accessed in ActionScript callback functions
+using the ensure<> function template:
+
+
+               as_value
+               boolean_toString(const fn_call& fn)
+               {
+                   // This ensures that the function can only be called as a
+                   // member function of a genuine Boolean_as object.
+                   Boolean_as* b = ensure<IsNativeType<Boolean_as> >(fn);
+
+                   return as_value(b.value());
+               }
 
 
-File: gnash_ref.info,  Node: Instantiation,  Next: Methods,  Prev: Declaration,  Up: Adding New ActionScript Class
-
-3.4.3 Instantiation
--------------------
-
-When a new object is needed, instance data is added to the methods and
-properties inherited from the prototype.
-
-   The init method should be called in the constructor in _Global.cpp_,
-where all other ActionScript classes are similarly referenced. This
-method constructs a prototype, which is implemented as an _as_object_.
-In addition, the method registers the constructor to be used for future
-object creation, and attaches methods and properties to the prototype.
-
-
-File: gnash_ref.info,  Node: Methods,  Next: Dynamic Properties,  Prev: Instantiation,  Up: Adding New ActionScript Class
-
-3.4.4 Methods
--------------
-
-Every method you implement and attach (*note Prototype::) will receive
-an _fn_call_ data structure as an argument when it is called.
-
-* Menu:
-
-* Accessing Arguments::
-* Returning a Value to ActionScript::
-* Additional fn_call Members::
-
-
-File: gnash_ref.info,  Node: Accessing Arguments,  Next: Returning a Value to ActionScript,  Up: Methods
-
-3.4.4.1 Accessing Arguments
-...........................
-
-The arguments stored in _fn_call_ should be accessed using _arg()_.  For
-instance, the first element can be popped with _fn.arg(0)_.
-
-   The element popped off the stack is an _as_value_ object (*note The
-as_value Object Type::).
-
-
-File: gnash_ref.info,  Node: Returning a Value to ActionScript,  Next: Additional fn_call Members,  Prev: Accessing Arguments,  Up: Methods
-
-3.4.4.2 Returning a Value to ActionScript
-.........................................
-
-The return value should be an _as_value_ object (*note The as_value
-Object Type::).  For example:
-
-
-     	  return as_value('Goodbye, cruel world.');
-
-
-File: gnash_ref.info,  Node: Additional fn_call Members,  Prev: Returning a Value to ActionScript,  Up: Methods
-
-3.4.4.3 Additional fn_call Members
-..................................
-
-There are two other useful members of the _fn_call_ structure, namely
-_this_ptr_ and _nargs_.  The former points to the class which is
-invoking this method, while the latter is a count of the number of
-arguments in the stack (*note Accessing Arguments::).
-
-   You may also see instances of the _env_ pointer being used.   This
-is being deprecated.  Instances which could be replaced with _arg()_
-(*note Accessing Arguments::) are already deprecated; other uses will
-be deprecated in the near future.
-
-   Beyond the _arg() (*note Accessing Arguments::)_ method, there is
-one method of note.  _dump_args()_ can be used in debugging to output
-the entire argument stack.
-
-
-File: gnash_ref.info,  Node: Dynamic Properties,  Next: The as_value Object Type,  Prev: Methods,  Up: Adding New ActionScript Class
-
-3.4.5 Dynamic Properties
-------------------------
-
-This section describes accessors to dynamic properties.  Read-only
-properties are described in the prototype (*note Prototype::) section.
-
-   Accessors should be written as a single get/set method.  Previously
-this was done by overriding _get_member()_ and _set_member()_, but this
-practice is deprecated.
-
-   The accessor is written so that it sets the property if it is called
-with an argument, and puts the property in the _fn_call_ (*note
-Methods::) result pointer (*note Returning a Value to ActionScript::).
-For instance:
-
-
-     	void
-     	MyClass::myProperty_getset(const fn_call& fn) {
-     	  boost::intrusive_ptr<MyClass> ptr = ensureType<MyClass>(fn.this_ptr);
-
-     	  // setter
-     	  if ( fn.nargs > 0 ) {
-     	    bool h = fn.arg(0).to_bool();
-     	    ptr->MyMethod(h);
-     	    return;
-     	   }
-
-     	  // getter
-     	  bool h = ptr->MyMethod();
-     	  fn.result->set_bool(h);
-     	}
-
-   It has not yet been decided whether properties should be set in the
-exported interface (*note Prototype::) or attached to instances of the
-class.  A property is attached in the following manner:
-
-
-     	boost::intrusive_ptr<builtin_function> gettersetter;
-     	gettersetter = new builtin_function(&MyClass::myProperty_getset, NULL);
-     	o.init_property("myProperty", *gettersetter, *gettersetter);
-
-
-File: gnash_ref.info,  Node: The as_value Object Type,  Next: Object ActionScript Class,  Prev: Dynamic Properties,  Up: Adding New ActionScript Class
-
-3.4.6 The as_value Object Type
-------------------------------
-
-The _as_value_ class is used throughout the interpreter to create
-generic objects to hold data.
-
-* Menu:
-
-* Data Types::
-* Determining the Type::
-* Fetching the Value::
-* Setting the Value and Type::
-* Further Reading::
-
-
-File: gnash_ref.info,  Node: Data Types,  Next: Determining the Type,  Up: The as_value Object Type
-
-3.4.6.1 Data Types
-..................
-
-The following data types are supported: _NULLTYPE_, _BOOLEAN_, _STRING_,
-_NUMBER_, _OBJECT_, _AS_FUNCTION_, and _MOVIECLIP_ (sprite).  The type
-_C_FUNCTION_ is being deprecated.
-
-
-File: gnash_ref.info,  Node: Determining the Type,  Next: Fetching the Value,  Prev: Data Types,  Up: The as_value Object Type
-
-3.4.6.2 Determining the Type
-............................
-
-Several methods allow you to determine if a value stored in _as_value_
-is of a specific type.  These follow the form of _is_TYPE_, for example
-_is_as_function()_ and _is_number()_.  In general, the type names match
-the data types (*note Data Types::) listed above, with the exception of
-the type _MOVIECLIP_ which has a method _is_sprite()_.
-
-
-File: gnash_ref.info,  Node: Fetching the Value,  Next: Setting the Value and Type,  Prev: Determining the Type,  Up: The as_value Object Type
-
-3.4.6.3 Fetching the Value
-..........................
-
-Another set of methods will return a representation of the value as a
-particular type.  They follow the _to_TYPE_ naming convention.  Examples
-are _to_number()_ and _to_bool()_.  The type names are as listed (*note
-Data Types::) earlier, except for _MOVIECLIP_, which uses _to_sprite()_.
-
-
-File: gnash_ref.info,  Node: Setting the Value and Type,  Next: Further Reading,  Prev: Fetching the Value,  Up: The as_value Object Type
-
-3.4.6.4 Setting the Value and Type
-..................................
-
-Finally, there is the _set_TYPE_ series of methods.  They change the
-type to the type specified in the method name, and set the value to the
-one given as an argument.  It is also possible to accomplish the same
-thing with the _=_ operator.  Again, type names match those named
-earlier (*note Data Types::), except in the case of _MOVIECLASS_.  Its
-method is called _set_sprite()_.
-
-
-File: gnash_ref.info,  Node: Further Reading,  Prev: Setting the Value and Type,  Up: The as_value Object Type
-
-3.4.6.5 Further Reading
-.......................
-
-Please refer to _as_value.h_ or the Doxygen documentation (see
-'Processing The Documentation' in the Gnash manual for instructions on
-generating documents with Doxygen) for more information about which
-methods are available for the _as_value_ object.
-
-
-File: gnash_ref.info,  Node: Object ActionScript Class,  Prev: The as_value Object Type,  Up: Adding New ActionScript Class
-
-3.4.7 Object ActionScript Class
--------------------------------
-
-This class implements an Object object.
-
-* Menu:
-
-* The Methods of the Class::
-* The Properties of the Object Class::
-* Object Class Conformance::
-
-
-File: gnash_ref.info,  Node: The Methods of the Class,  Next: The Properties of the Object Class,  Up: Object ActionScript Class
-
-3.4.7.1 The Methods of the Class
-................................
-
-addProperty()
-
-registerClass()
-
-toString()
-
-unwatch()
-
-valueOf()
-
-watch()
-
-Sharedclear()
-
-Sharedflush()
-
-SharedgetLocal()
-
-SharedgetSize()
-
-
-File: gnash_ref.info,  Node: The Properties of the Object Class,  Next: Object Class Conformance,  Prev: The Methods of the Class,  Up: Object ActionScript Class
-
-3.4.7.2 The Properties of the Object Class
-..........................................
-
-constructor
-
-__proto__
-
-__resolve
-
-Shareddata
-
-SharedonStatus
-
-
-File: gnash_ref.info,  Node: Object Class Conformance,  Prev: The Properties of the Object Class,  Up: Object ActionScript Class
-
-3.4.7.3 Object Class Conformance
-................................
-
-Class Name                           Conformance
-addProperty()                         This method has an unknown status.
-registerClass()                       This method has an unknown status.
-toString()                            This method has an unknown status.
-unwatch()                             This method has an unknown status.
-valueOf()                             This method has an unknown status.
-watch()                               This method has an unknown status.
-Sharedclear()                         This method has an unknown status.
-Sharedflush()                         This method has an unknown status.
-SharedgetLocal()                      This method has an unknown status.
-SharedgetSize()                       This method has an unknown status.
-constructor                           This property has an unknown
-                                     status.
-__proto__                             This property has an unknown
-                                     status.
-__resolve                             This property has an unknown
-                                     status.
-Shareddata                            This property has an unknown
-                                     status.
-SharedonStatus                        This property has an unknown
-                                     status.
+File: gnash_ref.info,  Node: properties,  Prev: Constructor,  Up: Adding New ActionScript Classes
+
+3.4.3
+-----
+
+There are three kinds of property: simple data members, functions, and
+getter-setters.  All three kinds may be inherited. Getter-setters are
+attached using the init_property() function. Functions and data members
+using the init_member() function.
 
 
 File: gnash_ref.info,  Node: Reporting Bugs,  Next: Gnash Extensions,  Prev: Software Internals,  Up: Top
@@ -3110,42 +2824,21 @@ File: gnash_ref.info,  Node: Gnash Extensions,  Next: RTMP Protocol,  Prev: Repo
 5 Gnash Extensions
 ******************
 
-Gnash supports extending the SWF specification by creating custom
-ActionScript classes that are compiled code, as opposed to the existing
-method of defining custom classes as ActionScript. Executing compiled
-code has many performance benefits over having to interpret the byte
-stream of the ActionScript opcodes.
+Gnash supports the creation of custom extensions to ActionScript. This
+allows you to integrate any conceivable system or library function into
+ActionScript execution.
 
-   I can already hear people complaining now about the concept of
-extending SWF, so this in no way affects Gnash's ability to play SWF
-movies when functioning as a browser plugin.  Gnash's goal is still to
-function in a way that is compatible with the current proprietary Flash
-player.
+   Extensions do not represent a general alteration of the ActionScript
+language. They are designed to allow Gnash to be more flexible and
+powerful where it is required. They allow you to customize Gnash for
+your own purposes and to distribute those changes to other users who
+need them. They are not intended for use in normal SWF execution or
+internet browsing, but rather for executing SWFs designed to use those
+extensions under controlled conditions.
 
-   But at the same time, we see SWF as the ideal scripting language for
-a digital multi-media streaming environment. There are many resources
-for SWF movie creators for widgets, higher level APIs, all sorts of
-desirable things. But for those of use committed to using free software
-tools for SWF, our options are very limited.
-
-   Rather than launching a multi-year project to duplicate all classes
-in the commercial Flash IDE, it's much more efficient to use existing
-development libraries much like Python or Perl do. The extension
-mechanism in Gnash allows wrappers to be created for any C or C++
-development library. Unlike the proprietary Flash IDE, which compiles
-all the extension libraries into byte codes from ActionScript, the
-support is moved to the player side. Movies with all of the goodies of
-the proprietary IDE in them play in Gnash just fine, as it's all just
-byte codes by then.
-
-   This trick works because until SWF version 9, all the ActionScript
-class names and methods are passed as ASCII strings into the SWF movie.
-So the Gnash Virtual Machine just loads the extension file if that
-class name is invoked in the movie. All extension files specify the
-class name and methods it implements in an identical style as adding
-any new ActionScript class. The advantage is the class itself is
-compiled code, and runs much faster than the equivalent byte codes
-which all have to be interpreted..
+   Some extensions are distributed with Gnash, mainly to serve as an
+example. Extensions are not enabled by default, both for security and
+compatibility reasons.
 
 * Menu:
 
@@ -3159,32 +2852,28 @@ File: gnash_ref.info,  Node: Creating A New Extension,  Next: Debugging An Exten
 5.1 Creating A New Extension
 ============================
 
-Each new extension should live in it's own directory. The extensions
+Each new extension should live in its own directory. The extensions
 included in Gnash are all in the _gnash/extensions_ directory. Creating
 an extension requires a Makefile.am,
 
    If you are adding this extension to the Gnash source tree itself,
-then you need to make two changes to add the new extension.
-
-   The first change is to add the directory to the list in
-extensions/Makefile.am. This can be done either by adding the new
-directory to the SUBDIRS setting, or by wrapping it in a conditional
-test.
-
-   The other change is to add it to the AC_OUTPUT list in
-_configure.ac_ so the new directory will be configured along with the
-rest of Gnash.
+then you need to make two changes to add the new extension.  The first
+change is to add the directory to the list in extensions/Makefile.am.
+This can be done either by adding the new directory to the SUBDIRS
+setting, or by wrapping it in a conditional test.  The other change is
+to add it to the AC_OUTPUT list in _configure.ac_ so the new directory
+will be configured along with the rest of Gnash.
 
    Each extension should have an ActionScript source file included that
 tests the new class, and this file should be referenced in the new
 Makefile.am in the _check_PROGRAMS_ variable so that "make check" works.
 
    When creating an extension that is a wrapper for an existing
-development library API, it's often better to make this a thin layer,
+development library API, it's often better to make this a thin layer
 than to get carried away with creating beautiful abstractions.
 Higher-level classes that offer a lot of new functionality are fine,
-but is different than wrapping a library so it can be used from within
-Gnash.
+but this is different from wrapping a library so it can be used from
+within Gnash.
 
 * Menu:
 
@@ -3196,117 +2885,252 @@ File: gnash_ref.info,  Node: Crafting an Extension,  Up: Creating A New Extensio
 5.1.1 Crafting an Extension
 ---------------------------
 
-All extensions have the same requirements, namely setting up a few
-defined function callbacks, which the Gnash VM then uses to do the
-right thing. The initial two function callbacks are for handling the
-interface of the newly created object so that Gnash can find and use it.
+An extension defines a built-in type of ActionScript object.  An
+ActionScript object may have native type information known as a Relay.
+This adds an extra layer of complexity and runtime cost, so avoid using
+it unless necessary.
 
-   The first function is commonly called _attachInterface_, and this
-sets the other function callbacks for all the methods this class
-supports. The method callbacks are attached to the parent class by
-using _init_member()_ to set a C function pointer to the string value
-used in the SWF movie.
-
-
-     	// Attach DummyClass 'func1' and 'func2' methods to the given object
-     	static void
-     	attachInterface(as_object& obj) {
-                 obj.init_member("func1", &ext_func1);
-                 obj.init_member("func2", &ext_func2);
-     	}
-
-   The second function is commonly called _getInterface()_, and this
-returns a pointer to a static prototype of the class.  Gnash uses
-garbage collection for ActionScript objects so you need to register the
-static with the VM to give it a chance to be marked as reachable.
+   ActionScript classes consist of a constructor function and a
+prototype object. The constructor function is called when an instance
+of your extension class is created. The prototype object contains the
+properties inherited by instances of the extension class. To create an
+extension class, you must provide an entry function with the following
+signature:
 
 
-     	static as_object*
-     	getInterface()
-     	{
-     	    static boost::intrusive_ptr<as_object> o;
-     	    if (o == NULL) {
-     	        o = new as_object();
-                     VM::get().addStatic(o);
-                     attachInterface(*o);
-     	    }
-     	    return o.get();
-     	}
+     	      void extension_init(as_object& where, const ObjectURI& uri);
 
-   This is the callback that gets executed when constructing a new
-object for the VM. In this example we'll assume the new ActionScript
-class is called _DummyExt_, and has two methods, _func1_ and _func2_.
+   This will be called during initialization. The first argument is the
+object to which your class will be attached. For extensions, this is
+the Global object, known as _global in ActionScript 2.0.  The second
+argument is ignored for extension classes.
+
+   Our extension class will imaginatively be called "Extension". Our
+extension_init function takes care of attaching the prototype and
+constructor function to the passed object object. One way to do this is
+as follows:
 
 
-     	static as_value
-     	dummyext_ctor(const fn_call& fn)
-     	{
-     	    DummyExt *obj = new DummyExt(); // will setup prototypes
+               void
+               extension_init(as_object& where, const ObjectURI& uri)
+               {
+                   // Get a reference to the global object.
+                   Global_as& gl = getGlobal(where);
 
-     	    return as_value(obj);
-     	}
+                   // Create a prototype object
+                   as_object* proto = gl.createObject();
 
-   The trick for the above simple constructor to work is that class
-appartenence is setup in the C++ DummyExt constructor itself, which
-should derive from as_object and construct the base passing it the
-interface (prototype) of it's class.
+                   // Create the class
+                   as_object* cl = gl.createClass(&extension_ctor, proto);
 
+                   // Attach the class's functions to the prototype object.
+                   attachInterface(*proto);
 
-     	class DummyExt : public as_object
-             {
-             public:
-     	    DummyExt()
-                     :
-                     as_object(getInterface()) // returns the static prototype
-                 {}
+                   // Attach static properties to the class itself
+                   attachStaticInterface(*cl);
 
-     	};
+                   // Attach the class to the passed object.
+                   where.init_member("Extension", cl);
+               }
 
-   Initialize the extension. This is looked for by the extension
-handling code in each extension, and is executed when the extension is
-loaded. This is the main entry point into the extension. This function
-can be found because the prefix of _dummyext_, which also matches the
-file name of the extension. Gnash uses the name of the extension file
-itself when looking for the init function.
+   You will notice three functions in the example above that need
+definition. The first two are attachInterface() and
+attachStaticInterface(). This is a convention in Gnash to separate
+ActionScript interface creation from the registration of our Extension
+class. We will see why this is useful later. The attachInterface
+function may be defined as follows:
 
 
-             extern "C" {
-     	    void
-     	    dummyext_class_init(as_object &obj)
-     	    {
-     	        static builtin_function* cl=NULL;
-     	        if (!cl)
-                     {
-                         // Create a builtin function using the given constructor
-                         // to instanciate objects and exporting the given interface
-     	            cl = new builtin_function(&dummyext_ctor, getInterface());
-     	            VM::get().addStatic(cl); // will forbid to collect the class
-     	        }
+               void
+               attachInterface(as_object& obj)
+               {
+                   Global_as& gl = getGlobal(obj);
+                   obj.init_member("ext1", gl.createFunction(&extension_ext1));
+               }
 
-     		obj.init_member("DummyExt", cl);
-     	    }
-             } // end of extern C
+   This attaches a function called ext1 to the Extension class
+prototype. When ext1 is called in ActionScript, Gnash will execute the
+C++ function named extension_ext1. This is known as a ActionScript
+callback function and must have the correct signature.  We will deal
+with this next. The member function function will be inherited by all
+instances of Extension.
 
-   The callbacks are all C functions. Like all the other code that
-implements ActionScript, parameters to the function are passed in using
-the _fn_call_ data structure. The return code, if any, is also returned
-using this data structure. _this_ptr_ is the object that the method is
-a member of.
+   The attachStaticInterface() function looks identical:
 
 
-     	// Creates a new button with the label as the text.
-     	as_value func1(const fn_call& fn) {
-                 // Following line will ensure 'func1' is called for a DummyExt instance,
-                 // or would throw an exception which should behave as if we returned the
-                 // undefined value.
-                 boost::intrusive_ptr<DummyExt> ptr = ensureType<DummyExt>(fn.this_ptr);
+               void
+               attachStaticInterface(as_object& obj)
+               {
+                   Global_as& gl = getGlobal(obj);
+                   obj.init_member("static1", gl.createFunction(&extension_static1));
+               }
 
-     	    if (fn.nargs > 0) {
-     	        std::string label = fn.arg(0).to_string();
-     		bool ret = ptr->dummy_text_label(label);
-     		return as_value(ret);
-     	    }
-     	}
+   This does exactly the same as the previous function, but it attaches
+"static" properties to the class. Such functions can be called
+directly, that is, without requiring an instance of Extension:
+
+
+               Extension.static();
+
+   The other undefined function is extension_ctor. Like extension_ext1,
+this is an ActionScript callback function. Such functions have the
+signature:
+
+
+               as_value extension_ctor(const fn_call& fn);
+
+   The fn_call type contains information about the ActionScript function
+call, including the number of arguments, the "this" object (if
+present), the VM and the Global object. With one small exception, the
+constructor function extension_ctor, and the ext1 function
+implementation, extension_ext1, do the same thing.
+
+   The function extension_static is the simplest function. A possible
+implementation is as follows:
+
+
+               as_value
+               extension_static(const fn_call& fn)
+               {
+                   // Reject any calls with no arguments. We must ensure that
+                   // we do not access out-of-range arguments.
+                   if (!fn.nargs) return as_value();
+
+                   // Convert the first argument to a double.
+                   const double d = fn.arg(0).to_number();
+
+                   // This is the return value of the function.
+                   return as_value(d * 6);
+               }
+
+   The member function implementation extension_ext1 is barely more
+complex. It could look like this:
+
+
+               as_value extension_ext1(const fn_call& fn)
+               {
+                   // This ensures that the function can only be called as a
+                   // member function of an object. If not, execution of the
+                   // function ends at this point.
+                   as_object* this_ptr = ensure<ValidThis>(fn);
+
+                   // Reject any calls with no arguments.
+                   if (!fn.nargs) return as_value();
+
+                   const as_value& arg0 = fn.arg(0);
+
+                   // The string table manages all strings; we refer to strings
+                   // by their index in the table.
+                   string_table& st = getStringTable(fn);
+
+                   // Set a member named "property" on the object to the value of
+                   // the first argument.
+                   this_ptr->set_member(st.find("property"), arg0);
+
+                   // This is the return value of the function.
+                   return as_value("return value");
+               }
+
+   It is not a very useful function. In ActionScript, this definition
+will have the following effect:
+
+
+               var e = new Extension();
+               var i = e.ext1(8);
+               trace(e.property) // traces "8"
+               trace(i) // traces "return value"
+
+   The constructor function is very similar, but has a different
+purpose. When the actionscript "new Extension" is called, this
+extension_ctor function will be called with a newly-created object as
+the "this" object. Its job is to attach properties to the "this"
+object. Unlike the class prototype's propertes that we attached in the
+attachInterface function, any properties attached here belong directly
+to the new object.
+
+
+               as_value
+               extension_ctor(const fn_call& fn)
+               {
+                   // When called as a constructor, there is always a "this" object
+                   as_object* this_ptr = ensure<ValidThis>(fn);
+
+                   // The init_member function will never replace an existing
+                   // property.
+                   this_ptr->init_member("myProperty", true);
+
+                   // A constructor function must not return anything.
+                   return as_value();
+               }
+
+   You may not want to do anything in your constructor. It is perfectly
+valid to use the following as a constructor function (and indeed this
+is recommended unless you need more complex behaviour):
+
+
+               as_value extension_ctor(const fn_call& fn)
+               {
+               }
+
+   If you have defined all the callback functions in the way described
+above, you can simplify the class registration. Gnash provides a
+convenience function to register a built-in class. In this case, your
+entry function would look like this:
+
+
+               void
+               extension_init(as_object& where, const ObjectURI& uri)
+               {
+                   string_table& st = getStringTable(where);
+                   registerBuiltinClass(where, extension_ctor, attachInterface,
+                       0, st.find("Extension"));
+               }
+
+   For more advanced extensions, you may want to store extra information
+in an object. You can do this using a Relay. This imposes type
+restrictions when using the object in ActionScript. A Relay is a C++
+class that could look like this:
+
+
+               #include "Relay.h"
+               #include <complex>
+
+               class Complex : public Relay
+               {
+               public:
+                   typedef std::complex<double> type;
+                   Complex(type c = type()) : _c(c) {}
+                   type _c;
+               };
+
+   Using this Relay involves two steps: attaching it, and accessing it.
+Relays must be attached in the constructor:
+
+
+               as_value extension_ctor(const fn_call& fn)
+               {
+                   as_object* this_ptr = ensure<ValidThis>(fn);
+                   this_ptr->setRelay(new Complex())
+               }
+
+   To access this information in ActionScript callback functions, we
+must ensure that the object has the correct type of Relay attached.  A
+toString function (which must also be attached to the prototype!)
+could look like this:
+
+
+               as_value
+               extension_toString(const fn_call& fn)
+               {
+                   // This ensures that the function can only be called as a
+                   // member function of a genuine Complex object.
+                   Complex* c = ensure<IsNativeType<Complex> >(fn);
+
+                   std::ostringstream s;
+                   s << "real:" << c.real() << ",imag: << c.imag();
+                   // This is the return value of the function.
+                   return as_value(s.str());
+               }
 
 
 File: gnash_ref.info,  Node: Debugging An Extension,  Next: Included Extensions,  Prev: Creating A New Extension,  Up: Gnash Extensions
@@ -3314,31 +3138,10 @@ File: gnash_ref.info,  Node: Debugging An Extension,  Next: Included Extensions,
 5.2 Debugging An Extension
 ==========================
 
-As extensions are loaded dynamically at runtime, debugging one can be
-difficult. You can use GDB, but you have the problem of not being able
-to set a breakpoint in Gnash until _after_ the extension has been
-loaded into Gnash's VM. The easy solution is to use the Gnash debugger.
-
-   You can insert these few lines in any file that you wish to manually
-start the debugger. Once at the console, you can attach GDB to the
-process. Then you can set breakpoints, etc... and you are at the point
-of execution where the console was started. To then continue playing
-the movie, type the _c_ (for continue) command to the Gnash console.
-
-
-           // Get the debugger instance
-           static Debugger& debugger = Debugger::getDefaultInstance();
-
-           // Enable the debugger
-           debugger.enabled(true);
-           // Stop and drop into a console
-           debugger.console();
-
-   You can also resort to the time honored technique of creating a loop
-before the point you want to set a breakpoint for. Gnash will stop
-playing the movie at this point, and then you can externally attach GDB
-to the running process, or type _^C_ to drop into the GDB command
-console.
+You can resort to the time honored technique of creating a loop before
+the point you want to set a breakpoint for. Gnash will stop playing the
+movie at this point, and then you can externally attach GDB to the
+running process, or type _^C_ to drop into the GDB command console.
 
 
            bool stall = true;
@@ -3527,6 +3330,8 @@ tunnel RTMP over an HTTP connection using port 80. Each AMF packet is
 
    The basics of the RTMP protocol are as follows. All communications
 are initiated by the client.
+
+Image of the RTMP protocol.
 
    The client starts the RTMP connection by sending a single byte with
 a value of 0x3. This byte is followed by a data block of 1536 bytes.
@@ -4581,142 +4386,126 @@ software.
 
 Tag Table:
 Node: Top168
-Node: Introduction1998
-Node: Audience2803
-Node: What Is Supported?3130
-Node: Building from Source5637
-Node: Overview6017
-Node: Getting The Source7159
-Node: Releases7365
-Node: Bzr Access7733
-Node: Code Dependencies8482
-Ref: Code Dependency Table9181
-Node: Testing Dependencies35154
-Ref: Testing Dependency Table35463
-Node: Documentation Dependencies39387
-Ref: Documentation Dependency Table39656
-Node: Configuring Gnash48724
-Node: Features51018
-Ref: Configuration Options - Features51618
-Node: Specifying Custom Paths58693
-Ref: Custom Path Options59163
-Node: Compiling the Code70910
-Node: Creating the Documentation71851
-Node: Running the Tests73197
-Node: Using DejaGnu73651
-Node: Increasing Verbosity74014
-Node: Running Some Tests74550
-Node: Running The Tests Manually75370
-Node: Movie tests76032
-Node: ActionScript Unit Tests76382
-Node: Installation76699
-Node: Libraries78012
-Node: Executables78868
-Node: Documentation79738
-Node: Cross Configuring80493
-Node: Software Internals83573
-Node: A Tour of Gnash83842
-Node: The Libraries84408
-Node: libgnashbase84678
-Node: libgnashserver85105
-Node: libgnashmedia85476
-Node: libgnashamf85963
-Node: libgnashbackend86385
-Node: libgnashplugin86700
-Node: libklashpart86906
-Node: The Applications87076
-Node: The Standalone Player87444
-Node: Gprocessor87741
-Node: SOLdumper88133
-Node: Dumpshm88400
-Node: The Plugin88619
-Node: Current Implementation89109
-Node: GUI Support89650
-Node: Mozplugger91339
-Node: Klash93226
-Node: The Message Logging System93776
-Node: Logging System API95333
-Node: The LogFile Instance98167
-Node: Sound handling in Gnash99651
-Node: Sound types100394
-Node: Sound parsing100931
-Node: Sound playback101499
-Node: The SDL sound backend102029
-Node: The Gstreamer backend103330
-Node: Future audio backends104346
-Node: Detailed description of the Gstreamer backend104836
-Node: Testing107087
-Node: Testing Tools107558
-Node: Test Cases108388
-Node: Writing ActionScript Tests108967
-Node: Writing Ming-based self-contained SWF tests111468
-Node: Using Ming-based test generators facilities112625
-Node: Writing self-contained SWF tests with other compilers114985
-Node: Writing Test Runners118110
-Node: Using the generic test runner for self-contained SWF tests119859
-Node: Writing Movie testers121949
-Node: Adding New ActionScript Class123689
-Node: Prototype124869
-Node: Declaration126286
-Node: Instantiation126551
-Node: Methods127178
-Node: Accessing Arguments127569
-Node: Returning a Value to ActionScript127965
-Node: Additional fn_call Members128344
-Node: Dynamic Properties129198
-Node: The as_value Object Type130703
-Node: Data Types131141
-Node: Determining the Type131462
-Node: Fetching the Value131994
-Node: Setting the Value and Type132484
-Node: Further Reading133078
-Node: Object ActionScript Class133493
-Node: The Methods of the Class133833
-Node: The Properties of the Object Class134172
-Node: Object Class Conformance134487
-Node: Reporting Bugs136026
-Node: Get a Fresh Binary Package137009
-Node: Determine if the bug was previously reported137795
-Node: Review the bug writing guidelines138613
-Node: Filing a bug report139664
-Node: Gnash Extensions139947
-Node: Creating A New Extension142194
-Node: Crafting an Extension143612
-Node: Debugging An Extension147914
-Node: Included Extensions149604
-Node: Gtk Extension150048
-Node: File I/O Extension151035
-Node: MySQL Extension152221
-Node: RTMP Protocol153072
-Node: AMF Format162811
-Node: Mozilla/Firefox NPAPI Plugin163781
-Node: Plugin C API164799
-Node: Plugin C++ API166658
-Node: OpenGL and Threads169922
-Node: Plugin Event Handling171250
-Node: Appendix172219
-Node: Code Style172371
-Node: Authors176201
-Node: GNU Free Documentation License176910
-Node: 0_ PREAMBLE177673
-Node: 1_ APPLICABILITY AND DEFINITIONS178979
-Ref: fdl-document179204
-Ref: fdl-modified179495
-Ref: fdl-secondary179682
-Ref: fdl-invariant180327
-Ref: fdl-cover-texts180576
-Ref: fdl-transparent180789
-Ref: fdl-title-page182079
-Node: 2_ VERBATIM COPYING182468
-Node: 3_ COPYING IN QUANTITY183448
-Node: 4_ MODIFICATIONS185805
-Node: 5_ COMBINING DOCUMENTS191865
-Node: 6_ COLLECTIONS OF DOCUMENTS193362
-Node: 7_ AGGREGATION WITH INDEPENDENT WORKS194253
-Node: 8_ TRANSLATION195481
-Node: 9_ TERMINATION196384
-Node: 10_ FUTURE REVISIONS OF THIS LICENSE197039
-Node: Addendum198179
+Node: Introduction2000
+Node: Audience2805
+Node: What Is Supported?3132
+Node: Building from Source5639
+Node: Overview6019
+Node: Getting The Source7161
+Node: Releases7367
+Node: Bzr Access7735
+Node: Code Dependencies8484
+Ref: Code Dependency Table9183
+Node: Testing Dependencies35156
+Ref: Testing Dependency Table35465
+Node: Documentation Dependencies39389
+Ref: Documentation Dependency Table39658
+Node: Configuring Gnash48726
+Node: Features51020
+Ref: Configuration Options - Features51620
+Node: Specifying Custom Paths58695
+Ref: Custom Path Options59165
+Node: Compiling the Code70912
+Node: Creating the Documentation71853
+Node: Running the Tests73199
+Node: Using DejaGnu73653
+Node: Increasing Verbosity74016
+Node: Running Some Tests74552
+Node: Running The Tests Manually75372
+Node: Movie tests76034
+Node: ActionScript Unit Tests76384
+Node: Installation76701
+Node: Libraries78014
+Node: Executables78870
+Node: Documentation79740
+Node: Cross Configuring80495
+Node: Software Internals83575
+Node: A Tour of Gnash83846
+Node: The Libraries84410
+Node: libgnashbase84696
+Node: libgnashcore85121
+Node: libgnashmedia85482
+Node: libgnashsound85932
+Node: libgnashamf86147
+Node: libgnashbackend86569
+Node: libgnashplugin86884
+Node: libklashpart87090
+Node: The Applications87260
+Node: The Standalone Player87628
+Node: Gprocessor87925
+Node: SOLdumper88317
+Node: Dumpshm88584
+Node: The Plugin88803
+Node: Current Implementation89278
+Node: GUI Support89722
+Node: Klash91406
+Node: The Message Logging System91957
+Node: Logging System API93514
+Node: The LogFile Instance96323
+Node: Sound handling in Gnash97807
+Node: Sound types98471
+Node: Sound parsing99008
+Node: Sound playback99576
+Node: The SDL sound backend100106
+Node: The Gstreamer backend101407
+Node: Detailed description of the Gstreamer backend102447
+Node: Testing104698
+Node: Testing Tools105171
+Node: Test Cases106001
+Node: Writing ActionScript Tests106580
+Node: Writing Ming-based self-contained SWF tests109081
+Node: Using Ming-based test generators facilities110238
+Node: Writing self-contained SWF tests with other compilers112598
+Node: Writing Test Runners115723
+Node: Using the generic test runner for self-contained SWF tests117472
+Node: Writing Movie testers119562
+Node: Adding New ActionScript Classes121302
+Node: Prototype121974
+Node: Constructor123133
+Node: properties125340
+Node: Reporting Bugs125702
+Node: Get a Fresh Binary Package126685
+Node: Determine if the bug was previously reported127471
+Node: Review the bug writing guidelines128289
+Node: Filing a bug report129340
+Node: Gnash Extensions129623
+Node: Creating A New Extension130644
+Node: Crafting an Extension132059
+Node: Debugging An Extension141688
+Node: Included Extensions142484
+Node: Gtk Extension142928
+Node: File I/O Extension143915
+Node: MySQL Extension145101
+Node: RTMP Protocol145952
+Node: AMF Format155720
+Node: Mozilla/Firefox NPAPI Plugin156690
+Node: Plugin C API157708
+Node: Plugin C++ API159567
+Node: OpenGL and Threads162831
+Node: Plugin Event Handling164159
+Node: Appendix165128
+Node: Code Style165280
+Node: Authors169110
+Node: GNU Free Documentation License169819
+Node: 0_ PREAMBLE170582
+Node: 1_ APPLICABILITY AND DEFINITIONS171888
+Ref: fdl-document172113
+Ref: fdl-modified172404
+Ref: fdl-secondary172591
+Ref: fdl-invariant173236
+Ref: fdl-cover-texts173485
+Ref: fdl-transparent173698
+Ref: fdl-title-page174988
+Node: 2_ VERBATIM COPYING175377
+Node: 3_ COPYING IN QUANTITY176357
+Node: 4_ MODIFICATIONS178714
+Node: 5_ COMBINING DOCUMENTS184774
+Node: 6_ COLLECTIONS OF DOCUMENTS186271
+Node: 7_ AGGREGATION WITH INDEPENDENT WORKS187162
+Node: 8_ TRANSLATION188390
+Node: 9_ TERMINATION189293
+Node: 10_ FUTURE REVISIONS OF THIS LICENSE189948
+Node: Addendum191088
 
 End Tag Table
 

@@ -1,17 +1,17 @@
-// 
+//
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -39,7 +39,7 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 using namespace std;
 using namespace gnash::SWF;
 
-namespace gnash 
+namespace gnash
 {
 
 const char *as_arg_strs[] = {
@@ -55,7 +55,7 @@ const char *as_arg_strs[] = {
 };
 const char *state_strs[] = { "rw", "w", "r" };
 
-Debugger::Debugger() 
+Debugger::Debugger()
     : _enabled(false), _tracing(false), _state(NONE), _skipb(0), _env(0), _pc(0)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -123,7 +123,7 @@ Debugger::console(as_environment &env)
     if (!this->isEnabled()) {
  	return;
     }
-    
+
     if (!_env) {
 	cerr << "WARNING: environment not set yet";
 	cerr << "\nOnly watch point commands will work untill after you continue." << endl;
@@ -219,7 +219,6 @@ Debugger::console(as_environment &env)
 		    this->dumpSymbols();
 		    break;
 		case 'c':
-		    
 		    this->callStackDump();
 		    break;
 	      };
@@ -304,10 +303,10 @@ Debugger::dumpMovieInfo()
 	movie_root &mr = vm.getRoot();
 	int x, y, buttons;
 	mr.get_mouse_state(x, y, buttons);
-	
+
 	cerr << "Movie is Flash v" << vm.getSWFVersion() << endl;
 	cerr << "Mouse coordinates are: X=" << x << ", Y=" << y << endl;
-	vm.getGlobal()->dump_members();
+	reinterpret_cast<as_object *>(vm.getGlobal())->dump_members();
     }
 }
 
@@ -333,7 +332,7 @@ Debugger::disassemble(const unsigned char *data)
 
     if (_pc == 0) {
     }
-    
+
     // Show instruction.
     if (action_id > ash.lastType()) {
 	cerr << "WARNING: <unknown>[0x" << action_id  << "]" << endl;
@@ -410,9 +409,9 @@ void
 Debugger::removeBreakPoint(const std::string &func)
 {
 //    GNASH_REPORT_FUNCTION;
-    
     string name;
     std::map<std::string, bool>::const_iterator it;
+
     it = _breakpoints.find(func);
     if (it != _breakpoints.end()) {
 	_breakpoints.erase(func);
@@ -469,9 +468,9 @@ void
 Debugger::removeWatchPoint(const std::string &var)
 {
 //    GNASH_REPORT_FUNCTION;
-    
     string name;
     std::map<std::string, watch_state_e>::const_iterator it;
+
     it = _watchpoints.find(var);
     if (it != _watchpoints.end()) {
 	_watchpoints.erase(var);
@@ -486,7 +485,7 @@ Debugger::dumpWatchPoints()
     watch_state_e state;
     int index = 0;
     std::map<std::string, watch_state_e>::const_iterator it;
-    
+
     for (it=_watchpoints.begin(); it != _watchpoints.end(); it++) {
 	name = it->first;
 	state = it->second;
@@ -554,14 +553,14 @@ Debugger::changeStackValue(as_environment &env, unsigned int index, as_value &va
 void
 Debugger::dumpStackFrame(as_environment &env)
 {
-//    GNASH_REPORT_FUNCTION;    
+//    GNASH_REPORT_FUNCTION;
     if (!_env) {
 	log_error (_("WARNING: environment not set in %s"), __PRETTY_FUNCTION__);
 	return;
     }
     if (env.stack_size()) {
         log_debug (_("Stack Dump of: %p"), (void *)&env);
-        for (unsigned int i=0, n=env.stack_size(); i<n; i++) {    
+        for (unsigned int i=0, n=env.stack_size(); i<n; i++) {
 	    // FIXME, shouldn't these go to the log as well as to cerr?
             cerr << "\t" << i << ": ";
 	    as_value val = env.bottom(i);
@@ -576,7 +575,7 @@ Debugger::dumpStackFrame(as_environment &env)
         cerr << env.bottom(i);
 
 	    if (val.is_object()) {
-		boost::intrusive_ptr<as_object> o = val.to_object(getGlobal(fn));
+		boost::intrusive_ptr<as_object> o = val.to_object(getGlobal(env));
 		string name = lookupSymbol(o.get());
 		if (name.size()) {
 		    cerr << " \"" << name << "\"";
@@ -617,7 +616,7 @@ Debugger::dumpGlobalRegisters()
 void
 Debugger::dumpGlobalRegisters(as_environment &env)
 {
-//    GNASH_REPORT_FUNCTION;  
+//    GNASH_REPORT_FUNCTION;
     if (!_env) {
 	log_error (_("WARNING: environment not set in %s"), __PRETTY_FUNCTION__);
 	return;
@@ -660,7 +659,7 @@ Debugger::changeLocalRegister(as_environment &env, unsigned index, as_value &val
 {
 //    GNASH_REPORT_FUNCTION;
 	env.set_local_register(index, val);
-}   
+}
 
 // Change the value of a global variable
 void
@@ -675,7 +674,7 @@ Debugger::changeGlobalRegister(as_environment &env, unsigned index, as_value &va
 {
 //    GNASH_REPORT_FUNCTION;
     env.set_global_register(index, val);
-}   
+}
 
 void
 Debugger::dumpLocalVariables()
@@ -707,7 +706,7 @@ Debugger::lookupSymbol(std::string &name)
 	    }
 	}
     }
-    return NULL; 
+    return NULL;
 }
 
 void
@@ -721,7 +720,6 @@ Debugger::addSymbol(void *ptr, std::string name)
 //	log_debug ("Adding symbol %s at address: %p", namei, ptr);
 	_symbols[ptr] = namei;
     }
-    
 }
 
 /// Get the name associated with an address
@@ -751,7 +749,8 @@ Debugger::dumpSymbols()
 {
 //    GNASH_REPORT_FUNCTION;
     int index = 0;
-    std::map<void *, std::string>::const_iterator it;    
+    std::map<void *, std::string>::const_iterator it;
+
     for (it=_symbols.begin(); it != _symbols.end(); it++) {
 	string name = it->second;
 	void *addr = it->first;

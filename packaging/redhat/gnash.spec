@@ -1,6 +1,7 @@
 Name:           gnash
-Version:        20100117
-Release:        1
+Version:        trunk
+Release:        0
+Epoch: 		1
 Distribution:	fc12
 #Distribution:	ydl6
 Summary:        GNU SWF player
@@ -16,31 +17,25 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 BuildRequires:  libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  gtk2-devel glib2-devel
 BuildRequires:  atk-devel pango-devel openssl-devel
-BuildRequires:  agg-devel boost-devel boost-date-time boost-thread
-BuildRequires:	curl-devel libXt-devel
+BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
 BuildRequires:  pygtk2-devel giflib-devel
 BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
 # These are for the kde4 support
 BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
-
-# Mandriva uses different names for the X11 library packages
-%if %{distribution} != "fc12"
-BuildRequires:  libx11_6-devel libxt_6-devel
-%else
-BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel 
-%endif
+BuildRequires:  libX11-devel libXt-devel
 
 # Installation requirements
 Requires: libpng libjpeg libogg gtk2 glib2 atk pango
-Requires:  gstreamer gstreamer-ffmpeg gstreamer-plugins-base
-# Mandriva uses differ names for the X11 library packages
-%if %{distribution} != "fc11"
-Requires: libx11_6 libxt_6
-%else
-Requires: libX11 libXt 
-%endif
-Requires: agg boost libcurl SDL boost-date-time boost-thread
+Requires: gstreamer gstreamer-ffmpeg gstreamer-plugins-base
+Requires: libX11 libXt agg boost libcurl SDL
 Requires: freetype fontconfig libstdc++
+
+# Fedora 12 packages the boost libraries as separate packages,
+# whereas Fedora 11 has just the one dependency on boost-devel.
+%if %{distribution} != "fc11"
+BuildRequires:   boost-date-time boost-thread
+Requires:   boost-date-time boost-thread
+%endif
 
 # BuildRequires:  scrollkeeper
 
@@ -184,14 +179,16 @@ make $MAKEFLAGS dumpconfig all
 # shell, but sometimes that's what you need to do.
 # export CONFIG_SHELL="sh -x"
 # sh -x ./configure
-./configure \
+sh ./configure \
 	$CROSS_OPTS \
 	$SOUND $GUI \
 	$RENDERER \
 	$OTHER \
 	$OPTIONAL \
+	CXXFLAGS="$CXXFLAGS" \
 	--disable-dependency-tracking \
 	--disable-rpath \
+	--enable-cygnal \
 	--enable-sdkinstall \
 	--disable-testsuite \
         --prefix=/usr \
@@ -199,13 +196,7 @@ make $MAKEFLAGS dumpconfig all
 	--infodir=%{_prefix}/share/info \
 	--with-plugins-install=system
 
-        # --with-kde4-pluginprefix=%{_prefix} \
-	# --with-kde4-plugindir=%{_libdir}/kde4/plugins \
-        # --with-kde4-servicesdir=%{_prefix}/share/kde4/services \
-        # --with-kde4-appsdatadir=%{_prefix}/share/kde4/apps/klash \
-        # --with-kde4-configdir=${_datadir}/config
-
-make $MAKEFLAGS dumpconfig all
+make $MAKEFLAGS dumpconfig all LDFLAGS="-Wl,--build-id"
 %endif
 # When testing the spec file, try setting MAKEFLAGS to
 # "CXXFLAGS-O0 -j4" to speed up getting results. Note *don't*
@@ -213,10 +204,10 @@ make $MAKEFLAGS dumpconfig all
 
 %install
 strip gui/.libs/*-gnash
-strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
+strip utilities/.libs/g* utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
-make $MAKEFLAGS install DESTDIR=$RPM_BUILD_ROOT
-make $MAKEFLAGS install-plugins DESTDIR=$RPM_BUILD_ROOT
+make $MAKEFLAGS install DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
+make $MAKEFLAGS install-plugins DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
 %if !%{cross_compile}
 
@@ -256,7 +247,7 @@ scrollkeeper-update -q || :
 %{_bindir}/flvdumper
 %{_bindir}/findmicrophones
 %{_bindir}/findwebcams
-%{_bindir}/dumpshm
+#%{_bindir}/dumpshm
 %{_libdir}/gnash/*.so*
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico

@@ -309,7 +309,6 @@ public:
     void init_member(const ObjectURI& uri, const as_value& val, 
         int flags = DefaultFlags, int slotId = -1);
 
-    /// \brief
     /// Initialize a getter/setter property by name
     //
     /// This is just a wrapper around the other init_property method
@@ -345,25 +344,15 @@ public:
     /// used as a trampoline to avoid changing all classes to 
     /// use string_table::key directly.
     ///
-    /// @param key
-    ///     Name of the property.
-    ///    Will be converted to lowercase if VM is initialized for SWF6 or lower.
-    ///
-    /// @param getter
-    ///    A function to invoke when this property value is requested.
-    ///    add_ref will be called on the function.
-    ///
-    /// @param setter
-    ///    A function to invoke when setting this property's value.
-    ///    add_ref will be called on the function.
-    ///
-    /// @param flags
-    ///     Flags for the new member. By default dontDelete and dontEnum.
-    ///    See PropFlags::Flags.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
+    /// @param key      Name of the property. Will be converted to lowercase
+    ///                 if VM is initialized for SWF6 or lower.
+    /// @param getter   A function to invoke when this property value is
+    ///                 requested.
+    /// @param setter   A function to invoke when setting this property's
+    ///                 value.
+    /// @param flags    Flags for the new member. By default dontDelete and
+    ///                 dontEnum. See PropFlags::Flags.
+    /// @param nsname   The id of the namespace to which this member belongs.
     void init_property(const std::string& key, as_c_function_ptr getter,
         as_c_function_ptr setter, int flags = DefaultFlags,
         string_table::key nsname = 0);
@@ -400,7 +389,6 @@ public:
     void init_property(const ObjectURI& uri, as_c_function_ptr getter,
         as_c_function_ptr setter, int flags = DefaultFlags);
 
-
     /// Initialize a destructive getter property
     //
     /// A destructive getter can be used as a place holder for the real
@@ -429,8 +417,6 @@ public:
     bool init_destructive_property(const ObjectURI& uri, 
             as_c_function_ptr getter, int flags = PropFlags::dontEnum);
 
-
-    /// \brief
     /// Use this method for read-only properties.
     //
     /// This method achieves the same as the above init_property method.
@@ -564,7 +550,7 @@ public:
     ///                 - (false, false) : property not found
     ///                 - (true, false) : property protected from deletion
     ///                 - (true, true) : property successfully deleted
-    std::pair<bool,bool> delProperty(const ObjectURI& uri);
+    std::pair<bool, bool> delProperty(const ObjectURI& uri);
 
     /// Get this object's own named property, if existing.
     //
@@ -588,11 +574,8 @@ public:
 
     /// Get a property from this object (or a prototype) by ordering index.
     ///
-    /// @param index
-    /// An index returned by nextIndex
-    ///
-    /// @return
-    /// The property associated with the order index.
+    /// @param index    An index returned by nextIndex
+    /// @return         The property associated with the order index.
     const Property* getByIndex(int index);
 
     /// Get the next index after the one whose index was used as a parameter.
@@ -613,23 +596,13 @@ public:
 
     /// Set member flags (probably used by ASSetPropFlags)
     //
-    /// @param name
-    ///    Name of the property. Must be all lowercase
-    ///    if the current VM is initialized for a  target
-    ///    up to SWF6.
-    ///
-    /// @param setTrue
-    ///    the set of flags to set
-    ///
-    /// @param setFalse
-    ///    the set of flags to clear
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
-    ///
-    /// @return true on success, false on failure
-    ///    (non-existent or protected member)
+    /// @param name     Name of the property. Must be all lowercase
+    ///                 if the current VM is initialized for a  target
+    ///                 up to SWF6.
+    /// @param setTrue  The set of flags to set
+    /// @param setFalse The set of flags to clear
+    /// @return         true on success, false on failure (non-existent or
+    ///                 protected member)
     bool set_member_flags(const ObjectURI& uri, int setTrue, int setFalse = 0);
 
     /// Cast to a as_function, or return NULL
@@ -730,15 +703,15 @@ public:
     void add_property(const std::string& key, as_function& getter,
         as_function* setter);
 
-    /// Return this object's '__proto__' member.
+    /// Return this object's __proto__ member.
     //
-    /// The __proto__ member is the exported interface ('prototype')
+    /// The __proto__ member is the exported interface (prototype)
     /// of the class this object is an instance of.
     ///
     /// NOTE: can return NULL (and it is expected to do for Object.prototype)
     as_object* get_prototype() const;
 
-    /// Set this object's '__proto__' member
+    /// Set this object's __proto__ member
     //
     /// This does more or less what set_member("__proto__") does, but without
     /// the lookup process.
@@ -787,51 +760,44 @@ public:
         _array = array;
     }
 
-    /// Return true if this is a DisplayObject.
+    /// Return the DisplayObject associated with this object.
+    //
+    /// @return     A DisplayObject if this is as_object is associated with
+    ///             one, otherwise 0.
     DisplayObject* displayObject() const {
         return _displayObject;
     }
 
-    /// Indicate that this object is a DisplayObject
-    //
-    /// This enables DisplayObject properties such as _x and _y. A flag
-    /// is used to avoid RTTI on every get and set of properties.
+    /// Set the DisplayObject associated with this as_object.
     void setDisplayObject(DisplayObject* d) {
         _displayObject = d;
     }
 
-    ///Get a member value at a given slot.
+    /// Get a member value at a given slot.
     //
-    /// @param order
-    /// The slot index of the property.
-    ///
-    /// @param val
-    /// The as_value to store a found variable's value in.
-    ///
-    /// @return true if a member exists at the given slot, 
-    /// and the member's value is successfully retrieved,
-    /// false otherwise.
+    /// Note it is quite likely that slots only apply to static properties.
+    //
+    /// @param order    The slot index of the property.
+    /// @param val      The as_value to store a found variable's value in.
+    /// @return         true if a member exists at the given slot, 
+    ///                 and the member's value is successfully retrieved,
+    ///                 false otherwise.
     bool get_member_slot(int order, as_value* val);
 
-    ///Set a member value at a given slot.
+    /// Set a member value at a given slot.
     //
-    ///This is a wrapper around set_member_default.
-    /// @param order
-    ///
-    /// The slot index of the property.
-    /// @param val
-    ///    Value to assign to the named property.
-    ///
-    /// @param ifFound
-    ///    If true, don't create a new member, but only update
-    ///    an existing one.
-    ///
-    /// @return true if the member exists at the given slot, 
-    /// false otherwise.
-    ///    NOTE: the return doesn't tell if the member exists after
-    ///          the call, as watch triggers might have deleted it
-    ///          after setting.
-    ///
+    /// Note it is quite likely that slots only apply to static properties.
+    //
+    /// @param order    The slot index of the property.
+    /// @param val      Value to assign to the named property.
+    /// @param ifFound  If true, don't create a new member, but only update
+    ///                 an existing one.
+    /// @return true    if the member exists at the given slot, 
+    ///                 false otherwise.
+    ///    
+    /// NOTE: the return doesn't tell if the member exists after
+    ///       the call, as watch triggers might have deleted it
+    ///       after setting.
     bool set_member_slot(int order, const as_value& val, bool ifFound = false);
 
 protected:
@@ -852,6 +818,22 @@ protected:
     void markAsObjectReachable() const;
 
 private:
+    
+    /// Find an existing property for update
+    //
+    /// Scans the inheritance chain only for getter/setters or statics.
+    //
+    /// NOTE: updatable here doesn't mean the property isn't protected
+    /// from update but only that a set_member will NOT create a new
+    /// property (either completely new or as an override).
+    ///
+    /// @returns a property if found, NULL if not found
+    ///          or not visible in current VM version
+    ///
+    Property* findUpdatableProperty(const ObjectURI& uri);
+
+    void executeTriggers(Property* prop, const ObjectURI& uri,
+            const as_value& val);
 
     /// A utility class for processing this as_object's inheritance chain
     template<typename T> class PrototypeRecursor;
@@ -882,22 +864,6 @@ private:
 
     /// Properties of this as_object
     PropertyList _members;
-
-    /// \brief
-    /// Find an existing property for update, only scanning the
-    /// inheritance chain for getter/setters or statics.
-    //
-    /// NOTE: updatable here doesn't mean the property isn't protected
-    /// from update but only that a set_member will NOT create a new
-    /// property (either completely new or as an override).
-    ///
-    /// @returns a property if found, NULL if not found
-    ///          or not visible in current VM version
-    ///
-    Property* findUpdatableProperty(const ObjectURI& uri);
-
-    void executeTriggers(Property* prop, const ObjectURI& uri,
-            const as_value& val);
 
     /// The constructors of the objects implemented by this as_object.
     //

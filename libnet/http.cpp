@@ -1103,6 +1103,9 @@ HTTP::formatContentType(DiskStream::filetype_e filetype)
     case DiskStream::FILETYPE_FLAC:
 	  _buffer += "Content-Type: audio/flac\r\n";
 	  break;
+    case DiskStream::FILETYPE_PHP:
+	  _buffer += "Content-Type: application/x-httpd-php\r\n";
+	  break;
       default:
 	  _buffer += "Content-Type: text/html\r\n";
     }

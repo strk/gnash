@@ -77,7 +77,6 @@ AM_CPPFLAGS = \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(GSTREAMER_CFLAGS) \
 	$(GSTREAMER_PLUGINS_BASE_CFLAGS) \
-	$(LIBXML2_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
@@ -97,13 +96,13 @@ endif
 if USE_GST_ENGINE
  AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
- GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS) $(LIBXML2_LIBS)
+ GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
 if CROSS_COMPILING
-  GNASH_LIBS +=	$(LIBXML2_LIBS) $(GLIB_LIBS)
+  GNASH_LIBS +=	$(GLIB_LIBS)
 endif
 endif
 
-bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper
+bin_PROGRAMS = gprocessor soldumper flvdumper
 #check_PROGRAMS = gdebug.swf
 
 if USE_GST_ENGINE
@@ -119,8 +118,9 @@ gprocessor_SOURCES = processor.cpp
 gprocessor_LDFLAGS = -export-dynamic
 gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
-dumpshm_SOURCES = dumpshm.cpp
-dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+
+#dumpshm_SOURCES = dumpshm.cpp
+#dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 soldumper_SOURCES = soldumper.cpp
 soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)

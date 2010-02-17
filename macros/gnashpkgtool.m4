@@ -61,7 +61,9 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
       AC_MSG_CHECKING([for $2 header using pkg-config])
+      $PKG_CONFIG --exists [lib]DASHDOWN && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags [lib]DASHDOWN`"
       $PKG_CONFIG --exists DASHDOWN[] && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags DASHDOWN[]`"
+      $PKG_CONFIG --exists lib$name && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags lib$name`"
       $PKG_CONFIG --exists $name && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags $name`"
       if test x"${ac_cv_path_$1_incl}" != x; then
         AC_MSG_RESULT(${ac_cv_path_$1_incl})
@@ -105,15 +107,17 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
                 fi
                 break
               else
-                found_$1_incl="yes"
                 if test -f $i/$name/$2; then
+                  found_$1_incl="yes"
                   ac_cv_path_$1_incl="-I$i/$name"
+                  break
                 else
                   if test -f $i/$2; then
+                    found_$1_incl="yes" 
                     ac_cv_path_$1_incl="-I$i"
+                    break
                   fi
                 fi
-                break
               fi
             done
           fi
@@ -123,20 +127,20 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
   ])
   fi
   
-  dnl AC_MSG_CHECKING([for $2 header]) 
+  AC_MSG_CHECKING([for $2 header]) 
   if test x"${found_$1_incl}" = "xyes"; then
 
       dnl It seems we need to explicitly call AC_DEFINE as AC_CHECK_HEADER doesn't
       dnl do this automatically. AC_CHECK_HEADERS (not the final S) would do it.
       AC_DEFINE([HAVE_]UPHEADER, 1, [Define if you have the $2 header])
-      dnl AC_MSG_RESULT(${ac_cv_path_$1_incl})
+      AC_MSG_RESULT(${ac_cv_path_$1_incl})
       if test x"${ac_cv_path_$1_incl}" != x -a x"${ac_cv_path_$1_incl}" != x"-I/usr/include"; then
         UP[]_CFLAGS="${ac_cv_path_$1_incl}"        
       else
         UP[]_CFLAGS=""
       fi
-  dnl else
-  	dnl AC_MSG_RESULT([not found])
+  else
+  	  AC_MSG_RESULT([not found])
     fi
   fi
   AC_SUBST(UP[]_CFLAGS)
@@ -176,16 +180,16 @@ if test x"${$1}" = x"yes"; then
   dnl If the header doesn't exist, there is no point looking for the library.
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_lib}" = x; then
-      $PKG_CONFIG --exists [lib]DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l [lib]DASHDOWN`"
-      $PKG_CONFIG --exists DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l DASHDOWN`"
-      $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l lib$name`"
-      $PKG_CONFIG --exists $name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs-only-l $name`"
-      dnl AC_MSG_CHECKING([for lib$1 library])
+      AC_MSG_CHECKING([for lib$1 library using pkg-config])
+      $PKG_CONFIG --exists [lib]DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs [lib]DASHDOWN`"
+      $PKG_CONFIG --exists DASHDOWN && ac_cv_path_$1_lib="`$PKG_CONFIG --libs DASHDOWN`"
+      $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs lib$name`"
+      $PKG_CONFIG --exists $name && ac_cv_path_$1_lib="`$PKG_CONFIG --libs $name`"
       if test x"${ac_cv_path_$1_lib}" != x; then
-        dnl AC_MSG_RESULT(${ac_cv_path_$1_lib})
+        AC_MSG_RESULT(${ac_cv_path_$1_lib})
         ac_manual=no
-      dnl else
-        dnl AC_MSG_RESULT([not found])
+      else
+        AC_MSG_RESULT([not found])
       fi
     fi
     if test x"${ac_cv_path_$1_lib}" = x; then

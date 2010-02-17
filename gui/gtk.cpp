@@ -996,7 +996,6 @@ private:
         GtkWidget *solLocalDomainToggle;
         GtkWidget *localConnectionToggle;
         GtkWidget *insecureSSLToggle; 
-        GtkWidget *lcTraceToggle;
         GtkWidget *solSandbox;
         GtkWidget *osText;
         GtkWidget *versionText;
@@ -1027,7 +1026,6 @@ private:
         	solLocalDomainToggle(0),
         	localConnectionToggle(0),
         	insecureSSLToggle(0), 
-        	lcTraceToggle(0),
         	solSandbox(0),
         	osText(0),
         	versionText(0),
@@ -1186,11 +1184,6 @@ PreferencesDialog::handlePrefs(GtkWidget* dialog, gint response, gpointer data)
                 gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->insecureSSLToggle)));
         }
 
-        if ( prefs->lcTraceToggle ) {
-            _rcfile.setLCTrace(
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->lcTraceToggle)));
-        }
-    		
         if ( prefs->solSandbox ) {
             tmp = gtk_entry_get_text(GTK_ENTRY(prefs->solSandbox));
             _rcfile.setSOLSafeDir(tmp);
@@ -1392,13 +1385,6 @@ PreferencesDialog::addLoggingTab()
     // Align button state with _rcfile
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->ASCodingErrorToggle),
     			_rcfile.showASCodingErrors());
-
-    _prefs->lcTraceToggle = gtk_check_button_new_with_mnemonic(
-    				_("Log _Local Connection activity"));
-    gtk_box_pack_start (GTK_BOX(loggingvbox), _prefs->lcTraceToggle, FALSE,
-            FALSE, 0);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->lcTraceToggle),
-    			_rcfile.getLCTrace()); 
 
 #ifdef USE_DEBUGGER
 

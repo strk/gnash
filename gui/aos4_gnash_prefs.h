@@ -55,6 +55,7 @@
 #include <libraries/gadtools.h>
 
 #include <stdio.h>
+#include <cstdio>
 
 //#define DEBUG_GUI 1
 struct GnashPrefs

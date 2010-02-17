@@ -17,23 +17,29 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ3_TEXTFIELD_H
-#define GNASH_ASOBJ3_TEXTFIELD_H
+#ifndef GNASH_TEXTFIELD_AS_H
+#define GNASH_TEXTFIELD_AS_H
 
-
+namespace gnash {
+    class as_object;
+    class ObjectURI;
+    class Global_as;
+}
 
 namespace gnash {
 
-// Forward declarations
-class as_object;
-class ObjectURI;
+/// Native function to create a plain object with TextField properties
+//
+/// This function calls the TextField constructor.
+as_object* createTextFieldObject(Global_as& gl);
 
 /// Initialize the global TextField class
-void textfield_class_init(as_object& where, const ObjectURI& uri);
+void textfield_class_init(as_object& global, const ObjectURI& uri);
 
-} // gnash namespace
+void registerTextFieldNative(as_object& global);
 
-// GNASH_ASOBJ3_TEXTFIELD_H
+} // namespace gnash
+
 #endif
 
 // local Variables:

@@ -35,6 +35,7 @@ pkglib_LTLIBRARIES = libgnashasobjs.la
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libnet \
+	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/swf \
@@ -48,7 +49,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	$(PTHREAD_CFLAGS) \
-	$(LIBXML2_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(FREETYPE2_CFLAGS)

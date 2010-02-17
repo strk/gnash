@@ -19,7 +19,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // USE_SOL_READ_ONLY
+#include "gnashconfig.h" 
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -28,10 +28,7 @@
 #include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
 #include "as_value.h"
-#include "amf.h"
-#include "element.h"
-#include "sol.h"
-#include "net/SharedObject_as.h"
+#include "SharedObject_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -44,23 +41,20 @@
 #include "rc.h" // for use of rcfile
 #include "URLAccessManager.h"
 #include "network.h"
-#include "rtmp_client.h"
 #include "URL.h"
 #include "NetConnection_as.h"
 #include "Object.h"
+#include "AMF.h"
+#include "GnashAlgorithm.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
-
-// Undefine this to use the Element-based AMF0 decoder/encoder.
-// May be useful to test libamf.
-#define BUFFERED_AMF_SOL
+#include <cstdio>
 
 namespace {
-gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
-using namespace amf;
 
 namespace gnash {
 
@@ -71,7 +65,7 @@ namespace {
     as_value sharedobject_send(const fn_call& fn);
     as_value sharedobject_flush(const fn_call& fn);
     as_value sharedobject_close(const fn_call& fn);
-    as_value sharedobject_getsize(const fn_call& fn);
+    as_value sharedobject_getSize(const fn_call& fn);
     as_value sharedobject_setFps(const fn_call& fn);
     as_value sharedobject_clear(const fn_call& fn);
     as_value sharedobject_deleteAll(const fn_call& fn);
@@ -80,10 +74,22 @@ namespace {
     as_value sharedobject_data(const fn_call& fn);
     as_value sharedobject_getLocal(const fn_call& fn);
     as_value sharedobject_ctor(const fn_call& fn);
-    as_value sharedobject_setdirty(const fn_call& fn);
-    as_value sharedobject_setproperty(const fn_call& fn);
 
     as_object* readSOL(VM& vm, const std::string& filespec);
+
+    /// Encode the SharedObject data.
+    //
+    /// @param name     The name of the SharedObject.
+    /// @param data     The data object to encode.
+    /// @param buf      The SimpleBuffer to encode the data to.
+    bool encodeData(const std::string& name, as_object& data,
+            SimpleBuffer& buf);
+
+    /// Encode the 2 header bytes and data length field.
+    //
+    /// @param size     The genuine size of the object data.
+    /// @param buf      The SimpleBuffer to encode the data to.
+    void encodeHeader(const size_t size, SimpleBuffer& buf);
 
     void attachSharedObjectInterface(as_object& o);
     void attachSharedObjectStaticInterface(as_object& o);
@@ -96,84 +102,40 @@ namespace {
 // Serializer helper
 namespace { 
 
-class PropsSerializer : public AbstractPropertyVisitor
-{
-public:
-
-    PropsSerializer(SOL& sol, VM& vm)
-        :
-        _sol(sol),
-        _st(vm.getStringTable())
-    {};
-
-    bool accept(const ObjectURI& uri, const as_value& val) 
-    {
-        AMF amf;
-        boost::shared_ptr<amf::Element> el;
-        
-        // We omit the namespace.
-        const std::string& name = _st.string_table::value(getName(uri));
-
-        //log_debug("Serializing SharedObject property %s:%s", name, val);
-
-        if (val.is_string()) {
-            std::string str;
-            if (!val.is_undefined()) {
-                str = val.to_string();
-            }
-            el.reset(new amf::Element(name, str));
-        }
-        if (val.is_bool()) {
-            bool flag = val.to_bool();
-            el.reset(new amf::Element(name, flag));
-        }
-        if (val.is_number()) { 
-            double dub;
-            if (val.is_undefined()) {
-                dub = 0.0;
-            } else {
-                dub = val.to_number();
-            }
-            el.reset(new amf::Element(name, dub));
-        }
-
-        if (el) {
-            _sol.addObj(el);
-        }
-        return true;
-    }
-
-private:
-
-    SOL& _sol;
-    string_table& _st;
-};
-
 /// Class used to serialize properties of an object to a buffer in SOL format
 class SOLPropsBufSerializer : public AbstractPropertyVisitor
 {
 
-    typedef std::map<as_object*, size_t> PropertiesOffsetTable;
-
 public:
 
-    SOLPropsBufSerializer(SimpleBuffer& buf, VM& vm,
-            PropertiesOffsetTable& offsetTable)
+    SOLPropsBufSerializer(AMF::Writer w, string_table& st)
         :
-        _buf(buf),
-        _vm(vm),
-        _st(vm.getStringTable()),
-        _offsetTable(offsetTable),
-        _error(false)
-	{};
+        _writer(w),
+        _st(st),
+        _error(false),
+        _count(0)
+	{}
     
-    bool success() const { return !_error; }
+    /// Check if the object data was successfully encoded.
+    //
+    /// Success means that no encoding errors were encountered and at least one
+    /// property was encoded.
+    bool success() const {
+        return !_error && _count;
+    }
 
+    /// Visitor called for each property to serialize.
+    //
+    /// SOL serialization calls this for all existing properties, whether
+    /// visible or not.
+    //
+    /// accept() returns false if the visitor should stop, true if it should
+    /// go on to the next property.
     virtual bool accept(const ObjectURI& uri, const as_value& val) 
     {
         assert(!_error);
 
-        if ( val.is_function()) {
+        if (val.is_function()) {
             log_debug("SOL: skip serialization of FUNCTION property");
             return true;
         }
@@ -181,98 +143,115 @@ public:
         const string_table::key key = getName(uri);
 
         // Test conducted with AMFPHP:
-        // '__proto__' and 'constructor' members
-        // of an object don't get back from an 'echo-service'.
+        // '__proto__' and 'constructor' members of an object are not returned
+        // from an 'echo-service'.
         // Dunno if they are not serialized or just not sent back.
-        // A '__constructor__' member gets back, but only if 
-        // not a function. Actually no function gets back.
-        // 
-        if ( key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR )
-        {
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(" skip serialization of specially-named property %s",
-                    _st.value(key));
-#endif
+        // A '__constructor__' member is returned, but only if 
+        // not a function; no functions are returned at all.
+        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR) {
             return true;
         }
 
         // write property name
         const std::string& name = _st.value(key);
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-        log_debug(" serializing property %s", name);
-#endif
-        boost::uint16_t namelen = name.size();
-        _buf.appendNetworkShort(namelen);
-        _buf.append(name.c_str(), namelen);
+        
+        _writer.writePropertyName(name);
+
         // Strict array are never encoded in SharedObject
-        if (!val.writeAMF0(_buf, _offsetTable, _vm, false))
-        {
+        if (!val.writeAMF0(_writer)) {
             log_error("Problems serializing an object's member %s=%s",
                     name, val);
             _error = true;
 
-            // Stop visiting....
+            // Stop visiting.
             return false;
         }
-        // SOL-specific
-        _buf.appendByte(0); 
+
+        // This is SOL specific.
+        boost::uint8_t end(0);
+        _writer.writeData(&end, 1);
+        ++_count;
         return true;
     }
 
 private:
 
-    SimpleBuffer& _buf;
-    VM& _vm;
+    AMF::Writer _writer;
+
+    /// String table for looking up property names as strings.
     string_table& _st;
-    PropertiesOffsetTable& _offsetTable;
+
+    /// Whether an error has been encountered.
     bool _error;
+
+    /// How many properties have been encoded.
+    //
+    /// A boolean would do just as nicely, but we may want to use the count
+    /// info.
+    size_t _count;
 };
 
 } // anonymous namespace
 
-class SharedObject_as : public Relay, public RTMPClient
+class SharedObject_as : public Relay
 {
 public:
-
-    ~SharedObject_as();
 
     SharedObject_as(as_object& owner)
         :
         _owner(owner),
         _data(0),
-        _persistence(0),
         _connected(false)
     { 
     }
 
+    virtual ~SharedObject_as();
+
+    /// The as_object that owns this Relay.
     as_object& owner() {
         return _owner;
     }
 
+    /// Write the data as a SOL file.
+    //
+    /// If there is no data to write, the file is removed.
     bool flush(int space = 0) const;
 
+    /// The filename of this SharedObject.
     const std::string& getFilespec() const {
-        return _sol.getFilespec();
+        return _filename;
     }
 
+    /// Set the filename of the SharedObject.
     void setFilespec(const std::string& s) {
-        _sol.setFilespec(s);
+        _filename = s;
     }
 
-    const std::string& getObjectName() const {
-        return _sol.getObjectName();
-    }
-
+    /// Set the name of this SharedObject.
     void setObjectName(const std::string& s) {
-        _sol.setObjectName(s);
+        _name = s;
     }
 
-    /// This isn't correct, as the default implementation doesn't use SOL
-    /// for reading.
-    size_t size() const { 
-        return _sol.fileSize(); 
+    /// Return the size of the data plus header.
+    size_t size() const {
+        if (!_data) return 0;
+        SimpleBuffer buf;
+
+        // The header comprises 2 bytes and a length field of 4 bytes.
+        if (encodeData(_name, *_data, buf)) {
+            return buf.size() + 6;
+        }
+        return 0;
     }
 
+    /// Set the data object.
+    //
+    /// It seems much cleaner not to implement this as a getter/setter as it
+    /// currently is, but it is shown that flush() does not call data if
+    /// data is a getter-setter. This suggests that flush does not access
+    /// the data object directly, which in turn suggests it's not a real
+    /// property. This is the only test that fails if the data object is a
+    /// simple object property.
     void setData(as_object* data) {
 
         assert(data);
@@ -286,40 +265,37 @@ public:
 
     }
 
-    as_object* data() {
+    /// Get the data object.
+    as_object* data() const {
         return _data;
     }
 
-    const as_object* data() const {
-        return _data;
-    }
-
-    bool getPersistence() const { return _persistence; };
-    void setPersistence(bool flag) { _persistence = flag; };
-
-    /// Process the close() method.
+    /// Close the SharedObject
+    //
+    /// Note that this currently does nothing.
     void close();
 
-    /// Process the connect(uri) method.
-    void connect(NetConnection_as *obj, const std::string& uri);
+    /// Are we connected? 
+    bool connected() const { return _connected; }
 
-    void setURI(const std::string &url) { _uri = url; }
-    const std::string& getURI() const { return _uri; }
-
-    bool isConnected() const { return _connected; };
-    void isConnected(bool x) { _connected = x; };
-
-    // Override from Relay.
+    /// Override from Relay.
     virtual void setReachable(); 
 
 private:
 
+    /// The as_object to which this Relay belongs.
     as_object& _owner;
+
+    /// An object to store and access the actual data.
     as_object* _data;
-    bool _persistence;
-    SOL _sol;
+
+    std::string _name;
+
+    std::string _filename;
+
+    /// Are we connected? (No).
     bool _connected;
-    std::string	_uri;
+
 };
 
 
@@ -328,6 +304,9 @@ SharedObject_as::~SharedObject_as()
 }
 
 
+/// Returns false if the data cannot be written to file.
+//
+/// If there is no data, the file is removed and the function returns true.
 bool
 SharedObject_as::flush(int space) const
 {
@@ -344,10 +323,9 @@ SharedObject_as::flush(int space) const
                 "argument (%d), which is currently ignored", space);
     }
 
-    const std::string& filespec = _sol.getFilespec();
+    const std::string& filespec = getFilespec();
 
-    if (!mkdirRecursive(filespec))
-    {
+    if (!mkdirRecursive(filespec)) {
         log_error("Couldn't create dir for flushing SharedObject %s", filespec);
         return false;
     }
@@ -358,100 +336,60 @@ SharedObject_as::flush(int space) const
     return false;
 #endif
 
-    if (rcfile.getSOLReadOnly() ) {
+    if (rcfile.getSOLReadOnly()) {
         log_security("Attempting to write object %s when it's SOL "
                 "Read Only is set! Refusing...", filespec);
         return false;
     }
     
-#ifdef BUFFERED_AMF_SOL
-
-    gnash::SimpleBuffer buf;
-    // see http://osflash.org/documentation/amf/envelopes/sharedobject
-
-    // length field filled in later
-    buf.append("\x00\xbf\x00\x00\x00\x00TCSO\x00\x04\x00\x00\x00\x00", 16); 
-
-    // append object name
-    std::string object_name = getObjectName();
-    boost::uint16_t len = object_name.length();
-    buf.appendNetworkShort(len);
-    buf.append(object_name.c_str(), len);
-
-    // append padding
-    buf.append("\x00\x00\x00\x00", 4);
-
-    // append properties of object
-    VM& vm = getVM(_owner);
-
-    std::map<as_object*, size_t> offsetTable;
-    SOLPropsBufSerializer props(buf, vm, offsetTable);
-    _data->visitProperties<Exists>(props);
-    if (!props.success()) {
-        log_error("Could not serialize object");
-        return false;
-    }
-
-    // fix length field
-    *(reinterpret_cast<uint32_t*>(buf.data() + 2)) = htonl(buf.size() - 6);
-    
-    // TODO write file
+    // Open file
     std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if (!ofs) {
         log_error("SharedObject::flush(): Failed opening file '%s' in "
                 "binary mode", filespec.c_str());
         return false;
     }
+
+    // Encode data part.
+    SimpleBuffer buf;
+    if (!encodeData(_name, *_data, buf)) {
+        std::remove(filespec.c_str());
+        return true;
+    }
+
+    // Encode header part.
+    SimpleBuffer header;
+    encodeHeader(buf.size(), header);
     
-    if (ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size()).fail())
-    {
+    // Write header
+    ofs.write(reinterpret_cast<const char*>(header.data()), header.size());
+    if (!ofs) {
+        log_error("Error writing SOL header");
+        return false;
+    }
+
+    // Write AMF data
+    ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size());
+    if (!ofs) {
         log_error("Error writing %d bytes to output file %s",
                 buf.size(), filespec.c_str());
-        ofs.close();
         return false;
     }
     ofs.close();
-
-#else // amf::SOL-based serialization
-
-    // append properties of object
-    VM& vm = getVM(*this)
-
-    SOL sol;
-    PropsSerializer props(sol, vm);
-    _data->visitPropertyValues(props);
-    // We only want to access files in this directory
-    bool ret = sol.writeFile(filespec, getObjectName().c_str());
-    if ( ! ret )
-    {
-        log_error("writing SharedObject file to %s", filespec);
-        return false;
-    }
-#endif
 
     log_security("SharedObject '%s' written to filesystem.", filespec);
     return true;
 }
 
-/// Process the close() method.
 void
 SharedObject_as::close()
 {
-}
-
-/// Process the connect(uri) method.
-void
-SharedObject_as::connect(NetConnection_as* /*obj*/, const std::string& /*uri*/)
-{
-    GNASH_REPORT_FUNCTION;
-   
 }
 
 SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     :
     _vm(vm)
 {
-    GNASH_REPORT_FUNCTION;
 
     _solSafeDir = rcfile.getSOLSafeDir();
     if (_solSafeDir.empty()) {
@@ -461,8 +399,7 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
 
     // Check if the base dir exists here
     struct stat statbuf;
-    if ( -1 == stat(_solSafeDir.c_str(), &statbuf) )
-    {
+    if (stat(_solSafeDir.c_str(), &statbuf) == -1) {
        log_debug("Invalid SOL safe dir %s: %s. Will try to create on "
                "flush/exit.", _solSafeDir, std::strerror(errno));
     }
@@ -484,7 +421,6 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // blindly trusting the SWF publisher as base url is changed
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
-    //
     const movie_root& mr = _vm.getRoot();
     const std::string& swfURL = mr.getOriginalURL();
 
@@ -521,12 +457,8 @@ SharedObject_as::setReachable()
 void
 SharedObjectLibrary::markReachableResources() const
 {
-    for (SoLib::const_iterator it = _soLib.begin(), itE = _soLib.end();
-            it != itE; ++it)
-    {
-        SharedObject_as* sh = it->second;
-        sh->setReachable();
-    }
+    foreachSecond(_soLib.begin(), _soLib.end(),
+            std::mem_fun(&SharedObject_as::setReachable));
 }
 
 /// The SharedObjectLibrary keeps all known SharedObjects alive. They must
@@ -633,7 +565,6 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 
     log_debug("SharedObject %s not loaded. Loading it now", key);
 
-
     // Otherwise create a new one and register to the lib
     SharedObject_as* sh = createSharedObject(*_vm.getGlobal());
     if (!sh) return 0;
@@ -659,64 +590,6 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     return &sh->owner();
 }
 
-as_object*
-SharedObjectLibrary::getRemote(const std::string& objName,
-       const std::string& uri, const std::string& persistence)
-{
-    GNASH_REPORT_FUNCTION;
-
-    assert (!objName.empty());
-
-    // Check that the name is valid; if not, return null
-    if (!validateName(objName)) {
-        return 0;
-    }
-
-    // The 'root' argument, otherwise known as localPath, specifies where
-    // in the SWF path the SOL should be stored. It cannot be outside this
-    // path.
-    std::string requestedPath;
-    std::ostringstream solPath;
-    URL url(uri);
-    
-    const std::string& key = url.path();
-
-    // If the shared object was already opened, use it.
-    SoLib::iterator it = _soLib.find(key);
-    if (it != _soLib.end()) {
-        log_debug("SharedObject %s already known, returning it", key);
-        return &it->second->owner();
-    } 
-
-    log_debug("SharedObject %s not loaded. Loading it now", key);
-
-    // Otherwise create a new one and register to the lib
-    SharedObject_as* sh = createSharedObject(*_vm.getGlobal());
-    if (!sh) return 0;
-
-    _soLib[key] = sh;
-
-    sh->setObjectName(objName);
-
-    // Not persistence on either the client or the server
-    if (persistence == "false") {
-        sh->setPersistence(false);
-    }
-    // Persistence only on the server
-    if (persistence == "true") {
-        sh->setPersistence(true);
-    }
-    
-    if (persistence[0] == '/') {
-        sh->setPersistence(true);
-        as_object* localdata = getLocal(objName, url.path());
-        if (localdata) {
-            sh->setData(localdata);
-        }
-    }
-
-    return &sh->owner();
-}
 
 void
 sharedobject_class_init(as_object& where, const ObjectURI& uri)
@@ -741,7 +614,7 @@ registerSharedObjectNative(as_object& o)
     vm.registerNative(sharedobject_send, 2106, 1);
     vm.registerNative(sharedobject_flush, 2106, 2);
     vm.registerNative(sharedobject_close, 2106, 3);
-    vm.registerNative(sharedobject_getsize, 2106, 4);
+    vm.registerNative(sharedobject_getSize, 2106, 4);
     vm.registerNative(sharedobject_setFps, 2106, 5);
     vm.registerNative(sharedobject_clear, 2106, 6);
 
@@ -758,8 +631,6 @@ registerSharedObjectNative(as_object& o)
     
     vm.registerNative(sharedobject_deleteAll, 2106, 206);
     vm.registerNative(sharedobject_getDiskUsage, 2106, 207);
-    vm.registerNative(sharedobject_setdirty, 2106, 208);
-    vm.registerNative(sharedobject_setproperty, 2106, 209);
 }
 
 
@@ -783,9 +654,6 @@ attachSharedObjectInterface(as_object& o)
     o.init_member("getSize", vm.getNative(2106, 4), flags);
     o.init_member("setFps", vm.getNative(2106, 5), flags);
     o.init_member("clear", vm.getNative(2106, 6), flags);
-
-    o.init_member("setDirty", vm.getNative(2106, 7), flags);
-    o.init_member("setProperty", vm.getNative(2106, 8), flags);
 }
 
 
@@ -797,8 +665,7 @@ attachSharedObjectStaticInterface(as_object& o)
     const int flags = 0;
 
     Global_as& gl = getGlobal(o);
-    o.init_member("getLocal", 
-            gl.createFunction(sharedobject_getLocal), flags);
+    o.init_member("getLocal", gl.createFunction(sharedobject_getLocal), flags);
     o.init_member("getRemote",
             gl.createFunction(sharedobject_getRemote), flags);
 
@@ -821,34 +688,12 @@ sharedobject_clear(const fn_call& fn)
 }
 
 as_value
-sharedobject_setdirty(const fn_call& fn)
-{
-    SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
-    UNUSED(obj);
-    
-    LOG_ONCE(log_unimpl (__FUNCTION__));
-
-    return as_value();
-}
-
-as_value
-sharedobject_setproperty(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;    
-    SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
-    UNUSED(obj);
-    
-    LOG_ONCE(log_unimpl (__FUNCTION__));
-
-    return as_value();
-}
-
-as_value
 sharedobject_connect(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;    
 
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
+    
+    UNUSED(obj);
 
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -858,45 +703,8 @@ sharedobject_connect(const fn_call& fn)
         return as_value();
     }
 
-    // Although the ActionScript spec says connect() takes two
-    // arguments, the HAXE implementation only supports one.
-    // So we have to make sure the NetCnnection object we get
-    // passed is already had the URI specified to connect to.
-    if (fn.nargs > 1) {
-#if 0
-        const as_value& uri = fn.arg(1);
-        const VM& vm = getVM(fn);
-        const std::string& uriStr = uri.to_string(vm.getSWFVersion());
-#endif
-    }
-    
-    NetConnection_as* nc;
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), nc)) {
-        return as_value();
-    }
+    LOG_ONCE(log_unimpl("SharedObject.connect()"));
 
-    // This is always set without validification.fooc->setURI(uriStr);
-    std::string str = nc->getURI();
-    obj->setPath(str);
-    URL uri = nc->getURI();
-    Network *net = new Network;
-
-    net->setProtocol(uri.protocol());
-    net->setHost(uri.hostname());
-    net->setPort(strtol(uri.port().c_str(), NULL, 0) & 0xffff);
-
-    // Check first arg for validity 
-    if (getSWFVersion(fn) > 6) {
-        nc->connect();
-    } else {
-        if (fn.nargs > 0) {
-            std::stringstream ss; fn.dump_args(ss);
-            log_unimpl("SharedObject.connect(%s): args after the first are "
-                    "not supported", ss.str());
-        }
-        nc->connect();
-    }
-    
     return as_value();
 }
 
@@ -923,17 +731,13 @@ sharedobject_setFps(const fn_call& fn)
 as_value
 sharedobject_send(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
-
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
-
-    if (!obj->isConnected()) {
-        obj->connectToServer(obj->getURI());
-    }
-    
+    UNUSED(obj);
+    LOG_ONCE(log_unimpl("SharedObject.send"));
     return as_value();
 }
 
+/// Returns false only if there was a failure writing data to file.
 as_value
 sharedobject_flush(const fn_call& fn)
 {    
@@ -967,17 +771,17 @@ sharedobject_flush(const fn_call& fn)
 as_value
 sharedobject_getLocal(const fn_call& fn)
 {
-    int swfVersion = getSWFVersion(fn);
+    const int swfVersion = getSWFVersion(fn);
 
     as_value objNameVal;
     if (fn.nargs > 0) objNameVal = fn.arg(0);
+
     const std::string objName = objNameVal.to_string(swfVersion);
     if (objName.empty()) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("SharedObject.getLocal(%s): %s", 
-                _("missing object name"));
+            log_aserror("SharedObject.getLocal(%s): missing object name");
         );
         as_value ret;
         ret.set_null();
@@ -985,8 +789,7 @@ sharedobject_getLocal(const fn_call& fn)
     }
 
     std::string root;
-    if (fn.nargs > 1)
-    {
+    if (fn.nargs > 1) {
         root = fn.arg(1).to_string(swfVersion);
     }
 
@@ -1002,60 +805,14 @@ sharedobject_getLocal(const fn_call& fn)
 }
 
 as_value
-sharedobject_getRemote(const fn_call& fn)
+sharedobject_getRemote(const fn_call& /*fn*/)
 {
-    GNASH_REPORT_FUNCTION;
-
-    int swfVersion = getSWFVersion(fn);
-    as_value objNameVal;
-
-    if (fn.nargs > 0) {
-        objNameVal = fn.arg(0);
-    }
-    
-    std::string objName = objNameVal.to_string(swfVersion);
-    if (objName.empty()) {
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::ostringstream ss;
-            fn.dump_args(ss);
-            log_aserror("SharedObject.getRemote(%s): %s", 
-                _("missing object name"));
-        );
-        as_value ret;
-        ret.set_null();
-        return ret;
-    }
-
-    std::string root;
-
-    // TODO: this certainly shouldn't be a string. The behaviour is different
-    // according to the type:
-    // null or false    not persistent.
-    // true             persistent.
-    // string (URL)     something else.
-    // We can implement this by making the interface cope with those different
-    // cases and just checking the argument type here.
-    std::string persistence;
-    if (fn.nargs > 1) {
-        root = fn.arg(1).to_string(swfVersion);
-        persistence = fn.arg(2).to_string(swfVersion);
-    }
-
-    log_debug("SO name:%s, root:%s, persistence: %s", objName, root, persistence);
-
-    VM& vm = getVM(fn);
-
-    as_object* obj = vm.getSharedObjectLibrary().getRemote(objName, root,
-            persistence);
-
-    as_value ret(obj);
-    log_debug("SharedObject.getRemote returning %s", ret);
-    
-    return ret;
+    LOG_ONCE(log_unimpl("SharedObject.getRemote()"));
+    return as_value();
 }
 
 
-/// Undocumented
+/// Officially undocumented.
 //
 /// Takes a URL argument and deletes all SharedObjects under that URL.
 as_value
@@ -1094,7 +851,7 @@ sharedobject_data(const fn_call& fn)
 }
 
 as_value
-sharedobject_getsize(const fn_call& fn)
+sharedobject_getSize(const fn_call& fn)
 {
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
     return as_value(obj->size());
@@ -1127,8 +884,6 @@ as_object*
 readSOL(VM& vm, const std::string& filespec)
 {
 
-#ifdef BUFFERED_AMF_SOL
-
     Global_as& gl = *vm.getGlobal();
 
     // The 'data' member is initialized only on getLocal() (and probably
@@ -1145,20 +900,22 @@ readSOL(VM& vm, const std::string& filespec)
         return data;
     }
 
-    if (st.st_size < 28) {
+    const size_t size = st.st_size;
+
+    if (size < 28) {
         // A SOL file exists, but it was invalid. Count it as not existing.
-        log_error("SharedObject::readSOL: SOL file %s is too short "
+        log_error("readSOL: SOL file %s is too short "
 		  "(only %s bytes long) to be valid.", filespec, st.st_size);
         return data;
     }
-    
-    boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[st.st_size]);
+
+    boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[size]);
     const boost::uint8_t *buf = sbuf.get();
-    const boost::uint8_t *end = buf + st.st_size;
+    const boost::uint8_t *end = buf + size;
 
     try {
         std::ifstream ifs(filespec.c_str(), std::ios::binary);
-        ifs.read(reinterpret_cast<char*>(sbuf.get()), st.st_size);
+        ifs.read(reinterpret_cast<char*>(sbuf.get()), size);
 
         // TODO check initial bytes, and print warnings if they are fishy
 
@@ -1172,35 +929,45 @@ readSOL(VM& vm, const std::string& filespec)
 
         if (buf >= end) {
             // In this case there is no data member.
-            log_error("SharedObject::readSOL: file ends before data segment");
+            log_error("readSOL: file ends before data segment");
             return data;
         }
 
-        std::vector<as_object*> objRefs;
+        AMF::Reader rd(buf, end, gl);
 
-        while (buf < end) {
-            log_debug("SharedObject::readSOL: reading property name at "
+        while (buf != end) {
+
+            log_debug("readSOL: reading property name at "
                     "byte %s", buf - sbuf.get());
             // read property name
-            boost::uint16_t len = 
+            
+            if (end - buf < 2) {
+                log_error("SharedObject: end of buffer while reading length");
+                break;
+            }
+
+            const boost::uint16_t len = 
                 ntohs(*(reinterpret_cast<const boost::uint16_t*>(buf)));
             buf += 2;
 
-            if( buf + len >= end ) {
+            if (!len) {
+                log_error("readSOL: empty property name");
+                break;
+            }
+
+            if (end - buf < len) {
                 log_error("SharedObject::readSOL: premature end of input");
                 break;
             }
-            if ( ! len ) {
-                log_error("SharedObject::readSOL: empty property name");
-                break;
-            }
+
             std::string prop_name(reinterpret_cast<const char*>(buf), len);
             buf += len;
 
             // read value
             as_value as;
-            if (!as.readAMF0(buf, end, -1, objRefs, vm)) {
-                log_error("SharedObject::readSOL: Parsing SharedObject '%s'",
+
+            if (!rd(as)) {
+                log_error("SharedObject: error parsing SharedObject '%s'",
                         filespec);
                 return false;
             }
@@ -1212,90 +979,25 @@ readSOL(VM& vm, const std::string& filespec)
             string_table& st = vm.getStringTable();
             data->set_member(st.find(prop_name), as);
             
+            if (buf == end) break;;
+
             buf += 1; // skip null byte after each property
         }
         return data;
     }
 
     catch (std::exception& e) {
-        log_error("SharedObject::readSOL: Reading SharedObject %s: %s", 
+        log_error("readSOL: Reading SharedObject %s: %s", 
 		  filespec, e.what());
         return 0;
     }
 
-#else
-    SOL sol;
-    log_security("Opening SharedObject file: %s", filespec);
-    if (sol.readFile(filespec) == false) {
-        log_security("empty or non-existing SOL file \"%s\", will be "
-                "created on flush/exit", filespec);
-        return false;
-    }
-    
-    std::vector<boost::shared_ptr<amf::Element> >::const_iterator it, e;
-    std::vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
-    log_debug("Read %d AMF objects from %s", els.size(), filespec);
-
-    as_value as = getMember(NSV::PROP_DATA);
-    as_object* ptr = as.to_object(getGlobal(fn));
-    
-    for (it = els.begin(), e = els.end(); it != e; it++) {
-        boost::shared_ptr<amf::Element> el = *it;
-
-        switch (el->getType())
-        {
-            case Element::NUMBER_AMF0:
-            {
-                double dub =  *(reinterpret_cast<double*>(el->getData()));
-                ptr->set_member(st.string_table::find(el->getName()),
-                        as_value(dub));
-                break;
-            }
-
-            case Element::BOOLEAN_AMF0:
-                ptr->set_member(st.string_table::find(el->getName()),
-                                            as_value(el->to_bool()));
-                break;
-
-            case Element::STRING_AMF0:
-            {
-                if (el->getLength() == 0) {
-                    ptr->set_member(st.string_table::find(el->getName()), "");
-                    break;
-                }
-                
-                std::string str(reinterpret_cast<const char*>(el->getData()),
-                        el->getLength());
-                ptr->set_member(st.string_table::find(el->getName()), str);
-                break;
-            }
-
-            case Element::OBJECT_AMF0:
-                // TODO: implement!
-                log_unimpl("Reading OBJECT type from SharedObject");
-                //data.convert_to_object(getGlobal(fn));
-                //ptr->set_member(st.string_table::find(el->name), data);
-                return false;
-                break;
-
-            default:
-                // TODO: what about other types?
-                log_unimpl("Reading SOL type %d", el->getType());
-                return false;
-                break;
-        } 
-
-    }
-
-    return true;
-#endif
 }
 
 
 void
 flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
 {
-//    GNASH_REPORT_FUNCTION;
     sol.second->flush();
 }
 
@@ -1313,6 +1015,60 @@ createSharedObject(Global_as& gl)
 
     // We know what it is...
     return &static_cast<SharedObject_as&>(*o->relay());;
+}
+
+/// Encode header data.
+//
+/// Note that the separation of header and data here is arbitrary.
+void
+encodeHeader(const size_t size, SimpleBuffer& buf)
+{
+    const boost::uint8_t header[] = { 0x00, 0xbf };
+    
+    // Initial header byters
+    buf.append(header, arraySize(header));
+    
+    // Size of data plus 14 (complete size of data after size field).
+    buf.appendNetworkLong(size);
+}
+
+/// This writes everything after the 'length' field of the SOL data.
+bool
+encodeData(const std::string& name, as_object& data, SimpleBuffer& buf)
+{
+    // Write the remaining header-like information.
+    const boost::uint8_t magic[] = { 'T', 'C', 'S', 'O',
+        0x00, 0x04, 0x00, 0x00, 0x00, 0x00 };
+
+    // Magic SharedObject bytes.
+    buf.append(magic, arraySize(magic)); 
+
+    // SharedObject name
+    const boost::uint16_t len = name.length();
+    buf.appendNetworkShort(len);
+    buf.append(name.c_str(), len);
+
+    // Padding
+    const boost::uint8_t padding[] = { 0, 0, 0, 0 };
+    buf.append(padding, arraySize(padding));
+    
+    // see http://osflash.org/documentation/amf/envelopes/sharedobject
+    // Do not encode strict arrays!
+    AMF::Writer w(buf, false);
+    string_table& st = getStringTable(data);
+
+    SOLPropsBufSerializer props(w, st);
+
+    // Visit all existing properties.
+    data.visitProperties<Exists>(props);
+
+    if (!props.success()) {
+        // There are good reasons for this to fail, so it's not an error. Real
+        // errors are logged during serialization.
+        log_debug("Did not serialize object");
+        return false;
+    }
+    return true;
 }
 
 } // anonymous namespace

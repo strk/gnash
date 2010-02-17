@@ -69,6 +69,12 @@ namespace gnash
     class movie_definition;
 }
 
+/// Quit flag for C signal handlers.
+//
+/// If set to true, Gnash will exit at the next opportunity.
+/// This is not part of any API.
+extern bool globalQuit;
+
 namespace gnash {
 
 /// Enumerates mouse cursor types.
@@ -77,6 +83,7 @@ enum gnash_cursor_type {
   CURSOR_NORMAL,
   CURSOR_INPUT
 };
+
 
 /// Handles screen dumps.
 class ScreenShotter

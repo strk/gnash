@@ -85,8 +85,7 @@ AC_DEFUN([GNASH_PATH_AGG],
   pkg=no
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_agg_lib}" = x; then
-      $PKG_CONFIG --exists libagg && ac_cv_path_agg_lib="`$PKG_CONFIG --libs-only-l libagg`"
-      $PKG_CONFIG --exists libagg && ac_cv_path_agg_lib="${ac_cv_path_agg_lib}`$PKG_CONFIG --libs-only-l libagg`"
+      $PKG_CONFIG --exists libagg && ac_cv_path_agg_lib="`$PKG_CONFIG --libs libagg`"
       $PKG_CONFIG --exists libagg && pkg=yes
     fi
   fi

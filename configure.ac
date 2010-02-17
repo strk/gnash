@@ -1901,15 +1901,6 @@ fi
 
 AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 
-dnl
-dnl gstreamer should take care of libxml2 and glib cflags/libs
-dnl
-if test x$cross_compiling = xyes; then
-  if test x$media_handler = xgst; then
-    GNASH_PKG_FIND(libxml2, [libxml/parser.h], [XML2 library], init)   
-  fi
-fi
-
 GNASH_PATH_QT3
 GNASH_PATH_KDE3
 
@@ -2040,9 +2031,9 @@ if test x$build_fltk = xyes; then
   GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
 fi
 
-dnl Some systems have a pervered set of dependencies. Although Gnash itself uses libXML,
-dnl Fedora Core 6 appears to have a dependency on expat for fontconfig. We only need the
-dnl library, but this is the easy wind to find it.
+dnl Some systems have a pervered set of dependencies.
+dnl Fedora Core 6 appears to have a dependency on expat for fontconfig.
+dnl We only need the library, but this is the easy wind to find it.
 GNASH_PKG_FIND(expat, [expat.h], [Expat library], XML_ErrorString)
 
 dnl these conditionals were moved out of kde.m4

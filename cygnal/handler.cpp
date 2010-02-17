@@ -278,12 +278,21 @@ Handler::setPlugin(Handler::cygnal_io_read_t /* read_ptr */, Handler::cygnal_io_
 }
 
 boost::shared_ptr<Handler::cygnal_init_t>
-Handler::initModule(const std::string& module)
+Handler::initModule(const std::string& str)
 {
     // GNASH_REPORT_FUNCTION;
 
+    if (str.empty()) {
+	return _plugin;
+    }
+
+    string module = str;
+    if (module[0] == '/') {
+	module.erase(0,1);
+    }
+    
     SharedLib *sl;
-    std::string symbol(module);
+    string symbol(module);
 
     _pluginsdir = PLUGINSDIR;
     log_security(_("Initializing module: \"%s\" from %s"), symbol, _pluginsdir);

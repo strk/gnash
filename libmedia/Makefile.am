@@ -32,7 +32,6 @@ pkglib_LTLIBRARIES =  libgnashmedia.la
 libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
 	$(PTHREAD_CFLAGS) \
-	$(LIBXML2_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(GLIB_CFLAGS) \
@@ -59,7 +58,6 @@ libgnashmedia_la_LIBADD = \
 
 libgnashmedia_la_SOURCES = \
 	MediaHandler.cpp \
-	AudioDecoderNellymoser.cpp \
 	AudioDecoderSimple.cpp \
 	MediaParser.cpp \
 	FLVParser.cpp \
@@ -73,7 +71,6 @@ noinst_HEADERS = \
 	MediaParser.h \
 	MediaHandler.h \
 	FLVParser.h \
-	AudioDecoderNellymoser.h \
 	AudioDecoderSimple.h \
 	SoundInfo.h \
 	AudioResampler.h \

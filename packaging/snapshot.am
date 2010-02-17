@@ -23,8 +23,8 @@ NOW = `date "+%Y%m%d"`
 #bzr version-info --custom --template='#define BRANCH_REVNO {revno}\n#define BRANCH_NICK {branch_nick}\n'
 
 # this is used for Debian style naming conventions
-PREVIOUS_RELEASE = 0.8.7
-SNAPSHOT_VERSION = $(PREVIOUS_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
+NEXT_RELEASE = 0.8.8
+SNAPSHOT_VERSION = $(NEXT_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
 
 # these is the directories where the snapshot gets built. Sources are
 # in the top level, the build goes in a _build subdirectory
@@ -47,27 +47,14 @@ SNAPSHOT_TMP = /tmp/$(SNAPSHOT_DIR)
 # Do the entire process to build a binary tarball
 snapshot: snapshot-src snapshot-configure snapshot-build snapshot-install snapshot-bundle
 
-# start by creating the initial tarball using the dist-bzip2 target.
-# This uses the default version for Gnash. which is 'trunk'. So we
-# rename it to the dir we want to stay clear. Then we change the default
-# version from 'trunk' to a date stamped version of trunk.
-snapshot-src: distdir  force
-	snapshot_tar="$(SNAPSHOT_TAR)"; \
-	snapshot_dir="$(SNAPSHOT_DIR)"; \
-	if test -d $${snapshot_dir}; then \
-	  rm -fr $${snapshot_dir}; \
-	fi; \
-	mv -f gnash-trunk $${snapshot_dir}; \
-	if test ! -f $${snapshot_dir}/configure.ac.orig; then \
-	  mv -f $${snapshot_dir}/configure.ac $${snapshot_dir}/configure.ac.orig; \
-	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $(BRANCH_NICK)$(BRANCH_REVNO))/" \
-	    $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
-	fi; \
-	tar zcvf $${snapshot_tar} --exclude=$${snapshot_dir}/autom4te.cache \
-	  --exclude=$${snapshot_dir}/configure.ac.orig $${snapshot_dir}
-#	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;
+# start by creating the source tree using the distdir target,
+# which builds a source tree only using what's in the DIST variables
+# from Automake. This uses the default version for Gnash. which is
+# 'trunk'. Then it gets renamed from the default version from 'trunk'
+# to a branch-revno stamped version instead of trunk.
+snapshot-src: distdir
 
-snapshot-configure: force
+snapshot-configure:
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-$(BRANCH_NICK)-${BRANCH_REVNO}"; \
 	snapshot_dir=$(SNAPSHOT_DIR); \
@@ -125,9 +112,8 @@ snapshot-bundle:
 	strip $${snapshot_tmp}/bin/rtmpget; \
 	tar zcvCf /tmp $${snapshot_tar} $(SNAPSHOT_NAME)
 
-
 snapshot-clean:
 	-@rm -fr snapshot-* $(SNAPSHOT_BUILD) $(SNAPSHOT_TMP) gnash*$(VERSION)*.ipk
 
-.PHONY : snapshot snapshot-build snapshot-install snapshot-clean snapshot-src
+.PHONY : snapshot snapshot-build snapshot-install snapshot-clean snapshot-src snapshot-configure
 

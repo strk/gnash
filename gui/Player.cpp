@@ -64,12 +64,9 @@
 using namespace gnash;
 
 namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
 
-/// @todo Shouldn't Player be in 'gnash' namespace ?
-
-/*static private*/
 void
 Player::setFlashVars(const std::string& varstr)
 {

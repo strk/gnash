@@ -160,7 +160,8 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
 // and prevents malformed instructions causing a read past the
 // end of the buffer.
 static std::string
-disasm_instruction(const unsigned char* instruction_data, size_t maxBufferLength)
+disasm_instruction(const unsigned char* instruction_data,
+        size_t maxBufferLength)
 {
 
     using namespace SWF;
@@ -188,7 +189,7 @@ disasm_instruction(const unsigned char* instruction_data, size_t maxBufferLength
         assert (maxBufferLength >= 3);
         ss << " (";
         fmt = ash[action_id].getArgFormat();
-        assert(fmt != ARG_NONE);
+        
         size_t length = (instruction_data[1] | (instruction_data[2] << 8));
         
         // Assert that length without the three initial bytes
@@ -201,28 +202,28 @@ disasm_instruction(const unsigned char* instruction_data, size_t maxBufferLength
                 break;
 
             case ARG_HEX:
-            {
                 ss << hexify(&instruction_data[3], length, false) << " ";
                 break;
-            }
 
             case ARG_STR:
             {
-                std::string str = hexify(&instruction_data[3], length, true);
+                const std::string str =
+                    hexify(&instruction_data[3], length, true);
                 ss << "\"" << str.c_str() << "\"";
                 break;
             }
 
             case ARG_U8:
             {
-                int val = instruction_data[3];
+                const int val = instruction_data[3];
                 ss << " " << val;
                 break;
             }
 
             case ARG_U16:
             {
-                int val = instruction_data[3] | (instruction_data[4] << 8);
+                const int val =
+                    instruction_data[3] | (instruction_data[4] << 8);
                 ss << " " << val;
                 break;
             }
@@ -238,16 +239,15 @@ disasm_instruction(const unsigned char* instruction_data, size_t maxBufferLength
             case ARG_PUSH_DATA:
             {
                 size_t i = 0;
-                while (i < length)
-                {
+                while (i < length) {
                     int type = instruction_data[3 + i];
                     
-                    // This should be safe, as the buffer is always 0-terminated.
-                    if ( i++ ) ss << ", ";
+                    // This should be safe, as the buffer is always
+                    // 0-terminated.
+                    if (i++) ss << ", ";
 
                     switch (type)
                     {
-
                         case 0:
                         {
                             // string

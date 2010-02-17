@@ -64,7 +64,6 @@
 // 0 : no assertions
 // 1 : quick assertions
 // 2 : check that handlers are called on correct tag
-//
 #ifndef GNASH_PARANOIA_LEVEL
 # define GNASH_PARANOIA_LEVEL 1
 #endif
@@ -83,33 +82,148 @@ namespace {
             unsigned int nargs);
     as_object* toObject(Global_as& gl, const as_value& val);
 
-	/// Common code for ActionGetUrl and ActionGetUrl2
-	//
-	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_url2
-	/// @see http://sswf.sourceforge.net/SWFalexref.html#action_get_url
-	///
-	/// @param target
-	///	the target window or _level1 to _level10
-	///
-	/// @param method
-	///	0:NONE, 1:GET, 2:POST
-	///
-	void commonGetURL(as_environment& env, as_value target,
+    /// Common code for ActionGetUrl and ActionGetUrl2
+    //
+    /// @param target         the target window or _level1 to _level10
+    /// @param method       0:NONE, 1:GET, 2:POST
+    void commonGetURL(as_environment& env, as_value target,
             const std::string& url, boost::uint8_t method);
+    
+    /// Common code for SetTarget and SetTargetExpression
+    ///
+    /// @param target_name      The target name. If empty new target will
+    ///                         be the main movie.
+    /// @param thread           The current execution thread.
+    void commonSetTarget(ActionExec& thread, const std::string& target_name);
+
+
+    enum as_encoding_guess_t {
+        ENCGUESS_UNICODE = 0,
+        ENCGUESS_JIS = 1,
+        ENCGUESS_OTHER = 2
+    };
+
+    /// Common code for guessing at the encoding of random text, between
+    // Shift-Jis, UTF8, and other. Puts the DisplayObject count in length,
+    // and the offsets to the DisplayObjects in offsets, if offsets is not NULL.
+    // If not NULL, offsets should be at least s.length().
+    // offsets are not accurate if the return value is GUESSENC_OTHER
+    //
+    /// NB It's doubtful if this even works.
+    as_encoding_guess_t guessEncoding(const std::string& s, int& length,
+            std::vector<int>& offsets);
+
+    
+    void ActionEnd(ActionExec& thread);
+    void ActionNextFrame(ActionExec& thread);
+    void ActionPrevFrame(ActionExec& thread);
+    void ActionPlay(ActionExec& thread);
+    void ActionStop(ActionExec& thread);
+    void ActionToggleQuality(ActionExec& thread);
+    void ActionStopSounds(ActionExec& thread);
+    void ActionGotoFrame(ActionExec& thread);
+    void ActionGetUrl(ActionExec& thread);
+    void ActionWaitForFrame(ActionExec& thread);
+    void ActionSetTarget(ActionExec& thread);
+    void ActionGotoLabel(ActionExec& thread);
+    void ActionAdd(ActionExec& thread);
+    void ActionSubtract(ActionExec& thread);
+    void ActionMultiply(ActionExec& thread);
+    void ActionDivide(ActionExec& thread);
+    void ActionEqual(ActionExec& thread);
+    void ActionLessThan(ActionExec& thread);
+    void ActionLogicalAnd(ActionExec& thread);
+    void ActionLogicalOr(ActionExec& thread);
+    void ActionLogicalNot(ActionExec& thread);
+    void ActionStringEq(ActionExec& thread);
+    void ActionStringLength(ActionExec& thread);
+    void ActionSubString(ActionExec& thread);
+    void ActionPop(ActionExec& thread);
+    void ActionInt(ActionExec& thread);
+    void ActionGetVariable(ActionExec& thread);
+    void ActionSetVariable(ActionExec& thread);
+    void ActionSetTargetExpression(ActionExec& thread);
+    void ActionStringConcat(ActionExec& thread);
+    void ActionGetProperty(ActionExec& thread);
+    void ActionSetProperty(ActionExec& thread);
+    void ActionDuplicateClip(ActionExec& thread);
+    void ActionRemoveClip(ActionExec& thread);
+    void ActionTrace(ActionExec& thread);
+    void ActionStartDragMovie(ActionExec& thread);
+    void ActionStopDragMovie(ActionExec& thread);
+    void ActionStringCompare(ActionExec& thread);
+    void ActionThrow(ActionExec& thread);
+    void ActionCastOp(ActionExec& thread);
+    void ActionImplementsOp(ActionExec& thread);
+    void ActionFscommand2(ActionExec& thread);
+    void ActionRandom(ActionExec& thread);
+    void ActionMbLength(ActionExec& thread);
+    void ActionOrd(ActionExec& thread);
+    void ActionChr(ActionExec& thread);
+    void ActionGetTimer(ActionExec& thread);
+    void ActionMbSubString(ActionExec& thread);
+    void ActionMbOrd(ActionExec& thread);
+    void ActionMbChr(ActionExec& thread);
+    void ActionStrictMode(ActionExec& thread);
+    void ActionWaitForFrameExpression(ActionExec& thread);
+    void ActionPushData(ActionExec& thread);
+    void ActionBranchAlways(ActionExec& thread);
+    void ActionGetUrl2(ActionExec& thread);
+    void ActionBranchIfTrue(ActionExec& thread);
+    void ActionCallFrame(ActionExec& thread);
+    void ActionGotoExpression(ActionExec& thread);
+    void ActionDelete(ActionExec& thread);
+    void ActionDelete2(ActionExec& thread);
+    void ActionVarEquals(ActionExec& thread);
+    void ActionCallFunction(ActionExec& thread);
+    void ActionReturn(ActionExec& thread);
+    void ActionModulo(ActionExec& thread);
+    void ActionNew(ActionExec& thread);
+    void ActionVar(ActionExec& thread);
+    void ActionInitArray(ActionExec& thread);
+    void ActionInitObject(ActionExec& thread);
+    void ActionTypeOf(ActionExec& thread);
+    void ActionTargetPath(ActionExec& thread);
+    void ActionEnumerate(ActionExec& thread);
+    void ActionNewAdd(ActionExec& thread);
+    void ActionNewLessThan(ActionExec& thread);
+    void ActionNewEquals(ActionExec& thread);
+    void ActionToNumber(ActionExec& thread);
+    void ActionToString(ActionExec& thread);
+    void ActionDup(ActionExec& thread);
+    void ActionSwap(ActionExec& thread);
+    void ActionGetMember(ActionExec& thread);
+    void ActionSetMember(ActionExec& thread);
+    void ActionIncrement(ActionExec& thread);
+    void ActionDecrement(ActionExec& thread);
+    void ActionCallMethod(ActionExec& thread);
+    void ActionNewMethod(ActionExec& thread);
+    void ActionInstanceOf(ActionExec& thread);
+    void ActionEnum2(ActionExec& thread);
+    void ActionBitwiseAnd(ActionExec& thread);
+    void ActionBitwiseOr(ActionExec& thread);
+    void ActionBitwiseXor(ActionExec& thread);
+    void ActionShiftLeft(ActionExec& thread);
+    void ActionShiftRight(ActionExec& thread);
+    void ActionShiftRight2(ActionExec& thread);
+    void ActionStrictEq(ActionExec& thread);
+    void ActionGreater(ActionExec& thread);
+    void ActionStringGreater(ActionExec& thread);
+    void ActionExtends(ActionExec& thread);
+    void ActionConstantPool(ActionExec& thread);
+    void ActionDefineFunction2(ActionExec& thread);
+    void ActionTry(ActionExec& thread);
+    void ActionWith(ActionExec& thread);
+    void ActionDefineFunction(ActionExec& thread);
+    void ActionSetRegister(ActionExec& thread);
+    void ActionUnsupported(ActionExec& thread);
 }
 
-namespace SWF { // gnash::SWF
-
-static void unsupported_action_handler(ActionExec& thread)
-{
-    log_error(_("Unsupported action handler invoked, code at pc is %#x"),
-            static_cast<int>(thread.code[thread.getCurrentPC()]));
-}
-
+namespace SWF { 
 ActionHandler::ActionHandler()
     :
     _name("unsupported"),
-    _callback(unsupported_action_handler),
+    _callback(ActionUnsupported),
     _debug(false),
     _arg_format(ARG_NONE)
 {
@@ -155,219 +269,220 @@ ActionHandler::execute(ActionExec& thread) const
 SWFHandlers::SWFHandlers()
 {
 
-    // Just to be sure we can start using different handler
-    // based on version (would make sense)
-    if ( ! VM::isInitialized() )
-    {
-        log_error(_("FIXME: VM not initialized at SWFHandlers construction time, can't set action handlers based on SWF version"));
-    }
-
     container_type & handlers = get_handlers();
 
     handlers[ACTION_END] = ActionHandler(ACTION_END,
-             "<End>", SWFHandlers::ActionEnd);
+             "End", ActionEnd);
     handlers[ACTION_NEXTFRAME] = ActionHandler(ACTION_NEXTFRAME,
-             "NextFrame", SWFHandlers::ActionNextFrame);
+             "NextFrame", ActionNextFrame);
     handlers[ACTION_PREVFRAME] =  ActionHandler(ACTION_PREVFRAME,
-             "PreviousFrame", SWFHandlers::ActionPrevFrame);
+             "PreviousFrame", ActionPrevFrame);
     handlers[ACTION_PLAY] = ActionHandler(ACTION_PLAY,
-             "Play", SWFHandlers::ActionPlay);
+             "Play", ActionPlay);
     handlers[ACTION_STOP] = ActionHandler(ACTION_STOP,
-             "Stop", SWFHandlers::ActionStop);
+             "Stop", ActionStop);
     handlers[ACTION_TOGGLEQUALITY] = ActionHandler(ACTION_TOGGLEQUALITY,
-             "ToggleQuality", SWFHandlers::ActionToggleQuality);
+             "ToggleQuality", ActionToggleQuality);
     handlers[ACTION_STOPSOUNDS] = ActionHandler(ACTION_STOPSOUNDS,
-             "StopSounds", SWFHandlers::ActionStopSounds);
+             "StopSounds", ActionStopSounds);
     handlers[ACTION_GOTOFRAME] = ActionHandler(ACTION_GOTOFRAME,
-             "GotoFrame", SWFHandlers::ActionGotoFrame, ARG_U16);
+             "GotoFrame", ActionGotoFrame, ARG_U16);
     handlers[ACTION_GETURL] = ActionHandler(ACTION_GETURL,
-             "GetUrl", SWFHandlers::ActionGetUrl, ARG_STR);
+             "GetUrl", ActionGetUrl, ARG_STR);
     handlers[ACTION_WAITFORFRAME] = ActionHandler(ACTION_WAITFORFRAME,
-             "WaitForFrame", SWFHandlers::ActionWaitForFrame, ARG_HEX);
+             "WaitForFrame", ActionWaitForFrame, ARG_HEX);
     handlers[ACTION_SETTARGET] = ActionHandler(ACTION_SETTARGET,
-             "SetTarget", SWFHandlers::ActionSetTarget, ARG_STR);
+             "SetTarget", ActionSetTarget, ARG_STR);
     handlers[ACTION_GOTOLABEL] = ActionHandler(ACTION_GOTOLABEL,
-             "GotoLabel", SWFHandlers::ActionGotoLabel, ARG_STR);
+             "GotoLabel", ActionGotoLabel, ARG_STR);
     handlers[ACTION_ADD] = ActionHandler(ACTION_ADD,
-             "Add", SWFHandlers::ActionAdd);
+             "Add", ActionAdd);
     handlers[ACTION_SUBTRACT] = ActionHandler(ACTION_SUBTRACT,
-             "Subtract", SWFHandlers::ActionSubtract);
+             "Subtract", ActionSubtract);
     handlers[ACTION_MULTIPLY] = ActionHandler(ACTION_MULTIPLY,
-             "Multiply", SWFHandlers::ActionMultiply);
+             "Multiply", ActionMultiply);
     handlers[ACTION_DIVIDE] = ActionHandler(ACTION_DIVIDE,
-             "Divide", SWFHandlers::ActionDivide);
+             "Divide", ActionDivide);
     handlers[ACTION_EQUAL] = ActionHandler(ACTION_EQUAL,
-             "Equal", SWFHandlers::ActionEqual);
+             "Equal", ActionEqual);
     handlers[ACTION_LESSTHAN] = ActionHandler(ACTION_LESSTHAN,
-             "LessThan", SWFHandlers::ActionLessThan);
+             "LessThan", ActionLessThan);
     handlers[ACTION_LOGICALAND] = ActionHandler(ACTION_LOGICALAND,
-             "LogicalAnd", SWFHandlers::ActionLogicalAnd);
+             "LogicalAnd", ActionLogicalAnd);
     handlers[ACTION_LOGICALOR] = ActionHandler(ACTION_LOGICALOR,
-             "LogicalOr", SWFHandlers::ActionLogicalOr);
+             "LogicalOr", ActionLogicalOr);
     handlers[ACTION_LOGICALNOT] = ActionHandler(ACTION_LOGICALNOT,
-             "LogicalNot", SWFHandlers::ActionLogicalNot);
+             "LogicalNot", ActionLogicalNot);
     handlers[ACTION_STRINGEQ] = ActionHandler(ACTION_STRINGEQ,
-             "StringEq", SWFHandlers::ActionStringEq);
+             "StringEq", ActionStringEq);
     handlers[ACTION_STRINGLENGTH] = ActionHandler(ACTION_STRINGLENGTH,
-             "ActionStringLength", SWFHandlers::ActionStringLength);
+             "ActionStringLength", ActionStringLength);
     handlers[ACTION_SUBSTRING] = ActionHandler(ACTION_SUBSTRING,
-             "ActionSubString", SWFHandlers::ActionSubString);
+             "ActionSubString", ActionSubString);
     handlers[ACTION_POP] = ActionHandler(ACTION_POP,
-             "ActionPop", SWFHandlers::ActionPop);
+             "ActionPop", ActionPop);
     handlers[ACTION_INT] = ActionHandler(ACTION_INT,
-             "ActionInt", SWFHandlers::ActionInt);
+             "ActionInt", ActionInt);
     handlers[ACTION_GETVARIABLE] = ActionHandler(ACTION_GETVARIABLE,
-             "ActionGetVariable", SWFHandlers::ActionGetVariable);
+             "ActionGetVariable", ActionGetVariable);
     handlers[ACTION_SETVARIABLE] = ActionHandler(ACTION_SETVARIABLE,
-             "ActionSetVariable", SWFHandlers::ActionSetVariable);
-    handlers[ACTION_SETTARGETEXPRESSION] = ActionHandler(ACTION_SETTARGETEXPRESSION,
-             "ActionSetTargetExpression", SWFHandlers::ActionSetTargetExpression);
+             "ActionSetVariable", ActionSetVariable);
+    handlers[ACTION_SETTARGETEXPRESSION] =
+        ActionHandler(ACTION_SETTARGETEXPRESSION,
+             "ActionSetTargetExpression",
+             ActionSetTargetExpression);
     handlers[ACTION_STRINGCONCAT] = ActionHandler(ACTION_STRINGCONCAT,
-             "ActionStringConcat", SWFHandlers::ActionStringConcat);
+             "ActionStringConcat", ActionStringConcat);
     handlers[ACTION_GETPROPERTY] = ActionHandler(ACTION_GETPROPERTY,
-             "ActionGetProperty", SWFHandlers::ActionGetProperty);
+             "ActionGetProperty", ActionGetProperty);
     handlers[ACTION_SETPROPERTY] = ActionHandler(ACTION_SETPROPERTY,
-             "ActionSetProperty", SWFHandlers::ActionSetProperty);
+             "ActionSetProperty", ActionSetProperty);
     handlers[ACTION_DUPLICATECLIP] = ActionHandler(ACTION_DUPLICATECLIP,
-             "ActionDuplicateClip", SWFHandlers::ActionDuplicateClip);
+             "ActionDuplicateClip", ActionDuplicateClip);
     handlers[ACTION_REMOVECLIP] = ActionHandler(ACTION_REMOVECLIP,
-             "ActionRemoveClip", SWFHandlers::ActionRemoveClip);
+             "ActionRemoveClip", ActionRemoveClip);
     handlers[ACTION_TRACE] = ActionHandler(ACTION_TRACE,
-             "ActionTrace", SWFHandlers::ActionTrace);
+             "ActionTrace", ActionTrace);
     handlers[ACTION_STARTDRAGMOVIE] = ActionHandler(ACTION_STARTDRAGMOVIE,
-             "ActionStartDragMovie", SWFHandlers::ActionStartDragMovie);
+             "ActionStartDragMovie", ActionStartDragMovie);
     handlers[ACTION_STOPDRAGMOVIE] = ActionHandler(ACTION_STOPDRAGMOVIE,
-             "ActionStopDragMovie", SWFHandlers::ActionStopDragMovie);
+             "ActionStopDragMovie", ActionStopDragMovie);
     handlers[ACTION_STRINGCOMPARE] = ActionHandler(ACTION_STRINGCOMPARE,
-             "ActionStringCompare", SWFHandlers::ActionStringCompare);
+             "ActionStringCompare", ActionStringCompare);
     handlers[ACTION_THROW] = ActionHandler(ACTION_THROW,
-             "ActionThrow", SWFHandlers::ActionThrow);
+             "ActionThrow", ActionThrow);
     handlers[ACTION_CASTOP] = ActionHandler(ACTION_CASTOP,
-             "ActionCastOp", SWFHandlers::ActionCastOp);
+             "ActionCastOp", ActionCastOp);
     handlers[ACTION_IMPLEMENTSOP] = ActionHandler(ACTION_IMPLEMENTSOP,
-             "ActionImplementsOp", SWFHandlers::ActionImplementsOp);
+             "ActionImplementsOp", ActionImplementsOp);
     handlers[ACTION_FSCOMMAND2] = ActionHandler(ACTION_FSCOMMAND2,
-             "ActionFscommand2", SWFHandlers::ActionFscommand2);
+             "ActionFscommand2", ActionFscommand2);
     handlers[ACTION_RANDOM] = ActionHandler(ACTION_RANDOM,
-             "ActionRandom", SWFHandlers::ActionRandom);
+             "ActionRandom", ActionRandom);
     handlers[ACTION_MBLENGTH] = ActionHandler(ACTION_MBLENGTH,
-             "ActionMbLength", SWFHandlers::ActionMbLength);
+             "ActionMbLength", ActionMbLength);
     handlers[ACTION_ORD] = ActionHandler(ACTION_ORD,
-             "ActionOrd", SWFHandlers::ActionOrd);
+             "ActionOrd", ActionOrd);
     handlers[ACTION_CHR] = ActionHandler(ACTION_CHR,
-             "ActionChr", SWFHandlers::ActionChr);
+             "ActionChr", ActionChr);
     handlers[ACTION_GETTIMER] = ActionHandler(ACTION_GETTIMER,
-             "ActionGetTimer", SWFHandlers::ActionGetTimer);
+             "ActionGetTimer", ActionGetTimer);
     handlers[ACTION_MBSUBSTRING] = ActionHandler(ACTION_MBSUBSTRING,
-             "ActionMbSubString", SWFHandlers::ActionMbSubString);
+             "ActionMbSubString", ActionMbSubString);
     handlers[ACTION_MBORD] = ActionHandler(ACTION_MBORD,
-             "ActionMbOrd", SWFHandlers::ActionMbOrd);
+             "ActionMbOrd", ActionMbOrd);
     handlers[ACTION_MBCHR] = ActionHandler(ACTION_MBCHR,
-             "ActionMbChr", SWFHandlers::ActionMbChr);
-    handlers[ACTION_WAITFORFRAMEEXPRESSION] = ActionHandler(ACTION_WAITFORFRAMEEXPRESSION,
+             "ActionMbChr", ActionMbChr);
+    handlers[ACTION_STRICTMODE] = ActionHandler(ACTION_STRICTMODE,
+             "ActionStrictMode", ActionStrictMode, ARG_U8);
+    handlers[ACTION_WAITFORFRAMEEXPRESSION] =
+        ActionHandler(ACTION_WAITFORFRAMEEXPRESSION,
              "ActionWaitForFrameExpression",
-             SWFHandlers::ActionWaitForFrameExpression, ARG_HEX);
+             ActionWaitForFrameExpression, ARG_HEX);
     handlers[ACTION_PUSHDATA] = ActionHandler(ACTION_PUSHDATA,
-             "ActionPushData", SWFHandlers::ActionPushData, ARG_PUSH_DATA);
+             "ActionPushData", ActionPushData, ARG_PUSH_DATA);
     handlers[ACTION_BRANCHALWAYS] = ActionHandler(ACTION_BRANCHALWAYS,
-             "ActionBranchAlways", SWFHandlers::ActionBranchAlways, ARG_S16);
+             "ActionBranchAlways", ActionBranchAlways, ARG_S16);
     handlers[ACTION_GETURL2] = ActionHandler(ACTION_GETURL2,
-             "ActionGetUrl2", SWFHandlers::ActionGetUrl2, ARG_HEX);
+             "ActionGetUrl2", ActionGetUrl2, ARG_HEX);
     handlers[ACTION_BRANCHIFTRUE] = ActionHandler(ACTION_BRANCHIFTRUE,
-             "ActionBranchIfTrue", SWFHandlers::ActionBranchIfTrue, ARG_S16);
+             "ActionBranchIfTrue", ActionBranchIfTrue, ARG_S16);
     handlers[ACTION_CALLFRAME] = ActionHandler(ACTION_CALLFRAME,
-             "ActionCallFrame", SWFHandlers::ActionCallFrame, ARG_HEX);
+             "ActionCallFrame", ActionCallFrame, ARG_HEX);
     handlers[ACTION_GOTOEXPRESSION] = ActionHandler(ACTION_GOTOEXPRESSION,
-             "ActionGotoExpression", SWFHandlers::ActionGotoExpression, ARG_HEX);
+             "ActionGotoExpression",
+             ActionGotoExpression, ARG_HEX);
     handlers[ACTION_DELETE] = ActionHandler(ACTION_DELETE,
-             "ActionDelete", SWFHandlers::ActionDelete);
+             "ActionDelete", ActionDelete);
     handlers[ACTION_DELETE2] = ActionHandler(ACTION_DELETE2,
-             "ActionDelete2", SWFHandlers::ActionDelete2);
+             "ActionDelete2", ActionDelete2);
     handlers[ACTION_VAREQUALS] = ActionHandler(ACTION_VAREQUALS,
-             "ActionVarEquals", SWFHandlers::ActionVarEquals);
+             "ActionVarEquals", ActionVarEquals);
     handlers[ACTION_CALLFUNCTION] = ActionHandler(ACTION_CALLFUNCTION,
-             "ActionCallFunction", SWFHandlers::ActionCallFunction);
+             "ActionCallFunction", ActionCallFunction);
     handlers[ACTION_RETURN] = ActionHandler(ACTION_RETURN,
-             "ActionReturn", SWFHandlers::ActionReturn);
+             "ActionReturn", ActionReturn);
     handlers[ACTION_MODULO] = ActionHandler(ACTION_MODULO,
-             "ActionModulo", SWFHandlers::ActionModulo);
+             "ActionModulo", ActionModulo);
     handlers[ACTION_NEW] = ActionHandler(ACTION_NEW,
-             "ActionNew", SWFHandlers::ActionNew);
+             "ActionNew", ActionNew);
     handlers[ACTION_VAR] = ActionHandler(ACTION_VAR,
-             "ActionVar", SWFHandlers::ActionVar);
+             "ActionVar", ActionVar);
     handlers[ACTION_INITARRAY] = ActionHandler(ACTION_INITARRAY,
-             "ActionInitArray", SWFHandlers::ActionInitArray);
+             "ActionInitArray", ActionInitArray);
     handlers[ACTION_INITOBJECT] = ActionHandler(ACTION_INITOBJECT,
-             "ActionInitObject", SWFHandlers::ActionInitObject);
+             "ActionInitObject", ActionInitObject);
     handlers[ACTION_TYPEOF] = ActionHandler(ACTION_TYPEOF,
-             "ActionTypeOf", SWFHandlers::ActionTypeOf);
+             "ActionTypeOf", ActionTypeOf);
     handlers[ACTION_TARGETPATH] = ActionHandler(ACTION_TARGETPATH,
-             "ActionTargetPath", SWFHandlers::ActionTargetPath);
+             "ActionTargetPath", ActionTargetPath);
     handlers[ACTION_ENUMERATE] = ActionHandler(ACTION_ENUMERATE,
-             "ActionEnumerate", SWFHandlers::ActionEnumerate);
+             "ActionEnumerate", ActionEnumerate);
     handlers[ACTION_NEWADD] = ActionHandler(ACTION_NEWADD,
-             "ActionNewAdd", SWFHandlers::ActionNewAdd);
+             "ActionNewAdd", ActionNewAdd);
     handlers[ACTION_NEWLESSTHAN] = ActionHandler(ACTION_NEWLESSTHAN,
-             "ActionNewLessThan", SWFHandlers::ActionNewLessThan);
+             "ActionNewLessThan", ActionNewLessThan);
     handlers[ACTION_NEWEQUALS] = ActionHandler(ACTION_NEWEQUALS,
-             "ActionNewEquals", SWFHandlers::ActionNewEquals);
+             "ActionNewEquals", ActionNewEquals);
     handlers[ACTION_TONUMBER] = ActionHandler(ACTION_TONUMBER,
-             "ActionToNumber", SWFHandlers::ActionToNumber);
+             "ActionToNumber", ActionToNumber);
     handlers[ACTION_TOSTRING] = ActionHandler(ACTION_TOSTRING,
-             "ActionToString", SWFHandlers::ActionToString);
+             "ActionToString", ActionToString);
     handlers[ACTION_DUP] = ActionHandler(ACTION_DUP,
-             "ActionDup", SWFHandlers::ActionDup);
+             "ActionDup", ActionDup);
     handlers[ACTION_SWAP] = ActionHandler(ACTION_SWAP,
-             "ActionSwap", SWFHandlers::ActionSwap);
+             "ActionSwap", ActionSwap);
     handlers[ACTION_GETMEMBER] = ActionHandler(ACTION_GETMEMBER,
-             "ActionGetMember", SWFHandlers::ActionGetMember);
+             "ActionGetMember", ActionGetMember);
     handlers[ACTION_SETMEMBER] = ActionHandler(ACTION_SETMEMBER,
-             "ActionSetMember", SWFHandlers::ActionSetMember);
+             "ActionSetMember", ActionSetMember);
     handlers[ACTION_INCREMENT] = ActionHandler(ACTION_INCREMENT,
-             "ActionIncrement", SWFHandlers::ActionIncrement);
+             "ActionIncrement", ActionIncrement);
     handlers[ACTION_DECREMENT] = ActionHandler(ACTION_DECREMENT,
-             "ActionDecrement", SWFHandlers::ActionDecrement);
+             "ActionDecrement", ActionDecrement);
     handlers[ACTION_CALLMETHOD] = ActionHandler(ACTION_CALLMETHOD,
-             "ActionCallMethod", SWFHandlers::ActionCallMethod);
+             "ActionCallMethod", ActionCallMethod);
     handlers[ACTION_NEWMETHOD] = ActionHandler(ACTION_NEWMETHOD,
-             "ActionNewMethod", SWFHandlers::ActionNewMethod);
+             "ActionNewMethod", ActionNewMethod);
     handlers[ACTION_INSTANCEOF] = ActionHandler(ACTION_INSTANCEOF,
-             "ActionInstanceOf", SWFHandlers::ActionInstanceOf);
+             "ActionInstanceOf", ActionInstanceOf);
     handlers[ACTION_ENUM2] = ActionHandler(ACTION_ENUM2,
-             "ActionEnum2", SWFHandlers::ActionEnum2);
+             "ActionEnum2", ActionEnum2);
     handlers[ACTION_BITWISEAND] = ActionHandler(ACTION_BITWISEAND,
-             "ActionBitwiseAnd", SWFHandlers::ActionBitwiseAnd);
+             "ActionBitwiseAnd", ActionBitwiseAnd);
     handlers[ACTION_BITWISEOR] = ActionHandler(ACTION_BITWISEOR,
-             "ActionBitwiseOr", SWFHandlers::ActionBitwiseOr);
+             "ActionBitwiseOr", ActionBitwiseOr);
     handlers[ACTION_BITWISEXOR] = ActionHandler(ACTION_BITWISEXOR,
-             "ActionBitwiseXor", SWFHandlers::ActionBitwiseXor);
+             "ActionBitwiseXor", ActionBitwiseXor);
     handlers[ACTION_SHIFTLEFT] = ActionHandler(ACTION_SHIFTLEFT,
-             "ActionShiftLeft", SWFHandlers::ActionShiftLeft);
+             "ActionShiftLeft", ActionShiftLeft);
     handlers[ACTION_SHIFTRIGHT] = ActionHandler(ACTION_SHIFTRIGHT,
-             "ActionShiftRight", SWFHandlers::ActionShiftRight);
+             "ActionShiftRight", ActionShiftRight);
     handlers[ACTION_SHIFTRIGHT2] = ActionHandler(ACTION_SHIFTRIGHT2,
-             "ActionShiftRight2", SWFHandlers::ActionShiftRight2);
+             "ActionShiftRight2", ActionShiftRight2);
     handlers[ACTION_STRICTEQ] = ActionHandler(ACTION_STRICTEQ,
-             "ActionStrictEq", SWFHandlers::ActionStrictEq);
+             "ActionStrictEq", ActionStrictEq);
     handlers[ACTION_GREATER] = ActionHandler(ACTION_GREATER,
-             "ActionGreater", SWFHandlers::ActionGreater);
+             "ActionGreater", ActionGreater);
     handlers[ACTION_STRINGGREATER] = ActionHandler(ACTION_STRINGGREATER,
-             "ActionStringGreater", SWFHandlers::ActionStringGreater);
+             "ActionStringGreater", ActionStringGreater);
     handlers[ACTION_EXTENDS] = ActionHandler(ACTION_EXTENDS,
-             "ActionExtends", SWFHandlers::ActionExtends);
+             "ActionExtends", ActionExtends);
     handlers[ACTION_CONSTANTPOOL] = ActionHandler(ACTION_CONSTANTPOOL,
-             "ActionConstantPool", SWFHandlers::ActionConstantPool, ARG_DECL_DICT);
+             "ActionConstantPool", ActionConstantPool,
+             ARG_DECL_DICT);
     handlers[ACTION_DEFINEFUNCTION2] = ActionHandler(ACTION_DEFINEFUNCTION2,
-             "ActionDefineFunction2", SWFHandlers::ActionDefineFunction2,
+             "ActionDefineFunction2", ActionDefineFunction2,
              ARG_FUNCTION2);
     handlers[ACTION_TRY] = ActionHandler(ACTION_TRY,
-             "ActionTry", SWFHandlers::ActionTry, ARG_FUNCTION2);
+             "ActionTry", ActionTry, ARG_FUNCTION2);
     handlers[ACTION_WITH] = ActionHandler(ACTION_WITH,
-             "ActionWith", SWFHandlers::ActionWith, ARG_U16);
+             "ActionWith", ActionWith, ARG_U16);
     handlers[ACTION_DEFINEFUNCTION] = ActionHandler(ACTION_DEFINEFUNCTION,
-             "ActionDefineFunction", SWFHandlers::ActionDefineFunction, ARG_HEX);
+             "ActionDefineFunction", ActionDefineFunction,
+             ARG_HEX);
     handlers[ACTION_SETREGISTER] = ActionHandler(ACTION_SETREGISTER,
-             "ActionSetRegister", SWFHandlers::ActionSetRegister, ARG_U8);
+             "ActionSetRegister", ActionSetRegister, ARG_U8);
 }
 
 SWFHandlers::~SWFHandlers()
@@ -400,8 +515,30 @@ SWFHandlers::execute(ActionType type, ActionExec& thread) const
     }
 }
 
+const char*
+SWFHandlers::action_name(ActionType x) const
+{
+    if (static_cast<size_t>(x) > get_handlers().size())
+    {
+        log_error(_("at SWFHandlers::action_name(%d) call time, "
+                    "_handlers size is %d"),
+                    x, get_handlers().size());
+        return NULL;
+    }
+    else
+    {
+        return get_handlers()[x].getName().c_str();
+    }
+}
+
+
+} // namespace SWF
+
+
+namespace {
+
 void
-SWFHandlers::ActionEnd(ActionExec& thread)
+ActionEnd(ActionExec& thread)
 {
 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -414,7 +551,7 @@ SWFHandlers::ActionEnd(ActionExec& thread)
 
 
 void
-SWFHandlers::ActionNextFrame(ActionExec& thread)
+ActionNextFrame(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -430,7 +567,7 @@ SWFHandlers::ActionNextFrame(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionPrevFrame(ActionExec& thread)
+ActionPrevFrame(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -446,7 +583,7 @@ SWFHandlers::ActionPrevFrame(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionPlay(ActionExec& thread)
+ActionPlay(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -462,7 +599,7 @@ SWFHandlers::ActionPlay(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionStop(ActionExec& thread)
+ActionStop(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -478,7 +615,7 @@ SWFHandlers::ActionStop(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionToggleQuality(ActionExec&
+ActionToggleQuality(ActionExec&
 #if GNASH_PARANOIA_LEVEL > 1
     thread
 #endif
@@ -493,7 +630,7 @@ SWFHandlers::ActionToggleQuality(ActionExec&
 }
 
 void
-SWFHandlers::ActionStopSounds(ActionExec& thread)
+ActionStopSounds(ActionExec& thread)
 {
 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -509,7 +646,7 @@ SWFHandlers::ActionStopSounds(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionGotoFrame(ActionExec& thread)
+ActionGotoFrame(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -533,7 +670,7 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionGetUrl(ActionExec& thread)
+ActionGetUrl(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -569,7 +706,7 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionWaitForFrame(ActionExec& thread)
+ActionWaitForFrame(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -628,7 +765,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionSetTarget(ActionExec& thread)
+ActionSetTarget(ActionExec& thread)
 {
 
     const action_buffer& code = thread.code;
@@ -641,11 +778,11 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
     // Change the movie we're working on.
     std::string target_name ( code.read_string(pc+3) );
 
-    CommonSetTarget(thread, target_name);
+    commonSetTarget(thread, target_name);
 }
 
 void
-SWFHandlers::ActionGotoLabel(ActionExec& thread)
+ActionGotoLabel(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -666,7 +803,7 @@ SWFHandlers::ActionGotoLabel(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionAdd(ActionExec& thread)
+ActionAdd(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -678,7 +815,7 @@ SWFHandlers::ActionAdd(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionSubtract(ActionExec& thread)
+ActionSubtract(ActionExec& thread)
 {
     as_environment& env = thread.env;
     subtract(env.top(1), env.top(0), getVM(env));
@@ -686,7 +823,7 @@ SWFHandlers::ActionSubtract(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionMultiply(ActionExec& thread)
+ActionMultiply(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -703,7 +840,7 @@ SWFHandlers::ActionMultiply(ActionExec& thread)
 // 0 / 0 : NaN
 // Either operand is NaN: NaN
 void
-SWFHandlers::ActionDivide(ActionExec& thread)
+ActionDivide(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -738,7 +875,7 @@ SWFHandlers::ActionDivide(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionEqual(ActionExec& thread)
+ActionEqual(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -759,7 +896,7 @@ SWFHandlers::ActionEqual(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionLessThan(ActionExec& thread)
+ActionLessThan(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -773,7 +910,7 @@ SWFHandlers::ActionLessThan(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionLogicalAnd(ActionExec& thread)
+ActionLogicalAnd(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -783,7 +920,7 @@ SWFHandlers::ActionLogicalAnd(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionLogicalOr(ActionExec& thread)
+ActionLogicalOr(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -793,7 +930,7 @@ SWFHandlers::ActionLogicalOr(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionLogicalNot(ActionExec& thread)
+ActionLogicalNot(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -805,7 +942,7 @@ SWFHandlers::ActionLogicalNot(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionStringEq(ActionExec& thread)
+ActionStringEq(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -819,7 +956,7 @@ SWFHandlers::ActionStringEq(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionStringLength(ActionExec& thread)
+ActionStringLength(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
@@ -840,7 +977,7 @@ SWFHandlers::ActionStringLength(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionSubString(ActionExec& thread)
+ActionSubString(ActionExec& thread)
 {
 
     // substring("string",  base,  size) 
@@ -924,7 +1061,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionPop(ActionExec& thread)
+ActionPop(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -934,14 +1071,14 @@ SWFHandlers::ActionPop(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionInt(ActionExec& thread)
+ActionInt(ActionExec& thread)
 {
     as_environment& env = thread.env;
     env.top(0).set_double(toInt(env.top(0)));
 }
 
 void
-SWFHandlers::ActionGetVariable(ActionExec& thread)
+ActionGetVariable(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -978,7 +1115,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionSetVariable(ActionExec& thread)
+ActionSetVariable(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -1010,7 +1147,7 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 
 // See: http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
 void
-SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
+ActionSetTargetExpression(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -1024,13 +1161,13 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
     // 
     std::string target_name = env.top(0).to_string(env.get_version());
 
-    CommonSetTarget(thread, target_name);
+    commonSetTarget(thread, target_name);
 
     env.drop(1); // pop the target sprite off the stack
 }
 
 void
-SWFHandlers::ActionStringConcat(ActionExec& thread)
+ActionStringConcat(ActionExec& thread)
 {
     as_environment& env = thread.env;
     const int version = getSWFVersion(env);
@@ -1041,7 +1178,7 @@ SWFHandlers::ActionStringConcat(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionGetProperty(ActionExec& thread)
+ActionGetProperty(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -1083,7 +1220,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionSetProperty(ActionExec& thread)
+ActionSetProperty(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -1109,7 +1246,7 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionDuplicateClip(ActionExec& thread)
+ActionDuplicateClip(ActionExec& thread)
 {
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
@@ -1162,7 +1299,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionRemoveClip(ActionExec& thread)
+ActionRemoveClip(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -1194,7 +1331,7 @@ SWFHandlers::ActionRemoveClip(ActionExec& thread)
 
 /// \brief Trace messages from the Flash movie using trace();
 void
-SWFHandlers::ActionTrace(ActionExec& thread)
+ActionTrace(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -1209,7 +1346,7 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionStartDragMovie(ActionExec& thread)
+ActionStartDragMovie(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -1284,7 +1421,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionStopDragMovie(ActionExec& thread)
+ActionStopDragMovie(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -1295,7 +1432,7 @@ SWFHandlers::ActionStopDragMovie(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionStringCompare(ActionExec& thread)
+ActionStringCompare(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -1306,7 +1443,7 @@ SWFHandlers::ActionStringCompare(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionThrow(ActionExec& thread)
+ActionThrow(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -1319,7 +1456,7 @@ SWFHandlers::ActionThrow(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionCastOp(ActionExec& thread)
+ActionCastOp(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -1370,7 +1507,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 /// for "c instanceOf B);". That seems to be the end of its usefulness, as
 /// c inherits no properties from B.
 void
-SWFHandlers::ActionImplementsOp(ActionExec& thread)
+ActionImplementsOp(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -1449,7 +1586,7 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
 /// Flash Lite (from 1.1 onwards) and is used to control
 /// devices (backlight, vibrate etc).
 void
-SWFHandlers::ActionFscommand2(ActionExec& thread)
+ActionFscommand2(ActionExec& thread)
 {
 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -1483,7 +1620,7 @@ SWFHandlers::ActionFscommand2(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionRandom(ActionExec& thread)
+ActionRandom(ActionExec& thread)
 {
 
     // Action random(n) should return an integer from 0 up to (not
@@ -1508,103 +1645,8 @@ SWFHandlers::ActionRandom(ActionExec& thread)
     env.top(0).set_double(uni());
 }
 
-as_encoding_guess_t
-SWFHandlers::guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
-{
-    int width = 0; // The remaining width, not the total.
-    bool is_sought = true;
-
-    std::string::const_iterator it = str.begin();
-    const std::string::const_iterator e = str.end();
-
-    length = 0;
-    
-    // First, assume it's UTF8 and try to be wrong.
-    while (it != e && is_sought)
-    {
-        ++length;
-
-        offsets.push_back(it - str.begin()); // current position
-
-        // Advances the iterator to point to the next 
-        boost::uint32_t c = utf8::decodeNextUnicodeCharacter(it, e);
-
-        if (c == utf8::invalid)
-        {
-            is_sought = false;
-            break;
-        }
-    }
-
-    offsets.push_back(it - str.begin()); // current position
-
-    if (it == e && is_sought)
-    {
-        // No characters left, so it's almost certainly UTF8.
-        return ENCGUESS_UNICODE;
-    }
-
-    it = str.begin();
-    int index = 0;
-    is_sought = true;
-    width = 0;
-    length = 0;
-    bool was_odd = true;
-    bool was_even = true;
-    // Now, assume it's SHIFT_JIS and try to be wrong.
-    while (it != e && is_sought)
-    {
-        int c = static_cast<int> (*it);
-
-        if (width)
-        {
-            --width;
-            if ((c < 0x40) || ((c < 0x9F) && was_even) ||
-                ((c > 0x9E) && was_odd) || (c == 0x7F))
-            {
-                is_sought = false;
-            }
-            continue;
-        }
-
-        ++length;
-        offsets.push_back(index); // [length - 1] = index;
-
-        if ((c == 0x80) || (c == 0xA0) || (c >= 0xF0))
-        {
-            is_sought = false;
-            break;
-        }
-
-        if (((c >= 0x81) && (c <= 0x9F)) || ((c >= 0xE0) && (c <= 0xEF)))
-        {
-            width = 1;
-            was_odd = c & 0x01;
-            was_even = !was_odd;
-        }
-    
-        it++;
-        index++;    
-    }
-    offsets.push_back(index); // [length - 1] = index;
-    
-    if (!width && is_sought)
-    {
-        // No width left, so it's probably SHIFT_JIS.
-        return ENCGUESS_JIS;
-    }
-
-    // It's something else.
-    length = std::mbstowcs(NULL, str.c_str(), 0);
-    if (length == -1)
-    {
-        length = str.length();
-    }
-    return ENCGUESS_OTHER;
-}
-
 void
-SWFHandlers::ActionMbLength(ActionExec& thread)
+ActionMbLength(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -1627,7 +1669,7 @@ SWFHandlers::ActionMbLength(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionOrd(ActionExec& thread)
+ActionOrd(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -1653,7 +1695,7 @@ SWFHandlers::ActionOrd(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionChr(ActionExec& thread)
+ActionChr(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -1693,7 +1735,7 @@ SWFHandlers::ActionChr(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionGetTimer(ActionExec& thread)
+ActionGetTimer(ActionExec& thread)
 {
     
     
@@ -1704,7 +1746,7 @@ SWFHandlers::ActionGetTimer(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionMbSubString(ActionExec& thread)
+ActionMbSubString(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -1730,9 +1772,6 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     std::vector<int> offsets;
 
     as_encoding_guess_t encoding = guessEncoding(str, length, offsets);
-
-    //log_debug("Guessed encoding for %s: %d - len:%d, offsets.size:%d", str, encoding, length, offsets.size());
-    //for (int i=0; i<offsets.size(); ++i) log_debug("  offsets[%d]: %d", i, offsets[i]);
 
     if (size < 0)
     {
@@ -1789,7 +1828,7 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionMbOrd(ActionExec& thread)
+ActionMbOrd(ActionExec& thread)
 {
     /// This only deals with UTF-8 characters.
     /// TODO: what else is possible?
@@ -1814,7 +1853,7 @@ SWFHandlers::ActionMbOrd(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionMbChr(ActionExec& thread)
+ActionMbChr(ActionExec& thread)
 {
     /// This only generates UTF-8 characters. No idea
     /// what difference user locale might make, but UTF-8
@@ -1839,18 +1878,34 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
 
 }
 
+/// Sets strict mode in the compiler.
+//
+/// This is irrelevant for execution, but included for completeness.
+void
+ActionStrictMode(ActionExec& thread)
+{
+    const action_buffer& code = thread.code;
+    
+    // off if 0, on for anything else.
+    const bool on = code[thread.getCurrentPC() + 3];
+    
+    IF_VERBOSE_ACTION(
+        log_action(_("ActionStrictMode set to %1%"), on);
+    );
+}
+
+
+
 // also known as WaitForFrame2
 void
-SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
+ActionWaitForFrameExpression(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
-    
-
     // how many actions to skip if frame has not been loaded
-    boost::uint8_t skip = code[thread.getCurrentPC()+3];
+    const boost::uint8_t skip = code[thread.getCurrentPC() + 3];
 
     // env.top(0) contains frame specification,
     // evaluated as for ActionGotoExpression
@@ -1858,15 +1913,14 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 
     DisplayObject* tgtch = env.get_target();
     MovieClip* target_sprite = tgtch ? tgtch->to_movie() : 0;
-    if ( ! target_sprite )
-    {
+    if (!target_sprite) {
         log_error(_("%s: environment target is null or not a MovieClip"),
             __FUNCTION__);
         return;
     }
 
     size_t framenum;
-        if ( ! target_sprite->get_frame_number(framespec, framenum) )
+    if ( ! target_sprite->get_frame_number(framespec, framenum) )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Frame spec found on stack "
@@ -1877,10 +1931,8 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
         return;
     }
 
-    size_t lastloaded = target_sprite->get_loaded_frames();
-    if ( lastloaded < framenum )
-    {
-        //log_debug(_("ActionWaitForFrameExpression: frame %u not reached yet (loaded %u), skipping next %u actions"), framenum, lastloaded, skip);
+    const size_t lastloaded = target_sprite->get_loaded_frames();
+    if (lastloaded < framenum) {
         // better delegate this to ActionExec
         thread.skip_actions(skip);
     }
@@ -1888,7 +1940,7 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionPushData(ActionExec& thread)
+ActionPushData(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -2057,24 +2109,23 @@ SWFHandlers::ActionPushData(ActionExec& thread)
             }
         }
 
-        IF_VERBOSE_ACTION (
-        if ( type == pushDict8 || type == pushDict16 )
-        {
-            log_action(_("\t%d) type=%s (%d), value=%s"),
-                count, pushType[type], id, env.top(0));
-        }
-        else
-        {
-            log_action(_("\t%d) type=%s, value=%s"),
-                count, pushType[type], env.top(0));
-        }
-        ++count;
+        IF_VERBOSE_ACTION(
+            if (type == pushDict8 || type == pushDict16) {
+                log_action(_("\t%d) type=%s (%d), value=%s"),
+                    count, pushType[type], id, env.top(0));
+            }
+            else
+            {
+                log_action(_("\t%d) type=%s, value=%s"),
+                    count, pushType[type], env.top(0));
+            }
+            ++count;
         );
     }
 }
 
 void
-SWFHandlers::ActionBranchAlways(ActionExec& thread)
+ActionBranchAlways(ActionExec& thread)
 {
     
 
@@ -2083,39 +2134,8 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
     // @@ TODO range checks
 }
 
-// Common code for SetTarget and SetTargetExpression. See:
-// http://sswf.sourceforge.net/SWFalexref.html#action_set_target
-// http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
 void
-SWFHandlers::CommonSetTarget(ActionExec& thread, const std::string& target_name)
-{
-    as_environment& env = thread.env;
-
-    // see swfdec's settarget-relative-*.swf
-    env.reset_target();
-
-    DisplayObject *new_target;
-
-    // if the string is blank, we reset the target to its original value
-    if ( target_name.empty() ) return;
-
-    new_target = env.find_target(target_name); // TODO: pass thread.getScopeStack()
-    if (new_target == NULL)
-    {
-        IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_("Couldn't find movie \"%s\" to set target to!"
-            " Setting target to NULL..."), target_name);
-        );
-        //return;
-    }
-    //else
-    //{
-        env.set_target(new_target);
-    //}
-}
-
-void
-SWFHandlers::ActionGetUrl2(ActionExec& thread)
+ActionGetUrl2(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -2141,7 +2161,7 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
+ActionBranchIfTrue(ActionExec& thread)
 {
 
     // Alias these
@@ -2174,7 +2194,7 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionCallFrame(ActionExec& thread)
+ActionCallFrame(ActionExec& thread)
 {
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
@@ -2211,7 +2231,7 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionGotoExpression(ActionExec& thread)
+ActionGotoExpression(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -2283,7 +2303,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 
 
 void
-SWFHandlers::ActionDelete(ActionExec& thread)
+ActionDelete(ActionExec& thread)
 {
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
@@ -2371,7 +2391,7 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionDelete2(ActionExec& thread)
+ActionDelete2(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -2411,7 +2431,7 @@ SWFHandlers::ActionDelete2(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionVarEquals(ActionExec& thread)
+ActionVarEquals(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -2428,7 +2448,7 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionCallFunction(ActionExec& thread)
+ActionCallFunction(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -2505,7 +2525,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionReturn(ActionExec& thread)
+ActionReturn(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -2525,7 +2545,7 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionModulo(ActionExec& thread)
+ActionModulo(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -2541,7 +2561,7 @@ SWFHandlers::ActionModulo(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionNew(ActionExec& thread)
+ActionNew(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -2588,7 +2608,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionVar(ActionExec& thread)
+ActionVar(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -2608,7 +2628,7 @@ SWFHandlers::ActionVar(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionInitArray(ActionExec& thread)
+ActionInitArray(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -2632,7 +2652,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionInitObject(ActionExec& thread)
+ActionInitObject(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -2670,14 +2690,14 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionTypeOf(ActionExec& thread)
+ActionTypeOf(ActionExec& thread)
 {
     as_environment& env = thread.env;
     env.top(0).set_string(env.top(0).typeOf());
 }
 
 void
-SWFHandlers::ActionTargetPath(ActionExec& thread)
+ActionTargetPath(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -2707,7 +2727,7 @@ enumerateObject(as_environment& env, const as_object& obj)
 }
 
 void
-SWFHandlers::ActionEnumerate(ActionExec& thread)
+ActionEnumerate(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -2735,7 +2755,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionNewAdd(ActionExec& thread)
+ActionNewAdd(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
@@ -2745,7 +2765,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionNewLessThan(ActionExec& thread)
+ActionNewLessThan(ActionExec& thread)
 {
     as_environment& env = thread.env;
     env.top(1) = newLessThan(env.top(1), env.top(0), getVM(env));
@@ -2753,7 +2773,7 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionNewEquals(ActionExec& thread)
+ActionNewEquals(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
@@ -2793,35 +2813,35 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionToNumber(ActionExec& thread)
+ActionToNumber(ActionExec& thread)
 {
     as_environment& env = thread.env;
     convertToNumber(env.top(0), getVM(env));
 }
 
 void
-SWFHandlers::ActionToString(ActionExec& thread)
+ActionToString(ActionExec& thread)
 {
     as_environment& env = thread.env;
     convertToString(env.top(0), getVM(env));
 }
 
 void
-SWFHandlers::ActionDup(ActionExec& thread)
+ActionDup(ActionExec& thread)
 {
     as_environment& env = thread.env;
     env.push(env.top(0));
 }
 
 void
-SWFHandlers::ActionSwap(ActionExec& thread)
+ActionSwap(ActionExec& thread)
 {
     as_environment& env = thread.env;
     std::swap(env.top(1), env.top(0));
 }
 
 void
-SWFHandlers::ActionGetMember(ActionExec& thread)
+ActionGetMember(ActionExec& thread)
 {
         
     as_environment& env = thread.env;
@@ -2845,7 +2865,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
 
     IF_VERBOSE_ACTION (
     log_action(_(" ActionGetMember: target: %s (object %p)"),
-               target, (void*)obj.get());
+               target, static_cast<void *>(obj.get()));
     );
 
     if (!thread.getObjectMember(*obj, member_name.to_string(), env.top(1)))
@@ -2870,7 +2890,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionSetMember(ActionExec& thread)
+ActionSetMember(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -2913,14 +2933,14 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionIncrement(ActionExec& thread)
+ActionIncrement(ActionExec& thread)
 {
     as_environment& env = thread.env;
     env.top(0).set_double(env.top(0).to_number() + 1);
 }
 
 void
-SWFHandlers::ActionDecrement(ActionExec& thread)
+ActionDecrement(ActionExec& thread)
 {
     as_environment& env = thread.env;
     env.top(0).set_double(env.top(0).to_number() - 1);
@@ -2948,7 +2968,7 @@ SWFHandlers::ActionDecrement(ActionExec& thread)
 //
 /// In both usages the arguments are passed.
 void
-SWFHandlers::ActionCallMethod(ActionExec& thread)
+ActionCallMethod(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
@@ -3088,7 +3108,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     call.super = super;
     call.callerDef = &(thread.code.getMovieDefinition());
     as_value result;
-	try {
+    try {
         result = method_obj->call(call);
     } catch (ActionTypeError& e) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -3104,7 +3124,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionNewMethod(ActionExec& thread)
+ActionNewMethod(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3187,7 +3207,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionInstanceOf(ActionExec& thread)
+ActionInstanceOf(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -3217,7 +3237,7 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionEnum2(ActionExec& thread)
+ActionEnum2(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3244,7 +3264,7 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionBitwiseAnd(ActionExec& thread)
+ActionBitwiseAnd(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
@@ -3256,7 +3276,7 @@ SWFHandlers::ActionBitwiseAnd(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionBitwiseOr(ActionExec& thread)
+ActionBitwiseOr(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -3269,7 +3289,7 @@ SWFHandlers::ActionBitwiseOr(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionBitwiseXor(ActionExec& thread)
+ActionBitwiseXor(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3282,7 +3302,7 @@ SWFHandlers::ActionBitwiseXor(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionShiftLeft(ActionExec& thread)
+ActionShiftLeft(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3302,7 +3322,7 @@ SWFHandlers::ActionShiftLeft(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionShiftRight(ActionExec& thread)
+ActionShiftRight(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3317,7 +3337,7 @@ SWFHandlers::ActionShiftRight(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionShiftRight2(ActionExec& thread)
+ActionShiftRight2(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3332,7 +3352,7 @@ SWFHandlers::ActionShiftRight2(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionStrictEq(ActionExec& thread)
+ActionStrictEq(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -3342,7 +3362,7 @@ SWFHandlers::ActionStrictEq(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionGreater(ActionExec& thread)
+ActionGreater(ActionExec& thread)
 {
     // Just swap the operator and invoke ActionNewLessThan
     as_environment& env = thread.env;
@@ -3353,7 +3373,7 @@ SWFHandlers::ActionGreater(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionStringGreater(ActionExec& thread)
+ActionStringGreater(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
@@ -3364,7 +3384,7 @@ SWFHandlers::ActionStringGreater(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionExtends(ActionExec& thread)
+ActionExtends(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3390,27 +3410,27 @@ SWFHandlers::ActionExtends(ActionExec& thread)
     }
     env.drop(2);
 
-	as_object* newproto = new as_object(gl);
-	as_object* p = super->getMember(NSV::PROP_PROTOTYPE).to_object(gl);
-	newproto->set_prototype(p);
+    as_object* newproto = new as_object(gl);
+    as_object* p = super->getMember(NSV::PROP_PROTOTYPE).to_object(gl);
+    newproto->set_prototype(p);
 
     if (getSWFVersion(*super) > 5) {
         const int flags = PropFlags::dontEnum;
-        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, super, flags); 
+        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, super, flags);
     }
 
-	sub->init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
+    sub->init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
 
 }
 
 void
-SWFHandlers::ActionConstantPool(ActionExec& thread)
+ActionConstantPool(ActionExec& thread)
 {
     thread.code.process_decl_dict(thread.getCurrentPC(), thread.getNextPC());
 }
 
 void
-SWFHandlers::ActionDefineFunction2(ActionExec& thread)
+ActionDefineFunction2(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3512,13 +3532,13 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
     //          thing into the intrusive_ptr, so the debugger
     //          will be left with a deleted object !!
     //          Rob: we don't want to use void pointers here..
-    as_object* o = toObject(getGlobal(thread.env), function_value);
+    boost::intrusive_ptr<as_object> o = toObject(getGlobal(thread.env), function_value);
     debugger.addSymbol(o.get(), name);
 #endif
 }
 
 void
-SWFHandlers::ActionTry(ActionExec& thread)
+ActionTry(ActionExec& thread)
 {
 
     const action_buffer& code = thread.code;
@@ -3575,7 +3595,7 @@ SWFHandlers::ActionTry(ActionExec& thread)
 
 /// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
 void
-SWFHandlers::ActionWith(ActionExec& thread)
+ActionWith(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3636,7 +3656,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionDefineFunction(ActionExec& thread)
+ActionDefineFunction(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3729,7 +3749,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionSetRegister(ActionExec& thread)
+ActionSetRegister(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
@@ -3770,26 +3790,13 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
     }
 }
 
-const char*
-SWFHandlers::action_name(ActionType x) const
+
+void
+ActionUnsupported(ActionExec& thread)
 {
-    if (static_cast<size_t>(x) > get_handlers().size())
-    {
-        log_error(_("at SWFHandlers::action_name(%d) call time, "
-                    "_handlers size is %d"),
-                    x, get_handlers().size());
-        return NULL;
-    }
-    else
-    {
-        return get_handlers()[x].getName().c_str();
-    }
+    log_error(_("Unsupported action handler invoked, code at pc is %#x"),
+            static_cast<int>(thread.code[thread.getCurrentPC()]));
 }
-
-} // namespace gnash::SWF
-
-/// Helper functions.
-namespace {
 
 as_object*
 toObject(Global_as& gl, const as_value& val)
@@ -4022,6 +4029,130 @@ commonGetURL(as_environment& env, as_value target,
     m.getURL(url, target_string, varsToSend, sendVarsMethod);
 
 }
+
+// Common code for SetTarget and SetTargetExpression. See:
+// http://sswf.sourceforge.net/SWFalexref.html#action_set_target
+// http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
+void
+commonSetTarget(ActionExec& thread, const std::string& target_name)
+{
+    as_environment& env = thread.env;
+
+    // see swfdec's settarget-relative-*.swf
+    env.reset_target();
+
+    DisplayObject *new_target;
+
+    // if the string is blank, we reset the target to its original value
+    if ( target_name.empty() ) return;
+
+    // TODO: pass thread.getScopeStack()
+    new_target = env.find_target(target_name); 
+    if (!new_target) {
+        IF_VERBOSE_ASCODING_ERRORS (
+        log_aserror(_("Couldn't find movie \"%s\" to set target to!"
+            " Setting target to NULL..."), target_name);
+        );
+    }
+    
+    env.set_target(new_target);
+}
+
+as_encoding_guess_t
+guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
+{
+    int width = 0; // The remaining width, not the total.
+    bool is_sought = true;
+
+    std::string::const_iterator it = str.begin();
+    const std::string::const_iterator e = str.end();
+
+    length = 0;
+    
+    // First, assume it's UTF8 and try to be wrong.
+    while (it != e && is_sought)
+    {
+        ++length;
+
+        offsets.push_back(it - str.begin()); // current position
+
+        // Advances the iterator to point to the next 
+        boost::uint32_t c = utf8::decodeNextUnicodeCharacter(it, e);
+
+        if (c == utf8::invalid)
+        {
+            is_sought = false;
+            break;
+        }
+    }
+
+    offsets.push_back(it - str.begin()); // current position
+
+    if (it == e && is_sought)
+    {
+        // No characters left, so it's almost certainly UTF8.
+        return ENCGUESS_UNICODE;
+    }
+
+    it = str.begin();
+    int index = 0;
+    is_sought = true;
+    width = 0;
+    length = 0;
+    bool was_odd = true;
+    bool was_even = true;
+    // Now, assume it's SHIFT_JIS and try to be wrong.
+    while (it != e && is_sought)
+    {
+        int c = static_cast<int> (*it);
+
+        if (width)
+        {
+            --width;
+            if ((c < 0x40) || ((c < 0x9F) && was_even) ||
+                ((c > 0x9E) && was_odd) || (c == 0x7F))
+            {
+                is_sought = false;
+            }
+            continue;
+        }
+
+        ++length;
+        offsets.push_back(index); // [length - 1] = index;
+
+        if ((c == 0x80) || (c == 0xA0) || (c >= 0xF0))
+        {
+            is_sought = false;
+            break;
+        }
+
+        if (((c >= 0x81) && (c <= 0x9F)) || ((c >= 0xE0) && (c <= 0xEF)))
+        {
+            width = 1;
+            was_odd = c & 0x01;
+            was_even = !was_odd;
+        }
+    
+        it++;
+        index++;    
+    }
+    offsets.push_back(index); // [length - 1] = index;
+    
+    if (!width && is_sought)
+    {
+        // No width left, so it's probably SHIFT_JIS.
+        return ENCGUESS_JIS;
+    }
+
+    // It's something else.
+    length = std::mbstowcs(NULL, str.c_str(), 0);
+    if (length == -1)
+    {
+        length = str.length();
+    }
+    return ENCGUESS_OTHER;
+}
+
 
 }
 

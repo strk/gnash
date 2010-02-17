@@ -838,16 +838,6 @@ private:
 	
 };
 
-/// Native function to create a plain object with TextField properties
-//
-/// This function calls the TextField constructor.
-as_object* createTextFieldObject(Global_as& gl);
-
-/// Initialize the global TextField class
-void textfield_class_init(as_object& global, const ObjectURI& uri);
-
-void registerTextFieldNative(as_object& global);
-
 } // namespace gnash
 
 #endif 

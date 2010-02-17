@@ -16,6 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "DefineEditTextTag.h"
+#include "text/TextField_as.h"
 #include "TextField.h"
 #include "movie_definition.h"
 #include "Font.h"
@@ -47,27 +48,6 @@ DefineEditTextTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
 	getFont();
     as_object* obj = createTextFieldObject(gl);
 	TextField* ch = new TextField(obj, parent, *this);
-
-	// This gives an "instance name" to the TextField, but
-	// it is not really what we need.
-	//
-	// First of all the VariableName ("_variableName") is
-	// NOT the default name of an instance, rather it is
-	// a variable associated with it and can contain path
-	// information (ie. we can associate a variable in a different
-	// timeline)
-	//
-	// We actually need to set that variable to an object which
-	// is a TextField dinamic variable. The object should take
-	// care of updating this TextField text when assigned to
-	// and to retrive this TextField text when extracted value from.
-	//
-	// The DefineEditTextVariableNameTest.swf file under
-	// testsuite/misc-ming.all gives an idea of the problem
-	// (in particular it shows a case in which VariableName is
-	// outside of TextField timeline/scope)
-	//
-	//ch->set_name(m_variable_name.c_str());
 
 	return ch;
 }

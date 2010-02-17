@@ -54,9 +54,9 @@ check_PROGRAMS = \
 	test_amf \
 	test_amfmsg \
 	test_buffer \
+	test_lc \
 	test_el \
 	test_sol \
-	test_lc \
 	test_flv
 
 test_el_SOURCES = test_el.cpp
