@@ -60,7 +60,7 @@ if USE_SOUND_AHI
  noinst_HEADERS += aos4/sound_handler_ahi.h
 endif
 
-if USE_SOUND_HAIKU
+if USE_SOUND_MKIT
  libgnashsound_la_SOURCES += haiku/sound_handler_haiku.cpp
  libgnashsound_la_LIBADD += -lmedia
  noinst_HEADERS += haiku/sound_handler_haiku.h

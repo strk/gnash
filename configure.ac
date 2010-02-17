@@ -2120,6 +2120,8 @@ AM_CONDITIONAL(USE_SOUND_MKIT, test x$build_sound_mkit = xyes)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
 AM_CONDITIONAL(USE_GST_ENGINE, test x"$media_handler" = xgst)
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
+dnl for now the Haiku media handler is experimental
+AM_CONDITIONAL(USE_HAIKU_ENGINE, test x"$media_handler" = xno)
 
 if test x$build_sound_mkit = xyes; then
   AC_DEFINE([SOUND_MKIT],  [1], [Use Haiku's Media Kit for sound handling])

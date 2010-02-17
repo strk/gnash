@@ -111,7 +111,7 @@ libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
 libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 endif
 
-if HAIKU
+if BUILD_HAIKU_GUI
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
 endif
 

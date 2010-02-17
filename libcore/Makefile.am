@@ -340,7 +340,7 @@ libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
 # 	$(top_builddir)/libsound/libgnashsound.la
 # endif
 
-if HAIKU
+if BUILD_HAIKU_GUI
   libgnashcore_la_LIBADD += $(HAIKU_LIBS)
 endif
 
