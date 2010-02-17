@@ -388,7 +388,7 @@ public:
 
     /// Fetch mixed samples
     //
-    /// We run trough all the plugged InputStreams fetching decoded
+    /// We run through all the plugged InputStreams fetching decoded
     /// audio blocks and mixing them into the given output stream.
     ///
     /// @param to
@@ -584,6 +584,13 @@ DSOEXPORT sound_handler* create_sound_handler_aos4();
 
 /// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler* create_sound_handler_aos4(const std::string& wave_file);
+
+#elif defined(SOUND_HAIKU)
+/// @throw a SoundException if fails to create node.
+DSOEXPORT sound_handler* create_sound_handler_haiku();
+
+/// @throw a SoundException if fails to create node.
+DSOEXPORT sound_handler* create_sound_handler_haiku(const std::string& wave_file);
 #endif
 
 } // gnash.sound namespace 
