@@ -29,11 +29,13 @@
 #include <boost/cstdint.hpp>
 #include <boost/tokenizer.hpp>
 
-#if !defined(_WIN32) && !defined(HAIKU_HOST)
+#if !defined(_WIN32) && !defined(__HAIKU__)
 #include <sys/shm.h>
 #else
-typedef boost::uint32_t key_t;
+#ifdef _WIN32
+  typedef boost::uint32_t key_t;
 #endif // _WIN32
+#endif // _WIN32 and __HAIKU__
 
 namespace gnash {
   
