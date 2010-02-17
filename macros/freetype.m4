@@ -90,7 +90,7 @@ dnl   fi
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_freetype_lib}" = x; then
     dnl freetype-config gives us way too many libraries, which create nasty linking
-    dnl dependancy issue, so we strip them off here. The real dependencies are
+    dnl dependancy issues, so we strip them off here. The real dependencies are
     dnl are taken care of by other config tests.
     AC_MSG_CHECKING([for ${libname} library])
     for i in $libslist; do

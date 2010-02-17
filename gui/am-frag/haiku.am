@@ -26,8 +26,8 @@ haiku_gnash_CPPFLAGS = -DGUI_HAIKU -DGUI_CONFIG=\"HAIKU\" \
 	$(AM_CPPFLAGS) $(HAIKU_CFLAGS)
 haiku_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 haiku_gnash_LDADD = $(GNASH_LIBS)
-all-local: haiku-gnash$(EXEEXT)
-	echo
+# all-local: haiku-gnash$(EXEEXT)
+# 	echo
 
 if BUILD_AGG_RENDERER
 haiku_gnash_CPPFLAGS += $(AGG_CFLAGS)

@@ -29,7 +29,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/tokenizer.hpp>
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(HAIKU_HOST)
 #include <sys/shm.h>
 #else
 typedef boost::uint32_t key_t;

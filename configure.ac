@@ -288,8 +288,9 @@ AC_ARG_ENABLE(jemalloc,
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-jemalloc option]) ;;
 esac],jemalloc=yes)
 
-dnl There is some weird stuff going on with NetBSD and jemalloc, so don't build it for now.
-if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes"; then
+dnl There is some weird stuff going on with NetBSD and jemalloc, so don't 
+dnl build it for now.
+if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes" -o x"${haiku}" = x"yes"; then
   jemalloc=no
 fi
 dnl If the compiler doesn't have local thread storage enabled, don't try to
@@ -505,7 +506,7 @@ AC_ARG_ENABLE(i810-lod-bias,
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-i810-lod-bias option]) ;;
 esac])
 
-if test x$i810lodbias = xyes; then
+if test x"${i810lodbias}" = xyes; then
     AC_DEFINE([FIX_I810_LOD_BIAS], [], [Fix i810 LOD bias problem])
 fi
 
@@ -651,7 +652,9 @@ if test x"${haiku}" = xyes; then
   build_haiku=yes;
   build_gtk=no;
   build_kde3=no;
+  build_qt3=no;
   build_kde4=no;
+  build_qt4=no;
 fi
 
 add_renderer=
@@ -2499,33 +2502,37 @@ exec 4> $cwarn
 
 echo "Configurable options are:"
 
-if test x"$i810lodbias" = x"yes"; then
+if test x"${i810lodbias}" = x"yes"; then
   echo "        Intel 810 LOD bias hack enabled"
 else
   echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
 fi
 
-if test x"$pthreads" = x"yes"; then
+if test x"${pthreads}" = x"yes"; then
   echo "        POSIX Threads support enabled (default)"
 else
-  echo "        POSIX Thread support disabled."
+  if test x"${build_haiku}" = x"yes"; then
+     echo "        POSIX Thread support built into C library."
+  els
+     echo "        POSIX Thread support disabled."
+  fi
 fi
 
-if test x"$dmalloc" = x"yes"; then
+if test x"${dmalloc}" = x"yes"; then
   echo "        DMalloc support enabled"
   echo "        For a list of the command-line options enter: dmalloc --usage"
 else
   echo "        DMalloc support disabled (default). Use --enable-dmalloc to enable."
 fi
 
-if test x"$npapi" = x"yes"; then
+if test x"${npapi}" = x"yes"; then
   echo "        NPAPI plugin enabled (default). Use --disable-npapi to disable."
   echo "            NPAPI plugin will be installed in ${FIREFOX_PLUGINS}"
 else
   echo "        NPAPI plugin disabled."
 fi
 
-if test x"$build_kparts3" = x"yes"; then
+if test x"${build_kparts3}" = x"yes"; then
   echo "        KPARTS 3.x plugin enabled (default). Use --disable-kparts3 to disable"
   echo "            KPARTS 3.x plugin will be installed in ${KDE3_PLUGINDIR}"
   echo "            KPARTS 3.x service will be installed in ${KDE3_SERVICESDIR}"
@@ -2535,7 +2542,7 @@ else
   echo "        KPARTS 3.x plugin disabled."
 fi
 
-if test x"$build_kparts4" = x"yes"; then
+if test x"${build_kparts4}" = x"yes"; then
   echo "        KPARTS 4.x plugin enabled (default). Use --disable-kparts4 to disable"
   echo "            KPARTS 4.x plugin will be installed in ${KDE4_PLUGINDIR}"
   echo "            KPARTS 4.x service will be installed in ${KDE4_SERVICESDIR}"
@@ -2551,48 +2558,48 @@ dnl -- else
 dnl --   echo "        Loadable GUI & renderer disabled (default). Use --enable-dynamic-gui to enable."
 dnl -- fi
 
-if test x"$ghelp" = x"yes"; then
+if test x"${ghelp}" = x"yes"; then
   echo "        GNOME help enabled"
 else
   echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
 fi
 
-dnl if test x"$extensions" = x"yes"; then
+dnl if test x"${extensions}" = x"yes"; then
 dnl   echo "        Building extensions enabled (default). Use --disable-extensions to disable."
 dnl else
 dnl   echo "        Building Gnash extensions disabled."
 dnl fi
 
-if test x"$cygnal" = x"yes"; then
+if test x"${cygnal}" = x"yes"; then
   echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
 else
   echo "        Building Cygnal media server disabled."
 fi
 
-if test x"$debugger" = x"yes"; then
+if test x"${debugger}" = x"yes"; then
   echo "        Building Flash debugger support (default). Use --disable-debugger to disable."
 else
   echo "        Building the Flash debugger is disabled."
 fi
 
-if test x"$with-top_level" != x; then
+if test x"${with-top_level}" != x; then
   echo "        Top level for cross compiling support files is: $with_top_level"
 fi
 
-if test x$build_gtk = xyes -a x$pixelformat = xrgb565; then
+if test x"${build_gtk}" = xyes -a x"${pixelformat}" = xrgb565; then
   echo "        WARNING: Pixel format RGB565 selected in combination with the" >&4
   echo "                 GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)." >&4
 fi
 
-if test x"$extensions_list" != x; then
+if test x"${extensions_list}" != x; then
   echo "        Building extensions: ${extensions_list}"
 fi
 
-if test x"$security_list" != x; then
+if test x"${security_list}" != x; then
   echo "        Enabling security features: ${security_list}"
 fi
 
-if test x"$statistics_list" != x; then
+if test x"${statistics_list}" != x; then
   echo "        Enabling statistics collecting for: ${statistics_list}"
 fi
 
@@ -3057,20 +3064,20 @@ dnl    echo "        ERROR: No Firefox or Mozilla development package installed!
 dnl  fi
 fi
 
-if test x"$pthreads" = x"yes"; then
+if test x"${pthreads}" = x"yes"; then
   if test x"$PTHREAD_CFLAGS" != x; then
     echo "        POSIX Threads flags are: $PTHREAD_CFLAGS"
   fi
-  if test x"$PTHREAD_LIBS" != x; then
+  if test x"${PTHREAD_LIBS}" != x; then
     echo "        POSIX Threads lib is: $PTHREAD_LIBS"
   else
-    if test x$cross_compiling = xno; then
+    if test x"${cross_compiling}" = xno; then
       echo "ERROR: No pthread development package installed!" >&3
     fi
   fi
 fi
 
-if test x"$docbook" = x"yes"; then
+if test x"${docbook}" = x"yes"; then
   if test x"$MAKEINFO" = x; then
     echo "        ERROR: no makeinfo tools installed!" >&3
     echo "               Either install it from http://www.gnu.org/software/texinfo/" >&3

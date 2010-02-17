@@ -54,7 +54,7 @@ AC_DEFUN([GNASH_PATH_AGG],
     for i in $incllist; do
       if test -f $i/agg2/agg_gradient_lut.h; then
         ac_cv_path_agg_incl="-I$i/agg2"
-        agg_include_dir=$i/agg2
+        agg_include_dir="$i/agg2"
 	      agg25=yes
         break
       fi

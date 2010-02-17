@@ -25,15 +25,15 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__)
-#include <sys/mman.h>
-#include <sys/shm.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST)
+# include <sys/mman.h>
+# include <sys/shm.h>
+# include <sys/ipc.h>
+# include <sys/sem.h>
 #elif !defined(__riscos__) && !defined(__OS2__)
-#include <windows.h>
-#include <process.h>
-#include <io.h>
+# include <windows.h>
+# include <process.h>
+# include <io.h>
 #endif
 #include <string>
 #include <vector>
@@ -219,9 +219,7 @@ SharedMem::attach()
 #else
 # error "You need SYSV Shared memory support to use this option"
 #endif
-}    
-
-
+}
 
 } // end of gnash namespace
 

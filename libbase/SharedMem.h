@@ -23,7 +23,7 @@
 #include <boost/cstdint.hpp>
 
 #include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST)
 # include <sys/ipc.h>
 # include <sys/shm.h>
 #elif !defined(__riscos__) && !defined(__OS2__)
