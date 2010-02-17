@@ -85,6 +85,11 @@ runtests = function() {
     check_equals(typeof(c), "object");
     lc.send("lc576", "test7", c);
 
+    o = { a:5, b:"string" };
+    e = { a:6, b:false };
+    
+    lc.send("lc576", "test8", o, e, o, e, o);
+
     stressTest();
 };
 

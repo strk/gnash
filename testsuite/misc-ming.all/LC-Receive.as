@@ -70,6 +70,25 @@ lc.test7 = function(c) {
     check_equals(typeof(c), "object");
 };
 
+lc.test8 = function(arg1, arg2, arg3, arg4, arg5) {
+    check_equals(typeof(arg1), "object");
+    check_equals(typeof(arg2), "object");
+    check_equals(typeof(arg3), "object");
+    check_equals(typeof(arg4), "object");
+    check_equals(typeof(arg5), "object");
+
+    check_equals(arg1.a, 5);
+    check_equals(arg3.a, 5);
+    check_equals(arg5.a, 5);
+
+    check_equals(arg1, arg3);
+    check_equals(arg1, arg5);
+    check_equals(arg2, arg4);
+
+    check(arg1 != arg2);
+
+};
+
 var i = 0;
 
 lc.stress = function(arg1, arg2, arg3) {
