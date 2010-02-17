@@ -202,6 +202,11 @@ AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
 dnl AM_GNU_GETTEXT_VERSION(0.15)
 
+dnl For Haiku, we know the sysroot is in a non-standard place
+if test x"${haiku}" = xyes; then
+  with_top_level="/boot/common"
+  LIBS += -lbe
+fi
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
@@ -209,10 +214,6 @@ dnl different development libraries.
 dnl I want to depreciate this option for the new sysroot name to be
 dnl consistant with other tools. This will be left for a while as 
 dnl a transistion.
-dnl For Haiku, we know the sysroot is in a non-standard place
-if test x"${haiku}" = xyes; then
-  with_top_level="/boot/common"
-fi
 AC_ARG_WITH(top_level,
   AC_HELP_STRING([--with-top-level],
   [top level directory for cross compiling files]),
