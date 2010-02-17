@@ -65,6 +65,7 @@ if USE_SOUND_MKIT
  libgnashsound_la_LIBADD += -lmedia
  noinst_HEADERS += haiku/sound_handler_haiku.h
 endif
+EXTRA_DIST += haiku
 
 libgnashsound_la_LDFLAGS = -release $(VERSION)
 
