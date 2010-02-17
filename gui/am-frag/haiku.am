@@ -18,6 +18,7 @@
 #
 # Build the Haiku gui
 #
+
 if BUILD_HAIKU_GUI
 bin_PROGRAMS += haiku-gnash
 haiku_gnash_SOURCES = $(GUI_SRCS) gui_haiku.cpp haiku.cpp haikusup.h

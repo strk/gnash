@@ -33,7 +33,7 @@ pluginsdir = $(libdir)/gnash/plugins
 # noinst_LTLIBRARIES = libgnashgui.la
 BUILT_SOURCES = .configline
 
-EXTRA_DIST = gnash.in klash3.moc.in klash4.moc.in
+EXTRA_DIST = gnash.in klash3.moc.in klash4.moc.in am-frag
 
 # If python support is enabled, built that too
 if HAS_PYTHON
@@ -201,7 +201,7 @@ GUI_SRCS = gnash.cpp \
 
 if BUILD_AQUA_GUI
 BUILT_SOURCES += bundle
-EXTRA_DIST += Gnash.app am-frag
+EXTRA_DIST += Gnash.app
 endif
 
 # Build the QTOPIA gui
