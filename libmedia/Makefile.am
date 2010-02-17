@@ -154,6 +154,35 @@ if USE_FFMPEG_ENGINE
 	$(NULL)
 endif
 
+if USE_HAIKU_ENGINE
+   libgnashmedia_la_SOURCES += \
+	haiku/MediaHandlerHaiku.cpp \
+	haiku/MediaParserHaiku.cpp \
+	haiku/AudioDecoderHaiku.cpp \
+	haiku/VideoDecoderHaiku.cpp \
+	haiku/VideoConverterHaiku.cpp \
+	haiku/VideoInputHaiku.cpp \
+	haiku/AudioInputHaiku.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	haiku/MediaHandlerHaiku.h \
+	haiku/MediaParserHaiku.h \
+	haiku/AudioDecoderHaiku.h \
+	haiku/VideoDecoderHaiku.h \
+	haiku/VideoConverterHaiku.h \
+	haiku/VideoInputHaiku.h \
+	haiku/AudioInputHaiku.h \
+	$(NULL)
+
+   libgnashmedia_la_LIBADD += \
+	-lmedia \
+	$(NULL)
+
+   libgnashmedia_la_CPPFLAGS += \
+	$(NULL)
+endif
+
 if HAVE_SPEEX
    libgnashmedia_la_LIBADD += \
 	$(SPEEX_LIBS) \

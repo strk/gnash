@@ -1,4 +1,4 @@
-// AudioInput.cpp: Audio input base class source file.
+// AudioInputFfmpeg.cpp: Audio input base class source file.
 // 
 //   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
@@ -21,7 +21,8 @@
 
 namespace gnash {
 namespace media {
-    
+namespace ffmpeg {
+ 
 AudioInputFfmpeg::AudioInputFfmpeg()
     :
     _activityLevel(-1),
@@ -50,5 +51,6 @@ AudioInputFfmpeg::setRate(int r)
     _rate = *rate;
 }
 
-} //media namespace
-} //gnash namespace
+} // gnash.media.ffmpeg namespace
+} // gnash.media namespace
+} // gnash namespace

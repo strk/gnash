@@ -36,7 +36,7 @@ public:
     /// be queried from the input device.
     VideoInputFfmpeg();
     
-    /// Destructor for the VideoInputGst class
+    /// Destructor for the VideoInputFfmpeg class
     virtual ~VideoInputFfmpeg();
     
     static void getNames(std::vector<std::string>& /*names*/) {}

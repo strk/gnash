@@ -259,6 +259,11 @@ public:
     
     void setLocalConnection(bool x) { _lcdisabled = x; }
     
+    /// \brief Enable tracing all LocalConnection traffic
+    bool getLCTrace() const { return _lctrace; }
+    
+    void setLCTrace(bool x) { _lctrace = x; }
+
     key_t getLCShmKey() const { return static_cast<key_t>(_lcshmkey); }
     
     void setLCShmKey(bool x) { _lcshmkey = x; }

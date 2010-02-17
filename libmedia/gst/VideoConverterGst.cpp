@@ -19,12 +19,11 @@
 #include "log.h"
 #include <cassert>
 
-
 namespace gnash {
 namespace media {
 namespace gst {
 
-/// Base class for video image space conversion.
+/// Base class for video image space conversion with gst
 
 VideoConverterGst::VideoConverterGst(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat)
     : VideoConverter(srcFormat, dstFormat)

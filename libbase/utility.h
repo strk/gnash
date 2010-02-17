@@ -27,6 +27,7 @@
 
 #include <cstdlib>
 #include <cassert>
+#include <cstring>
 #include <string>
 #include <typeinfo>
 
@@ -57,6 +58,45 @@
 namespace std
 {
 	typedef std::basic_string<wchar_t> wstring;
+};
+#endif
+
+#if defined(__HAIKU__)
+namespace std {
+	class wstring : public std::basic_string<wchar_t>
+	{
+	public:
+		wstring(const char *t)
+			: std::basic_string<wchar_t>(_ble(t))
+		{
+			delete [] X;
+		}
+		wstring()
+		{
+		}
+		wstring(const wstring &that)
+			: std::basic_string<wchar_t>(that)
+		{
+		}
+		wstring(const std::basic_string<wchar_t> &that)
+			: std::basic_string<wchar_t>(that)
+		{
+		}
+	private:
+		wchar_t *X;
+		
+		wchar_t* _ble(const char *t)
+		{
+			size_t l = strlen(t);
+			wchar_t *cp = new wchar_t[l+1];
+			for (size_t i = 0; i < l; ++i) {
+				cp[i] = t[i];
+			}
+			cp[l] = '\0';
+			X = cp;
+			return X;
+		}
+	};
 };
 #endif
 

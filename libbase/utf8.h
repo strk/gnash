@@ -24,6 +24,18 @@
 #include "dsodefs.h" // For DSOEXPORT
 #include "utility.h"
 #include <string>
+#if 0
+namespace std {
+	class wstring : public string
+	{
+	public:
+		wstring() { }
+		wstring(const char*c) : string(c) { }
+		wstring(const string &s) : string(s) { }
+	};
+};
+#endif
+
 #include <boost/cstdint.hpp> // for C99 int types
 #include <limits>
 

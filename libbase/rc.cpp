@@ -45,6 +45,11 @@
 
 #include <boost/format.hpp>
 
+#ifdef HAIKU_HOST
+# include <Path.h>
+# include <FindDirectory.h>
+#endif
+
 using std::endl;
 using std::cout;
 using std::cerr;
@@ -152,15 +157,28 @@ RcInitFile::loadFiles()
 #endif
     
     // Check the users home directory
-#ifndef __amigaos4__
-        char *home = std::getenv("HOME");
+    char *home = 0;
+    //on AmigaOS we have a GNASH: assign that point to program dir
+#if defined (__amigaos4__)
+    home = "/gnash";
+#elif defined(HAIKU_HOST)
+    BPath bp;
+    if (B_OK != find_directory(B_USER_SETTINGS_DIRECTORY, &bp)) {
+	log_error(_("Failed to find user settings directory"));
+    } else {
+	bp.Append("Gnash");
+	home = bp.Path();
+    }
 #else
-		//on AmigaOS we have a GNASH: assign that point to program dir
-        char *home = "/gnash";
+    home = std::getenv("HOME");
 #endif
     if (home) {
         loadfile = home;
+#ifdef HAIKU_HOST
+        loadfile.append("/gnashrc");
+#else
         loadfile.append("/.gnashrc");
+#endif
         parseFile(loadfile);
     }
 
@@ -544,7 +562,10 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_sollocaldomain, "solLocalDomain", variable,
                            value)
             ||
-                 extractSetting(_lcdisabled, "LocalConnection", variable,
+		 extractSetting(_lcdisabled, "LocalConnection", variable,
+                           value)
+            ||
+		 extractSetting(_lctrace, "LCTrace", variable,
                            value)
             ||
                  extractNumber(_movieLibraryLimit, "movieLibraryLimit",
@@ -722,9 +743,10 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "delay " << _delay << endl <<
     cmd << "verbosity " << _verbosity << endl <<
     cmd << "solReadOnly " << _solreadonly << endl <<
-	cmd << "solLocalDomain " << _sollocaldomain << endl <<
+    cmd << "solLocalDomain " << _sollocaldomain << endl <<
     cmd << "SOLSafeDir " << _solsandbox << endl <<
     cmd << "localConnection " << _lcdisabled << endl <<
+    cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
