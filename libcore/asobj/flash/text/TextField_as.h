@@ -17,16 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_TEXTFIELD_AS_H
-#define GNASH_TEXTFIELD_AS_H
+#ifndef GNASH_ASOBJ3_TEXTFIELD_AS_H
+#define GNASH_ASOBJ3_TEXTFIELD_AS_H
 
 namespace gnash {
-    class as_object;
-    class ObjectURI;
-    class Global_as;
-}
 
-namespace gnash {
+class as_object;
+class ObjectURI;
+class Global_as;
 
 /// Native function to create a plain object with TextField properties
 //
@@ -40,6 +38,7 @@ void registerTextFieldNative(as_object& global);
 
 } // namespace gnash
 
+// end of GNASH_ASOBJ3_TEXTFIELD_H
 #endif
 
 // local Variables:

@@ -340,6 +340,10 @@ libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
 # 	$(top_builddir)/libsound/libgnashsound.la
 # endif
 
+if HAIKU
+  libgnashcore_la_LIBADD += $(HAIKU_LIBS)
+endif
+
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"

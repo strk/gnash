@@ -182,6 +182,7 @@ case "${host}" in
     ;;
 esac
 
+
 AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
 AM_CONDITIONAL(WIN32, test x$windows = xyes)
 
@@ -208,6 +209,10 @@ dnl different development libraries.
 dnl I want to depreciate this option for the new sysroot name to be
 dnl consistant with other tools. This will be left for a while as 
 dnl a transistion.
+dnl For Haiku, we know the sysroot is in a non-standard place
+if test x"${haiku}" = xyes; then
+  with_top_level="/boot/common"
+fi
 AC_ARG_WITH(top_level,
   AC_HELP_STRING([--with-top-level],
   [top level directory for cross compiling files]),
@@ -215,7 +220,7 @@ AC_ARG_WITH(top_level,
   cross_compiling=yes)
 
 AC_ARG_WITH(sysroot,
-  AC_HELP_STRING([--sysroot],
+  AC_HELP_STRING([--with-sysroot],
   [system root directory for cross compiling]),
   with_top_level=${withval} ;
   cross_compiling=yes)
