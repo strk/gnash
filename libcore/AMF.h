@@ -26,6 +26,7 @@
 
 #include "as_value.h"
 #include "dsodefs.h"
+#include "GnashException.h"
 
 namespace gnash {
     class as_object;
@@ -122,6 +123,19 @@ private:
 
 };
 
+/// Exception for handling malformed buffers.
+//
+/// This exception is thrown only during reading.
+struct DSOEXPORT
+AMFException : public GnashException
+{
+    AMFException(const std::string& msg)
+        :
+        GnashException(msg)
+    {}
+};
+
+
 /// Deserialize an AMF buffer to as_values.
 //
 /// This class relies on the public interface of as_value because we don't
@@ -140,6 +154,17 @@ private:
 class Reader
 {
 public:
+
+    /// Construct a Reader with pointers into an AMF buffer.
+    //
+    /// You can use the AMF::Reader in combination with other reads on the
+    /// data as long as the read position is never moved after end.
+    //
+    /// @param pos      The read position in the buffer. This is moved after
+    ///                 every read to point to the next data field. You must
+    ///                 ensure that pos is not greater than end on every read.
+    /// @param end      The end of the buffer.
+    /// @param gl       A global reference for creating objects when necessary.
     Reader(const boost::uint8_t*& pos, const boost::uint8_t* end, Global_as& gl)
         :
         _pos(pos),
@@ -189,6 +214,39 @@ private:
     Global_as& _global;
 
 };
+
+/// Read a number from an AMF buffer
+//
+/// This does not read a type byte; use AMF::Reader when the type should
+/// be determined from the buffer.
+//
+/// This function will throw an AMFException if it encounters ill-formed AMF.
+double readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end);
+
+/// Read a boolean value from the buffer.
+//
+/// This does not read a type byte; use AMF::Reader when the type should
+/// be determined from the buffer.
+//
+/// This function will throw an AMFException if it encounters ill-formed AMF.
+bool readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* end);
+
+/// Read a string value from the buffer.
+//
+/// This does not read a type byte; use AMF::Reader when the type should
+/// be determined from the buffer.
+//
+/// This function will throw an AMFException if it encounters ill-formed AMF.
+std::string readString(const boost::uint8_t*& pos, const boost::uint8_t* end);
+
+/// Read a long string value from the buffer.
+//
+/// This does not read a type byte; use AMF::Reader when the type should
+/// be determined from the buffer.
+//
+/// This function will throw an AMFException if it encounters ill-formed AMF.
+std::string readLongString(const boost::uint8_t*& pos,
+        const boost::uint8_t* end);
 
 /// Swap bytes in raw data.
 //
