@@ -51,11 +51,11 @@ namespace {
 namespace {
 
 /// Class used to serialize properties of an object to a buffer
-class PropsBufSerializer : public AbstractPropertyVisitor
+class ObjectSerializer : public AbstractPropertyVisitor
 {
 
 public:
-    PropsBufSerializer(Writer& w, VM& vm)
+    ObjectSerializer(Writer& w, VM& vm)
         :
         _writer(w),
         _st(vm.getStringTable()),
@@ -246,7 +246,7 @@ Writer::writeObject(as_object* obj)
         _buf.appendByte(OBJECT_AMF0);
     }
 
-    PropsBufSerializer props(*this, vm);
+    ObjectSerializer props(*this, vm);
     obj->visitProperties<IsEnumerable>(props);
     if (!props.success()) {
         log_error("Could not serialize object");
