@@ -43,13 +43,6 @@ namespace AMF {
 
 namespace {
 
-    as_value readNumber(const boost::uint8_t*& pos, const boost::uint8_t* _end);
-    as_value readBoolean(const boost::uint8_t*& pos,
-            const boost::uint8_t* _end);
-    as_value readString(const boost::uint8_t*& pos, const boost::uint8_t* _end);
-    as_value readLongString(const boost::uint8_t*& pos,
-            const boost::uint8_t* _end);
-
     inline boost::uint16_t readNetworkShort(const boost::uint8_t* buf);
     inline boost::uint32_t readNetworkLong(const boost::uint8_t* buf);
 
@@ -58,11 +51,11 @@ namespace {
 namespace {
 
 /// Class used to serialize properties of an object to a buffer
-class PropsBufSerializer : public AbstractPropertyVisitor
+class ObjectSerializer : public AbstractPropertyVisitor
 {
 
 public:
-    PropsBufSerializer(Writer& w, VM& vm)
+    ObjectSerializer(Writer& w, VM& vm)
         :
         _writer(w),
         _st(vm.getStringTable()),
@@ -117,19 +110,6 @@ private:
     string_table& _st;
     mutable bool _error;
 
-};
-
-/// Exception for handling malformed buffers.
-//
-/// This exception is for internal use only! Do not throw it outside this
-/// TU.
-struct
-AMFException : public GnashException
-{
-    AMFException(const std::string& msg)
-        :
-        GnashException(msg)
-    {}
 };
 
 }
@@ -266,7 +246,7 @@ Writer::writeObject(as_object* obj)
         _buf.appendByte(OBJECT_AMF0);
     }
 
-    PropsBufSerializer props(*this, vm);
+    ObjectSerializer props(*this, vm);
     obj->visitProperties<IsEnumerable>(props);
     if (!props.success()) {
         log_error("Could not serialize object");
@@ -695,9 +675,8 @@ swapBytes(void *word, size_t size)
     return word;
 }
 
-namespace {
 
-as_value
+bool
 readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
 {
     if (pos == _end) {
@@ -712,11 +691,11 @@ readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
     return val;
 }
 
-as_value
-readNumber(const boost::uint8_t*& pos, const boost::uint8_t* _end)
+double
+readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end)
 {
 
-    if (_end - pos < 8) {
+    if (end - pos < 8) {
         throw AMFException("Read past _end of buffer for number type");
     }
 
@@ -731,20 +710,20 @@ readNumber(const boost::uint8_t*& pos, const boost::uint8_t* _end)
     log_debug("amf0 read double: %e", dub);
 #endif
 
-    return as_value(d);
+    return d;
 }
 
-as_value
-readString(const boost::uint8_t*& pos, const boost::uint8_t* _end)
+std::string
+readString(const boost::uint8_t*& pos, const boost::uint8_t* end)
 {
-    if (_end - pos < 2) {
+    if (end - pos < 2) {
         throw AMFException("Read past _end of buffer for string length");
     }
 
     const boost::uint16_t si = readNetworkShort(pos);
     pos += 2;
 
-    if (_end - pos < si) {
+    if (end - pos < si) {
         throw AMFException("Read past _end of buffer for string type");
     }
 
@@ -753,19 +732,19 @@ readString(const boost::uint8_t*& pos, const boost::uint8_t* _end)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
     log_debug("amf0 read string: %s", str);
 #endif
-    return as_value(str);
+    return str;
 }
 
-as_value
-readLongString(const boost::uint8_t*& pos, const boost::uint8_t* _end)
+std::string
+readLongString(const boost::uint8_t*& pos, const boost::uint8_t* end)
 {
-    if (_end - pos < 4) {
+    if (end - pos < 4) {
         throw AMFException("Read past _end of buffer for long string length");
     }
 
     const boost::uint32_t si = readNetworkLong(pos);
     pos += 4;
-    if (_end - pos < si) {
+    if (end - pos < si) {
         throw AMFException("Read past _end of buffer for long string type");
     }
 
@@ -776,9 +755,11 @@ readLongString(const boost::uint8_t*& pos, const boost::uint8_t* _end)
     log_debug("amf0 read long string: %s", str);
 #endif
 
-    return as_value(str);
+    return str;
 
 }
+
+namespace {
 
 inline boost::uint16_t
 readNetworkShort(const boost::uint8_t* buf)
