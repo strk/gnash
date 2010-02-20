@@ -144,7 +144,7 @@ writePlainString(SimpleBuffer& buf, const std::string& str, Type t)
 void
 write(SimpleBuffer& buf, const std::string& str)
 {
-    Type t = str.size() < 65566 ? STRING_AMF0 : LONG_STRING_AMF0;
+    Type t = str.size() < 65536 ? STRING_AMF0 : LONG_STRING_AMF0;
 	buf.appendByte(t);
     writePlainString(buf, str, t);
 }
