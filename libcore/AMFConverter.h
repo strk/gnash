@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef GNASH_AMF_H
-#define GNASH_AMF_H
+#ifndef GNASH_AMFCONVERTER_H
+#define GNASH_AMFCONVERTER_H
 
 #include <map>
 #include <string>
@@ -27,6 +27,7 @@
 #include "as_value.h"
 #include "dsodefs.h"
 #include "GnashException.h"
+#include "AMF.h"
 
 namespace gnash {
     class as_object;
@@ -36,33 +37,12 @@ namespace gnash {
 
 namespace gnash {
 
-/// Simple functions and classes for handling AMF.
+/// Functions and classes for handling AMF.
 //
 /// AMF is a simple serialization format for ActionScript objects and values,
 /// allowing them to be stored and transmitted. These classes convert between
 /// AMF buffers and the objects they contain.
 namespace AMF {
-
-enum Type {
-    NOTYPE            = -1,
-    NUMBER_AMF0       = 0x00,
-    BOOLEAN_AMF0      = 0x01,
-    STRING_AMF0       = 0x02,
-    OBJECT_AMF0       = 0x03,
-    MOVIECLIP_AMF0    = 0x04,
-    NULL_AMF0         = 0x05,
-    UNDEFINED_AMF0    = 0x06,
-    REFERENCE_AMF0    = 0x07,
-    ECMA_ARRAY_AMF0   = 0x08,
-    OBJECT_END_AMF0   = 0x09,
-    STRICT_ARRAY_AMF0 = 0x0a,
-    DATE_AMF0         = 0x0b,
-    LONG_STRING_AMF0  = 0x0c,
-    UNSUPPORTED_AMF0  = 0x0d,
-    RECORD_SET_AMF0   = 0x0e,
-    XML_OBJECT_AMF0   = 0x0f,
-    TYPED_OBJECT_AMF0 = 0x10,
-};
 
 /// A class to compose AMF buffers.
 //
@@ -121,18 +101,6 @@ private:
     SimpleBuffer& _buf;
     bool _strictArray;
 
-};
-
-/// Exception for handling malformed buffers.
-//
-/// This exception is thrown only during reading.
-struct DSOEXPORT
-AMFException : public GnashException
-{
-    AMFException(const std::string& msg)
-        :
-        GnashException(msg)
-    {}
 };
 
 
@@ -214,52 +182,6 @@ private:
     Global_as& _global;
 
 };
-
-/// Read a number from an AMF buffer
-//
-/// This does not read a type byte; use AMF::Reader when the type should
-/// be determined from the buffer.
-//
-/// This function will throw an AMFException if it encounters ill-formed AMF.
-double readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end);
-
-/// Read a boolean value from the buffer.
-//
-/// This does not read a type byte; use AMF::Reader when the type should
-/// be determined from the buffer.
-//
-/// This function will throw an AMFException if it encounters ill-formed AMF.
-bool readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* end);
-
-/// Read a string value from the buffer.
-//
-/// This does not read a type byte; use AMF::Reader when the type should
-/// be determined from the buffer.
-//
-/// This function will throw an AMFException if it encounters ill-formed AMF.
-std::string readString(const boost::uint8_t*& pos, const boost::uint8_t* end);
-
-/// Read a long string value from the buffer.
-//
-/// This does not read a type byte; use AMF::Reader when the type should
-/// be determined from the buffer.
-//
-/// This function will throw an AMFException if it encounters ill-formed AMF.
-std::string readLongString(const boost::uint8_t*& pos,
-        const boost::uint8_t* end);
-
-/// Swap bytes in raw data.
-//
-///	This only swaps bytes if the host byte order is little endian.
-///
-/// @param word The address of the data to byte swap.
-///
-/// @param size The number of bytes in the data.
-///
-/// @return A pointer to the raw data.
-///
-DSOEXPORT void* swapBytes(void *word, size_t size);
-
 
 } // namespace amf
 } // namespace gnash

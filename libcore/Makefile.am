@@ -60,7 +60,7 @@ libgnashcore_la_SOURCES = \
 	event_id.cpp \
 	Relay.cpp \
 	as_object.cpp \
-	AMF.cpp \
+	AMFConverter.cpp \
 	as_value.cpp \
 	DisplayObjectContainer.cpp \
 	DisplayObject.cpp \
@@ -232,7 +232,7 @@ EXTENSIONS_API = \
 	ObjectURI.h \
 	Property.h \
 	PropertyList.h \
-	AMF.h \
+	AMFConverter.h \
 	as_value.h \
 	PropFlags.h	\
 	CharacterProxy.h \

@@ -21,6 +21,7 @@
 
 #include "SimpleBuffer.h"
 #include "AMF.h"
+#include "AMFConverter.h"
 #include "namedStrings.h"
 #include "as_value.h"
 #include "as_object.h"
@@ -29,7 +30,6 @@
 #include "Date_as.h"
 #include "xml/XMLDocument_as.h"
 #include "Array_as.h"
-
 
 // Define this macro to make AMF parsing verbose
 //#define GNASH_DEBUG_AMF_DESERIALIZE 1
@@ -40,13 +40,6 @@
 namespace gnash {
 
 namespace AMF {
-
-namespace {
-
-    inline boost::uint16_t readNetworkShort(const boost::uint8_t* buf);
-    inline boost::uint32_t readNetworkLong(const boost::uint8_t* buf);
-
-}
 
 namespace {
 
@@ -117,9 +110,7 @@ private:
 bool
 Writer::writePropertyName(const std::string& name)
 {
-    boost::uint16_t namelen = name.size();
-    _buf.appendNetworkShort(namelen);
-    _buf.append(name.c_str(), namelen);
+    writePlainString(_buf, name, STRING_AMF0);
     return true;
 }
 
@@ -181,8 +172,8 @@ Writer::writeObject(as_object* obj)
             xml->toString(s, true);
 
             const std::string& xmlstr = s.str();
-            _buf.appendNetworkLong(xmlstr.size());
-            _buf.append(xmlstr.c_str(), xmlstr.size());
+            writePlainString(_buf, xmlstr, LONG_STRING_AMF0);
+
             return true;
         }
 
@@ -260,37 +251,24 @@ Writer::writeObject(as_object* obj)
 bool
 Writer::writeString(const std::string& str)
 {
-    const size_t strlen = str.size();
-    if (strlen <= 65535) {
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-        log_debug(_("amf: serializing string '%s'"), str);
-#endif
-        _buf.appendByte(STRING_AMF0);
-        _buf.appendNetworkShort(strlen);
-        _buf.append(str.c_str(), strlen);
-        return true;
-    }
-
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-    log_debug(_("amf: serializing long string '%s'"), str);
-#endif
-    _buf.appendByte(LONG_STRING_AMF0);
-    _buf.appendNetworkLong(strlen);
-    _buf.append(str.c_str(), strlen);
+    write(_buf, str);
     return true;
 }
 
 bool
 Writer::writeNumber(double d)
 {
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-    log_debug(_("amf: serializing number '%g'"), d);
-#endif
-    _buf.appendByte(NUMBER_AMF0);
-    swapBytes(&d, 8);
-    _buf.append(&d, 8);
+    write(_buf, d);
     return true;
 }
+
+bool
+Writer::writeBoolean(bool b)
+{
+    write(_buf, b);
+    return true;
+}
+
 
 bool
 Writer::writeUndefined()
@@ -317,21 +295,6 @@ Writer::writeData(const boost::uint8_t* data, size_t length)
 {
     _buf.append(data, length);
 }
-
-bool
-Writer::writeBoolean(bool b)
-{
-#ifdef GNASH_DEBUG_AMF_SERIALIZE
-    log_debug(_("amf: serializing boolean '%s'"), b);
-#endif
-    _buf.appendByte(BOOLEAN_AMF0);
-    
-    if (b) _buf.appendByte(1);
-    else _buf.appendByte(0);
-
-    return true;
-}
-
 
 bool
 Reader::operator()(as_value& val, Type t)
@@ -647,136 +610,6 @@ Reader::readDate()
     }
     return date;
 }
-
-void*
-swapBytes(void *word, size_t size)
-{
-    union {
-    boost::uint16_t s;
-    struct {
-        boost::uint8_t c0;
-        boost::uint8_t c1;
-    } c;
-    } u;
-       
-    u.s = 1;
-        if (u.c.c0 == 0) {
-        // Big-endian machine: do nothing
-        return word;
-    }
-
-    // Little-endian machine: byte-swap the word
-    // A conveniently-typed pointer to the source data
-    boost::uint8_t *x = static_cast<boost::uint8_t *>(word);
-
-    /// Handle odd as well as even counts of bytes
-    std::reverse(x, x + size);
-    
-    return word;
-}
-
-
-bool
-readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
-{
-    if (pos == _end) {
-        throw AMFException("Read past _end of buffer for boolean type");
-    }
-
-    const bool val = *pos;
-    ++pos;
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read bool: %d", val);
-#endif
-    return val;
-}
-
-double
-readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end)
-{
-
-    if (end - pos < 8) {
-        throw AMFException("Read past _end of buffer for number type");
-    }
-
-    double d;
-    // TODO: may we avoid a copy and swapBytes call
-    //       by bitshifting b[0] trough b[7] ?
-    std::copy(pos, pos + 8, reinterpret_cast<char*>(&d));
-    pos += 8; 
-    swapBytes(&d, 8);
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read double: %e", dub);
-#endif
-
-    return d;
-}
-
-std::string
-readString(const boost::uint8_t*& pos, const boost::uint8_t* end)
-{
-    if (end - pos < 2) {
-        throw AMFException("Read past _end of buffer for string length");
-    }
-
-    const boost::uint16_t si = readNetworkShort(pos);
-    pos += 2;
-
-    if (end - pos < si) {
-        throw AMFException("Read past _end of buffer for string type");
-    }
-
-    const std::string str(reinterpret_cast<const char*>(pos), si);
-    pos += si;
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read string: %s", str);
-#endif
-    return str;
-}
-
-std::string
-readLongString(const boost::uint8_t*& pos, const boost::uint8_t* end)
-{
-    if (end - pos < 4) {
-        throw AMFException("Read past _end of buffer for long string length");
-    }
-
-    const boost::uint32_t si = readNetworkLong(pos);
-    pos += 4;
-    if (end - pos < si) {
-        throw AMFException("Read past _end of buffer for long string type");
-    }
-
-    const std::string str(reinterpret_cast<const char*>(pos), si);
-    pos += si;
-
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read long string: %s", str);
-#endif
-
-    return str;
-
-}
-
-namespace {
-
-inline boost::uint16_t
-readNetworkShort(const boost::uint8_t* buf)
-{
-    boost::uint16_t s = buf[0] << 8 | buf[1];
-    return s;
-}
-
-inline boost::uint32_t
-readNetworkLong(const boost::uint8_t* buf)
-{
-    boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
-    return s;
-}
-
-} // anonymous namespace
-
 
 } // namespace AMF
 } // namespace gnash

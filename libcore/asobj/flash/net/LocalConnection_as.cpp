@@ -33,7 +33,7 @@
 #include "namedStrings.h"
 #include "StringPredicates.h"
 #include "as_value.h"
-#include "AMF.h"
+#include "AMFConverter.h"
 #include "ClockTime.h"
 #include "GnashAlgorithm.h"
 

@@ -44,7 +44,7 @@
 #include "URL.h"
 #include "NetConnection_as.h"
 #include "Object.h"
-#include "AMF.h"
+#include "AMFConverter.h"
 #include "GnashAlgorithm.h"
 
 #include <boost/scoped_array.hpp>
