@@ -61,13 +61,7 @@ public:
     /// Throw IOException on error
     ///
     boost::uint8_t read_byte();
-
-    /// write a single byte to the stream
-    //
-    /// Throw IOException on error
-    ///
-    void write_byte(boost::uint8_t u);
-
+    
     /// Read the given number of bytes from the stream
     //
     /// Return the number of bytes actually read. 

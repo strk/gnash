@@ -86,12 +86,6 @@ IOChannel::read_byte()
     return u;
 }
 
-void
-IOChannel::write_byte(boost::uint8_t u)
-{
-    write(&u, 1); // will trhow on error it seems
-}
-
 std::streamsize
 IOChannel::write(const void* /*src*/, std::streamsize /*num*/)
 {

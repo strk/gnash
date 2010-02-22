@@ -64,13 +64,6 @@ public:
     ///       is in error condition, see bad().
     ///
     boost::uint8_t read_byte() { return read8(); }
-
-    /// \brief write a single byte to the stream
-    //
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see bad().
-    ///
-    void write_byte(boost::uint8_t u) { write8(u); }
     
     /// \brief Read the given number of bytes from the stream
     //
@@ -130,54 +123,6 @@ public:
     size_t size() const;
     
 private:
-
-    boost::uint64_t	read64()
-    {
-        boost::uint64_t u;
-        read(&u, 8);
-        return u;
-    }
-
-    boost::uint32_t	read32()
-    {
-        boost::uint32_t u;
-        read(&u, 4);
-        return u;
-    }
-
-    boost::uint16_t read16()
-    {
-        boost::uint16_t u;
-        read(&u, 2);
-        return u;
-    }
-    
-    boost::uint8_t	read8()
-    {
-        boost::uint8_t u;
-        read(&u, 1);
-        return u;
-    }
-    
-    void write64(boost::uint64_t u)
-    {
-        write(&u, 8);
-    }
-
-    void write32(boost::uint32_t u)
-    {
-        write(&u, 4);
-    }
-
-    void write16(boost::uint16_t u)
-    {
-        write(&u, 2);
-    }
-
-    void write8(boost::uint8_t u)
-    {
-        write(&u, 1);
-    }
     
     void close();
     
