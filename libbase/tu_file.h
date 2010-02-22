@@ -58,19 +58,6 @@ public:
 	    return(result);
     }
 
-    /// \brief Write a 32-bit word to a little-endian stream.
-    //
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see bad().
-    ///
-    void 	write_le32(boost::uint32_t u)
-    {
-        write8(static_cast<boost::int8_t>(u));
-        write8(static_cast<boost::int8_t>(u>>8));
-        write8(static_cast<boost::int8_t>(u>>16));
-        write8(static_cast<boost::int8_t>(u>>24));
-    }
-
     /// \brief Write a 16-bit word to a little-endian stream.
     //
     /// TODO: define what happens when the stream

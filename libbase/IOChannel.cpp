@@ -46,15 +46,6 @@ IOChannel::read_le16()
 }
 
 void
-IOChannel::write_le32(boost::uint32_t u)
-{
-        write_byte(static_cast<boost::int8_t>(u));
-        write_byte(static_cast<boost::int8_t>(u>>8));
-        write_byte(static_cast<boost::int8_t>(u>>16));
-        write_byte(static_cast<boost::int8_t>(u>>24));
-}
-
-void
 IOChannel::write_le16(boost::uint16_t u)
 {
     write_byte(static_cast<boost::int8_t>(u));

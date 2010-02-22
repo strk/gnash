@@ -56,12 +56,6 @@ public:
     ///
     boost::uint16_t read_le16();
 
-    /// Write a 32-bit word to a little-endian stream.
-    //
-    /// Throw IOException on error
-    ///
-    void write_le32(boost::uint32_t u);
-
     /// \brief Write a 16-bit word to a little-endian stream.
     //
     /// Throw IOException on error
