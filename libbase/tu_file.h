@@ -57,17 +57,6 @@ public:
 	    result |= static_cast<boost::uint16_t>(read8()) << 8;
 	    return(result);
     }
-
-    /// \brief Write a 16-bit word to a little-endian stream.
-    //
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see bad().
-    ///
-    void write_le16(boost::uint16_t u)
-    {
-        write8(static_cast<boost::int8_t>(u));
-        write8(static_cast<boost::int8_t>(u>>8));
-    }
     
     /// \brief Read a single byte from the stream
     //

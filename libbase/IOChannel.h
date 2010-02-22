@@ -56,12 +56,6 @@ public:
     ///
     boost::uint16_t read_le16();
 
-    /// \brief Write a 16-bit word to a little-endian stream.
-    //
-    /// Throw IOException on error
-    ///
-    void write_le16(boost::uint16_t u);
-
     /// Read a single byte from the stream
     //
     /// Throw IOException on error
