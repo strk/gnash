@@ -37,15 +37,6 @@ IOChannel::read_le32()
     return(result);
 }
 
-long double
-IOChannel::read_le_double64() 
-{
-    return static_cast<long double> (
-        static_cast<boost::int64_t> (read_le32()) |
-        static_cast<boost::int64_t> (read_le32()) << 32
-    );
-}
-
 boost::uint16_t
 IOChannel::read_le16()
 {

@@ -46,20 +46,6 @@ public:
 	    return(result);
     }
 	
-	/// \brief Read a 64-bit word from a little-ending stream,
-	/// returning it as a native-endian word.
-	//
-	/// TODO: define what happens when the stream is in
-	///       error condition, see bad().
-	/// TODO: define a platform-neutral type for 64 bits.
-	long double read_le_double64()
-	{
-		return static_cast<long double> (
-			static_cast<boost::int64_t> (read_le32()) |
-			static_cast<boost::int64_t> (read_le32()) << 32
-		);
-	}
-
     /// \brief Read a 16-bit word from a little-endian stream.
     //
     /// TODO: define what happens when the stream

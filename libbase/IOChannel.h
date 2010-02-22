@@ -50,15 +50,6 @@ public:
     ///
     boost::uint32_t read_le32();
 
-    /// \brief Read a 64-bit word from a little-ending stream,
-    /// returning it as a native-endian word.
-    //
-    /// Throw IOException on premature EOF
-    ///
-    /// TODO: define a platform-neutral type for 64 bits.
-    ///
-    long double read_le_double64();
-
     /// Read a 16-bit word from a little-endian stream.
     //
     /// Throw IOException on error
