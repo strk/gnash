@@ -38,11 +38,11 @@ public:
     ///
     boost::uint32_t read_le32() 
     {
-	    // read8() is boost::uint8_t, so no masks with 0xff are required.
-	    boost::uint32_t result = static_cast<boost::uint32_t>(read8());
-	    result |= static_cast<boost::uint32_t>(read8()) << 8;
-	    result |= static_cast<boost::uint32_t>(read8()) << 16;
-	    result |= static_cast<boost::uint32_t>(read8()) << 24;
+	    // read_byte() is boost::uint8_t, so no masks with 0xff are required.
+	    boost::uint32_t result = static_cast<boost::uint32_t>(read_byte());
+	    result |= static_cast<boost::uint32_t>(read_byte()) << 8;
+	    result |= static_cast<boost::uint32_t>(read_byte()) << 16;
+	    result |= static_cast<boost::uint32_t>(read_byte()) << 24;
 	    return(result);
     }
 	
@@ -53,8 +53,8 @@ public:
     ///
     boost::uint16_t read_le16()
     {
-	    boost::uint16_t result = static_cast<boost::uint16_t>(read8());
-	    result |= static_cast<boost::uint16_t>(read8()) << 8;
+	    boost::uint16_t result = static_cast<boost::uint16_t>(read_byte());
+	    result |= static_cast<boost::uint16_t>(read_byte()) << 8;
 	    return(result);
     }
     
@@ -63,7 +63,11 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see bad().
     ///
-    boost::uint8_t read_byte() { return read8(); }
+    boost::uint8_t read_byte() {
+        boost::uint8_t u;
+        read(&u, 1);
+        return u;
+    }
     
     /// \brief Read the given number of bytes from the stream
     //
