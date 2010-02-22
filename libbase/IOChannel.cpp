@@ -88,20 +88,6 @@ IOChannel::read_string(char* dst, int max_length)
     return -1;
 }
 
-void
-IOChannel::write_float32(float value)
-{
-    union alias {
-        float    f;
-        boost::uint32_t    i;
-    } u;
-
-    BOOST_STATIC_ASSERT(sizeof(alias) == sizeof(boost::uint32_t));
-    
-    u.f = value;
-    write_le32(u.i);
-}
-
 float
 IOChannel::read_float32()
 {
