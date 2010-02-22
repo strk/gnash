@@ -62,6 +62,7 @@ libgnashbase_la_SOURCES = \
 	GnashImage.cpp \
 	GnashImageJpeg.cpp \
 	GnashFileUtilities.cpp \
+	AMF.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
@@ -170,6 +171,7 @@ EXTENSIONS_API = \
 	ref_counted.h \
 	GC.h \
 	GnashException.h \
+	AMF.h \
 	dsodefs.h \
 	utility.h \
 	log.h \

@@ -38,7 +38,7 @@
 #include "GnashAlgorithm.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "AMF.h"
+#include "AMFConverter.h"
 
 #include <iostream>
 #include <string>

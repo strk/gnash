@@ -37,48 +37,12 @@ IOChannel::read_le32()
     return(result);
 }
 
-long double
-IOChannel::read_le_double64() 
-{
-    return static_cast<long double> (
-        static_cast<boost::int64_t> (read_le32()) |
-        static_cast<boost::int64_t> (read_le32()) << 32
-    );
-}
-
 boost::uint16_t
 IOChannel::read_le16()
 {
     boost::uint16_t result = static_cast<boost::uint16_t>(read_byte());
     result |= static_cast<boost::uint16_t>(read_byte()) << 8;
     return(result);
-}
-
-void
-IOChannel::write_le32(boost::uint32_t u)
-{
-        write_byte(static_cast<boost::int8_t>(u));
-        write_byte(static_cast<boost::int8_t>(u>>8));
-        write_byte(static_cast<boost::int8_t>(u>>16));
-        write_byte(static_cast<boost::int8_t>(u>>24));
-}
-
-void
-IOChannel::write_le16(boost::uint16_t u)
-{
-    write_byte(static_cast<boost::int8_t>(u));
-    write_byte(static_cast<boost::int8_t>(u>>8));
-}
-
-void
-IOChannel::write_string(const char* src)
-{
-    for (;;)
-    {
-        write_byte(*src);
-        if (*src == 0) break;
-        src++;
-        }
 }
 
 int
@@ -95,20 +59,6 @@ IOChannel::read_string(char* dst, int max_length)
     dst[max_length - 1] = '\0';    // force termination.
     
     return -1;
-}
-
-void
-IOChannel::write_float32(float value)
-{
-    union alias {
-        float    f;
-        boost::uint32_t    i;
-    } u;
-
-    BOOST_STATIC_ASSERT(sizeof(alias) == sizeof(boost::uint32_t));
-    
-    u.f = value;
-    write_le32(u.i);
 }
 
 float
@@ -134,12 +84,6 @@ IOChannel::read_byte()
         throw IOException("Could not read a single byte from input");
     }
     return u;
-}
-
-void
-IOChannel::write_byte(boost::uint8_t u)
-{
-    write(&u, 1); // will trhow on error it seems
 }
 
 std::streamsize

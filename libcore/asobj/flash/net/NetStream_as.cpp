@@ -39,7 +39,7 @@
 #include "StreamProvider.h"
 #include "sound_handler.h"
 #include "GnashSystemNetHeaders.h"
-#include "AMF.h"
+#include "AMFConverter.h"
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
