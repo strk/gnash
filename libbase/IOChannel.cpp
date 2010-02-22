@@ -45,17 +45,6 @@ IOChannel::read_le16()
     return(result);
 }
 
-void
-IOChannel::write_string(const char* src)
-{
-    for (;;)
-    {
-        write_byte(*src);
-        if (*src == 0) break;
-        src++;
-        }
-}
-
 int
 IOChannel::read_string(char* dst, int max_length) 
 {

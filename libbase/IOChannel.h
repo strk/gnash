@@ -99,12 +99,6 @@ public:
     ///
     virtual std::streamsize write(const void* src, std::streamsize num);
 
-    /// \brief Write a 0-terminated string to a stream.
-    //
-    /// Throw IOException on error
-    ///
-    void write_string(const char* src);
-
     /// \brief
     /// Read up to max_length characters, returns the number of characters 
     /// read, or -1 if the string length is longer than max_length.
