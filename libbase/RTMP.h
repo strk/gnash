@@ -461,6 +461,12 @@ private:
     bool handShake();
 
     /// A set of channels. An RTMP handler has two sets.
+    //
+    /// Packets are stored on these channels. As soon as a packet has been
+    /// processed, its payload is removed. The header remains in memory to
+    /// allow compression of later packets.
+    //
+    /// RTMPPackets must be stored with an absolute timestamp.
     typedef std::map<size_t, RTMPPacket> ChannelSet;
     
     Socket _socket;

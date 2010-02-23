@@ -301,6 +301,7 @@ RTMP::readSocket(boost::uint8_t* buffer, int n)
         // Doesn't seem very likely to be the way the pp does it.
         if (_bytesIn > _bytesInSent + _bandwidth / 2) {
             sendBytesReceived(this);
+            log_debug("Sent bytes received");
         }
         buffer += bytesRead;
     }
@@ -431,9 +432,9 @@ RTMP::readPacket(RTMPPacket& packet)
             if (nSize > 6) {
                 hr.packetType = static_cast<PacketType>(header[6]);
      
-                // Large packets have a complete timestamp.
+                // Large packets have a streamID.
                 if (nSize == 11) {
-                    hr._timestamp = decodeInt32LE(header + 7);
+                    hr._streamID = decodeInt32LE(header + 7);
                 }
             }
 	    }
@@ -596,7 +597,10 @@ RTMP::sendPacket(RTMPPacket& packet)
     // is no previous packet.
     assert(hr.headerType == RTMP_PACKET_SIZE_LARGE);
 
-    if (prev) {
+    if (!prev) {
+        hr._timestamp = uptime;
+    }
+    else {
 
         const RTMPPacket& prevPacket = getPacket(CHANNELS_OUT, hr.channel);
         const RTMPHeader& oldh = prevPacket.header;
@@ -604,6 +608,7 @@ RTMP::sendPacket(RTMPPacket& packet)
 
         // If this timestamp is later than the other and the difference fits
         // in 3 bytes, encode a relative one.
+        log_debug("Time delta %s", uptime - prevTimestamp);
         if (uptime >= oldh._timestamp && uptime - prevTimestamp < 0xffffff) {
             //log_debug("Shrinking to medium");
             hr.headerType = RTMP_PACKET_SIZE_MEDIUM;
@@ -765,7 +770,10 @@ RTMP::sendPacket(RTMPPacket& packet)
         log_debug( "Calling remote method %s", s);
     }
 
-    storePacket(CHANNELS_OUT, hr.channel, packet);
+    RTMPPacket& storedpacket = storePacket(CHANNELS_OUT, hr.channel, packet);
+
+    // Make it absolute for the next delta.
+    storedpacket.header._timestamp = uptime;
 
     return true;
 }
