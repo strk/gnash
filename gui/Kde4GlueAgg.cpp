@@ -110,7 +110,7 @@ Kde4AggGlue::createRenderHandler()
 
     if ( ! _renderer )
     {
-        throw GnashException("Could not create AGG renderer with pixelformat ABGR32");
+        throw GnashException_(("Could not create AGG renderer with pixelformat ABGR32"));
     }
     return _renderer;
 }

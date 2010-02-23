@@ -41,6 +41,13 @@ AC_DEFUN([GNASH_PATH_FREETYPE2],
         ac_cv_path_freetype_incl="-I$i/freetype2"
 	      break
       fi
+      dnl Haiku uses only freetype as the directory, not freetype2
+      if test x"${haiku}" = xyes; then
+        if test -f $i/freetype/freetype/freetype.h; then
+          ac_cv_path_freetype_incl="-I$i/freetype"
+	        break
+        fi
+      fi
     done
 
     if test x"${ac_cv_path_freetype_incl}" = x ; then

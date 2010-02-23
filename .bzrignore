@@ -36,6 +36,7 @@ macros/argz.m4
 gui/gnash
 gui/gtk-gnash
 gui/kde-gnash
+gui/haiku-gnash
 gui/sdl-gnash
 gui/fb-gnash
 gui/riscos-gnash

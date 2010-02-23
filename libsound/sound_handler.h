@@ -585,7 +585,7 @@ DSOEXPORT sound_handler* create_sound_handler_aos4();
 /// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler* create_sound_handler_aos4(const std::string& wave_file);
 
-#elif defined(SOUND_HAIKU)
+#elif defined(SOUND_MKIT)
 /// @throw a SoundException if fails to create node.
 DSOEXPORT sound_handler* create_sound_handler_haiku();
 

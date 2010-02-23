@@ -406,6 +406,9 @@ endif
 if BUILD_AMIGAOS4_GUI
        @echo " Supported GUI: AMIGAOS4"
 endif
+if BUILD_HAIKU_GUI
+    @echo " Supported GUI: Haiku"
+endif
 if XPCOM
 	@echo "	XPCOM support for Mozilla/Firefox"
 endif

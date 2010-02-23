@@ -178,7 +178,7 @@ case "${host}" in
     ;;
   *-*haiku*)
     haiku=yes
-    AC_DEFINE([HAIKU_HOST], [1], [this is an Haiku platform])
+    AC_DEFINE([HAIKU_HOST], [1], [this is a Haiku platform])
     ;;
 esac
 
@@ -202,11 +202,6 @@ AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
 dnl AM_GNU_GETTEXT_VERSION(0.15)
 
-dnl For Haiku, we know the sysroot is in a non-standard place
-if test x"${haiku}" = xyes; then
-  with_top_level="/boot/common"
-  LIBS += -lbe
-fi
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
@@ -630,8 +625,10 @@ dnl        build_qtopia=yes
 dnl        build_hildon=yes
 dnl        build_alp=yes
 dnl        build_riscos=yes
+dnl        build_aos4=yes
+dnl        build_haiku=yes        
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump|aos4)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump|aos4|haiku)])
          ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -1165,6 +1162,12 @@ AC_SUBST(SECURITY_LIST)
 
 if test x$build_agg = xyes; then
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
+fi
+
+dnl For Haiku, we know the sysroot is in a non-standard place
+dnl it is important that -lagg comes before -lbe
+if test x"${haiku}" = xyes; then
+  HAIKU_LIBS = -lbe
 fi
 
 DLOPEN="-dlopen"
@@ -1916,7 +1919,7 @@ fi
 
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 
-if test x$build_gtk = xno -o x$build_kde4 = xno; then
+if test x$build_gtk = xno -o x$build_kde4 = xno -a x$build_haiku = xno; then
   if test x$npapi = xyes; then
     AC_MSG_WARN(["Enabled NPAPI plugin, but it's not supported by the selected GUI"])
   fi
@@ -3423,6 +3426,13 @@ if test x"${build_alp}" = xyes; then
     echo "        ALP libs are: $ALP_LIBS"
   else
     echo "        ERROR: No ALP development package is installed." >&3
+  fi
+fi
+
+dnl Haiku gui
+if test x"${build_haiku}" = xyes; then
+  if test x"$haiku" != xyes; then
+    echo "        ERROR: Can not build Haiku gui outside of Haiku operating system." >&3
   fi
 fi
 
