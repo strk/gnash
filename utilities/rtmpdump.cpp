@@ -344,6 +344,14 @@ sendFCSubscribe(rtmp::RTMP& r, FakeNC& nc, const std::string& subscribepath)
     r.call(buf);
 }
 
+/// Some URLs to try are:
+//
+/// -u rtmp://tagesschau.fcod.llnwd.net:1935/a3705/d1
+/// with -p 2010/0216/TV-20100216-0911-2401.hi or
+///      -p 2010/0216/TV-20100216-0911-2401.lo
+//
+/// -u rtmp://ndr.fc.llnwd.net:1935/ndr/_definst_
+/// with -p ndr_fs_nds_hi_flv *and* -s -1 (live stream)
 int
 main(int argc, char** argv)
 {
