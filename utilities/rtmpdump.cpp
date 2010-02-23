@@ -86,12 +86,19 @@ using namespace gnash;
 //     connection.call("createStream", new OnCreate(this));
 // }
 
+namespace {
+    void usage(std::ostream& o);
+}
+
 class FakeNC
 {
 public:
+
     FakeNC()
         :
-        _callCount(0)
+        _callCount(0),
+        _seek(0),
+        _len(-1)
     {}
 
     size_t callNumber() {
@@ -119,11 +126,29 @@ public:
         return _playpath;
     }
 
+    void setSeekTime(double secs) {
+        _seek = secs;
+    }
+
+    double seekTime() const {
+        return _seek;
+    }
+
+    void setLength(double len) {
+        _len = len;
+    }
+
+    double length() const {
+        return _len;
+    }
+
 private:
     size_t _callCount;
     std::map<size_t, std::string> _calls;
 
     std::string _playpath;
+
+    double _seek, _len;
 };
 
 
@@ -206,7 +231,7 @@ replyBWCheck(rtmp::RTMP& r, FakeNC& /*nc*/, double txn)
 }
 
 void
-sendPausePacket(rtmp::RTMP& r, FakeNC& nc, bool flag, double time)
+sendPausePacket(rtmp::RTMP& r, FakeNC& /*nc*/, bool flag, double time)
 {
     // TODO: store in NetStream or NC?
     const int streamid = r.m_stream_id;
@@ -232,11 +257,13 @@ sendPausePacket(rtmp::RTMP& r, FakeNC& nc, bool flag, double time)
 //ASnative(2101, 202)(this, "play", null, name, start * 1000, len * 1000, reset);
 // This call is not queued (it's a play call, and doesn't have a callback).
 void
-sendPlayPacket(rtmp::RTMP& r, FakeNC& nc, double seektime, double length)
+sendPlayPacket(rtmp::RTMP& r, FakeNC& nc)
 {
 
     // TODO: where should we store this?
     const int streamid = r.m_stream_id;
+    const double seektime = nc.seekTime() * 1000.0;
+    const double length = nc.length() * 1000.0;
 
     log_debug("Sending play packet. Stream id: %s, playpath %s", streamid,
             nc.playpath());
@@ -256,19 +283,19 @@ sendPlayPacket(rtmp::RTMP& r, FakeNC& nc, double seektime, double length)
     // Optional parameters start and len.
     //
     // start: -2, -1, 0, positive number
-    //  -2: looks for a live stream, then a recorded stream, if not found any open a live stream
+    //  -2: looks for a live stream, then a recorded stream, if not found
+    //  any open a live stream
     //  -1: plays a live stream
     // >=0: plays a recorded streams from 'start' milliseconds
-    AMF::write(buf, seektime * 1000.0);
+    AMF::write(buf, seektime);
 
     // len: -1, 0, positive number
     //  -1: plays live or recorded stream to the end (default)
     //   0: plays a frame 'start' ms away from the beginning
     //  >0: plays a live or recoded stream for 'len' milliseconds
     //enc += EncodeNumber(enc, -1.0); // len
-    if (length) {
-        AMF::write(buf, length * 1000.0);
-    }
+    AMF::write(buf, length);
+    
     r.play(buf, streamid);
 }
 
@@ -324,7 +351,9 @@ main(int argc, char** argv)
         {
         { 'h', "help",          Arg_parser::no  },
         { 'u', "url",           Arg_parser::yes  },
-        { 'p', "playpath",      Arg_parser::yes  }
+        { 'p', "playpath",      Arg_parser::yes  },
+        { 's', "seek",          Arg_parser::yes  },
+        { 'l', "length",        Arg_parser::yes  }
         };
 
     Arg_parser parser(argc, argv, opts);
@@ -340,11 +369,14 @@ main(int argc, char** argv)
     std::string swf;
     std::string page;
 
+    double seek = 0, len = -1;
+
     for (int i = 0; i < parser.arguments(); ++i) {
         const int code = parser.code(i);
         try {
             switch (code) {
               case 'h':
+                  usage(std::cout);
                   exit(EXIT_SUCCESS);
               case 'u':
                   url = parser.argument(i);
@@ -354,6 +386,12 @@ main(int argc, char** argv)
                   break;
               case 't':
                   tc = parser.argument(i);
+                  break;
+              case 's':
+                  seek = parser.argument<double>(i);
+                  break;
+              case 'l':
+                  len = parser.argument<double>(i);
                   break;
             }
         }
@@ -381,6 +419,8 @@ main(int argc, char** argv)
     gnash::rtmp::RTMP r;
     FakeNC nc;
     nc.setPlayPath(playpath);
+    nc.setLength(len);
+    nc.setSeekTime(seek);
 
     log_debug("Initial connection");
 
@@ -405,6 +445,7 @@ main(int argc, char** argv)
                     b->data() + b->size());
             b = r.getMessage();
         }
+        if (!r.connected()) break;
     }
 
 }
@@ -447,22 +488,8 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
 
         if (calledMethod == "connect")
         {
-
-            r.setBufferTime(300);
-
             // Do here.
             sendCreateStream(r, nc);
-#if 0
-            /* Send the FCSubscribe if live stream or if subscribepath is set */
-            if (r._subscribepath.size()) {
-                log_debug("Subscribe path set");
-                SendFCSubscribe(r, r._subscribepath);
-            }
-            else if (r._liveStream) {
-                log_debug("Live stream");
-                SendFCSubscribe(r, r._playpath);
-            }
-#endif
         }
 
         else if (calledMethod == "createStream") {
@@ -476,9 +503,11 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
             log_debug("Stream ID: %s", r.m_stream_id);
             r.m_stream_id = 1;
 
-            /// 2. play.
-            sendPlayPacket(r, nc, 0, 0);
-            r.setBufferTime(300);
+            /// Issue NetStream.play command.
+            sendPlayPacket(r, nc);
+
+            /// Allows quick downloading.
+            r.setBufferTime(3600000);
         }
 
         else if (calledMethod == "play") {
@@ -504,8 +533,7 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
     
     /// If the server sends this, we reply (the call should contain a
     /// callback object!).
-    if (method == "_onbwcheck")
-    {
+    if (method == "_onbwcheck") {
         if (txn) replyBWCheck(r, nc, txn);
         else {
             log_error("Server called _onbwcheck without a callback");
@@ -516,8 +544,7 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
     // This should be called by the server when the bandwidth test is finished.
     //
     // It contains information, but we don't have to do anything.
-    if (method == "onBWDone")
-    {
+    if (method == "onBWDone") {
         // This is a SWF implementation detail, not required by the protocol.
         //sendCheckBW(r, nc);
         return ret;
@@ -538,43 +565,34 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
     }
 
     /// Don't know when it sends this.
-    if (method == "onFCSubscribe")
-    {
-        // SendOnFCSubscribe();
+    if (method == "onFCSubscribe") {
         return ret;
     }
 
     /// Or this.
-    if (method == "onFCUnsubscribe")
-    {
+    if (method == "onFCUnsubscribe") {
         r.close();
         ret = true;
         return ret;
     }
 
-
-    /// Forward.
-    if (method ==  "_error")
-    {
+    if (method ==  "_error") {
         log_error( "rtmp server sent error");
         std::exit(EXIT_FAILURE);
     }
     
-    /// Forward.
-    if (method == "close")
-    {
+    if (method == "close") {
         log_error( "rtmp server requested close");
         r.close();
         return ret;
     }
     
-    if (method == "onStatus")
-    {
+    if (method == "onStatus") {
         if (*payload != AMF::NULL_AMF0) return false;
         ++payload;
 #if 1
         log_debug("AMF buffer for onstatus: %s",
-                hexify(payload, end - payload, false));
+                hexify(payload, end - payload, true));
 #endif
         if (*payload != AMF::OBJECT_AMF0) {
             log_debug("not an object");
@@ -636,5 +654,23 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
         }
     }
     return ret;
+}
+
+namespace {
+
+void
+usage(std::ostream& o)
+{
+    o << "usage: rtmpdump -u <app> -p playpath\n";
+    o << "\n";
+    o << "-u <url>  The full url, including port, of the rtmp application\n";
+    o << "-p <path> The play path of the stream (what is passed to "
+        "NetStream.play()\n";
+    o << "-s <sec>  Start at the given seek offset\n";
+    o << "-l <sec>  Retrieve only the specified length in seconds\n";
+}
+
+
+
 }
 
