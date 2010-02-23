@@ -52,6 +52,8 @@
 # include "MediaHandlerFfmpeg.h"
 #elif defined(USE_GST)
 # include "MediaHandlerGst.h"
+#elif defined(USE_HAIKU_ENGINE)
+# include "MediaHandlerHaiku.h"
 #endif
 
 #include "GnashSystemIOHeaders.h" // for write() 
@@ -185,7 +187,7 @@ Player::init_sound()
 #elif defined(SOUND_AHI)
             _soundHandler.reset(sound::create_sound_handler_aos4(_audioDump));
 #elif defined(SOUND_MKIT)
-            _soundHandler.reset(sound::create_sound_handler_haiku(_audioDump));
+            _soundHandler.reset(sound::create_sound_handler_mkit(_audioDump));
 #else
             log_error(_("Sound requested but no sound support compiled in"));
             return;
