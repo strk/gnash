@@ -63,6 +63,7 @@ libgnashbase_la_SOURCES = \
 	GnashImageJpeg.cpp \
 	GnashFileUtilities.cpp \
 	AMF.cpp \
+	RTMP.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
@@ -71,6 +72,7 @@ libgnashbase_la_SOURCES = \
 	string_table.cpp \
 	tu_file.cpp \
 	IOChannel.cpp \
+	Socket.cpp \
 	ClockTime.cpp \
 	NamingPolicy.cpp \
 	WallClockTimer.cpp \
@@ -140,6 +142,7 @@ noinst_HEADERS = \
 	tree.hh \
 	tu_file.h \
 	IOChannel.h \
+	Socket.h \
 	tu_opengl_includes.h \
 	GnashSystemFDHeaders.h \
 	GnashSystemNetHeaders.h \
@@ -172,6 +175,7 @@ EXTENSIONS_API = \
 	GC.h \
 	GnashException.h \
 	AMF.h \
+	RTMP.h \
 	dsodefs.h \
 	utility.h \
 	log.h \

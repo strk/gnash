@@ -138,6 +138,14 @@ readNetworkLong(const boost::uint8_t* buf)
 /// it!
 void write(SimpleBuffer& buf, const std::string& str);
 
+/// Write a C string to an AMF buffer.
+//
+/// The overload is necessary to prevent const char* being resolved to the
+/// boolean overload.
+inline void write(SimpleBuffer& buf, const char* str) {
+    return write(buf, std::string(str));
+}
+
 /// Write a number to an AMF buffer.
 //
 /// This function writes the type byte and the double value.
