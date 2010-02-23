@@ -3441,6 +3441,7 @@ fi
 dnl Haiku
 if test x"${build_haiku}" = xyes -o x"${build_sound_mkit}" = xyes -o x"${media_handler}" = x"mkit"; then
     echo "        Haiku libs are: $HAIKU_LIBS"
+fi
  
 dnl XPCOM support for Mozilla/Firefox
 if test x"$xpcom" = x"yes"; then
