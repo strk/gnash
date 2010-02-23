@@ -65,13 +65,15 @@ enum Type {
 /// Exception for handling malformed buffers.
 //
 /// All low-level reading operations can throw this error.
-struct DSOEXPORT
+class DSOEXPORT
 AMFException : public GnashException
 {
+public:
     AMFException(const std::string& msg)
         :
         GnashException(msg)
     {}
+private:
 };
 
 /// Read a number from an AMF buffer
