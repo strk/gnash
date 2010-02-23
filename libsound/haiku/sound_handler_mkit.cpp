@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "sound_handler_haiku.h"
+#include "sound_handler_mkit.h"
 
 #include "SoundInfo.h"
 #include "EmbedSound.h"
@@ -33,7 +33,7 @@
 #include <SoundPlayer.h>
 
 // Define this to get debugging call about pausing/unpausing audio
-//#define GNASH_DEBUG_HAIKU_AUDIO_PAUSING
+//#define GNASH_DEBUG_MKIT_AUDIO_PAUSING
 
 // Mixing and decoding debugging
 //#define GNASH_DEBUG_MIXING
@@ -74,12 +74,12 @@ typedef struct{
 namespace gnash {
 namespace sound {
 
-Haiku_sound_handler::Haiku_sound_handler()
+Mkit_sound_handler::Mkit_sound_handler()
 : _audioopen(false)
 {
 }
 
-Haiku_sound_handler::Haiku_sound_handler(const std::string& wavefile)
+Mkit_sound_handler::Mkit_sound_handler(const std::string& wavefile)
 : _audioopen(false)
 {
     if (! wavefile.empty() ) {
@@ -96,7 +96,7 @@ Haiku_sound_handler::Haiku_sound_handler(const std::string& wavefile)
 }
 
 void
-Haiku_sound_handler::openAudio()
+Mkit_sound_handler::openAudio()
 {
     if (_audioopen == true)
         return;
@@ -111,20 +111,20 @@ Haiku_sound_handler::openAudio()
     format.buffer_size = media_raw_audio_format::wildcard.buffer_size;
 
     _soundplayer.reset(new BSoundPlayer(&format, "Gnash",
-            Haiku_sound_handler::FillNextBuffer, NULL, this));
+            Mkit_sound_handler::FillNextBuffer, NULL, this));
     if (B_OK != _soundplayer->InitCheck())
         throw SoundException(_("Unable to open audio"));
     _soundplayer->Start();
 }
 
-Haiku_sound_handler::~Haiku_sound_handler()
+Mkit_sound_handler::~Mkit_sound_handler()
 {
     if (_soundplayer != NULL)
         _soundplayer->Stop(true, true);
 
 //    boost::mutex::scoped_lock lock(_mutex);
 //#ifdef GNASH_DEBUG_HAIKU_AUDIO_PAUSING
-//    log_debug("Pausing Haiku Audio on destruction");
+//    log_debug("Pausing Mkit Audio on destruction");
 //#endif
 //    SDL_PauseAudio(1);
 //
@@ -143,7 +143,7 @@ Haiku_sound_handler::~Haiku_sound_handler()
 
 // write a wave header, using the current audioSpec settings
 void
-Haiku_sound_handler::write_wave_header(std::ofstream& outfile)
+Mkit_sound_handler::write_wave_header(std::ofstream& outfile)
 {
     // allocate wav header
     WAV_HDR wav;
@@ -179,7 +179,7 @@ Haiku_sound_handler::write_wave_header(std::ofstream& outfile)
 }
 
 void
-Haiku_sound_handler::FillNextBuffer(void *cookie, void *buffer, size_t size,
+Mkit_sound_handler::FillNextBuffer(void *cookie, void *buffer, size_t size,
         const media_raw_audio_format &format)
 {
     (void) format;
@@ -188,14 +188,14 @@ Haiku_sound_handler::FillNextBuffer(void *cookie, void *buffer, size_t size,
         size / sizeof(uint16);
     boost::int16_t *data = (boost::int16_t*) buffer;
 
-    Haiku_sound_handler *that =
-        reinterpret_cast<Haiku_sound_handler*>(cookie);
+    Mkit_sound_handler *that =
+        reinterpret_cast<Mkit_sound_handler*>(cookie);
 
     that->fetchSamples(data, numSamples);
 }
 
 void
-Haiku_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
+Mkit_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
     boost::mutex::scoped_lock lock(_mutex);
     sound_handler::fetchSamples(to, nSamples);
@@ -216,14 +216,14 @@ Haiku_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
     if ( ! hasInputStreams() )
     {
 #ifdef GNASH_DEBUG_HAIKU_AUDIO_PAUSING
-        log_debug("Pausing Haiku Audio...");
+        log_debug("Pausing Mkit Audio...");
 #endif
         sound_handler::pause();
     }
 }
 
 void
-Haiku_sound_handler::reset()
+Mkit_sound_handler::reset()
 {
     boost::mutex::scoped_lock lock(_mutex);
     sound_handler::delete_all_sounds();
@@ -231,7 +231,7 @@ Haiku_sound_handler::reset()
 }
 
 int
-Haiku_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
+Mkit_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
                                 std::auto_ptr<media::SoundInfo> sinfo)
 {
     boost::mutex::scoped_lock lock(_mutex);
@@ -239,7 +239,7 @@ Haiku_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 }
 
 sound_handler::StreamBlockId
-Haiku_sound_handler::addSoundBlock(unsigned char* data,
+Mkit_sound_handler::addSoundBlock(unsigned char* data,
         unsigned int dataBytes, unsigned int nSamples,
         int streamId)
 {
@@ -249,7 +249,7 @@ Haiku_sound_handler::addSoundBlock(unsigned char* data,
 }
 
 void
-Haiku_sound_handler::stop_sound(int soundHandle)
+Mkit_sound_handler::stop_sound(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
     sound_handler::stop_sound(soundHandle);
@@ -257,14 +257,14 @@ Haiku_sound_handler::stop_sound(int soundHandle)
 
 
 void
-Haiku_sound_handler::delete_sound(int soundHandle)
+Mkit_sound_handler::delete_sound(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
     sound_handler::delete_sound(soundHandle);
 }
 
 void
-Haiku_sound_handler::stop_all_sounds()
+Mkit_sound_handler::stop_all_sounds()
 {
     boost::mutex::scoped_lock lock(_mutex);
     sound_handler::stop_all_sounds();
@@ -272,7 +272,7 @@ Haiku_sound_handler::stop_all_sounds()
 
 
 int
-Haiku_sound_handler::get_volume(int soundHandle)
+Mkit_sound_handler::get_volume(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_volume(soundHandle);
@@ -280,35 +280,35 @@ Haiku_sound_handler::get_volume(int soundHandle)
 
 
 void
-Haiku_sound_handler::set_volume(int soundHandle, int volume)
+Mkit_sound_handler::set_volume(int soundHandle, int volume)
 {
     boost::mutex::scoped_lock lock(_mutex);
     sound_handler::set_volume(soundHandle, volume);
 }
 
 media::SoundInfo*
-Haiku_sound_handler::get_sound_info(int soundHandle)
+Mkit_sound_handler::get_sound_info(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_sound_info(soundHandle);
 }
 
 unsigned int
-Haiku_sound_handler::get_duration(int soundHandle)
+Mkit_sound_handler::get_duration(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_duration(soundHandle);
 }
 
 unsigned int
-Haiku_sound_handler::tell(int soundHandle)
+Mkit_sound_handler::tell(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::tell(soundHandle);
 }
 
 void 
-Haiku_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, boost::uint32_t len, int volume)
+Mkit_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, boost::uint32_t len, int volume)
 {
     //boost::uint16_t format;
 
@@ -358,7 +358,7 @@ Haiku_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, b
 }
 
 void
-Haiku_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, unsigned int nSamples, float volume)
+Mkit_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, unsigned int nSamples, float volume)
 {
     //if (!_closing)
     {
@@ -372,7 +372,7 @@ Haiku_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, 
 }
 
 void
-Haiku_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
+Mkit_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
 {
     boost::mutex::scoped_lock lock(_mutex);
 
@@ -381,8 +381,8 @@ Haiku_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
     { // TODO: this whole block should only be executed when adding
       // the first stream.
 
-#ifdef GNASH_DEBUG_Haiku_AUDIO_PAUSING
-        log_debug("Unpausing Haiku Audio on inpust stream plug...");
+#ifdef GNASH_DEBUG_Mkit_AUDIO_PAUSING
+        log_debug("Unpausing Mkit Audio on inpust stream plug...");
 #endif
         openAudio();
         sound_handler::unpause();
@@ -391,46 +391,46 @@ Haiku_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
 }
 
 void
-Haiku_sound_handler::mute()
+Mkit_sound_handler::mute()
 {
     boost::mutex::scoped_lock lock(_mutedMutex);
     sound_handler::mute();
 }
 
 void
-Haiku_sound_handler::unmute()
+Mkit_sound_handler::unmute()
 {
     boost::mutex::scoped_lock lock(_mutedMutex);
     sound_handler::unmute();
 }
 
 bool
-Haiku_sound_handler::is_muted() const
+Mkit_sound_handler::is_muted() const
 {
     boost::mutex::scoped_lock lock(_mutedMutex);
     return sound_handler::is_muted();
 }
 
 void
-Haiku_sound_handler::pause()
+Mkit_sound_handler::pause()
 {
-    log_debug(_("Haiku: Haiku_sound_handler::pause"));
+    log_debug(_("Mkit: Mkit_sound_handler::pause"));
     if (_soundplayer != NULL)
         _soundplayer->SetHasData(false);
     sound_handler::pause();
-    log_debug(_("Haiku: paused"));
+    log_debug(_("Mkit: paused"));
 }
 
 void
-Haiku_sound_handler::unpause()
+Mkit_sound_handler::unpause()
 {
     if ( hasInputStreams() )
     {
-        log_debug(_("Haiku: Haiku_sound_handler::unpause"));
+        log_debug(_("Mkit: Mkit_sound_handler::unpause"));
         if (_soundplayer != NULL)
             _soundplayer->SetHasData(true);
         sound_handler::unpause();
-        log_debug(_("Haiku: unpaused"));
+        log_debug(_("Mkit: unpaused"));
     }
 }
 
@@ -439,14 +439,14 @@ sound_handler*
 create_sound_handler_haiku()
 // Factory.
 {
-    return new Haiku_sound_handler;
+    return new Mkit_sound_handler;
 }
 
 sound_handler*
 create_sound_handler_haiku(const std::string& wave_file)
 // Factory.
 {
-    return new Haiku_sound_handler(wave_file);
+    return new Mkit_sound_handler(wave_file);
 }
 
 

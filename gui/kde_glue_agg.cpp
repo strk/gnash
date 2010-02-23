@@ -152,9 +152,8 @@ KdeAggGlue::createRenderHandler()
 {
     // QT requires the use of this pixel format...
     _renderer = create_Renderer_agg("BGRA32");
-    if ( ! _renderer )
-    {
-        throw GnashException("Could not create AGG renderer with pixelformat BGRA32");
+    if (! _renderer) {
+        throw GnashException_(("Could not create AGG renderer with pixelformat BGRA32"));
     }
     return _renderer;
 }

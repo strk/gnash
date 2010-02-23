@@ -544,13 +544,13 @@ build_hildon=no                 dnl Native LIMO
 build_alp=no                    dnl Acess Linux Platform using Hiker
 build_dump=no
 AC_ARG_ENABLE(gui,
-  AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde3)]),
-  if test -n ${enableval}; then
+  AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde4)]),
+  [if test -n ${enableval}; then
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
   while test -n "${enableval}" ; do
     val=`echo ${enableval} | cut -d ' ' -f 1`
-    [case "${val}" in
+    case "${val}" in
       hildon|HILDON|hildon2|HILDON2)
         build_hildon=yes
         AC_DEFINE(USE_HILDON, [1], [Use the Hildon mobile framework])
@@ -630,29 +630,31 @@ dnl        build_haiku=yes
         ;;
       *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump|aos4|haiku)])
          ;;
-      esac]
+      esac
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
     if test "x$val" = "x$enableval"; then
       break;
     fi
-  done,build_gtk=yes;
-if test x$openbsd_os = xopenbsd; then
-  build_kde3=yes;
-  build_qt3=yes;
-else
-  build_kde4=yes;
-  build_qt4=yes;
-fi
+  done];
+  [if test x"${openbsd_os}" = x"openbsd"; then
+    build_kde3=yes;
+    build_qt3=yes;
+    build_gtk=yes;
+  else if test x"${haiku}" = xyes; then
+    build_haiku=yes;
+  else
+    build_kde4=yes;
+    build_qt4=yes;
+    build_gtk=yes;
+  fi
+  fi]
 )
 
-dnl If we're on Haiku, there is only one supported GUI.
-if test x"${haiku}" = xyes; then
-  build_haiku=yes;
-  build_gtk=no;
-  build_kde3=no;
-  build_qt3=no;
-  build_kde4=no;
-  build_qt4=no;
+if test x"${build_haiku}" = xyes; then
+  if test x"$haiku" != xyes; then
+    echo "        ERROR: Can not build Haiku gui outside of Haiku
+operating system." >&3
+  fi
 fi
 
 add_renderer=
@@ -707,16 +709,14 @@ AC_ARG_ENABLE(sound,
         add_sound="mkit"
         ;;
      esac],
-  build_sound_sdl=yes
-  add_sound=sdl
+  [if test x"${haiku}" = xyes; then
+     build_sound_mkit=yes
+     add_sound="mkit"
+   else
+     build_sound_sdl=yes
+     add_sound=sdl
+   fi]
 )
-
-dnl If we're on Haiku, there is only one supported sound handler.
-if test x"${build_haiku}" = xyes; then
-  build_sound_mkit=yes
-  add_sound="mkit"
-  build_sound_sdl=no
-fi
 
 if test x$build_ogl = xyes; then
   if test x$build_fb = xyes; then
@@ -725,8 +725,8 @@ if test x$build_ogl = xyes; then
   if test x$build_fltk = xyes; then
     AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
-  if test x$build_dump = xyes; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
+  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
+    AC_MSG_ERROR([OpenGL renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
@@ -1168,6 +1168,7 @@ dnl For Haiku, we know the sysroot is in a non-standard place
 dnl it is important that -lagg comes before -lbe
 if test x"${haiku}" = xyes; then
   HAIKU_LIBS = -lbe
+  AC_SUBST(HAIKU_LIBS)
 fi
 
 DLOPEN="-dlopen"
@@ -2113,8 +2114,8 @@ dnl   fi
   if test x$build_kde3 = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
-  if test x$build_dump = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
+  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
+    AC_MSG_ERROR([Cairo renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
@@ -2131,15 +2132,23 @@ dnl for now the Haiku media handler is experimental
 AM_CONDITIONAL(USE_HAIKU_ENGINE, test x"$media_handler" = xno)
 
 if test x$build_sound_mkit = xyes; then
-  AC_DEFINE([SOUND_MKIT],  [1], [Use Haiku's Media Kit for sound handling])
+  if test x"${haiku}" != xyes; then
+    AC_MSG_ERROR([Media Kit sound handling is supported only under Haiku]);
+  else
+    AC_DEFINE([SOUND_MKIT],  [1], [Use Haiku's Media Kit for sound handling])
+  fi
 fi
 
-if test x$build_sound_sdl = xyes; then
+if test x"${build_sound_sdl}" = xyes; then
   AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling])
 fi
 
-if test x$build_sound_ahi = xyes; then
-  AC_DEFINE([SOUND_AHI],  [1], [Use AmigaOS AHI for sound handling])
+if test x"${build_sound_ahi}" = xyes; then
+  if test x"$amigaos4" != xyes; then
+    AC_MSG_ERROR([AHI sound handling is supported only under AmigaOS]);
+  else
+    AC_DEFINE([SOUND_AHI],  [1], [Use AmigaOS AHI for sound handling])
+  fi
 fi
 
 case "${media_handler}" in
@@ -3429,13 +3438,10 @@ if test x"${build_alp}" = xyes; then
   fi
 fi
 
-dnl Haiku gui
-if test x"${build_haiku}" = xyes; then
-  if test x"$haiku" != xyes; then
-    echo "        ERROR: Can not build Haiku gui outside of Haiku operating system." >&3
-  fi
-fi
-
+dnl Haiku
+if test x"${build_haiku}" = xyes -o x"${build_sound_mkit}" = xyes -o x"${media_handler}" = x"mkit"; then
+    echo "        Haiku libs are: $HAIKU_LIBS"
+ 
 dnl XPCOM support for Mozilla/Firefox
 if test x"$xpcom" = x"yes"; then
   if test x"$has_xpcom" = x"yes"; then

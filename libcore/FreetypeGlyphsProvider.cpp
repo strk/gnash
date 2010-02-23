@@ -278,7 +278,7 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
     BPath bp;
     if (B_OK != find_directory(B_BEOS_FONTS_DIRECTORY, &bp)) {
         log_error(_("Failed to find fonts directory, using hard-coded "
-                    "font filename \"%s\""), name);
+                    "font filename \"%s\""), DEFAULT_FONTFILE);
         filename = DEFAULT_FONTFILE;
         return true;
     }
@@ -289,11 +289,9 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 #endif
     
 #ifdef HAVE_FONTCONFIG
-    
-    if (!FcInit ()) {
-        
+    if (!FcInit ()) {        
         log_error(_("Can't init fontconfig library, using hard-"
-                "coded font filename \"%s\""), filename);
+                "coded font filename \"%s\""), DEFAULT_FONTFILE);
         filename = DEFAULT_FONTFILE;
         return true;
         //return false;
@@ -360,7 +358,7 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 #else
     log_error("Font filename matching not implemented (no fontconfig"
             " support built-in), using hard-coded font filename",
-            name);
+            DEFAULT_FONTFILE);
     filename = DEFAULT_FONTFILE;
     return true;
 #endif

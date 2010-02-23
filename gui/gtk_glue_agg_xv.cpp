@@ -105,8 +105,16 @@ GtkAggXvGlue::prepDrawingArea(GtkWidget *drawing_area)
 Renderer*
 GtkAggXvGlue::createRenderHandler()
 {
-    _agg_renderer = create_Renderer_agg(findPixelFormat(_xv_format).c_str());
-    return _agg_renderer;
+    std::string pixelformat = findPixelFormat(_xv_format);
+    _agg_renderer = create_Renderer_agg(pixelformat.c_str());
+    if (_agg_renderer == NULL) {
+        boost::format fmt = boost::format(
+            _("Could not create AGG renderer with pixelformat %s")
+            ) % pixelformat;
+        throw GnashException(fmt.str());
+    }
+
+     return _agg_renderer;
 }
 
 void

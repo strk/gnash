@@ -1,4 +1,4 @@
-// sound_handler_haiku.h: Sound handling using Haiku media kit
+// sound_handler_haiku.h: Sound handling using Mkit media kit
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
@@ -46,8 +46,8 @@ namespace sound {
 
 
 
-/// Haiku media kit based sound_handler
-class Haiku_sound_handler : public sound_handler
+/// Mkit media kit based sound_handler
+class Mkit_sound_handler : public sound_handler
 {
     boost::scoped_ptr<BSoundPlayer> _soundplayer;
 
@@ -82,11 +82,11 @@ class Haiku_sound_handler : public sound_handler
     void MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, boost::uint32_t len, int volume);
 
 public:
-    Haiku_sound_handler();
+    Mkit_sound_handler();
 
-    Haiku_sound_handler(const std::string& wave_file);
+    Mkit_sound_handler(const std::string& wave_file);
 
-    ~Haiku_sound_handler();
+    ~Mkit_sound_handler();
 
     // See dox in sound_handler.h
     virtual int create_sound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> sinfo);
