@@ -5,4 +5,4 @@
 version=3
 
 # Examine an FTP server
-ftp://ftp.gnu.org/pub/gnu/gnash/(.*)/gnash-(.*)\.tar\.gz debian uupdate
+ftp://ftp.gnu.org/pub/gnu/gnash/([\d\.]+)/gnash-(.*)\.tar\.gz debian uupdate
