@@ -200,7 +200,7 @@ struct RTMPPacket
     //
     /// Creates an identical RTMPPacket with shared ownership of the
     /// buffer.
-    explicit RTMPPacket(const RTMPPacket& other);
+    RTMPPacket(const RTMPPacket& other);
 
     ~RTMPPacket() {}
 
