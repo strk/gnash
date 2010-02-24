@@ -33,6 +33,8 @@
 # include <io.h>
 #endif
 
+#include "dsodefs.h" //For DSOEXPORT
+
 // Forward declarations
 namespace gnash {
 	class fn_call;
@@ -84,7 +86,7 @@ public:
     //
     /// This is called by LocalConnection when either connect() or send()
     /// is called.
-    bool attach();
+    DSOEXPORT bool attach();
 
     /// Use to get a scoped semaphore lock on the shared memory.
     class Lock
@@ -105,12 +107,12 @@ private:
     /// Get a semaphore lock if possible
     //
     /// @return     true if successful, false if not.
-    bool lock();
+    DSOEXPORT bool lock();
     
     /// Release a semaphore lock if possible
     //
     /// @return     true if successful, false if not.
-    bool unlock();
+    DSOEXPORT bool unlock();
 
     iterator _addr;
 

@@ -81,7 +81,7 @@ public:
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-double readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end);
+DSOEXPORT double readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end);
 
 /// Read a boolean value from the buffer.
 //
@@ -89,7 +89,7 @@ double readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end);
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-bool readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* end);
+DSOEXPORT bool readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* end);
 
 /// Read a string value from the buffer.
 //
@@ -97,7 +97,7 @@ bool readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* end);
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-std::string readString(const boost::uint8_t*& pos, const boost::uint8_t* end);
+DSOEXPORT std::string readString(const boost::uint8_t*& pos, const boost::uint8_t* end);
 
 /// Read a long string value from the buffer.
 //
@@ -105,7 +105,7 @@ std::string readString(const boost::uint8_t*& pos, const boost::uint8_t* end);
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-std::string readLongString(const boost::uint8_t*& pos,
+DSOEXPORT std::string readLongString(const boost::uint8_t*& pos,
         const boost::uint8_t* end);
 
 /// Read an unsigned 16-bit value in network byte order.
@@ -137,7 +137,7 @@ readNetworkLong(const boost::uint8_t* buf)
 /// This is overloaded for automatic type deduction to allow the use of
 /// a template for more complex operations. You must be careful when using
 /// it!
-void write(SimpleBuffer& buf, const std::string& str);
+DSOEXPORT void write(SimpleBuffer& buf, const std::string& str);
 
 /// Write a C string to an AMF buffer.
 //
@@ -154,7 +154,7 @@ inline void write(SimpleBuffer& buf, const char* str) {
 /// This is overloaded for automatic type deduction to allow the use of
 /// a template for more complex operations. You must be careful when using
 /// it!
-void write(SimpleBuffer& buf, double d);
+DSOEXPORT void write(SimpleBuffer& buf, double d);
 
 /// Write a boolean value to an AMF buffer.
 //
@@ -163,14 +163,14 @@ void write(SimpleBuffer& buf, double d);
 /// This is overloaded for automatic type deduction to allow the use of
 /// a template for more complex operations. You must be careful when using
 /// it!
-void write(SimpleBuffer& buf, bool b);
+DSOEXPORT void write(SimpleBuffer& buf, bool b);
 
 /// Encode a plain short string to an AMF buffer.
 //
 /// This does not encode a type byte; it is used for cases where a string is
 /// required, such as for the name of an object property, and therefore does
 /// not use a type byte.
-void writePlainString(SimpleBuffer& buf, const std::string& str, Type t);
+DSOEXPORT void writePlainString(SimpleBuffer& buf, const std::string& str, Type t);
 
 /// Encode a string-value pair.
 //
