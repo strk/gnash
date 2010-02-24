@@ -54,6 +54,10 @@ AM_CPPFLAGS = -I.. \
 	$(CAIRO_CFLAGS) \
 	$(NULL)
 
+GNASH_LIBS = \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libcore/libgnashcore.la
+
 noinst_HEADERS = \
 	Renderer.h \
 	Renderer_agg.h \
@@ -75,7 +79,7 @@ noinst_LTLIBRARIES += libgnashogl.la
 libgnashogl_la_SOURCES = Renderer_ogl.cpp PathParser.cpp
 #libgnashogl_la_LDFLAGS = -module -avoid-version -no-undefined
 libgnashogl_la_LDFLAGS =
-libgnashogl_la_LIBADD = $(OPENGL_LIBS)
+libgnashogl_la_LIBADD = $(OPENGL_LIBS) $(GNASH_LIBS)
 endif
 endif
 
@@ -85,7 +89,7 @@ if HAVE_AGG
 pkglib_LTLIBRARIES += libgnashagg.la
 libgnashagg_la_SOURCES = Renderer_agg.cpp 
 #libgnashagg_la_LDFLAGS = -module -avoid-version -no-undefined
-libgnashagg_la_LIBADD = $(AGG_LIBS)
+libgnashagg_la_LIBADD = $(AGG_LIBS) $(GNASH_LIBS)
 endif
 endif
 
@@ -95,7 +99,7 @@ noinst_LTLIBRARIES += libgnashcairo.la
 # plugins_LTLIBRARIES += libgnashcairo.la
 libgnashcairo_la_SOURCES = Renderer_cairo.cpp PathParser.cpp
 #libgnashcairo_la_LDFLAGS = -module -avoid-version -no-undefined
-libgnashcairo_la_LIBADD = $(CAIRO_LIBS)
+libgnashcairo_la_LIBADD = $(CAIRO_LIBS) $(GNASH_LIBS)
 endif
 endif
 

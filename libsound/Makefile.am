@@ -30,6 +30,8 @@ libgnashsound_la_CPPFLAGS = \
 	$(NULL)
 
 libgnashsound_la_LIBADD = \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(SDL_LIBS) \
@@ -65,8 +67,6 @@ libgnashsound_la_LDFLAGS = -release $(VERSION)
 if WIN32
   libgnashsound_la_LDFLAGS += -no-undefined
   libgnashsound_la_LIBADD += \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
 	-lintl
 endif
 

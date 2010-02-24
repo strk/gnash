@@ -46,6 +46,7 @@ libgnashmedia_la_CPPFLAGS = \
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
 libgnashmedia_la_LIBADD = \
+	$(top_builddir)/libbase/libgnashbase.la \
 	$(PNG_LIBS) \
 	$(JPEG_LIBS) \
 	$(GIF_LIBS) \
@@ -172,7 +173,6 @@ libgnashmedia_la_LDFLAGS = -release $(VERSION)
 if WIN32
   libgnashmedia_la_LDFLAGS += -no-undefined
   libgnashmedia_la_LIBADD += \
-	$(top_builddir)/libbase/libgnashbase.la
 	-lintl
 endif
 
