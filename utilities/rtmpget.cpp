@@ -101,7 +101,8 @@ public:
         :
         _callCount(0),
         _seek(0),
-        _len(-1)
+        _len(-1),
+        _stream(0)
     {}
 
     size_t callNumber() {
@@ -145,6 +146,14 @@ public:
         return _len;
     }
 
+    void setStreamID(int s) {
+        _stream = s;
+    }
+
+    int streamID() const {
+        return _stream;
+    }
+
 private:
     size_t _callCount;
     std::map<size_t, std::string> _calls;
@@ -152,6 +161,8 @@ private:
     std::string _playpath;
 
     double _seek, _len;
+
+    int _stream;
 };
 
 void
@@ -247,10 +258,9 @@ replyBWCheck(rtmp::RTMP& r, FakeNC& /*nc*/, double txn)
 }
 
 void
-sendPausePacket(rtmp::RTMP& r, FakeNC& /*nc*/, bool flag, double time)
+sendPausePacket(rtmp::RTMP& r, FakeNC& nc, bool flag, double time)
 {
-    // TODO: store in NetStream or NC?
-    const int streamid = r.m_stream_id;
+    const int streamid = nc.streamID();
 
     SimpleBuffer buf;
 
@@ -276,8 +286,7 @@ void
 sendPlayPacket(rtmp::RTMP& r, FakeNC& nc)
 {
 
-    // TODO: where should we store this?
-    const int streamid = r.m_stream_id;
+    const int streamid = nc.streamID();
     const double seektime = nc.seekTime() * 1000.0;
     const double length = nc.length() * 1000.0;
 
@@ -566,13 +575,13 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
             double sid = AMF::readNumber(payload, end);
 
             log_debug("Stream ID: %s", sid);
-            r.m_stream_id = sid;
+            nc.setStreamID(sid);
 
             /// Issue NetStream.play command.
             sendPlayPacket(r, nc);
 
             /// Allows quick downloading.
-            r.setBufferTime(3600000);
+            r.setBufferTime(3600000, nc.streamID());
         }
 
         else if (calledMethod == "play") {
@@ -706,7 +715,6 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
                 || code == "NetStream.Play.StreamNotFound"
                 || code == "NetConnection.Connect.InvalidApp")
         {
-            r.m_stream_id = -1;
             r.close();
             log_error( "Closing connection: %s", code);
             std::exit(EXIT_SUCCESS);

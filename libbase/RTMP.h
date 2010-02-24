@@ -340,7 +340,8 @@ struct DSOEXPORT RTMP
     /// Instruct server to buffer this much data.
     //
     /// @param time     time in milliseconds.
-    void setBufferTime(size_t time);
+    /// @param streamID the ID of the stream to set buffer time on.
+    void setBufferTime(size_t time, int streamID);
 
     /// Whether we have a basic connection to a server.
     //
@@ -417,7 +418,6 @@ struct DSOEXPORT RTMP
     }
 
     int _inChunkSize;
-    int m_stream_id;
     int m_mediaChannel;
     boost::uint8_t m_nClientBW2;
     size_t _bytesIn;
