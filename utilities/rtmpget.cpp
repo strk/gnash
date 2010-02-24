@@ -717,13 +717,16 @@ namespace {
 void
 usage(std::ostream& o)
 {
-    o << "usage: rtmpdump -u <app> -p playpath\n";
+    o << "usage: rtmpdump -u <app> -p playpath [ -o outfile ]\n";
     o << "\n";
-    o << "-u <url>  The full url, including port, of the rtmp application\n";
-    o << "-p <path> The play path of the stream (what is passed to "
-        "NetStream.play()\n";
-    o << "-s <sec>  Start at the given seek offset\n";
-    o << "-l <sec>  Retrieve only the specified length in seconds\n";
+    o << "\t-h          Show this help and exit\n";
+    o << "\t-u <url>    The full url of the rtmp application\n";
+    o << "\t-p <path>   The play path of the stream\n";
+    o << "\t-s <sec>    Start at the given seek offset\n";
+    o << "\t-l <sec>    Retrieve only the specified length in seconds\n";
+    o << "\t-o <file>   Output file for video\n";
+    o << "\t-v          Verbose output (more 'v's for more verbosity)\n";
+    o << "\n";
 }
 
 
