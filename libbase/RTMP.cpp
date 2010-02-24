@@ -100,7 +100,6 @@ const size_t RTMPHeader::headerSize;
 RTMP::RTMP()
     :
     _inChunkSize(RTMP_DEFAULT_CHUNKSIZE),
-    m_stream_id(-1),
     m_mediaChannel(0),
     m_nClientBW2(2),
     _bytesIn(0),
@@ -141,9 +140,9 @@ RTMP::connected() const
 }
 
 void
-RTMP::setBufferTime(size_t size)
+RTMP::setBufferTime(size_t size, int streamID)
 {
-    sendCtrl(*this, CONTROL_BUFFER_TIME, m_stream_id, size);
+    sendCtrl(*this, CONTROL_BUFFER_TIME, streamID, size);
 }
 
 void
@@ -774,8 +773,6 @@ RTMP::close()
     _socket.close();
     _inChannels.clear();
     _outChannels.clear();
-
-    m_stream_id = -1;
     _inChunkSize = RTMP_DEFAULT_CHUNKSIZE;
     _outChunkSize = RTMP_DEFAULT_CHUNKSIZE;
     _bytesIn = 0;
