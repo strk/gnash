@@ -23,11 +23,14 @@
 #include "arg_parser.h"
 #include "SimpleBuffer.h"
 #include "AMF.h"
+#include "GnashAlgorithm.h"
+
 #include <boost/cstdint.hpp>
 #include <iomanip>
 #include <map>
 #include <algorithm>
 #include <iterator>
+#include <fstream>
 
 using namespace gnash;
 
@@ -150,6 +153,19 @@ private:
 
     double _seek, _len;
 };
+
+void
+writeFLVHeader(std::ostream& o)
+{
+    char flvHeader[] = {
+        'F',  'L',  'V',  0x01,
+        0x05,
+        0x00, 0x00, 0x00, 0x09,
+        0x00, 0x00, 0x00, 0x00	// first prevTagSize=0
+    };
+
+    o.write(flvHeader, arraySize(flvHeader));
+}
 
 
 bool handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
@@ -361,7 +377,8 @@ main(int argc, char** argv)
         { 'u', "url",           Arg_parser::yes  },
         { 'p', "playpath",      Arg_parser::yes  },
         { 's', "seek",          Arg_parser::yes  },
-        { 'l', "length",        Arg_parser::yes  }
+        { 'l', "length",        Arg_parser::yes  },
+        { 'o', "outfile",       Arg_parser::yes  }
         };
 
     Arg_parser parser(argc, argv, opts);
@@ -376,6 +393,7 @@ main(int argc, char** argv)
     std::string tc;
     std::string swf;
     std::string page;
+    std::string outf;
 
     double seek = 0, len = -1;
 
@@ -401,6 +419,9 @@ main(int argc, char** argv)
               case 'l':
                   len = parser.argument<double>(i);
                   break;
+              case 'o':
+                  outf = parser.argument(i);
+                  break;
             }
         }
         catch (Arg_parser::ArgParserException &e) {
@@ -412,6 +433,17 @@ main(int argc, char** argv)
     if (url.empty() || playpath.empty()) {
         std::cerr << "You must specify URL and playpath\n";
         std::exit(EXIT_FAILURE);
+    }
+
+    if (outf.empty()) {
+        std::cerr << "No output file specified. Will connect anyway\n";
+    }
+
+    std::ofstream flv;
+
+    if (!outf.empty()) {
+        flv.open(outf.c_str());
+        if (flv) writeFLVHeader(flv);
     }
 
     URL playurl(url);
@@ -447,12 +479,27 @@ main(int argc, char** argv)
 
     while (1) {
         r.update();
+
+        /// Retrieve messages.
         boost::shared_ptr<SimpleBuffer> b = r.getMessage();
-        while(b.get()) {
+        while (b.get()) {
             handleInvoke(r, nc, b->data() + rtmp::RTMPHeader::headerSize,
                     b->data() + b->size());
             b = r.getMessage();
         }
+
+        /// Retrive video packets.
+        boost::shared_ptr<SimpleBuffer> f = r.getFLVFrame();
+        while (f.get()) {
+            log_debug("Got frame");
+            if (flv) {
+                const char* start = reinterpret_cast<const char*>(
+                        f->data() + rtmp::RTMPHeader::headerSize);
+                flv.write(start, f->size() - rtmp::RTMPHeader::headerSize);
+            }
+            f = r.getMessage();
+        }
+
         if (!r.connected()) break;
     }
 

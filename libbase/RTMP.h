@@ -21,6 +21,7 @@
 
 #include <cerrno>
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 #include <deque>
 #include <string>
 #include <map>
@@ -400,6 +401,18 @@ struct DSOEXPORT RTMP
         _messageQueue.pop_front();
         return b;
     }
+    
+    /// Get an FLV packet received from the server
+    //
+    /// TODO: this returns the whole RTMP message, which is ugly. And it
+    /// only returns one at time, and can return a null pointer. We need
+    /// a better way to retrieve the frames.
+    boost::shared_ptr<SimpleBuffer> getFLVFrame() {
+        if (_flvQueue.empty()) return boost::shared_ptr<SimpleBuffer>();
+        boost::shared_ptr<SimpleBuffer> b = _flvQueue.front();
+        _flvQueue.pop_front();
+        return b;
+    }
 
     /// Store the server bandwidth
     //
@@ -478,6 +491,7 @@ private:
     ChannelSet _outChannels;
     
     std::deque<boost::shared_ptr<SimpleBuffer> > _messageQueue;
+    std::deque<boost::shared_ptr<SimpleBuffer> > _flvQueue;
 
     /// Stored server bandwidth (reported by server).
     boost::uint32_t _serverBandwidth;

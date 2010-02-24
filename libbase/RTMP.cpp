@@ -47,7 +47,6 @@ namespace {
     void handleControl(RTMP& r, const RTMPPacket& packet);
     void handleServerBW(RTMP& r, const RTMPPacket& packet);
     void handleClientBW(RTMP& r, const RTMPPacket& packet);
-    void handleFLV(RTMP& r, const RTMPPacket& packet);
     
     void setupInvokePacket(RTMPPacket& packet);
     boost::uint32_t getUptime();
@@ -64,12 +63,6 @@ namespace {
 
     static const int packetSize[] = { 12, 8, 4, 1 };
  
-    // For writing an FLV to a stream (debugging).
-    void writeFLVHeader(std::ostream& o);
-
-    // Temporary debugging files.
-    static std::ofstream flv("flv");
-    static std::ofstream outi("outi");
 }
 
 namespace {
@@ -116,7 +109,6 @@ RTMP::RTMP()
     _bandwidth(2500000),
     _outChunkSize(RTMP_DEFAULT_CHUNKSIZE)
 {
-    writeFLVHeader(flv);
 }
 
 bool
@@ -271,7 +263,7 @@ RTMP::handlePacket(const RTMPPacket& packet)
             break;
 
         case PACKET_TYPE_FLV:
-            handleFLV(*this, packet);
+            _flvQueue.push_back(packet.buffer);
             break;
     
         default:
@@ -717,8 +709,6 @@ RTMP::sendPacket(RTMPPacket& packet)
 
     std::string hx = hexify(header, payloadEnd(packet) - header, false);
 
-    outi << "Packet: " << hx << "\n" << std::flush;
-
     while (nSize + hSize) {
 
         if (nSize < nChunkSize) nChunkSize = nSize;
@@ -970,13 +960,6 @@ handleClientBW(RTMP& r, const RTMPPacket& packet)
 }
 
 
-void
-handleFLV(RTMP& /*r*/, const RTMPPacket& packet)
-{
-    flv.write(reinterpret_cast<const char*>(payloadData(packet)),
-            payloadSize(packet));
-}
-
 
 boost::int32_t
 decodeInt32LE(const boost::uint8_t* c)
@@ -995,19 +978,6 @@ encodeInt32LE(boost::uint8_t *output, int nVal)
     nVal >>= 8;
     output[3] = nVal;
     return 4;
-}
-
-void
-writeFLVHeader(std::ostream& o)
-{
-    char flvHeader[] = {
-        'F',  'L',  'V',  0x01,
-        0x05,
-        0x00, 0x00, 0x00, 0x09,
-        0x00, 0x00, 0x00, 0x00	// first prevTagSize=0
-    };
-
-    o.write(flvHeader, arraySize(flvHeader));
 }
 
 void
