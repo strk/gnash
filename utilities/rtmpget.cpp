@@ -1,4 +1,4 @@
-// rtmpget.cpp:  RTMP file downloader utility
+// rtmpdump.cpp:  RTMP file downloader utility
 // 
 //   Copyright (C) 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
@@ -17,414 +17,668 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-// classes internal to Gnash
-#include "gnash.h"
-#include "network.h"
-#include "log.h"
-#include "http.h"
-#include "limits.h"
-#include "netstats.h"
-#include "statistics.h"
-#include "gmemory.h"
-#include "arg_parser.h"
-#include "amf.h"
-#include "rtmp.h"
-#include "rtmp_client.h"
-#include "rtmp_msg.h"
-#include "buffer.h"
-#include "network.h"
-#include "element.h"
-#include "URL.h"
-
-#ifdef ENABLE_NLS
-# include <locale>
-#endif
-
+#include "RTMP.h"
 #include <string>
-#include <iostream>
-#include <sstream>
-#include <csignal>
-#include <vector>
-#include <sys/mman.h>
-#include <cerrno>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include "log.h"
+#include "arg_parser.h"
+#include "SimpleBuffer.h"
+#include "AMF.h"
+#include <boost/cstdint.hpp>
+#include <iomanip>
+#include <map>
+#include <algorithm>
+#include <iterator>
 
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/time_zone_base.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-
-using gnash::log_debug;
-using namespace std;
 using namespace gnash;
-using namespace amf;
 
-static void usage();
-static void version_and_copyright();
-static void cntrlc_handler(int sig);
+/// The play command is initiated by NetStream.play. This must specify a
+/// play path, and can add three further optional arguments. These are:
+///     1. start: start offset, or -1 for a live stream, or -2 for either
+///        a live stream if found, or a recorded stream if not.
+///     2. length: how long to play, or -1 for all of a live stream, or 0 for
+///                a single frame.
+///     3. reset: (object) no documentation.
+/// This class should not care about these! NetStream / NetConnection should
+/// encode all the play arguments and send them. The play packet should be
+/// on the video channel (what about audio?) and be an "invoke" packet.
+//
+/// ActionScript can send invoke packets directly using NetConnection call.
+//
+/// TODO:   This class needs a function to be called at heartbeat rate so that
+///         the data can be processed.
+/// TODO:   Work out which messages should be handled internally and which
+///         should be made available to the core (maybe all).
+///             1. Core events are those that should be available to AS. They
+///                include: onStatus.
+///             2. Internal events are not important to AS. We don't know
+///                if they ever get through. They certainly aren't documented
+///                and they may expect a certain response. They include:
+///                _onbwdone, _onbwcheck, _result. The _result function is
+///                almost certainly forwarded as onResult.
+///             3. The client should send createStream. This is builtin to
+///                to actionscript.
+// function NetStream(connection) {
+//  
+//     function OnCreate(nStream) {
+//          this.nStream = nStream;
+//     }
+//  
+//     // Some kind of type thing associating NetStream and NetConnection.
+//     ASnative(2101, 200)(this, connection);
+//  
+//     var _local2 = OnCreate.prototype;
+//  
+//     /// The server should send onResult with stream ID.
+//     //
+//     /// What does the function do? Stores the stream ID somewhere so it
+//     /// can 
+//     _local2.onResult = function (streamId) {
+//         ASnative(2101, 201)(this.nStream, streamId);
+//     };
+//  
+//      /// onStatus messages are forwarded to the NetStream object.
+//     _local2.onStatus = function (info) {
+//         this.nStream.onStatus(info);
+//     };
+// 
+//     /// Send invoke packet with createStream. The callback is the OnCreate
+//     /// object.
+//     connection.call("createStream", new OnCreate(this));
+// }
 
-void connection_handler(Network::thread_params_t *args);
-void admin_handler(Network::thread_params_t *args);
+namespace {
+    void usage(std::ostream& o);
+}
 
-LogFile& dbglogfile = LogFile::getDefaultInstance();
-
-// The rcfile is loaded and parsed here:
-RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-
-// Toggles very verbose debugging info from the network Network class
-static bool netdebug = false;
-
-static struct sigaction  act;
-
-std::vector<std::string> infiles;
-
-// The next few global variables have to be global because Boost
-// threads don't take arguments. Since these are set in main() before
-// any of the threads are started, and it's value should never change,
-// it's safe to use these without a mutex, as all threads share the
-// same read-only value.
-
-typedef boost::shared_ptr<amf::Buffer> BufferSharedPtr;
-typedef boost::shared_ptr<amf::Element> ElementSharedPtr;
-
-// end of globals
-
-int
-main(int argc, char *argv[])
+class FakeNC
 {
-    // Initialize national language support
-#ifdef ENABLE_NLS
-    setlocale (LC_ALL, "");
-    bindtextdomain (PACKAGE, LOCALEDIR);
-    textdomain (PACKAGE);
-#endif
-    
-    // If no command line arguments have been supplied, do nothing but
-    // print the  usage message.
-    if (argc < 2) {
-        usage();
-        exit(EXIT_SUCCESS);
+public:
+
+    FakeNC()
+        :
+        _callCount(0),
+        _seek(0),
+        _len(-1)
+    {}
+
+    size_t callNumber() {
+        return _callCount++;
     }
 
+    void queueCall(size_t n, const std::string& call) {
+        _calls.insert(std::make_pair(n, call));
+    }
+
+    std::string getCall(size_t n) {
+        std::map<size_t, std::string>::iterator i = _calls.find(n);
+        if (i == _calls.end()) return "";
+
+        std::string s = i->second;
+        _calls.erase(i);
+        return s;
+    }
+
+    void setPlayPath(const std::string& p) {
+        _playpath = p;
+    }
+
+    const std::string& playpath() const {
+        return _playpath;
+    }
+
+    void setSeekTime(double secs) {
+        _seek = secs;
+    }
+
+    double seekTime() const {
+        return _seek;
+    }
+
+    void setLength(double len) {
+        _len = len;
+    }
+
+    double length() const {
+        return _len;
+    }
+
+private:
+    size_t _callCount;
+    std::map<size_t, std::string> _calls;
+
+    std::string _playpath;
+
+    double _seek, _len;
+};
+
+
+bool handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
+        const boost::uint8_t* end);
+
+/// These functions create an RTMP call buffer and send it. They mimic
+/// NetConnection.call() methods and replies to server calls.
+//
+/// If a call is initiated by us, we send our own call number.
+/// If we are replying to a server call, we send the server's call number back.
+void
+sendConnectPacket(rtmp::RTMP& r, FakeNC& nc, const std::string& app,
+        const std::string& ver, const std::string& swfurl,
+        const std::string& tcurl, const std::string& pageurl)
+{
+    log_debug("Sending connect packet.");
+    
+    log_debug("app      : %s", app);
+    log_debug("flashVer : %s", ver);
+    log_debug("tcURL    : %s", tcurl);
+    log_debug("swfURL   : %s", swfurl);
+    log_debug("pageURL  : %s", pageurl);
+
+    SimpleBuffer buf;
+
+    AMF::write(buf, "connect");
+    const size_t cn = nc.callNumber();
+    
+    /// Call number?
+    AMF::write(buf, static_cast<double>(cn));
+
+    buf.appendByte(AMF::OBJECT_AMF0);
+    if (!app.empty()) AMF::writeProperty(buf, "app", app);
+    if (!ver.empty()) AMF::writeProperty(buf, "flashVer", ver);
+    if (!swfurl.empty()) AMF::writeProperty(buf, "swfUrl", swfurl);
+    if (!tcurl.empty()) AMF::writeProperty(buf, "tcUrl", tcurl);
+    AMF::writeProperty(buf, "fpad", false);
+    AMF::writeProperty(buf, "capabilities", 15.0);
+    AMF::writeProperty(buf, "audioCodecs", 3191.0);
+    AMF::writeProperty(buf, "videoCodecs", 252.0);
+    AMF::writeProperty(buf, "videoFunction", 1.0);
+    if (!pageurl.empty()) AMF::writeProperty(buf, "pageUrl", pageurl);
+    buf.appendByte(0);
+    buf.appendByte(0);
+    buf.appendByte(AMF::OBJECT_END_AMF0);
+
+    nc.queueCall(cn, "connect");
+    r.call(buf);
+
+}
+
+void
+sendCheckBW(rtmp::RTMP& r, FakeNC& nc)
+{
+    SimpleBuffer buf;
+    
+    const size_t cn = nc.callNumber();
+
+    AMF::write(buf, "_checkbw");
+    AMF::write(buf, static_cast<double>(cn));
+    buf.appendByte(AMF::NULL_AMF0);
+
+    nc.queueCall(cn, "_checkbw");
+    r.call(buf);
+}
+
+void
+replyBWCheck(rtmp::RTMP& r, FakeNC& /*nc*/, double txn)
+{
+    // Infofield1?
+    SimpleBuffer buf;
+    AMF::write(buf, "_result");
+    AMF::write(buf, txn);
+    buf.appendByte(AMF::NULL_AMF0);
+    AMF::write(buf, 0.0);
+    
+    r.call(buf);
+
+}
+
+void
+sendPausePacket(rtmp::RTMP& r, FakeNC& /*nc*/, bool flag, double time)
+{
+    // TODO: store in NetStream or NC?
+    const int streamid = r.m_stream_id;
+
+    SimpleBuffer buf;
+
+    AMF::write(buf, "pause");
+
+    // What is this? The play stream? Call number?
+    AMF::write(buf, 0.0);
+    buf.appendByte(AMF::NULL_AMF0);
+
+    log_debug( "Pause: flag=%s, time=%d", flag, time);
+    AMF::write(buf, flag);
+
+    // "this.time", i.e. NetStream.time.
+    AMF::write(buf, time * 1000.0);
+
+    r.play(buf, streamid);
+}
+
+// Which channel to send on? Always video?
+//ASnative(2101, 202)(this, "play", null, name, start * 1000, len * 1000, reset);
+// This call is not queued (it's a play call, and doesn't have a callback).
+void
+sendPlayPacket(rtmp::RTMP& r, FakeNC& nc)
+{
+
+    // TODO: where should we store this?
+    const int streamid = r.m_stream_id;
+    const double seektime = nc.seekTime() * 1000.0;
+    const double length = nc.length() * 1000.0;
+
+    log_debug("Sending play packet. Stream id: %s, playpath %s", streamid,
+            nc.playpath());
+
+    SimpleBuffer buf;
+
+    AMF::write(buf, "play");
+
+    // What is this? The play stream? Call number?
+    AMF::write(buf, 0.0);
+    buf.appendByte(AMF::NULL_AMF0);
+
+    log_debug( "seekTime=%.2f, dLength=%d, sending play: %s",
+        seektime, length, nc.playpath());
+    AMF::write(buf, nc.playpath());
+
+    // Optional parameters start and len.
+    //
+    // start: -2, -1, 0, positive number
+    //  -2: looks for a live stream, then a recorded stream, if not found
+    //  any open a live stream
+    //  -1: plays a live stream
+    // >=0: plays a recorded streams from 'start' milliseconds
+    AMF::write(buf, seektime);
+
+    // len: -1, 0, positive number
+    //  -1: plays live or recorded stream to the end (default)
+    //   0: plays a frame 'start' ms away from the beginning
+    //  >0: plays a live or recoded stream for 'len' milliseconds
+    //enc += EncodeNumber(enc, -1.0); // len
+    AMF::write(buf, length);
+    
+    r.play(buf, streamid);
+}
+
+void
+sendCreateStream(rtmp::RTMP& r, FakeNC& nc)
+{
+    const size_t cn = nc.callNumber();
+
+    SimpleBuffer buf;
+    AMF::write(buf, "createStream");
+    AMF::write(buf, static_cast<double>(cn));
+    buf.appendByte(AMF::NULL_AMF0);
+    nc.queueCall(cn, "createStream");
+    r.call(buf);
+}
+void
+sendDeleteStream(rtmp::RTMP& r, FakeNC& nc, double id)
+{
+    const size_t cn = nc.callNumber();
+
+    SimpleBuffer buf;
+    AMF::write(buf, "deleteStream");
+
+    // Call number?
+    AMF::write(buf, static_cast<double>(cn));
+    buf.appendByte(AMF::NULL_AMF0);
+    AMF::write(buf, id);
+    nc.queueCall(cn, "deleteStream");
+    r.call(buf);
+}
+
+void
+sendFCSubscribe(rtmp::RTMP& r, FakeNC& nc, const std::string& subscribepath)
+{
+    const size_t cn = nc.callNumber();
+
+    SimpleBuffer buf;
+    AMF::write(buf, "FCSubscribe");
+
+    // What is this?
+    AMF::write(buf, static_cast<double>(cn));
+    buf.appendByte(AMF::NULL_AMF0);
+    AMF::write(buf, subscribepath);
+
+    nc.queueCall(cn, "FCSubscribe");
+    r.call(buf);
+}
+
+/// Some URLs to try are:
+//
+/// -u rtmp://tagesschau.fcod.llnwd.net:1935/a3705/d1
+/// with -p 2010/0216/TV-20100216-0911-2401.hi or
+///      -p 2010/0216/TV-20100216-0911-2401.lo
+//
+/// -u rtmp://ndr.fc.llnwd.net:1935/ndr/_definst_
+/// with -p ndr_fs_nds_hi_flv *and* -s -1 (live stream)
+int
+main(int argc, char** argv)
+{
    const Arg_parser::Option opts[] =
         {
         { 'h', "help",          Arg_parser::no  },
-        { 'V', "version",       Arg_parser::no  },
-        { 'p', "port-offset",   Arg_parser::yes },
-        { 'v', "verbose",       Arg_parser::no  },
-        { 'd', "dump",          Arg_parser::no  },
-        { 'a', "app",           Arg_parser::yes  },
-        { 'p', "path",          Arg_parser::yes  },
-        { 'f', "filename",      Arg_parser::yes  },
-        { 't', "tcurl",         Arg_parser::yes  },
-        { 's', "swfurl",        Arg_parser::yes  },
         { 'u', "url",           Arg_parser::yes  },
-        { 'n', "netdebug",      Arg_parser::no  }
+        { 'p', "playpath",      Arg_parser::yes  },
+        { 's', "seek",          Arg_parser::yes  },
+        { 'l', "length",        Arg_parser::yes  }
         };
 
     Arg_parser parser(argc, argv, opts);
-    if( ! parser.error().empty() )  
-    {
-        cout << parser.error() << endl;
-        exit(EXIT_FAILURE);
+
+    if (!parser.error().empty())  {
+        std::cout << parser.error() << std::endl;
+        std::exit(EXIT_FAILURE);
     }
 
-    // Set the log file name before trying to write to
-    // it, or we might get two.
-    dbglogfile.setLogFilename("rtmpget-dbg.log");
-    
-    if (rcfile.verbosityLevel() > 0) {
-        dbglogfile.setVerbosity(rcfile.verbosityLevel());
-    }    
+    std::string url;
+    std::string playpath;
+    std::string tc;
+    std::string swf;
+    std::string page;
 
-#if 1
-    string app; // the application name
-    string path; // the path to the file on the server
-    string tcUrl; // the tcUrl field
-    string swfUrl; // the swfUrl field
-    string filename; // the filename to play
-#endif
-    
-    // Handle command line arguments
-    for( int i = 0; i < parser.arguments(); ++i ) {
+    double seek = 0, len = -1;
+
+    for (int i = 0; i < parser.arguments(); ++i) {
         const int code = parser.code(i);
         try {
-            switch( code ) {
+            switch (code) {
               case 'h':
-                  version_and_copyright();
-                  usage();
+                  usage(std::cout);
                   exit(EXIT_SUCCESS);
-              case 'V':
-                  version_and_copyright();
-                  exit(EXIT_SUCCESS);
-              case 'v':
-                  dbglogfile.setVerbosity();
-                  log_debug (_("Verbose output turned on"));
-                  break;
-              case 'a':
-                  app = parser.argument(i);
+              case 'u':
+                  url = parser.argument(i);
                   break;
               case 'p':
-                  path = parser.argument(i);
+                  playpath = parser.argument(i);
                   break;
               case 't':
-                  tcUrl = parser.argument(i);
+                  tc = parser.argument(i);
                   break;
               case 's':
-                  swfUrl = parser.argument(i);
+                  seek = parser.argument<double>(i);
                   break;
-              case 'f':
-                  filename = parser.argument(i);
+              case 'l':
+                  len = parser.argument<double>(i);
                   break;
-              case 'n':
-                  netdebug = true;
-                  break;
-              case 'd':
-                  rcfile.dump();
-                  exit(EXIT_SUCCESS);
-                  break;
-              case 0:
-                  infiles.push_back(parser.argument(i));
-                  break;
-              default:
-                  log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
             }
         }
-        
         catch (Arg_parser::ArgParserException &e) {
-            cerr << _("Error parsing command line options: ") << e.what() << endl;
-            cerr << _("This is a Gnash bug.") << endl;
+            std::cerr << _("Error parsing command line: ") << e.what() << "\n";
+            std::exit(EXIT_FAILURE);
+        }
+    }
+
+    if (url.empty() || playpath.empty()) {
+        std::cerr << "You must specify URL and playpath\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    URL playurl(url);
+    if (tc.empty()) tc = playurl.str();
+
+    const std::string app = playurl.path().substr(1);
+
+    std::string ver = "LNX 10,0,22,87";
+
+    gnash::LogFile& l = gnash::LogFile::getDefaultInstance();
+    l.setVerbosity(3);
+
+    gnash::rtmp::RTMP r;
+    FakeNC nc;
+    nc.setPlayPath(playpath);
+    nc.setLength(len);
+    nc.setSeekTime(seek);
+
+    log_debug("Initial connection");
+
+    if (!r.connect(url)) {
+        log_error("Initial connection failed!");
+        std::exit(EXIT_FAILURE);
+    }
+
+    /// 1. connect.
+    sendConnectPacket(r, nc, app, ver, swf, tc, page);
+ 
+    /// Check bandwidth.
+    sendCheckBW(r, nc);   
+
+    log_debug("Connect packet sent.");
+
+    while (1) {
+        r.update();
+        boost::shared_ptr<SimpleBuffer> b = r.getMessage();
+        while(b.get()) {
+            handleInvoke(r, nc, b->data() + rtmp::RTMPHeader::headerSize,
+                    b->data() + b->size());
+            b = r.getMessage();
+        }
+        if (!r.connected()) break;
+    }
+
+}
+
+bool
+handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
+        const boost::uint8_t* end)
+{
+    assert(payload != end);
+
+    // make sure it is a string method name we start with
+    if (payload[0] != 0x02) {
+        log_error( "%s, Sanity failed. no string method in invoke packet",
+                __FUNCTION__);
+        return false;
+    }
+
+    ++payload;
+    std::string method = AMF::readString(payload, end);
+
+    log_debug("Invoke: read method string %s", method);
+    if (*payload != AMF::NUMBER_AMF0) return false;
+    ++payload;
+
+
+    log_debug( "%s, server invoking <%s>", __FUNCTION__, method);
+
+    bool ret = false;
+
+
+    /// _result means it's the answer to a remote method call initiated
+    /// by us.
+    if (method == "_result") {
+        
+        const double txn = AMF::readNumber(payload, end);
+        std::string calledMethod = nc.getCall(txn);
+
+        log_debug("Received result for method call %s (%s)",
+                calledMethod, boost::io::group(std::setprecision(15), txn));
+
+        if (calledMethod == "connect")
+        {
+            // Do here.
+            sendCreateStream(r, nc);
+        }
+
+        else if (calledMethod == "createStream") {
+            
+            log_debug("createStream invoked");
+            if (*payload != AMF::NULL_AMF0) return false;
+            ++payload;
+
+            r.m_stream_id = AMF::readNumber(payload, end);
+
+            log_debug("Stream ID: %s", r.m_stream_id);
+            r.m_stream_id = 1;
+
+            /// Issue NetStream.play command.
+            sendPlayPacket(r, nc);
+
+            /// Allows quick downloading.
+            r.setBufferTime(3600000);
+        }
+
+        else if (calledMethod == "play") {
+            log_debug("Play called");
+        }
+        return ret;
+    }
+
+    /// These are remote function calls initiated by the server .
+
+    const double txn = AMF::readNumber(payload, end);
+    log_debug("Received server call %s %s",
+            boost::io::group(std::setprecision(15), txn),
+            txn ? "" : "(no reply expected)");
+
+    /// This must return a value. It can be anything.
+    if (method == "onBWCheck") {
+        if (txn) replyBWCheck(r, nc, txn);
+        else {
+            log_error("Expected call number for onBWCheck");
         }
     }
     
-    if (infiles.empty()) {
-        cerr << _("Error: no input file was specified. Exiting.") << endl;
-        usage();
-        return EXIT_FAILURE;
+    /// If the server sends this, we reply (the call should contain a
+    /// callback object!).
+    if (method == "_onbwcheck") {
+        if (txn) replyBWCheck(r, nc, txn);
+        else {
+            log_error("Server called _onbwcheck without a callback");
+        }
+        return ret;
     }
 
-    // Trap ^C (SIGINT) so we can kill all the threads
-    act.sa_handler = cntrlc_handler;
-    sigaction (SIGINT, &act, NULL);
+    // This should be called by the server when the bandwidth test is finished.
+    //
+    // It contains information, but we don't have to do anything.
+    if (method == "onBWDone") {
+        // This is a SWF implementation detail, not required by the protocol.
+        //sendCheckBW(r, nc);
+        return ret;
+    }
 
-    RTMPClient client;
-    client.toggleDebug(netdebug);
-    if (client.createClient(hostname, port) == false) {
-        log_error("Can't connect to RTMP server %s", hostname);
-        exit(EXIT_FAILURE);
+    if (method == "_onbwdone") {
+
+        if (*payload != AMF::NULL_AMF0) return false;
+        ++payload;
+
+        log_debug("AMF buffer for _onbwdone: %s\n",
+                hexify(payload, end - payload, false));
+
+        double latency = AMF::readNumber(payload, end);
+        double bandwidth = AMF::readNumber(payload, end);
+        log_debug("Latency: %s, bandwidth %s", latency, bandwidth);
+        return ret;
+    }
+
+    /// Don't know when it sends this.
+    if (method == "onFCSubscribe") {
+        return ret;
+    }
+
+    /// Or this.
+    if (method == "onFCUnsubscribe") {
+        r.close();
+        ret = true;
+        return ret;
+    }
+
+    if (method ==  "_error") {
+        log_error( "rtmp server sent error");
+        std::exit(EXIT_FAILURE);
     }
     
-    if (! client.handShakeRequest()) {
-        log_error("RTMP handshake request failed");
-        exit(EXIT_FAILURE);
+    if (method == "close") {
+        log_error( "rtmp server requested close");
+        r.close();
+        return ret;
     }
     
-    if (! client.clientFinish()) {
-        log_error("RTMP handshake completion failed");
-        exit(EXIT_FAILURE);
-    }
-    
-    // Make a buffer to hold the handshake data.
-    Buffer buf(1537);
-    // RTMP::rtmp_head_t *rthead = 0;
-    // int ret = 0;
-    log_debug("Sending NetConnection Connect message,");
-#if 0
-    BufferSharedPtr buf2 = client.encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), RTMPClient::DEFAULT_AUDIO_SET,
-		      RTMPClient::DEFAULT_VIDEO_SET,
-		      RTMPClient::SEEK, pageUrl.c_str());
-#else
-    BufferSharedPtr buf2 = client.encodeConnect(infiles[0]);    
+    if (method == "onStatus") {
+        if (*payload != AMF::NULL_AMF0) return false;
+        ++payload;
+#if 1
+        log_debug("AMF buffer for onstatus: %s",
+                hexify(payload, end - payload, true));
 #endif
-//    BufferSharedPtr buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
-//    BufferSharedPtr buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
-    //buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
-    size_t total_size = buf2->size();    
-    RTMPMsg *msg1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf2);
-    
-    if (!msg1) {
-        log_error("No response from INVOKE of NetConnection connect");
-        exit(EXIT_FAILURE);
-    }
-
-    msg1->dump();
-    if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
-        log_debug("Sent NetConnection Connect message sucessfully");
-    } else {
-        log_error("Couldn't send NetConnection Connect message,");
-        //exit(EXIT_FAILURE);
-    }
-
-    // make the createStream for ID 3 encoded object
-    log_debug("Sending NetStream::createStream message,");
-    BufferSharedPtr buf3 = client.encodeStream(0x2);
-//    buf3->dump();
-    total_size = buf3->size();
-    RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
-    double streamID = 0.0;
-
-    if (!msg2) {
-        log_error("No response from INVOKE of NetStream::createStream");
-        exit(EXIT_FAILURE);
-    }
-
-    log_debug("Sent NetStream::createStream message successfully:"); msg2->dump();
-    std::vector<ElementSharedPtr> hell = msg2->getElements();
-    if (hell.size() > 0) {
-        streamID = hell[0]->to_number();
-        log_debug("Stream ID returned from createStream is: %d", streamID);
-    } else {
-        if (msg2->getMethodName() == "close") { 
-            log_debug("Got close packet!!! Exiting...");
-            exit(EXIT_SUCCESS);
+        if (*payload != AMF::OBJECT_AMF0) {
+            log_debug("not an object");
+            return false;
         }
-        log_error("Got no properties from NetStream::createStream invocation, arbitrarily taking 0 as streamID");
-        streamID = 0.0;
-    }
+        ++payload;
+        if (payload == end) return false;
 
-    int id = int(streamID);
-    
-    // make the NetStream::play() operations for ID 2 encoded object
-//    log_debug("Sending NetStream play message,");
-    BufferSharedPtr buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, filename.c_str());
-//    BufferSharedPtr buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
-//     log_debug("TRACE: buf4: %s", hexify(buf4->reference(), buf4->size(), true));
-    total_size = buf4->size();
-    RTMPMsg *msg3 = client.sendRecvMsg(0x8, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf4);
-    if (msg3) {
-        msg3->dump();
-        if (msg3->getStatus() ==  RTMPMsg::NS_PLAY_START) {
-            log_debug("Sent NetStream::play message sucessfully.");
-        } else {
-            log_error("Couldn't send NetStream::play message,");
-//          exit(EXIT_FAILURE);
-        }
-    }
+        std::string code;
+        std::string level;
+        try {
 
-    int loop = 20;
-    do {
-        BufferSharedPtr msgs = client.recvMsg(1);   // use a 1 second timeout
-        if (msgs == 0) {
-            log_error("Never got any data!");
-            exit(EXIT_FAILURE);
-        }
-        RTMP::queues_t *que = client.split(msgs);
-        if (que == 0) {
-            log_error("Never got any messages!");
-            exit(EXIT_FAILURE);
-        }
+            // Hack.
+            while (payload < end && *payload != AMF::OBJECT_END_AMF0) {
 
-#if 0
-        deque<CQue *>::iterator it;
-        for (it = que->begin(); it != que->end(); it++) {
-            CQue *q = *(it);
-            q->dump();
-        }
-#endif
-        while (que->size()) {
-            cerr << "QUE SIZE: " << que->size() << endl;
-            BufferSharedPtr ptr = que->front()->pop();
-            if (!ptr->empty()) {
-                que->pop_front();   // delete the item from the queue
-                /* RTMP::rtmp_head_t *rthead = */ client.decodeHeader(ptr);
-                msg2 = client.decodeMsgBody(ptr);
-                if (msg2 == 0) {
-    //              log_error("Couldn't process the RTMP message!");
-                    continue;
-                }
-            } else {
-                log_error("Buffer size (%d) out of range at %d", ptr->size(), __LINE__);
-                break;
+                const std::string& n = AMF::readString(payload, end);
+                if (n.empty()) continue;
+
+                //log_debug("read string %s", n);
+                if (payload == end) break;
+
+                if (*payload != AMF::STRING_AMF0) return false;
+                ++payload;
+                if (payload == end) break;
+
+                const std::string& v = AMF::readString(payload, end);
+                if (payload == end) break;
+                if (n == "code") code = v;
+                if (n == "level") level = v;
             }
         }
-    } while(loop--);
+        catch (const AMF::AMFException& e) {
+            throw;
+            return false;
+        }
 
-//     std::vector<amf::Element *> hell = msg2->getElements();
-//     std::vector<amf::Element *> props = hell[0]->getProperties();
+        if (code.empty() || level.empty()) return false;
 
-//     cerr << "HELL Elements: " << hell.size() << endl;
-//     cerr << "HELL Properties: " << props.size() << endl;
+        //log_debug( "%s, onStatus: %s", __FUNCTION__, code);
+        if (code == "NetStream.Failed"
+                || code == "NetStream.Play.Failed"
+                || code == "NetStream.Play.StreamNotFound"
+                || code == "NetConnection.Connect.InvalidApp")
+        {
+            r.m_stream_id = -1;
+            r.close();
+            log_error( "Closing connection: %s", code);
+        }
 
-// //     cerr << props[0]->getName() << endl;
-// //     cerr << props[0]->to_string() << endl;
-//     cerr << props[0]->getName() << endl;
-// //    cerr << props[0]->to_number() << endl;
-//     cerr << props[1]->getName() << ": " << props[1]->to_string() << endl;
-//     cerr << props[2]->getName() << ": " << props[3]->to_string() << endl;
-//     cerr << props[3]->getName() << ": " << props[3]->to_string() << endl;
+        if (code == "NetStream.Play.Start") {
+            log_debug("Netstream.Play.Start called");
+        }
 
-//     Element *eell = hell[0]->findProperty("level");
-//     if (eell) {
-//  eell->dump();
-//     }
-//     *eell = hell[0]->findProperty("code");
-//     if (eell) {
-//  eell->dump();
-//     }
-
-#if 0
-    // Write the packet to disk so we can anaylze it with other tools
-    int fd = open("outbuf.raw",O_WRONLY|O_CREAT, S_IRWXU);
-    if (fd < 0) {
-        perror("open");
+        // Return 1 if this is a Play.Complete or Play.Stop
+        if (code == "NetStream.Play.Complete" ||
+                code == "NetStream.Play.Stop") {
+            r.close();
+            ret = true;
+        }
     }
-    cout << "Writing packet to disk: \"outbuf.raw\"" << endl;
-//     write(fd, out, 12);
-//     write(fd, outbuf.begin(), amf_obj.totalsize());
-    write(fd, buf2->reference(), buf2->size());
-    write(fd, buf3->reference(), buf3->size());
-    close(fd);
-#endif    
-
-    exit(EXIT_SUCCESS);
+    return ret;
 }
 
-// Trap Control-C so we can cleanly exit
-static void
-cntrlc_handler (int /*sig*/)
+namespace {
+
+void
+usage(std::ostream& o)
 {
-    log_debug(_("Got an interrupt"));
-
-    exit(EXIT_FAILURE);
-}
-
-static void
-version_and_copyright()
-{
-    cout << "rtmpget " << VERSION << endl
-        << endl
-        << _("Copyright (C) 2008, 2009, 2010 Free Software Foundation, Inc.\n"
-        "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
-        "You may redistribute copies of Cygnal under the terms of the GNU General\n"
-        "Public License.  For more information, see the file named COPYING.\n")
-        << endl;
+    o << "usage: rtmpdump -u <app> -p playpath\n";
+    o << "\n";
+    o << "-u <url>  The full url, including port, of the rtmp application\n";
+    o << "-p <path> The play path of the stream (what is passed to "
+        "NetStream.play()\n";
+    o << "-s <sec>  Start at the given seek offset\n";
+    o << "-l <sec>  Retrieve only the specified length in seconds\n";
 }
 
 
-static void
-usage()
-{
-    cout << _("rtmpget -- a file downloaded that uses RTMP.") << endl
-        << endl
-        << _("Usage: rtmpget [options...] <url>") << endl
-        << _("  -h,  --help          Print this help and exit") << endl
-        << _("  -V,  --version       Print version information and exit") << endl
-        << _("  -v,  --verbose       Output verbose debug info") << endl
-        << _("  -n,  --netdebug      Verbose networking debug info") << endl
-        << _("  -d,  --dump          display init file to terminal") << endl
-        << endl;
+
 }
 
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
