@@ -491,7 +491,6 @@ main(int argc, char** argv)
         /// Retrive video packets.
         boost::shared_ptr<SimpleBuffer> f = r.getFLVFrame();
         while (f.get()) {
-            log_debug("Got frame");
             if (flv) {
                 const char* start = reinterpret_cast<const char*>(
                         f->data() + rtmp::RTMPHeader::headerSize);
