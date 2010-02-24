@@ -374,6 +374,7 @@ main(int argc, char** argv)
    const Arg_parser::Option opts[] =
         {
         { 'h', "help",          Arg_parser::no  },
+        { 'v', "verbose",       Arg_parser::no  },
         { 'u', "url",           Arg_parser::yes  },
         { 'p', "playpath",      Arg_parser::yes  },
         { 's', "seek",          Arg_parser::yes  },
@@ -387,6 +388,7 @@ main(int argc, char** argv)
         std::cout << parser.error() << std::endl;
         std::exit(EXIT_FAILURE);
     }
+    gnash::LogFile& l = gnash::LogFile::getDefaultInstance();
 
     std::string url;
     std::string playpath;
@@ -422,6 +424,9 @@ main(int argc, char** argv)
               case 'o':
                   outf = parser.argument(i);
                   break;
+              case 'v':
+                  l.setVerbosity();
+                  break;
             }
         }
         catch (Arg_parser::ArgParserException &e) {
@@ -452,9 +457,6 @@ main(int argc, char** argv)
     const std::string app = playurl.path().substr(1);
 
     std::string ver = "LNX 10,0,22,87";
-
-    gnash::LogFile& l = gnash::LogFile::getDefaultInstance();
-    l.setVerbosity(3);
 
     gnash::rtmp::RTMP r;
     FakeNC nc;

@@ -600,7 +600,6 @@ RTMP::sendPacket(RTMPPacket& packet)
 
         // If this timestamp is later than the other and the difference fits
         // in 3 bytes, encode a relative one.
-        log_debug("Time delta %s", uptime - prevTimestamp);
         if (uptime >= oldh._timestamp && uptime - prevTimestamp < 0xffffff) {
             //log_debug("Shrinking to medium");
             hr.headerType = RTMP_PACKET_SIZE_MEDIUM;
