@@ -475,7 +475,7 @@ main(int argc, char** argv)
     sendConnectPacket(r, nc, app, ver, swf, tc, page);
  
     /// Check bandwidth.
-    sendCheckBW(r, nc);   
+    //sendCheckBW(r, nc);   
 
     log_debug("Connect packet sent.");
 
@@ -490,7 +490,7 @@ main(int argc, char** argv)
             b = r.getMessage();
         }
 
-        /// Retrive video packets.
+        /// Retrieve video packets.
         boost::shared_ptr<SimpleBuffer> f = r.getFLVFrame();
         while (f.get()) {
             if (flv) {
@@ -700,13 +700,14 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
 
         if (code == "NetStream.Play.Start") {
             log_debug("Netstream.Play.Start called");
+            return ret;
         }
 
         // Return 1 if this is a Play.Complete or Play.Stop
         if (code == "NetStream.Play.Complete" ||
                 code == "NetStream.Play.Stop") {
             r.close();
-            ret = true;
+            std::exit(EXIT_SUCCESS);
         }
     }
     return ret;
