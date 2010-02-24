@@ -1817,6 +1817,10 @@ AM_CONDITIONAL(ENABLE_SWFMILL, [ test x"$SWFMILL" != x ])
 AM_CONDITIONAL(SWFMILL_AS3_SUPPORT,
         [ test x"$SWFMILL" != x && test $SWFMILL_VERSION -ge 00021206 ])
 
+dnl SWFMILL versions older than 0.3 didn't get function2 flags order correctly
+AM_CONDITIONAL(SWFMILL_FUNCTION2_FLAGS_ORDER_CORRECT,
+        [ test x"$SWFMILL" != x && test $SWFMILL_VERSION -ge 00030000 ])
+
 AM_CONDITIONAL(ENABLE_AS3COMPILE, [ test x"$AS3COMPILE" != x ])
 AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
 AM_CONDITIONAL(ENABLE_HAXE, [ test x"$HAXE" != x ])
