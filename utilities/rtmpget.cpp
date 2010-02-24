@@ -557,11 +557,16 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
             log_debug("createStream invoked");
             if (*payload != AMF::NULL_AMF0) return false;
             ++payload;
+            
+            log_debug("AMF buffer for createStream: %s\n",
+                    hexify(payload, end - payload, false));
 
-            r.m_stream_id = AMF::readNumber(payload, end);
+            if (*payload != AMF::NUMBER_AMF0) return false;
+            ++payload;
+            double sid = AMF::readNumber(payload, end);
 
-            log_debug("Stream ID: %s", r.m_stream_id);
-            r.m_stream_id = 1;
+            log_debug("Stream ID: %s", sid);
+            r.m_stream_id = sid;
 
             /// Issue NetStream.play command.
             sendPlayPacket(r, nc);
