@@ -32,11 +32,11 @@
 #include "ClockTime.h"
 
 namespace gnash {
-namespace rtmp {
+    namespace rtmp {
 
-namespace {
+        namespace {
 
-    bool sendBytesReceived(RTMP* r);
+            bool sendBytesReceived(RTMP* r);
 
     // Not sure we ever want to do this.
     bool sendServerBW(RTMP& r);
@@ -358,7 +358,7 @@ RTMP::readPacket(RTMPPacket& packet)
     }
     else if (hr.channel == 1) {
         if (readSocket(&hbuf[1], 2) != 2) {
-	        log_error("Failed to read RTMP packet header 3nd byte");
+            log_error("Failed to read RTMP packet header 3nd byte");
              return false;
         }
       
@@ -418,7 +418,7 @@ RTMP::readPacket(RTMPPacket& packet)
             // We do this in case there was an incomplete packet in the
             // channel already.
             clearPayload(packet);
-	        hr.dataSize = decodeInt24(header + 3);
+            hr.dataSize = decodeInt24(header + 3);
 
             // More than six: read packet type
             if (nSize > 6) {
@@ -429,13 +429,13 @@ RTMP::readPacket(RTMPPacket& packet)
                     hr._streamID = decodeInt32LE(header + 7);
                 }
             }
-	    }
+        }
     }
 
     if (hr._timestamp == 0xffffff) {
       if (readSocket(header+nSize, 4) != 4) {
               log_error( "%s, failed to read extended timestamp",
-	          __FUNCTION__);
+              __FUNCTION__);
               return false;
             }
           hr._timestamp = AMF::readNetworkLong(header+nSize);
@@ -524,7 +524,7 @@ RTMP::handShake()
 
     if (type != clientbuf[0]) {
         log_error( "%s: Type mismatch: client sent %d, server answered %d",
-	        __FUNCTION__, clientbuf[0], type);
+            __FUNCTION__, clientbuf[0], type);
     }
     
     boost::uint8_t serverSig[sigSize];
@@ -808,7 +808,7 @@ sendCtrl(RTMP& r, ControlType t, unsigned int nObject, unsigned int nTime)
     packet.header.channel = CHANNEL_CONTROL1;
     packet.header.headerType = RTMP_PACKET_SIZE_LARGE;
     packet.header.packetType = PACKET_TYPE_CONTROL;
-  	
+      
     // type 3 is the buffer time and requires all 3 parameters.
     // all in all 10 bytes.
     int nSize = (t == CONTROL_BUFFER_TIME ? 10 : 6);
@@ -867,7 +867,7 @@ void
 handleMetadata(RTMP& /*r*/, const boost::uint8_t* /* payload*/, 
         unsigned int /*len*/)
 {
-	return;
+    return;
 }
 
 void
@@ -883,59 +883,59 @@ void
 handleControl(RTMP& r, const RTMPPacket& packet)
 {
 
-  const size_t size = payloadSize(packet);
+    const size_t size = payloadSize(packet);
 
-  if (size < 2) {
-      log_error("Control packet too short");
-      return;
-  }
+    if (size < 2) {
+        log_error("Control packet too short");
+        return;
+    }
     
-  const ControlType t = 
-      static_cast<ControlType>(AMF::readNetworkShort(payloadData(packet)));
+    const ControlType t = 
+        static_cast<ControlType>(AMF::readNetworkShort(payloadData(packet)));
+    
+    if (size < 6) {
+        log_error("Control packet (%s) data too short", t);
+        return;
+    }
+    
+    const int arg = AMF::readNetworkLong(payloadData(packet) + 2);
+    log_debug( "Received control packet %s with argument %s", t, arg);
   
-  if (size < 6) {
-      log_error("Control packet (%s) data too short", t);
-      return;
-  }
+    switch (t)
+    {
   
-  const int arg = AMF::readNetworkLong(payloadData(packet) + 2);
-  log_debug( "Received control packet %s with argument %s", t, arg);
-
-  switch (t)
-  {
-
-      case CONTROL_CLEAR_STREAM:
-          // TODO: handle this.
-          break;
-
-      case CONTROL_CLEAR_BUFFER:
-          // TODO: handle this.
-          break;
-
-      case CONTROL_STREAM_DRY:
-          break;
-
-      case CONTROL_RESET_STREAM:
-          log_debug("Stream is recorded: %s", arg);
-          break;
-
-      case CONTROL_PING:
-          sendCtrl(r, CONTROL_PONG, arg, 0);
-          break;
-
-      case CONTROL_BUFFER_EMPTY:
-          // TODO: handle.
-          break;
-
-      case CONTROL_BUFFER_READY:
-          // TODO: handle
-          break;
-
-      default:
-          log_error("Received unknown or unhandled control %s", t);
-          break;
-  }
-
+        case CONTROL_CLEAR_STREAM:
+            // TODO: handle this.
+            break;
+  
+        case CONTROL_CLEAR_BUFFER:
+            // TODO: handle this.
+            break;
+  
+        case CONTROL_STREAM_DRY:
+            break;
+  
+        case CONTROL_RESET_STREAM:
+            log_debug("Stream is recorded: %s", arg);
+            break;
+  
+        case CONTROL_PING:
+            sendCtrl(r, CONTROL_PONG, arg, 0);
+            break;
+  
+        case CONTROL_BUFFER_EMPTY:
+            // TODO: handle.
+            break;
+  
+        case CONTROL_BUFFER_READY:
+            // TODO: handle
+            break;
+  
+        default:
+            log_error("Received unknown or unhandled control %s", t);
+            break;
+    }
+  
 }
 
 void
@@ -993,52 +993,49 @@ setupInvokePacket(RTMPPacket& packet)
 unsigned int
 decodeInt24(const boost::uint8_t *c)
 {
-  unsigned int val;
-  val = (c[0] << 16) | (c[1] << 8) | c[2];
-  return val;
+    unsigned int val;
+    val = (c[0] << 16) | (c[1] << 8) | c[2];
+    return val;
 }
 
 boost::uint8_t*
 encodeInt16(boost::uint8_t *output, boost::uint8_t *outend, short nVal)
 {
-  if (output+2 > outend)
-    return NULL;
-
-  output[1] = nVal & 0xff;
-  output[0] = nVal >> 8;
-  return output+2;
+    if (output+2 > outend) return NULL;
+  
+    output[1] = nVal & 0xff;
+    output[0] = nVal >> 8;
+    return output + 2;
 }
 
 boost::uint8_t*
 encodeInt24(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
 {
-  if (output+3 > outend)
-    return NULL;
+    if (output + 3 > outend) return NULL;
 
-  output[2] = nVal & 0xff;
-  output[1] = nVal >> 8;
-  output[0] = nVal >> 16;
-  return output+3;
+    output[2] = nVal & 0xff;
+    output[1] = nVal >> 8;
+    output[0] = nVal >> 16;
+    return output+3;
 }
 
 boost::uint8_t*
 encodeInt32(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
 {
-  if (output+4 > outend)
-    return NULL;
+    if (output+4 > outend) return NULL;
 
-  output[3] = nVal & 0xff;
-  output[2] = nVal >> 8;
-  output[1] = nVal >> 16;
-  output[0] = nVal >> 24;
-  return output+4;
+    output[3] = nVal & 0xff;
+    output[2] = nVal >> 8;
+    output[1] = nVal >> 16;
+    output[0] = nVal >> 24;
+    return output + 4;
 }
 
 boost::uint32_t
 getUptime()
 {
-  struct tms t;
-  return times(&t) * 1000 / sysconf(_SC_CLK_TCK);
+    struct tms t;
+    return times(&t) * 1000 / sysconf(_SC_CLK_TCK);
 }
 
 } // anonymous namespace

@@ -18,8 +18,6 @@
 #ifndef GNASH_RTMP_H
 #define GNASH_RTMP_H
 
-
-#include <cerrno>
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <deque>
@@ -31,29 +29,11 @@
 #include "Socket.h"
 #include "URL.h"
 
-#define RTMP_PROTOCOL_UNDEFINED	-1
-#define RTMP_PROTOCOL_RTMP      0
-#define RTMP_PROTOCOL_RTMPT     1	// not yet supported
-#define RTMP_PROTOCOL_RTMPS     2	// not yet supported
-#define RTMP_PROTOCOL_RTMPE     3
-#define RTMP_PROTOCOL_RTMPTE    4	// not yet supported
-#define RTMP_PROTOCOL_RTMFP     5	// not yet supported
-
 #define RTMP_DEFAULT_CHUNKSIZE	128
 
 namespace gnash {
 
 namespace rtmp {
-
-extern const char RTMPProtocolStringsLower[][7];
-extern bool RTMP_ctrlC;
-
-boost::uint32_t RTMP_GetTime();
-
-#define RTMP_PACKET_TYPE_AUDIO 0x08
-#define RTMP_PACKET_TYPE_VIDEO 0x09
-#define RTMP_PACKET_TYPE_INFO  0x12
-
 
 /// Known control / ping codes
 //
