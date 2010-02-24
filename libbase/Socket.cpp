@@ -25,8 +25,11 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+
 #include <boost/cstdint.hpp>
 #include <cstring>
+#include <cerrno>
+#include <boost/lexical_cast.hpp>
 
 #include "URL.h"
 #include "Socket.h"

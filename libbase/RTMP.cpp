@@ -32,11 +32,11 @@
 #include "ClockTime.h"
 
 namespace gnash {
-    namespace rtmp {
+namespace rtmp {
 
-        namespace {
+namespace {
 
-            bool sendBytesReceived(RTMP* r);
+    bool sendBytesReceived(RTMP* r);
 
     // Not sure we ever want to do this.
     bool sendServerBW(RTMP& r);
@@ -54,12 +54,12 @@ namespace gnash {
     boost::int32_t decodeInt32LE(const boost::uint8_t* c);
     int encodeInt32LE(boost::uint8_t *output, int nVal);
     unsigned int decodeInt24(const boost::uint8_t* c);
-    boost::uint8_t* encodeInt16(boost::uint8_t *output, boost::uint8_t *outend, short nVal);
+    boost::uint8_t* encodeInt16(boost::uint8_t *output, boost::uint8_t *outend,
+            short nVal);
     boost::uint8_t* encodeInt24(boost::uint8_t *output, boost::uint8_t *outend,
             int nVal);
     boost::uint8_t* encodeInt32(boost::uint8_t *output, boost::uint8_t *outend,
             int nVal);
-
 
     static const int packetSize[] = { 12, 8, 4, 1 };
  
