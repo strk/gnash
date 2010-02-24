@@ -73,7 +73,6 @@ public:
         :
         GnashException(msg)
     {}
-private:
 };
 
 /// Read a number from an AMF buffer
@@ -139,6 +138,14 @@ readNetworkLong(const boost::uint8_t* buf)
 /// a template for more complex operations. You must be careful when using
 /// it!
 void write(SimpleBuffer& buf, const std::string& str);
+
+/// Write a C string to an AMF buffer.
+//
+/// The overload is necessary to prevent const char* being resolved to the
+/// boolean overload.
+inline void write(SimpleBuffer& buf, const char* str) {
+    return write(buf, std::string(str));
+}
 
 /// Write a number to an AMF buffer.
 //
