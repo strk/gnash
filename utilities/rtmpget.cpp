@@ -474,8 +474,13 @@ main(int argc, char** argv)
     /// 1. connect.
     sendConnectPacket(r, nc, app, ver, swf, tc, page);
  
-    /// Check bandwidth.
+    // Some servers are fine if we send _onbwcheck here, others aren't.
+    // Either way it's a SWF implementation detail, not an automatic
+    // send.
     //sendCheckBW(r, nc);   
+    
+    // Note that rtmpdump sends the "ServerBW" control ping when the connect
+    // call returns.
 
     log_debug("Connect packet sent.");
 
@@ -530,7 +535,6 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
     log_debug( "%s, server invoking <%s>", __FUNCTION__, method);
 
     bool ret = false;
-
 
     /// _result means it's the answer to a remote method call initiated
     /// by us.
@@ -602,7 +606,6 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
     // It contains information, but we don't have to do anything.
     if (method == "onBWDone") {
         // This is a SWF implementation detail, not required by the protocol.
-        //sendCheckBW(r, nc);
         return ret;
     }
 
@@ -670,7 +673,12 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
                 //log_debug("read string %s", n);
                 if (payload == end) break;
 
-                if (*payload != AMF::STRING_AMF0) return false;
+                // There's no guarantee that all members are strings, but
+                // it's usually enough for this.
+                if (*payload != AMF::STRING_AMF0) {
+                    break;
+                }
+
                 ++payload;
                 if (payload == end) break;
 
@@ -687,7 +695,7 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
 
         if (code.empty() || level.empty()) return false;
 
-        //log_debug( "%s, onStatus: %s", __FUNCTION__, code);
+        log_debug("onStatus: %s, %s", code, level);
         if (code == "NetStream.Failed"
                 || code == "NetStream.Play.Failed"
                 || code == "NetStream.Play.StreamNotFound"
@@ -696,6 +704,7 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
             r.m_stream_id = -1;
             r.close();
             log_error( "Closing connection: %s", code);
+            std::exit(EXIT_SUCCESS);
         }
 
         if (code == "NetStream.Play.Start") {

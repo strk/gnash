@@ -173,7 +173,7 @@ RTMP::connect(const URL& url)
         close();
         return false;
     }
-
+    
     return true;
 }
 
@@ -831,7 +831,7 @@ namespace {
 //
 /// Why would we want to send this?
 bool
-sendServerBW(RTMP* r)
+sendServerBW(RTMP& r)
 {
     RTMPPacket packet(4);
   
@@ -840,8 +840,8 @@ sendServerBW(RTMP* r)
   
     SimpleBuffer& buf = *packet.buffer;
   
-    buf.appendNetworkLong(r->serverBandwidth());
-    return r->sendPacket(packet);
+    buf.appendNetworkLong(r.serverBandwidth());
+    return r.sendPacket(packet);
 }
 
 
