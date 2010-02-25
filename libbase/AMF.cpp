@@ -165,7 +165,7 @@ write(SimpleBuffer& buf, bool b)
 }
 
 void*
-swapBytes(void *word, size_t size)
+swapBytes(void* word, size_t size)
 {
     union {
     boost::uint16_t s;

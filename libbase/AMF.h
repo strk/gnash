@@ -24,6 +24,7 @@
 #define GNASH_AMF_H
 
 #include <string>
+#include <boost/cstdint.hpp>
 
 #include "dsodefs.h"
 #include "GnashException.h"
@@ -81,7 +82,8 @@ public:
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-DSOEXPORT double readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end);
+DSOEXPORT double readNumber(const boost::uint8_t*& pos,
+        const boost::uint8_t* end);
 
 /// Read a boolean value from the buffer.
 //
@@ -89,7 +91,8 @@ DSOEXPORT double readNumber(const boost::uint8_t*& pos, const boost::uint8_t* en
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-DSOEXPORT bool readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* end);
+DSOEXPORT bool readBoolean(const boost::uint8_t*& pos,
+        const boost::uint8_t* end);
 
 /// Read a string value from the buffer.
 //
@@ -97,7 +100,8 @@ DSOEXPORT bool readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* end
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-DSOEXPORT std::string readString(const boost::uint8_t*& pos, const boost::uint8_t* end);
+DSOEXPORT std::string readString(const boost::uint8_t*& pos,
+        const boost::uint8_t* end);
 
 /// Read a long string value from the buffer.
 //
@@ -191,7 +195,7 @@ writeProperty(SimpleBuffer& buf, const std::string& name, const T& t)
 /// @param word The address of the data to byte swap.
 /// @param size The number of bytes in the data.
 /// @return A pointer to the raw data.
-DSOEXPORT void* swapBytes(void *word, size_t size);
+DSOEXPORT void* swapBytes(void* word, size_t size);
 
 
 } // namespace amf
