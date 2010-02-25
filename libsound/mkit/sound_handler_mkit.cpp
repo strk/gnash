@@ -436,14 +436,14 @@ Mkit_sound_handler::unpause()
 
 
 sound_handler*
-create_sound_handler_haiku()
+create_sound_handler_mkit()
 // Factory.
 {
     return new Mkit_sound_handler;
 }
 
 sound_handler*
-create_sound_handler_haiku(const std::string& wave_file)
+create_sound_handler_mkit(const std::string& wave_file)
 // Factory.
 {
     return new Mkit_sound_handler(wave_file);

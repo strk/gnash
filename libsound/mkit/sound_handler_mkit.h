@@ -17,10 +17,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-#ifndef SOUND_HANDLER_HAIKU_H
-#define SOUND_HANDLER_HAIKU_H
-
+#ifndef SOUND_HANDLER_MKIT_H
+#define SOUND_HANDLER_MKIT_H
 
 #include "sound_handler.h" // for inheritance
 
@@ -43,8 +41,6 @@ namespace gnash {
 
 namespace gnash {
 namespace sound {
-
-
 
 /// Mkit media kit based sound_handler
 class Mkit_sound_handler : public sound_handler
@@ -156,4 +152,4 @@ public:
 } // gnash.sound namespace 
 } // namespace gnash
 
-#endif // SOUND_HANDLER_HAIKU_H
+#endif // SOUND_HANDLER_MKIT_H

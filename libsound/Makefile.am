@@ -61,11 +61,11 @@ if USE_SOUND_AHI
 endif
 
 if USE_SOUND_MKIT
- libgnashsound_la_SOURCES += haiku/sound_handler_mkit.cpp
+ libgnashsound_la_SOURCES += mkit/sound_handler_mkit.cpp
  libgnashsound_la_LIBADD += -lmedia
- noinst_HEADERS += haiku/sound_handler_mkit.h
+ noinst_HEADERS += mkit/sound_handler_mkit.h
 endif
-EXTRA_DIST += haiku
+EXTRA_DIST += mkit
 
 libgnashsound_la_LDFLAGS = -release $(VERSION)
 

@@ -635,7 +635,7 @@ dnl        build_haiku=yes
     if test "x$val" = "x$enableval"; then
       break;
     fi
-  done];
+  done],
   [if test x"${openbsd_os}" = x"openbsd"; then
     build_kde3=yes;
     build_qt3=yes;
@@ -1167,7 +1167,7 @@ fi
 dnl For Haiku, we know the sysroot is in a non-standard place
 dnl it is important that -lagg comes before -lbe
 if test x"${haiku}" = xyes; then
-  HAIKU_LIBS = -lbe
+  HAIKU_LIBS=-lbe
   AC_SUBST(HAIKU_LIBS)
 fi
 
@@ -1387,10 +1387,21 @@ gcc_cv_ld_as_needed=no
 if $LD --help 2>/dev/null | grep as-needed > /dev/null; then
 	gcc_cv_ld_as_needed=yes
 fi
-if test x"$gcc_cv_ld_as_needed" = xyes; then
-	LDFLAGS="${LDFLAGS} -Wl,--as-needed"
-fi
+dnl if test x"$gcc_cv_ld_as_needed" = xyes; then
+dnl 	LDFLAGS=" -Wl,--as-needed"
+dnl fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
+
+dnl AC_MSG_CHECKING(linker --no-undefined support)
+dnl gcc_cv_ld_undef_needed=no
+dnl # Check if linker supports --no-undefined
+dnl if $LD --help 2>/dev/null | grep as-needed > /dev/null; then
+dnl 	gcc_cv_ld_undef_needed=yes
+dnl fi
+dnl if test x"$gcc_cv_ld_undef_needed" = xyes; then
+dnl 	LDFLAGS=" ${LDFLAGS} -Wl,--no-undefined"
+dnl fi
+dnl AC_MSG_RESULT($gcc_cv_ld_undef_needed)
 
 AC_DEFINE(USE_GIF, [1], [Use the GIF library])
 AC_DEFINE(USE_PNG, [1], [Use the PNG library])
@@ -1920,7 +1931,7 @@ fi
 
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 
-if test x$build_gtk = xno -o x$build_kde4 = xno -a x$build_haiku = xno; then
+if test x$build_gtk = xno -o x$build_kde4 = xno; then
   if test x$npapi = xyes; then
     AC_MSG_WARN(["Enabled NPAPI plugin, but it's not supported by the selected GUI"])
   fi

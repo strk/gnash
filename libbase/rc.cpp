@@ -664,28 +664,37 @@ RcInitFile::updateFile()
         
         std::string::size_type pos = filelist.find_last_of(':');
         
-        if (pos == std::string::npos)
-        {
+        if (pos == std::string::npos) {
             // no separator: just one file.
             writefile = filelist;
-        }
-        else
-        {
+        } else {
             writefile = filelist.substr(pos + 1);
         }
-    }
-    else
-    {
-        // Check the users home directory    
-#ifndef __amigaos4__
-        char *home = std::getenv("HOME");
+    } else {
+        // Check the users home directory
+        const char *home = NULL;
+#if defined(__amigaos4__)
+        //on AmigaOS we have a GNASH: assign that point to program dir
+        home = "/gnash";
+#elif defined(HAIKU_HOST)
+        BPath bp;
+        if (B_OK != find_directory(B_USER_SETTINGS_DIRECTORY, &bp)) {
+            log_error(_("Failed to find user settings directory"));
+        } else {
+            bp.Append("Gnash");
+            home = bp.Path();
+        }
 #else
-		//on AmigaOS we have a GNASH: assign that point to program dir
-        char *home = "/gnash";
+	//on AmigaOS we have a GNASH: assign that point to program dir
+	home = std::getenv("HOME");
 #endif
         if (home) {
             writefile = home;
-            writefile.append("/.gnashrc");
+#ifdef HAIKU_HOST
+            writefile.append("/gnashrc");
+#else
+             writefile.append("/.gnashrc");
+#endi
         }
     }
     
