@@ -587,10 +587,10 @@ DSOEXPORT sound_handler* create_sound_handler_aos4(const std::string& wave_file)
 
 #elif defined(SOUND_MKIT)
 /// @throw a SoundException if fails to create node.
-DSOEXPORT sound_handler* create_sound_handler_haiku();
+DSOEXPORT sound_handler* create_sound_handler_mkit();
 
 /// @throw a SoundException if fails to create node.
-DSOEXPORT sound_handler* create_sound_handler_haiku(const std::string& wave_file);
+DSOEXPORT sound_handler* create_sound_handler_mkit(const std::string& wave_file);
 #endif
 
 } // gnash.sound namespace 
