@@ -21,6 +21,7 @@
 #include "VaapiGlobalContext.h"
 #include "vaapi_utils.h"
 #include <va/va_glx.h>
+#include <va/va_x11.h>
 
 #define DEBUG 0
 #include "vaapi_debug.h"
