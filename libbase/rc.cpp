@@ -603,8 +603,7 @@ RcInitFile::parseFile(const std::string& filespec)
                              "\"%s\" in rcfile %s line %d")) 
                              % variable % filespec % lineno << endl;
             }
-        }
-        else if (noCaseCompare(action, "include")) {
+        } else if (noCaseCompare(action, "include")) {
             //cout << "Include directive in " << filespec << endl; 
             // TODO: resolve relative paths ?
             // TODO: skip parsing if already parsed ?
@@ -615,8 +614,7 @@ RcInitFile::parseFile(const std::string& filespec)
                 cerr << boost::format(_("Warning: empty include "
                             "specification in rcfile %s, line %d"))
                             % filespec % lineno << endl;
-            }
-            else {
+            } else {
                 if ( variable[0] != '/' ) {
                     cerr << boost::format(_("Warning: include specification "
                                 "must be an absolute path in rcfile %s, "
@@ -626,8 +624,7 @@ RcInitFile::parseFile(const std::string& filespec)
                     parseFile(variable);
                 }
             }
-        }
-        else {
+        } else {
             cerr << boost::format(_("Warning: unrecognized action \"%s\" in "
                 "rcfile %s, line %d")) % action % filespec % lineno << endl;
         }
@@ -693,12 +690,14 @@ RcInitFile::updateFile()
 #ifdef HAIKU_HOST
             writefile.append("/gnashrc");
 #else
-             writefile.append("/.gnashrc");
-#endi
+	    writefile.append("/.gnashrc");
+#endif
         }
     }
     
-    if (writefile.empty()) return false;
+    if (writefile.empty()) {
+	return false;
+    }
 
     return updateFile(writefile);
 
