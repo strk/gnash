@@ -37,7 +37,7 @@ set inp		""
 set outp	""
 set timeout	""
 set verbose	0
-set sum_file	""
+set sumfile	""
 set tool	""
 set state       "bzr"
 #
@@ -76,6 +76,7 @@ if {![info exists hex]} {
 if {![info exists decimal]} {
     set decimal "\[0-9\]+"
 }
+
 
 #
 # set the base dir (current working directory)
@@ -469,7 +470,57 @@ load_lib target.exp
 load_lib remote.exp
 
 # set an output file name for commands
-# set outp "/tmp/foo"
+# set outp "|& cat"
+# set outp "> /tmp/foo"
+
+set sumfile /tmp/sum
+set sum [open $sumfile w]
+
+# print an entry to the summary file
+proc sumfile { msg } {
+    global sum
+    puts $sum $msg
+}
+
+# print an entry to the summary file
+proc sumfile { msg } {
+    global sum
+    puts $sum $msg
+}
+
+# print an informational entry to the summary file
+proc suminfo { msg } {
+    global inp outp timeout srcdir sum
+    set whoami [exec whoami]
+    set date [exec date]
+    #set logname [exec 'grep $whoami /etc/passwd | cut -d ":" -f 5']
+    set ret [local_exec "uname --kernel-name --kernel-release" $inp $outp $timeout]
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+    puts $sum "$msg: $date"
+    set rpm_opts [getenv RPM_BUILD_OPTIONS]
+    if {[string length $rpm_opts] > 0} {
+	puts $sum "RPM_BUILD_OPTIONS: $rpm_opts"
+    }
+    set deb_opts [getenv DEB_BUILD_OPTIONS]
+    if {[string length $deb_opts] > 0} {
+	puts $sum "DEB_BUILD_OPTIONS: $deb_opts"
+    }
+#    puts $sum "$whoami"
+    puts $sum "$output"
+}
+
+# print a Start entry to the summary file
+proc procstart { msg } {
+    global sum
+    puts $sum "+ $msg: Started"
+}
+
+# print a Start entry to the summary file
+proc procdone { msg } {
+    global sum
+    puts $sum "- $msg: Done"
+}
 
 # update the source tree. This assume you already have it checked out.
 proc changedir { dir } {
@@ -482,6 +533,7 @@ proc changedir { dir } {
 proc bzr_update {} {
     global inp outp timeout objdir srcdir
     changedir $srcdir
+    procstart "Bzr"
     set ret [local_exec "bzr pull" $inp $outp $timeout]
     set status [lindex $ret 0]
     set output [lindex $ret 1]
@@ -490,6 +542,7 @@ proc bzr_update {} {
 	perror "bzr pull failed! " $output
 	exit 1
     }
+    procdone "Bzr"
     return $output
 }
 
@@ -541,6 +594,7 @@ proc autogen {} {
     global inp outp timeout srcdir
     # recreate the build files
     changedir $srcdir
+    procstart "Autogen"
     set ret [local_exec "./autogen.sh" $inp $outp $timeout]
     set status [lindex $ret 0]
     set output [lindex $ret 1]
@@ -549,6 +603,7 @@ proc autogen {} {
 	perror "./autogen.sh failed! " $output
 	exit 1
     }
+    procdone "Autogen"
     return $output
 }
 
@@ -556,6 +611,12 @@ proc autogen {} {
 proc configure { opts } {
     global inp outp timeout srcdir objdir
     changedir $objdir
+    procstart "Configure"
+    
+    # add any options to the sumfile
+    if {[string length $opts] > 0} {
+	sumfile "Configure options: $opts"
+    }
     set ret [local_exec "$srcdir/configure $opts" $inp $outp $timeout]
     set status [lindex $ret 0]
     set output [lindex $ret 1]
@@ -564,6 +625,7 @@ proc configure { opts } {
 	perror "$srcdir/configure failed with these options: $configopts! $output"
 	exit 1
     }
+    procdone "Configure"
     return $output
 }
 
@@ -571,6 +633,7 @@ proc configure { opts } {
 proc dpkg { opts } {
     global inp outp timeout objdir package revno branch
 
+    # find the snapshot directory
     foreach i [glob -nocomplain $objdir/gnash-*bzr*] {
 	if {[file isdirectory $i]} {
 	    set build $i
@@ -594,6 +657,11 @@ proc dpkg { opts } {
 proc make { opts } {
     global inp outp timeout make objdir
     changedir $objdir
+    procstart "Make"
+    # add any options to the sumfile
+    if {[string length $opts] > 0} {
+	sumfile "Make flags: $opts"
+    }
     set ret [local_exec "$make $opts" $inp $outp 1000]
     set status [lindex $ret 0]
     set output [lindex $ret 1]
@@ -602,6 +670,7 @@ proc make { opts } {
 	perror "$make failed with these options: $opts! $output"
 	exit 1
     }
+    procdone "Make"
     return $output
 }
 
@@ -609,6 +678,7 @@ proc make { opts } {
 proc upload { files } {
     global inp outp timeout objdir uploadcmd
     changedir $objdir
+    procstart "Upload"
     if {$uploadcmd == "dupload"} {
 	set ret [local_exec "$uploadcmd $files" $inp $outp $timeout]
     }
@@ -622,6 +692,8 @@ proc upload { files } {
 	perror "$uploadcmd failed to upload $changes!: $output"
 	exit 1
     }
+
+    procdone "Upload"
     return $output
 }
 
@@ -665,6 +737,8 @@ set revno [bzr_revno]
 set branch [bzr_branch]
 changedir $srcdir
 
+suminfo Gnash
+
 # the state table is the sequence of tasks required to build Gnash.
 while {$state != "done"} {
     verbose "======= Current state is: $state ======="
@@ -672,11 +746,11 @@ while {$state != "done"} {
 	"b*" {			# "bzr"
 	    changedir $srcdir
 	    verbose "Changed to source tree: $srcdir"
-	    set output [bzr_update];			# update the source tree
+	    set output [bzr_update];	# update the source tree
 	    # update the branch and revision after the update
 	    set revno [bzr_revno]
 	    set branch [bzr_branch]
-#	    if {[string match "configure.ac" $output]} {
+#	    if {[string match "*configure.ac*" $output]} {
 		set state "autogen.sh"
 #	    } else {
 #		set state "configure"
@@ -732,11 +806,12 @@ while {$state != "done"} {
 	    changedir $objdir
 	    verbose "Changed to build tree: $objdir"
 	    clean
-	    set state "done"
+	    set only yes
 	}	
     };				# end of switch
     # exit the while loop if we only want to run one step of the state table
     if { $only == "yes" } {
+	set state "done"
 	break;
     }
 };				# end of while
