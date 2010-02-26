@@ -29,26 +29,58 @@ deb: snapshot-src setup-deb snapshot-deb
 # /usr/lib/mozilla/plugins or $HOME/.mozilla/plugins, we also
 # have to change the path to the NPAPI plugin so it gets installed
 # for the correct browser.
+
+# DEB_BUILD_OPTIONS is used to change the configuration of the
+# packages that get built. This is used for both the debian/rules
+# file and here.
+
+# SNAPSHOT_VERSION is the name that gets used for the packages. By default
+# it is "$(NEXT_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)", but when
+# building alternate packages, we want to rename them so there isn't a
+# name collision.
 setup-deb: 
+	@snapshot_version="$(SNAPSHOT_VERSION)"; \
 	snapshot_dir="gnash-$(SNAPSHOT_VERSION)"; \
+	ffmpeg=`echo $(DEB_BUILD_OPTIONS) | grep -c ffmpeg`; \
+	ogl=`echo $(DEB_BUILD_OPTIONS) | grep -c ogl`; \
+	vaapi=`echo $(DEB_BUILD_OPTIONS) | grep -c vaapi`; \
+	if test $${ogl} -eq 1; then \
+	  snapshot_dir=`echo $${snapshot_dir} | sed -e 's:bzr:bzr.ogl:'`; \
+	  snapshot_version=`echo $${snapshot_version} | sed -e 's:bzr:bzr.ogl:'`; \
+	fi; \
+	if test $${ffmpeg} -eq 1; then \
+	  snapshot_dir=`echo $${snapshot_dir} | sed -e 's:bzr:bzr.ffmpeg:'`; \
+	  snapshot_version=`echo $${snapshot_version} | sed -e 's:bzr:bzr.ffmpeg:'`; \
+	fi; \
+	if test $${ogl} -eq 1 -a $${ffmpeg} -eq 1; then \
+	  snapshot_dir=`echo $${snapshot_dir} | sed -e 's:bzr:bzr.ogl.ffmpeg:'`; \
+	  snapshot_version=`echo $${snapshot_version} | sed -e 's:bzr:bzr.ogl.ffmpeg:'`; \
+	fi; \
+	if test $${vaapi} -eq 1; then \
+	  snapshot_dir=`echo $${snapshot_dir} | sed -e 's:bzr:bzr.vaapi:'`; \
+	  snapshot_version=`echo $${snapshot_version} | sed -e 's:bzr:bzr.vaapi:'`; \
+	fi; \
+	echo "Building package in: $${snapshot_dir}...}"; \
+	echo "Using $${snapshot_version}..."; \
 	if test -d gnash-$(PACKAGE_VERSION); then \
 	  mv gnash-$(PACKAGE_VERSION) $${snapshot_dir}; \
 	fi; \
-	if test ! -f $(SNAPSHOT_DIR)/configure.ac.orig; then \
-	  mv -f $(SNAPSHOT_DIR)/configure.ac $(SNAPSHOT_DIR)/configure.ac.orig; \
+	if test ! -f $${snapshot_dir}/configure.ac.orig; then \
+	  mv -f $${snapshot_dir}/configure.ac $${snapshot_dir}/configure.ac.orig; \
 	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $${snapshot_version})/" \
-	    $(SNAPSHOT_DIR)/configure.ac.orig > $(SNAPSHOT_DIR)/configure.ac; \
+	    $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
 	fi; \
-	if test ! -f $(SNAPSHOT_DIR)/configure.orig; then \
-	  mv -f $(SNAPSHOT_DIR)/configure $(SNAPSHOT_DIR)/configure.orig; \
+	if test ! -f $${snapshot_dir}/configure.orig; then \
+	  mv -f $${snapshot_dir}/configure $${snapshot_dir}/configure.orig; \
 	  sed -e "s/ VERSION='trunk'/ VERSION='$${snapshot_version}'/" \
-	    $(SNAPSHOT_DIR)/configure.orig > $(SNAPSHOT_DIR)/configure; \
+	    $${snapshot_dir}/configure.orig > $${snapshot_dir}/configure; \
+	   chmod u+x $${snapshot_dir}/configure; \
 	fi; \
 	mkdir -p $${snapshot_dir}/debian; \
 	cp -rfp $(srcdir)/packaging/debian/* $${snapshot_dir}/debian/; \
 	if test -e $${snapshot_dir}/debian/changelog; then \
 	  mv -f $${snapshot_dir}/debian/changelog $${snapshot_dir}/debian/changelog.orig; \
-	  sed -e "s:trunk:$(SNAPSHOT_VERSION):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
+	  sed -e "s:trunk:$${snapshot_version}:" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
 	fi; \
 	ubuntu=`uname -a | grep -ci ubuntu`; \
 	if test $$ubuntu -eq 1; then \
