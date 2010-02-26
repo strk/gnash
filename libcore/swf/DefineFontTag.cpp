@@ -327,7 +327,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
                 char0 = in.read_u8();
                 char1 = in.read_u8();
             }
-            const float adjustment = static_cast<float>(in.read_s16());
+            const boost::int16_t adjustment = in.read_s16();
 
             kerning_pair k;
             k.m_char0 = char0;
@@ -335,7 +335,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
 
             // Remember this adjustment; we can look it up quickly
             // later using the DisplayObject pair as the key.
-            if (!m_kerning_pairs.insert(std::make_pair(k, adjustment)).second) {
+            if (!_kerningPairs.insert(std::make_pair(k, adjustment)).second) {
                 IF_VERBOSE_MALFORMED_SWF(
                     log_swferror(_("Repeated kerning pair found - ignoring"));
                 );

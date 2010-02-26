@@ -34,6 +34,7 @@
 #include "SWF.h"
 #include "Font.h"
 #include <vector>
+#include <boost/cstdint.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -145,8 +146,8 @@ private:
     boost::int16_t _descent;
     boost::int16_t _leading;
 
-	typedef std::map<kerning_pair, float> kernings_table;
-	kernings_table m_kerning_pairs;
+	typedef std::map<kerning_pair, boost::int16_t> KerningTable;
+	KerningTable _kerningPairs;
 
     boost::shared_ptr<const Font::CodeTable> _codeTable;
 };
