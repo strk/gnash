@@ -6,28 +6,48 @@
 # Reinholdtsen for Debian Edu.
 
 # Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
+# export DH_VERBOSE=1
 
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-MAIN_VERSION = $(shell head -n 1 debian/changelog | cut '-d ' -f 2 | sed 's/[()]//g')
-BUILD_VERSION = $(shell head -n 1 debian/changelog | cut '-d ' -f 2 | sed 's/^[()]//' | sed 's/-.*//')
+SNAPSHOT_VERSION = $(shell head -n 1 debian/changelog | cut '-d ' -f 2 | sed 's/[()]//g')
+MAIN_VERSION = $(shell head -n 1 debian/changelog | cut '-d ' -f 2 | sed 's/[()]//g' | cut -d '.' -f 1-3)
+BUILD_VERSION = $(shell head -n 1 debian/changelog | cut '-d ' -f 2 | sed 's/[()]//g' | cut -d '.' -f 4)
 
-# this is where all the objects and executables go
-BUILD_DIRECTORY = _build
+INFILES := $(wildcard debian/*.desktop.in)
+OUTFILES := $(INFILES:.desktop.in=.desktop)
 
+%.desktop: %.desktop.in
+	intltool-merge -d debian/po $< $@
+
+# Set defaults for the compiler and linker flags
 CFLAGS = -Wall -g -Werror-implicit-function-declaration
+
+# Look for the standard build options
 
 # Sometimes we want to build without optimization, usually only when
 # testing package building.
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
-	CXXFLAGS += -O0
 else
 	CFLAGS += -O2
+endif
+
+# Enable debugging in the package instead of using the debug package
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -g
+endif
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+	INSTALL_PROGRAM += -s
+endif
+
+# Do paralle builds, ie.. the -jN option to make
+ifneq (,$(findstring parallel=,$(DEB_BUILD_OPTIONS)))
+	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	MAKEFLAGS += -j$(NUMJOBS)
 endif
 
 DEB_DH_SHLIBDEPS_ARGS_ALL := -X* /usr/lib/gnash
@@ -43,13 +63,72 @@ patch-stamp:
 
 # CONFIGURE
 
+# Handle optional configurarions
+
+# These flags are the defaults Gnash uses when configuring, but we pass
+# them here explicitly because it makes it easier for non Gnash developers
+# to know what those defaults are.
+BUILD_FLAGS = --enable-jemalloc --enable-avm2
+
+# this is where all the objects and executables go. We have to
+# redfine this, instead of just appending the path elements, as
+# make insists on putting a space between each element, which
+# produces a path that doens't work.
+BUILD_DIRECTORY = _build
+
+# Optionally build an OpenGL enabled package, AGG is the default
+ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
+	BUILD_FLAGS += --enable-renderer=ogl
+	BUILD_DIRECTORY = _build.ogl
+	BUILD_VERSION = $(MAIN_VERSION).ogl.$(BUILD_VERSION)
+else
+	BUILD_FLAGS += --enable-renderer=agg
+endif
+
+# Optionally build an ffmpeg enabled package, Gstreamer is the default
+ifneq (,$(findstring ffmpeg,$(DEB_BUILD_OPTIONS)))
+	BUILD_FLAGS += --enable-media=ffmpeg
+	BUILD_VERSION = $(MAIN_VERSION).ffmpeg.$(BUILD_VERSION)
+ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
+	BUILD_DIRECTORY = _build.ogl.ffmpeg
+	BUILD_VERSION = $(MAIN_VERSION).ogl.ffmpeg.$(BUILD_VERSION)
+else
+	BUILD_DIRECTORY = _build.ffmpeg
+endif
+else
+	BUILD_FLAGS += --enable-media=gst
+endif
+
+# Optionally build the older kde3 package, KDE4 is the default
+ifneq (,$(findstring kde3,$(DEB_BUILD_OPTIONS)))
+	BUILD_FLAGS += --enable-gui=gtk,kde3
+	BUILD_VERSION = $(MAIN_VERSION).kde3.$(BUILD_VERSION)
+ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
+	BUILD_DIRECTORY = _build.ogl.kde3
+	BUILD_VERSION = $(MAIN_VERSION).ogl.kde3.$(BUILD_VERSION)
+else
+	BUILD_DIRECTORY = _build.kde3
+endif
+else
+	BUILD_FLAGS += --enable-gui=gtk,kde4
+endif
+
+# Optionally build an VA API enabled package, which is very experimental,
+# so it's not enabled by default.
+ifneq (,$(findstring vaapi,$(DEB_BUILD_OPTIONS)))
+	BUILD_FLAGS += --enable-media=ffmpeg --enable-vaapi
+	BUILD_DIRECTORY = _build.vaapi
+	BUILD_VERSION = $(MAIN_VERSION).vaapi.$(BUILD_VERSION)
+endif
+
 # Configure Gnash. We use a different set of options, as when building
 # packages, we want to enable everything that Gnash can do, like
 # python support, the SDK cygnal, etc... These are not enabled by
 # default to make it less complicated for end users building Gnash
 # from source.
 # for now, only build the kde4 support, as kde3 is being depreciated.
-CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
+CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
+	CXXFLAGS="$(CXXFLAGS)" \
 	--host=$(DEB_HOST_GNU_TYPE) \
 	--build=$(DEB_BUILD_GNU_TYPE) \
 	--prefix=/usr \
@@ -63,11 +142,8 @@ CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
 	--with-plugins-install=system \
 	--disable-dependency-tracking \
 	--enable-python \
-	--enable-jemalloc \
 	--enable-sdkinstall \
-	--enable-media=gst \
-	--enable-gui=gtk,kde4 \
-	--enable-renderer=agg
+	$(BUILD_FLAGS)
 
 config: config-stamp
 config-stamp: patch-stamp
@@ -97,7 +173,7 @@ endif
 
 # 	Configure that build subdirectory.
 	printf "\n == CONFIGURE == \n\n"
-	cd $(BUILD_DIRECTORY) && $(CURDIR)/configure VERSION="$(BUILD_VERSION)" $(CONFIGURE_FLAGS);
+	cd $(BUILD_DIRECTORY) && $(CURDIR)/configure $(CONFIGURE_FLAGS);
 	printf "\n ---- End of CONFIGURE ---- \n\n"
 
 	touch $@
@@ -109,11 +185,11 @@ endif
 # package builder to run make check before building packages if the
 # state is unknown.
 build: build-stamp
-build-stamp: config-stamp
+build-stamp: config-stamp $(OUTFILES)
 	dh_testdir
 
 	@printf "\n == MAKE == \n\n"
-	$(MAKE) -C $(BUILD_DIRECTORY)
+	$(MAKE) -C $(BUILD_DIRECTORY) LDFLAGS="$(LDFLAGS)"
 	@printf "\n ---- End of MAKE ---- \n\n"
 	cp libamf/README README.amf
 	cp cygnal/README README.cygnal
@@ -132,9 +208,15 @@ build-stamp: config-stamp
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp 
+	rm -f build-stamp
+	rm -f $(OUTFILES)
 	rm -f README.amf README.cygnal
-
+	if test -d debian/po; then \
+	  ls $(INFILES) | sed 's#^#../#' > debian/po/POTFILES.in; \
+	  cd debian/po && intltool-update -g debian --pot && \
+		for i in *.po; do intltool-update -g debian --dist $${i%.po}; done; \
+	  rm -f debian/po/POTFILES.in; \
+	fi
 	rm -fr $(BUILD_DIRECTORY)
 
 	@printf "\n == CLEANING PATCHES ==\n\n"
@@ -210,15 +292,37 @@ binary-arch: install
 	dh_makeshlibs
 	[ ! -e /usr/bin/dh_buildinfo ] || dh_buildinfo
 	dh_installdeb
-	dh_shlibdeps debian/tmp/usr/bin/* debian/tmp/usr/lib/gnash/*
+	export LD_LIBRARY_PATH="$(CURDIR)/debian/gnash-common-opengl/usr/lib/gnash:$$LD_LIBRARY_PATH" ; \
+		dh_shlibdeps -Lgnash-common-opengl \
+		-pgnash-common-opengl \
+		-- -Ldebian/shlibs-opengl.local $(shell dpkg-shlibdeps --help | sed -ne "s/.*\(--ignore-missing-info\).*/\1/p")
+	export LD_LIBRARY_PATH="$(CURDIR)/debian/gnash-common-opengl/usr/lib/gnash:$$LD_LIBRARY_PATH" ; \
+		dh_shlibdeps -Lgnash-common-opengl \
+		-pgnash-opengl -pklash-opengl \
+		-- -Ldebian/shlibs-opengl.local
+	export LD_LIBRARY_PATH="$(CURDIR)/debian/gnash-common/usr/lib/gnash:$$LD_LIBRARY_PATH" ; \
+		dh_shlibdeps -Lgnash-common \
+		-pgnash-common \
+		-- -Ldebian/shlibs-agg.local $(shell dpkg-shlibdeps --help | sed -ne "s/.*\(--ignore-missing-info\).*/\1/p")
+	export LD_LIBRARY_PATH="$(CURDIR)/debian/gnash-common/usr/lib/gnash:$$LD_LIBRARY_PATH" ; \
+		dh_shlibdeps -Lgnash-common \
+		-pgnash -pklash \
+		-- -Ldebian/shlibs-agg.local
+	export LD_LIBRARY_PATH="$(CURDIR)/debian/gnash-common/usr/lib/gnash:$$LD_LIBRARY_PATH" ; \
+		dh_shlibdeps -Lgnash-common \
+		-pmozilla-plugin-gnash -pkonqueror-plugin-gnash -pgnash-tools -pgnash-cygnal \
+		-- -Ldebian/shlibs-both.local
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
 
 VERSION_DATE = $(shell /bin/date --utc +%0Y%0m%0d.%0k%0M)
-VERSION_ID = 0.8.7+bzr.trunk$(VERSION_DATE)
+BRANCH_NICK   = `grep "NICK" $(BUILD_DIRECTORY)/bzrversion.h | cut -d '"' -f 2`
+BRANCH_REVNO  = `grep "REVNO" $(BUILD_DIRECTORY)/bzrversion.h | cut -d '"' -f 2`
+#VERSION_ID = 0.8.8+bzr.trunk$(VERSION_DATE)
+VERSION_ID = 0.8.8+bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
 get-bzr-source:
-	echo Downloading gnash $(VERSION_ID) from CVS...
+	echo Downloading gnash $(VERSION_ID) from bzr...
 #	test -e gnashd && exit
 	bzr branch http://bzr.savannah.gnu.org/r/gnash/trunk gnash
 #	cd gnash; rm -rf `find . -name CVS`
@@ -226,7 +330,6 @@ get-bzr-source:
 	mv gnash "gnash-$(VERSION_ID)"
 	cp debian "gnash-$(VERSION_ID)" -a
 	cd "gnash-$(VERSION_ID)"; dch -v "$(VERSION_ID)-1" "New Upstream Release. Downloaded from Bazaar."
-
 
 binary: binary-indep binary-arch
 .PHONY: config build clean binary-indep binary-arch binary install get-bzr-source patch
