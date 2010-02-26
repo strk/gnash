@@ -169,7 +169,9 @@ endif
 	fi
 
 #	Make a sub-directory to build all the objects and executables in.
-	mkdir $(BUILD_DIRECTORY)
+	if test ! -d $(BUILD_DIRECTORY); then
+	  mkdir $(BUILD_DIRECTORY)
+	fi
 
 # 	Configure that build subdirectory.
 	printf "\n == CONFIGURE == \n\n"
