@@ -34,6 +34,7 @@
 #include "SWF.h"
 #include "Font.h"
 #include <vector>
+#include <boost/cstdint.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -88,9 +89,28 @@ public:
     bool italic() const { return _italic; }
     bool bold() const { return _bold; }
     bool subpixelFont() const { return _subpixelFont; }
-    bool leading() const { return _leading; }
-    bool ascent() const { return _ascent; }
-    bool descent() const { return _descent; }
+
+    /// The font leading value
+    //
+    /// This is documented to be int16_t, but may be uint16_t like advance.
+    boost::int16_t leading() const {
+        return _leading;
+    }
+
+    /// The font ascent value
+    //
+    /// This is documented to be int16_t, but may be uint16_t like advance.
+    boost::int16_t ascent() const {
+        return _ascent;
+    }
+
+    /// The font descent value
+    //
+    /// This is documented to be int16_t, but may be uint16_t like advance.
+    boost::int16_t descent() const {
+        return _descent;
+    }
+
     const std::string& name() const { return _name; }
 
     /// Read Font::CodeTable, which maps glyph indices to DisplayObject codes.
@@ -121,12 +141,13 @@ private:
 	bool _italic;
 	bool _bold;
 	bool _wideCodes;
-    float _ascent;
-    float _descent;
-    float _leading;
 
-	typedef std::map<kerning_pair, float> kernings_table;
-	kernings_table m_kerning_pairs;
+    boost::int16_t _ascent;
+    boost::int16_t _descent;
+    boost::int16_t _leading;
+
+	typedef std::map<kerning_pair, boost::int16_t> KerningTable;
+	KerningTable _kerningPairs;
 
     boost::shared_ptr<const Font::CodeTable> _codeTable;
 };
