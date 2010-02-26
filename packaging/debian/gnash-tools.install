@@ -1,3 +1,5 @@
+usr/bin/rtmpget
+usr/share/man/man1/rtmpget.1
 usr/bin/gprocessor
 usr/share/man/man1/gprocessor.1
 usr/bin/soldumper
