@@ -62,6 +62,13 @@ if USE_SOUND_AHI
  noinst_HEADERS += aos4/sound_handler_ahi.h
 endif
 
+if USE_SOUND_MKIT
+ libgnashsound_la_SOURCES += mkit/sound_handler_mkit.cpp
+ libgnashsound_la_LIBADD += -lmedia
+ noinst_HEADERS += mkit/sound_handler_mkit.h
+endif
+EXTRA_DIST += mkit
+
 libgnashsound_la_LDFLAGS = -release $(VERSION)
 
 if WIN32

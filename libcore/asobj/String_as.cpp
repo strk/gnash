@@ -646,15 +646,32 @@ string_toUpperCase(const fn_call& fn)
         currentLocale = std::locale::classic();
     }
 
-    if (currentLocale == std::locale::classic())
-    {
+    if (currentLocale == std::locale::classic()) {
         LOG_ONCE(
             log_error(_("Your locale probably can't convert non-ascii "
             "DisplayObjects to upper case. Using a UTF8 locale may fix this."));
         );
     }
 
-    boost::to_upper(wstr, currentLocale);
+#if !defined(__HAIKU__)
+    try {
+        boost::to_upper(wstr, currentLocale);
+    }
+    catch (std::bad_cast&)
+        {
+            // std::use_facet<wchar_t>(currentLocale) called from
+            // boost::to_upper may throw std::bad_cast
+            log_error(_("bad_cast caught"));
+            std::abort();
+        }
+#else
+    size_t l = wstr.size();
+    for (size_t i = 0; i < l; ++i) {
+        if (wstr[i] >= 'a' && wstr[i] <= 'z') {
+            wstr[i] += 'A' - 'a';
+        }
+    }
+#endif
 
     return as_value(utf8::encodeCanonicalString(wstr, version));
 
@@ -691,7 +708,25 @@ string_toLowerCase(const fn_call& fn)
         );
     }
 
-    boost::to_lower(wstr, currentLocale);
+#if !defined(__HAIKU__)
+    try {
+        boost::to_lower(wstr, currentLocale);
+    }
+    catch (std::bad_cast&)
+    {
+        // std::use_facet<wchar_t>(currentLocale) called from
+        // boost::to_lower may throw std::bad_cast
+        log_error(_("bad_cast caught"));
+        std::abort();
+    }
+#else
+    size_t l = wstr.size();
+    for (size_t i = 0; i < l; ++i) {
+        if (wstr[i] >= 'A' && wstr[i] <= 'Z') {
+            wstr[i] -= 'A' - 'a';
+        }
+    }
+#endif
 
     return as_value(utf8::encodeCanonicalString(wstr, version));
 }

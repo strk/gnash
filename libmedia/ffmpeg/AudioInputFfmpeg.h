@@ -1,4 +1,4 @@
-// AudioInput.h: Audio input base class
+// AudioInputFfmpeg.h: Audio input base class
 // 
 //   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
@@ -28,6 +28,7 @@
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
 /// A class representing a single AudioInput device.
 class AudioInputFfmpeg : public AudioInput
@@ -116,8 +117,8 @@ private:
     int _silenceTimeout;
     bool _useEchoSuppression;
 };
-
     
+} // gnash.media.ffmpeg namespace
 } // gnash.media namespace 
 } // gnash namespace
 

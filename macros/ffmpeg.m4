@@ -14,7 +14,6 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
 
@@ -285,7 +284,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     AC_DEFINE(HAVE_LIBSWSCALE_SWSCALE_H, 1, [Define if swscale.h is found])
   fi
 
-  if test x"$have_ffmpeg_swscale" = "xno" -a $ffmpeg_num_version -ge 520000; then
+  if test x"$have_ffmpeg_swscale" = "xno" -a 1$ffmpeg_num_version -ge 1"520000"; then
      AC_MSG_WARN([Cannot find swscale.h, required for ffmpeg versions >= 52.0.0 (detected version: $ffmpeg_version)])
      ffmpeg_version_check=
   fi

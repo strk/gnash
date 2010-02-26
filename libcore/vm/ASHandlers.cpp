@@ -513,6 +513,10 @@ SWFHandlers::execute(ActionType type, ActionExec& thread) const
     catch (ActionParserException& e) {
         log_swferror(_("Malformed action code: %s"), e.what());
     }
+    catch (std::bad_cast&) {
+	log_error(_("bad_cast caught"));
+	std::abort();
+    }
 }
 
 const char*

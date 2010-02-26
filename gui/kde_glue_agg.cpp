@@ -21,7 +21,6 @@
 #include "gnashconfig.h"
 #endif
 
-
 #if GNASH_QT_VERSION == 4
 #include <Qt/qpixmap.h>
 #include <Qt/qcolor.h>
@@ -34,6 +33,7 @@
 #include "kde_glue_agg.h"
 #include "Renderer.h"
 #include "Renderer_agg.h"
+#include "GnashException.h"
 
 namespace gnash
 {
@@ -152,9 +152,8 @@ KdeAggGlue::createRenderHandler()
 {
     // QT requires the use of this pixel format...
     _renderer = create_Renderer_agg("BGRA32");
-    if ( ! _renderer )
-    {
-        throw GnashException("Could not create AGG renderer with pixelformat BGRA32");
+    if (! _renderer) {
+        throw GnashException(_("Could not create AGG renderer with pixelformat BGRA32"));
     }
     return _renderer;
 }

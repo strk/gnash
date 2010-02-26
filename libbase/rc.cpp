@@ -45,6 +45,11 @@
 
 #include <boost/format.hpp>
 
+#ifdef HAIKU_HOST
+# include <Path.h>
+# include <FindDirectory.h>
+#endif
+
 using std::endl;
 using std::cout;
 using std::cerr;
@@ -152,15 +157,28 @@ RcInitFile::loadFiles()
 #endif
     
     // Check the users home directory
-#ifndef __amigaos4__
-        char *home = std::getenv("HOME");
+    const char *home = 0;
+    //on AmigaOS we have a GNASH: assign that point to program dir
+#if defined (__amigaos4__)
+    home = "/gnash";
+#elif defined(HAIKU_HOST)
+    BPath bp;
+    if (B_OK != find_directory(B_USER_SETTINGS_DIRECTORY, &bp)) {
+	log_error(_("Failed to find user settings directory"));
+    } else {
+	bp.Append("Gnash");
+	home = bp.Path();
+    }
 #else
-		//on AmigaOS we have a GNASH: assign that point to program dir
-        char *home = "/gnash";
+    home = std::getenv("HOME");
 #endif
     if (home) {
         loadfile = home;
+#ifdef HAIKU_HOST
+        loadfile.append("/gnashrc");
+#else
         loadfile.append("/.gnashrc");
+#endif
         parseFile(loadfile);
     }
 
@@ -544,7 +562,10 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_sollocaldomain, "solLocalDomain", variable,
                            value)
             ||
-                 extractSetting(_lcdisabled, "LocalConnection", variable,
+		 extractSetting(_lcdisabled, "LocalConnection", variable,
+                           value)
+            ||
+		 extractSetting(_lctrace, "LCTrace", variable,
                            value)
             ||
                  extractNumber(_movieLibraryLimit, "movieLibraryLimit",
@@ -582,8 +603,7 @@ RcInitFile::parseFile(const std::string& filespec)
                              "\"%s\" in rcfile %s line %d")) 
                              % variable % filespec % lineno << endl;
             }
-        }
-        else if (noCaseCompare(action, "include")) {
+        } else if (noCaseCompare(action, "include")) {
             //cout << "Include directive in " << filespec << endl; 
             // TODO: resolve relative paths ?
             // TODO: skip parsing if already parsed ?
@@ -594,8 +614,7 @@ RcInitFile::parseFile(const std::string& filespec)
                 cerr << boost::format(_("Warning: empty include "
                             "specification in rcfile %s, line %d"))
                             % filespec % lineno << endl;
-            }
-            else {
+            } else {
                 if ( variable[0] != '/' ) {
                     cerr << boost::format(_("Warning: include specification "
                                 "must be an absolute path in rcfile %s, "
@@ -605,8 +624,7 @@ RcInitFile::parseFile(const std::string& filespec)
                     parseFile(variable);
                 }
             }
-        }
-        else {
+        } else {
             cerr << boost::format(_("Warning: unrecognized action \"%s\" in "
                 "rcfile %s, line %d")) % action % filespec % lineno << endl;
         }
@@ -643,32 +661,43 @@ RcInitFile::updateFile()
         
         std::string::size_type pos = filelist.find_last_of(':');
         
-        if (pos == std::string::npos)
-        {
+        if (pos == std::string::npos) {
             // no separator: just one file.
             writefile = filelist;
-        }
-        else
-        {
+        } else {
             writefile = filelist.substr(pos + 1);
         }
-    }
-    else
-    {
-        // Check the users home directory    
-#ifndef __amigaos4__
-        char *home = std::getenv("HOME");
+    } else {
+        // Check the users home directory
+        const char *home = NULL;
+#if defined(__amigaos4__)
+        //on AmigaOS we have a GNASH: assign that point to program dir
+        home = "/gnash";
+#elif defined(HAIKU_HOST)
+        BPath bp;
+        if (B_OK != find_directory(B_USER_SETTINGS_DIRECTORY, &bp)) {
+            log_error(_("Failed to find user settings directory"));
+        } else {
+            bp.Append("Gnash");
+            home = bp.Path();
+        }
 #else
-		//on AmigaOS we have a GNASH: assign that point to program dir
-        char *home = "/gnash";
+	//on AmigaOS we have a GNASH: assign that point to program dir
+	home = std::getenv("HOME");
 #endif
         if (home) {
             writefile = home;
-            writefile.append("/.gnashrc");
+#ifdef HAIKU_HOST
+            writefile.append("/gnashrc");
+#else
+	    writefile.append("/.gnashrc");
+#endif
         }
     }
     
-    if (writefile.empty()) return false;
+    if (writefile.empty()) {
+	return false;
+    }
 
     return updateFile(writefile);
 
@@ -722,9 +751,10 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "delay " << _delay << endl <<
     cmd << "verbosity " << _verbosity << endl <<
     cmd << "solReadOnly " << _solreadonly << endl <<
-	cmd << "solLocalDomain " << _sollocaldomain << endl <<
+    cmd << "solLocalDomain " << _sollocaldomain << endl <<
     cmd << "SOLSafeDir " << _solsandbox << endl <<
     cmd << "localConnection " << _lcdisabled << endl <<
+    cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    

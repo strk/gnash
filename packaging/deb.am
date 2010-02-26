@@ -38,6 +38,10 @@ deb: snapshot-src setup-deb snapshot-deb
 # it is "$(NEXT_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)", but when
 # building alternate packages, we want to rename them so there isn't a
 # name collision.
+
+# This gets more fun, as if we configure with ffmpeg, the two utilities that
+# deal with Gstreamer based input devices, findwebcam and findmicrophone,
+# don't get built. So we strip them out of the packages.
 setup-deb: 
 	@snapshot_version="$(SNAPSHOT_VERSION)"; \
 	snapshot_dir="gnash-$(SNAPSHOT_VERSION)"; \
@@ -83,6 +87,16 @@ setup-deb:
 	  sed -e "s:trunk:$${snapshot_version}:" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
 	else \
 	  sed -e "s:trunk:$${snapshot_version}:" $(srcdir)/packaging/debian/changelog > $${snapshot_dir}/debian/changelog; \
+	fi; \
+	if test $${ffmpeg} -eq 1; then \
+	  if test -e $${snapshot_dir}/debian/gnash-tools.install; then \
+	    mv -f $${snapshot_dir}/debian/gnash-tools.install $${snapshot_dir}/debian/gnash-tools.install.orig; \
+	    sed -e '/webcam/d' -e '/microphone/d' $${snapshot_dir}/debian/gnash-tools.install.orig > $${snapshot_dir}/debian/gnash-tools.install; \
+	  fi; \
+	  if test -e $${snapshot_dir}/debian/gnash-tools.manpages; then \
+	    mv -f $${snapshot_dir}/debian/gnash-tools.manpages $${snapshot_dir}/debian/gnash-tools.manpages.orig; \
+	    sed -e '/webcam/d' -e '/microphone/d' $${snapshot_dir}/debian/gnash-tools.manpages.orig > $${snapshot_dir}/debian/gnash-tools.manpages; \
+	  fi; \
 	fi; \
 	ubuntu=`uname -a | grep -ci ubuntu`; \
 	if test $$ubuntu -eq 1; then \

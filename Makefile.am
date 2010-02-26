@@ -247,6 +247,9 @@ if BUILD_FLTK_GUI
 	@echo "	XFT_CFLAGS is $(XFT_CFLAGS)"
 	@echo "	XFT_LIBS is $(XFT_LIBS)"
 endif
+if BUILD_HAIKU_GUI
+	@echo "	HAIKU_LIBS is $(HAIKU_LIBS)"
+endif
 if BUILD_GTK_GUI
 	@echo "	GTK2_CFLAGS is $(GTK2_CFLAGS)"
 	@echo "	GTK2_LIBS is $(GTK2_LIBS)"
@@ -405,6 +408,9 @@ if BUILD_FB_GUI
 endif
 if BUILD_AMIGAOS4_GUI
        @echo " Supported GUI: AMIGAOS4"
+endif
+if BUILD_HAIKU_GUI
+	@echo " Supported GUI: Haiku"
 endif
 if XPCOM
 	@echo "	XPCOM support for Mozilla/Firefox"

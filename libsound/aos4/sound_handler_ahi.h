@@ -17,10 +17,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-#ifndef SOUND_HANDLER_AOS4_H
-#define SOUND_HANDLER_AOS4_H
-
+#ifndef SOUND_HANDLER_AHI_H
+#define SOUND_HANDLER_AHI_H
 
 #include "sound_handler.h" // for inheritance
 
@@ -190,4 +188,4 @@ public:
 } // gnash.sound namespace
 } // namespace gnash
 
-#endif // SOUND_HANDLER_SDL_H
+#endif // SOUND_HANDLER_AHI_H

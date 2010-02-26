@@ -24,6 +24,7 @@
 #include "dsodefs.h" // For DSOEXPORT
 #include "utility.h"
 #include <string>
+
 #include <boost/cstdint.hpp> // for C99 int types
 #include <limits>
 

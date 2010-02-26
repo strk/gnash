@@ -102,6 +102,10 @@ case "${host}" in
     DEFAULT_FLASH_PLATFORM_ID="OS4"
     DEFAULT_FLASH_SYSTEM_OS="AmigaOS4"
     ;;    
+  *-haiku*)
+    DEFAULT_FLASH_PLATFORM_ID="HAIKU"
+    DEFAULT_FLASH_SYSTEM_OS="Haiku"
+    ;;    
   *)
     DEFAULT_FLASH_PLATFORM_ID="UNK"
     DEFAULT_FLASH_SYSTEM_OS="Unknown"
@@ -172,7 +176,12 @@ case "${host}" in
     amigaos4=yes
     AC_DEFINE([AMIGAOS4_HOST], [1], [this is an AmigaOS4 platform])
     ;;
+  *-*haiku*)
+    haiku=yes
+    AC_DEFINE([HAIKU_HOST], [1], [this is a Haiku platform])
+    ;;
 esac
+
 
 AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
 AM_CONDITIONAL(WIN32, test x$windows = xyes)
@@ -207,7 +216,7 @@ AC_ARG_WITH(top_level,
   cross_compiling=yes)
 
 AC_ARG_WITH(sysroot,
-  AC_HELP_STRING([--sysroot],
+  AC_HELP_STRING([--with-sysroot],
   [system root directory for cross compiling]),
   with_top_level=${withval} ;
   cross_compiling=yes)
@@ -275,8 +284,9 @@ AC_ARG_ENABLE(jemalloc,
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-jemalloc option]) ;;
 esac],jemalloc=yes)
 
-dnl There is some weird stuff going on with NetBSD and jemalloc, so don't build it for now.
-if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes"; then
+dnl There is some weird stuff going on with NetBSD and jemalloc, so don't 
+dnl build it for now.
+if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes" -o x"${haiku}" = x"yes"; then
   jemalloc=no
 fi
 dnl If the compiler doesn't have local thread storage enabled, don't try to
@@ -492,7 +502,7 @@ AC_ARG_ENABLE(i810-lod-bias,
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-i810-lod-bias option]) ;;
 esac])
 
-if test x$i810lodbias = xyes; then
+if test x"${i810lodbias}" = xyes; then
     AC_DEFINE([FIX_I810_LOD_BIAS], [], [Fix i810 LOD bias problem])
 fi
 
@@ -516,6 +526,7 @@ GNASH_PKG_CLASSFILE
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
 
+build_haiku=no
 build_aos4=no                   dnl AmigaOS4 GUI
 build_kde3=no
 build_kde4=no
@@ -533,13 +544,13 @@ build_hildon=no                 dnl Native LIMO
 build_alp=no                    dnl Acess Linux Platform using Hiker
 build_dump=no
 AC_ARG_ENABLE(gui,
-  AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde3)]),
-  if test -n ${enableval}; then
+  AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde4)]),
+  [if test -n ${enableval}; then
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
   while test -n "${enableval}" ; do
     val=`echo ${enableval} | cut -d ' ' -f 1`
-    [case "${val}" in
+    case "${val}" in
       hildon|HILDON|hildon2|HILDON2)
         build_hildon=yes
         AC_DEFINE(USE_HILDON, [1], [Use the Hildon mobile framework])
@@ -595,6 +606,9 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
       aos4|AOS4)
         build_aos4=yes
         ;;
+      haiku|HAIKU)
+        build_haiku=yes
+        ;;
       dump|DUMP)
         build_dump=yes
         ;;
@@ -611,23 +625,37 @@ dnl        build_qtopia=yes
 dnl        build_hildon=yes
 dnl        build_alp=yes
 dnl        build_riscos=yes
+dnl        build_aos4=yes
+dnl        build_haiku=yes        
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump|aos4)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump|aos4|haiku)])
          ;;
-      esac]
+      esac
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
     if test "x$val" = "x$enableval"; then
       break;
     fi
-  done,build_gtk=yes;
-if test x$openbsd_os = xopenbsd; then
-  build_kde3=yes;
-  build_qt3=yes;
-else
-  build_kde4=yes;
-  build_qt4=yes;
-fi
+  done],
+  [if test x"${openbsd_os}" = x"openbsd"; then
+    build_kde3=yes;
+    build_qt3=yes;
+    build_gtk=yes;
+  else if test x"${haiku}" = xyes; then
+    build_haiku=yes;
+  else
+    build_kde4=yes;
+    build_qt4=yes;
+    build_gtk=yes;
+  fi
+  fi]
 )
+
+if test x"${build_haiku}" = xyes; then
+  if test x"$haiku" != xyes; then
+    echo "        ERROR: Can not build Haiku gui outside of Haiku
+operating system." >&3
+  fi
+fi
 
 add_renderer=
 build_ogl=no
@@ -664,8 +692,9 @@ dnl         ;;
 add_sound=
 build_sound_sdl=no
 build_sound_ahi=no
+build_sound_mkit=no
 AC_ARG_ENABLE(sound,
-  AC_HELP_STRING([--enable-sound=[[sdl|ahi]]], [Use the specified sound handler (default=sdl)]),
+  AC_HELP_STRING([--enable-sound=[[sdl|ahi|mkit]]], [Use the specified sound handler (default=sdl)]),
      [case "${enableval}" in
       sdl|SDL|Sdl)
         build_sound_sdl=yes
@@ -675,9 +704,18 @@ AC_ARG_ENABLE(sound,
         build_sound_ahi=yes
         add_sound="ahi"
         ;;
+      mkit|MKIT|Mkit)
+        build_sound_mkit=yes
+        add_sound="mkit"
+        ;;
      esac],
-  build_sound_sdl=yes
-  add_sound=sdl
+  [if test x"${haiku}" = xyes; then
+     build_sound_mkit=yes
+     add_sound="mkit"
+   else
+     build_sound_sdl=yes
+     add_sound=sdl
+   fi]
 )
 
 if test x$build_ogl = xyes; then
@@ -687,8 +725,8 @@ if test x$build_ogl = xyes; then
   if test x$build_fltk = xyes; then
     AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
-  if test x$build_dump = xyes; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
+  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
+    AC_MSG_ERROR([OpenGL renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
@@ -787,6 +825,12 @@ AC_ARG_ENABLE(media,
   esac],
  [media_handler=gst; media_handler_specified=true]
 )
+
+dnl If we're on Haiku, there is only one supported media handler.
+if test x"${build_haiku}" = xyes; then
+     media_handler=ffmpeg
+     media_handler_specified=true
+fi
 
 AC_ARG_ENABLE(lirc, AC_HELP_STRING([--enable-lirc], [Disable support for Lirc]),
 [case "${enableval}" in
@@ -1120,6 +1164,13 @@ if test x$build_agg = xyes; then
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
 fi
 
+dnl For Haiku, we know the sysroot is in a non-standard place
+dnl it is important that -lagg comes before -lbe
+if test x"${haiku}" = xyes; then
+  HAIKU_LIBS=-lbe
+  AC_SUBST(HAIKU_LIBS)
+fi
+
 DLOPEN="-dlopen"
 DLPREOPEN="-dlpreopen"
 AC_SUBST(DLOPEN)
@@ -1336,10 +1387,21 @@ gcc_cv_ld_as_needed=no
 if $LD --help 2>/dev/null | grep as-needed > /dev/null; then
 	gcc_cv_ld_as_needed=yes
 fi
-if test x"$gcc_cv_ld_as_needed" = xyes; then
-	LDFLAGS="${LDFLAGS} -Wl,--as-needed"
-fi
+dnl if test x"$gcc_cv_ld_as_needed" = xyes; then
+dnl 	LDFLAGS=" -Wl,--as-needed"
+dnl fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
+
+dnl AC_MSG_CHECKING(linker --no-undefined support)
+dnl gcc_cv_ld_undef_needed=no
+dnl # Check if linker supports --no-undefined
+dnl if $LD --help 2>/dev/null | grep as-needed > /dev/null; then
+dnl 	gcc_cv_ld_undef_needed=yes
+dnl fi
+dnl if test x"$gcc_cv_ld_undef_needed" = xyes; then
+dnl 	LDFLAGS=" ${LDFLAGS} -Wl,--no-undefined"
+dnl fi
+dnl AC_MSG_RESULT($gcc_cv_ld_undef_needed)
 
 AC_DEFINE(USE_GIF, [1], [Use the GIF library])
 AC_DEFINE(USE_PNG, [1], [Use the PNG library])
@@ -1932,6 +1994,7 @@ AM_CONDITIONAL(ALLSTATIC,          [ test x$build_aqua = xyes ]) dnl the Aqua-bi
 AM_CONDITIONAL(BUILD_RISCOS_GUI,   [ test x$build_riscos = xyes ])
 AM_CONDITIONAL(BUILD_DUMP_GUI,     [ test x$build_dump = xyes ])
 AM_CONDITIONAL(BUILD_AMIGAOS4_GUI, [ test x$build_aos4 = xyes ])
+AM_CONDITIONAL(BUILD_HAIKU_GUI,    [ test x$build_haiku = xyes ])
 
 # plugin building flags
 AM_CONDITIONAL(NPAPI, [test x$npapi = xyes])
@@ -2066,8 +2129,8 @@ dnl   fi
   if test x$build_kde3 = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
-  if test x$build_dump = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
+  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
+    AC_MSG_ERROR([Cairo renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
@@ -2076,16 +2139,31 @@ AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
 
 AM_CONDITIONAL(USE_SOUND_SDL, test x$build_sound_sdl = xyes)
 AM_CONDITIONAL(USE_SOUND_AHI, test x$build_sound_ahi = xyes)
+AM_CONDITIONAL(USE_SOUND_MKIT, test x$build_sound_mkit = xyes)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
 AM_CONDITIONAL(USE_GST_ENGINE, test x"$media_handler" = xgst)
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
+dnl for now the Haiku media handler is experimental
+AM_CONDITIONAL(USE_HAIKU_ENGINE, test x"$media_handler" = xno)
 
-if test x$build_sound_sdl = xyes; then
+if test x$build_sound_mkit = xyes; then
+  if test x"${haiku}" != xyes; then
+    AC_MSG_ERROR([Media Kit sound handling is supported only under Haiku]);
+  else
+    AC_DEFINE([SOUND_MKIT],  [1], [Use Haiku's Media Kit for sound handling])
+  fi
+fi
+
+if test x"${build_sound_sdl}" = xyes; then
   AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling])
 fi
 
-if test x$build_sound_ahi = xyes; then
-  AC_DEFINE([SOUND_AHI],  [1], [Use AmigaOS AHI for sound handling])
+if test x"${build_sound_ahi}" = xyes; then
+  if test x"$amigaos4" != xyes; then
+    AC_MSG_ERROR([AHI sound handling is supported only under AmigaOS]);
+  else
+    AC_DEFINE([SOUND_AHI],  [1], [Use AmigaOS AHI for sound handling])
+  fi
 fi
 
 case "${media_handler}" in
@@ -2359,6 +2437,9 @@ fi
 if test x$build_aos4 = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},aos4"
 fi
+if test x$build_haiku = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},haiku"
+fi
 SUPPORTED_GUIS="`echo ${SUPPORTED_GUIS} | sed 's/,//'`" # Strip leading comma
 AC_SUBST(SUPPORTED_GUIS)
 
@@ -2449,33 +2530,37 @@ exec 4> $cwarn
 
 echo "Configurable options are:"
 
-if test x"$i810lodbias" = x"yes"; then
+if test x"${i810lodbias}" = x"yes"; then
   echo "        Intel 810 LOD bias hack enabled"
 else
   echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
 fi
 
-if test x"$pthreads" = x"yes"; then
+if test x"${pthreads}" = x"yes"; then
   echo "        POSIX Threads support enabled (default)"
 else
-  echo "        POSIX Thread support disabled."
+  if test x"${build_haiku}" = x"yes"; then
+     echo "        POSIX Thread support built into C library."
+  els
+     echo "        POSIX Thread support disabled."
+  fi
 fi
 
-if test x"$dmalloc" = x"yes"; then
+if test x"${dmalloc}" = x"yes"; then
   echo "        DMalloc support enabled"
   echo "        For a list of the command-line options enter: dmalloc --usage"
 else
   echo "        DMalloc support disabled (default). Use --enable-dmalloc to enable."
 fi
 
-if test x"$npapi" = x"yes"; then
+if test x"${npapi}" = x"yes"; then
   echo "        NPAPI plugin enabled (default). Use --disable-npapi to disable."
   echo "            NPAPI plugin will be installed in ${FIREFOX_PLUGINS}"
 else
   echo "        NPAPI plugin disabled."
 fi
 
-if test x"$build_kparts3" = x"yes"; then
+if test x"${build_kparts3}" = x"yes"; then
   echo "        KPARTS 3.x plugin enabled (default). Use --disable-kparts3 to disable"
   echo "            KPARTS 3.x plugin will be installed in ${KDE3_PLUGINDIR}"
   echo "            KPARTS 3.x service will be installed in ${KDE3_SERVICESDIR}"
@@ -2485,7 +2570,7 @@ else
   echo "        KPARTS 3.x plugin disabled."
 fi
 
-if test x"$build_kparts4" = x"yes"; then
+if test x"${build_kparts4}" = x"yes"; then
   echo "        KPARTS 4.x plugin enabled (default). Use --disable-kparts4 to disable"
   echo "            KPARTS 4.x plugin will be installed in ${KDE4_PLUGINDIR}"
   echo "            KPARTS 4.x service will be installed in ${KDE4_SERVICESDIR}"
@@ -2501,48 +2586,48 @@ dnl -- else
 dnl --   echo "        Loadable GUI & renderer disabled (default). Use --enable-dynamic-gui to enable."
 dnl -- fi
 
-if test x"$ghelp" = x"yes"; then
+if test x"${ghelp}" = x"yes"; then
   echo "        GNOME help enabled"
 else
   echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
 fi
 
-dnl if test x"$extensions" = x"yes"; then
+dnl if test x"${extensions}" = x"yes"; then
 dnl   echo "        Building extensions enabled (default). Use --disable-extensions to disable."
 dnl else
 dnl   echo "        Building Gnash extensions disabled."
 dnl fi
 
-if test x"$cygnal" = x"yes"; then
+if test x"${cygnal}" = x"yes"; then
   echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
 else
   echo "        Building Cygnal media server disabled."
 fi
 
-if test x"$debugger" = x"yes"; then
+if test x"${debugger}" = x"yes"; then
   echo "        Building Flash debugger support (default). Use --disable-debugger to disable."
 else
   echo "        Building the Flash debugger is disabled."
 fi
 
-if test x"$with-top_level" != x; then
+if test x"${with-top_level}" != x; then
   echo "        Top level for cross compiling support files is: $with_top_level"
 fi
 
-if test x$build_gtk = xyes -a x$pixelformat = xrgb565; then
+if test x"${build_gtk}" = xyes -a x"${pixelformat}" = xrgb565; then
   echo "        WARNING: Pixel format RGB565 selected in combination with the" >&4
   echo "                 GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)." >&4
 fi
 
-if test x"$extensions_list" != x; then
+if test x"${extensions_list}" != x; then
   echo "        Building extensions: ${extensions_list}"
 fi
 
-if test x"$security_list" != x; then
+if test x"${security_list}" != x; then
   echo "        Enabling security features: ${security_list}"
 fi
 
-if test x"$statistics_list" != x; then
+if test x"${statistics_list}" != x; then
   echo "        Enabling statistics collecting for: ${statistics_list}"
 fi
 
@@ -3007,20 +3092,20 @@ dnl    echo "        ERROR: No Firefox or Mozilla development package installed!
 dnl  fi
 fi
 
-if test x"$pthreads" = x"yes"; then
+if test x"${pthreads}" = x"yes"; then
   if test x"$PTHREAD_CFLAGS" != x; then
     echo "        POSIX Threads flags are: $PTHREAD_CFLAGS"
   fi
-  if test x"$PTHREAD_LIBS" != x; then
+  if test x"${PTHREAD_LIBS}" != x; then
     echo "        POSIX Threads lib is: $PTHREAD_LIBS"
   else
-    if test x$cross_compiling = xno; then
+    if test x"${cross_compiling}" = xno; then
       echo "ERROR: No pthread development package installed!" >&3
     fi
   fi
 fi
 
-if test x"$docbook" = x"yes"; then
+if test x"${docbook}" = x"yes"; then
   if test x"$MAKEINFO" = x; then
     echo "        ERROR: no makeinfo tools installed!" >&3
     echo "               Either install it from http://www.gnu.org/software/texinfo/" >&3
@@ -3368,6 +3453,11 @@ if test x"${build_alp}" = xyes; then
   fi
 fi
 
+dnl Haiku
+if test x"${build_haiku}" = xyes -o x"${build_sound_mkit}" = xyes -o x"${media_handler}" = x"mkit"; then
+    echo "        Haiku libs are: $HAIKU_LIBS"
+fi
+ 
 dnl XPCOM support for Mozilla/Firefox
 if test x"$xpcom" = x"yes"; then
   if test x"$has_xpcom" = x"yes"; then

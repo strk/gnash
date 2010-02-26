@@ -642,6 +642,7 @@ std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, RunRes
 std::auto_ptr<Gui> createAQUAGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createRISCOSGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createAOS4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createHaikuGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createDumpGui(unsigned long xid, float scale, bool loop, RunResources& r);
 
  

@@ -67,7 +67,6 @@ libgnashbase_la_SOURCES = \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
-	SharedMem.cpp \
 	sharedlib.cpp \
 	string_table.cpp \
 	tu_file.cpp \
@@ -85,6 +84,13 @@ libgnashbase_la_SOURCES = \
 	BitsReader.cpp \
 	arg_parser.cpp \
 	$(NULL)
+
+
+if BUILD_HAIKU_GUI
+libgnashbase_la_SOURCES += SharedMemHaiku.cpp
+else
+libgnashbase_la_SOURCES += SharedMem.cpp
+endif
 
 edit = sed \
 	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
@@ -112,6 +118,10 @@ if LIBLTDL1
 noinst_LTLIBRARIES = libltdlc.la
 libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
 libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+endif
+
+if BUILD_HAIKU_GUI
+  libgnashbase_la_LIBADD += $(HAIKU_LIBS)
 endif
 
 if WIN32

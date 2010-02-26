@@ -24,6 +24,7 @@
 #include "Kde4GlueAgg.h"
 #include "Renderer.h"
 #include "Renderer_agg.h"
+#include "GnashException.h"
 #include <QImage>
 #include <QRect>
 
@@ -110,7 +111,7 @@ Kde4AggGlue::createRenderHandler()
 
     if ( ! _renderer )
     {
-        throw GnashException("Could not create AGG renderer with pixelformat ABGR32");
+        throw GnashException(_("Could not create AGG renderer with pixelformat ABGR32"));
     }
     return _renderer;
 }

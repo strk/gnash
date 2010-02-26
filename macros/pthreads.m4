@@ -114,6 +114,8 @@ for flag in $pthread_flags; do\
     case $flag in
       none)
         AC_MSG_CHECKING([whether pthreads work without any flags])
+        PTHREAD_CFLAGS=""
+        PTHREAD_LIBS=""
         ;;
       -*)
         AC_MSG_CHECKING([whether pthreads work with $flag])
@@ -173,13 +175,13 @@ for flag in $pthread_flags; do\
     CXXFLAGS="$save_CXXFLAGS"
 
     AC_MSG_RESULT($pthreads)
-    if test "x$pthreads" = xyes; then
+    if test "x${pthreads}" = xyes; then
        break;
     fi
 done
 
 dnl Try a manual search, useful for cross-compiling
-if test x"${PTHREAD_LIBS}" = "x"; then
+if test "x${pthreads}" = xyes; then
   AC_MSG_CHECKING([searching for pthread library])
   for i in $libslist; do
     if test -f $i/libpthread.a -o -f $i/libpthread.${shlibext} -o -f $i/libpthread.dylib; then
@@ -203,6 +205,7 @@ if test x"${PTHREAD_LIBS}" = "x"; then
   done
   if test x"${PTHREAD_LIBS}" = "x"; then
     AC_MSG_RESULT(not found)
+    pthreads=no
   fi
 fi
 
