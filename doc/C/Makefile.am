@@ -97,7 +97,6 @@ EXTRA_DIST = \
 	preformatted/gnash_ref.info.in \
 	preformatted/soldumper.1.in \
 	preformatted/flvdumper.1.in \
-	preformatted/dumpshm.1.in \
 	preformatted/gnashref.html.in \
 	preformatted/gnash_user.info.in \
 	preformatted/rtmpget.1.in \
@@ -105,6 +104,7 @@ EXTRA_DIST = \
 	preformatted/findwebcams.1.in \
 	preformatted/gtk-gnash.1.in \
 	preformatted/kde4-gnash.1.in
+#	preformatted/dumpshm.1.in
 
 #noinst_SCRIPT = gen-doc.sh
 # We list the texi and info pages twice, as differing versions of the 
@@ -114,13 +114,13 @@ EXTRA_DIST = \
 MANPAGES = \
 	gnash.1 \
 	gprocessor.1 \
-	dumpshm.1 \
 	soldumper.1 \
 	flvdumper.1 \
 	cygnal.1 \
 	rtmpget.1 \
 	findmicrophones.1 \
 	findwebcams.1
+#	dumpshm.1
 
 MANSRC = $(MANPAGES:.1=.man-xml)
 INFOS  = gnash_user.info gnash_ref.info
@@ -232,7 +232,7 @@ endif
 
 gnash.1: $(srcdir)/gnash.man-xml
 gprocessor.1: $(srcdir)/gprocessor.man-xml
-dumpshm.1: $(srcdir)/dumpshm.man-xml
+#dumpshm.1: $(srcdir)/dumpshm.man-xml
 soldumper.1: $(srcdir)/soldumper.man-xml
 flvdumper.1: $(srcdir)/flvdumper.man-xml
 cygnal.1: $(srcdir)/cygnal.man-xml
