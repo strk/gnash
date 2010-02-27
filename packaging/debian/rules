@@ -80,6 +80,7 @@ BUILD_DIRECTORY = _build
 ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
 	BUILD_FLAGS += --enable-renderer=ogl
 	BUILD_DIRECTORY = _build.ogl
+	BUILD_DEBUG = -opengl
 	BUILD_VERSION = $(MAIN_VERSION).ogl.$(BUILD_VERSION)
 else
 	BUILD_FLAGS += --enable-renderer=agg
@@ -92,8 +93,10 @@ ifneq (,$(findstring ffmpeg,$(DEB_BUILD_OPTIONS)))
 ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
 	BUILD_DIRECTORY = _build.ogl.ffmpeg
 	BUILD_VERSION = $(MAIN_VERSION).ogl.ffmpeg.$(BUILD_VERSION)
+	BUILD_DEBUG = -opengl-ffmpeg
 else
 	BUILD_DIRECTORY = _build.ffmpeg
+	BUILD_DEBUG = -ffmpeg
 endif
 else
 	BUILD_FLAGS += --enable-media=gst
@@ -106,8 +109,10 @@ ifneq (,$(findstring kde3,$(DEB_BUILD_OPTIONS)))
 ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
 	BUILD_DIRECTORY = _build.ogl.kde3
 	BUILD_VERSION = $(MAIN_VERSION).ogl.kde3.$(BUILD_VERSION)
+	BUILD_DEBUG = -opengl-kde3
 else
 	BUILD_DIRECTORY = _build.kde3
+	BUILD_DEBUG = -kde3
 endif
 else
 	BUILD_FLAGS += --enable-gui=gtk,kde4
@@ -119,6 +124,7 @@ ifneq (,$(findstring vaapi,$(DEB_BUILD_OPTIONS)))
 	BUILD_FLAGS += --enable-media=ffmpeg --enable-vaapi
 	BUILD_DIRECTORY = _build.vaapi
 	BUILD_VERSION = $(MAIN_VERSION).vaapi.$(BUILD_VERSION)
+	BUILD_DEBUG = -vaapi
 endif
 
 # Configure Gnash. We use a different set of options, as when building
@@ -288,7 +294,7 @@ binary-arch: install
 	dh_desktop
 	dh_lintian
 	dh_link
-	dh_strip --dbg-package=gnash-dbg
+	dh_strip --dbg-package=gnash-dbg$(BUILD_DEBUG)
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs
@@ -326,7 +332,7 @@ VERSION_ID = 0.8.8+bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
 get-bzr-source:
 	echo Downloading gnash $(VERSION_ID) from bzr...
 #	test -e gnashd && exit
-	bzr branch http://bzr.savannah.gnu.org/r/gnash/trunk gnash
+	bzr branch http://bzr.savannah.gnu.org/r/gnash/$(BRANCH_NICK) gnash
 #	cd gnash; rm -rf `find . -name CVS`
 	tar cvfz "gnash_$(VERSION_ID).orig.tar.gz" gnash
 	mv gnash "gnash-$(VERSION_ID)"

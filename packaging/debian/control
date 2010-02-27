@@ -64,7 +64,7 @@ Description: free SWF movie player - standalone player for KDE
 Package: gnash-tools
 Section: utils
 Architecture: any
-Depends:  gnash-common (= ${binary:Version}),
+Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: free SWF movie player - Command-line Tools
  Gnash is a free Flash movie player, which works either standalone, or as
