@@ -46,6 +46,7 @@ VAAPI := $(shell echo $(DEB_BUILD_OPTIONS) | grep -c "vaapi")
 # Look at the build options to calculate the new build name. This is
 # used for the the snapshot source directory name.
 BUILD_DIR := $(shell \
+	snapshot_dir=_build; \
 	if test $(OGL) -eq 1 -o $(FFMPEG) -eq 1 -o $(VAAPI) -eq 1; then \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 1; then \
 	    snapshot_dir=$(subst bzr,bzr.ogl.ffmpeg,$(SNAPSHOT_DIR)); \
@@ -65,21 +66,22 @@ BUILD_DIR := $(shell \
 # Look at the build options to calculate the new build name. This is
 # used for the the snapshot version.
 BUILD_VERSION := $(shell \
+	snapshot_version=$(SNAPSHOT_VERSION); \
 	if test $(OGL) -eq 1 -o $(FFMPEG) -eq 1 -o $(VAAPI) -eq 1; then \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 1; then \
-	    snapshot_dir=$(subst bzr,bzr.ogl.ffmpeg,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst bzr,bzr.ogl.ffmpeg,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 0; then \
-	    snapshot_dir=$(subst bzr,bzr.ogl,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst bzr,bzr.ogl,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	  if test $(OGL) -eq 0 -a $(FFMPEG) -eq 1; then \
-	    snapshot_dir=$(subst bzr,bzr.ffmpeg,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst bzr,bzr.ffmpeg,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	  if test $(VAAPI) -eq 1; then \
-	    snapshot_dir=$(subst bzr,bzr.vaapi,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst bzr,bzr.vaapi,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	fi; \
-	echo "$${snapshot_dir}")
+	echo "$${snapshot_version}")
 
 # This is a list of all the packages in the control file.
 PACKAGES := $(shell grep Package $(srcdir)/packaging/debian/control | sed -e 's/Package://')
@@ -98,11 +100,10 @@ setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control
 # usually something like "gnash-trunk" to "0.8.8~bzr.ogl.ffmpeg.trunk11977".
 # This requires distdir to be run first, but it's not a dependency as we
 # don't want to always rebuild the source tree, just the dependencies.
-deb-rename-build: $(BUILD_DIR)
-$(BUILD_DIR):
+deb-rename-build:
 	@echo "Building package in: $(BUILD_DIR)..."
 	@if test -d gnash-$(PACKAGE_VERSION); then \
-	  mv gnash-$(PACKAGE_VERSION) $(BUILD_DIR); \
+	  mv -f gnash-$(PACKAGE_VERSION) $(BUILD_DIR); \
 	fi
 
 # Once the directory has been renamed, we copy over the Debian packaging

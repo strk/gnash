@@ -482,12 +482,6 @@ proc sumfile { msg } {
     puts $sum $msg
 }
 
-# print an entry to the summary file
-proc sumfile { msg } {
-    global sum
-    puts $sum $msg
-}
-
 # print an informational entry to the summary file
 proc suminfo { msg } {
     global inp outp timeout srcdir sum
