@@ -88,4 +88,10 @@ public:
 
 } // gnash namespace
 
-#endif /* GNASH_GNASHVAAPIIMAGEPROXY_H */
+#endif // end of GNASH_GNASHVAAPIIMAGEPROXY_H
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

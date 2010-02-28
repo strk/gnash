@@ -69,4 +69,9 @@ public:
 
 } // gnash namespace
 
-#endif /* GNASH_GNASHVAAPIIMAGE_H */
+#endif // GNASH_GNASHVAAPIIMAGE_H
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

@@ -47,4 +47,10 @@ public:
 
 } // gnash namespace
 
-#endif /* GNASH_GNASHVAAPITEXTURE_H */
+#endif // end of GNASH_GNASHVAAPITEXTURE_H
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

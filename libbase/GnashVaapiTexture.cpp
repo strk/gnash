@@ -42,3 +42,8 @@ void GnashVaapiTexture::update(boost::shared_ptr<VaapiSurface> surface)
 }
 
 } // gnash namespace
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

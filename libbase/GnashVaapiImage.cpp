@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #include <time.h>
 
 #include "log.h"
@@ -104,7 +103,7 @@ void GnashVaapiImage::update(boost::uint8_t* data)
 {
     log_debug("GnashVaapi::update(): data %p\n", data);
 
-    /* XXX: use vaPutImage() */
+    // XXX: use vaPutImage()
     _creation_time = get_ticks_usec();
 }
 

@@ -99,3 +99,9 @@ const char *string_of_VAEntrypoint(VAEntrypoint entrypoint)
 }
 
 } // gnash namespace
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
