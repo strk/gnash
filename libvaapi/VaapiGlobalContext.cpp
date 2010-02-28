@@ -17,9 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#include "log.h"
 #include "VaapiGlobalContext.h"
 #include "VaapiDisplayX11.h"
-#if USE_VAAPI_GLX
+#ifdef USE_VAAPI_GLX
 #include "VaapiDisplayGLX.h"
 #endif
 #include "vaapi_utils.h"
@@ -29,6 +34,7 @@ namespace gnash {
 VaapiGlobalContext::VaapiGlobalContext(std::auto_ptr<VaapiDisplay> display)
     : _display(display)
 {
+    GNASH_REPORT_FUNCTION;
     init();
 }
 
@@ -39,21 +45,25 @@ VaapiGlobalContext::~VaapiGlobalContext()
 bool
 VaapiGlobalContext::init()
 {
+    GNASH_REPORT_FUNCTION;
+
     VADisplay dpy = display();
     VAStatus status;
 
     int num_profiles = 0;
     _profiles.resize(vaMaxNumProfiles(dpy));
     status = vaQueryConfigProfiles(dpy, &_profiles[0], &num_profiles);
-    if (!vaapi_check_status(status, "vaQueryConfigProfiles()"))
+    if (!vaapi_check_status(status, "vaQueryConfigProfiles()")) {
         return false;
+    }
     _profiles.resize(num_profiles);
 
     int num_image_formats = 0;
     _image_formats.resize(vaMaxNumImageFormats(dpy));
     status = vaQueryImageFormats(dpy, &_image_formats[0], &num_image_formats);
-    if (!vaapi_check_status(status, "vaQueryImageFormats()"))
+    if (!vaapi_check_status(status, "vaQueryImageFormats()")) {
         return false;
+    }
     _image_formats.resize(num_image_formats);
 
     unsigned int num_subpicture_formats = 0;
@@ -61,8 +71,9 @@ VaapiGlobalContext::init()
     flags.resize(vaMaxNumSubpictureFormats(dpy));
     _subpicture_formats.resize(vaMaxNumSubpictureFormats(dpy));
     status = vaQuerySubpictureFormats(dpy, &_subpicture_formats[0], &flags[0], &num_subpicture_formats);
-    if (!vaapi_check_status(status, "vaQuerySubpictureFormats()"))
+    if (!vaapi_check_status(status, "vaQuerySubpictureFormats()")) {
         return false;
+    }
     _subpicture_formats.resize(num_subpicture_formats);
     return true;
 }
@@ -71,8 +82,9 @@ bool
 VaapiGlobalContext::hasProfile(VAProfile profile) const
 {
     for (unsigned int i = 0; i < _profiles.size(); i++) {
-        if (_profiles[i] == profile)
+        if (_profiles[i] == profile) {
             return true;
+	}
     }
     return false;
 }
@@ -114,6 +126,8 @@ VaapiGlobalContext::getSubpictureFormats() const
 /// A wrapper around a VaapiGlobalContext to ensure it's free'd on destruction.
 VaapiGlobalContext *VaapiGlobalContext::get()
 {
+    LOG_ONCE(GNASH_REPORT_FUNCTION);
+
     static std::auto_ptr<VaapiGlobalContext> vaapi_global_context;
 
     if (!vaapi_global_context.get()) {
@@ -124,8 +138,9 @@ VaapiGlobalContext *VaapiGlobalContext::get()
 #else
         dpy.reset(new VaapiDisplayX11());
 #endif
-        if (!dpy.get())
+        if (!dpy.get()) {
             return NULL;
+	}
         vaapi_global_context.reset(new VaapiGlobalContext(dpy));
     }
     return vaapi_global_context.get();

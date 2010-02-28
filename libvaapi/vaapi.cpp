@@ -28,19 +28,23 @@ static bool
 getenv_yesno(const char *env, int *pval)
 {
     const char *env_str = getenv(env);
-    if (!env_str)
+    if (!env_str) {
         return false;
+    }
 
     int val;
-    if (strcmp(env_str, "1") == 0 || strcmp(env_str, "yes") == 0)
+    if (strcmp(env_str, "1") == 0 || strcmp(env_str, "yes") == 0) {
         val = 1;
-    else if (strcmp(env_str, "0") == 0 || strcmp(env_str, "no") == 0)
+    } else if (strcmp(env_str, "0") == 0 || strcmp(env_str, "no") == 0) {
         val = 0;
-    else
+    } else {
         return false;
+    }
 
-    if (pval)
+    if (pval) {
         *pval = val;
+    }
+
     return true;
 }
 
@@ -62,10 +66,18 @@ void vaapi_disable()
 bool vaapi_is_enabled()
 {
     if (g_vaapi_is_enabled < 0) {
-        if (!getenv_yesno("GNASH_VAAPI", &g_vaapi_is_enabled))
+        if (!getenv_yesno("GNASH_VAAPI", &g_vaapi_is_enabled)) {
             g_vaapi_is_enabled = 1;
+	}
     }
+
     return g_vaapi_is_enabled;
 }
 
 } // gnash namespace
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

@@ -17,13 +17,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include <va/va_glx.h>
+#include <va/va_x11.h>
+
+#include "log.h"
 #include "VaapiSurfaceGLX.h"
 #include "VaapiGlobalContext.h"
 #include "vaapi_utils.h"
-#include <va/va_glx.h>
-
-#define DEBUG 0
-#include "vaapi_debug.h"
 
 namespace gnash {
 
@@ -50,8 +50,9 @@ static const char *gl_get_error_string(GLenum error)
 
     int i;
     for (i = 0; gl_errors[i].str; i++) {
-        if (gl_errors[i].val == error)
+        if (gl_errors[i].val == error) {
             return gl_errors[i].str;
+	}
     }
     return "unknown";
 }
@@ -61,8 +62,9 @@ static inline bool gl_do_check_error(int report)
     GLenum error;
     bool is_error = false;
     while ((error = glGetError()) != GL_NO_ERROR) {
-        if (report)
+        if (report) {
             vaapi_dprintf("glError: %s caught\n", gl_get_error_string(error));
+	}
         is_error = true;
     }
     return is_error;
@@ -85,10 +87,12 @@ static bool gl_get_param(GLenum param, unsigned int *pval)
 
     gl_purge_errors();
     glGetIntegerv(param, &val);
-    if (gl_check_error())
+    if (gl_check_error()) {
         return false;
-    if (pval)
+    }
+    if (pval) {
         *pval = val;
+    }
     return true;
 }
 
@@ -127,18 +131,20 @@ static bool bind_texture(TextureState *ts, GLenum target, GLuint texture)
         return false;
     }
 
-    if (!ts->was_enabled)
+    if (!ts->was_enabled) {
         glEnable(target);
-    else if (gl_get_param(texture_binding, &ts->old_texture))
+    } else if (gl_get_param(texture_binding, &ts->old_texture)) {
         ts->was_bound = texture == ts->old_texture;
-    else
+    } else {
         return false;
+    }
 
     if (!ts->was_bound) {
         gl_purge_errors();
         glBindTexture(target, texture);
-        if (gl_check_error())
+        if (gl_check_error()) {
             return false;
+	}
     }
     return true;
 }
@@ -146,10 +152,13 @@ static bool bind_texture(TextureState *ts, GLenum target, GLuint texture)
 /// Release texture, restore previous texture state
 static void unbind_texture(TextureState *ts)
 {
-    if (!ts->was_bound && ts->old_texture)
+    if (!ts->was_bound && ts->old_texture) {
         glBindTexture(ts->target, ts->old_texture);
-    if (!ts->was_enabled)
+    }
+    if (!ts->was_enabled) {
         glDisable(ts->target);
+    }
+
     gl_check_error();
 }
 
@@ -167,54 +176,67 @@ public:
 VaapiSurfaceGLXImpl::VaapiSurfaceGLXImpl(GLenum target, GLuint texture)
     : VaapiSurfaceImplBase(0, 0)
 {
-    D(bug("VaapiSurfaceGLX::VaapiSurfaceGLX()\n"));
+    GNASH_REPORT_FUNCTION;
 
     reset(0);
 
-    if (target == 0 || texture == 0)
+    if (target == 0 || texture == 0) {
         return;
+    }
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return;
+    }
 
     VAStatus status;
     void *surface = NULL;
     status = vaCreateSurfaceGLX(gvactx->display(), target, texture, &surface);
-    if (!vaapi_check_status(status, "vaCreateSurfaceGLX()"))
+    if (!vaapi_check_status(status, "vaCreateSurfaceGLX()")) {
         return;
+    }
 
     reset(reinterpret_cast<uintptr_t>(surface));
-    D(bug("  -> surface %p\n", this->surface()));
+
+    log_debug("  -> surface %p\n", this->surface());
 }
 
 VaapiSurfaceGLXImpl::~VaapiSurfaceGLXImpl()
 {
-    D(bug("VaapiSurface::~VaapiSurface(): surface %p\n", surface()));
+    GNASH_REPORT_FUNCTION;
 
-    if (!surface())
+    log_debug("VaapiSurface::~VaapiSurface(): surface %p\n", surface());
+
+    if (!surface()) {
         return;
+    }
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return;
+    }
 
     VAStatus status;
     status = vaDestroySurfaceGLX(gvactx->display(), surface());
-    if (!vaapi_check_status(status, "vaDestroySurfaceGLX()"))
+    if (!vaapi_check_status(status, "vaDestroySurfaceGLX()")) {
         return;
+    }
 
     reset(0);
 }
 
 bool VaapiSurfaceGLXImpl::update(boost::shared_ptr<VaapiSurface> surface)
 {
-    if (!this->surface())
+    GNASH_REPORT_FUNCTION;
+
+    if (!this->surface()) {
         return false;
+    }
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return false;
+    }
 
     VAStatus status;
     status = vaSyncSurface(gvactx->display(), surface->get());
@@ -223,8 +245,9 @@ bool VaapiSurfaceGLXImpl::update(boost::shared_ptr<VaapiSurface> surface)
 
     status = vaCopySurfaceGLX(gvactx->display(), this->surface(),
                               surface->get(), VA_FRAME_PICTURE);
-    if (!vaapi_check_status(status, "vaCopySurfaceGLX()"))
+    if (!vaapi_check_status(status, "vaCopySurfaceGLX()")) {
         return false;
+    }
 
     return true;
 }
@@ -236,9 +259,15 @@ VaapiSurfaceGLX::VaapiSurfaceGLX(GLenum target, GLuint texture)
 
 bool VaapiSurfaceGLX::update(boost::shared_ptr<VaapiSurface> surface)
 {
-    D(bug("VaapiSurfaceGLX::update(): from surface 0x%08x\n", surface->get()));
+    log_debug("VaapiSurfaceGLX::update(): from surface 0x%08x\n", surface->get());
 
     return dynamic_cast<VaapiSurfaceGLXImpl *>(_impl.get())->update(surface);
 }
 
 } // gnash namespace
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

@@ -17,12 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "log.h"
 #include "VaapiSurfaceProxy.h"
 #include "VaapiSurface.h"
 #include "VaapiContext.h"
-
-#define DEBUG 0
-#include "vaapi_debug.h"
 
 namespace gnash {
 
@@ -30,13 +28,20 @@ VaapiSurfaceProxy::VaapiSurfaceProxy(boost::shared_ptr<VaapiSurface> surface,
                                      boost::shared_ptr<VaapiContext> context)
     : _context(context), _surface(surface)
 {
-    D(bug("VaapiSurfaceProxy::VaapiSurfaceProxy(): surface 0x%08x\n", _surface->get()));
+    log_debug("VaapiSurfaceProxy::VaapiSurfaceProxy(): surface 0x%08x\n", _surface->get());
 }
 
 VaapiSurfaceProxy::~VaapiSurfaceProxy()
 {
-    D(bug("VaapiSurfaceProxy::~VaapiSurfaceProxy(): surface 0x%08x\n", _surface->get()));
+    log_debug("VaapiSurfaceProxy::~VaapiSurfaceProxy(): surface 0x%08x\n", _surface->get());
+
     _context->releaseSurface(_surface);
 }
 
 } // gnash namespace
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

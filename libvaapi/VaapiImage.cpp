@@ -17,16 +17,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include <boost/format.hpp>
+#include <cstring>
+
 #include "VaapiImage.h"
 #include "VaapiSurface.h"
 #include "VaapiGlobalContext.h"
 #include "VaapiException.h"
 #include "vaapi_utils.h"
-#include <boost/format.hpp>
-#include <cstring>
-
-#define DEBUG 0
-#include "vaapi_debug.h"
+#include "log.h"
 
 namespace gnash {
 
@@ -36,7 +35,7 @@ VaapiImage::VaapiImage(unsigned int     width,
     : _format(format)
     , _image_data(NULL)
 {
-    D(bug("VaapiImage::VaapiImage(): format '%s'\n", string_of_FOURCC(format)));
+    log_debug("VaapiImage::VaapiImage(): format '%s'\n", string_of_FOURCC(format));
 
     memset(&_image, 0, sizeof(_image));
     _image.image_id = VA_INVALID_ID;
@@ -51,7 +50,8 @@ VaapiImage::VaapiImage(unsigned int     width,
 
 VaapiImage::~VaapiImage()
 {
-    D(bug("VaapiImage::~VaapiImage()\n"));
+
+    GNASH_REPORT_FUNCTION;
 
     destroy();
 }
@@ -59,15 +59,16 @@ VaapiImage::~VaapiImage()
 // Create VA image
 bool VaapiImage::create(unsigned int width, unsigned int height)
 {
-    D(bug("VaapiImage::create()\n"));
+    GNASH_REPORT_FUNCTION;
 
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
     if (!gvactx)
         return false;
 
     const VAImageFormat *va_format = gvactx->getImageFormat(_format);
-    if (!va_format)
+    if (!va_format) {
         return false;
+    }
 
     VAStatus status;
     _image.image_id = VA_INVALID_ID;
@@ -78,7 +79,8 @@ bool VaapiImage::create(unsigned int width, unsigned int height)
     if (!vaapi_check_status(status, "vaCreateImage()"))
         return false;
 
-    D(bug("  image 0x%08x, format '%s'\n", get(), string_of_FOURCC(_format)));
+    log_debug("  image 0x%08x, format '%s'\n", get(), string_of_FOURCC(_format));
+
     return true;
 }
 
@@ -87,63 +89,75 @@ void VaapiImage::destroy()
 {
     unmap();
 
-    if (_image.image_id == VA_INVALID_ID)
+    if (_image.image_id == VA_INVALID_ID) {
         return;
+    }
 
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return;
+    }
 
     VAStatus status;
     status = vaDestroyImage(gvactx->display(), _image.image_id);
-    if (!vaapi_check_status(status, "vaDestroyImage()"))
+    if (!vaapi_check_status(status, "vaDestroyImage()")) {
         return;
+    }
 }
 
 // Map image data
 bool VaapiImage::map()
 {
-    if (isMapped())
+    if (isMapped()) {
         return true;
+    }
 
-    if (_image.image_id == VA_INVALID_ID)
+    if (_image.image_id == VA_INVALID_ID) {
         return false;
+    }
 
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return false;
+    }
 
     VAStatus status;
     status = vaMapBuffer(gvactx->display(), _image.buf, (void **)&_image_data);
-    if (!vaapi_check_status(status, "vaMapBuffer()"))
+    if (!vaapi_check_status(status, "vaMapBuffer()")) {
         return false;
+    }
+
     return true;
 }
 
 // Unmap image data
 bool VaapiImage::unmap()
 {
-    if (!isMapped())
+    if (!isMapped()) {
         return true;
+    }
 
     _image_data = NULL;
 
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return false;
+    }
 
     VAStatus status;
     status = vaUnmapBuffer(gvactx->display(), _image.buf);
-    if (!vaapi_check_status(status, "vaUnmapBuffer()"))
+    if (!vaapi_check_status(status, "vaUnmapBuffer()")) {
         return false;
+    }
     return true;
 }
 
 // Get pixels for the specified plane
 boost::uint8_t *VaapiImage::getPlane(int plane) const
 {
-    if (!isMapped())
+    if (!isMapped()) {
         throw VaapiException("VaapiImage::getPixels(): unmapped image");
+    }
 
     return _image_data + _image.offsets[plane];
 }
@@ -151,10 +165,16 @@ boost::uint8_t *VaapiImage::getPlane(int plane) const
 // Get scanline pitch for the specified plane
 unsigned int VaapiImage::getPitch(int plane) const
 {   
-    if (!isMapped())
+    if (!isMapped()) {
         throw VaapiException("VaapiImage::getPitch(): unmapped image");
+    }
 
     return _image.pitches[plane];
 }
 
 } // gnash namespace
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

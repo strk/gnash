@@ -17,6 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "log.h"
 #include "VaapiDisplay.h"
 #include "vaapi_utils.h"
 
@@ -25,6 +26,8 @@ namespace gnash {
 VaapiDisplay::VaapiDisplay(VADisplay display)
     : _display(display)
 {
+    GNASH_REPORT_FUNCTION;
+
     init();
 }
 
@@ -36,18 +39,30 @@ VaapiDisplay::~VaapiDisplay()
 
 bool VaapiDisplay::init()
 {
+    GNASH_REPORT_FUNCTION;
+
     VAStatus status;
     int major_version, minor_version;
 
-    if (!_display)
+    if (!_display) {
         return false;
+    }
 
     status = vaInitialize(_display, &major_version, &minor_version);
-    if (!vaapi_check_status(status, "vaInitialize()"))
+
+    if (!vaapi_check_status(status, "vaInitialize()")) {
       return false;
+    }
 
     vaapi_dprintf("VA API version %d.%d\n", major_version, minor_version);
+
     return true;
 }
 
 } // gnash namespace
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

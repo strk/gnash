@@ -17,19 +17,18 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include <algorithm>
+
+#include "log.h"
 #include "VaapiSurface.h"
 #include "VaapiGlobalContext.h"
 #include "VaapiImage.h"
 #include "VaapiSubpicture.h"
 #include "vaapi_utils.h"
-#include <algorithm>
 
 extern "C" {
 #include <libswscale/swscale.h>
 }
-
-#define DEBUG 0
-#include "vaapi_debug.h"
 
 namespace gnash {
 
@@ -48,43 +47,49 @@ VaapiSurfaceImpl::VaapiSurfaceImpl(const VaapiSurface *surface,
                                    unsigned int width, unsigned int height)
     : VaapiSurfaceImplBase(width, height)
 {
-    D(bug("VaapiSurface::VaapiSurface()\n"));
+    GNASH_REPORT_FUNCTION;
 
-    if (width == 0 || height == 0)
+    if (width == 0 || height == 0) {
         return;
+    }
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return;
+    }
 
     VAStatus status;
     VASurfaceID surface_id;
     status = vaCreateSurfaces(gvactx->display(),
                               width, height, VA_RT_FORMAT_YUV420,
                               1, &surface_id);
-    if (!vaapi_check_status(status, "vaCreateSurfaces()"))
+    if (!vaapi_check_status(status, "vaCreateSurfaces()")) {
         return;
+    }
 
     reset(surface_id);
-    D(bug("  -> surface 0x%08x\n", surface()));
+    //    log_debug("  -> surface 0x%08x\n", surface());
 }
 
 VaapiSurfaceImpl::~VaapiSurfaceImpl()
 {
-    D(bug("VaapiSurface::~VaapiSurface(): surface 0x%08x\n", surface()));
+    log_debug("VaapiSurface::~VaapiSurface(): surface 0x%08x\n", surface());
 
-    if (surface() == VA_INVALID_SURFACE)
+    if (surface() == VA_INVALID_SURFACE) {
         return;
+    }
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return;
+    }
 
     VAStatus status;
     VASurfaceID surface_id = surface();
     status = vaDestroySurfaces(gvactx->display(), &surface_id, 1);
-    if (!vaapi_check_status(status, "vaDestroySurfaces()"))
+    if (!vaapi_check_status(status, "vaDestroySurfaces()")) {
         return;
+    }
 
     reset(VA_INVALID_SURFACE);
 }
@@ -100,33 +105,38 @@ void VaapiSurface::clear()
 {
     VaapiImage background(width(), height(), VAAPI_IMAGE_NV12);
 
-    if (!background.map())
+    if (!background.map()) {
         return;
+    }
 
     // 0x10 is the black level for Y
     boost::uint8_t *Y = background.getPlane(0);
     unsigned int i, stride = background.getPitch(0);
-    for (i = 0; i < background.height(); i++, Y += stride)
+    for (i = 0; i < background.height(); i++, Y += stride) {
         memset(Y, 0x10, stride);
+    }
 
     // 0x80 is the black level for Cb and Cr
     boost::uint8_t *UV = background.getPlane(1);
     stride = background.getPitch(1);
-    for (i = 0; i < background.height()/2; i++, UV += stride)
+    for (i = 0; i < background.height()/2; i++, UV += stride) {
         memset(UV, 0x80, stride);
+    }
 
     background.unmap();
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return;
+    }
 
     VAStatus status;
     status = vaPutImage(gvactx->display(), get(), background.get(),
                         0, 0, background.width(), background.height(),
                         0, 0, width(), height());
-    if (!vaapi_check_status(status, "vaPutImage()"))
+    if (!vaapi_check_status(status, "vaPutImage()")) {
         return;
+    }
 }
 
 // Compare two subpictures
@@ -142,8 +152,9 @@ bool VaapiSurface::associateSubpicture(boost::shared_ptr<VaapiSubpicture> subpic
                                        VaapiRectangle const & dst_rect)
 {
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return false;
+    }
 
     deassociateSubpicture(subpicture);
 
@@ -156,10 +167,11 @@ bool VaapiSurface::associateSubpicture(boost::shared_ptr<VaapiSubpicture> subpic
                                    dst_rect.x, dst_rect.y,
                                    dst_rect.width, dst_rect.height,
                                    0);
-    if (!vaapi_check_status(status, "vaAssociateSubpicture()"))
+    if (!vaapi_check_status(status, "vaAssociateSubpicture()")) {
         return false;
-
+    }
     _subpictures.push_back(subpicture);
+
     return true;
 }
 
@@ -168,22 +180,31 @@ bool VaapiSurface::deassociateSubpicture(boost::shared_ptr<VaapiSubpicture> subp
 {
     std::vector< boost::shared_ptr<VaapiSubpicture> >::iterator it;
     it = std::find(_subpictures.begin(), _subpictures.end(), subpicture);
-    if (it == _subpictures.end())
+    if (it == _subpictures.end()) {
         return false;
+    }
     _subpictures.erase(it);
 
     VaapiGlobalContext * gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return false;
+    }
 
     VAStatus status;
     VASurfaceID surface_id = this->get();
     status = vaDeassociateSubpicture(gvactx->display(), subpicture->get(),
                                      &surface_id, 1);
-    if (!vaapi_check_status(status, "vaDeassociateSubpicture()"))
+    if (!vaapi_check_status(status, "vaDeassociateSubpicture()")) {
         return false;
+    }
 
     return true;
 }
 
 } // gnash namespace
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

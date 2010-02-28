@@ -72,4 +72,10 @@ public:
 
 } // gnash namespace
 
-#endif /* GNASH_VAAPIGLOBALCONTEXT_H */
+#endif // GNASH_VAAPIGLOBALCONTEXT_H
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

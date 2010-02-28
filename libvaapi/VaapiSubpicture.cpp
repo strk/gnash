@@ -17,15 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include <boost/format.hpp>
+
+#include "log.h"
 #include "VaapiSubpicture.h"
 #include "VaapiGlobalContext.h"
 #include "VaapiException.h"
 #include "VaapiImage.h"
 #include "vaapi_utils.h"
-#include <boost/format.hpp>
-
-#define DEBUG 0
-#include "vaapi_debug.h"
 
 namespace gnash {
 
@@ -33,7 +32,7 @@ VaapiSubpicture::VaapiSubpicture(boost::shared_ptr<VaapiImage> image)
     : _image(image)
     , _subpicture(VA_INVALID_ID)
 {
-    D(bug("VaapiSubpicture::VaapiSubpicture(): format '%s'\n", string_of_FOURCC(image->format())));
+    log_debug("VaapiSubpicture::VaapiSubpicture(): format '%s'\n", string_of_FOURCC(image->format()));
 
     if (!create()) {
         boost::format msg;
@@ -45,26 +44,29 @@ VaapiSubpicture::VaapiSubpicture(boost::shared_ptr<VaapiImage> image)
 
 VaapiSubpicture::~VaapiSubpicture()
 {
-    D(bug("VaapiSubpicture::~VaapiSubpicture()\n"));
+    GNASH_REPORT_FUNCTION;
 
     destroy();
 }
 
 bool VaapiSubpicture::create()
 {
-    D(bug("VaapiSubpicture::create()\n"));
+    GNASH_REPORT_FUNCTION;
 
-    if (!_image.get())
+    if (!_image.get()) {
 	return false;
+    }
 
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return false;
+    }
 
     VASubpictureID subpicture;
     VAStatus status = vaCreateSubpicture(gvactx->display(), _image->get(), &subpicture);
-    if (!vaapi_check_status(status, "vaCreateSubpicture()"))
+    if (!vaapi_check_status(status, "vaCreateSubpicture()")) {
 	return false;
+    }
 
     _subpicture = subpicture;
     return true;
@@ -73,8 +75,9 @@ bool VaapiSubpicture::create()
 void VaapiSubpicture::destroy()
 {
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
-    if (!gvactx)
+    if (!gvactx) {
         return;
+    }
 
     if (_subpicture != VA_INVALID_ID) {
 	VAStatus status = vaDestroySubpicture(gvactx->display(), _subpicture);
@@ -84,4 +87,10 @@ void VaapiSubpicture::destroy()
     }
 }
 
-}
+} // end of gnash namespace
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
