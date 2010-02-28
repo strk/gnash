@@ -20,12 +20,12 @@
 #include <boost/format.hpp>
 #include <cstring>
 
+#include "log.h"
 #include "VaapiImage.h"
 #include "VaapiSurface.h"
 #include "VaapiGlobalContext.h"
 #include "VaapiException.h"
 #include "vaapi_utils.h"
-#include "log.h"
 
 namespace gnash {
 

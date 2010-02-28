@@ -26,7 +26,7 @@
     The variables in the <filename>.gnashrc</filename> file support
     three types of arguments: on/off, numeric values, or in the case
     of the whitelist and blacklist, a list of hostnames as ASCII text. 
-  </para>  
+  </para>
   
   <table id="tb-config-variables">
     <title>User Configuration Variables</title>

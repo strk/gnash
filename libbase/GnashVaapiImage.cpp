@@ -17,13 +17,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+
+#include <time.h>
+
+#include "log.h"
 #include "GnashVaapiImage.h"
 #include "vaapi.h"
-#include <time.h>
-#include "log.h"
-
-#define DEBUG 0
-#include "vaapi_debug.h"
 
 namespace gnash {
 
@@ -67,8 +66,8 @@ GnashVaapiImage::GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface, ImageT
     , _surface(surface)
     , _creation_time(get_ticks_usec())
 {
-    D(bug("GnashVaapiImage::GnashVaapiImage(): surface 0x%08x, size %dx%d\n",
-          _surface->get(), _width, _height));
+    log_debug("GnashVaapiImage::GnashVaapiImage(): surface 0x%08x, size %dx%d\n",
+          _surface->get(), _width, _height);
 }
 
 GnashVaapiImage::GnashVaapiImage(const GnashVaapiImage& o)
@@ -77,20 +76,20 @@ GnashVaapiImage::GnashVaapiImage(const GnashVaapiImage& o)
     , _surface(o.surface())
     , _creation_time(get_ticks_usec())
 {
-    D(bug("GnashVaapiImage::GnashVaapiImage(): VA image %p\n", &o));
+    log_debug("GnashVaapiImage::GnashVaapiImage(): VA image %p\n", &o);
 
     update(o);
 }
 
 GnashVaapiImage::~GnashVaapiImage()
 {
-    D(bug("GnashVaapiImage::~GnashVaapiImage(): surface 0x%08x\n",
-          _surface->get()));
+    log_debug("GnashVaapiImage::~GnashVaapiImage(): surface 0x%08x\n",
+          _surface->get());
 }
 
 std::auto_ptr<GnashImage> GnashVaapiImage::clone()
 {
-    D(bug("GnashVaapiImage::clone(): image %p\n", this));
+    log_debug("GnashVaapiImage::clone(): image %p\n", this);
 
     return std::auto_ptr<GnashImage>(new GnashVaapiImage(*this));
 }
@@ -103,7 +102,7 @@ void GnashVaapiImage::update(boost::shared_ptr<VaapiSurface> surface)
 
 void GnashVaapiImage::update(boost::uint8_t* data)
 {
-    D(bug("GnashVaapi::update(): data %p\n", data));
+    log_debug("GnashVaapi::update(): data %p\n", data);
 
     /* XXX: use vaPutImage() */
     _creation_time = get_ticks_usec();
@@ -131,10 +130,10 @@ void GnashVaapiImage::update(const GnashImage& from)
 // Transfer (and convert) VA surface to CPU image data
 bool GnashVaapiImage::transfer()
 {
-    /* NOTE: if VAAPI is used, we have a dedicated backend, so we
-       should not have to retrieve the VA surface underlying pixels.
-       Mark this usage scenario as a fatal error and fix the code
-       instead. */
+    // NOTE: if VAAPI is used, we have a dedicated backend, so we
+    //       should not have to retrieve the VA surface underlying pixels.
+    //       Mark this usage scenario as a fatal error and fix the code
+    //       instead.
     log_error("GnashVaapiImage: VA surface to SW pixels are not supported\n");
     assert(0);
 
@@ -145,12 +144,13 @@ bool GnashVaapiImage::transfer()
 // Get access to the underlying data
 boost::uint8_t* GnashVaapiImage::data()
 {
-    D(bug("GnashVaapiImage::data(): surface 0x%08x\n", _surface->get()));
-    D(bug("  -> %u usec from creation\n",
-          (boost::uint32_t)(get_ticks_usec() - _creation_time)));
+    log_debug("GnashVaapiImage::data(): surface 0x%08x\n", _surface->get());
+    log_debug("  -> %u usec from creation\n",
+	      (boost::uint32_t)(get_ticks_usec() - _creation_time));
 
-    if (!transfer())
+    if (!transfer()) {
         return NULL;
+    }
 
     return _data.get();
 }
@@ -158,15 +158,21 @@ boost::uint8_t* GnashVaapiImage::data()
 // Get read-only access to the underlying data
 const boost::uint8_t* GnashVaapiImage::data() const
 {
-    D(bug("GnashVaapiImage::data() const: surface 0x%08x\n", _surface->get()));
-    D(bug("  -> %u usec from creation\n",
-          (boost::uint32_t)(get_ticks_usec() - _creation_time)));
+    log_debug("GnashVaapiImage::data() const: surface 0x%08x\n", _surface->get());
+    log_debug("  -> %u usec from creation\n",
+          (boost::uint32_t)(get_ticks_usec() - _creation_time));
 
     /* XXX: awful hack... */
-    if (!const_cast<GnashVaapiImage *>(this)->transfer())
+    if (!const_cast<GnashVaapiImage *>(this)->transfer()) {
         return NULL;
+    }
 
     return _data.get();
 }
 
 } // gnash namespace
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
