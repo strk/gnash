@@ -242,6 +242,13 @@ public:
     }
 
     // Get the location of the sandbox for .sol files
+    const std::string &getHWAccel() const { return _hwaccel; }
+
+    // Set the location of the sandbox for .sol files
+    void setHWAccel(const std::string &x) { _hwaccel = x; }
+
+
+    // Get the location of the sandbox for .sol files
     const std::string &getSOLSafeDir() const { return _solsandbox; }
 
     // Set the location of the sandbox for .sol files
@@ -564,6 +571,9 @@ protected:
     /// default value is true
     bool _ignoreShowMenu;
 
+    /// Whether to ue HW video decoding support, no value means disabled.
+    /// The only currently supported value other than blank is "vaapi".
+    std::string _hwaccel;
 };
 
 // End of gnash namespace 
