@@ -50,10 +50,14 @@ static const char *
 find_pixel_format(VaapiImageFormat format)
 {
     switch (format) {
-    case VAAPI_IMAGE_RGBA: return "RGBA32";
-    case VAAPI_IMAGE_ARGB: return "ARGB32";
-    case VAAPI_IMAGE_ABGR: return "ABGR32";
-    case VAAPI_IMAGE_BGRA: return "BGRA32";
+    case VAAPI_IMAGE_RGBA:
+	return "RGBA32";
+    case VAAPI_IMAGE_ARGB: return
+	    "ARGB32";
+    case VAAPI_IMAGE_ABGR:
+	return "ABGR32";
+    case VAAPI_IMAGE_BGRA:
+	return "BGRA32";
     default:;
     }
     return NULL;
@@ -102,8 +106,9 @@ VaapiVideoWindow::VaapiVideoWindow(GdkWindow *parent_window, VaapiRectangle cons
     wattr.wclass      = GDK_INPUT_OUTPUT;
     wattr.window_type = GDK_WINDOW_CHILD;
     _window = gdk_window_new(parent_window, &wattr, GDK_WA_X|GDK_WA_Y);
-    if (!_window)
+    if (!_window) {
         throw VaapiException("Could not create video child window");
+    }
 
     gdk_window_show(_window);
     gdk_window_raise(_window);
@@ -122,8 +127,9 @@ VaapiVideoWindow::~VaapiVideoWindow()
 void
 VaapiVideoWindow::moveResize(VaapiRectangle const & rect)
 {
-    if (!_window)
+    if (!_window) {
         return;
+    }
 
     gdk_window_move_resize(_window, rect.x, rect.y, rect.width, rect.height);
     gdk_flush();

@@ -65,6 +65,10 @@ static gboolean gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigur
 static void gnash_canvas_realize(GtkWidget *widget);
 static void gnash_canvas_after_realize(GtkWidget *widget);
 
+namespace {
+gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+}
+
 GtkWidget *
 gnash_canvas_new ()
 {
@@ -191,17 +195,20 @@ gnash_canvas_setup(GnashCanvas *canvas, int argc, char **argv[])
 {
 
     GNASH_REPORT_FUNCTION;
+
+    // TODO: improve checks for the AGG backend. Order should be VAAPI, Xv, X11
     // TODO: don't rely on a macro to select renderer
 #ifdef RENDERER_CAIRO
     canvas->glue.reset(new gnash::GtkCairoGlue);
 #elif defined(RENDERER_OPENGL)
     canvas->glue.reset(new gnash::GtkGlExtGlue);
 #elif defined(RENDERER_AGG) && USE_VAAPI
-    // TODO: improve checks for the AGG backend. Order should be VAAPI, Xv, X11
-    canvas->glue.reset(new gnash::GtkAggVaapiGlue);
-    if (!canvas->glue->init(argc, argv)) {
-        canvas->glue.reset(new gnash::GtkAggGlue);
-        canvas->glue->init(argc, argv);
+    if (rcfile.getHWAccel() == "vaapi") {
+	canvas->glue.reset(new gnash::GtkAggVaapiGlue);
+	canvas->glue->init(argc, argv);
+    } else {
+	canvas->glue.reset(new gnash::GtkAggGlue);
+	canvas->glue->init(argc, argv);
     }
 #elif defined(RENDERER_AGG) && !defined(HAVE_XV)
     canvas->glue.reset(new gnash::GtkAggGlue);
