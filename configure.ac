@@ -1121,27 +1121,6 @@ if test x$build_agg = xyes; then
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
 fi
 
-dnl Check for VA API
-AC_ARG_ENABLE(vaapi, [Enable Video Acceleration support (default=no)],
-[case "${enableval}" in
-  yes) enable_vaapi=yes ;;
-  no)  enable_vaapi=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-vaapi option]) ;;
-esac],enable_vaapi=yes)
-
-dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
-dnl restrict using HW Accel to using ffmpeg directly.
-if test x"${media_handler}" = x"gst" -a x"${enable_vaapi}" = x"yes"; then
-  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
-fi
-
-if test x"${enable_vaapi}" = x"yes"; then
-  AC_DEFINE([USE_VAAPI], [1], [Enable libVA API])
-  if test x$build_ogl = xyes; then
-    AC_DEFINE([USE_VAAPI_GLX], [1], [Enable libVA API with GLX extensions])
-  fi
-fi
-
 DLOPEN="-dlopen"
 DLPREOPEN="-dlpreopen"
 AC_SUBST(DLOPEN)
@@ -1482,17 +1461,72 @@ dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
 dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
 
-use_vaapi=no
-use_vaapi_x11=no
-use_vaapi_glx=no
-if test x"${enable_vaapi}" = x"yes"; then
-  use_vaapi=yes
+AC_ARG_WITH(hwaccel,
+  AC_HELP_STRING([--with-hwaccel=], [Specify which accleration to support to enable (none,vaapi,omap)]),
+  if test -n ${withval}; then
+    if test "x${withval}" != "xno" -o "x${withval}" != "xnone" ; then
+      hwaccel_list="none"
+      withval=`echo ${withval} | tr '\054' ' ' `
+    else
+      hwaccel_list=""
+      withval=""
+    fi
+  fi
+  hwaccel_list=""
+  nhwaccel=0
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      no*|NO*)
+        hwaccel_list="none"
+        build_vaapi=no
+        build_omap=no
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      va*|VA*)
+        hwaccel_list="${hwaccel_list} vaapi"
+        build_vaapi=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      omap*|OMAP*)
+        hwaccel_list="${hwaccel_list} omap"
+        build_omap=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      *) AC_MSG_ERROR([invalid hwaccel feature specified: ${withval} given (accept: none,vaapi,omap)])
+        ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$withval"; then
+      break;
+    fi
+  done
+)
+
+dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
+dnl restrict using HW Accel to using ffmpeg directly.
+if test x"${media_handler}" = x"gst" -a x"${build_vaapi}" = x"yes"; then
+  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
+fi
+
+if test x"${build_vaapi}" = x"yes"; then
+  AC_DEFINE([USE_VAAPI], [1], [Enable libVA API])
+  if test x$build_ogl = xyes; then
+    AC_DEFINE([USE_VAAPI_GLX], [1], [Enable libVA API with GLX extensions])
+  fi
+fi
+
+use_libva=no
+use_vliba_x11=no
+use_libva_glx=no
+if test x"${build_vaapi}" = x"yes"; then
+  use_libva=yes
   GNASH_PKG_FIND([libva],
     [va/va.h],
     [Video Acceleration API],
     vaInitialize
   )
-  use_vaapi_x11=yes
+  use_libva_x11=yes
   GNASH_PKG_FIND([libva_x11],
     [va/va_x11.h],
     [VA API (X11 display)],
@@ -1501,7 +1535,7 @@ if test x"${enable_vaapi}" = x"yes"; then
   )
 
   if test x$build_ogl = xyes; then
-    use_vaapi_glx=yes
+    use_libva_glx=yes
     GNASH_PKG_FIND([libva_glx],
       [va/va_glx.h],
       [VA API (GLX display)],
@@ -1512,9 +1546,10 @@ if test x"${enable_vaapi}" = x"yes"; then
 fi
 
 dnl libVA drivers
-AM_CONDITIONAL(USE_VAAPI, test x"${use_vaapi}" = xyes)
-AM_CONDITIONAL(USE_VAAPI_X11, test x"${use_vaapi_x11}" = xyes)
-AM_CONDITIONAL(USE_VAAPI_GLX, test x"${use_vaapi_glx}" = xyes)
+AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
+AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
+AM_CONDITIONAL(USE_VAAPI_X11, test x"${use_libva_x11}" = xyes)
+AM_CONDITIONAL(USE_VAAPI_GLX, test x"${use_libva_glx}" = xyes)
 
 dnl IRIX-hack.
 case $host in
@@ -2605,6 +2640,10 @@ if test x"$security_list" != x; then
   echo "        Enabling security features: ${security_list}"
 fi
 
+if test x"${hwaccel_list}" != xnone; then
+  echo "        Enabling hardware acceleration features: ${hwaccel_list}"
+fi
+
 if test x"$statistics_list" != x; then
   echo "        Enabling statistics collecting for: ${statistics_list}"
 fi
@@ -2616,7 +2655,7 @@ fi
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
-if test x"${enable_vaapi}" = x"yes"; then
+if test x"${build_vaapi}" = x"yes"; then
   echo "        Video Acceleration via libVA API support: yes"
   if test x$use_vaapi_x11 = xyes; then
     echo "        Video Acceleration via libVA X11 API support: yes"
@@ -3424,7 +3463,7 @@ if test "$GMSGFMT" = ":"; then
   echo "                 or .rpm users: yum install gettext" >&4
 fi
 
-if test x"${enable_vaapi}" = x"yes"; then
+if test x"${build_vaapi}" = x"yes"; then
   if test x"${LIBVA_CFLAGS}" = xyes; then
       echo "        LIBVA flags are: default"
     else

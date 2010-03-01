@@ -168,9 +168,6 @@ bzrversion.h: Makefile.in
 BRANCH_REVNO  = `grep "REVNO" bzrversion.h | cut -d '"' -f 2`
 BRANCH_NICK   = `grep "NICK" bzrversion.h | cut -d '"' -f 2`
 
-test:
-	echo $(SNAPSHOT_NAME)
-
 #
 # Binary tarball packaging
 #
@@ -456,6 +453,10 @@ if USE_PYTHON
 else
 	@echo "	PYTHON support disabled"
 endif
+if BUILD_OMAP
+	@echo "	Hardware Acceleration support via OMAP enabled"
+else
+	@echo "	Hardware Acceleration support via OMAP disabled"
 if USE_VAAPI
 	@echo "	Hardware Acceleration support via libVA API enabled"
 else
@@ -470,6 +471,7 @@ if USE_VAAPI_GLX
 	@echo "	Hardware Acceleration support via libVA OpenGL renderer enabled"
 else
 	@echo "	Hardware Acceleration support via libVA OpenGL renderer disabled"
+endif
 endif
 
 if TESTSUITE
