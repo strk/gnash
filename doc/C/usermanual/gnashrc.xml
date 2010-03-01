@@ -298,21 +298,24 @@
 	  <entry>string</entry>
 	  <entry>
 	    Specify the type of Hardware Video Decoder. Currently only
-	    <emphasis>vaapi</emphasis>, <emphasis>omap3</emphasis>, or
-	    <emphasis>none</emphasis> are supported. None disables
-	    any acceleration support (the default).
+	    <emphasis>vaapi</emphasis>, <emphasis>omap</emphasis>,
+	    <emphasis>xv</emphasis> or <emphasis>none</emphasis> are
+	    supported. None disables any acceleration support (the
+	    default).
 	  </entry>
 	</row>
 
 	<row>
-	  <entry>XVideo</entry>
-	  <entry>on/off</entry>
-	  <entry>If set to <emphasis>on</emphasis>, &app; will attempt
-	  to render using the X Video Extension, if system support was
-	  found during compilation. By default, X Video rendering is
-	  disabled. 
+	  <entry>Renderer</entry>
+	  <entry>string</entry>
+	  <entry>
+	    Specify the type of Renderer to use. Currently only
+	    <emphasis>agg</emphasis>, <emphasis>opengl</emphasis>, or
+	    <emphasis>cairo</emphasis> are supported. The default is
+	    AGG, as it doesn't require any special hardware support.
 	  </entry>
 	</row>
+
 	<row>
 	  <entry>quality</entry>
 	  <entry>[-1|0|1|2|3]</entry>
