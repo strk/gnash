@@ -31,6 +31,7 @@ GNASH_INCLUDES = \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libmedia/gst \
 	-I$(top_srcdir)/libmedia/ffmpeg \
+	-I$(top_srcdir)/libvaapi \
 	-I$(top_srcdir)/libsound
 
 INCLUDES = \
@@ -54,7 +55,8 @@ gnash_la_LDFLAGS = -module -avoid-version initgnash -export-dynamic #-no-undefin
 gnash_la_LIBADD = \
 	$(GNASH_LIBS) \
 	$(GTK2_LIBS) \
-	$(DEPS_LIBS)
+	$(DEPS_LIBS) \
+	$(LIBVA_LIBS) $(LIBVA_X11_LIBS) 
 
 instdir = $(includedir)/gnash
 inst_HEADERS = gnash-view.h

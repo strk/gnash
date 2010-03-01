@@ -51,8 +51,7 @@ public:
     RunResources(const std::string& baseURL)
         :
         _baseURL(baseURL)
-    {
-    }
+    { /* do nothing */  }
 
     /// Get the base URL for the run.
     //
@@ -120,6 +119,20 @@ public:
         return *_tagLoaders;
     }
 
+#if 1
+    /// Set the renderer backend, agg, opengl, or cairo. This is set
+    /// in the users gnashrc file, or can be overridden with the
+    /// --hwaccel option to gnash.
+    void setRenderBackend(const std::string &x) {_renderer_backend = x; }
+    std::string &getRenderBackend() { return _renderer_backend; }
+
+    /// Set the hardware video accleration backend, none, vaapi, xv,
+    /// or cairo. This is set in the users gnashrc file, or can be
+    /// overridden with the --render-mode option to gnash.
+    std::string &getHWAccelBackend() { return _hwaccel_backend; }
+    void setHWAccelBackend(const std::string &x) {_hwaccel_backend = x; }
+#endif
+
 private:
 
     const std::string _baseURL;
@@ -132,8 +145,25 @@ private:
 
     boost::shared_ptr<const SWF::TagLoadersTable> _tagLoaders;
 
+#if 1
+    /// Whether to ue HW video decoding support, no value means disabled.
+    /// The only currently supported values are: none, vaapi, or xv (omap)
+    /// support coming.  The default is none,
+    std::string _hwaccel_backend;
+
+    /// Which renderer backend to use, no value means use the default.
+    /// The currently supported values are agg, opengl, or cairo. AGG
+    /// being the default.
+    std::string _renderer_backend;
+#endif    
 };
 
-}
+} // end of gnash namespace
 
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
+

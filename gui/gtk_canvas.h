@@ -20,6 +20,7 @@
 #ifndef GNASH_GTK_CANVAS_H
 #define GNASH_GTK_CANVAS_H
 
+#include <string>
 #include <gtk/gtkdrawingarea.h>
 #include <boost/shared_ptr.hpp>
 
@@ -47,11 +48,16 @@ struct _GnashCanvasClass {
 GType            gnash_canvas_get_type              ();
 GtkWidget       *gnash_canvas_new                   ();
 
-void             gnash_canvas_setup                 (GnashCanvas *canvas, int argc, char **argv[]);
+void             gnash_canvas_setup                 (GnashCanvas *canvas, std::string &hwaccel, std::string &renderer, int argc, char **argv[]);
 void             gnash_canvas_before_rendering      (GnashCanvas *canvas);
 boost::shared_ptr<gnash::Renderer>  gnash_canvas_get_renderer   (GnashCanvas *canvas);
 
 G_END_DECLS
 
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
 

@@ -114,7 +114,8 @@ Gui::Gui(RunResources& r) :
     //       before and destroyed after _virtualClock !
     ,_systemClock()
     ,_virtualClock(_systemClock)
-
+//     ,_hwaccel_backend("none")
+//     ,_renderer_backend("agg")
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
@@ -159,6 +160,8 @@ Gui::Gui(unsigned long xid, float scale, bool loop, RunResources& r)
     //       before and destroyed after _virtualClock !
     ,_systemClock()
     ,_virtualClock(_systemClock)
+//     ,_hwaccel_backend("none")
+//     ,_renderer_backend("agg")
 
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
@@ -905,8 +908,7 @@ void
 Gui::start()
 {
     assert ( ! _started );
-    if ( _stopped )
-    {
+    if (_stopped) {
         log_debug("Gui is in stop mode, won't start application");
         return;
     }
@@ -934,44 +936,50 @@ Gui::start()
 bool
 Gui::advanceMovie()
 {
-    if (globalQuit) quit();
+    if (globalQuit) {
+	quit();
+    }
 
-	if (isStopped()) return true;
+    if (isStopped()) {
+	return true;
+    }
 
-    if (!_started) start();
+    if (!_started) {
+	start();
+    }
 
-	gnash::movie_root* m = _stage;
-	
-// Define REVIEW_ALL_FRAMES to have *all* frames
-// consequentially displayed. Useful for debugging.
-//#define REVIEW_ALL_FRAMES 1
-
+    gnash::movie_root* m = _stage;
+    
+    // Define REVIEW_ALL_FRAMES to have *all* frames
+    // consequentially displayed. Useful for debugging.
+    //#define REVIEW_ALL_FRAMES 1
+    
 #ifndef REVIEW_ALL_FRAMES
-	// Advance movie by one frame
-	bool advanced = m->advance();
+    // Advance movie by one frame
+    bool advanced = m->advance();
 #else
-	const size_t cur_frame = m->getRootMovie()->get_current_frame();
-	const size_t tot_frames = m->getRootMovie()->get_frame_count();
-	const bool advanced = m->advance();
-	
+    const size_t cur_frame = m->getRootMovie()->get_current_frame();
+    const size_t tot_frames = m->getRootMovie()->get_frame_count();
+    const bool advanced = m->advance();
+    
     m->getRootMovie.ensureFrameLoaded(tot_frames);
-	m->goto_frame(cur_frame + 1);
+    m->goto_frame(cur_frame + 1);
     m->set_play_state(gnash::MovieClip::PLAYSTATE_PLAY);
-	log_debug(_("Frame %d"), m->get_current_frame());
+    log_debug(_("Frame %d"), m->get_current_frame());
 #endif
     
-
 #ifdef GNASH_FPS_DEBUG
     // will be a no-op if fps_timer_interval is zero
-	if (advanced) fpsCounterTick(); 
+    if (advanced) {
+	fpsCounterTick();
+    }
 #endif
-
-
-
+    
+    
     // TODO: ask stage about doDisplay ?
     // - if it didn't advance might need to check updateAfterEvent
     bool doDisplay = true;
-
+    
 #ifdef SKIP_RENDERING_IF_LATE
     // We want to skip rendering IFF it's time to advance again.
     // We'll ask the stage about it
@@ -1006,7 +1014,6 @@ Gui::advanceMovie()
     // Only increment advances and check for exit condition when we've
     // really changed frame.
     if (advanced) {
-
         /// Quit if we've reached the frame advance limit.
         if (_maxAdvances && (_advances > _maxAdvances)) {
             quit();
@@ -1040,7 +1047,9 @@ Gui::requestScreenShots(const ScreenShotter::FrameList& l, bool last,
 {
     // Nothing to do if there is no renderer or if no frames should be
     // saved.
-    if (!_renderer.get() || (l.empty() && !last)) return;
+    if (!_renderer.get() || (l.empty() && !last)) {
+	return;
+    }
 
     _screenShotter.reset(new ScreenShotter(_renderer, filename));
     if (last) _screenShotter->lastFrame();
@@ -1051,6 +1060,7 @@ Gui::requestScreenShots(const ScreenShotter::FrameList& l, bool last,
 void
 Gui::setCursor(gnash_cursor_type /*newcursor*/)
 {
+    /* do nothing */
 }
 
 bool
@@ -1062,23 +1072,26 @@ Gui::want_redraw()
 void
 Gui::setInvalidatedRegion(const SWFRect& /*bounds*/)
 {
+    /* do nothing */
 }
 
 void
 Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
-	// fallback to single regions
-	geometry::Range2d<float> full = ranges.getFullArea();
-	
-	SWFRect bounds;
-	
-	if (full.isFinite())
-		bounds = SWFRect(full.getMinX(), full.getMinY(), full.getMaxX(), full.getMaxY());
-	else
-	if (full.isWorld())
-		bounds.set_world();
-	
-	setInvalidatedRegion(bounds);
+    // fallback to single regions
+    geometry::Range2d<float> full = ranges.getFullArea();
+    
+    SWFRect bounds;
+    
+    if (full.isFinite()) {
+	bounds = SWFRect(full.getMinX(), full.getMinY(), full.getMaxX(), full.getMaxY());
+    } else {
+	if (full.isWorld()) {
+	    bounds.set_world();
+	}
+    }
+    
+    setInvalidatedRegion(bounds);
 }
 
 #ifdef USE_SWFTREE
@@ -1088,8 +1101,7 @@ Gui::getMovieInfo() const
 {
     std::auto_ptr<InfoTree> tr;
 
-    if ( ! VM::isInitialized() )
-    {
+    if (! VM::isInitialized()) {
         return tr;
     }
 
@@ -1117,8 +1129,7 @@ Gui::getMovieInfo() const
     // which relies on the availability of a _rootMovie for doing
     // it's work, while we don't set it if we didn't start..
     // 
-    if ( ! _started )
-    {
+    if (! _started) {
         topIter = tr->insert(topIter, StringPair("Stage properties", 
                     "not constructed yet"));
         return tr;
@@ -1134,8 +1145,7 @@ Gui::getMovieInfo() const
 
     const DisplayObject* ch;
     ch = stage.getActiveEntityUnderPointer();
-    if ( ch )
-    {
+    if (ch) {
 	    std::stringstream ss;
 	    ss << ch->getTarget() << " (" + typeName(*ch)
             << " - depth:" << ch->get_depth()
@@ -1145,8 +1155,7 @@ Gui::getMovieInfo() const
     }
 
     ch = stage.getEntityUnderPointer();
-    if ( ch )
-    {
+    if (ch) {
 	    std::stringstream ss;
 	    ss << ch->getTarget() << " (" + typeName(*ch) 
                << " - depth:" << ch->get_depth()
@@ -1155,8 +1164,7 @@ Gui::getMovieInfo() const
     }
 
     ch = stage.getDraggingCharacter();
-    if ( ch ) 
-    {
+    if (ch) {
 	    std::stringstream ss;
 	    ss << ch->getTarget() << " (" + typeName(*ch) 
                << " - depth:" << ch->get_depth() << ")";
@@ -1171,8 +1179,7 @@ Gui::getMovieInfo() const
     GC::get().countCollectables(cc);
     
     const std::string lbl = "GC managed ";
-    for (GC::CollectablesCount::iterator i=cc.begin(), e=cc.end(); i!=e; ++i)
-    {
+    for (GC::CollectablesCount::iterator i=cc.begin(), e=cc.end(); i!=e; ++i) {
         const std::string& typ = i->first;
         std::ostringstream ss;
         ss << i->second;
@@ -1196,9 +1203,8 @@ Gui::fpsCounterTick()
   // frame count on exit is still valid
   ++fps_counter_total;
 
-  if ( ! fps_timer_interval )
-  {
-	  return;
+  if (! fps_timer_interval) {
+      return;
   }
 
   boost::uint64_t current_timer = clocktime::getTicks();
@@ -1297,21 +1303,21 @@ Gui::yesno(const std::string& question)
 void
 Gui::setQuality(Quality q)
 {
-	if (!_stage) {
-		log_error("Gui::setQuality called before a movie_root was available");
-		return;
-	}
+    if (!_stage) {
+	log_error("Gui::setQuality called before a movie_root was available");
+	return;
+    }
     _stage->setQuality(q);
 }
 
 Quality
 Gui::getQuality() const
 {
-	if (!_stage) {
-		log_error("Gui::getQuality called before a movie_root was available");
-        // just a guess..
-		return QUALITY_HIGH;
-	}
+    if (!_stage) {
+	log_error("Gui::getQuality called before a movie_root was available");
+	// just a guess..
+	return QUALITY_HIGH;
+    }
     return _stage->getQuality();
 }
 
@@ -1321,13 +1327,12 @@ ScreenShotter::saveImage(const std::string& id) const
     // Replace all "%f" in the filename with the frameAdvance.
     std::string outfile(_fileName);
     boost::replace_all(outfile, "%f", id);
-
+    
     FILE* f = std::fopen(outfile.c_str(), "wb");
     if (f) {
         boost::shared_ptr<IOChannel> t(new tu_file(f, true));
         _renderer->renderToImage(t, GNASH_FILETYPE_PNG);
-    }
-    else {
+    } else {
         log_error("Failed to open screenshot file \"%s\"!", outfile);
     }
 }
@@ -1347,7 +1352,9 @@ ScreenShotter::screenShot(size_t frameAdvance)
 void
 ScreenShotter::last() const
 {
-    if (_last) saveImage("last");
+    if (_last) {
+	saveImage("last");
+    }
 }
 
 void
@@ -1359,3 +1366,8 @@ ScreenShotter::setFrames(const FrameList& frames)
 
 // end of namespace
 }
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

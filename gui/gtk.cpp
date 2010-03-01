@@ -76,6 +76,8 @@ namespace gnash
 // Forward declarations
 namespace {
 
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+
     // Menu Item callbacks
     void menuSound(GtkMenuItem *menuitem, gpointer instance);
     void menuFullscreen(GtkMenuItem *menuitem, gpointer instance);
@@ -155,7 +157,7 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, RunResources& r)
 	,_overlay(0)
 	,_canvas(0)
 	,_popup_menu(0)
-    ,_popup_menu_alt(0)
+	,_popup_menu_alt(0)
 	,_menubar(0)
 	,_vbox(0)
 	,_advanceSourceTimer(0)
@@ -196,10 +198,19 @@ GtkGui::init(int argc, char **argv[])
     }
     
     addGnashIcon(GTK_WINDOW(_window));
+    
+    std::string hwaccel = _runResources.getHWAccelBackend();
+    if (hwaccel.empty()) {
+	hwaccel = rcfile.getHWAccel();
+    }
+    std::string renderer = _runResources.getRenderBackend();
+    if (renderer.empty()) {
+	renderer = rcfile.getRenderer();
+    }
 
 #ifdef BUILD_CANVAS
     _canvas = gnash_canvas_new();
-    gnash_canvas_setup(GNASH_CANVAS(_canvas), argc, argv);
+    gnash_canvas_setup(GNASH_CANVAS(_canvas), hwaccel, renderer, argc, argv);
     // Increase reference count to prevent its destruction (which could happen
     // later if we remove it from its container).
     g_object_ref(G_OBJECT(_canvas));
@@ -2749,3 +2760,7 @@ menuQualityBest(GtkMenuItem* /*menuitem*/, gpointer data)
 
 } // end of namespace gnash
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

@@ -38,100 +38,104 @@
 //    The syntax for optional option arguments is `-<short_option><argument>'
 //    (without whitespace), or `--<long_option>=<argument>'.
 
-// This class has been modified with a templated parser.argument<> method, allowing
-// typesafe handling of different return types, and saving using strto* on the user
-// side. I've added an exception class because I'd like to know if we call an argument
-// outside the range of argument - there's no reasonable situation in which that would
+// This class has been modified with a templated parser.argument<>
+// method, allowing typesafe handling of different return types, and
+// saving using strto* on the user side. I've added an exception class
+// because I'd like to know if we call an argument outside the range
+// of argument - there's no reasonable situation in which that would 
 // happen. <bwy>
 
 #include "dsodefs.h"
 #include <sstream>
 
 class Arg_parser
-  {
+{
 public:
-  enum Has_arg { no, yes, maybe };
-
-  struct Option
+    enum Has_arg { no, yes, maybe };
+    
+    struct Option
     {
-    int code;			// Short option letter or code ( code != 0 )
-    const char * name;		// Long option name (maybe null)
-    Has_arg has_arg;
+	int code;			// Short option letter or code ( code != 0 )
+	const char * name;		// Long option name (maybe null)
+	Has_arg has_arg;
     };
-
-  class ArgParserException : public std::exception
-  {
-  public:
-    ArgParserException(const std::string& s)
-		:
-		_msg(s)
+    
+    class ArgParserException : public std::exception
+    {
+    public:
+	ArgParserException(const std::string& s)
+	    :
+	    _msg(s)
 	{}
-
+	
 	virtual ~ArgParserException() throw() {}
-
+	
 	const char* what() const throw() { return _msg.c_str(); }
-
-  private:
-
-	    std::string _msg;
-  };
-
-private:
-  struct Record
-    {
-    int code;
-    std::string argument;
-    Record( const int c = 0 ) : code( c ) {}
+	
+    private:
+	
+	std::string _msg;
     };
-
-  std::string _error;
-  std::vector< Record > data;
-
-  bool parse_long_option( const char * const opt, const char * const arg,
-                          const Option options[], int & argind ) throw();
-  bool parse_short_option( const char * const opt, const char * const arg,
-                           const Option options[], int & argind ) throw();
-
+    
+private:
+    struct Record
+    {
+	int code;
+	std::string argument;
+	Record( const int c = 0 ) : code( c ) {}
+    };
+    
+    std::string _error;
+    std::vector< Record > data;
+    
+    bool parse_long_option( const char * const opt, const char * const arg,
+			    const Option options[], int & argind ) throw();
+    bool parse_short_option( const char * const opt, const char * const arg,
+			     const Option options[], int & argind ) throw();
+    
 public:
-  DSOEXPORT Arg_parser( const int argc, const char * const argv[],
-              const Option options[], const bool in_order = false ) throw();
-
-      // Restricted constructor. Parses a single token and argument (if any)
-  DSOEXPORT Arg_parser( const char * const opt, const char * const arg,
-              const Option options[] ) throw();
-
-  const std::string & error() const throw() { return _error; }
-
-      // The number of arguments parsed (may be different from argc)
-  int arguments() const throw() { return data.size(); }
-
-      // If code( i ) is 0, argument( i ) is a non-option.
-      // Else argument( i ) is the option's argument (or empty).
-  int code( const int i ) const throw()
+    DSOEXPORT Arg_parser( const int argc, const char * const argv[],
+			  const Option options[], const bool in_order = false ) throw();
+    
+    // Restricted constructor. Parses a single token and argument (if any)
+    DSOEXPORT Arg_parser( const char * const opt, const char * const arg,
+			  const Option options[] ) throw();
+    
+    const std::string & error() const throw() { return _error; }
+    
+    // The number of arguments parsed (may be different from argc)
+    int arguments() const throw() { return data.size(); }
+    
+    // If code( i ) is 0, argument( i ) is a non-option.
+    // Else argument( i ) is the option's argument (or empty).
+    int code( const int i ) const throw()
     {
-    if( i >= 0 && i < arguments() ) return data[i].code;
-    else return 0;
+	if( i >= 0 && i < arguments() ) return data[i].code;
+	else return 0;
     }
-
-  std::string argument(const int i) const throw(ArgParserException)
+    
+    std::string argument(const int i) const throw(ArgParserException)
     {
-    if( i >= 0 && i < arguments() ) return data[i].argument;
-    else return _error;
+	if( i >= 0 && i < arguments() ) return data[i].argument;
+	else return _error;
     }    
-
-  template<typename T>
-  T argument(const int i) const throw (ArgParserException)
+    
+    template<typename T>
+    T argument(const int i) const throw (ArgParserException)
     {
         T t = 0;
         if( i >= 0 && i < arguments() )
-        {
-            std::istringstream in(data[i].argument);
-            in >> t;
-            return t;
-        }
+	    {
+		std::istringstream in(data[i].argument);
+		in >> t;
+		return t;
+	    }
         else throw ArgParserException("Code out of range");
-    }
-    
-  
-    
-  };
+    }  
+};
+
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

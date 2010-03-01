@@ -354,6 +354,11 @@ Player::run(int argc, char* argv[], const std::string& infile,
     boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));
 
     _runResources->setStreamProvider(sp);
+
+    // Set the Hardware video decoding resources. none, vaapi, xv, omap
+    _runResources->setHWAccelBackend(_hwaccel);
+    // Set the Renderer resource, opengl, agg, or cairo
+    _runResources->setRenderBackend(_renderer);
     
     init_gui();
 
@@ -513,7 +518,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
         _gui->requestScreenShots(v, last, _screenshotFile);
     }
-    
+
     _gui->run();
 
     log_debug("Main loop ended, cleaning up");

@@ -477,6 +477,11 @@ RcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
             
+            if(noCaseCompare(variable, "Renderer")) {
+                _renderer = value;
+                continue;
+            }
+            
             if (noCaseCompare(variable, "CertDir") ) {
                 expandPath(value);
                 _certdir = value;
@@ -520,8 +525,6 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_sound, "sound", variable, value)
             ||
                  extractSetting(_pluginSound, "pluginsound", variable, value)
-            ||
-                 extractSetting(_useXv, "xvideo", variable, value)
             ||
                  extractSetting(_verboseASCodingErrors,
                            "ASCodingErrorsVerbosity", variable, value)
@@ -728,7 +731,6 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
     cmd << "saveLoadedMedia " << _saveLoadedMedia << endl <<    
-    cmd << "XVideo " << _useXv << endl <<    
    
     // Strings.
 
@@ -792,12 +794,6 @@ void
 RcInitFile::useLocalDomain(bool value)
 {
     _localdomainOnly = value;
-}
-
-void
-RcInitFile::useXv(bool value)
-{
-    _useXv = value;
 }
 
 void

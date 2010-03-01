@@ -1311,10 +1311,7 @@ if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
-   if test x$build_ogl = xyes; then
-      GNASH_PATH_GLEXT
-   fi
-
+   GNASH_PATH_GLEXT
    GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 fi
 if test x$build_hildon = xyes; then
@@ -2145,8 +2142,8 @@ if test x"$media_handler" = x"ffmpeg"; then
   fi
 fi
 
+dnl GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 if test x$build_cairo = xyes; then
-  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 dnl   if test x"${CAIRO_CFLAGS}" != x; then
 dnl      CAIRO_CFLAGS=`echo ${CAIRO_CFLAGS} | sed -e 's/ *//'`
 dnl      CAIRO_CFLAGS="${CAIRO_CFLAGS} ${CAIRO_CFLAGS}/cairo"

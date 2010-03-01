@@ -58,109 +58,122 @@ namespace gnash
 class Player
 {
 public:
-
-	Player();
-
-	~Player();
-
-	/// Play the movie at the given url/path.
-	//
-	/// @param argc
-	///	number of argument strings in argv
-	///
-	/// @param argv
-	///	argument strings 
-	///
-	/// @param url
-	///	an optional url to assign to the given movie.
-	///	if unspecified the url will be set to the 
-	///	movie path/url.
-	///           
-	///
-	int run(int argc, char* argv[],
-		const std::string& infile, const std::string& url = "");
-
-	float setScale(float s);
-
-	// milliseconds per frame
-	void setDelay(unsigned int d) { _delay=d; }
-
+    
+    Player();
+    
+    ~Player();
+    
+    /// Play the movie at the given url/path.
+    //
+    /// @param argc
+    ///	number of argument strings in argv
+    ///
+    /// @param argv
+    ///	argument strings 
+    ///
+    /// @param url
+    ///	an optional url to assign to the given movie.
+    ///	if unspecified the url will be set to the 
+    ///	movie path/url.
+    ///           
+    ///
+    int run(int argc, char* argv[],
+	    const std::string& infile, const std::string& url = "");
+    
+    float setScale(float s);
+    
+    // milliseconds per frame
+    void setDelay(unsigned int d) { _delay=d; }
+    
 #ifdef GNASH_FPS_DEBUG
-	/// Set the number of seconds between FPS debugging prints
-	//
-	/// @param time
-	///	Number of seconds between FPS debugging prints.
-	///	A value of 0 disables FPS printing.
-	///	A negative value results in an assertion failure.
-	///
-	void setFpsPrintTime(float time)
-	{
-		assert(time >= 0.0);
-		_fpsDebugTime = time;
-	}
+    /// Set the number of seconds between FPS debugging prints
+    //
+    /// @param time
+    ///	Number of seconds between FPS debugging prints.
+    ///	A value of 0 disables FPS printing.
+    ///	A negative value results in an assertion failure.
+    ///
+    void setFpsPrintTime(float time)
+    {
+	assert(time >= 0.0);
+	_fpsDebugTime = time;
+    }
 #endif // def GNASH_FPS_DEBUG
-
-	void setWidth(size_t w) { _width = w; }
-	size_t getWidth() { return _width; }
-
-	void setHeight(size_t h) { _height = h; }
-	size_t getHeight() { return _height; }
-
-	void setXPosition(int xPos) { _xPosition = xPos; }
-	size_t getXPosition() { return _xPosition; }
-
-	void setYPosition(int yPos) { _yPosition = yPos; }
-	size_t getYPosition() { return _yPosition; }
-
-	void setWindowId(unsigned long x) { _windowID = x; }
-
-	void setDoLoop(bool b) { _doLoop = b; }
-
-	void setDoRender(bool b) { _doRender = b; }
-
-	void setDoSound(bool b) { _doSound = b; }
-	
-	void setMaxAdvances(unsigned long ul) { if (ul > 0) _maxAdvances = ul; }
-
-	/// Set the base url for this run.
-	//
-	/// The base url will be used to resolve relative
-	/// urls on load requests.
-	///
-	void setBaseUrl(const std::string& baseurl) {
-		_baseurl = baseurl;
-	}
-
-	float setExitTimeout(float n) {
-		float oldtimeout = _exitTimeout;
-		_exitTimeout = n;
-		return oldtimeout;
-	}
-
-	void setParam(std::string& name, std::string& value) {
-		params[name] = value;
-	}
-
-	void setHostFD(int fd) {
-		_hostfd = fd;
-	}
-	
+    
+    void setWidth(size_t w) { _width = w; }
+    size_t getWidth() { return _width; }
+    
+    void setHeight(size_t h) { _height = h; }
+    size_t getHeight() { return _height; }
+    
+    void setXPosition(int xPos) { _xPosition = xPos; }
+    size_t getXPosition() { return _xPosition; }
+    
+    void setYPosition(int yPos) { _yPosition = yPos; }
+    size_t getYPosition() { return _yPosition; }
+    
+    void setWindowId(unsigned long x) { _windowID = x; }
+    
+    void setDoLoop(bool b) { _doLoop = b; }
+    
+    void setDoRender(bool b) { _doRender = b; }
+    
+    void setDoSound(bool b) { _doSound = b; }
+    
+    void setMaxAdvances(unsigned long ul) { if (ul > 0) _maxAdvances = ul; }
+    
+    /// Set the base url for this run.
+    //
+    /// The base url will be used to resolve relative
+    /// urls on load requests.
+    ///
+    void setBaseUrl(const std::string& baseurl) {
+	_baseurl = baseurl;
+    }
+    
+    float setExitTimeout(float n) {
+	float oldtimeout = _exitTimeout;
+	_exitTimeout = n;
+	return oldtimeout;
+    }
+    
+    void setParam(std::string& name, std::string& value) {
+	params[name] = value;
+    }
+    
+    void setHostFD(int fd) {
+	_hostfd = fd;
+    }
+    
     int getHostFD() const {
-        return _hostfd;
+	return _hostfd;
     }
-
-	void setStartFullscreen(bool x) {
-	    _startFullscreen = x;
-	}
-	
+    
+    void setStartFullscreen(bool x) {
+	_startFullscreen = x;
+    }
+    
     void hideMenu(bool x) {
-	    _hideMenu = x;
-	}
-
-    void setAudioDumpfile(const std::string& filespec) {
-        _audioDump = filespec;
+	_hideMenu = x;
     }
-	
+    
+    void setAudioDumpfile(const std::string& filespec) {
+	_audioDump = filespec;
+    }
+    
+    /// Set the renderer backend, agg, opengl, or cairo. This is set
+    /// in the users gnashrc file, or can be overridden with the
+    /// --hwaccel option to gnash.
+    void setRenderer(const std::string &x) { _renderer = x; }
+    std::string &getRenderer() { return _renderer; }
+    
+    /// Set the hardware video accleration backend, none, vaapi, xv,
+    /// or cairo. This is set in the users gnashrc file, or can be
+    /// overridden with the --render-mode option to gnash.
+    std::string &getHWAccel() { return _hwaccel; }
+    void setHWAccel(const std::string &x) { _hwaccel = x; }
+    
+
     /// This should be a comma-separated list of frames.
     //
     /// Only numbers and the word "last" are valid.
@@ -180,105 +193,115 @@ public:
 
 private:
 
-	class CallbacksHandler : public movie_root::AbstractIfaceCallback,
-		                     public movie_root::AbstractFsCallback
-	{
-	public:
-		CallbacksHandler(Gui& gui, const Player& player)
-			:
-			_gui(gui),
+    /// Whether to ue HW video decoding support, no value means disabled.
+    /// The only currently supported values are: none, vaapi, or xv (omap)
+    /// support coming.  The default is none,
+    std::string _hwaccel;
+    
+    /// Which renderer backend to use, no value means use the default.
+    /// The currently supported values are agg, opengl, or cairo. AGG
+    /// being the default.
+    std::string _renderer;
+
+    class CallbacksHandler : public movie_root::AbstractIfaceCallback,
+			     public movie_root::AbstractFsCallback
+    {
+    public:
+	CallbacksHandler(Gui& gui, const Player& player)
+	    :
+	    _gui(gui),
             _player(player)
-		{}
-
-		std::string call(const std::string& event,
-				const std::string& arg);
-
-		bool yesNo(const std::string& query);
-
+	{ /* do nothing */}
+	
+	std::string call(const std::string& event,
+			 const std::string& arg);
+	
+	bool yesNo(const std::string& query);
+	
         void error(const std::string& msg);
-
-		// For handling notification callbacks from ActionScript.
-		// The callback is always sent to a hosting application
-		// (i.e. if a file descriptor is supplied). It is never
-		// acted on by Gnash when running as a plugin.
-		void notify(const std::string& event, const std::string& arg);
-
-	private:
-
-		Gui& _gui;
-
-        const Player& _player;
-	};
-
-	std::auto_ptr<CallbacksHandler> _callbacksHandler;
-
-	void init();
-
-	/// This aux streamer returns a silent audio stream
-	///
-	/// @param udata
-	///     Pointer to user-specific data
-	/// @param stream
-	///     Buffer into which method will put samples
-	/// @param len
-	///     Requested amount of samples to put
-	/// @param atEOF
-	///     Will always set to false, silent stream never ends ..
+	
+	// For handling notification callbacks from ActionScript.
+	// The callback is always sent to a hosting application
+	// (i.e. if a file descriptor is supplied). It is never
+	// acted on by Gnash when running as a plugin.
+	void notify(const std::string& event, const std::string& arg);
+	
+    private:
+	
+	Gui& _gui;
+	
+	const Player& _player;
+    };
+    
+    std::auto_ptr<CallbacksHandler> _callbacksHandler;
+    
+    void init();
+    
+    /// This aux streamer returns a silent audio stream
+    ///
+    /// @param udata
+    ///     Pointer to user-specific data
+    /// @param stream
+    ///     Buffer into which method will put samples
+    /// @param len
+    ///     Requested amount of samples to put
+    /// @param atEOF
+    ///     Will always set to false, silent stream never ends ..
     /// 
-	/// @return always the len parameter value (silent stream never ends 
+    /// @return always the len parameter value (silent stream never ends 
     ///         and is always available)
     ///
-	static unsigned int silentStream(void* udata, boost::int16_t* stream,
-                unsigned int len, bool& atEOF);
-        
-	void init_sound();
-
-	void init_media();
-
-	void init_logfile();
-
-	void init_gui();
-
-	/// Create the gui instance
-	//
-	/// Uses the USE_<guiname> macros to find out which one
-	///
-	std::auto_ptr<Gui> getGui();
-
-	void setFlashVars(const std::string& varstr);
-
+    static unsigned int silentStream(void* udata, boost::int16_t* stream,
+				     unsigned int len, bool& atEOF);
+    
+    void init_sound();
+    
+    void init_media();
+    
+    void init_logfile();
+    
+    void init_gui();
+    
+    /// Create the gui instance
+    //
+    /// Uses the USE_<guiname> macros to find out which one
+    ///
+    std::auto_ptr<Gui> getGui();
+    
+    void setFlashVars(const std::string& varstr);
+    
     typedef std::map<std::string, std::string, StringNoCaseLessThan> Params;
-
-	// Movie parameters (for -P)
-	Params params;
-
-	unsigned int _bitDepth;
-
-	// the scale at which to play 
-	float _scale;
-
-	unsigned int _delay;
-
-	size_t _width;
-
-	size_t _height;
-	
-	int _xPosition;
-
-	int _yPosition;
-
-	unsigned long _windowID;
-
-	bool _doLoop;
-
-	bool _doRender;
-
-	bool _doSound;
-
-	float _exitTimeout;
-
-	std::string _baseurl;
-
+    
+    // Movie parameters (for -P)
+    Params params;
+    
+    unsigned int _bitDepth;
+    
+    // the scale at which to play 
+    float _scale;
+    
+    unsigned int _delay;
+    
+    size_t _width;
+    
+    size_t _height;
+    
+    int _xPosition;
+    
+    int _yPosition;
+    
+    unsigned long _windowID;
+    
+    bool _doLoop;
+    
+    bool _doRender;
+    
+    bool _doSound;
+    
+    float _exitTimeout;
+    
+    std::string _baseurl;
+    
     /// Initialization / destruction order is important here.
     //
     /// some sound_samples are destroyed in the dtor of SWFMovieDefinition,
@@ -295,58 +318,59 @@ private:
     ///         sound_sample knows about its sound::sound_handler without
     ///         needing a RunResources.
     boost::shared_ptr<sound::sound_handler> _soundHandler;
-
-	std::auto_ptr<media::MediaHandler> _mediaHandler;
-
+    
+    std::auto_ptr<media::MediaHandler> _mediaHandler;
+    
     /// Handlers (for sound etc) for a libcore run.
     //
     /// This must be kept alive for the entire lifetime of the movie_root
     /// (currently: of the Gui).
     std::auto_ptr<RunResources> _runResources;
-
+    
     /// This must be initialized after _runResources
-	std::auto_ptr<Gui> _gui;
-
+    std::auto_ptr<Gui> _gui;
+    
     std::string _url;
-
-	std::string _infile;
-
-	boost::intrusive_ptr<movie_definition> _movieDef;
-	
-	unsigned long _maxAdvances;
-
-	/// Load the "_infile" movie setting its url to "_url"
-	// 
-	/// This function takes care of interpreting _infile as
-	/// stdin when it equals "-". May throw a GnashException
-	/// on failure.
-	///
-	boost::intrusive_ptr<movie_definition> load_movie();
-
+    
+    std::string _infile;
+    
+    boost::intrusive_ptr<movie_definition> _movieDef;
+    
+    unsigned long _maxAdvances;
+    
+    /// Load the "_infile" movie setting its url to "_url"
+    // 
+    /// This function takes care of interpreting _infile as
+    /// stdin when it equals "-". May throw a GnashException
+    /// on failure.
+    ///
+    boost::intrusive_ptr<movie_definition> load_movie();
+    
 #ifdef GNASH_FPS_DEBUG
-	float _fpsDebugTime;
+    float _fpsDebugTime;
 #endif
-
-	// Filedescriptor to use for host application requests, -1 if none
-	int _hostfd;
-	
-	// Whether to start Gnash in fullscreen mode.
-	// (Or what did you think it meant?)
-	bool _startFullscreen;
-	bool _hideMenu;
-
+    
+    // Filedescriptor to use for host application requests, -1 if none
+    int _hostfd;
+    
+    // Whether to start Gnash in fullscreen mode.
+    // (Or what did you think it meant?)
+    bool _startFullscreen;
+    bool _hideMenu;
+    
     /// The filename to use for dumping audio.
     std::string _audioDump;
-
+    
     /// A comma-separated list of frames to output as screenshots.
     //
     /// If empty, no screenshots are required.
     std::string _screenshots;
-
+    
     /// The filename to save screenshots to.
     //
     /// If empty, a default is used.
     std::string _screenshotFile;
+
 
 };
 
@@ -355,3 +379,8 @@ private:
 
 // end of _PLAYER_H_
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
