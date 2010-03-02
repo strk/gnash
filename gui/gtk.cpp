@@ -2254,26 +2254,21 @@ GtkGui::playHook()
 
 // See if the X11 server we're using supports an extension.
 bool 
-GtkGui::checkX11Extension(const std::string &ext)
+GtkGui::checkX11Extension(const std::string& ext)
 {
-    //    GNASH_REPORT_FUNCTION;
     
     int n = 0;
-
-    char **extlist = XListExtensions (GDK_DISPLAY(), &n);
+    char **extlist = XListExtensions(GDK_DISPLAY(), &n);
 
     if (extlist) {
-	int i;
-
-	for (i = 0; i < n; i++) {
-            if (strncmp(ext.c_str(), extlist[i], ext.size()) == 0) {
+        for (size_t i = 0; i < n; i++) {
+            if (std::strncmp(ext.c_str(), extlist[i], ext.size()) == 0) {
                 return true;
             }
-	}
-        return false;
-	/* do not free, Xlib can depend on contents being unaltered */
-	/* XFreeExtensionList (extlist); */
+        }
     }
+    // do not free, Xlib can depend on contents being unaltered
+    return false;
 }
 
 

@@ -150,7 +150,7 @@ public:
 
     virtual void error(const std::string& msg);
 
-    bool checkX11Extension(const std::string &ext);
+    bool checkX11Extension(const std::string& ext);
 
 private:
 
