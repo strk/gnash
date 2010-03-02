@@ -43,7 +43,7 @@ extern bool globalQuit;
 // Forward declarations
 namespace gnash
 {
-	class MovieClip;
+    class MovieClip;
 }
 
 
@@ -66,19 +66,19 @@ public:
     /// Play the movie at the given url/path.
     //
     /// @param argc
-    ///	number of argument strings in argv
+    ///        number of argument strings in argv
     ///
     /// @param argv
-    ///	argument strings 
+    ///        argument strings 
     ///
     /// @param url
-    ///	an optional url to assign to the given movie.
-    ///	if unspecified the url will be set to the 
-    ///	movie path/url.
+    ///        an optional url to assign to the given movie.
+    ///        if unspecified the url will be set to the 
+    ///        movie path/url.
     ///           
     ///
     int run(int argc, char* argv[],
-	    const std::string& infile, const std::string& url = "");
+            const std::string& infile, const std::string& url = "");
     
     float setScale(float s);
     
@@ -89,14 +89,14 @@ public:
     /// Set the number of seconds between FPS debugging prints
     //
     /// @param time
-    ///	Number of seconds between FPS debugging prints.
-    ///	A value of 0 disables FPS printing.
-    ///	A negative value results in an assertion failure.
+    ///        Number of seconds between FPS debugging prints.
+    ///        A value of 0 disables FPS printing.
+    ///        A negative value results in an assertion failure.
     ///
     void setFpsPrintTime(float time)
     {
-	assert(time >= 0.0);
-	_fpsDebugTime = time;
+        assert(time >= 0.0);
+        _fpsDebugTime = time;
     }
 #endif // def GNASH_FPS_DEBUG
     
@@ -128,37 +128,37 @@ public:
     /// urls on load requests.
     ///
     void setBaseUrl(const std::string& baseurl) {
-	_baseurl = baseurl;
+        _baseurl = baseurl;
     }
     
     float setExitTimeout(float n) {
-	float oldtimeout = _exitTimeout;
-	_exitTimeout = n;
-	return oldtimeout;
+        float oldtimeout = _exitTimeout;
+        _exitTimeout = n;
+        return oldtimeout;
     }
     
     void setParam(std::string& name, std::string& value) {
-	params[name] = value;
+        params[name] = value;
     }
     
     void setHostFD(int fd) {
-	_hostfd = fd;
+        _hostfd = fd;
     }
     
     int getHostFD() const {
-	return _hostfd;
+        return _hostfd;
     }
     
     void setStartFullscreen(bool x) {
-	_startFullscreen = x;
+        _startFullscreen = x;
     }
     
     void hideMenu(bool x) {
-	_hideMenu = x;
+        _hideMenu = x;
     }
     
     void setAudioDumpfile(const std::string& filespec) {
-	_audioDump = filespec;
+        _audioDump = filespec;
     }
     
     /// Set the renderer backend, agg, opengl, or cairo. This is set
@@ -204,33 +204,34 @@ private:
     std::string _renderer;
 
     class CallbacksHandler : public movie_root::AbstractIfaceCallback,
-			     public movie_root::AbstractFsCallback
+                             public movie_root::AbstractFsCallback
     {
     public:
-	CallbacksHandler(Gui& gui, const Player& player)
-	    :
-	    _gui(gui),
+        CallbacksHandler(Gui& gui, const Player& player)
+            :
+            _gui(gui),
             _player(player)
-	{ /* do nothing */}
-	
-	std::string call(const std::string& event,
-			 const std::string& arg);
-	
-	bool yesNo(const std::string& query);
-	
+        {
+        }
+        
+        std::string call(const std::string& event,
+                         const std::string& arg);
+        
+        bool yesNo(const std::string& query);
+        
         void error(const std::string& msg);
-	
-	// For handling notification callbacks from ActionScript.
-	// The callback is always sent to a hosting application
-	// (i.e. if a file descriptor is supplied). It is never
-	// acted on by Gnash when running as a plugin.
-	void notify(const std::string& event, const std::string& arg);
-	
+        
+        // For handling notification callbacks from ActionScript.
+        // The callback is always sent to a hosting application
+        // (i.e. if a file descriptor is supplied). It is never
+        // acted on by Gnash when running as a plugin.
+        void notify(const std::string& event, const std::string& arg);
+        
     private:
-	
-	Gui& _gui;
-	
-	const Player& _player;
+        
+        Gui& _gui;
+        
+        const Player& _player;
     };
     
     std::auto_ptr<CallbacksHandler> _callbacksHandler;
@@ -252,7 +253,7 @@ private:
     ///         and is always available)
     ///
     static unsigned int silentStream(void* udata, boost::int16_t* stream,
-				     unsigned int len, bool& atEOF);
+                     unsigned int len, bool& atEOF);
     
     void init_sound();
     
@@ -370,7 +371,6 @@ private:
     //
     /// If empty, a default is used.
     std::string _screenshotFile;
-
 
 };
 
