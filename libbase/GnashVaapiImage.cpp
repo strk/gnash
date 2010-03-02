@@ -145,7 +145,7 @@ boost::uint8_t* GnashVaapiImage::data()
 {
     log_debug("GnashVaapiImage::data(): surface 0x%08x\n", _surface->get());
     log_debug("  -> %u usec from creation\n",
-	      (boost::uint32_t)(get_ticks_usec() - _creation_time));
+              (boost::uint32_t)(get_ticks_usec() - _creation_time));
 
     if (!transfer()) {
         return NULL;

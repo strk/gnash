@@ -18,7 +18,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
@@ -39,6 +38,7 @@
 #ifdef HAVE_VA_VA_H
 #include "va/va.h"
 #include "va/va_backend.h"
+#include "vaapi_utils.h"
 #endif
 
 #ifdef HAVE_X11

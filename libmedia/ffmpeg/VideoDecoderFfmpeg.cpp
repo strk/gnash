@@ -46,6 +46,7 @@ extern "C" {
 #include "FLVParser.h"
 
 #if USE_VAAPI
+#  include "vaapi_utils.h"
 #  include "VideoDecoderFfmpegVaapi.h"
 #  include "GnashVaapiImage.h"
 #endif
@@ -99,7 +100,7 @@ clear_vaapi_context(AVCodecContext *avctx)
 #if USE_VAAPI
     VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
     if (!vactx)
-	return;
+        return;
 
     delete vactx;
     set_vaapi_context(avctx, NULL);
@@ -142,9 +143,9 @@ reset_context(AVCodecContext *avctx, VaapiContextFfmpeg *vactx = NULL)
     avctx->thread_count = 1;
     avctx->draw_horiz_band = NULL;
     if (vactx)
-	avctx->slice_flags = SLICE_FLAG_CODED_ORDER|SLICE_FLAG_ALLOW_FIELD;
+        avctx->slice_flags = SLICE_FLAG_CODED_ORDER|SLICE_FLAG_ALLOW_FIELD;
     else
-	avctx->slice_flags = 0;
+        avctx->slice_flags = 0;
 }
 
 /// AVCodecContext.get_format() implementation
@@ -155,12 +156,12 @@ get_format(AVCodecContext *avctx, const enum PixelFormat *fmt)
     VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
 
     if (vactx) {
-	for (int i = 0; fmt[i] != PIX_FMT_NONE; i++) {
-	    if (fmt[i] != PIX_FMT_VAAPI_VLD)
-		continue;
-	    if (vactx->initDecoder(avctx->width, avctx->height))
-		return fmt[i];
-	}
+        for (int i = 0; fmt[i] != PIX_FMT_NONE; i++) {
+            if (fmt[i] != PIX_FMT_VAAPI_VLD)
+                continue;
+            if (vactx->initDecoder(avctx->width, avctx->height))
+                return fmt[i];
+        }
     }
 #endif
 
@@ -174,15 +175,15 @@ get_buffer(AVCodecContext *avctx, AVFrame *pic)
 {
     VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
     if (!vactx)
-	return avcodec_default_get_buffer(avctx, pic);
+        return avcodec_default_get_buffer(avctx, pic);
 
 #if USE_VAAPI
     if (!vactx->initDecoder(avctx->width, avctx->height))
-	return -1;
+        return -1;
 
     VaapiSurfaceFfmpeg * const surface = vactx->getSurface();
     if (!surface)
-	return -1;
+        return -1;
     vaapi_set_surface(pic, surface);
 
     static unsigned int pic_num = 0;
@@ -201,7 +202,7 @@ reget_buffer(AVCodecContext *avctx, AVFrame *pic)
     VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
 
     if (!vactx)
-	return avcodec_default_reget_buffer(avctx, pic);
+        return avcodec_default_reget_buffer(avctx, pic);
 
     return get_buffer(avctx, pic);
 }
@@ -212,14 +213,14 @@ release_buffer(AVCodecContext *avctx, AVFrame *pic)
 {
     VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
     if (!vactx) {
-	avcodec_default_release_buffer(avctx, pic);
-	return;
+        avcodec_default_release_buffer(avctx, pic);
+        return;
     }
 
 #if USE_VAAPI
     VaapiSurfaceFfmpeg * const surface = vaapi_get_surface(pic);
     if (surface)
-	delete surface;
+        delete surface;
 
     pic->data[0] = NULL;
     pic->data[1] = NULL;
@@ -306,15 +307,17 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
     ctx->extradata = extradata;
     ctx->extradata_size = extradataSize;
 
-    ctx->get_format	= get_format;
-    ctx->get_buffer	= get_buffer;
-    ctx->reget_buffer	= reget_buffer;
-    ctx->release_buffer	= release_buffer;
+    ctx->get_format     = get_format;
+    ctx->get_buffer     = get_buffer;
+    ctx->reget_buffer   = reget_buffer;
+    ctx->release_buffer = release_buffer;
 
 #if USE_VAAPI
-    VaapiContextFfmpeg *vactx = VaapiContextFfmpeg::create(codecId);
-    if (vactx)
-	reset_context(ctx, vactx);
+    if (vaapi_is_enabled()) {
+        VaapiContextFfmpeg *vactx = VaapiContextFfmpeg::create(codecId);
+        if (vactx)
+            reset_context(ctx, vactx);
+    }
 #endif
 
     int ret = avcodec_open(ctx, _videoCodec);
@@ -328,7 +331,7 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
     }
     
     log_debug(_("VideoDecoder: initialized FFMPEG codec %s (%d)"), 
-		_videoCodec->name, (int)codecId);
+                _videoCodec->name, (int)codecId);
 
 }
 
@@ -372,13 +375,13 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 #if USE_VAAPI
     VaapiContextFfmpeg * const vactx = get_vaapi_context(srcCtx);
     if (vactx) {
-	VaapiSurfaceFfmpeg * const vaSurface = vaapi_get_surface(&srcFrameRef);
-	if (!vaSurface) {
-	    im.reset();
-	    return im;
-	}
-	im.reset(new GnashVaapiImage(vaSurface->get(), GNASH_IMAGE_RGBA));
-	return im;
+        VaapiSurfaceFfmpeg * const vaSurface = vaapi_get_surface(&srcFrameRef);
+        if (!vaSurface) {
+            im.reset();
+            return im;
+        }
+        im.reset(new GnashVaapiImage(vaSurface->get(), GNASH_IMAGE_RGBA));
+        return im;
     }
 #endif
 

@@ -775,16 +775,17 @@ public:
         path.line_to(a.x, a.y);
 
 #if USE_VAAPI
-	if (frame->location() == GNASH_IMAGE_GPU) {
-	    RenderImage image;
-	    image.reset(new GnashVaapiImageProxy(
-			    static_cast<GnashVaapiImage *>(frame),
-			    a.x, a.y, c.x - a.x, c.y - a.y));
-	    _render_images.push_back(image);
+        if (frame->location() == GNASH_IMAGE_GPU) {
+            RenderImage image;
+            image.reset(new GnashVaapiImageProxy(
+                            static_cast<GnashVaapiImage *>(frame),
+                            a.x, a.y, c.x - a.x, c.y - a.y));
+            _render_images.push_back(image);
+
             // clear video region with transparent color
             renderEmptyVideo(path);
-	    return;
-	}
+            return;
+        }
 #endif
 
         switch (frame->type())
@@ -922,15 +923,15 @@ public:
 
     // Get first render image
     virtual RenderImages::iterator getFirstRenderImage()
-	{ return _render_images.begin(); }
+        { return _render_images.begin(); }
     virtual RenderImages::const_iterator getFirstRenderImage() const
-	{ return _render_images.begin(); }
+        { return _render_images.begin(); }
 
     // Get last render image
     virtual RenderImages::iterator getLastRenderImage()
-	{ return _render_images.end(); }
+        { return _render_images.end(); }
     virtual RenderImages::const_iterator getLastRenderImage() const
-	{ return _render_images.end(); }
+        { return _render_images.end(); }
   
 
     // Draw the line strip formed by the sequence of points.

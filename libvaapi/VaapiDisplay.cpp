@@ -19,6 +19,7 @@
 
 #include "log.h"
 #include "VaapiDisplay.h"
+#include "VaapiException.h"
 #include "vaapi_utils.h"
 
 namespace gnash {
@@ -28,7 +29,8 @@ VaapiDisplay::VaapiDisplay(VADisplay display)
 {
     GNASH_REPORT_FUNCTION;
 
-    init();
+    if (!init())
+        throw VaapiException("Could not create VA-API display");
 }
 
 VaapiDisplay::~VaapiDisplay()

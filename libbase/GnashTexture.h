@@ -27,42 +27,42 @@ namespace gnash {
 
 /// Texture flags
 enum {
-    GNASH_TEXTURE_VAAPI	= 1 << 0,
+    GNASH_TEXTURE_VAAPI = 1 << 0,
 };
 
 /// OpenGL texture format
 class DSOEXPORT GnashTextureFormat {
-    unsigned int	_internal_format;
-    unsigned int	_format;
+    unsigned int        _internal_format;
+    unsigned int        _format;
 
 public:
     GnashTextureFormat(ImageType type);
 
     /// Return GL internal format
     unsigned int internal_format() const
-	{ return _internal_format; }
+        { return _internal_format; }
 
     /// Return GL format
     unsigned int format() const
-	{ return _format; }
+        { return _format; }
 };
 
 /// OpenGL texture abstraction
 class DSOEXPORT GnashTexture {
-    unsigned int	_width;
-    unsigned int	_height;
-    unsigned int	_texture;
-    GnashTextureFormat	_format;
+    unsigned int        _width;
+    unsigned int        _height;
+    unsigned int        _texture;
+    GnashTextureFormat  _format;
 
     /// OpenGL texture state
     struct TextureState {
-	unsigned int	old_texture;
-	unsigned int	was_enabled : 1;
-	unsigned int	was_bound   : 1;
-    }			_texture_state;
+        unsigned int    old_texture;
+        unsigned int    was_enabled : 1;
+        unsigned int    was_bound   : 1;
+    }                   _texture_state;
 
 protected:
-    unsigned int	_flags;
+    unsigned int        _flags;
 
 private:
     bool init();
@@ -73,27 +73,27 @@ public:
 
     /// Return texture flags
     unsigned int flags() const
-	{ return _flags; }
+        { return _flags; }
 
     /// Return texture width
     unsigned int width() const
-	{ return _width; }
+        { return _width; }
 
     /// Return texture height
     unsigned int height() const
-	{ return _height; }
+        { return _height; }
 
     /// Return GL texture
     unsigned int texture() const
-	{ return _texture; }
+        { return _texture; }
 
     /// Return GL internal format
     unsigned int internal_format() const
-	{ return _format.internal_format(); }
+        { return _format.internal_format(); }
 
     /// Return GL format
     unsigned int format() const
-	{ return _format.format(); }
+        { return _format.format(); }
 
     /// Bind texture to a texturing target
     bool bind();

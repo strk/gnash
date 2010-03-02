@@ -26,14 +26,14 @@ VaapiColorspace vaapi_image_format_get_colorspace(VaapiImageFormat format)
     case VAAPI_IMAGE_NV12:
     case VAAPI_IMAGE_YV12:
     case VAAPI_IMAGE_I420:
-	return VAAPI_COLORSPACE_YUV;
+        return VAAPI_COLORSPACE_YUV;
     case VAAPI_IMAGE_ARGB:
     case VAAPI_IMAGE_RGBA:
     case VAAPI_IMAGE_ABGR:
     case VAAPI_IMAGE_BGRA:
     case VAAPI_IMAGE_RGB32:
     case VAAPI_IMAGE_RGB24:
-	return VAAPI_COLORSPACE_RGB;
+        return VAAPI_COLORSPACE_RGB;
     default:;
     }
     return VAAPI_COLORSPACE_UNKNOWN;

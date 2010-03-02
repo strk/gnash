@@ -689,55 +689,55 @@ public:
 
       switch (frame->location()) {
       case GNASH_IMAGE_CPU:
-	  frameFlags = 0;
-	  break;
+          frameFlags = 0;
+          break;
 #if USE_VAAPI_GLX
       case GNASH_IMAGE_GPU:
-	  frameFlags = GNASH_TEXTURE_VAAPI;
-	  break;
+          frameFlags = GNASH_TEXTURE_VAAPI;
+          break;
 #endif
       default:
-	  assert(0);
-	  return texture;
+          assert(0);
+          return texture;
       }
 
       // Look for a texture with the same dimensions and type
       std::list< boost::shared_ptr<GnashTexture> >::iterator it;
       for (it = _cached_textures.begin(); it != _cached_textures.end(); it++) {
-	  if ((*it)->width() == frame->width() &&
-	      (*it)->height() == frame->height() &&
-	      (*it)->internal_format() == frameFormat.internal_format() &&
-	      (*it)->format() == frameFormat.format() &&
-	      (*it)->flags() == frameFlags)
-	      break;
+          if ((*it)->width() == frame->width() &&
+              (*it)->height() == frame->height() &&
+              (*it)->internal_format() == frameFormat.internal_format() &&
+              (*it)->format() == frameFormat.format() &&
+              (*it)->flags() == frameFlags)
+              break;
       }
 
       // Found texture and remove it from cache. It will be pushed
       // back into the cache when rendering is done, in end_display()
       if (it != _cached_textures.end()) {
-	  texture = *it;
-	  _cached_textures.erase(it);
+          texture = *it;
+          _cached_textures.erase(it);
       }
 
       // Otherwise, create one and empty cache because they may no
       // longer be referenced
       else {
-	  _cached_textures.clear();
+          _cached_textures.clear();
 
-	  switch (frame->location()) {
-	  case GNASH_IMAGE_CPU:
-	      texture.reset(new GnashTexture(frame->width(),
-					     frame->height(),
-					     frame->type()));
-	      break;
+          switch (frame->location()) {
+          case GNASH_IMAGE_CPU:
+              texture.reset(new GnashTexture(frame->width(),
+                                             frame->height(),
+                                             frame->type()));
+              break;
 #if USE_VAAPI_GLX
-	  case GNASH_IMAGE_GPU:
-	      texture.reset(new GnashVaapiTexture(frame->width(),
-						  frame->height(),
-						  frame->type()));
-	      break;
+          case GNASH_IMAGE_GPU:
+              texture.reset(new GnashVaapiTexture(frame->width(),
+                                                  frame->height(),
+                                                  frame->type()));
+              break;
 #endif
-	  }
+          }
       }
 
       assert(texture->width() == frame->width());
@@ -770,20 +770,20 @@ public:
 
     boost::shared_ptr<GnashTexture> texture = getCachedTexture(frame);
     if (!texture.get())
-	return;
+        return;
 
     switch (frame->location()) {
     case GNASH_IMAGE_CPU:
-	texture->update(frame->data());
-	break;
+        texture->update(frame->data());
+        break;
 #if USE_VAAPI_GLX
     case GNASH_IMAGE_GPU:
-	dynamic_cast<GnashVaapiTexture *>(texture.get())->update(dynamic_cast<GnashVaapiImage *>(frame)->surface());
-	break;
+        dynamic_cast<GnashVaapiTexture *>(texture.get())->update(dynamic_cast<GnashVaapiImage *>(frame)->surface());
+        break;
 #endif
     default:
-	assert(0);
-	return;
+        assert(0);
+        return;
     }
     _render_textures.push_back(texture);
 
@@ -821,10 +821,10 @@ private:
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glBegin(GL_QUADS);
     {
-	glTexCoord2f(0.0f, 0.0f); glVertex2i(0, 0);
-	glTexCoord2f(0.0f, 1.0f); glVertex2i(0, h);
-	glTexCoord2f(1.0f, 1.0f); glVertex2i(w, h);
-	glTexCoord2f(1.0f, 0.0f); glVertex2i(w, 0);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(0, 0);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(0, h);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(w, h);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(w, 0);
     }
     glEnd();
     texture->release();
@@ -896,7 +896,7 @@ public:
     // Don't use accumulation buffer based anti-aliasing
     glClear(GL_COLOR_BUFFER_BIT);
     glCallLists(_render_indices.size(), GL_UNSIGNED_BYTE,
-		&_render_indices.front());
+                &_render_indices.front());
 #else
     // This is a table of randomly generated numbers between -0.5 and 0.5.
     struct {
@@ -959,7 +959,7 @@ public:
     _render_indices.clear();
 
     for (int i = 0; i < _render_textures.size(); i++)
-	_cached_textures.push_front(_render_textures[i]);
+        _cached_textures.push_front(_render_textures[i]);
     _render_textures.clear();
   
     check_error();

@@ -27,6 +27,7 @@
 #ifdef USE_VAAPI_GLX
 #include "VaapiDisplayGLX.h"
 #endif
+#include "VaapiException.h"
 #include "vaapi_utils.h"
 
 namespace gnash {
@@ -35,7 +36,9 @@ VaapiGlobalContext::VaapiGlobalContext(std::auto_ptr<VaapiDisplay> display)
     : _display(display)
 {
     GNASH_REPORT_FUNCTION;
-    init();
+
+    if (!init())
+        throw VaapiException("could not initialize VA-API global context");
 }
 
 VaapiGlobalContext::~VaapiGlobalContext()
@@ -84,7 +87,7 @@ VaapiGlobalContext::hasProfile(VAProfile profile) const
     for (unsigned int i = 0; i < _profiles.size(); i++) {
         if (_profiles[i] == profile) {
             return true;
-	}
+        }
     }
     return false;
 }
@@ -104,9 +107,9 @@ get_formats(std::vector<VAImageFormat> const &vaFormats)
 {
     std::vector<VaapiImageFormat> formats;
     for (unsigned int i = 0; i < vaFormats.size(); i++) {
-	VaapiImageFormat format = vaapi_get_image_format(vaFormats[i]);
-	if (format != VAAPI_IMAGE_NONE)
-	    formats.push_back(format);
+        VaapiImageFormat format = vaapi_get_image_format(vaFormats[i]);
+        if (format != VAAPI_IMAGE_NONE)
+            formats.push_back(format);
     }
     return formats;
 }
@@ -130,21 +133,24 @@ VaapiGlobalContext *VaapiGlobalContext::get()
 
     static std::auto_ptr<VaapiGlobalContext> vaapi_global_context;
 
-    if (!vaapi_is_enabled())
-        return NULL;
-
     if (!vaapi_global_context.get()) {
         std::auto_ptr<VaapiDisplay> dpy;
         /* XXX: this won't work with multiple renders built-in */
+        try {
 #if USE_VAAPI_GLX
-        dpy.reset(new VaapiDisplayGLX());
+            dpy.reset(new VaapiDisplayGLX());
 #else
-        dpy.reset(new VaapiDisplayX11());
+            dpy.reset(new VaapiDisplayX11());
 #endif
-        if (!dpy.get()) {
+            if (!dpy.get()) {
+                return NULL;
+            }
+            vaapi_global_context.reset(new VaapiGlobalContext(dpy));
+        }
+        catch (...) {
+            vaapi_set_is_enabled(false);
             return NULL;
-	}
-        vaapi_global_context.reset(new VaapiGlobalContext(dpy));
+        }
     }
     return vaapi_global_context.get();
 }

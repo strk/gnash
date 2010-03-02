@@ -52,7 +52,7 @@ static const char *gl_get_error_string(GLenum error)
     for (i = 0; gl_errors[i].str; i++) {
         if (gl_errors[i].val == error) {
             return gl_errors[i].str;
-	}
+        }
     }
     return "unknown";
 }
@@ -64,7 +64,7 @@ static inline bool gl_do_check_error(int report)
     while ((error = glGetError()) != GL_NO_ERROR) {
         if (report) {
             vaapi_dprintf("glError: %s caught\n", gl_get_error_string(error));
-	}
+        }
         is_error = true;
     }
     return is_error;
@@ -144,7 +144,7 @@ static bool bind_texture(TextureState *ts, GLenum target, GLuint texture)
         glBindTexture(target, texture);
         if (gl_check_error()) {
             return false;
-	}
+        }
     }
     return true;
 }

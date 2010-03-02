@@ -30,7 +30,7 @@
 #include "log.h"
 #include "gtk_glue.h"
 
-#if USE_VAAPI
+#ifdef USE_VAAPI
 #include "vaapi_utils.h"
 #endif
 

@@ -43,6 +43,10 @@
 
 #define dprintf(format,...)
 
+// Defined to 1 if the stage will be scaled by the HW and not AGG
+// XXX: disabled for now because of generic Gnash rendering problems
+#define USE_HW_SCALING 0
+
 namespace gnash
 {
 
@@ -51,13 +55,13 @@ find_pixel_format(VaapiImageFormat format)
 {
     switch (format) {
     case VAAPI_IMAGE_RGBA:
-	return "RGBA32";
+        return "RGBA32";
     case VAAPI_IMAGE_ARGB: return
-	    "ARGB32";
+            "ARGB32";
     case VAAPI_IMAGE_ABGR:
-	return "ABGR32";
+        return "ABGR32";
     case VAAPI_IMAGE_BGRA:
-	return "BGRA32";
+        return "BGRA32";
     default:;
     }
     return NULL;
@@ -139,8 +143,8 @@ VaapiVideoWindow::moveResize(VaapiRectangle const & rect)
 GtkAggVaapiGlue::GtkAggVaapiGlue()
     : _agg_renderer(NULL)
     , _vaapi_image_format(VAAPI_IMAGE_NONE)
-    , _movie_width(0)
-    , _movie_height(0)
+    , _vaapi_image_width(0)
+    , _vaapi_image_height(0)
     , _window_width(0)
     , _window_height(0)
     , _window_is_setup(false)
@@ -209,6 +213,41 @@ GtkAggVaapiGlue::createRenderHandler()
 }
 
 void
+GtkAggVaapiGlue::resetRenderSurface(unsigned int width, unsigned int height)
+{
+    /* XXX: round up to 128-byte boundaries to workaround GMA500 bugs */
+    const unsigned int aligned_width = (width + 31) & -32U;
+
+    dprintf("GtkAggVaapiGlue::resetRenderSurface(): size %ux%u\n",
+            width, height);
+
+    _vaapi_surface.reset(new VaapiSurface(width, height));
+    _vaapi_image.reset(new VaapiImage(aligned_width, height, _vaapi_image_format));
+    _vaapi_image_width = width;
+    _vaapi_image_height = height;
+    _vaapi_subpicture.reset(new VaapiSubpicture(_vaapi_image));
+
+    if (!_vaapi_image->map()) {
+        log_debug(_("ERROR: failed to map VA-API image."));
+        return;
+    }
+
+    VaapiRectangle r(width, height);
+    if (!_vaapi_surface->associateSubpicture(_vaapi_subpicture, r, r)) {
+        log_debug(_("ERROR: failed to associate VA-API subpicture."));
+        return;
+    }
+    _vaapi_surface->clear();
+
+    _agg_renderer->init_buffer(
+        static_cast<unsigned char*>(_vaapi_image->getPlane(0)),
+        _vaapi_image->getPitch(0) * height,
+        width,
+        height,
+        _vaapi_image->getPitch(0));
+}
+
+void
 GtkAggVaapiGlue::setRenderHandlerSize(int width, int height)
 {
     dprintf("GtkAggVaapiGlue::setRenderHandlerSize(): %dx%d\n", width, height);
@@ -220,57 +259,37 @@ GtkAggVaapiGlue::setRenderHandlerSize(int width, int height)
 void 
 GtkAggVaapiGlue::beforeRendering()
 {
-    static bool first = true;
-    if (first && VM::isInitialized()) {
-        first = false;
+    // Process all GDK pending operations
+    gdk_flush();
 
-        Movie const & mi = VM::get().getRoot().getRootMovie();
-        _movie_width  = mi.widthPixels();
-        _movie_height = mi.heightPixels();
-        dprintf("GtkAggVaapiGlue::beforeRendering(): movie size %dx%d\n",
-                _movie_width, _movie_height);
+    if (USE_HW_SCALING) {
+        movie_root & stage = VM::get().getRoot();
 
-        /* XXX: round up to 128-byte boundaries to workaround GMA500 bugs */
-        const unsigned int image_width  = (_movie_width + 31) & -32U;
-        const unsigned int image_height = _movie_height;
+        static bool first = true;
+        if (first && VM::isInitialized()) {
+            first = false;
 
-        _vaapi_surface.reset(new VaapiSurface(_movie_width, _movie_height));
-        _vaapi_image.reset(new VaapiImage(image_width, image_height,
-                                          _vaapi_image_format));
-        _vaapi_subpicture.reset(new VaapiSubpicture(_vaapi_image));
-
-        if (!_vaapi_image->map()) {
-            log_debug(_("ERROR: failed to map VA-API image."));
-            return;
+            Movie const & mi = stage.getRootMovie();
+            const unsigned int width  = mi.widthPixels();
+            const unsigned int height = mi.heightPixels();
+            resetRenderSurface(width, height);
+            dprintf("GtkAggVaapiGlue::beforeRendering(): movie size %dx%d\n",
+                    width, height);
         }
 
-        VaapiRectangle r(_movie_width, _movie_height);
-        if (!_vaapi_surface->associateSubpicture(_vaapi_subpicture, r, r)) {
-            log_debug(_("ERROR: failed to associate VA-API subpicture."));
-            return;
-        }
-        _vaapi_surface->clear();
-
-        _agg_renderer->init_buffer(
-            static_cast<unsigned char*>(_vaapi_image->getPlane(0)),
-            _vaapi_image->getPitch(0) * _movie_height,
-            _movie_width,
-            _movie_height,
-            _vaapi_image->getPitch(0));
+        // We force the scale to its original state in case the GUI
+        // changed it (in the event of a resize), because we want
+        // VA-API to do the scaling for us.
+        _agg_renderer->set_scale(1.0, 1.0);
     }
+    else if (_vaapi_image_width != _window_width ||
+             _vaapi_image_height != _window_height)
+        resetRenderSurface(_window_width, _window_height);
 
     if (!_vaapi_image->map()) {
         log_debug(_("ERROR: failed to map VA-API image."));
         return;
     }
-
-    // Process all GDK pending operations
-    gdk_flush();
-
-    // We force the scale to its original state in case the GUI
-    // changed it (in the event of a resize), because we want
-    // VA-API to do the scaling for us.
-    _agg_renderer->set_scale(1.0, 1.0);
 }
 
 VaapiVideoWindow *
@@ -333,22 +352,30 @@ GtkAggVaapiGlue::render()
          for (img = first_img; img != last_img; ++img) {
              boost::shared_ptr<VaapiSurface> surface = (*img)->surface();
 
-             VaapiRectangle rect;
-             rect.x      = (*img)->x();
-             rect.y      = (*img)->y();
-             rect.width  = (*img)->width();
-             rect.height = (*img)->height();
+             VaapiRectangle src_rect;
+             src_rect.x      = (*img)->x();
+             src_rect.y      = (*img)->y();
+             src_rect.width  = (*img)->width();
+             src_rect.height = (*img)->height();
+
+             VaapiRectangle dst_rect;
+             const float xscale = _window_width / (float)_vaapi_image_width;
+             const float yscale = _window_height / (float)_vaapi_image_height;
+             dst_rect.x      = src_rect.x * xscale;
+             dst_rect.y      = src_rect.y * yscale;
+             dst_rect.width  = src_rect.width * xscale;
+             dst_rect.height = src_rect.height * yscale;
 
              VaapiVideoWindow *videoWindow;
-             videoWindow = getVideoWindow(surface, _drawing_area->window, rect);
+             videoWindow = getVideoWindow(surface, _drawing_area->window, dst_rect);
              if (!videoWindow) {
                  log_debug(_("ERROR: failed to setup video window for surface 0x%08x."), surface->get());
                  continue;
              }
-             videoWindow->moveResize(rect);
+             videoWindow->moveResize(dst_rect);
 
-             VaapiRectangle dst_rect(surface->width(), surface->height());
-             if (!surface->associateSubpicture(_vaapi_subpicture, rect, dst_rect)) {
+             VaapiRectangle pic_rect(surface->width(), surface->height());
+             if (!surface->associateSubpicture(_vaapi_subpicture, src_rect, pic_rect)) {
                  log_debug(_("ERROR: failed to associate subpicture to surface 0x%08x."), surface->get());
                  continue;
              }
@@ -357,7 +384,7 @@ GtkAggVaapiGlue::render()
                                    surface->get(),
                                    videoWindow->xid(),
                                    0, 0, surface->width(), surface->height(),
-                                   0, 0, rect.width, rect.height,
+                                   0, 0, dst_rect.width, dst_rect.height,
                                    NULL, 0,
                                    VA_FRAME_PICTURE);
              if (!vaapi_check_status(status, "vaPutSurface() video"))

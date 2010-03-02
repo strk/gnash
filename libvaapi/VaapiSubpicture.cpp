@@ -54,7 +54,7 @@ bool VaapiSubpicture::create()
     GNASH_REPORT_FUNCTION;
 
     if (!_image.get()) {
-	return false;
+        return false;
     }
 
     VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
@@ -65,7 +65,7 @@ bool VaapiSubpicture::create()
     VASubpictureID subpicture;
     VAStatus status = vaCreateSubpicture(gvactx->display(), _image->get(), &subpicture);
     if (!vaapi_check_status(status, "vaCreateSubpicture()")) {
-	return false;
+        return false;
     }
 
     _subpicture = subpicture;
@@ -80,10 +80,10 @@ void VaapiSubpicture::destroy()
     }
 
     if (_subpicture != VA_INVALID_ID) {
-	VAStatus status = vaDestroySubpicture(gvactx->display(), _subpicture);
-	if (!vaapi_check_status(status, "vaDestroySubpicture()"))
-	    return;
-	_subpicture = VA_INVALID_ID;
+        VAStatus status = vaDestroySubpicture(gvactx->display(), _subpicture);
+        if (!vaapi_check_status(status, "vaDestroySubpicture()"))
+            return;
+        _subpicture = VA_INVALID_ID;
     }
 }
 

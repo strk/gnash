@@ -120,16 +120,16 @@ GnashTextureFormat::GnashTextureFormat(ImageType type)
 {
     switch (type) {
     case GNASH_IMAGE_RGB:
-	_internal_format = GL_RGB;
-	_format = GL_RGB;
-	break;
+        _internal_format = GL_RGB;
+        _format = GL_RGB;
+        break;
     case GNASH_IMAGE_RGBA:
-	_internal_format = GL_RGBA;
-	_format = GL_BGRA;
-	break;
+        _internal_format = GL_RGBA;
+        _format = GL_BGRA;
+        break;
     default:
-	assert(0);
-	break;
+        assert(0);
+        break;
     }
 }
 
@@ -146,8 +146,8 @@ GnashTexture::~GnashTexture()
     D(bug("GnashTexture::~GnashTexture()\n"));
 
     if (_texture) {
-	glDeleteTextures(1, &_texture);
-	_texture = 0;
+        glDeleteTextures(1, &_texture);
+        _texture = 0;
     }
 }
 
@@ -161,15 +161,15 @@ bool GnashTexture::init()
     assert(_width > 0);
     assert(_height > 0);
     if (_width == 0 || _height == 0)
-	return false;
+        return false;
 
     glGenTextures(1, &_texture);
     if (!_texture)
-	return false;
+        return false;
 
     if (!bind()) {
-	glDeleteTextures(1, &_texture);
-	return false;
+        glDeleteTextures(1, &_texture);
+        return false;
     }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, internal_format() == GL_RGBA ? 4 : 1);
@@ -190,7 +190,7 @@ bool GnashTexture::bind()
     if (!ts->was_enabled)
         glEnable(GL_TEXTURE_2D);
     else if (gl_get_param(GL_TEXTURE_BINDING_2D, &ts->old_texture))
-	ts->was_bound = _texture == ts->old_texture;
+        ts->was_bound = _texture == ts->old_texture;
     else
         return false;
 
@@ -215,7 +215,7 @@ void GnashTexture::release()
     if (!ts->was_bound && ts->old_texture)
         glBindTexture(GL_TEXTURE_2D, ts->old_texture);
     if (!ts->was_enabled)
-	glDisable(GL_TEXTURE_2D);
+        glDisable(GL_TEXTURE_2D);
     gl_check_error();
 }
 
@@ -226,8 +226,8 @@ void GnashTexture::update(const boost::uint8_t *data)
 
     bind();
     glTexSubImage2D(GL_TEXTURE_2D, 0,
-		    0, 0, _width, _height,
-		    format(), GL_UNSIGNED_BYTE, data);
+                    0, 0, _width, _height,
+                    format(), GL_UNSIGNED_BYTE, data);
     release();
 }
 

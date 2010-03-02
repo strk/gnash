@@ -60,14 +60,16 @@ private:
                                      GdkWindow *parent_window,
                                      VaapiRectangle const & rect);
 
+    void resetRenderSurface(unsigned int width, unsigned int height);
+
 private:
     Renderer_agg_base                  *_agg_renderer;
     VaapiImageFormat                    _vaapi_image_format;
     boost::shared_ptr<VaapiImage>       _vaapi_image;
+    unsigned int                        _vaapi_image_width;
+    unsigned int                        _vaapi_image_height;
     boost::shared_ptr<VaapiSubpicture>  _vaapi_subpicture;
     std::auto_ptr<VaapiSurface>         _vaapi_surface;
-    unsigned int                        _movie_width;
-    unsigned int                        _movie_height;
     unsigned int                        _window_width;
     unsigned int                        _window_height;
     bool                                _window_is_setup;
