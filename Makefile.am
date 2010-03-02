@@ -474,15 +474,6 @@ else
 endif
 endif
 
-if USE_VAAPI
-if USE_VDPAU
-	@echo "	Hardware Acceleration support via NVidia's VDPAU enabled"
-endif
-if USE_XVBA
-	@echo "	Hardware Acceleration support via AMD's XVBA enabled"
-endif
-endif
-
 if TESTSUITE
 check-local:
 	$(MAKE) anal

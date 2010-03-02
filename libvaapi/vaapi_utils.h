@@ -30,12 +30,6 @@ void DSOEXPORT vaapi_set_is_enabled(bool enabled);
 /// Check whether video acceleration is enabled
 bool DSOEXPORT vaapi_is_enabled();
 
-/// Enable video acceleration (with VA API)
-void DSOEXPORT vaapi_set_is_enabled(bool enabled);
-
-/// Check whether video acceleration is enabled
-bool DSOEXPORT vaapi_is_enabled();
-
 /// Debug output
 void DSOEXPORT vaapi_dprintf(const char *format, ...);
 
