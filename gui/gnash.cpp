@@ -238,7 +238,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         exit(EXIT_FAILURE);
     }
 
-
     bool renderflag = false;
     bool plugin = false;
     bool widthGiven = false, heightGiven = false;
@@ -248,220 +247,219 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         const int code = parser.code(i);
         try {
             switch (code) {
-	    case 'h':
-		version_and_copyright();
-		usage ();
-		exit(EXIT_SUCCESS);
-	    case 'v':
-		dbglogfile.setVerbosity();
-		// This happens once per 'v' flag 
-		gnash::log_debug(_("Verbose output turned on"));
-		break;
-	    case 'V':
-		version_and_copyright();
-		build_options();
-		exit(EXIT_SUCCESS);          
-	    case 'w':
-		rcfile.useWriteLog(true); 
-		gnash::log_debug(_("Logging to disk enabled"));
-		break;
-	    case 'a':
+                case 'h':
+                    version_and_copyright();
+                    usage ();
+                    exit(EXIT_SUCCESS);
+                case 'v':
+                    dbglogfile.setVerbosity();
+                    // This happens once per 'v' flag 
+                    gnash::log_debug(_("Verbose output turned on"));
+                    break;
+                case 'V':
+                    version_and_copyright();
+                    build_options();
+                    exit(EXIT_SUCCESS);          
+                case 'w':
+                    rcfile.useWriteLog(true); 
+                    gnash::log_debug(_("Logging to disk enabled"));
+                    break;
+                case 'a':
 #if VERBOSE_ACTION
-		dbglogfile.setActionDump(true); 
+                    dbglogfile.setActionDump(true); 
 #else
-		log_error(_("No verbose actions; disabled at compile time"));
+                    gnash::log_error(_("No verbose actions; disabled at "
+                                "compile time"));
 #endif
-		break;
-	    case 'p':
+                    break;
+                case 'p':
 #if VERBOSE_PARSE
-		dbglogfile.setParserDump(true); 
+                    dbglogfile.setParserDump(true); 
 #else
-		log_error (_("No verbose parsing; disabled at compile time"));
+                    gnash::log_error (_("No verbose parsing; disabled at "
+                                "compile time"));
 #endif
-		break;
-	    case 256:
-		player.setMaxAdvances( parser.argument<unsigned long>(i));
-		break;
-	    case 257:
-		player.setStartFullscreen(true);
-		break;
-	    case 258:
-		player.hideMenu(true);
-		break;
-	    case 's':
-		player.setScale(gnash::clamp<float>(
-						    parser.argument<float>(i),
-						    0.01f, 100.f));
-		break;
-	    case 'd':
-		player.setDelay(parser.argument<long>(i));
-		break;
-	    case 'u':
-		url = parser.argument(i);
-		gnash::log_debug (_("Setting root URL to %s"), url.c_str());
-		break;
-	    case 'U':    
-		// Set base URL
-		player.setBaseUrl(parser.argument(i));
-		gnash::log_debug (_("Setting base URL to %s"),
-				  parser.argument(i));
-		break;
-	    case 'F':
+                    break;
+                case 256:
+                    player.setMaxAdvances(parser.argument<unsigned long>(i));
+                    break;
+                case 257:
+                    player.setStartFullscreen(true);
+                    break;
+                case 258:
+                    player.hideMenu(true);
+                    break;
+                case 's':
+                    player.setScale(gnash::clamp<float>(
+                                    parser.argument<float>(i), 0.01f, 100.f));
+                    break;
+                case 'd':
+                    player.setDelay(parser.argument<long>(i));
+                    break;
+                case 'u':
+                    url = parser.argument(i);
+                    gnash::log_debug (_("Setting root URL to %s"), url.c_str());
+                    break;
+                case 'U':    
+                    // Set base URL
+                    player.setBaseUrl(parser.argument(i));
+                    gnash::log_debug (_("Setting base URL to %s"),
+                                      parser.argument(i));
+                    break;
+                case 'F':
                 {
                     const int fd = parser.argument<long>(i);
                     if (fd < 1) {
                         cerr << boost::format(_("Invalid host communication "
-						"filedescriptor %d\n")) % fd << endl;
+                                        "filedescriptor %d\n")) % fd << endl;
                         exit(EXIT_FAILURE);
                     }
                     player.setHostFD ( fd );
                     break;
                 }
-	    case 'j':
-		widthGiven = true;
-		player.setWidth(parser.argument<long>(i));
-		gnash::log_debug(_("Setting width to %d"),
-				 player.getWidth());
-		break;
-	    case 'g':
+                case 'j':
+                    widthGiven = true;
+                    player.setWidth(parser.argument<long>(i));
+                    gnash::log_debug(_("Setting width to %d"),
+                                     player.getWidth());
+                    break;
+                case 'g':
 #ifdef USE_DEBUGGER
-		gnash::log_debug(_("Setting debugger ON"));
-		debugger.enabled(true);
-		//              debugger.startServer(&debugger);
-		debugger.console();
+                    gnash::log_debug(_("Setting debugger ON"));
+                    debugger.enabled(true);
+                    //              debugger.startServer(&debugger);
+                    debugger.console();
 #else
-		gnash::log_error(_("No debugger; disabled at compile time, -g "
-				   "is invalid"));
-		exit(EXIT_FAILURE);
+                    gnash::log_error(_("No debugger; disabled at compile "
+                                "time, -g is invalid"));
+                    exit(EXIT_FAILURE);
 #endif
-		break;
-	    case 'k':
-		heightGiven = true;
-		player.setHeight ( parser.argument<long>(i));
-		gnash::log_debug(_("Setting height to %d"),
-				 player.getHeight());
-		break;
-	    case 'X':
-		xPosGiven = true;
-		player.setXPosition ( parser.argument<int>(i));
-		gnash::log_debug (_("Setting x position to %d"), 
-				  player.getXPosition());
-		break;
-	    case 'Y':
-		yPosGiven = true;
-		player.setYPosition ( parser.argument<int>(i));
-		gnash::log_debug (_("Setting x position to %d"), 
-				  player.getYPosition());
-		break;
-	    case 'x':
-		plugin = true;
-		player.setWindowId(parser.argument<long>(i));
-		break;
-	    case '1':
-		player.setDoLoop(false);
-		break;
-		// See if the hardware video decoder was specified
- 	    case 261:
-		switch (parser.argument<char>(i))
-                    {
-		    case 'v':
-			player.setHWAccel("vaapi");
-			break;
-		    case 'x':
-			player.setHWAccel("xv");
-			break;
-		    case 'n':
-		    default:
-			player.setHWAccel("none");
-			break;
-		    }
-		break;
-	    case 'r':
-		renderflag = true;
-		switch (parser.argument<char>(i))
-                    {
-		    case '0':
-			// Disable both
-			player.setDoRender(false);
-			player.setDoSound(false);
-			break;
-		    case '1':
-			// Enable rendering, disable sound
-			player.setDoRender(true);
-			player.setDoSound(false);
-			break;
-		    case '2':
-			// Enable sound, disable rendering
-			player.setDoRender(false);
-			player.setDoSound(true);
-			break;
-		    case '3':
-			// Enable render & sound
-			player.setDoRender(true);
-			player.setDoSound(true);
-			break;
-			// See if a renderer was specified
-		    case 'a':
-			// Enable AGG as the rendering backend
-			player.setRenderer("agg");
-			break;
-		    case 'o':
-			// Enable OpenGL as the rendering backend
-			player.setRenderer("opengl");
-			break;
-		    case 'c':
-			// Enable Cairo as the rendering backend
-			player.setRenderer("cairo");
-			break;
-		    default:
-			gnash::log_error(_("ERROR: -r must be followed by "
-					   "0, 1, 2 or 3 "));
-			break;
-                    }
-		break;
-	    case 't':
-		player.setExitTimeout(parser.argument<float>(i));
-		break;
-	    case 'f':
+                    break;
+                case 'k':
+                    heightGiven = true;
+                    player.setHeight(parser.argument<long>(i));
+                    gnash::log_debug(_("Setting height to %d"),
+                                     player.getHeight());
+                    break;
+                case 'X':
+                    xPosGiven = true;
+                    player.setXPosition ( parser.argument<int>(i));
+                    gnash::log_debug (_("Setting x position to %d"), 
+                                      player.getXPosition());
+                    break;
+                case 'Y':
+                    yPosGiven = true;
+                    player.setYPosition(parser.argument<int>(i));
+                    gnash::log_debug(_("Setting x position to %d"), 
+                                      player.getYPosition());
+                    break;
+                case 'x':
+                    plugin = true;
+                    player.setWindowId(parser.argument<long>(i));
+                    break;
+                case '1':
+                    player.setDoLoop(false);
+                    break;
+                    // See if the hardware video decoder was specified
+                 case 261:
+                    switch (parser.argument<char>(i)) {
+                        case 'v':
+                            player.setHWAccel("vaapi");
+                            break;
+                        case 'x':
+                            player.setHWAccel("xv");
+                            break;
+                        case 'n':
+                        default:
+                            player.setHWAccel("none");
+                            break;
+                        }
+                    break;
+                case 'r':
+                    renderflag = true;
+                    switch (parser.argument<char>(i)) {
+                        case '0':
+                            // Disable both
+                            player.setDoRender(false);
+                            player.setDoSound(false);
+                            break;
+                        case '1':
+                            // Enable rendering, disable sound
+                            player.setDoRender(true);
+                            player.setDoSound(false);
+                            break;
+                        case '2':
+                            // Enable sound, disable rendering
+                            player.setDoRender(false);
+                            player.setDoSound(true);
+                            break;
+                        case '3':
+                            // Enable render & sound
+                            player.setDoRender(true);
+                            player.setDoSound(true);
+                            break;
+                            // See if a renderer was specified
+                        case 'a':
+                            // Enable AGG as the rendering backend
+                            player.setRenderer("agg");
+                            break;
+                        case 'o':
+                            // Enable OpenGL as the rendering backend
+                            player.setRenderer("opengl");
+                            break;
+                        case 'c':
+                            // Enable Cairo as the rendering backend
+                            player.setRenderer("cairo");
+                            break;
+                        default:
+                            gnash::log_error(_("ERROR: -r must be followed by "
+                                               "0, 1, 2 or 3 "));
+                            break;
+                }
+                break;
+            case 't':
+                player.setExitTimeout(parser.argument<float>(i));
+                break;
+            case 'f':
 #ifdef GNASH_FPS_DEBUG
-		player.setFpsPrintTime(parser.argument<float>(i));
+                player.setFpsPrintTime(parser.argument<float>(i));
 #else
-		cout << _("FPS debugging disabled at compile time, -f "
-			  "is invalid") << endl;
-		exit(EXIT_FAILURE);
+                cout << _("FPS debugging disabled at compile time, -f "
+                          "is invalid") << endl;
+                exit(EXIT_FAILURE);
 #endif 
-		break;
-	    case 'P':
-                {
-                    const std::string& param = parser.argument(i);
-                    const size_t eq = param.find("=");
-                    std::string name, value;
-                    if (eq == std::string::npos) {
-                        name = param;
-                        value = "true";
-                    }
-                    else {
-                        name = param.substr(0, eq);
-                        value = param.substr(eq + 1);
-                    }
-                    player.setParam(name, value);
-                    break;
+                break;
+            case 'P':
+            {
+                const std::string& param = parser.argument(i);
+                const size_t eq = param.find("=");
+                std::string name, value;
+                if (eq == std::string::npos) {
+                    name = param;
+                    value = "true";
                 }
-	    case 'A':
-                {
-                    player.setAudioDumpfile(parser.argument(i));
-                    break;
+                else {
+                    name = param.substr(0, eq);
+                    value = param.substr(eq + 1);
                 }
-                case 259:
-                    // The player takes care of parsing the list.
-                    player.setScreenShots(parser.argument(i));
-                    break;
-                case 260:
-                    player.setScreenShotFile(parser.argument(i));
-                    break;
-                case 0:
-                    infiles.push_back(parser.argument(i));
-                    break;
+                player.setParam(name, value);
+                break;
+            }
+            case 'A':
+            {
+                player.setAudioDumpfile(parser.argument(i));
+                break;
+            }
+            case 259:
+                // The player takes care of parsing the list.
+                player.setScreenShots(parser.argument(i));
+                break;
+            case 260:
+                player.setScreenShotFile(parser.argument(i));
+                break;
+            case 0:
+                infiles.push_back(parser.argument(i));
+                break;
             }
         }
         catch (Arg_parser::ArgParserException &e) {
