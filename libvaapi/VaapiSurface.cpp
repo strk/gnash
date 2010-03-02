@@ -206,5 +206,5 @@ bool VaapiSurface::deassociateSubpicture(boost::shared_ptr<VaapiSubpicture> subp
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

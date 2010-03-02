@@ -176,5 +176,5 @@ unsigned int VaapiImage::getPitch(int plane) const
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

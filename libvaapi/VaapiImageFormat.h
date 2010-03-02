@@ -72,3 +72,10 @@ static inline bool vaapi_image_format_is_yuv(VaapiImageFormat format)
 VaapiImageFormat vaapi_get_image_format(VAImageFormat const &format);
 
 #endif /* GNASH_VAAPIIMAGEFORMAT_H */
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
+
+

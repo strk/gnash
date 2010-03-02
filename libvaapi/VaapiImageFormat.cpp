@@ -45,3 +45,9 @@ VaapiImageFormat vaapi_get_image_format(VAImageFormat const &format)
     /* XXX: check RGB formats and endianess */
     return static_cast<VaapiImageFormat>(format.fourcc);
 }
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
+

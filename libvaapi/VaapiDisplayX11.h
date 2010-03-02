@@ -50,3 +50,9 @@ struct VaapiDisplayX11 : public X11Display, VaapiDisplay {
 } // gnash namespace
 
 #endif /* GNASH_VAAPIDISPLAY_H */
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
+

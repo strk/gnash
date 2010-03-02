@@ -93,3 +93,10 @@ public:
 } // gnash namespace
 
 #endif /* GNASH_VAAPIIMAGE_H */
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
+
+

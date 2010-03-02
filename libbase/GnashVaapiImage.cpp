@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "GnashVaapiImage.h"
-#include "vaapi.h"
+#include "VaapiSurface.h"
 
 namespace gnash {
 

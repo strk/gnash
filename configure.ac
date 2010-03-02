@@ -2661,12 +2661,12 @@ echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
 if test x"${build_vaapi}" = x"yes"; then
   echo "        Video Acceleration via libVA API support: yes"
-  if test x$use_vaapi_x11 = xyes; then
+  if test x$use_libva_x11 = xyes; then
     echo "        Video Acceleration via libVA X11 API support: yes"
   else
     echo "        Video Acceleration via libVA X11 API support: no"
   fi
-  if test x$use_vaapi_glx = xyes; then
+  if test x$use_libva_glx = xyes; then
     echo "        Video Acceleration via libVA OpenGL API support: yes"
   else
     echo "        Video Acceleration via libVA OpenGL API support: no"
@@ -3474,7 +3474,7 @@ if test x"${build_vaapi}" = x"yes"; then
       echo "        LIBVA flags are: $LIBVA_CFLAGS"
       echo "        LIBVA libraries are: $LIBVA_LIBS"
   fi
-  if test x$use_vaapi_x11 = xyes; then
+  if test x$use_libva_x11 = xyes; then
     if test x"${LIBVA_X11_CFLAGS}" = xyes; then
       echo "        LIBVA X11 flags are: default"
     else
@@ -3482,7 +3482,7 @@ if test x"${build_vaapi}" = x"yes"; then
       echo "        LIBVA X11 libraries are: $LIBVA_X11_LIBS"
     fi
   fi
-  if test x$use_vaapi_glx = xyes; then
+  if test x$use_libva_glx = xyes; then
     if test x"${LIBVA_GLX_CFLAGS}" = xyes; then
       echo "        LIBVA GLXflags are: default"
     else

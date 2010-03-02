@@ -650,5 +650,5 @@ std::auto_ptr<Gui> createDumpGui(unsigned long xid, float scale, bool loop, RunR
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

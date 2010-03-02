@@ -36,7 +36,6 @@ libgnashvaapi_la_LIBADD = \
 	$(NULL)
 
 libgnashvaapi_la_SOURCES = \
-	vaapi.cpp \
 	vaapi_utils.cpp	\
 	VaapiContext.cpp \
 	VaapiDisplay.cpp \
@@ -49,7 +48,6 @@ libgnashvaapi_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-	vaapi.h	\
 	vaapi_common.h \
 	vaapi_utils.h \
 	VaapiContext.h \

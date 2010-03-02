@@ -42,3 +42,9 @@ struct VaapiException: public std::runtime_error {
 } // gnash namespace
 
 #endif /* GNASH_VAAPIEXCEPTION_H */
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
+

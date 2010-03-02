@@ -32,3 +32,9 @@
 #include "dsodefs.h"
 
 #endif /* GNASH_VAAPI_COMMON_H */
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
+

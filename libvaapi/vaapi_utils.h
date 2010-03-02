@@ -24,6 +24,18 @@
 
 namespace gnash {
 
+/// Enable video acceleration (with VA API)
+void DSOEXPORT vaapi_set_is_enabled(bool enabled);
+
+/// Check whether video acceleration is enabled
+bool DSOEXPORT vaapi_is_enabled();
+
+/// Enable video acceleration (with VA API)
+void DSOEXPORT vaapi_set_is_enabled(bool enabled);
+
+/// Check whether video acceleration is enabled
+bool DSOEXPORT vaapi_is_enabled();
+
 /// Debug output
 void DSOEXPORT vaapi_dprintf(const char *format, ...);
 
@@ -42,3 +54,9 @@ const char *string_of_VAEntrypoint(VAEntrypoint entrypoint);
 } // gnash namespace
 
 #endif /* GNASH_VAAPI_UTILS_H */
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
+

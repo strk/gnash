@@ -36,6 +36,11 @@
 #include "gnash.h" // Quality
 
 #include <iostream>
+#ifdef HAVE_VA_VA_H
+#include "va/va.h"
+#include "va/va_backend.h"
+#endif
+
 #ifdef HAVE_X11
 #include <X11/keysym.h>
 #include <gdk/gdkx.h>
@@ -73,6 +78,7 @@ extern "C" {
 # include <hildon/hildon.h>
 #endif
 
+extern VAStatus va_getDriverName(VADisplay dpy, char **driver_name);
 
 namespace gnash 
 {
@@ -242,7 +248,22 @@ GtkGui::init(int argc, char **argv[])
             log_debug("Xvideo extension found");
         }
     }
-    
+
+#ifdef USE_VAAPI_X
+    char *driver_name = NULL;
+    struct VADisplayContext *pDisplayContext = (struct VADisplayContext *)GDK_DISPLAY();
+    if (pDisplayContext->vaGetDriverName(pDisplayContext, &driver_name) == 0) {
+        if ((strcmp(driver_name, "nvidia" ) == 0) || (strcmp(driver_name, "vdpau" ) == 0) || (strcmp(driver_name, "s3g" ) == 0)) {
+            log_debug("found suppored vaapi driver for %s", driver_name);
+        } else {
+            log_error("No vaapi driver found for %s!", driver_name);
+        }
+    } else {
+        log_error("Coildn't get the VAAPI driver name!");
+    }
+
+#endif
+
 #ifdef BUILD_CANVAS
     _canvas = gnash_canvas_new();
     gnash_canvas_setup(GNASH_CANVAS(_canvas), hwaccel, renderer, argc, argv);

@@ -30,6 +30,10 @@
 #include "log.h"
 #include "gtk_glue.h"
 
+#if USE_VAAPI
+#include "vaapi_utils.h"
+#endif
+
 // OpenGL support for rendering in the canvas. This also requires
 // the GtkGL widget for GTK2.
 #ifdef HAVE_GTK_GTKGL_H
@@ -225,6 +229,8 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
     }
     
     while (!initialized_renderer) {
+        // Global enable VA-API, if requested
+        gnash::vaapi_set_is_enabled(hwaccel == "vaapi");
         // Use the Cairo renderer. Cairo is also used by GTK2, so using
         // Cairo makes much sense. Unfortunately, our implementation seems
         // to have serious performance issues, although it does work.

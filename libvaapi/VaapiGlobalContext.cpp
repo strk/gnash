@@ -130,6 +130,9 @@ VaapiGlobalContext *VaapiGlobalContext::get()
 
     static std::auto_ptr<VaapiGlobalContext> vaapi_global_context;
 
+    if (!vaapi_is_enabled())
+        return NULL;
+
     if (!vaapi_global_context.get()) {
         std::auto_ptr<VaapiDisplay> dpy;
         /* XXX: this won't work with multiple renders built-in */
@@ -147,3 +150,9 @@ VaapiGlobalContext *VaapiGlobalContext::get()
 }
 
 } // gnash namespace
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
+
