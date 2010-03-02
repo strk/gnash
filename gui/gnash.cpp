@@ -311,7 +311,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     const int fd = parser.argument<long>(i);
                     if (fd < 1) {
                         cerr << boost::format(_("Invalid host communication "
-                                        "filedescriptor %d\n")) % fd << endl;
+                                    "filedescriptor %d\n")) % fd << endl;
                         exit(EXIT_FAILURE);
                     }
                     player.setHostFD ( fd );
@@ -321,7 +321,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     widthGiven = true;
                     player.setWidth(parser.argument<long>(i));
                     gnash::log_debug(_("Setting width to %d"),
-                                     player.getWidth());
+                             player.getWidth());
                     break;
                 case 'g':
 #ifdef USE_DEBUGGER
@@ -339,19 +339,19 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     heightGiven = true;
                     player.setHeight(parser.argument<long>(i));
                     gnash::log_debug(_("Setting height to %d"),
-                                     player.getHeight());
+                             player.getHeight());
                     break;
                 case 'X':
                     xPosGiven = true;
                     player.setXPosition ( parser.argument<int>(i));
                     gnash::log_debug (_("Setting x position to %d"), 
-                                      player.getXPosition());
+                              player.getXPosition());
                     break;
                 case 'Y':
                     yPosGiven = true;
                     player.setYPosition(parser.argument<int>(i));
                     gnash::log_debug(_("Setting x position to %d"), 
-                                      player.getYPosition());
+                              player.getYPosition());
                     break;
                 case 'x':
                     plugin = true;
