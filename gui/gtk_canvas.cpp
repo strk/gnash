@@ -54,9 +54,9 @@
 #include "gtk_glue_agg_vaapi.h"
 #endif
 
-struct _GnashCanvas {
-	GtkDrawingArea base_instance;
-
+struct _GnashCanvas
+{
+    GtkDrawingArea base_instance;
     std::auto_ptr<gnash::GtkGlue> glue;
     boost::shared_ptr<gnash::Renderer> renderer;
 };
@@ -74,7 +74,7 @@ static void gnash_canvas_realize(GtkWidget *widget);
 static void gnash_canvas_after_realize(GtkWidget *widget);
 
 namespace {
-gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
 GtkWidget *
@@ -90,7 +90,7 @@ gnash_canvas_class_init(GnashCanvasClass *gnash_canvas_class)
     GNASH_REPORT_FUNCTION;
     GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(gnash_canvas_class);
 
-    parent_class = (GObjectClass *) g_type_class_peek_parent(gnash_canvas_class);
+    parent_class = (GObjectClass *)g_type_class_peek_parent(gnash_canvas_class);
 
     widget_class->size_allocate = gnash_canvas_size_allocate;
     widget_class->expose_event = gnash_canvas_expose_event;
@@ -121,12 +121,15 @@ gnash_canvas_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
     GNASH_REPORT_FUNCTION;
     GnashCanvas *canvas = GNASH_CANVAS(widget);
 
-    gnash::log_debug("gnash_canvas_size_allocate %d %d", allocation->width, allocation->height);
+    gnash::log_debug("gnash_canvas_size_allocate %d %d", allocation->width,
+            allocation->height);
 
-    if (canvas->renderer.get())
-        canvas->glue->setRenderHandlerSize(allocation->width, allocation->height);
+    if (canvas->renderer.get()) {
+        canvas->glue->setRenderHandlerSize(allocation->width,
+                allocation->height);
+    }
     
-    GTK_WIDGET_CLASS (parent_class)->size_allocate (widget, allocation);
+    GTK_WIDGET_CLASS(parent_class)->size_allocate (widget, allocation);
 }
 
 static gboolean
@@ -181,7 +184,8 @@ gnash_canvas_realize(GtkWidget *widget)
 
 #if defined(RENDERER_CAIRO) || defined(RENDERER_AGG)
     // cairo needs the _drawingArea.window to prepare it ..
-    // TODO: find a way to make 'glue' use independent from actual renderer in use
+    // TODO: find a way to make 'glue' use independent from actual
+    // renderer in use
     canvas->glue->prepDrawingArea(GTK_WIDGET(canvas));
 #endif
 }
@@ -199,7 +203,8 @@ gnash_canvas_after_realize(GtkWidget *widget)
 }
 
 void
-gnash_canvas_setup(GnashCanvas *canvas, std::string &hwaccel, std::string &renderer, int argc, char **argv[])
+gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
+        std::string& renderer, int argc, char **argv[])
 {
 
     GNASH_REPORT_FUNCTION;
@@ -210,68 +215,75 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string &hwaccel, std::string &rende
     // If a renderer hasn't been defined in gnashrc, or on the command
     // line, pick a sensible default.
     if (renderer.empty()) {
-	renderer = "agg";
+        renderer = "agg";
     }
 
     // If the Hardware acceleration isn't defined in gnashrc, or on
     // the command line, pick a sensible default.
     if (hwaccel.empty()) {
-	hwaccel = "none";
+        hwaccel = "none";
     }
     
     while (!initialized_renderer) {
-	// Use the Cairo renderer. Cairo is also used by GTK2, so using
-	// Cairo makes much sense. Unfortunately, our implementation seems
-	// to have serious performance issues, although it does work.
-	if (renderer == "cairo") {
-	    canvas->glue.reset(new gnash::GtkCairoGlue);
-	    // Set the renderer to the next one to try if initializing
-	    // fails.
-	    renderer = "agg";
-	} else if (renderer == "opengl") {
-	    canvas->glue.reset(new gnash::GtkGlExtGlue);
-	    // Set the renderer to the next one to try if initializing
-	    // fails.
-	    renderer = "agg";
-	// Use the AGG software library for rendering. While this runs
-	// on any hardware platform, it does have performance issues
-	// on low-end platforms without a GPU. So while AGG may render
-	// streaming video over a network connection just fine,
-	// anything below about 600Mhz CPU may have buffering and
-	// rendering performance issues.
-	} else if (renderer == "agg") {
-	    // Use LibVva, which works on Nvidia, AT, or Intel 965 GPUs
-	    // with AGG or OpenGL.
-	    if (hwaccel == "vaapi") {
-		canvas->glue.reset(new gnash::GtkAggVaapiGlue);
-		// Set the hardware acclerator to the next one to try
-		// if initializing fails.
-		hwaccel = "xv";
-	    // Use the X11 XV extension, which works on most GPUs.
-	    } else if (hwaccel == "xv") {
-		canvas->glue.reset(new gnash::GtkAggXvGlue);
-		// Set the hardware acclerator to the next one to try
-		// if initializing fails.
-		hwaccel = "none";
-	    } else {
-		canvas->glue.reset(new gnash::GtkAggGlue);
-	    }
-	}
+        // Use the Cairo renderer. Cairo is also used by GTK2, so using
+        // Cairo makes much sense. Unfortunately, our implementation seems
+        // to have serious performance issues, although it does work.
+        if (renderer == "cairo") {
+            canvas->glue.reset(new gnash::GtkCairoGlue);
+            // Set the renderer to the next one to try if initializing
+            // fails.
+            renderer = "agg";
+        }
+        else if (renderer == "opengl") {
+            canvas->glue.reset(new gnash::GtkGlExtGlue);
+            // Set the renderer to the next one to try if initializing
+            // fails.
+            renderer = "agg";
+            // Use the AGG software library for rendering. While this runs
+            // on any hardware platform, it does have performance issues
+            // on low-end platforms without a GPU. So while AGG may render
+            // streaming video over a network connection just fine,
+            // anything below about 600Mhz CPU may have buffering and
+            // rendering performance issues.
+        }
+        else if (renderer == "agg") {
+            // Use LibVva, which works on Nvidia, AT, or Intel 965 GPUs
+            // with AGG or OpenGL.
+            if (hwaccel == "vaapi") {
+                canvas->glue.reset(new gnash::GtkAggVaapiGlue);
+                // Set the hardware acclerator to the next one to try
+                // if initializing fails.
+                hwaccel = "xv";
+            }
+            else if (hwaccel == "xv") {
+                // Use the X11 XV extension, which works on most GPUs.
+                canvas->glue.reset(new gnash::GtkAggXvGlue);
+                // Set the hardware acclerator to the next one to try
+                // if initializing fails.
+                hwaccel = "none";
+            }
+            else {
+                canvas->glue.reset(new gnash::GtkAggGlue);
+            }
+        }
 
-	// Initializze the canvas for rendering into
-	initialized_renderer = canvas->glue->init(argc, argv);
-	// If the renderer with the least dependencies fails, we can't
-	// proceed.
-	if (!initialized_renderer && (renderer == "agg") && (hwaccel == "none")) {
-	    break;
-	}
+        // Initializze the canvas for rendering into
+        initialized_renderer = canvas->glue->init(argc, argv);
+        // If the renderer with the least dependencies fails, we can't
+        // proceed.
+        if (!initialized_renderer && (renderer == "agg") &&
+                (hwaccel == "none")) {
+            break;
+        }
     }
-	
+        
     if (initialized_renderer && renderer == "opengl") {
-	// OpenGL glue needs to prepare the drawing area for OpenGL rendering before
-	// widgets are realized and before the configure event is fired.
-	// TODO: find a way to make '_glue' use independent from actual renderer in use
-	canvas->glue->prepDrawingArea(GTK_WIDGET(canvas));
+        // OpenGL glue needs to prepare the drawing area for OpenGL
+        // rendering before
+        // widgets are realized and before the configure event is fired.
+        // TODO: find a way to make '_glue' use independent from
+        // actual renderer in use
+        canvas->glue->prepDrawingArea(GTK_WIDGET(canvas));
     }
 }
 
