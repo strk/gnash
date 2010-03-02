@@ -42,6 +42,7 @@ GtkAggGlue::GtkAggGlue()
 :   _offscreenbuf(NULL),
     _agg_renderer(NULL)
 {
+    GNASH_REPORT_FUNCTION;
 }
 
 GtkAggGlue::~GtkAggGlue()

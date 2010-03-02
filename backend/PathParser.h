@@ -19,7 +19,6 @@
 #ifndef GNASH_PATH_PARSER_H
 #define GNASH_PATH_PARSER_H
 
-
 #include "Geometry.h"
 #include <vector>
 #include <deque>

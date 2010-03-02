@@ -630,36 +630,37 @@ fi
 )
 
 add_renderer=
-build_ogl=no
-build_agg=no
-build_cairo=no
-AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=[[agg|ogl|cairo]]], [Use the specified renderer (default=agg)]),
-    [case "${enableval}" in
-      ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
-        build_ogl=yes
-	      add_renderer="ogl"
-        ;;
-      agg|AGG|Agg)
-        build_agg=yes
-	      add_renderer="agg"
-        ;;
-      cairo|CAIRO|Cairo)
-        build_cairo=yes
-	      add_renderer="cairo"
-        ;;
+build_ogl=yes
+build_agg=yes
+build_cairo=yes
+dnl AC_ARG_ENABLE(renderer,
+dnl   AC_HELP_STRING([--enable-renderer=[[agg|ogl|cairo]]], [Use the specified renderer (default=agg)]),
+dnl     [case "${enableval}" in
+dnl       ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
+dnl         build_ogl=yes
+dnl 	      add_renderer="ogl"
+dnl         ;;
+dnl       agg|AGG|Agg)
+dnl         build_agg=yes
+dnl 	      add_renderer="agg"
+dnl         ;;
+dnl       cairo|CAIRO|Cairo)
+dnl         build_cairo=yes
+dnl 	      add_renderer="cairo"
+dnl         ;;
 dnl       all|ALL|All)
 dnl         build_ogl=yes
 dnl         build_agg=yes
 dnl         build_cairo=yes
-dnl 	add_renderer="ogl,agg,cairo"
+dnl  	     add_renderer="ogl,agg,cairo"
 dnl         ;;
-      *) AC_MSG_ERROR([invalid renderer ${enableval} given (accept: ogl,agg,cairo)])
-         ;;
-      esac],
-	build_agg=yes
-	add_renderer=agg
-)
+dnl       *) AC_MSG_ERROR([invalid renderer ${enableval} given (accept: ogl,agg,cairo)])
+dnl          ;;
+dnl       esac],
+dnl 	build_agg=yes
+dnl   build_ogl=yes
+dnl 	add_renderer="agg,ogl"
+dnl )
 
 add_sound=
 build_sound_sdl=no
@@ -680,14 +681,14 @@ AC_ARG_ENABLE(sound,
   add_sound=sdl
 )
 
-if test x$build_ogl = xyes; then
-  if test x$build_fb = xyes; then
+if test x${build_ogl} = xyes; then
+  if test x${build_fb} = xyes; then
     AC_MSG_ERROR([OpenGL renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
-  if test x$build_fltk = xyes; then
+  if test x${build_fltk} = xyes; then
     AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
-  if test x$build_dump = xyes; then
+  if test x${build_dump} = xyes; then
     AC_MSG_ERROR([OpenGL renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
@@ -1311,10 +1312,14 @@ if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
-   GNASH_PATH_GLEXT
-   GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+   if test x"${build_ogl}" = xyes; then
+      GNASH_PATH_GLEXT
+   fi
+   if test x"${build_cairo}" = xyes; then
+      GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+   fi
 fi
-if test x$build_hildon = xyes; then
+if test x"${build_hildon}" = xyes; then
   GNASH_PATH_HILDON
   build_gtk=yes
   build_kde3=no
@@ -1948,24 +1953,24 @@ has_qtopia4=no
 
 AM_CONDITIONAL(HAVE_QTOPIA3, [test x$has_qtopia3 = xyes])
 AM_CONDITIONAL(HAVE_QTOPIA4, [test x$has_qtopia4 = xyes])
-AM_CONDITIONAL(HAVE_KDE3, [test x$has_kde3 = xyes])
-AM_CONDITIONAL(HAVE_KDE4, [test x$has_kde4 = xyes])
-AM_CONDITIONAL(HAVE_QT3, [test x$has_qt3 = xyes])
-AM_CONDITIONAL(HAVE_QT4, [test x$has_qt4 = xyes])
+AM_CONDITIONAL(HAVE_KDE3,    [test x$has_kde3 = xyes])
+AM_CONDITIONAL(HAVE_KDE4,    [test x$has_kde4 = xyes])
+AM_CONDITIONAL(HAVE_QT3,     [test x$has_qt3 = xyes])
+AM_CONDITIONAL(HAVE_QT4,     [test x$has_qt4 = xyes])
 
-AM_CONDITIONAL(WITH_KDE4, test "$with_kde4" != "no")
-AM_CONDITIONAL([QT_X11], [test "$platform" = "X11"])
-AM_CONDITIONAL([QTOPIA], [test "$platform" = "Qtopia"])
-AM_CONDITIONAL([QT_OSX], [test "$platform" = "OSX"])
-AM_CONDITIONAL([QT_OS9], [test "$platform" = "OS9"])
-AM_CONDITIONAL([QT_WIN32], [test "$platform" = "Win32"])
+AM_CONDITIONAL(WITH_KDE4,    [test "$with_kde4" != "no"])
+AM_CONDITIONAL([QT_X11],     [test "$platform" = "X11"])
+AM_CONDITIONAL([QTOPIA],     [test "$platform" = "Qtopia"])
+AM_CONDITIONAL([QT_OSX],     [test "$platform" = "OSX"])
+AM_CONDITIONAL([QT_OS9],     [test "$platform" = "OS9"])
+AM_CONDITIONAL([QT_WIN32],   [test "$platform" = "Win32"])
 
 dnl Need GLIB for both GTK and GST
-if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
+if test x"${build_gtk}" = xyes -o x"${media_handler}" = xgst; then
   GNASH_PATH_GLIB
 fi
 
-AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
+AM_CONDITIONAL(HAVE_GLIB, [ test x"${has_glib} "= xyes ])
 
 if test x$build_gtk = xno -o x$build_kde4 = xno; then
   if test x$npapi = xyes; then
@@ -2028,15 +2033,15 @@ AM_CONDITIONAL(BUILD_DUMP_GUI,     [ test x$build_dump = xyes ])
 AM_CONDITIONAL(BUILD_AMIGAOS4_GUI, [ test x$build_aos4 = xyes ])
 
 # plugin building flags
-AM_CONDITIONAL(NPAPI, [test x$npapi = xyes])
-AM_CONDITIONAL(KPARTS3, [test x$build_kparts3 = xyes])
-AM_CONDITIONAL(KPARTS4, [test x$build_kparts4 = xyes])
+AM_CONDITIONAL(NPAPI,   [test x"${npapi}" = xyes])
+AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
+AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
 
-if test x$build_ogl = xyes; then
+if test x"${build_ogl}" = xyes; then
   GNASH_PATH_OPENGL
 fi
 
-if test x$build_gtk = xyes; then
+if test x"${build_gtk}" = xyes; then
   AC_ARG_ENABLE(ghelp,
     AC_HELP_STRING([--enable-ghelp], [Enable support for the GNOME help system]),
     [case "${enableval}" in
@@ -2046,7 +2051,7 @@ if test x$build_gtk = xyes; then
     esac], ghelp=no
   )
 
-  if test x"$ghelp" = x"yes" ; then
+  if test x"${ghelp}" = x"yes" ; then
     AC_PATH_PROG(SCROLLKEEPER, scrollkeeper-config, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
     AC_PATH_PROG(SCROLLUPDATE, scrollkeeper-update, [],	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
     AC_PATH_PROG(SCROLLINSTALL, scrollkeeper-preinstall, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
@@ -2057,9 +2062,9 @@ if test x$build_gtk = xyes; then
     fi
   fi
 fi
-AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
+AM_CONDITIONAL(GHELP, [test x${ghelp} = xyes])
 
-if test x$build_fltk = xyes; then
+if test x${build_fltk} = xyes; then
   GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
 fi
 
@@ -2166,13 +2171,15 @@ dnl   fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
 
-AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
+AM_CONDITIONAL(HAVE_CAIRO, [true])
+dnl AM_CONDITIONAL(HAVE_CAIRO, [test x"${has_cairo}" = xyes])
+AM_CONDITIONAL(HAVE_OPENGL, [true])
+dnl AM_CONDITIONAL(HAVE_OPENGL, test x"${has_opengl}" = xyes)
 
 AM_CONDITIONAL(USE_SOUND_SDL, test x$build_sound_sdl = xyes)
 AM_CONDITIONAL(USE_SOUND_AHI, test x$build_sound_ahi = xyes)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
 AM_CONDITIONAL(USE_GST_ENGINE, test x"$media_handler" = xgst)
-AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
 
 if test x$build_sound_sdl = xyes; then
   AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling])

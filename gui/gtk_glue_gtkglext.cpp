@@ -18,6 +18,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
 
 #include "gtk_glue_gtkglext.h"
 #include "log.h"
@@ -32,7 +35,7 @@ GtkGlExtGlue::GtkGlExtGlue()
   : _tex_lod_bias(-1.2f)
 #endif
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 }
 
 GtkGlExtGlue::~GtkGlExtGlue()
@@ -146,3 +149,8 @@ GtkGlExtGlue::configure(GtkWidget *const widget, GdkEventConfigure *const event)
 
 
 } // namespace gnash
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

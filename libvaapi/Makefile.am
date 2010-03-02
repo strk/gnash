@@ -51,7 +51,6 @@ libgnashvaapi_la_SOURCES = \
 noinst_HEADERS = \
 	vaapi.h	\
 	vaapi_common.h \
-	vaapi_debug.h \
 	vaapi_utils.h \
 	VaapiContext.h \
 	VaapiDisplay.h \

@@ -51,3 +51,8 @@ class GtkAggGlue : public GtkGlue
 };
 
 } // namespace gnash
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

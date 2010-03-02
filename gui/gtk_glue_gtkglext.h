@@ -19,13 +19,15 @@
 #ifndef GTK_GLU_GTKGLEXT_H
 #define GTK_GLU_GTKGLEXT_H
 
-#include "Renderer_ogl.h"
-#include "gtk_glue.h"
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
 
 #include <gtk/gtkgl.h>
 
+#include "Renderer_ogl.h"
+#include "gtk_glue.h"
 #include "tu_opengl_includes.h"
-
 
 namespace gnash
 {
@@ -49,7 +51,12 @@ class GtkGlExtGlue : public GtkGlue
 #endif
 };
 
-}
+} // end of gnash namespace
 
 // end of GNASH_GTK_GLEXT_H
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

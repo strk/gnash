@@ -32,7 +32,7 @@
 
 // OpenGL support for rendering in the canvas. This also requires
 // the GtkGL widget for GTK2.
-#ifdef HAVE_GL_GL_H
+#ifdef HAVE_GTK_GTKGL_H
 #include "gtk_glue_gtkglext.h"
 #endif
 
@@ -224,12 +224,12 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string &hwaccel, std::string &rende
 	// Cairo makes much sense. Unfortunately, our implementation seems
 	// to have serious performance issues, although it does work.
 	if (renderer == "cairo") {
-	    // FIXME: canvas->glue.reset(new gnash::GtkCairoGlue);
+	    canvas->glue.reset(new gnash::GtkCairoGlue);
 	    // Set the renderer to the next one to try if initializing
 	    // fails.
 	    renderer = "agg";
 	} else if (renderer == "opengl") {
-	    // FIXME: canvas->glue.reset(new gnash::GtkGlExtGlue);
+	    canvas->glue.reset(new gnash::GtkGlExtGlue);
 	    // Set the renderer to the next one to try if initializing
 	    // fails.
 	    renderer = "agg";

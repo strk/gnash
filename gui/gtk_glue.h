@@ -21,6 +21,8 @@
 
 #include "gnash.h"
 
+#include <cassert>
+
 #include <gtk/gtk.h>
 #if !defined(_WIN32) && !defined(__MACH__)
 #include <gdk/gdkx.h>
