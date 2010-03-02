@@ -38,6 +38,10 @@
 #include <iostream>
 #ifdef HAVE_X11
 #include <X11/keysym.h>
+#include <gdk/gdkx.h>
+#include <X11/Xlib.h>
+#include <X11/extensions/Xv.h>
+#include <X11/extensions/Xvlib.h>
 #endif
 
 #include <gtk/gtk.h>
@@ -198,7 +202,7 @@ GtkGui::init(int argc, char **argv[])
     }
     
     addGnashIcon(GTK_WINDOW(_window));
-    
+
     std::string hwaccel = _runResources.getHWAccelBackend();
     if (hwaccel.empty()) {
 	hwaccel = rcfile.getHWAccel();
@@ -208,6 +212,37 @@ GtkGui::init(int argc, char **argv[])
 	renderer = rcfile.getRenderer();
     }
 
+    if (renderer == "opengl") {
+        // See if our X11 server supports the DRI extension, otherwise
+        // there is no point in trying to use OpenGL.
+        bool dri = false;
+        if (checkX11Extension("DRI")) {
+            log_debug("DRI extension found");
+            dri = true;
+        }
+        bool glx = false;
+        // See if our X11 server supports the GLX extension, otherwise
+        // there is no point in trying to use OpenGL.
+        if (checkX11Extension("GLX")) {
+            log_debug("GLX extension found");
+            glx = true;
+        }
+        // If we don't have these extensions, don't bother with OpenGl,
+        // drop back to AGG.
+        if (!glx || !dri) {
+            g_warning("This systms lacks a hardware OpenGL driver!");
+        }
+    }
+
+    // Gnash can only use the XVideo extension if our X server supports it.
+    if (hwaccel == "xv") {
+        // See if our X11 server supports the Xvideo extension, otherwise
+        // there is no point in trying to use Xvideo for scaling.
+        if (checkX11Extension("XVideo")) {
+            log_debug("Xvideo extension found");
+        }
+    }
+    
 #ifdef BUILD_CANVAS
     _canvas = gnash_canvas_new();
     gnash_canvas_setup(GNASH_CANVAS(_canvas), hwaccel, renderer, argc, argv);
@@ -478,8 +513,7 @@ GtkGui::showMouse(bool show)
 
     if (show == _mouseShown) return state;
 
-    if (!show)
-    {
+    if (!show) {
         GdkPixmap *pixmap;
         GdkColor *color;
 
@@ -2218,6 +2252,29 @@ GtkGui::playHook()
     startAdvanceTimer();
 }
 
+// See if the X11 server we're using supports an extension.
+bool 
+GtkGui::checkX11Extension(const std::string &ext)
+{
+    //    GNASH_REPORT_FUNCTION;
+    
+    int n = 0;
+
+    char **extlist = XListExtensions (GDK_DISPLAY(), &n);
+
+    if (extlist) {
+	int i;
+
+	for (i = 0; i < n; i++) {
+            if (strncmp(ext.c_str(), extlist[i], ext.size()) == 0) {
+                return true;
+            }
+	}
+        return false;
+	/* do not free, Xlib can depend on contents being unaltered */
+	/* XFreeExtensionList (extlist); */
+    }
+}
 
 
 /// Anonymous namespace for callbacks, local functions, event handlers etc.
@@ -2721,7 +2778,9 @@ menuShowUpdatedRegions(GtkMenuItem* /*menuitem*/, gpointer data)
     gui->showUpdatedRegions(!gui->showUpdatedRegions());
     
     // refresh to clear the remaining red lines...
-    if (!gui->showUpdatedRegions()) gui->refreshView();
+    if (!gui->showUpdatedRegions()) {
+        gui->refreshView();
+    }
 }
 
 /// \brief Set quality to LOW level
@@ -2762,5 +2821,5 @@ menuQualityBest(GtkMenuItem* /*menuitem*/, gpointer data)
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
