@@ -221,14 +221,18 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
     if (renderer.empty()) {
         renderer = "agg";
     }
+    std::string next_renderer = renderer;
 
     // If the Hardware acceleration isn't defined in gnashrc, or on
     // the command line, pick a sensible default.
     if (hwaccel.empty()) {
         hwaccel = "none";
     }
-    
+    std::string next_hwaccel = hwaccel;
+
     while (!initialized_renderer) {
+        renderer = next_renderer;
+        hwaccel = next_hwaccel;
         // Global enable VA-API, if requested
         gnash::vaapi_set_is_enabled(hwaccel == "vaapi");
         // Use the Cairo renderer. Cairo is also used by GTK2, so using
@@ -238,13 +242,13 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             canvas->glue.reset(new gnash::GtkCairoGlue);
             // Set the renderer to the next one to try if initializing
             // fails.
-            renderer = "agg";
+            next_renderer = "agg";
         }
         else if (renderer == "opengl") {
             canvas->glue.reset(new gnash::GtkGlExtGlue);
             // Set the renderer to the next one to try if initializing
             // fails.
-            renderer = "agg";
+            next_renderer = "agg";
             // Use the AGG software library for rendering. While this runs
             // on any hardware platform, it does have performance issues
             // on low-end platforms without a GPU. So while AGG may render
@@ -259,14 +263,14 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
                 canvas->glue.reset(new gnash::GtkAggVaapiGlue);
                 // Set the hardware acclerator to the next one to try
                 // if initializing fails.
-                hwaccel = "xv";
+                next_hwaccel = "xv";
             }
             else if (hwaccel == "xv") {
                 // Use the X11 XV extension, which works on most GPUs.
                 canvas->glue.reset(new gnash::GtkAggXvGlue);
                 // Set the hardware acclerator to the next one to try
                 // if initializing fails.
-                hwaccel = "none";
+                next_hwaccel = "none";
             }
             else {
                 canvas->glue.reset(new gnash::GtkAggGlue);
