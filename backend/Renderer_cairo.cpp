@@ -575,7 +575,6 @@ Renderer_cairo::begin_display(const rgba& bg_color,
       set_color(bg_color);
     }
 
-    cairo_set_matrix(_cr, &_stage_mat);
 
     for (size_t rno=0; rno < _invalidated_ranges.size(); rno++) {
         const geometry::Range2d<float>& range =
@@ -587,6 +586,7 @@ Renderer_cairo::begin_display(const rgba& bg_color,
             cairo_paint(_cr);
             // reset any rectangles that might have been added to the path...
             cairo_new_path(_cr);
+            cairo_set_matrix(_cr, &_stage_mat);
             return;
         }
 
@@ -595,16 +595,19 @@ Renderer_cairo::begin_display(const rgba& bg_color,
                maxx = range.getMaxX(),
                maxy = range.getMaxY();
 
-        snap_to_pixel(_cr, x, y, false);
-        snap_to_pixel(_cr, maxx, maxy, true);
+        // Transform to pixels.
+        cairo_matrix_transform_point(&_stage_mat, &x, &y);
+        cairo_matrix_transform_point(&_stage_mat, &maxx, &maxy);
 
-        cairo_rectangle(_cr, x, y, maxx - x, maxy - y);
+        cairo_rectangle(_cr, rint(x), rint(y), rint(maxx - x), rint(maxy - y));
     }
 
     cairo_clip(_cr);
 
     // Paint the background color over the clipped region(s).
     cairo_paint(_cr);
+
+    cairo_set_matrix(_cr, &_stage_mat);
 }
 
 void
