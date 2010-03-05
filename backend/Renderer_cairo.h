@@ -75,11 +75,13 @@ public:
 
     void add_path(cairo_t* cr, const Path& cur_path);
 
-    void apply_line_style(const LineStyle& style, const cxform& cx);
+    void apply_line_style(const LineStyle& style, const cxform& cx,
+                          const SWFMatrix& mat);
 
     void draw_outlines(const PathVec& path_vec,
                        const std::vector<LineStyle>& line_styles,
-                       const cxform& cx);
+                       const cxform& cx,
+                       const SWFMatrix& mat);
 
     std::vector<PathVec::const_iterator> find_subshapes(const PathVec& path_vec);
 
