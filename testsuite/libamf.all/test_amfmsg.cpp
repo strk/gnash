@@ -36,7 +36,6 @@
 #include "GnashException.h"
 #include "check.h"
 //#include "dejagnu.h"
-#include "as_object.h"
 #include "arg_parser.h"
 #include "amf.h"
 #include "amf_msg.h"

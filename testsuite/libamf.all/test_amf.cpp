@@ -32,11 +32,9 @@
 #include <iostream>
 #include <string>
 #include <boost/shared_ptr.hpp>
-
 #include "GnashException.h"
 #include "check.h"
 //#include "dejagnu.h"
-#include "as_object.h"
 #include "arg_parser.h"
 #include "amf.h"
 #include "buffer.h"
