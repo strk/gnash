@@ -244,32 +244,6 @@ SWFMatrix::transform(point* result, const point& p) const
     result->y = Fixed16Mul(shx, p.x) + Fixed16Mul(sy,  p.y) + ty;
 }
 
-void
-SWFMatrix::transform(geometry::Range2d<float>& r) const
-{
-    if ( ! r.isFinite() ) return;
-
-    float xmin = r.getMinX();
-    float xmax = r.getMaxX();
-    float ymin = r.getMinY();
-    float ymax = r.getMaxY();
-
-    point p0(xmin, ymin);
-    point p1(xmin, ymax);
-    point p2(xmax, ymax);
-    point p3(xmax, ymin);
-
-    transform(p0);
-    transform(p1);
-    transform(p2);
-    transform(p3);
-
-    r.setTo(p0.x, p0.y);
-    r.expandTo(p1.x, p1.y);
-    r.expandTo(p2.x, p2.y);
-    r.expandTo(p3.x, p3.y);
-}
-
 void 
 SWFMatrix::transform(SWFRect& r) const
 {

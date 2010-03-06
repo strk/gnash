@@ -92,7 +92,7 @@ namespace gnash {
 		/// See Renderer::bounds_in_clipping_area (in backend/Renderer.h)
 		bool bounds_in_clipping_area(const SWFRect& bounds);
 		bool bounds_in_clipping_area(const InvalidatedRanges& ranges);
-		bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds);
+		bool bounds_in_clipping_area(const geometry::Range2d<boost::int32_t>& bounds);
 				
 		/// See Renderer::begin_submit_mask (in backend/Renderer.h)
 		void	begin_submit_mask();

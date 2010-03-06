@@ -160,7 +160,30 @@ public:
     //
     /// NULL and WORLD ranges are untouched.
     ///
-    void    transform(geometry::Range2d<float>& r) const;
+    template <typename T>
+    void transform(geometry::Range2d<T>& r) const
+    {
+        T xmin = r.getMinX();
+        T xmax = r.getMaxX();
+        T ymin = r.getMinY();
+        T ymax = r.getMaxY();
+
+        point p0(xmin, ymin);
+        point p1(xmin, ymax);
+        point p2(xmax, ymax);
+        point p3(xmax, ymin);
+
+        transform(p0);
+        transform(p1);
+        transform(p2);
+        transform(p3);
+
+        r.setTo(p0.x, p0.y);
+        r.expandTo(p1.x, p1.y);
+        r.expandTo(p2.x, p2.y);
+        r.expandTo(p3.x, p3.y);
+    }
+
 
     void    transform(SWFRect& r) const;
     

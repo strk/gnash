@@ -233,20 +233,20 @@ public:
 
     /// Construct and return a Range2d object.
     // TODO: deprecate this.
-    geometry::Range2d<float> getRange() const
+    geometry::Range2d<boost::int32_t> getRange() const
     {
         if (is_null())
         {
            // Range2d has a differnt idea about what is a null SWFRect.
-           return geometry::Range2d<float>(geometry::nullRange); //null range
+           return geometry::Range2d<boost::int32_t>(geometry::nullRange); //null range
         }
         else if( is_world() ) 
         {
-            return geometry::Range2d<float>(geometry::worldRange); //world range
+            return geometry::Range2d<boost::int32_t>(geometry::worldRange); //world range
         }
         else
         {
-            return geometry::Range2d<float>(_xMin, _yMin, _xMax, _yMax);
+            return geometry::Range2d<boost::int32_t>(_xMin, _yMin, _xMax, _yMax);
         }
     }
 

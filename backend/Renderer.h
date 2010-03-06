@@ -401,7 +401,7 @@ public:
     /// Converts pixel coordinates to world coordinates (TWIPS)
     virtual point pixel_to_world(int x, int y) = 0;
     
-    virtual geometry::Range2d<float> pixel_to_world(
+    virtual geometry::Range2d<int> pixel_to_world(
                     const geometry::Range2d<int>& pixelbounds)
     {
         point topleft = pixel_to_world(
@@ -409,12 +409,12 @@ public:
         point bottomright = pixel_to_world(
                         pixelbounds.getMaxX(), pixelbounds.getMaxY());
         
-        return geometry::Range2d<float> (topleft.x, topleft.y, 
+        return geometry::Range2d<int> (topleft.x, topleft.y, 
             bottomright.x, bottomright.y);
     }
     
     virtual geometry::Range2d<int> world_to_pixel(
-                    const geometry::Range2d<float>& worldbounds)
+                    const geometry::Range2d<int>& worldbounds)
     {
         if ((worldbounds.isNull() || worldbounds.isWorld())) return worldbounds;
 
@@ -461,7 +461,7 @@ public:
     }
     
     virtual bool bounds_in_clipping_area(
-            const geometry::Range2d<float>& /*bounds*/)
+            const geometry::Range2d<int>& /*bounds*/)
     {
         return true;
     }

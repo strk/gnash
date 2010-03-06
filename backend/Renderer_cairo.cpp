@@ -266,7 +266,6 @@ get_cairo_pattern(Renderer_cairo& renderer, const fill_style& style, const cxfor
       init_cairo_matrix(&mat, m);       
 
       pattern = binfo->apply(&mat, fill_type);
-      
       break;
     } 
 
@@ -314,7 +313,7 @@ public:
     }
     
     cairo_set_source(_cr, _pattern);
-    
+
     cairo_fill(_cr);
 
     // Surfaces are owned by const bitmap_info_cairo
@@ -504,7 +503,7 @@ Renderer_cairo::drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
     cairo_save(_cr);
     cairo_set_source(_cr, pattern);
     
-    geometry::Range2d<float> range = bounds->getRange();
+    geometry::Range2d<boost::int32_t> range = bounds->getRange();
     m->transform(range);
   
     cairo_rectangle(_cr, range.getMinX(), range.getMinY(), range.width(),
@@ -577,8 +576,8 @@ Renderer_cairo::begin_display(const rgba& bg_color,
 
 
     for (size_t rno=0; rno < _invalidated_ranges.size(); rno++) {
-        const geometry::Range2d<float>& range =
-                                   _invalidated_ranges.getRange(rno);
+        const geometry::Range2d<boost::int32_t>& range =
+            _invalidated_ranges.getRange(rno);
         if (range.isNull()) {
             continue;
         }

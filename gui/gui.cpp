@@ -801,7 +801,8 @@ Gui::display(movie_root* m)
 		
 			for (size_t rno = 0; rno < changed_ranges.size(); rno++) {
 			
-				geometry::Range2d<float> bounds = changed_ranges.getRange(rno);
+				const geometry::Range2d<int>& bounds = 
+					changed_ranges.getRange(rno);
 
 				point corners[4];
 				float xmin = bounds.getMinX();
@@ -1068,7 +1069,7 @@ void
 Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
 	// fallback to single regions
-	geometry::Range2d<float> full = ranges.getFullArea();
+	const geometry::Range2d<int>& full = ranges.getFullArea();
 	
 	SWFRect bounds;
 	
