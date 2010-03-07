@@ -139,7 +139,7 @@ enum PacketSize {
     RTMP_PACKET_SIZE_LARGE = 0,
     RTMP_PACKET_SIZE_MEDIUM = 1,
     RTMP_PACKET_SIZE_SMALL = 2,
-    RTMP_PACKET_SIZE_MINIMUM = 3,
+    RTMP_PACKET_SIZE_MINIMUM = 3
 };
 
 /// The RTMPHeader contains all the fields for the packet header.

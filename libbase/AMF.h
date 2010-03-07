@@ -60,7 +60,7 @@ enum Type {
     UNSUPPORTED_AMF0  = 0x0d,
     RECORD_SET_AMF0   = 0x0e,
     XML_OBJECT_AMF0   = 0x0f,
-    TYPED_OBJECT_AMF0 = 0x10,
+    TYPED_OBJECT_AMF0 = 0x10
 };
 
 /// Exception for handling malformed buffers.
