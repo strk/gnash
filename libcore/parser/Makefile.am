@@ -26,7 +26,6 @@ noinst_LTLIBRARIES = libgnashparser.la
 # rendering calls from the parser (see https://savannah.gnu.org/task/?5837)
 #
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/swf \
@@ -38,7 +37,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
-	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libltdl \
 	$(GLIB_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
