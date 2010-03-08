@@ -60,7 +60,7 @@ public:
     void removeResponse(const std::string &name);
     
     void addFile(const std::string &name, boost::shared_ptr<DiskStream > &file);
-    boost::shared_ptr<DiskStream> &DSOEXPORT findFile(const std::string &name);
+    boost::shared_ptr<DiskStream> & findFile(const std::string &name);
     void removeFile(const std::string &name);
     
     ///  \brief Dump the internal data of this class in a human readable form.
