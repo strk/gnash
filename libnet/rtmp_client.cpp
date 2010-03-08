@@ -46,10 +46,6 @@
 #include "GnashSleep.h"
 #include "URL.h"
 
-using namespace gnash;
-using namespace std;
-using namespace amf;
-
 typedef boost::shared_ptr<amf::Element> ElementSharedPtr;
 
 namespace gnash
@@ -83,7 +79,7 @@ RTMPClient::~RTMPClient()
 
 // Make the NetConnection object that is used to connect to the
 // server.
-boost::shared_ptr<Buffer> 
+boost::shared_ptr<amf::Buffer> 
 RTMPClient::encodeConnect()
 {
 //     GNASH_REPORT_FUNCTION;
@@ -91,7 +87,7 @@ RTMPClient::encodeConnect()
     return encodeConnect(_path.c_str());
 }
 
-boost::shared_ptr<Buffer> 
+boost::shared_ptr<amf::Buffer> 
 RTMPClient::encodeConnect(const char *uri)
 {
 //     GNASH_REPORT_FUNCTION;
@@ -101,12 +97,13 @@ RTMPClient::encodeConnect(const char *uri)
 			 RTMPClient::SEEK);
 }
 
-boost::shared_ptr<Buffer> 
+boost::shared_ptr<amf::Buffer> 
 RTMPClient::encodeConnect(const char *uri,
 			  double audioCodecs, double videoCodecs,
 			  double videoFunction)
 {
     GNASH_REPORT_FUNCTION;
+    using std::string;
     
     URL url(uri);
     string portstr;
@@ -169,14 +166,14 @@ RTMPClient::encodeConnect(const char *uri,
 			 pageUrl.c_str());
 }
 
-boost::shared_ptr<Buffer> 
+boost::shared_ptr<amf::Buffer> 
 RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl,
                           double audioCodecs, double videoCodecs, double videoFunction,
                           const char *pageUrl)
 {
     GNASH_REPORT_FUNCTION;
     
-    AMF amf_obj;
+    amf::AMF amf_obj;
 
     ElementSharedPtr connect(new amf::Element);
     connect->makeString("connect");
@@ -220,22 +217,22 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     fpad->makeBoolean("fpad", false);
     obj->addProperty(fpad);
 
-    ElementSharedPtr audioCodecsnode(new Element);
+    ElementSharedPtr audioCodecsnode(new amf::Element);
 //    audioCodecsnode->makeNumber("audioCodecs", 615);
     audioCodecsnode->makeNumber("audioCodecs", audioCodecs);
     obj->addProperty(audioCodecsnode);
     
-    ElementSharedPtr videoCodecsnode(new Element);
+    ElementSharedPtr videoCodecsnode(new amf::Element);
 //    videoCodecsnode->makeNumber("videoCodecs", 124);
     videoCodecsnode->makeNumber("videoCodecs", videoCodecs);
     obj->addProperty(videoCodecsnode);
 
-    ElementSharedPtr videoFunctionnode(new Element);
+    ElementSharedPtr videoFunctionnode(new amf::Element);
 //    videoFunctionnode->makeNumber("videoFunction", 0x1);
     videoFunctionnode->makeNumber("videoFunction", videoFunction);
     obj->addProperty(videoFunctionnode);
 
-    ElementSharedPtr pageUrlnode(new Element);
+    ElementSharedPtr pageUrlnode(new amf::Element);
 //    pageUrlnode->makeString("pageUrl", "http://x86-ubuntu/software/gnash/tests/");
     pageUrlnode->makeString("pageUrl", pageUrl);
     obj->addProperty(pageUrlnode);
@@ -250,11 +247,11 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
 //                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
 //     const char *rtmpStr = "03 00 00 04 00 01 1f 14 00 00 00 00";
 //     Buffer *rtmpBuf = hex2mem(rtmpStr);
-    boost::shared_ptr<Buffer> conobj = connect->encode();
-    boost::shared_ptr<Buffer> numobj = connum->encode();
-    boost::shared_ptr<Buffer> encobj = obj->encode();
+    boost::shared_ptr<amf::Buffer> conobj = connect->encode();
+    boost::shared_ptr<amf::Buffer> numobj = connum->encode();
+    boost::shared_ptr<amf::Buffer> encobj = obj->encode();
 
-    boost::shared_ptr<Buffer> buf(new Buffer(conobj->size() + numobj->size() + encobj->size()));
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(conobj->size() + numobj->size() + encobj->size()));
     *buf += conobj;
     *buf += numobj;
     *buf += encobj;
@@ -367,23 +364,23 @@ RTMPClient::encodeEchoRequest(const std::string &method, double id, amf::Element
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Element> str(new amf::Element);
     str->makeString(method);
-    boost::shared_ptr<Buffer> strobj = str->encode();
+    boost::shared_ptr<amf::Buffer> strobj = str->encode();
 
     // Encod ethe stream ID
     boost::shared_ptr<amf::Element>  num(new amf::Element);
     num->makeNumber(id);
-    boost::shared_ptr<Buffer> numobj = num->encode();
+    boost::shared_ptr<amf::Buffer> numobj = num->encode();
 
     // Set the NULL object element that follows the stream ID
     boost::shared_ptr<amf::Element> null(new amf::Element);
     null->makeNull();
-    boost::shared_ptr<Buffer> nullobj = null->encode();
+    boost::shared_ptr<amf::Buffer> nullobj = null->encode();
 
-    boost::shared_ptr<Buffer> elobj = el.encode();
+    boost::shared_ptr<amf::Buffer> elobj = el.encode();
 
     size_t totalsize = strobj->size() + numobj->size() + nullobj->size() + elobj->size();
 
-    boost::shared_ptr<Buffer> buf(new Buffer(totalsize));
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(totalsize));
     
     *buf += strobj;
     *buf += numobj;
@@ -396,7 +393,7 @@ RTMPClient::encodeEchoRequest(const std::string &method, double id, amf::Element
 // 43 00 1a 21 00 00 19 14 02 00 0c 63 72 65 61 74  C..!.......creat
 // 65 53 74 72 65 61 6d 00 40 08 00 00 00 00 00 00  eStream.@.......
 // 05                                                    .               
-boost::shared_ptr<Buffer> 
+boost::shared_ptr<amf::Buffer> 
 RTMPClient::encodeStream(double id)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -406,20 +403,20 @@ RTMPClient::encodeStream(double id)
 
     boost::shared_ptr<amf::Element> str(new amf::Element);
     str->makeString("createStream");
-    boost::shared_ptr<Buffer> strobj = str->encode();
+    boost::shared_ptr<amf::Buffer> strobj = str->encode();
   
     boost::shared_ptr<amf::Element>  num(new amf::Element);
     num->makeNumber(id);
-    boost::shared_ptr<Buffer> numobj = num->encode();
+    boost::shared_ptr<amf::Buffer> numobj = num->encode();
 
     // Set the NULL object element that follows the stream ID
     boost::shared_ptr<amf::Element> null(new amf::Element);
     null->makeNull();
-    boost::shared_ptr<Buffer> nullobj = null->encode();    
+    boost::shared_ptr<amf::Buffer> nullobj = null->encode();    
 
     size_t totalsize = strobj->size() + numobj->size() + nullobj->size();
 
-    boost::shared_ptr<Buffer> buf(new Buffer(totalsize));
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(totalsize));
 
     *buf += strobj;
     *buf += numobj;
@@ -434,21 +431,21 @@ RTMPClient::encodeStream(double id)
 // 6f 6e 32 5f 66 6c 61 73 68 38 5f 77 5f 61 75 64  on2_flash8_w_aud
 // 69 6f 2e 66 6c 76 c2 00 03 00 00 00 01 00 00 27  io.flv.........'
 // 10
-boost::shared_ptr<Buffer> 
+boost::shared_ptr<amf::Buffer> 
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     return encodeStreamOp(id, op, flag, "", 0);
 }    
 
-boost::shared_ptr<Buffer> 
+boost::shared_ptr<amf::Buffer> 
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, double pos)
 {
 //    GNASH_REPORT_FUNCTION;
     return encodeStreamOp(id, op, flag, "", pos);
 }    
 
-boost::shared_ptr<Buffer> 
+boost::shared_ptr<amf::Buffer> 
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -461,13 +458,13 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
 // A pause packet is the operation name "pause", followed by the stream ID,
 // then a NULL object, a boolean (always true from what I can tell), and then
 // a location, which appears to always be 0.
-boost::shared_ptr<Buffer> 
+boost::shared_ptr<amf::Buffer> 
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos)
 {
 //    GNASH_REPORT_FUNCTION;
 
     // Set the operations command name
-    Element str;
+    amf::Element str;
     switch (op) {
       case STREAM_PLAY:		// play the existing stream
 	  str.makeString("play");
@@ -485,35 +482,35 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
 	  str.makeString("seek");
 	  break;
       default:
-	  boost::shared_ptr<Buffer> foo;
+	  boost::shared_ptr<amf::Buffer> foo;
 	  return foo;
     };
 
-    boost::shared_ptr<Buffer> strobj = str.encode();
+    boost::shared_ptr<amf::Buffer> strobj = str.encode();
 
     // Set the stream ID, which follows the command
-    Element strid;
+    amf::Element strid;
     strid.makeNumber(id);
-    boost::shared_ptr<Buffer> stridobj = strid.encode();
+    boost::shared_ptr<amf::Buffer> stridobj = strid.encode();
 
     // Set the NULL object element that follows the stream ID
-    Element null;
+    amf::Element null;
     null.makeNull();
-    boost::shared_ptr<Buffer> nullobj = null.encode();    
+    boost::shared_ptr<amf::Buffer> nullobj = null.encode();    
 
     // Set the BOOLEAN object element that is the last field in the packet
     // (SEEK and PLAY don't use the boolean flag)
-    boost::shared_ptr<Buffer> boolobj;
+    boost::shared_ptr<amf::Buffer> boolobj;
     if ((op != STREAM_SEEK) && (op != STREAM_PLAY)) {
-        Element boolean;
+        amf::Element boolean;
         boolean.makeBoolean(flag);
         boolobj = boolean.encode();    
     }
 
     // The seek command also may have an optional location to seek to
-    boost::shared_ptr<Buffer> posobj;
+    boost::shared_ptr<amf::Buffer> posobj;
     if ((op == STREAM_PAUSE) || (op == STREAM_SEEK)) {
-        Element seek;
+        amf::Element seek;
         seek.makeNumber(pos);
         posobj = seek.encode();
     }
@@ -521,9 +518,9 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // The play command has an optional field, which is the name of the file
     // used for the stream. A Play command without this name set play an
     // existing stream that is already open.
-    boost::shared_ptr<Buffer> fileobj; 
+    boost::shared_ptr<amf::Buffer> fileobj; 
     if (!name.empty()) {
-        Element filespec;
+        amf::Element filespec;
         filespec.makeString(name);
         fileobj = filespec.encode();
     }
@@ -536,7 +533,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     if ( fileobj ) pktsize += fileobj->size();
     if ( posobj ) pktsize += posobj->size();
 
-    boost::shared_ptr<Buffer> buf(new Buffer(pktsize));    
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(pktsize));    
     *buf += strobj;
     *buf += stridobj;
     *buf += nullobj;
@@ -556,7 +553,7 @@ RTMPClient::handShakeRequest()
     boost::uint32_t zero = 0;
 
     // Make a buffer to hold the handshake data.
-    boost::shared_ptr<amf::Buffer> handshake(new Buffer(RTMP_HANDSHAKE_SIZE+1));
+    boost::shared_ptr<amf::Buffer> handshake(new amf::Buffer(RTMP_HANDSHAKE_SIZE+1));
     if (!handshake) {
 	return handshake;
     }

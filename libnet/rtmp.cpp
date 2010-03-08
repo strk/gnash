@@ -46,8 +46,6 @@
 #include "GnashSleep.h"
 
 using std::cerr;
-using std::endl;
-using namespace amf;
 
 namespace gnash
 {
@@ -378,7 +376,7 @@ boost::shared_ptr<amf::Buffer>
 RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buf(new Buffer(1));
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(1));
     buf->clear();
     boost::uint8_t *ptr = buf->reference();
     
@@ -400,16 +398,16 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
     boost::shared_ptr<amf::Buffer> buf;
     switch(head_size) {
       case HEADER_1:
-	  buf.reset(new Buffer(1));
+	  buf.reset(new amf::Buffer(1));
 	  break;
       case HEADER_4:
-	  buf.reset(new Buffer(4));
+	  buf.reset(new amf::Buffer(4));
 	  break;
       case HEADER_8:
-	  buf.reset(new Buffer(8));
+	  buf.reset(new amf::Buffer(8));
 	  break;
       case HEADER_12:
-	  buf.reset(new Buffer(12));
+	  buf.reset(new amf::Buffer(12));
 	  break;
     }
     boost::uint8_t *ptr = buf->reference();
@@ -551,7 +549,8 @@ RTMP::packetRead(amf::Buffer &buf)
 void
 RTMP::dump()
 {
-    cerr << "RTMP packet contains " << _properties.size() << " variables." << endl;
+    cerr << "RTMP packet contains " << _properties.size() << " variables." 
+         << std::endl;
     AMFProperties::iterator it;
     for (it = _properties.begin(); it != _properties.end(); it++) {
 //	const char *name = it->first;
@@ -688,9 +687,9 @@ RTMP::encodeUserControl(user_control_e eventid, boost::uint32_t data)
     boost::uint32_t swapped = 0;
     boost::shared_ptr<amf::Buffer> buf;
     if (eventid == STREAM_BUFFER) {
-	buf.reset(new Buffer(sizeof(boost::uint16_t) * 5));
+	buf.reset(new amf::Buffer(sizeof(boost::uint16_t) * 5));
     } else {
-	buf.reset(new Buffer(sizeof(boost::uint16_t) * 3));
+	buf.reset(new amf::Buffer(sizeof(boost::uint16_t) * 3));
     }
 
     // Set the type of this ping message
@@ -706,17 +705,17 @@ RTMP::encodeUserControl(user_control_e eventid, boost::uint32_t data)
       case STREAM_EOF:
       case STREAM_NODATA:
 	  swapped = data;
-	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  amf::swapBytes(&swapped, sizeof(boost::uint32_t));
 	  *buf += swapped;
 	  break;
       case STREAM_BUFFER:
-	  buf.reset(new Buffer(sizeof(boost::uint16_t) * 5));
+	  buf.reset(new amf::Buffer(sizeof(boost::uint16_t) * 5));
 	  break;
       case STREAM_LIVE:
       case STREAM_PING:
       case STREAM_PONG:
 	  swapped = data;
-	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  amf::swapBytes(&swapped, sizeof(boost::uint32_t));
 	  *buf += swapped;
 	  break;
       default:
@@ -730,7 +729,7 @@ boost::shared_ptr<RTMPMsg>
 RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 {
 //     GNASH_REPORT_FUNCTION;
-    AMF amf_obj;
+    amf::AMF amf_obj;
     boost::uint8_t *ptr = data;
     boost::uint8_t* tooFar = data + size;
     bool status = false;
@@ -739,7 +738,7 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
     // The first data object is the method name of this object.
     boost::shared_ptr<amf::Element> name = amf_obj.extractAMF(ptr, tooFar);
     if (name) {
-	ptr += name->getDataSize() + AMF_HEADER_SIZE; // skip the length bytes too
+	ptr += name->getDataSize() + amf::AMF_HEADER_SIZE; // skip the length bytes too
     } else {
 	log_error("Name field of RTMP Message corrupted!");
 	msg.reset();
@@ -753,8 +752,8 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 	// Most onStatus messages have the stream ID, but the Data
 	// Start onStatus message is basically just a marker that an
 	// FLV file is coming next. 
-	if (streamid->getType() == Element::NUMBER_AMF0) {
-	    ptr += AMF0_NUMBER_SIZE + 1;
+	if (streamid->getType() == amf::Element::NUMBER_AMF0) {
+	    ptr += amf::AMF0_NUMBER_SIZE + 1;
 	}
     } else {
 	log_error("Stream ID field of RTMP Message corrupted!");
@@ -1266,7 +1265,7 @@ RTMP::recvMsg(int fd)
     //bool nopacket = true;
 
     // Read really big packets, they get split into the smaller ones when 'split'
-    boost::shared_ptr<amf::Buffer> buf(new Buffer(3074));
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(3074));
     do {
 	ret = readNet(fd, buf->reference()+ret, buf->size()-ret, _timeout);
 	// We got data. Resize the buffer if necessary.
@@ -1358,13 +1357,13 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	// range, we can't really continue.
 	if (rthead->head_size <= RTMP_MAX_HEADER_SIZE) {
 	    // Any packet with a header size greater than 1 is a
-	    // always a new RTMP message, so create a new Buffer to
+	    // always a new RTMP message, so create a new amf::Buffer to
 	    // hold all the data.
 	    if ((rthead->head_size >= 1) || (ptr == data)) {
   		// cerr << "New packet for channel #" << rthead->channel << " of size "
   		//      << (rthead->head_size + rthead->bodysize) << endl;
 		// give it some memory to store data in. We store
-		chunk.reset(new Buffer(rthead->bodysize + rthead->head_size + 1));
+		chunk.reset(new amf::Buffer(rthead->bodysize + rthead->head_size + 1));
 		// Each RTMP connection has 64 channels, so we store
 		// the header with the data so that info is accessible
 		// via the Buffer for processing later. All the data
@@ -1381,8 +1380,9 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	    // Red5 version 5 sends out PING messages with a 1 byte header. I think this
 	    // may be a bug in Red5, but we should handle it anyway.
 	    if (chunk == 0) {
- 		cerr << "Chunk wasn't allocated! " << (rthead->bodysize + rthead->head_size) << endl;
-		chunk.reset(new Buffer(rthead->bodysize + rthead->head_size));
+ 		cerr << "Chunk wasn't allocated! " << (rthead->bodysize + rthead->head_size) 
+                     << std::endl;
+		chunk.reset(new amf::Buffer(rthead->bodysize + rthead->head_size));
 		chunk->clear();	// FIXME: temporary debug only, should be unnecessary
 		_queues[rthead->channel].push(chunk);
 	    }
