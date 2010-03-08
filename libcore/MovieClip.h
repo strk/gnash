@@ -34,6 +34,7 @@
 #include "DynamicShape.h" // for composition
 #include "Range2d.h"
 #include "dsodefs.h" // for DSOEXPORT
+#include "GnashImage.h"
 
 #include <vector>
 #include <list>

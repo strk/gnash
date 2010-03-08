@@ -1,17 +1,17 @@
-// 
+//
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -25,7 +25,7 @@
 ///
 /// A Movie definition is defined by the gnash::movie_definition class.
 /// A Movie instance is defined by the gnash::Movie class.
-/// 
+///
 /// A Movie instance exposes the ActionScript
 /// Object base interface (gnash::as_object),
 /// thus it can manage gnash::as_value members.
@@ -53,12 +53,11 @@
 #endif
 
 #include "DefinitionTag.h"
-#include "GnashImageJpeg.h"
 
 #include <string>
 #include <memory> // for auto_ptr
 #include <vector> // for PlayList typedef
-#include <set> 
+#include <set>
 
 // Forward declarations
 namespace gnash {
@@ -71,6 +70,7 @@ namespace gnash {
     class Font;
     class ExportableResource;
     class sound_sample;
+    class JpegImageInput;
 }
 
 namespace gnash
@@ -107,7 +107,7 @@ public:
 	virtual size_t get_frame_count() const = 0;
 	virtual float get_frame_rate() const = 0;
 
-	/// Return size of frame, in TWIPS 
+	/// Return size of frame, in TWIPS
 	virtual const SWFRect& get_frame_size() const = 0;
 
 	virtual size_t get_bytes_loaded() const = 0;
@@ -139,7 +139,7 @@ public:
 	{
 		return NULL;
 	}
-	
+
     virtual void incrementLoadedFrames() {}
 
 	/// Return the list of execute tags for given frame number
@@ -175,7 +175,7 @@ public:
 	typedef std::pair<int, std::string> ImportSpec;
 	typedef std::vector< ImportSpec > Imports;
 
-	/// Import resources 
+	/// Import resources
 	//
 	/// @param source
 	///	Movie containing the resources being imported
@@ -263,7 +263,7 @@ public:
 	}
 
 	/// Find a font from the movie (not shared) lib
-	virtual Font* get_font(const std::string& /*name*/, 
+	virtual Font* get_font(const std::string& /*name*/,
             bool /*bold*/, bool /*italic*/) const
 	{
 		return 0;
@@ -285,7 +285,7 @@ public:
 	{
 	}
 
-	/// Labels the frame currently being loaded with the given name. 
+	/// Labels the frame currently being loaded with the given name.
 	//
 	/// A copy of the name string is made and kept in this object.
 	/// In case of multiple frames with the same name, the last added
@@ -381,7 +381,7 @@ public:
 	virtual void set_loading_sound_stream_id(int /*id*/)
 	{
 	}
-	
+
 	/// Get the currently being loaded sound stream, if any
 	//
 	/// @see set_loading_sound_stream_id
@@ -397,7 +397,7 @@ public:
 
 	/// Mark the given resource as "exported" with the given linkage name.
 	//
-    /// Note that any previously exported resource with the same linkage 
+    /// Note that any previously exported resource with the same linkage
     /// name will become unreachable (export override).
     ///
 	/// @see get_exported_resource
@@ -465,7 +465,7 @@ public:
 	{
 	    static const std::string s;
 	    return s;
-	}	
+	}
 
 #endif
 
