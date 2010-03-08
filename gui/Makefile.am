@@ -44,7 +44,6 @@ DIST_SUBDIRS = pythonmod
 noinst_LTLIBRARIES = #libgnashgui.la
 AM_CPPFLAGS = \
         -I../.. \
-        -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/swf \
@@ -108,7 +107,6 @@ AM_LDFLAGS =  \
 	$(NULL)
 
 GNASH_LIBS = \
-	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libcore/libgnashcore.la \

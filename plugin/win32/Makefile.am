@@ -42,7 +42,6 @@ AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
-	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashagg.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/plugin/mozilla-sdk/np_entry.lo \

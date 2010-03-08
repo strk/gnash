@@ -381,6 +381,8 @@ Machine::execute()
     // This automatically switches back again when we leave this scope.
     AVM2Switcher avm2(_vm);
 
+    assert(mStream);
+
 	for (;;) {
 		std::size_t opStart = mStream->tellg();
         

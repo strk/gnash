@@ -32,8 +32,6 @@ pluginsdir = $(libdir)/gnash/plugins
 AM_CPPFLAGS = -I.. \
         -I$(srcdir) \
         -I$(top_srcdir) \
-        -I$(top_srcdir)/libamf \
-        -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libcore/swf \

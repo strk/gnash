@@ -28,6 +28,7 @@
 #include "GnashNumeric.h"
 #include "Renderer.h"
 #include "RunResources.h"
+#include "GnashImage.h"
 
 #include <cmath> // sqrt, floor
 #include <iostream> // for output operator
