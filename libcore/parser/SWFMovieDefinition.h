@@ -35,6 +35,7 @@
 #include "StringPredicates.h" 
 #include "SWFRect.h"
 #include "GnashNumeric.h"
+#include "GnashAlgorithm.h"
 
 #include <map> // for CharacterDictionary
 #include <set> // for _importSources
@@ -45,7 +46,6 @@
 #include <boost/thread/barrier.hpp>
 #include <boost/scoped_ptr.hpp>
 
-//
 // Forward declarations
 namespace gnash {
     class SWFMovieDefinition;
@@ -57,13 +57,9 @@ namespace gnash {
     class Font;
 }
 
-namespace gnash
-{
+namespace gnash {
 
-/// \brief
-/// SWFMovieDefinition helper class handling start and execution of
-/// an SWF loading thread
-///
+/// Helper class handling start and execution of a loading thread
 class SWFMovieLoader
 {
 public:
@@ -154,10 +150,8 @@ public:
     /// Mark all dictionary items to be reachable (for GC)
     void markReachableResources() const
     {
-        for(CharacterConstIterator i=_map.begin(), e=_map.end(); i!=e; ++i)
-        {
-            i->second->setReachable();
-        }
+        foreachSecond(_map.begin(), _map.end(),
+                boost::mem_fn(&SWF::DefinitionTag::setReachable));
     }
 #endif 
 
