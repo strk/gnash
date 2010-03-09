@@ -25,11 +25,6 @@ AUTOMAKE_OPTIONS = -Wno-portability
 # Build the current directory first. It's hard to see, but there is a '.' dot here.
 SUBDIRS = .
 
-if ENABLE_PCH
-SUBDIRS += ../pch
-AM_CXXFLAGS = $(PCH_FLAGS)
-endif
-
 localedir = $(datadir)/locale
 
 # this is where Gnash plugins get installed

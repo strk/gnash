@@ -112,11 +112,6 @@ if !CROSS_COMPILING
 endif
 endif
 
-if ENABLE_PCH
-SUBDIRS = ../pch
-AM_CXXFLAGS = $(PCH_FLAGS)
-endif
-
 gprocessor_SOURCES = processor.cpp
 # export our symbols so they can be used by Gnash plugins
 gprocessor_LDFLAGS = -export-dynamic
