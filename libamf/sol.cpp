@@ -35,10 +35,10 @@
 #include <fstream>
 #include <cassert>
 
-
-using namespace std;
-using namespace amf;
-using namespace gnash;
+using std::vector;
+using gnash::ParserException;
+using gnash::log_debug;
+using gnash::log_error;
 
 // It comprises of a magic number, followed by the file length, a
 // filetype, which appears to always be "TCSO", and what appears to be
@@ -242,10 +242,10 @@ SOL::formatHeader(const std::string &name, int filesize)
 ///
 /// @return true if this succeeded. false if it doesn't.
 bool
-SOL::writeFile(const string &filespec, const string &name)
+SOL::writeFile(const std::string &filespec, const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    ofstream ofs(filespec.c_str(), ios::binary);
+    std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if ( ! ofs ) {
         log_error("Failed opening file '%s' in binary mode", filespec.c_str());
         return false;
@@ -370,7 +370,7 @@ SOL::readFile(const std::string &filespec)
 
         boost::uint8_t *ptr = 0;
 
-	    ifstream ifs(filespec.c_str(), ios::binary);
+	    std::ifstream ifs(filespec.c_str(), std::ios::binary);
 
         _filesize = st.st_size;
         boost::scoped_array<boost::uint8_t> buf(
@@ -486,6 +486,7 @@ SOL::updateSO(int index, boost::shared_ptr<amf::Element> &el)
 void
 SOL::dump()
 {
+    using namespace std;
     vector<boost::shared_ptr<amf::Element> >::iterator it;
 
     cerr << "Dumping SOL file" << endl;

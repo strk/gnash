@@ -21,8 +21,6 @@
 #include "netstats.h"
 #include "log.h"
 
-using namespace gnash;
-using namespace boost::posix_time;
 
 namespace gnash {
 

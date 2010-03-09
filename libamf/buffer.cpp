@@ -31,8 +31,6 @@
 //#include "network.h"
 #include "GnashException.h"
 
-using namespace std;
-using namespace gnash;
 
 /// \namespace amf
 ///
@@ -70,7 +68,7 @@ Buffer::hex2digit (boost::uint8_t digit)
 ///		primary used only for testing to create binary data
 ///		from an easy to read and edit format.
 Buffer &
-Buffer::hex2mem(const string &str)
+Buffer::hex2mem(const std::string &str)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t count = str.size();
@@ -208,7 +206,7 @@ Buffer::copy(boost::uint8_t *data, size_t nbytes)
 	    boost::format msg("Not enough storage was allocated to hold the "
 			      "copied data! Needs %1%, only has %2% bytes");
 	    msg % nbytes % _nbytes;
-	    throw GnashException(msg.str());
+	    throw gnash::GnashException(msg.str());
 	}
     }
     return *this;
@@ -234,7 +232,7 @@ Buffer::append(boost::uint8_t *data, size_t nbytes)
 	    boost::format msg("Not enough storage was allocated to hold the "
 			      "appended data! Needs %1%, only has %2% bytes");
 	    msg % nbytes % spaceLeft();
-	    throw GnashException(msg.str());
+	    throw gnash::GnashException(msg.str());
 	}
     }
 
@@ -514,7 +512,7 @@ Buffer::operator=(boost::uint8_t *data)
     if (data) {
 	_data.reset(data);
     } else {
-	throw ParserException("Passing invalid pointer!");
+	throw gnash::ParserException("Passing invalid pointer!");
     }
     return *this;
 }
@@ -710,7 +708,7 @@ Buffer::resize(size_t size)
 	// deleted when this method returns.
 	// We loose data if we resize smaller than the data currently held.
 	if (size < used) {
-	    log_error("amf::Buffer::resize(%d): Truncating data (%d bytes) while resizing!", size, used - size);
+	    gnash::log_error("amf::Buffer::resize(%d): Truncating data (%d bytes) while resizing!", size, used - size);
 	    used = size;
 	}
 	boost::uint8_t *newptr = new boost::uint8_t[size];
@@ -736,10 +734,12 @@ Buffer::dump(std::ostream& os) const
      // Skip in-memory address " at " << (void *)_data.get() << endl;
     if (_nbytes > 0) {
 	const size_t bytes = _seekptr - _data.get();
-	os << gnash::hexify((unsigned char *)_data.get(), bytes, false) << endl;
-	os << gnash::hexify((unsigned char *)_data.get(), bytes, true) << endl;
+	os << gnash::hexify((unsigned char *)_data.get(), bytes, false)
+       << std::endl;
+	os << gnash::hexify((unsigned char *)_data.get(), bytes, true)
+	   << std::endl;
     } else {
-	os << "ERROR: Buffer size out of range!" << endl;
+	os << "ERROR: Buffer size out of range!" << std::endl;
     }
 }
 
@@ -763,7 +763,7 @@ Buffer::corrupt(int factor)
     // Pick the number of errors to create based on the Buffer's data size
     boost::uniform_int<> errs(1, (_nbytes/factor));
     int errors = errs(seed);
-    log_debug("Creating %d errors in the buffer", errors);
+    gnash::log_debug("Creating %d errors in the buffer", errors);
     
     for (int i=0; i<errors; i++) {
 	// find a location someplace within the file.

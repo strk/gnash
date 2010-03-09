@@ -24,7 +24,7 @@
 #include "log.h"
 #include "lirc.h"
 
-using namespace std;
+using std::string;
 
 namespace gnash {
 
@@ -95,7 +95,7 @@ Lirc::getKey()
     string control_str = packet.substr(space3);
 
     if (button_str[0] > 'A' && button_str[0] < 'Z') {
-        cerr << "Character: " << button_str << endl;
+        std::cerr << "Character: " << button_str << std::endl;
         key = (gnash::key::code)button_str[0];
     }
 

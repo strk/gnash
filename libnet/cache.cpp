@@ -37,7 +37,9 @@
 #include "log.h"
 #include "diskstream.h"
 
-using namespace std;
+using std::string;
+using std::map;
+using std::endl;
 
 static boost::mutex cache_mutex;
 
@@ -188,7 +190,7 @@ Cache::stats(bool xml) const
 //    GNASH_REPORT_FUNCTION;
     // dump timing related data
     struct timespec now;
-    stringstream text;
+    std::stringstream text;
     
     clock_gettime (CLOCK_REALTIME, &now);    
     double time = ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9));
@@ -209,7 +211,7 @@ Cache::stats(bool xml) const
 	     << "		<Hits>"     << _file_hits        << "</Hits>" << endl
 	     << "       </Files>" << endl;
     } else {
-	text << "Time since last access:  " << fixed << time << " seconds ago." << endl;
+	text << "Time since last access:  " << std::fixed << time << " seconds ago." << endl;
 	
 	text << "Pathnames in cache: " << _pathnames.size() << ", accessed "
 	     << _pathname_lookups << " times" << endl;
@@ -238,7 +240,7 @@ Cache::stats(bool xml) const
 	    text << "Disktream: " << data->first
 		 << ", accessed: " << data->second->getAccessCount()
 		 << " times." << endl;
-	    text << "	Time since last file access:  " << fixed << time << " seconds ago." << endl;
+	    text << "	Time since last file access:  " << std::fixed << time << " seconds ago." << endl;
 	}
     }
 

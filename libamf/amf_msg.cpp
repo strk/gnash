@@ -31,9 +31,11 @@
 #include <string>
 #include <boost/cstdint.hpp> // For C99 int types
 
+using gnash::GnashException;
+using gnash::log_error;
+using std::cout;
+using std::endl;
 
-using namespace std;
-using namespace gnash;
 
 namespace amf 
 {
@@ -142,7 +144,7 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
         throw GnashException(msg.str());
     }
     tmpptr += sizeof(boost::uint16_t);
-    string str1(reinterpret_cast<const char *>(tmpptr), length);
+    std::string str1(reinterpret_cast<const char *>(tmpptr), length);
     msg->target = str1;
     if ((tmpptr - data) > static_cast<int>(size)) {
         boost::format msg("Trying to read past the end of data! Wants %1% bytes, given %2% bytes");
@@ -160,7 +162,7 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
         throw GnashException(msg.str());
     }
     tmpptr += sizeof(boost::uint16_t);
-    string str2(reinterpret_cast<const char *>(tmpptr), length);
+    std::string str2(reinterpret_cast<const char *>(tmpptr), length);
     msg->response = str2;
     tmpptr += length;
     if ((tmpptr - data) > static_cast<int>(size)) {
@@ -253,7 +255,7 @@ AMF_msg::encodeAMFPacket()
 
     // Now encode all the messages
 
-    vector<boost::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
+    std::vector<boost::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
     for (it = _messages.begin(); it != _messages.end(); it++) {
         boost::shared_ptr<AMF_msg::amf_message_t> msg = (*(it));
 
@@ -320,7 +322,7 @@ AMF_msg::dump()
 {
 //    GNASH_REPORT_FUNCTION;
     cout << "AMF Packet has " << _messages.size() << " messages." << endl;
-    vector<boost::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
+    std::vector<boost::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
     for (it = _messages.begin(); it != _messages.end(); it++) {
         boost::shared_ptr<AMF_msg::amf_message_t> msg = (*(it));
         AMF_msg::dump(msg->header);

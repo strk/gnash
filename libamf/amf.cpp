@@ -31,9 +31,6 @@
 #include <vector>
 #include <boost/cstdint.hpp>
 
-using namespace std;
-using namespace gnash;
-
 namespace amf 
 {
 
@@ -179,7 +176,7 @@ AMF::encodeObject(const amf::Element &data)
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
     length = data.propertySize();
-    log_debug("Encoded data size has %d properties", length);
+    gnash::log_debug("Encoded data size has %d properties", length);
     boost::shared_ptr<amf::Buffer> buf;
     if (length) {
 	buf.reset(new amf::Buffer);
@@ -189,8 +186,8 @@ AMF::encodeObject(const amf::Element &data)
     
     *buf = Element::OBJECT_AMF0;
     if (data.propertySize() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;
-	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
+	std::vector<boost::shared_ptr<amf::Element> >::const_iterator ait;
+	std::vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
 	for (ait = props.begin(); ait != props.end(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
 	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
@@ -299,7 +296,7 @@ AMF::encodeXMLObject(const boost::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
-    log_unimpl("XML AMF objects not supported yet");
+    gnash::log_unimpl("XML AMF objects not supported yet");
     buf.reset();
     return buf;
 }
@@ -341,15 +338,15 @@ AMF::encodeTypedObject(const amf::Element &data)
     *buf += enclength;
 
     if (data.getName()) {
-	string name = data.getName();
+	std::string name = data.getName();
 	if (name.size() > 0) {
 	    *buf += name;
 	}
     }
     
     if (data.propertySize() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;
-	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
+	std::vector<boost::shared_ptr<amf::Element> >::const_iterator ait;
+	std::vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
 	for (ait = props.begin(); ait != props.end(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
 	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
@@ -403,7 +400,7 @@ AMF::encodeMovieClip(const boost::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
-    log_unimpl("Movie Clip AMF objects not supported yet");
+    gnash::log_unimpl("Movie Clip AMF objects not supported yet");
     
     return buf;
 }
@@ -442,8 +439,8 @@ AMF::encodeECMAArray(const amf::Element &data)
     // first, so we do the same for now.
     if (data.propertySize() > 0) {
 	boost::shared_ptr<amf::Buffer> item;
-	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
-	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
+	std::vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
+	std::vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
 	for (ait = props.begin(); ait != props.end(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
 	    if (sparse) {
@@ -494,7 +491,7 @@ AMF::encodeLongString(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
-    log_unimpl("Long String AMF objects not supported yet");
+    gnash::log_unimpl("Long String AMF objects not supported yet");
     
     return buf;
 }
@@ -511,7 +508,7 @@ AMF::encodeRecordSet(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
-    log_unimpl("Reecord Set AMF objects not supported yet");
+    gnash::log_unimpl("Reecord Set AMF objects not supported yet");
     
     return buf;
 }
@@ -546,8 +543,8 @@ AMF::encodeStrictArray(const amf::Element &data)
     *buf += items;
 
     if (data.propertySize() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
-	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
+	std::vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
+	std::vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
 	bool sparse = false;
 	size_t counter = 0;
 	for (ait = props.begin(); ait != props.end(); ait++) {
@@ -560,7 +557,7 @@ AMF::encodeStrictArray(const amf::Element &data)
 	    // array which is more compact. At least this is what Red5 does.
 	    if (el->getType() == Element::UNDEFINED_AMF0) {
 		if (!sparse) {
-		    log_debug("Encoding a strict array as an ecma array");
+		    gnash::log_debug("Encoding a strict array as an ecma array");
 		    *buf->reference() = Element::ECMA_ARRAY_AMF0;
 		    // When returning an ECMA array for a sparsely populated
 		    // array, Red5 adds one more to the count to be 1 based,
@@ -607,7 +604,7 @@ AMF::encodeStrictArray(const amf::Element &data)
 ///
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeString(const string &str)
+AMF::encodeString(const std::string &str)
 {
     boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
     return encodeString(ptr, str.size());
@@ -783,7 +780,7 @@ AMF::encodeElement(const amf::Element& el)
 //       case Element::FUNCTION:
 //          break;
       case Element::AMF3_DATA:
-	  log_error("FIXME: got AMF3 data type");
+	  gnash::log_error("FIXME: got AMF3 data type");
 	  break;
       default:
 	  buf.reset();
@@ -805,7 +802,7 @@ AMF::encodeElement(const amf::Element& el)
 	swapBytes(&enclength, 2);
 	*bigbuf = enclength;
 	// Now the name itself
-	string name = el.getName();
+	std::string name = el.getName();
 	if (name.size() > 0) {
 	    *bigbuf += name;
 	}
@@ -841,7 +838,7 @@ AMF::encodeProperty(boost::shared_ptr<amf::Element> el)
     *buf = enclength;
 
     if (el->getName()) {
-	string name = el->getName();
+	std::string name = el->getName();
 	if (name.size() > 0) {
 	    *buf += name;
 	}
@@ -912,7 +909,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
     boost::shared_ptr<amf::Element> el(new Element);
 
     if (in == 0) {
-        log_error(_("AMF body input data is NULL"));
+        gnash::log_error(_("AMF body input data is NULL"));
         return el;
     }
 
@@ -936,7 +933,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
     //    char c = *(reinterpret_cast<char *>(tmpptr));
 
     if (tooFar - tmpptr < 1) {
-        log_error(_("AMF data too short to contain type field"));
+        gnash::log_error(_("AMF data too short to contain type field"));
         return el;
     }
 
@@ -947,7 +944,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
     switch (type) {
         case Element::NOTYPE:
         {
-	    log_error("Element has no type!");
+	    gnash::log_error("Element has no type!");
 	    break;
 	}
         case Element::NUMBER_AMF0:
@@ -957,7 +954,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             assert(tooFar >= tmpptr);
             
             if (static_cast<size_t>(tooFar - tmpptr) < sizeof(const double)) {
-                log_error(_("AMF data segment too short to contain"
+                gnash::log_error(_("AMF data segment too short to contain"
                             "type NUMBER"));
 		el.reset();
                 return el;
@@ -977,7 +974,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
             tmpptr += sizeof(boost::uint16_t);
             if (length >= SANE_STR_SIZE) {
-                log_error("%d bytes for a string is over the safe "
+                gnash::log_error("%d bytes for a string is over the safe "
                         "limit of %d, line %d", length,
                         SANE_STR_SIZE, __LINE__);
                 el.reset();
@@ -1020,7 +1017,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             break;
         }
         case Element::MOVIECLIP_AMF0:
-            log_debug("AMF0 MovieClip frame");
+            gnash::log_debug("AMF0 MovieClip frame");
             break;
         case Element::NULL_AMF0:
             el->makeNull();
@@ -1150,7 +1147,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             while (tmpptr < tooFar - length) { 
                 // FIXME: was tooFar - AMF_HEADER_SIZE)
                 if (*(tmpptr +3) == TERMINATOR) {
-                    log_debug("Found object terminator byte");
+                    gnash::log_debug("Found object terminator byte");
                     tmpptr++;
                     break;
                 }
@@ -1168,7 +1165,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
         }
         case Element::AMF3_DATA:
         default:
-            log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
+            gnash::log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
             el.reset();
             return el;
     }
@@ -1243,7 +1240,7 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
     }    
 #else
     if (length >= SANE_STR_SIZE) {
-	log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
+	gnash::log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
     }    
 #endif
     
@@ -1261,7 +1258,7 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
     // If we get a NULL object, there is no data. In that case, we only return
     // the name of the property.
     if (type == Element::NULL_AMF0) {
-	log_debug("No data associated with Property \"%s\"", name);
+	gnash::log_debug("No data associated with Property \"%s\"", name);
 	el.reset(new Element);
 	el->setName(name.c_str(), name.size());
 	tmpptr += 1;

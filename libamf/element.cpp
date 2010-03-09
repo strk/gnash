@@ -33,8 +33,8 @@
 #include "element.h"
 #include "GnashException.h"
 
-using namespace std;
-using namespace gnash;
+using std::string;
+using gnash::log_error;
 
 /// \namespace amf
 ///
@@ -431,7 +431,7 @@ Element::calculateSize(amf::Element &el) const
     // More complex messages have child elements, either properties or
     // the items in an array, If we have children, count up their size too.
     // Calculate the total size of the message
-    vector<boost::shared_ptr<amf::Element> > props = el.getProperties();
+    std::vector<boost::shared_ptr<amf::Element> > props = el.getProperties();
     for (size_t i=0; i<props.size(); i++) {
 	outsize += props[i]->getDataSize();
 	if (props[i]->getNameSize()) {
@@ -476,7 +476,7 @@ Element::encode(bool notobject)
 	    size += _properties[i]->getNameSize();
 	    size += AMF_PROP_HEADER_SIZE;
 	}
-	log_debug("Size of Element \"%s\" is: %d", _name, size);
+	gnash::log_debug("Size of Element \"%s\" is: %d", _name, size);
 	buf.reset(new Buffer(size+AMF_PROP_HEADER_SIZE));
 	if (!notobject) {
 	    *buf = Element::OBJECT_AMF0;
@@ -967,7 +967,7 @@ Element::makeObject(std::vector<boost::shared_ptr<Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::OBJECT_AMF0;
-    vector<boost::shared_ptr<Element> >::const_iterator ait;
+    std::vector<boost::shared_ptr<Element> >::const_iterator ait;
     for (ait = data.begin(); ait != data.end(); ait++) {
 	boost::shared_ptr<Element> el = (*(ait));
 	addProperty(el);
@@ -1474,10 +1474,10 @@ Element::check_buffer(size_t size)
 	_buffer.reset(new Buffer(size));
     } else {
 	if (_buffer->size() < size) {
-	    throw ParserException("Buffer not big enough, try resizing!");
+	    throw gnash::ParserException("Buffer not big enough, try resizing!");
 	}
 	if (_buffer->size() == 0) {
-	    throw ParserException("Buffer has zero size, not initialized!");
+	    throw gnash::ParserException("Buffer has zero size, not initialized!");
 	}
     }
 }
@@ -1495,22 +1495,22 @@ Element::dump(std::ostream& os) const
     } else {
  	os << "(no name), ";
     }
-    os << "data length is " << getDataSize() << endl;
+    os << "data length is " << getDataSize() << std::endl;
 
 
     switch (_type) {
       case Element::NUMBER_AMF0:
-	  os << to_number() << endl;
+	  os << to_number() << std::endl;
 	  break;
       case Element::BOOLEAN_AMF0:
-	  os << (to_bool() ? "true" : "false") << endl;
+	  os << (to_bool() ? "true" : "false") << std::endl;
 	  break;
       case Element::STRING_AMF0:
 	  os << "(" << getDataSize() << " bytes): ";
 	  if (getDataSize()) {
 	      os << "\t\"" << to_string() << "\"";
 	  }
-	  cerr << endl;
+	  std::cerr << std::endl;
 	  break;
       case Element::OBJECT_AMF0:
 	  break;
@@ -1527,11 +1527,11 @@ Element::dump(std::ostream& os) const
       case Element::RECORD_SET_AMF0:
       case Element::XML_OBJECT_AMF0:
       case Element::TYPED_OBJECT_AMF0:
-	  cerr << endl;
+	  std::cerr << std::endl;
 	  break;
       case Element::AMF3_DATA:
 	  if (getDataSize() != 0) {
-	      log_debug("FIXME: got AMF3 data!");
+	      gnash::log_debug("FIXME: got AMF3 data!");
 	  }
 //	  cerr << "AMF3 data is: 0x" << hexify(_data, _length, false) << endl;
 	  break;
@@ -1554,8 +1554,8 @@ Element::dump(std::ostream& os) const
     }
 
     if (_properties.size() > 0) {
-	vector<boost::shared_ptr<Element> >::const_iterator ait;
-	os << "# of Properties in object: " << _properties.size() << endl;
+	std::vector<boost::shared_ptr<Element> >::const_iterator ait;
+	os << "# of Properties in object: " << _properties.size() << std::endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
 	    const boost::shared_ptr<Element> el = (*(ait));
 	    el->dump(os);
@@ -1573,7 +1573,7 @@ boost::shared_ptr<amf::Element>
 Element::findProperty(const std::string &name)
 {
     if (_properties.size() > 0) {
-	vector<boost::shared_ptr<Element> >::iterator ait;
+	std::vector<boost::shared_ptr<Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
 	    boost::shared_ptr<Element> el = (*(ait));

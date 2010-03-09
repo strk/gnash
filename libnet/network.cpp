@@ -77,7 +77,8 @@
 #define FIONREAD 0
 #endif
 
-using namespace std;
+using std::string;
+using std::vector;
 
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.

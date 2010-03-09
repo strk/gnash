@@ -58,9 +58,7 @@
 static boost::mutex io_mutex;
 static boost::mutex mem_mutex;
 
-using namespace gnash;
-using namespace std;
-using namespace amf;
+using std::string;
 
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.
@@ -1102,6 +1100,7 @@ DiskStream::determineFileType( boost::uint8_t *data)
 void
 DiskStream::dump()
 {
+    using namespace std;
 //    GNASH_REPORT_FUNCTION;
     const char *state_str[] = {
 	"NO_STATE",

@@ -37,8 +37,10 @@
 #include <vector>
 #endif
 
-using namespace std;
-using namespace gnash;
+using std::string;
+using std::vector;
+using gnash::log_debug;
+using gnash::log_error;
 
 // Some facts:
 //     * The header is 16 bytes,
@@ -87,7 +89,7 @@ const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
 /// @remarks May throw an Exception
 #define ENSUREBYTES(from, toofar, size) { \
 	if ( from+size >= toofar ) \
-		throw ParserException("Premature end of AMF stream"); \
+		throw gnash::ParserException("Premature end of AMF stream"); \
 }
 
 /// \brief Construct an uninitialized shared memory segment.
@@ -296,11 +298,11 @@ Listener::removeListener(const string &name)
 /// @return A smart pointer to a vector of Listener names.
 ///
 /// @remarks This is only used for debugging
-auto_ptr< vector<string> >
+std::auto_ptr< vector<string> >
 Listener::listListeners()
 {
 //    GNASH_REPORT_FUNCTION;    
-    auto_ptr< vector<string> > listeners ( new vector<string> );
+    std::auto_ptr< vector<string> > listeners ( new vector<string> );
     if (_baseaddr != 0) {
         boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
         
@@ -779,7 +781,7 @@ LcShm::dump()
 
 //     cerr <<"Timestamp: " << _header.timestamp << endl;
 //     cerr << "Length: " << _header.length << endl;
-
+    using namespace std;
     cerr << "Connection Name:\t" << _object.connection_name << endl;
     cerr << "Hostname Name:\t\t" << _object.hostname << endl;
     cerr << "Domain Allowed:\t\t" << ((_object.domain) ? "true" : "false") << endl;

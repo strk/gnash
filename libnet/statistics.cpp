@@ -27,8 +27,6 @@
 #include "netstats.h"
 #include "statistics.h"
 
-using namespace gnash;
-using namespace std;
 
 static boost::mutex io_mutex;
 
@@ -108,7 +106,7 @@ Statistics::addStats() {
 void
 Statistics::dump() {   
     boost::mutex::scoped_lock lock(io_mutex);
-    list<NetStats *>::iterator it;
+    std::list<NetStats *>::iterator it;
 
     for (it = _netstats.begin(); it != _netstats.end(); it++) {
         NetStats *stats = (*it);

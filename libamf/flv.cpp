@@ -34,8 +34,8 @@
 #include <climits>
 #include <boost/cstdint.hpp> 
 
-using namespace std;
-using namespace gnash;
+using gnash::log_debug;
+using gnash::log_error;
 
 namespace amf 
 {
@@ -310,7 +310,7 @@ boost::shared_ptr<amf::Element>
 Flv::findProperty(const std::string &name)
 {
     if (_properties.size() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::iterator ait;
+	std::vector<boost::shared_ptr<amf::Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
@@ -329,8 +329,9 @@ Flv::dump()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_properties.size() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::iterator ait;
-	cerr << "# of Properties in object: " << _properties.size() << endl;
+	std::vector<boost::shared_ptr<amf::Element> >::iterator ait;
+	std::cerr << "# of Properties in object: " << _properties.size()
+	          << std::endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
             // an onMetaData packet of an FLV stream only contains number or
@@ -344,7 +345,7 @@ Flv::dump()
             }
 	}
     } else {
-	cerr << "No properties" << endl;
+	std::cerr << "No properties" << std::endl;
     }
 }
 

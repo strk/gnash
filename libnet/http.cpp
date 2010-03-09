@@ -63,8 +63,7 @@
 # include <sys/param.h>
 #endif
 
-using namespace gnash;
-using namespace std;
+using std::string;
 
 static boost::mutex stl_mutex;
 
@@ -1118,7 +1117,7 @@ HTTP::formatLastModified()
 {
 //    GNASH_REPORT_FUNCTION;
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    stringstream date;
+    std::stringstream date;
     
     boost::gregorian::date d(now.date());
     
@@ -1560,7 +1559,7 @@ HTTP::dump() {
     log_debug (_("Filespec: %s"), _filespec.c_str());
     log_debug (_("Version: %d.%d"), _version.major, _version.minor);
 
-    map<string, string>::const_iterator it;
+    std::map<string, string>::const_iterator it;
     for (it = _fields.begin(); it != _fields.end(); ++it) {
 	log_debug("Field: \"%s\" = \"%s\"", it->first, it->second);
     }

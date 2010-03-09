@@ -29,10 +29,7 @@
 #include "gmemory.h"
 #include "buffer.h"
 
-using namespace gnash;
-using namespace amf;
-using namespace std;
-using namespace boost;
+using std::deque;
 
 namespace gnash
 {
@@ -235,7 +232,7 @@ CQue::merge(boost::shared_ptr<amf::Buffer> start)
 //     log_debug("%s: Final Totalsize is %s", __PRETTY_FUNCTION__, totalsize);
     
     // Merge all elements in a single buffer. We have totalsize now.
-    boost::shared_ptr<amf::Buffer> newbuf(new Buffer(totalsize));
+    boost::shared_ptr<amf::Buffer> newbuf(new amf::Buffer(totalsize));
     for (que_t::iterator i=from; i!=to; ++i) {
 //  	log_debug("%s: copying %d bytes, space left is %d, totalsize is %d", __PRETTY_FUNCTION__,
 //  		  (*i)->allocated(), newbuf->spaceLeft(), totalsize);
@@ -265,7 +262,8 @@ CQue::dump()
 //    GNASH_REPORT_FUNCTION;
     deque<boost::shared_ptr<amf::Buffer> >::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
-    cerr << endl << "CQue \"" << _name << "\" has "<< _que.size() << " buffers." << endl;
+    std::cerr << std::endl << "CQue \"" << _name << "\" has "<< _que.size()
+              << " buffers." << std::endl;
     for (it = _que.begin(); it != _que.end(); it++) {
 	boost::shared_ptr<amf::Buffer> ptr = *(it);
         ptr->dump();

@@ -40,9 +40,8 @@
 #include "utility.h"
 #include "buffer.h"
 
-using namespace gnash;
-using namespace std;
-using namespace amf;
+using std::vector;
+using amf::Element;
 
 namespace gnash
 {
@@ -139,8 +138,8 @@ RTMPMsg::checkStatus(boost::shared_ptr<amf::Element>  /* el */)
 		for (cit = props.begin(); cit != props.end(); cit++) {
 		    boost::shared_ptr<amf::Element> child = (*(cit));
 //		    child->dump();
-		    string name = child->getName();
-		    string value;
+		    std::string name = child->getName();
+		    std::string value;
 		    if (child->getDataSize()) {
 			value = child->to_string();
 			if (name == "code") {
@@ -206,6 +205,7 @@ RTMPMsg::findProperty(const std::string &name)
 void
 RTMPMsg::dump()
 {
+    using namespace std;
 //    GNASH_REPORT_FUNCTION;
 
 //     cerr <<"Timestamp: " << _header.timestamp << endl;
