@@ -98,8 +98,7 @@ public:
 
     size_t writeMessage(const std::string& str) {
         // We have to write the null terminator as well.
-	return 0;		// TODO
-//        return write(_socket.getFileFd(), str.c_str(), str.size() + 1);
+        return write(_socket.connected(), str.c_str(), str.size() + 1);
     }
 
     /// Read from the socket.
@@ -107,7 +106,7 @@ public:
         
         assert(_socket.connected());
     
-        const int fd = 0; //_socket.getFileFd(); TODO
+        const int fd = _socket.connected();
         assert(fd > 0);
 
         fd_set fdset;
@@ -192,19 +191,22 @@ public:
         if (_start) {
 	    _start.reset();
 	}
-      // _socket.closeNet(); TODO:
+	_socket.close();
         
         // Reset for next connection.
         _complete = false;
 
-        // assert(_socket.getFileFd() <= 0); TODO
         assert(!_socket.connected());
     }
 
 private:
 
     void makeConnection(const std::string& host, boost::uint16_t port) {
-        // _socket.createClient(host, port); TODO
+	std::string combined = host;
+	combined += ":";
+	combined += port;	
+	URL url(combined);
+        _socket.connect(url);
         _complete = true;
     }
 
