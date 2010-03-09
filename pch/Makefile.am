@@ -1,7 +1,9 @@
 BUILT_SOURCES = all-includes.h.gch
 
 PCHHEADERS = \
-	$(top_srcdir)/libcore/as_object.h \
+	$(top_srcdir)/libcore/asobj/Global_as.h \
+	$(top_srcdir)/libcore/builtin_function.h \
+	$(top_srcdir)/libcore/NativeFunction.h \
 	$(top_srcdir)/libcore/Shape.h \
 	$(top_srcdir)/libcore/SWFStream.h \
 	$(top_srcdir)/libcore/ObjectURI.h \
@@ -19,7 +21,6 @@ PCHHEADERS = \
 	$(top_srcdir)/libbase/GnashAlgorithm.h \
 	$(top_srcdir)/libbase/smart_ptr.h \
 	$(top_srcdir)/libbase/GC.h \
-	$(top_srcdir)/libbase/GnashException.h \
 	$(top_srcdir)/libbase/log.h \
 	$(top_srcdir)/libbase/rc.h \
 	$(top_srcdir)/libbase/URL.h \
