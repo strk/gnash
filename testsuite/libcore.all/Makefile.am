@@ -23,8 +23,6 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/backend  \
         -I$(top_srcdir)/libsound  \
         -I$(top_srcdir)/libmedia  \
-        -I$(top_srcdir)/libamf  \
-        -I$(top_srcdir)/libnet  \
         -I$(top_srcdir)/libbase  \
         -I$(top_srcdir)/libcore  \
         -I$(top_srcdir)/libcore/asobj \
@@ -44,7 +42,6 @@ check_PROGRAMS = \
 	PropertyListTest \
 	PropFlagsTest \
 	DisplayListTest \
-	AsValueTest \
 	ClassSizes \
 	SafeStackTest \
 	$(NULL)
@@ -64,7 +61,6 @@ CLEANFILES = \
 AM_LDFLAGS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la
 
@@ -103,8 +99,11 @@ PropFlagsTest_LDADD = $(AM_LDFLAGS)
 DisplayListTest_SOURCES = DisplayListTest.cpp
 DisplayListTest_LDADD = $(AM_LDFLAGS)
 
+# if CYGNAL
+check_PROGRAMS += AsValueTest
 AsValueTest_SOURCES = AsValueTest.cpp
 AsValueTest_LDADD = $(AM_LDFLAGS)
+# endif
 
 ClassSizes_SOURCES = ClassSizes.cpp
 ClassSizes_LDADD = $(AM_LDFLAGS)

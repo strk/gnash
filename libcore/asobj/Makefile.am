@@ -34,7 +34,6 @@ BUILT_SOURCES =
 pkglib_LTLIBRARIES = libgnashasobjs.la 
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/swf \
@@ -120,8 +119,7 @@ inst_HEADERS = $(EXTENSIONS_API)
 endif
 
 libgnashasobjs_la_LIBADD = \
-	$(top_builddir)/libnet/libgnashmedia.la \
-	$(top_builddir)/libnet/libgnashnet.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
 if USE_FFMPEG_ENGINE

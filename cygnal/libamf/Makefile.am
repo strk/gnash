@@ -41,7 +41,8 @@ endif
 # noinst_HEADERS = amf.h amfutf8.h
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/libnet \
+	-I$(top_srcdir)/cygnal/libamf \
+	-I$(top_srcdir)/cygnal/libnet \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libbase \
 	$(BOOST_CFLAGS) \
@@ -61,7 +62,6 @@ noinst_HEADERS = \
 	sol.h
 
 if ENABLE_PCH
-SUBDIRS = ../pch
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 

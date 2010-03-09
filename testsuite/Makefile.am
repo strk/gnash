@@ -59,8 +59,6 @@ DIST_SUBDIRS = \
 	as3compile.all \
 	actionscript.all \
 	libbase.all	\
-	libamf.all \
-	libnet.all \
 	libcore.all \
 	libmedia.all \
 	network.all \
@@ -86,9 +84,7 @@ SUBDIRS = \
 	$(DIR_SWFMILL) \
 	$(DIR_SWFC) \
 	movies.all \
-	libnet.all \
 	libbase.all	\
-	libamf.all \
 	libmedia.all \
 	libcore.all \
 	$(NULL)

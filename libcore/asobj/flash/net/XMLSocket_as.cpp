@@ -20,8 +20,8 @@
 
 
 #include "GnashSystemFDHeaders.h"
-#include "network.h"
 #include "utility.h"
+#include "Socket.h"
 #include "net/XMLSocket_as.h"
 #include "as_function.h"
 #include "movie_root.h"
@@ -98,7 +98,8 @@ public:
 
     size_t writeMessage(const std::string& str) {
         // We have to write the null terminator as well.
-        return write(_socket.getFileFd(), str.c_str(), str.size() + 1);
+	return 0;		// TODO
+//        return write(_socket.getFileFd(), str.c_str(), str.size() + 1);
     }
 
     /// Read from the socket.
@@ -106,7 +107,7 @@ public:
         
         assert(_socket.connected());
     
-        const int fd = _socket.getFileFd();
+        const int fd = 0; //_socket.getFileFd(); TODO
         assert(fd > 0);
 
         fd_set fdset;
@@ -188,24 +189,26 @@ public:
     //
     /// This also cancels any connection attempt in progress.
     void close() {
-        if (_start) _start.reset();
-        _socket.closeNet();
+        if (_start) {
+	    _start.reset();
+	}
+      // _socket.closeNet(); TODO:
         
         // Reset for next connection.
         _complete = false;
 
-        assert(_socket.getFileFd() <= 0);
+        // assert(_socket.getFileFd() <= 0); TODO
         assert(!_socket.connected());
     }
 
 private:
 
     void makeConnection(const std::string& host, boost::uint16_t port) {
-        _socket.createClient(host, port);
+        // _socket.createClient(host, port); TODO
         _complete = true;
     }
 
-    Network _socket;
+    Socket _socket;
 
     bool _complete;
 

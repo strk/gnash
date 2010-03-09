@@ -107,7 +107,6 @@ AM_LDFLAGS =  \
 	$(NULL)
 
 GNASH_LIBS = \
-	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libsound/libgnashsound.la \

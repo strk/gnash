@@ -73,7 +73,6 @@ inst_HEADERS = $(EXTENSIONS_API)
 endif
 
 libgnashparser_la_LIBADD = \
-	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
 ## $(top_builddir)/libmedia/libgnashmedia.la

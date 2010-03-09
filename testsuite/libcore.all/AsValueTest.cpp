@@ -29,11 +29,7 @@
 #include "as_value.h"
 #include "as_object.h"
 #include "arg_parser.h"
-#include "buffer.h"
-#include "network.h"
-#include "amf.h"
 #include "Global_as.h"
-#include "element.h"
 #include "GnashNumeric.h"
 #include "movie_root.h"
 #include <string>
@@ -42,6 +38,13 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
+#if 0
+#include "buffer.h"
+#include "network.h"
+#include "amf.h"
+#include "element.h"
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -49,15 +52,16 @@
 #include <iostream>
 #include <string>
 
-using namespace amf;
 using namespace gnash;
 using namespace std;
 
 static void usage (void);
 
 // Prototypes for test cases
+#if 0                           // this needs libamf and libnet
 static void test_el();
 static void test_obj(const as_object* o);
+#endif
 static void test_isnan();
 static void test_conversion();
 
@@ -121,8 +125,10 @@ main(int argc, char *argv[])
 
     // run the tests
     test_isnan();
+#if 0                           // this needs libamf and libnet
     test_el();
     test_obj(getObject(m));
+#endif
     test_conversion();
    
 }
@@ -185,11 +191,10 @@ test_conversion()
     
 }
 
-
+#if 0
 void
 test_el()
 {
-#if 0
 //    bool notest = false;
     
     Element el1;
@@ -241,13 +246,11 @@ test_el()
     //}
 
     // There is no equivalent AMF element type to the as_value AS_FUNCTION type
-#endif
 }
 
 void
 test_obj(const as_object* o)
 {
-#if 0
     // Create an object element with some properties
     bool notest = false;
     Element top;
@@ -264,7 +267,6 @@ test_obj(const as_object* o)
     if (top.propertySize() != 2) {
         notest = true;
     }
-    
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
 
@@ -320,8 +322,8 @@ test_obj(const as_object* o)
     } else {
         runtest.fail("as_value::to_element()");
     }
-#endif
 }
+#endif
 
 void
 test_isnan()

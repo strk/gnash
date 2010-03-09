@@ -20,8 +20,6 @@
 #ifndef GNASH_ASOBJ3_XMLSOCKET_H
 #define GNASH_ASOBJ3_XMLSOCKET_H
 
-
-
 namespace gnash {
 
 // Forward declarations

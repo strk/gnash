@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,19 +25,19 @@ cgi_LTLIBRARIES = echo.la # gateway.la
 GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashnet.la \
-	$(BOOST_CFLAGS) \
+	../../libamf/libgnashamf.la \
+	../../libnet/libgnashnet.la \
+	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
 INCLUDES = \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/libamf \
-	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/cygnal \
+        -I$(top_srcdir)/cygnal/libamf \
+	-I$(top_srcdir)/cygnal/libnet \
 	$(BOOST_CFLAGS)
 
 echo_la_SOURCES = echo.cpp echo.h

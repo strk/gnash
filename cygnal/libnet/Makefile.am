@@ -23,7 +23,7 @@ AUTOMAKE_OPTIONS = dejagnu
 pkglib_LTLIBRARIES = libgnashnet.la
 
 AM_LDFLAGS = \
-	../libbase/libgnashbase.la \
+	$(top_builddir)/libbase/libgnashbase.la \
 	../libamf/libgnashamf.la \
 	$(SSH_LIBS) \
 	$(SSL_LIBS) \
@@ -37,7 +37,8 @@ AM_LDFLAGS = \
 localedir = $(datadir)/locale
 
 INCLUDES = \
-        -I$(top_srcdir)/libamf \
+	-I$(top_srcdir)/cygnal/libamf \
+	-I$(top_srcdir)/cygnal/libnet \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
@@ -89,7 +90,6 @@ if WIN32
 endif
 
 if ENABLE_PCH
-SUBDIRS = ../pch
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 

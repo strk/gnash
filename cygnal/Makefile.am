@@ -24,15 +24,14 @@ if TESTSUITE
 TEST_DIR = #testsuite
 endif
 
-#if USE_CGI
-CGI_DIR = cgi-bin
-#endif
-
 EXTRA_DIST = cygnalrc.in
 CLEANFILES = cygnalrc
 
-SUBDIRS = . \
-	$(CGI_DIR) \
+SUBDIRS = \
+	libamf \
+	libnet \
+	. \
+	cgi-bin
 	$(TEST_DIR)
 
 # these need to be included in a distribution, even if not part
@@ -47,10 +46,10 @@ pluginsdir = $(libdir)/cygnal/plugins
 AM_CPPFLAGS = 	-DPLUGINSDIR=\"$(pluginsdir)\"
 
 AM_LDFLAGS = \
+	libnet/libgnashnet.la \
+	libamf/libgnashamf.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/libnet/libgnashnet.la \
-	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(GLIB_LIBS) \
@@ -70,9 +69,9 @@ endif
 localedir = $(datadir)/locale
 
 INCLUDES = -I.. \
+        -I$(srcdir)/libamf \
+        -I$(srcdir)/libnet \
         -I$(top_srcdir)	\
-        -I$(top_srcdir)/libnet \
-        -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libltdl \
         -I$(top_srcdir)/libmedia \

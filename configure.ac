@@ -2470,8 +2470,6 @@ libbase/Makefile
 libcore/Makefile
 libcore/vm/Makefile
 libcore/parser/Makefile
-libnet/Makefile
-libamf/Makefile
 backend/Makefile
 utilities/Makefile
 doc/Makefile
@@ -2495,8 +2493,6 @@ testsuite/misc-swfc.all/Makefile
 testsuite/network.all/Makefile
 testsuite/movies.all/Makefile
 testsuite/libcore.all/Makefile
-testsuite/libamf.all/Makefile
-testsuite/libnet.all/Makefile
 testsuite/libmedia.all/Makefile
 gui/Makefile
 gui/Info.plist
@@ -2515,11 +2511,15 @@ plugin/klash4/Makefile
 plugin/mozilla-sdk/Makefile
 plugin/win32/Makefile
 cygnal/Makefile
+cygnal/libnet/Makefile
+cygnal/libamf/Makefile
 cygnal/cgi-bin/Makefile
 cygnal/cgi-bin/echo/Makefile
 cygnal/cgi-bin/oflaDemo/Makefile
 cygnal/cgi-bin/fitcDemo/Makefile
 cygnal/testsuite/Makefile
+cygnal/testsuite/libamf.all/Makefile
+cygnal/testsuite/libnet.all/Makefile
 cygnal/testsuite/cygnal.all/Makefile
 pch/Makefile
 )

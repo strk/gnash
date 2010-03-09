@@ -44,13 +44,16 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-testsuite
 #--enable-cygnal
 
+if CYGNAL
+CYGNAL_DIR = cygnal
+endif
+
 STD_DIRS = \
 	libbase \
-	libamf \
-	libnet \
 	libmedia \
 	libsound \
 	libcore \
+	$(CYGNAL_DIR) \
 	backend \
 	gui \
 	plugin \
@@ -63,12 +66,8 @@ if LIBLTDL2
 LIBLTDLDIR = libltdl
 endif
 
-if CYGNAL
-CYGNAL_DIR = cygnal
-endif
-
 DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl
-SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) $(CYGNAL_DIR)
+SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS)
 
 if TESTSUITE
 SUBDIRS += testsuite

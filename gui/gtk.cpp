@@ -32,7 +32,9 @@
 #include "Renderer.h"
 #include "RunResources.h"
 #include "VM.h"
+#ifdef USE_LIRC
 #include "lirc.h"
+#endif
 #include "gnash.h" // Quality
 
 #include <iostream>
@@ -135,10 +137,12 @@ namespace {
 
 }
 
-// This is global so it can be accessed by the evnt handler, which
+#ifdef USE_LIRC
+// This is global so it can be accessed by the event handler, which
 // isn't part of this class. 
 Lirc *lirc;
 bool lirc_handler(void*, int, void* data);
+#endif
 
 GtkGui::~GtkGui()
 {
@@ -2164,6 +2168,7 @@ GtkGui::createControlMenu(GtkWidget *obj)
 
 }
 
+#ifdef USE_LIRC
 bool
 lirc_handler(void*, int, void* /*data*/)
 { 
@@ -2174,6 +2179,7 @@ lirc_handler(void*, int, void* /*data*/)
     // Want to keep this handler
     return true;
 }
+#endif
 
 // This assumes that the parent of _drawingArea is _window, which
 // isn't the case in the plugin fullscreen (it's _overlay). Currently

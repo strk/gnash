@@ -40,7 +40,6 @@
 #include "string_table.h"
 #include "rc.h" // for use of rcfile
 #include "URLAccessManager.h"
-#include "network.h"
 #include "URL.h"
 #include "NetConnection_as.h"
 #include "Object.h"
