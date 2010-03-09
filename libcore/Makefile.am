@@ -21,7 +21,7 @@ SUBDIRS = parser vm
 
 if ENABLE_PCH
 SUBDIRS += ../pch
-AM_CXXFLAGS = -I$(top_builddir)/pch -include all-includes.h
+AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 # noinst_LTLIBRARIES = libserver.la 

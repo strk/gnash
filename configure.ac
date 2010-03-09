@@ -2239,6 +2239,9 @@ AC_ARG_ENABLE([pch],
 
 AM_CONDITIONAL([ENABLE_PCH], [test x"$enable_pch" != x"no"])
 
+PCH_FLAGS="-I`pwd`/pch -include all-includes.h -Winvalid-pch"
+AC_SUBST(PCH_FLAGS)
+
 GNASH_PATH_PTHREADS
 
 GNASH_PATH_BOOST

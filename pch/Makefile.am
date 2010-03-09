@@ -47,6 +47,7 @@ PCHFLAGS = \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
+	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 all-includes.h.gch: $(PCHHEADERS)

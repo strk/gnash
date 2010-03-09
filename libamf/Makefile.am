@@ -62,7 +62,7 @@ noinst_HEADERS = \
 
 if ENABLE_PCH
 SUBDIRS = ../pch
-AM_CXXFLAGS = -I$(top_builddir)/pch -include all-includes.h
+AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support
