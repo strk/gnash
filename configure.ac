@@ -1385,11 +1385,11 @@ AC_MSG_CHECKING(linker --as-needed support)
 gcc_cv_ld_as_needed=no
 # Check if linker supports --as-needed and --no-as-needed options
 if $LD --help 2>/dev/null | grep as-needed > /dev/null; then
-	gcc_cv_ld_as_needed=yes
+  gcc_cv_ld_as_needed=yes
 fi
-dnl if test x"$gcc_cv_ld_as_needed" = xyes; then
-dnl 	LDFLAGS=" -Wl,--as-needed"
-dnl fi
+if test x"$gcc_cv_ld_as_needed" = xyes; then
+  LDFLAGS=" -Wl,--as-needed"
+fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
 
 dnl AC_MSG_CHECKING(linker --no-undefined support)
