@@ -114,3 +114,8 @@ clean-hook:
 # 	for i in $(plugins_LTLIBRARIES); do \
 # 	  $(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$i "$(DESTDIR)$(pluginsdir)/$$i" ; \
 # 	done
+
+if ENABLE_PCH
+SUBDIRS = ../pch
+AM_CXXFLAGS = -I$(top_builddir)/pch -include all-includes.h
+endif

@@ -224,6 +224,11 @@ if WIN32
   libgnashbase_la_LIBADD += -lws2_32 -lwinmm
 endif
 
+if ENABLE_PCH
+SUBDIRS = ../pch
+AM_CXXFLAGS = -I$(top_builddir)/pch -include all-includes.h
+endif
+
 CLEANFILES = libltdl.la libltdlc.la gnashrc gnashpluginrc
 
 # Rebuild with GCC 4.x Mudflap support

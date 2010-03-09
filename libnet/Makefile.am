@@ -88,6 +88,11 @@ if WIN32
   AM_LDFLAGS += -no-undefined
 endif
 
+if ENABLE_PCH
+SUBDIRS = ../pch
+AM_CXXFLAGS = -I$(top_builddir)/pch -include all-includes.h
+endif
+
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"

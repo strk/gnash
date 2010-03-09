@@ -19,6 +19,11 @@ AUTOMAKE_OPTIONS =
 
 SUBDIRS = parser vm
 
+if ENABLE_PCH
+SUBDIRS += ../pch
+AM_CXXFLAGS = -I$(top_builddir)/pch -include all-includes.h
+endif
+
 # noinst_LTLIBRARIES = libserver.la 
 pkglib_LTLIBRARIES = libgnashcore.la
 # noinst_SCRIPTS = gen-files.sh

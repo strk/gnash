@@ -69,6 +69,11 @@ if USE_SOUND_MKIT
 endif
 EXTRA_DIST += mkit
 
+if ENABLE_PCH
+SUBDIRS = ../pch
+AM_CXXFLAGS = -I$(top_builddir)/pch -include all-includes.h
+endif
+
 libgnashsound_la_LDFLAGS = -release $(VERSION)
 
 if WIN32

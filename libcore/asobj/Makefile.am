@@ -139,6 +139,11 @@ libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS) \
 				$(SDL_LIBS)
 endif
 
+if ENABLE_PCH
+SUBDIRS = ../../pch
+AM_CXXFLAGS = -I$(top_builddir)/pch -include all-includes.h
+endif
+
 # These makefile fragments build the ActionScript library for
 # Gnash, and supports both AS2 as well as AS3, so we always
 # want to build.

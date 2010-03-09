@@ -2234,6 +2234,10 @@ if test x"$enable_visibility" != x"no"; then
   CFLAGS="$save_CFLAGS"
 fi
 
+AC_ARG_ENABLE([pch],
+  AC_HELP_STRING([--enable-pch], [Enable precompiled header support]), [], [enable_pch=no])
+
+AM_CONDITIONAL([ENABLE_PCH], [test x"$enable_pch" != x"no"])
 
 GNASH_PATH_PTHREADS
 
@@ -2514,6 +2518,7 @@ cygnal/cgi-bin/oflaDemo/Makefile
 cygnal/cgi-bin/fitcDemo/Makefile
 cygnal/testsuite/Makefile
 cygnal/testsuite/cygnal.all/Makefile
+pch/Makefile
 )
 
 ###
