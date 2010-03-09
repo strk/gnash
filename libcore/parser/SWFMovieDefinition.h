@@ -150,8 +150,8 @@ public:
     /// Mark all dictionary items to be reachable (for GC)
     void markReachableResources() const
     {
-        foreachSecond(_map.begin(), _map.end(),
-                boost::mem_fn(&SWF::DefinitionTag::setReachable));
+        foreachSecond(_map.begin(), _map.end(), 
+                      &SWF::DefinitionTag::setReachable);
     }
 #endif 
 
