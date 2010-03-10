@@ -161,8 +161,20 @@ RTMP::connect(const URL& url)
 {
     log_debug("Connecting to %s", url.str());
 
+    const std::string& hostname = url.hostname();
+    const std::string& p = url.port();
+
+    // Default port.
+    boost::uint16_t port = 1935;
+    if (!p.empty()) {
+        try {
+            port = boost::lexical_cast<boost::uint16_t>(p);
+        }
+        catch (boost::bad_lexical_cast&) {}
+    }
+
     // Basic connection attempt.
-    if (!_socket.connect(url)) {
+    if (!_socket.connect(hostname, port)) {
         log_error("Initial connection failed");
         return false;
     }

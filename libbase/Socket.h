@@ -33,25 +33,49 @@ namespace gnash {
 
 /// A simple IOChannel subclass for reading and writing sockets.
 //
-/// The only important functions here are read and write.
+/// The Socket class will give you years of satisfaction provided you observe
+/// the following points:
+/// 1. A socket is active only when both connected() and not bad().
+/// 2. The only accurate way of determining an error is to check bad().
+/// 3. read() and write() should not be called until connected() is true.
 class DSOEXPORT Socket : public IOChannel
 {
 public:
 
+    /// Create a non-connected socket.
     Socket();
 
     virtual ~Socket() {}
 
-    bool connect(const URL& url);
+    /// Initiate a connection
+    //
+    /// @return         false if the connection fails. In this case, the
+    ///                 Socket is still in a closed state and is ready for
+    ///                 a new connection attempt.
+    ///                 true if there is no immediate failure. This does
+    ///                 not mean it is ready for writing or that the
+    ///                 connection will ultimately succeed.
+    bool connect(const std::string& hostname, boost::uint16_t port);
 
+    /// Close the Socket.
+    //
+    /// A closed Socket is in a state where another connection attempt can
+    /// be made. This resets any errors.
     void close();
 
-    bool connected() const {
-        return (_socket);
-    }
-
-    bool timedOut() const {
-        return (_timedOut);
+    /// True if a valid connection attempt has been made.
+    //
+    /// This may be true even when the Socket is in error condition and does
+    /// not mean that a read or write will succeed. 
+    bool connected() const;
+    
+    /// True if the Socket is in an error condition.
+    //
+    /// An error condition is fatal and can only be reset when the Socket
+    /// is closed. Any read or write failure other than EAGAIN or EWOULDBLOCK
+    /// causes a fatal error.
+    virtual bool bad() const {
+        return _error;
     }
 
     /// Read the given number of bytes from the stream
@@ -63,6 +87,11 @@ public:
     virtual std::streamsize readNonBlocking(void* dst, std::streamsize num);
 
     /// Write the given number of bytes to the stream
+    //
+    /// If you call write() before connected() is true, it may put the Socket
+    /// into an error condition.
+    //
+    /// Calling write() when the Socket is bad has no effect.
     virtual std::streamsize write(const void* src, std::streamsize num);
     
     /// Return current stream position
@@ -84,11 +113,10 @@ public:
     //
     /// Not implemented for Socket.
     virtual bool eof() const;
-    
-    /// Return true if the stream is in an error state
-    virtual bool bad() const;
 
 private:
+
+    mutable bool _connected;
 
     /// Fill the cache.
     std::streamsize fillCache();
@@ -105,7 +133,7 @@ private:
     /// Current read position in cache.
     boost::uint8_t* _pos;
 
-    bool _timedOut;
+    mutable bool _error;
 };
 
 } // namespace gnash

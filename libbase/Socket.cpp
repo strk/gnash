@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <fcntl.h>
 
 #include <boost/cstdint.hpp>
 #include <cstring>
@@ -41,12 +42,70 @@ namespace gnash
 
 Socket::Socket()
     :
+    _connected(false),
     _socket(0),
     _size(0),
     _pos(0),
-    _timedOut(false)
+    _error(false)
 {}
 
+bool
+Socket::connected() const
+{
+    if (_connected) return true;
+    if (!_socket) return false;
+
+    size_t retries = 10;
+    fd_set fdset;
+    struct timeval tval;
+
+    while (retries-- > 0) {
+
+        FD_ZERO(&fdset);
+        FD_SET(_socket, &fdset);
+            
+        tval.tv_sec = 0;
+        tval.tv_usec = 103;
+            
+        const int ret = select(_socket + 1, NULL, &fdset, NULL, &tval);
+        
+        // Select timeout
+        if (ret == 0) continue;
+           
+        if (ret > 0) {
+            boost::uint32_t val = 0;
+            socklen_t len = sizeof(val);
+            if (::getsockopt(_socket, SOL_SOCKET, SO_ERROR, &val, &len) < 0) {
+                log_debug("Error");
+                _error = true;
+                return false;
+            }
+            log_debug("error value: %s", val);
+
+            if (!val) {
+                _connected = true;
+                return true;
+            }
+            _error = true;
+            return false;
+        }
+
+        // If interrupted by a system call, try again
+        if (ret == -1) {
+            const int err = errno;
+            if (err == EINTR) {
+                log_debug(_("Socket interrupted by a system call"));
+                continue;
+            }
+
+            log_error(_("XMLSocket: The socket was never available"));
+            _error = true;
+            return false;
+        }
+    }
+    return false;
+} 
+    
 
 void
 Socket::close()
@@ -57,7 +116,7 @@ Socket::close()
 }
 
 bool
-Socket::connect(const URL& url)
+Socket::connect(const std::string& hostname, boost::uint16_t port)
 {
 
     if (connected()) {
@@ -65,51 +124,61 @@ Socket::connect(const URL& url)
         return false;
     }
 
-    const std::string& hostname = url.hostname();
+    assert(!_error);
+    assert(!_socket);
+
     if (hostname.empty()) return false;
 
     struct sockaddr_in addr;
     std::memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
 
-    addr.sin_addr.s_addr = inet_addr(hostname.c_str());
+    addr.sin_addr.s_addr = ::inet_addr(hostname.c_str());
     if (addr.sin_addr.s_addr == INADDR_NONE) {
-        struct hostent* host = gethostbyname(hostname.c_str());
+        struct hostent* host = ::gethostbyname(hostname.c_str());
         if (!host || !host->h_addr) {
             return false;
         }
         addr.sin_addr = *reinterpret_cast<in_addr*>(host->h_addr);
     }
 
-    const std::string& port = url.port();
-    const int p = port.empty() ? 0 : boost::lexical_cast<int>(port);
-    addr.sin_port = htons(p);
+    addr.sin_port = htons(port);
 
-    _timedOut = false;
+    _socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    
+    if (_socket < 0) {
+        const int err = errno;
+        log_debug("Socket creation failed: %s", std::strerror(err));
+        _socket = 0;
+        return false;
+    }
 
-    _socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (_socket != -1) {
-        const struct sockaddr* a = reinterpret_cast<struct sockaddr*>(&addr);
+    // Set non-blocking.
+    const int flag = ::fcntl(_socket, F_GETFL, 0);
+    ::fcntl(_socket, F_SETFL, flag | O_NONBLOCK);
 
-        if (::connect(_socket, a, sizeof(struct sockaddr)) < 0) {
-            const int err = errno;
+    const struct sockaddr* a = reinterpret_cast<struct sockaddr*>(&addr);
+
+    // Attempt connection
+    if (::connect(_socket, a, sizeof(struct sockaddr)) < 0) {
+        const int err = errno;
+        if (err != EINPROGRESS) {
             log_error("Failed to connect socket: %s", std::strerror(err));
-            close();
+            _socket = 0;
             return false;
         }
-
     }
 
     // Magic timeout number. Use rcfile ?
     struct timeval tv = { 120, 0 };
 
-    if (setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO,
+    if (::setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO,
                 reinterpret_cast<unsigned char*>(&tv), sizeof(tv))) {
         log_error("Setting socket timeout failed");
     }
 
     const boost::int32_t on = 1;
-    setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
+    ::setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
 
     assert(_socket);
     return true;
@@ -127,23 +196,22 @@ Socket::fillCache()
 
     while (1) {
 
-
         // Read up to the end of the cache if possible.
         const int toRead = arraySize(_cache) - _size - (_pos - _cache);
 
         const int bytesRead = recv(_socket, _pos + _size, toRead, 0);
         
         if (bytesRead == -1) {
-            const int err = errno;
-            log_debug("Socket receive error %s", std::strerror(err));
-            //if (err == EINTR) continue;
             
+            const int err = errno;
             if (err == EWOULDBLOCK || err == EAGAIN) {
-                // Nothing read.
-                _timedOut = true;
+                // Nothing to read. Carry on.
                 return 0;
             }
+            log_error("Socket received error %s", std::strerror(err));
+            _error = true;
         }
+
         _size += bytesRead;
         return bytesRead;
     }
@@ -156,13 +224,12 @@ Socket::read(void* dst, std::streamsize num)
 {
     
     int toRead = num;
-    _timedOut = false;
 
     boost::uint8_t* ptr = static_cast<boost::uint8_t*>(dst);
 
     if (!_size) {
         if (fillCache() < 1) {
-            if (_timedOut) {
+            if (_error) {
                 return -1;
             }
         }
@@ -186,7 +253,7 @@ Socket::readNonBlocking(void* dst, std::streamsize num)
 std::streamsize
 Socket::write(const void* src, std::streamsize num)
 {
-    assert(!bad());
+    if (bad()) return 0;
 
     int bytesSent = 0;
     int toWrite = num;
@@ -199,11 +266,11 @@ Socket::write(const void* src, std::streamsize num)
         if (bytesSent < 0) {
             const int err = errno;
             log_error("Socket send error %s", std::strerror(err));
-            close();
-            return -1;
-            break;
+            _error = true;
+            return 0;
         }
-        if (bytesSent == 0) break;
+
+        if (!bytesSent) break;
         toWrite -= bytesSent;
         buf += bytesSent;
     }
@@ -235,12 +302,6 @@ Socket::eof() const
 {
     log_error("eof() called for Socket");
     return false;
-}
-
-bool
-Socket::bad() const
-{
-    return !_socket || _timedOut;
 }
 
 } // namespace gnash
