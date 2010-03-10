@@ -55,172 +55,6 @@ namespace {
     void attachXMLSocketInterface(as_object& o);
 }
 
-/// Connection object
-//
-/// A wrapper round a Network object that adds specific functions needed
-/// by XMLSocket.
-namespace {
-
-class SocketConnection
-{
-public:
-
-    SocketConnection()
-        :
-        _complete(false)
-    {}
-
-    /// Initiate a connection.
-    void connect(const std::string& host, boost::uint16_t port) {
-        _start.reset(new boost::thread(
-            boost::bind(&SocketConnection::makeConnection, this, host, port)));
-    }
-
-    /// The state of the connection.
-    //
-    /// Until complete() is true, this may change.
-    bool connected() const {
-        return _socket.connected();
-    }
-
-    /// Whether an initiated connection is finished
-    //
-    /// @return true if a connection attempt is complete.
-    ///         The connection attempt may have failed. Check
-    ///         connected() to find out.
-    bool complete() const {
-        return _complete;
-    }
-
-    void setComplete() {
-        _complete = true;
-    }
-
-    size_t writeMessage(const std::string& str) {
-        // We have to write the null terminator as well.
-        return write(_socket.connected(), str.c_str(), str.size() + 1);
-    }
-
-    /// Read from the socket.
-    void readMessages(std::vector<std::string>& msgs) {
-        
-        assert(_socket.connected());
-    
-        const int fd = _socket.connected();
-        assert(fd > 0);
-
-        fd_set fdset;
-        struct timeval tval;
-        size_t retries = 10;
-
-        const int bufSize = 10000;
-        boost::scoped_array<char> buf(new char[bufSize]);
-
-        while (retries-- > 0) {
-            FD_ZERO(&fdset);
-            FD_SET(fd, &fdset);
-            
-            tval.tv_sec = 0;
-            tval.tv_usec = 103;
-            
-            const int ret = select(fd + 1, &fdset, NULL, NULL, &tval);
-            
-            // If interupted by a system call, try again
-            if (ret == -1 && errno == EINTR) {
-                log_debug(_("The socket for fd #%d was interupted by a "
-                            "system call"), fd);
-                continue;
-            }
-            if (ret == -1) {
-                log_error(_("XMLSocket: The socket for fd #%d was never "
-                            "available"), fd);
-                return;
-            }
-     
-            // Return if timed out.
-            if (ret == 0) return;
-
-            const size_t bytesRead = read(fd, buf.get(), bufSize - 1);
-
-            // Return if there's no data.
-            if (!bytesRead) return;
-
-            if (buf[bytesRead - 1] != 0) {
-                // We received a partial message, so bung
-                // a null-terminator on the end.
-                buf[bytesRead] = 0;
-            }
-
-            char* ptr = buf.get();
-            while (static_cast<size_t>(ptr - buf.get()) < bytesRead - 1) {
-
-#ifdef GNASH_XMLSOCKET_DEBUG
-                log_debug ("read: %d, this string ends: %d", bytesRead,
-                        ptr + std::strlen(ptr) - buf.get());
-#endif
-
-                // If the string reaches to the final byte read, it's
-                // incomplete. Store it and continue. The buffer is 
-                // NULL-terminated, so this cannot read past the end.
-                if (static_cast<size_t>(
-                    ptr + std::strlen(ptr) - buf.get()) == bytesRead) {
-
-                    _remainder += std::string(ptr);
-                    break;
-                }
-
-                if (!_remainder.empty()) {
-                    msgs.push_back(_remainder + std::string(ptr));
-                    ptr += std::strlen(ptr) + 1;
-                    _remainder.clear();
-                    continue;
-                }
-                
-                // Don't do anything if nothing is received.
-                msgs.push_back(ptr);
-                
-                ptr += std::strlen(ptr) + 1;
-            }
-        }
-    }
-    
-    /// Close the connection.
-    //
-    /// This also cancels any connection attempt in progress.
-    void close() {
-        if (_start) {
-	    _start.reset();
-	}
-	_socket.close();
-        
-        // Reset for next connection.
-        _complete = false;
-
-        assert(!_socket.connected());
-    }
-
-private:
-
-    void makeConnection(const std::string& host, boost::uint16_t port) {
-	std::string combined = host;
-	combined += ":";
-	combined += port;	
-	URL url(combined);
-        _socket.connect(url);
-        _complete = true;
-    }
-
-    Socket _socket;
-
-    bool _complete;
-
-    std::string _remainder;
-
-    boost::scoped_ptr<boost::thread> _start;
-
-};
-
-}
 
 class XMLSocket_as : public ActiveRelay
 {
@@ -231,21 +65,12 @@ public:
     XMLSocket_as(as_object* owner);
     ~XMLSocket_as();
     
-    /// True when the XMLSocket is not trying to connect.
-    //
-    /// If this is true but the socket is not connected, the connection
-    /// has failed.
+    /// True only when the XMLSocket is ready for read/write.
     bool ready() const {
         return _ready;
     }
 
-    /// Whether a connection exists.
-    //
-    /// This is not final until ready() is true.
-    bool connected() const {
-        return _connection.connected();
-    }
-
+    /// Attempt a connection.
     bool connect(const std::string& host, boost::uint16_t port);
 
     /// Send a string with a null-terminator to the socket.
@@ -265,14 +90,12 @@ private:
 
 	void checkForIncomingData();
     
-	/// Return the as_function with given name.
-	boost::intrusive_ptr<as_function> getEventHandler(
-            const std::string& name);
-
     /// The connection
-    SocketConnection _connection;
+    Socket _socket;
 
     bool _ready;
+    
+    std::string _remainder;
 
 };
 
@@ -294,26 +117,29 @@ XMLSocket_as::~XMLSocket_as()
 void
 XMLSocket_as::update()
 {
-    // Wait until something has happened with the connection
-    if (!_connection.complete()) return;
-    
-    // If this XMLSocket hadn't finished a connection, check whether it
-    // has now.
+
+    // This function should never be called unless a connection is active 
+    // or a connection attempt is being made.
+
+    // If the connection was not complete, check to see if it is.
     if (!ready()) {
-
-        if (!connected()) {
-
-            // If connection failed, notify onConnect and stop callback.
-            // This means update() will not be called again until
-            // XMLSocket.connect() is invoked.
+        
+        if (_socket.bad()) {
+            // Connection failed during connect()
+            // Notify onConnect and stop callback. This means update()
+            // will not be called again until XMLSocket.connect() is invoked.
             callMethod(&owner(), NSV::PROP_ON_CONNECT, false);
             getRoot(owner()).removeAdvanceCallback(this);
-            return;    
+            return;
         }
+
+        // Not yet ready.
+        if (!_socket.connected()) return;
 
         // Connection succeeded.
         _ready = true;
         callMethod(&owner(), NSV::PROP_ON_CONNECT, true);
+
     }
 
     // Now the connection is established we can receive data.
@@ -329,7 +155,7 @@ XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
 	    return false;
     }
 
-    _connection.connect(host, port);
+    _socket.connect(host, port);
     
     // Start callbacks on advance.
     getRoot(owner()).addAdvanceCallback(this);
@@ -341,62 +167,83 @@ void
 XMLSocket_as::close()
 {
     getRoot(owner()).removeAdvanceCallback(this);
-    _connection.close();
+    _socket.close();
     _ready = false;
 }
 
 
-boost::intrusive_ptr<as_function>
-XMLSocket_as::getEventHandler(const std::string& name)
-{
-	boost::intrusive_ptr<as_function> ret;
-
-	as_value tmp;
-	string_table& st = getStringTable(owner());
-	if (!owner().get_member(st.find(name), &tmp) ) return ret;
-	ret = tmp.to_function();
-	return ret;
-}
-
 void
 XMLSocket_as::checkForIncomingData()
 {
-    assert(ready() && connected());
+    assert(ready());
     
     std::vector<std::string> msgs;
-    _connection.readMessages(msgs);
+    
+    const int bufSize = 10000;
+    boost::scoped_array<char> buf(new char[bufSize]);
+
+    const size_t bytesRead = _socket.readNonBlocking(buf.get(), bufSize - 1);
+
+    // Return if there's no data.
+    if (!bytesRead) return;
+
+    if (buf[bytesRead - 1] != 0) {
+        // We received a partial message, so bung
+        // a null-terminator on the end.
+        buf[bytesRead] = 0;
+    }
+
+    char* ptr = buf.get();
+    while (static_cast<size_t>(ptr - buf.get()) < bytesRead) {
+
+#ifdef GNASH_XMLSOCKET_DEBUG
+        log_debug ("read: %d, this string ends: %d", bytesRead,
+                ptr + std::strlen(ptr) - buf.get());
+#endif
+
+        std::string msg(ptr);
+
+        // If the string reaches to the final byte read, it's
+        // incomplete. Store it and continue. The buffer is 
+        // NULL-terminated, so this cannot read past the end.
+        if (static_cast<size_t>(
+            ptr + std::strlen(ptr) - buf.get()) == bytesRead) {
+            _remainder += msg;
+            break;
+        }
+
+        if (!_remainder.empty()) {
+            msgs.push_back(_remainder + msg);
+            ptr += msg.size() + 1;
+            _remainder.clear();
+            continue;
+        }
+        
+        // Don't do anything if nothing is received.
+        msgs.push_back(msg);
+        
+        ptr += msg.size() + 1;
+    }
    
     if (msgs.empty()) return;
     
-    //log_debug(_("Got %d messages: "), msgs.size());
-
 #ifdef GNASH_XMLSOCKET_DEBUG
     for (size_t i = 0, e = msgs.size(); i != e; ++i) {
         log_debug(_(" Message %d: %s "), i, msgs[i]);
     }
 #endif
 
-    as_environment env(getVM(owner())); 
-
     for (XMLSocket_as::MessageList::const_iterator it=msgs.begin(),
                     itEnd=msgs.end(); it != itEnd; ++it) {
- 
-        // This should be checked on every iteration in case one call
-        // changes the handler.       
-        boost::intrusive_ptr<as_function> onDataHandler =
-            getEventHandler("onData");
-
-        if (!onDataHandler) break;
-
-        const std::string& s = *it;
-
-        fn_call::Args args;
-        args += s;
-        
-        fn_call call(&owner(), env, args);
-
-        onDataHandler->call(call);
+        callMethod(&owner(), NSV::PROP_ON_DATA, *it);
     }
+    
+    if (_socket.bad()) {
+        callMethod(&owner(), NSV::PROP_ON_CLOSE);
+        getRoot(owner()).removeAdvanceCallback(this);
+        return;
+    }
+
 
 }
 
@@ -406,12 +253,12 @@ XMLSocket_as::checkForIncomingData()
 void
 XMLSocket_as::send(std::string str)
 {
-    if (!ready() || !connected()) {
+    if (!_socket.connected()) {
         log_error(_("XMLSocket.send(): socket not initialized"));
 	    return;
     }
     
-    _connection.writeMessage(str);
+    _socket.write(str.c_str(), str.size() + 1);
     
     return;
 }

@@ -20,6 +20,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <deque>
 #include <map>
 
@@ -30,8 +31,14 @@
 
 #define RTMP_DEFAULT_CHUNKSIZE	128
 
+// Forward declarations.
 namespace gnash {
+    namespace rtmp {
+        class HandShaker;
+    }
+}
 
+namespace gnash {
 namespace rtmp {
 
 /// Known control / ping codes
@@ -294,27 +301,45 @@ isReady(const RTMPPacket& p) {
 
 /// This class is for handling the RTMP protocol.
 //
-/// What should happen:
+/// Only the RTMP protocol itself is handled in this class. An RTMP connection
+/// is valid only when connected() is true.
 //
-/// The RTMP object should connect to a server.
+/// An RTMP object may be closed and reconnected. As soon as connect() returns
+/// true, callers are responsible for calling close().
 //
-/// Once that is done the caller should call "play" on a stream. This (and
-/// other commands) can be called as long as the connection is connected.
+/// RTMP has a set of channels for incoming and outgoing packets. Packets 
+/// are stored here for two reasons:
+/// 1. The payload size exceeds the chunk size, so a single payload requires
+///    several complete packets. A packet is not 'ready' unless it has a
+///    complete payload, or is the packet that completes the payload of
+///    previous packets.
+/// 2. Subsequent packets sent on the same channel can be compressed if they
+///    have the same header information. The stored packet header is used for
+///    comparison. For this case, the payload is no longer necessary.
 //
-/// It can be closed and reconnected.
+/// A different case applies to incomplete packets. The payload of a single
+/// packet (whether the packet is 'ready' or not) is the smaller of (a) the
+/// advertised data size and (b) the chunk size. Until this much data has
+/// been read, the packet is incomplete.  Whereas Gnash always
+/// expects a complete header to be available or none at all, the payload
+/// can be read over several calls to update().
 struct DSOEXPORT RTMP
 {
 
-    /// Construct an RTMP handler.
+    /// Construct a non-connected RTMP handler.
     RTMP();
 
-    ~RTMP() {}
+    ~RTMP();
 
     /// Initiate a network connection.
     //
     /// Note that this only creates the TCP connection and carries out the
-    /// handshake. You must send a "connect" request before doing anything
-    /// else.
+    /// handshake. An active data connection needs an AMF connect request,
+    /// which is not part of the RTMP protocol.
+    //
+    /// @return     true if the connection attempt starts, otherwise false.
+    ///             A return of false means that the RTMP object is in a 
+    ///             closed state and can be reconnected.
     bool connect(const URL& url);
 
     /// This is used for sending call requests from the core.
@@ -344,31 +369,43 @@ struct DSOEXPORT RTMP
 
     /// Whether we have a basic connection to a server.
     //
-    /// This does not mean we are ready to send or receive streams. It does
-    /// mean that messages sent via call() will be transmitted to the server.
-    bool connected() const;
-
-    /// Called to do receives.
+    /// This only means that the handshake is complete and that AMF requests
+    /// can be sent to the server. It does not mean that was can send or
+    /// receive media streams.
     //
-    /// TODO: this is the least satisfactory part. Currently sends are
-    /// executed immediately. This is probably correct. Data are only
-    /// received when update() is called, and then only one packet at a
-    /// time.
-    void update();
+    /// You should ensure that connected() is true before attempting to send
+    /// or receive data.
+    bool connected() const {
+        return _connected;
+    }
 
-    /// Handle an RTMPPacket.
-    void handlePacket(const RTMPPacket& packet);
+    /// Whether the RTMP connection is in error condition.
+    //
+    /// This is a fatal error.
+    bool error() const {
+        return _error;
+    }
+
+    /// This function handles reading incoming data and filling data queues.
+    //
+    /// You should call this function regularly once the initial connection
+    /// has been initiated.
+    //
+    /// Its tasks involve:
+    /// 1. completing the handshake
+    /// 2. checking for socket errors
+    /// 3. reading incoming data
+    /// 4. filling data queues.
+    //
+    /// None of those things should concern you. Just call the function
+    /// regularly and use connected(), error(), and check the message
+    /// queues.
+    void update();
 
     /// Close the connection.
     //
     /// A new connection may now be opened.
     void close();
-    
-    /// Read from the socket.
-    int readSocket(boost::uint8_t* dst, int num);
-
-    /// Send an RTMPPacket on the connection.
-    bool sendPacket(RTMPPacket& packet);
 
     /// Get an AMF message received from the server.
     //
@@ -393,6 +430,15 @@ struct DSOEXPORT RTMP
         _flvQueue.pop_front();
         return b;
     }
+
+    /// Handle an RTMPPacket.
+    void handlePacket(const RTMPPacket& packet);
+    
+    /// Read from the socket.
+    int readSocket(boost::uint8_t* dst, int num);
+
+    /// Send an RTMPPacket on the connection.
+    bool sendPacket(RTMPPacket& packet);
 
     /// Store the server bandwidth
     //
@@ -430,7 +476,9 @@ private:
     };
     
     /// Read an RTMP packet from the connection.
-    bool readPacket(RTMPPacket& packet);
+    bool readPacketHeader(RTMPPacket& packet);
+
+    bool readPacketPayload(RTMPPacket& packet);
 
     /// Check whether a packet exists on a channel.
     bool hasPacket(ChannelType t, size_t channel) const;
@@ -480,6 +528,18 @@ private:
 
     /// Chunk size for sending.
     size_t _outChunkSize;
+
+    boost::scoped_ptr<HandShaker> _handShaker;
+
+    bool _connected;
+
+    bool _error;
+
+    /// If a packet could not be read in one go, it is stored here.
+    //
+    /// This is not the same as a non-ready packet. It applies only to packets
+    /// waiting for payload data.
+    boost::scoped_ptr<RTMPPacket> _incompletePacket;
 
 };
 

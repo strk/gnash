@@ -79,6 +79,45 @@ struct RandomByte
 
 }
 
+/// A utility functor for carrying out the handshake.
+class HandShaker
+{
+public:
+
+    static const int sigSize = 1536;
+
+    HandShaker(Socket& s);
+
+    /// Calls the next stage in the handshake process.
+    void call();
+
+    bool success() const {
+        return _complete;
+    }
+
+    bool error() const {
+        return _error || _socket.bad();
+    }
+
+private:
+
+    /// These are the stages of the handshake.
+    //
+    /// If the socket is not ready, they will return false. If the socket
+    /// is in error, they will set _error.
+    bool stage0();
+    bool stage1();
+    bool stage2();
+    bool stage3();
+
+    Socket _socket;
+    std::vector<boost::uint8_t> _sendBuf;
+    std::vector<boost::uint8_t> _recvBuf;
+    bool _error;
+    bool _complete;
+    size_t _stage;
+};
+
 RTMPPacket::RTMPPacket(size_t reserve)
     :
     header(),
@@ -106,7 +145,13 @@ RTMP::RTMP()
     _bytesInSent(0),
     _serverBandwidth(2500000),
     _bandwidth(2500000),
-    _outChunkSize(RTMP_DEFAULT_CHUNKSIZE)
+    _outChunkSize(RTMP_DEFAULT_CHUNKSIZE),
+    _connected(false),
+    _error(false)
+{
+}
+
+RTMP::~RTMP()
 {
 }
 
@@ -133,12 +178,6 @@ RTMP::storePacket(ChannelType t, size_t channel, const RTMPPacket& p)
     return stored;
 }
 
-bool
-RTMP::connected() const
-{
-    return _socket.connected();
-}
-
 void
 RTMP::setBufferTime(size_t size, int streamID)
 {
@@ -161,18 +200,29 @@ RTMP::connect(const URL& url)
 {
     log_debug("Connecting to %s", url.str());
 
+    const std::string& hostname = url.hostname();
+    const std::string& p = url.port();
+
+    // Default port.
+    boost::uint16_t port = 1935;
+    if (!p.empty()) {
+        try {
+            port = boost::lexical_cast<boost::uint16_t>(p);
+        }
+        catch (boost::bad_lexical_cast&) {}
+    }
+
     // Basic connection attempt.
-    if (!_socket.connect(url)) {
+    if (!_socket.connect(hostname, port)) {
         log_error("Initial connection failed");
         return false;
     }
     
-    if (!handShake()) {
-        log_error( "handshake failed.");
-        close();
-        return false;
-    }
-    
+    _handShaker.reset(new HandShaker(_socket));
+
+    // Start handshake attempt immediately.
+    _handShaker->call();
+
     return true;
 }
 
@@ -180,18 +230,50 @@ void
 RTMP::update()
 {
     if (!connected()) {
-        log_debug("Not connected!");
-        return;
+        _handShaker->call();
+        if (_handShaker->error()) {
+            _error = true;
+        }
+        if (!_handShaker->success()) return;
+        _connected = true;
     }
     
     const size_t reads = 10;
 
     for (size_t i = 0; i < reads; ++i) {
 
+        /// No need to continue reading (though it should do no harm).
+        if (error()) return;
+
         RTMPPacket p;
-        readPacket(p);
-    
+
+        // If we haven't finished reading a packet, retrieve it; otherwise
+        // use an empty one.
+        if (_incompletePacket.get()) {
+            log_debug("Doing incomplete packet");
+            p = *_incompletePacket;
+            _incompletePacket.reset();
+        }
+        else {
+            if (!readPacketHeader(p)) continue;
+        }
+
+        // Get the payload if possible.
+        if (hasPayload(p) && !readPacketPayload(p)) {
+            // If the payload is not completely readable, store it and
+            // continue.
+            _incompletePacket.reset(new RTMPPacket(p));
+            continue;
+        }
+        
+        // Store a copy of the packet for later additions and as a reference for
+        // future sends.
+        RTMPPacket& stored = storePacket(CHANNELS_IN, p.header.channel, p);
+      
+        // If the packet is complete, the stored packet no longer needs to
+        // keep the data alive.
         if (isReady(p)) {
+            clearPayload(stored);
             handlePacket(p);
             return;
         }
@@ -275,28 +357,29 @@ RTMP::handlePacket(const RTMPPacket& packet)
 int
 RTMP::readSocket(boost::uint8_t* buffer, int n)
 {
-    int toRead = n;
-    while (toRead) {
-        const std::streamsize bytesRead = _socket.read(buffer, toRead);
 
-        if (bytesRead < 0) return -1;
-        
-        if (!bytesRead) {
-            return -1;
-        }
+    assert(n >= 0);
 
-        _bytesIn += bytesRead;
-        toRead -= bytesRead;
-
-        // Report bytes recieved every time we reach half the bandwidth.
-        // Doesn't seem very likely to be the way the pp does it.
-        if (_bytesIn > _bytesInSent + _bandwidth / 2) {
-            sendBytesReceived(this);
-            log_debug("Sent bytes received");
-        }
-        buffer += bytesRead;
+    const std::streamsize bytesRead = _socket.read(buffer, n);
+    
+    if (_socket.bad()) {
+        _error = true;
+        return 0;
     }
-    return n - toRead;
+
+    if (!bytesRead) return 0;
+
+    _bytesIn += bytesRead;
+
+    // Report bytes recieved every time we reach half the bandwidth.
+    // Doesn't seem very likely to be the way the pp does it.
+    if (_bytesIn > _bytesInSent + _bandwidth / 2) {
+        sendBytesReceived(this);
+        log_debug("Sent bytes received");
+    }
+
+    buffer += bytesRead;
+    return bytesRead;
 }
 
 void
@@ -322,7 +405,7 @@ RTMP::play(const SimpleBuffer& buf, int streamID)
 /// It seems as if new packets can add to the data of old ones if they have
 /// a minimal, small header.
 bool
-RTMP::readPacket(RTMPPacket& packet)
+RTMP::readPacketHeader(RTMPPacket& packet)
 {
       
     RTMPHeader& hr = packet.header;
@@ -330,8 +413,8 @@ RTMP::readPacket(RTMPPacket& packet)
     boost::uint8_t hbuf[RTMPHeader::headerSize] = { 0 };
     boost::uint8_t* header = hbuf;
   
+    // The first read may fail, but otherwise we expect a complete header.
     if (readSocket(hbuf, 1) == 0) {
-        log_error( "%s, failed to read RTMP packet header", __FUNCTION__);
         return false;
     }
 
@@ -457,6 +540,13 @@ RTMP::readPacket(RTMPPacket& packet)
     // Resize anyway. If it's different from what it was before, we should
     // already have cleared it.
     packet.buffer->resize(bufSize);
+    return true;
+}
+
+bool
+RTMP::readPacketPayload(RTMPPacket& packet)
+{
+    RTMPHeader& hr = packet.header;
 
     const size_t bytesRead = packet.bytesRead;
 
@@ -465,23 +555,13 @@ RTMP::readPacket(RTMPPacket& packet)
     const int nChunk = std::min<int>(nToRead, _inChunkSize);
     assert(nChunk >= 0);
 
+    // This is fine. We'll keep trying to read this payload until there
+    // is enough data.
     if (readSocket(payloadData(packet) + bytesRead, nChunk) != nChunk) {
-        log_error( "Failed to read RTMP packet payload. len: %s", bytesRead);
         return false;
     }
 
     packet.bytesRead += nChunk;
-
-    // Store a copy of the packet for later additions and as a reference for
-    // future sends.
-    RTMPPacket& storedpacket = storePacket(CHANNELS_IN, hr.channel, packet);
-  
-    // If the packet is complete, the stored packet no longer needs to
-    // keep the data alive.
-    if (isReady(packet)) {
-        // The timestamp should be absolute by this stage.
-        clearPayload(storedpacket);
-    }
         
     return true;
 }
@@ -766,7 +846,6 @@ RTMP::sendPacket(RTMPPacket& packet)
     return true;
 }
 
-   
 void
 RTMP::close()
 {
@@ -780,6 +859,154 @@ RTMP::close()
     _bandwidth = 2500000;
     m_nClientBW2 = 2;
     _serverBandwidth = 2500000;
+}
+
+
+/////////////////////////////////////
+/// HandShaker implementation
+/////////////////////////////////////
+
+HandShaker::HandShaker(Socket& s)
+    :
+    _socket(s),
+    _sendBuf(sigSize + 1),
+    _recvBuf(sigSize + 1),
+    _error(false),
+    _complete(false),
+    _stage(0)
+{
+    // Not encrypted
+    _sendBuf[0] = 0x03;
+    
+    // TODO: do this properly.
+    boost::uint32_t uptime = htonl(getUptime());
+
+    boost::uint8_t* ourSig = &_sendBuf.front() + 1;
+    std::memcpy(ourSig, &uptime, 4);
+    std::fill_n(ourSig + 4, 4, 0);
+
+    // Generate 1536 random bytes.
+    std::generate(ourSig + 8, ourSig + sigSize, RandomByte());
+
+}
+
+
+/// Calls the next stage in the handshake process.
+void
+HandShaker::call()
+{
+    if (error() || !_socket.connected()) return;
+
+    switch (_stage) {
+        case 0:
+            if (!stage0()) return;
+            _stage = 1;
+        case 1:
+            if (!stage1()) return;
+            _stage = 2;
+        case 2:
+            if (!stage2()) return;
+            _stage = 3;
+        case 3:
+            if (!stage3()) return;
+            log_debug("Handshake completed");
+            _complete = true;
+    }
+}
+
+bool
+HandShaker::stage0()
+{
+    std::streamsize sent = _socket.write(&_sendBuf.front(), sigSize + 1);
+
+    // This should probably not happen, but we can try again. An error will
+    // be signalled later if the socket is no longer usable.
+    if (!sent) {
+        log_error("Stage 1 socket not ready. This should not happen.");
+        return false;
+    }
+
+    /// If we sent the wrong amount of data, we can't recover.
+    if (sent != sigSize + 1) {
+        log_error("Could not send stage 1 data");
+        _error = true;
+        return false;
+    }
+    return true;
+}
+
+bool
+HandShaker::stage1()
+{
+
+    std::streamsize read = _socket.read(&_recvBuf.front(), sigSize + 1);
+
+    if (!read) {
+        // If we receive nothing, wait until the next try.
+        return false;
+    }
+
+    // The read should never return anything but 0 or what we asked for.
+    assert (read == sigSize + 1);
+
+    if (_recvBuf[0] != _sendBuf[0]) {
+        log_error( "Type mismatch: client sent %d, server answered %d",
+	        _recvBuf[0], _sendBuf[0]);
+    }
+    
+    const boost::uint8_t* serverSig = &_recvBuf.front() + 1;
+
+    // decode server response
+    boost::uint32_t suptime;
+    std::memcpy(&suptime, serverSig, 4);
+    suptime = ntohl(suptime);
+
+    log_debug("Server Uptime : %d", suptime);
+    log_debug("FMS Version   : %d.%d.%d.%d",
+            +serverSig[4], +serverSig[5], +serverSig[6], +serverSig[7]);
+
+    return true;
+}
+
+bool
+HandShaker::stage2()
+{
+    
+    std::streamsize sent = _socket.write(&_recvBuf.front() + 1, sigSize);
+    
+    // This should probably not happen.
+    if (!sent) return false;
+
+    if (sent != sigSize) {
+        log_error("Could not send complete signature.");
+        _error = true;
+        return false;
+    }
+
+    return true;
+}
+
+bool
+HandShaker::stage3()
+{
+
+    // Expect it back again.
+    std::streamsize got = _socket.read(&_recvBuf.front(), sigSize);
+   
+    if (!got) return false;
+    
+    assert (got == sigSize);
+
+    const boost::uint8_t* serverSig = &_recvBuf.front();
+    const boost::uint8_t* ourSig = &_sendBuf.front() + 1;
+
+    const bool match = std::equal(serverSig, serverSig + sigSize, ourSig);
+
+    // Should we set an error here?
+    if (!match) {
+        log_error( "Signatures do not match during handshake!");
+    }
+    return true;
 }
 
 /// The type of Ping packet is 0x4 and contains two mandatory parameters
