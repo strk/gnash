@@ -32,8 +32,14 @@
 
 #define RTMP_DEFAULT_CHUNKSIZE	128
 
+// Forward declarations.
 namespace gnash {
+    namespace rtmp {
+        class HandShaker;
+    }
+}
 
+namespace gnash {
 namespace rtmp {
 
 /// Known control / ping codes
@@ -293,43 +299,6 @@ isReady(const RTMPPacket& p) {
     return p.bytesRead == p.header.dataSize;
 }
 
-/// A utility functor for carrying out the handshake.
-class HandShaker
-{
-public:
-    static const int sigSize = 1536;
-
-    HandShaker(Socket& s);
-
-    /// Calls the next stage in the handshake process.
-    void call();
-
-    bool success() const {
-        return _complete;
-    }
-
-    bool error() const {
-        return _error || _socket.bad();
-    }
-
-private:
-
-    /// These are the stages of the handshake.
-    //
-    /// If the socket is not ready, they will return false. If the socket
-    /// is in error, they will set _error.
-    bool stage0();
-    bool stage1();
-    bool stage2();
-    bool stage3();
-
-    Socket _socket;
-    std::vector<boost::uint8_t> _sendBuf;
-    std::vector<boost::uint8_t> _recvBuf;
-    bool _error;
-    bool _complete;
-    size_t _stage;
-};
 
 /// This class is for handling the RTMP protocol.
 //
@@ -338,13 +307,30 @@ private:
 //
 /// An RTMP object may be closed and reconnected. As soon as connect() returns
 /// true, callers are responsible for calling close().
+//
+/// RTMP has a set of channels for incoming and outgoing packets. Packets 
+/// are stored here for two reasons:
+/// 1. The payload size exceeds the chunk size, so a single payload requires
+///    several complete packets. A packet is not 'ready' unless it has a
+///    complete payload, or is the packet that completes the payload of
+///    previous packets.
+/// 2. Subsequent packets sent on the same channel can be compressed if they
+///    have the same header information. The stored packet header is used for
+///    comparison. For this case, the payload is no longer necessary.
+//
+/// A different case applies to incomplete packets. The payload of a single
+/// packet (whether the packet is 'ready' or not) is the smaller of (a) the
+/// advertised data size and (b) the chunk size. Until this much data has
+/// been read, the packet is incomplete.  Whereas Gnash always
+/// expects a complete header to be available or none at all, the payload
+/// can be read over several calls to update().
 struct DSOEXPORT RTMP
 {
 
     /// Construct a non-connected RTMP handler.
     RTMP();
 
-    ~RTMP() {}
+    ~RTMP();
 
     /// Initiate a network connection.
     //
@@ -542,6 +528,10 @@ private:
 
     bool _error;
 
+    /// If a packet could not be read in one go, it is stored here.
+    //
+    /// This is not the same as a non-ready packet. It applies only to packets
+    /// waiting for payload data.
     boost::scoped_ptr<RTMPPacket> _incompletePacket;
 
 };

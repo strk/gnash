@@ -80,7 +80,6 @@ Socket::connected() const
                 _error = true;
                 return false;
             }
-            log_debug("error value: %s", val);
 
             if (!val) {
                 _connected = true;
@@ -113,6 +112,7 @@ Socket::close()
     if (_socket) ::close(_socket);
     _socket = 0;
     _size = 0;
+    _pos = 0;
 }
 
 bool
@@ -199,9 +199,6 @@ Socket::fillCache()
     size_t end = (start + completeRead) % cacheSize;
     if (end == 0) end = cacheSize;
 
-    log_debug("Read request of %s bytes from %s to %s",
-            completeRead, start, end);
-
     boost::uint8_t* startpos = _cache + start;
 
     while (1) {
@@ -210,11 +207,6 @@ Socket::fillCache()
         // unprocessed byte.
         boost::uint8_t* endpos = _cache + ((startpos < _cache + _pos) ?
                 _pos : cacheSize);
-
-        log_debug("Pos: %s, size %s", _pos, _size);
-
-        log_debug("Cache %s, startpos %s, endpos %s", (void*)_cache,
-                (void*)startpos, (void*)endpos);
 
         const int thisRead = endpos - startpos;
         assert(thisRead >= 0);
@@ -232,7 +224,6 @@ Socket::fillCache()
             _error = true;
         }
 
-        log_debug("Partial of %s bytes from %s", bytesRead, thisRead);
 
         _size += bytesRead;
 
@@ -256,20 +247,12 @@ Socket::read(void* dst, std::streamsize num)
 
     if (num < 0) return 0;
 
-    log_debug("Cache size %s", _size);
-
     if (_size < num) {
         fillCache();
-        if (_error) {
-            log_error("There was an error");
-            return 0;
-        }
+        if (_error) return 0;
     }
 
-    if (_size < num) {
-        log_debug("No enough bytes in cache to read %s bytes", num);
-        return 0;
-    }
+    if (_size < num) return 0;
     return readNonBlocking(dst, num);
 
 }
@@ -281,12 +264,9 @@ Socket::readNonBlocking(void* dst, std::streamsize num)
     
     boost::uint8_t* ptr = static_cast<boost::uint8_t*>(dst);
     
-    log_debug("Cache size %s", _size);
-
     if (!_size) {
         fillCache();
         if (_error) {
-            log_error("There was an error in rNB");
             return 0;
         }
     }
@@ -294,7 +274,6 @@ Socket::readNonBlocking(void* dst, std::streamsize num)
     size_t cacheSize = arraySize(_cache);
 
     // First read from pos to end
-    log_debug("Bytes requested %s", num);
 
     // Maximum bytes available to read.
     const size_t canRead = std::min<size_t>(_size, num);
@@ -304,21 +283,17 @@ Socket::readNonBlocking(void* dst, std::streamsize num)
     // Space to the end (for the first read).
     const int thisRead = std::min<size_t>(canRead, cacheSize - _pos);
 
-    log_debug("First read %s", thisRead);
     std::copy(_cache + _pos, _cache + _pos + thisRead, ptr);
     _pos += thisRead;
     _size -= thisRead;
     toRead -= thisRead;
 
     if (toRead) {
-        log_debug("Second read %s", toRead);
         std::copy(_cache, _cache + toRead, ptr + thisRead);
         _pos = toRead;
         _size -= toRead;
         toRead = 0;
     }
-
-    log_debug("Bytes read %s, cache size %s", canRead - toRead, _size);
 
     return canRead - toRead;
 }
@@ -335,7 +310,6 @@ Socket::write(const void* src, std::streamsize num)
 
     while (toWrite > 0) {
         bytesSent = ::send(_socket, buf, toWrite, 0);
-        //log_debug("Bytes sent %s", bytesSent);
         if (bytesSent < 0) {
             const int err = errno;
             log_error("Socket send error %s", std::strerror(err));

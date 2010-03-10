@@ -79,6 +79,45 @@ struct RandomByte
 
 }
 
+/// A utility functor for carrying out the handshake.
+class HandShaker
+{
+public:
+
+    static const int sigSize = 1536;
+
+    HandShaker(Socket& s);
+
+    /// Calls the next stage in the handshake process.
+    void call();
+
+    bool success() const {
+        return _complete;
+    }
+
+    bool error() const {
+        return _error || _socket.bad();
+    }
+
+private:
+
+    /// These are the stages of the handshake.
+    //
+    /// If the socket is not ready, they will return false. If the socket
+    /// is in error, they will set _error.
+    bool stage0();
+    bool stage1();
+    bool stage2();
+    bool stage3();
+
+    Socket _socket;
+    std::vector<boost::uint8_t> _sendBuf;
+    std::vector<boost::uint8_t> _recvBuf;
+    bool _error;
+    bool _complete;
+    size_t _stage;
+};
+
 RTMPPacket::RTMPPacket(size_t reserve)
     :
     header(),
@@ -109,6 +148,10 @@ RTMP::RTMP()
     _outChunkSize(RTMP_DEFAULT_CHUNKSIZE),
     _connected(false),
     _error(false)
+{
+}
+
+RTMP::~RTMP()
 {
 }
 
@@ -199,8 +242,13 @@ RTMP::update()
 
     for (size_t i = 0; i < reads; ++i) {
 
+        /// No need to continue reading (though it should do no harm).
+        if (error()) return;
+
         RTMPPacket p;
 
+        // If we haven't finished reading a packet, retrieve it; otherwise
+        // use an empty one.
         if (_incompletePacket.get()) {
             log_debug("Doing incomplete packet");
             p = *_incompletePacket;
@@ -210,7 +258,10 @@ RTMP::update()
             if (!readPacketHeader(p)) continue;
         }
 
+        // Get the payload if possible.
         if (hasPayload(p) && !readPacketPayload(p)) {
+            // If the payload is not completely readable, store it and
+            // continue.
             _incompletePacket.reset(new RTMPPacket(p));
             continue;
         }
@@ -312,7 +363,6 @@ RTMP::readSocket(boost::uint8_t* buffer, int n)
     const std::streamsize bytesRead = _socket.read(buffer, n);
     
     if (_socket.bad()) {
-        log_debug("Socket error while reading");
         _error = true;
         return 0;
     }
@@ -363,8 +413,8 @@ RTMP::readPacketHeader(RTMPPacket& packet)
     boost::uint8_t hbuf[RTMPHeader::headerSize] = { 0 };
     boost::uint8_t* header = hbuf;
   
+    // The first read may fail, but otherwise we expect a complete header.
     if (readSocket(hbuf, 1) == 0) {
-        log_debug("No packet header data");
         return false;
     }
 
@@ -500,15 +550,14 @@ RTMP::readPacketPayload(RTMPPacket& packet)
 
     const size_t bytesRead = packet.bytesRead;
 
-    log_debug("Datasize: %s, bytes alread read %s", hr.dataSize, bytesRead);
-
     const int nToRead = hr.dataSize - bytesRead;
 
     const int nChunk = std::min<int>(nToRead, _inChunkSize);
     assert(nChunk >= 0);
 
+    // This is fine. We'll keep trying to read this payload until there
+    // is enough data.
     if (readSocket(payloadData(packet) + bytesRead, nChunk) != nChunk) {
-        log_error( "Failed to read RTMP packet payload. len: %s", bytesRead);
         return false;
     }
 
@@ -797,7 +846,6 @@ RTMP::sendPacket(RTMPPacket& packet)
     return true;
 }
 
-   
 void
 RTMP::close()
 {
@@ -812,6 +860,11 @@ RTMP::close()
     m_nClientBW2 = 2;
     _serverBandwidth = 2500000;
 }
+
+
+/////////////////////////////////////
+/// HandShaker implementation
+/////////////////////////////////////
 
 HandShaker::HandShaker(Socket& s)
     :
@@ -842,10 +895,7 @@ HandShaker::HandShaker(Socket& s)
 void
 HandShaker::call()
 {
-
     if (error() || !_socket.connected()) return;
-
-    log_debug("Handshake stage %s", _stage);
 
     switch (_stage) {
         case 0:
@@ -869,15 +919,16 @@ HandShaker::stage0()
 {
     std::streamsize sent = _socket.write(&_sendBuf.front(), sigSize + 1);
 
-    // If we sent nothing, the socket was probably not ready.
+    // This should probably not happen, but we can try again. An error will
+    // be signalled later if the socket is no longer usable.
     if (!sent) {
-        log_debug("Stage 1 socket not ready");
+        log_error("Stage 1 socket not ready. This should not happen.");
         return false;
     }
 
     /// If we sent the wrong amount of data, we can't recover.
     if (sent != sigSize + 1) {
-        log_debug("Stage 1 error");
+        log_error("Could not send stage 1 data");
         _error = true;
         return false;
     }
@@ -894,11 +945,9 @@ HandShaker::stage1()
         // If we receive nothing, wait until the next try.
         return false;
     }
-    else if (read != sigSize + 1) {
-        log_debug("Could not read enough bytes %s of %s", read, sigSize + 1);
-        _error = true;
-        return false;
-    }
+
+    // The read should never return anything but 0 or what we asked for.
+    assert (read == sigSize + 1);
 
     if (_recvBuf[0] != _sendBuf[0]) {
         log_error( "Type mismatch: client sent %d, server answered %d",
@@ -922,14 +971,14 @@ HandShaker::stage1()
 bool
 HandShaker::stage2()
 {
-    log_debug("Stage 2");
+    
     std::streamsize sent = _socket.write(&_recvBuf.front() + 1, sigSize);
     
     // This should probably not happen.
     if (!sent) return false;
 
     if (sent != sigSize) {
-        log_error("Could not send signature");
+        log_error("Could not send complete signature.");
         _error = true;
         return false;
     }
@@ -941,23 +990,19 @@ bool
 HandShaker::stage3()
 {
 
-    log_debug("Stage 3");
     // Expect it back again.
     std::streamsize got = _socket.read(&_recvBuf.front(), sigSize);
    
     if (!got) return false;
     
-    if (got != sigSize) {
-        log_debug("Could not receive enough bytes");
-        _error = true;
-        return false;
-    }
+    assert (got == sigSize);
 
     const boost::uint8_t* serverSig = &_recvBuf.front();
     const boost::uint8_t* ourSig = &_sendBuf.front() + 1;
 
     const bool match = std::equal(serverSig, serverSig + sigSize, ourSig);
 
+    // Should we set an error here?
     if (!match) {
         log_error( "Signatures do not match during handshake!");
     }
