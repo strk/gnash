@@ -29,14 +29,16 @@ VaapiDisplay::VaapiDisplay(VADisplay display)
 {
     GNASH_REPORT_FUNCTION;
 
-    if (!init())
+    if (!init()) {
         throw VaapiException("Could not create VA-API display");
+    }
 }
 
 VaapiDisplay::~VaapiDisplay()
 {
-    if (_display)
+    if (_display) {
         vaTerminate(_display);
+    }
 }
 
 bool VaapiDisplay::init()
@@ -53,7 +55,7 @@ bool VaapiDisplay::init()
     status = vaInitialize(_display, &major_version, &minor_version);
 
     if (!vaapi_check_status(status, "vaInitialize()")) {
-      return false;
+        return false;
     }
 
     vaapi_dprintf("VA API version %d.%d\n", major_version, minor_version);
