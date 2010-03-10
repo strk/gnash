@@ -391,7 +391,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                             player.setRenderer("cairo");
                             break;
                         default:
-                            gnash::log_error(_("ERROR: -R must be followed by "
+                            gnash::log_error(_("ERROR: -R (--Renderer) must be followed by "
                                                "agg, opengl, or cairo"));
                             break;
                     }
