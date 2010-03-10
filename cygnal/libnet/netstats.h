@@ -56,7 +56,7 @@ namespace gnash
 class NetStats {
 public:
     NetStats();
-    ~NetStats();
+    virtual ~NetStats();
     typedef enum {
         NO_CODEC,
         OGG,
