@@ -90,9 +90,6 @@ private:
 
 	void checkForIncomingData();
     
-	/// Return the as_function with given name.
-	boost::intrusive_ptr<as_function> getEventHandler(const std::string& name);
-
     /// The connection
     Socket _socket;
 
@@ -180,23 +177,17 @@ XMLSocket_as::close()
 }
 
 
-boost::intrusive_ptr<as_function>
-XMLSocket_as::getEventHandler(const std::string& name)
-{
-	boost::intrusive_ptr<as_function> ret;
-
-	as_value tmp;
-	string_table& st = getStringTable(owner());
-	if (!owner().get_member(st.find(name), &tmp) ) return ret;
-	ret = tmp.to_function();
-	return ret;
-}
-
 void
 XMLSocket_as::checkForIncomingData()
 {
     assert(ready());
     
+    if (_socket.bad()) {
+        callMethod(&owner(), NSV::PROP_ON_CLOSE);
+        getRoot(owner()).removeAdvanceCallback(this);
+        return;
+    }
+
     std::vector<std::string> msgs;
     
     const int bufSize = 10000;
@@ -253,26 +244,11 @@ XMLSocket_as::checkForIncomingData()
     }
 #endif
 
-    as_environment env(getVM(owner())); 
-
     for (XMLSocket_as::MessageList::const_iterator it=msgs.begin(),
                     itEnd=msgs.end(); it != itEnd; ++it) {
- 
-        // This should be checked on every iteration in case one call
-        // changes the handler.       
-        boost::intrusive_ptr<as_function> onDataHandler =
-            getEventHandler("onData");
-
-        if (!onDataHandler) break;
-
-        const std::string& s = *it;
-
-        fn_call::Args args;
-        args += s;
         
-        fn_call call(&owner(), env, args);
-
-        onDataHandler->call(call);
+        callMethod(&owner(), NSV::PROP_ON_DATA, *it);
+    
     }
 
 }
