@@ -51,7 +51,9 @@ function handleConnect(connectionStatus) {
    if (connectionStatus) {                                      
        trace('Connected');                
        connected = true;
-       myXML.send(xmlArray[gc++]);
+       if (gc < xmlArray.length) {
+           myXML.send(xmlArray[gc++]);
+       }
    }                                      
    else { trace('Initial connection failed!'); }  
 };                                         
@@ -81,8 +83,6 @@ receivedArray = new Array();
 
 function checkResults() {
 
-    check_equals(receivedArray.length, expectedArray.length);
-    
     check_equals(receivedArray[0], expectedArray[0]);
     check_equals(receivedArray[1], expectedArray[1]);
     check_equals(receivedArray[2], expectedArray[2]);
@@ -100,9 +100,10 @@ function checkResults() {
     check_equals(receivedArray[14], expectedArray[14]);
     check_equals(receivedArray[15].length, 15000);         
     check_equals(receivedArray[15].charAt(0), 'a');         
-    check_equals(receivedArray[16], expectedArray[16]);         
+    check_equals(receivedArray[16], expectedArray[16]);
 
-    totals();
+    trace("ENDOFTEST");
+
     loadMovie ("FSCommand:quit", "");
 };
-
+    
