@@ -58,11 +58,8 @@ function handleConnect(connectionStatus) {
 
 // Store data and send next lot.
 function handleData(data) {       
-    trace('Data received: ' + data);
     receivedArray.push(data);
-    trace("handling data");
     str = xmlArray[gc++];
-    trace("Seind " + gc + " " + str);
     myXML.send(str);
 };                                         
 
@@ -102,9 +99,10 @@ function checkResults() {
     check_equals(receivedArray[13], expectedArray[13]);         
     check_equals(receivedArray[14], expectedArray[14]);
     check_equals(receivedArray[15].length, 15000);         
+    check_equals(receivedArray[15].charAt(0), 'a');         
     check_equals(receivedArray[16], expectedArray[16]);         
 
     totals();
-    stop();
+    loadMovie ("FSCommand:quit", "");
 };
 

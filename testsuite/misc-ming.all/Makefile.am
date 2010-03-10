@@ -254,6 +254,7 @@ check_SCRIPTS = \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
 	TextSnapshotTest-Runner \
+	XMLSocketTester \
 	LCTestRunner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
@@ -1821,6 +1822,11 @@ LCTestRunner: $(srcdir)/../simultaneous-testrunner.sh LC-Receive.swf LC-Send.swf
 XMLSocketTest.swf: $(srcdir)/XMLSocketTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/XMLSocketTest.as
 
+XMLSocketTester: $(srcdir)/XMLSocketTester.sh XMLSocketTest.swf
+	sh $< -c "ENDOFTEST" $(top_builddir) $(top_srcdir) $(PERL) \
+		XMLSocketTest.swf > $@
+	chmod 755 $@
+
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
 
@@ -2054,6 +2060,7 @@ TEST_CASES = \
 	action_execution_order_extend_testrunner \
 	simple_loop_testrunner \
 	loadMovieTestRunner \
+	XMLSocketTester \
 	LCTestRunner \
 	DrawingApiTestRunner \
 	TextSnapshotTest-Runner \
