@@ -200,9 +200,29 @@ RTMP::update()
     for (size_t i = 0; i < reads; ++i) {
 
         RTMPPacket p;
-        if (!readPacket(p)) return;
-    
+
+        if (_incompletePacket.get()) {
+            log_debug("Doing incomplete packet");
+            p = *_incompletePacket;
+            _incompletePacket.reset();
+        }
+        else {
+            if (!readPacketHeader(p)) continue;
+        }
+
+        if (hasPayload(p) && !readPacketPayload(p)) {
+            _incompletePacket.reset(new RTMPPacket(p));
+            continue;
+        }
+        
+        // Store a copy of the packet for later additions and as a reference for
+        // future sends.
+        RTMPPacket& stored = storePacket(CHANNELS_IN, p.header.channel, p);
+      
+        // If the packet is complete, the stored packet no longer needs to
+        // keep the data alive.
         if (isReady(p)) {
+            clearPayload(stored);
             handlePacket(p);
             return;
         }
@@ -286,32 +306,30 @@ RTMP::handlePacket(const RTMPPacket& packet)
 int
 RTMP::readSocket(boost::uint8_t* buffer, int n)
 {
-    int toRead = n;
 
-    while (toRead) {
+    assert(n >= 0);
 
-        const std::streamsize bytesRead = _socket.read(buffer, toRead);
-        
-        if (_socket.bad()) {
-            log_debug("Socket error while reading");
-            _error = true;
-            return 0;
-        }
-
-        if (!bytesRead) return 0;
-
-        _bytesIn += bytesRead;
-        toRead -= bytesRead;
-
-        // Report bytes recieved every time we reach half the bandwidth.
-        // Doesn't seem very likely to be the way the pp does it.
-        if (_bytesIn > _bytesInSent + _bandwidth / 2) {
-            sendBytesReceived(this);
-            log_debug("Sent bytes received");
-        }
-        buffer += bytesRead;
+    const std::streamsize bytesRead = _socket.read(buffer, n);
+    
+    if (_socket.bad()) {
+        log_debug("Socket error while reading");
+        _error = true;
+        return 0;
     }
-    return n - toRead;
+
+    if (!bytesRead) return 0;
+
+    _bytesIn += bytesRead;
+
+    // Report bytes recieved every time we reach half the bandwidth.
+    // Doesn't seem very likely to be the way the pp does it.
+    if (_bytesIn > _bytesInSent + _bandwidth / 2) {
+        sendBytesReceived(this);
+        log_debug("Sent bytes received");
+    }
+
+    buffer += bytesRead;
+    return bytesRead;
 }
 
 void
@@ -337,7 +355,7 @@ RTMP::play(const SimpleBuffer& buf, int streamID)
 /// It seems as if new packets can add to the data of old ones if they have
 /// a minimal, small header.
 bool
-RTMP::readPacket(RTMPPacket& packet)
+RTMP::readPacketHeader(RTMPPacket& packet)
 {
       
     RTMPHeader& hr = packet.header;
@@ -346,7 +364,7 @@ RTMP::readPacket(RTMPPacket& packet)
     boost::uint8_t* header = hbuf;
   
     if (readSocket(hbuf, 1) == 0) {
-        log_error( "%s, failed to read RTMP packet header", __FUNCTION__);
+        log_debug("No packet header data");
         return false;
     }
 
@@ -472,8 +490,17 @@ RTMP::readPacket(RTMPPacket& packet)
     // Resize anyway. If it's different from what it was before, we should
     // already have cleared it.
     packet.buffer->resize(bufSize);
+    return true;
+}
+
+bool
+RTMP::readPacketPayload(RTMPPacket& packet)
+{
+    RTMPHeader& hr = packet.header;
 
     const size_t bytesRead = packet.bytesRead;
+
+    log_debug("Datasize: %s, bytes alread read %s", hr.dataSize, bytesRead);
 
     const int nToRead = hr.dataSize - bytesRead;
 
@@ -486,17 +513,6 @@ RTMP::readPacket(RTMPPacket& packet)
     }
 
     packet.bytesRead += nChunk;
-
-    // Store a copy of the packet for later additions and as a reference for
-    // future sends.
-    RTMPPacket& storedpacket = storePacket(CHANNELS_IN, hr.channel, packet);
-  
-    // If the packet is complete, the stored packet no longer needs to
-    // keep the data alive.
-    if (isReady(packet)) {
-        // The timestamp should be absolute by this stage.
-        clearPayload(storedpacket);
-    }
         
     return true;
 }

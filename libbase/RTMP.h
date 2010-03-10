@@ -483,7 +483,9 @@ private:
     };
     
     /// Read an RTMP packet from the connection.
-    bool readPacket(RTMPPacket& packet);
+    bool readPacketHeader(RTMPPacket& packet);
+
+    bool readPacketPayload(RTMPPacket& packet);
 
     /// Check whether a packet exists on a channel.
     bool hasPacket(ChannelType t, size_t channel) const;
@@ -539,6 +541,8 @@ private:
     bool _connected;
 
     bool _error;
+
+    boost::scoped_ptr<RTMPPacket> _incompletePacket;
 
 };
 

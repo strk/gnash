@@ -184,39 +184,66 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     return true;
 }
 
-
-std::streamsize
+void
 Socket::fillCache()
 {
 
-    // If there are no unprocessed bytes, start from the beginning.
-    if (!_size) {
-        _pos = _cache;
-    }
+    // Read position is always _pos + _size wrapped.
+    const size_t cacheSize = arraySize(_cache);
+    size_t start = (_pos + _size) % cacheSize;
+
+    // Try to fill the whole remaining buffer.
+    const size_t completeRead = cacheSize - _size;
+    
+    // End is start + read size, wrapped.
+    size_t end = (start + completeRead) % cacheSize;
+    if (end == 0) end = cacheSize;
+
+    log_debug("Read request of %s bytes from %s to %s",
+            completeRead, start, end);
+
+    boost::uint8_t* startpos = _cache + start;
 
     while (1) {
 
-        // Read up to the end of the cache if possible.
-        const int toRead = arraySize(_cache) - _size - (_pos - _cache);
+        // The end pos is either the end of the cache or the first 
+        // unprocessed byte.
+        boost::uint8_t* endpos = _cache + ((startpos < _cache + _pos) ?
+                _pos : cacheSize);
 
-        const int bytesRead = recv(_socket, _pos + _size, toRead, 0);
+        log_debug("Pos: %s, size %s", _pos, _size);
+
+        log_debug("Cache %s, startpos %s, endpos %s", (void*)_cache,
+                (void*)startpos, (void*)endpos);
+
+        const int thisRead = endpos - startpos;
+        assert(thisRead >= 0);
+
+        const int bytesRead = ::recv(_socket, startpos, thisRead, 0);
         
         if (bytesRead == -1) {
             
             const int err = errno;
             if (err == EWOULDBLOCK || err == EAGAIN) {
                 // Nothing to read. Carry on.
-                return 0;
+                return;
             }
             log_error("Socket receive error %s", std::strerror(err));
             _error = true;
         }
 
-        log_debug("Bytes read %s", bytesRead);
+        log_debug("Partial of %s bytes from %s", bytesRead, thisRead);
 
         _size += bytesRead;
-        return bytesRead;
+
+        // If there weren't enough bytes, that's it.
+        if (bytesRead < thisRead) break;
+
+        // If we wrote up to the end of the cache, try writing more to the
+        // beginning.
+        startpos = _cache;
     }
+    
 }
 
 
@@ -239,7 +266,10 @@ Socket::read(void* dst, std::streamsize num)
         }
     }
 
-    if (_size < num) return 0;
+    if (_size < num) {
+        log_debug("No enough bytes in cache to read %s bytes", num);
+        return 0;
+    }
     return readNonBlocking(dst, num);
 
 }
@@ -249,8 +279,6 @@ Socket::readNonBlocking(void* dst, std::streamsize num)
 {
     if (bad()) return 0;
     
-    int toRead = num;
-
     boost::uint8_t* ptr = static_cast<boost::uint8_t*>(dst);
     
     log_debug("Cache size %s", _size);
@@ -263,13 +291,36 @@ Socket::readNonBlocking(void* dst, std::streamsize num)
         }
     }
 
-    const int thisRead = std::min(_size, toRead);
-    if (thisRead > 0) {
-        std::copy(_pos, _pos + thisRead, ptr);
-        _pos += thisRead;
-        _size -= thisRead;
+    size_t cacheSize = arraySize(_cache);
+
+    // First read from pos to end
+    log_debug("Bytes requested %s", num);
+
+    // Maximum bytes available to read.
+    const size_t canRead = std::min<size_t>(_size, num);
+    
+    size_t toRead = canRead;
+
+    // Space to the end (for the first read).
+    const int thisRead = std::min<size_t>(canRead, cacheSize - _pos);
+
+    log_debug("First read %s", thisRead);
+    std::copy(_cache + _pos, _cache + _pos + thisRead, ptr);
+    _pos += thisRead;
+    _size -= thisRead;
+    toRead -= thisRead;
+
+    if (toRead) {
+        log_debug("Second read %s", toRead);
+        std::copy(_cache, _cache + toRead, ptr + thisRead);
+        _pos = toRead;
+        _size -= toRead;
+        toRead = 0;
     }
-    return thisRead;
+
+    log_debug("Bytes read %s, cache size %s", canRead - toRead, _size);
+
+    return canRead - toRead;
 }
 
 std::streamsize

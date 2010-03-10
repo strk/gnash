@@ -120,7 +120,7 @@ private:
     mutable bool _connected;
 
     /// Fill the cache.
-    std::streamsize fillCache();
+    void fillCache();
 
     /// A cache for received data.
     boost::uint8_t _cache[16384];
@@ -132,7 +132,7 @@ private:
     int _size;
 
     /// Current read position in cache.
-    boost::uint8_t* _pos;
+    size_t _pos;
 
     mutable bool _error;
 };
