@@ -20,7 +20,6 @@
 
 
 #include "ExportableResource.h"
-#include "ControlTag.h" // for sound tags inheritance
 #include "RunResources.h" // TODO: drop.
 
 // Forward declarations

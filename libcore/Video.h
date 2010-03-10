@@ -22,7 +22,6 @@
 #define GNASH_VIDEO_H
 
 #include "DisplayObject.h" // for inheritance
-#include "swf/DefineVideoStreamTag.h"
 
 // Forward declarations
 namespace gnash {

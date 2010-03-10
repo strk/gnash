@@ -31,7 +31,6 @@
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
 #include "dsodefs.h" //for DSOEXPORT
-#include "log.h"
 #include "snappingrange.h"
 #ifdef USE_SWFTREE
 # include "tree.hh"

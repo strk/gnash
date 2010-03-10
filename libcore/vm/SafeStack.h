@@ -20,7 +20,6 @@
 #ifndef GNASH_SAFESTACK_H
 #define GNASH_SAFESTACK_H
 
-#include "log.h"
 
 #include <vector>
 

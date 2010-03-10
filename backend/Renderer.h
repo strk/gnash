@@ -151,6 +151,7 @@
 #include "DisplayObject.h"
 #include "Range2d.h"
 #include "RGBA.h"
+#include "log.h"
 
 // Forward declarations.
 namespace gnash {

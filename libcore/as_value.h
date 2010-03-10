@@ -20,7 +20,6 @@
 #define GNASH_AS_VALUE_H
 
 #include "dsodefs.h"
-#include "smart_ptr.h"
 #include "CharacterProxy.h"
 
 #include <cmath>

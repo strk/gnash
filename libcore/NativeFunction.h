@@ -21,7 +21,6 @@
 
 #include "as_function.h" // for inheritance
 #include "fn_call.h" // for call operator
-#include "namedStrings.h"
 
 #include <cassert>
 

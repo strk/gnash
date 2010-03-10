@@ -22,7 +22,6 @@
 #define GNASH_ASOBJ_POINT_H
 
 
-#include "smart_ptr.h" // boost::intrusive_ptr
 
 namespace gnash {
 

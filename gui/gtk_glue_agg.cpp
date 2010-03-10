@@ -34,6 +34,7 @@
 #include "Renderer.h"
 #include "Renderer_agg.h"
 #include "gtk_glue_agg.h"
+#include "GnashException.h"
 
 namespace gnash
 {

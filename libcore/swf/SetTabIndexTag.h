@@ -19,8 +19,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "SWF.h"
-#include "ShapeRecord.h"
-#include "DefinitionTag.h"
 
 // Forward declarations.
 namespace gnash {

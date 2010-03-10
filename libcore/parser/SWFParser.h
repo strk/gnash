@@ -24,7 +24,6 @@
 #define GNASH_SWFPARSER_H
 
 #include "SWF.h"
-#include "TagLoadersTable.h"
 
 namespace gnash {
     class SWFStream;

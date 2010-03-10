@@ -24,6 +24,7 @@
 #include "fn_call.h"
 #include "GnashException.h"
 #include "as_function.h"
+#include "log.h"
 
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>

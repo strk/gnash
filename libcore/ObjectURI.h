@@ -4,7 +4,6 @@
 
 #include "string_table.h"
 #include <ostream>
-#include <boost/format.hpp>
 /// Define this for verbose logging of ObjectURIs
 //#define FULL_OBJECT_URI_LOGGING 1
 

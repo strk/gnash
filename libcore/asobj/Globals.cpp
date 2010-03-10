@@ -106,6 +106,7 @@
 #include "Namespace_as.h"
 #include "QName_as.h"
 #include "Object.h"
+#include "LoadableObject.h"
 
 #include <map>
 #include <limits> 

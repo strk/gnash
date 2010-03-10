@@ -21,9 +21,7 @@
 #ifndef GNASH_NUMBER_H
 #define GNASH_NUMBER_H
 
-#include "smart_ptr.h"
 
-#include <memory> // for auto_ptr
 
 namespace gnash {
 

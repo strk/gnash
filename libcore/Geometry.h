@@ -22,7 +22,6 @@
 #include "dsodefs.h"
 #include "SWFMatrix.h" 
 #include "LineStyle.h"
-#include "log.h"
 
 #include <vector> // for path composition
 #include <cmath> // sqrt

@@ -20,9 +20,7 @@
 #ifndef GNASH_NETCONNECTION_H
 #define GNASH_NETCONNECTION_H
 
-#include "IOChannel.h"
 #include "as_object.h" // for inheritance
-#include "fn_call.h"
 
 #include <string>
 #include <list>

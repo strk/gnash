@@ -24,7 +24,6 @@
 #include <vector> // for composition
 
 #include "GnashException.h"
-#include "smart_ptr.h"
 #include "log.h" // For gettext macro
 
 // Forward declarations

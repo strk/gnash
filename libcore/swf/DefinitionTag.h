@@ -21,8 +21,6 @@
 
 #include "ExportableResource.h"
 
-#include <boost/cstdint.hpp>
-#include <vector>
 #include <boost/noncopyable.hpp>
 
 // Forward declarations

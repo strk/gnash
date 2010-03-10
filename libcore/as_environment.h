@@ -21,8 +21,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_value.h" // for composition (vector + frame_slot)
-#include "StringPredicates.h" // for Variables 
-#include "as_object.h"
 #include "SafeStack.h"
 #include "CallStack.h" // for composition
 

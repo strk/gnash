@@ -19,7 +19,6 @@
 #ifndef GNASH_CONTROL_TAG_H
 #define GNASH_CONTROL_TAG_H
 
-#include <cassert>
 
 // Forward declarations
 namespace gnash {

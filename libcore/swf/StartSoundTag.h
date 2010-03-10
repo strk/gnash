@@ -20,7 +20,6 @@
 
 #include "ControlTag.h" // for inheritance
 #include "sound_handler.h" // for sound_envelope (composition)
-#include "VM.h" // We only need this to get movie_root
 #include "SWF.h" // for TagType definition
 #include "SoundInfoRecord.h"
 

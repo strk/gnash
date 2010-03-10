@@ -23,7 +23,6 @@
 #include "LineStyle.h" 
 #include "SWFRect.h" // for composition
 #include "SWF.h"
-#include "movie_definition.h"
 #include "SWFMatrix.h"
 #include "TextRecord.h"
 

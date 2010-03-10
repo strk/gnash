@@ -20,7 +20,6 @@
 #ifndef GNASH_VIRTUAL_CLOCK_H
 #define GNASH_VIRTUAL_CLOCK_H
 
-#include <memory> // for InterruptableVirtualClock
 #include <cassert> // for InterruptableVirtualClock
 
 namespace gnash

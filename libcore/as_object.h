@@ -30,7 +30,6 @@
 #include "as_value.h" 
 #include "smart_ptr.h"
 #include "PropFlags.h"
-#include "GnashException.h"
 #include "Relay.h"
 #include "ObjectURI.h"
 

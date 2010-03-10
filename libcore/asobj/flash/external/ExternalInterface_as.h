@@ -22,7 +22,6 @@
 #define GNASH_ASOBJ_EXTERNALINTERFACE_H
 
 
-//#include <memory> // for auto_ptr
 
 namespace gnash {
 

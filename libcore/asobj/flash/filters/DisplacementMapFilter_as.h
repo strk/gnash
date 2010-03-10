@@ -22,7 +22,6 @@
 #define __GNASH_ASOBJ_DISPLACEMENTMAPFILTER_H__
 
 
-//#include <memory> // for auto_ptr
 
 namespace gnash {
 

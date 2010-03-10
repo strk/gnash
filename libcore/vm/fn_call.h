@@ -24,6 +24,7 @@
 #include "smart_ptr.h"
 #include "as_value.h"
 #include "VM.h"
+#include "GnashException.h"
 
 #include <cassert> 
 #include <ostream>

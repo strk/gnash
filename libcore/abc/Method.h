@@ -22,10 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "log.h"
 #include "string_table.h"
-#include "Property.h"
-#include "namedStrings.h"
 #include "AbcBlock.h"
 
 #include <list>

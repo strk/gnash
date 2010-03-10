@@ -22,7 +22,6 @@
 #include "movie_definition.h" // for inheritance
 #include "SWFRect.h" // for composition
 #include "BitmapInfo.h" // for destructor visibility by intrusive_ptr
-#include "DynamicShape.h" // for destructor visibility by intrusive_ptr
 #include "GnashImage.h"
 #include "GnashNumeric.h"
 

@@ -23,7 +23,6 @@
 #include "as_object.h" // for composition (vector element)
 #include "VM.h" //fow SWF version
 
-#include <boost/algorithm/string/case_conv.hpp> 
 #include <cassert>
 #include <string>
 

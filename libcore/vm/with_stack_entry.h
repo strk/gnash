@@ -19,7 +19,6 @@
 #ifndef GNASH_WITH_STACK_ENTRY_H
 #define GNASH_WITH_STACK_ENTRY_H
 
-#include "as_object.h" // for dtor visibility by boost::intrusive_ptr
 #include "smart_ptr.h"
 
 namespace gnash {
