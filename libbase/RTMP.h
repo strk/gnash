@@ -387,27 +387,26 @@ struct DSOEXPORT RTMP
         return _error;
     }
 
-    /// Called to do receives.
+    /// This function handles reading incoming data and filling data queues.
     //
-    /// TODO: this is the least satisfactory part. Currently sends are
-    /// executed immediately. This is probably correct. Data are only
-    /// received when update() is called, and then only one packet at a
-    /// time.
+    /// You should call this function regularly once the initial connection
+    /// has been initiated.
+    //
+    /// Its tasks involve:
+    /// 1. completing the handshake
+    /// 2. checking for socket errors
+    /// 3. reading incoming data
+    /// 4. filling data queues.
+    //
+    /// None of those things should concern you. Just call the function
+    /// regularly and use connected(), error(), and check the message
+    /// queues.
     void update();
-
-    /// Handle an RTMPPacket.
-    void handlePacket(const RTMPPacket& packet);
 
     /// Close the connection.
     //
     /// A new connection may now be opened.
     void close();
-    
-    /// Read from the socket.
-    int readSocket(boost::uint8_t* dst, int num);
-
-    /// Send an RTMPPacket on the connection.
-    bool sendPacket(RTMPPacket& packet);
 
     /// Get an AMF message received from the server.
     //
@@ -432,6 +431,15 @@ struct DSOEXPORT RTMP
         _flvQueue.pop_front();
         return b;
     }
+
+    /// Handle an RTMPPacket.
+    void handlePacket(const RTMPPacket& packet);
+    
+    /// Read from the socket.
+    int readSocket(boost::uint8_t* dst, int num);
+
+    /// Send an RTMPPacket on the connection.
+    bool sendPacket(RTMPPacket& packet);
 
     /// Store the server bandwidth
     //
