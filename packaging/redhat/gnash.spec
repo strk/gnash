@@ -248,6 +248,7 @@ scrollkeeper-update -q || :
 %{_bindir}/findmicrophones
 %{_bindir}/findwebcams
 #%{_bindir}/dumpshm
+%{_bindir}/rtmpget
 %{_libdir}/gnash/*.so*
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
