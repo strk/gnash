@@ -36,7 +36,7 @@ SUBDIRS = \
 
 # these need to be included in a distribution, even if not part
 # of the top level configure options.
-DIST_SUBDIRS  = testsuite cgi-bin
+DIST_SUBDIRS  = testsuite cgi-bin libamf libnet
 
 sysconf_DATA = cygnalrc
 
