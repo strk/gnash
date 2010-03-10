@@ -277,7 +277,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             }
         }
 
-        // Initializze the canvas for rendering into
+        // Initialize the canvas for rendering into
         initialized_renderer = canvas->glue->init(argc, argv);
         // If the renderer with the least dependencies fails, we can't
         // proceed.
