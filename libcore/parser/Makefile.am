@@ -22,12 +22,12 @@ noinst_LTLIBRARIES = libgnashparser.la
 
 # Only enable if we're configured with --enable-mp3
 #
-# The 'backend' dir should not be required if we finally drop
+# The 'librender' dir should not be required if we finally drop
 # rendering calls from the parser (see https://savannah.gnu.org/task/?5837)
 #
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libnet \
-	-I$(top_srcdir)/backend \
+	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/abc \

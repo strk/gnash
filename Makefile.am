@@ -48,7 +48,7 @@ STD_DIRS = \
 	libmedia \
 	libsound \
 	libcore \
-	backend \
+	librender \
 	gui \
 	plugin \
 	utilities \

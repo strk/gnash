@@ -2391,7 +2391,7 @@ dnl default configuration of the build.
 RENDERER_CONFIG=${add_renderer}
 RENDERER_LIBS=
 for rend in `echo "${add_renderer}" | tr ',' ' '`; do
-	RENDERER_LIBS="${RENDERER_LIBS} \$(top_builddir)/backend/libgnash${rend}.la"
+	RENDERER_LIBS="${RENDERER_LIBS} \$(top_builddir)/librender/libgnash${rend}.la"
 done
 dnl echo "RENDERER_LIBS=$RENDERER_LIBS"
 AC_SUBST(RENDERER_LIBS)
@@ -2486,7 +2486,7 @@ libcore/parser/Makefile
 libnet/Makefile
 libamf/Makefile
 libvaapi/Makefile
-backend/Makefile
+librender/Makefile
 utilities/Makefile
 doc/Makefile
 doc/C/Makefile

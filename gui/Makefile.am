@@ -54,7 +54,7 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libltdl \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/backend \
+        -I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libmedia/ffmpeg \
@@ -153,7 +153,7 @@ libgnashaqua_ogl_la_SOURCES = \
 	aqua.cpp aquasup.h aqua_glue.h
 libgnashaqua_ogl_la_LDFLAGS = $(LIB_FLAGS)
 libgnashaqua_ogl_la_LIBADD = \
-	$(top_builddir)/backend/libgnashogl.la 
+	$(top_builddir)/librender/libgnashogl.la 
 endif # HAVE_OPENGL
 endif # BUILD_AQUA_GUI
 

@@ -36,7 +36,7 @@ pkglib_LTLIBRARIES = libgnashasobjs.la
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/libamf \
-	-I$(top_srcdir)/backend \
+	-I$(top_srcdir)/render \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/abc \

@@ -77,7 +77,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libltdl \
         -I$(top_srcdir)/libmedia \
         -I$(top_srcdir)/libsound \
-        -I$(top_srcdir)/backend \
+        -I$(top_srcdir)/librender \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/asobj \
         -I$(top_srcdir)/libcore/swf \

@@ -62,7 +62,7 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(GNASHBINDIR)\
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/backend \
+        -I$(top_srcdir)/librender \
 	-I$(srcdir)/mozilla-sdk \
 	-I$(srcdir)/mozilla-sdk/include \
 	$(GLIB_CFLAGS) \

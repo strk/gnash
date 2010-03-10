@@ -22,7 +22,7 @@ GNASH_INCLUDES = \
 	-I$(top_srcdir)/gui \
 	-I$(top_srcdir)/gui/pythonmod \
 	-I$(top_srcdir)/libbase	\
-	-I$(top_srcdir)/backend	\
+	-I$(top_srcdir)/librender	\
 	-I$(top_srcdir)/libcore	\
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/vm \

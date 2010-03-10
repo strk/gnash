@@ -30,7 +30,7 @@ FREETYPE_SOURCES = FreetypeGlyphsProvider.h FreetypeGlyphsProvider.cpp
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/libamf \
-	-I$(top_srcdir)/backend \
+	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/abc \
 	-I$(top_srcdir)/libcore/asobj \
