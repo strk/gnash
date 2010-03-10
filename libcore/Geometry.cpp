@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include "Geometry.h"
+#include "log.h"
 
 namespace gnash {
 namespace geometry {

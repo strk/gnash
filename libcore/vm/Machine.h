@@ -27,6 +27,7 @@
 #include "as_environment.h"
 #include "VM.h"
 #include "fn_call.h"
+#include "log.h"
 
 namespace gnash {
     namespace abc {

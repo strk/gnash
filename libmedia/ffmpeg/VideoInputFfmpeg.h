@@ -20,6 +20,7 @@
 #define GNASH_VIDEOINPUTFFMPEG_H
 
 #include <boost/cstdint.hpp> // for C99 int types
+#include <vector>
 #include "VideoInput.h"
 
 namespace gnash {

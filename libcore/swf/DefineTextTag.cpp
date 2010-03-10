@@ -28,6 +28,7 @@
 #include "StaticText.h"
 #include "GnashAlgorithm.h"
 #include "Global_as.h"
+#include "movie_definition.h"
 
 #include <algorithm>
 #include <numeric>

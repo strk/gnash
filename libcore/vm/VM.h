@@ -28,6 +28,7 @@
 #include "string_table.h"
 #include "SafeStack.h"
 #include "CallStack.h"
+#include "smart_ptr.h"
 
 #include <memory> 
 #include <locale>

@@ -21,6 +21,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h" // for inheritance
+#include "log.h"
 
 #include <cassert>
 
