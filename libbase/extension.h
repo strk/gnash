@@ -19,6 +19,7 @@
 #ifndef GNASH_EXTENSION_H
 #define GNASH_EXTENSION_H
 
+#include <map>
 #include <vector>
 #include <string>
 #include <boost/tokenizer.hpp>
