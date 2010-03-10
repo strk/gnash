@@ -106,7 +106,9 @@ RTMP::RTMP()
     _bytesInSent(0),
     _serverBandwidth(2500000),
     _bandwidth(2500000),
-    _outChunkSize(RTMP_DEFAULT_CHUNKSIZE)
+    _outChunkSize(RTMP_DEFAULT_CHUNKSIZE),
+    _connected(false),
+    _error(false)
 {
 }
 
@@ -131,12 +133,6 @@ RTMP::storePacket(ChannelType t, size_t channel, const RTMPPacket& p)
     RTMPPacket& stored = set[channel];
     stored = p;
     return stored;
-}
-
-bool
-RTMP::connected() const
-{
-    return _socket.connected();
 }
 
 void
@@ -179,12 +175,11 @@ RTMP::connect(const URL& url)
         return false;
     }
     
-    if (!handShake()) {
-        log_error( "handshake failed.");
-        close();
-        return false;
-    }
-    
+    _handShaker.reset(new HandShaker(_socket));
+
+    // Start handshake attempt immediately.
+    _handShaker->call();
+
     return true;
 }
 
@@ -192,8 +187,12 @@ void
 RTMP::update()
 {
     if (!connected()) {
-        log_debug("Not connected!");
-        return;
+        _handShaker->call();
+        if (_handShaker->error()) {
+            _error = true;
+        }
+        if (!_handShaker->success()) return;
+        _connected = true;
     }
     
     const size_t reads = 10;
@@ -201,7 +200,7 @@ RTMP::update()
     for (size_t i = 0; i < reads; ++i) {
 
         RTMPPacket p;
-        readPacket(p);
+        if (!readPacket(p)) return;
     
         if (isReady(p)) {
             handlePacket(p);
@@ -288,14 +287,18 @@ int
 RTMP::readSocket(boost::uint8_t* buffer, int n)
 {
     int toRead = n;
-    while (toRead) {
-        const std::streamsize bytesRead = _socket.read(buffer, toRead);
 
-        if (bytesRead < 0) return -1;
+    while (toRead) {
+
+        const std::streamsize bytesRead = _socket.read(buffer, toRead);
         
-        if (!bytesRead) {
-            return -1;
+        if (_socket.bad()) {
+            log_debug("Socket error while reading");
+            _error = true;
+            return 0;
         }
+
+        if (!bytesRead) return 0;
 
         _bytesIn += bytesRead;
         toRead -= bytesRead;
@@ -792,6 +795,157 @@ RTMP::close()
     _bandwidth = 2500000;
     m_nClientBW2 = 2;
     _serverBandwidth = 2500000;
+}
+
+HandShaker::HandShaker(Socket& s)
+    :
+    _socket(s),
+    _sendBuf(sigSize + 1),
+    _recvBuf(sigSize + 1),
+    _error(false),
+    _complete(false),
+    _stage(0)
+{
+    // Not encrypted
+    _sendBuf[0] = 0x03;
+    
+    // TODO: do this properly.
+    boost::uint32_t uptime = htonl(getUptime());
+
+    boost::uint8_t* ourSig = &_sendBuf.front() + 1;
+    std::memcpy(ourSig, &uptime, 4);
+    std::fill_n(ourSig + 4, 4, 0);
+
+    // Generate 1536 random bytes.
+    std::generate(ourSig + 8, ourSig + sigSize, RandomByte());
+
+}
+
+
+/// Calls the next stage in the handshake process.
+void
+HandShaker::call()
+{
+
+    if (error() || !_socket.connected()) return;
+
+    log_debug("Handshake stage %s", _stage);
+
+    switch (_stage) {
+        case 0:
+            if (!stage0()) return;
+            _stage = 1;
+        case 1:
+            if (!stage1()) return;
+            _stage = 2;
+        case 2:
+            if (!stage2()) return;
+            _stage = 3;
+        case 3:
+            if (!stage3()) return;
+            log_debug("Handshake completed");
+            _complete = true;
+    }
+}
+
+bool
+HandShaker::stage0()
+{
+    std::streamsize sent = _socket.write(&_sendBuf.front(), sigSize + 1);
+
+    // If we sent nothing, the socket was probably not ready.
+    if (!sent) {
+        log_debug("Stage 1 socket not ready");
+        return false;
+    }
+
+    /// If we sent the wrong amount of data, we can't recover.
+    if (sent != sigSize + 1) {
+        log_debug("Stage 1 error");
+        _error = true;
+        return false;
+    }
+    return true;
+}
+
+bool
+HandShaker::stage1()
+{
+
+    std::streamsize read = _socket.read(&_recvBuf.front(), sigSize + 1);
+
+    if (!read) {
+        // If we receive nothing, wait until the next try.
+        return false;
+    }
+    else if (read != sigSize + 1) {
+        log_debug("Could not read enough bytes %s of %s", read, sigSize + 1);
+        _error = true;
+        return false;
+    }
+
+    if (_recvBuf[0] != _sendBuf[0]) {
+        log_error( "Type mismatch: client sent %d, server answered %d",
+	        _recvBuf[0], _sendBuf[0]);
+    }
+    
+    const boost::uint8_t* serverSig = &_recvBuf.front() + 1;
+
+    // decode server response
+    boost::uint32_t suptime;
+    std::memcpy(&suptime, serverSig, 4);
+    suptime = ntohl(suptime);
+
+    log_debug("Server Uptime : %d", suptime);
+    log_debug("FMS Version   : %d.%d.%d.%d",
+            +serverSig[4], +serverSig[5], +serverSig[6], +serverSig[7]);
+
+    return true;
+}
+
+bool
+HandShaker::stage2()
+{
+    log_debug("Stage 2");
+    std::streamsize sent = _socket.write(&_recvBuf.front() + 1, sigSize);
+    
+    // This should probably not happen.
+    if (!sent) return false;
+
+    if (sent != sigSize) {
+        log_error("Could not send signature");
+        _error = true;
+        return false;
+    }
+
+    return true;
+}
+
+bool
+HandShaker::stage3()
+{
+
+    log_debug("Stage 3");
+    // Expect it back again.
+    std::streamsize got = _socket.read(&_recvBuf.front(), sigSize);
+   
+    if (!got) return false;
+    
+    if (got != sigSize) {
+        log_debug("Could not receive enough bytes");
+        _error = true;
+        return false;
+    }
+
+    const boost::uint8_t* serverSig = &_recvBuf.front();
+    const boost::uint8_t* ourSig = &_sendBuf.front() + 1;
+
+    const bool match = std::equal(serverSig, serverSig + sigSize, ourSig);
+
+    if (!match) {
+        log_error( "Signatures do not match during handshake!");
+    }
+    return true;
 }
 
 /// The type of Ping packet is 0x4 and contains two mandatory parameters

@@ -20,6 +20,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <deque>
 #include <string>
 #include <map>
@@ -292,21 +293,55 @@ isReady(const RTMPPacket& p) {
     return p.bytesRead == p.header.dataSize;
 }
 
+/// A utility functor for carrying out the handshake.
+class HandShaker
+{
+public:
+    static const int sigSize = 1536;
+
+    HandShaker(Socket& s);
+
+    /// Calls the next stage in the handshake process.
+    void call();
+
+    bool success() const {
+        return _complete;
+    }
+
+    bool error() const {
+        return _error || _socket.bad();
+    }
+
+private:
+
+    /// These are the stages of the handshake.
+    //
+    /// If the socket is not ready, they will return false. If the socket
+    /// is in error, they will set _error.
+    bool stage0();
+    bool stage1();
+    bool stage2();
+    bool stage3();
+
+    Socket _socket;
+    std::vector<boost::uint8_t> _sendBuf;
+    std::vector<boost::uint8_t> _recvBuf;
+    bool _error;
+    bool _complete;
+    size_t _stage;
+};
 
 /// This class is for handling the RTMP protocol.
 //
-/// What should happen:
+/// Only the RTMP protocol itself is handled in this class. An RTMP connection
+/// is valid only when connected() is true.
 //
-/// The RTMP object should connect to a server.
-//
-/// Once that is done the caller should call "play" on a stream. This (and
-/// other commands) can be called as long as the connection is connected.
-//
-/// It can be closed and reconnected.
+/// An RTMP object may be closed and reconnected. As soon as connect() returns
+/// true, callers are responsible for calling close().
 struct DSOEXPORT RTMP
 {
 
-    /// Construct an RTMP handler.
+    /// Construct a non-connected RTMP handler.
     RTMP();
 
     ~RTMP() {}
@@ -314,8 +349,12 @@ struct DSOEXPORT RTMP
     /// Initiate a network connection.
     //
     /// Note that this only creates the TCP connection and carries out the
-    /// handshake. You must send a "connect" request before doing anything
-    /// else.
+    /// handshake. An active data connection needs an AMF connect request,
+    /// which is not part of the RTMP protocol.
+    //
+    /// @return     true if the connection attempt starts, otherwise false.
+    ///             A return of false means that the RTMP object is in a 
+    ///             closed state and can be reconnected.
     bool connect(const URL& url);
 
     /// This is used for sending call requests from the core.
@@ -345,9 +384,22 @@ struct DSOEXPORT RTMP
 
     /// Whether we have a basic connection to a server.
     //
-    /// This does not mean we are ready to send or receive streams. It does
-    /// mean that messages sent via call() will be transmitted to the server.
-    bool connected() const;
+    /// This only means that the handshake is complete and that AMF requests
+    /// can be sent to the server. It does not mean that was can send or
+    /// receive media streams.
+    //
+    /// You should ensure that connected() is true before attempting to send
+    /// or receive data.
+    bool connected() const {
+        return _connected;
+    }
+
+    /// Whether the RTMP connection is in error condition.
+    //
+    /// This is a fatal error.
+    bool error() const {
+        return _error;
+    }
 
     /// Called to do receives.
     //
@@ -481,6 +533,12 @@ private:
 
     /// Chunk size for sending.
     size_t _outChunkSize;
+
+    boost::scoped_ptr<HandShaker> _handShaker;
+
+    bool _connected;
+
+    bool _error;
 
 };
 

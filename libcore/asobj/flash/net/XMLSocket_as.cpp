@@ -202,7 +202,7 @@ XMLSocket_as::checkForIncomingData()
     const int bufSize = 10000;
     boost::scoped_array<char> buf(new char[bufSize]);
 
-    const size_t bytesRead = _socket.read(buf.get(), bufSize - 1);
+    const size_t bytesRead = _socket.readNonBlocking(buf.get(), bufSize - 1);
 
     // Return if there's no data.
     if (!bytesRead) return;

@@ -208,9 +208,11 @@ Socket::fillCache()
                 // Nothing to read. Carry on.
                 return 0;
             }
-            log_error("Socket received error %s", std::strerror(err));
+            log_error("Socket receive error %s", std::strerror(err));
             _error = true;
         }
+
+        log_debug("Bytes read %s", bytesRead);
 
         _size += bytesRead;
         return bytesRead;
@@ -222,16 +224,42 @@ Socket::fillCache()
 std::streamsize 
 Socket::read(void* dst, std::streamsize num)
 {
+ 
+    if (bad()) return 0;
+
+    if (num < 0) return 0;
+
+    log_debug("Cache size %s", _size);
+
+    if (_size < num) {
+        fillCache();
+        if (_error) {
+            log_error("There was an error");
+            return 0;
+        }
+    }
+
+    if (_size < num) return 0;
+    return readNonBlocking(dst, num);
+
+}
+
+std::streamsize
+Socket::readNonBlocking(void* dst, std::streamsize num)
+{
+    if (bad()) return 0;
     
     int toRead = num;
 
     boost::uint8_t* ptr = static_cast<boost::uint8_t*>(dst);
+    
+    log_debug("Cache size %s", _size);
 
     if (!_size) {
-        if (fillCache() < 1) {
-            if (_error) {
-                return -1;
-            }
+        fillCache();
+        if (_error) {
+            log_error("There was an error in rNB");
+            return 0;
         }
     }
 
@@ -242,12 +270,6 @@ Socket::read(void* dst, std::streamsize num)
         _size -= thisRead;
     }
     return thisRead;
-}
-
-std::streamsize
-Socket::readNonBlocking(void* dst, std::streamsize num)
-{
-    return read(dst, num);
 }
 
 std::streamsize

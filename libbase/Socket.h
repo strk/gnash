@@ -49,24 +49,26 @@ public:
 
     /// Initiate a connection
     //
+    /// A return of true does not mean the connection has succeeded, only that
+    /// it did not fail. The connection attempt is only complete when
+    /// connected() returns true.
+    //
     /// @return         false if the connection fails. In this case, the
     ///                 Socket is still in a closed state and is ready for
-    ///                 a new connection attempt.
-    ///                 true if there is no immediate failure. This does
-    ///                 not mean it is ready for writing or that the
-    ///                 connection will ultimately succeed.
+    ///                 a new connection attempt. Otherwise true.
     bool connect(const std::string& hostname, boost::uint16_t port);
 
     /// Close the Socket.
     //
     /// A closed Socket is in a state where another connection attempt can
-    /// be made. This resets any errors.
+    /// be made. Any errors are reset.
     void close();
 
-    /// True if a valid connection attempt has been made.
+    /// Whether a connection attempt is complete.
     //
-    /// This may be true even when the Socket is in error condition and does
-    /// not mean that a read or write will succeed. 
+    /// This is true as soon as the socket is ready for reading and writing.
+    /// But beware! This function may still return true if the Socket is
+    /// in error condition. Always check bad() if you care about this.
     bool connected() const;
     
     /// True if the Socket is in an error condition.
@@ -78,12 +80,11 @@ public:
         return _error;
     }
 
-    /// Read the given number of bytes from the stream
+    /// Read exactly the given number of bytes from the Socket or none at all.
     //
-    /// Return the number of bytes actually read. 
     virtual std::streamsize read(void* dst, std::streamsize num);
 
-    /// The same as read().
+    /// Read up to the given number of bytes from the Socket.
     virtual std::streamsize readNonBlocking(void* dst, std::streamsize num);
 
     /// Write the given number of bytes to the stream

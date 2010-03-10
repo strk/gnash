@@ -24,6 +24,7 @@
 #include "SimpleBuffer.h"
 #include "AMF.h"
 #include "GnashAlgorithm.h"
+#include "GnashSleep.h"
 
 #include <boost/cstdint.hpp>
 #include <iomanip>
@@ -480,6 +481,16 @@ main(int argc, char** argv)
         std::exit(EXIT_FAILURE);
     }
 
+    do {
+        r.update();
+        gnashSleep(1000);
+    } while (!r.connected());
+    
+    if (r.error()) {
+        log_error("Connection attempt failed");
+        std::exit(EXIT_FAILURE);
+    }
+
     /// 1. connect.
     sendConnectPacket(r, nc, app, ver, swf, tc, page);
  
@@ -495,6 +506,10 @@ main(int argc, char** argv)
 
     while (1) {
         r.update();
+        if (r.error()) {
+            gnash::log_error("Connection error");
+            break;
+        }
 
         /// Retrieve messages.
         boost::shared_ptr<SimpleBuffer> b = r.getMessage();
@@ -514,8 +529,8 @@ main(int argc, char** argv)
             }
             f = r.getMessage();
         }
+        gnashSleep(1000);
 
-        if (!r.connected()) break;
     }
 
 }
