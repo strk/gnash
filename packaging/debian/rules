@@ -199,7 +199,7 @@ build-stamp: config-stamp $(OUTFILES)
 	@printf "\n == MAKE == \n\n"
 	$(MAKE) -C $(BUILD_DIRECTORY) LDFLAGS="$(LDFLAGS)"
 	@printf "\n ---- End of MAKE ---- \n\n"
-	cp libamf/README README.amf
+	cp cygnal/libamf/README README.amf
 	cp cygnal/README README.cygnal
 #	@printf "\n == CHECK ==\n\n"
 #	$(MAKE) -C $(BUILD_DIRECTORY) check
@@ -257,7 +257,9 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libnet/
 	cp libbase/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libnet/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libamf/
-	cp libamf/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libamf/
+	cp cygnal/libamf/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libamf/
+	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libcore/
+	cp cygnal/libnet/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libnet/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libcore/
 	cp libcore/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libcore/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libmedia/
