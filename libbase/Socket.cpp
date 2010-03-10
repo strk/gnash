@@ -243,13 +243,10 @@ std::streamsize
 Socket::read(void* dst, std::streamsize num)
 {
  
-    if (bad()) return 0;
-
     if (num < 0) return 0;
 
-    if (_size < num) {
+    if (_size < num && !_error) {
         fillCache();
-        if (_error) return 0;
     }
 
     if (_size < num) return 0;
@@ -264,11 +261,8 @@ Socket::readNonBlocking(void* dst, std::streamsize num)
     
     boost::uint8_t* ptr = static_cast<boost::uint8_t*>(dst);
     
-    if (!_size) {
+    if (!_size && !_error) {
         fillCache();
-        if (_error) {
-            return 0;
-        }
     }
 
     size_t cacheSize = arraySize(_cache);
