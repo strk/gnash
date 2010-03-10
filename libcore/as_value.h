@@ -25,7 +25,6 @@
 #include <cmath>
 #include <limits>
 #include <string>
-#include <vector>
 #include <boost/variant.hpp>
 #include <ostream> // for inlined output operator
 #include <boost/type_traits/is_floating_point.hpp>

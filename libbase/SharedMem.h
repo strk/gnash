@@ -19,7 +19,6 @@
 #ifndef GNASH_SHM_H
 #define GNASH_SHM_H
 
-#include <string>
 #include <boost/cstdint.hpp>
 
 #include <sys/types.h>

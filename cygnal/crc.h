@@ -20,7 +20,6 @@
 #define __CRC_H__
 
 #include <string>
-#include <vector>
 #include <iostream> // for output operator
 
 #include "rc.h"

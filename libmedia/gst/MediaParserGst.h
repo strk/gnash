@@ -21,7 +21,6 @@
 
 #include "MediaParser.h" // for inheritance
 
-#include <vector>
 #include <boost/scoped_array.hpp>
 #include <memory>
 #include <queue>

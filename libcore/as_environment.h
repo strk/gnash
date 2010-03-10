@@ -24,7 +24,6 @@
 #include "SafeStack.h"
 #include "CallStack.h" // for composition
 
-#include <map> // for composition (Variables)
 #include <string> // for frame_slot name
 #include <vector>
 #include <iostream> // for dump_stack inline

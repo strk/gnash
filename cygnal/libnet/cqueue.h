@@ -26,7 +26,6 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <string>
 #include <iostream>
 #include <vector>
 #include "log.h"

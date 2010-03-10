@@ -19,7 +19,6 @@
 #ifndef _FITCDEMO_H_
 #define _FITCDEMO_H_
 
-#include <string>
 #include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>

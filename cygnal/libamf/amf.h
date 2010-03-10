@@ -27,7 +27,6 @@
 #ifndef _AMF_H_
 #define _AMF_H_
 
-#include <vector>
 #include <string>
 #include <cstring>
 #include <map>

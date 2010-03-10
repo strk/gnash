@@ -22,7 +22,6 @@
 #include "MediaParser.h" // for inheritance
 #include "ffmpegHeaders.h"
 
-#include <vector>
 #include <boost/scoped_array.hpp>
 #include <memory>
 

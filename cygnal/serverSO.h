@@ -19,7 +19,6 @@
 #define __SERVERSO_H__
 
 #include <string>
-#include <vector>
 #include <iostream>
 
 #include "sol.h"

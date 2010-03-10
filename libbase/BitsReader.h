@@ -27,7 +27,6 @@
 #include "log.h"
 
 #include <cassert> // for assert used in this file
-#include <string>
 #include <sstream>
 #include <boost/cstdint.hpp> // for boost::uint32_t used in this file
 

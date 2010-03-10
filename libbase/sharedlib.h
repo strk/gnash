@@ -25,7 +25,6 @@
 
 #include <boost/thread/mutex.hpp>
 #include <string>
-#include <map>
 #include "dsodefs.h" // DSOEXPORT
 
 #ifdef _WIN32

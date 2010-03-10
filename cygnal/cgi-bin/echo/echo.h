@@ -19,7 +19,6 @@
 #ifndef _ECHO_H_
 #define _ECHO_H_
 
-#include <string>
 #include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>

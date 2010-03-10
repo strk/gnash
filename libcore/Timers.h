@@ -25,7 +25,6 @@
 #include "smart_ptr.h"
 
 #include <string>
-#include <vector> 
 #include <limits>
 
 // Forward declarations

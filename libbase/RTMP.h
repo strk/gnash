@@ -21,7 +21,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <deque>
-#include <string>
 #include <map>
 
 #include "log.h"

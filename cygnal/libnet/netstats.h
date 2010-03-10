@@ -22,7 +22,6 @@
 
 //include all types plus i/o
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <string>
 
 // This is what the ActionScript 'Client' class returns:
 //

@@ -25,7 +25,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 
 #include <list>
-#include <vector>
 #include <string>
 #include <sstream>
 

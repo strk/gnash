@@ -25,7 +25,6 @@
 #include "SoundInfo.h" 
 #include "dsodefs.h" // for DSOEXPORT
 
-#include <vector>
 #include <memory>
 #include <cassert>
 #include <cstring>

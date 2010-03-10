@@ -23,7 +23,6 @@
 #include "SWF.h" // for TagType definition
 #include "SoundInfoRecord.h"
 
-#include <vector> // for composition
 #include <boost/cstdint.hpp> // for boost::uint16_t and friends
  
 

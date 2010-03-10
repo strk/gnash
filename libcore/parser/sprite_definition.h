@@ -22,7 +22,6 @@
 #define GNASH_SPRITE_DEFINITION_H
 
 
-#include <vector>
 #include <map>
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h" // for inheritance

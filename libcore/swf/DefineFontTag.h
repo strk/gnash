@@ -33,7 +33,6 @@
 #include "smart_ptr.h" // GC
 #include "SWF.h"
 #include "Font.h"
-#include <vector>
 #include <boost/cstdint.hpp>
 
 // Forward declarations

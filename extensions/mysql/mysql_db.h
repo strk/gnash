@@ -24,7 +24,6 @@
 #endif
 
 #include <string>
-#include <vector>
 #include <mysql/errmsg.h>
 #include <mysql/mysql.h>
 

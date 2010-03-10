@@ -28,7 +28,6 @@
 
 #include <vector>
 #include <string>
-#include <deque>
 
 #ifdef HAVE_POLL
 # include <sys/poll.h>
