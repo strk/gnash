@@ -4,8 +4,8 @@ use Time::HiRes;
 
 $SIG{PIPE}='IGNORE';
 
-$m=new IO::Socket::INET(Listen=>1,LocalPort=>2229);
-$O=new IO::Select($m);
+my $m=new IO::Socket::INET(Listen=>1,LocalPort=>2229);
+my $O=new IO::Select($m);
 
 
 $/ = "\0";
@@ -22,6 +22,11 @@ while (@S = $O->can_read) {
             # Log message received:
             print "XmlSocketServer: received \"$i\"\n";
             
+            if ($i =~ m/closeNow/) {
+                close($m, 2);
+                exit;
+            }
+
             if ($R==0) {
                 $T=syswrite($_, "\n", 16000);
                 if ($T==undef) {

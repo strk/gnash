@@ -143,7 +143,6 @@ check_PROGRAMS = \
 	attachMovieLoopingTestRunner \
 	registerClassTest \
 	registerClassTestRunner \
-	XMLSocketTest \
 	goto_frame_test \
 	consecutive_goto_frame_test \
 	matrix_test \
@@ -1517,14 +1516,6 @@ action_execution_order_extend_testrunner: $(srcdir)/../generic-testrunner.sh act
 	sh $< $(top_builddir) action_execution_order_extend_test.swf > $@
 	chmod 755 $@
 
-XMLSocketTest_SOURCES =	\
-	XMLSocketTest.c	\
-	$(NULL)
-XMLSocketTest_LDADD = libgnashmingutils.la
-
-XMLSocketTest.swf: XMLSocketTest
-	./XMLSocketTest $(top_srcdir)/testsuite/media
-
 BitmapDataTest_SOURCES = \
 	BitmapDataTest.c \
 	$(NULL)
@@ -1826,6 +1817,9 @@ LC-Send.swf: $(srcdir)/LC-Send.as
 LCTestRunner: $(srcdir)/../simultaneous-testrunner.sh LC-Receive.swf LC-Send.swf
 	sh $< -c "ENDOFTEST" $(top_builddir) LC-Receive.swf LC-Send.swf > $@
 	chmod 755 $@
+
+XMLSocketTest.swf: $(srcdir)/XMLSocketTest.as 
+	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/XMLSocketTest.as
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
