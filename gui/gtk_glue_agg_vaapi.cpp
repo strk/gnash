@@ -158,7 +158,7 @@ GtkAggVaapiGlue::~GtkAggVaapiGlue()
 bool
 GtkAggVaapiGlue::init(int /*argc*/, char ** /*argv*/[])
 {
-    VaapiGlobalContext * const gvactx = VaapiGlobalContext::get();
+    VaapiGlobalContext *const gvactx = VaapiGlobalContext::get();
     if (!gvactx) {
         log_debug(_("WARNING: failed to create VA-API display."));
         return false;
