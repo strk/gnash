@@ -142,11 +142,6 @@ XMLSocket_as::update()
 
     }
 
-    // If the socket is in error condition at any other stage, call onClose?
-    if (_socket.bad()) {
-        log_error("Socket failed");
-    }
-
     // Now the connection is established we can receive data.
     checkForIncomingData();
 }
@@ -182,12 +177,6 @@ XMLSocket_as::checkForIncomingData()
 {
     assert(ready());
     
-    if (_socket.bad()) {
-        callMethod(&owner(), NSV::PROP_ON_CLOSE);
-        getRoot(owner()).removeAdvanceCallback(this);
-        return;
-    }
-
     std::vector<std::string> msgs;
     
     const int bufSize = 10000;
@@ -205,39 +194,39 @@ XMLSocket_as::checkForIncomingData()
     }
 
     char* ptr = buf.get();
-    while (static_cast<size_t>(ptr - buf.get()) < bytesRead - 1) {
+    while (static_cast<size_t>(ptr - buf.get()) < bytesRead) {
 
 #ifdef GNASH_XMLSOCKET_DEBUG
         log_debug ("read: %d, this string ends: %d", bytesRead,
                 ptr + std::strlen(ptr) - buf.get());
 #endif
 
+        std::string msg(ptr);
+
         // If the string reaches to the final byte read, it's
         // incomplete. Store it and continue. The buffer is 
         // NULL-terminated, so this cannot read past the end.
         if (static_cast<size_t>(
             ptr + std::strlen(ptr) - buf.get()) == bytesRead) {
-            _remainder += std::string(ptr);
+            _remainder += msg;
             break;
         }
 
         if (!_remainder.empty()) {
-            msgs.push_back(_remainder + std::string(ptr));
-            ptr += std::strlen(ptr) + 1;
+            msgs.push_back(_remainder + msg);
+            ptr += msg.size() + 1;
             _remainder.clear();
             continue;
         }
         
         // Don't do anything if nothing is received.
-        msgs.push_back(ptr);
+        msgs.push_back(msg);
         
-        ptr += std::strlen(ptr) + 1;
+        ptr += msg.size() + 1;
     }
    
     if (msgs.empty()) return;
     
-    log_debug(_("Got %d messages: "), msgs.size());
-
 #ifdef GNASH_XMLSOCKET_DEBUG
     for (size_t i = 0, e = msgs.size(); i != e; ++i) {
         log_debug(_(" Message %d: %s "), i, msgs[i]);
@@ -246,10 +235,15 @@ XMLSocket_as::checkForIncomingData()
 
     for (XMLSocket_as::MessageList::const_iterator it=msgs.begin(),
                     itEnd=msgs.end(); it != itEnd; ++it) {
-        
         callMethod(&owner(), NSV::PROP_ON_DATA, *it);
-    
     }
+    
+    if (_socket.bad()) {
+        callMethod(&owner(), NSV::PROP_ON_CLOSE);
+        getRoot(owner()).removeAdvanceCallback(this);
+        return;
+    }
+
 
 }
 
