@@ -119,8 +119,7 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("                           1 enable rendering, disable sound\n") 
     << _("                           2 enable sound, disable rendering\n") 
     << _("                           3 enable rendering and sound (default)\n") 
-    << _("                           or select one of the supported renderers\n") 
-    << _("                           agg|opengl|cairo (default: agg)\n") 
+    << _("  -R,  --Renderer <agg|cairo|opengl> (default: agg)\n")
     << _("  -t,  --timeout <sec>     Exit after the specified number of "
             "seconds\n") 
     << _("  -u,  --real-url <url>    Set \"real\" URL of the movie\n") 
@@ -209,6 +208,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'c', 0,                   Arg_parser::no  },
         { 'd', "delay",             Arg_parser::yes },
         { 'x', "xid",               Arg_parser::yes },
+        { 'R', "Renderer",          Arg_parser::yes },
         { 'r', "render-mode",       Arg_parser::yes },
         { 't', "timeout",           Arg_parser::yes },        
         { '1', "once",              Arg_parser::no  },        
@@ -375,7 +375,28 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                             break;
                         }
                     break;
-                case 'r':
+              case 'R':
+                    switch (parser.argument<char>(i)) {
+                            // See if a renderer was specified
+                        case 'a':
+                            // Enable AGG as the rendering backend
+                            player.setRenderer("agg");
+                            break;
+                        case 'o':
+                            // Enable OpenGL as the rendering backend
+                            player.setRenderer("opengl");
+                            break;
+                        case 'c':
+                            // Enable Cairo as the rendering backend
+                            player.setRenderer("cairo");
+                            break;
+                        default:
+                            gnash::log_error(_("ERROR: -R must be followed by "
+                                               "agg, opengl, or cairo"));
+                            break;
+                    }
+                  break;
+              case 'r':
                     renderflag = true;
                     switch (parser.argument<char>(i)) {
                         case '0':
@@ -415,7 +436,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                             gnash::log_error(_("ERROR: -r must be followed by "
                                                "0, 1, 2 or 3 "));
                             break;
-                }
+                    }
                 break;
             case 't':
                 player.setExitTimeout(parser.argument<float>(i));
