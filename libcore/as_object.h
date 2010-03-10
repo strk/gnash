@@ -33,6 +33,7 @@
 #include "Relay.h"
 #include "ObjectURI.h"
 
+#include <vector>
 #include <cmath>
 #include <utility> 
 #include <set>
