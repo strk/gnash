@@ -66,38 +66,23 @@ noinst_HEADERS = \
 noinst_LTLIBRARIES =		# set later on by conditionals
 pkglib_LTLIBRARIES =		# set later on by conditionals
 plugins_LTLIBRARIES = libgnashrender.la
-libgnashrender_la_LIBADD = 
+libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
 libgnashrender_la_SOURCES = PathParser.cpp
 
 if BUILD_OGL_RENDERER
-#if HAVE_OPENGL
-#noinst_LTLIBRARIES += libgnashrender.la
-#plugins_LTLIBRARIES += libgnashogl.la
 libgnashrender_la_SOURCES += Renderer_ogl.cpp
-#libgnashogl_la_LDFLAGS = -module -avoid-version -no-undefined
 libgnashrender_la_LIBADD += $(OPENGL_LIBS)
-# endif
 endif
 
 if  BUILD_AGG_RENDERER
-# if HAVE_AGG
-#noinst_LTLIBRARIES += libgnashagg.la
 libgnashrender_la_SOURCES += Renderer_agg.cpp 
-#libgnashagg_la_LDFLAGS = -module -avoid-version -no-undefined
-libgnashrender_la_LIBADD += $(AGG_LIBS)
-# endif
+libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
 if  BUILD_CAIRO_RENDERER
-# if HAVE_CAIRO
-#noinst_LTLIBRARIES += libgnashcairo.la
-#libgnashcairo_la_SOURCES = Renderer_cairo.cpp PathParser.cpp
 libgnashrender_la_SOURCES += Renderer_cairo.cpp
-#libgnashrender_la_LDFLAGS = -module -avoid-version -no-undefined
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
-# endif
 endif
-
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
@@ -107,8 +92,3 @@ mudflap:
 clean-hook:
 	-rm -f core.*
 
-# install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
-# 	test -d "$(DESTDIR)$(pluginsdir)" || $(mkinstalldirs) "$(DESTDIR)$(pluginsdir)"
-# 	for i in $(plugins_LTLIBRARIES); do \
-# 	  $(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$i "$(DESTDIR)$(pluginsdir)/$$i" ; \
-# 	done
