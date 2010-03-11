@@ -74,6 +74,12 @@ public:
     }
 
     /// Attempt a connection.
+    //
+    /// @param host     The host name to connect to.
+    /// @param port     The port to connect to.
+    /// @return         false if the connection is not allowed, otherwise true.
+    ///                 Note that a return of true does not mean a successful
+    ///                 connection.
     bool connect(const std::string& host, boost::uint16_t port);
 
     /// Send a string with a null-terminator to the socket.
@@ -86,6 +92,9 @@ public:
     /// This removes the core callback and instructs the Socket to close
     /// in case it isn't already. After close() is called, the XMLSocket is
     /// no longer ready.
+    //
+    /// You must call close() to ensure that the Socket object is ready for
+    /// a new connection.
     void close();
 
     /// Called on advance() when socket is connected
@@ -158,6 +167,8 @@ XMLSocket_as::update()
 bool
 XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
 {
+
+    GNASH_REPORT_FUNCTION;
 
     if (!URLAccessManager::allowXMLSocket(host, port)) {
 	    return false;

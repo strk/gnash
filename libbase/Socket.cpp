@@ -113,6 +113,8 @@ Socket::close()
     _socket = 0;
     _size = 0;
     _pos = 0;
+    _connected = false;
+    _error = false;
 }
 
 bool
