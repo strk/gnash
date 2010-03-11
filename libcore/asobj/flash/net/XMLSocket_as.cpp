@@ -67,6 +67,8 @@ public:
     ~XMLSocket_as();
     
     /// True only when the XMLSocket is ready for read/write.
+    //
+    /// This should always match the known state of the Socket.
     bool ready() const {
         return _ready;
     }
@@ -79,12 +81,17 @@ public:
     /// Actionscript doesn't care about the result.
     void send(std::string str);
 
-    /// Close the socket
+    /// Close the XMLSocket
     //
-    /// Actionscript doesn't care about the result.
+    /// This removes the core callback and instructs the Socket to close
+    /// in case it isn't already. After close() is called, the XMLSocket is
+    /// no longer ready.
     void close();
 
     /// Called on advance() when socket is connected
+    //
+    /// This handles reading of data and error checking. If the Socket is
+    /// in error, it is closed and this XMLSocket object is no longer ready.
     virtual void update();
 
 private:
@@ -241,10 +248,9 @@ XMLSocket_as::checkForIncomingData()
     
     if (_socket.bad()) {
         callMethod(&owner(), NSV::PROP_ON_CLOSE);
-        getRoot(owner()).removeAdvanceCallback(this);
+        close();
         return;
     }
-
 
 }
 
@@ -254,7 +260,7 @@ XMLSocket_as::checkForIncomingData()
 void
 XMLSocket_as::send(std::string str)
 {
-    if (!_socket.connected()) {
+    if (!ready()) {
         log_error(_("XMLSocket.send(): socket not initialized"));
 	    return;
     }
@@ -349,8 +355,6 @@ xmlsocket_send(const fn_call& fn)
 as_value
 xmlsocket_close(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
-    
     XMLSocket_as* ptr = ensure<ThisIsNative<XMLSocket_as> >(fn);
 
     ptr->close();
