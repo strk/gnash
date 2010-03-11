@@ -121,13 +121,16 @@ bool
 Socket::connect(const std::string& hostname, boost::uint16_t port)
 {
 
-    if (connected()) {
+    // We use _socket here because connected() or _connected might not
+    // be true if a connection attempt is underway but not completed.
+    if (_socket) {
         log_error("Connection attempt while already connected");
         return false;
     }
 
+    // If _socket is 0, either there has been no connection, or close() has
+    // been called. There must not be an error in either case.
     assert(!_error);
-    assert(!_socket);
 
     if (hostname.empty()) return false;
 
