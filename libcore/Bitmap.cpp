@@ -25,6 +25,7 @@
 #include "Renderer.h"
 #include "VM.h"
 #include "movie_root.h"
+#include "RunResources.h"
 
 namespace gnash {
 

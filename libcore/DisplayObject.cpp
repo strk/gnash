@@ -36,6 +36,7 @@
 #include "gnash.h" // Quality
 #include "GnashNumeric.h"
 #include "Global_as.h"
+#include "Renderer.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"

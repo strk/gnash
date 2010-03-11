@@ -25,6 +25,7 @@
 #include "SWF.h"
 #include "movie_definition.h"
 #include "ShapeRecord.h"
+#include "log.h"
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 

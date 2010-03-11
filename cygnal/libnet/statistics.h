@@ -20,6 +20,7 @@
 #ifndef __STATISTICS_H__
 #define __STATISTICS_H__
 
+#include <vector>
 #include <sys/time.h>
 #include <network.h>
 #include <list>

@@ -30,9 +30,10 @@
 #ifndef GNASH_SWF_DEFINEFONTTAG_H
 #define GNASH_SWF_DEFINEFONTTAG_H
 
-#include "smart_ptr.h" // GC
 #include "SWF.h"
 #include "Font.h"
+#include <map>
+#include <string>
 #include <boost/cstdint.hpp>
 
 // Forward declarations

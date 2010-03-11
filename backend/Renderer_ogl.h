@@ -24,6 +24,7 @@
 # ifdef __APPLE_CC__
 # include <AGL/agl.h>
 # endif
+#include <vector>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <OpenGL/glext.h>

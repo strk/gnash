@@ -23,6 +23,8 @@
 #include "as_object.h" // for composition (vector element)
 #include "VM.h" //fow SWF version
 
+#include "smart_ptr.h"
+#include <vector>
 #include <cassert>
 #include <string>
 

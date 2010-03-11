@@ -25,6 +25,7 @@
 #include "DefineShapeTag.h"
 #include "DynamicShape.h"
 
+#include <boost/intrusive_ptr.hpp>
 #include <cassert>
 #include <boost/shared_ptr.hpp>
 

@@ -21,7 +21,6 @@
 
 #include "IOChannel.h" // for inlines
 #include "dsodefs.h" // DSOEXPORT
-#include "SimpleBuffer.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -37,6 +36,9 @@
 // Undefine this to load/parse media files in main thread
 #define LOAD_MEDIA_IN_A_SEPARATE_THREAD 1
 
+namespace gnash {
+    class SimpleBuffer;
+}
 
 namespace gnash {
 namespace media {

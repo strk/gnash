@@ -38,6 +38,8 @@
 #include "Global_as.h"
 #include "utf8.h"
 #include "IOChannel.h"
+#include "RunResources.h"
+#include "Renderer.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>

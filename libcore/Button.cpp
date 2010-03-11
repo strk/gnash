@@ -40,6 +40,7 @@
 #include "GnashKey.h" 
 #include "SoundInfoRecord.h" 
 #include "Global_as.h" 
+#include "RunResources.h"
 
 #include <boost/bind.hpp>
 

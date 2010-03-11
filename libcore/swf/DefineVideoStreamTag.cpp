@@ -18,6 +18,7 @@
 
 // 
 
+#include "RunResources.h"
 #include "DefineVideoStreamTag.h"
 #include "Video.h"
 #include "MediaParser.h" // for VideoInfo

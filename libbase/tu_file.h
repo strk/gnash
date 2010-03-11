@@ -13,7 +13,6 @@
 #include "utility.h"
 #include "IOChannel.h" // for inheritance
 
-#include <cstdio>
 
 namespace gnash {
 

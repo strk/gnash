@@ -25,7 +25,9 @@
 #include "DisplayObject.h"
 #include "swf/DefineTextTag.h"
 
+#include <vector>
 #include <boost/dynamic_bitset.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <cassert>
 
 // Forward declarations

@@ -22,7 +22,6 @@
 #include "as_function.h" 
 #include "fn_call.h" 
 #include "as_environment.h" 
-#include "namedStrings.h"
 
 #include <cassert>
 

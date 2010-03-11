@@ -20,6 +20,7 @@
 #ifndef BACKEND_RENDER_HANDLER_CAIRO_H
 #define BACKEND_RENDER_HANDLER_CAIRO_H
 
+#include <vector>
 #include <boost/scoped_array.hpp>
 #include <cairo/cairo.h>
 #include "Renderer.h"

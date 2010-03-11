@@ -24,6 +24,7 @@
 #include "Geometry.h"
 #include "GnashNumeric.h"
 #include "RunResources.h"
+#include "log.h"
 
 #include <vector>
 

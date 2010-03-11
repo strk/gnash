@@ -28,7 +28,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "MediaParser.h"
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
-#include "NetConnection_as.h"
 #include "PlayHead.h" // for composition
 
 #include "VideoDecoder.h" // for visibility of dtor
@@ -36,6 +35,8 @@
 
 #include "VirtualClock.h"
 
+#include <boost/intrusive_ptr.hpp>
+#include <string>
 #include <deque>
 #include <boost/scoped_ptr.hpp>
 
@@ -43,6 +44,7 @@
 namespace gnash {
     class CharacterProxy;
     class IOChannel;
+    class NetConnection_as;
     namespace media {
         class MediaHandler;
     }

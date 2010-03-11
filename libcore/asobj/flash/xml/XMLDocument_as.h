@@ -21,7 +21,6 @@
 #define GNASH_ASOBJ3_XMLDOCUMENT_H
 
 #include "xml/XMLNode_as.h"
-#include "log.h"
 #include "dsodefs.h"
 #include "StringPredicates.h"
 

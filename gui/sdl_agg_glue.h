@@ -18,6 +18,7 @@
 
 #include "sdl_glue.h"
 
+#include <vector>
 #include <SDL.h>
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 

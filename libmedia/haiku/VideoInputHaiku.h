@@ -19,6 +19,7 @@
 #ifndef GNASH_VIDEOINPUTHAIKU_H
 #define GNASH_VIDEOINPUTHAIKU_H
 
+#include <vector>
 #include <boost/cstdint.hpp> // for C99 int types
 #include "VideoInput.h"
 

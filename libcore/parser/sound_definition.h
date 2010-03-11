@@ -20,11 +20,11 @@
 
 
 #include "ExportableResource.h"
-#include "RunResources.h" // TODO: drop.
 
 // Forward declarations
 namespace gnash {
-	class movie_definition;
+    class movie_definition;
+    class RunResources;
 }
 
 

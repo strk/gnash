@@ -34,6 +34,8 @@
 #include "RunResources.h" // For initialization.
 #include "movie_root.h"
 
+#include <boost/intrusive_ptr.hpp>
+#include <vector>
 #include <memory> // for auto_ptr
 #include <string> 
 #include <boost/shared_ptr.hpp>

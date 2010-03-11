@@ -24,6 +24,8 @@
 #include "RGBA.h"
 #include "TextField.h"
 
+#include <boost/intrusive_ptr.hpp>
+#include <string>
 #include <boost/cstdint.hpp> // for boost::uint16_t and friends
  
 

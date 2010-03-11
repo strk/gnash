@@ -30,6 +30,8 @@
 #include <vector> // for composition
 #include <iosfwd> // for output operator forward declarations
 
+#include <boost/intrusive_ptr.hpp>
+
 namespace gnash {
 
 class SWFStream;

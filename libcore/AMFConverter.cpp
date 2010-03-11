@@ -32,6 +32,7 @@
 #include "Array_as.h"
 #include "Global_as.h"
 #include "fn_call.h"
+#include "as_function.h"
 
 // Define this macro to make AMF parsing verbose
 //#define GNASH_DEBUG_AMF_DESERIALIZE 1

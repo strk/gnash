@@ -20,13 +20,19 @@
 #ifndef GNASH_RUN_INFO_H
 #define GNASH_RUN_INFO_H
 
-#include "TagLoadersTable.h"
-#include "StreamProvider.h"
-#include "Renderer.h"
-#include "sound_handler.h"
-
 #include <string>
 #include <boost/shared_ptr.hpp>
+
+namespace gnash {
+    class Renderer;
+    class StreamProvider;
+    namespace SWF {
+        class TagLoadersTable;
+    }
+    namespace sound {
+        class sound_handler;
+    }
+}
 
 namespace gnash {
 

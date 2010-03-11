@@ -26,6 +26,8 @@
 #include "VM.h"
 #include "GnashException.h"
 
+#include <string>
+#include <vector>
 #include <cassert> 
 #include <ostream>
 #include <sstream>

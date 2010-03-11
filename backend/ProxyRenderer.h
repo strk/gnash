@@ -22,6 +22,7 @@
 #ifndef GNASH_RENDER_H
 #define GNASH_RENDER_H
 
+#include <vector>
 #include "gnash.h"
 #include "Renderer.h"
 #include "dsodefs.h"

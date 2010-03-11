@@ -21,7 +21,10 @@
 
 #include "dsodefs.h" //DSOEXPORT
 #include "SWF.h"
-#include "TagLoadersTable.h"
+
+namespace gnash {
+    class TagLoadersTable;
+}
 
 namespace gnash {
 namespace SWF {

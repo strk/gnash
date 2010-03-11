@@ -23,6 +23,7 @@
 #include "DisplayObject.h" // for inheritance
 #include "log.h"
 
+#include <vector>
 #include <cassert>
 
 namespace gnash {

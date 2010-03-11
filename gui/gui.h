@@ -36,6 +36,7 @@
 #include "tree.hh" // for tree
 #endif
 
+#include <boost/intrusive_ptr.hpp>
 #include <vector>
 #include <cstdlib> 
 #include <string>

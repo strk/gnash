@@ -19,12 +19,11 @@
 #ifndef GNASH_SIMPLEBUFFER_H
 #define GNASH_SIMPLEBUFFER_H
 
-//#include "dsodefs.h" // for DSOEXPORT (not used)
 
-#include <cassert> // for assert
 #include <boost/cstdint.hpp> // for boost::uint8_t
 #include <algorithm> // for std::copy
 #include <boost/scoped_array.hpp>
+#include <cassert>
 
 
 namespace gnash {

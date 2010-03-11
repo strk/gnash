@@ -24,6 +24,7 @@
 #include "SWFStream.h" // for reading from SWF
 #include "log.h"
 #include "GnashNumeric.h"
+#include "SWFRect.h"
 
 #include <cmath>
 #include <iomanip>

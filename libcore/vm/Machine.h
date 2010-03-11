@@ -19,11 +19,11 @@
 #ifndef GNASH_MACHINE_H
 #define GNASH_MACHINE_H
 
+#include <string>
 #include <vector>
 #include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
-#include "SWF.h"
 #include "as_environment.h"
 #include "VM.h"
 #include "fn_call.h"

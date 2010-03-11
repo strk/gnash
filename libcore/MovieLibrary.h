@@ -22,6 +22,8 @@
 #include "rc.h"
 #include "movie_definition.h"
 
+#include <boost/intrusive_ptr.hpp>
+#include <string>
 #include <map>
 #include <algorithm>
 #include <boost/thread/thread.hpp>

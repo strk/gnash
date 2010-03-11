@@ -19,6 +19,7 @@
 
 // Derived from text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
 
+#include "RunResources.h"
 #include "DefineTextTag.h"
 #include "SWFStream.h"
 #include "log.h"

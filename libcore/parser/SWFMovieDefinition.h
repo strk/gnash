@@ -36,6 +36,8 @@
 #include "GnashNumeric.h"
 #include "GnashAlgorithm.h"
 
+#include <boost/intrusive_ptr.hpp>
+#include <vector>
 #include <map> // for CharacterDictionary
 #include <set> // for _importSources
 #include <string>

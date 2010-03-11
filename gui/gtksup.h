@@ -26,6 +26,7 @@
 #include "gnash.h"
 #include "gtk_glue.h"
 
+#include <string>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 

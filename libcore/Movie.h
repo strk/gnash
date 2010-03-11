@@ -22,6 +22,7 @@
 #ifndef GNASH_MOVIE_H
 #define GNASH_MOVIE_H
 
+#include <string>
 #include <set>
 
 #include "MovieClip.h" // for inheritance

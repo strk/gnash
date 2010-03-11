@@ -20,10 +20,11 @@
 #include <cassert>
 #include <cstdio>
 
+#include <boost/lexical_cast.hpp>
+
 // Replace!!
 #include <sys/times.h>
 #include <netinet/in.h>
-#include <boost/lexical_cast.hpp>
 
 #include "RTMP.h"
 #include "log.h"

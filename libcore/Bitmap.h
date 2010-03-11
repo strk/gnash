@@ -19,6 +19,7 @@
 #ifndef GNASH_BITMAP_H
 #define GNASH_BITMAP_H
 
+#include <boost/intrusive_ptr.hpp>
 #include "DisplayObject.h" 
 #include "BitmapInfo.h"
 #include "flash/display/BitmapData_as.h"

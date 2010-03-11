@@ -19,6 +19,7 @@
 #ifndef __CQUE_H__
 #define __CQUE_H__
 
+#include <string>
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>

@@ -78,7 +78,6 @@
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
 #include "Movie.h"
-#include "RunResources.h" // for initialization
 #include "gnash.h" // Quality
 #include "MovieClip.h"
 #include "SimpleBuffer.h" // for LoadCallback
@@ -97,6 +96,8 @@
 # define GNASH_PARANOIA_LEVEL 1
 #endif
 
+#include <map>
+#include <string>
 #include <vector>
 #include <deque>
 #include <list>
@@ -113,6 +114,7 @@ namespace gnash {
     class MovieClip;
     class VirtualClock;
     class IOChannel;
+    class RunResources;
 }
 
 namespace gnash

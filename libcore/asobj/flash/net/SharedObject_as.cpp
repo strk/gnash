@@ -45,6 +45,8 @@
 #include "Object.h"
 #include "AMFConverter.h"
 #include "GnashAlgorithm.h"
+#include "RunResources.h"
+#include "namedStrings.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>

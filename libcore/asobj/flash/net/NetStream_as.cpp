@@ -20,6 +20,7 @@
 
 
 
+#include "RunResources.h"
 #include "NetStream_as.h"
 #include "CharacterProxy.h"
 #include "smart_ptr.h" // GNASH_USE_GC

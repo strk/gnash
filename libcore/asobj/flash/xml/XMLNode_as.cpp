@@ -33,6 +33,7 @@
 #include "Object.h"
 #include "Array_as.h"
 
+#include "namedStrings.h"
 #include <boost/bind.hpp>
 #include <string>
 #include <sstream>

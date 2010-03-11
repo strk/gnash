@@ -21,6 +21,7 @@
 #ifndef GNASH_VIDEO_H
 #define GNASH_VIDEO_H
 
+#include <boost/intrusive_ptr.hpp>
 #include "DisplayObject.h" // for inheritance
 
 // Forward declarations

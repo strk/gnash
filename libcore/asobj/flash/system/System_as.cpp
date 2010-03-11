@@ -28,6 +28,7 @@
 #include "NativeFunction.h" 
 #include "VM.h" // for getPlayerVersion() 
 #include "GnashAlgorithm.h"
+#include "RunResources.h"
 
 #include <sstream>
 

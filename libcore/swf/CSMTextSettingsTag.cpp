@@ -17,10 +17,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "RunResources.h"
 #include "log.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "CSMTextSettingsTag.h"
+#include "smart_ptr.h"
 
 namespace gnash {
 namespace SWF {

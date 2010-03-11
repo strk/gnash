@@ -20,6 +20,7 @@
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
 
+#include <vector>
 #include "LineStyle.h" 
 #include "ShapeRecord.h"
 

@@ -19,6 +19,7 @@
 #ifndef __HANDLER_H__
 #define __HANDLER_H__ 1
 
+#include <map>
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>

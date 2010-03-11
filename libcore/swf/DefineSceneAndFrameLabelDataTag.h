@@ -22,9 +22,9 @@
 #include "SWF.h" 
 #include "MovieClip.h" 
 #include "SWFStream.h"
-#include "VM.h"
 #include "log.h"
 
+#include <string>
 #include <map>
 
 // Forward declarations

@@ -26,6 +26,7 @@
 
 #include "aos4_gnash_prefs.h"
 
+#include <vector>
 #include <proto/intuition.h>
 #include <proto/graphics.h>
 #include <proto/Picasso96API.h>

@@ -35,6 +35,7 @@
 #include "Bitmap.h"
 #include "Array_as.h"
 
+#include "namedStrings.h"
 #include <boost/lexical_cast.hpp>
 
 namespace gnash {

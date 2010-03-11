@@ -21,6 +21,7 @@
 #ifndef GNASH_EVENT_ID_H
 #define GNASH_EVENT_ID_H
 
+#include <string>
 #include "string_table.h"
 #include "GnashKey.h"
 

@@ -24,6 +24,7 @@
 #include "Range2d.h"
 #include "Point2d.h"
 
+#include <string>
 #include <cassert> // for inlines
 #include <iostream> // for output operator
 #include <boost/cstdint.hpp>

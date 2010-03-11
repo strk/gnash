@@ -24,6 +24,7 @@
 #include "dsodefs.h" // DSOEXPORT
 #include "GnashException.h" // for IOException inheritance
 
+#include <string>
 #include <boost/cstdint.hpp> // for boost int types
 #include <ios>
 

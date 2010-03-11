@@ -33,10 +33,6 @@
 # include "tree.hh"
 #endif
 
-#include <list>
-#include <map>
-#include <string>
-
 // Forward declarations
 namespace gnash {
 }

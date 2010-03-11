@@ -29,6 +29,8 @@
 #include "Globals.h"
 #include "Global_as.h"
 #include "Class.h"
+#include "CodeStream.h"
+#include "SWF.h"
 
 namespace gnash {
 namespace abc {

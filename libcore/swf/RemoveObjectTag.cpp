@@ -18,6 +18,7 @@
 //
 
 
+#include "RunResources.h"
 #include "RemoveObjectTag.h"
 #include "MovieClip.h"
 #include "SWF.h" // for TagType definition

@@ -26,6 +26,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "InteractiveObject.h" // for inheritance
 
+#include <boost/intrusive_ptr.hpp>
 #include <vector>
 #include <set>
 

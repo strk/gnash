@@ -21,6 +21,8 @@
 #ifndef GNASH_ASOBJ_BITMAPDATA_H
 #define GNASH_ASOBJ_BITMAPDATA_H
 
+#include <list>
+#include <vector>
 #include "smart_ptr.h"
 #include "as_object.h"
 

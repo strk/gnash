@@ -144,6 +144,7 @@
 /// faster than converting between ints and floats all the way.
 
 
+#include <vector>
 #include "dsodefs.h" // for DSOEXPORT
 
 #include "FileTypes.h"

@@ -21,6 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "namedStrings.h"
 #include <cstdarg>
 
 #include <mysql/errmsg.h>

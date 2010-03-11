@@ -30,6 +30,7 @@
 #include "URL.h"
 #include "namedStrings.h"
 #include "ExecutableCode.h"
+#include "RunResources.h"
 
 #include <memory> // for auto_ptr
 #include <boost/bind.hpp>

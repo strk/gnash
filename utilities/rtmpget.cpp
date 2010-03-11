@@ -25,6 +25,7 @@
 #include "AMF.h"
 #include "GnashAlgorithm.h"
 #include "GnashSleep.h"
+#include "URL.h"
 
 #include <boost/cstdint.hpp>
 #include <iomanip>

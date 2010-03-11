@@ -18,6 +18,7 @@
 #ifndef _RTMP_CLIENT_H_
 #define _RTMP_CLIENT_H_
 
+#include <deque>
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>

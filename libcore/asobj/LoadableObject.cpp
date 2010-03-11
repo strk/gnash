@@ -18,6 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "RunResources.h"
 #include "LoadableObject.h"
 #include "log.h"
 #include "Array_as.h"

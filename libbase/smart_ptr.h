@@ -42,7 +42,6 @@
 #include "ref_counted.h"
 #include "GC.h"
 
-#include <boost/intrusive_ptr.hpp>
 #include <typeinfo>
 
 #define COMPILER_SUPPORTS_ARGUMENT_DEPENDENT_LOOKUP 1

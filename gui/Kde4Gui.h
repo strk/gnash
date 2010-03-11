@@ -26,6 +26,7 @@
 #include "gui.h"
 #include "rc.h"
 
+#include <vector>
 #include <QX11EmbedWidget>
 #include <QDialog>
 

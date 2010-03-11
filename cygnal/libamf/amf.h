@@ -29,7 +29,6 @@
 
 #include <string>
 #include <cstring>
-#include <map>
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 

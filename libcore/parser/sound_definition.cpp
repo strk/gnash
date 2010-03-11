@@ -9,6 +9,7 @@
 #include "sound_definition.h"
 #include "sound_handler.h" // for use
 #include "VM.h"
+#include "RunResources.h"
 
 namespace gnash {
 

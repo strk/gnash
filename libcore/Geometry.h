@@ -20,8 +20,8 @@
 #define GNASH_GEOMETRY_H
 
 #include "dsodefs.h"
-#include "SWFMatrix.h" 
-#include "LineStyle.h"
+#include "SWFMatrix.h"
+#include "SWFRect.h"
 
 #include <vector> // for path composition
 #include <cmath> // sqrt
@@ -29,7 +29,7 @@
 
 // Forward declarations
 namespace gnash {
-    class SWFRect; 
+    class LineStyle;
 }
 
 namespace gnash { 

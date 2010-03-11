@@ -19,6 +19,7 @@
 #ifndef GNASH_LIBNET_RTMP_H
 #define GNASH_LIBNET_RTMP_H
 
+#include <deque>
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>

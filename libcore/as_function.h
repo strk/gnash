@@ -19,6 +19,7 @@
 #ifndef GNASH_AS_FUNCTION_H
 #define GNASH_AS_FUNCTION_H
 
+#include <string>
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h" // for inheritance
 #include "fn_call.h"

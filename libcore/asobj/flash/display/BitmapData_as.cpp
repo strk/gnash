@@ -32,6 +32,7 @@
 #include "GnashException.h" // for ActionException
 #include "VM.h" // for addStatics
 
+#include "namedStrings.h"
 #include <vector>
 #include <sstream>
 #include <algorithm>

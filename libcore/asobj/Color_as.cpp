@@ -30,6 +30,7 @@
 #include "VM.h"
 #include "MovieClip.h"
 
+#include "namedStrings.h"
 #include <sstream>
 
 

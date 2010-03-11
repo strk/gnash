@@ -25,6 +25,8 @@
 #include "SWF.h"
 #include "action_buffer.h"
 
+#include <string>
+#include <list>
 #include <vector>
 
 // Forward declarations

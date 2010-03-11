@@ -25,6 +25,8 @@
 #include "string_table.h"
 #include "AbcBlock.h"
 
+#include <map>
+#include <vector>
 #include <list>
 
 // Forward declarations

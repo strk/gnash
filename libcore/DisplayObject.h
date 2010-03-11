@@ -36,6 +36,7 @@
 # include "tree.hh"
 #endif
 
+#include <vector>
 #include <map>
 #include <string>
 #include <cassert>

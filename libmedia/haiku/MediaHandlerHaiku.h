@@ -21,6 +21,7 @@
 
 #include "MediaHandler.h" // for inheritance
 
+#include <vector>
 #include <memory>
 
 namespace gnash {

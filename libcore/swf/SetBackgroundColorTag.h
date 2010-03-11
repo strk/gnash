@@ -24,7 +24,6 @@
 #include "movie_definition.h" // for inlines (loader)
 #include "log.h" // for log_parse
 #include "RGBA.h" // for rgba class
-#include "GnashNumeric.h" // for frnd
 
 // Forward declarations
 namespace gnash {

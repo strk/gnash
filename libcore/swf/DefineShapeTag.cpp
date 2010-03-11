@@ -24,6 +24,7 @@
 // Quadratic bezier outline shapes are the basis for most SWF rendering.
 
 
+#include "RunResources.h"
 #include "DefineShapeTag.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"

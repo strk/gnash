@@ -3,6 +3,7 @@
 #define GNASH_OBJECTURI_H
 
 #include "string_table.h"
+#include <string>
 #include <ostream>
 /// Define this for verbose logging of ObjectURIs
 //#define FULL_OBJECT_URI_LOGGING 1

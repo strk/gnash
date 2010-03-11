@@ -34,6 +34,7 @@
 #include "SoundEnvelope.h" // for SoundEnvelopes typedef
 #include "AuxStream.h" // for aux_stramer_ptr typedef
 
+#include <string>
 #include <vector>
 #include <memory>
 #include <cassert>

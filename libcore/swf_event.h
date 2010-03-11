@@ -20,8 +20,11 @@
 #ifndef GNASH_SWF_EVENT_H
 #define GNASH_SWF_EVENT_H
 
-#include "action_buffer.h" // for composition
 #include "event_id.h" // for composition
+
+namespace gnash {
+    class action_buffer;
+}
 
 namespace gnash {
 

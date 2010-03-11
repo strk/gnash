@@ -22,6 +22,7 @@
 
 #include "as_object.h" // for inheritance
 
+#include <vector>
 #include <string>
 #include <list>
 

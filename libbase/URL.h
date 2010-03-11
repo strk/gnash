@@ -23,7 +23,6 @@
 
 #include <iosfwd>
 #include <string>
-#include <fstream>
 #include <map>
 
 namespace gnash {

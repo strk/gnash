@@ -22,6 +22,7 @@
 
 #include "sound_handler.h" // for inheritance
 
+#include <string>
 #include <set> // for composition (InputStreams)
 #include <fstream> // for composition (file_stream)
 #include <boost/thread/mutex.hpp>

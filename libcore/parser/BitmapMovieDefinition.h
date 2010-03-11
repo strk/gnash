@@ -21,10 +21,10 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h" // for inheritance
 #include "SWFRect.h" // for composition
-#include "BitmapInfo.h" // for destructor visibility by intrusive_ptr
 #include "GnashImage.h"
 #include "GnashNumeric.h"
 
+#include <boost/intrusive_ptr.hpp>
 #include <string>
 #include <memory> // for auto_ptr
 

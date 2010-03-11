@@ -24,13 +24,13 @@
 #include <string>
 #include <vector>
 
-#include "as_value.h"
 #include "dsodefs.h"
 #include "GnashException.h"
 #include "AMF.h"
 
 namespace gnash {
     class as_object;
+    class as_value;
     class SimpleBuffer;
     class Global_as;
 }

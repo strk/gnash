@@ -19,6 +19,7 @@
 #ifndef HAIKU_AGG_GLUE_H
 #define HAIKU_AGG_GLUE_H
 
+#include <vector>
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 #include <Renderer.h>
 

@@ -51,6 +51,7 @@
 #include "DisplayObject.h"
 #include "as_environment.h"
 #include "as_value.h"
+#include "RunResources.h"
 
 #include <string>
 #include <vector>

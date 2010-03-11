@@ -31,6 +31,7 @@
 #include "DisplayObject.h"
 #include "tu_file.h"
 #include "gnash.h"
+#include "RunResources.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"

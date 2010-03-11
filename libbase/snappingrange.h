@@ -21,12 +21,10 @@
 
 #include "Range2d.h"
 
-#include <list>
 #include <vector>
-#include <boost/bind.hpp>
 #include <iterator>
 #include <algorithm>
-#include <iostream>
+#include <ostream>
 #include <boost/cstdint.hpp>
 
 namespace gnash {

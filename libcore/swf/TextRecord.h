@@ -21,6 +21,7 @@
 
 #include "RGBA.h"
 #include "SWF.h"
+#include <string>
 #include <vector>
 
 namespace gnash {

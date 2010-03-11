@@ -33,6 +33,7 @@
 #include "SWF.h"
 #include "Button.h"
 
+#include <vector>
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> 
 #include <memory>

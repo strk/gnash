@@ -30,6 +30,7 @@
 #include "NativeFunction.h"
 #include "VM.h"
 
+#include "namedStrings.h"
 #include <sstream>
 #include <cmath>
 

@@ -24,10 +24,8 @@
 #include <deque>
 #include <map>
 
-#include "log.h"
 #include "SimpleBuffer.h"
 #include "Socket.h"
-#include "URL.h"
 
 #define RTMP_DEFAULT_CHUNKSIZE	128
 
@@ -36,6 +34,7 @@ namespace gnash {
     namespace rtmp {
         class HandShaker;
     }
+    class URL;
 }
 
 namespace gnash {

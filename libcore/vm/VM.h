@@ -30,11 +30,14 @@
 #include "CallStack.h"
 #include "smart_ptr.h"
 
+#include <map>
+#include <vector>
 #include <memory> 
 #include <locale>
 #include <boost/cstdint.hpp> 
 #include <boost/random.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/intrusive_ptr.hpp>
 
 // Forward declarations
 namespace gnash {

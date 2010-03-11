@@ -21,9 +21,6 @@
 
 #include <boost/cstdint.hpp> // for C99 int types
 #include <string>
-#include <ostream>
-#include <cstdio>
-#include <map>
 
 #include "dsodefs.h" //DSOEXPORT
 

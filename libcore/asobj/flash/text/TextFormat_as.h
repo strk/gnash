@@ -26,6 +26,7 @@
 #include "TextField.h"
 #include "RGBA.h" 
 
+#include <vector>
 #include <boost/cstdint.hpp> 
 #include <string>
 

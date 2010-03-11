@@ -34,6 +34,7 @@
 #include "Global_as.h" 
 #include "log.h"
 
+#include "namedStrings.h"
 #include <boost/thread.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>

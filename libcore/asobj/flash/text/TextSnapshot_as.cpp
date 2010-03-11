@@ -36,6 +36,7 @@
 #include "RGBA.h"
 #include "GnashNumeric.h"
 
+#include "namedStrings.h"
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <algorithm>

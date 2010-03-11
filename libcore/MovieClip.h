@@ -34,8 +34,8 @@
 #include "DynamicShape.h" // for composition
 #include "Range2d.h"
 #include "dsodefs.h" // for DSOEXPORT
-#include "GnashImage.h"
 
+#include <boost/intrusive_ptr.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -51,6 +51,7 @@ namespace gnash {
     class TextField;
     class BitmapData_as;
     class BitmapInfo;
+    class GnashImage;
     namespace SWF {
         class PlaceObject2Tag;
     }

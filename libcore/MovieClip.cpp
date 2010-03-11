@@ -59,6 +59,7 @@
 #include "InteractiveObject.h"
 #include "DisplayObjectContainer.h"
 #include "Global_as.h"
+#include "RunResources.h"
 
 #include <vector>
 #include <string>

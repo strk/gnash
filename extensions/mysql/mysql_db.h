@@ -23,7 +23,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include <string>
 #include <mysql/errmsg.h>
 #include <mysql/mysql.h>
 

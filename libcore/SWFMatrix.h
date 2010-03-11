@@ -27,7 +27,6 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "Range2d.h" // for transforming Range2d<float>
-#include "SWFRect.h"    // for SWFRect 
 #include "Point2d.h" // for Point2d
 
 #include <iostream> 
@@ -36,6 +35,7 @@
 // Forward declarations
 namespace gnash {
     class SWFStream;
+    class SWFRect;
 }
 
 

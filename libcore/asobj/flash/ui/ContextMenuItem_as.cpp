@@ -18,6 +18,7 @@
 //
 
 
+#include "namedStrings.h"
 #include "ui/ContextMenuItem_as.h"
 #include "log.h"
 #include "fn_call.h"

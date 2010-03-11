@@ -29,6 +29,7 @@
 #include "VM.h"
 #include "GnashNumeric.h"
 
+#include "namedStrings.h"
 #include <sstream>
 
 namespace gnash {

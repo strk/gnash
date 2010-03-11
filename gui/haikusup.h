@@ -32,6 +32,8 @@
 
 #include "haiku_agg_glue.h"
 
+#include <string>
+
 class BMessageRunner;
 
 

@@ -27,6 +27,7 @@
 #include "log.h"
 #include "gui.h"
 
+#include <vector>
 #include <fltk/Window.h>
 #include <fltk/PopupMenu.h>
 
