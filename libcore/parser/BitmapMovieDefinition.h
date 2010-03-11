@@ -18,10 +18,8 @@
 #ifndef GNASH_BITMAPMOVIEDEFINITION_H
 #define GNASH_BITMAPMOVIEDEFINITION_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h" // for inheritance
 #include "SWFRect.h" // for composition
-#include "GnashImage.h"
 #include "GnashNumeric.h"
 
 #include <boost/intrusive_ptr.hpp>
@@ -31,6 +29,7 @@
 // Forward declarations
 namespace gnash {
     class Renderer;
+    class GnashImage;
 }
 
 namespace gnash
