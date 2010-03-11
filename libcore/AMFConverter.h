@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "dsodefs.h"
-#include "GnashException.h"
 #include "AMF.h"
 
 namespace gnash {

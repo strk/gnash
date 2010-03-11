@@ -22,7 +22,6 @@
 #include "Property.h" // for templated functions
 #include "PropFlags.h" // for templated functions
 #include "as_value.h" // for templated functions
-#include "string_table.h"
 #include "ObjectURI.h"
 
 #include <set> 

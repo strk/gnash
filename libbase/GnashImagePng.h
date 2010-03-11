@@ -25,7 +25,7 @@
 
 #include "dsodefs.h"
 #include "GnashImage.h"
-#include "boost/scoped_array.hpp"
+#include <boost/scoped_array.hpp>
 
 
 extern "C" {

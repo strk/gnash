@@ -41,6 +41,7 @@
 #include "SoundInfoRecord.h" 
 #include "Global_as.h" 
 #include "RunResources.h"
+#include "sound_definition.h"
 
 #include <boost/bind.hpp>
 

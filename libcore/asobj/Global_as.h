@@ -22,7 +22,6 @@
 
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
-#include "GnashException.h"
 #include "log.h"
 
 #include <string>

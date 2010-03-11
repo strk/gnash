@@ -21,9 +21,8 @@
 #ifndef GNASH_SWF_DEFINEBUTTONSOUNDTAG_H
 #define GNASH_SWF_DEFINEBUTTONSOUNDTAG_H
 
-#include "SWF.h"
-#include "sound_definition.h" // For sound_sample. Ugh.
 #include "SoundInfoRecord.h" 
+#include "SWF.h"
 
 #include <vector>
 
@@ -31,6 +30,7 @@ namespace gnash {
     class SWFStream;
     class RunResources;
     class movie_definition;
+    class sound_sample;
 }
 
 namespace gnash {

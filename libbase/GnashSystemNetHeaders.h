@@ -27,6 +27,10 @@
 #ifndef GNASH_NET_HEADERS_H
 #define GNASH_NET_HEADERS_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 /// @todo A configure 'test' (a #define in gnashconfig.h) might be a better
 ///       way of checking for compiler.
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)

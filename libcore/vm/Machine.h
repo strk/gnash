@@ -24,7 +24,6 @@
 #include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
-#include "as_environment.h"
 #include "VM.h"
 #include "fn_call.h"
 #include "log.h"

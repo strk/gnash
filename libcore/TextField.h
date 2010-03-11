@@ -21,7 +21,7 @@
 
 #include "InteractiveObject.h" // for inheritance
 #include "LineStyle.h" // for LineStyle
-#include "Range2d.h"
+#include "snappingrange.h"
 #include "SWFRect.h" // for inlines
 
 #include <boost/intrusive_ptr.hpp>

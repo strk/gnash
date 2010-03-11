@@ -24,9 +24,6 @@
 
 #include "as_function.h"
 #include "as_value.h"
-#include "SafeStack.h"
-#include "as_object.h"
-#include "as_environment.h"
 #include "Method.h"
 
 namespace gnash {
