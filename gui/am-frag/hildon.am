@@ -30,14 +30,14 @@ if BUILD_OGL_RENDERER
 hildon_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
 hildon_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
 		gtk.cpp gtksup.h gtk_glue.h
-hildon_gnash_LDADD = $(top_builddir)/backend/libgnashogl.la \
+hildon_gnash_LDADD = $(top_builddir)/librender/libgnashogl.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS) $(HILDON_LIBS)
 endif				# BUILD_OGL_RENDERER
 if BUILD_AGG_RENDERER
 hildon_gnash_CPPFLAGS += $(AGG_CFLAGS) $(HILDON_CFLAGS)
 hildon_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
 		gtk.cpp gtksup.h gtk_glue.h
-hildon_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
+hildon_gnash_LDADD = $(top_builddir)/librender/libgnashagg.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(HILDON_LIBS)
 
 endif				# BUILD_AGG_RENDERER
@@ -45,7 +45,7 @@ if BUILD_CAIRO_RENDERER
 hildon_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
 hildon_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
 		gtk.cpp gtksup.h gtk_glue.h
-hildon_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la \
+hildon_gnash_LDADD = $(top_builddir)/librender/libgnashcairo.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS) $(HILDON_LIBS)
 endif				# BUILD_CAIRO_RENDERER
 endif				# BUILD_GTK_HILDON
@@ -65,14 +65,14 @@ endif				# BUILD_GTK_HILDON
 # hildon_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
 # hildon_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
 # 		gtk.cpp gtksup.h gtk_glue.h
-# hildon_gnash_LDADD = $(top_builddir)/backend/libgnashogl.la \
+# hildon_gnash_LDADD = $(top_builddir)/librender/libgnashogl.la \
 # 		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS) $(HILDON_LIBS)
 # endif				# BUILD_OGL_RENDERER
 # if BUILD_AGG_RENDERER
 # hildon_gnash_CPPFLAGS += $(AGG_CFLAGS) $(HILDON_CFLAGS)
 # hildon_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
 # 		gtk.cpp gtksup.h gtk_glue.h
-# hildon_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
+# hildon_gnash_LDADD = $(top_builddir)/librender/libgnashagg.la \
 # 		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(HILDON_LIBS)
 
 # endif				# BUILD_AGG_RENDERER
@@ -80,7 +80,7 @@ endif				# BUILD_GTK_HILDON
 # hildon_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
 # hildon_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
 # 		gtk.cpp gtksup.h gtk_glue.h
-# hildon_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la \
+# hildon_gnash_LDADD = $(top_builddir)/librender/libgnashcairo.la \
 # 		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS) $(HILDON_LIBS)
 # endif				# BUILD_CAIRO_RENDERER
 # endif				# BUILD_GTK_HILDON
