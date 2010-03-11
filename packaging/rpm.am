@@ -50,7 +50,7 @@ rpm: distdir spec setup-rpm rpm-gnash
 
 # build everything in one pass using rpmbuild
 rpm-gnash: 
-	rpmbuild -ba $(RPMBUILD_FLAGS) gnash.spec
+	rpmbuild -ba $(RPMBUILD_FLAGS) --sign gnash.spec
 
 # configure the build directory, which we do by executing only the %prep stage,
 # which doesn't actually run configure
