@@ -40,9 +40,13 @@
 //       else have it map to gc_ptr (yet to be defined)
 
 #include "ref_counted.h"
-#include "GC.h"
 
 #include <typeinfo>
+
+namespace gnash {
+    class GcResource;
+}
+
 
 #define COMPILER_SUPPORTS_ARGUMENT_DEPENDENT_LOOKUP 1
 #ifdef COMPILER_SUPPORTS_ARGUMENT_DEPENDENT_LOOKUP

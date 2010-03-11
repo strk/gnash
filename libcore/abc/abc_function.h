@@ -23,8 +23,12 @@
 #endif
 
 #include "as_function.h"
-#include "as_value.h"
 #include "Method.h"
+
+namespace gnash {
+    class as_value;
+    class CodeStream;
+}
 
 namespace gnash {
 namespace abc {

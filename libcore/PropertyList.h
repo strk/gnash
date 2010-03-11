@@ -21,7 +21,6 @@
 
 #include "Property.h" // for templated functions
 #include "PropFlags.h" // for templated functions
-#include "as_value.h" // for templated functions
 #include "ObjectURI.h"
 
 #include <set> 
@@ -41,6 +40,7 @@ namespace gnash {
     class as_environment;
     class as_function;
     class ObjectURI;
+    class as_value;
 }
 
 namespace gnash {

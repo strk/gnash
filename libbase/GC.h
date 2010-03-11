@@ -23,7 +23,6 @@
 #include <list>
 #include <map>
 #include <string>
-#include <algorithm> //for std::find
 
 #ifndef NDEBUG
 # include <boost/thread.hpp>

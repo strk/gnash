@@ -20,9 +20,12 @@
 #define GNASH_NATIVE_FUNCTION_H
 
 #include "as_function.h" // for inheritance
-#include "fn_call.h" // for call operator
 
 #include <cassert>
+
+namespace gnash {
+    class fn_call;
+}
 
 namespace gnash {
 

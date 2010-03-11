@@ -20,10 +20,13 @@
 #define GNASH_BUILTIN_FUNCTION_H
 
 #include "as_function.h" 
-#include "fn_call.h" 
-#include "as_environment.h" 
 
 #include <cassert>
+
+namespace gnash {
+    class as_environment;
+    class fn_call;
+}
 
 namespace gnash {
 

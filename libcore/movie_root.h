@@ -74,8 +74,6 @@
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
 #include "drag_state.h" // for composition
-#include "smart_ptr.h" // for memory management
-#include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
 #include "Movie.h"
 #include "gnash.h" // Quality

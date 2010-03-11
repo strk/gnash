@@ -22,7 +22,6 @@
 
 #include "dsodefs.h"
 #include "Range2d.h"
-#include "Point2d.h"
 
 #include <string>
 #include <cassert> // for inlines
@@ -33,6 +32,9 @@
 namespace gnash {
     class SWFMatrix;
     class SWFStream;
+    namespace geometry {
+        class Point2d;
+    }
 }
 
 namespace gnash {
@@ -230,7 +232,7 @@ public:
     /// \brief
     /// Make sure that the given point falls in this rectangle, 
     /// modifying it's coordinates if needed.
-    void clamp(point& p) const;
+    void clamp(geometry::Point2d& p) const;
 
     /// Construct and return a Range2d object.
     // TODO: deprecate this.

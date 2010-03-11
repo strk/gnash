@@ -20,7 +20,6 @@
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
 #include "DefineShapeTag.h"
 #include "DynamicShape.h"
