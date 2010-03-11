@@ -168,8 +168,6 @@ bool
 XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
 {
 
-    GNASH_REPORT_FUNCTION;
-
     if (!URLAccessManager::allowXMLSocket(host, port)) {
 	    return false;
     }
@@ -383,7 +381,6 @@ xmlsocket_new(const fn_call& fn)
 as_value
 xmlsocket_onData(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
    
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
