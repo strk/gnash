@@ -32,6 +32,7 @@
 #include "Global_as.h"
 #include "GnashNumeric.h"
 #include "movie_root.h"
+#include "RunResources.h"
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>

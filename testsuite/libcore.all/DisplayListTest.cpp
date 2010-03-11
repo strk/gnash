@@ -29,6 +29,7 @@
 #include "DummyCharacter.h"
 #include "movie_definition.h"
 #include "ManualClock.h"
+#include "RunResources.h"
 
 #include <iostream>
 #include <sstream>
