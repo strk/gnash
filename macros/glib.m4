@@ -22,7 +22,9 @@ AC_DEFUN([GNASH_PATH_GLIB],
   AC_CACHE_VAL(ac_cv_path_glib_incl,[
     if test x"${with_glib_incl}" != x ; then
       if test -f ${with_glib_incl}/glib.h ; then
-      	ac_cv_path_glib_incl="-I`(cd ${with_glib_incl}; pwd)`"
+        ac_cv_path_glib_incl="-I`(cd ${with_glib_incl}; pwd)`"
+        gnash_glib_topdir=`basename ${with_glib_incl}`
+        gnash_glib_version=`echo ${gnash_glib_topdir} | sed -e 's:glib-::'`
       else
     	  AC_MSG_ERROR([${with_glib_incl} directory doesn't contain glib.h])
       fi
@@ -41,7 +43,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
   AC_MSG_CHECKING([for Glib header])  
-  if test x"${gnash_glib_version}" = x; then
+  if test x"${ac_cv_path_glib_incl}" = x -a x"${gnash_glib_version}" = x; then
     gnash_glib_topdir=""
     gnash_glib_version=""
     for i in $incllist; do
@@ -59,11 +61,12 @@ AC_DEFUN([GNASH_PATH_GLIB],
       done
     done
   fi
-      if test x"${ac_cv_path_glib_incl}" = x; then
-        AC_MSG_RESULT(no)
-	else
-        AC_MSG_RESULT(${ac_cv_path_glib_incl})	
-      fi
+
+  if test x"${ac_cv_path_glib_incl}" = x; then
+    AC_MSG_RESULT(no)
+  else
+    AC_MSG_RESULT(${ac_cv_path_glib_incl})	
+  fi
  
 
   dnl Look for the library
