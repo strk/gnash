@@ -264,8 +264,12 @@ allowHost(const std::string& host)
 }
 
 bool
-allowXMLSocket(const std::string& host, short /* port */)
+allowXMLSocket(const std::string& host, short port)
 {
+    if (port < 1024) {
+        log_security("Attempt to connect to disallowed port %s", port);
+        return false;
+    }
 	return allowHost(host);
 }
 

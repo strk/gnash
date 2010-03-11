@@ -117,10 +117,10 @@ public:
 
 private:
 
-    mutable bool _connected;
-
     /// Fill the cache.
     void fillCache();
+
+    mutable bool _connected;
 
     /// A cache for received data.
     boost::uint8_t _cache[16384];

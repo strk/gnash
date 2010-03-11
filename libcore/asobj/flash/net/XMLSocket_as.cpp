@@ -67,11 +67,19 @@ public:
     ~XMLSocket_as();
     
     /// True only when the XMLSocket is ready for read/write.
+    //
+    /// This should always match the known state of the Socket.
     bool ready() const {
         return _ready;
     }
 
     /// Attempt a connection.
+    //
+    /// @param host     The host name to connect to.
+    /// @param port     The port to connect to.
+    /// @return         false if the connection is not allowed, otherwise true.
+    ///                 Note that a return of true does not mean a successful
+    ///                 connection.
     bool connect(const std::string& host, boost::uint16_t port);
 
     /// Send a string with a null-terminator to the socket.
@@ -79,12 +87,20 @@ public:
     /// Actionscript doesn't care about the result.
     void send(std::string str);
 
-    /// Close the socket
+    /// Close the XMLSocket
     //
-    /// Actionscript doesn't care about the result.
+    /// This removes the core callback and instructs the Socket to close
+    /// in case it isn't already. After close() is called, the XMLSocket is
+    /// no longer ready.
+    //
+    /// You must call close() to ensure that the Socket object is ready for
+    /// a new connection.
     void close();
 
     /// Called on advance() when socket is connected
+    //
+    /// This handles reading of data and error checking. If the Socket is
+    /// in error, it is closed and this XMLSocket object is no longer ready.
     virtual void update();
 
 private:
@@ -241,10 +257,9 @@ XMLSocket_as::checkForIncomingData()
     
     if (_socket.bad()) {
         callMethod(&owner(), NSV::PROP_ON_CLOSE);
-        getRoot(owner()).removeAdvanceCallback(this);
+        close();
         return;
     }
-
 
 }
 
@@ -254,7 +269,7 @@ XMLSocket_as::checkForIncomingData()
 void
 XMLSocket_as::send(std::string str)
 {
-    if (!_socket.connected()) {
+    if (!ready()) {
         log_error(_("XMLSocket.send(): socket not initialized"));
 	    return;
     }
@@ -349,8 +364,6 @@ xmlsocket_send(const fn_call& fn)
 as_value
 xmlsocket_close(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
-    
     XMLSocket_as* ptr = ensure<ThisIsNative<XMLSocket_as> >(fn);
 
     ptr->close();
@@ -368,7 +381,6 @@ xmlsocket_new(const fn_call& fn)
 as_value
 xmlsocket_onData(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
    
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
