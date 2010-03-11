@@ -29,6 +29,7 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
+#include <map>
 #include <boost/cstdint.hpp>
 
 namespace amf 
