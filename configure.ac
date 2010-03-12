@@ -3580,7 +3580,7 @@ if test x"$testsuite" = x"yes"; then
 fi
 
 if test x$cross_compiling = xyes; then
-   if test x"${android_ndk}" != x; then
+   if test x"${android_ndk}" != xno; then
       AC_MSG_NOTICE([This build is setup for cross compiling for Android])
    else
       AC_MSG_NOTICE([This build is setup for cross compiling])
