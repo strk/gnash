@@ -24,7 +24,6 @@
 #include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
-#include "VM.h"
 #include "fn_call.h"
 #include "log.h"
 
@@ -42,6 +41,7 @@ namespace gnash {
     class as_object;
     class Property;
     class CodeStream;
+    class VM;
 }
 
 

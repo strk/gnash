@@ -20,7 +20,6 @@
 
 #include <string>
 #include <vector>
-#include "SWF.h"
 
 
 // Forward declarations
