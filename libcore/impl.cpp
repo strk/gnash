@@ -34,6 +34,7 @@
 #include "MovieClip.h"
 #include "VM.h"
 #include "MovieLibrary.h"
+#include "gnash.h" // DSOEXPORTS
 
 #ifdef GNASH_USE_GC
 #include "GC.h"
