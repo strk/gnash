@@ -221,6 +221,41 @@ AC_ARG_WITH(sysroot,
   with_top_level=${withval} ;
   cross_compiling=yes)
 
+dnl Android is a little different when using a standard cross toolchain,
+dnl so we have to configure especially for it for now. Usually it's
+dnl something like this:
+dnl
+dnl arm-linux-eabi-gcc -Wl,--dynamic-linker -Wl,/system/bin/linker
+dnl -nostdlib -Wl,-rpath -Wl,/system/lib -Wl,-rpath
+dnl -Wl,/opt/android-ndk-r3/build/platforms/android-5/arch-arm/usr/lib
+dnl -L/opt/android-ndk-r3/build/platforms/android-5/arch-arm/usr/lib
+dnl -lc -o hello
+dnl  /opt/android-ndk-r3/build/platforms/android-3/arch-arm/usr/lib/crtbegin_dynamic.o
+dnl Recent versions of G++ (I'm using 4.5 from source
+android_ndk=no
+AC_ARG_WITH([android],
+  AC_HELP_STRING([--with-android],
+	  [directory where android NDK is installed]),
+        android_ndk=${withval}
+        if test x"${withval}" != x; then
+          android_ndk=${withval}
+        else
+          android_ndk=/opt/android-ndk-r3/build/platforms/android-5/arch-arm
+        fi
+)
+CROSS_CXXFLAGS=
+if test x"${android_ndk}" != xno; then
+dnl  LDFLAGS=-Wl,--dynamic-linker -Wl,/system/bin/linker -nostdlib -Wl,-rpath -Wl,/system/lib -Wl,-rpath -Wl,${android_ndk}/usr/lib -L${android_ndk}/usr/lib -lc -o hello ${android_ndk}/usr/lib/crtbegin_dynamic.o
+  CROSS_CXXFLAGS=-mandroid
+  if test x"${with_top_level}" = x; then
+    with_top_level=/usr/local/android-arm/sysroot/usr
+    cross_compiling=yes
+  fi
+  ANDROID_NDK=${android_ndk}
+fi
+AC_SUBST(ANDROID_NDK)
+AM_CONDITIONAL(ANDROID, [ test x"${android_ndk}" != x ])
+
 soldir=/tmp
 AC_ARG_WITH(soldir,
  AC_HELP_STRING([--with-soldir],
@@ -1388,7 +1423,7 @@ if $LD --help 2>/dev/null | grep as-needed > /dev/null; then
   gcc_cv_ld_as_needed=yes
 fi
 if test x"$gcc_cv_ld_as_needed" = xyes; then
-  LDFLAGS=" -Wl,--as-needed"
+  LDFLAGS+=" -Wl,--as-needed"
 fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
 
@@ -2270,6 +2305,7 @@ fi
 #
 if test x"$GCC" = x"yes"; then
   CXXFLAGS="$CXXFLAGS \
+    $CROSS_CXXFLAGS \
     -W \
     -Wall \
     -Wcast-align \
@@ -2280,6 +2316,7 @@ if test x"$GCC" = x"yes"; then
     -Wunused \
     "
   CFLAGS="$CFLAGS \
+    $CROSS_CXXFLAGS \
     -W \
     -Wall \
     -Wcast-align \
@@ -3543,9 +3580,12 @@ if test x"$testsuite" = x"yes"; then
 fi
 
 if test x$cross_compiling = xyes; then
-  AC_MSG_NOTICE([This build is setup for cross compiling])
+   if test x"${android_ndk}" != x; then
+      AC_MSG_NOTICE([This build is setup for cross compiling for Android])
+   else
+      AC_MSG_NOTICE([This build is setup for cross compiling])
+   fi
 fi
-
 if test -s $cwarn; then
   echo ""
   cat $cwarn
