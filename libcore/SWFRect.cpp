@@ -20,6 +20,7 @@
 #include "log.h"
 #include "SWFStream.h"
 #include "SWFMatrix.h"
+#include "Point2d.h"
 #include "GnashNumeric.h" // for flerp, clamp...
 
 #include <sstream> // for ::print and ::toString

@@ -22,6 +22,7 @@
 #include "dsodefs.h"
 #include "SWFMatrix.h"
 #include "SWFRect.h"
+#include "Point2d.h"
 
 #include <vector> // for path composition
 #include <cmath> // sqrt

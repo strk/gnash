@@ -151,6 +151,7 @@
 #include "gnash.h" // Quality
 #include "DisplayObject.h"
 #include "Range2d.h"
+#include "Point2d.h"
 #include "RGBA.h"
 #include "log.h"
 

@@ -21,6 +21,7 @@
 #endif
 
 #include "SWFMatrix.h"
+#include "Point2d.h"
 #include <iostream>
 #include <sstream>
 #include <cassert>

@@ -25,6 +25,7 @@
 #include "log.h"
 #include "GnashNumeric.h"
 #include "SWFRect.h"
+#include "Point2d.h"
 
 #include <cmath>
 #include <iomanip>
@@ -123,6 +124,30 @@ SWFMatrix::transform(boost::int32_t& x, boost::int32_t& y) const
     boost::int32_t  t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy,  y) + ty;
     x = t0;
     y = t1;
+}
+
+void
+SWFMatrix::transform(geometry::Range2d<boost::int32_t>& r) const
+{
+    boost::int32_t xmin = r.getMinX(),
+                   xmax = r.getMaxX(),
+                   ymin = r.getMinY(),
+                   ymax = r.getMaxY();
+
+    point p0(xmin, ymin);
+    point p1(xmin, ymax);
+    point p2(xmax, ymax);
+    point p3(xmax, ymin);
+
+    transform(p0);
+    transform(p1);
+    transform(p2);
+    transform(p3);
+
+    r.setTo(p0.x, p0.y);
+    r.expandTo(p1.x, p1.y);
+    r.expandTo(p2.x, p2.y);
+    r.expandTo(p3.x, p3.y);
 }
 
 void
