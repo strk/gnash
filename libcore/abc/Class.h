@@ -26,7 +26,6 @@
 #include <map>
 #include <vector>
 #include "string_table.h"
-#include "as_value.h"
 #include "Property.h"
 #include "AbcBlock.h"
 
@@ -43,6 +42,7 @@ namespace gnash {
     }
     class ClassHierarchy;
     class Property;
+    class as_value;
 }
 
 namespace gnash {

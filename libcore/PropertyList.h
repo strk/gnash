@@ -20,8 +20,6 @@
 #define GNASH_PROPERTYLIST_H
 
 #include "Property.h" // for templated functions
-#include "PropFlags.h" // for templated functions
-#include "ObjectURI.h"
 
 #include <set> 
 #include <map> 

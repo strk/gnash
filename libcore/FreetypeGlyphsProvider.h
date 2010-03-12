@@ -20,9 +20,6 @@
 #ifndef GNASH_FREETYPE_H
 #define GNASH_FREETYPE_H
 
-#include "SWFRect.h"
-#include "smart_ptr.h" // for intrusive_ptr
-
 #include <string>
 #include <memory> // for auto_ptr
 #include <boost/thread/mutex.hpp>

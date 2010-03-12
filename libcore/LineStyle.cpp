@@ -24,6 +24,7 @@
 #include "LineStyle.h"
 #include "log.h"
 #include "SWFStream.h"
+#include "smart_ptr.h"
 #include "movie_definition.h"
 #include "SWF.h"
 #include "GnashException.h"

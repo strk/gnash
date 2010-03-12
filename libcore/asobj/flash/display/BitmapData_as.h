@@ -23,7 +23,6 @@
 
 #include <list>
 #include <vector>
-#include "smart_ptr.h"
 #include "as_object.h"
 
 namespace gnash {

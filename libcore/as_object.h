@@ -27,7 +27,6 @@
 #include "string_table.h"
 #include "GC.h" // for inheritance from GcResource (to complete)
 #include "PropertyList.h"
-#include "as_value.h" 
 #include "smart_ptr.h"
 #include "PropFlags.h"
 #include "Relay.h"
@@ -58,6 +57,7 @@ namespace gnash {
     class movie_root;
     class RunResources;
     class Global_as;
+    class as_value;
 }
 
 namespace gnash {

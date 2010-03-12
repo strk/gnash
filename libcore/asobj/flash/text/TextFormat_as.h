@@ -22,13 +22,16 @@
 #ifndef GNASH_TEXTFORMAT_H
 #define GNASH_TEXTFORMAT_H
 
-#include "as_object.h" 
 #include "TextField.h"
 #include "RGBA.h" 
 
 #include <vector>
 #include <boost/cstdint.hpp> 
 #include <string>
+
+namespace gnash {
+    class as_object;
+}
 
 namespace gnash {  
 

@@ -20,7 +20,6 @@
 #define HAVE_TIMERS_H
 
 #include "dsodefs.h"
-#include "as_object.h"
 #include "as_function.h"
 #include "smart_ptr.h"
 
@@ -30,6 +29,7 @@
 // Forward declarations
 namespace gnash {
     class as_function;
+    class as_object;
 }
 
 namespace gnash {

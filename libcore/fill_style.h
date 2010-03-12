@@ -25,7 +25,6 @@
 #include "BitmapInfo.h"
 #include "SWF.h"
 #include "RGBA.h" // for rgba type
-#include "smart_ptr.h" // for BitmapInfo (shared)
 
 #include <vector> // for composition
 #include <iosfwd> // for output operator forward declarations

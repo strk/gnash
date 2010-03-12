@@ -26,7 +26,6 @@
 #include <set>
 
 #include "MovieClip.h" // for inheritance
-#include "smart_ptr.h" // for composition
 
 // Forward declarations
 namespace gnash {

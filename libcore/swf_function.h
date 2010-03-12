@@ -20,7 +20,6 @@
 #define GNASH_SWF_FUNCTION_H
 
 #include "as_function.h" // for inheritance
-#include "as_object.h" // for composition (vector element)
 
 #include "smart_ptr.h"
 #include <vector>
@@ -29,8 +28,9 @@
 
 // Forward declarations
 namespace gnash {
-	class action_buffer;
-	class as_environmnet;
+    class action_buffer;
+    class as_environmnet;
+    class as_object;
 }
 
 namespace gnash {

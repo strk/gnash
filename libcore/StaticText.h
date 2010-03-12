@@ -22,7 +22,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h" // for inheritance
-#include "DisplayObject.h"
 #include "swf/DefineTextTag.h"
 
 #include <vector>
