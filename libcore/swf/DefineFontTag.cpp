@@ -23,6 +23,7 @@
 #include "Font.h"
 #include "RunResources.h"
 #include "SWF.h"
+#include "smart_ptr.h"
 #include "movie_definition.h"
 #include "ShapeRecord.h"
 #include "log.h"
