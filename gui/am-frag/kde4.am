@@ -33,32 +33,31 @@ endif
 
 bin_PROGRAMS += kde4-gnash
 
+kde4_gnash_SOURCES = Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
+
+
 kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" $(AM_CPPFLAGS) $(KDE4_CFLAGS) $(QT4_CFLAGS)
-kde4_gnash_SOURCES = $(GUI_SRCS) GuiKde4.cpp
+kde4_gnash_SOURCES += $(GUI_SRCS) GuiKde4.cpp
 kde4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 kde4_gnash_LDADD = $(MYSQL_LIBS) $(GNASH_LIBS) $(AM_LDFLAGS) $(KDE4_LIBS)
 
 if BUILD_OGL_RENDERER
+kde4_gnash_SOURCES += Kde4GlueOgl.cpp Kde4GlueOgl.h
 kde4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-kde4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
+kde4_gnash_LDADD   += $(top_builddir)/librender/libgnashrender.la \
 	$(QT4_LIBS) $(OGL_LIBS) -lQtOpenGL
-kde4_gnash_SOURCES += Kde4GlueOgl.cpp Kde4GlueOgl.h \
-	 	Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
 endif                           # BUILD_OGL_RENDERER
 
 if BUILD_CAIRO_RENDERER
 kde4_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
 kde4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
 	$(QT4_LIBS) $(CAIRO_LIBS)
-kde4_gnash_SOURCES += Kde4GlueCairo.cpp Kde4GlueCairo.h \
-	 	Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
+kde4_gnash_SOURCES += Kde4GlueCairo.cpp Kde4GlueCairo.h
 endif                           # BUILD_CAIRO_RENDERER
 
 if BUILD_AGG_RENDERER
+kde4_gnash_SOURCES += Kde4GlueAgg.cpp Kde4GlueAgg.h
 kde4_gnash_CPPFLAGS += $(AGG_CFLAGS)
 kde4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
 	$(QT4_LIBS) $(AGG_LIBS)
-kde4_gnash_SOURCES += Kde4GlueAgg.cpp Kde4GlueAgg.h \
-	 	Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
-
 endif
