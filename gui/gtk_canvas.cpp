@@ -267,7 +267,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
                 // Set the hardware acclerator to the next one to try
                 // if initializing fails.
                 next_hwaccel = "xv";
-            } else if {
+            }
 #endif
 	    if (hwaccel == "xv") {
                 // Use the X11 XV extension, which works on most GPUs.
