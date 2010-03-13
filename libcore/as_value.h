@@ -22,18 +22,15 @@
 #include "dsodefs.h"
 #include "CharacterProxy.h"
 
-#include <cmath>
 #include <limits>
 #include <string>
 #include <boost/variant.hpp>
 #include <ostream> // for inlined output operator
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/cstdint.hpp>
 
 #include "utility.h" // UNUSED
-#include "string_table.h"
 
 // Forward declarations
 namespace gnash {

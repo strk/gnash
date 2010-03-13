@@ -42,6 +42,7 @@ namespace gnash {
     class CodeStream;
     class VM;
     template <typename T> class FunctionArgs;
+    class string_table;
 }
 
 

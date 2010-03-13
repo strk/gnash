@@ -35,6 +35,7 @@ class DisplayObject;
 class VM;
 class Global_as;
 class movie_root;
+class string_table;
 
 /// ActionScript execution environment.
 class as_environment
