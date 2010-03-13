@@ -23,11 +23,9 @@
 #include "gnashconfig.h"
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "string_table.h"
 #include "GC.h" // for inheritance from GcResource (to complete)
 #include "PropertyList.h"
-#include "smart_ptr.h"
 #include "PropFlags.h"
 #include "Relay.h"
 #include "ObjectURI.h"

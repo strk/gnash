@@ -29,7 +29,6 @@
 #include "MediaHandler.h" 
 #include "gui.h"
 #include "movie_definition.h" 
-#include "smart_ptr.h"
 #include "movie_root.h"
 #include "RunResources.h"
 

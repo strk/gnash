@@ -9,6 +9,7 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
+#include "smart_ptr.h"
 #include "Font.h"
 #include "log.h"
 #include "DefineShapeTag.h"

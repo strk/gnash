@@ -24,7 +24,6 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "event_id.h" // for inlines
 #include "as_object.h" // for inheritance
 #include "SWFRect.h" // for composition (invalidated bounds)

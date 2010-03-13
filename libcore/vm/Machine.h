@@ -24,7 +24,6 @@
 #include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
-#include "fn_call.h"
 #include "log.h"
 
 namespace gnash {
@@ -42,6 +41,7 @@ namespace gnash {
     class Property;
     class CodeStream;
     class VM;
+    template <typename T> class FunctionArgs;
 }
 
 
@@ -297,7 +297,7 @@ private:
 
 	void print_scope_stack();
 
-	void get_args(size_t argc, fn_call::Args& args);
+	void get_args(size_t argc, FunctionArgs<as_value>& args);
 	
 	void load_function(CodeStream* stream, boost::uint32_t maxRegisters);
 

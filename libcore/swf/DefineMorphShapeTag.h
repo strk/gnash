@@ -23,7 +23,6 @@
 #ifndef GNASH_SWF_MORPH_SHAPE_H
 #define GNASH_SWF_MORPH_SHAPE_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "SWF.h"
 #include "ShapeRecord.h"
 #include "DefinitionTag.h"

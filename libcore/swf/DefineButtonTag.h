@@ -21,7 +21,6 @@
 #ifndef GNASH_SWF_DEFINEBUTTONTAG_H
 #define GNASH_SWF_DEFINEBUTTONTAG_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "DefinitionTag.h"
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition

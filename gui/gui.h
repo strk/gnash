@@ -27,7 +27,6 @@
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "GnashKey.h" // for gnash::key::code type
 #include "Renderer.h" // for gnash::key::code type
-#include "smart_ptr.h"
 #include "VirtualClock.h"
 #include "SystemClock.h"
 #include "gnash.h" // for Quality

@@ -10,7 +10,6 @@
 #define GNASH_SHAPE_CHARACTER_DEF_H
 
 #include "DefinitionTag.h" // for inheritance of DefineShapeTag
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "SWF.h"
 #include "ShapeRecord.h"
 

@@ -25,15 +25,15 @@
 #define __STDC_CONSTANT_MACROS
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "MediaParser.h"
-#include "as_function.h" // for visibility of destructor by intrusive_ptr
 #include "PlayHead.h" // for composition
 
 #include "VideoDecoder.h" // for visibility of dtor
 #include "AudioDecoder.h" // for visibility of dtor
 
 #include "VirtualClock.h"
+
+#include "Relay.h" // for ActiveRelay inheritance
 
 #include <boost/intrusive_ptr.hpp>
 #include <string>
@@ -45,6 +45,9 @@ namespace gnash {
     class CharacterProxy;
     class IOChannel;
     class NetConnection_as;
+    class as_function;
+    class DisplayObject;
+    class ObjectURI;
     namespace media {
         class MediaHandler;
     }

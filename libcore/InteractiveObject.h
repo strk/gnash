@@ -19,7 +19,6 @@
 #ifndef GNASH_INTERACTIVE_DISPLAY_OBJECT_H
 #define GNASH_INTERACTIVE_DISPLAY_OBJECT_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h" // for inheritance
 #include "log.h"
 

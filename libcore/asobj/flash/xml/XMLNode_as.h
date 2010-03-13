@@ -22,7 +22,6 @@
 
 
 #include "as_object.h"
-#include "smart_ptr.h" // GNASH_USE_GC
 
 #include <list>
 #include <string>
