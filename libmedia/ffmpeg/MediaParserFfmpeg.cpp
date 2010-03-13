@@ -334,171 +334,154 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<IOChannel> stream)
 void
 MediaParserFfmpeg::initializeParser()
 {
-	av_register_all(); // TODO: needs to be invoked only once ?
+    av_register_all(); // TODO: needs to be invoked only once ?
 
-	_byteIOCxt.buffer = NULL;
-
-	_inputFmt = probeStream();
+    _byteIOCxt.buffer = NULL;
+    
+    _inputFmt = probeStream();
 #ifdef GNASH_ALLOW_VCODEC_ENV	
-	if ( ! _inputFmt )
-	{
-	  char* defcodec = getenv("GNASH_DEFAULT_VCODEC");
-	  if (defcodec && strlen(defcodec))
-      _inputFmt = av_find_input_format(defcodec);	
-
-  }
+    if ( ! _inputFmt ) {
+	char* defcodec = getenv("GNASH_DEFAULT_VCODEC");
+	if (defcodec && strlen(defcodec))
+	    _inputFmt = av_find_input_format(defcodec);	
+	
+    }
 #endif	
-	if ( ! _inputFmt )
+    if ( ! _inputFmt ) {
+	throw MediaException("MediaParserFfmpeg couldn't figure out input "
+			     "format");
+    }
+    
+    _formatCtx = av_alloc_format_context();
+    assert(_formatCtx);
+    
+    // Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
+    // which isn't needed.
+    _byteIOBuffer.reset( new unsigned char[byteIOBufferSize] );
+    init_put_byte(&_byteIOCxt,
+		  _byteIOBuffer.get(), // buffer
+		  byteIOBufferSize, // buffer size
+		  0, // write flags
+		  this, // opaque pointer to pass to the callbacks
+		  MediaParserFfmpeg::readPacketWrapper, // packet reader callback
+		  NULL, // packet writer callback
+		  MediaParserFfmpeg::seekMediaWrapper // seeker callback
+		  );
+    
+    _byteIOCxt.is_streamed = 1;
+    
+    // Open the stream. the 4th argument is the filename, which we ignore.
+    if(av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, NULL) < 0) {
+	throw IOException("MediaParserFfmpeg couldn't open input stream");
+    }
+    
+    log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d", _inputFmt->name, _formatCtx->nb_streams);
+    
+    if ( _formatCtx->title[0] )     log_debug(_("  Title:'%s'"), _formatCtx->title);
+    if ( _formatCtx->author[0] )    log_debug(_("  Author:'%s'"), _formatCtx->author);
+    if ( _formatCtx->copyright[0] ) log_debug(_("  Copyright:'%s'"), _formatCtx->copyright);
+    if ( _formatCtx->comment[0] )   log_debug(_("  Comment:'%s'"), _formatCtx->comment);
+    if ( _formatCtx->album[0] )     log_debug(_("  Album:'%s'"), _formatCtx->album);
+    
+    // Find first audio and video stream
+    for (unsigned int i = 0; i < static_cast<unsigned int>(_formatCtx->nb_streams); i++)
 	{
-		throw MediaException("MediaParserFfmpeg couldn't figure out input "
-                "format");
-	}
-
-	_formatCtx = av_alloc_format_context();
-	assert(_formatCtx);
-
-	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
-	// which isn't needed.
-	_byteIOBuffer.reset( new unsigned char[byteIOBufferSize] );
-	init_put_byte(&_byteIOCxt,
-		_byteIOBuffer.get(), // buffer
-		byteIOBufferSize, // buffer size
-		0, // write flags
-		this, // opaque pointer to pass to the callbacks
-		MediaParserFfmpeg::readPacketWrapper, // packet reader callback
-		NULL, // packet writer callback
-		MediaParserFfmpeg::seekMediaWrapper // seeker callback
-		);
-
-	_byteIOCxt.is_streamed = 1;
-
-	// Open the stream. the 4th argument is the filename, which we ignore.
-	if(av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, NULL) < 0)
-	{
-		throw IOException("MediaParserFfmpeg couldn't open input stream");
-	}
-
-	log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d", _inputFmt->name, _formatCtx->nb_streams);
-
-	if ( _formatCtx->title[0] )     log_debug(_("  Title:'%s'"), _formatCtx->title);
-	if ( _formatCtx->author[0] )    log_debug(_("  Author:'%s'"), _formatCtx->author);
-	if ( _formatCtx->copyright[0] ) log_debug(_("  Copyright:'%s'"), _formatCtx->copyright);
-	if ( _formatCtx->comment[0] )   log_debug(_("  Comment:'%s'"), _formatCtx->comment);
-	if ( _formatCtx->album[0] )     log_debug(_("  Album:'%s'"), _formatCtx->album);
-
-	// Find first audio and video stream
-	for (unsigned int i = 0; i < static_cast<unsigned int>(_formatCtx->nb_streams); i++)
-	{
-		AVStream* stream = _formatCtx->streams[i];
-		if ( ! stream ) 
-		{
-			log_debug("Stream %d of FFMPEG media file is null ?", i);
-			continue;
+	    AVStream* stream = _formatCtx->streams[i];
+	    if ( ! stream ) {
+		log_debug("Stream %d of FFMPEG media file is null ?", i);
+		continue;
+	    }
+	    
+	    AVCodecContext* enc = stream->codec; 
+	    if ( ! enc ) {
+		log_debug("Stream %d of FFMPEG media file has no codec info", i);
+		continue;
+	    }
+	    
+	    switch (enc->codec_type) {
+	    case CODEC_TYPE_AUDIO:
+		if (_audioStreamIndex < 0) {
+		    _audioStreamIndex = i;
+		    _audioStream = _formatCtx->streams[i];
+		    log_debug(_("  Using stream %d for audio: codec id %d"),
+			      i, _audioStream->codec->codec_id);
+		    // codec_name will only be filled by avcodec_find_decoder (later);
 		}
-
-		AVCodecContext* enc = stream->codec; 
-		if ( ! enc ) 
-		{
-			log_debug("Stream %d of FFMPEG media file has no codec info", i);
-			continue;
-		}
-
-		switch (enc->codec_type)
-		{
-			case CODEC_TYPE_AUDIO:
-				if (_audioStreamIndex < 0)
-				{
-					_audioStreamIndex = i;
-					_audioStream = _formatCtx->streams[i];
-					log_debug(_("  Using stream %d for audio: codec id %d"),
-						i, _audioStream->codec->codec_id);
-					// codec_name will only be filled by avcodec_find_decoder (later);
-				}
-				break;
-
-			case CODEC_TYPE_VIDEO:
-				if (_videoStreamIndex < 0)
-				{
-					_videoStreamIndex = i;
-					_videoStream = _formatCtx->streams[i];
-					log_debug(_("  Using stream %d for video: codec id %d"),
-						i, _videoStream->codec->codec_id);
-					// codec_name will only be filled by avcodec_find_decoder (later);
-				}
-				break;
-			default:
-				break;
-		}
-	}
-
-	// Create VideoInfo
-	if ( _videoStream)
-	{
-		int codec = static_cast<int>(_videoStream->codec->codec_id); // originally an enum CodecID 
-		boost::uint16_t width = _videoStream->codec->width;
-		boost::uint16_t height = _videoStream->codec->height;
-		boost::uint16_t frameRate = static_cast<boost::uint16_t>(as_double(_videoStream->r_frame_rate));
-#if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
-		boost::uint64_t duration = _videoStream->codec_info_duration;
-#else
-		boost::uint64_t duration = _videoStream->duration;
-#endif
-        if ( duration == AV_NOPTS_VALUE )
-        {
-            log_error("Duration of video stream unknown");
-            duration=0; // TODO: guess!
-        }
-        else
-        {
-            duration = duration / as_double(_videoStream->time_base); // TODO: check this
-        }
-
-		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, CUSTOM /*codec type*/) );
+		break;
 		
-		_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(
-			// NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
-			(uint8_t*)_videoStream->codec->extradata,
-			_videoStream->codec->extradata_size));
-
-		//log_debug("EXTRA: %d bytes of video extra data", _videoStream->codec->extradata_size);
+	    case CODEC_TYPE_VIDEO:
+		if (_videoStreamIndex < 0) {
+		    _videoStreamIndex = i;
+		    _videoStream = _formatCtx->streams[i];
+		    log_debug(_("  Using stream %d for video: codec id %d"),
+			      i, _videoStream->codec->codec_id);
+		    // codec_name will only be filled by avcodec_find_decoder (later);
+		}
+		break;
+	    default:
+		break;
+	    }
 	}
-
-	// Create AudioInfo
-	if ( _audioStream)
-	{
-		int codec = static_cast<int>(_audioStream->codec->codec_id); // originally an enum CodecID 
-		boost::uint16_t sampleRate = _audioStream->codec->sample_rate;
-		boost::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
-		bool stereo = (_audioStream->codec->channels == 2);
+    
+    // Create VideoInfo
+    if ( _videoStream) {
+	int codec = static_cast<int>(_videoStream->codec->codec_id); // originally an enum CodecID 
+	boost::uint16_t width = _videoStream->codec->width;
+	boost::uint16_t height = _videoStream->codec->height;
+	boost::uint16_t frameRate = static_cast<boost::uint16_t>(as_double(_videoStream->r_frame_rate));
 #if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
-		boost::uint64_t duration = _audioStream->codec_info_duration;
+	boost::uint64_t duration = _videoStream->codec_info_duration;
 #else
-		boost::uint64_t duration = _audioStream->duration;
+	boost::uint64_t duration = _videoStream->duration;
 #endif
-        if ( duration == AV_NOPTS_VALUE )
-        {
-            log_error("Duration of audio stream unknown to ffmpeg");
-            duration=0; // TODO: guess!
+        if ( duration == AV_NOPTS_VALUE ) {
+	    log_error("Duration of video stream unknown");
+	    duration=0; // TODO: guess!
+        } else {
+	    duration = duration / as_double(_videoStream->time_base); // TODO: check this
         }
-        else
-        {
-            duration = duration / as_double(_audioStream->time_base); // TODO: check this
-        }
-
-		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, CUSTOM /*codec type*/) );
-
-		_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(
-			// NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
-			(uint8_t*)_audioStream->codec->extradata,
-			_audioStream->codec->extradata_size));
-
-		//log_debug("EXTRA: %d bytes of audio extra data", _videoStream->codec->extradata_size);
+	
+	_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, CUSTOM /*codec type*/) );
+	
+	_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(
+							 // NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
+							 (uint8_t*)_videoStream->codec->extradata,
+							 _videoStream->codec->extradata_size));
+	
+	//log_debug("EXTRA: %d bytes of video extra data", _videoStream->codec->extradata_size);
+    }
+    
+    // Create AudioInfo
+    if ( _audioStream) {
+	int codec = static_cast<int>(_audioStream->codec->codec_id); // originally an enum CodecID 
+	boost::uint16_t sampleRate = _audioStream->codec->sample_rate;
+	boost::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
+	bool stereo = (_audioStream->codec->channels == 2);
+#if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
+	boost::uint64_t duration = _audioStream->codec_info_duration;
+#else
+	boost::uint64_t duration = _audioStream->duration;
+#endif
+        if ( duration == AV_NOPTS_VALUE ) {
+	    log_error("Duration of audio stream unknown to ffmpeg");
+	    duration=0; // TODO: guess!
+	} else {
+	    duration = duration / as_double(_audioStream->time_base); // TODO: check this
 	}
-
-
+	
+	_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, CUSTOM /*codec type*/) );
+	
+	_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(
+							 // NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
+							 (uint8_t*)_audioStream->codec->extradata,
+							 _audioStream->codec->extradata_size));
+	
+	//log_debug("EXTRA: %d bytes of audio extra data", _videoStream->codec->extradata_size);
+    }
+    
+    
 }
-
-
+    
 MediaParserFfmpeg::~MediaParserFfmpeg()
 {
 	stopParserThread();
