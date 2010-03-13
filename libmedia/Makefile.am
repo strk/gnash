@@ -46,6 +46,7 @@ libgnashmedia_la_CPPFLAGS = \
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
 libgnashmedia_la_LIBADD = \
+	$(FFMPEG_LIBS) \
 	$(PNG_LIBS) \
 	$(JPEG_LIBS) \
 	$(GIF_LIBS) \
