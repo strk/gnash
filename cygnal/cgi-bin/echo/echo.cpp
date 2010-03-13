@@ -222,7 +222,7 @@ EchoTest::parseEchoRequest(boost::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    AMF amf;
+    amf::AMF amf;
     vector<boost::shared_ptr<amf::Element > > headers;
 
     // The first element is the name of the test, 'echo'
