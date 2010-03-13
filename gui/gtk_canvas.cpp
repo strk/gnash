@@ -233,8 +233,10 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
     while (!initialized_renderer) {
         renderer = next_renderer;
         hwaccel = next_hwaccel;
+#ifdef USE_VAAPI
         // Global enable VA-API, if requested
         gnash::vaapi_set_is_enabled(hwaccel == "vaapi");
+#endif
         // Use the Cairo renderer. Cairo is also used by GTK2, so using
         // Cairo makes much sense. Unfortunately, our implementation seems
         // to have serious performance issues, although it does work.
@@ -259,20 +261,21 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         else if (renderer == "agg") {
             // Use LibVva, which works on Nvidia, AT, or Intel 965 GPUs
             // with AGG or OpenGL.
+#ifdef USE_VAAPI
             if (hwaccel == "vaapi") {
                 canvas->glue.reset(new gnash::GtkAggVaapiGlue);
                 // Set the hardware acclerator to the next one to try
                 // if initializing fails.
                 next_hwaccel = "xv";
-            }
-            else if (hwaccel == "xv") {
+            } else if {
+#endif
+	    if (hwaccel == "xv") {
                 // Use the X11 XV extension, which works on most GPUs.
                 canvas->glue.reset(new gnash::GtkAggXvGlue);
                 // Set the hardware acclerator to the next one to try
                 // if initializing fails.
                 next_hwaccel = "none";
-            }
-            else {
+            } else {
                 canvas->glue.reset(new gnash::GtkAggGlue);
             }
         }

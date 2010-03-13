@@ -78,7 +78,9 @@ extern "C" {
 # include <hildon/hildon.h>
 #endif
 
+#ifdef USE_VAAPI
 extern VAStatus va_getDriverName(VADisplay dpy, char **driver_name);
+#endif
 
 namespace gnash 
 {
