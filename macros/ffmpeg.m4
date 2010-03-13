@@ -335,7 +335,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   dnl Try with pkg-config (if not cross-compiling)
   if test x"${cross_compiling}" = xno; then
     if test x"$PKG_CONFIG" != x -a x"${libavcodec}" = x; then
-      $PKG_CONFIG --exists libavcodec && libavcodec=`$PKG_CONFIG --libs-only-l libavcodec`
+      $PKG_CONFIG --exists libavcodec && libavcodec=`$PKG_CONFIG --libs libavcodec`
       dnl
       dnl WARNING: we won't be able to set top_lib_dir here, as pkg-config doesn't
       dnl          return any -L when not neeed.
