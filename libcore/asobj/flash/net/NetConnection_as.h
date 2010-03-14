@@ -20,7 +20,7 @@
 #ifndef GNASH_NETCONNECTION_H
 #define GNASH_NETCONNECTION_H
 
-#include "as_object.h" // for inheritance
+#include "Relay.h" // for inheritance
 
 #include <vector>
 #include <string>
@@ -28,7 +28,8 @@
 
 // Forward declarations
 namespace gnash {
-	class ConnectionHandler;
+    class ConnectionHandler;
+    class as_object;
 }
 
 namespace gnash {

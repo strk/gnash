@@ -22,7 +22,11 @@
 #define GNASH_ASOBJ_COLORTRANSFORM_H
 
 
-#include "as_object.h"
+#include "Relay.h"
+
+namespace gnash {
+    class as_object;
+}
 
 namespace gnash {
 

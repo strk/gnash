@@ -20,9 +20,10 @@
 #ifndef GNASH_ASOBJ3_TEXTSNAPSHOT_H
 #define GNASH_ASOBJ3_TEXTSNAPSHOT_H
 
-
-#include "as_object.h"
-
+namespace gnash {
+    class as_object;
+    class ObjectURI;
+}
 
 namespace gnash {
 

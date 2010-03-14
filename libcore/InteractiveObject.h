@@ -21,6 +21,7 @@
 
 #include "DisplayObject.h" // for inheritance
 #include "log.h"
+#include "as_object.h" // for getRoot()
 
 #include <vector>
 #include <cassert>

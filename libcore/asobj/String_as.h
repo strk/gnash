@@ -22,7 +22,7 @@
 #define GNASH_STRING_H
 
 #include <string>
-#include "as_object.h"
+#include "Relay.h"
 
 namespace gnash {
 

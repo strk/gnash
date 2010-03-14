@@ -20,12 +20,15 @@
 #ifndef GNASH_ASOBJ3_XMLNODE_H
 #define GNASH_ASOBJ3_XMLNODE_H
 
-
-#include "as_object.h"
-
 #include <list>
 #include <string>
 #include <sstream>
+
+#include "Relay.h"
+
+namespace gnash {
+    class as_object;
+}
 
 namespace gnash {
 

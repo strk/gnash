@@ -21,9 +21,10 @@
 #ifndef GNASH_ASOBJ_BITMAPDATA_H
 #define GNASH_ASOBJ_BITMAPDATA_H
 
+#include "Relay.h"
+
 #include <list>
 #include <vector>
-#include "as_object.h"
 
 namespace gnash {
 

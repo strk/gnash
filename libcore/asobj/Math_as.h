@@ -20,7 +20,9 @@
 #ifndef GNASH_ASOBJ_MATH_H
 #define GNASH_ASOBJ_MATH_H
 
-#include "as_object.h"
+namespace gnash {
+    class as_object;
+}
 
 namespace gnash {
 
