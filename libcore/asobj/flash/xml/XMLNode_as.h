@@ -23,11 +23,14 @@
 #include <list>
 #include <string>
 #include <sstream>
+#include <cassert>
 
 #include "Relay.h"
 
 namespace gnash {
     class as_object;
+    class Global_as;
+    class ObjectURI;
 }
 
 namespace gnash {

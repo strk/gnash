@@ -34,6 +34,7 @@
 #include "log.h"
 #include "utility.h"
 #include "Range2d.h"
+#include "cxform.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #  include <Windows.h>

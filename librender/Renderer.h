@@ -149,16 +149,16 @@
 
 #include "FileTypes.h"
 #include "gnash.h" // Quality
-#include "DisplayObject.h"
 #include "Range2d.h"
 #include "Point2d.h"
 #include "RGBA.h"
 #include "log.h"
+#include "snappingrange.h"
+#include "SWFRect.h"
 
 // Forward declarations.
 namespace gnash {
     class BitmapInfo;
-    class SWFRect;
     class rgba;
     class SWFMatrix;
     class cxform;
@@ -389,14 +389,18 @@ public:
     typedef boost::shared_ptr<GnashVaapiImageProxy> RenderImage;
     typedef std::vector<RenderImage> RenderImages;
 
+    // Get first render image
     virtual RenderImages::iterator getFirstRenderImage()
-      { return RenderImages::iterator(0); }
+            { return _render_images.begin(); }
     virtual RenderImages::const_iterator getFirstRenderImage() const
-      { return RenderImages::const_iterator(0); }
+            { return _render_images.begin(); }
+
+    // Get last render image
     virtual RenderImages::iterator getLastRenderImage()
-      { return RenderImages::iterator(0); }
+            { return _render_images.end(); }
     virtual RenderImages::const_iterator getLastRenderImage() const
-      { return RenderImages::const_iterator(0); }
+            { return _render_images.end(); }
+    
     ///@}
         
     ///@{ Masks
@@ -606,6 +610,8 @@ protected:
     /// Kept in parallel with movie_root's setting.
     Quality _quality;
 
+    // Delayed imaged to render
+    RenderImages _render_images;
 }; 
 
 } // namespace gnash

@@ -25,11 +25,15 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <memory>
 
 // Forward declarations
 namespace gnash {
     class ConnectionHandler;
     class as_object;
+    class as_value;
+    class IOChannel;
+    class ObjectURI;
 }
 
 namespace gnash {

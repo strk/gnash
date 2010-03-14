@@ -22,6 +22,7 @@
 
 
 #include "smart_ptr.h" //GNASH_USE_GC
+#include "Relay.h"
 
 #include <string>
 #include <boost/scoped_ptr.hpp>
@@ -45,6 +46,7 @@ class CharacterProxy;
 	class fn_call;
 	class as_object;
     class ObjectURI;
+    class DisplayObject;
 
 class Sound_as : public ActiveRelay
 {

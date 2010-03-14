@@ -26,6 +26,7 @@
 
 namespace gnash {
     class as_object;
+    class ObjectURI;
 }
 
 namespace gnash {

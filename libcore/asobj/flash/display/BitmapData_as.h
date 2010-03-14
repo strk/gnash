@@ -25,6 +25,8 @@
 
 #include <list>
 #include <vector>
+#include <boost/cstdint.hpp>
+#include <cassert>
 
 namespace gnash {
 

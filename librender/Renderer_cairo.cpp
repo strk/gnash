@@ -44,6 +44,7 @@
 #include "PathParser.h"
 #include "swf/ShapeRecord.h"
 #include "Renderer_cairo.h"
+#include "utility.h"
 
 namespace gnash {
 

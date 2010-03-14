@@ -121,13 +121,12 @@ AGG resources
 #include "Renderer.h"
 #include "Renderer_agg.h" 
 #include "Range2d.h"
-#include "swf/DefineMorphShapeTag.h" 
+#include "smart_ptr.h"
 #include "swf/ShapeRecord.h" 
 #include "DefineShapeTag.h" 
-#include "DisplayObject.h"
-#include "MorphShape.h"
-#include "Shape.h"
 #include "GnashNumeric.h"
+#include "GC.h"
+#include "cxform.h"
 
 #if USE_VAAPI
 #include "GnashVaapiImage.h"
@@ -920,19 +919,6 @@ public:
             disable_mask();      
         }
     }
-
-    // Get first render image
-    virtual RenderImages::iterator getFirstRenderImage()
-        { return _render_images.begin(); }
-    virtual RenderImages::const_iterator getFirstRenderImage() const
-        { return _render_images.begin(); }
-
-    // Get last render image
-    virtual RenderImages::iterator getLastRenderImage()
-        { return _render_images.end(); }
-    virtual RenderImages::const_iterator getLastRenderImage() const
-        { return _render_images.end(); }
-  
 
     // Draw the line strip formed by the sequence of points.
     void drawLine(const std::vector<point>& coords, const rgba& color,
@@ -2185,9 +2171,6 @@ private:  // private variables
 
     // renderer base
     std::auto_ptr<renderer_base> m_rbase;
-
-    // Delayed imaged to render
-    RenderImages _render_images;
 
     int xres;
     int yres;

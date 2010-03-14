@@ -28,6 +28,7 @@
 namespace gnash {
 	class NetStream_as;
     class GnashImage;
+    class ObjectURI;
     namespace SWF {
         class DefineVideoStreamTag;
     }
