@@ -304,11 +304,6 @@ main (int /*argc*/, char** /*argv*/) {
             }
         }
 
-        if (rc.useXv() == true) {
-            runtest.pass ("Xvideo on by local.rc");
-        } else {
-            runtest.fail ("Xvideo on by local.rc");
-        }
     }
 
     if (rc.getURLOpenerFormat() == "lynx %u") {

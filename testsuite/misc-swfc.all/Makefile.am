@@ -72,11 +72,17 @@ GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 
+if LIBLTDL2
+GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
+endif
+if LIBLTDL1
+GNASH_LIBS += $(top_builddir)/libbase/libltdlc.la
+endif
+
 # These will get compiled to SWFs just as above, but will not be executed as a test
 # They are for secondary movies to be loaded by the above tests.
 AUXMOVIES = \
 	    $(NULL)
-
 
 EXTRA_DIST = $(SANE_SCTESTS) $(BOGO_SCTESTS) $(AUXMOVIES) $(INTERACTIVE_SCTESTS) check.sc Dejagnu.sc hello.sc
 

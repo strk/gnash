@@ -50,8 +50,6 @@
 
 namespace gnash {
 
-
-
 // Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
 rgb_to_cairo_rgb24(boost::uint8_t* dst, const GnashImage* im)

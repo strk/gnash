@@ -133,6 +133,7 @@ AGG resources
 #include "GnashVaapiImageProxy.h"
 #endif
 
+#include <climits>
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
 #include <agg_pixfmt_rgb.h>
@@ -173,9 +174,8 @@ AGG resources
 
 #include <boost/scoped_array.hpp>
 #include <boost/bind.hpp>
-
 #ifndef round
-	#define round(x) rint(x)
+#  define round(x) rint(x)
 #endif
 
 // Print a debugging warning when rendering of a whole character

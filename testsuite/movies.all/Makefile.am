@@ -52,11 +52,19 @@ AM_LDFLAGS = \
 	$(OPENGL_LIBS) \
 	$(NULL)
 
+if LIBLTDL2
+AM_LDFLAGS += $(top_builddir)/libltdl/libltdlc.la
+endif
+if LIBLTDL1
+AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
+endif
+
 gravity_embedded_TestRunner_SOURCES = \
 	gravity_embedded-TestRunner.cpp \
 	$(NULL)
 gravity_embedded_TestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
 gravity_embedded_TestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
