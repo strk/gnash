@@ -278,6 +278,9 @@ main(int /*argc*/, char** /*argv*/)
        check_equals (u2.querystring(), "");
        check_equals (u2.anchor(), "anchor");
     }
+    { // pseudo-url from Mozilla
+        URL u("about:blank");
+    }
 
 
 	// TODO: Samba paths
