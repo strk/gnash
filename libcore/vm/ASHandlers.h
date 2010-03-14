@@ -19,9 +19,7 @@
 #define GNASH_ASHANDLERS_H
 
 #include <string>
-#include <map>
 #include <vector>
-#include "SWF.h"
 
 
 // Forward declarations

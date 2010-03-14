@@ -21,6 +21,7 @@
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
+#include "RunResources.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DefineButtonTag.h"
 #include "DisplayObject.h"

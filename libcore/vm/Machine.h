@@ -19,14 +19,12 @@
 #ifndef GNASH_MACHINE_H
 #define GNASH_MACHINE_H
 
+#include <string>
 #include <vector>
 #include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
-#include "SWF.h"
-#include "as_environment.h"
-#include "VM.h"
-#include "fn_call.h"
+#include "log.h"
 
 namespace gnash {
     namespace abc {
@@ -42,6 +40,9 @@ namespace gnash {
     class as_object;
     class Property;
     class CodeStream;
+    class VM;
+    template <typename T> class FunctionArgs;
+    class string_table;
 }
 
 
@@ -297,7 +298,7 @@ private:
 
 	void print_scope_stack();
 
-	void get_args(size_t argc, fn_call::Args& args);
+	void get_args(size_t argc, FunctionArgs<as_value>& args);
 	
 	void load_function(CodeStream* stream, boost::uint32_t maxRegisters);
 

@@ -24,6 +24,7 @@
 #include "smart_ptr.h" //GNASH_USE_GC
 #include "as_object.h"
 
+#include <string>
 #include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/thread/mutex.hpp>

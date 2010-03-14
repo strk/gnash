@@ -22,7 +22,7 @@
 #include "SWF.h" // for TagType definition
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition 
-#include "DisplayObject.h" // BlendMode enum
+#include <string>
 #include <vector>
 
 // Forward declarations

@@ -23,6 +23,7 @@
 #include "gtk_glue.h"
 #include "MediaHandler.h"
 
+#include <string>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <boost/scoped_array.hpp>

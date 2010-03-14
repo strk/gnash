@@ -37,8 +37,7 @@
 #include "StringPredicates.h"
 #include "Global_as.h"
 #include "String_as.h"
-#include "AMF.h"
-
+#include "AMFConverter.h"
 
 #include <boost/shared_ptr.hpp>
 #include <cmath> 

@@ -32,9 +32,10 @@
 #include "DisplayObjectContainer.h"
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
-#include "Range2d.h"
+#include "snappingrange.h"
 #include "dsodefs.h" // for DSOEXPORT
 
+#include <boost/intrusive_ptr.hpp>
 #include <vector>
 #include <list>
 #include <map>
@@ -50,6 +51,7 @@ namespace gnash {
     class TextField;
     class BitmapData_as;
     class BitmapInfo;
+    class GnashImage;
     namespace SWF {
         class PlaceObject2Tag;
     }
@@ -496,7 +498,7 @@ public:
     // Set TextField variables
     //
     /// TODO: this is also unlikely to be the best way to do it.
-    bool setTextFieldVariables(const ObjectURI& uri, const as_value& val);;
+    bool setTextFieldVariables(const ObjectURI& uri, const as_value& val);
 
     /// Search for a named object on the DisplayList
     //

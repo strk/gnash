@@ -16,8 +16,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # 
-# build gtk-gnash, kde-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash, riscos-gnash
-# and dump-gnash
+# build gtk-gnash, kde-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash,
+# riscos-gnash, haiku-gnash and dump-gnash
 #
 
 AUTOMAKE_OPTIONS = -Wno-portability
@@ -33,7 +33,7 @@ pluginsdir = $(libdir)/gnash/plugins
 # noinst_LTLIBRARIES = libgnashgui.la
 BUILT_SOURCES = .configline
 
-EXTRA_DIST = gnash.in klash3.moc.in klash4.moc.in
+EXTRA_DIST = gnash.in klash3.moc.in klash4.moc.in am-frag
 
 # If python support is enabled, built that too
 if HAS_PYTHON
@@ -45,7 +45,6 @@ noinst_HEADERS =
 noinst_LTLIBRARIES = #libgnashgui.la
 AM_CPPFLAGS = \
         -I../.. \
-        -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/swf \
@@ -59,6 +58,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libmedia/ffmpeg \
 	-I$(top_srcdir)/libmedia/gst \
+	-I$(top_srcdir)/libmedia/haiku \
        -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
@@ -108,8 +108,6 @@ AM_LDFLAGS =  \
 	$(NULL)
 
 GNASH_LIBS = \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libsound/libgnashsound.la \
@@ -201,7 +199,7 @@ GUI_SRCS = gnash.cpp \
 
 if BUILD_AQUA_GUI
 BUILT_SOURCES += bundle
-EXTRA_DIST += Gnash.app am-frag
+EXTRA_DIST += Gnash.app
 endif
 
 # Build the QTOPIA gui
@@ -229,6 +227,11 @@ endif
 # Build the AmigaOS4 gui
 if BUILD_AMIGAOS4_GUI
 include $(srcdir)/am-frag/aos4.am
+endif
+
+# Build the Haiku gui
+if BUILD_HAIKU_GUI
+include $(srcdir)/am-frag/haiku.am
 endif
 
 # Build the FLTK gui

@@ -20,9 +20,7 @@
 #ifndef GNASH_ASOBJ3_XMLDOCUMENT_H
 #define GNASH_ASOBJ3_XMLDOCUMENT_H
 
-#include "LoadableObject.h"
 #include "xml/XMLNode_as.h"
-#include "log.h"
 #include "dsodefs.h"
 #include "StringPredicates.h"
 

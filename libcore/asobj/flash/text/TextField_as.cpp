@@ -18,6 +18,7 @@
 //
 
 
+#include "namedStrings.h"
 #include "text/TextField_as.h"
 #include "TextField.h"
 #include "log.h"
@@ -33,6 +34,7 @@
 #include "Movie.h"
 #include "fontlib.h"
 #include "utf8.h"
+#include "Font.h"
 
 namespace gnash {
 

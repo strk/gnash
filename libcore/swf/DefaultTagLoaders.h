@@ -20,8 +20,12 @@
 #define GNASH_SWF_DEFAULTLOADERS_H
 
 #include "dsodefs.h" //DSOEXPORT
-#include "SWF.h"
-#include "TagLoadersTable.h"
+
+namespace gnash {
+    namespace SWF {
+        class TagLoadersTable;
+    }
+}
 
 namespace gnash {
 namespace SWF {

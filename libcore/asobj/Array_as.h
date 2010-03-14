@@ -20,7 +20,6 @@
 #define GNASH_ARRAY_H
 
 #include "as_object.h" 
-#include "Global_as.h"
 
 // Forward declarations
 namespace gnash {

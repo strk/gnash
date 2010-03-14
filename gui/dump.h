@@ -25,6 +25,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "gui.h" // for inheritance
+#include <string>
 #include <fstream>
 #include <boost/scoped_array.hpp>
 

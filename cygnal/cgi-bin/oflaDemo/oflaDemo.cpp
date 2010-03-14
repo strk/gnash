@@ -392,7 +392,7 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
     GNASH_REPORT_FUNCTION;
 
     demoService demo;
-    AMF amf;
+    amf::AMF amf;
     vector<boost::shared_ptr<amf::Element > > headers;
 
     boost::shared_ptr<amf::Element> el1 = amf.extractAMF(ptr, ptr+size);

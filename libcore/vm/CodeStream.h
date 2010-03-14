@@ -19,6 +19,7 @@
 #ifndef GNASH_CODESTREAM_H
 #define GNASH_CODESTREAM_H
 
+#include <string>
 #include <boost/utility.hpp>
 #include <boost/cstdint.hpp>
 #include <istream>

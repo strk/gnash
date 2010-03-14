@@ -21,15 +21,13 @@
 #include "VideoConverter.h"
 #include "swfdec_codec_gst.h"
 
-
-
 #include <gst/gst.h>
 
 namespace gnash {
 namespace media {
 namespace gst {
 
-/// Base class for video image space conversion.
+/// Base class for video image space conversion with gst
 
 class VideoConverterGst : public VideoConverter {
 

@@ -1,8 +1,7 @@
 Source: gnash
 Priority: optional
 Maintainer: Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>
-Build-Depends: dpkg-dev (>= 1.13.19), debhelper (>= 7.0.0), autoconf, automake, libtool, libltdl3-dev, libxmu-dev, dejagnu, autotools-dev, libjpeg-dev, libpng12-dev | libpng-dev, libagg-dev, libpango1.0-dev | pango-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev | libcurl4-openssl-dev | libcurl3-openssl-dev, libboost1.40-dev | libboost1.39-dev | libboost1.38.0-dev | libboost1.37-dev | libboost1.36-dev | libboost1.35-dev | libboost1.34.1-dev | libboost-dev, libboost-thread1.40-dev | libboost-thread1.39-dev | libboost-thread1.38.0-dev | libboost-thread1.37-dev | libboost-thread1.36-dev | libboost-thread1.35-dev | libboost-thread1.34.1-dev | libboost-thread-dev, libboost-date-time1.40-dev | libboost-date-time1.39-dev | libboost-date-time1.38.0-dev | libboost-date-time1.37-dev | libboost-date-time1.36-dev | libboost-date-time1.35-dev | libboost-date-time1.34.1-dev | libboost-date-time-dev, libgtk2.0-dev, libpango1.0-dev, libatk1.0-dev, python2.6-dev | python2.5-dev | python2.4-dev, kdelibs5-dev, python-gtk2-dev, qt4-qmake, docbook, docbook2x, libgif-dev, gstreamer-plugins-base-dev | libgstreamer-plugins-base0.10-dev, libgstreamer0.10-dev | gstreamer0.10-dev
-## TODO: On Ub ubuntu for XV support I need: libxv-dev x11proto-video-dev
+Build-Depends: dpkg-dev (>= 1.13.19), debhelper (>= 7.0.0), autoconf, automake, libtool, libltdl3-dev, libxmu-dev, dejagnu, autotools-dev, libjpeg-dev, libpng12-dev | libpng-dev, libagg-dev, libpango1.0-dev | pango-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev | libcurl4-openssl-dev | libcurl3-openssl-dev, libboost1.40-dev | libboost1.39-dev | libboost1.38.0-dev | libboost1.37-dev | libboost1.36-dev | libboost1.35-dev | libboost1.34.1-dev | libboost-dev, libboost-thread1.40-dev | libboost-thread1.39-dev | libboost-thread1.38.0-dev | libboost-thread1.37-dev | libboost-thread1.36-dev | libboost-thread1.35-dev | libboost-thread1.34.1-dev | libboost-thread-dev, libboost-date-time1.40-dev | libboost-date-time1.39-dev | libboost-date-time1.38.0-dev | libboost-date-time1.37-dev | libboost-date-time1.36-dev | libboost-date-time1.35-dev | libboost-date-time1.34.1-dev | libboost-date-time-dev, libgtk2.0-dev, libpango1.0-dev, libatk1.0-dev, python2.6-dev | python2.5-dev | python2.4-dev, kdelibs5-dev, python-gtk2-dev, qt4-qmake, docbook, docbook2x, libgif-dev, gstreamer-plugins-base-dev | libgstreamer-plugins-base0.10-dev, libgstreamer0.10-dev | gstreamer0.10-dev, libsdl1.2-dev
 Standards-Version: 3.8.4
 Section: utils
 Homepage: http://www.gnu.org/software/gnash/
@@ -65,7 +64,7 @@ Description: free SWF movie player - standalone player for KDE
 Package: gnash-tools
 Section: utils
 Architecture: any
-Depends:  gnash-common (= ${binary:Version}),
+Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: free SWF movie player - Command-line Tools
  Gnash is a free Flash movie player, which works either standalone, or as

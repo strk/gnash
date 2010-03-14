@@ -20,7 +20,6 @@
 #define GNASH_SWF_DISPLAYLISTTAG_H
 
 #include "ControlTag.h" // for inheritance
-//#include "SWF.h" // for TagType definition
 
 
 // Forward declarations

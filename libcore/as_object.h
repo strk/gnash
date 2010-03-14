@@ -23,17 +23,15 @@
 #include "gnashconfig.h"
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "string_table.h"
 #include "GC.h" // for inheritance from GcResource (to complete)
 #include "PropertyList.h"
-#include "as_value.h" 
-#include "smart_ptr.h"
 #include "PropFlags.h"
-#include "GnashException.h"
 #include "Relay.h"
 #include "ObjectURI.h"
 
+#include <map>
+#include <vector>
 #include <cmath>
 #include <utility> 
 #include <set>
@@ -57,6 +55,7 @@ namespace gnash {
     class movie_root;
     class RunResources;
     class Global_as;
+    class as_value;
 }
 
 namespace gnash {

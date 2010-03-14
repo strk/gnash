@@ -52,6 +52,8 @@
 # include "MediaHandlerFfmpeg.h"
 #elif defined(USE_GST)
 # include "MediaHandlerGst.h"
+#elif defined(USE_HAIKU_ENGINE)
+# include "MediaHandlerHaiku.h"
 #endif
 
 #include "GnashSystemIOHeaders.h" // for write() 
@@ -177,38 +179,29 @@ Player::init_sound()
 {
 
     if (_doSound) {
+        try {
 #ifdef SOUND_SDL
-        try {
             _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
-        } catch (SoundException& ex) {
-            log_error(_("Could not create sound handler: %s."
-                " Will continue w/out sound."), ex.what());
-        }
-        if (! _audioDump.empty()) {
-            // add a silent stream to the audio pool so that our output file
-            // is homogenous;  we actually want silent wave data when no sounds
-            // are playing on the stage
-            _soundHandler->attach_aux_streamer(silentStream, (void*) this);
-        }
-#elif defined(SOUND_AHI)
-        try {
-            _soundHandler.reset(sound::create_sound_handler_aos4(_audioDump));
-        } catch (SoundException& ex) {
-            log_error(_("Could not create sound handler: %s."
-                " Will continue w/out sound."), ex.what());
-        }
-        if (! _audioDump.empty()) {
-            // add a silent stream to the audio pool so that our output file
-            // is homogenous;  we actually want silent wave data when no sounds
-            // are playing on the stage
-            _soundHandler->attach_aux_streamer(silentStream, (void*) this);
-        }
 #elif defined(SOUND_GST)
-        _soundHandler.reset(media::create_sound_handler_gst());
+            _soundHandler.reset(media::create_sound_handler_gst());
+#elif defined(SOUND_AHI)
+            _soundHandler.reset(sound::create_sound_handler_aos4(_audioDump));
+#elif defined(SOUND_MKIT)
+            _soundHandler.reset(sound::create_sound_handler_mkit(_audioDump));
 #else
-        log_error(_("Sound requested but no sound support compiled in"));
-        return;
+            log_error(_("Sound requested but no sound support compiled in"));
+            return;
 #endif
+        } catch (SoundException& ex) {
+            log_error(_("Could not create sound handler: %s."
+                " Will continue w/out sound."), ex.what());
+        }
+        if (! _audioDump.empty()) {
+            // add a silent stream to the audio pool so that our output file
+            // is homogenous;  we actually want silent wave data when no sounds
+            // are playing on the stage
+            _soundHandler->attach_aux_streamer(silentStream, (void*) this);
+        }
     }
 }
 
@@ -219,6 +212,8 @@ Player::init_media()
         _mediaHandler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
 #elif defined(USE_GST)
         _mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
+#elif defined(USE_HAIKU_ENGINE)
+        _mediaHandler.reset( new gnash::media::haiku::MediaHandlerHaiku() );
 #else
         log_error(_("No media support compiled in"));
         return;
@@ -794,6 +789,10 @@ Player::getGui()
 
 #ifdef GUI_AOS4
     return createAOS4Gui(_windowID, _scale, _doLoop, *_runResources);
+#endif
+
+#ifdef GUI_HAIKU
+    return createHaikuGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_DUMP

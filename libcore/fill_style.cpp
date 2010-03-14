@@ -19,6 +19,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
+#include "smart_ptr.h"
 #include "fill_style.h"
 #include "log.h"
 #include "SWFStream.h"
@@ -28,6 +29,7 @@
 #include "GnashNumeric.h"
 #include "Renderer.h"
 #include "RunResources.h"
+#include "GnashImage.h"
 
 #include <cmath> // sqrt, floor
 #include <iostream> // for output operator

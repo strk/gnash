@@ -36,6 +36,7 @@ extern "C" {
 
 #include "VideoConverterFfmpeg.h"
 #include "GnashException.h"
+#include "log.h"
 
 namespace gnash {
 namespace media {

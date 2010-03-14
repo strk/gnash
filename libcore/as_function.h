@@ -19,14 +19,14 @@
 #ifndef GNASH_AS_FUNCTION_H
 #define GNASH_AS_FUNCTION_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include <string>
 #include "as_object.h" // for inheritance
-#include "fn_call.h"
 
 // Forward declarations
 namespace gnash {
-	class NativeFunction;
-	class Global_as;
+    class NativeFunction;
+    class Global_as;
+    template <typename T> class FunctionArgs;
 }
 
 namespace gnash {
@@ -96,7 +96,7 @@ public:
     ///                 necessitates returning a different object from the
     ///                 passed 'this' pointer.
     as_object* construct(as_object& newobj, const as_environment& env,
-            fn_call::Args& args);
+            FunctionArgs<as_value>& args);
 
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin() { return false; }
@@ -127,7 +127,7 @@ protected:
 /// @return         A newly-created object constructed by the specified
 ///                 function.
 as_object* constructInstance(as_function& ctor, const as_environment& env,
-        fn_call::Args& args);
+        FunctionArgs<as_value>& args);
 
 /// Initialize the global Function constructor
 void function_class_init(as_object& global, const ObjectURI& uri);

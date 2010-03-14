@@ -27,7 +27,6 @@
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "GnashKey.h" // for gnash::key::code type
 #include "Renderer.h" // for gnash::key::code type
-#include "smart_ptr.h"
 #include "VirtualClock.h"
 #include "SystemClock.h"
 #include "gnash.h" // for Quality
@@ -36,6 +35,7 @@
 #include "tree.hh" // for tree
 #endif
 
+#include <boost/intrusive_ptr.hpp>
 #include <vector>
 #include <cstdlib> 
 #include <string>
@@ -640,6 +640,7 @@ std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, RunRes
 std::auto_ptr<Gui> createAQUAGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createRISCOSGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createAOS4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::auto_ptr<Gui> createHaikuGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createDumpGui(unsigned long xid, float scale, bool loop, RunResources& r);
 
  

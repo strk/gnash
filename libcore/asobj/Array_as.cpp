@@ -30,6 +30,7 @@
 #include "GnashException.h"
 #include "VM.h" 
 #include "GnashNumeric.h"
+#include "namedStrings.h"
 
 #include <string>
 #include <algorithm>

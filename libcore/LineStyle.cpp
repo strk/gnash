@@ -20,9 +20,11 @@
 // Based on public domain work by Thatcher Ulrich <tu@tulrich.com> 2003
 // styles.cpp   -- Thatcher Ulrich <tu@tulrich.com> 2003
 
+#include "RunResources.h"
 #include "LineStyle.h"
 #include "log.h"
 #include "SWFStream.h"
+#include "smart_ptr.h"
 #include "movie_definition.h"
 #include "SWF.h"
 #include "GnashException.h"

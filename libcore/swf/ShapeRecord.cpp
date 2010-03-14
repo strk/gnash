@@ -20,10 +20,12 @@
 #include "SWF.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
+#include "smart_ptr.h"
 #include "fill_style.h"
 #include "Geometry.h"
 #include "GnashNumeric.h"
 #include "RunResources.h"
+#include "log.h"
 
 #include <vector>
 

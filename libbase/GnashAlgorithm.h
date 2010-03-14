@@ -20,7 +20,6 @@
 #ifndef GNASH_ALGORITHM_H
 #define GNASH_ALGORITHM_H
 
-#include <iterator>
 #include <algorithm>
 #include <boost/checked_delete.hpp>
 #include <boost/intrusive_ptr.hpp>

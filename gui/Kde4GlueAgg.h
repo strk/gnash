@@ -26,6 +26,7 @@
 
 #include "Kde4Glue.h"
 
+#include <memory>
 #include <QImage>
 #include <boost/scoped_array.hpp>
 #include <QPainter>

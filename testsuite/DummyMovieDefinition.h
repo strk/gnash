@@ -25,6 +25,7 @@
 #include "Global_as.h"
 #include "namedStrings.h"
 
+#include <vector>
 #include <string>
 #include <memory> // for auto_ptr
 

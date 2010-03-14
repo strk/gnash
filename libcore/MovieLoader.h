@@ -21,10 +21,9 @@
 
 #include "URL.h"
 #include "as_object.h" 
-#include "movie_definition.h" 
 #include "MovieClip.h" 
-#include "smart_ptr.h"
 
+#include <boost/intrusive_ptr.hpp>
 #include <list>
 #include <string>
 #include <boost/noncopyable.hpp>

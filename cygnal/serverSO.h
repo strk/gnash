@@ -18,8 +18,6 @@
 #ifndef __SERVERSO_H__
 #define __SERVERSO_H__
 
-#include <string>
-#include <vector>
 #include <iostream>
 
 #include "sol.h"

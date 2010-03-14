@@ -20,10 +20,7 @@
 // Based on the public domain work of Mike Shaver <shaver@off.net> 2003,
 // Vitalij Alexeev <tishka92@mail.ru> 2004.
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "SWF.h"
-#include "ShapeRecord.h"
-#include "DefinitionTag.h"
 
 // Forward declarations.
 namespace gnash {

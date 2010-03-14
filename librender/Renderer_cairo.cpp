@@ -35,6 +35,7 @@
 // - masks
 // - video (from old Cairo renderer)
 
+#include <smart_ptr.h>
 #include <cairo/cairo.h>
 #include <boost/scoped_array.hpp>
 #include "Renderer.h"
@@ -266,7 +267,6 @@ get_cairo_pattern(Renderer_cairo& renderer, const fill_style& style, const cxfor
       init_cairo_matrix(&mat, m);       
 
       pattern = binfo->apply(&mat, fill_type);
-      
       break;
     } 
 
@@ -314,7 +314,7 @@ public:
     }
     
     cairo_set_source(_cr, _pattern);
-    
+
     cairo_fill(_cr);
 
     // Surfaces are owned by const bitmap_info_cairo
@@ -504,7 +504,7 @@ Renderer_cairo::drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
     cairo_save(_cr);
     cairo_set_source(_cr, pattern);
     
-    geometry::Range2d<float> range = bounds->getRange();
+    geometry::Range2d<boost::int32_t> range = bounds->getRange();
     m->transform(range);
   
     cairo_rectangle(_cr, range.getMinX(), range.getMinY(), range.width(),
@@ -575,11 +575,10 @@ Renderer_cairo::begin_display(const rgba& bg_color,
       set_color(bg_color);
     }
 
-    cairo_set_matrix(_cr, &_stage_mat);
 
     for (size_t rno=0; rno < _invalidated_ranges.size(); rno++) {
-        const geometry::Range2d<float>& range =
-                                   _invalidated_ranges.getRange(rno);
+        const geometry::Range2d<boost::int32_t>& range =
+            _invalidated_ranges.getRange(rno);
         if (range.isNull()) {
             continue;
         }
@@ -587,6 +586,7 @@ Renderer_cairo::begin_display(const rgba& bg_color,
             cairo_paint(_cr);
             // reset any rectangles that might have been added to the path...
             cairo_new_path(_cr);
+            cairo_set_matrix(_cr, &_stage_mat);
             return;
         }
 
@@ -595,16 +595,19 @@ Renderer_cairo::begin_display(const rgba& bg_color,
                maxx = range.getMaxX(),
                maxy = range.getMaxY();
 
-        snap_to_pixel(_cr, x, y, false);
-        snap_to_pixel(_cr, maxx, maxy, true);
+        // Transform to pixels.
+        cairo_matrix_transform_point(&_stage_mat, &x, &y);
+        cairo_matrix_transform_point(&_stage_mat, &maxx, &maxy);
 
-        cairo_rectangle(_cr, x, y, maxx - x, maxy - y);
+        cairo_rectangle(_cr, rint(x), rint(y), rint(maxx - x), rint(maxy - y));
     }
 
     cairo_clip(_cr);
 
     // Paint the background color over the clipped region(s).
     cairo_paint(_cr);
+
+    cairo_set_matrix(_cr, &_stage_mat);
 }
 
 void
@@ -788,7 +791,8 @@ Renderer_cairo::add_path(cairo_t* cr, const Path& cur_path)
 }
 
 void
-Renderer_cairo::apply_line_style(const LineStyle& style, const cxform& cx)
+Renderer_cairo::apply_line_style(const LineStyle& style, const cxform& cx,
+                                 const SWFMatrix& mat)
 {
     cairo_line_join_t join_style = CAIRO_LINE_JOIN_MITER;
     switch(style.joinStyle()) {
@@ -831,10 +835,16 @@ Renderer_cairo::apply_line_style(const LineStyle& style, const cxform& cx)
     float width = style.getThickness();
 
     if ( width == 0.0 ) {
-        double hwidth = 1.0;
 
-        cairo_device_to_user_distance(_cr, &hwidth, &hwidth);
-        cairo_set_line_width(_cr, hwidth);
+        cairo_matrix_t inv_stage = _stage_mat;
+        cairo_matrix_invert(&inv_stage);
+
+        double xconv = 1.0;
+        double yconv = 1.0;
+
+        cairo_matrix_transform_distance(&inv_stage, &xconv, &yconv);
+
+        cairo_set_line_width(_cr, xconv);
     } else {
         // TODO: this is correct for !style.scaleThicknessVertically() 
         //       and !style.scaleThicknessHorizontally().
@@ -847,7 +857,7 @@ Renderer_cairo::apply_line_style(const LineStyle& style, const cxform& cx)
 
         cairo_set_line_width(_cr, width);
     }
-    
+
     rgba color = cx.transform(style.get_color());
     set_color(color);
 }
@@ -855,7 +865,8 @@ Renderer_cairo::apply_line_style(const LineStyle& style, const cxform& cx)
 void
 Renderer_cairo::draw_outlines(const PathVec& path_vec,
                               const std::vector<LineStyle>& line_styles,
-                              const cxform& cx)
+                              const cxform& cx,
+                              const SWFMatrix& mat)
 {
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
@@ -865,7 +876,7 @@ Renderer_cairo::draw_outlines(const PathVec& path_vec,
             continue;
         }
       
-        apply_line_style(line_styles[cur_path.m_line-1], cx);
+        apply_line_style(line_styles[cur_path.m_line-1], cx, mat);
         add_path(_cr, cur_path);
         cairo_stroke(_cr);
     }  
@@ -880,7 +891,7 @@ Renderer_cairo::draw_subshape(const PathVec& path_vec, const SWFMatrix& mat,
     CairoPathRunner runner(*this, path_vec, fill_styles, _cr);
     runner.run(cx, mat);
 
-    draw_outlines(path_vec, line_styles, cx);
+    draw_outlines(path_vec, line_styles, cx, mat);
 }
 
 

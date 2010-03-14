@@ -19,7 +19,9 @@
 #ifndef GNASH_VIDEOINPUTFFMPEG_H
 #define GNASH_VIDEOINPUTFFMPEG_H
 
+#include <vector>
 #include <boost/cstdint.hpp> // for C99 int types
+#include <vector>
 #include "VideoInput.h"
 
 namespace gnash {
@@ -36,7 +38,7 @@ public:
     /// be queried from the input device.
     VideoInputFfmpeg();
     
-    /// Destructor for the VideoInputGst class
+    /// Destructor for the VideoInputFfmpeg class
     virtual ~VideoInputFfmpeg();
     
     static void getNames(std::vector<std::string>& /*names*/) {}

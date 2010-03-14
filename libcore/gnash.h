@@ -26,7 +26,6 @@
 
 #include "dsodefs.h"
 
-#include <string>
 
 namespace gnash {
 	class IOChannel;

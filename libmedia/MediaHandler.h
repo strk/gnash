@@ -24,6 +24,7 @@
 #include "dsodefs.h" // DSOEXPORT
 #include "VideoConverter.h"
 
+#include <vector>
 #include <memory>
 
 // Forward declarations

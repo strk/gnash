@@ -20,6 +20,7 @@
 #ifndef BACKEND_RENDER_HANDLER_CAIRO_H
 #define BACKEND_RENDER_HANDLER_CAIRO_H
 
+#include <vector>
 #include <boost/scoped_array.hpp>
 #include <cairo/cairo.h>
 #include "Renderer.h"
@@ -75,11 +76,13 @@ public:
 
     void add_path(cairo_t* cr, const Path& cur_path);
 
-    void apply_line_style(const LineStyle& style, const cxform& cx);
+    void apply_line_style(const LineStyle& style, const cxform& cx,
+                          const SWFMatrix& mat);
 
     void draw_outlines(const PathVec& path_vec,
                        const std::vector<LineStyle>& line_styles,
-                       const cxform& cx);
+                       const cxform& cx,
+                       const SWFMatrix& mat);
 
     std::vector<PathVec::const_iterator> find_subshapes(const PathVec& path_vec);
 

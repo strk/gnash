@@ -46,6 +46,7 @@
 // happen. <bwy>
 
 #include "dsodefs.h"
+#include <vector>
 #include <sstream>
 
 class Arg_parser

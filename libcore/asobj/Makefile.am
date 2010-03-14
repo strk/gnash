@@ -34,9 +34,7 @@ BUILT_SOURCES =
 pkglib_LTLIBRARIES = libgnashasobjs.la 
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/libnet \
-	-I$(top_srcdir)/libamf \
-	-I$(top_srcdir)/render \
+	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/abc \
@@ -44,7 +42,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/asobj/flash \
 	-I$(top_srcdir)/libbase \
-	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
@@ -122,9 +119,7 @@ inst_HEADERS = $(EXTENSIONS_API)
 endif
 
 libgnashasobjs_la_LIBADD = \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashmedia.la \
-	$(top_builddir)/libnet/libgnashnet.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
 if USE_FFMPEG_ENGINE
@@ -140,6 +135,11 @@ AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
 libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS) \
 				$(SDL_LIBS)
+endif
+
+if ENABLE_PCH
+SUBDIRS = ../../pch
+AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 # These makefile fragments build the ActionScript library for

@@ -22,8 +22,7 @@
 
 #include "dsodefs.h"
 
-#include "MovieLibrary.h"
-
+#include <boost/intrusive_ptr.hpp>
 #include <string>
 #include <memory>
 
@@ -32,6 +31,7 @@ namespace gnash {
     class RunResources;
     class movie_definition;
     class URL;
+    class MovieLibrary;
 }
 
 namespace gnash {

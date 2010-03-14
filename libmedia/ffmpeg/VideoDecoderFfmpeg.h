@@ -19,6 +19,7 @@
 #ifndef GNASH_VIDEODECODERFFMPEG_H
 #define GNASH_VIDEODECODERFFMPEG_H
 
+#include <vector>
 #include <memory>
 #include "dsodefs.h" //For DSOEXPORT
 #include "log.h"

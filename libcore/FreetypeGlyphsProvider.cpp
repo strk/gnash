@@ -51,6 +51,11 @@
 # include <fontconfig/fcfreetype.h>
 #endif
 
+#ifdef HAIKU_HOST
+# include <Path.h>
+# include <FindDirectory.h>
+#endif
+
 #include <string>
 #include <memory> // for auto_ptr
 #include <boost/cstdint.hpp>
@@ -244,7 +249,7 @@ FreetypeGlyphsProvider::init()
 
     if (m_lib) return; 
 
-    int    error = FT_Init_FreeType(&m_lib);
+    int error = FT_Init_FreeType(&m_lib);
     if (error) {
         std::cerr << boost::format(_("Can't init FreeType! Error "
                     "= %d")) % error << std::endl;
@@ -256,34 +261,44 @@ FreetypeGlyphsProvider::init()
 void FreetypeGlyphsProvider::close()
 {
     int error = FT_Done_FreeType(m_lib);
-    if (error)
-    {
+    if (error) {
         std::cerr << boost::format(_("Can't close FreeType! Error "
-                "= %d")) % error << std::endl;
+                                     "= %d")) % error << std::endl;
     }
 }
-
 
 // private
 bool
 FreetypeGlyphsProvider::getFontFilename(const std::string &name,
-        bool bold, bool italic, std::string& filename)
+   bool bold, bool italic, std::string& filename)
 {
 
+#ifdef HAIKU_HOST
+    // only returns a default
+    BPath bp;
+    if (B_OK != find_directory(B_BEOS_FONTS_DIRECTORY, &bp)) {
+        log_error(_("Failed to find fonts directory, using hard-coded "
+                    "font filename \"%s\""), DEFAULT_FONTFILE);
+        filename = DEFAULT_FONTFILE;
+        return true;
+    }
+    
+    bp.Append("ttfonts/DejaVuSans.ttf");
+    filename = bp.Path();
+    return true;
+#endif
+    
 #ifdef HAVE_FONTCONFIG
-
-    if (!FcInit ())
-    {
-
-        log_error("Can't init fontconfig library, using hard-"
-                "coded font filename");
+    if (!FcInit ()) {        
+        log_error(_("Can't init fontconfig library, using hard-"
+                "coded font filename \"%s\""), DEFAULT_FONTFILE);
         filename = DEFAULT_FONTFILE;
         return true;
         //return false;
     }
     
     FcResult result;
-
+    
     FcPattern* pat = FcNameParse((const FcChar8*)name.c_str());
     
     FcConfigSubstitute (0, pat, FcMatchPattern);
@@ -303,24 +318,20 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
     FcPatternDestroy (pat);
 
     FcFontSet* fs = NULL;
-    if (match)
-    {
+    if (match) {
         fs = FcFontSetCreate ();
         FcFontSetAdd (fs, match);
     }
 
-    if ( fs )
-    {
+    if ( fs ) {
 #ifdef GNASH_DEBUG_DEVICEFONTS
         log_debug("Found %d fonts matching the family %s (using "
                 "first)", fs->nfont, name);
 #endif
 
-        for (int j = 0; j < fs->nfont; j++)
-        {
+        for (int j = 0; j < fs->nfont; j++) {
             FcChar8 *file;
-            if (FcPatternGetString (fs->fonts[j], FC_FILE, 0, &file) != FcResultMatch)
-            {
+            if (FcPatternGetString (fs->fonts[j], FC_FILE, 0, &file) != FcResultMatch) {
 #ifdef GNASH_DEBUG_DEVICEFONTS
         log_debug("Matching font %d has unknown filename, skipping", j);
 #endif
@@ -347,7 +358,7 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 #else
     log_error("Font filename matching not implemented (no fontconfig"
             " support built-in), using hard-coded font filename",
-            name);
+            DEFAULT_FONTFILE);
     filename = DEFAULT_FONTFILE;
     return true;
 #endif

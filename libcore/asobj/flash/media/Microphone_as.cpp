@@ -31,6 +31,7 @@
 #include "AudioInput.h"
 #include "MediaHandler.h"
 
+#include "namedStrings.h"
 #include <algorithm>
 
 namespace gnash {

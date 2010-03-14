@@ -34,6 +34,7 @@
 #include "Renderer.h"
 #include "Renderer_agg.h"
 #include "gtk_glue_agg.h"
+#include "GnashException.h"
 
 namespace gnash
 {
@@ -88,6 +89,13 @@ GtkAggGlue::createRenderHandler()
     gdk_image_destroy(tmpimage);
 
     _agg_renderer = create_Renderer_agg(pixelformat);
+    if (! _agg_renderer) {
+        boost::format fmt = boost::format(
+            _("Could not create AGG renderer with pixelformat %s")
+            ) % pixelformat;
+        throw GnashException(fmt.str());
+    }
+
     return _agg_renderer;
 }
 

@@ -29,6 +29,8 @@
 #include "Globals.h"
 #include "Global_as.h"
 #include "Class.h"
+#include "CodeStream.h"
+#include "SWF.h"
 
 namespace gnash {
 namespace abc {
@@ -380,6 +382,8 @@ Machine::execute()
 
     // This automatically switches back again when we leave this scope.
     AVM2Switcher avm2(_vm);
+
+    assert(mStream);
 
 	for (;;) {
 		std::size_t opStart = mStream->tellg();

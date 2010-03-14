@@ -66,6 +66,9 @@ Renderer*
 RiscosAggGlue::createRenderHandler()
 {
   _agg_renderer = create_Renderer_agg("RGB24");
+  if (! _agg_renderer) {
+      throw GnashException(_("Could not create AGG renderer with pixelformat RGB24"));
+  }
   return _agg_renderer;
 }
 

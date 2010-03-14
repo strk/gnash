@@ -19,12 +19,12 @@
 #ifndef GNASH_ACTION_BUFFER_H
 #define GNASH_ACTION_BUFFER_H
 
+#include <string>
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp> // for boost::uint8_t
 #include <vector> // for composition
 
 #include "GnashException.h"
-#include "smart_ptr.h"
 #include "log.h" // For gettext macro
 
 // Forward declarations

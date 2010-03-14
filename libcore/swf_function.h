@@ -20,17 +20,17 @@
 #define GNASH_SWF_FUNCTION_H
 
 #include "as_function.h" // for inheritance
-#include "as_object.h" // for composition (vector element)
-#include "VM.h" //fow SWF version
 
-#include <boost/algorithm/string/case_conv.hpp> 
+#include "smart_ptr.h"
+#include <vector>
 #include <cassert>
 #include <string>
 
 // Forward declarations
 namespace gnash {
-	class action_buffer;
-	class as_environmnet;
+    class action_buffer;
+    class as_environmnet;
+    class as_object;
 }
 
 namespace gnash {

@@ -29,10 +29,10 @@
 #include "MediaHandler.h" 
 #include "gui.h"
 #include "movie_definition.h" 
-#include "smart_ptr.h"
 #include "movie_root.h"
 #include "RunResources.h"
 
+#include <boost/intrusive_ptr.hpp>
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <map>

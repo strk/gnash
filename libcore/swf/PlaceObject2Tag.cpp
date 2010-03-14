@@ -18,6 +18,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
+#include "RunResources.h"
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
@@ -29,6 +30,7 @@
 #include "SWFStream.h"
 #include "filter_factory.h"
 #include "GnashAlgorithm.h"
+#include "action_buffer.h"
 
 namespace gnash {
 namespace SWF {

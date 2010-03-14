@@ -20,12 +20,11 @@
 
 
 #include "ExportableResource.h"
-#include "ControlTag.h" // for sound tags inheritance
-#include "RunResources.h" // TODO: drop.
 
 // Forward declarations
 namespace gnash {
-	class movie_definition;
+    class movie_definition;
+    class RunResources;
 }
 
 

@@ -22,8 +22,8 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
-#include "Geometry.h"
 #include "swf/DefineMorphShapeTag.h"
+#include <boost/intrusive_ptr.hpp>
 #include <cassert>
 
 namespace gnash {

@@ -48,6 +48,8 @@ Renderer*
 FltkAggGlue::createRenderHandler()
 {
     _renderer = create_Renderer_agg("RGB24");
+    if (_renderer == NULL)
+        throw GnashException(_("Could not create AGG renderer with pixelformat RGB24"));
     return _renderer;
 }
 

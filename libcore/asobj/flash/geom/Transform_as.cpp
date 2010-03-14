@@ -32,6 +32,7 @@
 #include "ColorTransform_as.h"
 #include "GnashNumeric.h"
 
+#include "namedStrings.h"
 #include <sstream>
 #include <limits>
 

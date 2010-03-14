@@ -24,19 +24,18 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "event_id.h" // for inlines
 #include "as_object.h" // for inheritance
 #include "SWFRect.h" // for composition (invalidated bounds)
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
 #include "dsodefs.h" //for DSOEXPORT
-#include "log.h"
 #include "snappingrange.h"
 #ifdef USE_SWFTREE
 # include "tree.hh"
 #endif
 
+#include <vector>
 #include <map>
 #include <string>
 #include <cassert>

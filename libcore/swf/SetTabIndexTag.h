@@ -17,10 +17,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "SWF.h"
-#include "ShapeRecord.h"
-#include "DefinitionTag.h"
 
 // Forward declarations.
 namespace gnash {

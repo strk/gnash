@@ -19,8 +19,8 @@
 #ifndef GNASH_ASOBJ_DATE_H
 #define GNASH_ASOBJ_DATE_H
 
+#include <string>
 #include "as_object.h" // for inheritance
-#include "fn_call.h" // for inheritance
 #include "ClockTime.h"
 
 namespace gnash {

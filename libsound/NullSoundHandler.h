@@ -22,13 +22,7 @@
 #define NULL_SOUND_HANDLER_H
 
 #include "sound_handler.h" // for inheritance
-#include "SoundInfo.h" 
 #include "dsodefs.h" // for DSOEXPORT
-
-#include <vector>
-#include <memory>
-#include <cassert>
-#include <cstring>
 
 namespace gnash {
 namespace sound {

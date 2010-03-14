@@ -19,6 +19,7 @@
 
 // Derived from text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
 
+#include "RunResources.h"
 #include "DefineTextTag.h"
 #include "SWFStream.h"
 #include "log.h"
@@ -28,6 +29,7 @@
 #include "StaticText.h"
 #include "GnashAlgorithm.h"
 #include "Global_as.h"
+#include "movie_definition.h"
 
 #include <algorithm>
 #include <numeric>

@@ -24,6 +24,7 @@
 #include <cstring>
 #include <cmath>
 
+#include <smart_ptr.h>
 #include "swf/ShapeRecord.h"
 #include "gnash.h"
 #include "RGBA.h"
@@ -415,8 +416,8 @@ Tesselator::error(GLenum error)
 
 // static
 void
-Tesselator::combine(GLdouble coords [3], void *vertex_data[4],
-                      GLfloat weight[4], void **outData, void* userdata)
+Tesselator::combine(GLdouble coords [3], void **/*vertex_data[4] */,
+		    GLfloat * /* weight[4] */, void **outData, void* userdata)
 {
   Tesselator* tess = (Tesselator*)userdata;
   assert(tess);
@@ -958,7 +959,7 @@ public:
     glDeleteLists(1, _render_indices.size());
     _render_indices.clear();
 
-    for (int i = 0; i < _render_textures.size(); i++)
+    for (size_t i = 0; i < _render_textures.size(); i++)
         _cached_textures.push_front(_render_textures[i]);
     _render_textures.clear();
   
@@ -1003,7 +1004,7 @@ public:
   // NOTE: this implementation can't handle complex polygons (such as concave
   // polygons.
   virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool masked)
+    const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool /* masked */)
   {
     if (corner_count < 1) {
       return;
@@ -1030,7 +1031,7 @@ public:
     glPopMatrix();
   }
 
-  virtual void  set_antialiased(bool enable)
+  virtual void  set_antialiased(bool /* enable */ )
   {
     log_unimpl("set_antialiased");
   }
@@ -1294,7 +1295,7 @@ public:
     }    
   }
 
-  void apply_fill_style(const fill_style& style, const SWFMatrix& mat, const cxform& cx)
+  void apply_fill_style(const fill_style& style, const SWFMatrix& /* mat */, const cxform& cx)
   {
       int fill_type = style.get_type();
       
@@ -1367,7 +1368,7 @@ public:
     bool rv = true;
     
     float width = style.getThickness();
-    float pointSize;
+    //    float pointSize;
     
     if (!width)
     {
@@ -1455,8 +1456,9 @@ public:
   }
     
   void
-  draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints, const SWFMatrix& mat,
-                const cxform& cx, const std::vector<fill_style>& fill_styles,
+  draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints,
+		const SWFMatrix& mat, const cxform& cx,
+		const std::vector<fill_style>& /* fill_styles */,
                 const std::vector<LineStyle>& line_styles)
   {
   
@@ -1766,7 +1768,7 @@ public:
     _yscale = yscale;
   }
 
-  virtual void set_invalidated_regions(const InvalidatedRanges& ranges)
+  virtual void set_invalidated_regions(const InvalidatedRanges& /* ranges */)
   {
 #if 0
     if (ranges.isWorld() || ranges.isNull()) {

@@ -23,12 +23,10 @@
 #define BITSREADER_H
 
 #include "dsodefs.h"
-#include "GnashException.h"
 #include "log.h"
 
-#include <cassert> // for assert used in this file
-#include <string>
 #include <sstream>
+#include <cassert>
 #include <boost/cstdint.hpp> // for boost::uint32_t used in this file
 
 namespace gnash {

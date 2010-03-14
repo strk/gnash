@@ -23,8 +23,10 @@
 #include "Font.h"
 #include "RunResources.h"
 #include "SWF.h"
+#include "smart_ptr.h"
 #include "movie_definition.h"
 #include "ShapeRecord.h"
+#include "log.h"
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -92,9 +94,9 @@ DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, TagType tag,
     _italic(false),
     _bold(false),
     _wideCodes(false),
-    _ascent(0.0f),
-    _descent(0.0f),
-    _leading(0.0f)
+    _ascent(0),
+    _descent(0),
+    _leading(0)
 {
     switch (tag)
     {
@@ -221,32 +223,31 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
     // offset table. Make sure wide offsets fit into elements
     std::vector<boost::uint32_t> offsets;
     int	font_code_offset;
-    if (wide_offsets)
-    {
+
+    if (wide_offsets) {
         // 32-bit offsets.
         in.ensureBytes(4*glyph_count + 4); 
-        for (unsigned int i = 0; i < glyph_count; i++)
+        for (size_t i = 0; i < glyph_count; ++i)
         {
-            boost::uint32_t off = in.read_u32();	
+            const boost::uint32_t off = in.read_u32();	
 
             IF_VERBOSE_PARSE (
-            log_parse(_("Glyph %d at offset %u"), i, off);
+                log_parse(_("Glyph %d at offset %u"), i, off);
             );
 
             offsets.push_back(off);
         }
         font_code_offset = in.read_u32();
     }
-    else
-    {
+    else {
         // 16-bit offsets.
         in.ensureBytes(2*glyph_count + 2); 
-        for (unsigned int i = 0; i < glyph_count; i++)
-        {
-            boost::uint16_t off = in.read_u16();	
+        for (size_t i = 0; i < glyph_count; ++i) {
+
+            const boost::uint16_t off = in.read_u16();	
 
             IF_VERBOSE_PARSE (
-            log_parse(_("Glyph %d at offset %u"), i, off);
+                log_parse(_("Glyph %d at offset %u"), i, off);
             );
 
             offsets.push_back(off);
@@ -257,17 +258,13 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
     _glyphTable.resize(glyph_count);
 
     // Read the glyph shapes.
-    for (int i = 0; i < glyph_count; i++)
-    {
+    for (size_t i = 0; i < glyph_count; ++i) {
         // Seek to the start of the shape data.
         unsigned long new_pos = table_base + offsets[i];
 
         // It seems completely possible to
         // have such seeks-back, see bug #16311
-        //assert(new_pos >= in.tell());
-
-        if ( ! in.seek(new_pos) )
-        {
+        if (!in.seek(new_pos)) {
             throw ParserException(_("Glyphs offset table corrupted in "
                         "DefineFont2/3 tag"));
         }
@@ -281,7 +278,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
     {
         // Bad offset!  Don't try to read any more.
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("Bad offset in DefineFont2"));
+            log_swferror(_("Bad offset in DefineFont2"));
         );
         return;
     }
@@ -292,19 +289,21 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
     _codeTable.reset(table.release());
 
     // Read layout info for the glyphs.
-    if (has_layout)
-    {
+    if (has_layout) {
         in.ensureBytes(6);
-        _ascent = static_cast<float>(in.read_s16());
-        _descent = static_cast<float>(in.read_s16());
-        _leading = static_cast<float>(in.read_s16());
+        _ascent = in.read_s16();
+        _descent = in.read_s16();
+        _leading = in.read_s16();
         
         // Advance table; i.e. how wide each DisplayObject is.
         size_t nGlyphs = _glyphTable.size();
         in.ensureBytes(nGlyphs*2);
-        for (size_t i = 0; i < nGlyphs; i++)
-        {
-            _glyphTable[i].advance = static_cast<float>(in.read_s16());
+
+        for (size_t i = 0; i < nGlyphs; i++) {
+            // This is documented to be unsigned, but then we get negative
+            // advances for subpixel fonts because the advance overflows
+            // int16_t.
+            _glyphTable[i].advance = static_cast<float>(in.read_u16());
         }
 
         // Bounds table.
@@ -316,30 +315,21 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
 
         // Kerning pairs.
         in.ensureBytes(2);
-        int	kerning_count = in.read_u16();
-        if (wideCodes)
-        {
-            in.ensureBytes(6*kerning_count); // includes the adjustment 
-        }
-        else
-        {
-            in.ensureBytes(4*kerning_count); // includes the adjustment 
-        }
+        const boost::uint16_t kerning_count = in.read_u16();
 
-        for (int i = 0; i < kerning_count; i++)
-        {
+        in.ensureBytes(kerning_count * (wideCodes ? 6 : 4));
+
+        for (int i = 0; i < kerning_count; ++i) {
             boost::uint16_t	char0, char1;
-            if (wideCodes)
-            {
+            if (wideCodes) {
                 char0 = in.read_u16();
                 char1 = in.read_u16();
             }
-            else
-            {
+            else {
                 char0 = in.read_u8();
                 char1 = in.read_u8();
             }
-            float adjustment =  static_cast<float>(in.read_s16());
+            const boost::int16_t adjustment = in.read_s16();
 
             kerning_pair k;
             k.m_char0 = char0;
@@ -347,10 +337,9 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
 
             // Remember this adjustment; we can look it up quickly
             // later using the DisplayObject pair as the key.
-            if ( ! m_kerning_pairs.insert(std::make_pair(k, adjustment)).second )
-            {
+            if (!_kerningPairs.insert(std::make_pair(k, adjustment)).second) {
                 IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("Repeated kerning pair found - ignoring"));
+                    log_swferror(_("Repeated kerning pair found - ignoring"));
                 );
             }
 

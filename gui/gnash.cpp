@@ -128,7 +128,7 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
      << _(" cairo")
 #endif
 #ifdef RENDERER_AGG
-    << _(" agg > (default: agg)")
+    << _(" agg > (default: agg)\n")
 #else
     << " >\n"
 #endif

@@ -15,22 +15,17 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-NOW = `date "+%Y%m%d"`
-
-# for snapshots, this should always be something like trunk or head
-# for an official release, it should be unset
-
-#bzr version-info --custom --template='#define BRANCH_REVNO {revno}\n#define BRANCH_NICK {branch_nick}\n'
+NOW := $(shell date "+%Y%m%d")
 
 # this is used for Debian style naming conventions
 NEXT_RELEASE = 0.8.8
-SNAPSHOT_VERSION = $(NEXT_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
+SNAPSHOT_VERSION := $(NEXT_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
 
 # these is the directories where the snapshot gets built. Sources are
 # in the top level, the build goes in a _build subdirectory
-SNAPSHOT_DIR = gnash-$(BRANCH_NICK)$(BRANCH_REVNO)
-SNAPSHOT_BUILD = $(SNAPSHOT_DIR)/_build
-SNAPSHOT_NAME = $(SNAPSHOT_DIR)
+SNAPSHOT_DIR := gnash-$(SNAPSHOT_VERSION)
+SNAPSHOT_BUILD := $(SNAPSHOT_DIR)/_build
+SNAPSHOT_NAME := $(SNAPSHOT_DIR)
 
 # this is the name of the actual tarball
 SNAPSHOT_TAR = gnash-$(SNAPSHOT_VERSION).tar.gz
@@ -52,7 +47,7 @@ snapshot: snapshot-src snapshot-configure snapshot-build snapshot-install snapsh
 # from Automake. This uses the default version for Gnash. which is
 # 'trunk'. Then it gets renamed from the default version from 'trunk'
 # to a branch-revno stamped version instead of trunk.
-snapshot-src: distdir
+snapshot-src: bzrversion.h distdir
 
 snapshot-configure:
 	-@now=`date "+%Y%m%d"`; \

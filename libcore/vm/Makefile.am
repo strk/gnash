@@ -21,7 +21,6 @@ AUTOMAKE_OPTIONS =
 noinst_LTLIBRARIES = libgnashvm.la 
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/asobj \
@@ -30,7 +29,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/abc \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libbase \
-	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libltdl \
@@ -95,6 +93,11 @@ libgnashvm_la_LDFLAGS = -export-dynamic # -release $(VERSION)
 
 if WIN32
   libgnashvm_la_LDFLAGS += -no-undefined
+endif
+
+if ENABLE_PCH
+SUBDIRS = ../../pch
+AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support

@@ -40,12 +40,13 @@
 #include "string_table.h"
 #include "rc.h" // for use of rcfile
 #include "URLAccessManager.h"
-#include "network.h"
 #include "URL.h"
 #include "NetConnection_as.h"
 #include "Object.h"
-#include "AMF.h"
+#include "AMFConverter.h"
 #include "GnashAlgorithm.h"
+#include "RunResources.h"
+#include "namedStrings.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -458,7 +459,7 @@ void
 SharedObjectLibrary::markReachableResources() const
 {
     foreachSecond(_soLib.begin(), _soLib.end(),
-            std::mem_fun(&SharedObject_as::setReachable));
+                  &SharedObject_as::setReachable);
 }
 
 /// The SharedObjectLibrary keeps all known SharedObjects alive. They must

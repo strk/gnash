@@ -22,8 +22,8 @@
 
 #include "dsodefs.h"
 #include "Range2d.h"
-#include "Point2d.h"
 
+#include <string>
 #include <cassert> // for inlines
 #include <iostream> // for output operator
 #include <boost/cstdint.hpp>
@@ -32,6 +32,9 @@
 namespace gnash {
     class SWFMatrix;
     class SWFStream;
+    namespace geometry {
+        class Point2d;
+    }
 }
 
 namespace gnash {
@@ -229,24 +232,24 @@ public:
     /// \brief
     /// Make sure that the given point falls in this rectangle, 
     /// modifying it's coordinates if needed.
-    void clamp(point& p) const;
+    void clamp(geometry::Point2d& p) const;
 
     /// Construct and return a Range2d object.
     // TODO: deprecate this.
-    geometry::Range2d<float> getRange() const
+    geometry::Range2d<boost::int32_t> getRange() const
     {
         if (is_null())
         {
            // Range2d has a differnt idea about what is a null SWFRect.
-           return geometry::Range2d<float>(geometry::nullRange); //null range
+           return geometry::Range2d<boost::int32_t>(geometry::nullRange); //null range
         }
         else if( is_world() ) 
         {
-            return geometry::Range2d<float>(geometry::worldRange); //world range
+            return geometry::Range2d<boost::int32_t>(geometry::worldRange); //world range
         }
         else
         {
-            return geometry::Range2d<float>(_xMin, _yMin, _xMax, _yMax);
+            return geometry::Range2d<boost::int32_t>(_xMin, _yMin, _xMax, _yMax);
         }
     }
 

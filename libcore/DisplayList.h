@@ -23,11 +23,12 @@
 #include "snappingrange.h"
 #include "DisplayObject.h"
 
+#include <string>
 #include <list>
 #include <iosfwd>
-#ifndef NDEBUG
-#include "log.h"
+#if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
 #include <set>  // for testInvariant
+#include "log.h"
 #endif
 
 // GNASH_PARANOIA_LEVEL:

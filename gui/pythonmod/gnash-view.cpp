@@ -39,6 +39,8 @@
 #include "smart_ptr.h"
 #include "DisplayObject.h"
 #include "Global_as.h"
+#include "NamingPolicy.h"
+#include "StreamProvider.h"
 
 #ifdef USE_FFMPEG
 # include "MediaHandlerFfmpeg.h"

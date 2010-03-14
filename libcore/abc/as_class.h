@@ -19,6 +19,7 @@
 #ifndef GNASH_ABC_AS_CLASS_H
 #define GNASH_ABC_AS_CLASS_H
 
+#include <string>
 #include "as_object.h"
 namespace gnash {
     namespace abc {

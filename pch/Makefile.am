@@ -1,0 +1,64 @@
+BUILT_SOURCES = all-includes.h.gch
+
+PCHHEADERS = \
+	$(top_srcdir)/libcore/asobj/Global_as.h \
+	$(top_srcdir)/libcore/builtin_function.h \
+	$(top_srcdir)/libcore/NativeFunction.h \
+	$(top_srcdir)/libcore/Shape.h \
+	$(top_srcdir)/libcore/SWFStream.h \
+	$(top_srcdir)/libcore/ObjectURI.h \
+	$(top_srcdir)/libcore/PropertyList.h \
+	$(top_srcdir)/libcore/movie_root.h \
+	$(top_srcdir)/libcore/SWFRect.h \
+	$(top_srcdir)/libcore/MovieClip.h \
+	$(top_srcdir)/libcore/SWFMatrix.h \
+	$(top_srcdir)/libcore/DisplayList.h	\
+	$(top_srcdir)/libcore/DynamicShape.h	\
+	$(top_srcdir)/libcore/Geometry.h	\
+	$(top_srcdir)/libbase/SimpleBuffer.h \
+	$(top_srcdir)/libbase/GnashNumeric.h \
+	$(top_srcdir)/libbase/tu_file.h \
+	$(top_srcdir)/libbase/GnashAlgorithm.h \
+	$(top_srcdir)/libbase/smart_ptr.h \
+	$(top_srcdir)/libbase/GC.h \
+	$(top_srcdir)/libbase/log.h \
+	$(top_srcdir)/libbase/rc.h \
+	$(top_srcdir)/libbase/URL.h \
+	$(top_srcdir)/libbase/snappingrange.h \
+	$(top_srcdir)/libbase/GnashImage.h \
+	$(NULL)
+
+PCHFLAGS = \
+	-I$(top_builddir) \
+	-I$(srcdir) \
+	-I$(top_srcdir) \
+	-I$(top_srcdir)/libamf \
+	-I$(top_srcdir)/libnet \
+	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libcore/parser \
+	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/backend \
+	-I$(top_srcdir)/libcore/abc \
+	-I$(top_srcdir)/libcore/asobj \
+	-I$(top_srcdir)/libcore/asobj/flash \
+	-I$(top_srcdir)/libltdl \
+	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
+	$(PTHREAD_CFLAGS) \
+	$(NULL)
+
+all-includes.h.gch: $(PCHHEADERS)
+	for i in $(PCHHEADERS); do \
+	  file=`basename $$i`; \
+	  echo "#include \"$$file\"" >> all-includes.h ; \
+	done; \
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -fPIC -DPIC \
+	  $(PCHFLAGS)  -x c++-header -c -o all-includes.h.gch all-includes.h; \
+	rm all-includes.h;
+
+CLEANFILES = all-includes.h.gch
+

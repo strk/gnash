@@ -62,14 +62,16 @@ libgnashbase_la_SOURCES = \
 	GnashImage.cpp \
 	GnashImageJpeg.cpp \
 	GnashFileUtilities.cpp \
+	AMF.cpp \
+	RTMP.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
-	SharedMem.cpp \
 	sharedlib.cpp \
 	string_table.cpp \
 	tu_file.cpp \
 	IOChannel.cpp \
+	Socket.cpp \
 	ClockTime.cpp \
 	NamingPolicy.cpp \
 	WallClockTimer.cpp \
@@ -82,6 +84,13 @@ libgnashbase_la_SOURCES = \
 	BitsReader.cpp \
 	arg_parser.cpp \
 	$(NULL)
+
+
+if BUILD_HAIKU_GUI
+libgnashbase_la_SOURCES += SharedMemHaiku.cpp
+else
+libgnashbase_la_SOURCES += SharedMem.cpp
+endif
 
 edit = sed \
 	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
@@ -109,6 +118,10 @@ if LIBLTDL1
 noinst_LTLIBRARIES = libltdlc.la
 libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
 libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+endif
+
+if BUILD_HAIKU_GUI
+  libgnashbase_la_LIBADD += $(HAIKU_LIBS)
 endif
 
 if WIN32
@@ -139,6 +152,7 @@ noinst_HEADERS = \
 	tree.hh \
 	tu_file.h \
 	IOChannel.h \
+	Socket.h \
 	tu_opengl_includes.h \
 	GnashSystemFDHeaders.h \
 	GnashSystemNetHeaders.h \
@@ -170,6 +184,8 @@ EXTENSIONS_API = \
 	ref_counted.h \
 	GC.h \
 	GnashException.h \
+	AMF.h \
+	RTMP.h \
 	dsodefs.h \
 	utility.h \
 	log.h \
@@ -243,6 +259,11 @@ endif
 if WIN32
   libgnashbase_la_LDFLAGS += -no-undefined
   libgnashbase_la_LIBADD += -lws2_32 -lwinmm
+endif
+
+if ENABLE_PCH
+SUBDIRS = ../pch
+AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 CLEANFILES = libltdl.la libltdlc.la gnashrc gnashpluginrc

@@ -20,14 +20,12 @@
 #define GNASH_BUILTIN_FUNCTION_H
 
 #include "as_function.h" 
-#include "fn_call.h" 
-#include "as_environment.h" 
-#include "namedStrings.h"
+#include "as_environment.h"
+#include "fn_call.h"
 
 #include <cassert>
 
 namespace gnash {
-
 
 
 /// This is a special type of function implementing AS-code in C++

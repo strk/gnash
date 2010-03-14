@@ -22,7 +22,7 @@
 #define GNASH_ASOBJ_RECTANGLE_H
 
 
-#include "smart_ptr.h" // boost::intrusive_ptr
+#include <boost/intrusive_ptr.hpp>
 
 namespace gnash {
 

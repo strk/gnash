@@ -1,0 +1,814 @@
+#!/usr/bin/expect
+# 
+#   Copyright (C) 2010 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
+if {![info exists argv0]} {
+    send_error "Must use a version of Expect greater than 5.0\n"
+    exit 1
+}
+
+#
+# Global variables used by all files.
+#
+set logname     ""		;# the users login name
+set configopts  ""		;# options to pass to configure
+set branch      "trunk"		;# the bzr branch to build
+set revno       ""		;# the bzr revno to build
+set make        "make"		;# make program, sometimes gmake
+set makeopts    "-w"		;# options to pass to make
+set uploadcmd   "dupload"	;# program to upload packages
+set objdir      "/build/trunk"	;# the base build tree
+set srcdir      "/build/src/trunk"	;# the base source tree
+set inp		""
+set outp	""
+set timeout	""
+set verbose	0
+set sumfile	""
+set tool	""
+set state       "bzr"
+#
+# These describe the host and target environments.
+#
+set build_triplet  ""		;# type of architecture to run tests on
+set build_os	   ""		;# type of os the tests are running on
+set build_vendor   ""		;# vendor name of the OS or workstation the test are running on
+set build_cpu      ""		;# type of the cpu tests are running on
+set host_triplet   ""		;# type of architecture to run tests on, sometimes remotely
+set host_os	   ""		;# type of os the tests are running on
+set host_vendor    ""		;# vendor name of the OS or workstation the test are running on
+set host_cpu       ""		;# type of the cpu tests are running on
+set target_triplet ""		;# type of architecture to run tests on, final remote
+set target_os	   ""		;# type of os the tests are running on
+set target_vendor  ""		;# vendor name of the OS or workstation the test are running on
+set target_cpu     ""		;# type of the cpu tests are running on
+set target_alias   ""		;# standard abbreviation of target
+set compiler_flags ""		;# the flags used by the compiler
+set only	   "no"		;# only run one state at a time
+
+#
+# trap some signals so we know whats happening. These definitions are only
+# temporary until we read in the library stuff
+#
+trap { send_user "\nterminated\n";             exit 1 } SIGTERM
+trap { send_user "\ninterrupted by user\n";    exit 1 } SIGINT
+trap { send_user "\nsigquit\n";                exit 1 } SIGQUIT
+
+#
+# some convenience abbreviations
+#
+if {![info exists hex]} {
+    set hex "0x\[0-9A-Fa-f\]+"
+}
+if {![info exists decimal]} {
+    set decimal "\[0-9\]+"
+}
+
+
+#
+# set the base dir (current working directory)
+#
+set base_dir [pwd]
+
+#
+# verbose [-n] [-log] [--] message [level]
+#
+# Print MESSAGE if the verbose level is >= LEVEL.
+# The default value of LEVEL is 1.
+# "-n" says to not print a trailing newline.
+# "-log" says to add the text to the log file even if it won't be printed.
+# Note that the apparent behaviour of `send_user' dictates that if the message
+# is printed it is also added to the log file.
+# Use "--" if MESSAGE begins with "-".
+#
+# This is defined here rather than in framework.exp so we can use it
+# while still loading in the support files.
+#
+proc verbose { args } {
+    global verbose
+    set newline 1
+    set logfile 0
+
+    set i 0
+    if { [string index [lindex $args 0] 0] == "-" } {
+	for { set i 0 } { $i < [llength $args] } { incr i } {
+	    if { [lindex $args $i] == "--" } {
+		incr i
+		break
+	    } elseif { [lindex $args $i] == "-n" } {
+		set newline 0
+	    } elseif { [lindex $args $i] == "-log" } {
+		set logfile 1
+            } elseif { [lindex $args $i] == "-x" } {
+                set xml 1
+	    } elseif { [string index [lindex $args $i] 0] == "-" } {
+		clone_output "ERROR: verbose: illegal argument: [lindex $args $i]"
+		return
+	    } else {
+		break
+	    }
+	}
+	if { [llength $args] == $i } {
+	    clone_output "ERROR: verbose: nothing to print"
+	    return
+	}
+    }
+
+    set level 1
+    if { [llength $args] > $i + 1 } {
+	set level [lindex $args [expr { $i + 1 }]]
+    }
+    set message [lindex $args $i]
+
+    if { $verbose >= $level } {
+	# There is no need for the "--" argument here, but play it safe.
+	# We assume send_user also sends the text to the log file (which
+	# appears to be the case though the docs aren't clear on this).
+	if { $newline } {
+	    send_user -- "$message\n"
+	} else {
+	    send_user -- "$message"
+	}
+    } elseif { $logfile } {
+	if { $newline } {
+	    send_log "$message\n"
+	} else {
+	    send_log "$message"
+	}
+    }
+}
+#
+# load_file [-1] [--] file1 [ file2 ... ]
+#
+# Utility to source a file.  All are sourced in order unless the flag "-1"
+# is given in which case we stop after finding the first one.
+# The result is 1 if a file was found, 0 if not.
+# If a tcl error occurs while sourcing a file, we print an error message
+# and exit.
+#
+# ??? Perhaps add an optional argument of some descriptive text to add to
+# verbose and error messages (eg: -t "library file" ?).
+#
+proc load_file { args } {
+    set i 0
+    set only_one 0
+    if { [lindex $args $i] == "-1" } {
+	set only_one 1
+	incr i
+    }
+    if { [lindex $args $i] == "--" } {
+	incr i
+    }
+
+    set found 0
+    foreach file [lrange $args $i end] {
+	verbose "Looking for $file" 2
+        # In Tcl7.5a2, "file exists" can fail if the filename looks
+	# like ~/FILE and the environment variable HOME does not
+	# exist.
+        if {! [catch {file exists $file} result] && $result} {
+	    set found 1
+	    verbose "Found $file"
+	    if { [catch "uplevel #0 source $file"] == 1 } {
+		send_error "ERROR: tcl error sourcing $file.\n"
+		global errorInfo
+		if {[info exists errorInfo]} {
+		    send_error "$errorInfo\n"
+		}
+		exit 1
+	    }
+	    if { $only_one } {
+		break
+	    }
+	}
+    }
+    return $found
+}
+
+#
+# search_and_load_file -- search DIRLIST looking for FILELIST.
+# TYPE is used when displaying error and progress messages.
+#
+proc search_and_load_file { type filelist dirlist } {
+    set found 0
+
+    foreach dir $dirlist {
+	foreach initfile $filelist {
+	    verbose "Looking for $type ${dir}/${initfile}" 2
+	    if {[file exists [file join ${dir} ${initfile}]]} {
+		set found 1
+		set error ""
+		if { ${type} != "library file" } {
+		    send_user "Using ${dir}/${initfile} as ${type}.\n"
+		} else {
+		    verbose "Loading ${dir}/${initfile}"
+		}
+		if {[catch "uplevel #0 source ${dir}/${initfile}" error] == 1} {
+		    global errorInfo
+		    send_error "ERROR: tcl error sourcing ${type} ${dir}/${initfile}.\n${error}\n"
+		    if {[info exists errorInfo]} {
+			send_error "$errorInfo\n"
+		    }
+		    exit 1
+		}
+		break
+	    }
+	}
+	if { $found } {
+	    break
+	}
+    }
+    return $found
+}
+
+#
+# Give a usage statement.
+#
+proc usage { } {
+    global tool
+
+    send_user "USAGE: buildhost \[options...\]\n"
+    send_user "\t (--st) (-state)\t\tset the state manually\n"
+    send_user "\t (--on) (-only)\t\tonly run the one state\n"
+    send_user "\tstates are: bzr autogen configure make dpkg upload test clean"
+}
+
+#
+# Parse the arguments the first time looking for these.  We will ultimately
+# parse them twice.  Things are complicated because:
+# - we want to parse --verbose early on
+# - we don't want config files to override command line arguments
+#   (eg: $base_dir/$configfile vs --host/--target)
+# - we need some command line arguments before we can process some config files
+#   (eg: --objdir before $objdir/$configfile, --host/--target before $DEJAGNU)
+# The use of `arg_host_triplet' and `arg_target_triplet' lets us avoid parsing
+# the arguments three times.
+#
+
+set arg_host_triplet ""
+set arg_target_triplet ""
+set arg_build_triplet ""
+set argc [ llength $argv ]
+for { set i 0 } { $i < $argc } { incr i } {
+    set option [lindex $argv $i]
+
+    # make all options have two hyphens
+    switch -glob -- $option {
+        "--*" {
+        }
+        "-*" {
+	    set option "-$option"
+        }
+    }
+
+    # split out the argument for options that take them
+    switch -glob -- $option {
+	"--*=*" {
+	    regexp {^[^=]*=(.*)$} $option nil optarg
+	}
+	"--on*" -
+	"--ob*" -
+	"--sr*" -
+	"--st*" {
+	    incr i
+	    set optarg [lindex $argv $i]
+	}
+    }
+
+    switch -glob -- $option {
+	"--ob*" {			# (--objdir) where the test case object code lives
+	    set objdir $optarg
+	    continue
+	}
+
+	"--sr*" {			# (--srcdir) where the source code lives
+	    set srcdir $optarg
+	    continue
+	}	
+
+	"--st*" {			# (--state) the initial state
+	    set state $optarg
+	    continue
+	}	
+
+	"--on*" {			# (--only) only run one state, then exit
+	    set only yes
+	    continue
+	}	
+
+	"--v" -
+	"--verb*" {			# (--verbose) verbose output
+	    incr verbose
+	    continue
+	}
+
+	"[A-Z0-9_-.]*=*" { # process makefile style args like CC=gcc, etc...
+	    if {[regexp "^(\[A-Z0-9_-\]+)=(.*)$" $option junk var val]} {
+		set $var $val
+		verbose "$var is now $val"
+		append makevars "set $var $val;" ;# FIXME: Used anywhere?
+		unset junk var val
+	    } else {
+		send_error "Illegal variable specification:\n"
+		send_error "$option\n"
+	    }
+	    continue
+	}
+
+    }
+}
+
+verbose "Verbose level is $verbose"
+
+#
+# get the users login name
+#
+if {[string match "" $logname]} {
+    if {[info exists env(USER)]} {
+	set logname $env(USER)
+    } else {
+	if {[info exists env(LOGNAME)]} {
+	    set logname $env(LOGNAME)
+	} else {
+	    # try getting it with whoami
+	    catch "set logname [exec whoami]" tmp
+	    if {[string match "*couldn't find*to execute*" $tmp]} {
+		# try getting it with who am i
+		unset tmp
+		catch "set logname [exec who am i]" tmp
+		if {[string match "*Command not found*" $tmp]} {	
+		    send_user "ERROR: couldn't get the users login name\n"
+		    set logname "Unknown"
+		} else {
+		    set logname [lindex [split $logname " !"] 1]
+		}
+	    }
+	}
+    }
+}
+
+#
+# lookfor_file -- try to find a file by searching up multiple directory levels
+#
+proc lookfor_file { dir name } {
+    foreach x ".. ../.. ../../.. ../../../.." {
+	verbose "$dir/$name" 2
+	if {[file exists [file join $dir $name]]} {
+	    return [file join $dir $name]
+	}
+	set dir [remote_file build dirname $dir]
+    }
+    return ""
+}
+
+#
+# load_lib -- load a library by sourcing it
+#
+# If there a multiple files with the same name, stop after the first one found.
+# The order is first look in the install dir, then in a parallel dir in the
+# source tree, (up one or two levels), then in the current dir.
+#
+proc load_lib { file } {
+    global verbose libdir srcdir base_dir execpath tool
+    global loaded_libs
+
+    if {[info exists loaded_libs($file)]} {
+	return
+    }
+
+    set loaded_libs($file) ""
+
+    if { [search_and_load_file "library file" $file [list ../lib $libdir $libdir/lib [file dirname [file dirname $srcdir]]/dejagnu/lib $srcdir/lib $execpath/lib . [file dirname [file dirname [file dirname $srcdir]]]/dejagnu/lib]] == 0 } {
+	send_error "ERROR: Couldn't find library file $file.\n"
+	exit 1
+    }
+}
+
+# local_hostname - get the local hostname
+proc get_local_hostname { } {
+    if {[catch "info hostname" hb]} {
+	set hb ""
+    } else {
+	regsub "\\..*$" $hb "" hb
+    }
+    verbose "hostname=$hb" 3
+    return $hb
+}
+
+verbose "Login name on [get_local_hostname] is $logname"
+
+#
+# parse out the config parts of the triplet name
+#
+
+# build values
+if { $build_cpu == "" } {
+    regsub -- "-.*-.*" ${build_triplet} "" build_cpu
+}
+if { $build_vendor == "" } {
+    regsub -- "^\[a-z0-9\]*-" ${build_triplet} "" build_vendor
+    regsub -- "-.*" ${build_vendor} "" build_vendor
+}
+if { $build_os == "" } {
+    regsub -- ".*-.*-" ${build_triplet} "" build_os
+}
+
+# host values
+if { $host_cpu == "" } {
+    regsub -- "-.*-.*" ${host_triplet} "" host_cpu
+}
+if { $host_vendor == "" } {
+    regsub -- "^\[a-z0-9\]*-" ${host_triplet} "" host_vendor
+    regsub -- "-.*" ${host_vendor} "" host_vendor
+}
+if { $host_os == "" } {
+    regsub -- ".*-.*-" ${host_triplet} "" host_os
+}
+
+# target values
+if { $target_cpu == "" } {
+    regsub -- "-.*-.*" ${target_triplet} "" target_cpu
+}
+if { $target_vendor == "" } {
+    regsub -- "^\[a-z0-9\]*-" ${target_triplet} "" target_vendor
+    regsub -- "-.*" ${target_vendor} "" target_vendor
+}
+if { $target_os == "" } {
+    regsub -- ".*-.*-" ${target_triplet} "" target_os
+}
+
+#
+# Load some of the DejaGnu libraries, so we can use the configure
+# and build procedures ourselves. Most of the time, these files
+# live in /usr or /usr/local.
+#
+if {[file exists "/usr/share/dejagnu"]} {
+    set libdir   "/usr/share/dejagnu"
+} else {
+    set libdir   "/usr/local/share/dejagnu"
+}
+set execpath [file dirname $argv0]
+if {[info exists env(DEJAGNULIBS)]} {
+    set libdir $env(DEJAGNULIBS)
+}
+load_lib framework.exp
+load_lib utils.exp
+load_lib target.exp
+load_lib remote.exp
+
+# set an output file name for commands
+# set outp "|& cat"
+# set outp "> /tmp/foo"
+
+set sumfile /tmp/sum
+set sum [open $sumfile w]
+
+# print an entry to the summary file
+proc sumfile { msg } {
+    global sum
+    puts $sum $msg
+}
+
+# print an informational entry to the summary file
+proc suminfo { msg } {
+    global inp outp timeout srcdir sum
+    set whoami [exec whoami]
+    set date [exec date]
+    #set logname [exec 'grep $whoami /etc/passwd | cut -d ":" -f 5']
+    set ret [local_exec "uname --kernel-name --kernel-release" $inp $outp $timeout]
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+    puts $sum "$msg: $date"
+    set rpm_opts [getenv RPM_BUILD_OPTIONS]
+    if {[string length $rpm_opts] > 0} {
+	puts $sum "RPM_BUILD_OPTIONS: $rpm_opts"
+    }
+    set deb_opts [getenv DEB_BUILD_OPTIONS]
+    if {[string length $deb_opts] > 0} {
+	puts $sum "DEB_BUILD_OPTIONS: $deb_opts"
+    }
+#    puts $sum "$whoami"
+    puts $sum "$output"
+}
+
+# print a Start entry to the summary file
+proc procstart { msg } {
+    global sum
+    puts $sum "+ $msg: Started"
+}
+
+# print a Start entry to the summary file
+proc procdone { msg } {
+    global sum
+    puts $sum "- $msg: Done"
+}
+
+# update the source tree. This assume you already have it checked out.
+proc changedir { dir } {
+    cd $dir
+    verbose "Changed to directory: [pwd]"
+}
+
+# update the source tree. This assumes you already have it checked out
+# in the desired directory.
+proc bzr_update {} {
+    global inp outp timeout objdir srcdir
+    changedir $srcdir
+    procstart "Bzr"
+    set ret [local_exec "bzr pull" $inp $outp $timeout]
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+    # if we couldn't update the sources, then we can't proceed
+    if {$status != 0} {
+	perror "bzr pull failed! " $output
+	exit 1
+    }
+    procdone "Bzr"
+    return $output
+}
+
+# extract the revision number
+proc bzr_revno {} {
+    global inp outp timeout objdir
+    changedir $objdir
+    set ret [local_exec "grep REVNO bzrversion.h" $inp $outp $timeout]
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+
+    #
+    set revno ""
+    regsub ".* = " $output "" revno
+    set revno [string trim $revno]
+    set revno [string trim $revno "\;\n\""]
+
+    # if we couldn't update the sources, then we can't proceed
+    if {$status != 0} {
+	perror "bzr revno failed! " $output
+    }
+    return $revno
+}
+
+# extract the branch nickname
+proc bzr_branch {} {
+    global inp outp timeout verbose srcdir objdir
+    changedir $objdir
+    set ret [local_exec "grep NICK bzrversion.h" $inp $outp $timeout]
+    incr verbose
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+
+    #
+    set nick ""
+    regsub ".* = " $output "" nick
+    set nick [string trim $nick]
+    set nick [string trim $nick "\;\n\""]
+
+    # if we couldn't update the sources, then we can't proceed
+    if {$status != 0} {
+	perror "bzr branch failed! " $output
+    }
+    return $nick
+}
+
+# run the Gnash autogen,sh script to regenerate config files.
+proc autogen {} {
+    global inp outp timeout srcdir
+    # recreate the build files
+    changedir $srcdir
+    procstart "Autogen"
+    set ret [local_exec "./autogen.sh" $inp $outp $timeout]
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+    # if autogen.sh fails, then we can't proceed
+    if {$status != 0} {
+	perror "./autogen.sh failed! " $output
+	exit 1
+    }
+    procdone "Autogen"
+    return $output
+}
+
+# configure a checked out tree
+proc configure { opts } {
+    global inp outp timeout srcdir objdir
+    changedir $objdir
+    procstart "Configure"
+    
+    # add any options to the sumfile
+    if {[string length $opts] > 0} {
+	sumfile "Configure options: $opts"
+    }
+    set ret [local_exec "$srcdir/configure $opts" $inp $outp $timeout]
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+    # if configuring fails, then we can't proceed
+    if {$status != 0} {
+	perror "$srcdir/configure failed with these options: $configopts! $output"
+	exit 1
+    }
+    procdone "Configure"
+    return $output
+}
+
+# build a Debian package
+proc dpkg { opts } {
+    global inp outp timeout objdir package revno branch
+
+    # find the snapshot directory
+    foreach i [glob -nocomplain $objdir/gnash-*bzr*] {
+	if {[file isdirectory $i]} {
+	    set build $i
+	    changedir $i
+	    break
+	}
+    }
+
+    set ret [local_exec "dpkg-buildpackage $opts" $inp $outp $timeout]
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+    # if configuring fails, then we can't proceed
+    if {$status != 0} {
+    	perror "dpkg-buildpackage failed with these options: $opts! $output"
+	exit 1
+    }
+    return $output
+}
+
+# run make to compile everything
+proc make { opts } {
+    global inp outp timeout make objdir
+    changedir $objdir
+    procstart "Make"
+    # add any options to the sumfile
+    if {[string length $opts] > 0} {
+	sumfile "Make flags: $opts"
+    }
+    set ret [local_exec "$make $opts" $inp $outp 1000]
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+    # if configuring fails, then we can't proceed
+    if {$status != 0} {
+	perror "$make failed with these options: $opts! $output"
+	exit 1
+    }
+    procdone "Make"
+    return $output
+}
+
+# upload files to the repository
+proc upload { files } {
+    global inp outp timeout objdir uploadcmd
+    changedir $objdir
+    procstart "Upload"
+    if {$uploadcmd == "dupload"} {
+	set ret [local_exec "$uploadcmd $files" $inp $outp $timeout]
+    }
+    if {$uploadcmd == "scp"} {
+	set ret [local_exec "$uploadcmd $files" $inp $outp $timeout]
+    }
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+    # if configuring fails, then we can't proceed
+    if {$status != 0} {
+	perror "$uploadcmd failed to upload $changes!: $output"
+	exit 1
+    }
+
+    procdone "Upload"
+    return $output
+}
+
+# remove old package builds
+proc clean {} {
+    set ret [local_exec "rm -fr gnash-*" $inp $outp $timeout]
+    set status [lindex $ret 0]
+    set output [lindex $ret 1]
+    # if configuring fails, then we can't proceed
+    if {$status != 0} {
+	perror "$uploadcmd failed to upload $changes!: $output"
+	exit 1
+    }
+    return $output
+}
+
+# see if this is a apt or rpm based system
+# All Debian based systems have this file, which no rpm based ones do
+if {[file exists /etc/network/interfaces]} {
+    set package "deb"
+} else {
+    set package "rpm"
+}
+
+verbose "Building a $package package"
+#
+# The real guts start here
+#
+
+# set a default timeoput value for comamnd exececution. Some commands,
+# like bzr checkouts can 
+set timeout 600
+
+#
+# Switch to the source directory now
+#
+set startdir [pwd]
+
+# extract info so we know what we're building
+set revno [bzr_revno]
+set branch [bzr_branch]
+changedir $srcdir
+
+suminfo Gnash
+
+# the state table is the sequence of tasks required to build Gnash.
+while {$state != "done"} {
+    verbose "======= Current state is: $state ======="
+    switch -glob -- $state {
+	"b*" {			# "bzr"
+	    changedir $srcdir
+	    verbose "Changed to source tree: $srcdir"
+	    set output [bzr_update];	# update the source tree
+	    # update the branch and revision after the update
+	    set revno [bzr_revno]
+	    set branch [bzr_branch]
+#	    if {[string match "*configure.ac*" $output]} {
+		set state "autogen.sh"
+#	    } else {
+#		set state "configure"
+#	    }
+	}
+	
+	"a*" {			# "autogen.sh"
+	    changedir $srcdir
+	    autogen;			# create the config and build files
+	    set state "configure"
+	}
+	
+	"co*" {			# "configure"
+	    # Switch to the build directory now
+	    changedir $objdir
+	    verbose "Changed to build tree: $objdir"
+	    configure "$configopts"
+	    set state "make"
+	}	
+       
+	"m*" {			# "make"
+	    changedir $objdir
+	    make $package
+	    set state "upload"
+	}
+	
+	"dp*" {			# "dpkg-buildpackage"
+	    # This should only be run by package code maintainers, as this
+	    # manually runs dpkg-buildpackage, and assumes everything is
+	    # all setup correctly, or it'll fail. This is basically just
+	    # an optimization step when debugging package building.
+	    changedir $objdir
+	    dpkg "-nc"
+	    set state "upload"
+	    set only yes
+	}
+	
+	"u*" {			# "upload"
+	    changedir $objdir
+	    #upload
+	    set state "done"
+	}
+	
+	"t*" {			# "test"
+	    changedir $objdir
+	    # test the repository to make sure it worked
+	    
+	    set state "upload"
+	}
+
+	"cl*" {			# "clean"
+	    # Switch to the build directory now
+	    changedir $objdir
+	    verbose "Changed to build tree: $objdir"
+	    clean
+	    set only yes
+	}	
+    };				# end of switch
+    # exit the while loop if we only want to run one step of the state table
+    if { $only == "yes" } {
+	set state "done"
+	break;
+    }
+};				# end of while
+
+# back to where we started
+cd $startdir

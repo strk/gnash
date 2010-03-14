@@ -21,10 +21,12 @@
 
 #include "as_environment.h" 
 #include "as_object.h"
-#include "smart_ptr.h"
 #include "as_value.h"
 #include "VM.h"
+#include "GnashException.h"
 
+#include <string>
+#include <vector>
 #include <cassert> 
 #include <ostream>
 #include <sstream>

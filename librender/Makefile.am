@@ -32,8 +32,6 @@ pluginsdir = $(libdir)/gnash/plugins
 AM_CPPFLAGS = -I.. \
         -I$(srcdir) \
         -I$(top_srcdir) \
-        -I$(top_srcdir)/libamf \
-        -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libcore/swf \
@@ -53,6 +51,10 @@ AM_CPPFLAGS = -I.. \
 	$(AGG_CFLAGS) \
 	$(CAIRO_CFLAGS) \
 	$(NULL)
+
+GNASH_LIBS = \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libcore/libgnashcore.la
 
 noinst_HEADERS = \
 	Renderer.h \
@@ -92,3 +94,8 @@ mudflap:
 clean-hook:
 	-rm -f core.*
 
+
+if ENABLE_PCH
+SUBDIRS = ../pch
+AM_CXXFLAGS = $(PCH_FLAGS)
+endif

@@ -20,5 +20,5 @@
 
 AUTOMAKE_OPTIONS = 
 
-SUBDIRS = cygnal.all
+SUBDIRS = libamf.all libnet.all cygnal.all
 

@@ -20,10 +20,6 @@
 #define GNASH_PROPERTYLIST_H
 
 #include "Property.h" // for templated functions
-#include "PropFlags.h" // for templated functions
-#include "as_value.h" // for templated functions
-#include "string_table.h"
-#include "ObjectURI.h"
 
 #include <set> 
 #include <map> 
@@ -42,6 +38,7 @@ namespace gnash {
     class as_environment;
     class as_function;
     class ObjectURI;
+    class as_value;
 }
 
 namespace gnash {

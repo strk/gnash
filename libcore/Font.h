@@ -24,9 +24,9 @@
 #ifndef GNASH_FONT_H
 #define GNASH_FONT_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "ExportableResource.h" 
 
+#include <string>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/cstdint.hpp>

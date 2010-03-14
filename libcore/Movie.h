@@ -22,11 +22,10 @@
 #ifndef GNASH_MOVIE_H
 #define GNASH_MOVIE_H
 
-#include <vector>
+#include <string>
 #include <set>
 
 #include "MovieClip.h" // for inheritance
-#include "smart_ptr.h" // for composition
 
 // Forward declarations
 namespace gnash {

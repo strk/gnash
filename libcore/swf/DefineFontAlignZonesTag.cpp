@@ -18,11 +18,14 @@
 //
 
 
+#include "RunResources.h"
 #include "Font.h"
 #include "log.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "DefineFontAlignZonesTag.h"
+#include "smart_ptr.h"
+
 #include <iostream>
 
 namespace gnash {

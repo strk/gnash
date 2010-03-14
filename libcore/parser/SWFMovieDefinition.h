@@ -29,13 +29,15 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "GnashImageJpeg.h"
-#include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
 #include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
 #include "StringPredicates.h" 
 #include "SWFRect.h"
 #include "GnashNumeric.h"
+#include "GnashAlgorithm.h"
 
+#include <boost/intrusive_ptr.hpp>
+#include <vector>
 #include <map> // for CharacterDictionary
 #include <set> // for _importSources
 #include <string>
@@ -45,7 +47,6 @@
 #include <boost/thread/barrier.hpp>
 #include <boost/scoped_ptr.hpp>
 
-//
 // Forward declarations
 namespace gnash {
     class SWFMovieDefinition;
@@ -57,13 +58,9 @@ namespace gnash {
     class Font;
 }
 
-namespace gnash
-{
+namespace gnash {
 
-/// \brief
-/// SWFMovieDefinition helper class handling start and execution of
-/// an SWF loading thread
-///
+/// Helper class handling start and execution of a loading thread
 class SWFMovieLoader
 {
 public:
@@ -154,10 +151,8 @@ public:
     /// Mark all dictionary items to be reachable (for GC)
     void markReachableResources() const
     {
-        for(CharacterConstIterator i=_map.begin(), e=_map.end(); i!=e; ++i)
-        {
-            i->second->setReachable();
-        }
+        foreachSecond(_map.begin(), _map.end(), 
+                      &SWF::DefinitionTag::setReachable);
     }
 #endif 
 

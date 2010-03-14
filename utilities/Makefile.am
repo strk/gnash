@@ -25,8 +25,6 @@ AUTOMAKE_OPTIONS = # dejagnu
 
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
@@ -61,11 +59,8 @@ endif
 
 localedir = $(datadir)/locale
 
-#AM_CPPFLAGS = # -Wall
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/libnet \
-        -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/librender \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/asobj \
@@ -102,7 +97,25 @@ if CROSS_COMPILING
 endif
 endif
 
-bin_PROGRAMS = gprocessor soldumper flvdumper
+bin_PROGRAMS = gprocessor rtmpget
+
+if CYGNAL
+AM_CPPFLAGS += \
+	-I$(top_srcdir)/cygnal/libamf \
+	-I$(top_srcdir)/cygnal/libnet
+bin_PROGRAMS += soldumper flvdumper
+
+soldumper_SOURCES = soldumper.cpp
+soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+
+flvdumper_SOURCES = flvdumper.cpp
+flvdumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+
+GNASH_LIBS += \
+	$(top_builddir)/cygnal/libamf/libgnashamf.la \
+	$(top_builddir)/cygnal/libnet/libgnashnet.la
+endif
+
 #check_PROGRAMS = gdebug.swf
 
 if USE_GST_ENGINE
@@ -118,15 +131,11 @@ gprocessor_SOURCES = processor.cpp
 gprocessor_LDFLAGS = -export-dynamic
 gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
+rtmpget_SOURCES = rtmpget.cpp 
+rtmpget_LDADD =  $(GNASH_LIBS) $(AM_LDFLAGS)
 
 #dumpshm_SOURCES = dumpshm.cpp
 #dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
-
-soldumper_SOURCES = soldumper.cpp
-soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
-
-flvdumper_SOURCES = flvdumper.cpp
-flvdumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 if USE_GST_ENGINE
  GST_STUFF = $(GSTPBUTILS_LIBS) $(GSTREAMER_PLUGINS_BASE_LIBS) $(GSTREAMER_LIBS) 

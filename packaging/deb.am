@@ -19,7 +19,7 @@
 
 deb: snapshot-src setup-deb snapshot-deb
 
-# Build a .deb snapshot, which means we have to munge the date
+# Build a .deb snapshot, which means we have to munge the release data
 # into the proper files to build a package with the version in
 # all the right places. This involves editing the debian/changelog
 # file. Configure.ac is edited by the snapshot target.
@@ -29,50 +29,199 @@ deb: snapshot-src setup-deb snapshot-deb
 # /usr/lib/mozilla/plugins or $HOME/.mozilla/plugins, we also
 # have to change the path to the NPAPI plugin so it gets installed
 # for the correct browser.
-setup-deb: 
-	snapshot_dir="gnash-$(SNAPSHOT_VERSION)"; \
-	if test -d gnash-$(PACKAGE_VERSION); then \
-	  mv gnash-$(PACKAGE_VERSION) $${snapshot_dir}; \
-	fi; \
-	if test ! -f $(SNAPSHOT_DIR)/configure.ac.orig; then \
-	  mv -f $(SNAPSHOT_DIR)/configure.ac $(SNAPSHOT_DIR)/configure.ac.orig; \
-	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $${snapshot_version})/" \
-	    $(SNAPSHOT_DIR)/configure.ac.orig > $(SNAPSHOT_DIR)/configure.ac; \
-	fi; \
-	if test ! -f $(SNAPSHOT_DIR)/configure.orig; then \
-	  mv -f $(SNAPSHOT_DIR)/configure $(SNAPSHOT_DIR)/configure.orig; \
-	  sed -e "s/ VERSION='trunk'/ VERSION='$${snapshot_version}'/" \
-	    $(SNAPSHOT_DIR)/configure.orig > $(SNAPSHOT_DIR)/configure; \
-	fi; \
-	mkdir -p $${snapshot_dir}/debian; \
-	cp -rfp $(srcdir)/packaging/debian/* $${snapshot_dir}/debian/; \
-	if test -e $${snapshot_dir}/debian/changelog; then \
-	  mv -f $${snapshot_dir}/debian/changelog $${snapshot_dir}/debian/changelog.orig; \
-	  sed -e "s:trunk:$(SNAPSHOT_VERSION):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
-	fi; \
-	ubuntu=`uname -a | grep -ci ubuntu`; \
-	if test $$ubuntu -eq 1; then \
-	  if test -e $${snapshot_dir}/debian/gtk-plugin-gnash.dirs; then \
-	    mv -f $${snapshot_dir}/debian/gtk-plugin-gnash.dirs $${snapshot_dir}/debian/gtk-plugin-gnash.dirs.orig; \
+
+# DEB_BUILD_OPTIONS is used to change the configuration of the
+# packages that get built. This is used for both the debian/rules
+# file and here. By default, this looks for the value in the users
+# environment, which is what dpkg-buildpackage does as well. If
+# DEB_BUILD_OPTIONS is defined on the command line to make, then
+# that value takes precedence. Once we have the value of the
+# build options, we can then see what is enabled or not. The
+# default produces a package with normal defaults.
+DEB_BUILD_OPTIONS ?= $(shell echo $DEB_BUILD_OPTIONS)
+FFMPEG := $(shell echo $(DEB_BUILD_OPTIONS) | grep -c "ffmpeg")
+OGL := $(shell echo $(DEB_BUILD_OPTIONS) | grep -c "ogl")
+VAAPI := $(shell echo $(DEB_BUILD_OPTIONS) | grep -c "vaapi")
+
+# Look at the build options to calculate the new build name. This is
+# used for the the snapshot source directory name.
+BUILD_DIR := $(shell \
+	snapshot_dir=$(SNAPSHOT_DIR); \
+	if test $(OGL) -eq 1 -o $(FFMPEG) -eq 1 -o $(VAAPI) -eq 1; then \
+	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 1; then \
+	    snapshot_dir=$(subst bzr,bzr.ogl.ffmpeg,$(SNAPSHOT_DIR)); \
 	  fi; \
-	  sed -e "s:python2.5/site:python2.6/dist:" $${snapshot_dir}/debian/gtk-plugin-gnash.dirs.orig > $${snapshot_dir}/debian/gtk-plugin-gnash.dirs; \
-	  if test -e $${snapshot_dir}/debian/gtk-plugin-gnash.install; then \
-	    mv -f $${snapshot_dir}/debian/gtk-plugin-gnash.install $${snapshot_dir}/debian/gtk-plugin-gnash.install.orig; \
+	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 0; then \
+	    snapshot_dir=$(subst bzr,bzr.ogl,$(SNAPSHOT_DIR)); \
 	  fi; \
-	  sed -e 's:python2.5/site:python2.6/dist:' $${snapshot_dir}/debian/gtk-plugin-gnash.install.orig > $${snapshot_dir}/debian/gtk-plugin-gnash.install; \
-	  if test `echo $(FIREFOX_PLUGINS) | grep -c mozilla` -eq 0; then \
-	    if test -e $${snapshot_dir}/debian/mozilla-plugin-gnash.dirs; then \
-	      mv -f $${snapshot_dir}/debian/mozilla-plugin-gnash.dirs $${snapshot_dir}/debian/gtk-plugin-gnash.install.orig; \
-	    fi; \
-	    echo $(FIREFOX_PLUGINS) | sed -e 's:/::' > $${snapshot_dir}/debian/mozilla-plugin-gnash.dirs; \
+	  if test $(OGL) -eq 0 -a $(FFMPEG) -eq 1; then \
+	    snapshot_dir=$(subst bzr,bzr.ffmpeg,$(SNAPSHOT_DIR)); \
 	  fi; \
+	  if test $(VAAPI) -eq 1; then \
+	    snapshot_dir=$(subst bzr,bzr.vaapi,$(SNAPSHOT_DIR)); \
+	  fi; \
+	fi; \
+	echo "$${snapshot_dir}")
+
+# Look at the build options to calculate the new build name. This is
+# used for the the snapshot version.
+BUILD_VERSION := $(shell \
+	snapshot_version=$(SNAPSHOT_VERSION); \
+	if test $(OGL) -eq 1 -o $(FFMPEG) -eq 1 -o $(VAAPI) -eq 1; then \
+	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 1; then \
+	    snapshot_version=$(subst bzr,bzr.ogl.ffmpeg,$(SNAPSHOT_VERSION)); \
+	  fi; \
+	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 0; then \
+	    snapshot_version=$(subst bzr,bzr.ogl,$(SNAPSHOT_VERSION)); \
+	  fi; \
+	  if test $(OGL) -eq 0 -a $(FFMPEG) -eq 1; then \
+	    snapshot_version=$(subst bzr,bzr.ffmpeg,$(SNAPSHOT_VERSION)); \
+	  fi; \
+	  if test $(VAAPI) -eq 1; then \
+	    snapshot_version=$(subst bzr,bzr.vaapi,$(SNAPSHOT_VERSION)); \
+	  fi; \
+	fi; \
+	echo "$${snapshot_version}")
+
+# This is a list of all the packages in the control file.
+PACKAGES := $(shell grep Package $(srcdir)/packaging/debian/control | sed -e 's/Package://')
+
+# SNAPSHOT_VERSION is the name that gets used for the packages. By default
+# it is "$(NEXT_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)", but when
+# building alternate packages, we want to rename them so there isn't a
+# name collision.
+
+# This gets more fun, as if we configure with ffmpeg, the two utilities that
+# deal with Gstreamer based input devices, findwebcam and findmicrophone,
+# don't get built. So we strip them out of the packages.
+setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control deb-edit-utilities deb-edit-python deb-edit-mozilla
+
+# Rename the directory created by distdir to the snapshot. This is
+# usually something like "gnash-trunk" to "0.8.8~bzr.ogl.ffmpeg.trunk11977".
+# This requires distdir to be run first, but it's not a dependency as we
+# don't want to always rebuild the source tree, just the dependencies.
+deb-rename-build:
+	@echo "Building package in: $(BUILD_DIR)..."
+	@if test -d gnash-$(PACKAGE_VERSION); then \
+	  mv -f gnash-$(PACKAGE_VERSION) $(BUILD_DIR); \
+	fi
+
+# Once the directory has been renamed, we copy over the Debian packaging
+# files. Then we have to edit a few of them to match this snapshot
+deb-copy-files: deb-copy-stamp
+deb-copy-stamp: deb-rename-build
+	@echo "Copying debian packaging files..."
+	@if test ! -d $(BUILD_DIR)/debian; then \
+	  mkdir -p $(BUILD_DIR)/debian; \
+	fi
+	@cp -rfp $(srcdir)/packaging/debian/* $(BUILD_DIR)/debian/
+	@touch $@
+
+# The findwebcam and findmicrophone utilities are only support for Gstreamer
+# builds, so we have to remove them from packaging when configuring with ffmpeg.
+deb-edit-utilities:
+	@if test $(FFMPEG) -eq 1; then \
+	   echo "Removing findwebcam and findmicrophone files from package as they aren't supported with ffmpeg..."; \
+	   if test -e $(BUILD_DIR)/debian/gnash-tools.install; then \
+	     mv -f $(BUILD_DIR)/debian/gnash-tools.install $(BUILD_DIR)/debian/gnash-tools.install.orig; \
+	   fi; \
+	   sed -e '/webcam/d' -e '/microphone/d' $(BUILD_DIR)/debian/gnash-tools.install.orig > $(BUILD_DIR)/debian/gnash-tools.install; \
+	   if test -e $(BUILD_DIR)/debian/gnash-tools.manpages; then \
+	     mv -f $(BUILD_DIR)/debian/gnash-tools.manpages $(BUILD_DIR)/debian/gnash-tools.manpages.orig; \
+	   fi; \
+	   sed -e '/webcam/d' -e '/microphone/d' $(BUILD_DIR)/debian/gnash-tools.manpages.orig > $(BUILD_DIR)/debian/gnash-tools.manpages; \
 	fi;
 
+# Python is at different revisions and paths depending on the Distribution and release
+deb-edit-python:
+	@ubuntu=`uname -a | grep -ci ubuntu`; \
+	 if test $${ubuntu} -eq 1; then \
+	   echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Ubuntu"; \
+	   if test -e $(BUILD_DIR)/debian/gtk-plugin-gnash.install; then \
+	     mv -f $(BUILD_DIR)/debian/gtk-plugin-gnash.install $(BUILD_DIR)/debian/gtk-plugin-gnash.install.orig; \
+	   fi; \
+	   sed -e 's:python2.5/site:python2.6/dist:' $(BUILD_DIR)/debian/gtk-plugin-gnash.install.orig > $(BUILD_DIR)/debian/gtk-plugin-gnash.install; \
+	   if test -e $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs; then \
+	     mv -f $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs.orig; \
+	   fi; \
+	   sed -e "s:python2.5/site:python2.6/dist:" $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs.orig > $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs; \
+	fi;
+
+deb-edit-mozilla:
+	@if test `echo $(FIREFOX_PLUGINS) | grep -c mozilla` -eq 0; then \
+	   echo "Adjusting plugin path for a Mozilla browser"; \
+	   if test -e $(BUILD_DIR)/debian/mozilla-plugin-gnash.dirs; then \
+	     mv -f $(BUILD_DIR)/debian/mozilla-plugin-gnash.dirs $(BUILD_DIR)/debian/gtk-plugin-gnash.install.orig; \
+	   fi; \
+	   echo $(FIREFOX_PLUGINS) | sed -e 's:/::' > $(BUILD_DIR)/debian/mozilla-plugin-gnash.dirs; \
+	fi;
+
+# Edit the debian/changelog file. This is because the version in the top level
+# entry becomes the name of the source directory, the build directory, and
+# the packages. We do it this way so the snapshot matches the branch nickname
+# with the revision.
+deb-edit-changelog:
+	@echo "Editing debian/changelog for snapshot: $(BUILD_VERSION)"
+	@if test -e $(BUILD_DIR)/debian/changelog; then \
+	  mv -f $(BUILD_DIR)/debian/changelog $(BUILD_DIR)/debian/changelog.orig; \
+	  sed -e "s:trunk:$(BUILD_VERSION):" $(BUILD_DIR)/debian/changelog.orig > $(BUILD_DIR)/debian/changelog; \
+	else \
+	  sed -e "s:trunk:$(BUILD_VERSION):" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
+	fi
+
+# Edit the configure scripts, so if somebody reconfigures from this tarball,
+# they'll get the exact same name for all the packages.
+deb-edit-configure: 
+	@echo "Editing configure.ac in $(BUILD_VERSION)..."
+	@if test ! -f $(BUILD_DIR)/configure.ac.orig; then \
+	  mv -f $(BUILD_DIR)/configure.ac $(BUILD_DIR)/configure.ac.orig; \
+	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $(BUILD_VERSION))/" \
+	    $(BUILD_DIR)/configure.ac.orig > $(BUILD_DIR)/configure.ac; \
+	fi
+	@echo "Editing configure in $(BUILD_VERSION)..."
+	@if test ! -f $(BUILD_DIR)/configure.orig; then \
+	  mv -f $(BUILD_DIR)/configure $(BUILD_DIR)/configure.orig; \
+	  sed -e "s/ VERSION='trunk'/ VERSION='$(BUILD_VERSION)'/" \
+	    $(BUILD_DIR)/configure.orig > $(BUILD_DIR)/configure; \
+	   chmod u+x $(BUILD_DIR)/configure; \
+	fi
+
+# Edit the debian/control file. This is because we want to produce packages with
+# unique names, so differently configured packages of the same branch and revision
+# can all live in the same deb repository.
+deb-edit-control: deb-copy-files
+	@if test $(OGL) -eq 1 -o $(FFMPEG) -eq 1 -o $(VAAPI) -eq 1; then \
+	  echo -n "Editing debian/control for alternate configuration..."; \
+	  if test -e $(BUILD_DIR)/debian/control; then \
+	    mv -f $(BUILD_DIR)/debian/control $(BUILD_DIR)/debian/control.orig; \
+	  fi; \
+	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 1; then \
+	    pkg_version="opengl-ffmpeg"; \
+	  fi; \
+	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 0; then \
+	    pkg_version="opengl"; \
+	  fi; \
+	  if test $(OGL) -eq 0 -a $(FFMPEG) -eq 1; then \
+	    pkg_version="ffmpeg"; \
+	  fi; \
+	  if test $(VAAPI) -eq 1; then \
+	    pkg_version="vaapi"; \
+	  fi; \
+	  echo "$${pkg_version}"; \
+	  sed -e "/^Conflicts:/d" \
+	      -e "s/^Package: .*$$/&-$${pkg_version}/" \
+	      -e "s/^Depends: gnash-common/Depends: gnash-common-$${pkg_version}/" \
+	      -e "s/^Depends: gnash /Depends: gnash-$${pkg_version} /" \
+	      -e "s/^Depends: klash /Depends: klash-$${pkg_version} /" \
+	  $(top_srcdir)/packaging/debian/control > $(BUILD_DIR)/debian/control; \
+	fi
+
+# Build the package. debuild would also work. This requires all
+# the file editing to be done
 snapshot-deb:
-	snapshot_dir="gnash-$(SNAPSHOT_VERSION)"; \
-	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot -j4)
+	(cd $(BUILD_DIR); dpkg-buildpackage -rfakeroot -j4)
 
 # these files are created when building packages
-CLEANFILES += *trunk*.deb *trunk*.gz *trunk*.bz2 *trunk*.changes
+CLEANFILES += *trunk*.deb *trunk*.gz *trunk*.bz2 *trunk*.changes deb-copy-stamp
 
-.PHONY : deb debian snapshot-deb setup-deb
+.PHONY : deb debian snapshot-deb setup-deb deb-edit-control deb-edit-changelog deb-copy-files deb-rename-build deb-edit-configure deb-edit-install deb-edit-utilities deb-edit-python deb-edit-mozilla

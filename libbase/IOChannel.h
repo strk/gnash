@@ -24,6 +24,7 @@
 #include "dsodefs.h" // DSOEXPORT
 #include "GnashException.h" // for IOException inheritance
 
+#include <string>
 #include <boost/cstdint.hpp> // for boost int types
 #include <ios>
 
@@ -50,45 +51,18 @@ public:
     ///
     boost::uint32_t read_le32();
 
-    /// \brief Read a 64-bit word from a little-ending stream,
-    /// returning it as a native-endian word.
-    //
-    /// Throw IOException on premature EOF
-    ///
-    /// TODO: define a platform-neutral type for 64 bits.
-    ///
-    long double read_le_double64();
-
     /// Read a 16-bit word from a little-endian stream.
     //
     /// Throw IOException on error
     ///
     boost::uint16_t read_le16();
 
-    /// Write a 32-bit word to a little-endian stream.
-    //
-    /// Throw IOException on error
-    ///
-    void write_le32(boost::uint32_t u);
-
-    /// \brief Write a 16-bit word to a little-endian stream.
-    //
-    /// Throw IOException on error
-    ///
-    void write_le16(boost::uint16_t u);
-
     /// Read a single byte from the stream
     //
     /// Throw IOException on error
     ///
     boost::uint8_t read_byte();
-
-    /// write a single byte to the stream
-    //
-    /// Throw IOException on error
-    ///
-    void write_byte(boost::uint8_t u);
-
+    
     /// Read the given number of bytes from the stream
     //
     /// Return the number of bytes actually read. 
@@ -120,12 +94,6 @@ public:
     ///
     virtual std::streamsize write(const void* src, std::streamsize num);
 
-    /// \brief Write a 0-terminated string to a stream.
-    //
-    /// Throw IOException on error
-    ///
-    void write_string(const char* src);
-
     /// \brief
     /// Read up to max_length characters, returns the number of characters 
     /// read, or -1 if the string length is longer than max_length.
@@ -140,16 +108,7 @@ public:
     /// Throw IOException on error
     ///
     int    read_string(char* dst, int max_length);
-
-    /// Write a 32-bit float to a stream in little-endian order.
-    //
-    /// NOTE: this currently relies on host FP format being the same
-        ///       as the Flash one (presumably IEEE 754).
-    ///
-    /// Throw IOException on error
-    ///
-    void write_float32(float value);
-
+    
     /// Read a 32-bit float from a little-endian stream.
     //
     /// NOTE: this currently relies on host FP format being the

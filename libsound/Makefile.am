@@ -30,6 +30,8 @@ libgnashsound_la_CPPFLAGS = \
 	$(NULL)
 
 libgnashsound_la_LIBADD = \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(SDL_LIBS) \
@@ -60,13 +62,23 @@ if USE_SOUND_AHI
  noinst_HEADERS += aos4/sound_handler_ahi.h
 endif
 
+if USE_SOUND_MKIT
+ libgnashsound_la_SOURCES += mkit/sound_handler_mkit.cpp
+ libgnashsound_la_LIBADD += -lmedia
+ noinst_HEADERS += mkit/sound_handler_mkit.h
+endif
+EXTRA_DIST += mkit
+
+if ENABLE_PCH
+SUBDIRS = ../pch
+AM_CXXFLAGS = $(PCH_FLAGS)
+endif
+
 libgnashsound_la_LDFLAGS = -release $(VERSION)
 
 if WIN32
   libgnashsound_la_LDFLAGS += -no-undefined
   libgnashsound_la_LIBADD += \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
 	-lintl
 endif
 

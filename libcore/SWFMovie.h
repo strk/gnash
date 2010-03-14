@@ -23,9 +23,10 @@
 #define GNASH_SWF_MOVIE_H
 
 #include "Movie.h" // for inheritance
-#include "smart_ptr.h" // for composition
 #include "SWFMovieDefinition.h" // for dtor visibility by smart ptr
 
+#include <boost/intrusive_ptr.hpp>
+#include <string>
 #include <set>
 
 // Forward declarations

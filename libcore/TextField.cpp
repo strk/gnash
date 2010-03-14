@@ -47,6 +47,7 @@
 #include "GnashNumeric.h"
 #include "MouseButtonState.h"
 #include "Global_as.h"
+#include "Renderer.h"
 
 #include <algorithm> 
 #include <string>

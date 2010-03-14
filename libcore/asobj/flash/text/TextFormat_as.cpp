@@ -32,6 +32,7 @@
 #include "GnashNumeric.h"
 #include "Array_as.h"
 #include "fontlib.h"
+#include "Font.h"
 
 
 namespace gnash {

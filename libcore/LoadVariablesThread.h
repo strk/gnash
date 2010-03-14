@@ -24,8 +24,6 @@
 #include "StreamProvider.h" // for inlines
 #include "URL.h" // for inlines
 
-#include "log.h"
-#include "IOChannel.h"
 
 #include <string>
 #include <map>

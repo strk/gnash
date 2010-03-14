@@ -23,12 +23,12 @@
 #endif
 
 #include "as_function.h"
-#include "as_value.h"
-#include "CodeStream.h"
-#include "SafeStack.h"
-#include "as_object.h"
-#include "as_environment.h"
 #include "Method.h"
+
+namespace gnash {
+    class as_value;
+    class CodeStream;
+}
 
 namespace gnash {
 namespace abc {

@@ -19,6 +19,7 @@
 #ifndef _RTMP_SERVER_H_
 #define _RTMP_SERVER_H_
 
+#include <vector>
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/array.hpp>

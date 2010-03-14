@@ -21,8 +21,6 @@
 #include "ffmpegHeaders.h"
 #include "VideoConverter.h"
 
-#include "log.h"
-
 #if HAVE_SWSCALE_H
 extern "C" {
 #include <libswscale/swscale.h>

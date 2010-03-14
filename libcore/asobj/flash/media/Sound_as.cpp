@@ -18,6 +18,7 @@
 //
 
 
+#include "RunResources.h"
 #include "media/Sound_as.h"
 #include "log.h"
 #include "sound_handler.h"

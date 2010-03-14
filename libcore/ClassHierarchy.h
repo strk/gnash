@@ -23,7 +23,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "as_object.h"
 
 #ifdef ENABLE_AVM2
 # include "SafeStack.h"
@@ -34,6 +33,8 @@
 # include "Method.h"
 #endif
 
+#include <map>
+#include <string>
 #include <list>
 #include <vector>
 #include <ostream>

@@ -21,7 +21,6 @@
 #ifndef GNASH_LOADABLE_OBJECT_H
 #define GNASH_LOADABLE_OBJECT_H
 
-#include "movie_root.h"
 
 namespace gnash {
     class as_object;

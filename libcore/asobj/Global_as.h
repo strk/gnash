@@ -22,16 +22,14 @@
 
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
-#include "GnashException.h"
-#include "as_function.h"
+#include "log.h"
 
+#include <string>
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
-#include <boost/preprocessor/control.hpp>
-#include <boost/preprocessor/expand.hpp>
 
 // Forward declarations
 namespace gnash {

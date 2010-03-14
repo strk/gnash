@@ -31,6 +31,7 @@
 #include "DisplayObject.h"
 #include "tu_file.h"
 #include "gnash.h"
+#include "RunResources.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
@@ -804,7 +805,8 @@ Gui::display(movie_root* m)
 		
 			for (size_t rno = 0; rno < changed_ranges.size(); rno++) {
 			
-				geometry::Range2d<float> bounds = changed_ranges.getRange(rno);
+				const geometry::Range2d<int>& bounds = 
+					changed_ranges.getRange(rno);
 
 				point corners[4];
 				float xmin = bounds.getMinX();

@@ -38,7 +38,10 @@
 #include "GnashAlgorithm.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "AMF.h"
+#include "AMFConverter.h"
+#include "smart_ptr.h"
+#include "RunResources.h"
+#include "IOChannel.h"
 
 #include <iostream>
 #include <string>

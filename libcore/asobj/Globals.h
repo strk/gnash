@@ -45,6 +45,7 @@
 #ifndef GNASH_GLOBALS_H
 #define GNASH_GLOBALS_H
 
+#include <string>
 #include "Global_as.h" 
 #include "extension.h"
 #include "ClassHierarchy.h"

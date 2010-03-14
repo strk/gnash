@@ -19,11 +19,10 @@
 #ifndef GNASH_SWF_DEFINETEXTTAG_H
 #define GNASH_SWF_DEFINETEXTTAG_H
 
+#include <vector>
 #include "DefinitionTag.h" // for inheritance
-#include "LineStyle.h" 
 #include "SWFRect.h" // for composition
 #include "SWF.h"
-#include "movie_definition.h"
 #include "SWFMatrix.h"
 #include "TextRecord.h"
 

@@ -16,7 +16,10 @@
 # 
 
 ## Process this file with automake to produce Makefile.in
-AUTOMAKE_OPTIONS = 1.6.0
+# no-portability allows us to use GNU make variable assignments
+# without automake complaining.
+AUTOMAKE_OPTIONS = 1.6.0 -Wno-portability
+
 ACLOCAL_AMFLAGS = -I macros
 noinst_SCRIPT = autogen.sh
 
@@ -41,16 +44,19 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-testsuite
 #--enable-cygnal
 
+if CYGNAL
+CYGNAL_DIR = cygnal
+endif
+
 STD_DIRS = \
 	libbase \
-	libamf \
-	libnet \
 	libmedia \
 	libsound \
 	libcore \
 	librender \
 	gui \
 	plugin \
+	$(CYGNAL_DIR) \
 	utilities \
 	doc \
 	po \
@@ -60,16 +66,12 @@ if LIBLTDL2
 LIBLTDLDIR = libltdl
 endif
 
-if CYGNAL
-CYGNAL_DIR = cygnal
-endif
-
 if USE_VAAPI
 VAAPI_DIR = libvaapi
 endif
 
-SUBDIRS = $(LIBLTDLDIR) $(VAAPI_DIR) $(STD_DIRS) $(CYGNAL_DIR)
-DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl
+SUBDIRS = $(LIBLTDLDIR) $(VAAPI_DIR) $(STD_DIRS)
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl libvaapi
 
 if TESTSUITE
 SUBDIRS += testsuite
@@ -108,35 +110,6 @@ EXTRA_DIST =  \
 CLEANFILES =
 
 #
-# Build an RPM package
-#
-include $(srcdir)/packaging/rpm.am
-
-# Build a Debian/Ubuntu .deb GNU/Linux package
-include $(srcdir)/packaging/deb.am
-
-#
-# Build a Debian Familiar .ipk GNU/Linux package. These are always
-# cross compiled, typically for the ARM or XScale.
-#
-include $(srcdir)/packaging/ipkg.am
-
-#
-# Access Linux Platform support.
-#
-include $(srcdir)/packaging/alp.am
-
-#
-# BSD package building
-#
-include $(srcdir)/packaging/bsd.am
-
-#
-# Mozille/Firefox XPI support
-#
-include $(srcdir)/packaging/xpi.am
-
-#
 # Extract info from the repository to include in the build. If
 # bazar (bzr) isn't installed, just print stubs, as this is only
 # used for display purposes. It's primarily used by the testsuites
@@ -165,13 +138,45 @@ bzrversion.h: Makefile.in
 	echo "static const char *BRANCH_REVNO  = \"$${revno}\";" > bzrversion.h; \
 	echo "static const char *BRANCH_NICK = \"$${nick}\";" >> bzrversion.h;
 
-BRANCH_REVNO  = `grep "REVNO" bzrversion.h | cut -d '"' -f 2`
-BRANCH_NICK   = `grep "NICK" bzrversion.h | cut -d '"' -f 2`
+# The branch nickname and revision number must be set before including
+# the other Makefile fragments used for package building, as they use
+# these values.
+BRANCH_REVNO  := $(shell grep "REVNO" bzrversion.h | cut -d '"' -f 2)
+BRANCH_NICK   := $(shell grep "NICK" bzrversion.h | cut -d '"' -f 2)
 
 #
 # Binary tarball packaging
 #
 include $(srcdir)/packaging/snapshot.am
+
+#
+# Build an RPM package
+#
+include $(srcdir)/packaging/rpm.am
+
+# Build a Debian/Ubuntu .deb GNU/Linux package
+include $(srcdir)/packaging/deb.am
+
+#
+# Build a Debian Familiar .ipk GNU/Linux package. These are always
+# cross compiled, typically for the ARM or XScale.
+#
+include $(srcdir)/packaging/ipkg.am
+
+#
+# Access Linux Platform support.
+#
+include $(srcdir)/packaging/alp.am
+
+#
+# BSD package building
+#
+include $(srcdir)/packaging/bsd.am
+
+#
+# Mozille/Firefox XPI support
+#
+include $(srcdir)/packaging/xpi.am
 
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
@@ -247,6 +252,9 @@ if BUILD_FLTK_GUI
 	@echo "	FLTK2_LIBS is $(FLTK2_LIBS)"
 	@echo "	XFT_CFLAGS is $(XFT_CFLAGS)"
 	@echo "	XFT_LIBS is $(XFT_LIBS)"
+endif
+if BUILD_HAIKU_GUI
+	@echo "	HAIKU_LIBS is $(HAIKU_LIBS)"
 endif
 if BUILD_GTK_GUI
 	@echo "	GTK2_CFLAGS is $(GTK2_CFLAGS)"
@@ -406,6 +414,9 @@ if BUILD_FB_GUI
 endif
 if BUILD_AMIGAOS4_GUI
        @echo " Supported GUI: AMIGAOS4"
+endif
+if BUILD_HAIKU_GUI
+	@echo " Supported GUI: Haiku"
 endif
 if XPCOM
 	@echo "	XPCOM support for Mozilla/Firefox"

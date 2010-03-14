@@ -24,6 +24,8 @@
 #include "SWFStream.h" // for reading from SWF
 #include "log.h"
 #include "GnashNumeric.h"
+#include "SWFRect.h"
+#include "Point2d.h"
 
 #include <cmath>
 #include <iomanip>
@@ -122,6 +124,30 @@ SWFMatrix::transform(boost::int32_t& x, boost::int32_t& y) const
     boost::int32_t  t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy,  y) + ty;
     x = t0;
     y = t1;
+}
+
+void
+SWFMatrix::transform(geometry::Range2d<boost::int32_t>& r) const
+{
+    boost::int32_t xmin = r.getMinX(),
+                   xmax = r.getMaxX(),
+                   ymin = r.getMinY(),
+                   ymax = r.getMaxY();
+
+    point p0(xmin, ymin);
+    point p1(xmin, ymax);
+    point p2(xmax, ymax);
+    point p3(xmax, ymin);
+
+    transform(p0);
+    transform(p1);
+    transform(p2);
+    transform(p3);
+
+    r.setTo(p0.x, p0.y);
+    r.expandTo(p1.x, p1.y);
+    r.expandTo(p2.x, p2.y);
+    r.expandTo(p3.x, p3.y);
 }
 
 void
@@ -242,32 +268,6 @@ SWFMatrix::transform(point* result, const point& p) const
 
     result->x = Fixed16Mul(sx,  p.x) + Fixed16Mul(shy, p.y) + tx;
     result->y = Fixed16Mul(shx, p.x) + Fixed16Mul(sy,  p.y) + ty;
-}
-
-void
-SWFMatrix::transform(geometry::Range2d<float>& r) const
-{
-    if ( ! r.isFinite() ) return;
-
-    float xmin = r.getMinX();
-    float xmax = r.getMaxX();
-    float ymin = r.getMinY();
-    float ymax = r.getMaxY();
-
-    point p0(xmin, ymin);
-    point p1(xmin, ymax);
-    point p2(xmax, ymax);
-    point p3(xmax, ymin);
-
-    transform(p0);
-    transform(p1);
-    transform(p2);
-    transform(p3);
-
-    r.setTo(p0.x, p0.y);
-    r.expandTo(p1.x, p1.y);
-    r.expandTo(p2.x, p2.y);
-    r.expandTo(p3.x, p3.y);
 }
 
 void 

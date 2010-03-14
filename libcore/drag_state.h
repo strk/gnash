@@ -22,7 +22,6 @@
 #define GNASH_DRAG_STATE_H
 
 #include "SWFRect.h" // for composition
-#include "smart_ptr.h" // we keep DisplayObject being dragged by intrusive_ptr
 
 namespace gnash
 {

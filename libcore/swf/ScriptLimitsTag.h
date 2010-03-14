@@ -23,7 +23,6 @@
 #include "movie_root.h"
 #include "movie_definition.h"
 #include "ControlTag.h"
-#include "VM.h"
 
 namespace gnash {
 namespace SWF {

@@ -55,18 +55,17 @@ TEST_CASES = \
 dist_noinst_SCRIPTS = gen-test.sh
 
 AM_CPPFLAGS = \
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/libamf  \
-        -I$(top_srcdir)/libcore  \
-        -I$(top_srcdir)/libcore/vm  \
-        -I$(top_srcdir)/libcore/asobj \
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libcore  \
+	-I$(top_srcdir)/libcore/vm  \
+	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/testsuite \
 	$(OPENGL_CFLAGS)	\
 	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)		\
-        $(MING_CFLAGS)		\
-        $(SDL_CFLAGS)		\
-        $(NULL)
+	$(MING_CFLAGS)		\
+	$(SDL_CFLAGS)		\
+	$(NULL)
 
 ## These are needed to properly set dependencies
 ASTESTS =			\

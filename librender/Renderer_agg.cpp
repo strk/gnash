@@ -1083,17 +1083,7 @@ public:
     bounds.set_null();
     bounds.expand_to_transformed_rect(mat, objectBounds);
     
-    const geometry::Range2d<float>& range_float = bounds.getRange();
-    
-    assert(range_float.isFinite());
-    
-    geometry::Range2d<int> range_int(
-      (int) range_float.getMinX(),
-      (int) range_float.getMinY(),
-      (int) range_float.getMaxX(),
-      (int) range_float.getMaxY()
-    );
-    
+    assert(bounds.getRange().isFinite());
     
     const int count = _clipbounds.size();
     for (int cno=0; cno<count; ++cno) {
@@ -2061,7 +2051,7 @@ public:
     return Range2d<int>(xmin, ymin, xmax, ymax);
   }
   
-  geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb)
+  geometry::Range2d<int> world_to_pixel(const geometry::Range2d<int>& wb)
   {
     if (wb.isNull() || wb.isWorld()) return wb;
     
@@ -2113,7 +2103,7 @@ public:
     
     for (size_t rno=0; rno<ranges.size(); ++rno) {
     
-      const Range2d<float>& range = ranges.getRange(rno);
+      const Range2d<int>& range = ranges.getRange(rno);
 
       Range2d<int> pixbounds = world_to_pixel(range);
       
@@ -2132,7 +2122,7 @@ public:
   }
   
   
-  virtual bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds) {    
+  virtual bool bounds_in_clipping_area(const geometry::Range2d<int>& bounds) {    
     
     using gnash::geometry::Range2d;
   

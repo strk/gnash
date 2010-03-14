@@ -26,7 +26,6 @@ noinst_LTLIBRARIES = libgnashparser.la
 # rendering calls from the parser (see https://savannah.gnu.org/task/?5837)
 #
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/swf \
@@ -38,7 +37,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
-	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libltdl \
 	$(GLIB_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
@@ -75,7 +73,6 @@ inst_HEADERS = $(EXTENSIONS_API)
 endif
 
 libgnashparser_la_LIBADD = \
-	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
 ## $(top_builddir)/libmedia/libgnashmedia.la
@@ -94,6 +91,11 @@ endif
 if USE_FFMPEG_ENGINE
 AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
 		-I$(top_srcdir)/libmedia/ffmpeg
+endif
+
+if ENABLE_PCH
+SUBDIRS = ../../pch
+AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support

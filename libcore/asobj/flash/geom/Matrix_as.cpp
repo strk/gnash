@@ -28,6 +28,7 @@
 #include "GnashException.h" // for ActionException
 #include "VM.h"
 
+#include "namedStrings.h"
 #include <cmath>
 #include <boost/numeric/ublas/matrix.hpp> // boost matrix
 #include <boost/numeric/ublas/io.hpp>

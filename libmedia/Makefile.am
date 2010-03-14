@@ -46,6 +46,7 @@ libgnashmedia_la_CPPFLAGS = \
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
 libgnashmedia_la_LIBADD = \
+	$(top_builddir)/libbase/libgnashbase.la \
 	$(FFMPEG_LIBS) \
 	$(PNG_LIBS) \
 	$(JPEG_LIBS) \
@@ -165,6 +166,35 @@ if USE_VAAPI
 endif
 endif
 
+if USE_HAIKU_ENGINE
+   libgnashmedia_la_SOURCES += \
+	haiku/MediaHandlerHaiku.cpp \
+	haiku/MediaParserHaiku.cpp \
+	haiku/AudioDecoderHaiku.cpp \
+	haiku/VideoDecoderHaiku.cpp \
+	haiku/VideoConverterHaiku.cpp \
+	haiku/VideoInputHaiku.cpp \
+	haiku/AudioInputHaiku.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	haiku/MediaHandlerHaiku.h \
+	haiku/MediaParserHaiku.h \
+	haiku/AudioDecoderHaiku.h \
+	haiku/VideoDecoderHaiku.h \
+	haiku/VideoConverterHaiku.h \
+	haiku/VideoInputHaiku.h \
+	haiku/AudioInputHaiku.h \
+	$(NULL)
+
+   libgnashmedia_la_LIBADD += \
+	-lmedia \
+	$(NULL)
+
+   libgnashmedia_la_CPPFLAGS += \
+	$(NULL)
+endif
+
 if HAVE_SPEEX
    libgnashmedia_la_LIBADD += \
 	$(SPEEX_LIBS) \
@@ -193,8 +223,12 @@ endif
 if WIN32
   libgnashmedia_la_LDFLAGS += -no-undefined
   libgnashmedia_la_LIBADD += \
-	$(top_builddir)/libbase/libgnashbase.la
 	-lintl
+endif
+
+if ENABLE_PCH
+SUBDIRS = ../pch
+AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support

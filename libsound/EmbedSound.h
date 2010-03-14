@@ -24,6 +24,7 @@
 #include "SoundInfo.h" // for composition
 #include "SoundEnvelope.h" // for SoundEnvelopes define
 
+#include <vector>
 #include <map> // for composition (m_frame_size)
 #include <memory> // for auto_ptr (composition)
 #include <set> // for composition (_soundInstances)

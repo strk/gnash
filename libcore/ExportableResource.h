@@ -20,7 +20,6 @@
 #define GNASH_RESOURCE_H
 
 #include "ref_counted.h" // for inheritance
-#include "smart_ptr.h"
 
 namespace gnash {
 

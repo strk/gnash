@@ -18,6 +18,8 @@
 
 #include <cmath>
 #include "Geometry.h"
+#include "log.h"
+#include "LineStyle.h"
 
 namespace gnash {
 namespace geometry {

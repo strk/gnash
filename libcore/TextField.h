@@ -21,10 +21,12 @@
 
 #include "InteractiveObject.h" // for inheritance
 #include "LineStyle.h" // for LineStyle
-#include "Range2d.h"
+#include "snappingrange.h"
 #include "SWFRect.h" // for inlines
-#include "Font.h" // for visibility of font add_ref/drop_ref
 
+#include <boost/intrusive_ptr.hpp>
+#include <map>
+#include <string>
 #include <vector>
 
 // Forward declarations
@@ -33,7 +35,8 @@ namespace gnash {
         class DefineEditTextTag;
         class TextRecord;
     }
-	class TextFormat_as;
+    class TextFormat_as;
+    class Font;
 }
 
 namespace gnash {

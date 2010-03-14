@@ -22,8 +22,6 @@
 
 #include "PropFlags.h"
 #include "as_value.h"
-#include "string_table.h"
-#include "log.h"
 #include "ObjectURI.h"
 
 #include <boost/variant.hpp>

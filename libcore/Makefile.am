@@ -19,6 +19,11 @@ AUTOMAKE_OPTIONS =
 
 SUBDIRS = parser vm
 
+if ENABLE_PCH
+SUBDIRS += ../pch
+AM_CXXFLAGS = $(PCH_FLAGS)
+endif
+
 # noinst_LTLIBRARIES = libserver.la 
 pkglib_LTLIBRARIES = libgnashcore.la
 # noinst_SCRIPTS = gen-files.sh
@@ -28,8 +33,6 @@ FREETYPE_SOURCES = FreetypeGlyphsProvider.h FreetypeGlyphsProvider.cpp
 
 # Only enable if we're configured with --enable-mp3
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/libnet \
-	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/abc \
@@ -60,7 +63,7 @@ libgnashcore_la_SOURCES = \
 	event_id.cpp \
 	Relay.cpp \
 	as_object.cpp \
-	AMF.cpp \
+	AMFConverter.cpp \
 	as_value.cpp \
 	DisplayObjectContainer.cpp \
 	DisplayObject.cpp \
@@ -232,7 +235,7 @@ EXTENSIONS_API = \
 	ObjectURI.h \
 	Property.h \
 	PropertyList.h \
-	AMF.h \
+	AMFConverter.h \
 	as_value.h \
 	PropFlags.h	\
 	CharacterProxy.h \
@@ -289,7 +292,6 @@ endif
 
 libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
@@ -339,6 +341,10 @@ libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
 #   libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
 # 	$(top_builddir)/libsound/libgnashsound.la
 # endif
+
+if BUILD_HAIKU_GUI
+  libgnashcore_la_LIBADD += $(HAIKU_LIBS)
+endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

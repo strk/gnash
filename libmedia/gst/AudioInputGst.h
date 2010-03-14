@@ -21,6 +21,7 @@
 
 #include "gst/gst.h"
 #include "AudioInput.h"
+#include <string>
 #include <boost/cstdint.hpp> // for C99 int types
 #include <vector>
 #include <cassert>

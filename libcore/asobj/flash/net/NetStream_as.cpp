@@ -20,6 +20,7 @@
 
 
 
+#include "RunResources.h"
 #include "NetStream_as.h"
 #include "CharacterProxy.h"
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -39,7 +40,7 @@
 #include "StreamProvider.h"
 #include "sound_handler.h"
 #include "GnashSystemNetHeaders.h"
-#include "AMF.h"
+#include "AMFConverter.h"
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS

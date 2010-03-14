@@ -18,9 +18,9 @@
 #ifndef GNASH_SWF_DOABCTAG_H
 #define GNASH_SWF_DOABCTAG_H
 
+#include <string>
 #include "ControlTag.h" // for inheritance
 #include "SWF.h" // for tag_type definition
-#include "action_buffer.h" // for composition
 #include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines
 #include "AbcBlock.h"

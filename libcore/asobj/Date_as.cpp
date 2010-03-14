@@ -75,6 +75,7 @@
 #include "ClockTime.h"
 #include "VM.h"
 
+#include "namedStrings.h"
 #include <cmath>
 #include <boost/format.hpp>
 

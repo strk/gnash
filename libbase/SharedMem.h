@@ -19,19 +19,20 @@
 #ifndef GNASH_SHM_H
 #define GNASH_SHM_H
 
-#include <string>
 #include <boost/cstdint.hpp>
 
 #include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__)
 # include <sys/ipc.h>
 # include <sys/shm.h>
-#elif !defined(__riscos__) && !defined(__OS2__)
+#elif !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__)
 # include <windows.h>
 # include <process.h>
 # include <fcntl.h>
 # include <io.h>
 #endif
+
+#include "dsodefs.h" //For DSOEXPORT
 
 // Forward declarations
 namespace gnash {
@@ -84,7 +85,7 @@ public:
     //
     /// This is called by LocalConnection when either connect() or send()
     /// is called.
-    bool attach();
+    DSOEXPORT bool attach();
 
     /// Use to get a scoped semaphore lock on the shared memory.
     class Lock
@@ -105,12 +106,12 @@ private:
     /// Get a semaphore lock if possible
     //
     /// @return     true if successful, false if not.
-    bool lock();
+    DSOEXPORT bool lock();
     
     /// Release a semaphore lock if possible
     //
     /// @return     true if successful, false if not.
-    bool unlock();
+    DSOEXPORT bool unlock();
 
     iterator _addr;
 

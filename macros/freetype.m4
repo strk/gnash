@@ -41,6 +41,13 @@ AC_DEFUN([GNASH_PATH_FREETYPE2],
         ac_cv_path_freetype_incl="-I$i/freetype2"
 	      break
       fi
+      dnl Haiku uses only freetype as the directory, not freetype2
+      if test x"${haiku}" = xyes; then
+        if test -f $i/freetype/freetype/freetype.h; then
+          ac_cv_path_freetype_incl="-I$i/freetype"
+	        break
+        fi
+      fi
     done
 
     if test x"${ac_cv_path_freetype_incl}" = x ; then
@@ -90,7 +97,7 @@ dnl   fi
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_freetype_lib}" = x; then
     dnl freetype-config gives us way too many libraries, which create nasty linking
-    dnl dependancy issue, so we strip them off here. The real dependencies are
+    dnl dependancy issues, so we strip them off here. The real dependencies are
     dnl are taken care of by other config tests.
     AC_MSG_CHECKING([for ${libname} library])
     for i in $libslist; do

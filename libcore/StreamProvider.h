@@ -23,7 +23,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 #include "NamingPolicy.h"
 
-#include <map>
+#include <string>
 #include <memory>
 
 // Forward declarations

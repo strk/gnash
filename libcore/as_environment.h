@@ -21,12 +21,9 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_value.h" // for composition (vector + frame_slot)
-#include "StringPredicates.h" // for Variables 
-#include "as_object.h"
 #include "SafeStack.h"
 #include "CallStack.h" // for composition
 
-#include <map> // for composition (Variables)
 #include <string> // for frame_slot name
 #include <vector>
 #include <iostream> // for dump_stack inline
@@ -38,6 +35,7 @@ class DisplayObject;
 class VM;
 class Global_as;
 class movie_root;
+class string_table;
 
 /// ActionScript execution environment.
 class as_environment

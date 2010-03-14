@@ -21,18 +21,16 @@
 #ifndef GNASH_SWF_DEFINEBUTTONTAG_H
 #define GNASH_SWF_DEFINEBUTTONTAG_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "DefinitionTag.h"
-#include "sound_definition.h"
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
 #include "action_buffer.h" // for composition of ButtonAction
 #include "filter_factory.h" // for Filters (composition of button_record)
-#include "sound_handler.h" // for sound_handler::sound_envelope in a vector..
 #include "DefineButtonSoundTag.h"
 #include "SWF.h"
 #include "Button.h"
 
+#include <vector>
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> 
 #include <memory>

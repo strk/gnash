@@ -21,8 +21,8 @@
 #ifndef GNASH_VIDEO_H
 #define GNASH_VIDEO_H
 
+#include <boost/intrusive_ptr.hpp>
 #include "DisplayObject.h" // for inheritance
-#include "swf/DefineVideoStreamTag.h"
 
 // Forward declarations
 namespace gnash {

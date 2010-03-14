@@ -19,6 +19,7 @@
 #ifndef GNASH_BITMAP_MOVIE_H
 #define GNASH_BITMAP_MOVIE_H
 
+#include <string>
 #include "BitmapMovieDefinition.h"
 #include "Movie.h" // for inheritance
 

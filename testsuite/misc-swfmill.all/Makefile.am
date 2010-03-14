@@ -27,7 +27,11 @@ DIR_TRACE_AS3 = trace-as3
 endif
 endif
 
-SUBDIRS = trace-as2 $(DIR_TRACE_AS3)
+if SWFMILL_FUNCTION2_FLAGS_ORDER_CORRECT
+DIR_TRACE_AS2 = trace-as2
+endif
+
+SUBDIRS = $(DIR_TRACE_AS2) $(DIR_TRACE_AS3)
 
 DIST_SUBDIRS = \
 	trace-as2 \

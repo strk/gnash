@@ -24,7 +24,7 @@
 
 #include "sound_handler.h" // for inheritance
 
-#include <vector> // for composition (Sounds)
+#include <string>
 #include <set> // for composition (InputStreams)
 #include <fstream> // for composition (file_stream)
 #include <SDL_audio.h>

@@ -26,16 +26,18 @@
 #define GNASH_MATRIX_H
 
 #include "dsodefs.h" // for DSOEXPORT
-#include "Range2d.h" // for transforming Range2d<float>
-#include "SWFRect.h"    // for SWFRect 
-#include "Point2d.h" // for Point2d
 
-#include <iostream> 
+#include <ostream> 
 #include <boost/cstdint.hpp>
 
 // Forward declarations
 namespace gnash {
     class SWFStream;
+    class SWFRect;
+    namespace geometry {
+        class Point2d;
+        template <typename T> class Range2d;
+    }
 }
 
 
@@ -154,13 +156,14 @@ public:
     //
     /// Put the result in *result.
     ///
-    void    transform(point* result, const point& p) const;
+    void    transform(geometry::Point2d* result,
+                      const geometry::Point2d& p) const;
 
     /// Transform Range2d<float> 'r' by our SWFMatrix. 
     //
     /// NULL and WORLD ranges are untouched.
     ///
-    void    transform(geometry::Range2d<float>& r) const;
+    void transform(geometry::Range2d<boost::int32_t>& r) const;
 
     void    transform(SWFRect& r) const;
     

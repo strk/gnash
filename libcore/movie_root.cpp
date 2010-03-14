@@ -38,6 +38,8 @@
 #include "Global_as.h"
 #include "utf8.h"
 #include "IOChannel.h"
+#include "RunResources.h"
+#include "Renderer.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -1630,7 +1632,7 @@ movie_root::executeTimers()
     }
 
     foreachSecond(expiredTimers.begin(), expiredTimers.end(),
-            std::mem_fun(&Timer::executeAndReset));
+                  &Timer::executeAndReset);
 
     if (!expiredTimers.empty()) processActionQueue();
 
@@ -1640,8 +1642,7 @@ movie_root::executeTimers()
 void
 movie_root::markReachableResources() const
 {
-    foreachSecond(_movies.rbegin(), _movies.rend(),
-            std::mem_fun(&MovieClip::setReachable));
+    foreachSecond(_movies.rbegin(), _movies.rend(), &MovieClip::setReachable);
 
     // Mark original top-level movie
     // This should always be in _movies, but better make sure
@@ -1652,7 +1653,7 @@ movie_root::markReachableResources() const
     
     // Mark timer targets
     foreachSecond(_intervalTimers.begin(), _intervalTimers.end(),
-            std::mem_fun(&Timer::markReachableResources));
+                  &Timer::markReachableResources);
 
     std::for_each(_objectCallbacks.begin(), _objectCallbacks.end(),
             std::mem_fun(&ActiveRelay::setReachable));
@@ -1773,7 +1774,7 @@ movie_root::cleanupDisplayList()
     //       in local display lists must happen at the *end* of global action
     //       queue processing.
     foreachSecond(_movies.rbegin(), _movies.rend(),
-            std::mem_fun(&MovieClip::cleanupDisplayList));
+                  &MovieClip::cleanupDisplayList);
 
     // Now remove from the instance list any unloaded DisplayObject
     // Note that some DisplayObjects may be unloaded but not yet destroyed,

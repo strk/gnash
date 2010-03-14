@@ -25,19 +25,19 @@ cgi_LTLIBRARIES = oflaDemo.la
 GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashnet.la \
+	../../libamf/libgnashamf.la \
+	../../libnet/libgnashnet.la \
+	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(BOOST_CFLAGS) \
 	$(NULL)
 
 INCLUDES = \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/libamf \
-	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/cygnal \
+        -I$(top_srcdir)/cygnal/libamf \
+	-I$(top_srcdir)/cygnal/libnet \
 	$(BOOST_CFLAGS)
 
 oflaDemo_la_SOURCES = oflaDemo.cpp oflaDemo.h

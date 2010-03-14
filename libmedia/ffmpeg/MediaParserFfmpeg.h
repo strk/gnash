@@ -1,4 +1,4 @@
-// MediaParserFfmpeg.h: FFMPG media parsers, for Gnash
+// MediaParserFfmpeg.h: FFMEPG media parsers, for Gnash
 // 
 //   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
@@ -22,7 +22,6 @@
 #include "MediaParser.h" // for inheritance
 #include "ffmpegHeaders.h"
 
-#include <vector>
 #include <boost/scoped_array.hpp>
 #include <memory>
 

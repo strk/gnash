@@ -1,4 +1,4 @@
-// VideoInputFfmpeg.h: Video input processing using Gstreamer
+// VideoInputFfmpeg.h: Video input processing using Ffmpeg
 // 
 //   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 

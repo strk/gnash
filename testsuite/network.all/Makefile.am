@@ -44,8 +44,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/parser  \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/asobj \
-	-I$(top_srcdir)/libamf \
-	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/testsuite \
 	-I$(top_srcdir)/testsuite/misc-ming.all \
 	$(MING_CFLAGS) \
@@ -56,12 +54,10 @@ AM_CPPFLAGS = \
 
 AM_LDFLAGS = 
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashnet.la \
+	$(MING_LIBS) \
 	$(OPENGL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
-	$(MING_LIBS) \
 	$(NULL)
 
 if LIBLTDL2
@@ -134,8 +130,6 @@ if BUILD_SSL
 test_ssl_SOURCES = test_ssl.cpp
 test_ssl_LDADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashnet.la
 test_ssl_DEPENDENCIES = site-update
 endif
 
@@ -143,8 +137,6 @@ if BUILD_SSH
 test_ssh_SOURCES = test_ssh.cpp
 test_ssh_LDADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashnet.la
 test_ssh_DEPENDENCIES = site-update
 endif
 

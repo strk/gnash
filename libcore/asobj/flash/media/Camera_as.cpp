@@ -30,6 +30,7 @@
 #include "VideoInput.h"
 #include "Object.h"
 
+#include "namedStrings.h"
 #include <sstream>
 
 

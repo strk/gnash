@@ -25,6 +25,7 @@
 #include "abc_function.h"
 #include "Global_as.h"
 #include "VM.h"
+#include "namedStrings.h"
 
 #include <boost/bind.hpp>
 
