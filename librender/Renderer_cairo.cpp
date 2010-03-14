@@ -35,16 +35,18 @@
 // - masks
 // - video (from old Cairo renderer)
 
-#include <smart_ptr.h>
-#include <cairo/cairo.h>
-#include <boost/scoped_array.hpp>
+#include "smart_ptr.h"
 #include "Renderer.h"
 #include "GnashImage.h"
-#include <cmath>
 #include "PathParser.h"
 #include "swf/ShapeRecord.h"
 #include "Renderer_cairo.h"
 #include "utility.h"
+
+#include <cmath>
+#include <cairo/cairo.h>
+#include <boost/scoped_array.hpp>
+#include <boost/bind.hpp>
 
 namespace gnash {
 

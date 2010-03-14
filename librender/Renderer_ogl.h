@@ -54,6 +54,8 @@
 #include "Geometry.h"
 #include "BitmapInfo.h"
 
+#include <map>
+
 
 namespace gnash {
 
