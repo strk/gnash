@@ -785,15 +785,15 @@ AC_ARG_ENABLE(sound,
 )
 
 if test x$build_ogl = xyes; then
-  if test x$build_fb = xyes; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
-  fi
-  if test x$build_fltk = xyes; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
-  fi
-  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
-  fi
+dnl  if test x$build_fb = xyes; then
+dnl    AC_MSG_ERROR([OpenGL renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
+dnl  fi
+dnl  if test x$build_fltk = xyes; then
+dnl    AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
+dnl  fi
+dnl  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
+dnl    AC_MSG_ERROR([OpenGL renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
+dnl  fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
 
@@ -2283,8 +2283,8 @@ if test x"$media_handler" = x"ffmpeg"; then
   fi
 fi
 
-dnl GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 if test x$build_cairo = xyes; then
+    GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 dnl   if test x"${CAIRO_CFLAGS}" != x; then
 dnl      CAIRO_CFLAGS=`echo ${CAIRO_CFLAGS} | sed -e 's/ *//'`
 dnl      CAIRO_CFLAGS="${CAIRO_CFLAGS} ${CAIRO_CFLAGS}/cairo"
@@ -2295,15 +2295,15 @@ dnl  fi
 dnl   if test x$build_sdl = xyes; then
 dnl     AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
 dnl   fi
-  if test x$build_fltk = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-  fi
-  if test x$build_kde3 = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-  fi
-  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-  fi
+dnl  if test x$build_fltk = xyes; then
+dnl    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
+dnl  fi
+dnl  if test x$build_kde3 = xyes; then
+dnl    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
+dnl  fi
+dnl  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
+dnl    AC_MSG_ERROR([Cairo renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
+dnl  fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
 
