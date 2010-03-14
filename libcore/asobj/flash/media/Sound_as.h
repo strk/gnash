@@ -28,6 +28,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/cstdint.hpp> // For C99 int types
 
 namespace gnash {
 
