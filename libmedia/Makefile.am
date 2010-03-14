@@ -42,8 +42,13 @@ libgnashmedia_la_CPPFLAGS = \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
+if ANDROID
+  libgnashmedia_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
+endif
+
+
 # These headers get installed
-# include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
+# include_HEADERS = log.h err.h
 
 libgnashmedia_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \

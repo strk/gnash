@@ -234,8 +234,7 @@ dnl  /opt/android-ndk-r3/build/platforms/android-3/arch-arm/usr/lib/crtbegin_dyn
 dnl Recent versions of G++ (I'm using 4.5 from source
 android_ndk=no
 AC_ARG_WITH([android],
-  AC_HELP_STRING([--with-android],
-	  [directory where android NDK is installed]),
+  AC_HELP_STRING([--with-android], [directory where android NDK is installed]),
         android_ndk=${withval}
         if test x"${withval}" != x; then
           android_ndk=${withval}
@@ -252,9 +251,11 @@ dnl  LDFLAGS=-Wl,--dynamic-linker -Wl,/system/bin/linker -nostdlib -Wl,-rpath -W
     cross_compiling=yes
   fi
   ANDROID_NDK=${android_ndk}
+else
+  ANDROID_NDK=
 fi
 AC_SUBST(ANDROID_NDK)
-AM_CONDITIONAL(ANDROID, [ test x"${android_ndk}" != x ])
+AM_CONDITIONAL(ANDROID, [ test x"${android_ndk}" != xno ])
 
 soldir=/tmp
 AC_ARG_WITH(soldir,
