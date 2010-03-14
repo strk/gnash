@@ -216,7 +216,9 @@ public:
     /// Sets the x/y scale for the movie    
     virtual void set_scale(float /*xscale*/, float /*yscale*/) {} 
 
-    /// Sets the x/y offset for the movie    
+    /// Sets the x/y offset for the movie in pixels. This applies to all
+    /// graphics drawn except the background, which must be drawn for the
+    /// entire canvas, regardless of the translation.
     virtual void set_translation(float /*xoff*/, float /*yoff*/) {}
 
     void setQuality(Quality q) { _quality = q; }
