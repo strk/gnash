@@ -1178,7 +1178,6 @@ private:
     size_t _unnamedInstance;
 
     MovieLoader _movieLoader;
-
 };
 
 /// Return true if the given string can be interpreted as a _level name

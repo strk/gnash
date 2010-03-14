@@ -24,10 +24,12 @@
 #include <cstring>
 #include <cmath>
 
+#include <smart_ptr.h>
 #include "swf/ShapeRecord.h"
 #include "gnash.h"
 #include "RGBA.h"
 #include "GnashImage.h"
+#include "GnashTexture.h"
 #include "GnashNumeric.h"
 #include "log.h"
 #include "utility.h"
@@ -41,6 +43,14 @@
 
 #include <boost/utility.hpp>
 #include <boost/bind.hpp>
+
+#if USE_VAAPI_GLX
+#  include "GnashVaapiImage.h"
+#  include "GnashVaapiTexture.h"
+#endif
+
+// Defined to 1 to disable (slow) anti-aliasing with the accumulation buffer
+#define NO_ANTIALIASING 1
 
 /// \file Renderer_ogl.cpp
 /// \brief The OpenGL renderer and related code.
@@ -406,8 +416,8 @@ Tesselator::error(GLenum error)
 
 // static
 void
-Tesselator::combine(GLdouble coords [3], void *vertex_data[4],
-                      GLfloat weight[4], void **outData, void* userdata)
+Tesselator::combine(GLdouble coords [3], void **/*vertex_data[4] */,
+		    GLfloat * /* weight[4] */, void **outData, void* userdata)
 {
   Tesselator* tess = (Tesselator*)userdata;
   assert(tess);
@@ -672,6 +682,73 @@ public:
       }
   }
 
+  boost::shared_ptr<GnashTexture> getCachedTexture(GnashImage *frame)
+  {
+      boost::shared_ptr<GnashTexture> texture;
+      GnashTextureFormat frameFormat(frame->type());
+      unsigned int frameFlags;
+
+      switch (frame->location()) {
+      case GNASH_IMAGE_CPU:
+          frameFlags = 0;
+          break;
+#if USE_VAAPI_GLX
+      case GNASH_IMAGE_GPU:
+          frameFlags = GNASH_TEXTURE_VAAPI;
+          break;
+#endif
+      default:
+          assert(0);
+          return texture;
+      }
+
+      // Look for a texture with the same dimensions and type
+      std::list< boost::shared_ptr<GnashTexture> >::iterator it;
+      for (it = _cached_textures.begin(); it != _cached_textures.end(); it++) {
+          if ((*it)->width() == frame->width() &&
+              (*it)->height() == frame->height() &&
+              (*it)->internal_format() == frameFormat.internal_format() &&
+              (*it)->format() == frameFormat.format() &&
+              (*it)->flags() == frameFlags)
+              break;
+      }
+
+      // Found texture and remove it from cache. It will be pushed
+      // back into the cache when rendering is done, in end_display()
+      if (it != _cached_textures.end()) {
+          texture = *it;
+          _cached_textures.erase(it);
+      }
+
+      // Otherwise, create one and empty cache because they may no
+      // longer be referenced
+      else {
+          _cached_textures.clear();
+
+          switch (frame->location()) {
+          case GNASH_IMAGE_CPU:
+              texture.reset(new GnashTexture(frame->width(),
+                                             frame->height(),
+                                             frame->type()));
+              break;
+#if USE_VAAPI_GLX
+          case GNASH_IMAGE_GPU:
+              texture.reset(new GnashVaapiTexture(frame->width(),
+                                                  frame->height(),
+                                                  frame->type()));
+              break;
+#endif
+          }
+      }
+
+      assert(texture->width() == frame->width());
+      assert(texture->height() == frame->height());
+      assert(texture->internal_format() == frameFormat.internal_format());
+      assert(texture->format() == frameFormat.format());
+      assert(texture->flags() == frameFlags);
+      return texture;
+  }
+
   // Since we store drawing operations in display lists, we take special care
   // to store video frame operations in their own display list, lest they be
   // anti-aliased with the rest of the drawing. Since display lists cannot be
@@ -692,14 +769,33 @@ public:
 
     glEndList();
 
+    boost::shared_ptr<GnashTexture> texture = getCachedTexture(frame);
+    if (!texture.get())
+        return;
+
+    switch (frame->location()) {
+    case GNASH_IMAGE_CPU:
+        texture->update(frame->data());
+        break;
+#if USE_VAAPI_GLX
+    case GNASH_IMAGE_GPU:
+        dynamic_cast<GnashVaapiTexture *>(texture.get())->update(dynamic_cast<GnashVaapiImage *>(frame)->surface());
+        break;
+#endif
+    default:
+        assert(0);
+        return;
+    }
+    _render_textures.push_back(texture);
+
     glGenLists(2);
 
     ++index;
 
     glNewList(index, GL_COMPILE);
-    _video_indices.push_back(index);
+    _render_indices.push_back(index);
 
-    reallyDrawVideoFrame(frame, m, bounds);
+    reallyDrawVideoFrame(texture, m, bounds);
 
     glEndList();
 
@@ -708,57 +804,34 @@ public:
     glNewList(index, GL_COMPILE);
     _render_indices.push_back(index);
   }
-  
-  virtual void reallyDrawVideoFrame(GnashImage* frame, const SWFMatrix* m, const SWFRect* bounds)
+
+private:  
+  void reallyDrawVideoFrame(boost::shared_ptr<GnashTexture> texture, const SWFMatrix* m, const SWFRect* bounds)
   {
-  
-    if (frame->type() == GNASH_IMAGE_RGBA)
-    {
-        LOG_ONCE(log_error(_("Can't render videos with alpha")));
-        return;
-    }
-  
-    assert(frame->type() == GNASH_IMAGE_RGB);
-
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
-
-
-    glMatrixMode(GL_COLOR);
     glPushMatrix();
 
-    glLoadIdentity();
-    glPixelTransferf(GL_GREEN_BIAS, 0.0);
-    glPixelTransferf(GL_BLUE_BIAS, 0.0);
+    gnash::point l, u;
+    m->transform(&l, point(bounds->get_x_min(), bounds->get_y_min()));
+    m->transform(&u, point(bounds->get_x_max(), bounds->get_y_max()));
+    const unsigned int w = u.x - l.x;
+    const unsigned int h = u.y - l.y;
 
-    gnash::point a, b, c, d;
-    m->transform(&a, gnash::point(bounds->get_x_min(), bounds->get_y_min()));
-    m->transform(&b, gnash::point(bounds->get_x_max(), bounds->get_y_min()));
-    m->transform(&c, gnash::point(bounds->get_x_min(), bounds->get_y_max()));
-    d.x = b.x + c.x - a.x;
-    d.y = b.y + c.y - a.y;
-
-    float w_bounds = twipsToPixels(b.x - a.x);
-    float h_bounds = twipsToPixels(c.y - a.y);
-
-    unsigned char*   ptr = frame->data();
-    float xpos = a.x < 0 ? 0.0f : a.x;  //hack
-    float ypos = a.y < 0 ? 0.0f : a.y;  //hack
-    glRasterPos2f(xpos, ypos);  //hack
-
-    size_t height = frame->height();
-    size_t width = frame->width();
-    float zx = w_bounds / static_cast<float>(width);
-    float zy = h_bounds / static_cast<float>(height);
-    glPixelZoom(zx,  -zy);  // flip & zoom image
-    glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, ptr);
+    texture->bind();
+    glTranslatef(l.x, l.y, 0.0f);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glBegin(GL_QUADS);
+    {
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(0, 0);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(0, h);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(w, h);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(w, 0);
+    }
+    glEnd();
+    texture->release();
 
     glPopMatrix();
-
     glPopAttrib();
-
-    // Restore the default SWFMatrix mode.
-    glMatrixMode(GL_MODELVIEW); 
-    
   }
 
   // FIXME
@@ -779,6 +852,7 @@ public:
     return point(pixelsToTwips(x), pixelsToTwips(y));
   }
 
+public:
   virtual void  begin_display(
     const rgba& bg_color,
     int viewport_x0, int viewport_y0,
@@ -819,6 +893,12 @@ public:
   {
     glEndList();    
     
+#if NO_ANTIALIASING
+    // Don't use accumulation buffer based anti-aliasing
+    glClear(GL_COLOR_BUFFER_BIT);
+    glCallLists(_render_indices.size(), GL_UNSIGNED_BYTE,
+                &_render_indices.front());
+#else
     // This is a table of randomly generated numbers between -0.5 and 0.5.
     struct {
       GLfloat x;
@@ -862,12 +942,7 @@ public:
     }
     
     glAccum (GL_RETURN, 1.0);
-    
-    if (!_video_indices.empty()) {
-      // there's a video frame (or several) to draw, without anti-aliasing.
-      glCallLists(_video_indices.size(), GL_UNSIGNED_BYTE,
-                  &_video_indices.front());
-    }  
+#endif
   
   #if 0
     GLint box[4];
@@ -881,9 +956,12 @@ public:
     glRectd(x, y - h, x + w, y + h);
   #endif
 
-    glDeleteLists(1, _render_indices.size() + _video_indices.size());
+    glDeleteLists(1, _render_indices.size());
     _render_indices.clear();
-    _video_indices.clear();
+
+    for (size_t i = 0; i < _render_textures.size(); i++)
+        _cached_textures.push_front(_render_textures[i]);
+    _render_textures.clear();
   
     check_error();
 
@@ -926,7 +1004,7 @@ public:
   // NOTE: this implementation can't handle complex polygons (such as concave
   // polygons.
   virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool masked)
+    const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool /* masked */)
   {
     if (corner_count < 1) {
       return;
@@ -953,7 +1031,7 @@ public:
     glPopMatrix();
   }
 
-  virtual void  set_antialiased(bool enable)
+  virtual void  set_antialiased(bool /* enable */ )
   {
     log_unimpl("set_antialiased");
   }
@@ -1217,7 +1295,7 @@ public:
     }    
   }
 
-  void apply_fill_style(const fill_style& style, const SWFMatrix& mat, const cxform& cx)
+  void apply_fill_style(const fill_style& style, const SWFMatrix& /* mat */, const cxform& cx)
   {
       int fill_type = style.get_type();
       
@@ -1290,7 +1368,7 @@ public:
     bool rv = true;
     
     float width = style.getThickness();
-    float pointSize;
+    //    float pointSize;
     
     if (!width)
     {
@@ -1378,8 +1456,9 @@ public:
   }
     
   void
-  draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints, const SWFMatrix& mat,
-                const cxform& cx, const std::vector<fill_style>& fill_styles,
+  draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints,
+		const SWFMatrix& mat, const cxform& cx,
+		const std::vector<fill_style>& /* fill_styles */,
                 const std::vector<LineStyle>& line_styles)
   {
   
@@ -1689,7 +1768,7 @@ public:
     _yscale = yscale;
   }
 
-  virtual void set_invalidated_regions(const InvalidatedRanges& ranges)
+  virtual void set_invalidated_regions(const InvalidatedRanges& /* ranges */)
   {
 #if 0
     if (ranges.isWorld() || ranges.isNull()) {
@@ -1742,7 +1821,8 @@ private:
   bool _drawing_mask;
   
   std::vector<boost::uint8_t> _render_indices;
-  std::vector<boost::uint8_t> _video_indices;
+  std::vector< boost::shared_ptr<GnashTexture> > _render_textures;
+  std::list< boost::shared_ptr<GnashTexture> > _cached_textures;
   
 #ifdef OSMESA_TESTING
   std::auto_ptr<OSRenderMesa> _offscreen;

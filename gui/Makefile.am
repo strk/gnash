@@ -41,6 +41,7 @@ SUBDIRS += pythonmod
 endif
 DIST_SUBDIRS = pythonmod
 
+noinst_HEADERS =
 noinst_LTLIBRARIES = #libgnashgui.la
 AM_CPPFLAGS = \
         -I../.. \
@@ -52,7 +53,7 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libltdl \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/backend \
+        -I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libmedia/ffmpeg \
@@ -150,12 +151,12 @@ libgnashaqua_ogl_la_SOURCES = \
 	aqua.cpp aquasup.h aqua_glue.h
 libgnashaqua_ogl_la_LDFLAGS = $(LIB_FLAGS)
 libgnashaqua_ogl_la_LIBADD = \
-	$(top_builddir)/backend/libgnashogl.la 
+	$(top_builddir)/librender/libgnashogl.la 
 endif # HAVE_OPENGL
 endif # BUILD_AQUA_GUI
 
 if USE_FFMPEG_ENGINE
-AM_LDFLAGS += $(FFMPEG_LIBS)
+AM_LDFLAGS += $(FFMPEG_LIBS) $(LIBVA_LIBS) $(LIBVA_X11_LIBS) 
 AM_CPPFLAGS += $(FFMPEG_CFLAGS) 
 endif
 

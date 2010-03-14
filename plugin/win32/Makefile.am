@@ -25,7 +25,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libmedia/ffmpeg \
-	-I$(top_srcdir)/backend \
+	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/vm \
@@ -42,7 +42,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
-	$(top_builddir)/backend/libgnashagg.la \
+	$(top_builddir)/librender/libgnashrender.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/plugin/mozilla-sdk/np_entry.lo \
 	$(top_builddir)/plugin/mozilla-sdk/npn_gate.lo \

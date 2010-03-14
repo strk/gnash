@@ -30,14 +30,14 @@ aqua_gnash_LDADD = \
 	$(AM_LDFLAGS)
 if BUILD_OGL_RENDERER
 aqua_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-aqua_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
+aqua_gnash_LDADD += $(top_builddir)/librender/libgnashogl.la \
 	$(AQUA_LIBS) $(OPENGL_LIBS)
 aqua_gnash_SOURCES += aqua_ogl_glue.cpp aqua_ogl_glue.h \
 	aqua.cpp aquasup.h aqua_glue.h
 endif
 # if BUILD_AGG_RENDERER
 #	aqua_gnash_CPPFLAGS += $(AGG_CFLAGS)
-# 	aqua_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+# 	aqua_gnash_LDADD += $(top_builddir)/librender/libgnashagg.la \
 #	$(AQUA_LIBS) $(AGG_LIBS)
 # 	aqua_gnash_SOURCES += aqua_agg_glue.cpp aqua_agg_glue.h \
 # 	aqua.cpp aquasup.h aqua_glue.h

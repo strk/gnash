@@ -349,6 +349,11 @@ Player::run(int argc, char* argv[], const std::string& infile,
     boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));
 
     _runResources->setStreamProvider(sp);
+
+    // Set the Hardware video decoding resources. none, vaapi, xv, omap
+    _runResources->setHWAccelBackend(_hwaccel);
+    // Set the Renderer resource, opengl, agg, or cairo
+    _runResources->setRenderBackend(_renderer);
     
     init_gui();
 
@@ -465,18 +470,18 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     it = params.find("scale");
     if (it != params.end()) {
-		
+                
         StringNoCaseEqual noCaseCompare;
         const std::string& str = it->second;
-		
+                
         movie_root::ScaleMode mode = movie_root::showAll;
 
-		if (noCaseCompare(str, "noScale")) mode = movie_root::noScale;
-		else if (noCaseCompare(str, "exactFit")) mode = movie_root::exactFit;
-		else if (noCaseCompare(str, "noBorder")) mode = movie_root::noBorder;
+                if (noCaseCompare(str, "noScale")) mode = movie_root::noScale;
+                else if (noCaseCompare(str, "exactFit")) mode = movie_root::exactFit;
+                else if (noCaseCompare(str, "noBorder")) mode = movie_root::noBorder;
 
         log_debug("Setting scale mode");
-	    root.setStageScaleMode(mode);
+            root.setStageScaleMode(mode);
     }
 
     // Set up screenshots. 
@@ -508,7 +513,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
         _gui->requestScreenShots(v, last, _screenshotFile);
     }
-    
+
     _gui->run();
 
     log_debug("Main loop ended, cleaning up");
@@ -536,25 +541,22 @@ std::string
 Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
 {
     StringNoCaseEqual noCaseCompare;
-	
+        
     if (event == "Mouse.hide") {
         return _gui.showMouse(false) ? "true" : "false";
     }
 
-    if (event == "Mouse.show")
-    {
+    if (event == "Mouse.show") {
         return _gui.showMouse(true) ? "true" : "false";
     }
     
-    if (event == "Stage.displayState")
-    {
+    if (event == "Stage.displayState") {
         if (arg == "fullScreen") _gui.setFullscreen();
         else if (arg == "normal") _gui.unsetFullscreen();
         return "";
     }
 
-    if (event == "Stage.scaleMode" || event == "Stage.align" )
-    {
+    if (event == "Stage.scaleMode" || event == "Stage.align" ) {
         _gui.updateStageMatrix();
         return "";
     }
@@ -566,8 +568,7 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         return "";
     }
 
-    if (event == "Stage.resize")
-    {
+    if (event == "Stage.resize") {
         if ( _gui.isPlugin() ) {
             log_debug("Player doing nothing on Stage.resize as we're a plugin");
             return "";

@@ -32,7 +32,7 @@ CLEANFILES = \
 	$(gmofiles) 
 
 dirs =  libbase \
-	backend \
+	librender \
 	libamf \
 	libmedia \
 	libmedia/ffmpeg \

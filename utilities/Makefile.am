@@ -46,6 +46,7 @@ AM_LDFLAGS = \
 	$(CURL_LIBS) \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
+	$(X11_LIBS) \
 	$(BOOST_LIBS) \
 	$(PYTHON_LIBS) \
 	$(PTHREAD_LIBS) \
@@ -60,7 +61,7 @@ localedir = $(datadir)/locale
 
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/backend \
+        -I$(top_srcdir)/librender \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/asobj \
         -I$(top_srcdir)/libcore/swf \

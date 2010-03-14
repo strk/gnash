@@ -35,6 +35,7 @@
 // - masks
 // - video (from old Cairo renderer)
 
+#include <smart_ptr.h>
 #include <cairo/cairo.h>
 #include <boost/scoped_array.hpp>
 #include "Renderer.h"

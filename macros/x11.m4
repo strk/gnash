@@ -15,7 +15,6 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-
 AC_DEFUN([GNASH_PATH_X11],
 [
   dnl Look for the header

@@ -24,6 +24,7 @@
 #include "Kde4GlueOgl.h"
 #include "Renderer.h"
 #include "Renderer_ogl.h"
+#include "GnashException.h"
 #include <QRect>
 #include <QGLWidget>
 
@@ -78,8 +79,7 @@ Kde4OglGlue::createRenderHandler()
 {
     _renderer = create_Renderer_ogl();
 
-    if ( ! _renderer )
-    {
+    if ( ! _renderer ) {
         throw GnashException("Could not create OpenGL renderer");
     }
     return _renderer;

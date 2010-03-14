@@ -221,10 +221,20 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfound=no])
   
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 511100; then
-      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required, $ffmpeg_version detected.])
+    dnl This makes sure the version of ffmpeg is new enough to contain
+    dnl the libva support.
+    if test x"${enable_vaapi}" = x"yes"; then
+      if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 52480; then
+        AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 52.48.0 or greater required to use libVA, $ffmpeg_version detected.])
+      else
+        ffmpeg_version_check=ok
+      fi
     else
-      ffmpeg_version_check=ok
+      if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 511100; then
+        AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required, $ffmpeg_version detected.])
+      else
+        ffmpeg_version_check=ok
+      fi
     fi
 
     if test ! -z "$ffmpeg_num_version" -a "$ffmpeg_num_version" -gt 512800; then
@@ -324,7 +334,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   dnl Try with pkg-config (if not cross-compiling)
   if test x"${cross_compiling}" = xno; then
     if test x"$PKG_CONFIG" != x -a x"${libavcodec}" = x; then
-      $PKG_CONFIG --exists libavcodec && libavcodec=`$PKG_CONFIG --libs-only-l libavcodec`
+      $PKG_CONFIG --exists libavcodec && libavcodec=`$PKG_CONFIG --libs libavcodec`
       dnl
       dnl WARNING: we won't be able to set top_lib_dir here, as pkg-config doesn't
       dnl          return any -L when not neeed.

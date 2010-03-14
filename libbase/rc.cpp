@@ -185,21 +185,18 @@ RcInitFile::loadFiles()
     // Check the GNASHRC environment variable
     // Parse each file only once
     char *gnashrc = std::getenv("GNASHRC");
-    if (gnashrc)
-    {
+    if (gnashrc) {
         std::string paths(gnashrc);
         Tok t(paths, Sep(":"));
 
         std::list<std::string> l;
 
-        for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i)
-        {
+        for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i) {
             l.remove(*i);
             l.push_back(*i);
         }
 
-        for (std::list<std::string>::const_iterator i = l.begin(), e = l.end(); i != e; ++i)
-        {
+        for (std::list<std::string>::const_iterator i = l.begin(), e = l.end(); i != e; ++i) {
             parseFile(*i);
         }
     }
@@ -233,7 +230,6 @@ RcInitFile::parseList(PathList &list, const std::string &action,
 {
 
     if (action == "set") {
-
         // Clear array of hosts in previously parsed
         // rc files.
         list.clear();
@@ -392,13 +388,14 @@ RcInitFile::parseFile(const std::string& filespec)
         ++lineno;
 
         // Ignore comment and empty lines
-        if (line.empty() || line[0] == '#') continue;
+        if (line.empty() || line[0] == '#') {
+	    continue;
+	}
 
         std::istringstream ss(line);
         
         // Get the first token
-        if ( ! (ss >> action) )
-        {
+        if (! (ss >> action)) {
             // Empty line 
             continue;
         }
@@ -409,18 +406,15 @@ RcInitFile::parseFile(const std::string& filespec)
         if ( action[0] == '#' ) continue; // discard comments
 
         // Get second token
-        if (! (ss >> variable) )
-        {
+        if (! (ss >> variable)) {
             // Do we need to warn here as well?
             continue;
         }
 
-        if (noCaseCompare(action, "set") || noCaseCompare(action, "append") )
-        {
+        if (noCaseCompare(action, "set") || noCaseCompare(action, "append")) {
 
              // The rest of the line is the value
-            if (!std::getline (ss, value))
-            {
+            if (!std::getline (ss, value)) {
                 cerr << boost::format(_("Warning: missing value for "
                             "variable \"%s\" in rcfile %s, line %d"))
                     % variable % filespec % lineno << endl;
@@ -496,6 +490,16 @@ RcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
 
+            if(noCaseCompare(variable, "HWAccel")) {
+                _hwaccel = value;
+                continue;
+            }
+            
+            if(noCaseCompare(variable, "Renderer")) {
+                _renderer = value;
+                continue;
+            }
+            
             if (noCaseCompare(variable, "CertDir") ) {
                 expandPath(value);
                 _certdir = value;
@@ -539,8 +543,6 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_sound, "sound", variable, value)
             ||
                  extractSetting(_pluginSound, "pluginsound", variable, value)
-            ||
-                 extractSetting(_useXv, "xvideo", variable, value)
             ||
                  extractSetting(_verboseASCodingErrors,
                            "ASCodingErrorsVerbosity", variable, value)
@@ -759,7 +761,6 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
     cmd << "saveLoadedMedia " << _saveLoadedMedia << endl <<    
-    cmd << "XVideo " << _useXv << endl <<    
    
     // Strings.
 
@@ -823,12 +824,6 @@ void
 RcInitFile::useLocalDomain(bool value)
 {
     _localdomainOnly = value;
-}
-
-void
-RcInitFile::useXv(bool value)
-{
-    _useXv = value;
 }
 
 void

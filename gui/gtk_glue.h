@@ -21,6 +21,8 @@
 
 #include "gnash.h"
 
+#include <cassert>
+
 #include <gtk/gtk.h>
 #if !defined(_WIN32) && !defined(__MACH__)
 #include <gdk/gdkx.h>
@@ -48,6 +50,22 @@ class GtkGlue
     virtual void render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/)
     {
         render();	
+    }
+
+    virtual void render(GdkRegion * const region)
+    {
+        GdkRectangle* rects;
+        gint num_rects;
+
+        gdk_region_get_rectangles(region, &rects, &num_rects);
+        assert(num_rects);
+
+        for (gint i = 0; i < num_rects; ++i) {
+            GdkRectangle const & r = rects[i];
+            render(r.x, r.y, r.x + r.width, r.y + r.height);
+        }
+
+        g_free(rects);
     }
 
     virtual void configure(GtkWidget *const widget,

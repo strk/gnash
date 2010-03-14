@@ -47,6 +47,7 @@ libgnashmedia_la_CPPFLAGS = \
 
 libgnashmedia_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
+	$(FFMPEG_LIBS) \
 	$(PNG_LIBS) \
 	$(JPEG_LIBS) \
 	$(GIF_LIBS) \
@@ -153,6 +154,16 @@ if USE_FFMPEG_ENGINE
    libgnashmedia_la_CPPFLAGS += \
 	$(FFMPEG_CFLAGS) \
 	$(NULL)
+
+if USE_VAAPI
+   libgnashmedia_la_SOURCES += \
+		ffmpeg/VideoDecoderFfmpegVaapi.cpp \
+		$(NULL)
+
+   noinst_HEADERS += \
+		ffmpeg/VideoDecoderFfmpegVaapi.h \
+		$(NULL)
+endif
 endif
 
 if USE_HAIKU_ENGINE
@@ -198,6 +209,16 @@ if HAVE_SPEEX
 endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
+
+if USE_VAAPI
+   libgnashmedia_la_CPPFLAGS += \
+	-I$(top_srcdir)/libvaapi \
+	$(NULL)
+
+   libgnashmedia_la_LIBADD += \
+	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(NULL)
+endif
 
 if WIN32
   libgnashmedia_la_LDFLAGS += -no-undefined

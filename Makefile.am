@@ -53,10 +53,10 @@ STD_DIRS = \
 	libmedia \
 	libsound \
 	libcore \
-	$(CYGNAL_DIR) \
-	backend \
+	librender \
 	gui \
 	plugin \
+	$(CYGNAL_DIR) \
 	utilities \
 	doc \
 	po \
@@ -66,8 +66,12 @@ if LIBLTDL2
 LIBLTDLDIR = libltdl
 endif
 
-DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl
-SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS)
+if USE_VAAPI
+VAAPI_DIR = libvaapi
+endif
+
+SUBDIRS = $(LIBLTDLDIR) $(VAAPI_DIR) $(STD_DIRS)
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl libvaapi
 
 if TESTSUITE
 SUBDIRS += testsuite
@@ -173,9 +177,6 @@ include $(srcdir)/packaging/bsd.am
 # Mozille/Firefox XPI support
 #
 include $(srcdir)/packaging/xpi.am
-
-test:
-	echo $(SNAPSHOT_NAME)
 
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
@@ -462,6 +463,26 @@ if USE_PYTHON
 	@echo "	PYTHON support enabled"
 else
 	@echo "	PYTHON support disabled"
+endif
+if BUILD_OMAP
+	@echo "	Hardware Acceleration support via OMAP enabled"
+else
+	@echo "	Hardware Acceleration support via OMAP disabled"
+if USE_VAAPI
+	@echo "	Hardware Acceleration support via libVA API enabled"
+else
+	@echo "	Hardware Acceleration support via libVA API disabled"
+endif
+if USE_VAAPI_X11
+	@echo "	Hardware Acceleration support via libVA X11 display enabled"
+else
+	@echo "	Hardware Acceleration support via libVA X11 display disabled"
+endif
+if USE_VAAPI_GLX
+	@echo "	Hardware Acceleration support via libVA OpenGL renderer enabled"
+else
+	@echo "	Hardware Acceleration support via libVA OpenGL renderer disabled"
+endif
 endif
 
 if TESTSUITE

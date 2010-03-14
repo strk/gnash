@@ -556,7 +556,6 @@ protected:
     virtual void playHook() {}
 
 private:
-
     /// Width of a window pixel, in stage pseudopixel units.
     float _xscale;
 
@@ -624,12 +623,11 @@ private:
     boost::scoped_ptr<ScreenShotter> _screenShotter;
 
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
-	int _xpointer;
-	int _ypointer;
-	bool _keyboardMouseMovements;
-	int _keyboardMouseMovementsStep;
+    int _xpointer;
+    int _ypointer;
+    bool _keyboardMouseMovements;
+    int _keyboardMouseMovementsStep;
 #endif // ENABLE_KEYBOARD_MOUSE_MOVEMENTS
-
 };
 
 /// Named constructors
@@ -653,5 +651,5 @@ std::auto_ptr<Gui> createDumpGui(unsigned long xid, float scale, bool loop, RunR
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

@@ -61,7 +61,7 @@ struct _GnashView {
     const gchar *uri;
     guint advance_timer;
 
-	std::auto_ptr<gnash::media::MediaHandler> media_handler;
+    std::auto_ptr<gnash::media::MediaHandler> media_handler;
     boost::shared_ptr<gnash::sound::sound_handler> sound_handler;
 
     /// Handlers (for sound etc) for a libcore run.
@@ -243,7 +243,8 @@ gnash_view_init(GnashView *view)
 #endif
 
     view->canvas = GNASH_CANVAS(gnash_canvas_new());
-    gnash_canvas_setup(view->canvas, 0, NULL);
+    std::string nullstr;
+    gnash_canvas_setup(view->canvas, nullstr, nullstr, 0, NULL);
     gtk_container_add (GTK_CONTAINER (view), GTK_WIDGET(view->canvas));
     gtk_widget_show (GTK_WIDGET(view->canvas));
 

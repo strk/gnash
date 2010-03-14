@@ -39,7 +39,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
-	-I$(top_srcdir)/backend \
+	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libcore  \
 	-I$(top_srcdir)/libcore/parser  \
 	-I$(top_srcdir)/libcore/vm \

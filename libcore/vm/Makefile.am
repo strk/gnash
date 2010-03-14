@@ -21,7 +21,7 @@ AUTOMAKE_OPTIONS =
 noinst_LTLIBRARIES = libgnashvm.la 
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/backend \
+	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libcore/asobj/flash \

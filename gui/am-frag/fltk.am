@@ -34,7 +34,7 @@ fltk_gnash_LDADD = \
 	$(AM_LDFLAGS)
 # if BUILD_OGL_RENDERER
 #	fltk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-# 	fltk_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la
+# 	fltk_gnash_LDADD += $(top_builddir)/librender/libgnashogl.la
 #	$(SDL_LIBS) $(OPENGL_LIBS)
 # 	fltk_gnash_SOURCES += fltk_glue_ogl.cpp fltk_glue_ogl.h \
 # 	 	fltk.cpp fltksup.h 
@@ -42,7 +42,7 @@ fltk_gnash_LDADD = \
 if BUILD_AGG_RENDERER
 fltk_gnash_CPPFLAGS += $(AGG_CFLAGS)
 fltk_gnash_LDADD += \
-	$(top_builddir)/backend/libgnashagg.la \
+	$(top_builddir)/librender/libgnashagg.la \
 	$(FLTK2_LIBS) $(AGG_LIBS) $(XFT_LIBS) $(X11_LIBS)
 if WIN32
   fltk_gnash_LDADD += $(top_builddir)/libcore/libgnashcore.la

@@ -127,6 +127,7 @@ AC_DEFUN([GNASH_PATH_OPENGL],
 
   if test x"${ac_cv_path_opengl_lib}" != x ; then
       OPENGL_LIBS="${ac_cv_path_opengl_lib}"
+      has_opengl="yes"
   else
       OPENGL_LIBS=""
   fi

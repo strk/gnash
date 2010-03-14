@@ -32,14 +32,14 @@ qtopia_gnash_LDADD = \
 	$(AM_LDFLAGS)
 if BUILD_OGL_RENDERER
 qtopia_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-qtopia_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
+qtopia_gnash_LDADD += $(top_builddir)/librender/libgnashogl.la \
 	$(KDE_LIBS) $(QTOPIA_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
 qtopia_gnash_SOURCES += kde_glue_opengl.cpp kde_glue_opengl.h kde_glue.h \
 	 	kde.cpp kdesup.h kde_glue.h
 endif
 if BUILD_AGG_RENDERER
 qtopia_gnash_CPPFLAGS += $(AGG_CFLAGS)
-qtopia_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+qtopia_gnash_LDADD += $(top_builddir)/librender/libgnashagg.la \
 	$(KDE_LIBS) $(QTOPIA_LIBS) $(QT_LIBS) $(AGG_LIBS)
 qtopia_gnash_SOURCES += kde_glue_agg.cpp kde_glue_agg.h \
 	 	kde.cpp kdesup.h kde_glue.h

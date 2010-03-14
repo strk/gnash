@@ -211,13 +211,50 @@ endif
 libgnashbase_la_LDFLAGS = -release $(VERSION) 
 libgnashbase_la_DEPENDENCIES = $(LIBLTDLLIB)
 
-if LIBLTDL2
-libgnashbase_la_LIBADD += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-libgnashbase_la_LIBADD += $(top_builddir)/libbase/libltdlc.la
+if BUILD_OGL_RENDERER
+   libgnashbase_la_SOURCES += \
+	GnashTexture.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashTexture.h \
+	$(NULL)
 endif
 
+if USE_VAAPI
+   libgnashbase_la_SOURCES += \
+	GnashVaapiImage.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashVaapiImage.h \
+	GnashVaapiImageProxy.h \
+	$(NULL)
+
+if USE_VAAPI_GLX
+   libgnashbase_la_SOURCES += \
+	GnashVaapiTexture.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashVaapiTexture.h \
+	$(NULL)
+endif
+
+if USE_VAAPI
+   libgnashbase_la_CPPFLAGS += \
+	-I$(top_srcdir)/libvaapi \
+	$(NULL)
+
+   libgnashbase_la_LIBADD += \
+	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(NULL)
+
+   libgnashbase_la_DEPENDENCIES += \
+	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(NULL)
+endif
+endif
 
 if WIN32
   libgnashbase_la_LDFLAGS += -no-undefined

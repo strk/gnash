@@ -692,36 +692,67 @@ operating system." >&3
   fi
 fi
 
-add_renderer=
-build_ogl=no
-build_agg=no
-build_cairo=no
-AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=[[agg|ogl|cairo]]], [Use the specified renderer (default=agg)]),
-    [case "${enableval}" in
-      ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
+dnl By default, we want to to build all renderers
+build_ogl=yes
+build_agg=yes
+build_cairo=yes
+renderer_list="opengl, agg, cairo"
+AC_ARG_WITH(renderer,
+  AC_HELP_STRING([--with-renderer=], [Specify which renderers to support to enable (ogl|cairo|agg, default all)]),
+  if test -n ${withval}; then
+    if test "x${withval}" != "xno" -o "x${withval}" != "xnone" ; then
+      renderer_list="none"
+      withval=`echo ${withval} | tr '\054' ' ' `
+    else
+      renderer_list=""
+      withval=""
+    fi
+  fi
+  renderer_list=""
+  nhwaccel=0
+  build_ogl=no
+  build_agg=no
+  build_cairo=no
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      no*|NO*)
+        renderer_list="none"
+        build_ogl=no
+        build_agg=no
+        build_cairo=no
+        nhwaccel=1
+        ;;
+      all|ALL)
+        renderer_list="opengl, cairo, agg"
         build_ogl=yes
-	      add_renderer="ogl"
-        ;;
-      agg|AGG|Agg)
         build_agg=yes
-	      add_renderer="agg"
-        ;;
-      cairo|CAIRO|Cairo)
         build_cairo=yes
-	      add_renderer="cairo"
+        nhwaccel=3
         ;;
-dnl       all|ALL|All)
-dnl         build_ogl=yes
-dnl         build_agg=yes
-dnl         build_cairo=yes
-dnl 	add_renderer="ogl,agg,cairo"
-dnl         ;;
-      *) AC_MSG_ERROR([invalid renderer ${enableval} given (accept: ogl,agg,cairo)])
-         ;;
-      esac],
-	build_agg=yes
-	add_renderer=agg
+      ogl|OGL|OpenGL|opengl)
+        renderer_list="${renderer_list} opengl"
+        build_ogl=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      agg|AGG)
+        renderer_list="${renderer_list} agg"
+        build_agg=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      cairo|CAIRO|Cairo*)
+        renderer_list="${renderer_list} cairo"
+        build_cairo=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      *) AC_MSG_ERROR([invalid renderer feature specified: ${withval} given (accept:  (ogl|cairo|agg|all)])
+        ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$withval"; then
+      break;
+    fi
+  done
 )
 
 add_sound=
@@ -1008,6 +1039,7 @@ AC_PROG_LIBTOOL
 AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
 AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
 
+AC_C_BIGENDIAN
 AC_C_CONST
 AC_C_INLINE
 AC_SUBST([LIBTOOL_DEPS])
@@ -1396,13 +1428,14 @@ if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
-   if test x$build_ogl = xyes; then
+   if test x"${build_ogl}" = xyes; then
       GNASH_PATH_GLEXT
    fi
-
-   GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+   if test x"${build_cairo}" = xyes; then
+      GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+   fi
 fi
-if test x$build_hildon = xyes; then
+if test x"${build_hildon}" = xyes; then
   GNASH_PATH_HILDON
   build_gtk=yes
   build_kde3=no
@@ -1546,6 +1579,106 @@ AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes -a x$has_nspr = xyes)
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
+
+dnl VA API is used by default for all H.264 videos. HW requirements:
+dnl     * AMD GPUs with UVD2 and xvba-video VA driver
+dnl     * NVIDIA GPUs with vdpau-video VA driver
+dnl     * All HW with a VA driver supporting the VA/GLX extensions or
+dnl     vaPutSurface(Pixmap,...). This may include the Intel
+dnl     Moorestown platform and future G45 VA driver.
+dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
+dnl GMA500 but you currently will have to build the AGG renderer
+dnl instead of the OGL (OpenGL) one. 
+
+AC_ARG_WITH(hwaccel,
+  AC_HELP_STRING([--with-hwaccel=], [Specify which accleration to support to enable (none,vaapi,omap)]),
+  if test -n ${withval}; then
+    if test "x${withval}" != "xno" -o "x${withval}" != "xnone" ; then
+      hwaccel_list="none"
+      withval=`echo ${withval} | tr '\054' ' ' `
+    else
+      hwaccel_list=""
+      withval=""
+    fi
+  fi
+  hwaccel_list=""
+  nhwaccel=0
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      no*|NO*)
+        hwaccel_list="none"
+        build_vaapi=no
+        build_omap=no
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      va*|VA*)
+        hwaccel_list="${hwaccel_list} vaapi"
+        build_vaapi=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      omap*|OMAP*)
+        hwaccel_list="${hwaccel_list} omap"
+        build_omap=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      *) AC_MSG_ERROR([invalid hwaccel feature specified: ${withval} given (accept: none,vaapi,omap)])
+        ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$withval"; then
+      break;
+    fi
+  done
+)
+
+dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
+dnl restrict using HW Accel to using ffmpeg directly.
+if test x"${media_handler}" = x"gst" -a x"${build_vaapi}" = x"yes"; then
+  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
+fi
+
+if test x"${build_vaapi}" = x"yes"; then
+  AC_DEFINE([USE_VAAPI], [1], [Enable libVA API])
+  if test x$build_ogl = xyes; then
+    AC_DEFINE([USE_VAAPI_GLX], [1], [Enable libVA API with GLX extensions])
+  fi
+fi
+
+use_libva=no
+use_vliba_x11=no
+use_libva_glx=no
+if test x"${build_vaapi}" = x"yes"; then
+  use_libva=yes
+  GNASH_PKG_FIND([libva],
+    [va/va.h],
+    [Video Acceleration API],
+    vaInitialize
+  )
+  use_libva_x11=yes
+  GNASH_PKG_FIND([libva_x11],
+    [va/va_x11.h],
+    [VA API (X11 display)],
+    vaGetDisplay,
+    [], [-lva-x11]
+  )
+
+  if test x$build_ogl = xyes; then
+    use_libva_glx=yes
+    GNASH_PKG_FIND([libva_glx],
+      [va/va_glx.h],
+      [VA API (GLX display)],
+      vaGetDisplayGLX,
+      [], [-lva-glx]
+    )
+  fi
+fi
+
+dnl libVA drivers
+AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
+AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
+AM_CONDITIONAL(USE_VAAPI_X11, test x"${use_libva_x11}" = xyes)
+AM_CONDITIONAL(USE_VAAPI_GLX, test x"${use_libva_glx}" = xyes)
 
 dnl IRIX-hack.
 case $host in
@@ -1955,24 +2088,24 @@ has_qtopia4=no
 
 AM_CONDITIONAL(HAVE_QTOPIA3, [test x$has_qtopia3 = xyes])
 AM_CONDITIONAL(HAVE_QTOPIA4, [test x$has_qtopia4 = xyes])
-AM_CONDITIONAL(HAVE_KDE3, [test x$has_kde3 = xyes])
-AM_CONDITIONAL(HAVE_KDE4, [test x$has_kde4 = xyes])
-AM_CONDITIONAL(HAVE_QT3, [test x$has_qt3 = xyes])
-AM_CONDITIONAL(HAVE_QT4, [test x$has_qt4 = xyes])
+AM_CONDITIONAL(HAVE_KDE3,    [test x$has_kde3 = xyes])
+AM_CONDITIONAL(HAVE_KDE4,    [test x$has_kde4 = xyes])
+AM_CONDITIONAL(HAVE_QT3,     [test x$has_qt3 = xyes])
+AM_CONDITIONAL(HAVE_QT4,     [test x$has_qt4 = xyes])
 
-AM_CONDITIONAL(WITH_KDE4, test "$with_kde4" != "no")
-AM_CONDITIONAL([QT_X11], [test "$platform" = "X11"])
-AM_CONDITIONAL([QTOPIA], [test "$platform" = "Qtopia"])
-AM_CONDITIONAL([QT_OSX], [test "$platform" = "OSX"])
-AM_CONDITIONAL([QT_OS9], [test "$platform" = "OS9"])
-AM_CONDITIONAL([QT_WIN32], [test "$platform" = "Win32"])
+AM_CONDITIONAL(WITH_KDE4,    [test "$with_kde4" != "no"])
+AM_CONDITIONAL([QT_X11],     [test "$platform" = "X11"])
+AM_CONDITIONAL([QTOPIA],     [test "$platform" = "Qtopia"])
+AM_CONDITIONAL([QT_OSX],     [test "$platform" = "OSX"])
+AM_CONDITIONAL([QT_OS9],     [test "$platform" = "OS9"])
+AM_CONDITIONAL([QT_WIN32],   [test "$platform" = "Win32"])
 
 dnl Need GLIB for both GTK and GST
-if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
+if test x"${build_gtk}" = xyes -o x"${media_handler}" = xgst; then
   GNASH_PATH_GLIB
 fi
 
-AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
+AM_CONDITIONAL(HAVE_GLIB, [ test x"${has_glib} "= xyes ])
 
 if test x$build_gtk = xno -o x$build_kde4 = xno; then
   if test x$npapi = xyes; then
@@ -2036,15 +2169,15 @@ AM_CONDITIONAL(BUILD_AMIGAOS4_GUI, [ test x$build_aos4 = xyes ])
 AM_CONDITIONAL(BUILD_HAIKU_GUI,    [ test x$build_haiku = xyes ])
 
 # plugin building flags
-AM_CONDITIONAL(NPAPI, [test x$npapi = xyes])
-AM_CONDITIONAL(KPARTS3, [test x$build_kparts3 = xyes])
-AM_CONDITIONAL(KPARTS4, [test x$build_kparts4 = xyes])
+AM_CONDITIONAL(NPAPI,   [test x"${npapi}" = xyes])
+AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
+AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
 
-if test x$build_ogl = xyes; then
+if test x"${build_ogl}" = xyes; then
   GNASH_PATH_OPENGL
 fi
 
-if test x$build_gtk = xyes; then
+if test x"${build_gtk}" = xyes; then
   AC_ARG_ENABLE(ghelp,
     AC_HELP_STRING([--enable-ghelp], [Enable support for the GNOME help system]),
     [case "${enableval}" in
@@ -2054,7 +2187,7 @@ if test x$build_gtk = xyes; then
     esac], ghelp=no
   )
 
-  if test x"$ghelp" = x"yes" ; then
+  if test x"${ghelp}" = x"yes" ; then
     AC_PATH_PROG(SCROLLKEEPER, scrollkeeper-config, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
     AC_PATH_PROG(SCROLLUPDATE, scrollkeeper-update, [],	[$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
     AC_PATH_PROG(SCROLLINSTALL, scrollkeeper-preinstall, [], [$PATH:/usr/bin/X11:/usr/local/bin/X11:/opt/X11])
@@ -2065,9 +2198,9 @@ if test x$build_gtk = xyes; then
     fi
   fi
 fi
-AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
+AM_CONDITIONAL(GHELP, [test x${ghelp} = xyes])
 
-if test x$build_fltk = xyes; then
+if test x${build_fltk} = xyes; then
   GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
 fi
 
@@ -2150,15 +2283,15 @@ if test x"$media_handler" = x"ffmpeg"; then
   fi
 fi
 
+dnl GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 if test x$build_cairo = xyes; then
-  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
 dnl   if test x"${CAIRO_CFLAGS}" != x; then
 dnl      CAIRO_CFLAGS=`echo ${CAIRO_CFLAGS} | sed -e 's/ *//'`
 dnl      CAIRO_CFLAGS="${CAIRO_CFLAGS} ${CAIRO_CFLAGS}/cairo"
 dnl   fi
-  if test x$build_fb = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-  fi
+dnl  if test x$build_fb = xyes; then
+dnl    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
+dnl  fi
 dnl   if test x$build_sdl = xyes; then
 dnl     AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
 dnl   fi
@@ -2174,7 +2307,10 @@ dnl   fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
 
-AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
+AM_CONDITIONAL(HAVE_CAIRO, [true])
+dnl AM_CONDITIONAL(HAVE_CAIRO, [test x"${has_cairo}" = xyes])
+AM_CONDITIONAL(HAVE_OPENGL, [true])
+dnl AM_CONDITIONAL(HAVE_OPENGL, test x"${has_opengl}" = xyes)
 
 AM_CONDITIONAL(USE_SOUND_SDL, test x$build_sound_sdl = xyes)
 AM_CONDITIONAL(USE_SOUND_AHI, test x$build_sound_ahi = xyes)
@@ -2416,7 +2552,7 @@ dnl default configuration of the build.
 RENDERER_CONFIG=${add_renderer}
 RENDERER_LIBS=
 for rend in `echo "${add_renderer}" | tr ',' ' '`; do
-	RENDERER_LIBS="${RENDERER_LIBS} \$(top_builddir)/backend/libgnash${rend}.la"
+	RENDERER_LIBS="${RENDERER_LIBS} \$(top_builddir)/librender/libgnash${rend}.la"
 done
 dnl echo "RENDERER_LIBS=$RENDERER_LIBS"
 AC_SUBST(RENDERER_LIBS)
@@ -2511,7 +2647,8 @@ libbase/Makefile
 libcore/Makefile
 libcore/vm/Makefile
 libcore/parser/Makefile
-backend/Makefile
+libvaapi/Makefile
+librender/Makefile
 utilities/Makefile
 doc/Makefile
 doc/C/Makefile
@@ -2676,6 +2813,10 @@ if test x"${security_list}" != x; then
   echo "        Enabling security features: ${security_list}"
 fi
 
+if test x"${hwaccel_list}" != xnone; then
+  echo "        Enabling hardware acceleration features: ${hwaccel_list}"
+fi
+
 if test x"${statistics_list}" != x; then
   echo "        Enabling statistics collecting for: ${statistics_list}"
 fi
@@ -2685,8 +2826,23 @@ if test x"${SUPPORTED_GUIS}" = x; then
 fi
 
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
-echo "        Renderers supported: ${add_renderer}"
+echo "        Renderers supported: ${renderer_list}"
 echo "        Media handler: "$media_handler
+if test x"${build_vaapi}" = x"yes"; then
+  echo "        Video Acceleration via libVA API support: yes"
+  if test x$use_libva_x11 = xyes; then
+    echo "        Video Acceleration via libVA X11 API support: yes"
+  else
+    echo "        Video Acceleration via libVA X11 API support: no"
+  fi
+  if test x$use_libva_glx = xyes; then
+    echo "        Video Acceleration via libVA OpenGL API support: yes"
+  else
+    echo "        Video Acceleration via libVA OpenGL API support: no"
+  fi
+else
+  echo "        Video Acceleration via libVA API support: no"
+fi
 echo "        Using ${add_sound} for sound handling"
 echo "        Using $with_shm mode for shared memory"
 echo ""
@@ -3480,16 +3636,39 @@ if test "$GMSGFMT" = ":"; then
   echo "                 or .rpm users: yum install gettext" >&4
 fi
 
-if test x"$testsuite" = x"yes"; then
-  if test x"${DEJAGNU}" != x""; then
-    echo "        DEJAGNU's runtest is $DEJAGNU"
-  else
-    echo "        WARNING: You need the dejagnu package installed to get a summary" >&4
-    echo "                 report after running ''make check''" >&4
-    echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
-    echo "                 or .deb users: apt-get install dejagnu" >&4
-    echo "                 or .rpm users: yum install dejagnu" >&4
+if test x"${build_vaapi}" = x"yes"; then
+  if test x"${LIBVA_CFLAGS}" = xyes; then
+      echo "        LIBVA flags are: default"
+    else
+      echo "        LIBVA flags are: $LIBVA_CFLAGS"
+      echo "        LIBVA libraries are: $LIBVA_LIBS"
   fi
+  if test x$use_libva_x11 = xyes; then
+    if test x"${LIBVA_X11_CFLAGS}" = xyes; then
+      echo "        LIBVA X11 flags are: default"
+    else
+      echo "        LIBVA X11 flags are: $LIBVA_X11_CFLAGS"
+      echo "        LIBVA X11 libraries are: $LIBVA_X11_LIBS"
+    fi
+  fi
+  if test x$use_libva_glx = xyes; then
+    if test x"${LIBVA_GLX_CFLAGS}" = xyes; then
+      echo "        LIBVA GLXflags are: default"
+    else
+      echo "        LIBVA GLX flags are: $LIBVA_GLX_CFLAGS"
+    fi
+    echo "        LIBVA GLX libraries are: $LIBVA_GLX_LIBS"
+  fi
+fi
+
+if test x"${DEJAGNU}" != x""; then
+  echo "        DEJAGNU's runtest is $DEJAGNU"
+else
+  echo "        WARNING: You need the dejagnu package installed to get a summary" >&4
+  echo "                 report after running ''make check''" >&4
+  echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
+  echo "                 or .deb users: apt-get install dejagnu" >&4
+  echo "                 or .rpm users: yum install dejagnu" >&4
 fi
 
 dnl Access Linux Platform

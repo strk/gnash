@@ -16,6 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "log.h"
 #include "gtk_glue_cairo.h"
 #include "Renderer_cairo.h"
 
@@ -32,6 +33,7 @@ GtkCairoGlue::GtkCairoGlue()
     _cairo_offscreen(0),
     _image(0)
 {
+    GNASH_REPORT_FUNCTION;
 }
 
 GtkCairoGlue::~GtkCairoGlue()

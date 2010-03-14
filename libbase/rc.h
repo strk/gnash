@@ -134,9 +134,6 @@ public:
     bool useLocalDomain() const { return _localdomainOnly; }
     void useLocalDomain(bool value);
 
-    bool useXv() const { return _useXv; }
-    void useXv(bool value);
- 
     /// Whether to restrict access to the local host   
     bool useLocalHost() const { return _localhostOnly; }
 
@@ -242,6 +239,18 @@ public:
     {
         _urlOpenerFormat = value;
     }
+ 
+    // Get the name of the hardware acclerator to use for video
+    const std::string &getHWAccel() const { return _hwaccel; }
+
+    // Set the name of the hardware acclerator to use for video
+    void setHWAccel(const std::string &x) { _hwaccel = x; }
+
+    // Get the name of the hardware acclerator to use for video
+    const std::string &getRenderer() const { return _renderer; }
+
+    // Set the name of the hardware acclerator to use for video
+    void setRendeer(const std::string &x) { _renderer = x; }
 
     // Get the location of the sandbox for .sol files
     const std::string &getSOLSafeDir() const { return _solsandbox; }
@@ -571,6 +580,15 @@ protected:
     /// default value is true
     bool _ignoreShowMenu;
 
+    /// Whether to ue HW video decoding support, no value means disabled.
+    /// The only currently supported values are: none, vaapi,  or xv (omap)
+    /// support coming. 
+    std::string _hwaccel;
+
+    /// Which renderer backend to use, no value means use the default.
+    /// The currently supported values are agg, opengl, or cairo. AGG
+    /// being the default.
+    std::string _renderer;
 };
 
 // End of gnash namespace 
