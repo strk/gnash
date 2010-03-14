@@ -20,7 +20,6 @@
 #define HAVE_TIMERS_H
 
 #include "dsodefs.h"
-#include "as_function.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
 

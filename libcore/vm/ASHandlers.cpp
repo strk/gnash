@@ -52,6 +52,7 @@
 #include "as_environment.h"
 #include "as_value.h"
 #include "RunResources.h"
+#include "with_stack_entry.h"
 
 #include <string>
 #include <vector>

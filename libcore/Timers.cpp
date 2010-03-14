@@ -25,6 +25,7 @@
 #include "VM.h"
 #include "movie_root.h"
 #include "Global_as.h"
+#include "as_function.h"
 
 #include <limits> // for numeric_limits
 #include <functional>

@@ -36,6 +36,7 @@
 #include "as_environment.h"
 #include "debugger.h"
 #include "SystemClock.h"
+#include "with_stack_entry.h"
 
 #include <sstream>
 #include <string>
