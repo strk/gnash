@@ -49,6 +49,7 @@ GNASH_LIBS = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
 if LIBLTDL2

@@ -264,12 +264,6 @@ main (int /*argc*/, char** /*argv*/) {
         }
     }
 
-    if (rc.useXv() == false) {
-        runtest.pass ("Xvideo off by default");
-    } else {
-        runtest.fail ("Xvideo is on by default!");
-    }
-
     // Parse a second file
     if (rc.parseFile("gnashrc-local")) {
 
