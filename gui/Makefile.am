@@ -150,8 +150,7 @@ libgnashaqua_ogl_la_SOURCES = \
 	aqua_ogl_glue.cpp aqua_ogl_glue.h \
 	aqua.cpp aquasup.h aqua_glue.h
 libgnashaqua_ogl_la_LDFLAGS = $(LIB_FLAGS)
-libgnashaqua_ogl_la_LIBADD = \
-	$(top_builddir)/librender/libgnashogl.la 
+libgnashaqua_ogl_la_LIBADD = 
 endif # HAVE_OPENGL
 endif # BUILD_AQUA_GUI
 

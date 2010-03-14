@@ -33,22 +33,19 @@ sdl_gnash_LDADD = \
 
 if BUILD_OGL_RENDERER
 sdl_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-sdl_gnash_LDADD += $(top_builddir)/librender/libgnashogl.la \
-	$(OPENGL_LIBS)
+sdl_gnash_LDADD += $(OPENGL_LIBS)
 sdl_gnash_SOURCES += sdl_ogl_glue.cpp sdl_ogl_glue.h 
 endif
 
 if BUILD_AGG_RENDERER
 sdl_gnash_CPPFLAGS += $(AGG_CFLAGS)
-sdl_gnash_LDADD += $(top_builddir)/librender/libgnashagg.la \
-	$(AGG_LIBS)
+sdl_gnash_LDADD += $(AGG_LIBS)
 sdl_gnash_SOURCES += sdl_agg_glue.cpp sdl_agg_glue.h 
 endif
 
 if BUILD_CAIRO_RENDERER
 sdl_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-sdl_gnash_LDADD += $(top_builddir)/librender/libgnashcairo.la \
-	$(CAIRO_LIBS) 
+sdl_gnash_LDADD += $(CAIRO_LIBS) 
 sdl_gnash_SOURCES += sdl_cairo_glue.cpp sdl_cairo_glue.h 
 endif
 endif
