@@ -629,38 +629,68 @@ else
 fi
 )
 
-add_renderer=
+dnl By default, we want to to build all renderers
 build_ogl=yes
 build_agg=yes
 build_cairo=yes
-dnl AC_ARG_ENABLE(renderer,
-dnl   AC_HELP_STRING([--enable-renderer=[[agg|ogl|cairo]]], [Use the specified renderer (default=agg)]),
-dnl     [case "${enableval}" in
-dnl       ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
-dnl         build_ogl=yes
-dnl 	      add_renderer="ogl"
-dnl         ;;
-dnl       agg|AGG|Agg)
-dnl         build_agg=yes
-dnl 	      add_renderer="agg"
-dnl         ;;
-dnl       cairo|CAIRO|Cairo)
-dnl         build_cairo=yes
-dnl 	      add_renderer="cairo"
-dnl         ;;
-dnl       all|ALL|All)
-dnl         build_ogl=yes
-dnl         build_agg=yes
-dnl         build_cairo=yes
-dnl  	     add_renderer="ogl,agg,cairo"
-dnl         ;;
-dnl       *) AC_MSG_ERROR([invalid renderer ${enableval} given (accept: ogl,agg,cairo)])
-dnl          ;;
-dnl       esac],
-dnl 	build_agg=yes
-dnl   build_ogl=yes
-dnl 	add_renderer="agg,ogl"
-dnl )
+renderer_list="opengl, agg, cairo"
+AC_ARG_WITH(renderer,
+  AC_HELP_STRING([--with-renderer=], [Specify which renderers to support to enable (ogl|cairo|agg, default all)]),
+  if test -n ${withval}; then
+    if test "x${withval}" != "xno" -o "x${withval}" != "xnone" ; then
+      renderer_list="none"
+      withval=`echo ${withval} | tr '\054' ' ' `
+    else
+      renderer_list=""
+      withval=""
+    fi
+  fi
+  renderer_list=""
+  nhwaccel=0
+  build_ogl=no
+  build_agg=no
+  build_cairo=no
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      no*|NO*)
+        renderer_list="none"
+        build_ogl=no
+        build_agg=no
+        build_cairo=no
+        nhwaccel=1
+        ;;
+      all|ALL)
+        renderer_list="opengl, cairo, agg"
+        build_ogl=yes
+        build_agg=yes
+        build_cairo=yes
+        nhwaccel=3
+        ;;
+      ogl|OGL|OpenGL|opengl)
+        renderer_list="${renderer_list} opengl"
+        build_ogl=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      agg|AGG)
+        renderer_list="${renderer_list} agg"
+        build_agg=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      cairo|CAIRO|Cairo*)
+        renderer_list="${renderer_list} cairo"
+        build_cairo=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      *) AC_MSG_ERROR([invalid renderer feature specified: ${withval} given (accept:  (ogl|cairo|agg|all)])
+        ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$withval"; then
+      break;
+    fi
+  done
+)
 
 add_sound=
 build_sound_sdl=no
@@ -2657,7 +2687,7 @@ if test x"${SUPPORTED_GUIS}" = x; then
 fi
 
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
-echo "        Renderers supported: ${add_renderer}"
+echo "        Renderers supported: ${renderer_list}"
 echo "        Media handler: "$media_handler
 if test x"${build_vaapi}" = x"yes"; then
   echo "        Video Acceleration via libVA API support: yes"

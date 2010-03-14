@@ -240,13 +240,17 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         // Use the Cairo renderer. Cairo is also used by GTK2, so using
         // Cairo makes much sense. Unfortunately, our implementation seems
         // to have serious performance issues, although it does work.
+#ifdef RENDERER_CAIRO
         if (renderer == "cairo") {
             canvas->glue.reset(new gnash::GtkCairoGlue);
             // Set the renderer to the next one to try if initializing
             // fails.
             next_renderer = "agg";
         }
-        else if (renderer == "opengl") {
+#endif
+
+#ifdef RENDERER_OPENGL
+        if (renderer == "opengl") {
             canvas->glue.reset(new gnash::GtkGlExtGlue);
             // Set the renderer to the next one to try if initializing
             // fails.
@@ -258,7 +262,8 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             // anything below about 600Mhz CPU may have buffering and
             // rendering performance issues.
         }
-        else if (renderer == "agg") {
+#endif
+        if (renderer == "agg") {
             // Use LibVva, which works on Nvidia, AT, or Intel 965 GPUs
             // with AGG or OpenGL.
 #ifdef USE_VAAPI
@@ -269,6 +274,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
                 next_hwaccel = "xv";
             }
 #endif
+#ifdef RENDERER_AGG
 	    if (hwaccel == "xv") {
                 // Use the X11 XV extension, which works on most GPUs.
                 canvas->glue.reset(new gnash::GtkAggXvGlue);
@@ -278,6 +284,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             } else {
                 canvas->glue.reset(new gnash::GtkAggGlue);
             }
+#endif
         }
 
         // Initialize the canvas for rendering into

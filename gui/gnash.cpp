@@ -119,7 +119,19 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("                           1 enable rendering, disable sound\n") 
     << _("                           2 enable sound, disable rendering\n") 
     << _("                           3 enable rendering and sound (default)\n") 
-    << _("  -R,  --Renderer <agg|cairo|opengl> (default: agg)\n")
+    // Only list the renderes that were configured in for this build
+    << _("  -R,  --Renderer <")
+#ifdef RENDERER_OPENGL
+     << _(" opengl")
+#endif
+#ifdef RENDERER_CAIRO
+     << _(" cairo")
+#endif
+#ifdef RENDERER_AGG
+    << _(" agg > (default: agg)")
+#else
+    << " >\n"
+#endif
     << _("  -t,  --timeout <sec>     Exit after the specified number of "
             "seconds\n") 
     << _("  -u,  --real-url <url>    Set \"real\" URL of the movie\n") 
@@ -374,28 +386,36 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                             player.setHWAccel("none");
                             break;
                         }
-                    break;
-              case 'R':
+                    break; 
+#if defined(RENDERER_AGG) || defined(RENDERER_OPENGL) || defined(RENDERER_CAIRO)
+             case 'R':
                     switch (parser.argument<char>(i)) {
                             // See if a renderer was specified
+#ifdef RENDERER_AGG
                         case 'a':
                             // Enable AGG as the rendering backend
                             player.setRenderer("agg");
                             break;
+#endif
+#ifdef RENDERER_OPENGL
                         case 'o':
                             // Enable OpenGL as the rendering backend
                             player.setRenderer("opengl");
                             break;
+#endif
+#ifdef RENDERER_CAIRO
                         case 'c':
                             // Enable Cairo as the rendering backend
                             player.setRenderer("cairo");
                             break;
+#endif
                         default:
                             gnash::log_error(_("ERROR: -R (--Renderer) must be followed by "
                                                "agg, opengl, or cairo"));
                             break;
                     }
                   break;
+#endif	// any RENDERER_* set
               case 'r':
                     renderflag = true;
                     switch (parser.argument<char>(i)) {
