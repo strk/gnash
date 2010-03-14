@@ -1,6 +1,6 @@
 // cygnal.cpp:  GNU streaming Flash media server, for Gnash.
 // 
-//   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -898,6 +898,9 @@ connection_handler(Network::thread_params_t *args)
 	// Setup RTMP handler
 	//
 	if (args->protocol == Network::RTMP) {
+	    Network::thread_params_t *rargs = new Network::thread_params_t;
+	    rargs->protocol = args->protocol;
+	    rargs->netfd = args->netfd;
 	    RTMPServer *rtmp = new RTMPServer;
 	    boost::shared_ptr<amf::Element> tcurl = 
 		rtmp->processClientHandShake(args->netfd);
@@ -914,7 +917,7 @@ connection_handler(Network::thread_params_t *args)
 			    proto_str[args->protocol], key, args->netfd);
 		hand.reset(new Handler);
 		cyg.addHandler(key, hand);
-		// args->entry = rtmp;
+		rargs->entry = rtmp;
 		hand->setNetConnection(rtmp->getNetConnection());
 		std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
 		std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
@@ -923,7 +926,7 @@ connection_handler(Network::thread_params_t *args)
 		    hand->addRemote(peer->fd);
 		}
 		hand->addClient(args->netfd, Network::RTMP);
-		args->handler = reinterpret_cast<void *>(hand.get());
+		rargs->handler = reinterpret_cast<void *>(hand.get());
 		args->filespec = key;
 		args->entry = rtmp;
 		
