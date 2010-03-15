@@ -264,8 +264,8 @@ install: build
 	cp libcore/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libcore/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libmedia/
 	cp libmedia/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libmedia/
-	install -d $(CURDIR)/debian/tmp/usr/include/gnash/backend/
-	cp backend/*.h $(CURDIR)/debian/tmp/usr/include/gnash/backend/
+	install -d $(CURDIR)/debian/tmp/usr/include/gnash/librender/
+	cp backend/*.h $(CURDIR)/debian/tmp/usr/include/gnash/librender/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/gui/
 	cp gui/*.h $(CURDIR)/debian/tmp/usr/include/gnash/gui/
 
