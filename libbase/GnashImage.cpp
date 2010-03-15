@@ -182,24 +182,6 @@ ImageRGBA::mergeAlpha(const boost::uint8_t* alphaData,
 }
 
 //
-// alpha
-//
-
-
-alpha::alpha(int width, int height)
-    :
-    GnashImage(width, height, width, GNASH_IMAGE_ALPHA)
-{
-    assert(width > 0);
-    assert(height > 0);
-}
-
-
-alpha::~alpha()
-{
-}
-
-//
 // utility
 //
 

@@ -50,7 +50,6 @@ enum ImageType
     GNASH_IMAGE_INVALID,
     GNASH_IMAGE_RGB,
     GNASH_IMAGE_RGBA,
-    GNASH_IMAGE_ALPHA
 };
 
 /// The locations of images handled in Gnash.
@@ -281,26 +280,6 @@ public:
     virtual std::auto_ptr<GnashImage> clone()
     {
         return std::auto_ptr<GnashImage>(new ImageRGBA(*this));
-    };
-
-};
-
-/// 8-bit alpha image.
-class DSOEXPORT alpha : public GnashImage
-{
-public:
-    alpha(int width, int height);
-
-    alpha(const alpha& o)
-        :
-        GnashImage(o)
-    {}
-
-    ~alpha();
-
-    virtual std::auto_ptr<GnashImage> clone()
-    {
-        return std::auto_ptr<GnashImage>(new alpha(*this));
     };
 
 };
