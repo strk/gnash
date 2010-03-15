@@ -26,6 +26,7 @@ sdl_gnash_SOURCES = $(GUI_SRCS) gui_sdl.cpp sdl.cpp sdlsup.h sdl_glue.h
 sdl_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 #sdl_gnash_DEPENDENCIES = .configline
 sdl_gnash_LDADD = \
+	$(top_builddir)/librender/libgnashrender.la \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
