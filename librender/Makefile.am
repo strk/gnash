@@ -65,9 +65,7 @@ noinst_HEADERS = \
 	Renderer_ogl.h \
         PathParser.h
 
-noinst_LTLIBRARIES =		# set later on by conditionals
-pkglib_LTLIBRARIES =		# set later on by conditionals
-plugins_LTLIBRARIES = libgnashrender.la
+pkglib_LTLIBRARIES = libgnashrender.la
 libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
 libgnashrender_la_SOURCES = PathParser.cpp
 
