@@ -25,12 +25,13 @@ fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
 	$(AM_CPPFLAGS) 
 fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 #fb_gnash_DEPENDENCIES = .configline
+fb_gnash_LDADD = \
+	$(top_builddir)/librender/libgnashrender.la \
+	$(GNASH_LIBS) 
 
 if BUILD_AGG_RENDERER
 fb_gnash_CPPFLAGS += $(AGG_CFLAGS)
-fb_gnash_SOURCES += 
-fb_gnash_LDADD = $(top_builddir)/librender/libgnashagg.la \
-		$(GNASH_LIBS) $(AGG_LIBS)
+fb_gnash_LDADD += $(AGG_LIBS)
 endif				# BUILD_AGG_RENDERER
 endif				# BUILD_FB_GUI
 
