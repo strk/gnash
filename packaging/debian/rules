@@ -265,7 +265,7 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libmedia/
 	cp libmedia/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libmedia/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/librender/
-	cp backend/*.h $(CURDIR)/debian/tmp/usr/include/gnash/librender/
+	cp librender/*.h $(CURDIR)/debian/tmp/usr/include/gnash/librender/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/gui/
 	cp gui/*.h $(CURDIR)/debian/tmp/usr/include/gnash/gui/
 
