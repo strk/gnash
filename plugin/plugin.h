@@ -42,11 +42,7 @@
 #include <X11/Xlib.h>
 //#include <X11/Intrinsic.h>
 #include <X11/cursorfont.h>
-#ifdef HAVE_GTK2
-#include <gtk/gtk.h>
-#else
 #include <glib.h>
-#endif
 #include <string>
 #include <map>
 #include "pluginbase.h"
