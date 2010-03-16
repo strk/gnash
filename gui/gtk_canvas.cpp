@@ -25,7 +25,6 @@
 
 #include "gtk_canvas.h"
 #include "Renderer.h"
-
 #include "rc.h"
 #include "log.h"
 #include "gtk_glue.h"
@@ -275,13 +274,16 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             }
 #endif
 #ifdef RENDERER_AGG
+#ifdef HAVE_XV
 	    if (hwaccel == "xv") {
                 // Use the X11 XV extension, which works on most GPUs.
                 canvas->glue.reset(new gnash::GtkAggXvGlue);
                 // Set the hardware acclerator to the next one to try
                 // if initializing fails.
                 next_hwaccel = "none";
-            } else {
+            } else
+#endif
+                {
                 canvas->glue.reset(new gnash::GtkAggGlue);
             }
 #endif
