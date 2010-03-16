@@ -42,6 +42,10 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(INCLTDL) \
 	$(NULL)
 
+if ANDROID
+libgnashbase_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
+endif
+
 # These headers get installed
 
 libgnashbase_la_LIBADD = \
@@ -86,6 +90,9 @@ libgnashbase_la_SOURCES = \
 	$(NULL)
 
 
+if ANDROID
+libgnashbase_la_SOURCES += SharedMemHaiku.cpp
+endif
 if BUILD_HAIKU_GUI
 libgnashbase_la_SOURCES += SharedMemHaiku.cpp
 else

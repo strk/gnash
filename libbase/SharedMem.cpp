@@ -25,12 +25,12 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST) && !defined(_ANDROID)
 # include <sys/mman.h>
 # include <sys/shm.h>
-# include <sys/ipc.h>
 # include <sys/sem.h>
-#elif !defined(__riscos__) && !defined(__OS2__)
+# include <sys/ipc.h>
+#elif !defined(__riscos__) && !defined(__OS2__) && !defined(_ANDROID)
 # include <windows.h>
 # include <process.h>
 # include <io.h>
@@ -39,10 +39,22 @@
 #include <vector>
 #include <cerrno>
 
+#ifdef _ANDROID
+# include <linux/shm.h>
+# include <linux/sem.h>
+extern int shmctl (int __shmid, int __cmd, struct shmid_ds *__buf);
+extern int semget (key_t __key, int __nsems, int __semflg);
+extern int semop (int __semid, struct sembuf *__sops, size_t __nsops);
+extern int shmdt (__const void *__shmaddr);
+extern void *shmat (int __shmid, __const void *__shmaddr, int __shmflg);
+extern int shmget (key_t __key, size_t __size, int __shmflg);
+extern int semctl (int __semid, int __semnum, int __cmd, ...);
+#endif
+
 #include "log.h"
 #include "SharedMem.h"
 
-#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
+#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32) || defined(_ANDROID)
 # define ENABLE_SHARED_MEM 1
 #else
 # undef ENABLE_SHARED_MEM

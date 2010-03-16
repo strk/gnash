@@ -22,6 +22,10 @@
 #include "gnashconfig.h"
 #endif
 
+#ifdef _ANDROID
+#include <sys/select.h>
+#endif
+
 #include "NetworkAdapter.h"
 #include "utility.h" // UNUSED macro
 #include "log.h"
@@ -33,7 +37,6 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/version.hpp>
 #include <boost/assign/list_of.hpp>
-
 
 #ifndef USE_CURL
 

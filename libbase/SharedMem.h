@@ -19,12 +19,20 @@
 #ifndef GNASH_SHM_H
 #define GNASH_SHM_H
 
+#ifdef HAVE_CONFIG_H
+# include "gnashconfig.h"
+#endif
+
 #include <boost/cstdint.hpp>
 
 #include <sys/types.h>
 #if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__)
 # include <sys/ipc.h>
+#ifdef _ANDROID
+# include <linux/shm.h>
+#else
 # include <sys/shm.h>
+#endif
 #elif !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__)
 # include <windows.h>
 # include <process.h>
