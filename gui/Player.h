@@ -148,6 +148,10 @@ public:
     int getHostFD() const {
         return _hostfd;
     }
+
+    void setControlFD(int fd) {
+        _controlfd = fd;
+    }
     
     void setStartFullscreen(bool x) {
         _startFullscreen = x;
@@ -354,6 +358,8 @@ private:
     // Filedescriptor to use for host application requests, -1 if none
     int _hostfd;
     
+    int _controlfd;
+
     // Whether to start Gnash in fullscreen mode.
     // (Or what did you think it meant?)
     bool _startFullscreen;

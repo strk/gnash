@@ -37,6 +37,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/function.hpp>
 #include <vector>
 #include <cstdlib> 
 #include <string>
@@ -171,6 +172,10 @@ public:
     virtual void setInterval(unsigned int interval) {
       _interval = interval;
     }
+
+    void setFDCallback(int fd, boost::function<void ()> callback);
+
+    void callCallback(int fd);
 
     /// Return the clock provided by this Gui.
     //
@@ -505,6 +510,11 @@ protected:
         std::exit(EXIT_SUCCESS);
     }
 
+    virtual bool watchFD(int /* fd */)
+    {
+        log_unimpl("This GUI does not implement FD watching.");
+    }
+
 
     /// Determines if playback should restart after the movie ends.
     bool            _loop;
@@ -557,6 +567,8 @@ protected:
     virtual void playHook() {}
 
 private:
+    std::map<int /* fd */, boost::function<void ()> > _fd_callbacks;
+
     /// Width of a window pixel, in stage pseudopixel units.
     float _xscale;
 

@@ -109,7 +109,10 @@ namespace {
     void menuQualityLow(GtkMenuItem *menuitem, gpointer instance); 
     void menuQualityMedium(GtkMenuItem *menuitem, gpointer instance); 
     void menuQualityHigh(GtkMenuItem *menuitem, gpointer instance); 
-    void menuQualityBest(GtkMenuItem *menuitem, gpointer instance); 
+    void menuQualityBest(GtkMenuItem *menuitem, gpointer instance);
+
+    gboolean fd_callback_handler(GIOChannel *source, GIOCondition condition,
+                                 gpointer data);
 
     void timeoutQuit(gpointer data);
 
@@ -150,13 +153,6 @@ namespace {
     bool _showMenuState;
 
 }
-
-#ifdef USE_LIRC
-// This is global so it can be accessed by the event handler, which
-// isn't part of this class. 
-Lirc *lirc;
-bool lirc_handler(void*, int, void* data);
-#endif
 
 GtkGui::~GtkGui()
 {
@@ -326,10 +322,7 @@ GtkGui::init(int argc, char **argv[])
     
 #ifdef USE_LIRC
     lirc = new Lirc();
-    if (lirc->init("/dev/lircd")) {
-        int fd = lirc->getFileFd();
-        addFDListener(fd, lirc_handler, &fd);
-    } else {
+    if (!lirc->init("/dev/lircd")) {
         log_debug(_("LIRC daemon not running"));
     }
 #endif
@@ -367,8 +360,9 @@ GtkGui::setTimeout(unsigned int timeout)
     g_timeout_add(timeout, (GSourceFunc)timeoutQuit, this);
 }
 
+
 bool
-GtkGui::addFDListener(int fd, callback_t callback, void* data)
+GtkGui::watchFD(int fd)
 {
     // NOTE: "The default encoding for GIOChannel is UTF-8. If your application
     // is reading output from a command using via pipe, you may need to set the
@@ -381,13 +375,13 @@ GtkGui::addFDListener(int fd, callback_t callback, void* data)
         return false;
     }
     
-    if (!g_io_add_watch (gio_read, GIOCondition(G_IO_IN | G_IO_HUP),
-                         GIOFunc (callback), data)) {
+    if (!g_io_add_watch (gio_read, GIOCondition(G_IO_HUP),
+                         GIOFunc (fd_callback_handler), this)) {
         g_io_channel_unref(gio_read);
-        return false;    
+        return false;
     }
     
-    return true;    
+    return true;
 }
 
 void
@@ -2244,19 +2238,6 @@ GtkGui::createControlMenu(GtkWidget *obj)
 
 }
 
-#ifdef USE_LIRC
-bool
-lirc_handler(void*, int, void* /*data*/)
-{ 
-    
-    // want to remove this handler. You may want to close fd.
-    log_debug("%s\n", lirc->getButton());
-  
-    // Want to keep this handler
-    return true;
-}
-#endif
-
 // This assumes that the parent of _drawingArea is _window, which
 // isn't the case in the plugin fullscreen (it's _overlay). Currently
 // we return from fullscreen when Gui::stop() is called, which
@@ -2842,6 +2823,18 @@ menuQualityBest(GtkMenuItem* /*menuitem*/, gpointer data)
     Gui* gui = static_cast<Gui*>(data);
     gui->setQuality(QUALITY_BEST);
 }
+
+gboolean
+fd_callback_handler(GIOChannel *source, GIOCondition condition,
+                    gpointer data)
+{
+    Gui* gui = static_cast<Gui*>(data);
+
+    gui->callCallback(g_io_channel_unix_get_fd (source));
+
+    return true;
+}
+
 
 } // anonymous namespace
 

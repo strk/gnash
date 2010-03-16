@@ -1324,6 +1324,30 @@ Gui::getQuality() const
 }
 
 void
+Gui::setFDCallback(int fd, boost::function<void ()> callback)
+{
+    _fd_callbacks[fd] = callback;
+
+    watchFD(fd);
+}
+
+
+void
+Gui::callCallback(int fd)
+{
+    std::map<int, boost::function<void ()> >::iterator it = _fd_callbacks.find(fd);
+
+    if (it == _fd_callbacks.end()) {
+        log_error("Attempted to call a callback for an unregistered fd.");
+        return;
+    }
+
+    boost::function<void()>& f = it->second;
+
+    f();
+}
+
+void
 ScreenShotter::saveImage(const std::string& id) const
 {
     // Replace all "%f" in the filename with the frameAdvance.

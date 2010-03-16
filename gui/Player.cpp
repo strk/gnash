@@ -104,6 +104,7 @@ Player::Player()
     _fpsDebugTime(0.0),
 #endif
     _hostfd(-1),
+    _controlfd(-1),
     _startFullscreen(false),
     _hideMenu(false)
 {
@@ -417,6 +418,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     // Set host requests fd (if any)
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);
+
+    if (_controlfd != -1) {
+        _gui->setFDCallback(_controlfd, boost::bind(&Gui::quit, boost::ref(_gui)));
+    }
 
     _gui->setStage(&root);
     

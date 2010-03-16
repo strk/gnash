@@ -141,6 +141,8 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
             "\"FlashVars=A=1&b=2\")\n") 
     << _("  -F,  --fd <fd>           Filedescriptor to use for external "
             "communications\n") 
+    << _("  -G,  --controlfd <fd>    File descriptor for external application"
+            " control\n")
 #ifdef GNASH_FPS_DEBUG
     << _("  -f,  --debug-fps num     Print FPS every num seconds (float)\n") 
 #endif // def GNASH_FPS_DEBUG
@@ -236,6 +238,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'V', "version",           Arg_parser::no  },        
         { 'f', "debug-fps",         Arg_parser::yes },        
         { 'F', "fd",                Arg_parser::yes },
+        { 'G', "controlfd",         Arg_parser::yes },
         { 'A', "dump",              Arg_parser::yes },
         { 259, "screenshot",        Arg_parser::yes },
         { 260, "screenshot-file",   Arg_parser::yes },
@@ -327,6 +330,17 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                         exit(EXIT_FAILURE);
                     }
                     player.setHostFD ( fd );
+                    break;
+                }
+                case 'G':
+                {
+                    const int fd = parser.argument<long>(i);
+                    if (fd < 1) {
+                        cerr << boost::format(_("Invalid host communication "
+                                    "filedescriptor %d\n")) % fd << endl;
+                        exit(EXIT_FAILURE);
+                    }
+                    player.setControlFD ( fd );
                     break;
                 }
                 case 'j':

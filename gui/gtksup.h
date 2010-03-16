@@ -52,9 +52,6 @@ class GtkGui : public Gui
 {
 public:
 
-    /// For the Gtk GUI FD listener, whatever that might be for.
-    typedef bool (*callback_t)(void*, int, void *data);
-
     GtkGui(unsigned long xid, float scale, bool loop, RunResources& r);
     
     virtual ~GtkGui();
@@ -109,7 +106,7 @@ public:
     ///        callback should return false if the listener is to be removed.
     /// @param data A pointer to a user-defined data structure.
     /// @return true on success, false on failure.
-    bool addFDListener(int fd, callback_t callback, void* data);
+    bool watchFD(int fd);
 
     /// Grab focus so to receive all key events
     //

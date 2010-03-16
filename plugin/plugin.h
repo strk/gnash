@@ -123,6 +123,7 @@ private:
     int                                _streamfd;
     GIOChannel*                        _ichan;
     int                                _ichanWatchId;
+    int                                _controlfd;
     pid_t                              _childpid;
     int                                _filefd;
 

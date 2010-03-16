@@ -411,6 +411,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _width(0),
     _height(0),
     _streamfd(-1),
+    _controlfd(-1),
     _ichan(0),
     _ichanWatchId(0),
     _childpid(0),
@@ -467,6 +468,17 @@ nsPluginInstance::~nsPluginInstance()
             << " should be unlinked!" << std::endl;
 #endif
     }
+
+    if (_childpid > 0) {
+        // When the child has terminated (signaled by _controlfd), it remains
+        // as a defunct process and we remove it from the kernel table now.
+        int status;
+        waitpid(_childpid, &status, 0);
+#if GNASH_PLUGIN_DEBUG > 1
+        std::cout << "Child process exited with status " << status << std::endl;    
+#endif
+    }
+    _childpid = 0;
 }
 
 /// \brief Initialize an instance of the plugin object
@@ -509,21 +521,14 @@ nsPluginInstance::shut()
     std::cout << "Gnash plugin shutting down" << std::endl;
 #endif
 
-    if (_childpid > 0) {
-        // it seems that waiting after a SIGINT hangs firefox
-        // IFF not run from the console (see bug#17082).
-        // SIGTERM instead solves this problem
-        kill(_childpid, SIGTERM);
-        int status;
-        waitpid(_childpid, &status, 0);
+    int ret = close(_controlfd);
 #if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "Child process exited with status " << status << std::endl;    
-#endif
+    if (ret != 0) {
+        std::cout << "Gnash plugin failed to close the control socket!"
+                  << std::endl;
     }
-
-    _childpid = 0;
+#endif
 }
-
 /// \brief Set the window to be used to render in
 ///
 /// This sets up the window the plugin is supposed to render
@@ -1165,6 +1170,7 @@ nsPluginInstance::startProc(Window win)
     // 0 For reading, 1 for writing.
     int p2c_pipe[2];
     int c2p_pipe[2];
+    int p2c_controlpipe[2];
     
     int ret = pipe(p2c_pipe);
     if (ret == -1) {
@@ -1183,17 +1189,29 @@ nsPluginInstance::startProc(Window win)
 #endif
     }
 
+    ret = pipe(p2c_controlpipe);
+    if (ret == -1) {
+#ifdef GNASH_PLUGIN_DEBUG
+        std::cout << "ERROR: child to parent pipe() failed: " << 
+            std::strerror(errno) << std::endl;
+#endif
+    }
+
+    _controlfd = p2c_controlpipe[1];
+
     /*
     Setup the command line for starting Gnash
     */
 
     // Prepare width, height and window ID variables
     const size_t buf_size = 30;
-    char xid[buf_size], width[buf_size], height[buf_size], hostfd[buf_size];
+    char xid[buf_size], width[buf_size], height[buf_size], hostfd[buf_size],
+         controlfd[buf_size];
     snprintf(xid, buf_size, "%ld", win);
     snprintf(width, buf_size, "%d", _width);
     snprintf(height, buf_size, "%d", _height);
     snprintf(hostfd, buf_size, "%d", c2p_pipe[1]);
+    snprintf(controlfd, buf_size, "%d", p2c_controlpipe[0]);
 
     // Prepare Actionscript variables (e.g. Flashvars).
     std::vector<std::string> paramvalues;
@@ -1219,7 +1237,7 @@ nsPluginInstance::startProc(Window win)
     ADD NEW ARGUMENTS
     */ 
 
-    const size_t maxargc = 18 + paramvalues.size() * 2;
+    const size_t maxargc = 20 + paramvalues.size() * 2;
     const char **argv = new const char *[maxargc];
 
 #ifdef CREATE_STANDALONE_GNASH_LAUNCHER
@@ -1268,6 +1286,10 @@ nsPluginInstance::startProc(Window win)
     // Host FD
     argv[argc++] = "-F";
     argv[argc++] = hostfd;
+
+    // Control FD
+    argv[argc++] = "-G";
+    argv[argc++] = controlfd; 
 
     // Base URL is the page that the SWF is embedded in. It is 
     // by Gnash for resolving relative URLs in the movie. If the
@@ -1347,6 +1369,8 @@ nsPluginInstance::startProc(Window win)
                                 << std::endl;
 #endif
         }
+
+        ret = close (p2c_controlpipe[0]); // close read descriptor
     
 
 #if GNASH_PLUGIN_DEBUG > 1
@@ -1360,7 +1384,7 @@ nsPluginInstance::startProc(Window win)
         _ichanWatchId = g_io_add_watch(_ichan, 
                 (GIOCondition)(G_IO_IN|G_IO_HUP), 
                 (GIOFunc)handlePlayerRequestsWrapper, this);
-
+        g_io_channel_unref(_ichan);
         return;
     }
 
@@ -1377,6 +1401,8 @@ nsPluginInstance::startProc(Window win)
         std::cout << "ERROR: close() failed: " << strerror(errno) << std::endl;
 #endif
     }
+
+    ret = close(p2c_controlpipe[1]);
 
     // close standard input and direct read-fd1 to standard input
     ret = dup2 (p2c_pipe[0], fileno(stdin));
@@ -1399,6 +1425,8 @@ nsPluginInstance::startProc(Window win)
     for ( ; numfailed < 10; anfd++) {
         if ( anfd == c2p_pipe[1] ) continue; // don't close this
         if ( anfd == c2p_pipe[0] ) continue; // don't close this either (correct?)
+        if ( anfd == p2c_controlpipe[0] ) continue; // don't close this either (correct?)
+        if ( anfd == p2c_controlpipe[1] ) continue; // don't close this either (correct?)
         ret = close (anfd);
         if (ret < 0) {
 	    numfailed++;
