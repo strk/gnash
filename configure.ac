@@ -245,12 +245,13 @@ AC_ARG_WITH([android],
 CROSS_CXXFLAGS=
 if test x"${android_ndk}" != xno; then
 dnl  LDFLAGS=-Wl,--dynamic-linker -Wl,/system/bin/linker -nostdlib -Wl,-rpath -Wl,/system/lib -Wl,-rpath -Wl,${android_ndk}/usr/lib -L${android_ndk}/usr/lib -lc -o hello ${android_ndk}/usr/lib/crtbegin_dynamic.o
-  CROSS_CXXFLAGS=-mandroid
+  CROSS_CXXFLAGS=-mandroid -fexceptions
   if test x"${with_top_level}" = x; then
     with_top_level=/usr/local/android-arm/sysroot/usr
     cross_compiling=yes
   fi
   ANDROID_NDK=${android_ndk}
+  AC_DEFINE(_ANDROID, [1], [This is an Android build])
 else
   ANDROID_NDK=
 fi
@@ -1059,12 +1060,15 @@ AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
 dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
 dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
 
-dnl These options are for Cygnal, which collects optional statistics on all the network traffic
-dnl By default, we turn on statistics collecting for the incoming and outgoing queues, since
-dnl those are required to be compatiable with FMS 3, and the ActionScript server management API.
-dnl buffers are the lowest level data storage, this data is the time spent in the queue, and is
-dnl primarily only used for tuning the queueing API in Gnash. Memoryis the same, it's only used
-dnl by developers for tuning performance of memory allocations in Gnash.
+dnl These options are for Cygnal, which collects optional statistics
+dnl on all the network traffic By default, we turn on statistics
+dnl collecting for the incoming and outgoing queues, since those are
+dnl required to be compatiable with FMS 3, and the ActionScript server
+dnl management API. buffers are the lowest level data storage, this
+dnl data is the time spent in the queue, and is primarily only used
+dnl for tuning the queueing API in Gnash. Memoryis the same, it's only
+dnl used by developers for tuning performance of memory allocations in
+dnl Gnash.
 buffers=no
 que=no
 memory=no
