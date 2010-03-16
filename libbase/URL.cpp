@@ -55,7 +55,10 @@ URL::normalize_path(std::string& path)
 	return;
 #endif
 
-	assert(path[0] == '/');
+	if (path.empty() || path[0] != '/')
+	{
+		throw gnash::GnashException("invalid url");
+	}
 
     std::vector<std::string> components;
 

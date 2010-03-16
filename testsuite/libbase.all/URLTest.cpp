@@ -22,6 +22,7 @@
 
 #include "check.h"
 #include "URL.h"
+#include "log.h"
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -32,6 +33,8 @@ using namespace gnash;
 int
 main(int /*argc*/, char** /*argv*/)
 {
+	//gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+	//dbglogfile.setVerbosity(2);
 
 	std::string label;
 
@@ -278,9 +281,17 @@ main(int /*argc*/, char** /*argv*/)
        check_equals (u2.querystring(), "");
        check_equals (u2.anchor(), "anchor");
     }
+
+    bool threw = false;
+    try
     { // pseudo-url from Mozilla
         URL u("about:blank");
     }
+    catch (const std::exception& e)
+    {
+       threw = true;
+    }
+    check(threw);
 
 
 	// TODO: Samba paths
