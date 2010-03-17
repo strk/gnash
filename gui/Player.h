@@ -169,7 +169,7 @@ public:
     /// in the users gnashrc file, or can be overridden with the
     /// --hwaccel option to gnash.
     void setRenderer(const std::string &x) { _renderer = x; }
-    std::string &getRenderer() { return _renderer; }
+    const std::string &getRenderer() { return _renderer; }
     
     /// Set the hardware video accleration backend, none, vaapi, xv,
     /// or cairo. This is set in the users gnashrc file, or can be
