@@ -86,21 +86,6 @@
 #include "prerror.h"
 #include "prthread.h"
 
-#ifdef HAVE_XPCOM
-# include <nscore.h>
-# include <nsISupports.h>
-# include <nsIExtensionManager.h>
-# include <nsIFile.h>
-# include <nsXPCOM.h>
-# include <nsIServiceManager.h>
-# include <nsICookie.h>
-# include <nsICookieManager.h>
-# include <nsISimpleEnumerator.h>
-# include <nsNetCID.h>
-# include <nsCOMPtr.h>
-# include <nsStringAPI.h>
-#endif // HAVE_XPCOM
-
 #ifndef PATH_MAX
 #define PATH_MAX 1024
 #endif
@@ -113,11 +98,8 @@ static bool waitforgdb = false;
 static bool createSaLauncher = false;
 
 static const char* getPluginDescription();
-
-#ifdef HAVE_XPCOM
-static nsICookieManager *cookieManager = NULL;
-#endif // HAVE_XPCOM
-
+static void logDebug(const std::string& msg);
+static void logError(const std::string& msg);
 
 
 void
@@ -154,46 +136,11 @@ NPError
 NS_PluginInitialize()
 {
     if ( plugInitialized ) {
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "NS_PluginInitialize called, but ignored (we already initialized)" << std::endl;
-#endif
+        logDebug("NS_PluginInitialize called, but ignored (we already initialized)");
         return NPERR_NO_ERROR;
     }
 
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "NS_PluginInitialize call ---------------------------------------------------" << std::endl;
-#endif
-
-#ifdef HAVE_XPCOM
-    if(!cookieManager) {
-        nsIServiceManager *serviceManager = nsnull;
-        NPError err;
-        err = CallNPN_GetValueProc (NPNFuncs.getvalue,
-                                        NULL, NPNVserviceManager,
-                                     reinterpret_cast<void *>
-                                   (reinterpret_cast<void **>(&serviceManager)));
-
-            if (err != NPERR_NO_ERROR || !serviceManager) {
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "[XPCOM] Failed to get the service manager" << std::endl;
-#endif
-            return NPERR_GENERIC_ERROR;
-        }
-        nsresult rv;
-        rv = serviceManager->GetServiceByContractID (NS_COOKIEMANAGER_CONTRACTID,
-                                NS_GET_IID (nsICookieManager),
-                                reinterpret_cast<void **>(&cookieManager));
-        if (NS_FAILED (rv) || !cookieManager) {
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "[XPCOM] Failed to get CookieManager" << std::endl;
-#endif
-            return NPERR_GENERIC_ERROR;
-        }
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "[XPCOM] - CookieManager retrieved." << std::endl;
-#endif
-    }
-#endif // HAVE_XPCOM
+    logDebug("NS_PluginInitialize call ---------------------------------------------------");
 
     /* Browser Functionality Checks */
 
@@ -212,15 +159,10 @@ NS_PluginInitialize()
 
 
     if (err != NPERR_NO_ERROR || !supportsXEmbed) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "NPAPI ERROR: No xEmbed support in this browser!"
-		  << std::endl;
-#endif
+        logError("NPAPI ERROR: No xEmbed support in this browser!");
         return NPERR_INCOMPATIBLE_VERSION_ERROR;
     } else {
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "xEmbed supported in this browser" << std::endl;
-#endif
+        logDebug("xEmbed supported in this browser");
     }
 
 #if 0 // Gtk is no longer required in the browser
@@ -252,9 +194,7 @@ NS_PluginInitialize()
     */
     char* opts = std::getenv("GNASH_OPTIONS");
     if (opts != NULL) {
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "GNASH_OPTIONS : " << opts << std::endl;
-#endif
+        logDebug(std::string("GNASH_OPTIONS : ") + std::string(opts));
         
         // Should the plugin wait for gdb to be attached?
         if ( strstr(opts, "waitforgdb") ) {
@@ -299,9 +239,7 @@ NS_PluginInitialize()
     if ( putenv(gnashrc) ) {
         std::cout << "WARNING: NPAPI plugin could not append to the GNASHRC env variable" << std::endl;
     }
-#if GNASH_PLUGIN_DEBUG > 1
-    else std::cout << "NOTE: NPAPI plugin set GNASHRC to " << newGnashRc << std::endl;
-#endif
+    else logDebug(std::string("NOTE: NPAPI plugin set GNASHRC to ") + newGnashRc);
 
     /* Success */
 
@@ -411,9 +349,9 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _width(0),
     _height(0),
     _streamfd(-1),
-    _controlfd(-1),
     _ichan(0),
     _ichanWatchId(0),
+    _controlfd(-1),
     _childpid(0),
     _filefd(-1),
     _name()
@@ -443,13 +381,11 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 /// \brief Destructor
 nsPluginInstance::~nsPluginInstance()
 {
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "plugin instance destruction" << std::endl;
-#endif
+    logDebug("plugin instance destruction");
+
     if (_ichan) {
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "shutting down input chan " << _ichan << std::endl;
-#endif
+        logDebug("shutting down input chan");
+
         GError *error = NULL;
         g_io_channel_shutdown (_ichan, TRUE, &error);
         g_io_channel_unref (_ichan);
@@ -461,22 +397,12 @@ nsPluginInstance::~nsPluginInstance()
         _ichanWatchId = 0;
     }
 
-    // TODO: unlink the cookie jar
-    if ( ! _cookieFile.empty() ) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << " ~nsPluginInstance: file " << _cookieFile 
-            << " should be unlinked!" << std::endl;
-#endif
-    }
-
     if (_childpid > 0) {
         // When the child has terminated (signaled by _controlfd), it remains
         // as a defunct process and we remove it from the kernel table now.
         int status;
         waitpid(_childpid, &status, 0);
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "Child process exited with status " << status << std::endl;    
-#endif
+        logDebug("Child process exited with status " + status);
     }
     _childpid = 0;
 }
@@ -490,10 +416,7 @@ NPBool
 nsPluginInstance::init(NPWindow* aWindow)
 {
     if(!aWindow) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout <<  __PRETTY_FUNCTION__ << " ERROR: Window handle was bogus!"
-            << std::endl;
-#endif
+        logError(std::string(__PRETTY_FUNCTION__) + " ERROR: Window handle was bogus!");
         return FALSE;
     } else {
 #if GNASH_PLUGIN_DEBUG > 1
@@ -517,17 +440,12 @@ nsPluginInstance::init(NPWindow* aWindow)
 void
 nsPluginInstance::shut()
 {
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "Gnash plugin shutting down" << std::endl;
-#endif
+    logDebug("Gnash plugin shutting down");
 
     int ret = close(_controlfd);
-#if GNASH_PLUGIN_DEBUG > 1
     if (ret != 0) {
-        std::cout << "Gnash plugin failed to close the control socket!"
-                  << std::endl;
+        logDebug("Gnash plugin failed to close the control socket!");
     }
-#endif
 }
 /// \brief Set the window to be used to render in
 ///
@@ -540,10 +458,7 @@ NPError
 nsPluginInstance::SetWindow(NPWindow* aWindow)
 {
     if(!aWindow) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << __FUNCTION__ << ": ERROR: Window handle was bogus!" 
-            << std::endl;
-#endif
+        logError(std::string(__FUNCTION__) + ": ERROR: Window handle was bogus!");
         return NPERR_INVALID_PARAM;
 #if 0
     } else {
@@ -623,9 +538,8 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     start = _swf_url.rfind("/", end) + 1;
     fname = "/tmp/";
     fname += _swf_url.substr(start, end - start);
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "The Flash movie name is: " << fname << std::endl;
-#endif
+
+    logDebug("The Flash movie name is: " + fname);
 
     _filefd = open(fname.c_str(),
             O_CREAT | O_WRONLY,
@@ -708,9 +622,7 @@ bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
     if ( cond & G_IO_HUP ) {
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "Player request channel hang up" << std::endl;
-#endif
+        logDebug("Player request channel hang up");
         // false signals that the source should be removed.
         return false;
     }
@@ -731,34 +643,22 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
         switch ( status ) {
             case G_IO_STATUS_ERROR:
-#ifdef GNASH_PLUGIN_DEBUG
-                std::cout << "Error reading request line: " << error->message
-                    << std::endl; 
-#endif
+                logError(std::string("Error reading request line: ") + error->message);
+
                 g_error_free(error);
                 return false;
             case G_IO_STATUS_EOF:
-#ifdef GNASH_PLUGIN_DEBUG
-                std::cout << "EOF (error:" << error << ")" << std::endl;
-#endif
+                logError(std::string("EOF (error: ") + error->message);
                 return false;
             case G_IO_STATUS_AGAIN:
-#ifdef GNASH_PLUGIN_DEBUG
-                std::cout << "Read again (error:" << error << ")" << std::endl;
-#endif
+                logError(std::string("Read again(error: ") + error->message);
                 break;
             case G_IO_STATUS_NORMAL:
                 // process request
-#if GNASH_PLUGIN_DEBUG > 1
-                std::cout << "Normal read: " << request << " (error:" 
-                    << error << ")" << std::endl;
-#endif
+                logDebug("Normal read: " + std::string(request));
                 break;
             default:
-#ifdef GNASH_PLUGIN_DEBUG
-                std::cout << "Abnormal status " << status << "  (error:" 
-                    << error << ")" << std::endl;
-#endif
+                logError("Abnormal status!");
                 return false;
             
         }
@@ -777,9 +677,7 @@ bool
 nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 {
     if ( linelen < 4 ) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "Invalid player request (too short): " << buf << std::endl;
-#endif
+        logError(std::string("Invalid player request (too short): ") +  buf);
         return false;
     }
 
@@ -787,9 +685,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         char* target = buf + 4;
         if ( ! *target )
         {
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "No target found after GET request" << std::endl;
-#endif
+            logError("No target found after GET request");
             return false;
         }
         char* url = target;
@@ -798,10 +694,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             *url='\0';
             ++url;
         } else {
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "No colon found after GETURL target string" 
-                << std::endl;
-#endif
+            logError("No colon found after GETURL target string");
             return false;
         }
 
@@ -815,9 +708,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
     } else if ( ! std::strncmp(buf, "INVOKE ", 7) ) {
         char* command = buf + 7;
         if ( ! *command ) {
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "No command found after INVOKE request" << std::endl;
-#endif
+            logError("No command found after INVOKE request");
             return false;
         }
         char* arg = command;
@@ -826,10 +717,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             *arg='\0';
             ++arg;
         } else {
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "No colon found after INVOKE command string" 
-                << std::endl;
-#endif
+            logError("No colon found after INVOKE command string");
             return false;
         }
 
@@ -841,9 +729,8 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         // TODO: check if _self is a good target for this
         static const char* tgt = "_self";
 
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "Calling NPN_GetURL(" << jsurl.str() << ", '" << tgt << "');" << std::endl;
-#endif
+        logDebug("Calling NPN_GetURL(" + jsurl.str() + ", '" + std::string(tgt) + "');");
+
         NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
         return true;
     }  else if ( ! strncmp(buf, "POST ", 5)) {
@@ -858,10 +745,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         }
         else
         {
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "No colon found after getURL postdata string" 
-                << std::endl;
-#endif
+            logError("No colon found after getURL postdata string");
             return false;
         }
         
@@ -871,10 +755,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             *url='\0';
             ++url;
         } else {
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "No $ character found after getURL target string" 
-                << std::endl;
-#endif
+            logError("No $ character found after getURL target string");
             return false;
         }
         
@@ -884,231 +765,29 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 
         return true;
     } else {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "Unknown player request: '" << buf << "'" << std::endl;
-#endif
+        logError("Unknown player request: " + std::string(buf));
         return false;
     }
 }
 
-#ifdef GNASH_XPI_PLUGIN
-static int
-getHome(std::string& gnashpath)
+void
+logDebug(const std::string& msg)
 {
-    nsresult rv;
-
-    // this is probably a good place to get the service manager
-    // note that Mozilla will add reference, so do not forget to release
-    nsISupports * sm = NULL;
-
-    // Get service manager
 #if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "Getting Path" << NPN_GetValue(NULL, NPNVserviceManager, &sm)
-        << std::endl;
+    std::cout << msg << std::endl;
+#else
+    (void) msg; // suppress warning
 #endif
-
-    // Mozilla returns nsIServiceManager so we can use it directly;
-    // doing QI on nsISupports here can still be more appropriate in
-    // case something is changed in the future so we don't need to 
-    // do casting of any sort.
-
-    // valid service manager
-    if (!sm) return -1;
-
-    nsIServiceManager * gServiceManager = NULL;
-    rv = sm->QueryInterface(NS_GET_IID(nsIServiceManager),
-            (void**)&gServiceManager);
-
-    nsIFile *file = NULL;
-    nsIInstallLocation * installLocation = NULL;
-    nsIExtensionManager * nsExtensionService = NULL;
-
-    // Gets extension service
-    rv = gServiceManager->GetServiceByContractID(
-            "@mozilla.org/extensions/manager;1",
-            NS_GET_IID(nsIExtensionManager), (void **)&nsExtensionService);
-
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "gSM" << rv << " " << (nsExtensionService == NULL) << "\n";
-#endif
-
-    if (!nsExtensionService) return -2;
-    
-    // Gets install location object
-    rv = nsExtensionService->GetInstallLocation(
-            NS_LITERAL_STRING("{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}"),
-            (nsIInstallLocation**)&installLocation);
-
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "nES" << rv << " " << (installLocation == NULL) << "\n";
-#endif
-
-    if (!installLocation) return -3;
-
-    // Gets information on file in the extension - here, 
-    // "PetsCity@PetsCity.com" is the ID of the plugin. install.rdf 
-    // is a file stored in the plugin
-    rv = installLocation->GetItemFile(
-            NS_LITERAL_STRING("{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}"),
-            NS_LITERAL_STRING("plugins/gnash"), (nsIFile**)&file);
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "iL" << rv << " " << (file == NULL) << "\n";
-#endif
-    if (!file) return -4;
-
-    // We get the path (stored as unicode in nsName)
-    nsString sName;
-    file->GetPath(sName);
-
-    gnashpath = ToNewCString(NS_LossyConvertUTF16toASCII(sName));
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "Path" << gnashpath << "\n";
-#endif
-    return 0;
 }
-#endif // GNASH_XPI_PLUGIN
 
 void
-nsPluginInstance::dumpCookies()
+logError(const std::string& msg)
 {
-    if ( ! _cookieFile.empty() ) {
 #ifdef GNASH_PLUGIN_DEBUG
-        std::cout << " dumpCookies: file " << _cookieFile 
-            << " should be unlinked!" << std::endl;
+    std::cout << msg << std::endl;
 #endif
-    }
-    _cookieFile.clear();
-
-// Linking problems...
-//#ifdef HAVE_XPCOM 
-#if 0
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "[XPCOM] trying to dump cookies" << std::endl;
-#endif
-
-    nsCOMPtr<nsISimpleEnumerator> cookie_e;
-    nsresult rv =  cookieManager->GetEnumerator(getter_AddRefs(cookie_e));
-
-    //char *cookiefile = NULL;
-
-    if(NS_SUCCEEDED(rv)) {
-        PRBool res = FALSE;
-        ofstream fout;
-        mode_t oldmask = umask(0077);
-        char tmpnamebuf[L_tmpnam];
-        while(!res) {
-            const char *tmpname = tmpnam(tmpnamebuf); 
-            fout.open(tmpname, ios::out | ios::trunc);
-            if(!fout.is_open()) {
-#ifdef GNASH_PLUGIN_DEBUG
-                std::cout << "[XPCOM] cookie file not opened!!" << std::endl;
-#endif
-                continue;
-            } else {
-#if GNASH_PLUGIN_DEBUG > 1
-                std::cout << "[XPCOM] opened cookie store: " << tmpname << std::endl;
-#endif
-            }
-            res = TRUE;
-            _cookieFile = tmpname; // assign ? 
-        }
-        umask(oldmask);
-
-        res = TRUE;
-        int c = 0;
-        while(NS_SUCCEEDED(cookie_e->HasMoreElements(&res)) && res ) {
-            nsCOMPtr<nsICookie> cookie;
-            cookie_e->GetNext(getter_AddRefs(cookie));
-            if(!cookie)
-              continue;
-
-            nsCString host;
-            if(NS_FAILED(cookie->GetHost(host))) {
-#ifdef GNASH_PLUGIN_DEBUG
-              std::cout << "[XPCOM] cookie without host ... ommitting" << std::endl;
-#endif
-              continue;
-            }
-            nsCString path;
-            if(NS_FAILED(cookie->GetPath(path))) {
-#ifdef GNASH_PLUGIN_DEBUG
-              std::cout << "[XPCOM] cookie without path ... ommitting" << std::endl;
-#endif
-              continue;
-            }
-            PRBool isSecure;
-            if(NS_FAILED(cookie->GetIsSecure(&isSecure))) {
-#ifdef GNASH_PLUGIN_DEBUG
-              std::cout << "[XPCOM] cookie without isSecure ... ommitting" << std::endl;
-#endif
-              continue;
-            }
-            PRUint64 expires;
-            if(NS_FAILED(cookie->GetExpires(&expires))) {
-#ifdef GNASH_PLUGIN_DEBUG
-              std::cout << "[XPCOM] cookie without expires ... ommitting" << std::endl;
-#endif
-              continue;
-            }    
-            nsCString name;
-            if(NS_FAILED(cookie->GetName(name))) {
-#ifdef GNASH_PLUGIN_DEBUG
-              std::cout << "[XPCOM] cookie without name ... ommitting" << std::endl;
-#endif
-              continue;
-            }
-            nsCString value;
-            if(NS_FAILED(cookie->GetValue(value))) {
-#ifdef GNASH_PLUGIN_DEBUG
-                std::cout << "[XPCOM] cookie without value ... ommitting" 
-                    << std::endl;
-#endif
-              continue;
-            }
-
-            char *hostChar = ToNewCString (host);
-            char *pathChar = ToNewCString (path);
-            char *nameChar = ToNewCString (name);
-            char *valueChar = ToNewCString (value);
-
-            /*
-            std::cout << "[XPCOM] have cookie line:" << std::endl
-                 << "  "
-                 << hostChar << "\t"
-                 << pathChar << "\t"
-                 << isSecure << "\t"
-                 << expires << "\t"
-                 << nameChar << "\t"
-                 << valueChar << std::endl;
-            */
-
-            fout << hostChar << "\t"
-                 << pathChar << "\t"
-                 << isSecure << "\t"
-                 << expires << "\t"
-                 << nameChar << "\t"
-                 << valueChar << std::endl;
-
-            g_free(hostChar);
-            g_free(pathChar);
-            g_free(nameChar);
-            g_free(valueChar);
-            c++;
-        }
-        fout.close();
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "[XPCOM] dump finished (" << c << " cookies in total)" 
-            << std::endl;
-#endif
-    }
-    else {
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "[XPCOM] WARNING: Cookie feature disabled" << std::endl;
-#endif
-    }
-#endif // HAVE_XPCOM
-
 }
+
 
 void
 nsPluginInstance::startProc(Window win)
@@ -1119,21 +798,13 @@ nsPluginInstance::startProc(Window win)
 
     char *gnash_env = std::getenv("GNASH_PLAYER");
 
-#ifdef GNASH_XPI_PLUGIN
-    if (getHome(procname) >= 0)
-        process_found = true;
-    else
-#endif // def GNASH_XPI_PLUGIN
     if (gnash_env)
     {
         procname = gnash_env;
         process_found = (0 == stat(procname.c_str(), &procstats));
         if (!process_found)
         {
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "Invalid path to gnash executable: " << 
-                procname << std::endl;
-#endif
+            logError("Invalid path to gnash executable: ");
             return;
         }
     }
@@ -1151,21 +822,15 @@ nsPluginInstance::startProc(Window win)
 
     if (!process_found)
     {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "Unable to find Gnash in " GNASHBINDIR << std::endl;
-#endif
+        logError(std::string("Unable to find Gnash in ") + GNASHBINDIR);
         return;
     }
 
     const char* pageurl = getCurrentPageURL();
     if (!pageurl)
     {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "Could not get current page URL!" << std::endl;
-#endif
+        logError("Could not get current page URL!");
     }
-
-    dumpCookies();
 
     // 0 For reading, 1 for writing.
     int p2c_pipe[2];
@@ -1174,27 +839,21 @@ nsPluginInstance::startProc(Window win)
     
     int ret = pipe(p2c_pipe);
     if (ret == -1) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "ERROR: parent to child pipe() failed: " << 
-            std::strerror(errno) << std::endl;
-#endif
+        logError("ERROR: parent to child pipe() failed: " +
+                 std::string(std::strerror(errno)));
     }
     _streamfd = p2c_pipe[1];
 
     ret = pipe(c2p_pipe);
     if (ret == -1) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "ERROR: child to parent pipe() failed: " << 
-            std::strerror(errno) << std::endl;
-#endif
+        logError("ERROR: child to parent pipe() failed: " +
+                 std::string(std::strerror(errno)));
     }
 
     ret = pipe(p2c_controlpipe);
     if (ret == -1) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "ERROR: child to parent pipe() failed: " << 
-            std::strerror(errno) << std::endl;
-#endif
+        logError("ERROR: parent to child pipe() failed: " +
+                 std::string(std::strerror(errno)));
     }
 
     _controlfd = p2c_controlpipe[1];
@@ -1339,9 +998,7 @@ nsPluginInstance::startProc(Window win)
 
     // If the fork failed, childpid is -1. So print out an error message.
     if (_childpid == -1) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "ERROR: dup2() failed: " << strerror(errno) << std::endl;
-#endif
+        logError("ERROR: dup2() failed: " + std::string(strerror(errno)));
         return;
     }
 
@@ -1353,10 +1010,8 @@ nsPluginInstance::startProc(Window win)
         ret = close (p2c_pipe[0]);
         if (ret == -1) {
 // this is not really a fatal error...
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "ERROR: p2c_pipe[0] close() failed: " << strerror(errno)
-                                << std::endl;
-#endif
+            logError("ERROR: p2c_pipe[0] close() failed: " +
+                     std::string(strerror(errno)));
         }
 
         // we want to read from c2p pipe, so close read-fd1
@@ -1364,10 +1019,8 @@ nsPluginInstance::startProc(Window win)
         if (ret == -1)
         {
 // this is not really a fatal error...
-#ifdef GNASH_PLUGIN_DEBUG
-            std::cout << "ERROR: c2p_pipe[1] close() failed: " << strerror(errno)
-                                << std::endl;
-#endif
+            logError("ERROR: c2p_pipe[1] close() failed: " + 
+                     std::string(strerror(errno)));
         }
 
         ret = close (p2c_controlpipe[0]); // close read descriptor
@@ -1397,9 +1050,7 @@ nsPluginInstance::startProc(Window win)
     ret = close (p2c_pipe[1]); 
     if (ret == -1) {
 // not really a fatal error
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "ERROR: close() failed: " << strerror(errno) << std::endl;
-#endif
+        logError("ERROR: close() failed: " + std::string(strerror(errno)));
     }
 
     ret = close(p2c_controlpipe[1]);
@@ -1408,9 +1059,7 @@ nsPluginInstance::startProc(Window win)
     ret = dup2 (p2c_pipe[0], fileno(stdin));
     
     if (ret == -1) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "ERROR: dup2() failed: " << strerror(errno) << std::endl;
-#endif
+        logError("ERROR: dup2() failed: " + std::string(strerror(errno)));
     }
 
     // Close all of the browser's file descriptors that we just 
@@ -1503,9 +1152,7 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(window);
 
     if (!NPVARIANT_IS_OBJECT(vDoc)) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "Can't get window object" << std::endl;
-#endif
+        logError("Can't get window object");
         return NULL;
     }
     
@@ -1517,9 +1164,7 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(npDoc);
 
     if (!NPVARIANT_IS_OBJECT(vLoc)) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout <<"Can't get window.location object" << std::endl;
-#endif
+        logError("Can't get window.location object");
         return NULL;
     }
 
@@ -1531,9 +1176,7 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(npLoc);
 
     if (!NPVARIANT_IS_STRING(vProp)) {
-#ifdef GNASH_PLUGIN_DEBUG
-        std::cout << "Can't get window.location.href object" << std::endl;
-#endif
+        logError("Can't get window.location.href object");
         return NULL;
     }
 

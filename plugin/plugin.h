@@ -79,7 +79,6 @@ public:
     NPError WriteStatus(std::string msg) const;
 
     void startProc(Window win);
-
 private:
 
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
@@ -104,11 +103,6 @@ private:
     // @@ this should likely replace the _options element below
     std::map<std::string, std::string> _params;
 
-    /// Dump current session cookies to a file,
-    /// setting _cookieFile to its name (or clear
-    /// it on failure).
-    void dumpCookies();
-
     NPP                                _instance;
     Window                             _window;
     std::string                        _swf_url;
@@ -125,9 +119,6 @@ private:
 
     /// Name of the plugin instance element in the dom 
     std::string                        _name;
-
-    /// Cookie file
-    std::string                        _cookieFile;
 
     const char* getCurrentPageURL() const;
 };
