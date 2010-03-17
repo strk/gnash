@@ -513,6 +513,7 @@ protected:
     virtual bool watchFD(int /* fd */)
     {
         log_unimpl("This GUI does not implement FD watching.");
+        return false;
     }
 
 
