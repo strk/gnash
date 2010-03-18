@@ -45,6 +45,8 @@
 #include <glib.h>
 #include <string>
 #include <map>
+#include <vector>
+
 #include "pluginbase.h"
 #include "prlock.h"
 #include "prcvar.h"
@@ -78,8 +80,9 @@ public:
     NPError WriteStatus(char *msg) const;
     NPError WriteStatus(std::string msg) const;
 
-    void startProc(Window win);
 private:
+    void startProc();
+    std::vector<std::string> getCmdLine(int hostfd, int controlfd);
 
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
 

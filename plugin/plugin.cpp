@@ -55,14 +55,16 @@
 //  1: fatal errors (errors preventing the plugin from working as it should)
 //  2: informational messages
 //
-#define GNASH_PLUGIN_DEBUG 1
+#define GNASH_PLUGIN_DEBUG 2
 //#define WRITE_FILE
 
-#include <sys/param.h>
 #include "plugin.h" 
-#include <csignal>
 #include "GnashSystemIOHeaders.h"
 #include "StringPredicates.h"
+
+#include <boost/tokenizer.hpp>
+#include <sys/param.h>
+#include <csignal>
 #include <cstdio>
 #include <cstddef>
 #include <cstring>
@@ -470,10 +472,18 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 #endif
     }
 
+    if (_window) {
+        return NPERR_GENERIC_ERROR;
+    }
+
     _width = aWindow->width;
     _height = aWindow->height;
 
     _window = reinterpret_cast<Window> (aWindow->window);
+
+    if (!_childpid && !_swf_url.empty()) {
+        startProc();
+    }
 
     return NPERR_NO_ERROR;
 }
@@ -552,7 +562,9 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     }
 #endif
     
-    startProc(_window);
+    if (!_swf_url.empty() && _window) {
+        startProc();
+    }
 
     return NPERR_NO_ERROR;
 }
@@ -623,7 +635,11 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
     if ( cond & G_IO_HUP ) {
         logDebug("Player request channel hang up");
-        // false signals that the source should be removed.
+        // Returning false here will cause the "watch" to be removed. This watch
+        // is the only reference held to the GIOChannel, so it will be
+        // destroyed. We must make sure we don't attempt to destroy it again.
+        _ichan = 0;
+        _ichanWatchId = 0;
         return false;
     }
 
@@ -788,9 +804,8 @@ logError(const std::string& msg)
 #endif
 }
 
-
-void
-nsPluginInstance::startProc(Window win)
+std::string
+getGnashExecutable()
 {
     std::string procname;
     bool process_found = false;
@@ -798,40 +813,122 @@ nsPluginInstance::startProc(Window win)
 
     char *gnash_env = std::getenv("GNASH_PLAYER");
 
-    if (gnash_env)
-    {
+    if (gnash_env) {
         procname = gnash_env;
         process_found = (0 == stat(procname.c_str(), &procstats));
-        if (!process_found)
-        {
+        if (!process_found) {
             logError("Invalid path to gnash executable: ");
-            return;
+            return "";
         }
     }
 
-    if (!process_found)
-    {
+    if (!process_found) {
         procname = GNASHBINDIR "/gtk-gnash";
         process_found = (0 == stat(procname.c_str(), &procstats));
     }
-    if (!process_found)
-    {
+    if (!process_found) {
         procname = GNASHBINDIR "/kde4-gnash";
         process_found = (0 == stat(procname.c_str(), &procstats));
     }
 
-    if (!process_found)
-    {
+    if (!process_found) {
         logError(std::string("Unable to find Gnash in ") + GNASHBINDIR);
+        return "";
+    }
+
+
+    return procname;
+}
+
+void
+create_standalone_launcher(const std::string& page_url, const std::string& swf_url)
+{
+#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
+    if (!createSaLauncher) {
         return;
     }
 
-    const char* pageurl = getCurrentPageURL();
-    if (!pageurl)
-    {
-        logError("Could not get current page URL!");
+    std::ofstream saLauncher;
+
+    std::stringstream ss;
+    static int debugno = 0;
+    debugno = (debugno + 1) % 10;
+    ss << "/tmp/gnash-debug-" << debugno << ".sh";
+    saLauncher.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
+
+    if (!saLauncher) {
+        logError("Failed to open new file for standalone launcher: " + ss.str());
+        return;
     }
 
+    saLauncher << "#!/bin/sh" << std::endl
+               << getGnashExecutable() << " ";
+
+    if (!page_url.empty()) {
+        saLauncher << "-U '" << page_url << "' ";
+    }
+
+    saLauncher << "'" << swf_url << "' "
+               << "$@"       // allow caller to pass any additional argument
+               << std::endl;
+
+    saLauncher.close();
+#endif
+}
+
+std::vector<std::string>
+nsPluginInstance::getCmdLine(int hostfd, int controlfd)
+{
+    std::vector<std::string> arg_vec;
+
+    std::string cmd = getGnashExecutable();
+    if (cmd.empty()) {
+        logError("Failed to locate the Gnash executable!");
+        return arg_vec;
+    }
+    arg_vec.push_back(cmd);
+
+    arg_vec.push_back("-u");
+    arg_vec.push_back(_swf_url);
+
+    const char* pageurl = getCurrentPageURL();
+    if (!pageurl) {
+        logError("Could not get current page URL!");
+    } else {
+        arg_vec.push_back("-U");
+        arg_vec.push_back(pageurl);
+    }
+
+    std::stringstream pars;
+    pars << "-x "  <<  _window           // X window ID to render into
+         << " -j " << _width             // Width of window
+         << " -k " << _height            // Height of window
+         << " -F " << hostfd             // Socket to send commands to
+         << " -G " << controlfd;         // Socket determining lifespan
+    {
+        std::string pars_str = pars.str();
+        typedef boost::char_separator<char> char_sep;
+        boost::tokenizer<char_sep> tok(pars_str, char_sep(" "));
+        arg_vec.insert(arg_vec.end(), tok.begin(), tok.end());
+    }
+
+    for (std::map<std::string,std::string>::const_iterator it = _params.begin(),
+        itEnd = _params.end(); it != itEnd; ++it) {
+        const std::string& nam = it->first; 
+        const std::string& val = it->second;
+        arg_vec.push_back("-P");
+        arg_vec.push_back(nam + "=" + val);
+    }
+    arg_vec.push_back("-");
+
+    create_standalone_launcher(pageurl, _swf_url);
+
+    return arg_vec;
+}
+
+void
+nsPluginInstance::startProc()
+{
     // 0 For reading, 1 for writing.
     int p2c_pipe[2];
     int c2p_pipe[2];
@@ -862,133 +959,17 @@ nsPluginInstance::startProc(Window win)
     Setup the command line for starting Gnash
     */
 
-    // Prepare width, height and window ID variables
-    const size_t buf_size = 30;
-    char xid[buf_size], width[buf_size], height[buf_size], hostfd[buf_size],
-         controlfd[buf_size];
-    snprintf(xid, buf_size, "%ld", win);
-    snprintf(width, buf_size, "%d", _width);
-    snprintf(height, buf_size, "%d", _height);
-    snprintf(hostfd, buf_size, "%d", c2p_pipe[1]);
-    snprintf(controlfd, buf_size, "%d", p2c_controlpipe[0]);
-
-    // Prepare Actionscript variables (e.g. Flashvars).
-    std::vector<std::string> paramvalues;
-    paramvalues.reserve(_params.size());
-
-    for (std::map<std::string,std::string>::const_iterator it = _params.begin(),
-        itEnd = _params.end(); it != itEnd; ++it) {
-        const std::string& nam = it->first; 
-        const std::string& val = it->second;
-
-        std::string param = nam;
-        param += std::string("=");
-        param += val;
-        paramvalues.push_back(param);
+    std::vector<std::string> arg_vec = getCmdLine(c2p_pipe[1], p2c_controlpipe[0]);
+    if (arg_vec.empty()) {
+        logError("Failed to obtain command line parameters.");
+        return;
     }
 
-    /*
-    We pass the necessary arguments to the gnash executable for
-    it to run as a plugin. We do not specify rendering flags so
-    they can be set in gnashrc. Gnash defaults to -r3 anyway.
-    
-    REMEMBER TO INCREMENT THE maxargc COUNT IF YOU
-    ADD NEW ARGUMENTS
-    */ 
+    std::vector<const char*> args;
 
-    const size_t maxargc = 20 + paramvalues.size() * 2;
-    const char **argv = new const char *[maxargc];
-
-#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
-    std::ofstream saLauncher;
-
-    if ( createSaLauncher ) {
-        std::stringstream ss;
-        static int debugno = 0;
-        debugno = (debugno + 1) % 10;
-        ss << "/tmp/gnash-debug-" << debugno << ".sh";
-        saLauncher.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
-    }
-
-    if ( saLauncher )
-    {
-        saLauncher << "#!/bin/sh" << std::endl
-             << procname << " ";
-    }
-#endif 
-
-    size_t argc = 0;
-    argv[argc++] = procname.c_str();
-    
-    // Don't force verbosity, use configuration for that
-    //argv[argc++] = "-v";
-    
-    // X window ID (necessary for gnash to function as a plugin)
-    argv[argc++] = "-x";
-    argv[argc++] = xid;
-    
-    // Height and width
-    argv[argc++] = "-j";
-    argv[argc++] = width;
-    argv[argc++] = "-k";
-    argv[argc++] = height;
-
-#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
-    // we don't need this, do we ?
-    if ( saLauncher ) saLauncher << "-j " << width << " -k " << height << " ";
-#endif 
-    
-    // Url of the root movie
-    argv[argc++] = "-u";
-    argv[argc++] = _swf_url.c_str();
-
-    // Host FD
-    argv[argc++] = "-F";
-    argv[argc++] = hostfd;
-
-    // Control FD
-    argv[argc++] = "-G";
-    argv[argc++] = controlfd; 
-
-    // Base URL is the page that the SWF is embedded in. It is 
-    // by Gnash for resolving relative URLs in the movie. If the
-    // embed tag "base" is specified, its value overrides the -U
-    // flag later (Player.cpp).
-    if ( pageurl )
-    {
-        argv[argc++] = "-U";
-        argv[argc++] = pageurl;
-#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
-        if ( saLauncher ) saLauncher << "-U '" << pageurl << "' ";
-#endif 
-    }
-
-    // Variables for use by Actionscript.
-    for ( size_t i = 0, n = paramvalues.size(); i < n; ++i)
-    {
-        argv[argc++] = "-P";
-        argv[argc++] = paramvalues[i].c_str();
-#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
-        if ( saLauncher ) saLauncher << "-P '" << paramvalues[i] << "' ";
-#endif 
-    }
-
-    argv[argc++] = "-";
-    argv[argc++] = 0;
-#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
-    if ( saLauncher ) saLauncher << "'" << _swf_url << "' ";
-#endif
-
-    assert(argc <= maxargc);
-
-#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
-    if ( saLauncher ) {
-        // allow caller to pass any additional argument
-        saLauncher << "$@"
-                   << std::endl;
-        saLauncher.close();
-    }
-#endif 
+    std::transform(arg_vec.begin(), arg_vec.end(), std::back_inserter(args),
+                   std::mem_fun_ref(&std::string::c_str));
+    args.push_back(0);
 
     /*
       Argument List prepared, now fork(), close file descriptors and execv()
@@ -1004,7 +985,6 @@ nsPluginInstance::startProc(Window win)
 
     // If we are the parent and fork() worked, childpid is a positive integer.
     if (_childpid > 0) {
-        delete[] argv;//don't need the argument list
         
         // we want to write to p2c pipe, so close read-fd0
         ret = close (p2c_pipe[0]);
@@ -1025,7 +1005,6 @@ nsPluginInstance::startProc(Window win)
 
         ret = close (p2c_controlpipe[0]); // close read descriptor
     
-
 #if GNASH_PLUGIN_DEBUG > 1
         std::cout << "Forked successfully, child process PID is " 
                                 << _childpid
@@ -1097,8 +1076,8 @@ nsPluginInstance::startProc(Window win)
     
 #if GNASH_PLUGIN_DEBUG > 1
     std::cout << "Starting process: ";
-    for (int i = 0; argv[i] != 0; ++i) {
-        std::cout << argv[i] << " ";
+    for (int i = 0; args[i] != 0; ++i) {
+        std::cout << args[i] << " ";
     }
     std::cout << std::endl;
 #endif
@@ -1125,15 +1104,11 @@ nsPluginInstance::startProc(Window win)
         }
     }
 
-    execv(argv[0], const_cast<char**>(argv));
+    execv(args[0], const_cast<char**>(&args.front()));
 
     // if execv returns, an error has occurred.
     perror("executing standalone gnash");
     
-    //could actually cause a deadlock due to jemalloc and we
-    //are exiting now anyways
-    //delete[] argv;
-
     exit (-1);
 }
 
