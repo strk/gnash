@@ -243,6 +243,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 259, "screenshot",        Arg_parser::yes },
         { 260, "screenshot-file",   Arg_parser::yes },
         { 261, "hwaccel",           Arg_parser::yes },
+        { 262, "flash-version",     Arg_parser::no },
         { 'D', 0,                   Arg_parser::yes }, // Handled in dump gui
         {   0, 0,                   Arg_parser::no  }
     };
@@ -401,6 +402,10 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                             break;
                         }
                     break; 
+                case 262:
+                    cout << rcfile.getFlashVersionString() << endl;
+                    exit(EXIT_SUCCESS);          
+                    break;
 #if defined(RENDERER_AGG) || defined(RENDERER_OPENGL) || defined(RENDERER_CAIRO)
              case 'R':
                     switch (parser.argument<char>(i)) {
