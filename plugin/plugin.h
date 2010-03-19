@@ -77,9 +77,6 @@ public:
     int32_t WriteReady(NPStream *stream);
     int32_t Write(NPStream *stream, int32_t offset, int32_t len, void *buffer);
 
-    NPError WriteStatus(char *msg) const;
-    NPError WriteStatus(std::string msg) const;
-
 private:
     void startProc();
     std::vector<std::string> getCmdLine(int hostfd, int controlfd);

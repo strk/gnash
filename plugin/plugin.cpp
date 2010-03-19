@@ -63,6 +63,7 @@
 #include "StringPredicates.h"
 
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include <sys/param.h>
 #include <csignal>
 #include <cstdio>
@@ -493,25 +494,6 @@ NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
     return NS_PluginGetValue(aVariable, aValue);
-}
-
-/// \brief Write a status message
-///
-/// This writes a status message to the status line at the bottom of
-/// the browser window and the console firefox was started from.
-NPError
-nsPluginInstance::WriteStatus(char *msg) const
-{
-    NPN_Status(_instance, msg);
-    std::cout << msg << std::endl;
-
-    return NPERR_NO_ERROR;
-}
-
-NPError
-nsPluginInstance::WriteStatus(std::string msg) const
-{
-    return WriteStatus(const_cast<char*>(msg.c_str()));
 }
 
 /// \brief Open a new data stream
@@ -1087,11 +1069,8 @@ nsPluginInstance::startProc()
     /* Start the desired executable and go away.  */
     
 #if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "Starting process: ";
-    for (int i = 0; args[i] != 0; ++i) {
-        std::cout << args[i] << " ";
-    }
-    std::cout << std::endl;
+    std::cout << "Starting process: " << boost::algorithm::join(arg_vec, " ")
+              << std::endl;
 #endif
 
     wait_for_gdb();
