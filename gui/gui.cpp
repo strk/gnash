@@ -1081,7 +1081,7 @@ void
 Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
     // fallback to single regions
-    geometry::Range2d<float> full = ranges.getFullArea();
+    geometry::Range2d<int> full = ranges.getFullArea();
     
     SWFRect bounds;
     

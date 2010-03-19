@@ -94,18 +94,6 @@ public:
     virtual int getScreenResY();
     virtual double getScreenDPI();
     
-    /// Add a listener with default priority that listens for IN and HUP
-    /// events on a file descriptor.
-    //
-    /// @param fd The file descriptor to poll.
-    /// @param callback A pointer to a callback function with the following
-    ///                 signature:
-    ///        bool func(void*, int, void* data)
-    ///        The first and second arguments should be ignored.
-    ///        The last argument is a user-specified pointer. The
-    ///        callback should return false if the listener is to be removed.
-    /// @param data A pointer to a user-defined data structure.
-    /// @return true on success, false on failure.
     bool watchFD(int fd);
 
     /// Grab focus so to receive all key events

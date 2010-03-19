@@ -55,7 +55,7 @@
 //  1: fatal errors (errors preventing the plugin from working as it should)
 //  2: informational messages
 //
-#define GNASH_PLUGIN_DEBUG 2
+#define GNASH_PLUGIN_DEBUG 1
 //#define WRITE_FILE
 
 #include "plugin.h" 

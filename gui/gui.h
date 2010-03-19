@@ -173,8 +173,16 @@ public:
       _interval = interval;
     }
 
+    /// Instructs the Gui to monitor a file descriptor.
+    //
+    /// @param fd The file descriptor to monitor
+    /// @param callback The callback to fire
     void setFDCallback(int fd, boost::function<void ()> callback);
 
+    /// Calls the callback function registered for a file descriptor.
+    //
+    /// @param fd The file descriptor for which the registered callback should
+    ///        be fired.
     void callCallback(int fd);
 
     /// Return the clock provided by this Gui.
@@ -510,6 +518,13 @@ protected:
         std::exit(EXIT_SUCCESS);
     }
 
+    /// Watch a file descriptor.
+    //
+    /// An implementing Gui should monitor the file descriptor in its main
+    /// loop. When the file descriptor is triggered, the implementation should
+    /// call callCallback().
+    ///
+    /// @param fd The file descriptor to be watched
     virtual bool watchFD(int /* fd */)
     {
         log_unimpl("This GUI does not implement FD watching.");
