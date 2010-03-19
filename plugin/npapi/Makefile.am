@@ -40,13 +40,7 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(GNASHBINDIR)\
         -I$(top_srcdir)/librender \
 	-I$(srcdir)/mozilla-sdk \
 	-I$(srcdir)/mozilla-sdk/include \
-	$(GLIB_CFLAGS) \
-	$(X11_CFLAGS) \
-	$(GTK2_CFLAGS) \
-        $(CAIRO_CFLAGS) \
         $(GLIB_CFLAGS) \
-        $(ATK_CFLAGS) \
-        $(PANGO_CFLAGS) \
 	$(NULL)
 
 # AM_CXXFLAGS = $(AM_CPPFLAGS)
