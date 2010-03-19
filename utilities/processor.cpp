@@ -104,7 +104,6 @@ static long int delay = 0;
 
 const char *GPROC_VERSION = "1.0";
 
-using namespace std;
 using namespace gnash;
 
 static void usage (const char *);

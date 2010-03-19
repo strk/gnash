@@ -41,7 +41,6 @@
 #endif
 
 #include <cstddef>
-using namespace std;
 
 /***********************************************************************
 ** MACROS:      PR_EXTERN
