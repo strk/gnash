@@ -85,13 +85,19 @@ class VaapiContextFfmpeg;
 static inline VaapiContextFfmpeg *
 get_vaapi_context(AVCodecContext *avctx)
 {
+#if USE_VAAPI	
     return static_cast<VaapiContextFfmpeg *>(avctx->hwaccel_context);
+#else
+	return NULL;
+#endif
 }
 
 static inline void
 set_vaapi_context(AVCodecContext *avctx, VaapiContextFfmpeg *vactx)
 {
+#if USE_VAAPI	
     avctx->hwaccel_context = vactx;
+#endif
 }
 
 static inline void
