@@ -2707,10 +2707,11 @@ extensions/gtk2/Makefile
 extensions/lirc/Makefile
 extensions/dbus/Makefile
 plugin/Makefile
+plugin/npapi/Makefile
+plugin/npapi/mozilla-sdk/Makefile
 plugin/xpcom/Makefile
 plugin/klash/Makefile
 plugin/klash4/Makefile
-plugin/mozilla-sdk/Makefile
 plugin/win32/Makefile
 cygnal/Makefile
 cygnal/libnet/Makefile
