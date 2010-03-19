@@ -2110,7 +2110,7 @@ if test x"${build_gtk}" = xyes -o x"${media_handler}" = xgst; then
   GNASH_PATH_GLIB
 fi
 
-AM_CONDITIONAL(HAVE_GLIB, [ test x"${has_glib} "= xyes ])
+AM_CONDITIONAL(HAVE_GLIB, [ test x"${has_glib}" = xyes ])
 
 if test x$build_gtk = xno -o x$build_kde4 = xno; then
   if test x$npapi = xyes; then
@@ -2543,14 +2543,33 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
     )
     if test x$ac_cv_gcc_visibility_bug = xno; then
       CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
-      if test x"$enable_visibility" != x"no"; then
-        CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
-      fi
     fi
   ]
 )
 
 CHECK_VISIBILITY_GCC_BUG
+
+
+if test x$ac_cv_gcc_visibility_bug = xno; then
+  AC_LANG_PUSH(C++)
+  AC_MSG_CHECKING([whether $CXX supports -fvisibility=hidden])
+  save_CXXFLAGS=$CXXFLAGS
+  CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
+  AC_LINK_IFELSE([AC_LANG_PROGRAM()], 
+                 [ac_cv_gcc_visibility=yes;
+                  AC_MSG_RESULT([yes])],
+                 [ac_cv_gcc_visibility=no;
+                  AC_MSG_RESULT([no])]);
+  CXXFLAGS="$save_CXXFLAGS"
+  AC_LANG_POP(C++)
+fi
+
+
+AM_CONDITIONAL(VISIBILITY_WORKS, test x"$ac_cv_gcc_visibility" = xyes)
+
+if test x"$ac_cv_gcc_visibility" = xyes -a x"$enable_visibility" != xno; then
+  CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
+fi
 
 dnl Define convienience constants so Gnash can print out the
 dnl default configuration of the build.
@@ -3663,6 +3682,15 @@ if test x"${build_vaapi}" = x"yes"; then
       echo "        LIBVA GLX flags are: $LIBVA_GLX_CFLAGS"
     fi
     echo "        LIBVA GLX libraries are: $LIBVA_GLX_LIBS"
+  fi
+fi
+
+if test x"$ac_cv_gcc_visibility" != xyes; then
+  if test x"$npapi" = xyes; then
+    echo "        WARNING: NPAPI (mozilla) plugin is enabled, but your compiler"
+    echo "                 does not support symbol visibility. This may cause "
+    echo "                 the plugin to malfunction and may result in small "
+    echo "                 children being eaten. You have been warned!"
   fi
 fi
 

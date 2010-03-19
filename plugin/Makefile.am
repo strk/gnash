@@ -121,6 +121,11 @@ libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
 else
 libgnashplugin_la_LDFLAGS = -module -avoid-version -L$(plugindir)
 endif
+
+if VISIBILITY_WORKS
+libgnashplugin_la_CXXFLAGS = -fvisibility=hidden
+endif
+
 endif # NPAPI
 endif # WIN32
 
