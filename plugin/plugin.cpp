@@ -926,6 +926,54 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
     return arg_vec;
 }
 
+template <std::size_t N>
+void
+close_fds(const int (& except)[N])
+{
+    // Rather than close all the thousands of possible file
+    // descriptors, we start after stderr and keep closing higher numbers
+    // until we encounter ten fd's in a row that
+    // aren't open. This will tend to close most fd's in most programs.
+    int numfailed = 0, closed = 0;
+    for (int anfd = fileno(stderr)+1; numfailed < 10; anfd++) {
+        if (std::find(except, except+N, anfd) != except+N) {
+            continue;
+        }
+        if (close(anfd) < 0) {
+	    numfailed++;
+	} else {
+            numfailed = 0;
+            closed++;
+        }
+    }
+#if GNASH_PLUGIN_DEBUG > 1
+    std::cout << "Closed " << closed << " files." << std::endl;
+#endif
+} 
+
+void
+wait_for_gdb()
+{
+    if (!waitforgdb) {
+        return;
+    }
+
+    // For debugging the plugin (GNASH_OPTIONS=waitforgdb)
+    // Block here until gdb is attached and sets waitforgdb to false.
+
+    std::cout << std::endl << "  Attach GDB to PID " << getpid()
+              << " to debug!" << std::endl
+              << "  This thread will block until then!" << std::endl
+              << "  Once blocked here, you can set other breakpoints."
+              << std::endl
+              << "  Do a \"set variable waitforgdb=$false\" to continue"
+              << std::endl << std::endl;
+
+    while (waitforgdb) {
+        sleep(1);
+    }
+}
+
 void
 nsPluginInstance::startProc()
 {
@@ -989,16 +1037,13 @@ nsPluginInstance::startProc()
         // we want to write to p2c pipe, so close read-fd0
         ret = close (p2c_pipe[0]);
         if (ret == -1) {
-// this is not really a fatal error...
             logError("ERROR: p2c_pipe[0] close() failed: " +
                      std::string(strerror(errno)));
         }
 
-        // we want to read from c2p pipe, so close read-fd1
+        // we want to read from c2p pipe, so close write-fd1
         ret = close (c2p_pipe[1]);
-        if (ret == -1)
-        {
-// this is not really a fatal error...
+        if (ret == -1) {
             logError("ERROR: c2p_pipe[1] close() failed: " + 
                      std::string(strerror(errno)));
         }
@@ -1021,18 +1066,10 @@ nsPluginInstance::startProc()
     }
 
     // This is the child scope.
-    //FF3 uses jemalloc and it has problems after the fork(), do NOT
-    //use memory functions (malloc()/free()/new/delete) after the fork()
-    //in the child thread process
-
-    // We want to read parent to child, so close write-fd1
-    ret = close (p2c_pipe[1]); 
-    if (ret == -1) {
-// not really a fatal error
-        logError("ERROR: close() failed: " + std::string(strerror(errno)));
-    }
-
-    ret = close(p2c_controlpipe[1]);
+    
+    // FF3 uses jemalloc and it has problems after the fork(), do NOT
+    // use memory functions (malloc()/free()/new/delete) after the fork()
+    // in the child thread process
 
     // close standard input and direct read-fd1 to standard input
     ret = dup2 (p2c_pipe[0], fileno(stdin));
@@ -1041,38 +1078,13 @@ nsPluginInstance::startProc()
         logError("ERROR: dup2() failed: " + std::string(strerror(errno)));
     }
 
-    // Close all of the browser's file descriptors that we just 
-    // inherited (including p2c_pipe[0] that we just dup'd to fd 0).
-    // Experiments show seventy or eighty file descriptors open in
-    // typical cases.  Rather than close all the thousands of possible file
-    // descriptors, we start after stderr and keep closing higher numbers
-    // until we encounter ten fd's in a row that
-    // aren't open. This will tend to close most fd's in most programs.
-    int numfailed = 0, closed = 0;
-    int anfd = fileno(stderr)+1;
-    for ( ; numfailed < 10; anfd++) {
-        if ( anfd == c2p_pipe[1] ) continue; // don't close this
-        if ( anfd == c2p_pipe[0] ) continue; // don't close this either (correct?)
-        if ( anfd == p2c_controlpipe[0] ) continue; // don't close this either (correct?)
-        if ( anfd == p2c_controlpipe[1] ) continue; // don't close this either (correct?)
-        ret = close (anfd);
-        if (ret < 0) {
-	    numfailed++;
-	} else {
-            numfailed = 0;
-            closed++;
-        }
-    }
+    // Close all of the browser's file descriptors that we just inherited
+    // (including p2c_pipe[0] that we just dup'd to fd 0), but obviously
+    // not the file descriptors that we want the child to use.
+    int dontclose[] = {c2p_pipe[1], p2c_controlpipe[0]};
+    close_fds(dontclose);
 
-#if GNASH_PLUGIN_DEBUG > 1
-    std::cout << "Closed " << closed << " files." << std::endl;
-#endif
-
-
-    /*
-    Start the desired executable and go away.
-    */
-
+    /* Start the desired executable and go away.  */
     
 #if GNASH_PLUGIN_DEBUG > 1
     std::cout << "Starting process: ";
@@ -1082,27 +1094,7 @@ nsPluginInstance::startProc()
     std::cout << std::endl;
 #endif
 
-    /*
-    For debugging the plugin (GNASH_OPTIONS=waitforgdb)
-    Block here until gdb is attached and sets waitforgdb to
-    false.
-    */
-
-    if (waitforgdb) {
-
-        std::cout << std::endl << "  Attach GDB to PID " << getpid()
-                << " to debug!" << std::endl;
-        std::cout << "  This thread will block until then!" << std::endl;
-        std::cout << "  Once blocked here, you can set other breakpoints."
-                << std::endl;
-        std::cout << "  Do a \"set variable waitforgdb=$false\" to continue"
-                << std::endl << std::endl;
-        
-        while (waitforgdb)
-        {
-            sleep(1);
-        }
-    }
+    wait_for_gdb();
 
     execv(args[0], const_cast<char**>(&args.front()));
 
