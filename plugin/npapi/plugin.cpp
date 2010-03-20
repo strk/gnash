@@ -823,7 +823,7 @@ getGnashExecutable()
 }
 
 void
-create_standalone_launcher(const std::string& page_url, const std::string& swf_url)
+create_standalone_launcher(const std::string& page_url, const std::string& swf_url, const std::map<std::string, std::string>& params)
 {
 #ifdef CREATE_STANDALONE_GNASH_LAUNCHER
     if (!createSaLauncher) {
@@ -848,6 +848,13 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
 
     if (!page_url.empty()) {
         saLauncher << "-U '" << page_url << "' ";
+    }
+
+    for (std::map<std::string,std::string>::const_iterator it = params.begin(),
+        itEnd = params.end(); it != itEnd; ++it) {
+        const std::string& nam = it->first; 
+        const std::string& val = it->second;
+        saLauncher << "-P '" << nam << "=" << val << "' ";
     }
 
     saLauncher << "'" << swf_url << "' "
@@ -903,7 +910,7 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
     }
     arg_vec.push_back("-");
 
-    create_standalone_launcher(pageurl, _swf_url);
+    create_standalone_launcher(pageurl, _swf_url, _params);
 
     return arg_vec;
 }
@@ -1043,7 +1050,7 @@ nsPluginInstance::startProc()
         _ichanWatchId = g_io_add_watch(_ichan, 
                 (GIOCondition)(G_IO_IN|G_IO_HUP), 
                 (GIOFunc)handlePlayerRequestsWrapper, this);
-        g_io_channel_unref(_ichan);
+        //g_io_channel_unref(_ichan); // we'll unref on destruction
         return;
     }
 
