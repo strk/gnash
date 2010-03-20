@@ -1050,7 +1050,7 @@ nsPluginInstance::startProc()
         _ichanWatchId = g_io_add_watch(_ichan, 
                 (GIOCondition)(G_IO_IN|G_IO_HUP), 
                 (GIOFunc)handlePlayerRequestsWrapper, this);
-        g_io_channel_unref(_ichan);
+        //g_io_channel_unref(_ichan); // we'll unref on destruction
         return;
     }
 
