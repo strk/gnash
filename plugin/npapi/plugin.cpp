@@ -352,7 +352,6 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _width(0),
     _height(0),
     _streamfd(-1),
-    _ichan(0),
     _ichanWatchId(0),
     _controlfd(-1),
     _childpid(0),
@@ -385,15 +384,6 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 nsPluginInstance::~nsPluginInstance()
 {
     logDebug("plugin instance destruction");
-
-    if (_ichan) {
-        logDebug("shutting down input chan");
-
-        GError *error = NULL;
-        g_io_channel_shutdown (_ichan, TRUE, &error);
-        g_io_channel_unref (_ichan);
-        _ichan = 0;
-    }
 
     if ( _ichanWatchId ) {
         g_source_remove(_ichanWatchId);
@@ -620,7 +610,6 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
         // Returning false here will cause the "watch" to be removed. This watch
         // is the only reference held to the GIOChannel, so it will be
         // destroyed. We must make sure we don't attempt to destroy it again.
-        _ichan = 0;
         _ichanWatchId = 0;
         return false;
     }
@@ -823,7 +812,8 @@ getGnashExecutable()
 }
 
 void
-create_standalone_launcher(const std::string& page_url, const std::string& swf_url, const std::map<std::string, std::string>& params)
+create_standalone_launcher(const std::string& page_url, const std::string& swf_url,
+                           const std::map<std::string, std::string>& params)
 {
 #ifdef CREATE_STANDALONE_GNASH_LAUNCHER
     if (!createSaLauncher) {
@@ -929,8 +919,8 @@ close_fds(const int (& except)[N])
             continue;
         }
         if (close(anfd) < 0) {
-	    numfailed++;
-	} else {
+            numfailed++;
+        } else {
             numfailed = 0;
             closed++;
         }
@@ -1045,12 +1035,12 @@ nsPluginInstance::startProc()
                                 << std::endl;
 #endif
 
-        _ichan = g_io_channel_unix_new(c2p_pipe[0]);
-        g_io_channel_set_close_on_unref(_ichan, true);
-        _ichanWatchId = g_io_add_watch(_ichan, 
+        GIOChannel* ichan = g_io_channel_unix_new(c2p_pipe[0]);
+        g_io_channel_set_close_on_unref(ichan, true);
+        _ichanWatchId = g_io_add_watch(ichan, 
                 (GIOCondition)(G_IO_IN|G_IO_HUP), 
                 (GIOFunc)handlePlayerRequestsWrapper, this);
-        //g_io_channel_unref(_ichan); // we'll unref on destruction
+        g_io_channel_unref(ichan);
         return;
     }
 
