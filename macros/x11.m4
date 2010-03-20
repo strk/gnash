@@ -31,7 +31,7 @@ AC_DEFUN([GNASH_PATH_X11],
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_x11_incl}" = x ; then
-    newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/include ${incllist}"
+    newlist="/Developer/SDKs/MacOSX10.5*.sdk/usr/include /Developer/SDKs/MacOSX10.4*.sdk/usr/include ${incllist}"
     for i in $newlist; do
     	if test -f $i/X11/X.h; then
   	    ac_cv_path_x11_incl="-I$i"
