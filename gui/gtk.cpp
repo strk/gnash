@@ -2271,7 +2271,7 @@ bool
 GtkGui::checkX11Extension(const std::string& ext)
 {
     
-    int n = 0;
+    unsigned int n = 0;
     char **extlist = XListExtensions(GDK_DISPLAY(), &n);
 
     if (extlist) {
