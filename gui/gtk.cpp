@@ -2271,11 +2271,11 @@ bool
 GtkGui::checkX11Extension(const std::string& ext)
 {
     
-    unsigned int n = 0;
+    int n = 0;
     char **extlist = XListExtensions(GDK_DISPLAY(), &n);
 
     if (extlist) {
-        for (size_t i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             if (std::strncmp(ext.c_str(), extlist[i], ext.size()) == 0) {
                 return true;
             }
