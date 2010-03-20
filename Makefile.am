@@ -348,13 +348,6 @@ if BUILD_AGG_RENDERER
 	@echo "	AGG_CFLAGS is $(AGG_CFLAGS)"
 	@echo "	AGG_LIBS is $(AGG_LIBS)"
 endif
-if XPCOM
-	@echo "	XPCOM_CFLAGS is $(XPCOM_CFLAGS)"
-	@echo "	XPCOM_LIBS is $(XPCOM_LIBS)"
-	@echo "	XPIDL path is $(XPIDL)"
-	@echo "	NSPR_CFLAGS is $(NSPR_CFLAGS)"
-	@echo "	NSPR_LIBS is $(NSPR_LIBS)"
-endif
 	@echo ""
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
@@ -417,9 +410,6 @@ if BUILD_AMIGAOS4_GUI
 endif
 if BUILD_HAIKU_GUI
 	@echo " Supported GUI: Haiku"
-endif
-if XPCOM
-	@echo "	XPCOM support for Mozilla/Firefox"
 endif
 if JEMALLOC
 	@echo "	Using jemalloc memory manager"

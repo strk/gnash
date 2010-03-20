@@ -1573,13 +1573,6 @@ AC_ARG_WITH(plugins-install,
 
 
 GNASH_PATH_FIREFOX
-dnl XPCOM and NSPR can be used in the plugin for better integration
-dnl within Firefox.
-GNASH_PATH_XPCOM
-if test x$has_xpcom = xyes; then nspr4=yes; fi
-GNASH_PATH_NSPR
-dnl If we don't have both XPCOM and NSPR, we can't build either.
-AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes -a x$has_nspr = xyes)
 
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
@@ -2709,7 +2702,6 @@ extensions/dbus/Makefile
 plugin/Makefile
 plugin/npapi/Makefile
 plugin/npapi/mozilla-sdk/Makefile
-plugin/xpcom/Makefile
 plugin/klash/Makefile
 plugin/klash4/Makefile
 plugin/win32/Makefile
@@ -3720,27 +3712,6 @@ if test x"${build_haiku}" = xyes -o x"${build_sound_mkit}" = xyes -o x"${media_h
     echo "        Haiku libs are: $HAIKU_LIBS"
 fi
  
-dnl XPCOM support for Mozilla/Firefox
-if test x"$xpcom" = x"yes"; then
-  if test x"$has_xpcom" = x"yes"; then
-    echo "        XPCOM flags are: $XPCOM_CFLAGS"
-    echo "        XPCOM libs are: $XPCOM_LIBS"
-    echo "        XPIDL path is: $XPIDL"
-  else
-    echo "        ERROR: No XPCOM development package is installed." >&3
-    echo "                Install it from http://www.mozilla.org/projects/xpcom/" >&3
-    echo "                or .deb users: apt-get install xulrunner-1.9-dev" >&3
-   echo "                 or .rpm users: yum install xulrunner-devel" >&4
-  fi
-fi
-if test x"$nspr4" = x"yes"; then
-  if test x"$has_nspr" = x"yes"; then
-    echo "        NSPR flags are: $NSPR_CFLAGS"
-    echo "        NSPR libs are: $NSPR_LIBS"
-  else
-    echo "        ERROR: No NSPR development package is installed." >&3
-  fi
-fi
 if test x"$python" = x"yes"; then
   if test x"$has_python" = x"yes"; then
     echo "        PYTHON flags are: $PYTHON_CFLAGS"
