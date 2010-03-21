@@ -168,29 +168,19 @@ NS_PluginInitialize()
         logDebug("xEmbed supported in this browser");
     }
 
-#if 0 // Gtk is no longer required in the browser
+    // GTK is not strictly required, but we do use the Glib main event loop,
+    // so lack of GTK means reduced functionality.
     NPNToolkitType toolkit;
-    err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
-                NPNVToolkit,
-                (void *)&toolkit);
+    err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL, NPNVToolkit, &toolkit);
 
-    /*
-    GTK2 support is currently also necessary. Fail if not
-    present.
-    */
     if (err != NPERR_NO_ERROR || toolkit != NPNVGtk2) {
 #ifdef GNASH_PLUGIN_DEBUG
         std::cout << "NPAPI ERROR: No GTK2 support in this browser!"
             " Have version " << (int)toolkit << std::endl;
 #endif
-
-        return NPERR_INCOMPATIBLE_VERSION_ERROR;
     } else {
-#if GNASH_PLUGIN_DEBUG > 1
-        std::cout << "GTK2 supported in this browser" << std::endl;
-#endif
+        logDebug("GTK2 supported in this browser");
     }
-#endif
 
     /*
     Check for environment variables.

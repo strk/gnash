@@ -34,6 +34,7 @@
 #include "fn_call.h"
 #include "GnashAlgorithm.h"
 #include "Global_as.h"
+#include "IOChannel.h"
 
 #include <sstream>
 #include <map>
