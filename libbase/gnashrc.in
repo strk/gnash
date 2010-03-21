@@ -91,6 +91,12 @@
 #
 # Default: @DEFAULT_FLASH_PLATFORM_ID@ @DEFAULT_FLASH_MAJOR_VERSION@,@DEFAULT_FLASH_MINOR_VERSION@,@DEFAULT_FLASH_REV_NUMBER@,0
 #
+# When modifying this consider also exporting
+# GNASH_PLUGIN_DESCRIPTION to match the version.
+# Javascript based version detectors expect something like:
+# "Shockwave Flash @DEFAULT_FLASH_MAJOR_VERSION@.@DEFAULT_FLASH_MINOR_VERSION@ r@DEFAULT_FLASH_REV_NUMBER@"
+#
+#
 #set flashVersionString GSH 9,0,99,0
 
 # Enable the ActionScript debugger (if compile-time support was enabled)
