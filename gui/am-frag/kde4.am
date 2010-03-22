@@ -20,20 +20,29 @@
 # 
 if BUILD_KDE4_GUI
 
-klash4.moc: $(srcdir)/Kde4Gui.h
+Kde4Gui.moc: $(srcdir)/Kde4Gui.h
 	@if test x"$(MOC4)" != x; then \
-	  echo "Generating MOC 4 file..."; \
-	  $(MOC4) $(srcdir)/Kde4Gui.h -o klash4.moc; \
+	  echo "Generating MOC file: Kde4Gui.moc."; \
+	  $(MOC4) $(srcdir)/Kde4Gui.h -o Kde4Gui.moc; \
 	else  \
-	  echo "WARNING: Install QT 4.x moc tool! Linking to default MOC file"; \
-	  ln -sf $(srcdir)/klash4.moc.in klash4.moc; \
+	  echo "WARNING: Install QT 4.x moc tool! Using default MOC file"; \
+	  ln -sf $(srcdir)/Kde4Gui.moc.in Kde4Gui.moc; \
+	fi
+
+Kde4Glue.moc: $(srcdir)/Kde4Glue.h
+	@if test x"$(MOC4)" != x; then \
+	  echo "Generating MOC file: Kde4Glue.moc."; \
+	  $(MOC4) $(srcdir)/Kde4Glue.h -o Kde4Glue.moc; \
+	else  \
+	  echo "WARNING: Install QT 4.x moc tool! Using default MOC file"; \
+	  ln -sf $(srcdir)/Kde4Glue.moc.in Kde4Glue.moc; \
 	fi
 
 endif
 
 bin_PROGRAMS += kde4-gnash
 
-kde4_gnash_SOURCES = $(GUI_SRCS) GuiKde4.cpp  Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
+kde4_gnash_SOURCES = $(GUI_SRCS) GuiKde4.cpp  Kde4Gui.cpp Kde4Glue.cpp Kde4Gui.h Kde4Glue.h
 
 kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" $(AM_CPPFLAGS) $(KDE4_CFLAGS) $(QT4_CFLAGS)
 kde4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 

@@ -44,7 +44,7 @@ class Kde4AggGlue : public Kde4Glue
     ~Kde4AggGlue();
     
     bool init(int argc, char **argv[]);
-    void prepDrawingArea(QWidget *drawing_area);
+    void prepDrawingArea(DrawingWidget *drawing_area);
     Renderer* createRenderHandler();
     void initBuffer(int width, int height);
     void resize(int width, int height);
@@ -59,8 +59,6 @@ class Kde4AggGlue : public Kde4Glue
     std::auto_ptr<QImage> _image;
     std::auto_ptr<QPainter> _painter;
 };
-
-
 
 
 }

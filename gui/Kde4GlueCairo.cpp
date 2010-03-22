@@ -21,9 +21,11 @@
 #include "gnashconfig.h"
 #endif
 
+#include "Kde4Gui.h"
 #include "Kde4GlueCairo.h"
 #include "Renderer.h"
 #include "Renderer_cairo.h"
+#include <QWidget>
 #include <QRect>
 
 namespace gnash
@@ -96,7 +98,7 @@ Kde4CairoGlue::initBuffer(int width, int height)
 }
 
 void
-Kde4CairoGlue::prepDrawingArea(QWidget *drawing_area)
+Kde4CairoGlue::prepDrawingArea(DrawingWidget *drawing_area)
 {
     assert(drawing_area);
     _drawing_area = drawing_area;

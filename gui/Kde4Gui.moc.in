@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'Kde4Gui.h'
 **
-** Created: Fri May 22 20:44:55 2009
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
+** Created: Mon Mar 22 09:59:37 2010
+**      by: The Qt Meta Object Compiler version 62 (Qt 4.6.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -10,89 +10,25 @@
 #include "Kde4Gui.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'Kde4Gui.h' doesn't include <QObject>."
-#elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.4.3. It"
+#elif Q_MOC_OUTPUT_REVISION != 62
+#error "This file was generated using the moc from 4.6.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-static const uint qt_meta_data_gnash__DrawingWidget[] = {
-
- // content:
-       1,       // revision
-       0,       // classname
-       0,    0, // classinfo
-       8,   10, // methods
-       0,    0, // properties
-       0,    0, // enums/sets
-
- // slots: signature, parameters, type, tag, flags
-      22,   21,   21,   21, 0x0a,
-      35,   21,   21,   21, 0x0a,
-      49,   21,   21,   21, 0x0a,
-      56,   21,   21,   21, 0x0a,
-      64,   21,   21,   21, 0x0a,
-      71,   21,   21,   21, 0x0a,
-      81,   21,   21,   21, 0x0a,
-      98,   91,   21,   21, 0x0a,
-
-       0        // eod
-};
-
-static const char qt_meta_stringdata_gnash__DrawingWidget[] = {
-    "gnash::DrawingWidget\0\0properties()\0"
-    "preferences()\0play()\0pause()\0stop()\0"
-    "restart()\0refresh()\0isFull\0fullscreen(bool)\0"
-};
-
-const QMetaObject gnash::DrawingWidget::staticMetaObject = {
-    { &BaseWidget::staticMetaObject, qt_meta_stringdata_gnash__DrawingWidget,
-      qt_meta_data_gnash__DrawingWidget, 0 }
-};
-
-const QMetaObject *gnash::DrawingWidget::metaObject() const
-{
-    return &staticMetaObject;
-}
-
-void *gnash::DrawingWidget::qt_metacast(const char *_clname)
-{
-    if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_gnash__DrawingWidget))
-        return static_cast<void*>(const_cast< DrawingWidget*>(this));
-    return BaseWidget::qt_metacast(_clname);
-}
-
-int gnash::DrawingWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
-{
-    _id = BaseWidget::qt_metacall(_c, _id, _a);
-    if (_id < 0)
-        return _id;
-    if (_c == QMetaObject::InvokeMetaMethod) {
-        switch (_id) {
-        case 0: properties(); break;
-        case 1: preferences(); break;
-        case 2: play(); break;
-        case 3: pause(); break;
-        case 4: stop(); break;
-        case 5: restart(); break;
-        case 6: refresh(); break;
-        case 7: fullscreen((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        }
-        _id -= 8;
-    }
-    return _id;
-}
 static const uint qt_meta_data_gnash__EmbedWidget[] = {
 
  // content:
-       1,       // revision
+       4,       // revision
        0,       // classname
        0,    0, // classinfo
-       2,   10, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
 
  // slots: signature, parameters, type, tag, flags
       20,   19,   19,   19, 0x0a,
@@ -111,9 +47,13 @@ const QMetaObject gnash::EmbedWidget::staticMetaObject = {
       qt_meta_data_gnash__EmbedWidget, 0 }
 };
 
+#ifdef Q_NO_DATA_RELOCATION
+const QMetaObject &gnash::EmbedWidget::getStaticMetaObject() { return staticMetaObject; }
+#endif //Q_NO_DATA_RELOCATION
+
 const QMetaObject *gnash::EmbedWidget::metaObject() const
 {
-    return &staticMetaObject;
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->metaObject : &staticMetaObject;
 }
 
 void *gnash::EmbedWidget::qt_metacast(const char *_clname)
@@ -133,6 +73,7 @@ int gnash::EmbedWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: hidePlayButton(); break;
         case 1: showPlayButton(); break;
+        default: ;
         }
         _id -= 2;
     }
@@ -141,12 +82,15 @@ int gnash::EmbedWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 static const uint qt_meta_data_gnash__Kde4GuiPrefs__PreferencesDialog[] = {
 
  // content:
-       1,       // revision
+       4,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   10, // methods
+       1,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
 
  // slots: signature, parameters, type, tag, flags
       40,   39,   39,   39, 0x08,
@@ -164,9 +108,13 @@ const QMetaObject gnash::Kde4GuiPrefs::PreferencesDialog::staticMetaObject = {
       qt_meta_data_gnash__Kde4GuiPrefs__PreferencesDialog, 0 }
 };
 
+#ifdef Q_NO_DATA_RELOCATION
+const QMetaObject &gnash::Kde4GuiPrefs::PreferencesDialog::getStaticMetaObject() { return staticMetaObject; }
+#endif //Q_NO_DATA_RELOCATION
+
 const QMetaObject *gnash::Kde4GuiPrefs::PreferencesDialog::metaObject() const
 {
-    return &staticMetaObject;
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->metaObject : &staticMetaObject;
 }
 
 void *gnash::Kde4GuiPrefs::PreferencesDialog::qt_metacast(const char *_clname)
@@ -185,6 +133,7 @@ int gnash::Kde4GuiPrefs::PreferencesDialog::qt_metacall(QMetaObject::Call _c, in
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: savePreferences(); break;
+        default: ;
         }
         _id -= 1;
     }

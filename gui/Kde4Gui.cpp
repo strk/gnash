@@ -1,4 +1,4 @@
-// kde.cpp:  K Development Environment top level window, for Gnash.
+// Kde4Gui.cpp: KDE4/Qt4 Gui implementation for Gnash window
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
@@ -63,7 +63,7 @@
 
 #include "gui.h"
 #include "Kde4Gui.h"
-#include "klash4.moc"
+#include "Kde4Gui.moc"
 #include "Renderer.h"
 #include "RunResources.h" 
 
@@ -89,7 +89,7 @@ Kde4Gui::~Kde4Gui()
 
 
 bool
-Kde4Gui::init(int argc, char **argv[])
+Kde4Gui::init(int /*argc*/, char ** /*argv*/[])
 {
 
     char** r = NULL;
@@ -100,7 +100,37 @@ Kde4Gui::init(int argc, char **argv[])
     _embedWidget = new EmbedWidget(*this);
     _drawingWidget = _embedWidget->drawingWidget();
 
-    _glue.init (argc, argv);
+    std::string renderer = _runResources.getRenderBackend();
+    if (renderer.empty()) {
+        gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+        renderer = rcfile.getRenderer();
+    }
+
+    if (renderer == "cairo") {
+#ifdef RENDERER_CAIRO
+        log_debug("Using Cairo renderer");
+        _glue.reset(new Kde4CairoGlue());
+#else
+        log_error(_("Cairo renderer not supported!"));
+        return false;
+#endif
+    } else if (renderer == "opengl") {
+#ifdef RENDERER_OPENGL
+        log_debug("Using OpenGL renderer");
+        _glue.reset(new Kde4OglGlue());
+#else
+        log_error(_("OpenGL renderer not supported!"));
+        return false;
+#endif
+    } else {
+#ifdef RENDERER_AGG
+        log_debug("Using AGG renderer");
+        _glue.reset(new Kde4AggGlue());
+#else
+        log_error(_("AGG renderer not supported!"));
+        return false;
+#endif
+    }
 
     setupActions();
     setupMenus();
@@ -155,16 +185,16 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height,
         _window->show();
     }
 
-    _glue.prepDrawingArea(_drawingWidget);
+    _glue->prepDrawingArea(_drawingWidget);
 
-    _renderer.reset(_glue.createRenderHandler());
+    _renderer.reset(_glue->createRenderHandler());
 
     if (!_renderer.get()) {
         return false;
     }
 
     _validbounds.setTo(0, 0, _width, _height);
-    _glue.initBuffer(_width, _height);
+    _glue->initBuffer(_width, _height);
     
     log_debug(_("Setting renderer"));
 
@@ -222,7 +252,7 @@ Kde4Gui::renderWidget(const QRect& updateRect)
 {
     // This call renders onto the widget using a QPainter,
     // which *must only happen inside a paint event*.
-    _glue.render(updateRect);
+    _glue->render(updateRect);
 }
 
 
@@ -405,7 +435,7 @@ Kde4Gui::handleKeyEvent(QKeyEvent *event, bool down)
 void
 Kde4Gui::resize(int width, int height)
 {
-    _glue.resize(width, height);
+    _glue->resize(width, height);
     resize_view(width, height);
 }
 
@@ -689,143 +719,6 @@ void EmbedWidget::hidePlayButton()
 void EmbedWidget::showPlayButton()
 {
     _playButton->show();
-}
-
-/// DrawingWidget implementation
-
-DrawingWidget::DrawingWidget(Kde4Gui& gui)
- : _gui(gui)
-{
-}
-
-void 
-DrawingWidget::paintEvent(QPaintEvent *event)
-{
-    _gui.renderWidget(event->rect());
-}
-
-
-void
-DrawingWidget::timerEvent(QTimerEvent*)
-{
-    Gui::advance_movie(&_gui);
-}
-
-
-void
-DrawingWidget::mouseMoveEvent(QMouseEvent *event)
-{
-    QPoint position = event->pos();
-    _gui.notify_mouse_moved(position.x(), position.y());
-}
-
-
-void
-DrawingWidget::contextMenuEvent(QContextMenuEvent* event)
-{
-    _gui.popupMenu(event->globalPos());
-}
-
-
-void
-DrawingWidget::mousePressEvent(QMouseEvent* /* event */)
-{
-    _gui.notify_mouse_clicked(true, 1);
-}
-
-
-void
-DrawingWidget::mouseReleaseEvent(QMouseEvent* /* event */)
-{
-    _gui.notify_mouse_clicked(false, 1);
-}
-
-
-void
-DrawingWidget::keyPressEvent(QKeyEvent *event)
-{
-    _gui.handleKeyEvent(event, true);
-}
-
-
-void
-DrawingWidget::keyReleaseEvent(QKeyEvent *event)
-{
-    _gui.handleKeyEvent(event, false);
-}
-
-
-void
-DrawingWidget::resizeEvent(QResizeEvent *event)
-{
-    _gui.resize(event->size().width(), event->size().height());
-    update();
-}
-
-
-void
-DrawingWidget::properties()
-{
-    _gui.showProperties();
-}
-
-
-void
-DrawingWidget::preferences()
-{
-    _gui.showPreferences();
-}
-
-
-void
-DrawingWidget::play()
-{
-    _gui.play();
-}
-
-
-void
-DrawingWidget::pause()
-{
-    _gui.pause();
-}
-
-
-void
-DrawingWidget::restart()
-{
-    _gui.restart();
-}
-
-
-void
-DrawingWidget::stop()
-{
-    _gui.stop();
-}
-
-
-void
-DrawingWidget::refresh()
-{
-    _gui.refreshView();
-}
-
-void
-DrawingWidget::quit()
-{
-    _gui.quit();
-}
-
-void
-DrawingWidget::fullscreen(bool isFull)
-{
-    if (isFull) {
-        _gui.setFullscreen();
-    }
-    else {
-        _gui.unsetFullscreen();
-    }
 }
 
 namespace Kde4GuiPrefs {

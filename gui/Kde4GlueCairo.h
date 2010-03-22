@@ -16,8 +16,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_KDE4_AGG_GLUE_H
-#define GNASH_KDE4_AGG_GLUE_H
+#ifndef GNASH_KDE4_CAIRO_GLUE_H
+#define GNASH_KDE4_CAIRO_GLUE_H
 
 
 #ifdef HAVE_CONFIG_H
@@ -47,7 +47,7 @@ class Kde4CairoGlue : public Kde4Glue
     
     bool init(int argc, char **argv[]);
     void initBuffer(int width, int height);
-    void prepDrawingArea(QWidget *drawing_area);
+    void prepDrawingArea(DrawingWidget *drawing_area);
     Renderer* createRenderHandler();
     void render();
     void render(const QRect& updateRect);

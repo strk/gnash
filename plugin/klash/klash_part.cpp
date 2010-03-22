@@ -72,7 +72,7 @@ KlashFactory::~KlashFactory () {
 KParts::Part *KlashFactory::createPartObject
   (QWidget *wparent, const char *wname,
    QObject *parent, const char * name,
-   const char * cls, const QStringList & args) {
+   const char * /*cls*/, const QStringList & args) {
       //kdDebug() << "KlashFactory::createPartObject " << cls << endl;
       return new KlashPart (wparent, wname, parent, name, args);
 }

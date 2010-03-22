@@ -25,6 +25,7 @@
 #include "Renderer.h"
 #include "Renderer_agg.h"
 #include "GnashException.h"
+#include <QWidget>
 #include <QImage>
 #include <QRect>
 
@@ -51,7 +52,7 @@ Kde4AggGlue::init(int /* argc */, char *** /* argv */)
 
 
 void
-Kde4AggGlue::prepDrawingArea(QWidget *drawing_area)
+Kde4AggGlue::prepDrawingArea(DrawingWidget *drawing_area)
 {
     _drawing_area = drawing_area;
 }

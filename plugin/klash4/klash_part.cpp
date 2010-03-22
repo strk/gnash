@@ -74,7 +74,7 @@ KlashFactory::~KlashFactory () {
 KParts::Part *KlashFactory::createPartObject
   (QWidget *wparent,
    QObject *parent,
-   const char * cls, const QStringList & args) {
+   const char * /*cls*/, const QStringList & args) {
       //kdDebug() << "KlashFactory::createPartObject " << cls << endl;
       return new KlashPart (wparent, parent, args);
 }
@@ -313,7 +313,7 @@ KDE_NO_EXPORT void KlashBrowserExtension::restoreState (QDataStream & stream) {
     static_cast <KlashPart *> (parent ())->openUrl (KUrl(url));
 }
 
-KDE_NO_EXPORT void KlashBrowserExtension::requestOpenUrl (const KUrl & url, const QString & target, const QString & service) {
+KDE_NO_EXPORT void KlashBrowserExtension::requestOpenUrl (const KUrl & url, const QString & /*target*/, const QString & /*service*/) {
     KParts::OpenUrlArguments args;
     //FIXME what replaces those?
     //args.frameName = target;

@@ -30,19 +30,17 @@
 #include <QX11EmbedWidget>
 #include <QDialog>
 
-#ifdef RENDERER_OPENGL
-# include "Kde4GlueOgl.h"
-# include <QGLWidget>
-# define BaseWidget QGLWidget
-# define GlueClass Kde4OglGlue
-#elif defined(RENDERER_CAIRO)
+#ifdef RENDERER_AGG
+#include "Kde4GlueAgg.h"
+#endif
+
+#ifdef RENDERER_CAIRO
 #include "Kde4GlueCairo.h"
-# define BaseWidget QWidget
-# define GlueClass Kde4CairoGlue
-#elif defined(RENDERER_AGG)
-# include "Kde4GlueAgg.h"
-# define BaseWidget QWidget
-# define GlueClass Kde4AggGlue
+#endif
+
+#ifdef RENDERER_OPENGL
+#include "Kde4GlueOgl.h"
+class QGLWidget;
 #endif
 
 
@@ -58,48 +56,11 @@ class QStackedWidget;
 
 namespace gnash {
     class Kde4Gui;
+	class DrawingWidget;
 }
 
 namespace gnash
 {
-
-class DrawingWidget : public BaseWidget
-{
-    Q_OBJECT
-
-public:
-    DrawingWidget(Kde4Gui& gui);
-    ~DrawingWidget() {}
-
-public slots:
-
-    void properties();
-    void preferences();
-    void play();
-    void pause();
-    void stop();
-    void restart();
-    void refresh();
-    void fullscreen(bool isFull);
-    void quit();
-
-protected:
-    void paintEvent(QPaintEvent*);
-    void timerEvent(QTimerEvent*);
-    void resizeEvent(QResizeEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
-    void contextMenuEvent(QContextMenuEvent *event);
-
-private:
-
-    Kde4Gui& _gui;
-
-};
-
 
 class EmbedWidget : public QX11EmbedWidget
 {
@@ -188,7 +149,7 @@ private:
     DrawingWidget* _drawingWidget;
     
     /// Takes care of painting onto the widget.
-    GlueClass _glue;
+	std::auto_ptr<Kde4Glue> _glue;
     
     /// The main application window.
     std::auto_ptr<QMainWindow> _window;

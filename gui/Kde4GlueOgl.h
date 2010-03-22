@@ -16,8 +16,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_KDE4_AGG_GLUE_H
-#define GNASH_KDE4_AGG_GLUE_H
+#ifndef GNASH_KDE4_OGL_GLUE_H
+#define GNASH_KDE4_OGL_GLUE_H
 
 
 #ifdef HAVE_CONFIG_H
@@ -26,12 +26,11 @@
 
 #include "Kde4Glue.h"
 
-#include <QImage>
 #include <boost/scoped_array.hpp>
-#include <QPainter>
 #include "snappingrange.h"
 
 class QRect;
+class QWidget;
 
 namespace gnash
 {
@@ -43,7 +42,7 @@ class Kde4OglGlue : public Kde4Glue
     ~Kde4OglGlue();
     
     bool init(int argc, char **argv[]);
-    void prepDrawingArea(QWidget *drawing_area);
+    void prepDrawingArea(DrawingWidget *drawing_area);
     Renderer* createRenderHandler();
     void render();
     void render(const QRect& updateRect);
@@ -53,8 +52,6 @@ class Kde4OglGlue : public Kde4Glue
     int _height;
     Renderer* _renderer; // We don't own this pointer.
 };
-
-
 
 
 }

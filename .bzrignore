@@ -1,5 +1,6 @@
 Makefile.in
 Makefile
+bzrversion.h
 .deps
 .libs
 *.lo
@@ -36,12 +37,15 @@ macros/argz.m4
 gui/gnash
 gui/gtk-gnash
 gui/kde-gnash
+gui/kde4-gnash
 gui/haiku-gnash
 gui/sdl-gnash
 gui/fb-gnash
 gui/riscos-gnash
 gui/fltk-gnash
 gui/aqua-gnash
+gui/*.moc
+gui/*.gcda
 doc/Doxyfile
 libbase/gnashpluginrc
 libbase/gnashrc

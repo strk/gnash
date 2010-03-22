@@ -33,7 +33,7 @@ pluginsdir = $(libdir)/gnash/plugins
 # noinst_LTLIBRARIES = libgnashgui.la
 BUILT_SOURCES = .configline
 
-EXTRA_DIST = gnash.in klash3.moc.in klash4.moc.in am-frag
+EXTRA_DIST = gnash.in klash3.moc.in Kde4Gui.moc.in Kde4Glue.moc.in am-frag
 
 # If python support is enabled, built that too
 if HAS_PYTHON
@@ -214,7 +214,8 @@ endif
 
 # Build the KDE4 gui
 if BUILD_KDE4_GUI
-BUILT_SOURCES += klash4.moc
+BUILT_SOURCES += Kde4Gui.moc
+BUILT_SOURCES += Kde4Glue.moc
 include $(srcdir)/am-frag/kde4.am
 endif
 
@@ -278,7 +279,7 @@ if BUILD_RISCOS_GUI
 include $(srcdir)/am-frag/riscos.am
 endif
 
-CLEANFILES = klash3.moc klash4.moc .configline gnash
+CLEANFILES = klash3.moc Kde4Gui.moc Kde4Glue.moc .configline gnash
 
 bundle: Info.plist aqua-gnash
 	@echo " Building: $(bundle_name)" 

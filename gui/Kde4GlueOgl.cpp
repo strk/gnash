@@ -21,12 +21,15 @@
 #include "gnashconfig.h"
 #endif
 
+#include <QWidget>
+#include <QGLWidget>
+#include <QRect>
+
 #include "Kde4GlueOgl.h"
+#include "Kde4Gui.h"
 #include "Renderer.h"
 #include "Renderer_ogl.h"
 #include "GnashException.h"
-#include <QRect>
-#include <QGLWidget>
 
 namespace gnash
 {
@@ -51,11 +54,16 @@ Kde4OglGlue::init(int /* argc */, char *** /* argv */)
 
 
 void
-Kde4OglGlue::prepDrawingArea(QWidget *drawing_area)
+Kde4OglGlue::prepDrawingArea(DrawingWidget *drawing_area)
 {
     assert(drawing_area);
     _drawing_area = drawing_area;
-    static_cast<QGLWidget*>(_drawing_area)->makeCurrent();
+    _drawing_area->_glWidget = new QGLWidget(drawing_area);
+    _drawing_area->_glWidget->setVisible(drawing_area->isVisible());
+    _drawing_area->_glWidget->setMinimumSize(drawing_area->minimumSize());
+    _drawing_area->_glWidget->setSizePolicy(QSizePolicy::Expanding,
+                                            QSizePolicy::Expanding);
+    _drawing_area->_glWidget->makeCurrent();
 }
 
 
@@ -63,7 +71,7 @@ void
 Kde4OglGlue::render()
 {
     assert(_drawing_area);
-    static_cast<QGLWidget*>(_drawing_area)->swapBuffers();
+    _drawing_area->_glWidget->swapBuffers();
 }
 
 
