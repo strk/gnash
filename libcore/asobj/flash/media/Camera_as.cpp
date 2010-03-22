@@ -131,19 +131,7 @@ attachCameraProperties(as_object& o)
     o.init_property("width", *getset, *getset);
 }
 
-static as_object*
-getCameraInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o )
-    {
-        o = VM::get().getGlobal()->createObject();
-        attachCameraInterface(*o);
-    }
-    return o.get();
-}
-
-class Camera_as: public as_object
+class Camera_as: public Relay
 {
 public:
 
@@ -152,7 +140,6 @@ public:
         _input(input),
         _loopback(false)
     {
-        set_prototype(getCameraInterface());
         assert(input);
     }
 
@@ -234,11 +221,11 @@ private:
 as_value
 camera_get(const fn_call& fn)
 {
+    as_object* ptr = ensure<ValidThis>(fn);
 
-    // Properties are attached to the prototype when get() is called.
-    as_object* proto = getCameraInterface();
-
-    // This is an AS2-only function, so don't worry about VM version.
+    // Properties are attached to the prototype (not __proto__) when get() is
+    // called. 
+    as_object* proto = ptr->getMember(NSV::PROP_PROTOTYPE).to_object(getGlobal(fn));
     attachCameraProperties(*proto);
 
     // TODO: this should return the same object when the same device is
@@ -258,14 +245,24 @@ camera_get(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<as_object> obj = new Camera_as(input); 
 
     const size_t nargs = fn.nargs;
     if (nargs > 0) {
         log_debug("%s: the camera is automatically chosen from gnashrc",
                 "Camera.get()");
     }
-    return as_value(obj.get()); 
+
+    // Normally the VM would furnish us with a newly instantiated object, if
+    // a constructor were used. But we're in a factory, so we have to build
+    // one for ourselves.
+    as_object* cam_obj = getGlobal(fn).createObject();
+    cam_obj->set_prototype(proto);
+    attachCameraInterface(*cam_obj);
+    attachCameraProperties(*cam_obj);
+
+    cam_obj->setRelay(new Camera_as(input));
+
+    return as_value(cam_obj); 
 }
 
 // AS3 static accessor.
@@ -274,7 +271,9 @@ camera_getCamera(const fn_call& fn)
 {
     media::VideoInput* input = media::MediaHandler::get()->getVideoInput(0);
     
-    boost::intrusive_ptr<as_object> obj = new Camera_as(input);
+    boost::intrusive_ptr<as_object> obj = new as_object(getGlobal(fn));
+
+    obj->setRelay(new Camera_as(input));
     
     int numargs = fn.nargs;
     if (numargs > 0) {
@@ -286,8 +285,8 @@ camera_getCamera(const fn_call& fn)
 as_value
 camera_setmode(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
-    
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
+
     const size_t nargs = fn.nargs;
 
     const double width = nargs ? fn.arg(0).to_number() : 160;
@@ -308,8 +307,7 @@ as_value
 camera_setmotionlevel(const fn_call& fn)
 {
     log_unimpl ("Camera::motionLevel can be set, but it's not implemented");
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
-        (fn.this_ptr);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
     
     const size_t nargs = fn.nargs;
 
@@ -328,7 +326,7 @@ as_value
 camera_setquality(const fn_call& fn)
 {
     log_unimpl ("Camera::quality can be set, but it's not implemented");
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     const size_t nargs = fn.nargs;
 
@@ -346,7 +344,7 @@ camera_setquality(const fn_call& fn)
 as_value
 camera_activitylevel(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::activityLevel only has default value");
@@ -363,7 +361,7 @@ camera_activitylevel(const fn_call& fn)
 as_value
 camera_bandwidth(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::bandwidth only has default value");
@@ -380,7 +378,7 @@ camera_bandwidth(const fn_call& fn)
 as_value
 camera_currentFps(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->currentFPS());
@@ -396,7 +394,7 @@ camera_currentFps(const fn_call& fn)
 as_value
 camera_fps(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->fps());
@@ -412,7 +410,7 @@ camera_fps(const fn_call& fn)
 as_value
 camera_height(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->height());
@@ -428,7 +426,7 @@ camera_height(const fn_call& fn)
 as_value
 camera_index(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) 
     {
@@ -451,7 +449,7 @@ camera_index(const fn_call& fn)
 as_value
 camera_motionLevel(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::motionLevel only has default value");
@@ -468,7 +466,7 @@ camera_motionLevel(const fn_call& fn)
 as_value
 camera_motionTimeout(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::motionTimeout");
@@ -485,7 +483,7 @@ camera_motionTimeout(const fn_call& fn)
 as_value
 camera_muted(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera.muted");
@@ -502,7 +500,7 @@ camera_muted(const fn_call& fn)
 as_value
 camera_name(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->name());
@@ -544,7 +542,7 @@ camera_names(const fn_call& fn)
 as_value
 camera_quality(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         log_unimpl("Camera::quality has only default values");
@@ -567,7 +565,7 @@ camera_new(const fn_call& /*fn*/)
 as_value
 camera_setLoopback(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
     
     if (!fn.nargs) {
         // TODO: log AS error.
@@ -600,7 +598,7 @@ camera_setKeyFrameInterval(const fn_call& /*fn*/)
 as_value
 camera_width(const fn_call& fn)
 {
-    boost::intrusive_ptr<Camera_as> ptr = ensure<ThisIs<Camera_as> >(fn);
+    Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
         return as_value(ptr->width());
@@ -618,27 +616,18 @@ camera_width(const fn_call& fn)
 void
 camera_class_init(as_object& where, const ObjectURI& uri)
 {
+    Global_as::Properties static_props;
 
-    Global_as& gl = getGlobal(where);
-    
-    as_object* proto = getCameraInterface();
-    
-    // This is going to be the global Camera "class"/"function"
-    as_object* cl;
-
-    //for versions lower than 8, the ctor call was get(), for 9 and higher
-    //the ctor was getCamera()
+    // for versions lower than 8, the ctor call was get(), for 9 and higher
+    // the ctor was getCamera()
     if (isAS3(getVM(where))) {
-        cl = gl.createClass(&camera_new, proto);
-        attachCameraAS3StaticInterface(*cl);
+        static_props = attachCameraAS3StaticInterface;
     } else {
-        cl = gl.createClass(&camera_new, proto);
-        attachCameraStaticInterface(*cl);
+        static_props = attachCameraStaticInterface;
     }
-    
-    // Register _global.Camera
-    where.init_member(uri, cl, as_object::DefaultFlags);
 
+    registerBuiltinClass(where, camera_new, attachCameraInterface,
+                         static_props, uri);
 }
 
 void
