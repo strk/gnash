@@ -56,27 +56,8 @@ displayobjectcontainer_class_init(as_object& where, const ObjectURI& uri)
     // This should never be called during AVM1 execution!
     assert(isAS3(getVM(where)));
 
-    static boost::intrusive_ptr<as_object> cl;
-
-    if (!cl) {
-        Global_as& gl = getGlobal(where);
-        as_object* proto = getDisplayObjectContainerInterface();
-        cl = gl.createClass(&displayobjectcontainer_ctor, proto);
-    }
-
-    // Register _global.DisplayObjectContainer
-    where.init_member(uri, cl.get(), as_object::DefaultFlags);
-}
-
-as_object*
-getDisplayObjectContainerInterface()
-{
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object();
-        attachDisplayObjectContainerInterface(*o);
-    }
-    return o.get();
+    registerBuiltinClass(where, displayobjectcontainer_ctor,
+                         attachDisplayObjectContainerInterface, 0, uri);
 }
 
 namespace {
