@@ -192,7 +192,7 @@ moviecliploader_getProgress(const fn_call& fn)
 	}
 
 
-	as_object* mcl_obj = new as_object;
+	as_object* mcl_obj = new as_object(getGlobal(fn));
 
 	size_t bytesLoaded = sp->get_bytes_loaded();
 	size_t bytesTotal = sp->get_bytes_total();

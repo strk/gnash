@@ -272,7 +272,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
                     continue;
                 }
                 
-                as_object* el = new as_object;
+                as_object* el = new as_object(getGlobal(ri));
 
                 el->init_member("indexInRun", pos);
                 el->init_member("selected",
@@ -503,7 +503,7 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
     size_t end = std::max<boost::int32_t>(start + 1, toInt(fn.arg(1)));
 
     Global_as& gl = getGlobal(fn);
-    as_object* ri = gl.createArray();;
+    as_object* ri = gl.createArray();
 
     ts->getTextRunInfo(start, end, *ri);
     

@@ -87,7 +87,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	log_debug("VM version %d", vm.getSWFVersion());
 
-	as_object obj;
+	as_object obj(getGlobal(vm));
 	PropertyList props(obj);
 
 	as_value val("value");

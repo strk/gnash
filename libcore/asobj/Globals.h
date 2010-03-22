@@ -112,7 +112,6 @@ private:
 	Extension _et;
 
     ClassHierarchy _classes;
-    VM& _vm;
     
     as_object* _objectProto;
 
@@ -175,7 +174,6 @@ protected:
 private:
 
     ClassHierarchy _classes;
-    VM& _vm;
     as_object* _objectProto;
 
 };

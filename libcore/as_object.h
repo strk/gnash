@@ -197,11 +197,6 @@ public:
     ///                 uses the resources of the Global object.
     explicit as_object(Global_as& global);
 
-    /// Construct an ActionScript object with no prototype associated.
-    //
-    /// This constructor is deprecated!
-    as_object();
-
     /// Function dispatch
     //
     /// Various objects can be called, including functions and super objects.
@@ -801,6 +796,19 @@ public:
 
 protected:
 
+    /// Construct an as_object associated with a VM.
+    //
+    /// This constructor is intended for subclasses. Although they could call
+    /// the public constructor that accepts a Global_as, this could imply
+    /// that that constructor can access members of the passed Global_as
+    /// other than getVM(), which might not be available because the Global_as
+    /// will not be fully constructed yet. While that is currently not the
+    /// case, using this constructor eliminates this potential initialization
+    /// order problem.
+    /// @param vm The VM to associate the newly created as_object with.
+    explicit as_object(VM& vm);
+
+
     /// Mark all reachable resources, override from GcResource.
     //
     /// The default implementation marks all properties
@@ -816,8 +824,10 @@ protected:
     /// Mark properties and triggers list as reachable (for the GC)
     void markAsObjectReachable() const;
 
+    /// The VM containing this object.
+    VM& _vm;   
 private:
-    
+
     /// Find an existing property for update
     //
     /// Scans the inheritance chain only for getter/setters or statics.
@@ -857,9 +867,6 @@ private:
     /// This is owned by the as_object and destroyed when the as_object's
     /// destructor is called.
     boost::scoped_ptr<Relay> _relay;
-
-    /// The VM containing this object.
-    VM& _vm;   
 
     /// Properties of this as_object
     PropertyList _members;

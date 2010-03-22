@@ -261,17 +261,17 @@ function_apply(const fn_call& fn)
 
 	if (!fn.nargs)
 	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror (_("Function.apply() called with no args"));
-		);
-        new_fn_call.this_ptr = new as_object;
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror (_("Function.apply() called with no args"));
+            );
+            new_fn_call.this_ptr = new as_object(getGlobal(fn));
 	}
 	else
 	{
 		// Get the object to use as 'this' reference
 		as_object* obj = fn.arg(0).to_object(getGlobal(fn));
 
-        if (!obj) obj = new as_object; 
+        if (!obj) obj = new as_object(getGlobal(fn)); 
 
         new_fn_call.this_ptr = obj;
 

@@ -266,8 +266,8 @@ AVM1Global::markReachableResources() const
 
 AVM1Global::AVM1Global(VM& vm)
     :
+    Global_as(vm),
     _classes(this, &_et),
-    _vm(vm),
     _objectProto(new as_object(*this))
 {
 }
@@ -388,8 +388,8 @@ AVM1Global::loadExtensions()
 
 AVM2Global::AVM2Global(abc::Machine& /*machine*/, VM& vm)
     :
+    Global_as(vm),
     _classes(this, 0),
-    _vm(vm),
     _objectProto(new as_object(*this))
 {
 }

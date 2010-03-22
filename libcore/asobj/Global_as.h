@@ -59,6 +59,10 @@ public:
     virtual const ClassHierarchy& classHierarchy() const = 0;
     virtual ClassHierarchy& classHierarchy() = 0;
 
+    explicit Global_as(VM& vm)
+      : as_object(vm)
+    {}
+
     /// Create an ActionScript function
     virtual builtin_function* createFunction(ASFunction function) = 0;
 

@@ -124,7 +124,7 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
     as_object* proto = gl.createObject();
 
     if (isAS3(getVM(where))) {
-        as_object* cl = new as_object();
+        as_object* cl = new as_object(gl);
         cl->set_prototype(proto);
         attachMovieClipAS3Interface(*proto);
         
@@ -1284,7 +1284,7 @@ movieclip_getBounds(const fn_call& fn)
     }
 
     // This is a bare object.
-    as_object* bounds_obj = new as_object();
+    as_object* bounds_obj = new as_object(getGlobal(fn));
     bounds_obj->init_member("xMin", xMin);
     bounds_obj->init_member("yMin", yMin);
     bounds_obj->init_member("xMax", xMax);

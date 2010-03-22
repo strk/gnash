@@ -296,13 +296,13 @@ as_object::as_object(Global_as& gl)
 {
 }
 
-as_object::as_object()
+as_object::as_object(VM& vm)
 	:
     _displayObject(0),
     _array(false),
     _relay(0),
-	_vm(VM::get()),
-	_members(*this)
+    _vm(vm),
+    _members(*this)
 {
 }
 

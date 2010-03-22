@@ -153,7 +153,7 @@ object_ctor(const fn_call& fn)
     }
 
     if (!fn.isInstantiation()) {
-        return new as_object();
+        return new as_object(gl);
     }
 
     return gl.createObject();

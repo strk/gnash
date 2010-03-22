@@ -83,7 +83,7 @@ XMLNode_as::XMLNode_as(Global_as& gl)
     _global(gl),
     _object(0),
     _parent(0),
-    _attributes(new as_object),
+    _attributes(new as_object(gl)),
     _childNodes(0),
     _type(Element)
 {
@@ -94,7 +94,7 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     _global(tpl._global),
     _object(0),
     _parent(0), 
-    _attributes(new as_object),
+    _attributes(new as_object(_global)),
     _childNodes(0),
     _name(tpl._name),
     _value(tpl._value),
