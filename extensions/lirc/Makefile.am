@@ -29,7 +29,7 @@ INCLUDES = \
             -I$(top_srcdir)/libcore/swf \
             -I$(top_srcdir)/libcore/vm \
 	    -I$(top_srcdir)/libcore/asobj \
-	    -I$(top_srcdir)/libnet \
+	    -I$(top_srcdir)/cygnal/libnet \
 	    $(BOOST_CFLAGS) \
 	    $(INCLTDL)
 
