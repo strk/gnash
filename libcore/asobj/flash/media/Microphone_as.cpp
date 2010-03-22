@@ -30,6 +30,7 @@
 #include "GnashNumeric.h"
 #include "AudioInput.h"
 #include "MediaHandler.h"
+#include "Relay.h"
 
 #include "namedStrings.h"
 #include <algorithm>
@@ -122,30 +123,16 @@ attachMicrophoneInterface(as_object& o)
     
 }
 
-static as_object*
-getMicrophoneInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-        o = VM::get().getGlobal()->createObject();
-		attachMicrophoneInterface(*o);
-	}
-	return o.get();
-}
-
-class Microphone_as : public as_object
+class Microphone_as : public Relay
 {
 
 public:
 
-	Microphone_as(media::AudioInput* input)
+    Microphone_as(media::AudioInput* input)
         :
         _input(input)
-	{
+    {
         assert(_input);
-        set_prototype(getMicrophoneInterface());
-        attachMicrophoneProperties(*get_prototype());
     }
 
     /// Takes a value from 0..100
@@ -237,14 +224,15 @@ microphone_ctor(const fn_call& /*fn*/)
 
 // AS2 static accessor.
 as_value
-microphone_get(const fn_call& /*fn*/)
+microphone_get(const fn_call& fn)
 {
-    // Properties are attached to the prototype when get() is called.
-    as_object* proto = getMicrophoneInterface();
+    as_object* ptr = ensure<ValidThis>(fn);
 
-    // This is an AS2-only function, so don't worry about VM version.
+    // Properties are attached to the prototype (not __proto__) when get() is
+    // called. 
+    as_object* proto = ptr->getMember(NSV::PROP_PROTOTYPE).to_object(getGlobal(fn));
     attachMicrophoneProperties(*proto);
-
+ 
     // TODO: this should return the same object when the same device is
     // meant, not a new object each time. It will be necessary to query
     // the MediaHandler for this, and possibly to store the as_objects
@@ -263,29 +251,41 @@ microphone_get(const fn_call& /*fn*/)
         return as_value();
     }
 
-    as_object* obj = new Microphone_as(input);
-    return as_value(obj);
+    // Normally the VM would furnish us with a newly instantiated object, if
+    // a constructor were used. But we're in a factory, so we have to build
+    // one for ourselves.
+    as_object* mic_obj = getGlobal(fn).createObject();
+    mic_obj->set_prototype(proto);
+    attachMicrophoneInterface(*mic_obj);
+    attachMicrophoneProperties(*mic_obj);
 
+    mic_obj->setRelay(new Microphone_as(input));
+
+    return as_value(mic_obj);
 }
 
 // AS3 static accessor.
 as_value
 microphone_getMicrophone(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    media::AudioInput* input = media::MediaHandler::get()->getAudioInput(0);
+    as_object* obj = getGlobal(fn).createObject();
+
+    obj->setRelay(new Microphone_as(input));
+
     int numargs = fn.nargs;
     if (numargs > 0) {
         log_debug("Microphone.getMicrophone: the mic is automatically "
                 "chosen from gnashrc");
     }
-    return as_value(ptr); 
+    return as_value(obj); 
 }
 
 
 as_value 
 microphone_setgain(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
     
     // Really return if there are 2 args?
     if (fn.nargs != 1) {
@@ -302,7 +302,7 @@ microphone_setgain(const fn_call& fn)
 as_value
 microphone_setrate(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
     
     if (fn.nargs != 1) {
         log_error("Microphone.setRate: wrong number of parameters passed");
@@ -315,7 +315,7 @@ microphone_setrate(const fn_call& fn)
 as_value
 microphone_activityLevel(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
         
     if (!fn.nargs) {
         log_unimpl("Microphone::activityLevel only has default value (-1)");
@@ -332,7 +332,7 @@ microphone_activityLevel(const fn_call& fn)
 as_value
 microphone_gain(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
         
     if (!fn.nargs) {
         return as_value(ptr->gain());
@@ -343,7 +343,7 @@ microphone_gain(const fn_call& fn)
 as_value
 microphone_index(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
     
     if (!fn.nargs) {
         return as_value(ptr->index());
@@ -355,7 +355,7 @@ microphone_index(const fn_call& fn)
 as_value
 microphone_muted(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
     
     if (!fn.nargs) {
         log_unimpl("Microphone::muted is always false (always allows access)");
@@ -368,7 +368,7 @@ microphone_muted(const fn_call& fn)
 as_value
 microphone_name(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
         
     if (!fn.nargs) {
         return as_value(ptr->name());
@@ -400,7 +400,7 @@ microphone_names(const fn_call& fn)
 as_value
 microphone_rate(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
     
     return as_value(ptr->rate());
 }
@@ -408,7 +408,7 @@ microphone_rate(const fn_call& fn)
 as_value
 microphone_silenceLevel(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
 
     return as_value(ptr->silenceLevel());
 }
@@ -416,7 +416,7 @@ microphone_silenceLevel(const fn_call& fn)
 as_value
 microphone_silenceTimeout(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
         
     log_unimpl("Microphone::silenceTimeout can be set, but is unimplemented");
     return as_value(ptr->silenceTimeout());
@@ -425,7 +425,7 @@ microphone_silenceTimeout(const fn_call& fn)
 as_value
 microphone_useEchoSuppression(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
  
     // Documented to be a bool (which would make sense), but is a number.
     const double d = ptr->useEchoSuppression();
@@ -437,7 +437,7 @@ as_value
 microphone_setsilencelevel(const fn_call& fn)
 {
 
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
     
     const size_t numargs = fn.nargs;
     if (numargs > 2) {
@@ -459,7 +459,7 @@ microphone_setsilencelevel(const fn_call& fn)
 as_value 
 microphone_setuseechosuppression(const fn_call& fn)
 {
-    Microphone_as* ptr = ensure<ThisIs<Microphone_as> >(fn);
+    Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
     
     if (!fn.nargs) {
         return as_value();
@@ -472,22 +472,18 @@ microphone_setuseechosuppression(const fn_call& fn)
 void
 microphone_class_init(as_object& where, const ObjectURI& uri)
 {
+    Global_as::Properties static_props;
 
-    Global_as& gl = getGlobal(where);
-    
-    as_object* proto = getMicrophoneInterface();
-    as_object* cl;
-
+    // for versions lower than 8, the ctor call was get(), for 9 and higher
+    // the ctor was getCamera()
     if (isAS3(getVM(where))) {
-        cl = gl.createClass(microphone_ctor, proto);
-        attachMicrophoneAS3StaticInterface(*cl);
+        static_props = attachMicrophoneAS3StaticInterface;
     } else {
-        cl = gl.createClass(microphone_ctor, proto);
-        attachMicrophoneStaticInterface(*cl);
+        static_props = attachMicrophoneStaticInterface;
     }
-        
-	// Register _global.Microphone
-	where.init_member(uri, cl, as_object::DefaultFlags);
+    
+    registerBuiltinClass(where, microphone_ctor, attachMicrophoneInterface,
+                         static_props, uri);
 
 }
 
