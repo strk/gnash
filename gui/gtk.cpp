@@ -213,11 +213,11 @@ GtkGui::init(int argc, char **argv[])
 
     std::string hwaccel = _runResources.getHWAccelBackend();
     if (hwaccel.empty()) {
-    hwaccel = rcfile.getHWAccel();
+		hwaccel = rcfile.getHWAccel();
     }
     std::string renderer = _runResources.getRenderBackend();
     if (renderer.empty()) {
-    renderer = rcfile.getRenderer();
+		renderer = rcfile.getRenderer();
     }
 
     if (renderer == "opengl") {
@@ -691,7 +691,7 @@ GtkGui::startAdvanceTimer()
     _advanceSourceTimer = g_timeout_add_full(G_PRIORITY_LOW, _interval,
             (GSourceFunc)advance_movie, this, NULL);
 
-    log_debug("Advance interval timer set to %d ms (~ %d FPS)",
+    log_debug(_("Advance interval timer set to %d ms (~ %d FPS)"),
             _interval, 1000/_interval);
 }
 
@@ -828,7 +828,7 @@ GtkGui::createMenuAlt()
 void
 GtkGui::resizeWindow(int width, int height)
 {
-    log_debug("GtkGui: Window resize request received");
+    log_debug(_("GtkGui: Window resize request received"));
 
     if (!_xid) {
     
@@ -2825,7 +2825,7 @@ menuQualityBest(GtkMenuItem* /*menuitem*/, gpointer data)
 }
 
 gboolean
-fd_callback_handler(GIOChannel *source, GIOCondition condition,
+fd_callback_handler(GIOChannel *source, GIOCondition /*condition*/,
                     gpointer data)
 {
     Gui* gui = static_cast<Gui*>(data);
