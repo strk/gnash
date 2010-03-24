@@ -359,6 +359,11 @@ install-man1: $(MANPAGES)
 	   $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$file; \
 	done
 
+uninstall-man1:
+	-for file in $(MANPAGES); do \
+	   $(RM) $(DESTDIR)$(man1dir)/$$file; \
+	done
+
 # the gtk-gnash.1 and kde4-gnash.1 manpages are generated as aliases
 # for the gnash.1 man page, so we can't use the suffix rules to build
 # them, but we need to install the ".so gnash.1" manpages also, or
