@@ -2412,7 +2412,7 @@ AC_ARG_ENABLE([pch],
 
 AM_CONDITIONAL([ENABLE_PCH], [test x"$enable_pch" != x"no"])
 
-PCH_FLAGS="-I`pwd`/pch -include all-includes.h -Winvalid-pch"
+PCH_FLAGS="-include all-includes.h -Winvalid-pch"
 AC_SUBST(PCH_FLAGS)
 
 GNASH_PATH_PTHREADS
@@ -2715,7 +2715,6 @@ cygnal/testsuite/Makefile
 cygnal/testsuite/libamf.all/Makefile
 cygnal/testsuite/libnet.all/Makefile
 cygnal/testsuite/cygnal.all/Makefile
-pch/Makefile
 )
 
 ###

@@ -145,6 +145,11 @@ BRANCH_REVNO  := $(shell grep "REVNO" bzrversion.h | cut -d '"' -f 2)
 BRANCH_NICK   := $(shell grep "NICK" bzrversion.h | cut -d '"' -f 2)
 
 #
+# Precompiled header support
+#
+include $(srcdir)/pch.am
+
+#
 # Binary tarball packaging
 #
 include $(srcdir)/packaging/snapshot.am
