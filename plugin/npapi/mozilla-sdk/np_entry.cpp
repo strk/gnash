@@ -27,6 +27,8 @@
 
 NPNetscapeFuncs NPNFuncs;
 
+extern NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue);
+
 NPError OSCALL NP_Shutdown()
 {
   NS_PluginShutdown();
@@ -95,7 +97,7 @@ NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
 #endif
 
   // Number of function pointers in aNPNFuncs.
-  n = (aNPNFuncs->size - (2 * sizeof(uint16))) / sizeof(void *);
+  n = (aNPNFuncs->size - (2 * sizeof(uint16_t))) / sizeof(void *);
 
   NPNFuncs.size             = aNPNFuncs->size;
   NPNFuncs.version          = aNPNFuncs->version;

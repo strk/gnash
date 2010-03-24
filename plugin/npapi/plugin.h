@@ -48,13 +48,8 @@
 #include <vector>
 
 #include "pluginbase.h"
-#include "prlock.h"
-#include "prcvar.h"
-#include "prthread.h"
 
 extern NPBool      plugInitialized;
-extern PRLock      *playerMutex;
-extern PRCondVar   *playerCond;
 
 class nsPluginInstance : public nsPluginInstanceBase
 {

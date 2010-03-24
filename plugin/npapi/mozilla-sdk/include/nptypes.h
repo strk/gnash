@@ -1,39 +1,59 @@
-// 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
-//   Foundation, Inc
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
+/* -*- Mode: C; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is mozilla.org code.
+ *
+ * The Initial Developer of the Original Code is
+ * mozilla.org.
+ * Portions created by the Initial Developer are Copyright (C) 2004
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *   Johnny Stenback <jst@mozilla.org> (Original author)
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
+#ifndef nptypes_h_
+#define nptypes_h_
 
 /*
- * Header file for ensuring that C99 types ([u]int32_t and bool) are
- * available.
+ * Header file for ensuring that C99 types ([u]int32_t and bool) and
+ * true/false macros are available.
  */
 
 #if defined(WIN32) || defined(OS2)
   /*
-   * Win32 and OS/2 don't know C99, so define [u]int_32 here. The bool
+   * Win32 and OS/2 don't know C99, so define [u]int_16/32 here. The bool
    * is predefined tho, both in C and C++.
    */
+  typedef short int16_t;
+  typedef unsigned short uint16_t;
   typedef int int32_t;
   typedef unsigned int uint32_t;
-#elif defined(_AIX) || defined(__sun) || defined(__osf__) || defined(__sgi) || defined(HPUX)
+#elif defined(_AIX) || defined(__sun) || defined(__osf__) || defined(IRIX) || defined(HPUX)
   /*
    * AIX and SunOS ship a inttypes.h header that defines [u]int32_t,
    * but not bool for C.
@@ -42,8 +62,10 @@
 
   #ifndef __cplusplus
     typedef int bool;
+    #define true   1
+    #define false  0
   #endif
-#elif defined(bsdi) || defined(FREEBSD) || defined(OPENBSD) || defined(LINUX_HOST)
+#elif defined(bsdi) || defined(FREEBSD) || defined(OPENBSD)
   /*
    * BSD/OS, FreeBSD, and OpenBSD ship sys/types.h that define int32_t and 
    * u_int32_t.
@@ -52,18 +74,18 @@
 
   /*
    * BSD/OS ships no header that defines uint32_t, nor bool (for C)
-   * OpenBSD ships no header that defines uint32_t and using its bool macro is
-   * unsafe.
    */
-  #if defined(bsdi) || defined(OPENBSD)
+  #if defined(bsdi)
   typedef u_int32_t uint32_t;
 
   #if !defined(__cplusplus)
     typedef int bool;
+    #define true   1
+    #define false  0
   #endif
   #else
   /*
-   * FreeBSD defines uint32_t and bool.
+   * FreeBSD and OpenBSD define uint32_t and bool.
    */
     #include <inttypes.h>
     #include <stdbool.h>
@@ -76,9 +98,7 @@
    * it. Can't do the same for stdbool.h tho, since some systems ship
    * with a stdbool.h file that doesn't compile!
    */
-#ifdef HAVE_STDINT_H
   #include <stdint.h>
-#endif
 
   #ifndef __cplusplus
     #if !defined(__GNUC__) || (__GNUC__ > 2 || __GNUC_MINOR__ > 95)
@@ -89,6 +109,10 @@
        * works.
        */
       #define bool int
+      #define true   1
+      #define false  0
     #endif
   #endif
 #endif
+
+#endif /* nptypes_h_ */

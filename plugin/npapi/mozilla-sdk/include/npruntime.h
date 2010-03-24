@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 /*
- * Copyright © 2004, Apple Computer, Inc. and The Mozilla Foundation. 
+ * Copyright (c) 2004, Apple Computer, Inc. and The Mozilla Foundation. 
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -65,6 +65,7 @@
 #ifndef _NP_RUNTIME_H_
 #define _NP_RUNTIME_H_
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -115,8 +116,8 @@ typedef struct NPClass NPClass;
 
 typedef char NPUTF8;
 typedef struct _NPString {
-    const NPUTF8 *utf8characters;
-    uint32_t utf8length;
+    const NPUTF8 *UTF8Characters;
+    uint32_t UTF8Length;
 } NPString;
 
 typedef enum {
@@ -133,7 +134,7 @@ typedef struct _NPVariant {
     NPVariantType type;
     union {
         bool boolValue;
-        uint32_t intValue;
+        int32_t intValue;
         double doubleValue;
         NPString stringValue;
         NPObject *objectValue;
@@ -218,25 +219,25 @@ NP_END_MACRO
 
 
 /*
-	Type mappings (JavaScript types have been used for illustration
+  Type mappings (JavaScript types have been used for illustration
     purposes):
 
-	JavaScript       to             C (NPVariant with type:)
-	undefined                       NPVariantType_Void
-	null                            NPVariantType_Null
-	Boolean                         NPVariantType_Bool
-	Number                          NPVariantType_Double or NPVariantType_Int32
-	String                          NPVariantType_String
-	Object                          NPVariantType_Object
+  JavaScript       to             C (NPVariant with type:)
+  undefined                       NPVariantType_Void
+  null                            NPVariantType_Null
+  Boolean                         NPVariantType_Bool
+  Number                          NPVariantType_Double or NPVariantType_Int32
+  String                          NPVariantType_String
+  Object                          NPVariantType_Object
 
-	C (NPVariant with type:)   to   JavaScript
-	NPVariantType_Void              undefined
-	NPVariantType_Null              null
-	NPVariantType_Bool              Boolean	
-	NPVariantType_Int32             Number
-	NPVariantType_Double            Number
-	NPVariantType_String            String
-	NPVariantType_Object            Object
+  C (NPVariant with type:)   to   JavaScript
+  NPVariantType_Void              undefined
+  NPVariantType_Null              null
+  NPVariantType_Bool              Boolean
+  NPVariantType_Int32             Number
+  NPVariantType_Double            Number
+  NPVariantType_String            String
+  NPVariantType_Object            Object
 */
 
 typedef void *NPIdentifier;
@@ -248,7 +249,9 @@ typedef void *NPIdentifier;
     methods and properties can be identified by either strings or
     integers (i.e. foo["bar"] vs foo[1]). NPIdentifiers can be
     compared using ==.  In case of any errors, the requested
-    NPIdentifier(s) will be NULL.
+    NPIdentifier(s) will be NULL. NPIdentifier lifetime is controlled
+    by the browser. Plugins do not need to worry about memory management
+    with regards to NPIdentifiers.
 */
 NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name);
 void NPN_GetStringIdentifiers(const NPUTF8 **names, int32_t nameCount,
@@ -292,6 +295,12 @@ typedef bool (*NPSetPropertyFunctionPtr)(NPObject *npobj, NPIdentifier name,
                                          const NPVariant *value);
 typedef bool (*NPRemovePropertyFunctionPtr)(NPObject *npobj,
                                             NPIdentifier name);
+typedef bool (*NPEnumerationFunctionPtr)(NPObject *npobj, NPIdentifier **value,
+                                         uint32_t *count);
+typedef bool (*NPConstructFunctionPtr)(NPObject *npobj,
+                                       const NPVariant *args,
+                                       uint32_t argCount,
+                                       NPVariant *result);
 
 /*
     NPObjects returned by create, retain, invoke, and getProperty pass
@@ -310,6 +319,11 @@ typedef bool (*NPRemovePropertyFunctionPtr)(NPObject *npobj,
     will typically return immediately, with 0 or NULL, from an attempt
     to dispatch to a NPObject, but this behavior should not be
     depended upon.)
+
+    The NPEnumerationFunctionPtr function may pass an array of
+    NPIdentifiers back to the caller. The callee allocs the memory of
+    the array using NPN_MemAlloc(), and it's the caller's responsibility
+    to release it using NPN_MemFree().
 */
 struct NPClass
 {
@@ -324,9 +338,20 @@ struct NPClass
     NPGetPropertyFunctionPtr getProperty;
     NPSetPropertyFunctionPtr setProperty;
     NPRemovePropertyFunctionPtr removeProperty;
+    NPEnumerationFunctionPtr enumerate;
+    NPConstructFunctionPtr construct;
 };
 
-#define NP_CLASS_STRUCT_VERSION 1
+#define NP_CLASS_STRUCT_VERSION      3
+
+#define NP_CLASS_STRUCT_VERSION_ENUM 2
+#define NP_CLASS_STRUCT_VERSION_CTOR 3
+
+#define NP_CLASS_STRUCT_VERSION_HAS_ENUM(npclass)   \
+        ((npclass)->structVersion >= NP_CLASS_STRUCT_VERSION_ENUM)
+
+#define NP_CLASS_STRUCT_VERSION_HAS_CTOR(npclass)   \
+        ((npclass)->structVersion >= NP_CLASS_STRUCT_VERSION_CTOR)
 
 struct NPObject {
     NPClass *_class;
@@ -381,6 +406,10 @@ bool NPN_SetProperty(NPP npp, NPObject *npobj, NPIdentifier propertyName,
 bool NPN_RemoveProperty(NPP npp, NPObject *npobj, NPIdentifier propertyName);
 bool NPN_HasProperty(NPP npp, NPObject *npobj, NPIdentifier propertyName);
 bool NPN_HasMethod(NPP npp, NPObject *npobj, NPIdentifier methodName);
+bool NPN_Enumerate(NPP npp, NPObject *npobj, NPIdentifier **identifier,
+                   uint32_t *count);
+bool NPN_Construct(NPP npp, NPObject *npobj, const NPVariant *args,
+                   uint32_t argCount, NPVariant *result);
 
 /*
     NPN_SetException may be called to trigger a script exception upon

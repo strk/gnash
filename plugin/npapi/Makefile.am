@@ -48,28 +48,10 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(GNASHBINDIR)\
 noinst_HEADERS = plugin.h \
 	 mozilla-sdk/pluginbase.h \
 	 mozilla-sdk/npplat.h \
-         mozilla-sdk/include/jri.h \
 	 mozilla-sdk/include/npapi.h \
-         mozilla-sdk/include/npupp.h \
-         mozilla-sdk/include/prtypes.h \
-         mozilla-sdk/include/jni.h \
-         mozilla-sdk/include/jri_md.h \
+         mozilla-sdk/include/npfunctions.h \
          mozilla-sdk/include/npruntime.h \
-         mozilla-sdk/include/jni_md.h \
-         mozilla-sdk/include/jritypes.h \
-         mozilla-sdk/include/nptypes.h \
-         mozilla-sdk/include/prcpucfg.h \
-         mozilla-sdk/include/prcpucfg-glibc.h \
-         mozilla-sdk/include/prcpucfg-win32.h \
-         mozilla-sdk/include/prlock.h \
-         mozilla-sdk/include/prcvar.h \
-         mozilla-sdk/include/prthread.h \
-         mozilla-sdk/include/prinit.h \
-         mozilla-sdk/include/prerr.h \
-         mozilla-sdk/include/prerror.h \
-         mozilla-sdk/include/prinrval.h \
-	 mozilla-sdk/include/prwin16.h \
-         mozilla-sdk/include/obsolete/protypes.h 
+         mozilla-sdk/include/nptypes.h
 
 if !WIN32
 

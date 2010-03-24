@@ -83,14 +83,6 @@
 #include <fstream>
 #include <sstream>
 
-// Mozilla SDK headers
-#include "prinit.h"
-#include "prlock.h"
-#include "prcvar.h"
-#include "prerr.h"
-#include "prerror.h"
-#include "prthread.h"
-
 #ifndef PATH_MAX
 #define PATH_MAX 1024
 #endif
@@ -106,19 +98,6 @@ static const char* getPluginDescription();
 static void logDebug(const std::string& msg);
 static void logError(const std::string& msg);
 
-
-void
-PR_CALLBACK Destructor(void * /* data */)
-{
-#if 0
-    /*
-     * We don't actually free the storage since it's actually allocated
-     * on the stack. Normally, this would not be the case and this is
-     * the opportunity to free whatever.
-     */
-    PR_Free(data);
-#endif
-}
 
 /// \brief Return the MIME Type description for this plugin.
 char*
@@ -150,7 +129,7 @@ NS_PluginInitialize()
     /* Browser Functionality Checks */
 
     NPError err = NPERR_NO_ERROR;
-    PRBool supportsXEmbed = PR_TRUE;
+    NPBool supportsXEmbed = TRUE;
 
     /* 
     First, check for XEmbed support. The NPAPI Gnash plugin
@@ -158,7 +137,7 @@ NS_PluginInitialize()
     XEmbed is not found.
     */    
     
-    err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
+    err = NPN_GetValue(NULL,
                 NPNVSupportsXEmbedBool,
                 (void *)&supportsXEmbed);
 
@@ -173,7 +152,7 @@ NS_PluginInitialize()
     // GTK is not strictly required, but we do use the Glib main event loop,
     // so lack of GTK means reduced functionality.
     NPNToolkitType toolkit;
-    err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL, NPNVToolkit, &toolkit);
+    err = NPN_GetValue(NULL, NPNVToolkit, &toolkit);
 
     if (err != NPERR_NO_ERROR || toolkit != NPNVGtk2) {
 #ifdef GNASH_PLUGIN_DEBUG
@@ -292,9 +271,9 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 
         case NPPVpluginNeedsXEmbed:
 #ifdef HAVE_GTK2
-            *static_cast<PRBool *>(aValue) = PR_TRUE;
+            *static_cast<NPBool *>(aValue) = TRUE;
 #else
-            *static_cast<PRBool *>(aValue) = PR_FALSE;
+            *static_cast<NPBool *>(aValue) = FALSE;
 #endif
             break;
 
@@ -1117,7 +1096,7 @@ nsPluginInstance::getCurrentPageURL() const
 
     const NPString& propValue = NPVARIANT_TO_STRING(vProp);
 
-    return propValue.utf8characters; // const char *
+    return propValue.UTF8Characters; // const char *
 }
 
 static const char*
