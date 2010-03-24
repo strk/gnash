@@ -53,6 +53,7 @@
 #include <QCheckBox>
 #include <QLCDNumber>
 #include <QSpinBox>
+#include <QSocketNotifier>
 
 #include "Range2d.h"
 
@@ -79,6 +80,7 @@ namespace gnash
 
 Kde4Gui::Kde4Gui(unsigned long xid, float scale, bool loop, RunResources& r)
  : Gui(xid, scale, loop, r)
+ , _fdMonitor(*this)
 {
 }
 
@@ -151,6 +153,14 @@ bool
 Kde4Gui::run()
 {
     return _application->exec();
+}
+
+
+bool
+Kde4Gui::watchFD(int fd)
+{
+    _fdMonitor.addFD(fd);
+    return true;
 }
 
 
@@ -996,6 +1006,32 @@ PreferencesDialog::savePreferences()
 
 } // End of Kde4GuiPrefs namespace
 
+FDMonitor::FDMonitor(Kde4Gui& gui)
+    : _gui(gui)
+{
+}
+
+FDMonitor::~FDMonitor()
+{
+}
+
+void
+FDMonitor::dataReceived(int fd)
+{
+    _gui.callCallback(fd);
+}
+
+void
+FDMonitor::addFD(int fd)
+{
+    QSocketNotifier* socketNotifier =
+                        new QSocketNotifier(fd, QSocketNotifier::Read, this);
+
+    connect(socketNotifier, SIGNAL(activated(int)),
+            this, SLOT(dataReceived(int)));
+
+    socketNotifier->setEnabled(true);
+}
 
 }
 

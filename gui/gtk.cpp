@@ -180,8 +180,8 @@ bool
 GtkGui::init(int argc, char **argv[])
 {
     if (!XInitThreads()) {
-    log_debug("Failed to initialize X threading support\n");
-    return false;
+        log_debug("Failed to initialize X threading support\n");
+        return false;
     }
 
     gtk_init(&argc, argv);
@@ -213,11 +213,11 @@ GtkGui::init(int argc, char **argv[])
 
     std::string hwaccel = _runResources.getHWAccelBackend();
     if (hwaccel.empty()) {
-		hwaccel = rcfile.getHWAccel();
+        hwaccel = rcfile.getHWAccel();
     }
     std::string renderer = _runResources.getRenderBackend();
     if (renderer.empty()) {
-		renderer = rcfile.getRenderer();
+        renderer = rcfile.getRenderer();
     }
 
     if (renderer == "opengl") {
@@ -238,7 +238,7 @@ GtkGui::init(int argc, char **argv[])
         // If we don't have these extensions, don't bother with OpenGl,
         // drop back to AGG.
         if (!glx || !dri) {
-            g_warning("This systms lacks a hardware OpenGL driver!");
+            g_warning("This system lacks a hardware OpenGL driver!");
         }
     }
 

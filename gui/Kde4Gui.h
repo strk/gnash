@@ -56,7 +56,7 @@ class QStackedWidget;
 
 namespace gnash {
     class Kde4Gui;
-	class DrawingWidget;
+    class DrawingWidget;
 }
 
 namespace gnash
@@ -82,9 +82,26 @@ private:
 };
 
 
+class FDMonitor : public QObject
+{
+    Q_OBJECT
+public:
+    FDMonitor(Kde4Gui& gui);
+    ~FDMonitor();
+
+    // Add a file descriptor for monitoring.
+    void addFD(int fd);
+
+public slots:
+    void dataReceived(int fd);
+
+private:
+    Kde4Gui& _gui;
+};
+
+
 class DSOEXPORT Kde4Gui :  public Gui
 {
-
 public:
     Kde4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~Kde4Gui();
@@ -93,6 +110,7 @@ public:
                               int xPosition = 0, int yPosition = 0);
     virtual void resizeWindow(int width, int height);
     virtual bool run();
+    virtual bool watchFD(int fd);
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
@@ -114,7 +132,6 @@ public:
     void popupMenu(const QPoint& point);
 
 private:
-
     typedef std::vector<geometry::Range2d<int> > DrawBounds; 
     typedef std::map<int, gnash::key::code> KeyMap;
 
@@ -132,6 +149,8 @@ private:
     /// Called when the movie is played.
     void playHook();
 
+    /// Object that allows the mainloop to read file descriptors.
+    FDMonitor _fdMonitor;
 
     DrawBounds _drawbounds;
  
@@ -149,7 +168,7 @@ private:
     DrawingWidget* _drawingWidget;
     
     /// Takes care of painting onto the widget.
-	std::auto_ptr<Kde4Glue> _glue;
+    std::auto_ptr<Kde4Glue> _glue;
     
     /// The main application window.
     std::auto_ptr<QMainWindow> _window;
@@ -187,7 +206,6 @@ private:
     QMenu* viewMenu;
     QAction* refreshAction;
     QAction* fullscreenAction;
-
 };
 
 namespace Kde4GuiPrefs
