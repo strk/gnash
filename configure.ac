@@ -2701,7 +2701,6 @@ extensions/lirc/Makefile
 extensions/dbus/Makefile
 plugin/Makefile
 plugin/npapi/Makefile
-plugin/npapi/mozilla-sdk/Makefile
 plugin/klash/Makefile
 plugin/klash4/Makefile
 plugin/win32/Makefile
