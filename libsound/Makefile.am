@@ -70,7 +70,6 @@ endif
 EXTRA_DIST += mkit
 
 if ENABLE_PCH
-SUBDIRS = ../pch
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 

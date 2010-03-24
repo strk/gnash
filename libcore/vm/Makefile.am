@@ -96,7 +96,6 @@ if WIN32
 endif
 
 if ENABLE_PCH
-SUBDIRS = ../../pch
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 

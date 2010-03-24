@@ -20,7 +20,6 @@ AUTOMAKE_OPTIONS =
 SUBDIRS = parser vm
 
 if ENABLE_PCH
-SUBDIRS += ../pch
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 

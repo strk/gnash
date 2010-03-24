@@ -94,7 +94,6 @@ AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
 endif
 
 if ENABLE_PCH
-SUBDIRS = ../../pch
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
