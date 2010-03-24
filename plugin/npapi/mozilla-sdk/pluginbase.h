@@ -67,16 +67,16 @@ class DSOLOCAL nsPluginInstanceBase
 // functions that should be implemented for each specific plugin
 
 // creation and destruction of the object of the derived class
-DSOEXPORT nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct);
-DSOEXPORT void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin);
+nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct);
+void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin);
 
 // global plugin initialization and shutdown
-DSOEXPORT NPError NS_PluginInitialize();
-DSOEXPORT void NS_PluginShutdown();
+NPError NS_PluginInitialize();
+void NS_PluginShutdown();
 
 #ifdef XP_UNIX
 // global to get plugins name & description 
-DSOEXPORT NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue);
+NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue);
 #endif
 
 #endif // __PLUGININSTANCEBASE_H__

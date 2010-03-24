@@ -25,15 +25,15 @@
 #include "npplat.h"
 #include "pluginbase.h"
 
-DSOEXPORT NPNetscapeFuncs NPNFuncs;
+NPNetscapeFuncs NPNFuncs;
 
-DSOEXPORT NPError OSCALL NP_Shutdown()
+NPError OSCALL NP_Shutdown()
 {
   NS_PluginShutdown();
   return NPERR_NO_ERROR;
 }
 
-static NPError fillPluginFunctionTable(NPPluginFuncs* aNPPFuncs)
+NPError fillPluginFunctionTable(NPPluginFuncs* aNPPFuncs)
 {
   if(aNPPFuncs == NULL)
     return NPERR_INVALID_FUNCTABLE_ERROR;
@@ -79,7 +79,7 @@ static NPError fillPluginFunctionTable(NPPluginFuncs* aNPPFuncs)
   return NPERR_NO_ERROR;
 }
 
-static NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
+NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
 {
   int i = 0, n;
 
@@ -165,7 +165,7 @@ static NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
 /**************************************************/
 #ifdef XP_WIN
 
-DSOEXPORT NPError OSCALL NP_Initialize(NPNetscapeFuncs* aNPNFuncs)
+NPError OSCALL NP_Initialize(NPNetscapeFuncs* aNPNFuncs)
 {
   /*
    * N.B.  On Firefox 2.0.0.12/WinXP, aNPNFuncs->size is 172 while
@@ -187,7 +187,7 @@ DSOEXPORT NPError OSCALL NP_Initialize(NPNetscapeFuncs* aNPNFuncs)
   return rv2 != NPERR_NO_ERROR ? rv2 : rv;
 }
 
-DSOEXPORT NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* aNPPFuncs)
+NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* aNPPFuncs)
 {
   return fillPluginFunctionTable(aNPPFuncs);
 }
@@ -201,7 +201,7 @@ DSOEXPORT NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* aNPPFuncs)
 /**************************************************/
 #ifdef XP_UNIX
 
-DSOEXPORT NPError NP_Initialize(NPNetscapeFuncs* aNPNFuncs, NPPluginFuncs* aNPPFuncs)
+NPError NP_Initialize(NPNetscapeFuncs* aNPNFuncs, NPPluginFuncs* aNPPFuncs)
 {
   NPError rv = fillNetscapeFunctionTable(aNPNFuncs);
   if(rv != NPERR_NO_ERROR)
@@ -214,12 +214,12 @@ DSOEXPORT NPError NP_Initialize(NPNetscapeFuncs* aNPNFuncs, NPPluginFuncs* aNPPF
   return NS_PluginInitialize();
 }
 
-DSOEXPORT char * NP_GetMIMEDescription(void)
+char * NP_GetMIMEDescription(void)
 {
   return NPP_GetMIMEDescription();
 }
 
-DSOEXPORT NPError NP_GetValue(void* /*future*/, NPPVariable aVariable, void *aValue)
+NPError NP_GetValue(void* /*future*/, NPPVariable aVariable, void *aValue)
 {
   return NS_PluginGetValue(aVariable, aValue);
 }
@@ -234,26 +234,26 @@ DSOEXPORT NPError NP_GetValue(void* /*future*/, NPPVariable aVariable, void *aVa
 #ifdef XP_MAC
 
 #if !TARGET_API_MAC_CARBON
-DSOEXPORT QDGlobals* gQDPtr; // Pointer to Netscape's QuickDraw globals
+QDGlobals* gQDPtr; // Pointer to Netscape's QuickDraw globals
 #endif
 
-DSOEXPORT short gResFile; // Refnum of the plugin's resource file
+short gResFile; // Refnum of the plugin's resource file
 
-DSOEXPORT NPError Private_Initialize(void)
+NPError Private_Initialize(void)
 {
   NPError rv = NS_PluginInitialize();
   return rv;
 }
 
-DSOEXPORT void Private_Shutdown(void)
+void Private_Shutdown(void)
 {
   NS_PluginShutdown();
   __destroy_global_chain();
 }
 
-DSOEXPORT void SetUpQD(void);
+void SetUpQD(void);
 
-DSOEXPORT void SetUpQD(void)
+void SetUpQD(void)
 {
   ProcessSerialNumber PSN;
   FSSpec              myFSSpec;
@@ -314,18 +314,18 @@ DSOEXPORT void SetUpQD(void)
 #endif /* !TARGET_API_MAC_CARBON */
 }
 
-DSOEXPORT NPError main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unloadUpp);
+NPError main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownUPP* unloadUpp);
 
 #if !TARGET_API_MAC_CARBON
 #pragma export on
 #if GENERATINGCFM
-DSOEXPORT RoutineDescriptor mainRD = BUILD_ROUTINE_DESCRIPTOR(uppNPP_MainEntryProcInfo, main);
+RoutineDescriptor mainRD = BUILD_ROUTINE_DESCRIPTOR(uppNPP_MainEntryProcInfo, main);
 #endif
 #pragma export off
 #endif /* !TARGET_API_MAC_CARBON */
 
 
-DSOEXPORT NPError main(NPNetscapeFuncs* aNPNFuncs, NPPluginFuncs* aNPPFuncs, NPP_ShutdownUPP* aUnloadUpp)
+NPError main(NPNetscapeFuncs* aNPNFuncs, NPPluginFuncs* aNPPFuncs, NPP_ShutdownUPP* aUnloadUpp)
 {
   NPError rv = NPERR_NO_ERROR;
 
