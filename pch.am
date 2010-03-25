@@ -81,5 +81,8 @@ all-includes.h.gch: $(PCHHEADERS)
 	  $(PCHFLAGS)  -x c++-header -c -o all-includes.h.gch all-includes.h; \
 	rm all-includes.h;
 
-CLEANFILES += all-includes.h.gch
+$(PCHHEADERS): all-includes.h.gch
+
+CLEANFILES += all-includes.h.gch\
+
 endif
