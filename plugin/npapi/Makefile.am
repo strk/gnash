@@ -21,7 +21,7 @@ AUTOMAKE_OPTIONS =
 SUBDIRS =
 
 # make sure these files make it into the distribution tarball.
-DIST_SUBDIRS = mozilla-sdk 
+EXTRA_DIST = mozilla-sdk 
 
 # This is a hard coded path to where the plugin gets installed.
 GNASHBINDIR = $(bindir)
