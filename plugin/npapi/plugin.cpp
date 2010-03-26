@@ -783,7 +783,7 @@ getGnashExecutable()
 }
 
 void
-create_standalone_launcher(const std::string& page_url, const std::string& swf_url,
+create_standalone_launcher(const char* page_url, const std::string& swf_url,
                            const std::map<std::string, std::string>& params)
 {
 #ifdef CREATE_STANDALONE_GNASH_LAUNCHER
@@ -807,7 +807,7 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
     saLauncher << "#!/bin/sh" << std::endl
                << getGnashExecutable() << " ";
 
-    if (!page_url.empty()) {
+    if (page_url) {
         saLauncher << "-U '" << page_url << "' ";
     }
 
