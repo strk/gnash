@@ -364,9 +364,29 @@ nsPluginInstance::~nsPluginInstance()
     if (_childpid > 0) {
         // When the child has terminated (signaled by _controlfd), it remains
         // as a defunct process and we remove it from the kernel table now.
+        
+        // If all goes well, Gnash will already have terminated.
         int status;
-        waitpid(_childpid, &status, 0);
-        logDebug("Child process exited with status " + status);
+        int rv = waitpid(_childpid, &status, WNOHANG);
+
+        if (rv <= 0) {
+            // The childprocess has not exited; it may be deadlocked.
+            // We'll first try a gentle approach... which probably won't work.
+            logError("Child process ignored fd closure; trying SIGTERM. (bug)");
+            kill(_childpid, SIGTERM);
+            rv = waitpid(_childpid, &status, WNOHANG);
+
+            if (rv <= 0) {
+                // That still didn't work. Try to force-kill the process...
+                logError("Child process ignored SIGTERM. Trying SIGKILL. (BUG)");
+                kill(_childpid, SIGKILL);
+                waitpid(_childpid, &status, 0);
+            }
+        }
+
+#if GNASH_PLUGIN_DEBUG > 1
+        std::cout << "Child process exited with status "  << status << std::endl;
+#endif
     }
     _childpid = 0;
 }
