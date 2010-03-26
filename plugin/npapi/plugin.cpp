@@ -351,6 +351,31 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 
 }
 
+gboolean
+cleanup_childpid(gpointer data)
+{
+    int* pid = static_cast<int*>(data);
+
+    int status;
+    int rv = waitpid(*pid, &status, WNOHANG);
+
+    if (rv <= 0) {
+        // The child process has not exited; it may be deadlocked. Kill it.
+        logError("BUG: Child process is stuck. Killing it.");
+
+        kill(*pid, SIGKILL);
+        waitpid(*pid, &status, 0);
+    }
+ 
+#if GNASH_PLUGIN_DEBUG > 1
+        std::cout << "Child process exited with status "  << status << std::endl;
+#endif
+
+    delete pid;
+
+    return FALSE;
+}
+
 /// \brief Destructor
 nsPluginInstance::~nsPluginInstance()
 {
@@ -370,23 +395,14 @@ nsPluginInstance::~nsPluginInstance()
         int rv = waitpid(_childpid, &status, WNOHANG);
 
         if (rv <= 0) {
-            // The childprocess has not exited; it may be deadlocked.
-            // We'll first try a gentle approach... which probably won't work.
-            logError("Child process ignored fd closure; trying SIGTERM. (bug)");
-            kill(_childpid, SIGTERM);
-            rv = waitpid(_childpid, &status, WNOHANG);
-
-            if (rv <= 0) {
-                // That still didn't work. Try to force-kill the process...
-                logError("Child process ignored SIGTERM. Trying SIGKILL. (BUG)");
-                kill(_childpid, SIGKILL);
-                waitpid(_childpid, &status, 0);
-            }
-        }
+            int* pid = new int(_childpid);
+            g_timeout_add_seconds (1, cleanup_childpid, pid);
+        } else {
 
 #if GNASH_PLUGIN_DEBUG > 1
         std::cout << "Child process exited with status "  << status << std::endl;
 #endif
+        }
     }
     _childpid = 0;
 }
@@ -425,6 +441,14 @@ void
 nsPluginInstance::shut()
 {
     logDebug("Gnash plugin shutting down");
+
+    if (_streamfd != -1) {
+        if (close(_streamfd) == -1) {
+            perror("closing _streamfd");
+        } else {
+            _streamfd = -1;
+        }
+    }
 
     int ret = close(_controlfd);
     if (ret != 0) {
