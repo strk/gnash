@@ -27,14 +27,10 @@ RPMBUILD_FLAGS = # --clean --rmsource --rmspec
 gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
 	snapshot_version="$(SNAPSHOT_VERSION)"; \
 	snapshot_version=`echo $${snapshot_version}|tr "~" "_"`; \
-	echo "Editing the version in the spec file to be $${snapshot_version}..."; \
 	distver=`cat /etc/redhat-release | cut -d ' ' -f 3`; \
-	if test ${distdir} -eq 12; then \
-	  sed -e "s/Version.*/Version:	$${snapshot_version}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec; \
-	else \
-	  sed -e "s/Version.*/Version:	$${snapshot_version}/" \
-	      -e "s/Distribution:   fc12/Distribution:   fc11/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec; \
-	fi
+	echo "Editing the version in the spec file to be $${snapshot_version} for Distribution $${distver}..."; \
+	sed -e "s/Version.*/Version:	$${snapshot_version}/" \
+	    -e "s/Distribution:.*/Distribution:   fc$${distver}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec; 
 
 
 # Build an Redhat/Fedora .rpm package

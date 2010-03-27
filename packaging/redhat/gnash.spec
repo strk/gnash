@@ -1,9 +1,10 @@
 Name:           gnash
+# This next field gets edited by "make gnash.spec" when building an rpm
 Version:        trunk
 Release:        0
 Epoch: 		1
+# This next field gets edited by "make gnash.spec" when building an rpm
 Distribution:	fc12
-#Distribution:	ydl6
 Summary:        GNU SWF player
 
 Group:          Applications/Multimedia
