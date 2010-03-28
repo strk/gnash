@@ -76,7 +76,7 @@ rpm-install:
 # requires we do it ourselves, and copy it to $HOME/rpmbuild/SOURCES
 # before rpmbuild will work.
 setup-rpm: 
-	snapshot_version="gnash-$(SNAPSHOT_VERSION)"; \
+	-snapshot_version="gnash-$(SNAPSHOT_VERSION)"; \
 	snapshot_version=`echo $${snapshot_version}|tr "~" "_"`; \
 	if test -d gnash-trunk; then \
 	  mv gnash-trunk $${snapshot_version}; \

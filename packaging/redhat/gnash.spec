@@ -15,21 +15,22 @@ URL:            http://www.gnu.org/software/gnash/
 Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
-BuildRequires:  libpng-devel libjpeg-devel libogg-devel
-BuildRequires:  gtk2-devel glib2-devel
-BuildRequires:  atk-devel pango-devel openssl-devel
-BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
-BuildRequires:  pygtk2-devel giflib-devel
+# bitmap libraries for loading images
+BuildRequires:  libpng-devel libjpeg-devel giflib-devel
+# these are needed for the python gtk widget
+BuildRequires:  pygtk2-devel python-devel
+BuildRequires:  gtk2-devel freetype-devel fontconfig-devel
+BuildRequires:  openssl-devel curl-devel boost-devel
 BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
-# These are for the kde4 support
+# these are for the kde4 support
 BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
-BuildRequires:  libX11-devel libXt-devel
+# these are needed for the various renderers, which now all get built
+BuildRequires:  libXt-devel agg-devel gtkglext-devel libstdc++
 
-# Installation requirements
-Requires: libpng libjpeg libogg gtk2 glib2 atk pango
-Requires: gstreamer gstreamer-ffmpeg gstreamer-plugins-base
-Requires: libX11 libXt agg boost libcurl SDL
-Requires: freetype fontconfig libstdc++
+# The default Gnash package only includes the GTK parts, the rest
+# is in gnash-common.
+Requires:  gtkglext gtk2 pygtk2 python
+Requires:  gnash-common
 
 # Fedora 12 packages the boost libraries as separate packages,
 # whereas Fedora 11 has just the one dependency on boost-devel.
@@ -51,18 +52,47 @@ Requires(postun): /sbin/ldconfig
 Gnash is a GNU SWF movie player that supports many SWF v7 features,
 with growing support for swf v8, v9, and v10.
 
+%package common
+Summary:   Web-client SWF player plugin 
+Group:     Applications/Multimedia
+Requires:  %{name} = %{version}-%{release}
+Requires:  gnash-common = %{version}-%{release}
+# Installation requirements
+Requires:  libpng libjpeg giflib
+Requires:  boost agg cairo libGL libXt libX11 libXv 
+Requires:  freetype fontconfig libstdc++
+Requires:  gstreamer >= 0.10, gstreamer-plugins-base >= 0.10
+Requires:  openssl curl
+# libX11 libExt libXv
+
+%description common
+Common files Shared between Gnash and Klash, Gnash/Klash is a GNU SWF movie
+player that supports many SWF v7 features, with growing support for
+swf v8, v9, and v10.
+
+%package klash4
+Summary:   Konqueror SWF player plugin for KDE 4
+Group:     Applications/Multimedia
+Requires:  %{name} = %{version}-%{release}
+Requires:  kdelibs >= 4, kdebase >= 4, qt >= 4, gnash
+
+%description klash4
+The gnash (klash) SWF player plugin for Konqueror in KDE4.
+
 %package plugin
 Summary:   Web-client SWF player plugin 
-Requires:  %{name} = %{version}-%{release}
 Group:     Applications/Internet
+Requires:  %{name} = %{version}-%{release}
+Requires:  gnash-common = %{version}-%{release}
 
 %description plugin
 The gnash SWF player plugin for firefox or mozilla.
 
 %package cygnal
 Summary:   Streaming media server
-Requires:  %{name} = %{version}-%{release}
 Group:     Applications/Multimedia
+Requires:  %{name} = %{version}-%{release}
+Requires:  gnash-common = %{version}-%{release}
 
 %description cygnal
 Cygnal is a streaming media server that's Flash aware.
@@ -70,26 +100,21 @@ Cygnal is a streaming media server that's Flash aware.
 %package devel
 Summary:   Gnash header files
 Group:     Applications/Multimedia
-
-%package widget
-Summary:   Gnash widgets for Gtk and Python
-Group:     Applications/Multimedia
-
-%description widget
-The Gnash widgets can be used to embed Gnash into any Gtk or Python-Gtk
-application.
+Requires:  %{name} = %{version}-%{release}
+Requires:  gnash-common = %{version}-%{release}
 
 %description devel
 Gnash header files can be used to write external Gnash extensions.
 
-%package klash4
-Summary:   Konqueror SWF player plugin for KDE 4
-Requires:  %{name} = %{version}-%{release}
-Requires:  kdelibs >= 4, kdebase >= 4, qt >= 4, gnash
+%package widget
+Summary:   Gnash widgets for Gtk and Python
 Group:     Applications/Multimedia
+Requires:  %{name} = %{version}-%{release}
+Requires:  gnash-common = %{version}-%{release}
 
-%description klash4
-The gnash SWF player plugin for Konqueror in KDE4.
+%description widget
+The Gnash widgets can be used to embed Gnash into any Gtk or Python-Gtk
+application.
 
 %prep
 %setup -q
@@ -129,7 +154,7 @@ RPM_TARGET=%{_target}
 # cross building an RPM. This works as long as you have a good cross
 # compiler installed.
   CROSS_OPTS="--build=%{_host} --host=$RPM_TARGET --target=$RPM_TARGET"
-  RENDERER="--enable-renderer=agg"		# could be opengl
+  RENDERER="--with-renderer=agg"		# could be opengl
   %ifarch arm
     SOUND="--enable-media=none --disable-nsapi --disable-kparts"
   %else
@@ -142,10 +167,10 @@ RPM_TARGET=%{_target}
   # to the build so they appear in "gnash --version".
   GUI="--enable-gui=gtk,kde4"	# could be kde3, kde4, aqua, sdl
   SOUND="--enable-media=gst"	# could be ffmpeg
-  OTHER="--enable-jemalloc --enable-cygnal"
-  RENDERER="--enable-renderer=agg"		# could be opengl or cairo
+  OTHER="--enable-cygnal"
+  RENDERER="--with-renderer=all"		# could be opengl or cairo
   # These are not the defaults
-  OPTIONAL="--enable-avm2 --enable-python"
+  OPTIONAL="--enable-python"
 %endif
 
 %if %{distribution} != "ydl6"
@@ -186,7 +211,6 @@ sh ./configure \
 	$RENDERER \
 	$OTHER \
 	$OPTIONAL \
-	CXXFLAGS="$CXXFLAGS" \
 	--disable-dependency-tracking \
 	--disable-rpath \
 	--enable-cygnal \
@@ -239,10 +263,15 @@ scrollkeeper-update -q || :
 
 %files
 %defattr(-,root,root,-)
+%{_bindir}/gtk-gnash
+%{_datadir}/man/man1/gtk-gnash.1.gz
+
+%files common
+%defattr(-,root,root,-)
 %dump
 %doc README AUTHORS COPYING NEWS 
 %{_bindir}/gnash
-%{_bindir}/gtk-gnash
+%{_datadir}/man/man1/gnash.1.gz
 %{_bindir}/gprocessor
 %{_bindir}/soldumper
 %{_bindir}/flvdumper
@@ -253,7 +282,12 @@ scrollkeeper-update -q || :
 %{_libdir}/gnash/*.so*
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
-%{_datadir}/man/man1/*.1*
+%{_datadir}/man/man1/gprocessor.1.gz
+%{_datadir}/man/man1/soldumper.1.gz
+%{_datadir}/man/man1/flvdumper.1.gz
+%{_datadir}/man/man1/findmicrophones.1.gz
+%{_datadir}/man/man1/findwebcams.1.gz
+%{_datadir}/man/man1/rtmpget.1.gz
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
 %if !%{cross_compile}
 #%{_prefix}/share/info/*.info*
@@ -278,6 +312,7 @@ scrollkeeper-update -q || :
 %{_bindir}/cygnal
 %{_prefix}/etc/cygnalrc
 %{_libdir}/cygnal/plugins/*.so*
+%{_datadir}/man/man1/cygnal.1.gz
 
 %files devel
 %{_prefix}/include/gnash/*.h
@@ -289,16 +324,18 @@ scrollkeeper-update -q || :
 
 %files klash4
 %defattr(-,root,root,-)
-%{_bindir}/gnash
-%if !%{cross_compile}
 %{_bindir}/kde4-gnash
+%{_datadir}/man/man1/kde4-gnash.1.gz
 %{_libdir}/kde4/libklashpart.*
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo
 %{_prefix}/share/kde4/services/klash_part.desktop
-%endif
 
 %changelog
+* Sat Mar 27 2010 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
+- add gnash-common package for non GUI files so as not to contaminate
+  the gtk or kde packages. 
+
 * Sat Sep 07 2009 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
 - add kde4 support for klash.
 
