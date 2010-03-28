@@ -55,8 +55,6 @@ with growing support for swf v8, v9, and v10.
 %package common
 Summary:   Web-client SWF player plugin 
 Group:     Applications/Multimedia
-Requires:  %{name} = %{version}-%{release}
-Requires:  gnash-common = %{version}-%{release}
 # Installation requirements
 Requires:  libpng libjpeg giflib
 Requires:  boost agg cairo libGL libXt libX11 libXv 
@@ -73,7 +71,7 @@ swf v8, v9, and v10.
 %package klash4
 Summary:   Konqueror SWF player plugin for KDE 4
 Group:     Applications/Multimedia
-Requires:  %{name} = %{version}-%{release}
+Requires:  gnash-common
 Requires:  kdelibs >= 4, kdebase >= 4, qt >= 4, gnash
 
 %description klash4
@@ -82,8 +80,7 @@ The gnash (klash) SWF player plugin for Konqueror in KDE4.
 %package plugin
 Summary:   Web-client SWF player plugin 
 Group:     Applications/Internet
-Requires:  %{name} = %{version}-%{release}
-Requires:  gnash-common = %{version}-%{release}
+Requires:  gnash, gnash-common
 
 %description plugin
 The gnash SWF player plugin for firefox or mozilla.
@@ -91,8 +88,7 @@ The gnash SWF player plugin for firefox or mozilla.
 %package cygnal
 Summary:   Streaming media server
 Group:     Applications/Multimedia
-Requires:  %{name} = %{version}-%{release}
-Requires:  gnash-common = %{version}-%{release}
+Requires:  gnash-common
 
 %description cygnal
 Cygnal is a streaming media server that's Flash aware.
@@ -100,8 +96,7 @@ Cygnal is a streaming media server that's Flash aware.
 %package devel
 Summary:   Gnash header files
 Group:     Applications/Multimedia
-Requires:  %{name} = %{version}-%{release}
-Requires:  gnash-common = %{version}-%{release}
+Requires:  gnash-common
 
 %description devel
 Gnash header files can be used to write external Gnash extensions.
@@ -109,8 +104,7 @@ Gnash header files can be used to write external Gnash extensions.
 %package widget
 Summary:   Gnash widgets for Gtk and Python
 Group:     Applications/Multimedia
-Requires:  %{name} = %{version}-%{release}
-Requires:  gnash-common = %{version}-%{release}
+Requires:  gnash, gnash-common
 
 %description widget
 The Gnash widgets can be used to embed Gnash into any Gtk or Python-Gtk
