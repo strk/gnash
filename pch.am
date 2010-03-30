@@ -83,6 +83,6 @@ all-includes.h.gch: $(PCHHEADERS)
 
 $(PCHHEADERS): all-includes.h.gch
 
-CLEANFILES += all-includes.h.gch\
+CLEANFILES += all-includes.h.gch
 
 endif
