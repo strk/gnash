@@ -225,7 +225,7 @@ struct RTMPPacket
 //
 /// Only stored packets may not have a payload. A packet without a payload
 /// has already been processed and is only used for its header information.
-bool
+inline bool
 hasPayload(const RTMPPacket& p)
 {
     return (p.buffer.get());
@@ -236,7 +236,7 @@ hasPayload(const RTMPPacket& p)
 /// This is to be used to free used information from packets in a channel.
 /// The header information must be preserved for future packets, but the
 /// payload is no longer needed once read.
-void
+inline void
 clearPayload(RTMPPacket& p)
 {
     p.buffer.reset();
@@ -247,7 +247,7 @@ clearPayload(RTMPPacket& p)
 //
 /// For messages we create, this matches the exact size of the payload. For
 /// messages we read, this is the expected size of the data.
-size_t
+inline size_t
 payloadSize(const RTMPPacket& p)
 {
     assert(hasPayload(p));
@@ -257,7 +257,7 @@ payloadSize(const RTMPPacket& p)
 }
 
 /// Access the payload data section of the buffer.
-boost::uint8_t*
+inline boost::uint8_t*
 payloadData(RTMPPacket& p)
 {
     assert(hasPayload(p));
@@ -266,7 +266,7 @@ payloadData(RTMPPacket& p)
 }
 
 /// Access the payload data section of the buffer.
-const boost::uint8_t*
+inline const boost::uint8_t*
 payloadData(const RTMPPacket& p)
 {
     assert(hasPayload(p));
@@ -279,7 +279,7 @@ payloadData(const RTMPPacket& p)
 /// Note that this is only valid for packets we create, and for packets
 /// we have fully read. Stored packets that have not yet received all data
 /// have allocated space that has not yet been written.
-const boost::uint8_t*
+inline const boost::uint8_t*
 payloadEnd(const RTMPPacket& p)
 {
     assert(hasPayload(p));
@@ -292,7 +292,7 @@ payloadEnd(const RTMPPacket& p)
 /// A packet is ready for processing if its payload size matches the data
 /// size in its header. It may take several successive packets to form a 
 /// complete packet. 
-bool
+inline bool
 isReady(const RTMPPacket& p) {
     return p.bytesRead == p.header.dataSize;
 }
