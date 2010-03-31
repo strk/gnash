@@ -57,7 +57,7 @@ public:
     RunResources(const std::string& baseURL)
         :
         _baseURL(baseURL)
-    { /* do nothing */  }
+    {}
 
     /// Get the base URL for the run.
     //
