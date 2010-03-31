@@ -90,22 +90,6 @@ rgba_to_cairo_argb(boost::uint8_t* dst, const GnashImage* im)
 
 
 static void
-snap_to_pixel(cairo_t* cr, double& x, double& y, bool up)
-{
-    cairo_user_to_device(cr, &x, &y);
-  
-    if (up) {
-        x = std::ceil(x);
-        y = std::ceil(y);
-    } else {
-        x = std::floor(x);
-        y = std::floor(y);
-    }
-
-    cairo_device_to_user(cr, &x, &y);
-}
-
-static void
 snap_to_half_pixel(cairo_t* cr, double& x, double& y)
 {
     cairo_user_to_device(cr, &x, &y);
@@ -129,7 +113,7 @@ void
 pattern_add_color_stops(const fill_style& style, cairo_pattern_t* pattern,
                         const cxform& cx)
 {      
-    for (int index = 0; index < style.get_color_stop_count(); ++index) {
+    for (size_t index = 0; index < style.get_color_stop_count(); ++index) {
         const gradient_record& grad = style.get_color_stop(index);
         
         rgba c = cx.transform(grad.m_color);
@@ -793,10 +777,10 @@ Renderer_cairo::add_path(cairo_t* cr, const Path& cur_path)
 
 void
 Renderer_cairo::apply_line_style(const LineStyle& style, const cxform& cx,
-                                 const SWFMatrix& mat)
+                                 const SWFMatrix& /*mat*/)
 {
     cairo_line_join_t join_style = CAIRO_LINE_JOIN_MITER;
-    switch(style.joinStyle()) {
+    switch (style.joinStyle()) {
         case JOIN_ROUND:
             join_style = CAIRO_LINE_JOIN_ROUND;
             break;

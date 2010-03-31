@@ -732,13 +732,16 @@ public:
                                              frame->height(),
                                              frame->type()));
               break;
-#if USE_VAAPI_GLX
           case GNASH_IMAGE_GPU:
+              // This case should never be reached if vaapi is not
+              // enabled; but has to be handled to keep the compiler
+              // happy.
+#if USE_VAAPI_GLX
               texture.reset(new GnashVaapiTexture(frame->width(),
                                                   frame->height(),
                                                   frame->type()));
-              break;
 #endif
+              break;
           }
       }
 

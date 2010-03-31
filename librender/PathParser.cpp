@@ -21,6 +21,7 @@
 #include "PathParser.h"
 #include <map>
 #include <boost/bind.hpp>
+#include "log.h"
 
 namespace gnash
 {
@@ -45,7 +46,7 @@ PathParser::PathParser(const std::vector<Path>& paths, size_t numstyles)
 {}
 
 void
-PathParser::run(const cxform& cx, const SWFMatrix& mat)
+PathParser::run(const cxform& cx, const SWFMatrix& /*mat*/)
 {
   // Since we frequently remove an element from the front or the back, we use
   // a double ended queue here.
@@ -86,7 +87,7 @@ PathParser::run(const cxform& cx, const SWFMatrix& mat)
      
       if (it == path_list.end()) {
         if (!closed_shape()) {
-          std::cout << "error: path not closed!" << std::endl;
+          log_error("path not closed!");
           _cur_endpoint = _shape_origin;
         }
       } else {
