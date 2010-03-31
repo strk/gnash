@@ -31,14 +31,13 @@
 namespace gnash {
 namespace SWF {
 
-DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */,
-	SWFStream& /* in */)
+DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /*m*/,
+	SWFStream& /*in*/)
     :
     _csm_table_int(2)
 {
 }
 
-/* public static */
 void
 DefineFontAlignZonesTag::loader(SWFStream& in, TagType tag,
         movie_definition& m, const RunResources& /*r*/)
@@ -63,36 +62,48 @@ DefineFontAlignZonesTag::loader(SWFStream& in, TagType tag,
     // 2bits are cms table, 6bits are reserved
 	const boost::uint8_t flags = in.read_u8();
 
+    // What is this?
+	const boost::uint16_t csm_table_int = flags >> 6;
+
 	// TODO:
     // The first thing to to is test what this does. According to some
     // sources, the tag is ignored and merely turns on the player's
     // font engine.
 	IF_VERBOSE_PARSE (
-        log_parse(_(" ** DefineFontAlignZones: font=%d, flags=%d"), ref, flags);
+        log_parse(_("DefineFontAlignZones: font=%d, flags=%d, "
+                "table int: %s"), ref, flags, csm_table_int);
 	);
 
-	const boost::uint16_t csm_table_int_temp = flags >> 6;
-			
-	Font::GlyphInfoRecords::size_type glyphs_count_temp =
+	const Font::GlyphInfoRecords::size_type glyphs_count =
         referencedFont->glyphCount();
 
-	for (size_t i = 0; i != glyphs_count_temp; ++i) {
+	for (size_t i = 0; i != glyphs_count; ++i) {
+
         in.ensureBytes(1);
         
+        // What is this for?
         in.read_u8();		
         
-        for (int j = 0; j != 2; ++j) {
-            in.ensureBytes(2);
-            float f_zone_position_temp = in.read_u16();
-            in.ensureBytes(2);
-            float f_zone_size_temp = in.read_u16();
+        for (size_t j = 0; j != 2; ++j) {
+            in.ensureBytes(4);
+            const boost::uint16_t zone_position = in.read_u16();
+            const boost::uint16_t zone_size = in.read_u16();
+
+            IF_VERBOSE_PARSE(
+                log_parse("Zone position: %s, size: %s", zone_position,
+                    zone_size);
+            );
         }		
-        in.ensureBytes(1);
         
+        in.ensureBytes(1);
         // What is this?
-        boost::uint8_t u = in.read_u8();
-        const boost::uint32_t f_zone_x_temp = u & 0x0001;
-        unsigned f_zone_y_temp = (u >> 1) & 0x0001;
+        const boost::uint8_t u = in.read_u8();
+        const bool zone_x = u & 0x01;
+        const bool zone_y = (u >> 1) & 0x01;
+
+        IF_VERBOSE_PARSE(
+            log_parse("Zone x: %s, y: %s", zone_x, zone_y);
+        );
 			
     }
 	in.skip_to_tag_end();
