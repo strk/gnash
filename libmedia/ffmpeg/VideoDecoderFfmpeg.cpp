@@ -56,6 +56,21 @@ namespace gnash {
 namespace media {
 namespace ffmpeg {
 
+// Forward declarations of VAAPI functions.
+namespace {
+
+    class VaapiContextFfmpeg;
+
+    VaapiContextFfmpeg* get_vaapi_context(AVCodecContext* avctx);
+    void set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx);
+    void clear_vaapi_context(AVCodecContext* avctx);
+    void reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx = 0);
+    PixelFormat get_format(AVCodecContext* avctx, const PixelFormat* fmt);
+    int get_buffer(AVCodecContext* avctx, AVFrame* pic);
+    int reget_buffer(AVCodecContext* avctx, AVFrame* pic);
+    void release_buffer(AVCodecContext *avctx, AVFrame *pic);
+}
+
 #ifdef HAVE_SWSCALE_H
 /// A wrapper round an SwsContext that ensures it's
 /// freed on destruction.
@@ -81,142 +96,6 @@ private:
 };
 #endif
 
-
-
-class VaapiContextFfmpeg;
-
-namespace {
-
-inline VaapiContextFfmpeg*
-get_vaapi_context(AVCodecContext* avctx)
-{
-#if USE_VAAPI	
-    return static_cast<VaapiContextFfmpeg *>(avctx->hwaccel_context);
-#else
-    UNUSED(avctx);
-	return 0;
-#endif
-}
-
-inline void
-set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx)
-{
-#if USE_VAAPI	
-    avctx->hwaccel_context = vactx;
-#else
-    UNUSED(avctx), UNUSED(vactx);
-#endif
-    
-}
-
-inline void
-clear_vaapi_context(AVCodecContext* avctx)
-{
-#if USE_VAAPI
-    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
-    if (!vactx) return;
-
-    delete vactx;
-    set_vaapi_context(avctx, NULL);
-#else
-    UNUSED(avctx);
-#endif
-}
-
-/// (Re)set AVCodecContext to sane values 
-void
-reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx = 0)
-{
-    clear_vaapi_context(avctx);
-    set_vaapi_context(avctx, vactx);
-
-    avctx->thread_count = 1;
-    avctx->draw_horiz_band = 0;
-    if (vactx) {
-        avctx->slice_flags = SLICE_FLAG_CODED_ORDER|SLICE_FLAG_ALLOW_FIELD;
-    }
-    else avctx->slice_flags = 0;
-}
-
-/// AVCodecContext.get_format() implementation
-PixelFormat
-get_format(AVCodecContext* avctx, const PixelFormat* fmt)
-{
-#if USE_VAAPI
-    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
-
-    if (vactx) {
-        for (int i = 0; fmt[i] != PIX_FMT_NONE; i++) {
-            if (fmt[i] != PIX_FMT_VAAPI_VLD) continue;
-
-            if (vactx->initDecoder(avctx->width, avctx->height)) {
-                return fmt[i];
-            }
-        }
-    }
-#endif
-
-    reset_context(avctx);
-    return avcodec_default_get_format(avctx, fmt);
-}
-
-/// AVCodecContext.get_buffer() implementation
-int
-get_buffer(AVCodecContext* avctx, AVFrame* pic)
-{
-    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
-    if (!vactx) return avcodec_default_get_buffer(avctx, pic);
-
-#if USE_VAAPI
-    if (!vactx->initDecoder(avctx->width, avctx->height)) return -1;
-
-    VaapiSurfaceFfmpeg * const surface = vactx->getSurface();
-    if (!surface) return -1;
-
-    vaapi_set_surface(pic, surface);
-
-    static unsigned int pic_num = 0;
-    pic->type = FF_BUFFER_TYPE_USER;
-    pic->age  = ++pic_num - surface->getPicNum();
-    surface->setPicNum(pic_num);
-    return 0;
-#endif
-    return -1;
-}
-
-/// AVCodecContext.reget_buffer() implementation
-int
-reget_buffer(AVCodecContext* avctx, AVFrame* pic)
-{
-    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
-
-    if (!vactx) return avcodec_default_reget_buffer(avctx, pic);
-
-    return get_buffer(avctx, pic);
-}
-
-/// AVCodecContext.release_buffer() implementation
-void
-release_buffer(AVCodecContext *avctx, AVFrame *pic)
-{
-    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
-    if (!vactx) {
-        avcodec_default_release_buffer(avctx, pic);
-        return;
-    }
-
-#if USE_VAAPI
-    VaapiSurfaceFfmpeg* const surface = vaapi_get_surface(pic);
-    delete surface;
-
-    pic->data[0] = NULL;
-    pic->data[1] = NULL;
-    pic->data[2] = NULL;
-    pic->data[3] = NULL;
-#endif
-}
-
-}
 
 // A Wrapper ensuring an AVCodecContext is closed and freed
 // on destruction.
@@ -567,6 +446,138 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
         }
 }
 
+namespace {
+
+inline VaapiContextFfmpeg*
+get_vaapi_context(AVCodecContext* avctx)
+{
+#if USE_VAAPI	
+    return static_cast<VaapiContextFfmpeg *>(avctx->hwaccel_context);
+#else
+    UNUSED(avctx);
+	return 0;
+#endif
+}
+
+inline void
+set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx)
+{
+#if USE_VAAPI	
+    avctx->hwaccel_context = vactx;
+#else
+    UNUSED(avctx), UNUSED(vactx);
+#endif
+    
+}
+
+inline void
+clear_vaapi_context(AVCodecContext* avctx)
+{
+#if USE_VAAPI
+    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
+    if (!vactx) return;
+
+    delete vactx;
+    set_vaapi_context(avctx, NULL);
+#else
+    UNUSED(avctx);
+#endif
+}
+
+/// (Re)set AVCodecContext to sane values 
+void
+reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx)
+{
+    clear_vaapi_context(avctx);
+    set_vaapi_context(avctx, vactx);
+
+    avctx->thread_count = 1;
+    avctx->draw_horiz_band = 0;
+    if (vactx) {
+        avctx->slice_flags = SLICE_FLAG_CODED_ORDER|SLICE_FLAG_ALLOW_FIELD;
+    }
+    else avctx->slice_flags = 0;
+}
+
+/// AVCodecContext.get_format() implementation
+PixelFormat
+get_format(AVCodecContext* avctx, const PixelFormat* fmt)
+{
+#if USE_VAAPI
+    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
+
+    if (vactx) {
+        for (int i = 0; fmt[i] != PIX_FMT_NONE; i++) {
+            if (fmt[i] != PIX_FMT_VAAPI_VLD) continue;
+
+            if (vactx->initDecoder(avctx->width, avctx->height)) {
+                return fmt[i];
+            }
+        }
+    }
+#endif
+
+    reset_context(avctx);
+    return avcodec_default_get_format(avctx, fmt);
+}
+
+/// AVCodecContext.get_buffer() implementation
+int
+get_buffer(AVCodecContext* avctx, AVFrame* pic)
+{
+    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
+    if (!vactx) return avcodec_default_get_buffer(avctx, pic);
+
+#if USE_VAAPI
+    if (!vactx->initDecoder(avctx->width, avctx->height)) return -1;
+
+    VaapiSurfaceFfmpeg * const surface = vactx->getSurface();
+    if (!surface) return -1;
+
+    vaapi_set_surface(pic, surface);
+
+    static unsigned int pic_num = 0;
+    pic->type = FF_BUFFER_TYPE_USER;
+    pic->age  = ++pic_num - surface->getPicNum();
+    surface->setPicNum(pic_num);
+    return 0;
+#endif
+    return -1;
+}
+
+/// AVCodecContext.reget_buffer() implementation
+int
+reget_buffer(AVCodecContext* avctx, AVFrame* pic)
+{
+    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
+
+    if (!vactx) return avcodec_default_reget_buffer(avctx, pic);
+
+    return get_buffer(avctx, pic);
+}
+
+/// AVCodecContext.release_buffer() implementation
+void
+release_buffer(AVCodecContext *avctx, AVFrame *pic)
+{
+    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
+    if (!vactx) {
+        avcodec_default_release_buffer(avctx, pic);
+        return;
+    }
+
+#if USE_VAAPI
+    VaapiSurfaceFfmpeg* const surface = vaapi_get_surface(pic);
+    delete surface;
+
+    pic->data[0] = NULL;
+    pic->data[1] = NULL;
+    pic->data[2] = NULL;
+    pic->data[3] = NULL;
+#endif
+}
+
+}
 
 } // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
