@@ -38,6 +38,7 @@ extern "C" {
 #include "VideoDecoderFfmpeg.h"
 #include "MediaParserFfmpeg.h" // for ExtraVideoInfoFfmpeg 
 #include "GnashException.h" // for MediaException
+#include "utility.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/format.hpp>
@@ -82,34 +83,39 @@ private:
 
 class VaapiContextFfmpeg;
 
-static inline VaapiContextFfmpeg *
-get_vaapi_context(AVCodecContext *avctx)
+static inline VaapiContextFfmpeg*
+get_vaapi_context(AVCodecContext* avctx)
 {
 #if USE_VAAPI	
     return static_cast<VaapiContextFfmpeg *>(avctx->hwaccel_context);
 #else
-	return NULL;
+    UNUSED(avctx);
+	return 0;
 #endif
 }
 
 static inline void
-set_vaapi_context(AVCodecContext *avctx, VaapiContextFfmpeg *vactx)
+set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx)
 {
 #if USE_VAAPI	
     avctx->hwaccel_context = vactx;
+#else
+    UNUSED(avctx), UNUSED(vactx);
 #endif
+    
 }
 
 static inline void
-clear_vaapi_context(AVCodecContext *avctx)
+clear_vaapi_context(AVCodecContext* avctx)
 {
 #if USE_VAAPI
-    VaapiContextFfmpeg * const vactx = get_vaapi_context(avctx);
-    if (!vactx)
-        return;
+    VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
+    if (!vactx) return;
 
     delete vactx;
     set_vaapi_context(avctx, NULL);
+#else
+    UNUSED(avctx);
 #endif
 }
 
