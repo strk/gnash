@@ -53,7 +53,7 @@ attachURLVariablesInterface(as_object& o)
 }
 
 void
-attachURLVariablesStaticInterface(as_object& o)
+attachURLVariablesStaticInterface(as_object& /*o*/)
 {
 }
 
