@@ -247,10 +247,10 @@ public:
     void setHWAccel(const std::string &x) { _hwaccel = x; }
 
     // Get the name of the hardware acclerator to use for video
-    const std::string &getRenderer() const { return _renderer; }
+    const std::string& getRenderer() const { return _renderer; }
 
     // Set the name of the hardware acclerator to use for video
-    void setRendeer(const std::string &x) { _renderer = x; }
+    void setRenderer(const std::string& x) { _renderer = x; }
 
     // Get the location of the sandbox for .sol files
     const std::string &getSOLSafeDir() const { return _solsandbox; }
