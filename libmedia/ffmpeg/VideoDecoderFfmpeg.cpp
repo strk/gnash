@@ -55,11 +55,12 @@ extern "C" {
 namespace gnash {
 namespace media {
 namespace ffmpeg {
+ 
+class VaapiContextFfmpeg;
 
 // Forward declarations of VAAPI functions.
 namespace {
 
-    class VaapiContextFfmpeg;
 
     VaapiContextFfmpeg* get_vaapi_context(AVCodecContext* avctx);
     void set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx);
