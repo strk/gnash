@@ -19,6 +19,10 @@
 #ifndef GNASH_VIDEODECODERFFMPEG_H
 #define GNASH_VIDEODECODERFFMPEG_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include <vector>
 #include <memory>
 #include "dsodefs.h" //For DSOEXPORT
@@ -27,11 +31,9 @@
 #include "MediaParser.h" // for videoCodecType enum
 #include "ffmpegHeaders.h"
 
-
 namespace gnash {
 namespace media {
 namespace ffmpeg {
-
 
 // Forward declarations
 class CodecContextWrapper;
