@@ -57,7 +57,7 @@ public:
     RunResources(const std::string& baseURL)
         :
         _baseURL(baseURL)
-    { /* do nothing */  }
+    {}
 
     /// Get the base URL for the run.
     //
@@ -129,14 +129,14 @@ public:
     /// Set the renderer backend, agg, opengl, or cairo. This is set
     /// in the users gnashrc file, or can be overridden with the
     /// --hwaccel option to gnash.
-    void setRenderBackend(const std::string &x) {_renderer_backend = x; }
-    std::string &getRenderBackend() { return _renderer_backend; }
+    void setRenderBackend(const std::string& x) { _renderer_backend = x; }
+    std::string& getRenderBackend() { return _renderer_backend; }
 
     /// Set the hardware video accleration backend, none, vaapi, xv,
     /// or cairo. This is set in the users gnashrc file, or can be
     /// overridden with the --render-mode option to gnash.
-    std::string &getHWAccelBackend() { return _hwaccel_backend; }
-    void setHWAccelBackend(const std::string &x) {_hwaccel_backend = x; }
+    std::string& getHWAccelBackend() { return _hwaccel_backend; }
+    void setHWAccelBackend(const std::string& x) { _hwaccel_backend = x; }
 #endif
 
 private:

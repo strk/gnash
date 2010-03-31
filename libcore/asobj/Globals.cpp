@@ -291,29 +291,32 @@ AVM1Global::registerClasses()
     as_value nullVal; nullVal.set_null();
     init_member("o", nullVal, PropFlags::dontEnum);
 
+
+    VM& vm = getVM();
+
     // _global functions.            
     // These functions are only available in SWF6+, but this is just
     // because SWF5 or lower did not have a "_global"
     // reference at all.
     init_member("ASnative", createFunction(global_asnative));
     init_member("ASconstructor", createFunction(global_asconstructor));
-    init_member("ASSetPropFlags", _vm.getNative(1, 0));
-    init_member("ASSetNative", _vm.getNative(4, 0));
-    init_member("ASSetNativeAccessor", _vm.getNative(4, 1));
+    init_member("ASSetPropFlags", vm.getNative(1, 0));
+    init_member("ASSetNative", vm.getNative(4, 0));
+    init_member("ASSetNativeAccessor", vm.getNative(4, 1));
     init_member("AsSetupError", createFunction(global_assetuperror));
-    init_member("updateAfterEvent", _vm.getNative(9, 0));
-    init_member("trace", _vm.getNative(100, 4));
+    init_member("updateAfterEvent", vm.getNative(9, 0));
+    init_member("trace", vm.getNative(100, 4));
 
-    init_member("setInterval", _vm.getNative(250, 0));
-    init_member("clearInterval", _vm.getNative(250, 1));
-    init_member("setTimeout", _vm.getNative(250, 2));
+    init_member("setInterval", vm.getNative(250, 0));
+    init_member("clearInterval", vm.getNative(250, 1));
+    init_member("setTimeout", vm.getNative(250, 2));
  
     // This is an odd function with no properties. There ought to be
     // a better way of implementing this. See also TextFormat.getTextExtent.
     as_function* edc = createFunction(global_enableDebugConsole);
     edc->clearProperties();
     init_member("enableDebugConsole", edc);
-    init_member("showRedrawRegions", _vm.getNative(1021, 1));
+    init_member("showRedrawRegions", vm.getNative(1021, 1));
     
     string_table& st = getStringTable(*this);
     init_member("clearTimeout", getMember(st.find("clearInterval")));
@@ -324,7 +327,7 @@ AVM1Global::registerClasses()
     const string_table::key NS_FLASH = st.find("flash");
     flash_package_init(*this, NS_FLASH); 
 
-    const int version = _vm.getSWFVersion();
+    const int version = vm.getSWFVersion();
 
     switch (version)
     {
@@ -340,12 +343,12 @@ AVM1Global::registerClasses()
         
             // This is surely not correct, but they are not available
             // in SWF4
-            init_member("escape", _vm.getNative(100, 0));
-            init_member("unescape", _vm.getNative(100, 1));
-            init_member("parseInt", _vm.getNative(100, 2));
-            init_member("parseFloat", _vm.getNative(100, 3));
-            init_member("isNaN", _vm.getNative(200, 18));
-            init_member("isFinite", _vm.getNative(200, 19));
+            init_member("escape", vm.getNative(100, 0));
+            init_member("unescape", vm.getNative(100, 1));
+            init_member("parseInt", vm.getNative(100, 2));
+            init_member("parseFloat", vm.getNative(100, 3));
+            init_member("isNaN", vm.getNative(200, 18));
+            init_member("isFinite", vm.getNative(200, 19));
 
             init_member("NaN", as_value(NaN));
             init_member("Infinity", as_value(
