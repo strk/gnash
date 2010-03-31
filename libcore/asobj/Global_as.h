@@ -60,7 +60,8 @@ public:
     virtual ClassHierarchy& classHierarchy() = 0;
 
     explicit Global_as(VM& vm)
-      : as_object(vm)
+        :
+        as_object(vm)
     {}
 
     /// Create an ActionScript function
