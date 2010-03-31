@@ -824,8 +824,6 @@ protected:
     /// Mark properties and triggers list as reachable (for the GC)
     void markAsObjectReachable() const;
 
-    /// The VM containing this object.
-    VM& _vm;   
 private:
 
     /// Find an existing property for update
@@ -867,6 +865,9 @@ private:
     /// This is owned by the as_object and destroyed when the as_object's
     /// destructor is called.
     boost::scoped_ptr<Relay> _relay;
+
+    /// The VM containing this object.
+    VM& _vm;
 
     /// Properties of this as_object
     PropertyList _members;

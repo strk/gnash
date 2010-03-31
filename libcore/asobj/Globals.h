@@ -89,7 +89,7 @@ public:
     }
 
     virtual VM& getVM() const {
-        return _vm;
+        return vm();
     }
     
     /// Create an ActionScript function
@@ -160,7 +160,7 @@ public:
     }
     
     virtual VM& getVM() const {
-        return _vm;
+        return vm();
     }
 
 protected:
