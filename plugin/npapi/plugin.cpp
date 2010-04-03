@@ -395,8 +395,9 @@ nsPluginInstance::~nsPluginInstance()
         int rv = waitpid(_childpid, &status, WNOHANG);
 
         if (rv <= 0) {
-            int* pid = new int(_childpid);
-            g_timeout_add_seconds (1, cleanup_childpid, pid);
+             int* pid = new int(_childpid);
+	     usleep(1000);
+	     cleanup_childpid(pid);
         } else {
 
 #if GNASH_PLUGIN_DEBUG > 1
