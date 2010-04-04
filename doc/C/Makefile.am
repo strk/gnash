@@ -346,6 +346,9 @@ uninstall-html-hook:
 	-$(RM) $(DESTDIR)$(htmldir)/gnashref.html
 	-$(RM) $(DESTDIR)$(htmldir)/images/*png
 
+uninstall-man1-hook:
+	-$(RM) $(DESTDIR)$(htmldir)/gnashuser.html
+
 # install-data-hook: install-data-hook-omf
 # uninstall-local: uninstall-local-doc uninstall-local-omf
 
@@ -380,8 +383,7 @@ link-extra-man:
 
 install-data-hook: $(MANPAGES) install-man1 install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
-	-$(RM) -f $(DESTDIR)$(man1dir)/gtk-gnash.1 
-	-$(RM) -f $(DESTDIR)$(man1dir)/kde4-gnash.1
+	-$(RM) -f $(DESTDIR)$(man1dir)/*.1 
 
 #
 # GNOME Help support, which currently isn't supported
