@@ -262,8 +262,12 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     else
       AC_DEFINE(FFMPEG_NELLYMOSER, 1, [Define if ffmpeg can decode NELLYMOSER audio.])
     fi
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -gt 52450; then
+      dnl 52.45.0 (r20957) or higher required for VAAPI support
+      AC_DEFINE(FFMPEG_VAAPI, 1, [Define if ffmpeg supports VAAPI.])
+    fi
   else
-    AC_MSG_WARN([Could not check ffmpeg version (dunno where avcodec.h is)])
+    AC_MSG_WARN([Could not check ffmpeg version (can't find avcodec.h file)])
     # ffmpeg_version_check=ok # this is NOT ok, why would it be ?! 
   fi
 
