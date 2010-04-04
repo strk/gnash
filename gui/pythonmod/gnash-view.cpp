@@ -225,7 +225,7 @@ gnash_view_init(GnashView *view)
     view->media_handler.reset( new gnash::media::gst::MediaHandlerGst() );
     gnash::media::MediaHandler::set(view->media_handler);
 #else
-    log_error(_("No media support compiled in"));
+    gnash::log_error(_("No media support compiled in"));
 #endif    
 
     // Init sound
