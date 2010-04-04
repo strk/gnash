@@ -698,7 +698,8 @@ dnl By default, we want to to build all renderers
 build_ogl=yes
 build_agg=yes
 build_cairo=yes
-renderer_list="opengl, agg, cairo"
+renderer_list="OpenGL AGG Cairo"
+nrender=3
 AC_ARG_WITH(renderer,
   AC_HELP_STRING([--with-renderer=], [Specify which renderers to support to enable (ogl|cairo|agg, default all)]),
   if test -n ${withval}; then
@@ -711,7 +712,7 @@ AC_ARG_WITH(renderer,
     fi
   fi
   renderer_list=""
-  nhwaccel=0
+  nrender=0
   build_ogl=no
   build_agg=no
   build_cairo=no
@@ -723,29 +724,29 @@ AC_ARG_WITH(renderer,
         build_ogl=no
         build_agg=no
         build_cairo=no
-        nhwaccel=1
+        nrender=1
         ;;
       all|ALL)
-        renderer_list="opengl, cairo, agg"
+        renderer_list="OpenGL, Cairo, AGG"
         build_ogl=yes
         build_agg=yes
         build_cairo=yes
-        nhwaccel=3
+        nrender=3
         ;;
       ogl|OGL|OpenGL|opengl)
-        renderer_list="${renderer_list} opengl"
+        renderer_list="${renderer_list} OpenGL"
         build_ogl=yes
-        nhwaccel=$((nhwaccel+1))
+        nrender=$((nrender+1))
         ;;
       agg|AGG)
-        renderer_list="${renderer_list} agg"
+        renderer_list="${renderer_list} AGG"
         build_agg=yes
-        nhwaccel=$((nhwaccel+1))
+        nrender=$((nrender+1))
         ;;
       cairo|CAIRO|Cairo*)
-        renderer_list="${renderer_list} cairo"
+        renderer_list="${renderer_list} Cairo"
         build_cairo=yes
-        nhwaccel=$((nhwaccel+1))
+        nrender=$((nrender+1))
         ;;
       *) AC_MSG_ERROR([invalid renderer feature specified: ${withval} given (accept:  (ogl|cairo|agg|all)])
         ;;
@@ -1588,96 +1589,6 @@ dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
 dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
 
-AC_ARG_WITH(hwaccel,
-  AC_HELP_STRING([--with-hwaccel=], [Specify which accleration to support to enable (none,vaapi,omap)]),
-  if test -n ${withval}; then
-    if test "x${withval}" != "xno" -o "x${withval}" != "xnone" ; then
-      hwaccel_list="none"
-      withval=`echo ${withval} | tr '\054' ' ' `
-    else
-      hwaccel_list=""
-      withval=""
-    fi
-  fi
-  hwaccel_list=""
-  nhwaccel=0
-  while test -n "${withval}" ; do
-    val=`echo ${withval} | cut -d ' ' -f 1`
-    [case "${val}" in
-      no*|NO*)
-        hwaccel_list="none"
-        build_vaapi=no
-        build_omap=no
-        nhwaccel=$((nhwaccel+1))
-        ;;
-      va*|VA*)
-        hwaccel_list="${hwaccel_list} vaapi"
-        build_vaapi=yes
-        nhwaccel=$((nhwaccel+1))
-        ;;
-      omap*|OMAP*)
-        hwaccel_list="${hwaccel_list} omap"
-        build_omap=yes
-        nhwaccel=$((nhwaccel+1))
-        ;;
-      *) AC_MSG_ERROR([invalid hwaccel feature specified: ${withval} given (accept: none,vaapi,omap)])
-        ;;
-      esac]
-    withval=`echo ${withval} | cut -d ' ' -f 2-6`
-    if test "x$val" = "x$withval"; then
-      break;
-    fi
-  done
-)
-
-dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
-dnl restrict using HW Accel to using ffmpeg directly.
-if test x"${media_handler}" = x"gst" -a x"${build_vaapi}" = x"yes"; then
-  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
-fi
-
-if test x"${build_vaapi}" = x"yes"; then
-  AC_DEFINE([USE_VAAPI], [1], [Enable libVA API])
-  if test x$build_ogl = xyes; then
-    AC_DEFINE([USE_VAAPI_GLX], [1], [Enable libVA API with GLX extensions])
-  fi
-fi
-
-use_libva=no
-use_vliba_x11=no
-use_libva_glx=no
-if test x"${build_vaapi}" = x"yes"; then
-  use_libva=yes
-  GNASH_PKG_FIND([libva],
-    [va/va.h],
-    [Video Acceleration API],
-    vaInitialize
-  )
-  use_libva_x11=yes
-  GNASH_PKG_FIND([libva_x11],
-    [va/va_x11.h],
-    [VA API (X11 display)],
-    vaGetDisplay,
-    [], [-lva-x11]
-  )
-
-  if test x$build_ogl = xyes; then
-    use_libva_glx=yes
-    GNASH_PKG_FIND([libva_glx],
-      [va/va_glx.h],
-      [VA API (GLX display)],
-      vaGetDisplayGLX,
-      [], [-lva-glx]
-    )
-  fi
-fi
-
-dnl libVA drivers
-AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
-AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
-AM_CONDITIONAL(USE_VAAPI_X11, test x"${use_libva_x11}" = xyes)
-AM_CONDITIONAL(USE_VAAPI_GLX, test x"${use_libva_glx}" = xyes)
-
 dnl IRIX-hack.
 case $host in
   *-*-irix*)
@@ -2358,6 +2269,117 @@ if test x$build_agg = xyes; then
    GNASH_PATH_AGG
 fi
 
+dnl Try to configure in VAAPI support if it exists. It's not an error
+dnl if it doesn't. Tnis is also only used with ffmpeg for now.
+
+build_vaapi=yes
+hwaccel_list="VAAPI XVideo"
+nhwaccel=2
+AC_ARG_WITH(hwaccel,
+  AC_HELP_STRING([--with-hwaccel=], [Specify which accleration to support to enable (none,vaapi,omap)]),
+  if test -n ${withval}; then
+    if test "x${withval}" != "xno" -o "x${withval}" != "xnone" ; then
+      hwaccel_list="none"
+      withval=`echo ${withval} | tr '\054' ' ' `
+    else
+      hwaccel_list=""
+      withval=""
+    fi
+  fi
+  hwaccel_list=""
+  nhwaccel=0
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      no*|NO*)
+        hwaccel_list="none"
+        build_vaapi=no
+        build_omap=no
+        nhwaccel=0
+        ;;
+      va*|VA*)
+        hwaccel_list="${hwaccel_list} vaapi"
+        build_vaapi=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      xv*|XV*|Xv*)
+        hwaccel_list="${hwaccel_list} XVideo"
+        dnl build_xv=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      all|ALL)
+        hwaccel_list="XVideo VAAPI OMAP"
+        nhwaccel=3
+        build_omap=yes
+        build_vaapi=yes
+        dnl build_xv=yes
+        ;;
+      omap*|OMAP*)
+        hwaccel_list="${hwaccel_list} omap"
+        build_omap=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      *) AC_MSG_ERROR([invalid hwaccel feature specified: ${withval} given (accept: none,vaapi,omap)])
+        ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$withval"; then
+      break;
+    fi
+  done
+)
+
+dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
+dnl restrict using HW Accel to using ffmpeg directly.
+if test x"${media_handler}" = x"gst" -a x"${build_vaapi}" = x"yes"; then
+  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
+fi
+
+if test x"${media_handler}" = x"ffmpeg" -a x"${build_vaapi}" = x"yes"; then
+  use_libva=no
+  use_vliba_x11=no
+  use_libva_glx=no
+  dnl if the version of ffmpeg is recent enough, (r20957, 52.45.0), then
+  dnl look for VAAPI support so we can use use the VAAPI enabled ffmpeg.
+  if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -gt 52450; then
+    use_libva=yes
+    GNASH_PKG_FIND([libva],
+      [va/va.h],
+      [Video Acceleration API],
+      vaInitialize
+    )
+
+    use_libva_x11=yes
+    GNASH_PKG_FIND([libva_x11],
+      [va/va_x11.h],
+      [VA API (X11 display)],
+      vaGetDisplay,
+      [], [-lva-x11]
+    )
+
+    if test x$build_ogl = xyes; then
+      use_libva_glx=yes
+      GNASH_PKG_FIND([libva_glx],
+        [va/va_glx.h],
+        [VA API (GLX display)],
+        vaGetDisplayGLX,
+        [], [-lva-glx]
+      )
+    fi
+  fi
+fi
+
+dnl libVA drivers. We declare conditional for both the option being
+dnl selected, as well as whether or not it's found. This we can
+dnl generate better error handling if it's not found.
+AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
+AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
+
+
+AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
+AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
+AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
+
 GNASH_DOCBOOK
 AM_CONDITIONAL(ENABLE_INFO, test x${INSTALL_INFO} != x)
 AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
@@ -2566,7 +2588,7 @@ fi
 
 dnl Define convienience constants so Gnash can print out the
 dnl default configuration of the build.
-RENDERER_CONFIG=${add_renderer}
+RENDERER_CONFIG="${renderer_list}"
 RENDERER_LIBS=
 for rend in `echo "${add_renderer}" | tr ',' ' '`; do
 	RENDERER_LIBS="${RENDERER_LIBS} \$(top_builddir)/librender/libgnash${rend}.la"
@@ -2575,6 +2597,8 @@ dnl echo "RENDERER_LIBS=$RENDERER_LIBS"
 AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 
+HWACCEL_CONFIG="${hwaccel_list}"
+AC_SUBST(HWACCEL_CONFIG)
 
 dnl check for missing libraries and disable them.
 if test x"$BOOST_LIBS" != x; then
@@ -2787,94 +2811,11 @@ dnl -- else
 dnl --   echo "        Loadable GUI & renderer disabled (default). Use --enable-dynamic-gui to enable."
 dnl -- fi
 
-if test x"${ghelp}" = x"yes"; then
-  echo "        GNOME help enabled"
-else
-  echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
-fi
-
-dnl if test x"${extensions}" = x"yes"; then
-dnl   echo "        Building extensions enabled (default). Use --disable-extensions to disable."
-dnl else
-dnl   echo "        Building Gnash extensions disabled."
-dnl fi
-
-if test x"${cygnal}" = x"yes"; then
-  echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
-else
-  echo "        Building Cygnal media server disabled."
-fi
-
-if test x"${debugger}" = x"yes"; then
-  echo "        Building Flash debugger support (default). Use --disable-debugger to disable."
-else
-  echo "        Building the Flash debugger is disabled."
-fi
-
-if test x"${with-top_level}" != x; then
-  echo "        Top level for cross compiling support files is: $with_top_level"
-fi
-
-if test x"${build_gtk}" = xyes -a x"${pixelformat}" = xrgb565; then
-  echo "        WARNING: Pixel format RGB565 selected in combination with the" >&4
-  echo "                 GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)." >&4
-fi
-
-if test x"${extensions_list}" != x; then
-  echo "        Building extensions: ${extensions_list}"
-fi
-
-if test x"${security_list}" != x; then
-  echo "        Enabling security features: ${security_list}"
-fi
-
-if test x"${hwaccel_list}" != xnone; then
-  echo "        Enabling hardware acceleration features: ${hwaccel_list}"
-fi
-
-if test x"${statistics_list}" != x; then
-  echo "        Enabling statistics collecting for: ${statistics_list}"
-fi
-
-if test x"${SUPPORTED_GUIS}" = x; then
-  AC_MSG_ERROR(no supported GUIs found);
-fi
-
-echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
-echo "        Renderers supported: ${renderer_list}"
-echo "        Media handler: "$media_handler
-if test x"${build_vaapi}" = x"yes"; then
-  echo "        Video Acceleration via libVA API support: yes"
-  if test x$use_libva_x11 = xyes; then
-    echo "        Video Acceleration via libVA X11 API support: yes"
-  else
-    echo "        Video Acceleration via libVA X11 API support: no"
-  fi
-  if test x$use_libva_glx = xyes; then
-    echo "        Video Acceleration via libVA OpenGL API support: yes"
-  else
-    echo "        Video Acceleration via libVA OpenGL API support: no"
-  fi
-else
-  echo "        Video Acceleration via libVA API support: no"
-fi
-echo "        Using ${add_sound} for sound handling"
-echo "        Using $with_shm mode for shared memory"
-echo ""
-echo "Configured paths for ${build} are:"
-
-if test x"$docbook" = x"yes"; then
-  echo '        DocBook document processing enabled (for "make html" and "make pdf")'
-  if test x"$docbook_styles" != x; then
-    echo "        Docbook styles sheets in $docbook_styles"
-  fi
-else
-  echo "        DocBook document processing disabled (default)"
-fi
-
 # set a variable if we shouldn't continue. This way we can print
 # out everything that is missing in one pass, hopefully making it
 # easy for new developers to get everything they need installed.
+
+echo "Configured paths for ${build} are:"
 
 dnl Dump QT3 options is the user specified a QT3 or KDE3 GUI
 if test x"${build_qt3}" = xyes; then
@@ -3772,6 +3713,77 @@ if test x$cross_compiling = xyes; then
       AC_MSG_NOTICE([This build is setup for cross compiling])
    fi
 fi
+
+echo "--------"
+dnl if test x"${ghelp}" = x"yes"; then
+dnl   echo "        GNOME help enabled"
+dnl else
+dnl   echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
+dnl fi
+
+dnl if test x"${extensions}" = x"yes"; then
+dnl   echo "        Building extensions enabled (default). Use --disable-extensions to disable."
+dnl else
+dnl   echo "        Building Gnash extensions disabled."
+dnl fi
+
+if test x"${cygnal}" = x"yes"; then
+  echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
+else
+  echo "        Building Cygnal media server disabled."
+fi
+
+if test x"${debugger}" = x"yes"; then
+  echo "        Building Flash debugger support (default). Use --disable-debugger to disable."
+else
+  echo "        Building the Flash debugger is disabled."
+fi
+
+if test x"${with-top_level}" != x; then
+  echo "        Top level for cross compiling support files is: $with_top_level"
+fi
+
+if test x"${build_gtk}" = xyes -a x"${pixelformat}" = xrgb565; then
+  echo "        WARNING: Pixel format RGB565 selected in combination with the" >&4
+  echo "                 GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)." >&4
+fi
+
+if test x"${extensions_list}" != x; then
+  echo "        Building extensions: ${extensions_list}"
+fi
+
+if test x"${security_list}" != x; then
+  echo "        Enabling security features: ${security_list}"
+fi
+
+if test x"${hwaccel_list}" != xnone; then
+  echo "        Enabling hardware acceleration features: ${hwaccel_list}"
+fi
+
+if test x"${statistics_list}" != x; then
+  echo "        Enabling statistics collecting for: ${statistics_list}"
+fi
+
+if test x"${SUPPORTED_GUIS}" = x; then
+  AC_MSG_ERROR(no supported GUIs found);
+fi
+
+echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
+echo "        Renderers supported: ${renderer_list}"
+echo "        Hardware Acceleration: ${hwaccel_list}"
+echo "        Media handler: "$media_handler
+echo "        Using ${add_sound} for sound handling"
+echo "        Using $with_shm mode for shared memory"
+
+if test x"$docbook" = x"yes"; then
+  echo '        DocBook document processing enabled (for "make html" and "make pdf")'
+  if test x"$docbook_styles" != x; then
+    echo "        Docbook styles sheets in $docbook_styles"
+  fi
+else
+  echo "        DocBook document processing disabled (default)"
+fi
+
 if test -s $cwarn; then
   echo ""
   cat $cwarn
@@ -3792,6 +3804,7 @@ fi
 if test x"$fork" = x"no"; then
   AC_MSG_ERROR([Currently only forking the standalone player works!])
 fi
+echo ""
 
 # Local Variables:
 # c-basic-offset: 2
