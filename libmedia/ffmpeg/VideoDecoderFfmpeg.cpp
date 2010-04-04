@@ -46,7 +46,7 @@ extern "C" {
 
 #include "FLVParser.h"
 
-#if USE_VAAPI
+#ifdef HAVE_VA_VA_H
 #  include "vaapi_utils.h"
 #  include "VideoDecoderFfmpegVaapi.h"
 #  include "GnashVaapiImage.h"
@@ -208,7 +208,7 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
     ctx->reget_buffer   = reget_buffer;
     ctx->release_buffer = release_buffer;
 
-#if USE_VAAPI
+#ifdef HAVE_VA_VA_H
     if (vaapi_is_enabled()) {
         VaapiContextFfmpeg *vactx = VaapiContextFfmpeg::create(codecId);
         if (vactx)
@@ -268,7 +268,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 
     std::auto_ptr<GnashImage> im;
 
-#if USE_VAAPI
+#ifdef HAVE_VA_VA_H
     VaapiContextFfmpeg * const vactx = get_vaapi_context(srcCtx);
     if (vactx) {
         VaapiSurfaceFfmpeg * const vaSurface = vaapi_get_surface(&srcFrameRef);
@@ -452,7 +452,7 @@ namespace {
 inline VaapiContextFfmpeg*
 get_vaapi_context(AVCodecContext* avctx)
 {
-#if USE_VAAPI	
+#ifdef HAVE_VA_VA_H
     return static_cast<VaapiContextFfmpeg *>(avctx->hwaccel_context);
 #else
     UNUSED(avctx);
@@ -463,7 +463,7 @@ get_vaapi_context(AVCodecContext* avctx)
 inline void
 set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx)
 {
-#if USE_VAAPI	
+#ifdef HAVE_VA_VA_H
     avctx->hwaccel_context = vactx;
 #else
     UNUSED(avctx), UNUSED(vactx);
@@ -474,7 +474,7 @@ set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx)
 inline void
 clear_vaapi_context(AVCodecContext* avctx)
 {
-#if USE_VAAPI
+#ifdef HAVE_VA_VA_H
     VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
     if (!vactx) return;
 
@@ -504,7 +504,7 @@ reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx)
 PixelFormat
 get_format(AVCodecContext* avctx, const PixelFormat* fmt)
 {
-#if USE_VAAPI
+#ifdef HAVE_VA_VA_H
     VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
 
     if (vactx) {
@@ -529,7 +529,7 @@ get_buffer(AVCodecContext* avctx, AVFrame* pic)
     VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
     if (!vactx) return avcodec_default_get_buffer(avctx, pic);
 
-#if USE_VAAPI
+#ifdef HAVE_VA_VA_H
     if (!vactx->initDecoder(avctx->width, avctx->height)) return -1;
 
     VaapiSurfaceFfmpeg * const surface = vactx->getSurface();
@@ -567,7 +567,7 @@ release_buffer(AVCodecContext *avctx, AVFrame *pic)
         return;
     }
 
-#if USE_VAAPI
+#ifdef HAVE_VA_VA_H
     VaapiSurfaceFfmpeg* const surface = vaapi_get_surface(pic);
     delete surface;
 

@@ -64,7 +64,7 @@ noinst_HEADERS = \
 	VaapiSurfaceProxy.h \
 	$(NULL)
 
-if USE_VAAPI_GLX
+if HAVE_VAAPI_GLX
 libgnashvaapi_la_CPPFLAGS += \
 	$(LIBVA_GLX_CFLAGS) \
 	$(NULL)

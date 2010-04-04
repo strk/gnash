@@ -128,7 +128,7 @@ AGG resources
 #include "GC.h"
 #include "cxform.h"
 
-#if USE_VAAPI
+#ifdef HAVE_VA_VA_H
 #include "GnashVaapiImage.h"
 #include "GnashVaapiImageProxy.h"
 #endif
@@ -773,7 +773,7 @@ public:
         path.line_to(d.x, d.y);
         path.line_to(a.x, a.y);
 
-#if USE_VAAPI
+#ifdef HAVE_VA_VA_H
         if (frame->location() == GNASH_IMAGE_GPU) {
             RenderImage image;
             image.reset(new GnashVaapiImageProxy(

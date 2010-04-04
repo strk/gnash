@@ -45,7 +45,7 @@
 #include <boost/utility.hpp>
 #include <boost/bind.hpp>
 
-#if USE_VAAPI_GLX
+#ifdef HAVE_VA_VA_GLX_H
 #  include "GnashVaapiImage.h"
 #  include "GnashVaapiTexture.h"
 #endif
@@ -693,7 +693,7 @@ public:
       case GNASH_IMAGE_CPU:
           frameFlags = 0;
           break;
-#if USE_VAAPI_GLX
+#ifdef HAVE_VA_VA_GLX_H
       case GNASH_IMAGE_GPU:
           frameFlags = GNASH_TEXTURE_VAAPI;
           break;
@@ -736,7 +736,7 @@ public:
               // This case should never be reached if vaapi is not
               // enabled; but has to be handled to keep the compiler
               // happy.
-#if USE_VAAPI_GLX
+#ifdef HAVE_VA_VA_GLX_H
               texture.reset(new GnashVaapiTexture(frame->width(),
                                                   frame->height(),
                                                   frame->type()));
@@ -781,7 +781,7 @@ public:
     case GNASH_IMAGE_CPU:
         texture->update(frame->data());
         break;
-#if USE_VAAPI_GLX
+#ifdef HAVE_VA_VA_GLX_H
     case GNASH_IMAGE_GPU:
         dynamic_cast<GnashVaapiTexture *>(texture.get())->update(dynamic_cast<GnashVaapiImage *>(frame)->surface());
         break;

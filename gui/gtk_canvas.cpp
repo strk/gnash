@@ -29,7 +29,7 @@
 #include "log.h"
 #include "gtk_glue.h"
 
-#ifdef USE_VAAPI
+#ifdef HAVE_VA_VA_H
 #include "vaapi_utils.h"
 #endif
 
@@ -232,7 +232,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
     while (!initialized_renderer) {
         renderer = next_renderer;
         hwaccel = next_hwaccel;
-#ifdef USE_VAAPI
+#ifdef HAVE_VA_VA_H
         // Global enable VA-API, if requested
         gnash::vaapi_set_is_enabled(hwaccel == "vaapi");
 #endif
@@ -265,7 +265,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         if (renderer == "agg") {
             // Use LibVva, which works on Nvidia, AT, or Intel 965 GPUs
             // with AGG or OpenGL.
-#ifdef USE_VAAPI
+#ifdef HAVE_VA_VA_H
             if (hwaccel == "vaapi") {
                 canvas->glue.reset(new gnash::GtkAggVaapiGlue);
                 // Set the hardware acclerator to the next one to try

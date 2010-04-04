@@ -24,7 +24,7 @@
 #include "log.h"
 #include "VaapiGlobalContext.h"
 #include "VaapiDisplayX11.h"
-#ifdef USE_VAAPI_GLX
+#ifdef HAVE_VA_VA_GLX_H
 #include "VaapiDisplayGLX.h"
 #endif
 #include "VaapiException.h"
@@ -137,7 +137,7 @@ VaapiGlobalContext *VaapiGlobalContext::get()
         std::auto_ptr<VaapiDisplay> dpy;
         /* XXX: this won't work with multiple renders built-in */
         try {
-#if USE_VAAPI_GLX
+#if HAVE_VA_VA_GLX_H
             dpy.reset(new VaapiDisplayGLX());
 #else
             dpy.reset(new VaapiDisplayX11());
