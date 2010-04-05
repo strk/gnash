@@ -468,8 +468,9 @@ KDE_NO_EXPORT bool KlashLiveConnectExtension::call
     if (!entry)
         return false;
     kdDebug () << "[01;35mentry[00m " << entry->name << endl;
-    for (unsigned int i = 0; i < args.size (); ++i)
+    for (unsigned int i = 0; i < args.size (); ++i) {
         kdDebug () << "      " << args[i] << endl;
+    }
     //Klash::View * view = static_cast <Klash::View*> (player->widget ());
     //if (!view)
     //    return false;
@@ -483,8 +484,9 @@ KDE_NO_EXPORT bool KlashLiveConnectExtension::call
         case play:
             if (args.size ()) {
                 KUrl url (args.first ());
-                if (player->allowRedir (url))
+                if (player->allowRedir (url)) {
                     ;//player->openNewUrl (url);
+                }
             } else
                 player->play ();
             rval = "true";
