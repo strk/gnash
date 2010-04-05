@@ -25,7 +25,6 @@
 #include <string>
 #include <iostream>
 #include <ios>
-#include <csignal>
 #include <boost/format.hpp>
 #ifdef ENABLE_NLS
 # include <clocale>
@@ -548,19 +547,10 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 
 }
 
-void
-quitGnash(int)
-{
-    globalQuit = true;
-}
-
 int
 gnash_main(int argc, char *argv[])
 {
     
-    // Handle sigterm gracefully.
-    signal(SIGTERM, quitGnash);
-
     std::ios::sync_with_stdio(false);
 
     gnash::Player player;
