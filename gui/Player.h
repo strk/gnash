@@ -37,9 +37,6 @@
 #include <boost/shared_ptr.hpp>
 #include <map>
 
-// Flag for signal handlers to allow Gnash to quit gracefully.
-extern bool globalQuit;
-
 // Forward declarations
 namespace gnash
 {
