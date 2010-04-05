@@ -2266,7 +2266,7 @@ fi
 AM_CONDITIONAL(HAVE_FLTK2, [ test x$has_fltk2 = xyes ])
 AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 
-if test x$build_agg = xyes; then
+if test x"${build_agg}" = xyes; then
    GNASH_PATH_AGG
 fi
 
@@ -2325,7 +2325,7 @@ AC_ARG_ENABLE(hwaccel,
 
 dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
 dnl restrict using HW Accel to using ffmpeg directly.
-if test x"${media_handler}" = x"gst" -a x"${build_vaapi}" = x"yes"; then
+if test x"${media_handler}" = x"gst" -a x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg_vaapi}" = x"yes"; then
   AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
 fi
 
