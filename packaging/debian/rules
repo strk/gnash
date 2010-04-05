@@ -78,12 +78,12 @@ BUILD_DIRECTORY = _build
 
 # Optionally build an OpenGL enabled package, AGG is the default
 ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
-	BUILD_FLAGS += --enable-renderer=ogl
+	BUILD_FLAGS += --with-renderer=ogl
 	BUILD_DIRECTORY = _build.ogl
 	BUILD_DEBUG = -opengl
 	BUILD_VERSION = $(MAIN_VERSION).ogl.$(BUILD_VERSION)
 else
-	BUILD_FLAGS += --enable-renderer=agg
+	BUILD_FLAGS += --with-renderer=all
 endif
 
 # Optionally build an ffmpeg enabled package, Gstreamer is the default
