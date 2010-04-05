@@ -71,6 +71,7 @@ AM_LDFLAGS = \
 	$(MING_LIBS) \
 	$(OPENGL_LIBS) \
 	$(GIF_LIBS) \
+	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 

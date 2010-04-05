@@ -80,7 +80,7 @@ extern "C" {
 # include <hildon/hildon.h>
 #endif
 
-#ifdef USE_VAAPI
+#ifdef HAVE_VA_VA_H
 extern VAStatus va_getDriverName(VADisplay dpy, char **driver_name);
 #endif
 
@@ -251,19 +251,20 @@ GtkGui::init(int argc, char **argv[])
         }
     }
 
-#ifdef USE_VAAPI_X
-    char *driver_name = NULL;
-    struct VADisplayContext *pDisplayContext = (struct VADisplayContext *)GDK_DISPLAY();
-    if (pDisplayContext->vaGetDriverName(pDisplayContext, &driver_name) == 0) {
-        if ((strcmp(driver_name, "nvidia" ) == 0) || (strcmp(driver_name, "vdpau" ) == 0) || (strcmp(driver_name, "s3g" ) == 0)) {
-            log_debug("found suppored vaapi driver for %s", driver_name);
+#ifdef HAVE_VA_VA_X11_H
+    if (hwaccel == "vaapi") {
+        char *driver_name = NULL;
+        struct VADisplayContext *pDisplayContext = (struct VADisplayContext *)GDK_DISPLAY();
+        if (pDisplayContext->vaGetDriverName(pDisplayContext, &driver_name) == 0) {
+            if ((strcmp(driver_name, "nvidia" ) == 0) || (strcmp(driver_name, "vdpau" ) == 0) || (strcmp(driver_name, "s3g" ) == 0)) {
+                log_debug("found supported vaapi driver for %s", driver_name);
+            } else {
+                log_error("No vaapi driver found for %s!", driver_name);
+            }
         } else {
-            log_error("No vaapi driver found for %s!", driver_name);
+            log_error("Coildn't get the VAAPI driver name!");
         }
-    } else {
-        log_error("Coildn't get the VAAPI driver name!");
     }
-
 #endif
 
 #ifdef BUILD_CANVAS
@@ -1891,6 +1892,8 @@ GtkGui::showAboutDialog()
 
     comments.append(_("\nRenderer: "));
     comments.append(RENDERER_CONFIG);
+    comments.append(_("\nHardwar Acceleration:: "));
+    comments.append(HWACCEL_CONFIG);
     comments.append(_("\nGUI: "));
     comments.append("GTK2"); // gtk of course!
     comments.append(_("\nMedia: "));

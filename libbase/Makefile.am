@@ -234,7 +234,7 @@ if BUILD_OGL_RENDERER
 	$(NULL)
 endif
 
-if USE_VAAPI
+if HAVE_VAAPI
    libgnashbase_la_SOURCES += \
 	GnashVaapiImage.cpp \
 	$(NULL)
@@ -244,7 +244,7 @@ if USE_VAAPI
 	GnashVaapiImageProxy.h \
 	$(NULL)
 
-if USE_VAAPI_GLX
+if HAVE_VAAPI_GLX
    libgnashbase_la_SOURCES += \
 	GnashVaapiTexture.cpp \
 	$(NULL)
@@ -254,7 +254,7 @@ if USE_VAAPI_GLX
 	$(NULL)
 endif
 
-if USE_VAAPI
+if HAVE_VAAPI
    libgnashbase_la_CPPFLAGS += \
 	-I$(top_srcdir)/libvaapi \
 	$(NULL)

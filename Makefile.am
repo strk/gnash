@@ -66,7 +66,7 @@ if LIBLTDL2
 LIBLTDLDIR = libltdl
 endif
 
-if USE_VAAPI
+if HAVE_VAAPI
 VAAPI_DIR = libvaapi
 endif
 
@@ -360,7 +360,8 @@ endif
 	@echo ""
 	@echo "Configurable options are:"
 	@echo "	Media handler: $(MEDIA_CONFIG)"
-	@echo "	Renderer engine: $(RENDERER_CONFIG)"
+	@echo "	Renderer engines: $(RENDERER_CONFIG)"
+	@echo "	Hardware Acceleration: $(HWACCEL_CONFIG)"
 
 if BUILD_SSL
 	@echo "	SSL_CFLAGS is $(SSL_CFLAGS)"
@@ -458,26 +459,6 @@ if USE_PYTHON
 	@echo "	PYTHON support enabled"
 else
 	@echo "	PYTHON support disabled"
-endif
-if BUILD_OMAP
-	@echo "	Hardware Acceleration support via OMAP enabled"
-else
-	@echo "	Hardware Acceleration support via OMAP disabled"
-if USE_VAAPI
-	@echo "	Hardware Acceleration support via libVA API enabled"
-else
-	@echo "	Hardware Acceleration support via libVA API disabled"
-endif
-if USE_VAAPI_X11
-	@echo "	Hardware Acceleration support via libVA X11 display enabled"
-else
-	@echo "	Hardware Acceleration support via libVA X11 display disabled"
-endif
-if USE_VAAPI_GLX
-	@echo "	Hardware Acceleration support via libVA OpenGL renderer enabled"
-else
-	@echo "	Hardware Acceleration support via libVA OpenGL renderer disabled"
-endif
 endif
 
 if TESTSUITE

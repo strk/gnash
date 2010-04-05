@@ -22,6 +22,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   backupCFLAGS="$CFLAGS"
   avcodec_h=""
   ffmpeg_top_incl=""
+  have_ffmpeg_vaapi="no"
 
   dnl If the user specify an path to include headers from, we assume it's the full
   dnl path to the header file, and not the top level path without the 'ffmpeg' node
@@ -260,10 +261,17 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
       dnl 51.46.0 (r10741) or higher required for CODEC_ID_NELLYMOSER
       AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to decode NELLYMOSER encoded audio: 51.46.0 (r10741) or higher required!])
     else
-      AC_DEFINE(FFMPEG_NELLYMOSER, 1, [Define if ffmpeg can decode NELLYMOSER audio.])
+      AC_DEFINE(FFMPEG_NELLYMOSER, 1, [Define if ffmpeg can decode NELLYMOSER audio])
+    fi
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -gt 524800; then
+      dnl 52.48.0 (r21285) or higher required for VAAPI support
+      have_ffmpeg_vaapi=yes
+      AC_DEFINE(FFMPEG_VAAPI, 1, [Define if ffmpeg supports VAAPI])
+    else
+      have_ffmpeg_vaapi=no
     fi
   else
-    AC_MSG_WARN([Could not check ffmpeg version (dunno where avcodec.h is)])
+    AC_MSG_WARN([Could not check ffmpeg version (can't find avcodec.h file)])
     # ffmpeg_version_check=ok # this is NOT ok, why would it be ?! 
   fi
 

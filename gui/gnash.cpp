@@ -181,22 +181,21 @@ static void
 build_options()
 {
     cout << _("Build options ") << VERSION << endl
-        << _("   Target: ") << TARGET_CONFIG << endl
-
-        << _("   Renderer: ") << RENDERER_CONFIG
-        << _(" - GUI: ") << GUI_CONFIG
-        << _(" - Media handler: ") << MEDIA_CONFIG << endl
+	 << _("   Renderers: ") << RENDERER_CONFIG << endl
+	 << _("   Hardware Acceleration: ") << HWACCEL_CONFIG << endl
+	 << _("   GUI: ") << GUI_CONFIG
+	 << _(" - Media handler: ") << MEDIA_CONFIG << endl
         
-        << _("   Configured with: ") << CONFIG_CONFIG << endl
-        << _("   CXXFLAGS: ") << CXXFLAGS << endl
-        << "   Version: "  << BRANCH_NICK << ":" << BRANCH_REVNO << endl;
-
+	 << _("   Configured with: ") << CONFIG_CONFIG << endl
+	 << _("   CXXFLAGS: ") << CXXFLAGS << endl
+	 << "   Version: "  << BRANCH_NICK << ":" << BRANCH_REVNO << endl;
+    
 #ifdef USE_FFMPEG
     cout << _("Built against ffmpeg version: ") << LIBAVCODEC_IDENT << endl;
 #endif
 #ifdef USE_GST
     cout << _("Built against gstreamer version: ") << GST_VERSION_MAJOR << "."
-        << GST_VERSION_MINOR << "." << GST_VERSION_MICRO << endl;
+	 << GST_VERSION_MINOR << "." << GST_VERSION_MICRO << endl;
     guint major, minor, micro, nano;
     gst_version(&major, &minor, &micro, &nano);
     cout << _("Linked against gstreamer version: ") << major << "."

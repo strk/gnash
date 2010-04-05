@@ -160,7 +160,7 @@ if USE_FFMPEG_ENGINE
 	$(FFMPEG_CFLAGS) \
 	$(NULL)
 
-if USE_VAAPI
+if HAVE_VAAPI
    libgnashmedia_la_SOURCES += \
 		ffmpeg/VideoDecoderFfmpegVaapi.cpp \
 		$(NULL)
@@ -215,11 +215,11 @@ endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
 
-if USE_VAAPI
    libgnashmedia_la_CPPFLAGS += \
 	-I$(top_srcdir)/libvaapi \
 	$(NULL)
 
+if HAVE_VAAPI
    libgnashmedia_la_LIBADD += \
 	$(top_builddir)/libvaapi/libgnashvaapi.la \
 	$(NULL)
