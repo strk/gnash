@@ -66,6 +66,12 @@ libgnashplugin_la_LIBADD   = \
 	$(GLIB_LIBS) \
 	$(NULL)
 
+# Scriptable plugin support
+if SCRIPTABLE
+noinst_HEADERS += pluginScriptObject.h
+libgnashplugin_la_SOURCES += pluginScriptObject.cpp
+endif
+
 if PLUGIN_LINK_UNDEFINED
 libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
 else
