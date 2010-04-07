@@ -283,6 +283,19 @@ if test x$avm2 = xyes; then
     AC_DEFINE(ENABLE_AVM2, [1], [Enable AVM2 code])
 fi
 
+AC_ARG_ENABLE(scriptable,
+  AC_HELP_STRING([--enable-scriptable], [Enable support for AS3]),
+  [case "${enableval}" in
+    yes) scriptable=yes ;;
+    no)  scriptable=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-scriptable option]) ;;
+  esac], scriptable=yes
+)
+AM_CONDITIONAL(SCRIPTABLE, [test x"$scriptable" = xyes])
+if test x$scriptable = xyes; then
+    AC_DEFINE(ENABLE_SCRIPTABLE, [1], [Enable scriptable code in plugin])
+fi
+
 dnl This option is only used if you want Gnash to interwork with 
 dnl the Adobe player using the LocalConnection class.
 dnl lckey=0xdd3adabd
