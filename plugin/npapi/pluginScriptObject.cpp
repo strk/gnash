@@ -45,6 +45,13 @@ static NPClass GnashPluginScriptObjectClass = {
 };
 
 // Constructor
+GnashPluginScriptObject::GnashPluginScriptObject()
+    : m_npp (0)
+{
+    // GnashLogDebug("GnashPluginScriptObject constructor");
+}
+
+// Constructor
 GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
     : m_npp (npp)
 {
