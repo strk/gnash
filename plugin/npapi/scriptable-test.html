@@ -21,11 +21,20 @@ function ShowVersion()
 {
   alert(embed.version);
 }
+
+function ShowFoobar(msg)
+{
+  alert(embed.showFoobar(msg));
+}
 </script>
 
 <br>
-<form name="formname">
+<form name="form1">
 <input type=button value="Show Version" onclick='ShowVersion()'>
+</form>
+<br>
+<form name="form">
+<input type=button value="Show Foobar" onclick='ShowFoobar("barfood")'>
 </form>
 
 </center>
