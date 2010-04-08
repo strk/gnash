@@ -57,7 +57,7 @@
 //  1: fatal errors (errors preventing the plugin from working as it should)
 //  2: informational messages
 //
-#define GNASH_PLUGIN_DEBUG 1
+#define GNASH_PLUGIN_DEBUG 2
 //#define WRITE_FILE
 
 #include "plugin.h" 
@@ -87,6 +87,10 @@
 #define PATH_MAX 1024
 #endif
 
+// For scriptable plugin support
+#ifdef ENABLE_SCRIPTABLE
+#include "pluginScriptObject.h"
+#endif
 extern NPNetscapeFuncs NPNFuncs;
 
 NPBool plugInitialized = FALSE;
@@ -95,8 +99,8 @@ static bool waitforgdb = false;
 static bool createSaLauncher = false;
 
 static const char* getPluginDescription();
-static void logDebug(const std::string& msg);
-static void logError(const std::string& msg);
+void GnashLogDebug(const std::string& msg);
+void GnashLogError(const std::string& msg);
 
 
 /// \brief Return the MIME Type description for this plugin.
@@ -120,11 +124,11 @@ NPError
 NS_PluginInitialize()
 {
     if ( plugInitialized ) {
-        logDebug("NS_PluginInitialize called, but ignored (we already initialized)");
+        GnashLogDebug("NS_PluginInitialize called, but ignored (we already initialized)");
         return NPERR_NO_ERROR;
     }
 
-    logDebug("NS_PluginInitialize call ---------------------------------------------------");
+    GnashLogDebug("NS_PluginInitialize call ---------------------------------------------------");
 
     /* Browser Functionality Checks */
 
@@ -137,16 +141,14 @@ NS_PluginInitialize()
     XEmbed is not found.
     */    
     
-    err = NPN_GetValue(NULL,
-                NPNVSupportsXEmbedBool,
-                (void *)&supportsXEmbed);
-
+    err = NPN_GetValue(NULL,NPNVSupportsXEmbedBool,
+                       (void *)&supportsXEmbed);
 
     if (err != NPERR_NO_ERROR || !supportsXEmbed) {
-        logError("NPAPI ERROR: No xEmbed support in this browser!");
+        GnashLogError("NPAPI ERROR: No xEmbed support in this browser!");
         return NPERR_INCOMPATIBLE_VERSION_ERROR;
     } else {
-        logDebug("xEmbed supported in this browser");
+        GnashLogDebug("xEmbed supported in this browser");
     }
 
     // GTK is not strictly required, but we do use the Glib main event loop,
@@ -160,7 +162,7 @@ NS_PluginInitialize()
             " Have version " << (int)toolkit << std::endl;
 #endif
     } else {
-        logDebug("GTK2 supported in this browser");
+        GnashLogDebug("GTK2 supported in this browser");
     }
 
     /*
@@ -168,7 +170,7 @@ NS_PluginInitialize()
     */
     char* opts = std::getenv("GNASH_OPTIONS");
     if (opts != NULL) {
-        logDebug(std::string("GNASH_OPTIONS : ") + std::string(opts));
+        GnashLogDebug(std::string("GNASH_OPTIONS : ") + std::string(opts));
         
         // Should the plugin wait for gdb to be attached?
         if ( strstr(opts, "waitforgdb") ) {
@@ -213,7 +215,7 @@ NS_PluginInitialize()
     if ( putenv(gnashrc) ) {
         std::cout << "WARNING: NPAPI plugin could not append to the GNASHRC env variable" << std::endl;
     }
-    else logDebug(std::string("NOTE: NPAPI plugin set GNASHRC to ") + newGnashRc);
+    else GnashLogDebug(std::string("NOTE: NPAPI plugin set GNASHRC to ") + newGnashRc);
 
     /* Success */
 
@@ -254,36 +256,51 @@ NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
     NPError err = NPERR_NO_ERROR;
-
+    GnashLogDebug("nsPluginInstance::NS_PluginGetValue()");
+    
     switch (aVariable) {
-        case NPPVpluginNameString:
-            *static_cast<const char **> (aValue) = PLUGIN_NAME;
-            break;
-
-        // This becomes the description field you see below the opening
-        // text when you type about:plugins and in
-        // navigator.plugins["Shockwave Flash"].description, used in
-        // many flash version detection scripts.
-        case NPPVpluginDescriptionString:
-            *static_cast<const char **>(aValue) =
-                        getPluginDescription();
-            break;
-
-        case NPPVpluginNeedsXEmbed:
+      case NPPVpluginNameString:
+          *static_cast<const char **> (aValue) = PLUGIN_NAME;
+          break;
+          
+          // This becomes the description field you see below the opening
+          // text when you type about:plugins and in
+          // navigator.plugins["Shockwave Flash"].description, used in
+          // many flash version detection scripts.
+      case NPPVpluginDescriptionString:
+          *static_cast<const char **>(aValue) =
+              getPluginDescription();
+          break;
+          
+      case NPPVpluginNeedsXEmbed:
 #ifdef HAVE_GTK2
-            *static_cast<NPBool *>(aValue) = TRUE;
+          *static_cast<NPBool *>(aValue) = TRUE;
 #else
-            *static_cast<NPBool *>(aValue) = FALSE;
+          *static_cast<NPBool *>(aValue) = FALSE;
 #endif
-            break;
+          break;
+          
+#if 0
+// Scriptable plugin interface (for accessing from javascript)
+      case NPPVpluginScriptableNPObject:
+         GnashLogDebug("Trying to access variable from Javascript!");
+#ifdef ENABLE_SCRIPTABLE
+         {
+             NPObject *nobj = (NPObject *)new GnashPluginScriptObject();
+             // retval = (NPObject *)GnashPluginScriptObject(this->npp);
+             NPN_RetainObject(nobj);
+         }
+#endif
+          break;
+#endif
 
-        case NPPVpluginTimerInterval:
-
-        case NPPVpluginKeepLibraryInMemory:
-
-        default:
-            err = NPERR_INVALID_PARAM;
-            break;
+      case NPPVpluginTimerInterval:
+          
+      case NPPVpluginKeepLibraryInMemory:
+          
+      default:
+          err = NPERR_INVALID_PARAM;
+          break;
     }
     return err;
 }
@@ -329,8 +346,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _filefd(-1),
     _name()
 {
-    for (size_t i=0, n=data->argc; i<n; ++i)
-    {
+    for (size_t i=0, n=data->argc; i<n; ++i) {
         std::string name, val;
         gnash::StringNoCaseEqual noCaseCompare;
 
@@ -349,6 +365,9 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
         _params[name] = val;
     }
 
+#ifdef ENABLE_SCRIPTABLE
+    _scriptObject = NPNFuncs.createobject(_instance, GnashPluginScriptObject::marshalGetNPClass());
+#endif
 }
 
 gboolean
@@ -361,7 +380,7 @@ cleanup_childpid(gpointer data)
 
     if (rv <= 0) {
         // The child process has not exited; it may be deadlocked. Kill it.
-        logError("BUG: Child process is stuck. Killing it.");
+        GnashLogError("BUG: Child process is stuck. Killing it.");
 
         kill(*pid, SIGKILL);
         waitpid(*pid, &status, 0);
@@ -379,7 +398,7 @@ cleanup_childpid(gpointer data)
 /// \brief Destructor
 nsPluginInstance::~nsPluginInstance()
 {
-    logDebug("plugin instance destruction");
+    GnashLogDebug("plugin instance destruction");
 
     if ( _ichanWatchId ) {
         g_source_remove(_ichanWatchId);
@@ -417,7 +436,7 @@ NPBool
 nsPluginInstance::init(NPWindow* aWindow)
 {
     if(!aWindow) {
-        logError(std::string(__PRETTY_FUNCTION__) + " ERROR: Window handle was bogus!");
+        GnashLogError(std::string(__PRETTY_FUNCTION__) + " ERROR: Window handle was bogus!");
         return FALSE;
     } else {
 #if GNASH_PLUGIN_DEBUG > 1
@@ -441,7 +460,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 void
 nsPluginInstance::shut()
 {
-    logDebug("Gnash plugin shutting down");
+    GnashLogDebug("Gnash plugin shutting down");
 
     if (_streamfd != -1) {
         if (close(_streamfd) == -1) {
@@ -453,7 +472,7 @@ nsPluginInstance::shut()
 
     int ret = close(_controlfd);
     if (ret != 0) {
-        logDebug("Gnash plugin failed to close the control socket!");
+        GnashLogDebug("Gnash plugin failed to close the control socket!");
     }
 }
 /// \brief Set the window to be used to render in
@@ -467,7 +486,7 @@ NPError
 nsPluginInstance::SetWindow(NPWindow* aWindow)
 {
     if(!aWindow) {
-        logError(std::string(__FUNCTION__) + ": ERROR: Window handle was bogus!");
+        GnashLogError(std::string(__FUNCTION__) + ": ERROR: Window handle was bogus!");
         return NPERR_INVALID_PARAM;
 #if 0
     } else {
@@ -499,6 +518,18 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
+    GnashLogDebug("nsPluginInstance::GetValue()");
+
+    if (aVariable == NPPVpluginScriptableNPObject) {
+        if (_scriptObject) {
+            void **v = (void **)aValue;
+            NPNFuncs.retainobject(_scriptObject);
+            *v = _scriptObject;
+        } else {
+            GnashLogDebug("_scriptObject is not assigned");
+        }
+    }
+
     return NS_PluginGetValue(aVariable, aValue);
 }
 
@@ -512,6 +543,19 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 ///
 /// So this is where we parse the URL to get all the options passed in
 /// when invoking the plugin.
+void myfunc(void *param)
+{
+    GnashLogDebug("Here I am!!!\n");
+}
+
+void
+NPN_PluginThreadAsyncCall(NPP plugin, void (*func)(void *), void *userData)
+{
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) >= 20)
+    return (*NPNFuncs.pluginthreadasynccall)(plugin, func, userData);
+#endif
+}
+
 NPError
 nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
                             NPBool /*seekable*/, uint16_t* /*stype*/)
@@ -525,6 +569,9 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     }
     _swf_url = stream->url;
 
+    // call javascript
+    NPN_PluginThreadAsyncCall(_instance, myfunc, NULL);
+    
 #if GNASH_PLUGIN_DEBUG > 1
     std::cout << __FUNCTION__ << ": The full URL is " << _swf_url << std::endl;
 #endif
@@ -537,7 +584,7 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     fname = "/tmp/";
     fname += _swf_url.substr(start, end - start);
 
-    logDebug("The Flash movie name is: " + fname);
+    GnashLogDebug("The Flash movie name is: " + fname);
 
     _filefd = open(fname.c_str(),
             O_CREAT | O_WRONLY,
@@ -622,7 +669,7 @@ bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
     if ( cond & G_IO_HUP ) {
-        logDebug("Player request channel hang up");
+        GnashLogDebug("Player request channel hang up");
         // Returning false here will cause the "watch" to be removed. This watch
         // is the only reference held to the GIOChannel, so it will be
         // destroyed. We must make sure we don't attempt to destroy it again.
@@ -646,22 +693,22 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
         switch ( status ) {
             case G_IO_STATUS_ERROR:
-                logError(std::string("Error reading request line: ") + error->message);
+                GnashLogError(std::string("Error reading request line: ") + error->message);
 
                 g_error_free(error);
                 return false;
             case G_IO_STATUS_EOF:
-                logError(std::string("EOF (error: ") + error->message);
+                GnashLogError(std::string("EOF (error: ") + error->message);
                 return false;
             case G_IO_STATUS_AGAIN:
-                logError(std::string("Read again(error: ") + error->message);
+                GnashLogError(std::string("Read again(error: ") + error->message);
                 break;
             case G_IO_STATUS_NORMAL:
                 // process request
-                logDebug("Normal read: " + std::string(request));
+                GnashLogDebug("Normal read: " + std::string(request));
                 break;
             default:
-                logError("Abnormal status!");
+                GnashLogError("Abnormal status!");
                 return false;
             
         }
@@ -680,7 +727,7 @@ bool
 nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 {
     if ( linelen < 4 ) {
-        logError(std::string("Invalid player request (too short): ") +  buf);
+        GnashLogError(std::string("Invalid player request (too short): ") +  buf);
         return false;
     }
 
@@ -688,7 +735,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         char* target = buf + 4;
         if ( ! *target )
         {
-            logError("No target found after GET request");
+            GnashLogError("No target found after GET request");
             return false;
         }
         char* url = target;
@@ -697,7 +744,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             *url='\0';
             ++url;
         } else {
-            logError("No colon found after GETURL target string");
+            GnashLogError("No colon found after GETURL target string");
             return false;
         }
 
@@ -711,7 +758,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
     } else if ( ! std::strncmp(buf, "INVOKE ", 7) ) {
         char* command = buf + 7;
         if ( ! *command ) {
-            logError("No command found after INVOKE request");
+            GnashLogError("No command found after INVOKE request");
             return false;
         }
         char* arg = command;
@@ -720,7 +767,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             *arg='\0';
             ++arg;
         } else {
-            logError("No colon found after INVOKE command string");
+            GnashLogError("No colon found after INVOKE command string");
             return false;
         }
 
@@ -732,7 +779,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         // TODO: check if _self is a good target for this
         static const char* tgt = "_self";
 
-        logDebug("Calling NPN_GetURL(" + jsurl.str() + ", '" + std::string(tgt) + "');");
+        GnashLogDebug("Calling NPN_GetURL(" + jsurl.str() + ", '" + std::string(tgt) + "');");
 
         NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
         return true;
@@ -748,7 +795,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         }
         else
         {
-            logError("No colon found after getURL postdata string");
+            GnashLogError("No colon found after getURL postdata string");
             return false;
         }
         
@@ -758,7 +805,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             *url='\0';
             ++url;
         } else {
-            logError("No $ character found after getURL target string");
+            GnashLogError("No $ character found after getURL target string");
             return false;
         }
         
@@ -768,13 +815,13 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 
         return true;
     } else {
-        logError("Unknown player request: " + std::string(buf));
+        GnashLogError("Unknown player request: " + std::string(buf));
         return false;
     }
 }
 
 void
-logDebug(const std::string& msg)
+GnashLogDebug(const std::string& msg)
 {
 #if GNASH_PLUGIN_DEBUG > 1
     std::cout << msg << std::endl;
@@ -784,7 +831,7 @@ logDebug(const std::string& msg)
 }
 
 void
-logError(const std::string& msg)
+GnashLogError(const std::string& msg)
 {
 #ifdef GNASH_PLUGIN_DEBUG
     std::cout << msg << std::endl;
@@ -804,7 +851,7 @@ getGnashExecutable()
         procname = gnash_env;
         process_found = (0 == stat(procname.c_str(), &procstats));
         if (!process_found) {
-            logError("Invalid path to gnash executable: ");
+            GnashLogError("Invalid path to gnash executable: ");
             return "";
         }
     }
@@ -819,7 +866,7 @@ getGnashExecutable()
     }
 
     if (!process_found) {
-        logError(std::string("Unable to find Gnash in ") + GNASHBINDIR);
+        GnashLogError(std::string("Unable to find Gnash in ") + GNASHBINDIR);
         return "";
     }
 
@@ -845,7 +892,7 @@ create_standalone_launcher(const char* page_url, const std::string& swf_url,
     saLauncher.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
 
     if (!saLauncher) {
-        logError("Failed to open new file for standalone launcher: " + ss.str());
+        GnashLogError("Failed to open new file for standalone launcher: " + ss.str());
         return;
     }
 
@@ -878,7 +925,7 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
 
     std::string cmd = getGnashExecutable();
     if (cmd.empty()) {
-        logError("Failed to locate the Gnash executable!");
+        GnashLogError("Failed to locate the Gnash executable!");
         return arg_vec;
     }
     arg_vec.push_back(cmd);
@@ -888,7 +935,7 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
 
     const char* pageurl = getCurrentPageURL();
     if (!pageurl) {
-        logError("Could not get current page URL!");
+        GnashLogError("Could not get current page URL!");
     } else {
         arg_vec.push_back("-U");
         arg_vec.push_back(pageurl);
@@ -979,20 +1026,20 @@ nsPluginInstance::startProc()
     
     int ret = pipe(p2c_pipe);
     if (ret == -1) {
-        logError("ERROR: parent to child pipe() failed: " +
+        GnashLogError("ERROR: parent to child pipe() failed: " +
                  std::string(std::strerror(errno)));
     }
     _streamfd = p2c_pipe[1];
 
     ret = pipe(c2p_pipe);
     if (ret == -1) {
-        logError("ERROR: child to parent pipe() failed: " +
+        GnashLogError("ERROR: child to parent pipe() failed: " +
                  std::string(std::strerror(errno)));
     }
 
     ret = pipe(p2c_controlpipe);
     if (ret == -1) {
-        logError("ERROR: parent to child pipe() failed: " +
+        GnashLogError("ERROR: parent to child pipe() failed: " +
                  std::string(std::strerror(errno)));
     }
 
@@ -1004,7 +1051,7 @@ nsPluginInstance::startProc()
 
     std::vector<std::string> arg_vec = getCmdLine(c2p_pipe[1], p2c_controlpipe[0]);
     if (arg_vec.empty()) {
-        logError("Failed to obtain command line parameters.");
+        GnashLogError("Failed to obtain command line parameters.");
         return;
     }
 
@@ -1022,7 +1069,7 @@ nsPluginInstance::startProc()
 
     // If the fork failed, childpid is -1. So print out an error message.
     if (_childpid == -1) {
-        logError("ERROR: dup2() failed: " + std::string(strerror(errno)));
+        GnashLogError("ERROR: dup2() failed: " + std::string(strerror(errno)));
         return;
     }
 
@@ -1032,14 +1079,14 @@ nsPluginInstance::startProc()
         // we want to write to p2c pipe, so close read-fd0
         ret = close (p2c_pipe[0]);
         if (ret == -1) {
-            logError("ERROR: p2c_pipe[0] close() failed: " +
+            GnashLogError("ERROR: p2c_pipe[0] close() failed: " +
                      std::string(strerror(errno)));
         }
 
         // we want to read from c2p pipe, so close write-fd1
         ret = close (c2p_pipe[1]);
         if (ret == -1) {
-            logError("ERROR: c2p_pipe[1] close() failed: " + 
+            GnashLogError("ERROR: c2p_pipe[1] close() failed: " + 
                      std::string(strerror(errno)));
         }
 
@@ -1070,7 +1117,7 @@ nsPluginInstance::startProc()
     ret = dup2 (p2c_pipe[0], fileno(stdin));
     
     if (ret == -1) {
-        logError("ERROR: dup2() failed: " + std::string(strerror(errno)));
+        GnashLogError("ERROR: dup2() failed: " + std::string(strerror(errno)));
     }
 
     // Close all of the browser's file descriptors that we just inherited
@@ -1111,7 +1158,7 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(window);
 
     if (!NPVARIANT_IS_OBJECT(vDoc)) {
-        logError("Can't get window object");
+        GnashLogError("Can't get window object");
         return NULL;
     }
     
@@ -1123,7 +1170,7 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(npDoc);
 
     if (!NPVARIANT_IS_OBJECT(vLoc)) {
-        logError("Can't get window.location object");
+        GnashLogError("Can't get window.location object");
         return NULL;
     }
 
@@ -1135,7 +1182,7 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(npLoc);
 
     if (!NPVARIANT_IS_STRING(vProp)) {
-        logError("Can't get window.location.href object");
+        GnashLogError("Can't get window.location.href object");
         return NULL;
     }
 
@@ -1157,5 +1204,5 @@ getPluginDescription()
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
