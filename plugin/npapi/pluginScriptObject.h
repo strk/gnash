@@ -78,6 +78,7 @@ protected:
     void Deallocate();
     void Invalidate();
     bool HasMethod(NPIdentifier name);
+    bool AddMethod(NPIdentifier name, NPInvokeFunctionPtr func);
     bool Invoke(NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result);
     bool InvokeDefault(const NPVariant *args, uint32_t argCount, NPVariant *result);
     bool HasProperty(NPIdentifier name);
@@ -92,6 +93,7 @@ private:
     NPP _nppinstance;
 
     std::map<NPIdentifier, NPVariant *> _properties;
+    std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
 };
 
 #endif /* GNASH_PLUGIN_SCRIPT_OBJECT_H */

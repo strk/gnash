@@ -68,17 +68,18 @@ static const NPUTF8 *pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
 };
 #endif
 
-// NPVARIANT_IS_VOID()
-// NPVARIANT_IS_NULL()
-// NPVARIANT_IS_BOOLEAN()
-// NPVARIANT_IS_INT32()
-// NPVARIANT_IS_DOUBLE()
-// NPVARIANT_IS_STRING()
-// NPVARIANT_IS_OBJECT()
-        
-void testfunc(void *param)
-{
-    printf("TEST WORKS: %g!\n", *(double *)param);
+bool
+testfunc (NPObject *npobj, NPIdentifier name, const NPVariant *args,
+          uint32_t argCount, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    printf("TEST WORKS: \n");
+
+    // STRINGN_TO_NPVARIANT("Hello World!", 12, *result);
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
 }
 
 // Sets up the property and method identifier arrays used by the browser
@@ -112,7 +113,13 @@ GnashPluginScriptObject::initializeIdentifiers()
 #else
    STRINGN_TO_NPVARIANT("987.654", 7, *value);
 #endif
-   SetProperty(id, value);   
+   SetProperty(id, value);
+   
+   NPIdentifier fid = NPN_GetStringIdentifier("showFoobar");
+   NPInvokeFunctionPtr func = testfunc;
+   
+   AddMethod(fid, func);
+
 };
 
 // Constructor
@@ -173,72 +180,47 @@ GnashPluginScriptObject::marshalInvalidate (NPObject *npobj)
 }
 
 bool 
-GnashPluginScriptObject::marshalHasMethod (NPObject */* npobj */, NPIdentifier name)
+GnashPluginScriptObject::marshalHasMethod (NPObject *npobj, NPIdentifier name)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    // GnashLogDebug(__PRETTY_FUNCTION__);
 
-//    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
+#if 0
     printf("Checking for Method: ");
     if (NPN_IdentifierIsString(name)) {
         printf("%s\n", NPN_UTF8FromIdentifier(name));
     } else {
         printf("%d\n", NPN_IntFromIdentifier(name));
     }
+#endif
     
-    // int i;
-    // for (i = 0; i < NUM_METHOD_IDENTIFIERS; i++) {
-    //     if (name == pluginMethodIdentifiers[i]) {
-    //         printf("FOUND method: %s: \n", pluginMethodIdentifierNames [i]);
-    //        return true;
-    //     }
-    // }
-
-    // printf("Couldn't find method for %d\n", i);
-    
-    return false;
+    return gpso->HasMethod(name);
 }
 
 bool 
-GnashPluginScriptObject::marshalInvoke (NPObject */* npobj */, NPIdentifier name,
-                                        const NPVariant */* args */, uint32_t /* argCount */,
-                                        NPVariant */* result */)
+GnashPluginScriptObject::marshalInvoke (NPObject *npobj, NPIdentifier name,
+                                        const NPVariant *args, uint32_t argCount,
+                                        NPVariant *result)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    printf("Invoking Method: ");
-    if (NPN_IdentifierIsString(name)) {
-        printf("%s\n", NPN_UTF8FromIdentifier(name));
-    } else {
-        printf("%d\n", NPN_IntFromIdentifier(name));
-    }    
-
-    // int i;
-    // for (i = 0; i < NUM_METHOD_IDENTIFIERS; i++) {
-    //     if (name == pluginMethodIdentifiers[i]) {
-    //         printf("FOUND method: ");
-    //         if (NPN_IdentifierIsString(name)) {
-    //             printf("%s\n", NPN_UTF8FromIdentifier(name));
-    //         } else {
-    //             printf("%d\n", NPN_IntFromIdentifier(name));
-    //         }
-    //         return true;
-    //     }
-    // }
+    // GnashLogDebug(__PRETTY_FUNCTION__);
     
-    // printf("Couldn't find method for %d\n", i);    
-
-    return false;
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+    
+    return gpso->Invoke(name, args, argCount, result);
 }
 
 bool 
-GnashPluginScriptObject::marshalInvokeDefault (NPObject */* npobj */,
-                                               const NPVariant */* args */,
-                                               uint32_t /* argCount */,
-                                               NPVariant */* result */)
+GnashPluginScriptObject::marshalInvokeDefault (NPObject *npobj,
+                                               const NPVariant *args,
+                                               uint32_t argCount,
+                                               NPVariant *result)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    // GnashLogDebug(__PRETTY_FUNCTION__);
 
-    return false;
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+    
+    return gpso->InvokeDefault(args, argCount, result);
 }
 
 bool 
@@ -359,7 +341,7 @@ GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
 bool
 GnashPluginScriptObject::SetProperty(NPIdentifier name, const NPVariant *value)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    // GnashLogDebug(__PRETTY_FUNCTION__);
 
     _properties[name] = const_cast<NPVariant *>(value);
 
@@ -369,7 +351,7 @@ GnashPluginScriptObject::SetProperty(NPIdentifier name, const NPVariant *value)
 bool
 GnashPluginScriptObject::RemoveProperty(NPIdentifier name)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    // GnashLogDebug(__PRETTY_FUNCTION__);
 
     std::map<NPIdentifier, NPVariant *>::iterator it;
     it = _properties.find(name);
@@ -379,6 +361,88 @@ GnashPluginScriptObject::RemoveProperty(NPIdentifier name)
     }    
     
     return false;
+}
+
+bool
+GnashPluginScriptObject::HasMethod(NPIdentifier name)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+
+#if 0
+    printf("Checking for Method \"");
+    if (NPN_IdentifierIsString(name)) {
+        printf("%s\"...", NPN_UTF8FromIdentifier(name));
+    } else {
+        printf("%d\"...", NPN_IntFromIdentifier(name));
+    }
+#endif
+
+    std::map<NPIdentifier, NPInvokeFunctionPtr>::iterator it;
+    it = _methods.find(name);
+    if (it != _methods.end()) {
+        // printf(" FOUND\n");
+        return true;
+    }    
+    
+    return false;
+}
+
+bool
+GnashPluginScriptObject::Invoke(NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+#if 1
+    printf("Invoking Method \"");
+    if (NPN_IdentifierIsString(name)) {
+        printf("%s\"...", NPN_UTF8FromIdentifier(name));
+    } else {
+        printf("%d\"...", NPN_IntFromIdentifier(name));
+    }
+#endif
+
+    std::map<NPIdentifier, NPInvokeFunctionPtr>::iterator it;
+    it = _methods.find(name);
+    if (it != _methods.end()) {
+        printf(" FOUND\n");
+        NPInvokeFunctionPtr func = it->second;
+        return func(NULL, name, args, argCount, result);
+    }    
+
+    return false;
+}
+
+bool
+GnashPluginScriptObject::InvokeDefault(const NPVariant *args, uint32_t argCount, NPVariant *result)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+#if 0
+    printf("Invoking Default Method \"");
+    if (NPN_IdentifierIsString(name)) {
+        printf("%s\"...\n", NPN_UTF8FromIdentifier(name));
+    } else {
+        printf("%d\"...\n", NPN_IntFromIdentifier(name));
+    }
+#endif
+
+    return false;
+}
+
+bool
+GnashPluginScriptObject::AddMethod(NPIdentifier name, NPInvokeFunctionPtr func)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+#if 1
+    printf("Adding Method \"");
+    if (NPN_IdentifierIsString(name)) {
+        printf("%s\"...\n", NPN_UTF8FromIdentifier(name));
+    } else {
+        printf("%d\"...\n", NPN_IntFromIdentifier(name));
+    }
+#endif
+
+    _methods[name] = func;
+    
+    return true;
 }
 
 // local Variables:
