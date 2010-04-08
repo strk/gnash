@@ -256,8 +256,7 @@ NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
     NPError err = NPERR_NO_ERROR;
-    GnashLogDebug("nsPluginInstance::NS_PluginGetValue()");
-    
+
     switch (aVariable) {
       case NPPVpluginNameString:
           *static_cast<const char **> (aValue) = PLUGIN_NAME;
@@ -268,8 +267,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
           // navigator.plugins["Shockwave Flash"].description, used in
           // many flash version detection scripts.
       case NPPVpluginDescriptionString:
-          *static_cast<const char **>(aValue) =
-              getPluginDescription();
+          *static_cast<const char **>(aValue) = getPluginDescription();
           break;
           
       case NPPVpluginNeedsXEmbed:
@@ -279,20 +277,6 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
           *static_cast<NPBool *>(aValue) = FALSE;
 #endif
           break;
-          
-#if 0
-// Scriptable plugin interface (for accessing from javascript)
-      case NPPVpluginScriptableNPObject:
-         GnashLogDebug("Trying to access variable from Javascript!");
-#ifdef ENABLE_SCRIPTABLE
-         {
-             NPObject *nobj = (NPObject *)new GnashPluginScriptObject();
-             // retval = (NPObject *)GnashPluginScriptObject(this->npp);
-             NPN_RetainObject(nobj);
-         }
-#endif
-          break;
-#endif
 
       case NPPVpluginTimerInterval:
           
@@ -312,7 +296,9 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
-    if(!aCreateDataStruct) return NULL;
+    if(!aCreateDataStruct) {
+        return NULL;
+    }
 
     return new nsPluginInstance(aCreateDataStruct);
 }
@@ -518,8 +504,6 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
-    GnashLogDebug("nsPluginInstance::GetValue()");
-
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
@@ -571,6 +555,8 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
 
     // call javascript
     NPN_PluginThreadAsyncCall(_instance, myfunc, NULL);
+
+    printf("FIXME: %s", getEmbedURL());
     
 #if GNASH_PLUGIN_DEBUG > 1
     std::cout << __FUNCTION__ << ": The full URL is " << _swf_url << std::endl;
@@ -932,7 +918,7 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
 
     arg_vec.push_back("-u");
     arg_vec.push_back(_swf_url);
-
+    
     const char* pageurl = getCurrentPageURL();
     if (!pageurl) {
         GnashLogError("Could not get current page URL!");
@@ -1183,6 +1169,54 @@ nsPluginInstance::getCurrentPageURL() const
 
     if (!NPVARIANT_IS_STRING(vProp)) {
         GnashLogError("Can't get window.location.href object");
+        return NULL;
+    }
+
+    const NPString& propValue = NPVARIANT_TO_STRING(vProp);
+
+    return propValue.UTF8Characters; // const char *
+}
+
+const char*
+nsPluginInstance::getEmbedURL() const
+{
+    NPP npp = _instance;
+
+    NPIdentifier sDocument = NPN_GetStringIdentifier("document");
+
+    NPObject *window;
+    NPN_GetValue(npp, NPNVWindowNPObject, &window);
+
+    NPVariant vDoc;
+    NPN_GetProperty(npp, window, sDocument, &vDoc);
+    NPN_ReleaseObject(window);
+
+    if (!NPVARIANT_IS_OBJECT(vDoc)) {
+        GnashLogError("Can't get document object");
+        return NULL;
+    }
+    
+    NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
+
+    NPIdentifier sLocation = NPN_GetStringIdentifier("yt");
+    NPVariant vLoc;
+    NPN_GetProperty(npp, npDoc, sLocation, &vLoc);
+    NPN_ReleaseObject(npDoc);
+
+    if (!NPVARIANT_IS_OBJECT(vLoc)) {
+        GnashLogError("Can't get document.yt object");
+        return NULL;
+    }
+
+    NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
+
+    NPIdentifier sProperty = NPN_GetStringIdentifier("config_");
+    NPVariant vProp;
+    NPN_GetProperty(npp, npLoc, sProperty, &vProp);
+    NPN_ReleaseObject(npLoc);
+
+    if (!NPVARIANT_IS_STRING(vProp)) {
+        GnashLogError("Can't get document.yt.config_ object");
         return NULL;
     }
 

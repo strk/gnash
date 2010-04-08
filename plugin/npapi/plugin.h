@@ -73,6 +73,7 @@ public:
     int32_t Write(NPStream *stream, int32_t offset, int32_t len, void *buffer);
 #ifdef ENABLE_SCRIPTABLE
     NPObject *getScriptableObject();
+    const char *getEmbedURL() const;
 #endif
     
 private:

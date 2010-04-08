@@ -35,8 +35,10 @@
 //    Support the methods listed in
 //    http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_03.html
 
-#ifndef GNASH_PLUGIN_SCRITP_OBJECT_H
-#define GNASH_PLUGIN_SCRITP_OBJECT_H
+#ifndef GNASH_PLUGIN_SCRIPT_OBJECT_H
+#define GNASH_PLUGIN_SCRIPT_OBJECT_H
+
+#include <map>
 
 #include "npapi.h"
 #include "npruntime.h"
@@ -47,50 +49,52 @@ public:
 
     GnashPluginScriptObject();
     GnashPluginScriptObject(NPP npp);
-
     ~GnashPluginScriptObject();
-
-    // Marshal Functions
+    
     static NPClass *marshalGetNPClass();
 
+    // NPObject static Functions. These get used by the browser, which is
+    // why they have to be static.
     static NPObject *marshalAllocate (NPP npp, NPClass *aClass);
-
     static void marshalDeallocate (NPObject *npobj);
-
     static void marshalInvalidate (NPObject *npobj);
-
     static bool marshalHasMethod (NPObject *npobj, NPIdentifier name);
-
-    static bool marshalInvoke (NPObject *npobj, 
-                               NPIdentifier name,
-                               const NPVariant *args, 
-                               uint32_t argCount,
+    static bool marshalInvoke (NPObject *npobj, NPIdentifier name,
+                               const NPVariant *args, uint32_t argCount,
                                NPVariant *result);
-
-    static bool marshalInvokeDefault (NPObject *npobj,
-                                      const NPVariant *args,
-                                      uint32_t argCount,
-                                      NPVariant *result);
-
+    static bool marshalInvokeDefault (NPObject *npobj, const NPVariant *args,
+                                      uint32_t argCount, NPVariant *result);
     static bool marshalHasProperty (NPObject *npobj, NPIdentifier name);
-
     static bool marshalGetProperty (NPObject *npobj, NPIdentifier name,
                                     NPVariant *result);
-
     static bool marshalSetProperty (NPObject *npobj, NPIdentifier name,
                                     const NPVariant *value);
-
     static bool marshalRemoveProperty (NPObject *npobj, NPIdentifier name);
-
+    
+    static NPClass _npclass;
+    
+protected:
+    // Internal functions
+    void Deallocate();
+    void Invalidate();
+    bool HasMethod(NPIdentifier name);
+    bool Invoke(NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result);
+    bool InvokeDefault(const NPVariant *args, uint32_t argCount, NPVariant *result);
+    bool HasProperty(NPIdentifier name);
+    bool GetProperty(NPIdentifier name, NPVariant *result);
+    bool SetProperty(NPIdentifier name, const NPVariant *value);
+    bool RemoveProperty(NPIdentifier name);
+    bool Enumerate(NPIdentifier **identifier, uint32_t *count);
+    bool Construct(const NPVariant *args, uint32_t argCount, NPVariant *result);
 private:
+    void initializeIdentifiers();
+    // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
+    NPP _nppinstance;
 
-    // m_npp->pdata should be the nsPluginInstance once NPP_New() is finished.
-    NPP m_npp;
-
-
+    std::map<NPIdentifier, NPVariant *> _properties;
 };
 
-#endif /* GNASH_PLUGIN_SCRITP_OBJECT_H */
+#endif /* GNASH_PLUGIN_SCRIPT_OBJECT_H */
 
 // local Variables:
 // mode: C++
