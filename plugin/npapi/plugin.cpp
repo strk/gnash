@@ -556,7 +556,7 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     // call javascript
     NPN_PluginThreadAsyncCall(_instance, myfunc, NULL);
 
-    printf("FIXME: %s", getEmbedURL());
+//    printf("FIXME: %s", getEmbedURL());
     
 #if GNASH_PLUGIN_DEBUG > 1
     std::cout << __FUNCTION__ << ": The full URL is " << _swf_url << std::endl;

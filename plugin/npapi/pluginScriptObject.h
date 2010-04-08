@@ -74,11 +74,16 @@ public:
     static NPClass _npclass;
     
 protected:
+    bool AddMethod(NPIdentifier name, NPInvokeFunctionPtr func);
+    void AddProperty(const std::string &name, const std::string &str);
+    void AddProperty(const std::string &name, double num);
+    void AddProperty(const std::string &name, int num);
+
     // Internal functions
     void Deallocate();
     void Invalidate();
     bool HasMethod(NPIdentifier name);
-    bool AddMethod(NPIdentifier name, NPInvokeFunctionPtr func);
+
     bool Invoke(NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result);
     bool InvokeDefault(const NPVariant *args, uint32_t argCount, NPVariant *result);
     bool HasProperty(NPIdentifier name);

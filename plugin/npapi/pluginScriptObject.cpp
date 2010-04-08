@@ -52,12 +52,6 @@ static NPClass GnashPluginScriptObjectClass = {
 };
 
 #if 0
-#define NUM_PROPERTY_IDENTIFIERS   2
-static NPIdentifier pluginPropertyIdentifiers[NUM_PROPERTY_IDENTIFIERS];
-static const NPUTF8 *pluginPropertyIdentifierNames[NUM_PROPERTY_IDENTIFIERS] = {
-   "version",
-   "url"
-};
 
 #define NUM_METHOD_IDENTIFIERS       3
 static NPIdentifier pluginMethodIdentifiers[NUM_METHOD_IDENTIFIERS];
@@ -69,17 +63,45 @@ static const NPUTF8 *pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
 #endif
 
 bool
-testfunc (NPObject *npobj, NPIdentifier name, const NPVariant *args,
-          uint32_t argCount, NPVariant *result)
+testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
     
-    printf("TEST WORKS: \n");
-
-    // STRINGN_TO_NPVARIANT("Hello World!", 12, *result);
     DOUBLE_TO_NPVARIANT(122333.4444, *result);
     
     return true;
+}
+
+void
+GnashPluginScriptObject::AddProperty(const std::string &name,
+                                     const std::string &str)
+{
+    NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
+    NPVariant *value = new NPVariant;
+    int length = str.size();;
+    char *bar = new char[length+1];
+    std::copy(str.begin(), str.end(), bar);
+    STRINGN_TO_NPVARIANT(bar, length, *value);
+    SetProperty(id, value);
+}
+
+void
+GnashPluginScriptObject::AddProperty(const std::string &name, double num)
+{
+    NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
+    NPVariant *value = new NPVariant;
+    DOUBLE_TO_NPVARIANT(num, *value);
+    SetProperty(id, value);
+}
+
+void
+GnashPluginScriptObject::AddProperty(const std::string &name, int num)
+{
+    NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
+    NPVariant *value = new NPVariant;
+    INT32_TO_NPVARIANT(num, *value);
+    SetProperty(id, value);
 }
 
 // Sets up the property and method identifier arrays used by the browser
@@ -88,32 +110,83 @@ void
 GnashPluginScriptObject::initializeIdentifiers()
 {
     GnashLogDebug("initializeIdentifiers");
-    // const NPUTF8 **names;
-    // int32_t nameCount;
-    // NPNFuncs.getstringidentifiers(names, nameCount, identifiers);
+
+    AddProperty("src", "example");
+    AddProperty("align", "middle");
+    AddProperty("quality", "high");
+    AddProperty("bgcolor", "#FFFFFF");
+    AddProperty("allowScriptAccess", "sameDomain");
+    AddProperty("type", "application/x-shockwave-flash");
+    AddProperty("codebase", "http://www.getgnash.org");
+    AddProperty("pluginspage", "http://www.getgnash.org");
+
+    AddProperty("classid", "unneeded for free software");
+    AddProperty("movie", "unknown");
+    AddProperty("id", "id unknown");
+    AddProperty("width", 0);
+    AddProperty("height", 0);
+    AddProperty("vspace", 0);
+    AddProperty("hspace", 0);
+    AddProperty("class", "class unknown");
+    AddProperty("title", "title unknown");
+    AddProperty("accesskey", 0);
+    AddProperty("name", "name unknown");
+    AddProperty("tabindex", 8);
+    AddProperty("FlashVars", "flashVars unknown");
+
+    // Javascript and flash events
+    AddProperty("onafterupdate", "unknown");
+    AddProperty("onbeforeupdate", "unknown");
+    AddProperty("onblur", "unknown");
+    AddProperty("oncellchange", "unknown");
+    AddProperty("onclick", "unknown");
+    AddProperty("ondblClick", "unknown");
+    AddProperty("ondrag", "unknown");
+    AddProperty("ondragend", "unknown");
+    AddProperty("ondragenter", "unknown");
+    AddProperty("ondragleave", "unknown");
+    AddProperty("ondragover", "unknown");
+    AddProperty("ondrop", "unknown");
+    AddProperty("onfinish", "unknown");
+    AddProperty("onfocus", "unknown");
+    AddProperty("onhelp", "unknown");
+    AddProperty("onmousedown", "unknown");
+    AddProperty("onmouseup", "unknown");
+    AddProperty("onmouseover", "unknown");
+    AddProperty("onmousemove", "unknown");
+    AddProperty("onmouseout", "unknown");
+    AddProperty("onkeypress", "unknown");
+    AddProperty("onkeydown", "unknown");
+    AddProperty("onkeyup", "unknown");
+    AddProperty("onload", "unknown");
+    AddProperty("onlosecapture", "unknown");
+    AddProperty("onpropertychange", "unknown");
+    AddProperty("onreadystatechange", "unknown");
+    AddProperty("onrowsdelete", "unknown");
+    AddProperty("onrowenter", "unknown");
+    AddProperty("onrowexit", "unknown");
+    AddProperty("onrowsinserted", "unknown");
+    AddProperty("onstart", "");
+    AddProperty("onscroll", "unknown");
+    AddProperty("onbeforeeditfocus", "unknown");
+    AddProperty("onactivate", "unknown");
+    AddProperty("onbeforedeactivate", "unknown");
+    AddProperty("ondeactivate", "unknown");
 
 #if 0
-   // fill the property identifier array
-   NPNFuncs.getstringidentifiers(pluginPropertyIdentifierNames, 
-                                 NUM_PROPERTY_IDENTIFIERS,
-                                 pluginPropertyIdentifiers);
-
+   for (int i = 0; i < NUM_METHOD_IDENTIFIERS; i++) {
+       SetProperty(pluginMethodIdentifiers[i], value);
+   }
+   
    // fill the method identifier array
    NPNFuncs.getstringidentifiers(pluginMethodIdentifierNames,
                                  NUM_METHOD_IDENTIFIERS,
                                  pluginMethodIdentifiers);
 #endif
-
    // We maintain an internal property for our version number, rather
    // than asking the player.
-   NPIdentifier id = NPN_GetStringIdentifier("version");
-   NPVariant *value = new NPVariant;
-#if 1
-   DOUBLE_TO_NPVARIANT(456.789, *value);
-#else
-   STRINGN_TO_NPVARIANT("987.654", 7, *value);
-#endif
-   SetProperty(id, value);
+   AddProperty("version", 456.789);
+   AddProperty("hello", "Hello World");
    
    NPIdentifier fid = NPN_GetStringIdentifier("showFoobar");
    NPInvokeFunctionPtr func = testfunc;
@@ -290,7 +363,7 @@ GnashPluginScriptObject::HasProperty(NPIdentifier name)
 bool
 GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+//    GnashLogDebug(__PRETTY_FUNCTION__);
 
     printf("Getting Property \"");
     if (NPN_IdentifierIsString(name)) {
@@ -366,7 +439,7 @@ GnashPluginScriptObject::RemoveProperty(NPIdentifier name)
 bool
 GnashPluginScriptObject::HasMethod(NPIdentifier name)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+//    GnashLogDebug(__PRETTY_FUNCTION__);
 
 #if 0
     printf("Checking for Method \"");
@@ -390,7 +463,7 @@ GnashPluginScriptObject::HasMethod(NPIdentifier name)
 bool
 GnashPluginScriptObject::Invoke(NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+//    GnashLogDebug(__PRETTY_FUNCTION__);
 #if 1
     printf("Invoking Method \"");
     if (NPN_IdentifierIsString(name)) {
@@ -430,8 +503,9 @@ GnashPluginScriptObject::InvokeDefault(const NPVariant *args, uint32_t argCount,
 bool
 GnashPluginScriptObject::AddMethod(NPIdentifier name, NPInvokeFunctionPtr func)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
-#if 1
+//    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+#if 0
     printf("Adding Method \"");
     if (NPN_IdentifierIsString(name)) {
         printf("%s\"...\n", NPN_UTF8FromIdentifier(name));
