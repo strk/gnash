@@ -1,0 +1,34 @@
+<HTML>
+<HEAD>
+<TITLE>Scriptable Plugin Test</TITLE>
+</HEAD>
+<BODY>
+
+<center>
+<h1> Scriptable Plugin </h1>
+</center>
+
+<br><br>
+
+<center>
+
+<embed type="application/x-shockwave-flash" width=1 height=1 hidden="true"><br>
+
+<script>
+var embed = document.embeds[0];
+
+function ShowVersion()
+{
+  alert(embed.version);
+}
+</script>
+
+<br>
+<form name="formname">
+<input type=button value="Show Version" onclick='ShowVersion()'>
+</form>
+
+</center>
+
+</BODY>
+</HTML>
