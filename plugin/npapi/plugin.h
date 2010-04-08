@@ -56,7 +56,7 @@ class nsPluginInstance : public nsPluginInstanceBase
 public:
     nsPluginInstance(nsPluginCreateData* );
     virtual ~nsPluginInstance();
-
+    
     // We are required to implement these three methods.
     NPBool init(NPWindow *aWindow);
     NPBool isInitialized() { return plugInitialized; }
@@ -71,7 +71,11 @@ public:
 
     int32_t WriteReady(NPStream *stream);
     int32_t Write(NPStream *stream, int32_t offset, int32_t len, void *buffer);
-
+#ifdef ENABLE_SCRIPTABLE
+    NPObject *getScriptableObject();
+    const char *getEmbedURL() const;
+#endif
+    
 private:
     void startProc();
     std::vector<std::string> getCmdLine(int hostfd, int controlfd);
@@ -113,13 +117,17 @@ private:
 
     /// Name of the plugin instance element in the dom 
     std::string                        _name;
-
+#ifdef ENABLE_SCRIPTABLE
+    NPObject                            *_scriptObject;
+#endif
+    
     const char* getCurrentPageURL() const;
 };
 
 // end of __PLUGIN_H__
 #endif
 
-// Local Variables:
+// local Variables:
 // mode: C++
+// indent-tabs-mode: nil
 // End:
