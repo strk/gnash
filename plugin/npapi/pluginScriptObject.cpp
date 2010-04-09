@@ -24,6 +24,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <string>
 
 #include "npapi.h"
 #include "npruntime.h"
@@ -48,22 +49,234 @@ static NPClass GnashPluginScriptObjectClass = {
     GnashPluginScriptObject::marshalHasProperty,
     GnashPluginScriptObject::marshalGetProperty,
     GnashPluginScriptObject::marshalSetProperty,
-    GnashPluginScriptObject::marshalRemoveProperty
+    GnashPluginScriptObject::marshalRemoveProperty,
+    GnashPluginScriptObject::marshalEnumerate,
+    GnashPluginScriptObject::marshalConstruct
 };
+
+// FIXME: The Flash variables should be changed in the standalone player,
+// but for now we're going to cheat and store them locally.
+std::map<std::string, NPVariant *> _variables;
 
 #if 0
 
-#define NUM_METHOD_IDENTIFIERS       3
+// From http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_03.html
+// var movie = window.document.movie
+
+#define NUM_METHOD_IDENTIFIERS       13
 static NPIdentifier pluginMethodIdentifiers[NUM_METHOD_IDENTIFIERS];
+// Standard Methods
 static const NPUTF8 *pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
-   "setVariable",
-   "getVariable",
-   "showFoobar"
+   "SetVariable",
+   "GetVariable",
+   "GotoFrame",
+   "IsPlaying",
+   "LoadMovie",
+   "Pan",
+   "PercentLoaded",
+   "Play",
+   "Rewind",
+   "SetZoomRect",
+   "StopPlay",
+   "Zoom",
+   "TotalFrames"
 };
+
+// http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_04.html
+// Tell Target Methods. Use TGetProperty, TGetPropertyAsNumber, TSetProperty
+TCallLabel
+TCurrentFrame
+TCurrentLabel
+TGetProperty
+TGetPropertyAsNumber
+TGotoFrame
+TGotoLabel
+TPlay
+TSetProperty
+TStopPlay
+
+// Target Properties
+X_POS
+Y_POS
+X_SCALE
+Y_SCALE
+CURRENT_FRAME                   // read-only
+TOTAL_FRAMES                    // read-only
+ALPHA
+VISIBLE
+WIDTH                           // read-only
+HEIGHT                          // read-only
+ROTATE
+TARGET                          // read-only
+FRAMES_LOADED                   // read-only
+NAME
+DROP_TARGET                     // read-only
+URL                             // read-only
+HIGH_QUALITY
+FOCUS_RECT
+SOUND_BUF_TIME
+
+// Standard Events
+OnProgress
+OnReadyStateChange
+FSCommand
 #endif
 
 bool
 testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+// Callbacks for the default methods
+bool
+SetVariableCallback (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
+          uint32_t argCount, NPVariant */* result */)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    std::string varname;
+    if (argCount == 2) {
+        varname = NPVARIANT_TO_STRING(args[0]).UTF8Characters;
+        NPVariant *value = const_cast<NPVariant *>(&args[1]);
+        // printf("Setting Variable \"%s\"\n", varname.c_str());
+        gpso->SetVariable(varname, value);
+        return true;
+    }
+    
+    return false;
+}
+
+bool
+GetVariableCallback (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+GotoFrame (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+IsPlaying (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+LoadMovie (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+Pan (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+PercentLoaded (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+Play (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+Rewind (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+SetZoomRect (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+StopPlay (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+Zoom (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */* args */,
+          uint32_t /* argCount */, NPVariant *result)
+{   
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    
+    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    
+    return true;
+}
+
+bool
+TotalFrames (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
           uint32_t /* argCount */, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
@@ -111,6 +324,8 @@ GnashPluginScriptObject::initializeIdentifiers()
 {
     GnashLogDebug("initializeIdentifiers");
 
+//    http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_04.html
+    
     AddProperty("src", "example");
     AddProperty("align", "middle");
     AddProperty("quality", "high");
@@ -120,7 +335,7 @@ GnashPluginScriptObject::initializeIdentifiers()
     AddProperty("codebase", "http://www.getgnash.org");
     AddProperty("pluginspage", "http://www.getgnash.org");
 
-    AddProperty("classid", "unneeded for free software");
+    AddProperty("classid", "2b70f2b1-fc72-4734-bb81-4eb2a7713e49");
     AddProperty("movie", "unknown");
     AddProperty("id", "id unknown");
     AddProperty("width", 0);
@@ -172,7 +387,7 @@ GnashPluginScriptObject::initializeIdentifiers()
     AddProperty("onactivate", "unknown");
     AddProperty("onbeforedeactivate", "unknown");
     AddProperty("ondeactivate", "unknown");
-
+    
 #if 0
    for (int i = 0; i < NUM_METHOD_IDENTIFIERS; i++) {
        SetProperty(pluginMethodIdentifiers[i], value);
@@ -188,11 +403,49 @@ GnashPluginScriptObject::initializeIdentifiers()
    AddProperty("version", 456.789);
    AddProperty("hello", "Hello World");
    
-   NPIdentifier fid = NPN_GetStringIdentifier("showFoobar");
-   NPInvokeFunctionPtr func = testfunc;
-   
-   AddMethod(fid, func);
+   NPIdentifier id = NPN_GetStringIdentifier("showFoobar");
+   NPInvokeFunctionPtr func = testfunc;   
+   AddMethod(id, func);
 
+   id = NPN_GetStringIdentifier("SetVariable");
+   AddMethod(id, SetVariableCallback);
+
+   id = NPN_GetStringIdentifier("GetVariable");
+   AddMethod(id, GetVariableCallback);
+
+   id = NPN_GetStringIdentifier("GotoFrame");
+   AddMethod(id, GotoFrame);
+
+   id = NPN_GetStringIdentifier("IsPlaying");
+   AddMethod(id, IsPlaying);
+
+   id = NPN_GetStringIdentifier("LoadMovie");
+   AddMethod(id, LoadMovie);
+
+   id = NPN_GetStringIdentifier("Pan");
+   AddMethod(id, Pan);
+
+   id = NPN_GetStringIdentifier("PercentLoaded");
+   AddMethod(id, PercentLoaded);
+
+   id = NPN_GetStringIdentifier("Play");
+   AddMethod(id, Play);
+
+   id = NPN_GetStringIdentifier("Rewind");
+   AddMethod(id, Rewind);
+
+   id = NPN_GetStringIdentifier("SetZoomRect");
+   AddMethod(id, SetZoomRect);
+
+   id = NPN_GetStringIdentifier("StopPlay");
+   AddMethod(id, StopPlay);
+
+   id = NPN_GetStringIdentifier("Zoom");
+   AddMethod(id, Zoom);
+
+   id = NPN_GetStringIdentifier("TotalFrames");
+   AddMethod(id, TotalFrames);
+   
 };
 
 // Constructor
@@ -244,10 +497,9 @@ GnashPluginScriptObject::marshalDeallocate (NPObject *npobj)
 }
 
 void 
-GnashPluginScriptObject::marshalInvalidate (NPObject *npobj)
+GnashPluginScriptObject::marshalInvalidate (NPObject */* npobj */)
 {
     GnashLogDebug(__PRETTY_FUNCTION__);
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
 //    gpso->Invalidate();
 }
@@ -336,6 +588,30 @@ GnashPluginScriptObject::marshalRemoveProperty (NPObject *npobj, NPIdentifier na
     return gpso->RemoveProperty(name);
 }
 
+bool 
+GnashPluginScriptObject::marshalEnumerate (NPObject *npobj, void***identifier,
+                                           uint32_t *count)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+    return gpso->Enumerate(identifier, count);
+
+    return false;
+}
+
+bool 
+GnashPluginScriptObject::marshalConstruct (NPObject *npobj, const NPVariant *data,
+                                  uint32_t count, NPVariant *result)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;    
+    return gpso->Construct(data, count, result);
+
+    return false;
+}
+
 bool
 GnashPluginScriptObject::HasProperty(NPIdentifier name)
 {
@@ -382,10 +658,10 @@ GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
         NPVariant *value = it->second;
         if (NPVARIANT_IS_DOUBLE(*value)) {
             double num = NPVARIANT_TO_DOUBLE(*value);
-            printf(" %g\n", num);
+            printf(" %g", num);
             DOUBLE_TO_NPVARIANT(num, *result);
         } else if (NPVARIANT_IS_STRING(*value)) {
-            printf(" %s\n", NPVARIANT_TO_STRING(*value).UTF8Characters);
+            printf(" %s", NPVARIANT_TO_STRING(*value).UTF8Characters);
             STRINGN_TO_NPVARIANT(NPVARIANT_TO_STRING(*value).UTF8Characters,
                                  NPVARIANT_TO_STRING(*value).UTF8Length,
                                  *result);
@@ -405,9 +681,11 @@ GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
             printf(" object\n");
             OBJECT_TO_NPVARIANT(NPVARIANT_TO_OBJECT(*value), *result);
         }
+        printf("\n");
         return true;
     }
 
+    printf("\n");
     return false;
 };
 
@@ -433,6 +711,23 @@ GnashPluginScriptObject::RemoveProperty(NPIdentifier name)
         return true;
     }    
     
+    return false;
+}
+
+bool
+GnashPluginScriptObject::Enumerate(NPIdentifier **/*identifier */, uint32_t */* count */)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+
+    return false;
+}
+
+bool
+GnashPluginScriptObject::Construct(const NPVariant */* args */, uint32_t /* argCount */,
+                                   NPVariant */* result */)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+
     return false;
 }
 
@@ -485,7 +780,8 @@ GnashPluginScriptObject::Invoke(NPIdentifier name, const NPVariant *args, uint32
 }
 
 bool
-GnashPluginScriptObject::InvokeDefault(const NPVariant *args, uint32_t argCount, NPVariant *result)
+GnashPluginScriptObject::InvokeDefault(const NPVariant */* args */,
+                          uint32_t /* argCount */, NPVariant */* result */)
 {
     GnashLogDebug(__PRETTY_FUNCTION__);
 #if 0
@@ -517,6 +813,33 @@ GnashPluginScriptObject::AddMethod(NPIdentifier name, NPInvokeFunctionPtr func)
     _methods[name] = func;
     
     return true;
+}
+
+void
+GnashPluginScriptObject::SetVariable(const std::string &name,
+                                     NPVariant *value)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+    printf("Set Variable \"%s\" to ", name.c_str());
+    
+#if 1
+    if (NPVARIANT_IS_STRING(*value)) {
+        std::string varname = NPVARIANT_TO_STRING(*value).UTF8Characters;
+        printf("%s\n", varname.c_str());
+    } else if (NPVARIANT_IS_DOUBLE(*value)) {
+        printf("%g\n", NPVARIANT_TO_DOUBLE(*value));
+    }
+#endif
+
+    _variables[name] = value;
+}
+
+NPVariant *
+GnashPluginScriptObject::GetVariable(const std::string &name)
+{
+    GnashLogDebug(__PRETTY_FUNCTION__);
+
+    return _variables[name];
 }
 
 // local Variables:
