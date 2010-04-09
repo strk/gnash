@@ -160,13 +160,30 @@ deb-edit-mozilla:
 # entry becomes the name of the source directory, the build directory, and
 # the packages. We do it this way so the snapshot matches the branch nickname
 # with the revision.
+# DIST is set in the environment when using pbuilder, so we use that so
+# our distribution matches the repoository. DIST is usually one of lenny,
+# squeeze, lucid, karmic, metad.
 deb-edit-changelog:
 	@echo "Editing debian/changelog for snapshot: $(BUILD_VERSION)"
-	@if test -e $(BUILD_DIR)/debian/changelog; then \
-	  mv -f $(BUILD_DIR)/debian/changelog $(BUILD_DIR)/debian/changelog.orig; \
-	  sed -e "s:trunk:$(BUILD_VERSION):" $(BUILD_DIR)/debian/changelog.orig > $(BUILD_DIR)/debian/changelog; \
+	if test x"$${DIST}" = x; then \
+	  if test -e /etc/lsb-release; then \
+            . /etc/lsb-release; \
+	    dist=$${DISTRIB_CODENAME}; \
+	  else \
+	    if test -x /usr/bin/lsb_release; then \
+	      dist=`lsb_release -d | cut -d ' ' -f 4 | sed -e "s:(::" -e "s:)::"`; \
+	    else \
+	      dist="lenny"; \
+	    fi; \
+	  fi; \
 	else \
-	  sed -e "s:trunk:$(BUILD_VERSION):" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
+	  dist=$(DIST); \
+	fi; \
+	if test -e $(BUILD_DIR)/debian/changelog; then \
+	  mv -f $(BUILD_DIR)/debian/changelog $(BUILD_DIR)/debian/changelog.orig; \
+	  sed -e "s:trunk:$(BUILD_VERSION):" -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
+	else \
+	  sed -e "s:trunk:$(BUILD_VERSION):"  -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
 	fi
 
 # Edit the configure scripts, so if somebody reconfigures from this tarball,

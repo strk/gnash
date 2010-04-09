@@ -517,6 +517,23 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
     return NS_PluginGetValue(aVariable, aValue);
 }
 
+#if 0
+// FIXME: debugging stuff, will be gone soon after I figure how this works
+void myfunc(void */* param */)
+{
+    GnashLogDebug("Here I am!!!\n");
+}
+
+// Call a JavaScript method from the plugin
+void
+NPN_PluginThreadAsyncCall(NPP plugin, void (*func)(void *), void *userData)
+{
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) >= 20)
+    return (*NPNFuncs.pluginthreadasynccall)(plugin, func, userData);
+#endif
+}
+#endif
+
 /// \brief Open a new data stream
 ///
 /// Opens a new incoming data stream, which is the flash movie we want
@@ -525,20 +542,6 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 /// http://www.shockwave.com/swf/navbar/navbar_sw.swf?atomfilms=http%3a//www.atomfilms.com/af/home/&shockwave=http%3a//www.shockwave.com&gameblast=http%3a//gameblast.shockwave.com/gb/gbHome.jsp&known=0
 /// ../flash/gui.swf?ip_addr=foobar.com&ip_port=3660&show_cursor=true&path_prefix=../flash/&trapallkeys=true"
 ///
-/// So this is where we parse the URL to get all the options passed in
-/// when invoking the plugin.
-void myfunc(void *param)
-{
-    GnashLogDebug("Here I am!!!\n");
-}
-
-void
-NPN_PluginThreadAsyncCall(NPP plugin, void (*func)(void *), void *userData)
-{
-#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) >= 20)
-    return (*NPNFuncs.pluginthreadasynccall)(plugin, func, userData);
-#endif
-}
 
 NPError
 nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
@@ -553,10 +556,12 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     }
     _swf_url = stream->url;
 
-    // call javascript
+#if 0
+    // FIXME: debugging crap for now call javascript
     NPN_PluginThreadAsyncCall(_instance, myfunc, NULL);
-
 //    printf("FIXME: %s", getEmbedURL());
+#endif
+    
     
 #if GNASH_PLUGIN_DEBUG > 1
     std::cout << __FUNCTION__ << ": The full URL is " << _swf_url << std::endl;

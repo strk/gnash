@@ -1,4 +1,4 @@
-gnash (trunk) unstable; urgency=low
+gnash (trunk) distro; urgency=low
 
   * local package, many tweaks to be more standards compliant.
     - Drop depend on gstreamer0.10-alsa, it is not needed as long as

@@ -121,7 +121,7 @@ endif
 # Optionally build an VA API enabled package, which is very experimental,
 # so it's not enabled by default.
 ifneq (,$(findstring vaapi,$(DEB_BUILD_OPTIONS)))
-	BUILD_FLAGS += --enable-media=ffmpeg --enable-vaapi
+	BUILD_FLAGS += --enable-media=ffmpeg
 	BUILD_DIRECTORY = _build.vaapi
 	BUILD_VERSION = $(MAIN_VERSION).vaapi.$(BUILD_VERSION)
 	BUILD_DEBUG = -vaapi
