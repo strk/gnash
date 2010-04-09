@@ -82,6 +82,10 @@ function ShowVersion()
 
 function ShowFoobar(msg)
 {
+        document.write(embed.SetVariable("foo", "bar") + "<br>");
+        document.write(embed.SetVariable("fuby", 1.1) + "<br>");
+        document.write(embed.GetVariable("foo") + "<br>");
+
 	alert(embed.showFoobar(msg));
 }
 </script>
