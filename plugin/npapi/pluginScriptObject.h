@@ -39,6 +39,7 @@
 #define GNASH_PLUGIN_SCRIPT_OBJECT_H
 
 #include <map>
+#include <string>
 
 #include "npapi.h"
 #include "npruntime.h"
@@ -70,8 +71,15 @@ public:
     static bool marshalSetProperty (NPObject *npobj, NPIdentifier name,
                                     const NPVariant *value);
     static bool marshalRemoveProperty (NPObject *npobj, NPIdentifier name);
+    static bool marshalEnumerate (NPObject *npobj, void***identifier,
+                                  uint32_t *count);
+    static bool marshalConstruct (NPObject *npobj, const NPVariant *data,
+                                  uint32_t count, NPVariant *result);
     
     static NPClass _npclass;
+
+    void SetVariable(const std::string &name, NPVariant *value);
+    NPVariant *GetVariable(const std::string &name);
     
 protected:
     bool AddMethod(NPIdentifier name, NPInvokeFunctionPtr func);
@@ -79,7 +87,7 @@ protected:
     void AddProperty(const std::string &name, double num);
     void AddProperty(const std::string &name, int num);
 
-    // Internal functions
+    // Internal functions for the API
     void Deallocate();
     void Invalidate();
     bool HasMethod(NPIdentifier name);
@@ -91,7 +99,7 @@ protected:
     bool SetProperty(NPIdentifier name, const NPVariant *value);
     bool RemoveProperty(NPIdentifier name);
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
-    bool Construct(const NPVariant *args, uint32_t argCount, NPVariant *result);
+    bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
 private:
     void initializeIdentifiers();
     // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.

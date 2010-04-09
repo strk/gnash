@@ -23,6 +23,7 @@
 
 #include <cstdlib> // getenv
 #include <stdlib.h> // putenv
+#include <sys/socket.h> // shutdown
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
@@ -456,9 +457,14 @@ nsPluginInstance::shut()
         }
     }
 
-    int ret = close(_controlfd);
-    if (ret != 0) {
-        GnashLogDebug("Gnash plugin failed to close the control socket!");
+    if (_controlfd != -1) {
+        if (shutdown(_controlfd, SHUT_RDWR) !=0) {
+            GnashLogError("Gnash plugin failed to shutdown the control socket!");
+        }
+
+        if (close(_controlfd) != 0) {
+            GnashLogError("Gnash plugin failed to close the control socket!");
+        }
     }
 }
 /// \brief Set the window to be used to render in
