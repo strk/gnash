@@ -3,28 +3,38 @@ running standalone, that supports the ExternalInterface ActionScript
 class. This is currently purely ASCII based, although it wouldn't be
 hard to change to a binary protocol. The bandwidth is minor, and XML
 would be overkill, so for now it's just text keywords, delimited by
-spaces.
+spaces. A CR is used to terminate each message.
 
-SetVariable( variableName, value )
-   Sets the value of the Flash variable specified by variableName to
-   the value specified by value. The argument type for both arguments
-   is string. 
+SetVariable( Name, Value )
+   Sets the value of the Flash variable specified by Name to
+   Value. The value is everything from the last delimiter to the end
+   of the line.
+   
+   Sends:
+	"Command Name Type value\n",
+		ie... "SetVariable var1 string value1\n"
+  Receives:
+	nothing
 
-	"Command Name Type Length value\n",
-		ie... "SetVariable var1 string 6 value1\n"
+GetVariable( Name )
+   Returns the value of the Flash variable specified by Name. Returns
+   null if the variable does not exist.
 
-GetVariable( varName )
-   Returns the value of the Flash variable specified by
-   varName. Returns null if the variable does not exist. The argument
-   type is string. 
-
+   Sends:
 	"Command Name\n", ie... "GetVariable var1\n"
+
+  Receives:
+	"Command Name Type value", ie... "GetVariable var1 string value1\n"
 
 PercentLoaded()
    Returns the percent of the Flash Player movie that has streamed
    into the browser so far; possible values are from 0 to 100. 
 
+   Sends:
 	"Command\n", ie... "PercentLoaded\n"
+
+  Receives:
+	"Command number\n", ie... "PercentLoaded 23\n"
 
 Zoom( percent )
    Zooms the view by a relative scale factor specified by percent.
@@ -32,7 +42,11 @@ Zoom( percent )
    reduces the size of objects in the view by one half. Zoom(0) resets
    the view to 100%.
 
+   Sends:
 	"Command number\n", ie... "Zoom 200\n"
+
+  Receives:
+	nothing
 
 GotoFrame( frameNumber )
    Activates the frame number specified by frameNumber in the current
@@ -42,22 +56,38 @@ GotoFrame( frameNumber )
    to determine if enough of the movie is available to execute the
    GotoFrame() method.
 
+   Sends:
 	"Command number\n", ie... "GotoFrame 77\n"
+
+  Receives:
+	nothing
 
 IsPlaying()
    Returns true if the movie is currently playing.
 
+   Sends:
 	"Command\n", ie... "IsPlaying\n"
+
+  Receives:
+	"Command Flag", ie... "IsPlaying true\n"
 
 movie.Play();
   Starts the movie playing.
 
+   Sends:
 	"Command\n", ie... "Play\n"
+
+  Receives:
+	nothing
 
 movie.Rewind();
   Goes to the first frame.
 
+   Sends:
 	"Command\n", ie... "Rewind\n"
+
+  Receives:
+	nothing
 
 SetZoomRect ( left, top, right, bottom )
    Zooms in on a rectangular area of the movie. The units of the
@@ -65,4 +95,9 @@ SetZoomRect ( left, top, right, bottom )
    rectangle in Flash, set the ruler units to Points and multiply the
    coordinates by 20 to get twips.
 
+   Sends:
 	"Command left top right bottom\n", ie... "SetZoomRect 0 0 10 10\n"
+
+  Receives:
+	nothing
+
