@@ -78,8 +78,27 @@ public:
     
     static NPClass _npclass;
 
-    void SetVariable(const std::string &name, NPVariant *value);
+    /// Scripting API support. This is where all the protocol support
+    /// lives.
+
+    //  The ControlFD is the file descriptor for the socket connection
+    // to the standalone player.
+    void setControlFD(int x);
+    int getControlFD();
+
+    /// Set a variable in the standalone player
+    bool SetVariable(const std::string &name, NPVariant *value);
+    
+    /// Get the value of a variable from the standalone player
     NPVariant *GetVariable(const std::string &name);
+
+    // Write to the standalone player over the control socket
+    int writePlayer(int fd, const char *data, size_t length);
+    int writePlayer(int fd, const std::string &data);
+    
+    // Read the standalone player over the control socket
+    int readPlayer(int fd, const char **data, size_t length);
+    int readPlayer(int fd, const std::string &data);
     
 protected:
     bool AddMethod(NPIdentifier name, NPInvokeFunctionPtr func);
@@ -102,9 +121,10 @@ protected:
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
 private:
     void initializeIdentifiers();
+    
     // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
     NPP _nppinstance;
-
+    
     std::map<NPIdentifier, NPVariant *> _properties;
     std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
 };
