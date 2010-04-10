@@ -93,62 +93,82 @@ function FlashGetVariable(name)
           alert(value);
 }
 
-function FlashGotoFrame()
+function FlashGotoFrame(num)
 {
-          alert("FlashGotoFrame");
+          embed.GotoFrame(num);
+//          document.write("GotoFrame<br>");
+//          alert(value);
 }
 
 function FlashIsPlaying()
 {
-          alert("FlashIsPlaying");
+          var value = embed.IsPlaying();
+//          document.write("IsPlaying() = " + value + "<br>");          
+          alert(value);
 }
 
-function FlashLoadMovie()
+function FlashLoadMovie(layer, name)
 {
-          alert("FlashLoadMovie");
+          embed.LoadMovie(layer, name);
+//          document.write("LoadMovie()<br>");
+//          alert("FlashLoadMovie");
 }
 
-function FlashPan()
+function FlashPan(x, y, mode)
 {
-        alert("FlashPan");
+          embed.Pan(x, y, mode);
+//          document.write("Pan()<br>");
+//          alert("FlashPan");
 }
 
 function FlashPercentLoaded()
 {
-        alert("FlashPercentLoaded");
+          var value = embed.PercentLoaded();
+//          document.write("PercentLoaded() = " + value + "<br>");          
+          alert(value);
 }
 
 function FlashPlay()
 {
+//          embed.Play();
+//          document.write("Play()<br>");
         alert("FlashPlay");
 }
 
 function FlashRewind()
 {
+//          embed.Rewind();
+//          document.write("Rewind()<br>");
         alert("FlashRewind");
 }
 
-function FlashSetZoomRect()
+function FlashSetZoomRect(left, top, right, bottom)
 {
-        alert("FlashSetZoomRect");
+          embed.SetZoomRect(left, top, right, bottom);
+//          document.write("SetZoomRect()<br>");
+//        alert("FlashSetZoomRect");
 }
 
 function FlashStopPlay()
 {
-        alert("FlashStopPlay");
+          embed.StopPlay();
+//          document.write("StopPlay()<br>");
+//        alert("FlashStopPlay");
 }
 
-function FlashZoom()
+function FlashZoom(zoom)
 {
-        alert("FlashZoom");
+          embed.Zoom(zoom);
+//          document.write("Zoom()<br>");
+//        alert("FlashZoom");
 }
 
-function FlashTotalFrames(foo)
+function FlashTotalFrames()
 {
-        var msg = "FlashTotalFrames " + foo;
-        alert(msg);
+          var value = embed.TotalFrames();
+//          document.write("TotalFrames() = " + value + "<br>");          
+          alert(value);
 }
-
 
 function ShowFoobar(msg)
 {
@@ -188,7 +208,7 @@ function ShowFoobar(msg)
 
     <td>
       <form name="form5">
-        <input type=button value="GotoFrame" onclick='FlashGotoFrame()'>
+        <input type=button value="GotoFrame" onclick='FlashGotoFrame(123)'>
       </form>
     </td>
 
@@ -200,13 +220,13 @@ function ShowFoobar(msg)
 
     <td>
       <form name="form7">
-        <input type=button value="LoadMovie" onclick='FlashLoadMovie()'>
+        <input type=button value="LoadMovie" onclick='FlashLoadMovie(2, "bogus")'>
       </form>
     </td>
 
     <td>
       <form name="form8">
-        <input type=button value="Pan" onclick='FlashPan()'>
+        <input type=button value="Pan" onclick='FlashPan(1, 2, 0)'>
       </form>
       
     </td>
@@ -233,7 +253,7 @@ function ShowFoobar(msg)
 
     <td>      
       <form name="form12">
-        <input type=button value="SetZoomRect" onclick='FlashSetZoomRect()'>
+        <input type=button value="SetZoomRect" onclick='FlashSetZoomRect(1, 2, 3, 4)'>
       </form>
 
     </td>
@@ -246,13 +266,13 @@ function ShowFoobar(msg)
 
     <td>
       <form name="form14">
-        <input type=button value="Zoom" onclick='FlashZoom()'>
+        <input type=button value="Zoom" onclick='FlashZoom(12)'>
       </form>      
     </td>
 
     <td>
       <form name="form15">
-        <input type=button value="TotalFrames" onclick='FlashTotalFrames("foo")'>
+        <input type=button value="TotalFrames" onclick='FlashTotalFrames()'>
       </form>
     </td></tr>
 </table>

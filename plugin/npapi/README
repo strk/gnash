@@ -131,6 +131,18 @@ TotalFrames()
    Receives:
 	"Command Num\n", ie... "TotalFrames 1234\n"
 
+Pan ( x, y, mode ) 
+   Pans a zoomed-in movie to the coordinates specified by x and y. Use
+   mode to specify whether the values for x and y are pixels or a
+   percent of the window. When mode is either pixels or percent of the
+   window.
+
+   Sends:
+	"Command Pan x y mode\n", ie... "Pan 10 10 pixels\n"
+
+   Receives:
+   	nothing
+
 ---------------
 
   Many of the methods don't supposedly have a return value, so for now

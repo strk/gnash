@@ -283,7 +283,7 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
             printf("Legit response: %s", ptr);
         }    
         ptr += 10;
-        bool flag;
+        bool flag = false;
         if (strncmp(ptr, "true", 4) == 0) {
             flag = true;
         } else if (strncmp(ptr, "false", 5) == 0) {
@@ -334,26 +334,105 @@ LoadMovie (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
     return false;
 }
 
+// Pan ( x, y, mode ) 
+//    Sends:
+// 	"Command Pan x y mode\n", ie... "Pan 10 10 pixels\n"
+//
+//    Receives:
+//    	nothing
 bool
-Pan (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+Pan (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 3) {
+        std::stringstream ss;
+        NPVariant *value = const_cast<NPVariant *>(&args[0]);
+        int x = NPVARIANT_TO_INT32(*value);
+        value = const_cast<NPVariant *>(&args[1]);
+        int y = NPVARIANT_TO_INT32(*value);
+        value = const_cast<NPVariant *>(&args[2]);
+        int mode = NPVARIANT_TO_INT32(*value);
+        ss << "Pan " << x << y;
+        if (mode) {
+            ss << " pixels";
+        } else {
+            ss << " percent";
+        }
+        ss << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't pan the movie, network problems.");
+            return false;
+        }        
+        BOOLEAN_TO_NPVARIANT(true, *result);
+        return true;
+    }
     
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
+// PercentLoaded()
+//    Sends:
+// 	"Command\n", ie... "PercentLoaded\n"
+//
+//    Receives:
+// 	"Command number\n", ie... "PercentLoaded 23\n"
 bool
-PercentLoaded (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 0) {
+        std::stringstream ss;
+        ss << "PercentLoaded" << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't check percent loaded, network problems.");
+            BOOLEAN_TO_NPVARIANT(false, *result);
+            return false;
+        }        
+        const char *data = 0;
+        char *ptr = 0;
+        ret = gpso->readPlayer(controlfd, &data, 0);
+        if (ret == 0) {
+            BOOLEAN_TO_NPVARIANT(false, *result);
+            return false;
+        }
+        ptr = const_cast<char *>(data);
+        if (strncmp(ptr, "PercentLoaded ", 15) != 0) {
+            printf("Illegal response! %s\n", ptr);
+            BOOLEAN_TO_NPVARIANT(false, *result);
+            return false;
+        } else {
+            // A legit response has CR on the end already
+            printf("Legit response: %s", ptr);
+        }    
+        ptr += 15;
+        int percent = strtol(ptr, NULL, 0);
+        if ((percent >= 0) && (percent <= 100)) {
+            INT32_TO_NPVARIANT(percent, *result);
+        } else {
+            INT32_TO_NPVARIANT(-1, *result);
+        }
+        return true;
+    }
     
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
 // Play();
@@ -431,14 +510,39 @@ Rewind (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
 //    Receives:
 // 	nothing
 bool
-SetZoomRect (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+SetZoomRect (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 4) {
+        std::stringstream ss;
+        NPVariant *value = const_cast<NPVariant *>(&args[0]);
+        int left = NPVARIANT_TO_INT32(*value);
+        value = const_cast<NPVariant *>(&args[1]);
+        int top = NPVARIANT_TO_INT32(*value);
+        value = const_cast<NPVariant *>(&args[2]);
+        int right = NPVARIANT_TO_INT32(*value);
+        value = const_cast<NPVariant *>(&args[3]);
+        int bottom = NPVARIANT_TO_INT32(*value);
+        ss << "SetZoomRect " << left << " " << top << " ";
+        ss << right << " " << bottom << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't Set the Zoom Rect the movie, network problems.");
+            return false;
+        }        
+        BOOLEAN_TO_NPVARIANT(true, *result);
+        return true;
+    }
     
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
 // StopPlay()
@@ -482,14 +586,32 @@ StopPlay (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
 //    Receives:
 // 	nothing
 bool
-Zoom (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */* args */,
-          uint32_t /* argCount */, NPVariant *result)
+Zoom (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
+
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 1) {
+        std::stringstream ss;
+        NPVariant *value = const_cast<NPVariant *>(&args[1]);
+        int zoom = NPVARIANT_TO_INT32(*value);
+        ss << "Zoom " << zoom << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't zoom movie, network problems.");
+            return false;
+        }        
+        BOOLEAN_TO_NPVARIANT(true, *result);
+        return true;
+    }
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
-    
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
 // TotalFrames()
@@ -499,14 +621,49 @@ Zoom (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */* args *
 //    Receives:
 // 	"Command Num\n", ie... "TotalFrames 1234\n"
 bool
-TotalFrames (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 0) {
+        std::stringstream ss;
+        ss << "TotalFrames" << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't check percent loaded, network problems.");
+            BOOLEAN_TO_NPVARIANT(false, *result);
+            return false;
+        }        
+        const char *data = 0;
+        char *ptr = 0;
+        ret = gpso->readPlayer(controlfd, &data, 0);
+        if (ret == 0) {
+            BOOLEAN_TO_NPVARIANT(false, *result);
+            return false;
+        }
+        ptr = const_cast<char *>(data);
+        if (strncmp(ptr, "TotalFrames ", 13) != 0) {
+            printf("Illegal response! %s\n", ptr);
+            BOOLEAN_TO_NPVARIANT(false, *result);
+            return false;
+        } else {
+            // A legit response has CR on the end already
+            printf("Legit response: %s", ptr);
+        }    
+        ptr += 13;
+        int frames = strtol(ptr, NULL, 0);
+        INT32_TO_NPVARIANT(frames, *result);
+        return true;
+    }
     
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
 //

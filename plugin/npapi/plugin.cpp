@@ -372,7 +372,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 #ifdef ENABLE_SCRIPTABLE
     _scriptObject = NPNFuncs.createobject(_instance, GnashPluginScriptObject::marshalGetNPClass());
 #endif
-#ifdef NETTEST
+#if defined(ENABLE_SCRIPTABLE) && defined(NETTEST)
     // This is a network testing node switch. This is only used for testing the
     // interface between the player and the plugin.
     struct sockaddr_in  sock_in;
