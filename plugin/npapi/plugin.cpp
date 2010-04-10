@@ -565,6 +565,7 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
+#ifdef ENABLE_SCRIPTABLE
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
@@ -574,6 +575,7 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
             GnashLogDebug("_scriptObject is not assigned");
         }
     }
+#endif
 
     return NS_PluginGetValue(aVariable, aValue);
 }
@@ -1235,54 +1237,6 @@ nsPluginInstance::getCurrentPageURL() const
 
     if (!NPVARIANT_IS_STRING(vProp)) {
         GnashLogError("Can't get window.location.href object");
-        return NULL;
-    }
-
-    const NPString& propValue = NPVARIANT_TO_STRING(vProp);
-
-    return propValue.UTF8Characters; // const char *
-}
-
-const char*
-nsPluginInstance::getEmbedURL() const
-{
-    NPP npp = _instance;
-
-    NPIdentifier sDocument = NPN_GetStringIdentifier("document");
-
-    NPObject *window;
-    NPN_GetValue(npp, NPNVWindowNPObject, &window);
-
-    NPVariant vDoc;
-    NPN_GetProperty(npp, window, sDocument, &vDoc);
-    NPN_ReleaseObject(window);
-
-    if (!NPVARIANT_IS_OBJECT(vDoc)) {
-        GnashLogError("Can't get document object");
-        return NULL;
-    }
-    
-    NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
-
-    NPIdentifier sLocation = NPN_GetStringIdentifier("yt");
-    NPVariant vLoc;
-    NPN_GetProperty(npp, npDoc, sLocation, &vLoc);
-    NPN_ReleaseObject(npDoc);
-
-    if (!NPVARIANT_IS_OBJECT(vLoc)) {
-        GnashLogError("Can't get document.yt object");
-        return NULL;
-    }
-
-    NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
-
-    NPIdentifier sProperty = NPN_GetStringIdentifier("config_");
-    NPVariant vProp;
-    NPN_GetProperty(npp, npLoc, sProperty, &vProp);
-    NPN_ReleaseObject(npLoc);
-
-    if (!NPVARIANT_IS_STRING(vProp)) {
-        GnashLogError("Can't get document.yt.config_ object");
         return NULL;
     }
 
