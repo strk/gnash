@@ -1,84 +1,154 @@
-<HTML>
-<HEAD>
-<TITLE>Scriptable Plugin Test</TITLE>
-</HEAD>
-<BODY>
+<html>
+  <head>
+    <title>Scriptable Plugin Test</title>
+  </head>
+  <body>
 
-<center>
-<h1> Scriptable Plugin </h1>
-</center>
-
-<br><br>
-
-<center>
-
-<embed type="application/x-shockwave-flash" width=1 height=1 hidden="true"><br>
-
-<script>
-var embed = document.embeds[0];
-
-function ShowVersion()
-{
-        document.write("Codebase =  = " + embed.codebase + "<br>");
-        document.write("Classid = " + embed.classid + "<br>");
-        document.write("Pluginspage = " + embed.pluginspage + "<br>");
-        document.write("Src = " + embed.src + "<br>");
-        document.write("BG Color = " + embed.bgcolor + "<br>");
-        document.write("Quality = " + embed.quality + "<br>");
-        document.write("movie = " + embed.movie + "<br>");
-        document.write("onafterupdate = " + embed.onafterupdate + "<br>");
-        document.write("onbeforeupdate = " + embed.onbeforeupdate + "<br>");
-        document.write("onblur = " + embed.onblur + "<br>");
-        document.write("oncellchange = " + embed.oncellchange + "<br>");
-        document.write("onclick = " + embed.onclick + "<br>");
-        document.write("ondblClick = " + embed.ondblClick + "<br>");
-        document.write("ondrag = " + embed.ondrag + "<br>");
-        document.write("ondragend = " + embed.ondragend + "<br>");
-        document.write("ondragenter = " + embed.ondragenter + "<br>");
-        document.write("ondragleave = " + embed.ondragleave + "<br>");
-        document.write("ondragover = " + embed.ondragover + "<br>");
-        document.write("ondrop = " + embed.ondrop + "<br>");
-        document.write("onfinish = " + embed.onfinish + "<br>");
-        document.write("onfocus = " + embed.onfocus + "<br>");
-        document.write("onhelp = " + embed.onhelp + "<br>");
-        document.write("onmousedown = " + embed.onmousedown + "<br>");
-        document.write("onmouseup = " + embed.onmouseup + "<br>");
-        document.write("onmouseover = " + embed.onmouseover + "<br>");
-        document.write("onmousemove = " + embed.onmousemove + "<br>");
-        document.write("onmouseout = " + embed.onmouseout + "<br>");
-        document.write("onkeypress = " + embed.onkeypress + "<br>");
-        document.write("onkeydown = " + embed.onkeydown + "<br>");
-        document.write("onkeyup = " + embed.onkeyup + "<br>");
-        document.write("onload = " + embed.onload + "<br>");
-        document.write("onlosecapture = " + embed.onlosecapture + "<br>");
-        document.write("onpropertychange = " + embed.onpropertychange + "<br>");
-        document.write("onreadystatechange = " + embed.onreadystatechange + "<br>");
-        document.write("onrowsdelete = " + embed.onrowsdelete + "<br>");
-        document.write("onrowenter = " + embed.onrowenter + "<br>");
-        document.write("onrowexit = " + embed.onrowexit + "<br>");
-        document.write("onrowsinserted = " + embed.onrowsinserted + "<br>");
-        document.write("onstart = " + embed.onstart + "<br>");
-        document.write("onscroll = " + embed.onscroll + "<br>");
-        document.write("onbeforeeditfocus = " + embed.onbeforeeditfocus + "<br>");
-        document.write("onactivate = " + embed.onactivate) + "<br>";
-        document.write("onbeforedeactivate = " + embed.onbeforedeactivate + "<br>");
-        document.write("ondeactivate = " + embed.ondeactivate + "<br>");
-        document.write("type = " + embed.type + "<br>");
-        document.write("id = " + embed.id + "<br>");
-        document.write("width = " + embed.width + "<br>");
-        document.write("height = " + embed.height + "<br>");
-        document.write("align = " + embed.align + "<br>");
-        document.write("vspace", + embed.vspace + "<br>");
-        document.write("hspace = " + embed.hspace + "<br>");
-        document.write("class = " + embed.class + "<br>");
-        document.write("title = " + embed.title + "<br>");
-	document.write("accesskey = " + embed.accesskey + "<br>");
-	document.write("name = " + embed.name + "<br>");
-        document.write("tabindex = " + embed.tabindex + "<br>");
-        document.write("FlashVars = " + embed.FlashVars + "<br>");
-
-	alert(embed.version);
+    <center>
+      <h1> Scriptable Plugin </h1>
+    </center>
+    
+    <br><br>
+    
+    <center>
+      
+      <embed type="application/x-shockwave-flash" width=1 height=1 hidden="true"><br>
+        
+        <script>
+          var embed = document.embeds[0];
+          
+          function ShowVersion()
+          {
+          document.write("Codebase =  = " + embed.codebase + "<br>");
+          document.write("Classid = " + embed.classid + "<br>");
+          document.write("Pluginspage = " + embed.pluginspage + "<br>");
+          document.write("Src = " + embed.src + "<br>");
+          document.write("BG Color = " + embed.bgcolor + "<br>");
+          document.write("Quality = " + embed.quality + "<br>");
+          document.write("movie = " + embed.movie + "<br>");
+          // document.write("onafterupdate = " + embed.onafterupdate + "<br>");
+          // document.write("onbeforeupdate = " + embed.onbeforeupdate + "<br>");
+          // document.write("onblur = " + embed.onblur + "<br>");
+          // document.write("oncellchange = " + embed.oncellchange + "<br>");
+          // document.write("onclick = " + embed.onclick + "<br>");
+          // document.write("ondblClick = " + embed.ondblClick + "<br>");
+          // document.write("ondrag = " + embed.ondrag + "<br>");
+          // document.write("ondragend = " + embed.ondragend + "<br>");
+          // document.write("ondragenter = " + embed.ondragenter + "<br>");
+          // document.write("ondragleave = " + embed.ondragleave + "<br>");
+          // document.write("ondragover = " + embed.ondragover + "<br>");
+          // document.write("ondrop = " + embed.ondrop + "<br>");
+          // document.write("onfinish = " + embed.onfinish + "<br>");
+          // document.write("onfocus = " + embed.onfocus + "<br>");
+          // document.write("onhelp = " + embed.onhelp + "<br>");
+          // document.write("onmousedown = " + embed.onmousedown + "<br>");
+          // document.write("onmouseup = " + embed.onmouseup + "<br>");
+          // document.write("onmouseover = " + embed.onmouseover + "<br>");
+          // document.write("onmousemove = " + embed.onmousemove + "<br>");
+          // document.write("onmouseout = " + embed.onmouseout + "<br>");
+          // document.write("onkeypress = " + embed.onkeypress + "<br>");
+          // document.write("onkeydown = " + embed.onkeydown + "<br>");
+          // document.write("onkeyup = " + embed.onkeyup + "<br>");
+          // document.write("onload = " + embed.onload + "<br>");
+          // document.write("onlosecapture = " + embed.onlosecapture + "<br>");
+          // document.write("onpropertychange = " + embed.onpropertychange + "<br>");
+          // document.write("onreadystatechange = " + embed.onreadystatechange + "<br>");
+          // document.write("onrowsdelete = " + embed.onrowsdelete + "<br>");
+          // document.write("onrowenter = " + embed.onrowenter + "<br>");
+          // document.write("onrowexit = " + embed.onrowexit + "<br>");
+          // document.write("onrowsinserted = " + embed.onrowsinserted + "<br>");
+          // document.write("onstart = " + embed.onstart + "<br>");
+          // document.write("onscroll = " + embed.onscroll + "<br>");
+          // document.write("onbeforeeditfocus = " + embed.onbeforeeditfocus + "<br>");
+          // document.write("onactivate = " + embed.onactivate) + "<br>";
+          // document.write("onbeforedeactivate = " + embed.onbeforedeactivate + "<br>");
+          // document.write("ondeactivate = " + embed.ondeactivate + "<br>");
+          document.write("type = " + embed.type + "<br>");
+          document.write("id = " + embed.id + "<br>");
+          document.write("width = " + embed.width + "<br>");
+          document.write("height = " + embed.height + "<br>");
+          document.write("align = " + embed.align + "<br>");
+          document.write("vspace", + embed.vspace + "<br>");
+          document.write("hspace = " + embed.hspace + "<br>");
+          document.write("class = " + embed.class + "<br>");
+          document.write("title = " + embed.title + "<br>");
+	  document.write("accesskey = " + embed.accesskey + "<br>");
+	  document.write("name = " + embed.name + "<br>");
+          document.write("tabindex = " + embed.tabindex + "<br>");
+          document.write("FlashVars = " + embed.FlashVars + "<br>");
+          
+ 	  alert(embed.version);
 }
+
+function FlashSetVariable(name, value)
+{
+          embed.SetVariable(name, value);
+//          alert("FlashSetVariable");
+}
+
+function FlashGetVariable(name)
+{
+          var value = embed.GetVariable(name);
+//          document.write("Got Variable = " + value + "<br>");          
+          alert(value);
+}
+
+function FlashGotoFrame()
+{
+          alert("FlashGotoFrame");
+}
+
+function FlashIsPlaying()
+{
+          alert("FlashIsPlaying");
+}
+
+function FlashLoadMovie()
+{
+          alert("FlashLoadMovie");
+}
+
+function FlashPan()
+{
+        alert("FlashPan");
+}
+
+function FlashPercentLoaded()
+{
+        alert("FlashPercentLoaded");
+}
+
+function FlashPlay()
+{
+        alert("FlashPlay");
+}
+
+function FlashRewind()
+{
+        alert("FlashRewind");
+}
+
+function FlashSetZoomRect()
+{
+        alert("FlashSetZoomRect");
+}
+
+function FlashStopPlay()
+{
+        alert("FlashStopPlay");
+}
+
+function FlashZoom()
+{
+        alert("FlashZoom");
+}
+
+function FlashTotalFrames(foo)
+{
+        var msg = "FlashTotalFrames " + foo;
+        alert(msg);
+}
+
 
 function ShowFoobar(msg)
 {
@@ -95,14 +165,101 @@ function ShowFoobar(msg)
 <input type=button value="Show Version" onclick='ShowVersion()'>
 </form>
 <br>
-<form name="form">
+
+<form name="form2">
 <input type=button value="Show Foobar" onclick='ShowFoobar("barfood")'>
 </form>
 
 </center>
 
-</BODY>
-</HTML>
+<div id="main">
+<table>
+  <tr><td>
+      <form name="form3">
+        <input type=button value="SetVariable" onclick='FlashSetVariable("var1", "value1")'>
+      </form>
+    </td>
+
+    <td>
+      <form name="form4">
+        <input type=button value="GetVariable" onclick='FlashGetVariable("var1")'>
+      </form>
+    </td>
+
+    <td>
+      <form name="form5">
+        <input type=button value="GotoFrame" onclick='FlashGotoFrame()'>
+      </form>
+    </td>
+
+    <td>
+      <form name="form6">
+        <input type=button value="IsPlaying" onclick='FlashIsPlaying()'>
+      </form>
+    </td>
+
+    <td>
+      <form name="form7">
+        <input type=button value="LoadMovie" onclick='FlashLoadMovie()'>
+      </form>
+    </td>
+
+    <td>
+      <form name="form8">
+        <input type=button value="Pan" onclick='FlashPan()'>
+      </form>
+      
+    </td>
+
+    <td>
+      <form name="form9">
+        <input type=button value="PercentLoaded" onclick='FlashPercentLoaded()'>
+      </form>
+    </td>
+
+  </tr><tr>
+
+    <td>
+      <form name="form10">
+        <input type=button value="Play" onclick='FlashPlay()'>
+      </form>
+    </td>
+
+    <td>
+      <form name="form11">
+        <input type=button value="Rewind" onclick='FlashRewind()'>
+      </form>
+    </td>
+
+    <td>      
+      <form name="form12">
+        <input type=button value="SetZoomRect" onclick='FlashSetZoomRect()'>
+      </form>
+
+    </td>
+
+    <td>
+      <form name="form13">
+        <input type=button value="StopPlay" onclick='FlashStopPlay()'>
+      </form>
+    </td>
+
+    <td>
+      <form name="form14">
+        <input type=button value="Zoom" onclick='FlashZoom()'>
+      </form>      
+    </td>
+
+    <td>
+      <form name="form15">
+        <input type=button value="TotalFrames" onclick='FlashTotalFrames("foo")'>
+      </form>
+    </td></tr>
+</table>
+</div>
+
+</body>
+</html>
 
 <!--
 local Variables:
