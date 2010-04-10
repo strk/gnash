@@ -23,7 +23,16 @@
 
 #include <cstdlib> // getenv
 #include <stdlib.h> // putenv
-#include <sys/socket.h> // shutdown
+#include <sys/types.h>
+#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
+# include <winsock2.h>
+# include <windows.h>
+#else
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+# include <sys/socket.h> // shutdown
+#endif
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
@@ -60,6 +69,12 @@
 //
 #define GNASH_PLUGIN_DEBUG 2
 //#define WRITE_FILE
+
+// Defining this flag disables the pipe to the standalone player, as well
+// as prevents the standalone Gnash player from being exec'd. Instead it
+// makes a network connection to localhost:1111 so the developer can use
+// Netcat (nc) to send and receive messages to test the interface.
+#define NETTEST 1
 
 #include "plugin.h" 
 #include "GnashSystemIOHeaders.h"
@@ -333,6 +348,8 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _filefd(-1),
     _name()
 {
+    // GnashLogDebug(__PRETTY_FUNCTION__);
+
     for (size_t i=0, n=data->argc; i<n; ++i) {
         std::string name, val;
         gnash::StringNoCaseEqual noCaseCompare;
@@ -355,6 +372,36 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 #ifdef ENABLE_SCRIPTABLE
     _scriptObject = NPNFuncs.createobject(_instance, GnashPluginScriptObject::marshalGetNPClass());
 #endif
+#ifdef NETTEST
+    // This is a network testing node switch. This is only used for testing the
+    // interface between the player and the plugin.
+    struct sockaddr_in  sock_in;
+    memset(&sock_in, 0, sizeof(struct sockaddr_in));
+    sock_in.sin_family = AF_INET;
+    sock_in.sin_port = ntohs(1111);
+    const struct hostent *hent = ::gethostbyname("localhost");
+    if (hent > 0) {
+        ::memcpy(&sock_in.sin_addr, hent->h_addr, hent->h_length);
+    }
+    struct protoent     *proto;
+    proto = ::getprotobyname("TCP");
+    int sockfd = ::socket(PF_INET, SOCK_STREAM, proto->p_proto);
+    if (sockfd > 0) {
+        int ret = ::connect(sockfd, 
+                            reinterpret_cast<struct sockaddr *>(&sock_in),
+                            sizeof(sock_in));
+        if (ret == 0) {
+            GnashLogDebug("Connected to debug server");
+            _controlfd = sockfd;
+            GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)_scriptObject;
+            gpso->setControlFD(_controlfd);
+        } else {
+            GnashLogError("Couldn't connect to debug server");
+        }
+    }
+#endif
+    
+    return;
 }
 
 gboolean
@@ -499,9 +546,20 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 
     _window = reinterpret_cast<Window> (aWindow->window);
 
-    if (!_childpid && !_swf_url.empty()) {
-        startProc();
+#ifdef ENABLE_SCRIPTABLE
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)_scriptObject;
+    printf("FIXME: the control FD is #%d\n", _controlfd);
+    gpso->setControlFD(_controlfd);
+#endif
+
+    // When testing the interface to the plugin, don't start the player
+    // as a debug client "nc -l 1111" is used instead.
+#ifndef NETTEST
+        if (!_childpid && !_swf_url.empty()) {
+            startProc();
+        }
     }
+#endif
 
     return NPERR_NO_ERROR;
 }
@@ -523,14 +581,13 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
     return NS_PluginGetValue(aVariable, aValue);
 }
 
-#if 0
+#if 1
 // FIXME: debugging stuff, will be gone soon after I figure how this works
 void myfunc(void */* param */)
 {
     GnashLogDebug("Here I am!!!\n");
 }
 
-// Call a JavaScript method from the plugin
 void
 NPN_PluginThreadAsyncCall(NPP plugin, void (*func)(void *), void *userData)
 {
@@ -562,10 +619,10 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     }
     _swf_url = stream->url;
 
-#if 0
+#if 1
     // FIXME: debugging crap for now call javascript
     NPN_PluginThreadAsyncCall(_instance, myfunc, NULL);
-//    printf("FIXME: %s", getEmbedURL());
+    // printf("FIXME: %s", getEmbedURL());
 #endif
     
     
@@ -1041,35 +1098,36 @@ nsPluginInstance::startProc()
     }
 
     _controlfd = p2c_controlpipe[1];
-
+    
     /*
     Setup the command line for starting Gnash
     */
 
-    std::vector<std::string> arg_vec = getCmdLine(c2p_pipe[1], p2c_controlpipe[0]);
+    std::vector<std::string> arg_vec = getCmdLine(c2p_pipe[1],
+                                                  p2c_controlpipe[0]);
     if (arg_vec.empty()) {
         GnashLogError("Failed to obtain command line parameters.");
         return;
     }
-
+    
     std::vector<const char*> args;
-
+    
     std::transform(arg_vec.begin(), arg_vec.end(), std::back_inserter(args),
                    std::mem_fun_ref(&std::string::c_str));
     args.push_back(0);
-
+    
     /*
       Argument List prepared, now fork(), close file descriptors and execv()
-     */
-
+    */
+    
     _childpid = fork();
-
+    
     // If the fork failed, childpid is -1. So print out an error message.
     if (_childpid == -1) {
         GnashLogError("ERROR: dup2() failed: " + std::string(strerror(errno)));
         return;
     }
-
+    
     // If we are the parent and fork() worked, childpid is a positive integer.
     if (_childpid > 0) {
         
@@ -1077,33 +1135,33 @@ nsPluginInstance::startProc()
         ret = close (p2c_pipe[0]);
         if (ret == -1) {
             GnashLogError("ERROR: p2c_pipe[0] close() failed: " +
-                     std::string(strerror(errno)));
+                          std::string(strerror(errno)));
         }
-
+        
         // we want to read from c2p pipe, so close write-fd1
         ret = close (c2p_pipe[1]);
         if (ret == -1) {
             GnashLogError("ERROR: c2p_pipe[1] close() failed: " + 
-                     std::string(strerror(errno)));
+                          std::string(strerror(errno)));
         }
-
+        
         ret = close (p2c_controlpipe[0]); // close read descriptor
-    
+        
 #if GNASH_PLUGIN_DEBUG > 1
         std::cout << "Forked successfully, child process PID is " 
-                                << _childpid
-                                << std::endl;
+                  << _childpid
+                  << std::endl;
 #endif
-
+        
         GIOChannel* ichan = g_io_channel_unix_new(c2p_pipe[0]);
         g_io_channel_set_close_on_unref(ichan, true);
         _ichanWatchId = g_io_add_watch(ichan, 
-                (GIOCondition)(G_IO_IN|G_IO_HUP), 
-                (GIOFunc)handlePlayerRequestsWrapper, this);
+                                       (GIOCondition)(G_IO_IN|G_IO_HUP), 
+                                       (GIOFunc)handlePlayerRequestsWrapper, this);
         g_io_channel_unref(ichan);
         return;
     }
-
+    
     // This is the child scope.
     
     // FF3 uses jemalloc and it has problems after the fork(), do NOT
