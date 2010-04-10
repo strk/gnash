@@ -71,28 +71,6 @@ static int controlfd = -1;
 
 #if 0
 
-// From http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_03.html
-// var movie = window.document.movie
-
-#define NUM_METHOD_IDENTIFIERS       13
-static NPIdentifier pluginMethodIdentifiers[NUM_METHOD_IDENTIFIERS];
-// Standard Methods
-static const NPUTF8 *pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
-   "SetVariable",
-   "GetVariable",
-   "GotoFrame",
-   "IsPlaying",
-   "LoadMovie",
-   "Pan",
-   "PercentLoaded",
-   "Play",
-   "Rewind",
-   "SetZoomRect",
-   "StopPlay",
-   "Zoom",
-   "TotalFrames"
-};
-
 // http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_04.html
 // Tell Target Methods. Use TGetProperty, TGetPropertyAsNumber, TSetProperty
 TCallLabel
@@ -146,11 +124,19 @@ testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*arg
 
 // Callbacks for the default methods
 
-// name is SetVariable, so can be ignored. This callback also has no result
-// returned.
+// As these callbacks use a generalized typedef for the signature, often some
+// of the parameters can be ignored. These are commented out to elimnate the
+// volumnes of bogus warnings about not using them in the method.
+
+// SetVariable( Name, Value )
+// Sends:
+//      "Command Name Type value\n",
+//      	ie... "SetVariable var1 string value1\n"
+// Receives:
+//      nothing
 bool
 SetVariableCallback (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
-          uint32_t argCount, NPVariant */* result */)
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
 
@@ -162,12 +148,20 @@ SetVariableCallback (NPObject *npobj, NPIdentifier /* name */, const NPVariant *
         NPVariant *value = const_cast<NPVariant *>(&args[1]);
         // printf("Setting Variable \"%s\"\n", varname.c_str());
         gpso->SetVariable(varname, value);
+        BOOLEAN_TO_NPVARIANT(true, *result);
         return true;
     }
     
+    BOOLEAN_TO_NPVARIANT(false, *result);
     return false;
 }
 
+// GetVariable( Name )
+//    Sends:
+// 	"Command Name\n", ie... "GetVariable var1\n"
+//
+//    Receives:
+// 	"Command Name Type value", ie... "GetVariable var1 string value1\n"
 bool
 GetVariableCallback (NPObject *npobj, NPIdentifier /* name */,
                      const NPVariant *args,
@@ -210,37 +204,134 @@ GetVariableCallback (NPObject *npobj, NPIdentifier /* name */,
     return false;
 }
 
+// GotoFrame( frameNumber )
+//    Sends:
+// 	"Command number\n", ie... "GotoFrame 77\n"
+//
+//    Receives:
+// 	nothing
 bool
-GotoFrame (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+GotoFrame (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
+
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    std::string varname;
+    if (argCount == 1) {
+        int value = NPVARIANT_TO_INT32(args[0]);
+        std::stringstream ss;
+        ss << "GotoFrame " << value << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't goto the specified frame, network problems.");
+            return false;
+        }        
+        // gpso->GotoFrame(value);
+        BOOLEAN_TO_NPVARIANT(true, *result);
+        return true;
+    }
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
-    
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
+// IsPlaying()
+//    Sends:
+// 	"Command\n", ie... "IsPlaying\n"
+
+//    Receives:
+// 	"Command Flag", ie... "IsPlaying true\n"
 bool
-IsPlaying (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 0) {
+        std::stringstream ss;
+        ss << "IsPlaying" << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't check if the movie is playing, network problems.");
+            BOOLEAN_TO_NPVARIANT(false, *result);
+            return false;
+        }        
+        const char *data = 0;
+        char *ptr = 0;
+        ret = gpso->readPlayer(controlfd, &data, 0);
+        if (ret == 0) {
+            BOOLEAN_TO_NPVARIANT(false, *result);
+            return false;
+        }
+        ptr = const_cast<char *>(data);
+        if (strncmp(ptr, "IsPlaying ", 10) != 0) {
+            printf("Illegal response! %s\n", ptr);
+            BOOLEAN_TO_NPVARIANT(false, *result);
+            return false;
+        } else {
+            // A legit response has CR on the end already
+            printf("Legit response: %s", ptr);
+        }    
+        ptr += 10;
+        bool flag;
+        if (strncmp(ptr, "true", 4) == 0) {
+            flag = true;
+        } else if (strncmp(ptr, "false", 5) == 0) {
+            flag = false;
+        }
+        BOOLEAN_TO_NPVARIANT(flag, *result);
+        // gpso->IsPlaying(value);
+        return true;
+    }
     
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
+// LoadMovie( Layer, Url )
+//    Sends:
+// 	"Command Layer Url\n", ie... "LoadMovie 1 /foo.swf\n"
+//
+//    Receives:
+// 	nothing
 bool
-LoadMovie (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+LoadMovie (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
+
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 2) {
+        std::stringstream ss;
+        int layer = NPVARIANT_TO_INT32(args[0]);
+        std::string url = NPVARIANT_TO_STRING(args[1]).UTF8Characters;
+        ss << "LoadMovie " << layer << " " << url << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't load the movie, network problems.");
+            return false;
+        }        
+        // gpso->LoadMovie();
+        BOOLEAN_TO_NPVARIANT(true, *result);
+        return true;
+    }
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
-    
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
 bool
@@ -265,28 +356,80 @@ PercentLoaded (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant *
     return true;
 }
 
+// Play();
+//    Sends:
+// 	"Command\n", ie... "Play\n"
+//
+//    Receives:
+// 	nothing
 bool
-Play (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+Play (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
+
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 0) {
+        std::stringstream ss;
+        ss << "Play" << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't play movie, network problems.");
+            return false;
+        }        
+        // gpso->IsPlaying(value);
+        BOOLEAN_TO_NPVARIANT(true, *result);
+        return true;
+    }
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
-    
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
+// Rewind();
+//    Sends:
+// 	"Command\n", ie... "Rewind\n"
+//
+//    Receives:
+// 	nothing
 bool
-Rewind (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+Rewind (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
+
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 0) {
+        std::stringstream ss;
+        ss << "Rewind" << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't rewind movie, network problems.");
+            return false;
+        }        
+        // gpso->Rewind(value);
+        BOOLEAN_TO_NPVARIANT(true, *result);
+        return true;
+    }
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
-    
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
+// SetZoomRect ( left, top, right, bottom )
+//    Sends:
+// 	"Command left top right bottom\n", ie... "SetZoomRect 0 0 10 10\n"
+//
+//    Receives:
+// 	nothing
 bool
 SetZoomRect (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
           uint32_t /* argCount */, NPVariant *result)
@@ -298,17 +441,46 @@ SetZoomRect (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*
     return true;
 }
 
+// StopPlay()
+//    Sends:
+// 	"Command StopPlay\n", ie... "StopPlay\n"
+
+//    Receives:
+// 	nothing
 bool
-StopPlay (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
+StopPlay (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
+          uint32_t argCount, NPVariant *result)
 {   
     GnashLogDebug(__PRETTY_FUNCTION__);
     
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    if (argCount == 0) {
+        std::stringstream ss;
+        ss << "StopPlay" << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't stop-play movie, network problems.");
+            return false;
+        }        
+        // gpso->IsPlaying(value);
+        BOOLEAN_TO_NPVARIANT(true, *result);
+        return true;
+    }
     
-    return true;
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
 }
 
+// Zoom( percent )
+//    Sends:
+// 	"Command number\n", ie... "Zoom 200\n"
+//
+//    Receives:
+// 	nothing
 bool
 Zoom (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */* args */,
           uint32_t /* argCount */, NPVariant *result)
@@ -320,6 +492,12 @@ Zoom (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */* args *
     return true;
 }
 
+// TotalFrames()
+//    Sends:
+// 	"Command TotalFrames\n", ie... "TotalFrames\n"
+//
+//    Receives:
+// 	"Command Num\n", ie... "TotalFrames 1234\n"
 bool
 TotalFrames (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
           uint32_t /* argCount */, NPVariant *result)
@@ -330,6 +508,10 @@ TotalFrames (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*
     
     return true;
 }
+
+//
+// The methods for GnashPluginScriptObject start here.
+//
 
 void
 GnashPluginScriptObject::AddProperty(const std::string &name,
@@ -893,7 +1075,7 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
     // Add the CR, so we know where the message ends when parsing.
     ss << std::endl;
     // Write the message to the Control FD.
-    int ret = writePlayer(controlfd, ss.str());
+    size_t ret = writePlayer(controlfd, ss.str());
     // Unless we wrote the same amount of data as the message contained,
     // something went wrong.
     if (ret != ss.str().size()) {
@@ -1030,11 +1212,13 @@ GnashPluginScriptObject::writePlayer(int fd, const char *data, size_t length)
 
 // Read the standalone player over the control socket
 int
-GnashPluginScriptObject::readPlayer(int fd, const std::string &data)
+GnashPluginScriptObject::readPlayer(int /* fd */, const std::string &/* data */)
 {
 //    GnashLogDebug(__PRETTY_FUNCTION__);
 
 //    return readPlayer(fd, data.c_str(), data.size());
+
+    return -1;
 }
 
 int

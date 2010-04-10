@@ -13,7 +13,7 @@ SetVariable( Name, Value )
    Sends:
 	"Command Name Type value\n",
 		ie... "SetVariable var1 string value1\n"
-  Receives:
+   Receives:
 	nothing
 
 GetVariable( Name )
@@ -23,7 +23,7 @@ GetVariable( Name )
    Sends:
 	"Command Name\n", ie... "GetVariable var1\n"
 
-  Receives:
+   Receives:
 	"Command Name Type value", ie... "GetVariable var1 string value1\n"
 
 PercentLoaded()
@@ -33,7 +33,7 @@ PercentLoaded()
    Sends:
 	"Command\n", ie... "PercentLoaded\n"
 
-  Receives:
+   Receives:
 	"Command number\n", ie... "PercentLoaded 23\n"
 
 Zoom( percent )
@@ -45,7 +45,7 @@ Zoom( percent )
    Sends:
 	"Command number\n", ie... "Zoom 200\n"
 
-  Receives:
+   Receives:
 	nothing
 
 GotoFrame( frameNumber )
@@ -59,7 +59,7 @@ GotoFrame( frameNumber )
    Sends:
 	"Command number\n", ie... "GotoFrame 77\n"
 
-  Receives:
+   Receives:
 	nothing
 
 IsPlaying()
@@ -68,25 +68,25 @@ IsPlaying()
    Sends:
 	"Command\n", ie... "IsPlaying\n"
 
-  Receives:
+   Receives:
 	"Command Flag", ie... "IsPlaying true\n"
 
-movie.Play();
+Play();
   Starts the movie playing.
 
    Sends:
 	"Command\n", ie... "Play\n"
 
-  Receives:
+   Receives:
 	nothing
 
-movie.Rewind();
-  Goes to the first frame.
+Rewind();
+   Goes to the first frame.
 
    Sends:
 	"Command\n", ie... "Rewind\n"
 
-  Receives:
+   Receives:
 	nothing
 
 SetZoomRect ( left, top, right, bottom )
@@ -98,6 +98,47 @@ SetZoomRect ( left, top, right, bottom )
    Sends:
 	"Command left top right bottom\n", ie... "SetZoomRect 0 0 10 10\n"
 
-  Receives:
+   Receives:
 	nothing
+
+
+LoadMovie( layer, url )
+   Loads the movie identified by url to the layer specified by
+   layerNumber.  The argument type is integer for layer and
+   string for url.
+ 
+   Sends:
+	"Command Layer Url\n", ie... "LoadMovie 1 /foo.swf\n"
+
+   Receives:
+	nothing
+
+ StopPlay()
+   Stops playing the movie.
+
+   Sends:
+	"Command StopPlay\n", ie... "StopPlay\n"
+
+   Receives:
+	nothing
+
+TotalFrames()
+   Returns the total number of frames in the movie.
+
+   Sends:
+	"Command TotalFrames\n", ie... "TotalFrames\n"
+
+   Receives:
+	"Command Num\n", ie... "TotalFrames 1234\n"
+
+---------------
+
+  Many of the methods don't supposedly have a return value, so for now
+commands are sent blindy, and the only ones that expect a response at
+all are few. To be more tightly coupled, (I figured loosely coupled is
+ok for now) every command sent should get an boolean back stating
+whether the command worked correctly on the GNash side of things.
+
+  For methods that don't appear to return anything, the result
+NPVariant data is set to true or false just in case.
 
