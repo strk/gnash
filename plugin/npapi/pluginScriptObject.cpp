@@ -711,6 +711,13 @@ GnashPluginScriptObject::initializeIdentifiers()
 
 //    http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_04.html
     
+    // We maintain an internal property for our version number, rather
+    // than asking the player.
+   
+    AddProperty("$version", "456.789");
+    AddProperty("name", "Hello World");
+    AddProperty("id", 1);
+
     AddProperty("src", "example");
     AddProperty("align", "middle");
     AddProperty("quality", "high");
@@ -722,7 +729,6 @@ GnashPluginScriptObject::initializeIdentifiers()
 
     AddProperty("classid", "2b70f2b1-fc72-4734-bb81-4eb2a7713e49");
     AddProperty("movie", "unknown");
-    AddProperty("id", "id unknown");
     AddProperty("width", 0);
     AddProperty("height", 0);
     AddProperty("vspace", 0);
@@ -783,16 +789,11 @@ GnashPluginScriptObject::initializeIdentifiers()
                                  NUM_METHOD_IDENTIFIERS,
                                  pluginMethodIdentifiers);
 #endif
-   // We maintain an internal property for our version number, rather
-   // than asking the player.
-   AddProperty("version", 456.789);
-   AddProperty("hello", "Hello World");
-   
-   NPIdentifier id = NPN_GetStringIdentifier("showFoobar");
-   NPInvokeFunctionPtr func = testfunc;   
-   AddMethod(id, func);
+//     NPIdentifier id = NPN_GetStringIdentifier("showFoobar");
+//    NPInvokeFunctionPtr func = testfunc;  
+//    AddMethod(id, func);
 
-   id = NPN_GetStringIdentifier("SetVariable");
+   NPIdentifier id = NPN_GetStringIdentifier("SetVariable");
    AddMethod(id, SetVariableCallback);
 
    id = NPN_GetStringIdentifier("GetVariable");
@@ -1229,15 +1230,17 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
         ss << " object";         // FIXME: add the object data
     }
 
-    // Add the CR, so we know where the message ends when parsing.
-    ss << std::endl;
-    // Write the message to the Control FD.
-    size_t ret = writePlayer(controlfd, ss.str());
-    // Unless we wrote the same amount of data as the message contained,
-    // something went wrong.
-    if (ret != ss.str().size()) {
-        GnashLogError("Couldn't set the variable, network problems.");
-        return false;
+    if (controlfd > 0) {
+        // Add the CR, so we know where the message ends when parsing.
+        ss << std::endl;
+        // Write the message to the Control FD.
+        size_t ret = writePlayer(controlfd, ss.str());
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != ss.str().size()) {
+            GnashLogError("Couldn't set the variable, network problems.");
+            return false;
+        }
     }
 
     return true;
@@ -1252,15 +1255,22 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
     GnashLogDebug(__PRETTY_FUNCTION__);
     printf("Get Variable \"%s\" is ", name.c_str());
 
-    NPVariant *value = 0;
+    NPVariant *value = new NPVariant;
+    NULL_TO_NPVARIANT(*value);
+
     std::stringstream ss;
     
+    if (controlfd <= 0) {
+        return value;
+    }
+
     ss << "GetVariable " << name << std::endl;
     writePlayer(controlfd, ss.str());
 
     // Have the read function allocate the memory
     const char *data = 0;
     char *ptr = 0;
+    ptr = const_cast<char *>(data);
     int ret = readPlayer(controlfd, &data, 0);
     if (ret == 0) {
         return value;
