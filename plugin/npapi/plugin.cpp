@@ -31,7 +31,6 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <netdb.h>
-# include <sys/socket.h> // shutdown
 #endif
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
@@ -67,7 +66,7 @@
 //  1: fatal errors (errors preventing the plugin from working as it should)
 //  2: informational messages
 //
-#define GNASH_PLUGIN_DEBUG 1
+#define GNASH_PLUGIN_DEBUG 2
 //#define WRITE_FILE
 
 // Defining this flag disables the pipe to the standalone player, as well
@@ -82,6 +81,7 @@
 
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/format.hpp>
 #include <sys/param.h>
 #include <csignal>
 #include <cstdio>
@@ -144,7 +144,7 @@ NS_PluginInitialize()
         return NPERR_NO_ERROR;
     }
 
-    GnashLogDebug("NS_PluginInitialize call ---------------------------------------------------");
+    GnashLogDebug("NS_PluginInitialize call ---------------------------");
 
     /* Browser Functionality Checks */
 
@@ -505,10 +505,6 @@ nsPluginInstance::shut()
     }
 
     if (_controlfd != -1) {
-        if (shutdown(_controlfd, SHUT_RDWR) !=0) {
-            GnashLogError("Gnash plugin failed to shutdown the control socket!");
-        }
-
         if (close(_controlfd) != 0) {
             GnashLogError("Gnash plugin failed to close the control socket!");
         }
@@ -618,12 +614,11 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     }
     _swf_url = stream->url;
 
-#if 1
+#if 0
     // FIXME: debugging crap for now call javascript
     NPN_PluginThreadAsyncCall(_instance, myfunc, NULL);
     // printf("FIXME: %s", getEmbedURL());
 #endif
-    
     
 #if GNASH_PLUGIN_DEBUG > 1
     std::cout << __FUNCTION__ << ": The full URL is " << _swf_url << std::endl;

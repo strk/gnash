@@ -170,14 +170,14 @@ GetVariableCallback (NPObject *npobj, NPIdentifier /* name */,
     GnashLogDebug(__PRETTY_FUNCTION__);
     
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
+    NPVariant *value = 0;
     std::string varname;
     // This method only takes one argument
     if (argCount == 1) {
         varname = NPVARIANT_TO_STRING(args[0]).UTF8Characters;
-        NPVariant *value = gpso->GetVariable(varname);
+        value = gpso->GetVariable(varname);
         if (value == 0) {
-            NPVARIANT_IS_VOID(*value);
+            NPVARIANT_IS_NULL(*result);
         } else {
             if (NPVARIANT_IS_DOUBLE(*value)) {
                 double num = NPVARIANT_TO_DOUBLE(*value);
@@ -193,14 +193,16 @@ GetVariableCallback (NPObject *npobj, NPIdentifier /* name */,
             } else if (NPVARIANT_IS_NULL(*value)) {
                 NULL_TO_NPVARIANT(*result);
             } else if (NPVARIANT_IS_VOID(*value)) {
-            VOID_TO_NPVARIANT(*result);
+                VOID_TO_NPVARIANT(*result);
             } else if (NPVARIANT_IS_OBJECT(*value)) {
                 OBJECT_TO_NPVARIANT(NPVARIANT_TO_OBJECT(*value), *result);
             }
+            NPN_MemFree(value);
             return true;
         }
     }
     
+    NPVARIANT_IS_NULL(*result);
     return false;
 }
 
@@ -389,10 +391,21 @@ bool
 PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
           uint32_t argCount, NPVariant *result)
 {   
-    GnashLogDebug(__PRETTY_FUNCTION__);
+//    GnashLogDebug(__PRETTY_FUNCTION__);
     
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
+#if 1
+    static int counter = 0;
+//    log_error("%s: %d ; %d\n", __FUNCTION__, gpso->getControlFD(), counter);
+    INT32_TO_NPVARIANT(counter, *result);
+    if (counter >= 100) {
+        counter = 0;
+    } else {
+        counter += 20;
+    }
+    return true;
+#else
     if (argCount == 0) {
         std::stringstream ss;
         ss << "PercentLoaded" << std::endl;
@@ -433,6 +446,7 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
     
     BOOLEAN_TO_NPVARIANT(false, *result);
     return false;
+#endif
 }
 
 // Play();
@@ -675,11 +689,14 @@ GnashPluginScriptObject::AddProperty(const std::string &name,
                                      const std::string &str)
 {
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
-    NPVariant *value = new NPVariant;
+    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
     int length = str.size();;
-    char *bar = new char[length+1];
+    char *bar = (char *)NPN_MemAlloc(length+1);
     std::copy(str.begin(), str.end(), bar);
     bar[length] = 0;  // terminate the new string or bad things happen
+    
+    // When an NPVariant becomes a string object, it *does not* make a copy.
+    // Instead it stores the pointer (and length) we just allocated.
     STRINGN_TO_NPVARIANT(bar, length, *value);
     SetProperty(id, value);
 }
@@ -688,7 +705,7 @@ void
 GnashPluginScriptObject::AddProperty(const std::string &name, double num)
 {
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
-    NPVariant *value = new NPVariant;
+    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
     DOUBLE_TO_NPVARIANT(num, *value);
     SetProperty(id, value);
 }
@@ -697,7 +714,7 @@ void
 GnashPluginScriptObject::AddProperty(const std::string &name, int num)
 {
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
-    NPVariant *value = new NPVariant;
+    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
     INT32_TO_NPVARIANT(num, *value);
     SetProperty(id, value);
 }
@@ -707,16 +724,19 @@ GnashPluginScriptObject::AddProperty(const std::string &name, int num)
 void
 GnashPluginScriptObject::initializeIdentifiers()
 {
-    GnashLogDebug("initializeIdentifiers");
+//    GnashLogDebug("initializeIdentifiers");
 
+//    NPN_Status(_nppinstance, __FUNCTION__);
+    
 //    http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_04.html
     
     // We maintain an internal property for our version number, rather
     // than asking the player.
-   
-    AddProperty("$version", "456.789");
+    AddProperty("$version", "10,1,r999");
+    // id and name appear to be the same tag, but differeing browsers access
+    // one or the other, or both.
     AddProperty("name", "Hello World");
-    AddProperty("id", 1);
+    AddProperty("id", "Hello World");
 
     AddProperty("src", "example");
     AddProperty("align", "middle");
@@ -869,7 +889,14 @@ NPObject *
 GnashPluginScriptObject::marshalAllocate (NPP npp, NPClass */* aClass */)
 {
     GnashLogDebug(__PRETTY_FUNCTION__);
+#if 0
+    GnashPluginScriptObject *npobj = reinterpret_cast<GnashPluginScriptObject *>
+        (NPN_MemAlloc(sizeof(GnashPluginScriptObject)));
+    npobj->setInstance(npp);
+    return npobj;
+#else
     return new GnashPluginScriptObject(npp);
+#endif
 }
 
 
@@ -877,9 +904,11 @@ void
 GnashPluginScriptObject::marshalDeallocate (NPObject *npobj)
 {
     GnashLogDebug(__PRETTY_FUNCTION__);
-//    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-//    gpso->Deallocate();
+#if 0
+    NPN_MemFree(reinterpret_cast<void *>(npobj));
+#else
     delete (GnashPluginScriptObject *)npobj;
+#endif
 }
 
 void 
@@ -1145,22 +1174,22 @@ bool
 GnashPluginScriptObject::Invoke(NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result)
 {
 //    GnashLogDebug(__PRETTY_FUNCTION__);
-#if 1
+#if 0
     printf("Invoking Method \"");
     if (NPN_IdentifierIsString(name)) {
-        printf("%s\"...", NPN_UTF8FromIdentifier(name));
+        printf("%s\"...\n", NPN_UTF8FromIdentifier(name));
     } else {
-        printf("%d\"...", NPN_IntFromIdentifier(name));
+        printf("%d\"...\n", NPN_IntFromIdentifier(name));
     }
 #endif
 
     std::map<NPIdentifier, NPInvokeFunctionPtr>::iterator it;
     it = _methods.find(name);
     if (it != _methods.end()) {
-        printf(" FOUND\n");
+        // printf(" FOUND\n");
         NPInvokeFunctionPtr func = it->second;
         return func(NULL, name, args, argCount, result);
-    }    
+    }
 
     return false;
 }
@@ -1255,7 +1284,7 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
     GnashLogDebug(__PRETTY_FUNCTION__);
     printf("Get Variable \"%s\" is ", name.c_str());
 
-    NPVariant *value = new NPVariant;
+    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
     NULL_TO_NPVARIANT(*value);
 
     std::stringstream ss;
@@ -1275,9 +1304,8 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
     if (ret == 0) {
         return value;
     }
-
+    // We need a non const pointer to walk through the data.
     ptr = const_cast<char *>(data);
-    value = new NPVariant;
 
     // Make sure this mesasge is our response, whnich it should be,
     // but you never know...
@@ -1336,7 +1364,7 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
     ss << std::endl;
 
     // free the memory used for the data, as it was allocated in readPlayer().
-    delete[](data);
+    NPN_MemFree(reinterpret_cast<void *>(const_cast<char *>(data)));
     
     return value;
 }
@@ -1351,7 +1379,7 @@ GnashPluginScriptObject::setControlFD(int x)
 int
 GnashPluginScriptObject::getControlFD()
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+//    GnashLogDebug(__PRETTY_FUNCTION__);
 
     return controlfd;
 };
@@ -1425,7 +1453,7 @@ GnashPluginScriptObject::readPlayer(int fd, const char **data, size_t length)
         if (*data == 0) {
             // Since we know how bytes are in the network buffer, allocate
             // some memory to read the data.
-            buf = new char[bytes+1];
+            buf = (char *)NPN_MemAlloc(bytes+1);
             // terminate incase we want to treat the data like a string.
             buf[bytes] = 0;
             length = bytes;

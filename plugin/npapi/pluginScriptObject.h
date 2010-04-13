@@ -119,8 +119,10 @@ protected:
     bool RemoveProperty(NPIdentifier name);
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
+
 private:
     void initializeIdentifiers();
+    void setInstance(NPP inst) { _nppinstance = inst; };
     
     // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
     NPP _nppinstance;
