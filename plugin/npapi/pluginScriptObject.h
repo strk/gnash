@@ -120,6 +120,7 @@ protected:
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
 
+    
 private:
     void initializeIdentifiers();
     void setInstance(NPP inst) { _nppinstance = inst; };
@@ -129,6 +130,7 @@ private:
     
     std::map<NPIdentifier, NPVariant *> _properties;
     std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
+    // int _control;
 };
 
 #endif /* GNASH_PLUGIN_SCRIPT_OBJECT_H */

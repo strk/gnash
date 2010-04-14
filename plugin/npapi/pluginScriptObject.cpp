@@ -122,6 +122,30 @@ testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*arg
     return true;
 }
 
+void
+printNPVariant(NPVariant *value)
+{
+    if (NPVARIANT_IS_DOUBLE(*value)) {
+        double num = NPVARIANT_TO_DOUBLE(*value);
+        printf("is double, value %g\n", num);
+    } else if (NPVARIANT_IS_STRING(*value)) {
+        std::string str(NPVARIANT_TO_STRING(*value).UTF8Characters);
+        printf("is string, value %s\n", str.c_str());
+    } else if (NPVARIANT_IS_BOOLEAN(*value)) {
+        bool flag = NPVARIANT_TO_BOOLEAN(*value);
+        printf("is boolean, value %d\n", flag);
+    } else if (NPVARIANT_IS_INT32(*value)) {
+        int num = NPVARIANT_TO_INT32(*value);
+        printf("is int, value %d\n", num);
+    } else if (NPVARIANT_IS_NULL(*value)) {
+        printf("value is null\n");
+    } else if (NPVARIANT_IS_VOID(*value)) {
+        printf("value is void\n");
+    } else if (NPVARIANT_IS_OBJECT(*value)) {
+        printf("value is object\n");
+    }    
+}
+
 // Callbacks for the default methods
 
 // As these callbacks use a generalized typedef for the signature, often some
@@ -202,6 +226,7 @@ GetVariableCallback (NPObject *npobj, NPIdentifier /* name */,
         }
     }
     
+    NPN_MemFree(value);
     NPVARIANT_IS_NULL(*result);
     return false;
 }
@@ -270,7 +295,7 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
         }        
         const char *data = 0;
         char *ptr = 0;
-        ret = gpso->readPlayer(controlfd, &data, 0);
+        ret = gpso->readPlayer(gpso->getControlFD(), &data, 0);
         if (ret == 0) {
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
@@ -420,7 +445,7 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
         }        
         const char *data = 0;
         char *ptr = 0;
-        ret = gpso->readPlayer(controlfd, &data, 0);
+        ret = gpso->readPlayer(gpso->getControlFD(), &data, 0);
         if (ret == 0) {
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
@@ -656,7 +681,7 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
         }        
         const char *data = 0;
         char *ptr = 0;
-        ret = gpso->readPlayer(controlfd, &data, 0);
+        ret = gpso->readPlayer(gpso->getControlFD(), &data, 0);
         if (ret == 0) {
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
@@ -1239,7 +1264,6 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
     GnashLogDebug(__PRETTY_FUNCTION__);
 
     // Build the command message
-    printf("Set Variable \"%s\" to ", name.c_str());
     std::stringstream ss;
     ss << "SetVariable " << name;
     if (NPVARIANT_IS_DOUBLE(*value)) {
@@ -1248,28 +1272,27 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
         std::string varname = NPVARIANT_TO_STRING(*value).UTF8Characters;
         ss << " string " << varname;
     } else if (NPVARIANT_IS_BOOLEAN(*value)) {
-        ss << " boolean " << NPVARIANT_TO_BOOLEAN(*value);
+        ss << " boolean\n" << NPVARIANT_TO_BOOLEAN(*value);
     } else if (NPVARIANT_IS_INT32(*value)) {
-        ss << " int32 " << NPVARIANT_TO_INT32(*value);
+        ss << " int32\n" << NPVARIANT_TO_INT32(*value);
     } else if (NPVARIANT_IS_NULL(*value)) {
         ss << " null";
     } else if (NPVARIANT_IS_VOID(*value)) {
         ss << " void";
     } else if (NPVARIANT_IS_OBJECT(*value)) {
-        ss << " object";         // FIXME: add the object data
+        ss << " object\n";         // FIXME: add the object data
     }
 
-    if (controlfd > 0) {
-        // Add the CR, so we know where the message ends when parsing.
-        ss << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = writePlayer(controlfd, ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't set the variable, network problems.");
-            return false;
-        }
+    // Add the CR, so we know where the message ends when parsing.
+    ss << std::endl;
+
+    // Write the message to the Control FD.
+    size_t ret = writePlayer(controlfd, ss.str());
+    // Unless we wrote the same amount of data as the message contained,
+    // something went wrong.
+    if (ret != ss.str().size()) {
+        GnashLogError("Couldn't set the variable, network problems.");
+        return false;
     }
 
     return true;
@@ -1282,25 +1305,24 @@ NPVariant *
 GnashPluginScriptObject::GetVariable(const std::string &name)
 {
     GnashLogDebug(__PRETTY_FUNCTION__);
-    printf("Get Variable \"%s\" is ", name.c_str());
 
     NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
     NULL_TO_NPVARIANT(*value);
 
     std::stringstream ss;
     
-    if (controlfd <= 0) {
-        return value;
-    }
-
     ss << "GetVariable " << name << std::endl;
-    writePlayer(controlfd, ss.str());
+    size_t ret = writePlayer(controlfd, ss.str());
+    if (ret != ss.str().size()) {
+        GnashLogError("Couldn't send GetVariable request, network problems.");
+        return false;
+    }
 
     // Have the read function allocate the memory
     const char *data = 0;
     char *ptr = 0;
     ptr = const_cast<char *>(data);
-    int ret = readPlayer(controlfd, &data, 0);
+    ret = readPlayer(controlfd, &data, 0);
     if (ret == 0) {
         return value;
     }
@@ -1327,33 +1349,34 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
     }
 #endif
     ptr += name.size() + 1;     // don't forget to skip the space
-    
+
     if (strncmp(ptr, "double ", 7) == 0) {
-        double num = strtod(ptr, NULL);
         ptr += 7;
-        printf("\tdouble %s = %g\n", name.c_str(), num);
+        double num = strtod(ptr, NULL);
         DOUBLE_TO_NPVARIANT(num, *value);
     } else if (strncmp(ptr, "string ", 7) == 0) {
         ptr += 7;
         std::string str(ptr);
-        printf("\tstring %s = %s\n", name.c_str(), str.c_str());
+        int length = str.size();;
+        char *bar = (char *)NPN_MemAlloc(length+1);
+        std::copy(str.begin(), str.end(), bar);
+        bar[length] = 0;  // terminate the new string or bad things happen
+        // When an NPVariant becomes a string object, it *does not* make a copy.
+        // Instead it stores the pointer (and length) we just allocated.
+        STRINGN_TO_NPVARIANT(bar, length, *value);
     } else if (strncmp(ptr, "boolean ", 8) == 0) {
         ptr += 8;
         bool flag = strtol(ptr, NULL, 0);
-        printf("\tboolean %s = %d\n", name.c_str(), flag);
         BOOLEAN_TO_NPVARIANT(flag, *value);
     } else if (strncmp(ptr, "int32 ", 6) == 0) {
         ptr += 6;
         int num = strtol(ptr, NULL, 0);
-        printf("\tint32 %s = %d\n", name.c_str(), num);
         INT32_TO_NPVARIANT(num, *value);
     } else if (strncmp(ptr, "null ", 5) == 0) {
         ptr += 5;
-        printf("\t%s = null\n", name.c_str());
         NULL_TO_NPVARIANT(*value);
     } else if (strncmp(ptr, "void ", 5) == 0) {
         ptr += 5;
-        printf("\t%s = void\n", name.c_str());
         VOID_TO_NPVARIANT(*value);
     } else if (strncmp(ptr, "object ", 7) == 0) {
         ptr += 7;
@@ -1361,10 +1384,10 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
         // OBJECT_TO_NPVARIANT(num, *value);
     }
 
-    ss << std::endl;
-
     // free the memory used for the data, as it was allocated in readPlayer().
     NPN_MemFree(reinterpret_cast<void *>(const_cast<char *>(data)));
+    
+    printNPVariant(value);
     
     return value;
 }
@@ -1372,15 +1395,16 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
 void
 GnashPluginScriptObject::setControlFD(int x)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+//    printf("%s: %d\n", __FUNCTION__, x);
+    
     controlfd = x;
 }
 
 int
 GnashPluginScriptObject::getControlFD()
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
-
+    printf("%s: %d\n", __FUNCTION__, controlfd);
+    
     return controlfd;
 };
 
@@ -1390,15 +1414,24 @@ int
 GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 {
     GnashLogDebug(__PRETTY_FUNCTION__);
-    return writePlayer(fd, data.c_str(), data.size());
+
+    printf("Writing to fd #%d: %s\n", fd, data.c_str());
+
+    if (fd > 2) {
+        return writePlayer(fd, data.c_str(), data.size());
+    }
+    
+    return 0;
 }
 
 int
 GnashPluginScriptObject::writePlayer(int fd, const char *data, size_t length)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+    GnashLogDebug(__PRETTY_FUNCTION__);
     
-    if (controlfd > 0) {
+    printf("Writing to fd #%d: %s\n", fd, data);
+
+    if (fd > 2) {
         return ::write(fd, data, length);
     }
     

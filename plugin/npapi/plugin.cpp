@@ -66,7 +66,7 @@
 //  1: fatal errors (errors preventing the plugin from working as it should)
 //  2: informational messages
 //
-#define GNASH_PLUGIN_DEBUG 2
+#define GNASH_PLUGIN_DEBUG 1
 //#define WRITE_FILE
 
 // Defining this flag disables the pipe to the standalone player, as well
@@ -117,7 +117,6 @@ static bool createSaLauncher = false;
 static const char* getPluginDescription();
 void GnashLogDebug(const std::string& msg);
 void GnashLogError(const std::string& msg);
-
 
 /// \brief Return the MIME Type description for this plugin.
 char*
@@ -391,12 +390,12 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
                             reinterpret_cast<struct sockaddr *>(&sock_in),
                             sizeof(sock_in));
         if (ret == 0) {
-            GnashLogDebug("Connected to debug server");
+            printf("Connected to debug server on fd #%d\n", sockfd);
             _controlfd = sockfd;
             GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)_scriptObject;
             gpso->setControlFD(_controlfd);
         } else {
-            GnashLogError("Couldn't connect to debug server");
+            printf("Couldn't connect to debug server: %s\n", strerror(errno));
         }
     }
 #endif
@@ -542,19 +541,12 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 
     _window = reinterpret_cast<Window> (aWindow->window);
 
-#ifdef ENABLE_SCRIPTABLE
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)_scriptObject;
-//    printf("FIXME: the control FD is #%d\n", _controlfd);
-    gpso->setControlFD(_controlfd);
-#endif
-
     // When testing the interface to the plugin, don't start the player
     // as a debug client "nc -l 1111" is used instead.
-#ifndef NETTEST
     if (!_childpid && !_swf_url.empty()) {
         startProc();
     }
-#endif
+
     return NPERR_NO_ERROR;
 }
 
@@ -1092,6 +1084,11 @@ nsPluginInstance::startProc()
     }
 
     _controlfd = p2c_controlpipe[1];
+    
+#ifdef ENABLE_SCRIPTABLE
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)_scriptObject;
+    gpso->setControlFD(_controlfd);
+#endif
     
     /*
     Setup the command line for starting Gnash
