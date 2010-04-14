@@ -21,8 +21,6 @@
 #endif
 
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST) && !defined(_ANDROID)
 # include <sys/shm.h>
 # include <sys/sem.h>
