@@ -46,6 +46,12 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/format.hpp>
+#include <boost/preprocessor/arithmetic/inc.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
+#include <boost/preprocessor/seq/for_each.hpp>
 
 #include "pluginbase.h"
 
@@ -123,6 +129,66 @@ private:
     
     const char* getCurrentPageURL() const;
 };
+
+// Define the following to make the plugin verbose
+// WARNING: will write to .xsession_errors !
+// Values:
+//  0: no messages at all
+//  1: fatal errors (errors preventing the plugin from working as it should)
+//  2: informational messages
+//
+#define GNASH_PLUGIN_DEBUG 2
+
+// This following logging code is copied from libbase/log.h, but
+// duplicated here because the plugin only needs a more trimmed down
+// version that doesn't require any Gnash libraires to keep the
+// memory footprint down.
+DSOEXPORT void processLog_error(const boost::format& fmt);
+DSOEXPORT void processLog_debug(const boost::format& fmt);
+
+/// This heap of steaming preprocessor code magically converts
+/// printf-style statements into boost::format messages using templates.
+//
+/// Macro to feed boost::format strings to the boost::format object,
+/// producing code like this: "% t1 % t2 % t3 ..."
+#define TOKENIZE_FORMAT(z, n, t) % t##n
+
+/// Macro to add a number of arguments to the templated function
+/// corresponding to the number of template arguments. Produces code
+/// like this: "const T0& t0, const T1& t1, const T2& t2 ..."
+#define TOKENIZE_ARGS(z, n, t) BOOST_PP_COMMA_IF(n) const T##n& t##n
+
+/// This is a sequence of different log message types to be used in
+/// the code. Append the name to log_ to call the function, e.g. 
+/// log_error, log_unimpl.
+#define LOG_TYPES (error) (debug)
+/// The preprocessor generates templates with 1..ARG_NUMBER
+/// arguments.
+#define ARG_NUMBER 2
+#define LOG_TEMPLATES(z, n, data)\
+template<BOOST_PP_ENUM_PARAMS(BOOST_PP_INC(n), typename T)>\
+inline void log_##data(BOOST_PP_REPEAT(BOOST_PP_INC(n), TOKENIZE_ARGS, t)) \
+{\
+   if (GNASH_PLUGIN_DEBUG < 1) return; \
+    boost::format f(t0);           \
+    using namespace boost::io; \
+    f.exceptions(all_error_bits ^ (too_many_args_bit | \
+                                   too_few_args_bit | \
+                                   bad_format_string_bit)); \
+    processLog_##data(f BOOST_PP_REPEAT_FROM_TO(1, \
+            BOOST_PP_INC(n), \
+            TOKENIZE_FORMAT, t));\
+}
+
+/// Calls the macro LOG_TEMPLATES an ARG_NUMBER number
+/// of times, each time adding an extra typename argument to the
+/// template.
+#define GENERATE_LOG_TYPES(r, _, t) \
+    BOOST_PP_REPEAT(ARG_NUMBER, LOG_TEMPLATES, t)
+
+/// Calls the template generator for each log type in the
+/// sequence LOG_TYPES.
+BOOST_PP_SEQ_FOR_EACH(GENERATE_LOG_TYPES, _, LOG_TYPES)
 
 // end of __PLUGIN_H__
 #endif
