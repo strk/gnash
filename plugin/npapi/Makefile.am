@@ -68,8 +68,8 @@ libgnashplugin_la_LIBADD   = \
 
 # Scriptable plugin support
 if SCRIPTABLE
-noinst_HEADERS += pluginScriptObject.h
-libgnashplugin_la_SOURCES += pluginScriptObject.cpp
+noinst_HEADERS += pluginScriptObject.h callbacks.h
+libgnashplugin_la_SOURCES += pluginScriptObject.cpp callbacks.cpp
 endif
 
 if PLUGIN_LINK_UNDEFINED
