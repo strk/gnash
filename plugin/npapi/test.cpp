@@ -243,8 +243,8 @@ main(int argc, char *argv[])
     str = ei.makeNumber(135.78);
     iargs.push_back(str);
     
-    str = ei.makeInvoke("barfoo", iargs);
-    xml = "<invoke name=\"barfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments><invoke>";
+    str = ei.makeInvoke("barbyfoo", iargs);
+    xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
 //    std::cout << str << std::endl;
     regcomp (&regex_pat, xml.c_str(), REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0) == 0) {
@@ -267,6 +267,8 @@ main(int argc, char *argv[])
     }
 }
 
+// We have to implement these two memory allocation functions as
+// they're used in the code we're testing.
 void* NPN_MemAlloc(uint32_t size)
 {
   void * rv = NULL;
@@ -282,28 +284,6 @@ void NPN_MemFree(void* ptr)
 // These are just stubs to get the test case to link standalone.
 NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
 {
-}
-
-bool NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier name,
-                     const NPVariant *value)
-{
-    _properties[name] = const_cast<NPVariant *>(value);
-}
-
-bool NPN_GetProperty(NPP npp, NPObject* obj, NPIdentifier name,
-                     const NPVariant *value)
-{
-    return _properties[name];
-}
-
-bool NPN_HasProperty(NPP npp, NPObject* obj, NPIdentifier name,
-                     const NPVariant *value)
-{
-    std::map<NPIdentifier, NPVariant *>::iterator it;
-    it = _properties.find(name);
-    if (it != _properties.end()) {
-        return true;
-    }
 }
 
 nsPluginInstanceBase *
@@ -337,3 +317,31 @@ void
 NS_DestroyPluginInstance(nsPluginInstanceBase *aPlugin)
 {
 }
+
+// Implement minimal properties handling
+bool NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier name,
+                     const NPVariant *value)
+{
+    _properties[name] = const_cast<NPVariant *>(value);
+}
+
+bool NPN_GetProperty(NPP npp, NPObject* obj, NPIdentifier name,
+                     const NPVariant *value)
+{
+    return _properties[name];
+}
+
+bool NPN_HasProperty(NPP npp, NPObject* obj, NPIdentifier name,
+                     const NPVariant *value)
+{
+    std::map<NPIdentifier, NPVariant *>::iterator it;
+    it = _properties.find(name);
+    if (it != _properties.end()) {
+        return true;
+    }
+}
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

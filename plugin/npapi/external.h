@@ -56,7 +56,7 @@ public:
     NPVariant *parseXML(const std::string &xml);
     std::map<std::string, NPVariant *> parseProperties(const std::string &xml);
     std::vector<NPVariant *> parseArguments(const std::string &xml);
-    std::string convertNPVariant (NPVariant *npv);
+    std::string convertNPVariant (const NPVariant *npv);
 };
 
 #endif // GNASH_PLUGIN_EXTERNAL_H

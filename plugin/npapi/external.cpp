@@ -55,7 +55,11 @@ ExternalInterface::makeInvoke (const std::string &method,
     }
     
     ss << "</arguments>";
-    ss << "<invoke>";
+    ss << "</invoke>";
+
+    // Add a CR on the end so the output is more readable on the other
+    // end. XL should be ignoring the CR anyway.
+    ss << std::endl;
     
     return ss.str();
 }
@@ -273,7 +277,7 @@ ExternalInterface::parseXML(const std::string &xml)
 }
 
 std::string
-ExternalInterface::convertNPVariant (NPVariant *value)
+ExternalInterface::convertNPVariant (const NPVariant *value)
 {
     std::stringstream ss;
     

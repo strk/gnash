@@ -43,6 +43,7 @@
 #include "npruntime.h"
 #include "plugin.h" 
 #include "callbacks.h" 
+#include "external.h" 
 #include "pluginScriptObject.h"
 
 extern NPNetscapeFuncs NPNFuncs;
@@ -66,48 +67,6 @@ static NPClass GnashPluginScriptObjectClass = {
 
 static int controlfd = -1;
 
-#if 0
-
-// http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_04.html
-// Tell Target Methods. Use TGetProperty, TGetPropertyAsNumber, TSetProperty
-TCallLabel
-TCurrentFrame
-TCurrentLabel
-TGetProperty
-TGetPropertyAsNumber
-TGotoFrame
-TGotoLabel
-TPlay
-TSetProperty
-TStopPlay
-
-// Target Properties
-X_POS
-Y_POS
-X_SCALE
-Y_SCALE
-CURRENT_FRAME                   // read-only
-TOTAL_FRAMES                    // read-only
-ALPHA
-VISIBLE
-WIDTH                           // read-only
-HEIGHT                          // read-only
-ROTATE
-TARGET                          // read-only
-FRAMES_LOADED                   // read-only
-NAME
-DROP_TARGET                     // read-only
-URL                             // read-only
-HIGH_QUALITY
-FOCUS_RECT
-SOUND_BUF_TIME
-
-// Standard Events
-OnProgress
-OnReadyStateChange
-FSCommand
-#endif
-
 bool
 testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
           uint32_t /* argCount */, NPVariant *result)
@@ -120,7 +79,7 @@ testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*arg
 }
 
 void
-printNPVariant(NPVariant *value)
+printNPVariant(const NPVariant *value)
 {
     if (NPVARIANT_IS_DOUBLE(*value)) {
         double num = NPVARIANT_TO_DOUBLE(*value);
@@ -510,22 +469,21 @@ GnashPluginScriptObject::HasProperty(NPIdentifier name)
         // log_debug(" FOUND");
         return true;
     }
-    
+
     return false;
 };
 
 bool
 GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
 {
-//    log_debug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
 
-    log_debug("Getting Property \"");
     if (NPN_IdentifierIsString(name)) {
-        log_debug("%s\"...", NPN_UTF8FromIdentifier(name));
+        log_debug("Getting Property %s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        log_debug("%d\"...", NPN_IntFromIdentifier(name));
+        log_debug("Getting Property %d\"...", NPN_IntFromIdentifier(name));
     }
-    
+
     std::map<NPIdentifier, NPVariant *>::iterator it;
     it = _properties.find(name);
     if (it != _properties.end()) {
@@ -699,38 +657,24 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
 {
     log_debug(__PRETTY_FUNCTION__);
 
-    // Build the command message
-    std::stringstream ss;
-    ss << "SetVariable " << name;
-    if (NPVARIANT_IS_DOUBLE(*value)) {
-        ss << " double " << NPVARIANT_TO_DOUBLE(*value);
-    } else if (NPVARIANT_IS_STRING(*value)) {
-        std::string varname = NPVARIANT_TO_STRING(*value).UTF8Characters;
-        ss << " string " << varname;
-    } else if (NPVARIANT_IS_BOOLEAN(*value)) {
-        ss << " boolean\n" << NPVARIANT_TO_BOOLEAN(*value);
-    } else if (NPVARIANT_IS_INT32(*value)) {
-        ss << " int32\n" << NPVARIANT_TO_INT32(*value);
-    } else if (NPVARIANT_IS_NULL(*value)) {
-        ss << " null";
-    } else if (NPVARIANT_IS_VOID(*value)) {
-        ss << " void";
-    } else if (NPVARIANT_IS_OBJECT(*value)) {
-        ss << " object\n";         // FIXME: add the object data
-    }
-
-    // Add the CR, so we know where the message ends when parsing.
-    ss << std::endl;
-
+    ExternalInterface ei;
+    
+    std::vector<std::string> iargs;
+    std::string str = ei.makeString(name);
+    iargs.push_back(str);
+    str = ei.convertNPVariant(value);
+    iargs.push_back(str);
+    str = ei.makeInvoke("SetVariable", iargs);
+    
     // Write the message to the Control FD.
-    size_t ret = writePlayer(controlfd, ss.str());
+    size_t ret = writePlayer(controlfd, str);
     // Unless we wrote the same amount of data as the message contained,
     // something went wrong.
-    if (ret != ss.str().size()) {
+    if (ret != str.size()) {
         log_error("Couldn't set the variable, network problems.");
         return false;
     }
-
+    
     return true;
 }
 
@@ -742,83 +686,31 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
 {
     log_debug(__PRETTY_FUNCTION__);
 
-    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
-    NULL_TO_NPVARIANT(*value);
+    ExternalInterface ei;
+    std::vector<std::string> iargs;
+    std::string str = ei.makeString(name);
+    iargs.push_back(str);
+    str = ei.makeInvoke("GetVariable", iargs);
 
-    std::stringstream ss;
-    
-    ss << "GetVariable " << name << std::endl;
-    size_t ret = writePlayer(controlfd, ss.str());
-    if (ret != ss.str().size()) {
+    size_t ret = writePlayer(controlfd, str);
+    if (ret != str.size()) {
         log_error("Couldn't send GetVariable request, network problems.");
         return false;
     }
 
     // Have the read function allocate the memory
+    NPVariant *value = 0;
     const char *data = 0;
     char *ptr = 0;
     ptr = const_cast<char *>(data);
     ret = readPlayer(controlfd, &data, 0);
     if (ret == 0) {
-        return value;
-    }
-    // We need a non const pointer to walk through the data.
-    ptr = const_cast<char *>(data);
-
-    // Make sure this mesasge is our response, whnich it should be,
-    // but you never know...
-    if (strncmp(ptr, "GetVariable ", 12) != 0) {
-        log_debug("Illegal response! %s", ptr);
-        return value;
-    } else {
-        // A legit response has CR on the end already
-        log_debug("Legit response: %s", ptr);
-    }    
-    ptr += 12;
-
-#if 0
-    if (strncmp(ptr, name.c_str(), name.size()) == 0) {
-        log_debug("Mismatched variable name! %s", ptr);
-        return value;
-    } else {
-        log_debug("Variable names matched: %s", ptr);
-    }
-#endif
-    ptr += name.size() + 1;     // don't forget to skip the space
-
-    if (strncmp(ptr, "double ", 7) == 0) {
-        ptr += 7;
-        double num = strtod(ptr, NULL);
-        DOUBLE_TO_NPVARIANT(num, *value);
-    } else if (strncmp(ptr, "string ", 7) == 0) {
-        ptr += 7;
-        std::string str(ptr);
-        int length = str.size();;
-        char *bar = (char *)NPN_MemAlloc(length+1);
-        std::copy(str.begin(), str.end(), bar);
-        bar[length] = 0;  // terminate the new string or bad things happen
-        // When an NPVariant becomes a string object, it *does not* make a copy.
-        // Instead it stores the pointer (and length) we just allocated.
-        STRINGN_TO_NPVARIANT(bar, length, *value);
-    } else if (strncmp(ptr, "boolean ", 8) == 0) {
-        ptr += 8;
-        bool flag = strtol(ptr, NULL, 0);
-        BOOLEAN_TO_NPVARIANT(flag, *value);
-    } else if (strncmp(ptr, "int32 ", 6) == 0) {
-        ptr += 6;
-        int num = strtol(ptr, NULL, 0);
-        INT32_TO_NPVARIANT(num, *value);
-    } else if (strncmp(ptr, "null ", 5) == 0) {
-        ptr += 5;
+        value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
         NULL_TO_NPVARIANT(*value);
-    } else if (strncmp(ptr, "void ", 5) == 0) {
-        ptr += 5;
-        VOID_TO_NPVARIANT(*value);
-    } else if (strncmp(ptr, "object ", 7) == 0) {
-        ptr += 7;
-        log_debug("\tFIXME: %s = object", name);
-        // OBJECT_TO_NPVARIANT(num, *value);
+        return value;
     }
+
+    value = ei.parseXML(data);
 
     // free the memory used for the data, as it was allocated in readPlayer().
     NPN_MemFree(reinterpret_cast<void *>(const_cast<char *>(data)));
@@ -908,7 +800,7 @@ GnashPluginScriptObject::readPlayer(int fd, const char **data, size_t length)
             ioctlSocket(fd, FIONREAD, &bytes);
 #endif
         // } else {
-        //     log_debug("There is no data in thhe network");
+        //     log_debug("There is no data in the network");
         }
         
 

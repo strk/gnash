@@ -68,6 +68,7 @@
 // as prevents the standalone Gnash player from being exec'd. Instead it
 // makes a network connection to localhost:1111 so the developer can use
 // Netcat (nc) to send and receive messages to test the interface.
+// #define NETTEST 1
 #undef NETTEST
 
 #include "plugin.h" 
