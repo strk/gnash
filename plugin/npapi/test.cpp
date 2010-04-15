@@ -110,9 +110,9 @@ main(int argc, char *argv[])
     
     str = ei.makeProperty("hi", "Hello World!");
     if (str == "<property id=\"hi\">Hello World!</property>") {
-        runtest.pass("makeProperty()");
+        runtest.pass("ExternalInterface::makeProperty()");
     } else {
-        runtest.fail("makeProperty()");
+        runtest.fail("ExternalInterface::makeProperty()");
     }
     
 #if 0
@@ -149,7 +149,9 @@ main(int argc, char *argv[])
     margs["test3"] = prop3;
     
     str = ei.makeObject(margs);
-    regcomp (&regex_pat, "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>", REG_NOSUB|REG_NEWLINE);
+    std::string xml = "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>";
+    
+    regcomp (&regex_pat, xml.c_str(), REG_NOSUB|REG_NEWLINE);
 
 //    std::cout << str << std::endl;
     if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0)) {
@@ -158,18 +160,93 @@ main(int argc, char *argv[])
         runtest.pass("ExternalInterface::makeObject()");
     }
 
+    //
+    // Parsing tests
+    //
+    xml = "<string>Hello World!</string>";
+    NPVariant *np = ei.parseXML(xml);
+    std::string data = NPVARIANT_TO_STRING(np[0]).UTF8Characters;
+    if (NPVARIANT_IS_STRING(*np) &&
+        (data == "Hello World!")) {
+        runtest.pass("ExternalInterface::parseXML(string)");
+    } else {
+        runtest.fail("ExternalInterface::parseXML(string)");
+    }
+
+    xml = "<number>123.456</number>";
+    np = ei.parseXML(xml);
+    double num = NPVARIANT_TO_DOUBLE(*np);
+    if (NPVARIANT_IS_DOUBLE(*np) &&
+        (num == 123.456)) {
+        runtest.pass("ExternalInterface::parseXML(double)");
+    } else {
+        runtest.fail("ExternalInterface::parseXML(double)");
+    }
+
+    xml = "<number>78</number>";
+    np = ei.parseXML(xml);
+    int inum = NPVARIANT_TO_INT32(*np);
+    if (NPVARIANT_IS_INT32(*np) &&
+        (inum == 78)) {
+        runtest.pass("ExternalInterface::parseXML(int32)");
+    } else {
+        runtest.fail("ExternalInterface::parseXML(int32)");
+    }
+
+    xml = "<true/>";
+    np = ei.parseXML(xml);
+    bool flag = NPVARIANT_TO_BOOLEAN(*np);
+    if (NPVARIANT_IS_BOOLEAN(*np) &&
+        (flag == true)) {
+        runtest.pass("ExternalInterface::parseXML(true)");
+    } else {
+        runtest.fail("ExternalInterface::parseXML(true)");
+    }
+
+    xml = "<false/>";
+    np = ei.parseXML(xml);
+    flag = NPVARIANT_TO_BOOLEAN(*np);
+    if (NPVARIANT_IS_BOOLEAN(*np) &&
+        (flag == false)) {
+        runtest.pass("ExternalInterface::parseXML(false)");
+    } else {
+        runtest.fail("ExternalInterface::parseXML(false)");
+    }
+
+    xml = "<null/>";
+    np = ei.parseXML(xml);
+    if (NPVARIANT_IS_NULL(*np)) {
+        runtest.pass("ExternalInterface::parseXML(null)");
+    } else {
+        runtest.fail("ExternalInterface::parseXML(null)");
+    }
+
+    xml = "<void/>";
+    np = ei.parseXML(xml);
+    if (NPVARIANT_IS_VOID(*np)) {
+        runtest.pass("ExternalInterface::parseXML(void)");
+    } else {
+        runtest.fail("ExternalInterface::parseXML(void)");
+    }
+
+    xml = "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>";
+    np = ei.parseXML(xml);
+    if (NPVARIANT_IS_OBJECT(*np)) {
+        runtest.pass("ExternalInterface::parseXML(object)");
+    } else {
+        runtest.fail("ExternalInterface::parseXML(object)");
+    }
+
 }
 
 // These are just stubs to get the test case to link standalone.
 NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
 {
-  // return getstringidentifier(name);
 }
 
 bool NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier propertyName,
                      const NPVariant *value)
 {
-  // return setproperty(npp, obj, propertyName, value);
 }
 
 nsPluginInstanceBase *

@@ -175,7 +175,6 @@ ExternalInterface::makeObject (std::map<std::string, std::string> &args)
     ss << "<object>";
     for (it = args.begin(); it != args.end(); ++it) {
         ss << "<property id=\"" << it->first << "\">" << it->second << "</property>";
-        //makeProperty(it->first, it->second);
     }
     ss << "</object>";
     
@@ -198,18 +197,21 @@ ExternalInterface::parseXML(const std::string &xml)
     // Look for the ending > in the first part of the data for the tag
     end = xml.find(">");
     if (end != std::string::npos) {
+        end++;                  // go past the > character
         tag = xml.substr(start, end);
         // Look for the easy ones first
         if (tag == "<null/>") {
             NULL_TO_NPVARIANT(*value);
+        } else if (tag == "<void/>") {
+            VOID_TO_NPVARIANT(*value);
         } else if (tag == "<true/>") {
             BOOLEAN_TO_NPVARIANT(true, *value);
         } else if (tag == "<false/>") {
             BOOLEAN_TO_NPVARIANT(false, *value);
         } else if (tag == "<number>") {
-            start = end + 1;
+            start = end;
             end = xml.find("</number>");
-            std::string str = xml.substr(start, end);
+            std::string str = xml.substr(start, end-start);
             if (str.find(".") != std::string::npos) {
                 double num = strtod(str.c_str(), NULL);
                 DOUBLE_TO_NPVARIANT(num, *value);
@@ -218,9 +220,9 @@ ExternalInterface::parseXML(const std::string &xml)
                 INT32_TO_NPVARIANT(num, *value);
             }
         } else if (tag == "<string>") {
-            start = end + 1;
+            start = end;
             end = xml.find("</string>");
-            std::string str = xml.substr(start, end);
+            std::string str = xml.substr(start, end-start);
             int length = str.size();;
             char *data = (char *)NPN_MemAlloc(length+1);
             std::copy(str.begin(), str.end(), data);
@@ -228,6 +230,12 @@ ExternalInterface::parseXML(const std::string &xml)
             // When an NPVariant becomes a string object, it *does not* make a copy.
             // Instead it stores the pointer (and length) we just allocated.
             STRINGN_TO_NPVARIANT(data, length, *value);
+        } else if (tag == "<array>") {
+            NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+            OBJECT_TO_NPVARIANT(obj, *value);
+        } else if (tag == "<object>") {
+            NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+            OBJECT_TO_NPVARIANT(obj, *value);
         }
     }
     
