@@ -232,9 +232,29 @@ ExternalInterface::parseXML(const std::string &xml)
             STRINGN_TO_NPVARIANT(data, length, *value);
         } else if (tag == "<array>") {
             NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+            start = end;
+            end = xml.find("</array");
+            std::string str = xml.substr(start, end-start);
+            std::map<std::string, NPVariant *> props = parseProperties(str);
+            std::map<std::string, NPVariant *>::iterator it;
+            for (it=props.begin(); it != props.end(); ++it) {
+                NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
+                NPVariant *value = it->second;
+                NPN_SetProperty(NULL, obj, id, value);
+            }
             OBJECT_TO_NPVARIANT(obj, *value);
         } else if (tag == "<object>") {
             NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+            start = end;
+            end = xml.find("</object");
+            std::string str = xml.substr(start, end-start);
+            std::map<std::string, NPVariant *> props = parseProperties(str);
+            std::map<std::string, NPVariant *>::iterator it;
+            for (it=props.begin(); it != props.end(); ++it) {
+                NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
+                NPVariant *value = it->second;
+                NPN_SetProperty(NULL, obj, id, value);
+            }
             OBJECT_TO_NPVARIANT(obj, *value);
         }
     }
@@ -272,6 +292,34 @@ ExternalInterface::convertNPVariant (NPVariant *value)
     }    
     
     return ss.str();
+}
+
+std::map<std::string, NPVariant *>
+ExternalInterface::parseProperties(const std::string &xml)
+{
+    std::map<std::string, NPVariant *> props;
+
+    std::string::size_type start = 0;
+    std::string::size_type end;
+
+    std::string id;
+    start = xml.find(" id=");
+    while (start != std::string::npos) {
+        // Extract the id from the property tag
+        start++;
+        end = xml.find(">", start) - 1;
+        id = xml.substr(start, end-start);
+        id.erase(0, 4);
+
+        // Extract the data
+        start = end + 2;
+        end = xml.find("</property>", start) ;
+        std::string data = xml.substr(start, end-start);
+        props[id] = parseXML(data);
+        start = xml.find(" id=", end);
+    }
+
+    return props;
 }
 
 // local Variables:

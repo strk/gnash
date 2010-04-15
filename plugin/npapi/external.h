@@ -54,8 +54,8 @@ public:
     std::string makeObject (std::map<std::string, std::string> &args);
     
     NPVariant *parseXML(const std::string &xml);
+    std::map<std::string, NPVariant *> parseProperties(const std::string &xml);
     std::string convertNPVariant (NPVariant *npv);
-    
 };
 
 #endif // GNASH_PLUGIN_EXTERNAL_H

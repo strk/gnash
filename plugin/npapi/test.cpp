@@ -33,18 +33,8 @@
 
 TestState runtest;
 
-void* NPN_MemAlloc(uint32_t size)
-{
-  void * rv = NULL;
-  rv = malloc(size);
-  return rv;
-}
-
-void NPN_MemFree(void* ptr)
-{
-  free(ptr);
-}
-
+std::map<NPIdentifier, NPVariant *> _properties;
+std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
 
 int
 main(int argc, char *argv[])
@@ -229,6 +219,16 @@ main(int argc, char *argv[])
         runtest.fail("ExternalInterface::parseXML(void)");
     }
 
+    xml = "<property id=\"0\"><string>foobar</string></property><property id=\"1\"><number>12.34</number></property><property id=\"2\"><number>56</number></property>";
+    std::map<std::string, NPVariant *> props = ei.parseProperties(xml);
+    np = props["0"];
+    data = NPVARIANT_TO_STRING(np[0]).UTF8Characters;
+    if ((props.size() == 3) && (data == "foobar")) {
+        runtest.pass("ExternalInterface::parseProperties()");
+    } else {
+        runtest.fail("ExternalInterface::parseProperties()");
+    }
+    
     xml = "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>";
     np = ei.parseXML(xml);
     if (NPVARIANT_IS_OBJECT(*np)) {
@@ -239,14 +239,43 @@ main(int argc, char *argv[])
 
 }
 
+void* NPN_MemAlloc(uint32_t size)
+{
+  void * rv = NULL;
+  rv = malloc(size);
+  return rv;
+}
+
+void NPN_MemFree(void* ptr)
+{
+  free(ptr);
+}
+
 // These are just stubs to get the test case to link standalone.
 NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
 {
 }
 
-bool NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier propertyName,
+bool NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier name,
                      const NPVariant *value)
 {
+    _properties[name] = const_cast<NPVariant *>(value);
+}
+
+bool NPN_GetProperty(NPP npp, NPObject* obj, NPIdentifier name,
+                     const NPVariant *value)
+{
+    return _properties[name];
+}
+
+bool NPN_HasProperty(NPP npp, NPObject* obj, NPIdentifier name,
+                     const NPVariant *value)
+{
+    std::map<NPIdentifier, NPVariant *>::iterator it;
+    it = _properties.find(name);
+    if (it != _properties.end()) {
+        return true;
+    }
 }
 
 nsPluginInstanceBase *
