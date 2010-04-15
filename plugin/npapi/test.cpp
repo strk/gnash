@@ -20,11 +20,14 @@
 #include <string>
 #include <cstdlib>
 #include <vector>
+#include <map>
 
 #include "npapi.h"
 #include "npruntime.h"
 #include "pluginbase.h"
+#include "npfunctions.h"
 #include "dejagnu.h"
+#include <regex.h>
 
 #include "external.h"
 
@@ -105,6 +108,13 @@ main(int argc, char *argv[])
         runtest.fail("convertNPVariant(string)");
     }
     
+    str = ei.makeProperty("hi", "Hello World!");
+    if (str == "<property id=\"hi\">Hello World!</property>") {
+        runtest.pass("makeProperty()");
+    } else {
+        runtest.fail("makeProperty()");
+    }
+    
 #if 0
     ARRAY_TO_NPVARIANT(*value);
     str = ei.convertNPVariant(value);
@@ -113,18 +123,54 @@ main(int argc, char *argv[])
     } else {
         runtest.fail("convertNPVariant(array)");
     }
-
-    OBJECT_TO_NPVARIANT(*value);
-    str = ei.convertNPVariant(value);
-    if (str == "<object></object>") {
-        runtest.pass("convertNPVariant(object)");
-    } else {
-        runtest.fail("convertNPVariant(object)");
-    }
 #endif
+
+    NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+    std::string prop1 = ei.makeString("foobar");
+    std::string prop2 = ei.makeNumber(12.34);
+    std::string prop3 = ei.makeNumber(56);
+    std::vector<std::string> aargs;
+    aargs.push_back(prop1);
+    aargs.push_back(prop2);
+    aargs.push_back(prop3);
     
+    regex_t regex_pat;
+    regcomp (&regex_pat, "<array><property id=\"0\"><string>foobar</string></property><property id=\"1\"><number>12.34</number></property><property id=\"2\"><number>56</number></property></array>", REG_NOSUB|REG_NEWLINE);
+    str = ei.makeArray(aargs);
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0)) {    
+        runtest.fail("ExternalInterface::makeArray()");
+    } else {
+        runtest.pass("ExternalInterface::makeArray()");
+    }
+
+    std::map<std::string, std::string> margs;
+    margs["test1"] = prop1;
+    margs["test2"] = prop2;
+    margs["test3"] = prop3;
+    
+    str = ei.makeObject(margs);
+    regcomp (&regex_pat, "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>", REG_NOSUB|REG_NEWLINE);
+
+//    std::cout << str << std::endl;
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0)) {
+        runtest.fail("ExternalInterface::makeObject()");
+    } else {
+        runtest.pass("ExternalInterface::makeObject()");
+    }
+
 }
 
+// These are just stubs to get the test case to link standalone.
+NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
+{
+  // return getstringidentifier(name);
+}
+
+bool NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier propertyName,
+                     const NPVariant *value)
+{
+  // return setproperty(npp, obj, propertyName, value);
+}
 
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)

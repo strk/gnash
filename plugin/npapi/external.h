@@ -26,32 +26,36 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 
 #include "npapi.h"
 #include "npruntime.h"
 
 class ExternalInterface
 {
- public:
-  ExternalInterface ();
-  ~ExternalInterface ();
-
-  // Create an Invoke message for the standalone Gnash
-  std::string makeInvoke (const std::string &method, std::vector<std::string> args);
-
-  std::string makeNull ();
-  std::string makeTrue ();
-  std::string makeFalse ();
-  std::string makeString (const std::string &str);
-  std::string makeNumber (double num);
-  std::string makeNumber (int num);
-  std::string makeNumber (unsigned int num);
-  std::string makeArray (std::vector<std::string> args);
-  std::string makeObject (std::vector<std::string> args);
-
-  NPVariant *parseXML(const std::string &xml);
-  std::string convertNPVariant (NPVariant *npv);
-
+public:
+    ExternalInterface ();
+    ~ExternalInterface ();
+    
+    // Create an Invoke message for the standalone Gnash
+    std::string makeInvoke (const std::string &method, std::vector<std::string> args);
+    
+    std::string makeNull ();
+    std::string makeTrue ();
+    std::string makeFalse ();
+    std::string makeString (const std::string &str);
+    std::string makeProperty (const std::string &str, const std::string &data);
+    std::string makeProperty (const std::string &str, double num);
+    std::string makeProperty (const std::string &str, int num);
+    std::string makeNumber (double num);
+    std::string makeNumber (int num);
+    std::string makeNumber (unsigned int num);
+    std::string makeArray (std::vector<std::string> &args);
+    std::string makeObject (std::map<std::string, std::string> &args);
+    
+    NPVariant *parseXML(const std::string &xml);
+    std::string convertNPVariant (NPVariant *npv);
+    
 };
 
 #endif // GNASH_PLUGIN_EXTERNAL_H

@@ -23,12 +23,14 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <cstring>
 #include <cstdlib>
 
 #include "npapi.h"
 #include "npruntime.h"
 #include "external.h"
+
 
 ExternalInterface::ExternalInterface ()
 {
@@ -88,6 +90,33 @@ ExternalInterface::makeString (const std::string &str)
     return ss.str();
 }
 
+
+std::string
+ExternalInterface::makeProperty (const std::string &id, double num)
+{
+    std::stringstream ss;
+    ss << num;
+    return makeProperty(id, ss.str());
+}
+
+std::string
+ExternalInterface::makeProperty (const std::string &id, int num)
+{
+    std::stringstream ss;
+    ss << num;
+    return makeProperty(id, ss.str());
+}
+
+std::string
+ExternalInterface::makeProperty (const std::string &id, const std::string &data)
+{
+    std::stringstream ss;
+
+    ss << "<property id=\"" << id << "\">" << data << "</property>";
+    
+    return ss.str();
+}
+
 std::string
 ExternalInterface::makeNumber (double num)
 {
@@ -119,15 +148,15 @@ ExternalInterface::makeNumber (unsigned int num)
 }
 
 std::string
-ExternalInterface::makeArray (std::vector<std::string> args)
+ExternalInterface::makeArray (std::vector<std::string> &args)
 {
     std::stringstream ss;
     std::vector<std::string>::iterator it;
     int index = 0;
     
     ss << "<array>";
-    for (it == args.begin(); it != args.end(); ++it) {
-        ss << "<property is = \">" << index++ << "\"";
+    for (it=args.begin(); it != args.end(); ++it) {
+        ss << "<property id=\"" << index << "\">" << *it << "</property>";
         index++;
     }
     
@@ -137,9 +166,18 @@ ExternalInterface::makeArray (std::vector<std::string> args)
 }
 
 std::string
-ExternalInterface::makeObject (std::vector<std::string> args)
+ExternalInterface::makeObject (std::map<std::string, std::string> &args)
 {
     std::stringstream ss;
+    std::map<std::string, std::string>::iterator it;
+    int index = 0;
+
+    ss << "<object>";
+    for (it = args.begin(); it != args.end(); ++it) {
+        ss << "<property id=\"" << it->first << "\">" << it->second << "</property>";
+        //makeProperty(it->first, it->second);
+    }
+    ss << "</object>";
     
     return ss.str();
 }
@@ -222,7 +260,7 @@ ExternalInterface::convertNPVariant (NPVariant *value)
     } else if (NPVARIANT_IS_VOID(*value)) {
         ss << "<void/>";
     } else if (NPVARIANT_IS_OBJECT(*value)) {
-        ss << "<object>";
+        ss << "<object></object>";
     }    
     
     return ss.str();
