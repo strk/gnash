@@ -236,7 +236,35 @@ main(int argc, char *argv[])
     } else {
         runtest.fail("ExternalInterface::parseXML(object)");
     }
-
+    
+    std::vector<std::string> iargs;
+    str = ei.makeString("barfoo");
+    iargs.push_back(str);
+    str = ei.makeNumber(135.78);
+    iargs.push_back(str);
+    
+    str = ei.makeInvoke("barfoo", iargs);
+    xml = "<invoke name=\"barfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments><invoke>";
+//    std::cout << str << std::endl;
+    regcomp (&regex_pat, xml.c_str(), REG_NOSUB|REG_NEWLINE);
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0) == 0) {
+        runtest.pass("ExternalInterface::makeInvoke()");
+    } else {
+        runtest.fail("ExternalInterface::makeInvoke()");
+    }
+    
+    xml = "<arguments><string>barfoo</string><number>135.78</number><number>89</number></arguments>";
+    std::vector<NPVariant *> arguments = ei.parseArguments(xml);
+    np = arguments[0];
+    str = NPVARIANT_TO_STRING(np[0]).UTF8Characters;
+    double dub = NPVARIANT_TO_DOUBLE(*arguments[1]);
+    int    val = NPVARIANT_TO_INT32(*arguments[2]);
+    if ((arguments.size() == 3) && (str == "barfoo")
+        && (dub == 135.78) && (val = 89)) {
+        runtest.pass("ExternalInterface::parseArguments()");
+    } else {
+        runtest.fail("ExternalInterface::parseArguments()");
+    }
 }
 
 void* NPN_MemAlloc(uint32_t size)

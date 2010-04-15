@@ -46,6 +46,16 @@ ExternalInterface::makeInvoke (const std::string &method,
                                std::vector<std::string> args)
 {
     std::stringstream ss;
+    std::vector<std::string>::iterator it;
+
+    ss << "<invoke name=\"" << method << "\" returntype=\"xml\">";
+    ss << "<arguments>";
+    for (it=args.begin(); it != args.end(); ++it) {
+        ss << *it;
+    }
+    
+    ss << "</arguments>";
+    ss << "<invoke>";
     
     return ss.str();
 }
@@ -320,6 +330,37 @@ ExternalInterface::parseProperties(const std::string &xml)
     }
 
     return props;
+}
+
+std::vector<NPVariant *>
+ExternalInterface::parseArguments(const std::string &xml)
+{
+    std::vector<NPVariant *> args;
+
+    std::string::size_type start = 0;
+    std::string::size_type end;
+
+    std::string name;
+    std::string data = xml;
+    std::string tag = "<arguments>";
+    start = data.find(tag);
+    if (start != std::string::npos) {
+        data.erase(0, tag.size());
+    }
+    while (!data.empty()) {
+        // Extract the data
+        start = data.find("<", 1); // start past the opening <
+        end = data.find(">", start) + 1;
+        std::string sub = data.substr(0, end);
+        if (data == "</arguments>") {
+            break;
+        }
+        NPVariant *value = parseXML(sub);
+        args.push_back(value);
+        data.erase(0, end);
+    }
+
+    return args;
 }
 
 // local Variables:
