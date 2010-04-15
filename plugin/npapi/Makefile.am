@@ -68,8 +68,23 @@ libgnashplugin_la_LIBADD   = \
 
 # Scriptable plugin support
 if SCRIPTABLE
-noinst_HEADERS += pluginScriptObject.h callbacks.h
-libgnashplugin_la_SOURCES += pluginScriptObject.cpp callbacks.cpp
+check_PROGRAMS = test
+test_LDADD  = \
+	$(GLIB_LIBS) \
+	$(NULL)
+test_SOURCES = test.cpp \
+	external.cpp
+
+noinst_HEADERS += pluginScriptObject.h \
+	 callbacks.h \
+	external.h
+libgnashplugin_la_SOURCES += pluginScriptObject.cpp \
+	callbacks.cpp \
+	external.cpp
+
+check:
+	./test
+
 endif
 
 if PLUGIN_LINK_UNDEFINED
