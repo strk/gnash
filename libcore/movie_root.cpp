@@ -1950,8 +1950,9 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         const std::string& data, MovieClip::VariablesMethod method)
 {
 
-    if (_hostfd == -1)
-    {
+    log_network("%s: HOSTFD is %d",  __FUNCTION__, _hostfd);
+    
+    if (_hostfd == -1) {
         /// If there is no hosting application, call the URL launcher. For
         /// safety, we resolve the URL against the base URL for this run.
         /// The data is not sent at all.
@@ -2004,29 +2005,28 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     /// This is when there is a hosting application.
     std::ostringstream request;
     std::string querystring;
-    switch (method)
-    {
-        case MovieClip::METHOD_POST:
-             request << "POST " << target << ":" << 
-                data << "$" << urlstr << std::endl;
-             break;
-
-        // METHOD_GET and METHOD_NONE are the same, except that
-        // for METHOD_GET we append the variables to the query
-        // string.
-        case MovieClip::METHOD_GET:
-            // Append vars to URL query string
-            if (urlstr.find("?") == std::string::npos) {
-                querystring = "?";
-            }
-            else querystring = "&";
-            querystring.append(data);
-
-        case MovieClip::METHOD_NONE:
-            // use the original url, non parsed (the browser will know
-            // better how to resolve relative urls and handle
-            // javascript)
-            request << "GET " << target << ":" << urlstr << std::endl;
+    switch (method) {
+      case MovieClip::METHOD_POST:
+          request << "POST " << target << ":" << 
+              data << "$" << urlstr << std::endl;
+          break;
+          
+          // METHOD_GET and METHOD_NONE are the same, except that
+          // for METHOD_GET we append the variables to the query
+          // string.
+      case MovieClip::METHOD_GET:
+          // Append vars to URL query string
+          if (urlstr.find("?") == std::string::npos) {
+              querystring = "?";
+          }
+          else querystring = "&";
+          querystring.append(data);
+          
+      case MovieClip::METHOD_NONE:
+          // use the original url, non parsed (the browser will know
+          // better how to resolve relative urls and handle
+          // javascript)
+          request << "GET " << target << ":" << urlstr << std::endl;
             break;
     }
 
@@ -2037,13 +2037,11 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     log_debug(_("Attempt to write geturl requests fd %d"), _hostfd);
 
     int ret = write(_hostfd, requestString.c_str(), len);
-    if (ret == -1)
-    {
+    if (ret == -1) {
         log_error(_("Could not write to user-provided host requests "
                     "fd %d: %s"), _hostfd, std::strerror(errno));
     }
-    if (static_cast<size_t>(ret) < len)
-    {
+    if (static_cast<size_t>(ret) < len) {
         log_error(_("Could only write %d bytes over %d required to "
                     "user-provided host requests fd %d"),
                     ret, len, _hostfd);
