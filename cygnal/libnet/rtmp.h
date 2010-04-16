@@ -45,10 +45,12 @@ namespace gnash
 ///     The headers and data for the initial RTMP handshake differ from
 ///     what is used by RTMP during normal message processing. The layout
 ///     is this:
+/// <pre>
 ///     [version (1 byte)]
 ///     [1st timestamp (4 bytes)]
 ///     [2nd timestamp (4 bytes)]
 ///     [1528 bytes of random data]
+/// </pre>
 ///
 ///     The handshake process is client sends a handhsake request to the
 ///     server. This is 1537 bytes (version + handshake).
