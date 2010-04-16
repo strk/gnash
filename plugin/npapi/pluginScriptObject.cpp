@@ -42,13 +42,11 @@
 #include "npapi.h"
 #include "npruntime.h"
 #include "plugin.h" 
+#include "callbacks.h" 
+#include "external.h" 
 #include "pluginScriptObject.h"
 
 extern NPNetscapeFuncs NPNFuncs;
-
-// Debugging utilities
-extern void GnashLogDebug(const std::string& msg);
-extern void GnashLogError(const std::string& msg);
 
 // NPClass of GnashPluginScriptObject
 static NPClass GnashPluginScriptObjectClass = {
@@ -69,601 +67,39 @@ static NPClass GnashPluginScriptObjectClass = {
 
 static int controlfd = -1;
 
-#if 0
-
-// http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_04.html
-// Tell Target Methods. Use TGetProperty, TGetPropertyAsNumber, TSetProperty
-TCallLabel
-TCurrentFrame
-TCurrentLabel
-TGetProperty
-TGetPropertyAsNumber
-TGotoFrame
-TGotoLabel
-TPlay
-TSetProperty
-TStopPlay
-
-// Target Properties
-X_POS
-Y_POS
-X_SCALE
-Y_SCALE
-CURRENT_FRAME                   // read-only
-TOTAL_FRAMES                    // read-only
-ALPHA
-VISIBLE
-WIDTH                           // read-only
-HEIGHT                          // read-only
-ROTATE
-TARGET                          // read-only
-FRAMES_LOADED                   // read-only
-NAME
-DROP_TARGET                     // read-only
-URL                             // read-only
-HIGH_QUALITY
-FOCUS_RECT
-SOUND_BUF_TIME
-
-// Standard Events
-OnProgress
-OnReadyStateChange
-FSCommand
-#endif
-
 bool
 testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
           uint32_t /* argCount */, NPVariant *result)
 {   
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
     
     DOUBLE_TO_NPVARIANT(122333.4444, *result);
     
     return true;
 }
 
-// Callbacks for the default methods
-
-// As these callbacks use a generalized typedef for the signature, often some
-// of the parameters can be ignored. These are commented out to elimnate the
-// volumnes of bogus warnings about not using them in the method.
-
-// SetVariable( Name, Value )
-// Sends:
-//      "Command Name Type value\n",
-//      	ie... "SetVariable var1 string value1\n"
-// Receives:
-//      nothing
-bool
-SetVariableCallback (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    std::string varname;
-    if (argCount == 2) {
-        varname = NPVARIANT_TO_STRING(args[0]).UTF8Characters;
-        NPVariant *value = const_cast<NPVariant *>(&args[1]);
-        // printf("Setting Variable \"%s\"\n", varname.c_str());
-        gpso->SetVariable(varname, value);
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// GetVariable( Name )
-//    Sends:
-// 	"Command Name\n", ie... "GetVariable var1\n"
-//
-//    Receives:
-// 	"Command Name Type value", ie... "GetVariable var1 string value1\n"
-bool
-GetVariableCallback (NPObject *npobj, NPIdentifier /* name */,
-                     const NPVariant *args,
-                     uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    std::string varname;
-    // This method only takes one argument
-    if (argCount == 1) {
-        varname = NPVARIANT_TO_STRING(args[0]).UTF8Characters;
-        NPVariant *value = gpso->GetVariable(varname);
-        if (value == 0) {
-            NPVARIANT_IS_VOID(*value);
-        } else {
-            if (NPVARIANT_IS_DOUBLE(*value)) {
-                double num = NPVARIANT_TO_DOUBLE(*value);
-                DOUBLE_TO_NPVARIANT(num, *result);
-            } else if (NPVARIANT_IS_STRING(*value)) {
-                STRINGN_TO_NPVARIANT(NPVARIANT_TO_STRING(*value).UTF8Characters,
-                                     NPVARIANT_TO_STRING(*value).UTF8Length,
-                                     *result);
-            } else if (NPVARIANT_IS_BOOLEAN(*value)) {
-                BOOLEAN_TO_NPVARIANT(NPVARIANT_TO_BOOLEAN(*value), *result);
-            } else if (NPVARIANT_IS_INT32(*value)) {
-                INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(*value), *result);
-            } else if (NPVARIANT_IS_NULL(*value)) {
-                NULL_TO_NPVARIANT(*result);
-            } else if (NPVARIANT_IS_VOID(*value)) {
-            VOID_TO_NPVARIANT(*result);
-            } else if (NPVARIANT_IS_OBJECT(*value)) {
-                OBJECT_TO_NPVARIANT(NPVARIANT_TO_OBJECT(*value), *result);
-            }
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-// GotoFrame( frameNumber )
-//    Sends:
-// 	"Command number\n", ie... "GotoFrame 77\n"
-//
-//    Receives:
-// 	nothing
-bool
-GotoFrame (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    std::string varname;
-    if (argCount == 1) {
-        int value = NPVARIANT_TO_INT32(args[0]);
-        std::stringstream ss;
-        ss << "GotoFrame " << value << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't goto the specified frame, network problems.");
-            return false;
-        }        
-        // gpso->GotoFrame(value);
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// IsPlaying()
-//    Sends:
-// 	"Command\n", ie... "IsPlaying\n"
-
-//    Receives:
-// 	"Command Flag", ie... "IsPlaying true\n"
-bool
-IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 0) {
-        std::stringstream ss;
-        ss << "IsPlaying" << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't check if the movie is playing, network problems.");
-            BOOLEAN_TO_NPVARIANT(false, *result);
-            return false;
-        }        
-        const char *data = 0;
-        char *ptr = 0;
-        ret = gpso->readPlayer(controlfd, &data, 0);
-        if (ret == 0) {
-            BOOLEAN_TO_NPVARIANT(false, *result);
-            return false;
-        }
-        ptr = const_cast<char *>(data);
-        if (strncmp(ptr, "IsPlaying ", 10) != 0) {
-            printf("Illegal response! %s\n", ptr);
-            BOOLEAN_TO_NPVARIANT(false, *result);
-            return false;
-        } else {
-            // A legit response has CR on the end already
-            printf("Legit response: %s", ptr);
-        }    
-        ptr += 10;
-        bool flag = false;
-        if (strncmp(ptr, "true", 4) == 0) {
-            flag = true;
-        } else if (strncmp(ptr, "false", 5) == 0) {
-            flag = false;
-        }
-        BOOLEAN_TO_NPVARIANT(flag, *result);
-        // gpso->IsPlaying(value);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// LoadMovie( Layer, Url )
-//    Sends:
-// 	"Command Layer Url\n", ie... "LoadMovie 1 /foo.swf\n"
-//
-//    Receives:
-// 	nothing
-bool
-LoadMovie (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 2) {
-        std::stringstream ss;
-        int layer = NPVARIANT_TO_INT32(args[0]);
-        std::string url = NPVARIANT_TO_STRING(args[1]).UTF8Characters;
-        ss << "LoadMovie " << layer << " " << url << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't load the movie, network problems.");
-            return false;
-        }        
-        // gpso->LoadMovie();
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// Pan ( x, y, mode ) 
-//    Sends:
-// 	"Command Pan x y mode\n", ie... "Pan 10 10 pixels\n"
-//
-//    Receives:
-//    	nothing
-bool
-Pan (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 3) {
-        std::stringstream ss;
-        NPVariant *value = const_cast<NPVariant *>(&args[0]);
-        int x = NPVARIANT_TO_INT32(*value);
-        value = const_cast<NPVariant *>(&args[1]);
-        int y = NPVARIANT_TO_INT32(*value);
-        value = const_cast<NPVariant *>(&args[2]);
-        int mode = NPVARIANT_TO_INT32(*value);
-        ss << "Pan " << x << y;
-        if (mode) {
-            ss << " pixels";
-        } else {
-            ss << " percent";
-        }
-        ss << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't pan the movie, network problems.");
-            return false;
-        }        
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// PercentLoaded()
-//    Sends:
-// 	"Command\n", ie... "PercentLoaded\n"
-//
-//    Receives:
-// 	"Command number\n", ie... "PercentLoaded 23\n"
-bool
-PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 0) {
-        std::stringstream ss;
-        ss << "PercentLoaded" << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't check percent loaded, network problems.");
-            BOOLEAN_TO_NPVARIANT(false, *result);
-            return false;
-        }        
-        const char *data = 0;
-        char *ptr = 0;
-        ret = gpso->readPlayer(controlfd, &data, 0);
-        if (ret == 0) {
-            BOOLEAN_TO_NPVARIANT(false, *result);
-            return false;
-        }
-        ptr = const_cast<char *>(data);
-        if (strncmp(ptr, "PercentLoaded ", 15) != 0) {
-            printf("Illegal response! %s\n", ptr);
-            BOOLEAN_TO_NPVARIANT(false, *result);
-            return false;
-        } else {
-            // A legit response has CR on the end already
-            printf("Legit response: %s", ptr);
-        }    
-        ptr += 15;
-        int percent = strtol(ptr, NULL, 0);
-        if ((percent >= 0) && (percent <= 100)) {
-            INT32_TO_NPVARIANT(percent, *result);
-        } else {
-            INT32_TO_NPVARIANT(-1, *result);
-        }
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// Play();
-//    Sends:
-// 	"Command\n", ie... "Play\n"
-//
-//    Receives:
-// 	nothing
-bool
-Play (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 0) {
-        std::stringstream ss;
-        ss << "Play" << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't play movie, network problems.");
-            return false;
-        }        
-        // gpso->IsPlaying(value);
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// Rewind();
-//    Sends:
-// 	"Command\n", ie... "Rewind\n"
-//
-//    Receives:
-// 	nothing
-bool
-Rewind (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 0) {
-        std::stringstream ss;
-        ss << "Rewind" << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't rewind movie, network problems.");
-            return false;
-        }        
-        // gpso->Rewind(value);
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// SetZoomRect ( left, top, right, bottom )
-//    Sends:
-// 	"Command left top right bottom\n", ie... "SetZoomRect 0 0 10 10\n"
-//
-//    Receives:
-// 	nothing
-bool
-SetZoomRect (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 4) {
-        std::stringstream ss;
-        NPVariant *value = const_cast<NPVariant *>(&args[0]);
-        int left = NPVARIANT_TO_INT32(*value);
-        value = const_cast<NPVariant *>(&args[1]);
-        int top = NPVARIANT_TO_INT32(*value);
-        value = const_cast<NPVariant *>(&args[2]);
-        int right = NPVARIANT_TO_INT32(*value);
-        value = const_cast<NPVariant *>(&args[3]);
-        int bottom = NPVARIANT_TO_INT32(*value);
-        ss << "SetZoomRect " << left << " " << top << " ";
-        ss << right << " " << bottom << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't Set the Zoom Rect the movie, network problems.");
-            return false;
-        }        
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// StopPlay()
-//    Sends:
-// 	"Command StopPlay\n", ie... "StopPlay\n"
-
-//    Receives:
-// 	nothing
-bool
-StopPlay (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 0) {
-        std::stringstream ss;
-        ss << "StopPlay" << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't stop-play movie, network problems.");
-            return false;
-        }        
-        // gpso->IsPlaying(value);
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// Zoom( percent )
-//    Sends:
-// 	"Command number\n", ie... "Zoom 200\n"
-//
-//    Receives:
-// 	nothing
-bool
-Zoom (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 1) {
-        std::stringstream ss;
-        NPVariant *value = const_cast<NPVariant *>(&args[1]);
-        int zoom = NPVARIANT_TO_INT32(*value);
-        ss << "Zoom " << zoom << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't zoom movie, network problems.");
-            return false;
-        }        
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
-}
-
-// TotalFrames()
-//    Sends:
-// 	"Command TotalFrames\n", ie... "TotalFrames\n"
-//
-//    Receives:
-// 	"Command Num\n", ie... "TotalFrames 1234\n"
-bool
-TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t argCount, NPVariant *result)
-{   
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
-    if (argCount == 0) {
-        std::stringstream ss;
-        ss << "TotalFrames" << std::endl;
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), ss.str());
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != ss.str().size()) {
-            GnashLogError("Couldn't check percent loaded, network problems.");
-            BOOLEAN_TO_NPVARIANT(false, *result);
-            return false;
-        }        
-        const char *data = 0;
-        char *ptr = 0;
-        ret = gpso->readPlayer(controlfd, &data, 0);
-        if (ret == 0) {
-            BOOLEAN_TO_NPVARIANT(false, *result);
-            return false;
-        }
-        ptr = const_cast<char *>(data);
-        if (strncmp(ptr, "TotalFrames ", 13) != 0) {
-            printf("Illegal response! %s\n", ptr);
-            BOOLEAN_TO_NPVARIANT(false, *result);
-            return false;
-        } else {
-            // A legit response has CR on the end already
-            printf("Legit response: %s", ptr);
-        }    
-        ptr += 13;
-        int frames = strtol(ptr, NULL, 0);
-        INT32_TO_NPVARIANT(frames, *result);
-        return true;
-    }
-    
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
+void
+printNPVariant(const NPVariant *value)
+{
+    if (NPVARIANT_IS_DOUBLE(*value)) {
+        double num = NPVARIANT_TO_DOUBLE(*value);
+        log_debug("is double, value %g", num);
+    } else if (NPVARIANT_IS_STRING(*value)) {
+        std::string str(NPVARIANT_TO_STRING(*value).UTF8Characters);
+        log_debug("is string, value %s", str);
+    } else if (NPVARIANT_IS_BOOLEAN(*value)) {
+        bool flag = NPVARIANT_TO_BOOLEAN(*value);
+        log_debug("is boolean, value %d", flag);
+    } else if (NPVARIANT_IS_INT32(*value)) {
+        int num = NPVARIANT_TO_INT32(*value);
+        log_debug("is int, value %d", num);
+    } else if (NPVARIANT_IS_NULL(*value)) {
+        log_debug("value is null");
+    } else if (NPVARIANT_IS_VOID(*value)) {
+        log_debug("value is void");
+    } else if (NPVARIANT_IS_OBJECT(*value)) {
+        log_debug("value is object");
+    }    
 }
 
 //
@@ -675,11 +111,14 @@ GnashPluginScriptObject::AddProperty(const std::string &name,
                                      const std::string &str)
 {
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
-    NPVariant *value = new NPVariant;
+    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
     int length = str.size();;
-    char *bar = new char[length+1];
+    char *bar = (char *)NPN_MemAlloc(length+1);
     std::copy(str.begin(), str.end(), bar);
     bar[length] = 0;  // terminate the new string or bad things happen
+    
+    // When an NPVariant becomes a string object, it *does not* make a copy.
+    // Instead it stores the pointer (and length) we just allocated.
     STRINGN_TO_NPVARIANT(bar, length, *value);
     SetProperty(id, value);
 }
@@ -688,7 +127,7 @@ void
 GnashPluginScriptObject::AddProperty(const std::string &name, double num)
 {
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
-    NPVariant *value = new NPVariant;
+    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
     DOUBLE_TO_NPVARIANT(num, *value);
     SetProperty(id, value);
 }
@@ -697,7 +136,7 @@ void
 GnashPluginScriptObject::AddProperty(const std::string &name, int num)
 {
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
-    NPVariant *value = new NPVariant;
+    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
     INT32_TO_NPVARIANT(num, *value);
     SetProperty(id, value);
 }
@@ -707,10 +146,20 @@ GnashPluginScriptObject::AddProperty(const std::string &name, int num)
 void
 GnashPluginScriptObject::initializeIdentifiers()
 {
-    GnashLogDebug("initializeIdentifiers");
+//    log_debug("initializeIdentifiers");
 
+//    NPN_Status(_nppinstance, __FUNCTION__);
+    
 //    http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_04.html
     
+    // We maintain an internal property for our version number, rather
+    // than asking the player.
+    AddProperty("$version", "10,1,r999");
+    // id and name appear to be the same tag, but differeing browsers access
+    // one or the other, or both.
+    AddProperty("name", "Hello World");
+    AddProperty("id", "Hello World");
+
     AddProperty("src", "example");
     AddProperty("align", "middle");
     AddProperty("quality", "high");
@@ -722,7 +171,6 @@ GnashPluginScriptObject::initializeIdentifiers()
 
     AddProperty("classid", "2b70f2b1-fc72-4734-bb81-4eb2a7713e49");
     AddProperty("movie", "unknown");
-    AddProperty("id", "id unknown");
     AddProperty("width", 0);
     AddProperty("height", 0);
     AddProperty("vspace", 0);
@@ -783,16 +231,11 @@ GnashPluginScriptObject::initializeIdentifiers()
                                  NUM_METHOD_IDENTIFIERS,
                                  pluginMethodIdentifiers);
 #endif
-   // We maintain an internal property for our version number, rather
-   // than asking the player.
-   AddProperty("version", 456.789);
-   AddProperty("hello", "Hello World");
-   
-   NPIdentifier id = NPN_GetStringIdentifier("showFoobar");
-   NPInvokeFunctionPtr func = testfunc;   
-   AddMethod(id, func);
+//     NPIdentifier id = NPN_GetStringIdentifier("showFoobar");
+//    NPInvokeFunctionPtr func = testfunc;  
+//    AddMethod(id, func);
 
-   id = NPN_GetStringIdentifier("SetVariable");
+   NPIdentifier id = NPN_GetStringIdentifier("SetVariable");
    AddMethod(id, SetVariableCallback);
 
    id = NPN_GetStringIdentifier("GetVariable");
@@ -837,7 +280,7 @@ GnashPluginScriptObject::initializeIdentifiers()
 GnashPluginScriptObject::GnashPluginScriptObject()
     : _nppinstance (0)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
     initializeIdentifiers();
 }
 
@@ -845,14 +288,14 @@ GnashPluginScriptObject::GnashPluginScriptObject()
 GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
     : _nppinstance (npp)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
     initializeIdentifiers();
 }
 
 // Destructor
 GnashPluginScriptObject::~GnashPluginScriptObject() 
 {
-    // GnashLogDebug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
     // do nothing
 }
 
@@ -860,31 +303,40 @@ GnashPluginScriptObject::~GnashPluginScriptObject()
 NPClass *
 GnashPluginScriptObject::marshalGetNPClass() 
 {
-    // GnashLogDebug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
     return &GnashPluginScriptObjectClass;
 }
 
 NPObject *
 GnashPluginScriptObject::marshalAllocate (NPP npp, NPClass */* aClass */)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
+#if 0
+    GnashPluginScriptObject *npobj = reinterpret_cast<GnashPluginScriptObject *>
+        (NPN_MemAlloc(sizeof(GnashPluginScriptObject)));
+    npobj->setInstance(npp);
+    return npobj;
+#else
     return new GnashPluginScriptObject(npp);
+#endif
 }
 
 
 void 
 GnashPluginScriptObject::marshalDeallocate (NPObject *npobj)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
-//    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-//    gpso->Deallocate();
+    log_debug(__PRETTY_FUNCTION__);
+#if 0
+    NPN_MemFree(reinterpret_cast<void *>(npobj));
+#else
     delete (GnashPluginScriptObject *)npobj;
+#endif
 }
 
 void 
 GnashPluginScriptObject::marshalInvalidate (NPObject */* npobj */)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
 
 //    gpso->Invalidate();
 }
@@ -892,16 +344,16 @@ GnashPluginScriptObject::marshalInvalidate (NPObject */* npobj */)
 bool 
 GnashPluginScriptObject::marshalHasMethod (NPObject *npobj, NPIdentifier name)
 {
-    // GnashLogDebug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
 #if 0
-    printf("Checking for Method: ");
+    log_debug("Checking for Method: ");
     if (NPN_IdentifierIsString(name)) {
-        printf("%s\n", NPN_UTF8FromIdentifier(name));
+        log_debug("%s", NPN_UTF8FromIdentifier(name));
     } else {
-        printf("%d\n", NPN_IntFromIdentifier(name));
+        log_debug("%d", NPN_IntFromIdentifier(name));
     }
 #endif
     
@@ -913,7 +365,7 @@ GnashPluginScriptObject::marshalInvoke (NPObject *npobj, NPIdentifier name,
                                         const NPVariant *args, uint32_t argCount,
                                         NPVariant *result)
 {
-    // GnashLogDebug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
     
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
     
@@ -926,7 +378,7 @@ GnashPluginScriptObject::marshalInvokeDefault (NPObject *npobj,
                                                uint32_t argCount,
                                                NPVariant *result)
 {
-    // GnashLogDebug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
     
@@ -936,7 +388,7 @@ GnashPluginScriptObject::marshalInvokeDefault (NPObject *npobj,
 bool 
 GnashPluginScriptObject::marshalHasProperty (NPObject *npobj, NPIdentifier name)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
     
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
@@ -947,7 +399,7 @@ bool
 GnashPluginScriptObject::marshalGetProperty (NPObject *npobj, NPIdentifier name,
                                              NPVariant *result)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
     
@@ -958,7 +410,7 @@ bool
 GnashPluginScriptObject::marshalSetProperty (NPObject *npobj, NPIdentifier name,
                                              const NPVariant *value)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;    
     return gpso->SetProperty(name, value);
@@ -967,7 +419,7 @@ GnashPluginScriptObject::marshalSetProperty (NPObject *npobj, NPIdentifier name,
 bool 
 GnashPluginScriptObject::marshalRemoveProperty (NPObject *npobj, NPIdentifier name)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;    
     return gpso->RemoveProperty(name);
@@ -977,7 +429,7 @@ bool
 GnashPluginScriptObject::marshalEnumerate (NPObject *npobj, void***identifier,
                                            uint32_t *count)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
     return gpso->Enumerate(identifier, count);
@@ -989,7 +441,7 @@ bool
 GnashPluginScriptObject::marshalConstruct (NPObject *npobj, const NPVariant *data,
                                   uint32_t count, NPVariant *result)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;    
     return gpso->Construct(data, count, result);
@@ -1000,84 +452,81 @@ GnashPluginScriptObject::marshalConstruct (NPObject *npobj, const NPVariant *dat
 bool
 GnashPluginScriptObject::HasProperty(NPIdentifier name)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 
 #if 0
-    printf("Checking for Property \"");
+    log_debug("Checking for Property \"");
     if (NPN_IdentifierIsString(name)) {
-        printf("%s\"...", NPN_UTF8FromIdentifier(name));
+        log_debug("%s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        printf("%d\"...", NPN_IntFromIdentifier(name));
+        log_debug("%d\"...", NPN_IntFromIdentifier(name));
     }
 #endif
     
     std::map<NPIdentifier, NPVariant *>::iterator it;
     it = _properties.find(name);
     if (it != _properties.end()) {
-        // printf(" FOUND\n");
+        // log_debug(" FOUND");
         return true;
     }
-    
+
     return false;
 };
 
 bool
 GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
 
-    printf("Getting Property \"");
     if (NPN_IdentifierIsString(name)) {
-        printf("%s\"...", NPN_UTF8FromIdentifier(name));
+        log_debug("Getting Property %s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        printf("%d\"...", NPN_IntFromIdentifier(name));
+        log_debug("Getting Property %d\"...", NPN_IntFromIdentifier(name));
     }
-    
+
     std::map<NPIdentifier, NPVariant *>::iterator it;
     it = _properties.find(name);
     if (it != _properties.end()) {
-        printf(" FOUND = ");
+//        log_debug(" FOUND = ");
         // We have to copy the data we hold internally into the result
         // data object, rather than just resetting the result point to
         // our internal copy, which doesn't work.
         NPVariant *value = it->second;
         if (NPVARIANT_IS_DOUBLE(*value)) {
             double num = NPVARIANT_TO_DOUBLE(*value);
-            printf(" %g", num);
+            log_debug(" %g", num);
             DOUBLE_TO_NPVARIANT(num, *result);
         } else if (NPVARIANT_IS_STRING(*value)) {
-            printf(" %s", NPVARIANT_TO_STRING(*value).UTF8Characters);
+            log_debug(" %s", NPVARIANT_TO_STRING(*value).UTF8Characters);
             STRINGN_TO_NPVARIANT(NPVARIANT_TO_STRING(*value).UTF8Characters,
                                  NPVARIANT_TO_STRING(*value).UTF8Length,
                                  *result);
         } else if (NPVARIANT_IS_BOOLEAN(*value)) {
-            printf(" %d", NPVARIANT_TO_BOOLEAN(*value));
+            log_debug(" %d", NPVARIANT_TO_BOOLEAN(*value));
             BOOLEAN_TO_NPVARIANT(NPVARIANT_TO_BOOLEAN(*value), *result);
         } else if (NPVARIANT_IS_INT32(*value)) {
-            printf(" %d", NPVARIANT_TO_INT32(*value));
+            log_debug(" %d", NPVARIANT_TO_INT32(*value));
             INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(*value), *result);
         } else if (NPVARIANT_IS_NULL(*value)) {
-            printf(" null value");
+            log_debug(" null value");
             NULL_TO_NPVARIANT(*result);
         } else if (NPVARIANT_IS_VOID(*value)) {
-            printf(" void value");
+            log_debug(" void value");
             VOID_TO_NPVARIANT(*result);
         } else if (NPVARIANT_IS_OBJECT(*value)) {
-            printf(" object");
+            log_debug(" object");
             OBJECT_TO_NPVARIANT(NPVARIANT_TO_OBJECT(*value), *result);
         }
-        printf("\n");
         return true;
     }
 
-    printf("\n");
     return false;
 };
 
 bool
 GnashPluginScriptObject::SetProperty(NPIdentifier name, const NPVariant *value)
 {
-    // GnashLogDebug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
 
     _properties[name] = const_cast<NPVariant *>(value);
 
@@ -1087,7 +536,7 @@ GnashPluginScriptObject::SetProperty(NPIdentifier name, const NPVariant *value)
 bool
 GnashPluginScriptObject::RemoveProperty(NPIdentifier name)
 {
-    // GnashLogDebug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
 
     std::map<NPIdentifier, NPVariant *>::iterator it;
     it = _properties.find(name);
@@ -1102,7 +551,7 @@ GnashPluginScriptObject::RemoveProperty(NPIdentifier name)
 bool
 GnashPluginScriptObject::Enumerate(NPIdentifier **/*identifier */, uint32_t */* count */)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
 
     return false;
 }
@@ -1111,7 +560,7 @@ bool
 GnashPluginScriptObject::Construct(const NPVariant */* args */, uint32_t /* argCount */,
                                    NPVariant */* result */)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
 
     return false;
 }
@@ -1119,21 +568,21 @@ GnashPluginScriptObject::Construct(const NPVariant */* args */, uint32_t /* argC
 bool
 GnashPluginScriptObject::HasMethod(NPIdentifier name)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 
 #if 0
-    printf("Checking for Method \"");
+    log_debug("Checking for Method \"");
     if (NPN_IdentifierIsString(name)) {
-        printf("%s\"...", NPN_UTF8FromIdentifier(name));
+        log_debug("%s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        printf("%d\"...", NPN_IntFromIdentifier(name));
+        log_debug("%d\"...", NPN_IntFromIdentifier(name));
     }
 #endif
 
     std::map<NPIdentifier, NPInvokeFunctionPtr>::iterator it;
     it = _methods.find(name);
     if (it != _methods.end()) {
-        // printf(" FOUND\n");
+        // log_debug(" FOUND");
         return true;
     }    
     
@@ -1143,23 +592,23 @@ GnashPluginScriptObject::HasMethod(NPIdentifier name)
 bool
 GnashPluginScriptObject::Invoke(NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
-#if 1
-    printf("Invoking Method \"");
+//    log_debug(__PRETTY_FUNCTION__);
+#if 0
+    log_debug("Invoking Method \"");
     if (NPN_IdentifierIsString(name)) {
-        printf("%s\"...", NPN_UTF8FromIdentifier(name));
+        log_debug("%s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        printf("%d\"...", NPN_IntFromIdentifier(name));
+        log_debug("%d\"...", NPN_IntFromIdentifier(name));
     }
 #endif
 
     std::map<NPIdentifier, NPInvokeFunctionPtr>::iterator it;
     it = _methods.find(name);
     if (it != _methods.end()) {
-        printf(" FOUND\n");
+        // log_debug(" FOUND");
         NPInvokeFunctionPtr func = it->second;
         return func(NULL, name, args, argCount, result);
-    }    
+    }
 
     return false;
 }
@@ -1168,13 +617,13 @@ bool
 GnashPluginScriptObject::InvokeDefault(const NPVariant */* args */,
                           uint32_t /* argCount */, NPVariant */* result */)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
 #if 0
-    printf("Invoking Default Method \"");
+    log_debug("Invoking Default Method \"");
     if (NPN_IdentifierIsString(name)) {
-        printf("%s\"...\n", NPN_UTF8FromIdentifier(name));
+        log_debug("%s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        printf("%d\"...\n", NPN_IntFromIdentifier(name));
+        log_debug("%d\"...", NPN_IntFromIdentifier(name));
     }
 #endif
 
@@ -1184,14 +633,14 @@ GnashPluginScriptObject::InvokeDefault(const NPVariant */* args */,
 bool
 GnashPluginScriptObject::AddMethod(NPIdentifier name, NPInvokeFunctionPtr func)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
     
 #if 0
-    printf("Adding Method \"");
+    log_debug("Adding Method \"");
     if (NPN_IdentifierIsString(name)) {
-        printf("%s\"...\n", NPN_UTF8FromIdentifier(name));
+        log_debug("%s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        printf("%d\"...\n", NPN_IntFromIdentifier(name));
+        log_debug("%d\"...", NPN_IntFromIdentifier(name));
     }
 #endif
 
@@ -1206,40 +655,26 @@ bool
 GnashPluginScriptObject::SetVariable(const std::string &name,
                                      NPVariant *value)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
 
-    // Build the command message
-    printf("Set Variable \"%s\" to ", name.c_str());
-    std::stringstream ss;
-    ss << "SetVariable " << name;
-    if (NPVARIANT_IS_DOUBLE(*value)) {
-        ss << " double " << NPVARIANT_TO_DOUBLE(*value);
-    } else if (NPVARIANT_IS_STRING(*value)) {
-        std::string varname = NPVARIANT_TO_STRING(*value).UTF8Characters;
-        ss << " string " << varname;
-    } else if (NPVARIANT_IS_BOOLEAN(*value)) {
-        ss << " boolean " << NPVARIANT_TO_BOOLEAN(*value);
-    } else if (NPVARIANT_IS_INT32(*value)) {
-        ss << " int32 " << NPVARIANT_TO_INT32(*value);
-    } else if (NPVARIANT_IS_NULL(*value)) {
-        ss << " null";
-    } else if (NPVARIANT_IS_VOID(*value)) {
-        ss << " void";
-    } else if (NPVARIANT_IS_OBJECT(*value)) {
-        ss << " object";         // FIXME: add the object data
-    }
-
-    // Add the CR, so we know where the message ends when parsing.
-    ss << std::endl;
+    ExternalInterface ei;
+    
+    std::vector<std::string> iargs;
+    std::string str = ei.makeString(name);
+    iargs.push_back(str);
+    str = ei.convertNPVariant(value);
+    iargs.push_back(str);
+    str = ei.makeInvoke("SetVariable", iargs);
+    
     // Write the message to the Control FD.
-    size_t ret = writePlayer(controlfd, ss.str());
+    size_t ret = writePlayer(controlfd, str);
     // Unless we wrote the same amount of data as the message contained,
     // something went wrong.
-    if (ret != ss.str().size()) {
-        GnashLogError("Couldn't set the variable, network problems.");
+    if (ret != str.size()) {
+        log_error("Couldn't set the variable, network problems.");
         return false;
     }
-
+    
     return true;
 }
 
@@ -1249,84 +684,38 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
 NPVariant *
 GnashPluginScriptObject::GetVariable(const std::string &name)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    printf("Get Variable \"%s\" is ", name.c_str());
+    log_debug(__PRETTY_FUNCTION__);
 
-    NPVariant *value = 0;
-    std::stringstream ss;
-    
-    ss << "GetVariable " << name << std::endl;
-    writePlayer(controlfd, ss.str());
+    ExternalInterface ei;
+    std::vector<std::string> iargs;
+    std::string str = ei.makeString(name);
+    iargs.push_back(str);
+    str = ei.makeInvoke("GetVariable", iargs);
+
+    size_t ret = writePlayer(controlfd, str);
+    if (ret != str.size()) {
+        log_error("Couldn't send GetVariable request, network problems.");
+        return false;
+    }
 
     // Have the read function allocate the memory
+    NPVariant *value = 0;
     const char *data = 0;
     char *ptr = 0;
-    int ret = readPlayer(controlfd, &data, 0);
-    if (ret == 0) {
-        return value;
-    }
-
     ptr = const_cast<char *>(data);
-    value = new NPVariant;
-
-    // Make sure this mesasge is our response, whnich it should be,
-    // but you never know...
-    if (strncmp(ptr, "GetVariable ", 12) != 0) {
-        printf("Illegal response! %s\n", ptr);
-        return value;
-    } else {
-        // A legit response has CR on the end already
-        printf("Legit response: %s", ptr);
-    }    
-    ptr += 12;
-
-#if 0
-    if (strncmp(ptr, name.c_str(), name.size()) == 0) {
-        printf("Mismatched variable name! %s\n", ptr);
-        return value;
-    } else {
-        printf("Variable names matched: %s\n", ptr);
-    }
-#endif
-    ptr += name.size() + 1;     // don't forget to skip the space
-    
-    if (strncmp(ptr, "double ", 7) == 0) {
-        double num = strtod(ptr, NULL);
-        ptr += 7;
-        printf("\tdouble %s = %g\n", name.c_str(), num);
-        DOUBLE_TO_NPVARIANT(num, *value);
-    } else if (strncmp(ptr, "string ", 7) == 0) {
-        ptr += 7;
-        std::string str(ptr);
-        printf("\tstring %s = %s\n", name.c_str(), str.c_str());
-    } else if (strncmp(ptr, "boolean ", 8) == 0) {
-        ptr += 8;
-        bool flag = strtol(ptr, NULL, 0);
-        printf("\tboolean %s = %d\n", name.c_str(), flag);
-        BOOLEAN_TO_NPVARIANT(flag, *value);
-    } else if (strncmp(ptr, "int32 ", 6) == 0) {
-        ptr += 6;
-        int num = strtol(ptr, NULL, 0);
-        printf("\tint32 %s = %d\n", name.c_str(), num);
-        INT32_TO_NPVARIANT(num, *value);
-    } else if (strncmp(ptr, "null ", 5) == 0) {
-        ptr += 5;
-        printf("\t%s = null\n", name.c_str());
+    ret = readPlayer(controlfd, &data, 0);
+    if (ret == 0) {
+        value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
         NULL_TO_NPVARIANT(*value);
-    } else if (strncmp(ptr, "void ", 5) == 0) {
-        ptr += 5;
-        printf("\t%s = void\n", name.c_str());
-        VOID_TO_NPVARIANT(*value);
-    } else if (strncmp(ptr, "object ", 7) == 0) {
-        ptr += 7;
-        printf("\tFIXME: %s = object\n", name.c_str());
-        // OBJECT_TO_NPVARIANT(num, *value);
+        return value;
     }
 
-    ss << std::endl;
+    value = ei.parseXML(data);
 
     // free the memory used for the data, as it was allocated in readPlayer().
-    delete[](data);
+    NPN_MemFree(reinterpret_cast<void *>(const_cast<char *>(data)));
+    
+    printNPVariant(value);
     
     return value;
 }
@@ -1334,15 +723,16 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
 void
 GnashPluginScriptObject::setControlFD(int x)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug("%s: %d", __FUNCTION__, x);
+    
     controlfd = x;
 }
 
 int
 GnashPluginScriptObject::getControlFD()
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
-
+    log_debug("getControlFD: %d", controlfd);
+    
     return controlfd;
 };
 
@@ -1351,18 +741,27 @@ GnashPluginScriptObject::getControlFD()
 int
 GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 {
-    GnashLogDebug(__PRETTY_FUNCTION__);
-    return writePlayer(fd, data.c_str(), data.size());
+    log_debug(__PRETTY_FUNCTION__);
+
+//    log_debug("Writing data: %s", data);
+
+    if (fd > 2) {
+        return writePlayer(fd, data.c_str(), data.size());
+    }
+    
+    return 0;
 }
 
 int
 GnashPluginScriptObject::writePlayer(int fd, const char *data, size_t length)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
-    
-    if (controlfd > 0) {
+    log_debug(__PRETTY_FUNCTION__);    
+
+    if (fd > 2) {
         return ::write(fd, data, length);
     }
+
+//    log_debug("Writing data: %s", data);    
     
     return 0;
 }
@@ -1371,7 +770,7 @@ GnashPluginScriptObject::writePlayer(int fd, const char *data, size_t length)
 int
 GnashPluginScriptObject::readPlayer(int /* fd */, const std::string &/* data */)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 
 //    return readPlayer(fd, data.c_str(), data.size());
 
@@ -1381,7 +780,7 @@ GnashPluginScriptObject::readPlayer(int /* fd */, const std::string &/* data */)
 int
 GnashPluginScriptObject::readPlayer(int fd, const char **data, size_t length)
 {
-//    GnashLogDebug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 
     if (fd > 0) {
         // Wait for some data from the player
@@ -1392,20 +791,20 @@ GnashPluginScriptObject::readPlayer(int fd, const char **data, size_t length)
         struct timeval tval;
         tval.tv_sec = 10;
         tval.tv_usec = 0;
-        printf("Waiting for data... ");
+        log_debug("Waiting for data... ");
         if (select(fd+1, &fdset, NULL, NULL, &tval)) {
-            // printf("There is data in the network\n");
+            // log_debug("There is data in the network");
 #ifndef _WIN32
             ioctl(fd, FIONREAD, &bytes);
 #else
             ioctlSocket(fd, FIONREAD, &bytes);
 #endif
         // } else {
-        //     printf("There is no data in thhe network\n");
+        //     log_debug("There is no data in the network");
         }
         
 
-        printf("There are %d bytes in the network buffer\n", bytes);
+        log_debug("There are %d bytes in the network buffer", bytes);
         // No data yet
         if (bytes == 0) {
             return 0;
@@ -1415,7 +814,7 @@ GnashPluginScriptObject::readPlayer(int fd, const char **data, size_t length)
         if (*data == 0) {
             // Since we know how bytes are in the network buffer, allocate
             // some memory to read the data.
-            buf = new char[bytes+1];
+            buf = (char *)NPN_MemAlloc(bytes+1);
             // terminate incase we want to treat the data like a string.
             buf[bytes] = 0;
             length = bytes;

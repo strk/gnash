@@ -289,7 +289,7 @@ AC_ARG_ENABLE(scriptable,
     yes) scriptable=yes ;;
     no)  scriptable=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for enable-scriptable option]) ;;
-  esac], scriptable=yes
+  esac], scriptable=no
 )
 AM_CONDITIONAL(SCRIPTABLE, [test x"$scriptable" = xyes])
 if test x$scriptable = xyes; then

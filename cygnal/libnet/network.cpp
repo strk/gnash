@@ -420,13 +420,12 @@ Network::connectSocket(const string &sockname)
     strncpy(addr.sun_path, sockname.c_str(), 100);
 
     _sockfd = ::socket(AF_UNIX, SOCK_STREAM, 0);
-    if (_sockfd < 0)
-        {
-            log_error(_("unable to create socket: %s"), strerror(errno));
-            _sockfd = -1;
-            return false;
-        }
-
+    if (_sockfd < 0) {
+	log_error(_("unable to create socket: %s"), strerror(errno));
+	_sockfd = -1;
+	return false;
+    }
+    
     retries = 2;
     while (retries-- > 0) {
         // We use select to wait for the read file descriptor to be
@@ -442,25 +441,23 @@ Network::connectSocket(const string &sockname)
         ret = ::select(_sockfd+1, &fdset, NULL, NULL, &tval);
 
         // If interupted by a system call, try again
-        if (ret == -1 && errno == EINTR)
-            {
-                log_debug(_("The connect() socket for fd %d was interupted by a system call"),
-                        _sockfd);
-                continue;
-            }
+        if (ret == -1 && errno == EINTR) {
+	    log_debug(_("The connect() socket for fd %d was interupted by a system call"),
+		      _sockfd);
+	    continue;
+	}
 
-        if (ret == -1)
-            {
-                log_debug(_("The connect() socket for fd %d never was available for writing"),
-                        _sockfd);
+        if (ret == -1) {
+	    log_debug(_("The connect() socket for fd %d never was available for writing"),
+		      _sockfd);
 #ifdef HAVE_WINSOCK_H
-                ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
+	    ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
 #else
-                ::shutdown(_sockfd, SHUT_RDWR);
+	    ::shutdown(_sockfd, SHUT_RDWR);
 #endif
-                _sockfd = -1;
-                return false;
-            }
+	    _sockfd = -1;
+	    return false;
+	}
         if (ret == 0) {
             log_error(_("The connect() socket for fd %d timed out waiting to write"),
                       _sockfd);

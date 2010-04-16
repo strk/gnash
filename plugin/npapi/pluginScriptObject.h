@@ -87,9 +87,19 @@ public:
     int getControlFD();
 
     /// Set a variable in the standalone player
+    ///
+    /// @param name the name of the variable to set
+    ///
+    /// @param value the value to set the variable to
+    ///
+    /// @return true or false based on the status of the invoke call
     bool SetVariable(const std::string &name, NPVariant *value);
     
     /// Get the value of a variable from the standalone player
+    ///
+    /// @param name the name of the variable to set
+    ///
+    /// @return the value as returned by the standalone player
     NPVariant *GetVariable(const std::string &name);
 
     // Write to the standalone player over the control socket
@@ -119,14 +129,18 @@ protected:
     bool RemoveProperty(NPIdentifier name);
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
+
+    
 private:
     void initializeIdentifiers();
+    void setInstance(NPP inst) { _nppinstance = inst; };
     
     // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
     NPP _nppinstance;
     
     std::map<NPIdentifier, NPVariant *> _properties;
     std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
+    // int _control;
 };
 
 #endif /* GNASH_PLUGIN_SCRIPT_OBJECT_H */
