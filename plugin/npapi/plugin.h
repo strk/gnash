@@ -71,10 +71,13 @@ public:
     NPError GetValue(NPPVariable variable, void *value);
     NPError SetWindow(NPWindow *aWindow);
 
+    /// Open a new stream. THis is called every time there is swf content.
     NPError NewStream(NPMIMEType type, NPStream *stream, NPBool seekable,
                       uint16_t *stype);
+    /// Destroy the stream
     NPError DestroyStream(NPStream * stream, NPError reason);
 
+    /// Can the stream be written to yet ?
     int32_t WriteReady(NPStream *stream);
     int32_t Write(NPStream *stream, int32_t offset, int32_t len, void *buffer);
 #ifdef ENABLE_SCRIPTABLE
@@ -85,7 +88,7 @@ public:
 private:
     void startProc();
     std::vector<std::string> getCmdLine(int hostfd, int controlfd);
-
+//    std::vector<std::string> getCmdLine(const std::string &pipe);
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);
@@ -137,7 +140,7 @@ private:
 //  1: fatal errors (errors preventing the plugin from working as it should)
 //  2: informational messages
 //
-#define GNASH_PLUGIN_DEBUG 1
+#define GNASH_PLUGIN_DEBUG 2
 
 // This following logging code is copied from libbase/log.h, but
 // duplicated here because the plugin only needs a more trimmed down
@@ -164,7 +167,7 @@ DSOEXPORT void processLog_debug(const boost::format& fmt);
 #define LOG_TYPES (error) (debug)
 /// The preprocessor generates templates with 1..ARG_NUMBER
 /// arguments.
-#define ARG_NUMBER 2
+#define ARG_NUMBER 4
 #define LOG_TEMPLATES(z, n, data)\
 template<BOOST_PP_ENUM_PARAMS(BOOST_PP_INC(n), typename T)>\
 inline void log_##data(BOOST_PP_REPEAT(BOOST_PP_INC(n), TOKENIZE_ARGS, t)) \
