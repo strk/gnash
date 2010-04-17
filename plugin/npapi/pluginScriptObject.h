@@ -126,7 +126,9 @@ public:
     int getPipeFD() { return _sockfd; };
     
     // Write to the standalone player over the control socket
+    int writePlayer(const char *data, size_t length);
     int writePlayer(int fd, const char *data, size_t length);
+    int writePlayer(const std::string &data);
     int writePlayer(int fd, const std::string &data);
     
     // Read the standalone player over the control socket
