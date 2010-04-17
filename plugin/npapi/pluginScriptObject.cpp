@@ -759,6 +759,12 @@ GnashPluginScriptObject::getControlFD()
 
 // Write to the standalone player over the control socket
 int
+GnashPluginScriptObject::writePlayer(const std::string &data)
+{
+    return writePlayer(_sockfd, data);
+}
+
+int
 GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 {
 //    log_debug(__PRETTY_FUNCTION__);
@@ -770,6 +776,12 @@ GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
     }
     
     return 0;
+}
+
+int
+GnashPluginScriptObject::writePlayer(const char *data, size_t length)
+{
+    return writePlayer(_sockfd, data, length);
 }
 
 int
@@ -945,7 +957,7 @@ GnashPluginScriptObject::checkPipe(int fd)
         int ret = select(fd+1, &fdset, NULL, NULL, &tval);
         if (ret == 0) {
             log_debug ("The pipe for #fd %d timed out waiting to read", fd);
-            return true;
+            return false;
         } else if (ret == 1) {
             log_debug ("The pipe for #fd is ready", fd);
             controlfd = fd;
