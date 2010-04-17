@@ -421,7 +421,7 @@ cleanup_childpid(gpointer data)
 /// \brief Destructor
 nsPluginInstance::~nsPluginInstance()
 {
-    log_debug("plugin instance destruction");
+//    log_debug("plugin instance destruction");
 
     if ( _ichanWatchId ) {
         g_source_remove(_ichanWatchId);
@@ -496,6 +496,12 @@ nsPluginInstance::shut()
             log_error("Gnash plugin failed to close the control socket!");
         }
     }
+
+#ifdef ENABLE_SCRIPTABLE
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)_scriptObject;
+    gpso->closePipe();
+#endif
+
 }
 /// \brief Set the window to be used to render in
 ///
@@ -769,8 +775,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             return false;
         }
 
-        log_debug("Asked to get URL '%s''", url);
-        log_debug("In target '%s'", target);
+        log_debug("Asked to get URL '%s' in target %s", url, target);
         NPN_GetURL(_instance, url, target);
         return true;
 
@@ -920,7 +925,7 @@ create_standalone_launcher(const char* page_url, const std::string& swf_url,
 }
 
 std::vector<std::string>
-nsPluginInstance::getCmdLine(int hostfd, int controlfd)
+nsPluginInstance::getCmdLine(int hostfd, int controlfd, const std::string &pipe)
 {
     std::vector<std::string> arg_vec;
 
@@ -946,8 +951,8 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
     pars << "-x "  <<  _window           // X window ID to render into
          << " -j " << _width             // Width of window
          << " -k " << _height            // Height of window
-         << " -F " << hostfd             // Socket to send commands to
-         << " -G " << controlfd;         // Socket determining lifespan
+         << " -F " << pipe;              // Socket to send commands to
+//          << " -G " << controlfd;         // Socket determining lifespan
     {
         std::string pars_str = pars.str();
         typedef boost::char_separator<char> char_sep;
@@ -1046,6 +1051,8 @@ nsPluginInstance::startProc()
     
 #ifdef ENABLE_SCRIPTABLE
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)_scriptObject;
+    gpso->createPipe();
+    gpso->checkPipe();
 #ifdef NETTEST
     gpso->setControlFD(_controlfd);
 #endif
@@ -1056,7 +1063,9 @@ nsPluginInstance::startProc()
     */
 
     std::vector<std::string> arg_vec = getCmdLine(c2p_pipe[1],
-                                                  p2c_controlpipe[0]);
+                                                  p2c_controlpipe[0],
+                                                  gpso->getPipeName());
+
     if (arg_vec.empty()) {
         log_error("Failed to obtain command line parameters.");
         return;
@@ -1208,13 +1217,17 @@ processLog_error(const boost::format& fmt)
     std::cerr << "ERROR: " << fmt.str() << std::endl;
 }
 
+#if GNASH_PLUGIN_DEBUG > 1
 void
 processLog_debug(const boost::format& fmt)
 {
-#if GNASH_PLUGIN_DEBUG > 1
     std::cout << "DEBUG: " << fmt.str() << std::endl;
-#endif
 }
+#else
+void
+processLog_debug(const boost::format& fmt)
+{ /* do nothing */ }
+#endif
 
 // Local Variables:
 // mode: C++

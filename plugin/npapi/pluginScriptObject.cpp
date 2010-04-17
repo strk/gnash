@@ -28,6 +28,10 @@
 #include <fcntl.h>
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
+#include <cerrno>
+#include <sys/types.h>
+#include <unistd.h>
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
 # include <winsock2.h>
 # include <windows.h>
@@ -35,9 +39,12 @@
 # include <io.h>
 # include <ws2tcpip.h>
 #else
+# include <sys/un.h>
 # include <sys/ioctl.h>
 # include <unistd.h>
 # include <sys/select.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
 #endif
 #include "npapi.h"
 #include "npruntime.h"
@@ -278,7 +285,11 @@ GnashPluginScriptObject::initializeIdentifiers()
 
 // Constructor
 GnashPluginScriptObject::GnashPluginScriptObject()
-    : _nppinstance (0)
+    : _nppinstance (0),
+    _sockfd(0)
+#ifdef HAVE_GLIB
+    ,_iochan(0)
+#endif
 {
 //    log_debug(__PRETTY_FUNCTION__);
     initializeIdentifiers();
@@ -286,7 +297,11 @@ GnashPluginScriptObject::GnashPluginScriptObject()
 
 // Constructor
 GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
-    : _nppinstance (npp)
+    : _nppinstance (npp),
+      _sockfd(0)
+#ifdef HAVE_GLIB
+    ,_iochan(0)
+#endif
 {
 //    log_debug(__PRETTY_FUNCTION__);
     initializeIdentifiers();
@@ -295,22 +310,22 @@ GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
 // Destructor
 GnashPluginScriptObject::~GnashPluginScriptObject() 
 {
-    // log_debug(__PRETTY_FUNCTION__);
-    // do nothing
+    log_debug(__PRETTY_FUNCTION__);
+    closePipe();
 }
 
 // Marshal Functions
 NPClass *
 GnashPluginScriptObject::marshalGetNPClass() 
 {
-    // log_debug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
     return &GnashPluginScriptObjectClass;
 }
 
 NPObject *
 GnashPluginScriptObject::marshalAllocate (NPP npp, NPClass */* aClass */)
 {
-    log_debug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 #if 0
     GnashPluginScriptObject *npobj = reinterpret_cast<GnashPluginScriptObject *>
         (NPN_MemAlloc(sizeof(GnashPluginScriptObject)));
@@ -325,7 +340,7 @@ GnashPluginScriptObject::marshalAllocate (NPP npp, NPClass */* aClass */)
 void 
 GnashPluginScriptObject::marshalDeallocate (NPObject *npobj)
 {
-    log_debug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 #if 0
     NPN_MemFree(reinterpret_cast<void *>(npobj));
 #else
@@ -336,7 +351,7 @@ GnashPluginScriptObject::marshalDeallocate (NPObject *npobj)
 void 
 GnashPluginScriptObject::marshalInvalidate (NPObject */* npobj */)
 {
-    log_debug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 
 //    gpso->Invalidate();
 }
@@ -724,16 +739,21 @@ void
 GnashPluginScriptObject::setControlFD(int x)
 {
 //    log_debug("%s: %d", __FUNCTION__, x);
+    if (_iochan == 0) {
+        _iochan = g_io_channel_unix_new(x);
+    }
     
-    controlfd = x;
+    controlfd = x;              // FIXME: this should go away
 }
 
 int
 GnashPluginScriptObject::getControlFD()
 {
-    log_debug("getControlFD: %d", controlfd);
+// log_debug("getControlFD: %d", controlfd);
+
+    return g_io_channel_unix_get_fd (_iochan);
     
-    return controlfd;
+    // return controlfd;
 };
 
 
@@ -741,7 +761,7 @@ GnashPluginScriptObject::getControlFD()
 int
 GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 {
-    log_debug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
 
 //    log_debug("Writing data: %s", data);
 
@@ -755,7 +775,7 @@ GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 int
 GnashPluginScriptObject::writePlayer(int fd, const char *data, size_t length)
 {
-    log_debug(__PRETTY_FUNCTION__);    
+    // log_debug(__PRETTY_FUNCTION__);    
 
     if (fd > 2) {
         return ::write(fd, data, length);
@@ -791,7 +811,7 @@ GnashPluginScriptObject::readPlayer(int fd, const char **data, size_t length)
         struct timeval tval;
         tval.tv_sec = 10;
         tval.tv_usec = 0;
-        log_debug("Waiting for data... ");
+        // log_debug("Waiting for data... ");
         if (select(fd+1, &fdset, NULL, NULL, &tval)) {
             // log_debug("There is data in the network");
 #ifndef _WIN32
@@ -804,11 +824,11 @@ GnashPluginScriptObject::readPlayer(int fd, const char **data, size_t length)
         }
         
 
-        log_debug("There are %d bytes in the network buffer", bytes);
         // No data yet
         if (bytes == 0) {
             return 0;
         }
+        log_debug("There are %d bytes in the network buffer", bytes);
 
         char *buf = 0;
         if (*data == 0) {
@@ -823,11 +843,120 @@ GnashPluginScriptObject::readPlayer(int fd, const char **data, size_t length)
         if (ret == bytes) {
             *data = buf;
         }
+
+        std::cout << buf << std::endl;
         return ret;
     }
     
     return 0;
-}   
+}
+
+// Create a socket so we can talk to the player.
+bool
+GnashPluginScriptObject::connectPipe(const std::string &/* sockname */)
+{
+//     log_debug(__FUNCTION__);
+    
+    return false;
+}
+
+// Close the socket
+bool
+GnashPluginScriptObject::closePipe()
+{
+//     log_debug(__FUNCTION__);
+
+    bool ret = closePipe(_sockfd);
+    _sockfd = 0;
+    
+    return ret;
+}
+
+bool
+GnashPluginScriptObject::closePipe(int fd)
+{
+//     log_debug(__FUNCTION__);
+    
+    if (fd > 0) {
+        ::close(fd);
+    }
+
+    ::unlink(_pipename.c_str());
+    
+    return true;
+}
+
+// Create a socket so we can talk to the player.
+bool
+GnashPluginScriptObject::createPipe()
+{
+    log_debug(__PRETTY_FUNCTION__);
+    std::stringstream ss;
+    static int count = 0;
+    ss << "/tmp/gnash-" << getpid() << count++;
+
+    return createPipe(ss.str());
+}
+
+bool
+GnashPluginScriptObject::createPipe(const std::string &name)
+{
+    log_debug(__PRETTY_FUNCTION__);
+
+    mode_t mode = S_IRUSR|S_IWUSR;
+    if (!name.empty()) {
+        int ret = mkfifo(name.c_str(), mode);
+        if (ret == 0) {
+            _sockfd = ::open(name.c_str(), O_RDWR|O_NONBLOCK, mode);
+            if (_sockfd < 0) {
+                log_error("Couldn't open the pipe: \"%s\"", strerror(errno));
+            }
+        } else {
+            log_error("Couldn't create fifo: s\n", strerror(errno));
+        }
+    }
+
+    _pipename = name;
+    
+    return false;
+}
+
+// Check the pipe to see if it's ready, ie... is gnash connected yet ?
+bool
+GnashPluginScriptObject::checkPipe()
+{
+    return checkPipe(_sockfd);
+}
+
+bool
+GnashPluginScriptObject::checkPipe(int fd)
+{
+//    log_debug(__PRETTY_FUNCTION__);
+    
+    fd_set fdset;
+        
+    if (fd > 2) {
+        FD_ZERO(&fdset);
+        FD_SET(fd, &fdset);
+	struct timeval tval;
+        tval.tv_sec = 0;
+        tval.tv_usec = 100;
+        errno = 0;
+        int ret = select(fd+1, &fdset, NULL, NULL, &tval);
+        if (ret == 0) {
+            log_debug ("The pipe for #fd %d timed out waiting to read", fd);
+            return true;
+        } else if (ret == 1) {
+            log_debug ("The pipe for #fd is ready", fd);
+            controlfd = fd;
+            return true;
+        } else {
+            log_error("The pipe has this error: %s", strerror(errno));
+        }
+    }
+
+    return false;
+}
 
 // local Variables:
 // mode: C++

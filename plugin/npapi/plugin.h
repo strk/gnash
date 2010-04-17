@@ -87,8 +87,8 @@ public:
     
 private:
     void startProc();
-    std::vector<std::string> getCmdLine(int hostfd, int controlfd);
-//    std::vector<std::string> getCmdLine(const std::string &pipe);
+    std::vector<std::string> getCmdLine(int hostfd, int controlfd,
+                                        const std::string &pipe);
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);

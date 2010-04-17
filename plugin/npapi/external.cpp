@@ -184,7 +184,6 @@ ExternalInterface::makeObject (std::map<std::string, std::string> &args)
 {
     std::stringstream ss;
     std::map<std::string, std::string>::iterator it;
-    int index = 0;
 
     ss << "<object>";
     for (it = args.begin(); it != args.end(); ++it) {

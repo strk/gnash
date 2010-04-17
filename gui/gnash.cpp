@@ -26,6 +26,9 @@
 #include <iostream>
 #include <ios>
 #include <boost/format.hpp>
+#include <cstdlib>
+#include <sys/types.h>
+#include <fcntl.h>
 #ifdef ENABLE_NLS
 # include <clocale>
 #endif
@@ -118,7 +121,7 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("                           1 enable rendering, disable sound\n") 
     << _("                           2 enable sound, disable rendering\n") 
     << _("                           3 enable rendering and sound (default)\n") 
-    // Only list the renderes that were configured in for this build
+    // Only list the renderers that were configured in for this build
     << _("  -R,  --Renderer <")
 #ifdef RENDERER_OPENGL
      << _(" opengl")
@@ -322,12 +325,25 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     break;
                 case 'F':
                 {
+#if 1
+		    const std::string& pipename = parser.argument(i);
+
+                    int fd = ::open(pipename.c_str(), O_RDWR|O_NONBLOCK, S_IRUSR|S_IWUSR);
+                    if (fd < 0) {
+			cerr << "Couldn't open the pipe: " << strerror(errno) << endl;
+
+                    } else {
+                        write(fd, "Helo\n", 5);
+                        cerr << "Opened " << pipename << " on fd #" << fd << endl;
+		    }
+#else
                     const int fd = parser.argument<long>(i);
                     if (fd < 1) {
                         cerr << boost::format(_("Invalid host communication "
-                                    "filedescriptor %d\n")) % fd << endl;
+						"filedescriptor %d\n")) % fd << endl;
                         exit(EXIT_FAILURE);
                     }
+#endif
                     player.setHostFD ( fd );
                     break;
                 }

@@ -20,6 +20,10 @@
 #include "gnashconfig.h"
 #endif
 
+#ifdef HAVE_GLIB
+#include <glib.h>
+#endif
+
 // Test:
 //     Use browser to open plugin/scriptable-test.html.
 //
@@ -102,6 +106,25 @@ public:
     /// @return the value as returned by the standalone player
     NPVariant *GetVariable(const std::string &name);
 
+    // Create a named socket so we can talk to the player.
+    bool createPipe();
+    bool createPipe(const std::string &name);
+    
+    // Connect to an existing socket
+    bool connectPipe(const std::string &name);
+    
+    // Close the socket
+    bool closePipe();
+    bool closePipe(int fd);
+
+    // Check the pipe to see if it's ready, ie... is gnash connected yet ?
+    bool checkPipe();
+    bool checkPipe(int fd);
+
+    // Get the name of the pipe so we can pass it to Gnash
+    std::string getPipeName() { return _pipename; };
+    int getPipeFD() { return _sockfd; };
+    
     // Write to the standalone player over the control socket
     int writePlayer(int fd, const char *data, size_t length);
     int writePlayer(int fd, const std::string &data);
@@ -130,17 +153,19 @@ protected:
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
 
-    
 private:
     void initializeIdentifiers();
     void setInstance(NPP inst) { _nppinstance = inst; };
     
     // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
-    NPP _nppinstance;
-    
+    NPP         _nppinstance;
     std::map<NPIdentifier, NPVariant *> _properties;
     std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
-    // int _control;
+    int         _sockfd;
+    std::string _pipename;
+#ifdef HAVE_GLIB
+    GIOChannel *_iochan;
+#endif
 };
 
 #endif /* GNASH_PLUGIN_SCRIPT_OBJECT_H */
