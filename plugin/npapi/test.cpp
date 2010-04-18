@@ -265,6 +265,21 @@ main(int argc, char *argv[])
     } else {
         runtest.fail("ExternalInterface::parseArguments()");
     }
+
+    // Parse an invoke message
+    xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
+    ExternalInterface::invoke_t *invoke = ei.parseInvoke(xml);
+    str = NPVARIANT_TO_STRING(*invoke->args[0]).UTF8Characters;
+    if ((invoke->name == "barbyfoo") && (invoke->type == "xml")
+        && (NPVARIANT_IS_STRING(*invoke->args[0]))
+        && (str == "barfoo")
+        && (NPVARIANT_IS_DOUBLE(*invoke->args[1]))
+        && (NPVARIANT_TO_DOUBLE(*invoke->args[1]) == 135.78)
+        ) {
+        runtest.pass("ExternalInterface::parseInvoke()");
+    } else {
+        runtest.fail("ExternalInterface::parseInvoke()");
+    }
 }
 
 // We have to implement these two memory allocation functions as
