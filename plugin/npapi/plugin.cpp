@@ -692,12 +692,16 @@ bool
 nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
         GIOCondition cond, nsPluginInstance* plugin)
 {
+    log_trace(__PRETTY_FUNCTION__);
+    
     return plugin->handlePlayerRequests(iochan, cond);
 }
 
 bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
+    log_trace(__PRETTY_FUNCTION__);
+    
     if ( cond & G_IO_HUP ) {
         log_debug("Player request channel hang up");
         // Returning false here will cause the "watch" to be removed. This watch
@@ -709,7 +713,8 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
     assert(cond & G_IO_IN);
 
-    log_debug("Checking player requests on fd #%d", g_io_channel_unix_get_fd(iochan));
+    log_debug("Checking player requests on fd #%d",
+              g_io_channel_unix_get_fd(iochan));
 
     do {
         GError* error=NULL;
@@ -925,7 +930,7 @@ create_standalone_launcher(const char* page_url, const std::string& swf_url,
 }
 
 std::vector<std::string>
-nsPluginInstance::getCmdLine(int hostfd, int controlfd, const std::string &pipe)
+nsPluginInstance::getCmdLine(int hostfd, int controlfd)
 {
     std::vector<std::string> arg_vec;
 
@@ -951,7 +956,7 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd, const std::string &pipe)
     pars << "-x "  <<  _window           // X window ID to render into
          << " -j " << _width             // Width of window
          << " -k " << _height            // Height of window
-         << " -F " << pipe;              // Socket to send commands to
+         << " -F " << hostfd;              // Socket to send commands to
 //          << " -G " << controlfd;         // Socket determining lifespan
     {
         std::string pars_str = pars.str();
@@ -1063,8 +1068,7 @@ nsPluginInstance::startProc()
     */
 
     std::vector<std::string> arg_vec = getCmdLine(c2p_pipe[1],
-                                                  p2c_controlpipe[0],
-                                                  gpso->getPipeName());
+                                                  p2c_controlpipe[0]);
 
     if (arg_vec.empty()) {
         log_error("Failed to obtain command line parameters.");
@@ -1223,9 +1227,19 @@ processLog_debug(const boost::format& fmt)
 {
     std::cout << "DEBUG: " << fmt.str() << std::endl;
 }
+
+void
+processLog_trace(const boost::format& fmt)
+{
+    std::cout << "TRACE: " << fmt.str() << std::endl;
+}
 #else
 void
 processLog_debug(const boost::format& fmt)
+{ /* do nothing */ }
+
+void
+processLog_trace(const boost::format& fmt)
 { /* do nothing */ }
 #endif
 
