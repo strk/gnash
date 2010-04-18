@@ -35,7 +35,7 @@
 #endif
 
 #ifndef HAVE_PRETTY_FUNCTION
-	#define __PRETTY_FUNCTION__ __FUNCTION__
+# define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
 /* Xlib/Xt stuff */
@@ -87,8 +87,7 @@ public:
     
 private:
     void startProc();
-    std::vector<std::string> getCmdLine(int hostfd, int controlfd,
-                                        const std::string &pipe);
+    std::vector<std::string> getCmdLine(int hostfd, int controlfd);
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);
@@ -148,6 +147,7 @@ private:
 // memory footprint down.
 DSOEXPORT void processLog_error(const boost::format& fmt);
 DSOEXPORT void processLog_debug(const boost::format& fmt);
+DSOEXPORT void processLog_trace(const boost::format& fmt);
 
 /// This heap of steaming preprocessor code magically converts
 /// printf-style statements into boost::format messages using templates.
@@ -164,7 +164,7 @@ DSOEXPORT void processLog_debug(const boost::format& fmt);
 /// This is a sequence of different log message types to be used in
 /// the code. Append the name to log_ to call the function, e.g. 
 /// log_error, log_unimpl.
-#define LOG_TYPES (error) (debug)
+#define LOG_TYPES (error) (debug) (trace)
 /// The preprocessor generates templates with 1..ARG_NUMBER
 /// arguments.
 #define ARG_NUMBER 4
