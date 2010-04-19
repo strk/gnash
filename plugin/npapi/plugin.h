@@ -54,6 +54,7 @@
 #include <boost/preprocessor/seq/for_each.hpp>
 
 #include "pluginbase.h"
+#include "pluginScriptObject.h"
 
 extern NPBool      plugInitialized;
 
@@ -126,7 +127,7 @@ private:
     /// Name of the plugin instance element in the dom 
     std::string                        _name;
 #ifdef ENABLE_SCRIPTABLE
-    NPObject                            *_scriptObject;
+    GnashPluginScriptObject             *_scriptObject;
 #endif
     
     const char* getCurrentPageURL() const;
