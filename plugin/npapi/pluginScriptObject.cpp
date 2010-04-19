@@ -228,59 +228,46 @@ GnashPluginScriptObject::initializeIdentifiers()
     AddProperty("onbeforedeactivate", "unknown");
     AddProperty("ondeactivate", "unknown");
     
-#if 0
-   for (int i = 0; i < NUM_METHOD_IDENTIFIERS; i++) {
-       SetProperty(pluginMethodIdentifiers[i], value);
-   }
-   
-   // fill the method identifier array
-   NPNFuncs.getstringidentifiers(pluginMethodIdentifierNames,
-                                 NUM_METHOD_IDENTIFIERS,
-                                 pluginMethodIdentifiers);
-#endif
-//     NPIdentifier id = NPN_GetStringIdentifier("showFoobar");
-//    NPInvokeFunctionPtr func = testfunc;  
-//    AddMethod(id, func);
-
-   NPIdentifier id = NPN_GetStringIdentifier("SetVariable");
-   AddMethod(id, SetVariableCallback);
-
-   id = NPN_GetStringIdentifier("GetVariable");
-   AddMethod(id, GetVariableCallback);
-
-   id = NPN_GetStringIdentifier("GotoFrame");
-   AddMethod(id, GotoFrame);
-
-   id = NPN_GetStringIdentifier("IsPlaying");
-   AddMethod(id, IsPlaying);
-
-   id = NPN_GetStringIdentifier("LoadMovie");
-   AddMethod(id, LoadMovie);
-
-   id = NPN_GetStringIdentifier("Pan");
-   AddMethod(id, Pan);
-
-   id = NPN_GetStringIdentifier("PercentLoaded");
-   AddMethod(id, PercentLoaded);
-
-   id = NPN_GetStringIdentifier("Play");
-   AddMethod(id, Play);
-
-   id = NPN_GetStringIdentifier("Rewind");
-   AddMethod(id, Rewind);
-
-   id = NPN_GetStringIdentifier("SetZoomRect");
-   AddMethod(id, SetZoomRect);
-
-   id = NPN_GetStringIdentifier("StopPlay");
-   AddMethod(id, StopPlay);
-
-   id = NPN_GetStringIdentifier("Zoom");
-   AddMethod(id, Zoom);
-
-   id = NPN_GetStringIdentifier("TotalFrames");
-   AddMethod(id, TotalFrames);
-   
+    // Add the default methods
+    NPIdentifier id = NPN_GetStringIdentifier("SetVariable");
+    AddMethod(id, SetVariableCallback);
+    
+    id = NPN_GetStringIdentifier("GetVariable");
+    AddMethod(id, GetVariableCallback);
+    
+    id = NPN_GetStringIdentifier("GotoFrame");
+    AddMethod(id, GotoFrame);
+    
+    id = NPN_GetStringIdentifier("IsPlaying");
+    AddMethod(id, IsPlaying);
+    
+    id = NPN_GetStringIdentifier("LoadMovie");
+    AddMethod(id, LoadMovie);
+    
+    id = NPN_GetStringIdentifier("Pan");
+    AddMethod(id, Pan);
+    
+    id = NPN_GetStringIdentifier("PercentLoaded");
+    AddMethod(id, PercentLoaded);
+    
+    id = NPN_GetStringIdentifier("Play");
+    AddMethod(id, Play);
+    
+    id = NPN_GetStringIdentifier("Rewind");
+    AddMethod(id, Rewind);
+    
+    id = NPN_GetStringIdentifier("SetZoomRect");
+    AddMethod(id, SetZoomRect);
+    
+    id = NPN_GetStringIdentifier("StopPlay");
+    AddMethod(id, StopPlay);
+    
+    id = NPN_GetStringIdentifier("Zoom");
+    AddMethod(id, Zoom);
+    
+    id = NPN_GetStringIdentifier("TotalFrames");
+    AddMethod(id, TotalFrames);
+    
 };
 
 // Constructor
@@ -289,6 +276,9 @@ GnashPluginScriptObject::GnashPluginScriptObject()
 {
 //    log_debug(__PRETTY_FUNCTION__);
     initializeIdentifiers();
+    
+    _sockfds[READFD] = 0;
+    _sockfds[WRITEFD] = 0;
 }
 
 // Constructor
@@ -297,13 +287,17 @@ GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
 {
 //    log_debug(__PRETTY_FUNCTION__);
     initializeIdentifiers();
+
+    _sockfds[READFD] = 0;
+    _sockfds[WRITEFD] = 0;
 }
 
 // Destructor
 GnashPluginScriptObject::~GnashPluginScriptObject() 
 {
-    log_debug(__PRETTY_FUNCTION__);
-    closePipe();
+//    log_debug(__PRETTY_FUNCTION__);
+// Should be automatically shutdown by GIO
+//    closePipe();
 }
 
 // Marshal Functions
@@ -699,14 +693,27 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
     iargs.push_back(str);
     str = ei.makeInvoke("GetVariable", iargs);
 
+    log_debug("Trying to get a value for %s.", name);
+    
+    NPVariant *value = 0;
     size_t ret = writePlayer(controlfd, str);
     if (ret != str.size()) {
-        log_error("Couldn't send GetVariable request, network problems.");
-        return false;
+        // If all the browser wants is the version, we don't need to
+        // ask the standalone player for this value. YouTube at
+        // least depends on this for some pages which want this to
+        // be greater than 8.0.0. This appears to potentially be
+        // Google's way of trying to revent downloaders, as this requires
+        // plugin support.
+        if (name == "$version") {
+            value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
+            STRINGZ_TO_NPVARIANT(strdup("LNX 10,0,r999"), *value);
+        } else {
+            log_error("Couldn't send GetVariable request, network problems.");
+        }
+        return value;
     }
 
     // Have the read function allocate the memory
-    NPVariant *value = 0;
     const char *data = 0;
     char *ptr = 0;
     ptr = const_cast<char *>(data);
@@ -890,25 +897,27 @@ GnashPluginScriptObject::closePipe(int fd)
 bool
 GnashPluginScriptObject::createPipe()
 {
-    log_debug(__PRETTY_FUNCTION__);
+    log_trace(__PRETTY_FUNCTION__);
 
-    int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, _sockfds);
+    if ((_sockfds[READFD] == 0) && (_sockfds[WRITEFD] == 0)) {
+        int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, _sockfds);
     
-    if (ret == 0) {
-        // Set up the Glib IO Channel for reading from the plugin
-        _iochan[READFD]  = g_io_channel_unix_new(_sockfds[READFD]);
-        g_io_channel_set_close_on_unref(_iochan[READFD], true);
-        g_io_channel_unref(_iochan[READFD]);
-        _watchid = g_io_add_watch(_iochan[READFD], 
-                                  (GIOCondition)(G_IO_IN|G_IO_HUP), 
-                                  (GIOFunc)handleInvokeWrapper, this);
-        
-        // Set up the Glib IO Channel for writing to the plugin
-        _iochan[WRITEFD] = g_io_channel_unix_new(_sockfds[WRITEFD]);
-        g_io_channel_set_close_on_unref(_iochan[WRITEFD], true);
-
-        g_io_channel_unref(_iochan[WRITEFD]);
-        return true;
+        if (ret == 0) {
+            // Set up the Glib IO Channel for reading from the plugin
+//            log_debug("Read fd for socketpair is: %d", _sockfds[READFD]);
+            
+            _iochan[READFD]  = g_io_channel_unix_new(_sockfds[READFD]);
+            g_io_channel_set_close_on_unref(_iochan[READFD], true);
+            _watchid = g_io_add_watch(_iochan[READFD], 
+                                      (GIOCondition)(G_IO_IN|G_IO_HUP), 
+                                      (GIOFunc)handleInvokeWrapper, this);
+            
+            // Set up the Glib IO Channel for writing to the plugin
+//            log_debug("Write fd for socketpair is: %d", _sockfds[WRITEFD]);
+            _iochan[WRITEFD] = g_io_channel_unix_new(_sockfds[WRITEFD]);
+            g_io_channel_set_close_on_unref(_iochan[WRITEFD], true);
+            return true;
+        }
     }
     
 #if 0
@@ -918,6 +927,8 @@ GnashPluginScriptObject::createPipe()
 
     return createPipe(ss.str());
 #endif
+
+    return false;
 }
 
 #if 0
