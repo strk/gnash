@@ -233,12 +233,11 @@ ExternalInterface::parseInvoke(const std::string &xml)
 
             // extract the return type of the method
             start = tag.find("returntype=") + 11;
-            end   = tag.find(" ", start);
+            end   = tag.find(">", start);
             invoke->type  = tag.substr(start, end-start);
             // Ignore any quote characters around the string
             boost::erase_first(invoke->type, "\"");
             boost::erase_last(invoke->type, "\"");
-            boost::erase_last(invoke->type, ">");
 
             // extract the arguments to the method
             start = xml.find("<arguments>");
