@@ -35,7 +35,7 @@
 #endif
 
 #ifndef HAVE_PRETTY_FUNCTION
-	#define __PRETTY_FUNCTION__ __FUNCTION__
+# define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
 /* Xlib/Xt stuff */
@@ -54,6 +54,7 @@
 #include <boost/preprocessor/seq/for_each.hpp>
 
 #include "pluginbase.h"
+#include "pluginScriptObject.h"
 
 extern NPBool      plugInitialized;
 
@@ -71,10 +72,13 @@ public:
     NPError GetValue(NPPVariable variable, void *value);
     NPError SetWindow(NPWindow *aWindow);
 
+    /// Open a new stream. THis is called every time there is swf content.
     NPError NewStream(NPMIMEType type, NPStream *stream, NPBool seekable,
                       uint16_t *stype);
+    /// Destroy the stream
     NPError DestroyStream(NPStream * stream, NPError reason);
 
+    /// Can the stream be written to yet ?
     int32_t WriteReady(NPStream *stream);
     int32_t Write(NPStream *stream, int32_t offset, int32_t len, void *buffer);
 #ifdef ENABLE_SCRIPTABLE
@@ -85,7 +89,6 @@ public:
 private:
     void startProc();
     std::vector<std::string> getCmdLine(int hostfd, int controlfd);
-
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);
@@ -124,7 +127,7 @@ private:
     /// Name of the plugin instance element in the dom 
     std::string                        _name;
 #ifdef ENABLE_SCRIPTABLE
-    NPObject                            *_scriptObject;
+    GnashPluginScriptObject             *_scriptObject;
 #endif
     
     const char* getCurrentPageURL() const;
@@ -145,6 +148,7 @@ private:
 // memory footprint down.
 DSOEXPORT void processLog_error(const boost::format& fmt);
 DSOEXPORT void processLog_debug(const boost::format& fmt);
+DSOEXPORT void processLog_trace(const boost::format& fmt);
 
 /// This heap of steaming preprocessor code magically converts
 /// printf-style statements into boost::format messages using templates.
@@ -161,10 +165,10 @@ DSOEXPORT void processLog_debug(const boost::format& fmt);
 /// This is a sequence of different log message types to be used in
 /// the code. Append the name to log_ to call the function, e.g. 
 /// log_error, log_unimpl.
-#define LOG_TYPES (error) (debug)
+#define LOG_TYPES (error) (debug) (trace)
 /// The preprocessor generates templates with 1..ARG_NUMBER
 /// arguments.
-#define ARG_NUMBER 2
+#define ARG_NUMBER 4
 #define LOG_TEMPLATES(z, n, data)\
 template<BOOST_PP_ENUM_PARAMS(BOOST_PP_INC(n), typename T)>\
 inline void log_##data(BOOST_PP_REPEAT(BOOST_PP_INC(n), TOKENIZE_ARGS, t)) \

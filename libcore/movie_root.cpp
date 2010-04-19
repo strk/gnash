@@ -1968,35 +1968,9 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         /// with complex urlOpenerFormats like:
         ///    firefox -remote 'openurl(%u)'
         ///
-        ///
-        /// NOTE: this escaping implementation is far from optimal, but
-        ///       I felt pretty in rush to fix the arbitrary command
-        ///      execution... we'll optimize if needed
-        ///
-        std::string safeurl = url.str(); 
-        boost::replace_all(safeurl, "\\", "\\\\");    // escape backslashes first
-        boost::replace_all(safeurl, "'", "\\'");    // then single quotes
-        boost::replace_all(safeurl, "\"", "\\\"");    // double quotes
-        boost::replace_all(safeurl, ";", "\\;");    // colons
-        boost::replace_all(safeurl, " ", "\\ ");    // spaces
-        boost::replace_all(safeurl, ">", "\\>");    // output redirection
-        boost::replace_all(safeurl, "<", "\\<");    // input redirection
-        boost::replace_all(safeurl, "&", "\\&");    // background (sic)
-        boost::replace_all(safeurl, "\n", "\\n");    // newline
-        boost::replace_all(safeurl, "\r", "\\r");    // return
-        boost::replace_all(safeurl, "\t", "\\t");    // tab
-        boost::replace_all(safeurl, "|", "\\|");    // pipe
-        boost::replace_all(safeurl, "`", "\\`");    // backtick
-
-        boost::replace_all(safeurl, "(", "\\(");    // subshell :'(
-        boost::replace_all(safeurl, ")", "\\)");    // 
-        boost::replace_all(safeurl, "}", "\\}");    // 
-        boost::replace_all(safeurl, "{", "\\{");    // 
-
-        boost::replace_all(safeurl, "$", "\\$");    // variable expansions
-
+        std::string safeurl = url.encode(urlstr);
         boost::replace_all(command, "%u", safeurl);
-
+        
         log_debug (_("Launching URL: %s"), command);
         std::system(command.c_str());
         return;

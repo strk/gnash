@@ -26,6 +26,9 @@
 #include <iostream>
 #include <ios>
 #include <boost/format.hpp>
+#include <cstdlib>
+#include <sys/types.h>
+#include <fcntl.h>
 #ifdef ENABLE_NLS
 # include <clocale>
 #endif
@@ -118,7 +121,7 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("                           1 enable rendering, disable sound\n") 
     << _("                           2 enable sound, disable rendering\n") 
     << _("                           3 enable rendering and sound (default)\n") 
-    // Only list the renderes that were configured in for this build
+    // Only list the renderers that were configured in for this build
     << _("  -R,  --Renderer <")
 #ifdef RENDERER_OPENGL
      << _(" opengl")
@@ -140,8 +143,6 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
             "\"FlashVars=A=1&b=2\")\n") 
     << _("  -F,  --fd <fd>           Filedescriptor to use for external "
             "communications\n") 
-    << _("  -G,  --controlfd <fd>    File descriptor for external application"
-            " control\n")
 #ifdef GNASH_FPS_DEBUG
     << _("  -f,  --debug-fps num     Print FPS every num seconds (float)\n") 
 #endif // def GNASH_FPS_DEBUG
@@ -235,8 +236,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'g', "debugger",          Arg_parser::no  },
         { 'V', "version",           Arg_parser::no  },        
         { 'f', "debug-fps",         Arg_parser::yes },        
-        { 'F', "fd",                Arg_parser::yes },
-        { 'G', "controlfd",         Arg_parser::yes },
+        { 'F', "fifo",              Arg_parser::yes },
         { 'A', "dump",              Arg_parser::yes },
         { 259, "screenshot",        Arg_parser::yes },
         { 260, "screenshot-file",   Arg_parser::yes },
@@ -322,26 +322,31 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     break;
                 case 'F':
                 {
-                    const int fd = parser.argument<long>(i);
-                    if (fd < 1) {
+		    const std::string& fds = parser.argument(i);
+                    fds.find(":");
+                    int hostfd = 0, controlfd = 0;
+                    hostfd = strtol(fds.substr(0, fds.find(":")).c_str(), NULL, 0);
+                    std::string csub = fds.substr(fds.find(":")+1, fds.size());
+                    controlfd = strtol(csub.c_str(), 0, 0);
+                    gnash::log_debug(_("Host FD #%d, Control FD #%d\n"), 
+                              hostfd, controlfd);
+                    if (hostfd < 0) {
                         cerr << boost::format(_("Invalid host communication "
-                                    "filedescriptor %d\n")) % fd << endl;
+						"filedescriptor %d\n"))
+                            % hostfd << endl;
                         exit(EXIT_FAILURE);
                     }
-                    player.setHostFD ( fd );
-                    break;
-                }
-                case 'G':
-                {
-                    const int fd = parser.argument<long>(i);
-                    if (fd < 1) {
-                        cerr << boost::format(_("Invalid host communication "
-                                    "filedescriptor %d\n")) % fd << endl;
-                        exit(EXIT_FAILURE);
+                    player.setHostFD (hostfd);
+
+                    if (controlfd < 1) {
+                        cerr << boost::format(_("Invalid control communication "
+                                    "filedescriptor %d\n")) % controlfd << endl;
+//                        exit(EXIT_FAILURE);
+                        controlfd = hostfd + 1;
                     }
-                    player.setControlFD ( fd );
-                    break;
+                    player.setControlFD (controlfd);
                 }
+                break;
                 case 'j':
                     widthGiven = true;
                     player.setWidth(parser.argument<long>(i));

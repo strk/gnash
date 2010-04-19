@@ -16,9 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
+#include <glib.h>
 
 // Test:
 //     Use browser to open plugin/scriptable-test.html.
@@ -43,6 +41,9 @@
 
 #include "npapi.h"
 #include "npruntime.h"
+
+#define READFD 0
+#define WRITEFD 1
 
 class GnashPluginScriptObject : public NPObject
 {
@@ -102,12 +103,30 @@ public:
     /// @return the value as returned by the standalone player
     NPVariant *GetVariable(const std::string &name);
 
+    // Create a socketpair so we can talk to the player.
+    bool createPipe();
+    
+    // Close the socket
+    bool closePipe();
+    bool closePipe(int fd);
+
+    // Check the pipe to see if it's ready, ie... is gnash connected yet ?
+    bool checkPipe();
+    bool checkPipe(int fd);
+
+    int getReadFD()  { return _sockfds[READFD]; };
+    int getWriteFD() { return _sockfds[WRITEFD]; };
+    
     // Write to the standalone player over the control socket
+    int writePlayer(const char *data, size_t length);
     int writePlayer(int fd, const char *data, size_t length);
+    int writePlayer(const std::string &data);
     int writePlayer(int fd, const std::string &data);
     
     // Read the standalone player over the control socket
+    int readPlayer(const char **data, size_t length);
     int readPlayer(int fd, const char **data, size_t length);
+    int readPlayer(const std::string &data);
     int readPlayer(int fd, const std::string &data);
     
 protected:
@@ -130,20 +149,41 @@ protected:
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
 
+    bool handleInvoke(GIOChannel* iochan, GIOCondition cond);
     
+    /// Process a null-terminated request line
+    //
+    /// @param buf
+    ///	  The single request.
+    ///   Caller is responsible for memory management, but give us
+    ///   permission to modify the string.
+    ///
+    /// @param len
+    ///	  Lenght of buffer.
+    ///
+    /// @return true if the request was processed, false otherwise (bogus request..)
+    ///
+    bool processPlayerRequest(gchar* buf, gsize len);
+
 private:
+    static bool handleInvokeWrapper(GIOChannel* iochan, GIOCondition cond,
+                                     GnashPluginScriptObject* plugin);
+
     void initializeIdentifiers();
     void setInstance(NPP inst) { _nppinstance = inst; };
     
     // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
-    NPP _nppinstance;
-    
+    NPP         _nppinstance;
     std::map<NPIdentifier, NPVariant *> _properties;
     std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
-    // int _control;
+    // 0 for reading, 1 for writing
+    int         _sockfds[2];
+    GIOChannel *_iochan[2];
+    // ID to watch the read channel from the player
+    int         _watchid;
 };
 
-#endif /* GNASH_PLUGIN_SCRIPT_OBJECT_H */
+#endif // GNASH_PLUGIN_SCRIPT_OBJECT_H
 
 // local Variables:
 // mode: C++

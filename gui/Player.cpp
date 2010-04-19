@@ -329,8 +329,11 @@ Player::run(int argc, char* argv[], const std::string& infile,
     }
 
     // Set _root._url (either explicit of from infile)
-    if (!url.empty()) _url = url;
-    else _url = infile;
+    if (!url.empty()) {
+        _url = url;
+    } else {
+        _url = infile;
+    }
 
     // Parse player parameters. These are not passed to the SWF, but rather
     // control stage properties etc.
@@ -417,7 +420,9 @@ Player::run(int argc, char* argv[], const std::string& infile,
     root.registerFSCommandCallback(_callbacksHandler.get());
 
     // Set host requests fd (if any)
-    if ( _hostfd != -1 ) root.setHostFD(_hostfd);
+    if ( _hostfd != -1 ) {
+        root.setHostFD(_hostfd);
+    }
 
     if (_controlfd != -1) {
         _gui->setFDCallback(_controlfd, boost::bind(&Gui::quit, boost::ref(_gui)));
@@ -433,7 +438,9 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // because the gui window should be properly set up by this point.
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-    if (rcfile.startStopped()) _gui->stop();
+    if (rcfile.startStopped()) {
+        _gui->stop();
+    }
 
     // Start loader thread
     // NOTE: the loader thread might (in IMPORT tag parsing)

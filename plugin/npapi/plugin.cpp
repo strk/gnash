@@ -62,8 +62,6 @@
   <br>\
   Compatible Shockwave Flash "FLASH_VERSION
 
-//#define WRITE_FILE
-
 // Defining this flag disables the pipe to the standalone player, as well
 // as prevents the standalone Gnash player from being exec'd. Instead it
 // makes a network connection to localhost:1111 so the developer can use
@@ -361,7 +359,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     }
 
 #ifdef ENABLE_SCRIPTABLE
-    _scriptObject = NPNFuncs.createobject(_instance, GnashPluginScriptObject::marshalGetNPClass());
+    _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(_instance, GnashPluginScriptObject::marshalGetNPClass());
 #endif
 #if defined(ENABLE_SCRIPTABLE) && defined(NETTEST)
     // This is a network testing node switch. This is only used for testing the
@@ -384,8 +382,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
         if (ret == 0) {
             log_debug("Connected to debug server on fd #%d", sockfd);
             _controlfd = sockfd;
-            GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)_scriptObject;
-            gpso->setControlFD(_controlfd);
+            _scriptObject->setControlFD(_controlfd);
         } else {
             log_debug("Couldn't connect to debug server: %s", strerror(errno));
         }
@@ -421,7 +418,7 @@ cleanup_childpid(gpointer data)
 /// \brief Destructor
 nsPluginInstance::~nsPluginInstance()
 {
-    log_debug("plugin instance destruction");
+//    log_debug("plugin instance destruction");
 
     if ( _ichanWatchId ) {
         g_source_remove(_ichanWatchId);
@@ -496,6 +493,11 @@ nsPluginInstance::shut()
             log_error("Gnash plugin failed to close the control socket!");
         }
     }
+
+// #ifdef ENABLE_SCRIPTABLE
+//     _scriptObject->closePipe();
+// #endif
+
 }
 /// \brief Set the window to be used to render in
 ///
@@ -556,7 +558,7 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
     return NS_PluginGetValue(aVariable, aValue);
 }
 
-#if 1
+#if 0
 // FIXME: debugging stuff, will be gone soon after I figure how this works
 void myfunc(void */* param */)
 {
@@ -602,27 +604,6 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     
     log_debug("The full URL is %s", _swf_url);
 
-#ifdef WRITE_FILE
-    size_t start, end;
-    std::string fname;
-    end   = _swf_url.find(".swf", 0) + 4;
-    start = _swf_url.rfind("/", end) + 1;
-    fname = "/tmp/";
-    fname += _swf_url.substr(start, end - start);
-
-    log_debug("The Flash movie name is: %s", fname);
-
-    _filefd = open(fname.c_str(),
-            O_CREAT | O_WRONLY,
-            S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
-    
-    if (_filefd < 0) {
-        _filefd = open(fname.c_str(),
-                O_TRUNC | O_WRONLY,
-                S_IRUSR | S_IRGRP | S_IROTH);
-    }
-#endif
-    
     if (!_swf_url.empty() && _window) {
         startProc();
     }
@@ -642,16 +623,6 @@ nsPluginInstance::DestroyStream(NPStream* /*stream*/, NPError /*reason*/)
             _streamfd = -1;
         }
     }
-
-#ifdef WRITE_FILE
-    if (_filefd != -1) {
-        if (close(_filefd) == -1) {
-            perror("closing _filefd");
-        } else {
-            _filefd = -1;
-        }
-    }
-#endif
 
     return NPERR_NO_ERROR;
 }
@@ -675,9 +646,6 @@ int32_t
 nsPluginInstance::Write(NPStream* /*stream*/, int32_t /*offset*/, int32_t len,
         void* buffer)
 {
-#ifdef WRITE_FILE
-    write(_filefd, buffer, len);
-#endif
     int written = write(_streamfd, buffer, len);
     return written;
 }
@@ -686,12 +654,16 @@ bool
 nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
         GIOCondition cond, nsPluginInstance* plugin)
 {
+    log_trace(__PRETTY_FUNCTION__);
+    
     return plugin->handlePlayerRequests(iochan, cond);
 }
 
 bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
+    log_trace(__PRETTY_FUNCTION__);
+    
     if ( cond & G_IO_HUP ) {
         log_debug("Player request channel hang up");
         // Returning false here will cause the "watch" to be removed. This watch
@@ -703,15 +675,15 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
     assert(cond & G_IO_IN);
 
-    log_debug("Checking player requests on fd #%d", g_io_channel_unix_get_fd(iochan));
+    log_debug("Checking player requests on fd #%d",
+              g_io_channel_unix_get_fd(iochan));
 
     do {
         GError* error=NULL;
         gchar* request;
         gsize requestSize=0;
         GIOStatus status = g_io_channel_read_line(iochan, &request,
-                &requestSize, NULL, &error);
-
+                           &requestSize, NULL, &error);
         switch ( status ) {
             case G_IO_STATUS_ERROR:
                 log_error(std::string("Error reading request line: ") + error->message);
@@ -769,8 +741,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             return false;
         }
 
-        log_debug("Asked to get URL '%s''", url);
-        log_debug("In target '%s'", target);
+        log_debug("Asked to get URL '%s' in target %s", url, target);
         NPN_GetURL(_instance, url, target);
         return true;
 
@@ -943,17 +914,20 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
     }
 
     std::stringstream pars;
-    pars << "-x "  <<  _window           // X window ID to render into
-         << " -j " << _width             // Width of window
-         << " -k " << _height            // Height of window
-         << " -F " << hostfd             // Socket to send commands to
-         << " -G " << controlfd;         // Socket determining lifespan
-    {
-        std::string pars_str = pars.str();
-        typedef boost::char_separator<char> char_sep;
-        boost::tokenizer<char_sep> tok(pars_str, char_sep(" "));
-        arg_vec.insert(arg_vec.end(), tok.begin(), tok.end());
+    pars << "-x "  <<  _window          // X window ID to render into
+         << " -j " << _width            // Width of window
+         << " -k " << _height;           // Height of window
+#if GNASH_PLUGIN_DEBUG > 1
+    pars << " -vv ";
+#endif
+    if ((hostfd > 0) && (controlfd)) {
+        pars << " -F " << hostfd            // Socket to send commands to
+             << ":"    << controlfd;        // Socket determining lifespan
     }
+    std::string pars_str = pars.str();
+    typedef boost::char_separator<char> char_sep;
+    boost::tokenizer<char_sep> tok(pars_str, char_sep(" "));
+    arg_vec.insert(arg_vec.end(), tok.begin(), tok.end());
 
     for (std::map<std::string,std::string>::const_iterator it = _params.begin(),
         itEnd = _params.end(); it != itEnd; ++it) {
@@ -1020,8 +994,6 @@ nsPluginInstance::startProc()
 {
     // 0 For reading, 1 for writing.
     int p2c_pipe[2];
-    int c2p_pipe[2];
-    int p2c_controlpipe[2];
     
     int ret = pipe(p2c_pipe);
     if (ret == -1) {
@@ -1030,12 +1002,15 @@ nsPluginInstance::startProc()
     }
     _streamfd = p2c_pipe[1];
 
+#if 0
+    int c2p_pipe[2];
     ret = pipe(c2p_pipe);
     if (ret == -1) {
         log_error("ERROR: child to parent pipe() failed: " +
                  std::string(std::strerror(errno)));
     }
 
+    int p2c_controlpipe[2];
     ret = pipe(p2c_controlpipe);
     if (ret == -1) {
         log_error("ERROR: parent to child pipe() failed: " +
@@ -1043,20 +1018,22 @@ nsPluginInstance::startProc()
     }
 
     _controlfd = p2c_controlpipe[1];
+#endif
     
 #ifdef ENABLE_SCRIPTABLE
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)_scriptObject;
+    _scriptObject->createPipe();
+//    _controlfd = _scriptObject->getReadFD();
+//    _scriptObject->checkPipe();
 #ifdef NETTEST
-    gpso->setControlFD(_controlfd);
+    _scriptObject->setControlFD(_controlfd);
 #endif
 #endif
     
-    /*
-    Setup the command line for starting Gnash
-    */
+    // Setup the command line for starting Gnash
 
-    std::vector<std::string> arg_vec = getCmdLine(c2p_pipe[1],
-                                                  p2c_controlpipe[0]);
+    std::vector<std::string> arg_vec = getCmdLine(_scriptObject->getReadFD(),
+                                                  _scriptObject->getWriteFD());
+
     if (arg_vec.empty()) {
         log_error("Failed to obtain command line parameters.");
         return;
@@ -1068,9 +1045,7 @@ nsPluginInstance::startProc()
                    std::mem_fun_ref(&std::string::c_str));
     args.push_back(0);
     
-    /*
-      Argument List prepared, now fork(), close file descriptors and execv()
-    */
+    // Argument List prepared, now fork(), close file descriptors and execv()
     
     _childpid = fork();
     
@@ -1089,7 +1064,7 @@ nsPluginInstance::startProc()
             log_error("ERROR: p2c_pipe[0] close() failed: " +
                           std::string(strerror(errno)));
         }
-        
+#if 0
         // we want to read from c2p pipe, so close write-fd1
         ret = close (c2p_pipe[1]);
         if (ret == -1) {
@@ -1098,15 +1073,10 @@ nsPluginInstance::startProc()
         }
         
         ret = close (p2c_controlpipe[0]); // close read descriptor
+#endif
         
         log_debug("Forked successfully, child process PID is %d" , _childpid);
-        
-        GIOChannel* ichan = g_io_channel_unix_new(c2p_pipe[0]);
-        g_io_channel_set_close_on_unref(ichan, true);
-        _ichanWatchId = g_io_add_watch(ichan, 
-                                       (GIOCondition)(G_IO_IN|G_IO_HUP), 
-                                       (GIOFunc)handlePlayerRequestsWrapper, this);
-        g_io_channel_unref(ichan);
+      
         return;
     }
     
@@ -1126,7 +1096,7 @@ nsPluginInstance::startProc()
     // Close all of the browser's file descriptors that we just inherited
     // (including p2c_pipe[0] that we just dup'd to fd 0), but obviously
     // not the file descriptors that we want the child to use.
-    int dontclose[] = {c2p_pipe[1], p2c_controlpipe[0]};
+    int dontclose[] = {_scriptObject->getReadFD(), _scriptObject->getWriteFD()};
     close_fds(dontclose);
 
     // Start the desired executable and go away.
@@ -1208,13 +1178,27 @@ processLog_error(const boost::format& fmt)
     std::cerr << "ERROR: " << fmt.str() << std::endl;
 }
 
+#if GNASH_PLUGIN_DEBUG > 1
 void
 processLog_debug(const boost::format& fmt)
 {
-#if GNASH_PLUGIN_DEBUG > 1
     std::cout << "DEBUG: " << fmt.str() << std::endl;
-#endif
 }
+
+void
+processLog_trace(const boost::format& fmt)
+{
+    std::cout << "TRACE: " << fmt.str() << std::endl;
+}
+#else
+void
+processLog_debug(const boost::format& fmt)
+{ /* do nothing */ }
+
+void
+processLog_trace(const boost::format& fmt)
+{ /* do nothing */ }
+#endif
 
 // Local Variables:
 // mode: C++

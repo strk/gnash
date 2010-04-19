@@ -34,6 +34,12 @@
 class ExternalInterface
 {
 public:
+    typedef struct {
+        std::string name;
+        std::string type;
+        std::vector<NPVariant *> args;
+    } invoke_t;
+    
     ExternalInterface ();
     ~ExternalInterface ();
     
@@ -54,6 +60,8 @@ public:
     std::string makeObject (std::map<std::string, std::string> &args);
     
     NPVariant *parseXML(const std::string &xml);
+    invoke_t *parseInvoke(const std::string &xml);
+    
     std::map<std::string, NPVariant *> parseProperties(const std::string &xml);
     std::vector<NPVariant *> parseArguments(const std::string &xml);
     std::string convertNPVariant (const NPVariant *npv);

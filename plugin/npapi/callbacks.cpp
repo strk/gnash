@@ -141,7 +141,7 @@ GetVariableCallback (NPObject *npobj, NPIdentifier /* name */,
         varname = NPVARIANT_TO_STRING(args[0]).UTF8Characters;
         value = gpso->GetVariable(varname);
         if (value == 0) {
-            NPVARIANT_IS_NULL(*result);
+            NULL_TO_NPVARIANT(*result);
         } else {
             if (NPVARIANT_IS_DOUBLE(*value)) {
                 double num = NPVARIANT_TO_DOUBLE(*value);
@@ -382,7 +382,7 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
     
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
-#if 0
+#if 1
     static int counter = 0;
 //    log_error("%s: %d ; %d\n", __FUNCTION__, gpso->getControlFD(), counter);
     INT32_TO_NPVARIANT(counter, *result);
