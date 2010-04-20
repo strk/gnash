@@ -21,18 +21,83 @@
 #ifndef GNASH_ASOBJ_EXTERNALINTERFACE_H
 #define GNASH_ASOBJ_EXTERNALINTERFACE_H
 
+#include <string>
+#include <vector>
 
+#include "Relay.h" // for inheritance
 
 namespace gnash {
 
 class as_object;
+class as_value;
 class ObjectURI;
+
+class ExternalInterface_as : public ActiveRelay
+{
+public:
+    ExternalInterface_as(as_object* owner);
+    ~ExternalInterface_as();
+
+    /// Add an ActionScript function as a callback by JavaScript
+    // in the browser.
+    bool addCallback(const std::string &name, as_object *method);
+    
+    /// Add an ActionScript function as a callback by JavaScript
+    // in the browser.
+    void marshallExceptions(bool flag) { _exceptions = flag; };
+    bool marshallExceptions() { return _exceptions; };
+    std::string &objectID() { return _objectid; };
+    
+    /// Call a callback if it's registered already.
+    bool call(as_object* asCallback, const std::string& methodName,
+              const std::vector<as_value>& args, size_t firstArg);
+
+    // These appear to be undocumented helper functions of this class
+    // that while propably designed to be used internally, get used
+    // by ActionScript coders.
+
+// check(EI.hasOwnProperty("_argumentsToXML"));
+// check(EI.hasOwnProperty("_argumentsToAS"));
+    
+    std::string objectToXML(as_object &obj);
+    std::string objectToJS(as_object &obj);
+    std::string objectToAS(as_object &obj);
+    
+// check(EI.hasOwnProperty("_arrayToXML"));
+// check(EI.hasOwnProperty("_arrayToJS"));
+// check(EI.hasOwnProperty("_arrayToAS"));
+
+// check(EI.hasOwnProperty("_toXML"));
+// check(EI.hasOwnProperty("_toJS"));
+// check(EI.hasOwnProperty("_toAS"));
+
+// check(EI.hasOwnProperty("_jsQuoteString"));
+// check(EI.hasOwnProperty("_initJS"));
+// check(EI.hasOwnProperty("_evalJS"));
+    
+// check(EI.hasOwnProperty("_callOut"));
+// check(EI.hasOwnProperty("_callIn"));
+
+    std::string objectID(as_object &obj);
+    std::string toXML(as_object &obj);
+    
+    std::string escapeXML(as_object &obj);
+    std::string unescapeXML(as_object &obj);
+    
+private:
+    std::string _objectid;
+    bool        _exceptions;
+};
 
 /// Initialize the global ExternalInterface class
 void externalinterface_class_init(as_object& where, const ObjectURI& uri);
-
 
 } // end of gnash namespace
 
 // __GNASH_ASOBJ_EXTERNALINTERFACE_H__
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

@@ -20,41 +20,216 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-#include "check.as"
+#include "dejagnu.as"
 
 ASSetPropFlags (_global, "flash", 0, 5248);
 
 #if OUTPUT_VERSION < 6
-check_equals(flash.external.ExternalInterface, undefined);
-totals(1);
-#else
+
+if (flash.external.ExternalInterface == undefined) {
+    pass("ExternalInterface class doesn't exist in older versions");
+} else {
+    fail("ExternalInterface class doesn't exist in older versions");
+}
+
+#endif
 
 EI = flash.external.ExternalInterface;
 
-check(EI.hasOwnProperty("call"));
-check(EI.hasOwnProperty("addCallback"));
-check(EI.hasOwnProperty("available"));
+// First make sure all the documented methods and properties exist
+if (EI.hasOwnProperty("call")) {
+    pass("ExternalInterface::call() exists");
+} else {
+    fail("ExternalInterface::call() doesn't exist");
+}
 
-check(EI.hasOwnProperty("_argumentsToXML"));
-check(EI.hasOwnProperty("_argumentsToAS"));
-check(EI.hasOwnProperty("_unescapeXML"));
-check(EI.hasOwnProperty("_toXML"));
-check(EI.hasOwnProperty("_toJS"));
-check(EI.hasOwnProperty("_toAS"));
-check(EI.hasOwnProperty("_objectToXML"));
-check(EI.hasOwnProperty("_objectToJS"));
-check(EI.hasOwnProperty("_objectToAS"));
-check(EI.hasOwnProperty("_objectID"));
-check(EI.hasOwnProperty("_jsQuoteString"));
-check(EI.hasOwnProperty("_initJS"));
-check(EI.hasOwnProperty("_evalJS"));
-check(EI.hasOwnProperty("_escapeXML"));
-check(EI.hasOwnProperty("_callOut"));
-check(EI.hasOwnProperty("_callIn"));
-check(EI.hasOwnProperty("_arrayToXML"));
-check(EI.hasOwnProperty("_arrayToJS"));
-check(EI.hasOwnProperty("_arrayToAS"));
-check(EI.hasOwnProperty("_addCallback"));
+if (EI.hasOwnProperty("addCallback")) {
+    pass("ExternalInterface::addCallback() exists");
+} else {
+    fail("ExternalInterface::addCallback() doesn't exist");
+}
+
+if (EI.hasOwnProperty("available")) {
+    pass("ExternalInterface::available() exists");
+} else {
+    fail("ExternalInterface::available() doesn't exist");
+}
+
+// this should always be true now that Gnash supports this class
+if (EI.available == true) {
+    pass("ExternalInterface::available is correct");
+} else {
+    fail("ExternalInterface::available property isn't correct");
+}
+
+// Create a test function for the callback
+function TestEIMethod () {
+    note("TestEIMethod called!");
+}
+
+if (ExternalInterface.addCallback("TestEIMethod", null, TestEIMethod)) {
+    pass("ExternalInterface::addCallback(\"TestEIMethod\")");
+} else {
+    fail("ExternalInterface::addCallback(\"TestEIMethod\")");
+}
+
+if (ExternalInterface.call("TestEIMethod", null)) {
+    pass("ExternalInterface::call(\"TestEIMethod\")");
+} else {
+    fail("ExternalInterface::call(\"TestEIMethod\")");
+}
+
+// The marshallExceptions and objectID are new
+#if OUTPUT_VERSION > 7
+if (EI.hasOwnProperty("marshallExceptions")) {
+    pass("ExternalInterface::marshallExceptions() exists");
+} else {
+    fail("ExternalInterface::marshallExceptions() doesn't exist");
+}
+
+// The default is false, so if we can set it to true, it worked
+EI.marshallExceptions = true;
+if (EI.marshallExceptions == true) {
+    pass("ExternalInterface::marshallExceptions()");
+} else {
+    fail("ExternalInterface::marshallExceptions()");
+}
+
+if (EI.hasOwnProperty("objectID")) {
+    pass("ExternalInterface::objectID() exists");
+} else {
+    fail("ExternalInterface::objectID() doesn't exist");
+}
+if (EI.objectID == undefined) {
+    pass("ExternalInterface::objectID() is undefined");
+} else {
+    fail("ExternalInterface::objectID() is undefined");
+}
+
+trace(EI.objectID);
+
+// this should always be true now that Gnash supports this class
+if (EI.objectID == true) {
+    pass("ExternalInterface::objectID is correct");
+} else {
+    fail("ExternalInterface::objectID property isn't correct");
+}
+
+// Then make sure all the undocumented methods and properties exist
+if (EI.hasOwnProperty("_argumentsToXML")) {
+    pass("ExternalInterface::_argumentsToXML() exists");
+} else {
+    fail("ExternalInterface::_argumentsToXML() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_argumentsToAS")) {
+    pass("ExternalInterface::_argumentsToAS() exists");
+} else {
+    fail("ExternalInterface::_argumentsToAS() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_unescapeXML")) {
+    pass("ExternalInterface::_unescapeXML() exists");
+} else {
+    fail("ExternalInterface::_unescapeXML() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_toXML")) {
+    pass("ExternalInterface::_toXML() exists");
+} else {
+    fail("ExternalInterface::_toXML() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_toJS")) {
+    pass("ExternalInterface::_toJS() exists");
+} else {
+    fail("ExternalInterface::_toJS() doesn't exist");
+}
+
+
+if (EI.hasOwnProperty("_toAS")) {
+    pass("ExternalInterface::_toAS() exists");
+} else {
+    fail("ExternalInterface::_toAS() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_objectToXML")) {
+    pass("ExternalInterface::_objectToXML() exists");
+} else {
+    fail("ExternalInterface::_objectToXML() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_objectToJS")) {
+    pass("ExternalInterface::_objectToJS() exists");
+} else {
+    fail("ExternalInterface::_objectToJS() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_objectToAS")) {
+    pass("ExternalInterface::_objectToAS() exists");
+} else {
+    fail("ExternalInterface::_objectToAS() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_objectID")) {
+    pass("ExternalInterface::_objectID() exists");
+} else {
+    fail("ExternalInterface::_objectID() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_jsQuoteString")) {
+    pass("ExternalInterface::_jsQuoteString() exists");
+} else {
+    fail("ExternalInterface::_jsQuoteString() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_initJS")) {
+    pass("ExternalInterface::_initJS() exists");
+} else {
+    fail("ExternalInterface::_initJS() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_evalJS")) {
+    pass("ExternalInterface::_evalJS() exists");
+} else {
+    fail("ExternalInterface::_evalJS() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_escapeXML")) {
+    pass("ExternalInterface::_escapeXML() exists");
+} else {
+    fail("ExternalInterface::_escapeXML() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_callOut")) {
+    pass("ExternalInterface::_callOut() exists");
+} else {
+    fail("ExternalInterface::_callOut() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_callIn")) {
+    pass("ExternalInterface::_callIn() exists");
+} else {
+    fail("ExternalInterface::_callIn() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_arrayToXML")) {
+    pass("ExternalInterface::_arrayToXML() exists");
+} else {
+    fail("ExternalInterface::_arrayToXML() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_arrayToJS")) {
+    pass("ExternalInterface::_arrayToJS() exists");
+} else {
+    fail("ExternalInterface::_arrayToJS() doesn't exist");
+}
+
+if (EI.hasOwnProperty("_arrayToAS")) {
+    pass("ExternalInterface::_arrayToAS() exists");
+} else {
+    fail("ExternalInterface::_arrayToAS() doesn't exist");
+}
 
 // An object
 o = { a: 1, b: "string" };
@@ -81,9 +256,6 @@ check_equals(typeof(r), "object");
 check(r instanceOf EI);
 // But it doesn't do much.
 check_equals(r._toXML(o), undefined);
-
-
-#if OUTPUT_VERSION > 7
 
 // All methods are static.
 
@@ -120,11 +292,7 @@ xcheck_equals(EI._escapeXML(r), "&amp; ß+ü &lt; &lt;&lt; &lt;&gt;&apos;&apos;&
 r = "&amp; ß+ü &nbsp; &lt; &lt;&lt; &lt;&gt;&apos;&apos;&quot;";
 xcheck_equals(EI._unescapeXML(r), "& ß+ü &nbsp; < << <>''\"");
 
-totals(42);
+#endif  // version > 7
 
-#else
-totals (26);
-#endif
+totals();
 
-
-#endif

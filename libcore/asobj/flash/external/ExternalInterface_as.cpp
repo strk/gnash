@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
+#include "Relay.h" // for inheritance
 #include "ExternalInterface_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
@@ -28,6 +28,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "VM.h"
+#include "namedStrings.h"
 
 #include <sstream>
 
@@ -36,6 +37,11 @@ namespace gnash {
 namespace {
     as_value externalinterface_addCallback(const fn_call& fn);
     as_value externalinterface_call(const fn_call& fn);
+    as_value externalInterfaceConstructor(const fn_call& fn);
+    as_value externalinterface_available(const fn_call& fn);
+    as_value externalinterface_marshallExceptions(const fn_call& fn);
+    as_value externalinterface_objectID(const fn_call& fn);
+
     as_value externalinterface_uArgumentsToXML(const fn_call& fn);
     as_value externalinterface_uArgumentsToAS(const fn_call& fn);
     as_value externalinterface_uAddCallback(const fn_call& fn);
@@ -56,10 +62,6 @@ namespace {
     as_value externalinterface_uToJS(const fn_call& fn);
     as_value externalinterface_uToXML(const fn_call& fn);
     as_value externalinterface_uUnescapeXML(const fn_call& fn);
-    as_value externalinterface_available(const fn_call& fn);
-    as_value externalinterface_uctor(const fn_call& fn);
-    as_value externalInterfaceConstructor(const fn_call& fn);
-
 }
 
 // extern 
@@ -86,71 +88,171 @@ attachExternalInterfaceStaticProperties(as_object& o)
                       PropFlags::readOnly;
 
     Global_as& gl = getGlobal(o);
+    
+    // Initialize the properties
+    o.init_readonly_property("available", &externalinterface_available);
+
+    // FIXME: for now, always make these available as ming doesn't support v9
+//    if (getSWFVersion(o) > 8) {
+    o.init_readonly_property("marshallExceptions", &externalinterface_marshallExceptions);
+    o.init_property("objectID", externalinterface_objectID, externalinterface_objectID);
+//    }
+    
+    // Initialize the methods, most of which are undocumented helper functions
     o.init_member("addCallback", gl.createFunction(
                 externalinterface_addCallback), flags);
     o.init_member("call", gl.createFunction(externalinterface_call), flags);
-    o.init_member("_argumentsToXML",
-            gl.createFunction(externalinterface_uArgumentsToXML), flags);
-    o.init_member("_argumentsToAS",
-            gl.createFunction(externalinterface_uArgumentsToAS), flags);
-    o.init_member("_addCallback",
-            gl.createFunction(externalinterface_uAddCallback), flags);
-    o.init_member("_arrayToAS",
-            gl.createFunction(externalinterface_uArrayToAS), flags);
-    o.init_member("_arrayToJS",
-            gl.createFunction(externalinterface_uArrayToJS), flags);
-    o.init_member("_arrayToXML",
-            gl.createFunction(externalinterface_uArrayToXML), flags);
-    o.init_member("_callIn",
-            gl.createFunction(externalinterface_uCallIn), flags);
-    o.init_member("_callOut",
-            gl.createFunction(externalinterface_uCallOut), flags);
-    o.init_member("_escapeXML",
-            gl.createFunction(externalinterface_uEscapeXML), flags);
-    o.init_member("_evalJS",
-            gl.createFunction(externalinterface_uEvalJS), flags);
-    o.init_member("_initJS",
-            gl.createFunction(externalinterface_uInitJS), flags);
-    o.init_member("_jsQuoteString",
-            gl.createFunction(externalinterface_uJsQuoteString), flags);
-    o.init_member("_objectID",
-            gl.createFunction(externalinterface_uObjectID), flags);
-    o.init_member("_objectToAS",
-            gl.createFunction(externalinterface_uObjectToAS), flags);
-    o.init_member("_objectToJS",
-            gl.createFunction(externalinterface_uObjectToJS), flags);
-    o.init_member("_objectToXML",
-            gl.createFunction(externalinterface_uObjectToXML), flags);
-    o.init_member("_toAS",
-            gl.createFunction(externalinterface_uToAS), flags);
-    o.init_member("_toJS",
-            gl.createFunction(externalinterface_uToJS), flags);
-    o.init_member("_toXML",
-            gl.createFunction(externalinterface_uToXML), flags);
-    o.init_member("_unescapeXML",
-            gl.createFunction(externalinterface_uUnescapeXML), flags);
 
-    int protectedFlags = PropFlags::dontEnum |
-                         PropFlags::dontDelete |
-                         PropFlags::isProtected;
-
-    o.init_member("available",
-            gl.createFunction(externalinterface_available), protectedFlags);
-}
-
-
-as_value
-externalinterface_addCallback(const fn_call& /*fn*/)
-{
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    if (getSWFVersion(o) > 6) {
+        o.init_member("_argumentsToXML",
+                      gl.createFunction(externalinterface_uArgumentsToXML), flags);
+        o.init_member("_argumentsToAS",
+                      gl.createFunction(externalinterface_uArgumentsToAS), flags);
+        o.init_member("_addCallback",
+                      gl.createFunction(externalinterface_uAddCallback), flags);
+        o.init_member("_arrayToAS",
+                      gl.createFunction(externalinterface_uArrayToAS), flags);
+        o.init_member("_arrayToJS",
+                      gl.createFunction(externalinterface_uArrayToJS), flags);
+        o.init_member("_arrayToXML",
+                      gl.createFunction(externalinterface_uArrayToXML), flags);
+        o.init_member("_callIn",
+                      gl.createFunction(externalinterface_uCallIn), flags);
+        o.init_member("_callOut",
+                      gl.createFunction(externalinterface_uCallOut), flags);
+        o.init_member("_escapeXML",
+                      gl.createFunction(externalinterface_uEscapeXML), flags);
+        o.init_member("_evalJS",
+                      gl.createFunction(externalinterface_uEvalJS), flags);
+        o.init_member("_initJS",
+                      gl.createFunction(externalinterface_uInitJS), flags);
+        o.init_member("_jsQuoteString",
+                      gl.createFunction(externalinterface_uJsQuoteString), flags);
+        o.init_member("_objectID",
+                      gl.createFunction(externalinterface_uObjectID), flags);
+        o.init_member("_objectToAS",
+                      gl.createFunction(externalinterface_uObjectToAS), flags);
+        o.init_member("_objectToJS",
+                      gl.createFunction(externalinterface_uObjectToJS), flags);
+        o.init_member("_objectToXML",
+                      gl.createFunction(externalinterface_uObjectToXML), flags);
+        o.init_member("_toAS",
+                      gl.createFunction(externalinterface_uToAS), flags);
+        o.init_member("_toJS",
+                      gl.createFunction(externalinterface_uToJS), flags);
+        o.init_member("_toXML",
+                      gl.createFunction(externalinterface_uToXML), flags);
+        o.init_member("_unescapeXML",
+                      gl.createFunction(externalinterface_uUnescapeXML), flags);
+    }
+    
 }
 
 as_value
-externalinterface_call(const fn_call& /*fn*/)
+externalinterface_addCallback(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    GNASH_REPORT_FUNCTION;
+    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+
+    if (fn.nargs > 1) {
+        const as_value& methodName_as = fn.arg(0);
+        std::string methodName = methodName_as.to_string();
+        boost::intrusive_ptr<as_object> asCallback;
+        if (fn.arg(1).is_object()) {
+            asCallback = (fn.arg(1).to_object(getGlobal(fn)));
+        }
+        
+        ptr->addCallback(methodName, asCallback.get());
+    }
+    
+    
+    return as_value();    
+}
+
+as_value
+externalinterface_call(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;
+
+    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+    if (fn.nargs > 3) {
+        const as_value& methodName_as = fn.arg(0);
+        std::string methodName = methodName_as.to_string();
+        boost::intrusive_ptr<as_object> asCallback;
+        if (fn.arg(1).is_object()) {
+            asCallback = (fn.arg(1).to_object(getGlobal(fn)));
+        }
+        
+        const std::vector<as_value>& args = fn.getArgs();
+        ptr->call(asCallback.get(), methodName, args, 2);
+    }
+    
+    return as_value();
+}
+
+as_value
+externalinterface_available(const fn_call& fn)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    // Yes, Gnash supports the ExternalInterface
+    return as_value(true);
+}
+
+as_value
+externalinterface_marshallExceptions(const fn_call& fn)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    // No, don't pass exception up to the broswer
+    if (fn.nargs) {
+        ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+        ptr->marshallExceptions(fn.arg(0).to_bool());
+    } else {
+        return as_value(true);
+    }
+    
+    return as_value(true);
+}
+
+as_value
+externalinterface_objectID(const fn_call& fn)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+    std::string &str = ptr->objectID();
+    if (str.empty()) {
+        return as_value();
+    }
+
+    return as_value(str);
+}
+
+as_value
+externalinterface_ctor(const fn_call& fn)
+{
+    if (fn.nargs) {
+        std::stringstream ss;
+        fn.dump_args(ss);
+        LOG_ONCE(log_unimpl("ExternalInterface(%s): %s", ss.str(),
+                            _("arguments discarded")) );
+    }
+    
+    return as_value(); 
+}
+
+as_value
+externalInterfaceConstructor(const fn_call& fn)
+{
+    log_debug("Loading flash.external.ExternalInterface class");
+    Global_as& gl = getGlobal(fn);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&externalinterface_ctor, proto);
+
+    attachExternalInterfaceInterface(*proto);
+    attachExternalInterfaceStaticProperties(*cl);
+    return cl;
 }
 
 as_value
@@ -293,40 +395,37 @@ externalinterface_uUnescapeXML(const fn_call& /*fn*/)
 	return as_value();
 }
 
-as_value
-externalinterface_available(const fn_call& /*fn*/)
+} // end of anonymous namespace used for callbacks
+
+
+ExternalInterface_as::ExternalInterface_as(as_object* owner)
+    : ActiveRelay(owner),
+      _exceptions(false)
+
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
 }
 
-
-as_value
-externalinterface_ctor(const fn_call& fn)
+ExternalInterface_as::~ExternalInterface_as()
 {
-	if (fn.nargs) {
-		std::stringstream ss;
-		fn.dump_args(ss);
-		LOG_ONCE(log_unimpl("ExternalInterface(%s): %s", ss.str(),
-                    _("arguments discarded")) );
-	}
-
-	return as_value(); 
+//    LOG_ONCE( log_unimpl (__FUNCTION__) );
 }
 
-as_value
-externalInterfaceConstructor(const fn_call& fn)
+bool
+ExternalInterface_as::addCallback(const std::string &name, as_object *method)
 {
-    log_debug("Loading flash.external.ExternalInterface class");
-    Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
-    as_object* cl = gl.createClass(&externalinterface_ctor, proto);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
 
-    attachExternalInterfaceInterface(*proto);
-    attachExternalInterfaceStaticProperties(*cl);
-    return cl;
+    return false;
 }
 
+bool
+ExternalInterface_as::call(as_object* asCallback, const std::string& methodName,
+              const std::vector<as_value>& args, size_t firstArg)
+{
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    return false;
 }
 
 } // end of gnash namespace
