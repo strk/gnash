@@ -80,9 +80,9 @@ public:
     std::string getXML() { return _xml.str(); };
     
 private:
+    ExternalInterface_as &_ei;
     string_table&       _st;
     mutable bool        _error;
-    ExternalInterface_as &_ei;
     std::stringstream   _xml;
 };
 }
@@ -314,7 +314,7 @@ externalinterface_uArgumentsToXML(const fn_call& fn)
     
     if (fn.nargs > 0) {
         std::vector<as_value> args;
-        for (int i=0; i<fn.nargs; i++) {
+        for (size_t i=0; i<fn.nargs; i++) {
             args.push_back(fn.arg(i));
         }
         return ptr.argumentsToXML(args);
@@ -360,10 +360,10 @@ externalinterface_uArrayToXML(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    ExternalInterface_as *ptr = (ExternalInterface_as *)(&fn);
+    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     if (fn.nargs == 1) {
         as_object *obj = fn.arg(0).to_object(getGlobal(fn));
-        std::string str = ptr->arrayToXML(obj);
+        std::string str = ptr.arrayToXML(obj);
         return as_value(str);
     }
     
@@ -431,12 +431,18 @@ externalinterface_uObjectToXML(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    ExternalInterface_as *ptr = (ExternalInterface_as *)(&fn);
+    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     if (fn.nargs == 1) {
-        as_object *obj = fn.arg(0).to_object(getGlobal(fn));
-        std::string str = ptr->objectToXML(obj);
-        return as_value(str);
+        if (!fn.arg(0).is_null() && !fn.arg(0).is_undefined()) {
+            as_object *obj = fn.arg(0).to_object(getGlobal(fn));
+            std::string str = ptr.objectToXML(obj);
+            return as_value(str);
+        } else {
+            return "<object></object>";
+        }
     }
+    
+//    const string_table::key key = getName(uri);    
     
     return as_value();
 }
@@ -452,11 +458,11 @@ as_value
 externalinterface_uToXML(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    ExternalInterface_as *ptr = (ExternalInterface_as *)(&fn);
+    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     
     if (fn.nargs == 1) {
         as_value val = fn.arg(0);
-        std::string str = ptr->toXML(val);
+        std::string str = ptr.toXML(val);
         return as_value(str);
     }
     
@@ -547,14 +553,21 @@ ExternalInterface_as::objectToXML(as_object *obj)
     
     ss << "<object>";
     
+    // FIXME: figure out why accessing properties of a native
+    // class is different.
+    if (obj->relay()) {
+        log_error("%s: native objects barely supported!", __FUNCTION__);
+    }
+
+    // Get all the properties
     PropsSerializer props(*this, vm);
     obj->visitProperties<IsEnumerable>(props);
     if (!props.success()) {
         log_error("Could not serialize object");
         return false;
+    } else {
+        ss << props.getXML();
     }
-    ss << props.getXML();
-    
     ss << "</object>";
     
     return ss.str();
@@ -586,7 +599,7 @@ ExternalInterface_as::arrayToXML(as_object *obj)
     return ss.str();
 }
 
-/// Convert an AS valect to an XML string.
+/// Convert an AS object to an XML string.
 std::string
 ExternalInterface_as::toXML(as_value &val)
 {
@@ -611,8 +624,8 @@ ExternalInterface_as::toXML(as_value &val)
     } else if (val.is_function()) {
         ss << "<function>" << val.to_string() << "</function>";
     } else if (val.is_object()) {
-        as_object* obj = 0;     //val.to_object(*_global);
-        ss << objectToXML(obj);
+//        as_object *obj = (as_object *)&val;
+//         ss << "<object></object>";
     } else {
         log_error("Can't convert unknown type %d", val.to_string());
     }
