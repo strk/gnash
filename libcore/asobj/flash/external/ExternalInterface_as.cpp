@@ -28,42 +28,92 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "VM.h"
+#include "as_value.h"
+#include "as_object.h"
 #include "xml/XMLDocument_as.h"
 #include "namedStrings.h"
+#include "PropertyList.h"
 
 #include <sstream>
 
 namespace gnash {
 
 namespace {
-    as_value externalinterface_addCallback(const fn_call& fn);
-    as_value externalinterface_call(const fn_call& fn);
-    as_value externalInterfaceConstructor(const fn_call& fn);
-    as_value externalinterface_available(const fn_call& fn);
-    as_value externalinterface_marshallExceptions(const fn_call& fn);
-    as_value externalinterface_objectID(const fn_call& fn);
 
-    as_value externalinterface_uArgumentsToXML(const fn_call& fn);
-    as_value externalinterface_uArgumentsToAS(const fn_call& fn);
-    as_value externalinterface_uAddCallback(const fn_call& fn);
-    as_value externalinterface_uArrayToAS(const fn_call& fn);
-    as_value externalinterface_uArrayToJS(const fn_call& fn);
-    as_value externalinterface_uArrayToXML(const fn_call& fn);
-    as_value externalinterface_uCallIn(const fn_call& fn);
-    as_value externalinterface_uCallOut(const fn_call& fn);
-    as_value externalinterface_uEscapeXML(const fn_call& fn);
-    as_value externalinterface_uEvalJS(const fn_call& fn);
-    as_value externalinterface_uInitJS(const fn_call& fn);
-    as_value externalinterface_uJsQuoteString(const fn_call& fn);
-    as_value externalinterface_uObjectID(const fn_call& fn);
-    as_value externalinterface_uObjectToAS(const fn_call& fn);
-    as_value externalinterface_uObjectToJS(const fn_call& fn);
-    as_value externalinterface_uObjectToXML(const fn_call& fn);
-    as_value externalinterface_uToAS(const fn_call& fn);
-    as_value externalinterface_uToJS(const fn_call& fn);
-    as_value externalinterface_uToXML(const fn_call& fn);
-    as_value externalinterface_uUnescapeXML(const fn_call& fn);
+/// Class used to serialize properties of an object to a buffer
+class PropsSerializer : public AbstractPropertyVisitor
+{
+
+public:
+    
+    PropsSerializer(ExternalInterface_as &ei, VM& vm)
+        : _ei(ei),
+        _st(vm.getStringTable()),
+        _error(false)
+    {}
+    
+    bool success() const { return !_error; }
+
+    bool accept(const ObjectURI& uri, const as_value& val) {
+        if (_error) return true;
+
+        const string_table::key key = getName(uri);
+
+        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR) {
+            log_debug(" skip serialization of specially-named property %s",
+                      _st.value(key));
+            return true;
+        }
+
+        // write property name
+        const std::string& id = _st.value(key);
+
+        log_debug(" serializing property %s", id);
+        
+        _xml << "<property id=\"" << id << "\">";
+        _xml << _ei.toXML(const_cast<as_value &>(val));
+        _xml << "</property>";
+            
+        return true;
+    }
+
+    std::string getXML() { return _xml.str(); };
+    
+private:
+    string_table&       _st;
+    mutable bool        _error;
+    ExternalInterface_as &_ei;
+    std::stringstream   _xml;
+};
 }
+
+as_value externalinterface_addCallback(const fn_call& fn);
+as_value externalinterface_call(const fn_call& fn);
+as_value externalInterfaceConstructor(const fn_call& fn);
+as_value externalinterface_available(const fn_call& fn);
+as_value externalinterface_marshallExceptions(const fn_call& fn);
+as_value externalinterface_objectID(const fn_call& fn);
+
+as_value externalinterface_uArgumentsToXML(const fn_call& fn);
+as_value externalinterface_uArgumentsToAS(const fn_call& fn);
+as_value externalinterface_uAddCallback(const fn_call& fn);
+as_value externalinterface_uArrayToAS(const fn_call& fn);
+as_value externalinterface_uArrayToJS(const fn_call& fn);
+as_value externalinterface_uArrayToXML(const fn_call& fn);
+as_value externalinterface_uCallIn(const fn_call& fn);
+as_value externalinterface_uCallOut(const fn_call& fn);
+as_value externalinterface_uEscapeXML(const fn_call& fn);
+as_value externalinterface_uEvalJS(const fn_call& fn);
+as_value externalinterface_uInitJS(const fn_call& fn);
+as_value externalinterface_uJsQuoteString(const fn_call& fn);
+as_value externalinterface_uObjectID(const fn_call& fn);
+as_value externalinterface_uObjectToAS(const fn_call& fn);
+as_value externalinterface_uObjectToJS(const fn_call& fn);
+as_value externalinterface_uObjectToXML(const fn_call& fn);
+as_value externalinterface_uToAS(const fn_call& fn);
+as_value externalinterface_uToJS(const fn_call& fn);
+as_value externalinterface_uToXML(const fn_call& fn);
+as_value externalinterface_uUnescapeXML(const fn_call& fn);
 
 // extern 
 void
@@ -73,8 +123,6 @@ externalinterface_class_init(as_object& where, const ObjectURI& uri)
     const int flags = 0;
     where.init_destructive_property(uri, externalInterfaceConstructor, flags);
 }
-
-namespace {
 
 void
 attachExternalInterfaceInterface(as_object& /*o*/)
@@ -192,7 +240,7 @@ externalinterface_call(const fn_call& fn)
 }
 
 as_value
-externalinterface_available(const fn_call& fn)
+externalinterface_available(const fn_call& /* fn */)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -257,17 +305,28 @@ externalInterfaceConstructor(const fn_call& fn)
 }
 
 as_value
-externalinterface_uArgumentsToXML(const fn_call& /*fn*/)
+externalinterface_uArgumentsToXML(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    GNASH_REPORT_FUNCTION;
+    
+    if (fn.nargs == 1) {
+        std::string str(fn.arg(0).to_string());
+        escapeXML(str);
+        return as_value(str);
+    }
+    
+    return as_value();
 }
 
 as_value
-externalinterface_uArgumentsToAS(const fn_call& /*fn*/)
+externalinterface_uArgumentsToAS(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    GNASH_REPORT_FUNCTION;
+    
+    std::string str(fn.arg(0).to_string());
+    escapeXML(str);
+
+    return as_value();
 }
 
 as_value
@@ -292,10 +351,18 @@ externalinterface_uArrayToJS(const fn_call& /*fn*/)
 }
 
 as_value
-externalinterface_uArrayToXML(const fn_call& /*fn*/)
+externalinterface_uArrayToXML(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    
+    ExternalInterface_as *ptr = (ExternalInterface_as *)(&fn);
+    if (fn.nargs == 1) {
+        as_object *obj = fn.arg(0).to_object(getGlobal(fn));
+        std::string str = ptr->arrayToXML(obj);
+        return as_value(str);
+    }
+    
+    return as_value();
 }
 
 as_value
@@ -355,17 +422,18 @@ externalinterface_uObjectToJS(const fn_call& /*fn*/)
 }
 
 as_value
-externalinterface_uObjectToXML(const fn_call& /*fn*/)
+externalinterface_uObjectToXML(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
-}
-
-as_value
-externalinterface_uToAS(const fn_call& /*fn*/)
-{
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    
+    ExternalInterface_as *ptr = (ExternalInterface_as *)(&fn);
+    if (fn.nargs == 1) {
+        as_object *obj = fn.arg(0).to_object(getGlobal(fn));
+        std::string str = ptr->objectToXML(obj);
+        return as_value(str);
+    }
+    
+    return as_value();
 }
 
 as_value
@@ -376,12 +444,26 @@ externalinterface_uToJS(const fn_call& /*fn*/)
 }
 
 as_value
-externalinterface_uToXML(const fn_call& /*fn*/)
+externalinterface_uToXML(const fn_call& fn)
+{
+//    GNASH_REPORT_FUNCTION;
+    ExternalInterface_as *ptr = (ExternalInterface_as *)(&fn);
+    
+    if (fn.nargs == 1) {
+        as_value val = fn.arg(0);
+        std::string str = ptr->toXML(val);
+        return as_value(str);
+    }
+    
+    return as_value();
+}
+
+as_value
+externalinterface_uToAS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
-
 
 as_value
 externalinterface_uEscapeXML(const fn_call& fn)
@@ -411,8 +493,9 @@ externalinterface_uUnescapeXML(const fn_call& fn)
     return as_value();
 }
 
-} // end of anonymous namespace used for callbacks
+// } // end of anonymous namespace used for callbacks
 
+// namespace gnash {
 
 ExternalInterface_as::ExternalInterface_as(as_object* owner)
     : ActiveRelay(owner),
@@ -428,7 +511,7 @@ ExternalInterface_as::~ExternalInterface_as()
 }
 
 bool
-ExternalInterface_as::addCallback(const std::string &name, as_object *method)
+ExternalInterface_as::addCallback(const std::string &/*name */, as_object */* method */)
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
 
@@ -436,12 +519,112 @@ ExternalInterface_as::addCallback(const std::string &name, as_object *method)
 }
 
 bool
-ExternalInterface_as::call(as_object* asCallback, const std::string& methodName,
-              const std::vector<as_value>& args, size_t firstArg)
+ExternalInterface_as::call(as_object */*asCallback*/, const std::string& /*methodName*/,
+                           const std::vector<as_value>& /*args*/, size_t /*firstArg*/)
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
 
     return false;
 }
 
+/// Convert an AS object to an XML string.
+std::string
+ExternalInterface_as::objectToXML(as_object *obj)
+{
+    std::stringstream ss;
+
+    if (obj == 0) {
+        log_error("Need a valid AS Object!");
+        return ss.str();
+    }
+
+    VM& vm = getVM(*obj);
+    
+    ss << "<object>";
+    
+    PropsSerializer props(*this, vm);
+    obj->visitProperties<IsEnumerable>(props);
+    if (!props.success()) {
+        log_error("Could not serialize object");
+        return false;
+    }
+    ss << props.getXML();
+    
+    ss << "</object>";
+    
+    return ss.str();
+}
+
+/// Convert an AS object to an XML string.
+std::string
+ExternalInterface_as::arrayToXML(as_object *obj)
+{
+    std::stringstream ss;
+    if (obj == 0) {
+        log_error("Need a valid AS Object!");
+        return ss.str();
+    }
+
+    VM& vm = getVM(*obj);    
+    
+    ss << "<array>";
+    PropsSerializer props(*this, vm);
+    obj->visitProperties<IsEnumerable>(props);
+    if (!props.success()) {
+        log_error("Could not serialize object");
+        return false;
+    }
+    ss << props.getXML();
+    
+    ss << "</array>";
+    
+    return ss.str();
+}
+
+/// Convert an AS valect to an XML string.
+std::string
+ExternalInterface_as::toXML(as_value &val)
+{
+    std::stringstream ss;
+    
+    if (val.is_string()) {
+        ss << "<string>" << val.to_string() << "</string>";
+    } else if (val.is_number()) {
+        ss << "<number>" << val.to_string() << "</number>";
+    } else if (val.is_undefined()) {
+        ss << "<undefined/>";
+    } else if (val.is_null()) {
+        ss << "<null/>";
+        // Exception isn't listed in any docs, but we'll use it for
+        // marshallExceptions.
+    } else if (val.is_exception()) {
+        ss << "<exception>" << val.to_string()<< "</exception>";
+    } else if (val.is_bool()) {
+        ss << (val.to_bool() ? "<true/>" : "<false/>");
+        // Function also isn't listed, but it's the only other type
+        // supported by as_value, so leaving it out doesn't seem right.
+    } else if (val.is_function()) {
+        ss << "<function>" << val.to_string() << "</function>";
+    } else if (val.is_object()) {
+        as_object* obj = 0;     //val.to_object(*_global);
+        ss << objectToXML(obj);
+    } else {
+        log_error("Can't convert unknown type %d", val.to_string());
+    }
+
+    return ss.str();
+}
+
+/// Convert an XML string to an AS object.
+as_value
+ExternalInterface_as::toAS(const std::string &xml)
+{
+    return as_value();
+}
+
 } // end of gnash namespace
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

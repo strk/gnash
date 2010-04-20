@@ -32,6 +32,7 @@ class as_object;
 class as_value;
 class ObjectURI;
 
+
 class ExternalInterface_as : public ActiveRelay
 {
 public:
@@ -50,23 +51,31 @@ public:
     // Returns the id attribute of the object tag in Internet Explorer,
     // or the name attribute of the embed tag in Netscape. 
     std::string &objectID() { return _objectid; };
+    std::string objectID(as_object &obj);    
     
     /// Call a callback if it's registered already.
     bool call(as_object* asCallback, const std::string& methodName,
               const std::vector<as_value>& args, size_t firstArg);
 
+    /// Convert an AS object to an XML string.
+    std::string toXML(as_value &obj);
+    
+    /// Convert an XML string to an AS object.
+    as_value toAS(const std::string &xml);
+    
     // These appear to be undocumented helper functions of this class
     // that while propably designed to be used internally, get used
     // by ActionScript coders.
 
-// check(EI.hasOwnProperty("_argumentsToXML"));
-// check(EI.hasOwnProperty("_argumentsToAS"));
+    // check(EI.hasOwnProperty("_argumentsToXML"));
+    // check(EI.hasOwnProperty("_argumentsToAS"));
     
-    std::string objectToXML(as_object &obj);
-    std::string objectToJS(as_object &obj);
-    std::string objectToAS(as_object &obj);
+    std::string objectToXML(as_object *obj);
+    // std::string objectToJS(as_object &obj);
+    // std::string objectToAS(as_object &obj);
     
-// check(EI.hasOwnProperty("_arrayToXML"));
+    std::string arrayToXML(as_object *obj);
+
 // check(EI.hasOwnProperty("_arrayToJS"));
 // check(EI.hasOwnProperty("_arrayToAS"));
 
@@ -81,9 +90,6 @@ public:
 // check(EI.hasOwnProperty("_callOut"));
 // check(EI.hasOwnProperty("_callIn"));
 
-    std::string objectID(as_object &obj);
-    std::string toXML(as_object &obj);
-    
     std::string escapeXML(as_object &obj);
     std::string unescapeXML(as_object &obj);
     

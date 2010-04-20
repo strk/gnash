@@ -254,8 +254,54 @@ r = new EI;
 // You get an object
 check_equals(typeof(r), "object");
 check(r instanceOf EI);
-// But it doesn't do much.
-check_equals(r._toXML(o), undefined);
+
+// 
+xml = EI._objectToXML(o);
+if (xml == '<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>') {
+    pass("ExternalInterface::_objectToXML(object)");
+} else {
+    fail("ExternalInterface::_objectToXML(object)");
+}
+
+xml = EI._arrayToXML(a);
+if (xml == '<array><property id="0"><number>12</number></property><property id="1"><number>34</number></property><property id="2"><string>tr</string></property><property id="3"><number>1</number></property><property id="4"><number>2</number></property><property id="5"><number>3</number></property><property id="6"><number>4</number></property></array>') {
+    pass("ExternalInterface::_arrayToXML(array)");
+} else {
+    fail("ExternalInterface::_arrayToXML(array)");
+}
+
+xml = EI._toXML(o);
+trace(xml);
+if (xml == '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>') {
+    pass("ExternalInterface::_toXML(object)");
+} else {
+    fail("ExternalInterface::_toXML(object)");
+}
+
+xml = EI._toXML("Hello World!");
+trace(xml);
+if (xml == "<string>Hello World!</string>") {
+    pass("ExternalInterface::_toXML(string)");
+} else {
+    fail("ExternalInterface::_toXML(string)");
+}
+
+xml = EI._toXML(123.456);
+trace(xml);
+if (xml == "<number>123.456</number>") {
+    pass("ExternalInterface::_toXML(number)");
+} else {
+    fail("ExternalInterface::_toXML(number)");
+}
+
+xml = EI._toXML(a);
+trace(xml);
+if (xml == "<array>12,34,tr,1,2,3,4</array>") {
+    pass("ExternalInterface::_toXML(array)");
+} else {
+    fail("ExternalInterface::_toXML(array)");
+}
+
 
 // All methods are static.
 
