@@ -63,12 +63,14 @@ public:
     /// Convert an XML string to an AS object.
     as_value toAS(const std::string &xml);
     
+//    as_value toJS(const std::string &xml);;
+    
     // These appear to be undocumented helper functions of this class
     // that while propably designed to be used internally, get used
     // by ActionScript coders.
 
-    // check(EI.hasOwnProperty("_argumentsToXML"));
-    // check(EI.hasOwnProperty("_argumentsToAS"));
+    as_value argumentsToXML(std::vector<as_value> &args);
+//    as_value argumentsToAS();
     
     std::string objectToXML(as_object *obj);
     // std::string objectToJS(as_object &obj);
@@ -79,9 +81,6 @@ public:
 // check(EI.hasOwnProperty("_arrayToJS"));
 // check(EI.hasOwnProperty("_arrayToAS"));
 
-// check(EI.hasOwnProperty("_toXML"));
-// check(EI.hasOwnProperty("_toJS"));
-// check(EI.hasOwnProperty("_toAS"));
 
 // check(EI.hasOwnProperty("_jsQuoteString"));
 // check(EI.hasOwnProperty("_initJS"));

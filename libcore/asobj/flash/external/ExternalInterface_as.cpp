@@ -68,7 +68,7 @@ public:
         // write property name
         const std::string& id = _st.value(key);
 
-        log_debug(" serializing property %s", id);
+//        log_debug(" serializing property %s", id);
         
         _xml << "<property id=\"" << id << "\">";
         _xml << _ei.toXML(const_cast<as_value &>(val));
@@ -307,12 +307,17 @@ externalInterfaceConstructor(const fn_call& fn)
 as_value
 externalinterface_uArgumentsToXML(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
+    std::stringstream ss;
+    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     
-    if (fn.nargs == 1) {
-        std::string str(fn.arg(0).to_string());
-        escapeXML(str);
-        return as_value(str);
+    if (fn.nargs > 0) {
+        std::vector<as_value> args;
+        for (int i=0; i<fn.nargs; i++) {
+            args.push_back(fn.arg(i));
+        }
+        return ptr.argumentsToXML(args);
     }
     
     return as_value();
@@ -321,7 +326,7 @@ externalinterface_uArgumentsToXML(const fn_call& fn)
 as_value
 externalinterface_uArgumentsToAS(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     std::string str(fn.arg(0).to_string());
     escapeXML(str);
@@ -439,8 +444,8 @@ externalinterface_uObjectToXML(const fn_call& fn)
 as_value
 externalinterface_uToJS(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
@@ -461,14 +466,14 @@ externalinterface_uToXML(const fn_call& fn)
 as_value
 externalinterface_uToAS(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 externalinterface_uEscapeXML(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     if (fn.nargs == 1) {
         std::string str(fn.arg(0).to_string());
@@ -482,7 +487,7 @@ externalinterface_uEscapeXML(const fn_call& fn)
 as_value
 externalinterface_uUnescapeXML(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if (fn.nargs == 1) {
         std::string str = fn.arg(0).to_string();
@@ -534,7 +539,7 @@ ExternalInterface_as::objectToXML(as_object *obj)
     std::stringstream ss;
 
     if (obj == 0) {
-        log_error("Need a valid AS Object!");
+        //log_error("Need a valid AS Object!");
         return ss.str();
     }
 
@@ -561,7 +566,7 @@ ExternalInterface_as::arrayToXML(as_object *obj)
 {
     std::stringstream ss;
     if (obj == 0) {
-        log_error("Need a valid AS Object!");
+        //log_error("Need a valid AS Object!");
         return ss.str();
     }
 
@@ -620,6 +625,22 @@ as_value
 ExternalInterface_as::toAS(const std::string &xml)
 {
     return as_value();
+}
+
+as_value
+ExternalInterface_as::argumentsToXML(std::vector<as_value> &args)
+{
+    std::vector<as_value>::iterator it;
+    std::stringstream ss;
+
+    ss << "<arguments>";
+    for (it=args.begin(); it != args.end(); it++) {
+        as_value val = *it;
+        ss << toXML(val);
+    }
+    ss << "</arguments>";
+    
+    return as_value(ss.str());
 }
 
 } // end of gnash namespace
