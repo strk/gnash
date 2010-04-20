@@ -41,11 +41,14 @@ public:
     /// Add an ActionScript function as a callback by JavaScript
     // in the browser.
     bool addCallback(const std::string &name, as_object *method);
-    
-    /// Add an ActionScript function as a callback by JavaScript
-    // in the browser.
+
+    // This is a flag that specifies wether exceptions in ActionScript
+    // should be propogated to JavaScript in the browser.
     void marshallExceptions(bool flag) { _exceptions = flag; };
     bool marshallExceptions() { return _exceptions; };
+
+    // Returns the id attribute of the object tag in Internet Explorer,
+    // or the name attribute of the embed tag in Netscape. 
     std::string &objectID() { return _objectid; };
     
     /// Call a callback if it's registered already.

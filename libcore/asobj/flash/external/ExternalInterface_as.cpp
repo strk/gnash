@@ -28,6 +28,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "VM.h"
+#include "xml/XMLDocument_as.h"
 #include "namedStrings.h"
 
 #include <sstream>
@@ -312,13 +313,6 @@ externalinterface_uCallOut(const fn_call& /*fn*/)
 }
 
 as_value
-externalinterface_uEscapeXML(const fn_call& /*fn*/)
-{
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
-}
-
-as_value
 externalinterface_uEvalJS(const fn_call& /*fn*/)
 {
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
@@ -388,11 +382,33 @@ externalinterface_uToXML(const fn_call& /*fn*/)
 	return as_value();
 }
 
+
 as_value
-externalinterface_uUnescapeXML(const fn_call& /*fn*/)
+externalinterface_uEscapeXML(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    GNASH_REPORT_FUNCTION;
+    
+    if (fn.nargs == 1) {
+        std::string str(fn.arg(0).to_string());
+        escapeXML(str);
+        return as_value(str);
+    }
+    
+    return as_value();
+}
+
+as_value
+externalinterface_uUnescapeXML(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;
+
+    if (fn.nargs == 1) {
+        std::string str = fn.arg(0).to_string();
+        gnash::unescapeXML(str);
+        return as_value(str);
+    }
+    
+    return as_value();
 }
 
 } // end of anonymous namespace used for callbacks
