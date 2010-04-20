@@ -73,8 +73,6 @@ namespace {
     typedef std::map<std::string, std::string> Entities;
     const Entities& getEntities();
 
-    void unescapeXML(std::string& text);
-
     void attachXMLProperties(as_object& o);
 	void attachXMLInterface(as_object& o);
 
@@ -111,6 +109,21 @@ escapeXML(std::string& text)
     {
         boost::replace_all(text, i->second, i->first);
     }
+}
+
+void
+unescapeXML(std::string& text)
+{
+    const Entities& ent = getEntities();
+
+    for (Entities::const_iterator i = ent.begin(), e = ent.end();
+            i != e; ++i) {
+        boost::replace_all(text, i->first, i->second);
+    }
+
+    // Additionally, the &nbsp; entity is unescaped (but never escaped).
+    // Note we do this as UTF-8, which is most likely wrong for SWF5.
+    boost::replace_all(text, "&nbsp;", "\xc2\xa0");
 }
 
 void
@@ -890,21 +903,6 @@ parseNodeWithTerminator(xml_iterator& it, const xml_iterator end,
     it = ourend + terminator.length();
 
     return true;
-}
-
-void
-unescapeXML(std::string& text)
-{
-    const Entities& ent = getEntities();
-
-    for (Entities::const_iterator i = ent.begin(), e = ent.end();
-            i != e; ++i) {
-        boost::replace_all(text, i->first, i->second);
-    }
-
-    // Additionally, the &nbsp; entity is unescaped (but never escaped).
-    // Note we do this as UTF-8, which is most likely wrong for SWF5.
-    boost::replace_all(text, "&nbsp;", "\xc2\xa0");
 }
 
 const Entities&
