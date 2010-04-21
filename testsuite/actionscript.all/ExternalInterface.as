@@ -314,7 +314,6 @@ if (xml == "<number>123.456</number>") {
     fail("ExternalInterface::_toXML(number)");
 }
 
-// _objectTo*
 xml = EI._objectToXML(no);
 trace(xml);
 if (xml == '<object><property id="namespaceURI"><null/></property><property id="localName"><null/></property><property id="prefix"><null/></property><property id="previousSibling"><null/></property><property id="parentNode"><null/></property><property id="nodeValue"><null/></property><property id="nodeType"><number>1</number></property><property id="nodeName"><null/></property><property id="nextSibling"><null/></property><property id="lastChild"><null/></property><property id="firstChild"><null/></property><property id="childNodes"><array></array></property><property id="attributes"><null/></property><property id="getPrefixForNamespace"><null/></property><property id="getNamespaceForPrefix"><null/></property><property id="toString"><null/></property><property id="hasChildNodes"><null/></property><property id="appendChild"><null/></property><property id="insertBefore"><null/></property><property id="removeNode"><null/></property><property id="cloneNode"><null/></property><property id="xmlDecl"><undefined/></property><property id="status"><number>0</number></property><property id="loaded"><undefined/></property><property id="ignoreWhite"><false/></property><property id="docTypeDecl"><undefined/></property><property id="contentType"><string>application/x-www-form-urlencoded</string></property><property id="addRequestHeader"><null/></property><property id="getBytesTotal"><null/></property><property id="getBytesLoaded"><null/></property><property id="onData"><null/></property><property id="onLoad"><null/></property><property id="sendAndLoad"><null/></property><property id="send"><null/></property><property id="load"><null/></property><property id="parseXML"><null/></property><property id="createTextNode"><null/></property><property id="createElement"><null/></property></object>') {
@@ -351,6 +350,48 @@ if ((ret1 == "& ß+ü ") && (ret2 ==  " < << <>''")) {
     pass("ExternalInterface::_unescapeXML()");
 } else {
     fail("ExternalInterface::_unescapeXML()");
+}
+
+val = EI._toAS("<number>34.56</number>");
+if (val == 34.56) {
+    pass("ExternalInterface::_toAS(number)");
+} else {
+    fail("ExternalInterface::_toAS(number)");
+}
+
+val = EI._toAS("<string>Hello World!</string>");
+if (val == "Hello World!") {
+    pass("ExternalInterface::_toAS(string)");
+} else {
+    fail("ExternalInterface::_toAS(string)");
+}
+
+val = EI._toAS("<null/>");
+if (val == null) {
+    pass("ExternalInterface::_toAS(null)");
+} else {
+    fail("ExternalInterface::_toAS(null)");
+}
+
+val = EI._toAS("<true/>");
+if (val == true) {
+    pass("ExternalInterface::_toAS(true)");
+} else {
+    fail("ExternalInterface::_toAS(true)");
+}
+
+val = EI._toAS("<false/>");
+if (val == false) {
+    pass("ExternalInterface::_toAS(false)");
+} else {
+    fail("ExternalInterface::_toAS(false)");
+}
+
+val = EI._toAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
+if (typeOf(val) == "object") {
+    pass("ExternalInterface::_toAS(object)");
+} else {
+    fail("ExternalInterface::_toAS(object)");
 }
 
 #endif  // version > 7

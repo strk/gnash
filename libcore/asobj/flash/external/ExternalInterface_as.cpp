@@ -329,7 +329,10 @@ externalinterface_uArgumentsToAS(const fn_call& fn)
     // GNASH_REPORT_FUNCTION;
     
     std::string str(fn.arg(0).to_string());
-    escapeXML(str);
+    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
+    // if (fn.nargs > 0) {
+    //     return ptr->argumentsToAS();
+    // }
 
     return as_value();
 }
@@ -470,9 +473,15 @@ externalinterface_uToXML(const fn_call& fn)
 }
 
 as_value
-externalinterface_uToAS(const fn_call& /*fn*/)
+externalinterface_uToAS(const fn_call& fn)
 {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
+    
+    if (fn.nargs == 1) {
+        as_value val = ptr.toAS(fn.arg(0).to_string());
+        return val;
+    }
+    
     return as_value();
 }
 
@@ -542,6 +551,7 @@ ExternalInterface_as::call(as_object */*asCallback*/, const std::string& /*metho
 std::string
 ExternalInterface_as::objectToXML(as_object *obj)
 {
+    // GNASH_REPORT_FUNCTION;
     std::stringstream ss;
 
     if (obj == 0) {
@@ -577,6 +587,7 @@ ExternalInterface_as::objectToXML(as_object *obj)
 std::string
 ExternalInterface_as::arrayToXML(as_object *obj)
 {
+    // GNASH_REPORT_FUNCTION;
     std::stringstream ss;
     if (obj == 0) {
         //log_error("Need a valid AS Object!");
@@ -603,6 +614,7 @@ ExternalInterface_as::arrayToXML(as_object *obj)
 std::string
 ExternalInterface_as::toXML(as_value &val)
 {
+    // GNASH_REPORT_FUNCTION;
     std::stringstream ss;
     
     if (val.is_string()) {
@@ -637,12 +649,81 @@ ExternalInterface_as::toXML(as_value &val)
 as_value
 ExternalInterface_as::toAS(const std::string &xml)
 {
-    return as_value();
+    // GNASH_REPORT_FUNCTION;
+
+    std::string::size_type start = 0;
+    std::string::size_type end;
+    std::string tag;
+    as_value val;
+    
+    // Look for the ending > in the first part of the data for the tag
+    end = xml.find(">");
+    if (end != std::string::npos) {
+        end++;                  // go past the > character
+        tag = xml.substr(start, end);
+        // Look for the easy ones first
+        if (tag == "<null/>") {
+            val.set_null();
+        } else if (tag == "<void/>") {
+            val.set_null();     // FIXME: we need a void type in as_value
+        } else if (tag == "<true/>") {
+            val.set_bool(true);
+        } else if (tag == "<false/>") {
+            val.set_bool(false);
+        } else if (tag == "<number>") {
+            start = end;
+            end = xml.find("</number>");
+            std::string str = xml.substr(start, end-start);
+            if (str.find(".") != std::string::npos) {
+                double num = strtod(str.c_str(), NULL);
+                val.set_double(num);
+            } else {
+                int num = strtol(str.c_str(), NULL, 0);
+                val.set_double(num);
+            }
+        } else if (tag == "<string>") {
+            start = end;
+            end = xml.find("</string>");
+            std::string str = xml.substr(start, end-start);
+            int length = str.size();;
+            char *data = new char[length+1];
+            std::copy(str.begin(), str.end(), data);
+            data[length] = 0;  // terminate the new string or bad things happen
+            // When an NPVariant becomes a string object, it *does not* make a copy.
+            // Instead it stores the pointer (and length) we just allocated.
+            val.set_string(data);
+        } else if (tag == "<array>") {
+            start = end;
+            end = xml.find("</array");
+            std::string str = xml.substr(start, end-start);
+            // std::map<std::string, NPVariant *> props = parseProperties(str);
+            // std::map<std::string, NPVariant *>::iterator it;
+            // for (it=props.begin(); it != props.end(); ++it) {
+            //     // NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
+            //     // NPVariant *value = it->second;
+            // }
+        } else if (tag == "<object>") {
+            start = end;
+            end = xml.find("</object");
+            std::string str = xml.substr(start, end-start);
+            // std::map<std::string, NPVariant *> props = parseProperties(str);
+            // std::map<std::string, NPVariant *>::iterator it;
+            // for (it=props.begin(); it != props.end(); ++it) {
+            //     // NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
+            //     // NPVariant *value = it->second;
+            // }
+            // as_object *obj = new as_object;
+            // val = obj; 
+        }
+    }
+
+    return val;
 }
 
 as_value
 ExternalInterface_as::argumentsToXML(std::vector<as_value> &args)
 {
+    // GNASH_REPORT_FUNCTION;
     std::vector<as_value>::iterator it;
     std::stringstream ss;
 

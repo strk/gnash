@@ -60,7 +60,7 @@ public:
     /// Convert an AS object to an XML string.
     std::string toXML(as_value &obj);
     
-    /// Convert an XML string to an AS object.
+    /// Convert an XML string to an AS value.
     as_value toAS(const std::string &xml);
     
 //    as_value toJS(const std::string &xml);;
