@@ -109,85 +109,85 @@ class as_value
 public:
 
     // The exception type should always be one greater than the normal type.
-	enum AsType
-	{
-		UNDEFINED,
-		UNDEFINED_EXCEPT,
-		NULLTYPE,
-		NULLTYPE_EXCEPT,
-		BOOLEAN,
-		BOOLEAN_EXCEPT,
-		STRING,
-		STRING_EXCEPT,
-		NUMBER, 
-		NUMBER_EXCEPT,
-		OBJECT,
-		OBJECT_EXCEPT,
-		DISPLAYOBJECT,
-		DISPLAYOBJECT_EXCEPT
-	};
-
-	/// Construct an undefined value
-	DSOEXPORT as_value();
-
-	/// Construct a primitive String value 
-	as_value(const char* str);
-	as_value(const std::string& str);
-
-	/// Construct a primitive Boolean value
-	template <typename T>
-	as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type*
-            dummy = 0)
-		:
+    enum AsType
+    {
+        UNDEFINED,
+        UNDEFINED_EXCEPT,
+        NULLTYPE,
+        NULLTYPE_EXCEPT,
+        BOOLEAN,
+        BOOLEAN_EXCEPT,
+        STRING,
+        STRING_EXCEPT,
+        NUMBER, 
+        NUMBER_EXCEPT,
+        OBJECT,
+        OBJECT_EXCEPT,
+        DISPLAYOBJECT,
+        DISPLAYOBJECT_EXCEPT
+    };
+    
+    /// Construct an undefined value
+    DSOEXPORT as_value();
+    
+    /// Construct a primitive String value 
+    as_value(const char* str);
+    as_value(const std::string& str);
+    
+    /// Construct a primitive Boolean value
+    template <typename T>
+    as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type*
+             dummy = 0)
+        :
         _type(BOOLEAN),
-		_value(val)
+        _value(val)
 	{
-		UNUSED(dummy);
+            UNUSED(dummy);
 	}
-
-	/// Construct a primitive Number value
-	as_value(double val);
-	
-	/// Construct a null, Object, or DisplayObject value
-	as_value(as_object* obj);
-
-	/// Copy constructor.
-	as_value(const as_value& value);
-
-	/// Return the primitive type of this value as a string.
-	const char* typeOf() const;
-
-	/// Get the primitive type of this value
+    
+    /// Construct a primitive Number value
+    as_value(double val);
+    
+    /// Construct a null, Object, or DisplayObject value
+    as_value(as_object* obj);
+    
+    /// Copy constructor.
+    as_value(const as_value& value);
+    
+    /// Return the primitive type of this value as a string.
+    const char* typeOf() const;
+    
+    /// Get the primitive type of this value
     //
     /// Only used in AVM2
-	primitive_types ptype() const;
-
-	/// Return true if this value is a function
-	bool is_function() const;
-
-	/// Return true if this value is a string
-	bool is_string() const {
-		return _type == STRING;
-	}
-
-	/// Return true if this value is strictly a number
-	bool is_number() const {
-		return _type == NUMBER;
-	}
-
-	/// Return true if this value is an object
+    primitive_types ptype() const;
+    
+    /// Return true if this value is a function
+    bool is_function() const;
+    
+    /// Return true if this value is a string
+    bool is_string() const {
+        return _type == STRING;
+    }
+    
+    /// Return true if this value is strictly a number
+    bool is_number() const {
+        return _type == NUMBER;
+    }
+    
+    /// Return true if this value is an object
     //
     /// Both DisplayObjects and Objects count as Objects
-	bool is_object() const {
-		return _type == OBJECT || _type == DISPLAYOBJECT;
-	}
-
-	/// Return true if this value is a DISPLAYOBJECT 
-	bool is_sprite() const {
-		return _type == DISPLAYOBJECT;
-	}
-
-	/// Get a std::string representation for this value.
+    bool is_object() const {
+        return _type == OBJECT || _type == DISPLAYOBJECT;
+    }
+    
+    /// Return true if this value is a DISPLAYOBJECT 
+    bool is_sprite() const {
+        return _type == DISPLAYOBJECT;
+    }
+    
+    /// Get a std::string representation for this value.
     //
     /// @param version      The SWF version to use to transform the string.
     ///                     This only affects undefined values, which trace
@@ -195,163 +195,163 @@ public:
     ///                     for lower versions.
     //
     /// TODO: drop the default argument.
-	std::string to_string(int version = 7) const;
-
-	/// Get a number representation for this value
+    std::string to_string(int version = 7) const;
+    
+    /// Get a number representation for this value
     //
     /// This function performs conversion if necessary.
-	double to_number() const;
-
-	/// Conversion to boolean.
-	//
+    double to_number() const;
+    
+    /// Conversion to boolean.
+    //
     /// This function performs conversion if necessary.
-	bool to_bool() const;
-
-	/// Return value as an object, converting primitive values as needed.
-	//
+    bool to_bool() const;
+    
+    /// Return value as an object, converting primitive values as needed.
+    //
     /// This function performs conversion where necessary.
     //
-	/// string values are converted to String objects
-	/// numeric values are converted to Number objects
-	/// boolean values are converted to Boolean objects
-	///
-	/// If you want to avoid the conversion, check with is_object() before
-	/// calling this function.
+    /// string values are converted to String objects
+    /// numeric values are converted to Number objects
+    /// boolean values are converted to Boolean objects
+    ///
+    /// If you want to avoid the conversion, check with is_object() before
+    /// calling this function.
     //
     /// @param global   The global object object for the conversion. This
     ///                 contains the prototypes or constructors necessary for
     ///                 conversion.
-	as_object* to_object(Global_as& global) const;
-
-	/// Returns value as a MovieClip if it is a MovieClip.
-	//
+    as_object* to_object(Global_as& global) const;
+    
+    /// Returns value as a MovieClip if it is a MovieClip.
+    //
     /// This function performs no conversion, so returns 0 if the as_value is
     /// not a MovieClip.
     //
-	/// This is just a wrapper around toDisplayObject() performing 
-	/// an additional final cast.
-	MovieClip* toMovieClip(bool skipRebinding = false) const;
-
-	/// Return value as a DisplayObject or NULL if this is not possible.
-	//
+    /// This is just a wrapper around toDisplayObject() performing 
+    /// an additional final cast.
+    MovieClip* toMovieClip(bool skipRebinding = false) const;
+    
+    /// Return value as a DisplayObject or NULL if this is not possible.
+    //
     /// Note that this function performs no conversion, so returns 0 if the
     /// as_value is not a DisplayObject.
     //
-	/// If the value is a DisplayObject value, the stored DisplayObject target
-	/// is evaluated using the root movie's environment.
-	/// If the target points to something that doesn't cast to a DisplayObject,
-	/// 0 is returned.
-	///
-	/// @param skipRebinding    If true a reference to a destroyed
+    /// If the value is a DisplayObject value, the stored DisplayObject target
+    /// is evaluated using the root movie's environment.
+    /// If the target points to something that doesn't cast to a DisplayObject,
+    /// 0 is returned.
+    ///
+    /// @param skipRebinding    If true a reference to a destroyed
     ///                         DisplayObject is still returned, rather than
     ///                         attempting to resolve it as a soft-reference.
-	///	                        Main use for this is during paths resolution,
+    ///	                        Main use for this is during paths resolution,
     ///                         to avoid infinite loops. See bug #21647.
-	DisplayObject* toDisplayObject(bool skipRebinding = false) const;
+    DisplayObject* toDisplayObject(bool skipRebinding = false) const;
 
     /// Return the value as a function only if it is a function.
     //
     /// Note that this performs no conversion, so returns 0 if the as_value
     /// is not a function.
-	as_function* to_function() const;
+    as_function* to_function() const;
 
     // Used for operator<< to give useful information about an
     // as_value object.
-	DSOEXPORT std::string toDebugString() const;
-
-	AsType defaultPrimitive(int version) const;
-
-	/// Return value as a primitive type, with a preference
-	//
+    DSOEXPORT std::string toDebugString() const;
+    
+    AsType defaultPrimitive(int version) const;
+    
+    /// Return value as a primitive type, with a preference
+    //
     /// This function performs no conversion.
     //
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
-	///
-	/// @param hint
-	/// 	NUMBER or STRING, the preferred representation we're asking for.
-	///
-	/// @throw ActionTypeError if an object can't be converted to a primitive
-	///
-	as_value to_primitive(AsType hint) const;
-
+    /// Primitive types are: undefined, null, boolean, string, number.
+    /// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
+    ///
+    /// @param hint
+    /// 	NUMBER or STRING, the preferred representation we're asking for.
+    ///
+    /// @throw ActionTypeError if an object can't be converted to a primitive
+    ///
+    as_value to_primitive(AsType hint) const;
+    
     /// Set to a primitive string.
-	void set_string(const std::string& str);
-
+    void set_string(const std::string& str);
+    
     /// Set to a primitive number.
-	void set_double(double val);
-
+    void set_double(double val);
+    
     /// Set to a primitive boolean.
-	void set_bool(bool val);
+    void set_bool(bool val);
 
-	/// Make this value a NULL, OBJECT, DISPLAYOBJECT value
-	void set_as_object(as_object* obj);
-
+    /// Make this value a NULL, OBJECT, DISPLAYOBJECT value
+    void set_as_object(as_object* obj);
+    
     /// Set to undefined.
-	void set_undefined();
-
-	/// Set this value to the NULL value
-	void set_null();
-
-	void operator=(const as_value& v);
-
-	bool is_undefined() const {
+    void set_undefined();
+    
+    /// Set this value to the NULL value
+    void set_null();
+    
+    void operator=(const as_value& v);
+    
+    bool is_undefined() const {
         return (_type == UNDEFINED);
     }
-
-	bool is_null() const {
+    
+    bool is_null() const {
         return (_type == NULLTYPE);
     }
-
-	bool is_bool() const {
+    
+    bool is_bool() const {
         return (_type == BOOLEAN);
     }
-
+    
     bool is_exception() const {
         return (_type == UNDEFINED_EXCEPT || _type == NULLTYPE_EXCEPT
                 || _type == BOOLEAN_EXCEPT || _type == NUMBER_EXCEPT
                 || _type == OBJECT_EXCEPT || _type == DISPLAYOBJECT_EXCEPT
                 || _type == STRING_EXCEPT);
-	}
-
-	// Flag or unflag an as_value as an exception -- this gets flagged
-	// when an as_value is 'thrown'.
-	void flag_exception() {
+    }
+    
+    // Flag or unflag an as_value as an exception -- this gets flagged
+    // when an as_value is 'thrown'.
+    void flag_exception() {
         if (!is_exception()) {
             _type = static_cast<AsType>(static_cast<int>(_type) + 1);
         }
     }
-
-	void unflag_exception() {
+    
+    void unflag_exception() {
         if (is_exception()) {
             _type = static_cast<AsType>(static_cast<int>(_type) - 1);
         }
     }
-
-	/// Return true if this value is strictly equal to the given one
-	//
-	/// Strict equality is defined as the two values being of the
-	/// same type and the same value.
-	bool strictly_equals(const as_value& v) const;
-
-	/// Return true if this value is abstractly equal to the given one
-	//
-	/// See ECMA-262 abstract equality comparison (sect 11.9.3)
-	///
-	/// NOTE: these invariants should hold 
-	///
-	///	- A != B is equivalent to ! ( A == B )
-	///	- A == B is equivalent to B == A, except for order of
-	///	  evaluation of A and B.
-	///
-	/// @param v     The as_value to compare to
-	bool equals(const as_value& v) const;
-
-	/// Set any object value as reachable (for the GC)
-	//
-	/// Object values are values stored by pointer (objects and functions)
-	void setReachable() const;
-
+    
+    /// Return true if this value is strictly equal to the given one
+    //
+    /// Strict equality is defined as the two values being of the
+    /// same type and the same value.
+    bool strictly_equals(const as_value& v) const;
+    
+    /// Return true if this value is abstractly equal to the given one
+    //
+    /// See ECMA-262 abstract equality comparison (sect 11.9.3)
+    ///
+    /// NOTE: these invariants should hold 
+    ///
+    ///	- A != B is equivalent to ! ( A == B )
+    ///	- A == B is equivalent to B == A, except for order of
+    ///	  evaluation of A and B.
+    ///
+    /// @param v     The as_value to compare to
+    bool equals(const as_value& v) const;
+    
+    /// Set any object value as reachable (for the GC)
+    //
+    /// Object values are values stored by pointer (objects and functions)
+    void setReachable() const;
+    
     /// Serialize value in AMF0 format.
     //
     /// @param buf
@@ -361,25 +361,25 @@ public:
     ///     A map of already-parsed objects, pass an empty map on first call as
     ///     it will be used internally.
     ///
-	/// @param vm
+    /// @param vm
     ///     Virtual machine to use for serialization of property names
     ///     (string_table)
     ///
-	/// @param allowStrictArray
+    /// @param allowStrictArray
     ///     If true strict arrays will be encoded a STRICT_ARRAY types.
     ///
     bool writeAMF0(AMF::Writer& w) const;
 
 private:
 
-	/// AsValueType handles the following AS types:
-	//
-	/// 1. undefined / null
-	/// 2. Number
-	/// 3. Boolean
-	/// 4. Object
-	/// 5. MovieClip
-	/// 6. String
+    /// AsValueType handles the following AS types:
+    //
+    /// 1. undefined / null
+    /// 2. Number
+    /// 3. Boolean
+    /// 4. Object
+    /// 5. MovieClip
+    /// 6. String
     typedef boost::variant<boost::blank,
                            double,
                            bool,
@@ -390,70 +390,69 @@ private:
     
     /// Use the relevant equality function, not operator==
     bool operator==(const as_value& v) const;
-
+    
     /// Use the relevant inequality function, not operator!=
     bool operator!=(const as_value& v) const;
-
-	/// Compare values of the same type
-	//
-	/// NOTE: will abort if values are not of the same type!
-	///
-	bool equalsSameType(const as_value& v) const;
-
-	/// Conversion to boolean for SWF7 and up
-	bool to_bool_v7() const;
-
-	/// Conversion to boolean for SWF6
-	bool to_bool_v6() const;
-
-	/// Conversion to boolean up to SWF5
-	bool to_bool_v5() const;
-
-	AsType _type;
-
+    
+    /// Compare values of the same type
+    //
+    /// NOTE: will abort if values are not of the same type!
+    ///
+    bool equalsSameType(const as_value& v) const;
+    
+    /// Conversion to boolean for SWF7 and up
+    bool to_bool_v7() const;
+    
+    /// Conversion to boolean for SWF6
+    bool to_bool_v6() const;
+    
+    /// Conversion to boolean up to SWF5
+    bool to_bool_v5() const;
+    
+    AsType _type;
+    
     AsValueType _value;
-
-	/// Get the object pointer variant member.
+    
+    /// Get the object pointer variant member.
     //
     /// Callers must check that this is an Object (including DisplayObjects).
-	as_object* getObj() const;
-
-	/// Get the DisplayObject variant member.
+    as_object* getObj() const;
+    
+    /// Get the DisplayObject variant member.
     //
     /// The caller must check that this is a DisplayObject.
-	DisplayObject* getCharacter(bool skipRebinding = false) const;
+    DisplayObject* getCharacter(bool skipRebinding = false) const;
 
-	/// Get the DisplayObject proxy variant member.
+    /// Get the DisplayObject proxy variant member.
     //
     /// The caller must check that this value is a DisplayObject
-	CharacterProxy getCharacterProxy() const;
+    CharacterProxy getCharacterProxy() const;
 
-	/// Get the number variant member.
+    /// Get the number variant member.
     //
     /// The caller must check that this value is a Number.
-	double getNum() const {
-		assert(_type == NUMBER);
-		return boost::get<double>(_value);
-	}
-
-	/// Get the boolean variant member.
+    double getNum() const {
+        assert(_type == NUMBER);
+        return boost::get<double>(_value);
+    }
+    
+    /// Get the boolean variant member.
     //
     /// The caller must check that this value is a Boolean.
-	bool getBool() const {
-		assert(_type == BOOLEAN);
-		return boost::get<bool>(_value);
-	}
+    bool getBool() const {
+        assert(_type == BOOLEAN);
+        return boost::get<bool>(_value);
+    }
 
-	/// Get the boolean variant member.
+    /// Get the boolean variant member.
     //
     /// The caller must check that this value is a String.
-	const std::string& getStr() const {
-		assert(_type == STRING);
-		return boost::get<std::string>(_value);
-	}
-
+    const std::string& getStr() const {
+        assert(_type == STRING);
+        return boost::get<std::string>(_value);
+    }
+    
 };
-
 
 /// Force type to number.
 as_value& convertToNumber(as_value& v, VM& vm);
@@ -525,6 +524,6 @@ setNaN(as_value& v) {
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
 
