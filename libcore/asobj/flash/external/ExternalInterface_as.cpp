@@ -205,7 +205,6 @@ attachExternalInterfaceStaticProperties(as_object& o)
                   gl.createFunction(externalinterface_uToXML), swf8Flags);
     o.init_member("_unescapeXML",
                   gl.createFunction(externalinterface_uUnescapeXML), swf8Flags);
-
 }
 
 as_value
@@ -255,7 +254,10 @@ externalinterface_available(const fn_call& /* fn */)
 //    GNASH_REPORT_FUNCTION;
     
     // Yes, Gnash supports the ExternalInterface
-    return as_value(true);
+
+    bool flag = false;          // _ei.getAvailable();
+    
+    return as_value(flag);
 }
 
 as_value
@@ -534,7 +536,8 @@ externalinterface_uUnescapeXML(const fn_call& fn)
 // namespace gnash {
 
 ExternalInterface_as::ExternalInterface_as(as_object* /*owner*/)
-    : _exceptions(false)
+    : _available(false),
+      _exceptions(false)
 
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );

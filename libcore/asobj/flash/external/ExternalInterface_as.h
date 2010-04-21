@@ -50,6 +50,9 @@ public:
     void marshallExceptions(bool flag) { _exceptions = flag; };
     bool marshallExceptions() { return _exceptions; };
 
+    bool getAvailable() { return _available; };
+    void setAvailable(bool flag) { _available = flag; };
+    
     /// Returns the id attribute of the object tag in Internet Explorer,
     /// or the name attribute of the embed tag in Netscape. 
     const std::string &objectID() { return _objectid; };
@@ -97,6 +100,7 @@ public:
     static std::string unescapeXML(as_object &obj);
     
 private:
+    bool        _available;
     std::string _objectid;
     bool        _exceptions;
     std::map<std::string, as_object *> _methods;

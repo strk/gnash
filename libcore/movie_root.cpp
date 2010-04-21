@@ -1262,6 +1262,22 @@ movie_root::setStageAlignment(short s)
     callInterface("Stage.align");
 }
 
+/// Takes a short int bitfield: the four bits correspond
+/// to the AlignMode enum 
+void
+movie_root::setAllowScriptAccess(const std::string &s)
+{
+    _allowScriptAccess = s;
+}
+
+/// Takes a short int bitfield: the four bits correspond
+/// to the AlignMode enum 
+std::string &
+movie_root::getAllowScriptAccess()
+{
+    return _allowScriptAccess;
+}
+
 /// Returns a pair of enum values giving the actual alignment
 /// of the stage after align mode flags are evaluated.
 movie_root::StageAlign

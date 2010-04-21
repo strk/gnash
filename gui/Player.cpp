@@ -483,6 +483,13 @@ Player::run(int argc, char* argv[], const std::string& infile,
         root.setStageAlignment(align);
     }
 
+    it = params.find("allowscriptaccess");
+    if (it != params.end()) {
+        std::string access = it->second;
+        log_debug("Setting allowscriptaccess to %s", access);
+        root.setAllowScriptAccess(access);
+    }
+
     it = params.find("scale");
     if (it != params.end()) {
                 

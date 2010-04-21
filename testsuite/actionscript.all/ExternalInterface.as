@@ -56,7 +56,7 @@ if (EI.hasOwnProperty("available")) {
 }
 
 // this should always be true now that Gnash supports this class
-if (EI.available == true) {
+if (EI.available == false) {
     pass("ExternalInterface::available is correct");
 } else {
     fail("ExternalInterface::available property isn't correct");
