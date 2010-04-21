@@ -426,7 +426,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     
     if (_controlfd != -1) {
-        root.setControlFD(_controlfd);
+        // root.setControlFD(_controlfd);
         
         _gui->setFDCallback(_controlfd, boost::bind(&Gui::quit, boost::ref(_gui)));
     }

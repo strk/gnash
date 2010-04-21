@@ -143,30 +143,13 @@ GetVariableCallback (NPObject *npobj, NPIdentifier /* name */,
         if (value == 0) {
             NULL_TO_NPVARIANT(*result);
         } else {
-            if (NPVARIANT_IS_DOUBLE(*value)) {
-                double num = NPVARIANT_TO_DOUBLE(*value);
-                DOUBLE_TO_NPVARIANT(num, *result);
-            } else if (NPVARIANT_IS_STRING(*value)) {
-                STRINGN_TO_NPVARIANT(NPVARIANT_TO_STRING(*value).UTF8Characters,
-                                     NPVARIANT_TO_STRING(*value).UTF8Length,
-                                     *result);
-            } else if (NPVARIANT_IS_BOOLEAN(*value)) {
-                BOOLEAN_TO_NPVARIANT(NPVARIANT_TO_BOOLEAN(*value), *result);
-            } else if (NPVARIANT_IS_INT32(*value)) {
-                INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(*value), *result);
-            } else if (NPVARIANT_IS_NULL(*value)) {
-                NULL_TO_NPVARIANT(*result);
-            } else if (NPVARIANT_IS_VOID(*value)) {
-                VOID_TO_NPVARIANT(*result);
-            } else if (NPVARIANT_IS_OBJECT(*value)) {
-                OBJECT_TO_NPVARIANT(NPVARIANT_TO_OBJECT(*value), *result);
-            }
+            CopyVariantValue(*value, *result);
+
             NPN_MemFree(value);
             return true;
         }
     }
     
-    NPN_MemFree(value);
     NPVARIANT_IS_NULL(*result);
     return false;
 }
@@ -260,7 +243,7 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
             BOOLEAN_TO_NPVARIANT(false, *result);
         }
         // free the memory used for the data, as it was allocated in readPlayer().
-        NPN_MemFree(reinterpret_cast<void *>(value));
+        NPN_MemFree(value);
 
         return true;
     }
@@ -421,7 +404,7 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
             INT32_TO_NPVARIANT(0, *result);
         }
         // free the memory used for the data, as it was allocated in readPlayer().
-        NPN_MemFree(reinterpret_cast<void *>(value));
+        NPN_MemFree(value);
 
         return true;
     }
@@ -684,7 +667,7 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
             INT32_TO_NPVARIANT(0, *result);
         }
         // free the memory used for the data, as it was allocated in readPlayer().
-        NPN_MemFree(reinterpret_cast<void *>(value));
+        NPN_MemFree(value);
 
         return true;
     }
