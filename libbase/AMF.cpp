@@ -145,7 +145,7 @@ void
 write(SimpleBuffer& buf, const std::string& str)
 {
     Type t = str.size() < 65536 ? STRING_AMF0 : LONG_STRING_AMF0;
-	buf.appendByte(t);
+    buf.appendByte(t);
     writePlainString(buf, str, t);
 }
 
@@ -160,35 +160,33 @@ write(SimpleBuffer& buf, double d)
 void
 write(SimpleBuffer& buf, bool b)
 {
-	buf.appendByte(BOOLEAN_AMF0);
+    buf.appendByte(BOOLEAN_AMF0);
     buf.appendByte(b ? 1 : 0);
 }
 
-void*
+void
 swapBytes(void* word, size_t size)
 {
     union {
-    boost::uint16_t s;
-    struct {
-        boost::uint8_t c0;
-        boost::uint8_t c1;
-    } c;
+        boost::uint16_t s;
+        struct {
+             boost::uint8_t c0;
+             boost::uint8_t c1;
+        } c;
     } u;
        
     u.s = 1;
-        if (u.c.c0 == 0) {
+    if (u.c.c0 == 0) {
         // Big-endian machine: do nothing
-        return word;
+        return;
     }
 
     // Little-endian machine: byte-swap the word
     // A conveniently-typed pointer to the source data
     boost::uint8_t *x = static_cast<boost::uint8_t *>(word);
 
-    /// Handle odd as well as even counts of bytes
+    // Handles odd as well as even counts of bytes
     std::reverse(x, x + size);
-    
-    return word;
 }
 
 

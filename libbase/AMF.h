@@ -195,7 +195,7 @@ writeProperty(SimpleBuffer& buf, const std::string& name, const T& t)
 /// @param word The address of the data to byte swap.
 /// @param size The number of bytes in the data.
 /// @return A pointer to the raw data.
-DSOEXPORT void* swapBytes(void* word, size_t size);
+DSOEXPORT void swapBytes(void* word, size_t size);
 
 
 } // namespace amf
