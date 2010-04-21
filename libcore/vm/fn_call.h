@@ -86,7 +86,7 @@ public:
     /// extends beyond a function call.
     void setReachable() const {
         std::for_each(_v.begin(), _v.end(),
-                std::mem_fun_ref(&as_value::setReachable));
+                      std::mem_fun_ref(&as_value::setReachable));
     }
 
     void swap(std::vector<T>& to) {
@@ -121,132 +121,131 @@ public:
     ///                     null) whenever a function requires it.
     fn_call(as_object* this_in, const as_environment& env_in,
             Args& args, as_object* sup = 0, bool isNew = false)
-		:
-		this_ptr(this_in),
-		super(sup),
-		nargs(args.size()),
+	:
+        this_ptr(this_in),
+        super(sup),
+        nargs(args.size()),
         callerDef(0),
         _new(isNew),
-		_env(env_in)
-	{
-        args.swap(_args);
-	}
-
+        _env(env_in)
+        {
+            args.swap(_args);
+        }
+    
     fn_call(as_object* this_in, const as_environment& env_in)
-		:
-		this_ptr(this_in),
-		super(0),
-		nargs(0),
+	:
+	this_ptr(this_in),
+	super(0),
+	nargs(0),
         callerDef(0),
         _new(false),
-		_env(env_in)
+	_env(env_in)
 	{
 	}
-
+    
     /// Copy constructor
     fn_call(const fn_call& fn)
         :
         this_ptr(fn.this_ptr),
         super(fn.super),
-		nargs(fn.nargs),
+	nargs(fn.nargs),
         callerDef(fn.callerDef),
         _new(false),
         _env(fn._env),
         _args(fn._args)
 	{
 	}
-
-	/// The as_object (or a pointer derived thereof) on which this call
-	/// is taking place.
-	as_object* this_ptr;
-
-	/// The "super" object in this function call context
+    
+    /// The as_object (or a pointer derived thereof) on which this call
+    /// is taking place.
+    as_object* this_ptr;
+    
+    /// The "super" object in this function call context
     //
     /// If this is 0, the super may be constructed from the this pointer.
-	as_object* super;
-
-	/// Number of arguments to this ActionScript function call.
+    as_object* super;
+    
+    /// Number of arguments to this ActionScript function call.
     Args::size_type nargs;
-
+    
     /// Definition containing caller code. 0 if spontaneous (system event).
     const movie_definition* callerDef;
-
+    
     /// Return the VM this fn_call is running from
     VM& getVM() const
-    {
-        return _env.getVM();
-    }
-
-	/// Return true if this call is an object instantiation
-	bool isInstantiation() const
+        {
+            return _env.getVM();
+        }
+    
+    /// Return true if this call is an object instantiation
+    bool isInstantiation() const
 	{
-		return _new;
+            return _new;
 	}
-
-	/// Access a particular argument.
-	const Args::value_type& arg(unsigned int n) const
+    
+    /// Access a particular argument.
+    const Args::value_type& arg(unsigned int n) const
 	{
-		assert(n < nargs);
-		return _args[n]; 
+            assert(n < nargs);
+            return _args[n]; 
 	}
-
+    
     const Args::container_type& getArgs() const {
         return _args;
     }
-
-	void drop_bottom()
+    
+    void drop_bottom()
 	{
-		assert(!_args.empty());
-        _args.erase(_args.begin());
-		--nargs;
+            assert(!_args.empty());
+            _args.erase(_args.begin());
+            --nargs;
 	}
-
-	const as_environment& env() const
+    
+    const as_environment& env() const
 	{
-		return _env;
+            return _env;
 	}
-
-	/// Dump arguments to given output stream
-	void dump_args(std::ostream& os) const
+    
+    /// Dump arguments to given output stream
+    void dump_args(std::ostream& os) const
 	{
-		for (size_t i = 0; i < nargs; ++i)
-		{
-			if ( i ) os << ", ";
-			os << arg(i).toDebugString();
-		}
+            for (size_t i = 0; i < nargs; ++i) {
+                if ( i ) os << ", ";
+                os << arg(i).toDebugString();
+            }
 	}
-
-	/// Return arguments as a string (for debugging)
-	std::string dump_args() const
+    
+    /// Return arguments as a string (for debugging)
+    std::string dump_args() const
 	{
-		std::stringstream ss;
-		dump_args(ss);
-		return ss.str();
+            std::stringstream ss;
+            dump_args(ss);
+            return ss.str();
 	}
-
-	void resetArgs()
+    
+    void resetArgs()
 	{
-		nargs = 0;
-		_args.clear();
+            nargs = 0;
+            _args.clear();
 	}
-
-	void pushArg(const Args::value_type& arg)
+    
+    void pushArg(const Args::value_type& arg)
 	{
-		++nargs;
-		_args.push_back(arg);
+            ++nargs;
+            _args.push_back(arg);
 	}
-
+    
 private:
 
     bool _new;
-
-	/// The ActionScript environment in which the function call is taking
-	/// place. This contains, among other things, the function arguments.
-	const as_environment& _env;
-
-	/// The actual arguments
+    
+    /// The ActionScript environment in which the function call is taking
+    /// place. This contains, among other things, the function arguments.
+    const as_environment& _env;
+    
+    /// The actual arguments
     Args::container_type _args;
-
+    
 };
 
 
@@ -274,7 +273,6 @@ struct ThisIsNative
         return dynamic_cast<value_type*>(o->relay());
     }
 };
-
 
 /// Check that the 'this' pointer is a DisplayObject
 //
@@ -322,9 +320,9 @@ ensure(const fn_call& fn)
 {
     as_object* obj = fn.this_ptr;
     if (!obj) throw ActionTypeError();
-
+    
     typename T::value_type* ret = T()(obj);
-
+    
     if (!ret) {
         std::string target = typeName(ret);
         std::string source = typeName(obj);
@@ -385,5 +383,5 @@ getGlobal(const fn_call& fn)
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
