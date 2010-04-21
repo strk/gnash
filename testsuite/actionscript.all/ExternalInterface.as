@@ -401,9 +401,9 @@ if (val == false) {
 val = EI._objectToAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
 trace(val);
 if (typeOf(val) == "object") {
-    pass("ExternalInterface::_objectToAS(object)");
+    xpass("ExternalInterface::_objectToAS(object)");
 } else {
-    fail("ExternalInterface::_objectToAS(object)");
+    xfail("ExternalInterface::_objectToAS(object)");
 }
 
 #endif  // version > 7
