@@ -25,8 +25,6 @@
 #include <vector>
 #include <map>
 
-#include "Relay.h" // for inheritance
-
 namespace gnash {
 
 class as_object;
@@ -37,7 +35,7 @@ class Global_as;
 
 namespace gnash {
 
-class ExternalInterface_as : public ActiveRelay
+class ExternalInterface_as
 {
 public:
     ExternalInterface_as(as_object* owner);
@@ -54,11 +52,11 @@ public:
 
     /// Returns the id attribute of the object tag in Internet Explorer,
     /// or the name attribute of the embed tag in Netscape. 
-    std::string &objectID() { return _objectid; };
+    const std::string &objectID() { return _objectid; };
     std::string objectID(as_object &obj);    
     
     /// Call a callback if it's registered already.
-    bool call(as_object* asCallback, const std::string& methodName,
+    static bool call(as_object* asCallback, const std::string& methodName,
               const std::vector<as_value>& args, size_t firstArg);
 
     // These appear to be undocumented helper functions of this class
@@ -66,24 +64,24 @@ public:
     // by ActionScript coders.
 
     /// Convert an AS object to an XML string.
-    std::string toXML(as_value &obj);
+    static std::string toXML(const as_value &obj);
     
     /// Convert an XML string to an AS value.
-    as_value toAS(Global_as& as, const std::string &xml);
+    static as_value toAS(Global_as& as, const std::string &xml);
 
     /// Convert an XML string of properties to a data structure.
-    std::map<std::string, as_value> propertiesToAS(Global_as& gl,
+    static std::map<std::string, as_value> propertiesToAS(Global_as& gl,
                                                    std::string &xml);
     
-    as_value argumentsToXML(std::vector<as_value> &args);
+    static as_value argumentsToXML(std::vector<as_value> &args);
 //    as_value argumentsToAS();
     
-    std::string objectToXML(as_object *obj);
-    as_value objectToAS(Global_as& gl, const std::string &xml);
+    static std::string objectToXML(as_object *obj);
+    static as_value objectToAS(Global_as& gl, const std::string &xml);
 //  std::string objectToJS(as_object &obj);
 //  as_value toJS(const std::string &xml);;
     
-    std::string arrayToXML(as_object *obj);
+    static std::string arrayToXML(as_object *obj);
 
 //  std::string arrayToJS();
 //  as_value arrayToAS();
@@ -95,8 +93,8 @@ public:
 //  callOut"));
 //  callIn"));
 
-    std::string escapeXML(as_object &obj);
-    std::string unescapeXML(as_object &obj);
+    static std::string escapeXML(as_object &obj);
+    static std::string unescapeXML(as_object &obj);
     
 private:
     std::string _objectid;

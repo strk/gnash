@@ -77,10 +77,9 @@ class PropsSerializer : public AbstractPropertyVisitor
 
 public:
     
-    PropsSerializer(ExternalInterface_as &ei, VM& vm)
-        : _ei(ei),
-        _st(vm.getStringTable()),
-        _error(false)
+    PropsSerializer(VM& vm)
+        : _st(vm.getStringTable()),
+          _error(false)
     {}
     
     bool success() const { return !_error; }
@@ -102,7 +101,7 @@ public:
 //        log_debug(" serializing property %s", id);
         
         _xml << "<property id=\"" << id << "\">";
-        _xml << _ei.toXML(const_cast<as_value &>(val));
+        _xml << ExternalInterface_as::toXML(val);
         _xml << "</property>";
             
         return true;
@@ -111,7 +110,6 @@ public:
     std::string getXML() { return _xml.str(); };
     
 private:
-    ExternalInterface_as &_ei;
     string_table&       _st;
     mutable bool        _error;
     std::stringstream   _xml;
@@ -121,9 +119,22 @@ private:
 void
 externalinterface_class_init(as_object& where, const ObjectURI& uri)
 {
-    // TODO: this may not be correct, but it should be enumerable.
-    const int flags = 0;
-    where.init_destructive_property(uri, externalInterfaceConstructor, flags);
+#if 1
+    where.init_destructive_property(uri, externalInterfaceConstructor, 0);
+#else
+    Global_as& gl = getGlobal(where);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&externalInterfaceConstructor, proto);
+
+    attachTextFieldInterface(*proto);
+    attachTextFieldStaticMembers(*cl);
+             
+    where.init_member(uri, cl, as_object::DefaultFlags);
+
+    // ASSetPropFlags is called on the TextField class.
+    as_object* null = 0;
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, cl, null, 131);
+#endif
 }
 
 namespace {
@@ -137,23 +148,18 @@ void
 attachExternalInterfaceStaticProperties(as_object& o)
 {
     
-    const int swf6Flags = PropFlags::dontEnum | PropFlags::dontDelete
-        | PropFlags::onlySWF6Up;
-    const int swf7Flags = PropFlags::dontEnum | PropFlags::dontDelete
-        | PropFlags::onlySWF7Up;
-    const int swf8Flags = PropFlags::dontEnum | PropFlags::dontDelete
-        | PropFlags::onlySWF8Up;
+//    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+    const int swf7Flags = as_object::DefaultFlags | PropFlags::onlySWF7Up;
+    const int swf8Flags = as_object::DefaultFlags | PropFlags::onlySWF8Up;
 
     Global_as& gl = getGlobal(o);
     
     // Initialize the properties
-    o.init_readonly_property("available", &externalinterface_available);
+    o.init_readonly_property("available", &externalinterface_available, swf7Flags);
 
-    // FIXME: for now, always make these available as ming doesn't support v9
-//    if (getSWFVersion(o) > 8) {
-    o.init_readonly_property("marshallExceptions", &externalinterface_marshallExceptions);
-    o.init_property("objectID", externalinterface_objectID, externalinterface_objectID);
-//    }
+    o.init_property("marshallExceptions", externalinterface_marshallExceptions,
+                    externalinterface_marshallExceptions, swf8Flags);
+    o.init_readonly_property("objectID", &externalinterface_objectID, swf8Flags);
     
     // Initialize the methods, most of which are undocumented helper functions
     o.init_member("addCallback", gl.createFunction(
@@ -219,7 +225,6 @@ externalinterface_addCallback(const fn_call& fn)
         ptr->addCallback(methodName, asCallback.get());
     }
     
-    
     return as_value();    
 }
 
@@ -275,7 +280,7 @@ externalinterface_objectID(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
 
     ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
-    std::string &str = ptr->objectID();
+    const std::string &str = ptr->objectID();
     if (str.empty()) {
         return as_value();
     }
@@ -315,26 +320,25 @@ externalinterface_uArgumentsToXML(const fn_call& fn)
     // GNASH_REPORT_FUNCTION;
 
     std::stringstream ss;
-    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     
     if (fn.nargs > 0) {
         std::vector<as_value> args;
         for (size_t i=0; i<fn.nargs; i++) {
             args.push_back(fn.arg(i));
         }
-        return ptr.argumentsToXML(args);
+        return ExternalInterface_as::argumentsToXML(args);
     }
     
     return as_value();
 }
 
 as_value
-externalinterface_uArgumentsToAS(const fn_call& fn)
+externalinterface_uArgumentsToAS(const fn_call& /*fn*/)
 {
     // GNASH_REPORT_FUNCTION;
     
-    std::string str(fn.arg(0).to_string());
-    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
+    // std::string str(fn.arg(0).to_string());
+    // ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     // if (fn.nargs > 0) {
     //     return ptr->argumentsToAS();
     // }
@@ -371,10 +375,9 @@ externalinterface_uArrayToXML(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     if (fn.nargs == 1) {
         as_object *obj = fn.arg(0).to_object(getGlobal(fn));
-        std::string str = ptr.arrayToXML(obj);
+        std::string str = ExternalInterface_as::arrayToXML(obj);
         return as_value(str);
     }
     
@@ -433,10 +436,8 @@ as_value
 externalinterface_uObjectToAS(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
-    
     if (fn.nargs == 1) {
-        return ptr.objectToAS(getGlobal(fn), fn.arg(0).to_string());
+        return ExternalInterface_as::objectToAS(getGlobal(fn), fn.arg(0).to_string());
     }
     
     return as_value();
@@ -454,11 +455,10 @@ externalinterface_uObjectToXML(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     if (fn.nargs == 1) {
         if (!fn.arg(0).is_null() && !fn.arg(0).is_undefined()) {
             as_object *obj = fn.arg(0).to_object(getGlobal(fn));
-            std::string str = ptr.objectToXML(obj);
+            std::string str = ExternalInterface_as::objectToXML(obj);
             return as_value(str);
         } else {
             return as_value("<object></object>");
@@ -479,12 +479,10 @@ as_value
 externalinterface_uToXML(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
-    
+
     if (fn.nargs == 1) {
         as_value val = fn.arg(0);
-        std::string str = ptr.toXML(val);
-        return as_value(str);
+        as_value(ExternalInterface_as::toXML(val));
     }
     
     return as_value();
@@ -494,10 +492,9 @@ as_value
 externalinterface_uToAS(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     
     if (fn.nargs == 1) {
-        as_value val = ptr.toAS(getGlobal(fn), fn.arg(0).to_string());
+        as_value val = ExternalInterface_as::toAS(getGlobal(fn), fn.arg(0).to_string());
         return val;
     }
     
@@ -536,9 +533,8 @@ externalinterface_uUnescapeXML(const fn_call& fn)
 
 // namespace gnash {
 
-ExternalInterface_as::ExternalInterface_as(as_object* owner)
-    : ActiveRelay(owner),
-      _exceptions(false)
+ExternalInterface_as::ExternalInterface_as(as_object* /*owner*/)
+    : _exceptions(false)
 
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
@@ -591,7 +587,7 @@ ExternalInterface_as::objectToXML(as_object *obj)
     }
 
     // Get all the properties
-    PropsSerializer props(*this, vm);
+    PropsSerializer props(vm);
     obj->visitProperties<IsEnumerable>(props);
     if (!props.success()) {
         log_error("Could not serialize object");
@@ -618,7 +614,7 @@ ExternalInterface_as::arrayToXML(as_object *obj)
     VM& vm = getVM(*obj);    
     
     ss << "<array>";
-    PropsSerializer props(*this, vm);
+    PropsSerializer props(vm);
     obj->visitProperties<IsEnumerable>(props);
     if (!props.success()) {
         log_error("Could not serialize object");
@@ -633,7 +629,7 @@ ExternalInterface_as::arrayToXML(as_object *obj)
 
 /// Convert an AS object to an XML string.
 std::string
-ExternalInterface_as::toXML(as_value &val)
+ExternalInterface_as::toXML(const as_value &val)
 {
     // GNASH_REPORT_FUNCTION;
     std::stringstream ss;
@@ -668,7 +664,7 @@ ExternalInterface_as::toXML(as_value &val)
 
 /// Convert an XML string to an AS object.
 as_value
-ExternalInterface_as::toAS(Global_as& gl, const std::string &xml)
+ExternalInterface_as::toAS(Global_as& /*gl*/, const std::string &xml)
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -723,7 +719,7 @@ ExternalInterface_as::toAS(Global_as& gl, const std::string &xml)
             //     // NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
             //     // NPVariant *value = it->second;
             // }
-            as_object *obj = new as_object(gl);
+            // as_object *obj = new as_object(gl);
         } else if (tag == "<object>") {
             start = end;
             end = xml.find("</object");
@@ -736,7 +732,7 @@ ExternalInterface_as::toAS(Global_as& gl, const std::string &xml)
             // }
             // as_object *obj = val.to_object();
             // val.set_as_object(obj); 
-            as_object *obj = new as_object(gl);
+            // as_object *obj = new as_object(gl);
         }
     }
 
@@ -753,7 +749,7 @@ ExternalInterface_as::argumentsToXML(std::vector<as_value> &args)
     ss << "<arguments>";
     for (it=args.begin(); it != args.end(); it++) {
         as_value val = *it;
-        ss << toXML(val);
+        // ss << externalinterface_uToXML(val);
     }
     ss << "</arguments>";
     
@@ -790,7 +786,7 @@ ExternalInterface_as::propertiesToAS(Global_as& gl, std::string &xml)
 }
 
 as_value
-ExternalInterface_as::objectToAS(Global_as& gl, const std::string &xml)
+ExternalInterface_as::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
 {
     // GNASH_REPORT_FUNCTION;
 
