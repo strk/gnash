@@ -150,6 +150,10 @@ public:
         _controlfd = fd;
     }
     
+    int getControlFD() const {
+        return _controlfd;
+    }
+
     void setStartFullscreen(bool x) {
         _startFullscreen = x;
     }
