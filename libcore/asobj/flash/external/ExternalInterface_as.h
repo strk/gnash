@@ -33,6 +33,9 @@ class as_object;
 class as_value;
 class ObjectURI;
 class Global_as;
+}
+
+namespace gnash {
 
 class ExternalInterface_as : public ActiveRelay
 {

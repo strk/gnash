@@ -42,6 +42,34 @@
 namespace gnash {
 
 namespace {
+as_value externalinterface_addCallback(const fn_call& fn);
+as_value externalinterface_call(const fn_call& fn);
+as_value externalInterfaceConstructor(const fn_call& fn);
+as_value externalinterface_available(const fn_call& fn);
+as_value externalinterface_marshallExceptions(const fn_call& fn);
+as_value externalinterface_objectID(const fn_call& fn);
+
+as_value externalinterface_uArgumentsToXML(const fn_call& fn);
+as_value externalinterface_uArgumentsToAS(const fn_call& fn);
+as_value externalinterface_uAddCallback(const fn_call& fn);
+as_value externalinterface_uArrayToAS(const fn_call& fn);
+as_value externalinterface_uArrayToJS(const fn_call& fn);
+as_value externalinterface_uArrayToXML(const fn_call& fn);
+as_value externalinterface_uCallIn(const fn_call& fn);
+as_value externalinterface_uCallOut(const fn_call& fn);
+as_value externalinterface_uEscapeXML(const fn_call& fn);
+as_value externalinterface_uEvalJS(const fn_call& fn);
+as_value externalinterface_uInitJS(const fn_call& fn);
+as_value externalinterface_uJsQuoteString(const fn_call& fn);
+as_value externalinterface_uObjectID(const fn_call& fn);
+as_value externalinterface_uObjectToAS(const fn_call& fn);
+as_value externalinterface_uObjectToJS(const fn_call& fn);
+as_value externalinterface_uObjectToXML(const fn_call& fn);
+as_value externalinterface_uToAS(const fn_call& fn);
+as_value externalinterface_uToJS(const fn_call& fn);
+as_value externalinterface_uToXML(const fn_call& fn);
+as_value externalinterface_uUnescapeXML(const fn_call& fn);
+}
 
 /// Class used to serialize properties of an object to a buffer
 class PropsSerializer : public AbstractPropertyVisitor
@@ -88,35 +116,6 @@ private:
     mutable bool        _error;
     std::stringstream   _xml;
 };
-}
-
-as_value externalinterface_addCallback(const fn_call& fn);
-as_value externalinterface_call(const fn_call& fn);
-as_value externalInterfaceConstructor(const fn_call& fn);
-as_value externalinterface_available(const fn_call& fn);
-as_value externalinterface_marshallExceptions(const fn_call& fn);
-as_value externalinterface_objectID(const fn_call& fn);
-
-as_value externalinterface_uArgumentsToXML(const fn_call& fn);
-as_value externalinterface_uArgumentsToAS(const fn_call& fn);
-as_value externalinterface_uAddCallback(const fn_call& fn);
-as_value externalinterface_uArrayToAS(const fn_call& fn);
-as_value externalinterface_uArrayToJS(const fn_call& fn);
-as_value externalinterface_uArrayToXML(const fn_call& fn);
-as_value externalinterface_uCallIn(const fn_call& fn);
-as_value externalinterface_uCallOut(const fn_call& fn);
-as_value externalinterface_uEscapeXML(const fn_call& fn);
-as_value externalinterface_uEvalJS(const fn_call& fn);
-as_value externalinterface_uInitJS(const fn_call& fn);
-as_value externalinterface_uJsQuoteString(const fn_call& fn);
-as_value externalinterface_uObjectID(const fn_call& fn);
-as_value externalinterface_uObjectToAS(const fn_call& fn);
-as_value externalinterface_uObjectToJS(const fn_call& fn);
-as_value externalinterface_uObjectToXML(const fn_call& fn);
-as_value externalinterface_uToAS(const fn_call& fn);
-as_value externalinterface_uToJS(const fn_call& fn);
-as_value externalinterface_uToXML(const fn_call& fn);
-as_value externalinterface_uUnescapeXML(const fn_call& fn);
 
 // extern 
 void
@@ -126,6 +125,8 @@ externalinterface_class_init(as_object& where, const ObjectURI& uri)
     const int flags = 0;
     where.init_destructive_property(uri, externalInterfaceConstructor, flags);
 }
+
+namespace {
 
 void
 attachExternalInterfaceInterface(as_object& /*o*/)
@@ -530,7 +531,7 @@ externalinterface_uUnescapeXML(const fn_call& fn)
     return as_value();
 }
 
-// } // end of anonymous namespace used for callbacks
+} // end of anonymous namespace used for callbacks
 
 // namespace gnash {
 
