@@ -760,8 +760,16 @@ public:
     /// (for browser communication mostly)
     void setHostFD(int fd)
     {
-        assert(fd > 0);
+        assert(fd >= 0);
         _hostfd = fd;
+    }
+
+    /// Set a filedescriptor to use for host application requests
+    /// (for browser communication mostly)
+    void setControlFD(int fd)
+    {
+        assert(fd >= 0);
+        _controlfd = fd;
     }
 
     /// Get the filedescriptor to use for host application requests
@@ -771,6 +779,10 @@ public:
     int getHostFD() const
     {
         return _hostfd;
+    }
+    int getControlFD() const
+    {
+        return _controlfd;
     }
 
     /// Abstract base class for FS handlers
@@ -1146,6 +1158,7 @@ private:
     //
     /// -1 if none
     int _hostfd;
+    int _controlfd;
 
     /// The display quality of the entire movie.
     //
@@ -1155,7 +1168,7 @@ private:
 
     std::bitset<4u> _alignMode;
 
-	bool _showMenu;
+    bool _showMenu;
     
     ScaleMode _scaleMode;
     
