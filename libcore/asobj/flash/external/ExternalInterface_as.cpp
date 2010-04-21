@@ -136,9 +136,13 @@ attachExternalInterfaceInterface(as_object& /*o*/)
 void
 attachExternalInterfaceStaticProperties(as_object& o)
 {
-    const int flags = PropFlags::dontEnum |
-                      PropFlags::dontDelete |
-                      PropFlags::readOnly;
+    
+    const int swf6Flags = PropFlags::dontEnum | PropFlags::dontDelete
+        | PropFlags::onlySWF6Up;
+    const int swf7Flags = PropFlags::dontEnum | PropFlags::dontDelete
+        | PropFlags::onlySWF7Up;
+    const int swf8Flags = PropFlags::dontEnum | PropFlags::dontDelete
+        | PropFlags::onlySWF8Up;
 
     Global_as& gl = getGlobal(o);
     
@@ -153,52 +157,49 @@ attachExternalInterfaceStaticProperties(as_object& o)
     
     // Initialize the methods, most of which are undocumented helper functions
     o.init_member("addCallback", gl.createFunction(
-                externalinterface_addCallback), flags);
-    o.init_member("call", gl.createFunction(externalinterface_call), flags);
+                externalinterface_addCallback), swf7Flags);
+    o.init_member("call", gl.createFunction(externalinterface_call), swf7Flags);
+    o.init_member("_argumentsToXML",
+                  gl.createFunction(externalinterface_uArgumentsToXML), swf8Flags);
+    o.init_member("_argumentsToAS",
+                  gl.createFunction(externalinterface_uArgumentsToAS), swf8Flags);
+    o.init_member("_addCallback",
+                  gl.createFunction(externalinterface_uAddCallback), swf8Flags);
+    o.init_member("_arrayToAS",
+                  gl.createFunction(externalinterface_uArrayToAS), swf8Flags);
+    o.init_member("_arrayToJS",
+                  gl.createFunction(externalinterface_uArrayToJS), swf8Flags);
+    o.init_member("_arrayToXML",
+                  gl.createFunction(externalinterface_uArrayToXML), swf8Flags);
+    o.init_member("_callIn",
+                  gl.createFunction(externalinterface_uCallIn), swf8Flags);
+    o.init_member("_callOut",
+                  gl.createFunction(externalinterface_uCallOut), swf8Flags);
+    o.init_member("_escapeXML",
+                  gl.createFunction(externalinterface_uEscapeXML), swf8Flags);
+    o.init_member("_evalJS",
+                  gl.createFunction(externalinterface_uEvalJS), swf8Flags);
+    o.init_member("_initJS",
+                  gl.createFunction(externalinterface_uInitJS), swf8Flags);
+    o.init_member("_jsQuoteString",
+                  gl.createFunction(externalinterface_uJsQuoteString), swf8Flags);
+    o.init_member("_objectID",
+                  gl.createFunction(externalinterface_uObjectID), swf8Flags);
+    o.init_member("_objectToAS",
+                  gl.createFunction(externalinterface_uObjectToAS), swf8Flags);
+    o.init_member("_objectToJS",
+                  gl.createFunction(externalinterface_uObjectToJS), swf8Flags);
+    o.init_member("_objectToXML",
+                  gl.createFunction(externalinterface_uObjectToXML), swf8Flags);
+    o.init_member("_toAS",
+                  gl.createFunction(externalinterface_uToAS), swf8Flags);
+    o.init_member("_toJS",
+                  gl.createFunction(externalinterface_uToJS), swf8Flags);
+    o.init_member("_toXML",
+                  gl.createFunction(externalinterface_uToXML), swf8Flags);
+    o.init_member("_unescapeXML",
+                  gl.createFunction(externalinterface_uUnescapeXML), swf8Flags);
 
-    if (getSWFVersion(o) > 6) {
-        o.init_member("_argumentsToXML",
-                      gl.createFunction(externalinterface_uArgumentsToXML), flags);
-        o.init_member("_argumentsToAS",
-                      gl.createFunction(externalinterface_uArgumentsToAS), flags);
-        o.init_member("_addCallback",
-                      gl.createFunction(externalinterface_uAddCallback), flags);
-        o.init_member("_arrayToAS",
-                      gl.createFunction(externalinterface_uArrayToAS), flags);
-        o.init_member("_arrayToJS",
-                      gl.createFunction(externalinterface_uArrayToJS), flags);
-        o.init_member("_arrayToXML",
-                      gl.createFunction(externalinterface_uArrayToXML), flags);
-        o.init_member("_callIn",
-                      gl.createFunction(externalinterface_uCallIn), flags);
-        o.init_member("_callOut",
-                      gl.createFunction(externalinterface_uCallOut), flags);
-        o.init_member("_escapeXML",
-                      gl.createFunction(externalinterface_uEscapeXML), flags);
-        o.init_member("_evalJS",
-                      gl.createFunction(externalinterface_uEvalJS), flags);
-        o.init_member("_initJS",
-                      gl.createFunction(externalinterface_uInitJS), flags);
-        o.init_member("_jsQuoteString",
-                      gl.createFunction(externalinterface_uJsQuoteString), flags);
-        o.init_member("_objectID",
-                      gl.createFunction(externalinterface_uObjectID), flags);
-        o.init_member("_objectToAS",
-                      gl.createFunction(externalinterface_uObjectToAS), flags);
-        o.init_member("_objectToJS",
-                      gl.createFunction(externalinterface_uObjectToJS), flags);
-        o.init_member("_objectToXML",
-                      gl.createFunction(externalinterface_uObjectToXML), flags);
-        o.init_member("_toAS",
-                      gl.createFunction(externalinterface_uToAS), flags);
-        o.init_member("_toJS",
-                      gl.createFunction(externalinterface_uToJS), flags);
-        o.init_member("_toXML",
-                      gl.createFunction(externalinterface_uToXML), flags);
-        o.init_member("_unescapeXML",
-                      gl.createFunction(externalinterface_uUnescapeXML), flags);
-    }
-    
 }
 
 as_value
