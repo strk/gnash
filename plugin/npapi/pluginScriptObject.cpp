@@ -464,14 +464,7 @@ GnashPluginScriptObject::HasProperty(NPIdentifier name)
     }
 #endif
     
-    std::map<NPIdentifier, NPVariant *>::iterator it;
-    it = _properties.find(name);
-    if (it != _properties.end()) {
-        // log_debug(" FOUND");
-        return true;
-    }
-
-    return false;
+    return _properties.find(name) != _properties.end();
 };
 
 bool
@@ -485,43 +478,16 @@ GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
         log_debug("Getting Property %d\"...", NPN_IntFromIdentifier(name));
     }
 
-    std::map<NPIdentifier, NPVariant *>::iterator it;
+    std::map<NPIdentifier, const NPVariant *>::iterator it;
     it = _properties.find(name);
-    if (it != _properties.end()) {
-//        log_debug(" FOUND = ");
-        // We have to copy the data we hold internally into the result
-        // data object, rather than just resetting the result point to
-        // our internal copy, which doesn't work.
-        NPVariant *value = it->second;
-        if (NPVARIANT_IS_DOUBLE(*value)) {
-            double num = NPVARIANT_TO_DOUBLE(*value);
-            log_debug(" %g", num);
-            DOUBLE_TO_NPVARIANT(num, *result);
-        } else if (NPVARIANT_IS_STRING(*value)) {
-            log_debug(" %s", NPVARIANT_TO_STRING(*value).UTF8Characters);
-            STRINGN_TO_NPVARIANT(NPVARIANT_TO_STRING(*value).UTF8Characters,
-                                 NPVARIANT_TO_STRING(*value).UTF8Length,
-                                 *result);
-        } else if (NPVARIANT_IS_BOOLEAN(*value)) {
-            log_debug(" %d", NPVARIANT_TO_BOOLEAN(*value));
-            BOOLEAN_TO_NPVARIANT(NPVARIANT_TO_BOOLEAN(*value), *result);
-        } else if (NPVARIANT_IS_INT32(*value)) {
-            log_debug(" %d", NPVARIANT_TO_INT32(*value));
-            INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(*value), *result);
-        } else if (NPVARIANT_IS_NULL(*value)) {
-            log_debug(" null value");
-            NULL_TO_NPVARIANT(*result);
-        } else if (NPVARIANT_IS_VOID(*value)) {
-            log_debug(" void value");
-            VOID_TO_NPVARIANT(*result);
-        } else if (NPVARIANT_IS_OBJECT(*value)) {
-            log_debug(" object");
-            OBJECT_TO_NPVARIANT(NPVARIANT_TO_OBJECT(*value), *result);
-        }
-        return true;
+    if (it == _properties.end()) {
+        return false;
     }
 
-    return false;
+    const NPVariant *value = it->second;
+    CopyVariantValue(*value, *result);
+
+    return true;
 };
 
 bool
@@ -529,7 +495,7 @@ GnashPluginScriptObject::SetProperty(NPIdentifier name, const NPVariant *value)
 {
     // log_debug(__PRETTY_FUNCTION__);
 
-    _properties[name] = const_cast<NPVariant *>(value);
+    _properties[name] = value;
 
     return false;
 }
@@ -539,7 +505,7 @@ GnashPluginScriptObject::RemoveProperty(NPIdentifier name)
 {
     // log_debug(__PRETTY_FUNCTION__);
 
-    std::map<NPIdentifier, NPVariant *>::iterator it;
+    std::map<NPIdentifier, const NPVariant *>::iterator it;
     it = _properties.find(name);
     if (it != _properties.end()) {
         _properties.erase(it);
@@ -580,14 +546,7 @@ GnashPluginScriptObject::HasMethod(NPIdentifier name)
     }
 #endif
 
-    std::map<NPIdentifier, NPInvokeFunctionPtr>::iterator it;
-    it = _methods.find(name);
-    if (it != _methods.end()) {
-        // log_debug(" FOUND");
-        return true;
-    }    
-    
-    return false;
+    return _methods.find(name) != _methods.end();
 }
 
 bool
@@ -1085,6 +1044,34 @@ GnashPluginScriptObject::handleInvokeWrapper(GIOChannel *iochan,
     log_trace(__PRETTY_FUNCTION__);
     
     return plugin->handleInvoke(iochan, cond);
+}
+
+void
+CopyVariantValue(const NPVariant& from, NPVariant& to)
+{
+    // First, we'll make a shallow copy, which is fine for most variant types.
+    to = from;
+
+    // For deep copies for strings we obviously have to duplicate the string,
+    // and object pointer copies need to have their reference count increased.
+    switch(from.type) {
+        case NPVariantType_String:
+        {
+            const NPString& fromstr = NPVARIANT_TO_STRING(from);
+            const uint32_t& len = fromstr.UTF8Length;
+
+            NPUTF8* tostr = static_cast<NPUTF8*>(NPN_MemAlloc(len));
+            std::copy(fromstr.UTF8Characters, fromstr.UTF8Characters+len, tostr);
+
+            STRINGN_TO_NPVARIANT(tostr, len, to);
+            break;
+        }
+        case NPVariantType_Object:
+            NPN_RetainObject(NPVARIANT_TO_OBJECT(to));
+            break;
+        default:
+        {}
+    }
 }
 
 // local Variables:

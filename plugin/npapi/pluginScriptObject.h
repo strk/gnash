@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <glib.h>
 
 // Test:
 //     Use browser to open plugin/scriptable-test.html.
@@ -39,11 +38,18 @@
 #include <map>
 #include <string>
 
+#include <glib.h>
 #include "npapi.h"
 #include "npruntime.h"
 
 #define READFD 0
 #define WRITEFD 1
+
+/// Makes a deep copy of a NPVariant.
+/// @param from The source NPVariant to copy values from.
+/// @param to The destination NPVariant.
+void
+CopyVariantValue(const NPVariant& from, NPVariant& to);
 
 class GnashPluginScriptObject : public NPObject
 {
@@ -173,8 +179,9 @@ private:
     void setInstance(NPP inst) { _nppinstance = inst; };
     
     // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
-    NPP         _nppinstance;
-    std::map<NPIdentifier, NPVariant *> _properties;
+    NPP _nppinstance;
+    
+    std::map<NPIdentifier, const NPVariant*> _properties;
     std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
     // 0 for reading, 1 for writing
     int         _sockfds[2];
