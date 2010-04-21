@@ -75,6 +75,8 @@ OnReadyStateChange
 FSCommand
 #endif
 
+namespace gnash {
+
 // Callbacks for the default methods
 
 // As these callbacks use a generalized typedef for the signature, often some
@@ -675,6 +677,8 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
     BOOLEAN_TO_NPVARIANT(false, *result);
     return false;
 }
+
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

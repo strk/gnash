@@ -45,6 +45,8 @@
 #define READFD 0
 #define WRITEFD 1
 
+namespace gnash {
+
 /// Makes a deep copy of a NPVariant.
 /// @param from The source NPVariant to copy values from.
 /// @param to The destination NPVariant.
@@ -189,6 +191,8 @@ private:
     // ID to watch the read channel from the player
     int         _watchid;
 };
+
+} // end of gnash namespace
 
 #endif // GNASH_PLUGIN_SCRIPT_OBJECT_H
 

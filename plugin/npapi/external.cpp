@@ -253,7 +253,6 @@ ExternalInterface::parseInvoke(const std::string &xml)
 NPVariant *
 ExternalInterface::parseXML(const std::string &xml)
 {
-
     NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
     NULL_TO_NPVARIANT(*value);
     

@@ -103,6 +103,8 @@
 #endif
 extern NPNetscapeFuncs NPNFuncs;
 
+namespace gnash {
+
 NPBool plugInitialized = FALSE;
 
 static bool waitforgdb = false;
@@ -402,7 +404,7 @@ cleanup_childpid(gpointer data)
 
     if (rv <= 0) {
         // The child process has not exited; it may be deadlocked. Kill it.
-        log_error("BUG: Child process is stuck. Killing it.");
+//        log_error("BUG: Child process is stuck. Killing it.");
 
         kill(*pid, SIGKILL);
         waitpid(*pid, &status, 0);
@@ -1199,6 +1201,8 @@ void
 processLog_trace(const boost::format& fmt)
 { /* do nothing */ }
 #endif
+
+} // end of gnash namespace
 
 // Local Variables:
 // mode: C++

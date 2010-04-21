@@ -55,6 +55,8 @@
 
 extern NPNetscapeFuncs NPNFuncs;
 
+namespace gnash {
+
 // NPClass of GnashPluginScriptObject
 static NPClass GnashPluginScriptObjectClass = {
     NP_CLASS_STRUCT_VERSION,
@@ -1071,6 +1073,8 @@ CopyVariantValue(const NPVariant& from, NPVariant& to)
         {}
     }
 }
+
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++
