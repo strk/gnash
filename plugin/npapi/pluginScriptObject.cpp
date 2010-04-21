@@ -674,8 +674,6 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
 
     // Have the read function allocate the memory
     const char *data = 0;
-    char *ptr = 0;
-    ptr = const_cast<char *>(data);
     ret = readPlayer(controlfd, &data, 0);
     if (ret == 0) {
         value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
@@ -686,7 +684,7 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
     value = ei.parseXML(data);
 
     // free the memory used for the data, as it was allocated in readPlayer().
-    NPN_MemFree(reinterpret_cast<void *>(const_cast<char *>(data)));
+    NPN_MemFree(const_cast<char *>(data));
     
     printNPVariant(value);
     

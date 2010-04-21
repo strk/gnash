@@ -243,7 +243,7 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
             BOOLEAN_TO_NPVARIANT(false, *result);
         }
         // free the memory used for the data, as it was allocated in readPlayer().
-        NPN_MemFree(reinterpret_cast<void *>(value));
+        NPN_MemFree(value);
 
         return true;
     }
@@ -404,7 +404,7 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
             INT32_TO_NPVARIANT(0, *result);
         }
         // free the memory used for the data, as it was allocated in readPlayer().
-        NPN_MemFree(reinterpret_cast<void *>(value));
+        NPN_MemFree(value);
 
         return true;
     }
@@ -667,7 +667,7 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
             INT32_TO_NPVARIANT(0, *result);
         }
         // free the memory used for the data, as it was allocated in readPlayer().
-        NPN_MemFree(reinterpret_cast<void *>(value));
+        NPN_MemFree(value);
 
         return true;
     }
