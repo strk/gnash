@@ -56,6 +56,8 @@
 #include "pluginbase.h"
 #include "pluginScriptObject.h"
 
+namespace gnash {
+
 extern NPBool      plugInitialized;
 
 class nsPluginInstance : public nsPluginInstanceBase
@@ -196,6 +198,8 @@ BOOST_PP_SEQ_FOR_EACH(GENERATE_LOG_TYPES, _, LOG_TYPES)
 
 // end of __PLUGIN_H__
 #endif
+
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

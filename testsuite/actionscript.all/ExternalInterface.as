@@ -242,7 +242,18 @@ if (typeof(r) == "object") {
 }
 
 // check(r instanceOf EI);
+if (r instanceOf EI) {
+    pass("ExternalInterface instanceOf");
+} else {
+    fail("ExternalInterface instanceOf");
+}
 
+// But it doesn't do much.
+if (r._toXML(o) == undefined) {
+    pass("ExternalInterface undefined");
+} else {
+    fail("ExternalInterface undefined");
+}
 
 xml = EI._objectToXML(nc);
 if (xml == '<object></object>') {
@@ -387,11 +398,12 @@ if (val == false) {
     fail("ExternalInterface::_toAS(false)");
 }
 
-val = EI._toAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
+val = EI._objectToAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
+trace(val);
 if (typeOf(val) == "object") {
-    xpass("ExternalInterface::_toAS(object)");
+    xpass("ExternalInterface::_objectToAS(object)");
 } else {
-    xfail("ExternalInterface::_toAS(object)");
+    xfail("ExternalInterface::_objectToAS(object)");
 }
 
 #endif  // version > 7

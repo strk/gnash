@@ -55,6 +55,8 @@
 /// request to the player while waiting for a response. So not having to wait
 /// can be a good thing to avoid issues.
 
+namespace gnash {
+
 /// Set a variable in the flash player
 ///
 /// @param npobj the NPObject to act on
@@ -286,6 +288,8 @@ extern bool TotalFrames (NPObject *npobj, NPIdentifier name,
                           NPVariant *result);
 
 #endif // GNASH_PLUGIN_CALLBACKS_H
+
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

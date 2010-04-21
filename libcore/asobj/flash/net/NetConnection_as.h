@@ -57,8 +57,8 @@ public:
         CALL_BADVERSION
     };
 
-	NetConnection_as(as_object* owner);
-	~NetConnection_as();
+    NetConnection_as(as_object* owner);
+    ~NetConnection_as();
 
     /// Process connection stuff
     virtual void update();
@@ -94,8 +94,8 @@ public:
     /// Get an stream by name
     std::auto_ptr<IOChannel> getStream(const std::string& name);
 
-	/// Mark responders associated with remoting calls
-	void markReachableResources() const;
+    /// Mark responders associated with remoting calls
+    void markReachableResources() const;
 
 private:
 
@@ -103,8 +103,8 @@ private:
 
     void getStatusCodeInfo(StatusCode code, NetConnectionStatus& info);
 
-	/// Extend the URL to be used for playing
-	void addToURL(const std::string& url);
+    /// Extend the URL to be used for playing
+    void addToURL(const std::string& url);
 
     /// Queue of call groups
     //
@@ -112,7 +112,7 @@ private:
     /// will perform a POST request containing all calls
     /// to the same uri and dispatch results.
     ///
-	std::list<ConnectionHandler*> _queuedConnections;
+    std::list<ConnectionHandler*> _queuedConnections;
 
     /// Queue of calls gathered during a single movie advancement
     //
@@ -121,8 +121,8 @@ private:
     ///
     std::auto_ptr<ConnectionHandler> _currentConnection; 
 
-	/// the url prefix optionally passed to connect()
-	std::string _uri;
+    /// the url prefix optionally passed to connect()
+    std::string _uri;
 
     bool _isConnected;
 
@@ -136,3 +136,8 @@ void netconnection_class_init(as_object& global, const ObjectURI& uri);
 } // end of gnash namespace
 
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
