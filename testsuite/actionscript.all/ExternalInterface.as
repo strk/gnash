@@ -242,7 +242,18 @@ if (typeof(r) == "object") {
 }
 
 // check(r instanceOf EI);
+if (r instanceOf EI) {
+    pass("ExternalInterface instanceOf");
+} else {
+    fail("ExternalInterface instanceOf");
+}
 
+// But it doesn't do much.
+if (r._toXML(o) == undefined) {
+    pass("ExternalInterface undefined");
+} else {
+    fail("ExternalInterface undefined");
+}
 
 xml = EI._objectToXML(nc);
 if (xml == '<object></object>') {
