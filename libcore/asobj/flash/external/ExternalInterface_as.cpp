@@ -18,6 +18,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include <map>
+#include <sstream>
+
 #include "Relay.h" // for inheritance
 #include "ExternalInterface_as.h"
 #include "as_object.h" // for inheritance
@@ -31,10 +34,10 @@
 #include "as_value.h"
 #include "as_object.h"
 #include "xml/XMLDocument_as.h"
+#include "Array_as.h"
 #include "namedStrings.h"
+#include "Global_as.h"
 #include "PropertyList.h"
-
-#include <sstream>
 
 namespace gnash {
 
@@ -340,22 +343,25 @@ externalinterface_uArgumentsToAS(const fn_call& fn)
 as_value
 externalinterface_uAddCallback(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 externalinterface_uArrayToAS(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 externalinterface_uArrayToJS(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
@@ -376,50 +382,62 @@ externalinterface_uArrayToXML(const fn_call& fn)
 as_value
 externalinterface_uCallIn(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 externalinterface_uCallOut(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 externalinterface_uEvalJS(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 externalinterface_uInitJS(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 externalinterface_uJsQuoteString(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 externalinterface_uObjectID(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
-externalinterface_uObjectToAS(const fn_call& /*fn*/)
+externalinterface_uObjectToAS(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+//    GNASH_REPORT_FUNCTION;
+    ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
+    
+    if (fn.nargs == 1) {
+        return ptr.objectToAS(getGlobal(fn), fn.arg(0).to_string());
+    }
+    
+    return as_value();
 }
 
 as_value
@@ -441,11 +459,9 @@ externalinterface_uObjectToXML(const fn_call& fn)
             std::string str = ptr.objectToXML(obj);
             return as_value(str);
         } else {
-            return "<object></object>";
+            return as_value("<object></object>");
         }
     }
-    
-//    const string_table::key key = getName(uri);    
     
     return as_value();
 }
@@ -475,10 +491,11 @@ externalinterface_uToXML(const fn_call& fn)
 as_value
 externalinterface_uToAS(const fn_call& fn)
 {
+//    GNASH_REPORT_FUNCTION;
     ExternalInterface_as &ptr = (ExternalInterface_as &)(fn);
     
     if (fn.nargs == 1) {
-        as_value val = ptr.toAS(fn.arg(0).to_string());
+        as_value val = ptr.toAS(getGlobal(fn), fn.arg(0).to_string());
         return val;
     }
     
@@ -531,17 +548,19 @@ ExternalInterface_as::~ExternalInterface_as()
 }
 
 bool
-ExternalInterface_as::addCallback(const std::string &/*name */, as_object */* method */)
+ExternalInterface_as::addCallback(const std::string &name, as_object *method)
 {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-
-    return false;
+    // GNASH_REPORT_FUNCTION;
+    _methods[name] = method;
+    
+    return true;
 }
 
 bool
-ExternalInterface_as::call(as_object */*asCallback*/, const std::string& /*methodName*/,
+ExternalInterface_as::call(as_object */*asCallback*/, const std::string& /*name*/,
                            const std::vector<as_value>& /*args*/, size_t /*firstArg*/)
 {
+    // GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
 
     return false;
@@ -647,7 +666,7 @@ ExternalInterface_as::toXML(as_value &val)
 
 /// Convert an XML string to an AS object.
 as_value
-ExternalInterface_as::toAS(const std::string &xml)
+ExternalInterface_as::toAS(Global_as& gl, const std::string &xml)
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -702,18 +721,20 @@ ExternalInterface_as::toAS(const std::string &xml)
             //     // NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
             //     // NPVariant *value = it->second;
             // }
+            as_object *obj = new as_object(gl);
         } else if (tag == "<object>") {
             start = end;
             end = xml.find("</object");
             std::string str = xml.substr(start, end-start);
-            // std::map<std::string, NPVariant *> props = parseProperties(str);
+            // std::map<std::string, as_value> props = parseProperties(str);
             // std::map<std::string, NPVariant *>::iterator it;
             // for (it=props.begin(); it != props.end(); ++it) {
             //     // NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
             //     // NPVariant *value = it->second;
             // }
-            // as_object *obj = new as_object;
-            // val = obj; 
+            // as_object *obj = val.to_object();
+            // val.set_as_object(obj); 
+            as_object *obj = new as_object(gl);
         }
     }
 
@@ -735,6 +756,43 @@ ExternalInterface_as::argumentsToXML(std::vector<as_value> &args)
     ss << "</arguments>";
     
     return as_value(ss.str());
+}
+
+std::map<std::string, as_value>
+ExternalInterface_as::propertiesToAS(Global_as& gl, std::string &xml)
+{
+    // GNASH_REPORT_FUNCTION;
+    std::map<std::string, as_value> props;
+
+    std::string::size_type start = 0;
+    std::string::size_type end;
+
+    std::string id;
+    start = xml.find(" id=");
+    while (start != std::string::npos) {
+        // Extract the id from the property tag
+        start++;
+        end = xml.find(">", start) - 1;
+        id = xml.substr(start, end-start);
+        id.erase(0, 4);
+
+        // Extract the data
+        start = end + 2;
+        end = xml.find("</property>", start) ;
+        std::string data = xml.substr(start, end-start);
+        props[id] = toAS(gl, data);
+        start = xml.find(" id=", end);
+    }
+
+    return props;
+}
+
+as_value
+ExternalInterface_as::objectToAS(Global_as& gl, const std::string &xml)
+{
+    // GNASH_REPORT_FUNCTION;
+
+    return as_value();
 }
 
 } // end of gnash namespace
