@@ -1229,5 +1229,5 @@ convertToPrimitive(as_value& v, VM& vm)
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

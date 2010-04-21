@@ -362,13 +362,12 @@ fileio_fopen(const fn_call& fn)
     FileIO* ptr = ensure<ThisIsNative<FileIO> >(fn);
     assert(ptr);
     
-    if (fn.nargs < 2)
-    {
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("FileIO.fopen(%s): need two arguments", ss.str().c_str());
-		);
-		return as_value(false);
+    if (fn.nargs < 2) {
+	IF_VERBOSE_ASCODING_ERRORS(
+	    std::stringstream ss; fn.dump_args(ss);
+	    log_aserror("FileIO.fopen(%s): need two arguments", ss.str().c_str());
+	    );
+	return as_value(false);
     }
 
     string filespec = fn.arg(0).to_string();
@@ -394,13 +393,14 @@ fileio_fread(const fn_call& fn)
     FileIO* ptr = ensure<ThisIsNative<FileIO> >(fn);
     assert(ptr);
 		
-		string str;
-		int count = ptr->fread(str);
-
-		if (count<0)
-			return as_value(false);
-		else
-			return as_value(str.c_str());    
+    string str;
+    int count = ptr->fread(str);
+    
+    if (count<0) {
+	return as_value(false);
+    } else {
+	return as_value(str.c_str());
+    }
 }
 
 as_value
@@ -411,13 +411,12 @@ fileio_fgetc(const fn_call& fn)
     assert(ptr);
     int i = ptr->fgetc();
     
-    if ((i==EOF) || (i<0)) 
-    {
-      return as_value(false);  // possible in async mode
+    if ((i==EOF) || (i<0)) {
+	return as_value(false);  // possible in async mode
     } else {
-      char c[2]="x"; // set to 1 char to get the zero byte!
-      c[0] = i;
-      return as_value(c);
+	char c[2]="x"; // set to 1 char to get the zero byte!
+	c[0] = i;
+	return as_value(c);
     }
 }
 

@@ -43,70 +43,70 @@ namespace gnash {
 // Forward declarations
 namespace {
 	
-    /// Sort flags
-	enum SortFlags {
-		/// Case-insensitive (z precedes A)
-		SORT_CASE_INSENSITIVE = (1<<0), // 1
-		/// Descending order (b precedes a)
-		SORT_DESCENDING	= (1<<1), // 2
-		/// If two or more elements in the array
-		/// have identical sort fields, return 0
-		/// and don't modify the array.
-		/// Otherwise proceed to sort the array.
-		SORT_UNIQUE	= (1<<2), // 4
-		/// Don't modify the array, rather return
-		/// a new array containing indexes into it
-		/// in sorted order.
-		SORT_RETURN_INDEX = (1<<3), // 8
-		/// Numerical sort (9 precedes 10)
-		SORT_NUMERIC = (1<<4) // 16
-	};
-    
-    class indexed_as_value;
+/// Sort flags
+enum SortFlags {
+    /// Case-insensitive (z precedes A)
+    SORT_CASE_INSENSITIVE = (1<<0), // 1
+    /// Descending order (b precedes a)
+    SORT_DESCENDING	= (1<<1), // 2
+    /// If two or more elements in the array
+    /// have identical sort fields, return 0
+    /// and don't modify the array.
+    /// Otherwise proceed to sort the array.
+    SORT_UNIQUE	= (1<<2), // 4
+    /// Don't modify the array, rather return
+    /// a new array containing indexes into it
+    /// in sorted order.
+    SORT_RETURN_INDEX = (1<<3), // 8
+    /// Numerical sort (9 precedes 10)
+    SORT_NUMERIC = (1<<4) // 16
+};
 
-    typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
+class indexed_as_value;
 
-    as_object* getArrayInterface();
-    void attachArrayInterface(as_object& proto);
-    void attachArrayStatics(as_object& proto);
+typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 
-    as_value join(as_object* array, const std::string& separator);
+as_object* getArrayInterface();
+void attachArrayInterface(as_object& proto);
+void attachArrayStatics(as_object& proto);
 
-    as_value array_new(const fn_call& fn);
-    as_value array_slice(const fn_call& fn);
-    as_value array_concat(const fn_call& fn);
-    as_value array_toString(const fn_call& fn);
-    as_value array_join(const fn_call& fn);
-    as_value array_reverse(const fn_call& fn);
-    as_value array_shift(const fn_call& fn);
-    as_value array_pop(const fn_call& fn);
-    as_value array_unshift(const fn_call& fn);
-    as_value array_push(const fn_call& fn);
-    as_value array_sortOn(const fn_call& fn);
-    as_value array_sort(const fn_call& fn);
-    as_value array_splice(const fn_call& fn);
+as_value join(as_object* array, const std::string& separator);
 
-    string_table::key getKey(const fn_call& fn, size_t i);
-	int isIndex(const std::string& name);
+as_value array_new(const fn_call& fn);
+as_value array_slice(const fn_call& fn);
+as_value array_concat(const fn_call& fn);
+as_value array_toString(const fn_call& fn);
+as_value array_join(const fn_call& fn);
+as_value array_reverse(const fn_call& fn);
+as_value array_shift(const fn_call& fn);
+as_value array_pop(const fn_call& fn);
+as_value array_unshift(const fn_call& fn);
+as_value array_push(const fn_call& fn);
+as_value array_sortOn(const fn_call& fn);
+as_value array_sort(const fn_call& fn);
+as_value array_splice(const fn_call& fn);
 
-    /// Implementation of foreachArray that takes a start and end range.
-    template<typename T> void foreachArray(as_object& array, int start,
-            int end, T& pred);
+string_table::key getKey(const fn_call& fn, size_t i);
+int isIndex(const std::string& name);
 
-    inline bool int_lt_or_eq (int a) {
-        return a <= 0;
-    }
+/// Implementation of foreachArray that takes a start and end range.
+template<typename T> void foreachArray(as_object& array, int start,
+				       int end, T& pred);
 
-    inline bool int_gt (int a) {
-        return a > 0;
-    }
+inline bool int_lt_or_eq (int a) {
+    return a <= 0;
+}
 
-    void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
+inline bool int_gt (int a) {
+    return a > 0;
+}
 
-    void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
+void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
 
-    /// Set the length property of an object only if it is a genuine array.
-    void setArrayLength(as_object& o, const int size);
+void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
+
+/// Set the length property of an object only if it is a genuine array.
+void setArrayLength(as_object& o, const int size);
 
     void resizeArray(as_object& o, const int size);
 }
@@ -116,12 +116,12 @@ namespace {
 
 struct indexed_as_value : public as_value
 {
-	int vec_index;
-
-	indexed_as_value(const as_value& val, int index)
+    int vec_index;
+    
+    indexed_as_value(const as_value& val, int index)
 	: as_value(val)
 	{
-		vec_index = index;
+	    vec_index = index;
 	}
 };
 
@@ -1153,7 +1153,7 @@ array_sortOn(const fn_call& fn)
                 foreachArray(*farray, mf);
                 do_unique = mf.unique();
                 do_index = mf.index();
-
+                
                 std::vector<boost::uint8_t>::const_iterator it = 
                     flgs.begin();
 
@@ -1370,7 +1370,6 @@ array_concat(const fn_call& fn)
         as_object* other = arg.to_object(gl);
 
         if (other) {
-            
             // If it's not an array, we want to carry on and add it as an
             // object.
             if (other->instanceOf(getClassConstructor(fn, "Array"))) {
@@ -1564,6 +1563,6 @@ isIndex(const std::string& nameString)
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
 

@@ -133,51 +133,50 @@ class as_super : public as_object
 {
 public:
 
-	as_super(Global_as& gl, as_object* super)
-		:
-        as_object(gl),
-		_super(super)
+    as_super(Global_as& gl, as_object* super)
+        : as_object(gl),
+          _super(super)
 	{
-		set_prototype(prototype());
+            set_prototype(prototype());
 	}
 
-	virtual bool isSuper() const { return true; }
+    virtual bool isSuper() const { return true; }
 
-	virtual as_object* get_super(string_table::key fname = 0);
+    virtual as_object* get_super(string_table::key fname = 0);
 
-	// Fetching members from 'super' yelds a lookup on the associated prototype
-	virtual bool get_member(const ObjectURI& uri, as_value* val)
+    // Fetching members from 'super' yelds a lookup on the associated prototype
+    virtual bool get_member(const ObjectURI& uri, as_value* val)
 	{
-        as_object* proto = prototype();
-		if (proto) return proto->get_member(uri, val);
-		log_debug("Super has no associated prototype");
-		return false;
+            as_object* proto = prototype();
+            if (proto) return proto->get_member(uri, val);
+            log_debug("Super has no associated prototype");
+            return false;
 	}
 
-	/// Dispatch.
-	virtual as_value call(const fn_call& fn)
+    /// Dispatch.
+    virtual as_value call(const fn_call& fn)
 	{
 
-        // TODO: this is a hack to make sure objects are constructed, not
-        // converted (fn.isInstantiation() must be true).
-        fn_call::Args::container_type argsIn(fn.getArgs());
-        fn_call::Args args;
-        args.swap(argsIn);
+            // TODO: this is a hack to make sure objects are constructed, not
+            // converted (fn.isInstantiation() must be true).
+            fn_call::Args::container_type argsIn(fn.getArgs());
+            fn_call::Args args;
+            args.swap(argsIn);
 
-        fn_call fn2(fn.this_ptr, fn.env(), args, fn.super, true);
-        assert(fn2.isInstantiation());
-        as_function* ctor = constructor();
-		if (ctor) return ctor->call(fn2);
-		log_debug("Super has no associated constructor");
-		return as_value();
+            fn_call fn2(fn.this_ptr, fn.env(), args, fn.super, true);
+            assert(fn2.isInstantiation());
+            as_function* ctor = constructor();
+            if (ctor) return ctor->call(fn2);
+            log_debug("Super has no associated constructor");
+            return as_value();
 	}
 
 protected:
 
-	virtual void markReachableResources() const
+    virtual void markReachableResources() const
 	{
-		if (_super) _super->setReachable();
-		markAsObjectReachable();
+            if (_super) _super->setReachable();
+            markAsObjectReachable();
 	}
 
 private:
@@ -190,19 +189,19 @@ private:
         return _super ? getConstructor(*_super) : 0;
     }
 
-	as_object* _super;
+    as_object* _super;
 };
 
 as_object*
 as_super::get_super(string_table::key fname)
 {
-	// Super references the super class of our class prototype.
-	// Our class prototype is __proto__.
-	// Our class superclass prototype is __proto__.__proto__
+    // Super references the super class of our class prototype.
+    // Our class prototype is __proto__.
+    // Our class superclass prototype is __proto__.__proto__
 
-	// Our class prototype is __proto__.
-	as_object* proto = get_prototype(); 
-	if (!proto) return new as_super(getGlobal(*this), 0);
+    // Our class prototype is __proto__.
+    as_object* proto = get_prototype(); 
+    if (!proto) return new as_super(getGlobal(*this), 0);
 
     if (!fname || getSWFVersion(*this) <= 6) {
         return new as_super(getGlobal(*this), proto);
@@ -239,39 +238,39 @@ class PropsCopier : public AbstractPropertyVisitor
 
 public:
 
-	/// \brief
-	/// Initialize a PropsCopier instance associating it
-	/// with a target object (an object whose members has to be set)
-	///
-	PropsCopier(as_object& tgt)
-		:
-		_tgt(tgt)
+    /// \brief
+    /// Initialize a PropsCopier instance associating it
+    /// with a target object (an object whose members has to be set)
+    ///
+    PropsCopier(as_object& tgt)
+        :
+        _tgt(tgt)
 	{}
 
-	/// Set *inherited* properties of the given target object
-	bool accept(const ObjectURI& uri, const as_value& val) {
-		if (getName(uri) == NSV::PROP_uuPROTOuu) return true;
-		_tgt.set_member(uri, val);
+    /// Set *inherited* properties of the given target object
+    bool accept(const ObjectURI& uri, const as_value& val) {
+        if (getName(uri) == NSV::PROP_uuPROTOuu) return true;
+        _tgt.set_member(uri, val);
         return true;
-	}
+    }
 private:
-	as_object& _tgt;
+    as_object& _tgt;
 };
 
 class PropertyEnumerator : public AbstractPropertyVisitor
 {
 public:
     PropertyEnumerator(const as_object& this_ptr,
-            as_object::SortedPropertyList& to)
+                       as_object::SortedPropertyList& to)
         :
         _version(getSWFVersion(this_ptr)),
         _st(getStringTable(this_ptr)),
         _to(to)
-    {}
+        {}
 
     bool accept(const ObjectURI& uri, const as_value& val) {
-		_to.push_front(std::make_pair(_st.value(getName(uri)),
-				val.to_string(_version)));
+        _to.push_front(std::make_pair(_st.value(getName(uri)),
+                                      val.to_string(_version)));
         return true;
     }
 
@@ -287,17 +286,17 @@ private:
 const int as_object::DefaultFlags;
 
 as_object::as_object(Global_as& gl)
-	:
+    :
     _displayObject(0),
     _array(false),
     _relay(0),
-	_vm(getVM(gl)),
-	_members(*this)
+    _vm(getVM(gl)),
+    _members(*this)
 {
 }
 
 as_object::as_object(VM& vm)
-	:
+    :
     _displayObject(0),
     _array(false),
     _relay(0),
@@ -329,60 +328,60 @@ as_object::stringValue() const
 std::pair<bool,bool>
 as_object::delProperty(const ObjectURI& uri)
 {
-	return _members.delProperty(uri);
+    return _members.delProperty(uri);
 }
 
 
 void
 as_object::add_property(const std::string& name, as_function& getter,
-		as_function* setter)
+                        as_function* setter)
 {
-	string_table& st = getStringTable(*this);
-	string_table::key k = st.find(name);
+    string_table& st = getStringTable(*this);
+    string_table::key k = st.find(name);
 
-	as_value cacheVal;
+    as_value cacheVal;
 
-	Property* prop = _members.getProperty(k);
+    Property* prop = _members.getProperty(k);
 
     if (prop) {
-		cacheVal = prop->getCache();
+        cacheVal = prop->getCache();
         // Used to return the return value of addGetterSetter, but this
         // is always true.
-		_members.addGetterSetter(k, getter, setter, cacheVal);
+        _members.addGetterSetter(k, getter, setter, cacheVal);
         return;
-		// NOTE: watch triggers not called when adding a new
+        // NOTE: watch triggers not called when adding a new
         // getter-setter property
-	}
-	else {
+    }
+    else {
 
-		_members.addGetterSetter(k, getter, setter, cacheVal);
+        _members.addGetterSetter(k, getter, setter, cacheVal);
 
         // Nothing more to do if there are no triggers.
         if (!_trigs.get()) return;
 
-		// check if we have a trigger, if so, invoke it
-		// and set val to its return
-		TriggerContainer::iterator trigIter = _trigs->find(ObjectURI(k, 0));
-		if (trigIter != _trigs->end()) {
-			Trigger& trig = trigIter->second;
+        // check if we have a trigger, if so, invoke it
+        // and set val to its return
+        TriggerContainer::iterator trigIter = _trigs->find(ObjectURI(k, 0));
+        if (trigIter != _trigs->end()) {
+            Trigger& trig = trigIter->second;
 
-			log_debug("add_property: property %s is being watched, "
-                    "current val: %s", name, cacheVal);
-			cacheVal = trig.call(cacheVal, as_value(), *this);
+            log_debug("add_property: property %s is being watched, "
+                      "current val: %s", name, cacheVal);
+            cacheVal = trig.call(cacheVal, as_value(), *this);
 
-			// The trigger call could have deleted the property,
-			// so we check for its existence again, and do NOT put
-			// it back in if it was deleted
-			prop = _members.getProperty(k);
-			if (!prop) {
-				log_debug("Property %s deleted by trigger on create "
-                        "(getter-setter)", name);
-				return;
-			}
-			prop->setCache(cacheVal);
-		}
-		return;
-	}
+            // The trigger call could have deleted the property,
+            // so we check for its existence again, and do NOT put
+            // it back in if it was deleted
+            prop = _members.getProperty(k);
+            if (!prop) {
+                log_debug("Property %s deleted by trigger on create "
+                          "(getter-setter)", name);
+                return;
+            }
+            prop->setCache(cacheVal);
+        }
+        return;
+    }
 }
 
 
@@ -397,13 +396,13 @@ as_object::add_property(const std::string& name, as_function& getter,
 bool
 as_object::get_member(const ObjectURI& uri, as_value* val)
 {
-	assert(val);
+    assert(val);
 
     const int version = getSWFVersion(*this);
 
     PrototypeRecursor<IsVisible> pr(this, uri, IsVisible(version));
 	
-	Property* prop = pr.getProperty();
+    Property* prop = pr.getProperty();
     if (!prop) {
         if (displayObject()) {
             DisplayObject* d = displayObject();
@@ -432,20 +431,20 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
         return true;
     }
 
-	try {
-		*val = prop->getValue(*this);
-		return true;
-	}
-	catch (ActionLimitException& exc) {
-		// will be logged by outer catcher
-		throw;
-	}
-	catch (ActionTypeError& exc) {
+    try {
+        *val = prop->getValue(*this);
+        return true;
+    }
+    catch (ActionLimitException& exc) {
+        // will be logged by outer catcher
+        throw;
+    }
+    catch (ActionTypeError& exc) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Caught exception: %s"), exc.what());
-        );
-		return false;
-	}
+            );
+        return false;
+    }
 
 }
 
@@ -453,78 +452,78 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
 const Property*
 as_object::getByIndex(int index)
 {
-	// The low byte is used to contain the depth of the property.
-	unsigned char depth = index & 0xFF;
-	index /= 256; // Signed
-	as_object *obj = this;
-	while (depth--)
+    // The low byte is used to contain the depth of the property.
+    unsigned char depth = index & 0xFF;
+    index /= 256; // Signed
+    as_object *obj = this;
+    while (depth--)
 	{
-		obj = obj->get_prototype();
-		if (!obj)
-			return NULL;
+            obj = obj->get_prototype();
+            if (!obj)
+                return NULL;
 	}
 
-	return obj->_members.getPropertyByOrder(index);
+    return obj->_members.getPropertyByOrder(index);
 }
 
 as_object*
 as_object::get_super(string_table::key fname)
 {
-	// Super references the super class of our class prototype.
-	// Our class prototype is __proto__.
-	// Our class superclass prototype is __proto__.__proto__
+    // Super references the super class of our class prototype.
+    // Our class prototype is __proto__.
+    // Our class superclass prototype is __proto__.__proto__
 
-	// Our class prototype is __proto__.
-	as_object* proto = get_prototype();
+    // Our class prototype is __proto__.
+    as_object* proto = get_prototype();
 
-	if (fname && getSWFVersion(*this) > 6) {
-		as_object* owner = 0;
-		findProperty(fname, &owner);
+    if (fname && getSWFVersion(*this) > 6) {
+        as_object* owner = 0;
+        findProperty(fname, &owner);
         // should be 0 if findProperty returned 0
-		if (owner != this) proto = owner; 
-	}
+        if (owner != this) proto = owner; 
+    }
 
-	as_object* super = new as_super(getGlobal(*this), proto);
+    as_object* super = new as_super(getGlobal(*this), proto);
 
-	return super;
+    return super;
 }
 
 int
 as_object::nextIndex(int index, as_object **owner)
 {
-skip_duplicates:
-	unsigned char depth = index & 0xFF;
-	unsigned char i = depth;
-	index /= 256; // Signed
-	as_object *obj = this;
-	while (i--)
+  skip_duplicates:
+    unsigned char depth = index & 0xFF;
+    unsigned char i = depth;
+    index /= 256; // Signed
+    as_object *obj = this;
+    while (i--)
 	{
-		obj = obj->get_prototype();
-		if (!obj)
-			return 0;
+            obj = obj->get_prototype();
+            if (!obj)
+                return 0;
 	}
 	
-	const Property *p = obj->_members.getOrderAfter(index);
-	if (!p)
+    const Property *p = obj->_members.getOrderAfter(index);
+    if (!p)
 	{
-		obj = obj->get_prototype();
-		if (!obj)
-			return 0;
-		p = obj->_members.getOrderAfter(0);
-		++depth;
+            obj = obj->get_prototype();
+            if (!obj)
+                return 0;
+            p = obj->_members.getOrderAfter(0);
+            ++depth;
 	}
-	if (p)
+    if (p)
 	{
-		if (findProperty(p->uri()) != p)
+            if (findProperty(p->uri()) != p)
 		{
-			index = p->getOrder() * 256 | depth;
-			goto skip_duplicates; // Faster than recursion.
+                    index = p->getOrder() * 256 | depth;
+                    goto skip_duplicates; // Faster than recursion.
 		}
-		if (owner)
-			*owner = obj;
-		return p->getOrder() * 256 | depth;
+            if (owner)
+                *owner = obj;
+            return p->getOrder() * 256 | depth;
 	}
-	return 0;
+    return 0;
 }
 
 /*private*/
@@ -541,8 +540,8 @@ as_object::findProperty(const ObjectURI& uri, as_object **owner)
         if (prop) return prop;
     } while (pr());
 
-	// No Property found
-	return 0;
+    // No Property found
+    return 0;
 }
 
 Property*
@@ -551,48 +550,48 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 
     PrototypeRecursor<Exists> pr(this, uri);
 
-	Property* prop = pr.getProperty();
+    Property* prop = pr.getProperty();
 
-	// We won't scan the inheritance chain if we find a member,
-	// even if invisible.
-	if (prop) return prop; 
+    // We won't scan the inheritance chain if we find a member,
+    // even if invisible.
+    if (prop) return prop; 
 	
     const int swfVersion = getSWFVersion(*this);
 
     while (pr()) {
         if ((prop = pr.getProperty())) {
             if ((prop->isStatic() || prop->isGetterSetter()) &&
-                    prop->visible(swfVersion)) {
+                prop->visible(swfVersion)) {
                 return prop;
             }
         }
-	}
-	return 0;
+    }
+    return 0;
 }
 
 void
 as_object::set_prototype(const as_value& proto)
 {
-	// TODO: check what happens if __proto__ is set as a user-defined 
+    // TODO: check what happens if __proto__ is set as a user-defined 
     // getter/setter
-	// TODO: check triggers !!
+    // TODO: check triggers !!
     // Note that this sets __proto__ in namespace 0
-	_members.setValue(NSV::PROP_uuPROTOuu, proto, as_object::DefaultFlags);
+    _members.setValue(NSV::PROP_uuPROTOuu, proto, as_object::DefaultFlags);
 }
 
 void
 as_object::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 {
-	_members.reserveSlot(uri, slotId);
+    _members.reserveSlot(uri, slotId);
 }
 
 bool
 as_object::get_member_slot(int order, as_value* val){
 	
-	const Property* prop = _members.getPropertyByOrder(order);
-	if (prop) {
-		return get_member(prop->uri(), val);
-	}
+    const Property* prop = _members.getPropertyByOrder(order);
+    if (prop) {
+        return get_member(prop->uri(), val);
+    }
     return false;
 }
 
@@ -600,16 +599,16 @@ as_object::get_member_slot(int order, as_value* val){
 bool
 as_object::set_member_slot(int order, const as_value& val, bool ifFound)
 {
-	const Property* prop = _members.getPropertyByOrder(order);
-	if (prop) {
-		return set_member(prop->uri(), val, ifFound);
-	}
+    const Property* prop = _members.getPropertyByOrder(order);
+    if (prop) {
+        return set_member(prop->uri(), val, ifFound);
+    }
     return false;
 }
 
 void
 as_object::executeTriggers(Property* prop, const ObjectURI& uri,
-        const as_value& val)
+                           const as_value& val)
 {
 
     // check if we have a trigger, if so, invoke it
@@ -642,7 +641,7 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     
     // This is a particularly clear and concise way of removing dead triggers.
     EraseIf(*_trigs, boost::bind(boost::mem_fn(&Trigger::dead), 
-            boost::bind(SecondElement<TriggerContainer::value_type>(), _1)));
+                                 boost::bind(SecondElement<TriggerContainer::value_type>(), _1)));
                     
     // The trigger call could have deleted the property,
     // so we check for its existence again, and do NOT put
@@ -680,213 +679,212 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
 
     PrototypeRecursor<Exists> pr(this, uri);
 
-	Property* prop = pr.getProperty();
+    Property* prop = pr.getProperty();
 
-	// We won't scan the inheritance chain if we find a member,
-	// even if invisible.
-	if (!prop) { 
-
+    // We won't scan the inheritance chain if we find a member,
+    // even if invisible.
+    if (!prop) { 
+            
         if (displayObject()) {
             DisplayObject* d = displayObject();
             if (setDisplayObjectProperty(*d, getName(uri), val)) return true;
             // TODO: should we execute triggers?
         }
-
+            
         const int version = getSWFVersion(*this);
         while (pr()) {
             if ((prop = pr.getProperty())) {
                 if ((prop->isStatic() || prop->isGetterSetter()) &&
-                        prop->visible(version)) {
+                    prop->visible(version)) {
                     break;
                 }
                 else prop = 0;
             }
         }
     }
-
+        
     if (prop) {
-
-		if (prop->isReadOnly()) {
-			IF_VERBOSE_ASCODING_ERRORS(
+        if (prop->isReadOnly()) {
+            IF_VERBOSE_ASCODING_ERRORS(
                 ObjectURI::Logger l(getStringTable(*this));
                 log_aserror(_("Attempt to set read-only property '%s'"),
-                    l(uri));
-            );
-			return true;
-		}
-
-		try {
+                            l(uri));
+                );
+            return true;
+        }
+            
+        try {
             executeTriggers(prop, uri, val);
-		}
-		catch (ActionTypeError& exc) {
-			log_aserror(_("%s: Exception %s. Will create a new member"),
-				getStringTable(*this).value(getName(uri)), exc.what());
-		}
-
-		return true;
-	}
-
-	// Else, add new property...
-	if (ifFound) return false;
-
-	// Property does not exist, so it won't be read-only. Set it.
-	if (!_members.setValue(uri, val)) {
-
-		IF_VERBOSE_ASCODING_ERRORS(
+        }
+        catch (ActionTypeError& exc) {
+            log_aserror(_("%s: Exception %s. Will create a new member"),
+                        getStringTable(*this).value(getName(uri)), exc.what());
+        }
+            
+        return true;
+    }
+        
+    // Else, add new property...
+    if (ifFound) return false;
+        
+    // Property does not exist, so it won't be read-only. Set it.
+    if (!_members.setValue(uri, val)) {
+            
+        IF_VERBOSE_ASCODING_ERRORS(
             ObjectURI::Logger l(getStringTable(*this));
-			log_aserror(_("Unknown failure in setting property '%s' on "
-			"object '%p'"), l(uri), (void*) this);
-	    );
-		return false;
-	}
-
+            log_aserror(_("Unknown failure in setting property '%s' on "
+                          "object '%p'"), l(uri), (void*) this);
+            );
+        return false;
+    }
+        
     executeTriggers(prop, uri, val);
-
+        
     // Return true if we found a textfield variable.
     if (tfVarFound) return true;
-
-	return false;
+        
+    return false;
 }
 
 
 void
 as_object::init_member(const std::string& key1, const as_value& val, int flags,
-	string_table::key nsname)
+                       string_table::key nsname)
 {
-	const ObjectURI uri(getStringTable(*this).find(key1), nsname);
-	init_member(uri, val, flags);
+    const ObjectURI uri(getStringTable(*this).find(key1), nsname);
+    init_member(uri, val, flags);
 }
 
 void
 as_object::init_member(const ObjectURI& uri, const as_value& val, int flags,
-	int order)
+                       int order)
 {
 
-	if (order >= 0 && !_members.reserveSlot(uri,
-                static_cast<boost::uint16_t>(order))) {
-		log_error(_("Attempt to set a slot for either a slot or a property "
-			"which already exists."));
-		return;
-	}
+    if (order >= 0 && !_members.reserveSlot(uri,
+                                            static_cast<boost::uint16_t>(order))) {
+        log_error(_("Attempt to set a slot for either a slot or a property "
+                    "which already exists."));
+        return;
+    }
 		
-	// Set (or create) a SimpleProperty 
-	if (!_members.setValue(uri, val, flags)) {
+    // Set (or create) a SimpleProperty 
+    if (!_members.setValue(uri, val, flags)) {
         ObjectURI::Logger l(getStringTable(*this));
-		log_error(_("Attempt to initialize read-only property ``%s''"
-			" on object ``%p'' twice"), l(uri), (void*)this);
-		// We shouldn't attempt to initialize a member twice, should we ?
-		abort();
-	}
+        log_error(_("Attempt to initialize read-only property ``%s''"
+                    " on object ``%p'' twice"), l(uri), (void*)this);
+        // We shouldn't attempt to initialize a member twice, should we ?
+        abort();
+    }
 }
 
 void
 as_object::init_property(const std::string& key, as_function& getter,
-		as_function& setter, int flags, string_table::key nsname)
+                         as_function& setter, int flags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(key);
-	init_property(ObjectURI(k, nsname), getter, setter, flags);
+    string_table::key k = getStringTable(*this).find(key);
+    init_property(ObjectURI(k, nsname), getter, setter, flags);
 }
 
 void
 as_object::init_property(const ObjectURI& uri, as_function& getter,
-		as_function& setter, int flags)
+                         as_function& setter, int flags)
 {
-	as_value cacheValue;
+    as_value cacheValue;
 
     // PropertyList::addGetterSetter always returns true (used to be
     // an assert).
-	_members.addGetterSetter(uri, getter, &setter, cacheValue, flags);
+    _members.addGetterSetter(uri, getter, &setter, cacheValue, flags);
 }
 
 void
 as_object::init_property(const std::string& key, as_c_function_ptr getter,
-		as_c_function_ptr setter, int flags, string_table::key nsname)
+                         as_c_function_ptr setter, int flags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(key);
-	init_property(ObjectURI(k, nsname), getter, setter, flags);
+    string_table::key k = getStringTable(*this).find(key);
+    init_property(ObjectURI(k, nsname), getter, setter, flags);
 }
 
 void
 as_object::init_property(const ObjectURI& uri, as_c_function_ptr getter,
-		as_c_function_ptr setter, int flags)
+                         as_c_function_ptr setter, int flags)
 {
     // PropertyList::addGetterSetter always returns true (used to be
     // an assert).
-	_members.addGetterSetter(uri, getter, setter, flags);
+    _members.addGetterSetter(uri, getter, setter, flags);
 }
 
 bool
 as_object::init_destructive_property(const ObjectURI& uri, as_function& getter,
-        int flags)
+                                     int flags)
 {
-	// No case check, since we've already got the key.
-	bool success = _members.addDestructiveGetter(uri, getter, flags);
-	return success;
+    // No case check, since we've already got the key.
+    bool success = _members.addDestructiveGetter(uri, getter, flags);
+    return success;
 }
 
 bool
 as_object::init_destructive_property(const ObjectURI& uri,
-        as_c_function_ptr getter, int flags)
+                                     as_c_function_ptr getter, int flags)
 {
-	// No case check, since we've already got the key.
-	bool success = _members.addDestructiveGetter(uri, getter, flags);
-	return success;
+    // No case check, since we've already got the key.
+    bool success = _members.addDestructiveGetter(uri, getter, flags);
+    return success;
 }
 
 void
 as_object::init_readonly_property(const std::string& key, as_function& getter,
-	int initflags, string_table::key nsname)
+                                  int initflags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(key);
+    string_table::key k = getStringTable(*this).find(key);
 
-	init_property(ObjectURI(k, nsname), getter, getter,
-            initflags | PropFlags::readOnly | PropFlags::isProtected);
-	assert(_members.getProperty(ObjectURI(k, nsname)));
+    init_property(ObjectURI(k, nsname), getter, getter,
+                  initflags | PropFlags::readOnly | PropFlags::isProtected);
+    assert(_members.getProperty(ObjectURI(k, nsname)));
 }
 
 void
 as_object::init_readonly_property(const ObjectURI& uri, as_function& getter,
-        int initflags)
+                                  int initflags)
 {
-	init_property(uri, getter, getter,
-            initflags | PropFlags::readOnly | PropFlags::isProtected);
-	assert(_members.getProperty(uri));
+    init_property(uri, getter, getter,
+                  initflags | PropFlags::readOnly | PropFlags::isProtected);
+    assert(_members.getProperty(uri));
 }
 
 void
 as_object::init_readonly_property(const std::string& key,
-        as_c_function_ptr getter, int initflags, string_table::key nsname)
+                                  as_c_function_ptr getter, int initflags, string_table::key nsname)
 {
-	string_table::key k = getStringTable(*this).find(key);
+    string_table::key k = getStringTable(*this).find(key);
 
-	init_property(ObjectURI(k, nsname), getter, getter,
-            initflags | PropFlags::readOnly | PropFlags::isProtected);
-	assert(_members.getProperty(ObjectURI(k, nsname)));
+    init_property(ObjectURI(k, nsname), getter, getter,
+                  initflags | PropFlags::readOnly | PropFlags::isProtected);
+    assert(_members.getProperty(ObjectURI(k, nsname)));
 }
 
 void
 as_object::init_readonly_property(const ObjectURI& uri,
-        as_c_function_ptr getter, int initflags)
+                                  as_c_function_ptr getter, int initflags)
 {
-	init_property(uri, getter, getter, initflags | PropFlags::readOnly
-		| PropFlags::isProtected);
-	assert(_members.getProperty(uri));
+    init_property(uri, getter, getter, initflags | PropFlags::readOnly
+                  | PropFlags::isProtected);
+    assert(_members.getProperty(uri));
 }
 
 
 bool
 as_object::set_member_flags(const ObjectURI& uri, int setTrue, int setFalse)
 {
-	return _members.setFlags(uri, setTrue, setFalse);
+    return _members.setFlags(uri, setTrue, setFalse);
 }
 
 void
 as_object::addInterface(as_object* obj)
 {
-	assert(obj);
-	if (std::find(_interfaces.begin(), _interfaces.end(), obj) ==
-            _interfaces.end()) {
-		_interfaces.push_back(obj);
+    assert(obj);
+    if (std::find(_interfaces.begin(), _interfaces.end(), obj) ==
+        _interfaces.end()) {
+        _interfaces.push_back(obj);
     }
 }
 
@@ -897,110 +895,110 @@ as_object::instanceOf(as_object* ctor)
     /// An object is never an instance of a null prototype.
     if (!ctor) return false;
 
-	as_value protoVal;
-	if (!ctor->get_member(NSV::PROP_PROTOTYPE, &protoVal)) {
+    as_value protoVal;
+    if (!ctor->get_member(NSV::PROP_PROTOTYPE, &protoVal)) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
-		log_debug("Object %p can't be an instance of an object (%p) "
-                "with no 'prototype'",
-			(void*)this, (void*)ctor);
+        log_debug("Object %p can't be an instance of an object (%p) "
+                  "with no 'prototype'",
+                  (void*)this, (void*)ctor);
 #endif
-		return false;
-	}
+        return false;
+    }
 
-	as_object* ctorProto = protoVal.to_object(getGlobal(*this));
-	if (!ctorProto) {
+    as_object* ctorProto = protoVal.to_object(getGlobal(*this));
+    if (!ctorProto) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
-		log_debug("Object %p can't be an instance of an object (%p) "
-                "with non-object 'prototype' (%s)",
-			(void*)this, (void*)ctor, protoVal);
+        log_debug("Object %p can't be an instance of an object (%p) "
+                  "with non-object 'prototype' (%s)",
+                  (void*)this, (void*)ctor, protoVal);
 #endif
-		return false;
-	}
+        return false;
+    }
 
-	// TODO: cleanup the iteration, make it more readable ...
-	std::set<as_object*> visited;
+    // TODO: cleanup the iteration, make it more readable ...
+    std::set<as_object*> visited;
 
-	as_object* obj = this;
-	while (obj && visited.insert(obj).second) {
-		as_object* thisProto = obj->get_prototype();
-		if (!thisProto) {
-			break;
-		}
+    as_object* obj = this;
+    while (obj && visited.insert(obj).second) {
+        as_object* thisProto = obj->get_prototype();
+        if (!thisProto) {
+            break;
+        }
 
-		// Check our proto
-		if (thisProto == ctorProto) {
+        // Check our proto
+        if (thisProto == ctorProto) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
-			log_debug("Object %p is an instance of constructor %p as "
-                    "the constructor exposes our __proto__ %p",
-				(void*)obj, (void*)ctor, (void*)thisProto);
+            log_debug("Object %p is an instance of constructor %p as "
+                      "the constructor exposes our __proto__ %p",
+                      (void*)obj, (void*)ctor, (void*)thisProto);
 #endif
-			return true;
-		}
+            return true;
+        }
 
-		// Check our proto interfaces
-		if (std::find(thisProto->_interfaces.begin(),
-                    thisProto->_interfaces.end(), ctorProto)
-                != thisProto->_interfaces.end()) {
+        // Check our proto interfaces
+        if (std::find(thisProto->_interfaces.begin(),
+                      thisProto->_interfaces.end(), ctorProto)
+            != thisProto->_interfaces.end()) {
 
 #ifdef GNASH_DEBUG_INSTANCE_OF
-			log_debug("Object %p __proto__ %p had one interface matching "
-                    "with the constructor prototype %p",
-				(void*)obj, (void*)thisProto, (void*)ctorProto);
+            log_debug("Object %p __proto__ %p had one interface matching "
+                      "with the constructor prototype %p",
+                      (void*)obj, (void*)thisProto, (void*)ctorProto);
 #endif
-			return true;
-		}
+            return true;
+        }
 
-		obj = thisProto;
-	}
+        obj = thisProto;
+    }
 
-	return false;
+    return false;
 }
 
 bool
 as_object::prototypeOf(as_object& instance)
 {
-	boost::intrusive_ptr<as_object> obj = &instance;
+    boost::intrusive_ptr<as_object> obj = &instance;
 
-	std::set<as_object*> visited;
+    std::set<as_object*> visited;
 
-	while (obj && visited.insert(obj.get()).second )
+    while (obj && visited.insert(obj.get()).second )
 	{
-		if ( obj->get_prototype() == this ) return true;
-		obj = obj->get_prototype(); 
+            if ( obj->get_prototype() == this ) return true;
+            obj = obj->get_prototype(); 
 	}
 
-	// See actionscript.all/Inheritance.as for a way to trigger this
-	IF_VERBOSE_ASCODING_ERRORS(
+    // See actionscript.all/Inheritance.as for a way to trigger this
+    IF_VERBOSE_ASCODING_ERRORS(
         if (obj) log_aserror(_("Circular inheritance chain detected "
-                "during isPrototypeOf call"));
+                               "during isPrototypeOf call"));
 	);
 
-	return false;
+    return false;
 }
 
 void
 as_object::dump_members() 
 {
-	log_debug(_("%d members of object %p follow"),
-		_members.size(), (const void*)this);
-	_members.dump();
+    log_debug(_("%d members of object %p follow"),
+              _members.size(), (const void*)this);
+    _members.dump();
 }
 
 void
 as_object::dump_members(std::map<std::string, as_value>& to)
 {
-	_members.dump(to);
+    _members.dump(to);
 }
 
 void
 as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 {
 
-	if (props_val.is_null()) {
-		// Take all the members of the object
-		_members.setFlagsAll(set_true, set_false);
-		return;
-	}
+    if (props_val.is_null()) {
+        // Take all the members of the object
+        _members.setFlagsAll(set_true, set_false);
+        return;
+    }
 
     std::string propstr = props_val.to_string();
 
@@ -1018,14 +1016,14 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 
         // set_member_flags will take care of case conversion
         if (!set_member_flags(getStringTable(*this).find(prop), set_true,
-                    set_false) )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Can't set propflags on object "
-                "property %s "
-                "(either not found or protected)"),	prop);
-            );
-        }
+                              set_false) )
+            {
+                IF_VERBOSE_ASCODING_ERRORS(
+                    log_aserror(_("Can't set propflags on object "
+                                  "property %s "
+                                  "(either not found or protected)"),	prop);
+                    );
+            }
 
         if (next_comma == std::string::npos) {
             break;
@@ -1038,51 +1036,51 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 void
 as_object::copyProperties(const as_object& o)
 {
-	PropsCopier copier(*this);
+    PropsCopier copier(*this);
 
-	// TODO: check if non-visible properties should be also copied !
-	o.visitProperties<Exists>(copier);
+    // TODO: check if non-visible properties should be also copied !
+    o.visitProperties<Exists>(copier);
 }
 
 void
 as_object::enumeratePropertyKeys(as_environment& env) const
 {
 
-	assert(env.top(0).is_undefined());
+    assert(env.top(0).is_undefined());
 
     // Hack to handle MovieClips.
-	if (displayObject()) {
+    if (displayObject()) {
         displayObject()->enumerateNonProperties(env);
     }
 
-	// this set will keep track of visited objects,
-	// to avoid infinite loops
-	std::set<const as_object*> visited;
+    // this set will keep track of visited objects,
+    // to avoid infinite loops
+    std::set<const as_object*> visited;
 
     PropertyList::PropertyTracker doneList;
 	
-	const as_object* current(this);
-	while (current && visited.insert(current).second) {
-		current->_members.enumerateKeys(env, doneList);
-		current = current->get_prototype();
-	}
+    const as_object* current(this);
+    while (current && visited.insert(current).second) {
+        current->_members.enumerateKeys(env, doneList);
+        current = current->get_prototype();
+    }
 }
 
 void
 enumerateProperties(as_object& obj, as_object::SortedPropertyList& to)
 {
 
-	// this set will keep track of visited objects,
-	// to avoid infinite loops
-	std::set<as_object*> visited;
+    // this set will keep track of visited objects,
+    // to avoid infinite loops
+    std::set<as_object*> visited;
 
     PropertyEnumerator e(obj, to);
-	as_object* current(&obj);
+    as_object* current(&obj);
 
-	while (current && visited.insert(current).second) {
-		current->visitProperties<IsEnumerable>(e);
-		current = current->get_prototype();
-	}
+    while (current && visited.insert(current).second) {
+        current->visitProperties<IsEnumerable>(e);
+        current = current->get_prototype();
+    }
 
 }
 
@@ -1090,35 +1088,35 @@ enumerateProperties(as_object& obj, as_object::SortedPropertyList& to)
 Property*
 as_object::getOwnProperty(const ObjectURI& uri)
 {
-	return _members.getProperty(uri);
+    return _members.getProperty(uri);
 }
 
 bool
 as_object::hasOwnProperty(const ObjectURI& uri)
 {
-	return getOwnProperty(uri);
+    return getOwnProperty(uri);
 }
 
 as_object*
 as_object::get_prototype() const
 {
-	int swfVersion = getSWFVersion(*this);
-
-	Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
-	if (!prop) return 0;
-	if (!prop->visible(swfVersion)) return 0;
-
-	as_value tmp = prop->getValue(*this);
-
-	return tmp.to_object(getGlobal(*this));
+    int swfVersion = getSWFVersion(*this);
+    
+    Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
+    if (!prop) return 0;
+    if (!prop->visible(swfVersion)) return 0;
+    
+    as_value tmp = prop->getValue(*this);
+    
+    return tmp.to_object(getGlobal(*this));
 }
 
 as_value
 as_object::getMember(const ObjectURI& uri)
 {
-	as_value ret;
-	get_member(uri, &ret);
-	return ret;
+    as_value ret;
+    get_member(uri, &ret);
+    return ret;
 }
 
 as_object*
@@ -1126,25 +1124,23 @@ as_object::get_path_element(string_table::key key)
 {
 //#define DEBUG_TARGET_FINDING 1
 
-	as_value tmp;
-	if (!get_member(key, &tmp))
-	{
+    as_value tmp;
+    if (!get_member(key, &tmp)) {
 #ifdef DEBUG_TARGET_FINDING 
-		log_debug("Member %s not found in object %p",
-			getStringTable(*this).value(key), (void*)this);
+        log_debug("Member %s not found in object %p",
+                  getStringTable(*this).value(key), (void*)this);
 #endif
-		return NULL;
-	}
-	if (!tmp.is_object())
-	{
+        return NULL;
+    }
+    if (!tmp.is_object()) {
 #ifdef DEBUG_TARGET_FINDING 
-		log_debug("Member %s of object %p is not an object (%s)",
-			getStringTable(*this).value(key), (void*)this, tmp);
+        log_debug("Member %s of object %p is not an object (%s)",
+                  getStringTable(*this).value(key), (void*)this, tmp);
 #endif
-		return NULL;
-	}
-
-	return tmp.to_object(getGlobal(*this));
+        return NULL;
+    }
+    
+    return tmp.to_object(getGlobal(*this));
 }
 
 void
@@ -1174,18 +1170,17 @@ as_object::watch(const ObjectURI& uri, as_function& trig,
 		const as_value& cust)
 {
 	
-	std::string propname = getStringTable(*this).value(getName(uri));
+    std::string propname = getStringTable(*this).value(getName(uri));
 
     if (!_trigs.get()) _trigs.reset(new TriggerContainer);
 
-	TriggerContainer::iterator it = _trigs->find(uri);
-	if (it == _trigs->end())
-	{
-		return _trigs->insert(
-                std::make_pair(uri, Trigger(propname, trig, cust))).second;
-	}
-	it->second = Trigger(propname, trig, cust);
-	return true;
+    TriggerContainer::iterator it = _trigs->find(uri);
+    if (it == _trigs->end()) {
+        return _trigs->insert(
+            std::make_pair(uri, Trigger(propname, trig, cust))).second;
+    }
+    it->second = Trigger(propname, trig, cust);
+    return true;
 }
 
 bool
@@ -1193,39 +1188,38 @@ as_object::unwatch(const ObjectURI& uri)
 {
     if (!_trigs.get()) return false; 
 
-	TriggerContainer::iterator trigIter = _trigs->find(uri);
-	if (trigIter == _trigs->end()) {
-		log_debug("No watch for property %s",
-                getStringTable(*this).value(getName(uri)));
-		return false;
-	}
-	Property* prop = _members.getProperty(uri);
-	if (prop && prop->isGetterSetter()) {
-		log_debug("Watch on %s not removed (is a getter-setter)",
-                getStringTable(*this).value(getName(uri)));
-		return false;
-	}
-	trigIter->second.kill();
-	return true;
+    TriggerContainer::iterator trigIter = _trigs->find(uri);
+    if (trigIter == _trigs->end()) {
+        log_debug("No watch for property %s",
+                  getStringTable(*this).value(getName(uri)));
+        return false;
+    }
+    Property* prop = _members.getProperty(uri);
+    if (prop && prop->isGetterSetter()) {
+        log_debug("Watch on %s not removed (is a getter-setter)",
+                  getStringTable(*this).value(getName(uri)));
+        return false;
+    }
+    trigIter->second.kill();
+    return true;
 }
 
 #ifdef GNASH_USE_GC
 void
 as_object::markAsObjectReachable() const
 {
-	_members.setReachable();
+    _members.setReachable();
 
     if (_trigs.get()) {
         for (TriggerContainer::const_iterator it = _trigs->begin();
-                it != _trigs->end(); ++it)
-        {
+             it != _trigs->end(); ++it) {
             it->second.setReachable();
         }
     }
 
     // Mark interfaces reachable.
     std::for_each(_interfaces.begin(), _interfaces.end(), 
-            std::mem_fun(&as_object::setReachable));
+                  std::mem_fun(&as_object::setReachable));
 
     // Proxy objects can contain references to other as_objects.
     if (_relay) _relay->setReachable();
@@ -1245,30 +1239,30 @@ Trigger::call(const as_value& oldval, const as_value& newval,
         as_object& this_obj)
 {
     assert(!_dead);
-
-	if (_executing) return newval;
-
-	_executing = true;
-
-	try {
-		as_environment env(getVM(this_obj));
-
+    
+    if (_executing) return newval;
+    
+    _executing = true;
+    
+    try {
+        as_environment env(getVM(this_obj));
+        
         fn_call::Args args;
         args += _propname, oldval, newval, _customArg;
-
-		fn_call fn(&this_obj, env, args);
-
-		as_value ret = _func->call(fn);
-
-		_executing = false;
-
-		return ret;
-
-	}
-	catch (GnashException&) {
-		_executing = false;
-		throw;
-	}
+        
+        fn_call fn(&this_obj, env, args);
+        
+        as_value ret = _func->call(fn);
+        
+        _executing = false;
+        
+        return ret;
+        
+    }
+    catch (GnashException&) {
+        _executing = false;
+        throw;
+    }
 }
 
 as_object*
@@ -1329,3 +1323,8 @@ isAS3(const as_object& o)
 }
 
 } // end of gnash namespace
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
