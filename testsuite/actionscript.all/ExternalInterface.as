@@ -387,11 +387,12 @@ if (val == false) {
     fail("ExternalInterface::_toAS(false)");
 }
 
-val = EI._toAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
+val = EI._objectToAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
+trace(val);
 if (typeOf(val) == "object") {
-    pass("ExternalInterface::_toAS(object)");
+    pass("ExternalInterface::_objectToAS(object)");
 } else {
-    fail("ExternalInterface::_toAS(object)");
+    fail("ExternalInterface::_objectToAS(object)");
 }
 
 #endif  // version > 7
