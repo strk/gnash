@@ -134,6 +134,7 @@ movie_root::movie_root(const movie_definition& def,
     _hostfd(-1),
     _quality(QUALITY_HIGH),
     _alignMode(0),
+    _allowScriptAccess(sameDomain),
     _showMenu(true),
     _scaleMode(showAll),
     _displayState(DISPLAYSTATE_NORMAL),
@@ -1262,17 +1263,14 @@ movie_root::setStageAlignment(short s)
     callInterface("Stage.align");
 }
 
-/// Takes a short int bitfield: the four bits correspond
-/// to the AlignMode enum 
+/// The mode is one of never, always, with sameDomain the default
 void
-movie_root::setAllowScriptAccess(const std::string &s)
+movie_root::setAllowScriptAccess(AllowScriptAccessMode mode)
 {
-    _allowScriptAccess = s;
+    _allowScriptAccess = mode;
 }
 
-/// Takes a short int bitfield: the four bits correspond
-/// to the AlignMode enum 
-std::string &
+movie_root::AllowScriptAccessMode
 movie_root::getAllowScriptAccess()
 {
     return _allowScriptAccess;
@@ -1283,7 +1281,6 @@ movie_root::getAllowScriptAccess()
 movie_root::StageAlign
 movie_root::getStageAlignment() const
 {
-
     /// L takes precedence over R. Default is centred.
     StageHorizontalAlign ha = STAGE_H_ALIGN_C;
     if (_alignMode.test(STAGE_ALIGN_L)) ha = STAGE_H_ALIGN_L;
@@ -1318,7 +1315,6 @@ movie_root::setShowMenuState(bool state)
     // callInterface is the proper handler for this
     callInterface("Stage.showMenu", (_showMenu) ? "true" : "false");  //or this?
 }
-
 
 /// Returns the string representation of the current align mode,
 /// which must always be in the order: LTRB
@@ -1411,7 +1407,6 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     }
 
 }
-
 
 int
 movie_root::minPopulatedPriorityQueue() const

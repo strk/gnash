@@ -564,6 +564,13 @@ public:
         STAGE_ALIGN_B
     };
 
+    /// The possibile values of AllowScriptAccess
+    enum AllowScriptAccessMode {
+	never,
+	sameDomain,
+	always
+    };
+
     /// Set the current display quality of the entire SWF.
     void setQuality(Quality q);
 
@@ -574,8 +581,8 @@ public:
     /// of the three possible positions for each dimension.
     void setStageAlignment(short s);
 
-    void setAllowScriptAccess(const std::string &s);
-    std::string &getAllowScriptAccess();
+    void setAllowScriptAccess(AllowScriptAccessMode mode);
+    AllowScriptAccessMode getAllowScriptAccess();
 
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
@@ -1168,7 +1175,7 @@ private:
     /// does not rely on the presence of a renderer.
     Quality		_quality;
     std::bitset<4u>	_alignMode;
-    std::string		_allowScriptAccess;
+    AllowScriptAccessMode _allowScriptAccess;
     bool		_showMenu;
     ScaleMode		_scaleMode;
     DisplayState	_displayState;
