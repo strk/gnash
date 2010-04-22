@@ -710,12 +710,6 @@ GnashPluginScriptObject::getControlFD()
 
 // Write to the standalone player over the control socket
 int
-GnashPluginScriptObject::writePlayer(const std::string &data)
-{
-    return writePlayer(_sockfds[WRITEFD], data);
-}
-
-int
 GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 {
 //    log_debug(__PRETTY_FUNCTION__);
@@ -723,28 +717,8 @@ GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 //    log_debug("Writing data: %s", data);
 
     if (fd > 2) {
-        return writePlayer(fd, data.c_str(), data.size());
+        return ::write(fd, data.data(), data.size());
     }
-    
-    return 0;
-}
-
-int
-GnashPluginScriptObject::writePlayer(const char *data, size_t length)
-{
-    return writePlayer(_sockfds[WRITEFD], data, length);
-}
-
-int
-GnashPluginScriptObject::writePlayer(int fd, const char *data, size_t length)
-{
-    // log_debug(__PRETTY_FUNCTION__);    
-
-    if (fd > 2) {
-        return ::write(fd, data, length);
-    }
-
-//    log_debug("Writing data: %s", data);    
     
     return 0;
 }
