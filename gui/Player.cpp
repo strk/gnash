@@ -227,8 +227,11 @@ Player::init_media()
 void
 Player::init_gui()
 {
-    if (_doRender) _gui = getGui(); 
-    else _gui.reset(new NullGui(_doLoop, *_runResources));
+    if (_doRender) {
+        _gui = getGui();
+    } else {
+        _gui.reset(new NullGui(_doLoop, *_runResources));
+    }
 
     _gui->setMaxAdvances(_maxAdvances);
 
