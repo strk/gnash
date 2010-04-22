@@ -132,7 +132,7 @@ private:
     GnashPluginScriptObject             *_scriptObject;
 //#endif
     
-    const char* getCurrentPageURL() const;
+    std::string getCurrentPageURL() const;
 };
 
 // Define the following to make the plugin verbose

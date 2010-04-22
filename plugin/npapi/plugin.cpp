@@ -860,7 +860,7 @@ getGnashExecutable()
 }
 
 void
-create_standalone_launcher(const char* page_url, const std::string& swf_url,
+create_standalone_launcher(const std::string& page_url, const std::string& swf_url,
                            const std::map<std::string, std::string>& params)
 {
 #ifdef CREATE_STANDALONE_GNASH_LAUNCHER
@@ -884,7 +884,7 @@ create_standalone_launcher(const char* page_url, const std::string& swf_url,
     saLauncher << "#!/bin/sh" << std::endl
                << getGnashExecutable() << " ";
 
-    if (page_url) {
+    if (!page_url.empty()) {
         saLauncher << "-U '" << page_url << "' ";
     }
 
@@ -918,8 +918,8 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
     arg_vec.push_back("-u");
     arg_vec.push_back(_swf_url);
     
-    const char* pageurl = getCurrentPageURL();
-    if (!pageurl) {
+    std::string pageurl = getCurrentPageURL();
+    if (pageurl.empty()) {
         gnash::log_error("Could not get current page URL!");
     } else {
         arg_vec.push_back("-U");
@@ -1126,7 +1126,7 @@ nsPluginInstance::startProc()
     exit (-1);
 }
 
-const char*
+std::string
 nsPluginInstance::getCurrentPageURL() const
 {
     NPP npp = _instance;
@@ -1171,7 +1171,7 @@ nsPluginInstance::getCurrentPageURL() const
 
     const NPString& propValue = NPVARIANT_TO_STRING(vProp);
 
-    return propValue.UTF8Characters; // const char *
+    return NPStringToString(propValue);
 }
 
 void

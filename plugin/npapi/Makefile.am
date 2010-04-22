@@ -76,8 +76,9 @@ test_SOURCES = test.cpp \
 	external.cpp
 
 noinst_HEADERS += pluginScriptObject.h \
-	 callbacks.h \
-	external.h
+	callbacks.h \
+	external.h \
+	GnashNPVariant.h
 libgnashplugin_la_SOURCES += pluginScriptObject.cpp \
 	callbacks.cpp \
 	external.cpp

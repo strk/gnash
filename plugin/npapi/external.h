@@ -31,13 +31,17 @@
 #include "npapi.h"
 #include "npruntime.h"
 
+#include "GnashNPVariant.h"
+
+namespace gnash {
+
 class ExternalInterface
 {
 public:
     typedef struct {
         std::string name;
         std::string type;
-        std::vector<NPVariant *> args;
+        std::vector<GnashNPVariant> args;
     } invoke_t;
     
     ExternalInterface ();
@@ -59,13 +63,15 @@ public:
     std::string makeArray (std::vector<std::string> &args);
     std::string makeObject (std::map<std::string, std::string> &args);
     
-    NPVariant *parseXML(const std::string &xml);
+    GnashNPVariant parseXML(const std::string &xml);
     invoke_t *parseInvoke(const std::string &xml);
     
-    std::map<std::string, NPVariant *> parseProperties(const std::string &xml);
-    std::vector<NPVariant *> parseArguments(const std::string &xml);
+    std::map<std::string, GnashNPVariant> parseProperties(const std::string &xml);
+    std::vector<GnashNPVariant> parseArguments(const std::string &xml);
     std::string convertNPVariant (const NPVariant *npv);
 };
+
+}
 
 #endif // GNASH_PLUGIN_EXTERNAL_H
 

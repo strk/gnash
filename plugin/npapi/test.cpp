@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <vector>
 #include <map>
+#include <cassert>
 
 #include "npapi.h"
 #include "npruntime.h"
@@ -39,6 +40,8 @@ std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
 int
 main(int argc, char *argv[])
 {
+    using namespace gnash; 
+
     ExternalInterface ei;
     NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
 
@@ -154,9 +157,9 @@ main(int argc, char *argv[])
     // Parsing tests
     //
     xml = "<string>Hello World!</string>";
-    NPVariant *np = ei.parseXML(xml);
-    std::string data = NPVARIANT_TO_STRING(np[0]).UTF8Characters;
-    if (NPVARIANT_IS_STRING(*np) &&
+    GnashNPVariant np = ei.parseXML(xml);
+    std::string data = NPStringToString(NPVARIANT_TO_STRING(np.get()));
+    if (NPVARIANT_IS_STRING(np.get()) &&
         (data == "Hello World!")) {
         runtest.pass("ExternalInterface::parseXML(string)");
     } else {
@@ -165,8 +168,8 @@ main(int argc, char *argv[])
 
     xml = "<number>123.456</number>";
     np = ei.parseXML(xml);
-    double num = NPVARIANT_TO_DOUBLE(*np);
-    if (NPVARIANT_IS_DOUBLE(*np) &&
+    double num = NPVARIANT_TO_DOUBLE(np.get());
+    if (NPVARIANT_IS_DOUBLE(np.get()) &&
         (num == 123.456)) {
         runtest.pass("ExternalInterface::parseXML(double)");
     } else {
@@ -175,8 +178,8 @@ main(int argc, char *argv[])
 
     xml = "<number>78</number>";
     np = ei.parseXML(xml);
-    int inum = NPVARIANT_TO_INT32(*np);
-    if (NPVARIANT_IS_INT32(*np) &&
+    int inum = NPVARIANT_TO_INT32(np.get());
+    if (NPVARIANT_IS_INT32(np.get()) &&
         (inum == 78)) {
         runtest.pass("ExternalInterface::parseXML(int32)");
     } else {
@@ -185,8 +188,8 @@ main(int argc, char *argv[])
 
     xml = "<true/>";
     np = ei.parseXML(xml);
-    bool flag = NPVARIANT_TO_BOOLEAN(*np);
-    if (NPVARIANT_IS_BOOLEAN(*np) &&
+    bool flag = NPVARIANT_TO_BOOLEAN(np.get());
+    if (NPVARIANT_IS_BOOLEAN(np.get()) &&
         (flag == true)) {
         runtest.pass("ExternalInterface::parseXML(true)");
     } else {
@@ -195,8 +198,8 @@ main(int argc, char *argv[])
 
     xml = "<false/>";
     np = ei.parseXML(xml);
-    flag = NPVARIANT_TO_BOOLEAN(*np);
-    if (NPVARIANT_IS_BOOLEAN(*np) &&
+    flag = NPVARIANT_TO_BOOLEAN(np.get());
+    if (NPVARIANT_IS_BOOLEAN(np.get()) &&
         (flag == false)) {
         runtest.pass("ExternalInterface::parseXML(false)");
     } else {
@@ -205,7 +208,7 @@ main(int argc, char *argv[])
 
     xml = "<null/>";
     np = ei.parseXML(xml);
-    if (NPVARIANT_IS_NULL(*np)) {
+    if (NPVARIANT_IS_NULL(np.get())) {
         runtest.pass("ExternalInterface::parseXML(null)");
     } else {
         runtest.fail("ExternalInterface::parseXML(null)");
@@ -213,16 +216,16 @@ main(int argc, char *argv[])
 
     xml = "<void/>";
     np = ei.parseXML(xml);
-    if (NPVARIANT_IS_VOID(*np)) {
+    if (NPVARIANT_IS_VOID(np.get())) {
         runtest.pass("ExternalInterface::parseXML(void)");
     } else {
         runtest.fail("ExternalInterface::parseXML(void)");
     }
 
     xml = "<property id=\"0\"><string>foobar</string></property><property id=\"1\"><number>12.34</number></property><property id=\"2\"><number>56</number></property>";
-    std::map<std::string, NPVariant *> props = ei.parseProperties(xml);
+    std::map<std::string, GnashNPVariant> props = ei.parseProperties(xml);
     np = props["0"];
-    data = NPVARIANT_TO_STRING(np[0]).UTF8Characters;
+    data = NPStringToString(NPVARIANT_TO_STRING(np.get()));
     if ((props.size() == 3) && (data == "foobar")) {
         runtest.pass("ExternalInterface::parseProperties()");
     } else {
@@ -231,7 +234,7 @@ main(int argc, char *argv[])
     
     xml = "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>";
     np = ei.parseXML(xml);
-    if (NPVARIANT_IS_OBJECT(*np)) {
+    if (NPVARIANT_IS_OBJECT(np.get())) {
         runtest.pass("ExternalInterface::parseXML(object)");
     } else {
         runtest.fail("ExternalInterface::parseXML(object)");
@@ -254,13 +257,13 @@ main(int argc, char *argv[])
     }
     
     xml = "<arguments><string>barfoo</string><number>135.78</number><number>89</number></arguments>";
-    std::vector<NPVariant *> arguments = ei.parseArguments(xml);
+    std::vector<GnashNPVariant> arguments = ei.parseArguments(xml);
     np = arguments[0];
-    str = NPVARIANT_TO_STRING(np[0]).UTF8Characters;
-    double dub = NPVARIANT_TO_DOUBLE(*arguments[1]);
-    int    val = NPVARIANT_TO_INT32(*arguments[2]);
+    str = NPStringToString(NPVARIANT_TO_STRING(np.get()));
+    double dub = NPVARIANT_TO_DOUBLE(arguments[1].get());
+    int    val = NPVARIANT_TO_INT32(arguments[2].get());
     if ((arguments.size() == 3) && (str == "barfoo")
-        && (dub == 135.78) && (val = 89)) {
+        && (dub == 135.78) && (val == 89)) {
         runtest.pass("ExternalInterface::parseArguments()");
     } else {
         runtest.fail("ExternalInterface::parseArguments()");
@@ -269,12 +272,12 @@ main(int argc, char *argv[])
     // Parse an invoke message
     xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
     ExternalInterface::invoke_t *invoke = ei.parseInvoke(xml);
-    str = NPVARIANT_TO_STRING(*invoke->args[0]).UTF8Characters;
+    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
     if ((invoke->name == "barbyfoo") && (invoke->type == "xml")
-        && (NPVARIANT_IS_STRING(*invoke->args[0]))
+        && (NPVARIANT_IS_STRING(invoke->args[0].get()))
         && (str == "barfoo")
-        && (NPVARIANT_IS_DOUBLE(*invoke->args[1]))
-        && (NPVARIANT_TO_DOUBLE(*invoke->args[1]) == 135.78)
+        && (NPVARIANT_IS_DOUBLE(invoke->args[1].get()))
+        && (NPVARIANT_TO_DOUBLE(invoke->args[1].get()) == 135.78)
         ) {
         runtest.pass("ExternalInterface::parseInvoke()");
     } else {
@@ -293,6 +296,7 @@ void* NPN_MemAlloc(uint32_t size)
 
 void NPN_MemFree(void* ptr)
 {
+  assert(ptr);
   free(ptr);
 }
 
@@ -356,6 +360,44 @@ bool NPN_HasProperty(NPP npp, NPObject* obj, NPIdentifier name,
     }
 }
 
+void
+NPN_ReleaseVariantValue(NPVariant *variant)
+{
+    switch(variant->type) {
+        case NPVariantType_String:
+        {
+            NPN_MemFree(const_cast<NPUTF8*>(NPVARIANT_TO_STRING(*variant).UTF8Characters));
+            break;
+        }
+        case NPVariantType_Object:
+        {
+            NPObject* obj = NPVARIANT_TO_OBJECT(*variant);
+            if (obj) {
+                NPN_ReleaseObject(obj);
+            }
+            break;
+        }
+        default:
+        {}
+    }
+ 
+    NULL_TO_NPVARIANT(*variant);
+}
+
+NPObject*
+NPN_RetainObject(NPObject *obj)
+{ assert(obj); ++obj->referenceCount; return obj; }
+
+
+void
+NPN_ReleaseObject(NPObject *npobj)
+{
+    assert(npobj);
+    --npobj->referenceCount;
+    if (npobj->referenceCount == 0) {
+        NPN_MemFree(npobj);
+    }
+}
 // Local Variables:
 // mode: C++
 // indent-tabs-mode: nil

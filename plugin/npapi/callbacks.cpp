@@ -105,8 +105,8 @@ SetVariableCallback (NPObject *npobj, NPIdentifier /* name */, const NPVariant *
 
     std::string varname;
     if (argCount == 2) {
-        varname = NPVARIANT_TO_STRING(args[0]).UTF8Characters;
-        NPVariant *value = const_cast<NPVariant *>(&args[1]);
+        varname = NPStringToString(NPVARIANT_TO_STRING(args[0]));
+        const NPVariant& value = args[1];
         // log_debug("Setting Variable \"%s\"", varname);
         gpso->SetVariable(varname, value);
         BOOLEAN_TO_NPVARIANT(true, *result);
@@ -136,23 +136,18 @@ GetVariableCallback (NPObject *npobj, NPIdentifier /* name */,
     log_debug(__PRETTY_FUNCTION__);
     
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-    NPVariant *value = 0;
     std::string varname;
     // This method only takes one argument
     if (argCount == 1) {
-        varname = NPVARIANT_TO_STRING(args[0]).UTF8Characters;
-        value = gpso->GetVariable(varname);
-        if (value == 0) {
-            NULL_TO_NPVARIANT(*result);
-        } else {
-            CopyVariantValue(*value, *result);
+        varname = NPStringToString(NPVARIANT_TO_STRING(args[0]));
 
-            NPN_MemFree(value);
-            return true;
-        }
+        GnashNPVariant value = gpso->GetVariable(varname);
+        value.copy(*result);
+
+        return true;
     }
     
-    NPVARIANT_IS_NULL(*result);
+    NULL_TO_NPVARIANT(*result);
     return false;
 }
 
@@ -232,20 +227,18 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
         }        
-        const char *data = 0;
-        ret = gpso->readPlayer(gpso->getControlFD(), &data, 0);
-        if (ret == 0) {
+        std::string data = gpso->readPlayer(gpso->getControlFD());
+        if (data.empty()) {
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
         }
-        NPVariant *value = ei.parseXML(data);
-        if (NPVARIANT_TO_BOOLEAN(*value) == true) {
+
+        GnashNPVariant value = ei.parseXML(data);
+        if (NPVARIANT_TO_BOOLEAN(value.get()) == true) {
             BOOLEAN_TO_NPVARIANT(true, *result);
         } else {
             BOOLEAN_TO_NPVARIANT(false, *result);
         }
-        // free the memory used for the data, as it was allocated in readPlayer().
-        NPN_MemFree(value);
 
         return true;
     }
@@ -277,7 +270,7 @@ LoadMovie (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
     if (argCount == 2) {
         ExternalInterface ei;
         // int layer = NPVARIANT_TO_INT32(args[0]);
-        // std::string url = NPVARIANT_TO_STRING(args[1]).UTF8Characters;
+        // std::string url = NPStringToString(NPVARIANT_TO_STRING(args[1]));
         std::string str = ei.convertNPVariant(&args[0]);
         std::vector<std::string> iargs;
         iargs.push_back(str);
@@ -392,9 +385,8 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
         }        
-        const char *data = 0;
-        ret = gpso->readPlayer(gpso->getControlFD(), &data, 0);
-        if (ret == 0) {
+        std::string data = gpso->readPlayer(gpso->getControlFD());
+        if (data.empty()) {
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
         }
@@ -405,8 +397,6 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
         } else {
             INT32_TO_NPVARIANT(0, *result);
         }
-        // free the memory used for the data, as it was allocated in readPlayer().
-        NPN_MemFree(value);
 
         return true;
     }
@@ -656,20 +646,18 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
         }        
-        const char *data = 0;
-        ret = gpso->readPlayer(gpso->getControlFD(), &data, 0);
-        if (ret == 0) {
+        std::string data = gpso->readPlayer(gpso->getControlFD());
+        if (data.empty()) {
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
         }
-        NPVariant *value = ei.parseXML(data);
-        if (NPVARIANT_IS_INT32(*value)) {
-            INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(*value), *result);
+
+        GnashNPVariant value = ei.parseXML(data);
+        if (NPVARIANT_IS_INT32(value.get())) {
+            value.copy(*result);
         } else {
             INT32_TO_NPVARIANT(0, *result);
         }
-        // free the memory used for the data, as it was allocated in readPlayer().
-        NPN_MemFree(value);
 
         return true;
     }
