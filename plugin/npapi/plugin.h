@@ -128,9 +128,9 @@ private:
 
     /// Name of the plugin instance element in the dom 
     std::string                        _name;
-#ifdef ENABLE_SCRIPTABLE
+//#ifdef ENABLE_SCRIPTABLE
     GnashPluginScriptObject             *_scriptObject;
-#endif
+//#endif
     
     const char* getCurrentPageURL() const;
 };
