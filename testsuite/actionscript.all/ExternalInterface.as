@@ -55,8 +55,9 @@ if (EI.hasOwnProperty("available")) {
     fail("ExternalInterface::available() doesn't exist");
 }
 
-// this should always be true now that Gnash supports this class
-if (EI.available == false) {
+// this should always be true now that Gnash supports this class,
+// and sameDomain is the default when running standalone.
+if (EI.available == true) {
     pass("ExternalInterface::available is correct");
 } else {
     fail("ExternalInterface::available property isn't correct");

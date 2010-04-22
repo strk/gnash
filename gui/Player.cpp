@@ -262,17 +262,13 @@ Player::load_movie()
     }
 
     try {
-        if ( _infile == "-" )
-        {
+        if ( _infile == "-" ) {
             std::auto_ptr<IOChannel> in (
-                    noseek_fd_adapter::make_stream(fileno(stdin)));
+                noseek_fd_adapter::make_stream(fileno(stdin)));
             md = MovieFactory::makeMovie(in, _url, *_runResources, false);
-        }
-        else
-        {
+        } else {
             URL url(_infile);
-            if ( url.protocol() == "file" )
-            {
+            if ( url.protocol() == "file" ) {
                 std::string path = url.path();
                 // We'll need to allow load of the file, no matter virtual url
                 // specified...
@@ -294,8 +290,7 @@ Player::load_movie()
         md = NULL;
     }
 
-    if ( ! md )
-    {
+    if ( ! md ) {
         fprintf(stderr, "Could not load movie '%s'\n", _infile.c_str());
         return NULL;
     }
@@ -486,21 +481,37 @@ Player::run(int argc, char* argv[], const std::string& infile,
     it = params.find("allowscriptaccess");
     if (it != params.end()) {
         std::string access = it->second;
-        log_debug("Setting allowscriptaccess to %s", access);
-        root.setAllowScriptAccess(access);
+        StringNoCaseEqual noCaseCompare;
+        const std::string& str = it->second;
+        StringNoCaseEqual noCaseCompare;
+        const std::string& str = it->second;
+                
+        movie_root::AllowScriptAccessMode mode = movie_root::sameDomain;
+        if (noCaseCompare(str, "never")) {
+            mode = movie_root::never;
+        } else if (noCaseCompare(str, "sameDomain")) {
+            mode = movie_root::sameDomain;
+        } else if (noCaseCompare(str, "always")) {
+            mode = movie_root::always;
+        }
+        log_debug("Setting allowscriptaccess to %s", mode);
+        root.setAllowScriptAccess(mode);
     }
 
     it = params.find("scale");
-    if (it != params.end()) {
-                
+    if (it != params.end()) {                
         StringNoCaseEqual noCaseCompare;
         const std::string& str = it->second;
                 
         movie_root::ScaleMode mode = movie_root::showAll;
-
-                if (noCaseCompare(str, "noScale")) mode = movie_root::noScale;
-                else if (noCaseCompare(str, "exactFit")) mode = movie_root::exactFit;
-                else if (noCaseCompare(str, "noBorder")) mode = movie_root::noBorder;
+        
+        if (noCaseCompare(str, "noScale")) {
+            mode = movie_root::noScale;
+        } else if (noCaseCompare(str, "exactFit")) {
+            mode = movie_root::exactFit;
+        } else if (noCaseCompare(str, "noBorder")) {
+            mode = movie_root::noBorder;
+        }
 
         log_debug("Setting scale mode");
             root.setStageScaleMode(mode);

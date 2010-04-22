@@ -301,8 +301,8 @@ externalinterface_marshallExceptions(const fn_call& fn)
     
     // No, don't pass exception up to the broswer
     if (fn.nargs) {
-        ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
-        ptr->marshallExceptions(fn.arg(0).to_bool());
+        // ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+        // ptr->marshallExceptions(fn.arg(0).to_bool());
     } else {
         return as_value(true);
     }
@@ -570,8 +570,7 @@ externalinterface_uUnescapeXML(const fn_call& fn)
 // namespace gnash {
 
 ExternalInterface_as::ExternalInterface_as(as_object* /*owner*/)
-    : _available(false),
-      _exceptions(false)
+    : _exceptions(false)
 
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
