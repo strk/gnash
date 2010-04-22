@@ -585,6 +585,7 @@ bool
 ExternalInterface_as::addCallback(const std::string &name, as_object *method)
 {
     // GNASH_REPORT_FUNCTION;
+    
     _methods[name] = method;
     
     return true;
@@ -595,8 +596,11 @@ ExternalInterface_as::call(as_object */*asCallback*/, const std::string& /*name*
                            const std::vector<as_value>& /*args*/, size_t /*firstArg*/)
 {
     // GNASH_REPORT_FUNCTION;
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    
+    // call(asCallback, name, args, firstArg);
 
+    // startAdvanceTimer();
+    
     return false;
 }
 
@@ -827,6 +831,55 @@ ExternalInterface_as::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
     // GNASH_REPORT_FUNCTION;
 
     return as_value();
+}
+
+void
+ExternalInterface_as::marshallExceptions(bool flag)
+{
+    // GNASH_REPORT_DEBUG;
+    _exceptions = flag;
+}
+
+bool
+ExternalInterface_as::marshallExceptions()
+{
+    // GNASH_REPORT_DEBUG;
+    return _exceptions;
+}
+
+/// Returns the id attribute of the object tag in Internet Explorer,
+/// or the name attribute of the embed tag in Netscape. 
+const std::string &
+ExternalInterface_as::objectID()
+{
+    // GNASH_REPORT_DEBUG;
+    return _objectid;
+}
+
+std::string
+ExternalInterface_as::objectID(as_object &/*obj*/)
+    
+{
+    // GNASH_REPORT_DEBUG;
+    std::string str;
+    
+    return (str);
+}
+
+void
+ExternalInterface_as::setReachable() const
+{
+    // GNASH_REPORT_DEBUG;
+    std::map<std::string, as_object *>::const_iterator it;
+    for (it=_methods.begin(); it != _methods.end(); ++it) {
+        it->second->setReachable();
+    }
+}
+
+bool
+ExternalInterface_as::advance()
+{
+    return false;
 }
 
 } // end of gnash namespace

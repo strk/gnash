@@ -39,7 +39,7 @@ class ExternalInterface_as
 {
 public:
     ExternalInterface_as(as_object* owner);
-    ~ExternalInterface_as();
+    virtual ~ExternalInterface_as();
 
     /// Add an ActionScript function as a callback by JavaScript
     // in the browser.
@@ -47,18 +47,14 @@ public:
 
     // This is a flag that specifies wether exceptions in ActionScript
     // should be propogated to JavaScript in the browser.
-    void marshallExceptions(bool flag) { _exceptions = flag; };
-    bool marshallExceptions() { return _exceptions; };
+    void marshallExceptions(bool flag);
+    bool marshallExceptions();
 
     /// Returns the id attribute of the object tag in Internet Explorer,
     /// or the name attribute of the embed tag in Netscape. 
-    const std::string &objectID() { return _objectid; };
+    const std::string &objectID();
     std::string objectID(as_object &obj);    
     
-    /// Call a callback if it's registered already.
-    static bool call(as_object* asCallback, const std::string& methodName,
-              const std::vector<as_value>& args, size_t firstArg);
-
     // These appear to be undocumented helper functions of this class
     // that while propably designed to be used internally, get used
     // by ActionScript coders.
@@ -95,6 +91,13 @@ public:
 
     static std::string escapeXML(as_object &obj);
     static std::string unescapeXML(as_object &obj);
+
+    virtual bool advance() = 0;
+    virtual void setReachable() const = 0;
+    
+    /// Call a callback if it's registered already.
+    virtual bool call(as_object* asCallback, const std::string& methodName,
+              const std::vector<as_value>& args, size_t firstArg);
     
 private:
     std::string _objectid;
@@ -103,7 +106,8 @@ private:
 };
 
 /// Initialize the global ExternalInterface class
-void externalinterface_class_init(as_object& where, const ObjectURI& uri);
+void externalinterface_class_init(gnash::as_object& where,
+                                  const gnash::ObjectURI& uri);
 
 } // end of gnash namespace
 
