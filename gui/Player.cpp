@@ -500,7 +500,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     if (it != params.end()) {                
         StringNoCaseEqual noCaseCompare;
         const std::string& str = it->second;
-                
         movie_root::ScaleMode mode = movie_root::showAll;
         
         if (noCaseCompare(str, "noScale")) {
@@ -517,10 +516,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     // Set up screenshots. 
     if (!_screenshots.empty()) {
-
         std::istringstream is(_screenshots);
         std::string arg;
-
         bool last = false;
         ScreenShotter::FrameList v;
 
@@ -592,8 +589,7 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         return "";
     }
 
-    if (event == "Stage.showMenu")
-    {
+    if (event == "Stage.showMenu") {
         if (noCaseCompare(arg, "true")) _gui.showMenu(true);
         else if (noCaseCompare(arg, "false")) _gui.showMenu(false);
         return "";
@@ -615,22 +611,19 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
     }
 
 
-    if (event == "System.capabilities.screenResolutionX")
-    {
+    if (event == "System.capabilities.screenResolutionX") {
         std::ostringstream ss;
         ss << _gui.getScreenResX();
         return ss.str();
     }
 
-    if (event == "System.capabilities.screenResolutionY")
-    {
+    if (event == "System.capabilities.screenResolutionY") {
         std::ostringstream ss;
         ss << _gui.getScreenResY();
         return ss.str();
     }
 
-    if (event == "System.capabilities.pixelAspectRatio")
-    {
+    if (event == "System.capabilities.pixelAspectRatio") {
         std::ostringstream ss;
         // Whether the pp actively limits the precision or simply
         // gets a slightly different result isn't clear.
@@ -638,20 +631,17 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         return ss.str();
     }
 
-    if (event == "System.capabilities.screenDPI")
-    {
+    if (event == "System.capabilities.screenDPI") {
         std::ostringstream ss;
         ss << _gui.getScreenDPI();
         return ss.str();
     }
 
-    if (event == "System.capabilities.screenColor")
-    {
+    if (event == "System.capabilities.screenColor") {
         return _gui.getScreenColor();
     }
 
-    if (event == "System.capabilities.playerType")
-    {
+    if (event == "System.capabilities.playerType") {
         return _gui.isPlugin() ? "PlugIn" : "StandAlone";
     }
 
@@ -669,8 +659,7 @@ Player::CallbacksHandler::notify(const std::string& command,
 
     // it's _hostfd, but we're a static method...
     const int hostfd = _player.getHostFD();
-    if (hostfd != -1)
-    {
+    if (hostfd != -1) {
         //log_debug("user-provided host requests fd is %d", hostfd);
         std::stringstream request;
         request << "INVOKE " << command << ":" << args << std::endl;
@@ -682,13 +671,11 @@ Player::CallbacksHandler::notify(const std::string& command,
         // NOTE: we assuming the hostfd is set in blocking mode here..
         //log_debug("Attempt to write INVOKE requests fd %d", hostfd);
         int ret = write(hostfd, cmd, len);
-        if ( ret == -1 )
-        {
+        if ( ret == -1 ) {
             log_error("Could not write to user-provided host "
                       "requests fd %d: %s", hostfd, strerror(errno));
         }
-        if ( static_cast<size_t>(ret) < len )
-        {
+        if ( static_cast<size_t>(ret) < len ) {
             log_error("Could only write %d bytes over %d required to "
                       "user-provided host requests fd %d",
                       ret, len, hostfd);
@@ -702,8 +689,7 @@ Player::CallbacksHandler::notify(const std::string& command,
 
     /// Fscommands can be ignored using an rcfile setting. As a 
     /// plugin they are always ignored.
-    if (_gui.isPlugin())
-    {
+    if (_gui.isPlugin()) {
         // We log the request to the fd above
         log_debug(_("Running as plugin: skipping internal "
                     "handling of FsCommand %s%s."));
@@ -722,23 +708,20 @@ Player::CallbacksHandler::notify(const std::string& command,
     // quit, fullscreen, showmenu, exec, allowscale, and trapallkeys.
     
     // FSCommand quit
-    if (noCaseCompare(command, "quit"))
-    {
+    if (noCaseCompare(command, "quit")) {
         _gui.quit();
         return;
     }
 
     // FSCommand fullscreen
-    if (noCaseCompare(command, "fullscreen"))
-    {
+    if (noCaseCompare(command, "fullscreen")) {
         if (noCaseCompare(args, "true")) _gui.setFullscreen();
         else if (noCaseCompare(args, "false")) _gui.unsetFullscreen();
         return;
     }
        
     // FSCommand showmenu
-    if (noCaseCompare(command, "showmenu"))
-    {
+    if (noCaseCompare(command, "showmenu")) {
         if (noCaseCompare(args, "true")) _gui.showMenu(true);
         else if (noCaseCompare(args, "false")) _gui.showMenu(false);
         return;
@@ -748,28 +731,24 @@ Player::CallbacksHandler::notify(const std::string& command,
     // Note: the pp insists that the file to execute should be in 
     // a subdirectory 'fscommand' of the 'projector' executable's
     // location. In SWF5 there were no restrictions.
-    if (noCaseCompare(command, "exec"))
-    {
+    if (noCaseCompare(command, "exec")) {
         log_unimpl(_("FsCommand exec called with argument %s"), args);
         return;
     }
 
     // FSCommand allowscale
-    if (noCaseCompare(command, "allowscale"))
-    {
+    if (noCaseCompare(command, "allowscale")) {
         //log_debug("allowscale: %s", args);
         if (noCaseCompare(args, "true")) _gui.allowScale(true);
-        else
-        {
-                if (strtol(args.c_str(), NULL, 0)) _gui.allowScale(true);
-                else _gui.allowScale(false);
+        else {
+            if (strtol(args.c_str(), NULL, 0)) _gui.allowScale(true);
+            else _gui.allowScale(false);
         }
         return;
     }
 
     // FSCommand trapallkeys
-    if (noCaseCompare(command, "trapallkeys"))
-    {
+    if (noCaseCompare(command, "trapallkeys")) {
         log_unimpl(_("FsCommand trapallkeys called with argument %s"), args);
         return;
     }
@@ -835,8 +814,7 @@ Player::getGui()
 
 Player::~Player()
 {
-    if (_movieDef.get())
-    {
+    if (_movieDef.get()) {
         log_debug("~Player - _movieDef refcount: %d (1 will be dropped "
                 "now)", _movieDef->get_ref_count());
     }
