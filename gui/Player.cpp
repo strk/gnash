@@ -483,8 +483,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
         std::string access = it->second;
         StringNoCaseEqual noCaseCompare;
         const std::string& str = it->second;
-        StringNoCaseEqual noCaseCompare;
-        const std::string& str = it->second;
                 
         movie_root::AllowScriptAccessMode mode = movie_root::sameDomain;
         if (noCaseCompare(str, "never")) {
