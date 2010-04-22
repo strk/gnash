@@ -564,6 +564,13 @@ public:
         STAGE_ALIGN_B
     };
 
+    /// The possibile values of AllowScriptAccess
+    enum AllowScriptAccessMode {
+	never,
+	sameDomain,
+	always
+    };
+
     /// Set the current display quality of the entire SWF.
     void setQuality(Quality q);
 
@@ -574,19 +581,22 @@ public:
     /// of the three possible positions for each dimension.
     void setStageAlignment(short s);
 
+    void setAllowScriptAccess(AllowScriptAccessMode mode);
+    AllowScriptAccessMode getAllowScriptAccess();
+
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
     /// Returns the current alignment of the stage (left/right/centre, top/
     /// bottom/centre) as a std::pair
     StageAlign getStageAlignment() const;
 
-	/// Returns the current value of _showMenu which instructs the gui about
-	/// how much to display in the context menu
-	bool getShowMenuState() const;
-
-	/// Sets the value of _showMenu and calls the fscommand handler for the
-	/// current gui
-	void setShowMenuState( bool state );
+    /// Returns the current value of _showMenu which instructs the gui about
+    /// how much to display in the context menu
+    bool getShowMenuState() const;
+    
+    /// Sets the value of _showMenu and calls the fscommand handler for the
+    /// current gui
+    void setShowMenuState( bool state );
 
     /// Sets the Stage object's align mode.
     void setStageScaleMode(ScaleMode sm);
@@ -605,10 +615,10 @@ public:
 
     /// Action priority levels
     enum ActionPriorityLevel {
-
+	
         /// Init actions, Init event handlers
         apINIT=0,
-
+	
         /// Construct event handlers
         apCONSTRUCT=1,
 
@@ -1150,43 +1160,39 @@ private:
 
     /// This is set to true if execution of scripts
     /// aborted due to action limit set or whatever else
-    bool _disableScripts;
-
-    int _processingActionLevel;
+    bool		_disableScripts;
+    int			_processingActionLevel;
     
     /// filedescriptor to write to for host application requests
     //
     /// -1 if none
-    int _hostfd;
-    int _controlfd;
+    int			_hostfd;
+    int			_controlfd;
 
     /// The display quality of the entire movie.
     //
     /// This is here, not just in the Renderer, so that AS compatibility
     /// does not rely on the presence of a renderer.
-    Quality _quality;
-
-    std::bitset<4u> _alignMode;
-
-    bool _showMenu;
-    
-    ScaleMode _scaleMode;
-    
-    DisplayState _displayState;
+    Quality		_quality;
+    std::bitset<4u>	_alignMode;
+    AllowScriptAccessMode _allowScriptAccess;
+    bool		_showMenu;
+    ScaleMode		_scaleMode;
+    DisplayState	_displayState;
     
     // The maximum number of recursions e.g. when finding
     // 'super', set in the ScriptLimits tag.
-    boost::uint16_t _recursionLimit;
+    boost::uint16_t	_recursionLimit;
 
     // The timeout in seconds for script execution, in the
     // ScriptLimits tag.    
-    boost::uint16_t _timeoutLimit;
+    boost::uint16_t	_timeoutLimit;
 
     // delay between movie advancement, in milliseconds
-    unsigned int _movieAdvancementDelay;
+    unsigned int	_movieAdvancementDelay;
 
     // time of last movie advancement, in milliseconds
-    unsigned int _lastMovieAdvancement;
+    unsigned int	_lastMovieAdvancement;
 
     size_t _unnamedInstance;
 

@@ -21,6 +21,7 @@
 #include <map>
 #include <sstream>
 
+#include "StringPredicates.h"
 #include "Relay.h" // for inheritance
 #include "ExternalInterface_as.h"
 #include "as_object.h" // for inheritance
@@ -31,6 +32,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "VM.h"
+#include "rc.h"
 #include "as_value.h"
 #include "as_object.h"
 #include "xml/XMLDocument_as.h"
@@ -38,6 +40,7 @@
 #include "namedStrings.h"
 #include "Global_as.h"
 #include "PropertyList.h"
+#include "movie_root.h"
 
 namespace gnash {
 
@@ -205,7 +208,6 @@ attachExternalInterfaceStaticProperties(as_object& o)
                   gl.createFunction(externalinterface_uToXML), swf8Flags);
     o.init_member("_unescapeXML",
                   gl.createFunction(externalinterface_uUnescapeXML), swf8Flags);
-
 }
 
 as_value
@@ -250,12 +252,46 @@ externalinterface_call(const fn_call& fn)
 }
 
 as_value
-externalinterface_available(const fn_call& /* fn */)
+externalinterface_available(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
+    movie_root& m = getRoot(fn);
+    bool mode = false;
     
-    // Yes, Gnash supports the ExternalInterface
-    return as_value(true);
+    switch (m.getAllowScriptAccess()) {
+      case movie_root::never:
+          mode = false;
+          break;
+      case movie_root::sameDomain:
+      {
+          const std::string& baseurl = m.getOriginalURL();
+          const int MAXHOSTNAMELEN = 128;
+          char hostname[MAXHOSTNAMELEN];
+          if (gethostname(hostname, MAXHOSTNAMELEN) != 0) {
+              mode = false;
+          }
+          // The hostname is empty if running the standalone Gnash from
+          // a terminal, so we can assume the default of sameDomain applies.
+          URL localPath(hostname, baseurl);
+          if (localPath.hostname().empty()) {
+              mode = true;
+          } else {
+              StringNoCaseEqual noCaseCompare;
+              if (!noCaseCompare(localPath.hostname(), hostname)) {
+                  log_security(_("ExternalInterface path %s is outside the SWF domain "
+                                 "%s. Cannot access this object."), localPath, 
+                               hostname);
+                  mode = false;
+              }
+          }
+          break;
+      }
+      case movie_root::always:
+          mode = true;
+          break;
+    };
+    
+    return as_value(mode);
 }
 
 as_value
@@ -265,8 +301,8 @@ externalinterface_marshallExceptions(const fn_call& fn)
     
     // No, don't pass exception up to the broswer
     if (fn.nargs) {
-        ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
-        ptr->marshallExceptions(fn.arg(0).to_bool());
+        // ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+        // ptr->marshallExceptions(fn.arg(0).to_bool());
     } else {
         return as_value(true);
     }

@@ -202,11 +202,15 @@ Gui::unsetFullscreen()
 }
 
 void
-Gui::quit() {
+Gui::quit()
+{
+    log_debug(__PRETTY_FUNCTION__);
+
     // Take a screenshot of the last frame if required.
     if (_screenShotter.get()) {
         _screenShotter->last();
     }
+    
     quitUI();
 }
 

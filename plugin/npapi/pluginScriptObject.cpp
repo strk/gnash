@@ -166,9 +166,12 @@ GnashPluginScriptObject::initializeIdentifiers()
     AddProperty("$version", "10,1,r999");
     // id and name appear to be the same tag, but differeing browsers access
     // one or the other, or both.
+    // name=send_this_page_swf
     AddProperty("name", "Hello World");
+    // id=send_this_page_swf
     AddProperty("id", "Hello World");
 
+    // http://s.ytimg.com/yt/swf/watch-vfl161193.swf
     AddProperty("src", "example");
     AddProperty("align", "middle");
     AddProperty("quality", "high");
