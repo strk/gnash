@@ -26,15 +26,23 @@ namespace gnash {
 /// Destructor of ActiveRelay needs definition of movie_root.
 ActiveRelay::~ActiveRelay()
 {
-    getRoot(*_owner).removeAdvanceCallback(this);
+    if (_owner) {
+        getRoot(*_owner).removeAdvanceCallback(this);
+    }
 }
-
 
 void
 ActiveRelay::setReachable()
 {
     markReachableResources();
-    _owner->setReachable();
+    if (_owner) {
+        _owner->setReachable();
+    }
 }
 
 }
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
