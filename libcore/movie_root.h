@@ -188,7 +188,8 @@ public:
     /// SWF playback, so for normal playback this pointer should not be
     /// used.
     Movie* init(movie_definition* def,
-            const MovieClip::MovieVariables& variables);
+		const MovieClip::MovieVariables& variables,
+		const MovieClip::MovieVariables& scriptables);
 
     /// Return the movie at the given level (0 if unloaded level).
     //
@@ -581,9 +582,17 @@ public:
     /// of the three possible positions for each dimension.
     void setStageAlignment(short s);
 
+    /// Sets the flag to allow interfacing with JavaScript in the browser.
+    /// This is disabled by default, but enabled for ExternalInterface.
     void setAllowScriptAccess(AllowScriptAccessMode mode);
+    /// Gets the current Access Mode for ExternalInterface.
     AllowScriptAccessMode getAllowScriptAccess();
 
+    // This is a flag that specifies whether exceptions in ActionScript
+    // should be propogated to JavaScript in the browser.
+    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
+    bool getMarshallExceptions() { return _marshallExceptions; };
+    
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
     /// Returns the current alignment of the stage (left/right/centre, top/
@@ -1176,6 +1185,7 @@ private:
     Quality		_quality;
     std::bitset<4u>	_alignMode;
     AllowScriptAccessMode _allowScriptAccess;
+    bool		_marshallExceptions;
     bool		_showMenu;
     ScaleMode		_scaleMode;
     DisplayState	_displayState;

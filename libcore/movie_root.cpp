@@ -135,6 +135,7 @@ movie_root::movie_root(const movie_definition& def,
     _quality(QUALITY_HIGH),
     _alignMode(0),
     _allowScriptAccess(sameDomain),
+    _marshallExceptions(false),
     _showMenu(true),
     _scaleMode(showAll),
     _displayState(DISPLAYSTATE_NORMAL),
@@ -196,10 +197,12 @@ movie_root::~movie_root()
 }
 
 Movie*
-movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars)
+movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars,
+                 const MovieClip::MovieVariables& scriptables)
 {
     Movie* mr = def->createMovie(*_vm.getGlobal());
     mr->setVariables(vars);
+    mr->setVariables(scriptables);
     setRootMovie(mr);
     return mr;
 }
