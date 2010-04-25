@@ -80,6 +80,12 @@ Player::setFlashVars(const std::string& varstr)
     _gui->addFlashVars(vars);
 }
 
+void
+Player::setScriptableVar(const std::string &name, const std::string &value)
+{
+    _gui->addScriptableVar(name, value);
+}
+
 Player::Player()
     :
 #if defined(RENDERER_CAIRO)
@@ -335,8 +341,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     // Parse player parameters. These are not passed to the SWF, but rather
     // control stage properties etc.
-    Params::const_iterator it = params.find("base");
-    const URL baseURL = (it == params.end()) ? _baseurl :
+    Params::const_iterator it = _params.find("base");
+    const URL baseURL = (it == _params.end()) ? _baseurl :
                                                URL(it->second, _baseurl);
 
     /// The RunResources should be populated before parsing.
@@ -370,11 +376,24 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Parse querystring (before FlashVars, see
     // testsuite/misc-ming.all/FlashVarsTest*)
     setFlashVars(URL(_url).querystring());
-    
-    // Add FlashVars.
-    Params::const_iterator fv = params.find("flashvars");
-    if (fv != params.end()) setFlashVars(fv->second);
 
+    // Add FlashVars.
+    Params::const_iterator fv = _params.find("flashvars");
+    if (fv != _params.end()) {
+        setFlashVars(fv->second);
+    }
+
+    // Add Scriptable Variables. These values beconme the default, but
+    // they can be reset from JavaScript via ExternalInterface. These
+    // are passed to Gnash using the '-P' option, and have nothing to
+    // to do with 'flashVars'.
+    fv = _params.begin();
+    for (fv=_params.begin(); fv != _params.end(); fv++) {
+        if (fv->first != "flashvars") {
+            setScriptableVar(fv->first, fv->second);
+        }
+    }
+    
     // Load the actual movie.
     _movieDef = load_movie();
     if (!_movieDef) {
@@ -474,15 +493,15 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Now handle stage alignment and scale mode. This should be done after
     // the GUI is created, after its stage member is set, and after the
     // interface callbacks are registered.
-    it = params.find("salign");
-    if (it != params.end()) {
+    it = _params.find("salign");
+    if (it != _params.end()) {
         log_debug("Setting align");
         const short align = stringToStageAlign(it->second);
         root.setStageAlignment(align);
     }
 
-    it = params.find("allowscriptaccess");
-    if (it != params.end()) {
+    it = _params.find("allowscriptaccess");
+    if (it != _params.end()) {
         std::string access = it->second;
         StringNoCaseEqual noCaseCompare;
         const std::string& str = it->second;
@@ -499,8 +518,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
         root.setAllowScriptAccess(mode);
     }
 
-    it = params.find("scale");
-    if (it != params.end()) {                
+    it = _params.find("scale");
+    if (it != _params.end()) {                
         StringNoCaseEqual noCaseCompare;
         const std::string& str = it->second;
         movie_root::ScaleMode mode = movie_root::showAll;

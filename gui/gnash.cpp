@@ -500,8 +500,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                 if (eq == std::string::npos) {
                     name = param;
                     value = "true";
-                }
-                else {
+                } else {
                     name = param.substr(0, eq);
                     value = param.substr(eq + 1);
                 }

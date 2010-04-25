@@ -135,7 +135,7 @@ public:
     }
     
     void setParam(std::string& name, std::string& value) {
-        params[name] = value;
+        _params[name] = value;
     }
     
     void setHostFD(int fd) {
@@ -275,37 +275,27 @@ private:
     std::auto_ptr<Gui> getGui();
     
     void setFlashVars(const std::string& varstr);
+
+    void setScriptableVar(const std::string &name, const std::string& value);
     
     typedef std::map<std::string, std::string, StringNoCaseLessThan> Params;
     
     // Movie parameters (for -P)
-    Params params;
-    
+    Params      _params;
     unsigned int _bitDepth;
     
     // the scale at which to play 
-    float _scale;
-    
+    float       _scale;
     unsigned int _delay;
-    
-    size_t _width;
-    
-    size_t _height;
-    
-    int _xPosition;
-    
-    int _yPosition;
-    
+    size_t      _width;
+    size_t      _height;
+    int         _xPosition;
+    int         _yPosition;
     unsigned long _windowID;
-    
-    bool _doLoop;
-    
-    bool _doRender;
-    
-    bool _doSound;
-    
-    float _exitTimeout;
-    
+    bool        _doLoop;
+    bool        _doRender;
+    bool        _doSound;
+    float       _exitTimeout;
     std::string _baseurl;
     
     /// Initialization / destruction order is important here.
@@ -336,13 +326,13 @@ private:
     /// This must be initialized after _runResources
     std::auto_ptr<Gui> _gui;
     
-    std::string _url;
+    std::string         _url;
     
-    std::string _infile;
+    std::string         _infile;
     
     boost::intrusive_ptr<movie_definition> _movieDef;
     
-    unsigned long _maxAdvances;
+    unsigned long       _maxAdvances;
     
     /// Load the "_infile" movie setting its url to "_url"
     // 
@@ -353,18 +343,18 @@ private:
     boost::intrusive_ptr<movie_definition> load_movie();
     
 #ifdef GNASH_FPS_DEBUG
-    float _fpsDebugTime;
+    float       _fpsDebugTime;
 #endif
     
     // Filedescriptor to use for host application requests, -1 if none
-    int _hostfd;
+    int         _hostfd;
     
-    int _controlfd;
+    int         _controlfd;
 
     // Whether to start Gnash in fullscreen mode.
     // (Or what did you think it meant?)
-    bool _startFullscreen;
-    bool _hideMenu;
+    bool        _startFullscreen;
+    bool        _hideMenu;
     
     /// The filename to use for dumping audio.
     std::string _audioDump;
@@ -380,7 +370,6 @@ private:
     std::string _screenshotFile;
 
 };
-
  
 } // end of gnash namespace
 
