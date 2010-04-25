@@ -108,7 +108,6 @@ private:
 static void
 attachInterface(as_object& obj)
 {
-
     Global_as& gl = getGlobal(obj);
     
     obj.init_member("fopen", gl.createFunction(fileio_fopen));
@@ -143,11 +142,11 @@ fileio_ctor(const fn_call& fn)
     obj->setRelay(new FileIO());
 
     if (fn.nargs > 0) {
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("new FileIO(%s): all arguments discarded",
-            ss.str().c_str());
-		);
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror("new FileIO(%s): all arguments discarded",
+                        ss.str().c_str());
+            );
     }
 
     return as_value();
@@ -607,6 +606,7 @@ fileio_class_init(as_object& where, const ObjectURI& /* uri */)
     as_object* proto = gl.createObject();
     attachInterface(*proto);
     as_object* cl = gl.createClass(&fileio_ctor, proto);
+    
     where.init_member("FileIO", cl);
 }
 } // end of extern C
@@ -616,5 +616,5 @@ fileio_class_init(as_object& where, const ObjectURI& /* uri */)
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

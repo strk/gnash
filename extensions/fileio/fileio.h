@@ -29,7 +29,6 @@ namespace gnash {
 class ObjectURI;
 class as_object;
 
-
 extern "C" {
 
 void fileio_class_init(as_object& global, const ObjectURI& uri);  
@@ -43,5 +42,5 @@ void fileio_class_init(as_object& global, const ObjectURI& uri);
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
