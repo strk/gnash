@@ -232,15 +232,15 @@ attachMathInterface(as_object& proto)
                 | PropFlags::readOnly;
 
 	// constant
-	proto.init_member("E", 2.7182818284590452354, flags);
-	proto.init_member("LN2", 0.69314718055994530942, flags);
-	proto.init_member("LOG2E", 1.4426950408889634074, flags);
-	proto.init_member("LN10", 2.30258509299404568402, flags);
-	proto.init_member("LOG10E", 0.43429448190325182765, flags);
-	proto.init_member("PI", 3.14159265358979323846, flags);
-	proto.init_member("SQRT1_2", 0.7071067811865475244, flags);
-	proto.init_member("SQRT2", 1.4142135623730950488, flags);
-
+    proto.init_member("E", 2.7182818284590452354, flags);
+    proto.init_member("LN2", 0.69314718055994530942, flags);
+    proto.init_member("LOG2E", 1.4426950408889634074, flags);
+    proto.init_member("LN10", 2.30258509299404568402, flags);
+    proto.init_member("LOG10E", 0.43429448190325182765, flags);
+    proto.init_member("PI", 3.14159265358979323846, flags);
+    proto.init_member("SQRT1_2", 0.7071067811865475244, flags);
+    proto.init_member("SQRT2", 1.4142135623730950488, flags);
+    
     VM& vm = getVM(proto);
     
     proto.init_member("abs", vm.getNative(200, 0), flags);
@@ -265,3 +265,4 @@ attachMathInterface(as_object& proto)
 
 } // anonymous namespace
 } // end of gnash namespace
+

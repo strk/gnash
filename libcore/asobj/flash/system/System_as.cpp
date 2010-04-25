@@ -38,33 +38,32 @@ namespace gnash {
 // Forward declarations.
 namespace {
 
-    inline std::string trueFalse(bool x) { return x ? "t" : "f"; }
+inline std::string trueFalse(bool x) { return x ? "t" : "f"; }
 
-    template<typename T> inline void convertValue(const std::string& in,
-            T& val);
+template<typename T> inline void convertValue(const std::string& in,
+                                              T& val);
 
-    const std::string& systemLanguage(as_object& proto);
+const std::string& systemLanguage(as_object& proto);
 
-    as_value system_security_allowdomain(const fn_call& fn);
-    as_value system_security_allowinsecuredomain(const fn_call& fn);
-    as_value system_security_loadpolicyfile(const fn_call& fn);
-    as_value system_setClipboard(const fn_call& fn);
-    as_value system_showsettings(const fn_call& fn);
-    as_value system_exactsettings(const fn_call& fn);
-    as_value system_usecodepage(const fn_call& fn);
-    void attachSystemSecurityInterface(as_object& o);
-    void attachSystemCapabilitiesInterface(as_object& o);
-    void attachSystemInterface(as_object& proto);
-    
-    // AS3 functions.
-    as_value system_gc(const fn_call& fn);
-    as_value system_pause(const fn_call& fn);
-    as_value system_resume(const fn_call& fn);
+as_value system_security_allowdomain(const fn_call& fn);
+as_value system_security_allowinsecuredomain(const fn_call& fn);
+as_value system_security_loadpolicyfile(const fn_call& fn);
+as_value system_setClipboard(const fn_call& fn);
+as_value system_showsettings(const fn_call& fn);
+as_value system_exactsettings(const fn_call& fn);
+as_value system_usecodepage(const fn_call& fn);
+void attachSystemSecurityInterface(as_object& o);
+void attachSystemCapabilitiesInterface(as_object& o);
+void attachSystemInterface(as_object& proto);
 
-	// List of domains that can access/modify local data
-	std::vector<std::string> _allowDataAccess;
+// AS3 functions.
+as_value system_gc(const fn_call& fn);
+as_value system_pause(const fn_call& fn);
+as_value system_resume(const fn_call& fn);
+
+// List of domains that can access/modify local data
+std::vector<std::string> _allowDataAccess;
 }
-
 
 void
 system_class_init(as_object& where, const ObjectURI& uri)
@@ -128,12 +127,16 @@ attachSystemSecurityInterface(as_object& o)
     VM& vm = getVM(o);
     o.init_member("allowDomain", vm.getNative(12, 0));
 
+    const int swf7Flags = PropFlags::dontDelete | PropFlags::dontEnum
+        | PropFlags::readOnly | PropFlags::onlySWF7Up;
+
     Global_as& gl = getGlobal(o);
-    // TODO: only available when SWF >= 7 
     o.init_member("allowInsecureDomain",
-            gl.createFunction(system_security_allowinsecuredomain));
+                  gl.createFunction(system_security_allowinsecuredomain),
+                  swf7Flags);
     o.init_member("loadPolicyFile",
-            gl.createFunction(system_security_loadpolicyfile));
+                  gl.createFunction(system_security_loadpolicyfile),
+                  swf7Flags);
 }
 
 void
@@ -151,24 +154,24 @@ attachSystemCapabilitiesInterface(as_object& o)
     VM& vm = getVM(o);
     
     const std::string os = vm.getOSName();
-
+    
     const std::string language = systemLanguage(o);
-
+    
     // FIXME: these need to be implemented properly 
     // Does the NetStream object natively support SSL?
-	const bool hasTLS = true;
-
+    const bool hasTLS = true;
+    
     // Microphone and camera access disabled
-	const bool avHardwareDisable = false;
-	
-	// Not sure: seems to be whether the movie can 'float' above web pages,
-	// and is useful for disabling certain annoying adverts.
-	const bool windowlessDisable = false;
-
-	const bool hasPrinting = true;
-	const bool hasAccessibility = true;
-	const bool isDebugger = false;
-	const bool localFileReadDisable = false;
+    const bool avHardwareDisable = false;
+    
+    // Not sure: seems to be whether the movie can 'float' above web pages,
+    // and is useful for disabling certain annoying adverts.
+    const bool windowlessDisable = false;
+    
+    const bool hasPrinting = true;
+    const bool hasAccessibility = true;
+    const bool isDebugger = false;
+    const bool localFileReadDisable = false;
 
     //
     // Display information (needs active GUI)
@@ -228,56 +231,55 @@ attachSystemCapabilitiesInterface(as_object& o)
     const std::string manufacturer = rcfile.getFlashSystemManufacturer();
     
     // serverString
-	// A URL-encoded string to send system info to a server.
-	// Boolean values are represented as t or f.		
-	// Privacy concerns should probably be addressed by 	
-	// allowing this string to be sent or not; individual	
-	// values that might affect privacy can be overridden	
-	// in gnashrc.
-	
-	// hasIME seems not to be included in the server string, though
-	// it is documented to have a server string of IME.
-	// Linux player version 9 has no hasIME property (but no need
-	// to emulate that.)
-	
-	// TLS and hasTLS are documented for AS3, player version 9.
-	//
-	// WD is included in the server string for player version 9,
-	// but not documented. It corresponds to the equally undocumented
-	// windowlessDisable.
-	
-	// This should be the standard order of parameters in the server
-	// string.
-	std::ostringstream serverString;
-	serverString << "A="    << trueFalse(hasAudio)
-			<< "&SA="	<< trueFalse(hasStreamingAudio)
-			<< "&SV="	<< trueFalse(hasStreamingVideo)
-			<< "&EV="	<< trueFalse(hasEmbeddedVideo)
-			<< "&MP3="	<< trueFalse(hasMP3)						
-			<< "&AE="	<< trueFalse(hasAudioEncoder)
-			<< "&VE="	<< trueFalse(hasVideoEncoder)
-			<< "&ACC="	<< trueFalse(hasAccessibility)
-			<< "&PR="	<< trueFalse(hasPrinting)
-			<< "&SP="	<< trueFalse(hasScreenPlayback) 
-			<< "&SB="	<< trueFalse(hasScreenBroadcast) 
-			<< "&DEB="	<< trueFalse(isDebugger)
-			<< "&V="    << URL::encode(version)
-			<< "&M="    << URL::encode(manufacturer)
-			<< "&R="    << screenResolutionX << "x" << screenResolutionY
-			<< "&DP="	<< screenDPI
-			<< "&COL="	<< screenColor					
-			<< "&AR="   << pixelAspectRatio
-			<< "&OS="   << URL::encode(os)
-			<< "&L="    << language			
-			<< "&PT="   << playerType
-			<< "&AVD="	<< trueFalse(avHardwareDisable) 
-			<< "&LFD="	<< trueFalse(localFileReadDisable)
-			<< "&WD="   << trueFalse(windowlessDisable)
-			<< "&TLS="	<< trueFalse(hasTLS);
-	
+    // A URL-encoded string to send system info to a server.
+    // Boolean values are represented as t or f.		
+    // Privacy concerns should probably be addressed by 	
+    // allowing this string to be sent or not; individual	
+    // values that might affect privacy can be overridden	
+    // in gnashrc.
+    
+    // hasIME seems not to be included in the server string, though
+    // it is documented to have a server string of IME.
+    // Linux player version 9 has no hasIME property (but no need
+    // to emulate that.)
+    
+    // TLS and hasTLS are documented for AS3, player version 9.
+    //
+    // WD is included in the server string for player version 9,
+    // but not documented. It corresponds to the equally undocumented
+    // windowlessDisable.
+    
+    // This should be the standard order of parameters in the server
+    // string.
+    std::ostringstream serverString;
+    serverString << "A="    << trueFalse(hasAudio)
+                 << "&SA="	<< trueFalse(hasStreamingAudio)
+                 << "&SV="	<< trueFalse(hasStreamingVideo)
+                 << "&EV="	<< trueFalse(hasEmbeddedVideo)
+                 << "&MP3="	<< trueFalse(hasMP3)						
+                 << "&AE="	<< trueFalse(hasAudioEncoder)
+                 << "&VE="	<< trueFalse(hasVideoEncoder)
+                 << "&ACC="	<< trueFalse(hasAccessibility)
+                 << "&PR="	<< trueFalse(hasPrinting)
+                 << "&SP="	<< trueFalse(hasScreenPlayback) 
+                 << "&SB="	<< trueFalse(hasScreenBroadcast) 
+                 << "&DEB="	<< trueFalse(isDebugger)
+                 << "&V="       << URL::encode(version)
+                 << "&M="       << URL::encode(manufacturer)
+                 << "&R="       << screenResolutionX << "x" << screenResolutionY
+                 << "&DP="	<< screenDPI
+                 << "&COL="	<< screenColor					
+                 << "&AR="      << pixelAspectRatio
+                 << "&OS="      << URL::encode(os)
+                 << "&L="       << language			
+                 << "&PT="      << playerType
+                 << "&AVD="	<< trueFalse(avHardwareDisable) 
+                 << "&LFD="	<< trueFalse(localFileReadDisable)
+                 << "&WD="      << trueFalse(windowlessDisable)
+                 << "&TLS="	<< trueFalse(hasTLS);
+    
     const int flags = PropFlags::dontDelete
-                    | PropFlags::dontEnum
-                    | PropFlags::readOnly;
+        | PropFlags::dontEnum | PropFlags::readOnly;
 
     o.init_member("version", version, flags);
     o.init_member("playerType", playerType, flags);
@@ -323,29 +325,29 @@ void
 attachSystemInterface(as_object& proto)
 {
     Global_as& gl = getGlobal(proto);
-
+    
     string_table& st = getStringTable(proto);
     registerBuiltinObject(proto, attachSystemSecurityInterface,
-            ObjectURI(st.find("security"), 0));
+                          ObjectURI(st.find("security"), 0));
     registerBuiltinObject(proto, attachSystemCapabilitiesInterface,
-            ObjectURI(st.find("capabilities"), 0));
-
-	proto.init_member("setClipboard", 
-            gl.createFunction(system_setClipboard));
-	
+                          ObjectURI(st.find("capabilities"), 0));
+    
+    proto.init_member("setClipboard", 
+                      gl.createFunction(system_setClipboard));
+    
     VM& vm = getVM(proto);
-	proto.init_member("showSettings", vm.getNative(2107, 0));
-	proto.init_property("useCodepage", &system_usecodepage,
-            &system_usecodepage);
-
+    proto.init_member("showSettings", vm.getNative(2107, 0));
+    proto.init_property("useCodepage", &system_usecodepage,
+                        &system_usecodepage);
+    
     const int flags = PropFlags::dontDelete
-                    | PropFlags::dontEnum
-                    | PropFlags::readOnly
-                    | PropFlags::onlySWF6Up;
-
+        | PropFlags::dontEnum
+        | PropFlags::readOnly
+        | PropFlags::onlySWF6Up;
+    
     proto.init_property("exactSettings", &system_exactsettings,
-            &system_exactsettings, flags);
-
+                        &system_exactsettings, flags);
+    
 }
 
 // This function returns false if no arguments were passed, true if any
