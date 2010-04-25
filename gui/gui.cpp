@@ -1281,7 +1281,7 @@ Gui::addFlashVars(Gui::VariableMap& from)
 void
 Gui::addScriptableVar(const std::string &name, const std::string &value)
 {
-    log_debug("Adding variable %s (%s) to scriptable variables",
+    log_debug("Adding scriptable variable \"%s\" = %s",
               name, value);
     _scriptableVars[name] = value;
 }

@@ -1228,5 +1228,5 @@ DSOEXPORT short stringToStageAlign(const std::string& s);
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

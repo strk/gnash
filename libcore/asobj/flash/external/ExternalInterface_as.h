@@ -25,6 +25,8 @@
 #include <vector>
 #include <map>
 
+#include "Relay.h"
+
 namespace gnash {
 
 class as_object;
@@ -35,7 +37,7 @@ class Global_as;
 
 namespace gnash {
 
-class ExternalInterface_as
+class ExternalInterface_as: public ActiveRelay
 {
 public:
     ExternalInterface_as(as_object* owner);
@@ -45,10 +47,8 @@ public:
     // in the browser.
     bool addCallback(const std::string &name, as_object *method);
 
-    // This is a flag that specifies wether exceptions in ActionScript
-    // should be propogated to JavaScript in the browser.
-    void marshallExceptions(bool flag);
-    bool marshallExceptions();
+    ///
+    bool addRootCallback();    
 
     /// Returns the id attribute of the object tag in Internet Explorer,
     /// or the name attribute of the embed tag in Netscape. 
@@ -92,16 +92,18 @@ public:
     static std::string escapeXML(as_object &obj);
     static std::string unescapeXML(as_object &obj);
 
+    /// Call a callback if it's registered already.
+    bool call(as_object* callback, const std::string& name,
+              const std::vector<as_value>& args, size_t firstArg);
+    
+    // These are our implementations of ActiveRelay methods.
     virtual bool advance() = 0;
     virtual void setReachable() const = 0;
     
-    /// Call a callback if it's registered already.
-    virtual bool call(as_object* asCallback, const std::string& methodName,
-              const std::vector<as_value>& args, size_t firstArg);
+    virtual void update();
     
 private:
     std::string _objectid;
-    bool        _exceptions;
     std::map<std::string, as_object *> _methods;
 };
 

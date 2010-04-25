@@ -245,7 +245,7 @@ public:
     PropsCopier(as_object& tgt)
         :
         _tgt(tgt)
-	{}
+	{ /* do nothing */ }
 
     /// Set *inherited* properties of the given target object
     bool accept(const ObjectURI& uri, const as_value& val) {
@@ -266,7 +266,7 @@ public:
         _version(getSWFVersion(this_ptr)),
         _st(getStringTable(this_ptr)),
         _to(to)
-        {}
+        { /* do nothing */ }
 
     bool accept(const ObjectURI& uri, const as_value& val) {
         _to.push_front(std::make_pair(_st.value(getName(uri)),
