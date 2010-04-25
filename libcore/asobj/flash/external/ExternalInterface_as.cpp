@@ -86,7 +86,7 @@ public:
     PropsSerializer(VM& vm)
         : _st(vm.getStringTable()),
           _error(false)
-    {}
+        { /* do nothing */}
     
     bool success() const { return !_error; }
 
@@ -124,10 +124,12 @@ private:
 void
 externalinterface_class_init(as_object& where, const ObjectURI& uri)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
-    registerBuiltinClass(where, externalinterface_ctor, 0,
+    registerBuiltinClass(where, 0, 0,
                          attachExternalInterfaceStaticInterface, uri);
+
+    // ExternalInterface_as* ei = new  ExternalInterface_as(&where);
 }
 
 namespace {
@@ -205,8 +207,12 @@ externalinterface_addCallback(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-    // ExternalInterface_as* ptr = ensure<ExternalInterface_as> (fn);
+    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
 
+    movie_root& mr = getRoot(fn);
+    MovieClip *mc = mr.getLevel(0);
+    string_table& st = getStringTable(fn); 
+    
     if (fn.nargs == 3) {
         const as_value& methodName_as = fn.arg(0);
         std::string methodName = methodName_as.to_string();
@@ -214,14 +220,12 @@ externalinterface_addCallback(const fn_call& fn)
         if (fn.arg(1).is_object()) {
             asCallback = (fn.arg(1).to_object(getGlobal(fn)));
         }
-        movie_root& mr = getRoot(fn);
-//      mr.addAdvanceCallback(this);
-
-        // ptr->addCallback(methodName, asCallback.get());
-        // ptr->addRootCallback();
+        ptr.addCallback(methodName, asCallback.get());
+        ptr.addRootCallback(mr);
+        return as_value(true);        
     }
     
-    return as_value();    
+    return as_value(false);    
 }
 
 as_value
@@ -336,30 +340,13 @@ externalinterface_objectID(const fn_call& fn)
 }
 
 as_value
-externalinterface_ctor(const fn_call& /* fn */)
+externalinterface_ctor(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
     // there is nothing to construct, all methods are static
     return as_value();
 }
-
-#if 0
-as_value
-externalInterfaceConstructor(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-
-    log_debug("Loading flash.external.ExternalInterface class");
-    Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
-    as_object* cl = gl.createClass(&externalinterface_ctor, proto);
-
-    attachExternalInterfaceStaticInterface(*cl);
-    
-    return proto;
-}
-#endif
 
 as_value
 externalinterface_uArgumentsToXML(const fn_call& fn)
@@ -587,9 +574,16 @@ ExternalInterface_as::ExternalInterface_as(as_object* owner)
     GNASH_REPORT_FUNCTION;
 }
 
-ExternalInterface_as::~ExternalInterface_as()
+ExternalInterface_as::ExternalInterface_as()
+    : ActiveRelay(*this)
 {
     GNASH_REPORT_FUNCTION;
+
+}
+
+ExternalInterface_as::~ExternalInterface_as()
+{
+//    GNASH_REPORT_FUNCTION;
 //    LOG_ONCE( log_unimpl (__FUNCTION__) );
 }
 
@@ -610,13 +604,12 @@ ExternalInterface_as::addCallback(const std::string &name, as_object *method)
 }
 
 bool
-ExternalInterface_as::addRootCallback()
+ExternalInterface_as::addRootCallback(movie_root &mr)
 {
     log_debug(__PRETTY_FUNCTION__);
     
     if (_methods.size() == 1) {
         // Register callback so we can send the data on the next advance.
-        movie_root& mr = getRoot(owner());
         mr.addAdvanceCallback(this);
     }
     
@@ -865,27 +858,15 @@ ExternalInterface_as::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
     return as_value();
 }
 
-/// Returns the id attribute of the object tag in Internet Explorer,
-/// or the name attribute of the embed tag in Netscape. 
-const std::string &
-ExternalInterface_as::objectID()
+ExternalInterface_as &
+ExternalInterface_as::Instance()
 {
-    log_debug(__PRETTY_FUNCTION__);
+    static ExternalInterface_as ei;
     
-    return _objectid;
+    return ei;
 }
 
-std::string
-ExternalInterface_as::objectID(as_object &/*obj*/)
-    
-{
-    log_debug(__PRETTY_FUNCTION__);
-
-    std::string str;
-    
-    return (str);
-}
-
+#if 0
 void
 ExternalInterface_as::setReachable() const
 {
@@ -904,6 +885,7 @@ ExternalInterface_as::advance()
     
     return false;
 }
+#endif
 
 void
 ExternalInterface_as::update()

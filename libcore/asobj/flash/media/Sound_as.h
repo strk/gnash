@@ -57,7 +57,7 @@ public:
     
     ~Sound_as();
     
-	/// Make this sound control the given DisplayObject
+    /// Make this sound control the given DisplayObject
     //
     /// NOTE: 0 is accepted, to implement an "invalid"
     ///       controller type.
@@ -198,6 +198,6 @@ void registerSoundNative(as_object& global);
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
 

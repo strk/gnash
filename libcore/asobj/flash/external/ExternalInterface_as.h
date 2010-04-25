@@ -33,6 +33,7 @@ class as_object;
 class as_value;
 class ObjectURI;
 class Global_as;
+class movie_root;
 }
 
 namespace gnash {
@@ -40,7 +41,9 @@ namespace gnash {
 class ExternalInterface_as: public ActiveRelay
 {
 public:
+    ExternalInterface_as();
     ExternalInterface_as(as_object* owner);
+    static ExternalInterface_as &Instance();
     virtual ~ExternalInterface_as();
 
     /// Add an ActionScript function as a callback by JavaScript
@@ -48,13 +51,8 @@ public:
     bool addCallback(const std::string &name, as_object *method);
 
     ///
-    bool addRootCallback();    
+    bool addRootCallback(movie_root &mr);    
 
-    /// Returns the id attribute of the object tag in Internet Explorer,
-    /// or the name attribute of the embed tag in Netscape. 
-    const std::string &objectID();
-    std::string objectID(as_object &obj);    
-    
     // These appear to be undocumented helper functions of this class
     // that while propably designed to be used internally, get used
     // by ActionScript coders.
@@ -97,13 +95,12 @@ public:
               const std::vector<as_value>& args, size_t firstArg);
     
     // These are our implementations of ActiveRelay methods.
-    virtual bool advance() = 0;
-    virtual void setReachable() const = 0;
+    // virtual bool advance() = 0;
+    // virtual void setReachable() const = 0;
     
     virtual void update();
     
 private:
-    std::string _objectid;
     std::map<std::string, as_object *> _methods;
 };
 
