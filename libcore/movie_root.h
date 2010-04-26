@@ -787,7 +787,6 @@ public:
     /// (for browser communication mostly)
     void setControlFD(int fd)
     {
-        assert(fd >= 0);
         _controlfd = fd;
     }
 
