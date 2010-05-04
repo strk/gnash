@@ -22,10 +22,11 @@
 #endif
 
 #include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__) && !defined(_ANDROID)
 # include <sys/ipc.h>
 # include <sys/shm.h>
-#elif !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__)
+#elif !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__) && !defined(_ANDROID)
+
 # include <windows.h>
 # include <process.h>
 # include <fcntl.h>
