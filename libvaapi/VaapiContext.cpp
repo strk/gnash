@@ -1,6 +1,6 @@
 // VaapiContext.cpp: VA context abstraction
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@ namespace gnash {
 /// Translates VAProfile to VaapiCodec
 static VaapiCodec get_codec(VAProfile profile)
 {
+    GNASH_REPORT_FUNCTION;
+
     switch (profile) {
     case VAProfileMPEG2Simple:
     case VAProfileMPEG2Main:
@@ -82,6 +84,8 @@ VaapiContext::VaapiContext(VAProfile profile, VAEntrypoint entrypoint)
     , _entrypoint(entrypoint)
     , _picture_width(0), _picture_height(0)
 {
+    GNASH_REPORT_FUNCTION;
+
     log_debug("VaapiContext::VaapiContext(): profile %d, entrypoint %d\n", profile, entrypoint);
 
     if (!construct()) {
@@ -94,6 +98,7 @@ VaapiContext::VaapiContext(VAProfile profile, VAEntrypoint entrypoint)
 
 VaapiContext::~VaapiContext()
 {
+    GNASH_REPORT_FUNCTION;
     log_debug("VaapiContext::~VaapiContext(): context 0x%08x\n", _context);
 
     destruct();
@@ -186,6 +191,8 @@ bool VaapiContext::createContext(unsigned int width, unsigned int height)
 
 void VaapiContext::destroyContext()
 {
+    GNASH_REPORT_FUNCTION;
+
     VAStatus status;
 
     if (_context != VA_INVALID_ID) {
@@ -230,8 +237,7 @@ void VaapiContext::releaseSurface(boost::shared_ptr<VaapiSurface> surface)
     _surfaces.push(surface);
 }
 
-} // gnash namespace
-
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

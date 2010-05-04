@@ -1,6 +1,6 @@
 // VaapiException.h: VA exception abstraction
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,24 +24,24 @@
 #include <string>
 
 namespace gnash {
-
-/// VA exception abstraction
-struct VaapiException: public std::runtime_error {
-    VaapiException(const std::string & str)
-        : std::runtime_error(str)
-        { }
-
-    VaapiException()
-        : std::runtime_error("Video Acceleration error")
-        { }
-
-    virtual ~VaapiException() throw()
-        { }
+    
+    /// VA exception abstraction
+    struct VaapiException: public std::runtime_error {
+        VaapiException(const std::string & str)
+            : std::runtime_error(str)
+        { /* do nothing */ }
+        
+        VaapiException()
+            : std::runtime_error("Video Acceleration error")
+        { /* do nothing */ }
+        
+        virtual ~VaapiException() throw()
+        { /* do nothing */ }
 };
 
 } // gnash namespace
 
-#endif /* GNASH_VAAPIEXCEPTION_H */
+#endif // GNASH_VAAPIEXCEPTION_H
 
 // local Variables:
 // mode: C++

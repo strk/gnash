@@ -1,6 +1,6 @@
 // VaapiSurfaceProxy.cpp: VA surface proxy
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ VaapiSurfaceProxy::VaapiSurfaceProxy(boost::shared_ptr<VaapiSurface> surface,
 {
     log_debug("VaapiSurfaceProxy::VaapiSurfaceProxy(): surface 0x%08x\n", _surface->get());
 }
-
+    
 VaapiSurfaceProxy::~VaapiSurfaceProxy()
 {
     log_debug("VaapiSurfaceProxy::~VaapiSurfaceProxy(): surface 0x%08x\n", _surface->get());
@@ -38,8 +38,7 @@ VaapiSurfaceProxy::~VaapiSurfaceProxy()
     _context->releaseSurface(_surface);
 }
 
-} // gnash namespace
-
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

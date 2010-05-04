@@ -1,6 +1,6 @@
 // VaapiSurface.cpp: VA surface abstraction
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 //
 
 #include <algorithm>
+#include <boost/cstdint.hpp>
 
 #include "log.h"
 #include "VaapiSurface.h"
@@ -43,7 +44,7 @@ public:
     ~VaapiSurfaceImpl();
 };
 
-VaapiSurfaceImpl::VaapiSurfaceImpl(const VaapiSurface *surface,
+    VaapiSurfaceImpl::VaapiSurfaceImpl(const VaapiSurface */* surface */,
                                    unsigned int width, unsigned int height)
     : VaapiSurfaceImplBase(width, height)
 {
@@ -201,8 +202,7 @@ bool VaapiSurface::deassociateSubpicture(boost::shared_ptr<VaapiSubpicture> subp
     return true;
 }
 
-} // gnash namespace
-
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

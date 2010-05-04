@@ -1,6 +1,6 @@
 // VaapiImage.h: VA image abstraction
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,24 +54,19 @@ public:
     ~VaapiImage();
 
     /// Get VA image ID
-    VAImageID get() const
-        { return _image.image_id; }
+    VAImageID get() const { return _image.image_id; }
 
     /// Get image format
-    VaapiImageFormat format() const
-        { return _format; }
+    VaapiImageFormat format() const { return _format; }
 
     /// Get image width
-    unsigned int width() const
-        { return _image.width; }
+    unsigned int width() const { return _image.width; }
 
     /// Get image height
-    unsigned int height() const
-        { return _image.height; }
+    unsigned int height() const { return _image.height; }
 
     /// Check whether the VA image is mapped
-    bool isMapped() const
-        { return _image_data != NULL; }
+    bool isMapped() const { return _image_data != NULL; }
 
     /// Map image data
     bool map();
@@ -80,8 +75,7 @@ public:
     bool unmap();
 
     /// Get number of planes
-    unsigned int getPlaneCount() const
-        { return _image.num_planes; }
+    unsigned int getPlaneCount() const { return _image.num_planes; }
 
     /// Get pixels for the specified plane
     boost::uint8_t *getPlane(int plane) const;
@@ -92,7 +86,7 @@ public:
 
 } // gnash namespace
 
-#endif /* GNASH_VAAPIIMAGE_H */
+#endif // GNASH_VAAPIIMAGE_H
 
 // local Variables:
 // mode: C++

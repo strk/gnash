@@ -333,11 +333,9 @@ GtkAggXvGlue::findXvPort(Display* display)
     XvFreeAdaptorInfo(adaptor_info);    
 
     if (_xv_port != std::numeric_limits<XvPortID>::max()) {
-        const char fourcc[] = {(_xv_format.id & 0xFF),
-                               (_xv_format.id >> 8)  & 0xFF,
-                               (_xv_format.id >> 16) & 0xFF, 
-                               (_xv_format.id >> 24) & 0xFF, 0};
-        log_debug(_("GTK-AGG: Selected format %s for Xv rendering."), fourcc);
+	std::stringstream ss;
+	ss << _xv_format.id;
+        log_debug(_("GTK-AGG: Selected format %s for Xv rendering."), ss.str());
         get_max_xv_image(display, _xv_port, &_xv_max_width, &_xv_max_height);
     }
     

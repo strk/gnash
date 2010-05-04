@@ -1,6 +1,6 @@
 // VaapiImageFormat.cpp: VA image format abstraction
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ VaapiColorspace vaapi_image_format_get_colorspace(VaapiImageFormat format)
 // Return image format from a VA image format
 VaapiImageFormat vaapi_get_image_format(VAImageFormat const &format)
 {
-    /* XXX: check RGB formats and endianess */
+    // XXX: check RGB formats and endianess
     return static_cast<VaapiImageFormat>(format.fourcc);
 }
 

@@ -102,6 +102,7 @@ AM_LDFLAGS =  \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
 	$(LIRC_LIBS) \
+	$(INTLLIB) \
 	$(MYSQL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \

@@ -1,6 +1,6 @@
 // VaapiDisplayX11.h: VA/X11 display representation
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,14 +30,11 @@ class X11Display {
     Display *_x_display;
 
 public:
-    X11Display()
-        { _x_display = XOpenDisplay(NULL); }
+    X11Display() { _x_display = XOpenDisplay(NULL); }
 
-    ~X11Display()
-        { if (_x_display) XCloseDisplay(_x_display); }
+    ~X11Display() { if (_x_display) XCloseDisplay(_x_display); }
 
-    Display *get() const
-        { return _x_display; }
+    Display *get() const { return _x_display; }
 };
 
 /// VA/X11 display representation
@@ -49,7 +46,7 @@ struct VaapiDisplayX11 : public X11Display, VaapiDisplay {
 
 } // gnash namespace
 
-#endif /* GNASH_VAAPIDISPLAY_H */
+#endif // GNASH_VAAPIDISPLAY_H
 
 // local Variables:
 // mode: C++
