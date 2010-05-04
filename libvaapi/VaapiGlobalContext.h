@@ -1,6 +1,6 @@
 // VaapiGlobalContext.h: VA API global context
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@
 #ifndef GNASH_VAAPIGLOBALCONTEXT_H
 #define GNASH_VAAPIGLOBALCONTEXT_H
 
-#include "vaapi_common.h"
 #include <vector>
+
+#include "log.h"
+#include "vaapi_common.h"
 #include "VaapiDisplay.h"
 #include "VaapiImageFormat.h"
 
@@ -66,8 +68,7 @@ public:
     /// Get the VA display
     //
     /// @return     The VA display
-    VADisplay display() const
-        { return _display->get(); }
+    VADisplay display() const { return _display->get(); }
 };
 
 } // gnash namespace

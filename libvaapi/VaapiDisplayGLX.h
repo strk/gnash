@@ -1,6 +1,6 @@
 // VaapiDisplayGLX.h: VA/GLX display representation
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,21 +20,22 @@
 #ifndef GNASH_VAAPIDISPLAYGLX_H
 #define GNASH_VAAPIDISPLAYGLX_H
 
+#include "log.h"
 #include <va/va_glx.h>
 #include "VaapiDisplayX11.h"
 
 namespace gnash {
-
-/// VA/GLX display representation
-struct VaapiDisplayGLX : public X11Display, VaapiDisplay {
-    VaapiDisplayGLX()
-        : VaapiDisplay(vaGetDisplayGLX(X11Display::get()))
-        { }
-};
+    
+    /// VA/GLX display representation
+    struct VaapiDisplayGLX : public X11Display, VaapiDisplay {
+        VaapiDisplayGLX()
+            : VaapiDisplay(vaGetDisplayGLX(X11Display::get()))
+        { /* do nothing */ }
+    };
 
 } // gnash namespace
 
-#endif /* GNASH_VAAPIDISPLAY_H */
+#endif // GNASH_VAAPIDISPLAY_H
 
 // local Variables:
 // mode: C++

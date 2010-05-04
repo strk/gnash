@@ -1,6 +1,6 @@
 // VaapiSurfaceGLX.h: VA/GLX surface abstraction
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,16 +34,13 @@ public:
     VaapiSurfaceGLX(GLenum target, GLuint texture);
 
     /// Return VA surface id
-    void *get() const
-        { return reinterpret_cast<void *>(_impl->surface()); }
+    void *get() const { return reinterpret_cast<void *>(_impl->surface()); }
 
     /// Get surface width
-    unsigned int width() const
-        { return _impl->width(); }
+    unsigned int width() const { return _impl->width(); }
 
     /// Get surface height
-    unsigned int height() const
-        { return _impl->height(); }
+    unsigned int height() const { return _impl->height(); }
 
     /// Update VA/GLX surface from VA surface
     bool update(boost::shared_ptr<VaapiSurface> surface);
@@ -51,7 +48,7 @@ public:
 
 } // gnash namespace
 
-#endif /* GNASH_VAAPISURFACEGLX_H */
+#endif // GNASH_VAAPISURFACEGLX_H
 
 // local Variables:
 // mode: C++
