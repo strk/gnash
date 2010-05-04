@@ -122,7 +122,7 @@ GnashPluginScriptObject::AddProperty(const std::string &name,
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
 
     NPVariant strvar;
-    STRINGN_TO_NPVARIANT(val.c_str(), val.size(), strvar);
+    STRINGN_TO_NPVARIANT(val.c_str(), static_cast<int>(val.size()), strvar);
     SetProperty(id, strvar);
 }
 
@@ -663,7 +663,7 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
         // plugin support.
         NPVariant value;
         if (name == "$version") {
-            STRINGZ_TO_NPVARIANT(strdup("LNX 10,0,r999"), value);
+            STRINGN_TO_NPVARIANT("LNX 10,0,r999", 13, value);
         } else {
             log_error("Couldn't send GetVariable request, network problems.");
             NULL_TO_NPVARIANT(value);
