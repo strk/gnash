@@ -407,26 +407,26 @@ public:
     // Only print function tracing messages when multiple -v
     // options have been supplied. 
     __Host_Function_Report__(void) {
-	log_debug("entering");
+	log_trace("entering");
     }
 
     __Host_Function_Report__(char *_func) {
 	func = _func;
-	log_debug("%s enter", func);
+	log_trace("%s enter", func);
     }
 
     __Host_Function_Report__(const char *_func) {
 	func = _func;
 	if (func) {
-	    log_debug("%s enter", func);
+	    log_trace("%s enter", func);
 	} else {
-	    log_debug("No Function Name! enter");
+	    log_trace("No Function Name! enter");
 	}
     }
 
     ~__Host_Function_Report__(void) {
 	if (LogFile::getDefaultInstance().getVerbosity() > LogFile::LOG_DEBUG) {
-	    log_debug("%s returning", func);
+	    log_trace("%s returning", func);
 	}
     }
 };
@@ -451,10 +451,10 @@ public:
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \
-    gnash::log_debug("entering")
+    gnash::log_trace("entering")
 
 #define GNASH_REPORT_RETURN \
-    gnash::log_debug("returning")
+    gnash::log_trace("returning")
 #endif
 
 }
