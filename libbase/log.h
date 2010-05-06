@@ -451,10 +451,10 @@ public:
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \
-    gnash::log_trace("entering")
+    gnash::log_debug("entering")
 
 #define GNASH_REPORT_RETURN \
-    gnash::log_trace("returning")
+    gnash::log_debug("returning")
 #endif
 
 }
