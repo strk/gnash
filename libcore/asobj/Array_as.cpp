@@ -308,10 +308,7 @@ struct as_value_lt
 {
     int _version;
 
-    as_value_lt(int version)
-        : _version(version)
-    {
-    }
+    as_value_lt(int version) : _version(version) {}
 
     inline int str_cmp(const as_value& a, const as_value& b)
     {

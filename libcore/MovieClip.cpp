@@ -1230,7 +1230,7 @@ MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dli
         tag->getDepth(), 
         tag->hasCxform() ? &tag->getCxform() : NULL,
         tag->hasMatrix() ? &tag->getMatrix() : NULL,
-        tag->hasRatio()    ? &ratio    : NULL,
+        tag->hasRatio() ? &ratio : NULL,
         NULL);
 }
 
