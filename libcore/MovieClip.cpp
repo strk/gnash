@@ -535,18 +535,16 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     //             we'll temporarly clear the _callingFrameActions flag
     //             to properly queue actions back on the global queue.
     //
-    _callingFrameActions=true;
+    _callingFrameActions = true;
     const PlayList* playlist = _def->getPlaylist(frame_number);
-    if ( playlist )
-    {
-    PlayList::const_iterator it = playlist->begin();
+    if (playlist) {
+        PlayList::const_iterator it = playlist->begin();
         const PlayList::const_iterator e = playlist->end();
-    for(; it != e; it++)
-    {
-        (*it)->execute_action(this, _displayList);
+        for(; it != e; it++) {
+            (*it)->execute_action(this, _displayList);
+        }
     }
-    }
-    _callingFrameActions=false;
+    _callingFrameActions = false;
 
 }
 
