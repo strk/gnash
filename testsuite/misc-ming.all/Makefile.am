@@ -221,6 +221,7 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 check_PROGRAMS += \
 	init_action_test \
+	InitActionTest2 \
 	registerClassTest2 \
 	$(NULL)
 endif
@@ -348,7 +349,7 @@ endif
 
 if MING_SUPPORTS_INIT_ACTIONS
 check_SCRIPTS += \
-	init_action_testrunner \
+	InitActionTest2Runner \
 	registerClassTest2runner \
 	$(NULL)
 endif
@@ -1772,6 +1773,17 @@ ButtonPropertiesTestRunner_CXXFLAGS = \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
 
+InitActionTest2_SOURCES =	\
+	InitActionTest2.c	\
+	$(NULL)
+InitActionTest2_LDADD = libgnashmingutils.la
+
+InitActionTest2.swf: InitActionTest2
+	./InitActionTest2 $(top_srcdir)/testsuite/media
+
+InitActionTest2Runner: $(srcdir)/../generic-testrunner.sh InitActionTest2.swf
+	sh $< $(top_builddir) InitActionTest2.swf > $@
+	chmod 755 $@
 
 init_action_test_SOURCES =	\
 	init_action_test.c	\
@@ -2155,6 +2167,7 @@ if MING_SUPPORTS_INIT_ACTIONS
 TEST_CASES += \
 	registerClassTest2runner \
 	init_action_testrunner \
+	InitAction2TestRunner \
 	$(NULL)
 endif
 

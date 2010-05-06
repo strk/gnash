@@ -134,10 +134,11 @@ class as_super : public as_object
 public:
 
     as_super(Global_as& gl, as_object* super)
-        : as_object(gl),
-          _super(super)
+        :
+        as_object(gl),
+        _super(super)
 	{
-            set_prototype(prototype());
+        set_prototype(prototype());
 	}
 
     virtual bool isSuper() const { return true; }

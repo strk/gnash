@@ -81,8 +81,9 @@ class PropsSerializer : public AbstractPropertyVisitor
 public:
     
     PropsSerializer(VM& vm)
-        : _st(vm.getStringTable()),
-          _error(false)
+        :
+        _st(vm.getStringTable()),
+        _error(false)
     {}
     
     bool success() const { return !_error; }
@@ -570,7 +571,8 @@ externalinterface_uUnescapeXML(const fn_call& fn)
 // namespace gnash {
 
 ExternalInterface_as::ExternalInterface_as(as_object* /*owner*/)
-    : _exceptions(false)
+    :
+    _exceptions(false)
 
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );

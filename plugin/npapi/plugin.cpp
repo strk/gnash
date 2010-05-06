@@ -667,7 +667,7 @@ bool
 nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
         GIOCondition cond, nsPluginInstance* plugin)
 {
-    log_trace(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
     
     return plugin->handlePlayerRequests(iochan, cond);
 }
@@ -675,7 +675,7 @@ nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
 bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
-    log_trace(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
     
     if ( cond & G_IO_HUP ) {
         gnash::log_debug("Player request channel hang up");

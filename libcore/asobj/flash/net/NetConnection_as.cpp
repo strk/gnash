@@ -143,7 +143,8 @@ protected:
     /// The NetConnection_as owns all ConnectionHandlers, so there is no
     /// need to mark it reachable.
     ConnectionHandler(NetConnection_as& nc)
-        : _nc(nc)
+        :
+        _nc(nc)
     {}
 
     // Object handling connection status messages
@@ -667,7 +668,8 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
 //----- NetConnection_as ----------------------------------------------------
 
 NetConnection_as::NetConnection_as(as_object* owner)
-    : ActiveRelay(owner),
+    :
+    ActiveRelay(owner),
     _queuedConnections(),
     _currentConnection(0),
     _uri(),

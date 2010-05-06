@@ -796,7 +796,7 @@ GnashPluginScriptObject::closePipe(int fd)
 bool
 GnashPluginScriptObject::createPipe()
 {
-    log_trace(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
 
     if ((_sockfds[READFD] == 0) && (_sockfds[WRITEFD] == 0)) {
         int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, _sockfds);
@@ -922,7 +922,7 @@ GnashPluginScriptObject::checkPipe(int fd)
 bool
 GnashPluginScriptObject::handleInvoke(GIOChannel *iochan, GIOCondition cond)
 {
-    log_trace(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
     
     if ( cond & G_IO_HUP ) {
         log_debug("Player request channel hang up");
@@ -981,7 +981,7 @@ GnashPluginScriptObject::handleInvokeWrapper(GIOChannel *iochan,
                                              GIOCondition cond,
                                              GnashPluginScriptObject* plugin)
 {
-    log_trace(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
     
     return plugin->handleInvoke(iochan, cond);
 }

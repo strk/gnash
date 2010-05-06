@@ -400,34 +400,34 @@ DSOEXPORT std::string hexify(const unsigned char *bytes, size_t length,
 #define IF_VERBOSE_MALFORMED_AMF(x)
 #endif
 
-class DSOEXPORT __Host_Function_Report__ {
+class DSOEXPORT __Host_Function_Report__
+{
 public:
     const char *func;
 
     // Only print function tracing messages when multiple -v
     // options have been supplied. 
     __Host_Function_Report__(void) {
-	log_trace("entering");
+        log_debug("entering");
     }
 
     __Host_Function_Report__(char *_func) {
-	func = _func;
-	log_trace("%s enter", func);
+        func = _func;
+        log_debug("%s enter", func);
     }
 
     __Host_Function_Report__(const char *_func) {
-	func = _func;
-	if (func) {
-	    log_trace("%s enter", func);
-	} else {
-	    log_trace("No Function Name! enter");
-	}
+        func = _func;
+        if (func) {
+            log_debug("%s enter", func);
+        }
+        else {
+            log_debug("No Function Name! enter");
+        }
     }
 
     ~__Host_Function_Report__(void) {
-	if (LogFile::getDefaultInstance().getVerbosity() > LogFile::LOG_DEBUG) {
-	    log_trace("%s returning", func);
-	}
+        log_debug("%s returning", func);
     }
 };
 
@@ -451,10 +451,10 @@ public:
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \
-    gnash::log_trace("entering")
+    gnash::log_debug("entering")
 
 #define GNASH_REPORT_RETURN \
-    gnash::log_trace("returning")
+    gnash::log_debug("returning")
 #endif
 
 }
