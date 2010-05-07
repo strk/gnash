@@ -631,12 +631,10 @@ public:
     };
 
     /// Push an executable code to the ActionQueue
-    void pushAction(std::auto_ptr<ExecutableCode> code,
-            size_t lvl = PRIORITY_DOACTION);
+    void pushAction(std::auto_ptr<ExecutableCode> code, size_t lvl);
 
     /// Push an executable code to the ActionQueue
-    void pushAction(const action_buffer& buf, DisplayObject* target,
-            size_t lvl = PRIORITY_DOACTION);
+    void pushAction(const action_buffer& buf, DisplayObject* target);
 
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)

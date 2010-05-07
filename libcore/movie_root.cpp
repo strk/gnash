@@ -1539,10 +1539,8 @@ movie_root::pushAction(std::auto_ptr<ExecutableCode> code, size_t lvl)
 }
 
 void
-movie_root::pushAction(const action_buffer& buf, DisplayObject* target,
-        size_t lvl)
+movie_root::pushAction(const action_buffer& buf, DisplayObject* target)
 {
-    assert(lvl < PRIORITY_SIZE);
 #ifdef GNASH_DEBUG
     log_debug("Pushed action buffer for target %s", 
             target->getTargetPath());
@@ -1550,7 +1548,7 @@ movie_root::pushAction(const action_buffer& buf, DisplayObject* target,
 
     std::auto_ptr<ExecutableCode> code(new GlobalCode(buf, target));
 
-    _actionQueue[lvl].push_back(code.release());
+    _actionQueue[PRIORITY_DOACTION].push_back(code.release());
 }
 
 void
