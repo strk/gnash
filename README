@@ -120,11 +120,14 @@ Gnash has three main options: choice of renderer (graphics library used
 to render the SWF movie), choice(s) of GUI toolkit (gtk, kde, etc), and choice
 of multimedia backend (audio and video decoder).
 
-The choices of renderer (pick one only):
+Gnash supports multiple renderers.
+By default it'll build them all in the rendering library, or you can
+select which ones you want:
 
    --enable-renderer=opengl
    --enable-renderer=cairo
-or --enable-renderer=agg (default)
+   --enable-renderer=agg
+or --enable-renderer=all (default)
 
 Gnash can use different multimedia back-ends for sound and/or video:
 
