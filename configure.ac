@@ -595,7 +595,7 @@ build_hildon=no                 dnl Native LIMO
 build_alp=no                    dnl Acess Linux Platform using Hiker
 build_dump=no
 AC_ARG_ENABLE(gui,
-  AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde4)]),
+  AC_HELP_STRING([--enable-gui=], [Enable support for the specified GUI toolkits (default=gtk,kde4)]),
   [if test -n ${enableval}; then
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
@@ -714,15 +714,15 @@ build_agg=yes
 build_cairo=yes
 renderer_list="OpenGL AGG Cairo"
 nrender=3
-AC_ARG_WITH(renderer,
-  AC_HELP_STRING([--with-renderer=], [Specify which renderers to support to enable (ogl|cairo|agg, default all)]),
-  if test -n ${withval}; then
-    if test "x${withval}" != "xno" -o "x${withval}" != "xnone" ; then
+AC_ARG_ENABLE(renderer,
+  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|cairo|agg|all, default=all)]),
+  if test -n ${enableval}; then
+    if test "x${enableval}" != "xno" -o "x${enableval}" != "xnone" ; then
       renderer_list="none"
-      withval=`echo ${withval} | tr '\054' ' ' `
+      enableval=`echo ${enableval} | tr '\054' ' ' `
     else
       renderer_list=""
-      withval=""
+      enableval=""
     fi
   fi
   renderer_list=""
@@ -730,8 +730,8 @@ AC_ARG_WITH(renderer,
   build_ogl=no
   build_agg=no
   build_cairo=no
-  while test -n "${withval}" ; do
-    val=`echo ${withval} | cut -d ' ' -f 1`
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
     [case "${val}" in
       no*|NO*)
         renderer_list="none"
@@ -762,11 +762,11 @@ AC_ARG_WITH(renderer,
         build_cairo=yes
         nrender=$((nrender+1))
         ;;
-      *) AC_MSG_ERROR([invalid renderer feature specified: ${withval} given (accept:  (ogl|cairo|agg|all)])
+      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (ogl|cairo|agg|all)])
         ;;
       esac]
-    withval=`echo ${withval} | cut -d ' ' -f 2-6`
-    if test "x$val" = "x$withval"; then
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$enableval"; then
       break;
     fi
   done
