@@ -1553,24 +1553,6 @@ movie_root::pushAction(const action_buffer& buf, DisplayObject* target,
     _actionQueue[lvl].push_back(code.release());
 }
 
-#if 0
-
-void
-movie_root::pushAction(as_function* func, DisplayObject* target, size_t lvl)
-{
-    assert(lvl >= 0 && lvl < PRIORITY_SIZE);
-#ifdef GNASH_DEBUG
-    log_debug("Pushed function (event hanlder?) with target %s",
-            target->getTargetPath());
-#endif
-
-    std::auto_ptr<ExecutableCode> code(new FunctionCode(func, target));
-
-    _actionQueue[lvl].push_back(code.release());
-}
-
-#endif
-
 void
 movie_root::executeAdvanceCallbacks()
 {

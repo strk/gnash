@@ -641,10 +641,6 @@ public:
     void pushAction(const action_buffer& buf, DisplayObject* target,
             size_t lvl = PRIORITY_DOACTION);
 
-    /// Push a function code to the ActionQueue
-    void pushAction(as_function* func, DisplayObject* target,
-            size_t lvl = PRIORITY_DOACTION);
-
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)
     //
