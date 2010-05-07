@@ -209,49 +209,6 @@ private:
 
 };
 
-/// Function code
-class FunctionCode: public ExecutableCode {
-
-public:
-
-    FunctionCode(as_function* nFunc, DisplayObject* nTarget)
-        :
-        func(nFunc),
-        target(nTarget)
-    {}
-
-    ExecutableCode* clone() const
-    {
-        return new FunctionCode(*this);
-    }
-
-    virtual void execute()
-    {
-        as_environment env(getVM(*func)); env.set_target(target);
-        func->call(fn_call(getObject(target), env));
-    }
-
-#ifdef GNASH_USE_GC
-    /// Mark reachable resources (for the GC)
-    //
-    /// Reachable resources are:
-    ///  - the function body (func)
-    ///  - the action target (target)
-    ///
-    virtual void markReachableResources() const
-    {
-        if (func) func->setReachable();
-        if (target) target->setReachable();
-    }
-#endif // GNASU_USE_GC
-
-private:
-
-    as_function* func;
-
-    DisplayObject* target;
-};
-
 /// This class is used to queue a function call action
 //
 /// Exact use is to queue onLoadInit, which should be invoked
