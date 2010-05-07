@@ -563,7 +563,7 @@ Button::mouseEvent(const event_id& event)
     // check for built-in event handler.
     std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
     if (code.get()) {
-        mr.pushAction(code, movie_root::apDOACTION);
+        mr.pushAction(code, movie_root::PRIORITY_DOACTION);
     }
 
     callMethod(getObject(this), event.functionKey());
