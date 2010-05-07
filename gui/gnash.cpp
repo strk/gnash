@@ -116,7 +116,7 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("  -1,  --once              Exit when/if movie reaches the last "
             "frame\n") 
     << _("  -g,  --debugger          Turn on the SWF debugger\n") 
-    << _("  -r,  --render-mode <0|1|2|3|agg|cairo|opengl>\n") 
+    << _("  -r,  --render-mode <0|1|2|3>\n") 
     << _("                           0 disable rendering and sound\n") 
     << _("                           1 enable rendering, disable sound\n") 
     << _("                           2 enable sound, disable rendering\n") 
@@ -460,19 +460,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                             // Enable render & sound
                             player.setDoRender(true);
                             player.setDoSound(true);
-                            break;
-                            // See if a renderer was specified
-                        case 'a':
-                            // Enable AGG as the rendering backend
-                            player.setRenderer("agg");
-                            break;
-                        case 'o':
-                            // Enable OpenGL as the rendering backend
-                            player.setRenderer("opengl");
-                            break;
-                        case 'c':
-                            // Enable Cairo as the rendering backend
-                            player.setRenderer("cairo");
                             break;
                         default:
                             gnash::log_error(_("ERROR: -r must be followed by "
