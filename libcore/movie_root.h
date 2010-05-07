@@ -617,32 +617,32 @@ public:
     enum ActionPriorityLevel {
 	
         /// Init actions, Init event handlers
-        apINIT=0,
+        PRIORITY_INIT = 0,
 	
         /// Construct event handlers
-        apCONSTRUCT=1,
+        PRIORITY_CONSTRUCT = 1,
 
         /// EnterFrame event handlers
-        apENTERFRAME=2,
+        PRIORITY_ENTERFRAME = 2,
 
         /// Frame actions, load handlers, unload handlers
-        apDOACTION=3,
+        PRIORITY_DOACTION = 3,
 
         /// Last element used to easy computation of size...
-        apSIZE
+        PRIORITY_SIZE
         
     };
 
     /// Push an executable code to the ActionQueue
-    void pushAction(std::auto_ptr<ExecutableCode> code, int lvl=apDOACTION);
+    void pushAction(std::auto_ptr<ExecutableCode> code, int lvl=PRIORITY_DOACTION);
 
     /// Push an executable code to the ActionQueue
     void pushAction(const action_buffer& buf, DisplayObject* target,
-            int lvl=apDOACTION);
+            int lvl=PRIORITY_DOACTION);
 
     /// Push a function code to the ActionQueue
     void pushAction(as_function* func, DisplayObject* target,
-            int lvl=apDOACTION);
+            int lvl=PRIORITY_DOACTION);
 
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)
@@ -1069,7 +1069,7 @@ private:
 
     bool processingActions() const
     {
-        return (_processingActionLevel < apSIZE);
+        return (_processingActionLevel < PRIORITY_SIZE);
     }
 
     const DisplayObject* findDropTarget(boost::int32_t x, boost::int32_t y,
@@ -1094,7 +1094,7 @@ private:
     /// frequent push_back and pop_front. We also have to traverse it, so
     /// a std::queue is not usable.
     typedef std::deque<ExecutableCode*> ActionQueue;
-    ActionQueue _actionQueue[apSIZE];
+    ActionQueue _actionQueue[PRIORITY_SIZE];
 
     /// Process all actions in the queue
     void processActionQueue();

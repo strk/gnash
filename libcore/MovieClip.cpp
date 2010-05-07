@@ -819,7 +819,7 @@ MovieClip::advance()
 #endif
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
-    queueEvent(event_id::ENTER_FRAME, movie_root::apDOACTION);
+    queueEvent(event_id::ENTER_FRAME, movie_root::PRIORITY_DOACTION);
 
     // Update current and next frames.
     if (_playState == PLAYSTATE_PLAY)
@@ -886,7 +886,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 #endif
         std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
 
-        stage().pushAction(code, movie_root::apINIT);
+        stage().pushAction(code, movie_root::PRIORITY_INIT);
     }
     else
     {
@@ -1796,7 +1796,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #ifdef GNASH_DEBUG
             log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
 #endif
-            queueEvent(event_id::LOAD, movie_root::apDOACTION);
+            queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
         }
 
     }
@@ -1805,7 +1805,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
 #endif
-        queueEvent(event_id::LOAD, movie_root::apDOACTION);
+        queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
 
 #ifdef GNASH_DEBUG
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
@@ -1831,10 +1831,10 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
                 getTarget());
 #endif
-        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
+        queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
 
         std::auto_ptr<ExecutableCode> code(new ConstructEvent(this));
-        stage().pushAction(code, movie_root::apCONSTRUCT);
+        stage().pushAction(code, movie_root::PRIORITY_CONSTRUCT);
 
     }
     else {
@@ -1851,7 +1851,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
         // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
         // immediately.
-        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
+        queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
     }
 
 

@@ -232,11 +232,9 @@ MovieLoader::processCompletedRequest(const Request& r)
     DisplayObject* targetDO = _movieRoot.findCharacterByTarget(target);
     as_object* handler = r.getHandler();
 
-    if ( ! md )
-    {
+    if (!md) {
 
-        if ( targetDO && handler )
-        {
+        if (targetDO && handler) {
             // Signal load error
             // Tested not to happen if target isn't found at time of loading
             //
@@ -261,8 +259,7 @@ MovieLoader::processCompletedRequest(const Request& r)
     const URL& url = r.getURL();
 
 	Movie* extern_movie = md->createMovie(*_movieRoot.getVM().getGlobal());
-	if (!extern_movie)
-    {
+	if (!extern_movie) {
 		log_error(_("Can't create Movie instance "
                     "for definition loaded from %s"), url);
 		return true; // completed in any case...
@@ -273,31 +270,26 @@ MovieLoader::processCompletedRequest(const Request& r)
 	url.parse_querystring(url.querystring(), vars);
     extern_movie->setVariables(vars);
 
-    if (targetDO)
-    {
+    if (targetDO) {
         targetDO->getLoadedMovie(extern_movie);
     }
-    else
-    {
+    else {
         unsigned int levelno;
         const int version = _movieRoot.getVM().getSWFVersion();
-        if (isLevelTarget(version, target, levelno))
-        {
+        if (isLevelTarget(version, target, levelno)) {
             log_debug(_("processCompletedRequest: _level loading "
                     "(level %u)"), levelno);
 	        extern_movie->set_depth(levelno + DisplayObject::staticDepthOffset);
             _movieRoot.setLevel(levelno, extern_movie);
         }
-        else
-        {
+        else {
             log_debug("Target %s of a loadMovie request doesn't exist at "
                   "load complete time", target);
             return true;
         }
     }
 
-    if (handler && targetDO)
-    {
+    if (handler && targetDO) {
         // Dispatch onLoadStart
         // FIXME: should be signalled before starting to load
         //        (0/-1 bytes loaded/total) but still with *new*
@@ -335,7 +327,7 @@ MovieLoader::processCompletedRequest(const Request& r)
                 new DelayedFunctionCall(handler, NSV::PROP_BROADCAST_MESSAGE, 
                     "onLoadInit", getObject(targetDO)));
 
-        getRoot(*handler).pushAction(code, movie_root::apDOACTION);
+        getRoot(*handler).pushAction(code, movie_root::PRIORITY_DOACTION);
     }
 
     return true;

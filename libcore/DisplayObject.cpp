@@ -472,7 +472,7 @@ DisplayObject::unload()
 {
 
 	if (!_unloaded) {
-		queueEvent(event_id::UNLOAD, movie_root::apDOACTION);
+		queueEvent(event_id::UNLOAD, movie_root::PRIORITY_DOACTION);
 	}
 
     // Unregister this DisplayObject as mask and/or maskee.

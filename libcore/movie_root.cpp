@@ -130,7 +130,7 @@ movie_root::movie_root(const movie_definition& def,
     _rootMovie(0),
     _invalidated(true),
     _disableScripts(false),
-    _processingActionLevel(movie_root::apSIZE),
+    _processingActionLevel(movie_root::PRIORITY_SIZE),
     _hostfd(-1),
     _quality(QUALITY_HIGH),
     _alignMode(0),
@@ -170,7 +170,7 @@ movie_root::nextUnnamedInstance()
 void
 movie_root::clearActionQueue()
 {
-    for (int lvl=0; lvl<apSIZE; ++lvl)
+    for (int lvl=0; lvl<PRIORITY_SIZE; ++lvl)
     {
         ActionQueue& q = _actionQueue[lvl];
 
@@ -1411,11 +1411,11 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 int
 movie_root::minPopulatedPriorityQueue() const
 {
-    for (int l=0; l<apSIZE; ++l)
+    for (int l=0; l<PRIORITY_SIZE; ++l)
     {
         if (!_actionQueue[l].empty()) return l;
     }
-    return apSIZE;
+    return PRIORITY_SIZE;
 }
 
 int
@@ -1528,7 +1528,7 @@ movie_root::processActionQueue()
     }
 
     _processingActionLevel=minPopulatedPriorityQueue();
-    while ( _processingActionLevel<apSIZE )
+    while ( _processingActionLevel<PRIORITY_SIZE )
     {
         _processingActionLevel = processActionQueue(_processingActionLevel);
     }
@@ -1541,14 +1541,14 @@ movie_root::processActionQueue()
 void
 movie_root::pushAction(std::auto_ptr<ExecutableCode> code, int lvl)
 {
-    assert(lvl >= 0 && lvl < apSIZE);
+    assert(lvl >= 0 && lvl < PRIORITY_SIZE);
     _actionQueue[lvl].push_back(code.release());
 }
 
 void
 movie_root::pushAction(const action_buffer& buf, DisplayObject* target, int lvl)
 {
-    assert(lvl >= 0 && lvl < apSIZE);
+    assert(lvl >= 0 && lvl < PRIORITY_SIZE);
 #ifdef GNASH_DEBUG
     log_debug("Pushed action buffer for target %s", 
             target->getTargetPath());
@@ -1562,7 +1562,7 @@ movie_root::pushAction(const action_buffer& buf, DisplayObject* target, int lvl)
 void
 movie_root::pushAction(as_function* func, DisplayObject* target, int lvl)
 {
-    assert(lvl >= 0 && lvl < apSIZE);
+    assert(lvl >= 0 && lvl < PRIORITY_SIZE);
 #ifdef GNASH_DEBUG
     log_debug("Pushed function (event hanlder?) with target %s",
             target->getTargetPath());
@@ -1676,7 +1676,7 @@ movie_root::markReachableResources() const
     _movieLoader.setReachable();
 
     // Mark resources reachable by queued action code
-    for (int lvl=0; lvl<apSIZE; ++lvl)
+    for (int lvl=0; lvl<PRIORITY_SIZE; ++lvl)
     {
         const ActionQueue& q = _actionQueue[lvl];
         std::for_each(q.begin(), q.end(),
