@@ -226,7 +226,7 @@ MovieLoader::processCompletedRequest(const Request& r)
     //GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<movie_definition> md;
-    if ( ! r.getCompleted(md) ) return false; // not completed yet
+    if (!r.getCompleted(md)) return false; // not completed yet
 
     const std::string& target = r.getTarget();
     DisplayObject* targetDO = _movieRoot.findCharacterByTarget(target);

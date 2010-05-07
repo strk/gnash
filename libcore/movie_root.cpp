@@ -170,10 +170,8 @@ movie_root::nextUnnamedInstance()
 void
 movie_root::clearActionQueue()
 {
-    for (int lvl=0; lvl<PRIORITY_SIZE; ++lvl)
-    {
+    for (int lvl=0; lvl < PRIORITY_SIZE; ++lvl) {
         ActionQueue& q = _actionQueue[lvl];
-
         deleteChecked(q.begin(), q.end());
         q.clear();
     }
@@ -1408,18 +1406,17 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 
 }
 
-int
+size_t
 movie_root::minPopulatedPriorityQueue() const
 {
-    for (int l=0; l<PRIORITY_SIZE; ++l)
-    {
+    for (size_t l = 0; l < PRIORITY_SIZE; ++l) {
         if (!_actionQueue[l].empty()) return l;
     }
     return PRIORITY_SIZE;
 }
 
-int
-movie_root::processActionQueue(int lvl)
+size_t
+movie_root::processActionQueue(size_t lvl)
 {
     ActionQueue& q = _actionQueue[lvl];
 
@@ -1429,8 +1426,7 @@ movie_root::processActionQueue(int lvl)
     static unsigned calls=0;
     ++calls;
     bool actionsToProcess = !q.empty();
-    if ( actionsToProcess )
-    {
+    if (actionsToProcess) {
         log_debug(" Processing %d actions in priority queue %d (call %u)",
                     q.size(), lvl, calls);
     }
@@ -1439,15 +1435,14 @@ movie_root::processActionQueue(int lvl)
     // _actionQueue may be changed due to actions (appended-to)
     // this loop might be optimized by using an iterator
     // and a final call to .clear() 
-    while ( ! q.empty() )
-    {
+    while (!q.empty()) {
+
         std::auto_ptr<ExecutableCode> code(q.front());
         q.pop_front(); 
         code->execute();
 
-        int minLevel = minPopulatedPriorityQueue();
-        if ( minLevel < lvl )
-        {
+        size_t minLevel = minPopulatedPriorityQueue();
+        if (minLevel < lvl) {
 #ifdef GNASH_DEBUG
             log_debug(" Actions pushed in priority %d (< "
                     "%d), restarting the scan (call"
@@ -1460,8 +1455,7 @@ movie_root::processActionQueue(int lvl)
     assert(q.empty());
 
 #ifdef GNASH_DEBUG
-    if ( actionsToProcess )
-    {
+    if (actionsToProcess) {
         log_debug(" Done processing actions in priority queue "
                 "%d (call %u)", lvl, calls);
     }
@@ -1520,16 +1514,15 @@ movie_root::removeAdvanceCallback(ActiveRelay* obj)
 void
 movie_root::processActionQueue()
 {
-    if ( _disableScripts )
-    {
+    if (_disableScripts) {
         /// cleanup anything pushed later..
         clearActionQueue();
         return;
     }
 
-    _processingActionLevel=minPopulatedPriorityQueue();
-    while ( _processingActionLevel<PRIORITY_SIZE )
-    {
+    _processingActionLevel = minPopulatedPriorityQueue();
+
+    while (_processingActionLevel < PRIORITY_SIZE) {
         _processingActionLevel = processActionQueue(_processingActionLevel);
     }
 
@@ -1539,16 +1532,17 @@ movie_root::processActionQueue()
 }
 
 void
-movie_root::pushAction(std::auto_ptr<ExecutableCode> code, int lvl)
+movie_root::pushAction(std::auto_ptr<ExecutableCode> code, size_t lvl)
 {
-    assert(lvl >= 0 && lvl < PRIORITY_SIZE);
+    assert(lvl < PRIORITY_SIZE);
     _actionQueue[lvl].push_back(code.release());
 }
 
 void
-movie_root::pushAction(const action_buffer& buf, DisplayObject* target, int lvl)
+movie_root::pushAction(const action_buffer& buf, DisplayObject* target,
+        size_t lvl)
 {
-    assert(lvl >= 0 && lvl < PRIORITY_SIZE);
+    assert(lvl < PRIORITY_SIZE);
 #ifdef GNASH_DEBUG
     log_debug("Pushed action buffer for target %s", 
             target->getTargetPath());
@@ -1559,8 +1553,10 @@ movie_root::pushAction(const action_buffer& buf, DisplayObject* target, int lvl)
     _actionQueue[lvl].push_back(code.release());
 }
 
+#if 0
+
 void
-movie_root::pushAction(as_function* func, DisplayObject* target, int lvl)
+movie_root::pushAction(as_function* func, DisplayObject* target, size_t lvl)
 {
     assert(lvl >= 0 && lvl < PRIORITY_SIZE);
 #ifdef GNASH_DEBUG
@@ -1572,6 +1568,8 @@ movie_root::pushAction(as_function* func, DisplayObject* target, int lvl)
 
     _actionQueue[lvl].push_back(code.release());
 }
+
+#endif
 
 void
 movie_root::executeAdvanceCallbacks()
@@ -1676,7 +1674,7 @@ movie_root::markReachableResources() const
     _movieLoader.setReachable();
 
     // Mark resources reachable by queued action code
-    for (int lvl=0; lvl<PRIORITY_SIZE; ++lvl)
+    for (size_t lvl = 0; lvl < PRIORITY_SIZE; ++lvl)
     {
         const ActionQueue& q = _actionQueue[lvl];
         std::for_each(q.begin(), q.end(),

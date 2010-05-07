@@ -634,15 +634,16 @@ public:
     };
 
     /// Push an executable code to the ActionQueue
-    void pushAction(std::auto_ptr<ExecutableCode> code, int lvl=PRIORITY_DOACTION);
+    void pushAction(std::auto_ptr<ExecutableCode> code,
+            size_t lvl = PRIORITY_DOACTION);
 
     /// Push an executable code to the ActionQueue
     void pushAction(const action_buffer& buf, DisplayObject* target,
-            int lvl=PRIORITY_DOACTION);
+            size_t lvl = PRIORITY_DOACTION);
 
     /// Push a function code to the ActionQueue
     void pushAction(as_function* func, DisplayObject* target,
-            int lvl=PRIORITY_DOACTION);
+            size_t lvl = PRIORITY_DOACTION);
 
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)
@@ -1060,12 +1061,12 @@ private:
     //
     /// Scanned in proprity order (lower first)
     ///
-    int minPopulatedPriorityQueue() const;
+    size_t minPopulatedPriorityQueue() const;
 
     /// Process all actions in the the given queue, till more actions
     /// are found in lower levels, in which case we have an earlier
     /// return.
-    int processActionQueue(int lvl);
+    size_t processActionQueue(size_t lvl);
 
     bool processingActions() const
     {
