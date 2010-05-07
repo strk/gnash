@@ -617,16 +617,13 @@ public:
     enum ActionPriorityLevel {
 	
         /// Init actions, Init event handlers
-        PRIORITY_INIT = 0,
+        PRIORITY_INIT,
 	
         /// Construct event handlers
-        PRIORITY_CONSTRUCT = 1,
-
-        /// EnterFrame event handlers
-        PRIORITY_ENTERFRAME = 2,
+        PRIORITY_CONSTRUCT,
 
         /// Frame actions, load handlers, unload handlers
-        PRIORITY_DOACTION = 3,
+        PRIORITY_DOACTION,
 
         /// Last element used to easy computation of size...
         PRIORITY_SIZE
