@@ -121,6 +121,7 @@ private:
     unsigned int                       _height;
     std::map<std::string, std::string> _options;
     int                                _streamfd;
+    GIOChannel*                        _ichan;
     int                                _ichanWatchId;
     int                                _controlfd;
     pid_t                              _childpid;

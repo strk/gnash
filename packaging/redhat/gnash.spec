@@ -148,7 +148,7 @@ RPM_TARGET=%{_target}
 # cross building an RPM. This works as long as you have a good cross
 # compiler installed.
   CROSS_OPTS="--build=%{_host} --host=$RPM_TARGET --target=$RPM_TARGET"
-  RENDERER="--with-renderer=agg"		# could be opengl
+  RENDERER="--enable-renderer=agg"		# could be opengl
   %ifarch arm
     SOUND="--enable-media=none --disable-nsapi --disable-kparts"
   %else
@@ -162,7 +162,7 @@ RPM_TARGET=%{_target}
   GUI="--enable-gui=gtk,kde4"	# could be kde3, kde4, aqua, sdl
   SOUND="--enable-media=gst"	# could be ffmpeg
   OTHER="--enable-cygnal"
-  RENDERER="--with-renderer=all"		# could be opengl or cairo
+  RENDERER="--enable-renderer=all"		# could be opengl or cairo
   # These are not the defaults
   OPTIONAL="--enable-python"
 %endif

@@ -98,9 +98,8 @@
 #endif
 
 // For scriptable plugin support
-#ifdef ENABLE_SCRIPTABLE
 #include "pluginScriptObject.h"
-#endif
+
 extern NPNetscapeFuncs NPNFuncs;
 
 namespace gnash {
@@ -177,9 +176,7 @@ NS_PluginInitialize()
     err = NPN_GetValue(NULL, NPNVToolkit, &toolkit);
 
     if (err != NPERR_NO_ERROR || toolkit != NPNVGtk2) {
-#ifdef GNASH_PLUGIN_DEBUG
         gnash::log_error("NPAPI ERROR: No GTK2 support in this browser! Have version %d", (int)toolkit);
-#endif
     } else {
         gnash::log_debug("GTK2 supported in this browser");
     }
@@ -344,6 +341,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _width(0),
     _height(0),
     _streamfd(-1),
+    _ichan(0),
     _ichanWatchId(0),
     _controlfd(-1),
     _childpid(0),
@@ -371,10 +369,9 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
         _params[name] = val;
     }
 
-#ifdef ENABLE_SCRIPTABLE
     _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(_instance, GnashPluginScriptObject::marshalGetNPClass());
-#endif
-#if defined(ENABLE_SCRIPTABLE) && defined(NETTEST)
+
+#if defined(NETTEST)
     // This is a network testing node switch. This is only used for testing the
     // interface between the player and the plugin.
     struct sockaddr_in  sock_in;
@@ -556,7 +553,6 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
-#ifdef ENABLE_SCRIPTABLE
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
@@ -566,7 +562,6 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
             gnash::log_debug("_scriptObject is not assigned");
         }
     }
-#endif
 
     return NS_PluginGetValue(aVariable, aValue);
 }
@@ -654,7 +649,6 @@ nsPluginInstance::WriteReady(NPStream* /* stream */ )
 
 /// \brief Read the data stream from Mozilla/Firefox
 ///
-/// For now we read the bytes and write them to a disk file.
 int32_t
 nsPluginInstance::Write(NPStream* /*stream*/, int32_t /*offset*/, int32_t len,
         void* buffer)
@@ -667,16 +661,12 @@ bool
 nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
         GIOCondition cond, nsPluginInstance* plugin)
 {
-    log_debug(__PRETTY_FUNCTION__);
-    
     return plugin->handlePlayerRequests(iochan, cond);
 }
 
 bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
-    log_debug(__PRETTY_FUNCTION__);
-    
     if ( cond & G_IO_HUP ) {
         gnash::log_debug("Player request channel hang up");
         // Returning false here will cause the "watch" to be removed. This watch
@@ -692,31 +682,39 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
               g_io_channel_unix_get_fd(iochan));
 
     do {
-        GError* error=NULL;
-        gchar* request;
-        gsize requestSize=0;
+        GError* error = 0;
+        gchar* request = 0;
+        gsize requestSize = 0;
         GIOStatus status = g_io_channel_read_line(iochan, &request,
                            &requestSize, NULL, &error);
-        switch ( status ) {
-            case G_IO_STATUS_ERROR:
-                gnash::log_error(std::string("Error reading request line: ") + error->message);
-
-                g_error_free(error);
-                return false;
-            case G_IO_STATUS_EOF:
-                gnash::log_error(std::string("EOF (error: ") + error->message);
-                return false;
-            case G_IO_STATUS_AGAIN:
-                gnash::log_error(std::string("Read again(error: ") + error->message);
-                break;
-            case G_IO_STATUS_NORMAL:
-                // process request
-                gnash::log_debug("Normal read: " + std::string(request));
-                break;
-            default:
-                gnash::log_error("Abnormal status!");
-                return false;
-            
+        switch (status) {
+          case G_IO_STATUS_ERROR:
+              gnash::log_error(std::string("Error reading request line: ")
+                               + error->message);
+              g_error_free(error);
+              return false;
+          case G_IO_STATUS_EOF:
+              gnash::log_error(std::string("EOF (error: ") + error->message);
+              g_error_free(error);
+              return false;
+          case G_IO_STATUS_AGAIN:
+              gnash::log_error(std::string("Read again(error: ")
+                               + error->message);
+              break;
+          case G_IO_STATUS_NORMAL:
+              // process request
+              // Get rid of the newline on the end if there is one. The string
+              // is also NULL terninated, so the requestSize includes it in
+              // the total.
+              if (request[requestSize-1] == '\n') {
+                  request[requestSize-1] = 0;
+                  requestSize--;
+              }
+              gnash::log_debug("Normal read: %s", request);
+              break;
+          default:
+              gnash::log_error("Abnormal status!");
+              return false;
         }
 
         // process request..
@@ -739,8 +737,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 
     if ( ! std::strncmp(buf, "GET ", 4) ) {
         char* target = buf + 4;
-        if ( ! *target )
-        {
+        if ( ! *target ) {
             gnash::log_error("No target found after GET request");
             return false;
         }
@@ -1005,47 +1002,38 @@ wait_for_gdb()
 void
 nsPluginInstance::startProc()
 {
-    // 0 For reading, 1 for writing.
-    int p2c_pipe[2];
     
-    int ret = pipe(p2c_pipe);
+    int p2c_pipe[2];
+    int c2p_pipe[2];
+    int p2c_controlpipe[2];
+
+    int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_pipe);
     if (ret == -1) {
-        gnash::log_error("ERROR: parent to child pipe() failed: " +
-                 std::string(std::strerror(errno)));
+        gnash::log_error("ERROR: socketpair(p2c) failed: %s", strerror(errno));
+        return;
     }
     _streamfd = p2c_pipe[1];
 
-#if 0
-    int c2p_pipe[2];
-    ret = pipe(c2p_pipe);
+    ret = socketpair(AF_UNIX, SOCK_STREAM, 0, c2p_pipe);
     if (ret == -1) {
-        gnash::log_error("ERROR: child to parent pipe() failed: " +
-                 std::string(std::strerror(errno)));
+        gnash::log_error("ERROR: socketpair(c2p) failed: %s", strerror(errno));
+        return;
     }
 
-    int p2c_controlpipe[2];
-    ret = pipe(p2c_controlpipe);
+    ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_controlpipe);
     if (ret == -1) {
-        gnash::log_error("ERROR: parent to child pipe() failed: " +
-                 std::string(std::strerror(errno)));
+        gnash::log_error("ERROR: socketpair(control) failed: %s", strerror(errno));
+        return;
     }
-
     _controlfd = p2c_controlpipe[1];
-#endif
-    
-#ifdef ENABLE_SCRIPTABLE
-    _scriptObject->createPipe();
-//    _controlfd = _scriptObject->getReadFD();
-//    _scriptObject->checkPipe();
+
 #ifdef NETTEST
     _scriptObject->setControlFD(_controlfd);
-#endif
 #endif
     
     // Setup the command line for starting Gnash
 
-    std::vector<std::string> arg_vec = getCmdLine(_scriptObject->getReadFD(),
-                                                  _scriptObject->getWriteFD());
+    std::vector<std::string> arg_vec = getCmdLine(c2p_pipe[1], p2c_controlpipe[0]);
 
     if (arg_vec.empty()) {
         gnash::log_error("Failed to obtain command line parameters.");
@@ -1074,22 +1062,33 @@ nsPluginInstance::startProc()
         // we want to write to p2c pipe, so close read-fd0
         ret = close (p2c_pipe[0]);
         if (ret == -1) {
-            gnash::log_error("ERROR: p2c_pipe[0] close() failed: " +
-                          std::string(strerror(errno)));
+            // this is not really a fatal error, so continue best as we can
+            gnash::log_error("ERROR: p2c_pipe[0] close() failed: %s",
+                             strerror(errno));
         }
-#if 0
-        // we want to read from c2p pipe, so close write-fd1
+        
+        // we want to read from c2p pipe, so close read-fd1
         ret = close (c2p_pipe[1]);
         if (ret == -1) {
-            gnash::log_error("ERROR: c2p_pipe[1] close() failed: " + 
-                          std::string(strerror(errno)));
+
+            // this is not really a fatal error, so continue best as we can
+            gnash::log_error("ERROR: c2p_pipe[1] close() failed: %s",
+                             strerror(errno));
+            gnash::log_debug("Forked successfully but with ignorable errors.");
+        } else {
+            gnash::log_debug("Forked successfully, child process PID is %d" , _childpid);
         }
         
-        ret = close (p2c_controlpipe[0]); // close read descriptor
-#endif
-        
-        gnash::log_debug("Forked successfully, child process PID is %d" , _childpid);
-      
+        GIOChannel* ichan = g_io_channel_unix_new(c2p_pipe[0]);
+        gnash::log_debug("New IO Channel for fd #%d",
+                         g_io_channel_unix_get_fd(ichan));
+        g_io_channel_set_close_on_unref(ichan, true);
+        _ichanWatchId = g_io_add_watch(ichan, 
+                                       (GIOCondition)(G_IO_IN|G_IO_HUP), 
+                                       (GIOFunc)handlePlayerRequestsWrapper,
+                                       this);
+        gnash::log_debug("New watch for IO Channel on fd #%d",
+                         _ichanWatchId);
         return;
     }
     
@@ -1098,18 +1097,19 @@ nsPluginInstance::startProc()
     // FF3 uses jemalloc and it has problems after the fork(), do NOT
     // use memory functions (malloc()/free()/new/delete) after the fork()
     // in the child thread process
-
+    ret = close (p2c_pipe[1]);
+    
     // close standard input and direct read-fd1 to standard input
     ret = dup2 (p2c_pipe[0], fileno(stdin));
-    
+
     if (ret == -1) {
         gnash::log_error("ERROR: dup2() failed: " + std::string(strerror(errno)));
     }
-
+    
     // Close all of the browser's file descriptors that we just inherited
     // (including p2c_pipe[0] that we just dup'd to fd 0), but obviously
     // not the file descriptors that we want the child to use.
-    int dontclose[] = {_scriptObject->getReadFD(), _scriptObject->getWriteFD()};
+    int dontclose[] = {c2p_pipe[1], c2p_pipe[0], p2c_controlpipe[0]};
     close_fds(dontclose);
 
     // Start the desired executable and go away.
