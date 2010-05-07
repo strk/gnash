@@ -87,7 +87,12 @@ namespace gnash {
 //
 //#define DEBUG_MOUSE_ENTITY_FINDING 1
 
-/// Anonymous namespace for module-private definitions
+namespace {
+    inline void executeIfActionTag(const SWF::ControlTag& t, MovieClip* m,
+            DisplayList& dlist);
+}
+
+// Anonymous namespace for module-private definitions
 namespace {
 
 /// ConstructEvent, used for queuing construction
@@ -540,8 +545,8 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     if (playlist) {
         PlayList::const_iterator it = playlist->begin();
         const PlayList::const_iterator e = playlist->end();
-        for(; it != e; it++) {
-            (*it)->execute_action(this, _displayList);
+        for (; it != e; it++) {
+            executeIfActionTag(**it, this, _displayList);
         }
     }
     _callingFrameActions = false;
@@ -972,9 +977,8 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
         else
         {
             assert(typeflags & SWF::ControlTag::TAG_ACTION);
-            for( ; it != e; it++)
-            {
-                (*it)->execute_action(this, dlist);
+            for( ; it != e; it++) {
+                executeIfActionTag(**it, this, _displayList);
             }
         }
     }
@@ -2279,6 +2283,17 @@ MovieClip::setPlayState(PlayState s)
     if (s == _playState) return; // nothing to do
     if (s == PLAYSTATE_STOP) stopStreamSound();
     _playState = s;
+}
+
+namespace {
+
+/// 
+inline void
+executeIfActionTag(const SWF::ControlTag& t, MovieClip* m, DisplayList& dlist)
+{
+    if (t.is_action_tag()) t.execute(m, dlist);
+}
+
 }
 
 } // namespace gnash
