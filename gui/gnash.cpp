@@ -338,11 +338,10 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     }
                     player.setHostFD (hostfd);
 
-                    if (controlfd < 1) {
+                    if (controlfd < 0) {
                         cerr << boost::format(_("Invalid control communication "
                                     "filedescriptor %d\n")) % controlfd << endl;
-//                        exit(EXIT_FAILURE);
-                        controlfd = hostfd + 1;
+                        exit(EXIT_FAILURE);
                     }
                     player.setControlFD (controlfd);
                 }

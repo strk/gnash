@@ -562,133 +562,129 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 {
 
 	/* Handle GUI shortcuts */
-	if (pressed)
-	{
-		if (k == gnash::key::ESCAPE) {
-			if (isFullscreen()) {
-				_stage->setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
-			}
-		}
-		
-		if (modifier & gnash::key::GNASH_MOD_CONTROL) {
-			switch (k)
-			{
-                case gnash::key::o:
-                case gnash::key::O:
-                    takeScreenShot();
-                    break;
-				case gnash::key::r:
-				case gnash::key::R:
-					restart();
-					break;
-				case gnash::key::p:
-				case gnash::key::P:
-					pause();
-					break;
-				case gnash::key::l:
-				case gnash::key::L:
-					refreshView();
-					break;
-				case gnash::key::q:
-				case gnash::key::Q:
-				case gnash::key::w:
-				case gnash::key::W:
-					quit();
-					break;
-				case gnash::key::f:
-				case gnash::key::F:
-					toggleFullscreen();
-					break;
-				case gnash::key::h:
-				case gnash::key::H:
-					showUpdatedRegions(!showUpdatedRegions());
-					break;
-				case gnash::key::MINUS:
-				{
-					// Max interval allowed: 1 second (1FPS)
-					const size_t ni = std::min<size_t>(_interval + 2, 1000u);
-					setInterval(ni);
-					break;
-                }
-				case gnash::key::PLUS:
-				{
-					// Min interval allowed: 1/100 second (100FPS)
-					const size_t ni = std::max<size_t>(_interval - 2, 10u);
-					setInterval(ni);
-					break;
-                                }
-				case gnash::key::EQUALS:
-				{
-					if (_stage) {
-						const float fps = _stage->frameRate();
-						// Min interval allowed: 1/100 second (100FPS)
-						const size_t ni = 1000.0/fps;
-						setInterval(ni);
-					}
-					break;
-                }
-				default:
-					break;
-			}
-
+    if (pressed) {
+        if (k == gnash::key::ESCAPE) {
+            if (isFullscreen()) {
+                _stage->setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
+            }
+        }
+	
+        if (modifier & gnash::key::GNASH_MOD_CONTROL) {
+            switch (k) {
+              case gnash::key::o:
+              case gnash::key::O:
+                  takeScreenShot();
+                  break;
+              case gnash::key::r:
+              case gnash::key::R:
+                  restart();
+                  break;
+              case gnash::key::p:
+              case gnash::key::P:
+                  pause();
+                  break;
+              case gnash::key::l:
+              case gnash::key::L:
+                  refreshView();
+                  break;
+              case gnash::key::q:
+              case gnash::key::Q:
+              case gnash::key::w:
+              case gnash::key::W:
+                  quit();
+                  break;
+              case gnash::key::f:
+              case gnash::key::F:
+                  toggleFullscreen();
+                  break;
+              case gnash::key::h:
+              case gnash::key::H:
+                  showUpdatedRegions(!showUpdatedRegions());
+                  break;
+              case gnash::key::MINUS:
+              {
+                  // Max interval allowed: 1 second (1FPS)
+                  const size_t ni = std::min<size_t>(_interval + 2, 1000u);
+                  setInterval(ni);
+                  break;
+              }
+              case gnash::key::PLUS:
+              {
+                  // Min interval allowed: 1/100 second (100FPS)
+                  const size_t ni = std::max<size_t>(_interval - 2, 10u);
+                  setInterval(ni);
+                  break;
+              }
+              case gnash::key::EQUALS:
+              {
+                  if (_stage) {
+                      const float fps = _stage->frameRate();
+                      // Min interval allowed: 1/100 second (100FPS)
+                      const size_t ni = 1000.0/fps;
+                      setInterval(ni);
+                  }
+                  break;
+              }
+              default:
+                  break;
+            }
+            
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS
-			if ( _keyboardMouseMovements )
-			{
-				int step = _keyboardMouseMovementsStep; 
+            if ( _keyboardMouseMovements ) {
+                int step = _keyboardMouseMovementsStep; 
                 // x5 if SHIFT is pressed
-				if (modifier & gnash::key::GNASH_MOD_SHIFT) step *= 5; 
-				switch (k)
-				{
-					case gnash::key::UP:
-					{
-						int newx = _xpointer;
-						int newy = _ypointer-step;
-						if ( newy < 0 ) newy=0;
-						notify_mouse_moved(newx, newy);
-						break;
-					}
-					case gnash::key::DOWN:
-					{
-						int newx = _xpointer;
-						int newy = _ypointer+step;
-						if ( newy >= _height ) newy = _height-1;
-						notify_mouse_moved(newx, newy);
-						break;
-					}
-					case gnash::key::LEFT:
-					{
-						int newx = _xpointer-step;
-						int newy = _ypointer;
-						if ( newx < 0 ) newx = 0;
-						notify_mouse_moved(newx, newy);
-						break;
-					}
-					case gnash::key::RIGHT:
-					{
-						const int newy = _ypointer;
-						int newx = _xpointer + step;
-						if ( newx >= _width ) newx = _width-1;
-						notify_mouse_moved(newx, newy);
-						break;
-					}
-					default:
-						break;
-				}
-			}
+                if (modifier & gnash::key::GNASH_MOD_SHIFT) step *= 5; 
+                switch (k) {
+                  case gnash::key::UP:
+                  {
+                      int newx = _xpointer;
+                      int newy = _ypointer-step;
+                      if ( newy < 0 ) newy=0;
+                      notify_mouse_moved(newx, newy);
+                      break;
+                  }
+                  case gnash::key::DOWN:
+                  {
+                      int newx = _xpointer;
+                      int newy = _ypointer+step;
+                      if ( newy >= _height ) newy = _height-1;
+                      notify_mouse_moved(newx, newy);
+                      break;
+                  }
+                  case gnash::key::LEFT:
+                  {
+                      int newx = _xpointer-step;
+                      int newy = _ypointer;
+                      if ( newx < 0 ) newx = 0;
+                      notify_mouse_moved(newx, newy);
+                      break;
+                  }
+                  case gnash::key::RIGHT:
+                  {
+                      const int newy = _ypointer;
+                      int newx = _xpointer + step;
+                      if ( newx >= _width ) newx = _width-1;
+                      notify_mouse_moved(newx, newy);
+                      break;
+                  }
+                  default:
+                      break;
+                }
+            }
 #endif // ENABLE_KEYBOARD_MOUSE_MOVEMENTS
-		}
-	}
-
+        }
+    }
+    
     if (!_started) return;
-
+    
     if (_stopped) return;
-
-	if (_stage->notify_key_event(k, pressed)) {
-		// any action triggered by the
-		// event required screen refresh
-		display(_stage);
-	}
-
+    
+    if (_stage->notify_key_event(k, pressed)) {
+        // any action triggered by the
+        // event required screen refresh
+        display(_stage);
+    }
+    
 }
 
 bool
@@ -1148,28 +1144,28 @@ Gui::getMovieInfo() const
     const DisplayObject* ch;
     ch = stage.getActiveEntityUnderPointer();
     if (ch) {
-	    std::stringstream ss;
-	    ss << ch->getTarget() << " (" + typeName(*ch)
-            << " - depth:" << ch->get_depth()
-            << " - useHandCursor:" << ch->allowHandCursor()
-            << ")";
+        std::stringstream ss;
+        ss << ch->getTarget() << " (" + typeName(*ch)
+           << " - depth:" << ch->get_depth()
+           << " - useHandCursor:" << ch->allowHandCursor()
+           << ")";
     	firstLevelIter = tr->append_child(topIter, StringPair("Active entity under mouse pointer", ss.str()));
     }
 
     ch = stage.getEntityUnderPointer();
     if (ch) {
-	    std::stringstream ss;
-	    ss << ch->getTarget() << " (" + typeName(*ch) 
-               << " - depth:" << ch->get_depth()
-               << ")";
+        std::stringstream ss;
+        ss << ch->getTarget() << " (" + typeName(*ch) 
+           << " - depth:" << ch->get_depth()
+           << ")";
 	firstLevelIter = tr->append_child(topIter, StringPair("Topmost entity under mouse pointer", ss.str()));
     }
-
+    
     ch = stage.getDraggingCharacter();
     if (ch) {
-	    std::stringstream ss;
-	    ss << ch->getTarget() << " (" + typeName(*ch) 
-               << " - depth:" << ch->get_depth() << ")";
+        std::stringstream ss;
+        ss << ch->getTarget() << " (" + typeName(*ch) 
+           << " - depth:" << ch->get_depth() << ")";
     	firstLevelIter = tr->append_child(topIter, StringPair("Dragging character: ", ss.str()));
     }
 
@@ -1333,6 +1329,8 @@ Gui::getQuality() const
 void
 Gui::setFDCallback(int fd, boost::function<void ()> callback)
 {
+    log_debug("Setting callback for fd #%d", fd);
+    
     _fd_callbacks[fd] = callback;
 
     watchFD(fd);
