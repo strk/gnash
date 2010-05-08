@@ -62,13 +62,6 @@
   <br>\
   Compatible Shockwave Flash "FLASH_VERSION
 
-// Defining this flag disables the pipe to the standalone player, as well
-// as prevents the standalone Gnash player from being exec'd. Instead it
-// makes a network connection to localhost:1111 so the developer can use
-// Netcat (nc) to send and receive messages to test the interface.
-// #define NETTEST 1
-#undef NETTEST
-
 #include "plugin.h" 
 #include "GnashSystemIOHeaders.h"
 #include "StringPredicates.h"
@@ -937,6 +930,7 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
         pars << " -F " << hostfd            // Socket to send commands to
              << ":"    << controlfd;        // Socket determining lifespan
     }
+
     std::string pars_str = pars.str();
     typedef boost::char_separator<char> char_sep;
     boost::tokenizer<char_sep> tok(pars_str, char_sep(" "));
@@ -1033,13 +1027,8 @@ nsPluginInstance::startProc()
     _controlfd = p2c_controlpipe[1];
 #endif
     
-#ifdef ENABLE_SCRIPTABLE
+#if defined(ENABLE_SCRIPTABLE) && !defined(NETTEST)
     _scriptObject->createPipe();
-//    _controlfd = _scriptObject->getReadFD();
-//    _scriptObject->checkPipe();
-#ifdef NETTEST
-    _scriptObject->setControlFD(_controlfd);
-#endif
 #endif
     
     // Setup the command line for starting Gnash
@@ -1077,16 +1066,6 @@ nsPluginInstance::startProc()
             gnash::log_error("ERROR: p2c_pipe[0] close() failed: " +
                           std::string(strerror(errno)));
         }
-#if 0
-        // we want to read from c2p pipe, so close write-fd1
-        ret = close (c2p_pipe[1]);
-        if (ret == -1) {
-            gnash::log_error("ERROR: c2p_pipe[1] close() failed: " + 
-                          std::string(strerror(errno)));
-        }
-        
-        ret = close (p2c_controlpipe[0]); // close read descriptor
-#endif
         
         gnash::log_debug("Forked successfully, child process PID is %d" , _childpid);
       

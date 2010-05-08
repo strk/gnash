@@ -122,8 +122,8 @@ public:
     bool checkPipe();
     bool checkPipe(int fd);
 
-    int getReadFD()  { return _sockfds[READFD]; };
-    int getWriteFD() { return _sockfds[WRITEFD]; };
+    int getReadFD();
+    int getWriteFD();
     
     // Write to the standalone player over the control socket
     int writePlayer(const char *data, size_t length);
@@ -185,9 +185,9 @@ private:
     
     std::map<NPIdentifier, const NPVariant*> _properties;
     std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
-    // 0 for reading, 1 for writing
-    int         _sockfds[2];
-    GIOChannel *_iochan[2];
+    // // 0 for reading, 1 for writing
+    // int         _sockfds[2];
+    // GIOChannel *_iochan[2];
     // ID to watch the read channel from the player
     int         _watchid;
 };

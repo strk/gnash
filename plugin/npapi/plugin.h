@@ -121,6 +121,7 @@ private:
     unsigned int                       _height;
     std::map<std::string, std::string> _options;
     int                                _streamfd;
+    GIOChannel*                        _ichan;
     int                                _ichanWatchId;
     int                                _controlfd;
     pid_t                              _childpid;
@@ -128,11 +129,11 @@ private:
 
     /// Name of the plugin instance element in the dom 
     std::string                        _name;
-#ifdef ENABLE_SCRIPTABLE
+//#ifdef ENABLE_SCRIPTABLE
     GnashPluginScriptObject             *_scriptObject;
-#endif
+//#endif
     
-    const char* getCurrentPageURL() const;
+    std::string getCurrentPageURL() const;
 };
 
 // Define the following to make the plugin verbose
