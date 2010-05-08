@@ -259,7 +259,7 @@ attachMathInterface(as_object& proto)
     proto.init_member("ceil", vm.getNative(200, 13), flags);
     proto.init_member("atan", vm.getNative(200, 14), flags);
     proto.init_member("asin", vm.getNative(200, 15), flags);
-	proto.init_member("acos", vm.getNative(200, 16), flags);
+    proto.init_member("acos", vm.getNative(200, 16), flags);
     proto.init_member("pow", vm.getNative(200, 17), flags);
 }
 

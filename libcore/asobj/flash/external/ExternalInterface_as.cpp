@@ -20,6 +20,8 @@
 
 #include <map>
 #include <sstream>
+#include <sys/ioctl.h>
+#include <sys/types.h>
 
 #include "StringPredicates.h"
 #include "Relay.h" // for inheritance
@@ -210,19 +212,25 @@ externalinterface_addCallback(const fn_call& fn)
     ExternalInterface_as &ptr = ExternalInterface_as::Instance();
 
     movie_root& mr = getRoot(fn);
-    MovieClip *mc = mr.getLevel(0);
-    string_table& st = getStringTable(fn); 
+    // MovieClip *mc = mr.getLevel(1);
+    // string_table& st = getStringTable(fn);    
+
+    log_debug("FIXME: controlFD is: %d", mr.getControlFD());
+
+    if (mr.getControlFD() > 0) {
+        ptr.setFD(mr.getControlFD());
+    }
     
     if (fn.nargs == 3) {
-        const as_value& methodName_as = fn.arg(0);
-        std::string methodName = methodName_as.to_string();
+        const as_value& name_as = fn.arg(0);
+        std::string name = name_as.to_string();
         boost::intrusive_ptr<as_object> asCallback;
         if (fn.arg(1).is_object()) {
             asCallback = (fn.arg(1).to_object(getGlobal(fn)));
         }
-        ptr.addCallback(methodName, asCallback.get());
+        ptr.addCallback(name, asCallback.get());
         ptr.addRootCallback(mr);
-        return as_value(true);        
+        return as_value(true);  
     }
     
     return as_value(false);    
@@ -233,18 +241,20 @@ externalinterface_call(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-//    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
     
-    if (fn.nargs > 3) {
+    if (fn.nargs >= 2) {
         const as_value& methodName_as = fn.arg(0);
         std::string methodName = methodName_as.to_string();
-        boost::intrusive_ptr<as_object> asCallback;
-        if (fn.arg(1).is_object()) {
-            asCallback = (fn.arg(1).to_object(getGlobal(fn)));
-        }
+        // boost::intrusive_ptr<as_object> asCallback;
+        // if (fn.arg(1).is_object()) {
+        //     asCallback = (fn.arg(1).to_object(getGlobal(fn)));
+        // }
         
         const std::vector<as_value>& args = fn.getArgs();
-        // ptr->call(asCallback.get(), methodName, args, 2);
+        as_object *asCallback = ptr.getCallback(methodName);
+        log_debug("Calling External method \"%s\"", methodName);
+        // ptr.call(asCallback.get(), methodName, args, 2);
     }
     
     return as_value();
@@ -299,10 +309,11 @@ externalinterface_marshallExceptions(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    // No, don't pass exception up to the broswer
+    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
+
+    // No, don't pass exceptions up to the browser
     if (fn.nargs) {
-        movie_root& mr = getRoot(fn);
-        mr.setMarshallExceptions(fn.arg(0).to_bool());
+        ptr.setMarshallExceptions(fn.arg(0).to_bool());
     } else {
         return as_value(false);
     }
@@ -569,13 +580,17 @@ externalinterface_uUnescapeXML(const fn_call& fn)
 // namespace gnash {
 
 ExternalInterface_as::ExternalInterface_as(as_object* owner)
-    :  ActiveRelay(owner)
+    :  ActiveRelay(owner),
+       _fd(-1),
+       _marshallExceptions(false)
 {
     GNASH_REPORT_FUNCTION;
 }
 
 ExternalInterface_as::ExternalInterface_as()
-    : ActiveRelay(*this)
+    : ActiveRelay(*this),
+       _fd(-1),
+       _marshallExceptions(false)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -607,6 +622,8 @@ bool
 ExternalInterface_as::addRootCallback(movie_root &mr)
 {
     log_debug(__PRETTY_FUNCTION__);
+
+    //_root = &mr;
     
     if (_methods.size() == 1) {
         // Register callback so we can send the data on the next advance.
@@ -617,10 +634,15 @@ ExternalInterface_as::addRootCallback(movie_root &mr)
 }
 
 bool
-ExternalInterface_as::call(as_object */*asCallback*/, const std::string& /*name*/,
+ExternalInterface_as::call(as_object */*asCallback*/, const std::string& name,
                            const std::vector<as_value>& /*args*/, size_t /*firstArg*/)
 {
     GNASH_REPORT_FUNCTION;
+
+    // log_debug("Calling External method \"%s\"", name);
+
+    // as_object *method = getCallback(name);
+
     
     // call(asCallback, name, args, firstArg);
 
@@ -887,11 +909,76 @@ ExternalInterface_as::advance()
 }
 #endif
 
+as_object *
+ExternalInterface_as::getCallback(const std::string &name)
+{
+    log_debug(__PRETTY_FUNCTION__);
+    
+    std::map<std::string, as_object *>::const_iterator it;
+    it = _methods.find(name);
+    if (it != _methods.end()) {
+        log_debug("Found External Method \"%s\"", it->first);
+        return it->second;
+    }
+
+    return 0;
+}
+
 void
 ExternalInterface_as::update()
 {
     log_debug(__PRETTY_FUNCTION__);
     
+    // std::map<std::string, as_object *>::const_iterator it;
+    // for (it=_methods.begin(); it != _methods.end(); it++) {
+    //     log_debug("Method name %s", it->first);
+    // }
+    
+    if (_fd > 0) {
+        fd_set fdset;
+        FD_ZERO(&fdset);
+        FD_SET(_fd, &fdset);
+        struct timeval tval;
+        tval.tv_sec  = 0;
+        tval.tv_usec = 100;
+        errno = 0;
+        int ret = ::select(_fd+1, &fdset, NULL, NULL, &tval);
+        if (ret == 0) {
+            log_debug ("The pipe for fd #%d timed out waiting to read", _fd);
+            return;
+        } else if (ret == 1) {
+            log_debug ("The pipe for fd #%d is ready", _fd);
+        } else {
+            log_error("The pipe has this error: %s", strerror(errno));
+            return;
+        }
+
+        // 
+        int bytes = 0;
+#ifndef _WIN32
+        ioctl(_fd, FIONREAD, &bytes);
+#else
+        ioctlSocket(_fd, FIONREAD, &bytes);
+#endif
+        log_debug("There are %d bytes in the network buffer", bytes);
+
+        // No data yet
+        if (bytes == 0) {
+            return;
+        }
+        
+        char *buf = 0;
+        // Since we know how bytes are in the network buffer, allocate
+        // some memory to read the data.
+        buf = new char[bytes+1];
+        // terminate incase we want to treat the data like a string.
+        buf[bytes] = 0;
+        ret = ::read(_fd, buf, bytes);
+
+        if (ret) {
+            std::cout << buf << std::endl;
+        }
+    }
 }
 
 } // end of gnash namespace

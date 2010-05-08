@@ -588,11 +588,6 @@ public:
     /// Gets the current Access Mode for ExternalInterface.
     AllowScriptAccessMode getAllowScriptAccess();
 
-    // This is a flag that specifies whether exceptions in ActionScript
-    // should be propogated to JavaScript in the browser.
-    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
-    bool getMarshallExceptions() { return _marshallExceptions; };
-    
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
     /// Returns the current alignment of the stage (left/right/centre, top/
@@ -1184,7 +1179,6 @@ private:
     Quality		_quality;
     std::bitset<4u>	_alignMode;
     AllowScriptAccessMode _allowScriptAccess;
-    bool		_marshallExceptions;
     bool		_showMenu;
     ScaleMode		_scaleMode;
     DisplayState	_displayState;

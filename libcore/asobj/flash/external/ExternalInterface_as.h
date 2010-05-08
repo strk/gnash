@@ -46,6 +46,11 @@ public:
     static ExternalInterface_as &Instance();
     virtual ~ExternalInterface_as();
 
+    // This is a flag that specifies whether exceptions in ActionScript
+    // should be propogated to JavaScript in the browser.
+    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
+    bool getMarshallExceptions() { return _marshallExceptions; };
+    
     /// Add an ActionScript function as a callback by JavaScript
     // in the browser.
     bool addCallback(const std::string &name, as_object *method);
@@ -99,9 +104,15 @@ public:
     // virtual void setReachable() const = 0;
     
     virtual void update();
-    
+
+    void setFD(int x) { _fd = x; };
+
+    as_object *getCallback(const std::string &name);
+        
 private:
+    int         _fd;
     std::map<std::string, as_object *> _methods;
+    bool		_marshallExceptions;
 };
 
 /// Initialize the global ExternalInterface class
