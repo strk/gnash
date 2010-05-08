@@ -34,6 +34,8 @@
 
 #include <boost/algorithm/string/erase.hpp>
 
+namespace gnash {
+
 ExternalInterface::ExternalInterface ()
 {
 }
@@ -250,11 +252,11 @@ ExternalInterface::parseInvoke(const std::string &xml)
     return invoke;
 }
 
-NPVariant *
+GnashNPVariant 
 ExternalInterface::parseXML(const std::string &xml)
 {
-    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
-    NULL_TO_NPVARIANT(*value);
+    NPVariant value;
+    NULL_TO_NPVARIANT(value);
     
     if (xml.empty()) {
         return value;
@@ -270,23 +272,23 @@ ExternalInterface::parseXML(const std::string &xml)
         tag = xml.substr(start, end);
         // Look for the easy ones first
         if (tag == "<null/>") {
-            NULL_TO_NPVARIANT(*value);
+            NULL_TO_NPVARIANT(value);
         } else if (tag == "<void/>") {
-            VOID_TO_NPVARIANT(*value);
+            VOID_TO_NPVARIANT(value);
         } else if (tag == "<true/>") {
-            BOOLEAN_TO_NPVARIANT(true, *value);
+            BOOLEAN_TO_NPVARIANT(true, value);
         } else if (tag == "<false/>") {
-            BOOLEAN_TO_NPVARIANT(false, *value);
+            BOOLEAN_TO_NPVARIANT(false, value);
         } else if (tag == "<number>") {
             start = end;
             end = xml.find("</number>");
             std::string str = xml.substr(start, end-start);
             if (str.find(".") != std::string::npos) {
                 double num = strtod(str.c_str(), NULL);
-                DOUBLE_TO_NPVARIANT(num, *value);
+                DOUBLE_TO_NPVARIANT(num, value);
             } else {
                 int num = strtol(str.c_str(), NULL, 0);
-                INT32_TO_NPVARIANT(num, *value);
+                INT32_TO_NPVARIANT(num, value);
             }
         } else if (tag == "<string>") {
             start = end;
@@ -298,37 +300,41 @@ ExternalInterface::parseXML(const std::string &xml)
             data[length] = 0;  // terminate the new string or bad things happen
             // When an NPVariant becomes a string object, it *does not* make a copy.
             // Instead it stores the pointer (and length) we just allocated.
-            STRINGN_TO_NPVARIANT(data, length, *value);
+            STRINGN_TO_NPVARIANT(data, length, value);
         } else if (tag == "<array>") {
             NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
             start = end;
             end = xml.find("</array");
             std::string str = xml.substr(start, end-start);
-            std::map<std::string, NPVariant *> props = parseProperties(str);
-            std::map<std::string, NPVariant *>::iterator it;
+            std::map<std::string, GnashNPVariant> props = parseProperties(str);
+            std::map<std::string, GnashNPVariant>::iterator it;
             for (it=props.begin(); it != props.end(); ++it) {
                 NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
-                NPVariant *value = it->second;
-                NPN_SetProperty(NULL, obj, id, value);
+                GnashNPVariant& value = it->second;
+                NPN_SetProperty(NULL, obj, id, &value.get());
             }
-            OBJECT_TO_NPVARIANT(obj, *value);
+            OBJECT_TO_NPVARIANT(obj, value);
+            NPN_RetainObject(obj);
         } else if (tag == "<object>") {
             NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
             start = end;
             end = xml.find("</object");
             std::string str = xml.substr(start, end-start);
-            std::map<std::string, NPVariant *> props = parseProperties(str);
-            std::map<std::string, NPVariant *>::iterator it;
+            std::map<std::string, GnashNPVariant> props = parseProperties(str);
+            std::map<std::string, GnashNPVariant>::iterator it;
             for (it=props.begin(); it != props.end(); ++it) {
                 NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
-                NPVariant *value = it->second;
-                NPN_SetProperty(NULL, obj, id, value);
+                GnashNPVariant& value = it->second;
+                NPN_SetProperty(NULL, obj, id, &value.get());
             }
-            OBJECT_TO_NPVARIANT(obj, *value);
+            OBJECT_TO_NPVARIANT(obj, value);
+            NPN_RetainObject(obj);
         }
     }
     
-    return value;
+    GnashNPVariant rv(value);
+    NPN_ReleaseVariantValue(&value);
+    return rv;
 }
 
 std::string
@@ -340,7 +346,7 @@ ExternalInterface::convertNPVariant (const NPVariant *value)
         double num = NPVARIANT_TO_DOUBLE(*value);
         ss << "<number>" << num << "</number>";
     } else if (NPVARIANT_IS_STRING(*value)) {
-        std::string str(NPVARIANT_TO_STRING(*value).UTF8Characters);
+        std::string str = NPStringToString(NPVARIANT_TO_STRING(*value));
         ss << "<string>" << str << "</string>";
     } else if (NPVARIANT_IS_BOOLEAN(*value)) {
         bool flag = NPVARIANT_TO_BOOLEAN(*value);
@@ -363,10 +369,10 @@ ExternalInterface::convertNPVariant (const NPVariant *value)
     return ss.str();
 }
 
-std::map<std::string, NPVariant *>
+std::map<std::string, GnashNPVariant>
 ExternalInterface::parseProperties(const std::string &xml)
 {
-    std::map<std::string, NPVariant *> props;
+    std::map<std::string, GnashNPVariant> props;
 
     std::string::size_type start = 0;
     std::string::size_type end;
@@ -391,10 +397,10 @@ ExternalInterface::parseProperties(const std::string &xml)
     return props;
 }
 
-std::vector<NPVariant *>
+std::vector<GnashNPVariant>
 ExternalInterface::parseArguments(const std::string &xml)
 {
-    std::vector<NPVariant *> args;
+    std::vector<GnashNPVariant> args;
 
     std::string::size_type start = 0;
     std::string::size_type end;
@@ -414,13 +420,14 @@ ExternalInterface::parseArguments(const std::string &xml)
         if (data == "</arguments>") {
             break;
         }
-        NPVariant *value = parseXML(sub);
-        args.push_back(value);
+        args.push_back(parseXML(sub));
         data.erase(0, end);
     }
 
     return args;
 }
+
+} // namespace gnash
 
 // local Variables:
 // mode: C++

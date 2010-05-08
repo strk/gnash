@@ -62,19 +62,12 @@ public:
 	{
 	}
 
-	/// Execute this tag but only if it is an action tag
-	void execute_action(MovieClip* m, DisplayList& dlist) const
-	{
-		if (is_action_tag()) execute(m, dlist);
-	}
-
 	/// Return true if this is an action tag.
     //
     /// The default returns false.
 	virtual bool is_action_tag() const { return false; }
 
 };
-
 
 } // namespace SWF
 } // namespace gnash

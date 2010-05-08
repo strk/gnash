@@ -371,3 +371,7 @@ testsuite/misc-ming.all/EmbeddedFontTest
 testsuite/misc-ming.all/EmbeddedFontTestRunner
 testsuite/misc-ming.all/TextSnapshotTest
 testsuite/misc-ming.all/TextSnapshotTest-Runner
+testsuite/as3compile.all/pp_*.as
+testsuite/as3compile.all/*.swf
+testsuite/as3compile.all/bogustests-runner
+testsuite/as3compile.all/sanetests-runner

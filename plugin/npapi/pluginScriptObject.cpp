@@ -74,11 +74,7 @@ static NPClass GnashPluginScriptObjectClass = {
     GnashPluginScriptObject::marshalConstruct
 };
 
-// 0 for reading, 1 for writing
-int         _sockfds[2];
-GIOChannel *_iochan[2];
-
-//static int controlfd = -1;
+static int controlfd = -1;
 
 bool
 testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
@@ -94,27 +90,25 @@ testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*arg
 void
 printNPVariant(const NPVariant *value)
 {
-    if (value) {
-        if (NPVARIANT_IS_DOUBLE(*value)) {
-            double num = NPVARIANT_TO_DOUBLE(*value);
-            log_debug("is double, value %g", num);
-        } else if (NPVARIANT_IS_STRING(*value)) {
-            std::string str(NPVARIANT_TO_STRING(*value).UTF8Characters);
-            log_debug("is string, value %s", str);
-        } else if (NPVARIANT_IS_BOOLEAN(*value)) {
-            bool flag = NPVARIANT_TO_BOOLEAN(*value);
-            log_debug("is boolean, value %d", flag);
-        } else if (NPVARIANT_IS_INT32(*value)) {
-            int num = NPVARIANT_TO_INT32(*value);
-            log_debug("is int, value %d", num);
-        } else if (NPVARIANT_IS_NULL(*value)) {
-            log_debug("value is null");
-        } else if (NPVARIANT_IS_VOID(*value)) {
-            log_debug("value is void");
-        } else if (NPVARIANT_IS_OBJECT(*value)) {
-            log_debug("value is object");
-        }    
-    }
+    if (NPVARIANT_IS_DOUBLE(*value)) {
+        double num = NPVARIANT_TO_DOUBLE(*value);
+        log_debug("is double, value %g", num);
+    } else if (NPVARIANT_IS_STRING(*value)) {
+        std::string str(NPVARIANT_TO_STRING(*value).UTF8Characters);
+        log_debug("is string, value %s", str);
+    } else if (NPVARIANT_IS_BOOLEAN(*value)) {
+        bool flag = NPVARIANT_TO_BOOLEAN(*value);
+        log_debug("is boolean, value %d", flag);
+    } else if (NPVARIANT_IS_INT32(*value)) {
+        int num = NPVARIANT_TO_INT32(*value);
+        log_debug("is int, value %d", num);
+    } else if (NPVARIANT_IS_NULL(*value)) {
+        log_debug("value is null");
+    } else if (NPVARIANT_IS_VOID(*value)) {
+        log_debug("value is void");
+    } else if (NPVARIANT_IS_OBJECT(*value)) {
+        log_debug("value is object");
+    }    
 }
 
 //
@@ -123,27 +117,21 @@ printNPVariant(const NPVariant *value)
 
 void
 GnashPluginScriptObject::AddProperty(const std::string &name,
-                                     const std::string &str)
+                                     const std::string &val)
 {
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
-    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
-    int length = str.size();;
-    char *bar = (char *)NPN_MemAlloc(length+1);
-    std::copy(str.begin(), str.end(), bar);
-    bar[length] = 0;  // terminate the new string or bad things happen
-    
-    // When an NPVariant becomes a string object, it *does not* make a copy.
-    // Instead it stores the pointer (and length) we just allocated.
-    STRINGN_TO_NPVARIANT(bar, length, *value);
-    SetProperty(id, value);
+
+    NPVariant strvar;
+    STRINGN_TO_NPVARIANT(val.c_str(), static_cast<int>(val.size()), strvar);
+    SetProperty(id, strvar);
 }
 
 void
 GnashPluginScriptObject::AddProperty(const std::string &name, double num)
 {
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
-    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
-    DOUBLE_TO_NPVARIANT(num, *value);
+    NPVariant value;
+    DOUBLE_TO_NPVARIANT(num, value);
     SetProperty(id, value);
 }
 
@@ -151,8 +139,8 @@ void
 GnashPluginScriptObject::AddProperty(const std::string &name, int num)
 {
     NPIdentifier id = NPN_GetStringIdentifier(name.c_str());
-    NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
-    INT32_TO_NPVARIANT(num, *value);
+    NPVariant value;
+    INT32_TO_NPVARIANT(num, value);
     SetProperty(id, value);
 }
 
@@ -425,7 +413,7 @@ GnashPluginScriptObject::marshalSetProperty (NPObject *npobj, NPIdentifier name,
 //    log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;    
-    return gpso->SetProperty(name, value);
+    return gpso->SetProperty(name, *value);
 }
 
 bool 
@@ -489,20 +477,20 @@ GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
         log_debug("Getting Property %d\"...", NPN_IntFromIdentifier(name));
     }
 
-    std::map<NPIdentifier, const NPVariant *>::iterator it;
+    std::map<NPIdentifier, GnashNPVariant>::const_iterator it;
     it = _properties.find(name);
     if (it == _properties.end()) {
         return false;
     }
 
-    const NPVariant *value = it->second;
-    CopyVariantValue(*value, *result);
+    const GnashNPVariant& val = it->second;
+    val.copy(*result);
 
     return true;
 };
 
 bool
-GnashPluginScriptObject::SetProperty(NPIdentifier name, const NPVariant *value)
+GnashPluginScriptObject::SetProperty(NPIdentifier name, const NPVariant& value)
 {
     // log_debug(__PRETTY_FUNCTION__);
 
@@ -516,13 +504,13 @@ GnashPluginScriptObject::RemoveProperty(NPIdentifier name)
 {
     // log_debug(__PRETTY_FUNCTION__);
 
-    std::map<NPIdentifier, const NPVariant *>::iterator it;
+    std::map<NPIdentifier, GnashNPVariant>::iterator it;
     it = _properties.find(name);
     if (it != _properties.end()) {
         _properties.erase(it);
         return true;
-    }    
-    
+    }
+
     return false;
 }
 
@@ -624,7 +612,7 @@ GnashPluginScriptObject::AddMethod(NPIdentifier name, NPInvokeFunctionPtr func)
 // "Command Name Type value\n", ie... "SetVariable var1 string value1\n"
 bool
 GnashPluginScriptObject::SetVariable(const std::string &name,
-                                     NPVariant *value)
+                                     const NPVariant& value)
 {
     log_debug(__PRETTY_FUNCTION__);
 
@@ -633,12 +621,12 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
     std::vector<std::string> iargs;
     std::string str = ei.makeString(name);
     iargs.push_back(str);
-    str = ei.convertNPVariant(value);
+    str = ei.convertNPVariant(&value);
     iargs.push_back(str);
     str = ei.makeInvoke("SetVariable", iargs);
     
     // Write the message to the Control FD.
-    size_t ret = writePlayer(str);
+    size_t ret = writePlayer(controlfd, str);
     // Unless we wrote the same amount of data as the message contained,
     // something went wrong.
     if (ret != str.size()) {
@@ -652,7 +640,7 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
 // GetVariable sends a message to the player that looks like this:
 // "Command Name\n", ie... "GetVariable var1\n". Then it waits
 // for the response with the type and value.
-NPVariant *
+GnashNPVariant
 GnashPluginScriptObject::GetVariable(const std::string &name)
 {
     log_debug(__PRETTY_FUNCTION__);
@@ -662,243 +650,131 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
     std::string str = ei.makeString(name);
     iargs.push_back(str);
     str = ei.makeInvoke("GetVariable", iargs);
-    log_debug("Trying to get a value for %s", name);
-    
-    // If all the browser wants is the version, we don't need to
-    // ask the standalone player for this value. YouTube at
-    // least depends on this for some pages which want this to
-    // be greater than 8.0.0. This appears to potentially be
-    // Google's way of trying to revent downloaders, as this requires
-    // plugin support.
-    NPVariant *value = 0;
-    size_t ret = 0;
-    // if (name == "$version") {
-    //     value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
-    //     STRINGZ_TO_NPVARIANT(strdup("LNX 10,0,r999"), *value);
-    //     return value;
-    // }
 
-    ret = writePlayer(str);
+    log_debug("Trying to get a value for %s.", name);
+    
+    size_t ret = writePlayer(controlfd, str);
     if (ret != str.size()) {
-        log_error("Couldn't send GetVariable request, network problems.");
+        // If all the browser wants is the version, we don't need to
+        // ask the standalone player for this value. YouTube at
+        // least depends on this for some pages which want this to
+        // be greater than 8.0.0. This appears to potentially be
+        // Google's way of trying to revent downloaders, as this requires
+        // plugin support.
+        NPVariant value;
+        if (name == "$version") {
+            STRINGN_TO_NPVARIANT("LNX 10,0,r999", 13, value);
+        } else {
+            log_error("Couldn't send GetVariable request, network problems.");
+            NULL_TO_NPVARIANT(value);
+        }
         return value;
     }
-    // }
-    
-#if 0
+
     // Have the read function allocate the memory
-    const char *data = 0;
-    ret = readPlayer(controlfd, &data, 0);
-    if (ret == 0) {
-        value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
-        NULL_TO_NPVARIANT(*value);
-        return value;
+    std::string data = readPlayer(controlfd);
+    if (data.empty()) {
+        return GnashNPVariant();
     }
 
-    value = ei.parseXML(data);
+    GnashNPVariant parsed = ei.parseXML(data);
 
-    // free the memory used for the data, as it was allocated in readPlayer().
-    NPN_MemFree(const_cast<char *>(data));
-#endif
+    printNPVariant(&parsed.get());
     
-    printNPVariant(value);
-    
-    return value;
-}
-
-int
-GnashPluginScriptObject::getReadFD()
-{
-//    log_debug(__FUNCTION__);
-
-    return _sockfds[READFD];
-}
-
-int
-GnashPluginScriptObject::getWriteFD()
-{
-//    log_debug(__FUNCTION__);
-
-    return _sockfds[WRITEFD];
+    return parsed;
 }
 
 void
 GnashPluginScriptObject::setControlFD(int x)
 {
-//    log_debug("%s to: %d", __FUNCTION__, x);
-
-    _sockfds[WRITEFD] = x;
+//    log_debug("%s: %d", __FUNCTION__, x);
+#if 0
+    if (_iochan == 0) {
+        _iochan[WRITEFD] = g_io_channel_unix_new(x);
+    }
+#endif
+    controlfd = x;              // FIXME: this should go away
 }
 
 int
 GnashPluginScriptObject::getControlFD()
 {
-//    log_debug("getControlFD: %d", _sockfds[WRITEFD]);
+// log_debug("getControlFD: %d", controlfd);
 
 #if 0
     return g_io_channel_unix_get_fd (_iochan);
-#endif
-    
-    return _sockfds[WRITEFD];
+#endif    
+    return controlfd;
 };
 
 
 // Write to the standalone player over the control socket
 int
-GnashPluginScriptObject::writePlayer(const std::string &data)
-{
-    return writePlayer(_sockfds[WRITEFD], data.c_str(), data.size());
-}
-
-int
 GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 {
-    log_debug(__PRETTY_FUNCTION__);
+//    log_debug(__PRETTY_FUNCTION__);
+
+//    log_debug("Writing data: %s", data);
 
     if (fd > 2) {
-        return writePlayer(fd, data.c_str(), data.size());
+        return ::write(fd, data.data(), data.size());
     }
     
     return 0;
 }
 
-int
-GnashPluginScriptObject::writePlayer(const char *data, size_t length)
-{
-    log_debug(__PRETTY_FUNCTION__);
-
-    return writePlayer(_sockfds[WRITEFD], data, length);
-}
-
-int
-GnashPluginScriptObject::writePlayer(int fd, const char *data, size_t length)
-{
-    log_debug(__PRETTY_FUNCTION__);
-
-    log_debug("Trying to write (%d bytes) %s to fd #%d", length, data, fd);
-
-    GIOStatus ret;
-    GError *err = NULL;
-    gsize len = 0;
-    
-    ret = g_io_channel_write_chars(_iochan[WRITEFD], data, length, &len, &err);
-    if (ret == G_IO_STATUS_ERROR)
-        g_error("Error writing: %s\n", err->message);
-    
-    log_debug("Wrote %u bytes.\n", len);
-
-//    log_debug("Writing data: %s", data);    
-    
-    return 0;
-}
-
-// Read the standalone player over the control socket
-int
-GnashPluginScriptObject::readPlayer(const std::string &data)
+std::string
+GnashPluginScriptObject::readPlayer(int fd)
 {
 //    log_debug(__PRETTY_FUNCTION__);
 
-    const char *ptr = data.c_str();
-    return readPlayer(_sockfds[READFD], &ptr, data.size());
-}
+    std::string empty;
 
-int
-GnashPluginScriptObject::readPlayer(int fd, const std::string &data)
-{
-//    log_debug(__PRETTY_FUNCTION__);
-
-    const char *ptr = data.c_str();
-    return readPlayer(fd, &ptr, data.size());
-}
-
-int
-GnashPluginScriptObject::readPlayer(const char **data, size_t length)
-{
-    return readPlayer(_sockfds[READFD], data, length);
-}
-
-int
-GnashPluginScriptObject::readPlayer(int fd, const char **data, size_t length)
-{
-    log_debug(__PRETTY_FUNCTION__);
-
-#if 1
-    GError* error=NULL;
-    gchar* request;
-    gsize requestSize=0;
-    GIOStatus status = g_io_channel_read_line(_iochan[READFD], &request,
-                                              &requestSize, NULL, &error);
-
-    switch ( status ) {
-      case G_IO_STATUS_ERROR:
-          gnash::log_error(std::string("Error reading request line: ") + error->message);
-          
-          g_error_free(error);
-          return false;
-      case G_IO_STATUS_EOF:
-          gnash::log_error(std::string("EOF (error: ") + error->message);
-          return false;
-      case G_IO_STATUS_AGAIN:
-          gnash::log_error(std::string("Read again(error: ") + error->message);
-          break;
-      case G_IO_STATUS_NORMAL:
-          // process request
-          gnash::log_debug("Normal read: " + std::string(request));
-          break;
-      default:
-          gnash::log_error("Abnormal status!");
-          return false;
-          
+    if (fd <= 0) {
+        log_error("Invalid fd passed");
+        return empty;
     }
-#else
-    if (fd > 0) {
-        // Wait for some data from the player
-        int bytes = 0;
-        fd_set fdset;
-        FD_ZERO(&fdset);
-        FD_SET(fd, &fdset);
-        struct timeval tval;
-        tval.tv_sec = 10;
-        tval.tv_usec = 0;
-        // log_debug("Waiting for data... ");
-        if (select(fd+1, &fdset, NULL, NULL, &tval)) {
-            // log_debug("There is data in the network");
+
+    // Wait for some data from the player
+    int bytes = 0;
+    fd_set fdset;
+    FD_ZERO(&fdset);
+    FD_SET(fd, &fdset);
+    struct timeval tval;
+    tval.tv_sec = 10;
+    tval.tv_usec = 0;
+    // log_debug("Waiting for data... ");
+    if (select(fd+1, &fdset, NULL, NULL, &tval)) {
+        // log_debug("There is data in the network");
 #ifndef _WIN32
-            ioctl(fd, FIONREAD, &bytes);
+        ioctl(fd, FIONREAD, &bytes);
 #else
-            ioctlSocket(fd, FIONREAD, &bytes);
+        ioctlSocket(fd, FIONREAD, &bytes);
 #endif
-        // } else {
-        //     log_debug("There is no data in the network");
-        }
+    }
         
 
-        // No data yet
-        if (bytes == 0) {
-            return 0;
-        }
-        log_debug("There are %d bytes in the network buffer", bytes);
-
-        char *buf = 0;
-        if (*data == 0) {
-            // Since we know how bytes are in the network buffer, allocate
-            // some memory to read the data.
-            buf = (char *)NPN_MemAlloc(bytes+1);
-            // terminate incase we want to treat the data like a string.
-            buf[bytes] = 0;
-            length = bytes;
-        }
-        int ret = ::read(fd, buf, bytes);
-        if (ret == bytes) {
-            *data = buf;
-        }
-
-        std::cout << buf << std::endl;
-        return ret;
+    // No data yet
+    if (bytes == 0) {
+        return empty;
     }
-#endif
+
+    log_debug("There are %d bytes in the network buffer", bytes);
+
+    std::string buf(bytes, '\0');
+
+    int ret = ::read(fd, &buf[0], bytes);
+    if (ret <= 0) {
+        return empty;
+    }
+
+    if (ret < bytes) {
+        buf.resize(ret);
+    }
+
+    std::cout << buf << std::endl;
     
-    return 0;
+    return buf;
 }
 
 
@@ -920,11 +796,11 @@ GnashPluginScriptObject::closePipe(int fd)
 bool
 GnashPluginScriptObject::createPipe()
 {
-    log_trace(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
 
     if ((_sockfds[READFD] == 0) && (_sockfds[WRITEFD] == 0)) {
         int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, _sockfds);
-
+    
         if (ret == 0) {
             // Set up the Glib IO Channel for reading from the plugin
 //            log_debug("Read fd for socketpair is: %d", _sockfds[READFD]);
@@ -936,15 +812,49 @@ GnashPluginScriptObject::createPipe()
                                       (GIOFunc)handleInvokeWrapper, this);
             
             // Set up the Glib IO Channel for writing to the plugin
-            log_debug("Write fd for socketpair is: %d", _sockfds[WRITEFD]);
+//            log_debug("Write fd for socketpair is: %d", _sockfds[WRITEFD]);
             _iochan[WRITEFD] = g_io_channel_unix_new(_sockfds[WRITEFD]);
             g_io_channel_set_close_on_unref(_iochan[WRITEFD], true);
             return true;
         }
     }
     
+#if 0
+    std::stringstream ss;
+    static int count = 0;
+    ss << "/tmp/gnash-" << getpid() << count++;
+
+    return createPipe(ss.str());
+#endif
+
     return false;
 }
+
+#if 0
+bool
+GnashPluginScriptObject::createPipe(const std::string &name)
+{
+    log_debug(__PRETTY_FUNCTION__);
+
+    mode_t mode = S_IRUSR|S_IWUSR;
+    if (!name.empty()) {
+        int ret = mkfifo(name.c_str(), mode);
+        if (ret == 0) {
+            _sockfd = ::open(name.c_str(), O_RDWR|O_NONBLOCK, mode);
+            if (_sockfd < 0) {
+                log_error("Couldn't open the pipe: \"%s\"", strerror(errno));
+            }
+        } else {
+            log_error("Couldn't create fifo: s\n", strerror(errno));
+        }
+    }
+
+    _pipename = name;
+    
+    return false;
+}
+#endif
+
 
 // Close the socketpair
 bool
@@ -983,9 +893,10 @@ bool
 GnashPluginScriptObject::checkPipe(int fd)
 {
 //    log_debug(__PRETTY_FUNCTION__);
+    
+    fd_set fdset;
         
     if (fd > 2) {
-        fd_set fdset;
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
 	struct timeval tval;
@@ -998,7 +909,7 @@ GnashPluginScriptObject::checkPipe(int fd)
             return false;
         } else if (ret == 1) {
             log_debug ("The pipe for #fd is ready", fd);
-//            controlfd = fd;
+            controlfd = fd;
             return true;
         } else {
             log_error("The pipe has this error: %s", strerror(errno));
@@ -1011,7 +922,7 @@ GnashPluginScriptObject::checkPipe(int fd)
 bool
 GnashPluginScriptObject::handleInvoke(GIOChannel *iochan, GIOCondition cond)
 {
-    log_trace(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
     
     if ( cond & G_IO_HUP ) {
         log_debug("Player request channel hang up");
@@ -1066,46 +977,13 @@ GnashPluginScriptObject::handleInvoke(GIOChannel *iochan, GIOCondition cond)
 }
 
 bool
-GnashPluginScriptObject::processPlayerRequest(gchar* buf, gsize len)
-{
-    log_trace(__PRETTY_FUNCTION__);
-}
-
-bool
 GnashPluginScriptObject::handleInvokeWrapper(GIOChannel *iochan,
                                              GIOCondition cond,
                                              GnashPluginScriptObject* plugin)
 {
-    log_trace(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
     
     return plugin->handleInvoke(iochan, cond);
-}
-
-void
-CopyVariantValue(const NPVariant& from, NPVariant& to)
-{
-    // First, we'll make a shallow copy, which is fine for most variant types.
-    to = from;
-
-    // For deep copies for strings we obviously have to duplicate the string,
-    // and object pointer copies need to have their reference count increased.
-    switch(from.type) {
-        case NPVariantType_String: {
-            const NPString& fromstr = NPVARIANT_TO_STRING(from);
-            const uint32_t& len = fromstr.UTF8Length;
-            
-            NPUTF8* tostr = static_cast<NPUTF8*>(NPN_MemAlloc(len));
-            std::copy(fromstr.UTF8Characters, fromstr.UTF8Characters+len, tostr);
-
-            STRINGN_TO_NPVARIANT(tostr, len, to);
-            break;
-        }
-        case NPVariantType_Object:
-            NPN_RetainObject(NPVARIANT_TO_OBJECT(to));
-            break;
-        default:
-        {}
-    }
 }
 
 } // end of gnash namespace

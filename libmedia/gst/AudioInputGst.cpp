@@ -127,7 +127,7 @@ AudioInputGst::findAudioDevs()
         gst_element_set_state (element, GST_STATE_NULL);
         if ((strcmp(dev_name, "null") == 0) ||
                 (std::strstr(dev_name, "Monitor") != NULL)) {
-            log_trace("No pulse audio input devices.");
+            log_debug("No pulse audio input devices.");
         }
         else { 
             _audioVect.push_back(new GnashAudio);
@@ -295,7 +295,7 @@ AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
     }
     
     if (strcmp(audio->_deviceName, "audiotest") == 0) {
-        log_trace("%s: You don't have any mics chosen, using audiotestsrc",
+        log_debug("%s: You don't have any mics chosen, using audiotestsrc",
             __FUNCTION__);
         audio->_audioSourceBin = gst_parse_bin_from_description (
             "audiotestsrc name=audioSource",
@@ -352,7 +352,7 @@ AudioInputGst::audioCreateSourceBin(GnashAudioPrivate *audio)
     GError *error = NULL;
     gchar *command = NULL;
     if(strcmp(audio->_deviceName, "audiotest") == 0) {
-        log_trace("%s: You don't have any mics chosen, using audiotestsrc",
+        log_debug("%s: You don't have any mics chosen, using audiotestsrc",
             __FUNCTION__);
         audio->_audioSourceBin = gst_parse_bin_from_description (
             "audiotestsrc name=audioSource",
@@ -560,7 +560,7 @@ audio_bus_call (GstBus* /*bus*/, GstMessage *msg, gpointer /*data*/)
   switch (GST_MESSAGE_TYPE (msg)) {
 
     case GST_MESSAGE_EOS:
-        log_trace ("End of stream\n");
+        log_debug ("End of stream\n");
         break;
     
     case GST_MESSAGE_ERROR: {
@@ -733,11 +733,11 @@ AudioInputGst::makeAudioDevSelection()
     int devselect = -1;
     devselect = rcfile.getAudioInputDevice();
     if (devselect == -1) {
-        log_trace("No default audio input device specified, setting to testsrc");
+        log_debug("No default audio input device specified, setting to testsrc");
         rcfile.setAudioInputDevice(0);
         devselect = rcfile.getAudioInputDevice();
     } else {
-        log_trace("You've specified audio input %d in gnashrc, using that one",
+        log_debug("You've specified audio input %d in gnashrc, using that one",
             devselect);
     }
     

@@ -41,6 +41,7 @@
 #include <glib.h>
 #include "npapi.h"
 #include "npruntime.h"
+#include "GnashNPVariant.h"
 
 #define READFD 0
 #define WRITEFD 1
@@ -102,14 +103,14 @@ public:
     /// @param value the value to set the variable to
     ///
     /// @return true or false based on the status of the invoke call
-    bool SetVariable(const std::string &name, NPVariant *value);
+    bool SetVariable(const std::string &name, const NPVariant& value);
     
     /// Get the value of a variable from the standalone player
     ///
     /// @param name the name of the variable to set
     ///
     /// @return the value as returned by the standalone player
-    NPVariant *GetVariable(const std::string &name);
+    GnashNPVariant GetVariable(const std::string &name);
 
     // Create a socketpair so we can talk to the player.
     bool createPipe();
@@ -122,20 +123,14 @@ public:
     bool checkPipe();
     bool checkPipe(int fd);
 
-    int getReadFD();
-    int getWriteFD();
+    int getReadFD()  { return _sockfds[READFD]; };
+    int getWriteFD() { return _sockfds[WRITEFD]; };
     
     // Write to the standalone player over the control socket
-    int writePlayer(const char *data, size_t length);
-    int writePlayer(int fd, const char *data, size_t length);
-    int writePlayer(const std::string &data);
     int writePlayer(int fd, const std::string &data);
     
     // Read the standalone player over the control socket
-    int readPlayer(const char **data, size_t length);
-    int readPlayer(int fd, const char **data, size_t length);
-    int readPlayer(const std::string &data);
-    int readPlayer(int fd, const std::string &data);
+    std::string readPlayer(int fd);
     
 protected:
     bool AddMethod(NPIdentifier name, NPInvokeFunctionPtr func);
@@ -152,7 +147,7 @@ protected:
     bool InvokeDefault(const NPVariant *args, uint32_t argCount, NPVariant *result);
     bool HasProperty(NPIdentifier name);
     bool GetProperty(NPIdentifier name, NPVariant *result);
-    bool SetProperty(NPIdentifier name, const NPVariant *value);
+    bool SetProperty(NPIdentifier name, const NPVariant& value);
     bool RemoveProperty(NPIdentifier name);
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
@@ -183,11 +178,11 @@ private:
     // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
     NPP _nppinstance;
     
-    std::map<NPIdentifier, const NPVariant*> _properties;
-    std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
-    // // 0 for reading, 1 for writing
-    // int         _sockfds[2];
-    // GIOChannel *_iochan[2];
+    std::map<NPIdentifier, GnashNPVariant> _properties;
+    std::map<NPIdentifier, NPInvokeFunctionPtr> _methods;
+    // 0 for reading, 1 for writing
+    int         _sockfds[2];
+    GIOChannel *_iochan[2];
     // ID to watch the read channel from the player
     int         _watchid;
 };

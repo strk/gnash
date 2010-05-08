@@ -593,7 +593,6 @@ ExternalInterface_as::ExternalInterface_as()
        _marshallExceptions(false)
 {
     GNASH_REPORT_FUNCTION;
-
 }
 
 ExternalInterface_as::~ExternalInterface_as()

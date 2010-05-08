@@ -431,9 +431,9 @@ public:
     /// Add the given action buffer to the list of action
     /// buffers to be processed at the end of the next
     /// frame advance.
-    void    add_action_buffer(const action_buffer* a)
+    void add_action_buffer(const action_buffer* a)
     {
-        if ( ! _callingFrameActions ) queueAction(*a);
+        if (!_callingFrameActions) queueAction(*a);
         else execute_action(*a);
     }
 

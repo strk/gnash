@@ -1,6 +1,6 @@
 // vaapi_common.h: VA API common (internal) includes and definitions
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 
 #include <va/va.h>
 #include <memory>
-#include <stdint.h> /* XXX: uintptr_t */
+#include <stdint.h>
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include "dsodefs.h"
 
-#endif /* GNASH_VAAPI_COMMON_H */
+#endif // GNASH_VAAPI_COMMON_H
 
 // local Variables:
 // mode: C++

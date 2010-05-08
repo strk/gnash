@@ -1,6 +1,6 @@
 // vaapi_utils.cpp: VA API utilities
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 #include <stdarg.h>
 
 namespace gnash {
-
 
 static bool g_vaapi_is_enabled = false;
 
@@ -113,8 +112,7 @@ const char *string_of_VAEntrypoint(VAEntrypoint entrypoint)
     return "<unknown>";
 }
 
-} // gnash namespace
-
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

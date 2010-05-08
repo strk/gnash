@@ -1,6 +1,6 @@
 // VaapiSurface.h: VA surface abstraction
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,24 +45,20 @@ class VaapiSurfaceImplBase {
     unsigned int        _height;
 
 protected:
-    void reset(uintptr_t surface)
-        { _surface = surface; }
+    void reset(uintptr_t surface) { _surface = surface; }
 
 public:
     VaapiSurfaceImplBase(unsigned int width, unsigned int height);
     virtual ~VaapiSurfaceImplBase() { }
 
     /// Get VA surface
-    uintptr_t surface() const
-        { return _surface; }
+    uintptr_t surface() const { return _surface; }
 
     /// Get surface width
-    unsigned int width() const
-        { return _width; }
+    unsigned int width() const { return _width; }
 
     /// Get surface height
-    unsigned int height() const
-        { return _height; }
+    unsigned int height() const { return _height; }
 };
 
 /// VA surface abstraction
@@ -74,27 +70,22 @@ class VaapiSurface {
     VaapiContext *_context;
 
     /// Set parent VA context
-    void setContext(VaapiContext *context)
-        { _context = context; }
+    void setContext(VaapiContext *context) { _context = context; }
 
 public:
     VaapiSurface(unsigned int width, unsigned int height);
 
     /// Return parent VA context
-    VaapiContext *getContext() const
-        { return _context; }
+    VaapiContext *getContext() const { return _context; }
 
     /// Return VA surface id
-    VASurfaceID get() const
-        { return static_cast<VASurfaceID>(_impl->surface()); }
+    VASurfaceID get() const { return static_cast<VASurfaceID>(_impl->surface()); }
 
     /// Get surface width
-    unsigned int width() const
-        { return _impl->width(); }
+    unsigned int width() const { return _impl->width(); }
 
     /// Get surface height
-    unsigned int height() const
-        { return _impl->height(); }
+    unsigned int height() const { return _impl->height(); }
 
     /// Clear surface with black color
     void clear();
@@ -110,7 +101,7 @@ public:
 
 } // gnash namespace
 
-#endif /* GNASH_VAAPISURFACE_H */
+#endif // GNASH_VAAPISURFACE_H
 
 // local Variables:
 // mode: C++

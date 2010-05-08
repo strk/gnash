@@ -1,6 +1,6 @@
 // VaapiContext.h: VA context abstraction
 // 
-// Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,11 @@
 #ifndef GNASH_VAAPICONTEXT_H
 #define GNASH_VAAPICONTEXT_H
 
-#include "vaapi_common.h"
+
 #include <queue>
+
+#include "log.h"
+#include "vaapi_common.h"
 
 namespace gnash {
 
@@ -41,13 +44,13 @@ enum VaapiCodec {
 class VaapiContextData {
 public:
     virtual ~VaapiContextData()
-        { }
+    { /* do nothing */ }
 };
 
 /// VA context abstraction
 class VaapiContext {
     typedef boost::shared_ptr<VaapiSurface> VaapiSurfaceSP;
-
+    
     VADisplay                           _display;
     VAConfigID                          _config;
     VAContextID                         _context;
@@ -72,8 +75,7 @@ public:
     bool initDecoder(unsigned int width, unsigned int height);
 
     /// Return VA context
-    VAContextID get() const
-        { return _context; }
+    VAContextID get() const { return _context; }
 
     /// Get a free surface
     boost::shared_ptr<VaapiSurface> acquireSurface();
@@ -82,12 +84,10 @@ public:
     void releaseSurface(boost::shared_ptr<VaapiSurface> surface);
 
     /// Set user data
-    void setData(std::auto_ptr<VaapiContextData> user_data)
-        { _user_data = user_data; }
+    void setData(std::auto_ptr<VaapiContextData> user_data) { _user_data = user_data; }
 
     /// Get user data
-    VaapiContextData *getData() const
-        { return _user_data.get(); }
+    VaapiContextData *getData() const { return _user_data.get(); }
 };
 
 } // gnash namespace

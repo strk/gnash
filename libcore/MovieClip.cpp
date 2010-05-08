@@ -87,7 +87,12 @@ namespace gnash {
 //
 //#define DEBUG_MOUSE_ENTITY_FINDING 1
 
-/// Anonymous namespace for module-private definitions
+namespace {
+    inline void executeIfActionTag(const SWF::ControlTag& t, MovieClip* m,
+            DisplayList& dlist);
+}
+
+// Anonymous namespace for module-private definitions
 namespace {
 
 /// ConstructEvent, used for queuing construction
@@ -535,18 +540,16 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     //             we'll temporarly clear the _callingFrameActions flag
     //             to properly queue actions back on the global queue.
     //
-    _callingFrameActions=true;
+    _callingFrameActions = true;
     const PlayList* playlist = _def->getPlaylist(frame_number);
-    if ( playlist )
-    {
-    PlayList::const_iterator it = playlist->begin();
+    if (playlist) {
+        PlayList::const_iterator it = playlist->begin();
         const PlayList::const_iterator e = playlist->end();
-    for(; it != e; it++)
-    {
-        (*it)->execute_action(this, _displayList);
+        for (; it != e; it++) {
+            executeIfActionTag(**it, this, _displayList);
+        }
     }
-    }
-    _callingFrameActions=false;
+    _callingFrameActions = false;
 
 }
 
@@ -821,7 +824,7 @@ MovieClip::advance()
 #endif
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
-    queueEvent(event_id::ENTER_FRAME, movie_root::apDOACTION);
+    queueEvent(event_id::ENTER_FRAME, movie_root::PRIORITY_DOACTION);
 
     // Update current and next frames.
     if (_playState == PLAYSTATE_PLAY)
@@ -888,7 +891,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 #endif
         std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
 
-        stage().pushAction(code, movie_root::apINIT);
+        stage().pushAction(code, movie_root::PRIORITY_INIT);
     }
     else
     {
@@ -974,9 +977,8 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
         else
         {
             assert(typeflags & SWF::ControlTag::TAG_ACTION);
-            for( ; it != e; it++)
-            {
-                (*it)->execute_action(this, dlist);
+            for( ; it != e; it++) {
+                executeIfActionTag(**it, this, _displayList);
             }
         }
     }
@@ -1230,7 +1232,7 @@ MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dli
         tag->getDepth(), 
         tag->hasCxform() ? &tag->getCxform() : NULL,
         tag->hasMatrix() ? &tag->getMatrix() : NULL,
-        tag->hasRatio()    ? &ratio    : NULL,
+        tag->hasRatio() ? &ratio : NULL,
         NULL);
 }
 
@@ -1798,7 +1800,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #ifdef GNASH_DEBUG
             log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
 #endif
-            queueEvent(event_id::LOAD, movie_root::apDOACTION);
+            queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
         }
 
     }
@@ -1807,7 +1809,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
 #endif
-        queueEvent(event_id::LOAD, movie_root::apDOACTION);
+        queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
 
 #ifdef GNASH_DEBUG
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
@@ -1833,10 +1835,10 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
                 getTarget());
 #endif
-        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
+        queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
 
         std::auto_ptr<ExecutableCode> code(new ConstructEvent(this));
-        stage().pushAction(code, movie_root::apCONSTRUCT);
+        stage().pushAction(code, movie_root::PRIORITY_CONSTRUCT);
 
     }
     else {
@@ -1853,7 +1855,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
         // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
         // immediately.
-        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
+        queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
     }
 
 
@@ -2281,6 +2283,17 @@ MovieClip::setPlayState(PlayState s)
     if (s == _playState) return; // nothing to do
     if (s == PLAYSTATE_STOP) stopStreamSound();
     _playState = s;
+}
+
+namespace {
+
+/// 
+inline void
+executeIfActionTag(const SWF::ControlTag& t, MovieClip* m, DisplayList& dlist)
+{
+    if (t.is_action_tag()) t.execute(m, dlist);
+}
+
 }
 
 } // namespace gnash

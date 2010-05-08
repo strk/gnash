@@ -24,36 +24,36 @@
 #endif
 
 #if defined(_MSC_VER) || defined(WIN32) || defined(_WIN32)
-	// #ifdef BUILDING_DLL
-	#ifdef DLL_EXPORT
-		#define DSOEXPORT __declspec(dllexport)
-	#else
-		// Temporarily commented because of VC++ compiler problems 
-		#define DSOEXPORT // __declspec(dllimport)
-	#endif
-
-	#define DSOLOCAL
-#elif defined(__OS2__)
-	#ifdef BUILDING_DLL
-		#define DSOEXPORT __declspec(dllexport)
-	#else
-		// Temporarily commented because of VC++ compiler problems 
-		#define DSOEXPORT // __declspec(dllimport)
-	#endif
-
-	#define DSOLOCAL
-
+// #ifdef BUILDING_DLL
+#ifdef DLL_EXPORT
+#define DSOEXPORT __declspec(dllexport)
 #else
-	#ifdef HAVE_GNUC_VISIBILITY
-		#define DSOEXPORT __attribute__ ((visibility("default")))
-		#define DSOLOCAL __attribute__ ((visibility("hidden")))
-	#elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550) /* Sun Studio >= 8 */
-		#define DSOEXPORT __global
-		#define DSOLOCAL __hidden
-	#else
-		#define DSOEXPORT
-		#define DSOLOCAL
-	#endif
+// Temporarily commented because of VC++ compiler problems 
+#define DSOEXPORT // __declspec(dllimport)
 #endif
 
-#endif /* DSODEFS_H */
+#define DSOLOCAL
+#elif defined(__OS2__)
+#ifdef BUILDING_DLL
+#define DSOEXPORT __declspec(dllexport)
+#else
+// Temporarily commented because of VC++ compiler problems 
+#define DSOEXPORT // __declspec(dllimport)
+#endif
+
+#define DSOLOCAL
+
+#else
+#ifdef HAVE_GNUC_VISIBILITY
+#define DSOEXPORT __attribute__ ((visibility("default")))
+#define DSOLOCAL __attribute__ ((visibility("hidden")))
+#elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550) /* Sun Studio >= 8 */
+#define DSOEXPORT __global
+#define DSOLOCAL __hidden
+#else
+#define DSOEXPORT
+#define DSOLOCAL
+#endif
+#endif
+
+#endif // DSODEFS_H
