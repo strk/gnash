@@ -30,74 +30,67 @@ main(int argc, char** argv)
  
     SWFMovie_setRate (mo, 12.0);
 
-    mc1 = newSWFMovieClip();
-    SWFMovieClip_nextFrame(mc1);
-    
-    add_actions(mo, "onEnterFrame = function() { "
-            "trace(_level0.mc._currentframe + ':' + "
-            "           _level0.mc.Segments.a);"
-            "};"
-            );
-    
-    mc2 = newSWFMovieClip();
-    SWFMovieClip_nextFrame(mc2);
-    SWFMovie_addExport(mo, (SWFBlock)mc2, "MC1");
-    SWFMovie_writeExports(mo);
+    // Character ID: 1, 2
+    dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10,
+             0, 0, 800, 600);
+    SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
-    mc3 = newSWFMovieClip();
-    it = SWFMovieClip_add(mc3, (SWFBlock)mc2);
-    SWFDisplayItem_setName(it, "Segments");
-    SWFMovieClip_nextFrame(mc3);
-    SWFMovieClip_remove(mc3, it);
-    it = SWFMovieClip_add(mc3, (SWFBlock)mc1);
-    SWFMovieClip_nextFrame(mc3);
-
-    it = SWFMovie_add(mo, (SWFBlock)mc3);
-    SWFDisplayItem_setName(it, "mc");
-
+    // Character ID: 4
     mc4 = newSWFMovieClip();
-    
-    SWFMovie_addExport(mo, (SWFBlock)mc4, "MC4");
-    SWFMovie_writeExports(mo);
+    SWFMovieClip_nextFrame(mc4);
+    it = SWFMovie_add(mo, (SWFBlock)mc4);
 
-    ia = newSWFInitAction_withId(newSWFAction(
-                "if (!_global.Bug) {"
-                "   _global.Bug = function() {"
-                "       super();"
-                "       this.onLoad = function() {};"
-                "       this.onUnload = function() {};"
-                "       this.a = 5;"
-                "   };"
-                "} "
-                ), 4);
-    SWFMovie_add(mo, (SWFBlock)ia);
-    
-    mc4 = newSWFMovieClip();
-    //SWFMovie_add(mo, (SWFBlock)mc4);
-    mc4 = newSWFMovieClip();
-    //SWFMovie_add(mo, (SWFBlock)mc4);
-    SWFMovie_addExport(mo, (SWFBlock)mc4, "moo");
-    SWFMovie_writeExports(mo);
-    
-    
-    SWFMovie_add(mo, (SWFBlock)mc4);
-    
-    
-    SWFMovie_add(mo, (SWFBlock)mc4);
-
-    ia = newSWFInitAction_withId(newSWFAction(
-                "trace('hi');"
-                "Object.registerClass('MC1', Bug);"
-                ), 6);
+    // InitActions for ID 2 parsed here:
+    ia = newSWFInitAction_withId(
+            newSWFAction("_global.val4 = 'mc4';"), 4);
     SWFMovie_add(mo, (SWFBlock)ia);
 
+    // Check in first frame:
+    check(mo, "_global.val4 == undefined");
 
-
-    //dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10,
-    //		    0, 0, 800, 600);
-    //SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-
+    // Frame 2
     SWFMovie_nextFrame(mo);
+    
+    // Check in next frame:
+    check(mo, "_global.val4 == undefined");
+    
+    // Frame 4
+    SWFMovie_nextFrame(mo);
+
+    // Action is before export tag.
+    check(mo, "_global.val4 == undefined");
+    SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
+    SWFMovie_writeExports(mo);
+    check(mo, "_global.val4 == undefined");
+
+    // Frame 4
+    SWFMovie_nextFrame(mo);
+    check(mo, "_global.val4 == undefined");
+
+    // Add it again
+    SWFMovie_add(mo, (SWFBlock)mc4);
+    check(mo, "_global.val4 == undefined");
+
+    // Frame 5
+    SWFMovie_nextFrame(mo);
+    check(mo, "_global.val4 == undefined");
+    
+    // Add it again, export it again:
+    SWFMovie_add(mo, (SWFBlock)mc4);
+    SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
+    SWFMovie_writeExports(mo);
+    check(mo, "_global.val4 == undefined");
+    
+    // Frame 6
+    SWFMovie_nextFrame(mo);
+
+    // MovieClip *must be exported*, SWFInitAction *must be after export*
+    ia = newSWFInitAction_withId(
+            newSWFAction("_global.val4 = 'mc4';"), 4);
+    SWFMovie_add(mo, (SWFBlock)ia);
+    check(mo, "_global.val4 == 'mc4'");
+    
+    add_actions(mo, "stop();");
   
     puts("Saving " OUTPUT_FILENAME );
     SWFMovie_save(mo, OUTPUT_FILENAME);
