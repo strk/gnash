@@ -12,8 +12,7 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc1, mc2, mc3, mc4, dejagnuclip;
-    SWFAction ac;
+    SWFMovieClip mc4, mc5, dejagnuclip;
     SWFDisplayItem it;
     SWFInitAction ia;
 
@@ -42,7 +41,7 @@ main(int argc, char** argv)
 
     // InitActions for ID 2 parsed here:
     ia = newSWFInitAction_withId(
-            newSWFAction("_global.val4 = 'mc4';"), 4);
+            newSWFAction("trace('mc4'); _global.val4 = 'mc4';"), 4);
     SWFMovie_add(mo, (SWFBlock)ia);
 
     // Check in first frame:
@@ -52,44 +51,62 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
     
     // Check in next frame:
-    check(mo, "_global.val4 == undefined");
+    xcheck(mo, "_global.val4 == undefined");
     
     // Frame 4
     SWFMovie_nextFrame(mo);
 
     // Action is before export tag.
-    check(mo, "_global.val4 == undefined");
+    xcheck(mo, "_global.val4 == undefined");
     SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
     SWFMovie_writeExports(mo);
-    check(mo, "_global.val4 == undefined");
+    xcheck(mo, "_global.val4 == undefined");
 
     // Frame 4
     SWFMovie_nextFrame(mo);
-    check(mo, "_global.val4 == undefined");
+    xcheck(mo, "_global.val4 == undefined");
 
     // Add it again
     SWFMovie_add(mo, (SWFBlock)mc4);
-    check(mo, "_global.val4 == undefined");
+    xcheck(mo, "_global.val4 == undefined");
 
     // Frame 5
     SWFMovie_nextFrame(mo);
-    check(mo, "_global.val4 == undefined");
+    xcheck(mo, "_global.val4 == undefined");
     
     // Add it again, export it again:
     SWFMovie_add(mo, (SWFBlock)mc4);
     SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
     SWFMovie_writeExports(mo);
-    check(mo, "_global.val4 == undefined");
+    xcheck(mo, "_global.val4 == undefined");
     
     // Frame 6
     SWFMovie_nextFrame(mo);
 
-    // MovieClip *must be exported*, SWFInitAction *must be after export*
+    // MovieClip *must be exported*, SWFInitAction *must be after export*,
+    // but not necessarily in the same frame.
     ia = newSWFInitAction_withId(
-            newSWFAction("_global.val4 = 'mc4';"), 4);
+            newSWFAction("_global.val4 = 'mc4a';"), 4);
     SWFMovie_add(mo, (SWFBlock)ia);
-    check(mo, "_global.val4 == 'mc4'");
+    xcheck(mo, "_global.val4 == 'mc4a'");
     
+    // Frame 7
+    SWFMovie_nextFrame(mo);
+    
+    // The MovieClip does not have to be placed, but must be exported.
+    mc5 = newSWFMovieClip();
+    SWFMovie_addExport(mo, (SWFBlock)mc5, "export5");
+    SWFMovie_writeExports(mo);
+    
+    // Action is before InitAction, but this does not matter. As long as it's
+    // in the same frame it will work.
+    check(mo, "_global.val5 == 'mc5'");
+    
+    ia = newSWFInitAction_withId(
+            newSWFAction("trace('mc5'); _global.val5 = 'mc5';"), 5);
+    SWFMovie_add(mo, (SWFBlock)ia);
+    check(mo, "_global.val5 == 'mc5'");
+
     add_actions(mo, "stop();");
   
     puts("Saving " OUTPUT_FILENAME );
