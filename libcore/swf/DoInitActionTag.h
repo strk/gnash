@@ -76,7 +76,10 @@ public:
         }
         
         in.ensureBytes(2);
-        int cid = in.read_u16();
+        const boost::uint16_t cid = in.read_u16();
+        
+        // Tags should only be executed for exported characters, though
+        // it doesn't matter if the export is known during parsing.
         DoInitActionTag* da = new DoInitActionTag(in, m, cid);
 
         IF_VERBOSE_PARSE (
@@ -84,7 +87,6 @@ public:
         log_parse(_("  -- init actions for sprite %d"), cid);
         );
 
-        //m->add_init_action(da, cid); // ownership transferred
         m.addControlTag(da); // ownership transferred
     }
 
