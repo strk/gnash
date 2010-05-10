@@ -12,10 +12,9 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc3, mc2, dejagnuclip;
-    SWFAction ac, ac1;
+    SWFMovieClip mc4, mc5, dejagnuclip;
     SWFDisplayItem it;
-    SWFShape sha;
+    SWFInitAction ia;
 
     const char *srcdir=".";
     if (argc > 1) srcdir = argv[1];
@@ -27,90 +26,88 @@ main(int argc, char** argv)
     Ming_init();
     mo = newSWFMovieWithVersion(OUTPUT_VERSION);
     SWFMovie_setDimension(mo, 800, 600);
+ 
     SWFMovie_setRate (mo, 12.0);
 
-    sha = newSWFShape();
-
-    // Character ID 2. Has 1 showframe. Is exported first.
-    mc2 = newSWFMovieClip();
-    SWFMovieClip_add(mc2, (SWFBlock)sha);
-    SWFMovieClip_nextFrame(mc2);
-
-    // Export it.
-    SWFMovie_addExport(mo, (SWFBlock)mc2, "C2");
-    SWFMovie_writeExports(mo);
-
-    // Main timeline actions for frame 1
-    add_actions(mo, "var c = 0; trace('frame 1'); gotoAndStop(3);");
-    
-    // ID 3 is defined here. It has no showframe. It is exported immediately.
-    mc3 = newSWFMovieClip();
-    SWFMovie_addExport(mo, (SWFBlock)mc3, "ctor");
-    SWFMovie_writeExports(mo);
-
+    // Character ID: 1, 2
     dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10,
-    		    0, 0, 800, 600);
+             0, 0, 800, 600);
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
-    // Init actions for ID 3
-    ac = newSWFAction(
-    "   _global.ctor = function () {"
-    "       super();"
-    "       trace('Object in Frame 2 is constructed');"
-    "       c += 1;"
-    "   };"
-    );
-    SWFInitAction ia = newSWFInitAction_withId(ac, 3);
+    // Character ID: 4
+    mc4 = newSWFMovieClip();
+    SWFMovieClip_nextFrame(mc4);
+    it = SWFMovie_add(mo, (SWFBlock)mc4);
+
+    // InitActions for ID 2 parsed here:
+    ia = newSWFInitAction_withId(
+            newSWFAction("trace('mc4'); _global.val4 = 'mc4';"), 4);
     SWFMovie_add(mo, (SWFBlock)ia);
-    
-    // Init actions for ID 2 (registered class)
-    ac1 = newSWFAction("Object.registerClass('C2', ctor); "
-            "trace('Registered class');");
-    ia = newSWFInitAction_withId(ac1, 2);
-    SWFMovie_add(mo, (SWFBlock)ia);
-	
-    
+
+    // Check in first frame:
+    check(mo, "_global.val4 == undefined");
+
     // Frame 2
     SWFMovie_nextFrame(mo);
-    add_actions(mo, "trace('Frame 2');");
     
-    // Place object ID 2.
-    it = SWFMovie_add(mo, (SWFBlock)mc2);
-    SWFDisplayItem_setName(it, "mc2");
-
-    // Frame 3
+    // Check in next frame:
+    xcheck(mo, "_global.val4 == undefined");
+    
+    // Frame 4
     SWFMovie_nextFrame(mo);
 
-    // Remove object ID 2
-    SWFMovie_remove(mo, it);
-
-    add_actions(mo, "trace('frame 3');");
-    
-    // The class should not be constructed if the object is removed after
-    // being placed. It should be constructed if it's not removed.
-    xcheck(mo, "c == 0");
-    check(mo, "_root.mc2 == undefined");
-    add_actions(mo, "gotoAndStop(5);");
+    // Action is before export tag.
+    xcheck(mo, "_global.val4 == undefined");
+    SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
+    SWFMovie_writeExports(mo);
+    xcheck(mo, "_global.val4 == undefined");
 
     // Frame 4
     SWFMovie_nextFrame(mo);
-    add_actions(mo, "trace('Frame 4');");
-    
-    // Place object ID 2 again
-    it = SWFMovie_add(mo, (SWFBlock)mc2);
-    SWFDisplayItem_setName(it, "mc2a");
+    xcheck(mo, "_global.val4 == undefined");
+
+    // Add it again
+    SWFMovie_add(mo, (SWFBlock)mc4);
+    xcheck(mo, "_global.val4 == undefined");
 
     // Frame 5
     SWFMovie_nextFrame(mo);
-
-    // This time the MovieClip was not removed before we get here,
-    // so it should be present and the constructor should be
-    // called.
-    add_actions(mo, "trace('frame 5');");
-    xcheck(mo, "c == 1");
-    check(mo, "typeof(_root.mc2a) == 'movieclip'");
-
+    xcheck(mo, "_global.val4 == undefined");
+    
+    // Add it again, export it again:
+    SWFMovie_add(mo, (SWFBlock)mc4);
+    SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
+    SWFMovie_writeExports(mo);
+    xcheck(mo, "_global.val4 == undefined");
+    
+    // Frame 6
     SWFMovie_nextFrame(mo);
+
+    // MovieClip *must be exported*, SWFInitAction *must be after export*,
+    // but not necessarily in the same frame.
+    ia = newSWFInitAction_withId(
+            newSWFAction("_global.val4 = 'mc4a';"), 4);
+    SWFMovie_add(mo, (SWFBlock)ia);
+    xcheck(mo, "_global.val4 == 'mc4a'");
+    
+    // Frame 7
+    SWFMovie_nextFrame(mo);
+    
+    // The MovieClip does not have to be placed, but must be exported.
+    mc5 = newSWFMovieClip();
+    SWFMovie_addExport(mo, (SWFBlock)mc5, "export5");
+    SWFMovie_writeExports(mo);
+    
+    // Action is before InitAction, but this does not matter. As long as it's
+    // in the same frame it will work.
+    check(mo, "_global.val5 == 'mc5'");
+    
+    ia = newSWFInitAction_withId(
+            newSWFAction("trace('mc5'); _global.val5 = 'mc5';"), 5);
+    SWFMovie_add(mo, (SWFBlock)ia);
+    check(mo, "_global.val5 == 'mc5'");
+
+    add_actions(mo, "stop();");
   
     puts("Saving " OUTPUT_FILENAME );
     SWFMovie_save(mo, OUTPUT_FILENAME);

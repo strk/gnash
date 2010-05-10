@@ -222,6 +222,7 @@ if MING_SUPPORTS_INIT_ACTIONS
 check_PROGRAMS += \
 	init_action_test \
 	InitActionTest2 \
+	RegisterClassTest3 \
 	registerClassTest2 \
 	$(NULL)
 endif
@@ -350,6 +351,7 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 check_SCRIPTS += \
 	InitActionTest2Runner \
+	RegisterClassTest3Runner \
 	registerClassTest2runner \
 	$(NULL)
 endif
@@ -1785,6 +1787,18 @@ InitActionTest2Runner: $(srcdir)/../generic-testrunner.sh InitActionTest2.swf
 	sh $< $(top_builddir) InitActionTest2.swf > $@
 	chmod 755 $@
 
+RegisterClassTest3_SOURCES =	\
+	RegisterClassTest3.c	\
+	$(NULL)
+RegisterClassTest3_LDADD = libgnashmingutils.la
+
+RegisterClassTest3.swf: RegisterClassTest3
+	./RegisterClassTest3 $(top_srcdir)/testsuite/media
+
+RegisterClassTest3Runner: $(srcdir)/../generic-testrunner.sh RegisterClassTest3.swf
+	sh $< $(top_builddir) RegisterClassTest3.swf > $@
+	chmod 755 $@
+
 init_action_test_SOURCES =	\
 	init_action_test.c	\
 	$(NULL)
@@ -2168,6 +2182,7 @@ TEST_CASES += \
 	registerClassTest2runner \
 	init_action_testrunner \
 	InitAction2TestRunner \
+	RegisterClassTest3Runner \
 	$(NULL)
 endif
 
