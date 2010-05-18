@@ -109,7 +109,7 @@ class SOLPropsBufSerializer : public AbstractPropertyVisitor
 
 public:
 
-    SOLPropsBufSerializer(AMF::Writer w, string_table& st)
+    SOLPropsBufSerializer(amf::Writer w, string_table& st)
         :
         _writer(w),
         _st(st),
@@ -177,7 +177,7 @@ public:
 
 private:
 
-    AMF::Writer _writer;
+    amf::Writer _writer;
 
     /// String table for looking up property names as strings.
     string_table& _st;
@@ -934,7 +934,7 @@ readSOL(VM& vm, const std::string& filespec)
             return data;
         }
 
-        AMF::Reader rd(buf, end, gl);
+        amf::Reader rd(buf, end, gl);
 
         while (buf != end) {
 
@@ -1055,7 +1055,7 @@ encodeData(const std::string& name, as_object& data, SimpleBuffer& buf)
     
     // see http://osflash.org/documentation/amf/envelopes/sharedobject
     // Do not encode strict arrays!
-    AMF::Writer w(buf, false);
+    amf::Writer w(buf, false);
     string_table& st = getStringTable(data);
 
     SOLPropsBufSerializer props(w, st);

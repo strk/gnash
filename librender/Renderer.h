@@ -180,21 +180,6 @@ namespace gnash {
 
 namespace gnash {
 
-class DSOEXPORT render_cache_manager
-{
-public:
-    //Virtual dtor, removes compiler warning.
-    virtual ~render_cache_manager(){}
-
-    /// Clears the cache completely (necessary for runtime shapes / drawing API)
-    virtual void clear() 
-    {
-        // TODO: Make this abstract to force real implementation!!
-        // nop
-    } 
-};
-
-
 /// Base class for render handlers.
 //
 /// You must define a subclass of Renderer, and pass an

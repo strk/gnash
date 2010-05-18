@@ -41,11 +41,11 @@ namespace gnash {
 /// AMF is a simple serialization format for ActionScript objects and values,
 /// allowing them to be stored and transmitted. These classes convert between
 /// AMF buffers and the objects they contain.
-namespace AMF {
+namespace amf {
 
 /// A class to compose AMF buffers.
 //
-/// A single AMF::Writer class can take successive values and encode them
+/// A single amf::Writer class can take successive values and encode them
 /// in a single buffer. The class takes care of object references.
 //
 /// This class merely encodes basic types such as strings, numbers, and
@@ -124,7 +124,7 @@ public:
 
     /// Construct a Reader with pointers into an AMF buffer.
     //
-    /// You can use the AMF::Reader in combination with other reads on the
+    /// You can use the amf::Reader in combination with other reads on the
     /// data as long as the read position is never moved after end.
     //
     /// @param pos      The read position in the buffer. This is moved after

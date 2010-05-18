@@ -204,26 +204,26 @@ sendConnectPacket(rtmp::RTMP& r, FakeNC& nc, const std::string& app,
 
     SimpleBuffer buf;
 
-    AMF::write(buf, "connect");
+    amf::write(buf, "connect");
     const size_t cn = nc.callNumber();
     
     /// Call number?
-    AMF::write(buf, static_cast<double>(cn));
+    amf::write(buf, static_cast<double>(cn));
 
-    buf.appendByte(AMF::OBJECT_AMF0);
-    if (!app.empty()) AMF::writeProperty(buf, "app", app);
-    if (!ver.empty()) AMF::writeProperty(buf, "flashVer", ver);
-    if (!swfurl.empty()) AMF::writeProperty(buf, "swfUrl", swfurl);
-    if (!tcurl.empty()) AMF::writeProperty(buf, "tcUrl", tcurl);
-    AMF::writeProperty(buf, "fpad", false);
-    AMF::writeProperty(buf, "capabilities", 15.0);
-    AMF::writeProperty(buf, "audioCodecs", 3191.0);
-    AMF::writeProperty(buf, "videoCodecs", 252.0);
-    AMF::writeProperty(buf, "videoFunction", 1.0);
-    if (!pageurl.empty()) AMF::writeProperty(buf, "pageUrl", pageurl);
+    buf.appendByte(amf::OBJECT_AMF0);
+    if (!app.empty()) amf::writeProperty(buf, "app", app);
+    if (!ver.empty()) amf::writeProperty(buf, "flashVer", ver);
+    if (!swfurl.empty()) amf::writeProperty(buf, "swfUrl", swfurl);
+    if (!tcurl.empty()) amf::writeProperty(buf, "tcUrl", tcurl);
+    amf::writeProperty(buf, "fpad", false);
+    amf::writeProperty(buf, "capabilities", 15.0);
+    amf::writeProperty(buf, "audioCodecs", 3191.0);
+    amf::writeProperty(buf, "videoCodecs", 252.0);
+    amf::writeProperty(buf, "videoFunction", 1.0);
+    if (!pageurl.empty()) amf::writeProperty(buf, "pageUrl", pageurl);
     buf.appendByte(0);
     buf.appendByte(0);
-    buf.appendByte(AMF::OBJECT_END_AMF0);
+    buf.appendByte(amf::OBJECT_END_AMF0);
 
     nc.queueCall(cn, "connect");
     r.call(buf);
@@ -237,9 +237,9 @@ sendCheckBW(rtmp::RTMP& r, FakeNC& nc)
     
     const size_t cn = nc.callNumber();
 
-    AMF::write(buf, "_checkbw");
-    AMF::write(buf, static_cast<double>(cn));
-    buf.appendByte(AMF::NULL_AMF0);
+    amf::write(buf, "_checkbw");
+    amf::write(buf, static_cast<double>(cn));
+    buf.appendByte(amf::NULL_AMF0);
 
     nc.queueCall(cn, "_checkbw");
     r.call(buf);
@@ -250,10 +250,10 @@ replyBWCheck(rtmp::RTMP& r, FakeNC& /*nc*/, double txn)
 {
     // Infofield1?
     SimpleBuffer buf;
-    AMF::write(buf, "_result");
-    AMF::write(buf, txn);
-    buf.appendByte(AMF::NULL_AMF0);
-    AMF::write(buf, 0.0);
+    amf::write(buf, "_result");
+    amf::write(buf, txn);
+    buf.appendByte(amf::NULL_AMF0);
+    amf::write(buf, 0.0);
     
     r.call(buf);
 
@@ -266,17 +266,17 @@ sendPausePacket(rtmp::RTMP& r, FakeNC& nc, bool flag, double time)
 
     SimpleBuffer buf;
 
-    AMF::write(buf, "pause");
+    amf::write(buf, "pause");
 
     // What is this? The play stream? Call number?
-    AMF::write(buf, 0.0);
-    buf.appendByte(AMF::NULL_AMF0);
+    amf::write(buf, 0.0);
+    buf.appendByte(amf::NULL_AMF0);
 
     log_debug( "Pause: flag=%s, time=%d", flag, time);
-    AMF::write(buf, flag);
+    amf::write(buf, flag);
 
     // "this.time", i.e. NetStream.time.
-    AMF::write(buf, time * 1000.0);
+    amf::write(buf, time * 1000.0);
 
     r.play(buf, streamid);
 }
@@ -297,15 +297,15 @@ sendPlayPacket(rtmp::RTMP& r, FakeNC& nc)
 
     SimpleBuffer buf;
 
-    AMF::write(buf, "play");
+    amf::write(buf, "play");
 
     // What is this? The play stream? Call number?
-    AMF::write(buf, 0.0);
-    buf.appendByte(AMF::NULL_AMF0);
+    amf::write(buf, 0.0);
+    buf.appendByte(amf::NULL_AMF0);
 
     log_debug( "seekTime=%.2f, dLength=%d, sending play: %s",
         seektime, length, nc.playpath());
-    AMF::write(buf, nc.playpath());
+    amf::write(buf, nc.playpath());
 
     // Optional parameters start and len.
     //
@@ -314,14 +314,14 @@ sendPlayPacket(rtmp::RTMP& r, FakeNC& nc)
     //  any open a live stream
     //  -1: plays a live stream
     // >=0: plays a recorded streams from 'start' milliseconds
-    AMF::write(buf, seektime);
+    amf::write(buf, seektime);
 
     // len: -1, 0, positive number
     //  -1: plays live or recorded stream to the end (default)
     //   0: plays a frame 'start' ms away from the beginning
     //  >0: plays a live or recoded stream for 'len' milliseconds
     //enc += EncodeNumber(enc, -1.0); // len
-    AMF::write(buf, length);
+    amf::write(buf, length);
     
     r.play(buf, streamid);
 }
@@ -332,9 +332,9 @@ sendCreateStream(rtmp::RTMP& r, FakeNC& nc)
     const size_t cn = nc.callNumber();
 
     SimpleBuffer buf;
-    AMF::write(buf, "createStream");
-    AMF::write(buf, static_cast<double>(cn));
-    buf.appendByte(AMF::NULL_AMF0);
+    amf::write(buf, "createStream");
+    amf::write(buf, static_cast<double>(cn));
+    buf.appendByte(amf::NULL_AMF0);
     nc.queueCall(cn, "createStream");
     r.call(buf);
 }
@@ -344,12 +344,12 @@ sendDeleteStream(rtmp::RTMP& r, FakeNC& nc, double id)
     const size_t cn = nc.callNumber();
 
     SimpleBuffer buf;
-    AMF::write(buf, "deleteStream");
+    amf::write(buf, "deleteStream");
 
     // Call number?
-    AMF::write(buf, static_cast<double>(cn));
-    buf.appendByte(AMF::NULL_AMF0);
-    AMF::write(buf, id);
+    amf::write(buf, static_cast<double>(cn));
+    buf.appendByte(amf::NULL_AMF0);
+    amf::write(buf, id);
     nc.queueCall(cn, "deleteStream");
     r.call(buf);
 }
@@ -360,12 +360,12 @@ sendFCSubscribe(rtmp::RTMP& r, FakeNC& nc, const std::string& subscribepath)
     const size_t cn = nc.callNumber();
 
     SimpleBuffer buf;
-    AMF::write(buf, "FCSubscribe");
+    amf::write(buf, "FCSubscribe");
 
     // What is this?
-    AMF::write(buf, static_cast<double>(cn));
-    buf.appendByte(AMF::NULL_AMF0);
-    AMF::write(buf, subscribepath);
+    amf::write(buf, static_cast<double>(cn));
+    buf.appendByte(amf::NULL_AMF0);
+    amf::write(buf, subscribepath);
 
     nc.queueCall(cn, "FCSubscribe");
     r.call(buf);
@@ -550,10 +550,10 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
     }
 
     ++payload;
-    std::string method = AMF::readString(payload, end);
+    std::string method = amf::readString(payload, end);
 
     log_debug("Invoke: read method string %s", method);
-    if (*payload != AMF::NUMBER_AMF0) return false;
+    if (*payload != amf::NUMBER_AMF0) return false;
     ++payload;
 
 
@@ -565,7 +565,7 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
     /// by us.
     if (method == "_result") {
         
-        const double txn = AMF::readNumber(payload, end);
+        const double txn = amf::readNumber(payload, end);
         std::string calledMethod = nc.getCall(txn);
 
         log_debug("Received result for method call %s (%s)",
@@ -580,15 +580,15 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
         else if (calledMethod == "createStream") {
             
             log_debug("createStream invoked");
-            if (*payload != AMF::NULL_AMF0) return false;
+            if (*payload != amf::NULL_AMF0) return false;
             ++payload;
             
             log_debug("AMF buffer for createStream: %s\n",
                     hexify(payload, end - payload, false));
 
-            if (*payload != AMF::NUMBER_AMF0) return false;
+            if (*payload != amf::NUMBER_AMF0) return false;
             ++payload;
-            double sid = AMF::readNumber(payload, end);
+            double sid = amf::readNumber(payload, end);
 
             log_debug("Stream ID: %s", sid);
             nc.setStreamID(sid);
@@ -608,7 +608,7 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
 
     /// These are remote function calls initiated by the server .
 
-    const double txn = AMF::readNumber(payload, end);
+    const double txn = amf::readNumber(payload, end);
     log_debug("Received server call %s %s",
             boost::io::group(std::setprecision(15), txn),
             txn ? "" : "(no reply expected)");
@@ -641,14 +641,14 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
 
     if (method == "_onbwdone") {
 
-        if (*payload != AMF::NULL_AMF0) return false;
+        if (*payload != amf::NULL_AMF0) return false;
         ++payload;
 
         log_debug("AMF buffer for _onbwdone: %s\n",
                 hexify(payload, end - payload, false));
 
-        double latency = AMF::readNumber(payload, end);
-        double bandwidth = AMF::readNumber(payload, end);
+        double latency = amf::readNumber(payload, end);
+        double bandwidth = amf::readNumber(payload, end);
         log_debug("Latency: %s, bandwidth %s", latency, bandwidth);
         return ret;
     }
@@ -677,13 +677,13 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
     }
     
     if (method == "onStatus") {
-        if (*payload != AMF::NULL_AMF0) return false;
+        if (*payload != amf::NULL_AMF0) return false;
         ++payload;
 #if 1
         log_debug("AMF buffer for onstatus: %s",
                 hexify(payload, end - payload, true));
 #endif
-        if (*payload != AMF::OBJECT_AMF0) {
+        if (*payload != amf::OBJECT_AMF0) {
             log_debug("not an object");
             return false;
         }
@@ -695,9 +695,9 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
         try {
 
             // Hack.
-            while (payload < end && *payload != AMF::OBJECT_END_AMF0) {
+            while (payload < end && *payload != amf::OBJECT_END_AMF0) {
 
-                const std::string& n = AMF::readString(payload, end);
+                const std::string& n = amf::readString(payload, end);
                 if (n.empty()) continue;
 
                 //log_debug("read string %s", n);
@@ -705,20 +705,20 @@ handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
 
                 // There's no guarantee that all members are strings, but
                 // it's usually enough for this.
-                if (*payload != AMF::STRING_AMF0) {
+                if (*payload != amf::STRING_AMF0) {
                     break;
                 }
 
                 ++payload;
                 if (payload == end) break;
 
-                const std::string& v = AMF::readString(payload, end);
+                const std::string& v = amf::readString(payload, end);
                 if (payload == end) break;
                 if (n == "code") code = v;
                 if (n == "level") level = v;
             }
         }
-        catch (const AMF::AMFException& e) {
+        catch (const amf::AMFException& e) {
             throw;
             return false;
         }

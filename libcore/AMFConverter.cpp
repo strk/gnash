@@ -42,7 +42,7 @@
 
 namespace gnash {
 
-namespace AMF {
+namespace amf {
 
 namespace {
 
@@ -480,7 +480,7 @@ Reader::readArray()
         // followed by an OBJECT_END_AMF0 (0x09) byte
         if (!strlen) {
             // expect an object terminator here
-            if (*_pos != AMF::OBJECT_END_AMF0) {
+            if (*_pos != amf::OBJECT_END_AMF0) {
                 log_error("MALFORMED AMF: empty member name not "
                         "followed by OBJECT_END_AMF0 byte");
             }
@@ -527,9 +527,9 @@ Reader::readObject()
 
     as_value tmp;
     std::string keyString;
-    for(;;) {
+    for (;;) {
 
-        if (!operator()(tmp, AMF::STRING_AMF0)) {
+        if (!operator()(tmp, amf::STRING_AMF0)) {
             throw AMFException("Could not read object property name");
         }
         keyString = tmp.to_string();
@@ -614,5 +614,5 @@ Reader::readDate()
     return date;
 }
 
-} // namespace AMF
+} // namespace amf
 } // namespace gnash

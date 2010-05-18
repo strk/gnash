@@ -113,8 +113,6 @@ Gui::Gui(RunResources& r) :
     //       before and destroyed after _virtualClock !
     ,_systemClock()
     ,_virtualClock(_systemClock)
-//     ,_hwaccel_backend("none")
-//     ,_renderer_backend("agg")
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
@@ -159,9 +157,6 @@ Gui::Gui(unsigned long xid, float scale, bool loop, RunResources& r)
     //       before and destroyed after _virtualClock !
     ,_systemClock()
     ,_virtualClock(_systemClock)
-//     ,_hwaccel_backend("none")
-//     ,_renderer_backend("agg")
-
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)

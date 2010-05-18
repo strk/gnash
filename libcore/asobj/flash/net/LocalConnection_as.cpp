@@ -137,9 +137,10 @@ namespace {
     bool findListener(const std::string& name, SharedMem& mem);
     void getMarker(SharedMem::iterator& i, SharedMem::iterator end);
     void markRead(SharedMem& m);
+    inline boost::uint32_t getTimestamp(const VM& vm);
 
     /// Read the AMF data and invoke the function.
-    void executeAMFFunction(as_object& owner, AMF::Reader& rd);
+    void executeAMFFunction(as_object& owner, amf::Reader& rd);
 
     struct ConnectionData
     {
@@ -225,8 +226,7 @@ public:
     {
         assert(d.get());
         VM& vm = getVM(owner());
-        const boost::uint32_t time = vm.getTime();
-        d->ts = time;
+        d->ts = getTimestamp(vm);
         _queue.push_back(d);
         
         // Register callback so we can send the data on the next advance.
@@ -325,7 +325,7 @@ LocalConnection_as::update()
         // End at reported size of AMF sequence.
         const boost::uint8_t* end = b + size;
 
-        AMF::Reader rd(b, end, getGlobal(owner()));
+        amf::Reader rd(b, end, getGlobal(owner()));
         as_value a;
 
         // Get the connection name. That's all we need to remove expired
@@ -343,7 +343,7 @@ LocalConnection_as::update()
             const size_t timeout = 4 * 1000;
 
             VM& vm = getVM(owner());
-            const boost::uint32_t timeNow = vm.getTime();
+            const boost::uint32_t timeNow = getTimestamp(vm);
 
             if (timeNow - timestamp > timeout) {
                 log_debug("Data %s expired at %s. Removing its target "
@@ -671,7 +671,7 @@ localconnection_send(const fn_call& fn)
     SimpleBuffer& buf = cd->data;
 
     // Don't know whether strict arrays are allowed
-    AMF::Writer w(buf, false);
+    amf::Writer w(buf, false);
     const std::string& domain = relay->domain();
     
     w.writeString(domain + ":" + name);
@@ -887,7 +887,7 @@ getMarker(SharedMem::iterator& i, SharedMem::iterator end)
 //
 /// This function does not mark the data for overwriting.
 void
-executeAMFFunction(as_object& o, AMF::Reader& rd)
+executeAMFFunction(as_object& o, amf::Reader& rd)
 {
     as_value a;
 
@@ -958,6 +958,22 @@ markRead(SharedMem& m)
 {
     std::fill_n(m.begin() + 8, 8, 0);
 }
+    
+/// Return a number usable as a timestamp.
+//
+/// Different players use different values here. The Linux players use:
+/// Version 9: the time since player startup
+/// Version 10: the system uptime.
+//
+/// Version 10 fails if it recieves a value outside the signed 32-bit int
+/// range, so we surmise that there is an undocumented conversion to signed
+/// in that player. We make sure the value never exceeds 0x7fffffff.
+inline boost::uint32_t
+getTimestamp(const VM& vm)
+{
+    return vm.getTime() & 0x7fffffff;
+}
+
 } // anonymous namespace
 
 } // end of gnash namespace

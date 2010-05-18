@@ -379,7 +379,7 @@ HTTPRemotingHandler::advance()
                 const boost::uint8_t *b = reply.data() + reply_start;
                 const boost::uint8_t *end = reply.data() + reply.size();
                 
-                AMF::Reader rd(b, end, getGlobal(_nc.owner()));
+                amf::Reader rd(b, end, getGlobal(_nc.owner()));
 
                 // parse header
                 b += 2; // skip version indicator and client id
@@ -626,11 +626,11 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     buf.append("\000\000\000\000", 4); // total size to be filled in later
 
     // encode array of arguments to remote method
-    buf.appendByte(AMF::STRICT_ARRAY_AMF0);
+    buf.appendByte(amf::STRICT_ARRAY_AMF0);
     buf.appendNetworkLong(args.size() - firstArg);
 
     // STRICT_ARRAY encoding is allowed for remoting
-    AMF::Writer w(buf, true);
+    amf::Writer w(buf, true);
 
     for (unsigned int i = firstArg; i < args.size(); ++i)
     {

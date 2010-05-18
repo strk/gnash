@@ -74,14 +74,24 @@ SharedMem::SharedMem(size_t size)
 SharedMem::~SharedMem()
 {
 #ifndef _WIN32
-    shmdt(_addr);
-    struct shmid_ds ds;
-    shmctl(_shmid, IPC_STAT, &ds);
+    if (::shmdt(_addr) < 0) {
+        const int err = errno;
+        log_error("Error detaching shared memory: %s", std::strerror(err));
+    }
 
-    // Note that this isn't completely reliable.
-    if (!ds.shm_nattch) {
-        log_debug("No shared memory users left. Removing segment.");
-        shmctl(_shmid, IPC_RMID, 0);
+    // We can still try to shut it down.
+    struct ::shmid_ds ds;
+    if (::shmctl(_shmid, IPC_STAT, &ds) < 0) {
+        const int err = errno;
+        log_error("Error during stat of shared memory segment: %s",
+                std::strerror(err));
+    }
+    else {
+        // Note that this isn't completely reliable.
+        if (!ds.shm_nattch) {
+            log_debug("No shared memory users left. Removing segment.");
+            ::shmctl(_shmid, IPC_RMID, 0);
+        }
     }
 #else
     // Windows code here.
