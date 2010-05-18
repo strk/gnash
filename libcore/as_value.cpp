@@ -1004,7 +1004,7 @@ as_value::is_function() const
 }
 
 bool
-as_value::writeAMF0(AMF::Writer& w) const
+as_value::writeAMF0(amf::Writer& w) const
 {
 
     assert (!is_exception());
