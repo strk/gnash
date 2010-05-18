@@ -140,7 +140,7 @@ namespace {
     inline boost::uint32_t getTimestamp(const VM& vm);
 
     /// Read the AMF data and invoke the function.
-    void executeAMFFunction(as_object& owner, AMF::Reader& rd);
+    void executeAMFFunction(as_object& owner, amf::Reader& rd);
 
     struct ConnectionData
     {
@@ -325,7 +325,7 @@ LocalConnection_as::update()
         // End at reported size of AMF sequence.
         const boost::uint8_t* end = b + size;
 
-        AMF::Reader rd(b, end, getGlobal(owner()));
+        amf::Reader rd(b, end, getGlobal(owner()));
         as_value a;
 
         // Get the connection name. That's all we need to remove expired
@@ -671,7 +671,7 @@ localconnection_send(const fn_call& fn)
     SimpleBuffer& buf = cd->data;
 
     // Don't know whether strict arrays are allowed
-    AMF::Writer w(buf, false);
+    amf::Writer w(buf, false);
     const std::string& domain = relay->domain();
     
     w.writeString(domain + ":" + name);
@@ -887,7 +887,7 @@ getMarker(SharedMem::iterator& i, SharedMem::iterator end)
 //
 /// This function does not mark the data for overwriting.
 void
-executeAMFFunction(as_object& o, AMF::Reader& rd)
+executeAMFFunction(as_object& o, amf::Reader& rd)
 {
     as_value a;
 

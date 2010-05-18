@@ -35,7 +35,7 @@
 
 namespace gnash {
 
-namespace AMF {
+namespace amf {
 
 bool
 readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
@@ -190,5 +190,5 @@ swapBytes(void* word, size_t size)
 }
 
 
-} // namespace AMF
+} // namespace amf
 } // namespace gnash

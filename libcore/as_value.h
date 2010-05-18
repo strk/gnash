@@ -41,7 +41,7 @@ namespace gnash {
 	class as_function;
 	class MovieClip;
 	class DisplayObject;
-    namespace AMF {
+    namespace amf {
         class Writer;
     }
 }
@@ -368,7 +368,7 @@ public:
     /// @param allowStrictArray
     ///     If true strict arrays will be encoded a STRICT_ARRAY types.
     ///
-    bool writeAMF0(AMF::Writer& w) const;
+    bool writeAMF0(amf::Writer& w) const;
 
 private:
 

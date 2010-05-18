@@ -40,7 +40,7 @@ namespace gnash {
 /// AMF is a simple serialization format for ActionScript objects and values,
 /// allowing them to be stored and transmitted. The AMF namespace provides
 /// both low-level and high-level conversion to and from AMF buffers.
-namespace AMF {
+namespace amf {
 
 enum Type {
     NOTYPE            = -1,
@@ -174,7 +174,8 @@ DSOEXPORT void write(SimpleBuffer& buf, bool b);
 /// This does not encode a type byte; it is used for cases where a string is
 /// required, such as for the name of an object property, and therefore does
 /// not use a type byte.
-DSOEXPORT void writePlainString(SimpleBuffer& buf, const std::string& str, Type t);
+DSOEXPORT void writePlainString(SimpleBuffer& buf, const std::string& str,
+        Type t);
 
 /// Encode a string-value pair.
 //

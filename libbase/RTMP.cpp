@@ -522,7 +522,7 @@ RTMP::readPacketHeader(RTMPPacket& packet)
               __FUNCTION__);
               return false;
             }
-          hr._timestamp = AMF::readNetworkLong(header+nSize);
+          hr._timestamp = amf::readNetworkLong(header+nSize);
           hSize += 4;
         
     }
@@ -833,10 +833,10 @@ RTMP::sendPacket(RTMPPacket& packet)
 
     /* we invoked a remote method */
     if (hr.packetType == PACKET_TYPE_INVOKE) {
-        assert(payloadData(packet)[0] == AMF::STRING_AMF0);
+        assert(payloadData(packet)[0] == amf::STRING_AMF0);
         const boost::uint8_t* pos = payloadData(packet) + 1;
         const boost::uint8_t* end = payloadEnd(packet);
-        const std::string& s = AMF::readString(pos, end);
+        const std::string& s = amf::readString(pos, end);
         log_debug( "Calling remote method %s", s);
     }
 
@@ -1099,7 +1099,7 @@ void
 handleChangeChunkSize(RTMP& r, const RTMPPacket& packet)
 {
     if (payloadSize(packet) >= 4) {
-        r._inChunkSize = AMF::readNetworkLong(payloadData(packet));
+        r._inChunkSize = amf::readNetworkLong(payloadData(packet));
         log_debug( "Changed chunk size to %d", r._inChunkSize);
     }
 }
@@ -1116,14 +1116,14 @@ handleControl(RTMP& r, const RTMPPacket& packet)
     }
     
     const ControlType t = 
-        static_cast<ControlType>(AMF::readNetworkShort(payloadData(packet)));
+        static_cast<ControlType>(amf::readNetworkShort(payloadData(packet)));
     
     if (size < 6) {
         log_error("Control packet (%s) data too short", t);
         return;
     }
     
-    const int arg = AMF::readNetworkLong(payloadData(packet) + 2);
+    const int arg = amf::readNetworkLong(payloadData(packet) + 2);
     log_debug( "Received control packet %s with argument %s", t, arg);
   
     switch (t)
@@ -1166,7 +1166,7 @@ handleControl(RTMP& r, const RTMPPacket& packet)
 void
 handleServerBW(RTMP& r, const RTMPPacket& packet)
 {
-    const boost::uint32_t bw = AMF::readNetworkLong(payloadData(packet));
+    const boost::uint32_t bw = amf::readNetworkLong(payloadData(packet));
     log_debug( "Server bandwidth is %s", bw);
     r.setServerBandwidth(bw);
 }
@@ -1174,7 +1174,7 @@ handleServerBW(RTMP& r, const RTMPPacket& packet)
 void
 handleClientBW(RTMP& r, const RTMPPacket& packet)
 {
-    const boost::uint32_t bw = AMF::readNetworkLong(payloadData(packet));
+    const boost::uint32_t bw = amf::readNetworkLong(payloadData(packet));
 
     r.setBandwidth(bw);
 
