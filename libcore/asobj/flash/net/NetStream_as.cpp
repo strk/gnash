@@ -1946,7 +1946,7 @@ executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 	string_table& st = getStringTable(thisPtr);
 	string_table::key funcKey = st.find(funcName);
 
-    AMF::Reader rd(ptr, endptr, getGlobal(thisPtr));
+    amf::Reader rd(ptr, endptr, getGlobal(thisPtr));
 
 	as_value arg;
 	if (!rd(arg)) {
