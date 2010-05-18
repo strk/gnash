@@ -322,6 +322,8 @@ check_SCRIPTS = \
 	runtime_vm_stack_testrunner \
 	new_child_in_unload_testrunner \
 	instanceNameTestRunner \
+	init_action_testrunner \
+	InitActionTest2Runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -2181,7 +2183,7 @@ if MING_SUPPORTS_INIT_ACTIONS
 TEST_CASES += \
 	registerClassTest2runner \
 	init_action_testrunner \
-	InitAction2TestRunner \
+	InitActionTest2Runner \
 	RegisterClassTest3Runner \
 	$(NULL)
 endif
