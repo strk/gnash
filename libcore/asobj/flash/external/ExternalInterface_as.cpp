@@ -45,33 +45,33 @@
 namespace gnash {
 
 namespace {
-as_value externalinterface_addCallback(const fn_call& fn);
-as_value externalinterface_call(const fn_call& fn);
-as_value externalInterfaceConstructor(const fn_call& fn);
-as_value externalinterface_available(const fn_call& fn);
-as_value externalinterface_marshallExceptions(const fn_call& fn);
-as_value externalinterface_objectID(const fn_call& fn);
+    as_value externalinterface_addCallback(const fn_call& fn);
+    as_value externalinterface_call(const fn_call& fn);
+    as_value externalInterfaceConstructor(const fn_call& fn);
+    as_value externalinterface_available(const fn_call& fn);
+    as_value externalinterface_marshallExceptions(const fn_call& fn);
+    as_value externalinterface_objectID(const fn_call& fn);
 
-as_value externalinterface_uArgumentsToXML(const fn_call& fn);
-as_value externalinterface_uArgumentsToAS(const fn_call& fn);
-as_value externalinterface_uAddCallback(const fn_call& fn);
-as_value externalinterface_uArrayToAS(const fn_call& fn);
-as_value externalinterface_uArrayToJS(const fn_call& fn);
-as_value externalinterface_uArrayToXML(const fn_call& fn);
-as_value externalinterface_uCallIn(const fn_call& fn);
-as_value externalinterface_uCallOut(const fn_call& fn);
-as_value externalinterface_uEscapeXML(const fn_call& fn);
-as_value externalinterface_uEvalJS(const fn_call& fn);
-as_value externalinterface_uInitJS(const fn_call& fn);
-as_value externalinterface_uJsQuoteString(const fn_call& fn);
-as_value externalinterface_uObjectID(const fn_call& fn);
-as_value externalinterface_uObjectToAS(const fn_call& fn);
-as_value externalinterface_uObjectToJS(const fn_call& fn);
-as_value externalinterface_uObjectToXML(const fn_call& fn);
-as_value externalinterface_uToAS(const fn_call& fn);
-as_value externalinterface_uToJS(const fn_call& fn);
-as_value externalinterface_uToXML(const fn_call& fn);
-as_value externalinterface_uUnescapeXML(const fn_call& fn);
+    as_value externalinterface_uArgumentsToXML(const fn_call& fn);
+    as_value externalinterface_uArgumentsToAS(const fn_call& fn);
+    as_value externalinterface_uAddCallback(const fn_call& fn);
+    as_value externalinterface_uArrayToAS(const fn_call& fn);
+    as_value externalinterface_uArrayToJS(const fn_call& fn);
+    as_value externalinterface_uArrayToXML(const fn_call& fn);
+    as_value externalinterface_uCallIn(const fn_call& fn);
+    as_value externalinterface_uCallOut(const fn_call& fn);
+    as_value externalinterface_uEscapeXML(const fn_call& fn);
+    as_value externalinterface_uEvalJS(const fn_call& fn);
+    as_value externalinterface_uInitJS(const fn_call& fn);
+    as_value externalinterface_uJsQuoteString(const fn_call& fn);
+    as_value externalinterface_uObjectID(const fn_call& fn);
+    as_value externalinterface_uObjectToAS(const fn_call& fn);
+    as_value externalinterface_uObjectToJS(const fn_call& fn);
+    as_value externalinterface_uObjectToXML(const fn_call& fn);
+    as_value externalinterface_uToAS(const fn_call& fn);
+    as_value externalinterface_uToJS(const fn_call& fn);
+    as_value externalinterface_uToXML(const fn_call& fn);
+    as_value externalinterface_uUnescapeXML(const fn_call& fn);
 }
 
 /// Class used to serialize properties of an object to a buffer
@@ -255,42 +255,48 @@ externalinterface_call(const fn_call& fn)
 as_value
 externalinterface_available(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     movie_root& m = getRoot(fn);
     bool mode = false;
     
     switch (m.getAllowScriptAccess()) {
-      case movie_root::never:
-          mode = false;
-          break;
-      case movie_root::sameDomain:
-      {
-          const std::string& baseurl = m.getOriginalURL();
-          const int MAXHOSTNAMELEN = 128;
-          char hostname[MAXHOSTNAMELEN];
-          if (gethostname(hostname, MAXHOSTNAMELEN) != 0) {
-              mode = false;
-          }
-          // The hostname is empty if running the standalone Gnash from
-          // a terminal, so we can assume the default of sameDomain applies.
-          URL localPath(hostname, baseurl);
-          if (localPath.hostname().empty()) {
-              mode = true;
-          } else {
-              StringNoCaseEqual noCaseCompare;
-              if (!noCaseCompare(localPath.hostname(), hostname)) {
-                  log_security(_("ExternalInterface path %s is outside the SWF domain "
-                                 "%s. Cannot access this object."), localPath, 
-                               hostname);
-                  mode = false;
-              }
-          }
-          break;
-      }
-      case movie_root::always:
-          mode = true;
-          break;
-    };
+        case movie_root::never:
+            mode = false;
+            break;
+      
+        case movie_root::sameDomain:
+        {
+         
+            const std::string& baseurl = m.getOriginalURL();
+            const int MAXHOSTNAMELEN = 128;
+            char hostname[MAXHOSTNAMELEN];
+          
+            if (gethostname(hostname, MAXHOSTNAMELEN) != 0) {
+                mode = false;
+            }
+          
+            // The hostname is empty if running the standalone Gnash from
+            // a terminal, so we can assume the default of sameDomain applies.
+            URL localPath(hostname, baseurl);
+            if (localPath.hostname().empty()) {
+                mode = true;
+            } 
+            else {
+                StringNoCaseEqual noCaseCompare;
+              
+                if (!noCaseCompare(localPath.hostname(), hostname)) {
+                    log_security(_("ExternalInterface path %s is outside "
+                                "the SWF domain %s. Cannot access this "
+                                "object."), localPath, hostname);
+                    mode = false;
+                }
+            }
+            break;
+        }
+      
+        case movie_root::always:
+            mode = true;
+            break;
+    }
     
     return as_value(mode);
 }
