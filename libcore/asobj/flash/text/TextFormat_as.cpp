@@ -574,8 +574,6 @@ textformat_getTextExtent(const fn_call& fn)
     // Everything must be in twips here.
     const double tfw = limitWidth ? pixelsToTwips(fn.arg(1).to_number()) : 0;
 
-    if (limitWidth) log_debug("Width limited to %s twips", tfw);
-
     const bool bold = relay->bold() ? *relay->bold() : false;
     const bool italic = relay->italic() ? *relay->italic() : false;
     const double size = relay->size() ? *relay->size() : 240;
