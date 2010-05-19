@@ -236,8 +236,8 @@ Gui::allowScale(bool allow)
         return;
     }
     
-    if (allow) _stage->setStageScaleMode(movie_root::showAll);
-    else _stage->setStageScaleMode(movie_root::noScale);
+    if (allow) _stage->setStageScaleMode(movie_root::SCALEMODE_SHOWALL);
+    else _stage->setStageScaleMode(movie_root::SCALEMODE_NOSCALE);
 }
     
 void
@@ -277,14 +277,13 @@ Gui::updateStageMatrix()
     
     // Fetch scale mode
     movie_root::ScaleMode scaleMode = _stage->getStageScaleMode();
+
     switch (scaleMode) {
-    case movie_root::noScale:
-        _xscale = _yscale = 1.0f;
-        break;
+        case movie_root::SCALEMODE_NOSCALE:
+            _xscale = _yscale = 1.0f;
+            break;
         
-    case movie_root::showAll:
-        {
-            
+        case movie_root::SCALEMODE_SHOWALL:
             // set new scale value ( user-pixel / pseudo-pixel ). Do
             // not divide by zero, or we end up with an invalid
             // stage matrix that returns nan values.			
@@ -294,16 +293,13 @@ Gui::updateStageMatrix()
             // Scale proportionally, using smallest scale
             if (_xscale < _yscale) {
                 _yscale = _xscale;
-            } else if (_yscale < _xscale) {
+            } 
+            else if (_yscale < _xscale) {
                 _xscale = _yscale;
             }
-            
             break;
-        }
         
-    case movie_root::noBorder:
-        {
-            
+        case movie_root::SCALEMODE_NOBORDER:
             // set new scale value ( user-pixel / pseudo-pixel )
             _xscale = (swfwidth == 0.0f) ? 1.0f : _width / swfwidth;
             _yscale = (swfheight == 0.0f) ? 1.0f : _height / swfheight;
@@ -311,27 +307,21 @@ Gui::updateStageMatrix()
             // Scale proportionally, using biggest scale
             if (_xscale > _yscale) {
                 _yscale = _xscale;
-            } else if (_yscale > _xscale) {
+            } 
+            else if (_yscale > _xscale) {
                 _xscale = _yscale;
             }
-            
             break;
-        }
         
-    case movie_root::exactFit:
-        {
+        case movie_root::SCALEMODE_EXACTFIT:
             // NOTE: changing aspect ratio is valid!
             _xscale = (swfwidth == 0.0f) ? 1.0f : _width / swfwidth;
             _yscale = (swfheight == 0.0f) ? 1.0f : _height / swfheight;
-            //LOG_ONCE( log_unimpl("Stage.scaleMode=exactFit") );
             break;
-        }
         
-    default:
-        {
+        default:
             log_error("Invalid scaleMode %d", scaleMode);
             break;
-        }
     }
     
     _xoffset=0;

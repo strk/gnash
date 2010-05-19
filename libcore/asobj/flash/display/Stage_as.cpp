@@ -123,16 +123,20 @@ stage_scalemode(const fn_call& fn)
 	}
 
     // Defaults to showAll if the string is invalid.
-    movie_root::ScaleMode mode = movie_root::showAll;
+    movie_root::ScaleMode mode = movie_root::SCALEMODE_SHOWALL;
 
     const int version = getSWFVersion(fn);
     const std::string& str = fn.arg(0).to_string(version);
     
     StringNoCaseEqual noCaseCompare;
     
-    if (noCaseCompare(str, "noScale")) mode = movie_root::noScale;
-    else if (noCaseCompare(str, "exactFit")) mode = movie_root::exactFit;
-    else if (noCaseCompare(str, "noBorder")) mode = movie_root::noBorder;
+    if (noCaseCompare(str, "noScale")) mode = movie_root::SCALEMODE_NOSCALE;
+    else if (noCaseCompare(str, "exactFit")) {
+        mode = movie_root::SCALEMODE_EXACTFIT;
+    }
+    else if (noCaseCompare(str, "noBorder")) {
+        mode = movie_root::SCALEMODE_NOBORDER;
+    }
 
     m.setStageScaleMode(mode);
     return as_value();

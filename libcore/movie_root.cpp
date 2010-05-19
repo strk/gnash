@@ -130,13 +130,13 @@ movie_root::movie_root(const movie_definition& def,
     _rootMovie(0),
     _invalidated(true),
     _disableScripts(false),
-    _processingActionLevel(movie_root::PRIORITY_SIZE),
+    _processingActionLevel(PRIORITY_SIZE),
     _hostfd(-1),
     _quality(QUALITY_HIGH),
     _alignMode(0),
-    _allowScriptAccess(sameDomain),
+    _allowScriptAccess(SCRIPT_ACCESS_SAME_DOMAIN),
     _showMenu(true),
-    _scaleMode(showAll),
+    _scaleMode(SCALEMODE_SHOWALL),
     _displayState(DISPLAYSTATE_NORMAL),
     _recursionLimit(256),
     _timeoutLimit(15),
@@ -544,7 +544,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
     m_viewport_width = w;
     m_viewport_height = h;
 
-    if (_scaleMode == noScale) {
+    if (_scaleMode == SCALEMODE_NOSCALE) {
         //log_debug("Rescaling disabled");
         as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
         if (stage) {
@@ -1229,8 +1229,7 @@ movie_root::setQuality(Quality q)
 unsigned int
 movie_root::getStageWidth() const
 {
-    if (_scaleMode == noScale)
-    {
+    if (_scaleMode == SCALEMODE_NOSCALE) {
         return m_viewport_width;    
     }
 
@@ -1243,8 +1242,7 @@ movie_root::getStageWidth() const
 unsigned int
 movie_root::getStageHeight() const
 {
-    if (_scaleMode == noScale)
-    {
+    if (_scaleMode == SCALEMODE_NOSCALE) {
         return m_viewport_height;    
     }
 
@@ -1340,7 +1338,8 @@ movie_root::setStageScaleMode(ScaleMode sm)
     // movie size. If there is not yet a _rootMovie (when scaleMode
     // is passed as a parameter to the player), we also don't notify a 
     // resize.
-    if (_rootMovie && (sm == noScale || _scaleMode == noScale)) {
+    if (_rootMovie && 
+            (sm == SCALEMODE_NOSCALE || _scaleMode == SCALEMODE_NOSCALE)) {
 
         const movie_definition* md = _rootMovie->definition();
         log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d "

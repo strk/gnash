@@ -536,10 +536,10 @@ public:
 
     /// The possibile values of Stage.scaleMode
     enum ScaleMode {
-        showAll,
-        noScale,
-        exactFit,
-        noBorder
+        SCALEMODE_SHOWALL,
+        SCALEMODE_NOSCALE,
+        SCALEMODE_EXACTFIT,
+        SCALEMODE_NOBORDER
     };
 
     /// The possible horizonal positions of the Stage
@@ -566,9 +566,9 @@ public:
 
     /// The possibile values of AllowScriptAccess
     enum AllowScriptAccessMode {
-	never,
-	sameDomain,
-	always
+        SCRIPT_ACCESS_NEVER,
+        SCRIPT_ACCESS_SAME_DOMAIN,
+        SCRIPT_ACCESS_ALWAYS
     };
 
     /// Set the current display quality of the entire SWF.
