@@ -33,6 +33,21 @@ namespace gnash {
 static VaapiCodec get_codec(VAProfile profile)
 {
     GNASH_REPORT_FUNCTION;
+    const char *debug[] = {
+        "VAProfileMPEG2Simple",
+        "VAProfileMPEG2Main"
+        "VAProfileMPEG4Simple",
+        "VAProfileMPEG4AdvancedSimple",
+        "VAProfileMPEG4Main",
+        "VAProfileH264Baseline",
+        "VAProfileH264Main",
+        "VAProfileH264High",
+        "VAProfileVC1Simple",
+        "VAProfileVC1Main",
+        "VAProfileVC1Advanced",
+        "VAProfileUnknown"
+    };
+    log_debug("Video contains %s codec.", debug[profile]);
 
     switch (profile) {
     case VAProfileMPEG2Simple:

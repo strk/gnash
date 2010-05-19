@@ -37,14 +37,13 @@
 #include "gnash.h" // Quality
 
 #include <iostream>
+
 #ifdef HAVE_VA_VA_H
-#include "va/va.h"
-#include "va/va_backend.h"
+#include <va/va.h>
 #include "vaapi_utils.h"
 #endif
-
 #ifdef HAVE_VA_VA_X11_H
-#include "va/va_x11.h"
+#include <va/va_x11.h>
 #endif
 
 #ifdef HAVE_X11
@@ -258,23 +257,6 @@ GtkGui::init(int argc, char **argv[])
             log_debug("Xvideo extension found");
         }
     }
-
-#ifdef HAVE_VA_VA_X11_H
-    if (hwaccel == "vaapi") {
-        char *driver_name;
-        struct VADisplayContext *pDisplayContext = (struct VADisplayContext *)vaGetDisplay(GDK_DISPLAY());
-        
-        if (pDisplayContext->vaGetDriverName(pDisplayContext, &driver_name) == 0) {
-            if ((strcmp(driver_name, "nvidia" ) == 0) || (strcmp(driver_name, "vdpau" ) == 0) || (strcmp(driver_name, "s3g" ) == 0)) {
-                log_debug("Found supported vaapi driver for %s", driver_name);
-            } else {
-                log_error("No vaapi driver found for %s!", driver_name);
-            }
-        } else {
-            log_error("Couldn't get the VAAPI driver name!");
-        }
-    }
-#endif
 
 #ifdef BUILD_CANVAS
     _canvas = gnash_canvas_new();

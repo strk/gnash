@@ -22,7 +22,6 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   backupCFLAGS="$CFLAGS"
   avcodec_h=""
   ffmpeg_top_incl=""
-  have_ffmpeg_vaapi="no"
 
   dnl If the user specify an path to include headers from, we assume it's the full
   dnl path to the header file, and not the top level path without the 'ffmpeg' node
@@ -222,20 +221,10 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfound=no])
   
-    dnl This makes sure the version of ffmpeg is new enough to contain
-    dnl the libva support.
-    if test x"${enable_vaapi}" = x"yes"; then
-      if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 52480; then
-        AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 52.48.0 or greater required to use libVA, $ffmpeg_version detected.])
-      else
-        ffmpeg_version_check=ok
-      fi
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 511100; then
+      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required, $ffmpeg_version detected.])
     else
-      if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 511100; then
-        AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required, $ffmpeg_version detected.])
-      else
-        ffmpeg_version_check=ok
-      fi
+      ffmpeg_version_check=ok
     fi
 
     if test ! -z "$ffmpeg_num_version" -a "$ffmpeg_num_version" -gt 512800; then
@@ -262,17 +251,6 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
       AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to decode NELLYMOSER encoded audio: 51.46.0 (r10741) or higher required!])
     else
       AC_DEFINE(FFMPEG_NELLYMOSER, 1, [Define if ffmpeg can decode NELLYMOSER audio])
-    fi
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -gt 524800; then
-      dnl 52.48.0 (r21285) or higher required for VAAPI support
-      have_ffmpeg_vaapi=yes
-      AC_DEFINE(FFMPEG_VAAPI, 1, [Define if ffmpeg supports VAAPI])
-    else
-      have_ffmpeg_vaapi=no
-    fi
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -gt 52450; then
-      dnl 52.45.0 (r20957) or higher required for VAAPI support
-      AC_DEFINE(FFMPEG_VAAPI, 1, [Define if ffmpeg supports VAAPI.])
     fi
   else
     AC_MSG_WARN([Could not check ffmpeg version (can't find avcodec.h file)])
@@ -310,6 +288,18 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
      AC_MSG_WARN([Cannot find swscale.h, required for ffmpeg versions >= 52.0.0 (detected version: $ffmpeg_version)])
      ffmpeg_version_check=
   fi
+
+  AC_MSG_CHECKING([for libavcodec/vaapi.h])
+  have_ffmpeg_vaapi="no"
+  if test -f "${ffmpeg_top_incl}/ffmpeg/vaapi.h"; then
+    have_ffmpeg_vaapi="yes"
+    AC_DEFINE(HAVE_FFMPEG_VAAPI_H, 1, [Defined if ffmpeg/vaapi.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/libavcodec/vaapi.h"; then
+    have_ffmpeg_vaapi="yes"
+    AC_DEFINE(HAVE_LIBAVCODEC_VAAPI_H, 1, [Defined if libavcodec/vaapi.h is found])
+  fi
+  AC_MSG_RESULT($have_ffmpeg_vaapi)
 
   dnl ---------------------------------
   dnl

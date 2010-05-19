@@ -271,7 +271,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
                 // Set the hardware acclerator to the next one to try
                 // if initializing fails.
                 next_hwaccel = "xv";
-            }
+            } else
 #endif
 #ifdef RENDERER_AGG
 #ifdef HAVE_XV
