@@ -20,10 +20,10 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // USE_DEBUGGER
+#include "gnashconfig.h"
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h"
 #include "log.h"
 #include "SWF.h"
 #include "rc.h"
@@ -4151,7 +4151,11 @@ guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
     }
 
     // It's something else.
+#ifdef _ANDROID
+    length = str.size();
+#else
     length = std::mbstowcs(NULL, str.c_str(), 0);
+#endif
     if (length == -1)
     {
         length = str.length();
