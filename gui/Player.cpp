@@ -484,13 +484,17 @@ Player::run(int argc, char* argv[], const std::string& infile,
         StringNoCaseEqual noCaseCompare;
         const std::string& str = it->second;
                 
-        movie_root::AllowScriptAccessMode mode = movie_root::sameDomain;
+        movie_root::AllowScriptAccessMode mode = 
+            movie_root::SCRIPT_ACCESS_SAME_DOMAIN;
+        
         if (noCaseCompare(str, "never")) {
-            mode = movie_root::never;
-        } else if (noCaseCompare(str, "sameDomain")) {
-            mode = movie_root::sameDomain;
-        } else if (noCaseCompare(str, "always")) {
-            mode = movie_root::always;
+            mode = movie_root::SCRIPT_ACCESS_NEVER;
+        } 
+        else if (noCaseCompare(str, "sameDomain")) {
+            mode = movie_root::SCRIPT_ACCESS_SAME_DOMAIN;
+        } 
+        else if (noCaseCompare(str, "always")) {
+            mode = movie_root::SCRIPT_ACCESS_ALWAYS;
         }
         log_debug("Setting allowscriptaccess to %s", mode);
         root.setAllowScriptAccess(mode);
@@ -501,14 +505,16 @@ Player::run(int argc, char* argv[], const std::string& infile,
         StringNoCaseEqual noCaseCompare;
         const std::string& str = it->second;
                 
-        movie_root::ScaleMode mode = movie_root::showAll;
+        movie_root::ScaleMode mode = movie_root::SCALEMODE_SHOWALL;
         
         if (noCaseCompare(str, "noScale")) {
-            mode = movie_root::noScale;
-        } else if (noCaseCompare(str, "exactFit")) {
-            mode = movie_root::exactFit;
-        } else if (noCaseCompare(str, "noBorder")) {
-            mode = movie_root::noBorder;
+            mode = movie_root::SCALEMODE_NOSCALE;
+        } 
+        else if (noCaseCompare(str, "exactFit")) {
+            mode = movie_root::SCALEMODE_EXACTFIT;
+        }
+        else if (noCaseCompare(str, "noBorder")) {
+            mode = movie_root::SCALEMODE_NOBORDER;
         }
 
         log_debug("Setting scale mode");
@@ -530,7 +536,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
                 const size_t frame = boost::lexical_cast<size_t>(arg);
                 v.push_back(frame);
             }
-            catch (boost::bad_lexical_cast&) {}
+            catch (const boost::bad_lexical_cast&) {}
         }
 
         // Use default if filename is empty.

@@ -259,11 +259,11 @@ externalinterface_available(const fn_call& fn)
     bool mode = false;
     
     switch (m.getAllowScriptAccess()) {
-        case movie_root::never:
+        case movie_root::SCRIPT_ACCESS_NEVER:
             mode = false;
             break;
       
-        case movie_root::sameDomain:
+        case movie_root::SCRIPT_ACCESS_SAME_DOMAIN:
         {
          
             const std::string& baseurl = m.getOriginalURL();
@@ -293,7 +293,7 @@ externalinterface_available(const fn_call& fn)
             break;
         }
       
-        case movie_root::always:
+        case movie_root::SCRIPT_ACCESS_ALWAYS:
             mode = true;
             break;
     }
