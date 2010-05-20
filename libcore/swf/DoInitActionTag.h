@@ -48,6 +48,14 @@ public:
         read(in);
     }
 
+    /// Execute 'state' tags.
+    //
+    /// State tags change the current state of a MovieClip. They are executed
+    /// even for skipped frames to ensure that the state is consistent.
+    /// They should be executed before action tags.
+    //
+    /// Even though DoInitAction tags contain ActionScript, they are considered
+    /// to be state tags. They are executed only once.
     virtual void execute_state(MovieClip* m, DisplayList& /*dlist*/) const
     {
         m->execute_init_action_buffer(_buf, _cid);
