@@ -312,8 +312,6 @@ int
 Player::run(int argc, char* argv[], const std::string& infile,
         const std::string& url)
 {
-    printf("FIXME: %d\n", __LINE__);
-    
     // Call this at run() time, so the caller has
     // a cache of setting some parameter before calling us...
     // (example: setDoSound(), setWindowId() etc.. ) 
@@ -325,8 +323,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     assert (!infile.empty());
 
     _infile = infile;
-
-    printf("FIXME: %d\n", __LINE__);
 
     // Work out base url
     if (_baseurl.empty()) {
@@ -366,8 +362,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Set the Renderer resource, opengl, agg, or cairo
     _runResources->setRenderBackend(_renderer);
     
-    printf("FIXME: %d\n", __LINE__);
-    
     init_gui();
 
     // Initialize gui (we need argc/argv for this)
@@ -398,8 +392,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
             setScriptableVar(fv->first, fv->second);
         }
     }
-
-    printf("FIXME: %d\n", __LINE__);
     
     // Load the actual movie.
     _movieDef = load_movie();
