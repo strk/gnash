@@ -73,8 +73,12 @@ public:
         in.ensureBytes(2);
         const boost::uint16_t cid = in.read_u16();
         
-        // Tags should only be executed for exported characters; the export
-        // *must* already be known.
+        // Tags should only be executed for exported characters. Current
+        // tests show that the tag is only ever executed if the export
+        // is known at parsing time.
+        //
+        // If this is true, there is no need to parse or store the tag. If
+        // it's not true, this check will have to be done at runtime.
         DoInitActionTag* da = new DoInitActionTag(in, m, cid);
 
         IF_VERBOSE_PARSE(
