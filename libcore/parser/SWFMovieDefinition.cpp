@@ -671,8 +671,7 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
         //       might advertise less frames then actually
         //       found in it...
         //
-        if ( new_loading_frame >= m_frame_count )
-        {
+        if (new_loading_frame >= m_frame_count) {
             // Update of loading_frame is
             // really just for the latter debugging output
             loading_frame = new_loading_frame;
@@ -688,8 +687,7 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
 
         // We made frame progress since last iteration
         // so sleep some and try again
-		if ( new_loading_frame != loading_frame )
-		{
+		if (new_loading_frame != loading_frame) {
 #ifdef DEBUG_EXPORTS
 			log_debug(_("looking for exported resource: frame load "
 						"advancement (from %d to %d)"),
@@ -698,8 +696,7 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
 			loading_frame = new_loading_frame;
 			timeout = def_timeout+1;
 		}
-		else if ( ! --timeout ) 
-		{
+		else if (!--timeout) {
             // no progress since last run, and 
             // timeout reached: give up
 			break;
@@ -710,15 +707,15 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
 
 	}
 
-	if ( ! timeout ) // timed out
-	{
-		log_error("Timeout (%d milliseconds) seeking export symbol %s in movie %s. "
-			"Frames loaded %d/%d",
-			timeout_ms/1000, symbol, _url, loading_frame, m_frame_count);
+    // timed out
+	if (!timeout) {
+		log_error("Timeout (%d milliseconds) seeking export symbol %s in "
+                "movie %s. Frames loaded %d/%d", timeout_ms / 1000, symbol,
+                _url, loading_frame, m_frame_count);
 	}
-	else // eof 
-	{
-		assert(loading_frame >= m_frame_count);
+	else {
+        // eof
+        assert(loading_frame >= m_frame_count);
 		log_error("No export symbol %s found in movie %s. "
 			"Frames loaded %d/%d",
 			symbol, _url, loading_frame, m_frame_count);
@@ -744,7 +741,7 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
 {
     boost::mutex::scoped_lock lock(_namedFramesMutex);
     NamedFrameMap::const_iterator it = _namedFrames.find(label);
-    if ( it == _namedFrames.end() ) return false;
+    if (it == _namedFrames.end()) return false;
     frame_number = it->second;
     return true;
 }
@@ -757,6 +754,7 @@ SWFMovieDefinition::markReachableResources() const
     markMappedResources(_bitmaps);
     markMappedResources(m_sound_samples);
 
+    // Mutex scope.
 	{
 		boost::mutex::scoped_lock lock(_exportedResourcesMutex);
         markMappedResources(_exportedResources);
@@ -776,7 +774,6 @@ SWFMovieDefinition::importResources(
         boost::intrusive_ptr<movie_definition> source, Imports& imports)
 {
 	size_t importedSyms = 0;
-
 
     // Mutex scope.
     {
