@@ -281,6 +281,25 @@ typedef unsigned long long uintmax_t;
 # endif  /* end of DARWIN */
 #endif   /* end of WIN32 */
 
+
+#ifdef DARWIN
+DSOEXPORT void *moz_memalign(size_t alignment, size_t size);
+DSOEXPORT size_t moz_malloc_usable_size(const void *ptr)
+DSOEXPORT void *moz_calloc(size_t num, size_t size);
+DSOEXPORT void *moz_realloc(void *ptr, size_t size);
+DSOEXPORT void *moz_valloc(size_t size);
+DSOEXPORT size_t moz_malloc_usable_size(const void *ptr);
+#else
+DSOEXPORT void *memalign(size_t alignment, size_t size);
+DSOEXPORT size_t malloc_usable_size(const void *ptr);
+DSOEXPORT void *calloc(size_t num, size_t size);
+DSOEXPORT void *realloc(void *ptr, size_t size);
+DSOEXPORT void *valloc(size_t size);
+DSOEXPORT size_t malloc_usable_size(const void *ptr);
+#endif
+void _malloc_postfork(void);
+void _malloc_prefork(void);
+
 #ifdef DARWIN
 static const bool g_isthreaded = true;
 #endif
@@ -1485,10 +1504,10 @@ wrtmessage(const char *p1, const char *p2, const char *p3, const char *p4)
 #ifndef WIN32
 #define	_write	write
 #endif
-	_write(STDERR_FILENO, p1, (unsigned int) strlen(p1));
-	_write(STDERR_FILENO, p2, (unsigned int) strlen(p2));
-	_write(STDERR_FILENO, p3, (unsigned int) strlen(p3));
-	_write(STDERR_FILENO, p4, (unsigned int) strlen(p4));
+	size_t ret =_write(STDERR_FILENO, p1, (unsigned int) strlen(p1));
+	ret = _write(STDERR_FILENO, p2, (unsigned int) strlen(p2));
+	ret = _write(STDERR_FILENO, p3, (unsigned int) strlen(p3));
+	ret = _write(STDERR_FILENO, p4, (unsigned int) strlen(p4));
 }
 
 #define _malloc_message malloc_message
