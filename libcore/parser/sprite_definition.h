@@ -196,10 +196,9 @@ public:
 
 
 	/// Delegate call to associated root movie
-	virtual void export_resource(const std::string& sym,
-			ExportableResource* res)
+	virtual void exportResource(const std::string& sym, int id)
 	{
-		m_movie_def.export_resource(sym, res);
+		m_movie_def.exportResource(sym, id);
 	}
 
 	/// Delegate call to associated root movie

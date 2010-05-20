@@ -48,7 +48,6 @@
 #include "MediaHandler.h"
 #include "SimpleBuffer.h"
 #include "sound_handler.h"
-#include "ExportableResource.h"
 #include "MovieFactory.h"
 #include "RunResources.h"
 #include "Renderer.h"
@@ -799,14 +798,14 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
 //
 
 
+// Load an export tag (for exposing internal resources of m)
 void export_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunResources& /*r*/)
-    // Load an export tag (for exposing internal resources of m)
 {
     assert(tag == SWF::EXPORTASSETS); // 56
 
     in.ensureBytes(2);
-    int    count = in.read_u16();
+    const boost::uint16_t count = in.read_u16();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  export: count = %d"), count);
@@ -825,10 +824,8 @@ void export_loader(SWFStream& in, TagType tag, movie_definition& m,
         }
     );
 
-
     // Read the exports.
-    for (int i = 0; i < count; i++)
-    {
+    for (size_t i = 0; i < count; ++i) {
         in.ensureBytes(2);
         boost::uint16_t id = in.read_u16();
         std::string symbolName;
@@ -838,21 +835,8 @@ void export_loader(SWFStream& in, TagType tag, movie_definition& m,
             log_parse(_("  export: id = %d, name = %s"), id, symbolName);
         );
 
-        // Fonts, DisplayObjects and sounds can be exported.
-        ExportableResource* f;
-        if ((f = m.get_font(id)) ||
-            (f = m.getDefinitionTag(id)) ||
-            (f = m.get_sound_sample(id))) {
-            
-            m.export_resource(symbolName, f);
-        }
-        else {
-            IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("don't know how to export resource '%s' "
-                "with id %d (can't find that id)"),
-                symbolName, id);
-            );
-        }
+        m.exportResource(symbolName, id);
+
     }
 }
 

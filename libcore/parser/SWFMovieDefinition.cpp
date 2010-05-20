@@ -587,14 +587,25 @@ SWFMovieDefinition::incrementLoadedFrames()
 }
 
 void
-SWFMovieDefinition::export_resource(const std::string& symbol,
-        ExportableResource* res)
+SWFMovieDefinition::exportResource(const std::string& symbol, int id)
 {
 	// _exportedResources access should be protected by a mutex
 	boost::mutex::scoped_lock lock(_exportedResourcesMutex);
 
-	// SWF sometimes exports the same thing more than once!
-	_exportedResources[symbol] = res;
+    ExportableResource* f;
+    if ((f = get_font(id)) || (f = getDefinitionTag(id)) ||
+            (f = get_sound_sample(id))) {
+
+        // SWFs sometimes export the same thing more than once!
+        _exportedResources[symbol] = f;
+    }
+    else {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("don't know how to export resource '%s' "
+                        "with id %d (can't find that id)"), symbol, id);
+        );
+        return;
+    }
 }
 
 
@@ -764,50 +775,54 @@ void
 SWFMovieDefinition::importResources(
         boost::intrusive_ptr<movie_definition> source, Imports& imports)
 {
-	size_t importedSyms=0;
-	for (Imports::iterator i=imports.begin(), e=imports.end(); i!=e; ++i)
-	{
-		int id = i->first;
-		const std::string& symbolName = i->second;
+	size_t importedSyms = 0;
 
-        boost::intrusive_ptr<ExportableResource> res =
-            source->get_exported_resource(symbolName);
 
-        if (!res)
-        {
-			log_error(_("import error: could not find resource '%s' in "
-                        "movie '%s'"), symbolName, source->get_url());
-			continue;
-        }
+    // Mutex scope.
+    {
+		boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+
+        for (Imports::iterator i = imports.begin(), e = imports.end(); i != e;
+                ++i) {
+
+            const int id = i->first;
+            const std::string& symbolName = i->second;
+
+            boost::intrusive_ptr<ExportableResource> res =
+                source->get_exported_resource(symbolName);
+
+            if (!res) {
+                log_error(_("import error: could not find resource '%s' in "
+                            "movie '%s'"), symbolName, source->get_url());
+                continue;
+            }
 
 #ifdef DEBUG_EXPORTS
-        log_debug("Exporting symbol %s imported from source %s",
-            symbolName, source->get_url());
-#endif
-        export_resource(symbolName, res.get());
-
-        if (Font* f = dynamic_cast<Font*>(res.get()))
-		{
-			// Add this shared font to the currently-loading movie.
-			add_font(id, f);
-			++importedSyms;
-        }
-        else if (SWF::DefinitionTag* ch = dynamic_cast<SWF::DefinitionTag*>(res.get()))
-        {
-            // Add this DisplayObject to the loading movie.
-            addDisplayObject(id, ch);
-            ++importedSyms;
-        }
-        else
-        {
-            log_error(_("importResources error: unsupported import of '%s' "
-                "from movie '%s' has unknown type"),
+            log_debug("Exporting symbol %s imported from source %s",
                 symbolName, source->get_url());
-        }
-	}
+#endif
+            _exportedResources[symbolName] = res.get();
 
-	if ( importedSyms )
-	{
+            if (Font* f = dynamic_cast<Font*>(res.get())) {
+                // Add this shared font to the currently-loading movie.
+                add_font(id, f);
+                ++importedSyms;
+            }
+            else if (SWF::DefinitionTag* ch =
+                    dynamic_cast<SWF::DefinitionTag*>(res.get())) {
+                // Add this DisplayObject to the loading movie.
+                addDisplayObject(id, ch);
+                ++importedSyms;
+            }
+            else {
+                log_error(_("importResources error: unsupported import of '%s' "
+                    "from movie '%s' has unknown type"),
+                    symbolName, source->get_url());
+            }
+        }
+    }
+
+	if (importedSyms) {
 		_importSources.insert(source);
 	}
 }
