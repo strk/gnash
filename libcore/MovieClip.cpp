@@ -523,12 +523,11 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     if (!_def) return;
 
     size_t frame_number;
-    if ( ! get_frame_number(frame_spec, frame_number) )
-    {
+    if (!get_frame_number(frame_spec, frame_number)) {
         // No dice.
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("call_frame('%s') -- invalid frame"),
-                    frame_spec);
+            log_aserror(_("call_frame('%s') -- invalid frame"),
+                        frame_spec);
         );
         return;
     }
