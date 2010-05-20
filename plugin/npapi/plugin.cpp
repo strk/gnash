@@ -1007,7 +1007,6 @@ nsPluginInstance::startProc()
     int p2c_controlpipe[2];
 
     int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_pipe);
-    printf("FIXME: %d:%d\n", p2c_pipe[0], p2c_pipe[1]);
     if (ret == -1) {
         gnash::log_error("ERROR: socketpair(p2c) failed: %s", strerror(errno));
         return;
@@ -1015,14 +1014,12 @@ nsPluginInstance::startProc()
     _streamfd = p2c_pipe[1];
 
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, c2p_pipe);
-    printf("FIXME: %d:%d\n", c2p_pipe[0], c2p_pipe[1]);
     if (ret == -1) {
         gnash::log_error("ERROR: socketpair(c2p) failed: %s", strerror(errno));
         return;
     }
 
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_controlpipe);
-    printf("FIXME: %d:%d\n", p2c_controlpipe[0], p2c_controlpipe[1]);
     if (ret == -1) {
         gnash::log_error("ERROR: socketpair(control) failed: %s", strerror(errno));
         return;
