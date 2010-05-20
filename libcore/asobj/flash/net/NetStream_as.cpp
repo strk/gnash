@@ -1440,9 +1440,8 @@ NetStream_as::unpausePlayback()
 long
 NetStream_as::bytesLoaded ()
 {
-    if ( ! m_parser.get() )
-    {
-        log_debug("bytesLoaded: no parser, no party");
+    if ( ! m_parser.get() ) {
+//        log_debug("bytesLoaded: no parser, no party");
         return 0;
     }
 
@@ -1452,9 +1451,8 @@ NetStream_as::bytesLoaded ()
 long
 NetStream_as::bytesTotal ()
 {
-    if ( ! m_parser.get() )
-    {
-        log_debug("bytesTotal: no parser, no party");
+    if ( ! m_parser.get() ) {
+//        log_debug("bytesTotal: no parser, no party");
         return 0;
     }
 
