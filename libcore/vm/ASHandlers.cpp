@@ -2262,26 +2262,23 @@ ActionGotoExpression(ActionExec& thread)
     std::string target_path;
     std::string frame_var;
 
-    DisplayObject * target = NULL;
-    if( env.parse_path(target_frame, target_path, frame_var) )
-    {
+    DisplayObject* target = NULL;
+    if (env.parse_path(target_frame, target_path, frame_var)) {
         target = env.find_target(target_path);
     }
 
-    if ( ! target ) // 4.11 would make parse_path above return true,
-                    // we should check if a sprite named '4' is supposed to work
-                    // in that case
-    {
+    // 4.11 would make parse_path above return true,
+    // we should check if a sprite named '4' is supposed to work
+    // in that case
+    if (!target) {
         target = env.get_target();
         frame_var = target_frame;
     }
 
     MovieClip *target_sprite = target ? target->to_movie() : NULL;
-    if(target_sprite)
-    {
+    if (target_sprite) {
         size_t frame_number;
-        if ( ! target_sprite->get_frame_number(frame_var, frame_number) )
-        {
+        if (!target_sprite->get_frame_number(frame_var, frame_number)) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Frame spec found on stack "
                 "at ActionGotoExpression doesn't evaluate "
@@ -2293,8 +2290,7 @@ ActionGotoExpression(ActionExec& thread)
         target_sprite->goto_frame(frame_number);
         target_sprite->setPlayState(state);
     }
-    else
-    {
+    else {
         IF_VERBOSE_ASCODING_ERRORS (
         log_aserror(_("Couldn't find target sprite \"%s\" in "
                 "ActionGotoExpression. Will not go to target frame..."),
