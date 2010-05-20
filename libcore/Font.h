@@ -51,7 +51,8 @@ namespace gnash {
 class kerning_pair
 {
 public:
-    boost::uint16_t    m_char0, m_char1;
+    boost::uint16_t m_char0;
+    boost::uint16_t m_char1;
 
     bool operator==(const kerning_pair& k) const
     {
@@ -103,7 +104,7 @@ public:
     ///
     /// @param italic
     ///    Whether to use the italic variant of the font.
-    Font(const std::string& name, bool bold=false, bool italic=false);
+    Font(const std::string& name, bool bold = false, bool italic = false);
 
     ~Font();
 

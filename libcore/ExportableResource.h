@@ -32,7 +32,6 @@ class ExportableResource : public ref_counted
 protected:
     ExportableResource() {}
 	virtual ~ExportableResource() {}
-	
 };
 
 

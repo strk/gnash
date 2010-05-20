@@ -43,18 +43,14 @@ namespace gnash {
 /// of the identified sound_sample. This *might* be the reason why
 /// it is a ref-counted thing (hard to belive...).
 ///
-///
-/// QUESTION: why is this a resource ?
-///           does it really need to be ref-counted ?
-///
 /// @todo move definition to sound_handler.h and possibly nest
 /// inside sound_handler itself ?
-/// @todo   work out why this is a resource, what a resource is useful for,
-///         and if it really needs access to a sound_handler rather than
-///         belonging to it.
+//
+/// This is a resource because it can be exported.
 class sound_sample: public ExportableResource
 {
 public:
+
 	int	m_sound_handler_id;
 
 	sound_sample(int id, const RunResources& r)

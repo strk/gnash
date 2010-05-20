@@ -444,6 +444,7 @@ private:
 
     typedef std::map<std::string, boost::intrusive_ptr<ExportableResource>,
             StringNoCaseLessThan > ExportMap;
+
     ExportMap _exportedResources;
 
     // Mutex protecting access to _exportedResources

@@ -123,7 +123,8 @@ private:
             const RunResources& r);
 
     /// Read a DefineFont tag.
-    void readDefineFont(SWFStream& in, movie_definition& m, const RunResources& r);
+    void readDefineFont(SWFStream& in, movie_definition& m,
+            const RunResources& r);
 
     /// Read a DefineFont2 or DefineFont3 tag.
     void readDefineFont2Or3(SWFStream& in, movie_definition& m,
