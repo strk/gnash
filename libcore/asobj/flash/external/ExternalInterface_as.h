@@ -105,10 +105,16 @@ public:
     
     virtual void update();
 
+    // Parse the XML Invoke message.
+    void processInvoke(const std::string &str);
+
     void setFD(int x) { _fd = x; };
 
     as_object *getCallback(const std::string &name);
-        
+
+    as_value parseXML(const std::string &xml);
+    std::vector<as_value> parseArguments(const std::string &xml);
+    
 private:
     int         _fd;
     std::map<std::string, as_object *> _methods;

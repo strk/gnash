@@ -19,9 +19,11 @@
 //
 
 #include <map>
+#include <vector>
 #include <sstream>
 #include <sys/ioctl.h>
 #include <sys/types.h>
+#include <boost/algorithm/string/erase.hpp>
 
 #include "StringPredicates.h"
 #include "Relay.h" // for inheritance
@@ -44,6 +46,8 @@
 #include "PropertyList.h"
 #include "movie_root.h"
 #include "log.h"
+
+using namespace std;
 
 namespace gnash {
 
@@ -215,8 +219,6 @@ externalinterface_addCallback(const fn_call& fn)
     // MovieClip *mc = mr.getLevel(1);
     // string_table& st = getStringTable(fn);    
 
-    log_debug("FIXME: controlFD is: %d", mr.getControlFD());
-
     if (mr.getControlFD() > 0) {
         ptr.setFD(mr.getControlFD());
     }
@@ -241,7 +243,7 @@ externalinterface_call(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
+//    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
     
     if (fn.nargs >= 2) {
         const as_value& methodName_as = fn.arg(0);
@@ -251,10 +253,10 @@ externalinterface_call(const fn_call& fn)
         //     asCallback = (fn.arg(1).to_object(getGlobal(fn)));
         // }
         
-        const std::vector<as_value>& args = fn.getArgs();
-        as_object *asCallback = ptr.getCallback(methodName);
+//      const std::vector<as_value>& args = fn.getArgs();
+//      as_object *asCallback = ptr.getCallback(methodName);
         log_debug("Calling External method \"%s\"", methodName);
-        // ptr.call(asCallback.get(), methodName, args, 2);
+//      ptr.call(asCallback.get(), methodName, args, 2);
     }
     
     return as_value();
@@ -351,7 +353,7 @@ externalinterface_objectID(const fn_call& fn)
 }
 
 as_value
-externalinterface_ctor(const fn_call& fn)
+externalinterface_ctor(const fn_call& /* fn */)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -926,12 +928,7 @@ ExternalInterface_as::getCallback(const std::string &name)
 void
 ExternalInterface_as::update()
 {
-    log_debug(__PRETTY_FUNCTION__);
-    
-    // std::map<std::string, as_object *>::const_iterator it;
-    // for (it=_methods.begin(); it != _methods.end(); it++) {
-    //     log_debug("Method name %s", it->first);
-    // }
+//    log_debug(__PRETTY_FUNCTION__);
     
     if (_fd > 0) {
         fd_set fdset;
@@ -943,7 +940,7 @@ ExternalInterface_as::update()
         errno = 0;
         int ret = ::select(_fd+1, &fdset, NULL, NULL, &tval);
         if (ret == 0) {
-            log_debug ("The pipe for fd #%d timed out waiting to read", _fd);
+//            log_debug ("The pipe for fd #%d timed out waiting to read", _fd);
             return;
         } else if (ret == 1) {
             log_debug ("The pipe for fd #%d is ready", _fd);
@@ -952,7 +949,6 @@ ExternalInterface_as::update()
             return;
         }
 
-        // 
         int bytes = 0;
 #ifndef _WIN32
         ioctl(_fd, FIONREAD, &bytes);
@@ -961,23 +957,163 @@ ExternalInterface_as::update()
 #endif
         log_debug("There are %d bytes in the network buffer", bytes);
 
-        // No data yet
-        if (bytes == 0) {
-            return;
-        }
-        
-        char *buf = 0;
+        char *buf = new char[bytes+1];
         // Since we know how bytes are in the network buffer, allocate
         // some memory to read the data.
-        buf = new char[bytes+1];
         // terminate incase we want to treat the data like a string.
-        buf[bytes] = 0;
+        buf[bytes+1] = 0;
         ret = ::read(_fd, buf, bytes);
-
         if (ret) {
-            std::cout << buf << std::endl;
+            processInvoke(buf);
         }
     }
+}
+
+// Parse the XML Invoke message, which looks like this:
+//
+// <invoke name="LoadMovie" returntype="xml">
+//      <arguments>
+//              <number>2</number>
+//              <string>bogus</string>
+//      </arguments>
+// </invoke>
+//
+void
+ExternalInterface_as::processInvoke(const std::string &xml)
+{
+    GNASH_REPORT_FUNCTION;
+
+    if (xml.empty()) {
+        return;
+    }
+    
+    std::vector<as_value> args;
+    string::size_type start = 0;
+    string::size_type end;
+    string tag;
+    string name;
+
+    // Look for the ending > in the first part of the data for the tag
+    end = xml.find(">");
+    if (end != std::string::npos) {
+        end++;                  // go past the > character
+        tag = xml.substr(start, end);
+        // Look for the easy ones first
+        if (tag.substr(0, 7) == "<invoke") {
+            // extract the name of the method to invoke
+            start = tag.find("name=") + 5;
+            end   = tag.find(" ", start);
+            name  = tag.substr(start, end-start);
+            // Ignore any quote characters around the string
+            boost::erase_first(name, "\"");
+            boost::erase_last(name, "\"");
+
+#if 0
+            // extract the return type of the method
+            start = tag.find("returntype=") + 11;
+            end   = tag.find(">", start);
+            invoke->type  = tag.substr(start, end-start);
+            // Ignore any quote characters around the string
+            boost::erase_first(invoke->type, "\"");
+            boost::erase_last(invoke->type, "\"");
+#endif
+            // extract the arguments to the method
+            start = xml.find("<arguments>");
+            end   = xml.find("</invoke");
+            tag   = xml.substr(start, end-start);
+            args = parseArguments(tag);
+        }
+    }
+
+    // call(as_object* callback, const std::string& name,
+    std::map<std::string, as_object *>::const_iterator it;
+    for (it=_methods.begin(); it != _methods.end(); it++) {
+        log_debug("Method name %s", it->first);
+        if (name == it->first) {
+            // call(it->second, args, 0);
+        }
+    }    
+}
+
+as_value
+ExternalInterface_as::parseXML(const std::string &xml)
+{
+    GNASH_REPORT_FUNCTION;
+
+    if (xml.empty()) {
+        return as_value();
+    }
+
+    std::string::size_type start = 0;
+    std::string::size_type end;
+    std::string tag;
+    as_value value;
+
+    // Look for the ending > in the first part of the data for the tag
+    end = xml.find(">");
+    if (end != std::string::npos) {
+        end++;                  // go past the > character
+        tag = xml.substr(start, end);
+        // Look for the easy ones first
+        if (tag == "<null/>") {
+            value.set_null();
+        } else if (tag == "<void/>") {
+            value.set_undefined();
+        } else if (tag == "<true/>") {
+            value.set_bool(true);
+        } else if (tag == "<false/>") {
+            value.set_bool(false);
+        } else if (tag == "<number>") {
+            start = end;
+            end = xml.find("</number>");
+            std::string str = xml.substr(start, end-start);
+            if (str.find(".") != std::string::npos) {
+                double num = strtod(str.c_str(), NULL);
+                value.set_double(num);
+            } else {
+                int num = strtol(str.c_str(), NULL, 0);
+                value.set_double(num);
+            }
+        } else if (tag == "<string>") {
+            start = end;
+            end = xml.find("</string>");
+            std::string str = xml.substr(start, end-start);
+            value.set_string(str);
+        }
+    }
+    
+    return value;
+}
+
+std::vector<as_value>
+ExternalInterface_as::parseArguments(const std::string &xml)
+{
+    GNASH_REPORT_FUNCTION;
+
+    std::vector<as_value> args;
+    std::string::size_type start = 0;
+    std::string::size_type end;
+
+    std::string name;
+    std::string data = xml;
+    std::string tag = "<arguments>";
+    start = data.find(tag);
+    if (start != std::string::npos) {
+        data.erase(0, tag.size());
+    }
+    while (!data.empty()) {
+        // Extract the data
+        start = data.find("<", 1); // start past the opening <
+        end = data.find(">", start) + 1;
+        std::string sub = data.substr(0, end);
+        if (data == "</arguments>") {
+            break;
+        }
+        args.push_back(parseXML(sub));
+        data.erase(0, end);
+    }
+
+    return args;
 }
 
 } // end of gnash namespace
