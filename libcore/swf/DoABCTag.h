@@ -42,7 +42,7 @@ class DoABCTag : public ControlTag
 {
 public:
 
-    virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
+    virtual void executeActions(MovieClip* m, DisplayList& /* dlist */) const
 	{
 
         if (!_abc) {

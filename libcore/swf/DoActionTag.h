@@ -42,13 +42,11 @@ public:
 
 	/// Read a DoAction block from the stream
 	//
-	void read(SWFStream& in)
-	{
+	void read(SWFStream& in) {
         m_buf.read(in, in.get_tag_end_position());
 	}
 
-	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
-	{
+	virtual void executeActions(MovieClip* m, DisplayList& /* dlist */) const {
         m->add_action_buffer(&m_buf);
 	}
 

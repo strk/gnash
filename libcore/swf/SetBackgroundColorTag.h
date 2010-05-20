@@ -76,7 +76,7 @@ public:
 		read(in);
 	}
 
-	void execute_state(MovieClip* m, DisplayList& dlist) const {
+	void executeState(MovieClip* m, DisplayList& /*dlist*/) const {
 		m->set_background_color(m_color);
 	}
 

@@ -42,7 +42,7 @@ class SymbolClassTag : public ControlTag
 {
 public:
 
-	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
+	virtual void executeActions(MovieClip* m, DisplayList& /* dlist */) const
 	{
 		VM& vm = getVM(*getObject(m));
         abc::Machine* mach = vm.getMachine();

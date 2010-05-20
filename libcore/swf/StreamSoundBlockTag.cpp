@@ -31,7 +31,7 @@ namespace gnash {
 namespace SWF {
 
 void
-StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
+StreamSoundBlockTag::executeActions(MovieClip* m, DisplayList& /*dlist*/) const
 {
 
 	sound::sound_handler* handler = getRunResources(*getObject(m)).soundHandler(); 

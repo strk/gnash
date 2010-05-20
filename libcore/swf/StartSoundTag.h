@@ -73,7 +73,8 @@ class StartSoundTag : public ControlTag
 
 public:
 
-	void execute(MovieClip* /* m */, DisplayList& /* dlist */) const;
+    // This is not a state tag.
+	void executeActions(MovieClip* /* m */, DisplayList& /* dlist */) const;
 
 	/// Load a SWF::STARTSOUND tag.
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,

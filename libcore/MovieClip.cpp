@@ -539,7 +539,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
         PlayList::const_iterator it = playlist->begin();
         const PlayList::const_iterator e = playlist->end();
         for (; it != e; it++) {
-            (*it)->execute(this, _displayList);
+            (*it)->executeActions(this, _displayList);
         }
     }
     _callingFrameActions = false;
@@ -954,11 +954,11 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
                 e = playlist->end(); it != e; ++it) {
 
             if (typeflags & SWF::ControlTag::TAG_DLIST) {
-                (*it)->execute_state(this, dlist);
+                (*it)->executeState(this, dlist);
             }
 
             if (typeflags & SWF::ControlTag::TAG_ACTION) {
-                (*it)->execute(this, _displayList);
+                (*it)->executeActions(this, _displayList);
             }
         
         }

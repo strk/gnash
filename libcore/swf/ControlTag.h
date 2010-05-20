@@ -48,17 +48,20 @@ public:
 	{
 	}
 
-	/// Execute this tag, whatever it is.
-	//
-    /// The default does nothing.
-    virtual void execute(MovieClip* /*m*/, DisplayList& /*dlist*/) const
+    /// Execute Action tags
+    //
+    /// Not all tags that have ActionScript code are considered Action tags.
+    virtual void executeActions(MovieClip* /*m*/, DisplayList& /*dlist*/) const
 	{
 	}
 
-	/// Execute this tag but only if it's a "state" tag.
+	/// Execute "state" or "DisplayList" tags
 	//
-	/// State tags include all tags except action tags.
-	virtual void execute_state(MovieClip* /*m*/,  DisplayList& /*dlist*/) const
+	/// State tags exist to control the state of MovieClips along the timeline.
+    /// They are executed even for skipped frames so that the state is
+    /// consistent at each frame. Some tags are considered state tags even
+    /// though they only contain ActionScript, e.g. the DoInitAction tag.
+	virtual void executeState(MovieClip* /*m*/,  DisplayList& /*dlist*/) const
 	{
 	}
 
