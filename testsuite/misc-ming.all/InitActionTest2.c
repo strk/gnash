@@ -51,34 +51,34 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
     
     // Check in next frame:
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
     
     // Frame 4
     SWFMovie_nextFrame(mo);
 
     // Action is before export tag.
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
     SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
     SWFMovie_writeExports(mo);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
 
     // Frame 4
     SWFMovie_nextFrame(mo);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
 
     // Add it again
     SWFMovie_add(mo, (SWFBlock)mc4);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
 
     // Frame 5
     SWFMovie_nextFrame(mo);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
     
     // Add it again, export it again:
     SWFMovie_add(mo, (SWFBlock)mc4);
     SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
     SWFMovie_writeExports(mo);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
     
     // Frame 6
     SWFMovie_nextFrame(mo);
@@ -88,7 +88,7 @@ main(int argc, char** argv)
     ia = newSWFInitAction_withId(
             newSWFAction("_global.val4 = 'mc4a';"), 4);
     SWFMovie_add(mo, (SWFBlock)ia);
-    xcheck(mo, "_global.val4 == 'mc4a'");
+    check(mo, "_global.val4 == 'mc4a'");
     
     // Frame 7
     SWFMovie_nextFrame(mo);
