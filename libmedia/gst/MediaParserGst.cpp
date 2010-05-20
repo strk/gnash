@@ -32,9 +32,7 @@
 //#define MIN_PROBE_SIZE (PUSHBUF_SIZE * 3)
 #define MIN_PROBE_SIZE 0
 
-#define GNASH_DEBUG_DATAFLOW
-
-
+// #define GNASH_DEBUG_DATAFLOW
 
 namespace gnash {
 namespace media {
