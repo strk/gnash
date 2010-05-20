@@ -107,7 +107,7 @@ public:
     void read(SWFStream& in, TagType tag);
 
     /// Place/move/whatever our object in the given movie.
-    void execute(MovieClip* m, DisplayList& dlist) const;
+    void executeState(MovieClip* m, DisplayList& dlist) const;
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& r);
@@ -115,6 +115,7 @@ public:
     int getPlaceType() const { 
         return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK);
     } 
+
     int getRatio()     const { return m_ratio; }
     int getClipDepth() const { return m_clip_depth; }
     int getID()        const { return _id; }

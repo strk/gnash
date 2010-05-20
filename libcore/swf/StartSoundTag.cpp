@@ -73,22 +73,18 @@ StartSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 void
-StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
+StartSoundTag::executeActions(MovieClip* m, DisplayList& /* dlist */) const
 {
 
-    sound::sound_handler* handler = getRunResources(*getObject(m)).soundHandler();
+    sound::sound_handler* handler = 
+        getRunResources(*getObject(m)).soundHandler();
 
-    if (handler)
-    {
-        if (_soundInfo.stopPlayback)
-        {
+    if (handler) {
+        if (_soundInfo.stopPlayback) {
             //log_debug("Execute StartSoundTag with 'stop playback' flag on");
             handler->stop_sound(m_handler_id);
         }
-        else
-        {
-
-            //log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
+        else {
 
             const sound::SoundEnvelopes* env = 
                 _soundInfo.envelopes.empty() ? 0 : &_soundInfo.envelopes;
@@ -99,7 +95,7 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
                     !_soundInfo.noMultiple, // allow multiple instances ?
                     _soundInfo.inPoint,
                     _soundInfo.outPoint
-                    );
+                );
         }
     }
 }

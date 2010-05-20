@@ -42,7 +42,7 @@ class DoABCTag : public ControlTag
 {
 public:
 
-    virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
+    virtual void executeActions(MovieClip* m, DisplayList& /* dlist */) const
 	{
 
         if (!_abc) {
@@ -61,12 +61,6 @@ public:
 		mach->initMachine(_abc);
 		log_debug("Executing machine...");
 		mach->execute();
-	}
-
-	// Tell the caller that we are an action tag.
-	virtual bool is_action_tag() const
-	{
-	    return true;
 	}
 
     void read(SWFStream* /*in*/)

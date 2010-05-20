@@ -33,24 +33,25 @@ RemoveObjectTag::read(SWFStream& in, TagType tag)
 {
 	assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 
-	if (tag == SWF::REMOVEOBJECT)
-	{
-		// Older SWF's allow multiple objects at the same depth;
-		// this m_id disambiguates.  Later SWF's just use one
+	if (tag == SWF::REMOVEOBJECT) {
+		// Older SWFs allow multiple objects at the same depth;
+		// this m_id disambiguates. Later SWFs just use one
 		// object per depth.
+        //
+        // NB Gnash has never used this!
 		in.ensureBytes(2);
-		m_id = in.read_u16();
+		_id = in.read_u16();
 	}
 
     in.ensureBytes(2);
-	m_depth = in.read_u16() + DisplayObject::staticDepthOffset;
+	_depth = in.read_u16() + DisplayObject::staticDepthOffset;
 }
 
 void
-RemoveObjectTag::execute(MovieClip* m, DisplayList& dlist) const
+RemoveObjectTag::executeState(MovieClip* m, DisplayList& dlist) const
 {
     m->set_invalidated();
-	dlist.removeDisplayObject(m_depth);
+	dlist.removeDisplayObject(_depth);
 }
 
 /* public static */
@@ -65,9 +66,8 @@ RemoveObjectTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     int depth = t->getDepth();
 
-    IF_VERBOSE_PARSE
-    (
-	log_parse(_("  remove_object_2(%d)"), depth);
+    IF_VERBOSE_PARSE(
+        log_parse(_("  remove_object_2(%d)"), depth);
     );
 
     // Ownership transferred to movie_definition

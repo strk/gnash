@@ -40,7 +40,7 @@ class DefineSceneAndFrameLabelDataTag : public ControlTag
 public:
 
     /// TODO: implement this.
-	virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
+	virtual void executeState(MovieClip* /*m*/, DisplayList& /* dlist */) const
 	{
         log_unimpl("DefineSceneAndFrameLabelDataTag");
 	}

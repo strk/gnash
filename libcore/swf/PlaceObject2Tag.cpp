@@ -41,7 +41,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
     // Original place_object tag; very simple.
     in.ensureBytes(2 + 2);
     _id = in.read_u16();
-    m_depth = in.read_u16() + DisplayObject::staticDepthOffset;
+    _depth = in.read_u16() + DisplayObject::staticDepthOffset;
 
     // PlaceObject doesn't know about masks.
     m_clip_depth = DisplayObject::noClipDepthValue;
@@ -64,7 +64,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
     IF_VERBOSE_PARSE
     (
             log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
-            	m_depth, m_depth - DisplayObject::staticDepthOffset,
+            	_depth, _depth - DisplayObject::staticDepthOffset,
             	_id);
             if (hasMatrix()) log_parse("  SWFMatrix: %s", m_matrix);
             if (hasCxform()) log_parse(_("  cxform: %s"), m_color_transform);
@@ -260,7 +260,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
     // PlaceObject2 specific flags
     m_has_flags2 = in.read_u8();
 
-    m_depth = in.read_u16()+DisplayObject::staticDepthOffset;
+    _depth = in.read_u16()+DisplayObject::staticDepthOffset;
 
     if ( hasCharacter( ))
     {
@@ -306,7 +306,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
 
     IF_VERBOSE_PARSE (
         log_parse(_("  PLACEOBJECT2: depth = %d (%d)"),
-            m_depth, m_depth-DisplayObject::staticDepthOffset);
+            _depth, _depth-DisplayObject::staticDepthOffset);
         if ( hasCharacter() ) log_parse(_("  char id = %d"), _id);
         if ( hasMatrix() )
         {
@@ -341,7 +341,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     boost::uint8_t bitmask = 0;
     std::string className;
 
-    m_depth = in.read_u16() + DisplayObject::staticDepthOffset;
+    _depth = in.read_u16() + DisplayObject::staticDepthOffset;
 
     // This is documented to be here, but real instances of 
     // tags with either className or hasImage defined are rare to
@@ -418,8 +418,8 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 
     IF_VERBOSE_PARSE (
 
-        log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth,
-            m_depth - DisplayObject::staticDepthOffset);
+        log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), _depth,
+            _depth - DisplayObject::staticDepthOffset);
         if (hasCharacter()) log_parse(_("  char id = %d"), _id);
         if (hasMatrix()) log_parse(_("  SWFMatrix: %s"), m_matrix);
         if (hasCxform()) log_parse(_("  cxform: %d"), m_color_transform);
@@ -456,25 +456,25 @@ PlaceObject2Tag::read(SWFStream& in, TagType tag)
 
 /// Place/move/whatever our object in the given movie.
 void
-PlaceObject2Tag::execute(MovieClip* m, DisplayList& dlist) const
+PlaceObject2Tag::executeState(MovieClip* m, DisplayList& dlist) const
 {
-    switch ( getPlaceType() ) 
-    {
+    switch (getPlaceType()) {
+
       case PLACE:
           m->add_display_object(this, dlist);
-      break;
+          break;
 
       case MOVE:
           m->move_display_object(this, dlist);
-      break;
+          break;
 
       case REPLACE:
           m->replace_display_object(this, dlist);
-      break;
+          break;
 
       case REMOVE:
 		  m->remove_display_object(this, dlist);
-      break;
+          break;
     }
 }
 

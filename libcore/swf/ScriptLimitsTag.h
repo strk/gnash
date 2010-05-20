@@ -38,8 +38,8 @@ public:
 
     virtual ~ScriptLimitsTag() {}
 
-    virtual void execute(MovieClip* m, DisplayList& /*dl*/) const
-    {
+    virtual void executeState(MovieClip* m, DisplayList& /*dl*/) const {
+
         log_debug("Setting script limits: recursion %s, timeout %s",
                 _recursionLimit, _timeoutLimit);
         getRoot(*getObject(m)).setScriptLimits(_recursionLimit, _timeoutLimit);

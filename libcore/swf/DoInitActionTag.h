@@ -48,20 +48,15 @@ public:
         read(in);
     }
 
-    virtual void execute_state(MovieClip* m, DisplayList& /*dlist*/) const
-    {
+    /// Execute 'state' tags.
+    //
+    /// State tags change the current state of a MovieClip. They are executed
+    /// even for skipped frames to ensure that the state is consistent.
+    //
+    /// Even though DoInitAction tags contain ActionScript, they are considered
+    /// to be state tags. They are executed only once.
+    virtual void executeState(MovieClip* m, DisplayList& /*dlist*/) const {
         m->execute_init_action_buffer(_buf, _cid);
-    }
-
-    virtual void execute(MovieClip* m, DisplayList& /*dlist*/) const
-    {
-        m->execute_init_action_buffer(_buf, _cid);
-    }
-
-    // Tell the caller that we are an action tag.
-    virtual bool is_action_tag() const
-    {
-        return true;
     }
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
@@ -70,21 +65,31 @@ public:
         if (m.isAS3()) {
             IF_VERBOSE_MALFORMED_SWF(
                 log_swferror("SWF contains DoInitAction tag, but is an "
-                    "AS3 SWF!");
+                "AS3 SWF!");
             );
             throw ParserException("DoInitAction tag found in AS3 SWF!");
         }
         
         in.ensureBytes(2);
         const boost::uint16_t cid = in.read_u16();
-        
-        // Tags should only be executed for exported characters, though
-        // it doesn't matter if the export is known during parsing.
+
+        if (!m.getDefinitionTag(cid)) {
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror("SWF contains DoInitAction tag for an unknown"
+                    "id. This will not be executed.");
+            );
+            return;
+        }
+
+        // Tags should only be executed for already parsed character ids.
+        //
+        // If this is true, there is no need to parse or store the tag. If
+        // it's not true, this check will have to be done at runtime.
         DoInitActionTag* da = new DoInitActionTag(in, m, cid);
 
-        IF_VERBOSE_PARSE (
-        log_parse(_("  tag %d: do_init_action_loader"), tag);
-        log_parse(_("  -- init actions for sprite %d"), cid);
+        IF_VERBOSE_PARSE(
+            log_parse(_("  tag %d: do_init_action_loader"), tag);
+            log_parse(_("  -- init actions for sprite %d"), cid);
         );
 
         m.addControlTag(da); // ownership transferred

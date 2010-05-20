@@ -405,8 +405,7 @@ public:
 	///
 	/// The default implementation is a no-op
 	///
-	virtual void export_resource(const std::string& /*symbol*/,
-			ExportableResource* /*res*/)
+	virtual void exportResource(const std::string& /*symbol*/, int /*id*/)
 	{
 	}
 

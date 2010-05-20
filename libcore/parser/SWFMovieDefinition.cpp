@@ -74,45 +74,45 @@ namespace {
 }
 
 SWFMovieLoader::SWFMovieLoader(SWFMovieDefinition& md)
-	:
-	_movie_def(md),
-	_thread(NULL),
-	_barrier(2) // us and the main thread..
+    :
+    _movie_def(md),
+    _thread(NULL),
+    _barrier(2) // us and the main thread..
 {
 }
 
 SWFMovieLoader::~SWFMovieLoader()
 {
-	// we should assert _movie_def._loadingCanceled
-	// but we're not friend yet (anyone introduce us ?)
-	if ( _thread.get() )
-	{
-		//cout << "Joining thread.." << endl;
-		_thread->join();
-	}
+    // we should assert _movie_def._loadingCanceled
+    // but we're not friend yet (anyone introduce us ?)
+    if ( _thread.get() )
+    {
+        //cout << "Joining thread.." << endl;
+        _thread->join();
+    }
 }
 
 bool
 SWFMovieLoader::started() const
 {
-	boost::mutex::scoped_lock lock(_mutex);
+    boost::mutex::scoped_lock lock(_mutex);
 
-	return _thread.get() != NULL;
+    return _thread.get() != NULL;
 }
 
 bool
 SWFMovieLoader::isSelfThread() const
 {
-	boost::mutex::scoped_lock lock(_mutex);
+    boost::mutex::scoped_lock lock(_mutex);
 
-	if (!_thread.get()) {
-		return false;
-	}
+    if (!_thread.get()) {
+        return false;
+    }
 #if BOOST_VERSION < 103500
-	boost::thread this_thread;
-	return this_thread == *_thread;
+    boost::thread this_thread;
+    return this_thread == *_thread;
 #else
-	return boost::this_thread::get_id() == _thread->get_id();
+    return boost::this_thread::get_id() == _thread->get_id();
 #endif
 
 }
@@ -121,8 +121,8 @@ SWFMovieLoader::isSelfThread() const
 void
 SWFMovieLoader::execute(SWFMovieLoader& ml, SWFMovieDefinition* md)
 {
-	ml._barrier.wait(); // let _thread assignment happen before going on
-	md->read_all_swf();
+    ml._barrier.wait(); // let _thread assignment happen before going on
+    md->read_all_swf();
 }
 
 bool
@@ -131,16 +131,16 @@ SWFMovieLoader::start()
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
     std::abort();
 #endif
-	// don't start SWFMovieLoader thread() which rely
-	// on boost::thread() returning before they are executed. Therefore,
-	// we must employ locking.
-	// Those tests do seem a bit redundant, though...
-	boost::mutex::scoped_lock lock(_mutex);
+    // don't start SWFMovieLoader thread() which rely
+    // on boost::thread() returning before they are executed. Therefore,
+    // we must employ locking.
+    // Those tests do seem a bit redundant, though...
+    boost::mutex::scoped_lock lock(_mutex);
 
-	_thread.reset(new boost::thread(boost::bind(
+    _thread.reset(new boost::thread(boost::bind(
                     execute, boost::ref(*this), &_movie_def)));
 
-	_barrier.wait(); // let execution start befor returning
+    _barrier.wait(); // let execution start befor returning
 
     return true;
 }
@@ -151,17 +151,17 @@ SWFMovieLoader::start()
 //
 
 SWFMovieDefinition::SWFMovieDefinition(const RunResources& runResources)
-	:
-	m_frame_rate(30.0f),
-	m_frame_count(0u),
-	m_version(0),
-	_frames_loaded(0u),
-	_waiting_for_frame(0),
-	m_loading_sound_stream(-1),
-	m_file_length(0),
-	m_jpeg_in(0),
-	_loader(*this),
-	_loadingCanceled(false),
+    :
+    m_frame_rate(30.0f),
+    m_frame_count(0u),
+    m_version(0),
+    _frames_loaded(0u),
+    _waiting_for_frame(0),
+    m_loading_sound_stream(-1),
+    m_file_length(0),
+    m_jpeg_in(0),
+    _loader(*this),
+    _loadingCanceled(false),
     _runResources(runResources),
     _as3(false)
 {
@@ -170,14 +170,14 @@ SWFMovieDefinition::SWFMovieDefinition(const RunResources& runResources)
 SWFMovieDefinition::~SWFMovieDefinition()
 {
 
-	// Request cancelation of the loading thread
-	_loadingCanceled = true;
+    // Request cancelation of the loading thread
+    _loadingCanceled = true;
 
-	// Release frame tags
-	for (PlayListMap::iterator i = m_playlist.begin(),
+    // Release frame tags
+    for (PlayListMap::iterator i = m_playlist.begin(),
             e = m_playlist.end(); i != e; ++i)
-	{
-		PlayList& pl = i->second;
+    {
+        PlayList& pl = i->second;
         deleteChecked(pl.begin(), pl.end());
     }
 
@@ -186,23 +186,23 @@ SWFMovieDefinition::~SWFMovieDefinition()
 void
 SWFMovieDefinition::addDisplayObject(int id, SWF::DefinitionTag* c)
 {
-	assert(c);
-	boost::mutex::scoped_lock lock(_dictionaryMutex);
-	_dictionary.addDisplayObject(id, c);
+    assert(c);
+    boost::mutex::scoped_lock lock(_dictionaryMutex);
+    _dictionary.addDisplayObject(id, c);
 }
 
 SWF::DefinitionTag*
 SWFMovieDefinition::getDefinitionTag(int id) const
 {
 
-	boost::mutex::scoped_lock lock(_dictionaryMutex);
+    boost::mutex::scoped_lock lock(_dictionaryMutex);
 
-	boost::intrusive_ptr<SWF::DefinitionTag> ch = 
+    boost::intrusive_ptr<SWF::DefinitionTag> ch = 
         _dictionary.getDisplayObject(id);
 #ifndef GNASH_USE_GC
-	assert(ch == NULL || ch->get_ref_count() > 1);
+    assert(ch == NULL || ch->get_ref_count() > 1);
 #endif 
-	return ch.get(); 
+    return ch.get(); 
 }
 
 void
@@ -270,10 +270,10 @@ void SWFMovieDefinition::add_sound_sample(int id, sound_sample* sam)
     assert(sam);
     IF_VERBOSE_PARSE(
     log_parse(_("Add sound sample %d assigning id %d"),
-		id, sam->m_sound_handler_id);
+        id, sam->m_sound_handler_id);
     )
     m_sound_samples.insert(std::make_pair(id,
-			    boost::intrusive_ptr<sound_sample>(sam)));
+                boost::intrusive_ptr<sound_sample>(sam)));
 }
 
 // Read header and assign url
@@ -282,87 +282,87 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
         const std::string& url)
 {
 
-	_in = in;
+    _in = in;
 
-	// we only read a movie once
-	assert(!_str.get());
+    // we only read a movie once
+    assert(!_str.get());
 
-	_url = url.empty() ? "<anonymous>" : url;
+    _url = url.empty() ? "<anonymous>" : url;
 
-	boost::uint32_t file_start_pos = _in->tell();
-	boost::uint32_t header = _in->read_le32();
-	m_file_length = _in->read_le32();
-	_swf_end_pos = file_start_pos + m_file_length;
+    boost::uint32_t file_start_pos = _in->tell();
+    boost::uint32_t header = _in->read_le32();
+    m_file_length = _in->read_le32();
+    _swf_end_pos = file_start_pos + m_file_length;
 
-	m_version = (header >> 24) & 255;
-	if ((header & 0x0FFFFFF) != 0x00535746
-		&& (header & 0x0FFFFFF) != 0x00535743)
+    m_version = (header >> 24) & 255;
+    if ((header & 0x0FFFFFF) != 0x00535746
+        && (header & 0x0FFFFFF) != 0x00535743)
         {
-		// ERROR
-		log_error(_("gnash::SWFMovieDefinition::read() -- "
-			"file does not start with a SWF header"));
-		return false;
+        // ERROR
+        log_error(_("gnash::SWFMovieDefinition::read() -- "
+            "file does not start with a SWF header"));
+        return false;
         }
-	const bool compressed = (header & 255) == 'C';
+    const bool compressed = (header & 255) == 'C';
 
-	IF_VERBOSE_PARSE(
-		log_parse(_("version: %d, file_length: %d"), m_version, m_file_length);
+    IF_VERBOSE_PARSE(
+        log_parse(_("version: %d, file_length: %d"), m_version, m_file_length);
     )
 
-	if (m_version > 7)
-	{
-		log_unimpl(_("SWF%d is not fully supported, trying anyway "
-			"but don't expect it to work"), m_version);
-	}
+    if (m_version > 7)
+    {
+        log_unimpl(_("SWF%d is not fully supported, trying anyway "
+            "but don't expect it to work"), m_version);
+    }
 
-	if (compressed) {
+    if (compressed) {
 #ifndef HAVE_ZLIB_H
-		log_error(_("SWFMovieDefinition::read(): unable to read "
-			"zipped SWF data; gnash was compiled without zlib support"));
-		return false;
+        log_error(_("SWFMovieDefinition::read(): unable to read "
+            "zipped SWF data; gnash was compiled without zlib support"));
+        return false;
 #else
-		IF_VERBOSE_PARSE(
-			log_parse(_("file is compressed"));
-		);
+        IF_VERBOSE_PARSE(
+            log_parse(_("file is compressed"));
+        );
 
-		// Uncompress the input as we read it.
-		_in = zlib_adapter::make_inflater(_in);
+        // Uncompress the input as we read it.
+        _in = zlib_adapter::make_inflater(_in);
 #endif
     }
 
-	assert(_in.get());
+    assert(_in.get());
 
-	_str.reset(new SWFStream(_in.get()));
+    _str.reset(new SWFStream(_in.get()));
 
-	m_frame_size.read(*_str);
-	// If the SWFRect is malformed, SWFRect::read would already 
-	// print an error. We check again here just to give 
-	// the error are better context.
-	if ( m_frame_size.is_null() )
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("non-finite movie bounds");
-		);
-	}
+    m_frame_size.read(*_str);
+    // If the SWFRect is malformed, SWFRect::read would already 
+    // print an error. We check again here just to give 
+    // the error are better context.
+    if ( m_frame_size.is_null() )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror("non-finite movie bounds");
+        );
+    }
 
-	_str->ensureBytes(2 + 2); // frame rate, frame count.
-	m_frame_rate = _str->read_u16() / 256.0f;
+    _str->ensureBytes(2 + 2); // frame rate, frame count.
+    m_frame_rate = _str->read_u16() / 256.0f;
     if (!m_frame_rate) {
         m_frame_rate = std::numeric_limits<boost::uint16_t>::max();
     }
 
-	m_frame_count = _str->read_u16();
+    m_frame_count = _str->read_u16();
 
-	// TODO: This seems dangerous, check closely
-	if (!m_frame_count) ++m_frame_count;
+    // TODO: This seems dangerous, check closely
+    if (!m_frame_count) ++m_frame_count;
 
-	IF_VERBOSE_PARSE(
-		log_parse(_("frame size = %s, frame rate = %f, frames = %d"),
-			m_frame_size, m_frame_rate, m_frame_count);
-	);
+    IF_VERBOSE_PARSE(
+        log_parse(_("frame size = %s, frame rate = %f, frames = %d"),
+            m_frame_size, m_frame_rate, m_frame_count);
+    );
 
-	setBytesLoaded(_str->tell());
-	return true;
+    setBytesLoaded(_str->tell());
+    return true;
 }
 
 // Fire up the loading thread
@@ -370,35 +370,35 @@ bool
 SWFMovieDefinition::completeLoad()
 {
 
-	// should call this only once
-	assert( ! _loader.started() );
+    // should call this only once
+    assert( ! _loader.started() );
 
-	// should call readHeader before this
-	assert(_str.get());
+    // should call readHeader before this
+    assert(_str.get());
 
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
-	// Start the loading frame
-	if ( ! _loader.start() )
-	{
-		log_error(_("Could not start loading thread"));
-		return false;
-	}
+    // Start the loading frame
+    if ( ! _loader.start() )
+    {
+        log_error(_("Could not start loading thread"));
+        return false;
+    }
 
-	// Wait until 'startup_frames' have been loaded
+    // Wait until 'startup_frames' have been loaded
 #if 1
-	size_t startup_frames = 0;
+    size_t startup_frames = 0;
 #else
-	size_t startup_frames = m_frame_count;
+    size_t startup_frames = m_frame_count;
 #endif
-	ensure_frame_loaded(startup_frames);
+    ensure_frame_loaded(startup_frames);
 
 #else // undef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
-	read_all_swf();
+    read_all_swf();
 #endif
 
-	return true;
+    return true;
 }
 
 
@@ -406,27 +406,27 @@ SWFMovieDefinition::completeLoad()
 bool
 SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 {
-	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	return (framenum <= _frames_loaded);
+    return (framenum <= _frames_loaded);
 #endif
 
-	if ( framenum <= _frames_loaded ) return true;
+    if ( framenum <= _frames_loaded ) return true;
 
-	_waiting_for_frame = framenum;
+    _waiting_for_frame = framenum;
 
-	// TODO: return false on timeout
-	_frame_reached_condition.wait(lock);
+    // TODO: return false on timeout
+    _frame_reached_condition.wait(lock);
 
-	return ( framenum <= _frames_loaded );
+    return ( framenum <= _frames_loaded );
 }
 
 Movie*
 SWFMovieDefinition::createMovie(Global_as& gl, DisplayObject* parent)
 {
     as_object* o = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
-	return new SWFMovie(o, this, parent);
+    return new SWFMovie(o, this, parent);
 }
 
 
@@ -438,29 +438,29 @@ std::ostream&
 operator<<(std::ostream& o, const CharacterDictionary& cd)
 {
 
-   	for (CharacterDictionary::CharacterConstIterator it = cd.begin(), 
+       for (CharacterDictionary::CharacterConstIterator it = cd.begin(), 
             endIt = cd.end(); it != endIt; it++)
-   	{
-   	    o << std::endl
-   	      << "Character: " << it->first
-   	      << " at address: " << static_cast<void*>(it->second.get());
-   	}
-   	
-   	return o;
+       {
+           o << std::endl
+             << "Character: " << it->first
+             << " at address: " << static_cast<void*>(it->second.get());
+       }
+       
+       return o;
 }
 
 boost::intrusive_ptr<SWF::DefinitionTag>
 CharacterDictionary::getDisplayObject(int id) const
 {
     CharacterConstIterator it = _map.find(id);
-	if ( it == _map.end() )
-	{
-		IF_VERBOSE_PARSE(
+    if ( it == _map.end() )
+    {
+        IF_VERBOSE_PARSE(
             log_parse(_("Could not find char %d, dump is: %s"), id, *this);
-		);
-		return boost::intrusive_ptr<SWF::DefinitionTag>();
-	}
-	
+        );
+        return boost::intrusive_ptr<SWF::DefinitionTag>();
+    }
+    
     return it->second;
 }
 
@@ -468,21 +468,21 @@ void
 CharacterDictionary::addDisplayObject(int id,
         boost::intrusive_ptr<SWF::DefinitionTag> c)
 {
-	_map[id] = c;
+    _map[id] = c;
 }
 
 
 void
 SWFMovieDefinition::read_all_swf()
 {
-	assert(_str.get());
+    assert(_str.get());
 
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	assert( _loader.isSelfThread() );
-	assert( _loader.started() );
+    assert( _loader.isSelfThread() );
+    assert( _loader.started() );
 #else
-	assert( ! _loader.started() );
-	assert( ! _loader.isSelfThread() );
+    assert( ! _loader.started() );
+    assert( ! _loader.isSelfThread() );
 #endif
 
     SWFParser parser(*_str, this, _runResources);
@@ -523,78 +523,89 @@ SWFMovieDefinition::read_all_swf()
     // parsing after an exception?
     setBytesLoaded(std::min<size_t>(_str->tell(), _swf_end_pos));
 
-	size_t floaded = get_loading_frame();
-	if (!m_playlist[floaded].empty())
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("%d control tags are NOT followed by"
-			" a SHOWFRAME tag"), m_playlist[floaded].size());
-		);
-	}
+    size_t floaded = get_loading_frame();
+    if (!m_playlist[floaded].empty())
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("%d control tags are NOT followed by"
+            " a SHOWFRAME tag"), m_playlist[floaded].size());
+        );
+    }
 
-	if ( m_frame_count > floaded )
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("%d frames advertised in header, but only %d "
+    if ( m_frame_count > floaded )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("%d frames advertised in header, but only %d "
                 "SHOWFRAME tags found in stream. Pretending we loaded "
                 "all advertised frames"), m_frame_count, floaded);
-		);
-		boost::mutex::scoped_lock lock(_frames_loaded_mutex);
-		_frames_loaded = m_frame_count;
-		// Notify any thread waiting on frame reached condition
-		_frame_reached_condition.notify_all();
-	}
+        );
+        boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+        _frames_loaded = m_frame_count;
+        // Notify any thread waiting on frame reached condition
+        _frame_reached_condition.notify_all();
+    }
 }
 
 size_t
 SWFMovieDefinition::get_loading_frame() const
 {
-	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
-	return _frames_loaded;
+    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+    return _frames_loaded;
 }
 
 void
 SWFMovieDefinition::incrementLoadedFrames()
 {
-	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
-	++_frames_loaded;
+    ++_frames_loaded;
 
-	if ( _frames_loaded > m_frame_count )
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("number of SHOWFRAME tags "
-				"in SWF stream '%s' (%d) exceeds "
-				"the advertised number in header (%d)."),
-				get_url(), _frames_loaded,
-				m_frame_count);
-		)
-	}
+    if ( _frames_loaded > m_frame_count )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("number of SHOWFRAME tags "
+                "in SWF stream '%s' (%d) exceeds "
+                "the advertised number in header (%d)."),
+                get_url(), _frames_loaded,
+                m_frame_count);
+        )
+    }
 
 #ifdef DEBUG_FRAMES_LOAD
-	log_debug(_("Loaded frame %u/%u"), _frames_loaded, m_frame_count);
+    log_debug(_("Loaded frame %u/%u"), _frames_loaded, m_frame_count);
 #endif
 
-	// signal load of frame if anyone requested it
-	// FIXME: _waiting_for_frame needs mutex ?
-	if (_waiting_for_frame && _frames_loaded >= _waiting_for_frame )
-	{
-		// or should we notify_one ?
-		// See: http://boost.org/doc/html/condition.html
-		_frame_reached_condition.notify_all();
-	}
+    // signal load of frame if anyone requested it
+    // FIXME: _waiting_for_frame needs mutex ?
+    if (_waiting_for_frame && _frames_loaded >= _waiting_for_frame )
+    {
+        // or should we notify_one ?
+        // See: http://boost.org/doc/html/condition.html
+        _frame_reached_condition.notify_all();
+    }
 
 }
 
 void
-SWFMovieDefinition::export_resource(const std::string& symbol,
-        ExportableResource* res)
+SWFMovieDefinition::exportResource(const std::string& symbol, int id)
 {
-	// _exportedResources access should be protected by a mutex
-	boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+    // _exportedResources access should be protected by a mutex
+    boost::mutex::scoped_lock lock(_exportedResourcesMutex);
 
-	// SWF sometimes exports the same thing more than once!
-	_exportedResources[symbol] = res;
+    ExportableResource* f;
+    if ((f = get_font(id)) || (f = getDefinitionTag(id)) ||
+            (f = get_sound_sample(id))) {
+
+        // SWFs sometimes export the same thing more than once!
+        _exportedResources[symbol] = f;
+    }
+    else {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("don't know how to export resource '%s' "
+                        "with id %d (can't find that id)"), symbol, id);
+        );
+        return;
+    }
 }
 
 
@@ -602,57 +613,57 @@ boost::intrusive_ptr<ExportableResource>
 SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
 {
 #ifdef DEBUG_EXPORTS
-	log_debug("get_exported_resource(%s) called, loading frame:%u",
+    log_debug("get_exported_resource(%s) called, loading frame:%u",
             symbol, m_frame_count);
 #endif
 
-	// Don't call get_exported_resource() from this movie loader
-	assert( ! _loader.isSelfThread() );
+    // Don't call get_exported_resource() from this movie loader
+    assert( ! _loader.isSelfThread() );
 
-	// Keep trying until either we found the export or
-	// the stream is over, or there is NO frames progress
-	// after def_timeout microseconds.
-	//
-	// Note that the NO frame progress might be due
-	// to a circular import chain:
-	//
-	// 	A imports B imports A
-	//
+    // Keep trying until either we found the export or
+    // the stream is over, or there is NO frames progress
+    // after def_timeout microseconds.
+    //
+    // Note that the NO frame progress might be due
+    // to a circular import chain:
+    //
+    //     A imports B imports A
+    //
 
-	// Sleep 1/2 of a second between checks
-	// NOTE: make sure the nap is enough time for
-	//       thread execution switch !!
-	const unsigned long naptime=500000;
+    // Sleep 1/2 of a second between checks
+    // NOTE: make sure the nap is enough time for
+    //       thread execution switch !!
+    const unsigned long naptime=500000;
 
-	// Timeout after two seconds of NO frames progress
-	const unsigned long timeout_ms=2000000;
-	const unsigned long def_timeout=timeout_ms/naptime; 
+    // Timeout after two seconds of NO frames progress
+    const unsigned long timeout_ms=2000000;
+    const unsigned long def_timeout=timeout_ms/naptime; 
 
-	unsigned long timeout=def_timeout;
-	size_t loading_frame = (size_t)-1; // used to keep track of advancements
+    unsigned long timeout=def_timeout;
+    size_t loading_frame = (size_t)-1; // used to keep track of advancements
 
-	for(;;)
-	{
+    for(;;)
+    {
 
         // we query the loaded frame count before looking
         // up the exported resources map because while
         // we query the loader keeps parsing more frames.
         // and we don't want to giveup w/out having queried
         // up to the last frame.
-		size_t new_loading_frame = get_loading_frame();
+        size_t new_loading_frame = get_loading_frame();
 
-		// _exportedResources access is thread-safe
-		{
-			boost::mutex::scoped_lock lock(_exportedResourcesMutex);
-			ExportMap::const_iterator it = _exportedResources.find(symbol);
-			if ( it != _exportedResources.end() )
+        // _exportedResources access is thread-safe
+        {
+            boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+            ExportMap::const_iterator it = _exportedResources.find(symbol);
+            if ( it != _exportedResources.end() )
             {
 #ifdef DEBUG_EXPORTS
-	            log_debug(" resource found, loading frame:%u", new_loading_frame);
+                log_debug(" resource found, loading frame:%u", new_loading_frame);
 #endif
                 return it->second;
             }
-		}
+        }
 
         // We checked last (or past-last) advertised frame. 
         // TODO: this check should really be for a parser
@@ -660,8 +671,7 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
         //       might advertise less frames then actually
         //       found in it...
         //
-        if ( new_loading_frame >= m_frame_count )
-        {
+        if (new_loading_frame >= m_frame_count) {
             // Update of loading_frame is
             // really just for the latter debugging output
             loading_frame = new_loading_frame;
@@ -677,54 +687,52 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
 
         // We made frame progress since last iteration
         // so sleep some and try again
-		if ( new_loading_frame != loading_frame )
-		{
+        if (new_loading_frame != loading_frame) {
 #ifdef DEBUG_EXPORTS
-			log_debug(_("looking for exported resource: frame load "
-						"advancement (from %d to %d)"),
-				loading_frame, new_loading_frame);
+            log_debug(_("looking for exported resource: frame load "
+                        "advancement (from %d to %d)"),
+                loading_frame, new_loading_frame);
 #endif
-			loading_frame = new_loading_frame;
-			timeout = def_timeout+1;
-		}
-		else if ( ! --timeout ) 
-		{
+            loading_frame = new_loading_frame;
+            timeout = def_timeout+1;
+        }
+        else if (!--timeout) {
             // no progress since last run, and 
             // timeout reached: give up
-			break;
-		}
+            break;
+        }
 
-		// take a breath to give other threads more time to advance
-		gnashSleep(naptime);
+        // take a breath to give other threads more time to advance
+        gnashSleep(naptime);
 
-	}
+    }
 
-	if ( ! timeout ) // timed out
-	{
-		log_error("Timeout (%d milliseconds) seeking export symbol %s in movie %s. "
-			"Frames loaded %d/%d",
-			timeout_ms/1000, symbol, _url, loading_frame, m_frame_count);
-	}
-	else // eof 
-	{
-		assert(loading_frame >= m_frame_count);
-		log_error("No export symbol %s found in movie %s. "
-			"Frames loaded %d/%d",
-			symbol, _url, loading_frame, m_frame_count);
+    // timed out
+    if (!timeout) {
+        log_error("Timeout (%d milliseconds) seeking export symbol %s in "
+                "movie %s. Frames loaded %d/%d", timeout_ms / 1000, symbol,
+                _url, loading_frame, m_frame_count);
+    }
+    else {
+        // eof
+        assert(loading_frame >= m_frame_count);
+        log_error("No export symbol %s found in movie %s. "
+            "Frames loaded %d/%d",
+            symbol, _url, loading_frame, m_frame_count);
         //abort();
-	}
+    }
 
-	return boost::intrusive_ptr<ExportableResource>(0); // 0
+    return boost::intrusive_ptr<ExportableResource>(0); // 0
 
 }
 
 void
 SWFMovieDefinition::add_frame_name(const std::string& n)
 {
-	boost::mutex::scoped_lock lock1(_namedFramesMutex);
-	boost::mutex::scoped_lock lock2(_frames_loaded_mutex);
+    boost::mutex::scoped_lock lock1(_namedFramesMutex);
+    boost::mutex::scoped_lock lock2(_frames_loaded_mutex);
 
-	_namedFrames.insert(std::make_pair(n, _frames_loaded));
+    _namedFrames.insert(std::make_pair(n, _frames_loaded));
 }
 
 bool
@@ -733,7 +741,7 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
 {
     boost::mutex::scoped_lock lock(_namedFramesMutex);
     NamedFrameMap::const_iterator it = _namedFrames.find(label);
-    if ( it == _namedFrames.end() ) return false;
+    if (it == _namedFrames.end()) return false;
     frame_number = it->second;
     return true;
 }
@@ -746,16 +754,17 @@ SWFMovieDefinition::markReachableResources() const
     markMappedResources(_bitmaps);
     markMappedResources(m_sound_samples);
 
-	{
-		boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+    // Mutex scope.
+    {
+        boost::mutex::scoped_lock lock(_exportedResourcesMutex);
         markMappedResources(_exportedResources);
-	}
+    }
 
     std::for_each(m_import_source_movies.begin(), m_import_source_movies.end(),
            boost::mem_fn(&movie_definition::setReachable));
 
-	boost::mutex::scoped_lock lock(_dictionaryMutex);
-	_dictionary.markReachableResources();
+    boost::mutex::scoped_lock lock(_dictionaryMutex);
+    _dictionary.markReachableResources();
 
 }
 #endif // GNASH_USE_GC
@@ -764,52 +773,55 @@ void
 SWFMovieDefinition::importResources(
         boost::intrusive_ptr<movie_definition> source, Imports& imports)
 {
-	size_t importedSyms=0;
-	for (Imports::iterator i=imports.begin(), e=imports.end(); i!=e; ++i)
-	{
-		int id = i->first;
-		const std::string& symbolName = i->second;
+    size_t importedSyms = 0;
 
-        boost::intrusive_ptr<ExportableResource> res =
-            source->get_exported_resource(symbolName);
+    // Mutex scope.
+    {
+        boost::mutex::scoped_lock lock(_exportedResourcesMutex);
 
-        if (!res)
-        {
-			log_error(_("import error: could not find resource '%s' in "
-                        "movie '%s'"), symbolName, source->get_url());
-			continue;
-        }
+        for (Imports::iterator i = imports.begin(), e = imports.end(); i != e;
+                ++i) {
+
+            const int id = i->first;
+            const std::string& symbolName = i->second;
+
+            boost::intrusive_ptr<ExportableResource> res =
+                source->get_exported_resource(symbolName);
+
+            if (!res) {
+                log_error(_("import error: could not find resource '%s' in "
+                            "movie '%s'"), symbolName, source->get_url());
+                continue;
+            }
 
 #ifdef DEBUG_EXPORTS
-        log_debug("Exporting symbol %s imported from source %s",
-            symbolName, source->get_url());
-#endif
-        export_resource(symbolName, res.get());
-
-        if (Font* f = dynamic_cast<Font*>(res.get()))
-		{
-			// Add this shared font to the currently-loading movie.
-			add_font(id, f);
-			++importedSyms;
-        }
-        else if (SWF::DefinitionTag* ch = dynamic_cast<SWF::DefinitionTag*>(res.get()))
-        {
-            // Add this DisplayObject to the loading movie.
-            addDisplayObject(id, ch);
-            ++importedSyms;
-        }
-        else
-        {
-            log_error(_("importResources error: unsupported import of '%s' "
-                "from movie '%s' has unknown type"),
+            log_debug("Exporting symbol %s imported from source %s",
                 symbolName, source->get_url());
-        }
-	}
+#endif
+            _exportedResources[symbolName] = res.get();
 
-	if ( importedSyms )
-	{
-		_importSources.insert(source);
-	}
+            if (Font* f = dynamic_cast<Font*>(res.get())) {
+                // Add this shared font to the currently-loading movie.
+                add_font(id, f);
+                ++importedSyms;
+            }
+            else if (SWF::DefinitionTag* ch =
+                    dynamic_cast<SWF::DefinitionTag*>(res.get())) {
+                // Add this DisplayObject to the loading movie.
+                addDisplayObject(id, ch);
+                ++importedSyms;
+            }
+            else {
+                log_error(_("importResources error: unsupported import of '%s' "
+                    "from movie '%s' has unknown type"),
+                    symbolName, source->get_url());
+            }
+        }
+    }
+
+    if (importedSyms) {
+        _importSources.insert(source);
+    }
 }
 
 namespace {

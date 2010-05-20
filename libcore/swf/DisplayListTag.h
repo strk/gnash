@@ -43,28 +43,23 @@ public:
 
 	DisplayListTag(int depth)
 		:
-		m_depth(depth)
+		_depth(depth)
 	{}
 
 	virtual ~DisplayListTag() {}
 
-	virtual void execute(MovieClip* m, DisplayList& dlist) const=0;
-
-	void execute_state(MovieClip* m, DisplayList& dlist) const
-	{
-		execute(m, dlist);
-	}
+    /// All DisplayList tags are state tags.
+	virtual void executeState(MovieClip* m, DisplayList& dlist) const = 0;
 
 	/// Return the depth affected by this DisplayList tag
 	//
 	/// NOTE: the returned depth is always in the
 	///       static depth zone (DisplayObject::staticDepthOffset .. -1)
-	///
-	int getDepth() const { return m_depth; }
+	int getDepth() const { return _depth; }
 
 protected:
 
-	int m_depth;
+	int _depth;
 
 };
 

@@ -37,32 +37,29 @@ namespace SWF {
 
 /// SWF Tag RemoveObject (5) or RemoveObject2 (28)
 //
-/// The RemoveObject tag removes the DisplayObject instance at the specified depth.
-///
-/// TODO: make this and PlaceObject2Tag subclasses of DisplayListTag (subclass of ControlTag)
-///
+/// The RemoveObject tag removes the DisplayObject instance at the
+/// specified depth.
 class RemoveObjectTag : public DisplayListTag
 {
 public:
 
 	RemoveObjectTag()
 		:
-		DisplayListTag(-1),
-		m_id(-1)
+		DisplayListTag(-1)
 	{}
 
 	/// Read SWF::REMOVEOBJECT or SWF::REMOVEOBJECT2 
 	void read(SWFStream& in, TagType tag);
 
 	/// Remove object at specified depth from MovieClip DisplayList.
-	void execute(MovieClip* m, DisplayList& dlist) const;
+	void executeState(MovieClip* m, DisplayList& dlist) const;
 
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& r);
 
 private:
 
-	int m_id;
+    int _id;
 
 };
 

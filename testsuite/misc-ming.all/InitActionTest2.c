@@ -12,7 +12,7 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc4, mc5, dejagnuclip;
+    SWFMovieClip mc4, mc5, mc6, dejagnuclip;
     SWFDisplayItem it;
     SWFInitAction ia;
 
@@ -51,34 +51,34 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
     
     // Check in next frame:
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
     
     // Frame 4
     SWFMovie_nextFrame(mo);
 
     // Action is before export tag.
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
     SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
     SWFMovie_writeExports(mo);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
 
     // Frame 4
     SWFMovie_nextFrame(mo);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
 
     // Add it again
     SWFMovie_add(mo, (SWFBlock)mc4);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
 
     // Frame 5
     SWFMovie_nextFrame(mo);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
     
     // Add it again, export it again:
     SWFMovie_add(mo, (SWFBlock)mc4);
     SWFMovie_addExport(mo, (SWFBlock)mc4, "export4");
     SWFMovie_writeExports(mo);
-    xcheck(mo, "_global.val4 == undefined");
+    check(mo, "_global.val4 == undefined");
     
     // Frame 6
     SWFMovie_nextFrame(mo);
@@ -88,7 +88,7 @@ main(int argc, char** argv)
     ia = newSWFInitAction_withId(
             newSWFAction("_global.val4 = 'mc4a';"), 4);
     SWFMovie_add(mo, (SWFBlock)ia);
-    xcheck(mo, "_global.val4 == 'mc4a'");
+    check(mo, "_global.val4 == 'mc4a'");
     
     // Frame 7
     SWFMovie_nextFrame(mo);
@@ -98,14 +98,40 @@ main(int argc, char** argv)
     SWFMovie_addExport(mo, (SWFBlock)mc5, "export5");
     SWFMovie_writeExports(mo);
     
-    // Action is before InitAction, but this does not matter. As long as it's
-    // in the same frame it will work.
+    // Action is written before InitAction, but this does not matter. As
+    // long as it's in the same frame it will work.
     check(mo, "_global.val5 == 'mc5'");
     
     ia = newSWFInitAction_withId(
             newSWFAction("trace('mc5'); _global.val5 = 'mc5';"), 5);
     SWFMovie_add(mo, (SWFBlock)ia);
     check(mo, "_global.val5 == 'mc5'");
+
+    // Frame 8
+    SWFMovie_nextFrame(mo);
+
+    // Add new MovieClip and export.
+    mc6 = newSWFMovieClip();
+    SWFMovie_addExport(mo, (SWFBlock)mc6, "export6");
+    SWFMovie_writeExports(mo);
+
+    // Skip next frame
+    add_actions(mo, "gotoAndStop(10);");
+    
+    // Frame 9
+    SWFMovie_nextFrame(mo);
+
+    // This frame is skipped but contains init actions.
+    ia = newSWFInitAction_withId(
+            newSWFAction("trace('mc6'); _global.val6 = 'mc6';"), 6);
+    SWFMovie_add(mo, (SWFBlock)ia);
+    add_actions(mo, "fail('Actions in skipped frame executed!');");
+
+    // Frame 10
+    SWFMovie_nextFrame(mo);
+
+    // Check that the skipped InitActions are executed.
+    check(mo, "_global.val6 == 'mc6'");
 
     add_actions(mo, "stop();");
   

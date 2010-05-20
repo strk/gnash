@@ -27,7 +27,7 @@
 
 // Forward declarations
 namespace gnash {
- class movie_definition;
+    class movie_definition;
     class RunResources;
 }
 
@@ -78,7 +78,8 @@ void sprite_loader(SWFStream&, TagType, movie_definition&, const RunResources&);
 
 // end_tag doesn't actually need to exist.
 // TODO: drop this loader ?
-void end_loader(SWFStream& in, TagType tag, movie_definition&, const RunResources&)
+inline void end_loader(SWFStream& in, TagType tag, movie_definition&,
+        const RunResources&)
 {
     assert(tag == SWF::END); // 0
     assert(in.tell() == in.get_tag_end_position());

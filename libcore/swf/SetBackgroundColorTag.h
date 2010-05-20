@@ -71,20 +71,13 @@ public:
 	/// Tag header is assumed to have been read already
 	///
 	/// Can throw ParserException on premature end of input stream
-	///
 	SetBackgroundColorTag(SWFStream& in)
-	{
+    {
 		read(in);
 	}
 
-	void execute(MovieClip* m, DisplayList& /*dlist*/) const
-	{
+	void executeState(MovieClip* m, DisplayList& /*dlist*/) const {
 		m->set_background_color(m_color);
-	}
-
-	void execute_state(MovieClip* m, DisplayList& dlist) const
-	{
-		execute(m, dlist);
 	}
 
 	/// Set background color tag loader (SWF::SETBACKGROUNDCOLOR)

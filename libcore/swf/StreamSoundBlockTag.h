@@ -68,14 +68,11 @@ public:
     boost::uint16_t getStreamId() const { return m_handler_id; }
 
 	/// Start the associated block of sound
-	void execute(MovieClip* m, DisplayList& dlist) const;
+	void executeActions(MovieClip* m, DisplayList& dlist) const;
 
 	/// Load an SWF::SOUNDSTREAMBLOCK (19) tag.
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& r);
-
-	/// Not a "state" (DisplayList?) tag, so doesn't need to provide
-    /// execute_state
 
 private:
 

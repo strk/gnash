@@ -42,18 +42,12 @@ class SymbolClassTag : public ControlTag
 {
 public:
 
-	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
+	virtual void executeActions(MovieClip* m, DisplayList& /* dlist */) const
 	{
 		VM& vm = getVM(*getObject(m));
         abc::Machine* mach = vm.getMachine();
 		log_debug("SymbolClassTag: Creating class %s.", _rootClass);
 		mach->instantiateClass(_rootClass, vm.getGlobal());
-	}
-
-	// Tell the caller that we are an action tag.
-	virtual bool is_action_tag() const
-	{
-	    return true;
 	}
 
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,

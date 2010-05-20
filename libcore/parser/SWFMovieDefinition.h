@@ -245,8 +245,7 @@ public:
     }
 
     // See docs in movie_definition.h
-    virtual void export_resource(const std::string& symbol,
-            ExportableResource* res);
+    virtual void exportResource(const std::string& symbol, int id);
 
     /// Get the named exported resource, if we expose it.
     //
@@ -445,6 +444,7 @@ private:
 
     typedef std::map<std::string, boost::intrusive_ptr<ExportableResource>,
             StringNoCaseLessThan > ExportMap;
+
     ExportMap _exportedResources;
 
     // Mutex protecting access to _exportedResources
