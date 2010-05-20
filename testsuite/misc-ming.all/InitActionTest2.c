@@ -12,7 +12,7 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc4, mc5, dejagnuclip;
+    SWFMovieClip mc4, mc5, mc6, dejagnuclip;
     SWFDisplayItem it;
     SWFInitAction ia;
 
@@ -98,14 +98,40 @@ main(int argc, char** argv)
     SWFMovie_addExport(mo, (SWFBlock)mc5, "export5");
     SWFMovie_writeExports(mo);
     
-    // Action is before InitAction, but this does not matter. As long as it's
-    // in the same frame it will work.
+    // Action is written before InitAction, but this does not matter. As
+    // long as it's in the same frame it will work.
     check(mo, "_global.val5 == 'mc5'");
     
     ia = newSWFInitAction_withId(
             newSWFAction("trace('mc5'); _global.val5 = 'mc5';"), 5);
     SWFMovie_add(mo, (SWFBlock)ia);
     check(mo, "_global.val5 == 'mc5'");
+
+    // Frame 8
+    SWFMovie_nextFrame(mo);
+
+    // Add new MovieClip and export.
+    mc6 = newSWFMovieClip();
+    SWFMovie_addExport(mo, (SWFBlock)mc6, "export6");
+    SWFMovie_writeExports(mo);
+
+    // Skip next frame
+    add_actions(mo, "gotoAndStop(10);");
+    
+    // Frame 9
+    SWFMovie_nextFrame(mo);
+
+    // This frame is skipped but contains init actions.
+    ia = newSWFInitAction_withId(
+            newSWFAction("trace('mc6'); _global.val6 = 'mc6';"), 6);
+    SWFMovie_add(mo, (SWFBlock)ia);
+    add_actions(mo, "fail('Actions in skipped frame executed!');");
+
+    // Frame 10
+    SWFMovie_nextFrame(mo);
+
+    // Check that the skipped InitActions are executed.
+    check(mo, "_global.val6 == 'mc6'");
 
     add_actions(mo, "stop();");
   
