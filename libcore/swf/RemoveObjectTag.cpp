@@ -47,7 +47,7 @@ RemoveObjectTag::read(SWFStream& in, TagType tag)
 }
 
 void
-RemoveObjectTag::execute(MovieClip* m, DisplayList& dlist) const
+RemoveObjectTag::execute_state(MovieClip* m, DisplayList& dlist) const
 {
     m->set_invalidated();
 	dlist.removeDisplayObject(m_depth);

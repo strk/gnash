@@ -62,11 +62,6 @@ public:
 	{
 	}
 
-	/// Return true if this is an action tag.
-    //
-    /// The default returns false.
-	virtual bool is_action_tag() const { return false; }
-
 };
 
 } // namespace SWF

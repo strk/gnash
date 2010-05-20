@@ -74,9 +74,6 @@ public:
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& r);
 
-	/// Not a "state" (DisplayList?) tag, so doesn't need to provide
-    /// execute_state
-
 private:
 
 	/// Create a ControlTag playing the given sample when executed.

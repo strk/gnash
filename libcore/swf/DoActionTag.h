@@ -44,18 +44,12 @@ public:
 	//
 	void read(SWFStream& in)
 	{
-            m_buf.read(in, in.get_tag_end_position());
+        m_buf.read(in, in.get_tag_end_position());
 	}
 
 	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
-	    	m->add_action_buffer(&m_buf);
-	}
-
-	// Tell the caller that we are an action tag.
-	virtual bool is_action_tag() const
-	{
-	    return true;
+        m->add_action_buffer(&m_buf);
 	}
 
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,

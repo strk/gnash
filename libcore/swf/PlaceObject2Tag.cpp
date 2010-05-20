@@ -456,25 +456,25 @@ PlaceObject2Tag::read(SWFStream& in, TagType tag)
 
 /// Place/move/whatever our object in the given movie.
 void
-PlaceObject2Tag::execute(MovieClip* m, DisplayList& dlist) const
+PlaceObject2Tag::execute_state(MovieClip* m, DisplayList& dlist) const
 {
-    switch ( getPlaceType() ) 
-    {
+    switch (getPlaceType()) {
+
       case PLACE:
           m->add_display_object(this, dlist);
-      break;
+          break;
 
       case MOVE:
           m->move_display_object(this, dlist);
-      break;
+          break;
 
       case REPLACE:
           m->replace_display_object(this, dlist);
-      break;
+          break;
 
       case REMOVE:
 		  m->remove_display_object(this, dlist);
-      break;
+          break;
     }
 }
 

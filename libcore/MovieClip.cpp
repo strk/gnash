@@ -87,11 +87,6 @@ namespace gnash {
 //
 //#define DEBUG_MOUSE_ENTITY_FINDING 1
 
-namespace {
-    inline void executeIfActionTag(const SWF::ControlTag& t, MovieClip* m,
-            DisplayList& dlist);
-}
-
 // Anonymous namespace for module-private definitions
 namespace {
 
@@ -429,8 +424,7 @@ MovieClip::execute_actions(MovieClip::ActionList& action_list)
     // and a final call to .clear(), as repeated calls to
     // .size() or .end() are no quicker (and probably slower)
     // than pop_front(), which is constant time.
-    while ( ! action_list.empty() )
-    {
+    while (!action_list.empty()) {
         const action_buffer* ab = action_list.front();
         action_list.pop_front(); 
 
@@ -545,7 +539,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
         PlayList::const_iterator it = playlist->begin();
         const PlayList::const_iterator e = playlist->end();
         for (; it != e; it++) {
-            executeIfActionTag(**it, this, _displayList);
+            (*it)->execute(this, _displayList);
         }
     }
     _callingFrameActions = false;
@@ -921,7 +915,7 @@ MovieClip::restoreDisplayList(size_t tgtFrame)
     set_invalidated();
 
     DisplayList tmplist;
-    for (size_t f = 0; f<tgtFrame; ++f)
+    for (size_t f = 0; f < tgtFrame; ++f)
     {
         _currentFrame = f;
         executeFrameTags(f, tmplist, SWF::ControlTag::TAG_DLIST);
@@ -946,10 +940,7 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
     assert(typeflags);
 
     const PlayList* playlist = _def->getPlaylist(frame);
-    if ( playlist )
-    {
-        PlayList::const_iterator it = playlist->begin();
-        PlayList::const_iterator e = playlist->end();
+    if (playlist) {
     
         IF_VERBOSE_ACTION(
             // Use 1-based frame numbers
@@ -958,28 +949,20 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
                 getTargetPath());
         );
 
-        if ((typeflags & SWF::ControlTag::TAG_DLIST) && 
-                (typeflags & SWF::ControlTag::TAG_ACTION) )
-        {
-            for( ; it != e; it++)
-            {
-                (*it)->execute(this, dlist);
-            }
-        }
-        else if ( typeflags & SWF::ControlTag::TAG_DLIST )
-        {
-            for( ; it != e; it++)
-            {
+        // Generally tags should be executed in the order they are found in.
+        for (PlayList::const_iterator it = playlist->begin(),
+                e = playlist->end(); it != e; ++it) {
+
+            if (typeflags & SWF::ControlTag::TAG_DLIST) {
                 (*it)->execute_state(this, dlist);
             }
-        }
-        else
-        {
-            assert(typeflags & SWF::ControlTag::TAG_ACTION);
-            for( ; it != e; it++) {
-                executeIfActionTag(**it, this, _displayList);
+
+            if (typeflags & SWF::ControlTag::TAG_ACTION) {
+                (*it)->execute(this, _displayList);
             }
+        
         }
+
     }
 
 }
@@ -2282,17 +2265,6 @@ MovieClip::setPlayState(PlayState s)
     if (s == _playState) return; // nothing to do
     if (s == PLAYSTATE_STOP) stopStreamSound();
     _playState = s;
-}
-
-namespace {
-
-/// 
-inline void
-executeIfActionTag(const SWF::ControlTag& t, MovieClip* m, DisplayList& dlist)
-{
-    if (t.is_action_tag()) t.execute(m, dlist);
-}
-
 }
 
 } // namespace gnash

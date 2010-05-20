@@ -61,17 +61,6 @@ public:
         m->execute_init_action_buffer(_buf, _cid);
     }
 
-    virtual void execute(MovieClip* m, DisplayList& /*dlist*/) const
-    {
-        m->execute_init_action_buffer(_buf, _cid);
-    }
-
-    // Tell the caller that we are an action tag.
-    virtual bool is_action_tag() const
-    {
-        return true;
-    }
-
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& /*r*/)
     {

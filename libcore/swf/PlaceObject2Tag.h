@@ -107,7 +107,7 @@ public:
     void read(SWFStream& in, TagType tag);
 
     /// Place/move/whatever our object in the given movie.
-    void execute(MovieClip* m, DisplayList& dlist) const;
+    void execute_state(MovieClip* m, DisplayList& dlist) const;
 
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& r);

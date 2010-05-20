@@ -48,12 +48,7 @@ public:
 
 	virtual ~DisplayListTag() {}
 
-	virtual void execute(MovieClip* m, DisplayList& dlist) const=0;
-
-	void execute_state(MovieClip* m, DisplayList& dlist) const
-	{
-		execute(m, dlist);
-	}
+	virtual void execute_state(MovieClip* m, DisplayList& dlist) const = 0;
 
 	/// Return the depth affected by this DisplayList tag
 	//

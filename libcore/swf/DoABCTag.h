@@ -63,12 +63,6 @@ public:
 		mach->execute();
 	}
 
-	// Tell the caller that we are an action tag.
-	virtual bool is_action_tag() const
-	{
-	    return true;
-	}
-
     void read(SWFStream* /*in*/)
     {
     }

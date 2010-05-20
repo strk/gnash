@@ -55,7 +55,7 @@ public:
 	void read(SWFStream& in, TagType tag);
 
 	/// Remove object at specified depth from MovieClip DisplayList.
-	void execute(MovieClip* m, DisplayList& dlist) const;
+	void execute_state(MovieClip* m, DisplayList& dlist) const;
 
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& r);
