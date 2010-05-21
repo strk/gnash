@@ -595,14 +595,6 @@ ExternalInterface_as::ExternalInterface_as(as_object* owner)
     GNASH_REPORT_FUNCTION;
 }
 
-ExternalInterface_as::ExternalInterface_as()
-    : ActiveRelay(*this),
-       _fd(-1),
-       _marshallExceptions(false)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
 ExternalInterface_as::~ExternalInterface_as()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -890,7 +882,17 @@ ExternalInterface_as::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
 ExternalInterface_as &
 ExternalInterface_as::Instance()
 {
-    static ExternalInterface_as ei;
+
+    // TODO: this is a temporary hack to allow ExternalInterface to work as an
+    // ActiveRelay without changing the way ActiveRelay works.
+    // ExternalInterface shouldn't use ActiveRelay, neither should it need
+    // any of these singletons or statics.
+    static as_object* o = 0;
+    if (!o) {
+        o = new as_object();
+        VM::get().addStatic(o);
+    }
+    static ExternalInterface_as ei(o);
     
     return ei;
 }
