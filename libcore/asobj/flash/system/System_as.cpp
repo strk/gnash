@@ -38,31 +38,29 @@ namespace gnash {
 // Forward declarations.
 namespace {
 
-inline std::string trueFalse(bool x) { return x ? "t" : "f"; }
+    inline std::string trueFalse(bool x) { return x ? "t" : "f"; }
 
-template<typename T> inline void convertValue(const std::string& in,
-                                              T& val);
+    template<typename T> inline void convertValue(const std::string& in,
+                                                  T& val);
 
-const std::string& systemLanguage(as_object& proto);
+    const std::string& systemLanguage(as_object& proto);
 
-as_value system_security_allowdomain(const fn_call& fn);
-as_value system_security_allowinsecuredomain(const fn_call& fn);
-as_value system_security_loadpolicyfile(const fn_call& fn);
-as_value system_setClipboard(const fn_call& fn);
-as_value system_showsettings(const fn_call& fn);
-as_value system_exactsettings(const fn_call& fn);
-as_value system_usecodepage(const fn_call& fn);
-void attachSystemSecurityInterface(as_object& o);
-void attachSystemCapabilitiesInterface(as_object& o);
-void attachSystemInterface(as_object& proto);
+    as_value system_security_allowdomain(const fn_call& fn);
+    as_value system_security_allowinsecuredomain(const fn_call& fn);
+    as_value system_security_loadpolicyfile(const fn_call& fn);
+    as_value system_setClipboard(const fn_call& fn);
+    as_value system_showsettings(const fn_call& fn);
+    as_value system_exactsettings(const fn_call& fn);
+    as_value system_usecodepage(const fn_call& fn);
+    void attachSystemSecurityInterface(as_object& o);
+    void attachSystemCapabilitiesInterface(as_object& o);
+    void attachSystemInterface(as_object& proto);
 
-// AS3 functions.
-as_value system_gc(const fn_call& fn);
-as_value system_pause(const fn_call& fn);
-as_value system_resume(const fn_call& fn);
+    // AS3 functions.
+    as_value system_gc(const fn_call& fn);
+    as_value system_pause(const fn_call& fn);
+    as_value system_resume(const fn_call& fn);
 
-// List of domains that can access/modify local data
-std::vector<std::string> _allowDataAccess;
 }
 
 void
@@ -90,34 +88,6 @@ registerSystemNative(as_object& where)
     // System.Product.launch 2201, 2
     // System.Product.download 2201, 3    
 }
-
-
-/// Get the current System.security allowDataAccess list of domains allowed to
-/// access/modify local data
-//
-/// @return a std::vector of strings containing urls that can access local data
-const std::vector<std::string>&
-getAllowDataAccess()
-{
-	return _allowDataAccess;
-}
-
-
-/// Adds a string containing url or ip info to the allowDataAccess list of
-/// domains that can access/modify local data
-//
-/// @param url a std::string containing the domain name
-bool
-addAllowDataAccess( const std::string& url )
-{
-	size_t s = _allowDataAccess.size();
-	_allowDataAccess.push_back( url );	
-
-	if( s+1 == _allowDataAccess.size()) return true;
-
-	return false;
-}
-
 
 namespace {
 
