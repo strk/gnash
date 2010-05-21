@@ -889,7 +889,7 @@ ExternalInterface_as::Instance()
     // any of these singletons or statics.
     static as_object* o = 0;
     if (!o) {
-        o = new as_object();
+        o = new as_object(*VM::get().getGlobal());
         VM::get().addStatic(o);
     }
     static ExternalInterface_as ei(o);

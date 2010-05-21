@@ -97,22 +97,17 @@ attachSystemSecurityInterface(as_object& o)
     VM& vm = getVM(o);
     o.init_member("allowDomain", vm.getNative(12, 0));
 
-    const int swf7Flags = PropFlags::dontDelete | PropFlags::dontEnum
-        | PropFlags::readOnly | PropFlags::onlySWF7Up;
-
     Global_as& gl = getGlobal(o);
     o.init_member("allowInsecureDomain",
-                  gl.createFunction(system_security_allowinsecuredomain),
-                  swf7Flags);
+                  gl.createFunction(system_security_allowinsecuredomain));
     o.init_member("loadPolicyFile",
-                  gl.createFunction(system_security_loadpolicyfile),
-                  swf7Flags);
+                  gl.createFunction(system_security_loadpolicyfile));
 }
 
 void
 attachSystemCapabilitiesInterface(as_object& o)
 {
-	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
     //
     // Filesystem, access, miscellaneous hardware information
@@ -326,21 +321,10 @@ attachSystemInterface(as_object& proto)
 as_value
 system_security_allowdomain(const fn_call& fn)
 {
-	// NOTE: This is the AS2 version of allowDomain, the AS3 version is located
-	// in Security_as.cpp
-    if (!fn.nargs) {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("System.security.allowDomain requires at least one "
-                "argument.");
-        );
+    LOG_ONCE(log_unimpl("System.security.allowDomain"));
+    if (fn.nargs < 1) {
         return as_value(false);
     }
-
-    LOG_ONCE(log_unimpl ("System.security.allowDomain currently stores "
-                "domains but does nothing else.")); 
-	for (unsigned int i = 0; i < fn.nargs; ++i) {
-		addAllowDataAccess(fn.arg(i).to_string());
-	}
     return as_value(true);
 }
 
