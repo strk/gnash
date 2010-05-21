@@ -66,12 +66,6 @@ check_equals ( typeof(systemObj), 'undefined' );
 check_equals (typeof(System.__proto__), 'object');
 check_equals (System.__proto__, Object.prototype)
 
-// test the System::security.allowDomain method
-check_equals ( typeof(System.security.allowDomain), 'function' );
-
-// test the System.security.loadPolicyFile method
-check_equals ( typeof(System.security.loadPolicyFile), 'function');
-
 // test the System.setClipboard method
 check_equals ( typeof(System.setClipboard), 'function');
 
@@ -79,6 +73,12 @@ check_equals ( typeof(System.setClipboard), 'function');
 check_equals ( typeof(System.showSettings), 'function');
 
 #if OUTPUT_VERSION >= 7
+
+// test the System::security.allowDomain method
+check_equals ( typeof(System.security.allowDomain), 'function' );
+
+// test the System.security.loadPolicyFile method
+check_equals ( typeof(System.security.loadPolicyFile), 'function');
 
 // test the System.security.allowInsecureDomain method
 // added in player 7
@@ -200,8 +200,8 @@ check_equals(ret, true);
  check_totals(93);
 #else
 # if OUTPUT_VERSION == 6
-   check_totals(92);
+   check_totals(90);
 # else
-   check_totals(59);
+   check_totals(57);
 # endif
 #endif
