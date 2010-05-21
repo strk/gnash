@@ -46,36 +46,36 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-as_value sound_new(const fn_call& fn);
-as_value sound_attachsound(const fn_call& fn);
-as_value sound_getbytesloaded(const fn_call& fn);
-as_value sound_setPosition(const fn_call& fn);
-as_value sound_areSoundsInaccessible(const fn_call& fn);
-as_value sound_duration(const fn_call& fn);
-as_value sound_position(const fn_call& fn);
-as_value sound_getbytestotal(const fn_call& fn);
-as_value sound_getpan(const fn_call& fn);
-as_value sound_setpan(const fn_call& fn);
-as_value sound_getDuration(const fn_call& fn);
-as_value sound_setDuration(const fn_call& fn);
-as_value sound_gettransform(const fn_call& fn);
-as_value sound_getPosition(const fn_call& fn);
-as_value sound_getvolume(const fn_call& fn);
-as_value sound_loadsound(const fn_call& fn);
-as_value sound_settransform(const fn_call& fn);
-as_value sound_setvolume(const fn_call& fn);
-as_value sound_start(const fn_call& fn);
-as_value sound_stop(const fn_call& fn);
-as_value checkPolicyFile_getset(const fn_call& fn);
-as_value sound_load(const fn_call& fn);
-as_value sound_play(const fn_call& fn);
-as_value sound_complete(const fn_call& fn);
-as_value sound_id3(const fn_call& fn);
-as_value sound_ioError(const fn_call& fn);
-as_value sound_open(const fn_call& fn);
-as_value sound_progress(const fn_call& fn);
-as_value sound_ctor(const fn_call& fn);
-void attachSoundInterface(as_object& o);
+    as_value sound_new(const fn_call& fn);
+    as_value sound_attachsound(const fn_call& fn);
+    as_value sound_getbytesloaded(const fn_call& fn);
+    as_value sound_setPosition(const fn_call& fn);
+    as_value sound_areSoundsInaccessible(const fn_call& fn);
+    as_value sound_duration(const fn_call& fn);
+    as_value sound_position(const fn_call& fn);
+    as_value sound_getbytestotal(const fn_call& fn);
+    as_value sound_getpan(const fn_call& fn);
+    as_value sound_setpan(const fn_call& fn);
+    as_value sound_getDuration(const fn_call& fn);
+    as_value sound_setDuration(const fn_call& fn);
+    as_value sound_gettransform(const fn_call& fn);
+    as_value sound_getPosition(const fn_call& fn);
+    as_value sound_getvolume(const fn_call& fn);
+    as_value sound_loadsound(const fn_call& fn);
+    as_value sound_settransform(const fn_call& fn);
+    as_value sound_setvolume(const fn_call& fn);
+    as_value sound_start(const fn_call& fn);
+    as_value sound_stop(const fn_call& fn);
+    as_value checkPolicyFile_getset(const fn_call& fn);
+    as_value sound_load(const fn_call& fn);
+    as_value sound_play(const fn_call& fn);
+    as_value sound_complete(const fn_call& fn);
+    as_value sound_id3(const fn_call& fn);
+    as_value sound_ioError(const fn_call& fn);
+    as_value sound_open(const fn_call& fn);
+    as_value sound_progress(const fn_call& fn);
+    as_value sound_ctor(const fn_call& fn);
+    void attachSoundInterface(as_object& o);
 }
 
 Sound_as::Sound_as(as_object* owner) 
