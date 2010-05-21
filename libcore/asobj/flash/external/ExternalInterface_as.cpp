@@ -1067,13 +1067,8 @@ ExternalInterface_as::parseXML(const std::string &xml)
             start = end;
             end = xml.find("</number>");
             std::string str = xml.substr(start, end-start);
-            if (str.find(".") != std::string::npos) {
-                double num = strtod(str.c_str(), NULL);
-                value.set_double(num);
-            } else {
-                int num = strtol(str.c_str(), NULL, 0);
-                value.set_double(num);
-            }
+            double num = strtod(str.c_str(), NULL);
+            value.set_double(num);
         } else if (tag == "<string>") {
             start = end;
             end = xml.find("</string>");
@@ -1081,7 +1076,8 @@ ExternalInterface_as::parseXML(const std::string &xml)
             value.set_string(str);
         }
     }
-    
+
+    log_debug("Argument is: %s", value.to_string());
     return value;
 }
 
