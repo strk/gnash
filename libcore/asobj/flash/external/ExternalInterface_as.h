@@ -41,7 +41,6 @@ namespace gnash {
 class ExternalInterface_as: public ActiveRelay
 {
 public:
-    ExternalInterface_as();
     ExternalInterface_as(as_object* owner);
     static ExternalInterface_as &Instance();
     virtual ~ExternalInterface_as();
