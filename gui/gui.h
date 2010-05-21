@@ -457,6 +457,9 @@ public:
     /// Add variables to set into instances of the top-level movie definition
     void addFlashVars(VariableMap& vars);
 
+    /// Add a variable used by ExternalInterface
+    void addScriptableVar(const std::string &name, const std::string &value);
+
     /// Set the definition of top-level movie
     void setMovieDefinition(movie_definition* md);
 
@@ -624,6 +627,7 @@ private:
 #endif // def GNASH_FPS_DEBUG
 
     VariableMap _flashVars;
+    VariableMap _scriptableVars;
 
     boost::intrusive_ptr<movie_definition> _movieDef;
     

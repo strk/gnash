@@ -122,7 +122,9 @@ main(int argc, char *argv[])
     movie_root stage(*md, clock, runResources);
 
     MovieClip::MovieVariables v;
-    Movie* m = stage.init(md, v);
+    // We pass 'v' twice, as the second one is for scriptable
+    // Variables, which isn't fully implemented yet.
+    Movie* m = stage.init(md, v, v);
 
     // run the tests
     test_isnan();

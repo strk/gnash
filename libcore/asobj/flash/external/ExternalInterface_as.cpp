@@ -19,13 +19,16 @@
 //
 
 #include <map>
+#include <vector>
 #include <sstream>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <boost/algorithm/string/erase.hpp>
 
 #include "StringPredicates.h"
 #include "Relay.h" // for inheritance
 #include "ExternalInterface_as.h"
 #include "as_object.h" // for inheritance
-#include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
@@ -39,39 +42,45 @@
 #include "Array_as.h"
 #include "namedStrings.h"
 #include "Global_as.h"
+#include "Globals.h"
 #include "PropertyList.h"
 #include "movie_root.h"
+#include "log.h"
+
+using namespace std;
 
 namespace gnash {
 
 namespace {
-    as_value externalinterface_addCallback(const fn_call& fn);
-    as_value externalinterface_call(const fn_call& fn);
-    as_value externalInterfaceConstructor(const fn_call& fn);
-    as_value externalinterface_available(const fn_call& fn);
-    as_value externalinterface_marshallExceptions(const fn_call& fn);
-    as_value externalinterface_objectID(const fn_call& fn);
+as_value externalinterface_addCallback(const fn_call& fn);
+as_value externalinterface_call(const fn_call& fn);
+as_value externalinterface_available(const fn_call& fn);
+as_value externalinterface_marshallExceptions(const fn_call& fn);
+as_value externalinterface_objectID(const fn_call& fn);
 
-    as_value externalinterface_uArgumentsToXML(const fn_call& fn);
-    as_value externalinterface_uArgumentsToAS(const fn_call& fn);
-    as_value externalinterface_uAddCallback(const fn_call& fn);
-    as_value externalinterface_uArrayToAS(const fn_call& fn);
-    as_value externalinterface_uArrayToJS(const fn_call& fn);
-    as_value externalinterface_uArrayToXML(const fn_call& fn);
-    as_value externalinterface_uCallIn(const fn_call& fn);
-    as_value externalinterface_uCallOut(const fn_call& fn);
-    as_value externalinterface_uEscapeXML(const fn_call& fn);
-    as_value externalinterface_uEvalJS(const fn_call& fn);
-    as_value externalinterface_uInitJS(const fn_call& fn);
-    as_value externalinterface_uJsQuoteString(const fn_call& fn);
-    as_value externalinterface_uObjectID(const fn_call& fn);
-    as_value externalinterface_uObjectToAS(const fn_call& fn);
-    as_value externalinterface_uObjectToJS(const fn_call& fn);
-    as_value externalinterface_uObjectToXML(const fn_call& fn);
-    as_value externalinterface_uToAS(const fn_call& fn);
-    as_value externalinterface_uToJS(const fn_call& fn);
-    as_value externalinterface_uToXML(const fn_call& fn);
-    as_value externalinterface_uUnescapeXML(const fn_call& fn);
+as_value externalinterface_uArgumentsToXML(const fn_call& fn);
+as_value externalinterface_uArgumentsToAS(const fn_call& fn);
+as_value externalinterface_uAddCallback(const fn_call& fn);
+as_value externalinterface_uArrayToAS(const fn_call& fn);
+as_value externalinterface_uArrayToJS(const fn_call& fn);
+as_value externalinterface_uArrayToXML(const fn_call& fn);
+as_value externalinterface_uCallIn(const fn_call& fn);
+as_value externalinterface_uCallOut(const fn_call& fn);
+as_value externalinterface_uEscapeXML(const fn_call& fn);
+as_value externalinterface_uEvalJS(const fn_call& fn);
+as_value externalinterface_uInitJS(const fn_call& fn);
+as_value externalinterface_uJsQuoteString(const fn_call& fn);
+as_value externalinterface_uObjectID(const fn_call& fn);
+as_value externalinterface_uObjectToAS(const fn_call& fn);
+as_value externalinterface_uObjectToJS(const fn_call& fn);
+as_value externalinterface_uObjectToXML(const fn_call& fn);
+as_value externalinterface_uToAS(const fn_call& fn);
+as_value externalinterface_uToJS(const fn_call& fn);
+as_value externalinterface_uToXML(const fn_call& fn);
+as_value externalinterface_uUnescapeXML(const fn_call& fn);
+as_value externalinterface_ctor(const fn_call& fn);
+
+void attachExternalInterfaceStaticInterface(as_object& o);
 }
 
 /// Class used to serialize properties of an object to a buffer
@@ -81,10 +90,9 @@ class PropsSerializer : public AbstractPropertyVisitor
 public:
     
     PropsSerializer(VM& vm)
-        :
-        _st(vm.getStringTable()),
-        _error(false)
-    {}
+        : _st(vm.getStringTable()),
+          _error(false)
+        { /* do nothing */}
     
     bool success() const { return !_error; }
 
@@ -119,56 +127,45 @@ private:
     std::stringstream   _xml;
 };
 
-// extern 
 void
 externalinterface_class_init(as_object& where, const ObjectURI& uri)
 {
-#if 1
-    where.init_destructive_property(uri, externalInterfaceConstructor, 0);
-#else
-    Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
-    as_object* cl = gl.createClass(&externalInterfaceConstructor, proto);
+//    GNASH_REPORT_FUNCTION;
 
-    attachTextFieldInterface(*proto);
-    attachTextFieldStaticMembers(*cl);
-             
-    where.init_member(uri, cl, as_object::DefaultFlags);
+    registerBuiltinClass(where, 0, 0,
+                         attachExternalInterfaceStaticInterface, uri);
 
-    // ASSetPropFlags is called on the TextField class.
-    as_object* null = 0;
-    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, cl, null, 131);
-#endif
+    // ExternalInterface_as* ei = new  ExternalInterface_as(&where);
 }
 
 namespace {
 
 void
-attachExternalInterfaceInterface(as_object& /*o*/)
-{
-}
-
-void
-attachExternalInterfaceStaticProperties(as_object& o)
-{
+attachExternalInterfaceStaticInterface(as_object& o)
+{    
+//    GNASH_REPORT_FUNCTION;
     
-//    const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
-    const int swf7Flags = as_object::DefaultFlags | PropFlags::onlySWF7Up;
-    const int swf8Flags = as_object::DefaultFlags | PropFlags::onlySWF8Up;
+    const int swf7Flags = PropFlags::dontDelete | PropFlags::dontEnum
+        | PropFlags::readOnly | PropFlags::onlySWF7Up;
+    const int swf8Flags = PropFlags::dontDelete | PropFlags::dontEnum
+        | PropFlags::readOnly | PropFlags::onlySWF8Up;
 
-    Global_as& gl = getGlobal(o);
-    
     // Initialize the properties
     o.init_readonly_property("available", &externalinterface_available, swf7Flags);
 
     o.init_property("marshallExceptions", externalinterface_marshallExceptions,
                     externalinterface_marshallExceptions, swf8Flags);
     o.init_readonly_property("objectID", &externalinterface_objectID, swf8Flags);
+
+    // Initialize the documented methods
+    Global_as& gl = getGlobal(o);    
+    o.init_member("addCallback",
+                  gl.createFunction(externalinterface_addCallback), swf7Flags);
     
-    // Initialize the methods, most of which are undocumented helper functions
-    o.init_member("addCallback", gl.createFunction(
-                externalinterface_addCallback), swf7Flags);
     o.init_member("call", gl.createFunction(externalinterface_call), swf7Flags);
+    
+    // Initialize the other methods, most of which are undocumented
+    // helper functions.
     o.init_member("_argumentsToXML",
                   gl.createFunction(externalinterface_uArgumentsToXML), swf8Flags);
     o.init_member("_argumentsToAS",
@@ -215,20 +212,30 @@ as_value
 externalinterface_addCallback(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
 
-    if (fn.nargs > 1) {
-        const as_value& methodName_as = fn.arg(0);
-        std::string methodName = methodName_as.to_string();
+    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
+
+    movie_root& mr = getRoot(fn);
+    // MovieClip *mc = mr.getLevel(1);
+    // string_table& st = getStringTable(fn);    
+
+    if (mr.getControlFD() > 0) {
+        ptr.setFD(mr.getControlFD());
+    }
+    
+    if (fn.nargs == 3) {
+        const as_value& name_as = fn.arg(0);
+        std::string name = name_as.to_string();
         boost::intrusive_ptr<as_object> asCallback;
         if (fn.arg(1).is_object()) {
             asCallback = (fn.arg(1).to_object(getGlobal(fn)));
         }
-        
-        ptr->addCallback(methodName, asCallback.get());
+        ptr.addCallback(name, asCallback.get());
+        ptr.addRootCallback(mr);
+        return as_value(true);  
     }
     
-    return as_value();    
+    return as_value(false);    
 }
 
 as_value
@@ -236,17 +243,20 @@ externalinterface_call(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
-    if (fn.nargs > 3) {
+//    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
+    
+    if (fn.nargs >= 2) {
         const as_value& methodName_as = fn.arg(0);
         std::string methodName = methodName_as.to_string();
-        boost::intrusive_ptr<as_object> asCallback;
-        if (fn.arg(1).is_object()) {
-            asCallback = (fn.arg(1).to_object(getGlobal(fn)));
-        }
+        // boost::intrusive_ptr<as_object> asCallback;
+        // if (fn.arg(1).is_object()) {
+        //     asCallback = (fn.arg(1).to_object(getGlobal(fn)));
+        // }
         
-        const std::vector<as_value>& args = fn.getArgs();
-        ptr->call(asCallback.get(), methodName, args, 2);
+//      const std::vector<as_value>& args = fn.getArgs();
+//      as_object *asCallback = ptr.getCallback(methodName);
+        log_debug("Calling External method \"%s\"", methodName);
+//      ptr.call(asCallback.get(), methodName, args, 2);
     }
     
     return as_value();
@@ -255,47 +265,48 @@ externalinterface_call(const fn_call& fn)
 as_value
 externalinterface_available(const fn_call& fn)
 {
+//    GNASH_REPORT_FUNCTION;
+    
     movie_root& m = getRoot(fn);
     bool mode = false;
     
     switch (m.getAllowScriptAccess()) {
-        case movie_root::SCRIPT_ACCESS_NEVER:
-            mode = false;
-            break;
-      
-        case movie_root::SCRIPT_ACCESS_SAME_DOMAIN:
+    case movie_root::SCRIPT_ACCESS_NEVER:
+        mode = false;
+        break;
+        
+    case movie_root::SCRIPT_ACCESS_SAME_DOMAIN:
         {
-         
+            
             const std::string& baseurl = m.getOriginalURL();
             const int MAXHOSTNAMELEN = 128;
             char hostname[MAXHOSTNAMELEN];
-          
+            
             if (gethostname(hostname, MAXHOSTNAMELEN) != 0) {
                 mode = false;
             }
-          
+            
             // The hostname is empty if running the standalone Gnash from
             // a terminal, so we can assume the default of sameDomain applies.
             URL localPath(hostname, baseurl);
             if (localPath.hostname().empty()) {
                 mode = true;
-            } 
-            else {
+            } else {
                 StringNoCaseEqual noCaseCompare;
-              
+                
                 if (!noCaseCompare(localPath.hostname(), hostname)) {
                     log_security(_("ExternalInterface path %s is outside "
-                                "the SWF domain %s. Cannot access this "
-                                "object."), localPath, hostname);
+                                   "the SWF domain %s. Cannot access this "
+                                   "object."), localPath, hostname);
                     mode = false;
                 }
             }
             break;
         }
-      
-        case movie_root::SCRIPT_ACCESS_ALWAYS:
-            mode = true;
-            break;
+        
+    case movie_root::SCRIPT_ACCESS_ALWAYS:
+        mode = true;
+        break;
     }
     
     return as_value(mode);
@@ -306,12 +317,13 @@ externalinterface_marshallExceptions(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    // No, don't pass exception up to the broswer
+    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
+
+    // No, don't pass exceptions up to the browser
     if (fn.nargs) {
-        // ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
-        // ptr->marshallExceptions(fn.arg(0).to_bool());
+        ptr.setMarshallExceptions(fn.arg(0).to_bool());
     } else {
-        return as_value(true);
+        return as_value(false);
     }
     
     return as_value(true);
@@ -320,41 +332,39 @@ externalinterface_marshallExceptions(const fn_call& fn)
 as_value
 externalinterface_objectID(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
-    const std::string &str = ptr->objectID();
-    if (str.empty()) {
+    movie_root& mr = getRoot(fn);
+    MovieClip *mc = mr.getLevel(0);
+    string_table& st = getStringTable(fn);
+    
+    as_value id;
+    getObject(mc)->get_member(st.find("id"), &id);
+
+    as_value name;
+    getObject(mc)->get_member(st.find("name"), &name);
+
+    if (id.is_undefined() && !name.is_undefined()) {
+//        log_debug("ObjectdID name is: %s", name.to_string());
+        return name;
+    } else if (!id.is_undefined() && name.is_undefined()) {
+//        log_debug("ObjectdID id is: %s", id.to_string());
+        return id;
+    } else if (id.is_undefined() && name.is_undefined()) {
+//        log_debug("no objectID defined!");
         return as_value();
     }
-
-    return as_value(str);
-}
-
-as_value
-externalinterface_ctor(const fn_call& fn)
-{
-    if (fn.nargs) {
-        std::stringstream ss;
-        fn.dump_args(ss);
-        LOG_ONCE(log_unimpl("ExternalInterface(%s): %s", ss.str(),
-                            _("arguments discarded")) );
-    }
     
-    return as_value(); 
+    return as_value();
 }
 
 as_value
-externalInterfaceConstructor(const fn_call& fn)
+externalinterface_ctor(const fn_call& /* fn */)
 {
-    log_debug("Loading flash.external.ExternalInterface class");
-    Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
-    as_object* cl = gl.createClass(&externalinterface_ctor, proto);
+    GNASH_REPORT_FUNCTION;
 
-    attachExternalInterfaceInterface(*proto);
-    attachExternalInterfaceStaticProperties(*cl);
-    return cl;
+    // there is nothing to construct, all methods are static
+    return as_value();
 }
 
 as_value
@@ -392,7 +402,8 @@ externalinterface_uArgumentsToAS(const fn_call& /*fn*/)
 as_value
 externalinterface_uAddCallback(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+    
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -576,35 +587,74 @@ externalinterface_uUnescapeXML(const fn_call& fn)
 
 // namespace gnash {
 
-ExternalInterface_as::ExternalInterface_as(as_object* /*owner*/)
-    :
-    _exceptions(false)
-
+ExternalInterface_as::ExternalInterface_as(as_object* owner)
+    :  ActiveRelay(owner),
+       _fd(-1),
+       _marshallExceptions(false)
 {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    GNASH_REPORT_FUNCTION;
+}
+
+ExternalInterface_as::ExternalInterface_as()
+    : ActiveRelay(*this),
+       _fd(-1),
+       _marshallExceptions(false)
+{
+    GNASH_REPORT_FUNCTION;
 }
 
 ExternalInterface_as::~ExternalInterface_as()
 {
+//    GNASH_REPORT_FUNCTION;
 //    LOG_ONCE( log_unimpl (__FUNCTION__) );
 }
 
+// The ActionScript 3.0 version of this method does not accept the
+// instance parameter. The method parameter is replaced by a closure
+// parameter, which can take a reference to a function, a class
+// method, or a method of a particular class instance. In addition, if
+// the calling code cannot access the closure reference for security
+// reasons, a SecurityError exception is thrown.
 bool
 ExternalInterface_as::addCallback(const std::string &name, as_object *method)
 {
-    // GNASH_REPORT_FUNCTION;
+    log_debug(__PRETTY_FUNCTION__);
+    
     _methods[name] = method;
+
+    return true;
+}
+
+bool
+ExternalInterface_as::addRootCallback(movie_root &mr)
+{
+    log_debug(__PRETTY_FUNCTION__);
+
+    //_root = &mr;
+    
+    if (_methods.size() == 1) {
+        // Register callback so we can send the data on the next advance.
+        mr.addAdvanceCallback(this);
+    }
     
     return true;
 }
 
 bool
-ExternalInterface_as::call(as_object */*asCallback*/, const std::string& /*name*/,
+ExternalInterface_as::call(as_object */*asCallback*/, const std::string& name,
                            const std::vector<as_value>& /*args*/, size_t /*firstArg*/)
 {
-    // GNASH_REPORT_FUNCTION;
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    GNASH_REPORT_FUNCTION;
 
+    // log_debug("Calling External method \"%s\"", name);
+
+    // as_object *method = getCallback(name);
+
+    
+    // call(asCallback, name, args, firstArg);
+
+    // startAdvanceTimer();
+    
     return false;
 }
 
@@ -835,6 +885,237 @@ ExternalInterface_as::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
     // GNASH_REPORT_FUNCTION;
 
     return as_value();
+}
+
+ExternalInterface_as &
+ExternalInterface_as::Instance()
+{
+    static ExternalInterface_as ei;
+    
+    return ei;
+}
+
+#if 0
+void
+ExternalInterface_as::setReachable() const
+{
+    log_debug(__PRETTY_FUNCTION__);
+
+    std::map<std::string, as_object *>::const_iterator it;
+    for (it=_methods.begin(); it != _methods.end(); ++it) {
+        it->second->setReachable();
+    }
+}
+
+bool
+ExternalInterface_as::advance()
+{
+    log_debug(__PRETTY_FUNCTION__);
+    
+    return false;
+}
+#endif
+
+as_object *
+ExternalInterface_as::getCallback(const std::string &name)
+{
+    log_debug(__PRETTY_FUNCTION__);
+    
+    std::map<std::string, as_object *>::const_iterator it;
+    it = _methods.find(name);
+    if (it != _methods.end()) {
+        log_debug("Found External Method \"%s\"", it->first);
+        return it->second;
+    }
+
+    return 0;
+}
+
+void
+ExternalInterface_as::update()
+{
+//    log_debug(__PRETTY_FUNCTION__);
+    
+    if (_fd > 0) {
+        fd_set fdset;
+        FD_ZERO(&fdset);
+        FD_SET(_fd, &fdset);
+        struct timeval tval;
+        tval.tv_sec  = 0;
+        tval.tv_usec = 100;
+        errno = 0;
+        int ret = ::select(_fd+1, &fdset, NULL, NULL, &tval);
+        if (ret == 0) {
+//            log_debug ("The pipe for fd #%d timed out waiting to read", _fd);
+            return;
+        } else if (ret == 1) {
+            log_debug ("The pipe for fd #%d is ready", _fd);
+        } else {
+            log_error("The pipe has this error: %s", strerror(errno));
+            return;
+        }
+
+        int bytes = 0;
+#ifndef _WIN32
+        ioctl(_fd, FIONREAD, &bytes);
+#else
+        ioctlSocket(_fd, FIONREAD, &bytes);
+#endif
+        log_debug("There are %d bytes in the network buffer", bytes);
+
+        char *buf = new char[bytes+1];
+        // Since we know how bytes are in the network buffer, allocate
+        // some memory to read the data.
+        // terminate incase we want to treat the data like a string.
+        buf[bytes+1] = 0;
+        ret = ::read(_fd, buf, bytes);
+        if (ret) {
+            processInvoke(buf);
+        }
+    }
+}
+
+// Parse the XML Invoke message, which looks like this:
+//
+// <invoke name="LoadMovie" returntype="xml">
+//      <arguments>
+//              <number>2</number>
+//              <string>bogus</string>
+//      </arguments>
+// </invoke>
+//
+void
+ExternalInterface_as::processInvoke(const std::string &xml)
+{
+    GNASH_REPORT_FUNCTION;
+
+    if (xml.empty()) {
+        return;
+    }
+    
+    std::vector<as_value> args;
+    string::size_type start = 0;
+    string::size_type end;
+    string tag;
+    string name;
+
+    // Look for the ending > in the first part of the data for the tag
+    end = xml.find(">");
+    if (end != std::string::npos) {
+        end++;                  // go past the > character
+        tag = xml.substr(start, end);
+        // Look for the easy ones first
+        if (tag.substr(0, 7) == "<invoke") {
+            // extract the name of the method to invoke
+            start = tag.find("name=") + 5;
+            end   = tag.find(" ", start);
+            name  = tag.substr(start, end-start);
+            // Ignore any quote characters around the string
+            boost::erase_first(name, "\"");
+            boost::erase_last(name, "\"");
+
+#if 0
+            // extract the return type of the method
+            start = tag.find("returntype=") + 11;
+            end   = tag.find(">", start);
+            invoke->type  = tag.substr(start, end-start);
+            // Ignore any quote characters around the string
+            boost::erase_first(invoke->type, "\"");
+            boost::erase_last(invoke->type, "\"");
+#endif
+            // extract the arguments to the method
+            start = xml.find("<arguments>");
+            end   = xml.find("</invoke");
+            tag   = xml.substr(start, end-start);
+            args = parseArguments(tag);
+        }
+    }
+
+    // call(as_object* callback, const std::string& name,
+    std::map<std::string, as_object *>::const_iterator it;
+    for (it=_methods.begin(); it != _methods.end(); it++) {
+        log_debug("Method name %s", it->first);
+        if (name == it->first) {
+            // call(it->second, args, 0);
+        }
+    }    
+}
+
+as_value
+ExternalInterface_as::parseXML(const std::string &xml)
+{
+    GNASH_REPORT_FUNCTION;
+
+    if (xml.empty()) {
+        return as_value();
+    }
+
+    std::string::size_type start = 0;
+    std::string::size_type end;
+    std::string tag;
+    as_value value;
+
+    // Look for the ending > in the first part of the data for the tag
+    end = xml.find(">");
+    if (end != std::string::npos) {
+        end++;                  // go past the > character
+        tag = xml.substr(start, end);
+        // Look for the easy ones first
+        if (tag == "<null/>") {
+            value.set_null();
+        } else if (tag == "<void/>") {
+            value.set_undefined();
+        } else if (tag == "<true/>") {
+            value.set_bool(true);
+        } else if (tag == "<false/>") {
+            value.set_bool(false);
+        } else if (tag == "<number>") {
+            start = end;
+            end = xml.find("</number>");
+            std::string str = xml.substr(start, end-start);
+            double num = strtod(str.c_str(), NULL);
+            value.set_double(num);
+        } else if (tag == "<string>") {
+            start = end;
+            end = xml.find("</string>");
+            std::string str = xml.substr(start, end-start);
+            value.set_string(str);
+        }
+    }
+
+    log_debug("Argument is: %s", value.to_string());
+    return value;
+}
+
+std::vector<as_value>
+ExternalInterface_as::parseArguments(const std::string &xml)
+{
+    GNASH_REPORT_FUNCTION;
+
+    std::vector<as_value> args;
+    std::string::size_type start = 0;
+    std::string::size_type end;
+
+    std::string name;
+    std::string data = xml;
+    std::string tag = "<arguments>";
+    start = data.find(tag);
+    if (start != std::string::npos) {
+        data.erase(0, tag.size());
+    }
+    while (!data.empty()) {
+        // Extract the data
+        start = data.find("<", 1); // start past the opening <
+        end = data.find(">", start) + 1;
+        std::string sub = data.substr(0, end);
+        if (data == "</arguments>") {
+            break;
+        }
+        args.push_back(parseXML(sub));
+        data.erase(0, end);
+    }
+
+    return args;
 }
 
 } // end of gnash namespace

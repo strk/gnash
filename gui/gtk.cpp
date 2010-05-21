@@ -231,10 +231,6 @@ GtkGui::init(int argc, char **argv[])
             log_debug("DRI extension found");
             dri = true;
         }
-        if (checkX11Extension("DRI2")) {
-            log_debug("DRI2 extension found");
-            dri = true;
-        }
         bool glx = false;
         // See if our X11 server supports the GLX extension, otherwise
         // there is no point in trying to use OpenGL.

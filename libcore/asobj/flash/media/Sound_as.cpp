@@ -46,36 +46,36 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-	as_value sound_new(const fn_call& fn);
-	as_value sound_attachsound(const fn_call& fn);
-	as_value sound_getbytesloaded(const fn_call& fn);
-	as_value sound_setPosition(const fn_call& fn);
-	as_value sound_areSoundsInaccessible(const fn_call& fn);
-	as_value sound_duration(const fn_call& fn);
-	as_value sound_position(const fn_call& fn);
-	as_value sound_getbytestotal(const fn_call& fn);
-	as_value sound_getpan(const fn_call& fn);
-	as_value sound_setpan(const fn_call& fn);
-	as_value sound_getDuration(const fn_call& fn);
-	as_value sound_setDuration(const fn_call& fn);
-	as_value sound_gettransform(const fn_call& fn);
-	as_value sound_getPosition(const fn_call& fn);
-	as_value sound_getvolume(const fn_call& fn);
-	as_value sound_loadsound(const fn_call& fn);
-	as_value sound_settransform(const fn_call& fn);
-	as_value sound_setvolume(const fn_call& fn);
-	as_value sound_start(const fn_call& fn);
-	as_value sound_stop(const fn_call& fn);
-	as_value checkPolicyFile_getset(const fn_call& fn);
-	as_value sound_load(const fn_call& fn);
-    as_value sound_play(const fn_call& fn);
-    as_value sound_complete(const fn_call& fn);
-    as_value sound_id3(const fn_call& fn);
-    as_value sound_ioError(const fn_call& fn);
-    as_value sound_open(const fn_call& fn);
-    as_value sound_progress(const fn_call& fn);
-    as_value sound_ctor(const fn_call& fn);
-    void attachSoundInterface(as_object& o);
+as_value sound_new(const fn_call& fn);
+as_value sound_attachsound(const fn_call& fn);
+as_value sound_getbytesloaded(const fn_call& fn);
+as_value sound_setPosition(const fn_call& fn);
+as_value sound_areSoundsInaccessible(const fn_call& fn);
+as_value sound_duration(const fn_call& fn);
+as_value sound_position(const fn_call& fn);
+as_value sound_getbytestotal(const fn_call& fn);
+as_value sound_getpan(const fn_call& fn);
+as_value sound_setpan(const fn_call& fn);
+as_value sound_getDuration(const fn_call& fn);
+as_value sound_setDuration(const fn_call& fn);
+as_value sound_gettransform(const fn_call& fn);
+as_value sound_getPosition(const fn_call& fn);
+as_value sound_getvolume(const fn_call& fn);
+as_value sound_loadsound(const fn_call& fn);
+as_value sound_settransform(const fn_call& fn);
+as_value sound_setvolume(const fn_call& fn);
+as_value sound_start(const fn_call& fn);
+as_value sound_stop(const fn_call& fn);
+as_value checkPolicyFile_getset(const fn_call& fn);
+as_value sound_load(const fn_call& fn);
+as_value sound_play(const fn_call& fn);
+as_value sound_complete(const fn_call& fn);
+as_value sound_id3(const fn_call& fn);
+as_value sound_ioError(const fn_call& fn);
+as_value sound_open(const fn_call& fn);
+as_value sound_progress(const fn_call& fn);
+as_value sound_ctor(const fn_call& fn);
+void attachSoundInterface(as_object& o);
 }
 
 Sound_as::Sound_as(as_object* owner) 
@@ -102,8 +102,7 @@ Sound_as::~Sound_as()
 {
     //GNASH_REPORT_FUNCTION;
 
-    if (_inputStream && _soundHandler)
-    {
+    if (_inputStream && _soundHandler) {
         _soundHandler->unplugInputStream(_inputStream);
         _inputStream=0;
     }
@@ -166,8 +165,7 @@ Sound_as::stopProbeTimer()
     log_debug("stopProbeTimer called");
 #endif
 
-    if ( _probeTimer )
-    {
+    if ( _probeTimer ) {
         getRoot(owner()).removeAdvanceCallback(this);
         log_debug(" sound callback removed");
         _probeTimer = 0;
@@ -184,15 +182,13 @@ Sound_as::update()
 void
 Sound_as::probeAudio()
 {
-    if ( isAttached() )
-    {
+    if ( isAttached() ) {
 #ifdef GNASH_DEBUG_SOUND_AS
         log_debug("Probing audio for end");
 #endif
 
         boost::mutex::scoped_lock lock(_soundCompletedMutex);
-        if (_soundCompleted)
-        {
+        if (_soundCompleted) {
             // when _soundCompleted is true we're
             // NOT attached !
             _mediaParser.reset(); // no use for this anymore...
@@ -203,9 +199,7 @@ Sound_as::probeAudio()
             // dispatch onSoundComplete 
             callMethod(&owner(), NSV::PROP_ON_SOUND_COMPLETE);
         }
-    }
-    else
-    {
+    } else {
 #ifdef GNASH_DEBUG_SOUND_AS
         log_debug("Probing audio for start");
 #endif
@@ -222,21 +216,15 @@ Sound_as::probeAudio()
             return;
         }
 
-        if ( ! _inputStream )
-        {
-            if ( parsingCompleted )
-            {
+        if ( ! _inputStream ) {
+            if ( parsingCompleted ) {
                 log_debug("No audio in Sound input.");
                 stopProbeTimer();
                 _mediaParser.reset(); // no use for this anymore...
-            }
-            else
-            {
+            } else {
                 // keep probing
             }
-        }
-        else
-        {
+        } else {
             // An audio decoder was constructed, good!
             assert(_audioDecoder.get());
         }
@@ -247,7 +235,9 @@ Sound_as::probeAudio()
 void
 Sound_as::markReachableResources() const
 {
-    if (_attachedCharacter) _attachedCharacter->setReachable();
+    if (_attachedCharacter) {
+        _attachedCharacter->setReachable();
+    }
 }
 #endif // GNASH_USE_GC
 
@@ -274,14 +264,20 @@ Sound_as::attachSound(int si, const std::string& name)
 long
 Sound_as::getBytesLoaded()
 {
-    if ( _mediaParser ) return _mediaParser->getBytesLoaded();
+    if ( _mediaParser ) {
+        return _mediaParser->getBytesLoaded();
+    }
+    
     return -1;
 }
 
 long
 Sound_as::getBytesTotal()
 {
-    if ( _mediaParser ) return _mediaParser->getBytesTotal();
+    if ( _mediaParser ) {
+        return _mediaParser->getBytesTotal();
+    }
+    
     return -1;
 }
 
@@ -304,8 +300,7 @@ Sound_as::getVolume(int& volume)
     //       have both an attached DisplayObject *and*
     //       some other sound...
     //
-    if ( _attachedCharacter )
-    {
+    if ( _attachedCharacter ) {
         //log_debug("Sound has an attached DisplayObject");
         DisplayObject* ch = _attachedCharacter->get();
         if (! ch) {
@@ -329,8 +324,11 @@ Sound_as::getVolume(int& volume)
     // the final output as a whole.
     // If soundId is -1 we're controlling as a whole
     //
-    if (soundId == -1) volume = _soundHandler->getFinalVolume(); 
-    else volume = _soundHandler->get_volume(soundId);
+    if (soundId == -1) {
+        volume = _soundHandler->getFinalVolume();
+    } else {
+        volume = _soundHandler->get_volume(soundId);
+    }
 
     return true;
 }
@@ -338,16 +336,14 @@ Sound_as::getVolume(int& volume)
 void
 Sound_as::loadSound(const std::string& file, bool streaming)
 {
-    if ( ! _mediaHandler || ! _soundHandler ) 
-    {
+    if ( ! _mediaHandler || ! _soundHandler ) {
         log_debug("No media or sound handlers, won't load any sound");
         return;
     }
 
     /// If we are already streaming stop doing so as we'll replace
     /// the media parser
-    if ( _inputStream )
-    {
+    if ( _inputStream ) {
         _soundHandler->unplugInputStream(_inputStream);
         _inputStream = 0;
     }
@@ -367,8 +363,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     const StreamProvider& streamProvider = rr.streamProvider();
     std::auto_ptr<IOChannel> inputStream(streamProvider.getStream(url,
                 rcfile.saveStreamingMedia()));
-    if ( ! inputStream.get() )
-    {
+    if ( ! inputStream.get() ) {
         log_error( _("Gnash could not open this url: %s"), url );
         return;
     }
@@ -377,8 +372,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     isStreaming = streaming;
 
     _mediaParser.reset(_mediaHandler->createMediaParser(inputStream).release());
-    if ( ! _mediaParser )
-    {
+    if ( ! _mediaParser ) {
         log_error(_("Unable to create parser for Sound at %s"), url);
         // not necessarely correct, the stream might have been found...
         return;
@@ -387,12 +381,9 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     // TODO: use global _soundbuftime
     _mediaParser->setBufferTime(60000); // one minute buffer... should be fine
 
-    if ( isStreaming )
-    {
+    if ( isStreaming ) {
         startProbeTimer();
-    }
-    else
-    {
+    } else {
         LOG_ONCE(log_unimpl("Non-streaming Sound.loadSound: will behave "
                     "as a streaming one"));
         // if not streaming, we'll probe on .start()
@@ -434,13 +425,11 @@ Sound_as::setVolume(int volume)
     //       have both an attached DisplayObject *and*
     //       some other sound...
     //
-    if ( _attachedCharacter )
-    {
+    if ( _attachedCharacter ) {
         DisplayObject* ch = _attachedCharacter->get();
-        if ( ! ch )
-        {
+        if ( ! ch ) {
             log_debug("Character attached to Sound was unloaded and "
-                    "couldn't rebind");
+                      "couldn't rebind");
             return;
         }
         ch->setVolume(volume);
@@ -450,8 +439,7 @@ Sound_as::setVolume(int volume)
     // If we're not attached to a DisplayObject we'll need to use
     // sound_handler for volume. If we have no sound handler, we
     // can't do much, so we'll just return
-    if (!_soundHandler)
-    {
+    if (!_soundHandler) {
         return;
     }
 
@@ -459,12 +447,9 @@ Sound_as::setVolume(int volume)
     // the final output as a whole.
     // If soundId is -1 we're controlling as a whole
     //
-    if ( soundId == -1 )
-    {
+    if ( soundId == -1 ) {
         _soundHandler->setFinalVolume(volume);
-    }
-    else
-    {
+    } else {
         _soundHandler->set_volume(soundId, volume);
     }
 }
@@ -472,30 +457,25 @@ Sound_as::setVolume(int volume)
 void
 Sound_as::start(double secOff, int loops)
 {
-    if ( ! _soundHandler )
-    {
+    if ( ! _soundHandler ) {
         log_error("No sound handler, nothing to start...");
         return;
     }
 
-    if (externalSound)
-    {
-        if ( ! _mediaParser )
-        {
+    if (externalSound) {
+        if ( ! _mediaParser ) {
             log_error("No MediaParser initialized, can't start an external sound");
             return;
         }
 
-        if (secOff > 0)
-        {
+        if (secOff > 0) {
             _startTime = secOff * 1000;
             boost::uint32_t seekms = boost::uint32_t(secOff * 1000);
             // TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
             _mediaParser->seek(seekms); // well, we try...
         }
 
-        if (isStreaming)
-        {
+        if (isStreaming) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Sound.start() has no effect on a streaming Sound"));
             );
@@ -503,8 +483,7 @@ Sound_as::start(double secOff, int loops)
         }
 
         // Save how many loops to do (not when streaming)
-        if (loops > 0)
-        {
+        if (loops > 0) {
             remainingLoops = loops;
         }
 
@@ -515,9 +494,7 @@ Sound_as::start(double secOff, int loops)
         //if ( ! _inputStream ) {
         //  _inputStream=_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
         //}
-    }
-    else
-    {
+    } else {
         unsigned int inPoint = 0;
 
         if ( secOff > 0 ) {
@@ -539,30 +516,22 @@ Sound_as::start(double secOff, int loops)
 void
 Sound_as::stop(int si)
 {
-    if ( ! _soundHandler )
-    {
+    if ( ! _soundHandler ) {
         log_error("No sound handler, nothing to stop...");
         return;
     }
 
     // stop the sound
-    if (si < 0)
-    {
-        if (externalSound)
-        {
-            if ( _inputStream )
-            {
+    if (si < 0) {
+        if (externalSound) {
+            if ( _inputStream ) {
                 _soundHandler->unplugInputStream(_inputStream);
                 _inputStream=0;
             }
-        }
-        else
-        {
+        } else {
             _soundHandler->stop_sound(soundId);
         }
-    }
-    else
-    {
+    } else {
         _soundHandler->stop_sound(si);
     }
 }
@@ -570,25 +539,21 @@ Sound_as::stop(int si)
 unsigned int
 Sound_as::getDuration()
 {
-    if ( ! _soundHandler )
-    {
+    if ( ! _soundHandler ) {
         log_error("No sound handler, can't check duration...");
         return 0;
     }
 
     // If this is a event sound get the info from the soundhandler
-    if (!externalSound)
-    {
+    if (!externalSound) {
         return _soundHandler->get_duration(soundId);
     }
 
     // If we have a media parser (we'd do for an externalSound)
     // try fetching duration from it
-    if ( _mediaParser )
-    {
+    if ( _mediaParser ) {
         media::AudioInfo* info = _mediaParser->getAudioInfo();
-        if ( info )
-        {
+        if ( info ) {
             return info->duration;
         }
     }
@@ -599,23 +564,19 @@ Sound_as::getDuration()
 unsigned int
 Sound_as::getPosition()
 {
-    if ( ! _soundHandler )
-    {
+    if ( ! _soundHandler ) {
         log_error("No sound handler, can't check position (we're likely not playing anyway)...");
         return 0;
     }
 
     // If this is a event sound get the info from the soundhandler
-    if (!externalSound)
-    {
+    if (!externalSound) {
         return _soundHandler->tell(soundId);
     }
 
-    if ( _mediaParser )
-    {
+    if ( _mediaParser ) {
         boost::uint64_t ts;
-        if ( _mediaParser->nextAudioFrameTimestamp(ts) )
-        {
+        if ( _mediaParser->nextAudioFrameTimestamp(ts) ) {
             return ts;
         }
     }
@@ -633,17 +594,13 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
 
     //GNASH_REPORT_FUNCTION;
 
-    while (len)
-    {
-        if ( ! _leftOverData )
-        {
+    while (len) {
+        if ( ! _leftOverData ) {
             bool parsingComplete = _mediaParser->parsingCompleted(); // check *before* calling nextAudioFrame
             std::auto_ptr<media::EncodedAudioFrame> frame = _mediaParser->nextAudioFrame();
-            if ( ! frame.get() )
-            {
+            if ( ! frame.get() ) {
                 // just wait some more if parsing isn't complete yet
-                if ( ! parsingComplete )
-                {
+                if ( ! parsingComplete ) {
                     //log_debug("Parsing not complete and no more audio frames in input, try again later");
                     break;
                 }
@@ -666,16 +623,14 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
 
             // if we've been asked to start at a specific time, skip
             // any frame with earlier timestamp
-            if ( frame->timestamp < _startTime )
-            {
+            if ( frame->timestamp < _startTime ) {
                 //log_debug("This audio frame timestamp (%d) < requested start time (%d)", frame->timestamp, _startTime);
                 continue;
             }
 
             _leftOverData.reset( _audioDecoder->decode(*frame, _leftOverSize) );
             _leftOverPtr = _leftOverData.get();
-            if ( ! _leftOverData )
-            {
+            if ( ! _leftOverData ) {
                 log_error("No samples decoded from input of %d bytes", frame->dataSize);
                 continue;
             }
@@ -695,8 +650,7 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
         _leftOverSize -= n;
         len -= n;
 
-        if (_leftOverSize == 0)
-        {
+        if (_leftOverSize == 0) {
             _leftOverData.reset();
             _leftOverPtr = 0;
         }
@@ -789,8 +743,7 @@ sound_new(const fn_call& fn)
 
 
         const as_value& arg0 = fn.arg(0);
-        if ( ! arg0.is_null() && ! arg0.is_undefined() )
-        {
+        if ( ! arg0.is_null() && ! arg0.is_undefined() ) {
             as_object* obj = arg0.to_object(getGlobal(fn));
             DisplayObject* ch = get<DisplayObject>(obj);
             IF_VERBOSE_ASCODING_ERRORS(
@@ -853,8 +806,7 @@ sound_stop(const fn_call& fn)
         boost::intrusive_ptr<ExportableResource> res = 
             def->get_exported_resource(name);
 
-        if (!res)
-        {
+        if (!res) {
             IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("import error: resource '%s' is not exported"),
                     name);
@@ -864,17 +816,14 @@ sound_stop(const fn_call& fn)
 
         sound_sample* ss = dynamic_cast<sound_sample*>(res.get());
 
-        if (ss != NULL)
-        {
+        if (ss != NULL) {
             si = ss->m_sound_handler_id;
-        }
-        else
-        {
+        } else {
             log_error(_("sound sample is NULL (doesn't cast to sound_sample)"));
             return as_value();
         }
-
     }
+    
     so->stop(si);
     return as_value();
 }
@@ -885,8 +834,7 @@ sound_attachsound(const fn_call& fn)
     IF_VERBOSE_ACTION (
     log_action(_("-- attach sound"));
     )
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("attach sound needs one argument"));
             );
@@ -910,8 +858,7 @@ sound_attachsound(const fn_call& fn)
     assert(def);
     boost::intrusive_ptr<ExportableResource> res = 
         def->get_exported_resource(name);
-    if (!res)
-    {
+    if (!res) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("import error: resource '%s' is not exported"),
                 name);
@@ -922,12 +869,9 @@ sound_attachsound(const fn_call& fn)
     int si = 0;
     sound_sample* ss = dynamic_cast<sound_sample*>(res.get());
 
-    if (ss)
-    {
+    if (ss) {
         si = ss->m_sound_handler_id;
-    }
-    else
-    {
+    } else {
         log_error(_("sound sample is NULL (doesn't cast to sound_sample)"));
         return as_value();
     }
@@ -1004,8 +948,7 @@ sound_getvolume(const fn_call& fn)
 
     Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
 
-    if ( fn.nargs )
-    {
+    if ( fn.nargs ) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror("Sound.getVolume(%s) : arguments ignored");
@@ -1022,8 +965,7 @@ sound_loadsound(const fn_call& fn)
 {
     Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Sound.loadSound() needs at least 1 argument"));
             );
@@ -1033,8 +975,7 @@ sound_loadsound(const fn_call& fn)
     std::string url = fn.arg(0).to_string();
 
     bool streaming = false;
-    if ( fn.nargs > 1 )
-    {
+    if ( fn.nargs > 1 ) {
         streaming = fn.arg(1).to_bool();
 
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1069,8 +1010,7 @@ sound_settransform(const fn_call& /*fn*/)
 as_value
 sound_setvolume(const fn_call& fn)
 {
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("set volume of sound needs one argument"));
         );
@@ -1196,6 +1136,6 @@ sound_ctor(const fn_call& fn)
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
 

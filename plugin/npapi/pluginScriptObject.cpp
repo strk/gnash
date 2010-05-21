@@ -714,10 +714,10 @@ GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 {
 //    log_debug(__PRETTY_FUNCTION__);
 
-//    log_debug("Writing data: %s", data);
+//    log_debug("Writing data to fd #%d:\n %s", fd, data);
 
     if (fd > 2) {
-        return ::write(fd, data.data(), data.size());
+        return ::write(fd, data.c_str(), data.size());
     }
     
     return 0;
@@ -797,7 +797,33 @@ bool
 GnashPluginScriptObject::createPipe()
 {
     log_debug(__PRETTY_FUNCTION__);
+#if 0    
+    int p2c_pipe[2];
+    int c2p_pipe[2];
+    int p2c_controlpipe[2];
 
+    int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_pipe);
+    if (ret == -1) {
+        gnash::log_error("ERROR: socketpair(p2c) failed: %s", strerror(errno));
+        return;
+    }
+    _streamfd = p2c_pipe[1];
+
+    ret = socketpair(AF_UNIX, SOCK_STREAM, 0, c2p_pipe);
+    if (ret == -1) {
+        gnash::log_error("ERROR: socketpair(c2p) failed: %s", strerror(errno));
+        return;
+    }
+
+    ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_controlpipe);
+    if (ret == -1) {
+        gnash::log_error("ERROR: socketpair(control) failed: %s", strerror(errno));
+        return;
+    }
+    _controlfd = p2c_controlpipe[1];
+#endif
+
+#if 0
     if ((_sockfds[READFD] == 0) && (_sockfds[WRITEFD] == 0)) {
         int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, _sockfds);
     
@@ -818,6 +844,7 @@ GnashPluginScriptObject::createPipe()
             return true;
         }
     }
+#endif
     
 #if 0
     std::stringstream ss;

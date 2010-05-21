@@ -67,5 +67,5 @@ flash_package_init(as_object& where, const ObjectURI& uri)
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

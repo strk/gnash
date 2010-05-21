@@ -81,7 +81,10 @@ main(int /*argc*/, char** /*argv*/)
 
     movie_root root(*md5, clock, runResources);
 
-    root.init(md5.get(), MovieClip::MovieVariables());
+    // We pass MovieClip::MovieVariables() twice, as the second one is
+    // for scriptable Variables, which isn't fully implemented yet.
+    root.init(md5.get(), MovieClip::MovieVariables(),
+	      MovieClip::MovieVariables());
 
     VM& vm = root.getVM();
 

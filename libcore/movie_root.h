@@ -188,7 +188,8 @@ public:
     /// SWF playback, so for normal playback this pointer should not be
     /// used.
     Movie* init(movie_definition* def,
-            const MovieClip::MovieVariables& variables);
+		const MovieClip::MovieVariables& variables,
+		const MovieClip::MovieVariables& scriptables);
 
     /// Return the movie at the given level (0 if unloaded level).
     //
@@ -581,7 +582,10 @@ public:
     /// of the three possible positions for each dimension.
     void setStageAlignment(short s);
 
+    /// Sets the flag to allow interfacing with JavaScript in the browser.
+    /// This is disabled by default, but enabled for ExternalInterface.
     void setAllowScriptAccess(AllowScriptAccessMode mode);
+    /// Gets the current Access Mode for ExternalInterface.
     AllowScriptAccessMode getAllowScriptAccess();
 
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
@@ -770,7 +774,6 @@ public:
     /// (for browser communication mostly)
     void setControlFD(int fd)
     {
-        assert(fd >= 0);
         _controlfd = fd;
     }
 
@@ -1210,5 +1213,5 @@ DSOEXPORT short stringToStageAlign(const std::string& s);
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

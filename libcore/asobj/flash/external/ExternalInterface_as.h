@@ -25,39 +25,38 @@
 #include <vector>
 #include <map>
 
+#include "Relay.h"
+
 namespace gnash {
 
 class as_object;
 class as_value;
 class ObjectURI;
 class Global_as;
+class movie_root;
 }
 
 namespace gnash {
 
-class ExternalInterface_as
+class ExternalInterface_as: public ActiveRelay
 {
 public:
+    ExternalInterface_as();
     ExternalInterface_as(as_object* owner);
-    ~ExternalInterface_as();
+    static ExternalInterface_as &Instance();
+    virtual ~ExternalInterface_as();
 
+    // This is a flag that specifies whether exceptions in ActionScript
+    // should be propogated to JavaScript in the browser.
+    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
+    bool getMarshallExceptions() { return _marshallExceptions; };
+    
     /// Add an ActionScript function as a callback by JavaScript
     // in the browser.
     bool addCallback(const std::string &name, as_object *method);
 
-    // This is a flag that specifies wether exceptions in ActionScript
-    // should be propogated to JavaScript in the browser.
-    void marshallExceptions(bool flag) { _exceptions = flag; };
-    bool marshallExceptions() { return _exceptions; };
-
-    /// Returns the id attribute of the object tag in Internet Explorer,
-    /// or the name attribute of the embed tag in Netscape. 
-    const std::string &objectID() { return _objectid; };
-    std::string objectID(as_object &obj);    
-    
-    /// Call a callback if it's registered already.
-    static bool call(as_object* asCallback, const std::string& methodName,
-              const std::vector<as_value>& args, size_t firstArg);
+    ///
+    bool addRootCallback(movie_root &mr);    
 
     // These appear to be undocumented helper functions of this class
     // that while propably designed to be used internally, get used
@@ -95,15 +94,36 @@ public:
 
     static std::string escapeXML(as_object &obj);
     static std::string unescapeXML(as_object &obj);
+
+    /// Call a callback if it's registered already.
+    bool call(as_object* callback, const std::string& name,
+              const std::vector<as_value>& args, size_t firstArg);
+    
+    // These are our implementations of ActiveRelay methods.
+    // virtual bool advance() = 0;
+    // virtual void setReachable() const = 0;
+    
+    virtual void update();
+
+    // Parse the XML Invoke message.
+    void processInvoke(const std::string &str);
+
+    void setFD(int x) { _fd = x; };
+
+    as_object *getCallback(const std::string &name);
+
+    as_value parseXML(const std::string &xml);
+    std::vector<as_value> parseArguments(const std::string &xml);
     
 private:
-    std::string _objectid;
-    bool        _exceptions;
+    int         _fd;
     std::map<std::string, as_object *> _methods;
+    bool		_marshallExceptions;
 };
 
 /// Initialize the global ExternalInterface class
-void externalinterface_class_init(as_object& where, const ObjectURI& uri);
+void externalinterface_class_init(gnash::as_object& where,
+                                  const gnash::ObjectURI& uri);
 
 } // end of gnash namespace
 

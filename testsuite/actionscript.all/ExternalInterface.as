@@ -36,6 +36,8 @@ if (flash.external.ExternalInterface == undefined) {
 
 EI = flash.external.ExternalInterface;
 
+#if OUTPUT_VERSION > 6
+
 // First make sure all the documented methods and properties exist
 if (EI.hasOwnProperty("call")) {
     pass("ExternalInterface::call() exists");
@@ -48,7 +50,9 @@ if (EI.hasOwnProperty("addCallback")) {
 } else {
     fail("ExternalInterface::addCallback() doesn't exist");
 }
+#endif
 
+#if OUTPUT_VERSION > 7
 if (EI.hasOwnProperty("available")) {
     pass("ExternalInterface::available() exists");
 } else {
@@ -68,20 +72,19 @@ function TestEIMethod () {
     note("TestEIMethod called!");
 }
 
-if (ExternalInterface.addCallback("TestEIMethod", null, TestEIMethod)) {
-    xpass("ExternalInterface::addCallback(\"TestEIMethod\")");
+if (EI.addCallback("TestEIMethod", null, TestEIMethod)) {
+    pass("ExternalInterface::addCallback(\"TestEIMethod\")");
 } else {
-    xfail("ExternalInterface::addCallback(\"TestEIMethod\")");
+    fail("ExternalInterface::addCallback(\"TestEIMethod\")");
 }
 
-if (ExternalInterface.call("TestEIMethod", null)) {
+if (EI.call("TestEIMethod", null)) {
     xpass("ExternalInterface::call(\"TestEIMethod\")");
 } else {
     xfail("ExternalInterface::call(\"TestEIMethod\")");
 }
 
 // The marshallExceptions and objectID are new
-#if OUTPUT_VERSION > 7
 if (EI.hasOwnProperty("marshallExceptions")) {
     pass("ExternalInterface::marshallExceptions() exists");
 } else {
@@ -92,10 +95,10 @@ if (EI.hasOwnProperty("marshallExceptions")) {
 EI.marshallExceptions = true;
 if (EI.marshallExceptions == true) {
     pass("ExternalInterface::marshallExceptions()");
-} else if (EI.objectID == true) {
-    xpass("ExternalInterface::objectID is correct");
+} else if (EI.objectID == undefined) {
+    pass("ExternalInterface::objectID is correct");
 } else {
-    xfail("ExternalInterface::objectID property isn't correct");
+    fail("ExternalInterface::objectID property isn't correct");
 }
 
 // Then make sure all the undocumented methods and properties exist
@@ -406,6 +409,7 @@ if (typeOf(val) == "object") {
 } else {
     xfail("ExternalInterface::_objectToAS(object)");
 }
+
 
 #endif  // version > 7
 
