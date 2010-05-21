@@ -67,7 +67,7 @@ public:
 //
 /// The function setReachable() is called on every GC run. It calls
 /// markReachableResources() and marks its owner. 
-class ActiveRelay : public Relay, boost::noncopyable
+class ActiveRelay : public Relay
 {
 public:
 
