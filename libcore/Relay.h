@@ -19,6 +19,8 @@
 #ifndef GNASH_RELAY_H
 #define GNASH_RELAY_H
 
+#include <boost/noncopyable.hpp>
+
 namespace gnash {
     class as_object;
 }
@@ -44,7 +46,7 @@ namespace gnash {
 //
 /// An as_object with a non-null _relay member is a native class, as this
 /// information cannot be accessed by normal ActionScript functions.
-class Relay
+class Relay : boost::noncopyable
 {
 public:
     virtual ~Relay() {};
@@ -69,7 +71,7 @@ class ActiveRelay : public Relay
 {
 public:
 
-    ActiveRelay(as_object* owner)
+    explicit ActiveRelay(as_object* owner)
         :
         _owner(owner)
     {}

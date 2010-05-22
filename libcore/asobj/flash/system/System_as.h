@@ -35,13 +35,6 @@ void system_class_init(as_object& where, const ObjectURI& uri);
 
 void registerSystemNative(as_object& where);
 
-
-/// Get the vector aof allowed domains to access
-const std::vector<std::string>& getAllowDataAccess();
-
-/// add a url string to the vector of allowed domains
-bool addAllowDataAccess( const std::string& url );
-
 } // gnash namespace
 
 // GNASH_ASOBJ3_SYSTEM_H
