@@ -72,8 +72,6 @@ function TestEIMethod () {
     note("TestEIMethod called!");
 }
 
-var foo=EI.addCallback("TestEIMethodXXX", null, TestEIMethod);
-
 if (EI.addCallback("TestEIMethod", null, TestEIMethod) == false) {
     pass("ExternalInterface::addCallback(\"TestEIMethod\")");
 } else {
