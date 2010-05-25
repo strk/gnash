@@ -48,7 +48,7 @@ public:
 };
 
 /// VA context abstraction
-class VaapiContext {
+class DSOEXPORT VaapiContext {
     typedef boost::shared_ptr<VaapiSurface> VaapiSurfaceSP;
     
     VADisplay                           _display;

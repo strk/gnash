@@ -30,7 +30,7 @@ class VaapiSurface;
 class VaapiImage;
 
 /// VA surface proxy used to release surface to context
-class VaapiSurfaceProxy {
+class DSOEXPORT VaapiSurfaceProxy {
     boost::shared_ptr<VaapiContext> _context;
     boost::shared_ptr<VaapiSurface> _surface;
 

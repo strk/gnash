@@ -207,7 +207,6 @@ attachSystemCapabilitiesInterface(as_object& o)
     // self-explanatory.
     const bool hasAudioEncoder = true;
     const bool hasEmbeddedVideo = true;
-    const bool hasIME = true;
     const bool hasMP3 = true;
     const bool hasScreenBroadcast = true;
     const bool hasScreenPlayback = true;
@@ -294,7 +293,6 @@ attachSystemCapabilitiesInterface(as_object& o)
     o.init_member("avHardwareDisable", avHardwareDisable, flags);
     o.init_member("hasAudioEncoder", hasAudioEncoder, flags);
     o.init_member("hasEmbeddedVideo", hasEmbeddedVideo, flags);
-    o.init_member("hasIME", hasIME, flags);
     o.init_member("hasMP3", hasMP3, flags);
     o.init_member("hasPrinting", hasPrinting, flags);
     o.init_member("hasScreenBroadcast", hasScreenBroadcast, flags);
