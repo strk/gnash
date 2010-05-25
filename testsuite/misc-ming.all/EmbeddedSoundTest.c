@@ -75,10 +75,10 @@ addSoundExport(SWFMovie mo)
             SWF_SOUND_16BITS |
             SWF_SOUND_STEREO);
 
-    SWFMovie_addExport(mo, (SWFSound)soundMP3a, "mono22_mp2");
-    SWFMovie_addExport(mo, (SWFSound)soundMP3b, "mono22_mp2b");
-    SWFMovie_addExport(mo, (SWFSound)soundMP3c, "stereo8_mp3");
-    SWFMovie_addExport(mo, (SWFSound)soundMP3d, "stereo8_mp3b");
+    SWFMovie_addExport(mo, (SWFBlock)soundMP3a, "mono22_mp2");
+    SWFMovie_addExport(mo, (SWFBlock)soundMP3b, "mono22_mp2b");
+    SWFMovie_addExport(mo, (SWFBlock)soundMP3c, "stereo8_mp3");
+    SWFMovie_addExport(mo, (SWFBlock)soundMP3d, "stereo8_mp3b");
 
     SWFMovie_writeExports(mo);
 }
