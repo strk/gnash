@@ -1,39 +1,21 @@
-/* -*- Mode: C; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* ***** BEGIN LICENSE BLOCK *****
- * Version: MPL 1.1/GPL 2.0/LGPL 2.1
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is mozilla.org code.
- *
- * The Initial Developer of the Original Code is
- * Netscape Communications Corporation.
- * Portions created by the Initial Developer are Copyright (C) 1998
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the MPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
- *
- * ***** END LICENSE BLOCK ***** */
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+//   Foundation, Inc
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #ifndef npfunctions_h_
 #define npfunctions_h_
@@ -122,99 +104,94 @@ typedef NPError      (*NPN_PopUpContextMenuPtr)(NPP instance, NPMenu* menu);
 typedef NPBool       (*NPN_ConvertPointPtr)(NPP instance, double sourceX, double sourceY, NPCoordinateSpace sourceSpace, double *destX, double *destY, NPCoordinateSpace destSpace);
 
 typedef struct _NPPluginFuncs {
-  uint16_t size;
-  uint16_t version;
-  NPP_NewProcPtr newp;
-  NPP_DestroyProcPtr destroy;
-  NPP_SetWindowProcPtr setwindow;
-  NPP_NewStreamProcPtr newstream;
-  NPP_DestroyStreamProcPtr destroystream;
-  NPP_StreamAsFileProcPtr asfile;
-  NPP_WriteReadyProcPtr writeready;
-  NPP_WriteProcPtr write;
-  NPP_PrintProcPtr print;
-  NPP_HandleEventProcPtr event;
-  NPP_URLNotifyProcPtr urlnotify;
-  void* javaClass;
-  NPP_GetValueProcPtr getvalue;
-  NPP_SetValueProcPtr setvalue;
+    uint16_t size;
+    uint16_t version;
+    NPP_NewProcPtr newp;
+    NPP_DestroyProcPtr destroy;
+    NPP_SetWindowProcPtr setwindow;
+    NPP_NewStreamProcPtr newstream;
+    NPP_DestroyStreamProcPtr destroystream;
+    NPP_StreamAsFileProcPtr asfile;
+    NPP_WriteReadyProcPtr writeready;
+    NPP_WriteProcPtr write;
+    NPP_PrintProcPtr print;
+    NPP_HandleEventProcPtr event;
+    NPP_URLNotifyProcPtr urlnotify;
+    void* javaClass;
+    NPP_GetValueProcPtr getvalue;
+    NPP_SetValueProcPtr setvalue;    
 } NPPluginFuncs;
 
 typedef struct _NPNetscapeFuncs {
-  uint16_t size;
-  uint16_t version;
-  NPN_GetURLProcPtr geturl;
-  NPN_PostURLProcPtr posturl;
-  NPN_RequestReadProcPtr requestread;
-  NPN_NewStreamProcPtr newstream;
-  NPN_WriteProcPtr write;
-  NPN_DestroyStreamProcPtr destroystream;
-  NPN_StatusProcPtr status;
-  NPN_UserAgentProcPtr uagent;
-  NPN_MemAllocProcPtr memalloc;
-  NPN_MemFreeProcPtr memfree;
-  NPN_MemFlushProcPtr memflush;
-  NPN_ReloadPluginsProcPtr reloadplugins;
-  NPN_GetJavaEnvProcPtr getJavaEnv;
-  NPN_GetJavaPeerProcPtr getJavaPeer;
-  NPN_GetURLNotifyProcPtr geturlnotify;
-  NPN_PostURLNotifyProcPtr posturlnotify;
-  NPN_GetValueProcPtr getvalue;
-  NPN_SetValueProcPtr setvalue;
-  NPN_InvalidateRectProcPtr invalidaterect;
-  NPN_InvalidateRegionProcPtr invalidateregion;
-  NPN_ForceRedrawProcPtr forceredraw;
-  NPN_GetStringIdentifierProcPtr getstringidentifier;
-  NPN_GetStringIdentifiersProcPtr getstringidentifiers;
-  NPN_GetIntIdentifierProcPtr getintidentifier;
-  NPN_IdentifierIsStringProcPtr identifierisstring;
-  NPN_UTF8FromIdentifierProcPtr utf8fromidentifier;
-  NPN_IntFromIdentifierProcPtr intfromidentifier;
-  NPN_CreateObjectProcPtr createobject;
-  NPN_RetainObjectProcPtr retainobject;
-  NPN_ReleaseObjectProcPtr releaseobject;
-  NPN_InvokeProcPtr invoke;
-  NPN_InvokeDefaultProcPtr invokeDefault;
-  NPN_EvaluateProcPtr evaluate;
-  NPN_GetPropertyProcPtr getproperty;
-  NPN_SetPropertyProcPtr setproperty;
-  NPN_RemovePropertyProcPtr removeproperty;
-  NPN_HasPropertyProcPtr hasproperty;
-  NPN_HasMethodProcPtr hasmethod;
-  NPN_ReleaseVariantValueProcPtr releasevariantvalue;
-  NPN_SetExceptionProcPtr setexception;
-  NPN_PushPopupsEnabledStateProcPtr pushpopupsenabledstate;
-  NPN_PopPopupsEnabledStateProcPtr poppopupsenabledstate;
-  NPN_EnumerateProcPtr enumerate;
-  NPN_PluginThreadAsyncCallProcPtr pluginthreadasynccall;
-  NPN_ConstructProcPtr construct;
-  NPN_GetValueForURLPtr getvalueforurl;
-  NPN_SetValueForURLPtr setvalueforurl;
-  NPN_GetAuthenticationInfoPtr getauthenticationinfo;
-  NPN_ScheduleTimerPtr scheduletimer;
-  NPN_UnscheduleTimerPtr unscheduletimer;
-  NPN_PopUpContextMenuPtr popupcontextmenu;
-  NPN_ConvertPointPtr convertpoint;
+    uint16_t size;
+    uint16_t version;
+    NPN_GetURLProcPtr geturl;
+    NPN_PostURLProcPtr posturl;
+    NPN_RequestReadProcPtr requestread;
+    NPN_NewStreamProcPtr newstream;
+    NPN_WriteProcPtr write;
+    NPN_DestroyStreamProcPtr destroystream;
+    NPN_StatusProcPtr status;
+    NPN_UserAgentProcPtr uagent;
+    NPN_MemAllocProcPtr memalloc;
+    NPN_MemFreeProcPtr memfree;
+    NPN_MemFlushProcPtr memflush;
+    NPN_ReloadPluginsProcPtr reloadplugins;
+    NPN_GetJavaEnvProcPtr getJavaEnv;
+    NPN_GetJavaPeerProcPtr getJavaPeer;
+    NPN_GetURLNotifyProcPtr geturlnotify;
+    NPN_PostURLNotifyProcPtr posturlnotify;
+    NPN_GetValueProcPtr getvalue;
+    NPN_SetValueProcPtr setvalue;
+    NPN_InvalidateRectProcPtr invalidaterect;
+    NPN_InvalidateRegionProcPtr invalidateregion;
+    NPN_ForceRedrawProcPtr forceredraw;
+    NPN_GetStringIdentifierProcPtr getstringidentifier;
+    NPN_GetStringIdentifiersProcPtr getstringidentifiers;
+    NPN_GetIntIdentifierProcPtr getintidentifier;
+    NPN_IdentifierIsStringProcPtr identifierisstring;
+    NPN_UTF8FromIdentifierProcPtr utf8fromidentifier;
+    NPN_IntFromIdentifierProcPtr intfromidentifier;
+    NPN_CreateObjectProcPtr createobject;
+    NPN_RetainObjectProcPtr retainobject;
+    NPN_ReleaseObjectProcPtr releaseobject;
+    NPN_InvokeProcPtr invoke;
+    NPN_InvokeDefaultProcPtr invokeDefault;
+    NPN_EvaluateProcPtr evaluate;
+    NPN_GetPropertyProcPtr getproperty;
+    NPN_SetPropertyProcPtr setproperty;
+    NPN_RemovePropertyProcPtr removeproperty;
+    NPN_HasPropertyProcPtr hasproperty;
+    NPN_HasMethodProcPtr hasmethod;
+    NPN_ReleaseVariantValueProcPtr releasevariantvalue;
+    NPN_SetExceptionProcPtr setexception;
+    NPN_PushPopupsEnabledStateProcPtr pushpopupsenabledstate;
+    NPN_PopPopupsEnabledStateProcPtr poppopupsenabledstate;
+    NPN_EnumerateProcPtr enumerate;
+    NPN_PluginThreadAsyncCallProcPtr pluginthreadasynccall;
+    NPN_ConstructProcPtr construct;
+    NPN_GetValueForURLPtr getvalueforurl;
+    NPN_SetValueForURLPtr setvalueforurl;
+    NPN_GetAuthenticationInfoPtr getauthenticationinfo;
 } NPNetscapeFuncs;
 
 #ifdef XP_MACOSX
-/*
- * Mac OS X version(s) of NP_GetMIMEDescription(const char *)
- * These can be called to retreive MIME information from the plugin dynamically
- *
- * Note: For compatibility with Quicktime, BPSupportedMIMEtypes is another way
- *       to get mime info from the plugin only on OSX and may not be supported 
- *       in furture version -- use NP_GetMIMEDescription instead
- */
+// Mac OS X version(s) of NP_GetMIMEDescription(const char *)
+// These can be called to retreive MIME information from the plugin dynamically
+//
+// Note: For compatibility with Quicktime, BPSupportedMIMEtypes is another way
+//       to get mime info from the plugin only on OSX and may not be supported 
+//       in furture version -- use NP_GetMIMEDescription instead
 enum
 {
- kBPSupportedMIMETypesStructVers_1    = 1
+    kBPSupportedMIMETypesStructVers_1    = 1
 };
+
 typedef struct _BPSupportedMIMETypes
 {
- SInt32    structVersion;      /* struct version */
- Handle    typeStrings;        /* STR# formated handle, allocated by plug-in */
- Handle    infoStrings;        /* STR# formated handle, allocated by plug-in */
+    SInt32    structVersion;      // struct version
+    Handle    typeStrings;        // STR# formated handle, allocated by plug-in
+    Handle    infoStrings;        // STR# formated handle, allocated by plug-in
 } BPSupportedMIMETypes;
 OSErr BP_GetSupportedMIMETypes(BPSupportedMIMETypes *mimeInfo, UInt32 flags);
 #define NP_GETMIMEDESCRIPTION_NAME "NP_GetMIMEDescription"
@@ -248,23 +225,23 @@ typedef OSErr (*BP_GetSupportedMIMETypesProcPtr)(BPSupportedMIMETypes*, UInt32);
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* plugin meta member functions */
+// plugin meta member functions
 #if defined(__OS2__)
-typedef struct _NPPluginData {   /* Alternate OS2 Plugin interface */
-  char *pMimeTypes;
-  char *pFileExtents;
-  char *pFileOpenTemplate;
-  char *pProductName;
-  char *pProductDescription;
-  unsigned long dwProductVersionMS;
-  unsigned long dwProductVersionLS;
-} NPPluginData;
-NPError OSCALL NP_GetPluginData(NPPluginData * pPluginData);
+    typedef struct _NPPluginData {   // Alternate OS2 Plugin interface
+        char *pMimeTypes;
+        char *pFileExtents;
+        char *pFileOpenTemplate;
+        char *pProductName;
+        char *pProductDescription;
+        unsigned long dwProductVersionMS;
+        unsigned long dwProductVersionLS;
+    } NPPluginData;
+    NPError OSCALL NP_GetPluginData(NPPluginData * pPluginData);
 #endif
-NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* pFuncs);
-NPError OSCALL NP_Initialize(NPNetscapeFuncs* bFuncs);
-NPError OSCALL NP_Shutdown();
-char*          NP_GetMIMEDescription();
+    NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* pFuncs);
+    NPError OSCALL NP_Initialize(NPNetscapeFuncs* bFuncs);
+    NPError OSCALL NP_Shutdown();
+    char*          NP_GetMIMEDescription();
 #ifdef __cplusplus
 }
 #endif
@@ -278,19 +255,24 @@ char*          NP_GetMIMEDescription();
 #ifdef __cplusplus
 extern "C" {
 #endif
-NP_EXPORT(char*)   NP_GetPluginVersion();
-NP_EXPORT(char*)   NP_GetMIMEDescription();
+    NP_EXPORT(char*)   NP_GetPluginVersion();
+    NP_EXPORT(char*)   NP_GetMIMEDescription();
 #ifdef XP_MACOSX
-NP_EXPORT(NPError) NP_Initialize(NPNetscapeFuncs* bFuncs);
-NP_EXPORT(NPError) NP_GetEntryPoints(NPPluginFuncs* pFuncs);
+    NP_EXPORT(NPError) NP_Initialize(NPNetscapeFuncs* bFuncs);
+    NP_EXPORT(NPError) NP_GetEntryPoints(NPPluginFuncs* pFuncs);
 #else
-NP_EXPORT(NPError) NP_Initialize(NPNetscapeFuncs* bFuncs, NPPluginFuncs* pFuncs);
+    NP_EXPORT(NPError) NP_Initialize(NPNetscapeFuncs* bFuncs, NPPluginFuncs* pFuncs);
 #endif
-NP_EXPORT(NPError) NP_Shutdown();
-NP_EXPORT(NPError) NP_GetValue(void *future, NPPVariable aVariable, void *aValue);
+    NP_EXPORT(NPError) NP_Shutdown();
+    NP_EXPORT(NPError) NP_GetValue(void *future, NPPVariable aVariable, void *aValue);
 #ifdef __cplusplus
 }
 #endif
 #endif
 
-#endif /* npfunctions_h_ */
+#endif // npfunctions_h_
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
