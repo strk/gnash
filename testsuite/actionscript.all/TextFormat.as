@@ -312,7 +312,7 @@ tf.tabStops = a;
 check_equals(a.toString(), "string");
 xcheck_equals(tf.tabStops.toString(), "6");
 
-tf2 = new TextFormat("Arial", 12);
+tf2 = new TextFormat("dejafont", 12);
 
 // getTextExtent has different behaviour for SWF6.
 #if OUTPUT_VERSION > 6
@@ -332,16 +332,22 @@ check(te.hasOwnProperty("textFieldHeight"));
 check(te.hasOwnProperty("width"));
 check(te.hasOwnProperty("height"));
 
-xcheck_equals(Math.round(te.textFieldHeight), 18);
-xcheck_equals(Math.round(te.textFieldWidth), 33);
+xcheck_equals(Math.round(te.textFieldWidth), 37);
 check_equals(Math.round(te.ascent), 11);
-check_equals(Math.round(te.descent), 3);
+
+#if OUTPUT_VERSION > 7
+ xcheck_equals(Math.round(te.textFieldHeight), 18); 
+ check_equals(Math.round(te.descent), 3); 
+#else
+ xcheck_equals(Math.round(te.textFieldHeight), 17); 
+ xcheck_equals(Math.round(te.descent), 2); 
+#endif
 
 te = tf2.getTextExtent("Hello", 10);
 #if OUTPUT_VERSION > 7
-xcheck_equals(Math.round(te.textFieldHeight), 60);
+ xcheck_equals(Math.round(te.textFieldHeight), 74);
 #else
-xcheck_equals(Math.round(te.textFieldHeight), 18);
+ xcheck_equals(Math.round(te.textFieldHeight), 17);
 #endif
 
 check_equals(te.textFieldWidth, 10);
@@ -349,25 +355,26 @@ check_equals(te.textFieldWidth, 10);
 #if OUTPUT_VERSION > 7
 check_equals(Math.round(te.width), 9);
 #else
-xcheck_equals(Math.round(te.width), 29);
+xcheck_equals(Math.round(te.width), 33);
 #endif
 
 
 te = tf2.getTextExtent("Hello", 5);
-#if OUTPUT_VERSION > 7
-xcheck_equals(Math.round(te.textFieldHeight), 74);
+#if OUTPUT_VERSION < 8
+ xcheck_equals(Math.round(te.textFieldHeight), 17);
+ xcheck_equals(Math.round(te.descent), 2); 
 #else
-xcheck_equals(Math.round(te.textFieldHeight), 18);
+ xcheck_equals(Math.round(te.textFieldHeight), 74);
+ check_equals(Math.round(te.descent), 3);
 #endif
 check_equals(te.textFieldWidth, 5);
 check_equals(Math.round(te.ascent), 11);
-check_equals(Math.round(te.descent), 3);
 
 #if OUTPUT_VERSION > 7
 // Width of largest character in version 8?
 check_equals(Math.round(te.width), 9);
 #else
-xcheck_equals(Math.round(te.width), 29);
+xcheck_equals(Math.round(te.width), 33);
 #endif
 
 
@@ -376,29 +383,49 @@ check_equals(te.textFieldWidth, 30);
 xcheck_equals(Math.round(te.width), 25);
 
 te = tf2.getTextExtent("o");
-xcheck_equals(Math.round(te.textFieldHeight), 18);
-check_equals(Math.round(te.textFieldWidth), 11);
+xcheck_equals(Math.round(te.textFieldWidth), 12);
 check_equals(Math.round(te.ascent), 11);
-check_equals(Math.round(te.descent), 3);
+#if OUTPUT_VERSION < 8
+ xcheck_equals(Math.round(te.textFieldHeight), 17); 
+ xcheck_equals(Math.round(te.descent), 2); 
+#else
+ xcheck_equals(Math.round(te.textFieldHeight), 18); 
+ check_equals(Math.round(te.descent), 3); 
+#endif
 
 te = tf2.getTextExtent("oo");
-xcheck_equals(Math.round(te.textFieldHeight), 18);
-xcheck_equals(Math.round(te.textFieldWidth), 18);
+xcheck_equals(Math.round(te.textFieldWidth), 20);
 check_equals(Math.round(te.ascent), 11);
-check_equals(Math.round(te.descent), 3);
+#if OUTPUT_VERSION < 8
+ xcheck_equals(Math.round(te.textFieldHeight), 17); 
+ xcheck_equals(Math.round(te.descent), 2); 
+#else
+ xcheck_equals(Math.round(te.textFieldHeight), 18); 
+ check_equals(Math.round(te.descent), 3); 
+#endif
 
 te = tf2.getTextExtent("ool");
-xcheck_equals(Math.round(te.textFieldHeight), 18);
-xcheck_equals(Math.round(te.textFieldWidth), 21);
+xcheck_equals(Math.round(te.textFieldWidth), 24);
 check_equals(Math.round(te.ascent), 11);
-check_equals(Math.round(te.descent), 3);
+#if OUTPUT_VERSION < 8
+ xcheck_equals(Math.round(te.textFieldHeight), 17); 
+ xcheck_equals(Math.round(te.descent), 2); 
+#else
+ xcheck_equals(Math.round(te.textFieldHeight), 18); 
+ check_equals(Math.round(te.descent), 3); 
+#endif
 
 tf2.size = 20;
 te = tf2.getTextExtent("ool");
-xcheck_equals(Math.round(te.textFieldHeight), 28);
-xcheck_equals(Math.round(te.textFieldWidth), 32);
-xcheck_equals(Math.round(te.ascent), 19);
-xcheck_equals(Math.round(te.descent), 5);
+xcheck_equals(Math.round(te.textFieldHeight), 27);
+xcheck_equals(Math.round(te.textFieldWidth), 36);
+#if OUTPUT_VERSION < 8
+ xcheck_equals(Math.round(te.ascent), 18); 
+ xcheck_equals(Math.round(te.descent), 4); 
+#else
+ check_equals(Math.round(te.ascent), 19); 
+ check_equals(Math.round(te.descent), 5);
+#endif
 
 #endif
 
