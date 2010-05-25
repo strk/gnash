@@ -262,11 +262,10 @@ if (xml == '<object></object>') {
 }
 
 xml = EI._objectToXML(o);
-
 if (xml == '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>') {
-    pass("ExternalInterface::_objectToXML(object)");
+    xpass("ExternalInterface::_objectToXML(object)");
 } else {
-    fail("ExternalInterface::_objectToXML(object)");
+    xfail("ExternalInterface::_objectToXML(object)");
 }
 
 xml = EI._objectToXML(undefined);
@@ -297,8 +296,7 @@ if (xml == '<array><property id="0"><number>12</number></property><property id="
     fail("ExternalInterface::_arrayToXML(array)");
 }
 
-xml = EI._argumentsToXML(a, 1, true);
-
+xml = EI._argumentsToXML(a, 0);
 if (xml == '<arguments><number>34</number><string>tr</string><number>1</number><number>2</number><number>3</number><number>4</number></arguments>') {
     pass("ExternalInterface::_argumentsToXML()");
 } else {
@@ -354,9 +352,9 @@ rin = "&amp; ß+ü &nbsp; &lt; &lt;&lt; &lt;&gt;&apos;&apos;&quot;";
 rout = "& ß+ü .. < << <>''\"";
 ret  = EI._unescapeXML(rin);
 if (ret == "& ß+ü &nbsp; < << <>''\"") {
-    pass("ExternalInterface::_unescapeXML()");
+    xpass("ExternalInterface::_unescapeXML()");
 } else {
-    fail("ExternalInterface::_unescapeXML()");
+    xfail("ExternalInterface::_unescapeXML()");
 }
 
 val = EI._toAS("<number>34.56</number>");
@@ -395,7 +393,6 @@ if (val == false) {
 }
 
 val = EI._objectToAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
-trace(val);
 if (typeOf(val) == "object") {
     xpass("ExternalInterface::_objectToAS(object)");
 } else {
