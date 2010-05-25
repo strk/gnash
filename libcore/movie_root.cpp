@@ -112,6 +112,7 @@ movie_root::movie_root(const movie_definition& def,
     _vm(VM::init(def.get_version(), *this, clock)),
     _interfaceHandler(0),
     _fsCommandHandler(0),
+    _externalHandler(0),
     m_viewport_x0(0),
     m_viewport_y0(0),
     m_viewport_width(1),
@@ -1574,6 +1575,10 @@ movie_root::executeAdvanceCallbacks()
                 std::mem_fun_ref(&movie_root::LoadCallback::processLoad));
     }
 
+    if (!_externalHandler) {
+        handleExternal();
+    }
+    
     processActionQueue();
 }
 
@@ -2116,6 +2121,13 @@ movie_root::handleFsCommand(const std::string& cmd, const std::string& arg)
     const
 {
     if (_fsCommandHandler) _fsCommandHandler->notify(cmd, arg);
+}
+
+void
+movie_root::handleExternal()
+    const
+{
+    if (_externalHandler) _externalHandler->notify();
 }
 
 void
