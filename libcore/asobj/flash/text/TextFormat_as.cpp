@@ -592,24 +592,27 @@ textformat_getTextExtent(const fn_call& fn)
         fontlib::get_font(*relay->font(), bold, italic) :
         fontlib::get_default_font().get();
     
+    // Whether to use embedded fonts if required.
+    const bool em = false;
+
     /// Advance, descent, ascent given according to square of 1024.
     //
     /// An ascent of 1024 is equal to the whole size of the character, so
     /// 240 twips for a size 12.
-    const double scale = size / static_cast<double>(f->unitsPerEM(false));
+    const double scale = size / static_cast<double>(f->unitsPerEM(em));
 
     double height = size;
     double width = 0;
     double curr = 0;
     
-    const double ascent = f->ascent(false) * scale;
-    const double descent = f->descent(false) * scale;
+    const double ascent = f->ascent(em) * scale;
+    const double descent = f->descent(em) * scale;
 
     for (std::string::const_iterator it = s.begin(), e = s.end();
             it != e; ++it) {
 
-        int index = f->get_glyph_index(*it, false);
-        const double advance = f->get_advance(index, false) * scale;
+        int index = f->get_glyph_index(*it, em);
+        const double advance = f->get_advance(index, em) * scale;
         if (limitWidth && (curr + advance > width)) {
             curr = 0;
             height += size;
