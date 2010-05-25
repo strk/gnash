@@ -25,8 +25,6 @@
 #include <vector>
 #include <map>
 
-#include "Relay.h"
-
 namespace gnash {
 
 class as_object;
@@ -38,12 +36,11 @@ class movie_root;
 
 namespace gnash {
 
-class ExternalInterface_as: public ActiveRelay
+class ExternalInterface_as
 {
 public:
     ExternalInterface_as(as_object* owner);
-    static ExternalInterface_as &Instance();
-    virtual ~ExternalInterface_as();
+    ~ExternalInterface_as();
 
     // This is a flag that specifies whether exceptions in ActionScript
     // should be propogated to JavaScript in the browser.
@@ -115,7 +112,7 @@ public:
     std::vector<as_value> parseArguments(const std::string &xml);
     
 private:
-    int         _fd;
+    int                 _fd;
     std::map<std::string, as_object *> _methods;
     bool		_marshallExceptions;
 };

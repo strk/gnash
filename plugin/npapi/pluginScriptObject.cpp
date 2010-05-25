@@ -653,35 +653,39 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
 
     log_debug("Trying to get a value for %s.", name);
     
-    size_t ret = writePlayer(controlfd, str);
-    if (ret != str.size()) {
+    NPVariant value;
+    NULL_TO_NPVARIANT(value);
+    
+    if (name == "$version") {
         // If all the browser wants is the version, we don't need to
         // ask the standalone player for this value. YouTube at
         // least depends on this for some pages which want this to
         // be greater than 8.0.0. This appears to potentially be
         // Google's way of trying to revent downloaders, as this requires
         // plugin support.
-        NPVariant value;
-        if (name == "$version") {
-            STRINGN_TO_NPVARIANT("LNX 10,0,r999", 13, value);
-        } else {
+        STRINGN_TO_NPVARIANT("LNX 10,0,r999", 13, value);
+        return value;
+    } else {
+        size_t ret = writePlayer(controlfd, str);
+        if (ret != str.size()) {
             log_error("Couldn't send GetVariable request, network problems.");
             NULL_TO_NPVARIANT(value);
+            return value;
         }
-        return value;
+
+        // Have the read function allocate the memory
+        std::string data = readPlayer(controlfd);
+        if (data.empty()) {
+            return GnashNPVariant();
+        }
+        
+        GnashNPVariant parsed = ei.parseXML(data);
+        
+        printNPVariant(&parsed.get());
+        
+        return parsed;
     }
-
-    // Have the read function allocate the memory
-    std::string data = readPlayer(controlfd);
-    if (data.empty()) {
-        return GnashNPVariant();
-    }
-
-    GnashNPVariant parsed = ei.parseXML(data);
-
-    printNPVariant(&parsed.get());
-    
-    return parsed;
+    return value;
 }
 
 void
