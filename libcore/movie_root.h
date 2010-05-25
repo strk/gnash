@@ -585,6 +585,7 @@ public:
     /// Sets the flag to allow interfacing with JavaScript in the browser.
     /// This is disabled by default, but enabled for ExternalInterface.
     void setAllowScriptAccess(AllowScriptAccessMode mode);
+    
     /// Gets the current Access Mode for ExternalInterface.
     AllowScriptAccessMode getAllowScriptAccess();
 
@@ -815,6 +816,20 @@ public:
     DSOEXPORT void handleFsCommand(const std::string& cmd,
             const std::string& arg) const;
 
+    class AbstractExternalCallback {
+    public:
+        virtual void notify()=0;
+        virtual ~AbstractExternalCallback() {}
+    };
+
+    DSOEXPORT void registerExternalCallback(AbstractExternalCallback* handler)
+    {
+        _externalHandler = handler;
+    }
+
+    /// Call this to notify ExternalInterface commands
+    DSOEXPORT void handleExternal() const;
+    
     /// Abstract base class for hosting app handler
     class AbstractIfaceCallback
     {
@@ -954,6 +969,9 @@ private:
 
     /// Registered FsCommand handler, if any
     AbstractFsCallback* _fsCommandHandler;
+
+    /// Registered ExternalInterface handler, if any
+    AbstractExternalCallback *_externalHandler;
 
     /// Listeners container
     typedef std::list<DisplayObject*> Listeners;
@@ -1112,7 +1130,7 @@ private:
     ObjectCallbacks _objectCallbacks;
 
     LoadCallbacks _loadCallbacks;
-
+    
     typedef std::map<int, Timer*> TimerMap;
 
     TimerMap _intervalTimers;
