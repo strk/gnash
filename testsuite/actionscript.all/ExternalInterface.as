@@ -399,7 +399,6 @@ if (typeOf(val) == "object") {
     xfail("ExternalInterface::_objectToAS(object)");
 }
 
-
 #endif  // version > 7
 
 totals();

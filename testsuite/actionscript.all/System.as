@@ -58,7 +58,6 @@ check(System.capabilities.hasOwnProperty("windowlessDisable"));
 check(System.hasOwnProperty("exactSettings"));
 #endif
 
-
 // _global.System is NOT a class, just an object 
 var systemObj = new System;
 check_equals ( typeof(systemObj), 'undefined' );
