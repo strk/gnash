@@ -52,6 +52,8 @@ using namespace std;
 namespace gnash {
 
 namespace {
+as_value externalInterfaceConstructor(const fn_call& fn);
+
 as_value externalinterface_addCallback(const fn_call& fn);
 as_value externalinterface_call(const fn_call& fn);
 as_value externalinterface_available(const fn_call& fn);
@@ -82,6 +84,16 @@ as_value externalinterface_ctor(const fn_call& fn);
 
 void attachExternalInterfaceStaticInterface(as_object& o);
 }
+
+class ExternalExecutor: public movie_root::AbstractExternalCallback {
+public:
+	void notify()
+	{
+	    log_debug(_("external_callback()"));
+	}
+};
+
+ExternalExecutor externalUpdate;
 
 /// Class used to serialize properties of an object to a buffer
 class PropsSerializer : public AbstractPropertyVisitor
@@ -132,10 +144,9 @@ externalinterface_class_init(as_object& where, const ObjectURI& uri)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    registerBuiltinClass(where, 0, 0,
-                         attachExternalInterfaceStaticInterface, uri);
+    where.init_destructive_property(uri, externalInterfaceConstructor, 0);
 
-    // ExternalInterface_as* ei = new  ExternalInterface_as(&where);
+//    registerBuiltinClass(where, attachExternalInterfaceStaticInterface, uri);
 }
 
 namespace {
@@ -143,7 +154,7 @@ namespace {
 void
 attachExternalInterfaceStaticInterface(as_object& o)
 {    
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     const int swf7Flags = PropFlags::dontDelete | PropFlags::dontEnum
         | PropFlags::readOnly | PropFlags::onlySWF7Up;
@@ -213,14 +224,14 @@ externalinterface_addCallback(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
+    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
 
     movie_root& mr = getRoot(fn);
     // MovieClip *mc = mr.getLevel(1);
     // string_table& st = getStringTable(fn);    
 
     if (mr.getControlFD() > 0) {
-        ptr.setFD(mr.getControlFD());
+        ptr->setFD(mr.getControlFD());
     }
     
     if (fn.nargs == 3) {
@@ -229,10 +240,10 @@ externalinterface_addCallback(const fn_call& fn)
         boost::intrusive_ptr<as_object> asCallback;
         if (fn.arg(1).is_object()) {
             asCallback = (fn.arg(1).to_object(getGlobal(fn)));
+            ptr->addCallback(name, asCallback.get());
+            ptr->addRootCallback(mr);
+            return as_value(true);  
         }
-        ptr.addCallback(name, asCallback.get());
-        ptr.addRootCallback(mr);
-        return as_value(true);  
     }
     
     return as_value(false);    
@@ -243,7 +254,7 @@ externalinterface_call(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-//    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
+    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
     
     if (fn.nargs >= 2) {
         const as_value& methodName_as = fn.arg(0);
@@ -317,11 +328,11 @@ externalinterface_marshallExceptions(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    ExternalInterface_as &ptr = ExternalInterface_as::Instance();
+    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
 
     // No, don't pass exceptions up to the browser
     if (fn.nargs) {
-        ptr.setMarshallExceptions(fn.arg(0).to_bool());
+        ptr->setMarshallExceptions(fn.arg(0).to_bool());
     } else {
         return as_value(false);
     }
@@ -359,12 +370,29 @@ externalinterface_objectID(const fn_call& fn)
 }
 
 as_value
-externalinterface_ctor(const fn_call& /* fn */)
+externalinterface_ctor(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    if (fn.nargs) {
+        std::stringstream ss;
+        fn.dump_args(ss);
+        LOG_ONCE(log_unimpl("ExternalInterface(%s): %s", ss.str(),
+                            _("arguments discarded")) );
+    }
+    
+    return as_value(); 
+}
 
-    // there is nothing to construct, all methods are static
-    return as_value();
+as_value
+externalInterfaceConstructor(const fn_call& fn)
+{
+    log_debug("Loading flash.external.ExternalInterface class");
+    Global_as& gl = getGlobal(fn);
+    as_object* proto = gl.createObject();
+    as_object* cl = gl.createClass(&externalinterface_ctor, proto);
+
+//    attachExternalInterfaceInterface(*proto);
+    attachExternalInterfaceStaticInterface(*cl);
+    return cl;
 }
 
 as_value
@@ -587,9 +615,8 @@ externalinterface_uUnescapeXML(const fn_call& fn)
 
 // namespace gnash {
 
-ExternalInterface_as::ExternalInterface_as(as_object* owner)
-    :  ActiveRelay(owner),
-       _fd(-1),
+ExternalInterface_as::ExternalInterface_as(as_object* /*owner*/)
+    :  _fd(-1),
        _marshallExceptions(false)
 {
     GNASH_REPORT_FUNCTION;
@@ -611,8 +638,10 @@ bool
 ExternalInterface_as::addCallback(const std::string &name, as_object *method)
 {
     log_debug(__PRETTY_FUNCTION__);
-    
-    _methods[name] = method;
+
+    if (method) {
+        _methods[name] = method;
+    }
 
     return true;
 }
@@ -626,7 +655,7 @@ ExternalInterface_as::addRootCallback(movie_root &mr)
     
     if (_methods.size() == 1) {
         // Register callback so we can send the data on the next advance.
-        mr.addAdvanceCallback(this);
+        mr.registerExternalCallback(&externalUpdate);
     }
     
     return true;
@@ -879,10 +908,10 @@ ExternalInterface_as::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
     return as_value();
 }
 
+#if 0
 ExternalInterface_as &
 ExternalInterface_as::Instance()
 {
-
     // TODO: this is a temporary hack to allow ExternalInterface to work as an
     // ActiveRelay without changing the way ActiveRelay works.
     // ExternalInterface shouldn't use ActiveRelay, neither should it need
@@ -896,6 +925,7 @@ ExternalInterface_as::Instance()
     
     return ei;
 }
+#endif
 
 #if 0
 void
@@ -936,7 +966,7 @@ ExternalInterface_as::getCallback(const std::string &name)
 void
 ExternalInterface_as::update()
 {
-//    log_debug(__PRETTY_FUNCTION__);
+    log_debug(__PRETTY_FUNCTION__);
     
     if (_fd > 0) {
         fd_set fdset;
