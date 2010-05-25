@@ -568,17 +568,11 @@ textformat_getTextExtent(const fn_call& fn)
     const int version = getSWFVersion(fn);
     const std::string& s = fn.arg(0).to_string(version);
 
-    // Everything must be in twips here.
 
-    double tfw;
-    bool limitWidth = false;
-    if (fn.nargs > 1) {
-        limitWidth = true;
-        tfw = pixelsToTwips(fn.arg(1).to_number());       
-    }
-    else {
-        tfw = 0;
-    }
+    const bool limitWidth = (fn.nargs > 1);
+    
+    // Everything must be in twips here.
+    const double tfw = limitWidth ? pixelsToTwips(fn.arg(1).to_number()) : 0;
 
     const bool bold = relay->bold() ? *relay->bold() : false;
     const bool italic = relay->italic() ? *relay->italic() : false;
@@ -611,9 +605,9 @@ textformat_getTextExtent(const fn_call& fn)
     for (std::string::const_iterator it = s.begin(), e = s.end();
             it != e; ++it) {
 
-        int index = f->get_glyph_index(*it, em);
+        const int index = f->get_glyph_index(*it, em);
         const double advance = f->get_advance(index, em) * scale;
-        if (limitWidth && (curr + advance > width)) {
+        if (limitWidth && (curr + advance > tfw)) {
             curr = 0;
             height += size;
         }
