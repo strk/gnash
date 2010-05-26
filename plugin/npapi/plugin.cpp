@@ -159,7 +159,6 @@ NS_PluginInitialize()
     // First, check for XEmbed support. The NPAPI Gnash plugin
     // only works with XEmbed, so tell the plugin API to fail if
     // XEmbed is not found.
-    
     err = NPN_GetValue(NULL,NPNVSupportsXEmbedBool,
                        (void *)&supportsXEmbed);
 
@@ -282,6 +281,15 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
       case NPPVpluginDescriptionString:
           *static_cast<const char **>(aValue) = getPluginDescription();
           break;
+
+      case NPPVpluginWindowBool:
+          break;
+          
+      case NPPVpluginTimerInterval:
+          break;
+          
+      case NPPVpluginKeepLibraryInMemory:
+          break;
           
       case NPPVpluginNeedsXEmbed:
 #ifdef HAVE_GTK2
@@ -291,9 +299,13 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 #endif
           break;
 
-      case NPPVpluginTimerInterval:
-          
-      case NPPVpluginKeepLibraryInMemory:
+      case NPPVpluginScriptableNPObject:
+          break;
+
+      case NPPVpluginUrlRequestsDisplayedBool:
+          break;
+      case NPPVpluginWantsAllNetworkStreams:
+          break;
           
       default:
           err = NPERR_INVALID_PARAM;
@@ -553,6 +565,8 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
+    gnash::log_debug(__PRETTY_FUNCTION__);
+     
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
@@ -561,7 +575,7 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
         } else {
             gnash::log_debug("_scriptObject is not assigned");
         }
-    }
+    }    
 
     return NS_PluginGetValue(aVariable, aValue);
 }
@@ -571,14 +585,6 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 void myfunc(void */* param */)
 {
     gnash::log_debug("Here I am!!!\n");
-}
-
-void
-NPN_PluginThreadAsyncCall(NPP plugin, void (*func)(void *), void *userData)
-{
-#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) >= 20)
-    return (*NPNFuncs.pluginthreadasynccall)(plugin, func, userData);
-#endif
 }
 #endif
 
@@ -610,8 +616,6 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     // gnash::log_debug("FIXME: %s", getEmbedURL());
 #endif
     
-    gnash::log_debug("The full URL is %s", _swf_url);
-
     if (!_swf_url.empty() && _window) {
         startProc();
     }
@@ -923,6 +927,35 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
         arg_vec.push_back(pageurl);
     }
 
+    // Cookie appear to drop anything past the domain, so we strip
+    // that off.
+    std::string::size_type pos;
+    pos = pageurl.find("/", pageurl.find("//", 0) + 2) + 1;
+    std::string url = pageurl.substr(0, pos);
+    
+    char *cookie = 0;
+    uint32_t length = 0;
+    NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
+                       &cookie, &length);
+    if (cookie) {
+        gnash::log_debug("The Cookie for %s is %s", url, cookie);
+        std::ofstream cookiefile;
+        std::stringstream ss;
+        ss << "/tmp/gnash-cookies." << getpid(); 
+        
+        cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
+        cookiefile << "Set-Cookie: " << cookie << std::endl;
+        cookiefile.close();
+    
+        if (setenv("GNASH_COOKIES_IN", ss.str().c_str(), 1) < 0) {
+            gnash::log_error(
+                "Couldn't set environment variable GNASH_COOKIES_IN to %s",
+                cookie);
+        }
+    } else {
+        gnash::log_debug("No stored Cookie for %s", url);
+    }    
+    
     std::stringstream pars;
     pars << "-x "  <<  _window          // X window ID to render into
          << " -j " << _width            // Width of window
@@ -1002,6 +1035,7 @@ wait_for_gdb()
 void
 nsPluginInstance::startProc()
 {
+
     int p2c_pipe[2];
     int c2p_pipe[2];
     int p2c_controlpipe[2];
