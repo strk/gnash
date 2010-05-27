@@ -553,7 +553,7 @@ MovieClip::addDisplayListObject(DisplayObject* obj, int depth)
     //             an existing one !
     set_invalidated(); 
     _displayList.placeDisplayObject(obj, depth);
-    obj->construct(0);
+    obj->construct();
     return obj;
 }
 
@@ -1203,6 +1203,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     ch->set_clip_depth(tag->getClipDepth());
     
     dlist.placeDisplayObject(ch, tag->getDepth());
+    ch->construct();
     return ch;
 }
 
@@ -1277,6 +1278,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     // use SWFMatrix from the old DisplayObject if tag doesn't provide one.
     dlist.replaceDisplayObject(ch, tag->getDepth(), 
         !tag->hasCxform(), !tag->hasMatrix());
+    ch->construct();
 }
 
 void
@@ -1773,21 +1775,39 @@ MovieClip::construct(as_object* initObj)
     // A MovieClip should always have an associated object.
     assert(mc);
 
-    // This function should only be called on dynamic objects.
-    assert(isDynamic());
+    // We execute events immediately when the stage-placed DisplayObject 
+    // is dynamic, This is becase we assume that this means that 
+    // the DisplayObject is placed during processing of actions (opposed 
+    // that during advancement iteration).
+    //
+    // A more general implementation might ask movie_root about its state
+    // (iterating or processing actions?)
+    // Another possibility to inspect could be letting movie_root decide
+    // when to really queue and when rather to execute immediately the 
+    // events with priority INITIALIZE or CONSTRUCT ...
+    if (!isDynamic()) {
 
-    // A dynamic MovieClip must always have a parent. This also means we
-    // never have to set $version.
-    assert(get_parent());
+#ifdef GNASH_DEBUG
+        log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
+                getTarget());
+#endif
 
-    // Properties from an initObj must be copied before construction, but
-    // after the display list has been populated, so that _height and
-    // _width (which depend on bounds) are correct.
-    if (initObj) {
-        mc->copyProperties(*initObj);
+        std::auto_ptr<ExecutableCode> code(new ConstructEvent(this));
+        stage().pushAction(code, movie_root::PRIORITY_CONSTRUCT);
+
     }
+    else {
 
-    constructAsScriptObject();
+        // Properties from an initObj must be copied before construction, but
+        // after the display list has been populated, so that _height and
+        // _width (which depend on bounds) are correct.
+        if (initObj) {
+            mc->copyProperties(*initObj);
+        }
+
+        constructAsScriptObject();
+
+    }
 
     // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
     // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
@@ -1859,28 +1879,6 @@ MovieClip::stagePlacementCallback()
                 SWF::ControlTag::TAG_ACTION);
     }
 
-    // We execute events immediately when the stage-placed DisplayObject 
-    // is dynamic, This is becase we assume that this means that 
-    // the DisplayObject is placed during processing of actions (opposed 
-    // that during advancement iteration).
-    //
-    // A more general implementation might ask movie_root about its state
-    // (iterating or processing actions?)
-    // Another possibility to inspect could be letting movie_root decide
-    // when to really queue and when rather to execute immediately the 
-    // events with priority INITIALIZE or CONSTRUCT ...
-    if (!isDynamic())
-    {
-#ifdef GNASH_DEBUG
-        log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
-                getTarget());
-#endif
-        queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
-
-        std::auto_ptr<ExecutableCode> code(new ConstructEvent(this));
-        stage().pushAction(code, movie_root::PRIORITY_CONSTRUCT);
-
-    }
 
 }
 
@@ -1944,6 +1942,7 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
         assert(parent_sp);
         parent_sp->_displayList.replaceDisplayObject(extern_movie, get_depth(),
                 true, true);
+        extern_movie->construct();
     }
     else
     {

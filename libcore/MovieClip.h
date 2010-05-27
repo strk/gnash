@@ -387,7 +387,7 @@ public:
     virtual void stagePlacementCallback();
 
     /// Construct registered class and add properties.
-    virtual void construct(as_object* initObj);
+    virtual void construct(as_object* initObj = 0);
 
     /// Unload all contents in the displaylist and this instance
     /// See DisplayObject::unload for more info

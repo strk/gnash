@@ -831,6 +831,7 @@ Button::stagePlacementCallback()
         _stateCharacters[rno] = ch;
         addInstanceProperty(*this, ch);
         ch->stagePlacementCallback(); // give this DisplayObject a life
+        ch->construct();
     }
 
     // There is no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD event 
