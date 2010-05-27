@@ -955,10 +955,10 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
                     "Couldn't set environment variable GNASH_COOKIES_IN to %s",
                     ncookie);
             }
+            NPN_MemFree(cookie);
         } else {
             gnash::log_debug("No stored Cookie for %s", url);
         }    
-        NPN_MemFree(cookie);
     }
 
     std::stringstream pars;
