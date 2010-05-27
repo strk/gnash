@@ -208,8 +208,7 @@ DisplayList::getDisplayObjectByName_i(const std::string& name)
 }
 
 void
-DisplayList::placeDisplayObject(DisplayObject* ch, int depth,
-        as_object* initObj)
+DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
 {
     assert(!ch->unloaded());
     ch->set_invalidated();
