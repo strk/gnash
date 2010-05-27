@@ -246,7 +246,6 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth,
 
     // Give life to this instance
     ch->stagePlacementCallback();
-    if (ch->isDynamic()) ch->construct(initObj);
 
     testInvariant();
 }

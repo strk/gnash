@@ -596,6 +596,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     
     parent->_displayList.placeDisplayObject(newmovieclip, depth, 
             initObject);
+    newmovieclip->construct(initObject);
     
     return newmovieclip; 
 }
@@ -1135,6 +1136,7 @@ MovieClip::attachCharacter(DisplayObject& newch, int depth,
         as_object* initObject)
 { 
     _displayList.placeDisplayObject(&newch, depth, initObject);    
+    newch.construct(initObject);
 
     // FIXME: check return from placeDisplayObject above ?
     return true; 
