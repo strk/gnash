@@ -41,7 +41,7 @@
 #include "buffer.h"
 
 using std::vector;
-using amf::Element;
+using cygnal::Element;
 
 namespace gnash
 {
@@ -122,21 +122,21 @@ static RTMPStatusMsgCode rtmp_msg_code_list[] = {
 // error, or onStatus message, the actual data can be obtained from the Element.
 // 
 RTMPMsg::rtmp_status_e
-RTMPMsg::checkStatus(boost::shared_ptr<amf::Element>  /* el */)
+RTMPMsg::checkStatus(boost::shared_ptr<cygnal::Element>  /* el */)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_amfobjs.size() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::iterator pit;
-	vector<boost::shared_ptr<amf::Element> >::iterator cit;
+	vector<boost::shared_ptr<cygnal::Element> >::iterator pit;
+	vector<boost::shared_ptr<cygnal::Element> >::iterator cit;
 //	cerr << "# of Properties in object" << _amfobjs.size() << endl;
 	for (pit = _amfobjs.begin(); pit != _amfobjs.end(); pit++) {
-	    boost::shared_ptr<amf::Element> el = (*(pit));
-	    std::vector<boost::shared_ptr<amf::Element> > props = el->getProperties();
+	    boost::shared_ptr<cygnal::Element> el = (*(pit));
+	    std::vector<boost::shared_ptr<cygnal::Element> > props = el->getProperties();
 //  	    printf("FIXME2: %d, %s:%s\n", props.size(),
 //  		   props[2]->getName(), props[2]->to_string());
 	    if (el->getType() == Element::OBJECT_AMF0) {
 		for (cit = props.begin(); cit != props.end(); cit++) {
-		    boost::shared_ptr<amf::Element> child = (*(cit));
+		    boost::shared_ptr<cygnal::Element> child = (*(cit));
 //		    child->dump();
 		    std::string name = child->getName();
 		    std::string value;
@@ -165,7 +165,7 @@ RTMPMsg::checkStatus(boost::shared_ptr<amf::Element>  /* el */)
     
 // }
 
-boost::shared_ptr<amf::Element>
+boost::shared_ptr<cygnal::Element>
 RTMPMsg::operator[](size_t index)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -173,7 +173,7 @@ RTMPMsg::operator[](size_t index)
 	return _amfobjs[index];
     }
     
-    boost::shared_ptr<amf::Element> el;
+    boost::shared_ptr<cygnal::Element> el;
     return el;
 }
 
@@ -183,15 +183,15 @@ RTMPMsg::operator[](size_t index)
 ///	search for.
 ///
 /// @return A smart pointer to the Element for this property.
-boost::shared_ptr<amf::Element> 
+boost::shared_ptr<cygnal::Element> 
 RTMPMsg::findProperty(const std::string &name)
 {
     if (_amfobjs.size() > 0) {
 	vector<boost::shared_ptr<Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
-	    boost::shared_ptr<amf::Element> el = (*(ait));
-	    boost::shared_ptr<amf::Element> prop = el->findProperty(name);
+	    boost::shared_ptr<cygnal::Element> el = (*(ait));
+	    boost::shared_ptr<cygnal::Element> prop = el->findProperty(name);
 	    if (prop) {
 		return prop;
 	    }
@@ -215,10 +215,10 @@ RTMPMsg::dump()
 //    cerr << "Transaction ID:\t" << hexify((const unsigned char *)&_transid, 8, false) << endl;
     cerr << "Transaction ID:\t" << _transid << endl;
 
-    vector<boost::shared_ptr<amf::Element> >::iterator ait;
+    vector<boost::shared_ptr<cygnal::Element> >::iterator ait;
     cerr << "# of Elements in file: " << _amfobjs.size() << endl;
     for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
-	boost::shared_ptr<amf::Element> el = (*(ait));
+	boost::shared_ptr<cygnal::Element> el = (*(ait));
         el->dump();
     }
 }

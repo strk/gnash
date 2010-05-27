@@ -70,10 +70,10 @@ const short SOL_BLOCK_MARK = 0x0004;
 		throw ParserException("Premature end of AMF stream"); \
 }
 
-/// \namespace amf
+/// \namespace cygnal
 ///
 /// This namespace is for all the AMF specific classes in libamf.
-namespace amf
+namespace cygnal
 {
 
 SOL::SOL() 
@@ -118,7 +118,7 @@ SOL::extractHeader(const vector<unsigned char> & /*data*/)
 ///
 /// @return nothing.
 void
-SOL::addObj(boost::shared_ptr<amf::Element> el)
+SOL::addObj(boost::shared_ptr<cygnal::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
     _amfobjs.push_back(el);
@@ -252,7 +252,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
     }
     
     vector<boost::uint8_t>::iterator it;
-    vector<boost::shared_ptr<amf::Element> >::iterator ita; 
+    vector<boost::shared_ptr<cygnal::Element> >::iterator ita; 
     AMF amf_obj;
     char *ptr;
     int size = 0;
@@ -262,7 +262,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
     }
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
-        boost::shared_ptr<amf::Element> el = (*(ita));
+        boost::shared_ptr<cygnal::Element> el = (*(ita));
 	size += el->getNameSize() + el->getDataSize() + 7;
     }
     _filesize = size;
@@ -274,7 +274,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         boost::shared_ptr<Element> el = (*(ita));
-        boost::shared_ptr<amf::Buffer> var = amf_obj.encodeProperty(el); 
+        boost::shared_ptr<cygnal::Buffer> var = amf_obj.encodeProperty(el); 
         //  boost::uint8_t *var = amf_obj.encodeProperty(el, outsize); 
         if (!var) {
             continue;
@@ -436,7 +436,7 @@ SOL::readFile(const std::string &filespec)
 	    ptr += 4;
 	    
 	    AMF amf_obj;
-	    boost::shared_ptr<amf::Element> el;
+	    boost::shared_ptr<cygnal::Element> el;
 	    while ( ptr < tooFar) {
             if (ptr) {
                 el = amf_obj.extractProperty(ptr, tooFar);
@@ -459,12 +459,12 @@ SOL::readFile(const std::string &filespec)
 }
 
 bool 
-SOL::updateSO(boost::shared_ptr<amf::Element> &newel)
+SOL::updateSO(boost::shared_ptr<cygnal::Element> &newel)
 {
 //    GNASH_REPORT_FUNCTION;
-    vector<boost::shared_ptr<amf::Element> >::iterator ita; 
+    vector<boost::shared_ptr<cygnal::Element> >::iterator ita; 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
-        boost::shared_ptr<amf::Element> oldel = (*(ita));
+        boost::shared_ptr<cygnal::Element> oldel = (*(ita));
 	if (oldel == newel) {
 	    oldel = newel;
 	}
@@ -473,7 +473,7 @@ SOL::updateSO(boost::shared_ptr<amf::Element> &newel)
 }
 
 bool
-SOL::updateSO(int index, boost::shared_ptr<amf::Element> &el)
+SOL::updateSO(int index, boost::shared_ptr<cygnal::Element> &el)
 {
 //    GNASH_REPORT_FUNCTION;
     _amfobjs[index] = el;    
@@ -487,14 +487,14 @@ void
 SOL::dump()
 {
     using namespace std;
-    vector<boost::shared_ptr<amf::Element> >::iterator it;
+    vector<boost::shared_ptr<cygnal::Element> >::iterator it;
 
     cerr << "Dumping SOL file" << endl;
     cerr << "The file name is: " << _filespec << endl;
     cerr << "The size of the file is: " << _filesize << endl;
     cerr << "The name of the object is: " << _objname << endl;
     for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
-	boost::shared_ptr<amf::Element> el = (*(it));
+	boost::shared_ptr<cygnal::Element> el = (*(it));
         cerr << el->getName() << ": ";
         if (el->getType() == Element::STRING_AMF0) {
             if (el->getDataSize() != 0) {

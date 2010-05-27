@@ -770,11 +770,11 @@ Network::closeConnection(int fd)
     return false;
 }
 
-boost::shared_ptr<amf::Buffer>
+boost::shared_ptr<cygnal::Buffer>
 Network::readNet()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buffer(new amf::Buffer);
+    boost::shared_ptr<cygnal::Buffer> buffer(new cygnal::Buffer);
     int ret = readNet(*buffer);
     if (ret > 0) {
 	buffer->resize(ret);
@@ -784,7 +784,7 @@ Network::readNet()
 
 // Read from the connection
 int
-Network::readNet(int fd, amf::Buffer &buffer)
+Network::readNet(int fd, cygnal::Buffer &buffer)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = readNet(fd, buffer.reference(), buffer.size(), _timeout);
@@ -796,7 +796,7 @@ Network::readNet(int fd, amf::Buffer &buffer)
 }
 
 int
-Network::readNet(int fd, amf::Buffer *buffer)
+Network::readNet(int fd, cygnal::Buffer *buffer)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = readNet(fd, buffer->reference(), buffer->size(), _timeout);
@@ -808,7 +808,7 @@ Network::readNet(int fd, amf::Buffer *buffer)
 }
 
 int
-Network::readNet(amf::Buffer &buffer)
+Network::readNet(cygnal::Buffer &buffer)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = readNet(_sockfd, buffer, _timeout);
@@ -817,7 +817,7 @@ Network::readNet(amf::Buffer &buffer)
 }
 
 int
-Network::readNet(amf::Buffer &buffer, int timeout)
+Network::readNet(cygnal::Buffer &buffer, int timeout)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = readNet(_sockfd, buffer.reference(), buffer.size(), timeout);
@@ -829,7 +829,7 @@ Network::readNet(amf::Buffer &buffer, int timeout)
 }
 
 int
-Network::readNet(int fd, amf::Buffer &buffer, int timeout)
+Network::readNet(int fd, cygnal::Buffer &buffer, int timeout)
 {
     // GNASH_REPORT_FUNCTION;
     int ret = readNet(fd, buffer.reference(), buffer.size(), timeout);
@@ -994,14 +994,14 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 
 // Write to the connection
 int
-Network::writeNet(amf::Buffer *buffer)
+Network::writeNet(cygnal::Buffer *buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(buffer->reference(), buffer->allocated());
 }
 
 int
-Network::writeNet(int fd, amf::Buffer *buffer)
+Network::writeNet(int fd, cygnal::Buffer *buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer->reference(), buffer->allocated());
@@ -1009,7 +1009,7 @@ Network::writeNet(int fd, amf::Buffer *buffer)
 
 // Write to the connection
 int
-Network::writeNet(amf::Buffer &buffer)
+Network::writeNet(cygnal::Buffer &buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(buffer.reference(), buffer.allocated());
@@ -1017,7 +1017,7 @@ Network::writeNet(amf::Buffer &buffer)
 
 // Write to the connection
 int
-Network::writeNet(int fd, amf::Buffer &buffer)
+Network::writeNet(int fd, cygnal::Buffer &buffer)
 {
 //     GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer.reference(), buffer.allocated());

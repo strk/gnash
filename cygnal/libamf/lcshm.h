@@ -29,10 +29,11 @@
 #include "SharedMem.h"
 #include "dsodefs.h"
 
-/// \namespace amf
+/// \namespace cygnal
 ///
 /// This namespace is for all the AMF specific classes in libamf.
-namespace amf {
+namespace cygnal
+{
 
 /// \class Listener
 ///	Manipulate the list of LocalConnection Listeners. We've made
@@ -128,7 +129,7 @@ public:
         std::string connection_name;
         std::string protocol;
         std::string method_name;
-        std::vector<boost::shared_ptr<amf::Element> > data; // this can be any AMF data type
+        std::vector<boost::shared_ptr<cygnal::Element> > data; // this can be any AMF data type
     } lc_message_t;
     /// \struct LcShm::lc_object.t
     ///		Hold the data for each connection to the memory segment.
@@ -191,7 +192,7 @@ public:
     ///
     /// @return nothing.
     void send(const std::string& name, const std::string& dataname,
-	      std::vector< amf::Element* >& data);
+	      std::vector< cygnal::Element* >& data);
 
     /// \brief Read the date from the memory
     ///
@@ -202,7 +203,7 @@ public:
     ///
     /// @return nothing.
 	/// We may only need a connection name for the receive function.
-    void recv(std::string &name, std::string &dataname, boost::shared_ptr<amf::Element> data);
+    void recv(std::string &name, std::string &dataname, boost::shared_ptr<cygnal::Element> data);
 
     /// \brief Parse the body of a memory segment.
     ///
@@ -210,7 +211,7 @@ public:
     ///
     /// @return A vector of smart pointers to the AMF0 Elements in
     ///		this memopry segment.
-    std::vector<boost::shared_ptr<amf::Element> > parseBody(boost::uint8_t *data);
+    std::vector<boost::shared_ptr<cygnal::Element> > parseBody(boost::uint8_t *data);
 
     /// \brief Parse the header of the memory segment.
     ///
@@ -252,7 +253,7 @@ public:
     /// \brief Add an AMF0 Element array of data for this memory segment.
     ///
     /// @return 
-    void addObject(boost::shared_ptr<amf::Element> el) { _amfobjs.push_back(el); };
+    void addObject(boost::shared_ptr<cygnal::Element> el) { _amfobjs.push_back(el); };
 
     /// \brief Get the number of AMF0 Elements stored in this class.
     ///
@@ -262,7 +263,7 @@ public:
     /// \brief Get the array of AMF0 objects stored by this class.
     ///
     /// @return A vector of smart pointers to AMF0 Elements.
-    std::vector<boost::shared_ptr<amf::Element> > getElements() { return _amfobjs; };
+    std::vector<boost::shared_ptr<cygnal::Element> > getElements() { return _amfobjs; };
 
     /// \brief Set the base address to be used for the memory segment.
     ///
@@ -296,7 +297,7 @@ private:
     /// \var LcShm::_amfobjs
     ///		A vector of AMF0 Elements in the memory segment.
 	/// Is this necessary if we have put all the things to pass in the memory?
-    std::vector<boost::shared_ptr<amf::Element> > _amfobjs;
+    std::vector<boost::shared_ptr<cygnal::Element> > _amfobjs;
 	
 	///Si added
 	/// This is the mutex that controls access to the sharedmemory

@@ -37,10 +37,10 @@
 // Padding      - 4 bytes
 // After this is a series of AMF objects
 
-/// \namespace amf
+/// \namespace cygnal
 ///
 /// This namespace is for all the AMF specific classes in libamf.
-namespace amf
+namespace cygnal
 {
 
 // Forward declarations
@@ -138,7 +138,7 @@ public:
     ///
     /// @return A smart pointer to the array of properities for this
     ///		.sol file.
-    std::vector<boost::shared_ptr<amf::Element> > &getElements() { return _amfobjs; }
+    std::vector<boost::shared_ptr<cygnal::Element> > &getElements() { return _amfobjs; }
 
     /// \brief Get an element referenced by index in the array
     ///
@@ -179,8 +179,8 @@ public:
     ///		in the .sol file.
     const std::string &getObjectName() const { return _objname; };
         
-    bool updateSO(boost::shared_ptr<amf::Element> &el);
-    bool updateSO(int index, boost::shared_ptr<amf::Element> &el);
+    bool updateSO(boost::shared_ptr<cygnal::Element> &el);
+    bool updateSO(int index, boost::shared_ptr<cygnal::Element> &el);
     
     ///  \brief Dump the internal data of this class in a human readable form.
     ///

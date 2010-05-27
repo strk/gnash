@@ -88,7 +88,7 @@ public:
 
     DSOEXPORT DiskStream();
     DSOEXPORT DiskStream(const std::string &filespec);
-    DSOEXPORT DiskStream(const std::string &filespec, amf::Buffer &buf);
+    DSOEXPORT DiskStream(const std::string &filespec, cygnal::Buffer &buf);
     DSOEXPORT DiskStream(const std::string &filespec, boost::uint8_t *data, size_t size);
     DSOEXPORT DiskStream(const std::string &filespec, int netfd);
     DSOEXPORT ~DiskStream();
@@ -200,7 +200,7 @@ public:
     ///
     /// @return true if the operation suceeded, false if it failed.
     DSOEXPORT bool writeToDisk(const std::string &filespec, boost::uint8_t *data, size_t size);
-    DSOEXPORT bool writeToDisk(const std::string &filespec, amf::Buffer &data);
+    DSOEXPORT bool writeToDisk(const std::string &filespec, cygnal::Buffer &data);
     DSOEXPORT bool writeToDisk(const std::string &filespec);
     DSOEXPORT bool writeToDisk();
 
@@ -353,7 +353,7 @@ private:
 #endif
 
     // The header, tag, and onMetaData from the FLV file.
-    boost::shared_ptr<amf::Flv>    _flv;
+    boost::shared_ptr<cygnal::Flv>    _flv;
 };
 
 /// \brief Dump to the specified output stream.

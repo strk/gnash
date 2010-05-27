@@ -37,10 +37,10 @@
 
 // _definst_ is the default instance name
 
-/// \namespace amf
+/// \namespace cygnal
 ///
 /// This namespace is for all the AMF specific classes in libamf.
-namespace amf
+namespace cygnal
 {
 
 // Adjust for the constant size
@@ -200,7 +200,7 @@ public:
     /// @param type An AMF0 type. 
     /// 
     /// @return A reference to a Buffer.
-    Buffer &operator=(amf::Element::amf0_type_e type);
+    Buffer &operator=(cygnal::Element::amf0_type_e type);
     /// Copy a boolean into the buffer. This overwrites all data, and
     ///		resets the seek ptr.
     ///
@@ -266,7 +266,7 @@ public:
     /// @param type An AMF0 type. 
     /// 
     /// @return A reference to a Buffer.
-    Buffer &operator+=(amf::Element::amf0_type_e type);
+    Buffer &operator+=(cygnal::Element::amf0_type_e type);
     /// \brief Append a boolean to existing data in the buffer.
     ///
     /// @param type A boolean. 
@@ -444,11 +444,11 @@ inline std::ostream& operator << (std::ostream& os, const Buffer& buf)
 	return os;
 }
 
-} // end of amf namespace
+} // end of namespace cygnal
 
 #endif // end of __BUFFER_H__
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

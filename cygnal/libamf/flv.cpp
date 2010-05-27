@@ -37,7 +37,7 @@
 using gnash::log_debug;
 using gnash::log_error;
 
-namespace amf 
+namespace cygnal
 {
 
 Flv::Flv() 
@@ -61,11 +61,11 @@ Flv::~Flv()
 }
 
 // Encode the data into a Buffer
-boost::shared_ptr<amf::Buffer>
+boost::shared_ptr<cygnal::Buffer>
 Flv::encodeHeader(boost::uint8_t type)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buf(new Buffer(sizeof(Flv::flv_header_t)));
+    boost::shared_ptr<cygnal::Buffer> buf(new Buffer(sizeof(Flv::flv_header_t)));
     buf->clear();
     
     boost::uint8_t version = 0x1;
@@ -128,13 +128,13 @@ Flv::decodeHeader(boost::uint8_t *data)
 }
 
 // Decode a MetaData object, which is after the header, but before all the tags
-boost::shared_ptr<amf::Element> 
-Flv::decodeMetaData(boost::shared_ptr<amf::Buffer> buf)
+boost::shared_ptr<cygnal::Element> 
+Flv::decodeMetaData(boost::shared_ptr<cygnal::Buffer> buf)
 {
     return decodeMetaData(buf->reference(), buf->size());
 }
 
-boost::shared_ptr<amf::Element> 
+boost::shared_ptr<cygnal::Element> 
 Flv::decodeMetaData(boost::uint8_t *buf, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -306,21 +306,21 @@ Flv::decodeTagHeader(boost::uint8_t *buf)
     return tag;
 }
 
-boost::shared_ptr<amf::Element> 
+boost::shared_ptr<cygnal::Element> 
 Flv::findProperty(const std::string &name)
 {
     if (_properties.size() > 0) {
-	std::vector<boost::shared_ptr<amf::Element> >::iterator ait;
+	std::vector<boost::shared_ptr<cygnal::Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    boost::shared_ptr<amf::Element> el = (*(ait));
+	    boost::shared_ptr<cygnal::Element> el = (*(ait));
 	    if (el->getName() == name) {
 		return el;
 	    }
 //	    el->dump();
 	}
     }
-    boost::shared_ptr<amf::Element> el;
+    boost::shared_ptr<cygnal::Element> el;
     return el;
 }
 
@@ -329,11 +329,11 @@ Flv::dump()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_properties.size() > 0) {
-	std::vector<boost::shared_ptr<amf::Element> >::iterator ait;
+	std::vector<boost::shared_ptr<cygnal::Element> >::iterator ait;
 	std::cerr << "# of Properties in object: " << _properties.size()
 	          << std::endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    boost::shared_ptr<amf::Element> el = (*(ait));
+	    boost::shared_ptr<cygnal::Element> el = (*(ait));
             // an onMetaData packet of an FLV stream only contains number or
             // boolean bydefault
             if (el->getType() == Element::NUMBER_AMF0) {

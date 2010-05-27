@@ -73,17 +73,17 @@ public:
     ~OflaDemoTest ();
   
     // Parse an OflaDemo Request message coming from the Red5 oflaDemo_test.
-    std::vector<boost::shared_ptr<amf::Element > > parseOflaDemoRequest(amf::Buffer &buf)
+    std::vector<boost::shared_ptr<cygnal::Element > > parseOflaDemoRequest(cygnal::Buffer &buf)
         { return parseOflaDemoRequest(buf.reference(), buf.size()); };
-    std::vector<boost::shared_ptr<amf::Element > > parseOflaDemoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<boost::shared_ptr<cygnal::Element > > parseOflaDemoRequest(boost::uint8_t *buf, size_t size);
     
     // format a response to the 'oflaDemo' test used for testing Gnash.
-    boost::shared_ptr<amf::Buffer> formatOflaDemoResponse(double num, amf::Element &el);
-    boost::shared_ptr<amf::Buffer> formatOflaDemoResponse(double num, amf::Buffer &data);
-    boost::shared_ptr<amf::Buffer> formatOflaDemoResponse(double num, boost::uint8_t *data, size_t size);
+    boost::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, cygnal::Element &el);
+    boost::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, cygnal::Buffer &data);
+    boost::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, boost::uint8_t *data, size_t size);
 
-    boost::shared_ptr<amf::Buffer> getResponse() { return _response; };
-    void setResponse(boost::shared_ptr<amf::Buffer> &x) { _response = x; };
+    boost::shared_ptr<cygnal::Buffer> getResponse() { return _response; };
+    void setResponse(boost::shared_ptr<cygnal::Buffer> &x) { _response = x; };
     
     void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
     void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
@@ -96,7 +96,7 @@ public:
     ///    file paths and other information needed by the server.
     boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
 private:
-    boost::shared_ptr<amf::Buffer> _response;
+    boost::shared_ptr<cygnal::Buffer> _response;
     boost::shared_ptr<Handler::cygnal_init_t> _info;
 }; 
 
@@ -104,7 +104,7 @@ private:
 extern "C" {
     boost::shared_ptr<Handler::cygnal_init_t>oflaDemo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg);
     
-    boost::shared_ptr<amf::Buffer> oflaDemo_read_func();
+    boost::shared_ptr<cygnal::Buffer> oflaDemo_read_func();
     size_t oflaDemo_write_func(boost::uint8_t *data, size_t size);
 }
 

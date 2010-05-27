@@ -138,13 +138,13 @@ Handler::addClient(int fd, Network::protocols_supported_e proto)
 // Parse the first nessages when starting a new message handler,
 // which is used to determine the name of the resource to
 // initialize, or load from the cache.
-amf::Buffer *
+cygnal::Buffer *
 Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
 {
     GNASH_REPORT_FUNCTION;
     string key;
     Network net;
-    amf::Buffer *buf = 0;
+    cygnal::Buffer *buf = 0;
     boost::mutex::scoped_lock lock(_mutex);
     
     switch (proto) {
@@ -174,7 +174,7 @@ Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
 	  HTTPServer http;
 	  size_t bytes = http.sniffBytesReady(fd);
 	  if (bytes) {
-	      buf = new amf::Buffer(bytes);
+	      buf = new cygnal::Buffer(bytes);
 	  } else {
 	      return 0;
 	  }
@@ -367,12 +367,12 @@ Handler::writeToPlugin(boost::uint8_t *data, size_t size)
     return ret;
 }
 
-boost::shared_ptr<amf::Buffer>
+boost::shared_ptr<cygnal::Buffer>
 Handler::readFromPlugin()
 {
     // GNASH_REPORT_FUNCTION;
 
-    boost::shared_ptr<amf::Buffer> buf;
+    boost::shared_ptr<cygnal::Buffer> buf;
     if (_plugin) {
 	buf = _plugin->read_func();
     }

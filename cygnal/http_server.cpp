@@ -91,18 +91,18 @@ HTTPServer::processClientRequest(int fd)
 {
     GNASH_REPORT_FUNCTION;
     
-    amf::Buffer *buf = new amf::Buffer;
+    cygnal::Buffer *buf = new cygnal::Buffer;
 
     // return processClientRequest(fd, buf);
     return HTTP::HTTP_NONE;
 }
 
 HTTP::http_method_e
-HTTPServer::processClientRequest(Handler *hand, int fd, amf::Buffer *buf)
+HTTPServer::processClientRequest(Handler *hand, int fd, cygnal::Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
     
-    amf::Buffer result;
+    cygnal::Buffer result;
 
     if (buf) {
 	_cmd = extractCommand(buf->reference());
@@ -178,8 +178,8 @@ HTTPServer::processClientRequest(Handler *hand, int fd, amf::Buffer *buf)
 }
 
 // A GET request asks the server to send a file to the client
-amf::Buffer &
-HTTPServer::processGetRequest(Handler *hand, int fd, amf::Buffer *buf)
+cygnal::Buffer &
+HTTPServer::processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -191,7 +191,7 @@ HTTPServer::processGetRequest(Handler *hand, int fd, amf::Buffer *buf)
     if (buf == 0) {
      //	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	log_debug("Que empty, net connection dropped for fd #%d", fd);
-	amf::Buffer buf;
+	cygnal::Buffer buf;
 	return buf;
     }
     
@@ -237,7 +237,7 @@ HTTPServer::processGetRequest(Handler *hand, int fd, amf::Buffer *buf)
 
     // Create the reply message
 //     _close = true; Force sending the close connection in the header
-    amf::Buffer &reply = formatHeader(_diskstream->getFileType(),
+    cygnal::Buffer &reply = formatHeader(_diskstream->getFileType(),
 				      _diskstream->getFileSize(),
 				      HTTPServer::OK);
 
@@ -269,14 +269,14 @@ HTTPServer::processGetRequest(Handler *hand, int fd, amf::Buffer *buf)
 // A POST request asks sends a data from the client to the server. After processing
 // the header like we normally do, we then read the amount of bytes specified by
 // the "content-length" field, and then write that data to disk, or decode the amf.
-boost::shared_ptr<amf::Buffer>
-HTTPServer::processPostRequest(int fd, amf::Buffer *bufFIXME)
+boost::shared_ptr<cygnal::Buffer>
+HTTPServer::processPostRequest(int fd, cygnal::Buffer *bufFIXME)
 {
     GNASH_REPORT_FUNCTION;
 
 //    cerr << "QUE1 = " << _que.size() << endl;
 
-    boost::shared_ptr<amf::Buffer> buf;
+    boost::shared_ptr<cygnal::Buffer> buf;
     
     if (_que.size() == 0) {
 	return buf;
@@ -292,7 +292,7 @@ HTTPServer::processPostRequest(int fd, amf::Buffer *bufFIXME)
     clearHeader();
     boost::uint8_t *data = processHeaderFields(buf.get());
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
-    boost::shared_ptr<amf::Buffer> content(new amf::Buffer(length));
+    boost::shared_ptr<cygnal::Buffer> content(new cygnal::Buffer(length));
     int ret = 0;
     if (buf->allocated() - (data - buf->reference()) ) {
 //	cerr << "Don't need to read more data: have " << buf->allocated() << " bytes" << endl;
@@ -315,7 +315,7 @@ HTTPServer::processPostRequest(int fd, amf::Buffer *bufFIXME)
 	log_debug("Got AMF data in POST");
 #if 0
 	amf::AMF amf;
-	boost::shared_ptr<amf::Element> el = amf.extractAMF(content.reference(), content.end());
+	boost::shared_ptr<cygnal::Element> el = amf.extractAMF(content.reference(), content.end());
 	el->dump();		// FIXME: do something intelligent
 				// with this Element
 #endif
@@ -336,17 +336,17 @@ HTTPServer::processPostRequest(int fd, amf::Buffer *bufFIXME)
   	cgis.startCGI(_filespec, true, CGIBIN_PORT);
  	cgis.createClient("localhost", CGIBIN_PORT);
 	cgis.writeNet(*content);
-	boost::shared_ptr<amf::Buffer> reply = cgis.readNet();
+	boost::shared_ptr<cygnal::Buffer> reply = cgis.readNet();
 	
 	writeNet(fd, *reply);
 //	cgis.stopCGI(_filespec);
 #else
-	vector<boost::shared_ptr<amf::Element> > headers = parseEchoRequest(*content);
-  	//boost::shared_ptr<amf::Element> &el0 = headers[0];
+	vector<boost::shared_ptr<cygnal::Element> > headers = parseEchoRequest(*content);
+  	//boost::shared_ptr<cygnal::Element> &el0 = headers[0];
 
 	if (headers.size() >= 4) {
 	    if (headers[3]) {
-		amf::Buffer &reply = formatEchoResponse(headers[1]->getName(), *headers[3]);
+		cygnal::Buffer &reply = formatEchoResponse(headers[1]->getName(), *headers[3]);
 // 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), true) << endl;
 // 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), false) << endl;
 		writeNet(fd, reply);
@@ -354,74 +354,74 @@ HTTPServer::processPostRequest(int fd, amf::Buffer *bufFIXME)
  	}
 #endif
     } else {
-	amf::Buffer &reply = formatHeader(_filetype, _filesize, HTTPServer::OK);
+	cygnal::Buffer &reply = formatHeader(_filetype, _filesize, HTTPServer::OK);
 	writeNet(fd, reply);
     }
 
     return buf;
 }
 
-boost::shared_ptr<amf::Buffer>
-HTTPServer::processPutRequest(int /* fd */, amf::Buffer */* buf */)
+boost::shared_ptr<cygnal::Buffer>
+HTTPServer::processPutRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
-    boost::shared_ptr<amf::Buffer> buf;
+    boost::shared_ptr<cygnal::Buffer> buf;
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("PUT request");
 
     return buf;
 }
 
-boost::shared_ptr<amf::Buffer> 
-HTTPServer::processDeleteRequest(int /* fd */, amf::Buffer */* buf */)
+boost::shared_ptr<cygnal::Buffer> 
+HTTPServer::processDeleteRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buf;
+    boost::shared_ptr<cygnal::Buffer> buf;
     log_unimpl("DELETE request");
     
     return buf;
 }
 
-boost::shared_ptr<amf::Buffer> 
-HTTPServer::processConnectRequest(int /* fd */, amf::Buffer */* buf */)
+boost::shared_ptr<cygnal::Buffer> 
+HTTPServer::processConnectRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buf;
+    boost::shared_ptr<cygnal::Buffer> buf;
     log_unimpl("CONNECT request");
 
     return buf;
 }
 
-boost::shared_ptr<amf::Buffer>
-HTTPServer::processOptionsRequest(int /* fd */, amf::Buffer */* buf */)
+boost::shared_ptr<cygnal::Buffer>
+HTTPServer::processOptionsRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buf;
+    boost::shared_ptr<cygnal::Buffer> buf;
     log_unimpl("OPTIONS request");
 
     return buf;
 }
 
-boost::shared_ptr<amf::Buffer>
-HTTPServer::processHeadRequest(int /* fd */, amf::Buffer */* buf */)
+boost::shared_ptr<cygnal::Buffer>
+HTTPServer::processHeadRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buf;
+    boost::shared_ptr<cygnal::Buffer> buf;
     log_unimpl("HEAD request");
     
     return buf;
 }
 
-boost::shared_ptr<amf::Buffer>
-HTTPServer::processTraceRequest(int /* fd */, amf::Buffer */* buf */)
+boost::shared_ptr<cygnal::Buffer>
+HTTPServer::processTraceRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buf;
+    boost::shared_ptr<cygnal::Buffer> buf;
     log_unimpl("TRACE request");
     
     return buf;
 }
 
-amf::Buffer &
+cygnal::Buffer &
 HTTPServer::formatErrorResponse(http_status_e code)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -458,7 +458,7 @@ HTTPServer::formatErrorResponse(http_status_e code)
     return _buffer;
 }
 
-amf::Buffer &
+cygnal::Buffer &
 HTTPServer::formatGetReply(http_status_e code)
 {
 
@@ -467,7 +467,7 @@ HTTPServer::formatGetReply(http_status_e code)
     return formatHeader(_filesize, code);
 }
 
-amf::Buffer &
+cygnal::Buffer &
 HTTPServer::formatGetReply(size_t size, http_status_e code)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -492,7 +492,7 @@ HTTPServer::formatGetReply(size_t size, http_status_e code)
     return _buffer;
 }
 
-amf::Buffer &
+cygnal::Buffer &
 HTTPServer::formatPostReply(rtmpt_cmd_e /* code */)
 {
     GNASH_REPORT_FUNCTION;
@@ -506,7 +506,7 @@ HTTPServer::formatPostReply(rtmpt_cmd_e /* code */)
 
 #if 0
     formatHeader(_filesize, code);
-    boost::shared_ptr<amf::Buffer> buf = new amf::Buffer;
+    boost::shared_ptr<cygnal::Buffer> buf = new cygnal::Buffer;
     if (_header.str().size()) {
 	buf->resize(_header.str().size());
 	string str = _header.str();
@@ -527,12 +527,12 @@ HTTPServer::formatPostReply(rtmpt_cmd_e /* code */)
 #ifndef USE_CGIBIN
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
-vector<boost::shared_ptr<amf::Element > >
+vector<boost::shared_ptr<cygnal::Element > >
 HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    vector<boost::shared_ptr<amf::Element > > headers;
+    vector<boost::shared_ptr<cygnal::Element > > headers;
 	
     // skip past the header bytes, we don't care about them.
     boost::uint8_t *tmpptr = data + 6;
@@ -543,7 +543,7 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
 
     // Get the first name, which is a raw string, and not preceded by
     // a type byte.
-    boost::shared_ptr<amf::Element > el1(new amf::Element);
+    boost::shared_ptr<cygnal::Element > el1(new cygnal::Element);
     
     // If the length of the name field is corrupted, then we get out of
     // range quick, and corrupt memory. This is a bit of a hack, but
@@ -562,7 +562,7 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
     // a type byte.
     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
     tmpptr += sizeof(boost::uint16_t);
-    boost::shared_ptr<amf::Element > el2(new amf::Element);
+    boost::shared_ptr<cygnal::Element > el2(new cygnal::Element);
 
 //     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
 //     el2->setName(name2.c_str(), name2.size());
@@ -582,11 +582,11 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
     // Get the last two pieces of data, which are both AMF encoded
     // with a type byte.
     amf::AMF amf;
-    boost::shared_ptr<amf::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
+    boost::shared_ptr<cygnal::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
     headers.push_back(el3);
     tmpptr += amf.totalsize();
     
-    boost::shared_ptr<amf::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
+    boost::shared_ptr<cygnal::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
     headers.push_back(el4);
 
      return headers;
@@ -595,14 +595,14 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
 // format a response to the 'echo' test used for testing Gnash. This
 // is only used for testing by developers. The format appears to be
 // two strings, followed by a double, followed by the "onResult".
-amf::Buffer &
-HTTPServer::formatEchoResponse(const std::string &num, amf::Element &el)
+cygnal::Buffer &
+HTTPServer::formatEchoResponse(const std::string &num, cygnal::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> data;
+    boost::shared_ptr<cygnal::Buffer> data;
 
-    amf::Element nel;
-    if (el.getType() == amf::Element::TYPED_OBJECT_AMF0) {
+    cygnal::Element nel;
+    if (el.getType() == cygnal::Element::TYPED_OBJECT_AMF0) {
 	nel.makeTypedObject();
 	string name = el.getName();
 	nel.setName(name);
@@ -610,7 +610,7 @@ HTTPServer::formatEchoResponse(const std::string &num, amf::Element &el)
 	    // FIXME: see about using std::reverse() instead.
 	    for (int i=el.propertySize()-1; i>=0; i--) {
 // 	    for (int i=0 ; i<el.propertySize(); i++) {
-		boost::shared_ptr<amf::Element> child = el.getProperty(i);
+		boost::shared_ptr<cygnal::Element> child = el.getProperty(i);
 		nel.addProperty(child);
 	    }
 	    data = nel.encode();
@@ -624,14 +624,14 @@ HTTPServer::formatEchoResponse(const std::string &num, amf::Element &el)
     return formatEchoResponse(num, data->reference(), data->allocated());
 }
 
-amf::Buffer &
-HTTPServer::formatEchoResponse(const std::string &num, amf::Buffer &data)
+cygnal::Buffer &
+HTTPServer::formatEchoResponse(const std::string &num, cygnal::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return formatEchoResponse(num, data.reference(), data.allocated());
 }
 
-amf::Buffer &
+cygnal::Buffer &
 HTTPServer::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -639,8 +639,8 @@ HTTPServer::formatEchoResponse(const std::string &num, boost::uint8_t *data, siz
     //boost::uint8_t *tmpptr  = data;
     
     // FIXME: temporary hacks while debugging
-    amf::Buffer fixme("00 00 00 00 00 01");
-    amf::Buffer fixme2("ff ff ff ff");
+    cygnal::Buffer fixme("00 00 00 00 00 01");
+    cygnal::Buffer fixme2("ff ff ff ff");
     
     _buffer = "HTTPServer/1.1 200 OK\r\n";
     formatContentType(DiskStream::FILETYPE_AMF);
@@ -661,23 +661,23 @@ HTTPServer::formatEchoResponse(const std::string &num, boost::uint8_t *data, siz
     // the request, a slash followed by a number like "/2".
     string result = num;
     result += "/onResult";
-    boost::shared_ptr<amf::Buffer> res = amf::AMF::encodeString(result);
+    boost::shared_ptr<cygnal::Buffer> res = amf::AMF::encodeString(result);
     _buffer.append(res->begin()+1, res->size()-1);
 
     // Add the null data item
-    boost::shared_ptr<amf::Buffer> null = amf::AMF::encodeString("null");
+    boost::shared_ptr<cygnal::Buffer> null = amf::AMF::encodeString("null");
     _buffer.append(null->begin()+1, null->size()-1);
 
     // Add the other binary blob
     _buffer += fixme2;
 
-    amf::Element::amf0_type_e type = static_cast<amf::Element::amf0_type_e>(*data);
-    if ((type == amf::Element::UNSUPPORTED_AMF0)
-	|| (type == amf::Element::NULL_AMF0)) {
+    cygnal::Element::amf0_type_e type = static_cast<cygnal::Element::amf0_type_e>(*data);
+    if ((type == cygnal::Element::UNSUPPORTED_AMF0)
+	|| (type == cygnal::Element::NULL_AMF0)) {
 	_buffer += type;
 	// Red5 returns a NULL object when it's recieved an undefined one in the echo_test
-    } else if (type == amf::Element::UNDEFINED_AMF0) {
-	_buffer += amf::Element::NULL_AMF0;
+    } else if (type == cygnal::Element::UNDEFINED_AMF0) {
+	_buffer += cygnal::Element::NULL_AMF0;
     } else {
 	// Add the AMF data we're echoing back
 	if (size) {
@@ -888,7 +888,7 @@ HTTPServer::extractCommand(boost::uint8_t *data)
 }
 
 boost::uint8_t *
-HTTPServer::processHeaderFields(amf::Buffer &buf)
+HTTPServer::processHeaderFields(cygnal::Buffer &buf)
 {
   //    GNASH_REPORT_FUNCTION;
     string head(reinterpret_cast<const char *>(buf.reference()));
@@ -993,12 +993,12 @@ HTTPServer::dump()
 }
     
 bool
-HTTPServer::http_handler(Handler *hand, int netfd, amf::Buffer *buf)
+HTTPServer::http_handler(Handler *hand, int netfd, cygnal::Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
 
     // Handler *hand = reinterpret_cast<Handler *>(args->handler);
-    // amf::Buffer *buf = args->buffer;
+    // cygnal::Buffer *buf = args->buffer;
     // boost::shared_ptr<HTTPServer> www(new HTTPServer); // = hand->getHTTPHandler    (args->netfd);
     
     string url, parameters;
@@ -1051,7 +1051,7 @@ HTTPServer::http_handler(Handler *hand, int netfd, amf::Buffer *buf)
     if (response.empty()) {
 	cerr << "FIXME no cache hit for: " << www.getFilespec() << endl;
 //	    www.clearHeader();
-// 	    amf::Buffer &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
+// 	    cygnal::Buffer &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
 // 	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
 // 	    cache.addResponse(www.getFilespec(), www.getHeader());
     } else {

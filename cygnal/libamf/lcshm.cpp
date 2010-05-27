@@ -48,10 +48,11 @@ using gnash::log_error;
 //     * The listeners block starts at 40k+16 = 40976 bytes,
 //     * To add a listener, simply append its name in the listeners list (null terminated strings)
 
-/// \namespace amf
+/// \namespace cygnal
 ///
 /// This namespace is for all the AMF specific classes in libamf.
-namespace amf {
+namespace cygnal
+{
 
 // The maximum 
 // although a bool is one byte, it appears to be a short in AMF,
@@ -464,17 +465,17 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
 //  Make sure it is always right. Probably wrong.
 
     // Which is then always followed by 3 AMF objects.
-    boost::shared_ptr<amf::Buffer> buf1 = AMF::encodeString(con);
+    boost::shared_ptr<cygnal::Buffer> buf1 = AMF::encodeString(con);
     memcpy(ptr_FH, buf1->begin(), buf1->size());
     ptr_FH += buf1->size();
 
     const std::string protocol="localhost";
 	// This could equal to the domain name.
-    boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(protocol);
+    boost::shared_ptr<cygnal::Buffer> buf2 = AMF::encodeString(protocol);
     memcpy(ptr_FH, buf2->begin(), buf2->size());
     ptr_FH += buf2->size();
 
-    boost::shared_ptr<amf::Buffer> buf3 = AMF::encodeString(host);
+    boost::shared_ptr<cygnal::Buffer> buf3 = AMF::encodeString(host);
     memcpy(ptr_FH, buf3->begin(), buf3->size());
     ptr_FH += buf3->size();
     
@@ -590,12 +591,12 @@ LcShm::connect(key_t key)
 
 void
 LcShm::send(const string&  name , const string&  domainname ,
-            vector<amf::Element* >& data )
+            vector<cygnal::Element* >& data )
 {
     //GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_localconnection_mutex);
 	
-	std::vector<amf::Element* >::iterator iter;
+	std::vector<cygnal::Element* >::iterator iter;
 		   
 	if (!Listener::getBaseAddress()) return;
 
@@ -640,16 +641,16 @@ LcShm::send(const string&  name , const string&  domainname ,
 //  Make sure it is right later.
 
     // Which is then always followed by 3 AMF objects.
-    boost::shared_ptr<amf::Buffer> buf1 = AMF::encodeString(name);
+    boost::shared_ptr<cygnal::Buffer> buf1 = AMF::encodeString(name);
     memcpy(ptr, buf1->begin(), buf1->size());
     ptr += buf1->size();
 	
     const std::string protocol="localhostf";
-    boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(protocol);
+    boost::shared_ptr<cygnal::Buffer> buf2 = AMF::encodeString(protocol);
     memcpy(ptr, buf2->begin(), buf2->size());
     ptr += buf2->size();
 
-    boost::shared_ptr<amf::Buffer> buf3 = AMF::encodeString(domainname);
+    boost::shared_ptr<cygnal::Buffer> buf3 = AMF::encodeString(domainname);
     memcpy(ptr, buf3->begin(), buf3->size());
     ptr += buf3->size();
 	
@@ -746,7 +747,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 ///
 /// @return nothing.
 /// We may only need a connection name for the receive function.
-///void recv(std::string &name, std::string &dataname, boost::shared_ptr<amf::Element> data)
+///void recv(std::string &name, std::string &dataname, boost::shared_ptr<cygnal::Element> data)
 //{
 	 //GNASH_REPORT_FUNCTION;
 
@@ -763,7 +764,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 ///         boost::uint8_t *parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar);
 ///         	This should be easy if parseHeader function has been finished.
 ///  3: Parse the body of the shared memory
-/// 	    std::vector<boost::shared_ptr<amf::Element> > parseBody(boost::uint8_t *data);
+/// 	    std::vector<boost::shared_ptr<cygnal::Element> > parseBody(boost::uint8_t *data);
 ///         	This should be easy if parseHeader function has been finished.
 ///  4: The listened should implement these commands somehow automatically .
 ///         Handler?

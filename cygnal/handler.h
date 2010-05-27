@@ -91,7 +91,7 @@ public:
     /// This typedef is only used for the io function that must be
     /// supported by the plugin.
     typedef size_t (*cygnal_io_write_t)(boost::uint8_t *data, size_t size);
-    typedef boost::shared_ptr<amf::Buffer> (*cygnal_io_read_t)();
+    typedef boost::shared_ptr<cygnal::Buffer> (*cygnal_io_read_t)();
     typedef struct {
 	std::string version;
 	std::string description;
@@ -128,7 +128,7 @@ public:
     void setDiskStream(int x, boost::shared_ptr<gnash::DiskStream> y) { _diskstreams[x] = y; }
 
     /// Add a SharedObject
-    void addSOL(boost::shared_ptr<amf::Element> x) {
+    void addSOL(boost::shared_ptr<cygnal::Element> x) {
 	_sol.push_back(x);
     };
 
@@ -174,10 +174,10 @@ public:
     bool initialized();
 
     /// This method reads raw data from a plugin.
-    boost::shared_ptr<amf::Buffer> readFromPlugin();
+    boost::shared_ptr<cygnal::Buffer> readFromPlugin();
 
     /// This method writes raw data to a plugin.
-    size_t writeToPlugin(amf::Buffer &buf) {
+    size_t writeToPlugin(cygnal::Buffer &buf) {
 	return writeToPlugin(buf.begin(), buf.allocated()); };
     size_t writeToPlugin(boost::uint8_t *data, size_t size);
 
@@ -243,7 +243,7 @@ public:
     // Parse the first nessages when starting a new message handler,
     // which is used to determine the name of the resource to
     // initialize, or load from the cache.
-    amf::Buffer *parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto);
+    cygnal::Buffer *parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto);
     
     std::string &getKey(int x) { return _keys[x]; };
     void setKey(int fd, std::string x) { _keys[fd] = x; };
@@ -295,7 +295,7 @@ protected:
     std::vector<boost::shared_ptr<gnash::DiskStream> > _files;
     /// \var _sol
     ///	    is for remote SharedObjects
-    std::vector<boost::shared_ptr<amf::Element> > _sol;
+    std::vector<boost::shared_ptr<cygnal::Element> > _sol;
     ///var _bodysize;
     ///     is to store the body size of the previous packet for this
     ///     channel. 4 and 1 byte heades don't use the length field,

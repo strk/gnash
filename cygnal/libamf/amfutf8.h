@@ -21,7 +21,7 @@
 
 #include <vector>
 
-namespace amf
+namespace cygnal
 {
 
 // This represents an regular UTF8 type in an AMF message

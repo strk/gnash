@@ -102,7 +102,6 @@ extern "C"{
 using namespace std;
 using namespace gnash;
 using namespace cygnal;
-using namespace amf;
 
 static void usage();
 static void version_and_copyright();
@@ -840,7 +839,7 @@ connection_handler(Network::thread_params_t *args)
 	    HTTPServer *http = new HTTPServer;
 	    hargs.entry = http;
 	    http->setDocRoot(crcfile.getDocumentRoot());
-	    boost::shared_ptr<amf::Buffer> buf(http->peekChunk());
+	    boost::shared_ptr<cygnal::Buffer> buf(http->peekChunk());
 	    http->processHeaderFields(*buf);
 	    string hostname, path;
 	    string::size_type pos = http->getField("host").find(":", 0);
@@ -858,7 +857,7 @@ connection_handler(Network::thread_params_t *args)
 		hand = new Handler;
 		hand->addClient(args->netfd, Network::HTTP);
 		int retries = 10;
-		amf::Buffer *buf = 0;
+		cygnal::Buffer *buf = 0;
 		do {
 		    buf = hand->parseFirstRequest(args->netfd, Network::HTTP);
 		    if (!buf) {
@@ -902,7 +901,7 @@ connection_handler(Network::thread_params_t *args)
 	    rargs->protocol = args->protocol;
 	    rargs->netfd = args->netfd;
 	    RTMPServer *rtmp = new RTMPServer;
-	    boost::shared_ptr<amf::Element> tcurl = 
+	    boost::shared_ptr<cygnal::Element> tcurl = 
 		rtmp->processClientHandShake(args->netfd);
 	    if (!tcurl) {
 // 		    log_error("Couldn't read the tcUrl variable!");

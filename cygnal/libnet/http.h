@@ -131,13 +131,13 @@ public:
     ~HTTP();
 
     // Check the Header fields to make sure they're valid values.
-    bool checkRequestFields(amf::Buffer &buf);
-    bool checkEntityFields(amf::Buffer &buf);
-    bool checkGeneralFields(amf::Buffer &buf);
+    bool checkRequestFields(cygnal::Buffer &buf);
+    bool checkEntityFields(cygnal::Buffer &buf);
+    bool checkGeneralFields(cygnal::Buffer &buf);
 
 //     // Parse an Echo Request message coming from the Red5 echo_test.
-    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
+    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     
     // Convert the Content-Length field to a number we can use
     size_t getContentLength();
@@ -145,7 +145,7 @@ public:
     // process all the header fields in the Buffer, storing them internally
     // in _fields. The address returned is the address where the Content data
     // starts, and is "Content-Length" bytes long, of "Content-Type" data.
-    boost::uint8_t *processHeaderFields(amf::Buffer *buf);
+    boost::uint8_t *processHeaderFields(cygnal::Buffer *buf);
     
     // Get the field for header 'name' that was stored by processHeaderFields()
     std::string &getField(const std::string &name) { return _fields[name]; };
@@ -160,11 +160,11 @@ public:
     boost::shared_ptr<http_response_t> parseStatus(const std::string &line);
 
     // Handle the response for the request.
-    boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
-    amf::Buffer &formatGetReply(DiskStream::filetype_e type, size_t size, http_status_e code); 
-    amf::Buffer &formatGetReply(size_t size, http_status_e code); 
-    amf::Buffer &formatGetReply(http_status_e code); 
-    amf::Buffer &formatPostReply(rtmpt_cmd_e code);
+    boost::shared_ptr<cygnal::Buffer> formatServerReply(http_status_e code);
+    cygnal::Buffer &formatGetReply(DiskStream::filetype_e type, size_t size, http_status_e code); 
+    cygnal::Buffer &formatGetReply(size_t size, http_status_e code); 
+    cygnal::Buffer &formatGetReply(http_status_e code); 
+    cygnal::Buffer &formatPostReply(rtmpt_cmd_e code);
 
     // Make copies of ourself
     HTTP &operator = (HTTP &obj);
@@ -185,62 +185,62 @@ public:
     ///		chare a common constructor. A few require formatting
     ///		of numerical data into string data, so they can't use
     ///		the common form.
-    amf::Buffer &formatCommon(const std::string &data);
+    cygnal::Buffer &formatCommon(const std::string &data);
 
-    amf::Buffer &formatHeader(DiskStream::filetype_e type, size_t filesize,
+    cygnal::Buffer &formatHeader(DiskStream::filetype_e type, size_t filesize,
 			    http_status_e code);
-    amf::Buffer &formatHeader(size_t filesize, http_status_e type);
-    amf::Buffer &formatHeader(http_status_e type);
-    amf::Buffer &formatRequest(const std::string &url, http_method_e req);
+    cygnal::Buffer &formatHeader(size_t filesize, http_status_e type);
+    cygnal::Buffer &formatHeader(http_status_e type);
+    cygnal::Buffer &formatRequest(const std::string &url, http_method_e req);
     // format a response to the 'echo' test used for testing Gnash.
-    amf::Buffer &formatEchoResponse(const std::string &num, amf::Element &el);
-    amf::Buffer &formatEchoResponse(const std::string &num, amf::Buffer &data);
-    amf::Buffer &formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size);
+    cygnal::Buffer &formatEchoResponse(const std::string &num, cygnal::Element &el);
+    cygnal::Buffer &formatEchoResponse(const std::string &num, cygnal::Buffer &data);
+    cygnal::Buffer &formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size);
 
-    amf::Buffer &formatMethod(const std::string &data)
+    cygnal::Buffer &formatMethod(const std::string &data)
  	{return formatCommon("Method: " + data); };
-    amf::Buffer &formatDate();
-    amf::Buffer &formatServer();
-    amf::Buffer &formatServer(const std::string &data);
-    amf::Buffer &formatReferer(const std::string &data)
+    cygnal::Buffer &formatDate();
+    cygnal::Buffer &formatServer();
+    cygnal::Buffer &formatServer(const std::string &data);
+    cygnal::Buffer &formatReferer(const std::string &data)
  	{return formatCommon("Referer: " + data); };
-    amf::Buffer &formatConnection(const std::string &data)
+    cygnal::Buffer &formatConnection(const std::string &data)
  	{return formatCommon("Connection: " + data); };
-    amf::Buffer &formatKeepAlive(const std::string &data)
+    cygnal::Buffer &formatKeepAlive(const std::string &data)
  	{return formatCommon("Keep-Alive: " + data); };
-    amf::Buffer &formatContentLength();
-    amf::Buffer &formatContentLength(boost::uint32_t filesize);
-    amf::Buffer &formatContentType();
-    amf::Buffer &formatContentType(DiskStream::filetype_e type);
-    amf::Buffer &formatHost(const std::string &data)
+    cygnal::Buffer &formatContentLength();
+    cygnal::Buffer &formatContentLength(boost::uint32_t filesize);
+    cygnal::Buffer &formatContentType();
+    cygnal::Buffer &formatContentType(DiskStream::filetype_e type);
+    cygnal::Buffer &formatHost(const std::string &data)
  	{return formatCommon("Host: " + data); };
-    amf::Buffer &formatAgent(const std::string &data)
+    cygnal::Buffer &formatAgent(const std::string &data)
  	{return formatCommon("User-Agent: " + data); };
-    amf::Buffer &formatAcceptRanges(const std::string &data)
+    cygnal::Buffer &formatAcceptRanges(const std::string &data)
  	{return formatCommon("Accept-Ranges: " + data); };
-    amf::Buffer &formatLastModified();
-    amf::Buffer &formatLastModified(const std::string &data)
+    cygnal::Buffer &formatLastModified();
+    cygnal::Buffer &formatLastModified(const std::string &data)
  	{return formatCommon("Last-Modified: " + data); }
-    amf::Buffer &formatEtag(const std::string &data)
+    cygnal::Buffer &formatEtag(const std::string &data)
  	{return formatCommon("Etag: " + data); };
-    amf::Buffer &formatLanguage(const std::string &data)
+    cygnal::Buffer &formatLanguage(const std::string &data)
  	{return formatCommon("Accept-Language: " + data); };
-    amf::Buffer &formatCharset(const std::string &data)
+    cygnal::Buffer &formatCharset(const std::string &data)
  	{return formatCommon("Accept-Charset: " + data); };
-    amf::Buffer &formatEncoding(const std::string &data)
+    cygnal::Buffer &formatEncoding(const std::string &data)
  	{return formatCommon("Accept-Encoding: " + data); };
-    amf::Buffer &formatTE(const std::string &data)
+    cygnal::Buffer &formatTE(const std::string &data)
  	{return formatCommon("TE: " + data); };
     // All HTTP messages are terminated with a blank line
     void terminateHeader() { _buffer += "\r\n"; };    
     
-//     amf::Buffer &formatErrorResponse(http_status_e err);
+//     cygnal::Buffer &formatErrorResponse(http_status_e err);
     
     // Return the header that's been built up.
     boost::uint8_t *getHeader() { return _buffer.reference(); };
 
     // Return the header that's been built up.
-    amf::Buffer &getBuffer() { return _buffer; };
+    cygnal::Buffer &getBuffer() { return _buffer; };
 
 //     // Return the body that's been built up.
 //     std::string getBody() { return _body.str(); };
@@ -274,7 +274,7 @@ public:
     int sendMsg();
     int sendMsg(int fd);
     int sendMsg(const boost::uint8_t *data, size_t size);
-    int sendMsg(boost::shared_ptr<amf::Buffer> &buf)
+    int sendMsg(boost::shared_ptr<cygnal::Buffer> &buf)
 	{ return sendMsg(buf->reference(), buf->size()); };
     int sendMsg(std::stringstream &sstr)
 	{ return sendMsg(reinterpret_cast<const boost::uint8_t *>(sstr.str().c_str()), sstr.str().size()); };
@@ -297,13 +297,13 @@ public:
     std::string &getDocRoot() { return _docroot; };
     
     // Pop the first date element off the que
-    boost::shared_ptr<amf::Buffer> DSOEXPORT popChunk() { return _que.pop(); };
+    boost::shared_ptr<cygnal::Buffer> DSOEXPORT popChunk() { return _que.pop(); };
     // Peek at the first date element witjhout removing it from the que
-    boost::shared_ptr<amf::Buffer> DSOEXPORT peekChunk() { return _que.peek(); };
+    boost::shared_ptr<cygnal::Buffer> DSOEXPORT peekChunk() { return _que.peek(); };
     // Get the number of elements in the que
     size_t DSOEXPORT sizeChunks() { return _que.size(); };
 
-    boost::shared_ptr<amf::Buffer> DSOEXPORT mergeChunks() { return _que.merge(); };
+    boost::shared_ptr<cygnal::Buffer> DSOEXPORT mergeChunks() { return _que.merge(); };
 
     http_method_e getOperation() { return _cmd; };
     
@@ -311,14 +311,14 @@ protected:
     // Examine the beginning of the data for an HTTP request command
     // like GET or POST, etc...
     http_method_e extractCommand(boost::uint8_t *data);
-    http_method_e extractCommand(amf::Buffer &data)
+    http_method_e extractCommand(cygnal::Buffer &data)
 	{ return extractCommand(data.reference()); };    
 
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer<Sep> Tok;
     http_method_e	_cmd;
 
-    amf::Buffer		_buffer;
+    cygnal::Buffer		_buffer;
     CQue		_que;
     
     DiskStream::filetype_e  _filetype;

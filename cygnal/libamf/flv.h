@@ -30,10 +30,10 @@
 #include "buffer.h"
 #include "dsodefs.h" // DSOEXPORT
 
-/// \namespace amf
+/// \namespace cygnal
 ///
 /// This namespace is for all the AMF specific classes in libamf.
-namespace amf
+namespace cygnal
 {
 
 /// \brief The FLV header is always 9 bytes
@@ -167,14 +167,14 @@ class DSOEXPORT Flv {
     /// @param type The data type for the header
     ///
     /// @return a smart pointer to a Buffer containing the data in big endian format.
-    boost::shared_ptr<amf::Buffer> encodeHeader(boost::uint8_t type);
+    boost::shared_ptr<cygnal::Buffer> encodeHeader(boost::uint8_t type);
     
     /// \brief Decode a Buffer into a header
     ///
     /// @param buf a smart pointer to a Buffer containing the data.
     ///
     /// @return a smart pointer to data structure that contains the data.
-    boost::shared_ptr<flv_header_t> decodeHeader(boost::shared_ptr<amf::Buffer> buf) { return decodeHeader(buf->reference()); };
+    boost::shared_ptr<flv_header_t> decodeHeader(boost::shared_ptr<cygnal::Buffer> buf) { return decodeHeader(buf->reference()); };
     boost::shared_ptr<flv_header_t> decodeHeader(boost::uint8_t *data);
 
     /// \brief Decode a MetaData object.
@@ -183,7 +183,7 @@ class DSOEXPORT Flv {
     /// @param buf a smart pointer to a Buffer containing the data.
     ///
     /// @return a smart pointer to an Element that contains the data.
-    boost::shared_ptr<amf::Element> decodeMetaData(boost::shared_ptr<amf::Buffer> buf);
+    boost::shared_ptr<cygnal::Element> decodeMetaData(boost::shared_ptr<cygnal::Buffer> buf);
 
     /// \brief Decode a MetaData object.
     ///		This is after the header, but before all the other tags usually
@@ -193,7 +193,7 @@ class DSOEXPORT Flv {
     /// @param size The size of the data in bytes
     ///
     /// @return a smart pointer to an Element that contains the data.
-    boost::shared_ptr<amf::Element> decodeMetaData(boost::uint8_t *data, size_t size);
+    boost::shared_ptr<cygnal::Element> decodeMetaData(boost::uint8_t *data, size_t size);
 
     /// \brief Decode an Audio object.
     ///
@@ -214,7 +214,7 @@ class DSOEXPORT Flv {
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an video data structure that contains the data.
-    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::shared_ptr<amf::Buffer> &buf) { return decodeTagHeader(buf->reference()); };
+    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::shared_ptr<cygnal::Buffer> &buf) { return decodeTagHeader(buf->reference()); };
     boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::uint8_t *data);
 
     /// \brief Find the named property for this Object.
@@ -223,14 +223,14 @@ class DSOEXPORT Flv {
     ///		search for.
     ///
     /// @return A smart pointer to the Element for this property.    
-    boost::shared_ptr<amf::Element> findProperty(const std::string &name);
+    boost::shared_ptr<cygnal::Element> findProperty(const std::string &name);
 
     /// \brief Set all the properties from an array of Element classes.
     ///
     /// @param array
     ///
     /// @return nothing
-    void setProperties(std::vector<boost::shared_ptr<amf::Element> > array)
+    void setProperties(std::vector<boost::shared_ptr<cygnal::Element> > array)
 			{ _properties = array; };
 
     /// \brief Convert a 24 bit integer to a 32 bit one so we can use it.
@@ -258,12 +258,12 @@ class DSOEXPORT Flv {
     /// \var Flv::_properties
     ///		The array of properties for this Flv file, which is
     ///		populated by the data from the first onMetaTag block.
-    std::vector<boost::shared_ptr<amf::Element> > _properties;
+    std::vector<boost::shared_ptr<cygnal::Element> > _properties;
 
     /// \var _metadata
     ///         The data contained in the first onMetaData tag from
     ///         the FLV file.
-    boost::shared_ptr<amf::Element> _metadata;
+    boost::shared_ptr<cygnal::Element> _metadata;
     
 }; // end of class definition
 

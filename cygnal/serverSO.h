@@ -33,7 +33,7 @@ namespace cygnal {
 ///	This class handles storing SharedObject on the server side.
 ///     The SOL class is used to optionally read and write a disk 
 ///     file similar to the client side.
-class DSOEXPORT ServerSO : public amf::SOL
+class DSOEXPORT ServerSO : public cygnal::SOL
 {
 public:
     ServerSO();

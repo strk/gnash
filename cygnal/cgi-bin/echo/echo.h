@@ -46,24 +46,24 @@ public:
     ~EchoTest ();
   
     // Parse an Echo Request message coming from the Red5 echo_test.
-    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf)
+    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(cygnal::Buffer &buf)
         { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     
     // format a response to the 'echo' test used for testing Gnash.
-    boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Element &el);
-    boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Buffer &data);
-    boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);
+    boost::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, cygnal::Element &el);
+    boost::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, cygnal::Buffer &data);
+    boost::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);
 
-    boost::shared_ptr<amf::Buffer> getResponse() { return _response; };
-    void setResponse(boost::shared_ptr<amf::Buffer> &x) { _response = x; };
+    boost::shared_ptr<cygnal::Buffer> getResponse() { return _response; };
+    void setResponse(boost::shared_ptr<cygnal::Buffer> &x) { _response = x; };
 
     void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
     void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
     boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
     
 private:
-    boost::shared_ptr<amf::Buffer> _response;    
+    boost::shared_ptr<cygnal::Buffer> _response;    
     boost::shared_ptr<Handler::cygnal_init_t> _info;
     /// \var _netconnect
     ///    This store the data from the NetConnection ActionScript
@@ -77,7 +77,7 @@ private:
 extern "C" {
     boost::shared_ptr<Handler::cygnal_init_t>echo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg);
     
-    boost::shared_ptr<amf::Buffer> echo_read_func();
+    boost::shared_ptr<cygnal::Buffer> echo_read_func();
     size_t echo_write_func(boost::uint8_t *data, size_t size);
 }
 

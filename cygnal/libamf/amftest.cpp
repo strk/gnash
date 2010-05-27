@@ -49,7 +49,7 @@ bool nodelay = false;           // FIXME: this flag gets set based on
 
 #include "amf.h"
 
-using namespace amf;
+using namespace cygnal;
 using namespace gnash;
 using namespace std;
 

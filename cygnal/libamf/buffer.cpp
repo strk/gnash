@@ -32,10 +32,10 @@
 #include "GnashException.h"
 
 
-/// \namespace amf
+/// \namespace cygnal
 ///
 /// This namespace is for all the AMF specific classes in libamf.
-namespace amf
+namespace cygnal
 {
 
 /// \brief Convert a Hex digit into it's decimal value.
@@ -109,7 +109,7 @@ Buffer::hexify (bool ascii)
 }
 
 std::string
-Buffer::hexify (amf::Buffer &buf, bool ascii)
+Buffer::hexify (cygnal::Buffer &buf, bool ascii)
 {
     return gnash::hexify(buf.reference(), buf.allocated(), ascii);
 }
@@ -145,8 +145,8 @@ Buffer::Buffer()
     : _seekptr(0)
 {
 //    GNASH_REPORT_FUNCTION;
-    _nbytes = amf::NETBUFSIZE;
-    init(amf::NETBUFSIZE);
+    _nbytes = cygnal::NETBUFSIZE;
+    init(cygnal::NETBUFSIZE);
 }
     
 /// \brief Create a new Buffer with a size other than the default
@@ -259,7 +259,7 @@ Buffer::operator+=(Buffer &buf)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator+=(amf::Element::amf0_type_e type)
+Buffer::operator+=(cygnal::Element::amf0_type_e type)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint8_t nb = static_cast<boost::uint8_t>(type);
@@ -466,7 +466,7 @@ Buffer::operator=(boost::uint16_t length)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator=(amf::Element::amf0_type_e type)
+Buffer::operator=(cygnal::Element::amf0_type_e type)
 {
     boost::uint8_t nb = static_cast<boost::uint8_t>(type);
     return operator=(nb);
@@ -708,7 +708,7 @@ Buffer::resize(size_t size)
 	// deleted when this method returns.
 	// We loose data if we resize smaller than the data currently held.
 	if (size < used) {
-	    gnash::log_error("amf::Buffer::resize(%d): Truncating data (%d bytes) while resizing!", size, used - size);
+	    gnash::log_error("cygnal::Buffer::resize(%d): Truncating data (%d bytes) while resizing!", size, used - size);
 	    used = size;
 	}
 	boost::uint8_t *newptr = new boost::uint8_t[size];

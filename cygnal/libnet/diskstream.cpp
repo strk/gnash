@@ -210,7 +210,7 @@ DiskStream::DiskStream(const string &str, boost::uint8_t *data, size_t size)
 #endif    
 }
 
-DiskStream::DiskStream(const string &str, amf::Buffer &buf)
+DiskStream::DiskStream(const string &str, cygnal::Buffer &buf)
     : _state(DiskStream::NO_STATE),
       _filefd(0),
       _netfd(0),
@@ -507,15 +507,15 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
     boost::uint8_t *ptr = dataptr;
     if (_filetype == FILETYPE_FLV) {
 	// FIXME: for now, assume all media files are in FLV format
-	_flv.reset(new amf::Flv);
-	boost::shared_ptr<amf::Flv::flv_header_t> head = _flv->decodeHeader(ptr);
-	ptr += sizeof(amf::Flv::flv_header_t);
-	ptr += sizeof(amf::Flv::previous_size_t);
-	boost::shared_ptr<amf::Flv::flv_tag_t> tag  = _flv->decodeTagHeader(ptr);
-	ptr += sizeof(amf::Flv::flv_tag_t);
+	_flv.reset(new cygnal::Flv);
+	boost::shared_ptr<cygnal::Flv::flv_header_t> head = _flv->decodeHeader(ptr);
+	ptr += sizeof(cygnal::Flv::flv_header_t);
+	ptr += sizeof(cygnal::Flv::previous_size_t);
+	boost::shared_ptr<cygnal::Flv::flv_tag_t> tag  = _flv->decodeTagHeader(ptr);
+	ptr += sizeof(cygnal::Flv::flv_tag_t);
 	size_t bodysize = _flv->convert24(tag->bodysize);	    
-	if (tag->type == amf::Flv::TAG_METADATA) {
-	    boost::shared_ptr<amf::Element> metadata = _flv->decodeMetaData(ptr, bodysize);
+	if (tag->type == cygnal::Flv::TAG_METADATA) {
+	    boost::shared_ptr<cygnal::Element> metadata = _flv->decodeMetaData(ptr, bodysize);
 	    if (metadata) {
 		metadata->dump();
 	    }
@@ -564,7 +564,7 @@ DiskStream::writeToDisk(const std::string &filespec)
 }
 
 bool
-DiskStream::writeToDisk(const std::string &filespec, amf::Buffer &data)
+DiskStream::writeToDisk(const std::string &filespec, cygnal::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return writeToDisk(filespec, data.reference(), data.allocated());

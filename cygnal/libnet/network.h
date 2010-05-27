@@ -62,7 +62,7 @@
 
 #include "dsodefs.h" //For DSOEXPORT.
 
-namespace amf {
+namespace cygnal {
 class Buffer;
 }
 
@@ -138,7 +138,7 @@ public:
 	int netfd;
 	void *entry;
 	void *handler;
-	amf::Buffer *buffer;
+	cygnal::Buffer *buffer;
 	std::string filespec;
 	protocols_supported_e protocol;
     } thread_params_t;
@@ -204,12 +204,12 @@ public:
     /// @param nbytes The number of bytes to try to read.
     ///
     /// @return The number of bytes read.
-    boost::shared_ptr<amf::Buffer> readNet();
-    int readNet(amf::Buffer &buffer);
-    int readNet(int fd, amf::Buffer &buffer);
-    int readNet(int fd, amf::Buffer *buffer);
-    int readNet(amf::Buffer &buffer, int timeout);
-    int readNet(int fd, amf::Buffer &buffer, int timeout);
+    boost::shared_ptr<cygnal::Buffer> readNet();
+    int readNet(cygnal::Buffer &buffer);
+    int readNet(int fd, cygnal::Buffer &buffer);
+    int readNet(int fd, cygnal::Buffer *buffer);
+    int readNet(cygnal::Buffer &buffer, int timeout);
+    int readNet(int fd, cygnal::Buffer &buffer, int timeout);
     int readNet(byte_t *data, int nbytes);
     int readNet(byte_t *data, int nbytes, int timeout);
     int readNet(int fd, byte_t *data, int nbytes);
@@ -226,10 +226,10 @@ public:
     /// @param nbytes The number of bytes to try to write..
     ///
     /// @return The number of bytes read.
-    int writeNet(amf::Buffer *buffer);
-    int writeNet(amf::Buffer &buffer);
-    int writeNet(int fd, amf::Buffer *buffer);
-    int writeNet(int fd, amf::Buffer &buffer);
+    int writeNet(cygnal::Buffer *buffer);
+    int writeNet(cygnal::Buffer &buffer);
+    int writeNet(int fd, cygnal::Buffer *buffer);
+    int writeNet(int fd, cygnal::Buffer &buffer);
     int writeNet(const std::string &data);
     int writeNet(const byte_t *data, int nbytes);
 //    int writeNet(int fd, const byte_t *buffer);
@@ -363,5 +363,5 @@ public:
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

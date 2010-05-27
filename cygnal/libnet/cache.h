@@ -101,7 +101,7 @@ private:
     ///		The memory page size.
     size_t	_pagesize;    
 
-amf::AMF::filetype_e  _filetype; // FIXME: this shouldn't be here still
+cygnal::AMF::filetype_e  _filetype; // FIXME: this shouldn't be here still
 };
 
 /// \brief Dump to the specified output stream.
@@ -117,5 +117,5 @@ inline std::ostream& operator << (std::ostream& os, const Cache& cache)
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

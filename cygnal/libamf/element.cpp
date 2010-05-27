@@ -36,10 +36,10 @@
 using std::string;
 using gnash::log_error;
 
-/// \namespace amf
+/// \namespace cygnal
 ///
 /// This namespace is for all the AMF specific classes in libamf.
-namespace amf 
+namespace cygnal
 {
 
 /// \brief This is used to print more intelligent debug messages
@@ -186,7 +186,7 @@ Element::init(bool flag, double unknown1, double unknown2,
     }
 
     // Build up the properties for the function block
-    shared_ptr<amf::Element> el = new Element(flag);
+    shared_ptr<cygnal::Element> el = new Element(flag);
     _properties.push_back(el);
     
     el = new Element(unknown1);
@@ -404,7 +404,7 @@ Element::calculateSize()
 }
 
 size_t
-Element::calculateSize(amf::Element &el) const
+Element::calculateSize(cygnal::Element &el) const
 {
 //    GNASH_REPORT_FUNCTION;    
     size_t outsize = 0;
@@ -431,14 +431,14 @@ Element::calculateSize(amf::Element &el) const
     // More complex messages have child elements, either properties or
     // the items in an array, If we have children, count up their size too.
     // Calculate the total size of the message
-    std::vector<boost::shared_ptr<amf::Element> > props = el.getProperties();
+    std::vector<boost::shared_ptr<cygnal::Element> > props = el.getProperties();
     for (size_t i=0; i<props.size(); i++) {
 	outsize += props[i]->getDataSize();
 	if (props[i]->getNameSize()) {
 	    outsize += props[i]->getNameSize();
-	    outsize += amf::AMF_PROP_HEADER_SIZE;
+	    outsize += cygnal::AMF_PROP_HEADER_SIZE;
 	} else {
-	    outsize += amf::AMF_HEADER_SIZE;
+	    outsize += cygnal::AMF_HEADER_SIZE;
 	}
     }
 
@@ -711,7 +711,7 @@ Element::makeString(const string &name, const string &str)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeNumber(boost::shared_ptr<amf::Buffer> buf)
+Element::makeNumber(boost::shared_ptr<cygnal::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     return makeNumber(buf->reference());
@@ -1189,7 +1189,7 @@ Element::makeECMAArray(const std::string &name)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data)
+Element::makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::ECMA_ARRAY_AMF0;
@@ -1206,7 +1206,7 @@ Element::makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<am
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeECMAArray(std::vector<boost::shared_ptr<amf::Element> > &data)
+Element::makeECMAArray(std::vector<boost::shared_ptr<cygnal::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     makeObject(data);
@@ -1252,7 +1252,7 @@ Element::makeStrictArray(const std::string &name)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data)
+Element::makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     makeObject(name, data);
@@ -1268,7 +1268,7 @@ Element::makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeStrictArray(std::vector<boost::shared_ptr<amf::Element> > &data)
+Element::makeStrictArray(std::vector<boost::shared_ptr<cygnal::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     makeObject(data);
@@ -1569,7 +1569,7 @@ Element::dump(std::ostream& os) const
 ///	search for.
 ///
 /// @return A smart pointer to the Element for this property.
-boost::shared_ptr<amf::Element> 
+boost::shared_ptr<cygnal::Element> 
 Element::findProperty(const std::string &name)
 {
     if (_properties.size() > 0) {

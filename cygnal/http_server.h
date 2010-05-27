@@ -46,56 +46,56 @@ public:
 
     // These are for the protocol itself
     http_method_e processClientRequest(int fd);
-    http_method_e processClientRequest(Handler *hand, int fd, amf::Buffer *buf);
-    amf::Buffer &processGetRequest(Handler *hand, int fd, amf::Buffer *buf);
-    boost::shared_ptr<amf::Buffer> processPostRequest(int fd, amf::Buffer *buf);
-    boost::shared_ptr<amf::Buffer> processPutRequest(int fd, amf::Buffer *buf);
-    boost::shared_ptr<amf::Buffer> processDeleteRequest(int fd, amf::Buffer *buf);
-    boost::shared_ptr<amf::Buffer> processConnectRequest(int fd, amf::Buffer *buf);
-    boost::shared_ptr<amf::Buffer> processOptionsRequest(int fd, amf::Buffer *buf);
-    boost::shared_ptr<amf::Buffer> processHeadRequest(int fd, amf::Buffer *buf);
-    boost::shared_ptr<amf::Buffer> processTraceRequest(int fd, amf::Buffer *buf);
+    http_method_e processClientRequest(Handler *hand, int fd, cygnal::Buffer *buf);
+    cygnal::Buffer &processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf);
+    boost::shared_ptr<cygnal::Buffer> processPostRequest(int fd, cygnal::Buffer *buf);
+    boost::shared_ptr<cygnal::Buffer> processPutRequest(int fd, cygnal::Buffer *buf);
+    boost::shared_ptr<cygnal::Buffer> processDeleteRequest(int fd, cygnal::Buffer *buf);
+    boost::shared_ptr<cygnal::Buffer> processConnectRequest(int fd, cygnal::Buffer *buf);
+    boost::shared_ptr<cygnal::Buffer> processOptionsRequest(int fd, cygnal::Buffer *buf);
+    boost::shared_ptr<cygnal::Buffer> processHeadRequest(int fd, cygnal::Buffer *buf);
+    boost::shared_ptr<cygnal::Buffer> processTraceRequest(int fd, cygnal::Buffer *buf);
 
     // Handle the response for the request.
-    boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
-    amf::Buffer &formatGetReply(gnash::DiskStream::filetype_e type, size_t size, http_status_e code); 
-    amf::Buffer &formatGetReply(size_t size, http_status_e code); 
-    amf::Buffer &formatGetReply(http_status_e code); 
-    amf::Buffer &formatPostReply(rtmpt_cmd_e code);
-    amf::Buffer &formatErrorResponse(http_status_e err);
+    boost::shared_ptr<cygnal::Buffer> formatServerReply(http_status_e code);
+    cygnal::Buffer &formatGetReply(gnash::DiskStream::filetype_e type, size_t size, http_status_e code); 
+    cygnal::Buffer &formatGetReply(size_t size, http_status_e code); 
+    cygnal::Buffer &formatGetReply(http_status_e code); 
+    cygnal::Buffer &formatPostReply(rtmpt_cmd_e code);
+    cygnal::Buffer &formatErrorResponse(http_status_e err);
 
     // These methods extract data from an RTMPT message. RTMP is an
     // extension to HTTP that adds commands to manipulate the
     // connection's persistance.
     rtmpt_cmd_e extractRTMPT(boost::uint8_t *data);
-    rtmpt_cmd_e extractRTMPT(amf::Buffer &data)
+    rtmpt_cmd_e extractRTMPT(cygnal::Buffer &data)
 	{ return extractRTMPT(data.reference()); };    
 
 #if 0
     // Examine the beginning of the data for an HTTP request command
     // like GET or POST, etc...
     http_method_e extractCommand(boost::uint8_t *data);
-    http_method_e extractCommand(amf::Buffer &data)
+    http_method_e extractCommand(cygnal::Buffer &data)
 	{ return extractCommand(data.reference()); };    
 
     // process all the header fields in the Buffer, storing them internally
     // in _fields. The address returned is the address where the Content data
     // starts, and is "Content-Length" bytes long, of "Content-Type" data.
-    boost::uint8_t *processHeaderFields(amf::Buffer &buf);
+    boost::uint8_t *processHeaderFields(cygnal::Buffer &buf);
 #endif
     
 #if 0
     // Parse an Echo Request message coming from the Red5 echo_test.
-    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(gnash::amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(gnash::cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
+    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     
     // format a response to the 'echo' test used for testing Gnash.
-    gnash::amf::Buffer &formatEchoResponse(const std::string &num, amf::Element &el);
-    gnash::amf::Buffer &formatEchoResponse(const std::string &num, amf::Buffer &data);
-    gnash::amf::Buffer &formatEchoResponse(const std::string &num, uint8_t *data, size_t size);
+    gnash::cygnal::Buffer &formatEchoResponse(const std::string &num, cygnal::Element &el);
+    gnash::cygnal::Buffer &formatEchoResponse(const std::string &num, cygnal::Buffer &data);
+    gnash::cygnal::Buffer &formatEchoResponse(const std::string &num, uint8_t *data, size_t size);
 #endif
 
-    bool http_handler(Handler *hand, int netfd, amf::Buffer *buf);
+    bool http_handler(Handler *hand, int netfd, cygnal::Buffer *buf);
     boost::shared_ptr<gnash::DiskStream> getDiskStream() { return _diskstream; };
 
     void dump();    

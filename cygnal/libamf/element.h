@@ -30,10 +30,10 @@
 //#include "network.h"
 #include "dsodefs.h" // DSOEXPORT
 
-/// \namespace amf
+/// \namespace cygnal
 ///
 /// This namespace is for all the AMF specific classes in libamf.
-namespace amf
+namespace cygnal
 {
 
 // Forward decleration
@@ -254,7 +254,7 @@ public:
     /// @param buf A smart pointer to a Buffer class.
     ///
     /// @return A reference to this Element.
-    Element &makeNumber(boost::shared_ptr<amf::Buffer> buf); 
+    Element &makeNumber(boost::shared_ptr<cygnal::Buffer> buf); 
 
     /// \brief Make this Element with a double value.
     ///		The size isn't needed as a double is always the same size.
@@ -350,7 +350,7 @@ public:
     /// @param data A smart pointer to an Element to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeObject(std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeObject(std::vector<boost::shared_ptr<cygnal::Element> > &data);
     
     /// \brief Make this Element a Property with an Object as the value.
     ///
@@ -359,7 +359,7 @@ public:
     /// @param data A smart pointer to an Element to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeObject(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeObject(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data);
     
     /// \brief Make this Element as an XML Object data type.
     ///		This is like a string object, but the type is different.
@@ -407,7 +407,7 @@ public:
     /// @param data A smart pointer to a vector of Elements to use as the vaule.
     ///
     /// @return A reference to this Element.
-    Element &makeECMAArray(std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeECMAArray(std::vector<boost::shared_ptr<cygnal::Element> > &data);
 
     /// \brief Make this Element a Property with an ECMA Array as the value.
     ///
@@ -416,7 +416,7 @@ public:
     /// @param data A smart pointer to a vector of Elements to use as the vaule.
     ///
     /// @return A reference to this Element.
-    Element &makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data);
 
     /// \brief Make this Element a Property with an Strict Array as the value.
     ///		This is an array of a single AMF type. These are stored
@@ -441,7 +441,7 @@ public:
     /// @param data A smart pointer to a vector of Elements to use as the vaule.
     ///
     /// @return A reference to this Element.
-    Element &makeStrictArray(std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeStrictArray(std::vector<boost::shared_ptr<cygnal::Element> > &data);
 
     /// \brief Make this Element a Property with an Strict Array as the value.
     ///
@@ -450,7 +450,7 @@ public:
     /// @param data A smart pointer to a vector of Elements to use as the vaule.
     ///
     /// @return A reference to this Element.
-    Element &makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data);
 
     /// \brief Make this Element a Property with an Typed Object as the value.
     ///
@@ -573,7 +573,7 @@ public:
     /// @param buf A smart pointer to an Element.
     ///
     /// @return A boolean true if the Elements are indentical.
-    bool operator==(boost::shared_ptr<amf::Element> );
+    bool operator==(boost::shared_ptr<cygnal::Element> );
     
     /// \brief Test equivalance against a boolean value
     ///		This compares all the data and the data type in the
@@ -592,7 +592,7 @@ public:
     ///		the array to get.
     ///
     /// @return A smart pointer to the Element or property.
-    boost::shared_ptr<amf::Element> operator[](size_t index);
+    boost::shared_ptr<cygnal::Element> operator[](size_t index);
 
     /// \brief Get the size in bytes of the Element's data.
     ///		All data in an Element is stored in a Buffer class.
@@ -743,7 +743,7 @@ public:
 			{ return _properties; };
 
     size_t calculateSize();
-    size_t calculateSize(amf::Element &el) const;
+    size_t calculateSize(cygnal::Element &el) const;
 
     ///  \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
@@ -770,7 +770,7 @@ private:
     /// \var _buffer
     ///		A smart pointer to the Buffer used to hold the data
     ///		for this Element.
-    boost::shared_ptr<amf::Buffer> _buffer;
+    boost::shared_ptr<cygnal::Buffer> _buffer;
 
     /// \var _type
     ///		The AMF0 data type of this Element.
@@ -798,5 +798,5 @@ inline std::ostream& operator << (std::ostream& os, const Element& el)
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
