@@ -549,8 +549,6 @@ DisplayList::insertDisplayObject(DisplayObject* obj, int index)
     // Give life to this instance
     obj->stagePlacementCallback();
 
-    if (obj->isDynamic()) obj->construct(0);
-
     testInvariant();
 
 }
