@@ -339,6 +339,7 @@ movie_root::setLevel(unsigned int num, Movie* movie)
     
     /// Notify placement 
     movie->stagePlacementCallback();
+    if (movie->isDynamic()) movie->construct(0);
 
     assert(testInvariant());
 }

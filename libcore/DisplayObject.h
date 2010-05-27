@@ -789,7 +789,7 @@ public:
     /// If you override the method remember to call saveOriginalTarget()
     /// as the first thing.
     ///
-    virtual void stagePlacementCallback(as_object* = 0)
+    virtual void stagePlacementCallback()
     {
         saveOriginalTarget();
     }
@@ -827,6 +827,11 @@ public:
     ///             with the DisplayObject as it will not be needed anymore.
     ///
     virtual void destroy();
+
+    /// Construct any associated ActionScript objects and properties
+    //
+    /// This includes the init object if present and any registered classes.
+    virtual void construct(as_object* = 0) { }
 
     /// Return true if this DisplayObject was destroyed.
     //

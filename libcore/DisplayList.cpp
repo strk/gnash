@@ -245,7 +245,8 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth,
     }
 
     // Give life to this instance
-    ch->stagePlacementCallback(initObj);
+    ch->stagePlacementCallback();
+    if (ch->isDynamic()) ch->construct(initObj);
 
     testInvariant();
 }
@@ -329,6 +330,9 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
 
     // Give life to this instance
     ch->stagePlacementCallback();
+
+    // TODO: not here!
+    if (ch->isDynamic()) ch->construct(0);
 
     testInvariant();
 }
@@ -547,6 +551,8 @@ DisplayList::insertDisplayObject(DisplayObject* obj, int index)
 
     // Give life to this instance
     obj->stagePlacementCallback();
+
+    if (obj->isDynamic()) obj->construct(0);
 
     testInvariant();
 

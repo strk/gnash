@@ -1730,13 +1730,79 @@ MovieClip::registerAsListener()
     stage().add_mouse_listener(this);
 }
 
+void
+MovieClip::constructAsScriptObject()
+{
+    as_object* mc = getObject(this);
+    
+    // A MovieClip should always have an associated object.
+    assert(mc);
+
+    if (!isAS3(getVM(*mc)) && !get_parent()) {
+        mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
+    }
+
+    const sprite_definition* def = 
+        dynamic_cast<const sprite_definition*>(_def.get());
+
+    // We won't "construct" top-level movies
+    as_function* ctor = def ? def->getRegisteredClass() : 0;
+
+#ifdef GNASH_DEBUG
+    log_debug(_("Attached movieclips %s registered class is %p"),
+            getTarget(), (void*)ctor); 
+#endif
+
+    // Set this MovieClip object to be an instance of the class.
+    if (ctor) {
+        Property* proto = ctor->getOwnProperty(NSV::PROP_PROTOTYPE);
+        if (proto) mc->set_prototype(proto->getValue(*ctor));
+    }
+
+    // Send the construct event. This must be done after the __proto__ 
+    // member is set. It is always done.
+    notifyEvent(event_id::CONSTRUCT);
+        
+    if (ctor) {
+        const int swfversion = getSWFVersion(*mc);
+        if (swfversion > 5) {
+            fn_call::Args args;
+            ctor->construct(*mc, get_environment(), args);
+        }
+    }
+
+}
+
+void
+MovieClip::construct(as_object* initObj)
+{
+    as_object* mc = getObject(this);
+    
+    // A MovieClip should always have an associated object.
+    assert(mc);
+
+    // Properties from an initObj must be copied before construction, but
+    // after the display list has been populated, so that _height and
+    // _width (which depend on bounds) are correct.
+    if (initObj) {
+        mc->copyProperties(*initObj);
+    }
+
+    constructAsScriptObject();
+
+    // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
+    // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
+    // immediately.
+    queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
+
+}
 
 // WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", that is,
 //          its target path needs to exist, or any as_value for it will be
 //          a dangling reference to an unexistent movieclip !
 //          NOTE: this is just due to the wrong steps, see comment in header
 void
-MovieClip::stagePlacementCallback(as_object* initObj)
+MovieClip::stagePlacementCallback()
 {
     assert(!unloaded());
 
@@ -1748,7 +1814,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 
     // Register this movieclip as a live one
     stage().addLiveChar(this);
-  
 
     // Register this movieclip as a core broadcasters listener
     registerAsListener();
@@ -1807,7 +1872,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     // events with priority INITIALIZE or CONSTRUCT ...
     if (!isDynamic())
     {
-        assert(!initObj);
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
                 getTarget());
@@ -1818,68 +1882,9 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         stage().pushAction(code, movie_root::PRIORITY_CONSTRUCT);
 
     }
-    else {
-
-        // Properties from an initObj must be copied before construction, but
-        // after the display list has been populated, so that _height and
-        // _width (which depend on bounds) are correct.
-        if (initObj) {
-            getObject(this)->copyProperties(*initObj);
-        }
-
-        constructAsScriptObject(); 
-
-        // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
-        // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
-        // immediately.
-        queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
-    }
-
 
 }
 
-
-void
-MovieClip::constructAsScriptObject()
-{
-    as_object* mc = getObject(this);
-
-    // A MovieClip should always have an associated object.
-    assert(mc);
-
-    if (!isAS3(getVM(*mc)) && !get_parent()) {
-        mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
-    }
-
-    const sprite_definition* def = 
-        dynamic_cast<const sprite_definition*>(_def.get());
-
-    // We won't "construct" top-level movies
-    as_function* ctor = def ? def->getRegisteredClass() : 0;
-
-#ifdef GNASH_DEBUG
-    log_debug(_("Attached movieclips %s registered class is %p"),
-            getTarget(), (void*)ctor); 
-#endif
-
-    // Set this MovieClip object to be an instance of the class.
-    if (ctor) {
-        Property* proto = ctor->getOwnProperty(NSV::PROP_PROTOTYPE);
-        if (proto) mc->set_prototype(proto->getValue(*ctor));
-    }
-
-    // Send the construct event. This must be done after the __proto__ 
-    // member is set. It is always done.
-    notifyEvent(event_id::CONSTRUCT);
-        
-    if (ctor) {
-        const int swfversion = getSWFVersion(*mc);
-        if (swfversion > 5) {
-            fn_call::Args args;
-            ctor->construct(*mc, get_environment(), args);
-        }
-    }
-}
 
 bool
 MovieClip::unload()

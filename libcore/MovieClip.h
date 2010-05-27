@@ -405,7 +405,10 @@ public:
     //
     /// (1) Construct this instance as an ActionScript object.
     ///     See constructAsScriptObject() method.
-    virtual void stagePlacementCallback(as_object* initObj = 0);
+    virtual void stagePlacementCallback();
+
+    /// Construct registered class and add properties.
+    virtual void construct(as_object* initObj);
 
     /// Unload all contents in the displaylist and this instance
     /// See DisplayObject::unload for more info

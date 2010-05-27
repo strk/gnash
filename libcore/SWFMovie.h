@@ -72,8 +72,7 @@ public:
 	/// and then call MovieClip::stagePlacementCallback.
 	///
 	/// It's intended to be called by movie_root::setLevel().
-	///
-	void stagePlacementCallback(as_object* initObj = 0);
+    void stagePlacementCallback();
 
     const std::string& url() const {
         return _def->get_url();
