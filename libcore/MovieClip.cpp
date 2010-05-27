@@ -1298,16 +1298,11 @@ MovieClip::replace_display_object(DisplayObject* ch, int depth,
 void
 MovieClip::increment_frame_and_check_for_loop()
 {
-    size_t frame_count = get_loaded_frames(); 
-    if ( ++_currentFrame >= frame_count )
-    {
+    const size_t frame_count = get_loaded_frames(); 
+    if (++_currentFrame >= frame_count) {
         // Loop.
         _currentFrame = 0;
         _hasLooped = true;
-        if (frame_count > 1)
-        {
-            //_displayList.reset();
-        }
     }
 
 }
