@@ -320,9 +320,9 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
         // extend invalidated bounds
         // WARNING: when a new Button DisplayObject is added,
         //          the invalidated bounds computation will likely
-        //          be bogus, as the actual DisplayObject shown is not instantiated
-        //          until ::stagePlacementCallback for buttons (I'd
-        //          say this is a bug in Button). 
+        //          be bogus, as the actual DisplayObject shown is not
+        //          instantiated until stagePlacementCallback for buttons
+        //          (I'd say this is a bug in Button). 
         ch->extend_invalidated_bounds(old_ranges);                
 
     }
