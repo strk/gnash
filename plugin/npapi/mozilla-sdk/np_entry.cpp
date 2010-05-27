@@ -152,6 +152,8 @@ NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
   if (++i <= n) NPNFuncs.enumerate = aNPNFuncs->enumerate;
   if (++i <= n) NPNFuncs.pluginthreadasynccall = aNPNFuncs->pluginthreadasynccall;
   if (++i <= n) NPNFuncs.construct = aNPNFuncs->construct;
+  if (++i <= n) NPNFuncs.getvalueforurl = aNPNFuncs->getvalueforurl;
+  if (++i <= n) NPNFuncs.setvalueforurl = aNPNFuncs->setvalueforurl;
 
   return NPERR_NO_ERROR;
 }

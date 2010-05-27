@@ -318,3 +318,33 @@ void NPN_SetException(NPObject* obj, const NPUTF8 *message)
 {
   NPNFuncs.setexception(obj, message);
 }
+
+NPError NPN_GetValueForURL(NPP instance, NPNURLVariable variable,
+                   const char *url, char **value, uint32_t *len)
+{
+    return NPNFuncs.getvalueforurl(instance, variable, url, value, len);
+}
+
+NPError NPN_SetValueForURL(NPP instance, NPNURLVariable variable,
+                   const char *url, const char *value, uint32_t len)
+{
+    return NPNFuncs.setvalueforurl(instance, variable, url, value, len);
+}
+
+NPError NPN_GetAuthenticationInfo(NPP instance, const char *protocol,
+                          const char *host, int32_t port,
+                          const char *scheme, const char *realm,
+                          char **username, uint32_t *ulen,
+                          char **password, uint32_t *plen)
+{
+    return NPNFuncs.getauthenticationinfo(instance, protocol, host, port,
+                                          scheme, realm, username, ulen,
+                                          password, plen);
+}
+  
+void NPN_PluginThreadAsyncCall(NPP plugin, void (*func)(void *), void *userData)
+{
+    NPNFuncs.pluginthreadasynccall(plugin, func, userData);
+}
+
+
