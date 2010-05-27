@@ -331,9 +331,6 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
     // Give life to this instance
     ch->stagePlacementCallback();
 
-    // TODO: not here!
-    if (ch->isDynamic()) ch->construct(0);
-
     testInvariant();
 }
     
@@ -690,7 +687,7 @@ DisplayList::display(Renderer& renderer)
         // Don't display dynamic masks
         if (ch->isDynamicMask()) continue;
 
-        assert(! ch->unloaded() ); // we don't advance unloaded chars
+        assert(!ch->unloaded()); // we don't advance unloaded chars
 
         // Check if this charater or any of its parents is a mask.
         // Characters acting as masks should always be rendered to the

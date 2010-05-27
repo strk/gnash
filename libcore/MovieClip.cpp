@@ -1287,15 +1287,6 @@ MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag,
 }
 
 void
-MovieClip::replace_display_object(DisplayObject* ch, int depth, 
-        bool use_old_cxform, bool use_old_matrix)
-{
-    assert(ch);
-    _displayList.replaceDisplayObject(ch, depth,
-            use_old_cxform, use_old_matrix);
-}
-
-void
 MovieClip::increment_frame_and_check_for_loop()
 {
     const size_t frame_count = get_loaded_frames(); 
@@ -1943,9 +1934,8 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
         //       DisplayObjectContainer and log an error if it's not.
         MovieClip* parent_sp = parent->to_movie();
         assert(parent_sp);
-        parent_sp->replace_display_object(extern_movie, get_depth(),
-                     true, true);
-
+        parent_sp->_displayList.replaceDisplayObject(extern_movie, get_depth(),
+                true, true);
     }
     else
     {
