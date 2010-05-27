@@ -552,7 +552,8 @@ MovieClip::addDisplayListObject(DisplayObject* obj, int depth)
     // TODO: only call set_invalidated if this DisplayObject actually overrides
     //             an existing one !
     set_invalidated(); 
-    _displayList.placeDisplayObject(obj, depth);     
+    _displayList.placeDisplayObject(obj, depth);
+    obj->construct(0);
     return obj;
 }
 
@@ -1771,6 +1772,13 @@ MovieClip::construct(as_object* initObj)
     
     // A MovieClip should always have an associated object.
     assert(mc);
+
+    // This function should only be called on dynamic objects.
+    assert(isDynamic());
+
+    // A dynamic MovieClip must always have a parent. This also means we
+    // never have to set $version.
+    assert(get_parent());
 
     // Properties from an initObj must be copied before construction, but
     // after the display list has been populated, so that _height and
