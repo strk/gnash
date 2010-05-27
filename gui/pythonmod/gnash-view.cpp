@@ -484,7 +484,8 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     std::map<std::string, std::string> variables;
     gnash::URL::parse_querystring(url.querystring(), variables);
 
-    gnash::Movie* m = view->stage->init(view->movie_definition.get(), variables);
+    gnash::Movie* m = view->stage->init(view->movie_definition.get(), variables,
+                                        variables);
     view->movie = m;
 
     view->stage->set_background_alpha(1.0f);
