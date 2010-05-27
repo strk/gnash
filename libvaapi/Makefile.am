@@ -21,7 +21,7 @@ pkglib_LTLIBRARIES = libgnashvaapi.la
 libgnashvaapi_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
 	$(BOOST_CFLAGS)	\
-	$(LIBSWSCALE_CFLAGS) \
+	$(FFMPEG_CFLAGS) \
 	$(LIBVA_CFLAGS)	\
 	$(LIBVA_X11_CFLAGS) \
 	$(NULL)
@@ -30,7 +30,7 @@ libgnashvaapi_la_LIBADD = \
 	$(X11_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(LIBSWSCALE_LIBS) \
+	$(FFMPEG_LIBS) \
 	$(LIBVA_LIBS) \
 	$(LIBVA_X11_LIBS) \
 	$(NULL)
