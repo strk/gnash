@@ -42,7 +42,7 @@
 #include "buffer.h"
 #include "arg_parser.h"
 
-using namespace amf;
+using namespace cygnal;
 using namespace std;
 using namespace gnash;
 
@@ -195,7 +195,7 @@ main(int argc, char *argv[])
 	try {
             // Open the binary file
 	    ifstream ifs(filespec.c_str(), ios::binary);
-	    boost::shared_ptr<amf::Buffer> buf(new Buffer);
+	    boost::shared_ptr<cygnal::Buffer> buf(new Buffer);
             // Read just the initial 9 byte header
 	    ifs.read(reinterpret_cast<char *>(buf->reference()), sizeof(Flv::flv_header_t));
 	    log_debug("header is: %s",  hexify(buf->reference(), 9, false));
@@ -279,7 +279,7 @@ main(int argc, char *argv[])
  		       if (meta || all) {
  			   cout << "FLV Tag type is: MetaData" << endl;
  		       }
-		       boost::shared_ptr<amf::Element> metadata = flv.decodeMetaData(buf->reference(), bodysize);
+		       boost::shared_ptr<cygnal::Element> metadata = flv.decodeMetaData(buf->reference(), bodysize);
 		       if (meta && metadata) {
 			   metadata->dump();
 		       }

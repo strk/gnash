@@ -195,7 +195,7 @@ main(int argc, char *argv[])
         newspec += filespec;
     }
     
-    amf::SOL sol;
+    cygnal::SOL sol;
     
     if (sol.readFile(newspec)) {
         cout << "SOL file \"" << newspec << "\" read in" << endl;
