@@ -105,7 +105,7 @@ readLongString(const boost::uint8_t*& pos, const boost::uint8_t* end)
 
     const boost::uint32_t si = readNetworkLong(pos);
     pos += 4;
-    if (end - pos < si) {
+    if (static_cast<boost::uint32_t>(end - pos) < si) {
         throw AMFException("Read past _end of buffer for long string type");
     }
 
