@@ -51,7 +51,7 @@ gtk_gnash_SOURCES += gtk_glue_agg_xv.cpp gtk_glue_agg_xv.h
 gtk_gnash_LDADD += $(X11_LIBS)
 endif   # HAVE_XV
 
-if USE_VAAPI
+if HAVE_VAAPI
 noinst_HEADERS		+= gtk_glue_agg_vaapi.h
 gtk_gnash_SOURCES	+= gtk_glue_agg_vaapi.cpp
 gtk_gnash_CPPFLAGS	+= \
