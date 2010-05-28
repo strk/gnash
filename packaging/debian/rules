@@ -149,6 +149,7 @@ CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
 	--disable-dependency-tracking \
 	--enable-python \
 	--enable-sdkinstall \
+	--enable-extensions=all \
 	$(BUILD_FLAGS)
 
 config: config-stamp
