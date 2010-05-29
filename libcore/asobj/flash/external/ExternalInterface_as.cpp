@@ -26,9 +26,9 @@
 #include <boost/algorithm/string/erase.hpp>
 #include <algorithm>
 
-#include "StringPredicates.h"
-#include "Relay.h" // for inheritance
+#include "ExternalInterface.h"
 #include "ExternalInterface_as.h"
+#include "StringPredicates.h"
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
 #include "Global_as.h"
@@ -86,16 +86,6 @@ as_value externalinterface_ctor(const fn_call& fn);
 void attachExternalInterfaceStaticInterface(as_object& o);
 }
 
-class ExternalExecutor: public movie_root::AbstractExternalCallback {
-public:
-	void notify()
-	{
-	    log_debug(_("external_callback()"));
-	}
-};
-
-ExternalExecutor externalUpdate;
-
 /// Class used to serialize properties of an object to a buffer
 class PropsSerializer : public AbstractPropertyVisitor
 {
@@ -126,7 +116,7 @@ public:
 //        log_debug(" serializing property %s", id);
         
         _xml << "<property id=\"" << id << "\">";
-        _xml << ExternalInterface_as::toXML(val);
+        _xml << ExternalInterface::toXML(val);
         _xml << "</property>";
 
         _noprops.push_back(val);
@@ -151,7 +141,6 @@ externalinterface_class_init(as_object& where, const ObjectURI& uri)
 
     where.init_destructive_property(uri, externalInterfaceConstructor, 0);
 
-//    registerBuiltinClass(where, attachExternalInterfaceStaticInterface, uri);
 }
 
 namespace {
@@ -230,12 +219,13 @@ externalinterface_addCallback(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
 
     movie_root& mr = getRoot(fn);
+//    mr.registerExternalCallback(&externalUpdate);
     if (mr.getControlFD() <= 0) {
         log_debug("ExternalInterface not accessible when running standalone.");
         return as_value(false);
     }
 
-    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+    // ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
 
     // MovieClip *mc = mr.getLevel(1);
     // string_table& st = getStringTable(fn);    
@@ -246,9 +236,9 @@ externalinterface_addCallback(const fn_call& fn)
         boost::intrusive_ptr<as_object> asCallback;
         if (fn.arg(1).is_object()) {
             asCallback = (fn.arg(1).to_object(getGlobal(fn)));
-            ptr->addCallback(name, asCallback.get());
+            // ptr->addCallback(name, asCallback.get());
         }
-        ptr->addRootCallback(mr);
+//        ptr->addRootCallback(mr);
         return as_value(true);
     }
     
@@ -260,7 +250,7 @@ externalinterface_call(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+    // ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
     
     if (fn.nargs >= 2) {
         const as_value& methodName_as = fn.arg(0);
@@ -333,11 +323,11 @@ externalinterface_marshallExceptions(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
+    // ExternalInterface_as* ptr = ensure<ThisIsNative<ExternalInterface_as> >(fn);
 
     // No, don't pass exceptions up to the browser
     if (fn.nargs) {
-        ptr->setMarshallExceptions(fn.arg(0).to_bool());
+        // ptr->setMarshallExceptions(fn.arg(0).to_bool());
     } else {
         return as_value(false);
     }
@@ -426,7 +416,7 @@ externalinterface_uArgumentsToXML(const fn_call& fn)
                 args.push_back(fn.arg(i));
             }
         }
-        return ExternalInterface_as::argumentsToXML(args);
+        return ExternalInterface::argumentsToXML(args);
     }
     
     return as_value();
@@ -478,7 +468,7 @@ externalinterface_uArrayToXML(const fn_call& fn)
     
     if (fn.nargs == 1) {
         as_object *obj = fn.arg(0).to_object(getGlobal(fn));
-        std::string str = ExternalInterface_as::arrayToXML(obj);
+        std::string str = ExternalInterface::arrayToXML(obj);
         return as_value(str);
     }
     
@@ -538,7 +528,7 @@ externalinterface_uObjectToAS(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     if (fn.nargs == 1) {
-        return ExternalInterface_as::objectToAS(getGlobal(fn), fn.arg(0).to_string());
+        return ExternalInterface::objectToAS(getGlobal(fn), fn.arg(0).to_string());
     }
     
     return as_value();
@@ -559,7 +549,7 @@ externalinterface_uObjectToXML(const fn_call& fn)
     if (fn.nargs == 1) {
         if (!fn.arg(0).is_null() && !fn.arg(0).is_undefined()) {
             as_object *obj = fn.arg(0).to_object(getGlobal(fn));
-            std::string str = ExternalInterface_as::objectToXML(obj);
+            std::string str = ExternalInterface::objectToXML(obj);
             return as_value(str);
         } else {
             return as_value("<object></object>");
@@ -583,7 +573,7 @@ externalinterface_uToXML(const fn_call& fn)
 
     if (fn.nargs == 1) {
         as_value val = fn.arg(0);
-        std::string str = ExternalInterface_as::toXML(val);
+        std::string str = ExternalInterface::toXML(val);
         return as_value(str);
     }
     
@@ -596,7 +586,7 @@ externalinterface_uToAS(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     
     if (fn.nargs == 1) {
-        as_value val = ExternalInterface_as::toAS(getGlobal(fn), fn.arg(0).to_string());
+        as_value val = ExternalInterface::toAS(getGlobal(fn), fn.arg(0).to_string());
         return val;
     }
     
@@ -633,9 +623,8 @@ externalinterface_uUnescapeXML(const fn_call& fn)
 
 } // end of anonymous namespace used for callbacks
 
-// namespace gnash {
-
-ExternalInterface_as::ExternalInterface_as(as_object* /*owner*/)
+#if 0
+ExternalInterface_as::ExternalInterface_as(as_object* /* owner */)
     :  _fd(-1),
        _marshallExceptions(false)
 {
@@ -644,8 +633,7 @@ ExternalInterface_as::ExternalInterface_as(as_object* /*owner*/)
 
 ExternalInterface_as::~ExternalInterface_as()
 {
-//    GNASH_REPORT_FUNCTION;
-//    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    GNASH_REPORT_FUNCTION;
 }
 
 // The ActionScript 3.0 version of this method does not accept the
@@ -925,45 +913,83 @@ ExternalInterface_as::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
     return as_value();
 }
 
-#if 0
-ExternalInterface_as &
-ExternalInterface_as::Instance()
+as_value
+ExternalInterface_as::parseXML(const std::string &xml)
 {
-    // TODO: this is a temporary hack to allow ExternalInterface to work as an
-    // ActiveRelay without changing the way ActiveRelay works.
-    // ExternalInterface shouldn't use ActiveRelay, neither should it need
-    // any of these singletons or statics.
-    static as_object* o = 0;
-    if (!o) {
-        o = new as_object(*VM::get().getGlobal());
-        VM::get().addStatic(o);
+    GNASH_REPORT_FUNCTION;
+
+    if (xml.empty()) {
+        return as_value();
     }
-    static ExternalInterface_as ei(o);
-    
-    return ei;
-}
-#endif
 
-#if 0
-void
-ExternalInterface_as::setReachable() const
-{
-    log_debug(__PRETTY_FUNCTION__);
+    std::string::size_type start = 0;
+    std::string::size_type end;
+    std::string tag;
+    as_value value;
 
-    std::map<std::string, as_object *>::const_iterator it;
-    for (it=_methods.begin(); it != _methods.end(); ++it) {
-        it->second->setReachable();
+    // Look for the ending > in the first part of the data for the tag
+    end = xml.find(">");
+    if (end != std::string::npos) {
+        end++;                  // go past the > character
+        tag = xml.substr(start, end);
+        // Look for the easy ones first
+        if (tag == "<null/>") {
+            value.set_null();
+        } else if (tag == "<void/>") {
+            value.set_undefined();
+        } else if (tag == "<true/>") {
+            value.set_bool(true);
+        } else if (tag == "<false/>") {
+            value.set_bool(false);
+        } else if (tag == "<number>") {
+            start = end;
+            end = xml.find("</number>");
+            std::string str = xml.substr(start, end-start);
+            double num = strtod(str.c_str(), NULL);
+            value.set_double(num);
+        } else if (tag == "<string>") {
+            start = end;
+            end = xml.find("</string>");
+            std::string str = xml.substr(start, end-start);
+            value.set_string(str);
+        }
     }
+
+    log_debug("Argument is: %s", value.to_string());
+    return value;
 }
 
-bool
-ExternalInterface_as::advance()
+std::vector<as_value>
+ExternalInterface_as::parseArguments(const std::string &xml)
 {
-    log_debug(__PRETTY_FUNCTION__);
-    
-    return false;
+    GNASH_REPORT_FUNCTION;
+
+    std::vector<as_value> args;
+    std::string::size_type start = 0;
+    std::string::size_type end;
+
+    std::string name;
+    std::string data = xml;
+    std::string tag = "<arguments>";
+    start = data.find(tag);
+    if (start != std::string::npos) {
+        data.erase(0, tag.size());
+    }
+    while (!data.empty()) {
+        // Extract the data
+        start = data.find("<", 1); // start past the opening <
+        end = data.find(">", start) + 1;
+        std::string sub = data.substr(0, end);
+        if (data == "</arguments>") {
+            break;
+        }
+        args.push_back(parseXML(sub));
+        data.erase(0, end);
+    }
+
+    return args;
 }
-#endif
+
 
 as_object *
 ExternalInterface_as::getCallback(const std::string &name)
@@ -1089,83 +1115,7 @@ ExternalInterface_as::processInvoke(const std::string &xml)
         }
     }    
 }
-
-as_value
-ExternalInterface_as::parseXML(const std::string &xml)
-{
-    GNASH_REPORT_FUNCTION;
-
-    if (xml.empty()) {
-        return as_value();
-    }
-
-    std::string::size_type start = 0;
-    std::string::size_type end;
-    std::string tag;
-    as_value value;
-
-    // Look for the ending > in the first part of the data for the tag
-    end = xml.find(">");
-    if (end != std::string::npos) {
-        end++;                  // go past the > character
-        tag = xml.substr(start, end);
-        // Look for the easy ones first
-        if (tag == "<null/>") {
-            value.set_null();
-        } else if (tag == "<void/>") {
-            value.set_undefined();
-        } else if (tag == "<true/>") {
-            value.set_bool(true);
-        } else if (tag == "<false/>") {
-            value.set_bool(false);
-        } else if (tag == "<number>") {
-            start = end;
-            end = xml.find("</number>");
-            std::string str = xml.substr(start, end-start);
-            double num = strtod(str.c_str(), NULL);
-            value.set_double(num);
-        } else if (tag == "<string>") {
-            start = end;
-            end = xml.find("</string>");
-            std::string str = xml.substr(start, end-start);
-            value.set_string(str);
-        }
-    }
-
-    log_debug("Argument is: %s", value.to_string());
-    return value;
-}
-
-std::vector<as_value>
-ExternalInterface_as::parseArguments(const std::string &xml)
-{
-    GNASH_REPORT_FUNCTION;
-
-    std::vector<as_value> args;
-    std::string::size_type start = 0;
-    std::string::size_type end;
-
-    std::string name;
-    std::string data = xml;
-    std::string tag = "<arguments>";
-    start = data.find(tag);
-    if (start != std::string::npos) {
-        data.erase(0, tag.size());
-    }
-    while (!data.empty()) {
-        // Extract the data
-        start = data.find("<", 1); // start past the opening <
-        end = data.find(">", start) + 1;
-        std::string sub = data.substr(0, end);
-        if (data == "</arguments>") {
-            break;
-        }
-        args.push_back(parseXML(sub));
-        data.erase(0, end);
-    }
-
-    return args;
-}
+#endif
 
 } // end of gnash namespace
 
