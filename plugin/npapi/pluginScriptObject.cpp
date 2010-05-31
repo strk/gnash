@@ -74,6 +74,14 @@ static NPClass GnashPluginScriptObjectClass = {
     GnashPluginScriptObject::marshalConstruct
 };
 
+/// The HostFD is the file descriptor for the socket connection
+/// to the standalone player. This is used by this plugin when reading
+/// messages from the standalone player.
+static int hostfd = -1;
+
+/// The ControlFD is the file descriptor for the socket connection
+/// to the standalone player. This is used when writing to the
+/// standalone player from this plugin.
 static int controlfd = -1;
 
 bool
@@ -626,7 +634,7 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
     str = ei.makeInvoke("SetVariable", iargs);
     
     // Write the message to the Control FD.
-    size_t ret = writePlayer(controlfd, str);
+    size_t ret = writePlayer(str);
     // Unless we wrote the same amount of data as the message contained,
     // something went wrong.
     if (ret != str.size()) {
@@ -653,7 +661,7 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
 
     log_debug("Trying to get a value for %s.", name);
     
-    size_t ret = writePlayer(controlfd, str);
+    size_t ret = writePlayer(str);
     if (ret != str.size()) {
         // If all the browser wants is the version, we don't need to
         // ask the standalone player for this value. YouTube at
@@ -672,7 +680,7 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
     }
 
     // Have the read function allocate the memory
-    std::string data = readPlayer(controlfd);
+    std::string data = readPlayer();
     if (data.empty()) {
         return GnashNPVariant();
     }
@@ -707,8 +715,37 @@ GnashPluginScriptObject::getControlFD()
     return controlfd;
 };
 
+void
+GnashPluginScriptObject::setHostFD(int x)
+{
+//    log_debug("%s: %d", __FUNCTION__, x);
+#if 0
+    if (_iochan == 0) {
+        _iochan[WRITEFD] = g_io_channel_unix_new(x);
+    }
+#endif
+    hostfd = x;              // FIXME: this should go away
+}
+
+int
+GnashPluginScriptObject::getHostFD()
+{
+// log_debug("getControlFD: %d", controlfd);
+
+#if 0
+    return g_io_channel_unix_get_fd (_iochan);
+#endif    
+    return hostfd;
+};
+
 
 // Write to the standalone player over the control socket
+int
+GnashPluginScriptObject::writePlayer(const std::string &data)
+{
+    return writePlayer(controlfd, data);
+}
+
 int
 GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 {
@@ -721,6 +758,12 @@ GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
     }
     
     return 0;
+}
+
+std::string
+GnashPluginScriptObject::readPlayer()
+{
+    return readPlayer(hostfd);
 }
 
 std::string
@@ -952,7 +995,7 @@ GnashPluginScriptObject::handleInvoke(GIOChannel *iochan, GIOCondition cond)
     log_debug(__PRETTY_FUNCTION__);
     
     if ( cond & G_IO_HUP ) {
-        log_debug("Player request channel hang up");
+        log_debug("Player control channel hang up");
         // Returning false here will cause the "watch" to be removed. This watch
         // is the only reference held to the GIOChannel, so it will be
         // destroyed. We must make sure we don't attempt to destroy it again.
@@ -1001,6 +1044,12 @@ GnashPluginScriptObject::handleInvoke(GIOChannel *iochan, GIOCondition cond)
     } while (g_io_channel_get_buffer_condition(iochan) & G_IO_IN);
 
     return true;
+}
+
+bool
+GnashPluginScriptObject::processPlayerRequest(gchar* buf, gsize len)
+{
+    log_debug(__PRETTY_FUNCTION__);
 }
 
 bool

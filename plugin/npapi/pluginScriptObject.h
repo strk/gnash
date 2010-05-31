@@ -91,10 +91,17 @@ public:
     /// Scripting API support. This is where all the protocol support
     /// lives.
 
-    //  The ControlFD is the file descriptor for the socket connection
-    // to the standalone player.
+    /// The ControlFD is the file descriptor for the socket connection
+    /// to the standalone player. This is used when writing to the
+    /// standalone player from this plugin.
     void setControlFD(int x);
     int getControlFD();
+
+    /// The HostFD is the file descriptor for the socket connection
+    /// to the standalone player. This is used by this plugin when reading
+    /// messages from the standalone player.
+    void setHostFD(int x);
+    int getHostFD();
 
     /// Set a variable in the standalone player
     ///
@@ -127,9 +134,11 @@ public:
     int getWriteFD() { return _sockfds[WRITEFD]; };
     
     // Write to the standalone player over the control socket
+    int writePlayer(const std::string &data);
     int writePlayer(int fd, const std::string &data);
     
     // Read the standalone player over the control socket
+    std::string readPlayer();
     std::string readPlayer(int fd);
     
 protected:
