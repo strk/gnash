@@ -180,7 +180,7 @@ GotoFrame (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
         str = ei.makeInvoke("GotoFrame", iargs);
 
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -219,7 +219,7 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
         std::string str = ei.makeInvoke("IsPlaying", iargs);
         
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -227,7 +227,7 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
         }        
-        std::string data = gpso->readPlayer(gpso->getControlFD());
+        std::string data = gpso->readPlayer();
         if (data.empty()) {
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
@@ -279,13 +279,13 @@ LoadMovie (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
         str = ei.makeInvoke("LoadMovie", iargs);
 
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
             log_error("Couldn't load the movie, network problems.");
             return false;
-        }        
+        }
         // gpso->LoadMovie();
         BOOLEAN_TO_NPVARIANT(true, *result);
         return true;
@@ -328,7 +328,7 @@ Pan (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
         str = ei.makeInvoke("Pan", iargs);
         
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -377,7 +377,7 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
         std::string str = ei.makeInvoke("PercentLoaded", iargs);
 
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -385,7 +385,7 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
         }        
-        std::string data = gpso->readPlayer(gpso->getControlFD());
+        std::string data = gpso->readPlayer();
         if (data.empty()) {
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
@@ -429,7 +429,7 @@ Play (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
         std::string str = ei.makeInvoke("Play", iargs);
 
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -468,7 +468,7 @@ Rewind (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
         std::string str = ei.makeInvoke("Rewind", iargs);
 
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -519,7 +519,7 @@ SetZoomRect (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
         str = ei.makeInvoke("SetZoomRect", iargs);
 
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -557,7 +557,7 @@ StopPlay (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
         std::string str = ei.makeInvoke("StopPlay", iargs);
 
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -600,7 +600,7 @@ Zoom (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
         str = ei.makeInvoke("Zoom", iargs);
 
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -638,7 +638,7 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
         std::string str = ei.makeInvoke("TotalFrames", iargs);
 
         // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(gpso->getControlFD(), str);
+        size_t ret = gpso->writePlayer(str);
         // Unless we wrote the same amount of data as the message contained,
         // something went wrong.
         if (ret != str.size()) {
@@ -646,7 +646,7 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
         }        
-        std::string data = gpso->readPlayer(gpso->getControlFD());
+        std::string data = gpso->readPlayer();
         if (data.empty()) {
             BOOLEAN_TO_NPVARIANT(false, *result);
             return false;
