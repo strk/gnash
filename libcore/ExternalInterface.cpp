@@ -24,6 +24,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <boost/algorithm/string/erase.hpp>
+#include <boost/shared_ptr.hpp>
 #include <algorithm>
 
 #include "StringPredicates.h"
@@ -255,26 +256,12 @@ ExternalInterface::toAS(Global_as& /*gl*/, const std::string &xml)
             start = end;
             end = xml.find("</array");
             std::string str = xml.substr(start, end-start);
-            // std::map<std::string, NPVariant *> props = parseProperties(str);
-            // std::map<std::string, NPVariant *>::iterator it;
-            // for (it=props.begin(); it != props.end(); ++it) {
-            //     // NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
-            //     // NPVariant *value = it->second;
-            // }
-            // as_object *obj = new as_object(gl);
+            log_unimpl("array processing for ExternalInterface");
         } else if (tag == "<object>") {
             start = end;
             end = xml.find("</object");
             std::string str = xml.substr(start, end-start);
-            // std::map<std::string, as_value> props = parseProperties(str);
-            // std::map<std::string, NPVariant *>::iterator it;
-            // for (it=props.begin(); it != props.end(); ++it) {
-            //     // NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
-            //     // NPVariant *value = it->second;
-            // }
-            // as_object *obj = val.to_object();
-            // val.set_as_object(obj); 
-            // as_object *obj = new as_object(gl);
+            log_unimpl("object processing for ExternalInterface");
         }
     }
 
@@ -336,36 +323,37 @@ ExternalInterface::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
     return as_value();
 }
 
-#if 0
-void
-ExternalInterface::update()
+boost::shared_ptr<ExternalInterface::invoke_t>
+ExternalInterface::ExternalEventCheck(int fd)
 {
-    log_debug(__PRETTY_FUNCTION__);
+//    GNASH_REPORT_FUNCTION;
     
-    if (_fd > 0) {
+    boost::shared_ptr<ExternalInterface::invoke_t> error;
+
+    if (fd > 0) {
         fd_set fdset;
         FD_ZERO(&fdset);
-        FD_SET(_fd, &fdset);
+        FD_SET(fd, &fdset);
         struct timeval tval;
         tval.tv_sec  = 0;
         tval.tv_usec = 100;
         errno = 0;
-        int ret = ::select(_fd+1, &fdset, NULL, NULL, &tval);
+        int ret = ::select(fd+1, &fdset, NULL, NULL, &tval);
         if (ret == 0) {
-//            log_debug ("The pipe for fd #%d timed out waiting to read", _fd);
-            return;
+//            log_debug ("The pipe for fd #%d timed out waiting to read", fd);
+            return error;
         } else if (ret == 1) {
-            log_debug ("The pipe for fd #%d is ready", _fd);
+            log_debug ("The pipe for fd #%d is ready", fd);
         } else {
             log_error("The pipe has this error: %s", strerror(errno));
-            return;
+            return error;
         }
 
         int bytes = 0;
 #ifndef _WIN32
-        ioctl(_fd, FIONREAD, &bytes);
+        ioctl(fd, FIONREAD, &bytes);
 #else
-        ioctlSocket(_fd, FIONREAD, &bytes);
+        ioctlSocket(fd, FIONREAD, &bytes);
 #endif
         log_debug("There are %d bytes in the network buffer", bytes);
 
@@ -374,29 +362,13 @@ ExternalInterface::update()
         // some memory to read the data.
         // terminate incase we want to treat the data like a string.
         buf[bytes+1] = 0;
-        ret = ::read(_fd, buf, bytes);
+        ret = ::read(fd, buf, bytes);
         if (ret) {
-            processInvoke(buf);
+            return parseInvoke(buf);
         }
     }
-}
 
-bool
-ExternalInterface::call(as_object */*asCallback*/, const std::string& name,
-                           const std::vector<as_value>& /*args*/, size_t /*firstArg*/)
-{
-    GNASH_REPORT_FUNCTION;
-
-    // log_debug("Calling External method \"%s\"", name);
-
-    // as_object *method = getCallback(name);
-
-    
-    // call(asCallback, name, args, firstArg);
-
-    // startAdvanceTimer();
-    
-    return false;
+    return error;
 }
 
 // Parse the XML Invoke message, which looks like this:
@@ -408,20 +380,20 @@ ExternalInterface::call(as_object */*asCallback*/, const std::string& name,
 //      </arguments>
 // </invoke>
 //
-void
-ExternalInterface::processInvoke(const std::string &xml)
+boost::shared_ptr<ExternalInterface::invoke_t>
+ExternalInterface::parseInvoke(const std::string &xml)
 {
-    GNASH_REPORT_FUNCTION;
+    //    GNASH_REPORT_FUNCTION;
 
+    boost::shared_ptr<ExternalInterface::invoke_t> invoke;
     if (xml.empty()) {
-        return;
+        return invoke;
     }
     
-    std::vector<as_value> args;
+    invoke.reset(new ExternalInterface::invoke_t);
     string::size_type start = 0;
     string::size_type end;
     string tag;
-    string name;
 
     // Look for the ending > in the first part of the data for the tag
     end = xml.find(">");
@@ -433,12 +405,11 @@ ExternalInterface::processInvoke(const std::string &xml)
             // extract the name of the method to invoke
             start = tag.find("name=") + 5;
             end   = tag.find(" ", start);
-            name  = tag.substr(start, end-start);
+            invoke->name  = tag.substr(start, end-start);
             // Ignore any quote characters around the string
-            boost::erase_first(name, "\"");
-            boost::erase_last(name, "\"");
+            boost::erase_first(invoke->name, "\"");
+            boost::erase_last(invoke->name, "\"");
 
-#if 0
             // extract the return type of the method
             start = tag.find("returntype=") + 11;
             end   = tag.find(">", start);
@@ -446,32 +417,22 @@ ExternalInterface::processInvoke(const std::string &xml)
             // Ignore any quote characters around the string
             boost::erase_first(invoke->type, "\"");
             boost::erase_last(invoke->type, "\"");
-#endif
+
             // extract the arguments to the method
             start = xml.find("<arguments>");
             end   = xml.find("</invoke");
             tag   = xml.substr(start, end-start);
-            args = ExternalInterface::parseArguments(tag);
+            invoke->args = ExternalInterface::parseArguments(tag);
         }
     }
 
-#if 0
-    // call(as_object* callback, const std::string& name,
-    std::map<std::string, as_object *>::const_iterator it;
-    for (it=_methods.begin(); it != _methods.end(); it++) {
-        log_debug("Method name %s", it->first);
-        if (name == it->first) {
-            // call(it->second, args, 0);
-        }
-    }
-#endif    
+    return invoke;
 }
-#endif
 
 as_value
 ExternalInterface::parseXML(const std::string &xml)
 {
-    GNASH_REPORT_FUNCTION;
+    //    GNASH_REPORT_FUNCTION;
 
     if (xml.empty()) {
         return as_value();
@@ -517,7 +478,7 @@ ExternalInterface::parseXML(const std::string &xml)
 std::vector<as_value>
 ExternalInterface::parseArguments(const std::string &xml)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     std::vector<as_value> args;
     std::string::size_type start = 0;

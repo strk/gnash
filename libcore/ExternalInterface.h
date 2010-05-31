@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <boost/shared_ptr.hpp>
 
 namespace gnash {
 
@@ -38,6 +39,12 @@ namespace gnash {
 
 struct ExternalInterface
 {
+    typedef struct {
+        std::string name;
+        std::string type;
+        std::vector<as_value> args;
+    } invoke_t;
+
     // Some of these appear to be undocumented helper functions of this class
     // that while probably designed to be used internally, get used
     // by ActionScript coders.
@@ -79,9 +86,9 @@ struct ExternalInterface
     static std::vector<as_value> parseArguments(const std::string &xml);
 
     // Parse the XML Invoke message.
-    // static void processInvoke(const std::string &str);
+    static boost::shared_ptr<invoke_t> parseInvoke(const std::string &str);
 
-    // static void update();
+    static boost::shared_ptr<invoke_t> ExternalEventCheck(int fd);
 };
 
 } // end of gnash namespace
