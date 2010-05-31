@@ -80,6 +80,7 @@
 #include "MovieClip.h"
 #include "SimpleBuffer.h" // for LoadCallback
 #include "MovieLoader.h"
+#include "ExternalInterface.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -589,6 +590,7 @@ public:
     /// Gets the current Access Mode for ExternalInterface.
     AllowScriptAccessMode getAllowScriptAccess();
 
+
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
     /// Returns the current alignment of the stage (left/right/centre, top/
@@ -603,6 +605,11 @@ public:
     /// current gui
     void setShowMenuState( bool state );
 
+    // This is a flag that specifies whether exceptions in ActionScript
+    // should be propogated to JavaScript in the browser.
+    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
+    bool getMarshallExceptions() { return _marshallExceptions; };
+    
     /// Sets the Stage object's align mode.
     void setStageScaleMode(ScaleMode sm);
     
@@ -786,10 +793,12 @@ public:
     {
         return _hostfd;
     }
+
     int getControlFD() const
     {
         return _controlfd;
     }
+
 
     /// Abstract base class for FS handlers
     class AbstractFsCallback {
@@ -910,6 +919,16 @@ public:
 	const std::string& getOriginalURL() const { return _originalURL; }
 
     const RunResources& runResources() const { return _runResources; }
+
+    void addExternalCallback(const std::string &name, as_object *obj)
+    {
+        _externalCallbacks[name] = obj;
+    }    
+
+    bool processInvoke(ExternalInterface::invoke_t *);
+
+    void callExternalCallback(const std::string &name, 
+                              const std::vector<as_value>& obj);
 
 private:
 
@@ -1045,7 +1064,7 @@ private:
     /// An invalidated stage will trigger complete redraw
     //
     /// So, this method should return true everytime a complete
-    /// redraw is needed. This is tipically only needed when
+    /// redraw is needed. This is typically only needed when
     /// the background changes.
     ///
     /// See setInvalidated() and clearInvalidated().
@@ -1117,11 +1136,6 @@ private:
     typedef std::map<std::string, as_object *> ExternalCallbacks;
     ExternalCallbacks _externalCallbacks;
 
-    void addExternalCallback(const std::string &name, as_object *obj)
-    {
-        _externalCallbacks[name] = obj;
-    }
-    
     typedef std::map<int, Timer*> TimerMap;
     TimerMap _intervalTimers;
     unsigned int _lastTimerId;
@@ -1179,6 +1193,7 @@ private:
     Quality		_quality;
     std::bitset<4u>	_alignMode;
     AllowScriptAccessMode _allowScriptAccess;
+    bool		_marshallExceptions;
     bool		_showMenu;
     ScaleMode		_scaleMode;
     DisplayState	_displayState;

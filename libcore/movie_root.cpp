@@ -40,11 +40,16 @@
 #include "IOChannel.h"
 #include "RunResources.h"
 #include "Renderer.h"
+#include "ExternalInterface.h"
 
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <map>
 #include <bitset>
 #include <typeinfo>
@@ -136,6 +141,7 @@ movie_root::movie_root(const movie_definition& def,
     _quality(QUALITY_HIGH),
     _alignMode(0),
     _allowScriptAccess(SCRIPT_ACCESS_SAME_DOMAIN),
+    _marshallExceptions(false),
     _showMenu(true),
     _scaleMode(SCALEMODE_SHOWALL),
     _displayState(DISPLAYSTATE_NORMAL),
@@ -612,7 +618,7 @@ movie_root::notify_key_event(key::code k, bool down)
 
     processActionQueue();
 
-    return false; // should return true if needs update ...
+    return false; // should return true if needs updatee ...
 }
 
 
@@ -1574,16 +1580,106 @@ movie_root::executeAdvanceCallbacks()
                 std::mem_fun_ref(&movie_root::LoadCallback::processLoad));
     }
 
+    // _controlfd is set when running as a child process of a hosting
+    // application. If it is set, we have to check the socket connection
+    // for XML messages.
+    if (_controlfd) {
+	boost::shared_ptr<ExternalInterface::invoke_t> invoke = 
+	    ExternalInterface::ExternalEventCheck(_controlfd);
+	if (invoke) {
+	    if (processInvoke(invoke.get()) == false) {
+		if (!invoke->name.empty()) {
+		    log_error("Couldn't process ExternalInterface Call %s",
+			      invoke->name);
+		}
+	    }
 #if 0
-    char * xml = update();
-    if (xml) {
-        if (_externalCallback.size()) {
-            
-        }
-    }
+	    log_debug("Got back Method name %s", invoke->name);
+	    std::map<std::string, as_object *>::const_iterator it;
+	    for (it=_externalCallbacks.begin(); it != _externalCallbacks.end(); it++) {
+		log_debug("Method name %s", it->first);
+		if (invoke->name == it->first) {
+		    // call(it->second, args, 0);
+		}
+	    }
 #endif
+	}	
+    }
     
     processActionQueue();
+}
+
+bool
+movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
+{
+    GNASH_REPORT_FUNCTION;
+
+    if (invoke == 0) {
+	return false;
+    }
+    if (invoke->name.empty()) {
+	return false;
+    }
+
+    log_debug("Processing %s call from the Browser.", invoke->name);
+
+    std::stringstream ss;
+
+    // These are the default methods used by ExternalInterface
+    if (invoke->name == "SetVariable") {
+	// SetVariable doesn't send a response
+    } else if (invoke->name == "GetVariable") {
+	// GetVariable sends the value of the variable
+	as_value val("Hello World");
+	// FIXME: need to use a real value
+	ss << ExternalInterface::toXML(val);
+    } else if (invoke->name == "GotoFrame") {
+	// GotoFrame doesn't send a response
+    } else if (invoke->name == "IsPlaying") {
+	// IsPlaying sends true or false
+	as_value val(true);
+	// FIXME: need to use a real value
+	ss << ExternalInterface::toXML(val);	
+    } else if (invoke->name == "LoadMovie") {
+	// LoadMovie doesn't send a response
+    } else if (invoke->name == "Pan") {
+	// Pan doesn't send a response
+    } else if (invoke->name == "PercentLoaded") {
+	// PercentLoaded sends the percentage
+	as_value val(100);
+	// FIXME: need to use a real value
+	ss << ExternalInterface::toXML(val);	
+    } else if (invoke->name == "Play") {
+	// Play doesn't send a response
+    } else if (invoke->name == "Rewind") {
+	// Rewind doesn't send a response
+    } else if (invoke->name == "SetZoomRect") {
+	// SetZoomRect doesn't send a response
+    } else if (invoke->name == "StopPlay") {
+	// StopPlay doesn't send a response
+    } else if (invoke->name == "Zoom") {
+	// Zoom doesn't send a response
+    } else if (invoke->name == "TotalFrames") {
+	// TotalFrames sends the number of frames in the movie
+	as_value val(100);
+	// FIXME: need to use a real value
+	ss << ExternalInterface::toXML(val);
+    }
+
+    if (!ss.str().empty()) {
+	if (_hostfd) {
+	    log_debug(_("Attempt to write response to ExternalInterface requests fd %d"), _hostfd);
+	    int ret = write(_hostfd, ss.str().c_str(), ss.str().size());
+	    if (ret == -1) {
+		log_error(_("Could not write to user-provided host requests "
+			    "fd %d: %s"), _hostfd, std::strerror(errno));
+	    }
+	}
+    } else {
+	log_debug("No response needed for %s request", invoke->name);
+    }
+
+    return true;
 }
 
 void
@@ -1747,6 +1843,19 @@ movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
         if (ret) return ret;
     }
     return 0;
+}
+
+void
+movie_root::callExternalCallback(const std::string &name, 
+				 const std::vector<as_value> &obj)
+{
+    log_debug("Looking for method name: %s", name);
+
+    std::map<std::string, as_object *>::const_iterator it;
+    for (it=_externalCallbacks.begin(); it != _externalCallbacks.end(); it++) {
+	std::string method = it->first;
+	log_debug("Checking against method name: %s", method);
+    }
 }
 
 void
