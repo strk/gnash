@@ -78,6 +78,9 @@ if (EI.addCallback("TestEIMethod", null, TestEIMethod) == false) {
     fail("ExternalInterface::addCallback(\"TestEIMethod\")");
 }
 
+// ::call() calls JavaScript functions in the browser, not in flash,
+// so we can't test it when running standalone. So this will always
+// return null.
 var foo = EI.call("TestEIMethod", null);
 
 if (EI.call("TestEIMethod", null) == null) {
