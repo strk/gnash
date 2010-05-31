@@ -42,6 +42,8 @@
 #include "npapi.h"
 #include "npfunctions.h"
 
+#include "plugin.h"
+
 #ifndef HIBYTE
 #define HIBYTE(x) ((((uint32_t)(x)) & 0xff00) >> 8)
 #endif
@@ -181,13 +183,19 @@ void NPN_ReloadPlugins(NPBool reloadPages)
 
 NPError NPN_GetValue(NPP instance, NPNVariable variable, void *value)
 {
-  NPError rv = NPNFuncs.getvalue(instance, variable, value);
+  NPError rv = NPERR_GENERIC_ERROR;
+  if (NPNFuncs.getvalue) {
+    rv = NPNFuncs.getvalue(instance, variable, value);
+  }
   return rv;
 }
 
 NPError NPN_SetValue(NPP instance, NPPVariable variable, void *value)
 {
-  NPError rv = NPNFuncs.setvalue(instance, variable, value);
+  NPError rv = NPERR_GENERIC_ERROR;
+  if (NPNFuncs.setvalue) {
+    rv = NPNFuncs.setvalue(instance, variable, value);
+  }
   return rv;
 }
 
