@@ -43,11 +43,6 @@ public:
     ~ExternalInterface_as();
 
 #if 0
-    // This is a flag that specifies whether exceptions in ActionScript
-    // should be propogated to JavaScript in the browser.
-    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
-    bool getMarshallExceptions() { return _marshallExceptions; };
-    
     /// Add an ActionScript function as a callback by JavaScript
     // in the browser.
     bool addCallback(const std::string &name, as_object *method);
