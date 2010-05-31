@@ -101,6 +101,7 @@
 #include "pluginScriptObject.h"
 
 extern NPNetscapeFuncs NPNFuncs;
+extern NPPluginFuncs NPPFuncs;
 
 namespace gnash {
 NPBool plugInitialized = FALSE;
@@ -144,6 +145,8 @@ getPluginDescription()
 NPError
 NS_PluginInitialize()
 {
+    // gnash::log_debug(__PRETTY_FUNCTION__);
+
     if ( gnash::plugInitialized ) {
         gnash::log_debug("NS_PluginInitialize called, but ignored (we already initialized)");
         return NPERR_NO_ERROR;
@@ -250,6 +253,7 @@ NS_PluginInitialize()
 void
 NS_PluginShutdown()
 {
+    // gnash::log_debug(__PRETTY_FUNCTION__);
 #if 0
     if (!plugInitialized) {
         gnash::log_debug("Plugin already shut down");
@@ -268,6 +272,7 @@ NS_PluginShutdown()
 NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
+    // gnash::log_debug(__PRETTY_FUNCTION__);
     NPError err = NPERR_NO_ERROR;
 
     switch (aVariable) {
@@ -309,6 +314,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
+    // gnash::log_debug(__PRETTY_FUNCTION__);
     if(!aCreateDataStruct) {
         return NULL;
     }
@@ -667,8 +673,10 @@ nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
 bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
+    gnash::log_debug(__PRETTY_FUNCTION__);
+
     if ( cond & G_IO_HUP ) {
-        gnash::log_debug("Player request channel hang up");
+        gnash::log_debug("Player control socket hang up");
         // Returning false here will cause the "watch" to be removed. This watch
         // is the only reference held to the GIOChannel, so it will be
         // destroyed. We must make sure we don't attempt to destroy it again.
@@ -681,26 +689,36 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
     gnash::log_debug("Checking player requests on fd #%d",
               g_io_channel_unix_get_fd(iochan));
 
+    GError* error = 0;
+    //    g_io_channel_set_flags(iochan, G_IO_FLAG_NONBLOCK, &error);
+
+    size_t retries = 5;
     do {
-        GError* error = 0;
+        // When in non-blocking mode, we'll get several iterations of this
+        // loop while waiting for data. if data never arrives, we'd be stuck
+        // looping here forever, so this is our escape from that loop.
+        if (retries-- <= 0) {
+            gnash::log_error("Too many attempts to read from the player!");
+            return false;
+        }
+        error = 0;
         gchar* request = 0;
         gsize requestSize = 0;
         GIOStatus status = g_io_channel_read_line(iochan, &request,
                            &requestSize, NULL, &error);
         switch (status) {
           case G_IO_STATUS_ERROR:
-              gnash::log_error(std::string("Error reading request line: ")
-                               + error->message);
+              gnash::log_error("error reading request line: %s",
+                               error->message);
               g_error_free(error);
               return false;
           case G_IO_STATUS_EOF:
-              gnash::log_error(std::string("EOF (error: ") + error->message);
+              gnash::log_error("EOF (error: %s", error->message);
               g_error_free(error);
               return false;
           case G_IO_STATUS_AGAIN:
-              gnash::log_error(std::string("Read again(error: ")
-                               + error->message);
-              break;
+              gnash::log_debug("read again: nonblocking mode set ");
+              continue;
           case G_IO_STATUS_NORMAL:
               // process request
               // Get rid of the newline on the end if there is one. The string
@@ -730,8 +748,14 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 bool
 nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 {
+    gnash::log_debug(__PRETTY_FUNCTION__);
+
     if ( linelen < 4 ) {
-        gnash::log_error(std::string("Invalid player request (too short): ") +  buf);
+        if (buf) {
+            gnash::log_error("Invalid player request (too short): %s", buf);
+        } else {
+            gnash::log_error("Invalid player request (too short): %d bytes", linelen);
+        }
         return false;
     }
 
@@ -779,7 +803,8 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         // TODO: check if _self is a good target for this
         static const char* tgt = "_self";
 
-        gnash::log_debug("Calling NPN_GetURL(" + jsurl.str() + ", '" + std::string(tgt) + "');");
+        gnash::log_debug("Calling NPN_GetURL(%s, %s)",
+		jsurl.str(), tgt);
 
         NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
         return true;
@@ -1026,6 +1051,7 @@ nsPluginInstance::startProc()
     }
 
     _scriptObject->setControlFD(p2c_controlpipe[1]);
+    _scriptObject->setHostFD(c2p_pipe[0]);
     
     // Setup the command line for starting Gnash
 
