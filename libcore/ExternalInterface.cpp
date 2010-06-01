@@ -506,6 +506,215 @@ ExternalInterface::parseArguments(const std::string &xml)
     return args;
 }
 
+// Create an Invoke message for the standalone Gnash
+std::string
+ExternalInterface::makeInvoke (const std::string &method,
+                               const std::vector<as_value> &args)
+{
+    std::stringstream ss;
+    std::vector<as_value>::const_iterator it;
+
+    ss << "<invoke name=\"" << method << "\" returntype=\"xml\">";
+    ss << "<arguments>";
+    for (it=args.begin(); it != args.end(); ++it) {
+        ss << ExternalInterface::toXML(*it);
+    }
+    
+    ss << "</arguments>";
+    ss << "</invoke>";
+
+    // Add a CR on the end so the output is more readable on the other
+    // end. XL should be ignoring the CR anyway.
+    ss << std::endl;
+    
+    return ss.str();
+}
+
+std::string
+ExternalInterface::makeNull ()
+{
+    std::stringstream ss;
+    
+    ss << "<null/>";
+    
+    return ss.str();
+}
+
+std::string
+ExternalInterface::makeTrue ()
+{
+    std::stringstream ss;
+
+    ss << "<true/>";
+    
+    return ss.str();
+}
+
+std::string
+ExternalInterface::makeFalse ()
+{
+    std::stringstream ss;
+    
+    ss << "<false/>";
+
+    return ss.str();
+}
+
+std::string
+ExternalInterface::makeString (const std::string &str)
+{
+    std::stringstream ss;
+
+    ss << "<string>" << str << "</string>";
+    
+    return ss.str();
+}
+
+
+std::string
+ExternalInterface::makeProperty (const std::string &id, double num)
+{
+    std::stringstream ss;
+    ss << num;
+    return makeProperty(id, ss.str());
+}
+
+std::string
+ExternalInterface::makeProperty (const std::string &id, int num)
+{
+    std::stringstream ss;
+    ss << num;
+    return makeProperty(id, ss.str());
+}
+
+std::string
+ExternalInterface::makeProperty (const std::string &id, const std::string &data)
+{
+    std::stringstream ss;
+
+    ss << "<property id=\"" << id << "\">" << data << "</property>";
+    
+    return ss.str();
+}
+
+std::string
+ExternalInterface::makeNumber (double num)
+{
+    std::stringstream ss;
+
+    ss << "<number>" << num << "</number>";
+    
+    return ss.str();
+}
+
+std::string
+ExternalInterface::makeNumber (int num)
+{
+    std::stringstream ss;
+
+    ss << "<number>" << num << "</number>";
+    
+    return ss.str();
+}
+
+std::string
+ExternalInterface::makeNumber (unsigned int num)
+{
+    std::stringstream ss;
+    
+    ss << "<number>" << num << "</number>";
+
+    return ss.str();
+}
+
+std::string
+ExternalInterface::makeArray (std::vector<std::string> &args)
+{
+    std::stringstream ss;
+    std::vector<std::string>::iterator it;
+    int index = 0;
+    
+    ss << "<array>";
+    for (it=args.begin(); it != args.end(); ++it) {
+        ss << "<property id=\"" << index << "\">" << *it << "</property>";
+        index++;
+    }
+    
+    ss << "</array>";
+    
+    return ss.str();
+}
+
+std::string
+ExternalInterface::makeObject (std::map<std::string, std::string> &args)
+{
+    std::stringstream ss;
+    std::map<std::string, std::string>::iterator it;
+
+    ss << "<object>";
+    for (it = args.begin(); it != args.end(); ++it) {
+        ss << "<property id=\"" << it->first << "\">" << it->second << "</property>";
+    }
+    ss << "</object>";
+    
+    return ss.str();
+}
+
+size_t
+ExternalInterface::writeBrowser(int fd, const std::string &data)
+{
+    if (fd > 0) {
+        return ::write(fd, data.c_str(), data.size());
+    }
+
+    return -1;
+}
+
+std::string
+ExternalInterface::readBrowser(int fd)
+{
+    std::string empty;
+    // Wait for some data from the player
+    int bytes = 0;
+    fd_set fdset;
+    FD_ZERO(&fdset);
+    FD_SET(fd, &fdset);
+    struct timeval tval;
+    tval.tv_sec = 10;
+    tval.tv_usec = 0;
+    // log_debug("Waiting for data... ");
+    if (select(fd+1, &fdset, NULL, NULL, &tval)) {
+        // log_debug("There is data in the network");
+#ifndef _WIN32
+        ioctl(fd, FIONREAD, &bytes);
+#else
+        ioctlSocket(fd, FIONREAD, &bytes);
+#endif
+    }  
+
+    // No data yet
+    if (bytes == 0) {
+        return empty;
+    }
+
+    log_debug("There are %d bytes in the network buffer", bytes);
+
+    std::string buf(bytes, '\0');
+
+    int ret = ::read(fd, &buf[0], bytes);
+    if (ret <= 0) {
+        return empty;
+    }
+
+    if (ret < bytes) {
+        buf.resize(ret);
+    }
+
+    std::cout << buf << std::endl;
+    
+    return buf;
+}
+
 } // end of gnash namespace
 
 // local Variables:

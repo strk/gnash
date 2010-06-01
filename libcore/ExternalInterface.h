@@ -87,8 +87,29 @@ struct ExternalInterface
 
     // Parse the XML Invoke message.
     static boost::shared_ptr<invoke_t> parseInvoke(const std::string &str);
-
+    // Check for data from the browser and parse it.
     static boost::shared_ptr<invoke_t> ExternalEventCheck(int fd);
+
+    // These methods are for constructing Invoke messages.
+    // Create an Invoke message for the standalone Gnash
+    static std::string makeInvoke (const std::string &method,
+                                   const std::vector<as_value> &args);
+    
+    static std::string makeNull ();
+    static std::string makeTrue ();
+    static std::string makeFalse ();
+    static std::string makeString (const std::string &str);
+    static std::string makeProperty (const std::string &str, const std::string &data);
+    static std::string makeProperty (const std::string &str, double num);
+    static std::string makeProperty (const std::string &str, int num);
+    static std::string makeNumber (double num);
+    static std::string makeNumber (int num);
+    static std::string makeNumber (unsigned int num);
+    static std::string makeArray (std::vector<std::string> &args);
+    static std::string makeObject (std::map<std::string, std::string> &args);
+
+    static size_t writeBrowser(int fd, const std::string &xml);
+    static std::string readBrowser(int fd);
 };
 
 } // end of gnash namespace
