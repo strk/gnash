@@ -42,11 +42,10 @@ main(int argc, char *argv[])
 {
     using namespace gnash; 
 
-    ExternalInterface ei;
     NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
 
     BOOLEAN_TO_NPVARIANT(true, *value);
-    std::string str = ei.convertNPVariant(value);
+    std::string str = ExternalInterface::convertNPVariant(value);
     if (str == "<true/>") {
         runtest.pass("convertNPVariant(true)");
     } else {
@@ -54,7 +53,7 @@ main(int argc, char *argv[])
     }
     
     BOOLEAN_TO_NPVARIANT(false, *value);
-    str = ei.convertNPVariant(value);
+    str = ExternalInterface::convertNPVariant(value);
     if (str == "<false/>") {
         runtest.pass("convertNPVariant(false)");
     } else {
@@ -62,7 +61,7 @@ main(int argc, char *argv[])
     }
 
     NULL_TO_NPVARIANT(*value);
-    str = ei.convertNPVariant(value);
+    str = ExternalInterface::convertNPVariant(value);
     if (str == "<null/>") {
         runtest.pass("convertNPVariant(null)");
     } else {
@@ -70,7 +69,7 @@ main(int argc, char *argv[])
     }
 
     VOID_TO_NPVARIANT(*value);
-    str = ei.convertNPVariant(value);
+    str = ExternalInterface::convertNPVariant(value);
     if (str == "<void/>") {
         runtest.pass("convertNPVariant(void)");
     } else {
@@ -78,7 +77,7 @@ main(int argc, char *argv[])
     }
 
     DOUBLE_TO_NPVARIANT(123.456, *value);
-    str = ei.convertNPVariant(value);
+    str = ExternalInterface::convertNPVariant(value);
     if (str == "<number>123.456</number>") {
         runtest.pass("convertNPVariant(double)");
     } else {
@@ -86,7 +85,7 @@ main(int argc, char *argv[])
     }    
 
     INT32_TO_NPVARIANT(78, *value);
-    str = ei.convertNPVariant(value);
+    str = ExternalInterface::convertNPVariant(value);
     if (str == "<number>78</number>") {
         runtest.pass("convertNPVariant(int32)");
     } else {
@@ -94,14 +93,14 @@ main(int argc, char *argv[])
     }
     
     STRINGZ_TO_NPVARIANT("Hello World!", *value);
-    str = ei.convertNPVariant(value);
+    str = ExternalInterface::convertNPVariant(value);
     if (str == "<string>Hello World!</string>") {
         runtest.pass("convertNPVariant(string)");
     } else {
         runtest.fail("convertNPVariant(string)");
     }
     
-    str = ei.makeProperty("hi", "Hello World!");
+    str = ExternalInterface::makeProperty("hi", "Hello World!");
     if (str == "<property id=\"hi\">Hello World!</property>") {
         runtest.pass("ExternalInterface::makeProperty()");
     } else {
@@ -110,7 +109,7 @@ main(int argc, char *argv[])
     
 #if 0
     ARRAY_TO_NPVARIANT(*value);
-    str = ei.convertNPVariant(value);
+    str = ExternalInterface::convertNPVariant(value);
     if (str == "<array></array>") {
         runtest.pass("convertNPVariant(array)");
     } else {
@@ -119,9 +118,9 @@ main(int argc, char *argv[])
 #endif
 
     NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
-    std::string prop1 = ei.makeString("foobar");
-    std::string prop2 = ei.makeNumber(12.34);
-    std::string prop3 = ei.makeNumber(56);
+    std::string prop1 = ExternalInterface::makeString("foobar");
+    std::string prop2 = ExternalInterface::makeNumber(12.34);
+    std::string prop3 = ExternalInterface::makeNumber(56);
     std::vector<std::string> aargs;
     aargs.push_back(prop1);
     aargs.push_back(prop2);
@@ -129,7 +128,7 @@ main(int argc, char *argv[])
     
     regex_t regex_pat;
     regcomp (&regex_pat, "<array><property id=\"0\"><string>foobar</string></property><property id=\"1\"><number>12.34</number></property><property id=\"2\"><number>56</number></property></array>", REG_NOSUB|REG_NEWLINE);
-    str = ei.makeArray(aargs);
+    str = ExternalInterface::makeArray(aargs);
     if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0)) {    
         runtest.fail("ExternalInterface::makeArray()");
     } else {
@@ -141,7 +140,7 @@ main(int argc, char *argv[])
     margs["test2"] = prop2;
     margs["test3"] = prop3;
     
-    str = ei.makeObject(margs);
+    str = ExternalInterface::makeObject(margs);
     std::string xml = "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>";
     
     regcomp (&regex_pat, xml.c_str(), REG_NOSUB|REG_NEWLINE);
@@ -157,7 +156,7 @@ main(int argc, char *argv[])
     // Parsing tests
     //
     xml = "<string>Hello World!</string>";
-    GnashNPVariant np = ei.parseXML(xml);
+    GnashNPVariant np = ExternalInterface::parseXML(xml);
     std::string data = NPStringToString(NPVARIANT_TO_STRING(np.get()));
     if (NPVARIANT_IS_STRING(np.get()) &&
         (data == "Hello World!")) {
@@ -167,7 +166,7 @@ main(int argc, char *argv[])
     }
 
     xml = "<number>123.456</number>";
-    np = ei.parseXML(xml);
+    np = ExternalInterface::parseXML(xml);
     double num = NPVARIANT_TO_DOUBLE(np.get());
     if (NPVARIANT_IS_DOUBLE(np.get()) &&
         (num == 123.456)) {
@@ -177,7 +176,7 @@ main(int argc, char *argv[])
     }
 
     xml = "<number>78</number>";
-    np = ei.parseXML(xml);
+    np = ExternalInterface::parseXML(xml);
     int inum = NPVARIANT_TO_INT32(np.get());
     if (NPVARIANT_IS_INT32(np.get()) &&
         (inum == 78)) {
@@ -187,7 +186,7 @@ main(int argc, char *argv[])
     }
 
     xml = "<true/>";
-    np = ei.parseXML(xml);
+    np = ExternalInterface::parseXML(xml);
     bool flag = NPVARIANT_TO_BOOLEAN(np.get());
     if (NPVARIANT_IS_BOOLEAN(np.get()) &&
         (flag == true)) {
@@ -197,7 +196,7 @@ main(int argc, char *argv[])
     }
 
     xml = "<false/>";
-    np = ei.parseXML(xml);
+    np = ExternalInterface::parseXML(xml);
     flag = NPVARIANT_TO_BOOLEAN(np.get());
     if (NPVARIANT_IS_BOOLEAN(np.get()) &&
         (flag == false)) {
@@ -207,7 +206,7 @@ main(int argc, char *argv[])
     }
 
     xml = "<null/>";
-    np = ei.parseXML(xml);
+    np = ExternalInterface::parseXML(xml);
     if (NPVARIANT_IS_NULL(np.get())) {
         runtest.pass("ExternalInterface::parseXML(null)");
     } else {
@@ -215,7 +214,7 @@ main(int argc, char *argv[])
     }
 
     xml = "<void/>";
-    np = ei.parseXML(xml);
+    np = ExternalInterface::parseXML(xml);
     if (NPVARIANT_IS_VOID(np.get())) {
         runtest.pass("ExternalInterface::parseXML(void)");
     } else {
@@ -223,7 +222,7 @@ main(int argc, char *argv[])
     }
 
     xml = "<property id=\"0\"><string>foobar</string></property><property id=\"1\"><number>12.34</number></property><property id=\"2\"><number>56</number></property>";
-    std::map<std::string, GnashNPVariant> props = ei.parseProperties(xml);
+    std::map<std::string, GnashNPVariant> props = ExternalInterface::parseProperties(xml);
     np = props["0"];
     data = NPStringToString(NPVARIANT_TO_STRING(np.get()));
     if ((props.size() == 3) && (data == "foobar")) {
@@ -233,7 +232,7 @@ main(int argc, char *argv[])
     }
     
     xml = "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>";
-    np = ei.parseXML(xml);
+    np = ExternalInterface::parseXML(xml);
     if (NPVARIANT_IS_OBJECT(np.get())) {
         runtest.pass("ExternalInterface::parseXML(object)");
     } else {
@@ -241,12 +240,12 @@ main(int argc, char *argv[])
     }
     
     std::vector<std::string> iargs;
-    str = ei.makeString("barfoo");
+    str = ExternalInterface::makeString("barfoo");
     iargs.push_back(str);
-    str = ei.makeNumber(135.78);
+    str = ExternalInterface::makeNumber(135.78);
     iargs.push_back(str);
     
-    str = ei.makeInvoke("barbyfoo", iargs);
+    str = ExternalInterface::makeInvoke("barbyfoo", iargs);
     xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
 //    std::cout << str << std::endl;
     regcomp (&regex_pat, xml.c_str(), REG_NOSUB|REG_NEWLINE);
@@ -257,7 +256,7 @@ main(int argc, char *argv[])
     }
     
     xml = "<arguments><string>barfoo</string><number>135.78</number><number>89</number></arguments>";
-    std::vector<GnashNPVariant> arguments = ei.parseArguments(xml);
+    std::vector<GnashNPVariant> arguments = ExternalInterface::parseArguments(xml);
     np = arguments[0];
     str = NPStringToString(NPVARIANT_TO_STRING(np.get()));
     double dub = NPVARIANT_TO_DOUBLE(arguments[1].get());
@@ -271,7 +270,7 @@ main(int argc, char *argv[])
 
     // Parse an invoke message
     xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
-    ExternalInterface::invoke_t *invoke = ei.parseInvoke(xml);
+    ExternalInterface::invoke_t *invoke = ExternalInterface::parseInvoke(xml);
     str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
     if ((invoke->name == "barbyfoo") && (invoke->type == "xml")
         && (NPVARIANT_IS_STRING(invoke->args[0].get()))
@@ -287,21 +286,24 @@ main(int argc, char *argv[])
 
 // We have to implement these two memory allocation functions as
 // they're used in the code we're testing.
-void* NPN_MemAlloc(uint32_t size)
+void *
+NPN_MemAlloc(uint32_t size)
 {
   void * rv = NULL;
   rv = malloc(size);
   return rv;
 }
 
-void NPN_MemFree(void* ptr)
+void
+NPN_MemFree(void* ptr)
 {
   assert(ptr);
   free(ptr);
 }
 
 // These are just stubs to get the test case to link standalone.
-NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
+NPIdentifier
+NPN_GetStringIdentifier(const NPUTF8 *name)
 {
 }
 
@@ -338,19 +340,22 @@ NS_DestroyPluginInstance(nsPluginInstanceBase *aPlugin)
 }
 
 // Implement minimal properties handling
-bool NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier name,
+bool
+NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier name,
                      const NPVariant *value)
 {
     _properties[name] = const_cast<NPVariant *>(value);
 }
 
-bool NPN_GetProperty(NPP npp, NPObject* obj, NPIdentifier name,
+bool
+NPN_GetProperty(NPP npp, NPObject* obj, NPIdentifier name,
                      const NPVariant *value)
 {
     return _properties[name];
 }
 
-bool NPN_HasProperty(NPP npp, NPObject* obj, NPIdentifier name,
+bool
+NPN_HasProperty(NPP npp, NPObject* obj, NPIdentifier name,
                      const NPVariant *value)
 {
     std::map<NPIdentifier, NPVariant *>::iterator it;
