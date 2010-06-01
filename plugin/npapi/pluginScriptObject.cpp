@@ -623,15 +623,12 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
                                      const NPVariant& value)
 {
     log_debug(__PRETTY_FUNCTION__);
-
-    ExternalInterface ei;
-    
     std::vector<std::string> iargs;
-    std::string str = ei.makeString(name);
+    std::string str = ExternalInterface::makeString(name);
     iargs.push_back(str);
-    str = ei.convertNPVariant(&value);
+    str = ExternalInterface::convertNPVariant(&value);
     iargs.push_back(str);
-    str = ei.makeInvoke("SetVariable", iargs);
+    str = ExternalInterface::makeInvoke("SetVariable", iargs);
     
     // Write the message to the Control FD.
     size_t ret = writePlayer(str);
@@ -653,11 +650,10 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
 {
     log_debug(__PRETTY_FUNCTION__);
 
-    ExternalInterface ei;
     std::vector<std::string> iargs;
-    std::string str = ei.makeString(name);
+    std::string str = ExternalInterface::makeString(name);
     iargs.push_back(str);
-    str = ei.makeInvoke("GetVariable", iargs);
+    str = ExternalInterface::makeInvoke("GetVariable", iargs);
 
     log_debug("Trying to get a value for %s.", name);
     
@@ -685,7 +681,7 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
         return GnashNPVariant();
     }
 
-    GnashNPVariant parsed = ei.parseXML(data);
+    GnashNPVariant parsed = ExternalInterface::parseXML(data);
 
     printNPVariant(&parsed.get());
     
@@ -828,6 +824,11 @@ GnashPluginScriptObject::closePipe(int fd)
 //     log_debug(__FUNCTION__);
     
     if (fd > 0) {
+        // Send a Quit message to the player before closing the pipe.
+        std::vector<std::string> args;
+        std::string str = ExternalInterface::makeInvoke("Quit", args);
+        size_t ret =  writePlayer(fd, str);
+    
         ::shutdown(fd, SHUT_RDWR);
         ::close(fd);
     }
@@ -1047,9 +1048,11 @@ GnashPluginScriptObject::handleInvoke(GIOChannel *iochan, GIOCondition cond)
 }
 
 bool
-GnashPluginScriptObject::processPlayerRequest(gchar* buf, gsize len)
+GnashPluginScriptObject::processPlayerRequest(gchar */* buf */, gsize /* len */)
 {
     log_debug(__PRETTY_FUNCTION__);
+
+    return false;
 }
 
 bool

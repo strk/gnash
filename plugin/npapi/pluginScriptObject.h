@@ -176,7 +176,6 @@ protected:
     /// @return true if the request was processed, false otherwise (bogus request..)
     ///
     bool processPlayerRequest(gchar* buf, gsize len);
-
 private:
     static bool handleInvokeWrapper(GIOChannel* iochan, GIOCondition cond,
                                      GnashPluginScriptObject* plugin);
