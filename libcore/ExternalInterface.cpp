@@ -252,6 +252,8 @@ ExternalInterface::toAS(Global_as& /*gl*/, const std::string &xml)
             // When an NPVariant becomes a string object, it *does not* make a copy.
             // Instead it stores the pointer (and length) we just allocated.
             val.set_string(data);
+            // as_value copies the string, so we don't need data anymore
+            delete[] data;
         } else if (tag == "<array>") {
             start = end;
             end = xml.find("</array");
