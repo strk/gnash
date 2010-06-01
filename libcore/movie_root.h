@@ -927,8 +927,8 @@ public:
 
     bool processInvoke(ExternalInterface::invoke_t *);
 
-    void callExternalCallback(const std::string &name, 
-                              const std::vector<as_value>& obj);
+    std::string callExternalCallback(const std::string &name, 
+                                     const std::vector<as_value>& args);
 
 private:
 

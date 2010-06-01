@@ -1664,6 +1664,12 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 	as_value val(100);
 	// FIXME: need to use a real value
 	ss << ExternalInterface::toXML(val);
+    } else {
+	std::map<std::string, as_object *>::const_iterator it;
+	for (it=_externalCallbacks.begin(); it != _externalCallbacks.end(); it++) {
+	    std::string method = it->first;
+	    log_debug("Checking against method name: %s", method);
+	}
     }
 
     if (!ss.str().empty()) {
@@ -1845,17 +1851,27 @@ movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
     return 0;
 }
 
-void
+// This calls a JavaScript method in the web page
+std::string
 movie_root::callExternalCallback(const std::string &name, 
-				 const std::vector<as_value> &obj)
+				 const std::vector<as_value> &fnargs)
 {
-    log_debug("Looking for method name: %s", name);
+    log_unimpl("Looking for method name: %s", name);
 
-    std::map<std::string, as_object *>::const_iterator it;
-    for (it=_externalCallbacks.begin(); it != _externalCallbacks.end(); it++) {
-	std::string method = it->first;
-	log_debug("Checking against method name: %s", method);
+    std::vector<std::string> args;
+    std::vector<as_value>::const_iterator it;
+    std::string msg = ExternalInterface::makeInvoke(name, fnargs);
+
+    int ret = ExternalInterface::writeBrowser(_hostfd, msg);
+    if (ret != msg.size()) {
+        log_error(_("Could not write to browser fd #%d: %s"),
+		  _hostfd, std::strerror(errno));
+	return std::string();
     }
+
+    std::string result = ExternalInterface::readBrowser(_controlfd);
+
+    return result;
 }
 
 void
@@ -2117,23 +2133,27 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     size_t len = requestString.length();
     // TODO: should mutex-protect this ?
     // NOTE: we are assuming the hostfd is set in blocking mode here..
-    log_debug(_("Attempt to write geturl requests fd %d"), _hostfd);
 
-    int ret = write(_hostfd, requestString.c_str(), len);
-    if (ret == -1) {
-        log_error(_("Could not write to user-provided host requests "
-                    "fd %d: %s"), _hostfd, std::strerror(errno));
+    log_debug(_("Attempt to write geturl requests fd #%d"), _hostfd);
+
+    std::vector<as_value> fnargs;
+    fnargs.push_back(as_value(urlstr));
+    if (!target.empty()) {
+	fnargs.push_back(as_value(target));
     }
-    if (static_cast<size_t>(ret) < len) {
-        log_error(_("Could only write %d bytes over %d required to "
-                    "user-provided host requests fd %d"),
-                    ret, len, _hostfd);
+    std::string msg = ExternalInterface::makeInvoke("getURL", fnargs);
+
+    size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
+    if (ret < msg.size()) {
+        log_error(_("Could only write %d bytes to fd #%d"),
+		  ret, _hostfd);
     }
 
     // The request string ends with newline, and we don't want to log that
+#if 0
     requestString.resize(requestString.size() - 1);
     log_debug(_("Sent request '%s' to host fd %d"), requestString, _hostfd);
-
+#endif
 }
 
 void
