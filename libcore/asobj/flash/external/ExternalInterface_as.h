@@ -41,29 +41,10 @@ class ExternalInterface_as
 public:
     ExternalInterface_as(as_object* owner);
     ~ExternalInterface_as();
-
-#if 0
-    /// Add an ActionScript function as a callback by JavaScript
-    // in the browser.
-    bool addCallback(const std::string &name, as_object *method);
-
-    ///
-    bool addRootCallback(movie_root &mr);    
-
-    virtual void update();
-
-    // Parse the XML Invoke message.
-    void processInvoke(const std::string &str);
-
-    void setFD(int x) { _fd = x; };
-
-    as_object *getCallback(const std::string &name);
-#endif
     
 private:
     int                 _fd;
     std::map<std::string, as_object *> _methods;
-    bool		_marshallExceptions;
 };
 
 /// Initialize the global ExternalInterface class
