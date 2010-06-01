@@ -40,6 +40,7 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(GNASHBINDIR)\
         -I$(top_srcdir)/librender \
 	-I$(srcdir)/mozilla-sdk \
 	-I$(srcdir)/mozilla-sdk/include \
+	$(INCLTDL) \
         $(GLIB_CFLAGS) \
 	$(NULL)
 
@@ -68,12 +69,34 @@ libgnashplugin_la_LIBADD   = \
 
 # Scriptable plugin support
 if SCRIPTABLE
-check_PROGRAMS = test
+check_PROGRAMS = test 
+if GSHELL
+check_PROGRAMS += gshell
+endif
 test_LDADD  = \
 	$(GLIB_LIBS) \
 	$(NULL)
 test_SOURCES = test.cpp \
 	external.cpp
+
+if LIBLTDL1
+LTDL = $(top_builddir)/libbase/libltdlc.la
+endif
+
+if LIBLTDL2
+LTDL = $(top_builddir)/libltdl/libltdlc.la
+endif
+
+if GSHELL
+# gshell_LDFLAGS = -dlpreopen libgnashplugin.la
+gshell_LDADD  = \
+	$(GLIB_LIBS) \
+	$(LTDL) \
+	$(PTHREAD_LIBS) \
+	$(NULL)
+gshell_CPPFLAGS = $(AM_CPPFLAGS)
+gshell_SOURCES = gshell.cpp
+endif
 
 noinst_HEADERS += pluginScriptObject.h \
 	callbacks.h \
@@ -89,9 +112,9 @@ check:
 endif
 
 if PLUGIN_LINK_UNDEFINED
-libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
+libgnashplugin_la_LDFLAGS = -avoid-version -export-dynamic -L$(plugindir)
 else
-libgnashplugin_la_LDFLAGS = -module -avoid-version -L$(plugindir)
+libgnashplugin_la_LDFLAGS = -module -avoid-version -export-dynamic -L$(plugindir)
 endif
 
 if VISIBILITY_WORKS

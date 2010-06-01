@@ -296,6 +296,10 @@ if test x$scriptable = xyes; then
     AC_DEFINE(ENABLE_SCRIPTABLE, [1], [Enable scriptable code in plugin])
 fi
 
+dnl for now GSHELL is always disabled by default, as it's still a work
+dnl in progress, and shouldn't be built unless you plan to work on it.
+AM_CONDITIONAL(GSHELL, [false])
+
 dnl This option is only used if you want Gnash to interwork with 
 dnl the Adobe player using the LocalConnection class.
 dnl lckey=0xdd3adabd
