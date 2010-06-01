@@ -36,14 +36,6 @@
 
 namespace gnash {
 
-ExternalInterface::ExternalInterface ()
-{
-}
-
-ExternalInterface::~ExternalInterface ()
-{
-}
-
 // Create an Invoke message for the standalone Gnash
 std::string
 ExternalInterface::makeInvoke (const std::string &method,
