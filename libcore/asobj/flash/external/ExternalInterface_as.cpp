@@ -148,7 +148,7 @@ namespace {
 void
 attachExternalInterfaceStaticInterface(as_object& o)
 {    
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     const int swf7Flags = PropFlags::dontDelete | PropFlags::dontEnum
         | PropFlags::readOnly | PropFlags::onlySWF7Up;
@@ -216,7 +216,7 @@ attachExternalInterfaceStaticInterface(as_object& o)
 as_value
 externalinterface_addCallback(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     movie_root& mr = getRoot(fn);
 
@@ -243,7 +243,7 @@ externalinterface_addCallback(const fn_call& fn)
 as_value
 externalinterface_call(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     movie_root& mr = getRoot(fn);
 
@@ -252,8 +252,12 @@ externalinterface_call(const fn_call& fn)
         const std::string methodName = methodName_as.to_string();
         const std::vector<as_value>& args = fn.getArgs();
         log_debug("Calling External method \"%s\"", methodName);
-        as_value result = mr.callExternalCallback(methodName, args);
-        return result;
+        std::string result = mr.callExternalCallback(methodName, args);
+        if (result.empty()) {
+            return as_value();
+        } else {
+            return as_value(result);
+        }
     }
     
     return as_value();
@@ -326,7 +330,7 @@ externalinterface_marshallExceptions(const fn_call& fn)
 as_value
 externalinterface_objectID(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     movie_root& mr = getRoot(fn);
     MovieClip *mc = mr.getLevel(0);
@@ -428,7 +432,7 @@ externalinterface_uArgumentsToAS(const fn_call& /*fn*/)
 as_value
 externalinterface_uAddCallback(const fn_call& /*fn*/)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
