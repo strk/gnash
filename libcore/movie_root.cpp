@@ -1628,7 +1628,8 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
     // These are the default methods used by ExternalInterface
     if (invoke->name == "Quit") {
 	// The browser is telling us to quit.
-	// FIXME: This is probably not the right way to exit.
+	// FIXME: This is probably not the right way to exit, but it
+	// beats turning into a zombie and eating cpu cycles.
 	exit(0);
     } else if (invoke->name == "SetVariable") {
 	// SetVariable doesn't send a response
@@ -1860,7 +1861,11 @@ std::string
 movie_root::callExternalCallback(const std::string &name, 
 				 const std::vector<as_value> &fnargs)
 {
-    log_unimpl("Looking for method name: %s", name);
+    std::string empty;
+
+    if (_hostfd) {
+	return empty;
+    }
 
     std::vector<std::string> args;
     std::vector<as_value>::const_iterator it;
