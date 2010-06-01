@@ -47,6 +47,7 @@
 #include "noseek_fd_adapter.h"
 #include "VM.h"
 #include "SystemClock.h"
+#include "ExternalInterface.h"
 
 #ifdef USE_FFMPEG
 # include "MediaHandlerFfmpeg.h"
@@ -690,7 +691,10 @@ Player::CallbacksHandler::notify(const std::string& command,
     if (hostfd != -1) {
         //log_debug("user-provided host requests fd is %d", hostfd);
         std::stringstream request;
-        request << "INVOKE " << command << ":" << args << std::endl;
+	std::vector<as_value> fnargs;
+	fnargs.push_back(as_value(command));
+	fnargs.push_back(as_value(args));
+	request << ExternalInterface::makeInvoke("fsCommand", fnargs);
 
         std::string requestString = request.str();
         const char* cmd = requestString.c_str();
