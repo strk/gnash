@@ -252,7 +252,8 @@ externalinterface_call(const fn_call& fn)
         const std::string methodName = methodName_as.to_string();
         const std::vector<as_value>& args = fn.getArgs();
         log_debug("Calling External method \"%s\"", methodName);
-        mr.callExternalCallback(methodName, args);
+        as_value result = mr.callExternalCallback(methodName, args);
+        return result;
     }
     
     return as_value();
