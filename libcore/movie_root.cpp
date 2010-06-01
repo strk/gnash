@@ -1626,7 +1626,11 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
     std::stringstream ss;
 
     // These are the default methods used by ExternalInterface
-    if (invoke->name == "SetVariable") {
+    if (invoke->name == "Quit") {
+	// The browser is telling us to quit.
+	// FIXME: This is probably not the right way to exit.
+	exit(0);
+    } else if (invoke->name == "SetVariable") {
 	// SetVariable doesn't send a response
     } else if (invoke->name == "GetVariable") {
 	// GetVariable sends the value of the variable
