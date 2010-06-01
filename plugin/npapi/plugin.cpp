@@ -459,7 +459,6 @@ nsPluginInstance::~nsPluginInstance()
 	     usleep(1000);
 	     cleanup_childpid(pid);
         } else {
-
             gnash::log_debug("Child process exited with status %d", status);
         }
     }
@@ -510,14 +509,12 @@ nsPluginInstance::shut()
     }
 
     if (_controlfd != -1) {
+        _scriptObject->closePipe(_controlfd);
         if (close(_controlfd) != 0) {
             gnash::log_error("Gnash plugin failed to close the control socket!");
         }
     }
 
-// #ifdef ENABLE_SCRIPTABLE
-//     _scriptObject->closePipe();
-// #endif
 
 }
 /// \brief Set the window to be used to render in
@@ -763,9 +760,8 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         }
         return false;
     }
-
-    ExternalInterface ei;
-    ExternalInterface::invoke_t *invoke = ei.parseInvoke(buf);
+    
+    ExternalInterface::invoke_t *invoke = ExternalInterface::parseInvoke(buf);
 
     if (invoke) {
         if (invoke->name == "getURL") {
@@ -824,12 +820,14 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
                         postdata, false);
             
             return true;
-        }
 #endif
+        }
     } else {
         gnash::log_error("Unknown player request: " + std::string(buf));
         return false;
     }
+
+    return false;
 }
 
 std::string
