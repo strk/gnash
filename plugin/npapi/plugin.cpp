@@ -72,6 +72,11 @@
 #include "plugin.h" 
 #include "GnashSystemIOHeaders.h"
 #include "StringPredicates.h"
+#include "external.h"
+#include "npapi.h"
+#include "npruntime.h"
+#include "npfunctions.h"
+#include "GnashNPVariant.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -759,86 +764,68 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         return false;
     }
 
-    if ( ! std::strncmp(buf, "GET ", 4) ) {
-        char* target = buf + 4;
-        if ( ! *target ) {
-            gnash::log_error("No target found after GET request");
-            return false;
-        }
-        char* url = target;
-        while (*url && *url != ':') ++url;
-        if ( *url ) {
-            *url='\0';
-            ++url;
-        } else {
-            gnash::log_error("No colon found after GETURL target string");
-            return false;
-        }
+    ExternalInterface ei;
+    ExternalInterface::invoke_t *invoke = ei.parseInvoke(buf);
 
-        gnash::log_debug("Asked to get URL '%s' in target %s", url, target);
-        NPN_GetURL(_instance, url, target);
-        return true;
+    if (invoke) {
+        if (invoke->name == "getURL") {
+            // gnash::log_debug("Got a getURL() request: %", invoke->args[0].get());
 
-    } else if ( ! std::strncmp(buf, "INVOKE ", 7) ) {
-        char* command = buf + 7;
-        if ( ! *command ) {
-            gnash::log_error("No command found after INVOKE request");
-            return false;
-        }
-        char* arg = command;
-        while (*arg && *arg != ':') ++arg;
-        if ( *arg ) {
-            *arg='\0';
-            ++arg;
-        } else {
-            gnash::log_error("No colon found after INVOKE command string");
-            return false;
-        }
-
-        std::string name = _name; 
-
-        std::stringstream jsurl;
-        jsurl << "javascript:" << name << "_DoFSCommand('" << command << "','" << arg <<"')";
-
-        // TODO: check if _self is a good target for this
-        static const char* tgt = "_self";
-
-        gnash::log_debug("Calling NPN_GetURL(%s, %s)",
-		jsurl.str(), tgt);
-
-        NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
-        return true;
-    }  else if ( ! strncmp(buf, "POST ", 5)) {
-        char* target = buf + 5;
-        if (! *target) return false;
+            std::string url = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
+            std::string target;
+            if (invoke->args.size() == 2) {
+                target = NPStringToString(NPVARIANT_TO_STRING(invoke->args[1].get()));
+            }
+            
+            gnash::log_debug("Asked to getURL '%s' in target %s", url, target);
+            NPN_GetURL(_instance, url.c_str(), target.c_str());
+            return true;
+        } else if (invoke->name == "fsCommand") {
+            std::string command = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
+            std::string arg = NPStringToString(NPVARIANT_TO_STRING(invoke->args[1].get()));            
+            std::string name = _name; 
+            std::stringstream jsurl;
+            jsurl << "javascript:" << name << "_DoFSCommand('" << command << "','" << arg <<"')";
+            
+            // TODO: check if _self is a good target for this
+            static const char* tgt = "_self";
+            
+            gnash::log_debug("Calling NPN_GetURL(%s, %s)",
+                             jsurl.str(), tgt);
+            
+            NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
+            return true;
+#if 0
+        }  else if ( ! strncmp(buf, "POST ", 5)) {
+            char* target = buf + 5;
+            if (! *target) return false;
+            
+            char* postdata = target;
+            while (*postdata && *postdata != ':') ++postdata;
+            if ( *postdata ) {
+                *postdata='\0';
+                ++postdata;
+            } else {
+                gnash::log_error("No colon found after getURL postdata string");
+                return false;
+            }
         
-        char* postdata = target;
-        while (*postdata && *postdata != ':') ++postdata;
-        if ( *postdata ) {
-            *postdata='\0';
-            ++postdata;
+            char* url = postdata;
+            while (*url && *url != '$') ++url;
+            if (*url) {
+                *url='\0';
+                ++url;
+            } else {
+                gnash::log_error("No $ character found after getURL target string");
+                return false;
+            }
+            
+            NPN_PostURL(_instance, url, target, std::strlen(postdata),
+                        postdata, false);
+            
+            return true;
         }
-        else
-        {
-            gnash::log_error("No colon found after getURL postdata string");
-            return false;
-        }
-        
-        char* url = postdata;
-        while (*url && *url != '$') ++url;
-        if (*url) {
-            *url='\0';
-            ++url;
-        } else {
-            gnash::log_error("No $ character found after getURL target string");
-            return false;
-        }
-        
-
-        NPN_PostURL(_instance, url, target, std::strlen(postdata),
-                postdata, false);
-
-        return true;
+#endif
     } else {
         gnash::log_error("Unknown player request: " + std::string(buf));
         return false;
