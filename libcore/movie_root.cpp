@@ -1546,8 +1546,6 @@ movie_root::removeFromActionQueue(DisplayObject* target)
 {
     size_t st = _actionQueue[PRIORITY_CONSTRUCT].size();
 
-    if (target && target->hasEventHandler(event_id::UNLOAD)) return;
-
     _actionQueue[PRIORITY_CONSTRUCT].erase(
             std::remove_if(_actionQueue[PRIORITY_CONSTRUCT].begin(),
                 _actionQueue[PRIORITY_CONSTRUCT].end(), FindDO(target)),
