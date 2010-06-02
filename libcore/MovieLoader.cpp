@@ -324,7 +324,8 @@ MovieLoader::processCompletedRequest(const Request& r)
         // onLoadInit call next, so it happens after the former.
         //
         std::auto_ptr<ExecutableCode> code(
-                new DelayedFunctionCall(handler, NSV::PROP_BROADCAST_MESSAGE, 
+                new DelayedFunctionCall(targetDO, handler,
+                    NSV::PROP_BROADCAST_MESSAGE, 
                     "onLoadInit", getObject(targetDO)));
 
         getRoot(*handler).pushAction(code, movie_root::PRIORITY_DOACTION);
