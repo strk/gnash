@@ -351,11 +351,7 @@ public:
     /// (2)the id might be used for specifying a DisplayObject
     /// in the depth(think about multiple DisplayObjects within the same
     /// depth, not tested and a rare case)
-    void remove_display_object(int depth, int /* id */)
-    {
-        set_invalidated();
-        _displayList.removeDisplayObject(depth);
-    }
+    void remove_display_object(int depth, int /*id*/);
 
     void unloadMovie();
 

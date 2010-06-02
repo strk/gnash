@@ -907,6 +907,8 @@ public:
 
     const RunResources& runResources() const { return _runResources; }
 
+    void removeFromActionQueue(DisplayObject* target);
+
 private:
 
     /// Set the root movie, replacing the current one if any.
