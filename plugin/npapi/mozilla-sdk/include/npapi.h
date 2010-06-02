@@ -1,39 +1,22 @@
 /* -*- Mode: C; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
-/* ***** BEGIN LICENSE BLOCK *****
- * Version: MPL 1.1/GPL 2.0/LGPL 2.1
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is mozilla.org code.
- *
- * The Initial Developer of the Original Code is
- * Netscape Communications Corporation.
- * Portions created by the Initial Developer are Copyright (C) 1998
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the MPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
- *
- * ***** END LICENSE BLOCK ***** */
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+//   Foundation, Inc
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #ifndef npapi_h_
 #define npapi_h_
@@ -149,21 +132,21 @@ typedef char*         NPMIMEType;
  */
 typedef struct _NPP
 {
-  void* pdata;      /* plug-in private data */
-  void* ndata;      /* netscape private data */
+    void* pdata;      /* plug-in private data */
+    void* ndata;      /* netscape private data */
 } NPP_t;
 
 typedef NPP_t*  NPP;
 
 typedef struct _NPStream
 {
-  void*    pdata; /* plug-in private data */
-  void*    ndata; /* netscape private data */
-  const    char* url;
-  uint32_t end;
-  uint32_t lastmodified;
-  void*    notifyData;
-  const    char* headers; /* Response headers from host.
+    void*    pdata; /* plug-in private data */
+    void*    ndata; /* netscape private data */
+    const    char* url;
+    uint32_t end;
+    uint32_t lastmodified;
+    void*    notifyData;
+    const    char* headers; /* Response headers from host.
                            * Exists only for >= NPVERS_HAS_RESPONSE_HEADERS.
                            * Used for HTTP only; NULL for non-HTTP.
                            * Available from NPP_NewStream onwards.
@@ -177,29 +160,29 @@ typedef struct _NPStream
 
 typedef struct _NPByteRange
 {
-  int32_t  offset; /* negative offset means from the end */
-  uint32_t length;
-  struct _NPByteRange* next;
+    int32_t  offset; /* negative offset means from the end */
+    uint32_t length;
+    struct _NPByteRange* next;
 } NPByteRange;
 
 typedef struct _NPSavedData
 {
-  int32_t len;
-  void*   buf;
+    int32_t len;
+    void*   buf;
 } NPSavedData;
 
 typedef struct _NPRect
 {
-  uint16_t top;
-  uint16_t left;
-  uint16_t bottom;
-  uint16_t right;
+    uint16_t top;
+    uint16_t left;
+    uint16_t bottom;
+    uint16_t right;
 } NPRect;
 
 typedef struct _NPSize 
 { 
-  int32_t width; 
-  int32_t height; 
+    int32_t width; 
+    int32_t height; 
 } NPSize; 
 
 #ifdef XP_UNIX
@@ -213,30 +196,30 @@ typedef struct _NPSize
  * These are used to pass additional platform specific information.
  */
 enum {
-  NP_SETWINDOW = 1,
-  NP_PRINT
+    NP_SETWINDOW = 1,
+    NP_PRINT
 };
 
 typedef struct
 {
-  int32_t type;
+    int32_t type;
 } NPAnyCallbackStruct;
 
 typedef struct
 {
-  int32_t      type;
+    int32_t      type;
 #ifdef MOZ_X11
-  Display*     display;
-  Visual*      visual;
-  Colormap     colormap;
-  unsigned int depth;
+    Display*     display;
+    Visual*      visual;
+    Colormap     colormap;
+    unsigned int depth;
 #endif
 } NPSetWindowCallbackStruct;
 
 typedef struct
 {
-  int32_t type;
-  FILE* fp;
+    int32_t type;
+    FILE* fp;
 } NPPrintCallbackStruct;
 
 #endif /* XP_UNIX */
@@ -244,17 +227,17 @@ typedef struct
 #ifdef XP_MACOSX
 typedef enum {
 #ifndef NP_NO_QUICKDRAW
-  NPDrawingModelQuickDraw = 0,
+    NPDrawingModelQuickDraw = 0,
 #endif
-  NPDrawingModelCoreGraphics = 1,
-  NPDrawingModelCoreAnimation = 3
+    NPDrawingModelCoreGraphics = 1,
+    NPDrawingModelCoreAnimation = 3
 } NPDrawingModel;
 
 typedef enum {
 #ifndef NP_NO_CARBON
-  NPEventModelCarbon = 0,
+    NPEventModelCarbon = 0,
 #endif
-  NPEventModelCocoa = 1
+    NPEventModelCocoa = 1
 } NPEventModel;
 #endif
 
@@ -295,54 +278,54 @@ typedef enum {
  * List of variable names for which NPP_GetValue shall be implemented
  */
 typedef enum {
-  NPPVpluginNameString = 1,
-  NPPVpluginDescriptionString,
-  NPPVpluginWindowBool,
-  NPPVpluginTransparentBool,
-  NPPVjavaClass,                /* Not implemented in Mozilla 1.0 */
-  NPPVpluginWindowSize,
-  NPPVpluginTimerInterval,
-
-  NPPVpluginScriptableInstance = (10 | NP_ABI_MASK),
-  NPPVpluginScriptableIID = 11,
-
-  /* Introduced in Mozilla 0.9.9 */
-  NPPVjavascriptPushCallerBool = 12,
-
-  /* Introduced in Mozilla 1.0 */
-  NPPVpluginKeepLibraryInMemory = 13,
-  NPPVpluginNeedsXEmbed         = 14,
-
-  /* Get the NPObject for scripting the plugin. Introduced in Firefox
-   * 1.0 (NPAPI minor version 14).
-   */
-  NPPVpluginScriptableNPObject  = 15,
-
-  /* Get the plugin value (as \0-terminated UTF-8 string data) for
-   * form submission if the plugin is part of a form. Use
-   * NPN_MemAlloc() to allocate memory for the string data. Introduced
-   * in Mozilla 1.8b2 (NPAPI minor version 15).
-   */
-  NPPVformValue = 16,
-  
-  NPPVpluginUrlRequestsDisplayedBool = 17,
-  
-  /* Checks if the plugin is interested in receiving the http body of
-   * all http requests (including failed ones, http status != 200).
-   */
-  NPPVpluginWantsAllNetworkStreams = 18
-
+    NPPVpluginNameString = 1,
+    NPPVpluginDescriptionString,
+    NPPVpluginWindowBool,
+    NPPVpluginTransparentBool,
+    NPPVjavaClass,                /* Not implemented in Mozilla 1.0 */
+    NPPVpluginWindowSize,
+    NPPVpluginTimerInterval,
+    
+    NPPVpluginScriptableInstance = (10 | NP_ABI_MASK),
+    NPPVpluginScriptableIID = 11,
+    
+    /* Introduced in Mozilla 0.9.9 */
+    NPPVjavascriptPushCallerBool = 12,
+    
+    /* Introduced in Mozilla 1.0 */
+    NPPVpluginKeepLibraryInMemory = 13,
+    NPPVpluginNeedsXEmbed         = 14,
+    
+    /* Get the NPObject for scripting the plugin. Introduced in Firefox
+     * 1.0 (NPAPI minor version 14).
+     */
+    NPPVpluginScriptableNPObject  = 15,
+    
+    /* Get the plugin value (as \0-terminated UTF-8 string data) for
+     * form submission if the plugin is part of a form. Use
+     * NPN_MemAlloc() to allocate memory for the string data. Introduced
+     * in Mozilla 1.8b2 (NPAPI minor version 15).
+     */
+    NPPVformValue = 16,
+    
+    NPPVpluginUrlRequestsDisplayedBool = 17,
+    
+    /* Checks if the plugin is interested in receiving the http body of
+     * all http requests (including failed ones, http status != 200).
+     */
+    NPPVpluginWantsAllNetworkStreams = 18
+    
 #ifdef XP_MACOSX
-  /* Used for negotiating drawing models */
-  , NPPVpluginDrawingModel = 1000
-  /* Used for negotiating event models */
-  , NPPVpluginEventModel = 1001
-  /* In the NPDrawingModelCoreAnimation drawing model, the browser asks the plug-in for a Core Animation layer. */
-  , NPPVpluginCoreAnimationLayer = 1003
+    /* Used for negotiating drawing models */
+    , NPPVpluginDrawingModel = 1000
+    /* Used for negotiating event models */
+    , NPPVpluginEventModel = 1001
+    /* In the NPDrawingModelCoreAnimation drawing model, the browser asks the plug-in for a Core Animation layer. */
+    , NPPVpluginCoreAnimationLayer = 1003
 #endif
-
+    
 #if (MOZ_PLATFORM_MAEMO == 5)
-  , NPPVpluginWindowlessLocalBool = 2002
+    , NPPVpluginWindowlessLocalBool = 2002
 #endif
 } NPPVariable;
 
@@ -350,59 +333,59 @@ typedef enum {
  * List of variable names for which NPN_GetValue is implemented by Mozilla
  */
 typedef enum {
-  NPNVxDisplay = 1,
-  NPNVxtAppContext,
-  NPNVnetscapeWindow,
-  NPNVjavascriptEnabledBool,
-  NPNVasdEnabledBool,
-  NPNVisOfflineBool,
-
-  /* 10 and over are available on Mozilla builds starting with 0.9.4 */
-  NPNVserviceManager = (10 | NP_ABI_MASK),
-  NPNVDOMElement     = (11 | NP_ABI_MASK),   /* available in Mozilla 1.2 */
-  NPNVDOMWindow      = (12 | NP_ABI_MASK),
-  NPNVToolkit        = (13 | NP_ABI_MASK),
-  NPNVSupportsXEmbedBool = 14,
-
-  /* Get the NPObject wrapper for the browser window. */
-  NPNVWindowNPObject = 15,
-
-  /* Get the NPObject wrapper for the plugins DOM element. */
-  NPNVPluginElementNPObject = 16,
-
-  NPNVSupportsWindowless = 17,
-
-  NPNVprivateModeBool = 18
-
+    NPNVxDisplay = 1,
+    NPNVxtAppContext,
+    NPNVnetscapeWindow,
+    NPNVjavascriptEnabledBool,
+    NPNVasdEnabledBool,
+    NPNVisOfflineBool,
+    
+    /* 10 and over are available on Mozilla builds starting with 0.9.4 */
+    NPNVserviceManager = (10 | NP_ABI_MASK),
+    NPNVDOMElement     = (11 | NP_ABI_MASK),   /* available in Mozilla 1.2 */
+    NPNVDOMWindow      = (12 | NP_ABI_MASK),
+    NPNVToolkit        = (13 | NP_ABI_MASK),
+    NPNVSupportsXEmbedBool = 14,
+    
+    /* Get the NPObject wrapper for the browser window. */
+    NPNVWindowNPObject = 15,
+    
+    /* Get the NPObject wrapper for the plugins DOM element. */
+    NPNVPluginElementNPObject = 16,
+    
+    NPNVSupportsWindowless = 17,
+    
+    NPNVprivateModeBool = 18
+    
 #ifdef XP_MACOSX
-  /* Used for negotiating drawing models */
-  , NPNVpluginDrawingModel = 1000
+    /* Used for negotiating drawing models */
+    , NPNVpluginDrawingModel = 1000
 #ifndef NP_NO_QUICKDRAW
-  , NPNVsupportsQuickDrawBool = 2000
+    , NPNVsupportsQuickDrawBool = 2000
 #endif
-  , NPNVsupportsCoreGraphicsBool = 2001
-  , NPNVsupportsCoreAnimationBool = 2003
+    , NPNVsupportsCoreGraphicsBool = 2001
+    , NPNVsupportsCoreAnimationBool = 2003
 #ifndef NP_NO_CARBON
-  , NPNVsupportsCarbonBool = 3000 /* TRUE if the browser supports the Carbon event model */
+    , NPNVsupportsCarbonBool = 3000 /* TRUE if the browser supports the Carbon event model */
 #endif
-  , NPNVsupportsCocoaBool = 3001 /* TRUE if the browser supports the Cocoa event model */
+    , NPNVsupportsCocoaBool = 3001 /* TRUE if the browser supports the Cocoa event model */
 #endif
 #if (MOZ_PLATFORM_MAEMO == 5)
-  , NPNVSupportsWindowlessLocal = 2002
+    , NPNVSupportsWindowlessLocal = 2002
 #endif
 } NPNVariable;
 
 typedef enum {
-  NPNURLVCookie = 501,
-  NPNURLVProxy
+    NPNURLVCookie = 501,
+    NPNURLVProxy
 } NPNURLVariable;
 
 /*
  * The type of Toolkit the widgets use
  */
 typedef enum {
-  NPNVGtk12 = 1,
-  NPNVGtk2
+    NPNVGtk12 = 1,
+    NPNVGtk2
 } NPNToolkitType;
 
 /*
@@ -410,64 +393,63 @@ typedef enum {
  * returned in the window field.
  */
 typedef enum {
-  NPWindowTypeWindow = 1,
-  NPWindowTypeDrawable
+    NPWindowTypeWindow = 1,
+    NPWindowTypeDrawable
 } NPWindowType;
 
 typedef struct _NPWindow
 {
-  void* window;  /* Platform specific window handle */
-                 /* OS/2: x - Position of bottom left corner */
-                 /* OS/2: y - relative to visible netscape window */
-  int32_t  x;      /* Position of top left corner relative */
-  int32_t  y;      /* to a netscape page. */
-  uint32_t width;  /* Maximum window size */
-  uint32_t height;
-  NPRect   clipRect; /* Clipping rectangle in port coordinates */
+    void* window;  /* Platform specific window handle */
+    /* OS/2: x - Position of bottom left corner */
+    /* OS/2: y - relative to visible netscape window */
+    int32_t  x;      /* Position of top left corner relative */
+    int32_t  y;      /* to a netscape page. */
+    uint32_t width;  /* Maximum window size */
+    uint32_t height;
+    NPRect   clipRect; /* Clipping rectangle in port coordinates */
 #if defined(XP_UNIX) && !defined(XP_MACOSX)
-  void * ws_info; /* Platform-dependent additional data */
+    void * ws_info; /* Platform-dependent additional data */
 #endif /* XP_UNIX */
-  NPWindowType type; /* Is this a window or a drawable? */
+    NPWindowType type; /* Is this a window or a drawable? */
 } NPWindow;
 
 typedef struct _NPImageExpose
 {
-  char*    data;       /* image pointer */
-  int32_t  stride;     /* Stride of data image pointer */
-  int32_t  depth;      /* Depth of image pointer */
-  int32_t  x;          /* Expose x */
-  int32_t  y;          /* Expose y */
-  uint32_t width;      /* Expose width */
-  uint32_t height;     /* Expose height */
-  NPSize   dataSize;   /* Data buffer size */
-  float    translateX; /* translate X matrix value */
-  float    translateY; /* translate Y matrix value */
-  float    scaleX;     /* scale X matrix value */
-  float    scaleY;     /* scale Y matrix value */
+    char*    data;       /* image pointer */
+    int32_t  stride;     /* Stride of data image pointer */
+    int32_t  depth;      /* Depth of image pointer */
+    int32_t  x;          /* Expose x */
+    int32_t  y;          /* Expose y */
+    uint32_t width;      /* Expose width */
+    uint32_t height;     /* Expose height */
+    NPSize   dataSize;   /* Data buffer size */
+    float    translateX; /* translate X matrix value */
+    float    translateY; /* translate Y matrix value */
+    float    scaleX;     /* scale X matrix value */
+    float    scaleY;     /* scale Y matrix value */
 } NPImageExpose;
 
 typedef struct _NPFullPrint
 {
-  NPBool pluginPrinted;/* Set TRUE if plugin handled fullscreen printing */
-  NPBool printOne;     /* TRUE if plugin should print one copy to default
-                          printer */
-  void* platformPrint; /* Platform-specific printing info */
+    NPBool pluginPrinted;/* Set TRUE if plugin handled fullscreen printing */
+    NPBool printOne;     /* TRUE if plugin should print one copy to default
+                            printer */
+    void* platformPrint; /* Platform-specific printing info */
 } NPFullPrint;
 
 typedef struct _NPEmbedPrint
 {
-  NPWindow window;
-  void* platformPrint; /* Platform-specific printing info */
+    NPWindow window;
+    void* platformPrint; /* Platform-specific printing info */
 } NPEmbedPrint;
 
 typedef struct _NPPrint
 {
-  uint16_t mode;               /* NP_FULL or NP_EMBED */
-  union
-  {
-    NPFullPrint fullPrint;   /* if mode is NP_FULL */
-    NPEmbedPrint embedPrint; /* if mode is NP_EMBED */
-  } print;
+    uint16_t mode;               /* NP_FULL or NP_EMBED */
+    union {
+        NPFullPrint fullPrint;   /* if mode is NP_FULL */
+        NPEmbedPrint embedPrint; /* if mode is NP_EMBED */
+    } print;
 } NPPrint;
 
 #ifdef XP_MACOSX
@@ -475,18 +457,16 @@ typedef struct _NPPrint
 typedef EventRecord NPEvent;
 #endif
 #elif defined(XP_WIN)
-typedef struct _NPEvent
-{
-  uint16_t event;
-  uint32_t wParam;
-  uint32_t lParam;
+typedef struct _NPEvent {
+    uint16_t event;
+    uint32_t wParam;
+    uint32_t lParam;
 } NPEvent;
 #elif defined(XP_OS2)
-typedef struct _NPEvent
-{
-  uint32_t event;
-  uint32_t wParam;
-  uint32_t lParam;
+typedef struct _NPEvent {
+    uint32_t event;
+    uint32_t wParam;
+    uint32_t lParam;
 } NPEvent;
 #elif defined (XP_UNIX) && defined(MOZ_X11)
 typedef XEvent NPEvent;
@@ -519,96 +499,96 @@ typedef void *NPMenu;
 #endif
 
 typedef enum {
-  NPCoordinateSpacePlugin = 1,
-  NPCoordinateSpaceWindow,
-  NPCoordinateSpaceFlippedWindow,
-  NPCoordinateSpaceScreen,
-  NPCoordinateSpaceFlippedScreen
+    NPCoordinateSpacePlugin = 1,
+    NPCoordinateSpaceWindow,
+    NPCoordinateSpaceFlippedWindow,
+    NPCoordinateSpaceScreen,
+    NPCoordinateSpaceFlippedScreen
 } NPCoordinateSpace;
 
 #ifdef XP_MACOSX
 
 typedef struct NP_Port
 {
-  CGrafPtr port;
-  int32_t portx; /* position inside the topmost window */
-  int32_t porty;
+    CGrafPtr port;
+    int32_t portx; /* position inside the topmost window */
+    int32_t porty;
 } NP_Port;
 
 typedef struct NP_CGContext
 {
-  CGContextRef context;
+    CGContextRef context;
 #ifdef NP_NO_CARBON
-  NPNSWindow *window;
+    NPNSWindow *window;
 #else
-  void *window; /* A WindowRef or NULL for the Cocoa event model. */
+    void *window; /* A WindowRef or NULL for the Cocoa event model. */
 #endif
 } NP_CGContext;
 
 typedef enum {
-  NPCocoaEventDrawRect = 1,
-  NPCocoaEventMouseDown,
-  NPCocoaEventMouseUp,
-  NPCocoaEventMouseMoved,
-  NPCocoaEventMouseEntered,
-  NPCocoaEventMouseExited,
-  NPCocoaEventMouseDragged,
-  NPCocoaEventKeyDown,
-  NPCocoaEventKeyUp,
-  NPCocoaEventFlagsChanged,
-  NPCocoaEventFocusChanged,
-  NPCocoaEventWindowFocusChanged,
-  NPCocoaEventScrollWheel,
-  NPCocoaEventTextInput
+    NPCocoaEventDrawRect = 1,
+    NPCocoaEventMouseDown,
+    NPCocoaEventMouseUp,
+    NPCocoaEventMouseMoved,
+    NPCocoaEventMouseEntered,
+    NPCocoaEventMouseExited,
+    NPCocoaEventMouseDragged,
+    NPCocoaEventKeyDown,
+    NPCocoaEventKeyUp,
+    NPCocoaEventFlagsChanged,
+    NPCocoaEventFocusChanged,
+    NPCocoaEventWindowFocusChanged,
+    NPCocoaEventScrollWheel,
+    NPCocoaEventTextInput
 } NPCocoaEventType;
 
 typedef struct _NPCocoaEvent {
-  NPCocoaEventType type;
-  uint32_t version;
-  union {
-    struct {
-      uint32_t modifierFlags;
-      double   pluginX;
-      double   pluginY;           
-      int32_t  buttonNumber;
-      int32_t  clickCount;
-      double   deltaX;
-      double   deltaY;
-      double   deltaZ;
-    } mouse;
-    struct {
-      uint32_t    modifierFlags;
-      NPNSString *characters;
-      NPNSString *charactersIgnoringModifiers;
-      NPBool      isARepeat;
-      uint16_t    keyCode;
-    } key;
-    struct {
-      CGContextRef context;
-      double x;
-      double y;
-      double width;
-      double height;
-    } draw;
-    struct {
-      NPBool hasFocus;
-    } focus;
-    struct {
-      NPNSString *text;
-    } text;
-  } data;
+    NPCocoaEventType type;
+    uint32_t version;
+    union {
+        struct {
+            uint32_t modifierFlags;
+            double   pluginX;
+            double   pluginY;           
+            int32_t  buttonNumber;
+            int32_t  clickCount;
+            double   deltaX;
+            double   deltaY;
+            double   deltaZ;
+        } mouse;
+        struct {
+            uint32_t    modifierFlags;
+            NPNSString *characters;
+            NPNSString *charactersIgnoringModifiers;
+            NPBool      isARepeat;
+            uint16_t    keyCode;
+        } key;
+        struct {
+            CGContextRef context;
+            double x;
+            double y;
+            double width;
+            double height;
+        } draw;
+        struct {
+            NPBool hasFocus;
+        } focus;
+        struct {
+            NPNSString *text;
+        } text;
+    } data;
 } NPCocoaEvent;
 
 #ifndef NP_NO_CARBON
 /* Non-standard event types that can be passed to HandleEvent */
 enum NPEventType {
-  NPEventType_GetFocusEvent = (osEvt + 16),
-  NPEventType_LoseFocusEvent,
-  NPEventType_AdjustCursorEvent,
-  NPEventType_MenuCommandEvent,
-  NPEventType_ClippingChangedEvent,
-  NPEventType_ScrollingBeginsEvent = 1000,
-  NPEventType_ScrollingEndsEvent
+    NPEventType_GetFocusEvent = (osEvt + 16),
+    NPEventType_LoseFocusEvent,
+    NPEventType_AdjustCursorEvent,
+    NPEventType_MenuCommandEvent,
+    NPEventType_ClippingChangedEvent,
+    NPEventType_ScrollingBeginsEvent = 1000,
+    NPEventType_ScrollingEndsEvent
 };
 #ifdef OBSOLETE
 #define getFocusEvent     (osEvt + 16)
@@ -795,10 +775,16 @@ NPError     NP_LOADDS NPN_GetAuthenticationInfo(NPP instance,
                                                 char **username, uint32_t *ulen,
                                                 char **password,
                                                 uint32_t *plen);
-uint32_t    NP_LOADDS NPN_ScheduleTimer(NPP instance, uint32_t interval, NPBool repeat, void (*timerFunc)(NPP npp, uint32_t timerID));
+uint32_t    NP_LOADDS NPN_ScheduleTimer(NPP instance, uint32_t interval,
+                                        NPBool repeat,
+                                  void (*timerFunc)(NPP npp, uint32_t timerID));
 void        NP_LOADDS NPN_UnscheduleTimer(NPP instance, uint32_t timerID);
 NPError     NP_LOADDS NPN_PopUpContextMenu(NPP instance, NPMenu* menu);
-NPBool      NP_LOADDS NPN_ConvertPoint(NPP instance, double sourceX, double sourceY, NPCoordinateSpace sourceSpace, double *destX, double *destY, NPCoordinateSpace destSpace);
+NPBool      NP_LOADDS NPN_ConvertPoint(NPP instance, double sourceX,
+                                       double sourceY,
+                                       NPCoordinateSpace sourceSpace,
+                                       double *destX, double *destY,
+                                       NPCoordinateSpace destSpace);
 
 #ifdef __cplusplus
 }  /* end extern "C" */
@@ -810,3 +796,8 @@ NPBool      NP_LOADDS NPN_ConvertPoint(NPP instance, double sourceX, double sour
 #endif
 
 #endif /* npapi_h_ */
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

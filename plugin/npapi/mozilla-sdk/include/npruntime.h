@@ -424,3 +424,8 @@ void NPN_SetException(NPObject *npobj, const NPUTF8 *message);
 #endif
 
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

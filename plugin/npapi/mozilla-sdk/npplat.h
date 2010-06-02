@@ -44,3 +44,8 @@
 #endif
 
 #endif // npplat_h_
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
