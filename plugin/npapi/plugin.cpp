@@ -62,16 +62,14 @@
   <br>\
   Compatible Shockwave Flash "FLASH_VERSION
 
-// Defining this flag disables the pipe to the standalone player, as well
-// as prevents the standalone Gnash player from being exec'd. Instead it
-// makes a network connection to localhost:1111 so the developer can use
-// Netcat (nc) to send and receive messages to test the interface.
-// #define NETTEST 1
-#undef NETTEST
-
 #include "plugin.h" 
 #include "GnashSystemIOHeaders.h"
 #include "StringPredicates.h"
+#include "external.h"
+#include "npapi.h"
+#include "npruntime.h"
+#include "npfunctions.h"
+#include "GnashNPVariant.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -101,6 +99,7 @@
 #include "pluginScriptObject.h"
 
 extern NPNetscapeFuncs NPNFuncs;
+extern NPPluginFuncs NPPFuncs;
 
 namespace gnash {
 NPBool plugInitialized = FALSE;
@@ -144,6 +143,8 @@ getPluginDescription()
 NPError
 NS_PluginInitialize()
 {
+    // gnash::log_debug(__PRETTY_FUNCTION__);
+
     if ( gnash::plugInitialized ) {
         gnash::log_debug("NS_PluginInitialize called, but ignored (we already initialized)");
         return NPERR_NO_ERROR;
@@ -249,6 +250,7 @@ NS_PluginInitialize()
 void
 NS_PluginShutdown()
 {
+    // gnash::log_debug(__PRETTY_FUNCTION__);
 #if 0
     if (!plugInitialized) {
         gnash::log_debug("Plugin already shut down");
@@ -267,6 +269,7 @@ NS_PluginShutdown()
 NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
+    // gnash::log_debug(__PRETTY_FUNCTION__);
     NPError err = NPERR_NO_ERROR;
 
     switch (aVariable) {
@@ -321,6 +324,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
+    // gnash::log_debug(__PRETTY_FUNCTION__);
     if(!aCreateDataStruct) {
         return NULL;
     }
@@ -378,36 +382,11 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 
         _params[name] = val;
     }
-
-    _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(_instance, GnashPluginScriptObject::marshalGetNPClass());
-
-#if defined(NETTEST)
-    // This is a network testing node switch. This is only used for testing the
-    // interface between the player and the plugin.
-    struct sockaddr_in  sock_in;
-    memset(&sock_in, 0, sizeof(struct sockaddr_in));
-    sock_in.sin_family = AF_INET;
-    sock_in.sin_port = ntohs(1111);
-    const struct hostent *hent = ::gethostbyname("localhost");
-    if (hent > 0) {
-        ::memcpy(&sock_in.sin_addr, hent->h_addr, hent->h_length);
+    
+    if (NPNFuncs.version >= 14) { // since NPAPI start to support
+        _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(
+            _instance, GnashPluginScriptObject::marshalGetNPClass());
     }
-    struct protoent     *proto;
-    proto = ::getprotobyname("TCP");
-    int sockfd = ::socket(PF_INET, SOCK_STREAM, proto->p_proto);
-    if (sockfd > 0) {
-        int ret = ::connect(sockfd, 
-                            reinterpret_cast<struct sockaddr *>(&sock_in),
-                            sizeof(sock_in));
-        if (ret == 0) {
-            gnash::log_debug("Connected to debug server on fd #%d", sockfd);
-            _controlfd = sockfd;
-            _scriptObject->setControlFD(_controlfd);
-        } else {
-            gnash::log_debug("Couldn't connect to debug server: %s", strerror(errno));
-        }
-    }
-#endif
     
     return;
 }
@@ -458,7 +437,6 @@ nsPluginInstance::~nsPluginInstance()
 	     usleep(1000);
 	     cleanup_childpid(pid);
         } else {
-
             gnash::log_debug("Child process exited with status %d", status);
         }
     }
@@ -509,14 +487,12 @@ nsPluginInstance::shut()
     }
 
     if (_controlfd != -1) {
+        _scriptObject->closePipe(_controlfd);
         if (close(_controlfd) != 0) {
             gnash::log_error("Gnash plugin failed to close the control socket!");
         }
     }
 
-// #ifdef ENABLE_SCRIPTABLE
-//     _scriptObject->closePipe();
-// #endif
 
 }
 /// \brief Set the window to be used to render in
@@ -667,8 +643,10 @@ nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
 bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
+    gnash::log_debug(__PRETTY_FUNCTION__);
+
     if ( cond & G_IO_HUP ) {
-        gnash::log_debug("Player request channel hang up");
+        gnash::log_debug("Player control socket hang up");
         // Returning false here will cause the "watch" to be removed. This watch
         // is the only reference held to the GIOChannel, so it will be
         // destroyed. We must make sure we don't attempt to destroy it again.
@@ -681,26 +659,36 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
     gnash::log_debug("Checking player requests on fd #%d",
               g_io_channel_unix_get_fd(iochan));
 
+    GError* error = 0;
+    //    g_io_channel_set_flags(iochan, G_IO_FLAG_NONBLOCK, &error);
+
+    size_t retries = 5;
     do {
-        GError* error = 0;
+        // When in non-blocking mode, we'll get several iterations of this
+        // loop while waiting for data. if data never arrives, we'd be stuck
+        // looping here forever, so this is our escape from that loop.
+        if (retries-- <= 0) {
+            gnash::log_error("Too many attempts to read from the player!");
+            return false;
+        }
+        error = 0;
         gchar* request = 0;
         gsize requestSize = 0;
         GIOStatus status = g_io_channel_read_line(iochan, &request,
                            &requestSize, NULL, &error);
         switch (status) {
           case G_IO_STATUS_ERROR:
-              gnash::log_error(std::string("Error reading request line: ")
-                               + error->message);
+              gnash::log_error("error reading request line: %s",
+                               error->message);
               g_error_free(error);
               return false;
           case G_IO_STATUS_EOF:
-              gnash::log_error(std::string("EOF (error: ") + error->message);
+              gnash::log_error("EOF (error: %s", error->message);
               g_error_free(error);
               return false;
           case G_IO_STATUS_AGAIN:
-              gnash::log_error(std::string("Read again(error: ")
-                               + error->message);
-              break;
+              gnash::log_debug("read again: nonblocking mode set ");
+              continue;
           case G_IO_STATUS_NORMAL:
               // process request
               // Get rid of the newline on the end if there is one. The string
@@ -730,94 +718,84 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 bool
 nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 {
+    gnash::log_debug(__PRETTY_FUNCTION__);
+
     if ( linelen < 4 ) {
-        gnash::log_error(std::string("Invalid player request (too short): ") +  buf);
+        if (buf) {
+            gnash::log_error("Invalid player request (too short): %s", buf);
+        } else {
+            gnash::log_error("Invalid player request (too short): %d bytes", linelen);
+        }
         return false;
     }
+    
+    ExternalInterface::invoke_t *invoke = ExternalInterface::parseInvoke(buf);
 
-    if ( ! std::strncmp(buf, "GET ", 4) ) {
-        char* target = buf + 4;
-        if ( ! *target ) {
-            gnash::log_error("No target found after GET request");
-            return false;
-        }
-        char* url = target;
-        while (*url && *url != ':') ++url;
-        if ( *url ) {
-            *url='\0';
-            ++url;
-        } else {
-            gnash::log_error("No colon found after GETURL target string");
-            return false;
-        }
+    if (invoke) {
+        if (invoke->name == "getURL") {
+            // gnash::log_debug("Got a getURL() request: %", invoke->args[0].get());
 
-        gnash::log_debug("Asked to get URL '%s' in target %s", url, target);
-        NPN_GetURL(_instance, url, target);
-        return true;
-
-    } else if ( ! std::strncmp(buf, "INVOKE ", 7) ) {
-        char* command = buf + 7;
-        if ( ! *command ) {
-            gnash::log_error("No command found after INVOKE request");
-            return false;
-        }
-        char* arg = command;
-        while (*arg && *arg != ':') ++arg;
-        if ( *arg ) {
-            *arg='\0';
-            ++arg;
-        } else {
-            gnash::log_error("No colon found after INVOKE command string");
-            return false;
-        }
-
-        std::string name = _name; 
-
-        std::stringstream jsurl;
-        jsurl << "javascript:" << name << "_DoFSCommand('" << command << "','" << arg <<"')";
-
-        // TODO: check if _self is a good target for this
-        static const char* tgt = "_self";
-
-        gnash::log_debug("Calling NPN_GetURL(" + jsurl.str() + ", '" + std::string(tgt) + "');");
-
-        NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
-        return true;
-    }  else if ( ! strncmp(buf, "POST ", 5)) {
-        char* target = buf + 5;
-        if (! *target) return false;
+            std::string url = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
+            std::string target;
+            if (invoke->args.size() == 2) {
+                target = NPStringToString(NPVARIANT_TO_STRING(invoke->args[1].get()));
+            }
+            
+            gnash::log_debug("Asked to getURL '%s' in target %s", url, target);
+            NPN_GetURL(_instance, url.c_str(), target.c_str());
+            return true;
+        } else if (invoke->name == "fsCommand") {
+            std::string command = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
+            std::string arg = NPStringToString(NPVARIANT_TO_STRING(invoke->args[1].get()));            
+            std::string name = _name; 
+            std::stringstream jsurl;
+            jsurl << "javascript:" << name << "_DoFSCommand('" << command << "','" << arg <<"')";
+            
+            // TODO: check if _self is a good target for this
+            static const char* tgt = "_self";
+            
+            gnash::log_debug("Calling NPN_GetURL(%s, %s)",
+                             jsurl.str(), tgt);
+            
+            NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
+            return true;
+#if 0
+        }  else if ( ! strncmp(buf, "POST ", 5)) {
+            char* target = buf + 5;
+            if (! *target) return false;
+            
+            char* postdata = target;
+            while (*postdata && *postdata != ':') ++postdata;
+            if ( *postdata ) {
+                *postdata='\0';
+                ++postdata;
+            } else {
+                gnash::log_error("No colon found after getURL postdata string");
+                return false;
+            }
         
-        char* postdata = target;
-        while (*postdata && *postdata != ':') ++postdata;
-        if ( *postdata ) {
-            *postdata='\0';
-            ++postdata;
+            char* url = postdata;
+            while (*url && *url != '$') ++url;
+            if (*url) {
+                *url='\0';
+                ++url;
+            } else {
+                gnash::log_error("No $ character found after getURL target string");
+                return false;
+            }
+            
+            NPN_PostURL(_instance, url, target, std::strlen(postdata),
+                        postdata, false);
+            
+            return true;
+#endif
         }
-        else
-        {
-            gnash::log_error("No colon found after getURL postdata string");
-            return false;
-        }
-        
-        char* url = postdata;
-        while (*url && *url != '$') ++url;
-        if (*url) {
-            *url='\0';
-            ++url;
-        } else {
-            gnash::log_error("No $ character found after getURL target string");
-            return false;
-        }
-        
-
-        NPN_PostURL(_instance, url, target, std::strlen(postdata),
-                postdata, false);
-
-        return true;
     } else {
         gnash::log_error("Unknown player request: " + std::string(buf));
         return false;
     }
+
+    return false;
 }
 
 std::string
@@ -1065,6 +1043,7 @@ nsPluginInstance::startProc()
     }
 
     _scriptObject->setControlFD(p2c_controlpipe[1]);
+    _scriptObject->setHostFD(c2p_pipe[0]);
     
     // Setup the command line for starting Gnash
 

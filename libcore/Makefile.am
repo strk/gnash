@@ -85,6 +85,7 @@ libgnashcore_la_SOURCES = \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
 	InteractiveObject.cpp \
+	ExternalInterface.cpp \
 	SWFMatrix.cpp \
 	SWFMovie.cpp \
 	movie_root.cpp \
@@ -176,6 +177,7 @@ noinst_HEADERS = \
 	SWFMovie.h \
 	SWFStream.h \
 	MovieLibrary.h \
+	ExternalInterface.h \
 	swf/tag_loaders.h \
 	swf/DefaultTagLoaders.h \
 	swf/VideoFrameTag.h \

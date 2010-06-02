@@ -41,80 +41,10 @@ class ExternalInterface_as
 public:
     ExternalInterface_as(as_object* owner);
     ~ExternalInterface_as();
-
-    // This is a flag that specifies whether exceptions in ActionScript
-    // should be propogated to JavaScript in the browser.
-    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
-    bool getMarshallExceptions() { return _marshallExceptions; };
-    
-    /// Add an ActionScript function as a callback by JavaScript
-    // in the browser.
-    bool addCallback(const std::string &name, as_object *method);
-
-    ///
-    bool addRootCallback(movie_root &mr);    
-
-    // These appear to be undocumented helper functions of this class
-    // that while propably designed to be used internally, get used
-    // by ActionScript coders.
-
-    /// Convert an AS object to an XML string.
-    static std::string toXML(const as_value &obj);
-    
-    /// Convert an XML string to an AS value.
-    static as_value toAS(Global_as& as, const std::string &xml);
-
-    /// Convert an XML string of properties to a data structure.
-    static std::map<std::string, as_value> propertiesToAS(Global_as& gl,
-                                                   std::string &xml);
-    
-    static as_value argumentsToXML(std::vector<as_value> &args);
-//    as_value argumentsToAS();
-    
-    static std::string objectToXML(as_object *obj);
-    static as_value objectToAS(Global_as& gl, const std::string &xml);
-//  std::string objectToJS(as_object &obj);
-//  as_value toJS(const std::string &xml);;
-    
-    static std::string arrayToXML(as_object *obj);
-
-//  std::string arrayToJS();
-//  as_value arrayToAS();
-
-//  std::string jsQuoteString();
-//  void initJS();
-//  bool evalJS();
-    
-//  callOut"));
-//  callIn"));
-
-    static std::string escapeXML(as_object &obj);
-    static std::string unescapeXML(as_object &obj);
-
-    /// Call a callback if it's registered already.
-    bool call(as_object* callback, const std::string& name,
-              const std::vector<as_value>& args, size_t firstArg);
-    
-    // These are our implementations of ActiveRelay methods.
-    // virtual bool advance() = 0;
-    // virtual void setReachable() const = 0;
-    
-    virtual void update();
-
-    // Parse the XML Invoke message.
-    void processInvoke(const std::string &str);
-
-    void setFD(int x) { _fd = x; };
-
-    as_object *getCallback(const std::string &name);
-
-    as_value parseXML(const std::string &xml);
-    std::vector<as_value> parseArguments(const std::string &xml);
     
 private:
     int                 _fd;
     std::map<std::string, as_object *> _methods;
-    bool		_marshallExceptions;
 };
 
 /// Initialize the global ExternalInterface class

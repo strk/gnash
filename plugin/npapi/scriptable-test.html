@@ -53,6 +53,7 @@
       <li><button onclick='FlashStopPlay()'>StopPlay</button></li>
       <li><button onclick='FlashZoom(12)'>Zoom</button></li>
       <li><button onclick='FlashTotalFrames()'>TotalFrames</button></li>
+      <li><button onclick='FlashTestEIMethod()'>TestEIMethod</button></li>
     </ul>
 
 </div>
@@ -226,6 +227,13 @@
                   addLog(value);
         }
 
+        function FlashTestEIMethod()
+        {
+                  var value = embed.TestEIMethod();
+        //          addLog("TestEIMethod() = " + value);          
+                  addLog(value);
+        }
+
         function ShowFoobar(msg)
         {
             addLog(embed.SetVariable("foo", "bar"));
@@ -240,6 +248,40 @@
         }
 </script>
 
+<!-- 
+   This next test is a bit hokey, we should really trim down
+   the ExternalInterface test sae to e one that's focused on this
+   web page. ut for now, this gives us a resident player that we
+   can bounce XML messages off of.
+
+   To make this work for you, copy testsuite/Dejagnu.swf and
+   testsuite/actionsctiona.all/EsternalInterfce-v8.swf from your build
+   tree to your source tree in plugin/npapi/. You can then attach GDB
+   to the PID of gnash running, letting you debug the processing of
+   XML messages to and from the browser.
+-->
+<object>
+<param name="movie" value="ExternalInterface-v8.swf"
+<embed
+src="ExternalInterface-v8.swf"
+quality="high" wmode="transparent" width="320" height="240"
+   type="application/x-shockwave-flash"
+   pluginspage="http://www.getgnash.org">
+</embed>
+
+<!--
+   This causes this page to do an immediate redirect, but at least then
+   we know this is working.
+<br>
+<object>
+<param name="movie" value="geturl.swf"
+<embed
+src="geturl.swf"
+quality="high" wmode="transparent" width="320" height="240"
+   type="application/x-shockwave-flash"
+   pluginspage="http://www.getgnash.org">
+</embed>
+-->
 
 </body>
 </html>

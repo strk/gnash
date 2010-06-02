@@ -80,6 +80,7 @@
 #include "MovieClip.h"
 #include "SimpleBuffer.h" // for LoadCallback
 #include "MovieLoader.h"
+#include "ExternalInterface.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -585,8 +586,10 @@ public:
     /// Sets the flag to allow interfacing with JavaScript in the browser.
     /// This is disabled by default, but enabled for ExternalInterface.
     void setAllowScriptAccess(AllowScriptAccessMode mode);
+    
     /// Gets the current Access Mode for ExternalInterface.
     AllowScriptAccessMode getAllowScriptAccess();
+
 
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
@@ -602,6 +605,11 @@ public:
     /// current gui
     void setShowMenuState( bool state );
 
+    // This is a flag that specifies whether exceptions in ActionScript
+    // should be propogated to JavaScript in the browser.
+    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
+    bool getMarshallExceptions() { return _marshallExceptions; };
+    
     /// Sets the Stage object's align mode.
     void setStageScaleMode(ScaleMode sm);
     
@@ -785,10 +793,12 @@ public:
     {
         return _hostfd;
     }
+
     int getControlFD() const
     {
         return _controlfd;
     }
+
 
     /// Abstract base class for FS handlers
     class AbstractFsCallback {
@@ -814,7 +824,7 @@ public:
     /// Call this to notify FS commands
     DSOEXPORT void handleFsCommand(const std::string& cmd,
             const std::string& arg) const;
-
+    
     /// Abstract base class for hosting app handler
     class AbstractIfaceCallback
     {
@@ -909,6 +919,16 @@ public:
 	const std::string& getOriginalURL() const { return _originalURL; }
 
     const RunResources& runResources() const { return _runResources; }
+
+    void addExternalCallback(const std::string &name, as_object *obj)
+    {
+        _externalCallbacks[name] = obj;
+    }    
+
+    bool processInvoke(ExternalInterface::invoke_t *);
+
+    std::string callExternalCallback(const std::string &name, 
+                                     const std::vector<as_value>& args);
 
 private:
 
@@ -1044,7 +1064,7 @@ private:
     /// An invalidated stage will trigger complete redraw
     //
     /// So, this method should return true everytime a complete
-    /// redraw is needed. This is tipically only needed when
+    /// redraw is needed. This is typically only needed when
     /// the background changes.
     ///
     /// See setInvalidated() and clearInvalidated().
@@ -1112,9 +1132,11 @@ private:
     ObjectCallbacks _objectCallbacks;
 
     LoadCallbacks _loadCallbacks;
+    
+    typedef std::map<std::string, as_object *> ExternalCallbacks;
+    ExternalCallbacks _externalCallbacks;
 
     typedef std::map<int, Timer*> TimerMap;
-
     TimerMap _intervalTimers;
     unsigned int _lastTimerId;
 
@@ -1171,6 +1193,7 @@ private:
     Quality		_quality;
     std::bitset<4u>	_alignMode;
     AllowScriptAccessMode _allowScriptAccess;
+    bool		_marshallExceptions;
     bool		_showMenu;
     ScaleMode		_scaleMode;
     DisplayState	_displayState;

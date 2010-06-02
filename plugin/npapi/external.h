@@ -35,40 +35,36 @@
 
 namespace gnash {
 
-class ExternalInterface
+struct ExternalInterface
 {
-public:
     typedef struct {
         std::string name;
         std::string type;
         std::vector<GnashNPVariant> args;
     } invoke_t;
     
-    ExternalInterface ();
-    ~ExternalInterface ();
-    
     // Create an Invoke message for the standalone Gnash
-    std::string makeInvoke (const std::string &method, std::vector<std::string> args);
+    static std::string makeInvoke (const std::string &method, std::vector<std::string> args);
     
-    std::string makeNull ();
-    std::string makeTrue ();
-    std::string makeFalse ();
-    std::string makeString (const std::string &str);
-    std::string makeProperty (const std::string &str, const std::string &data);
-    std::string makeProperty (const std::string &str, double num);
-    std::string makeProperty (const std::string &str, int num);
-    std::string makeNumber (double num);
-    std::string makeNumber (int num);
-    std::string makeNumber (unsigned int num);
-    std::string makeArray (std::vector<std::string> &args);
-    std::string makeObject (std::map<std::string, std::string> &args);
+    static std::string makeNull ();
+    static std::string makeTrue ();
+    static std::string makeFalse ();
+    static std::string makeString (const std::string &str);
+    static std::string makeProperty (const std::string &str, const std::string &data);
+    static std::string makeProperty (const std::string &str, double num);
+    static std::string makeProperty (const std::string &str, int num);
+    static std::string makeNumber (double num);
+    static std::string makeNumber (int num);
+    static std::string makeNumber (unsigned int num);
+    static std::string makeArray (std::vector<std::string> &args);
+    static std::string makeObject (std::map<std::string, std::string> &args);
     
-    GnashNPVariant parseXML(const std::string &xml);
-    invoke_t *parseInvoke(const std::string &xml);
+    static GnashNPVariant parseXML(const std::string &xml);
+    static invoke_t *parseInvoke(const std::string &xml);
     
-    std::map<std::string, GnashNPVariant> parseProperties(const std::string &xml);
-    std::vector<GnashNPVariant> parseArguments(const std::string &xml);
-    std::string convertNPVariant (const NPVariant *npv);
+    static std::map<std::string, GnashNPVariant> parseProperties(const std::string &xml);
+    static std::vector<GnashNPVariant> parseArguments(const std::string &xml);
+    static std::string convertNPVariant (const NPVariant *npv);
 };
 
 }

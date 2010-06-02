@@ -694,7 +694,7 @@ if (Std.string(untyped __typeof__(p)) == 'object') {
 if (Std.string(untyped __typeof__(p.download)) == 'function') {
 	DejaGnu.xpass("Type of p.download is 'function'.");
 } else {
-	DejaGnu.xfail("Type of p.donwload should be 'functoin', is "+untyped __typeof__(p.download));
+	DejaGnu.xfail("Type of p.donwload should be 'function', is "+untyped __typeof__(p.download));
 }
 if (Std.string(untyped __typeof__(p.launch)) == 'function') {
 	DejaGnu.xpass("Type of p.launch is 'function'.");
@@ -747,6 +747,6 @@ if (Std.string(untyped __typeof__(p.launch)) == 'function') {
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
 
