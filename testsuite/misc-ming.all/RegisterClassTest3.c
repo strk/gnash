@@ -56,7 +56,7 @@ main(int argc, char** argv)
     ac = newSWFAction(
     "   _global.ctor = function () {"
     "       super();"
-    "       trace('Object in Frame 2 is constructed');"
+    "       trace('Object ID 3 is constructed');"
     "       c += 1;"
     "   };"
     );
