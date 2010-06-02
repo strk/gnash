@@ -24,8 +24,6 @@
 #include "SWF.h" // for TagType definition
 #include "log.h"
 #include "SWFStream.h"
-#include "movie_root.h"
-#include "as_object.h"
 
 namespace gnash {
 namespace SWF {
@@ -53,10 +51,7 @@ void
 RemoveObjectTag::executeState(MovieClip* m, DisplayList& dlist) const
 {
     m->set_invalidated();
-	DisplayObject* d = dlist.removeDisplayObject(_depth);
-    if (!d) return;
-
-    getRoot(*getObject(m)).removeFromActionQueue(d);
+    dlist.removeDisplayObject(_depth);
 }
 
 /* public static */

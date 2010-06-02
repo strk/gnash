@@ -1271,18 +1271,14 @@ MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
 {
     set_invalidated();
-    DisplayObject* removed = dlist.removeDisplayObject(tag->getDepth());
-    if (!removed) return;
-    stage().removeFromActionQueue(removed);
+    dlist.removeDisplayObject(tag->getDepth());
 }
     
 void
 MovieClip::remove_display_object(int depth, int)
 {
     set_invalidated();
-    DisplayObject* removed = _displayList.removeDisplayObject(depth);
-    if (!removed) return;
-    stage().removeFromActionQueue(removed);
+    _displayList.removeDisplayObject(depth);
 }
 
 void

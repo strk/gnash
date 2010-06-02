@@ -372,7 +372,7 @@ DisplayList::moveDisplayObject( int depth, const cxform* color_xform,
     
     
 // Removes the object at the specified depth.
-DisplayObject*
+void
 DisplayList::removeDisplayObject(int depth)
 {
     //GNASH_REPORT_FUNCTION;
@@ -389,13 +389,10 @@ DisplayList::removeDisplayObject(int depth)
     container_type::iterator it = 
         std::find_if( _charsByDepth.begin(), _charsByDepth.end(),
             DepthEquals(depth));
-    
-    DisplayObject* oldCh = 0;
 
     if (it != _charsByDepth.end()) {
-
         // Make a copy (before erasing)
-        oldCh = *it;
+        DisplayObject* oldCh = *it;
 
         // Erase (before calling unload)
         _charsByDepth.erase(it);
@@ -414,8 +411,6 @@ DisplayList::removeDisplayObject(int depth)
     assert(size >= _charsByDepth.size());
 
     testInvariant();
-
-    return oldCh;
 
 }
 

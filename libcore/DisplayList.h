@@ -166,7 +166,7 @@ public:
 	/// Removes the object at the specified depth.
 	//
 	/// Calls unload on the removed DisplayObject.
-	DisplayObject* removeDisplayObject(int depth);
+	void removeDisplayObject(int depth);
 
 	/// Remove all unloaded DisplayObject from the list
 	//
