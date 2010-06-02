@@ -97,16 +97,11 @@ attachSystemSecurityInterface(as_object& o)
     VM& vm = getVM(o);
     o.init_member("allowDomain", vm.getNative(12, 0));
 
-    const int swf7Flags = PropFlags::dontDelete | PropFlags::dontEnum
-        | PropFlags::readOnly | PropFlags::onlySWF7Up;
-
     Global_as& gl = getGlobal(o);
     o.init_member("allowInsecureDomain",
-                  gl.createFunction(system_security_allowinsecuredomain),
-                  swf7Flags);
+                  gl.createFunction(system_security_allowinsecuredomain));
     o.init_member("loadPolicyFile",
-                  gl.createFunction(system_security_loadpolicyfile),
-                  swf7Flags);
+                  gl.createFunction(system_security_loadpolicyfile));
 }
 
 void

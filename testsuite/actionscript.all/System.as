@@ -72,13 +72,13 @@ check_equals ( typeof(System.setClipboard), 'function');
 // test the System.showSettings method
 check_equals ( typeof(System.showSettings), 'function');
 
-#if OUTPUT_VERSION >= 7
-
 // test the System::security.allowDomain method
 check_equals ( typeof(System.security.allowDomain), 'function' );
 
 // test the System.security.loadPolicyFile method
 check_equals ( typeof(System.security.loadPolicyFile), 'function');
+
+#if OUTPUT_VERSION >= 7
 
 // test the System.security.allowInsecureDomain method
 // added in player 7
@@ -200,8 +200,8 @@ check_equals(ret, true);
  check_totals(93);
 #else
 # if OUTPUT_VERSION == 6
-   check_totals(90);
+   check_totals(92);
 # else
-   check_totals(57);
+   check_totals(59);
 # endif
 #endif

@@ -186,7 +186,7 @@ NS_PluginInitialize()
     */
     char* opts = std::getenv("GNASH_OPTIONS");
     if (opts != NULL) {
-        gnash::log_debug(std::string("GNASH_OPTIONS : ") + std::string(opts));
+        gnash::log_debug("GNASH_OPTIONS : ", opts);
         
         // Should the plugin wait for gdb to be attached?
         if ( strstr(opts, "waitforgdb") ) {
