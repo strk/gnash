@@ -568,17 +568,11 @@ textformat_getTextExtent(const fn_call& fn)
     const int version = getSWFVersion(fn);
     const std::string& s = fn.arg(0).to_string(version);
 
-    // Everything must be in twips here.
 
-    double tfw;
-    bool limitWidth = false;
-    if (fn.nargs > 1) {
-        limitWidth = true;
-        tfw = pixelsToTwips(fn.arg(1).to_number());       
-    }
-    else {
-        tfw = 0;
-    }
+    const bool limitWidth = (fn.nargs > 1);
+    
+    // Everything must be in twips here.
+    const double tfw = limitWidth ? pixelsToTwips(fn.arg(1).to_number()) : 0;
 
     const bool bold = relay->bold() ? *relay->bold() : false;
     const bool italic = relay->italic() ? *relay->italic() : false;
@@ -592,25 +586,28 @@ textformat_getTextExtent(const fn_call& fn)
         fontlib::get_font(*relay->font(), bold, italic) :
         fontlib::get_default_font().get();
     
+    // Whether to use embedded fonts if required.
+    const bool em = false;
+
     /// Advance, descent, ascent given according to square of 1024.
     //
     /// An ascent of 1024 is equal to the whole size of the character, so
     /// 240 twips for a size 12.
-    const double scale = size / static_cast<double>(f->unitsPerEM(false));
+    const double scale = size / static_cast<double>(f->unitsPerEM(em));
 
     double height = size;
     double width = 0;
     double curr = 0;
     
-    const double ascent = f->ascent(false) * scale;
-    const double descent = f->descent(false) * scale;
+    const double ascent = f->ascent(em) * scale;
+    const double descent = f->descent(em) * scale;
 
     for (std::string::const_iterator it = s.begin(), e = s.end();
             it != e; ++it) {
 
-        int index = f->get_glyph_index(*it, false);
-        const double advance = f->get_advance(index, false) * scale;
-        if (limitWidth && (curr + advance > width)) {
+        const int index = f->get_glyph_index(*it, em);
+        const double advance = f->get_advance(index, em) * scale;
+        if (limitWidth && (curr + advance > tfw)) {
             curr = 0;
             height += size;
         }
