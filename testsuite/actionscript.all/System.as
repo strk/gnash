@@ -122,8 +122,8 @@ check_equals(typeof(System.capabilities.hasAccessibility), 'boolean');
 check_equals(typeof(System.capabilities.avHardwareDisable), 'boolean');
 check_equals(typeof(System.capabilities.windowlessDisable), 'boolean');
 
-// Not present on Linux player version 9,0,115,0, but is (?) on windows.
-check_equals(typeof(System.capabilities.hasIME), 'boolean');
+// Not present on any known Linux player versions.
+check_equals(typeof(System.capabilities.hasIME), 'undefined');
 note("    System.capabilities.hasIME certainly fails on the pp on\n\
     some platforms. There's no verification that it exists at all so far.");
 
