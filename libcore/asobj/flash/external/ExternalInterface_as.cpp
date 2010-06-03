@@ -48,8 +48,6 @@
 #include "movie_root.h"
 #include "log.h"
 
-using namespace std;
-
 namespace gnash {
 
 namespace {

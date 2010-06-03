@@ -49,8 +49,6 @@
 #include "movie_root.h"
 #include "log.h"
 
-using namespace std;
-
 namespace gnash {
 
 /// Class used to serialize properties of an object to a buffer
@@ -133,7 +131,6 @@ ExternalInterface::objectToXML(as_object *obj)
     obj->visitProperties<IsEnumerable>(props);
     if (!props.success()) {
         log_error("Could not serialize object");
-        return false;
     } else {
         std::vector<as_value> properties = props.getArgs();
     }
@@ -160,7 +157,6 @@ ExternalInterface::arrayToXML(as_object *obj)
     obj->visitProperties<IsEnumerable>(props);
     if (!props.success()) {
         log_error("Could not serialize object");
-        return false;
     }
     ss << props.getXML();
     
@@ -393,9 +389,9 @@ ExternalInterface::parseInvoke(const std::string &xml)
     }
     
     invoke.reset(new ExternalInterface::invoke_t);
-    string::size_type start = 0;
-    string::size_type end;
-    string tag;
+    std::string::size_type start = 0;
+    std::string::size_type end;
+    std::string tag;
 
     // Look for the ending > in the first part of the data for the tag
     end = xml.find(">");
@@ -535,31 +531,19 @@ ExternalInterface::makeInvoke (const std::string &method,
 std::string
 ExternalInterface::makeNull ()
 {
-    std::stringstream ss;
-    
-    ss << "<null/>";
-    
-    return ss.str();
+    return "<null/>";
 }
 
 std::string
 ExternalInterface::makeTrue ()
 {
-    std::stringstream ss;
-
-    ss << "<true/>";
-    
-    return ss.str();
+    return "<true/>";
 }
 
 std::string
 ExternalInterface::makeFalse ()
 {
-    std::stringstream ss;
-    
-    ss << "<false/>";
-
-    return ss.str();
+    return "<false/>";
 }
 
 std::string
