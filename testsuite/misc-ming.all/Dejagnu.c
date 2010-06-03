@@ -77,6 +77,8 @@ main(int argc, char** argv)
 
 	SWFMovie_add(mo, (SWFBlock)dejaclip);
 	SWFMovie_addExport(mo, (SWFBlock)dejaclip, "dejagnu");
+	SWFMovie_addExport(mo, (SWFBlock)SWFMovie_addFont(mo, bfont),
+		"dejafont");
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
