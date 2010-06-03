@@ -239,13 +239,10 @@ Video::getVideoFrame()
 }
 
 void
-Video::stagePlacementCallback(as_object* initObj)
+Video::construct(as_object* /*init*/)
 {
-
-    // A Video cannot be created with an initObj
-    assert(!initObj);
-
-    saveOriginalTarget(); // for softref
+    // For soft references.
+    saveOriginalTarget();
 
     // Register this video instance as a live DisplayObject
     stage().addLiveChar(this);

@@ -208,8 +208,7 @@ DisplayList::getDisplayObjectByName_i(const std::string& name)
 }
 
 void
-DisplayList::placeDisplayObject(DisplayObject* ch, int depth,
-        as_object* initObj)
+DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
 {
     assert(!ch->unloaded());
     ch->set_invalidated();
@@ -243,9 +242,6 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth,
         // extend invalidated bounds
         ch->extend_invalidated_bounds(old_ranges);                
     }
-
-    // Give life to this instance
-    ch->stagePlacementCallback(initObj);
 
     testInvariant();
 }
@@ -326,9 +322,6 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
         ch->extend_invalidated_bounds(old_ranges);                
 
     }
-
-    // Give life to this instance
-    ch->stagePlacementCallback();
 
     testInvariant();
 }
@@ -545,9 +538,6 @@ DisplayList::insertDisplayObject(DisplayObject* obj, int index)
         ++index, ++it;
     }
 
-    // Give life to this instance
-    obj->stagePlacementCallback();
-
     testInvariant();
 
 }
@@ -575,9 +565,6 @@ DisplayList::addDisplayObject(DisplayObject* obj)
 
     // Insert the DisplayObject at the end
     _charsByDepth.insert(_charsByDepth.end(), obj);
-
-    // Give life to this instance
-    obj->stagePlacementCallback();
 
     testInvariant();
 
@@ -684,7 +671,7 @@ DisplayList::display(Renderer& renderer)
         // Don't display dynamic masks
         if (ch->isDynamicMask()) continue;
 
-        assert(! ch->unloaded() ); // we don't advance unloaded chars
+        assert(!ch->unloaded()); // we don't advance unloaded chars
 
         // Check if this charater or any of its parents is a mask.
         // Characters acting as masks should always be rendered to the

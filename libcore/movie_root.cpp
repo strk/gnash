@@ -347,7 +347,7 @@ movie_root::setLevel(unsigned int num, Movie* movie)
     movie->set_invalidated();
     
     /// Notify placement 
-    movie->stagePlacementCallback();
+    movie->construct();
 
     assert(testInvariant());
 }

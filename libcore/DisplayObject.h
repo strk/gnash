@@ -789,7 +789,8 @@ public:
     /// If you override the method remember to call saveOriginalTarget()
     /// as the first thing.
     ///
-    virtual void stagePlacementCallback(as_object* = 0)
+    /// This handles all ActionScript construction and initialization events.
+    virtual void construct(as_object* /*init*/ = 0)
     {
         saveOriginalTarget();
     }

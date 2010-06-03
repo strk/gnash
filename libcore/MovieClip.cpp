@@ -552,7 +552,8 @@ MovieClip::addDisplayListObject(DisplayObject* obj, int depth)
     // TODO: only call set_invalidated if this DisplayObject actually overrides
     //             an existing one !
     set_invalidated(); 
-    _displayList.placeDisplayObject(obj, depth);     
+    _displayList.placeDisplayObject(obj, depth);
+    obj->construct();
     return obj;
 }
 
@@ -594,8 +595,8 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
-    parent->_displayList.placeDisplayObject(newmovieclip, depth, 
-            initObject);
+    parent->_displayList.placeDisplayObject(newmovieclip, depth);
+    newmovieclip->construct(initObject);
     
     return newmovieclip; 
 }
@@ -1131,10 +1132,10 @@ void MovieClip::omit_display()
 }
 
 bool
-MovieClip::attachCharacter(DisplayObject& newch, int depth,
-        as_object* initObject)
+MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObj)
 { 
-    _displayList.placeDisplayObject(&newch, depth, initObject);    
+    _displayList.placeDisplayObject(&newch, depth);
+    newch.construct(initObj);
 
     // FIXME: check return from placeDisplayObject above ?
     return true; 
@@ -1202,6 +1203,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     ch->set_clip_depth(tag->getClipDepth());
     
     dlist.placeDisplayObject(ch, tag->getDepth());
+    ch->construct();
     return ch;
 }
 
@@ -1276,6 +1278,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     // use SWFMatrix from the old DisplayObject if tag doesn't provide one.
     dlist.replaceDisplayObject(ch, tag->getDepth(), 
         !tag->hasCxform(), !tag->hasMatrix());
+    ch->construct();
 }
 
 void
@@ -1284,15 +1287,6 @@ MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag,
 {
     set_invalidated();
     dlist.removeDisplayObject(tag->getDepth());
-}
-
-void
-MovieClip::replace_display_object(DisplayObject* ch, int depth, 
-        bool use_old_cxform, bool use_old_matrix)
-{
-    assert(ch);
-    _displayList.replaceDisplayObject(ch, depth,
-            use_old_cxform, use_old_matrix);
 }
 
 void
@@ -1730,14 +1724,53 @@ MovieClip::registerAsListener()
     stage().add_mouse_listener(this);
 }
 
-
-// WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", that is,
-//          its target path needs to exist, or any as_value for it will be
-//          a dangling reference to an unexistent movieclip !
-//          NOTE: this is just due to the wrong steps, see comment in header
 void
-MovieClip::stagePlacementCallback(as_object* initObj)
+MovieClip::constructAsScriptObject()
 {
+    as_object* mc = getObject(this);
+    
+    // A MovieClip should always have an associated object.
+    assert(mc);
+
+    if (!isAS3(getVM(*mc)) && !get_parent()) {
+        mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
+    }
+
+    const sprite_definition* def = 
+        dynamic_cast<const sprite_definition*>(_def.get());
+
+    // We won't "construct" top-level movies
+    as_function* ctor = def ? def->getRegisteredClass() : 0;
+
+#ifdef GNASH_DEBUG
+    log_debug(_("Attached movieclips %s registered class is %p"),
+            getTarget(), (void*)ctor); 
+#endif
+
+    // Set this MovieClip object to be an instance of the class.
+    if (ctor) {
+        Property* proto = ctor->getOwnProperty(NSV::PROP_PROTOTYPE);
+        if (proto) mc->set_prototype(proto->getValue(*ctor));
+    }
+
+    // Send the construct event. This must be done after the __proto__ 
+    // member is set. It is always done.
+    notifyEvent(event_id::CONSTRUCT);
+        
+    if (ctor) {
+        const int swfversion = getSWFVersion(*mc);
+        if (swfversion > 5) {
+            fn_call::Args args;
+            ctor->construct(*mc, get_environment(), args);
+        }
+    }
+
+}
+
+void
+MovieClip::construct(as_object* initObj)
+{
+    
     assert(!unloaded());
 
     saveOriginalTarget();
@@ -1748,7 +1781,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 
     // Register this movieclip as a live one
     stage().addLiveChar(this);
-  
 
     // Register this movieclip as a core broadcasters listener
     registerAsListener();
@@ -1795,6 +1827,11 @@ MovieClip::stagePlacementCallback(as_object* initObj)
                 SWF::ControlTag::TAG_ACTION);
     }
 
+    as_object* mc = getObject(this);
+    
+    // A MovieClip should always have an associated object.
+    assert(mc);
+
     // We execute events immediately when the stage-placed DisplayObject 
     // is dynamic, This is becase we assume that this means that 
     // the DisplayObject is placed during processing of actions (opposed 
@@ -1805,14 +1842,12 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     // Another possibility to inspect could be letting movie_root decide
     // when to really queue and when rather to execute immediately the 
     // events with priority INITIALIZE or CONSTRUCT ...
-    if (!isDynamic())
-    {
-        assert(!initObj);
+    if (!isDynamic()) {
+
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
                 getTarget());
 #endif
-        queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
 
         std::auto_ptr<ExecutableCode> code(new ConstructEvent(this));
         stage().pushAction(code, movie_root::PRIORITY_CONSTRUCT);
@@ -1824,61 +1859,18 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         // after the display list has been populated, so that _height and
         // _width (which depend on bounds) are correct.
         if (initObj) {
-            getObject(this)->copyProperties(*initObj);
+            mc->copyProperties(*initObj);
         }
 
-        constructAsScriptObject(); 
+        constructAsScriptObject();
 
-        // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
-        // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
-        // immediately.
-        queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
     }
 
+    // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
+    // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
+    // immediately.
+    queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
 
-}
-
-
-void
-MovieClip::constructAsScriptObject()
-{
-    as_object* mc = getObject(this);
-
-    // A MovieClip should always have an associated object.
-    assert(mc);
-
-    if (!isAS3(getVM(*mc)) && !get_parent()) {
-        mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
-    }
-
-    const sprite_definition* def = 
-        dynamic_cast<const sprite_definition*>(_def.get());
-
-    // We won't "construct" top-level movies
-    as_function* ctor = def ? def->getRegisteredClass() : 0;
-
-#ifdef GNASH_DEBUG
-    log_debug(_("Attached movieclips %s registered class is %p"),
-            getTarget(), (void*)ctor); 
-#endif
-
-    // Set this MovieClip object to be an instance of the class.
-    if (ctor) {
-        Property* proto = ctor->getOwnProperty(NSV::PROP_PROTOTYPE);
-        if (proto) mc->set_prototype(proto->getValue(*ctor));
-    }
-
-    // Send the construct event. This must be done after the __proto__ 
-    // member is set. It is always done.
-    notifyEvent(event_id::CONSTRUCT);
-        
-    if (ctor) {
-        const int swfversion = getSWFVersion(*mc);
-        if (swfversion > 5) {
-            fn_call::Args args;
-            ctor->construct(*mc, get_environment(), args);
-        }
-    }
 }
 
 bool
@@ -1938,9 +1930,9 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
         //       DisplayObjectContainer and log an error if it's not.
         MovieClip* parent_sp = parent->to_movie();
         assert(parent_sp);
-        parent_sp->replace_display_object(extern_movie, get_depth(),
-                     true, true);
-
+        parent_sp->_displayList.replaceDisplayObject(extern_movie, get_depth(),
+                true, true);
+        extern_movie->construct();
     }
     else
     {

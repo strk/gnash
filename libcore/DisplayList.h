@@ -90,11 +90,7 @@ public:
 	///
 	/// @param depth 
 	///	depth at which the new DisplayObject is placed.
-	///
-    /// @param initObj
-    /// an object to initialize the new DisplayObject's properties with.
-	void placeDisplayObject(DisplayObject* ch, int depth,
-            as_object* initObj = 0);
+    void placeDisplayObject(DisplayObject* ch, int depth);
 
 	/// \brief
 	/// Replace the old DisplayObject at the specified depth with

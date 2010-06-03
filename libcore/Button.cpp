@@ -710,7 +710,7 @@ Button::set_current_state(MouseState new_state)
                 set_invalidated();
                 _stateCharacters[i] = ch;
                 addInstanceProperty(*this, ch);
-                ch->stagePlacementCallback(); 
+                ch->construct(); 
             }
         }
     }
@@ -779,9 +779,8 @@ Button::pointInShape(boost::int32_t x, boost::int32_t y) const
 }
 
 void
-Button::stagePlacementCallback(as_object* initObj)
+Button::construct(as_object* initObj)
 {
-
     // Not sure how this can happen, but blip.tv does it.
     if (initObj) {
         log_unimpl("Button placed with an initObj. How did this happen? "
@@ -826,7 +825,7 @@ Button::stagePlacementCallback(as_object* initObj)
 
         _stateCharacters[rno] = ch;
         addInstanceProperty(*this, ch);
-        ch->stagePlacementCallback(); // give this DisplayObject a life
+        ch->construct();
     }
 
     // There is no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD event 

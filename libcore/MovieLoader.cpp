@@ -319,7 +319,7 @@ MovieLoader::processCompletedRequest(const Request& r)
         // in first frame of loaded clip have been executed.
         //
         // Since getLoadedMovie or setLevel above will invoke
-        // stagePlacementCallback and thus queue all actions in first
+        // construct() and thus queue all actions in first
         // frame, we'll queue the
         // onLoadInit call next, so it happens after the former.
         //

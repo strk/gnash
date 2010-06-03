@@ -342,27 +342,6 @@ public:
     void remove_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
-    /// Proxy of DisplayList::removeDisplayObject()
-    ///
-    /// @
-    /// new DisplayObject to be used for replacing.
-    ///
-    /// @param depth
-    /// depth at which the old DisplayObject is to be replaced.
-    ///
-    /// @param use_old_cxform
-    /// if true, the cxform of the new DisplayObject will be set to the old one.
-    /// if false, the cxform of the new DisplayObject will be untouched.
-    ///
-    /// @param use_old_matrix
-    /// if true, the transformation SWFMatrix of the new DisplayObject 
-    /// will be set to the old one.
-    /// if false, the transformation SWFMatrix of the new DisplayObject will
-    /// be untouched.
-    void replace_display_object(DisplayObject* ch, int depth,
-        bool use_old_cxform, bool use_old_matrix);
-
-
     /// \brief
     /// Remove the object at the specified depth.
     //
@@ -404,8 +383,9 @@ public:
     /// The callback will also (known to be bogus):
     //
     /// (1) Construct this instance as an ActionScript object.
-    ///     See constructAsScriptObject() method.
-    virtual void stagePlacementCallback(as_object* initObj = 0);
+    ///     See constructAsScriptObject() method, including constructing
+    ///     registered class and adding properties.
+    virtual void construct(as_object* initObj = 0);
 
     /// Unload all contents in the displaylist and this instance
     /// See DisplayObject::unload for more info

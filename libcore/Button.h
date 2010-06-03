@@ -115,20 +115,13 @@ public:
 
 	bool isEnabled();
 	
-	/// Receive a stage placement notification
-	//
-	/// This callback will:
-	///
-	/// (1) Register this button instance as a live DisplayObject
-	/// (2) Setup the state DisplayObjects calling stagePlacementCallback
-    /// on all [WRONG]
-	virtual void stagePlacementCallback(as_object* initObj = 0);
-
 	/// Properly unload contained DisplayObjects
 	bool unload();
 
 	/// Properly destroy contained DisplayObjects
 	void destroy();
+
+    virtual void construct(as_object* initObj);
 
 #ifdef USE_SWFTREE
 	// Override to append button DisplayObjects info, see dox in DisplayObject.h
