@@ -203,7 +203,7 @@ main(int argc, char** argv)
             );
 
     /* init object is not used for Buttons */
-    xcheck_equals(mo, "butatt.f", "undefined");
+    check_equals(mo, "butatt.f", "undefined");
     check_equals(mo, "butatt.t", "undefined");
     check_equals(mo, "butatt.s", "37");
 
