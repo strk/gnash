@@ -1851,21 +1851,18 @@ std::string
 movie_root::callExternalCallback(const std::string &name, 
 				 const std::vector<as_value> &fnargs)
 {
-    std::string empty;
 
     if (_hostfd) {
-	return empty;
+        return std::string();
     }
 
-    std::vector<std::string> args;
-    std::vector<as_value>::const_iterator it;
     std::string msg = ExternalInterface::makeInvoke(name, fnargs);
 
-    int ret = ExternalInterface::writeBrowser(_hostfd, msg);
+    const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
     if (ret != msg.size()) {
         log_error(_("Could not write to browser fd #%d: %s"),
 		  _hostfd, std::strerror(errno));
-	return std::string();
+        return std::string();
     }
 
     std::string result = ExternalInterface::readBrowser(_controlfd);
@@ -2129,7 +2126,6 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     }
 
     std::string requestString = request.str();
-    size_t len = requestString.length();
     // TODO: should mutex-protect this ?
     // NOTE: we are assuming the hostfd is set in blocking mode here..
 
