@@ -143,7 +143,6 @@ getPluginDescription()
 NPError
 NS_PluginInitialize()
 {
-    // gnash::log_debug(__PRETTY_FUNCTION__);
 
     if ( gnash::plugInitialized ) {
         gnash::log_debug("NS_PluginInitialize called, but ignored (we already initialized)");
@@ -186,7 +185,7 @@ NS_PluginInitialize()
     */
     char* opts = std::getenv("GNASH_OPTIONS");
     if (opts != NULL) {
-        gnash::log_debug("GNASH_OPTIONS : ", opts);
+        gnash::log_debug("GNASH_OPTIONS: %s", opts);
         
         // Should the plugin wait for gdb to be attached?
         if ( strstr(opts, "waitforgdb") ) {
@@ -250,7 +249,6 @@ NS_PluginInitialize()
 void
 NS_PluginShutdown()
 {
-    // gnash::log_debug(__PRETTY_FUNCTION__);
 #if 0
     if (!plugInitialized) {
         gnash::log_debug("Plugin already shut down");
@@ -269,7 +267,6 @@ NS_PluginShutdown()
 NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
-    // gnash::log_debug(__PRETTY_FUNCTION__);
     NPError err = NPERR_NO_ERROR;
 
     switch (aVariable) {
@@ -324,7 +321,6 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
-    // gnash::log_debug(__PRETTY_FUNCTION__);
     if(!aCreateDataStruct) {
         return NULL;
     }
@@ -643,7 +639,6 @@ nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
 bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
-    gnash::log_debug(__PRETTY_FUNCTION__);
 
     if ( cond & G_IO_HUP ) {
         gnash::log_debug("Player control socket hang up");
@@ -718,7 +713,6 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 bool
 nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 {
-    gnash::log_debug(__PRETTY_FUNCTION__);
 
     if ( linelen < 4 ) {
         if (buf) {
