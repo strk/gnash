@@ -18,8 +18,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ_EXTERNALINTERFACE_H
-#define GNASH_ASOBJ_EXTERNALINTERFACE_H
+#ifndef GNASH_EXTERNALINTERFACE_H
+#define GNASH_EXTERNALINTERFACE_H
 
 #include <string>
 #include <vector>
