@@ -28,6 +28,7 @@
 
 #include "ExternalInterface.h"
 #include "ExternalInterface_as.h"
+#include "NativeFunction.h"
 #include "StringPredicates.h"
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
@@ -133,6 +134,23 @@ private:
 };
 
 void
+registerExternalInterfaceNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(externalinterface_uInitJS, 14, 0);
+    vm.registerNative(externalinterface_uObjectID, 14, 1);
+    vm.registerNative(externalinterface_uAddCallback, 14, 2);
+    vm.registerNative(externalinterface_uEvalJS, 14, 3);
+    vm.registerNative(externalinterface_uCallOut, 14, 4);
+    vm.registerNative(externalinterface_uEscapeXML, 14, 5);
+    vm.registerNative(externalinterface_uUnescapeXML, 14, 6);
+    vm.registerNative(externalinterface_uJsQuoteString, 14, 7);
+
+    vm.registerNative(externalinterface_available, 14, 100);
+
+}
+
+void
 externalinterface_class_init(as_object& where, const ObjectURI& uri)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -148,67 +166,67 @@ attachExternalInterfaceStaticInterface(as_object& o)
 {    
     // GNASH_REPORT_FUNCTION;
     
-    const int swf7Flags = PropFlags::dontDelete | PropFlags::dontEnum
-        | PropFlags::readOnly | PropFlags::onlySWF7Up;
-    const int swf8Flags = PropFlags::dontDelete | PropFlags::dontEnum
-        | PropFlags::readOnly | PropFlags::onlySWF8Up;
+    const int swf8Flags = PropFlags::onlySWF8Up;
+    
+    VM& vm = getVM(o);
+ 
+    // Native functions
+    o.init_member("_initJS", vm.getNative(14, 0), swf8Flags);
+    o.init_member("_objectID", vm.getNative(14, 1), swf8Flags);
+    o.init_member("_addCallback", vm.getNative(14, 2), swf8Flags);
+    o.init_member("_evalJS", vm.getNative(14, 3), swf8Flags);
+    o.init_member("_callOut", vm.getNative(14, 4), swf8Flags);
+    o.init_member("_escapeXML", vm.getNative(14, 5), swf8Flags);
+    o.init_member("_unescapeXML", vm.getNative(14, 6), swf8Flags);
+    o.init_member("_jsQuoteString", vm.getNative(14, 7), swf8Flags);
 
-    // Initialize the properties
-    o.init_readonly_property("available", &externalinterface_available, swf7Flags);
+    // Native properties
+    NativeFunction* n = vm.getNative(14, 100);
+    o.init_property("available", *n, *n, swf8Flags);
 
-    o.init_property("marshallExceptions", externalinterface_marshallExceptions,
-                    externalinterface_marshallExceptions, swf8Flags);
-    o.init_readonly_property("objectID", &externalinterface_objectID, swf8Flags);
-
-    // Initialize the documented methods
-    Global_as& gl = getGlobal(o);    
+    Global_as& gl = getGlobal(o);
+    
+    // ActionScript functions
     o.init_member("addCallback",
-                  gl.createFunction(externalinterface_addCallback), swf7Flags);
+                  gl.createFunction(externalinterface_addCallback));
     
-    o.init_member("call", gl.createFunction(externalinterface_call), swf7Flags);
+    o.init_member("call", gl.createFunction(externalinterface_call));
     
-    // Initialize the other methods, most of which are undocumented
-    // helper functions.
+    // Undocumented ActionScript functions.
     o.init_member("_argumentsToXML",
-                  gl.createFunction(externalinterface_uArgumentsToXML), swf8Flags);
+              gl.createFunction(externalinterface_uArgumentsToXML));
     o.init_member("_argumentsToAS",
-                  gl.createFunction(externalinterface_uArgumentsToAS), swf8Flags);
-    o.init_member("_addCallback",
-                  gl.createFunction(externalinterface_uAddCallback), swf8Flags);
+              gl.createFunction(externalinterface_uArgumentsToAS));
     o.init_member("_arrayToAS",
-                  gl.createFunction(externalinterface_uArrayToAS), swf8Flags);
+                  gl.createFunction(externalinterface_uArrayToAS));
     o.init_member("_arrayToJS",
-                  gl.createFunction(externalinterface_uArrayToJS), swf8Flags);
+                  gl.createFunction(externalinterface_uArrayToJS));
     o.init_member("_arrayToXML",
-                  gl.createFunction(externalinterface_uArrayToXML), swf8Flags);
+                  gl.createFunction(externalinterface_uArrayToXML));
     o.init_member("_callIn",
-                  gl.createFunction(externalinterface_uCallIn), swf8Flags);
-    o.init_member("_callOut",
-                  gl.createFunction(externalinterface_uCallOut), swf8Flags);
-    o.init_member("_escapeXML",
-                  gl.createFunction(externalinterface_uEscapeXML), swf8Flags);
-    o.init_member("_evalJS",
-                  gl.createFunction(externalinterface_uEvalJS), swf8Flags);
-    o.init_member("_initJS",
-                  gl.createFunction(externalinterface_uInitJS), swf8Flags);
-    o.init_member("_jsQuoteString",
-                  gl.createFunction(externalinterface_uJsQuoteString), swf8Flags);
-    o.init_member("_objectID",
-                  gl.createFunction(externalinterface_uObjectID), swf8Flags);
+                  gl.createFunction(externalinterface_uCallIn));
     o.init_member("_objectToAS",
-                  gl.createFunction(externalinterface_uObjectToAS), swf8Flags);
+                  gl.createFunction(externalinterface_uObjectToAS));
     o.init_member("_objectToJS",
-                  gl.createFunction(externalinterface_uObjectToJS), swf8Flags);
+                  gl.createFunction(externalinterface_uObjectToJS));
     o.init_member("_objectToXML",
-                  gl.createFunction(externalinterface_uObjectToXML), swf8Flags);
+                  gl.createFunction(externalinterface_uObjectToXML));
     o.init_member("_toAS",
-                  gl.createFunction(externalinterface_uToAS), swf8Flags);
+                  gl.createFunction(externalinterface_uToAS));
     o.init_member("_toJS",
-                  gl.createFunction(externalinterface_uToJS), swf8Flags);
+                  gl.createFunction(externalinterface_uToJS));
     o.init_member("_toXML",
-                  gl.createFunction(externalinterface_uToXML), swf8Flags);
-    o.init_member("_unescapeXML",
-                  gl.createFunction(externalinterface_uUnescapeXML), swf8Flags);
+                  gl.createFunction(externalinterface_uToXML));
+    
+    // Apparently the pp calls:
+    //
+    // AsSetPropFlags(flash.external.ExternalInterface, null, 4103) 
+    //
+    // here, but it seems that the properties actually are visible in SWF6
+    // and SWF7, at least for the flashplayer 9. So we just make sure they
+    // are read-only.
+    as_object* null = 0;
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 7);
 }
 
 as_value
