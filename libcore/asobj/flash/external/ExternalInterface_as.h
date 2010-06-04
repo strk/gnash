@@ -21,9 +21,6 @@
 #ifndef GNASH_ASOBJ_EXTERNALINTERFACE_H
 #define GNASH_ASOBJ_EXTERNALINTERFACE_H
 
-#include <string>
-#include <vector>
-#include <map>
 
 namespace gnash {
 
@@ -35,17 +32,6 @@ class movie_root;
 }
 
 namespace gnash {
-
-class ExternalInterface_as
-{
-public:
-    ExternalInterface_as(as_object* owner);
-    ~ExternalInterface_as();
-    
-private:
-    int                 _fd;
-    std::map<std::string, as_object *> _methods;
-};
 
 /// Initialize the global ExternalInterface class
 void externalinterface_class_init(gnash::as_object& where,
