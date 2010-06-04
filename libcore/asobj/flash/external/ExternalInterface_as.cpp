@@ -184,10 +184,6 @@ attachExternalInterfaceStaticInterface(as_object& o)
     NativeFunction* n = vm.getNative(14, 100);
     o.init_property("available", *n, *n, swf8Flags);
 
-    // TODO: check whether it's there.
-    o.init_property("marshallExceptions", externalinterface_marshallExceptions,
-                    externalinterface_marshallExceptions, swf8Flags);
-
     Global_as& gl = getGlobal(o);
     
     // ActionScript functions
