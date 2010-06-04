@@ -781,11 +781,14 @@ Button::pointInShape(boost::int32_t x, boost::int32_t y) const
 void
 Button::construct(as_object* initObj)
 {
-    // Not sure how this can happen, but blip.tv does it.
+    // This can happen if attachMovie is called with an exported Button and
+    // an init object. The attachment happens, but the init object is not used
+    // (see misc-ming.all/attachMovieTest.swf).
     if (initObj) {
-        log_unimpl("Button placed with an initObj. How did this happen? "
-                "We'll copy the properties anyway");
-        getObject(this)->copyProperties(*initObj);
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("Button placed with an init object. This will "
+                "be ignored.");
+        );
     }
 
     saveOriginalTarget(); // for soft refs
