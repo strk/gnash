@@ -103,10 +103,17 @@ main(int argc, char** argv)
 
 	addRedSquareExport(mo);
 
-    sh = make_fill_square (100, 300, 60, 60, 255, 0, 0, 0, 255, 0);
     but = newSWFButton();
+
+    sh = make_fill_square (100, 300, 60, 60, 255, 0, 0, 0, 255, 0);
     br = SWFButton_addCharacter(but, (SWFCharacter)sh, SWFBUTTON_UP);
+    SWFButtonRecord_setDepth(br, 12);
+    
+    sh = make_fill_square (100, 300, 60, 60, 255, 0, 0, 255, 0, 0);
+    br = SWFButton_addCharacter(but, (SWFCharacter)sh, SWFBUTTON_HIT);
+    br = SWFButton_addCharacter(but, (SWFCharacter)sh, SWFBUTTON_OVER);
     SWFButtonRecord_setDepth(br, 10);
+
     SWFMovie_addExport(mo, (SWFBlock)but, "butexp");
     SWFMovie_writeExports(mo);
 
