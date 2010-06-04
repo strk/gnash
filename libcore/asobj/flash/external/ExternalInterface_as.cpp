@@ -218,9 +218,15 @@ attachExternalInterfaceStaticInterface(as_object& o)
     o.init_member("_toXML",
                   gl.createFunction(externalinterface_uToXML));
     
-    // Call AsSetPropFlags(flash.external.ExternalInterface, null, 4103);
+    // Apparently the pp calls:
+    //
+    // AsSetPropFlags(flash.external.ExternalInterface, null, 4103) 
+    //
+    // here, but it seems that the properties actually are visible in SWF6
+    // and SWF7, at least for the flashplayer 9. So we just make sure they
+    // are read-only.
     as_object* null = 0;
-    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 4103);
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 7);
 }
 
 as_value
