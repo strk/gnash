@@ -85,6 +85,7 @@
 #include "flash/text/TextRenderer_as.h"
 #include "flash/xml/XMLDocument_as.h"
 #include "flash/xml/XMLNode_as.h"
+#include "flash/external/ExternalInterface_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "Video.h"
@@ -1575,6 +1576,7 @@ registerNatives(as_object& global)
     registerLocalConnectionNative(global);
     registerBitmapFilterNative(global);
     registerColorTransformNative(global);
+    registerExternalInterfaceNative(global);
 
     AsBroadcaster::registerNative(global);
     registerTextFormatNative(global);

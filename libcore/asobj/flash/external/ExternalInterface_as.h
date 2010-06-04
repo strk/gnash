@@ -51,9 +51,10 @@ private:
 void externalinterface_class_init(gnash::as_object& where,
                                   const gnash::ObjectURI& uri);
 
+void registerExternalInterfaceNative(as_object& global);
+
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_EXTERNALINTERFACE_H__
 #endif
 
 // local Variables:
