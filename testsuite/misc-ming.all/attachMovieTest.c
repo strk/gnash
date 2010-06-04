@@ -103,6 +103,7 @@ main(int argc, char** argv)
 
 	addRedSquareExport(mo);
 
+#if MING_VERSION_CODE >= 00040300
     but = newSWFButton();
 
     sh = make_fill_square (100, 300, 60, 60, 255, 0, 0, 0, 255, 0);
@@ -116,7 +117,7 @@ main(int argc, char** argv)
 
     SWFMovie_addExport(mo, (SWFBlock)but, "butexp");
     SWFMovie_writeExports(mo);
-
+#endif
 	/* it seems we need a SHOWFRAME for this to be effective */
 	/* (maybe it's related to loop-back handling ?) */
 	SWFMovie_nextFrame(mo); 
@@ -195,8 +196,11 @@ main(int argc, char** argv)
 		);
 
 	check_equals(mo, "square3._x", "210");
+
+#if MING_VERSION_CODE >= 00040300
 	
     SWFMovie_nextFrame(mo); /* showFrame */
+
 
     add_actions(mo,
             "o = new Object();"
@@ -213,7 +217,7 @@ main(int argc, char** argv)
     check_equals(mo, "butatt.f", "undefined");
     check_equals(mo, "butatt.t", "undefined");
     check_equals(mo, "butatt.s", "37");
-
+#endif
 	add_actions(mo, "totals(); stop();");
 
 	SWFMovie_nextFrame(mo); /* showFrame */
