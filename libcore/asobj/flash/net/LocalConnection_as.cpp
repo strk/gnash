@@ -132,6 +132,8 @@ namespace {
     bool validFunctionName(const std::string& func);
     void attachLocalConnectionInterface(as_object& o);
 
+    std::string getDomain(as_object& o);
+
     void removeListener(const std::string& name, SharedMem& mem);
     bool addListener(const std::string& name, SharedMem& mem);
     bool findListener(const std::string& name, SharedMem& mem);
@@ -198,6 +200,8 @@ public:
     static const size_t listenersOffset = 40976;
 
     /// Create a LocalConnection_as object.
+    //
+    /// @param owner    The as_object that owns this Relay.
     LocalConnection_as(as_object* owner);
     
     virtual ~LocalConnection_as() {
@@ -236,12 +240,6 @@ public:
 
 private:
     
-    /// Work out the domain.
-    //
-    /// Called once on construction to set _domain, though it will do
-    /// no harm to call it again.
-    std::string getDomain();
-    
     std::string _name;
 
     // The immutable domain of this LocalConnection_as, based on the 
@@ -262,10 +260,10 @@ private:
 const size_t LocalConnection_as::listenersOffset;
 const size_t LocalConnection_as::defaultSize;
 
-LocalConnection_as::LocalConnection_as(as_object* owner)
+LocalConnection_as::LocalConnection_as(as_object* o)
     :
-    ActiveRelay(owner),
-    _domain(getDomain()),
+    ActiveRelay(o),
+    _domain(getDomain(owner())),
     _connected(false),
     _shm(defaultSize),
     _lastTime(0)
@@ -480,55 +478,6 @@ LocalConnection_as::connect(const std::string& name)
     _connected = true;
     
     return;
-}
-
-/// String representing the domain of the current SWF file.
-//
-/// This is set on construction, as it should be constant.
-/// The domain is either the "localhost", or the hostname from the
-/// network connection. This behaviour changed for SWF v7. Prior to v7
-/// only the domain was returned, ie dropping off node names like
-/// "www". As of v7, the behaviour is to return the full host
-/// name. Gnash supports both behaviours based on the version.
-std::string
-LocalConnection_as::getDomain()
-{
-    
-    URL url(getRoot(owner()).getOriginalURL());
-
-    if (url.hostname().empty()) {
-        return "localhost";
-    }
-
-    // Adjust the name based on the swf version. Prior to v7, the nodename part
-    // was removed. For v7 or later. the full hostname is returned. The
-    // localhost is always just the localhost.
-    if (getSWFVersion(owner()) > 6) {
-        return url.hostname();
-    }
-
-    const std::string& domain = url.hostname();
-
-    std::string::size_type pos;
-    pos = domain.rfind('.');
-
-    // If there is no '.', return the whole thing.
-    if (pos == std::string::npos) {
-        return domain;
-    }
-
-    pos = domain.rfind(".", pos - 1);
-    
-    // If there is no second '.', return the whole thing.
-    if (pos == std::string::npos) {
-        return domain;
-    }
-
-    // Return everything after the second-to-last '.'
-    // FIXME: this must be wrong, or it would return 'org.uk' for many
-    // UK websites, and not even Adobe is that stupid. I think.
-    return domain.substr(pos + 1);
-
 }
 
 void
@@ -972,6 +921,55 @@ inline boost::uint32_t
 getTimestamp(const VM& vm)
 {
     return vm.getTime() & 0x7fffffff;
+}
+
+/// String representing the domain of the current SWF file.
+//
+/// This is set on construction, as it should be constant.
+/// The domain is either the "localhost", or the hostname from the
+/// network connection. This behaviour changed for SWF v7. Prior to v7
+/// only the domain was returned, ie dropping off node names like
+/// "www". As of v7, the behaviour is to return the full host
+/// name. Gnash supports both behaviours based on the version.
+std::string
+getDomain(as_object& o)
+{
+    
+    URL url(getRoot(o).getOriginalURL());
+
+    if (url.hostname().empty()) {
+        return "localhost";
+    }
+
+    // Adjust the name based on the swf version. Prior to v7, the nodename part
+    // was removed. For v7 or later. the full hostname is returned. The
+    // localhost is always just the localhost.
+    if (getSWFVersion(o) > 6) {
+        return url.hostname();
+    }
+
+    const std::string& domain = url.hostname();
+
+    std::string::size_type pos;
+    pos = domain.rfind('.');
+
+    // If there is no '.', return the whole thing.
+    if (pos == std::string::npos) {
+        return domain;
+    }
+
+    pos = domain.rfind(".", pos - 1);
+    
+    // If there is no second '.', return the whole thing.
+    if (pos == std::string::npos) {
+        return domain;
+    }
+
+    // Return everything after the second-to-last '.'
+    // FIXME: this must be wrong, or it would return 'org.uk' for many
+    // UK websites, and not even Adobe is that stupid. I think.
+    return domain.substr(pos + 1);
+
 }
 
 } // anonymous namespace
