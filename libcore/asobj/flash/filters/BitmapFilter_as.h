@@ -25,7 +25,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global BitmapFilter class
 void bitmapfilter_class_init(as_object& where, const ObjectURI& uri);

@@ -26,7 +26,7 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global SyncEvent class
 void syncevent_class_init(as_object& where, const ObjectURI& uri);

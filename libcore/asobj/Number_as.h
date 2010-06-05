@@ -26,7 +26,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 class Global_as;
 
 /// Initialize the global Number class

@@ -46,7 +46,7 @@ class CharacterProxy;
 	
 	class fn_call;
 	class as_object;
-    class ObjectURI;
+    struct ObjectURI;
     class DisplayObject;
 
 class Sound_as : public ActiveRelay

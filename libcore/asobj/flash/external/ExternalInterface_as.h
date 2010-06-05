@@ -26,7 +26,7 @@ namespace gnash {
 
 class as_object;
 class as_value;
-class ObjectURI;
+struct ObjectURI;
 class Global_as;
 class movie_root;
 }

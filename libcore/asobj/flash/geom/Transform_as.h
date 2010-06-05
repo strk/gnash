@@ -25,7 +25,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global Transform class
 void transform_class_init(as_object& where, const ObjectURI& uri);

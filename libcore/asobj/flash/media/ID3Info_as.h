@@ -26,7 +26,7 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global ID3Info class
 void id3info_class_init(as_object& where, const ObjectURI& uri);

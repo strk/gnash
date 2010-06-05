@@ -24,7 +24,7 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global StageAlign class
 void stagealign_class_init(as_object& where, const ObjectURI& uri);

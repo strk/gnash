@@ -26,7 +26,7 @@
 
 namespace gnash {
 
-class ObjectURI;
+struct ObjectURI;
 class as_object;
 
 extern "C" {

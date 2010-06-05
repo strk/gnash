@@ -23,7 +23,7 @@
 
 // Forward declarations
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 namespace gnash {
 

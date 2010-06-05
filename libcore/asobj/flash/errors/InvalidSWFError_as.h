@@ -25,7 +25,7 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global InvalidSWFError class
 void invalidswferror_class_init(as_object& where, const ObjectURI& uri);

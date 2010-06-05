@@ -21,7 +21,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 void flash_package_init(as_object& pkg, const ObjectURI& uri);
 

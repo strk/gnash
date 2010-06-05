@@ -27,7 +27,7 @@ namespace gnash {
 
 class as_function;
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 class fn_call;
 
 /// Initialize the global Point class

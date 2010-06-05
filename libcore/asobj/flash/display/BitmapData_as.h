@@ -32,7 +32,7 @@ namespace gnash {
 
 class as_function;
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 class Bitmap;
 
 

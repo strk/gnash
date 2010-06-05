@@ -33,7 +33,7 @@ namespace gnash {
     class as_object;
     class as_value;
     class IOChannel;
-    class ObjectURI;
+    struct ObjectURI;
 }
 
 namespace gnash {

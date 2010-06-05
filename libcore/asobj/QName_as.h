@@ -24,7 +24,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global QName class
 void qname_class_init(as_object& global, const ObjectURI& uri);

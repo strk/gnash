@@ -25,7 +25,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global TextFormatAlign class
 void textformatalign_class_init(as_object& where, const ObjectURI& uri);

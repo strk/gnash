@@ -23,7 +23,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 class Global_as;
 
 /// Native function to create a plain object with TextField properties

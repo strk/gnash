@@ -22,7 +22,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global GlowFilter class
 void glowfilter_class_init(as_object& where, const ObjectURI& uri);

@@ -22,7 +22,7 @@
 
 namespace gnash {
     class as_object;
-    class ObjectURI;
+    struct ObjectURI;
 }
 
 namespace gnash {

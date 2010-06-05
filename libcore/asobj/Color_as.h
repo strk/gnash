@@ -23,7 +23,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 void registerColorNative(as_object& global);
 

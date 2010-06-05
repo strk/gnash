@@ -61,7 +61,7 @@ getNamespace(const ObjectURI& o)
     return o.ns;
 }
 
-class ObjectURI::Logger
+struct ObjectURI::Logger
 {
 public:
     Logger(string_table& st) : _st(st) {}

@@ -26,7 +26,7 @@
 // Forward declarations
 namespace gnash {
     class as_object;
-    class ObjectURI;
+    struct ObjectURI;
     class SharedObject_as;
     class VM;
 }

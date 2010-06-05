@@ -26,7 +26,7 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global DisplacementMapFilterMode class
 void displacementmapfiltermode_class_init(as_object& where, const ObjectURI& uri);

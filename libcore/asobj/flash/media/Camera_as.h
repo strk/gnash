@@ -24,7 +24,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global Camera class
 void camera_class_init(as_object& where, const ObjectURI& uri);

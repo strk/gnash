@@ -30,7 +30,7 @@
 namespace gnash {
     class as_object;
     class Global_as;
-    class ObjectURI;
+    struct ObjectURI;
 }
 
 namespace gnash {

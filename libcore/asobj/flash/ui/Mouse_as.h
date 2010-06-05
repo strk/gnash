@@ -23,7 +23,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 class Mouse_as
 {

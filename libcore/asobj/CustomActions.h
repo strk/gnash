@@ -23,7 +23,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global CustomActions class
 void customactions_class_init(as_object& global, const ObjectURI& uri);

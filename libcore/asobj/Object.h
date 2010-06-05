@@ -24,7 +24,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global Object class
 void initObjectClass(as_object* proto, as_object& global, const ObjectURI& uri);

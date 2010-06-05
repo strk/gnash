@@ -26,7 +26,7 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global IDynamicPropertyOutput class
 void idynamicpropertyoutput_class_init(as_object& where, const ObjectURI& uri);

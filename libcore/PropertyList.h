@@ -37,7 +37,7 @@ namespace gnash {
     class as_object;
     class as_environment;
     class as_function;
-    class ObjectURI;
+    struct ObjectURI;
     class as_value;
 }
 

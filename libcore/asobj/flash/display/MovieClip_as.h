@@ -25,7 +25,7 @@ namespace gnash {
 
 // Forward declarations
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 class DisplayObject;
 
 /// Initialize the global MovieClip class

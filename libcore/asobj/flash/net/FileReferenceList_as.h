@@ -26,7 +26,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global FileReferenceList class
 void filereferencelist_class_init(as_object& where, const ObjectURI& uri);

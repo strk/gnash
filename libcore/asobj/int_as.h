@@ -29,7 +29,7 @@
 namespace gnash {
 
 class as_object;
-class ObjectURI;
+struct ObjectURI;
 
 /// Initialize the global int class
 void int_class_init(as_object& global, const ObjectURI& uri);

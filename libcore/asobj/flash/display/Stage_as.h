@@ -22,7 +22,7 @@
 
 namespace gnash {
 
-class ObjectURI;
+struct ObjectURI;
 class as_object;
 
 /// This is the Stage ActionScript object.

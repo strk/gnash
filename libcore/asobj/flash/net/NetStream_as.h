@@ -47,7 +47,7 @@ namespace gnash {
     class NetConnection_as;
     class as_function;
     class DisplayObject;
-    class ObjectURI;
+    struct ObjectURI;
     namespace media {
         class MediaHandler;
     }
