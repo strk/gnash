@@ -800,11 +800,7 @@ DisplayObject::setMask(DisplayObject* mask)
 	_mask = mask;
 	_maskee = 0;
 
-	if ( _mask )
-	{
-		log_debug(" %s.setMask(%s): registering with new mask %s",
-			getTarget(), mask ? mask->getTarget() : "null",
-			_mask->getTarget());
+	if (_mask) {
 		/// Register as as masked by the mask
 		_mask->setMaskee(this);
 	}
@@ -815,14 +811,10 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 {
 	if ( _maskee == maskee ) { return; }
 
-	if ( _maskee )
-	{
+	if (_maskee) {
 		// We don't want the maskee to call setMaskee(null)
 		// on us again
-		log_debug(" %s.setMaskee(%s) : previously masked char %s "
-                "being set as non-masked", getTarget(), 
-                maskee ? maskee->getTarget() : "null", _maskee->getTarget());
-		_maskee->_mask = NULL;
+		_maskee->_mask = 0;
 	}
 
 	_maskee = maskee;

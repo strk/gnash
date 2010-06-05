@@ -2235,8 +2235,6 @@ as_value
 movieclip_attachBitmap(const fn_call& fn)
 {
 
-    GNASH_REPORT_FUNCTION;
-
     MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (fn.nargs < 2) {
