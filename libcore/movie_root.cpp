@@ -86,27 +86,28 @@
 
 namespace gnash {
 
+// Forward declarations
 namespace {
     bool generate_mouse_button_events(movie_root& mr, MouseButtonState& ms);
     const DisplayObject* getNearestObject(const DisplayObject* o);
     as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
 }
 
-}
+// Utility classes
+namespace {
 
-namespace gnash {
-
-inline bool
-movie_root::testInvariant() const
+class FindTarget
 {
-    // TODO: fill this function !
-    // The _movies map can not invariantably
-    // be non-empty as the stage is autonomous
-    // itself
-    //assert( ! _movies.empty() );
+public:
+    FindTarget(DisplayObject* target) : _target(target) {}
+    bool operator()(ExecutableCode* c) const {
+        return _target == c->target();
+    }
+private:
+    DisplayObject* _target;
+};
 
-    return true;
-}
+} // anonymous namespace
 
 
 movie_root::movie_root(const movie_definition& def,
@@ -1540,6 +1541,23 @@ movie_root::processActionQueue()
 }
 
 void
+movie_root::removeQueuedConstructor(DisplayObject* target)
+{
+
+    ActionQueue& pr = _actionQueue[PRIORITY_CONSTRUCT];
+    
+    const size_t st = pr.size();
+
+    pr.erase(std::remove_if(pr.begin(), pr.end(), FindTarget(target)),
+            pr.end());
+
+    const size_t sa = pr.size();
+
+    log_debug("%s items removed from ActionQueue (size now: %s)",
+            st - sa, sa);
+}
+
+void
 movie_root::pushAction(std::auto_ptr<ExecutableCode> code, size_t lvl)
 {
     assert(lvl < PRIORITY_SIZE);
@@ -2394,6 +2412,18 @@ movie_root::LoadCallback::processLoad()
 
     // NOTE: Another data copy here !
     callMethod(_obj, NSV::PROP_ON_DATA, dataVal);
+
+    return true;
+}
+
+inline bool
+movie_root::testInvariant() const
+{
+    // TODO: fill this function !
+    // The _movies map can not invariantably
+    // be non-empty as the stage is autonomous
+    // itself
+    //assert( ! _movies.empty() );
 
     return true;
 }

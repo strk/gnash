@@ -381,6 +381,11 @@ xcheck_equals(Math.round(te.width), 33);
 te = tf2.getTextExtent("Longer sentence with more words.", 30);
 check_equals(te.textFieldWidth, 30);
 xcheck_equals(Math.round(te.width), 25);
+#if OUTPUT_VERSION > 7
+xcheck_equals(te.height, 152.9);
+#else
+xcheck_equals(te.height, 152);
+#endif
 
 te = tf2.getTextExtent("o");
 xcheck_equals(Math.round(te.textFieldWidth), 12);
@@ -432,7 +437,7 @@ xcheck_equals(Math.round(te.textFieldWidth), 36);
 #if OUTPUT_VERSION < 7
     check_totals(122);
 #elif OUTPUT_VERSION == 7
-    check_totals(158);
+    check_totals(159);
 #else 
-    check_totals(158);
+    check_totals(159);
 #endif

@@ -51,7 +51,7 @@ void
 RemoveObjectTag::executeState(MovieClip* m, DisplayList& dlist) const
 {
     m->set_invalidated();
-	dlist.removeDisplayObject(_depth);
+    dlist.removeDisplayObject(_depth);
 }
 
 /* public static */

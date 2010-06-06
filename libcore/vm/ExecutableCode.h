@@ -33,7 +33,8 @@ namespace gnash
 class ExecutableCode {
 
 public:
-    ExecutableCode() {}
+
+    ExecutableCode(DisplayObject* t) : _target(t) {}
 
     virtual void execute()=0;
 
@@ -41,10 +42,23 @@ public:
 
     virtual ~ExecutableCode() {}
 
+    virtual void setReachable() const {}
+
 #ifdef GNASH_USE_GC
     /// Mark reachable resources (for the GC)
-    virtual void markReachableResources() const=0;
-#endif // GNASU_USE_GC
+    void markReachableResources() const {
+        setReachable();
+        if (_target) _target->setReachable();
+    }
+#endif 
+
+    DisplayObject* target() const { 
+        return _target;
+    }
+
+private:
+
+    DisplayObject* _target;
 };
 
 /// Global code (out of any function)
@@ -54,8 +68,8 @@ public:
 
     GlobalCode(const action_buffer& nBuffer, DisplayObject* nTarget)
         :
-        buffer(nBuffer),
-        target(nTarget)
+        ExecutableCode(nTarget),
+        buffer(nBuffer)
     {}
 
     ExecutableCode* clone() const
@@ -65,28 +79,16 @@ public:
 
     virtual void execute()
     {
-        if (!target->unloaded()) {
-            ActionExec exec(buffer, target->get_environment());
+        if (!target()->unloaded()) {
+            ActionExec exec(buffer, target()->get_environment());
             exec();
         }
     }
-
-#ifdef GNASH_USE_GC
-    /// Mark reachable resources (for the GC)
-    //
-    /// Reachable resources are:
-    ///  - the action target (target)
-    ///
-    virtual void markReachableResources() const {
-        if (target) target->setReachable();
-    }
-#endif // GNASU_USE_GC
 
 private:
 
     const action_buffer& buffer;
 
-    DisplayObject* target;
 };
 
 /// Event code 
@@ -98,12 +100,12 @@ public:
 
     EventCode(DisplayObject* nTarget)
         :
-        _target(nTarget)
+        ExecutableCode(nTarget)
     {}
 
     EventCode(DisplayObject* nTarget, const BufferList& buffers)
         :
-        _target(nTarget),
+        ExecutableCode(nTarget),
         _buffers(buffers)
     {}
 
@@ -124,7 +126,7 @@ public:
     {
         // don't push actions for destroyed DisplayObjects, 
         // our opcode guard is bogus at the moment.
-        if (!_target->isDestroyed()) {
+        if (!target()->isDestroyed()) {
             _buffers.push_back(&buffer);
         }
     }
@@ -136,28 +138,14 @@ public:
         {
             // onClipEvents code are guarded by isDestroyed(),
             // still might be also guarded by unloaded()
-            if (_target->isDestroyed())  break;
+            if (target()->isDestroyed())  break;
 
-            ActionExec exec(*(*it), _target->get_environment(), false);
+            ActionExec exec(*(*it), target()->get_environment(), false);
             exec();
         }
     }
 
-#ifdef GNASH_USE_GC
-    /// Mark reachable resources (for the GC)
-    //
-    /// Reachable resources are:
-    ///  - the action target (_target)
-    ///
-    virtual void markReachableResources() const
-    {
-        if ( _target ) _target->setReachable();
-    }
-#endif // GNASU_USE_GC
-
 private:
-
-    DisplayObject* _target;
 
     BufferList _buffers;
 
@@ -170,7 +158,7 @@ public:
 
     QueuedEvent(DisplayObject* nTarget, const event_id& id)
         :
-        _target(nTarget),
+        ExecutableCode(nTarget),
         _eventId(id)
     {}
 
@@ -183,27 +171,13 @@ public:
     virtual void execute()
     {
         // don't execute any events for destroyed DisplayObject.
-        if( !_target->isDestroyed() )
+        if (!target()->isDestroyed() )
         {
-            _target->notifyEvent(_eventId);
+            target()->notifyEvent(_eventId);
         }
     }
 
-#ifdef GNASH_USE_GC
-    /// Mark reachable resources (for the GC)
-    //
-    /// Reachable resources are:
-    ///  - the action target (_target)
-    ///
-    virtual void markReachableResources() const
-    {
-        if ( _target ) _target->setReachable();
-    }
-#endif // GNASU_USE_GC
-
 private:
-
-    DisplayObject* _target;
 
     const event_id _eventId;
 
@@ -225,10 +199,12 @@ class DelayedFunctionCall : public ExecutableCode
 
 public:
 
-    DelayedFunctionCall(as_object* target, string_table::key name,
+    DelayedFunctionCall(DisplayObject* target,
+            as_object* obj, string_table::key name,
             const as_value& arg1, const as_value& arg2)
         :
-        _target(target),
+        ExecutableCode(target),
+        _obj(obj),
         _name(name),
         _arg1(arg1),
         _arg2(arg2)
@@ -242,7 +218,7 @@ public:
 
     virtual void execute()
     {
-        callMethod(_target, _name, _arg1, _arg2);
+        callMethod(_obj, _name, _arg1, _arg2);
     }
 
 #ifdef GNASH_USE_GC
@@ -251,17 +227,17 @@ public:
     /// Reachable resources are:
     ///  - the action target (_target)
     ///
-    virtual void markReachableResources() const
+    virtual void setReachable() const
     {
-      _target->setReachable();
-      _arg1.setReachable();
-      _arg2.setReachable();
+        _obj->setReachable();
+        _arg1.setReachable();
+        _arg2.setReachable();
     }
 #endif // GNASH_USE_GC
 
 private:
 
-    as_object* _target;
+    as_object* _obj;
     string_table::key _name;
     as_value _arg1, _arg2;
 
