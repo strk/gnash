@@ -86,27 +86,28 @@
 
 namespace gnash {
 
+// Forward declarations
 namespace {
     bool generate_mouse_button_events(movie_root& mr, MouseButtonState& ms);
     const DisplayObject* getNearestObject(const DisplayObject* o);
     as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
 }
 
-}
+// Utility classes
+namespace {
 
-namespace gnash {
-
-inline bool
-movie_root::testInvariant() const
+class FindTarget
 {
-    // TODO: fill this function !
-    // The _movies map can not invariantably
-    // be non-empty as the stage is autonomous
-    // itself
-    //assert( ! _movies.empty() );
+public:
+    FindTarget(DisplayObject* target) : _target(target) {}
+    bool operator()(ExecutableCode* c) const {
+        return _target == c->target();
+    }
+private:
+    DisplayObject* _target;
+};
 
-    return true;
-}
+} // anonymous namespace
 
 
 movie_root::movie_root(const movie_definition& def,
@@ -1539,27 +1540,18 @@ movie_root::processActionQueue()
 
 }
 
-struct FindDO
-{
-    FindDO(DisplayObject* target) : _target(target) {}
-    bool operator()(ExecutableCode* c) const {
-        return _target == c->target();
-    }
-private:
-    DisplayObject* _target;
-};
-
 void
 movie_root::removeFromActionQueue(DisplayObject* target)
 {
-    size_t st = _actionQueue[PRIORITY_CONSTRUCT].size();
 
-    _actionQueue[PRIORITY_CONSTRUCT].erase(
-            std::remove_if(_actionQueue[PRIORITY_CONSTRUCT].begin(),
-                _actionQueue[PRIORITY_CONSTRUCT].end(), FindDO(target)),
-                    _actionQueue[PRIORITY_CONSTRUCT].end());
+    ActionQueue& pr = _actionQueue[PRIORITY_CONSTRUCT];
+    
+    const size_t st = pr.size();
 
-    size_t sa = _actionQueue[PRIORITY_CONSTRUCT].size();
+    pr.erase(std::remove_if(pr.begin(), pr.end(), FindTarget(target)),
+            pr.end());
+
+    const size_t sa = pr.size();
 
     log_debug("%s items removed from ActionQueue (size now: %s)",
             st - sa, sa);
@@ -2420,6 +2412,18 @@ movie_root::LoadCallback::processLoad()
 
     // NOTE: Another data copy here !
     callMethod(_obj, NSV::PROP_ON_DATA, dataVal);
+
+    return true;
+}
+
+inline bool
+movie_root::testInvariant() const
+{
+    // TODO: fill this function !
+    // The _movies map can not invariantably
+    // be non-empty as the stage is autonomous
+    // itself
+    //assert( ! _movies.empty() );
 
     return true;
 }
