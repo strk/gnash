@@ -110,7 +110,7 @@ public:
 	}
 
 	// Inheritance from movie_definition requires this.
-	// we always return 1 so MovieClip::stagePlacementCallback
+	// we always return 1 so MovieClip::construct()
 	// doesn't skip our handling (TODO: check if it's correct to
 	// skip handling of 0-frames movies..).
 	size_t  get_loading_frame() const 

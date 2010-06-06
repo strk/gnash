@@ -66,9 +66,8 @@ Bitmap::bitmap() const
 }
 
 void
-Bitmap::stagePlacementCallback(as_object* initObj)
+Bitmap::construct(as_object* /*init*/)
 {
-    assert(!initObj);
     if (_bitmapData) _bitmapData->registerBitmap(this);
     update();
 }

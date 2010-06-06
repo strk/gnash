@@ -277,12 +277,12 @@ main(int argc, char** argv)
   check_equals(mo, "ri2[18].selected", "false");
 
   xcheck_equals(mo, "ri2[50].corner2y", "388.85");
-  xcheck_equals(mo, "ri2[50].corner2x", "154.55");
+  xcheck_equals(mo, "ri2[50].corner2x", "156.6");
   xcheck_equals(mo, "ri2[51].corner2y", "388.85");
-  xcheck_equals(mo, "ri2[51].corner2x", "161.9");
+  xcheck_equals(mo, "ri2[51].corner2x", "163.95");
 
-  check_equals(mo, "ri2[50].matrix_tx", "149.6");
-  check_equals(mo, "ri2[51].matrix_tx", "154.5");
+  check_equals(mo, "ri2[50].matrix_tx", "151.65");
+  check_equals(mo, "ri2[51].matrix_tx", "156.55");
 
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'object'");

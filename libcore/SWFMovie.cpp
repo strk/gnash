@@ -40,25 +40,23 @@ SWFMovie::SWFMovie(as_object* object, const SWFMovieDefinition* def,
 }
 
 void
-SWFMovie::stagePlacementCallback(as_object* initObj)
+SWFMovie::construct(as_object* /*init*/)
 {
 
-    assert (!initObj);
+    saveOriginalTarget();
 
-	saveOriginalTarget();
+    // Load first frame  (1-based index)
+    size_t nextframe = 1;
+    if ( !_def->ensure_frame_loaded(nextframe) )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror("Frame %d never loaded. Total frames: %d",
+                        nextframe, get_frame_count());
+        );
+    }
 
-	// Load first frame  (1-based index)
-	size_t nextframe = 1;
-	if ( !_def->ensure_frame_loaded(nextframe) )
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("Frame %d never loaded. Total frames: %d",
-		                nextframe, get_frame_count());
-		);
-	}
-
-	// Invoke parent placement event handler
-	MovieClip::stagePlacementCallback();  
+    // Invoke parent placement event handler
+    MovieClip::construct();  
 }
 
 // Advance of an SWF-defined movie instance

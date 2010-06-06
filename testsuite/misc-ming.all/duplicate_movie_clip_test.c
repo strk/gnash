@@ -35,6 +35,10 @@ main(int argc, char** argv)
   SWFDisplayItem it1, it2;
   SWFShape  sh_red;
 
+  /* For the button duplication test */
+  SWFButton but;
+  SWFButtonRecord br;
+
   const char *srcdir=".";
   if ( argc>1 ) 
     srcdir=argv[1];
@@ -116,7 +120,47 @@ main(int argc, char** argv)
   SWFDisplayItem_remove(it1);
   SWFDisplayItem_remove(it2);
   add_actions(mo, " dup2.removeMovieClip(); ");
+
   SWFMovie_nextFrame(mo); /* 4th frame */
+  
+  /* Create a button, add it to mc1 */
+  but = newSWFButton();
+  br = SWFButton_addCharacter(but, (SWFCharacter)sh_red, SWFBUTTON_UP);
+  SWFButtonRecord_setDepth(br, 10);
+  it1 = SWFMovie_add(mo, (SWFBlock)but);
+  SWFDisplayItem_setName(it1, "button");
+
+  /* Sanity check */
+  check_equals(mo, "typeof(button)", "'object'");
+
+  add_actions(mo,
+          "trace(button);"
+          "dupl = MovieClip.prototype.duplicateMovieClip;"
+          "button.dupl = dupl;"
+          "o = { x: 4 };"
+          "d = button.dupl('buttdup', 201, o);"
+          );
+  
+  xcheck_equals(mo, "typeof(d)", "'object'");
+  xcheck_equals(mo, "'' + _root.buttdup", "'_level0.buttdup'");
+  check_equals(mo, "_root.buttdup", "d");
+  
+  /* initobj not used */
+  check_equals(mo, "_root.buttdup.x", "undefined");
+  
+  add_actions(mo,
+          "t = new Object();"
+          "t.dupl = dupl;"
+          "o2 = { x: 44 };"
+          "d2 = t.dupl('objdup', 202, o2);"
+          "trace(_root.objdup);"
+          );
+
+  /* Does not work on plain objects */
+  check_equals(mo, "typeof(d2)", "'undefined'");
+  check_equals(mo, "typeof(_root.objdup)", "'undefined'");
+
+  SWFMovie_nextFrame(mo); /* 5th frame */
 
   check_equals(mo, "_root.x1", "2");
   check_equals(mo, "_root.x2", "3");

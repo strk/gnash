@@ -69,11 +69,10 @@ public:
 	/// Handle a top-level movie on stage placement.
 	//
 	/// This method will just ensure first frame is loaded
-	/// and then call MovieClip::stagePlacementCallback.
+	/// and then call MovieClip::construct
 	///
 	/// It's intended to be called by movie_root::setLevel().
-	///
-	void stagePlacementCallback(as_object* initObj = 0);
+    void construct(as_object* init = 0);
 
     const std::string& url() const {
         return _def->get_url();

@@ -63,6 +63,10 @@ main(int argc, char** argv)
 	const char *srcdir=".";
 	SWFMovieClip dejagnuclip;
 
+    SWFShape sh;
+    SWFButton but;
+    SWFButtonRecord br;
+
 
 	/*********************************************
 	 *
@@ -98,6 +102,22 @@ main(int argc, char** argv)
 	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
 	addRedSquareExport(mo);
+
+#if MING_VERSION_CODE >= 00040400
+    but = newSWFButton();
+
+    sh = make_fill_square (100, 300, 60, 60, 255, 0, 0, 0, 255, 0);
+    br = SWFButton_addCharacter(but, (SWFCharacter)sh, SWFBUTTON_UP);
+    SWFButtonRecord_setDepth(br, 12);
+    
+    sh = make_fill_square (100, 300, 60, 60, 255, 0, 0, 255, 0, 0);
+    br = SWFButton_addCharacter(but, (SWFCharacter)sh, SWFBUTTON_HIT);
+    br = SWFButton_addCharacter(but, (SWFCharacter)sh, SWFBUTTON_OVER);
+    SWFButtonRecord_setDepth(br, 10);
+
+    SWFMovie_addExport(mo, (SWFBlock)but, "butexp");
+    SWFMovie_writeExports(mo);
+#endif
 	/* it seems we need a SHOWFRAME for this to be effective */
 	/* (maybe it's related to loop-back handling ?) */
 	SWFMovie_nextFrame(mo); 
@@ -177,6 +197,27 @@ main(int argc, char** argv)
 
 	check_equals(mo, "square3._x", "210");
 
+	
+    SWFMovie_nextFrame(mo); /* showFrame */
+
+#if MING_VERSION_CODE >= 00040400
+
+    add_actions(mo,
+            "o = new Object();"
+            "o.f = 56;"
+            "ar = attachMovie('butexp', 'butatt', 5000, o);"
+            "trace(ar);"
+            "trace(butatt);"
+            "ar = attachMovie('redsquare', 'rs', 5001, o);"
+            "ar.t = 34;"
+            "butatt.s = 37;"
+            );
+
+    /* init object is not used for Buttons */
+    check_equals(mo, "butatt.f", "undefined");
+    check_equals(mo, "butatt.t", "undefined");
+    check_equals(mo, "butatt.s", "37");
+#endif
 	add_actions(mo, "totals(); stop();");
 
 	SWFMovie_nextFrame(mo); /* showFrame */
