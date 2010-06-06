@@ -71,7 +71,7 @@ public:
 
     virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
-    virtual void construct(as_object* init);
+    virtual void construct(as_object* init = 0);
 
 protected:
 
