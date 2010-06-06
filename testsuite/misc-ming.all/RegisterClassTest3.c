@@ -87,7 +87,8 @@ main(int argc, char** argv)
     add_actions(mo, "trace('frame 3');");
     
     // The class should not be constructed if the object is removed after
-    // being placed. It should be constructed if it's not removed.
+    // being placed. It should be constructed if it's not removed. MovieClips
+    // with an onUnload handler are always constructed.
     check(mo, "c == 0");
     check(mo, "_root.mc2 == undefined");
     add_actions(mo, "gotoAndStop(5);");
