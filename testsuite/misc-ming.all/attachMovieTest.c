@@ -103,7 +103,7 @@ main(int argc, char** argv)
 
 	addRedSquareExport(mo);
 
-#if MING_VERSION_CODE >= 00040300
+#if MING_VERSION_CODE >= 00040400
     but = newSWFButton();
 
     sh = make_fill_square (100, 300, 60, 60, 255, 0, 0, 0, 255, 0);
@@ -197,10 +197,10 @@ main(int argc, char** argv)
 
 	check_equals(mo, "square3._x", "210");
 
-#if MING_VERSION_CODE >= 00040300
 	
     SWFMovie_nextFrame(mo); /* showFrame */
 
+#if MING_VERSION_CODE >= 00040400
 
     add_actions(mo,
             "o = new Object();"
