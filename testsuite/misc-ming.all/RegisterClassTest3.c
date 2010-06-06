@@ -13,7 +13,7 @@ main(int argc, char** argv)
 {
     SWFMovie mo;
     SWFMovieClip mc3, mc2, dejagnuclip;
-    SWFAction ac, ac1;
+    SWFAction ac, ac1, initac;
     SWFDisplayItem it;
     SWFShape sha;
 
@@ -29,6 +29,7 @@ main(int argc, char** argv)
     SWFMovie_setDimension(mo, 800, 600);
     SWFMovie_setRate (mo, 12.0);
 
+
     sha = newSWFShape();
 
     // Character ID 2. Has 1 showframe. Is exported first.
@@ -41,7 +42,8 @@ main(int argc, char** argv)
     SWFMovie_writeExports(mo);
 
     // Main timeline actions for frame 1
-    add_actions(mo, "var c = 0; trace('frame 1'); gotoAndStop(3);");
+    add_actions(mo, "var c = 0; var i = 0; trace('frame 1'); gotoAndStop(3);");
+    initac = newSWFAction("trace('onInitialize'); _root.i++;");
     
     // ID 3 is defined here. It has no showframe. It is exported immediately.
     mc3 = newSWFMovieClip();
@@ -77,6 +79,7 @@ main(int argc, char** argv)
     // Place object ID 2.
     it = SWFMovie_add(mo, (SWFBlock)mc2);
     SWFDisplayItem_setName(it, "mc2");
+    SWFDisplayItem_addAction(it, initac, SWFACTION_INIT);
 
     // Frame 3
     SWFMovie_nextFrame(mo);
@@ -89,9 +92,10 @@ main(int argc, char** argv)
     // The class should not be constructed if the object is removed after
     // being placed. It should be constructed if it's not removed. MovieClips
     // with an onUnload handler are always constructed.
-    check(mo, "c == 0");
+    check_equals(mo, "c", "0");
+    check_equals(mo, "i", "0");
     check(mo, "_root.mc2 == undefined");
-    add_actions(mo, "gotoAndStop(5);");
+    add_actions(mo, "gotoAndPlay(5);");
 
     // Frame 4
     SWFMovie_nextFrame(mo);
@@ -100,6 +104,7 @@ main(int argc, char** argv)
     // Place object ID 2 again
     it = SWFMovie_add(mo, (SWFBlock)mc2);
     SWFDisplayItem_setName(it, "mc2a");
+    SWFDisplayItem_addAction(it, initac, SWFACTION_INIT);
 
     // Frame 5
     SWFMovie_nextFrame(mo);
@@ -108,8 +113,10 @@ main(int argc, char** argv)
     // so it should be present and the constructor should be
     // called.
     add_actions(mo, "trace('frame 5');");
-    check(mo, "c == 1");
+    check_equals(mo, "c", "1");
+    check_equals(mo, "i", "1");
     check(mo, "typeof(_root.mc2a) == 'movieclip'");
+    add_actions(mo, "stop();");
 
     SWFMovie_nextFrame(mo);
   
