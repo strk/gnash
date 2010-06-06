@@ -54,11 +54,12 @@ main(int argc, char** argv)
     		    0, 0, 800, 600);
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
-    // Init actions for ID 3
+    // Init actions for ID 3. This only exists to create the constructor
+    // for mc2 in its initactions.
     ac = newSWFAction(
     "   _global.ctor = function () {"
     "       super();"
-    "       trace('Object ID 3 is constructed');"
+    "       trace('Object ID 2 is constructed');"
     "       c += 1;"
     "   };"
     );
