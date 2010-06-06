@@ -1539,6 +1539,32 @@ movie_root::processActionQueue()
 
 }
 
+struct FindDO
+{
+    FindDO(DisplayObject* target) : _target(target) {}
+    bool operator()(ExecutableCode* c) const {
+        return _target == c->target();
+    }
+private:
+    DisplayObject* _target;
+};
+
+void
+movie_root::removeFromActionQueue(DisplayObject* target)
+{
+    size_t st = _actionQueue[PRIORITY_CONSTRUCT].size();
+
+    _actionQueue[PRIORITY_CONSTRUCT].erase(
+            std::remove_if(_actionQueue[PRIORITY_CONSTRUCT].begin(),
+                _actionQueue[PRIORITY_CONSTRUCT].end(), FindDO(target)),
+                    _actionQueue[PRIORITY_CONSTRUCT].end());
+
+    size_t sa = _actionQueue[PRIORITY_CONSTRUCT].size();
+
+    log_debug("%s items removed from ActionQueue (size now: %s)",
+            st - sa, sa);
+}
+
 void
 movie_root::pushAction(std::auto_ptr<ExecutableCode> code, size_t lvl)
 {

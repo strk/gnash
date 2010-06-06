@@ -101,7 +101,7 @@ public:
 
     explicit ConstructEvent(MovieClip* nTarget)
         :
-        _target(nTarget)
+        ExecutableCode(nTarget)
     {}
 
 
@@ -112,24 +112,8 @@ public:
 
     virtual void execute()
     {
-        _target->constructAsScriptObject();
+        static_cast<MovieClip*>(target())->constructAsScriptObject();
     }
-
-#ifdef GNASH_USE_GC
-    /// Mark reachable resources (for the GC)
-    //
-    /// Reachable resources are:
-    ///    - the action target (_target)
-    ///
-    virtual void markReachableResources() const
-    {
-        _target->setReachable();
-    }
-#endif // GNASH_USE_GC
-
-private:
-
-    MovieClip* _target;
 
 };
 
@@ -1287,6 +1271,13 @@ MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag,
 {
     set_invalidated();
     dlist.removeDisplayObject(tag->getDepth());
+}
+
+void
+MovieClip::remove_display_object(int depth, int)
+{
+    set_invalidated();
+    _displayList.removeDisplayObject(depth);
 }
 
 void

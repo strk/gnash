@@ -56,7 +56,7 @@ main(int argc, char** argv)
     ac = newSWFAction(
     "   _global.ctor = function () {"
     "       super();"
-    "       trace('Object in Frame 2 is constructed');"
+    "       trace('Object ID 3 is constructed');"
     "       c += 1;"
     "   };"
     );
@@ -88,7 +88,7 @@ main(int argc, char** argv)
     
     // The class should not be constructed if the object is removed after
     // being placed. It should be constructed if it's not removed.
-    xcheck(mo, "c == 0");
+    check(mo, "c == 0");
     check(mo, "_root.mc2 == undefined");
     add_actions(mo, "gotoAndStop(5);");
 
@@ -107,7 +107,7 @@ main(int argc, char** argv)
     // so it should be present and the constructor should be
     // called.
     add_actions(mo, "trace('frame 5');");
-    xcheck(mo, "c == 1");
+    check(mo, "c == 1");
     check(mo, "typeof(_root.mc2a) == 'movieclip'");
 
     SWFMovie_nextFrame(mo);

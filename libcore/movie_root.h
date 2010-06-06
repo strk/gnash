@@ -930,6 +930,8 @@ public:
     std::string callExternalCallback(const std::string &name, 
                                      const std::vector<as_value>& args);
 
+    void removeFromActionQueue(DisplayObject* target);
+
 private:
 
     /// Set the root movie, replacing the current one if any.
