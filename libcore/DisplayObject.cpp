@@ -481,7 +481,7 @@ DisplayObject::unload()
 
 	const bool hasEvent = hasEventHandler(event_id::UNLOAD);
 
-    if (!hasEvent) stage().removeFromActionQueue(this);
+    if (!hasEvent) stage().removeQueuedConstructor(this);
 
 	_unloaded = true;
 

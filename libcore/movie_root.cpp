@@ -1541,7 +1541,7 @@ movie_root::processActionQueue()
 }
 
 void
-movie_root::removeFromActionQueue(DisplayObject* target)
+movie_root::removeQueuedConstructor(DisplayObject* target)
 {
 
     ActionQueue& pr = _actionQueue[PRIORITY_CONSTRUCT];

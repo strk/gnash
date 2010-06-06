@@ -930,7 +930,13 @@ public:
     std::string callExternalCallback(const std::string &name, 
                                      const std::vector<as_value>& args);
 
-    void removeFromActionQueue(DisplayObject* target);
+    /// Removes a queued constructor from the execution queue
+    //
+    /// This is used to prevent construction of targets that are placed and
+    /// then removed in skipped frames. Callers are responsible for determining
+    /// whether it should be removed, for instance by checking for an 
+    /// onUnload handler.
+    void removeQueuedConstructor(DisplayObject* target);
 
 private:
 
