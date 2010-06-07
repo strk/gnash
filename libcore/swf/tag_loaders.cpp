@@ -51,6 +51,7 @@
 #include "MovieFactory.h"
 #include "RunResources.h"
 #include "Renderer.h"
+#include "Movie.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -797,6 +798,72 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
 // export
 //
 
+class ExportTag : public ControlTag
+{
+public:
+
+    typedef std::vector<std::string> Exports;
+
+    ExportTag(SWFStream& in, movie_definition& m)
+    {
+        read(in, m);
+    }
+
+    // TODO: use Movie to store the actual exports.
+    virtual void executeState(MovieClip* m, DisplayList& /*l*/) const {
+        Movie* mov = m->get_root();
+        for (Exports::const_iterator it = _exports.begin(), e = _exports.end();
+                it != e; ++it) {
+            log_debug("Exporting %s", *it);
+            const_cast<movie_definition*>(mov->definition())->exportResource(*it);
+        }
+    }
+
+private:
+    void read(SWFStream& in, movie_definition& m) {
+        
+        // An EXPORT tag as part of a DEFINESPRITE
+        // would be a malformed SWF, anyway to be compatible
+        // we should still allow that. See bug #22468.
+        IF_VERBOSE_MALFORMED_SWF(
+            try {
+                dynamic_cast<SWFMovieDefinition&>(m);
+            }
+            catch (std::bad_cast& e) {
+                log_swferror(_("EXPORT tag inside DEFINESPRITE. Will export in "
+                        "top-level symbol table."));
+            }
+        );
+
+        in.ensureBytes(2);
+        const boost::uint16_t count = in.read_u16();
+
+        IF_VERBOSE_PARSE(
+            log_parse(_("  export: count = %d"), count);
+        );
+
+        // Read the exports.
+        for (size_t i = 0; i < count; ++i) {
+            in.ensureBytes(2);
+            boost::uint16_t id = in.read_u16();
+            std::string symbolName;
+            in.read_string(symbolName);
+
+            IF_VERBOSE_PARSE (
+                log_parse(_("  export: id = %d, name = %s"), id, symbolName);
+            );
+
+            // Register export with global map
+            m.registerExport(symbolName, id);
+
+            // Store export for later execution.
+            _exports.push_back(symbolName);
+        }
+
+    }
+private:
+    Exports _exports;
+};
 
 // Load an export tag (for exposing internal resources of m)
 void export_loader(SWFStream& in, TagType tag, movie_definition& m,
@@ -804,124 +871,129 @@ void export_loader(SWFStream& in, TagType tag, movie_definition& m,
 {
     assert(tag == SWF::EXPORTASSETS); // 56
 
-    in.ensureBytes(2);
-    const boost::uint16_t count = in.read_u16();
-
-    IF_VERBOSE_PARSE(
-        log_parse(_("  export: count = %d"), count);
-    );
-
-    // An EXPORT tag as part of a DEFINESPRITE
-    // would be a malformed SWF, anyway to be compatible
-    // we should still allow that. See bug #22468.
-    IF_VERBOSE_MALFORMED_SWF(
-        try {
-            dynamic_cast<SWFMovieDefinition&>(m);
-        }
-        catch (std::bad_cast& e) {
-            log_swferror(_("EXPORT tag inside DEFINESPRITE. Will export in "
-                    "top-level symbol table."));
-        }
-    );
-
-    // Read the exports.
-    for (size_t i = 0; i < count; ++i) {
-        in.ensureBytes(2);
-        boost::uint16_t id = in.read_u16();
-        std::string symbolName;
-        in.read_string(symbolName);
-
-        IF_VERBOSE_PARSE (
-            log_parse(_("  export: id = %d, name = %s"), id, symbolName);
-        );
-
-        m.exportResource(symbolName, id);
-
-    }
+    std::auto_ptr<ControlTag> t(new ExportTag(in, m));
+    m.addControlTag(t.release());
 }
-
 
 //
 // import
 //
 
+class ImportTag : public ControlTag
+{
+public:
+
+    typedef std::pair<int, std::string> Import;
+    typedef std::vector<Import> Imports;
+
+    ImportTag(TagType t, SWFStream& in, movie_definition& m,
+            const RunResources& r)
+    {
+        read(t, in, m, r);
+    }
+
+    virtual void executeState(MovieClip* m, DisplayList& /*l*/) const {
+        log_debug("Importing resources");
+        Movie* mov = m->get_root();
+        const_cast<movie_definition*>(mov->definition())->importResources(
+                _movie, _imports);
+    }
+
+private:
+
+    void read(TagType t, SWFStream& in, movie_definition& m,
+            const RunResources& r) {
+
+        std::string source_url;
+        in.read_string(source_url);
+
+        // Resolve relative urls against baseurl
+        URL abs_url(source_url, r.baseURL());
+
+        unsigned char import_version = 0;
+
+        if (t == SWF::IMPORTASSETS2) {
+            in.ensureBytes(2);
+            import_version = in.read_uint(8);
+            boost::uint8_t reserved = in.read_uint(8);
+            UNUSED(reserved);
+        }
+
+        in.ensureBytes(2);
+        const boost::uint16_t count = in.read_u16();
+
+        IF_VERBOSE_PARSE(
+            log_parse(_("  import: version = %u, source_url = %s (%s), "
+                "count = %d"), import_version, abs_url.str(), source_url,
+                count);
+        );
+
+        // Try to load the source movie into the movie library.
+        boost::intrusive_ptr<movie_definition> source_movie;
+
+        try {
+            _movie = MovieFactory::makeMovie(abs_url, r);
+        }
+        catch (gnash::GnashException& e) {
+            log_error(_("Exception: %s"), e.what());
+        }
+
+        if (!_movie) {
+            // Give up on imports.
+            log_error(_("can't import movie from url %s"), abs_url.str());
+            return;
+        }
+
+        // Quick consistency check, we might as well do
+        // something smarter, if we agree on semantic
+        if (_movie == &m) {
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("Movie attempts to import symbols from "
+                        "itself."));
+            );
+            return;
+        }
+        
+        // Get the imports.
+        for (size_t i = 0; i < count; ++i)
+        {
+            in.ensureBytes(2);
+            const boost::uint16_t id = in.read_u16();
+            std::string symbolName;
+            in.read_string(symbolName);
+            IF_VERBOSE_PARSE (
+                log_parse(_("  import: id = %d, name = %s"), id, symbolName);
+            );
+            _imports.push_back(std::make_pair(id, symbolName));
+        }
+        // An EXPORT tag as part of a DEFINESPRITE
+        // would be a malformed SWF, anyway to be compatible
+        // we should still allow that. See bug #22468.
+        IF_VERBOSE_MALFORMED_SWF(
+            try {
+                dynamic_cast<SWFMovieDefinition&>(m);
+            }
+            catch (std::bad_cast& e) {
+                log_swferror(_("EXPORT tag inside DEFINESPRITE. Will export in "
+                        "top-level symbol table."));
+            }
+        );
+    }
+
+    boost::intrusive_ptr<movie_definition> _movie;
+
+    mutable Imports _imports;
+
+};
 
 void import_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunResources& r)
 {
     assert(tag == SWF::IMPORTASSETS || tag == SWF::IMPORTASSETS2);
 
-    std::string source_url;
-    in.read_string(source_url);
-
-    // Resolve relative urls against baseurl
-    URL abs_url(source_url, r.baseURL());
-
-    unsigned char import_version = 0;
-
-    if ( tag == SWF::IMPORTASSETS2 )
-    {
-        in.ensureBytes(2);
-        import_version = in.read_uint(8);
-        unsigned char reserved = in.read_uint(8);
-        UNUSED(reserved);
-    }
-
-    in.ensureBytes(2);
-    int count = in.read_u16();
-
-    IF_VERBOSE_PARSE
-    (
-        log_parse(_("  import: version = %u, source_url = %s (%s), count = %d"),
-            import_version, abs_url.str(), source_url, count);
-    );
-
-
-    // Try to load the source movie into the movie library.
-    boost::intrusive_ptr<movie_definition> source_movie;
-
-    try {
-        source_movie = MovieFactory::makeMovie(abs_url, r);
-    }
-    catch (gnash::GnashException& e) {
-        log_error(_("Exception: %s"), e.what());
-    }
-
-    if (!source_movie)
-    {
-        // Give up on imports.
-        log_error(_("can't import movie from url %s"), abs_url.str());
-        return;
-    }
-
-    // Quick consistency check, we might as well do
-    // something smarter, if we agree on semantic
-    if (source_movie == &m)
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Movie attempts to import symbols from itself."));
-        );
-        return;
-    }
-
-    movie_definition::Imports imports;
-
-    // Get the imports.
-    for (int i = 0; i < count; i++)
-    {
-        in.ensureBytes(2);
-        boost::uint16_t    id = in.read_u16();
-        std::string symbolName;
-        in.read_string(symbolName);
-        IF_VERBOSE_PARSE (
-            log_parse(_("  import: id = %d, name = %s"), id, symbolName);
-        );
-        imports.push_back( std::make_pair(id, symbolName) );
-    }
-
-    m.importResources(source_movie, imports);
+    std::auto_ptr<ControlTag> t(new ImportTag(tag, in, m, r));
+    m.addControlTag(t.release());
 }
-
 
 //
 // Sound

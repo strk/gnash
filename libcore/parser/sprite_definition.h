@@ -23,6 +23,7 @@
 
 
 #include <boost/intrusive_ptr.hpp>
+#include <boost/cstdint.hpp>
 #include <string>
 #include <map>
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -196,10 +197,18 @@ public:
 
 
 	/// Delegate call to associated root movie
-	virtual void exportResource(const std::string& sym, int id)
+	virtual void exportResource(const std::string& sym)
 	{
-		m_movie_def.exportResource(sym, id);
+		m_movie_def.exportResource(sym);
 	}
+    
+    virtual boost::uint16_t exportID(const std::string& symbol) const {
+        return m_movie_def.exportID(symbol);
+    }
+    
+    virtual void registerExport(const std::string& s, boost::uint16_t id) {
+        m_movie_def.registerExport(s, id);
+    }
 
 	/// Delegate call to associated root movie
 	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(

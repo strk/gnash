@@ -245,7 +245,7 @@ public:
     }
 
     // See docs in movie_definition.h
-    virtual void exportResource(const std::string& symbol, int id);
+    virtual void exportResource(const std::string& symbol);
 
     /// Get the named exported resource, if we expose it.
     //
@@ -446,6 +446,17 @@ private:
             StringNoCaseLessThan > ExportMap;
 
     ExportMap _exportedResources;
+
+    void registerExport(const std::string& symbol, boost::uint16_t id);
+
+    boost::uint16_t exportID(const std::string& symbol) const;
+
+    /// This is the real export map
+    //
+    /// It maps string to character ID as parsed.
+    typedef std::map<std::string, boost::uint16_t> Exports;
+
+    Exports _exportMap;
 
     // Mutex protecting access to _exportedResources
     mutable boost::mutex _exportedResourcesMutex;

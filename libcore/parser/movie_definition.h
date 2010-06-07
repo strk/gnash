@@ -59,6 +59,7 @@
 #include <vector> // for PlayList typedef
 #include <set>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/cstdint.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -405,9 +406,15 @@ public:
 	///
 	/// The default implementation is a no-op
 	///
-	virtual void exportResource(const std::string& /*symbol*/, int /*id*/)
+	virtual void exportResource(const std::string& /*symbol*/)
 	{
 	}
+
+    virtual void registerExport(const std::string&, boost::uint16_t) {}
+    
+    virtual boost::uint16_t exportID(const std::string& symbol) const {
+        return 0;
+    }
 
     /// Set whether the SWFMovie should use AVM2 or AVM1.
     //
