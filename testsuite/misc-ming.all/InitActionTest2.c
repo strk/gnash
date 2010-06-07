@@ -43,6 +43,11 @@ main(int argc, char** argv)
     ia = newSWFInitAction_withId(
             newSWFAction("trace('mc4'); _global.val4 = 'mc4';"), 4);
     SWFMovie_add(mo, (SWFBlock)ia);
+    
+    // InitActions for non-existent ID 25 parsed here:
+    ia = newSWFInitAction_withId(
+            newSWFAction("fail('InitActions executed for bogus id');"), 25);
+    SWFMovie_add(mo, (SWFBlock)ia);
 
     // Check in first frame:
     check(mo, "_global.val4 == undefined");
