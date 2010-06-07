@@ -81,10 +81,19 @@ public:
             return;
         }
 
-        // Tags should only be executed for already parsed character ids.
+        // TODO: Currently, tags are only be executed for already parsed
+        // character ids. This is known to be wrong: a more accurate
+        // description is:
         //
-        // If this is true, there is no need to parse or store the tag. If
-        // it's not true, this check will have to be done at runtime.
+        // The DoInitAction tag is executed only for characters on the stage
+        // or exported characters. It is only executed once.
+        //
+        // It's not known whether characters that were placed on the stage
+        // but then removed before the InitAction tag is encountered cause
+        // the actions to be executed.
+        //
+        // Gnash currently doesn't know which characters are on the stage, or
+        // which IDs have been exported.
         DoInitActionTag* da = new DoInitActionTag(in, m, cid);
 
         IF_VERBOSE_PARSE(
