@@ -85,16 +85,6 @@ public:
 	}
 
 	long	get_ref_count() const { return m_ref_count; }
-
-	// These two methods are defined as a temporary hack to 
-	// easy transition to the GC model. Was added when introducing
-	// mixed ref-counted AND gc-collected classes to avoid touching
-	// all ref-counted classes when GNASH_USE_GC is defined.
-	// If this design convinces us we'll be removing these two
-	// methods and all the calls from ref-counted classes.
-	//
-	void setReachable() const { assert(m_ref_count > 0); }
-	bool isReachable() const { return true; }
 };
 
 } // namespace gnash

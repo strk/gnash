@@ -26,22 +26,11 @@
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
 
-// Define the following macro to use garbage collecting rather
-// then ref-counting. Currenlty this would make ref_counted
-// derive from GcResource and intrusive_ptr never really messing
-// with the stored pointer (not calling add_ref/drop_ref, which would
-// be not defined for ref_counted.
-// Is is a temporary hack to allow quick switch between GC and REFCOUNT
-// mechanism till the GC is stable
-//
-#define GNASH_USE_GC 1
-
-// TODO: if GNASH_USE_GC is defined have smart_ptr map to intrusive_ptr
-//       else have it map to gc_ptr (yet to be defined)
-
 #include "ref_counted.h"
-
 #include <typeinfo>
+
+// TODO: drop all users of this macro, we _are_ using GC now
+#define GNASH_USE_GC 1
 
 namespace gnash {
     class GcResource;
@@ -73,16 +62,7 @@ intrusive_ptr_release(const ref_counted* o)
 inline void intrusive_ptr_add_ref(const GcResource* ) { }
 inline void intrusive_ptr_release(const GcResource* ) { }
 
-#ifdef GNASH_USE_GC
-class as_object;
-inline void intrusive_ptr_add_ref(const as_object* ) { }
-inline void intrusive_ptr_release(const as_object* ) { }
-#endif
-
-// The below thing won't work. We'll need a real templated class..
-//template <typename C> typedef C* gc_ptr;
-
-} 
+} // namespace boost||gnash 
 
 
 #endif // SMART_PTR_H

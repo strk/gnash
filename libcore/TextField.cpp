@@ -2640,13 +2640,6 @@ TextField::killFocus()
 }
 
 void
-TextField::markOwnResources() const
-{
-    if (_tag) _tag->setReachable();
-    if (_font) _font->setReachable();
-}
-
-void
 TextField::setWidth(double newwidth)
 {
 	const SWFRect& bounds = getBounds();

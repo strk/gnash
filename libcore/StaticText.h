@@ -98,16 +98,6 @@ public:
         return _selectionColor;
     }
 
-protected:
-
-#ifdef GNASH_USE_GC
-	/// Mark reachable resources (for the GC)
-	void markReachableResources() const
-	{
-        _def->setReachable();
-	}
-#endif
-
 private:
 
     const boost::intrusive_ptr<const SWF::DefineTextTag> _def;

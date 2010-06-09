@@ -2122,7 +2122,6 @@ MovieClip::cleanupDisplayList()
     cleanup_textfield_variables();
 }
 
-#ifdef GNASH_USE_GC
 struct ReachableMarker {
     void operator() (DisplayObject *ch)
     {
@@ -2137,9 +2136,6 @@ MovieClip::markOwnResources() const
     _displayList.visitAll(marker);
 
     _environment.markReachableResources();
-
-    // Mark our own definition
-    if (_def.get()) _def->setReachable();
 
     // Mark textfields in the TextFieldIndex
     if ( _text_variables.get() )
@@ -2158,7 +2154,6 @@ MovieClip::markOwnResources() const
     _swf->setReachable();
 
 }
-#endif // GNASH_USE_GC
 
 void
 MovieClip::destroy()

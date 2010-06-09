@@ -64,16 +64,6 @@ public:
         return _shape;
     }
 
-protected:
-
-#ifdef GNASH_USE_GC
-	/// Mark reachable resources (for the GC)
-	void markReachableResources() const
-	{
-        _def->setReachable();
-	}
-#endif
-
 private:
     
     void morph();
