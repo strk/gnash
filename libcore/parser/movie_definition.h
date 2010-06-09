@@ -412,7 +412,7 @@ public:
 
     virtual void registerExport(const std::string&, boost::uint16_t) {}
     
-    virtual boost::uint16_t exportID(const std::string& symbol) const {
+    virtual boost::uint16_t exportID(const std::string& /*symbol*/) const {
         return 0;
     }
 
