@@ -631,13 +631,6 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
     // Don't call get_exported_resource() from this movie loader
     assert( ! _loader.isSelfThread() );
 
-    // we query the loaded frame count before looking
-    // up the exported resources map because while
-    // we query the loader keeps parsing more frames.
-    // and we don't want to giveup w/out having queried
-    // up to the last frame.
-    //size_t new_loading_frame = get_loading_frame();
-
     ExportMap::const_iterator it = _exportedResources.find(symbol);
     if (it != _exportedResources.end()) {
 #ifdef DEBUG_EXPORTS
