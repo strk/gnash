@@ -305,7 +305,10 @@ object_registerClass(const fn_call& fn)
     assert(relRoot);
     const movie_definition* def = relRoot->definition();
     
-    ExportableResource* exp_res = def->get_exported_resource(symbolid).get();
+    const boost::uint16_t id = def->exportID(symbolid);
+    ExportableResource* exp_res =
+        static_cast<ExportableResource*>(def->getDefinitionTag(id));
+
     if (!exp_res) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Object.registerClass(%s, %s): "

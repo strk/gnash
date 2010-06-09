@@ -590,6 +590,7 @@ void
 SWFMovieDefinition::registerExport(const std::string& symbol,
         boost::uint16_t id) {
     boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+    log_debug("%s registering export %s, %s", get_url(), symbol, id);
     _exportMap[symbol] = id;
 }
 
@@ -630,110 +631,21 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
     // Don't call get_exported_resource() from this movie loader
     assert( ! _loader.isSelfThread() );
 
-    // Keep trying until either we found the export or
-    // the stream is over, or there is NO frames progress
-    // after def_timeout microseconds.
-    //
-    // Note that the NO frame progress might be due
-    // to a circular import chain:
-    //
-    //     A imports B imports A
-    //
+    // we query the loaded frame count before looking
+    // up the exported resources map because while
+    // we query the loader keeps parsing more frames.
+    // and we don't want to giveup w/out having queried
+    // up to the last frame.
+    //size_t new_loading_frame = get_loading_frame();
 
-    // Sleep 1/2 of a second between checks
-    // NOTE: make sure the nap is enough time for
-    //       thread execution switch !!
-    //const unsigned long naptime=500000;
-
-    // Timeout after two seconds of NO frames progress
-    //const unsigned long timeout_ms=2000000;
-    //const unsigned long def_timeout=timeout_ms/naptime; 
-
-    //unsigned long timeout=def_timeout;
-    //size_t loading_frame = (size_t)-1; // used to keep track of advancements
-
-#if 0
-
-    for(;;)
-    {
-#endif
-        // we query the loaded frame count before looking
-        // up the exported resources map because while
-        // we query the loader keeps parsing more frames.
-        // and we don't want to giveup w/out having queried
-        // up to the last frame.
-        //size_t new_loading_frame = get_loading_frame();
-
-        // _exportedResources access is thread-safe
-        {
-            ExportMap::const_iterator it = _exportedResources.find(symbol);
-            if ( it != _exportedResources.end() )
-            {
+    ExportMap::const_iterator it = _exportedResources.find(symbol);
+    if (it != _exportedResources.end()) {
 #ifdef DEBUG_EXPORTS
-                log_debug(" resource found, loading frame:%u", new_loading_frame);
+        log_debug(" resource found, loading frame:%u", new_loading_frame);
 #endif
-                return it->second;
-            }
-        }
-#if 0
-        // We checked last (or past-last) advertised frame. 
-        // TODO: this check should really be for a parser
-        //       process being active or not, as SWF
-        //       might advertise less frames then actually
-        //       found in it...
-        //
-        if (new_loading_frame >= m_frame_count) {
-            // Update of loading_frame is
-            // really just for the latter debugging output
-            loading_frame = new_loading_frame;
-            break;
-        }
-
-        // There's more frames to parse, go ahead
-        // TODO: this is still based on *advertised*
-        //       number of frames, if SWF advertises
-        //       more then actually found we'd be
-        //       keep trying till timeout, see the
-        //       other TODO above.
-
-        // We made frame progress since last iteration
-        // so sleep some and try again
-        if (new_loading_frame != loading_frame) {
-#ifdef DEBUG_EXPORTS
-            log_debug(_("looking for exported resource: frame load "
-                        "advancement (from %d to %d)"),
-                loading_frame, new_loading_frame);
-#endif
-            loading_frame = new_loading_frame;
-            timeout = def_timeout+1;
-        }
-        else if (!--timeout) {
-            // no progress since last run, and 
-            // timeout reached: give up
-            break;
-        }
-
-        // take a breath to give other threads more time to advance
-        gnashSleep(naptime);
-
+        return it->second;
     }
-
-    // timed out
-    if (!timeout) {
-        log_error("Timeout (%d milliseconds) seeking export symbol %s in "
-                "movie %s. Frames loaded %d/%d", timeout_ms / 1000, symbol,
-                _url, loading_frame, m_frame_count);
-    }
-    else {
-        // eof
-        assert(loading_frame >= m_frame_count);
-        log_error("No export symbol %s found in movie %s. "
-            "Frames loaded %d/%d",
-            symbol, _url, loading_frame, m_frame_count);
-        //abort();
-    }
-#endif
-    return boost::intrusive_ptr<ExportableResource>(0); // 0
+    return boost::intrusive_ptr<ExportableResource>(0);
 
 }
 
@@ -766,9 +678,7 @@ SWFMovieDefinition::markReachableResources() const
     markMappedResources(m_sound_samples);
 
     // Mutex scope.
-    {
-        markMappedResources(_exportedResources);
-    }
+    markMappedResources(_exportedResources);
 
     std::for_each(m_import_source_movies.begin(), m_import_source_movies.end(),
            boost::mem_fn(&movie_definition::setReachable));
@@ -778,6 +688,7 @@ SWFMovieDefinition::markReachableResources() const
 
 }
 #endif // GNASH_USE_GC
+
 boost::uint16_t
 SWFMovieDefinition::exportID(const std::string& symbol) const
 {
@@ -791,7 +702,6 @@ SWFMovieDefinition::importResources(
         boost::intrusive_ptr<movie_definition> source, Imports& imports)
 {
     size_t importedSyms = 0;
-        
 
     // Mutex scope.
 
@@ -800,29 +710,26 @@ SWFMovieDefinition::importResources(
     
         size_t new_loading_frame = source->get_loading_frame();
         
-        // Sleep 1/2 of a second between checks
-        // NOTE: make sure the nap is enough time for
-        //       thread execution switch !!
-        const unsigned long naptime=500000;
+        // 0.1 seconds.
+        const size_t naptime = 100000;
 
         // Timeout after two seconds of NO frames progress
-        const unsigned long timeout_ms=2000000;
-        const unsigned long def_timeout=timeout_ms/naptime; 
+        const size_t timeout_ms = 2000000;
+        const size_t def_timeout = timeout_ms / naptime; 
 
-        unsigned long timeout=def_timeout;
+        size_t timeout = def_timeout;
         size_t loading_frame = (size_t)-1; // used to keep track of advancements
-
 
         const int id = i->first;
         const std::string& symbolName = i->second;
 
-        boost::uint16_t targetID = 0;
+        log_debug("%s importing %s from %s", get_url(), symbolName,
+                source->get_url());
 
-        // Wait for a bit.
-        while(!targetID) {
+        boost::uint16_t targetID;
+
+        while(!(targetID = source->exportID(symbolName))) {
             
-            targetID = source->exportID(symbolName);
-
             // We checked last (or past-last) advertised frame. 
             // TODO: this check should really be for a parser
             //       process being active or not, as SWF
@@ -868,9 +775,9 @@ SWFMovieDefinition::importResources(
         // timed out
         if (!timeout) {
             log_error("Timeout (%d milliseconds) seeking export "
-                    "symbol %s in movie %s. Frames loaded %d/%d",
-                    timeout_ms / 1000, symbolName,
-                    _url, loading_frame, source->get_frame_count());
+                "symbol %s in movie %s. Frames loaded %d/%d",
+                timeout_ms / 1000, symbolName,
+                source->get_url(), loading_frame, source->get_frame_count());
             continue;
         }
         else {
@@ -878,9 +785,11 @@ SWFMovieDefinition::importResources(
             //assert(loading_frame >= m_frame_count);
             log_error("No export symbol %s found in movie %s. "
                 "Frames loaded %d/%d",
-                symbolName, _url, loading_frame, source->get_frame_count());
+                symbolName, source->get_url(), loading_frame,
+                source->get_frame_count());
         }
 
+        // Export!
         // TODO: can this be anything else?
         boost::intrusive_ptr<ExportableResource> res =
             dynamic_cast<ExportableResource*>(source->getDefinitionTag(targetID));
@@ -895,6 +804,7 @@ SWFMovieDefinition::importResources(
         log_debug("Exporting symbol %s imported from source %s",
             symbolName, source->get_url());
 #endif
+        registerExport(symbolName, id);
         _exportedResources[symbolName] = res.get();
 
         if (Font* f = dynamic_cast<Font*>(res.get())) {

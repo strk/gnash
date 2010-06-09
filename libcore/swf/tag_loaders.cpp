@@ -978,6 +978,7 @@ private:
                         "top-level symbol table."));
             }
         );
+        m.importResources(_movie, _imports);
     }
 
     boost::intrusive_ptr<movie_definition> _movie;
