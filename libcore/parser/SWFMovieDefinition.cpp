@@ -789,10 +789,9 @@ SWFMovieDefinition::importResources(
                 source->get_frame_count());
         }
 
-        // Export!
         // TODO: can this be anything else?
         boost::intrusive_ptr<ExportableResource> res =
-            dynamic_cast<ExportableResource*>(source->getDefinitionTag(targetID));
+            source->getDefinitionTag(targetID);
 
         if (!res) {
             log_error(_("import error: could not find resource '%s' in "
