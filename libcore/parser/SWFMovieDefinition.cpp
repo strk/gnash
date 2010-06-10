@@ -595,53 +595,6 @@ SWFMovieDefinition::registerExport(const std::string& symbol,
 }
 
 
-/// TODO: not mutex protected, and moved to Movie anyway.
-void
-SWFMovieDefinition::exportResource(const std::string& symbol)
-{
-
-    const boost::uint16_t id = exportID(symbol);
-    assert(id);
-
-    ExportableResource* f;
-    if ((f = get_font(id)) || (f = getDefinitionTag(id)) ||
-            (f = get_sound_sample(id))) {
-
-        // SWFs sometimes export the same thing more than once!
-        _exportedResources[symbol] = f;
-    }
-    else {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("don't know how to export resource '%s' "
-                        "with id %d (can't find that id)"), symbol, id);
-        );
-        return;
-    }
-}
-
-
-boost::intrusive_ptr<ExportableResource>
-SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
-{
-#ifdef DEBUG_EXPORTS
-    log_debug("get_exported_resource(%s) called, loading frame:%u",
-            symbol, m_frame_count);
-#endif
-
-    // Don't call get_exported_resource() from this movie loader
-    assert( ! _loader.isSelfThread() );
-
-    ExportMap::const_iterator it = _exportedResources.find(symbol);
-    if (it != _exportedResources.end()) {
-#ifdef DEBUG_EXPORTS
-        log_debug(" resource found, loading frame:%u", new_loading_frame);
-#endif
-        return it->second;
-    }
-    return boost::intrusive_ptr<ExportableResource>(0);
-
-}
-
 void
 SWFMovieDefinition::add_frame_name(const std::string& n)
 {
@@ -779,7 +732,6 @@ SWFMovieDefinition::importResources(
             symbolName, source->get_url());
 #endif
         registerExport(symbolName, id);
-        _exportedResources[symbolName] = res.get();
 
         if (Font* f = dynamic_cast<Font*>(res.get())) {
             // Add this shared font to the currently-loading movie.

@@ -195,13 +195,6 @@ public:
 		return _loadingSoundStream;
 	}
 
-
-	/// Delegate call to associated root movie
-	virtual void exportResource(const std::string& sym)
-	{
-		m_movie_def.exportResource(sym);
-	}
-    
     virtual boost::uint16_t exportID(const std::string& symbol) const {
         return m_movie_def.exportID(symbol);
     }
@@ -209,13 +202,6 @@ public:
     virtual void registerExport(const std::string& s, boost::uint16_t id) {
         m_movie_def.registerExport(s, id);
     }
-
-	/// Delegate call to associated root movie
-	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
-            const std::string& sym) const
-	{
-		return m_movie_def.get_exported_resource(sym);
-	}
 
 	/// Overridden just for complaining  about malformed SWF
 	virtual void importResources(boost::intrusive_ptr<movie_definition> /*source*/, Imports& /*imports*/)

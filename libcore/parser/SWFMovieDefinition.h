@@ -235,16 +235,6 @@ public:
         return m_file_length;
     }
 
-    // See docs in movie_definition.h
-    virtual void exportResource(const std::string& symbol);
-
-    /// Get the named exported resource, if we expose it.
-    //
-    /// @return NULL if the label doesn't correspond to an exported
-    ///         resource, or if a timeout occurs while scanning the movie.
-    virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
-            const std::string& symbol) const;
-
     virtual void importResources(boost::intrusive_ptr<movie_definition> source,
             Imports& imports);
 
@@ -434,11 +424,6 @@ private:
 
     // Mutex protecting access to _namedFrames
     mutable boost::mutex _namedFramesMutex;
-
-    typedef std::map<std::string, boost::intrusive_ptr<ExportableResource>,
-            StringNoCaseLessThan > ExportMap;
-
-    ExportMap _exportedResources;
 
     void registerExport(const std::string& symbol, boost::uint16_t id);
 

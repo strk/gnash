@@ -158,21 +158,6 @@ public:
 		return 0;
 	}
 
-	/// Get the named exported resource, if we expose it.
-	//
-	/// @param symbol
-	///	The symbol name. Matching should be case-insensitive for all
-    /// SWF versions.
-	///
-	/// @return NULL if the label doesn't correspond to an exported
-	///         resource. This is the default behaviour.
-	///
-	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
-            const std::string& /*symbol*/) const
-	{
-		return NULL;
-	}
-
 
 	typedef std::pair<int, std::string> ImportSpec;
 	typedef std::vector< ImportSpec > Imports;
@@ -395,19 +380,6 @@ public:
 	virtual int get_loading_sound_stream_id() const
 	{
 		return -1;
-	}
-
-	/// Mark the given resource as "exported" with the given linkage name.
-	//
-    /// Note that any previously exported resource with the same linkage
-    /// name will become unreachable (export override).
-    ///
-	/// @see get_exported_resource
-	///
-	/// The default implementation is a no-op
-	///
-	virtual void exportResource(const std::string& /*symbol*/)
-	{
 	}
 
     virtual void registerExport(const std::string&, boost::uint16_t) {}

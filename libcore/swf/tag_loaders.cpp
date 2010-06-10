@@ -814,8 +814,6 @@ public:
         Movie* mov = m->get_root();
         for (Exports::const_iterator it = _exports.begin(), e = _exports.end();
                 it != e; ++it) {
-            log_debug("Exporting %s", *it);
-            const_cast<movie_definition*>(mov->definition())->exportResource(*it);
             mov->addCharacter(mov->definition()->exportID(*it));
         }
     }
