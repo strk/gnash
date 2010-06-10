@@ -803,25 +803,25 @@ sound_stop(const fn_call& fn)
         // check the import.
         const movie_definition* def = fn.callerDef;
         assert(def);
-        boost::intrusive_ptr<ExportableResource> res = 
-            def->get_exported_resource(name);
 
-        if (!res) {
+        const boost::uint16_t id = def->exportID(name);
+        if (!id) {
             IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("import error: resource '%s' is not exported"),
+                log_swferror(_("No such export '%s'"),
                     name);
                 );
             return as_value();
         }
 
-        sound_sample* ss = dynamic_cast<sound_sample*>(res.get());
-
-        if (ss != NULL) {
-            si = ss->m_sound_handler_id;
-        } else {
-            log_error(_("sound sample is NULL (doesn't cast to sound_sample)"));
+        sound_sample* ss = def->get_sound_sample(id);
+        if (!ss) {
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("Export '%s'is not a sound"), name);
+                );
             return as_value();
         }
+
+        si = ss->m_sound_handler_id;
     }
     
     so->stop(si);
@@ -856,25 +856,26 @@ sound_attachsound(const fn_call& fn)
     // (see 'winter bell' from orisinal morning sunshine for a testcase)
     const movie_definition* def = fn.callerDef;
     assert(def);
-    boost::intrusive_ptr<ExportableResource> res = 
-        def->get_exported_resource(name);
-    if (!res) {
+
+
+    const boost::uint16_t id = def->exportID(name);
+    if (!id) {
         IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("import error: resource '%s' is not exported"),
+            log_swferror(_("No such export '%s'"),
                 name);
-        );
+            );
         return as_value();
     }
 
-    int si = 0;
-    sound_sample* ss = dynamic_cast<sound_sample*>(res.get());
-
-    if (ss) {
-        si = ss->m_sound_handler_id;
-    } else {
-        log_error(_("sound sample is NULL (doesn't cast to sound_sample)"));
+    sound_sample* ss = def->get_sound_sample(id);
+    if (!ss) {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Export '%s'is not a sound"), name);
+            );
         return as_value();
     }
+
+    const int si = ss->m_sound_handler_id;
 
     // sanity check
     assert(si >= 0);
