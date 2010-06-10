@@ -73,14 +73,6 @@ public:
         in.ensureBytes(2);
         const boost::uint16_t cid = in.read_u16();
 
-        if (!m.getDefinitionTag(cid)) {
-            IF_VERBOSE_MALFORMED_SWF(
-                log_swferror("SWF contains DoInitAction tag for an unknown"
-                    "id. This will not be executed.");
-            );
-            return;
-        }
-
         // TODO: Currently, tags are only be executed for already parsed
         // character ids. This is known to be wrong: a more accurate
         // description is:
