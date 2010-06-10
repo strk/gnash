@@ -23,10 +23,11 @@
 
 #include <vector>
 #include <string>
-#include <cmath>
 
 #include <functional> // for mem_fun, bind1st
 #include <algorithm> // for for_each, std::min
+#include <utility>
+#include <map>
 
 namespace gnash {
 
@@ -79,6 +80,22 @@ SWFMovie::advance()
 	}
 
     MovieClip::advance(); 
+}
+
+void
+SWFMovie::addCharacter(boost::uint16_t id)
+{
+    _initializedCharacters.insert(std::make_pair(id, false));
+}
+
+bool
+SWFMovie::initializeCharacter(boost::uint16_t cid)
+{
+    Characters::iterator it = _initializedCharacters.find(cid);
+    if (it == _initializedCharacters.end()) return false;
+    if (it->second) return false;
+    it->second = true;
+    return true;
 }
 
 } // namespace gnash

@@ -816,6 +816,7 @@ public:
                 it != e; ++it) {
             log_debug("Exporting %s", *it);
             const_cast<movie_definition*>(mov->definition())->exportResource(*it);
+            mov->addCharacter(mov->definition()->exportID(*it));
         }
     }
 

@@ -27,7 +27,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <string>
-#include <set>
+#include <map>
 
 // Forward declarations
 namespace gnash {
@@ -40,6 +40,8 @@ namespace gnash
 /// Stateful Movie object (a special kind of sprite)
 class SWFMovie : public Movie
 {
+
+    typedef std::map<boost::uint16_t, bool> Characters;
 
 public:
 
@@ -82,12 +84,21 @@ public:
         return _def->get_version();
     }
 
-	/// Set a DisplayObject in the dictionary as initialized, returning
-	/// true if not already initialized.
-	bool setCharacterInitialized(int cid)
-	{
-		return _initializedCharacters.insert(cid).second;
-	}
+    /// Add a character to the list of known characters
+    //
+    /// This makes the character known to ActionScript for initialization.
+    /// Exported characters must both be in the definition's list of exports
+    /// and added with this function before they are available.
+    void addCharacter(boost::uint16_t id);
+
+    /// Returns true if character can be initialized.
+    //
+    /// A character can be initialized once, but only if it is known.
+    /// @return     false if the character cannot be initialized. This can mean
+    ///             1. The character is not yet present (either not exported
+    ///                or has not yet been placed on stage).
+    ///             2. The character has already been initialized.
+	bool initializeCharacter(boost::uint16_t id);
 
     const movie_definition* definition() const {
         return _def.get();
@@ -99,8 +110,7 @@ private:
 	//
 	/// Elements of this set are ids of DisplayObjects
 	/// in our definition's CharacterDictionary.
-	///
-	std::set<int> _initializedCharacters;
+	Characters _initializedCharacters;
 
     /// This should only be a top-level movie, not a sprite_definition.
 	const boost::intrusive_ptr<const SWFMovieDefinition> _def;

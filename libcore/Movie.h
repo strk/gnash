@@ -73,9 +73,11 @@ public:
 
     virtual int version() const = 0;
 
+    virtual void addCharacter(boost::uint16_t /*id*/) {}
+
 	/// Set a DisplayObject in the dictionary as initialized, returning
 	/// true if not already initialized.
-	virtual bool setCharacterInitialized(int /*cid*/) {
+	virtual bool initializeCharacter(boost::uint16_t /*id*/) {
         return false;
     }
 

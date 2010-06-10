@@ -861,7 +861,9 @@ MovieClip::advance()
 void
 MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 {
-    if ( _swf->setCharacterInitialized(cid) )
+    assert(cid >= 0);
+
+    if ( _swf->initializeCharacter(cid) )
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing init actions in frame %d of movieclip %s"),
@@ -1187,6 +1189,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     ch->set_clip_depth(tag->getClipDepth());
     
     dlist.placeDisplayObject(ch, tag->getDepth());
+    _swf->addCharacter(tag->getID());
     ch->construct();
     return ch;
 }
@@ -1262,6 +1265,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     // use SWFMatrix from the old DisplayObject if tag doesn't provide one.
     dlist.replaceDisplayObject(ch, tag->getDepth(), 
         !tag->hasCxform(), !tag->hasMatrix());
+    _swf->addCharacter(tag->getID());
     ch->construct();
 }
 
