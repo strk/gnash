@@ -77,8 +77,6 @@ protected:
 
     void markReachableObjects() const {
         if (_bitmapData) _bitmapData->setReachable();
-        if (_bitmapInfo) _bitmapInfo->setReachable();
-        if (_def) _def->setReachable();
     }
 
 private:

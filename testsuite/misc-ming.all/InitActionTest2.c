@@ -12,8 +12,9 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc4, mc5, mc6, dejagnuclip;
-    SWFDisplayItem it;
+    SWFMovieClip mc4, mc5, mc6, mc7, mc8, dejagnuclip;
+    SWFDisplayItem it, it2;
+    SWFAction ac;
     SWFInitAction ia;
 
     const char *srcdir=".";
@@ -42,6 +43,11 @@ main(int argc, char** argv)
     // InitActions for ID 2 parsed here:
     ia = newSWFInitAction_withId(
             newSWFAction("trace('mc4'); _global.val4 = 'mc4';"), 4);
+    SWFMovie_add(mo, (SWFBlock)ia);
+    
+    // InitActions for non-existent ID 25 parsed here:
+    ia = newSWFInitAction_withId(
+            newSWFAction("fail('InitActions executed for bogus id');"), 25);
     SWFMovie_add(mo, (SWFBlock)ia);
 
     // Check in first frame:
@@ -116,7 +122,7 @@ main(int argc, char** argv)
     SWFMovie_writeExports(mo);
 
     // Skip next frame
-    add_actions(mo, "gotoAndStop(10);");
+    add_actions(mo, "gotoAndPlay(10);");
     
     // Frame 9
     SWFMovie_nextFrame(mo);
@@ -132,6 +138,91 @@ main(int argc, char** argv)
 
     // Check that the skipped InitActions are executed.
     check(mo, "_global.val6 == 'mc6'");
+    
+    /// Now check what happens on a loop. The situation is:
+    //
+    //  11. Initactions defined for chars 7 and 8
+    //  12. Chars 7 and 8 placed.
+    //  13. Char 7 removed again, second time go to 15
+    //  14. Checks, go to 11
+    //  15. Checks
+    //
+    //  We expect that neither initaction tag is executed the first time,
+    //  but both the second time, even though one of the characters was
+    //  removed after being placed.
+
+    // Frame 11
+    SWFMovie_nextFrame(mo);
+
+    // This should not be present either time because it's removed.
+    check_equals(mo, "_root.mc7", "undefined");
+
+    // This should not be present the first time
+    check_equals(mo, "_global.goneBack ||! _root.mc8", "true");
+
+    ac = newSWFAction("trace('init7'); _global.init7 = true;");
+    ia = newSWFInitAction_withId(ac, 7);
+    SWFMovie_add(mo, (SWFBlock)ia);
+    
+    ac = newSWFAction("trace('init8'); _global.init8 = true;");
+    ia = newSWFInitAction_withId(ac, 8);
+    SWFMovie_add(mo, (SWFBlock)ia);
+
+    // Frame 12
+    SWFMovie_nextFrame(mo);
+
+    mc7 = newSWFMovieClip();
+    it = SWFMovie_add(mo, (SWFBlock)mc7);
+    SWFDisplayItem_setName(it, "mc7");
+
+    mc8 = newSWFMovieClip();
+    it2 = SWFMovie_add(mo, (SWFBlock)mc8);
+    SWFDisplayItem_setName(it2, "mc8");
+    
+    // Frame 13
+    SWFMovie_nextFrame(mo);
+
+    // Remove mc7
+    SWFMovie_remove(mo, it);
+
+    ac = newSWFAction(
+            "if (_global.goneBack) {"
+            "   gotoAndPlay(15);"
+            "};"
+            );
+    SWFMovie_add(mo, (SWFBlock)ac);
+    
+    // Frame 14
+    SWFMovie_nextFrame(mo);
+
+    // This frame performs checks after the first execution of the previous
+    // frames and should be skipped the second time!
+    
+    // Check that neither initaction tag was executed.
+    check_equals(mo, "_global.init7", "undefined");
+    check_equals(mo, "_global.init8", "undefined");
+    
+    // Check that mc7 has been removed and mc8 is still there.
+    check_equals(mo, "typeof(_root.mc7)", "'undefined'");
+    check_equals(mo, "typeof(_root.mc8)", "'movieclip'");
+
+    ac = newSWFAction(
+            "if (!_global.goneBack) { "
+            "   trace('Going back');"
+            "   _global.goneBack = true;"
+            // Go to frame 11 where the initactions are.
+            "   gotoAndPlay(11);"
+            "};"
+            );
+    
+    SWFMovie_add(mo, (SWFBlock)ac);
+    
+    // Frame 15
+    SWFMovie_nextFrame(mo);
+            
+    // Check that both initaction tags were executed.
+    xcheck_equals(mo, "_global.init7", "true");
+    xcheck_equals(mo, "_global.init8", "true");
 
     add_actions(mo, "stop();");
   

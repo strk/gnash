@@ -26,6 +26,8 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
+#include "dsodefs.h" /* For DSOEXPORT */
+
 namespace gnash {
 
 class as_object;
@@ -37,9 +39,9 @@ class movie_root;
 
 namespace gnash {
 
-struct ExternalInterface
+struct DSOEXPORT ExternalInterface
 {
-    typedef struct {
+    typedef struct DSOLOCAL {
         std::string name;
         std::string type;
         std::vector<as_value> args;
@@ -50,24 +52,24 @@ struct ExternalInterface
     // by ActionScript coders.
 
     /// Convert an AS object to an XML string.
-    static std::string toXML(const as_value &obj);
+    DSOEXPORT static std::string toXML(const as_value &obj);
     
     /// Convert an XML string to an AS value.
-    static as_value toAS(Global_as& as, const std::string &xml);
+    DSOEXPORT static as_value toAS(Global_as& as, const std::string &xml);
 
     /// Convert an XML string of properties to a data structure.
-    static std::map<std::string, as_value> propertiesToAS(Global_as& gl,
+    DSOEXPORT static std::map<std::string, as_value> propertiesToAS(Global_as& gl,
                                                    std::string &xml);
     
-    static as_value argumentsToXML(std::vector<as_value> &args);
+    DSOEXPORT static as_value argumentsToXML(std::vector<as_value> &args);
 //    as_value argumentsToAS();
     
-    static std::string objectToXML(as_object *obj);
-    static as_value objectToAS(Global_as& gl, const std::string &xml);
+    DSOEXPORT static std::string objectToXML(as_object *obj);
+    DSOEXPORT static as_value objectToAS(Global_as& gl, const std::string &xml);
 //  std::string objectToJS(as_object &obj);
 //  as_value toJS(const std::string &xml);;
     
-    static std::string arrayToXML(as_object *obj);
+    DSOEXPORT static std::string arrayToXML(as_object *obj);
 
 //  static std::string arrayToJS();
 //  static as_value arrayToAS();
@@ -88,12 +90,12 @@ struct ExternalInterface
     // Parse the XML Invoke message.
     static boost::shared_ptr<invoke_t> parseInvoke(const std::string &str);
     // Check for data from the browser and parse it.
-    static boost::shared_ptr<invoke_t> ExternalEventCheck(int fd);
+    DSOEXPORT static boost::shared_ptr<invoke_t> ExternalEventCheck(int fd);
 
     // These methods are for constructing Invoke messages.
     // Create an Invoke message for the standalone Gnash
-    static std::string makeInvoke (const std::string &method,
-                                   const std::vector<as_value> &args);
+    DSOEXPORT static std::string makeInvoke (const std::string &method,
+              		                     const std::vector<as_value> &args);
     
     static std::string makeNull ();
     static std::string makeTrue ();
@@ -108,8 +110,8 @@ struct ExternalInterface
     static std::string makeArray (std::vector<std::string> &args);
     static std::string makeObject (std::map<std::string, std::string> &args);
 
-    static size_t writeBrowser(int fd, const std::string &xml);
-    static std::string readBrowser(int fd);
+    DSOEXPORT static size_t writeBrowser(int fd, const std::string &xml);
+    DSOEXPORT static std::string readBrowser(int fd);
 };
 
 } // end of gnash namespace

@@ -587,17 +587,6 @@ public:
 	//
 	void setHtmlTextValue(const std::wstring& wstr);
 
-protected:
-
-	/// Mark reachable reosurces (for GC)
-	//
-	/// Reachable resources are:
-	///  - The font being used (m_font) 
-	///  - Our definition
-	///  - Common DisplayObject resources
-	///
-	void markOwnResources() const;
-
 private:
 
     void init();

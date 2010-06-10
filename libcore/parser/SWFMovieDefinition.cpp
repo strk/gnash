@@ -662,25 +662,6 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
     return true;
 }
 
-#ifdef GNASH_USE_GC
-void
-SWFMovieDefinition::markReachableResources() const
-{
-    markMappedResources(m_fonts);
-    markMappedResources(_bitmaps);
-    markMappedResources(m_sound_samples);
-
-    // Mutex scope.
-    markMappedResources(_exportedResources);
-
-    std::for_each(m_import_source_movies.begin(), m_import_source_movies.end(),
-           boost::mem_fn(&movie_definition::setReachable));
-
-    boost::mutex::scoped_lock lock(_dictionaryMutex);
-    _dictionary.markReachableResources();
-
-}
-#endif // GNASH_USE_GC
 
 boost::uint16_t
 SWFMovieDefinition::exportID(const std::string& symbol) const
@@ -689,6 +670,7 @@ SWFMovieDefinition::exportID(const std::string& symbol) const
     Exports::const_iterator it = _exportMap.find(symbol);
     return (it == _exportMap.end()) ? 0 : it->second;
 }
+
 
 void
 SWFMovieDefinition::importResources(

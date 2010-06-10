@@ -237,7 +237,7 @@ private:
 JpegImageInput::JpegImageInput(boost::shared_ptr<IOChannel> in)
     :
     ImageInput(in),
-    _errorOccurred(false),
+    _errorOccurred(0),
     _compressorOpened(false)
 {
     setup_jpeg_err(&m_jerr);

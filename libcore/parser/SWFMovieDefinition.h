@@ -147,15 +147,6 @@ public:
     friend std::ostream& operator<<(std::ostream& o,
             const CharacterDictionary& cd);
 
-#ifdef GNASH_USE_GC
-    /// Mark all dictionary items to be reachable (for GC)
-    void markReachableResources() const
-    {
-        foreachSecond(_map.begin(), _map.end(), 
-                      &SWF::DefinitionTag::setReachable);
-    }
-#endif 
-
 private:
 
     CharacterContainer _map;
@@ -542,27 +533,6 @@ private:
 
     /// Movies we import resources from
     std::set< boost::intrusive_ptr<movie_definition> > _importSources;
-
-
-protected:
-
-#ifdef GNASH_USE_GC
-    /// Mark reachable resources of a SWFMovieDefinition
-    //
-    /// Reachable resources are:
-    ///    - fonts (m_fonts)
-    ///    - bitmaps (_bitmaps)
-    ///    - bitmaps (m_bitmap_list) [ what's the difference with bitmap
-    ///   DisplayObjects ?? ]
-    ///    - sound samples (m_sound_samples)
-    ///    - exports (m_exports)
-    ///    - imported movies (m_import_source_movies)
-    ///    - DisplayObject dictionary (_dictionary)
-    ///
-    /// TODO: do we really need all this stuff to be a GcResource ??
-    void markReachableResources() const;
-
-#endif
 
 private:
 

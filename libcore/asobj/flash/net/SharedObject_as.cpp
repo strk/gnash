@@ -970,7 +970,7 @@ readSOL(VM& vm, const std::string& filespec)
             if (!rd(as)) {
                 log_error("SharedObject: error parsing SharedObject '%s'",
                         filespec);
-                return false;
+                return 0;
             }
 
             log_debug("parsed sol member named '%s' (len %s),  value '%s'",

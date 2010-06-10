@@ -66,14 +66,6 @@ public:
     
     virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
-protected:
-
-	/// Mark reachable resources (for the GC)
-	virtual void markReachableResources() const
-	{
-        if (_def) _def->setReachable();
-	}
-
 private:
 	
     const boost::intrusive_ptr<const SWF::DefineShapeTag> _def;

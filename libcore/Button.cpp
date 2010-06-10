@@ -835,12 +835,9 @@ Button::construct(as_object* initObj)
     // for Buttons
 }
 
-#ifdef GNASH_USE_GC
 void
 Button::markOwnResources() const
 {
-
-    _def->setReachable();
 
     // Mark state DisplayObjects as reachable
     for (DisplayObjects::const_iterator i = _stateCharacters.begin(),
@@ -855,7 +852,6 @@ Button::markOwnResources() const
             std::mem_fun(&DisplayObject::setReachable));
 
 }
-#endif // GNASH_USE_GC
 
 bool
 Button::unload()
