@@ -81,6 +81,16 @@ SWFMovie::advance()
 
     MovieClip::advance(); 
 }
+    
+SWF::DefinitionTag*
+SWFMovie::exportedCharacter(const std::string& symbol)
+{
+    const boost::uint16_t id = _def->exportID(symbol);
+    if (!id) return 0;
+    Characters::iterator it = _initializedCharacters.find(id);
+    if (it == _initializedCharacters.end()) return 0;
+    return _def->getDefinitionTag(id);
+}
 
 void
 SWFMovie::addCharacter(boost::uint16_t id)

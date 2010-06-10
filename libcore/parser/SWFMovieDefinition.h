@@ -385,6 +385,8 @@ public:
 
     virtual const std::string& get_url() const { return _url; }
     
+    boost::uint16_t exportID(const std::string& symbol) const;
+    
 #ifdef USE_SWFTREE
 
     // These methods attach the contents of the METADATA tag
@@ -439,8 +441,6 @@ private:
     ExportMap _exportedResources;
 
     void registerExport(const std::string& symbol, boost::uint16_t id);
-
-    boost::uint16_t exportID(const std::string& symbol) const;
 
     /// This is the real export map
     //

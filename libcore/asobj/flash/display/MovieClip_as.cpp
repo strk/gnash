@@ -463,28 +463,14 @@ movieclip_attachMovie(const fn_call& fn)
     // Get exported resource 
     const std::string& id_name = fn.arg(0).to_string();
 
-    boost::intrusive_ptr<ExportableResource> exported =
-        movieclip->get_root()->definition()->get_exported_resource(id_name);
-
-    if (!exported)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("attachMovie: '%s': no such exported resource - "
-            "returning undefined"), id_name);
-        );
-        return as_value(); 
-    }
-    
-    SWF::DefinitionTag* exported_movie =
-        dynamic_cast<SWF::DefinitionTag*>(exported.get());
+    SWF::DefinitionTag* exported_movie = 
+        movieclip->get_root()->exportedCharacter(id_name);
 
     if (!exported_movie)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("attachMovie: exported resource '%s' "
-            "is not a DisplayObject definition (%s) -- "
-            "returning undefined"), id_name,
-            typeid(*(exported.get())).name());
+            "is not a DisplayObject definition. Returning undefined"), id_name);
         );
         return as_value();
     }

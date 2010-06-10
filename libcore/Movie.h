@@ -73,6 +73,10 @@ public:
 
     virtual int version() const = 0;
 
+    virtual SWF::DefinitionTag* exportedCharacter(const std::string& /*s*/) {
+        return 0;
+    }
+
     virtual void addCharacter(boost::uint16_t /*id*/) {}
 
 	/// Set a DisplayObject in the dictionary as initialized, returning

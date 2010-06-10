@@ -83,6 +83,8 @@ public:
     int version() const {
         return _def->get_version();
     }
+    
+    virtual SWF::DefinitionTag* exportedCharacter(const std::string& symbol);
 
     /// Add a character to the list of known characters
     //
