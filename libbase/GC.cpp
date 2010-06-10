@@ -59,8 +59,9 @@ GC::~GC()
     log_debug(_("GC deleted, deleting all managed resources - collector run %d times"), _collectorRuns);
 #endif
 
-    while ( !_resList.empty() ) {
-        delete _resList.front();
+    for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
+    {
+        delete *i;
     }
 }
 
