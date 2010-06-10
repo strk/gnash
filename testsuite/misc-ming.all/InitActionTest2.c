@@ -221,8 +221,8 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
             
     // Check that both initaction tags were executed.
-    xcheck_equals(mo, "_global.init7", "true");
-    xcheck_equals(mo, "_global.init8", "true");
+    check_equals(mo, "_global.init7", "true");
+    check_equals(mo, "_global.init8", "true");
 
     add_actions(mo, "stop();");
   
