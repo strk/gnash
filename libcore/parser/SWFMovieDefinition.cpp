@@ -578,10 +578,13 @@ SWFMovieDefinition::incrementLoadedFrames()
 
 void
 SWFMovieDefinition::registerExport(const std::string& symbol,
-        boost::uint16_t id) {
+        boost::uint16_t id)
+{
+    assert(id);
+
     boost::mutex::scoped_lock lock(_exportedResourcesMutex);
     log_debug("%s registering export %s, %s", get_url(), symbol, id);
-    _exportMap[symbol] = id;
+    _exportTable[symbol] = id;
 }
 
 
@@ -610,8 +613,8 @@ boost::uint16_t
 SWFMovieDefinition::exportID(const std::string& symbol) const
 {
     boost::mutex::scoped_lock lock(_exportedResourcesMutex);
-    Exports::const_iterator it = _exportMap.find(symbol);
-    return (it == _exportMap.end()) ? 0 : it->second;
+    Exports::const_iterator it = _exportTable.find(symbol);
+    return (it == _exportTable.end()) ? 0 : it->second;
 }
 
 

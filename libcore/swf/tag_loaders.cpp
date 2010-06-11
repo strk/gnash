@@ -814,7 +814,11 @@ public:
         Movie* mov = m->get_root();
         for (Exports::const_iterator it = _exports.begin(), e = _exports.end();
                 it != e; ++it) {
-            mov->addCharacter(mov->definition()->exportID(*it));
+            const boost::uint16_t id = mov->definition()->exportID(*it);
+
+            // We exported it, so we assume it is known.
+            assert(id);
+            mov->addCharacter(id);
         }
     }
 
@@ -844,7 +848,10 @@ private:
         // Read the exports.
         for (size_t i = 0; i < count; ++i) {
             in.ensureBytes(2);
-            boost::uint16_t id = in.read_u16();
+            const boost::uint16_t id = in.read_u16();
+
+            if (!id) continue;
+
             std::string symbolName;
             in.read_string(symbolName);
 

@@ -375,7 +375,24 @@ public:
 
     virtual const std::string& get_url() const { return _url; }
     
+
+    /// Get the id that corresponds to a symbol.
+    //
+    /// @param symbol   The symbol to lookup in the table.
+    /// @return         The id corresponding to the passed symbol. 0 is not a
+    ///                 valid id and signifies that the symbol was not (yet)
+    ///                 exported.
     boost::uint16_t exportID(const std::string& symbol) const;
+    
+    /// Register a symbol to refer to a character id
+    //
+    /// This function is thread safe.
+    //
+    /// @param id       The id of the character to map to the symbol. NB: this
+    ///                 must never be 0!
+    /// @param symbol   The symbol to map to the id.
+    void registerExport(const std::string& symbol, boost::uint16_t id);
+
     
 #ifdef USE_SWFTREE
 
@@ -425,17 +442,14 @@ private:
     // Mutex protecting access to _namedFrames
     mutable boost::mutex _namedFramesMutex;
 
-    void registerExport(const std::string& symbol, boost::uint16_t id);
-
-    /// This is the real export map
-    //
-    /// It maps string to character ID as parsed.
+    /// Allow mapping symbol to id case insensitively.
     typedef std::map<std::string, boost::uint16_t,
             StringNoCaseLessThan> Exports;
 
-    Exports _exportMap;
+    /// A map of symbol to character id.
+    Exports _exportTable;
 
-    // Mutex protecting access to _exportedResources
+    // Mutex protecting access to the export map.
     mutable boost::mutex _exportedResourcesMutex;
 
     /// Movies we import from; hold a ref on these,
