@@ -70,7 +70,6 @@ namespace gnash {
         class ControlTag;
     }
     class Font;
-    class ExportableResource;
     class sound_sample;
     class JpegImageInput;
 }

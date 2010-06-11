@@ -24,8 +24,6 @@
 #ifndef GNASH_FONT_H
 #define GNASH_FONT_H
 
-#include "ExportableResource.h" 
-
 #include <string>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
@@ -33,6 +31,8 @@
 #include <memory>
 #include <vector>
 #include <map>
+
+#include "ref_counted.h"
 
 namespace gnash {
     class FreetypeGlyphsProvider;
@@ -85,7 +85,9 @@ operator< (const kerning_pair& p1, const kerning_pair& p2)
 /// font simultaneously means that callers must themselves ensure they
 /// specify which font they require. Failure to do this consistently may mean
 /// callers end up with the wrong information about a font.
-class Font : public ExportableResource
+//
+/// TODO: check whether it really needs to be ref_counted.
+class Font : public ref_counted
 {
 public:
 

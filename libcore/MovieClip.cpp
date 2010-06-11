@@ -54,7 +54,6 @@
 #include "LineStyle.h" // for CapStyle and JoinStyle enums
 #include "PlaceObject2Tag.h" 
 #include "flash/geom/Matrix_as.h"
-#include "ExportableResource.h"
 #include "GnashNumeric.h"
 #include "InteractiveObject.h"
 #include "DisplayObjectContainer.h"

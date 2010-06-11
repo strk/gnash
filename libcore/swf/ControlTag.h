@@ -35,6 +35,8 @@ namespace SWF {
 //
 /// These are the events associated with a frame.
 ///
+/// TODO: check whether this needs to be ref_counted. They are generally owned
+/// by a sprite_definition or a SWFMovieDefinition.
 class ControlTag : public ref_counted, boost::noncopyable
 {
 public:

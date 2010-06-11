@@ -38,7 +38,6 @@
 #include "GnashException.h" // for parser exception
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
-#include "ExportableResource.h"
 #include "GnashAlgorithm.h"
 #include "SWFParser.h"
 #include "Global_as.h"

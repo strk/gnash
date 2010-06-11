@@ -35,7 +35,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "VM.h"
 #include "namedStrings.h"
-#include "ExportableResource.h"
 #include "StreamProvider.h"
 
 #include <string>
