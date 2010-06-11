@@ -58,13 +58,6 @@ sprite_definition::createDisplayObject(Global_as& gl, DisplayObject* parent)
 
 sprite_definition::~sprite_definition()
 {
-	// Release our playlist data.
-	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end();
-            i != e; ++i)
-	{
-		PlayList& pl = i->second;
-        deleteChecked(pl.begin(), pl.end());
-    }
 }
 
 /*private*/

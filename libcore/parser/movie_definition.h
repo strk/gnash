@@ -101,7 +101,7 @@ namespace gnash
 class movie_definition : public SWF::DefinitionTag
 {
 public:
-	typedef std::vector<SWF::ControlTag*> PlayList;
+	typedef std::vector<boost::intrusive_ptr<SWF::ControlTag> > PlayList;
 
 	virtual int	get_version() const = 0;
 	virtual float get_width_pixels() const = 0;

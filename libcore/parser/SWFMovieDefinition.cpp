@@ -169,18 +169,8 @@ SWFMovieDefinition::SWFMovieDefinition(const RunResources& runResources)
 
 SWFMovieDefinition::~SWFMovieDefinition()
 {
-
     // Request cancelation of the loading thread
     _loadingCanceled = true;
-
-    // Release frame tags
-    for (PlayListMap::iterator i = m_playlist.begin(),
-            e = m_playlist.end(); i != e; ++i)
-    {
-        PlayList& pl = i->second;
-        deleteChecked(pl.begin(), pl.end());
-    }
-
 }
 
 void

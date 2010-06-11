@@ -24,7 +24,6 @@
 #include <boost/cstdint.hpp>
 
 #include "ControlTag.h"
-#include "ref_counted.h"
 
 // Forward declarations
 
@@ -42,7 +41,7 @@ namespace gnash {
 namespace SWF {
 
 /// Immutable data representing the definition of a movie display element.
-class DefinitionTag : public ControlTag, public ref_counted
+class DefinitionTag : public ControlTag
 {
 public:
 
