@@ -583,7 +583,9 @@ SWFMovieDefinition::registerExport(const std::string& symbol,
     assert(id);
 
     boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+#ifdef DEBUG_EXPORTS
     log_debug("%s registering export %s, %s", get_url(), symbol, id);
+#endif
     _exportTable[symbol] = id;
 }
 
@@ -644,9 +646,10 @@ SWFMovieDefinition::importResources(
         const int id = i->first;
         const std::string& symbolName = i->second;
 
+#ifdef DEBUG_EXPORTS
         log_debug("%s importing %s from %s", get_url(), symbolName,
                 source->get_url());
-
+#endif
         boost::uint16_t targetID;
 
         while(!(targetID = source->exportID(symbolName))) {

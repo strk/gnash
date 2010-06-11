@@ -85,13 +85,10 @@ SWFMovie::advance()
 SWF::DefinitionTag*
 SWFMovie::exportedCharacter(const std::string& symbol)
 {
-    log_debug("Looking for export %s", symbol);
     const boost::uint16_t id = _def->exportID(symbol);
     if (!id) return 0;
-    log_debug("Corresponds to character %s", id);
     Characters::iterator it = _characters.find(id);
     if (it == _characters.end()) return 0;
-    log_debug("Found character");
     return _def->getDefinitionTag(id);
 }
 
