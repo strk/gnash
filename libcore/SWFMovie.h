@@ -76,14 +76,26 @@ public:
 	/// It's intended to be called by movie_root::setLevel().
     void construct(as_object* init = 0);
 
+    /// Get the URL of the SWFMovie's definition.
     const std::string& url() const {
         return _def->get_url();
     }
 
+    /// Get the version of the SWFMovie.
+    //
+    /// @return     the version of the SWFMovie.
     int version() const {
         return _def->get_version();
     }
     
+    /// Get an exported character definition by its symbol name.
+    //
+    /// The character is only available after the ExportAssets tag has been
+    /// executed.
+    //
+    /// @param symbol   The exported symbol of the character to retrieve.
+    /// @return         The DefinitionTag of the requested character or 0
+    ///                 if the character has not yet been exported.
     virtual SWF::DefinitionTag* exportedCharacter(const std::string& symbol);
 
     /// Add a character to the list of known characters
@@ -93,13 +105,17 @@ public:
     /// and added with this function before they are available.
     void addCharacter(boost::uint16_t id);
 
-    /// Returns true if character can be initialized.
+    /// Attempt to mark a character as initialized.
     //
-    /// A character can be initialized once, but only if it is known.
+    /// A character can be initialized once, but only after it is known to this
+    /// Movie.
+    //
+    /// @param id   The id of the character to initialize.
     /// @return     false if the character cannot be initialized. This can mean
     ///             1. The character is not yet present (either not exported
     ///                or has not yet been placed on stage).
     ///             2. The character has already been initialized.
+    ///             true if the character was marked initialized.
 	bool initializeCharacter(boost::uint16_t id);
 
     const movie_definition* definition() const {
@@ -108,11 +124,8 @@ public:
 
 private:
 
-	/// A map to track execution of init actions
-	//
-	/// Elements of this set are ids of DisplayObjects
-	/// in our definition's CharacterDictionary.
-	Characters _initializedCharacters;
+    /// Tracks known characters and whether they have been initialized.
+	Characters _characters;
 
     /// This should only be a top-level movie, not a sprite_definition.
 	const boost::intrusive_ptr<const SWFMovieDefinition> _def;
