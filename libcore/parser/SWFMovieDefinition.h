@@ -375,8 +375,9 @@ public:
 
     virtual const std::string& get_url() const { return _url; }
     
-
     /// Get the id that corresponds to a symbol.
+    //
+    /// This function is thread-safe.
     //
     /// @param symbol   The symbol to lookup in the table.
     /// @return         The id corresponding to the passed symbol. 0 is not a

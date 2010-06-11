@@ -381,8 +381,15 @@ public:
 		return -1;
 	}
 
+    /// Register a symbol to refer to a character id
+    //
+    /// The default implementation does nothing.
     virtual void registerExport(const std::string&, boost::uint16_t) {}
     
+    /// Get the id that corresponds to a symbol.
+    //
+    /// @return         The id corresponding to the passed symbol. The default
+    ///                 implementation returns 0, as it has no export table.
     virtual boost::uint16_t exportID(const std::string& /*symbol*/) const {
         return 0;
     }
