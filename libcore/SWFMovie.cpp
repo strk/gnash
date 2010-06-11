@@ -85,16 +85,20 @@ SWFMovie::advance()
 SWF::DefinitionTag*
 SWFMovie::exportedCharacter(const std::string& symbol)
 {
+    log_debug("Looking for export %s", symbol);
     const boost::uint16_t id = _def->exportID(symbol);
     if (!id) return 0;
+    log_debug("Corresponds to character %s", id);
     Characters::iterator it = _initializedCharacters.find(id);
     if (it == _initializedCharacters.end()) return 0;
+    log_debug("Found character");
     return _def->getDefinitionTag(id);
 }
 
 void
 SWFMovie::addCharacter(boost::uint16_t id)
 {
+    log_debug("Adding character %s", id);
     _initializedCharacters.insert(std::make_pair(id, false));
 }
 
@@ -102,7 +106,10 @@ bool
 SWFMovie::initializeCharacter(boost::uint16_t cid)
 {
     Characters::iterator it = _initializedCharacters.find(cid);
-    if (it == _initializedCharacters.end()) return false;
+    if (it == _initializedCharacters.end()) {
+        log_debug("Character %s is not there!", cid);
+        return false;
+    }
     if (it->second) return false;
     it->second = true;
     return true;
