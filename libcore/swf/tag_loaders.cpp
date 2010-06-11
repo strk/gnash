@@ -885,14 +885,28 @@ void export_loader(SWFStream& in, TagType tag, movie_definition& m,
 // import
 //
 
-class ImportTag 
+class ImportTag : public ControlTag
 {
 public:
 
     typedef std::pair<int, std::string> Import;
     typedef std::vector<Import> Imports;
 
-    static void read(TagType t, SWFStream& in, movie_definition& m,
+    ImportTag(TagType t, SWFStream& in, movie_definition& m,
+            const RunResources& r)
+    {
+        read(t, in, m, r);
+    }
+
+    virtual void executeState(MovieClip* m, DisplayList& /*l*/) const {
+        Movie* mov = m->get_root();
+        for (Imports::const_iterator it = _imports.begin(), e = _imports.end();
+                it != e; ++it) {
+            mov->addCharacter(it->first);
+        }
+    }
+
+    void read(TagType t, SWFStream& in, movie_definition& m,
             const RunResources& r) {
 
         std::string source_url;
@@ -945,19 +959,21 @@ public:
             return;
         }
         
-        Imports imports;
-
         // Get the imports.
         for (size_t i = 0; i < count; ++i)
         {
             in.ensureBytes(2);
             const boost::uint16_t id = in.read_u16();
+
+            // We don't consider 0 valid.
+            if (!id) continue;
+
             std::string symbolName;
             in.read_string(symbolName);
             IF_VERBOSE_PARSE (
                 log_parse(_("  import: id = %d, name = %s"), id, symbolName);
             );
-            imports.push_back(std::make_pair(id, symbolName));
+            _imports.push_back(std::make_pair(id, symbolName));
         }
         // An EXPORT tag as part of a DEFINESPRITE
         // would be a malformed SWF, anyway to be compatible
@@ -971,8 +987,12 @@ public:
                         "top-level symbol table."));
             }
         );
-        m.importResources(source_movie, imports);
+        m.importResources(source_movie, _imports);
     }
+
+private:
+
+    Imports _imports;
 
 };
 
@@ -981,7 +1001,8 @@ void import_loader(SWFStream& in, TagType tag, movie_definition& m,
 {
     assert(tag == SWF::IMPORTASSETS || tag == SWF::IMPORTASSETS2);
 
-    ImportTag::read(tag, in, m, r);
+    std::auto_ptr<ControlTag> p(new ImportTag(tag, in, m, r));
+    m.addControlTag(p.release());
 }
 
 //

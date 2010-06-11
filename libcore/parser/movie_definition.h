@@ -52,14 +52,15 @@
 #include "gnashconfig.h" // for USE_SWFTREE
 #endif
 
-#include "DefinitionTag.h"
-
 #include <string>
 #include <memory> // for auto_ptr
 #include <vector> // for PlayList typedef
 #include <set>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
+
+#include "DefinitionTag.h"
+#include "log.h"
 
 // Forward declarations
 namespace gnash {
@@ -169,8 +170,13 @@ public:
 	/// @param imports
 	///	Resources to import, each with the id to use in our dictionary
 	///
-	virtual void importResources(boost::intrusive_ptr<movie_definition> /*source*/, Imports& /*imports*/)
+	virtual void importResources(
+            boost::intrusive_ptr<movie_definition> /*source*/, 
+            const Imports& /*imports*/)
 	{
+		IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("IMPORT tag appears outside SWF definition"));
+		);
 	}
 
 

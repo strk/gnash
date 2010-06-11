@@ -236,7 +236,7 @@ public:
     }
 
     virtual void importResources(boost::intrusive_ptr<movie_definition> source,
-            Imports& imports);
+            const Imports& imports);
 
     void addDisplayObject(int DisplayObject_id, SWF::DefinitionTag* c);
 

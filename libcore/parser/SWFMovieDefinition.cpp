@@ -620,13 +620,13 @@ SWFMovieDefinition::exportID(const std::string& symbol) const
 
 void
 SWFMovieDefinition::importResources(
-        boost::intrusive_ptr<movie_definition> source, Imports& imports)
+        boost::intrusive_ptr<movie_definition> source, const Imports& imports)
 {
     size_t importedSyms = 0;
 
     // Mutex scope.
 
-    for (Imports::iterator i = imports.begin(), e = imports.end(); i != e;
+    for (Imports::const_iterator i = imports.begin(), e = imports.end(); i != e;
             ++i) {
     
         size_t new_loading_frame = source->get_loading_frame();

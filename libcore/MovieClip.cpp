@@ -1188,7 +1188,6 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     ch->set_clip_depth(tag->getClipDepth());
     
     dlist.placeDisplayObject(ch, tag->getDepth());
-    _swf->addCharacter(tag->getID());
     ch->construct();
     return ch;
 }
@@ -1266,7 +1265,6 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     // use SWFMatrix from the old DisplayObject if tag doesn't provide one.
     dlist.replaceDisplayObject(ch, tag->getDepth(), 
         !tag->hasCxform(), !tag->hasMatrix());
-    _swf->addCharacter(id);
     ch->construct();
 }
 
