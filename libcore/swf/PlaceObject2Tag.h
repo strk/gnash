@@ -118,7 +118,7 @@ public:
 
     int getRatio()     const { return m_ratio; }
     int getClipDepth() const { return m_clip_depth; }
-    int getID()        const { return _id; }
+    boost::uint16_t getID()        const { return _id; }
     const std::string& getName() const { return m_name; }
     const SWFMatrix& getMatrix()    const { return m_matrix; }
     const cxform& getCxform()    const { return m_color_transform; }

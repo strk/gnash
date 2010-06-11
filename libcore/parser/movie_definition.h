@@ -190,8 +190,7 @@ public:
 	///
 	/// @return NULL if no DisplayObject with the given ID is found
 	///         (this is the default)
-	///
-	virtual DefinitionTag* getDefinitionTag(int /*id*/) const
+	virtual DefinitionTag* getDefinitionTag(boost::uint16_t /*id*/) const
 	{
 		return NULL;
 	}
@@ -228,8 +227,7 @@ public:
 	//
 	/// This method is here to be called by DEFINE tags loaders.
 	/// The default implementation does nothing.
-	///
-	virtual void addDisplayObject(int /*id*/, DefinitionTag* /*ch*/)
+	virtual void addDisplayObject(boost::uint16_t /*id*/, DefinitionTag* /*c*/)
 	{
 	}
 

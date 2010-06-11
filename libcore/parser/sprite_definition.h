@@ -207,15 +207,15 @@ public:
 	/// Get a SWF::DefinitionTag from this Sprite's root movie
 	/// CharacterDictionary.
 	///
-	virtual SWF::DefinitionTag*	getDefinitionTag(int id) const
+	virtual SWF::DefinitionTag*	getDefinitionTag(boost::uint16_t id) const
 	{
 	    return m_movie_def.getDefinitionTag(id);
 	}
 
 	/// Delegate call to associated root movie
-	virtual void addDisplayObject(int id, SWF::DefinitionTag* ch)
+	virtual void addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c)
 	{
-		m_movie_def.addDisplayObject(id, ch);
+		m_movie_def.addDisplayObject(id, c);
 	}
 
 	// Create a (mutable) instance of our definition.  The
