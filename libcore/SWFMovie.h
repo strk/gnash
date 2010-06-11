@@ -38,9 +38,18 @@ namespace gnash
 {
 
 /// Stateful Movie object (a special kind of sprite)
+//
+/// The tasks of the Movie include:
+//
+/// 1. Keep a 'dictionary' of parsed characters.
+///     This is a container of characters defined in previous frames. It
+///     acts like a genuine runtime dictionary of characters, although Gnash
+///     actually stores the definitions in the SWFMovieDefinition as it is
+///     parsed.
 class SWFMovie : public Movie
 {
 
+    /// A container to track known characters and whether they are initialized.
     typedef std::map<boost::uint16_t, bool> Characters;
 
 public:
