@@ -1543,18 +1543,10 @@ movie_root::processActionQueue()
 void
 movie_root::removeQueuedConstructor(DisplayObject* target)
 {
-
     ActionQueue& pr = _actionQueue[PRIORITY_CONSTRUCT];
     
-    const size_t st = pr.size();
-
     pr.erase(std::remove_if(pr.begin(), pr.end(), FindTarget(target)),
             pr.end());
-
-    const size_t sa = pr.size();
-
-    log_debug("%s items removed from ActionQueue (size now: %s)",
-            st - sa, sa);
 }
 
 void
