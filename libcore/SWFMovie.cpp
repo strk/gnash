@@ -108,7 +108,7 @@ SWFMovie::initializeCharacter(boost::uint16_t cid)
 {
     Characters::iterator it = _characters.find(cid);
     if (it == _characters.end()) {
-        IF_VERBOSE_SWFERRORS(
+        IF_VERBOSE_MALFORMED_SWF(
             log_swferror("Attempt to perform initialized for a character %s "
                 "that does not exist (either not exported or not defined)",
                 cid);
