@@ -98,7 +98,8 @@ SWFMovie::exportedCharacter(const std::string& symbol)
 void
 SWFMovie::addCharacter(boost::uint16_t id)
 {
-    log_debug("Adding character %s", id);
+    // If a character is already known, we don't want to mark it uninitialized
+    // again.
     _characters.insert(std::make_pair(id, false));
 }
 

@@ -112,6 +112,10 @@ public:
     /// This makes the character known to ActionScript for initialization.
     /// Exported characters must both be in the definition's list of exports
     /// and added with this function before they are available.
+    //
+    /// If a duplicated character is added, it will not be marked
+    /// uninitialized, as SWF::DoInitAction tags are only executed once
+    /// for each id.
     void addCharacter(boost::uint16_t id);
 
     /// Attempt to mark a character as initialized.
