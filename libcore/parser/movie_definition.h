@@ -228,8 +228,7 @@ public:
 	//
 	/// This method is here to be called by DEFINE tags loaders.
 	/// The default implementation does nothing.
-	///
-	virtual void addDisplayObject(int /*id*/, DefinitionTag* /*ch*/)
+	virtual void addDisplayObject(boost::uint16_t /*id*/, DefinitionTag* /*c*/)
 	{
 	}
 

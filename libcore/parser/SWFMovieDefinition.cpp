@@ -173,7 +173,7 @@ SWFMovieDefinition::~SWFMovieDefinition()
 }
 
 void
-SWFMovieDefinition::addDisplayObject(int id, SWF::DefinitionTag* c)
+SWFMovieDefinition::addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c)
 {
     assert(c);
     boost::mutex::scoped_lock lock(_dictionaryMutex);

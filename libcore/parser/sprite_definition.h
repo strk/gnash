@@ -213,9 +213,9 @@ public:
 	}
 
 	/// Delegate call to associated root movie
-	virtual void addDisplayObject(int id, SWF::DefinitionTag* ch)
+	virtual void addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c)
 	{
-		m_movie_def.addDisplayObject(id, ch);
+		m_movie_def.addDisplayObject(id, c);
 	}
 
 	// Create a (mutable) instance of our definition.  The
