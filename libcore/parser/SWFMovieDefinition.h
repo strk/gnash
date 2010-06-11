@@ -430,7 +430,8 @@ private:
     /// This is the real export map
     //
     /// It maps string to character ID as parsed.
-    typedef std::map<std::string, boost::uint16_t> Exports;
+    typedef std::map<std::string, boost::uint16_t,
+            StringNoCaseLessThan> Exports;
 
     Exports _exportMap;
 
