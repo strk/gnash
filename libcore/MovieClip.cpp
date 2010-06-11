@@ -1216,11 +1216,13 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     assert(_def);
     assert(tag != NULL);
 
-    SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
+    const boost::uint16_t id = tag->getID();
+
+    SWF::DefinitionTag* cdef = _def->getDefinitionTag(id);
     if (cdef == NULL)
     {
         log_error(_("movieclip::replace_display_object(): "
-            "unknown cid = %d"), tag->getID());
+            "unknown cid = %d"), id);
         return;
     }
     assert(cdef);
@@ -1265,7 +1267,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     // use SWFMatrix from the old DisplayObject if tag doesn't provide one.
     dlist.replaceDisplayObject(ch, tag->getDepth(), 
         !tag->hasCxform(), !tag->hasMatrix());
-    _swf->addCharacter(tag->getID());
+    _swf->addCharacter(id);
     ch->construct();
 }
 
