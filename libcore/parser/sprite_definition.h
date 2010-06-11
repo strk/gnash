@@ -207,7 +207,7 @@ public:
 	/// Get a SWF::DefinitionTag from this Sprite's root movie
 	/// CharacterDictionary.
 	///
-	virtual SWF::DefinitionTag*	getDefinitionTag(int id) const
+	virtual SWF::DefinitionTag*	getDefinitionTag(boost::uint16_t id) const
 	{
 	    return m_movie_def.getDefinitionTag(id);
 	}

@@ -190,8 +190,7 @@ public:
 	///
 	/// @return NULL if no DisplayObject with the given ID is found
 	///         (this is the default)
-	///
-	virtual DefinitionTag* getDefinitionTag(int /*id*/) const
+	virtual DefinitionTag* getDefinitionTag(boost::uint16_t /*id*/) const
 	{
 		return NULL;
 	}

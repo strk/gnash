@@ -241,7 +241,7 @@ public:
     virtual void addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c);
 
     /// Return a DisplayObject from the dictionary
-    SWF::DefinitionTag* getDefinitionTag(int id) const;
+    SWF::DefinitionTag* getDefinitionTag(boost::uint16_t id) const;
 
     // See dox in movie_definition
     //
