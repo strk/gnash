@@ -102,6 +102,7 @@ libgnashcore_la_SOURCES = \
 	swf/DefineButtonTag.cpp \
 	swf/DefineFontTag.cpp \
 	swf/VideoFrameTag.cpp \
+	swf/DefinitionTag.cpp \
 	swf/ShapeRecord.cpp \
 	swf/SoundInfoRecord.cpp \
 	swf/TextRecord.cpp \

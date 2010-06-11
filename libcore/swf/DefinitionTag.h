@@ -19,10 +19,12 @@
 #ifndef GNASH_DEFINITION_TAG_H
 #define GNASH_DEFINITION_TAG_H
 
-#include "ExportableResource.h"
 
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
+
+#include "ControlTag.h"
+#include "ref_counted.h"
 
 // Forward declarations
 
@@ -40,7 +42,7 @@ namespace gnash {
 namespace SWF {
 
 /// Immutable data representing the definition of a movie display element.
-class DefinitionTag : public ExportableResource, boost::noncopyable
+class DefinitionTag : public ControlTag, public ref_counted
 {
 public:
 
@@ -59,6 +61,8 @@ public:
     /// DisplayObject.
 	virtual DisplayObject* createDisplayObject(Global_as& gl,
             DisplayObject* parent) const = 0;
+
+	virtual void executeState(MovieClip* m,  DisplayList& /*dlist*/) const;
 
     boost::uint16_t id() const {
         return _id;

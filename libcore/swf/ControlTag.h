@@ -19,6 +19,7 @@
 #ifndef GNASH_CONTROL_TAG_H
 #define GNASH_CONTROL_TAG_H
 
+#include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -33,7 +34,7 @@ namespace SWF {
 //
 /// These are the events associated with a frame.
 ///
-class ControlTag
+class ControlTag : boost::noncopyable
 {
 public:
     

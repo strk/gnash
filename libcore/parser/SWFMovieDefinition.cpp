@@ -189,6 +189,7 @@ SWFMovieDefinition::addDisplayObject(int id, SWF::DefinitionTag* c)
     assert(c);
     boost::mutex::scoped_lock lock(_dictionaryMutex);
     _dictionary.addDisplayObject(id, c);
+    addControlTag(c);
 }
 
 SWF::DefinitionTag*
@@ -718,7 +719,7 @@ SWFMovieDefinition::importResources(
         }
 
         // TODO: can this be anything else?
-        boost::intrusive_ptr<ExportableResource> res =
+        boost::intrusive_ptr<SWF::DefinitionTag> res =
             source->getDefinitionTag(targetID);
 
         if (!res) {
