@@ -447,7 +447,11 @@ public:
 	}
 
 #endif
-
+protected:
+    movie_definition(boost::uint16_t id = 0)
+        :
+        DefinitionTag(id)
+    {}
 };
 
 } // namespace gnash

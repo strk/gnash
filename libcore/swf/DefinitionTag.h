@@ -22,6 +22,7 @@
 #include "ExportableResource.h"
 
 #include <boost/noncopyable.hpp>
+#include <boost/cstdint.hpp>
 
 // Forward declarations
 
@@ -58,6 +59,18 @@ public:
     /// DisplayObject.
 	virtual DisplayObject* createDisplayObject(Global_as& gl,
             DisplayObject* parent) const = 0;
+
+    boost::uint16_t id() const {
+        return _id;
+    }
+
+protected:
+
+    DefinitionTag(boost::uint16_t id) : _id(id) {}
+
+private:
+
+    const boost::uint16_t _id;
 	
 };
 

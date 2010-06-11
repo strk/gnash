@@ -47,8 +47,9 @@ namespace {
 }
 
 DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
-        TagType tag)
+        TagType tag, boost::uint16_t id)
     :
+    DefinitionTag(id),
     _soundTag(0),
     _trackAsMenu(false),
     _movieDef(m)
@@ -79,13 +80,13 @@ DefineButtonTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 {
     assert(tag == DEFINEBUTTON);
     in.ensureBytes(2);
-    int id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  DefineButton loader: chararacter id = %d"), id);
     );
 
-    std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag));
+    std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag, id));
 
     m.addDisplayObject(id, bt.release());
 }
@@ -96,13 +97,13 @@ DefineButton2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
 {
     assert(tag == DEFINEBUTTON2);
     in.ensureBytes(2);
-    int id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  DefineButton2 loader: chararacter id = %d"), id);
     );
 
-    std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag));
+    std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag, id));
 
     m.addDisplayObject(id, bt.release());
 }

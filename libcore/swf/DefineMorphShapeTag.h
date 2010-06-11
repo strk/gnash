@@ -66,7 +66,7 @@ public:
 private:
 
     DefineMorphShapeTag(SWFStream& in, SWF::TagType tag, movie_definition& md,
-            const RunResources& r);
+            const RunResources& r, boost::uint16_t id);
     
     /// Read a DefineMorphShape tag from stream
     //

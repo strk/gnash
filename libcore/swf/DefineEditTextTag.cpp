@@ -34,11 +34,11 @@ DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 	assert(tag == SWF::DEFINEEDITTEXT); // 37
 
     in.ensureBytes(2);
-    boost::uint16_t DisplayObjectID = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
-    std::auto_ptr<DefineEditTextTag> editText(new DefineEditTextTag(in, m));
+    std::auto_ptr<DefineEditTextTag> editText(new DefineEditTextTag(in, m, id));
 
-    m.addDisplayObject(DisplayObjectID, editText.release());
+    m.addDisplayObject(id, editText.release());
 }
 
 DisplayObject*
@@ -160,8 +160,10 @@ DefineEditTextTag::read(SWFStream& in, movie_definition& m)
 	);
 }
 
-DefineEditTextTag::DefineEditTextTag(SWFStream& in, movie_definition& m)
+DefineEditTextTag::DefineEditTextTag(SWFStream& in, movie_definition& m,
+        boost::uint16_t id)
     :
+    DefinitionTag(id),
 	_hasText(true),
 	_wordWrap(false),
 	_multiline(false),

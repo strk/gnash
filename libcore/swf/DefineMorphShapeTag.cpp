@@ -41,18 +41,20 @@ DefineMorphShapeTag::loader(SWFStream& in, TagType tag, movie_definition& md,
         const RunResources& r)
 {
     in.ensureBytes(2);
-    boost::uint16_t id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
             log_parse("DefineMorphShapeTag: id = %d", id);
     );
 
-    DefineMorphShapeTag* morph = new DefineMorphShapeTag(in, tag, md, r);
+    DefineMorphShapeTag* morph = new DefineMorphShapeTag(in, tag, md, r, id);
     md.addDisplayObject(id, morph);
 }
 
 DefineMorphShapeTag::DefineMorphShapeTag(SWFStream& in, TagType tag,
-        movie_definition& md, const RunResources& r)
+        movie_definition& md, const RunResources& r, boost::uint16_t id)
+    :
+    DefinitionTag(id)
 {
     read(in, tag, md, r);
 }

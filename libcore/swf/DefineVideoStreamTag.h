@@ -150,13 +150,6 @@ private:
 
 	void read(SWFStream& in);
 
-	/// Id of this DisplayObject definition, set by constructor.
-	///
-	/// The id is currently set to -1 when the definition is actually
-	/// created dynamically (instantiating the ActionScript Video class)
-	///
-	boost::uint16_t m_char_id;
-
 	/// Reserved flags read from DEFINEVIDEOSTREAM tag
 	boost::uint8_t m_reserved_flags;
 

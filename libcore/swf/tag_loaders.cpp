@@ -760,7 +760,7 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == SWF::DEFINESPRITE); // 39 - DefineSprite
 
     in.ensureBytes(2);
-    int    id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE
     (
@@ -781,7 +781,7 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
     );
 
     // will automatically read the sprite
-    sprite_definition* ch = new sprite_definition(m, in, r);
+    sprite_definition* ch = new sprite_definition(m, in, r, id);
 
     IF_VERBOSE_MALFORMED_SWF(
         if (!ch->get_frame_count()) {

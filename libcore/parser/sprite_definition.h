@@ -66,7 +66,7 @@ public:
 	///	to be already positioned right before the frame count
 	///
 	sprite_definition(movie_definition& m, SWFStream& in,
-            const RunResources& runResources);
+            const RunResources& runResources, boost::uint16_t id);
 
 	/// Destructor, releases playlist data
 	~sprite_definition();
