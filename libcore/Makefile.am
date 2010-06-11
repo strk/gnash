@@ -102,6 +102,7 @@ libgnashcore_la_SOURCES = \
 	swf/DefineButtonTag.cpp \
 	swf/DefineFontTag.cpp \
 	swf/VideoFrameTag.cpp \
+	swf/DefinitionTag.cpp \
 	swf/ShapeRecord.cpp \
 	swf/SoundInfoRecord.cpp \
 	swf/TextRecord.cpp \
@@ -271,7 +272,6 @@ EXTENSIONS_API = \
 	MovieFactory.h \
 	fill_style.h \
 	LineStyle.h \
-	ExportableResource.h \
 	BitmapInfo.h \
 	RGBA.h	\
 	Geometry.h	\

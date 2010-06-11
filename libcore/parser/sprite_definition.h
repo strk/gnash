@@ -23,6 +23,7 @@
 
 
 #include <boost/intrusive_ptr.hpp>
+#include <boost/cstdint.hpp>
 #include <string>
 #include <map>
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -65,7 +66,7 @@ public:
 	///	to be already positioned right before the frame count
 	///
 	sprite_definition(movie_definition& m, SWFStream& in,
-            const RunResources& runResources);
+            const RunResources& runResources, boost::uint16_t id);
 
 	/// Destructor, releases playlist data
 	~sprite_definition();
@@ -194,27 +195,13 @@ public:
 		return _loadingSoundStream;
 	}
 
-
-	/// Delegate call to associated root movie
-	virtual void exportResource(const std::string& sym, int id)
-	{
-		m_movie_def.exportResource(sym, id);
-	}
-
-	/// Delegate call to associated root movie
-	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
-            const std::string& sym) const
-	{
-		return m_movie_def.get_exported_resource(sym);
-	}
-
-	/// Overridden just for complaining  about malformed SWF
-	virtual void importResources(boost::intrusive_ptr<movie_definition> /*source*/, Imports& /*imports*/)
-	{
-		IF_VERBOSE_MALFORMED_SWF (
-		log_swferror(_("IMPORT tag appears in DEFINESPRITE tag"));
-		);
-	}
+    virtual boost::uint16_t exportID(const std::string& symbol) const {
+        return m_movie_def.exportID(symbol);
+    }
+    
+    virtual void registerExport(const std::string& s, boost::uint16_t id) {
+        m_movie_def.registerExport(s, id);
+    }
 
 	/// \brief
 	/// Get a SWF::DefinitionTag from this Sprite's root movie

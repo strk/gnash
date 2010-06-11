@@ -61,7 +61,7 @@ DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("DefineShapeTag(%s): id = %d"), tag, id);
     );
 
-    DefineShapeTag* ch = new DefineShapeTag(in, tag, m, r);
+    DefineShapeTag* ch = new DefineShapeTag(in, tag, m, r, id);
     m.addDisplayObject(id, ch);
 
 }
@@ -81,9 +81,9 @@ DefineShapeTag::pointTestLocal(boost::int32_t x, boost::int32_t y,
 
 
 DefineShapeTag::DefineShapeTag(SWFStream& in, TagType tag,
-        movie_definition& m, const RunResources& r)
+        movie_definition& m, const RunResources& r, boost::uint16_t id)
     :
-    DefinitionTag(),
+    DefinitionTag(id),
     _shape(in, tag, m, r)
 {
 }

@@ -54,7 +54,6 @@
 #include "LineStyle.h" // for CapStyle and JoinStyle enums
 #include "PlaceObject2Tag.h" 
 #include "flash/geom/Matrix_as.h"
-#include "ExportableResource.h"
 #include "GnashNumeric.h"
 #include "InteractiveObject.h"
 #include "DisplayObjectContainer.h"
@@ -861,7 +860,9 @@ MovieClip::advance()
 void
 MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 {
-    if ( _swf->setCharacterInitialized(cid) )
+    assert(cid >= 0);
+
+    if ( _swf->initializeCharacter(cid) )
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing init actions in frame %d of movieclip %s"),
@@ -1213,11 +1214,13 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     assert(_def);
     assert(tag != NULL);
 
-    SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
+    const boost::uint16_t id = tag->getID();
+
+    SWF::DefinitionTag* cdef = _def->getDefinitionTag(id);
     if (cdef == NULL)
     {
         log_error(_("movieclip::replace_display_object(): "
-            "unknown cid = %d"), tag->getID());
+            "unknown cid = %d"), id);
         return;
     }
     assert(cdef);

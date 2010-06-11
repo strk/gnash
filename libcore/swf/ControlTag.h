@@ -19,6 +19,8 @@
 #ifndef GNASH_CONTROL_TAG_H
 #define GNASH_CONTROL_TAG_H
 
+#include <boost/noncopyable.hpp>
+#include "ref_counted.h"
 
 // Forward declarations
 namespace gnash {
@@ -33,7 +35,12 @@ namespace SWF {
 //
 /// These are the events associated with a frame.
 ///
-class ControlTag
+/// TODO: check whether this needs to be ref_counted. They are generally owned
+/// by a sprite_definition or a SWFMovieDefinition.
+//
+/// TODO: rename this class so it's not the same as the SWF spec. It doesn't
+/// exactly correspond to the ControlTag defined there.
+class ControlTag : public ref_counted, boost::noncopyable
 {
 public:
     

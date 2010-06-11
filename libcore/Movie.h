@@ -69,13 +69,39 @@ public:
         return true;
     }
 
+    /// Get the URL the Movie was loaded from.
     virtual const std::string& url() const = 0;
 
+    /// Get the version of the Movie
+    //
+    /// @return     Either the version of the Movie or -1 if the Movie is of
+    ///             a type that has no version.
     virtual int version() const = 0;
 
-	/// Set a DisplayObject in the dictionary as initialized, returning
-	/// true if not already initialized.
-	virtual bool setCharacterInitialized(int /*cid*/) {
+    /// Get an exported character definition by its symbol name.
+    //
+    /// The character is only available after the ExportAssets tag has been
+    /// executed.
+    //
+    /// @param symbol   The exported symbol of the character to retrieve.
+    /// @return         The DefinitionTag of the requested character or 0
+    ///                 if the character has not yet been exported.
+    virtual SWF::DefinitionTag* exportedCharacter(const std::string& /*s*/) {
+        return 0;
+    }
+
+    /// Add a character to the list of known characters
+    //
+    /// This makes the character known to ActionScript for initialization.
+    /// Exported characters must both be in the definition's list of exports
+    /// and added with this function before they are available.
+    virtual void addCharacter(boost::uint16_t /*id*/) {}
+
+    /// Attempt to mark a character as initialized.
+    //
+    /// The default is to return false. Only a SWFMovie can have a list of
+    /// characters.
+	virtual bool initializeCharacter(boost::uint16_t /*id*/) {
         return false;
     }
 

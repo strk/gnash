@@ -58,13 +58,6 @@ sprite_definition::createDisplayObject(Global_as& gl, DisplayObject* parent)
 
 sprite_definition::~sprite_definition()
 {
-	// Release our playlist data.
-	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end();
-            i != e; ++i)
-	{
-		PlayList& pl = i->second;
-        deleteChecked(pl.begin(), pl.end());
-    }
 }
 
 /*private*/
@@ -125,8 +118,9 @@ sprite_definition::get_labeled_frame(const std::string& label,
 }
 
 sprite_definition::sprite_definition(movie_definition& m, SWFStream& in, 
-        const RunResources& runResources)
+        const RunResources& runResources, boost::uint16_t id)
 	:
+    movie_definition(id),
 	m_movie_def(m),
 	m_frame_count(0),
 	m_loading_frame(0),

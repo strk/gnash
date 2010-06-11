@@ -264,7 +264,8 @@ private:
     /// Construct a DefineButtonTag (DefinitionTag)
     //
     /// This can only be constructed using a loader() function.
-    DefineButtonTag(SWFStream& in, movie_definition& m, TagType tag);
+    DefineButtonTag(SWFStream& in, movie_definition& m, TagType tag, 
+            boost::uint16_t id);
 
     /// Read a DEFINEBUTTON tag
     void readDefineButtonTag(SWFStream& in, movie_definition& m);

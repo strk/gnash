@@ -189,7 +189,7 @@ private:
     /// Construct a DefineEditTextTag.
     //
     /// This should only be used from the loader() function.
-	DefineEditTextTag(SWFStream& in, movie_definition& m);
+	DefineEditTextTag(SWFStream& in, movie_definition& m, boost::uint16_t id);
 
     /// Read a tag from the SWFStream.
     void read(SWFStream& in, movie_definition& m);

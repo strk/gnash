@@ -18,8 +18,7 @@
 #ifndef GNASH_SOUND_H
 #define GNASH_SOUND_H
 
-
-#include "ExportableResource.h"
+#include "ref_counted.h"
 
 // Forward declarations
 namespace gnash {
@@ -46,8 +45,9 @@ namespace gnash {
 /// @todo move definition to sound_handler.h and possibly nest
 /// inside sound_handler itself ?
 //
-/// This is a resource because it can be exported.
-class sound_sample: public ExportableResource
+/// This is ref_counted because it is an export.
+/// TODO: check whether it really needs to be ref counted.
+class sound_sample : public ref_counted
 {
 public:
 

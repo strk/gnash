@@ -23,10 +23,11 @@
 
 #include <vector>
 #include <string>
-#include <cmath>
 
 #include <functional> // for mem_fun, bind1st
 #include <algorithm> // for for_each, std::min
+#include <utility>
+#include <map>
 
 namespace gnash {
 
@@ -79,6 +80,44 @@ SWFMovie::advance()
 	}
 
     MovieClip::advance(); 
+}
+    
+SWF::DefinitionTag*
+SWFMovie::exportedCharacter(const std::string& symbol)
+{
+    log_debug("Looking for export %s", symbol);
+    const boost::uint16_t id = _def->exportID(symbol);
+    if (!id) return 0;
+    log_debug("Corresponds to character %s", id);
+    Characters::iterator it = _characters.find(id);
+    if (it == _characters.end()) return 0;
+    log_debug("Found character");
+    return _def->getDefinitionTag(id);
+}
+
+void
+SWFMovie::addCharacter(boost::uint16_t id)
+{
+    // If a character is already known, we don't want to mark it uninitialized
+    // again.
+    _characters.insert(std::make_pair(id, false));
+}
+
+bool
+SWFMovie::initializeCharacter(boost::uint16_t cid)
+{
+    Characters::iterator it = _characters.find(cid);
+    if (it == _characters.end()) {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror("Attempt to perform initialized for a character %s "
+                "that does not exist (either not exported or not defined)",
+                cid);
+        );
+        return false;
+    }
+    if (it->second) return false;
+    it->second = true;
+    return true;
 }
 
 } // namespace gnash

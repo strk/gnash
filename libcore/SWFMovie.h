@@ -27,7 +27,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <string>
-#include <set>
+#include <map>
 
 // Forward declarations
 namespace gnash {
@@ -38,8 +38,19 @@ namespace gnash
 {
 
 /// Stateful Movie object (a special kind of sprite)
+//
+/// The tasks of the Movie include:
+//
+/// 1. Keep a 'dictionary' of parsed characters.
+///     This is a container of characters defined in previous frames. It
+///     acts like a genuine runtime dictionary of characters, although Gnash
+///     actually stores the definitions in the SWFMovieDefinition as it is
+///     parsed.
 class SWFMovie : public Movie
 {
+
+    /// A container to track known characters and whether they are initialized.
+    typedef std::map<boost::uint16_t, bool> Characters;
 
 public:
 
@@ -74,20 +85,51 @@ public:
 	/// It's intended to be called by movie_root::setLevel().
     void construct(as_object* init = 0);
 
+    /// Get the URL of the SWFMovie's definition.
     const std::string& url() const {
         return _def->get_url();
     }
 
+    /// Get the version of the SWFMovie.
+    //
+    /// @return     the version of the SWFMovie.
     int version() const {
         return _def->get_version();
     }
+    
+    /// Get an exported character definition by its symbol name.
+    //
+    /// The character is only available after the ExportAssets tag has been
+    /// executed.
+    //
+    /// @param symbol   The exported symbol of the character to retrieve.
+    /// @return         The DefinitionTag of the requested character or 0
+    ///                 if the character has not yet been exported.
+    virtual SWF::DefinitionTag* exportedCharacter(const std::string& symbol);
 
-	/// Set a DisplayObject in the dictionary as initialized, returning
-	/// true if not already initialized.
-	bool setCharacterInitialized(int cid)
-	{
-		return _initializedCharacters.insert(cid).second;
-	}
+    /// Add a character to the list of known characters
+    //
+    /// This makes the character known to ActionScript for initialization.
+    /// Exported characters must both be in the definition's list of exports
+    /// and added with this function before they are available.
+    //
+    /// If a duplicated character is added, it will not be marked
+    /// uninitialized, as SWF::DoInitAction tags are only executed once
+    /// for each id.
+    void addCharacter(boost::uint16_t id);
+
+    /// Attempt to mark a character as initialized.
+    //
+    /// A character can be initialized once, but only after it is known to this
+    /// Movie.
+    //
+    /// @param id   The id of the character to initialize.
+    /// @return     false if the character cannot be initialized. This can mean
+    ///             1. The character is not yet present (either not exported
+    ///                or has not yet been placed on stage).
+    ///             2. The character has already been initialized.
+    ///             true if the character was marked initialized.
+	bool initializeCharacter(boost::uint16_t id);
 
     const movie_definition* definition() const {
         return _def.get();
@@ -95,12 +137,8 @@ public:
 
 private:
 
-	/// A map to track execution of init actions
-	//
-	/// Elements of this set are ids of DisplayObjects
-	/// in our definition's CharacterDictionary.
-	///
-	std::set<int> _initializedCharacters;
+    /// Tracks known characters and whether they have been initialized.
+	Characters _characters;
 
     /// This should only be a top-level movie, not a sprite_definition.
 	const boost::intrusive_ptr<const SWFMovieDefinition> _def;

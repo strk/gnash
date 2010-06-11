@@ -52,13 +52,15 @@
 #include "gnashconfig.h" // for USE_SWFTREE
 #endif
 
-#include "DefinitionTag.h"
-
 #include <string>
 #include <memory> // for auto_ptr
 #include <vector> // for PlayList typedef
 #include <set>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/cstdint.hpp>
+
+#include "DefinitionTag.h"
+#include "log.h"
 
 // Forward declarations
 namespace gnash {
@@ -69,7 +71,6 @@ namespace gnash {
         class ControlTag;
     }
     class Font;
-    class ExportableResource;
     class sound_sample;
     class JpegImageInput;
 }
@@ -100,7 +101,7 @@ namespace gnash
 class movie_definition : public SWF::DefinitionTag
 {
 public:
-	typedef std::vector<SWF::ControlTag*> PlayList;
+	typedef std::vector<boost::intrusive_ptr<SWF::ControlTag> > PlayList;
 
 	virtual int	get_version() const = 0;
 	virtual float get_width_pixels() const = 0;
@@ -157,21 +158,6 @@ public:
 		return 0;
 	}
 
-	/// Get the named exported resource, if we expose it.
-	//
-	/// @param symbol
-	///	The symbol name. Matching should be case-insensitive for all
-    /// SWF versions.
-	///
-	/// @return NULL if the label doesn't correspond to an exported
-	///         resource. This is the default behaviour.
-	///
-	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
-            const std::string& /*symbol*/) const
-	{
-		return NULL;
-	}
-
 
 	typedef std::pair<int, std::string> ImportSpec;
 	typedef std::vector< ImportSpec > Imports;
@@ -184,8 +170,13 @@ public:
 	/// @param imports
 	///	Resources to import, each with the id to use in our dictionary
 	///
-	virtual void importResources(boost::intrusive_ptr<movie_definition> /*source*/, Imports& /*imports*/)
+	virtual void importResources(
+            boost::intrusive_ptr<movie_definition> /*source*/, 
+            const Imports& /*imports*/)
 	{
+		IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("IMPORT tag appears outside SWF definition"));
+		);
 	}
 
 
@@ -396,18 +387,18 @@ public:
 		return -1;
 	}
 
-	/// Mark the given resource as "exported" with the given linkage name.
-	//
-    /// Note that any previously exported resource with the same linkage
-    /// name will become unreachable (export override).
-    ///
-	/// @see get_exported_resource
-	///
-	/// The default implementation is a no-op
-	///
-	virtual void exportResource(const std::string& /*symbol*/, int /*id*/)
-	{
-	}
+    /// Register a symbol to refer to a character id
+    //
+    /// The default implementation does nothing.
+    virtual void registerExport(const std::string&, boost::uint16_t) {}
+    
+    /// Get the id that corresponds to a symbol.
+    //
+    /// @return         The id corresponding to the passed symbol. The default
+    ///                 implementation returns 0, as it has no export table.
+    virtual boost::uint16_t exportID(const std::string& /*symbol*/) const {
+        return 0;
+    }
 
     /// Set whether the SWFMovie should use AVM2 or AVM1.
     //
@@ -468,7 +459,11 @@ public:
 	}
 
 #endif
-
+protected:
+    movie_definition(boost::uint16_t id = 0)
+        :
+        DefinitionTag(id)
+    {}
 };
 
 } // namespace gnash

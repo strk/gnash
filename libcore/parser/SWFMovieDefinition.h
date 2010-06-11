@@ -235,18 +235,8 @@ public:
         return m_file_length;
     }
 
-    // See docs in movie_definition.h
-    virtual void exportResource(const std::string& symbol, int id);
-
-    /// Get the named exported resource, if we expose it.
-    //
-    /// @return NULL if the label doesn't correspond to an exported
-    ///         resource, or if a timeout occurs while scanning the movie.
-    virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
-            const std::string& symbol) const;
-
     virtual void importResources(boost::intrusive_ptr<movie_definition> source,
-            Imports& imports);
+            const Imports& imports);
 
     void addDisplayObject(int DisplayObject_id, SWF::DefinitionTag* c);
 
@@ -385,6 +375,26 @@ public:
 
     virtual const std::string& get_url() const { return _url; }
     
+    /// Get the id that corresponds to a symbol.
+    //
+    /// This function is thread-safe.
+    //
+    /// @param symbol   The symbol to lookup in the table.
+    /// @return         The id corresponding to the passed symbol. 0 is not a
+    ///                 valid id and signifies that the symbol was not (yet)
+    ///                 exported.
+    boost::uint16_t exportID(const std::string& symbol) const;
+    
+    /// Register a symbol to refer to a character id
+    //
+    /// This function is thread safe.
+    //
+    /// @param id       The id of the character to map to the symbol. NB: this
+    ///                 must never be 0!
+    /// @param symbol   The symbol to map to the id.
+    void registerExport(const std::string& symbol, boost::uint16_t id);
+
+    
 #ifdef USE_SWFTREE
 
     // These methods attach the contents of the METADATA tag
@@ -433,12 +443,14 @@ private:
     // Mutex protecting access to _namedFrames
     mutable boost::mutex _namedFramesMutex;
 
-    typedef std::map<std::string, boost::intrusive_ptr<ExportableResource>,
-            StringNoCaseLessThan > ExportMap;
+    /// Allow mapping symbol to id case insensitively.
+    typedef std::map<std::string, boost::uint16_t,
+            StringNoCaseLessThan> Exports;
 
-    ExportMap _exportedResources;
+    /// A map of symbol to character id.
+    Exports _exportTable;
 
-    // Mutex protecting access to _exportedResources
+    // Mutex protecting access to the export map.
     mutable boost::mutex _exportedResourcesMutex;
 
     /// Movies we import from; hold a ref on these,

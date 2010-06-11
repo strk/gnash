@@ -1,6 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
-//   Foundation, Inc
+//   Copyright (C) 2010 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,25 +15,19 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_RESOURCE_H
-#define GNASH_RESOURCE_H
-
-#include "ref_counted.h" // for inheritance
+#include "DefinitionTag.h"
+#include "MovieClip.h"
+#include "Movie.h"
 
 namespace gnash {
+namespace SWF {
 
-/// A class for SWF resources that may be exported
-//
-/// They are: DefinitionTag, sound_sample, and font.
-/// These may be held in the export map of a SWFMovieDefinition.
-class ExportableResource : public ref_counted
+void
+DefinitionTag::executeState(MovieClip* m, DisplayList& /*dlist*/) const
 {
-protected:
-    ExportableResource() {}
-	virtual ~ExportableResource() {}
-};
+    m->get_root()->addCharacter(_id);
+}
 
 
-} // namespace gnash
-
-#endif // GNASH_RESOURCE_H
+}
+}

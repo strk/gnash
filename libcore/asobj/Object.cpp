@@ -305,8 +305,11 @@ object_registerClass(const fn_call& fn)
     assert(relRoot);
     const movie_definition* def = relRoot->definition();
     
-    ExportableResource* exp_res = def->get_exported_resource(symbolid).get();
-    if (!exp_res) {
+    // We only care about definitions, not other exportable resources.
+    const boost::uint16_t id = def->exportID(symbolid);
+    SWF::DefinitionTag* d = def->getDefinitionTag(id);
+
+    if (!d) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Object.registerClass(%s, %s): "
                 "can't find exported symbol"),
@@ -317,17 +320,14 @@ object_registerClass(const fn_call& fn)
 
     // Check that the exported resource is a sprite_definition
     // (we're looking for a MovieClip symbol)
-
-    sprite_definition* exp_clipdef(
-            dynamic_cast<sprite_definition*>(exp_res));
-
+    sprite_definition* exp_clipdef(dynamic_cast<sprite_definition*>(d));
 
     if (!exp_clipdef) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Object.registerClass(%s, %s): "
             "exported symbol is not a MovieClip symbol "
             "(sprite_definition), but a %s"),
-            symbolid, typeName(theclass), typeName(exp_res));
+            symbolid, typeName(theclass), typeName(d));
         );
         return as_value(false);
     }
