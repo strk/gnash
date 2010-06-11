@@ -37,6 +37,9 @@ namespace SWF {
 ///
 /// TODO: check whether this needs to be ref_counted. They are generally owned
 /// by a sprite_definition or a SWFMovieDefinition.
+//
+/// TODO: rename this class so it's not the same as the SWF spec. It doesn't
+/// exactly correspond to the ControlTag defined there.
 class ControlTag : public ref_counted, boost::noncopyable
 {
 public:

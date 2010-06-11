@@ -41,6 +41,9 @@ namespace gnash {
 namespace SWF {
 
 /// Immutable data representing the definition of a movie display element.
+//
+/// TODO: rename this class so it's not the same as the SWF spec. It doesn't
+/// exactly correspond to the DefinitionTag defined there.
 class DefinitionTag : public ControlTag
 {
 public:
