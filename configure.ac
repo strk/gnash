@@ -696,13 +696,14 @@ operating system." >&3
 fi
 
 dnl By default, we want to to build all renderers
+build_gles=no
 build_ogl=yes
 build_agg=yes
 build_cairo=yes
 renderer_list="OpenGL AGG Cairo"
 nrender=3
 AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|cairo|agg|all, default=all)]),
+  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|gles|cairo|agg|all, default=all)]),
   if test -n ${enableval}; then
     if test "x${enableval}" != "xno" -o "x${enableval}" != "xnone" ; then
       renderer_list="none"
@@ -715,6 +716,7 @@ AC_ARG_ENABLE(renderer,
   renderer_list=""
   nrender=0
   build_ogl=no
+  build_gles=no
   build_agg=no
   build_cairo=no
   while test -n "${enableval}" ; do
@@ -723,6 +725,7 @@ AC_ARG_ENABLE(renderer,
       no*|NO*)
         renderer_list="none"
         build_ogl=no
+        build_gles=no
         build_agg=no
         build_cairo=no
         nrender=1
@@ -736,7 +739,14 @@ AC_ARG_ENABLE(renderer,
         ;;
       ogl|OGL|OpenGL|opengl)
         renderer_list="${renderer_list} OpenGL"
+        build_gles=no
         build_ogl=yes
+        nrender=$((nrender+1))
+        ;;
+      gles|GLES|GL-ES|gl-es)
+        renderer_list="${renderer_list} OpenGL-ES"
+        build_gles=yes
+        build_ogl=no
         nrender=$((nrender+1))
         ;;
       agg|AGG)
@@ -788,7 +798,7 @@ AC_ARG_ENABLE(sound,
    fi]
 )
 
-if test x$build_ogl = xyes; then
+if test x"${build_ogl}" = xyes; then
 dnl  if test x$build_fb = xyes; then
 dnl    AC_MSG_ERROR([OpenGL renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
 dnl  fi
@@ -799,6 +809,10 @@ dnl  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
 dnl    AC_MSG_ERROR([OpenGL renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
 dnl  fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
+fi
+
+if test x"${build_gles}" = xyes; then
+   AC_DEFINE([RENDERER_GLES], [], [Use OpenGL-ES renderer])
 fi
 
 dnl 16 bit: RGB555, RGB565
@@ -1055,7 +1069,8 @@ dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_sha
 
 AC_PATH_PROG(DEJAGNU, runtest)
 
-AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes ])
+AM_CONDITIONAL(BUILD_GLES_RENDERER, [ test x$build_gles = xyes ])
+AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes])
 AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
 AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
 
@@ -1428,6 +1443,7 @@ if test x"${build_alp}" = xyes; then
 dnl  build_gtk=yes
   build_kde3=no
   build_ogl=no
+  build_gles=no
   build_agg=yes
 fi
 
@@ -2082,6 +2098,10 @@ AM_CONDITIONAL(BUILD_HAIKU_GUI,    [ test x$build_haiku = xyes ])
 AM_CONDITIONAL(NPAPI,   [test x"${npapi}" = xyes])
 AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
 AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
+
+if test x"${build_gles}" = xyes; then
+   GNASH_PATH_GLES
+fi
 
 if test x"${build_ogl}" = xyes; then
   GNASH_PATH_OPENGL
@@ -2986,7 +3006,7 @@ dnl else
 dnl   echo "        ERROR: No VORBIS Vorbis development package installed!" >&3
 dnl fi
 
-if test x"$opengl" = x"yes"; then
+if test x"${build_ogl}" = x"yes"; then
   if test x"$OPENGL_LIBS" != x; then
     if test x"$OPENGL_CFLAGS" != x; then
       echo "        OpenGL flags are: $OPENGL_CFLAGS"
@@ -2999,6 +3019,21 @@ if test x"$opengl" = x"yes"; then
       echo "               You need to install the libmesa development package" >&3
       echo "               or .deb users: apt-get install libgl1-mesa-dev" >&3
       echo "               or .rpm users: yum install xorg-x11-Mesa-libGL" >&3
+      echo "               or use a different renderer with --enable-renderer=" >&3
+  fi
+fi
+
+if test x"${build_gles}" = x"yes"; then
+  if test x"${has_gles}" != x; then
+    if test x"$GLES_CFLAGS" != x; then
+      echo "        OpenGL-ES flags are: $GLES_CFLAGS"
+    else
+      echo "        OpenGL-ES flags are: default include path"
+    fi
+    echo "        OpenGL-ES libs are: $GLES_LIBS"
+  else
+      echo "        ERROR: No OpenGL-ES development package installed!" >&3
+      echo "               You need to install the this from source proobably" >&3
       echo "               or use a different renderer with --enable-renderer=" >&3
   fi
 fi
