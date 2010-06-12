@@ -725,25 +725,58 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
     
     ExternalInterface::invoke_t *invoke = ExternalInterface::parseInvoke(buf);
 
+    // The invoke message is also used for getURL. In this case there are 4
+    // possible arguments.
     if (invoke) {
         if (invoke->name == "getURL") {
             // gnash::log_debug("Got a getURL() request: %", invoke->args[0].get());
 
-            std::string url = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
+            // The first argument is the URL string.
+            std::string url = NPStringToString(NPVARIANT_TO_STRING(
+                                                   invoke->args[0].get()));
+            // The second is the the method, namely GET or POST.
+            std::string op = NPStringToString(NPVARIANT_TO_STRING(
+                                                  invoke->args[1].get()));
+            // The third is the optional target, which is something like
+            // _blank or _self.
             std::string target;
-            if (invoke->args.size() == 2) {
-                target = NPStringToString(NPVARIANT_TO_STRING(invoke->args[1].get()));
+            // The fourth is the optional data. If there is data, the target
+            // field is always set so this argument is on the correct index.
+            // No target is "none".
+            std::string data;
+            if (invoke->args.size() >= 3) {
+                target = NPStringToString(NPVARIANT_TO_STRING(
+                                              invoke->args[2].get()));
+                if (target == "NONE") {
+                    target.clear();
+                }
+            }
+            if (invoke->args.size() == 4) {
+                data = NPStringToString(NPVARIANT_TO_STRING(
+                                            invoke->args[3].get()));
+            }
+            if (op == "GET") {
+                gnash::log_debug("Asked to getURL '%s' in target %s", url,
+                                 target);
+                NPN_GetURL(_instance, url.c_str(), target.c_str());
+            } else if (op == "POST") {                
+                gnash::log_debug("Asked to postURL '%s' this data %s", url,
+                                 data);
+                NPN_PostURL(_instance, url.c_str(), target.c_str(), data.size(),
+                            data.c_str(), false);
+                return true;
             }
             
-            gnash::log_debug("Asked to getURL '%s' in target %s", url, target);
-            NPN_GetURL(_instance, url.c_str(), target.c_str());
             return true;
         } else if (invoke->name == "fsCommand") {
-            std::string command = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
-            std::string arg = NPStringToString(NPVARIANT_TO_STRING(invoke->args[1].get()));            
+            std::string command = NPStringToString(NPVARIANT_TO_STRING(
+                                                       invoke->args[0].get()));
+            std::string arg = NPStringToString(NPVARIANT_TO_STRING(
+                                                   invoke->args[1].get()));            
             std::string name = _name; 
             std::stringstream jsurl;
-            jsurl << "javascript:" << name << "_DoFSCommand('" << command << "','" << arg <<"')";
+            jsurl << "javascript:" << name << "_DoFSCommand('" << command
+                  << "','" << arg <<"')";
             
             // TODO: check if _self is a good target for this
             static const char* tgt = "_self";
@@ -753,36 +786,6 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             
             NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
             return true;
-#if 0
-        }  else if ( ! strncmp(buf, "POST ", 5)) {
-            char* target = buf + 5;
-            if (! *target) return false;
-            
-            char* postdata = target;
-            while (*postdata && *postdata != ':') ++postdata;
-            if ( *postdata ) {
-                *postdata='\0';
-                ++postdata;
-            } else {
-                gnash::log_error("No colon found after getURL postdata string");
-                return false;
-            }
-        
-            char* url = postdata;
-            while (*url && *url != '$') ++url;
-            if (*url) {
-                *url='\0';
-                ++url;
-            } else {
-                gnash::log_error("No $ character found after getURL target string");
-                return false;
-            }
-            
-            NPN_PostURL(_instance, url, target, std::strlen(postdata),
-                        postdata, false);
-            
-            return true;
-#endif
         }
     } else {
         gnash::log_error("Unknown player request: " + std::string(buf));
@@ -1201,11 +1204,11 @@ processLog_trace(const boost::format& fmt)
 }
 #else
 void
-processLog_debug(const boost::format& fmt)
+processLog_debug(const boost::format& /* fmt */)
 { /* do nothing */ }
 
 void
-processLog_trace(const boost::format& fmt)
+processLog_trace(const boost::format& /* fmt */)
 { /* do nothing */ }
 #endif
 

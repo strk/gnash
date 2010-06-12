@@ -827,7 +827,7 @@ GnashPluginScriptObject::closePipe(int fd)
         // Send a Quit message to the player before closing the pipe.
         std::vector<std::string> args;
         std::string str = ExternalInterface::makeInvoke("Quit", args);
-        size_t ret =  writePlayer(fd, str);
+        size_t ret = writePlayer(fd, str);
     
         ::shutdown(fd, SHUT_RDWR);
         ::close(fd);

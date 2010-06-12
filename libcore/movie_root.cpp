@@ -2108,44 +2108,42 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     }
 
     /// This is when there is a hosting application.
-    std::ostringstream request;
-    std::string querystring;
+    std::vector<as_value> fnargs;
+    // The first argument we push on the stack is the URL
+    fnargs.push_back(as_value(urlstr));
+    
     switch (method) {
       case MovieClip::METHOD_POST:
-          request << "POST " << target << ":" << 
-              data << "$" << urlstr << std::endl;
-          break;
-          
-          // METHOD_GET and METHOD_NONE are the same, except that
-          // for METHOD_GET we append the variables to the query
-          // string.
+          fnargs.push_back(as_value("POST"));
+          break;     
       case MovieClip::METHOD_GET:
-          // Append vars to URL query string
-          if (urlstr.find("?") == std::string::npos) {
-              querystring = "?";
-          }
-          else querystring = "&";
-          querystring.append(data);
-          
+          fnargs.push_back(as_value("GET"));
+          break;
       case MovieClip::METHOD_NONE:
-          // use the original url, non parsed (the browser will know
-          // better how to resolve relative urls and handle
-          // javascript)
-          request << "GET " << target << ":" << urlstr << std::endl;
-            break;
+      default:
+          fnargs.push_back(as_value("GET"));
+          break;
     }
 
-    std::string requestString = request.str();
+    // The third argument is the target, which is something like _blank
+    // or _self.
+    if (!target.empty()) {
+	fnargs.push_back(as_value(target));
+    }
+    // Add any data as the optional 4th argument
+    if (!data.empty()) {
+        // We have to write a value here so the data field is the fourth
+        if (target.empty()) {
+            fnargs.push_back(as_value("none"));
+        }
+        fnargs.push_back(as_value(data));
+    }
+
     // TODO: should mutex-protect this ?
     // NOTE: we are assuming the hostfd is set in blocking mode here..
 
     log_debug(_("Attempt to write geturl requests fd #%d"), _hostfd);
 
-    std::vector<as_value> fnargs;
-    fnargs.push_back(as_value(urlstr));
-    if (!target.empty()) {
-	fnargs.push_back(as_value(target));
-    }
     std::string msg = ExternalInterface::makeInvoke("getURL", fnargs);
 
     size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
@@ -2153,12 +2151,6 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         log_error(_("Could only write %d bytes to fd #%d"),
 		  ret, _hostfd);
     }
-
-    // The request string ends with newline, and we don't want to log that
-#if 0
-    requestString.resize(requestString.size() - 1);
-    log_debug(_("Sent request '%s' to host fd %d"), requestString, _hostfd);
-#endif
 }
 
 void
