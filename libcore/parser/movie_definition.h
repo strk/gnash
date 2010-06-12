@@ -223,8 +223,12 @@ public:
 	/// Returns 1 based index. Ex: if 1 then 1st frame as been fully loaded
 	virtual size_t	get_loading_frame() const = 0;
 
-	/// Add a DisplayObject with given ID to the CharactersDictionary.
+	/// Add a DefinitionTag with given ID to the CharactersDictionary.
 	//
+    /// @param id   The id of the tag. All tags store their own id, but
+    ///             imported characters receive a new id in the importing
+    ///             movie.
+    //
 	/// This method is here to be called by DEFINE tags loaders.
 	/// The default implementation does nothing.
 	virtual void addDisplayObject(boost::uint16_t /*id*/, DefinitionTag* /*c*/)
