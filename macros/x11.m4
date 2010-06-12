@@ -68,7 +68,7 @@ AC_DEFUN([GNASH_PATH_X11],
   AC_CACHE_VAL(ac_cv_path_x11_lib,[
     if test x"${with_x11_lib}" != x ; then
       if test -f ${with_x11_lib}/libX11.a -o -f ${with_x11_lib}/libX11.${shlibext}; then
-       ac_cv_path_x11_lib=`(cd ${with_x11_lib}; pwd)`
+       ac_cv_path_x11_lib="-L`(cd ${with_x11_lib}; pwd)`"
       else
        AC_MSG_ERROR([${with_x11_lib} directory doesn't contain libx11.])
       fi

@@ -20,15 +20,22 @@ AC_DEFUN([GNASH_PATH_QT4], [
 
   dnl Look for the header
   AC_ARG_WITH(qt4_incl, AC_HELP_STRING([--with-qt4-incl],
-             [directory where QT 3.x headers are]),
+             [directory where QT 4.x headers are]),
 	     with_qt4_incl=${withval})
 
   AC_CACHE_VAL(ac_cv_path_qt4_incl,[
     if test x"${with_qt4_incl}" != x; then
       if test -f ${with_qt4_incl}/QtCore/qobject.h; then
-        ac_cv_path_qt4_incl="-I`(cd ${with_qt4_incl}; pwd)`"
+        qt4_include_subdirs="QtCore QtGui QtOpenGL"
+
+        ac_cv_path_qt4_incl="${ac_cv_path_qt4_incl} -I`(cd ${with_qt4_incl}; pwd)`"
+        for i in ${qt4_include_subdirs}; do
+          if test -d "${with_qt4_incl}/$i"; then
+            ac_cv_path_qt4_incl="${ac_cv_path_qt4_incl} -I`(cd ${with_qt4_incl}\$i; pwd)`"
+          fi
+        done
       else
-        AC_MSG_ERROR([${with_qt4_incl}/QtCore directory doesn't contain any QT 4.x headers])
+        AC_MSG_ERROR([${with_qt4_incl}/QtCore directory doesn't contain QT 4.x headers])
       fi
     fi
   ])				dnl end of cache ac_cv_path_qt4_incl
@@ -90,18 +97,20 @@ dnl     fi
     dnl then, but we might as well get all the paths, as header files ofteninclude other
     dnl header files.
     all_qt4_libs="QtCore QtGui QtOpenGL QtXml QtDBus QtNetwork QtScript QtSql QtTest QtSvg QtWebKit"
-    for i in ${all_qt4_libs}; do
-      dnl Darwin is easy, everything is in the same location on all machines.
-      if test x"${darwin}" = xyes; then
-        if test -d /Library/Frameworks; then
-	  ac_cv_path_qt4_incl="${ac_cv_path_qt4_incl} /Library/Frameworks/$i.framework/Headers"
-	fi
-      else
-        if test -d ${gnash_qt4_topdir}/$i; then
-	  ac_cv_path_qt4_incl="${ac_cv_path_qt4_incl} -I${gnash_qt4_topdir}/$i"
-	fi
-      fi
-    done
+    if test x"${ac_cv_path_qt4_incl}" = x; then
+      for i in ${all_qt4_libs}; do
+        dnl Darwin is easy, everything is in the same location on all machines.
+        if test x"${darwin}" = xyes; then
+          if test -d /Library/Frameworks; then
+            ac_cv_path_qt4_incl="${ac_cv_path_qt4_incl} /Library/Frameworks/$i.framework/Headers"
+          fi
+        else
+          if test -d ${gnash_qt4_topdir}/$i; then
+            ac_cv_path_qt4_incl="${ac_cv_path_qt4_incl} -I${gnash_qt4_topdir}/$i"
+          fi
+        fi
+      done
+    fi
     if test x"${ac_cv_path_qt4_incl}" = x; then
       QT4_CFLAGS=""
       AC_MSG_RESULT(no)
