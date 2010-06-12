@@ -94,8 +94,6 @@ void do_action_loader(SWFStream&, TagType, movie_definition&, const RunResources
 void frame_label_loader(SWFStream&, TagType, movie_definition&,
 		const RunResources&);
 
-void export_loader(SWFStream&, TagType, movie_definition&, const RunResources&);
-
 /// Load a SWF::DEFINESOUND tag.
 void define_sound_loader(SWFStream&, TagType, movie_definition&,
 		const RunResources&);

@@ -48,6 +48,7 @@
 #include "DefineFontNameTag.h"
 #include "VideoFrameTag.h"
 #include "ImportAssetsTag.h"
+#include "ExportAssetsTag.h"
 #ifdef ENABLE_AVM2
 # include "SymbolClassTag.h"
 # include "DoABCTag.h"
@@ -164,7 +165,7 @@ addDefaultLoaders(TagLoadersTable& table)
         (TagPair(SWF::PLACEFUNCTION, fixme_loader)) // 54 
         (TagPair(SWF::GENTAGOBJECT, fixme_loader)) // 55 
 
-        (TagPair(SWF::EXPORTASSETS, export_loader)) // 56
+        (TagPair(SWF::EXPORTASSETS, ExportAssetsTag::loader)) // 56
         (TagPair(SWF::IMPORTASSETS, ImportAssetsTag::loader)) // 57
 
         //  We're not an authoring tool so we don't care.
