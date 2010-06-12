@@ -64,8 +64,15 @@ public:
 	virtual DisplayObject* createDisplayObject(Global_as& gl,
             DisplayObject* parent) const = 0;
 
+    /// Executing a DefinitionTag adds its id to list of known characters
+    //
+    /// The process is different for imported DefinitionTags, which are added
+    /// with a new id.
 	virtual void executeState(MovieClip* m,  DisplayList& /*dlist*/) const;
 
+    /// The immutable id of the DefinitionTag.
+    //
+    /// @return     the id of the DefinitionTag as parsed from a SWF.
     boost::uint16_t id() const {
         return _id;
     }

@@ -51,6 +51,11 @@ public:
     }
 
 
+    /// Execute an ImportAssetsTag.
+    //
+    /// Executing this tag adds the imported definition with an id to the 
+    /// list of known characters. This id may be different from the
+    /// genuine id of the DefinitionTag.
     virtual void executeState(MovieClip* m, DisplayList& /*l*/) const {
         Movie* mov = m->get_root();
         for (Imports::const_iterator it = _imports.begin(), e = _imports.end();
