@@ -795,14 +795,6 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 
 //
-// export
-//
-
-//
-// import
-//
-
-//
 // Sound
 //
 
