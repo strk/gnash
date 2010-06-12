@@ -181,6 +181,7 @@ noinst_HEADERS = \
 	ExternalInterface.h \
 	swf/tag_loaders.h \
 	swf/DefaultTagLoaders.h \
+	swf/ImportAssetsTag.h \
 	swf/VideoFrameTag.h \
 	swf/DefineVideoStreamTag.h \
 	swf/DefineFontAlignZonesTag.h \

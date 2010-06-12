@@ -47,6 +47,7 @@
 #include "DefineVideoStreamTag.h"
 #include "DefineFontNameTag.h"
 #include "VideoFrameTag.h"
+#include "ImportAssetsTag.h"
 #ifdef ENABLE_AVM2
 # include "SymbolClassTag.h"
 # include "DoABCTag.h"
@@ -164,7 +165,7 @@ addDefaultLoaders(TagLoadersTable& table)
         (TagPair(SWF::GENTAGOBJECT, fixme_loader)) // 55 
 
         (TagPair(SWF::EXPORTASSETS, export_loader)) // 56
-        (TagPair(SWF::IMPORTASSETS, import_loader)) // 57
+        (TagPair(SWF::IMPORTASSETS, ImportAssetsTag::loader)) // 57
 
         //  We're not an authoring tool so we don't care.
         // (might be nice to dump the password instead..)
@@ -200,7 +201,7 @@ addDefaultLoaders(TagLoadersTable& table)
         // 70
         (TagPair(SWF::PLACEOBJECT3, PlaceObject2Tag::loader))
         // 71
-        (TagPair(SWF::IMPORTASSETS2, import_loader))
+        (TagPair(SWF::IMPORTASSETS2, ImportAssetsTag::loader))
         // 73
         (TagPair(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader))
         // 74
