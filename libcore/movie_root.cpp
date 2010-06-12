@@ -2112,10 +2112,11 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     // The first argument we push on the stack is the URL
     fnargs.push_back(as_value(urlstr));
     
+    // The second argument we push is the method
     switch (method) {
       case MovieClip::METHOD_POST:
           fnargs.push_back(as_value("POST"));
-          break;     
+          break;
       case MovieClip::METHOD_GET:
           fnargs.push_back(as_value("GET"));
           break;

@@ -734,15 +734,15 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             // The first argument is the URL string.
             std::string url = NPStringToString(NPVARIANT_TO_STRING(
                                                    invoke->args[0].get()));
-            // The second is the the method, namely GET or POST.
+            // The second is the method, namely GET or POST.
             std::string op = NPStringToString(NPVARIANT_TO_STRING(
                                                   invoke->args[1].get()));
             // The third is the optional target, which is something like
-            // _blank or _self.
+            // _blank or _self. NONE means no target.
             std::string target;
             // The fourth is the optional data. If there is data, the target
             // field is always set so this argument is on the correct index.
-            // No target is "none".
+            // No target is "NONE".
             std::string data;
             if (invoke->args.size() >= 3) {
                 target = NPStringToString(NPVARIANT_TO_STRING(
