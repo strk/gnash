@@ -20,25 +20,25 @@
 #define GNASH_EXECUTABLECODE_H
 
 #include <vector>
+#include <boost/noncopyable.hpp>
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_function.h"
 #include "ActionExec.h"
 #include "Global_as.h"
 #include "fn_call.h"
 
-namespace gnash
-{
+namespace gnash {
 
 /// Any executable code 
-class ExecutableCode {
+class ExecutableCode : boost::noncopyable
+{
 
 public:
 
     ExecutableCode(DisplayObject* t) : _target(t) {}
 
     virtual void execute()=0;
-
-    virtual ExecutableCode* clone() const=0;
 
     virtual ~ExecutableCode() {}
 
@@ -72,11 +72,6 @@ public:
         buffer(nBuffer)
     {}
 
-    ExecutableCode* clone() const
-    {
-        return new GlobalCode(*this);
-    }
-
     virtual void execute()
     {
         if (!target()->unloaded()) {
@@ -108,12 +103,6 @@ public:
         ExecutableCode(nTarget),
         _buffers(buffers)
     {}
-
-
-    ExecutableCode* clone() const
-    {
-        return new EventCode(*this);
-    }
 
     /// Add an action buffer to this event handler
     //
@@ -162,12 +151,6 @@ public:
         _eventId(id)
     {}
 
-
-    ExecutableCode* clone() const
-    {
-        return new QueuedEvent(*this);
-    }
-
     virtual void execute()
     {
         // don't execute any events for destroyed DisplayObject.
@@ -209,12 +192,6 @@ public:
         _arg1(arg1),
         _arg2(arg2)
     {}
-
-
-    ExecutableCode* clone() const
-    {
-        return new DelayedFunctionCall(*this);
-    }
 
     virtual void execute()
     {

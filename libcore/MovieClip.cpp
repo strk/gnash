@@ -103,12 +103,6 @@ public:
         ExecutableCode(nTarget)
     {}
 
-
-    ExecutableCode* clone() const
-    {
-        return new ConstructEvent(*this);
-    }
-
     virtual void execute()
     {
         static_cast<MovieClip*>(target())->constructAsScriptObject();
