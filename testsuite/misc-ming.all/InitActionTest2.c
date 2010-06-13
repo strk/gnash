@@ -59,7 +59,7 @@ main(int argc, char** argv)
     // Check in next frame:
     check(mo, "_global.val4 == undefined");
     
-    // Frame 4
+    // Frame 3
     SWFMovie_nextFrame(mo);
 
     // Action is before export tag.
