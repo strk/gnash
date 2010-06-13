@@ -82,7 +82,6 @@ initObjectClass(as_object* proto, as_object& where, const ObjectURI& uri)
 {
 
     assert(proto);
-    attachObjectInterface(*proto);
 
     // Object is a native constructor.
     VM& vm = getVM(where);
