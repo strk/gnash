@@ -68,10 +68,6 @@
 namespace gnash
 {
 
-namespace {
-    template<typename T> void markMappedResources(const T& t);
-}
-
 SWFMovieLoader::SWFMovieLoader(SWFMovieDefinition& md)
     :
     _movie_def(md),
@@ -754,22 +750,6 @@ SWFMovieDefinition::importResources(
     if (importedSyms) {
         _importSources.insert(source);
     }
-}
-
-namespace {
-
-template<typename T>
-void markMappedResources(const T& t)
-{
-    typedef typename
-        RemovePointer<typename T::value_type::second_type>::value_type
-        contained_type;
-
-    std::for_each(t.begin(), t.end(),
-            boost::bind(&contained_type::setReachable,
-                boost::bind(SecondElement<typename T::value_type>(), _1)));
-}
-
 }
 
 } // namespace gnash
