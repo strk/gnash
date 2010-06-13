@@ -33,6 +33,7 @@ BitmapMovie::BitmapMovie(as_object* object, const BitmapMovieDefinition* def,
 
     const int depth = 1 + DisplayObject::staticDepthOffset;
     placeDisplayObject(bm, depth);
+    bm->construct();
 }
 
 } // namespace gnash
