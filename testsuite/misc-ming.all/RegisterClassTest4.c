@@ -41,10 +41,9 @@ int main(int argc, char* argv[])
         "fs = [];"
 		"onEnterFrame = function () {"
         "   fs.push(_level0.mc.Segments.onUnload);"
-        "   trace(fs[fs.length - 2]);"
-        "   trace(fs[fs.length - 1]);"
         "   trace(fs[fs.length - 2] == fs[fs.length - 1]);"
-        "  trace((_level0.mc._currentframe+': ')+_level0.mc.Segments.onUnload);"
+        "   trace((_level0.mc._currentframe+': ')+_level0.mc.Segments.onUnload);"
+        "   trace(mc.Segments.c);"
         "};"
 	);
 	SWFMovie_add(mo, (SWFBlock)ac);
@@ -84,6 +83,7 @@ int main(int argc, char* argv[])
     SWFDisplayItem_setDepth(it, 1);
     SWFDisplayItem_setName(it, "mc");
 
+
 	// SWF_DEFINESPRITE 
 
     //  MovieClip 4 
@@ -97,21 +97,43 @@ int main(int argc, char* argv[])
 
     ac = newSWFAction(
         "trace('hhoho');"
+        "_global.loops = 0;"
+        "_global.c = 0;"
         "if( !_global.Bug ) {"
 	    "   _global.Bug = function () {"
 	    "       this.onUnload = function() {}; "
+        "       this.c = _global.c;"
+        "       _global.c++;"
 	    "   };"
 	    "};"
 	);
 
     initac = newSWFInitAction_withId(ac, 4);
     SWFMovie_add(mo, (SWFBlock)initac);
-
+    
     ac = newSWFAction("Object.registerClass('Segments_Name',Bug);");
     initac = newSWFInitAction_withId(ac, 1);
     SWFMovie_add(mo, (SWFBlock)initac);
+    
+    // Frame 2
+    SWFMovie_nextFrame(mo);
 
-    SWFMovie_add(mo, newSWFAction("gotoAndPlay(2);"));
+    add_actions(mo,
+//        "   trace('frame 2');"
+//        "   trace('loops ' + _global.loops);"
+        "    if (_global.loops < 5) {"
+        "        _global.loops++;"
+        "        gotoAndPlay(1);"
+        "   }"
+        "   else {"
+//        "      trace('Should be finished');"
+        "      delete this.onEnterFrame;"
+        "   };"
+        );
+    
+    SWFMovie_nextFrame(mo);
+    
+    add_actions(mo, "stop();");
 
 	// SWF_END 
     SWFMovie_save(mo, OUTPUT_FILENAME);
