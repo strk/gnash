@@ -35,19 +35,6 @@ int main(int argc, char* argv[])
     SWFMovie_addExport(mo, (SWFBlock)mc1, "Segments_Name");
     SWFMovie_writeExports(mo);
 
-#if 1
-    ac = newSWFAction(
-        "fs = [];"
-		"onEnterFrame = function () {"
-        "   fs.push(_level0.mc.Segments.onUnload);"
-        "   trace(fs[fs.length - 2] == fs[fs.length - 1]);"
-        "   trace((_level0.mc._currentframe+': ')+_level0.mc.Segments.onUnload);"
-        "   trace(mc.Segments.c);"
-        "};"
-	);
-	SWFMovie_add(mo, (SWFBlock)ac);
-#endif
-
     //  MovieClip mc3 has two frames. In each frame a different MovieClip
     //  is placed with the name Segments.
 	mc3 = newSWFMovieClip(); // 2 frames 
@@ -130,7 +117,6 @@ int main(int argc, char* argv[])
         "        gotoAndPlay(1);"
         "   }"
         "   else {"
-        "      trace(this);"
         "      delete this.onEnterFrame;"
         "      gotoAndPlay(3);"
         "   };"
