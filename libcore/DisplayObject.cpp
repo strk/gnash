@@ -732,7 +732,7 @@ DisplayObject::destroy()
     /// see new_child_in_unload_test.c)
 	/// We don't destroy ourself twice, right ?
 
-    //if (_object) _object->clearProperties();
+    if (_object) _object->clearProperties();
 
 	assert(!_destroyed);
 	_destroyed = true;
