@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 {
 
     SWFMovie mo;
-    SWFMovieClip mc1, mc2, mc3, mc4;
+    SWFMovieClip mc1, mc2, mc3, mc4, dejagnuclip;
     SWFDisplayItem it;
     SWFAction ac;
     SWFInitAction initac;
@@ -30,13 +30,12 @@ int main(int argc, char* argv[])
 
 	//  MovieClip 1 
 	mc1 = newSWFMovieClip(); // 1 frames 
-	// SWF_SHOWFRAME 
-    SWFMovieClip_nextFrame(mc1);
 
 	// SWF_EXPORTASSETS 
     SWFMovie_addExport(mo, (SWFBlock)mc1, "Segments_Name");
     SWFMovie_writeExports(mo);
 
+#if 1
     ac = newSWFAction(
         "fs = [];"
 		"onEnterFrame = function () {"
@@ -47,56 +46,55 @@ int main(int argc, char* argv[])
         "};"
 	);
 	SWFMovie_add(mo, (SWFBlock)ac);
+#endif
 
-	// SWF_DEFINESPRITE 
+    //  MovieClip mc3 has two frames. In each frame a different MovieClip
+    //  is placed with the name Segments.
+	mc3 = newSWFMovieClip(); // 2 frames 
 
     //  MovieClip 2 
 	mc2 = newSWFMovieClip(); // 1 frames 
-	SWFMovieClip_nextFrame(mc2); // end of clip frame 1 
 
-	// SWF_DEFINESPRITE 
-
-    //  MovieClip 3 
-	mc3 = newSWFMovieClip(); // 2 frames 
-
-	// SWF_PLACEOBJECT2 
+    // Add mc2
 	it = SWFMovieClip_add(mc3, (SWFBlock)mc2);
     SWFDisplayItem_setDepth(it, 1);
 	SWFDisplayItem_setName(it, "Segments");
 
+    // Frame 2
     SWFMovieClip_nextFrame(mc3);
 
-	// SWF_REMOVEOBJECT2 
+    // Remove mc2
 	SWFDisplayItem_remove(it);
 
+    // Add mc1
     it = SWFMovieClip_add(mc3, (SWFBlock)mc1);
     SWFDisplayItem_setDepth(it, 1);
 	SWFDisplayItem_setName(it, "Segments");
 
-	// SWF_SHOWFRAME 
-	SWFMovieClip_nextFrame(mc3); // end of clip frame 2 
+	SWFMovieClip_nextFrame(mc3);
 
-	// SWF_END 
+    // End mc3
 
-	// SWF_PLACEOBJECT2 
+
+    // This is frame 1 of the main timeline
+
+    // Put our sprite mc3 on stage.
 	it = SWFMovie_add(mo, (SWFBlock)mc3);
     SWFDisplayItem_setDepth(it, 1);
     SWFDisplayItem_setName(it, "mc");
 
-
-	// SWF_DEFINESPRITE 
-
-    //  MovieClip 4 
-	mc4 = newSWFMovieClip(); // 0 frames 
-
-	// SWF_END 
-
-	// SWF_EXPORTASSETS 
+    //  mc4 is just for executing init actions.
+	mc4 = newSWFMovieClip(); 
     SWFMovie_addExport(mo, (SWFBlock)mc4, "__Packages.Bug");
     SWFMovie_writeExports(mo);
+    
+    dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10,
+    		    0, 0, 800, 600);
+    SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
     ac = newSWFAction(
-        "trace('hhoho');"
+        "_global.expec = [ 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2 ];"
+        "_global.pos = 0;"
         "_global.loops = 0;"
         "_global.c = 0;"
         "if( !_global.Bug ) {"
@@ -115,25 +113,33 @@ int main(int argc, char* argv[])
     initac = newSWFInitAction_withId(ac, 1);
     SWFMovie_add(mo, (SWFBlock)initac);
     
-    // Frame 2
+    check_equals(mo, "typeof(_level0.mc.Segments.onUnload)", "'function'");
+    check_equals(mo, "_level0.mc.Segments.c", "_global.expec[_global.pos]");
+    add_actions(mo, "_global.pos++;");
+
+    // Frame 2 of the main timeline
     SWFMovie_nextFrame(mo);
+    
+    check_equals(mo, "typeof(_level0.mc.Segments.onUnload)", "'function'");
+    check_equals(mo, "_level0.mc.Segments.c", "_global.expec[_global.pos]");
+    add_actions(mo, "_global.pos++;");
 
     add_actions(mo,
-//        "   trace('frame 2');"
-//        "   trace('loops ' + _global.loops);"
         "    if (_global.loops < 5) {"
         "        _global.loops++;"
         "        gotoAndPlay(1);"
         "   }"
         "   else {"
-//        "      trace('Should be finished');"
+        "      trace(this);"
         "      delete this.onEnterFrame;"
+        "      gotoAndPlay(3);"
         "   };"
         );
     
     SWFMovie_nextFrame(mo);
     
-    add_actions(mo, "stop();");
+    SWFMovie_nextFrame(mo);
+    add_actions(mo, "totals(); stop();");
 
 	// SWF_END 
     SWFMovie_save(mo, OUTPUT_FILENAME);
