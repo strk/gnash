@@ -55,10 +55,6 @@ int main(int argc, char* argv[])
 	mc2 = newSWFMovieClip(); // 1 frames 
 	SWFMovieClip_nextFrame(mc2); // end of clip frame 1 
 
-	// SWF_EXPORTASSETS (again!)
-	SWFMovie_addExport(mo, (SWFBlock)mc1, "Segments_Name");
-	SWFMovie_writeExports(mo);
-
 	// SWF_DEFINESPRITE 
 
     //  MovieClip 3 
@@ -111,8 +107,7 @@ int main(int argc, char* argv[])
     initac = newSWFInitAction_withId(ac, 4);
     SWFMovie_add(mo, (SWFBlock)initac);
 
-    ac = newSWFAction(
-                "Object.registerClass('Segments_Name',Bug);");
+    ac = newSWFAction("Object.registerClass('Segments_Name',Bug);");
     initac = newSWFInitAction_withId(ac, 1);
     SWFMovie_add(mo, (SWFBlock)initac);
 
