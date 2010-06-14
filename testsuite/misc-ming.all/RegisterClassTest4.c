@@ -84,8 +84,10 @@ int main(int argc, char* argv[])
         "_global.fns = [];"
         "_global.loops = 0;"
         "_global.c = 0;"
+        "_global.ctorcalls = 0;"
         "if( !_global.Bug ) {"
 	    "   _global.Bug = function () {"
+        "       _global.ctorcalls++;"
 	    "       this.onUnload = function() {}; "
         "       this.c = _global.c;"
         "       _global.c++;"
@@ -139,9 +141,11 @@ int main(int argc, char* argv[])
     check_equals(mo, "_global.fns[9]", "'function'");
     check_equals(mo, "_global.fns[10]", "'function'");
     xcheck_equals(mo, "_global.fns[11]", "'function'");
+    
+    check_equals(mo, "_global.ctorcalls", "3");
 
     SWFMovie_nextFrame(mo);
-    add_actions(mo, "totals(15); stop();");
+    add_actions(mo, "totals(16); stop();");
 
 	// SWF_END 
     SWFMovie_save(mo, OUTPUT_FILENAME);
