@@ -80,8 +80,8 @@ int main(int argc, char* argv[])
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
     ac = newSWFAction(
-        "_global.expec = [ 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2 ];"
-        "_global.pos = 0;"
+        "_global.real = [];"
+        "_global.fns = [];"
         "_global.loops = 0;"
         "_global.c = 0;"
         "if( !_global.Bug ) {"
@@ -100,16 +100,14 @@ int main(int argc, char* argv[])
     initac = newSWFInitAction_withId(ac, 1);
     SWFMovie_add(mo, (SWFBlock)initac);
     
-    check_equals(mo, "typeof(_level0.mc.Segments.onUnload)", "'function'");
-    check_equals(mo, "_level0.mc.Segments.c", "_global.expec[_global.pos]");
-    add_actions(mo, "_global.pos++;");
+    add_actions(mo, "_global.fns.push(typeof(_level0.mc.Segments.onUnload));");
+    add_actions(mo, "_global.real.push(_level0.mc.Segments.c);");
 
     // Frame 2 of the main timeline
     SWFMovie_nextFrame(mo);
     
-    check_equals(mo, "typeof(_level0.mc.Segments.onUnload)", "'function'");
-    check_equals(mo, "_level0.mc.Segments.c", "_global.expec[_global.pos]");
-    add_actions(mo, "_global.pos++;");
+    add_actions(mo, "_global.fns.push(typeof(_level0.mc.Segments.onUnload));");
+    add_actions(mo, "_global.real.push(_level0.mc.Segments.c);");
 
     add_actions(mo,
         "    if (_global.loops < 5) {"
@@ -124,10 +122,26 @@ int main(int argc, char* argv[])
     
     SWFMovie_nextFrame(mo);
     
-    check_equals(mo, "_global.pos", "12");
+    check_equals(mo, "_global.real.length", "12");
+    xcheck_equals(mo, "_global.real.toString()",
+            "'undefined,0,0,0,0,0,0,1,1,1,1,2'");
+
+    check_equals(mo, "_global.fns.length", "12");
+    check_equals(mo, "_global.fns[0]", "'undefined'");
+    check_equals(mo, "_global.fns[1]", "'function'");
+    check_equals(mo, "_global.fns[2]", "'function'");
+    check_equals(mo, "_global.fns[3]", "'function'");
+    check_equals(mo, "_global.fns[4]", "'function'");
+    check_equals(mo, "_global.fns[5]", "'function'");
+    check_equals(mo, "_global.fns[6]", "'function'");
+    xcheck_equals(mo, "_global.fns[7]", "'function'");
+    xcheck_equals(mo, "_global.fns[8]", "'function'");
+    check_equals(mo, "_global.fns[9]", "'function'");
+    check_equals(mo, "_global.fns[10]", "'function'");
+    xcheck_equals(mo, "_global.fns[11]", "'function'");
 
     SWFMovie_nextFrame(mo);
-    add_actions(mo, "totals(23); stop();");
+    add_actions(mo, "totals(15); stop();");
 
 	// SWF_END 
     SWFMovie_save(mo, OUTPUT_FILENAME);
