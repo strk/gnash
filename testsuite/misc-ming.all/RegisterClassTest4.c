@@ -138,8 +138,10 @@ int main(int argc, char* argv[])
     
     SWFMovie_nextFrame(mo);
     
+    check_equals(mo, "_global.pos", "12");
+
     SWFMovie_nextFrame(mo);
-    add_actions(mo, "totals(); stop();");
+    add_actions(mo, "totals(23); stop();");
 
 	// SWF_END 
     SWFMovie_save(mo, OUTPUT_FILENAME);
