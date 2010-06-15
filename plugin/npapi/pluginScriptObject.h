@@ -131,8 +131,10 @@ public:
     bool checkPipe(int fd);
 
     int getReadFD()  { return _sockfds[READFD]; };
+    GIOChannel *getReadChannel()  { return _iochan[READFD]; };
     int getWriteFD() { return _sockfds[WRITEFD]; };
-    
+    GIOChannel *getWriteChannel() { return _iochan[WRITEFD]; };
+
     // Write to the standalone player over the control socket
     int writePlayer(const std::string &data);
     int writePlayer(int fd, const std::string &data);
@@ -141,6 +143,8 @@ public:
     std::string readPlayer();
     std::string readPlayer(int fd);
     
+    bool Invoke(NPObject *npobj, NPIdentifier name, const NPVariant *args,
+                uint32_t argCount, NPVariant *result);
 protected:
     bool AddMethod(NPIdentifier name, NPInvokeFunctionPtr func);
     void AddProperty(const std::string &name, const std::string &str);
@@ -152,8 +156,8 @@ protected:
     void Invalidate();
     bool HasMethod(NPIdentifier name);
 
-    bool Invoke(NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result);
-    bool InvokeDefault(const NPVariant *args, uint32_t argCount, NPVariant *result);
+    bool InvokeDefault(const NPVariant *args, uint32_t argCount,
+                       NPVariant *result);
     bool HasProperty(NPIdentifier name);
     bool GetProperty(NPIdentifier name, NPVariant *result);
     bool SetProperty(NPIdentifier name, const NPVariant& value);
@@ -161,7 +165,7 @@ protected:
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
 
-    bool handleInvoke(GIOChannel* iochan, GIOCondition cond);
+    bool handleInvoke(GIOChannel *iochan, GIOCondition cond);
     
     /// Process a null-terminated request line
     //

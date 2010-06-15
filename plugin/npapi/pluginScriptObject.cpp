@@ -377,7 +377,7 @@ GnashPluginScriptObject::marshalInvoke (NPObject *npobj, NPIdentifier name,
     
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
     
-    return gpso->Invoke(name, args, argCount, result);
+//    return gpso->Invoke(npobj, name, args, argCount, result);
 }
 
 bool 
@@ -557,7 +557,9 @@ GnashPluginScriptObject::HasMethod(NPIdentifier name)
 }
 
 bool
-GnashPluginScriptObject::Invoke(NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result)
+GnashPluginScriptObject::Invoke(NPObject *npobj, NPIdentifier name,
+                                const NPVariant *args, uint32_t argCount,
+                                NPVariant *result)
 {
 //    log_debug(__PRETTY_FUNCTION__);
 #if 0
@@ -577,7 +579,8 @@ GnashPluginScriptObject::Invoke(NPIdentifier name, const NPVariant *args, uint32
         return func(NULL, name, args, argCount, result);
     }
 
-    return false;
+    NPIdentifier id = NPN_UTF8FromIdentifier(name);
+    return NPN_Invoke(_nppinstance, npobj, id, args, argCount, result);
 }
 
 bool
@@ -791,7 +794,6 @@ GnashPluginScriptObject::readPlayer(int fd)
         ioctlSocket(fd, FIONREAD, &bytes);
 #endif
     }
-        
 
     // No data yet
     if (bytes == 0) {

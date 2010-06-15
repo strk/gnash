@@ -694,16 +694,15 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
                   requestSize--;
               }
               gnash::log_debug("Normal read: %s", request);
+              // process request..
+              processPlayerRequest(request, requestSize);
+              g_free(request);
+              return true;
               break;
           default:
               gnash::log_error("Abnormal status!");
               return false;
         }
-
-        // process request..
-        processPlayerRequest(request, requestSize);
-        g_free(request);
-
     } while (g_io_channel_get_buffer_condition(iochan) & G_IO_IN);
 
     return true;
@@ -713,6 +712,7 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 bool
 nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 {
+    log_debug(__PRETTY_FUNCTION__);
 
     if ( linelen < 4 ) {
         if (buf) {
@@ -787,6 +787,32 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
             return true;
         }
+        // This is the player invoking a method in Javascript
+        NPP npp = _instance;
+        NPObject *window = 0;
+        NPN_GetValue(npp, NPNVWindowNPObject, &window);
+        NPVariant *result = 0;
+        uint32_t count = 1;
+        NPVariant args;
+        NPIdentifier id = NPN_GetStringIdentifier(invoke->name.c_str());
+        _scriptObject->Invoke(window, id, &args, count, result);
+        gnash::log_debug("Invoking Javascript method %s", invoke->name);
+        // We got a result from invoking the Javascript method
+        std::stringstream ss;
+        if (result) {
+            NPN_ReleaseVariantValue(result);
+            ss << ExternalInterface::convertNPVariant(result);
+        } else {
+            // Send response
+            // FIXME: "securityError" also possible, check domain
+            ss << ExternalInterface::makeString("Error");
+        }
+        size_t ret = _scriptObject->writePlayer(ss.str());
+        if (ret != ss.str().size()) {
+            log_error("Couldn't write the response to Gnash, network problems.");
+            return false;
+        }
+        return true;
     } else {
         gnash::log_error("Unknown player request: " + std::string(buf));
         return false;
