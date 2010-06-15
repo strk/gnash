@@ -141,7 +141,7 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
             "URLs\n") 
     << _("  -P,  --param <param>     Set parameter (e.g. "
             "\"FlashVars=A=1&b=2\")\n") 
-    << _("  -F,  --fd <fd>           Filedescriptor to use for external "
+    << _("  -F,  --fd <fd>:<fd>      Filedescriptor to use for external "
             "communications\n") 
 #ifdef GNASH_FPS_DEBUG
     << _("  -f,  --debug-fps num     Print FPS every num seconds (float)\n") 
