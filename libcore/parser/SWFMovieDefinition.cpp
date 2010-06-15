@@ -727,6 +727,8 @@ SWFMovieDefinition::importResources(
         log_debug("Exporting symbol %s imported from source %s",
             symbolName, source->get_url());
 #endif
+
+        // NB: we add this symbol with a new id, not its original one.
         registerExport(symbolName, id);
 
         if (Font* f = dynamic_cast<Font*>(res.get())) {
@@ -737,6 +739,8 @@ SWFMovieDefinition::importResources(
         else if (SWF::DefinitionTag* ch =
                 dynamic_cast<SWF::DefinitionTag*>(res.get())) {
             // Add this DisplayObject to the loading movie.
+
+            // NB: we add this character with a new id, not its original one.
             addDisplayObject(id, ch);
             ++importedSyms;
         }

@@ -14,6 +14,104 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+AC_DEFUN([GNASH_PATH_GLES],
+[
+  gles=yes
+
+  dnl the library has different names depending on the release
+  gleslist="GLESv2 GLES_CL GLESv1_CM GLESv1"
+
+  dnl add the default path to the Android NDK
+  newlist="${android_ndk}/usr/include ${incllist}"
+
+  dnl Look for the headers.
+  AC_ARG_WITH(gles_includes, AC_HELP_STRING([--with-gles-includes], [directory where OpenGL-ES headers are]), with_gles_includes=${withval})
+  AC_CACHE_VAL(ac_cv_path_gles_includes,[
+    if test x"${with_gles_includes}" != x ; then
+      if test -f ${with_gles_includes}/GLES/egl.h -o -f ${with_gles_includes}/GLES2/gl2.h ; then
+        ac_cv_path_gles_includes="-I`(cd ${with_gles_includes}; pwd)`"
+      else
+        AC_MSG_ERROR([${with_gles_includes} directory doesn't contain egl.h or gl2.h])
+      fi
+    fi
+  ])
+
+  if test x"${ac_cv_path_gles_includes}" = x; then
+    AC_MSG_CHECKING([for OpenGL-ES headers])
+    for i in ${newlist}; do
+      if test -f $i/GLES2/gl2.h; then
+        AC_DEFINE(HAVE_GLES2_GL2_H, [1], [Have OpenGL_ES version 2])
+        ac_cv_path_gles_includes="-I$i"
+        break;
+      else
+        if test -f $i/GLES/egl.h; then
+          AC_DEFINE(HAVE_GLES_EGL_H, [1], [Have OpenGL_ES version 1])
+          ac_cv_path_gles_includes="-I$i"
+          break;
+        fi
+      fi
+    done
+  fi
+  if test x"${ac_cv_path_gles_includes}" != x; then
+    AC_MSG_RESULT(${ac_cv_path_gles_includes})
+  fi
+
+  if test x"${ac_cv_path_gles_includes}" = x; then
+    AC_CHECK_HEADERS([GLES2/gl2.h], [ac_cv_path_gles_includes=""])
+  fi
+  if test x"${ac_cv_path_gles_includes}" = x; then
+    AC_CHECK_HEADERS([GLES/egl.h], [ac_cv_path_gles_includes=""])
+  fi
+
+  if test x"${ac_cv_path_gles_includes}" != x; then
+    GLES_CFLAGS="${ac_cv_path_gles_includes}"
+  else
+    GLES_CFLAGS=""
+  fi
+
+  dnl Look for the libraries.
+  AC_ARG_WITH(gles_lib, AC_HELP_STRING([--with-gles-lib], [directory where OpenGL-ES libraries are]), with_gles_lib=${withval})
+  AC_CACHE_VAL(ac_cv_path_gles_lib,[
+    if test x"${with_gles_lib}" != x ; then
+      for j in $gleslist; do
+        if test -f ${with_gles_lib}/$i.a -o -f ${with_gles_lib}/$i.${shlibext}; then
+          ac_cv_path_gles_lib="-L`(cd ${with_gles_lib}; pwd)` -l$i"
+          break;
+        fi
+      done
+    fi
+  ])
+
+  dnl add the default path to the Android NDK
+  newlist="${android_ndk}/usr/lib ${libslist}"
+  if test x"${ac_cv_path_gles_lib}" = x; then
+    for dir in ${newlist}; do
+      for lib in ${gleslist}; do
+        if test -f ${dir}/lib${lib}.${shlibext} -o -f ${dir}/lib${lib}.a; then
+          has_gles="yes"
+          if test ! x"${dir}" = x"/usr/lib" -a ! x"${dir}" = x"/usr/lib64"; then
+            ac_cv_path_gles_lib="-L${dir} -l${lib}"
+          else
+            ac_cv_path_gles_lib="-l${lib}"
+          fi
+          break
+        fi
+      done
+      if test x"${ac_cv_path_gles_lib}" != x ; then
+          break
+      fi
+    done
+  fi
+
+  if test x"${ac_cv_path_gles_lib}" != x ; then
+      GLES_LIBS="${ac_cv_path_gles_lib}"
+  else
+      GLES_LIBS=""
+  fi
+
+  AC_SUBST(GLES_CFLAGS)
+  AC_SUBST(GLES_LIBS)
+])
 
 AC_DEFUN([GNASH_PATH_OPENGL],
 [
