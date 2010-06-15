@@ -890,10 +890,10 @@ ActionEqual(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_EQUAL)); // 0x0E
 #endif
 
-    as_value& op1 = env.top(0);
-    as_value& op2 = env.top(1);
+    const double op1 = env.top(0).to_number();
+    const double op2 = env.top(1).to_number();
 
-    env.top(1).set_bool(op1.to_number() == op2.to_number());
+    env.top(1).set_bool(op2 == op1);
 
     // Flash4 used 1 and 0 as return from this tag
     if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
