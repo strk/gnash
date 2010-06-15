@@ -3373,11 +3373,11 @@ ActionGreater(ActionExec& thread)
 void
 ActionStringGreater(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
     
-    // No need to use to_string() here, this is a swf7 opcode
-    env.top(1).set_bool(env.top(1).to_string() > env.top(0).to_string());
+    const std::string& op1 = env.top(0).to_string();
+    const std::string& op2 = env.top(1).to_string();
+    env.top(1).set_bool(op2 > op1);
     env.drop(1);
 }
 
