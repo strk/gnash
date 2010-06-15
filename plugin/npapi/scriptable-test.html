@@ -39,7 +39,7 @@
 
     <ul id="test-actions">
       <li><button onclick='ShowVersion()'>Show Version</button></li>
-      <li><button onclick='ShowFoobar("barfood")'>Show Foobar</button></li>
+      <li><button onclick='TestASMethod("barfood")'>TestASMethod</button></li>
       <li><button onclick='FlashSetVariable("var1", "value1")'>SetVariable</button></li>
       <li><button onclick='FlashGetVariable("var1")'>GetVariable</button></li>
       <li><button onclick='FlashGotoFrame(123)'>GotoFrame</button></li>
@@ -53,7 +53,7 @@
       <li><button onclick='FlashStopPlay()'>StopPlay</button></li>
       <li><button onclick='FlashZoom(12)'>Zoom</button></li>
       <li><button onclick='FlashTotalFrames()'>TotalFrames</button></li>
-      <li><button onclick='FlashTestEIMethod()'>TestEIMethod</button></li>
+      <li><button onclick='FlashTestASMethod()'>TestASMethod</button></li>
     </ul>
 
 </div>
@@ -229,19 +229,29 @@
 
         function FlashTestEIMethod()
         {
-                  var value = embed.TestEIMethod();
+                  var value = embed.TestASMethod();
         //          addLog("TestEIMethod() = " + value);          
                   addLog(value);
         }
 
-        function ShowFoobar(msg)
+          // This gets call a javascript method
+        function TestJSMethod(msg)
         {
-            addLog(embed.SetVariable("foo", "bar"));
+//            addLog(embed.SetVariable("fo", "br"));
+//            addLog(embed.SetVariable("fuby", 1.1));
+            addLog("executed TestJSMethod");
+        }
+
+          // This calls a method in gnash
+        function TestASMethod(msg)
+        {
+            addLog("executing TestASMethod");
+            addLog(embed.SetVariable("fo", "br"));
             addLog(embed.SetVariable("fuby", 1.1));
-            addLog(embed.GetVariable("foo"));
-            if (typeof embed.showFoobar === 'function') {
-                addLog('Running embed.showFoobar("'+msg+'")');
-                addLog(embed.showFoobar(msg));
+            addLog(embed.GetVariable("fobe"));
+            if (typeof embed.TestASMethod === 'function') {
+                addLog('Running embed.TestASMethod("'+msg+'")');
+                addLog(embed.TestASMethod(msg));
             } else {
                 addLog("Quitting: embed.showFoobar is not a function. Tried running embed.showFoobar('"+msg+"')");
             }
@@ -250,8 +260,8 @@
 
 <!-- 
    This next test is a bit hokey, we should really trim down
-   the ExternalInterface test sae to e one that's focused on this
-   web page. ut for now, this gives us a resident player that we
+   the ExternalInterface test to one that's focused on this
+   web page. But for now, this gives us a resident player that we
    can bounce XML messages off of.
 
    To make this work for you, copy testsuite/Dejagnu.swf and
@@ -259,12 +269,14 @@
    tree to your source tree in plugin/npapi/. You can then attach GDB
    to the PID of gnash running, letting you debug the processing of
    XML messages to and from the browser.
+<param name="allowScriptAccess" value="sameDomain" />
 -->
 <object>
 <param name="movie" value="ExternalInterface-v8.swf"
+<param name="allowScriptAccess" value="always" />
 <embed
 src="ExternalInterface-v8.swf"
-quality="high" wmode="transparent" width="320" height="240"
+quality="high" wmode="transparent" width="640" height="480"
    type="application/x-shockwave-flash"
    pluginspage="http://www.getgnash.org">
 </embed>
@@ -281,6 +293,13 @@ quality="high" wmode="transparent" width="320" height="240"
    type="application/x-shockwave-flash"
    pluginspage="http://www.getgnash.org">
 </embed>
+-->
+
+<!--
+<a href="javascript:;" onclick="window.open('geturl.swf',
+	'_selfXX',
+	'width=100,height=100,location=yes,resizable=yes');
+ return false">GetURL test</a>
 -->
 
 </body>
