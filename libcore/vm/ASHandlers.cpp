@@ -904,10 +904,13 @@ ActionEqual(ActionExec& thread)
 void
 ActionLessThan(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
-    env.top(1).set_bool(env.top(1).to_number() < env.top(0).to_number());
+    // NB: this unusual order is correct!
+    const double d2 = env.top(1).to_number();
+    const double d1 = env.top(0).to_number();
+
+    env.top(1).set_bool(d2 < d1);
 
     // Flash4 used 1 and 0 as return from this tag
     if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
@@ -918,9 +921,9 @@ ActionLessThan(ActionExec& thread)
 void
 ActionLogicalAnd(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
+    // Note: the order of evaluation of the && operands is specified.
     env.top(1).set_bool(env.top(1).to_bool() && env.top(0).to_bool());
     env.drop(1);
 }
@@ -928,9 +931,9 @@ ActionLogicalAnd(ActionExec& thread)
 void
 ActionLogicalOr(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
+    // Note: the order of evaluation of the || operands is specified.
     env.top(1).set_bool(env.top(1).to_bool() || env.top(0).to_bool());
     env.drop(1);
 }
@@ -3368,9 +3371,7 @@ ActionGreater(ActionExec& thread)
 {
     // Just swap the operator and invoke ActionNewLessThan
     as_environment& env = thread.env;
-    as_value tmp = env.top(1);
-    env.top(1) = env.top(0);
-    env.top(0) = tmp;
+    std::swap(env.top(1), env.top(0));
     ActionNewLessThan(thread);
 }
 
