@@ -287,6 +287,10 @@ extern bool TotalFrames (NPObject *npobj, NPIdentifier name,
                           const NPVariant *args, uint32_t argCount,
                           NPVariant *result);
 
+extern bool remoteCallback (NPObject *npobj, NPIdentifier name,
+                            const NPVariant *args, uint32_t argCount,
+                            NPVariant *result);
+
 #endif // GNASH_PLUGIN_CALLBACKS_H
 
 } // end of gnash namespace

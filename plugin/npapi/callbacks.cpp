@@ -170,14 +170,12 @@ GotoFrame (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
-    ExternalInterface ei;
-
     std::string varname;
     if (argCount == 1) {
-        std::string str = ei.convertNPVariant(&args[0]);
+        std::string str = ExternalInterface::convertNPVariant(&args[0]);
         std::vector<std::string> iargs;
         iargs.push_back(str);
-        str = ei.makeInvoke("GotoFrame", iargs);
+        str = ExternalInterface::makeInvoke("GotoFrame", iargs);
 
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -214,9 +212,8 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     if (argCount == 0) {
-        ExternalInterface ei;
         std::vector<std::string> iargs;
-        std::string str = ei.makeInvoke("IsPlaying", iargs);
+        std::string str = ExternalInterface::makeInvoke("IsPlaying", iargs);
         
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -233,7 +230,7 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
             return false;
         }
 
-        GnashNPVariant value = ei.parseXML(data);
+        GnashNPVariant value = ExternalInterface::parseXML(data);
         if (NPVARIANT_TO_BOOLEAN(value.get()) == true) {
             BOOLEAN_TO_NPVARIANT(true, *result);
         } else {
@@ -268,15 +265,14 @@ LoadMovie (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
     
     if (argCount == 2) {
-        ExternalInterface ei;
         // int layer = NPVARIANT_TO_INT32(args[0]);
         // std::string url = NPStringToString(NPVARIANT_TO_STRING(args[1]));
-        std::string str = ei.convertNPVariant(&args[0]);
+        std::string str = ExternalInterface::convertNPVariant(&args[0]);
         std::vector<std::string> iargs;
         iargs.push_back(str);
-        str = ei.convertNPVariant(&args[1]);
+        str = ExternalInterface::convertNPVariant(&args[1]);
         iargs.push_back(str);
-        str = ei.makeInvoke("LoadMovie", iargs);
+        str = ExternalInterface::makeInvoke("LoadMovie", iargs);
 
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -317,15 +313,14 @@ Pan (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     if (argCount == 3) {
-        ExternalInterface ei;
-        std::string str = ei.convertNPVariant(&args[0]);
+        std::string str = ExternalInterface::convertNPVariant(&args[0]);
         std::vector<std::string> iargs;
         iargs.push_back(str);
-        str = ei.convertNPVariant(&args[1]);
+        str = ExternalInterface::convertNPVariant(&args[1]);
         iargs.push_back(str);
-        str = ei.convertNPVariant(&args[2]);
+        str = ExternalInterface::convertNPVariant(&args[2]);
         iargs.push_back(str);
-        str = ei.makeInvoke("Pan", iargs);
+        str = ExternalInterface::makeInvoke("Pan", iargs);
         
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -372,9 +367,8 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
     return true;
 #else
     if (argCount == 0) {
-        ExternalInterface ei;
         std::vector<std::string> iargs;
-        std::string str = ei.makeInvoke("PercentLoaded", iargs);
+        std::string str = ExternalInterface::makeInvoke("PercentLoaded", iargs);
 
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -424,9 +418,8 @@ Play (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     if (argCount == 0) {
-        ExternalInterface ei;
         std::vector<std::string> iargs;
-        std::string str = ei.makeInvoke("Play", iargs);
+        std::string str = ExternalInterface::makeInvoke("Play", iargs);
 
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -463,9 +456,8 @@ Rewind (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     if (argCount == 0) {
-        ExternalInterface ei;
         std::vector<std::string> iargs;
-        std::string str = ei.makeInvoke("Rewind", iargs);
+        std::string str = ExternalInterface::makeInvoke("Rewind", iargs);
 
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -506,17 +498,16 @@ SetZoomRect (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     if (argCount == 4) {
-        ExternalInterface ei;
-        std::string str = ei.convertNPVariant(&args[0]);
+        std::string str = ExternalInterface::convertNPVariant(&args[0]);
         std::vector<std::string> iargs;
         iargs.push_back(str);
-        str = ei.convertNPVariant(&args[1]);
+        str = ExternalInterface::convertNPVariant(&args[1]);
         iargs.push_back(str);
-        str = ei.convertNPVariant(&args[2]);
+        str = ExternalInterface::convertNPVariant(&args[2]);
         iargs.push_back(str);
-        str = ei.convertNPVariant(&args[3]);
+        str = ExternalInterface::convertNPVariant(&args[3]);
         iargs.push_back(str);
-        str = ei.makeInvoke("SetZoomRect", iargs);
+        str = ExternalInterface::makeInvoke("SetZoomRect", iargs);
 
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -552,9 +543,8 @@ StopPlay (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     if (argCount == 0) {
-        ExternalInterface ei;
         std::vector<std::string> iargs;
-        std::string str = ei.makeInvoke("StopPlay", iargs);
+        std::string str = ExternalInterface::makeInvoke("StopPlay", iargs);
 
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -593,11 +583,10 @@ Zoom (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     if (argCount == 1) {
-        ExternalInterface ei;
-        std::string str = ei.convertNPVariant(&args[0]);
+        std::string str = ExternalInterface::convertNPVariant(&args[0]);
         std::vector<std::string> iargs;
         iargs.push_back(str);
-        str = ei.makeInvoke("Zoom", iargs);
+        str = ExternalInterface::makeInvoke("Zoom", iargs);
 
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -633,9 +622,8 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     if (argCount == 0) {
-        ExternalInterface ei;
         std::vector<std::string> iargs;
-        std::string str = ei.makeInvoke("TotalFrames", iargs);
+        std::string str = ExternalInterface::makeInvoke("TotalFrames", iargs);
 
         // Write the message to the Control FD.
         size_t ret = gpso->writePlayer(str);
@@ -652,7 +640,7 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
             return false;
         }
 
-        GnashNPVariant value = ei.parseXML(data);
+        GnashNPVariant value = ExternalInterface::parseXML(data);
         if (NPVARIANT_IS_INT32(value.get())) {
             value.copy(*result);
         } else {
@@ -661,6 +649,51 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
 
         return true;
     }
+    
+    BOOLEAN_TO_NPVARIANT(false, *result);
+    return false;
+}
+
+// Sends something like this:
+// <invoke name="GotoFrame" returntype="xml">
+//      <arguments>
+//              <number>123</number>
+//      </arguments>
+// </invoke>
+//
+//    Receives:
+// 	nothing
+bool
+remoteCallback (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
+          uint32_t argCount, NPVariant *result)
+{   
+    log_debug(__PRETTY_FUNCTION__);
+
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
+    
+
+#if 0
+    std::string varname;
+    if (argCount == 1) {
+        std::string str = ExternalInterface::convertNPVariant(&args[0]);
+        std::vector<std::string> iargs;
+        iargs.push_back(str);
+        str = ExternalInterface::makeInvoke("GotoFrame", iargs);
+
+        // Write the message to the Control FD.
+        size_t ret = gpso->writePlayer(str);
+        // Unless we wrote the same amount of data as the message contained,
+        // something went wrong.
+        if (ret != str.size()) {
+            log_error("Couldn't goto the specified frame, network problems.");
+            return false;
+        }        
+        // gpso->GotoFrame(value);
+        BOOLEAN_TO_NPVARIANT(true, *result);
+        return true;
+    }
+#endif
     
     BOOLEAN_TO_NPVARIANT(false, *result);
     return false;
