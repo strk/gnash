@@ -66,6 +66,7 @@
 #include "GnashSystemIOHeaders.h"
 #include "StringPredicates.h"
 #include "external.h"
+#include "callbacks.h"
 #include "npapi.h"
 #include "npruntime.h"
 #include "npfunctions.h"
@@ -786,17 +787,25 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             
             NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
             return true;
+        } else if (invoke->name == "addMethod") {
+            // Make this flash function accessible to Javascript.
+            std::string method = NPStringToString(NPVARIANT_TO_STRING(
+                                                      invoke->args[0].get()));
+            NPIdentifier id = NPN_GetStringIdentifier(method.c_str());
+            _scriptObject->AddMethod(id, remoteCallback);
         }
+        if (!invoke->name.empty()) {
+            gnash::log_debug("Invoking Javascript method %s", invoke->name);
+        }
+        NPVariant *result = 0;
+#if 0
         // This is the player invoking a method in Javascript
         NPP npp = _instance;
-        NPObject *window = 0;
-        NPN_GetValue(npp, NPNVWindowNPObject, &window);
-        NPVariant *result = 0;
         uint32_t count = 1;
         NPVariant args;
-        NPIdentifier id = NPN_GetStringIdentifier(invoke->name.c_str());
-        _scriptObject->Invoke(window, id, &args, count, result);
-        gnash::log_debug("Invoking Javascript method %s", invoke->name);
+        NPIdentifier id = NPNGetStringIdentifier(invoke->name.c_str());      
+        _scriptObject->Invoke(_scriptObject, id, &args, count, result);
+#endif
         // We got a result from invoking the Javascript method
         std::stringstream ss;
         if (result) {

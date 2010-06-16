@@ -1867,7 +1867,21 @@ void
 movie_root::addExternalCallback(as_object *obj, const std::string &name,
                                 as_object *callback)
 {
+    GNASH_REPORT_FUNCTION;
+    
     _externalCallbacks.push_back(ExternalCallback(obj, name, callback));
+
+    if (_hostfd) {
+        std::vector<as_value> fnargs;
+        fnargs.push_back(name);
+        std::string msg = ExternalInterface::makeInvoke("addMethod", fnargs);
+        
+        const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
+        if (ret != msg.size()) {
+            log_error(_("Could not write to browser fd #%d: %s"),
+                      _hostfd, std::strerror(errno));
+        }
+    }
 }    
 
 // This calls a JavaScript method in the web page
