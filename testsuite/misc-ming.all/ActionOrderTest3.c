@@ -40,7 +40,11 @@ int main(int argc, char* argv[])
             "   if (typeof(b)=='undefined' || (typeof(b)=='boolean' && b)) {"
             "       _global.arr.push(a);"
             "   };"
-            "};");
+            "};"
+            "this.onEnterFrame = function() { "
+            "   _global.ch('onEnterFrame', false);"
+            "};"
+            );
 
     SWFMovie_nextFrame(mo);
 
@@ -143,6 +147,7 @@ int main(int argc, char* argv[])
         "        gotoAndPlay(2);"
         "   }"
         "   else {"
+        "      delete this.onEnterFrame;"
         "      gotoAndPlay(4);"
         "   };"
         );
@@ -178,6 +183,8 @@ int main(int argc, char* argv[])
 
     SWFMovie_nextFrame(mo);
     add_actions(mo, "totals(25); stop();");
+    
+    SWFMovie_nextFrame(mo);
 
     // SWF_END 
     SWFMovie_save(mo, OUTPUT_FILENAME);
