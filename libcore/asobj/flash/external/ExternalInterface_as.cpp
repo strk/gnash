@@ -272,7 +272,7 @@ externalinterface_call(const fn_call& fn)
         const std::string methodName = methodName_as.to_string();
         const std::vector<as_value>& args = fn.getArgs();
         log_debug("Calling External method \"%s\"", methodName);
-        std::string result = mr.callExternalCallback(methodName, args);
+        std::string result = mr.callExternalJavascript(methodName, args);
         if (!result.empty()) {
             val = ExternalInterface::parseXML(result);
             // There was an error trying to Invoke the callback
