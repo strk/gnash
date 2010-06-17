@@ -944,6 +944,9 @@ public:
 
     std::string callExternalCallback(const std::string &name, 
                                      const std::vector<as_value>& args);
+    
+    std::string callExternalJavascript(const std::string &name, 
+                                       const std::vector<as_value>& args);
 
     /// Removes a queued constructor from the execution queue
     //

@@ -1617,6 +1617,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
     if (invoke == 0) {
 	return false;
     }
+    
     if (invoke->name.empty()) {
 	return false;
     }
@@ -1863,6 +1864,13 @@ movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
     return 0;
 }
 
+/// @example "Internal Gnash message 'addMethod'"
+///
+/// <pre>
+/// <invoke name="addMethod" returntype="xml">
+///      <arguments><string>methodname</string</arguments>
+/// </invoke>
+/// </pre>
 void
 movie_root::addExternalCallback(as_object *obj, const std::string &name,
                                 as_object *callback)
@@ -1884,7 +1892,47 @@ movie_root::addExternalCallback(as_object *obj, const std::string &name,
     }
 }    
 
-// This calls a JavaScript method in the web page
+/// This calls a JavaScript method in the web page
+///
+/// @example "ExternalInterace::call message"
+///
+/// <pre>
+/// <invoke name="methodname" returntype="xml">
+///      <arguments></arguments>
+///             ...
+///      <arguments></arguments>
+/// </invoke>
+///
+/// May return any supported type like Number or String in XML format.
+///
+/// </pre>
+std::string
+movie_root::callExternalJavascript(const std::string &name, 
+                                   const std::vector<as_value> &fnargs)
+{
+    std::string result;
+    ExternalCallbacks::const_iterator it;
+    // If the browser is connected, we send an Invoke message to the
+    // browser.
+    if (_controlfd && _hostfd) {
+        std::string msg = ExternalInterface::makeInvoke(name, fnargs);
+        
+        const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
+        if (ret != msg.size()) {
+            log_error(_("Could not write to browser fd #%d: %s"),
+                      _hostfd, std::strerror(errno));
+        } else {
+            // Now read the response from the browser after it's exectuted
+            // the JavaScript function.
+            result = ExternalInterface::readBrowser(_controlfd);
+        }
+    }
+
+    return result;
+}
+
+// Call one of the registered callbacks, and return the result to
+// Javascript in the browser.
 std::string
 movie_root::callExternalCallback(const std::string &name, 
 				 const std::vector<as_value> &fnargs)
@@ -1895,19 +1943,17 @@ movie_root::callExternalCallback(const std::string &name,
         ExternalCallback ec = *it;
         log_debug("Checking %s against method name: %s", name, ec.methodName());
 
+        // FIXME: call the AS method here!
+
+        // Return an error
+        std::string result = ExternalInterface::makeString("Error");
         // If the browser is connected, we send an Invoke message to the
         // browser.
-        if (_controlfd && _hostfd) {
-            std::string msg = ExternalInterface::makeInvoke(name, fnargs);
-            
-            const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
-            if (ret != msg.size()) {
+        if (_hostfd) {
+            const size_t ret = ExternalInterface::writeBrowser(_hostfd, result);
+            if (ret != result.size()) {
                 log_error(_("Could not write to browser fd #%d: %s"),
                           _hostfd, std::strerror(errno));
-            } else {
-                // Now read the response from the browser after it's exectuted
-                // the JavaScript function.
-                result = ExternalInterface::readBrowser(_controlfd);
             }
         }
     }
