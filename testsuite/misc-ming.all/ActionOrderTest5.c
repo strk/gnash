@@ -5,7 +5,7 @@
 #include "ming_utils.h"
 
 #define OUTPUT_VERSION 8
-#define OUTPUT_FILENAME "InitActionTest5.swf"
+#define OUTPUT_FILENAME "ActionOrderTest5.swf"
 
 // A relatively simple looping test checking order of unload events.
 //

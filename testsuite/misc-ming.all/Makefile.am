@@ -222,9 +222,9 @@ if MING_SUPPORTS_INIT_ACTIONS
 check_PROGRAMS += \
 	init_action_test \
 	InitActionTest2 \
-	InitActionTest3 \
-	InitActionTest4 \
-	InitActionTest5 \
+	ActionOrderTest3 \
+	ActionOrderTest4 \
+	ActionOrderTest5 \
 	RegisterClassTest4 \
 	RegisterClassTest3 \
 	registerClassTest2 \
@@ -328,9 +328,9 @@ check_SCRIPTS = \
 	instanceNameTestRunner \
 	init_action_testrunner \
 	InitActionTest2Runner \
-	InitActionTest3Runner \
-	InitActionTest4Runner \
-	InitActionTest5Runner \
+	ActionOrderTest3Runner \
+	ActionOrderTest4Runner \
+	ActionOrderTest5Runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -360,9 +360,9 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 check_SCRIPTS += \
 	InitActionTest2Runner \
-	InitActionTest3Runner \
-	InitActionTest4Runner \
-	InitActionTest5Runner \
+	ActionOrderTest3Runner \
+	ActionOrderTest4Runner \
+	ActionOrderTest5Runner \
 	RegisterClassTest4Runner \
 	RegisterClassTest3Runner \
 	registerClassTest2runner \
@@ -1800,40 +1800,40 @@ InitActionTest2Runner: $(srcdir)/../generic-testrunner.sh InitActionTest2.swf
 	sh $< $(top_builddir) InitActionTest2.swf > $@
 	chmod 755 $@
 
-InitActionTest3_SOURCES =	\
-	InitActionTest3.c	\
+ActionOrderTest3_SOURCES =	\
+	ActionOrderTest3.c	\
 	$(NULL)
-InitActionTest3_LDADD = libgnashmingutils.la
+ActionOrderTest3_LDADD = libgnashmingutils.la
 
-InitActionTest3.swf: InitActionTest3
-	./InitActionTest3 $(abs_mediadir)
+ActionOrderTest3.swf: ActionOrderTest3
+	./ActionOrderTest3 $(abs_mediadir)
 
-InitActionTest3Runner: $(srcdir)/../generic-testrunner.sh InitActionTest3.swf
-	sh $< $(top_builddir) InitActionTest3.swf > $@
+ActionOrderTest3Runner: $(srcdir)/../generic-testrunner.sh ActionOrderTest3.swf
+	sh $< $(top_builddir) ActionOrderTest3.swf > $@
 	chmod 755 $@
 
-InitActionTest4_SOURCES =	\
-	InitActionTest4.c	\
+ActionOrderTest4_SOURCES =	\
+	ActionOrderTest4.c	\
 	$(NULL)
-InitActionTest4_LDADD = libgnashmingutils.la
+ActionOrderTest4_LDADD = libgnashmingutils.la
 
-InitActionTest4.swf: InitActionTest4
-	./InitActionTest4 $(abs_mediadir)
+ActionOrderTest4.swf: ActionOrderTest4
+	./ActionOrderTest4 $(abs_mediadir)
 
-InitActionTest4Runner: $(srcdir)/../generic-testrunner.sh InitActionTest4.swf
-	sh $< $(top_builddir) InitActionTest4.swf > $@
+ActionOrderTest4Runner: $(srcdir)/../generic-testrunner.sh ActionOrderTest4.swf
+	sh $< $(top_builddir) ActionOrderTest4.swf > $@
 	chmod 755 $@
 
-InitActionTest5_SOURCES =	\
-	InitActionTest5.c	\
+ActionOrderTest5_SOURCES =	\
+	ActionOrderTest5.c	\
 	$(NULL)
-InitActionTest5_LDADD = libgnashmingutils.la
+ActionOrderTest5_LDADD = libgnashmingutils.la
 
-InitActionTest5.swf: InitActionTest5
-	./InitActionTest5 $(abs_mediadir)
+ActionOrderTest5.swf: ActionOrderTest5
+	./ActionOrderTest5 $(abs_mediadir)
 
-InitActionTest5Runner: $(srcdir)/../generic-testrunner.sh InitActionTest5.swf
-	sh $< $(top_builddir) InitActionTest5.swf > $@
+ActionOrderTest5Runner: $(srcdir)/../generic-testrunner.sh ActionOrderTest5.swf
+	sh $< $(top_builddir) ActionOrderTest5.swf > $@
 	chmod 755 $@
 
 RegisterClassTest3_SOURCES =	\
@@ -2243,9 +2243,9 @@ TEST_CASES += \
 	registerClassTest2runner \
 	init_action_testrunner \
 	InitActionTest2Runner \
-	InitActionTest3Runner \
-	InitActionTest4Runner \
-	InitActionTest5Runner \
+	ActionOrderTest3Runner \
+	ActionOrderTest4Runner \
+	ActionOrderTest5Runner \
 	RegisterClassTest3Runner \
 	RegisterClassTest4Runner \
 	$(NULL)
