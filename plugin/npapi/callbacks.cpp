@@ -655,48 +655,76 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
 }
 
 // Sends something like this:
-// <invoke name="GotoFrame" returntype="xml">
+// <invoke name="TestASMethod" returntype="xml">
 //      <arguments>
 //              <number>123</number>
 //      </arguments>
 // </invoke>
 //
 //    Receives:
-// 	nothing
+// 	An XML response of one of the standard types like Number or String.
 bool
-remoteCallback (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
+remoteCallback (NPObject *npobj, NPIdentifier name, const NPVariant *args,
           uint32_t argCount, NPVariant *result)
 {   
     log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
+    std::string method;
     
-
-#if 0
-    std::string varname;
-    if (argCount == 1) {
-        std::string str = ExternalInterface::convertNPVariant(&args[0]);
-        std::vector<std::string> iargs;
-        iargs.push_back(str);
-        str = ExternalInterface::makeInvoke("GotoFrame", iargs);
-
-        // Write the message to the Control FD.
-        size_t ret = gpso->writePlayer(str);
-        // Unless we wrote the same amount of data as the message contained,
-        // something went wrong.
-        if (ret != str.size()) {
-            log_error("Couldn't goto the specified frame, network problems.");
-            return false;
-        }        
-        // gpso->GotoFrame(value);
-        BOOLEAN_TO_NPVARIANT(true, *result);
-        return true;
+#if 1
+    if (NPN_IdentifierIsString(name)) {
+        log_debug("Invoking remote Method \"%s\"...",
+                  NPN_UTF8FromIdentifier(name));
+        method = NPN_UTF8FromIdentifier(name);
+    } else {
+        log_debug("Invoking remote Method: \"%d\"...",
+                  NPN_IntFromIdentifier(name));
     }
 #endif
+
+    // Build the argument array
+    std::vector<std::string> fnargs;
+    for (uint32_t i=0; i<argCount; ++i) {
+        std::string xml = ExternalInterface::convertNPVariant(&args[i]);
+        fnargs.push_back(xml);
+        
+    }
     
-    BOOLEAN_TO_NPVARIANT(false, *result);
-    return false;
+    std::string str = ExternalInterface::makeInvoke(method, fnargs);
+
+    // Write the message to the Control FD.
+    size_t ret = gpso->writePlayer(str);
+    // Unless we wrote the same amount of data as the message contained,
+    // something went wrong.
+    if (ret != str.size()) {
+        log_error("Couldn't invoke %s, network problems.", method);
+            return false;
+    }        
+
+    // Have the read function allocate the memory
+    std::string data = gpso->readPlayer();
+    if (data.empty()) {
+        log_error("Couldn't read a response for invoke, network problems.");
+        NULL_TO_NPVARIANT(*result);
+        return false;
+    }
+
+    GnashNPVariant parsed = ExternalInterface::parseXML(data);
+    std::string answer = NPStringToString(NPVARIANT_TO_STRING(parsed.get()));
+    if (answer == "Error") {
+        NULL_TO_NPVARIANT(*result);
+    } else if (answer == "SecurityError") {
+        NULL_TO_NPVARIANT(*result);
+    } else {
+        parsed.copy(*result);
+    }
+    
+    // printNPVariant(&parsed.get());
+
+    // Returning false makes Javascript stop executing the script.
+    return true;
 }
 
 } // end of gnash namespace

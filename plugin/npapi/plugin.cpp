@@ -322,6 +322,8 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
+    // gnash::log_debug(__PRETTY_FUNCTION__);
+
     if(!aCreateDataStruct) {
         return NULL;
     }
@@ -359,8 +361,11 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _controlfd(-1),
     _childpid(0),
     _filefd(-1),
-    _name()
+    _name(),
+    _scriptObject(0)
 {
+    // gnash::log_debug("%s: %x", __PRETTY_FUNCTION__, (void *)this);
+
     for (size_t i=0, n=data->argc; i<n; ++i) {
         std::string name, val;
         gnash::StringNoCaseEqual noCaseCompare;
@@ -379,11 +384,14 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 
         _params[name] = val;
     }
-    
+
+#if 1
     if (NPNFuncs.version >= 14) { // since NPAPI start to support
         _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(
             _instance, GnashPluginScriptObject::marshalGetNPClass());
+        log_debug("SCRIPT OBJECT create: %x, ns: %x", (void *)_scriptObject, (void *)this);
     }
+#endif
     
     return;
 }
@@ -536,6 +544,7 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
+
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
@@ -545,6 +554,8 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
             gnash::log_debug("_scriptObject is not assigned");
         }
     }    
+
+    // log_debug("SCRIPT OBJECT getValue: %x, ns: %x", (void *)_scriptObject, (void *)this);
 
     return NS_PluginGetValue(aVariable, aValue);
 }
@@ -570,6 +581,8 @@ NPError
 nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
                             NPBool /*seekable*/, uint16_t* /*stype*/)
 {
+    // gnash::log_debug("%s: %x", __PRETTY_FUNCTION__, (void *)this);
+
     if (_childpid) {
         // Apparently the child process has already been started for this
         // plugin instance. It is puzzling that this method gets called
@@ -640,6 +653,7 @@ nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
 bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
+    // gnash::log_debug("%s: %d: %x", __PRETTY_FUNCTION__, __LINE__, (void *)this);
 
     if ( cond & G_IO_HUP ) {
         gnash::log_debug("Player control socket hang up");
@@ -659,6 +673,8 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
     //    g_io_channel_set_flags(iochan, G_IO_FLAG_NONBLOCK, &error);
 
     size_t retries = 5;
+    gchar* request = 0;
+    gsize requestSize = 0;
     do {
         // When in non-blocking mode, we'll get several iterations of this
         // loop while waiting for data. if data never arrives, we'd be stuck
@@ -668,8 +684,8 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
             return false;
         }
         error = 0;
-        gchar* request = 0;
-        gsize requestSize = 0;
+        request = 0;
+        requestSize = 0;
         GIOStatus status = g_io_channel_read_line(iochan, &request,
                            &requestSize, NULL, &error);
         switch (status) {
@@ -695,10 +711,6 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
                   requestSize--;
               }
               gnash::log_debug("Normal read: %s", request);
-              // process request..
-              processPlayerRequest(request, requestSize);
-              g_free(request);
-              return true;
               break;
           default:
               gnash::log_error("Abnormal status!");
@@ -706,14 +718,19 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
         }
     } while (g_io_channel_get_buffer_condition(iochan) & G_IO_IN);
 
+    // process request..
+    processPlayerRequest(request, requestSize);
+    g_free(request);
+    
     return true;
-
 }
 
 bool
 nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 {
-    log_debug(__PRETTY_FUNCTION__);
+    // gnash::log_debug(__PRETTY_FUNCTION__);
+
+   // log_debug("SCRIPT OBJECT %d: %x", __LINE__, this->getScriptObject());
 
     if ( linelen < 4 ) {
         if (buf) {
@@ -726,6 +743,10 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
     
     ExternalInterface::invoke_t *invoke = ExternalInterface::parseInvoke(buf);
 
+    if (!invoke->name.empty()) {
+        gnash::log_debug("Requested method is: %s", invoke->name);
+    }
+    
     // The invoke message is also used for getURL. In this case there are 4
     // possible arguments.
     if (invoke) {
@@ -788,24 +809,26 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
             return true;
         } else if (invoke->name == "addMethod") {
-            // Make this flash function accessible to Javascript.
+            // Make this flash function accessible to Javascript. The
+            // actual callback lives in libcore/movie_root, but it
+            // needs to be on the list of supported remote methods so
+            // it can be called by Javascript.
             std::string method = NPStringToString(NPVARIANT_TO_STRING(
                                                       invoke->args[0].get()));
             NPIdentifier id = NPN_GetStringIdentifier(method.c_str());
-            _scriptObject->AddMethod(id, remoteCallback);
-        }
-        if (!invoke->name.empty()) {
-            gnash::log_debug("Invoking Javascript method %s", invoke->name);
+            // log_debug("SCRIPT OBJECT addMethod: %x, %s", (void *)_scriptObject, method);
+            this->getScriptObject()->AddMethod(id, remoteCallback);
+            return true;
         }
         NPVariant *result = 0;
-#if 0
         // This is the player invoking a method in Javascript
-        NPP npp = _instance;
-        uint32_t count = 1;
+        uint32_t count = 0;
         NPVariant args;
-        NPIdentifier id = NPNGetStringIdentifier(invoke->name.c_str());      
-        _scriptObject->Invoke(_scriptObject, id, &args, count, result);
-#endif
+        if (!invoke->name.empty()) {
+            NPIdentifier id = NPN_GetStringIdentifier(invoke->name.c_str());      
+            gnash::log_debug("Invoking JavaScript method %s", invoke->name);
+            NPN_Invoke(_instance, _scriptObject, id, &args, count, result);
+        }
         // We got a result from invoking the Javascript method
         std::stringstream ss;
         if (result) {

@@ -85,7 +85,9 @@ public:
     int32_t Write(NPStream *stream, int32_t offset, int32_t len, void *buffer);
     NPObject *getScriptableObject();
     const char *getEmbedURL() const;
-    
+
+    GnashPluginScriptObject *getScriptObject() { return _scriptObject; }; // FIXME: debug only!!!
+
 private:
     void startProc();
     std::vector<std::string> getCmdLine(int hostfd, int controlfd);

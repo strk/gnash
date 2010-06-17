@@ -257,26 +257,28 @@ quality="high" wmode="transparent" width="640" height="100"
                   addLog(value);
         }
 
-        function FlashTestASMethod()
-        {
-                  addLog("flashTestASMethod(): enter ");
-                  var value = embed.TestASMethod();
-                  addLog("flashTestASMethod(): return");          
-        }
-
           // This gets call a javascript method
         function TestJSMethod(msg)
+          {
+                addLog("executed TestJSMethod");
+          }
+
+        function FlashTestASMethod(msg)
         {
-            addLog("executed TestJSMethod");
+                  addLog("flashTestASMethod(): enter " + msg);
+                  var value = embed.TestASMethod(msg);
+                  addLog(value);
+                  embed.SetVariable("variable1", 1.1);
+                  addLog("flashTestASMethod(): return");         
         }
 
           // This calls a method in gnash
         function TestASMethodJS(msg)
         {
-            addLog("executing TestASMethod");
-            addLog("SetVariable: " + embed.SetVariable("variable1", "bur"));
-            embed.TestASMethod(msg);
-            addLog(embed.SetVariable("variable2", 1.1));
+            addLog("TestASMethod(): enter " + msg);
+            var value = embed.TestASMethod(msg);
+            addLog(value);
+            embed.SetVariable("variable2", 1.1);
 //            if (typeof embed.TestASMethod === 'function') {
 //                addLog('Running embed.TestASMethod("'+msg+'")');
 //                addLog(embed.TestASMethod(msg));
@@ -284,6 +286,7 @@ quality="high" wmode="transparent" width="640" height="100"
 //                addLog("Quitting: embed.TestASMethod is not a function.");
 //            }
 //          addLog(embed.GetVariable("$version"));
+            addLog("TestASMethod(): return ");
         }
 </script>
 

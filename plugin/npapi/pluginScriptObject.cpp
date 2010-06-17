@@ -157,7 +157,7 @@ GnashPluginScriptObject::AddProperty(const std::string &name, int num)
 void
 GnashPluginScriptObject::initializeIdentifiers()
 {
-//    log_debug("initializeIdentifiers");
+    // log_debug("initializeIdentifiers");
 
 //    NPN_Status(_nppinstance, __FUNCTION__);
     
@@ -275,6 +275,8 @@ GnashPluginScriptObject::initializeIdentifiers()
     id = NPN_GetStringIdentifier("TotalFrames");
     AddMethod(id, TotalFrames);
     
+    // id = NPN_GetStringIdentifier("TestASMethod");
+    // AddMethod(id, remoteCallback);
 };
 
 // Constructor
@@ -282,6 +284,7 @@ GnashPluginScriptObject::GnashPluginScriptObject()
     : _nppinstance (0)
 {
 //    log_debug(__PRETTY_FUNCTION__);
+    
     initializeIdentifiers();
     
     _sockfds[READFD] = 0;
@@ -293,6 +296,7 @@ GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
     : _nppinstance (npp)
 {
 //    log_debug(__PRETTY_FUNCTION__);
+    
     initializeIdentifiers();
 
     _sockfds[READFD] = 0;
@@ -373,11 +377,9 @@ GnashPluginScriptObject::marshalInvoke (NPObject *npobj, NPIdentifier name,
                                         const NPVariant *args, uint32_t argCount,
                                         NPVariant *result)
 {
-    // log_debug(__PRETTY_FUNCTION__);
-    
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
     
-//    return gpso->Invoke(npobj, name, args, argCount, result);
+    return gpso->Invoke(npobj, name, args, argCount, result);
 }
 
 bool 
@@ -386,8 +388,6 @@ GnashPluginScriptObject::marshalInvokeDefault (NPObject *npobj,
                                                uint32_t argCount,
                                                NPVariant *result)
 {
-    // log_debug(__PRETTY_FUNCTION__);
-
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
     
     return gpso->InvokeDefault(args, argCount, result);
@@ -396,8 +396,6 @@ GnashPluginScriptObject::marshalInvokeDefault (NPObject *npobj,
 bool 
 GnashPluginScriptObject::marshalHasProperty (NPObject *npobj, NPIdentifier name)
 {
-//    log_debug(__PRETTY_FUNCTION__);
-    
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     return gpso->HasProperty(name);
@@ -407,8 +405,6 @@ bool
 GnashPluginScriptObject::marshalGetProperty (NPObject *npobj, NPIdentifier name,
                                              NPVariant *result)
 {
-//    log_debug(__PRETTY_FUNCTION__);
-
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
     
     return gpso->GetProperty(name, result);    
@@ -418,8 +414,6 @@ bool
 GnashPluginScriptObject::marshalSetProperty (NPObject *npobj, NPIdentifier name,
                                              const NPVariant *value)
 {
-//    log_debug(__PRETTY_FUNCTION__);
-
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;    
     return gpso->SetProperty(name, *value);
 }
@@ -427,8 +421,6 @@ GnashPluginScriptObject::marshalSetProperty (NPObject *npobj, NPIdentifier name,
 bool 
 GnashPluginScriptObject::marshalRemoveProperty (NPObject *npobj, NPIdentifier name)
 {
-//    log_debug(__PRETTY_FUNCTION__);
-
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;    
     return gpso->RemoveProperty(name);
 }
@@ -460,8 +452,6 @@ GnashPluginScriptObject::marshalConstruct (NPObject *npobj, const NPVariant *dat
 bool
 GnashPluginScriptObject::HasProperty(NPIdentifier name)
 {
-//    log_debug(__PRETTY_FUNCTION__);
-
 #if 0
     log_debug("Checking for Property \"");
     if (NPN_IdentifierIsString(name)) {
@@ -477,8 +467,6 @@ GnashPluginScriptObject::HasProperty(NPIdentifier name)
 bool
 GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
 {
-    // log_debug(__PRETTY_FUNCTION__);
-
     if (NPN_IdentifierIsString(name)) {
         log_debug("Getting Property %s\"...", NPN_UTF8FromIdentifier(name));
     } else {
@@ -500,8 +488,6 @@ GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
 bool
 GnashPluginScriptObject::SetProperty(NPIdentifier name, const NPVariant& value)
 {
-    // log_debug(__PRETTY_FUNCTION__);
-
     _properties[name] = value;
 
     return false;
@@ -510,8 +496,6 @@ GnashPluginScriptObject::SetProperty(NPIdentifier name, const NPVariant& value)
 bool
 GnashPluginScriptObject::RemoveProperty(NPIdentifier name)
 {
-    // log_debug(__PRETTY_FUNCTION__);
-
     std::map<NPIdentifier, GnashNPVariant>::iterator it;
     it = _properties.find(name);
     if (it != _properties.end()) {
@@ -542,8 +526,6 @@ GnashPluginScriptObject::Construct(const NPVariant */* args */, uint32_t /* argC
 bool
 GnashPluginScriptObject::HasMethod(NPIdentifier name)
 {
-//    log_debug(__PRETTY_FUNCTION__);
-
 #if 0
     log_debug("Checking for Method \"");
     if (NPN_IdentifierIsString(name)) {
@@ -562,25 +544,30 @@ GnashPluginScriptObject::Invoke(NPObject *npobj, NPIdentifier name,
                                 NPVariant *result)
 {
 //    log_debug(__PRETTY_FUNCTION__);
-#if 0
-    log_debug("Invoking Method \"");
+    
+#if 1
     if (NPN_IdentifierIsString(name)) {
-        log_debug("%s\"...", NPN_UTF8FromIdentifier(name));
+        log_debug("Invoking Method \"%s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        log_debug("%d\"...", NPN_IntFromIdentifier(name));
+        log_debug("Invoking Method: \"%d\"...", NPN_IntFromIdentifier(name));
     }
+    // log_debug("SCRIPT OBJECT invoke %s: %x", NPN_UTF8FromIdentifier(name),
+    //           (void *)npobj);    
 #endif
 
     std::map<NPIdentifier, NPInvokeFunctionPtr>::iterator it;
     it = _methods.find(name);
     if (it != _methods.end()) {
-        // log_debug(" FOUND");
+        // log_debug("FOUND Method \"%s\"!", NPN_UTF8FromIdentifier(name));
         NPInvokeFunctionPtr func = it->second;
         return func(NULL, name, args, argCount, result);
+    } else {
+        log_error("Couldn't find Method \"%s\"", NPN_UTF8FromIdentifier(name));
     }
 
-    NPIdentifier id = NPN_UTF8FromIdentifier(name);
-    return NPN_Invoke(_nppinstance, npobj, id, args, argCount, result);
+    return false;
+    
+//    return NPN_Invoke(_nppinstance, this, name, args, argCount, result);
 }
 
 bool
@@ -606,11 +593,10 @@ GnashPluginScriptObject::AddMethod(NPIdentifier name, NPInvokeFunctionPtr func)
 //    log_debug(__PRETTY_FUNCTION__);
     
 #if 0
-    log_debug("Adding Method \"");
     if (NPN_IdentifierIsString(name)) {
-        log_debug("%s\"...", NPN_UTF8FromIdentifier(name));
+        log_debug("Adding Method \"%s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        log_debug("%d\"...", NPN_IntFromIdentifier(name));
+        log_debug("Adding Method \"%d\"...", NPN_IntFromIdentifier(name));
     }
 #endif
 
@@ -625,7 +611,6 @@ bool
 GnashPluginScriptObject::SetVariable(const std::string &name,
                                      const NPVariant& value)
 {
-    log_debug(__PRETTY_FUNCTION__);
     std::vector<std::string> iargs;
     std::string str = ExternalInterface::makeString(name);
     iargs.push_back(str);
@@ -633,6 +618,8 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
     iargs.push_back(str);
     str = ExternalInterface::makeInvoke("SetVariable", iargs);
     
+    log_debug("Trying to set a value for %s.", name);
+
     // Write the message to the Control FD.
     size_t ret = writePlayer(str);
     // Unless we wrote the same amount of data as the message contained,
@@ -651,8 +638,6 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
 GnashNPVariant
 GnashPluginScriptObject::GetVariable(const std::string &name)
 {
-    log_debug(__PRETTY_FUNCTION__);
-
     std::vector<std::string> iargs;
     std::string str = ExternalInterface::makeString(name);
     iargs.push_back(str);
@@ -783,7 +768,7 @@ GnashPluginScriptObject::readPlayer(int fd)
     FD_ZERO(&fdset);
     FD_SET(fd, &fdset);
     struct timeval tval;
-    tval.tv_sec = 10;
+    tval.tv_sec = 2;
     tval.tv_usec = 0;
     // log_debug("Waiting for data... ");
     if (select(fd+1, &fdset, NULL, NULL, &tval)) {

@@ -145,12 +145,12 @@ public:
     
     bool Invoke(NPObject *npobj, NPIdentifier name, const NPVariant *args,
                 uint32_t argCount, NPVariant *result);
-protected:
     bool AddMethod(NPIdentifier name, NPInvokeFunctionPtr func);
     void AddProperty(const std::string &name, const std::string &str);
     void AddProperty(const std::string &name, double num);
     void AddProperty(const std::string &name, int num);
 
+protected:
     // Internal functions for the API
     void Deallocate();
     void Invalidate();
