@@ -1854,14 +1854,13 @@ MovieClip::unloadChildren()
     // stop any pending streaming sounds
     stopStreamSound();
 
-    bool childHaveUnloadHandler = _displayList.unload();
-
     // We won't be displayed again, so worth releasing
     // some memory. The drawable might take a lot of memory
     // on itself.
     _drawable.clear();
+    
+    return _displayList.unload();
 
-    return childHaveUnloadHandler;
 }
 
 void
