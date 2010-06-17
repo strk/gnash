@@ -34,7 +34,13 @@ int main(int argc, char* argv[])
     SWFMovie_setRate (mo, 12.0);
 
     add_actions(mo,
-            "if (!_global.hasOwnProperty('arr')) { _global.arr = []; };");
+            "if (!_global.hasOwnProperty('arr')) { _global.arr = []; };"
+            "_global.ch = function(a, b) {"
+            "   trace(a);"
+            "   if (typeof(b)=='undefined' || (typeof(b)=='boolean' && b)) {"
+            "       _global.arr.push(a);"
+            "   };"
+            "};");
 
     SWFMovie_nextFrame(mo);
 
@@ -58,7 +64,7 @@ int main(int argc, char* argv[])
     SWFDisplayItem_setName(it, "Segments");
     // Set static unload handler
     SWFDisplayItem_addAction(it,
-        newSWFAction("_global.arr.push('static unload: ' + this.c);"),
+        newSWFAction("_global.ch('static unload: ' + this.c);"),
         SWFACTION_UNLOAD);
 
     // Frame 2
@@ -73,7 +79,7 @@ int main(int argc, char* argv[])
     SWFDisplayItem_setName(it, "Segments");
     // Set static unload handler
     SWFDisplayItem_addAction(it,
-        newSWFAction("_global.arr.push('static unload: ' + this.c);"),
+        newSWFAction("_global.ch('static unload: ' + this.c);"),
         SWFACTION_UNLOAD);
 
     SWFMovieClip_nextFrame(mc3);
@@ -103,13 +109,13 @@ int main(int argc, char* argv[])
         "if( !_global.Bug ) {"
         "   _global.Bug = function () {"
         "       this.onUnload = function() { "
-        "           _global.arr.push('dynamic unload: ' + this.c);"
+        "           _global.ch('dynamic unload: ' + this.c);"
         "       }; "
         "       this.onLoad = function() { "
-        "           _global.arr.push('dynamic load: ' + this.c);"
+        "           _global.ch('dynamic load: ' + this.c);"
         "       }; "
         "       this.c = _global.c;"
-        "       _global.arr.push('ctor: ' + _global.c);"
+        "       _global.ch('ctor: ' + _global.c);"
         "       _global.c++;"
         "   };"
         "};"
@@ -121,13 +127,13 @@ int main(int argc, char* argv[])
     ac = newSWFAction("Object.registerClass('Segments_Name',Bug);");
     initac = newSWFInitAction_withId(ac, 1);
     SWFMovie_add(mo, (SWFBlock)initac);
-    add_actions(mo, "_global.arr.push('Frame ' + "
+    add_actions(mo, "_global.ch('Frame ' + "
                             "_level0._currentframe + ' actions: ' "
                             "+ _level0.mc.Segments.c);");
 
     // Frame 2 of the main timeline
     SWFMovie_nextFrame(mo);
-    add_actions(mo, "_global.arr.push('Frame ' + "
+    add_actions(mo, "_global.ch('Frame ' + "
                             "_level0._currentframe + ' actions: ' "
                             "+ _level0.mc.Segments.c);");
     
