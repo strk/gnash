@@ -222,6 +222,7 @@ if MING_SUPPORTS_INIT_ACTIONS
 check_PROGRAMS += \
 	init_action_test \
 	InitActionTest2 \
+	InitActionTest3 \
 	RegisterClassTest4 \
 	RegisterClassTest3 \
 	registerClassTest2 \
@@ -325,6 +326,7 @@ check_SCRIPTS = \
 	instanceNameTestRunner \
 	init_action_testrunner \
 	InitActionTest2Runner \
+	InitActionTest3Runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -354,6 +356,7 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 check_SCRIPTS += \
 	InitActionTest2Runner \
+	InitActionTest3Runner \
 	RegisterClassTest4Runner \
 	RegisterClassTest3Runner \
 	registerClassTest2runner \
@@ -1791,6 +1794,18 @@ InitActionTest2Runner: $(srcdir)/../generic-testrunner.sh InitActionTest2.swf
 	sh $< $(top_builddir) InitActionTest2.swf > $@
 	chmod 755 $@
 
+InitActionTest3_SOURCES =	\
+	InitActionTest3.c	\
+	$(NULL)
+InitActionTest3_LDADD = libgnashmingutils.la
+
+InitActionTest3.swf: InitActionTest3
+	./InitActionTest3 $(abs_mediadir)
+
+InitActionTest3Runner: $(srcdir)/../generic-testrunner.sh InitActionTest3.swf
+	sh $< $(top_builddir) InitActionTest3.swf > $@
+	chmod 755 $@
+
 RegisterClassTest3_SOURCES =	\
 	RegisterClassTest3.c	\
 	$(NULL)
@@ -2198,6 +2213,7 @@ TEST_CASES += \
 	registerClassTest2runner \
 	init_action_testrunner \
 	InitActionTest2Runner \
+	InitActionTest3Runner \
 	RegisterClassTest3Runner \
 	RegisterClassTest4Runner \
 	$(NULL)
