@@ -237,7 +237,6 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
             // reinsert removed DisplayObject if needed
             reinsertRemovedCharacter(oldCh);
         }
-        else oldCh->destroy();
         
         // extend invalidated bounds
         ch->extend_invalidated_bounds(old_ranges);                
@@ -311,7 +310,6 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
             // reinsert removed DisplayObject if needed
             reinsertRemovedCharacter(oldch);
         }
-        else oldch->destroy();
         
         // extend invalidated bounds
         // WARNING: when a new Button DisplayObject is added,
@@ -399,7 +397,6 @@ DisplayList::removeDisplayObject(int depth)
             //
             reinsertRemovedCharacter(oldCh);
         }
-        else oldCh->destroy();
     }
 
     assert(size >= _charsByDepth.size());
@@ -919,7 +916,6 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     _charsByDepth.erase(itOldBackup);
 
                      if (chOld->unload()) reinsertRemovedCharacter(chOld);
-                     else chOld->destroy();
                 }
 
                 break;
@@ -942,7 +938,6 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     
                     // unload the old DisplayObject
                     if (chOld->unload()) reinsertRemovedCharacter(chOld); 
-                    else chOld->destroy();
                 }
                 else {
                     newList._charsByDepth.erase(itNewBackup);
@@ -953,8 +948,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                         chOld->setMatrix(chNew->getMatrix(), true); 
                         chOld->set_cxform(chNew->get_cxform());
                     }
-                    chNew->unload();
-                    chNew->destroy();
+                    if (chNew->unload()) chNew->destroy();
                 }
 
                 break;
@@ -979,7 +973,6 @@ DisplayList::mergeDisplayList(DisplayList & newList)
         itOld = _charsByDepth.erase(itOld);
 
         if (chOld->unload()) reinsertRemovedCharacter(chOld);
-        else chOld->destroy();
     }
 
     // step3(only required if scanning of old list finished earlier in step1).
