@@ -539,7 +539,7 @@ GnashPluginScriptObject::HasMethod(NPIdentifier name)
 }
 
 bool
-GnashPluginScriptObject::Invoke(NPObject *npobj, NPIdentifier name,
+GnashPluginScriptObject::Invoke(NPObject */* npobj */, NPIdentifier name,
                                 const NPVariant *args, uint32_t argCount,
                                 NPVariant *result)
 {
@@ -798,8 +798,6 @@ GnashPluginScriptObject::readPlayer(int fd)
         buf.resize(ret);
     }
 
-    std::cout << buf << std::endl;
-    
     return buf;
 }
 
@@ -814,7 +812,7 @@ GnashPluginScriptObject::closePipe(int fd)
         // Send a Quit message to the player before closing the pipe.
         std::vector<std::string> args;
         std::string str = ExternalInterface::makeInvoke("Quit", args);
-        size_t ret = writePlayer(fd, str);
+        writePlayer(fd, str);
     
         ::shutdown(fd, SHUT_RDWR);
         ::close(fd);
