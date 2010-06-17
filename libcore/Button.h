@@ -116,7 +116,7 @@ public:
 	bool isEnabled();
 	
 	/// Properly unload contained DisplayObjects
-	bool unload();
+	virtual bool unloadChildren();
 
 	/// Properly destroy contained DisplayObjects
 	void destroy();

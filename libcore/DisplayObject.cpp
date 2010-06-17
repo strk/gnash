@@ -471,6 +471,8 @@ bool
 DisplayObject::unload()
 {
 
+    const bool childHandler = unloadChildren();
+
 	if (!_unloaded) {
 		queueEvent(event_id::UNLOAD, movie_root::PRIORITY_DOACTION);
 	}
@@ -479,7 +481,7 @@ DisplayObject::unload()
     if (_maskee) _maskee->setMask(0);
     if (_mask) _mask->setMaskee(0);
 
-	const bool hasEvent = hasEventHandler(event_id::UNLOAD);
+	const bool hasEvent = hasEventHandler(event_id::UNLOAD) || childHandler;
 
     if (!hasEvent) stage().removeQueuedConstructor(this);
 
@@ -732,7 +734,7 @@ DisplayObject::destroy()
     /// see new_child_in_unload_test.c)
 	/// We don't destroy ourself twice, right ?
 
-    if (_object) _object->clearProperties();
+    //if (_object) _object->clearProperties();
 
 	assert(!_destroyed);
 	_destroyed = true;

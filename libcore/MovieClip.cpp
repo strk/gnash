@@ -1845,7 +1845,7 @@ MovieClip::construct(as_object* initObj)
 }
 
 bool
-MovieClip::unload()
+MovieClip::unloadChildren()
 {
 #ifdef GNASH_DEBUG
     log_debug(_("Unloading movieclip '%s'"), getTargetPath());
@@ -1861,11 +1861,7 @@ MovieClip::unload()
     // on itself.
     _drawable.clear();
 
-    bool selfHaveUnloadHandler = DisplayObject::unload();
-
-    bool shouldKeepAlive = (selfHaveUnloadHandler || childHaveUnloadHandler);
-
-    return shouldKeepAlive;
+    return childHaveUnloadHandler;
 }
 
 void
