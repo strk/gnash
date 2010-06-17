@@ -114,6 +114,12 @@ DisplayObject::object() const
 {
     return _object;
 }
+    
+bool
+DisplayObject::unloaded() const
+{
+    return _unloaded;
+}
 
 void
 DisplayObject::getLoadedMovie(Movie* extern_movie)

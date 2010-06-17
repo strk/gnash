@@ -812,7 +812,7 @@ public:
     virtual void getLoadedMovie(Movie* newMovie);
 
     /// Return true if this DisplayObject was unloaded from the stage
-    bool unloaded() const { return _unloaded; }
+    bool unloaded() const;
 
     /// Mark this DisplayObject as destroyed
     //
