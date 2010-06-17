@@ -5,12 +5,12 @@
 #include "ming_utils.h"
 
 #define OUTPUT_VERSION 8
-#define OUTPUT_FILENAME "InitActionTest3.swf"
+#define OUTPUT_FILENAME "InitActionTest5.swf"
 
 // A relatively simple looping test checking order of unload events.
 //
-// See InitActionsTest4 and InitActionsTest5 for similar tests. This test
-// has a static onUnload handler.
+// See InitActionTest3 and InitActionTest4. This is the same test but without
+// static event handlers.
 
 int main(int argc, char* argv[])
 {
@@ -56,10 +56,6 @@ int main(int argc, char* argv[])
     it = SWFMovieClip_add(mc3, (SWFBlock)mc2);
     SWFDisplayItem_setDepth(it, 1);
     SWFDisplayItem_setName(it, "Segments");
-    // Set static unload handler
-    SWFDisplayItem_addAction(it,
-        newSWFAction("_global.arr.push('static unload: ' + this.c);"),
-        SWFACTION_UNLOAD);
 
     // Frame 2
     SWFMovieClip_nextFrame(mc3);
@@ -71,10 +67,6 @@ int main(int argc, char* argv[])
     it = SWFMovieClip_add(mc3, (SWFBlock)mc1);
     SWFDisplayItem_setDepth(it, 1);
     SWFDisplayItem_setName(it, "Segments");
-    // Set static unload handler
-    SWFDisplayItem_addAction(it,
-        newSWFAction("_global.arr.push('static unload: ' + this.c);"),
-        SWFACTION_UNLOAD);
 
     SWFMovieClip_nextFrame(mc3);
 
@@ -143,35 +135,31 @@ int main(int argc, char* argv[])
     
     SWFMovie_nextFrame(mo);
     
-    check_equals(mo, "_global.arr.length", "23");
+    check_equals(mo, "_global.arr.length", "20");
     check_equals(mo, "_global.arr[0]", "'Frame 2 actions: undefined'");
     check_equals(mo, "_global.arr[1]", "'ctor: 0'");
-    check_equals(mo, "_global.arr[2]", "'static unload: undefined'");
+    check_equals(mo, "_global.arr[2]", "'Frame 3 actions: 0'");
     check_equals(mo, "_global.arr[3]", "'dynamic load: 0'");
-    check_equals(mo, "_global.arr[4]", "'Frame 3 actions: undefined'");
-    check_equals(mo, "_global.arr[5]", "'Frame 2 actions: undefined'");
-    check_equals(mo, "_global.arr[6]", "'Frame 3 actions: 0'");
-    check_equals(mo, "_global.arr[7]", "'Frame 2 actions: 0'");
-    check_equals(mo, "_global.arr[8]", "'ctor: 1'");
-    check_equals(mo, "_global.arr[9]", "'static unload: 0'");
-    check_equals(mo, "_global.arr[10]", "'dynamic unload: 0'");
-    check_equals(mo, "_global.arr[11]", "'dynamic load: 1'");
-    check_equals(mo, "_global.arr[12]", "'Frame 3 actions: 0'");
-    check_equals(mo, "_global.arr[13]", "'Frame 2 actions: 0'");
-    check_equals(mo, "_global.arr[14]", "'Frame 3 actions: 1'");
-    check_equals(mo, "_global.arr[15]", "'Frame 2 actions: 1'");
-    check_equals(mo, "_global.arr[16]", "'ctor: 2'");
-    check_equals(mo, "_global.arr[17]", "'static unload: 1'");
-    check_equals(mo, "_global.arr[18]", "'dynamic unload: 1'");
-    check_equals(mo, "_global.arr[19]", "'dynamic load: 2'");
-    check_equals(mo, "_global.arr[20]", "'Frame 3 actions: 1'");
-    check_equals(mo, "_global.arr[21]", "'Frame 2 actions: 1'");
-    check_equals(mo, "_global.arr[22]", "'Frame 3 actions: 2'");
+    check_equals(mo, "_global.arr[4]", "'Frame 2 actions: 0'");
+    check_equals(mo, "_global.arr[5]", "'Frame 3 actions: 0'");
+    check_equals(mo, "_global.arr[6]", "'Frame 2 actions: 0'");
+    check_equals(mo, "_global.arr[7]", "'ctor: 1'");
+    check_equals(mo, "_global.arr[8]", "'dynamic unload: 0'");
+    check_equals(mo, "_global.arr[9]", "'Frame 3 actions: 0'");
+    check_equals(mo, "_global.arr[11]", "'Frame 2 actions: 0'");
+    check_equals(mo, "_global.arr[12]", "'Frame 3 actions: 1'");
+    check_equals(mo, "_global.arr[13]", "'Frame 2 actions: 1'");
+    check_equals(mo, "_global.arr[14]", "'ctor: 2'");
+    check_equals(mo, "_global.arr[15]", "'dynamic unload: 1'");
+    check_equals(mo, "_global.arr[16]", "'Frame 3 actions: 1'");
+    check_equals(mo, "_global.arr[17]", "'dynamic load: 2'");
+    check_equals(mo, "_global.arr[18]", "'Frame 2 actions: 1'");
+    check_equals(mo, "_global.arr[19]", "'Frame 3 actions: 2'");
     check_equals(mo, "_global.arr.toString()",
-            "'Frame 2 actions: undefined,ctor: 0,static unload: undefined,dynamic load: 0,Frame 3 actions: undefined,Frame 2 actions: undefined,Frame 3 actions: 0,Frame 2 actions: 0,ctor: 1,static unload: 0,dynamic unload: 0,dynamic load: 1,Frame 3 actions: 0,Frame 2 actions: 0,Frame 3 actions: 1,Frame 2 actions: 1,ctor: 2,static unload: 1,dynamic unload: 1,dynamic load: 2,Frame 3 actions: 1,Frame 2 actions: 1,Frame 3 actions: 2'");
+		    "'Frame 2 actions: undefined,ctor: 0,Frame 3 actions: 0,dynamic load: 0,Frame 2 actions: 0,Frame 3 actions: 0,Frame 2 actions: 0,ctor: 1,dynamic unload: 0,Frame 3 actions: 0,dynamic load: 1,Frame 2 actions: 0,Frame 3 actions: 1,Frame 2 actions: 1,ctor: 2,dynamic unload: 1,Frame 3 actions: 1,dynamic load: 2,Frame 2 actions: 1,Frame 3 actions: 2'");
 
     SWFMovie_nextFrame(mo);
-    add_actions(mo, "totals(25); stop();");
+    add_actions(mo, "totals(21); stop();");
 
     // SWF_END 
     SWFMovie_save(mo, OUTPUT_FILENAME);

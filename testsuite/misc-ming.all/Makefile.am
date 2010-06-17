@@ -223,6 +223,8 @@ check_PROGRAMS += \
 	init_action_test \
 	InitActionTest2 \
 	InitActionTest3 \
+	InitActionTest4 \
+	InitActionTest5 \
 	RegisterClassTest4 \
 	RegisterClassTest3 \
 	registerClassTest2 \
@@ -327,6 +329,8 @@ check_SCRIPTS = \
 	init_action_testrunner \
 	InitActionTest2Runner \
 	InitActionTest3Runner \
+	InitActionTest4Runner \
+	InitActionTest5Runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -357,6 +361,8 @@ if MING_SUPPORTS_INIT_ACTIONS
 check_SCRIPTS += \
 	InitActionTest2Runner \
 	InitActionTest3Runner \
+	InitActionTest4Runner \
+	InitActionTest5Runner \
 	RegisterClassTest4Runner \
 	RegisterClassTest3Runner \
 	registerClassTest2runner \
@@ -1806,6 +1812,30 @@ InitActionTest3Runner: $(srcdir)/../generic-testrunner.sh InitActionTest3.swf
 	sh $< $(top_builddir) InitActionTest3.swf > $@
 	chmod 755 $@
 
+InitActionTest4_SOURCES =	\
+	InitActionTest4.c	\
+	$(NULL)
+InitActionTest4_LDADD = libgnashmingutils.la
+
+InitActionTest4.swf: InitActionTest4
+	./InitActionTest4 $(abs_mediadir)
+
+InitActionTest4Runner: $(srcdir)/../generic-testrunner.sh InitActionTest4.swf
+	sh $< $(top_builddir) InitActionTest4.swf > $@
+	chmod 755 $@
+
+InitActionTest5_SOURCES =	\
+	InitActionTest5.c	\
+	$(NULL)
+InitActionTest5_LDADD = libgnashmingutils.la
+
+InitActionTest5.swf: InitActionTest5
+	./InitActionTest5 $(abs_mediadir)
+
+InitActionTest5Runner: $(srcdir)/../generic-testrunner.sh InitActionTest5.swf
+	sh $< $(top_builddir) InitActionTest5.swf > $@
+	chmod 755 $@
+
 RegisterClassTest3_SOURCES =	\
 	RegisterClassTest3.c	\
 	$(NULL)
@@ -2214,6 +2244,8 @@ TEST_CASES += \
 	init_action_testrunner \
 	InitActionTest2Runner \
 	InitActionTest3Runner \
+	InitActionTest4Runner \
+	InitActionTest5Runner \
 	RegisterClassTest3Runner \
 	RegisterClassTest4Runner \
 	$(NULL)
