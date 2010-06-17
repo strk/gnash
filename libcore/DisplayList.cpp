@@ -600,7 +600,7 @@ DisplayList::unload()
 
     testInvariant();
 
-    //_charsByDepth.clear();
+    //if (!uh) _charsByDepth.clear();
 
     return uh;
 

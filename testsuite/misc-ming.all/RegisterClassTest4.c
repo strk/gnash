@@ -143,11 +143,11 @@ int main(int argc, char* argv[])
     check_equals(mo, "_global.fns[4]", "'function'");
     check_equals(mo, "_global.fns[5]", "'function'");
     check_equals(mo, "_global.fns[6]", "'function'");
-    check_equals(mo, "_global.fns[7]", "'function'");
-    check_equals(mo, "_global.fns[8]", "'function'");
+    xcheck_equals(mo, "_global.fns[7]", "'function'");
+    xcheck_equals(mo, "_global.fns[8]", "'function'");
     check_equals(mo, "_global.fns[9]", "'function'");
     check_equals(mo, "_global.fns[10]", "'function'");
-    check_equals(mo, "_global.fns[11]", "'function'");
+    xcheck_equals(mo, "_global.fns[11]", "'function'");
     
     check_equals(mo, "_global.ctorcalls", "3");
 
