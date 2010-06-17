@@ -575,33 +575,34 @@ DisplayList::unload()
 
     testInvariant();
 
+    bool uh = false;
+
     // Should we start looking from beginNonRemoved ?
     // If I try, I get a failure in swfdec/gotoframe.swf
-    for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
-            it != itEnd; )
+    for (iterator it = beginNonRemoved(_charsByDepth),
+            itEnd = _charsByDepth.end(); it != itEnd; )
     {
         // make a copy
         DisplayItem di = *it;
 
-        // skip if already unloaded
-        if (di->unloaded()) {
-            // TODO: call di->destroy(); ?
+        // Destroy those with a handler anyway?
+        if (di->unload()) {
+            log_debug("Partially unloaded: %s", di->getTarget());
+            uh = true;
             ++it;
-            continue;
+        }
+        else {
+            log_debug("Completely unloaded: %s", di->getTarget());
+            it = _charsByDepth.erase(it);
         }
 
-        if (!di->unload()) {
-            // no event handler queued, we remove
-            // will be destroyed on next iteration, or by unload
-            // handler ? we don't want soft-ref to rebind here
-            it = _charsByDepth.erase(it); 
-        }
-        else ++it;
     }
 
     testInvariant();
 
-    return ! _charsByDepth.empty();
+    //_charsByDepth.clear();
+
+    return uh;
 
 }
 
