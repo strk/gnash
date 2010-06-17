@@ -34,7 +34,17 @@ int main(int argc, char* argv[])
     SWFMovie_setRate (mo, 12.0);
 
     add_actions(mo,
-            "if (!_global.hasOwnProperty('arr')) { _global.arr = []; };");
+            "if (!_global.hasOwnProperty('arr')) { _global.arr = []; };"
+            "_global.ch = function(a, b) {"
+            "   trace(a);"
+            "   if (typeof(b)=='undefined' || (typeof(b)=='boolean' && b)) {"
+            "       _global.arr.push(a);"
+            "   };"
+            "};"
+            "this.onEnterFrame = function() { "
+            "   _global.ch('onEnterFrame', false);"
+            "};"
+            );
 
     SWFMovie_nextFrame(mo);
 
@@ -95,13 +105,13 @@ int main(int argc, char* argv[])
         "if( !_global.Bug ) {"
         "   _global.Bug = function () {"
         "       this.onUnload = function() { "
-        "           _global.arr.push('dynamic unload: ' + this.c);"
+        "           _global.ch('dynamic unload: ' + this.c);"
         "       }; "
         "       this.onLoad = function() { "
-        "           _global.arr.push('dynamic load: ' + this.c);"
+        "           _global.ch('dynamic load: ' + this.c);"
         "       }; "
         "       this.c = _global.c;"
-        "       _global.arr.push('ctor: ' + _global.c);"
+        "       _global.ch('ctor: ' + _global.c);"
         "       _global.c++;"
         "   };"
         "};"
@@ -113,13 +123,13 @@ int main(int argc, char* argv[])
     ac = newSWFAction("Object.registerClass('Segments_Name',Bug);");
     initac = newSWFInitAction_withId(ac, 1);
     SWFMovie_add(mo, (SWFBlock)initac);
-    add_actions(mo, "_global.arr.push('Frame ' + "
+    add_actions(mo, "_global.ch('Frame ' + "
                             "_level0._currentframe + ' actions: ' "
                             "+ _level0.mc.Segments.c);");
 
     // Frame 2 of the main timeline
     SWFMovie_nextFrame(mo);
-    add_actions(mo, "_global.arr.push('Frame ' + "
+    add_actions(mo, "_global.ch('Frame ' + "
                             "_level0._currentframe + ' actions: ' "
                             "+ _level0.mc.Segments.c);");
     
@@ -129,6 +139,7 @@ int main(int argc, char* argv[])
         "        gotoAndPlay(2);"
         "   }"
         "   else {"
+        "      delete this.onEnterFrame;"
         "      gotoAndPlay(4);"
         "   };"
         );
@@ -160,6 +171,8 @@ int main(int argc, char* argv[])
 
     SWFMovie_nextFrame(mo);
     add_actions(mo, "totals(21); stop();");
+    
+    SWFMovie_nextFrame(mo);
 
     // SWF_END 
     SWFMovie_save(mo, OUTPUT_FILENAME);
