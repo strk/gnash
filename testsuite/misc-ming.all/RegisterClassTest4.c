@@ -88,8 +88,14 @@ int main(int argc, char* argv[])
         "if( !_global.Bug ) {"
 	    "   _global.Bug = function () {"
         "       _global.ctorcalls++;"
-	    "       this.onUnload = function() {}; "
+	    "       this.onUnload = function() { "
+        "           trace('unload ' + this + ' c: ' + this.c); "
+        "       }; "
+	    "       this.onLoad = function() { "
+        "           trace('load ' + this + ' c: ' + this.c); "
+        "       }; "
         "       this.c = _global.c;"
+        "       trace('Bug ctor: ' + _global.c);"
         "       _global.c++;"
 	    "   };"
 	    "};"
@@ -104,12 +110,14 @@ int main(int argc, char* argv[])
     
     add_actions(mo, "_global.fns.push(typeof(_level0.mc.Segments.onUnload));");
     add_actions(mo, "_global.real.push(_level0.mc.Segments.c);");
+    add_actions(mo, "trace(_level0._currentframe + ' ' + _level0.mc.Segments.c);");
 
     // Frame 2 of the main timeline
     SWFMovie_nextFrame(mo);
     
     add_actions(mo, "_global.fns.push(typeof(_level0.mc.Segments.onUnload));");
     add_actions(mo, "_global.real.push(_level0.mc.Segments.c);");
+    add_actions(mo, "trace(_level0._currentframe + ' ' + _level0.mc.Segments.c);");
 
     add_actions(mo,
         "    if (_global.loops < 5) {"
@@ -117,7 +125,6 @@ int main(int argc, char* argv[])
         "        gotoAndPlay(1);"
         "   }"
         "   else {"
-        "      delete this.onEnterFrame;"
         "      gotoAndPlay(3);"
         "   };"
         );

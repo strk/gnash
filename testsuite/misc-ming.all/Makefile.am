@@ -222,6 +222,9 @@ if MING_SUPPORTS_INIT_ACTIONS
 check_PROGRAMS += \
 	init_action_test \
 	InitActionTest2 \
+	ActionOrderTest3 \
+	ActionOrderTest4 \
+	ActionOrderTest5 \
 	RegisterClassTest4 \
 	RegisterClassTest3 \
 	registerClassTest2 \
@@ -325,6 +328,9 @@ check_SCRIPTS = \
 	instanceNameTestRunner \
 	init_action_testrunner \
 	InitActionTest2Runner \
+	ActionOrderTest3Runner \
+	ActionOrderTest4Runner \
+	ActionOrderTest5Runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -354,6 +360,9 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 check_SCRIPTS += \
 	InitActionTest2Runner \
+	ActionOrderTest3Runner \
+	ActionOrderTest4Runner \
+	ActionOrderTest5Runner \
 	RegisterClassTest4Runner \
 	RegisterClassTest3Runner \
 	registerClassTest2runner \
@@ -1791,6 +1800,42 @@ InitActionTest2Runner: $(srcdir)/../generic-testrunner.sh InitActionTest2.swf
 	sh $< $(top_builddir) InitActionTest2.swf > $@
 	chmod 755 $@
 
+ActionOrderTest3_SOURCES =	\
+	ActionOrderTest3.c	\
+	$(NULL)
+ActionOrderTest3_LDADD = libgnashmingutils.la
+
+ActionOrderTest3.swf: ActionOrderTest3
+	./ActionOrderTest3 $(abs_mediadir)
+
+ActionOrderTest3Runner: $(srcdir)/../generic-testrunner.sh ActionOrderTest3.swf
+	sh $< $(top_builddir) ActionOrderTest3.swf > $@
+	chmod 755 $@
+
+ActionOrderTest4_SOURCES =	\
+	ActionOrderTest4.c	\
+	$(NULL)
+ActionOrderTest4_LDADD = libgnashmingutils.la
+
+ActionOrderTest4.swf: ActionOrderTest4
+	./ActionOrderTest4 $(abs_mediadir)
+
+ActionOrderTest4Runner: $(srcdir)/../generic-testrunner.sh ActionOrderTest4.swf
+	sh $< $(top_builddir) ActionOrderTest4.swf > $@
+	chmod 755 $@
+
+ActionOrderTest5_SOURCES =	\
+	ActionOrderTest5.c	\
+	$(NULL)
+ActionOrderTest5_LDADD = libgnashmingutils.la
+
+ActionOrderTest5.swf: ActionOrderTest5
+	./ActionOrderTest5 $(abs_mediadir)
+
+ActionOrderTest5Runner: $(srcdir)/../generic-testrunner.sh ActionOrderTest5.swf
+	sh $< $(top_builddir) ActionOrderTest5.swf > $@
+	chmod 755 $@
+
 RegisterClassTest3_SOURCES =	\
 	RegisterClassTest3.c	\
 	$(NULL)
@@ -2198,6 +2243,9 @@ TEST_CASES += \
 	registerClassTest2runner \
 	init_action_testrunner \
 	InitActionTest2Runner \
+	ActionOrderTest3Runner \
+	ActionOrderTest4Runner \
+	ActionOrderTest5Runner \
 	RegisterClassTest3Runner \
 	RegisterClassTest4Runner \
 	$(NULL)

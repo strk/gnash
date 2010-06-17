@@ -1784,33 +1784,16 @@ MovieClip::construct(as_object* initObj)
     // See misc-ming.all/action_execution_order_test4.{c,swf}
     //
     assert(!_callingFrameActions); // or will not be queuing actions
-    if (!get_parent())
-    {
-#ifdef GNASH_DEBUG
-        log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
-#endif
+    if (!get_parent()) {
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
                 SWF::ControlTag::TAG_ACTION);
-
-        if (getSWFVersion(*getObject(this)) > 5)
-        {
-#ifdef GNASH_DEBUG
-            log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
-#endif
+        if (getSWFVersion(*getObject(this)) > 5) {
             queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
         }
 
     }
-    else
-    {
-#ifdef GNASH_DEBUG
-        log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
-#endif
+    else {
         queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
-
-#ifdef GNASH_DEBUG
-        log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
-#endif
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
                 SWF::ControlTag::TAG_ACTION);
     }
