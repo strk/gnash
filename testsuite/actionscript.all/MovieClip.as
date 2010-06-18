@@ -123,11 +123,11 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(927); // SWF7
+	check_totals(943); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1017); // SWF8+
+	check_totals(1033); // SWF8+
 #endif
 
 	play();
@@ -727,6 +727,61 @@ check_equals(sr61.member, 6);
 check_equals(typeof(sr62.member), 'undefined');
 check_equals(sr61._name, "hardref");
 check_equals(sr62._name, "hardref");
+
+
+#if OUTPUT_VERSION > 6
+
+ul4 = _root.createEmptyMovieClip("hul4", getNextHighestDepth());
+ul5 = ul4.createEmptyMovieClip("hul5", ul4.getNextHighestDepth());
+ul5.a = 7;
+ul6 = ul4.createEmptyMovieClip("hul6", ul4.getNextHighestDepth());
+ul6.a = 7;
+ul7 = ul4.createEmptyMovieClip("hul7", ul4.getNextHighestDepth());
+ul7.a = 7;
+ul8 = ul4.createEmptyMovieClip("hul8", ul4.getNextHighestDepth());
+ul8.a = 7;
+ul9 = ul4.createEmptyMovieClip("hul9", ul4.getNextHighestDepth());
+ul9.a = 7;
+
+ul7.onUnload = function() {};
+ul9.onUnload = function() {};
+
+// Sanity check
+check_equals(ul5.a, 7);
+
+ul4.removeMovieClip();
+
+// Child property removed
+check_equals(typeof(ul4.hul5), "undefined");
+
+// MovieClip still exists
+check_equals(typeof(ul5), "movieclip");
+
+// But without properties.
+check_equals(ul5.a, undefined);
+
+// Same with this child
+check_equals(typeof(ul4.hul6), "undefined");
+check_equals(typeof(ul6), "movieclip");
+check_equals(ul6.a, undefined);
+
+// Has unload handler, so not removed.
+check_equals(typeof(ul4.hul7), "movieclip");
+check_equals(typeof(ul7), "movieclip");
+check_equals(ul7.a, 7);
+
+// No unload handler, but still not removed because there was a handler at
+// a lower depth.
+check_equals(typeof(ul4.hul8), "movieclip");
+check_equals(typeof(ul8), "movieclip");
+check_equals(ul8.a, 7);
+
+// Also has unload handler.
+check_equals(typeof(ul4.hul9), "movieclip");
+check_equals(typeof(ul9), "movieclip");
+check_equals(ul9.a, 7);
+
+#endif
 
 // When getting a member by name, the one with lowest
 // depth comes up first

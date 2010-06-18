@@ -854,7 +854,7 @@ Button::markOwnResources() const
 }
 
 bool
-Button::unload()
+Button::unloadChildren()
 {
 
     bool childsHaveUnload = false;
@@ -877,9 +877,7 @@ Button::unload()
     //       hit instance off the GC).
     _hitCharacters.clear();
 
-    bool hasUnloadEvent = DisplayObject::unload();
-
-    return hasUnloadEvent || childsHaveUnload;
+    return childsHaveUnload;
 }
 
 void

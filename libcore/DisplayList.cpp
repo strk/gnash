@@ -574,37 +574,38 @@ DisplayList::addDisplayObject(DisplayObject* obj)
 bool
 DisplayList::unload()
 {
-    //GNASH_REPORT_FUNCTION;
-
     testInvariant();
 
-    // Should we start looking from beginNonRemoved ?
-    // If I try, I get a failure in swfdec/gotoframe.swf
-    for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
-            it != itEnd; )
+    bool unloadHandler = false;
+
+    // All children with an unload handler should be unloaded. As soon as
+    // the first unload handler is encountered, subsequent children should
+    // not be destroyed or removed from the display list. This affects
+    // children without an unload handler.
+    for (iterator it = beginNonRemoved(_charsByDepth),
+            itEnd = _charsByDepth.end(); it != itEnd; )
     {
         // make a copy
         DisplayItem di = *it;
 
-        // skip if already unloaded
-        if (di->unloaded()) {
-            // TODO: call di->destroy(); ?
+        // Destroy those with a handler anyway?
+        if (di->unload()) {
+            unloadHandler = true;
             ++it;
             continue;
         }
 
-        if (!di->unload()) {
-            // no event handler queued, we remove
-            // will be destroyed on next iteration, or by unload
-            // handler ? we don't want soft-ref to rebind here
-            it = _charsByDepth.erase(it); 
+        if (!unloadHandler) {
+            di->destroy();
+            it = _charsByDepth.erase(it);
         }
         else ++it;
+
     }
 
     testInvariant();
 
-    return ! _charsByDepth.empty();
+    return unloadHandler;
 
 }
 

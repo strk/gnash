@@ -806,14 +806,13 @@ public:
     /// @return true if any onUnload event handler was defined
     ///                 by either this or any child DisplayObjects, false
     ///                 otherwise.
-    ///
-    virtual bool unload();
+    bool unload();
 
     /// Accept a loaded Movie
     virtual void getLoadedMovie(Movie* newMovie);
 
     /// Return true if this DisplayObject was unloaded from the stage
-    bool unloaded() const { return _unloaded; }
+    bool unloaded() const;
 
     /// Mark this DisplayObject as destroyed
     //
@@ -978,6 +977,8 @@ public:
     virtual void markOwnResources() const {}
 
 protected:
+    
+    virtual bool unloadChildren() { return false; }
 
     /// Get the movie_root to which this DisplayObject belongs.
     movie_root& stage() {

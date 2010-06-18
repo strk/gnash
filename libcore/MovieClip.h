@@ -385,7 +385,7 @@ public:
 
     /// Unload all contents in the displaylist and this instance
     /// See DisplayObject::unload for more info
-    bool unload();
+    virtual bool unloadChildren();
 
     /// Mark this sprite as destroyed
     //

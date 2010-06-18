@@ -1845,7 +1845,7 @@ MovieClip::construct(as_object* initObj)
 }
 
 bool
-MovieClip::unload()
+MovieClip::unloadChildren()
 {
 #ifdef GNASH_DEBUG
     log_debug(_("Unloading movieclip '%s'"), getTargetPath());
@@ -1854,18 +1854,13 @@ MovieClip::unload()
     // stop any pending streaming sounds
     stopStreamSound();
 
-    bool childHaveUnloadHandler = _displayList.unload();
-
     // We won't be displayed again, so worth releasing
     // some memory. The drawable might take a lot of memory
     // on itself.
     _drawable.clear();
+    
+    return _displayList.unload();
 
-    bool selfHaveUnloadHandler = DisplayObject::unload();
-
-    bool shouldKeepAlive = (selfHaveUnloadHandler || childHaveUnloadHandler);
-
-    return shouldKeepAlive;
 }
 
 void
