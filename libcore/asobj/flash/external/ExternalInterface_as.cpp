@@ -230,11 +230,11 @@ attachExternalInterfaceStaticInterface(as_object& o)
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 7);
 }
 
+// This adds a function that can be called from javascript.
 as_value
 externalinterface_addCallback(const fn_call& fn)
 {
     // GNASH_REPORT_FUNCTION;
-
     movie_root& mr = getRoot(fn);
 
     if (mr.getControlFD() <= 0) {
@@ -259,14 +259,14 @@ externalinterface_addCallback(const fn_call& fn)
     return as_value(false);    
 }
 
+// This calls a Javascript function in the browser.
 as_value
 externalinterface_call(const fn_call& fn)
 {
     // GNASH_REPORT_FUNCTION;
-
     movie_root& mr = getRoot(fn);
     as_value val;
-    
+
     if (fn.nargs >= 2) {
         const as_value& methodName_as = fn.arg(0);
         const std::string methodName = methodName_as.to_string();
