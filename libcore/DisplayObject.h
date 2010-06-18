@@ -806,7 +806,7 @@ public:
     /// @return true if any onUnload event handler was defined
     ///                 by either this or any child DisplayObjects, false
     ///                 otherwise.
-    bool unload();
+    bool unload(bool destroy = true);
 
     /// Accept a loaded Movie
     virtual void getLoadedMovie(Movie* newMovie);

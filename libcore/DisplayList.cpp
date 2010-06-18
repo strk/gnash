@@ -571,31 +571,39 @@ DisplayList::addDisplayObject(DisplayObject* obj)
 bool
 DisplayList::unload()
 {
-    //GNASH_REPORT_FUNCTION;
-
     testInvariant();
 
-    // As soon as an unload handler is encountered, stop!
+    bool unloadHandler = false;
+
+    // All children with an unload handler should be unloaded. As soon as
+    // the first unload handler is encountered, subsequent children should
+    // not be destroyed or removed from the display list. This affects
+    // children without an unload handler.
     for (iterator it = beginNonRemoved(_charsByDepth),
             itEnd = _charsByDepth.end(); it != itEnd; )
     {
         // make a copy
         DisplayItem di = *it;
 
+        log_debug("Unloading %s", di->getTarget());
+
         // Destroy those with a handler anyway?
-        if (di->unload()) {
-            return true;
+        if (di->unload(!unloadHandler)) {
+            log_debug("Unload handler found %s", di->getTarget());
+            unloadHandler = true;
+            ++it;
         }
-        else {
+        else if (!unloadHandler) {
             log_debug("Completely unloaded: %s", di->getTarget());
             it = _charsByDepth.erase(it);
         }
+        else ++it;
 
     }
 
     testInvariant();
 
-    return false;
+    return unloadHandler;
 
 }
 
