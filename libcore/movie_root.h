@@ -175,7 +175,7 @@ public:
               _callback(callback)
         {}
         std::string &methodName() { return _name; };
-        as_value call(const std::string &name, const std::vector<as_value>& args);
+        as_value call(const std::vector<as_value>& args);
         void setReachable() const;
     private:
         std::string     _name;
