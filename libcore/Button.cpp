@@ -740,7 +740,7 @@ Button::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     getActiveCharacters(actChars);
     std::for_each(actChars.begin(), actChars.end(),
             boost::bind(&DisplayObject::add_invalidated_bounds, _1,
-                boost::ref(ranges), force||m_invalidated)
+                boost::ref(ranges), force || invalidated())
     );
 }
 

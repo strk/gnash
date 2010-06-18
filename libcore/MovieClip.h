@@ -873,29 +873,29 @@ private:
 
     PlayState _playState;
 
+    /// This timeline's variable scope
+    as_environment _environment;
+
+    /// We'll only allocate Textfield variables map if
+    /// we need them (ie: anyone calls set_textfield_variable)
+    ///
+    std::auto_ptr<TextFieldIndex> _text_variables;
+
+    cxform _userCxform;
+
+    std::string _droptarget;
+
     // 0-based index to current frame
     size_t _currentFrame;
+    
+    /// soundid for current playing stream. If no stream set to -1
+    int m_sound_stream_id;
 
     // true if this sprite reached the last frame and restarted
     bool _hasLooped;
 
     // true is we're calling frame actions
     bool _callingFrameActions;
-
-    /// This timeline's variable scope
-    as_environment _environment;
-
-   /// We'll only allocate Textfield variables map if
-    /// we need them (ie: anyone calls set_textfield_variable)
-    ///
-    std::auto_ptr<TextFieldIndex> _text_variables;
-
-    /// soundid for current playing stream. If no stream set to -1
-    int m_sound_stream_id;
-
-    cxform _userCxform;
-
-    std::string _droptarget;
 
     bool _lockroot;
 };

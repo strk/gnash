@@ -83,25 +83,25 @@ DisplayObject::DisplayObject(movie_root& mr, as_object* object,
         DisplayObject* parent)
     :
     _parent(parent),
-    m_invalidated(true),
-    m_child_invalidated(true),
     _object(object),
     _stage(mr),
-    m_depth(0),
     _xscale(100),
     _yscale(100),
     _rotation(0),
+    _depth(0),
     _volume(100),
     m_ratio(0),
     m_clip_depth(noClipDepthValue),
-    _unloaded(false),
-    _destroyed(false),
     _mask(0),
     _maskee(0),
     _blendMode(BLENDMODE_NORMAL),
     _visible(true),
     _scriptTransformed(false),
-    _dynamicallyCreated(false)
+    _dynamicallyCreated(false),
+    _unloaded(false),
+    _destroyed(false),
+    _invalidated(true),
+    _child_invalidated(true)
 {
     assert(m_old_invalidated_ranges.isNull());
 
@@ -216,9 +216,9 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
 	// be updated even (or first of all) if the DisplayObject
 	// moves away from here.
 	// 
-	if ( ! m_invalidated )
+	if ( ! _invalidated )
 	{
-		m_invalidated = true;
+		_invalidated = true;
 		
 		#ifdef DEBUG_SET_INVALIDATED
 		log_debug("%p set_invalidated() of %s in %s:%d",
@@ -243,7 +243,7 @@ void
 DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
     ranges.add(m_old_invalidated_ranges);
-    if (visible() && (m_invalidated||force))
+    if (visible() && (_invalidated||force))
     {
         SWFRect bounds;        
         bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds());
@@ -254,9 +254,9 @@ DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 void
 DisplayObject::set_child_invalidated()
 {
-  if ( ! m_child_invalidated ) 
+  if ( ! _child_invalidated ) 
   {
-    m_child_invalidated=true;
+    _child_invalidated=true;
   	if ( _parent ) _parent->set_child_invalidated();
   } 
 }
@@ -645,7 +645,7 @@ DisplayObject::computeTargetPath() const
 	if (path.empty()) {
 		if (&getRoot(*_object).getRootMovie() == this) return "/";
 		std::stringstream ss;
-		ss << "_level" << m_depth-DisplayObject::staticDepthOffset;
+		ss << "_level" << _depth-DisplayObject::staticDepthOffset;
 		return ss.str();
 	}
 
@@ -894,9 +894,9 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     tr.append_child(it, StringPair(_("Blend mode"), os.str()));
 #ifndef NDEBUG
     // This probably isn't interesting for non-developers
-    tr.append_child(it, StringPair(_("Invalidated"), m_invalidated ? yes : no));
+    tr.append_child(it, StringPair(_("Invalidated"), _invalidated ? yes : no));
     tr.append_child(it, StringPair(_("Child invalidated"),
-                m_child_invalidated ? yes : no));
+                _child_invalidated ? yes : no));
 #endif
 	return it;
 }

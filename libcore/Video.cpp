@@ -261,7 +261,7 @@ Video::advance()
 void
 Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {	
-	if (!force && !m_invalidated) return; // no need to redraw
+	if (!force && !invalidated()) return; // no need to redraw
     
 	ranges.add(m_old_invalidated_ranges);
 	
