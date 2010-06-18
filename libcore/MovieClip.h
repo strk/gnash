@@ -383,10 +383,6 @@ public:
     ///     registered class and adding properties.
     virtual void construct(as_object* initObj = 0);
 
-    /// Unload all contents in the displaylist and this instance
-    /// See DisplayObject::unload for more info
-    virtual bool unloadChildren();
-
     /// Mark this sprite as destroyed
     //
     /// This is an override of DisplayObject::destroy()
@@ -703,6 +699,11 @@ public:
     virtual int getDefinitionVersion() const;
 
 protected:
+
+    /// Unload all contents in the displaylist and this instance
+    //
+    /// Return true if there was an unloadHandler.
+    virtual bool unloadChildren();
 
     /// Mark sprite-specific reachable resources.
     //
