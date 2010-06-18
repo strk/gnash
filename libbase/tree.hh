@@ -5,7 +5,7 @@
 // Distributed under the GNU General Public License version 3,
 // (eventually to be changed to the Boost Software License).
 
-/** \mainpage tree.hh
+/** \page tree.hh
     \author   Kasper Peeters
     \version  2.65
     \date     03-Apr-2009
