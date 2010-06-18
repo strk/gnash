@@ -575,10 +575,7 @@ DisplayList::unload()
 
     testInvariant();
 
-    bool uh = false;
-
-    // Should we start looking from beginNonRemoved ?
-    // If I try, I get a failure in swfdec/gotoframe.swf
+    // As soon as an unload handler is encountered, stop!
     for (iterator it = beginNonRemoved(_charsByDepth),
             itEnd = _charsByDepth.end(); it != itEnd; )
     {
@@ -587,9 +584,7 @@ DisplayList::unload()
 
         // Destroy those with a handler anyway?
         if (di->unload()) {
-            log_debug("Partially unloaded: %s", di->getTarget());
-            uh = true;
-            ++it;
+            return true;
         }
         else {
             log_debug("Completely unloaded: %s", di->getTarget());
@@ -600,9 +595,7 @@ DisplayList::unload()
 
     testInvariant();
 
-    //if (!uh) _charsByDepth.clear();
-
-    return uh;
+    return false;
 
 }
 
