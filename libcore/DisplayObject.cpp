@@ -474,7 +474,7 @@ DisplayObject::get_event_handler(const event_id& id) const
 }
 
 bool
-DisplayObject::unload(bool dest)
+DisplayObject::unload()
 {
 
     const bool childHandler = unloadChildren();
@@ -491,7 +491,6 @@ DisplayObject::unload(bool dest)
 
     if (!hasEvent) {
         stage().removeQueuedConstructor(this);
-        if (dest) destroy();
     }
 
 	_unloaded = true;
