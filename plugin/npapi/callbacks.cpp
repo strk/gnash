@@ -348,13 +348,11 @@ Pan (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
 // Receives something like this:
 //      <number>33</number>
 bool
-PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t argCount, NPVariant *result)
+PercentLoaded (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
+               uint32_t /* argCount */, NPVariant *result)
 {   
 //    log_debug(__PRETTY_FUNCTION__);
     
-    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
-
 #if 1
     static int counter = 0;
 //    log_error("%s: %d ; %d\n", __FUNCTION__, gpso->getControlFD(), counter);
@@ -366,6 +364,8 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
     }
     return true;
 #else
+    GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
+
     if (argCount == 0) {
         std::vector<std::string> iargs;
         std::string str = ExternalInterface::makeInvoke("PercentLoaded", iargs);
@@ -667,7 +667,7 @@ bool
 remoteCallback (NPObject *npobj, NPIdentifier name, const NPVariant *args,
           uint32_t argCount, NPVariant *result)
 {   
-    log_debug(__PRETTY_FUNCTION__);
+    // log_debug(__PRETTY_FUNCTION__);
 
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
@@ -711,8 +711,11 @@ remoteCallback (NPObject *npobj, NPIdentifier name, const NPVariant *args,
         return false;
     }
 
+    std::string answer;
     GnashNPVariant parsed = ExternalInterface::parseXML(data);
-    std::string answer = NPStringToString(NPVARIANT_TO_STRING(parsed.get()));
+    if (!NPVARIANT_IS_NULL(parsed.get())) {
+        answer = NPStringToString(NPVARIANT_TO_STRING(parsed.get()));
+    }
     if (answer == "Error") {
         NULL_TO_NPVARIANT(*result);
     } else if (answer == "SecurityError") {
