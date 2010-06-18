@@ -585,16 +585,12 @@ DisplayList::unload()
         // make a copy
         DisplayItem di = *it;
 
-        log_debug("Unloading %s", di->getTarget());
-
         // Destroy those with a handler anyway?
         if (di->unload(!unloadHandler)) {
-            log_debug("Unload handler found %s", di->getTarget());
             unloadHandler = true;
             ++it;
         }
         else if (!unloadHandler) {
-            log_debug("Completely unloaded: %s", di->getTarget());
             it = _charsByDepth.erase(it);
         }
         else ++it;
