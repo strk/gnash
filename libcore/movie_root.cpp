@@ -1945,8 +1945,19 @@ movie_root::callExternalCallback(const std::string &name,
 
         // FIXME: call the AS method here!
 
-        // Return an error
-        std::string result = ExternalInterface::makeString("Error");
+        as_value val;
+        if (name == ec.methodName()) {
+            std::string result;
+            val = ec.call(fnargs);
+        }
+        
+        if (val.is_null()) {
+            // Return an error
+            result = ExternalInterface::makeString("Error");
+        } else {
+            result = ExternalInterface::toXML(val);
+        }
+        
         // If the browser is connected, we send an Invoke message to the
         // browser.
         if (_hostfd) {
@@ -1968,16 +1979,20 @@ movie_root::ExternalCallback::setReachable() const
 }
 
 as_value
-movie_root::ExternalCallback::call(const std::string &name,
-                                   const std::vector<as_value>& args)
+movie_root::ExternalCallback::call(const std::vector<as_value>& args)
 {
-#if 0
-    VM& vm = getVM(_caller);
-    string_table& st = vm.getStringTable();
-    string_table::key decodeKey = st.find(name); 
+    GNASH_REPORT_FUNCTION;
 
-    callMethod(_caller, name, args[0]);
+#if 0
+    as_environment env(VM::get());
+    fn_call::Args newargs;
+    as_function *as_func = _callback->to_function();    
+    fn_call fn(0, env, newargs);
+
+    as_func->call(fn);
 #endif
+    
+    return as_value();
 }
 
 
