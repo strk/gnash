@@ -151,16 +151,6 @@ protected:
 
 private:
 
-	int	_lastMouseFlags, _mouseFlags;
-
-	MouseState _mouseState;
-    
-    const boost::intrusive_ptr<const SWF::DefineButtonTag> _def;
-
-	DisplayObjects _stateCharacters;
-
-	DisplayObjects _hitCharacters;
-
 	/// Returns all DisplayObjects that are active based on the current state.
 	//
 	/// The "_visible" property does not matter here. 
@@ -194,6 +184,17 @@ private:
 
 	/// Return version of the SWF containing the button definition.
     virtual int getDefinitionVersion() const;
+	
+    int	_lastMouseFlags, _mouseFlags;
+
+	MouseState _mouseState;
+    
+    const boost::intrusive_ptr<const SWF::DefineButtonTag> _def;
+
+	DisplayObjects _stateCharacters;
+
+	DisplayObjects _hitCharacters;
+
 
 };
 

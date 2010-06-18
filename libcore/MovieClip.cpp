@@ -358,12 +358,11 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
     _def(def),
     _swf(r),
     _playState(PLAYSTATE_PLAY),
+    _environment(getVM(*object)),
     _currentFrame(0),
+    m_sound_stream_id(-1),
     _hasLooped(false),
     _callingFrameActions(false),
-    _environment(getVM(*object)),
-    m_sound_stream_id(-1),
-    _droptarget(),
     _lockroot(false)
 {
     assert(_swf);
@@ -1105,7 +1104,7 @@ MovieClip::display(Renderer& renderer)
 
 void MovieClip::omit_display()
 {
-    if (m_child_invalidated) _displayList.omit_display();
+    if (childInvalidated()) _displayList.omit_display();
         
     clear_invalidated();
 }
@@ -1679,21 +1678,21 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
         return;
     }
 
-    if ( ! m_invalidated && ! m_child_invalidated && ! force )
+    if ( ! invalidated() && ! childInvalidated() && ! force )
     {
         return;
     }
     
  
     // m_child_invalidated does not require our own bounds
-    if ( m_invalidated || force )            
+    if (invalidated() || force)            
     {
         // Add old invalidated bounds
         ranges.add(m_old_invalidated_ranges); 
     }
     
     
-    _displayList.add_invalidated_bounds(ranges, force||m_invalidated);
+    _displayList.add_invalidated_bounds(ranges, force || invalidated());
 
     /// Add drawable.
     SWFRect bounds;

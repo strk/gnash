@@ -91,7 +91,7 @@ Bitmap::display(Renderer& renderer)
 void
 Bitmap::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
-    if (!force && !m_invalidated) return;
+    if (!force && !invalidated()) return;
 
     ranges.add(m_old_invalidated_ranges);
 

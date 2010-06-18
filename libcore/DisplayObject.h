@@ -247,9 +247,9 @@ public:
 
     virtual MovieClip* to_movie() { return 0; }
 
-    int get_depth() const { return m_depth; }
+    int get_depth() const { return _depth; }
 
-    void  set_depth(int d) { m_depth = d; }
+    void  set_depth(int d) { _depth = d; }
 
     /// Get sound volume for this DisplayObject
     int getVolume() const { return _volume; }
@@ -355,7 +355,7 @@ public:
 
     /// Returns the clipping depth (if any) of this DisplayObject.
     /// The parameter tells us to use the DisplayObject as a mask for
-    /// all the objects contained in the display list from m_depth
+    /// all the objects contained in the display list from _depth
     /// to m_clipping_depth inclusive.
     /// 
     /// The value returned by get_clip_depth() is only valid when isMaskLayer()
@@ -695,6 +695,16 @@ public:
         return 0;
     }
 
+    /// Return whether this DisplayObject has been invalidated or not
+    bool invalidated() const {
+        return _invalidated;
+    }
+
+    /// Return whether this DisplayObject has and invalidated child or not
+    bool childInvalidated() const {
+        return _child_invalidated;
+    }
+
     /// @}
 
     /// \brief
@@ -733,7 +743,6 @@ public:
     /// not need to redraw itself completely. This function will 
     /// recursively inform all its parents of the change.
     void set_child_invalidated();
-    
 
     /// Clear invalidated flag and reset m_old_invalidated_bounds to null.
     ///
@@ -748,8 +757,8 @@ public:
     /// prevent the parent to be informed when this DisplayObject (or a
     /// child) is invalidated again (see set_invalidated() recursion).
     void clear_invalidated() {
-        m_invalidated = false;
-        m_child_invalidated = false;        
+        _invalidated = false;
+        _child_invalidated = false;        
         m_old_invalidated_ranges.setNull();
     }
     
@@ -769,7 +778,7 @@ public:
     ///
     /// It is used to determine what area needs to be re-rendered.
     /// The coordinates are world coordinates (in TWIPS).
-    /// Only instances with m_invalidated flag set are checked unless
+    /// Only instances with _invalidated flag set are checked unless
     /// force is set.
     ///
     virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
@@ -1016,21 +1025,6 @@ protected:
     as_object* getPathElementSeparator(string_table::key key);
 
     /// \brief
-    /// Set when the visual aspect of this particular DisplayObject or movie
-    /// has been changed and redrawing is necessary.    
-    //
-    /// This is initialized to true as the initial state for
-    /// any DisplayObject is the "invisible" state (it wasn't there)
-    /// so it starts in invalidated mode.
-    ///
-    bool m_invalidated;
-
-    /// Just like m_invalidated but set when a child is invalidated instead
-    /// of this DisplayObject instance. m_invalidated and m_child_invalidated
-    /// can be set at the same time. 
-    bool m_child_invalidated;
-
-    /// \brief
     /// Bounds of this DisplayObject instance before first invalidation
     /// since last call to clear_invalidated().
     ///
@@ -1061,14 +1055,19 @@ private:
     /// The movie_root to which this DisplayObject belongs.
     movie_root& _stage;
 
-    int m_depth;
     cxform m_color_transform;
+    
     SWFMatrix m_matrix;
+    
+    Events _event_handlers;
 
     /// Cache values for ActionScript access.
     /// NOTE: not all DisplayObjects need this, just the
     ///       ones which are ActionScript-referenceable
     double _xscale, _yscale, _rotation;
+
+    /// The depth of this DisplayObject.
+    boost::int32_t _depth;
 
     /// Volume control associated to this DisplayObject
     //
@@ -1082,13 +1081,6 @@ private:
 
     int m_ratio;
     int m_clip_depth;
-    Events _event_handlers;
-
-    /// Set to yes when this instance has been unloaded
-    bool _unloaded;
-
-    /// This flag should be set to true by a call to destroy()
-    bool _destroyed;
 
     /// The DisplayObject masking this instance (if any)
     DisplayObject* _mask;
@@ -1113,6 +1105,28 @@ private:
     bool _scriptTransformed;
 
     bool _dynamicallyCreated;
+
+    /// Set to yes when this instance has been unloaded
+    bool _unloaded;
+
+    /// This flag should be set to true by a call to destroy()
+    bool _destroyed;
+
+    /// \brief
+    /// Set when the visual aspect of this particular DisplayObject or movie
+    /// has been changed and redrawing is necessary.    
+    //
+    /// This is initialized to true as the initial state for
+    /// any DisplayObject is the "invisible" state (it wasn't there)
+    /// so it starts in invalidated mode.
+    ///
+    bool _invalidated;
+
+    /// Just like _invalidated but set when a child is invalidated instead
+    /// of this DisplayObject instance. _invalidated and _child_invalidated
+    /// can be set at the same time. 
+    bool _child_invalidated;
+
 
 };
 

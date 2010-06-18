@@ -690,6 +690,12 @@ private:
 	///
 	VariableRef parseTextVariableRef(const std::string& variableName) const;
 
+	/// Called in display(), sets the cursor using m_cursor and _textRecords
+	//
+	/// @param renderer
+	/// @param mat
+	void show_cursor(Renderer& renderer, const SWFMatrix& mat);
+
     /// The immutable definition of our TextField
     //
     /// This is NULL for dynamic TextFields.
@@ -707,25 +713,15 @@ private:
 	//
 	std::wstring _htmlText;
 
-	/// This flag will be true as soon as the TextField
-	/// is assigned a text value. Only way to be false is
-	/// when definition has the hasText flag set to false
-	/// and no actionscript added text.
-	bool _textDefined;
-
-	bool _htmlTextDefined;
-
-	bool _restrictDefined;
-
 	/// bounds of dynamic text, as laid out
 	SWFRect m_text_bounding_box;
 
 	typedef std::vector<SWF::TextRecord> TextRecords;
 	TextRecords _textRecords;
+
 	std::vector<size_t> _recordStarts;
+
 	TextRecords _displayRecords;
-	bool _underlined;
-	bool _bullet;
 
 	std::string _url;
 	std::string _target;
@@ -733,59 +729,7 @@ private:
 	std::set<wchar_t> _restrictedchars;
 	TextFormatDisplay _display;
 	std::vector<int> _tabStops;
-	
-	boost::int32_t _numChars;
-	boost::int16_t _leading;
-
-	TextAlignment _alignment;
-
-	boost::uint16_t _indent;
-
-	/// Indentation for every line (including the ones created by
-	/// effect of a word-wrap.
-	boost::uint16_t _blockIndent;
-
-	boost::uint16_t _leftMargin;
-
-	boost::uint16_t _rightMargin;
-
-	boost::uint16_t _fontHeight;
-	
-	boost::intrusive_ptr<const Font> _font;
-
-	bool m_has_focus;
-	size_t m_cursor;
-	size_t _glyphcount;
-	size_t _scroll;
-	size_t _maxScroll;
-	size_t _hScroll;
-	size_t _maxHScroll;
-	size_t _bottomScroll;
-	/// Called in display(), this sets the cursor using m_cursor and _textRecords
-	//
-	/// @param renderer
-	/// @param mat
-	void show_cursor(Renderer& renderer, const SWFMatrix& mat);
-
 	LineStarts _line_starts;
-
-	size_t _linesindisplay;
-
-    /// Corresponds to the multiline property.
-    bool _multiline;
-
-    /// Corresponds to the password property.
-    bool _password;
-
-    /// Corresponds to the maxChars property.
-    size_t _maxChars;
-	
-	/// The flag keeping status of TextVariable registration
-	//
-	/// It will be set to true if there's no need to register
-	/// a text variable (ie. non-specified in the SWF)
-	///
-	bool _text_variable_registered;
 
 	/// The text variable name
 	//
@@ -794,25 +738,28 @@ private:
 	/// 'TextFields.variable'
 	std::string _variable_name;
 
-	bool _drawBackground;
-
 	rgba _backgroundColor;
-
-	bool _drawBorder;
 
 	rgba _borderColor;
 
 	rgba _textColor;
+	
+	TextAlignment _alignment;
 
-	bool _embedFonts;
+	boost::intrusive_ptr<const Font> _font;
+	size_t m_cursor;
+	size_t _glyphcount;
+	size_t _scroll;
+	size_t _maxScroll;
+	size_t _hScroll;
+	size_t _maxHScroll;
+	size_t _bottomScroll;
+	size_t _linesindisplay;
 
-	bool _wordWrap;
-
-	bool _html;
-
-	bool _selectable;
-
-	AutoSize _autoSize;
+    /// Corresponds to the maxChars property.
+    size_t _maxChars;
+	
+    AutoSize _autoSize;
 
 	TypeValue _type;
 
@@ -827,6 +774,59 @@ private:
     /// Represents the selected part of the text. The second element must
     /// never be less than the first.
     std::pair<size_t, size_t> _selection;
+
+    boost::int16_t _leading;
+	boost::uint16_t _indent;
+
+	/// Indentation for every line (including the ones created by
+	/// effect of a word-wrap.
+	boost::uint16_t _blockIndent;
+
+	boost::uint16_t _leftMargin;
+
+	boost::uint16_t _rightMargin;
+
+	boost::uint16_t _fontHeight;
+
+	/// This flag will be true as soon as the TextField
+	/// is assigned a text value. Only way to be false is
+	/// when definition has the hasText flag set to false
+	/// and no actionscript added text.
+	bool _textDefined;
+
+	bool _htmlTextDefined;
+
+	bool _restrictDefined;
+	bool _underlined;
+	bool _bullet;
+
+	bool m_has_focus;
+	
+
+    /// Corresponds to the multiline property.
+    bool _multiline;
+
+    /// Corresponds to the password property.
+    bool _password;
+	
+	/// The flag keeping status of TextVariable registration
+	//
+	/// It will be set to true if there's no need to register
+	/// a text variable (ie. non-specified in the SWF)
+	///
+	bool _text_variable_registered;
+
+	bool _drawBackground;
+
+	bool _drawBorder;
+
+	bool _embedFonts;
+
+	bool _wordWrap;
+
+	bool _html;
+
+	bool _selectable;
 	
 };
 
