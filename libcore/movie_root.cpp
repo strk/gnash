@@ -1617,13 +1617,14 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
     if (invoke == 0) {
 	return false;
     }
+    
     if (invoke->name.empty()) {
 	return false;
     }
 
     log_debug("Processing %s call from the Browser.", invoke->name);
 
-    std::stringstream ss;
+    std::stringstream ss;       // ss is the response string
 
     // These are the default methods used by ExternalInterface
     if (invoke->name == "Quit") {
@@ -1635,8 +1636,13 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 	// SetVariable doesn't send a response
     } else if (invoke->name == "GetVariable") {
 	// GetVariable sends the value of the variable
+#if 1
 	as_value val("Hello World");
 	// FIXME: need to use a real value
+#else
+        as_object::SortedPropertyList props;
+        enumerateProperties(o, props);
+#endif
 	ss << ExternalInterface::toXML(val);
     } else if (invoke->name == "GotoFrame") {
 	// GotoFrame doesn't send a response
@@ -1670,11 +1676,13 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 	// FIXME: need to use a real value
 	ss << ExternalInterface::toXML(val);
     } else {
-	std::map<std::string, as_object *>::const_iterator it;
-	for (it=_externalCallbacks.begin(); it != _externalCallbacks.end(); it++) {
-	    std::string method = it->first;
-	    log_debug("Checking against method name: %s", method);
-	}
+        std::string result = callExternalCallback(invoke->name, invoke->args);
+        if (result == ExternalInterface::makeString("Error")) {
+            return false;
+        } else if (result == ExternalInterface::makeString("SecurityError")) {
+            return false;
+        }
+        return true;
     }
 
     if (!ss.str().empty()) {
@@ -1856,29 +1864,137 @@ movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
     return 0;
 }
 
-// This calls a JavaScript method in the web page
+/// @example "Internal Gnash message 'addMethod'"
+///
+/// <pre>
+/// <invoke name="addMethod" returntype="xml">
+///      <arguments><string>methodname</string</arguments>
+/// </invoke>
+/// </pre>
+void
+movie_root::addExternalCallback(as_object *obj, const std::string &name,
+                                as_object *callback)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    _externalCallbacks.push_back(ExternalCallback(obj, name, callback));
+
+    if (_hostfd) {
+        std::vector<as_value> fnargs;
+        fnargs.push_back(name);
+        std::string msg = ExternalInterface::makeInvoke("addMethod", fnargs);
+        
+        const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
+        if (ret != msg.size()) {
+            log_error(_("Could not write to browser fd #%d: %s"),
+                      _hostfd, std::strerror(errno));
+        }
+    }
+}    
+
+/// This calls a JavaScript method in the web page
+///
+/// @example "ExternalInterace::call message"
+///
+/// <pre>
+/// <invoke name="methodname" returntype="xml">
+///      <arguments></arguments>
+///             ...
+///      <arguments></arguments>
+/// </invoke>
+///
+/// May return any supported type like Number or String in XML format.
+///
+/// </pre>
+std::string
+movie_root::callExternalJavascript(const std::string &name, 
+                                   const std::vector<as_value> &fnargs)
+{
+    std::string result;
+    ExternalCallbacks::const_iterator it;
+    // If the browser is connected, we send an Invoke message to the
+    // browser.
+    if (_controlfd && _hostfd) {
+        std::string msg = ExternalInterface::makeInvoke(name, fnargs);
+        
+        const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
+        if (ret != msg.size()) {
+            log_error(_("Could not write to browser fd #%d: %s"),
+                      _hostfd, std::strerror(errno));
+        } else {
+            // Now read the response from the browser after it's exectuted
+            // the JavaScript function.
+            result = ExternalInterface::readBrowser(_controlfd);
+        }
+    }
+
+    return result;
+}
+
+// Call one of the registered callbacks, and return the result to
+// Javascript in the browser.
 std::string
 movie_root::callExternalCallback(const std::string &name, 
 				 const std::vector<as_value> &fnargs)
 {
+    std::string result;
+    ExternalCallbacks::const_iterator it;
+    for (it=_externalCallbacks.begin(); it != _externalCallbacks.end(); it++) {
+        ExternalCallback ec = *it;
+        log_debug("Checking %s against method name: %s", name, ec.methodName());
 
-    if (_hostfd) {
-        return std::string();
+        // FIXME: call the AS method here!
+
+        as_value val;
+        if (name == ec.methodName()) {
+            std::string result;
+            val = ec.call(fnargs);
+        }
+        
+        if (val.is_null()) {
+            // Return an error
+            result = ExternalInterface::makeString("Error");
+        } else {
+            result = ExternalInterface::toXML(val);
+        }
+        
+        // If the browser is connected, we send an Invoke message to the
+        // browser.
+        if (_hostfd) {
+            const size_t ret = ExternalInterface::writeBrowser(_hostfd, result);
+            if (ret != result.size()) {
+                log_error(_("Could not write to browser fd #%d: %s"),
+                          _hostfd, std::strerror(errno));
+            }
+        }
     }
-
-    std::string msg = ExternalInterface::makeInvoke(name, fnargs);
-
-    const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
-    if (ret != msg.size()) {
-        log_error(_("Could not write to browser fd #%d: %s"),
-		  _hostfd, std::strerror(errno));
-        return std::string();
-    }
-
-    std::string result = ExternalInterface::readBrowser(_controlfd);
 
     return result;
 }
+
+void
+movie_root::ExternalCallback::setReachable() const
+{
+    _caller->setReachable();
+}
+
+as_value
+movie_root::ExternalCallback::call(const std::vector<as_value>& args)
+{
+    GNASH_REPORT_FUNCTION;
+
+#if 0
+    as_environment env(VM::get());
+    fn_call::Args newargs;
+    as_function *as_func = _callback->to_function();    
+    fn_call fn(0, env, newargs);
+
+    as_func->call(fn);
+#endif
+    
+    return as_value();
+}
+
 
 void
 movie_root::cleanupDisplayList()
@@ -2553,3 +2669,7 @@ getBuiltinObject(movie_root& mr, string_table::key cl)
 
 } // namespace gnash
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

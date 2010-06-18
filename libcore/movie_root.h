@@ -164,8 +164,25 @@ public:
         SimpleBuffer _buf;
         as_object* _obj;
     };
-        
     typedef std::list<LoadCallback> LoadCallbacks;
+        
+    class ExternalCallback {
+    public:
+        ExternalCallback(as_object *obj, const std::string &name,
+                         as_object *callback)
+            : _name(name),
+              _caller(obj),
+              _callback(callback)
+        {}
+        std::string &methodName() { return _name; };
+        as_value call(const std::vector<as_value>& args);
+        void setReachable() const;
+    private:
+        std::string     _name;
+        as_object       *_caller;
+        as_object       *_callback;
+    };        
+    typedef std::list<ExternalCallback> ExternalCallbacks;
 
     typedef std::bitset<key::KEYCOUNT> Keys;
 
@@ -920,15 +937,16 @@ public:
 
     const RunResources& runResources() const { return _runResources; }
 
-    void addExternalCallback(const std::string &name, as_object *obj)
-    {
-        _externalCallbacks[name] = obj;
-    }    
+    void addExternalCallback(as_object *obj, const std::string &name,
+                             as_object *callback);
 
     bool processInvoke(ExternalInterface::invoke_t *);
 
     std::string callExternalCallback(const std::string &name, 
                                      const std::vector<as_value>& args);
+    
+    std::string callExternalJavascript(const std::string &name, 
+                                       const std::vector<as_value>& args);
 
     /// Removes a queued constructor from the execution queue
     //
@@ -1141,7 +1159,6 @@ private:
 
     LoadCallbacks _loadCallbacks;
     
-    typedef std::map<std::string, as_object *> ExternalCallbacks;
     ExternalCallbacks _externalCallbacks;
 
     typedef std::map<int, Timer*> TimerMap;

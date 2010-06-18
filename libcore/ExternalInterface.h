@@ -35,6 +35,7 @@ class as_value;
 struct ObjectURI;
 class Global_as;
 class movie_root;
+class IOChannel;
 }
 
 namespace gnash {

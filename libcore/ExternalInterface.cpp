@@ -469,7 +469,7 @@ ExternalInterface::parseXML(const std::string &xml)
         }
     }
 
-    log_debug("Argument is: %s", value.to_string());
+//    log_debug("Argument is: %s", value.to_string());
     return value;
 }
 

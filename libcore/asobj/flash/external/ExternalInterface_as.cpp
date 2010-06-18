@@ -36,6 +36,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
+#include "URLAccessManager.h"
 #include "VM.h"
 #include "rc.h"
 #include "as_value.h"
@@ -229,11 +230,11 @@ attachExternalInterfaceStaticInterface(as_object& o)
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 7);
 }
 
+// This adds a function that can be called from javascript.
 as_value
 externalinterface_addCallback(const fn_call& fn)
 {
     // GNASH_REPORT_FUNCTION;
-
     movie_root& mr = getRoot(fn);
 
     if (mr.getControlFD() <= 0) {
@@ -248,35 +249,44 @@ externalinterface_addCallback(const fn_call& fn)
         if (fn.arg(2).is_object()) {
             log_debug("adding callback %s", name);
             asCallback = (fn.arg(2).to_object(getGlobal(fn)));
-            mr.addExternalCallback(name, asCallback.get());
+            mr.addExternalCallback(fn.this_ptr, name, asCallback.get());
         }
-        return as_value(true);
-    }
-    
+     }
+
+    // This function doesn't actually have a return value, but we do this
+    // to quiet warnings about not returning anything, as the return
+    // value should never be checked anyway.
     return as_value(false);    
 }
 
+// This calls a Javascript function in the browser.
 as_value
 externalinterface_call(const fn_call& fn)
 {
     // GNASH_REPORT_FUNCTION;
-
     movie_root& mr = getRoot(fn);
+    as_value val;
 
     if (fn.nargs >= 2) {
         const as_value& methodName_as = fn.arg(0);
         const std::string methodName = methodName_as.to_string();
         const std::vector<as_value>& args = fn.getArgs();
         log_debug("Calling External method \"%s\"", methodName);
-        std::string result = mr.callExternalCallback(methodName, args);
-        if (result.empty()) {
-            return as_value();
+        std::string result = mr.callExternalJavascript(methodName, args);
+        if (!result.empty()) {
+            val = ExternalInterface::parseXML(result);
+            // There was an error trying to Invoke the callback
+            if (result == ExternalInterface::makeString("Error")
+                || (result == ExternalInterface::makeString("SecurityError"))) {
+                val.set_null();
+            }
         } else {
-            return as_value(result);
+            // We got nothing back from the Invoke, so return an error
+            val.set_null();
         }
     }
     
-    return as_value();
+    return val;
 }
 
 as_value
@@ -286,6 +296,12 @@ externalinterface_available(const fn_call& fn)
     
     movie_root& m = getRoot(fn);
     bool mode = false;
+
+    // If we're not running under a browser as a plugin, then just
+    // return, as ExternalInterface is only available as a plugin.
+    if (m.getHostFD() < 0) {
+        return false;
+    }
     
     switch (m.getAllowScriptAccess()) {
       case movie_root::SCRIPT_ACCESS_NEVER:
@@ -297,6 +313,7 @@ externalinterface_available(const fn_call& fn)
           const std::string& baseurl = m.getOriginalURL();
           const int MAXHOSTNAMELEN = 128;
           char hostname[MAXHOSTNAMELEN];
+          memset(hostname, 0, MAXHOSTNAMELEN);
           
           if (gethostname(hostname, MAXHOSTNAMELEN) != 0) {
               mode = false;
@@ -305,6 +322,10 @@ externalinterface_available(const fn_call& fn)
           // The hostname is empty if running the standalone Gnash from
           // a terminal, so we can assume the default of sameDomain applies.
           URL localPath(hostname, baseurl);
+          // If the URL has a file protocol, then 
+          if (URLAccessManager::allow(localPath)) {
+              return as_value(true);
+          }
           if (localPath.hostname().empty()) {
               mode = false;
           } else {

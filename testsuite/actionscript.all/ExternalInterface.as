@@ -22,6 +22,8 @@
 
 #include "dejagnu.as"
 
+flash.system.Security.allowDomain("localhost");
+
 ASSetPropFlags (_global, "flash", 0, 5248);
 
 #if OUTPUT_VERSION < 6
@@ -59,34 +61,38 @@ if (EI.hasOwnProperty("available")) {
     fail("ExternalInterface::available() doesn't exist");
 }
 
-// this should always be true now that Gnash supports this class,
-// and sameDomain is the default when running standalone.
-if (EI.available == false) {
-    pass("ExternalInterface::available is correct");
-} else {
-    fail("ExternalInterface::available property isn't correct");
-}
-
 // Create a test function for the callback
-function TestEIMethod () {
-    note("TestEIMethod called!");
+function TestASMethod () {
+    note("TestASMethod called!");
 }
 
-if (EI.addCallback("TestEIMethod", null, TestEIMethod) == false) {
-    pass("ExternalInterface::addCallback(\"TestEIMethod\")");
-} else {
-    fail("ExternalInterface::addCallback(\"TestEIMethod\")");
-}
+// ExternalInterface::available is always false when run standalone,
+// and true if running under a browser and has allowable access to the
+// resource. So we can't have a test case for this property that works
+// both standalone and online Instead we do depend on it being correct
+// as the ExternalInterface::call() tests require this test case to
+// be run under a browser.
 
 // ::call() calls JavaScript functions in the browser, not in flash,
 // so we can't test it when running standalone. So this will always
-// return null.
-var foo = EI.call("TestEIMethod", null);
+// return null unless run from a browser
 
-if (EI.call("TestEIMethod", null) == null) {
-    pass("ExternalInterface::call(\"TestEIMethod\")");
+// This adds a callback that the brower can call from Javascript. This is
+// a bit of a bogus test case, as addCallback() doesn't return anything, but
+// we need to add a method anyway to test being called by Javascript.
+if (EI.addCallback("TestASMethod", null, TestASMethod) == false) {
+    pass("ExternalInterface::addCallback(\"TestASMethod\")");
 } else {
-    fail("ExternalInterface::call(\"TestEIMethod\")");
+    fail("ExternalInterface::addCallback(\"TestASMethod\")");
+}
+
+if (EI.available == true) {
+  // This test tries to invoke a Javascript method running in the browser
+  if (EI.call("TestJSMethod", "test") == null) {
+    pass("ExternalInterface::call(\"TestJSMethod\") == null");
+  } else {
+    fail("ExternalInterface::call(\"TestJSMethod\") == null");
+  }
 }
 
 // The default is false, so if we can set it to true, it worked

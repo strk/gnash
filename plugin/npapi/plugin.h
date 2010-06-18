@@ -83,11 +83,11 @@ public:
     /// Can the stream be written to yet ?
     int32_t WriteReady(NPStream *stream);
     int32_t Write(NPStream *stream, int32_t offset, int32_t len, void *buffer);
-#ifdef ENABLE_SCRIPTABLE
     NPObject *getScriptableObject();
     const char *getEmbedURL() const;
-#endif
-    
+
+    GnashPluginScriptObject *getScriptObject() { return _scriptObject; }; // FIXME: debug only!!!
+
 private:
     void startProc();
     std::vector<std::string> getCmdLine(int hostfd, int controlfd);
@@ -129,9 +129,7 @@ private:
 
     /// Name of the plugin instance element in the dom 
     std::string                        _name;
-//#ifdef ENABLE_SCRIPTABLE
     GnashPluginScriptObject             *_scriptObject;
-//#endif
     
     std::string getCurrentPageURL() const;
 };
@@ -142,7 +140,6 @@ private:
 //  0: no messages at all
 //  1: fatal errors (errors preventing the plugin from working as it should)
 //  2: informational messages
-//
 #define GNASH_PLUGIN_DEBUG 1
 
 // This following logging code is copied from libbase/log.h, but
