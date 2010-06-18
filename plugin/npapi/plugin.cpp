@@ -389,7 +389,6 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     if (NPNFuncs.version >= 14) { // since NPAPI start to support
         _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(
             _instance, GnashPluginScriptObject::marshalGetNPClass());
-        log_debug("SCRIPT OBJECT create: %x, ns: %x", (void *)_scriptObject, (void *)this);
     }
 #endif
     
