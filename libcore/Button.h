@@ -114,9 +114,6 @@ public:
 	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
 	bool isEnabled();
-	
-	/// Properly unload contained DisplayObjects
-	virtual bool unloadChildren();
 
 	/// Properly destroy contained DisplayObjects
 	void destroy();
@@ -137,6 +134,9 @@ public:
 #endif
 
 protected:
+	
+	/// Properly unload contained DisplayObjects
+	virtual bool unloadChildren();
 
 #ifdef GNASH_USE_GC
 	/// Mark reachabe resources (for the GC)
