@@ -359,20 +359,18 @@ check_equals(ret, true);
 //-------------------------------------------------------------
 
 r0 = new Rectangle(10, 10, 15, 16);
-xcheck_equals(r0.containsPoint({x:4, y:6}), false);
-xcheck_equals(r0.containsPoint({x:11, y:11}), true);
-xcheck_equals(r0.containsPoint({x:10, y:10}), true);
-xcheck_equals(r0.containsPoint({x:10, y:26}), false);
-xcheck_equals(r0.containsPoint({x:10, y:25.9}), true);
-xcheck_equals(r0.containsPoint({x:24.9, y:25.9}), true);
-xcheck_equals(r0.containsPoint({x:25, y:10}), false);
-xcheck_equals(r0.containsPoint({x:-25, y:-10}), false);
+check_equals(r0.containsPoint({x:4, y:6}), false);
+check_equals(r0.containsPoint({x:11, y:11}), true);
+check_equals(r0.containsPoint({x:10, y:10}), true);
+check_equals(r0.containsPoint({x:10, y:26}), false);
+check_equals(r0.containsPoint({x:10, y:25.9}), true);
+check_equals(r0.containsPoint({x:24.9, y:25.9}), true);
+check_equals(r0.containsPoint({x:25, y:10}), false);
+check_equals(r0.containsPoint({x:-25, y:-10}), false);
 
-
-
-xcheck_equals(r0.containsPoint({x:13, y:undefined}), false);
-xcheck_equals(r0.containsPoint({x:undefined, y:14}), false);
-xcheck_equals(r0.containsPoint({x:"12", y:"12"}), false);
+check_equals(r0.containsPoint({x:13, y:undefined}), false);
+check_equals(r0.containsPoint({x:undefined, y:14}), false);
+check_equals(r0.containsPoint({x:"12", y:"12"}), false);
 
 // TODO
 
