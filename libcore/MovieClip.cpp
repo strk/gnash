@@ -249,7 +249,7 @@ public:
         _y(y)
     {}
 
-    bool operator() (DisplayObject* ch) {
+    bool operator()(const DisplayObject* ch) {
         if (ch->pointInShape(_x, _y)) {
             _found = true;
             return false;
@@ -257,12 +257,12 @@ public:
         return true;
     }
 
-    bool hitFound() { return _found; }
+    bool hitFound() const { return _found; }
 
 private:
     bool _found;
-    boost::int32_t    _x;
-    boost::int32_t    _y;
+    const boost::int32_t _x;
+    const boost::int32_t _y;
 };
 
 /// Find the first visible DisplayObject whose shape contain the point
@@ -273,14 +273,14 @@ class VisibleShapeContainerFinder
 {
 public:
 
-    VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t    y)
+    VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t y)
         :
         _found(false),
         _x(x),
         _y(y)
     {}
 
-    bool operator() (DisplayObject* ch)
+    bool operator()(const DisplayObject* ch)
     {
         if (ch->pointInVisibleShape(_x, _y)) {
             _found = true;
@@ -289,12 +289,12 @@ public:
         return true;
     }
 
-    bool hitFound() { return _found; }
+    bool hitFound() const { return _found; }
 
 private:
     bool _found;
-    boost::int32_t    _x;
-    boost::int32_t    _y;
+    const boost::int32_t _x;
+    const boost::int32_t _y;
 };
 
 /// Find the first hitable DisplayObject whose shape contain the point 
@@ -305,13 +305,13 @@ class HitableShapeContainerFinder
 { 
 public: 
     HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
-            : 
-    _found(false), 
-    _x(x), 
-    _y(y) 
+        : 
+        _found(false), 
+        _x(x), 
+        _y(y) 
     {} 
 
-    bool operator() (DisplayObject* ch) 
+    bool operator()(const DisplayObject* ch) 
     { 
         if (ch->isDynamicMask()) return true; 
         if (ch->pointInShape(_x, _y)) {
@@ -321,12 +321,17 @@ public:
         return true; 
     } 
 
-    bool hitFound() { return _found; } 
+    bool hitFound() const { return _found; } 
 
 private:
+
     bool _found; 
-    boost::int32_t _x; // TWIPS
-    boost::int32_t _y; // TWIPS
+
+    // x position in twips.
+    const boost::int32_t _x;
+    
+    // y position in twips.
+    const boost::int32_t _y;
 }; 
 
 /// A DisplayList visitor used to compute its overall bounds.
