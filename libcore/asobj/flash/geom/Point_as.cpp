@@ -374,14 +374,15 @@ point_toString(const fn_call& fn)
     ptr->get_member(NSV::PROP_X, &x);
     ptr->get_member(NSV::PROP_Y, &y);
 
-    int version = getSWFVersion(fn);
+    VM& vm = getVM(fn);
 
-    std::stringstream ss;
-    ss << "(x=" << x.to_string(version)
-        << ", y=" << y.to_string(version)
-        << ")";
+    as_value ret("(x=");
+    newAdd(ret, x, vm);
+    newAdd(ret, ", y=", vm);
+    newAdd(ret, y, vm);
+    newAdd(ret, ")", vm);
 
-    return as_value(ss.str());
+    return ret;
 }
 
 as_value
@@ -605,36 +606,16 @@ point_polar(const fn_call& fn)
 as_value
 point_ctor(const fn_call& fn)
 {
-
     as_object* obj = ensure<ValidThis>(fn);
 
-    as_value x;
-    as_value y;
-
-    if ( ! fn.nargs )
-    {
-        x.set_double(0);
-        y.set_double(0);
+    if (!fn.nargs) {
+        obj->set_member(NSV::PROP_X, 0.0);
+        obj->set_member(NSV::PROP_Y, 0.0);
     }
-    else
-    {
-        do {
-            x = fn.arg(0);
-            if ( fn.nargs < 2 ) break;
-            y = fn.arg(1);
-            if ( fn.nargs < 3 ) break;
-            IF_VERBOSE_ASCODING_ERRORS(
-                std::stringstream ss;
-                fn.dump_args(ss);
-                log_aserror("flash.geom.Point(%s): %s", ss.str(),
-                    _("arguments after the first two discarded"));
-            );
-        } while(0);
+    else {
+        obj->set_member(NSV::PROP_X, fn.arg(0));
+        obj->set_member(NSV::PROP_Y, (fn.nargs > 1) ? fn.arg(1) : as_value());
     }
-
-    obj->set_member(NSV::PROP_X, x);
-    obj->set_member(NSV::PROP_Y, y);
-
     return as_value(); 
 }
 
