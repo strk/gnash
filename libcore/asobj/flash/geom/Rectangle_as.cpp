@@ -243,6 +243,7 @@ Rectangle_containsPoint(const fn_call& fn)
     
     // argx >= thisx
     as_value ret = newLessThan(argx, thisx, vm);
+    if (ret.is_undefined()) return as_value(); 
     if (ret.to_bool()) return as_value(false); 
 
     as_value thisw;
@@ -250,6 +251,7 @@ Rectangle_containsPoint(const fn_call& fn)
     
     newAdd(thisx, thisw, vm);
     ret = newLessThan(argx, thisx, vm);
+    if (ret.is_undefined()) return as_value(); 
     if (!ret.to_bool()) return as_value(false); 
  
     as_value thisy;
@@ -259,6 +261,7 @@ Rectangle_containsPoint(const fn_call& fn)
     
     // argy >= thisy
     ret = newLessThan(argy, thisy, vm);
+    if (ret.is_undefined()) return as_value(); 
     if (ret.to_bool()) return as_value(false); 
 
     as_value thish;
@@ -266,6 +269,7 @@ Rectangle_containsPoint(const fn_call& fn)
     
     newAdd(thisy, thish, vm);
     ret = newLessThan(argy, thisy, vm);
+    if (ret.is_undefined()) return as_value(); 
     if (!ret.to_bool()) return as_value(false); 
 
     return as_value(true);
