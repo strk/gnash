@@ -249,7 +249,7 @@ public:
         _y(y)
     {}
 
-    bool operator() (DisplayObject* ch) {
+    bool operator()(const DisplayObject* ch) {
         if (ch->pointInShape(_x, _y)) {
             _found = true;
             return false;
@@ -257,12 +257,12 @@ public:
         return true;
     }
 
-    bool hitFound() { return _found; }
+    bool hitFound() const { return _found; }
 
 private:
     bool _found;
-    boost::int32_t    _x;
-    boost::int32_t    _y;
+    const boost::int32_t _x;
+    const boost::int32_t _y;
 };
 
 /// Find the first visible DisplayObject whose shape contain the point
@@ -273,14 +273,14 @@ class VisibleShapeContainerFinder
 {
 public:
 
-    VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t    y)
+    VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t y)
         :
         _found(false),
         _x(x),
         _y(y)
     {}
 
-    bool operator() (DisplayObject* ch)
+    bool operator()(const DisplayObject* ch)
     {
         if (ch->pointInVisibleShape(_x, _y)) {
             _found = true;
@@ -289,12 +289,12 @@ public:
         return true;
     }
 
-    bool hitFound() { return _found; }
+    bool hitFound() const { return _found; }
 
 private:
     bool _found;
-    boost::int32_t    _x;
-    boost::int32_t    _y;
+    const boost::int32_t _x;
+    const boost::int32_t _y;
 };
 
 /// Find the first hitable DisplayObject whose shape contain the point 
@@ -305,13 +305,13 @@ class HitableShapeContainerFinder
 { 
 public: 
     HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
-            : 
-    _found(false), 
-    _x(x), 
-    _y(y) 
+        : 
+        _found(false), 
+        _x(x), 
+        _y(y) 
     {} 
 
-    bool operator() (DisplayObject* ch) 
+    bool operator()(const DisplayObject* ch) 
     { 
         if (ch->isDynamicMask()) return true; 
         if (ch->pointInShape(_x, _y)) {
@@ -321,12 +321,17 @@ public:
         return true; 
     } 
 
-    bool hitFound() { return _found; } 
+    bool hitFound() const { return _found; } 
 
 private:
+
     bool _found; 
-    boost::int32_t _x; // TWIPS
-    boost::int32_t _y; // TWIPS
+
+    // x position in twips.
+    const boost::int32_t _x;
+    
+    // y position in twips.
+    const boost::int32_t _y;
 }; 
 
 /// A DisplayList visitor used to compute its overall bounds.
@@ -1310,7 +1315,7 @@ bool
 MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
     ShapeContainerFinder finder(x, y);
-    const_cast<DisplayList&>(_displayList).visitBackward(finder);
+    _displayList.visitBackward(finder);
     if ( finder.hitFound() ) return true;
     return hitTestDrawable(x, y);
 }
@@ -1339,7 +1344,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
         return false;
     }
     VisibleShapeContainerFinder finder(x, y);
-    const_cast<DisplayList&>(_displayList).visitBackward(finder);
+    _displayList.visitBackward(finder);
     if (finder.hitFound()) return true;
     return hitTestDrawable(x, y);
 }
@@ -2035,7 +2040,7 @@ MovieClip::getBounds() const
 {
     SWFRect bounds;
     BoundsFinder f(bounds);
-    const_cast<DisplayList&>(_displayList).visitAll(f);
+    _displayList.visitAll(f);
     SWFRect drawableBounds = _drawable.getBounds();
     bounds.expand_to_rect(drawableBounds);
     
@@ -2046,10 +2051,7 @@ bool
 MovieClip::isEnabled() const
 {
     as_value enabled;
-    // const_cast needed due to get_member being non-const due to the 
-    // possibility that a getter-setter would actually modify us ...
-    if (!getObject(const_cast<MovieClip*>(this))->get_member(NSV::PROP_ENABLED, &enabled))
-    {
+    if (!getObject(this)->get_member(NSV::PROP_ENABLED, &enabled)) {
          // We're enabled if there's no 'enabled' member...
          return true;
     }
