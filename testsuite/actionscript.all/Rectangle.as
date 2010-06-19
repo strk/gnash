@@ -368,6 +368,12 @@ xcheck_equals(r0.containsPoint({x:24.9, y:25.9}), true);
 xcheck_equals(r0.containsPoint({x:25, y:10}), false);
 xcheck_equals(r0.containsPoint({x:-25, y:-10}), false);
 
+
+
+xcheck_equals(r0.containsPoint({x:13, y:undefined}), false);
+xcheck_equals(r0.containsPoint({x:undefined, y:14}), false);
+xcheck_equals(r0.containsPoint({x:"12", y:"12"}), false);
+
 // TODO
 
 //-------------------------------------------------------------
@@ -434,6 +440,6 @@ xcheck_equals(r0.containsPoint({x:-25, y:-10}), false);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(157);
+check_totals(160);
 
 #endif // OUTPUT_VERSION >= 8
