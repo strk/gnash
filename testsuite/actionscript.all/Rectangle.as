@@ -368,9 +368,9 @@ check_equals(r0.containsPoint({x:24.9, y:25.9}), true);
 check_equals(r0.containsPoint({x:25, y:10}), false);
 check_equals(r0.containsPoint({x:-25, y:-10}), false);
 
-check_equals(r0.containsPoint({x:13, y:undefined}), false);
-check_equals(r0.containsPoint({x:undefined, y:14}), false);
-check_equals(r0.containsPoint({x:"12", y:"12"}), false);
+check_equals(r0.containsPoint({x:13, y:undefined}), undefined);
+check_equals(r0.containsPoint({x:undefined, y:14}), undefined);
+check_equals(r0.containsPoint({x:"12", y:"12"}), true);
 
 // TODO
 
