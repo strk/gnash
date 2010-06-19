@@ -664,6 +664,24 @@ matrix_toString(const fn_call& fn)
     ptr->get_member(NSV::PROP_TX, &tx);
     ptr->get_member(NSV::PROP_TY, &ty);
     
+    VM& vm = getVM(fn);
+
+    as_value ret("(a=");
+    newAdd(ret, a, vm);
+    newAdd(ret, ", b=", vm);
+    newAdd(ret, b, vm);
+    newAdd(ret, ", c=", vm);
+    newAdd(ret, c, vm);
+    newAdd(ret, ", d=", vm);
+    newAdd(ret, d, vm);
+    newAdd(ret, ", tx=", vm);
+    newAdd(ret, tx, vm);
+    newAdd(ret, ", ty=", vm);
+    newAdd(ret, ty, vm);
+    newAdd(ret, ")", vm);
+
+    return ret;
+    
     std::ostringstream ss;
     
     const int version = getSWFVersion(fn);
@@ -867,50 +885,18 @@ matrix_ctor(const fn_call& fn)
 {
     as_object* obj = ensure<ValidThis>(fn);
     
-    as_value a, b, c, d, tx, ty;
-
-    if (fn.nargs == 0)
-    {
-        a.set_double(1);
-        b.set_double(0);
-        c.set_double(0);
-        d.set_double(1);
-        tx.set_double(0);
-        ty.set_double(0);
+    if (!fn.nargs) {
+        const string_table::key identity = getStringTable(fn).find("identity");
+        callMethod(obj, identity);
+        return as_value();
     }
-    else
-    {
-        switch (fn.nargs)
-        {
-            default:
-                IF_VERBOSE_ASCODING_ERRORS(
-                    std::ostringstream ss;
-                    fn.dump_args(ss);
-                    log_aserror("Matrix(%s): discarding extra arguments", ss.str());
-                );
-            case 6:
-                ty = fn.arg(5);
-            case 5:
-                tx = fn.arg(4);
-            case 4:
-                d = fn.arg(3);
-            case 3:
-                c = fn.arg(2);
-            case 2:
-                b = fn.arg(1);
-            case 1:
-                a = fn.arg(0);
-                break;
-        }
     
-    }
-
-    obj->set_member(NSV::PROP_TY, ty);
-    obj->set_member(NSV::PROP_TX, tx);
-    obj->set_member(NSV::PROP_D, d);
-    obj->set_member(NSV::PROP_C, c);
-    obj->set_member(NSV::PROP_B, b);
-    obj->set_member(NSV::PROP_A, a);
+    obj->set_member(NSV::PROP_A, fn.arg(0));
+    obj->set_member(NSV::PROP_B, fn.nargs > 1 ? fn.arg(1) : as_value());
+    obj->set_member(NSV::PROP_C, fn.nargs > 2 ? fn.arg(2) : as_value());
+    obj->set_member(NSV::PROP_D, fn.nargs > 3 ? fn.arg(3) : as_value());
+    obj->set_member(NSV::PROP_TX, fn.nargs > 4 ? fn.arg(4) : as_value());
+    obj->set_member(NSV::PROP_TY, fn.nargs > 5 ? fn.arg(5) : as_value());
 
     return as_value(); 
 }

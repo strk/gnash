@@ -225,13 +225,56 @@ Rectangle_contains(const fn_call& fn)
 
 }
 
+
+// This is horrible ActionScript implemented in C++.
 as_value
 Rectangle_containsPoint(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
+
+    as_object* arg = (fn.nargs > 0) ? fn.arg(0).to_object(getGlobal(fn)) : 0;
+    
+    VM& vm = getVM(fn);
+
+    as_value thisx;
+    ptr->get_member(NSV::PROP_X, &thisx);
+    as_value argx;
+    if (arg) arg->get_member(NSV::PROP_X, &argx);
+    
+    // argx >= thisx
+    as_value ret = newLessThan(argx, thisx, vm);
+    if (ret.is_undefined()) return as_value(); 
+    if (ret.to_bool()) return as_value(false); 
+
+    as_value thisw;
+    ptr->get_member(NSV::PROP_WIDTH, &thisw);
+    
+    newAdd(thisx, thisw, vm);
+    ret = newLessThan(argx, thisx, vm);
+    if (ret.is_undefined()) return as_value(); 
+    if (!ret.to_bool()) return as_value(false); 
+ 
+    as_value thisy;
+    ptr->get_member(NSV::PROP_Y, &thisy);
+    as_value argy;
+    if (arg) arg->get_member(NSV::PROP_Y, &argy);
+    
+    // argy >= thisy
+    ret = newLessThan(argy, thisy, vm);
+    if (ret.is_undefined()) return as_value(); 
+    if (ret.to_bool()) return as_value(false); 
+
+    as_value thish;
+    ptr->get_member(NSV::PROP_HEIGHT, &thish);
+    
+    newAdd(thisy, thish, vm);
+    ret = newLessThan(argy, thisy, vm);
+    if (ret.is_undefined()) return as_value(); 
+    if (!ret.to_bool()) return as_value(false); 
+
+    return as_value(true);
+
+
 }
 
 as_value
@@ -334,8 +377,10 @@ as_value
 Rectangle_setEmpty(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    ptr->set_member(NSV::PROP_X, 0.0);
+    ptr->set_member(NSV::PROP_Y, 0.0);
+    ptr->set_member(NSV::PROP_WIDTH, 0.0);
+    ptr->set_member(NSV::PROP_HEIGHT, 0.0);
     return as_value();
 }
 
@@ -351,16 +396,19 @@ Rectangle_toString(const fn_call& fn)
     ptr->get_member(NSV::PROP_WIDTH, &w);
     ptr->get_member(NSV::PROP_HEIGHT, &h);
 
-    std::stringstream ss;
-    const int version = getSWFVersion(fn);
+    VM& vm = getVM(fn);
 
-    ss << "(x=" << x.to_string(version)
-        << ", y=" << y.to_string(version)
-        << ", w=" << w.to_string(version)
-        << ", h=" << h.to_string(version)
-         << ")";
+    as_value ret("(x=");
+    newAdd(ret, x, vm);
+    newAdd(ret, ", y=", vm);
+    newAdd(ret, y, vm);
+    newAdd(ret, ", w=", vm);
+    newAdd(ret, w, vm);
+    newAdd(ret, ", h=", vm);
+    newAdd(ret, h, vm);
+    newAdd(ret, ")", vm);
 
-    return as_value(ss.str());
+    return ret;
 }
 
 as_value
@@ -609,41 +657,17 @@ Rectangle_ctor(const fn_call& fn)
 
     as_object* obj = ensure<ValidThis>(fn);
 
-    as_value x;
-    as_value y;
-    as_value w;
-    as_value h;
-
-    if ( ! fn.nargs )
-    {
-        x.set_double(0);
-        y.set_double(0);
-        w.set_double(0);
-        h.set_double(0);
-    }
-    else
-    {
-        do {
-            x = fn.arg(0);
-            if ( fn.nargs < 2 ) break;
-            y = fn.arg(1);
-            if ( fn.nargs < 3 ) break;
-            w = fn.arg(2);
-            if ( fn.nargs < 4 ) break;
-            h = fn.arg(3);
-            if ( fn.nargs < 5 ) break;
-            IF_VERBOSE_ASCODING_ERRORS(
-                std::stringstream ss;
-                fn.dump_args(ss);
-                log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("arguments after the first four discarded"));
-            );
-        } while(0);
+    if (!fn.nargs) {
+        const string_table::key setEmpty = getStringTable(fn).find("setEmpty");
+        callMethod(obj, setEmpty);
+        return as_value();
     }
 
-    obj->set_member(NSV::PROP_X, x);
-    obj->set_member(NSV::PROP_Y, y);
-    obj->set_member(NSV::PROP_WIDTH, w);
-    obj->set_member(NSV::PROP_HEIGHT, h);
+    // At least one arg
+    obj->set_member(NSV::PROP_X, fn.arg(0));
+    obj->set_member(NSV::PROP_Y, fn.nargs > 1 ? fn.arg(1) : as_value());
+    obj->set_member(NSV::PROP_WIDTH, fn.nargs > 2 ? fn.arg(2) : as_value());
+    obj->set_member(NSV::PROP_HEIGHT, fn.nargs > 3 ? fn.arg(3) : as_value());
 
     return as_value();
 }

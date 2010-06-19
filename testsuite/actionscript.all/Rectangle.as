@@ -358,6 +358,20 @@ check_equals(ret, true);
 // Test containsPoint
 //-------------------------------------------------------------
 
+r0 = new Rectangle(10, 10, 15, 16);
+check_equals(r0.containsPoint({x:4, y:6}), false);
+check_equals(r0.containsPoint({x:11, y:11}), true);
+check_equals(r0.containsPoint({x:10, y:10}), true);
+check_equals(r0.containsPoint({x:10, y:26}), false);
+check_equals(r0.containsPoint({x:10, y:25.9}), true);
+check_equals(r0.containsPoint({x:24.9, y:25.9}), true);
+check_equals(r0.containsPoint({x:25, y:10}), false);
+check_equals(r0.containsPoint({x:-25, y:-10}), false);
+
+check_equals(r0.containsPoint({x:13, y:undefined}), undefined);
+check_equals(r0.containsPoint({x:undefined, y:14}), undefined);
+check_equals(r0.containsPoint({x:"12", y:"12"}), true);
+
 // TODO
 
 //-------------------------------------------------------------
@@ -424,6 +438,6 @@ check_equals(ret, true);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(149);
+check_totals(160);
 
 #endif // OUTPUT_VERSION >= 8
