@@ -158,7 +158,12 @@ clocktime::getTimeZoneOffset(double time)
     struct tm tm;
 
 #ifdef HAVE_LOCALTIME_R
-    localtime_r(&tt, &tm);
+
+    // If the requested time exceeds the limits we return 0; otherwise we'll
+    // be using uninitialized values
+    if (!localtime_r(&tt, &tm)) {
+        return 0;
+    }
 #else
     struct tm *tmp = NULL;
     tmp = localtime(&tt);
@@ -174,7 +179,10 @@ clocktime::getTimeZoneOffset(double time)
     ttmp = mktime(&tm2);
 
 #ifdef HAVE_LOCALTIME_R
-    localtime_r(&ttmp, &tm2);  // find out whether DST is in force
+    // find out whether DST is in force
+    if (!localtime_r(&ttmp, &tm2)) {
+        return 0;
+    }  
 #else
     struct tm *tmp2 = NULL;
     tmp2 = localtime(&ttmp);
