@@ -1315,7 +1315,7 @@ bool
 MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
     ShapeContainerFinder finder(x, y);
-    const_cast<DisplayList&>(_displayList).visitBackward(finder);
+    _displayList.visitBackward(finder);
     if ( finder.hitFound() ) return true;
     return hitTestDrawable(x, y);
 }
@@ -1344,7 +1344,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
         return false;
     }
     VisibleShapeContainerFinder finder(x, y);
-    const_cast<DisplayList&>(_displayList).visitBackward(finder);
+    _displayList.visitBackward(finder);
     if (finder.hitFound()) return true;
     return hitTestDrawable(x, y);
 }
@@ -2040,7 +2040,7 @@ MovieClip::getBounds() const
 {
     SWFRect bounds;
     BoundsFinder f(bounds);
-    const_cast<DisplayList&>(_displayList).visitAll(f);
+    _displayList.visitAll(f);
     SWFRect drawableBounds = _drawable.getBounds();
     bounds.expand_to_rect(drawableBounds);
     
@@ -2051,10 +2051,7 @@ bool
 MovieClip::isEnabled() const
 {
     as_value enabled;
-    // const_cast needed due to get_member being non-const due to the 
-    // possibility that a getter-setter would actually modify us ...
-    if (!getObject(const_cast<MovieClip*>(this))->get_member(NSV::PROP_ENABLED, &enabled))
-    {
+    if (!getObject(this)->get_member(NSV::PROP_ENABLED, &enabled)) {
          // We're enabled if there's no 'enabled' member...
          return true;
     }
