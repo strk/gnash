@@ -225,13 +225,52 @@ Rectangle_contains(const fn_call& fn)
 
 }
 
+
+// This is horrible ActionScript implemented in C++.
 as_value
 Rectangle_containsPoint(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
+
+    as_object* arg = (fn.nargs > 0) ? fn.arg(0).to_object(getGlobal(fn)) : 0;
+    
+    VM& vm = getVM(fn);
+
+    as_value thisx;
+    ptr->get_member(NSV::PROP_X, &thisx);
+    as_value argx;
+    if (arg) arg->get_member(NSV::PROP_X, &argx);
+    
+    // argx >= thisx
+    as_value ret = newLessThan(argx, thisx, vm);
+    if (ret.to_bool()) return as_value(false); 
+
+    as_value thisw;
+    ptr->get_member(NSV::PROP_WIDTH, &thisw);
+    
+    newAdd(thisx, thisw, vm);
+    ret = newLessThan(argx, thisx, vm);
+    if (!ret.to_bool()) return as_value(false); 
+ 
+    as_value thisy;
+    ptr->get_member(NSV::PROP_Y, &thisy);
+    as_value argy;
+    if (arg) arg->get_member(NSV::PROP_Y, &argy);
+    
+    // argy >= thisy
+    ret = newLessThan(argy, thisy, vm);
+    if (ret.to_bool()) return as_value(false); 
+
+    as_value thish;
+    ptr->get_member(NSV::PROP_HEIGHT, &thish);
+    
+    newAdd(thisy, thish, vm);
+    ret = newLessThan(argy, thisy, vm);
+    if (!ret.to_bool()) return as_value(false); 
+
+    return as_value(true);
+
+
 }
 
 as_value
