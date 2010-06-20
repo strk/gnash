@@ -47,7 +47,7 @@ main(int /*argc*/, char** /*argv*/)
 	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 3);
+	check_equals(root->get_frame_count(), 4);
 	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 	check_equals(root->get_current_frame(), 0);
 
@@ -75,14 +75,49 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(cOmr.x, cOmr.y, 4, green, 2); // O right side
 	check_pixel(cOum.x, cOum.y, 20, white, 2); // O underline (none)
 
-	for (int i=0; i<2; ++i) tester.advance(); // get to the end
+    tester.advance();
+
+    // Move to left part of O
+    tester.movePointerTo(cOml.x, cOml.y);
+
+    // Click there
+    tester.click();
+
+    // Move to centre of O
+    tester.movePointerTo(cOmm.x, cOmm.y);
+
+    // Click there a lot (shouldn't be registered)
+    tester.click();
+    tester.click();
+    tester.click();
+    tester.click();
+    tester.click();
+    tester.click();
+    tester.click();
+    tester.click();
+
+    // Move to right part of O
+    tester.movePointerTo(cOmr.x, cOmr.y);
+
+    // Click there.
+    tester.click();
+    tester.movePointerTo(1, 1);
+
+    // Just for fun. These shouldn't be registered.
+    tester.click();
+    tester.click();
+    tester.click();
+    tester.click();
+    tester.click();
+
+	for (int i=0; i<3; ++i) tester.advance(); // get to the end
 
 	string_table& st = VM::get().getStringTable();
 	as_value eot;
 	bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
-	check(endOfTestFound);
-	check(eot.is_bool());
-	check(eot.to_bool());
+	xcheck(endOfTestFound);
+	xcheck(eot.is_bool());
+	xcheck(eot.to_bool());
 
 	// TODO: use check_pixel for checking bacground colors
 }
