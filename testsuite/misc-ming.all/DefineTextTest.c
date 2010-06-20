@@ -101,7 +101,7 @@ main(int argc, char** argv)
     SWFText_addString(tf, "X", NULL);
 
     mc = newSWFMovieClip();
-    it = SWFMovieClip_add(mc, tf);
+    it = SWFMovieClip_add(mc, (SWFBlock)tf);
     SWFDisplayItem_setName(it, "stext1");
     SWFMovieClip_nextFrame(mc);
 
@@ -111,6 +111,42 @@ main(int argc, char** argv)
   }
   SWFMovie_nextFrame(mo);  // 2nd frame
 
+
+  add_actions(mo,
+          "_root.note('Follow the instructions. "
+                    "Click means press and release');"
+		  "instructions = [	"
+          "     'Move the mouse onto the green O',"
+		  "		'Click',"
+	      "		'Move the mouse to the centre of the O',"
+          "     'Click as much as you like then move back onto the green O',"
+          "     'Click',"
+          "     'Move outside the green O' ];"
+		  "_global.events = 0;"
+          "_global.clicks = 0;"
+          "_global.mouseInOut = 0;"
+          "checkEvents = function() {"
+          "     if (_global.events == instructions.length) {"
+          "         play();"
+          "     }"
+          "     else { _root.note(instructions[_global.events++]); };"
+          "};"
+		  "mc.onPress = function() {"
+		  "	    _global.clicks++;"
+          "     checkEvents();"
+		  "};"
+		  "mc.onRollOver = function() {"
+          "     _global.mouseInOut++;"
+          "     checkEvents();"
+		  "};"
+		  "mc.onRollOut = function() {"
+          "     _global.mouseInOut++;"
+          "     checkEvents();"
+		  "};"
+          "checkEvents();"
+		  );
+
+
   // static text is not a referenceable char
   check_equals(mo, "mc.stext1", "mc");
   check_equals(mo, "typeof(mc.stext1)", "'movieclip'");
@@ -118,6 +154,13 @@ main(int argc, char** argv)
 
   check_equals(mo, "mc._width", "288.05");
 
+  // Wait for mouse clicks.
+  add_actions(mo, "stop();");
+
+  SWFMovie_nextFrame(mo);
+
+  check_equals(mo, "_global.clicks", "2");
+  check_equals(mo, "_global.mouseInOut", "4");
   add_actions(mo, "endoftest=true; totals(); stop();");
   SWFMovie_nextFrame(mo);  // 3rd frame
 
