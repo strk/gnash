@@ -159,8 +159,8 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
-  check_equals(mo, "_global.clicks", "2");
-  check_equals(mo, "_global.mouseInOut", "4");
+  xcheck_equals(mo, "_global.clicks", "2");
+  xcheck_equals(mo, "_global.mouseInOut", "4");
   add_actions(mo, "endoftest=true; totals(); stop();");
   SWFMovie_nextFrame(mo);  // 3rd frame
 
