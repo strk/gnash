@@ -71,6 +71,20 @@ ColorTransform_as::ColorTransform_as(double rm, double gm,
 {
 }
 
+void
+ColorTransform_as::concat(const ColorTransform_as& other)
+{
+    _redOffset += _redMultiplier * other.getRedOffset();
+    _greenOffset += _greenMultiplier * other.getGreenOffset();
+    _blueOffset += _blueMultiplier * other.getBlueOffset();
+    _alphaOffset += _alphaMultiplier * other.getAlphaOffset();
+
+    _redMultiplier *= other.getRedMultiplier();
+    _greenMultiplier *= other.getGreenMultiplier();
+    _blueMultiplier *= other.getBlueMultiplier();
+    _alphaMultiplier *= other.getAlphaMultiplier();
+}
+
 // extern 
 void
 colortransform_class_init(as_object& where, const ObjectURI& uri)
@@ -103,12 +117,12 @@ namespace {
 void
 attachColorTransformInterface(as_object& o)
 {
-    const int flags = 0;
     
     /// These have no flags:
+    const int flags = 0;
     VM& vm = getVM(o);
-    o.init_member("concat", vm.getNative(1105, 1), flags);
     Global_as& gl = getGlobal(o);
+    o.init_member("concat", vm.getNative(1105, 1), flags);
     o.init_member("toString", gl.createFunction(colortransform_toString),
             flags);
 
@@ -242,8 +256,19 @@ as_value
 colortransform_concat(const fn_call& fn)
 {
 	ColorTransform_as* relay = ensure<ThisIsNative<ColorTransform_as> >(fn);
-	UNUSED(relay);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (!fn.nargs) {
+        // Log error
+        return as_value();
+    }
+    as_object* o = fn.arg(0).to_object(getGlobal(fn));
+    ColorTransform_as* tr;
+    if (!isNativeType(o, tr)) {
+        return as_value();
+    }
+    
+    relay->concat(*tr);
+
 	return as_value();
 }
 
@@ -264,20 +289,27 @@ colortransform_toString(const fn_call& fn)
     const as_value& rm = ptr->getMember(st.find("redMultiplier"));
     const as_value& ro = ptr->getMember(st.find("redOffset"));
    
-    std::ostringstream ss;
-    
-    const int version = getSWFVersion(fn);
+    VM& vm = getVM(fn);
 
-    ss << "(redMultiplier=" << rm.to_string(version) << ", "
-       << "greenMultiplier=" << gm.to_string(version) << ", "
-       << "blueMultiplier=" << bm.to_string(version) << ", "
-       << "alphaMultiplier=" << am.to_string(version) << ", "
-       << "redOffset=" << ro.to_string(version) << ", "
-       << "greenOffset=" << go.to_string(version) << ", "
-       << "blueOffset=" << bo.to_string(version) << ", "
-       << "alphaOffset=" << ao.to_string(version) << ")";
-       
-    return as_value(ss.str());
+    as_value ret("(redMultiplier=");
+    newAdd(ret, rm, vm);
+    newAdd(ret, ", greenMultiplier=", vm);
+    newAdd(ret, gm, vm);
+    newAdd(ret, ", blueMultiplier=", vm);
+    newAdd(ret, bm, vm);
+    newAdd(ret, ", alphaMultiplier=", vm);
+    newAdd(ret, am, vm);
+    newAdd(ret, ", redOffset=", vm);
+    newAdd(ret, ro, vm);
+    newAdd(ret, ", greenOffset=", vm);
+    newAdd(ret, go, vm);
+    newAdd(ret, ", blueOffset=", vm);
+    newAdd(ret, bo, vm);
+    newAdd(ret, ", alphaOffset=", vm);
+    newAdd(ret, ao, vm);
+    newAdd(ret, ")", vm);
+
+    return ret;
 
 }
 
