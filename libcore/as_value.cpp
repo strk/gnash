@@ -609,11 +609,8 @@ as_value::equals(const as_value& v) const
         return this_nulltype == v_nulltype;
     }
 
-    bool obj_or_func = (_type == OBJECT);
-    bool v_obj_or_func = (v._type == OBJECT);
-
-    /// Compare to same type
-    if (obj_or_func && v_obj_or_func) {
+    /// Compare to same type for objects (including functions).
+    if (_type == OBJECT && v._type == OBJECT) {
         return boost::get<as_object*>(_value) ==
             boost::get<as_object*>(v._value); 
     }
