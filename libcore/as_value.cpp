@@ -573,9 +573,6 @@ as_value::set_as_object(as_object* obj)
 bool
 as_value::equals(const as_value& v) const
 {
-    // Comments starting with numbers refer to the ECMA-262 document
-
-    int SWFVersion = VM::get().getSWFVersion();
 
     // First compare values of the same type.
     if (_type == v._type) return equalsSameType(v);
@@ -584,7 +581,8 @@ as_value::equals(const as_value& v) const
     if (is_bool()) return compareBoolean(*this, v);
     if (v.is_bool()) return compareBoolean(v, *this);
 
-    // Then compare any other primitive with an object.
+    // Then compare any other primitive, including null and undefined, with
+    // an object.
     if (!is_object() && v.is_object()) {
         return objectEqualsPrimitive(v, *this);
     }
@@ -593,34 +591,17 @@ as_value::equals(const as_value& v) const
         return objectEqualsPrimitive(*this, v);
     }
 
-    bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
-    bool v_nulltype = (v._type == UNDEFINED || v._type == NULLTYPE);
-    
-    // It seems like functions are considered the same as a NULL type
-    // in SWF5 (and I hope below, didn't check). But not for the checks above
-    // this point!
-    if (SWFVersion < 6) {
-        if (is_function()) this_nulltype = true;
-        if (v.is_function()) v_nulltype = true;
-    }
-    
-    if (this_nulltype || v_nulltype) {
-        return this_nulltype == v_nulltype;
-    }
+    // Remaining null or undefined values only equate to other null or
+    // undefined values.
+    const bool null = (is_undefined() || is_null());
+    const bool v_null = (v.is_undefined() || v.is_null());
+    if (null || v_null) return null == v_null;
 
     // Now compare a number with a string.
     if (is_number() && v.is_string()) return stringEqualsNumber(v, *this);
     if (is_string() && v.is_number()) return stringEqualsNumber(*this, v);
-
-#ifdef GNASH_DEBUG_EQUALITY
-    // Both operands are objects (OBJECT,DISPLAYOBJECT)
-    if (!is_object() || !v.is_object()) {
-        log_debug("Equals(%s,%s)", *this, v);
-    }
-#endif
-
-    // If any of the two converts to a primitive, we recurse
-
+    
+    // Finally compare two objects.
     as_value p = *this;
     as_value vp = v;
 
@@ -629,45 +610,22 @@ as_value::equals(const as_value& v) const
     try {
         p = to_primitive(NUMBER); 
         if (!strictly_equals(p)) converted = true;
-#ifdef GNASH_DEBUG_EQUALITY
-        log_debug(" conversion to primitive (this): %s -> %s", *this, p);
-#endif
     }
     catch (ActionTypeError& e) {
-#ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
-        log_debug(" %s.to_primitive() threw an ActionTypeError %s",
-            *this, e.what());
-#endif
     }
 
     try {
         vp = v.to_primitive(NUMBER); 
         if (!v.strictly_equals(vp)) converted = true;
-#ifdef GNASH_DEBUG_EQUALITY
-        log_debug(" conversion to primitive (that): %s -> %s", v, vp);
-#endif
     }
     catch (ActionTypeError& e) {
-#ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
-        log_debug(" %s.to_primitive() threw an ActionTypeError %s",
-            v, e.what());
-#endif
     }
 
-    if (converted)
-    {
-#ifdef GNASH_DEBUG_EQUALITY
-        log_debug(" some conversion took place, recursing");
-#endif
+    if (converted) {
         return p.equals(vp);
     }
-    else {
-#ifdef GNASH_DEBUG_EQUALITY
-        log_debug(" no conversion took place, returning false");
-#endif
-        return false;
-    }
-
+    
+    return false;
 
 }
     
