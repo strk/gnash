@@ -576,11 +576,10 @@ as_value::equals(const as_value& v) const
 
     int SWFVersion = VM::get().getSWFVersion();
 
-    bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
-    bool v_nulltype = (v._type == UNDEFINED || v._type == NULLTYPE);
+    // First compare values of the same type.
+    if (_type == v._type) return equalsSameType(v);
     
-    
-    // First compare booleans.
+    // Then compare booleans.
     if (is_bool()) return compareBoolean(*this, v);
     if (v.is_bool()) return compareBoolean(v, *this);
 
@@ -593,6 +592,9 @@ as_value::equals(const as_value& v) const
         return objectEqualsPrimitive(*this, v);
     }
 
+    bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
+    bool v_nulltype = (v._type == UNDEFINED || v._type == NULLTYPE);
+    
     // It seems like functions are considered the same as a NULL type
     // in SWF5 (and I hope below, didn't check). But not for the checks above
     // this point!
@@ -604,8 +606,6 @@ as_value::equals(const as_value& v) const
     if (this_nulltype || v_nulltype) {
         return this_nulltype == v_nulltype;
     }
-
-    if (_type == v._type) return equalsSameType(v);
 
     // 16. If Type(x) is Number and Type(y) is String,
     //    return the result of the comparison x == ToNumber(y).
