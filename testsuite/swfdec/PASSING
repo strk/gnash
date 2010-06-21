@@ -230,6 +230,7 @@ color-setTransform-negative.swf:0bc0510c35fc5c82de31b0db887fe535
 color-transform-concat-5.swf:92f467ed0cee02fbc9618a17c382ef3b
 color-transform-concat-6.swf:10677612a1795de193f9a8a7b99eaaa5
 color-transform-concat-7.swf:df14e747698a6513f73990f6726944b0
+color-transform-concat-8.swf:661a4bc180477ae2b75cc650d97e4688
 color-transform-construct-6.swf:ce54eb919f4069cd3ab70f84bfd31670
 color-transform-construct-7.swf:7c50d7d221a731c2296789f434b718e4
 color-transform-construct-8.swf:d68ee06d60eb6612648365ab75f6b794
@@ -241,6 +242,8 @@ color-transform-properties-5.swf:7e620e53cb1e19d5793e3198e9f08993
 color-transform-properties-6.swf:3946bb0de3a610f1a690b43b1fe48f70
 color-transform-properties-7.swf:f1e3056a0a679136529e317550797e63
 color-transform-properties-8.swf:23fff32f746e8267cf86d464e52727df
+color-transform-rgb-6.swf:7e40f9477cdd8036a25cb4e48acf6437
+color-transform-rgb-7.swf:915b6105e107e378d2b610ffff3486ce
 comparisons-4.swf:e0bb89e492f3f35e51b1beb190935a14
 comparisons-5.swf:d4dfeb4ec80ec1f5a7390eb699e269ee
 comparisons-6.swf:5a7bf1ffb3a4dd23828d6e180f1871b0
@@ -1432,6 +1435,7 @@ too-many-blocks-8.swf:882a04f9f7aa70a2994c88532d1dcc12
 totalframes.swf:cdc0d5e2017d293438ef80fa136c44e8
 transform2.swf:95d19c9ed6592c459d7f6836a0365df2
 transform-color-transform-5.swf:1b03afaa179024037f5d167556b3f7a9
+transform-color-transform-8.swf:e399d3c5e18ac09728653808ba14af89
 Transform-matrix-5.swf:ae65136f5adbcd6dfec68760f7d1d7b4
 Transform-matrix-6.swf:45c037253c5fbac0a80753a5d194f60c
 Transform-matrix-7.swf:c4110453b8151dd87efff882e5b312ca
