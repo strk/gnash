@@ -321,48 +321,16 @@ function_call(const fn_call& fn)
 	// the copy only if needed
 	fn_call new_fn_call(fn);
 
-	if (!fn.nargs) {
-		new_fn_call.nargs = 0;
-        new_fn_call.this_ptr = new as_object(getGlobal(fn));
-	}
-	else {
-		// Get the object to use as 'this' reference
-		as_value this_val = fn.arg(0);
-        as_object* this_ptr;
+    as_object* tp;
 
-        if (this_val.is_null() || this_val.is_undefined()) this_ptr = new as_object(getGlobal(fn));
-        else this_ptr = this_val.to_object(getGlobal(fn));
+    if (!fn.nargs || fn.arg(0).is_undefined() || fn.arg(0).is_null()) {
+        tp = new as_object(getGlobal(fn));
+    }
+    else tp = fn.arg(0).to_object(getGlobal(fn));
 
-		if (!this_ptr) {
-			// If the first argument is not an object, we should
-			// not pass an object to the function, which I believe
-			// should be allowed (but gnash code is not ready).
-			// Anyway, the 'this' label inside the function should 
-			// then be a strange object in that typeof() would return
-			// 'object' but when compared to undefined matches !!
-			// See actionscript.all/Function.as
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("First argument to Function.call(%s) doesn't "
-                "cast to object. "
-				"Gnash will keep the current 'this' pointer as it is, "
-				"but this is known to not be the correct way to handle "
-				"such a malformed call."), this_val);
-			);
-		}
-		else {
-			new_fn_call.this_ptr = this_ptr;
-            // Note: do not override fn_call::super by creating a super
-            // object, as it may not be needed. Doing so can have a very
-            // detrimental effect on memory usage!
-            // Normal supers will be created when needed in the function
-            // call.
-
-            // TODO: it seems pointless to copy the old fn_call and
-            // then change almost everything...
-            new_fn_call.super = 0;
-		}
-		new_fn_call.drop_bottom();
-	}
+    new_fn_call.this_ptr = tp;
+    new_fn_call.super = 0;
+    if (fn.nargs) new_fn_call.drop_bottom();
 
 	// Call the function 
 	return function_obj->call(new_fn_call);
