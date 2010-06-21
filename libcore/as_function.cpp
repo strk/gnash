@@ -323,11 +323,15 @@ function_call(const fn_call& fn)
 
 	if (!fn.nargs) {
 		new_fn_call.nargs = 0;
+        new_fn_call.this_ptr = new as_object(getGlobal(fn));
 	}
 	else {
 		// Get the object to use as 'this' reference
 		as_value this_val = fn.arg(0);
-		as_object* this_ptr = this_val.to_object(getGlobal(fn));
+        as_object* this_ptr;
+
+        if (this_val.is_null() || this_val.is_undefined()) this_ptr = new as_object(getGlobal(fn));
+        else this_ptr = this_val.to_object(getGlobal(fn));
 
 		if (!this_ptr) {
 			// If the first argument is not an object, we should
