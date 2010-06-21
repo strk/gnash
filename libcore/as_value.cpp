@@ -64,6 +64,7 @@ namespace gnash {
 
 namespace {
     bool objectEqualsPrimitive(const as_value& obj, const as_value& prim);
+    bool compareBoolean(const as_value& boolean, const as_value& other);
     inline bool findMethod(as_object& obj, string_table::key m, as_value& ret);
     boost::int32_t truncateToInt(double d);
 }
@@ -577,18 +578,18 @@ as_value::equals(const as_value& v) const
 
     bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
     bool v_nulltype = (v._type == UNDEFINED || v._type == NULLTYPE);
+    
+    
+    // First compare booleans.
+    if (is_bool()) return compareBoolean(*this, v);
+    if (v.is_bool()) return compareBoolean(v, *this);
 
-    // 20. If Type(x) is either String or Number and Type(y) is Object,
-    //     return the result of the comparison x == ToPrimitive(y).
-    if ((this_nulltype || _type == STRING || _type == NUMBER) &&
-            (v._type == OBJECT)) {
+    // Then compare any other primitive with an object.
+    if (!is_object() && v.is_object()) {
         return objectEqualsPrimitive(v, *this);
     }
 
-    // 21. If Type(x) is Object and Type(y) is either String or Number,
-    //    return the result of the comparison ToPrimitive(x) == y.
-    if ((v_nulltype || v._type == STRING || v._type == NUMBER) &&
-            (_type == OBJECT)) {
+    if (is_object() && !v.is_object()) {
         return objectEqualsPrimitive(*this, v);
     }
 
@@ -626,16 +627,6 @@ as_value::equals(const as_value& v) const
         const double n = to_number();
         if (!isFinite(n)) return false;
         return v.equalsSameType(n); 
-    }
-
-    // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
-    if (_type == BOOLEAN) {
-        return as_value(to_number()).equals(v); 
-    }
-
-    // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
-    if (v._type == BOOLEAN) {
-        return as_value(v.to_number()).equals(*this); 
     }
 
 #ifdef GNASH_DEBUG_EQUALITY
@@ -1194,6 +1185,15 @@ try {
 }
 catch (const ActionTypeError&) {
     return false;
+}
+
+/// @param boolean      A boolean as_value
+/// @param other        An as_value of any type.
+bool
+compareBoolean(const as_value& boolean, const as_value& other)
+{
+    assert(boolean.is_bool());
+    return as_value(boolean.to_number()).equals(other); 
 }
 
 /// Returns a member only if it is an object.
