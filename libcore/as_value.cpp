@@ -602,52 +602,24 @@ as_value::equals(const as_value& v) const
         if (v.is_function()) v_nulltype = true;
     }
 
-    if (v._type == UNDEFINED && _type == OBJECT) {
+    // An object that doesn't convert to a primitive string is equal to
+    // undefined or null.
+    if (v_nulltype && _type == OBJECT) {
         try {
             to_primitive(STRING); 
         }
         catch (ActionTypeError&) { return true; }
     }
-
+    
+    if (this_nulltype && v._type == OBJECT) {
+        try {
+            v.to_primitive(STRING); 
+        }
+        catch (ActionTypeError&) { return true; }
+    }
+    
     if (this_nulltype || v_nulltype) {
-#ifdef GNASH_DEBUG_EQUALITY
-       log_debug(" one of the two things is undefined or null");
-#endif
         return this_nulltype == v_nulltype;
-    }
-
-    /// Compare to same type for objects (including functions).
-    if (_type == OBJECT && v._type == OBJECT) {
-        return boost::get<as_object*>(_value) ==
-            boost::get<as_object*>(v._value); 
-    }
-
-    if (_type == v._type) return equalsSameType(v);
-
-    // 16. If Type(x) is Number and Type(y) is String,
-    //    return the result of the comparison x == ToNumber(y).
-    if (_type == NUMBER && v._type == STRING) {
-        const double n = v.to_number();
-        if (!isFinite(n)) return false;
-        return equalsSameType(n);
-    }
-
-    // 17. If Type(x) is String and Type(y) is Number,
-    //     return the result of the comparison ToNumber(x) == y.
-    if (v._type == NUMBER && _type == STRING) {
-        const double n = to_number();
-        if (!isFinite(n)) return false;
-        return v.equalsSameType(n); 
-    }
-
-    // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
-    if (_type == BOOLEAN) {
-        return as_value(to_number()).equals(v); 
-    }
-
-    // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
-    if (v._type == BOOLEAN) {
-        return as_value(v.to_number()).equals(*this); 
     }
 
     // 20. If Type(x) is either String or Number and Type(y) is Object,
@@ -693,6 +665,41 @@ as_value::equals(const as_value& v) const
 #endif
             return false; 
         }
+    }
+
+
+    /// Compare to same type for objects (including functions).
+    if (_type == OBJECT && v._type == OBJECT) {
+        return boost::get<as_object*>(_value) ==
+            boost::get<as_object*>(v._value); 
+    }
+
+    if (_type == v._type) return equalsSameType(v);
+
+    // 16. If Type(x) is Number and Type(y) is String,
+    //    return the result of the comparison x == ToNumber(y).
+    if (_type == NUMBER && v._type == STRING) {
+        const double n = v.to_number();
+        if (!isFinite(n)) return false;
+        return equalsSameType(n);
+    }
+
+    // 17. If Type(x) is String and Type(y) is Number,
+    //     return the result of the comparison ToNumber(x) == y.
+    if (v._type == NUMBER && _type == STRING) {
+        const double n = to_number();
+        if (!isFinite(n)) return false;
+        return v.equalsSameType(n); 
+    }
+
+    // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
+    if (_type == BOOLEAN) {
+        return as_value(to_number()).equals(v); 
+    }
+
+    // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
+    if (v._type == BOOLEAN) {
+        return as_value(v.to_number()).equals(*this); 
     }
 
 #ifdef GNASH_DEBUG_EQUALITY
