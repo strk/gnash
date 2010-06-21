@@ -123,7 +123,7 @@ s = new String("hello");
 #if OUTPUT_VERSION == 5
 check_equals(s, undefined);
 #else
-xcheck_equals(s, undefined);
+check_equals(s, undefined);
 #endif
 check_equals(s.__proto__, 8);
 check_equals(typeof(s), "object");
@@ -133,7 +133,7 @@ s = new Object("hello");
 #if OUTPUT_VERSION == 5
 check_equals(s, undefined);
 #else
-xcheck_equals(s, undefined);
+check_equals(s, undefined);
 #endif
 
 Cl = function() {};
