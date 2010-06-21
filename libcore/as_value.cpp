@@ -578,33 +578,17 @@ as_value::equals(const as_value& v) const
     bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
     bool v_nulltype = (v._type == UNDEFINED || v._type == NULLTYPE);
 
-    // An object that doesn't convert to a primitive string is equal to
-    // undefined or null.
-    if (v_nulltype && _type == OBJECT) {
-        try {
-            as_value v2 = to_primitive(NUMBER);
-            return (v2.is_undefined() || v2.is_null());
-        }
-        catch (ActionTypeError&) { return false; }
-    }
-    
-    if (this_nulltype && v._type == OBJECT) {
-        try {
-            as_value v2 = v.to_primitive(NUMBER);
-            return (v2.is_undefined() || v2.is_null());
-        }
-        catch (ActionTypeError&) { return false; }
-    }
-
     // 20. If Type(x) is either String or Number and Type(y) is Object,
     //     return the result of the comparison x == ToPrimitive(y).
-    if ((_type == STRING || _type == NUMBER) && (v._type == OBJECT)) {
+    if ((this_nulltype || _type == STRING || _type == NUMBER) &&
+            (v._type == OBJECT)) {
         return objectEqualsPrimitive(v, *this);
     }
 
     // 21. If Type(x) is Object and Type(y) is either String or Number,
     //    return the result of the comparison ToPrimitive(x) == y.
-    if ((v._type == STRING || v._type == NUMBER) && (_type == OBJECT)) {
+    if ((v_nulltype || v._type == STRING || v._type == NUMBER) &&
+            (_type == OBJECT)) {
         return objectEqualsPrimitive(*this, v);
     }
 
