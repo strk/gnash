@@ -198,7 +198,7 @@ check_equals(node2.previousSibling.nodeValue, "first text node");
 
 // FIXME: This is how it is now.
 #if OUTPUT_VERSION > 5
-xcheck_equals(node2.attributes, undefined);
+check_equals(node2.attributes, undefined);
 #else
 check_equals(node2.attributes, undefined);
 #endif
