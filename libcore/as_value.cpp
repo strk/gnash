@@ -64,6 +64,7 @@ namespace gnash {
 
 namespace {
     bool objectEqualsPrimitive(const as_value& obj, const as_value& prim);
+    bool stringEqualsNumber(const as_value& str, const as_value& num);
     bool compareBoolean(const as_value& boolean, const as_value& other);
     inline bool findMethod(as_object& obj, string_table::key m, as_value& ret);
     boost::int32_t truncateToInt(double d);
@@ -607,21 +608,9 @@ as_value::equals(const as_value& v) const
         return this_nulltype == v_nulltype;
     }
 
-    // 16. If Type(x) is Number and Type(y) is String,
-    //    return the result of the comparison x == ToNumber(y).
-    if (_type == NUMBER && v._type == STRING) {
-        const double n = v.to_number();
-        if (!isFinite(n)) return false;
-        return equalsSameType(n);
-    }
-
-    // 17. If Type(x) is String and Type(y) is Number,
-    //     return the result of the comparison ToNumber(x) == y.
-    if (v._type == NUMBER && _type == STRING) {
-        const double n = to_number();
-        if (!isFinite(n)) return false;
-        return v.equalsSameType(n); 
-    }
+    // Now compare a number with a string.
+    if (is_number() && v.is_string()) return stringEqualsNumber(v, *this);
+    if (is_string() && v.is_number()) return stringEqualsNumber(*this, v);
 
 #ifdef GNASH_DEBUG_EQUALITY
     // Both operands are objects (OBJECT,DISPLAYOBJECT)
@@ -1189,6 +1178,16 @@ compareBoolean(const as_value& boolean, const as_value& other)
     assert(boolean.is_bool());
     return as_value(boolean.to_number()).equals(other); 
 }
+
+bool
+stringEqualsNumber(const as_value& str, const as_value& num) {
+    assert(num.is_number());
+    assert(str.is_string());
+    const double n = str.to_number();
+    if (!isFinite(n)) return false;
+    return num.strictly_equals(n);
+}
+
 
 /// Returns a member only if it is an object.
 inline bool
