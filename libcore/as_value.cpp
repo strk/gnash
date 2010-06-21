@@ -602,6 +602,13 @@ as_value::equals(const as_value& v) const
         if (v.is_function()) v_nulltype = true;
     }
 
+    if (v._type == UNDEFINED && _type == OBJECT) {
+        try {
+            to_primitive(STRING); 
+        }
+        catch (ActionTypeError&) { return true; }
+    }
+
     if (this_nulltype || v_nulltype) {
 #ifdef GNASH_DEBUG_EQUALITY
        log_debug(" one of the two things is undefined or null");
