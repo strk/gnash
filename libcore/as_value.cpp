@@ -605,12 +605,6 @@ as_value::equals(const as_value& v) const
         return this_nulltype == v_nulltype;
     }
 
-    /// Compare to same type for objects (including functions).
-    if (_type == OBJECT && v._type == OBJECT) {
-        return boost::get<as_object*>(_value) ==
-            boost::get<as_object*>(v._value); 
-    }
-
     if (_type == v._type) return equalsSameType(v);
 
     // 16. If Type(x) is Number and Type(y) is String,
