@@ -66,6 +66,7 @@ public:
     double getBlueOffset() const { return _blueOffset; }
     double getGreenOffset() const { return _greenOffset; }
 
+    void concat(const ColorTransform_as& other);
 
 private:
 

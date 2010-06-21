@@ -293,7 +293,7 @@ check_equals (obj3.len2, 'test');
 obj3.__proto__ = undefined;
 check_equals(typeof(obj3), "object");
 check_equals(typeof(obj3.__proto__), 'undefined');
-xcheck_equals(obj3, undefined);
+check_equals(obj3, undefined);
 
 // Use name of an existing property
 

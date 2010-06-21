@@ -158,8 +158,8 @@ check_equals(ret, o);
 check_equals(c, 1);
 ret = getThis.call(null);
 check_equals(c, 2);
-xcheck_equals(typeof(ret), 'object');
-xcheck_equals(ret, undefined); // an object type which returns 'undefined' as primitive value ?
+check_equals(typeof(ret), 'object');
+check_equals(ret, undefined); // an object type which returns 'undefined' as primitive value ?
 check( ! (ret === undefined) ); // an object type which returns 'undefined' as primitive value ?
 check( ! (ret === null) ); // an object type which returns 'undefined' as primitive value ?
 

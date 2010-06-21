@@ -63,29 +63,14 @@
 namespace gnash {
 
 namespace {
-
-/// Returns a member only if it is an object.
-inline bool
-findMethod(as_object& obj, string_table::key m, as_value& ret)
-{
-    return obj.get_member(m, &ret) && ret.is_object();
+    bool objectEqualsPrimitive(const as_value& obj, const as_value& prim);
+    bool stringEqualsNumber(const as_value& str, const as_value& num);
+    bool compareBoolean(const as_value& boolean, const as_value& other);
+    inline bool findMethod(as_object& obj, string_table::key m, as_value& ret);
+    boost::int32_t truncateToInt(double d);
 }
 
-/// Truncates a double to a 32-bit unsigned int.
-//
-/// In fact, it is a 32-bit unsigned int with an additional sign, cast
-/// to an unsigned int. Not sure what the sense is, but that's how it works:
-//
-/// 0xffffffff is interpreted as -1, -0xffffffff as 1.
-boost::int32_t
-truncateToInt(double d)
-{
-    if (d < 0) {   
-        return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
-    }
-    
-    return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
-}
+namespace {
 
 enum Base
 {
@@ -588,166 +573,54 @@ as_value::set_as_object(as_object* obj)
 bool
 as_value::equals(const as_value& v) const
 {
-    // Comments starting with numbers refer to the ECMA-262 document
 
-    int SWFVersion = VM::get().getSWFVersion();
-
-    bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
-    bool v_nulltype = (v._type == UNDEFINED || v._type == NULLTYPE);
-
-    // It seems like functions are considered the same as a NULL type
-    // in SWF5 (and I hope below, didn't check)
-    if (SWFVersion < 6) {
-        if (is_function()) this_nulltype = true;
-        if (v.is_function()) v_nulltype = true;
-    }
-
-    if (this_nulltype || v_nulltype) {
-#ifdef GNASH_DEBUG_EQUALITY
-       log_debug(" one of the two things is undefined or null");
-#endif
-        return this_nulltype == v_nulltype;
-    }
-
-    bool obj_or_func = (_type == OBJECT);
-    bool v_obj_or_func = (v._type == OBJECT);
-
-    /// Compare to same type
-    if (obj_or_func && v_obj_or_func) {
-        return boost::get<as_object*>(_value) ==
-            boost::get<as_object*>(v._value); 
-    }
-
+    // First compare values of the same type.
     if (_type == v._type) return equalsSameType(v);
+    
+    // Then compare booleans.
+    if (is_bool()) return compareBoolean(*this, v);
+    if (v.is_bool()) return compareBoolean(v, *this);
 
-    // 16. If Type(x) is Number and Type(y) is String,
-    //    return the result of the comparison x == ToNumber(y).
-    if (_type == NUMBER && v._type == STRING) {
-        const double n = v.to_number();
-        if (!isFinite(n)) return false;
-        return equalsSameType(n);
+    // Then compare any other primitive, including null and undefined, with
+    // an object.
+    if (!is_object() && v.is_object()) {
+        return objectEqualsPrimitive(v, *this);
     }
 
-    // 17. If Type(x) is String and Type(y) is Number,
-    //     return the result of the comparison ToNumber(x) == y.
-    if (v._type == NUMBER && _type == STRING) {
-        const double n = to_number();
-        if (!isFinite(n)) return false;
-        return v.equalsSameType(n); 
+    if (is_object() && !v.is_object()) {
+        return objectEqualsPrimitive(*this, v);
     }
 
-    // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
-    if (_type == BOOLEAN) {
-        return as_value(to_number()).equals(v); 
-    }
+    // Remaining null or undefined values only equate to other null or
+    // undefined values.
+    const bool null = (is_undefined() || is_null());
+    const bool v_null = (v.is_undefined() || v.is_null());
+    if (null || v_null) return null == v_null;
 
-    // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
-    if (v._type == BOOLEAN) {
-        return as_value(v.to_number()).equals(*this); 
-    }
-
-    // 20. If Type(x) is either String or Number and Type(y) is Object,
-    //     return the result of the comparison x == ToPrimitive(y).
-    if ((_type == STRING || _type == NUMBER) && (v._type == OBJECT))
-    {
-        // convert this value to a primitive and recurse
-        try {
-            as_value v2 = v.to_primitive(v.defaultPrimitive(SWFVersion)); 
-            if (v.strictly_equals(v2)) return false;
-#ifdef GNASH_DEBUG_EQUALITY
-            log_debug(" 20: convertion to primitive : %s -> %s", v, v2);
-#endif
-            return equals(v2);
-        }
-        catch (ActionTypeError& e) {
-#ifdef GNASH_DEBUG_EQUALITY
-            log_debug(" %s.to_primitive() threw an ActionTypeError %s", v,
-                    e.what());
-#endif
-            return false; 
-        }
-    }
-
-    // 21. If Type(x) is Object and Type(y) is either String or Number,
-    //    return the result of the comparison ToPrimitive(x) == y.
-    if ((v._type == STRING || v._type == NUMBER) && (_type == OBJECT)) {
-        // convert this value to a primitive and recurse
-        try {
-            // Date objects default to primitive type STRING from SWF6 up,
-            // but we always prefer valueOf to toString in this case.
-            as_value v2 = to_primitive(NUMBER); 
-            if (strictly_equals(v2)) return false;
-#ifdef GNASH_DEBUG_EQUALITY
-            log_debug(" 21: convertion to primitive : %s -> %s", *this, v2);
-#endif
-            return v2.equals(v);
-        }
-        catch (ActionTypeError& e) {
-#ifdef GNASH_DEBUG_EQUALITY
-            log_debug(" %s.to_primitive() threw an ActionTypeError %s",
-                    *this, e.what());
-#endif
-            return false; 
-        }
-    }
-
-#ifdef GNASH_DEBUG_EQUALITY
-    // Both operands are objects (OBJECT,DISPLAYOBJECT)
-    if (!is_object() || !v.is_object()) {
-        log_debug("Equals(%s,%s)", *this, v);
-    }
-#endif
-
-    // If any of the two converts to a primitive, we recurse
-
+    // Now compare a number with a string.
+    if (is_number() && v.is_string()) return stringEqualsNumber(v, *this);
+    if (is_string() && v.is_number()) return stringEqualsNumber(*this, v);
+    
+    // Finally compare non-identical objects.
     as_value p = *this;
     as_value vp = v;
 
-    bool converted(false);
+    try {
+        p = to_primitive(NUMBER); 
+    }
+    catch (ActionTypeError& e) {}
 
     try {
-        p = to_primitive(p.defaultPrimitive(SWFVersion)); 
-        if (!strictly_equals(p)) converted = true;
-#ifdef GNASH_DEBUG_EQUALITY
-        log_debug(" conversion to primitive (this): %s -> %s", *this, p);
-#endif
+        vp = v.to_primitive(NUMBER); 
     }
-    catch (ActionTypeError& e) {
-#ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
-        log_debug(" %s.to_primitive() threw an ActionTypeError %s",
-            *this, e.what());
-#endif
-    }
+    catch (ActionTypeError& e) {}
 
-    try {
-        vp = v.to_primitive(v.defaultPrimitive(SWFVersion)); 
-        if (!v.strictly_equals(vp)) converted = true;
-#ifdef GNASH_DEBUG_EQUALITY
-        log_debug(" conversion to primitive (that): %s -> %s", v, vp);
-#endif
-    }
-    catch (ActionTypeError& e) {
-#ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
-        log_debug(" %s.to_primitive() threw an ActionTypeError %s",
-            v, e.what());
-#endif
-    }
-
-    if (converted)
-    {
-#ifdef GNASH_DEBUG_EQUALITY
-        log_debug(" some conversion took place, recursing");
-#endif
-        return p.equals(vp);
-    }
-    else {
-#ifdef GNASH_DEBUG_EQUALITY
-        log_debug(" no conversion took place, returning false");
-#endif
+    // No conversion took place; the result is false
+    if (strictly_equals(p) && v.strictly_equals(vp)) {
         return false;
     }
-
-
+    
+    return p.equals(vp);
 }
     
 const char*
@@ -1223,6 +1096,76 @@ convertToPrimitive(as_value& v, VM& vm)
     v = v.to_primitive(t);
     return v;
 }
+
+namespace {
+
+/// Checks for equality between an object value and a primitive value
+//
+/// @param obj      An as_value of object type. Callers must ensure this
+///                 condition is met.
+/// @param prim     An as_value of primitive type. Callers must ensure this
+///                 condition is met.
+//
+/// This is a function try-block.
+bool
+objectEqualsPrimitive(const as_value& obj, const as_value& prim)
+try {
+
+    assert(obj.is_object());
+    assert(!prim.is_object());
+
+    as_value tmp = obj.to_primitive(as_value::NUMBER);
+    if (obj.strictly_equals(tmp)) return false;
+    return tmp.equals(prim);
+}
+catch (const ActionTypeError&) {
+    return false;
+}
+
+/// @param boolean      A boolean as_value
+/// @param other        An as_value of any type.
+bool
+compareBoolean(const as_value& boolean, const as_value& other)
+{
+    assert(boolean.is_bool());
+    return as_value(boolean.to_number()).equals(other); 
+}
+
+bool
+stringEqualsNumber(const as_value& str, const as_value& num) {
+    assert(num.is_number());
+    assert(str.is_string());
+    const double n = str.to_number();
+    if (!isFinite(n)) return false;
+    return num.strictly_equals(n);
+}
+
+
+/// Returns a member only if it is an object.
+inline bool
+findMethod(as_object& obj, string_table::key m, as_value& ret)
+{
+    return obj.get_member(m, &ret) && ret.is_object();
+}
+
+/// Truncates a double to a 32-bit unsigned int.
+//
+/// In fact, it is a 32-bit unsigned int with an additional sign, cast
+/// to an unsigned int. Not sure what the sense is, but that's how it works:
+//
+/// 0xffffffff is interpreted as -1, -0xffffffff as 1.
+boost::int32_t
+truncateToInt(double d)
+{
+    if (d < 0) {   
+        return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
+    }
+    
+    return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
+}
+
+} // unnamed namespace
+
 
 } // namespace gnash
 

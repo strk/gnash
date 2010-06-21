@@ -682,18 +682,6 @@ matrix_toString(const fn_call& fn)
 
     return ret;
     
-    std::ostringstream ss;
-    
-    const int version = getSWFVersion(fn);
-
-    ss << "(a=" << a.to_string(version) << ", "
-          "b="<< b.to_string(version) << ", "
-          "c="<< c.to_string(version) << ", "
-          "d="<< d.to_string(version) << ", "
-          "tx="<< tx.to_string(version) << ", "
-          "ty="<< ty.to_string(version) << ")";
-    
-    return as_value(ss.str());
 }
 
 as_value
