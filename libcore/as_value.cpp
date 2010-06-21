@@ -601,32 +601,26 @@ as_value::equals(const as_value& v) const
     if (is_number() && v.is_string()) return stringEqualsNumber(v, *this);
     if (is_string() && v.is_number()) return stringEqualsNumber(*this, v);
     
-    // Finally compare two objects.
+    // Finally compare non-identical objects.
     as_value p = *this;
     as_value vp = v;
 
-    bool converted(false);
-
     try {
         p = to_primitive(NUMBER); 
-        if (!strictly_equals(p)) converted = true;
     }
-    catch (ActionTypeError& e) {
-    }
+    catch (ActionTypeError& e) {}
 
     try {
         vp = v.to_primitive(NUMBER); 
-        if (!v.strictly_equals(vp)) converted = true;
     }
-    catch (ActionTypeError& e) {
-    }
+    catch (ActionTypeError& e) {}
 
-    if (converted) {
-        return p.equals(vp);
+    // No conversion took place; the result is false
+    if (strictly_equals(p) && v.strictly_equals(vp)) {
+        return false;
     }
     
-    return false;
-
+    return p.equals(vp);
 }
     
 const char*
