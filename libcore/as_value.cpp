@@ -595,27 +595,30 @@ as_value::equals(const as_value& v) const
     bool this_nulltype = (_type == UNDEFINED || _type == NULLTYPE);
     bool v_nulltype = (v._type == UNDEFINED || v._type == NULLTYPE);
 
-    // It seems like functions are considered the same as a NULL type
-    // in SWF5 (and I hope below, didn't check)
-    if (SWFVersion < 6) {
-        if (is_function()) this_nulltype = true;
-        if (v.is_function()) v_nulltype = true;
-    }
-
     // An object that doesn't convert to a primitive string is equal to
     // undefined or null.
     if (v_nulltype && _type == OBJECT) {
         try {
-            to_primitive(STRING); 
+            as_value v2 = to_primitive(NUMBER);
+            return (v2.is_undefined() || v2.is_null());
         }
-        catch (ActionTypeError&) { return true; }
+        catch (ActionTypeError&) { return false; }
     }
     
     if (this_nulltype && v._type == OBJECT) {
         try {
-            v.to_primitive(STRING); 
+            as_value v2 = v.to_primitive(NUMBER);
+            return (v2.is_undefined() || v2.is_null());
         }
-        catch (ActionTypeError&) { return true; }
+        catch (ActionTypeError&) { return false; }
+    }
+
+    // It seems like functions are considered the same as a NULL type
+    // in SWF5 (and I hope below, didn't check). But not for the checks above
+    // this point!
+    if (SWFVersion < 6) {
+        if (is_function()) this_nulltype = true;
+        if (v.is_function()) v_nulltype = true;
     }
     
     if (this_nulltype || v_nulltype) {
@@ -628,7 +631,7 @@ as_value::equals(const as_value& v) const
     {
         // convert this value to a primitive and recurse
         try {
-            as_value v2 = v.to_primitive(v.defaultPrimitive(SWFVersion)); 
+            as_value v2 = v.to_primitive(NUMBER); 
             if (v.strictly_equals(v2)) return false;
 #ifdef GNASH_DEBUG_EQUALITY
             log_debug(" 20: convertion to primitive : %s -> %s", v, v2);
