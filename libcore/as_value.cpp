@@ -627,7 +627,7 @@ as_value::equals(const as_value& v) const
     bool converted(false);
 
     try {
-        p = to_primitive(p.defaultPrimitive(SWFVersion)); 
+        p = to_primitive(NUMBER); 
         if (!strictly_equals(p)) converted = true;
 #ifdef GNASH_DEBUG_EQUALITY
         log_debug(" conversion to primitive (this): %s -> %s", *this, p);
@@ -641,7 +641,7 @@ as_value::equals(const as_value& v) const
     }
 
     try {
-        vp = v.to_primitive(v.defaultPrimitive(SWFVersion)); 
+        vp = v.to_primitive(NUMBER); 
         if (!v.strictly_equals(vp)) converted = true;
 #ifdef GNASH_DEBUG_EQUALITY
         log_debug(" conversion to primitive (that): %s -> %s", v, vp);
