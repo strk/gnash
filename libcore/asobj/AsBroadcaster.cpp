@@ -245,11 +245,11 @@ asbroadcaster_addListener(const fn_call& fn)
     //       inheritance chain in case it's own property _listeners 
     //       has been deleted while another one is found in any base
     //       class.
-    if ( ! obj->get_member(NSV::PROP_uLISTENERS, &listenersValue) )
-    {
+    if (!obj->get_member(NSV::PROP_uLISTENERS, &listenersValue)) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object has no _listeners "
-                "member"), (void*)fn.this_ptr, fn.dump_args());
+            std::ostringstream ss; fn.dump_args(ss);
+            log_aserror(_("%p.addListener(%s): this object has no "
+                    "_listeners member"), (void*)fn.this_ptr, ss.str());
         );
         return as_value(true); // odd, but seems the case..
     }
@@ -258,8 +258,9 @@ asbroadcaster_addListener(const fn_call& fn)
     if (!listenersValue.is_object())
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object's _listener isn't "
-                "an object: %s"), (void*)fn.this_ptr, fn.dump_args(),
+            std::ostringstream ss; fn.dump_args(ss);
+            log_aserror(_("%p.addListener(%s): this object's _listener isn't "
+                "an object: %s"), (void*)fn.this_ptr, ss.str(),
                 listenersValue);
         );
         // TODO: check this
@@ -292,8 +293,9 @@ asbroadcaster_removeListener(const fn_call& fn)
     if (!obj->get_member(NSV::PROP_uLISTENERS, &listenersValue) )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object has no _listeners "
-                "member"), (void*)fn.this_ptr, fn.dump_args());
+            std::ostringstream ss; fn.dump_args(ss);
+            log_aserror(_("%p.addListener(%s): this object has no _listeners "
+                "member"), (void*)fn.this_ptr, ss.str());
         );
         return as_value(false); // TODO: check this
     }
@@ -302,8 +304,9 @@ asbroadcaster_removeListener(const fn_call& fn)
     if ( ! listenersValue.is_object() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object's _listener isn't "
-                "an object: %s"), (void*)fn.this_ptr, fn.dump_args(),
+            std::ostringstream ss; fn.dump_args(ss);
+            log_aserror(_("%p.addListener(%s): this object's _listener isn't "
+                "an object: %s"), (void*)fn.this_ptr, ss.str(),
                 listenersValue);
         );
         return as_value(false); // TODO: check this
@@ -353,8 +356,9 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     //       class.
     if (!obj->get_member(NSV::PROP_uLISTENERS, &listenersValue)) {
         IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss; fn.dump_args(ss);
             log_aserror(_("%p.addListener(%s): this object has no "
-                    "_listeners member"), obj, fn.dump_args());
+                    "_listeners member"), obj, ss.str());
         );
         return as_value(); // TODO: check this
     }
@@ -363,9 +367,10 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
     if ( ! listenersValue.is_object() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%p.addListener(%s): this object's _listener "
+            std::ostringstream ss; fn.dump_args(ss);
+            log_aserror(_("%p.addListener(%s): this object's _listener "
                 "isn't an object: %s"), (void*)fn.this_ptr,
-                fn.dump_args(), listenersValue);
+                ss.str(), listenersValue);
         );
         return as_value(); // TODO: check this
     }

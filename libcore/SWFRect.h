@@ -110,7 +110,7 @@ public:
             && _xMax == (rectMax >> 9)
             && _yMax == (rectMax >> 9);
     }
-	
+
     /// set the rectangle to the WORLD value
     void set_world()
     {
@@ -202,7 +202,8 @@ public:
     void enclose_transformed_rect(const SWFMatrix& m, const SWFRect& r);
     
     /// Expand this rectangle to enclose the given circle.
-    void expand_to_circle(boost::int32_t x, boost::int32_t y, boost::int32_t radius)
+    void expand_to_circle(boost::int32_t x, boost::int32_t y,
+            boost::int32_t radius)
     {
         // I know it's easy to make code work for minus radius.
         // would do that untill I see the requirement for a SWF RECTANGLE.
@@ -220,9 +221,10 @@ public:
         }
     }
       
-    /// Same as enclose_transformed_rect but expanding the current SWFRect instead
-    /// of replacing it.
-    DSOEXPORT void expand_to_transformed_rect(const SWFMatrix& m, const SWFRect& r);
+    /// Same as enclose_transformed_rect but expanding the current SWFRect
+    /// instead of replacing it.
+    DSOEXPORT void expand_to_transformed_rect(const SWFMatrix& m,
+            const SWFRect& r);
     
     /// Makes union of the given and the current SWFRect
     DSOEXPORT void expand_to_rect(const SWFRect& r);
@@ -241,15 +243,16 @@ public:
         if (is_null())
         {
            // Range2d has a differnt idea about what is a null SWFRect.
-           return geometry::Range2d<boost::int32_t>(geometry::nullRange); //null range
+           return geometry::Range2d<boost::int32_t>(geometry::nullRange); 
         }
         else if( is_world() ) 
         {
-            return geometry::Range2d<boost::int32_t>(geometry::worldRange); //world range
+            return geometry::Range2d<boost::int32_t>(geometry::worldRange);
         }
         else
         {
-            return geometry::Range2d<boost::int32_t>(_xMin, _yMin, _xMax, _yMax);
+            return geometry::Range2d<boost::int32_t>(_xMin, _yMin,
+                    _xMax, _yMax);
         }
     }
 
@@ -257,7 +260,7 @@ public:
     std::string toString() const;
 
 private:
-	
+
     // make ourself to enclose the given point.
     void expand_to(boost::int32_t x, boost::int32_t y)
     {
@@ -266,8 +269,6 @@ private:
         _xMax = std::max(_xMax, x);
         _yMax = std::max(_yMax, y);
     }
-
-private:
 
     boost::int32_t _xMin; // TWIPS
     boost::int32_t _yMin; // TWIPS
@@ -279,13 +280,14 @@ private:
 inline std::ostream&
 operator<< (std::ostream& os, const SWFRect& r)
 {
-    if( !r.is_null() ) {
+    if (!r.is_null()) {
         os << "RECT(" 
            << r.get_x_min() << "," 
            << r.get_y_min() << "," 
            << r.get_x_max() << "," 
            << r.get_y_max() << ")";
-    }else {
+    }
+    else {
         os << "NULL RECT!";
     }
 
