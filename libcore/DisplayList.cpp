@@ -882,19 +882,6 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 }
 
 void
-DisplayList::clean()
-{
-    for (std::list<DisplayObject*>::iterator i = _charsByDepth.begin(), 
-            e = _charsByDepth.end(); i != e;) {
-        if ((*i)->isDestroyed()) {
-            i = _charsByDepth.erase(i);
-        }
-        else ++i;
-    }
-}
-
-
-void
 DisplayList::sort()
 {
     _charsByDepth.sort(DepthLessThan());
@@ -907,7 +894,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 
     // Remove destroyed characters first, or they will continue to override
     // characters with the same name at a higher depth!
-    clean();
+    _charsByDepth.remove_if(std::mem_fun(&DisplayObject::isDestroyed));
 
     iterator itOld = beginNonRemoved(_charsByDepth);
     iterator itNew = beginNonRemoved(newList._charsByDepth);
