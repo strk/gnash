@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
     SWFMovie_nextFrame(mo);
     
     check_equals(mo, "_global.real.length", "12");
-    xcheck_equals(mo, "_global.real.toString()",
+    check_equals(mo, "_global.real.toString()",
             "'undefined,0,0,0,0,0,0,1,1,1,1,2'");
 
     check_equals(mo, "_global.fns.length", "12");
@@ -143,11 +143,11 @@ int main(int argc, char* argv[])
     check_equals(mo, "_global.fns[4]", "'function'");
     check_equals(mo, "_global.fns[5]", "'function'");
     check_equals(mo, "_global.fns[6]", "'function'");
-    xcheck_equals(mo, "_global.fns[7]", "'function'");
-    xcheck_equals(mo, "_global.fns[8]", "'function'");
+    check_equals(mo, "_global.fns[7]", "'function'");
+    check_equals(mo, "_global.fns[8]", "'function'");
     check_equals(mo, "_global.fns[9]", "'function'");
     check_equals(mo, "_global.fns[10]", "'function'");
-    xcheck_equals(mo, "_global.fns[11]", "'function'");
+    check_equals(mo, "_global.fns[11]", "'function'");
     
     check_equals(mo, "_global.ctorcalls", "3");
 

@@ -161,24 +161,24 @@ int main(int argc, char* argv[])
     check_equals(mo, "_global.arr[3]", "'dynamic load: 0'");
     check_equals(mo, "_global.arr[4]", "'Frame 3 actions: undefined'");
     check_equals(mo, "_global.arr[5]", "'Frame 2 actions: undefined'");
-    xcheck_equals(mo, "_global.arr[6]", "'Frame 3 actions: 0'");
-    xcheck_equals(mo, "_global.arr[7]", "'Frame 2 actions: 0'");
+    check_equals(mo, "_global.arr[6]", "'Frame 3 actions: 0'");
+    check_equals(mo, "_global.arr[7]", "'Frame 2 actions: 0'");
     check_equals(mo, "_global.arr[8]", "'ctor: 1'");
     check_equals(mo, "_global.arr[9]", "'static unload: 0'");
     check_equals(mo, "_global.arr[10]", "'dynamic unload: 0'");
     check_equals(mo, "_global.arr[11]", "'dynamic load: 1'");
     check_equals(mo, "_global.arr[12]", "'Frame 3 actions: 0'");
     check_equals(mo, "_global.arr[13]", "'Frame 2 actions: 0'");
-    xcheck_equals(mo, "_global.arr[14]", "'Frame 3 actions: 1'");
-    xcheck_equals(mo, "_global.arr[15]", "'Frame 2 actions: 1'");
+    check_equals(mo, "_global.arr[14]", "'Frame 3 actions: 1'");
+    check_equals(mo, "_global.arr[15]", "'Frame 2 actions: 1'");
     check_equals(mo, "_global.arr[16]", "'ctor: 2'");
     check_equals(mo, "_global.arr[17]", "'static unload: 1'");
     check_equals(mo, "_global.arr[18]", "'dynamic unload: 1'");
     check_equals(mo, "_global.arr[19]", "'dynamic load: 2'");
     check_equals(mo, "_global.arr[20]", "'Frame 3 actions: 1'");
     check_equals(mo, "_global.arr[21]", "'Frame 2 actions: 1'");
-    xcheck_equals(mo, "_global.arr[22]", "'Frame 3 actions: 2'");
-    xcheck_equals(mo, "_global.arr.toString()",
+    check_equals(mo, "_global.arr[22]", "'Frame 3 actions: 2'");
+    check_equals(mo, "_global.arr.toString()",
             "'Frame 2 actions: undefined,ctor: 0,static unload: undefined,dynamic load: 0,Frame 3 actions: undefined,Frame 2 actions: undefined,Frame 3 actions: 0,Frame 2 actions: 0,ctor: 1,static unload: 0,dynamic unload: 0,dynamic load: 1,Frame 3 actions: 0,Frame 2 actions: 0,Frame 3 actions: 1,Frame 2 actions: 1,ctor: 2,static unload: 1,dynamic unload: 1,dynamic load: 2,Frame 3 actions: 1,Frame 2 actions: 1,Frame 3 actions: 2'");
 
     SWFMovie_nextFrame(mo);

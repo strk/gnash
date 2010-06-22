@@ -170,16 +170,16 @@ int main(int argc, char* argv[])
     check_equals(mo, "_global.arr[12]", "'dynamic load: 1'");
     check_equals(mo, "_global.arr[13]", "'Frame 3 actions: 0'");
     check_equals(mo, "_global.arr[14]", "'Frame 2 actions: 0'");
-    xcheck_equals(mo, "_global.arr[15]", "'Frame 3 actions: 1'");
-    xcheck_equals(mo, "_global.arr[16]", "'Frame 2 actions: 1'");
+    check_equals(mo, "_global.arr[15]", "'Frame 3 actions: 1'");
+    check_equals(mo, "_global.arr[16]", "'Frame 2 actions: 1'");
     check_equals(mo, "_global.arr[17]", "'ctor: 2'");
     check_equals(mo, "_global.arr[18]", "'dynamic unload: 1'");
     check_equals(mo, "_global.arr[19]", "'static load: 2'");
     check_equals(mo, "_global.arr[20]", "'dynamic load: 2'");
     check_equals(mo, "_global.arr[21]", "'Frame 3 actions: 1'");
     check_equals(mo, "_global.arr[22]", "'Frame 2 actions: 1'");
-    xcheck_equals(mo, "_global.arr[23]", "'Frame 3 actions: 2'");
-    xcheck_equals(mo, "_global.arr.toString()", "'Frame 2 actions: undefined,static load: undefined,ctor: 0,static load: 0,dynamic load: 0,Frame 3 actions: 0,Frame 2 actions: 0,Frame 3 actions: 0,Frame 2 actions: 0,ctor: 1,dynamic unload: 0,static load: 1,dynamic load: 1,Frame 3 actions: 0,Frame 2 actions: 0,Frame 3 actions: 1,Frame 2 actions: 1,ctor: 2,dynamic unload: 1,static load: 2,dynamic load: 2,Frame 3 actions: 1,Frame 2 actions: 1,Frame 3 actions: 2'");
+    check_equals(mo, "_global.arr[23]", "'Frame 3 actions: 2'");
+    check_equals(mo, "_global.arr.toString()", "'Frame 2 actions: undefined,static load: undefined,ctor: 0,static load: 0,dynamic load: 0,Frame 3 actions: 0,Frame 2 actions: 0,Frame 3 actions: 0,Frame 2 actions: 0,ctor: 1,dynamic unload: 0,static load: 1,dynamic load: 1,Frame 3 actions: 0,Frame 2 actions: 0,Frame 3 actions: 1,Frame 2 actions: 1,ctor: 2,dynamic unload: 1,static load: 2,dynamic load: 2,Frame 3 actions: 1,Frame 2 actions: 1,Frame 3 actions: 2'");
 
     SWFMovie_nextFrame(mo);
     add_actions(mo, "totals(26); stop();");
