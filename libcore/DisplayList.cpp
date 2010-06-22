@@ -210,6 +210,7 @@ DisplayList::getDisplayObjectByName_i(const std::string& name)
 void
 DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
 {
+    log_debug("Placing %s(%s)", ch->getTarget(), ch);
     assert(!ch->unloaded());
     ch->set_invalidated();
     ch->set_depth(depth);
@@ -743,8 +744,10 @@ DisplayList::dump() const
             endIt = _charsByDepth.end(); it != endIt; ++it) {
 
         const DisplayItem& dobj = *it;
-        log_debug(_("Item %d at depth %d (char name %s, type %s)"),
-            num, dobj->get_depth(), dobj->get_name(), typeName(*dobj));
+        log_debug(_("Item %d(%s) at depth %d (char name %s, type %s)"
+                    "Destroyed: %s, unloaded: %s"),
+            num, dobj, dobj->get_depth(), dobj->get_name(), typeName(*dobj),
+            dobj->isDestroyed(), dobj->unloaded());
         num++;
     }
 }
@@ -879,6 +882,19 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 }
 
 void
+DisplayList::clean()
+{
+    for (std::list<DisplayObject*>::iterator i = _charsByDepth.begin(), 
+            e = _charsByDepth.end(); i != e;) {
+        if ((*i)->isDestroyed()) {
+            i = _charsByDepth.erase(i);
+        }
+        else ++i;
+    }
+}
+
+
+void
 DisplayList::sort()
 {
     _charsByDepth.sort(DepthLessThan());
@@ -946,6 +962,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     else chOld->destroy();
                 }
                 else {
+                    log_debug("Not replacing %s(%s)", chOld->getTarget(), chOld);
                     newList._charsByDepth.erase(itNewBackup);
 
                     // replace the transformation SWFMatrix if the old

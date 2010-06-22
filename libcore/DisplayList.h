@@ -347,6 +347,8 @@ public:
 	/// need reordering.
 	void sort();
 	
+    void clean();
+
 	/// \brief
 	/// merge the given display list
 	void mergeDisplayList(DisplayList& newList);

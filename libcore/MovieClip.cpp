@@ -888,6 +888,10 @@ MovieClip::execute_action(const action_buffer& ab)
 void
 MovieClip::restoreDisplayList(size_t tgtFrame)
 {
+
+    _displayList.dump();
+
+    log_debug("Restoring DisplayList %s(%s)", getTarget(), (DisplayObject*)this);
     // This is not tested as usable for jump-forwards (yet)...
     // TODO: I guess just moving here the code currently in goto_frame
     //             for jump-forwards would do
@@ -910,6 +914,7 @@ MovieClip::restoreDisplayList(size_t tgtFrame)
     executeFrameTags(tgtFrame, tmplist, SWF::ControlTag::TAG_DLIST |
                                         SWF::ControlTag::TAG_ACTION);
 
+    _displayList.clean();
     _displayList.mergeDisplayList(tmplist);
 }
 
