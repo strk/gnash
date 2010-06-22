@@ -289,8 +289,6 @@ Button::Button(as_object* object, const SWF::DefineButtonTag* def,
         DisplayObject* parent)
     :
     InteractiveObject(object, parent),
-    _lastMouseFlags(FLAG_IDLE),
-    _mouseFlags(FLAG_IDLE),
     _mouseState(MOUSESTATE_UP),
     _def(def)
 {

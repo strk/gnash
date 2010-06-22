@@ -185,8 +185,6 @@ private:
 	/// Return version of the SWF containing the button definition.
     virtual int getDefinitionVersion() const;
 	
-    int	_lastMouseFlags, _mouseFlags;
-
 	MouseState _mouseState;
     
     const boost::intrusive_ptr<const SWF::DefineButtonTag> _def;
