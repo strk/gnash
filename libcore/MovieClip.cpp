@@ -914,7 +914,6 @@ MovieClip::restoreDisplayList(size_t tgtFrame)
     executeFrameTags(tgtFrame, tmplist, SWF::ControlTag::TAG_DLIST |
                                         SWF::ControlTag::TAG_ACTION);
 
-    _displayList.clean();
     _displayList.mergeDisplayList(tmplist);
 }
 

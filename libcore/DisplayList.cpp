@@ -905,6 +905,10 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 {
     testInvariant();
 
+    // Remove destroyed characters first, or they will continue to override
+    // characters with the same name at a higher depth!
+    clean();
+
     iterator itOld = beginNonRemoved(_charsByDepth);
     iterator itNew = beginNonRemoved(newList._charsByDepth);
 
