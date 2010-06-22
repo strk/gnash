@@ -709,42 +709,26 @@ SWFMovieDefinition::importResources(
                 source->get_frame_count());
         }
 
-        // TODO: can this be anything else?
         boost::intrusive_ptr<SWF::DefinitionTag> res =
             source->getDefinitionTag(targetID);
-
-        if (!res) {
-            log_error(_("import error: could not find resource '%s' in "
-                        "movie '%s'"), symbolName, source->get_url());
+        if (res) {
+            // It's a character import.
+            addDisplayObject(id, res.get());
+            registerExport(symbolName, id);
+            ++importedSyms;
             continue;
         }
 
-#ifdef DEBUG_EXPORTS
-        log_debug("Exporting symbol %s imported from source %s",
-            symbolName, source->get_url());
-#endif
-
-        // NB: we add this symbol with a new id, not its original one.
-        registerExport(symbolName, id);
-
-        if (Font* f = dynamic_cast<Font*>(res.get())) {
-            // Add this shared font to the currently-loading movie.
+        Font* f = source->get_font(id);
+        if (f) {
+            // It's a font import
             add_font(id, f);
+            registerExport(symbolName, id);
             ++importedSyms;
+            continue;
         }
-        else if (SWF::DefinitionTag* ch =
-                dynamic_cast<SWF::DefinitionTag*>(res.get())) {
-            // Add this DisplayObject to the loading movie.
-
-            // NB: we add this character with a new id, not its original one.
-            addDisplayObject(id, ch);
-            ++importedSyms;
-        }
-        else {
-            log_error(_("importResources error: unsupported import of '%s' "
-                "from movie '%s' has unknown type"),
-                symbolName, source->get_url());
-        }
+        log_error(_("import error: could not find resource '%s' in "
+                    "movie '%s'"), symbolName, source->get_url());
     }
 
     if (importedSyms) {
