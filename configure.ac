@@ -246,13 +246,14 @@ AC_ARG_WITH([android],
 CROSS_CXXFLAGS=
 if test x"${android_ndk}" != xno; then
 dnl  LDFLAGS=-Wl,--dynamic-linker -Wl,/system/bin/linker -nostdlib -Wl,-rpath -Wl,/system/lib -Wl,-rpath -Wl,${android_ndk}/usr/lib -L${android_ndk}/usr/lib -lc -o hello ${android_ndk}/usr/lib/crtbegin_dynamic.o
+dnl  CROSS_CXXFLAGS=-mandroid -fexceptions -I${android_ndk}/include
   CROSS_CXXFLAGS=-mandroid -fexceptions
   if test x"${with_top_level}" = x; then
     with_top_level=/usr/local/android-arm/sysroot/usr
     cross_compiling=yes
   fi
   ANDROID_NDK=${android_ndk}
-  AC_DEFINE(_ANDROID, [1], [This is an Android build])
+  AC_DEFINE(ANDROID, [1], [This is an Android build])
 else
   ANDROID_NDK=
 fi
@@ -696,6 +697,7 @@ operating system." >&3
 fi
 
 dnl By default, we want to to build all renderers
+build_ovg=no
 build_gles=no
 build_ogl=yes
 build_agg=yes
@@ -715,6 +717,7 @@ AC_ARG_ENABLE(renderer,
   fi
   renderer_list=""
   nrender=0
+  build_ovg=no
   build_ogl=no
   build_gles=no
   build_agg=no
@@ -724,6 +727,7 @@ AC_ARG_ENABLE(renderer,
     [case "${val}" in
       no*|NO*)
         renderer_list="none"
+        build_ovg=no
         build_ogl=no
         build_gles=no
         build_agg=no
@@ -735,7 +739,8 @@ AC_ARG_ENABLE(renderer,
         build_ogl=yes
         build_agg=yes
         build_cairo=yes
-        nrender=3
+        build_ovg=yes
+        nrender=4
         ;;
       ogl|OGL|OpenGL|opengl)
         renderer_list="${renderer_list} OpenGL"
@@ -747,6 +752,11 @@ AC_ARG_ENABLE(renderer,
         renderer_list="${renderer_list} OpenGL-ES"
         build_gles=yes
         build_ogl=no
+        nrender=$((nrender+1))
+        ;;
+      ovg|OVG|OpenVG|openvg)
+        renderer_list="${renderer_list} OpenVG"
+        build_ogv=yes
         nrender=$((nrender+1))
         ;;
       agg|AGG)
@@ -809,10 +819,6 @@ dnl  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
 dnl    AC_MSG_ERROR([OpenGL renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
 dnl  fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
-fi
-
-if test x"${build_gles}" = xyes; then
-   AC_DEFINE([RENDERER_GLES], [], [Use OpenGL-ES renderer])
 fi
 
 dnl 16 bit: RGB555, RGB565
@@ -1069,6 +1075,7 @@ dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_sha
 
 AC_PATH_PROG(DEJAGNU, runtest)
 
+AM_CONDITIONAL(BUILD_OVG_RENDERER, [ test x$build_ovg = xyes ])
 AM_CONDITIONAL(BUILD_GLES_RENDERER, [ test x$build_gles = xyes ])
 AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes])
 AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
@@ -1321,6 +1328,10 @@ else
   export incllist="`eval cat ${srcdir}/macros/incllist`"
   export libslist="`eval cat ${srcdir}/macros/libslist`"
   export pathlist=$PATH
+fi
+
+if test x"${android_ndk}" != xno; then
+   incllist="${android_ndk}/include ${incllist}"
 fi
 
 AM_CONDITIONAL(CROSS_COMPILING, [ test x$cross_compiling = xyes ])
@@ -2099,8 +2110,16 @@ AM_CONDITIONAL(NPAPI,   [test x"${npapi}" = xyes])
 AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
 AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
 
+GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
+
 if test x"${build_gles}" = xyes; then
-   GNASH_PATH_GLES
+  GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
+  GNASH_PATH_GLES
+fi
+
+if test x"${build_ogv}" = xyes; then
+  GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
+  GNASH_PKG_FIND(OpenVG, [vg/openvg.h], [OpenVG library], vgDrawImage)
 fi
 
 if test x"${build_ogl}" = xyes; then
