@@ -1015,11 +1015,11 @@ as_value
 global_asconstructor(const fn_call& fn)
 {
 
-    if (fn.nargs < 2)
-    {
+    if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(    
-        log_aserror(_("ASNative(%s): needs at least two arguments"),
-            fn.dump_args());
+            std::ostringstream ss; fn.dump_args(ss);
+            log_aserror(_("ASNative(%s): needs at least two arguments"),
+                ss.str());
         )
         return as_value();
     }
@@ -1029,8 +1029,9 @@ global_asconstructor(const fn_call& fn)
 
     if (sx < 0 || sy < 0) {
         IF_VERBOSE_ASCODING_ERRORS(    
+            std::ostringstream ss; fn.dump_args(ss);
             log_aserror(_("ASconstructor(%s): args must be 0 or above"),
-                fn.dump_args());
+                ss.str());
         )
         return as_value();
     }
@@ -1061,8 +1062,9 @@ global_asnative(const fn_call& fn)
     if (fn.nargs < 2)
     {
         IF_VERBOSE_ASCODING_ERRORS(    
-        log_aserror(_("ASNative(%s): needs at least two arguments"),
-            fn.dump_args());
+            std::ostringstream ss; fn.dump_args(ss);
+            log_aserror(_("ASNative(%s): needs at least two arguments"),
+                ss.str());
         )
         return as_value();
     }
@@ -1072,8 +1074,9 @@ global_asnative(const fn_call& fn)
 
     if (sx < 0 || sy < 0) {
         IF_VERBOSE_ASCODING_ERRORS(    
+            std::ostringstream ss; fn.dump_args(ss);
             log_aserror(_("ASnative(%s): args must be 0 or above"),
-                fn.dump_args());
+                ss.str());
         )
         return as_value();
     }
