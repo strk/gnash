@@ -1067,11 +1067,11 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
     SWFRect bounds;
     
     if (full.isFinite()) {
-	bounds = SWFRect(full.getMinX(), full.getMinY(), full.getMaxX(), full.getMaxY());
-    } else {
-	if (full.isWorld()) {
-	    bounds.set_world();
-	}
+        bounds = SWFRect(full.getMinX(), full.getMinY(),
+                full.getMaxX(), full.getMaxY());
+    }
+    else if (full.isWorld()) {
+        bounds.set_world();
     }
     
     setInvalidatedRegion(bounds);
