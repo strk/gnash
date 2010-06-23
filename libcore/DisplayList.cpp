@@ -110,6 +110,12 @@ public:
 
     bool operator() (const DisplayItem& item) {
         assert (item);
+        // TODO: this is necessary because destroy() is called in
+        // movie_root, leaving destroyed items on the DisplayList. They
+        // shouldn't be found. A better fix would be to stop destroying
+        // objects there and add to the invariant that there are never
+        // destroyed DisplayObjects in the DisplayList.
+        if (item->isDestroyed()) return false;
         return item->get_name() == _name;
     }
 
@@ -125,6 +131,12 @@ public:
 
     bool operator() (const DisplayItem& item) {
         assert (item);
+        // TODO: this is necessary because destroy() is called in
+        // movie_root, leaving destroyed items on the DisplayList. They
+        // shouldn't be found. A better fix would be to stop destroying
+        // objects there and add to the invariant that there are never
+        // destroyed DisplayObjects in the DisplayList.
+        if (item->isDestroyed()) return false;
         return _noCaseEquals(item->get_name(), _name);
     }
 
@@ -210,7 +222,6 @@ DisplayList::getDisplayObjectByName_i(const std::string& name)
 void
 DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
 {
-    log_debug("Placing %s(%s)", ch->getTarget(), ch);
     assert(!ch->unloaded());
     ch->set_invalidated();
     ch->set_depth(depth);
@@ -892,10 +903,6 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 {
     testInvariant();
 
-    // Remove destroyed characters first, or they will continue to override
-    // characters with the same name at a higher depth!
-    _charsByDepth.remove_if(std::mem_fun(&DisplayObject::isDestroyed));
-
     iterator itOld = beginNonRemoved(_charsByDepth);
     iterator itNew = beginNonRemoved(newList._charsByDepth);
 
@@ -953,7 +960,6 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     else chOld->destroy();
                 }
                 else {
-                    log_debug("Not replacing %s(%s)", chOld->getTarget(), chOld);
                     newList._charsByDepth.erase(itNewBackup);
 
                     // replace the transformation SWFMatrix if the old

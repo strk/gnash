@@ -889,9 +889,6 @@ void
 MovieClip::restoreDisplayList(size_t tgtFrame)
 {
 
-    _displayList.dump();
-
-    log_debug("Restoring DisplayList %s(%s)", getTarget(), (DisplayObject*)this);
     // This is not tested as usable for jump-forwards (yet)...
     // TODO: I guess just moving here the code currently in goto_frame
     //             for jump-forwards would do
