@@ -1,7 +1,7 @@
 number=1
 
 [0]
-description=Shockwave Flash 7.0
+description=Shockwave Flash 10.1 r999
 file=libklashpart.so
 mime=application/x-shockwave-flash:swf:Shockwave Flash;application/futuresplash:spl:FutureSplash Player
 name=Shockwave Flash

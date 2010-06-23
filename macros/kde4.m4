@@ -24,7 +24,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
              with_kde4_incl=${withval})
   dnl make sure the path is a useable one
   if test x"${with_kde4_incl}" != x ; then
-    if test ! -f ${with_kde4_incl}/kapp.h ; then
+    if test ! -f ${with_kde4_incl}/kapplication.h ; then
       AC_MSG_ERROR([${with_kde4_incl} directory doesn't contain any KDE 4.x headers])
     fi
   fi
@@ -38,7 +38,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
              with_kde4_lib=${withval})
   dnl make sure the path is a useable one
   if test x"${with_kde4_lib}" != x ; then 
-    if test ! -f ${with_kde4_lib}/libkdeui.la; then
+    if test ! -f ${with_kde4_lib}/libkdeui.so; then
       AC_MSG_ERROR([${with_kde4_lib} directory doesn't contain any KDE 4.x libraries!])
     fi
   fi
@@ -169,19 +169,6 @@ AC_DEFUN([GNASH_PATH_KDE4],
          AC_MSG_RESULT(no)
         fi
       fi
-      dnl Look for the kdeprint library, which is required
-      AC_MSG_CHECKING([for kdeprint library])
-      if test x"${libkdeprint}" = x; then
-        if test -f ${kde4_topdir}/libkdeprint.la -o -f ${kde4_topdir}/libkdeprint.${shlibext}; then
-          ac_cv_path_kde4_lib="${ac_cv_path_kde4_lib} -lkdeprint"
-          AC_MSG_RESULT(${kde4_topdir}/libkdeprint)
-        else
-          AC_MSG_RESULT(no)
-        fi
-      else
-        AC_MSG_RESULT(${libkdeprint})
-        ac_cv_path_kde4_lib="${ac_cv_path_kde4_lib} ${libkdeprint}"
-      fi	
     ])                  dnl end of cache ac_cv_path_kde4_lib
   fi                    dnl end of build_kde4
 
@@ -218,7 +205,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
   fi                            dnl end of build_kparts4
 
   if test x"${ac_cv_path_kde4_incl}" != x ; then
-    if test x"${ac_cv_path_kde3_incl}" != x"-I/usr/include"; then
+    if test x"${ac_cv_path_kde4_incl}" != x"-I/usr/include"; then
       KDE4_CFLAGS="${ac_cv_path_kde4_incl}"
     else
       KDE4_CFLAGS=""
