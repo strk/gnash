@@ -110,6 +110,12 @@ public:
 
     bool operator() (const DisplayItem& item) {
         assert (item);
+        // TODO: this is necessary because destroy() is called in
+        // movie_root, leaving destroyed items on the DisplayList. They
+        // shouldn't be found. A better fix would be to stop destroying
+        // objects there and add to the invariant that there are never
+        // destroyed DisplayObjects in the DisplayList.
+        if (item->isDestroyed()) return false;
         return item->get_name() == _name;
     }
 
@@ -125,6 +131,12 @@ public:
 
     bool operator() (const DisplayItem& item) {
         assert (item);
+        // TODO: this is necessary because destroy() is called in
+        // movie_root, leaving destroyed items on the DisplayList. They
+        // shouldn't be found. A better fix would be to stop destroying
+        // objects there and add to the invariant that there are never
+        // destroyed DisplayObjects in the DisplayList.
+        if (item->isDestroyed()) return false;
         return _noCaseEquals(item->get_name(), _name);
     }
 
@@ -743,8 +755,10 @@ DisplayList::dump() const
             endIt = _charsByDepth.end(); it != endIt; ++it) {
 
         const DisplayItem& dobj = *it;
-        log_debug(_("Item %d at depth %d (char name %s, type %s)"),
-            num, dobj->get_depth(), dobj->get_name(), typeName(*dobj));
+        log_debug(_("Item %d(%s) at depth %d (char name %s, type %s)"
+                    "Destroyed: %s, unloaded: %s"),
+            num, dobj, dobj->get_depth(), dobj->get_name(), typeName(*dobj),
+            dobj->isDestroyed(), dobj->unloaded());
         num++;
     }
 }

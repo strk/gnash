@@ -888,6 +888,7 @@ MovieClip::execute_action(const action_buffer& ab)
 void
 MovieClip::restoreDisplayList(size_t tgtFrame)
 {
+
     // This is not tested as usable for jump-forwards (yet)...
     // TODO: I guess just moving here the code currently in goto_frame
     //             for jump-forwards would do
