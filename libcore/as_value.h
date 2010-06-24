@@ -131,8 +131,8 @@ public:
     DSOEXPORT as_value();
     
     /// Construct a primitive String value 
-    as_value(const char* str);
-    as_value(const std::string& str);
+    DSOEXPORT as_value(const char* str);
+    DSOEXPORT as_value(const std::string& str);
     
     /// Construct a primitive Boolean value
     template <typename T>
@@ -152,7 +152,7 @@ public:
     as_value(as_object* obj);
     
     /// Copy constructor.
-    as_value(const as_value& value);
+    DSOEXPORT as_value(const as_value& value);
     
     /// Return the primitive type of this value as a string.
     const char* typeOf() const;
@@ -293,7 +293,7 @@ public:
     /// Set this value to the NULL value
     void set_null();
     
-    void operator=(const as_value& v);
+    DSOEXPORT void operator=(const as_value& v);
     
     bool is_undefined() const {
         return (_type == UNDEFINED);
