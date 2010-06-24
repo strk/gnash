@@ -76,6 +76,63 @@ MovieClipLoader.prototype.broadcastMessage = function(arg1, arg2, arg3, arg4)
 	this.bm.apply(this, arguments);
 };
 
+// Test simple loadClip calls
+
+lmc = _root.createEmptyMovieClip("lmc", 2000);
+mldr = new MovieClipLoader();
+
+// String
+ret = mldr.loadClip("h", lmc);
+check_equals(ret, true);
+
+// Number
+ret = mldr.loadClip(9, lmc);
+check_equals(ret, false);
+
+// String again.
+ret = mldr.loadClip("h", lmc);
+check_equals(ret, true);
+
+// Boolean
+ret = mldr.loadClip(true, lmc);
+check_equals(ret, false);
+
+ret = mldr.loadClip(false, lmc);
+check_equals(ret, false);
+
+// Null
+ret = mldr.loadClip(null, lmc);
+check_equals(ret, false);
+
+// String again (just to check it doesn't depend on previous calls).
+ret = mldr.loadClip("h", lmc);
+check_equals(ret, true);
+
+// Undefined
+ret = mldr.loadClip(undefined, lmc);
+check_equals(ret, false);
+
+// Array
+ret = mldr.loadClip([], lmc);
+check_equals(ret, false);
+
+// Object
+
+o= {};
+ret = mldr.loadClip(o, lmc);
+check_equals(ret, false);
+
+// Object with toString
+o.toString = function() { return "url"; };
+ret = mldr.loadClip(o, lmc);
+check_equals(ret, false);
+
+// Object with valueOf
+o.valueOf = function() { return "url"; };
+ret = mldr.loadClip(o, lmc);
+check_equals(ret, false);
+
+
 //---------------------------------------------------------
 // Test loadClip and events
 //---------------------------------------------------------
@@ -316,7 +373,7 @@ function test3()
 	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
 	// BUT MAKE SURE nextTestOrEnd CONTAINS THE CORRECT testsPerProgressCallback INFO !!
 	//
-	expected.totals = 72;
+	expected.totals = 84;
 	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
 	// (or whatever else can become a movie_instance), while the PP does.
 	// So in this testcase, the attempt to load vars.txt is invalid for Gnash
