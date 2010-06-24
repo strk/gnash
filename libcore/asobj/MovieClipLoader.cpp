@@ -105,7 +105,7 @@ moviecliploader_loadClip(const fn_call& fn)
 
     as_object* ptr = ensure<ValidThis>(fn);
   
-	if ( fn.nargs < 2 ) {
+	if (fn.nargs < 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
             log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"),
@@ -113,6 +113,15 @@ moviecliploader_loadClip(const fn_call& fn)
         );
 		return as_value(false);
 	}
+
+    if (!fn.arg(0).is_string()) {
+		IF_VERBOSE_ASCODING_ERRORS(
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("MovieClipLoader.loadClip(%s): first argument must"
+                    "be a string"), ss.str());
+        );
+        return as_value(false);
+    }
 
 	const std::string& str_url = fn.arg(0).to_string(); 
 
