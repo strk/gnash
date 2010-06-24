@@ -383,7 +383,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
         setFlashVars(fv->second);
     }
 
-    // Add Scriptable Variables. These values beconme the default, but
+#if 0
+    // Add Scriptable Variables. These values become the default, but
     // they can be reset from JavaScript via ExternalInterface. These
     // are passed to Gnash using the '-P' option, and have nothing to
     // to do with 'flashVars'.
@@ -393,6 +394,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
             setScriptableVar(fv->first, fv->second);
         }
     }
+#endif
     
     // Load the actual movie.
     _movieDef = load_movie();
