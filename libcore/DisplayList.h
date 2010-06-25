@@ -47,9 +47,6 @@ namespace gnash {
 
 namespace gnash {
 
-/// A DisplayItem is simply a DisplayObject object 
-typedef DisplayObject* DisplayItem;
-
 /// A list of on-stage DisplayObjects, ordered by depth
 //
 /// Any MovieClip has an associated DisplayList
@@ -62,7 +59,7 @@ class DisplayList
 
 public:
 
-	typedef std::list<DisplayItem> container_type;
+	typedef std::list<DisplayObject*> container_type;
 	typedef container_type::iterator iterator;
 	typedef container_type::const_iterator const_iterator;
 	typedef container_type::reverse_iterator reverse_iterator;
@@ -411,9 +408,7 @@ DisplayList::visitForward(V& visitor)
 {
 	for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
 		it != itEnd; ++it) {
-
-		DisplayItem& di = *it;
-		if (!visitor(di)) break;
+		if (!visitor(*it)) break;
 	}
 }
 
@@ -423,9 +418,7 @@ DisplayList::visitBackward(V& visitor)
 {
 	for (reverse_iterator it = _charsByDepth.rbegin(),
 			itEnd = _charsByDepth.rend(); it != itEnd; ++it) {
-
-		DisplayItem& di = *it;
-		if (!visitor(di)) break;
+		if (!visitor(*it)) break;
 	}
 }
 
@@ -435,9 +428,7 @@ DisplayList::visitBackward(V& visitor) const
 {
 	for (const_reverse_iterator it = _charsByDepth.rbegin(),
 			itEnd = _charsByDepth.rend(); it != itEnd; ++it) {
-
-		const DisplayItem& di = *it;
-		if (!visitor(di)) break;
+		if (!visitor(*it)) break;
 	}
 }
 
