@@ -176,6 +176,9 @@ DisplayList::getDisplayObjectAtDepth(int depth)
 
         DisplayObject* ch = *it;
 
+        // Should not be there!
+        if (ch->isDestroyed()) continue;
+
         // found
         if (ch->get_depth() == depth) return ch;
 
@@ -598,7 +601,10 @@ DisplayList::unload()
             itEnd = _charsByDepth.end(); it != itEnd; )
     {
         // make a copy
-        DisplayItem di = *it;
+        DisplayObject* di = *it;
+
+        // Destroyed objects should not be there!
+        assert(!di->isDestroyed());
 
         // Destroy those with a handler anyway?
         if (di->unload()) {
@@ -662,6 +668,7 @@ DisplayList::display(Renderer& renderer)
     for (iterator endIt = _charsByDepth.end(); it != endIt; ++it)
     {
         DisplayObject* ch = *it;
+        assert(!ch->isDestroyed());
 
         DisplayObject* mask = ch->getMask();
         if (mask && ch->visible() && ! mask->unloaded())
@@ -1056,6 +1063,7 @@ void
 DisplayList::reinsertRemovedCharacter(DisplayObject* ch)
 {
     assert(ch->unloaded());
+    assert(!ch->isDestroyed());
     testInvariant();
 
     // TODO: have this done by DisplayObject::unload() instead ?
