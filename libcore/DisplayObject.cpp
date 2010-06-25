@@ -611,11 +611,10 @@ DisplayObject::set_y_scale(double scale_percent)
 }
 
 
-/*private*/
+/*public*/
 std::string
-DisplayObject::computeTargetPath() const
+DisplayObject::getTargetPath() const
 {
-
 	// TODO: check what happens when this DisplayObject
 	//       is a Movie loaded into another
 	//       running movie.
@@ -662,13 +661,6 @@ DisplayObject::computeTargetPath() const
 		target += "/" + *it; 
 	}
 	return target;
-}
-
-/*public*/
-std::string
-DisplayObject::getTargetPath() const
-{
-	return computeTargetPath();
 }
 
 

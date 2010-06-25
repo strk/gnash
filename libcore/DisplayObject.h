@@ -1046,9 +1046,6 @@ private:
     /// Register a DisplayObject masked by this instance
     void setMaskee(DisplayObject* maskee);
 
-    /// Build the _target member recursive on parent
-    std::string computeTargetPath() const;
-
     /// The as_object to which this DisplayObject is attached.
     as_object* _object;
 
