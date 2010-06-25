@@ -65,7 +65,7 @@ public:
 
     DepthEquals(int depth) : _depth(depth) {}
 
-    bool operator() (const DisplayItem& item) {
+    bool operator() (const DisplayObject* item) {
         if (!item) return false;
         return item->get_depth() == _depth;
     }
@@ -76,14 +76,14 @@ private:
 
 struct DepthGreaterThan
 {
-    bool operator()(const DisplayItem& a, const DisplayItem& b) {
+    bool operator()(const DisplayObject* a, const DisplayObject* b) {
         return a->get_depth() > b->get_depth();
     }
 };
 
 struct DepthLessThan
 {
-    bool operator()(const DisplayItem& a, const DisplayItem& b) {
+    bool operator()(const DisplayObject* a, const DisplayObject* b) {
         return a->get_depth() < b->get_depth();
     }
 };
@@ -94,7 +94,7 @@ public:
 
     DepthGreaterOrEqual(int depth) : _depth(depth) {}
 
-    bool operator() (const DisplayItem& item) {
+    bool operator() (const DisplayObject* item) {
         if (!item) return false;
         return item->get_depth() >= _depth;
     }
@@ -108,7 +108,7 @@ class NameEquals
 public:
     NameEquals(const std::string& name) : _name(name) {}
 
-    bool operator() (const DisplayItem& item) {
+    bool operator() (const DisplayObject* item) {
         assert (item);
         // TODO: this is necessary because destroy() is called in
         // movie_root, leaving destroyed items on the DisplayList. They
@@ -129,7 +129,7 @@ class NameEqualsNoCase
 public:
     NameEqualsNoCase(const std::string& name) : _name(name) {}
 
-    bool operator() (const DisplayItem& item) {
+    bool operator() (const DisplayObject* item) {
         assert (item);
         // TODO: this is necessary because destroy() is called in
         // movie_root, leaving destroyed items on the DisplayList. They
@@ -175,6 +175,9 @@ DisplayList::getDisplayObjectAtDepth(int depth)
         it != itEnd; ++it) {
 
         DisplayObject* ch = *it;
+
+        // Should not be there!
+        if (ch->isDestroyed()) continue;
 
         // found
         if (ch->get_depth() == depth) return ch;
@@ -232,7 +235,7 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
 
     if (it == _charsByDepth.end() || (*it)->get_depth() != depth) {
         // add the new char
-        _charsByDepth.insert(it, DisplayItem(ch));
+        _charsByDepth.insert(it, ch);
     }
     else {
         // remember bounds of old char
@@ -243,7 +246,7 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
         DisplayObject* oldCh = *it;
 
         // replace existing char (before calling unload!)
-        *it = DisplayItem(ch);
+        *it = ch;
     
         if (oldCh->unload()) {
             // reinsert removed DisplayObject if needed
@@ -268,9 +271,9 @@ DisplayList::add(DisplayObject* ch, bool replace)
                 DepthGreaterOrEqual(depth));
 
     if (it == _charsByDepth.end() || (*it)->get_depth() != depth) {
-        _charsByDepth.insert(it, DisplayItem(ch));
+        _charsByDepth.insert(it, ch);
     }
-    else if (replace) *it = DisplayItem(ch);
+    else if (replace) *it = ch;
 
     testInvariant();
 }
@@ -291,10 +294,8 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
             DepthGreaterOrEqual(depth));
 
-    DisplayItem di(ch);
-
     if (it == _charsByDepth.end() || (*it)->get_depth() != depth) {
-        _charsByDepth.insert(it, di);
+        _charsByDepth.insert(it, ch);
     }
     else {
         // Make a copy (before replacing)
@@ -316,7 +317,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
         oldch->add_invalidated_bounds(old_ranges, true);        
 
         // replace existing char (before calling unload)
-        *it = di;
+        *it = ch;
 
         // Unload old char
         if (oldch->unload()) {
@@ -460,7 +461,7 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
     // Found another DisplayObject at the given depth
     if (it2 != _charsByDepth.end() && (*it2)->get_depth() == newdepth)
     {
-        DisplayItem ch2 = *it2;
+        DisplayObject* ch2 = *it2;
 
         ch2->set_depth(srcdepth);
 
@@ -598,7 +599,10 @@ DisplayList::unload()
             itEnd = _charsByDepth.end(); it != itEnd; )
     {
         // make a copy
-        DisplayItem di = *it;
+        DisplayObject* di = *it;
+
+        // Destroyed objects should not be there!
+        assert(!di->isDestroyed());
 
         // Destroy those with a handler anyway?
         if (di->unload()) {
@@ -633,7 +637,7 @@ DisplayList::destroy()
             it != itEnd; ) {
 
         // make a copy
-        DisplayItem di = *it;
+        DisplayObject* di = *it;
 
         // skip if already unloaded
         if ( di->isDestroyed() ) {
@@ -662,6 +666,7 @@ DisplayList::display(Renderer& renderer)
     for (iterator endIt = _charsByDepth.end(); it != endIt; ++it)
     {
         DisplayObject* ch = *it;
+        assert(!ch->isDestroyed());
 
         DisplayObject* mask = ch->getMask();
         if (mask && ch->visible() && ! mask->unloaded())
@@ -754,7 +759,7 @@ DisplayList::dump() const
     for (const_iterator it = _charsByDepth.begin(),
             endIt = _charsByDepth.end(); it != endIt; ++it) {
 
-        const DisplayItem& dobj = *it;
+        const DisplayObject* dobj = *it;
         log_debug(_("Item %d(%s) at depth %d (char name %s, type %s)"
                     "Destroyed: %s, unloaded: %s"),
             num, dobj, dobj->get_depth(), dobj->get_name(), typeName(*dobj),
@@ -799,7 +804,7 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 
     iterator it = beginNonRemoved(_charsByDepth);
     for (iterator endIt = _charsByDepth.end(); it != endIt; ++it) {
-        DisplayItem& dobj = *it;
+        DisplayObject* dobj = *it;
         
 #ifndef GNASH_USE_GC
         assert(dobj->get_ref_count() > 0);
@@ -1056,6 +1061,7 @@ void
 DisplayList::reinsertRemovedCharacter(DisplayObject* ch)
 {
     assert(ch->unloaded());
+    assert(!ch->isDestroyed());
     testInvariant();
 
     // TODO: have this done by DisplayObject::unload() instead ?
@@ -1068,7 +1074,7 @@ DisplayList::reinsertRemovedCharacter(DisplayObject* ch)
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
                 DepthGreaterOrEqual(newDepth));
 
-    _charsByDepth.insert(it, DisplayItem(ch));
+    _charsByDepth.insert(it, ch);
 
     testInvariant();
 }
@@ -1144,7 +1150,7 @@ operator<< (std::ostream& os, const DisplayList& dl)
     for (DisplayList::const_iterator it = dl._charsByDepth.begin(),
             itEnd = dl._charsByDepth.end(); it != itEnd; ++it) {
 
-        const DisplayItem& item = *it; 
+        const DisplayObject* item = *it; 
         if (it != dl._charsByDepth.begin()) os << " | ";
         os << " name:" << item->get_name()
            << " depth:" << item->get_depth();
