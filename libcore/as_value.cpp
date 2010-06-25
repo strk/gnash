@@ -234,12 +234,9 @@ as_value::to_string(int version) const
                 // reference player.
                 if (ret.is_string()) return ret.getStr();
             }
-            catch (ActionTypeError& e) {
-            }
-
-            if (_type == OBJECT) {
-                return is_function() ? "[type Function]" : "[type Object]";
-            }
+            catch (ActionTypeError& e) {}
+           
+            return is_function() ? "[type Function]" : "[type Object]";
 
         }
 
