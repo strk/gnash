@@ -227,6 +227,7 @@ color-properties-6.swf:d5d6b8a4727d024c4c2434e4bf965fb1
 color-properties-7.swf:20f3b3832419655c629d84562ae8edd7
 color-properties-8.swf:a1ae8b87ebc7cc1adf7d9acb8da6592f
 color-setRGB.swf:0841414e9ac7d2f9b57e40aec3d2f44f
+color-setTransform-alpha.swf:d0675ba970d7418e51e38af845bc8a40
 color-setTransform-empty.swf:2a72a5273ab8713ee289ff1726b0959c
 color-setTransform-full.swf:7a8e59cef9592c4546f07fb9f391c61a
 color-setTransform-negative.swf:0bc0510c35fc5c82de31b0db887fe535
@@ -1479,6 +1480,7 @@ undefinedtrace-v6.swf:
 undefinedtrace-v7.swf:
 undefinedtrace-v8.swf:
 unloadmovie-simple-5.swf:3b897f539cb7eb764692def6fcc62853
+various-tests-5.swf:ff6088cd684cb3114303a3ae4e620953
 video-enumerate.swf:5eced177f03fc88bccb99f0acd2d2f7d
 video-properties-6.swf:95109f25a5cac0fe2d18628dcea22633
 video-properties-7.swf:64f07e267ae93cdefec5c51c3fc9981d
