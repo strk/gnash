@@ -261,11 +261,6 @@ public:
     /// False if the frame_spec was invalid.
     bool get_frame_number(const as_value& frame_spec, size_t& frameno) const;
 
-    /// MovieClip instances need to handle cxform specially 
-    //
-    /// This is to suppor the Color asobject class
-    cxform  get_world_cxform() const;
-
     /// Look up the labeled frame, and jump to it.
     bool goto_labeled_frame(const std::string& label);
         
