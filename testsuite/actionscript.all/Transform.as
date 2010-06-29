@@ -224,5 +224,64 @@ conc1._height = 0.6;
 xcheck_equals(conc1.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=2)");
 xcheck_equals(conc2.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=2)");
 
-totals(74);
+
+d = _root.createEmptyMovieClip("tar", 600);
+d.beginFill(0x00ff00);
+d.moveTo(20, 20);
+d.lineTo(20, 80);
+d.lineTo(80, 80);
+d.lineTo(80, 40);
+d.lineTo(20, 20);
+
+d.moveTo(50, 50);
+d.beginFill(0xff0000);
+d.lineTo(60, 50);
+d.lineTo(60, 60);
+d.lineTo(50, 60);
+d.lineTo(50, 50);
+
+ct8 = d.transform.colorTransform;
+
+check_equals(ct8.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)")
+
+c = new Color(tar);
+c.setRGB(0xff0000);
+
+btx = c.getTransform();
+check_equals(btx.ra, 0);
+check_equals(btx.ba, 0);
+check_equals(btx.ga, 0);
+check_equals(btx.aa, 100);
+check_equals(btx.rb, 255);
+check_equals(btx.gb, 0);
+check_equals(btx.bb, 0);
+check_equals(btx.ab, 0);
+
+ct9 = d.transform.colorTransform;
+xcheck_equals(ct9.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=255, greenOffset=0, blueOffset=0, alphaOffset=0)")
+
+c.setRGB(0x0000ff);
+ct10 = d.transform.colorTransform;
+xcheck_equals(ct10.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=255, alphaOffset=0)")
+
+tr = d.transform;
+tr.colorTransform = new ColorTransform(0, 0, 0, 1, 0, 127, 0, 0);
+d.transform = tr;
+ct11 = d.transform.colorTransform;
+check_equals(ct11.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=0, greenOffset=127, blueOffset=0, alphaOffset=0)");
+
+// User transform is
+btx = c.getTransform();
+check_equals(btx.ra, 0);
+check_equals(btx.ba, 0);
+check_equals(btx.ga, 0);
+check_equals(btx.aa, 100);
+check_equals(btx.rb, 0);
+check_equals(btx.gb, 127);
+check_equals(btx.bb, 0);
+check_equals(btx.ab, 0);
+
+
+
+totals(94);
 #endif
