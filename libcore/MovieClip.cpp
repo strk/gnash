@@ -2140,13 +2140,6 @@ MovieClip::destroy()
     DisplayObject::destroy();
 }
 
-cxform
-MovieClip::get_world_cxform() const
-{
-    cxform cf = DisplayObject::get_world_cxform();
-    return cf;
-}
-
 Movie*
 MovieClip::get_root() const
 {
