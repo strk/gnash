@@ -202,11 +202,6 @@ public:
     // delegates to movie_root (possibly wrong)
     void set_background_color(const rgba& color);
 
-    bool has_looped() const
-    {
-        return _hasLooped;
-    }
-
     /// Return true if we have any mouse event handlers.
     //
     /// NOTE: this function currently does not consider

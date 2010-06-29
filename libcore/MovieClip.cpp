@@ -823,7 +823,7 @@ MovieClip::advance()
         // SWFMovieDefinition(root)
         if (_currentFrame != (size_t)prev_frame)
         {
-            if ( _currentFrame == 0 && has_looped() )
+            if (_currentFrame == 0 && _hasLooped)
             {
 #ifdef GNASH_DEBUG
                 log_debug(_("Jumping back to frame 0 of movieclip %s"),
