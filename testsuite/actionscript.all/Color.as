@@ -143,6 +143,31 @@ check_equals ( trans.aa, 100 );
 check_equals ( trans.ab, 0 );
 
 
+ort = _root.createEmptyMovieClip("ort", 605);
+c = new Color(ort);
+ctr = c.getTransform();
+check_equals (ctr.ra, 100);
+check_equals (ctr.ga, 100);
+check_equals (ctr.ba, 100);
+check_equals (ctr.aa, 100);
+check_equals (ctr.rb, 0);
+check_equals (ctr.gb, 0);
+check_equals (ctr.bb, 0);
+check_equals (ctr.ab, 0);
+
+ort._alpha = 0;
+ctr = c.getTransform();
+check_equals (ctr.ra, 100);
+check_equals (ctr.ga, 100);
+check_equals (ctr.ba, 100);
+xcheck_equals (ctr.aa, 0);
+check_equals (ctr.rb, 0);
+check_equals (ctr.gb, 0);
+check_equals (ctr.bb, 0);
+check_equals (ctr.ab, 0);
+
+
+
 //-----------------------------------------------------------
 // test the Color::setTransform method
 //-----------------------------------------------------------
