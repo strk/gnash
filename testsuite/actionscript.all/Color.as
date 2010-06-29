@@ -142,6 +142,34 @@ check_equals ( trans.bb, 0 );
 check_equals ( trans.aa, 100 );
 check_equals ( trans.ab, 0 );
 
+#if OUTPUT_VERSION > 5
+
+// No createEmptyMovieClip in v5
+
+ort = _root.createEmptyMovieClip("ort", 605);
+c = new Color(ort);
+ctr = c.getTransform();
+check_equals (ctr.ra, 100);
+check_equals (ctr.ga, 100);
+check_equals (ctr.ba, 100);
+check_equals (ctr.aa, 100);
+check_equals (ctr.rb, 0);
+check_equals (ctr.gb, 0);
+check_equals (ctr.bb, 0);
+check_equals (ctr.ab, 0);
+
+ort._alpha = 0;
+ctr = c.getTransform();
+check_equals (ctr.ra, 100);
+check_equals (ctr.ga, 100);
+check_equals (ctr.ba, 100);
+check_equals (ctr.aa, 0);
+check_equals (ctr.rb, 0);
+check_equals (ctr.gb, 0);
+check_equals (ctr.bb, 0);
+check_equals (ctr.ab, 0);
+
+#endif
 
 //-----------------------------------------------------------
 // test the Color::setTransform method
@@ -303,11 +331,11 @@ trans2 = colorObj.getTransform();
 // (int16)(12800 / 100.0 * 256) == -12800
 // Gnash failed, but not due to accuracy problem,
 // _alpha is not calculated correctly.
-xcheck_equals(mc1._alpha, -12800);
+check_equals(mc1._alpha, -12800);
 
 trans.ab = 10;
 // _alpha is not calculated correctly. Not sure about the algorithm at the moment. 
-xcheck_equals(mc1._alpha, -12800);
+check_equals(mc1._alpha, -12800);
 
 mc1._alpha = 60;
 trans2 = colorObj.getTransform();
@@ -360,4 +388,10 @@ check_equals (typeof(c), 'undefined');
 //-----------------------------------------------------------
 
 
-totals();
+#if OUTPUT_VERSION == 5
+totals(134);
+#elif OUTPUT_VERSION == 6
+totals(165);
+#else
+totals(155);
+#endif

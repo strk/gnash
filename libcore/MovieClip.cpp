@@ -2144,7 +2144,6 @@ cxform
 MovieClip::get_world_cxform() const
 {
     cxform cf = DisplayObject::get_world_cxform();
-    cf.concatenate(_userCxform); 
     return cf;
 }
 

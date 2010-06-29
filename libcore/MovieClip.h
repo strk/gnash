@@ -266,23 +266,6 @@ public:
     /// This is to suppor the Color asobject class
     cxform  get_world_cxform() const;
 
-    /// Update user-defined color transform
-    //
-    /// This should only be used by the Color AS class
-    void set_user_cxform(const cxform& cx)
-    {
-        set_invalidated();
-        _userCxform = cx;
-    }
-
-    /// Return the user-defined color transform
-    //
-    /// This should only be used by the Color AS class
-    cxform get_user_cxform() const
-    {
-        return _userCxform;
-    }
-
     /// Look up the labeled frame, and jump to it.
     bool goto_labeled_frame(const std::string& label);
         
@@ -880,8 +863,6 @@ private:
     /// we need them (ie: anyone calls set_textfield_variable)
     ///
     std::auto_ptr<TextFieldIndex> _text_variables;
-
-    cxform _userCxform;
 
     std::string _droptarget;
 
