@@ -142,6 +142,9 @@ check_equals ( trans.bb, 0 );
 check_equals ( trans.aa, 100 );
 check_equals ( trans.ab, 0 );
 
+#if OUTPUT_VERSION > 5
+
+// No createEmptyMovieClip in v5
 
 ort = _root.createEmptyMovieClip("ort", 605);
 c = new Color(ort);
@@ -166,7 +169,7 @@ check_equals (ctr.gb, 0);
 check_equals (ctr.bb, 0);
 check_equals (ctr.ab, 0);
 
-
+#endif
 
 //-----------------------------------------------------------
 // test the Color::setTransform method
@@ -385,4 +388,10 @@ check_equals (typeof(c), 'undefined');
 //-----------------------------------------------------------
 
 
-totals();
+#if OUTPUT_VERSION == 5
+totals(134);
+#elif OUTPUT_VERSION == 6
+totals(165);
+#else
+totals(155);
+#endif
