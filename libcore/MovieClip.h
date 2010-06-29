@@ -278,8 +278,7 @@ public:
     /// Return the user-defined color transform
     //
     /// This should only be used by the Color AS class
-    cxform get_user_cxform() const
-    {
+    const cxform& get_user_cxform() const {
         return _userCxform;
     }
 
