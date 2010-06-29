@@ -163,7 +163,7 @@ ctr = c.getTransform();
 check_equals (ctr.ra, 100);
 check_equals (ctr.ga, 100);
 check_equals (ctr.ba, 100);
-xcheck_equals (ctr.aa, 0);
+check_equals (ctr.aa, 0);
 check_equals (ctr.rb, 0);
 check_equals (ctr.gb, 0);
 check_equals (ctr.bb, 0);
@@ -331,11 +331,11 @@ trans2 = colorObj.getTransform();
 // (int16)(12800 / 100.0 * 256) == -12800
 // Gnash failed, but not due to accuracy problem,
 // _alpha is not calculated correctly.
-xcheck_equals(mc1._alpha, -12800);
+check_equals(mc1._alpha, -12800);
 
 trans.ab = 10;
 // _alpha is not calculated correctly. Not sure about the algorithm at the moment. 
-xcheck_equals(mc1._alpha, -12800);
+check_equals(mc1._alpha, -12800);
 
 mc1._alpha = 60;
 trans2 = colorObj.getTransform();

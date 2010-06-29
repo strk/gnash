@@ -258,11 +258,11 @@ check_equals(btx.bb, 0);
 check_equals(btx.ab, 0);
 
 ct9 = d.transform.colorTransform;
-xcheck_equals(ct9.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=255, greenOffset=0, blueOffset=0, alphaOffset=0)")
+check_equals(ct9.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=255, greenOffset=0, blueOffset=0, alphaOffset=0)")
 
 c.setRGB(0x0000ff);
 ct10 = d.transform.colorTransform;
-xcheck_equals(ct10.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=255, alphaOffset=0)")
+check_equals(ct10.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=255, alphaOffset=0)")
 
 tr = d.transform;
 tr.colorTransform = new ColorTransform(0, 0, 0, 1, 0, 127, 0, 0);
@@ -280,8 +280,6 @@ check_equals(btx.rb, 0);
 check_equals(btx.gb, 127);
 check_equals(btx.bb, 0);
 check_equals(btx.ab, 0);
-
-
 
 totals(94);
 #endif
