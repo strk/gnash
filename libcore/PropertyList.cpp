@@ -219,8 +219,8 @@ PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
 	string_table& st = getStringTable(_owner);
 
     // We should enumerate in order of creation, not lexicographically.
-	for (container::const_reverse_iterator i = _props.rbegin(),
-            ie = _props.rend(); i != ie; ++i) {
+	for (container::const_iterator i = _props.begin(),
+            ie = _props.end(); i != ie; ++i) {
 
 		if (i->getFlags().get_dont_enum()) continue;
 

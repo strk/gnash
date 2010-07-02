@@ -99,9 +99,9 @@ public:
         // The template keyword is not required by the Standard here, but the
         // OpenBSD compiler needs it. Use of the template keyword where it is
         // not necessary is not an error.
-        for (container::const_reverse_iterator
-                it = _props.rbegin(),
-                ie = _props.rend(); it != ie; ++it)
+        for (container::const_iterator
+                it = _props.begin(),
+                ie = _props.end(); it != ie; ++it)
         {
             if (!cmp(*it)) continue;
             as_value val = it->getValue(_owner);
