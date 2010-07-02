@@ -126,7 +126,7 @@ public:
     ///                 should be returned, otherwise, this should be the
     ///                 result of a previous call to getOrderAfter
     /// @return         A value which can be used for ordered access. 
-    const Property* getOrderAfter(int order);
+    const Property* getOrderAfter(int order) const;
 
     /// Set the value of a property, creating a new one if it doesn't exist.
     //
@@ -172,7 +172,7 @@ public:
     /// Get a property, if existing, by order
     //
     /// @param order    The ordering id
-    const Property* getPropertyByOrder(int order);
+    const Property* getPropertyByOrder(int order) const;
     
     /// Delete a Property, if existing and not protected from deletion.
     //

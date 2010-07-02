@@ -64,10 +64,10 @@ iterator_find(PropertyList::container &p, const ObjectURI& uri)
 
 }
 
-typedef PropertyList::container::iterator order_iterator;
+typedef PropertyList::container::const_iterator order_iterator;
 
 order_iterator
-iterator_find(PropertyList::container &p, int order)
+iterator_find(const PropertyList::container &p, int order)
 {
     if (order < 0) return p.end();
     if (static_cast<size_t>(order) >= p.size()) return p.end();
@@ -77,7 +77,7 @@ iterator_find(PropertyList::container &p, int order)
 }
 
 const Property*
-PropertyList::getPropertyByOrder(int order)
+PropertyList::getPropertyByOrder(int order) const
 {
     order_iterator i = iterator_find(_props, order);
 	if (i == _props.end()) return 0;
@@ -86,7 +86,7 @@ PropertyList::getPropertyByOrder(int order)
 }
 
 const Property*
-PropertyList::getOrderAfter(int order)
+PropertyList::getOrderAfter(int order) const
 {
     order_iterator i = iterator_find(_props, order);
 
@@ -138,7 +138,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		return true;
 	}
 
-	const Property& prop = *found;
+	Property& prop = *found;
 	if (prop.isReadOnly() && ! prop.isDestructive())
 	{
         ObjectURI::Logger l(getStringTable(_owner));
@@ -147,10 +147,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		return false;
 	}
 
-	// Property is const because the container uses its members
-	// for indexing. We don't use value (only name and namespace)
-	// so this const_cast is safe
-	const_cast<Property&>(prop).setValue(_owner, val);
+	prop.setValue(_owner, val);
 
 	return true;
 }
@@ -163,7 +160,7 @@ PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 
 	PropFlags oldFlags = found->getFlags();
 
-	PropFlags& f = const_cast<PropFlags&>(found->getFlags());
+	PropFlags& f = found->getFlags();
 	return f.set_flags(setFlags, clearFlags);
 
 #ifdef GNASH_DEBUG_PROPERTY
@@ -178,7 +175,7 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 {
     PropertyList::container::iterator it;
     for (it=_props.begin(); it != _props.end(); ++it) {
-		PropFlags& f = const_cast<PropFlags&>(it->getFlags());
+		PropFlags& f = it->getFlags();
 		f.set_flags(setFlags, clearFlags);
     }
 }
@@ -188,7 +185,7 @@ PropertyList::getProperty(const ObjectURI& uri) const
 {
 	container::iterator found = iterator_find(const_cast<container&>(_props), uri);
 	if (found == _props.end()) return 0;
-	return const_cast<Property*>(&(*found));
+	return &(*found);
 }
 
 std::pair<bool,bool>
