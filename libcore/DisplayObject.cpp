@@ -191,7 +191,9 @@ DisplayObject::pathElement(string_table::key key)
 
 	string_table& st = getStringTable(*obj);
     if (key == st.find("..")) return getObject(get_parent());
-	if (key == st.find(".") || key == st.find("this")) return obj;
+	if (key == st.find(".") || noCaseEqual(st, key, st.find("this"))) {
+        return obj;
+    }
 	return 0;
 }
 
@@ -967,10 +969,13 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         }
     }
 
+    // These magic properties are case insensitive in all versions!
+    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
+
     // These properties have normal case-sensitivity.
     // They are tested to exist for TextField, MovieClip, and Button
     // but do not belong to the inheritance chain.
-    switch (key)
+    switch (getSWFVersion(*o) < 7 ? noCaseKey : key)
     {
         default:
             break;
@@ -985,9 +990,6 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
             val = &getGlobal(*o);
             return true;
     }
-
-    // These magic properties are case insensitive in all versions!
-    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
 
     if (doGet(noCaseKey, obj, val)) return true;
 

@@ -50,12 +50,9 @@ iterator_find(PropertyList::container &p, const ObjectURI& uri)
     const bool f = vm.getSWFVersion() < 7;
 
     if (f) {
+        string_table& st = vm.getStringTable();
         for (PropertyList::container::iterator it = p.begin(); it != p.end(); ++it) {
-            string_table& st = vm.getStringTable();
-            const std::string a = st.value(uri.name);
-            const std::string b = st.value(it->uri().name);
-            StringNoCaseEqual cmp;
-            if (cmp(a, b)) return it;
+            if (noCaseEqual(st, uri.name, it->uri().name)) return it;
         }
         return p.end();
     }
