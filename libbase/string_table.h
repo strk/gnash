@@ -138,24 +138,22 @@ public:
 	/// @return A mutex which can be used to lock the string table to inserts.
 	boost::mutex& lock_mutex() { return mLock; }
 
-	/// Make the comparisons case-insensitive.
-	void set_insensitive() { mCaseInsensitive = true; }
 
 	/// Construct the empty string_table
 	string_table() :
 		mTable(),
 		mLock(),
-		mHighestKey(0),
-		mCaseInsensitive(false)
-	{/**/}
+		mHighestKey(0)
+	{}
 
 private:
 	table mTable;
 	static const std::string mEmpty; // The empty string, universally.
 	boost::mutex mLock;
 	std::size_t mHighestKey;
-	bool mCaseInsensitive;
 };
+    
+bool noCaseEqual(string_table& st, string_table::key a, string_table::key b);
 
 } /* namespace gnash */
 #endif /* GNASH_STRING_TABLE_H */

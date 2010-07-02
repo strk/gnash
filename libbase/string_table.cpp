@@ -20,29 +20,16 @@
 #include "string_table.h"
 #include <boost/algorithm/string/case_conv.hpp>
 
-using namespace gnash;
+namespace gnash {
 
 const std::string string_table::mEmpty;
 
 string_table::key
 string_table::find(const std::string& t_f, bool insert_unfound)
 {
-	std::string t_fcase;
-	const std::string *to_find = NULL;
+    if (t_f.empty()) return 0;
 
-	if (mCaseInsensitive)
-	{
-		t_fcase = t_f;
-		boost::to_lower(t_fcase);
-		to_find = &t_fcase;
-	}
-	else
-		to_find = &t_f;
-		
-	// Empty strings all map to 0
-	if (to_find->empty()) return 0;
-
-	table::nth_index<0>::type::iterator i = mTable.get<0>().find(*to_find);
+	table::nth_index<0>::type::iterator i = mTable.get<0>().find(t_f);
 
 	if (i == mTable.end())
 	{
@@ -53,14 +40,14 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 			// First we lock.
 			boost::mutex::scoped_lock aLock(mLock);
 			// Then we see if someone else managed to sneak past us.
-			i = mTable.get<0>().find(*to_find);
+			i = mTable.get<0>().find(t_f);
 			// If they did, use that value.
 			if (i != mTable.end())
 				return i->mId;
 
 			// Otherwise, insert it.
 			theSvt.mValue = t_f;
-			theSvt.mComp = *to_find;
+			theSvt.mComp = t_f;
 			theSvt.mId = ++mHighestKey;
 			mTable.insert(theSvt);
 			return theSvt.mId;
@@ -101,7 +88,6 @@ string_table::insert_group(const svt* l, std::size_t size)
 	{
         // Copy to avoid changing the original table.
         svt s = l[i];
-        if (mCaseInsensitive) boost::to_lower(s.mComp);
 
 		// The keys don't have to be consecutive, so any time we find a key
 		// that is too big, jump a few keys to avoid rewriting this on every
@@ -115,8 +101,15 @@ string_table::key
 string_table::already_locked_insert(const std::string& to_insert, boost::mutex&)
 {
 	svt theSvt (to_insert, ++mHighestKey);
-	if (mCaseInsensitive)
-		boost::to_lower(theSvt.mComp);
 	return mTable.insert(theSvt).first->mId;
 }
 
+bool
+noCaseEqual(string_table& st, string_table::key a, string_table::key b)
+{
+    const std::string& s1 = boost::to_lower_copy(st.value(a));
+    const std::string& s2 = boost::to_lower_copy(st.value(b));
+    return s1 == s2;
+}
+          
+}
