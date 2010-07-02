@@ -42,27 +42,31 @@ namespace {
 
 inline
 PropertyList::container::iterator
-iterator_find(const PropertyList::container &p, const ObjectURI& uri)
+iterator_find(PropertyList::container &p, const ObjectURI& uri)
 {
-    return p.find(uri);
+    for (PropertyList::container::iterator it = p.begin(); it != p.end(); ++it) {
+        if (it->uri() == uri) return it;
+    }
+    return p.end();
 }
 
 }
 
-typedef PropertyList::container::index<PropertyList::OrderTag>::type::iterator
-    order_iterator;
+typedef PropertyList::container::iterator order_iterator;
 
 order_iterator
 iterator_find(PropertyList::container &p, int order)
 {
-	return p.get<1>().find(order);
+    if (order < 0) return p.end();
+    if (static_cast<size_t>(order) >= p.size()) return p.end();
+    return p.begin() + order;
 }
 
 const Property*
 PropertyList::getPropertyByOrder(int order)
 {
     order_iterator i = iterator_find(_props, order);
-	if (i == _props.get<1>().end()) return 0;
+	if (i == _props.end()) return 0;
 
 	return &(*i);
 }
@@ -72,11 +76,11 @@ PropertyList::getOrderAfter(int order)
 {
     order_iterator i = iterator_find(_props, order);
 
-	if (i == _props.get<1>().end()) return 0;
+	if (i == _props.end()) return 0;
 
 	do {
 		++i;
-		if (i == _props.get<1>().end()) return 0;
+		if (i == _props.end()) return 0;
 	} while (i->getFlags().get_dont_enum());
 
 	return &(*i);
@@ -86,11 +90,11 @@ bool
 PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 {
     order_iterator found = iterator_find(_props, slotId + 1);
-	if (found != _props.get<1>().end()) return false;
+	if (found != _props.end()) return false;
 
 	Property a(uri, as_value());
 	a.setOrder(slotId + 1);
-	_props.insert(a);
+	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
@@ -113,7 +117,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		Property a(uri, val, flagsIfMissing);
 		// Non slot properties are negative ordering in insertion order
 		a.setOrder(- ++_defaultOrder - 1);
-		_props.insert(a);
+		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("Simple AS property %s inserted with flags %s",
@@ -170,7 +174,7 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 Property*
 PropertyList::getProperty(const ObjectURI& uri) const
 {
-	container::iterator found = iterator_find(_props, uri);
+	container::iterator found = iterator_find(const_cast<container&>(_props), uri);
 	if (found == _props.end()) return 0;
 	return const_cast<Property*>(&(*found));
 }
@@ -215,10 +219,8 @@ PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
 	string_table& st = getStringTable(_owner);
 
     // We should enumerate in order of creation, not lexicographically.
-    typedef container::nth_index<1>::type ContainerByOrder;
-
-	for (ContainerByOrder::const_reverse_iterator i=_props.get<1>().rbegin(),
-            ie=_props.get<1>().rend(); i != ie; ++i) {
+	for (container::const_reverse_iterator i = _props.rbegin(),
+            ie = _props.rend(); i != ie; ++i) {
 
 		if (i->getFlags().get_dont_enum()) continue;
 
@@ -260,7 +262,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 		PropFlags& f = a.getFlags();
 		f = found->getFlags();
 		a.setCache(found->getCache());
-		_props.replace(found, a);
+		*found = a;
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -272,7 +274,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 	else
 	{
 		a.setCache(cacheVal);
-		_props.insert(a);
+		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("AS GetterSetter %s inserted with flags %s", l(uri),
@@ -296,7 +298,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 		// copy flags from previous member (even if it's a normal member ?)
 		PropFlags& f = a.getFlags();
 		f = found->getFlags();
-		_props.replace(found, a);
+		*found = a;
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -307,7 +309,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 	}
 	else
 	{
-		_props.insert(a);
+		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
 		string_table& st = getStringTable(_owner);
 		log_debug("Native GetterSetter %s in namespace %s inserted with "
@@ -334,7 +336,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 	// destructive getter don't need a setter
 	Property a(uri, &getter, (as_function*)0, flagsIfMissing, true);
 	a.setOrder(- ++_defaultOrder - 1);
-	_props.insert(a);
+	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
@@ -355,7 +357,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri,
 	// destructive getter don't need a setter
 	Property a(uri, getter, (as_c_function_ptr)0, flagsIfMissing, true);
 	a.setOrder(- ++_defaultOrder - 1);
-	_props.insert(a);
+	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));

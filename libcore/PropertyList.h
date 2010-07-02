@@ -63,30 +63,7 @@ public:
 
     typedef std::set<ObjectURI> PropertyTracker;
 
-    /// A tag for identifying an index in the container.
-    struct OrderTag {};
-
-    /// The actual container
-    /// index 0 is the fully indexed name/namespace pairs, which are unique
-    /// Because of the way searching works, this index can also be
-    /// used to search for the names alone (composite keys are sorted
-    /// lexographically, beginning with the first element specified)
-    ///
-    /// index 1 is an ordered sequence, and it is used for the AS3 style
-    /// enumeration (which requires an order number for each property),
-    /// for slot access, and for array access.
-    typedef boost::multi_index_container<
-        Property,
-        boost::multi_index::indexed_by<
-            boost::multi_index::ordered_unique<
-                boost::multi_index::const_mem_fun<Property,const ObjectURI&,&Property::uri>
-            >,
-            boost::multi_index::ordered_unique<
-                boost::multi_index::tag<OrderTag>,
-                boost::multi_index::const_mem_fun<Property,int,&Property::getOrder>
-            >
-        >
-    > container;
+    typedef std::vector<Property> container;
 
     /// Construct the PropertyList 
     //
@@ -119,14 +96,12 @@ public:
     template <class U, class V>
     void visitValues(V& visitor, U cmp = U()) const
     {
-        typedef container::nth_index<1>::type ContainerByOrder;
-
         // The template keyword is not required by the Standard here, but the
         // OpenBSD compiler needs it. Use of the template keyword where it is
         // not necessary is not an error.
-        for (ContainerByOrder::const_reverse_iterator
-                it = _props.template get<1>().rbegin(),
-                ie = _props.template get<1>().rend(); it != ie; ++it)
+        for (container::const_reverse_iterator
+                it = _props.rbegin(),
+                ie = _props.rend(); it != ie; ++it)
         {
             if (!cmp(*it)) continue;
             as_value val = it->getValue(_owner);
