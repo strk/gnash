@@ -492,38 +492,7 @@ as_object::get_super(string_table::key fname)
 int
 as_object::nextIndex(int index, as_object **owner)
 {
-  skip_duplicates:
-    unsigned char depth = index & 0xFF;
-    unsigned char i = depth;
-    index /= 256; // Signed
-    as_object *obj = this;
-    while (i--)
-	{
-            obj = obj->get_prototype();
-            if (!obj)
-                return 0;
-	}
-	
-    const Property *p = obj->_members.getOrderAfter(index);
-    if (!p)
-	{
-            obj = obj->get_prototype();
-            if (!obj)
-                return 0;
-            p = obj->_members.getOrderAfter(0);
-            ++depth;
-	}
-    if (p)
-	{
-            if (findProperty(p->uri()) != p)
-		{
-                    index = p->getOrder() * 256 | depth;
-                    goto skip_duplicates; // Faster than recursion.
-		}
-            if (owner)
-                *owner = obj;
-            return p->getOrder() * 256 | depth;
-	}
+    // TODO: drop.
     return 0;
 }
 

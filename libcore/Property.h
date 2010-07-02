@@ -257,8 +257,7 @@ public:
         : 
 		_bound(as_value()),
         _destructive(false),
-        _uri(uri),
-		_orderID(0)
+        _uri(uri)
 	{}
 
 	/// Copy constructor
@@ -267,8 +266,7 @@ public:
 		_flags(p._flags),
         _bound(p._bound),
         _destructive(p._destructive),
-        _uri(p._uri),
-        _orderID(p._orderID)
+        _uri(p._uri)
 	{}
 
 	Property(const ObjectURI& uri, const as_value& value,
@@ -277,8 +275,7 @@ public:
 		_flags(flags),
         _bound(value),
         _destructive(false),
-		_uri(uri),
-		_orderID(0)
+		_uri(uri)
 	{}
 
 	Property(const ObjectURI& uri,
@@ -288,8 +285,7 @@ public:
 		_flags(flags), 
         _bound(GetterSetter(getter, setter)),
 		_destructive(destroy),
-        _uri(uri),
-		_orderID(0)
+        _uri(uri)
 	{}
 
 	Property(const ObjectURI& uri, as_function *getter, as_function *setter,
@@ -298,8 +294,7 @@ public:
 		_flags(),
         _bound(GetterSetter(getter, setter)),
         _destructive(destroy),
-        _uri(uri),
-		_orderID(0)
+        _uri(uri)
 	{}
 
 	Property(const ObjectURI& uri, as_c_function_ptr getter,
@@ -309,8 +304,7 @@ public:
 		_flags(flags),
         _bound(GetterSetter(getter, setter)),
         _destructive(destroy),
-        _uri(uri),
-		_orderID(0)
+        _uri(uri)
 	{}
 
 	/// Set a user-defined setter
@@ -372,20 +366,6 @@ public:
 	///
 	void setValue(as_object& this_ptr, const as_value &value);
 
-	/// Set the order id
-	//
-	/// NOTE: this field is used by one of the indexes
-	///       in the boost::multi_index used by PropertyList,
-	///       so changing this value on an instance which was
-	///       put in that index might result in corruption of
-	///       the index invariant. (at least this is what happens
-	///       with standard containers indexed on an element's member).
-	///
-	void setOrder(int order) { _orderID = order; }
-
-	/// Get the order id
-	int getOrder() const { return _orderID; }
-
 	/// is this a read-only member ?
 	bool isReadOnly() const { return _flags.get_read_only(); }
 
@@ -441,10 +421,6 @@ private:
 	
     // TODO: this should be const, but the assignment operator is still needed 
     ObjectURI _uri;
-
-	// An ordering number, for access by order
-	// (AS3 enumeration and slots, AS2 arrays)
-	int _orderID;
 
 	/// Get a value from a getter function.
 	as_value getDelayedValue(const as_object& this_ptr) const;
