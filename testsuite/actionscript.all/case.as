@@ -209,7 +209,7 @@ for(var prop in obj)
 propRecorder.sort(); // case sensitive sort
 check_equals(propRecorder.length, 2);
 #if OUTPUT_VERSION < 7
-xcheck_equals(propRecorder[0], 'A')
+check_equals(propRecorder[0], 'A')
 #else
 check_equals(propRecorder[0], 'A')
 #endif
@@ -224,7 +224,7 @@ for(var prop in obj)
 propRecorder.sort(); //case sensitive sort
 #if OUTPUT_VERSION < 7
     check_equals(propRecorder.length, 2);
-    xcheck_equals(propRecorder[0], 'A')
+    check_equals(propRecorder[0], 'A')
     check_equals(propRecorder[1], 'b')
 #else
     check_equals(propRecorder.length, 3);
@@ -242,7 +242,7 @@ for(var prop in obj)
 propRecorder.sort(); //case sensitive sort
 #if OUTPUT_VERSION < 7
     check_equals(propRecorder.length, 2);
-    xcheck_equals(propRecorder[0], 'A')
+    check_equals(propRecorder[0], 'A')
     check_equals(propRecorder[1], 'b')
 #else
     check_equals(propRecorder.length, 4);
@@ -292,8 +292,8 @@ check_equals(propRecorder.length, 2);
  // gnash fails here because 'B' will point to a previously used 'b'
  // and 'a' will point to a previously used 'A'
  // in the global string_table
- xcheck_equals(propRecorder[0], 'B');
- xcheck_equals(propRecorder[1], 'a');
+ check_equals(propRecorder[0], 'B');
+ check_equals(propRecorder[1], 'a');
 #else
  // The problem above is a non-issue in SWF7 or higher, as 'b' and
  // 'B' will be separate entries in the string_table
