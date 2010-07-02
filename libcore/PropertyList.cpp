@@ -44,6 +44,21 @@ inline
 PropertyList::container::iterator
 iterator_find(PropertyList::container &p, const ObjectURI& uri)
 {
+
+    VM& vm = VM::get();
+
+    const bool f = vm.getSWFVersion() < 7;
+
+    if (f) {
+        for (PropertyList::container::iterator it = p.begin(); it != p.end(); ++it) {
+            string_table& st = vm.getStringTable();
+            const std::string a = st.value(uri.name);
+            const std::string b = st.value(it->uri().name);
+            StringNoCaseEqual cmp;
+            if (cmp(a, b)) return it;
+        }
+        return p.end();
+    }
     for (PropertyList::container::iterator it = p.begin(); it != p.end(); ++it) {
         if (it->uri() == uri) return it;
     }

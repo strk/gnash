@@ -249,10 +249,6 @@ static const string_table::svt preload_names[] =
 void
 loadStrings(string_table& table, int version)
 {
-    if (version < 7) {
-        table.set_insensitive();
-    }
-
     table.insert_group(preload_names, arraySize(preload_names));
 }
 
