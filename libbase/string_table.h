@@ -145,11 +145,15 @@ public:
 		mHighestKey(0)
 	{}
 
+    bool noCase(key a, key b) const;
+
 private:
 	table mTable;
 	static const std::string mEmpty; // The empty string, universally.
 	boost::mutex mLock;
 	std::size_t mHighestKey;
+
+    std::map<key, key> _caseTable;
 };
     
 bool noCaseEqual(string_table& st, string_table::key a, string_table::key b);

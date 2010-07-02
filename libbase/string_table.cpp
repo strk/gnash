@@ -35,21 +35,16 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 	{
 		if (insert_unfound)
 		{
-			svt theSvt;
 
 			// First we lock.
-			boost::mutex::scoped_lock aLock(mLock);
+			//boost::mutex::scoped_lock aLock(mLock);
 			// Then we see if someone else managed to sneak past us.
 			i = mTable.get<0>().find(t_f);
 			// If they did, use that value.
 			if (i != mTable.end())
 				return i->mId;
 
-			// Otherwise, insert it.
-			theSvt.mValue = t_f;
-			theSvt.mId = ++mHighestKey;
-			mTable.insert(theSvt);
-			return theSvt.mId;
+            return already_locked_insert(t_f, mLock);
 		}
 		else
 			return 0;
@@ -72,44 +67,77 @@ string_table::find_dot_pair(string_table::key left, string_table::key right,
 string_table::key
 string_table::insert(const std::string& to_insert)
 {
-	boost::mutex::scoped_lock aLock(mLock);
+	//boost::mutex::scoped_lock aLock(mLock);
 	svt theSvt(to_insert, ++mHighestKey);
+	
+    const key ret = mTable.insert(theSvt).first->mId;
 
-	return mTable.insert(theSvt).first->mId;
+    const std::string i = boost::to_lower_copy(to_insert);
+    if (i != to_insert)  {
+        const key k = find(i, true);
+        _caseTable[ret] = k;
+    }
+
+    return ret;
 }
 
 void
 string_table::insert_group(const svt* l, std::size_t size)
 {
-	boost::mutex::scoped_lock aLock(mLock);
-
-	for (std::size_t i = 0; i < size; ++i)
-	{
+	//boost::mutex::scoped_lock aLock(mLock);
+    for (std::size_t i = 0; i < size; ++i) {
         // Copy to avoid changing the original table.
-        svt s = l[i];
+        const svt s = l[i];
 
-		// The keys don't have to be consecutive, so any time we find a key
-		// that is too big, jump a few keys to avoid rewriting this on every
+        // The keys don't have to be consecutive, so any time we find a key
+        // that is too big, jump a few keys to avoid rewriting this on every
         // item.
-		if (s.mId > mHighestKey) mHighestKey = s.mId + 256;
-		mTable.insert(s);
-	}
+       if (s.mId > mHighestKey) mHighestKey = s.mId + 256;
+       mTable.insert(s);
+    }
+    
+    for (std::size_t i = 0; i < size; ++i) {
+        const svt s = l[i];
+        const std::string& t = boost::to_lower_copy(s.mValue);
+        if (t != s.mValue) {
+            _caseTable[s.mId] = insert(t);
+        }
+    }
+
 }
 
 string_table::key
 string_table::already_locked_insert(const std::string& to_insert, boost::mutex&)
 {
 	svt theSvt (to_insert, ++mHighestKey);
-	return mTable.insert(theSvt).first->mId;
+
+	const key ret = mTable.insert(theSvt).first->mId;
+
+    const std::string i = boost::to_lower_copy(to_insert);
+    if (i != to_insert)  {
+        const key k = find(i, true);
+        _caseTable[ret] = k;
+    }
+
+    return ret;
+}
+
+bool
+string_table::noCase(key a, key b) const
+{
+    std::map<key, key>::const_iterator i = _caseTable.find(a);
+    const key k1  = i == _caseTable.end() ? a : i->second;
+
+    std::map<key, key>::const_iterator j = _caseTable.find(b);
+    const key k2  = j == _caseTable.end() ? b : j->second;
+    return k2 == k1;
 }
 
 bool
 noCaseEqual(string_table& st, string_table::key a, string_table::key b)
 {
     if (a == b) return true;
-    const std::string& s1 = boost::to_lower_copy(st.value(a));
-    const std::string& s2 = boost::to_lower_copy(st.value(b));
-    return s1 == s2;
+    return st.noCase(a, b);
 }
           
 }
