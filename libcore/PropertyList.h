@@ -63,7 +63,7 @@ public:
 
     typedef std::set<ObjectURI> PropertyTracker;
 
-    typedef std::vector<Property> container;
+    typedef std::list<Property> container;
 
     /// Construct the PropertyList 
     //

@@ -71,7 +71,9 @@ iterator_find(PropertyList::container &p, int order)
 {
     if (order < 0) return p.end();
     if (static_cast<size_t>(order) >= p.size()) return p.end();
-    return p.begin() + order;
+    order_iterator i = p.begin();
+    std::advance(i, order);
+    return i;
 }
 
 const Property*
@@ -105,7 +107,6 @@ PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 	if (found != _props.end()) return false;
 
 	Property a(uri, as_value());
-	a.setOrder(slotId + 1);
 	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
