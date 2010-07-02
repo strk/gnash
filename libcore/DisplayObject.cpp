@@ -191,7 +191,13 @@ DisplayObject::pathElement(string_table::key key)
 
 	string_table& st = getStringTable(*obj);
     if (key == st.find("..")) return getObject(get_parent());
-	if (key == st.find(".") || noCaseEqual(st, key, st.find("this"))) {
+
+    const int version = getSWFVersion(*obj);
+
+	if (key == st.find(".")) return obj;
+    
+    const string_table::key th = st.find("this");
+    if (key == th || (version < 7 && noCaseEqual(st, key, th))) {
         return obj;
     }
 	return 0;

@@ -107,6 +107,7 @@ string_table::already_locked_insert(const std::string& to_insert, boost::mutex&)
 bool
 noCaseEqual(string_table& st, string_table::key a, string_table::key b)
 {
+    if (a == b) return true;
     const std::string& s1 = boost::to_lower_copy(st.value(a));
     const std::string& s2 = boost::to_lower_copy(st.value(b));
     return s1 == s2;
