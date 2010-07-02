@@ -116,7 +116,6 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		// create a new member
 		Property a(uri, val, flagsIfMissing);
 		// Non slot properties are negative ordering in insertion order
-		a.setOrder(- ++_defaultOrder - 1);
 		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -253,7 +252,6 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 	const PropFlags& flagsIfMissing)
 {
 	Property a(uri, &getter, setter, flagsIfMissing);
-	a.setOrder(- ++_defaultOrder - 1);
 
 	container::iterator found = iterator_find(_props, uri);
 	if (found != _props.end())
@@ -290,7 +288,6 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 	as_c_function_ptr setter, const PropFlags& flagsIfMissing)
 {
 	Property a(uri, getter, setter, flagsIfMissing);
-	a.setOrder(- ++_defaultOrder - 1);
 
 	container::iterator found = iterator_find(_props, uri);
 	if (found != _props.end())
@@ -335,7 +332,6 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 
 	// destructive getter don't need a setter
 	Property a(uri, &getter, (as_function*)0, flagsIfMissing, true);
-	a.setOrder(- ++_defaultOrder - 1);
 	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
@@ -356,7 +352,6 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri,
 
 	// destructive getter don't need a setter
 	Property a(uri, getter, (as_c_function_ptr)0, flagsIfMissing, true);
-	a.setOrder(- ++_defaultOrder - 1);
 	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
