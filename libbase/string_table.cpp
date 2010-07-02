@@ -47,7 +47,6 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 
 			// Otherwise, insert it.
 			theSvt.mValue = t_f;
-			theSvt.mComp = t_f;
 			theSvt.mId = ++mHighestKey;
 			mTable.insert(theSvt);
 			return theSvt.mId;

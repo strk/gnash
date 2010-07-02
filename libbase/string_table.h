@@ -48,20 +48,19 @@ public:
 	{
 		std::string mValue;
 		std::size_t mId;
-		std::string mComp;
 
-		svt() : mValue(""), mId(0), mComp("") {/**/}
+		svt() : mValue(""), mId(0) {/**/}
 
 		svt(const std::string &val, std::size_t id) :
-			mValue(val), mId(id), mComp(val) {/**/}
+			mValue(val), mId(id) {}
 	};
 
 public:
 	typedef boost::multi_index_container<svt,
 		boost::multi_index::indexed_by<
-			boost::multi_index::hashed_non_unique<
-				boost::multi_index::member<svt, std::string, &svt::mComp> >,
-			boost::multi_index::hashed_non_unique< // caseless
+			boost::multi_index::hashed_unique<
+				boost::multi_index::member<svt, std::string, &svt::mValue> >,
+			boost::multi_index::hashed_unique<
 				boost::multi_index::member<svt, std::size_t, &svt::mId> > 
 	> > table;
 
