@@ -70,58 +70,6 @@ iterator_find(PropertyList::container& p, const ObjectURI& uri, VM& vm)
 
 }
 
-PropertyList::const_iterator
-iterator_find(const PropertyList::container& p, int order)
-{
-    if (order < 0) return p.end();
-    if (static_cast<size_t>(order) >= p.size()) return p.end();
-    PropertyList::const_iterator i = p.begin();
-    std::advance(i, order);
-    return i;
-}
-
-const Property*
-PropertyList::getPropertyByOrder(int order) const
-{
-    const_iterator i = iterator_find(_props, order);
-	if (i == _props.end()) return 0;
-
-	return &(*i);
-}
-
-const Property*
-PropertyList::getOrderAfter(int order) const
-{
-    const_iterator i = iterator_find(_props, order);
-
-	if (i == _props.end()) return 0;
-
-	do {
-		++i;
-		if (i == _props.end()) return 0;
-	} while (i->getFlags().get_dont_enum());
-
-	return &(*i);
-}
-
-bool
-PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
-{
-    const_iterator found = iterator_find(_props, slotId + 1);
-	if (found != _props.end()) return false;
-
-	Property a(uri, as_value());
-	_props.push_back(a);
-
-#ifdef GNASH_DEBUG_PROPERTY
-    ObjectURI::Logger l(getStringTable(_owner));
-	log_debug("Slot for AS property %s inserted with flags %s", l(uri)
-            a.getFlags());
-#endif
-
-	return true;
-}
-
 bool
 PropertyList::setValue(const ObjectURI& uri, const as_value& val,
         const PropFlags& flagsIfMissing)

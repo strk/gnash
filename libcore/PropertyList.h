@@ -86,7 +86,6 @@ public:
     PropertyList(as_object& obj)
         :
         _props(),
-        _defaultOrder(0),
         _owner(obj)
     {
     }
@@ -132,14 +131,6 @@ public:
     ///                     Enumerated properties are added to donelist.
     void enumerateKeys(as_environment& env, PropertyTracker& donelist) const;
 
-    /// Get the order number just after the passed order number.
-    ///
-    /// @param order    0 is a special value indicating the first order
-    ///                 should be returned, otherwise, this should be the
-    ///                 result of a previous call to getOrderAfter
-    /// @return         A value which can be used for ordered access. 
-    const Property* getOrderAfter(int order) const;
-
     /// Set the value of a property, creating a new one if it doesn't exist.
     //
     /// If the named property is a getter/setter one it's setter
@@ -161,16 +152,6 @@ public:
     bool setValue(const ObjectURI& uri, const as_value& value,
             const PropFlags& flagsIfMissing = 0);
 
-    /// Reserves a slot number for a property
-    ///
-    /// @param slotId
-    /// The slot id to use. (Note that getOrder() on this property will return
-    /// this slot number + 1 if the assignment was successful.)
-    /// @param key      Name of the property.
-    /// @param nsId     The namespace in which the property should be found.
-    /// @return         true if the slot did not previously exist.
-    bool reserveSlot(const ObjectURI& uri, boost::uint16_t slotId);
-
     /// Get a property if it exists.
     //
     /// @param key  Name of the property. Search is case-*sensitive*
@@ -181,11 +162,6 @@ public:
     Property* getProperty(const ObjectURI& uri)
         const;
 
-    /// Get a property, if existing, by order
-    //
-    /// @param order    The ordering id
-    const Property* getPropertyByOrder(int order) const;
-    
     /// Delete a Property, if existing and not protected from deletion.
     //
     ///
@@ -297,8 +273,6 @@ private:
 
     container _props;
 
-    boost::uint32_t _defaultOrder;
-    
     as_object& _owner;
 
 };
