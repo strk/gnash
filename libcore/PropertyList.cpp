@@ -136,7 +136,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		return true;
 	}
 
-	Property& prop = *found;
+	const Property& prop = *found;
 	if (prop.isReadOnly() && ! prop.isDestructive())
 	{
         ObjectURI::Logger l(getStringTable(_owner));
@@ -145,7 +145,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		return false;
 	}
 
-	prop.setValue(_owner, val);
+	const_cast<Property&>(prop).setValue(_owner, val);
 
 	return true;
 }
@@ -158,7 +158,7 @@ PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 
 	PropFlags oldFlags = found->getFlags();
 
-	PropFlags& f = found->getFlags();
+	PropFlags& f = const_cast<Property&>(*found).getFlags();
 	return f.set_flags(setFlags, clearFlags);
 
 #ifdef GNASH_DEBUG_PROPERTY
@@ -173,7 +173,7 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 {
     PropertyList::iterator it;
     for (it=_props.begin(); it != _props.end(); ++it) {
-		PropFlags& f = it->getFlags();
+		PropFlags& f = const_cast<PropFlags&>(it->getFlags());
 		f.set_flags(setFlags, clearFlags);
     }
 }
@@ -183,7 +183,7 @@ PropertyList::getProperty(const ObjectURI& uri) const
 {
 	iterator found = iterator_find(const_cast<container&>(_props), uri);
 	if (found == _props.end()) return 0;
-	return &(*found);
+	return const_cast<Property*>(&(*found));
 }
 
 std::pair<bool,bool>
@@ -265,7 +265,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 		PropFlags& f = a.getFlags();
 		f = found->getFlags();
 		a.setCache(found->getCache());
-		*found = a;
+		_props.replace(found, a);
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -300,7 +300,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 		// copy flags from previous member (even if it's a normal member ?)
 		PropFlags& f = a.getFlags();
 		f = found->getFlags();
-		*found = a;
+		_props.replace(found, a);
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));

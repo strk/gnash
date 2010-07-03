@@ -29,6 +29,7 @@
 #include <boost/cstdint.hpp> 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/key_extractors.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -64,7 +65,16 @@ public:
 
     typedef std::set<ObjectURI> PropertyTracker;
     
-    typedef std::list<Property> container;
+    typedef boost::multi_index_container<
+        Property,
+        boost::multi_index::indexed_by<
+            boost::multi_index::sequenced<>,
+            boost::multi_index::ordered_unique<
+                boost::multi_index::const_mem_fun<
+                    Property, const ObjectURI&, &Property::uri>
+                >
+            >
+        > container;
     typedef container::iterator iterator;
     typedef container::const_iterator const_iterator;
 
