@@ -46,39 +46,17 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 
             return already_locked_insert(t_f, mLock);
 		}
-		else
-			return 0;
+        return 0;
 	}
 
 	return i->mId;
 }
 
 string_table::key
-string_table::find_dot_pair(string_table::key left, string_table::key right, 
-	bool insert_unfound)
-{
-	if (!right)
-		return left;
-
-	std::string isit = value(left) + "." + value(right);
-	return find(isit, insert_unfound);
-}
-
-string_table::key
 string_table::insert(const std::string& to_insert)
 {
 	//boost::mutex::scoped_lock aLock(mLock);
-	svt theSvt(to_insert, ++mHighestKey);
-	
-    const key ret = mTable.insert(theSvt).first->mId;
-
-    const std::string i = boost::to_lower_copy(to_insert);
-    if (i != to_insert)  {
-        const key k = find(i, true);
-        _caseTable[ret] = k;
-    }
-
-    return ret;
+    return already_locked_insert(to_insert, mLock);
 }
 
 void
