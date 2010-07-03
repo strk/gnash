@@ -145,8 +145,6 @@ public:
 		mHighestKey(0)
 	{}
 
-    bool noCase(key a, key b) const;
-
     key noCase(key a) const;
 
 private:
@@ -160,5 +158,5 @@ private:
     
 bool noCaseEqual(string_table& st, string_table::key a, string_table::key b);
 
-} /* namespace gnash */
-#endif /* GNASH_STRING_TABLE_H */
+}
+#endif 
