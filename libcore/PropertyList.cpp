@@ -42,7 +42,7 @@ namespace {
 
 inline
 PropertyList::iterator
-iterator_find(PropertyList::container &p, const ObjectURI& uri)
+iterator_find(PropertyList::container& p, const ObjectURI& uri)
 {
 
     VM& vm = VM::get();
@@ -56,10 +56,7 @@ iterator_find(PropertyList::container &p, const ObjectURI& uri)
         }
         return p.end();
     }
-    for (PropertyList::iterator it = p.begin(); it != p.end(); ++it) {
-        if (it->uri() == uri) return it;
-    }
-    return p.end();
+    return p.project<0>(p.get<1>().find(uri));
 }
 
 }
