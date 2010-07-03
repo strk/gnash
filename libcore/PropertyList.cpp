@@ -42,21 +42,30 @@ namespace {
 
 inline
 PropertyList::iterator
-iterator_find(PropertyList::container& p, const ObjectURI& uri)
+iterator_find(PropertyList::container& p, const ObjectURI& uri, VM& vm)
 {
+        
+    PropertyList::container::nth_index<1>::type::iterator it =
+        p.get<1>().find(uri);
+        
+    if (it != p.get<1>().end()) return p.project<0>(it);
 
-    VM& vm = VM::get();
+    const bool caseless = vm.getSWFVersion() < 7;
+    if (!caseless) return p.end();
 
-    const bool f = vm.getSWFVersion() < 7;
+    string_table& st = vm.getStringTable();
+    const string_table::key nocase = st.noCase(uri.name);
 
-    if (f) {
-        string_table& st = vm.getStringTable();
-        for (PropertyList::iterator it = p.begin(); it != p.end(); ++it) {
-            if (noCaseEqual(st, uri.name, it->uri().name)) return it;
-        }
-        return p.end();
+    // If the caseless version is the same as the lookup key, the
+    // property isn't there.
+    if (nocase == uri.name) return p.end();
+
+    // Do the slow iterating lookup.
+    for (PropertyList::iterator it = p.begin(); it != p.end(); ++it) {
+        if (nocase == st.noCase(it->uri().name)) return it;
     }
-    return p.project<0>(p.get<1>().find(uri));
+
+    return p.end();
 }
 
 }
@@ -117,7 +126,7 @@ bool
 PropertyList::setValue(const ObjectURI& uri, const as_value& val,
         const PropFlags& flagsIfMissing)
 {
-	iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri, getVM(_owner));
 	
 	if (found == _props.end())
 	{
@@ -150,7 +159,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 bool
 PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 {
-	iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if ( found == _props.end() ) return false;
 
 	PropFlags oldFlags = found->getFlags();
@@ -178,7 +187,8 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 Property*
 PropertyList::getProperty(const ObjectURI& uri) const
 {
-	iterator found = iterator_find(const_cast<container&>(_props), uri);
+	iterator found = iterator_find(const_cast<container&>(_props), uri,
+            getVM(_owner));
 	if (found == _props.end()) return 0;
 	return const_cast<Property*>(&(*found));
 }
@@ -187,7 +197,7 @@ std::pair<bool,bool>
 PropertyList::delProperty(const ObjectURI& uri)
 {
 	//GNASH_REPORT_FUNCTION;
-	iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found == _props.end()) {
 		return std::make_pair(false, false);
 	}
@@ -255,7 +265,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 {
 	Property a(uri, &getter, setter, flagsIfMissing);
 
-	iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
@@ -291,7 +301,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 {
 	Property a(uri, getter, setter, flagsIfMissing);
 
-	iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
@@ -323,7 +333,7 @@ bool
 PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter, 
 	const PropFlags& flagsIfMissing)
 {
-	iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end())
 	{
         ObjectURI::Logger l(getStringTable(_owner));
@@ -349,7 +359,7 @@ bool
 PropertyList::addDestructiveGetter(const ObjectURI& uri,
 	as_c_function_ptr getter, const PropFlags& flagsIfMissing)
 {
-	iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end()) return false; 
 
 	// destructive getter don't need a setter
