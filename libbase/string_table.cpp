@@ -100,6 +100,13 @@ string_table::already_locked_insert(const std::string& to_insert, boost::mutex&)
     return ret;
 }
 
+string_table::key
+string_table::noCase(key a) const
+{
+    std::map<key, key>::const_iterator i = _caseTable.find(a);
+    return i == _caseTable.end() ? a : i->second;
+}
+
 bool
 string_table::noCase(key a, key b) const
 {

@@ -147,6 +147,8 @@ public:
 
     bool noCase(key a, key b) const;
 
+    key noCase(key a) const;
+
 private:
 	table mTable;
 	static const std::string mEmpty; // The empty string, universally.
