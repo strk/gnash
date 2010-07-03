@@ -108,21 +108,10 @@ string_table::noCase(key a) const
 }
 
 bool
-string_table::noCase(key a, key b) const
-{
-    std::map<key, key>::const_iterator i = _caseTable.find(a);
-    const key k1  = i == _caseTable.end() ? a : i->second;
-
-    std::map<key, key>::const_iterator j = _caseTable.find(b);
-    const key k2  = j == _caseTable.end() ? b : j->second;
-    return k2 == k1;
-}
-
-bool
 noCaseEqual(string_table& st, string_table::key a, string_table::key b)
 {
     if (a == b) return true;
-    return st.noCase(a, b);
+    return st.noCase(a) == st.noCase(b);
 }
           
 }
