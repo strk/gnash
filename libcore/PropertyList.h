@@ -59,11 +59,14 @@ namespace gnash {
 /// owner.
 class PropertyList : boost::noncopyable
 {
+
 public:
 
     typedef std::set<ObjectURI> PropertyTracker;
-
+    
     typedef std::list<Property> container;
+    typedef container::iterator iterator;
+    typedef container::const_iterator const_iterator;
 
     /// Construct the PropertyList 
     //
@@ -99,9 +102,8 @@ public:
         // The template keyword is not required by the Standard here, but the
         // OpenBSD compiler needs it. Use of the template keyword where it is
         // not necessary is not an error.
-        for (container::const_iterator
-                it = _props.begin(),
-                ie = _props.end(); it != ie; ++it)
+        for (const_iterator it = _props.begin(), ie = _props.end();
+                it != ie; ++it)
         {
             if (!cmp(*it)) continue;
             as_value val = it->getValue(_owner);

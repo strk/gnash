@@ -41,7 +41,7 @@ namespace gnash {
 namespace {
 
 inline
-PropertyList::container::iterator
+PropertyList::iterator
 iterator_find(PropertyList::container &p, const ObjectURI& uri)
 {
 
@@ -51,12 +51,12 @@ iterator_find(PropertyList::container &p, const ObjectURI& uri)
 
     if (f) {
         string_table& st = vm.getStringTable();
-        for (PropertyList::container::iterator it = p.begin(); it != p.end(); ++it) {
+        for (PropertyList::iterator it = p.begin(); it != p.end(); ++it) {
             if (noCaseEqual(st, uri.name, it->uri().name)) return it;
         }
         return p.end();
     }
-    for (PropertyList::container::iterator it = p.begin(); it != p.end(); ++it) {
+    for (PropertyList::iterator it = p.begin(); it != p.end(); ++it) {
         if (it->uri() == uri) return it;
     }
     return p.end();
@@ -64,14 +64,12 @@ iterator_find(PropertyList::container &p, const ObjectURI& uri)
 
 }
 
-typedef PropertyList::container::const_iterator order_iterator;
-
-order_iterator
-iterator_find(const PropertyList::container &p, int order)
+PropertyList::const_iterator
+iterator_find(const PropertyList::container& p, int order)
 {
     if (order < 0) return p.end();
     if (static_cast<size_t>(order) >= p.size()) return p.end();
-    order_iterator i = p.begin();
+    PropertyList::const_iterator i = p.begin();
     std::advance(i, order);
     return i;
 }
@@ -79,7 +77,7 @@ iterator_find(const PropertyList::container &p, int order)
 const Property*
 PropertyList::getPropertyByOrder(int order) const
 {
-    order_iterator i = iterator_find(_props, order);
+    const_iterator i = iterator_find(_props, order);
 	if (i == _props.end()) return 0;
 
 	return &(*i);
@@ -88,7 +86,7 @@ PropertyList::getPropertyByOrder(int order) const
 const Property*
 PropertyList::getOrderAfter(int order) const
 {
-    order_iterator i = iterator_find(_props, order);
+    const_iterator i = iterator_find(_props, order);
 
 	if (i == _props.end()) return 0;
 
@@ -103,7 +101,7 @@ PropertyList::getOrderAfter(int order) const
 bool
 PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 {
-    order_iterator found = iterator_find(_props, slotId + 1);
+    const_iterator found = iterator_find(_props, slotId + 1);
 	if (found != _props.end()) return false;
 
 	Property a(uri, as_value());
@@ -122,7 +120,7 @@ bool
 PropertyList::setValue(const ObjectURI& uri, const as_value& val,
         const PropFlags& flagsIfMissing)
 {
-	container::iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri);
 	
 	if (found == _props.end())
 	{
@@ -155,7 +153,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 bool
 PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 {
-	container::iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri);
 	if ( found == _props.end() ) return false;
 
 	PropFlags oldFlags = found->getFlags();
@@ -173,7 +171,7 @@ PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 void
 PropertyList::setFlagsAll(int setFlags, int clearFlags)
 {
-    PropertyList::container::iterator it;
+    PropertyList::iterator it;
     for (it=_props.begin(); it != _props.end(); ++it) {
 		PropFlags& f = it->getFlags();
 		f.set_flags(setFlags, clearFlags);
@@ -183,7 +181,7 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 Property*
 PropertyList::getProperty(const ObjectURI& uri) const
 {
-	container::iterator found = iterator_find(const_cast<container&>(_props), uri);
+	iterator found = iterator_find(const_cast<container&>(_props), uri);
 	if (found == _props.end()) return 0;
 	return &(*found);
 }
@@ -192,7 +190,7 @@ std::pair<bool,bool>
 PropertyList::delProperty(const ObjectURI& uri)
 {
 	//GNASH_REPORT_FUNCTION;
-	container::iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri);
 	if (found == _props.end()) {
 		return std::make_pair(false, false);
 	}
@@ -206,15 +204,12 @@ PropertyList::delProperty(const ObjectURI& uri)
 	return std::make_pair(true, true);
 }
 
-
-/// This does not reflect the normal enumeration order. It is sorted
-/// lexicographically by property.
 void
 PropertyList::dump(std::map<std::string, as_value>& to) 
 {
     ObjectURI::Logger l(getStringTable(_owner));
 
-	for (container::const_iterator i=_props.begin(), ie=_props.end();
+	for (const_iterator i=_props.begin(), ie=_props.end();
             i != ie; ++i)
 	{
 		to.insert(std::make_pair(l(i->uri()), i->getValue(_owner)));
@@ -228,7 +223,7 @@ PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
 	string_table& st = getStringTable(_owner);
 
     // We should enumerate in order of creation, not lexicographically.
-	for (container::const_iterator i = _props.begin(),
+	for (const_iterator i = _props.begin(),
             ie = _props.end(); i != ie; ++i) {
 
 		if (i->getFlags().get_dont_enum()) continue;
@@ -250,7 +245,7 @@ void
 PropertyList::dump()
 {
     ObjectURI::Logger l(getStringTable(_owner));
-	for (container::const_iterator it=_props.begin(), itEnd=_props.end();
+	for (const_iterator it=_props.begin(), itEnd=_props.end();
             it != itEnd; ++it) {
 		log_debug("  %s: %s", l(it->uri()), it->getValue(_owner));
 	}
@@ -263,7 +258,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 {
 	Property a(uri, &getter, setter, flagsIfMissing);
 
-	container::iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri);
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
@@ -299,7 +294,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 {
 	Property a(uri, getter, setter, flagsIfMissing);
 
-	container::iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri);
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
@@ -331,7 +326,7 @@ bool
 PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter, 
 	const PropFlags& flagsIfMissing)
 {
-	container::iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri);
 	if (found != _props.end())
 	{
         ObjectURI::Logger l(getStringTable(_owner));
@@ -357,7 +352,7 @@ bool
 PropertyList::addDestructiveGetter(const ObjectURI& uri,
 	as_c_function_ptr getter, const PropFlags& flagsIfMissing)
 {
-	container::iterator found = iterator_find(_props, uri);
+	iterator found = iterator_find(_props, uri);
 	if (found != _props.end()) return false; 
 
 	// destructive getter don't need a setter
