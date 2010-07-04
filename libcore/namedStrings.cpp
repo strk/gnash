@@ -247,7 +247,7 @@ static const string_table::svt preload_names[] =
 };
 
 void
-loadStrings(string_table& table, int version)
+loadStrings(string_table& table)
 {
     table.insert_group(preload_names, arraySize(preload_names));
 }

@@ -66,7 +66,7 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 	_singleton.reset(new VM(version, root, clock));
 
 	assert(_singleton.get());
-	NSV::loadStrings(_singleton->_stringTable, _singleton->getSWFVersion());
+	NSV::loadStrings(_singleton->_stringTable);
 
     AVM1Global* gl(new AVM1Global(*_singleton));
 

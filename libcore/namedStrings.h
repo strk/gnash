@@ -267,8 +267,7 @@ enum NamedStrings {
     };
 
 /// Load the prenamed strings.
-/// version controls case
-void loadStrings(string_table &table, int version);
+void loadStrings(string_table &table);
 
 } // namespace NSV
 } // namespace gnash
