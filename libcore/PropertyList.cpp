@@ -56,10 +56,6 @@ iterator_find(PropertyList::container& p, const ObjectURI& uri, VM& vm)
     string_table& st = vm.getStringTable();
     const string_table::key nocase = st.noCase(uri.name);
 
-    // If the caseless version is the same as the lookup key, the
-    // property isn't there.
-    if (nocase == uri.name) return p.end();
-
     // Do the slow iterating lookup.
     for (PropertyList::iterator it = p.begin(); it != p.end(); ++it) {
         if (nocase == st.noCase(it->uri().name)) return it;
