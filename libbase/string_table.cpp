@@ -22,47 +22,46 @@
 
 namespace gnash {
 
-const std::string string_table::mEmpty;
+const std::string string_table::_empty;
 
 string_table::key
 string_table::find(const std::string& t_f, bool insert_unfound)
 {
     if (t_f.empty()) return 0;
 
-	table::nth_index<0>::type::iterator i = mTable.get<0>().find(t_f);
+	table::index<StringValue>::type::iterator i = 
+        _table.get<StringValue>().find(t_f);
 
-	if (i == mTable.end())
-	{
-		if (insert_unfound)
-		{
+	if (i == _table.get<StringValue>().end()) {
+
+		if (insert_unfound) {
 
 			// First we lock.
-			//boost::mutex::scoped_lock aLock(mLock);
+			//boost::mutex::scoped_lock aLock(_lock);
 			// Then we see if someone else managed to sneak past us.
-			i = mTable.get<0>().find(t_f);
+			i = _table.get<StringValue>().find(t_f);
 			// If they did, use that value.
-			if (i != mTable.end())
-				return i->mId;
+			if (i != _table.end()) return i->id;
 
-            return already_locked_insert(t_f, mLock);
+            return already_locked_insert(t_f, _lock);
 		}
         return 0;
 	}
 
-	return i->mId;
+	return i->id;
 }
 
 string_table::key
 string_table::insert(const std::string& to_insert)
 {
-	//boost::mutex::scoped_lock aLock(mLock);
-    return already_locked_insert(to_insert, mLock);
+	//boost::mutex::scoped_lock aLock(_lock);
+    return already_locked_insert(to_insert, _lock);
 }
 
 void
 string_table::insert_group(const svt* l, std::size_t size)
 {
-	//boost::mutex::scoped_lock aLock(mLock);
+	//boost::mutex::scoped_lock aLock(_lock);
     for (std::size_t i = 0; i < size; ++i) {
         // Copy to avoid changing the original table.
         const svt s = l[i];
@@ -70,15 +69,15 @@ string_table::insert_group(const svt* l, std::size_t size)
         // The keys don't have to be consecutive, so any time we find a key
         // that is too big, jump a few keys to avoid rewriting this on every
         // item.
-       if (s.mId > mHighestKey) mHighestKey = s.mId + 256;
-       mTable.insert(s);
+       if (s.id > _highestKey) _highestKey = s.id + 256;
+       _table.insert(s);
     }
     
     for (std::size_t i = 0; i < size; ++i) {
         const svt s = l[i];
-        const std::string& t = boost::to_lower_copy(s.mValue);
-        if (t != s.mValue) {
-            _caseTable[s.mId] = insert(t);
+        const std::string& t = boost::to_lower_copy(s.value);
+        if (t != s.value) {
+            _caseTable[s.id] = insert(t);
         }
     }
 
@@ -87,9 +86,9 @@ string_table::insert_group(const svt* l, std::size_t size)
 string_table::key
 string_table::already_locked_insert(const std::string& to_insert, boost::mutex&)
 {
-	svt theSvt (to_insert, ++mHighestKey);
+	svt theSvt(to_insert, ++_highestKey);
 
-	const key ret = mTable.insert(theSvt).first->mId;
+	const key ret = _table.insert(theSvt).first->id;
 
     const std::string i = boost::to_lower_copy(to_insert);
     if (i != to_insert)  {
