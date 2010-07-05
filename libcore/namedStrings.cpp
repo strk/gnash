@@ -44,7 +44,7 @@ static const string_table::svt preload_names[] =
     string_table::svt( "c", NSV::PROP_C ),
     string_table::svt( "callee", NSV::PROP_CALLEE ),
     string_table::svt( "caller", NSV::PROP_CALLER ),
-    //string_table::svt( "color", NSV::PROP_COLOR ), // clashes with CLASS_COLOR in case-insensitive mode
+    string_table::svt( "color", NSV::PROP_COLOR ),
     string_table::svt( "concat", NSV::PROP_CONCAT ),    
     string_table::svt( "constructor", NSV::PROP_CONSTRUCTOR ),
     string_table::svt( "__constructor__", NSV::PROP_uuCONSTRUCTORuu ),
@@ -131,7 +131,6 @@ static const string_table::svt preload_names[] =
     string_table::svt( "size", NSV::PROP_SIZE ),
     string_table::svt( "_soundbuftime", NSV::PROP_uSOUNDBUFTIME ),
     string_table::svt( "splice", NSV::PROP_SPLICE ),
-    string_table::svt( "Stage", NSV::PROP_iSTAGE ),
     string_table::svt( "status", NSV::PROP_STATUS ),
     string_table::svt( "super", NSV::PROP_SUPER ),
     string_table::svt( "target", NSV::PROP_TARGET ),
@@ -140,6 +139,7 @@ static const string_table::svt preload_names[] =
     string_table::svt( "textColor", NSV::PROP_TEXT_COLOR ),
     string_table::svt( "textWidth", NSV::PROP_TEXT_WIDTH ),
     string_table::svt( "textHeight", NSV::PROP_TEXT_HEIGHT ),
+    string_table::svt( "this", NSV::PROP_THIS ),
     string_table::svt( "toString", NSV::PROP_TO_STRING ),
     string_table::svt( "toLowerCase", NSV::PROP_TO_LOWER_CASE ),
     string_table::svt( "_totalframes", NSV::PROP_uTOTALFRAMES ),
@@ -174,7 +174,7 @@ static const string_table::svt preload_names[] =
     string_table::svt( "TextFormatAlign", NSV::CLASS_TEXTFORMATALIGN),
     string_table::svt( "TextLineMetrics", NSV::CLASS_TEXTLINEMETRICS),
     string_table::svt( "TextRenderer", NSV::CLASS_TEXTRENDERER),
-//  string_table::svt( "Stage", NSV::CLASS_STAGE ), // Identical to PROP_iSTAGE
+    string_table::svt( "Stage", NSV::CLASS_STAGE ),
     string_table::svt( "MovieClip", NSV::CLASS_MOVIE_CLIP ),
     string_table::svt( "TextField", NSV::CLASS_TEXT_FIELD ),
     string_table::svt( "Button", NSV::CLASS_BUTTON ),
