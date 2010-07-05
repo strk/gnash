@@ -992,6 +992,10 @@ Global_as& getGlobal(const as_object& o);
 /// Return whether the object is an AS3 object.
 bool isAS3(const as_object& o);
 
+/// Return whether property matching is caseless
+inline bool caseless(const as_object& o) {
+    return getSWFVersion(o) < 7;
+}
 
 } // namespace gnash
 
