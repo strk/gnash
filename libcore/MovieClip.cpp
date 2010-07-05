@@ -2076,8 +2076,10 @@ public:
         _env(env)
     {}
 
-    void operator() (DisplayObject* ch)
-    {
+    void operator() (DisplayObject* ch) {
+
+        if (!isReferenceable(*ch)) return;
+
         // Don't enumerate unloaded DisplayObjects
         if (ch->unloaded()) return;
         
@@ -2085,6 +2087,8 @@ public:
         // Don't enumerate unnamed DisplayObjects
         if (!name) return;
         
+        // Referenceable DisplayObject always have an object.
+        assert(getObject(ch));
         string_table& st = getStringTable(*getObject(ch));
         _env.push(st.value(name));
     }
