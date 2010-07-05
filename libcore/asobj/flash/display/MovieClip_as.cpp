@@ -333,7 +333,8 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     as_object* o = getObjectWithPrototype(getGlobal(fn), NSV::CLASS_MOVIE_CLIP);
     MovieClip* mc = new MovieClip(o, 0, m, ptr);
 
-    mc->set_name(fn.arg(0).to_string());
+    string_table& st = getStringTable(fn);
+    mc->set_name(st.find(fn.arg(0).to_string()));
     mc->setDynamic();
 
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
@@ -500,7 +501,8 @@ movieclip_attachMovie(const fn_call& fn)
     Global_as& gl = getGlobal(fn);
     DisplayObject* newch = exported_movie->createDisplayObject(gl, movieclip);
 
-    newch->set_name(newname);
+    string_table& st = getStringTable(fn);
+    newch->set_name(st.find(newname));
     newch->setDynamic();
 
     boost::intrusive_ptr<as_object> initObj;

@@ -559,7 +559,9 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
             NSV::CLASS_MOVIE_CLIP);
 
     MovieClip* newmovieclip = new MovieClip(o, _def.get(), _swf, parent);
-    newmovieclip->set_name(newname);
+
+    const string_table::key nn = getStringTable(*getObject(this)).find(newname);
+    newmovieclip->set_name(nn);
 
     newmovieclip->setDynamic();
 
@@ -1160,10 +1162,12 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     Global_as& gl = getGlobal(*getObject(this));
     DisplayObject* ch = cdef->createDisplayObject(gl, this);
 
-    if (tag->hasName()) ch->set_name(tag->getName());
+    string_table& st = getStringTable(*getObject(this));
+
+    if (tag->hasName()) ch->set_name(st.find(tag->getName()));
     else if (isReferenceable(*ch))
     {
-        std::string instance_name = getNextUnnamedInstanceName();
+        const string_table::key instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
     }
 
@@ -1241,14 +1245,16 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
 
     Global_as& gl = getGlobal(*getObject(this));
     DisplayObject* ch = cdef->createDisplayObject(gl, this);
+    
 
     // TODO: check if we can drop this for REPLACE!
     // should we rename the DisplayObject when it's REPLACE tag?
-    if(tag->hasName()) {
-        ch->set_name(tag->getName());
+    if (tag->hasName()) {
+        string_table& st = getStringTable(*getObject(this));
+        ch->set_name(st.find(tag->getName()));
     }
     else if (isReferenceable(*ch)) {
-        std::string instance_name = getNextUnnamedInstanceName();
+        const string_table::key instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
     }
     if (tag->hasRatio()) {
@@ -1652,14 +1658,15 @@ DisplayObject*
 MovieClip::getDisplayListObject(string_table::key key)
 {
 
-    const std::string& name = getStringTable(*getObject(this)).value(key);
+    as_object* obj = getObject(this);
+    assert(obj);
+
+    string_table& st = getStringTable(*obj);
 
     // Try items on our display list.
-    DisplayObject* ch;
-    if (caseless(*getObject(this))) {
-        ch = _displayList.getDisplayObjectByName_i(name);
-    }
-    else ch = _displayList.getDisplayObjectByName(name);
+    DisplayObject* ch = _displayList.getDisplayObjectByName(st, key,
+            caseless(*obj));
+
     if (!ch) return 0;
 
     // Found object.
@@ -1888,8 +1895,8 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
 
         // Copy own name
         // TODO: check empty != none...
-        const std::string& name = get_name();
-        if( !name.empty() ) extern_movie->set_name(name);
+        const string_table::key name = get_name();
+        if (name) extern_movie->set_name(name);
 
         // Copy own clip depth (TODO: check this)
         extern_movie->set_clip_depth(get_clip_depth());
@@ -2074,11 +2081,12 @@ public:
         // Don't enumerate unloaded DisplayObjects
         if (ch->unloaded()) return;
         
-        const std::string& name = ch->get_name();
+        string_table::key name = ch->get_name();
         // Don't enumerate unnamed DisplayObjects
-        if (name.empty()) return;
+        if (!name) return;
         
-        _env.push(name);
+        string_table& st = getStringTable(*getObject(ch));
+        _env.push(st.value(name));
     }
 };
 

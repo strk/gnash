@@ -226,16 +226,16 @@ private:
 namespace {
     void addInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
-        const std::string& name = d->get_name();
-        if (name.empty()) return;
+        const string_table::key name = d->get_name();
+        if (!name) return;
         getObject(&b)->init_member(name, getObject(d), 0);
     }
 
     void removeInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
-        const std::string& name = d->get_name();
-        if (name.empty()) return;
-        getObject(&b)->delProperty(getStringTable(*getObject(&b)).find(name));
+        const string_table::key name = d->get_name();
+        if (!name) return;
+        getObject(&b)->delProperty(name);
     }
 }
 

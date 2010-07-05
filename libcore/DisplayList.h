@@ -247,12 +247,8 @@ public:
 	DisplayObject* getDisplayObjectAtDepth(int depth) const;
 
 	/// If there are multiples, returns the *first* match only!
-	DisplayObject* getDisplayObjectByName(const std::string& name) const;
-
-	/// \brief
-	/// May return NULL.
-	/// If there are multiples, returns the *first* match only!
-	DisplayObject* getDisplayObjectByName_i(const std::string& name);
+	DisplayObject* getDisplayObjectByName(string_table& st,
+            string_table::key name, bool caseless) const;
 
 	/// \brief 
 	/// Visit each DisplayObject in the list in depth order
