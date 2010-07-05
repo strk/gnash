@@ -41,9 +41,6 @@ class DSOEXPORT string_table
 {
 public:
 
-    struct StringID {};
-    struct StringValue {};
-
 	/// A little helper for indexing.
 	struct svt
 	{
@@ -56,38 +53,51 @@ public:
 		std::string value;
 		std::size_t id;
 	};
+    
+    /// A tag to identify the key index.   
+    struct StringID {};
 
+    /// A tag to identify the string index.
+    struct StringValue {};
+
+    /// The container for indexing the strings
+    //
+    /// This contains two indices with no duplicate values:
+    /// 1. An index of unique, case-sensitive strings.
+    /// 2. An index of unique numeric keys.
 	typedef boost::multi_index_container<svt,
 		boost::multi_index::indexed_by<
+
 			boost::multi_index::hashed_unique<
                 boost::multi_index::tag<StringValue>,
 				boost::multi_index::member<svt, std::string, &svt::value> >,
+
 			boost::multi_index::hashed_unique<
                 boost::multi_index::tag<StringID>,
-				boost::multi_index::member<svt, std::size_t, &svt::id> > 
+				boost::multi_index::member<svt, std::size_t, &svt::id>
+
+        > 
 	> > table;
 
 	typedef std::size_t key;
 
-	/// \brief
-	/// Find a string. If insert_unfound is true, the string will
-	/// be inserted if the value is not found in the table already.
-	/// @param to_find
-	/// The string to be found. Case-sensitive comparison using < operator
-	///
-	/// @param insert_unfound
-	/// If this is set to false, a search is performed, but no update.
-	/// By update, any unfound string is added to the table.
-	///
-	/// @return
-	/// A key which can be used in value or 0 if the string is
-	/// not yet in the table and insert_unfound was false.
+	/// Find a key for a string.
+    //
+    /// By default a key will be created for a string that isn't present.
+    //
+	/// @param to_find          The string to be found. 
+	/// @param insert_unfound   If this is set to false, a search is
+    ///                         performed, but no update.
+	/// @return                 A key which can be used in value or 0 if the
+    ///                         string is not yet in the table and
+    ///                         insert_unfound was false.
 	key find(const std::string& to_find, bool insert_unfound = true);
 
 	/// Find a string by its key.
-	///
-	/// @return
-	/// The string which matches key or "" if an invalid key is given.
+	//
+    /// @param key  The key of the string to return. 
+	/// @return     The string which matches key or "" if an invalid key is
+    ///             given.
 	const std::string& value(key to_find)
 	{
 		if (_table.empty() || !to_find) return _empty;
@@ -97,39 +107,24 @@ public:
 		return (r == _table.get<StringID>().end()) ? _empty : r->value;
 	}
 
-	/// \brief
-	/// Force insert a string with auto-assigned id. Does not prevent
-	/// duplicate insertions.
-	///
+	/// Insert a string with auto-assigned id. 
+	//
 	/// @return The assigned key
 	key insert(const std::string& to_insert);
 
 	/// Insert a group of strings with their ids preset.
     //
-    /// This allows
-	/// for switches and enums and such, but be careful you don't set two
-	/// strings with the same id, as this does not check for such occurrences.
-	///
-	/// @param pList
-	/// An array of svt objects, these should be fully constructed, including
-	/// their ids.
-    ///
-	/// @param size
-    /// Number of elements in the svt objects array
-    ///
+	/// @param pList    An array of svt objects, these should be fully
+    ///                 constructed, including their ids. If any id is
+    ///                 duplicated, the insertion will fail.
+	/// @param size      Number of elements in the svt objects array
 	void insert_group(const svt* pList, std::size_t size);
 
 	/// Insert a string when you will handle the locking yourself.
     //
-	/// @param to_insert
-    /// String to insert
-    ///
-	/// @param lock
-	/// Use lock_mutex to obtain the correct mutex to use for this -- using
-	/// a different mutex will not be thread safe.
-	///
-	/// @return The assigned key
-	key already_locked_insert(const std::string& to_insert, boost::mutex& lock);
+	/// @param to_insert    The string to insert
+	/// @return             The assigned key
+	key already_locked_insert(const std::string& to_insert);
 
 	/// Construct the empty string_table
 	string_table()
@@ -137,6 +132,11 @@ public:
 		_highestKey(0)
 	{}
 
+    /// Return a caseless equivalent of the passed key.
+    //
+    /// @param a    The key to find a caseless equivalent for. The key
+    ///             may be its own caseless equivalent, in which case the
+    ///             same key will be returned.
     key noCase(key a) const;
 
 private:

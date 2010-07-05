@@ -43,7 +43,7 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 			// If they did, use that value.
 			if (i != _table.end()) return i->id;
 
-            return already_locked_insert(t_f, _lock);
+            return already_locked_insert(t_f);
 		}
         return 0;
 	}
@@ -55,7 +55,7 @@ string_table::key
 string_table::insert(const std::string& to_insert)
 {
 	//boost::mutex::scoped_lock aLock(_lock);
-    return already_locked_insert(to_insert, _lock);
+    return already_locked_insert(to_insert);
 }
 
 void
@@ -84,7 +84,7 @@ string_table::insert_group(const svt* l, std::size_t size)
 }
 
 string_table::key
-string_table::already_locked_insert(const std::string& to_insert, boost::mutex&)
+string_table::already_locked_insert(const std::string& to_insert)
 {
 	svt theSvt(to_insert, ++_highestKey);
 
