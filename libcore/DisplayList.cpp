@@ -167,11 +167,11 @@ DisplayList::getNextHighestDepth() const
 }
 
 DisplayObject*
-DisplayList::getDisplayObjectAtDepth(int depth)
+DisplayList::getDisplayObjectAtDepth(int depth) const
 {
     testInvariant();
 
-    for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
+    for (const_iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
         it != itEnd; ++it) {
 
         DisplayObject* ch = *it;
@@ -192,14 +192,14 @@ DisplayList::getDisplayObjectAtDepth(int depth)
 
 
 DisplayObject*
-DisplayList::getDisplayObjectByName(const std::string& name)
+DisplayList::getDisplayObjectByName(const std::string& name) const
 {
     testInvariant();
 
-    const container_type::iterator e = _charsByDepth.end();
+    const container_type::const_iterator e = _charsByDepth.end();
 
     container_type::const_iterator it =
-        std::find_if( _charsByDepth.begin(), e, NameEquals(name));
+        std::find_if(_charsByDepth.begin(), e, NameEquals(name));
 
     if (it == e) return 0;
     
