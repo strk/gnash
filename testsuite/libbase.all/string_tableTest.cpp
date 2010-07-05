@@ -36,19 +36,26 @@ using namespace gnash;
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	string_table testTable;
+	string_table st;
 	
 	LogFile& lgf = LogFile::getDefaultInstance();
 	lgf.setVerbosity(2);
 
-	testTable.insert("A");
-	testTable.insert("B");
-	testTable.insert("C");
+	st.insert("A");
+	st.insert("B");
+	st.insert("C");
 
-	check_equals(testTable.find("D",false),0);
-	check_equals(testTable.find("D"),4);
-	check_equals(testTable.find("A",false),1);
-	check_equals(testTable.find("B",false),2);
-	check_equals(testTable.find("C",false),3);
-	check_equals(testTable.find("D",false),4);
+	check_equals(st.find("D",false),0);
+	check(st.find("D") > 0);
+	check(st.find("A") > 0);
+	check(st.find("B") > 0);
+	check(st.find("C") > 0);
+
+    const bool nocase = true;
+    check(equal(st, st.find("AbAb"), st.find("abaB"), nocase));
+    check(equal(st, st.find("AbAb"), st.find("ABAB"), nocase));
+    check(!equal(st, st.find("AbAb"), st.find("abaB"), false));
+    check(!equal(st, st.find("AbAb"), st.find("ABAB"), false));
+
+
 }
