@@ -148,8 +148,23 @@ private:
 
     std::map<key, key> _caseTable;
 };
-    
-bool noCaseEqual(string_table& st, string_table::key a, string_table::key b);
+
+/// Check whether two keys are equivalent
+//
+/// This function provides a simple way to check for equivalence either in
+/// a case sensitive or case-insensitive way. It is mainly for convenience, to
+/// reduce conditionals in the code.
+//
+/// If the comparison is case-sensitive, the keys are equivalent if they are
+/// equal.
+//
+/// @param st       The string table to use
+/// @param a        One key to check
+/// @param b        The other key to check
+/// @param caseless Whether to compare in a case-insensitive way.
+/// @return         True if the keys are equivalent.
+bool equal(string_table& st, string_table::key a, string_table::key b,
+        bool caseless);
 
 }
 #endif 

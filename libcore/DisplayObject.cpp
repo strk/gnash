@@ -192,12 +192,10 @@ DisplayObject::pathElement(string_table::key key)
 	string_table& st = getStringTable(*obj);
     if (key == st.find("..")) return getObject(get_parent());
 
-    const int version = getSWFVersion(*obj);
-
 	if (key == st.find(".")) return obj;
     
-    const string_table::key th = st.find("this");
-    if (key == th || (version < 7 && noCaseEqual(st, key, th))) {
+    // The check is case-insensitive for SWF6 and below.
+    if (equal(st, key, NSV::PROP_THIS, caseless(*obj))) {
         return obj;
     }
 	return 0;
@@ -975,13 +973,12 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         }
     }
 
-    // These magic properties are case insensitive in all versions!
-    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
+    const string_table::key noCaseKey = st.noCase(key);
 
     // These properties have normal case-sensitivity.
     // They are tested to exist for TextField, MovieClip, and Button
     // but do not belong to the inheritance chain.
-    switch (getSWFVersion(*o) < 7 ? noCaseKey : key)
+    switch (caseless(*o) ? noCaseKey : key)
     {
         default:
             break;
@@ -997,6 +994,7 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
             return true;
     }
 
+    // These magic properties are case insensitive in all versions!
     if (doGet(noCaseKey, obj, val)) return true;
 
     // Check MovieClip such as TextField variables.
@@ -1013,9 +1011,7 @@ setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
 {
     // These magic properties are case insensitive in all versions!
     string_table& st = getStringTable(*getObject(&obj));
-    const std::string& propname = st.value(key);
-    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
-    return doSet(noCaseKey, obj, val);
+    return doSet(st.noCase(key), obj, val);
 }
 
 namespace {
@@ -1526,6 +1522,10 @@ doGet(string_table::key prop, DisplayObject& o, as_value& val)
 //
 /// Return true if the property is a DisplayObject property, regardless of
 /// whether it was successfully set or not.
+//
+/// @param prop     The property to search for. Note that all special
+///                 properties are lower-case, so for a caseless check
+///                 it is sufficient for prop to be caseless.
 bool
 doSet(string_table::key prop, DisplayObject& o, const as_value& val)
 {

@@ -107,10 +107,11 @@ string_table::noCase(key a) const
 }
 
 bool
-noCaseEqual(string_table& st, string_table::key a, string_table::key b)
+equal(string_table& st, string_table::key a, string_table::key b,
+        bool caseless)
 {
     if (a == b) return true;
-    return st.noCase(a) == st.noCase(b);
+    return caseless && (st.noCase(a) == st.noCase(b));
 }
           
 }
