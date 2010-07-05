@@ -1656,10 +1656,10 @@ MovieClip::getDisplayListObject(string_table::key key)
 
     // Try items on our display list.
     DisplayObject* ch;
-    if (getSWFVersion(*getObject(this)) >= 7 ) {
-        ch = _displayList.getDisplayObjectByName(name);
+    if (caseless(*getObject(this))) {
+        ch = _displayList.getDisplayObjectByName_i(name);
     }
-    else ch = _displayList.getDisplayObjectByName_i(name);
+    else ch = _displayList.getDisplayObjectByName(name);
     if (!ch) return 0;
 
     // Found object.
