@@ -35,9 +35,8 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 	if (i == _table.get<StringValue>().end()) {
 
 		if (insert_unfound) {
-
 			// First we lock.
-			//boost::mutex::scoped_lock aLock(_lock);
+			boost::mutex::scoped_lock aLock(_lock);
 			// Then we see if someone else managed to sneak past us.
 			i = _table.get<StringValue>().find(t_f);
 			// If they did, use that value.
@@ -54,14 +53,14 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 string_table::key
 string_table::insert(const std::string& to_insert)
 {
-	//boost::mutex::scoped_lock aLock(_lock);
+	boost::mutex::scoped_lock aLock(_lock);
     return already_locked_insert(to_insert);
 }
 
 void
 string_table::insert_group(const svt* l, std::size_t size)
 {
-	//boost::mutex::scoped_lock aLock(_lock);
+	boost::mutex::scoped_lock aLock(_lock);
     for (std::size_t i = 0; i < size; ++i) {
         // Copy to avoid changing the original table.
         const svt s = l[i];
@@ -77,7 +76,7 @@ string_table::insert_group(const svt* l, std::size_t size)
         const svt s = l[i];
         const std::string& t = boost::to_lower_copy(s.value);
         if (t != s.value) {
-            _caseTable[s.id] = insert(t);
+            _caseTable[s.id] = already_locked_insert(t);
         }
     }
 
@@ -86,14 +85,23 @@ string_table::insert_group(const svt* l, std::size_t size)
 string_table::key
 string_table::already_locked_insert(const std::string& to_insert)
 {
-	svt theSvt(to_insert, ++_highestKey);
+	const key ret = _table.insert(svt(to_insert, ++_highestKey)).first->id;
 
-	const key ret = _table.insert(theSvt).first->id;
+    const std::string lower = boost::to_lower_copy(to_insert);
 
-    const std::string i = boost::to_lower_copy(to_insert);
-    if (i != to_insert)  {
-        const key k = find(i, true);
-        _caseTable[ret] = k;
+    // Insert the caseless equivalent if it's not there. We're locked for
+    // the whole of this function, so we can do what we like.
+    if (lower != to_insert) {
+
+        // Find the caseless value in the table
+        table::index<StringValue>::type::iterator it = 
+            _table.get<StringValue>().find(lower);
+
+        const key nocase = (it == _table.end()) ? 
+            _table.insert(svt(lower, ++_highestKey)).first->id : it->id;
+
+        _caseTable[ret] = nocase;
+
     }
 
     return ret;
