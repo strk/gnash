@@ -42,8 +42,8 @@ namespace gnash {
 namespace {
 
 inline
-PropertyList::iterator
-iterator_find(PropertyList::container& p, const ObjectURI& uri, VM& vm)
+PropertyList::const_iterator
+iterator_find(const PropertyList::container& p, const ObjectURI& uri, VM& vm)
 {
     
     const bool caseless = vm.getSWFVersion() < 7;
@@ -117,7 +117,7 @@ bool
 PropertyList::setValue(const ObjectURI& uri, const as_value& val,
         const PropFlags& flagsIfMissing)
 {
-	iterator found = iterator_find(_props, uri, getVM(_owner));
+	const_iterator found = iterator_find(_props, uri, getVM(_owner));
 	
     string_table& st = getStringTable(_owner);
 
@@ -144,44 +144,36 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		return false;
 	}
 
-	const_cast<Property&>(prop).setValue(_owner, val);
+	prop.setValue(_owner, val);
 
 	return true;
 }
 
-bool
+void
 PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 {
 	iterator found = iterator_find(_props, uri, getVM(_owner));
-	if ( found == _props.end() ) return false;
+	if (found == _props.end()) return;
+    PropFlags f = found->first.getFlags();
+    f.set_flags(setFlags, clearFlags);
+	found->first.setFlags(f);
 
-	PropFlags oldFlags = found->first.getFlags();
-
-	PropFlags& f = const_cast<Property&>(found->first).getFlags();
-	return f.set_flags(setFlags, clearFlags);
-
-#ifdef GNASH_DEBUG_PROPERTY
-    ObjectURI::Logger l(getStringTable(_owner));
-	log_debug("Flags of property %s changed from %s to  %s",
-		l(uri), oldFlags, found->getFlags());
-#endif
 }
 
 void
 PropertyList::setFlagsAll(int setFlags, int clearFlags)
 {
-    PropertyList::iterator it;
-    for (it=_props.begin(); it != _props.end(); ++it) {
-		PropFlags& f = const_cast<PropFlags&>(it->first.getFlags());
-		f.set_flags(setFlags, clearFlags);
+    for (const_iterator it = _props.begin(); it != _props.end(); ++it) {
+        PropFlags f = it->first.getFlags();
+        f.set_flags(setFlags, clearFlags);
+        it->first.setFlags(f);
     }
 }
 
 Property*
 PropertyList::getProperty(const ObjectURI& uri) const
 {
-	iterator found = iterator_find(const_cast<container&>(_props), uri,
-            getVM(_owner));
+	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found == _props.end()) return 0;
 	return const_cast<Property*>(&(found->first));
 }
@@ -263,8 +255,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
-		PropFlags& f = a.getFlags();
-		f = found->first.getFlags();
+		a.setFlags(found->first.getFlags());
 		a.setCache(found->first.getCache());
 		_props.replace(found, std::make_pair(a, st.noCase(uri.name)));
 
@@ -296,12 +287,11 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 	Property a(uri, getter, setter, flagsIfMissing);
 
     string_table& st = getStringTable(_owner);
-	iterator found = iterator_find(_props, uri, getVM(_owner));
+	const_iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
-		PropFlags& f = a.getFlags();
-		f = found->first.getFlags();
+		a.setFlags(found->first.getFlags());
 		_props.replace(found, std::make_pair(a, st.noCase(uri.name)));
 
 #ifdef GNASH_DEBUG_PROPERTY
@@ -328,7 +318,7 @@ bool
 PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter, 
 	const PropFlags& flagsIfMissing)
 {
-	iterator found = iterator_find(_props, uri, getVM(_owner));
+	const_iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end())
 	{
         ObjectURI::Logger l(getStringTable(_owner));

@@ -842,10 +842,10 @@ as_object::init_readonly_property(const ObjectURI& uri,
 }
 
 
-bool
+void
 as_object::set_member_flags(const ObjectURI& uri, int setTrue, int setFalse)
 {
-    return _members.setFlags(uri, setTrue, setFalse);
+    _members.setFlags(uri, setTrue, setFalse);
 }
 
 void
@@ -985,15 +985,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
         }
 
         // set_member_flags will take care of case conversion
-        if (!set_member_flags(getStringTable(*this).find(prop), set_true,
-                              set_false) )
-            {
-                IF_VERBOSE_ASCODING_ERRORS(
-                    log_aserror(_("Can't set propflags on object "
-                                  "property %s "
-                                  "(either not found or protected)"),	prop);
-                    );
-            }
+        set_member_flags(getStringTable(*this).find(prop), set_true, set_false);
 
         if (next_comma == std::string::npos) {
             break;

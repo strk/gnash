@@ -81,7 +81,7 @@ Property::getDelayedValue(const as_object& this_ptr) const
 }
 
 void
-Property::setDelayedValue(as_object& this_ptr, const as_value& value)
+Property::setDelayedValue(as_object& this_ptr, const as_value& value) const
 {
 	GetterSetter* a = boost::get<GetterSetter>(&_bound);
 
@@ -173,7 +173,7 @@ Property::getCache() const
 }
 
 void
-Property::setValue(as_object& this_ptr, const as_value &value)
+Property::setValue(as_object& this_ptr, const as_value &value) const
 {
 	switch (_bound.which())
 	{

@@ -595,9 +595,7 @@ public:
     ///                 up to SWF6.
     /// @param setTrue  The set of flags to set
     /// @param setFalse The set of flags to clear
-    /// @return         true on success, false on failure (non-existent or
-    ///                 protected member)
-    bool set_member_flags(const ObjectURI& uri, int setTrue, int setFalse = 0);
+    void set_member_flags(const ObjectURI& uri, int setTrue, int setFalse = 0);
 
     /// Cast to a as_function, or return NULL
     virtual as_function* to_function() { return 0; }

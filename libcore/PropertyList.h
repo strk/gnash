@@ -271,9 +271,7 @@ public:
     /// @param key      Name of the property. Search is case-*sensitive*
     /// @param setTrue  The set of flags to set
     /// @param setFalse The set of flags to clear
-    /// @return         true if the value was successfully set, false
-    ///                 otherwise (either not found or protected)
-    bool setFlags(const ObjectURI& uri, int setTrue, int setFalse);
+    void setFlags(const ObjectURI& uri, int setTrue, int setFalse);
 
     /// Set the flags of all properties.
     //
