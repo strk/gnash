@@ -64,15 +64,28 @@ class PropertyList : boost::noncopyable
 public:
 
     typedef std::set<ObjectURI> PropertyTracker;
+    typedef std::pair<Property, string_table::key> value_type;
+
+    struct NameExtractor
+    {
+        typedef const ObjectURI& result_type;
+        const result_type operator()(const value_type& r) const {
+            return r.first.uri();
+        }
+        const result_type operator()(value_type& r) {
+            return r.first.uri();
+        }
+    };
     
+    typedef boost::multi_index::member<value_type, value_type::second_type,
+            &value_type::second> KeyExtractor;
+
     typedef boost::multi_index_container<
-        Property,
+        value_type,
         boost::multi_index::indexed_by<
             boost::multi_index::sequenced<>,
-            boost::multi_index::ordered_unique<
-                boost::multi_index::const_mem_fun<
-                    Property, const ObjectURI&, &Property::uri>
-                >
+            boost::multi_index::ordered_unique<NameExtractor>,
+            boost::multi_index::ordered_non_unique<KeyExtractor>
             >
         > container;
     typedef container::iterator iterator;
@@ -115,9 +128,9 @@ public:
         for (const_iterator it = _props.begin(), ie = _props.end();
                 it != ie; ++it)
         {
-            if (!cmp(*it)) continue;
-            as_value val = it->getValue(_owner);
-            if (!visitor.accept(it->uri(), val)) return;
+            if (!cmp(it->first)) continue;
+            as_value val = it->first.getValue(_owner);
+            if (!visitor.accept(it->first.uri(), val)) return;
         }
     }
 

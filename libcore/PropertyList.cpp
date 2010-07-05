@@ -26,6 +26,7 @@
 #include "as_value.h" // for enumerateValues
 #include "VM.h" // For string_table
 #include "string_table.h"
+#include "GnashAlgorithm.h"
 
 #include <utility> // for std::make_pair
 #include <boost/bind.hpp> 
@@ -44,24 +45,16 @@ inline
 PropertyList::iterator
 iterator_find(PropertyList::container& p, const ObjectURI& uri, VM& vm)
 {
-        
-    PropertyList::container::nth_index<1>::type::iterator it =
-        p.get<1>().find(uri);
-        
-    if (it != p.get<1>().end()) return p.project<0>(it);
-
+    
     const bool caseless = vm.getSWFVersion() < 7;
-    if (!caseless) return p.end();
 
+    if (!caseless) {
+        return p.project<0>(p.get<1>().find(uri));
+    }
+        
     string_table& st = vm.getStringTable();
     const string_table::key nocase = st.noCase(uri.name);
-
-    // Do the slow iterating lookup.
-    for (PropertyList::iterator it = p.begin(); it != p.end(); ++it) {
-        if (nocase == st.noCase(it->uri().name)) return it;
-    }
-
-    return p.end();
+    return p.project<0>(p.get<2>().find(nocase));
 }
 
 }
@@ -82,7 +75,7 @@ PropertyList::getPropertyByOrder(int order) const
     const_iterator i = iterator_find(_props, order);
 	if (i == _props.end()) return 0;
 
-	return &(*i);
+	return &(i->first);
 }
 
 const Property*
@@ -95,14 +88,15 @@ PropertyList::getOrderAfter(int order) const
 	do {
 		++i;
 		if (i == _props.end()) return 0;
-	} while (i->getFlags().get_dont_enum());
+	} while (i->first.getFlags().get_dont_enum());
 
-	return &(*i);
+	return &(i->first);
 }
 
 bool
 PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
 {
+#if 0
     const_iterator found = iterator_find(_props, slotId + 1);
 	if (found != _props.end()) return false;
 
@@ -115,6 +109,7 @@ PropertyList::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
             a.getFlags());
 #endif
 
+#endif
 	return true;
 }
 
@@ -124,12 +119,14 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 {
 	iterator found = iterator_find(_props, uri, getVM(_owner));
 	
+    string_table& st = getStringTable(_owner);
+
 	if (found == _props.end())
 	{
 		// create a new member
 		Property a(uri, val, flagsIfMissing);
 		// Non slot properties are negative ordering in insertion order
-		_props.push_back(a);
+		_props.push_back(std::make_pair(a, st.noCase(uri.name)));
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("Simple AS property %s inserted with flags %s",
@@ -138,7 +135,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		return true;
 	}
 
-	const Property& prop = *found;
+	const Property& prop = found->first;
 	if (prop.isReadOnly() && ! prop.isDestructive())
 	{
         ObjectURI::Logger l(getStringTable(_owner));
@@ -158,9 +155,9 @@ PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if ( found == _props.end() ) return false;
 
-	PropFlags oldFlags = found->getFlags();
+	PropFlags oldFlags = found->first.getFlags();
 
-	PropFlags& f = const_cast<Property&>(*found).getFlags();
+	PropFlags& f = const_cast<Property&>(found->first).getFlags();
 	return f.set_flags(setFlags, clearFlags);
 
 #ifdef GNASH_DEBUG_PROPERTY
@@ -175,7 +172,7 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 {
     PropertyList::iterator it;
     for (it=_props.begin(); it != _props.end(); ++it) {
-		PropFlags& f = const_cast<PropFlags&>(it->getFlags());
+		PropFlags& f = const_cast<PropFlags&>(it->first.getFlags());
 		f.set_flags(setFlags, clearFlags);
     }
 }
@@ -186,7 +183,7 @@ PropertyList::getProperty(const ObjectURI& uri) const
 	iterator found = iterator_find(const_cast<container&>(_props), uri,
             getVM(_owner));
 	if (found == _props.end()) return 0;
-	return const_cast<Property*>(&(*found));
+	return const_cast<Property*>(&(found->first));
 }
 
 std::pair<bool,bool>
@@ -199,7 +196,7 @@ PropertyList::delProperty(const ObjectURI& uri)
 	}
 
 	// check if member is protected from deletion
-	if (found->getFlags().get_dont_delete()) {
+	if (found->first.getFlags().get_dont_delete()) {
 		return std::make_pair(true, false);
 	}
 
@@ -215,7 +212,7 @@ PropertyList::dump(std::map<std::string, as_value>& to)
 	for (const_iterator i=_props.begin(), ie=_props.end();
             i != ie; ++i)
 	{
-		to.insert(std::make_pair(l(i->uri()), i->getValue(_owner)));
+		to.insert(std::make_pair(l(i->first.uri()), i->first.getValue(_owner)));
 	}
 }
 
@@ -229,9 +226,9 @@ PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
 	for (const_iterator i = _props.begin(),
             ie = _props.end(); i != ie; ++i) {
 
-		if (i->getFlags().get_dont_enum()) continue;
+		if (i->first.getFlags().get_dont_enum()) continue;
 
-        const ObjectURI& uri = i->uri();
+        const ObjectURI& uri = i->first.uri();
 
 		if (donelist.insert(uri).second) {
 
@@ -250,7 +247,7 @@ PropertyList::dump()
     ObjectURI::Logger l(getStringTable(_owner));
 	for (const_iterator it=_props.begin(), itEnd=_props.end();
             it != itEnd; ++it) {
-		log_debug("  %s: %s", l(it->uri()), it->getValue(_owner));
+		log_debug("  %s: %s", l(it->first.uri()), it->first.getValue(_owner));
 	}
 }
 
@@ -260,15 +257,16 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 	const PropFlags& flagsIfMissing)
 {
 	Property a(uri, &getter, setter, flagsIfMissing);
-
 	iterator found = iterator_find(_props, uri, getVM(_owner));
+    
+    string_table& st = getStringTable(_owner);
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
 		PropFlags& f = a.getFlags();
-		f = found->getFlags();
-		a.setCache(found->getCache());
-		_props.replace(found, a);
+		f = found->first.getFlags();
+		a.setCache(found->first.getCache());
+		_props.replace(found, std::make_pair(a, st.noCase(uri.name)));
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -280,7 +278,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 	else
 	{
 		a.setCache(cacheVal);
-		_props.push_back(a);
+		_props.push_back(std::make_pair(a, st.noCase(uri.name)));
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("AS GetterSetter %s inserted with flags %s", l(uri),
@@ -297,13 +295,14 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 {
 	Property a(uri, getter, setter, flagsIfMissing);
 
+    string_table& st = getStringTable(_owner);
 	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
 		PropFlags& f = a.getFlags();
-		f = found->getFlags();
-		_props.replace(found, a);
+		f = found->first.getFlags();
+		_props.replace(found, std::make_pair(a, st.noCase(uri.name)));
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -314,7 +313,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 	}
 	else
 	{
-		_props.push_back(a);
+		_props.push_back(std::make_pair(a, st.noCase(uri.name)));
 #ifdef GNASH_DEBUG_PROPERTY
 		string_table& st = getStringTable(_owner);
 		log_debug("Native GetterSetter %s in namespace %s inserted with "
@@ -340,7 +339,9 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 
 	// destructive getter don't need a setter
 	Property a(uri, &getter, (as_function*)0, flagsIfMissing, true);
-	_props.push_back(a);
+
+    string_table& st = getStringTable(_owner);
+	_props.push_back(std::make_pair(a, st.noCase(uri.name)));
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
@@ -360,7 +361,8 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri,
 
 	// destructive getter don't need a setter
 	Property a(uri, getter, (as_c_function_ptr)0, flagsIfMissing, true);
-	_props.push_back(a);
+    string_table& st = getStringTable(_owner);
+	_props.push_back(std::make_pair(a, st.noCase(uri.name)));
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
@@ -379,7 +381,7 @@ PropertyList::clear()
 void
 PropertyList::setReachable() const
 {
-    std::for_each(_props.begin(), _props.end(),
+    foreachFirst(_props.begin(), _props.end(),
             boost::mem_fn(&Property::setReachable));
 }
 
