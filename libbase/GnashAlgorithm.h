@@ -39,6 +39,17 @@ struct SecondElement
     }
 };
 
+/// Retrieve the first element of a container with std::pairs.
+template<typename T>
+struct FirstElement
+{
+    typedef typename T::first_type result_type;
+
+    const result_type& operator()(const T& pair) const {
+        return pair.first;
+    }
+};
+
 /// Return a pointer to a type
 template<typename T>
 struct CreatePointer
@@ -147,6 +158,22 @@ void
 foreachSecond(T begin, T end, U op)
 {
     typedef SecondElement<typename std::iterator_traits<T>::value_type> S;
+    std::for_each(begin, end, boost::bind(op, boost::bind(S(), _1)));
+}
+
+/// Call a functor on the first element of each element in a range.
+//
+/// @tparam T           An iterator type satisfying the requirements of a
+///                     forward iterator
+/// @tparam U           The type of the functor op.
+/// @param begin        The start of the range to call op on.
+/// @param end          The end of the range to call op on.
+/// @param op           The function to call on each second element.
+template<typename T, typename U>
+void
+foreachFirst(T begin, T end, U op)
+{
+    typedef FirstElement<typename std::iterator_traits<T>::value_type> S;
     std::for_each(begin, end, boost::bind(op, boost::bind(S(), _1)));
 }
 
