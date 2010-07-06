@@ -827,13 +827,13 @@ dnl 32 bit: RGBA32, BGRA32
 pixelformat=all
 AC_ARG_WITH(pixelformat,
   AC_HELP_STRING([--with-pixelformat=], [Use the specified pixel format for AGG (default=all)]),
-  if test -n ${withval}; then
+  [if test -n ${withval}; then
     pixelformat="${withval}"
     withval=`echo ${withval} | tr '\054' ' ' `
   fi
   while test -n "${withval}" ; do
     val=`echo ${withval} | cut -d ' ' -f 1`
-    [case "${val}" in
+    case "${val}" in
       all)
         # allow special value "all" set by user (handled below)
         ;; 
@@ -863,12 +863,16 @@ AC_ARG_WITH(pixelformat,
         ;;
       *) AC_MSG_ERROR([invalid pixel format ${withval} given (accept: all|RGB555|RGB565|RGB24|BGR24|BGRA32|RGBA32|ARGB32|ABGR32)])
          ;;
-      esac]
+      esac
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
     if test "x$val" = "x$withval"; then
       break;
     fi
-  done
+  done],
+  [if test x$build_haiku = xyes -a x$build_sdl != xyes; then
+	AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
+        pixelformat=BGRA32
+   fi]
 )
 
 if test x$pixelformat = xall; then
