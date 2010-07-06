@@ -92,11 +92,12 @@ libgnashbase_la_SOURCES = \
 
 if ANDROID
 libgnashbase_la_SOURCES += SharedMemHaiku.cpp
-endif
-if BUILD_HAIKU_GUI
+else
+if HAIKU
 libgnashbase_la_SOURCES += SharedMemHaiku.cpp
 else
 libgnashbase_la_SOURCES += SharedMem.cpp
+endif
 endif
 
 edit = sed \
@@ -133,7 +134,7 @@ libgnashbase_la_LIBADD += $(top_builddir)/libltdl/libltdlc.la
 endif
 
 
-if BUILD_HAIKU_GUI
+if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
 endif
 
