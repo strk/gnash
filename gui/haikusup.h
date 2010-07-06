@@ -34,7 +34,7 @@
 
 #include <string>
 
-class BMessageRunner;
+#include "OS.h"
 
 
 namespace gnash
@@ -46,7 +46,6 @@ class BeApp;
 class HaikuGui : public Gui
 {
     BeApp *_app;
-    BMessageRunner *_rnr;
 #ifdef RENDERER_AGG
     HaikuAggGlue _glue;
 #endif
@@ -75,6 +74,7 @@ public:
     virtual bool yesno(const std::string &question);
 
     void GnashPulse();
+    unsigned int getInterval();
     virtual void resize_view(int width, int height);
     void Shown();
     void Hidden();
