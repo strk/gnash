@@ -393,6 +393,8 @@ HaikuAggGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 
         if (_xid != 0)
         {
+	        if (ftruncate(_sharefd, _bufsize) != 0)
+		        perror("ftruncate");
             _sharebuf =
                 static_cast<unsigned char*>(
                 mmap(
