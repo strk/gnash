@@ -1466,10 +1466,10 @@ action_execution_order_test8_SOURCES =	\
 action_execution_order_test8_LDADD = libgnashmingutils.la
 
 action_execution_order_test8-v6.swf: action_execution_order_test8
-	./action_execution_order_test8 $(abs_mediadir)
+	./action_execution_order_test8 $(abs_mediadir) 6
 
 action_execution_order_test8-v5.swf: action_execution_order_test8
-	./action_execution_order_test8 $(abs_mediadir)
+	./action_execution_order_test8 $(abs_mediadir) 5
 
 action_execution_order_test8runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test8-v5.swf action_execution_order_test8-v6.swf
 	sh $< -f8 $(top_builddir) action_execution_order_test8-v5.swf action_execution_order_test8-v6.swf > $@
