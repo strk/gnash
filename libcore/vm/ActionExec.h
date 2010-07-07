@@ -369,37 +369,6 @@ public:
 	///
 	as_value getVariable(const std::string& name, as_object** target);
 
-	/// Set an object's member.
-	//
-	/// @param obj
-	///	The object we want to set the member of.
-	///
-	/// @param name
-	///	Name of the variable. Supports slash and dot syntax.
-	///	Name is converted to lowercase if SWF version is < 7.
-	///
-	/// @param val
-	///	The value to assign to the object's member.
-	///
-	void setObjectMember(as_object& obj, const std::string& name, const as_value& val);
-
-	/// Get an object's member.
-	//
-	/// @param obj
-	///	The object we want to set the member of.
-	///
-	/// @param name
-	///	Name of the variable. Supports slash and dot syntax.
-	///	Name is converted to lowercase if SWF version is < 7.
-	///
-	/// @param val
-	///	The as_value to write member value into.
-	///
-	/// @returns
-	///	True if the member was found, false otherwise.
-	///
-	bool getObjectMember(as_object& obj, const std::string& name, as_value& val);
-
 	/// Get current target.
 	//
 	/// This function returns top 'with' stack entry, if any.
