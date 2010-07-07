@@ -49,7 +49,7 @@ enum ImageType
 {
     GNASH_IMAGE_INVALID,
     GNASH_IMAGE_RGB,
-    GNASH_IMAGE_RGBA,
+    GNASH_IMAGE_RGBA
 };
 
 /// The locations of images handled in Gnash.
