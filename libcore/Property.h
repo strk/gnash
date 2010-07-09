@@ -266,15 +266,6 @@ public:
         _uri(uri)
 	{}
 
-	/// Copy constructor
-	Property(const Property& p)
-        :
-		_flags(p._flags),
-        _bound(p._bound),
-        _destructive(p._destructive),
-        _uri(p._uri)
-	{}
-
 	Property(const ObjectURI& uri, const as_value& value,
             const PropFlags& flags = PropFlags())
         :
@@ -312,12 +303,15 @@ public:
         _destructive(destroy),
         _uri(uri)
 	{}
-
-	/// Set a user-defined setter
-	void setSetter(as_function* fun);
-
-	/// Set a user-defined getter
-	void setGetter(as_function* fun);
+	
+    /// Copy constructor
+	Property(const Property& p)
+        :
+		_flags(p._flags),
+        _bound(p._bound),
+        _destructive(p._destructive),
+        _uri(p._uri)
+	{}
 
 	/// accessor to the properties flags
 	const PropFlags& getFlags() const { return _flags; }
