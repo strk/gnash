@@ -64,7 +64,6 @@ public:
 		std::string init_name;
 
         const ObjectURI uri;
-        const ObjectURI super;
 
 		/// The version at which this should be added.
 		int version;
@@ -76,12 +75,10 @@ public:
         /// The type of function to use for initialization
 		typedef void (*InitFunc)(as_object& obj, const ObjectURI& uri);
 
-        NativeClass(InitFunc init, const ObjectURI& u, const ObjectURI& s,
-                int ver)
+        NativeClass(InitFunc init, const ObjectURI& u, int ver)
             :
             initializer(init),
             uri(u),
-            super(s),
             version(ver)
         {}
 
@@ -92,9 +89,6 @@ public:
 
 		/// The name of the class.
 		const ObjectURI uri;
-
-		/// The name of the inherited class.
-		const ObjectURI super;
 
 		/// The version at which this should be visible.
 		int version;

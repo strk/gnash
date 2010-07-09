@@ -50,28 +50,17 @@ get_flash_filters_package(const fn_call& fn)
     as_object* pkg = gl.createObject();
 
     string_table& st = getStringTable(fn);
-    const string_table::key global = 0;
 
-    bitmapfilter_class_init(*pkg,
-            ObjectURI(st.find("BitmapFilter"), global));
-    bevelfilter_class_init(*pkg,
-            ObjectURI(st.find("BevelFilter"), global));
-    blurfilter_class_init(*pkg,
-            ObjectURI(st.find("BlurFilter"), global));
-    colormatrixfilter_class_init(*pkg,
-            ObjectURI(st.find("ColorMatrixFilter"), global));
-    convolutionfilter_class_init(*pkg,
-            ObjectURI(st.find("ConvolutionFilter"), global));
-    displacementmapfilter_class_init(*pkg,
-            ObjectURI(st.find("DisplacementMapFilter"), global));
-    dropshadowfilter_class_init(*pkg,
-            ObjectURI(st.find("DropShadowFilter"), global));
-    glowfilter_class_init(*pkg,
-            ObjectURI(st.find("GlowFilter"), global));
-    gradientbevelfilter_class_init(*pkg,
-            ObjectURI(st.find("GradientBevelFilter"), global));
-    gradientglowfilter_class_init(*pkg,
-            ObjectURI(st.find("GradientGlowFilter"), global));
+    bitmapfilter_class_init(*pkg, st.find("BitmapFilter"));
+    bevelfilter_class_init(*pkg, st.find("BevelFilter"));
+    blurfilter_class_init(*pkg, st.find("BlurFilter"));
+    colormatrixfilter_class_init(*pkg, st.find("ColorMatrixFilter"));
+    convolutionfilter_class_init(*pkg, st.find("ConvolutionFilter"));
+    displacementmapfilter_class_init(*pkg, st.find("DisplacementMapFilter"));
+    dropshadowfilter_class_init(*pkg, st.find("DropShadowFilter"));
+    glowfilter_class_init(*pkg, st.find("GlowFilter"));
+    gradientbevelfilter_class_init(*pkg, st.find("GradientBevelFilter"));
+    gradientglowfilter_class_init(*pkg, st.find("GradientGlowFilter"));
     
     return pkg;
 }

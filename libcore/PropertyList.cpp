@@ -169,11 +169,7 @@ PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
         const ObjectURI& uri = i->first.uri();
 
 		if (donelist.insert(uri).second) {
-
-            const std::string& qname = getNamespace(uri) ?
-                st.value(getName(uri)) + "." + st.value(getNamespace(uri)) :
-                st.value(getName(uri));
-
+            const std::string& qname = st.value(getName(uri));
 			env.push(qname);
 		}
 	}

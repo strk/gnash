@@ -42,10 +42,8 @@ get_flash_external_package(const fn_call& fn)
     as_object* pkg = gl.createObject();
     
     string_table& st = getStringTable(fn);
-    const string_table::key global = 0;
 
-    externalinterface_class_init(*pkg,
-            ObjectURI(st.find("ExternalInterface"), global));
+    externalinterface_class_init(*pkg, st.find("ExternalInterface"));
 
     return pkg;
 }

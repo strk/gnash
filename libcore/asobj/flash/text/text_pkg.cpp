@@ -38,9 +38,8 @@ get_flash_text_package(const fn_call& fn)
     as_object* pkg = gl.createObject();
     
     string_table& st = getStringTable(fn);
-    const string_table::key global = 0;
 
-    textrenderer_class_init(*pkg, ObjectURI(st.find("TextRenderer"), global));
+    textrenderer_class_init(*pkg, st.find("TextRenderer"));
 
     return pkg;
 }

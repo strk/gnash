@@ -270,13 +270,10 @@ public:
     //
     /// @param name         Name of the member.
     /// @param val          Value to assign to the member.
-    ///
     /// @param flags        Flags for the new member. By default dontDelete
     ///                     and dontEnum.
-    /// @param nsname       The id of the namespace to which this member
-    ///                     belongs.
     void init_member(const std::string& name, const as_value& val, 
-        int flags = DefaultFlags, string_table::key nsname = 0);
+        int flags = DefaultFlags);
 
     /// Initialize a member value by key
     //
@@ -320,13 +317,9 @@ public:
     /// @param flags
     ///     Flags for the new member. By default dontDelete and dontEnum.
     ///    See PropFlags::Flags.
-    ///
-    /// @param nsname
-    /// The id of the namespace to which this member belongs. 0 is a wildcard
-    /// and will be matched by anything not asking for a specific namespace.
     void init_property(const std::string& key, as_function& getter,
-        as_function& setter, int flags = DefaultFlags,
-        string_table::key nsname = 0);
+        as_function& setter, int flags = DefaultFlags);
+        
 
     /// Initialize a getter/setter property by name
     //
@@ -342,10 +335,8 @@ public:
     ///                 value.
     /// @param flags    Flags for the new member. By default dontDelete and
     ///                 dontEnum. See PropFlags::Flags.
-    /// @param nsname   The id of the namespace to which this member belongs.
     void init_property(const std::string& key, as_c_function_ptr getter,
-        as_c_function_ptr setter, int flags = DefaultFlags,
-        string_table::key nsname = 0);
+        as_c_function_ptr setter, int flags = DefaultFlags);
 
     /// Initialize a getter/setter property by key
     //
@@ -420,11 +411,8 @@ public:
     /// @param key      Property name id
     /// @param getter   The getter function
     /// @param flags    Property flags
-    /// @param nsname   The id of the namespace to which this member belongs.
-    ///                 0 is a wildcard and will be matched by anything not
-    ///                 asking for a specific namespace.
     void init_readonly_property(const std::string& key, as_function& getter,
-            int flags = DefaultFlags, string_table::key nsname = 0);
+            int flags = DefaultFlags);
 
     void init_readonly_property(const ObjectURI& uri,
             as_function& getter, int flags = DefaultFlags);
@@ -442,12 +430,8 @@ public:
     /// @param key      Property name id
     /// @param getter   The getter function
     /// @param flags    Property flags
-    /// @param nsname   The id of the namespace to which this member belongs.
-    ///                 0 is a wildcard and will be matched by anything not
-    ///                 asking for a specific namespace.
     void init_readonly_property(const std::string& key,
-            as_c_function_ptr getter, int flags = DefaultFlags,
-            string_table::key nsname = 0);
+            as_c_function_ptr getter, int flags = DefaultFlags);
 
     void init_readonly_property(const ObjectURI& uri,
             as_c_function_ptr getter, int flags = DefaultFlags);
