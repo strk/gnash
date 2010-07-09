@@ -42,10 +42,6 @@
 
 // Forward declarations
 namespace gnash {
-    namespace abc {
-        class Machine;
-        class Class;
-    }
     class as_function;
     class MovieClip;
     class DisplayObject;
@@ -301,7 +297,7 @@ public:
     ///                 an unsigned short, this is used as the slotId and
     ///                 can be subsequently found with get_slot
     void init_member(const ObjectURI& uri, const as_value& val, 
-        int flags = DefaultFlags, int slotId = -1);
+        int flags = DefaultFlags);
 
     /// Initialize a getter/setter property by name
     //
@@ -566,28 +562,6 @@ public:
     /// @return         true if the object has the property, false otherwise.
     bool hasOwnProperty(const ObjectURI& uri);
 
-    /// Get a property from this object (or a prototype) by ordering index.
-    ///
-    /// @param index    An index returned by nextIndex
-    /// @return         The property associated with the order index.
-    const Property* getByIndex(int index);
-
-    /// Get the next index after the one whose index was used as a parameter.
-    ///
-    /// @param index
-    /// 0 is a starter index -- use it to get the first index. Using the
-    /// return value in subsequent calls will walk through all enumerable
-    /// properties in the list.
-    ///
-    /// @param owner
-    /// If owner is not NULL, it will be set to the exact object to which
-    /// the property used for the value of index belongs, if such a property
-    /// exists, and left untouched otherwise.
-    ///
-    /// @return
-    /// A value which can be fed to getByIndex, or 0 if there are no more.
-    int nextIndex(int index, as_object **owner = NULL);
-
     /// Set member flags (probably used by ASSetPropFlags)
     //
     /// @param name     Name of the property. Must be all lowercase
@@ -764,33 +738,6 @@ public:
     void setDisplayObject(DisplayObject* d) {
         _displayObject = d;
     }
-
-    /// Get a member value at a given slot.
-    //
-    /// Note it is quite likely that slots only apply to static properties.
-    //
-    /// @param order    The slot index of the property.
-    /// @param val      The as_value to store a found variable's value in.
-    /// @return         true if a member exists at the given slot, 
-    ///                 and the member's value is successfully retrieved,
-    ///                 false otherwise.
-    bool get_member_slot(int order, as_value* val);
-
-    /// Set a member value at a given slot.
-    //
-    /// Note it is quite likely that slots only apply to static properties.
-    //
-    /// @param order    The slot index of the property.
-    /// @param val      Value to assign to the named property.
-    /// @param ifFound  If true, don't create a new member, but only update
-    ///                 an existing one.
-    /// @return true    if the member exists at the given slot, 
-    ///                 false otherwise.
-    ///    
-    /// NOTE: the return doesn't tell if the member exists after
-    ///       the call, as watch triggers might have deleted it
-    ///       after setting.
-    bool set_member_slot(int order, const as_value& val, bool ifFound = false);
 
 protected:
 

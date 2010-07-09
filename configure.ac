@@ -277,7 +277,7 @@ AC_ARG_ENABLE(avm2,
     yes) avm2=yes ;;
     no)  avm2=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for enable-avm2 option]) ;;
-  esac], avm2=yes
+  esac], avm2=no
 )
 AM_CONDITIONAL(ENABLE_AVM2, [test x"$avm2" = xyes])
 if test x$avm2 = xyes; then

@@ -450,23 +450,6 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
 }
 
 
-const Property*
-as_object::getByIndex(int index)
-{
-    // The low byte is used to contain the depth of the property.
-    unsigned char depth = index & 0xFF;
-    index /= 256; // Signed
-    as_object *obj = this;
-    while (depth--)
-	{
-            obj = obj->get_prototype();
-            if (!obj)
-                return NULL;
-	}
-
-    return obj->_members.getPropertyByOrder(index);
-}
-
 as_object*
 as_object::get_super(string_table::key fname)
 {
@@ -487,13 +470,6 @@ as_object::get_super(string_table::key fname)
     as_object* super = new as_super(getGlobal(*this), proto);
 
     return super;
-}
-
-int
-as_object::nextIndex(int index, as_object **owner)
-{
-    // TODO: drop.
-    return 0;
 }
 
 /*private*/
@@ -547,33 +523,6 @@ as_object::set_prototype(const as_value& proto)
     // TODO: check triggers !!
     // Note that this sets __proto__ in namespace 0
     _members.setValue(NSV::PROP_uuPROTOuu, proto, as_object::DefaultFlags);
-}
-
-void
-as_object::reserveSlot(const ObjectURI& uri, boost::uint16_t slotId)
-{
-    _members.reserveSlot(uri, slotId);
-}
-
-bool
-as_object::get_member_slot(int order, as_value* val){
-	
-    const Property* prop = _members.getPropertyByOrder(order);
-    if (prop) {
-        return get_member(prop->uri(), val);
-    }
-    return false;
-}
-
-
-bool
-as_object::set_member_slot(int order, const as_value& val, bool ifFound)
-{
-    const Property* prop = _members.getPropertyByOrder(order);
-    if (prop) {
-        return set_member(prop->uri(), val, ifFound);
-    }
-    return false;
 }
 
 void
@@ -726,17 +675,9 @@ as_object::init_member(const std::string& key1, const as_value& val, int flags,
 }
 
 void
-as_object::init_member(const ObjectURI& uri, const as_value& val, int flags,
-                       int order)
+as_object::init_member(const ObjectURI& uri, const as_value& val, int flags)
 {
 
-    if (order >= 0 && !_members.reserveSlot(uri,
-                                            static_cast<boost::uint16_t>(order))) {
-        log_error(_("Attempt to set a slot for either a slot or a property "
-                    "which already exists."));
-        return;
-    }
-		
     // Set (or create) a SimpleProperty 
     if (!_members.setValue(uri, val, flags)) {
         ObjectURI::Logger l(getStringTable(*this));
