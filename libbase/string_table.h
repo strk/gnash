@@ -30,6 +30,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/thread.hpp>
 #include <string>
+#include <map>
 #include "dsodefs.h"
 
 namespace gnash {
