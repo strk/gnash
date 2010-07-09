@@ -1,4 +1,4 @@
-// XMLDocument_as.h:  ActionScript 3 "XMLDocument" class, for Gnash.
+// XML_as.h:  ActionScript 3 "XMLDocument" class, for Gnash.
 //
 //   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 //
@@ -20,7 +20,7 @@
 #ifndef GNASH_ASOBJ3_XMLDOCUMENT_H
 #define GNASH_ASOBJ3_XMLDOCUMENT_H
 
-#include "xml/XMLNode_as.h"
+#include "XMLNode_as.h"
 #include "dsodefs.h"
 #include "StringPredicates.h"
 
@@ -41,7 +41,7 @@ class URL;
 //
 /// The class definition is necessary because XML is encoded differently
 /// in AMF.
-class XMLDocument_as : public XMLNode_as
+class XML_as : public XMLNode_as
 {
 public:
 
@@ -70,11 +70,11 @@ public:
     //
     /// An XMLDocument is always user-created, so always starts with an
     /// associated object.
-    XMLDocument_as(as_object& object);
+    XML_as(as_object& object);
 
-    XMLDocument_as(as_object& object, const std::string& xml);
+    XML_as(as_object& object, const std::string& xml);
 
-    ~XMLDocument_as() {};
+    ~XML_as() {};
     
     /// Convert the XML object to a string
     //

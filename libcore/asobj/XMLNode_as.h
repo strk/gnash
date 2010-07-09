@@ -45,7 +45,7 @@ namespace gnash {
 /// 2. It does not have to have an associated object. This is only created
 ///    once the XMLNode is accessed in ActionScript.
 /// 3. The top node of an XML tree is always accessible in ActionScript, either
-///    as an XMLDocument_as or a user-created XMLNode_as.
+///    as an XML_as or a user-created XMLNode_as.
 /// 4. XMLNodes consequently mark their children as reachable, but not their
 ///    parent.
 /// 5. When an XMLNode is destroyed, any children without an associated object

@@ -1,4 +1,4 @@
-// XMLDocument_as.cpp:  ActionScript "XMLDocument" class, for Gnash.
+// XML_as.cpp:  ActionScript "XMLDocument" class, for Gnash.
 //
 //   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 //
@@ -24,8 +24,8 @@
 #include "Global_as.h"
 
 #include "LoadableObject.h"
-#include "xml/XMLNode_as.h"
-#include "xml/XMLDocument_as.h"
+#include "XMLNode_as.h"
+#include "XML_as.h"
 #include "builtin_function.h"
 #include "NativeFunction.h"
 #include "VM.h"
@@ -61,7 +61,7 @@ namespace {
     as_value xml_loaded(const fn_call& fn);
     as_value xml_status(const fn_call& fn);
 
-    typedef XMLDocument_as::xml_iterator xml_iterator;
+    typedef XML_as::xml_iterator xml_iterator;
 
     bool textAfterWhitespace(xml_iterator& it, xml_iterator end);
     bool textMatch(xml_iterator& it, xml_iterator end,
@@ -79,7 +79,7 @@ namespace {
 }
 
 
-XMLDocument_as::XMLDocument_as(as_object& object) 
+XML_as::XML_as(as_object& object) 
     :
     XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
@@ -89,7 +89,7 @@ XMLDocument_as::XMLDocument_as(as_object& object)
 }
 
 // Parse the ASCII XML string into an XMLNode tree
-XMLDocument_as::XMLDocument_as(as_object& object, const std::string& xml)
+XML_as::XML_as(as_object& object, const std::string& xml)
     :
     XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
@@ -127,7 +127,7 @@ unescapeXML(std::string& text)
 }
 
 void
-XMLDocument_as::toString(std::ostream& o, bool encode) const
+XML_as::toString(std::ostream& o, bool encode) const
 {
     if (!_xmlDecl.empty()) o << _xmlDecl;
     if (!_docTypeDecl.empty()) o << _docTypeDecl;
@@ -136,7 +136,7 @@ XMLDocument_as::toString(std::ostream& o, bool encode) const
 }
 
 void
-XMLDocument_as::parseAttribute(XMLNode_as* node, xml_iterator& it,
+XML_as::parseAttribute(XMLNode_as* node, xml_iterator& it,
         const xml_iterator end, Attributes& attributes)
 {
 
@@ -220,7 +220,7 @@ XMLDocument_as::parseAttribute(XMLNode_as* node, xml_iterator& it,
 /// Parse and set the docTypeDecl. This is stored without any validation and
 /// with the same case as in the parsed XML.
 void
-XMLDocument_as::parseDocTypeDecl(xml_iterator& it, const xml_iterator end)
+XML_as::parseDocTypeDecl(xml_iterator& it, const xml_iterator end)
 {
 
     xml_iterator ourend;
@@ -254,7 +254,7 @@ XMLDocument_as::parseDocTypeDecl(xml_iterator& it, const xml_iterator end)
 
 
 void
-XMLDocument_as::parseXMLDecl(xml_iterator& it, const xml_iterator end)
+XML_as::parseXMLDecl(xml_iterator& it, const xml_iterator end)
 {
     std::string content;
     if (!parseNodeWithTerminator(it, end, "?>", content))
@@ -273,7 +273,7 @@ XMLDocument_as::parseXMLDecl(xml_iterator& it, const xml_iterator end)
 
 // The iterator should be pointing to the first char after the '<'
 void
-XMLDocument_as::parseTag(XMLNode_as*& node, xml_iterator& it,
+XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
         const xml_iterator end)
 {
 
@@ -393,7 +393,7 @@ XMLDocument_as::parseTag(XMLNode_as*& node, xml_iterator& it,
 }
 
 void
-XMLDocument_as::parseText(XMLNode_as* node, xml_iterator& it,
+XML_as::parseText(XMLNode_as* node, xml_iterator& it,
         const xml_iterator end)
 {
     xml_iterator ourend = std::find(it, end, '<');
@@ -417,7 +417,7 @@ XMLDocument_as::parseText(XMLNode_as* node, xml_iterator& it,
 }
 
 void
-XMLDocument_as::parseComment(XMLNode_as* /*node*/, xml_iterator& it,
+XML_as::parseComment(XMLNode_as* /*node*/, xml_iterator& it,
         const xml_iterator end)
 {
 
@@ -431,7 +431,7 @@ XMLDocument_as::parseComment(XMLNode_as* /*node*/, xml_iterator& it,
 }
 
 void
-XMLDocument_as::parseCData(XMLNode_as* node, xml_iterator& it,
+XML_as::parseCData(XMLNode_as* node, xml_iterator& it,
         const xml_iterator end)
 {
     std::string content;
@@ -451,7 +451,7 @@ XMLDocument_as::parseCData(XMLNode_as* node, xml_iterator& it,
 
 // This parses an XML string into a tree of XMLNodes.
 void
-XMLDocument_as::parseXML(const std::string& xml)
+XML_as::parseXML(const std::string& xml)
 {
 
     if (xml.empty()) {
@@ -505,7 +505,7 @@ XMLDocument_as::parseXML(const std::string& xml)
 }
 
 void
-XMLDocument_as::clear()
+XML_as::clear()
 {
     // TODO: should set childs's parent to NULL ?
     clearChildren();
@@ -515,7 +515,7 @@ XMLDocument_as::clear()
 }
 
 bool
-XMLDocument_as::ignoreWhite() 
+XML_as::ignoreWhite() 
 {
 
     const string_table::key propnamekey =
@@ -620,7 +620,7 @@ xml_new(const fn_call& fn)
         // Copy constructor clones nodes.
         if (fn.arg(0).is_object()) {
             as_object* other = fn.arg(0).to_object(getGlobal(fn));
-            XMLDocument_as* xml;
+            XML_as* xml;
             if (isNativeType(other, xml)) {
                 as_object* clone = xml->cloneNode(true)->object();
                 attachXMLProperties(*clone);
@@ -631,12 +631,12 @@ xml_new(const fn_call& fn)
         const int version = getSWFVersion(fn);
         const std::string& xml_in = fn.arg(0).to_string(version);
         // It doesn't matter if the string is empty.
-        obj->setRelay(new XMLDocument_as(*obj, xml_in));
+        obj->setRelay(new XML_as(*obj, xml_in));
         attachXMLProperties(*obj);
         return as_value();
     }
 
-    obj->setRelay(new XMLDocument_as(*obj));
+    obj->setRelay(new XML_as(*obj));
     attachXMLProperties(*obj);
 
     return as_value();
@@ -650,22 +650,22 @@ xml_new(const fn_call& fn)
 as_value
 xml_loaded(const fn_call& fn)
 {
-    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
+    XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
 
     if (!fn.nargs) {
-        XMLDocument_as::LoadStatus ls = ptr->loaded();
-        if (ls == XMLDocument_as::XML_LOADED_UNDEFINED) return as_value();
+        XML_as::LoadStatus ls = ptr->loaded();
+        if (ls == XML_as::XML_LOADED_UNDEFINED) return as_value();
         return as_value(static_cast<bool>(ls));
     }
     ptr->setLoaded(
-            static_cast<XMLDocument_as::LoadStatus>(fn.arg(0).to_bool()));
+            static_cast<XML_as::LoadStatus>(fn.arg(0).to_bool()));
     return as_value();
 }
 
 as_value
 xml_status(const fn_call& fn)
 {
-    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
+    XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
     
     if (!fn.nargs) {
         return as_value(ptr->status());
@@ -676,11 +676,11 @@ xml_status(const fn_call& fn)
             status > std::numeric_limits<boost::int32_t>::max() ||
             status < std::numeric_limits<boost::int32_t>::min()) {
 
-        ptr->setStatus(static_cast<XMLDocument_as::ParseStatus>(
+        ptr->setStatus(static_cast<XML_as::ParseStatus>(
                     std::numeric_limits<boost::int32_t>::min()));
     }
 
-    ptr->setStatus(static_cast<XMLDocument_as::ParseStatus>(int(status)));
+    ptr->setStatus(static_cast<XML_as::ParseStatus>(int(status)));
     return as_value();
 }
 
@@ -754,7 +754,7 @@ as_value
 xml_parseXML(const fn_call& fn)
 {
 
-    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
+    XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
 
     if (fn.nargs < 1)
     {
@@ -773,7 +773,7 @@ xml_parseXML(const fn_call& fn)
 as_value
 xml_xmlDecl(const fn_call& fn)
 {
-    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
+    XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
 
     if (!fn.nargs)
     {
@@ -795,7 +795,7 @@ xml_xmlDecl(const fn_call& fn)
 as_value
 xml_docTypeDecl(const fn_call& fn)
 {
-    XMLDocument_as* ptr = ensure<ThisIsNative<XMLDocument_as> >(fn);
+    XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
 
     if (!fn.nargs)
     {

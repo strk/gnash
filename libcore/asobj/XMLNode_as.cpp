@@ -18,8 +18,8 @@
 //
 
 
-#include "xml/XMLNode_as.h"
-#include "xml/XMLDocument_as.h"
+#include "XMLNode_as.h"
+#include "XML_as.h"
 #include "VM.h"
 #include "log.h"
 #include "fn_call.h"
