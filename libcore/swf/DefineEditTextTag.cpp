@@ -17,7 +17,7 @@
 
 #include "RunResources.h"
 #include "DefineEditTextTag.h"
-#include "text/TextField_as.h"
+#include "TextField_as.h"
 #include "TextField.h"
 #include "movie_definition.h"
 #include "Font.h"

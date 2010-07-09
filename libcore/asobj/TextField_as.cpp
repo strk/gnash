@@ -19,7 +19,7 @@
 
 
 #include "namedStrings.h"
-#include "text/TextField_as.h"
+#include "TextField_as.h"
 #include "TextField.h"
 #include "log.h"
 #include "fn_call.h"
@@ -27,7 +27,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
-#include "flash/text/TextFormat_as.h"
+#include "TextFormat_as.h"
 #include "MovieClip.h"
 #include "NativeFunction.h"
 #include "GnashNumeric.h"

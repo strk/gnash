@@ -18,7 +18,7 @@
 //
 
 
-#include "text/TextSnapshot_as.h"
+#include "TextSnapshot_as.h"
 #include "GnashException.h" // for ActionException
 
 #include "as_object.h" // for inheritance

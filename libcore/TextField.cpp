@@ -39,7 +39,7 @@
 #include "fontlib.h" 
 #include "namedStrings.h"
 #include "StringPredicates.h"
-#include "text/TextFormat_as.h"
+#include "TextFormat_as.h"
 #include "GnashKey.h"
 #include "TextRecord.h"
 #include "Point2d.h"

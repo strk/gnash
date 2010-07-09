@@ -23,97 +23,9 @@ TEXT_HEADERS = asobj/flash/text/text_pkg.h
 TEXT_SOURCES_AS2 = 
 TEXT_HEADERS_AS2 = 
 
-if BUILD_ANTIALIASTYPE_AS3
-TEXT_SOURCES += asobj/flash/text/AntiAliasType_as.cpp
-TEXT_HEADERS += asobj/flash/text/AntiAliasType_as.h
-endif
-
-if BUILD_CSMSETTINGS_AS3
-TEXT_SOURCES += asobj/flash/text/CSMSettings_as.cpp
-TEXT_HEADERS += asobj/flash/text/CSMSettings_as.h
-endif
-
-if BUILD_FONTSTYLE_AS3
-TEXT_SOURCES += asobj/flash/text/FontStyle_as.cpp
-TEXT_HEADERS += asobj/flash/text/FontStyle_as.h
-endif
-
-if BUILD_FONTTYPE_AS3
-TEXT_SOURCES += asobj/flash/text/FontType_as.cpp
-TEXT_HEADERS += asobj/flash/text/FontType_as.h
-endif
-
-if BUILD_FONT_AS3
-TEXT_SOURCES += asobj/flash/text/Font_as.cpp
-TEXT_HEADERS += asobj/flash/text/Font_as.h
-endif
-
-if BUILD_GRIDFITTYPE_AS3
-TEXT_SOURCES += asobj/flash/text/GridFitType_as.cpp
-TEXT_HEADERS += asobj/flash/text/GridFitType_as.h
-endif
-
-if BUILD_STATICTEXT_AS3
-TEXT_SOURCES += asobj/flash/text/StaticText_as.cpp
-TEXT_HEADERS += asobj/flash/text/StaticText_as.h
-endif
-
-if BUILD_STYLESHEET_AS3
-TEXT_SOURCES += asobj/flash/text/StyleSheet_as.cpp
-TEXT_HEADERS += asobj/flash/text/StyleSheet_as.h
-endif
-
-if BUILD_TEXTCOLORTYPE_AS3
-TEXT_SOURCES += asobj/flash/text/TextColorType_as.cpp
-TEXT_HEADERS += asobj/flash/text/TextColorType_as.h
-endif
-
-if BUILD_TEXTDISPLAYMODE_AS3
-TEXT_SOURCES += asobj/flash/text/TextDisplayMode_as.cpp
-TEXT_HEADERS += asobj/flash/text/TextDisplayMode_as.h
-endif
-
-if BUILD_TEXTFIELDAUTOSIZE_AS3
-TEXT_SOURCES += asobj/flash/text/TextFieldAutoSize_as.cpp
-TEXT_HEADERS += asobj/flash/text/TextFieldAutoSize_as.h
-endif
-
-if BUILD_TEXTFIELDTYPE_AS3
-TEXT_SOURCES += asobj/flash/text/TextFieldType_as.cpp
-TEXT_HEADERS += asobj/flash/text/TextFieldType_as.h
-endif
-
-# FIXME: already exists
-if BUILD_TEXTFIELD_AS3
-TEXT_SOURCES += asobj/flash/text/TextField_as.cpp
-TEXT_HEADERS += asobj/flash/text/TextField_as.h
-endif
-
-if BUILD_TEXTFORMATALIGN_AS3
-TEXT_SOURCES += asobj/flash/text/TextFormatAlign_as.cpp
-TEXT_HEADERS += asobj/flash/text/TextFormatAlign_as.h
-endif
-
-# FIXME: already exists
-if BUILD_TEXTFORMAT_AS3
-TEXT_SOURCES += asobj/flash/text/TextFormat_as.cpp
-TEXT_HEADERS += asobj/flash/text/TextFormat_as.h
-endif
-
-if BUILD_TEXTLINEMETRICS_AS3
-TEXT_SOURCES += asobj/flash/text/TextLineMetrics_as.cpp
-TEXT_HEADERS += asobj/flash/text/TextLineMetrics_as.h
-endif
-
 if BUILD_TEXTRENDERER_AS3
 TEXT_SOURCES_AS2 += asobj/flash/text/TextRenderer_as.cpp
 TEXT_HEADERS_AS2 += asobj/flash/text/TextRenderer_as.h
-endif
-
-# FIXME: already exists
-if BUILD_TEXTSNAPSHOT_AS3
-TEXT_SOURCES += asobj/flash/text/TextSnapshot_as.cpp
-TEXT_HEADERS += asobj/flash/text/TextSnapshot_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(TEXT_SOURCES) $(TEXT_SOURCES_AS2)
