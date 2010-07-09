@@ -45,6 +45,9 @@ libgnashasobjs_la_SOURCES = \
 	asobj/MovieClipLoader.cpp\
 	asobj/String_as.cpp \
 	asobj/LoadableObject.cpp \
+	asobj/MovieClip_as.cpp \
+	asobj/Stage_as.cpp \
+	asobj/Accessibility_as.cpp \
 	asobj/Object.cpp
 
 noinst_HEADERS += \
@@ -67,6 +70,9 @@ noinst_HEADERS += \
 	asobj/LoadableObject.h \
 	asobj/QName_as.h \
 	asobj/Namespace_as.h \
+	asobj/MovieClip_as.h \
+	asobj/Stage_as.h \
+	asobj/Accessibility_as.h \
 	asobj/Object.h
 
 EXTENSIONS_API += \
@@ -95,7 +101,6 @@ EXTENSIONS_API += \
 # These makefile fragments build the ActionScript library for
 # Gnash, and supports both AS2 as well as AS3, so we always
 # want to build.
-include $(srcdir)/asobj/flash/accessibility/accessibility.am
 include $(srcdir)/asobj/flash/display/display.am
 include $(srcdir)/asobj/flash/external/external.am
 include $(srcdir)/asobj/flash/filters/filters.am

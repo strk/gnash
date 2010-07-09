@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "display/Stage_as.h"
+#include "Stage_as.h"
 #include "movie_root.h"
 #include "as_object.h" // for inheritance
 #include "log.h"

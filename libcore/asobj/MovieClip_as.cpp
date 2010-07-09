@@ -19,8 +19,7 @@
 
 #include "MovieClip.h"
 #include "Movie.h"
-#include "display/MovieClip_as.h"
-#include "display/DisplayObjectContainer_as.h"
+#include "MovieClip_as.h"
 #include "display/BitmapData_as.h"
 #include "net/NetStream_as.h"
 #include "movie_root.h"
@@ -102,16 +101,6 @@ namespace {
     as_value movieclip_loadVariables(const fn_call& fn);
     as_value movieclip_dropTarget(const fn_call& fn);
 
-    // =============================================
-    // AS3 methods
-    // =============================================
-
-    void attachMovieClipAS3Interface(as_object& o);
-    as_value movieclip_as3_ctor(const fn_call& fn);
-    as_value movieclip_nextScene(const fn_call& fn);
-    as_value movieclip_prevScene(const fn_call& fn);
-    as_value movieclip_addFrameScript(const fn_call& fn);
-
 }
 
 // extern (used by Global.cpp)
@@ -122,21 +111,6 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
     as_object* proto = gl.createObject();
-
-    if (isAS3(getVM(where))) {
-        as_object* cl = new as_object(gl);
-        cl->set_prototype(proto);
-        attachMovieClipAS3Interface(*proto);
-        
-        // TODO: fix AVM2Global::createClass to work for AVM2.
-        cl->init_member(NSV::PROP_CONSTRUCTOR,
-                gl.createFunction(movieclip_as3_ctor));
-
-        log_debug("AVM2 MovieClip, proto %s", cl);
-
-        where.init_member(uri, cl, as_object::DefaultFlags);
-        return;
-    }
 
     as_object* cl = gl.createClass(&movieclip_as2_ctor, proto);
     attachMovieClipAS2Interface(*proto);
@@ -2305,69 +2279,6 @@ movieclip_lockroot(const fn_call& fn)
     }
     
     ptr->setLockRoot(fn.arg(0).to_bool());
-    return as_value();
-}
-
-// =======================
-// AS3 interface
-// =======================
-
-as_value
-movieclip_as3_ctor(const fn_call& fn)
-{
-    assert(isAS3(fn));
-
-    as_object* obj = ensure<ValidThis>(fn);
-
-    // TODO: currently it's necessary to have a top-level movie to initialize
-    // a MovieClip.
-    Movie* m = getRoot(fn).topLevelMovie();
-
-    // Okay, this looks silly.
-    new MovieClip(obj, 0, m, 0);
-    return as_value();
-}
-
-
-void
-attachMovieClipAS3Interface(as_object& o)
-{
-    Global_as& gl = getGlobal(o);
-    o.init_member("gotoAndStop", gl.createFunction(movieclip_gotoAndStop));
-    o.init_member("nextFrame", gl.createFunction(movieclip_nextFrame));
-    o.init_member("nextScene", gl.createFunction(movieclip_nextScene));
-    o.init_member("play", gl.createFunction(movieclip_play));
-    o.init_member("prevFrame", gl.createFunction(movieclip_prevFrame));
-    o.init_member("prevScene", gl.createFunction(movieclip_prevScene));
-    o.init_member("stop", gl.createFunction(movieclip_stop));
-    o.init_member("addFrameScript", gl.createFunction(
-                movieclip_addFrameScript));
-}
-
-as_value
-movieclip_addFrameScript(const fn_call& fn)
-{
-    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-movieclip_nextScene(const fn_call& fn)
-{
-    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-movieclip_prevScene(const fn_call& fn)
-{
-    MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
     return as_value();
 }
 

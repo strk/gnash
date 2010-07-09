@@ -1,4 +1,4 @@
-// GradientType_as.h:  ActionScript 3 "GradientType" class, for Gnash.
+// MovieClip_as.h:  ActionScript "MovieClip" class, for Gnash.
 //
 //   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 //
@@ -17,22 +17,25 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ3_GRADIENTTYPE_H
-#define GNASH_ASOBJ3_GRADIENTTYPE_H
+#ifndef GNASH_ASOBJ3_MOVIECLIP_H
+#define GNASH_ASOBJ3_MOVIECLIP_H
 
+
+namespace gnash {
 
 // Forward declarations
 class as_object;
 struct ObjectURI;
+class DisplayObject;
 
-namespace gnash {
+/// Initialize the global MovieClip class
+void movieclip_class_init(as_object& where, const ObjectURI& uri);
 
-/// Initialize the global GradientType class
-void gradienttype_class_init(as_object& where, const ObjectURI& uri);
+/// Register ASNative MovieClip methods (AS2 only).
+void registerMovieClipNative(as_object& where);
 
 } // gnash namespace
 
-// GNASH_ASOBJ3_GRADIENTTYPE_H
 #endif
 
 // local Variables:
