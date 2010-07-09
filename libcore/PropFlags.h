@@ -47,9 +47,6 @@ public:
 		/// Protect from assigning a value
 		readOnly	= 1 << 2, // 4
 
-		/// Property is static -- assignments change, not override.
-		staticProp	= 1 << 3, // 8
-
 		/// Flags are protected from changes
 		isProtected	= 1 << 4, // 16
 
@@ -100,18 +97,6 @@ public:
 	{
 		return ( _flags != o._flags );
 	}
-
-	/// Get "static" flag
-	bool get_static() const
-	{
-	    return (_flags & staticProp);
-	}
-
-	/// Set "static" flag
-	void set_static() { _flags |= staticProp; }
-
-	/// Clear "static" flag
-	void clear_static() { _flags &= ~staticProp; }
 
 	/// Get "read-only" flag 
 	bool get_read_only() const
@@ -211,7 +196,6 @@ inline std::ostream&
 operator << (std::ostream& os, const PropFlags& fl)
 {
 	os << "(";
-	if ( fl.get_static() ) os << " static";
 	if ( fl.get_read_only() ) os << " readonly";
 	if ( fl.get_dont_delete() ) os << " nodelete";
 	if ( fl.get_dont_enum() ) os << " noenum";

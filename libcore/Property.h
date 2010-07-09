@@ -339,7 +339,6 @@ public:
 	/// to watch for infinitely recurse on calling the getter
 	/// or setter; Native getter-setter has no cache,
 	/// undefined will be returned for them.
-	///
 	const as_value& getCache() const;
 
 	/// Set internal cached value of this property
@@ -366,11 +365,7 @@ public:
 	///	The new value for this property. It will be used as first
 	///	argument of the 'setter' function if this is a Getter/Setter
 	///	property. @see isGetterSetter().
-	///
 	void setValue(as_object& this_ptr, const as_value &value) const;
-
-	/// is this a read-only member ?
-	bool isReadOnly() const { return _flags.get_read_only(); }
 
 	/// Is this a getter/setter property?
 	bool isGetterSetter() const {
@@ -379,14 +374,6 @@ public:
 
 	/// is this a destructive property ?
 	bool isDestructive() const { return _destructive; }
-
-	/// Is this a static property?
-	bool isStatic() const { return _flags.get_static(); }
-
-	/// Is this member supposed to be visible by a VM of given version ?
-	bool visible(int swfVersion) const {
-        return _flags.get_visible(swfVersion);
-    }
 
 	/// Clear visibility flags
 	void clearVisible(int swfVersion) { _flags.clear_visible(swfVersion); }
@@ -431,6 +418,18 @@ private:
     ObjectURI _uri;
 
 };
+	
+/// is this a read-only member ?
+inline bool
+readOnly(const Property& prop) {
+    return prop.getFlags().get_read_only();
+}
+
+/// Is this member supposed to be visible by a VM of given version ?
+inline bool
+visible(const Property& prop, int version) {
+    return prop.getFlags().get_visible(version);
+}
 
 } // namespace gnash
 

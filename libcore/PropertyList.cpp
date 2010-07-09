@@ -82,7 +82,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 	}
 
 	const Property& prop = found->first;
-	if (prop.isReadOnly() && ! prop.isDestructive())
+	if (readOnly(prop) && ! prop.isDestructive())
 	{
         ObjectURI::Logger l(getStringTable(_owner));
 		log_error(_("Property %s is read-only %s, not setting it to %s"), 

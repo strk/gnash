@@ -506,8 +506,7 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 
     while (pr()) {
         if ((prop = pr.getProperty())) {
-            if ((prop->isStatic() || prop->isGetterSetter()) &&
-                prop->visible(swfVersion)) {
+            if (prop->isGetterSetter() && visible(*prop, swfVersion)) {
                 return prop;
             }
         }
@@ -613,8 +612,7 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
         const int version = getSWFVersion(*this);
         while (pr()) {
             if ((prop = pr.getProperty())) {
-                if ((prop->isStatic() || prop->isGetterSetter()) &&
-                    prop->visible(version)) {
+                if ((prop->isGetterSetter()) && visible(*prop, version)) {
                     break;
                 }
                 else prop = 0;
@@ -623,7 +621,7 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
     }
         
     if (prop) {
-        if (prop->isReadOnly()) {
+        if (readOnly(*prop)) {
             IF_VERBOSE_ASCODING_ERRORS(
                 ObjectURI::Logger l(getStringTable(*this));
                 log_aserror(_("Attempt to set read-only property '%s'"),
@@ -1007,7 +1005,7 @@ as_object::get_prototype() const
     
     Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
     if (!prop) return 0;
-    if (!prop->visible(swfVersion)) return 0;
+    if (!visible(*prop, swfVersion)) return 0;
     
     as_value tmp = prop->getValue(*this);
     

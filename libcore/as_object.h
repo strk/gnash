@@ -833,7 +833,7 @@ class IsVisible
 public:
     IsVisible(int version) : _version(version) {}
     bool operator()(const Property& prop) const {
-        return prop.visible(_version);
+        return visible(prop, _version);
     }
 private:
     const int _version;
