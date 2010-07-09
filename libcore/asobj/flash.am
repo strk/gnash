@@ -34,14 +34,11 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Date_as.cpp \
 	asobj/Error_as.cpp \
 	asobj/Globals.cpp \
-	asobj/int_as.cpp \
 	asobj/LoadVars_as.cpp \
 	asobj/Math_as.cpp \
 	asobj/Number_as.cpp \
 	asobj/PlayHead.cpp \
 	asobj/Selection_as.cpp \
-	asobj/QName_as.cpp \
-	asobj/Namespace_as.cpp \
 	asobj/MovieClipLoader.cpp\
 	asobj/String_as.cpp \
 	asobj/LoadableObject.cpp \
@@ -69,7 +66,6 @@ noinst_HEADERS += \
 	asobj/Math_as.h	\
 	asobj/Global_as.h\
 	asobj/Globals.h\
-	asobj/int_as.h \
 	asobj/LoadVars_as.h \
 	asobj/MovieClipLoader.h \
 	asobj/Number_as.h \
@@ -77,8 +73,6 @@ noinst_HEADERS += \
 	asobj/Selection_as.h \
 	asobj/String_as.h \
 	asobj/LoadableObject.h \
-	asobj/QName_as.h \
-	asobj/Namespace_as.h \
 	asobj/MovieClip_as.h \
 	asobj/Stage_as.h \
 	asobj/Accessibility_as.h \

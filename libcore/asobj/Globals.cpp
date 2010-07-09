@@ -82,10 +82,7 @@
 #include "fn_call.h"
 #include "Button.h"
 #include "Globals.h"
-#include "int_as.h"
 #include "LoadVars_as.h"
-#include "Namespace_as.h"
-#include "QName_as.h"
 #include "Object.h"
 #include "LoadableObject.h"
 
