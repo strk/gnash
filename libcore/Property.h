@@ -111,22 +111,6 @@ public:
 		return undefVal;
 	}
 
-	/// Set a user-defined getter
-	void setGetter(as_function* fun)
-	{
-		if (_getset.which() == 0) {
-			boost::get<UserDefinedGetterSetter>(_getset).setGetter(fun);
-		}
-	}
-
-	/// Set a user-defined setter
-	void setSetter(as_function* fun)
-	{
-		if (_getset.which() == 0) {
-			boost::get<UserDefinedGetterSetter>(_getset).setSetter(fun);
-		}
-	}
-
 	void markReachableResources() const
 	{
 		if (_getset.which() == 0) {
@@ -161,12 +145,6 @@ private:
 
 		/// Set the underlying value
 		void setUnderlying(const as_value& v) { _underlyingValue = v; }
-
-		/// Set the setter
-		void setSetter(as_function* setter) { _setter = setter; }
-
-		/// Set the getter
-		void setGetter(as_function* getter) { _getter = getter; }
 
 		void markReachableResources() const;
 
