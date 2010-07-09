@@ -1,4 +1,4 @@
-// Keyboard_as.cpp:  ActionScript "Keyboard" class, for Gnash.
+// Key_as.cpp:  ActionScript "Keyboard" class, for Gnash.
 //
 //   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 //
@@ -19,7 +19,7 @@
 
 
 #include "smart_ptr.h" //GNASH_USE_GC
-#include "ui/Keyboard_as.h"
+#include "Key_as.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
@@ -102,7 +102,7 @@ key_is_toggled(const fn_call& /* fn */)
 }
 
 void
-registerKeyboardNative(as_object& global)
+registerKeyNative(as_object& global)
 {
     VM& vm = getVM(global);
     vm.registerNative(key_get_ascii, 800, 0);
@@ -112,7 +112,7 @@ registerKeyboardNative(as_object& global)
 }
 
 void
-attachKeyboardInterface(as_object& o)
+attachKeyInterface(as_object& o)
 {
     const int flags = PropFlags::readOnly |
                       PropFlags::dontDelete |
@@ -155,10 +155,9 @@ attachKeyboardInterface(as_object& o)
 
 // extern (used by Global.cpp)
 void
-keyboard_class_init(as_object& where, const ObjectURI& uri)
+key_class_init(as_object& where, const ObjectURI& uri)
 {
-    as_object* key = registerBuiltinObject(where, attachKeyboardInterface,
-            uri);
+    as_object* key = registerBuiltinObject(where, attachKeyInterface, uri);
 
     /// Handles addListener, removeListener, and _listeners.
     AsBroadcaster::initialize(*key);

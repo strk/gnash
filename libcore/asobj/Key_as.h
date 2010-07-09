@@ -1,4 +1,4 @@
-// Keyboard_as.h:  ActionScript 3 "Keyboard" class, for Gnash.
+// Key_as.h:  ActionScript 3 "Keyboard" class, for Gnash.
 //
 //   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 //
@@ -26,8 +26,8 @@ namespace gnash {
 class as_object;
 struct ObjectURI;
 
-void keyboard_class_init(as_object& global, const ObjectURI& uri);
-void registerKeyboardNative(as_object& global);
+void key_class_init(as_object& global, const ObjectURI& uri);
+void registerKeyNative(as_object& global);
 
 } // gnash namespace
 

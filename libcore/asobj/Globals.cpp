@@ -41,10 +41,10 @@
 #include "Number_as.h"
 #include "Math_as.h"
 #include "Accessibility_as.h"
-#include "flash/ui/ContextMenu_as.h"
-#include "flash/ui/ContextMenuItem_as.h"
-#include "flash/ui/Keyboard_as.h"
-#include "flash/ui/Mouse_as.h"
+#include "ContextMenu_as.h"
+#include "ContextMenuItem_as.h"
+#include "Key_as.h"
+#include "Mouse_as.h"
 #include "Microphone_as.h"
 #include "Sound_as.h"
 #include "Camera_as.h"
@@ -391,7 +391,7 @@ avm1Classes()
         (N(mouse_class_init, NSV::CLASS_MOUSE, 0, 5))
         (N(number_class_init, NSV::CLASS_NUMBER, 0, 5))
         (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, 0, 5))
-        (N(keyboard_class_init, NSV::CLASS_KEY, 0, 5))
+        (N(key_class_init, NSV::CLASS_KEY, 0, 5))
         (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, 0, 5))
         (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, 0, 5))
         (N(video_class_init, NSV::CLASS_VIDEO, 0, 6))
@@ -1239,7 +1239,7 @@ registerNatives(as_object& global)
     registerMovieClipLoaderNative(global);
     registerXMLSocketNative(global);
     registerSharedObjectNative(global);
-    registerKeyboardNative(global);
+    registerKeyNative(global);
     registerNetStreamNative(global);
     registerCameraNative(global);
     registerMicrophoneNative(global);

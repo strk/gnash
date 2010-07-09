@@ -56,6 +56,10 @@ libgnashasobjs_la_SOURCES = \
 	asobj/XML_as.cpp \
 	asobj/XMLNode_as.cpp \
 	asobj/System_as.cpp \
+	asobj/Mouse_as.cpp \
+	asobj/ContextMenu_as.cpp \
+	asobj/ContextMenuItem_as.cpp \
+	asobj/Key_as.cpp \
 	asobj/Object.cpp
 
 noinst_HEADERS += \
@@ -89,11 +93,14 @@ noinst_HEADERS += \
 	asobj/XML_as.h \
 	asobj/XMLNode_as.h \
 	asobj/System_as.h \
+	asobj/Mouse_as.h \
+	asobj/ContextMenu_as.h \
+	asobj/ContextMenuItem_as.h \
 	asobj/Object.h
 
 EXTENSIONS_API += \
 	asobj/Array_as.h \
-	asobj/flash/ui/Keyboard_as.h \
+	asobj/Key_as.h \
 	$(NULL)
 
 # libgnashasobjs_la_LIBADD = \
@@ -123,7 +130,6 @@ include $(srcdir)/asobj/flash/filters/filters.am
 include $(srcdir)/asobj/flash/geom/geom.am
 include $(srcdir)/asobj/flash/net/net.am
 include $(srcdir)/asobj/flash/text/text.am
-include $(srcdir)/asobj/flash/ui/ui.am
 
 libgnashasobjs_la_SOURCES += \
 	asobj/flash/flash_pkg.cpp \

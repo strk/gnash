@@ -33,7 +33,6 @@
 #include "swf/DefineEditTextTag.h"
 #include "MovieClip.h"
 #include "TextField.h"
-#include "flash/ui/Keyboard_as.h" // for keyboard events
 #include "movie_root.h"     // for killing focus
 #include "as_environment.h" // for parse_path
 #include "Font.h" 

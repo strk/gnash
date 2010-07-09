@@ -19,7 +19,7 @@
 
 
 #include "namedStrings.h"
-#include "ui/ContextMenuItem_as.h"
+#include "ContextMenuItem_as.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
