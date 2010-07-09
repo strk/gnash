@@ -39,7 +39,6 @@ main(int /*argc*/, char** /*argv*/)
 	PropFlags flags;
 
 	// Check initial state
-	check(!flags.get_is_protected());
 	check(!flags.get_read_only());
 	check(!flags.get_dont_enum());
 	check(!flags.get_dont_delete());
