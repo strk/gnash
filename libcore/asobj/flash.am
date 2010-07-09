@@ -96,20 +96,14 @@ EXTENSIONS_API += \
 # Gnash, and supports both AS2 as well as AS3, so we always
 # want to build.
 include $(srcdir)/asobj/flash/accessibility/accessibility.am
-include $(srcdir)/asobj/flash/desktop/desktop.am
 include $(srcdir)/asobj/flash/display/display.am
-include $(srcdir)/asobj/flash/errors/errors.am
-include $(srcdir)/asobj/flash/events/events.am
 include $(srcdir)/asobj/flash/external/external.am
 include $(srcdir)/asobj/flash/filters/filters.am
 include $(srcdir)/asobj/flash/geom/geom.am
 include $(srcdir)/asobj/flash/media/media.am
 include $(srcdir)/asobj/flash/net/net.am
-include $(srcdir)/asobj/flash/printing/printing.am
-include $(srcdir)/asobj/flash/sampler/sampler.am
 include $(srcdir)/asobj/flash/system/system.am
 include $(srcdir)/asobj/flash/text/text.am
-include $(srcdir)/asobj/flash/utils/utils.am
 include $(srcdir)/asobj/flash/ui/ui.am
 include $(srcdir)/asobj/flash/xml/xml.am
 
