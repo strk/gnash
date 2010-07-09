@@ -172,8 +172,7 @@ public:
     /// @return     A Property or 0, if no such property exists.
     ///             All Property objects are owned by this PropertyList. Do
     ///             not delete them.
-    Property* getProperty(const ObjectURI& uri)
-        const;
+    Property* getProperty(const ObjectURI& uri) const;
 
     /// Delete a Property, if existing and not protected from deletion.
     //
