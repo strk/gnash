@@ -426,7 +426,7 @@ get_flash_geom_transform_constructor(const fn_call& fn)
 void
 attachTransformInterface(as_object& o)
 {
-    const int protectedFlags = PropFlags::isProtected;
+    const int protectedFlags = 0;
 
     o.init_property("matrix", transform_matrix, transform_matrix,
             protectedFlags);

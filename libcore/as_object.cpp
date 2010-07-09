@@ -558,7 +558,7 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     
     // This is a particularly clear and concise way of removing dead triggers.
     EraseIf(*_trigs, boost::bind(boost::mem_fn(&Trigger::dead), 
-                                 boost::bind(SecondElement<TriggerContainer::value_type>(), _1)));
+             boost::bind(SecondElement<TriggerContainer::value_type>(), _1)));
                     
     // The trigger call could have deleted the property,
     // so we check for its existence again, and do NOT put
@@ -744,8 +744,7 @@ as_object::init_readonly_property(const std::string& key, as_function& getter,
 {
     string_table::key k = getStringTable(*this).find(key);
 
-    init_property(k, getter, getter,
-                  initflags | PropFlags::readOnly | PropFlags::isProtected);
+    init_property(k, getter, getter, initflags | PropFlags::readOnly);
     assert(_members.getProperty(k));
 }
 
@@ -753,8 +752,7 @@ void
 as_object::init_readonly_property(const ObjectURI& uri, as_function& getter,
                                   int initflags)
 {
-    init_property(uri, getter, getter,
-                  initflags | PropFlags::readOnly | PropFlags::isProtected);
+    init_property(uri, getter, getter, initflags | PropFlags::readOnly);
     assert(_members.getProperty(uri));
 }
 
@@ -764,8 +762,7 @@ as_object::init_readonly_property(const std::string& key,
 {
     string_table::key k = getStringTable(*this).find(key);
 
-    init_property(k, getter, getter,
-                  initflags | PropFlags::readOnly | PropFlags::isProtected);
+    init_property(k, getter, getter, initflags | PropFlags::readOnly);
     assert(_members.getProperty(k));
 }
 
@@ -773,8 +770,7 @@ void
 as_object::init_readonly_property(const ObjectURI& uri,
                                   as_c_function_ptr getter, int initflags)
 {
-    init_property(uri, getter, getter, initflags | PropFlags::readOnly
-                  | PropFlags::isProtected);
+    init_property(uri, getter, getter, initflags | PropFlags::readOnly);
     assert(_members.getProperty(uri));
 }
 

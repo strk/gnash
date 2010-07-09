@@ -523,7 +523,7 @@ attachXMLNodeInterface(as_object& o)
     o.init_member("getNamespaceForPrefix", vm.getNative(253, 7), noFlags);
     o.init_member("getPrefixForNamespace", vm.getNative(253, 8), noFlags);
 
-    const int protectedFlags = PropFlags::isProtected;
+    const int protectedFlags = 0;
 
     // Just the protected flag:
     o.init_property("nodeValue", &xmlnode_nodeValue, 

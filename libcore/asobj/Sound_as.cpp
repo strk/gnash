@@ -50,8 +50,6 @@ namespace {
     as_value sound_getbytesloaded(const fn_call& fn);
     as_value sound_setPosition(const fn_call& fn);
     as_value sound_areSoundsInaccessible(const fn_call& fn);
-    as_value sound_duration(const fn_call& fn);
-    as_value sound_position(const fn_call& fn);
     as_value sound_getbytestotal(const fn_call& fn);
     as_value sound_getpan(const fn_call& fn);
     as_value sound_setpan(const fn_call& fn);
@@ -175,6 +173,13 @@ void
 Sound_as::update()
 {
     probeAudio();
+
+    string_table& st = getStringTable(owner());
+
+    if (isAttached()) {
+        owner().set_member(st.find("duration"), getDuration());
+        owner().set_member(st.find("position"), getPosition());
+    }
 }
 
 /*private*/
@@ -258,6 +263,11 @@ Sound_as::attachSound(int si, const std::string& name)
 {
     soundId = si;
     soundName = name;
+    
+    string_table& st = getStringTable(owner());
+    owner().set_member(st.find("duration"), getDuration());
+    owner().set_member(st.find("position"), getPosition());
+
 }
 
 long
@@ -711,11 +721,6 @@ attachSoundInterface(as_object& o)
 
     o.init_member("areSoundsInaccessible", vm.getNative(500, 16), flagsn9);
 
-    // Properties
-    //there's no such thing as an ID3 member (swfdec shows)
-    o.init_readonly_property("duration", &sound_duration);
-    o.init_readonly_property("position", &sound_position);
-
     int fl_hp = PropFlags::dontEnum | PropFlags::dontDelete;
 
     o.init_property("checkPolicyFile", &checkPolicyFile_getset, 
@@ -879,6 +884,7 @@ sound_attachsound(const fn_call& fn)
     // sanity check
     assert(si >= 0);
     so->attachSound(si, name);
+
     return as_value();
 }
 
@@ -908,10 +914,10 @@ sound_getpan(const fn_call& /*fn*/)
 }
 
 as_value
-sound_getDuration(const fn_call& /*fn*/)
+sound_getDuration(const fn_call& fn)
 {
-    LOG_ONCE( log_unimpl ("Sound.getDuration()") );
-    return as_value();
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
+    return as_value(so->getDuration());
 }
 
 as_value
@@ -922,10 +928,10 @@ sound_setDuration(const fn_call& /*fn*/)
 }
 
 as_value
-sound_getPosition(const fn_call& /*fn*/)
+sound_getPosition(const fn_call& fn)
 {
-    LOG_ONCE( log_unimpl ("Sound.getPosition()") );
-    return as_value();
+    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
+    return as_value(so->getPosition());
 }
 
 as_value
@@ -1025,13 +1031,6 @@ sound_setvolume(const fn_call& fn)
 }
 
 as_value
-sound_duration(const fn_call& fn)
-{
-    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
-    return as_value(so->getDuration());
-}
-
-as_value
 checkPolicyFile_getset(const fn_call& /*fn*/)
 {
     LOG_ONCE( log_unimpl ("Sound.checkPolicyFile") );
@@ -1050,15 +1049,6 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
     LOG_ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
     return as_value();
 }
-
-as_value
-sound_position(const fn_call& fn)
-{
-    Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
-
-    return as_value(so->getPosition());
-}
-
 
 as_value
 sound_load(const fn_call& fn)
