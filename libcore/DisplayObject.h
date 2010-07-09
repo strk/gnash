@@ -421,12 +421,11 @@ public:
     }
 
     /// Set DisplayObject name, initializing the original target member
-    void set_name(const std::string& name)
-    {
+    void set_name(string_table::key name) {
         _name = name;
     }
 
-    const std::string& get_name() const { return _name; }
+    string_table::key get_name() const { return _name; }
 
     /// \brief
     /// Get our concatenated SWFMatrix (all our ancestor transforms,
@@ -906,7 +905,7 @@ public:
 #endif
     
     /// Used to assign a name to unnamed instances
-    std::string getNextUnnamedInstanceName();
+    string_table::key getNextUnnamedInstanceName();
 
     enum BlendMode
     {
@@ -990,7 +989,7 @@ protected:
     virtual bool unloadChildren() { return false; }
 
     /// Get the movie_root to which this DisplayObject belongs.
-    movie_root& stage() {
+    movie_root& stage() const {
         return _stage;
     }
 
@@ -1014,7 +1013,7 @@ protected:
     void set_event_handlers(const Events& copyfrom);
 
     /// Name of this DisplayObject (if any)
-    std::string _name;
+    string_table::key _name;
 
     DisplayObject* _parent;
 

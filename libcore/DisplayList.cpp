@@ -106,43 +106,34 @@ private:
 class NameEquals
 {
 public:
-    NameEquals(const std::string& name) : _name(name) {}
+    NameEquals(string_table& st, string_table::key name, bool caseless)
+        :
+        _st(st),
+        _caseless(caseless),
+        _name(caseless ? _st.noCase(name) : name)
+    {}
 
     bool operator() (const DisplayObject* item) {
         assert (item);
+
         // TODO: this is necessary because destroy() is called in
         // movie_root, leaving destroyed items on the DisplayList. They
         // shouldn't be found. A better fix would be to stop destroying
         // objects there and add to the invariant that there are never
         // destroyed DisplayObjects in the DisplayList.
         if (item->isDestroyed()) return false;
-        return item->get_name() == _name;
+        
+        const string_table::key itname =
+            _caseless ? _st.noCase(item->get_name()) : item->get_name();
+
+        return itname == _name;
+
     }
 
 private:
-    const std::string& _name;
-};
-
-
-class NameEqualsNoCase
-{
-public:
-    NameEqualsNoCase(const std::string& name) : _name(name) {}
-
-    bool operator() (const DisplayObject* item) {
-        assert (item);
-        // TODO: this is necessary because destroy() is called in
-        // movie_root, leaving destroyed items on the DisplayList. They
-        // shouldn't be found. A better fix would be to stop destroying
-        // objects there and add to the invariant that there are never
-        // destroyed DisplayObjects in the DisplayList.
-        if (item->isDestroyed()) return false;
-        return _noCaseEquals(item->get_name(), _name);
-    }
-
-private:
-    const std::string& _name;
-    StringNoCaseEqual _noCaseEquals;
+    string_table& _st;
+    const bool _caseless;
+    const string_table::key _name;
 };
 
 } // anonymous namespace
@@ -167,11 +158,11 @@ DisplayList::getNextHighestDepth() const
 }
 
 DisplayObject*
-DisplayList::getDisplayObjectAtDepth(int depth)
+DisplayList::getDisplayObjectAtDepth(int depth) const
 {
     testInvariant();
 
-    for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
+    for (const_iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
         it != itEnd; ++it) {
 
         DisplayObject* ch = *it;
@@ -192,34 +183,20 @@ DisplayList::getDisplayObjectAtDepth(int depth)
 
 
 DisplayObject*
-DisplayList::getDisplayObjectByName(const std::string& name)
+DisplayList::getDisplayObjectByName(string_table& st, string_table::key name,
+        bool caseless) const
 {
     testInvariant();
 
-    const container_type::iterator e = _charsByDepth.end();
+    const container_type::const_iterator e = _charsByDepth.end();
 
     container_type::const_iterator it =
-        std::find_if( _charsByDepth.begin(), e, NameEquals(name));
+        std::find_if(_charsByDepth.begin(), e, NameEquals(st, name, caseless));
 
     if (it == e) return 0;
     
     return *it;
 
-}
-
-DisplayObject*
-DisplayList::getDisplayObjectByName_i(const std::string& name)
-{
-    testInvariant();
-
-    const container_type::iterator e = _charsByDepth.end();
-
-    container_type::const_iterator it =
-        std::find_if( _charsByDepth.begin(), e, NameEqualsNoCase(name));
-
-    if ( it == e ) return NULL;
-    
-    return *it;
 }
 
 void

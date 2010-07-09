@@ -244,25 +244,11 @@ public:
 	void omit_display();
 
 	/// May return NULL.
-	DisplayObject* getDisplayObjectAtDepth(int depth);
+	DisplayObject* getDisplayObjectAtDepth(int depth) const;
 
-	const DisplayObject* getDisplayObjectAtDepth(int depth) const {
-		return const_cast<DisplayList*>(this)->getDisplayObjectAtDepth(depth);
-	}
-
-	/// \brief
-	/// May return NULL.
 	/// If there are multiples, returns the *first* match only!
-	DisplayObject* getDisplayObjectByName(const std::string& name);
-
-	const DisplayObject* getDisplayObjectByName(const std::string& name) const {
-		return const_cast<DisplayList*>(this)->getDisplayObjectByName(name);
-	}
-
-	/// \brief
-	/// May return NULL.
-	/// If there are multiples, returns the *first* match only!
-	DisplayObject* getDisplayObjectByName_i(const std::string& name);
+	DisplayObject* getDisplayObjectByName(string_table& st,
+            string_table::key name, bool caseless) const;
 
 	/// \brief 
 	/// Visit each DisplayObject in the list in depth order

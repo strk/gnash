@@ -249,6 +249,12 @@ private:
 };
 
 /// An abstract property
+//
+/// A Property is a holder for a value or a getter-setter.
+//
+/// Properties have special const semantics: the value of a Property does
+/// not affect its outward state, so the value of a const Property can be
+/// changed.
 class Property
 {
 public:
@@ -257,8 +263,7 @@ public:
         : 
 		_bound(as_value()),
         _destructive(false),
-        _uri(uri),
-		_orderID(0)
+        _uri(uri)
 	{}
 
 	/// Copy constructor
@@ -267,8 +272,7 @@ public:
 		_flags(p._flags),
         _bound(p._bound),
         _destructive(p._destructive),
-        _uri(p._uri),
-        _orderID(p._orderID)
+        _uri(p._uri)
 	{}
 
 	Property(const ObjectURI& uri, const as_value& value,
@@ -277,8 +281,7 @@ public:
 		_flags(flags),
         _bound(value),
         _destructive(false),
-		_uri(uri),
-		_orderID(0)
+		_uri(uri)
 	{}
 
 	Property(const ObjectURI& uri,
@@ -288,8 +291,7 @@ public:
 		_flags(flags), 
         _bound(GetterSetter(getter, setter)),
 		_destructive(destroy),
-        _uri(uri),
-		_orderID(0)
+        _uri(uri)
 	{}
 
 	Property(const ObjectURI& uri, as_function *getter, as_function *setter,
@@ -298,8 +300,7 @@ public:
 		_flags(),
         _bound(GetterSetter(getter, setter)),
         _destructive(destroy),
-        _uri(uri),
-		_orderID(0)
+        _uri(uri)
 	{}
 
 	Property(const ObjectURI& uri, as_c_function_ptr getter,
@@ -309,8 +310,7 @@ public:
 		_flags(flags),
         _bound(GetterSetter(getter, setter)),
         _destructive(destroy),
-        _uri(uri),
-		_orderID(0)
+        _uri(uri)
 	{}
 
 	/// Set a user-defined setter
@@ -321,7 +321,11 @@ public:
 
 	/// accessor to the properties flags
 	const PropFlags& getFlags() const { return _flags; }
-	PropFlags& getFlags() { return _flags; }
+
+    /// Set the flags of the property
+    void setFlags(const PropFlags& flags) const {
+        _flags = flags;
+    }
 
 	/// Get value of this property
 	//
@@ -351,7 +355,6 @@ public:
 	/// to watch for infinitely recurse on calling the getter
 	/// or setter; Native getter-setter has no cache,
 	/// nothing would happen for them.
-	///
 	void setCache(const as_value& v);
 
 	/// Set value of this property
@@ -370,21 +373,7 @@ public:
 	///	argument of the 'setter' function if this is a Getter/Setter
 	///	property. @see isGetterSetter().
 	///
-	void setValue(as_object& this_ptr, const as_value &value);
-
-	/// Set the order id
-	//
-	/// NOTE: this field is used by one of the indexes
-	///       in the boost::multi_index used by PropertyList,
-	///       so changing this value on an instance which was
-	///       put in that index might result in corruption of
-	///       the index invariant. (at least this is what happens
-	///       with standard containers indexed on an element's member).
-	///
-	void setOrder(int order) { _orderID = order; }
-
-	/// Get the order id
-	int getOrder() const { return _orderID; }
+	void setValue(as_object& this_ptr, const as_value &value) const;
 
 	/// is this a read-only member ?
 	bool isReadOnly() const { return _flags.get_read_only(); }
@@ -417,9 +406,12 @@ public:
 	void setReachable() const;
 
 private:
+	
+    /// Get a value from a getter function.
+	as_value getDelayedValue(const as_object& this_ptr) const;
 
-	/// Properties flags
-	PropFlags _flags;
+	/// Set a value using a setter function.
+	void setDelayedValue(as_object& this_ptr, const as_value& value) const;
 
     enum Type {
         TYPE_EMPTY,
@@ -427,11 +419,13 @@ private:
         TYPE_GETTER_SETTER
     };
 
+	/// Properties flags
+	mutable PropFlags _flags;
+
 	// Store the various types of things that can be held.
 	typedef boost::variant<boost::blank, as_value, GetterSetter> BoundType;
 
-	// Changing this doesn't change the identity of the property, so it is
-	// mutable.
+    /// The value of the property.
 	mutable BoundType _bound;
 
 	// If true, as soon as getValue has been invoked once, the
@@ -441,16 +435,6 @@ private:
 	
     // TODO: this should be const, but the assignment operator is still needed 
     ObjectURI _uri;
-
-	// An ordering number, for access by order
-	// (AS3 enumeration and slots, AS2 arrays)
-	int _orderID;
-
-	/// Get a value from a getter function.
-	as_value getDelayedValue(const as_object& this_ptr) const;
-
-	/// Set a value using a setter function.
-	void setDelayedValue(as_object& this_ptr, const as_value& value);
 
 };
 

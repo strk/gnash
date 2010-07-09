@@ -713,22 +713,6 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
     }
 }
 
-void
-ActionExec::setObjectMember(as_object& obj, const std::string& var,
-        const as_value& val)
-{
-    string_table& st = getStringTable(env);
-    obj.set_member(st.find(var), val);
-}
-
-bool
-ActionExec::getObjectMember(as_object& obj, const std::string& var,
-        as_value& val)
-{
-    string_table& st = getStringTable(env);
-    return obj.get_member(st.find(var), &val);
-}
-
 as_object*
 ActionExec::getTarget()
 {

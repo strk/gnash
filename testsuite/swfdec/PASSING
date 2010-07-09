@@ -711,6 +711,7 @@ loadobject-sendandload-7.swf:d8cb91cb67ee27c6ec795cbbd44b9cb6
 loadobject-sendandload-8.swf:75cc0c0c435987ef63b0abc9a327a2b2
 loadvariables-5.swf:a24997be9ca59d8da2216f9527d0279a
 loadvars-5.swf:378a93e3fc7821a72f61332dcfa6cbf7
+loadvars-decode-6.swf:9c41bfc273298905ba56dfa0308212b7
 loadvars-decode-7.swf:c56b42214f26888edba5d991f711c209
 loadvars-decode-8.swf:ed7cb98e1a1ec7f7e6a6730a3d884f9a
 loadvars-decode-return-5.swf:7d961f35feb3d46db0725e93c26bb90a
@@ -898,6 +899,7 @@ object-properties-5.swf:86727344c3b46a88d41163cd01b26337
 object-properties-6.swf:c34734222b0c6eef649ab3b92b1b830f
 object-properties-7.swf:71ebb1f47408d993409748dae8d32d5e
 object-properties-8.swf:992fafbfd6ae4927116892eb205aac0f
+object-resolve-5.swf:5ec01818d35026f5ec889416fbbf8320
 object-resolve-propflags-9.swf:db769008cba912cd906834a4722fdb95
 object-valueof-5.swf:2520f058ac5a1af3db81ba9b3002e6ab
 object-valueof-6.swf:68d80a5ba580357d1dfeb3b515691e7e
@@ -1421,6 +1423,8 @@ text-field-type-of-8.swf:bac748e2b13ba9331c27f5ee45109ac4
 text-field-variable-5.swf:20821d0f34ab14b27bbc55f27c70c57f
 textformat-init-5.swf:52dec30885359d5bdda450588076eb10
 textformat-init-5.swf:d45b857148b96635af7d18855cb067ae
+textformat-properties-5.swf:a879a08351954d91c45d4f67e5ba2edd
+textformat-properties-6.swf:15e2a52688f6b11796dabf9d26061276
 textformat-properties-7.swf:390495b699f387f9647c8cf47afa2175
 text-snapshot-properties-5.swf:caf502463913e8aa1959715f629b92aa
 text-snapshot-properties-6.swf:b17d4634477fa1e2a5a095fba489d3ed
@@ -1501,6 +1505,9 @@ with-prototypes-7.swf:20f1f3b8905c8a3f3a61cb18e7e59e76
 xml-cdata-6.swf:d7559375e07591033d7739671a8c4d42
 xml-cdata-7.swf:5e51dafbe7f6af8206041ecabf0016f8
 xml-cdata-8.swf:d5537f4fb83eaf49d615eecb89b2ae95
+xml-errors-5.swf:d97d4e6fd3a604ff845c7cbdee144003
+xml-errors-6.swf:147e755000980143b5c145867523da
+xml-errors-6.swf:147e755000980143b5c145867523da51
 xml-errors-7.swf:0f90a1e9ae561ecc4c3206bb1e966ca1
 xml-errors-8.swf:321a6535952813fadeaef64c99fa467d
 xml-escape-6.swf:302349505514bd60239c7019355f6ab8

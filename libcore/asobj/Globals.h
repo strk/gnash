@@ -117,69 +117,6 @@ private:
 
 };
 
-#ifdef ENABLE_AVM2
-
-class AVM2Global : public Global_as
-{
-public:
-
-    /// Construct the AVM2 global object.
-    //
-    /// This takes a VM argument because most access to necessary
-    /// resources is still through the VM.
-	AVM2Global(abc::Machine& m, VM& vm);
-	~AVM2Global() {}
-    
-    void registerClasses();
-    
-    /// Create an ActionScript function
-    virtual builtin_function* createFunction(Global_as::ASFunction function);
-
-    /// Create an ActionScript class
-    //
-    /// An AS3 class is generally an object (the prototype) with a constructor.
-    virtual as_object* createClass(Global_as::ASFunction ctor,
-            as_object* prototype);
-
-    virtual as_object* createString(const std::string& s);
-
-    virtual as_object* createNumber(double d);
-
-    virtual as_object* createBoolean(bool b);
-
-    virtual as_object* createObject();
-
-    virtual as_object* createArray();
-
-    virtual const ClassHierarchy& classHierarchy() const {
-        return _classes;
-    }
-    
-    virtual ClassHierarchy& classHierarchy() {
-        return _classes;
-    }
-    
-    virtual VM& getVM() const {
-        return vm();
-    }
-
-protected:
-
-    virtual void markReachableResources() const {
-        _classes.markReachableResources();
-        _objectProto->setReachable();
-        markAsObjectReachable();
-    }
-
-private:
-
-    ClassHierarchy _classes;
-    as_object* _objectProto;
-
-};
-
-#endif 
-
 } // namespace gnash
 
 #endif 

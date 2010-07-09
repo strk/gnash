@@ -316,7 +316,8 @@ MovieTester::findDisplayItemByName(const MovieClip& mc,
 		const std::string& name) 
 {
     const DisplayList& dlist = mc.getDisplayList();
-    return dlist.getDisplayObjectByName(name);
+    string_table& st = getStringTable(*getObject(&mc));
+    return dlist.getDisplayObjectByName(st, st.find(name), false);
 }
 
 const DisplayObject*

@@ -134,14 +134,16 @@ DisplayObject::getLoadedMovie(Movie* extern_movie)
     UNUSED(extern_movie);
 }
 
-std::string
+string_table::key
 DisplayObject::getNextUnnamedInstanceName()
 {
     assert(_object);
     movie_root& mr = getRoot(*_object);
 	std::ostringstream ss;
 	ss << "instance" << mr.nextUnnamedInstance();
-	return ss.str();
+
+    string_table& st = getStringTable(*_object);
+	return st.find(ss.str());
 }
 
 
@@ -189,9 +191,14 @@ DisplayObject::pathElement(string_table::key key)
     as_object* obj = getObject(this);
     if (!obj) return 0;
 
-	string_table& st = getStringTable(*obj);
+    string_table& st = stage().getVM().getStringTable();
     if (key == st.find("..")) return getObject(get_parent());
-	if (key == st.find(".") || key == st.find("this")) return obj;
+	if (key == st.find(".")) return obj;
+    
+    // The check is case-insensitive for SWF6 and below.
+    if (equal(st, key, NSV::PROP_THIS, caseless(*obj))) {
+        return obj;
+    }
 	return 0;
 }
 
@@ -502,10 +509,8 @@ void
 DisplayObject::queueEvent(const event_id& id, int lvl)
 {
     if (!_object) return;
-    assert(_object);
-	movie_root& root = getRoot(*_object);
 	std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
-	root.pushAction(event, lvl);
+	stage().pushAction(event, lvl);
 }
 
 bool
@@ -611,7 +616,6 @@ DisplayObject::set_y_scale(double scale_percent)
 }
 
 
-/*public*/
 std::string
 DisplayObject::getTargetPath() const
 {
@@ -625,6 +629,8 @@ DisplayObject::getTargetPath() const
 	// Build parents stack
 	const DisplayObject* topLevel = 0;
 	const DisplayObject* ch = this;
+
+    string_table& st = getStringTable(*getObject(this));
 	for (;;)
 	{
 		const DisplayObject* parent = ch->get_parent();
@@ -635,14 +641,14 @@ DisplayObject::getTargetPath() const
 			break;
 		}
 
-		path.push_back(ch->get_name());
+		path.push_back(st.value(ch->get_name()));
 		ch = parent;
 	} 
 
 	assert(topLevel);
 
 	if (path.empty()) {
-		if (&getRoot(*_object).getRootMovie() == this) return "/";
+		if (&stage().getRootMovie() == this) return "/";
 		std::stringstream ss;
 		ss << "_level" << _depth-DisplayObject::staticDepthOffset;
 		return ss.str();
@@ -650,7 +656,7 @@ DisplayObject::getTargetPath() const
 
 	// Build the target string from the parents stack
 	std::string target;
-	if (topLevel != &getRoot(*_object).getRootMovie()) {
+	if (topLevel != &stage().getRootMovie()) {
 		std::stringstream ss;
 		ss << "_level" << 
             topLevel->get_depth() - DisplayObject::staticDepthOffset;
@@ -664,7 +670,6 @@ DisplayObject::getTargetPath() const
 }
 
 
-/*public*/
 std::string
 DisplayObject::getTarget() const
 {
@@ -678,6 +683,7 @@ DisplayObject::getTarget() const
 
 	// Build parents stack
 	const DisplayObject* ch = this;
+    string_table& st = stage().getVM().getStringTable();
 	for (;;)
 	{
 		const DisplayObject* parent = ch->get_parent();
@@ -703,7 +709,7 @@ DisplayObject::getTarget() const
 			break;
 		}
 
-		path.push_back(ch->get_name());
+		path.push_back(st.value(ch->get_name()));
 		ch = parent;
 	} 
 
@@ -947,7 +953,7 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     const std::string& propname = st.value(key);
 
     // Check _level0.._level9
-    movie_root& mr = getRoot(*o);
+    movie_root& mr = getRoot(*getObject(&obj));
     unsigned int levelno;
     if (isLevelTarget(getSWFVersion(*o), propname, levelno)) {
         MovieClip* mo = mr.getLevel(levelno);
@@ -967,10 +973,12 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
         }
     }
 
+    const string_table::key noCaseKey = st.noCase(key);
+
     // These properties have normal case-sensitivity.
     // They are tested to exist for TextField, MovieClip, and Button
     // but do not belong to the inheritance chain.
-    switch (key)
+    switch (caseless(*o) ? noCaseKey : key)
     {
         default:
             break;
@@ -987,8 +995,6 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     }
 
     // These magic properties are case insensitive in all versions!
-    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
-
     if (doGet(noCaseKey, obj, val)) return true;
 
     // Check MovieClip such as TextField variables.
@@ -1005,9 +1011,7 @@ setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
 {
     // These magic properties are case insensitive in all versions!
     string_table& st = getStringTable(*getObject(&obj));
-    const std::string& propname = st.value(key);
-    const string_table::key noCaseKey = st.find(boost::to_lower_copy(propname));
-    return doSet(noCaseKey, obj, val);
+    return doSet(st.noCase(key), obj, val);
 }
 
 namespace {
@@ -1368,7 +1372,8 @@ getTarget(DisplayObject& o)
 as_value
 getNameProperty(DisplayObject& o)
 {
-    const std::string& name = o.get_name();
+    string_table& st = getStringTable(*getObject(&o));
+    const std::string& name = st.value(o.get_name());
     if (getSWFVersion(*getObject(&o)) < 6 && name.empty()) return as_value(); 
     return as_value(name);
 }
@@ -1376,7 +1381,8 @@ getNameProperty(DisplayObject& o)
 void
 setName(DisplayObject& o, const as_value& val)
 {
-    o.set_name(val.to_string().c_str());
+    string_table& st = getStringTable(*getObject(&o));
+    o.set_name(st.find(val.to_string().c_str()));
 }
 
 void
@@ -1518,6 +1524,10 @@ doGet(string_table::key prop, DisplayObject& o, as_value& val)
 //
 /// Return true if the property is a DisplayObject property, regardless of
 /// whether it was successfully set or not.
+//
+/// @param prop     The property to search for. Note that all special
+///                 properties are lower-case, so for a caseless check
+///                 it is sufficient for prop to be caseless.
 bool
 doSet(string_table::key prop, DisplayObject& o, const as_value& val)
 {

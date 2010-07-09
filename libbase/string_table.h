@@ -32,10 +32,7 @@
 #include <string>
 #include "dsodefs.h"
 
-namespace gnash
-{
-
-class string_table;
+namespace gnash {
 
 // So many strings are duplicated (such as standard property names)
 // that a string table could give significant memory savings.
@@ -43,119 +40,131 @@ class string_table;
 class DSOEXPORT string_table
 {
 public:
+
 	/// A little helper for indexing.
 	struct svt
 	{
-		std::string mValue;
-		std::size_t mId;
-		std::string mComp;
+		svt(const std::string& val, std::size_t i)
+            :
+			value(val),
+            id(i)
+        {}
 
-		svt() : mValue(""), mId(0), mComp("") {/**/}
-
-		svt(const std::string &val, std::size_t id) :
-			mValue(val), mId(id), mComp(val) {/**/}
+		std::string value;
+		std::size_t id;
 	};
+    
+    /// A tag to identify the key index.   
+    struct StringID {};
 
-public:
+    /// A tag to identify the string index.
+    struct StringValue {};
+
+    /// The container for indexing the strings
+    //
+    /// This contains two indices with no duplicate values:
+    /// 1. An index of unique, case-sensitive strings.
+    /// 2. An index of unique numeric keys.
 	typedef boost::multi_index_container<svt,
 		boost::multi_index::indexed_by<
-			boost::multi_index::hashed_non_unique<
-				boost::multi_index::member<svt, std::string, &svt::mComp> >,
-			boost::multi_index::hashed_non_unique< // caseless
-				boost::multi_index::member<svt, std::size_t, &svt::mId> > 
+
+			boost::multi_index::hashed_unique<
+                boost::multi_index::tag<StringValue>,
+				boost::multi_index::member<svt, std::string, &svt::value> >,
+
+			boost::multi_index::hashed_unique<
+                boost::multi_index::tag<StringID>,
+				boost::multi_index::member<svt, std::size_t, &svt::id>
+
+        > 
 	> > table;
 
 	typedef std::size_t key;
 
-	/// \brief
-	/// Find a string. If insert_unfound is true, the string will
-	/// be inserted if the value is not found in the table already.
-	/// @param to_find
-	/// The string to be found. Case-sensitive comparison using < operator
-	///
-	/// @param insert_unfound
-	/// If this is set to false, a search is performed, but no update.
-	/// By update, any unfound string is added to the table.
-	///
-	/// @return
-	/// A key which can be used in value or 0 if the string is
-	/// not yet in the table and insert_unfound was false.
+	/// Find a key for a string.
+    //
+    /// By default a key will be created for a string that isn't present.
+    //
+	/// @param to_find          The string to be found. 
+	/// @param insert_unfound   If this is set to false, a search is
+    ///                         performed, but no update.
+	/// @return                 A key which can be used in value or 0 if the
+    ///                         string is not yet in the table and
+    ///                         insert_unfound was false.
 	key find(const std::string& to_find, bool insert_unfound = true);
 
-	/// \brief
-	/// Find a string which is the concatentation of two known strings
-	/// with a dot between them. (Used for namespaces.)
-	/// Otherwise, just like find.
-	key find_dot_pair(key left, key right, bool insert_unfound = true);
-
 	/// Find a string by its key.
-	///
-	/// @return
-	/// The string which matches key or "" if an invalid key is given.
+	//
+    /// @param key  The key of the string to return. 
+	/// @return     The string which matches key or "" if an invalid key is
+    ///             given.
 	const std::string& value(key to_find)
 	{
-		if (mTable.empty() || !to_find)
-			return mEmpty;
-		table::nth_index<1>::type::iterator r = 
-			mTable.get<1>().find(to_find);
-		return (r == mTable.get<1>().end()) ? mEmpty : r->mValue;
+		if (_table.empty() || !to_find) return _empty;
+
+		table::index<StringID>::type::iterator r =
+            _table.get<StringID>().find(to_find);
+		return (r == _table.get<StringID>().end()) ? _empty : r->value;
 	}
 
-	/// \brief
-	/// Force insert a string with auto-assigned id. Does not prevent
-	/// duplicate insertions.
-	///
+	/// Insert a string with auto-assigned id. 
+	//
 	/// @return The assigned key
 	key insert(const std::string& to_insert);
 
 	/// Insert a group of strings with their ids preset.
     //
-    /// This allows
-	/// for switches and enums and such, but be careful you don't set two
-	/// strings with the same id, as this does not check for such occurrences.
-	///
-	/// @param pList
-	/// An array of svt objects, these should be fully constructed, including
-	/// their ids.
-    ///
-	/// @param size
-    /// Number of elements in the svt objects array
-    ///
+	/// @param pList    An array of svt objects, these should be fully
+    ///                 constructed, including their ids. If any id is
+    ///                 duplicated, the insertion will fail.
+	/// @param size      Number of elements in the svt objects array
 	void insert_group(const svt* pList, std::size_t size);
 
 	/// Insert a string when you will handle the locking yourself.
     //
-	/// @param to_insert
-    /// String to insert
-    ///
-	/// @param lock
-	/// Use lock_mutex to obtain the correct mutex to use for this -- using
-	/// a different mutex will not be thread safe.
-	///
-	/// @return The assigned key
-	key already_locked_insert(const std::string& to_insert, boost::mutex& lock);
-
-	/// @return A mutex which can be used to lock the string table to inserts.
-	boost::mutex& lock_mutex() { return mLock; }
-
-	/// Make the comparisons case-insensitive.
-	void set_insensitive() { mCaseInsensitive = true; }
+	/// @param to_insert    The string to insert
+	/// @return             The assigned key
+	key already_locked_insert(const std::string& to_insert);
 
 	/// Construct the empty string_table
-	string_table() :
-		mTable(),
-		mLock(),
-		mHighestKey(0),
-		mCaseInsensitive(false)
-	{/**/}
+	string_table()
+        :
+		_highestKey(0)
+	{}
+
+    /// Return a caseless equivalent of the passed key.
+    //
+    /// @param a    The key to find a caseless equivalent for. The key
+    ///             may be its own caseless equivalent, in which case the
+    ///             same key will be returned.
+    key noCase(key a) const;
 
 private:
-	table mTable;
-	static const std::string mEmpty; // The empty string, universally.
-	boost::mutex mLock;
-	std::size_t mHighestKey;
-	bool mCaseInsensitive;
+
+	table _table;
+	static const std::string _empty;
+	boost::mutex _lock;
+	std::size_t _highestKey;
+
+    std::map<key, key> _caseTable;
 };
 
-} /* namespace gnash */
-#endif /* GNASH_STRING_TABLE_H */
+/// Check whether two keys are equivalent
+//
+/// This function provides a simple way to check for equivalence either in
+/// a case sensitive or case-insensitive way. It is mainly for convenience, to
+/// reduce conditionals in the code.
+//
+/// If the comparison is case-sensitive, the keys are equivalent if they are
+/// equal.
+//
+/// @param st       The string table to use
+/// @param a        One key to check
+/// @param b        The other key to check
+/// @param caseless Whether to compare in a case-insensitive way.
+/// @return         True if the keys are equivalent.
+bool equal(string_table& st, string_table::key a, string_table::key b,
+        bool caseless);
+
+}
+#endif 

@@ -53,6 +53,7 @@
 #include "as_value.h"
 #include "RunResources.h"
 #include "with_stack_entry.h"
+#include "ObjectURI.h"
 
 #include <string>
 #include <vector>
@@ -97,7 +98,6 @@ namespace {
     ///                         be the main movie.
     /// @param thread           The current execution thread.
     void commonSetTarget(ActionExec& thread, const std::string& target_name);
-
 
     enum as_encoding_guess_t {
         ENCGUESS_UNICODE = 0,
@@ -2645,11 +2645,12 @@ ActionInitArray(ActionExec& thread)
 
     as_object* ao = gl.createArray();
 
+    string_table& st = getStringTable(env);
     // Fill the elements with the initial values from the stack.
     for (int i = 0; i < array_size; i++) {
-        // @@ TODO a set_member that takes an int or as_value?
-        thread.setObjectMember(*ao, boost::lexical_cast<std::string>(i),
-                env.pop());
+        const string_table::key k = 
+            st.find(boost::lexical_cast<std::string>(i));
+        ao->set_member(k, env.pop());
     }
 
     env.push(ao);
@@ -2678,12 +2679,13 @@ ActionInitObject(ActionExec& thread)
 
     obj->init_member(NSV::PROP_CONSTRUCTOR, gl.getMember(NSV::CLASS_OBJECT));
 
+    string_table& st = getStringTable(env);
+
     // Set provided members
     for (int i = 0; i < nmembers; ++i) {
-        as_value member_value = env.top(0);
+        const as_value& member_value = env.top(0);
         std::string member_name = env.top(1).to_string();
-
-        thread.setObjectMember(*obj, member_name, member_value);
+        obj->set_member(st.find(member_name), member_value);
         env.drop(2);
     }
 
@@ -2873,8 +2875,11 @@ ActionGetMember(ActionExec& thread)
                target, static_cast<void *>(obj.get()));
     );
 
-    if (!thread.getObjectMember(*obj, member_name.to_string(), env.top(1)))
-    {
+    string_table& st = getStringTable(env);
+    const string_table::key k = st.find(member_name.to_string());
+
+    if (!obj->get_member(k, &env.top(1))) {
+
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("Reference to undefined member %s of object %s",
             member_name,
@@ -2913,7 +2918,8 @@ ActionSetMember(ActionExec& thread)
         );
     }
     else if (obj) {
-        thread.setObjectMember(*(obj.get()), member_name, member_value);
+        string_table& st = getStringTable(env);
+        obj->set_member(st.find(member_name), member_value);
 
         IF_VERBOSE_ACTION (
             log_action(_("-- set_member %s.%s=%s"),
@@ -3042,11 +3048,7 @@ ActionCallMethod(ActionExec& thread)
         // The method value
         as_value method_value; 
 
-        // Alright, not using 'thread' object here is kind of
-        // a policy break, but saves a duplicated string_table::find
-        // call so for now I'm fine like this ...
-        //if (!thread.getObjectMember(*obj, method_string, method_value)) {
-        if ( ! obj->get_member(method_key, &method_value) ) {
+        if (!obj->get_member(method_key, &method_value) ) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("ActionCallMethod: "
                 "Can't find method %s of object %s"),
@@ -3172,7 +3174,9 @@ ActionNewMethod(ActionExec& thread)
         method_val = obj_val;
     }
     else {
-        if (!thread.getObjectMember(*obj, method_string, method_val)) {
+        string_table& st = getStringTable(env);
+        const string_table::key k = st.find(method_string);
+        if (!obj->get_member(k, &method_val)) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("ActionNewMethod: can't find method %s of "
                         "object %s"), method_string, obj_val);
@@ -4159,7 +4163,6 @@ guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
     }
     return ENCGUESS_OTHER;
 }
-
 
 }
 

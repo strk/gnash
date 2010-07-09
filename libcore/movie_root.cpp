@@ -556,7 +556,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 
     if (_scaleMode == SCALEMODE_NOSCALE) {
         //log_debug("Rescaling disabled");
-        as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
+        as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
         if (stage) {
             log_debug("notifying Stage listeners about a resize");
             callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onResize");
@@ -1367,7 +1367,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
     callInterface("Stage.align");    
 
     if (notifyResize) {
-        as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
+        as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
         if (stage) {
             log_debug("notifying Stage listeners about a resize");
             callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onResize");
@@ -1380,7 +1380,7 @@ movie_root::setStageDisplayState(const DisplayState ds)
 {
     _displayState = ds;
 
-    as_object* stage = getBuiltinObject(*this, NSV::PROP_iSTAGE);
+    as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
     if (stage) {
         log_debug("notifying Stage listeners about fullscreen state");
         const bool fs = _displayState == DISPLAYSTATE_FULLSCREEN;

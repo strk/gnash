@@ -29,6 +29,7 @@
 #include <boost/cstdint.hpp> 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/key_extractors.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -59,34 +60,36 @@ namespace gnash {
 /// owner.
 class PropertyList : boost::noncopyable
 {
+
 public:
 
     typedef std::set<ObjectURI> PropertyTracker;
+    typedef std::pair<Property, string_table::key> value_type;
 
-    /// A tag for identifying an index in the container.
-    struct OrderTag {};
+    struct NameExtractor
+    {
+        typedef const ObjectURI& result_type;
+        const result_type operator()(const value_type& r) const {
+            return r.first.uri();
+        }
+        const result_type operator()(value_type& r) {
+            return r.first.uri();
+        }
+    };
+    
+    typedef boost::multi_index::member<value_type, value_type::second_type,
+            &value_type::second> KeyExtractor;
 
-    /// The actual container
-    /// index 0 is the fully indexed name/namespace pairs, which are unique
-    /// Because of the way searching works, this index can also be
-    /// used to search for the names alone (composite keys are sorted
-    /// lexographically, beginning with the first element specified)
-    ///
-    /// index 1 is an ordered sequence, and it is used for the AS3 style
-    /// enumeration (which requires an order number for each property),
-    /// for slot access, and for array access.
     typedef boost::multi_index_container<
-        Property,
+        value_type,
         boost::multi_index::indexed_by<
-            boost::multi_index::ordered_unique<
-                boost::multi_index::const_mem_fun<Property,const ObjectURI&,&Property::uri>
-            >,
-            boost::multi_index::ordered_unique<
-                boost::multi_index::tag<OrderTag>,
-                boost::multi_index::const_mem_fun<Property,int,&Property::getOrder>
+            boost::multi_index::sequenced<>,
+            boost::multi_index::ordered_unique<NameExtractor>,
+            boost::multi_index::ordered_non_unique<KeyExtractor>
             >
-        >
-    > container;
+        > container;
+    typedef container::iterator iterator;
+    typedef container::const_iterator const_iterator;
 
     /// Construct the PropertyList 
     //
@@ -96,7 +99,6 @@ public:
     PropertyList(as_object& obj)
         :
         _props(),
-        _defaultOrder(0),
         _owner(obj)
     {
     }
@@ -119,18 +121,15 @@ public:
     template <class U, class V>
     void visitValues(V& visitor, U cmp = U()) const
     {
-        typedef container::nth_index<1>::type ContainerByOrder;
-
         // The template keyword is not required by the Standard here, but the
         // OpenBSD compiler needs it. Use of the template keyword where it is
         // not necessary is not an error.
-        for (ContainerByOrder::const_reverse_iterator
-                it = _props.template get<1>().rbegin(),
-                ie = _props.template get<1>().rend(); it != ie; ++it)
+        for (const_iterator it = _props.begin(), ie = _props.end();
+                it != ie; ++it)
         {
-            if (!cmp(*it)) continue;
-            as_value val = it->getValue(_owner);
-            if (!visitor.accept(it->uri(), val)) return;
+            if (!cmp(it->first)) continue;
+            as_value val = it->first.getValue(_owner);
+            if (!visitor.accept(it->first.uri(), val)) return;
         }
     }
 
@@ -144,14 +143,6 @@ public:
     /// @param donelist     Don't enumerate properties in donelist.
     ///                     Enumerated properties are added to donelist.
     void enumerateKeys(as_environment& env, PropertyTracker& donelist) const;
-
-    /// Get the order number just after the passed order number.
-    ///
-    /// @param order    0 is a special value indicating the first order
-    ///                 should be returned, otherwise, this should be the
-    ///                 result of a previous call to getOrderAfter
-    /// @return         A value which can be used for ordered access. 
-    const Property* getOrderAfter(int order);
 
     /// Set the value of a property, creating a new one if it doesn't exist.
     //
@@ -174,16 +165,6 @@ public:
     bool setValue(const ObjectURI& uri, const as_value& value,
             const PropFlags& flagsIfMissing = 0);
 
-    /// Reserves a slot number for a property
-    ///
-    /// @param slotId
-    /// The slot id to use. (Note that getOrder() on this property will return
-    /// this slot number + 1 if the assignment was successful.)
-    /// @param key      Name of the property.
-    /// @param nsId     The namespace in which the property should be found.
-    /// @return         true if the slot did not previously exist.
-    bool reserveSlot(const ObjectURI& uri, boost::uint16_t slotId);
-
     /// Get a property if it exists.
     //
     /// @param key  Name of the property. Search is case-*sensitive*
@@ -194,11 +175,6 @@ public:
     Property* getProperty(const ObjectURI& uri)
         const;
 
-    /// Get a property, if existing, by order
-    //
-    /// @param order    The ordering id
-    const Property* getPropertyByOrder(int order);
-    
     /// Delete a Property, if existing and not protected from deletion.
     //
     ///
@@ -271,9 +247,7 @@ public:
     /// @param key      Name of the property. Search is case-*sensitive*
     /// @param setTrue  The set of flags to set
     /// @param setFalse The set of flags to clear
-    /// @return         true if the value was successfully set, false
-    ///                 otherwise (either not found or protected)
-    bool setFlags(const ObjectURI& uri, int setTrue, int setFalse);
+    void setFlags(const ObjectURI& uri, int setTrue, int setFalse);
 
     /// Set the flags of all properties.
     //
@@ -310,8 +284,6 @@ private:
 
     container _props;
 
-    boost::uint32_t _defaultOrder;
-    
     as_object& _owner;
 
 };

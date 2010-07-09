@@ -32,8 +32,6 @@ class string_table; // Forward
 ///
 /// Lowercase letters in the enum value signal the format of the string
 /// literals associated with these enums.
-/// i: Initial capital for groups which are normally initial lower case.
-/// For example: PROP_iSTAGE is "Stage";
 /// u: An underscore
 /// For example: PROP_uuPROTOuu is "__proto__"
 /// _: The next letter is capitalized
@@ -96,7 +94,6 @@ enum NamedStrings {
         CLASS_SOUND,
         CLASS_SPRITE,
         CLASS_STAGE,
-        PROP_iSTAGE = CLASS_STAGE,
         CLASS_STATICTEXT,
         CLASS_STRING,
         CLASS_STYLESHEET,
@@ -144,7 +141,7 @@ enum NamedStrings {
         PROP_C,
         PROP_CALLEE,
         PROP_CALLER,
-        //PROP_COLOR, // clashes with CLASS_COLOR in case-insensitive mode
+        PROP_COLOR,
         PROP_CONCAT,
         PROP_CONSTRUCTOR,
         PROP_CONTENT_TYPE,
@@ -219,6 +216,7 @@ enum NamedStrings {
         PROP_TEXT_COLOR,
         PROP_TEXT_HEIGHT,
         PROP_TEXT_WIDTH,
+        PROP_THIS,
         PROP_TO_LOWER_CASE,
         PROP_TO_STRING,
         PROP_TX,
@@ -267,8 +265,7 @@ enum NamedStrings {
     };
 
 /// Load the prenamed strings.
-/// version controls case
-void loadStrings(string_table &table, int version);
+void loadStrings(string_table &table);
 
 } // namespace NSV
 } // namespace gnash
