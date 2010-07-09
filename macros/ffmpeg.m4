@@ -258,7 +258,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   fi
 
   LIBAVCODEC_IDENT=${ffmpeg_version}
-  FFMPEG_CFLAGS="${ac_cv_path_ffmpeg_incl}"
+  FFMPEG_CFLAGS="-D__STDC_CONSTANT_MACROS ${ac_cv_path_ffmpeg_incl}"
 
   AC_MSG_CHECKING([for avformat.h])
   if test -f "${ffmpeg_top_incl}/avformat.h"; then
