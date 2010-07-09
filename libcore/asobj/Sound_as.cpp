@@ -176,7 +176,7 @@ Sound_as::update()
 
     string_table& st = getStringTable(owner());
 
-    if (isAttached()) {
+    if (active()) {
         owner().set_member(st.find("duration"), getDuration());
         owner().set_member(st.find("position"), getPosition());
     }
@@ -397,6 +397,10 @@ Sound_as::loadSound(const std::string& file, bool streaming)
                     "as a streaming one"));
         // if not streaming, we'll probe on .start()
     }
+
+    string_table& st = getStringTable(owner());
+    owner().set_member(st.find("duration"), getDuration());
+    owner().set_member(st.find("position"), getPosition());
 }
 
 sound::InputStream*
@@ -731,7 +735,6 @@ attachSoundInterface(as_object& o)
 as_value
 sound_new(const fn_call& fn)
 {
-
     as_object* so = fn.this_ptr;
     Sound_as* s(new Sound_as(so));
     so->setRelay(s);
@@ -747,18 +750,21 @@ sound_new(const fn_call& fn)
 
 
         const as_value& arg0 = fn.arg(0);
-        if ( ! arg0.is_null() && ! arg0.is_undefined() ) {
+
+        if (!arg0.is_null() && !arg0.is_undefined()) {
+
             as_object* obj = arg0.to_object(getGlobal(fn));
             DisplayObject* ch = get<DisplayObject>(obj);
             IF_VERBOSE_ASCODING_ERRORS(
-            if (!ch) {
-                std::stringstream ss; fn.dump_args(ss);
-                log_aserror("new Sound(%s) : first argument isn't null "
-                    "or undefined, and isn't a DisplayObject. "
-                    "We'll take as an invalid DisplayObject ref.",
-                    ss.str());
-            }
+                if (!ch) {
+                    std::stringstream ss; fn.dump_args(ss);
+                    log_aserror("new Sound(%s) : first argument isn't null "
+                        "or undefined, and isn't a DisplayObject. "
+                        "We'll take as an invalid DisplayObject ref.",
+                        ss.str());
+                }
             );
+
             s->attachCharacter(ch);
         }
     }
@@ -835,9 +841,10 @@ sound_stop(const fn_call& fn)
 as_value
 sound_attachsound(const fn_call& fn)
 {
-    IF_VERBOSE_ACTION (
-    log_action(_("-- attach sound"));
+    IF_VERBOSE_ACTION(
+        log_action(_("-- attach sound"));
     )
+
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("attach sound needs one argument"));
@@ -917,6 +924,7 @@ as_value
 sound_getDuration(const fn_call& fn)
 {
     Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
+    if (!so->active()) return as_value();
     return as_value(so->getDuration());
 }
 
@@ -931,6 +939,7 @@ as_value
 sound_getPosition(const fn_call& fn)
 {
     Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
+    if (!so->active()) return as_value();
     return as_value(so->getPosition());
 }
 

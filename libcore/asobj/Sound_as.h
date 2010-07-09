@@ -69,6 +69,11 @@ public:
     /// Get number of bytes loaded from the external sound (if any)
     long getBytesLoaded();
 
+    /// Whether the Sound_as has any sound data
+    bool active() const {
+        return soundId >= 0 || isStreaming;
+    }
+
     /// Get total number of bytes in the external sound being loaded
     //
     /// @return -1 if unknown
@@ -180,11 +185,12 @@ private:
 
     /// Thread-safe setter for _soundCompleted
     void markSoundCompleted(bool completed);
-
-    /// Is this sound attached to the soundhandler?
+    
+    // Does this sound have a live input stream?
     bool isAttached() const {
-        return _inputStream!=0;
+        return (_inputStream);
     }
+
 };
 
 void sound_class_init(as_object& where, const ObjectURI& uri);
