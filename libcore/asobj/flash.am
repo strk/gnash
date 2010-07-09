@@ -48,6 +48,9 @@ libgnashasobjs_la_SOURCES = \
 	asobj/MovieClip_as.cpp \
 	asobj/Stage_as.cpp \
 	asobj/Accessibility_as.cpp \
+	asobj/Sound_as.cpp \
+	asobj/Microphone_as.cpp \
+	asobj/Camera_as.cpp \
 	asobj/Object.cpp
 
 noinst_HEADERS += \
@@ -73,6 +76,9 @@ noinst_HEADERS += \
 	asobj/MovieClip_as.h \
 	asobj/Stage_as.h \
 	asobj/Accessibility_as.h \
+	asobj/Sound_as.h \
+	asobj/Microphone_as.h \
+	asobj/Camera_as.h \
 	asobj/Object.h
 
 EXTENSIONS_API += \
@@ -105,7 +111,6 @@ include $(srcdir)/asobj/flash/display/display.am
 include $(srcdir)/asobj/flash/external/external.am
 include $(srcdir)/asobj/flash/filters/filters.am
 include $(srcdir)/asobj/flash/geom/geom.am
-include $(srcdir)/asobj/flash/media/media.am
 include $(srcdir)/asobj/flash/net/net.am
 include $(srcdir)/asobj/flash/system/system.am
 include $(srcdir)/asobj/flash/text/text.am

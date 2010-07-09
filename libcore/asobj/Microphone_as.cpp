@@ -18,7 +18,7 @@
 //
 
 
-#include "flash/media/Microphone_as.h"
+#include "Microphone_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -37,24 +37,49 @@
 
 namespace gnash {
 
-as_value microphone_ctor(const fn_call& fn);
-as_value microphone_get(const fn_call& fn);
-as_value microphone_getMicrophone(const fn_call& fn);
-as_value microphone_setgain(const fn_call& fn);
-as_value microphone_setrate(const fn_call& fn);
-as_value microphone_setsilencelevel(const fn_call& fn);
-as_value microphone_setuseechosuppression(const fn_call& fn);
-as_value microphone_activityLevel(const fn_call& fn);
-as_value microphone_gain(const fn_call& fn);
-as_value microphone_index(const fn_call& fn);
-as_value microphone_muted(const fn_call& fn);
-as_value microphone_name(const fn_call& fn);
-as_value microphone_names(const fn_call& fn);
-as_value microphone_rate(const fn_call& fn);
-as_value microphone_silenceLevel(const fn_call& fn);
-as_value microphone_silenceTimeout(const fn_call& fn);
-as_value microphone_useEchoSuppression(const fn_call& fn);
+namespace {
 
+    as_value microphone_ctor(const fn_call& fn);
+    as_value microphone_get(const fn_call& fn);
+    as_value microphone_setgain(const fn_call& fn);
+    as_value microphone_setrate(const fn_call& fn);
+    as_value microphone_setsilencelevel(const fn_call& fn);
+    as_value microphone_setuseechosuppression(const fn_call& fn);
+    as_value microphone_activityLevel(const fn_call& fn);
+    as_value microphone_gain(const fn_call& fn);
+    as_value microphone_index(const fn_call& fn);
+    as_value microphone_muted(const fn_call& fn);
+    as_value microphone_name(const fn_call& fn);
+    as_value microphone_names(const fn_call& fn);
+    as_value microphone_rate(const fn_call& fn);
+    as_value microphone_silenceLevel(const fn_call& fn);
+    as_value microphone_silenceTimeout(const fn_call& fn);
+    as_value microphone_useEchoSuppression(const fn_call& fn);
+
+    void attachMicrophoneStaticInterface(as_object& o);
+    void attachMicrophoneInterface(as_object& o);
+}
+
+// extern (used by Global.cpp)
+void
+microphone_class_init(as_object& where, const ObjectURI& uri)
+{
+    registerBuiltinClass(where, microphone_ctor, attachMicrophoneInterface,
+                         attachMicrophoneStaticInterface, uri);
+}
+
+void
+registerMicrophoneNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(microphone_names, 2104, 201);
+    vm.registerNative(microphone_setsilencelevel, 2104, 0);
+    vm.registerNative(microphone_setrate, 2104, 1);
+    vm.registerNative(microphone_setgain, 2104, 2);
+    vm.registerNative(microphone_setuseechosuppression, 2104, 3);
+}
+
+namespace {
 
 // get() and names are static properties in AS2.
 void
@@ -69,15 +94,6 @@ attachMicrophoneStaticInterface(as_object& o)
     VM& vm = getVM(o);   
     NativeFunction* getset = vm.getNative(2102, 201);
     o.init_property("names", *getset, *getset);
-}
-
-void
-attachMicrophoneAS3StaticInterface(as_object& o)
-{
-    Global_as& gl = getGlobal(o);
-
-    o.init_member("getMicrophone",
-            gl.createFunction(microphone_getMicrophone));
 }
 
 // These are added to the AS2 prototype when get() is called.
@@ -108,7 +124,7 @@ attachMicrophoneProperties(as_object& o)
     o.init_readonly_property("useEchoSuppression", *getset);
 }
 
-static void
+void
 attachMicrophoneInterface(as_object& o)
 {
 
@@ -262,23 +278,6 @@ microphone_get(const fn_call& fn)
     mic_obj->setRelay(new Microphone_as(input));
 
     return as_value(mic_obj);
-}
-
-// AS3 static accessor.
-as_value
-microphone_getMicrophone(const fn_call& fn)
-{
-    media::AudioInput* input = media::MediaHandler::get()->getAudioInput(0);
-    as_object* obj = getGlobal(fn).createObject();
-
-    obj->setRelay(new Microphone_as(input));
-
-    int numargs = fn.nargs;
-    if (numargs > 0) {
-        log_debug("Microphone.getMicrophone: the mic is automatically "
-                "chosen from gnashrc");
-    }
-    return as_value(obj); 
 }
 
 
@@ -468,35 +467,6 @@ microphone_setuseechosuppression(const fn_call& fn)
     return as_value();
 }
 
-// extern (used by Global.cpp)
-void
-microphone_class_init(as_object& where, const ObjectURI& uri)
-{
-    Global_as::Properties static_props;
-
-    // for versions lower than 8, the ctor call was get(), for 9 and higher
-    // the ctor was getCamera()
-    if (isAS3(getVM(where))) {
-        static_props = attachMicrophoneAS3StaticInterface;
-    } else {
-        static_props = attachMicrophoneStaticInterface;
-    }
-    
-    registerBuiltinClass(where, microphone_ctor, attachMicrophoneInterface,
-                         static_props, uri);
-
-}
-
-void
-registerMicrophoneNative(as_object& global)
-{
-    VM& vm = getVM(global);
-    vm.registerNative(microphone_names, 2104, 201);
-    vm.registerNative(microphone_setsilencelevel, 2104, 0);
-    vm.registerNative(microphone_setrate, 2104, 1);
-    vm.registerNative(microphone_setgain, 2104, 2);
-    vm.registerNative(microphone_setuseechosuppression, 2104, 3);
-}
-
+} // anonymous
 
 } // end of gnash namespace

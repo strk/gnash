@@ -18,7 +18,7 @@
 //
 
 
-#include "flash/media/Camera_as.h"
+#include "Camera_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -36,29 +36,56 @@
 
 namespace gnash {
 
-as_value camera_get(const fn_call& fn);
-as_value camera_getCamera(const fn_call& fn);
-as_value camera_setmode(const fn_call& fn);
-as_value camera_setmotionlevel(const fn_call& fn);
-as_value camera_setquality(const fn_call& fn);
-as_value camera_setLoopback(const fn_call& fn);
-as_value camera_setCursor(const fn_call& fn);
-as_value camera_setKeyFrameInterval(const fn_call& fn);
+namespace {
 
-as_value camera_activitylevel(const fn_call& fn);
-as_value camera_bandwidth(const fn_call& fn);
-as_value camera_currentFps(const fn_call& fn);
-as_value camera_fps(const fn_call& fn);
-as_value camera_height(const fn_call& fn);
-as_value camera_index(const fn_call& fn);
-as_value camera_motionLevel(const fn_call& fn);
-as_value camera_motionTimeout(const fn_call& fn);
-as_value camera_muted(const fn_call& fn);
-as_value camera_name(const fn_call& fn);
-as_value camera_names(const fn_call& fn);
-as_value camera_quality(const fn_call& fn);
-as_value camera_width(const fn_call& fn);
+    as_value camera_new(const fn_call& fn);
+    as_value camera_get(const fn_call& fn);
+    as_value camera_setmode(const fn_call& fn);
+    as_value camera_setmotionlevel(const fn_call& fn);
+    as_value camera_setquality(const fn_call& fn);
+    as_value camera_setLoopback(const fn_call& fn);
+    as_value camera_setCursor(const fn_call& fn);
+    as_value camera_setKeyFrameInterval(const fn_call& fn);
+    as_value camera_activitylevel(const fn_call& fn);
+    as_value camera_bandwidth(const fn_call& fn);
+    as_value camera_currentFps(const fn_call& fn);
+    as_value camera_fps(const fn_call& fn);
+    as_value camera_height(const fn_call& fn);
+    as_value camera_index(const fn_call& fn);
+    as_value camera_motionLevel(const fn_call& fn);
+    as_value camera_motionTimeout(const fn_call& fn);
+    as_value camera_muted(const fn_call& fn);
+    as_value camera_name(const fn_call& fn);
+    as_value camera_names(const fn_call& fn);
+    as_value camera_quality(const fn_call& fn);
+    as_value camera_width(const fn_call& fn);
 
+    void attachCameraStaticInterface(as_object& o);
+    void attachCameraInterface(as_object& o);
+}
+
+// extern (used by Global.cpp)
+void
+camera_class_init(as_object& where, const ObjectURI& uri)
+{
+    registerBuiltinClass(where, camera_new, attachCameraInterface,
+                         attachCameraStaticInterface, uri);
+}
+
+void
+registerCameraNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(camera_names, 2102, 201);
+    vm.registerNative(camera_setmode, 2102, 0);
+    vm.registerNative(camera_setquality, 2102, 1);
+    vm.registerNative(camera_setKeyFrameInterval, 2102, 2);
+    vm.registerNative(camera_setmotionlevel, 2102, 3);
+    vm.registerNative(camera_setLoopback, 2102, 4);
+    vm.registerNative(camera_setCursor, 2102, 5);
+}
+
+namespace {
 
 void
 attachCameraStaticInterface(as_object& o)
@@ -76,13 +103,6 @@ attachCameraStaticInterface(as_object& o)
 }
 
 void
-attachCameraAS3StaticInterface(as_object& o)
-{
-    Global_as& gl = getGlobal(o);
-    o.init_member("getCamera", gl.createFunction(camera_getCamera));
-}
-
-static void
 attachCameraInterface(as_object& o)
 {
     
@@ -225,7 +245,9 @@ camera_get(const fn_call& fn)
 
     // Properties are attached to the prototype (not __proto__) when get() is
     // called. 
-    as_object* proto = ptr->getMember(NSV::PROP_PROTOTYPE).to_object(getGlobal(fn));
+    as_object* proto =
+        ptr->getMember(NSV::PROP_PROTOTYPE).to_object(getGlobal(fn));
+
     attachCameraProperties(*proto);
 
     // TODO: this should return the same object when the same device is
@@ -263,23 +285,6 @@ camera_get(const fn_call& fn)
     cam_obj->setRelay(new Camera_as(input));
 
     return as_value(cam_obj); 
-}
-
-// AS3 static accessor.
-as_value
-camera_getCamera(const fn_call& fn)
-{
-    media::VideoInput* input = media::MediaHandler::get()->getVideoInput(0);
-    
-    boost::intrusive_ptr<as_object> obj = new as_object(getGlobal(fn));
-
-    obj->setRelay(new Camera_as(input));
-    
-    int numargs = fn.nargs;
-    if (numargs > 0) {
-        log_debug("%s: the camera is automatically chosen from gnashrc", __FUNCTION__);
-    }
-    return as_value(obj.get()); // will keep alive
 }
 
 as_value
@@ -611,37 +616,7 @@ camera_width(const fn_call& fn)
     return as_value();
 }
 
-
-// extern (used by Global.cpp)
-void
-camera_class_init(as_object& where, const ObjectURI& uri)
-{
-    Global_as::Properties static_props;
-
-    // for versions lower than 8, the ctor call was get(), for 9 and higher
-    // the ctor was getCamera()
-    if (isAS3(getVM(where))) {
-        static_props = attachCameraAS3StaticInterface;
-    } else {
-        static_props = attachCameraStaticInterface;
-    }
-
-    registerBuiltinClass(where, camera_new, attachCameraInterface,
-                         static_props, uri);
-}
-
-void
-registerCameraNative(as_object& global)
-{
-    VM& vm = getVM(global);
-    vm.registerNative(camera_names, 2102, 201);
-    vm.registerNative(camera_setmode, 2102, 0);
-    vm.registerNative(camera_setquality, 2102, 1);
-    vm.registerNative(camera_setKeyFrameInterval, 2102, 2);
-    vm.registerNative(camera_setmotionlevel, 2102, 3);
-    vm.registerNative(camera_setLoopback, 2102, 4);
-    vm.registerNative(camera_setCursor, 2102, 5);
-}
+} // anonymous namespace
 
 } // end of gnash namespace
 
