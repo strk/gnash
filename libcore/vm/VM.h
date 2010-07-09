@@ -41,9 +41,6 @@
 
 // Forward declarations
 namespace gnash {
-    namespace abc {
-        class Machine;
-    }
 	class Global_as;
 	class VM;
 	class fn_call;
@@ -190,11 +187,6 @@ public:
 	/// Get a reference to the string table used by the VM.
 	string_table& getStringTable() const { return _stringTable; }
 
-#ifdef ENABLE_AVM2
-	/// Get a pointer to the machine, if it exists.
-    abc::Machine* getMachine() const { return _machine; }
-#endif
-
 	/// Get version of the player, in a compatible representation
 	//
 	/// This information will be used for the System.capabilities.version
@@ -331,11 +323,6 @@ private:
 	/// Mutable since it should not affect how the VM runs.
 	mutable string_table _stringTable;
 
-#ifdef ENABLE_AVM2
-	/// A running execution thread.
-    abc::Machine *_machine;
-#endif
-
 	VirtualClock& _clock;
 
 	SafeStack<as_value>	_stack;
@@ -361,10 +348,9 @@ private:
 ///
 /// These are currently used in:
 /// 1. VM (AVM1)
-/// 2. Machine (AVM2)
-/// 3. Gnash's C++ implementation of ActionScript.
+/// 2. Gnash's C++ implementation of ActionScript.
 ///
-/// Usage 3 replicates VM behaviour, but does not use the VM's stack or other
+/// Usage 2 replicates VM behaviour, but does not use the VM's stack or other
 /// resources. This can lead to different behaviour, for instance when there
 /// are limits on the stack size. Such cases are probably rare.
 ///

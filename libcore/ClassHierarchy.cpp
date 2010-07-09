@@ -208,14 +208,6 @@ ClassHierarchy::declareClass(ExtensionClass& c)
 {
     if (!mExtension) return false; 
 
-#ifdef ENABLE_AVM2
-    if (isAS3(*mGlobal)) {
-        mGlobalNamespace->stubPrototype(*this, getName(c.uri));
-        mGlobalNamespace->getScript(getName(c.uri))->setDeclared();
-        mGlobalNamespace->getScript(getName(c.uri))->setSystem();
-    }
-#endif
-
     as_function* getter(new declare_extension_function(c, mGlobal, mExtension));
 
     int flags = PropFlags::dontEnum;
@@ -226,19 +218,6 @@ ClassHierarchy::declareClass(ExtensionClass& c)
 bool
 ClassHierarchy::declareClass(const NativeClass& c)
 {
-
-#ifdef ENABLE_AVM2
-    if (isAS3(*mGlobal)) {
-        abc::Namespace *nso = findNamespace(getNamespace(c.uri));
-
-        if (!nso) nso = addNamespace(getNamespace(c.uri));
-
-        nso->stubPrototype(*this, getName(c.uri));
-        nso->getScript(getName(c.uri))->setDeclared();
-        nso->getScript(getName(c.uri))->setSystem();
-    }
-#endif
-
     as_function* getter = new declare_native_function(c, mGlobal);
     
     int flags = PropFlags::dontEnum;

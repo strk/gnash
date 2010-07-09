@@ -36,10 +36,6 @@
 #include "namedStrings.h"
 #include "VirtualClock.h" // for getTime()
 
-#ifdef ENABLE_AVM2
-# include "Machine.h"
-#endif
-
 #ifdef HAVE_SYS_UTSNAME_H
 # include <sys/utsname.h> // For system information
 #endif
@@ -73,11 +69,6 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 	_singleton->setGlobal(gl);
     gl->registerClasses();
 
-#ifdef ENABLE_AVM2
-	_singleton->_machine = new abc::Machine(*_singleton);
-    _singleton->_machine->init();
-#endif
-
 	return *_singleton;
 }
 
@@ -100,9 +91,6 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 	_rootMovie(root),
 	_global(0),
 	_swfversion(version),
-#ifdef ENABLE_AVM2
-    _machine(0),
-#endif
 	_clock(clock),
 	_stack(),
     _shLib(new SharedObjectLibrary(*this)),
@@ -113,9 +101,6 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 
 VM::~VM()
 {
-#ifdef ENABLE_AVM2
-    delete _machine;
-#endif
 }
 
 void
@@ -221,9 +206,6 @@ VM::getRoot() const
 Global_as*
 VM::getGlobal() const
 {
-#if ENABLE_AVM2
-    if (getAVMVersion() == VM::AVM2) return _machine->global();
-#endif
 	return _global;
 }
 
@@ -247,10 +229,6 @@ VM::markReachableResources() const
 	_rootMovie.markReachableResources();
 
 	_global->setReachable();
-
-#if ENABLE_AVM2
-    _machine->markReachableResources();
-#endif
 
 	/// Mark all static GcResources
 	for (ResVect::const_iterator i=_statics.begin(), e=_statics.end(); i!=e; ++i)
