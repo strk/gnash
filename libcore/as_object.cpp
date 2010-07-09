@@ -340,12 +340,10 @@ as_object::add_property(const std::string& name, as_function& getter,
     string_table& st = getStringTable(*this);
     string_table::key k = st.find(name);
 
-    as_value cacheVal;
-
     Property* prop = _members.getProperty(k);
 
     if (prop) {
-        cacheVal = prop->getCache();
+        as_value cacheVal = prop->getCache();
         // Used to return the return value of addGetterSetter, but this
         // is always true.
         _members.addGetterSetter(k, getter, setter, cacheVal);
@@ -355,20 +353,21 @@ as_object::add_property(const std::string& name, as_function& getter,
     }
     else {
 
-        _members.addGetterSetter(k, getter, setter, cacheVal);
+        _members.addGetterSetter(k, getter, setter, as_value());
 
         // Nothing more to do if there are no triggers.
         if (!_trigs.get()) return;
 
         // check if we have a trigger, if so, invoke it
         // and set val to its return
-        TriggerContainer::iterator trigIter = _trigs->find(ObjectURI(k, 0));
+        TriggerContainer::iterator trigIter = _trigs->find(k);
+
         if (trigIter != _trigs->end()) {
+
             Trigger& trig = trigIter->second;
 
-            log_debug("add_property: property %s is being watched, "
-                      "current val: %s", name, cacheVal);
-            cacheVal = trig.call(cacheVal, as_value(), *this);
+            log_debug("add_property: property %s is being watched" , name);
+            as_value v = trig.call(as_value(), as_value(), *this);
 
             // The trigger call could have deleted the property,
             // so we check for its existence again, and do NOT put
@@ -379,7 +378,7 @@ as_object::add_property(const std::string& name, as_function& getter,
                           "(getter-setter)", name);
                 return;
             }
-            prop->setCache(cacheVal);
+            prop->setCache(v);
         }
         return;
     }
@@ -506,8 +505,7 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
 
     while (pr()) {
         if ((prop = pr.getProperty())) {
-            if ((prop->isStatic() || prop->isGetterSetter()) &&
-                prop->visible(swfVersion)) {
+            if (prop->isGetterSetter() && visible(*prop, swfVersion)) {
                 return prop;
             }
         }
@@ -613,8 +611,7 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
         const int version = getSWFVersion(*this);
         while (pr()) {
             if ((prop = pr.getProperty())) {
-                if ((prop->isStatic() || prop->isGetterSetter()) &&
-                    prop->visible(version)) {
+                if ((prop->isGetterSetter()) && visible(*prop, version)) {
                     break;
                 }
                 else prop = 0;
@@ -623,7 +620,7 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
     }
         
     if (prop) {
-        if (prop->isReadOnly()) {
+        if (readOnly(*prop)) {
             IF_VERBOSE_ASCODING_ERRORS(
                 ObjectURI::Logger l(getStringTable(*this));
                 log_aserror(_("Attempt to set read-only property '%s'"),
@@ -667,10 +664,9 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
 
 
 void
-as_object::init_member(const std::string& key1, const as_value& val, int flags,
-                       string_table::key nsname)
+as_object::init_member(const std::string& key1, const as_value& val, int flags)
 {
-    const ObjectURI uri(getStringTable(*this).find(key1), nsname);
+    const ObjectURI uri(getStringTable(*this).find(key1));
     init_member(uri, val, flags);
 }
 
@@ -690,10 +686,10 @@ as_object::init_member(const ObjectURI& uri, const as_value& val, int flags)
 
 void
 as_object::init_property(const std::string& key, as_function& getter,
-                         as_function& setter, int flags, string_table::key nsname)
+                         as_function& setter, int flags)
 {
     string_table::key k = getStringTable(*this).find(key);
-    init_property(ObjectURI(k, nsname), getter, setter, flags);
+    init_property(k, getter, setter, flags);
 }
 
 void
@@ -709,10 +705,10 @@ as_object::init_property(const ObjectURI& uri, as_function& getter,
 
 void
 as_object::init_property(const std::string& key, as_c_function_ptr getter,
-                         as_c_function_ptr setter, int flags, string_table::key nsname)
+                         as_c_function_ptr setter, int flags)
 {
     string_table::key k = getStringTable(*this).find(key);
-    init_property(ObjectURI(k, nsname), getter, setter, flags);
+    init_property(k, getter, setter, flags);
 }
 
 void
@@ -744,13 +740,13 @@ as_object::init_destructive_property(const ObjectURI& uri,
 
 void
 as_object::init_readonly_property(const std::string& key, as_function& getter,
-                                  int initflags, string_table::key nsname)
+                                  int initflags)
 {
     string_table::key k = getStringTable(*this).find(key);
 
-    init_property(ObjectURI(k, nsname), getter, getter,
+    init_property(k, getter, getter,
                   initflags | PropFlags::readOnly | PropFlags::isProtected);
-    assert(_members.getProperty(ObjectURI(k, nsname)));
+    assert(_members.getProperty(k));
 }
 
 void
@@ -764,13 +760,13 @@ as_object::init_readonly_property(const ObjectURI& uri, as_function& getter,
 
 void
 as_object::init_readonly_property(const std::string& key,
-                                  as_c_function_ptr getter, int initflags, string_table::key nsname)
+                                  as_c_function_ptr getter, int initflags)
 {
     string_table::key k = getStringTable(*this).find(key);
 
-    init_property(ObjectURI(k, nsname), getter, getter,
+    init_property(k, getter, getter,
                   initflags | PropFlags::readOnly | PropFlags::isProtected);
-    assert(_members.getProperty(ObjectURI(k, nsname)));
+    assert(_members.getProperty(k));
 }
 
 void
@@ -1007,7 +1003,7 @@ as_object::get_prototype() const
     
     Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
     if (!prop) return 0;
-    if (!prop->visible(swfVersion)) return 0;
+    if (!visible(*prop, swfVersion)) return 0;
     
     as_value tmp = prop->getValue(*this);
     

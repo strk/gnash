@@ -291,9 +291,9 @@ attachSystemInterface(as_object& proto)
     
     string_table& st = getStringTable(proto);
     registerBuiltinObject(proto, attachSystemSecurityInterface,
-                          ObjectURI(st.find("security"), 0));
+                          st.find("security"));
     registerBuiltinObject(proto, attachSystemCapabilitiesInterface,
-                          ObjectURI(st.find("capabilities"), 0));
+                          st.find("capabilities"));
     
     proto.init_member("setClipboard", 
                       gl.createFunction(system_setClipboard));

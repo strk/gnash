@@ -41,9 +41,8 @@ get_flash_display_package(const fn_call& fn)
     as_object* pkg = gl.createObject();
     
     string_table& st = getStringTable(fn);
-    const string_table::key global = 0;
 
-    bitmapdata_class_init(*pkg, ObjectURI(st.find("BitmapData"), global));
+    bitmapdata_class_init(*pkg, st.find("BitmapData"));
 
 	return pkg;
 }

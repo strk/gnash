@@ -82,7 +82,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 	}
 
 	const Property& prop = found->first;
-	if (prop.isReadOnly() && ! prop.isDestructive())
+	if (readOnly(prop) && ! prop.isDestructive())
 	{
         ObjectURI::Logger l(getStringTable(_owner));
 		log_error(_("Property %s is read-only %s, not setting it to %s"), 
@@ -169,11 +169,7 @@ PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
         const ObjectURI& uri = i->first.uri();
 
 		if (donelist.insert(uri).second) {
-
-            const std::string& qname = getNamespace(uri) ?
-                st.value(getName(uri)) + "." + st.value(getNamespace(uri)) :
-                st.value(getName(uri));
-
+            const std::string& qname = st.value(getName(uri));
 			env.push(qname);
 		}
 	}

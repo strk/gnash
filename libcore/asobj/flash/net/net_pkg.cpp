@@ -40,9 +40,8 @@ get_flash_net_package(const fn_call& fn)
     as_object* pkg = gl.createObject();
     
     string_table& st = getStringTable(fn);
-    const string_table::key global = 0;
 
-    filereference_class_init(*pkg, ObjectURI(st.find("FileReference"), global));
+    filereference_class_init(*pkg, st.find("FileReference"));
 
     return pkg;
 }

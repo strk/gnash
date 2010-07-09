@@ -44,14 +44,12 @@ get_flash_package(const fn_call& fn)
     
     string_table& st = getStringTable(fn);
 
-    const string_table::key global = 0;
-
-    flash_text_package_init(*pkg, ObjectURI(st.find("text"), global));
-    flash_display_package_init(*pkg, ObjectURI(st.find("display"), global));
-    flash_filters_package_init(*pkg, ObjectURI(st.find("filters"), global));
-    flash_geom_package_init(*pkg, ObjectURI(st.find("geom"), global));
-    flash_net_package_init(*pkg, ObjectURI(st.find("net"), global));
-    flash_external_package_init(*pkg, ObjectURI(st.find("external"), global));
+    flash_text_package_init(*pkg, st.find("text"));
+    flash_display_package_init(*pkg, st.find("display"));
+    flash_filters_package_init(*pkg, st.find("filters"));
+    flash_geom_package_init(*pkg, st.find("geom"));
+    flash_net_package_init(*pkg, st.find("net"));
+    flash_external_package_init(*pkg, st.find("external"));
 
     return pkg;
 }

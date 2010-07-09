@@ -44,14 +44,12 @@ get_flash_geom_package(const fn_call& fn)
     as_object *pkg = gl.createObject();
 	
     string_table& st = getStringTable(fn);
-    const string_table::key global = 0;
 
-    colortransform_class_init(*pkg,
-            ObjectURI(st.find("ColorTransform"), global));
-	matrix_class_init(*pkg, ObjectURI(st.find("Matrix"), global));
-	point_class_init(*pkg, ObjectURI(st.find("Point"), global));
-	rectangle_class_init(*pkg, ObjectURI(st.find("Rectangle"), global));
-	transform_class_init(*pkg, ObjectURI(st.find("Transform"), global));
+    colortransform_class_init(*pkg, st.find("ColorTransform"));
+	matrix_class_init(*pkg, st.find("Matrix"));
+	point_class_init(*pkg, st.find("Point"));
+	rectangle_class_init(*pkg, st.find("Rectangle"));
+	transform_class_init(*pkg, st.find("Transform"));
 
     return pkg;
 }

@@ -97,29 +97,6 @@ Property::setDelayedValue(as_object& this_ptr, const as_value& value) const
 }
 
 void
-Property::setSetter(as_function* func)
-{
-	if (isGetterSetter())
-	{
-		GetterSetter* a = boost::get<GetterSetter>(&_bound);
-		a->setSetter(func);
-	}
-	else
-		_bound = GetterSetter(NULL, func);
-}
-
-void
-Property::setGetter(as_function* func)
-{
-	if (isGetterSetter())
-	{
-		GetterSetter* a = boost::get<GetterSetter>(&_bound);
-		a->setGetter(func);
-	}
-	else _bound = GetterSetter(func, 0);
-}
-
-void
 Property::setReachable() const
 {
 	switch (_bound.which())

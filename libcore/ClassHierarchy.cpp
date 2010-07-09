@@ -82,31 +82,6 @@ public:
         string_table& st = getStringTable(fn);
         log_debug("Loading extension class %s", st.value(getName(_decl.uri)));
 
-        as_value super;
-        if (getName(_decl.super))
-        {
-            // Check to be sure our super exists.
-            // This will trigger its instantiation if necessary.
-            if (!mTarget->get_member(_decl.super, &super)) {
-                // Error here -- doesn't exist.
-                log_error("Can't find %s.%s (Superclass of %s.%s)",
-                    st.value(getNamespace(_decl.super)),
-                    st.value(getName(_decl.super)),
-                    st.value(getNamespace(_decl.uri)),
-                    st.value(getName(_decl.uri)));
-                super.set_undefined();
-                return super;
-            }
-            if (!super.is_function())
-            {
-                // Error here -- not an object.
-                log_error("%s (Superclass of %s) is not a function (%s)",
-                    st.value(getName(_decl.super)),
-                    st.value(getName(_decl.uri)), super);
-                super.set_undefined();
-                return super;
-            }
-        }
         if (mExtension->initModuleWithFunc(_decl.file_name,
             _decl.init_name, *mTarget))
         {
@@ -117,8 +92,7 @@ public:
         }
         // Error here -- not successful in loading.
         log_error("Could not load class %s", st.value(getName(_decl.uri)));
-        super.set_undefined();
-        return super;
+        return as_value();
     }
 };
 
@@ -146,36 +120,7 @@ public:
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
         if (mTarget->get_member(_decl.uri, &us)) {
-
-            as_value super;
-            if (getName(_decl.super))
-            {
-                // Check to be sure our super exists.
-                // This will trigger its instantiation if necessary.
-                if (!mTarget->get_member(_decl.super, &super)) {
-                    // Error here -- doesn't exist.
-                    log_error("Can't find %s.%s (Superclass of %s.%s)",
-                        st.value(getNamespace(_decl.super)),
-                        st.value(getName(_decl.super)),
-                        st.value(getNamespace(_decl.uri)),
-                        st.value(getName(_decl.uri)));
-                    super.set_undefined();
-                    return super;
-                }
-                if (!super.is_function())
-                {
-                    // Error here -- not an object.
-                    log_error("%s (Superclass of %s) is not a function (%s)",
-                        st.value(getName(_decl.super)),
-                        st.value(getName(_decl.uri)), super);
-                    super.set_undefined();
-                    return super;
-                }
-                assert(super.to_function());
-            }
-
             Global_as& gl = getGlobal(fn);
-
             if (!us.to_object(gl)) {
                 log_error("Native class %s is not an object after "
                         "initialization (%s)",
@@ -249,8 +194,6 @@ operator<<(std::ostream& os, const ClassHierarchy::NativeClass& c)
 
     os << "("
         << " name:" << st.value(getName(c.uri))
-        << " super:" << st.value(getName(c.super))
-        << " namespace:" << st.value(getNamespace(c.uri))
         << " version:" << c.version
         << ")";
 
@@ -265,8 +208,6 @@ operator<<(std::ostream& os, const ClassHierarchy::ExtensionClass& c)
     os << "(file:" << c.file_name
         << " init:" << c.init_name
         << " name:" << st.value(getName(c.uri))
-        << " super:" << st.value(getName(c.super))
-        << " namespace:" << st.value(getNamespace(c.uri))
         << " version:" << c.version
         << ")";
 
