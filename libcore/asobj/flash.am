@@ -34,17 +34,35 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Date_as.cpp \
 	asobj/Error_as.cpp \
 	asobj/Globals.cpp \
-	asobj/int_as.cpp \
 	asobj/LoadVars_as.cpp \
 	asobj/Math_as.cpp \
 	asobj/Number_as.cpp \
 	asobj/PlayHead.cpp \
 	asobj/Selection_as.cpp \
-	asobj/QName_as.cpp \
-	asobj/Namespace_as.cpp \
 	asobj/MovieClipLoader.cpp\
 	asobj/String_as.cpp \
 	asobj/LoadableObject.cpp \
+	asobj/MovieClip_as.cpp \
+	asobj/Stage_as.cpp \
+	asobj/Accessibility_as.cpp \
+	asobj/Sound_as.cpp \
+	asobj/Microphone_as.cpp \
+	asobj/Camera_as.cpp \
+	asobj/LocalConnection_as.cpp \
+	asobj/NetConnection_as.cpp \
+	asobj/NetStream_as.cpp \
+	asobj/SharedObject_as.cpp \
+	asobj/XMLSocket_as.cpp \
+	asobj/XML_as.cpp \
+	asobj/XMLNode_as.cpp \
+	asobj/System_as.cpp \
+	asobj/Mouse_as.cpp \
+	asobj/ContextMenu_as.cpp \
+	asobj/ContextMenuItem_as.cpp \
+	asobj/Key_as.cpp \
+	asobj/TextField_as.cpp \
+	asobj/TextFormat_as.cpp \
+	asobj/TextSnapshot_as.cpp \
 	asobj/Object.cpp
 
 noinst_HEADERS += \
@@ -57,7 +75,6 @@ noinst_HEADERS += \
 	asobj/Math_as.h	\
 	asobj/Global_as.h\
 	asobj/Globals.h\
-	asobj/int_as.h \
 	asobj/LoadVars_as.h \
 	asobj/MovieClipLoader.h \
 	asobj/Number_as.h \
@@ -65,13 +82,31 @@ noinst_HEADERS += \
 	asobj/Selection_as.h \
 	asobj/String_as.h \
 	asobj/LoadableObject.h \
-	asobj/QName_as.h \
-	asobj/Namespace_as.h \
+	asobj/MovieClip_as.h \
+	asobj/Stage_as.h \
+	asobj/Accessibility_as.h \
+	asobj/Sound_as.h \
+	asobj/Microphone_as.h \
+	asobj/Camera_as.h \
+	asobj/LocalConnection_as.h \
+	asobj/NetConnection_as.h \
+	asobj/NetStream_as.h \
+	asobj/SharedObject_as.h \
+	asobj/XMLSocket_as.h \
+	asobj/XML_as.h \
+	asobj/XMLNode_as.h \
+	asobj/System_as.h \
+	asobj/Mouse_as.h \
+	asobj/ContextMenu_as.h \
+	asobj/ContextMenuItem_as.h \
+	asobj/TextField_as.h \
+	asobj/TextFormat_as.h \
+	asobj/TextSnapshot_as.h \
 	asobj/Object.h
 
 EXTENSIONS_API += \
 	asobj/Array_as.h \
-	asobj/flash/ui/Keyboard_as.h \
+	asobj/Key_as.h \
 	$(NULL)
 
 # libgnashasobjs_la_LIBADD = \
@@ -95,23 +130,12 @@ EXTENSIONS_API += \
 # These makefile fragments build the ActionScript library for
 # Gnash, and supports both AS2 as well as AS3, so we always
 # want to build.
-include $(srcdir)/asobj/flash/accessibility/accessibility.am
-include $(srcdir)/asobj/flash/desktop/desktop.am
 include $(srcdir)/asobj/flash/display/display.am
-include $(srcdir)/asobj/flash/errors/errors.am
-include $(srcdir)/asobj/flash/events/events.am
 include $(srcdir)/asobj/flash/external/external.am
 include $(srcdir)/asobj/flash/filters/filters.am
 include $(srcdir)/asobj/flash/geom/geom.am
-include $(srcdir)/asobj/flash/media/media.am
 include $(srcdir)/asobj/flash/net/net.am
-include $(srcdir)/asobj/flash/printing/printing.am
-include $(srcdir)/asobj/flash/sampler/sampler.am
-include $(srcdir)/asobj/flash/system/system.am
 include $(srcdir)/asobj/flash/text/text.am
-include $(srcdir)/asobj/flash/utils/utils.am
-include $(srcdir)/asobj/flash/ui/ui.am
-include $(srcdir)/asobj/flash/xml/xml.am
 
 libgnashasobjs_la_SOURCES += \
 	asobj/flash/flash_pkg.cpp \

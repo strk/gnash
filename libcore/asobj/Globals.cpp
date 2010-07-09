@@ -40,51 +40,30 @@
 #include "Selection_as.h"
 #include "Number_as.h"
 #include "Math_as.h"
-#include "flash/accessibility/Accessibility_as.h"
-#include "flash/ui/ContextMenu_as.h"
-#include "flash/ui/ContextMenuItem_as.h"
-#include "flash/ui/Keyboard_as.h"
-#include "flash/ui/Mouse_as.h"
-#include "flash/media/Microphone_as.h"
-#include "flash/media/Sound_as.h"
-#include "flash/media/Camera_as.h"
-#include "flash/display/InteractiveObject_as.h"
-#include "flash/display/DisplayObjectContainer_as.h"
-#include "flash/display/DisplayObject_as.h"
-#include "flash/display/Stage_as.h"
-#include "flash/display/MovieClip_as.h"
-#include "flash/display/Shape_as.h"
-#include "flash/display/Sprite_as.h"
-#include "flash/display/Bitmap_as.h"
-#include "flash/events/Event_as.h"
-#include "flash/events/EventDispatcher_as.h"
+#include "Accessibility_as.h"
+#include "ContextMenu_as.h"
+#include "ContextMenuItem_as.h"
+#include "Key_as.h"
+#include "Mouse_as.h"
+#include "Microphone_as.h"
+#include "Sound_as.h"
+#include "Camera_as.h"
+#include "Stage_as.h"
+#include "MovieClip_as.h"
 #include "flash/filters/BitmapFilter_as.h"
 #include "flash/geom/ColorTransform_as.h"
-#include "flash/net/LocalConnection_as.h"
-#include "flash/net/XMLSocket_as.h"
-#include "flash/net/SharedObject_as.h"
-#include "flash/net/NetConnection_as.h"
-#include "flash/net/NetStream_as.h"
-#include "flash/system/System_as.h"
-#include "flash/text/TextSnapshot_as.h"
-#include "flash/text/TextField_as.h"
-#include "flash/text/TextFieldAutoSize_as.h"
-#include "flash/text/Font_as.h"
-#include "flash/text/FontStyle_as.h"
-#include "flash/text/AntiAliasType_as.h"
-#include "flash/text/CSMSettings_as.h"
-#include "flash/text/GridFitType_as.h"
-#include "flash/text/StaticText_as.h"
-#include "flash/text/StyleSheet_as.h"
-#include "flash/text/TextColorType_as.h"
-#include "flash/text/TextDisplayMode_as.h"
-#include "flash/text/TextFieldType_as.h"
-#include "flash/text/TextFormatAlign_as.h"
-#include "flash/text/TextFormat_as.h"
-#include "flash/text/TextLineMetrics_as.h"
+#include "LocalConnection_as.h"
+#include "XMLSocket_as.h"
+#include "SharedObject_as.h"
+#include "NetConnection_as.h"
+#include "NetStream_as.h"
+#include "System_as.h"
+#include "TextSnapshot_as.h"
+#include "TextField_as.h"
+#include "TextFormat_as.h"
 #include "flash/text/TextRenderer_as.h"
-#include "flash/xml/XMLDocument_as.h"
-#include "flash/xml/XMLNode_as.h"
+#include "XML_as.h"
+#include "XMLNode_as.h"
 #include "flash/external/ExternalInterface_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
@@ -102,10 +81,7 @@
 #include "fn_call.h"
 #include "Button.h"
 #include "Globals.h"
-#include "int_as.h"
 #include "LoadVars_as.h"
-#include "Namespace_as.h"
-#include "QName_as.h"
 #include "Object.h"
 #include "LoadableObject.h"
 
@@ -414,7 +390,7 @@ avm1Classes()
         (N(mouse_class_init, NSV::CLASS_MOUSE, 0, 5))
         (N(number_class_init, NSV::CLASS_NUMBER, 0, 5))
         (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, 0, 5))
-        (N(keyboard_class_init, NSV::CLASS_KEY, 0, 5))
+        (N(key_class_init, NSV::CLASS_KEY, 0, 5))
         (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, 0, 5))
         (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, 0, 5))
         (N(video_class_init, NSV::CLASS_VIDEO, 0, 6))
@@ -1262,7 +1238,7 @@ registerNatives(as_object& global)
     registerMovieClipLoaderNative(global);
     registerXMLSocketNative(global);
     registerSharedObjectNative(global);
-    registerKeyboardNative(global);
+    registerKeyNative(global);
     registerNetStreamNative(global);
     registerCameraNative(global);
     registerMicrophoneNative(global);

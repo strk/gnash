@@ -28,7 +28,7 @@
 #include "ObjectURI.h"
 #include "VM.h"
 #include "Date_as.h"
-#include "xml/XMLDocument_as.h"
+#include "XML_as.h"
 #include "Array_as.h"
 #include "Global_as.h"
 #include "fn_call.h"
@@ -168,7 +168,7 @@ Writer::writeObject(as_object* obj)
         }
 
         /// XML is written like a long string (but with an XML marker).
-        XMLDocument_as* xml;
+        XML_as* xml;
         if (isNativeType(obj, xml)) {
             _buf.appendByte(XML_OBJECT_AMF0);
             std::ostringstream s;

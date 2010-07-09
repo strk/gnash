@@ -40,7 +40,7 @@
 #include "rc.h"
 #include "as_value.h"
 #include "as_object.h"
-#include "xml/XMLDocument_as.h"
+#include "XML_as.h"
 #include "Array_as.h"
 #include "namedStrings.h"
 #include "Global_as.h"
