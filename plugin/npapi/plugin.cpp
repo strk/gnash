@@ -205,14 +205,35 @@ NS_PluginInitialize()
 
     std::string newGnashRc("GNASHRC=");
 
+#if !defined(__OS2__ ) && ! defined(__amigaos4__)
     newGnashRc.append(SYSCONFDIR);
     newGnashRc.append("/gnashpluginrc");
+#endif
 
-    char *home = std::getenv("HOME");
+    const char *home = NULL;
+#if defined(__amigaos4__)
+    //on AmigaOS we have a GNASH: assign that point to program dir
+    home = "/gnash";
+#elif defined(__HAIKU__)
+    BPath bp;
+    if (B_OK != find_directory(B_USER_SETTINGS_DIRECTORY, &bp))
+    {
+        std::cerr << "Failed to find user settings directory" << std::endl;
+    } else {
+        bp.Append("Gnash");
+        home = bp.Path();
+    }
+#else
+    home = std::getenv("HOME");
+#endif
     if ( home ) {
         newGnashRc.append(":");
         newGnashRc.append(home);
+#ifdef __HAIKU__
+        newGnashRc.append("/gnashpluginrc");
+#else
         newGnashRc.append("/.gnashpluginrc");
+#endif
     } else {
         gnash::log_error("WARNING: NPAPI plugin could not find user home dir");
     }

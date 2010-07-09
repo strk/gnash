@@ -23,6 +23,8 @@
 
 #include "RunResources.h"
 
+#include <boost/format.hpp>
+
 #include "gnash.h"
 #include "adipe.h"
 #include "haikusup.h"
@@ -33,7 +35,6 @@
 #include <Alert.h>
 #include <Window.h>
 #include <Screen.h>
-#include <MessageRunner.h>
 
 using namespace std;
 
@@ -45,6 +46,8 @@ namespace gnash
 {
 
 const int32 GNASH_PULSE = 'GPLS';
+const int32 GNASH_SEND_PULSE = 'GSPL';
+const int32 GNASH_QUITTING = 'GQUI';
 
 
 class BeWin : public BWindow
@@ -119,6 +122,7 @@ class BeApp : public BApplication
 {
     HaikuGui *_gui;
     BWindow *_win;
+    thread_id _pulse_tid;
     time_t _start_t;
     time_t _timeout;
     int32 _mouse_moves_this_pulse;
@@ -126,10 +130,72 @@ class BeApp : public BApplication
 public:
     BeApp(HaikuGui *gui)
     : BApplication("application/gnash-player"),
-        _gui(gui), _win(NULL), _start_t(time(NULL)),
-        _timeout(0), _mouse_moves_this_pulse(0),
+        _gui(gui), _win(NULL),
+        _pulse_tid(-1),
+        _start_t(time(NULL)),
+        _timeout(0),
+        _mouse_moves_this_pulse(0),
         _mousemovedx(0), _mousemovedy(0)
     {
+        _pulse_tid = spawn_thread(SendPulses, "Pulses", B_NORMAL_PRIORITY, this);
+        if (_pulse_tid <= 0) {
+            throw runtime_error(_("spawn_thread failed"));
+        }
+        if (B_OK != resume_thread(_pulse_tid)) {
+            throw runtime_error(_("resume_thread failed"));
+        }
+
+    }
+
+    static int32
+    SendPulses(void *data)
+    {
+        BeApp *that =
+            static_cast<BeApp*>(data);
+        assert(that != NULL);
+        int32 i = that->SendPulsesEtc();
+        if (i != 0) {
+            boost::format fmt(_("pulses thread returned %d"));
+            fmt = fmt % i;
+            log_error(fmt.str());
+        }
+        return i;
+    }
+    
+    
+    int32
+    SendPulsesEtc()
+    {
+        BMessage m(GNASH_PULSE);
+        int32 code;
+        thread_id sender;
+    
+        while (true)
+        {
+            if (B_OK != be_app_messenger.SendMessage(&m))
+                return -1;
+    
+            unsigned int interval =
+                _gui->getInterval();
+            if (interval == 0)
+               interval = 15;
+            // interval in miliseconds, 1000 * interval in microseconds
+            usleep(1000 * interval);
+    
+            do {
+                code = receive_data(&sender, NULL, 0);
+            } while (code == B_INTERRUPTED);
+            switch (code)
+            {
+                case GNASH_SEND_PULSE:
+                    break;
+                case GNASH_QUITTING:
+                    return 0;
+                default:
+                    return -1;
+            };
+        }
+        return 0;
     }
 
     void setTimeout(time_t timeout)
@@ -139,6 +205,12 @@ public:
 
     virtual ~BeApp()
     {
+        status_t st, exit_value;
+        do {
+            st = send_data(_pulse_tid, GNASH_QUITTING, NULL, 0);
+        } while (st == B_INTERRUPTED);
+        if (st == B_OK)
+            wait_for_thread(_pulse_tid, &exit_value);
     }
 
     bool QuitRequested()
@@ -173,6 +245,10 @@ public:
                     _gui->notify_mouse_moved(_mousemovedx, _mousemovedy);
                 _mouse_moves_this_pulse = 0;
                 _gui->GnashPulse();
+                if (B_OK != send_data(_pulse_tid, GNASH_SEND_PULSE, NULL, 0)) {
+                    log_error(_("send_data failed"));
+                    Quit();
+                }
                 break;
             case GNASH_RESIZE:
             {
@@ -272,7 +348,8 @@ public:
 
 
 HaikuGui::HaikuGui(unsigned long xid, float scale, bool loop, RunResources& r)
-    : Gui(xid, scale, loop, r), _app(NULL), _rnr(NULL), _glue(this, xid), _timeout(0)
+    : Gui(xid, scale, loop, r), _app(NULL),
+      _glue(this, xid), _timeout(0)
 {
     QQ(8);
 }
@@ -280,7 +357,7 @@ HaikuGui::HaikuGui(unsigned long xid, float scale, bool loop, RunResources& r)
 HaikuGui::~HaikuGui()
 {
     GNASH_REPORT_FUNCTION;
-    delete _rnr;
+
     delete _app;
 }
 
@@ -314,9 +391,6 @@ HaikuGui::init(int argc, char **argv[])
 
 
     opterr = origopterr;
-
-    BMessage m(GNASH_PULSE);
-    be_app_messenger.SendMessage(&m);
 
     _glue.init(argc, argv, _app->GetWinAddr(), _sharefilename);
 
@@ -486,15 +560,14 @@ void HaikuGui::GnashPulse()
         return ;
     }
 
-    delete _rnr;
-    BMessage m(GNASH_PULSE);
-    _rnr = new BMessageRunner(BMessenger(NULL, _app), &m, 20000, 1);
-    if (_rnr->InitCheck() != B_OK)
-        abort();
-
     Gui::advance_movie(this);
 }
 
+unsigned int
+HaikuGui::getInterval()
+{
+    return _interval;
+}
 
 void
 HaikuGui::resize_view(int width, int height)

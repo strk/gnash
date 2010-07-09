@@ -32,7 +32,7 @@ plugindir   = $(FIREFOX_PLUGINS)
 # XP_UNIX	This needs to get defined for npapi.h on unix platforms.
 # PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
 #		api gets control.
-AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(GNASHBINDIR)\" \
+AM_CPPFLAGS = -DPLUGIN_TRACE -DGNASHBINDIR=\"$(GNASHBINDIR)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/parser \
@@ -42,6 +42,12 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(GNASHBINDIR)\
 	-I$(srcdir)/mozilla-sdk/include \
         $(GLIB_CFLAGS) \
 	$(NULL)
+
+if HAIKU
+  AM_CPPFLAGS += -DXP_HAIKU
+else
+  AM_CPPFLAGS += -DXP_UNIX -DMOZ_X11
+endif
 
 # AM_CXXFLAGS = $(AM_CPPFLAGS)
 

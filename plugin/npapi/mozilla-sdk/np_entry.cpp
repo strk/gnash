@@ -211,9 +211,10 @@ NP_GetEntryPoints(NPPluginFuncs* aNPPFuncs)
 /**************************************************/
 /*                                                */
 /*                    Unix                        */
+/*                    Haiku                       */
 /*                                                */
 /**************************************************/
-#ifdef XP_UNIX
+#if defined(XP_UNIX) || defined(XP_HAIKU)
 
 NPError
 NP_Initialize(NPNetscapeFuncs* aNPNFuncs, NPPluginFuncs* aNPPFuncs)
@@ -243,7 +244,7 @@ NP_GetValue(void* /*future*/, NPPVariable aVariable, void *aValue)
     return NS_PluginGetValue(aVariable, aValue);
 }
 
-#endif //XP_UNIX
+#endif //XP_UNIX, XP_HAIKU
 
 /**************************************************/
 /*                                                */
