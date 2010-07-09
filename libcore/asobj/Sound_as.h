@@ -177,8 +177,6 @@ private:
     /// Probe audio
     void probeAudio();
 
-    int _probeTimer;
-
     bool _soundCompleted;
 
     boost::mutex _soundCompletedMutex;

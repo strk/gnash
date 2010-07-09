@@ -64,13 +64,6 @@ namespace {
     as_value sound_start(const fn_call& fn);
     as_value sound_stop(const fn_call& fn);
     as_value checkPolicyFile_getset(const fn_call& fn);
-    as_value sound_load(const fn_call& fn);
-    as_value sound_play(const fn_call& fn);
-    as_value sound_complete(const fn_call& fn);
-    as_value sound_id3(const fn_call& fn);
-    as_value sound_ioError(const fn_call& fn);
-    as_value sound_open(const fn_call& fn);
-    as_value sound_progress(const fn_call& fn);
     as_value sound_ctor(const fn_call& fn);
     void attachSoundInterface(as_object& o);
 }
@@ -90,14 +83,15 @@ Sound_as::Sound_as(as_object* owner)
     _leftOverSize(0),
     _inputStream(0),
     remainingLoops(0),
-    _probeTimer(0),
     _soundCompleted(false)
 {
 }
 
 Sound_as::~Sound_as()
 {
-    //GNASH_REPORT_FUNCTION;
+
+    // Just in case...
+    stopProbeTimer();
 
     if (_inputStream && _soundHandler) {
         _soundHandler->unplugInputStream(_inputStream);
@@ -150,7 +144,6 @@ registerSoundNative(as_object& global)
 void
 Sound_as::startProbeTimer()
 {
-    _probeTimer = 1;
     getRoot(owner()).addAdvanceCallback(this);
 }
 
@@ -161,12 +154,7 @@ Sound_as::stopProbeTimer()
 #ifdef GNASH_DEBUG_SOUND_AS
     log_debug("stopProbeTimer called");
 #endif
-
-    if ( _probeTimer ) {
-        getRoot(owner()).removeAdvanceCallback(this);
-        log_debug(" sound callback removed");
-        _probeTimer = 0;
-    }
+    getRoot(owner()).removeAdvanceCallback(this);
 }
 
 void
@@ -182,11 +170,11 @@ Sound_as::update()
     }
 }
 
-/*private*/
 void
 Sound_as::probeAudio()
 {
-    if ( isAttached() ) {
+
+    if (isAttached()) {
 #ifdef GNASH_DEBUG_SOUND_AS
         log_debug("Probing audio for end");
 #endif
@@ -196,14 +184,15 @@ Sound_as::probeAudio()
             // when _soundCompleted is true we're
             // NOT attached !
             _mediaParser.reset(); // no use for this anymore...
-            _inputStream=0;
-            _soundCompleted=false;
+            _inputStream = 0;
+            _soundCompleted = false;
             stopProbeTimer();
 
             // dispatch onSoundComplete 
             callMethod(&owner(), NSV::PROP_ON_SOUND_COMPLETE);
         }
-    } else {
+    }
+    else if (_mediaParser) {
 #ifdef GNASH_DEBUG_SOUND_AS
         log_debug("Probing audio for start");
 #endif
@@ -211,7 +200,8 @@ Sound_as::probeAudio()
         bool parsingCompleted = _mediaParser->parsingCompleted();
         try {
             _inputStream = attachAuxStreamerIfNeeded();
-        } catch (MediaException& e) {
+        } 
+        catch (MediaException& e) {
             assert(!_inputStream);
             assert(!_audioDecoder.get());
             log_error(_("Could not create audio decoder: %s"), e.what());
@@ -390,9 +380,10 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     // TODO: use global _soundbuftime
     _mediaParser->setBufferTime(60000); // one minute buffer... should be fine
 
-    if ( isStreaming ) {
+    if (isStreaming) {
         startProbeTimer();
-    } else {
+    } 
+    else {
         LOG_ONCE(log_unimpl("Non-streaming Sound.loadSound: will behave "
                     "as a streaming one"));
         // if not streaming, we'll probe on .start()
@@ -504,9 +495,6 @@ Sound_as::start(double secOff, int loops)
         //       loaded before starting to play it (!isStreaming case)
         startProbeTimer();
 
-        //if ( ! _inputStream ) {
-        //  _inputStream=_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
-        //}
     } else {
         unsigned int inPoint = 0;
 
@@ -523,6 +511,7 @@ Sound_as::start(double secOff, int loops)
                     true, // allow multiple instances (checked)
                     inPoint
                     );
+        startProbeTimer();
     }
 }
 
@@ -577,8 +566,9 @@ Sound_as::getDuration()
 unsigned int
 Sound_as::getPosition()
 {
-    if ( ! _soundHandler ) {
-        log_error("No sound handler, can't check position (we're likely not playing anyway)...");
+    if (!_soundHandler) {
+        log_error("No sound handler, can't check position (we're "
+                "likely not playing anyway)...");
         return 0;
     }
 
@@ -587,7 +577,7 @@ Sound_as::getPosition()
         return _soundHandler->tell(soundId);
     }
 
-    if ( _mediaParser ) {
+    if (_mediaParser) {
         boost::uint64_t ts;
         if ( _mediaParser->nextAudioFrameTimestamp(ts) ) {
             return ts;
@@ -1056,69 +1046,6 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
     // naive test shows this always being undefined..
     //
     LOG_ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
-    return as_value();
-}
-
-as_value
-sound_load(const fn_call& fn)
-{
-    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-sound_play(const fn_call& fn)
-{
-    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-sound_complete(const fn_call& fn)
-{
-    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-sound_id3(const fn_call& fn)
-{
-    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-sound_ioError(const fn_call& fn)
-{
-    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-sound_open(const fn_call& fn)
-{
-    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-sound_progress(const fn_call& fn)
-{
-    Sound_as* ptr = ensure<ThisIsNative<Sound_as> >(fn);
-    UNUSED(ptr);
-    log_unimpl (__FUNCTION__);
     return as_value();
 }
 
