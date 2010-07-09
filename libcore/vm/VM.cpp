@@ -23,7 +23,7 @@
 #endif
 
 #include "VM.h"
-#include "flash/net/SharedObject_as.h" // for SharedObjectLibrary
+#include "SharedObject_as.h" // for SharedObjectLibrary
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "NativeFunction.h"
 #include "builtin_function.h"

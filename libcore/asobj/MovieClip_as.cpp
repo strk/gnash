@@ -21,7 +21,7 @@
 #include "Movie.h"
 #include "MovieClip_as.h"
 #include "display/BitmapData_as.h"
-#include "net/NetStream_as.h"
+#include "NetStream_as.h"
 #include "movie_root.h"
 #include "GnashNumeric.h"
 #include "as_value.h"

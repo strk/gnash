@@ -51,6 +51,12 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Sound_as.cpp \
 	asobj/Microphone_as.cpp \
 	asobj/Camera_as.cpp \
+	asobj/LocalConnection_as.cpp \
+	asobj/NetConnection_as.cpp \
+	asobj/NetStream_as.cpp \
+	asobj/SharedObject_as.cpp \
+	asobj/XMLSocket_as.cpp \
+	asobj/System_as.cpp \
 	asobj/Object.cpp
 
 noinst_HEADERS += \
@@ -79,6 +85,12 @@ noinst_HEADERS += \
 	asobj/Sound_as.h \
 	asobj/Microphone_as.h \
 	asobj/Camera_as.h \
+	asobj/LocalConnection_as.h \
+	asobj/NetConnection_as.h \
+	asobj/NetStream_as.h \
+	asobj/SharedObject_as.h \
+	asobj/XMLSocket_as.h \
+	asobj/System_as.h \
 	asobj/Object.h
 
 EXTENSIONS_API += \
@@ -112,7 +124,6 @@ include $(srcdir)/asobj/flash/external/external.am
 include $(srcdir)/asobj/flash/filters/filters.am
 include $(srcdir)/asobj/flash/geom/geom.am
 include $(srcdir)/asobj/flash/net/net.am
-include $(srcdir)/asobj/flash/system/system.am
 include $(srcdir)/asobj/flash/text/text.am
 include $(srcdir)/asobj/flash/ui/ui.am
 include $(srcdir)/asobj/flash/xml/xml.am

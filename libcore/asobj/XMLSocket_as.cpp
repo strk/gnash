@@ -22,7 +22,7 @@
 #include "GnashSystemFDHeaders.h"
 #include "utility.h"
 #include "Socket.h"
-#include "net/XMLSocket_as.h"
+#include "XMLSocket_as.h"
 #include "as_function.h"
 #include "movie_root.h"
 #include "fn_call.h"
