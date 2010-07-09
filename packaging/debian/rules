@@ -68,7 +68,7 @@ patch-stamp:
 # These flags are the defaults Gnash uses when configuring, but we pass
 # them here explicitly because it makes it easier for non Gnash developers
 # to know what those defaults are.
-BUILD_FLAGS = --enable-jemalloc --enable-avm2
+BUILD_FLAGS = --enable-jemalloc
 
 # this is where all the objects and executables go. We have to
 # redfine this, instead of just appending the path elements, as
