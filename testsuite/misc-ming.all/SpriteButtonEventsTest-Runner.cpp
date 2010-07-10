@@ -273,8 +273,18 @@ main(int /*argc*/, char** /*argv*/)
 
 	}
 
+    tester.scrollMouse(-1);
+    check_equals(text->get_text_value(), "onMouseWheel: -1, , 2");
+    
+    tester.scrollMouse(1);
+    check_equals(text->get_text_value(), "onMouseWheel: 1, , 2");
+
+    tester.movePointerTo(100, 100);
+    tester.scrollMouse(1);
+    check_equals(text->get_text_value(), "onMouseWheel: 1, _level0.textfield2, 2");
+
 	// last advance should not restart the loop (it's in STOP mode)
-        check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
+    check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 	check_equals(root->get_current_frame(), 4);
 
 }
