@@ -50,7 +50,7 @@ void
 DrawingWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint position = event->pos();
-    _gui.notify_mouse_moved(position.x(), position.y());
+    _gui.notifyMouseMove(position.x(), position.y());
 }
 
 
@@ -64,14 +64,14 @@ DrawingWidget::contextMenuEvent(QContextMenuEvent* event)
 void
 DrawingWidget::mousePressEvent(QMouseEvent* /* event */)
 {
-    _gui.notify_mouse_clicked(true, 1);
+    _gui.notifyMouseClick(true);
 }
 
 
 void
 DrawingWidget::mouseReleaseEvent(QMouseEvent* /* event */)
 {
-    _gui.notify_mouse_clicked(false, 1);
+    _gui.notifyMouseClick(false);
 }
 
 

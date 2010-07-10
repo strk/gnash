@@ -106,18 +106,18 @@ FltkGui::handle(int event)
         return true;
       case PUSH:
         Window::handle(event);
-        notify_mouse_clicked(true, 1);
+        notifyMouseClick(true);
         return true;
       case RELEASE:
         Window::handle(event);
-        notify_mouse_clicked(false, 1);
+        notifyMouseClick(false);
         return true;
       case MOVE:
       {
         if (!_xid && event_y() < static_cast<int>(_menu_height)) {
           return Window::handle(event);
         }
-        notify_mouse_moved(event_x(), event_y()-_menu_height);
+        notifyMouseMove(event_x(), event_y()-_menu_height);
         return Window::handle(event);
       }
       case SHORTCUT:

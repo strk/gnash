@@ -361,22 +361,21 @@ button_press_event_cb(GtkWidget */*widget*/, GdkEventButton *event, gpointer dat
 
     gtk_widget_grab_focus(GTK_WIDGET(view->canvas));
 
-    int	mask = 1 << (event->button - 1);
-    view->stage->notify_mouse_clicked(true, mask);
+    view->stage->mouseClick(true);
 
     return TRUE;
 }
 
 static gboolean
-button_release_event_cb(GtkWidget */*widget*/, GdkEventButton *event, gpointer data)
+button_release_event_cb(GtkWidget* /*widget*/, GdkEventButton* /*event*/,
+        gpointer data)
 {
     GNASH_REPORT_FUNCTION;
     GnashView *view = GNASH_VIEW(data);
     if (view->stage.get() == NULL)
         return FALSE;
 
-    int	mask = 1 << (event->button - 1);
-    view->stage->notify_mouse_clicked(false, mask);
+    view->stage->mouseClick(false);
 
     return TRUE;
 }
@@ -397,7 +396,7 @@ motion_notify_event_cb(GtkWidget */*widget*/, GdkEventMotion *event, gpointer da
 	// A stage pseudopixel is user pixel / _yscale high
 	boost::int32_t y = event->y / yscale;
 
-	if ( view->stage->notify_mouse_moved(x, y) )
+	if ( view->stage->mouseMoved(x, y) )
 	{
 		// any action triggered by the
 		// event required screen refresh

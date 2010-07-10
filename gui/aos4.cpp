@@ -511,7 +511,7 @@ AOS4Gui::run()
     	   	        		if ( _window->GZZMouseX == x_old && _window->GZZMouseY == y_old) { break; }
 							x_old = _window->GZZMouseX;
 							y_old = _window->GZZMouseY;
-   		        	    	notify_mouse_moved(x_old, y_old);
+   		        	    	notifyMouseMove(x_old, y_old);
    		        	    }
 		            break;
 		            case IDCMP_MOUSEBUTTONS:
@@ -522,11 +522,11 @@ AOS4Gui::run()
    							{
 							    case SELECTDOWN:
 		        	        	    if (imsg->Code == button_state_old) { break; }
-   	    		    	        	notify_mouse_clicked(true, 1);
+   	    		    	        	notifyMouseClick(true);
 	                			    button_state_old = imsg->Code;
 					    		break;
 							    case SELECTUP:
-		    	    	            notify_mouse_clicked(false, 1);
+		    	    	            notifyMouseClick(false);
        					            button_state_old = -1;
 							    break;
 							}

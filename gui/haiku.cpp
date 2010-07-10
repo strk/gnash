@@ -170,7 +170,7 @@ public:
         {
             case GNASH_PULSE:
                 if (_mouse_moves_this_pulse > 3)
-                    _gui->notify_mouse_moved(_mousemovedx, _mousemovedy);
+                    _gui->notifyMouseMove(_mousemovedx, _mousemovedy);
                 _mouse_moves_this_pulse = 0;
                 _gui->GnashPulse();
                 break;
@@ -208,7 +208,7 @@ public:
                     || B_OK != msg->FindInt32("mask", &mask))
                     QQ(1);
                 else
-                    _gui->notify_mouse_clicked(pressed, mask);
+                    _gui->notifyMouseClick(pressed);
                 break;
             }
             case GNASH_MOUSE_MOVED:
@@ -225,7 +225,7 @@ public:
                         _mousemovedx = x;
                         _mousemovedy = y;
                     } else
-                        _gui->notify_mouse_moved(x, y);
+                        _gui->notifyMouseMove(x, y);
                 }
                 break;
             }

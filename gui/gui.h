@@ -286,18 +286,22 @@ public:
 
     /// Mouse notification callback to be called when the mouse is moved.
     //
-    /// @param x The mouse coordinate X component in user/window coordinate space (pixels).
-    /// @param y The mouse coordinate Y component in user/window coordinate space (pixels).
-    ///
-    void notify_mouse_moved(int x, int y);
+    /// @param x    The mouse coordinate X component in user/window
+    ///             coordinate space (pixels).
+    /// @param y    The mouse coordinate Y component in user/window
+    ///             coordinate space (pixels).
+    void notifyMouseMove(int x, int y);
 
     /// Mouse notification callback to be called when the mouse is clicked.
     //
     /// @param mouse_pressed Determines whether the mouse button is being
     ///                      pressed (true) or being released (false)
-    /// @param mask A binary representation of the buttons currently pressed.
-    ///
-    void notify_mouse_clicked(bool mouse_pressed, int mask);
+    void notifyMouseClick(bool mouse_pressed);
+
+    /// Send a mouse wheel event to the stage.
+    //
+    /// @param delta    A number expressing the extent of the wheel scroll.
+    void notifyMouseWheel(int delta);
 
     /// Key event notification to be called when a key is pressed or depressed
     //

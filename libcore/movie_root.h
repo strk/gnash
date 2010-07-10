@@ -280,36 +280,31 @@ public:
     /// on scaleMode
     unsigned getStageHeight() const;
 
-    /// \brief
-    /// The host app can use this to tell the movie when
-    /// user's mouse pointer has moved.
+    /// Inform the Stage that the mouse has moved.
     //
     /// Coordinates are in Stage Coordinate Space (pseudo-pixels units).
     ///
-    /// This function should return TRUE iff any action triggered
-    /// by the event requires redraw, see \ref events_handling for
-    /// more info.
+    /// @param x    The x co-ordinate in pixels.
+    /// @param y    The y co-ordinate in pixels.
+    /// @return     true if any action triggered requires a redraw.
     ///
     /// TODO: take twips (or float pixels), or we won't be able to
     ///       support sub-pixel accuracy in collision detection.
-    ///
-    bool notify_mouse_moved(int x, int y);
+    bool mouseMoved(boost::int32_t x, boost::int32_t y);
 
-    /// \brief
-    /// The host app can use this to tell the movie when the
-    /// user clicked or released the mouse button.
+    /// Inform the Stage that a mouse click has occurred.
     //
-    /// @param mouse_pressed
-    /// true if the mouse has been pressed, false if released
-    ///
-    /// @param mask
-    /// ???
-    ///
-    /// This function should return TRUE iff any action triggered
-    /// by the event requires redraw, see \ref events_handling for
-    /// more info.
-    ///
-    bool notify_mouse_clicked(bool mouse_pressed, int mask);
+    /// @param press    true for a mouse click, false for a release
+    /// @return         true if any action triggered requires a redraw.
+    bool mouseClick(bool press);
+
+    /// Inform the Stage that a mouse wheel has moved.
+    //
+    /// @param delta    The direction of the scroll: positive for up, negative
+    ///                 for down. Although values from about -3 to 3 are
+    ///                 documented, only -1 and 1 have been observed.
+    /// @return         true if any action triggered requires a redraw.
+    bool mouseWheel(int delta);
 
     /// \brief
     /// The host app can use this to tell the movie when
@@ -321,14 +316,10 @@ public:
     ///
     bool notify_key_event(key::code k, bool down);
 
-    /// \brief
-    /// Use this to retrieve the last state of the mouse, as set via
-    /// notify_mouse_state(). 
+    /// Use this to retrieve the last state of the mouse.
     //
     /// Coordinates are in PIXELS, NOT TWIPS.
-    ///
-    void get_mouse_state(boost::int32_t& x, boost::int32_t& y,
-            boost::int32_t& buttons);
+    void get_mouse_state(boost::int32_t& x, boost::int32_t& y);
 
     void get_drag_state(drag_state& st);
 
@@ -1149,7 +1140,9 @@ private:
     bool m_background_color_set;
 
     float m_timer;
-    int m_mouse_x, m_mouse_y, m_mouse_buttons;
+    boost::int32_t _mouseX;
+    boost::int32_t _mouseY;
+    bool _mouseDown;
 
     MouseButtonState  _mouseButtonState;
 

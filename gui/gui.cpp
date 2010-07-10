@@ -457,7 +457,7 @@ Gui::toggleSound()
 
 
 void
-Gui::notify_mouse_moved(int ux, int uy) 
+Gui::notifyMouseMove(int ux, int uy) 
 {
 	movie_root* m = _stage;
 
@@ -475,7 +475,7 @@ Gui::notify_mouse_moved(int ux, int uy)
 	log_debug(_("mouse @ %d,%d"), x, y);
 #endif
 
-	if ( m->notify_mouse_moved(x, y) )
+	if ( m->mouseMoved(x, y) )
 	{
 		// any action triggered by the
 		// event required screen refresh
@@ -512,17 +512,31 @@ Gui::notify_mouse_moved(int ux, int uy)
 }
 
 void
-Gui::notify_mouse_clicked(bool mouse_pressed, int mask) 
+Gui::notifyMouseWheel(int delta)
 {
 	movie_root* m = _stage;
 	assert(m);
 
-    if ( ! _started ) return;
+    if (!_started) return;
+    if (_stopped) return;
 
-    if ( _stopped ) return;
+	if (m->mouseWheel(delta)) {
+		// any action triggered by the
+		// event required screen refresh
+		display(m);
+	}
+} 
 
-	if ( m->notify_mouse_clicked(mouse_pressed, mask) )
-	{
+void
+Gui::notifyMouseClick(bool mouse_pressed) 
+{
+	movie_root* m = _stage;
+	assert(m);
+
+    if (!_started) return;
+    if (_stopped) return;
+
+	if (m->mouseClick(mouse_pressed)) {
 		// any action triggered by the
 		// event required screen refresh
 		display(m);
@@ -625,7 +639,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
                       int newx = _xpointer;
                       int newy = _ypointer-step;
                       if ( newy < 0 ) newy=0;
-                      notify_mouse_moved(newx, newy);
+                      notifyMouseMove(newx, newy);
                       break;
                   }
                   case gnash::key::DOWN:
@@ -633,7 +647,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
                       int newx = _xpointer;
                       int newy = _ypointer+step;
                       if ( newy >= _height ) newy = _height-1;
-                      notify_mouse_moved(newx, newy);
+                      notifyMouseMove(newx, newy);
                       break;
                   }
                   case gnash::key::LEFT:
@@ -641,7 +655,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
                       int newx = _xpointer-step;
                       int newy = _ypointer;
                       if ( newx < 0 ) newx = 0;
-                      notify_mouse_moved(newx, newy);
+                      notifyMouseMove(newx, newy);
                       break;
                   }
                   case gnash::key::RIGHT:
@@ -649,7 +663,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
                       const int newy = _ypointer;
                       int newx = _xpointer + step;
                       if ( newx >= _width ) newx = _width-1;
-                      notify_mouse_moved(newx, newy);
+                      notifyMouseMove(newx, newy);
                       break;
                   }
                   default:

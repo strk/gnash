@@ -132,6 +132,8 @@ namespace {
                                        gpointer data);
     gboolean buttonReleaseEvent(GtkWidget *widget, GdkEventButton *event,
                                          gpointer data);
+    gboolean mouseWheelEvent(GtkWidget *widget, GdkEventScroll *event,
+                                       gpointer data);
     gboolean motionNotifyEvent(GtkWidget *widget, GdkEventMotion *event,
                                         gpointer data);
     gint popupHandler(GtkWidget *widget, GdkEvent *event);    
@@ -646,6 +648,8 @@ GtkGui::setupEvents()
                    G_CALLBACK(buttonReleaseEvent), this);
     g_signal_connect(_canvas, "motion_notify_event",
                    G_CALLBACK(motionNotifyEvent), this);
+    g_signal_connect(_canvas, "scroll_event",
+                   G_CALLBACK(mouseWheelEvent), this);
   
     g_signal_connect_after(_canvas, "realize",
                          G_CALLBACK (realizeEvent), NULL);
@@ -2513,6 +2517,30 @@ keyReleaseEvent(GtkWidget *const /*widget*/, GdkEventKey *const event,
 }
 
 gboolean
+mouseWheelEvent(GtkWidget *const /*widget*/, GdkEventScroll* const event,
+        const gpointer data)
+{
+    assert(event->type == GDK_SCROLL);
+    GtkGui *obj = static_cast<GtkGui*>(data);
+
+    obj->grabFocus();
+
+    switch (event->direction) {
+        case GDK_SCROLL_UP:
+            obj->notifyMouseWheel(1);
+            break;
+        case GDK_SCROLL_DOWN:
+            obj->notifyMouseWheel(-1);
+            break;
+        default:
+            break;
+    }
+
+
+    return true;
+}
+
+gboolean
 buttonPressEvent(GtkWidget *const /*widget*/, GdkEventButton *const event,
         const gpointer data)
 {
@@ -2524,20 +2552,16 @@ buttonPressEvent(GtkWidget *const /*widget*/, GdkEventButton *const event,
     GtkGui *obj = static_cast<GtkGui*>(data);
 
     obj->grabFocus();
-
-    int    mask = 1 << (event->button - 1);
-    obj->notify_mouse_clicked(true, mask);
+    obj->notifyMouseClick(true);
     return true;
 }
 
 gboolean
 buttonReleaseEvent(GtkWidget * const /*widget*/,
-     GdkEventButton * const event, const gpointer data)
+     GdkEventButton* const /*event*/, const gpointer data)
 {
     Gui *obj = static_cast<Gui*>(data);
-
-    int    mask = 1 << (event->button - 1);
-    obj->notify_mouse_clicked(false, mask);
+    obj->notifyMouseClick(false);
     return true;
 }
 
@@ -2547,7 +2571,7 @@ motionNotifyEvent(GtkWidget *const /*widget*/, GdkEventMotion *const event,
 {
     Gui *obj = static_cast<Gui *>(data);
 
-    obj->notify_mouse_moved(event->x, event->y);
+    obj->notifyMouseMove(event->x, event->y);
     return true;
 }
 

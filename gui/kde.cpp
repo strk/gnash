@@ -406,7 +406,7 @@ qwidget::mouseMoveEvent(QMouseEvent *event)
     assert(_godfather);
     QPoint position = event->pos();
 
-    _godfather->notify_mouse_moved(position.x(), position.y());
+    _godfather->notifyMouseMove(position.x(), position.y());
 }
 
 qwidget::qwidget(KdeGui* godfather)
@@ -454,13 +454,13 @@ qwidget::contextMenuEvent(QContextMenuEvent*)
 void
 qwidget::mousePressEvent(QMouseEvent* /* event */)
 {
-    _godfather->notify_mouse_clicked(true, 1);
+    _godfather->notifyMouseClick(true);
 }
 
 void
 qwidget::mouseReleaseEvent(QMouseEvent* /* event */)
 {
-    _godfather->notify_mouse_clicked(false, 1);
+    _godfather->notifyMouseClick(false);
 }
 
 void
