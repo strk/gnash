@@ -178,7 +178,6 @@ private:
     boost::scoped_ptr<CharacterProxy> _attachedCharacter;
     int soundId;
     bool externalSound;
-    std::string externalURL;
     bool isStreaming;
 
     sound::sound_handler* _soundHandler;
