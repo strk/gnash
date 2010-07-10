@@ -5,6 +5,8 @@ bzrversion.h
 .libs
 *.lo
 *.la
+bzrversion.h
+gnash.pc
 *site.bak
 aclocal.m4
 autom4te.cache
@@ -32,6 +34,8 @@ utilities/dumpshm
 utilities/gprocessor
 utilities/soldumper
 testsuite/gnashrc
+testsuite/libbase.all/gnashrc
+testsuite/libbase.all/gnashrc-local
 macros/lt*.m4
 macros/libtool.m4
 macros/argz.m4

@@ -258,7 +258,7 @@ if BUILD_FLTK_GUI
 	@echo "	XFT_CFLAGS is $(XFT_CFLAGS)"
 	@echo "	XFT_LIBS is $(XFT_LIBS)"
 endif
-if BUILD_HAIKU_GUI
+if HAIKU
 	@echo "	HAIKU_LIBS is $(HAIKU_LIBS)"
 endif
 if BUILD_GTK_GUI

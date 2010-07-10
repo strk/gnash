@@ -50,7 +50,7 @@
 #endif
 #endif
 
-#if defined(XP_UNIX) 
+#if defined(XP_UNIX) || defined(XP_HAIKU)
 # include <stdio.h>
 # if defined(MOZ_X11)
 #  include <X11/Xlib.h>
@@ -185,7 +185,7 @@ typedef struct _NPSize
     int32_t height; 
 } NPSize; 
 
-#ifdef XP_UNIX
+#if defined(XP_UNIX) || defined(XP_HAIKU)
 /*
  * Unix specific structures and definitions
  */
@@ -222,7 +222,7 @@ typedef struct
     FILE* fp;
 } NPPrintCallbackStruct;
 
-#endif /* XP_UNIX */
+#endif /* defined(XP_UNIX) || defined(XP_HAIKU) */
 
 #ifdef XP_MACOSX
 typedef enum {
@@ -259,7 +259,7 @@ typedef enum {
  *   gcc 3.x generated vtables on UNIX and OSX are incompatible with 
  *   previous compilers.
  */
-#if (defined(XP_UNIX) && defined(__GNUC__) && (__GNUC__ >= 3))
+#if ((defined (XP_UNIX) || defined(XP_HAIKU)) && defined(__GNUC__) && (__GNUC__ >= 3))
 #define _NP_ABI_MIXIN_FOR_GCC3 NP_ABI_GCC3_MASK
 #else
 #define _NP_ABI_MIXIN_FOR_GCC3 0
@@ -407,9 +407,9 @@ typedef struct _NPWindow
     uint32_t width;  /* Maximum window size */
     uint32_t height;
     NPRect   clipRect; /* Clipping rectangle in port coordinates */
-#if defined(XP_UNIX) && !defined(XP_MACOSX)
+#if (defined(XP_UNIX) && !defined(XP_MACOSX)) || defined(XP_HAIKU)
     void * ws_info; /* Platform-dependent additional data */
-#endif /* XP_UNIX */
+#endif /* XP_UNIX, XP_HAIKU */
     NPWindowType type; /* Is this a window or a drawable? */
 } NPWindow;
 
@@ -693,9 +693,9 @@ extern "C" {
 
 /* NPP_* functions are provided by the plugin and called by the navigator. */
 
-#ifdef XP_UNIX
+#if defined(XP_UNIX) || defined(XP_HAIKU)
 char* NPP_GetMIMEDescription();
-#endif
+#endif /* XP_UNIX, XP_HAIKU */
 
 NPError NP_LOADDS NPP_Initialize();
 void    NP_LOADDS NPP_Shutdown();

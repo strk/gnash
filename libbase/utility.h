@@ -63,38 +63,23 @@ namespace std
 
 #if defined(__HAIKU__)
 namespace std {
-	class wstring : public std::basic_string<wchar_t>
+	class wstring : public std::basic_string<char>
 	{
 	public:
 		wstring(const char *t)
-			: std::basic_string<wchar_t>(_ble(t))
+			: std::basic_string<char>(t)
 		{
-			delete [] X;
 		}
 		wstring()
 		{
 		}
 		wstring(const wstring &that)
-			: std::basic_string<wchar_t>(that)
+			: std::basic_string<char>(that.c_str())
 		{
 		}
-		wstring(const std::basic_string<wchar_t> &that)
-			: std::basic_string<wchar_t>(that)
+		wstring(const std::basic_string<char> &that)
+			: std::basic_string<char>(that)
 		{
-		}
-	private:
-		wchar_t *X;
-		
-		wchar_t* _ble(const char *t)
-		{
-			size_t l = strlen(t);
-			wchar_t *cp = new wchar_t[l+1];
-			for (size_t i = 0; i < l; ++i) {
-				cp[i] = t[i];
-			}
-			cp[l] = '\0';
-			X = cp;
-			return X;
 		}
 	};
 };

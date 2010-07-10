@@ -158,8 +158,8 @@ RcInitFile::loadFiles()
     
     // Check the users home directory
     const char *home = 0;
-    //on AmigaOS we have a GNASH: assign that point to program dir
 #if defined (__amigaos4__)
+    //on AmigaOS we have a GNASH: assign that point to program dir
     home = "/gnash";
 #elif defined(HAIKU_HOST)
     BPath bp;
@@ -684,7 +684,6 @@ RcInitFile::updateFile()
             home = bp.Path();
         }
 #else
-	//on AmigaOS we have a GNASH: assign that point to program dir
 	home = std::getenv("HOME");
 #endif
         if (home) {

@@ -32,7 +32,7 @@ haiku_gnash_LDADD = $(GNASH_LIBS)
 if BUILD_AGG_RENDERER
 haiku_gnash_CPPFLAGS += $(AGG_CFLAGS)
 # -lbe must be after -lagg
-haiku_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+haiku_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
 	$(AGG_LIBS) $(HAIKU_LIBS)
 haiku_gnash_SOURCES += haiku_agg_glue.cpp haiku_agg_glue.h
 endif				# BUILD_AGG_RENDERER
