@@ -132,6 +132,8 @@ namespace {
                                        gpointer data);
     gboolean buttonReleaseEvent(GtkWidget *widget, GdkEventButton *event,
                                          gpointer data);
+    gboolean mouseWheelEvent(GtkWidget *widget, GdkEventScroll *event,
+                                       gpointer data);
     gboolean motionNotifyEvent(GtkWidget *widget, GdkEventMotion *event,
                                         gpointer data);
     gint popupHandler(GtkWidget *widget, GdkEvent *event);    
@@ -646,6 +648,8 @@ GtkGui::setupEvents()
                    G_CALLBACK(buttonReleaseEvent), this);
     g_signal_connect(_canvas, "motion_notify_event",
                    G_CALLBACK(motionNotifyEvent), this);
+    g_signal_connect(_canvas, "scroll_event",
+                   G_CALLBACK(mouseWheelEvent), this);
   
     g_signal_connect_after(_canvas, "realize",
                          G_CALLBACK (realizeEvent), NULL);
@@ -2509,6 +2513,30 @@ keyReleaseEvent(GtkWidget *const /*widget*/, GdkEventKey *const event,
         gui->notify_key_event(c, mod, false);
     }
     
+    return true;
+}
+
+gboolean
+mouseWheelEvent(GtkWidget *const /*widget*/, GdkEventScroll* const event,
+        const gpointer data)
+{
+    assert(event->type == GDK_SCROLL);
+    GtkGui *obj = static_cast<GtkGui*>(data);
+
+    obj->grabFocus();
+
+    switch (event->direction) {
+        case GDK_SCROLL_UP:
+            obj->notifyMouseWheel(1);
+            break;
+        case GDK_SCROLL_DOWN:
+            obj->notifyMouseWheel(-1);
+            break;
+        default:
+            break;
+    }
+
+
     return true;
 }
 

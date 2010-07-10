@@ -301,7 +301,7 @@ public:
     /// Send a mouse wheel event to the stage.
     //
     /// @param delta    A number expressing the extent of the wheel scroll.
-    void notifyMouseWheel(double delta);
+    void notifyMouseWheel(int delta);
 
     /// Key event notification to be called when a key is pressed or depressed
     //

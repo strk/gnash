@@ -512,17 +512,31 @@ Gui::notifyMouseMove(int ux, int uy)
 }
 
 void
+Gui::notifyMouseWheel(int delta)
+{
+	movie_root* m = _stage;
+	assert(m);
+
+    if (!_started) return;
+    if (_stopped) return;
+
+	if (m->mouseWheel(delta)) {
+		// any action triggered by the
+		// event required screen refresh
+		display(m);
+	}
+} 
+
+void
 Gui::notifyMouseClick(bool mouse_pressed) 
 {
 	movie_root* m = _stage;
 	assert(m);
 
-    if ( ! _started ) return;
+    if (!_started) return;
+    if (_stopped) return;
 
-    if ( _stopped ) return;
-
-	if ( m->mouseClick(mouse_pressed) )
-	{
+	if (m->mouseClick(mouse_pressed)) {
 		// any action triggered by the
 		// event required screen refresh
 		display(m);
