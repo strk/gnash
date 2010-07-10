@@ -531,7 +531,6 @@ movie_root::clear()
 
     // remove key/mouse listeners
     _keyListeners.clear();
-    _mouseListeners.clear();
 
     // Cleanup the stack.
     _vm.getStack().clear();
@@ -1816,20 +1815,6 @@ movie_root::markReachableResources() const
 #if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
     for (Listeners::const_iterator i=_keyListeners.begin(),
             e=_keyListeners.end(); i!=e; ++i) {
-#ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
-        (*i)->setReachable();
-#else
-        assert((*i)->isReachable());
-#endif
-    }
-#endif
-
-    // NOTE: cleanupUnloadedListeners() should have cleaned up all
-    // unloaded mouse listeners. The remaining ones should be marked by
-    // their parents
-#if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
-    for (Listeners::const_iterator i = _mouseListeners.begin(),
-            e = _mouseListeners.end(); i!=e; ++i) {
 #ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
         (*i)->setReachable();
 #else

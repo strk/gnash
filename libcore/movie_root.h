@@ -481,18 +481,6 @@ public:
     /// Notify still loaded DisplayObject listeners for mouse events
     DSOEXPORT void notify_mouse_listeners(const event_id& event);
 
-    /// Push a new DisplayObject listener for mouse events
-    void add_mouse_listener(InteractiveObject* listener)
-    {
-        add_listener(_mouseListeners, listener);
-    }
-
-    /// Remove a DisplayObject listener for mouse events
-    void remove_mouse_listener(InteractiveObject* listener)
-    {
-        remove_listener(_mouseListeners, listener);
-    }
-
     /// Get the DisplayObject having focus
     //
     /// The DisplayObject having focus will receive mouse button
@@ -667,7 +655,6 @@ public:
     /// - Timer targets (_intervalTimers)
     /// - Resources reachable by ActionQueue code (_actionQueue)
     /// - Key listeners (_keyListeners)
-    /// - Mouse listeners (_mouseListeners)
     /// - Any DisplayObject being dragged 
     ///
     void markReachableResources() const;
@@ -1011,7 +998,6 @@ private:
     void cleanupUnloadedListeners()
     {
         cleanupUnloadedListeners(_keyListeners);
-        cleanupUnloadedListeners(_mouseListeners);
     }
 
     /// Erase unloaded DisplayObjects from the given listeners list
@@ -1154,9 +1140,6 @@ private:
 
     /// Characters for listening key events
     Listeners _keyListeners;
-
-    /// Objects listening for mouse events (down,up,move)
-    Listeners _mouseListeners;
 
     /// The DisplayObject currently holding focus, or 0 if no focus.
     DisplayObject* _currentFocus;
