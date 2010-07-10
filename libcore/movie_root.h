@@ -147,8 +147,10 @@ struct DepthComparator
 /// The _root object is provided by getAsRoot().
 class DSOEXPORT movie_root : boost::noncopyable
 {
-
 public:
+    
+    /// Listeners container
+    typedef std::list<InteractiveObject*> Listeners;
 
     class LoadCallback {
     public:
@@ -465,13 +467,13 @@ public:
     DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
     /// Push a new DisplayObject listener for key events
-    void add_key_listener(DisplayObject* listener)
+    void add_key_listener(InteractiveObject* listener)
     {
         add_listener(_keyListeners, listener);
     }
 
     /// Remove a DisplayObject listener for key events
-    void remove_key_listener(DisplayObject* listener)
+    void remove_key_listener(InteractiveObject* listener)
     {
         remove_listener(_keyListeners, listener);
     }
@@ -480,13 +482,13 @@ public:
     DSOEXPORT void notify_mouse_listeners(const event_id& event);
 
     /// Push a new DisplayObject listener for mouse events
-    void add_mouse_listener(DisplayObject* listener)
+    void add_mouse_listener(InteractiveObject* listener)
     {
         add_listener(_mouseListeners, listener);
     }
 
     /// Remove a DisplayObject listener for mouse events
-    void remove_mouse_listener(DisplayObject* listener)
+    void remove_mouse_listener(InteractiveObject* listener)
     {
         remove_listener(_mouseListeners, listener);
     }
@@ -991,9 +993,6 @@ private:
     /// Registered FsCommand handler, if any
     AbstractFsCallback* _fsCommandHandler;
 
-    /// Listeners container
-    typedef std::list<DisplayObject*> Listeners;
-
     /// Take care of dragging, if needed
     void doMouseDrag();
 
@@ -1024,10 +1023,10 @@ private:
 
     /// Push a DisplayObject listener to the front of given container, if not
     /// already present
-    static void add_listener(Listeners& ll, DisplayObject* elem);
+    static void add_listener(Listeners& ll, InteractiveObject* elem);
 
     /// Remove a listener from the list
-    static void remove_listener(Listeners& ll, DisplayObject* elem);
+    static void remove_listener(Listeners& ll, InteractiveObject* elem);
 
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for

@@ -644,12 +644,12 @@ movie_root::mouseClick(bool mouse_pressed)
 {
     assert(testInvariant());
 
+    _mouseButtonState.isDown = mouse_pressed;
+
     if (mouse_pressed) {
-        _mouseButtonState.isDown = true;
         notify_mouse_listeners(event_id(event_id::MOUSE_DOWN));
     }
     else {
-        _mouseButtonState.isDown = false;
         notify_mouse_listeners(event_id(event_id::MOUSE_UP));
     }
 
@@ -1056,7 +1056,7 @@ movie_root::notify_key_listeners(key::code k, bool down)
 }
 
 void
-movie_root::add_listener(Listeners& ll, DisplayObject* listener)
+movie_root::add_listener(Listeners& ll, InteractiveObject* listener)
 {
     assert(listener);
 
@@ -1068,10 +1068,10 @@ movie_root::add_listener(Listeners& ll, DisplayObject* listener)
 
 
 void
-movie_root::remove_listener(Listeners& ll, DisplayObject* listener)
+movie_root::remove_listener(Listeners& ll, InteractiveObject* listener)
 {
     assert(listener);
-    ll.remove_if(std::bind2nd(std::equal_to<DisplayObject*>(), listener));
+    ll.remove_if(std::bind2nd(std::equal_to<InteractiveObject*>(), listener));
 }
 
 void
@@ -1082,10 +1082,9 @@ movie_root::notify_mouse_listeners(const event_id& event)
     for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
             iter != itEnd; ++iter)
     {
-        DisplayObject* const ch = *iter;
-        if (!ch->unloaded())
-        {
-            ch->notifyEvent(event);
+        InteractiveObject* const ch = *iter;
+        if (!ch->unloaded()) {
+            ch->mouseEvent(event);
         }
     }
 
@@ -1813,7 +1812,7 @@ movie_root::markReachableResources() const
     // NOTE: cleanupUnloadedListeners() should have cleaned up all unloaded
     // key listeners. The remaining ones should be marked by their parents
 #if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
-    for (LiveChars::const_iterator i=_keyListeners.begin(),
+    for (Listeners::const_iterator i=_keyListeners.begin(),
             e=_keyListeners.end(); i!=e; ++i) {
 #ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
         (*i)->setReachable();
@@ -1827,7 +1826,7 @@ movie_root::markReachableResources() const
     // unloaded mouse listeners. The remaining ones should be marked by
     // their parents
 #if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
-    for (LiveChars::const_iterator i = _mouseListeners.begin(),
+    for (Listeners::const_iterator i = _mouseListeners.begin(),
             e = _mouseListeners.end(); i!=e; ++i) {
 #ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
         (*i)->setReachable();
@@ -2536,7 +2535,6 @@ movie_root::testInvariant() const
 namespace {
 
 // Return whether any action triggered by this event requires display redraw.
-// See page about events_handling (in movie_interface.h)
 //
 /// TODO: make this code more readable !
 bool
