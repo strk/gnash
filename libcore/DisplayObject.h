@@ -575,18 +575,6 @@ public:
     ///
     virtual as_object* pathElement(string_table::key key);
 
-    /// Advance this DisplayObject to next frame.
-    //
-    /// Character advancement is only meaningful for sprites
-    /// and sprite containers (button DisplayObjects) because
-    /// sprites are the only DisplayObjects that have frames.
-    /// 
-    /// Frame advancement include execution of all control tags.
-    /// 
-    virtual void advance()
-    {
-    }
-
     /// \brief
     /// Return true if PlaceObjects tag are allowed to move
     /// this DisplayObject.

@@ -1054,13 +1054,6 @@ private:
     /// from the display lists
     void cleanupDisplayList();
 
-    /// Advance a live DisplayObject
-    //
-    /// @param ch
-    ///     The DisplayObject to advance, will NOT be advanced if unloaded
-    ///
-    static void advanceLiveChar(DisplayObject* ch);
-
     /// Advance all non-unloaded live chars
     void advanceLiveChars();
 

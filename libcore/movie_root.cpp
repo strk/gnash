@@ -91,6 +91,7 @@ namespace {
     bool generate_mouse_button_events(movie_root& mr, MouseButtonState& ms);
     const DisplayObject* getNearestObject(const DisplayObject* o);
     as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
+    void advanceLiveChar(MovieClip* ch);
 }
 
 // Utility classes
@@ -998,7 +999,7 @@ movie_root::cleanupUnloadedListeners(Listeners& ll)
       // remove unloaded DisplayObject listeners from movie_root
       for (Listeners::iterator iter = ll.begin(); iter != ll.end(); )
       {
-          DisplayObject* const ch = *iter;
+          InteractiveObject* const ch = *iter;
           if ( ch->unloaded() )
           {
             if ( ! ch->isDestroyed() )
@@ -2049,10 +2050,10 @@ movie_root::cleanupDisplayList()
 #endif
         needScan=false;
 
-        // Remove unloaded DisplayObjects from the _liveChars list
+        // Remove unloaded MovieClips from the _liveChars list
         for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
         {
-            DisplayObject* ch = *i;
+            MovieClip* ch = *i;
             if (ch->unloaded()) {
                 // the sprite might have been destroyed already
                 // by effect of an unload() call with no onUnload
@@ -2099,24 +2100,6 @@ movie_root::cleanupDisplayList()
     }
 #endif
 
-}
-
-void
-movie_root::advanceLiveChar(DisplayObject* ch)
-{
-    if (!ch->unloaded())
-    {
-#ifdef GNASH_DEBUG
-        log_debug("    advancing DisplayObject %s", ch->getTarget());
-#endif
-        ch->advance();
-    }
-#ifdef GNASH_DEBUG
-    else {
-        log_debug("    DisplayObject %s is unloaded, not advancing it",
-                ch->getTarget());
-    }
-#endif
 }
 
 void
@@ -2660,6 +2643,24 @@ getBuiltinObject(movie_root& mr, string_table::key cl)
     if (!gl.get_member(cl, &val)) return 0;
     return val.to_object(gl);
 }
+
+void
+advanceLiveChar(MovieClip* mo)
+{
+    if (!mo->unloaded()) {
+#ifdef GNASH_DEBUG
+        log_debug("    advancing DisplayObject %s", ch->getTarget());
+#endif
+        mo->advance();
+    }
+#ifdef GNASH_DEBUG
+    else {
+        log_debug("    DisplayObject %s is unloaded, not advancing it",
+                mo->getTarget());
+    }
+#endif
+}
+
 
 
 }

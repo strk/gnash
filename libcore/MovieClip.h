@@ -229,6 +229,9 @@ public:
         return _droptarget;
     }
     
+    /// Advance to the next frame of the MovieClip.
+    //
+    /// Actions will be executed or pushed to the queue as necessary.
     virtual void advance();
 
     /// Set the sprite state at the specified frame number.
