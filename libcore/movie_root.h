@@ -1141,7 +1141,6 @@ private:
     float m_timer;
     boost::int32_t _mouseX;
     boost::int32_t _mouseY;
-    bool _mouseDown;
 
     MouseButtonState  _mouseButtonState;
 

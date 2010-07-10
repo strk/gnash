@@ -127,7 +127,6 @@ movie_root::movie_root(const movie_definition& def,
     m_timer(0.0f),
     _mouseX(0),
     _mouseY(0),
-    _mouseDown(0),
     _lastTimerId(0),
     _lastKeyEvent(key::INVALID),
     _currentFocus(0),
@@ -645,13 +644,12 @@ movie_root::mouseClick(bool mouse_pressed)
 {
     assert(testInvariant());
 
-    //log_debug("Mouse click notification");
     if (mouse_pressed) {
-        _mouseDown = true;
+        _mouseButtonState.isDown = true;
         notify_mouse_listeners(event_id(event_id::MOUSE_DOWN));
     }
     else {
-        _mouseDown = false;
+        _mouseButtonState.isDown = false;
         notify_mouse_listeners(event_id(event_id::MOUSE_UP));
     }
 
@@ -671,7 +669,6 @@ movie_root::fire_mouse_event()
 
     // Generate a mouse event
     _mouseButtonState.topmostEntity = getTopmostMouseEntity(x, y);
-    _mouseButtonState.isDown = _mouseDown;
 
     // Set _droptarget if dragging a sprite
     MovieClip* dragging = 0;
