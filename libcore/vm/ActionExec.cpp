@@ -664,7 +664,7 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
     }
     
     _withStack.push_back(entry);
-    _scopeStack.push_back(const_cast<as_object*>(entry.object()));
+    _scopeStack.push_back(entry.object());
     return true;
 }
 

@@ -760,7 +760,7 @@ DisplayObject::markReachableResources() const
 //
 /// This depends on the useHandCursor AS property, but:
 /// 1. Only AS-referenceable objects may use a hand cursor (TODO: check
-///    Video).
+///    Video). 
 /// 2. Only objects with a release event may use a hand cursor.
 /// 3. The default value (if the property is not defined) is true.
 bool
@@ -771,10 +771,7 @@ DisplayObject::allowHandCursor() const
     if (!hasEventHandler(event_id::RELEASE)) return false;
 
     as_value val;
-    // const_cast needed due to get_member being non-const due to the 
-    // possibility that a getter-setter would actually modify us ...
-    if (!getObject(const_cast<DisplayObject*>(this))->get_member(
-                NSV::PROP_USEHANDCURSOR, &val)) {
+    if (!getObject(this)->get_member(NSV::PROP_USEHANDCURSOR, &val)) {
          return true;
     }
     return val.to_bool();
