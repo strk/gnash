@@ -17,9 +17,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "Sound_as.h"
+
+#include <string>
+#include <boost/scoped_ptr.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/cstdint.hpp>
 
 #include "RunResources.h"
-#include "Sound_as.h"
 #include "log.h"
 #include "sound_handler.h"
 #include "AudioDecoder.h"
@@ -36,9 +42,8 @@
 #include "VM.h"
 #include "namedStrings.h"
 #include "StreamProvider.h"
-
-#include <string>
-
+#include "ObjectURI.h"
+#include "Relay.h"
 
 
 namespace gnash {
@@ -67,6 +72,158 @@ namespace {
     as_value sound_ctor(const fn_call& fn);
     void attachSoundInterface(as_object& o);
 }
+
+/// A Sound object in ActionScript can control and play sound
+//
+/// Two types of sound are handled:
+///
+/// 1. external sounds, either loaded or streamed
+/// 2. embedded sounds, referenced by library (export) symbol.
+//
+/// Sound objects also control volume, pan, and other properties for a target
+/// movieclip.
+class Sound_as : public ActiveRelay
+{
+
+public:
+
+    Sound_as(as_object* owner);
+    
+    ~Sound_as();
+    
+    /// Make this sound control the given DisplayObject
+    //
+    /// NOTE: 0 is accepted, to implement an "invalid"
+    ///       controller type.
+    ///
+    void attachCharacter(DisplayObject* attachedChar);
+
+    void attachSound(int si, const std::string& name);
+
+    /// Get number of bytes loaded from the external sound (if any)
+    long getBytesLoaded();
+
+    /// Whether the Sound_as has any sound data
+    bool active() const {
+        return soundId >= 0 || isStreaming;
+    }
+
+    /// Get total number of bytes in the external sound being loaded
+    //
+    /// @return -1 if unknown
+    ///
+    long getBytesTotal();
+
+    void getPan();
+    void getTransform();
+
+    /// Get volume from associated resource
+    //
+    /// @return true of volume was obtained, false
+    ///         otherwise (for example if the associated
+    ///         DisplayObject was unloaded).
+    ///
+    bool getVolume(int& volume);
+    void setVolume(int volume);
+
+    void loadSound(const std::string& file, bool streaming);
+    void setPan();
+    void setTransform();
+    void start(double secsStart, int loops);
+    void stop(int si);
+    unsigned int getDuration();
+    unsigned int getPosition();
+
+    std::string soundName;  
+
+private:
+
+#ifdef GNASH_USE_GC
+    /// Mark all reachable resources of a Sound, for the GC
+    //
+    /// Reachable resources are:
+    /// - attached DisplayObject object (attachedCharacter)
+    ///
+    void markReachableResources() const;
+#endif // GNASH_USE_GC
+
+    bool _duration;
+    bool _id3;
+    bool _onID3;
+    bool _onLoad;
+    bool _onComplete;
+    bool _position;
+
+    boost::scoped_ptr<CharacterProxy> _attachedCharacter;
+    int soundId;
+    bool externalSound;
+    std::string externalURL;
+    bool isStreaming;
+
+    sound::sound_handler* _soundHandler;
+
+    media::MediaHandler* _mediaHandler;
+
+    boost::scoped_ptr<media::MediaParser> _mediaParser;
+
+    boost::scoped_ptr<media::AudioDecoder> _audioDecoder;
+
+    /// Number of milliseconds into the sound to start it
+    //
+    /// This is set by start()
+    boost::uint64_t _startTime;
+
+    boost::scoped_array<boost::uint8_t> _leftOverData;
+    boost::uint8_t* _leftOverPtr;
+    boost::uint32_t _leftOverSize;
+
+    /// This is a sound_handler::aux_streamer_ptr type.
+    static unsigned int getAudioWrapper(void *owner, boost::int16_t* samples,
+            unsigned int nSamples, bool& etEOF);
+
+    unsigned int getAudio(boost::int16_t* samples, unsigned int nSamples,
+            bool& atEOF);
+
+    /// The aux streamer for sound handler
+    sound::InputStream* _inputStream;
+
+    int remainingLoops;
+
+    /// Query media parser for audio info, create decoder and attach aux streamer
+    /// if found.
+    ///
+    /// @return  an InputStream* if audio found and aux streamer attached,
+    ///          0 if no audio found.
+    ///
+    /// May throw a MediaException if audio was found but
+    /// audio decoder could not be created
+    /// 
+    sound::InputStream* attachAuxStreamerIfNeeded();
+
+    /// Register a timer for audio info probing
+    void startProbeTimer();
+
+    /// Unregister the probe timer
+    void stopProbeTimer();
+
+    virtual void update();
+
+    /// Probe audio
+    void probeAudio();
+
+    bool _soundCompleted;
+
+    boost::mutex _soundCompletedMutex;
+
+    /// Thread-safe setter for _soundCompleted
+    void markSoundCompleted(bool completed);
+    
+    // Does this sound have a live input stream?
+    bool isAttached() const {
+        return (_inputStream);
+    }
+
+};
 
 Sound_as::Sound_as(as_object* owner) 
     :
