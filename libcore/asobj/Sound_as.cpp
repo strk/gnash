@@ -175,9 +175,6 @@ private:
 
     void markReachableResources() const;
 
-    bool _duration;
-    bool _position;
-
     boost::scoped_ptr<CharacterProxy> _attachedCharacter;
     int soundId;
     bool externalSound;
