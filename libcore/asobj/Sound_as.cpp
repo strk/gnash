@@ -82,6 +82,14 @@ namespace {
 //
 /// Sound objects also control volume, pan, and other properties for a target
 /// movieclip.
+//
+/// Sound_as objects
+//
+/// 1. May be associated with a particular DisplayObject.
+/// 2. May be associated with one or more playing sounds.
+//
+/// A Sound_as that is not associated with a particular DisplayObject controls
+/// the sound properties of the whole Movie.
 class Sound_as : public ActiveRelay
 {
 
@@ -100,21 +108,31 @@ public:
 
     void attachSound(int si, const std::string& name);
 
-    /// Get number of bytes loaded from the external sound (if any)
+    /// Get number of bytes loaded.
+    //
+    /// This only applies to external sounds. If unknown or not external, -1
+    /// is returned.
     long getBytesLoaded();
+
+    /// Get total number of bytes in the external sound being loaded
+    //
+    /// This only applies to external sounds. If unknown or not external, -1
+    /// is returned.
+    long getBytesTotal();
 
     /// Whether the Sound_as has any sound data
     bool active() const {
         return soundId >= 0 || isStreaming;
     }
 
-    /// Get total number of bytes in the external sound being loaded
+    /// Get the pan setting of the attached DisplayObject.
     //
-    /// @return -1 if unknown
-    ///
-    long getBytesTotal();
-
+    /// If no object is attached, this retrieves settings for the whole Movie.
     void getPan();
+
+    /// Get the sound transform of the attached DisplayObject.
+    //
+    /// If no object is attached, this retrieves settings for the whole Movie.
     void getTransform();
 
     /// Get volume from associated resource
@@ -126,26 +144,36 @@ public:
     bool getVolume(int& volume);
     void setVolume(int volume);
 
+    /// Load an external sound.
+    //
+    /// The Sound object is then associated with the external sound.
     void loadSound(const std::string& file, bool streaming);
+
     void setPan();
+
     void setTransform();
+
     void start(double secsStart, int loops);
+
     void stop(int si);
-    unsigned int getDuration();
-    unsigned int getPosition();
+
+    /// Get the duration of the sound.
+    //
+    /// This is only meaningful when the Sound_as object has an associated
+    /// sound, that is after attachSound or loadSound has been called.
+    size_t getDuration() const;
+
+    /// Get the position within the sound.
+    //
+    /// This is only meaningful when the Sound_as object has an associated
+    /// sound, that is after attachSound or loadSound has been called.
+    size_t getPosition() const;
 
     std::string soundName;  
 
 private:
 
-#ifdef GNASH_USE_GC
-    /// Mark all reachable resources of a Sound, for the GC
-    //
-    /// Reachable resources are:
-    /// - attached DisplayObject object (attachedCharacter)
-    ///
     void markReachableResources() const;
-#endif // GNASH_USE_GC
 
     bool _duration;
     bool _id3;
@@ -695,8 +723,8 @@ Sound_as::stop(int si)
     }
 }
 
-unsigned int
-Sound_as::getDuration()
+size_t
+Sound_as::getDuration() const
 {
     if ( ! _soundHandler ) {
         log_error("No sound handler, can't check duration...");
@@ -720,8 +748,8 @@ Sound_as::getDuration()
     return 0;
 }
 
-unsigned int
-Sound_as::getPosition()
+size_t
+Sound_as::getPosition() const
 {
     if (!_soundHandler) {
         log_error("No sound handler, can't check position (we're "
