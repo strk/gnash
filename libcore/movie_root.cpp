@@ -976,7 +976,8 @@ movie_root::display()
 
 
 
-void movie_root::cleanupUnloadedListeners(Listeners& ll)
+void
+movie_root::cleanupUnloadedListeners(Listeners& ll)
 {
     bool needScan;
 
@@ -1033,7 +1034,7 @@ movie_root::notify_key_listeners(key::code k, bool down)
             iter != itEnd; ++iter)
     {
         // sprite, button & input_edit_text DisplayObjects
-        DisplayObject* const ch = *iter;
+        InteractiveObject* const ch = *iter;
         if (!ch->unloaded()) {
             if (down) {
                 // KEY_UP and KEY_DOWN events are unrelated to any key!
