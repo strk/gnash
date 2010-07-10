@@ -138,6 +138,10 @@ add_button(SWFMovie mo)
 		"	_root.msg='ReleaseOutside';"
 		"	gotoAndStop(1);"
 		"};"
+        "_root.onMouseWheel = function(delta, t) {"
+        "    _root.note('onMouseWheel: ' + delta + ', ' +  t);"
+        "};"
+        "Mouse.addListener(_root);"
 		"stop();"
 	));
 

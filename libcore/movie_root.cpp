@@ -627,9 +627,16 @@ movie_root::mouseWheel(int delta)
 {
     as_object* mouseObj = getBuiltinObject(*this, NSV::CLASS_MOUSE);
     if (!mouseObj) return false;
+    
+    const boost::int32_t x = pixelsToTwips(_mouseX);
+    const boost::int32_t y = pixelsToTwips(_mouseY);
 
+    DisplayObject* i = getTopmostMouseEntity(x, y);
+
+    // Always called with two arguments.
     callMethod(mouseObj, NSV::PROP_BROADCAST_MESSAGE, "onMouseWheel",
-            delta);
+            delta, i ? getObject(i) : as_value());
+
     return true;
 }
 
