@@ -147,8 +147,10 @@ struct DepthComparator
 /// The _root object is provided by getAsRoot().
 class DSOEXPORT movie_root : boost::noncopyable
 {
-
 public:
+    
+    /// Listeners container
+    typedef std::list<InteractiveObject*> Listeners;
 
     class LoadCallback {
     public:
@@ -466,31 +468,19 @@ public:
     DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
     /// Push a new DisplayObject listener for key events
-    void add_key_listener(DisplayObject* listener)
+    void add_key_listener(InteractiveObject* listener)
     {
         add_listener(_keyListeners, listener);
     }
 
     /// Remove a DisplayObject listener for key events
-    void remove_key_listener(DisplayObject* listener)
+    void remove_key_listener(InteractiveObject* listener)
     {
         remove_listener(_keyListeners, listener);
     }
 
     /// Notify still loaded DisplayObject listeners for mouse events
     DSOEXPORT void notify_mouse_listeners(const event_id& event);
-
-    /// Push a new DisplayObject listener for mouse events
-    void add_mouse_listener(DisplayObject* listener)
-    {
-        add_listener(_mouseListeners, listener);
-    }
-
-    /// Remove a DisplayObject listener for mouse events
-    void remove_mouse_listener(DisplayObject* listener)
-    {
-        remove_listener(_mouseListeners, listener);
-    }
 
     /// Get the DisplayObject having focus
     //
@@ -598,7 +588,6 @@ public:
     /// Gets the current Access Mode for ExternalInterface.
     AllowScriptAccessMode getAllowScriptAccess();
 
-
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
     /// Returns the current alignment of the stage (left/right/centre, top/
@@ -667,7 +656,6 @@ public:
     /// - Timer targets (_intervalTimers)
     /// - Resources reachable by ActionQueue code (_actionQueue)
     /// - Key listeners (_keyListeners)
-    /// - Mouse listeners (_mouseListeners)
     /// - Any DisplayObject being dragged 
     ///
     void markReachableResources() const;
@@ -681,7 +669,7 @@ public:
     /// its turn comes. Characters are advanced in reverse-placement
     /// order (first registered is advanced last)
     ///
-    void addLiveChar(DisplayObject* ch)
+    void addLiveChar(MovieClip* ch)
     {
         // Don't register the object in the list twice 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -992,9 +980,6 @@ private:
     /// Registered FsCommand handler, if any
     AbstractFsCallback* _fsCommandHandler;
 
-    /// Listeners container
-    typedef std::list<DisplayObject*> Listeners;
-
     /// Take care of dragging, if needed
     void doMouseDrag();
 
@@ -1014,7 +999,6 @@ private:
     void cleanupUnloadedListeners()
     {
         cleanupUnloadedListeners(_keyListeners);
-        cleanupUnloadedListeners(_mouseListeners);
     }
 
     /// Erase unloaded DisplayObjects from the given listeners list
@@ -1025,10 +1009,10 @@ private:
 
     /// Push a DisplayObject listener to the front of given container, if not
     /// already present
-    static void add_listener(Listeners& ll, DisplayObject* elem);
+    static void add_listener(Listeners& ll, InteractiveObject* elem);
 
     /// Remove a listener from the list
-    static void remove_listener(Listeners& ll, DisplayObject* elem);
+    static void remove_listener(Listeners& ll, InteractiveObject* elem);
 
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
@@ -1056,13 +1040,6 @@ private:
     /// Delete DisplayObjects removed from the stage
     /// from the display lists
     void cleanupDisplayList();
-
-    /// Advance a live DisplayObject
-    //
-    /// @param ch
-    ///     The DisplayObject to advance, will NOT be advanced if unloaded
-    ///
-    static void advanceLiveChar(DisplayObject* ch);
 
     /// Advance all non-unloaded live chars
     void advanceLiveChars();
@@ -1108,17 +1085,17 @@ private:
             DisplayObject* dragging) const;
 
     void handleActionLimitHit(const std::string& ref);
+
     /// A list of AdvanceableCharacters
     //
     /// This is a list (not a vector) as we want to allow
     /// ::advance of each element to insert new DisplayObjects before
     /// the start w/out invalidating iterators scanning the
     /// list forward for proper movie advancement
-    typedef std::list<DisplayObject*> LiveChars;
+    typedef std::list<MovieClip*> LiveChars;
 
     /// The list of advanceable DisplayObject, in placement order
     LiveChars _liveChars;
-
 
     /// A number of queues of code to execute
     //
@@ -1142,7 +1119,6 @@ private:
     float m_timer;
     boost::int32_t _mouseX;
     boost::int32_t _mouseY;
-    bool _mouseDown;
 
     MouseButtonState  _mouseButtonState;
 
@@ -1165,9 +1141,6 @@ private:
 
     /// Characters for listening key events
     Listeners _keyListeners;
-
-    /// Objects listening for mouse events (down,up,move)
-    Listeners _mouseListeners;
 
     /// The DisplayObject currently holding focus, or 0 if no focus.
     DisplayObject* _currentFocus;

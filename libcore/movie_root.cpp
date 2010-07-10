@@ -91,6 +91,7 @@ namespace {
     bool generate_mouse_button_events(movie_root& mr, MouseButtonState& ms);
     const DisplayObject* getNearestObject(const DisplayObject* o);
     as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
+    void advanceLiveChar(MovieClip* ch);
 }
 
 // Utility classes
@@ -127,7 +128,6 @@ movie_root::movie_root(const movie_definition& def,
     m_timer(0.0f),
     _mouseX(0),
     _mouseY(0),
-    _mouseDown(0),
     _lastTimerId(0),
     _lastKeyEvent(key::INVALID),
     _currentFocus(0),
@@ -531,7 +531,6 @@ movie_root::clear()
 
     // remove key/mouse listeners
     _keyListeners.clear();
-    _mouseListeners.clear();
 
     // Cleanup the stack.
     _vm.getStack().clear();
@@ -645,13 +644,12 @@ movie_root::mouseClick(bool mouse_pressed)
 {
     assert(testInvariant());
 
-    //log_debug("Mouse click notification");
+    _mouseButtonState.isDown = mouse_pressed;
+
     if (mouse_pressed) {
-        _mouseDown = true;
         notify_mouse_listeners(event_id(event_id::MOUSE_DOWN));
     }
     else {
-        _mouseDown = false;
         notify_mouse_listeners(event_id(event_id::MOUSE_UP));
     }
 
@@ -671,7 +669,6 @@ movie_root::fire_mouse_event()
 
     // Generate a mouse event
     _mouseButtonState.topmostEntity = getTopmostMouseEntity(x, y);
-    _mouseButtonState.isDown = _mouseDown;
 
     // Set _droptarget if dragging a sprite
     MovieClip* dragging = 0;
@@ -979,7 +976,8 @@ movie_root::display()
 
 
 
-void movie_root::cleanupUnloadedListeners(Listeners& ll)
+void
+movie_root::cleanupUnloadedListeners(Listeners& ll)
 {
     bool needScan;
 
@@ -1000,7 +998,7 @@ void movie_root::cleanupUnloadedListeners(Listeners& ll)
       // remove unloaded DisplayObject listeners from movie_root
       for (Listeners::iterator iter = ll.begin(); iter != ll.end(); )
       {
-          DisplayObject* const ch = *iter;
+          InteractiveObject* const ch = *iter;
           if ( ch->unloaded() )
           {
             if ( ! ch->isDestroyed() )
@@ -1036,7 +1034,7 @@ movie_root::notify_key_listeners(key::code k, bool down)
             iter != itEnd; ++iter)
     {
         // sprite, button & input_edit_text DisplayObjects
-        DisplayObject* const ch = *iter;
+        InteractiveObject* const ch = *iter;
         if (!ch->unloaded()) {
             if (down) {
                 // KEY_UP and KEY_DOWN events are unrelated to any key!
@@ -1059,7 +1057,7 @@ movie_root::notify_key_listeners(key::code k, bool down)
 }
 
 void
-movie_root::add_listener(Listeners& ll, DisplayObject* listener)
+movie_root::add_listener(Listeners& ll, InteractiveObject* listener)
 {
     assert(listener);
 
@@ -1071,24 +1069,23 @@ movie_root::add_listener(Listeners& ll, DisplayObject* listener)
 
 
 void
-movie_root::remove_listener(Listeners& ll, DisplayObject* listener)
+movie_root::remove_listener(Listeners& ll, InteractiveObject* listener)
 {
     assert(listener);
-    ll.remove_if(std::bind2nd(std::equal_to<DisplayObject*>(), listener));
+    ll.remove_if(std::bind2nd(std::equal_to<InteractiveObject*>(), listener));
 }
 
 void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
 
-    Listeners copy = _mouseListeners;
-    for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
+    LiveChars copy = _liveChars;
+    for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
             iter != itEnd; ++iter)
     {
-        DisplayObject* const ch = *iter;
-        if (!ch->unloaded())
-        {
-            ch->notifyEvent(event);
+        MovieClip* const ch = *iter;
+        if (!ch->unloaded()) {
+            ch->mouseEvent(event);
         }
     }
 
@@ -1816,22 +1813,8 @@ movie_root::markReachableResources() const
     // NOTE: cleanupUnloadedListeners() should have cleaned up all unloaded
     // key listeners. The remaining ones should be marked by their parents
 #if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
-    for (LiveChars::const_iterator i=_keyListeners.begin(),
+    for (Listeners::const_iterator i=_keyListeners.begin(),
             e=_keyListeners.end(); i!=e; ++i) {
-#ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
-        (*i)->setReachable();
-#else
-        assert((*i)->isReachable());
-#endif
-    }
-#endif
-
-    // NOTE: cleanupUnloadedListeners() should have cleaned up all
-    // unloaded mouse listeners. The remaining ones should be marked by
-    // their parents
-#if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
-    for (LiveChars::const_iterator i = _mouseListeners.begin(),
-            e = _mouseListeners.end(); i!=e; ++i) {
 #ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
         (*i)->setReachable();
 #else
@@ -2052,10 +2035,10 @@ movie_root::cleanupDisplayList()
 #endif
         needScan=false;
 
-        // Remove unloaded DisplayObjects from the _liveChars list
+        // Remove unloaded MovieClips from the _liveChars list
         for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
         {
-            DisplayObject* ch = *i;
+            MovieClip* ch = *i;
             if (ch->unloaded()) {
                 // the sprite might have been destroyed already
                 // by effect of an unload() call with no onUnload
@@ -2102,24 +2085,6 @@ movie_root::cleanupDisplayList()
     }
 #endif
 
-}
-
-void
-movie_root::advanceLiveChar(DisplayObject* ch)
-{
-    if (!ch->unloaded())
-    {
-#ifdef GNASH_DEBUG
-        log_debug("    advancing DisplayObject %s", ch->getTarget());
-#endif
-        ch->advance();
-    }
-#ifdef GNASH_DEBUG
-    else {
-        log_debug("    DisplayObject %s is unloaded, not advancing it",
-                ch->getTarget());
-    }
-#endif
 }
 
 void
@@ -2539,7 +2504,6 @@ movie_root::testInvariant() const
 namespace {
 
 // Return whether any action triggered by this event requires display redraw.
-// See page about events_handling (in movie_interface.h)
 //
 /// TODO: make this code more readable !
 bool
@@ -2664,6 +2628,24 @@ getBuiltinObject(movie_root& mr, string_table::key cl)
     if (!gl.get_member(cl, &val)) return 0;
     return val.to_object(gl);
 }
+
+void
+advanceLiveChar(MovieClip* mo)
+{
+    if (!mo->unloaded()) {
+#ifdef GNASH_DEBUG
+        log_debug("    advancing DisplayObject %s", ch->getTarget());
+#endif
+        mo->advance();
+    }
+#ifdef GNASH_DEBUG
+    else {
+        log_debug("    DisplayObject %s is unloaded, not advancing it",
+                mo->getTarget());
+    }
+#endif
+}
+
 
 
 }

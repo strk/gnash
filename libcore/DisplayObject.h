@@ -249,13 +249,13 @@ public:
 
     int get_depth() const { return _depth; }
 
-    void  set_depth(int d) { _depth = d; }
+    void set_depth(int d) { _depth = d; }
 
     /// Get sound volume for this DisplayObject
     int getVolume() const { return _volume; }
 
     /// Set sound volume for this DisplayObject
-    void setVolume(int vol) { _volume=vol; }
+    void setVolume(int vol) { _volume = vol; }
 
     /// Get concatenated sound volume for this DisplayObject
     //
@@ -281,7 +281,7 @@ public:
     /// @param updateCache if true, updates the cache values
     ///        from the SWFMatrix (only if SWFMatrix != current SWFMatrix)
     ///
-    void setMatrix(const SWFMatrix& m, bool updateCache=false);
+    void setMatrix(const SWFMatrix& m, bool updateCache = false);
 
     /// Set the xscale value of current SWFMatrix
     //
@@ -338,12 +338,6 @@ public:
             m_color_transform = cx;
         }
     }
-
-    void concatenate_cxform(const cxform& cx) {
-        m_color_transform.concatenate(cx);
-    }
-
-    void concatenateMatrix(const SWFMatrix& m) { m_matrix.concatenate(m); }
 
     int get_ratio() const { return m_ratio; }
 
@@ -412,13 +406,6 @@ public:
     /// being a mask for anything else.
     ///
     void setMask(DisplayObject* mask);
-
-    /// Returns true if this DisplayObject is a mask (either layer or
-    /// dynamic mask)
-    bool isMask() const
-    {
-        return isDynamicMask() || isMaskLayer();
-    }
 
     /// Set DisplayObject name, initializing the original target member
     void set_name(string_table::key name) {
@@ -529,8 +516,8 @@ public:
     ///
     virtual bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
     {
-        if ( ! visible() ) return false;
-        if ( isMask() ) return false;
+        if (!visible()) return false;
+        if (isDynamicMask() || isMaskLayer()) return false;
         return pointInShape(x, y);
     }
 
@@ -574,18 +561,6 @@ public:
     /// INSENSITIVE.
     ///
     virtual as_object* pathElement(string_table::key key);
-
-    /// Advance this DisplayObject to next frame.
-    //
-    /// Character advancement is only meaningful for sprites
-    /// and sprite containers (button DisplayObjects) because
-    /// sprites are the only DisplayObjects that have frames.
-    /// 
-    /// Frame advancement include execution of all control tags.
-    /// 
-    virtual void advance()
-    {
-    }
 
     /// \brief
     /// Return true if PlaceObjects tag are allowed to move

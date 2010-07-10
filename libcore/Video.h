@@ -63,9 +63,6 @@ public:
 
 	virtual SWFRect getBounds() const;
 
-	/// We use the call to ::advance to properly set invalidated status
-	virtual void advance();
-
 	/// Register this video instance as a live DisplayObject
 	virtual void construct(as_object* init = 0);
 

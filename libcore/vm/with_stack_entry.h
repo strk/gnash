@@ -43,17 +43,12 @@ public:
 	{
 	}
 
-	size_t end_pc()
+	size_t end_pc() const
 	{
 		return _block_end_pc;
 	}
 
-	const as_object* object() const
-	{
-		return _object;
-	}
-
-	as_object* object() 
+	as_object* object() const
 	{
 		return _object;
 	}

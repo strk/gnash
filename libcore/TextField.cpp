@@ -2603,11 +2603,6 @@ bool
 TextField::handleFocus()
 {
 
-    // despite the swfdec suggestions, the simpleguess.swf
-    // testcase (real case, SWF4) only works with TextField
-    // accepting focus
-    //if (getSWFVersion(*getObject(this)) < 6) return false;
-
     set_invalidated();
 
     /// Select the entire text on focus.

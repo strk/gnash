@@ -243,20 +243,8 @@ Video::construct(as_object* /*init*/)
 {
     // For soft references.
     saveOriginalTarget();
-
-    // Register this video instance as a live DisplayObject
-    stage().addLiveChar(this);
 }
 
-
-void
-Video::advance()
-{
-	if (_ns) {
-        // NOTE: only needed for gstreamer:
-		if (_ns->newFrameReady()) set_invalidated();
-	}
-}
 
 void
 Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)

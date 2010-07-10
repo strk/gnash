@@ -381,7 +381,6 @@ MovieClip::~MovieClip()
     stopStreamSound();
 
     stage().remove_key_listener(this);
-    stage().remove_mouse_listener(this);
 
     deleteChecked(_loadVariableRequests.begin(), _loadVariableRequests.end());
 }
@@ -1720,7 +1719,6 @@ void
 MovieClip::registerAsListener()
 {
     stage().add_key_listener(this);
-    stage().add_mouse_listener(this);
 }
 
 void
