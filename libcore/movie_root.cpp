@@ -1080,11 +1080,11 @@ void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
 
-    Listeners copy = _mouseListeners;
-    for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
+    LiveChars copy = _liveChars;
+    for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
             iter != itEnd; ++iter)
     {
-        InteractiveObject* const ch = *iter;
+        MovieClip* const ch = *iter;
         if (!ch->unloaded()) {
             ch->mouseEvent(event);
         }
