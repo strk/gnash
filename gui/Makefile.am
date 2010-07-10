@@ -85,6 +85,7 @@ GTK_LIBS =  \
 	$(ATK_LIBS) \
 	$(GLIB_LIBS) \
 	$(EXPAT_LIBS) \
+	$(X11_LIBS) \
 	$(Z_LIBS)
 
 DUMP_CFLAGS =
