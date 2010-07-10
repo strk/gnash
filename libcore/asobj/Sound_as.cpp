@@ -176,10 +176,6 @@ private:
     void markReachableResources() const;
 
     bool _duration;
-    bool _id3;
-    bool _onID3;
-    bool _onLoad;
-    bool _onComplete;
     bool _position;
 
     boost::scoped_ptr<CharacterProxy> _attachedCharacter;
