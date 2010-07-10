@@ -74,7 +74,6 @@ EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
         envelopes(env),
         current_env(0),
         _samplesFetched(0),
-
         _decoder(0),
         _soundDef(soundData),
         _decodedData(0)
@@ -192,6 +191,7 @@ EmbedSoundInst::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 
                 // Start next loop
                 playbackPosition = _inPoint; 
+                _samplesFetched = 0;
 
                 continue;
             }

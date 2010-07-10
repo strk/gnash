@@ -113,9 +113,9 @@ xcheck_equals(typeof(s1.checkPolicyFile), 'boolean');
 
 // The following are undefined in SWF5..SWF8, chances are
 // some ASSetPropFlag to drop SWF9-only flag would expose
-xcheck_equals(typeof(s1.duration), 'undefined');
+check_equals(typeof(s1.duration), 'undefined');
 check_equals(typeof(s1.ID3), 'undefined');
-xcheck_equals(typeof(s1.position), 'undefined');
+check_equals(typeof(s1.position), 'undefined');
 
 
 //
@@ -137,9 +137,9 @@ xcheck_equals(typeof(s2.checkPolicyFile), 'boolean');
 
 // The following are undefined in SWF5..SWF8, chances are
 // some ASSetPropFlag to drop SWF9-only flag would expose
-xcheck_equals(typeof(s2.duration), 'undefined');
+check_equals(typeof(s2.duration), 'undefined');
 check_equals(typeof(s2.ID3), 'undefined');
-xcheck_equals(typeof(s2.position), 'undefined');
+check_equals(typeof(s2.position), 'undefined');
 
 // this is still valid, altought getVolume would return undefined
 s3 = new Sound(33);
@@ -254,7 +254,7 @@ stop();
 
 check_equals(typeof(s.getBytesLoaded()), "undefined");
 check_equals(typeof(s.getBytesTotal()), "undefined");
-xcheck_equals(typeof(s.duration), "undefined");
+check_equals(typeof(s.duration), "undefined");
 check_equals(typeof(s.getPosition()), "undefined");
 check_equals(typeof(s.getDuration()), "undefined");
 
@@ -264,9 +264,9 @@ s.loadSound(MEDIA(sound1.mp3), true);
 
 check_equals(typeof(s.getBytesTotal()), "number");
 check_equals(typeof(s.getBytesLoaded()), "number");
-xcheck_equals(typeof(s.getPosition()), "number");
+check_equals(typeof(s.getPosition()), "number");
 check_equals(typeof(s.duration), "number");
-xcheck_equals(typeof(s.getDuration()), "number");
+check_equals(typeof(s.getDuration()), "number");
 
 //s.loadSound(MEDIA(brokenchord.wav), true); 
 

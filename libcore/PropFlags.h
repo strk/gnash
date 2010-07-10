@@ -47,9 +47,6 @@ public:
 		/// Protect from assigning a value
 		readOnly	= 1 << 2, // 4
 
-		/// Flags are protected from changes
-		isProtected	= 1 << 4, // 16
-
 		/// Only visible by VM initialized for version 6 or higher 
 		onlySWF6Up 	= 1 << 7, // 128
 
@@ -163,11 +160,6 @@ public:
 	/// accesor to the numerical flags value
 	int get_flags() const { return _flags; }
 
-	/// Get "protected" flag
-	bool get_is_protected() const {
-        return (_flags & isProtected);
-    }
-
 	/// set the numerical flags value (return the new value )
 	/// If unlocked is false, you cannot un-protect from over-write,
 	/// you cannot un-protect from deletion and you cannot
@@ -183,11 +175,8 @@ public:
 	///
 	bool set_flags(const int setTrue, const int setFalse = 0)
 	{
-		if (get_is_protected()) return false;
-
 		_flags &= ~setFalse;
 		_flags |= setTrue;
-
 		return true;
 	}
 };
@@ -199,7 +188,6 @@ operator << (std::ostream& os, const PropFlags& fl)
 	if ( fl.get_read_only() ) os << " readonly";
 	if ( fl.get_dont_delete() ) os << " nodelete";
 	if ( fl.get_dont_enum() ) os << " noenum";
-	if ( fl.get_is_protected() ) os << " protected";
 	os << " )";
 	// TODO: visibility flags
 	return os;

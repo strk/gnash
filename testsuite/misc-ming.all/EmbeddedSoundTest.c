@@ -132,7 +132,11 @@ main(int argc, char** argv)
     add_actions(mo, "d_soundComplete = 0;");
     add_actions(mo, "e_soundComplete = 0;");
 
-    add_actions(mo, "a = new Sound(); a.attachSound('mono22_mp2');");
+    add_actions(mo, "a = new Sound();");
+    check_equals(mo, "a.duration", "undefined");
+    add_actions(mo, "a.attachSound('mono22_mp2');");
+    check_equals(mo, "a.duration", "13740");
+
     add_actions(mo, "b = new Sound(); b.attachSound('mono22_mp2b');");
     add_actions(mo, "c = new Sound(); c.attachSound('stereo8_mp3');");
 
@@ -140,7 +144,6 @@ main(int argc, char** argv)
     add_actions(mo, "d = new Sound(); d.attachSound('stereo8_mp3b');");
     add_actions(mo, "e = new Sound(); e.attachSound('stereo8_mp3b');");
 
-    check_equals(mo, "a.duration", "13740");
     add_actions(mo, "check_equals(a.getBytesTotal(), undefined);");
     add_actions(mo, "check_equals(a.getBytesLoaded(), undefined);");
     add_actions(mo, "check_equals(a.id3, undefined);");

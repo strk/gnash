@@ -257,11 +257,6 @@ public:
     virtual bool set_member(const ObjectURI& uri, const as_value& val,
         bool ifFound = false);
 
-    /// Reserve a slot
-    ///
-    /// Reserves a slot for a property to follow.
-    void reserveSlot(const ObjectURI& uri, boost::uint16_t slotId);
-
     /// Initialize a member value by string
     //
     /// This is just a wrapper around the other init_member method
@@ -290,9 +285,6 @@ public:
     ///
     /// @param flags    Flags for the new member. By default dontDelete
     ///                 and dontEnum.
-    /// @param slotId   If this is a non-negative value which will fit in
-    ///                 an unsigned short, this is used as the slotId and
-    ///                 can be subsequently found with get_slot
     void init_member(const ObjectURI& uri, const as_value& val, 
         int flags = DefaultFlags);
 
