@@ -423,6 +423,12 @@ MovieTester::click()
 }
 
 void
+MovieTester::scrollMouse(int delta)
+{
+    if (_movie_root->mouseWheel(delta)) render();
+}
+
+void
 MovieTester::pressKey(key::code code)
 {
     if ( _movie_root->notify_key_event(code, true) ) {

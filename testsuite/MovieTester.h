@@ -216,6 +216,12 @@ public:
 	/// Simulate a mouse click (press and depress mouse button)
 	void click();
 
+    /// Simulate a mouse scroll.
+    //
+    /// The only values seen so far are -1 and 1, but documented to be
+    /// usually between -3 and 3. 1 is up, -1 is down.
+    void scrollMouse(int delta);
+
 	/// Notify key press
 	//
 	/// See key codes in namespace gnash::key (gnash.h)
