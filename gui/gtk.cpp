@@ -2524,20 +2524,16 @@ buttonPressEvent(GtkWidget *const /*widget*/, GdkEventButton *const event,
     GtkGui *obj = static_cast<GtkGui*>(data);
 
     obj->grabFocus();
-
-    int    mask = 1 << (event->button - 1);
-    obj->notify_mouse_clicked(true, mask);
+    obj->notifyMouseClick(true);
     return true;
 }
 
 gboolean
 buttonReleaseEvent(GtkWidget * const /*widget*/,
-     GdkEventButton * const event, const gpointer data)
+     GdkEventButton* const /*event*/, const gpointer data)
 {
     Gui *obj = static_cast<Gui*>(data);
-
-    int    mask = 1 << (event->button - 1);
-    obj->notify_mouse_clicked(false, mask);
+    obj->notifyMouseClick(false);
     return true;
 }
 
@@ -2547,7 +2543,7 @@ motionNotifyEvent(GtkWidget *const /*widget*/, GdkEventMotion *const event,
 {
     Gui *obj = static_cast<Gui *>(data);
 
-    obj->notify_mouse_moved(event->x, event->y);
+    obj->notifyMouseMove(event->x, event->y);
     return true;
 }
 

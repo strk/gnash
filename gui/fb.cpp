@@ -892,13 +892,13 @@ bool FBGui::check_mouse()
     
     //log_debug(_("mouse @ %d / %d, btn %d"), mouse_x, mouse_y, mouse_btn);
     
-    notify_mouse_moved(mouse_x, mouse_y);
+    notifyMouseMove(mouse_x, mouse_y);
     
     // button
     if (btn != mouse_btn) {
       mouse_btn = btn;
 printf("clicked: %d\n", btn);      
-      notify_mouse_clicked(btn, 1);  // mark=??
+      notifyMouseClick(btn);  // mark=??
       //log_debug(_("mouse click! %d"), btn);
     }    
 
@@ -1001,14 +1001,14 @@ bool FBGui::check_mouse()
     if ((new_x!=mouse_x) || (new_y!=mouse_y)) {
       mouse_x = new_x;
       mouse_y = new_y;
-      notify_mouse_moved(mouse_x, mouse_y);
+      notifyMouseMove(mouse_x, mouse_y);
       activity = true;
     }
     
     if (new_btn != mouse_btn) {
       mouse_btn = new_btn;      
 printf("clicked: %d\n", mouse_btn);      
-      notify_mouse_clicked(mouse_btn, 1);  // mask=?
+      notifyMouseClick(mouse_btn);  // mask=?
       activity = true;
     }
     
@@ -1157,9 +1157,9 @@ bool FBGui::check_mouse()
   static int new_mouse_y = 0;
   static int new_mouse_btn = 0;
   
-  int notify_x=0;     // coordinate to be sent via notify_mouse_moved()
+  int notify_x=0;     // coordinate to be sent via notifyMouseMove()
   int notify_y=0;
-  bool move_pending = false;  // true: notify_mouse_moved() should be called
+  bool move_pending = false;  // true: notifyMouseMove() should be called
   
   // this is necessary for our quick'n'dirty touchscreen calibration: 
   static int coordinatedebug = std::getenv("DUMP_RAW")!=NULL;
@@ -1187,9 +1187,9 @@ bool FBGui::check_mouse()
         else
           { cx=mouse_x; cy=mouse_y; }
               
-        // Don't call notify_mouse_moved() here because this would lead to
+        // Don't call notifyMouseMove() here because this would lead to
         // lots of calls, especially for touchscreens. Instead we save the
-        // coordinate and call notify_mouse_moved() only once.
+        // coordinate and call notifyMouseMove() only once.
         notify_x = cx;
         notify_y = cy;
         move_pending = true;        
@@ -1198,13 +1198,13 @@ bool FBGui::check_mouse()
       if (new_mouse_btn != mouse_btn) {
       
         if (move_pending) {
-          notify_mouse_moved(notify_x, notify_y);
+          notifyMouseMove(notify_x, notify_y);
           activity = true;
           move_pending = false;
         }
       
         mouse_btn = new_mouse_btn;
-        notify_mouse_clicked(mouse_btn, 1);  // mark=??
+        notifyMouseClick(mouse_btn);  // mark=??
         activity = true;
       }
 
@@ -1240,7 +1240,7 @@ bool FBGui::check_mouse()
   } 
   
   if (move_pending) {
-    notify_mouse_moved(notify_x, notify_y);
+    notifyMouseMove(notify_x, notify_y);
     activity = true;
   }
   

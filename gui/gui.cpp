@@ -457,7 +457,7 @@ Gui::toggleSound()
 
 
 void
-Gui::notify_mouse_moved(int ux, int uy) 
+Gui::notifyMouseMove(int ux, int uy) 
 {
 	movie_root* m = _stage;
 
@@ -512,7 +512,7 @@ Gui::notify_mouse_moved(int ux, int uy)
 }
 
 void
-Gui::notify_mouse_clicked(bool mouse_pressed, int) 
+Gui::notifyMouseClick(bool mouse_pressed) 
 {
 	movie_root* m = _stage;
 	assert(m);
@@ -625,7 +625,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
                       int newx = _xpointer;
                       int newy = _ypointer-step;
                       if ( newy < 0 ) newy=0;
-                      notify_mouse_moved(newx, newy);
+                      notifyMouseMove(newx, newy);
                       break;
                   }
                   case gnash::key::DOWN:
@@ -633,7 +633,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
                       int newx = _xpointer;
                       int newy = _ypointer+step;
                       if ( newy >= _height ) newy = _height-1;
-                      notify_mouse_moved(newx, newy);
+                      notifyMouseMove(newx, newy);
                       break;
                   }
                   case gnash::key::LEFT:
@@ -641,7 +641,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
                       int newx = _xpointer-step;
                       int newy = _ypointer;
                       if ( newx < 0 ) newx = 0;
-                      notify_mouse_moved(newx, newy);
+                      notifyMouseMove(newx, newy);
                       break;
                   }
                   case gnash::key::RIGHT:
@@ -649,7 +649,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
                       const int newy = _ypointer;
                       int newx = _xpointer + step;
                       if ( newx >= _width ) newx = _width-1;
-                      notify_mouse_moved(newx, newy);
+                      notifyMouseMove(newx, newy);
                       break;
                   }
                   default:

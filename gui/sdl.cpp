@@ -87,21 +87,20 @@ SDLGui::run()
                 if (event.motion.x == x_old && event.motion.y == y_old) { break; }
                 x_old = event.motion.x;
                 y_old = event.motion.y;
-                notify_mouse_moved(x_old, y_old);
+                notifyMouseMove(x_old, y_old);
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
             {
-                int     mask = 1 << (event.button.button - 1);
                 if (event.button.state == SDL_PRESSED) {
                     // multiple events will be fired while the mouse is held down
                     // we are interested only in a change in the mouse state:
                     if (event.button.button == button_state_old) { break; }
-                    notify_mouse_clicked(true, mask);
+                    notifyMouseClick(true);
                     button_state_old = event.button.button;
                 } else {
-                    notify_mouse_clicked(false, mask);
+                    notifyMouseClick(false);
                     button_state_old = -1;
                 }
                 break;

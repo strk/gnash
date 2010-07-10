@@ -361,8 +361,7 @@ button_press_event_cb(GtkWidget */*widget*/, GdkEventButton *event, gpointer dat
 
     gtk_widget_grab_focus(GTK_WIDGET(view->canvas));
 
-    int	mask = 1 << (event->button - 1);
-    view->stage->notify_mouse_clicked(true, mask);
+    view->stage->notifyMouseClick(true);
 
     return TRUE;
 }
@@ -376,7 +375,7 @@ button_release_event_cb(GtkWidget */*widget*/, GdkEventButton *event, gpointer d
         return FALSE;
 
     int	mask = 1 << (event->button - 1);
-    view->stage->notify_mouse_clicked(false, mask);
+    view->stage->notifyMouseClick(false, mask);
 
     return TRUE;
 }
@@ -397,7 +396,7 @@ motion_notify_event_cb(GtkWidget */*widget*/, GdkEventMotion *event, gpointer da
 	// A stage pseudopixel is user pixel / _yscale high
 	boost::int32_t y = event->y / yscale;
 
-	if ( view->stage->notify_mouse_moved(x, y) )
+	if ( view->stage->notifyMouseMove(x, y) )
 	{
 		// any action triggered by the
 		// event required screen refresh
