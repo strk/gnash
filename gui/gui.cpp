@@ -475,7 +475,7 @@ Gui::notify_mouse_moved(int ux, int uy)
 	log_debug(_("mouse @ %d,%d"), x, y);
 #endif
 
-	if ( m->notify_mouse_moved(x, y) )
+	if ( m->mouseMoved(x, y) )
 	{
 		// any action triggered by the
 		// event required screen refresh
@@ -512,7 +512,7 @@ Gui::notify_mouse_moved(int ux, int uy)
 }
 
 void
-Gui::notify_mouse_clicked(bool mouse_pressed, int mask) 
+Gui::notify_mouse_clicked(bool mouse_pressed, int) 
 {
 	movie_root* m = _stage;
 	assert(m);
@@ -521,7 +521,7 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 
     if ( _stopped ) return;
 
-	if ( m->notify_mouse_clicked(mouse_pressed, mask) )
+	if ( m->mouseClick(mouse_pressed) )
 	{
 		// any action triggered by the
 		// event required screen refresh

@@ -333,7 +333,7 @@ MovieTester::movePointerTo(int x, int y)
 {
     _x = x;
     _y = y;
-    if ( _movie_root->notify_mouse_moved(x, y) ) render();
+    if ( _movie_root->mouseMoved(x, y) ) render();
 }
 
 void
@@ -399,7 +399,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 void
 MovieTester::pressMouseButton()
 {
-    if ( _movie_root->notify_mouse_clicked(true, 1) ) {
+    if ( _movie_root->mouseClick(true) ) {
 	render();
     }
 }
@@ -407,7 +407,7 @@ MovieTester::pressMouseButton()
 void
 MovieTester::depressMouseButton()
 {
-    if ( _movie_root->notify_mouse_clicked(false, 1) ) {
+    if ( _movie_root->mouseClick(false) ) {
 	render();
     }
 }
@@ -416,8 +416,8 @@ void
 MovieTester::click()
 {
     int wantRedraw = 0;
-    if ( _movie_root->notify_mouse_clicked(true, 1) ) ++wantRedraw;
-    if ( _movie_root->notify_mouse_clicked(false, 1) ) ++wantRedraw;
+    if ( _movie_root->mouseClick(true) ) ++wantRedraw;
+    if ( _movie_root->mouseClick(false) ) ++wantRedraw;
     
     if ( wantRedraw ) render();
 }

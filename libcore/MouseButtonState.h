@@ -23,12 +23,6 @@ struct MouseButtonState
 
 public:
 
-	/// Possible button states
-	enum State {
-        UP,
-        DOWN
-    };  
-
 	/// entity that currently owns the mouse pointer
 	InteractiveObject* activeEntity;
 
@@ -36,10 +30,10 @@ public:
 	InteractiveObject* topmostEntity;
 
 	/// previous state of mouse button
-	bool previousButtonState;	
+	bool wasDown;	
 
 	/// current state of mouse button
-	bool currentButtonState;	
+	bool isDown;	
 
 	/// whether mouse was inside the active_entity last frame
 	bool wasInsideActiveEntity;
@@ -48,8 +42,8 @@ public:
 		:
         activeEntity(0),
         topmostEntity(0),
-		previousButtonState(UP),
-		currentButtonState(UP),
+		wasDown(false),
+		isDown(false),
 		wasInsideActiveEntity(false)
 	{
 	}

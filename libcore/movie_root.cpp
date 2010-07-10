@@ -125,9 +125,9 @@ movie_root::movie_root(const movie_definition& def,
     m_background_color(255, 255, 255, 255),
     m_background_color_set(false),
     m_timer(0.0f),
-    m_mouse_x(0),
-    m_mouse_y(0),
-    m_mouse_buttons(0),
+    _mouseX(0),
+    _mouseY(0),
+    _mouseDown(0),
     _lastTimerId(0),
     _lastKeyEvent(key::INVALID),
     _currentFocus(0),
@@ -568,12 +568,12 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 }
 
 bool
-movie_root::notify_mouse_moved(int x, int y)
+movie_root::mouseMoved(boost::int32_t x, boost::int32_t y)
 {
     assert(testInvariant());
 
-    m_mouse_x = x;
-    m_mouse_y = y;
+    _mouseX = x;
+    _mouseY = y;
     notify_mouse_listeners(event_id::MOUSE_MOVE);
     return fire_mouse_event();
 
@@ -624,19 +624,17 @@ movie_root::notify_key_event(key::code k, bool down)
 
 
 bool
-movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
+movie_root::mouseClick(bool mouse_pressed)
 {
     assert(testInvariant());
 
     //log_debug("Mouse click notification");
-    if (mouse_pressed)
-    {
-        m_mouse_buttons |= button_mask;
+    if (mouse_pressed) {
+        _mouseDown = true;
         notify_mouse_listeners(event_id(event_id::MOUSE_DOWN));
     }
-    else
-    {
-        m_mouse_buttons &= ~button_mask;
+    else {
+        _mouseDown = false;
         notify_mouse_listeners(event_id(event_id::MOUSE_UP));
     }
 
@@ -651,24 +649,22 @@ movie_root::fire_mouse_event()
 
     assert(testInvariant());
 
-    boost::int32_t x = pixelsToTwips(m_mouse_x);
-    boost::int32_t y = pixelsToTwips(m_mouse_y);
+    boost::int32_t x = pixelsToTwips(_mouseX);
+    boost::int32_t y = pixelsToTwips(_mouseY);
 
     // Generate a mouse event
     _mouseButtonState.topmostEntity = getTopmostMouseEntity(x, y);
-    _mouseButtonState.currentButtonState = (m_mouse_buttons & 1);
+    _mouseButtonState.isDown = _mouseDown;
 
     // Set _droptarget if dragging a sprite
     MovieClip* dragging = 0;
     DisplayObject* draggingChar = getDraggingCharacter();
     if (draggingChar) dragging = draggingChar->to_movie();
-    if (dragging)
-    {
+    if (dragging) {
         // TODO: optimize making findDropTarget and getTopmostMouseEntity
         //       use a single scan.
         const DisplayObject* dropChar = findDropTarget(x, y, dragging);
-        if (dropChar)
-        {
+        if (dropChar) {
             // Use target of closest script DisplayObject containing this
             dropChar = getNearestObject(dropChar);
             dragging->setDropTarget(dropChar->getTargetPath());
@@ -698,15 +694,14 @@ movie_root::fire_mouse_event()
 }
 
 void
-movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y,
-        boost::int32_t& buttons)
+movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y, bool& down)
 {
 
     assert(testInvariant());
 
-    x = m_mouse_x;
-    y = m_mouse_y;
-    buttons = m_mouse_buttons;
+    x = _mouseX;
+    y = _mouseY;
+    down = _mouseDown;
 
     assert(testInvariant());
 }
@@ -735,9 +730,7 @@ movie_root::set_drag_state(const drag_state& st)
         chmat.transform(&world_origin, origin);
 
         // Get current mouse coordinates
-        boost::int32_t x, y, buttons;
-        get_mouse_state(x, y, buttons);
-        point world_mouse(pixelsToTwips(x), pixelsToTwips(y));
+        point world_mouse(pixelsToTwips(_mouseX), pixelsToTwips(_mouseY));
 
         boost::int32_t xoffset = world_mouse.x - world_origin.x;
         boost::int32_t yoffset = world_mouse.y - world_origin.y;
@@ -760,10 +753,7 @@ movie_root::doMouseDrag()
         return; 
     }
 
-    boost::int32_t x, y, buttons;
-    get_mouse_state(x, y, buttons);
-
-    point world_mouse(pixelsToTwips(x), pixelsToTwips(y));
+    point world_mouse(pixelsToTwips(_mouseX), pixelsToTwips(_mouseY));
 
     SWFMatrix    parent_world_mat;
     DisplayObject* parent = dragChar->get_parent();
@@ -1189,9 +1179,10 @@ movie_root::getDraggingCharacter() const
 const DisplayObject*
 movie_root::getEntityUnderPointer() const
 {
-    boost::int32_t x = pixelsToTwips(m_mouse_x);
-    boost::int32_t y = pixelsToTwips(m_mouse_y);
-    const DisplayObject* dropChar = findDropTarget(x, y, getDraggingCharacter()); 
+    const boost::int32_t x = pixelsToTwips(_mouseX);
+    const boost::int32_t y = pixelsToTwips(_mouseY);
+    const DisplayObject* dropChar = 
+        findDropTarget(x, y, getDraggingCharacter()); 
     return dropChar;
 }
 
@@ -2546,100 +2537,95 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
     // whether the action must trigger
     // a redraw.
 
-    switch (ms.previousButtonState)
-    {
-        case MouseButtonState::DOWN:
-        {
-            // TODO: Handle trackAsMenu dragOver
-            // Handle onDragOut, onDragOver
-            if (!ms.wasInsideActiveEntity) {
+    if (ms.wasDown) {
+        // TODO: Handle trackAsMenu dragOver
+        // Handle onDragOut, onDragOver
+        if (!ms.wasInsideActiveEntity) {
 
-                if (ms.topmostEntity == ms.activeEntity) {
+            if (ms.topmostEntity == ms.activeEntity) {
 
-                    // onDragOver
-                    if (ms.activeEntity) {
-                        ms.activeEntity->mouseEvent(event_id::DRAG_OVER);
-                        need_redisplay=true;
-                    }
-                    ms.wasInsideActiveEntity = true;
-                }
-            }
-            else if (ms.topmostEntity != ms.activeEntity) {
-                // onDragOut
+                // onDragOver
                 if (ms.activeEntity) {
-                    ms.activeEntity->mouseEvent(event_id::DRAG_OUT);
+                    ms.activeEntity->mouseEvent(event_id::DRAG_OVER);
                     need_redisplay=true;
                 }
-                ms.wasInsideActiveEntity = false;
-            }
-
-            // Handle onRelease, onReleaseOutside
-            if (ms.currentButtonState == MouseButtonState::UP) {
-                // Mouse button just went up.
-                ms.previousButtonState = MouseButtonState::UP;
-
-                if (ms.activeEntity) {
-                    if (ms.wasInsideActiveEntity) {
-                        // onRelease
-                        ms.activeEntity->mouseEvent(event_id::RELEASE);
-                        need_redisplay = true;
-                    }
-                    else {
-                        // TODO: Handle trackAsMenu 
-                        // onReleaseOutside
-                        ms.activeEntity->mouseEvent(event_id::RELEASE_OUTSIDE);
-                        // We got out of active entity
-                        ms.activeEntity = 0; // so we don't get RollOut next...
-                        need_redisplay = true;
-                    }
-                }
-            }
-            return need_redisplay;
-        }
-
-        case MouseButtonState::UP:
-        {
-            // New active entity is whatever is below the mouse right now.
-            if (ms.topmostEntity != ms.activeEntity)
-            {
-                // onRollOut
-                if (ms.activeEntity) {
-                    ms.activeEntity->mouseEvent(event_id::ROLL_OUT);
-                    need_redisplay=true;
-                }
-
-                ms.activeEntity = ms.topmostEntity;
-
-                // onRollOver
-                if (ms.activeEntity) {
-                    ms.activeEntity->mouseEvent(event_id::ROLL_OVER);
-                    need_redisplay=true;
-                }
-
                 ms.wasInsideActiveEntity = true;
             }
+        }
+        else if (ms.topmostEntity != ms.activeEntity) {
+            // onDragOut
+            if (ms.activeEntity) {
+                ms.activeEntity->mouseEvent(event_id::DRAG_OUT);
+                need_redisplay=true;
+            }
+            ms.wasInsideActiveEntity = false;
+        }
 
-            // mouse button press
-            if (ms.currentButtonState == MouseButtonState::DOWN) {
-                // onPress
+        // Handle onRelease, onReleaseOutside
+        if (!ms.isDown) {
+            // Mouse button just went up.
+            ms.wasDown = false;
 
-                // Try setting focus on the new DisplayObject. This will handle
-                // all necessary events and removal of current focus.
-                // Do not set focus to NULL.
-                if (ms.activeEntity) {
-                    mr.setFocus(ms.activeEntity);
-
-                    ms.activeEntity->mouseEvent(event_id::PRESS);
-                    need_redisplay=true;
+            if (ms.activeEntity) {
+                if (ms.wasInsideActiveEntity) {
+                    // onRelease
+                    ms.activeEntity->mouseEvent(event_id::RELEASE);
+                    need_redisplay = true;
                 }
-
-                ms.wasInsideActiveEntity = true;
-                ms.previousButtonState = MouseButtonState::DOWN;
+                else {
+                    // TODO: Handle trackAsMenu 
+                    // onReleaseOutside
+                    ms.activeEntity->mouseEvent(event_id::RELEASE_OUTSIDE);
+                    // We got out of active entity
+                    ms.activeEntity = 0; // so we don't get RollOut next...
+                    need_redisplay = true;
+                }
             }
         }
-        default:
-              return need_redisplay;
+        return need_redisplay;
     }
+
+    else {
+        // New active entity is whatever is below the mouse right now.
+        if (ms.topmostEntity != ms.activeEntity)
+        {
+            // onRollOut
+            if (ms.activeEntity) {
+                ms.activeEntity->mouseEvent(event_id::ROLL_OUT);
+                need_redisplay=true;
+            }
+
+            ms.activeEntity = ms.topmostEntity;
+
+            // onRollOver
+            if (ms.activeEntity) {
+                ms.activeEntity->mouseEvent(event_id::ROLL_OVER);
+                need_redisplay=true;
+            }
+
+            ms.wasInsideActiveEntity = true;
+        }
+
+        // mouse button press
+        if (ms.isDown) {
+            // onPress
+
+            // Try setting focus on the new DisplayObject. This will handle
+            // all necessary events and removal of current focus.
+            // Do not set focus to NULL.
+            if (ms.activeEntity) {
+                mr.setFocus(ms.activeEntity);
+
+                ms.activeEntity->mouseEvent(event_id::PRESS);
+                need_redisplay=true;
+            }
+
+            ms.wasInsideActiveEntity = true;
+            ms.wasDown = true;
+        }
+    
+    }
+    return need_redisplay;
 
 }
 
