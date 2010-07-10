@@ -295,8 +295,15 @@ public:
     /// Inform the Stage that a mouse click has occurred.
     //
     /// @param press    true for a mouse click, false for a release
-    /// @return     true if any action triggered requires a redraw.
+    /// @return         true if any action triggered requires a redraw.
     bool mouseClick(bool press);
+
+    /// Inform the Stage that a mouse wheel has moved.
+    //
+    /// @param delta    The direction of the scroll: either 1 for up or -1
+    ///                 for down.
+    /// @return         true if any action triggered requires a redraw.
+    bool mouseWheel(int delta);
 
     /// \brief
     /// The host app can use this to tell the movie when
@@ -311,7 +318,7 @@ public:
     /// Use this to retrieve the last state of the mouse.
     //
     /// Coordinates are in PIXELS, NOT TWIPS.
-    void get_mouse_state(boost::int32_t& x, boost::int32_t& y, bool& down);
+    void get_mouse_state(boost::int32_t& x, boost::int32_t& y);
 
     void get_drag_state(drag_state& st);
 

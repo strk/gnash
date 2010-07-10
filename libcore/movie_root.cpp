@@ -622,6 +622,16 @@ movie_root::notify_key_event(key::code k, bool down)
     return false; // should return true if needs updatee ...
 }
 
+bool
+movie_root::mouseWheel(int delta)
+{
+    as_object* mouseObj = getBuiltinObject(*this, NSV::CLASS_MOUSE);
+    if (!mouseObj) return false;
+
+    callMethod(mouseObj, NSV::PROP_BROADCAST_MESSAGE, "onMouseWheel",
+            delta);
+    return true;
+}
 
 bool
 movie_root::mouseClick(bool mouse_pressed)
@@ -694,14 +704,13 @@ movie_root::fire_mouse_event()
 }
 
 void
-movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y, bool& down)
+movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y)
 {
 
     assert(testInvariant());
 
     x = _mouseX;
     y = _mouseY;
-    down = _mouseDown;
 
     assert(testInvariant());
 }
@@ -1079,10 +1088,10 @@ movie_root::notify_mouse_listeners(const event_id& event)
     as_object* mouseObj = getBuiltinObject(*this, NSV::CLASS_MOUSE);
     if (mouseObj) {
 
+        // Can throw an action limit exception if the stack limit is 0 or 1.
+        // A stack limit like that is hardly of any use, but could be used
+        // maliciously to crash Gnash.
         try {
-            // Can throw an action limit exception if the stack limit is 0 or 1.
-            // A stack limit like that is hardly of any use, but could be used
-            // maliciously to crash Gnash.
             callMethod(mouseObj, NSV::PROP_BROADCAST_MESSAGE, 
                     event.functionName());
         }

@@ -1306,8 +1306,7 @@ getMouseX(DisplayObject& o)
 {
 	// Local coord of mouse IN PIXELS.
 	boost::int32_t x, y;
-    bool down;
-	getRoot(*getObject(&o)).get_mouse_state(x, y, down);
+	getRoot(*getObject(&o)).get_mouse_state(x, y);
 
 	SWFMatrix m = o.getWorldMatrix();
     point a(pixelsToTwips(x), pixelsToTwips(y));
@@ -1321,8 +1320,7 @@ getMouseY(DisplayObject& o)
 {
 	// Local coord of mouse IN PIXELS.
 	boost::int32_t x, y;
-    bool down;
-	getRoot(*getObject(&o)).get_mouse_state(x, y, down);
+	getRoot(*getObject(&o)).get_mouse_state(x, y);
 
 	SWFMatrix m = o.getWorldMatrix();
     point a(pixelsToTwips(x), pixelsToTwips(y));
