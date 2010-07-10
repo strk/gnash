@@ -599,7 +599,6 @@ public:
     /// Gets the current Access Mode for ExternalInterface.
     AllowScriptAccessMode getAllowScriptAccess();
 
-
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
     /// Returns the current alignment of the stage (left/right/centre, top/
@@ -682,7 +681,7 @@ public:
     /// its turn comes. Characters are advanced in reverse-placement
     /// order (first registered is advanced last)
     ///
-    void addLiveChar(DisplayObject* ch)
+    void addLiveChar(MovieClip* ch)
     {
         // Don't register the object in the list twice 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -1106,17 +1105,17 @@ private:
             DisplayObject* dragging) const;
 
     void handleActionLimitHit(const std::string& ref);
+
     /// A list of AdvanceableCharacters
     //
     /// This is a list (not a vector) as we want to allow
     /// ::advance of each element to insert new DisplayObjects before
     /// the start w/out invalidating iterators scanning the
     /// list forward for proper movie advancement
-    typedef std::list<DisplayObject*> LiveChars;
+    typedef std::list<MovieClip*> LiveChars;
 
     /// The list of advanceable DisplayObject, in placement order
     LiveChars _liveChars;
-
 
     /// A number of queues of code to execute
     //
