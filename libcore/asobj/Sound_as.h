@@ -49,10 +49,20 @@ class CharacterProxy;
     struct ObjectURI;
     class DisplayObject;
 
+/// A Sound object in ActionScript can control and play sound
+//
+/// Two types of sound are handled:
+///
+/// 1. external sounds, either loaded or streamed
+/// 2. embedded sounds, referenced by library (export) symbol.
+//
+/// Sound objects also control volume, pan, and other properties for a target
+/// movieclip.
 class Sound_as : public ActiveRelay
 {
 
 public:
+
     Sound_as(as_object* owner);
     
     ~Sound_as();
