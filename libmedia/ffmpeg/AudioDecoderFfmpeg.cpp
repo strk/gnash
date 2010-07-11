@@ -575,7 +575,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
                     "ffmpeg/libavcodec might fix this issue."), tmp);
 		outputSize = 0;
 
-		if (output)
+		if (NEEDS_ALIGNED_MEMORY)
 		    av_free(output);
 		else
 		    delete [] output;
@@ -589,7 +589,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 			        outputSize, inputSize);
 		outputSize = 0;
 
-		if (output)
+		if (NEEDS_ALIGNED_MEMORY)
 		    av_free(output);
 		else
 		    delete [] output;
@@ -669,6 +669,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 	    boost::uint8_t* newOutput = new boost::uint8_t[outSize];
 	    memcpy(newOutput, output, outSize);
 	    outPtr = reinterpret_cast<boost::int16_t*>(newOutput);
+        av_free(output);
 	}
 
 	outputSize = outSize;
