@@ -1136,9 +1136,7 @@ movie_root::getEntityUnderPointer() const
 {
     const boost::int32_t x = pixelsToTwips(_mouseX);
     const boost::int32_t y = pixelsToTwips(_mouseY);
-    const DisplayObject* dropChar = 
-        findDropTarget(x, y, getDraggingCharacter()); 
-    return dropChar;
+    return findDropTarget(x, y, getDraggingCharacter()); 
 }
 
 
@@ -1655,16 +1653,6 @@ movie_root::executeTimers()
     for (TimerMap::iterator it=_intervalTimers.begin(),
             itEnd=_intervalTimers.end(); it != itEnd; ) {
 
-        // Get an iterator to next element, as we'll use
-        // erase to drop cleared timers, and that would
-        // invalidate the current iterator.
-        //
-        // FYI: it's been reported on ##iso-c++ that next
-        //      C++ version will fix std::map<>::erase(iterator)
-        //      to return the next valid iterator,
-        //      like std::list<>::erase(iterator) does.
-        //      For now, we'll have to handle this manually)
-        //
         TimerMap::iterator nextIterator = it;
         ++nextIterator;
 
