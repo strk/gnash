@@ -1655,16 +1655,6 @@ movie_root::executeTimers()
     for (TimerMap::iterator it=_intervalTimers.begin(),
             itEnd=_intervalTimers.end(); it != itEnd; ) {
 
-        // Get an iterator to next element, as we'll use
-        // erase to drop cleared timers, and that would
-        // invalidate the current iterator.
-        //
-        // FYI: it's been reported on ##iso-c++ that next
-        //      C++ version will fix std::map<>::erase(iterator)
-        //      to return the next valid iterator,
-        //      like std::list<>::erase(iterator) does.
-        //      For now, we'll have to handle this manually)
-        //
         TimerMap::iterator nextIterator = it;
         ++nextIterator;
 
