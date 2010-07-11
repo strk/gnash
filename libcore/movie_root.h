@@ -468,16 +468,10 @@ public:
     DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
     /// Push a new DisplayObject listener for key events
-    void add_key_listener(InteractiveObject* listener)
-    {
-        add_listener(_keyListeners, listener);
-    }
+    void add_key_listener(InteractiveObject* listener);
 
     /// Remove a DisplayObject listener for key events
-    void remove_key_listener(InteractiveObject* listener)
-    {
-        remove_listener(_keyListeners, listener);
-    }
+    void remove_key_listener(InteractiveObject* listener);
 
     /// Notify still loaded DisplayObject listeners for mouse events
     DSOEXPORT void notify_mouse_listeners(const event_id& event);
@@ -996,24 +990,11 @@ private:
     void executeTimers();
 
     /// Remove unloaded key and mouselisteners.
-    void cleanupUnloadedListeners()
-    {
-        cleanupUnloadedListeners(_keyListeners);
-    }
-
-    /// Erase unloaded DisplayObjects from the given listeners list
-    static void cleanupUnloadedListeners(Listeners& ll);
+    void cleanupUnloadedListeners();
 
     /// Cleanup references to unloaded DisplayObjects and run the GC.
     void cleanupAndCollect();
-
-    /// Push a DisplayObject listener to the front of given container, if not
-    /// already present
-    static void add_listener(Listeners& ll, InteractiveObject* elem);
-
-    /// Remove a listener from the list
-    static void remove_listener(Listeners& ll, InteractiveObject* elem);
-
+    
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
     /// more info.
