@@ -1143,13 +1143,6 @@ movie_root::getEntityUnderPointer() const
 }
 
 
-bool
-movie_root::isMouseOverActiveEntity() const
-{
-    assert(testInvariant());
-    return (_mouseButtonState.activeEntity);
-}
-
 void
 movie_root::setQuality(Quality q)
 {

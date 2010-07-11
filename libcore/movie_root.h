@@ -517,9 +517,6 @@ public:
     /// Return the DisplayObject currently being dragged, if any
     DisplayObject* getDraggingCharacter() const;
 
-    /// Return true if the mouse pointer is over an active entity
-    bool isMouseOverActiveEntity() const;
-
     bool testInvariant() const;
 
     /// The possible values of Stage.displayState

@@ -447,7 +447,7 @@ MovieTester::releaseKey(key::code code)
 bool
 MovieTester::isMouseOverMouseEntity()
 {
-    return _movie_root->isMouseOverActiveEntity();
+    return (_movie_root->getActiveEntityUnderPointer());
 }
 
 geometry::SnappingRanges2d<int>
