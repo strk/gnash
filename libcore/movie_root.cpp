@@ -92,6 +92,17 @@ namespace {
     const DisplayObject* getNearestObject(const DisplayObject* o);
     as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
     void advanceLiveChar(MovieClip* ch);
+
+    /// Erase unloaded DisplayObjects from the given listeners list
+    void cleanupListeners(movie_root::Listeners& ll);
+
+    /// Push a DisplayObject listener to the front of given container, if not
+    /// already present
+    void add_listener(movie_root::Listeners& ll, InteractiveObject* elem);
+
+    /// Remove a listener from the list
+    void remove_listener(movie_root::Listeners& ll, InteractiveObject* elem);
+
 }
 
 // Utility classes
@@ -125,7 +136,6 @@ movie_root::movie_root(const movie_definition& def,
     m_viewport_height(1),
     m_background_color(255, 255, 255, 255),
     m_background_color_set(false),
-    m_timer(0.0f),
     _mouseX(0),
     _mouseY(0),
     _lastTimerId(0),
@@ -977,55 +987,6 @@ movie_root::display()
 
 
 void
-movie_root::cleanupUnloadedListeners(Listeners& ll)
-{
-    bool needScan;
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-    int scansCount = 0;
-#endif
-
-    do
-    {
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-      scansCount++;
-      int cleaned =0;
-#endif
-
-      needScan=false;
-
-      // remove unloaded DisplayObject listeners from movie_root
-      for (Listeners::iterator iter = ll.begin(); iter != ll.end(); )
-      {
-          InteractiveObject* const ch = *iter;
-          if ( ch->unloaded() )
-          {
-            if ( ! ch->isDestroyed() )
-            {
-              ch->destroy();
-              needScan=true; // ->destroy() might mark already-scanned chars as unloaded
-            }
-            iter = ll.erase(iter);
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-            cleaned++;
-#endif
-
-          }
-
-          else ++iter;
-      }
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-      cout << " Scan " << scansCount << " cleaned " << cleaned << " instances" << endl;
-#endif
-
-    } while (needScan);
-    
-}
-
-void
 movie_root::notify_key_listeners(key::code k, bool down)
 {
 
@@ -1054,25 +1015,6 @@ movie_root::notify_key_listeners(key::code k, bool down)
         // process actions queued in the above step
         processActionQueue();
     }
-}
-
-void
-movie_root::add_listener(Listeners& ll, InteractiveObject* listener)
-{
-    assert(listener);
-
-    // Don't add the same listener twice (why not use a set?)
-    if (std::find(ll.begin(), ll.end(), listener) != ll.end()) return;
-
-    ll.push_front(listener);
-}
-
-
-void
-movie_root::remove_listener(Listeners& ll, InteractiveObject* listener)
-{
-    assert(listener);
-    ll.remove_if(std::bind2nd(std::equal_to<InteractiveObject*>(), listener));
 }
 
 void
@@ -1200,13 +1142,6 @@ movie_root::getEntityUnderPointer() const
 }
 
 
-bool
-movie_root::isMouseOverActiveEntity() const
-{
-    assert(testInvariant());
-    return (_mouseButtonState.activeEntity);
-}
-
 void
 movie_root::setQuality(Quality q)
 {
@@ -1323,7 +1258,7 @@ movie_root::setShowMenuState(bool state)
     //   or shows the menubar. Flash expects this option to disable some 
     //   context menu items.
     // callInterface is the proper handler for this
-    callInterface("Stage.showMenu", (_showMenu) ? "true" : "false");  //or this?
+    callInterface("Stage.showMenu", (_showMenu) ? "true" : "false"); 
 }
 
 /// Returns the string representation of the current align mode,
@@ -1632,10 +1567,10 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 
     // These are the default methods used by ExternalInterface
     if (invoke->name == "Quit") {
-	// The browser is telling us to quit.
-	// FIXME: This is probably not the right way to exit, but it
-	// beats turning into a zombie and eating cpu cycles.
-	exit(0);
+        // Leave to the hosting application. If there isn't one or it 
+        // chooses not to exit, that's fine.
+        if (_interfaceHandler) _interfaceHandler->exit();
+
     } else if (invoke->name == "SetVariable") {
 	// SetVariable doesn't send a response
     } else if (invoke->name == "GetVariable") {
@@ -1985,6 +1920,24 @@ movie_root::ExternalCallback::call(const std::vector<as_value>& args)
     return as_value();
 }
 
+void
+movie_root::cleanupUnloadedListeners()
+{
+    cleanupListeners(_keyListeners);
+}
+
+void
+movie_root::add_key_listener(InteractiveObject* listener)
+{
+    add_listener(_keyListeners, listener);
+}
+
+/// Remove a DisplayObject listener for key events
+void
+movie_root::remove_key_listener(InteractiveObject* listener)
+{
+    remove_listener(_keyListeners, listener);
+}
 
 void
 movie_root::cleanupDisplayList()
@@ -2646,11 +2599,76 @@ advanceLiveChar(MovieClip* mo)
 #endif
 }
 
+void
+add_listener(movie_root::Listeners& ll, InteractiveObject* listener)
+{
+    assert(listener);
 
+    // Don't add the same listener twice (why not use a set?)
+    if (std::find(ll.begin(), ll.end(), listener) != ll.end()) return;
 
+    ll.push_front(listener);
 }
 
 
+void
+remove_listener(movie_root::Listeners& ll, InteractiveObject* listener)
+{
+    assert(listener);
+    ll.remove_if(std::bind2nd(std::equal_to<InteractiveObject*>(), listener));
+}
+
+void
+cleanupListeners(movie_root::Listeners& ll)
+{
+    bool needScan;
+
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+    int scansCount = 0;
+#endif
+
+    do
+    {
+
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+      scansCount++;
+      int cleaned =0;
+#endif
+
+      needScan=false;
+
+      // remove unloaded DisplayObject listeners from movie_root
+      for (movie_root::Listeners::iterator iter = ll.begin();
+              iter != ll.end(); ) {
+          InteractiveObject* const ch = *iter;
+          if ( ch->unloaded() )
+          {
+            if ( ! ch->isDestroyed() )
+            {
+              ch->destroy();
+              needScan=true; // ->destroy() might mark already-scanned chars as unloaded
+            }
+            iter = ll.erase(iter);
+
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+            cleaned++;
+#endif
+
+          }
+
+          else ++iter;
+      }
+
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+      cout << " Scan " << scansCount << " cleaned " << cleaned << " instances" << endl;
+#endif
+
+    } while (needScan);
+    
+}
+
+
+} // anonymous namespace
 } // namespace gnash
 
 // local Variables:

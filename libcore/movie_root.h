@@ -468,16 +468,10 @@ public:
     DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
     /// Push a new DisplayObject listener for key events
-    void add_key_listener(InteractiveObject* listener)
-    {
-        add_listener(_keyListeners, listener);
-    }
+    void add_key_listener(InteractiveObject* listener);
 
     /// Remove a DisplayObject listener for key events
-    void remove_key_listener(InteractiveObject* listener)
-    {
-        remove_listener(_keyListeners, listener);
-    }
+    void remove_key_listener(InteractiveObject* listener);
 
     /// Notify still loaded DisplayObject listeners for mouse events
     DSOEXPORT void notify_mouse_listeners(const event_id& event);
@@ -522,9 +516,6 @@ public:
 
     /// Return the DisplayObject currently being dragged, if any
     DisplayObject* getDraggingCharacter() const;
-
-    /// Return true if the mouse pointer is over an active entity
-    bool isMouseOverActiveEntity() const;
 
     bool testInvariant() const;
 
@@ -600,7 +591,7 @@ public:
     
     /// Sets the value of _showMenu and calls the fscommand handler for the
     /// current gui
-    void setShowMenuState( bool state );
+    void setShowMenuState(bool state);
 
     // This is a flag that specifies whether exceptions in ActionScript
     // should be propogated to JavaScript in the browser.
@@ -838,6 +829,9 @@ public:
         /// a question.
         virtual bool yesNo(const std::string& cmd) = 0;
 
+        /// Instruct the hosting application to exit.
+        virtual void exit() = 0;
+
         /// Send an error message to the hosting application.
         //
         /// This does not have to be implemented; the default is a no-op.
@@ -996,24 +990,11 @@ private:
     void executeTimers();
 
     /// Remove unloaded key and mouselisteners.
-    void cleanupUnloadedListeners()
-    {
-        cleanupUnloadedListeners(_keyListeners);
-    }
-
-    /// Erase unloaded DisplayObjects from the given listeners list
-    static void cleanupUnloadedListeners(Listeners& ll);
+    void cleanupUnloadedListeners();
 
     /// Cleanup references to unloaded DisplayObjects and run the GC.
     void cleanupAndCollect();
-
-    /// Push a DisplayObject listener to the front of given container, if not
-    /// already present
-    static void add_listener(Listeners& ll, InteractiveObject* elem);
-
-    /// Remove a listener from the list
-    static void remove_listener(Listeners& ll, InteractiveObject* elem);
-
+    
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
     /// more info.
@@ -1116,7 +1097,6 @@ private:
     rgba m_background_color;
     bool m_background_color_set;
 
-    float m_timer;
     boost::int32_t _mouseX;
     boost::int32_t _mouseY;
 
@@ -1181,28 +1161,36 @@ private:
     //
     /// This is here, not just in the Renderer, so that AS compatibility
     /// does not rely on the presence of a renderer.
-    Quality		_quality;
+    Quality _quality;
+
+    /// The alignment of the Stage
     std::bitset<4u>	_alignMode;
+
     AllowScriptAccessMode _allowScriptAccess;
     bool		_marshallExceptions;
-    bool		_showMenu;
-    ScaleMode		_scaleMode;
-    DisplayState	_displayState;
+
+    /// Whether to show the menu or not.
+    bool _showMenu;
+
+    /// The current scaling mode of the Stage.
+    ScaleMode _scaleMode;
+
+    /// The current state of the Stage (fullscreen or not).
+    DisplayState _displayState;
     
-    // The maximum number of recursions e.g. when finding
-    // 'super', set in the ScriptLimits tag.
+    // Maximum number of recursions set in the ScriptLimits tag.
     boost::uint16_t	_recursionLimit;
 
-    // The timeout in seconds for script execution, in the
-    // ScriptLimits tag.    
+    // Timeout in seconds for script execution, set in the ScriptLimits tag.
     boost::uint16_t	_timeoutLimit;
 
     // delay between movie advancement, in milliseconds
-    unsigned int	_movieAdvancementDelay;
+    size_t _movieAdvancementDelay;
 
     // time of last movie advancement, in milliseconds
-    unsigned int	_lastMovieAdvancement;
+    size_t _lastMovieAdvancement;
 
+    /// The number of the last unnamed instance, used to name instances.
     size_t _unnamedInstance;
 
     MovieLoader _movieLoader;
