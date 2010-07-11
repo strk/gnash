@@ -1094,7 +1094,6 @@ private:
     rgba m_background_color;
     bool m_background_color_set;
 
-    float m_timer;
     boost::int32_t _mouseX;
     boost::int32_t _mouseY;
 
