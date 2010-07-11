@@ -1136,9 +1136,7 @@ movie_root::getEntityUnderPointer() const
 {
     const boost::int32_t x = pixelsToTwips(_mouseX);
     const boost::int32_t y = pixelsToTwips(_mouseY);
-    const DisplayObject* dropChar = 
-        findDropTarget(x, y, getDraggingCharacter()); 
-    return dropChar;
+    return findDropTarget(x, y, getDraggingCharacter()); 
 }
 
 
