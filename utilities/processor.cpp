@@ -158,7 +158,8 @@ public:
 	}
 };
 
-class EventCallback: public movie_root::AbstractIfaceCallback {
+class EventCallback: public movie_root::AbstractIfaceCallback
+{
 public:
 	std::string call(const std::string& event, const std::string& arg)
 	{
@@ -169,37 +170,37 @@ public:
 	    // These should return "true" if the mouse was visible before
 	    // the call.
 	    if ( event == "Mouse.hide" ) {
-		bool state = mouseShown;
-		mouseShown = false;
-		return state ? "true" : "false";
+            bool state = mouseShown;
+            mouseShown = false;
+            return state ? "true" : "false";
 	    }
 
 	    if ( event == "Mouse.show" ) {
-		bool state = mouseShown;
-		mouseShown = true;
-		return state ? "true" : "false" ;
+            bool state = mouseShown;
+            mouseShown = true;
+            return state ? "true" : "false" ;
 	    }
 	    
 	    // Some fake values for consistent test results.
 	    
 	    if ( event == "System.capabilities.screenResolutionX" ) {
-		return "800";
+            return "800";
 	    }
 
 	    if ( event == "System.capabilities.screenResolutionY" ) {
-		return "640";
+            return "640";
 	    } 
 
 	    if ( event == "System.capabilities.screenDPI" ) {
-		return "72";
+            return "72";
 	    }        
 
 	    if ( event == "System.capabilities.screenColor" ) {
-		return "Color";
+            return "Color";
 	    } 
 
 	    if ( event == "System.capabilities.playerType" ) {
-		return "StandAlone";
+            return "StandAlone";
 	    } 
 
 	    return "";
@@ -209,6 +210,10 @@ public:
     bool yesNo(const std::string& /*query*/)
     {
         return true;
+    }
+
+    void exit() {
+        std::exit(EXIT_SUCCESS);
     }
 };
 

@@ -829,6 +829,9 @@ public:
         /// a question.
         virtual bool yesNo(const std::string& cmd) = 0;
 
+        /// Instruct the hosting application to exit.
+        virtual void exit() = 0;
+
         /// Send an error message to the hosting application.
         //
         /// This does not have to be implemented; the default is a no-op.

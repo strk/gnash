@@ -222,6 +222,8 @@ private:
         bool yesNo(const std::string& query);
         
         void error(const std::string& msg);
+
+        void exit();
         
         // For handling notification callbacks from ActionScript.
         // The callback is always sent to a hosting application

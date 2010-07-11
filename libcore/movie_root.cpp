@@ -1567,10 +1567,10 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 
     // These are the default methods used by ExternalInterface
     if (invoke->name == "Quit") {
-	// The browser is telling us to quit.
-	// FIXME: This is probably not the right way to exit, but it
-	// beats turning into a zombie and eating cpu cycles.
-	exit(0);
+        // Leave to the hosting application. If there isn't one or it 
+        // chooses not to exit, that's fine.
+        if (_interfaceHandler) _interfaceHandler->exit();
+
     } else if (invoke->name == "SetVariable") {
 	// SetVariable doesn't send a response
     } else if (invoke->name == "GetVariable") {

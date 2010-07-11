@@ -583,6 +583,11 @@ Player::run(int argc, char* argv[], const std::string& infile,
     return EXIT_SUCCESS;
 }
 
+void
+Player::CallbacksHandler::exit()
+{
+    _gui.quit();
+}
 
 void
 Player::CallbacksHandler::error(const std::string& msg)
