@@ -591,7 +591,7 @@ public:
     
     /// Sets the value of _showMenu and calls the fscommand handler for the
     /// current gui
-    void setShowMenuState( bool state );
+    void setShowMenuState(bool state);
 
     // This is a flag that specifies whether exceptions in ActionScript
     // should be propogated to JavaScript in the browser.
@@ -1158,28 +1158,36 @@ private:
     //
     /// This is here, not just in the Renderer, so that AS compatibility
     /// does not rely on the presence of a renderer.
-    Quality		_quality;
+    Quality _quality;
+
+    /// The alignment of the Stage
     std::bitset<4u>	_alignMode;
+
     AllowScriptAccessMode _allowScriptAccess;
     bool		_marshallExceptions;
-    bool		_showMenu;
-    ScaleMode		_scaleMode;
-    DisplayState	_displayState;
+
+    /// Whether to show the menu or not.
+    bool _showMenu;
+
+    /// The current scaling mode of the Stage.
+    ScaleMode _scaleMode;
+
+    /// The current state of the Stage (fullscreen or not).
+    DisplayState _displayState;
     
-    // The maximum number of recursions e.g. when finding
-    // 'super', set in the ScriptLimits tag.
+    // Maximum number of recursions set in the ScriptLimits tag.
     boost::uint16_t	_recursionLimit;
 
-    // The timeout in seconds for script execution, in the
-    // ScriptLimits tag.    
+    // Timeout in seconds for script execution, set in the ScriptLimits tag.
     boost::uint16_t	_timeoutLimit;
 
     // delay between movie advancement, in milliseconds
-    unsigned int	_movieAdvancementDelay;
+    size_t _movieAdvancementDelay;
 
     // time of last movie advancement, in milliseconds
-    unsigned int	_lastMovieAdvancement;
+    size_t _lastMovieAdvancement;
 
+    /// The number of the last unnamed instance, used to name instances.
     size_t _unnamedInstance;
 
     MovieLoader _movieLoader;

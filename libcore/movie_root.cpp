@@ -1258,7 +1258,7 @@ movie_root::setShowMenuState(bool state)
     //   or shows the menubar. Flash expects this option to disable some 
     //   context menu items.
     // callInterface is the proper handler for this
-    callInterface("Stage.showMenu", (_showMenu) ? "true" : "false");  //or this?
+    callInterface("Stage.showMenu", (_showMenu) ? "true" : "false"); 
 }
 
 /// Returns the string representation of the current align mode,
