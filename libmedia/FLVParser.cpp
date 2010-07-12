@@ -306,7 +306,7 @@ FLVParser::parseNextTag(bool index_only)
 		_seekRequest = false;
 	}
 
-	uint64_t& position = index_only ? _nextPosToIndex : _lastParsedPosition;
+	boost::uint64_t& position = index_only ? _nextPosToIndex : _lastParsedPosition;
 	bool& completed = index_only ? _indexingCompleted : _parsingComplete;
 
 	//log_debug("parseNextTag: _lastParsedPosition:%d, _nextPosToIndex:%d, index_only:%d", _lastParsedPosition, _nextPosToIndex, index_only);

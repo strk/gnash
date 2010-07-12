@@ -184,7 +184,7 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
     int depth_bytes = _bpp / 8;  // TODO: <Udo> is this correct? Gives 1 for 15 bit modes!
 	struct Screen *_menu_screen; /* Screen pointer for the menu definition */
     APTR vi;
-	uint32_t left = 0, top = 0;
+	uint32 left = 0, top = 0;
 	
     assert(_bpp % 8 == 0);
 

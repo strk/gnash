@@ -130,11 +130,11 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         // GRADIENT
         in.ensureBytes(1);
 
-        uint8_t grad_props = in.read_u8();
+        boost::uint8_t grad_props = in.read_u8();
     
         if (t == SWF::DEFINESHAPE4 ||
             t == SWF::DEFINESHAPE4_) {
-            uint8_t spread_mode = grad_props >> 6;
+            boost::uint8_t spread_mode = grad_props >> 6;
             switch(spread_mode) {
                 case 0:
                     m_spread_mode = SWF::GRADIENT_SPREAD_PAD;
@@ -151,7 +151,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                 );
             }
     
-            uint8_t interpolation = (grad_props >> 4) & 3;
+            boost::uint8_t interpolation = (grad_props >> 4) & 3;
             switch(interpolation) {
                 case 0: 
                     m_interpolation = SWF::GRADIENT_INTERPOL_NORMAL;
@@ -167,7 +167,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             }
         }
     
-        uint8_t num_gradients = grad_props & 0xF;
+        boost::uint8_t num_gradients = grad_props & 0xF;
         if (!num_gradients) {
             IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("num gradients 0"));

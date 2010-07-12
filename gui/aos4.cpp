@@ -176,7 +176,7 @@ AOS4Gui::run()
     int button_state_old = -1;
 	struct IntuiMessage *imsg = NULL;
 	uint32 sigMask;
-    uint32_t movie_time = OS4_GetTicks();
+    uint32 movie_time = OS4_GetTicks();
 	int mod = 0;
 	key::code code;
 	uint32 new_width = _width, new_height = _height;
@@ -877,4 +877,49 @@ AOS4Gui::showAboutDialog(void)
 #endif
 						"\n\nCopyright (C) 2005, 2006, 2007, "
             			"2008, 2009, 2010 The Free Software Foundation"
-						"\n\nAmigaOS4 Version by Andrea Palmat
+						"\n\nAmigaOS4 Version by Andrea Palmatè - http://www.amigasoft.net";
+
+	PrintMsg(about);
+}
+
+struct GnashPrefs *
+AOS4Gui::ReadPrefs(void)
+{
+    RcInitFile& _rcfile = RcInitFile::getDefaultInstance();
+	struct GnashPrefs *localprefs;
+
+	localprefs = (struct GnashPrefs *) malloc(sizeof(GnashPrefs));
+	memset(localprefs, 0, sizeof(GnashPrefs));
+
+	localprefs->verbosity 			= _rcfile.verbosityLevel();
+	localprefs->logtofile 			= _rcfile.useWriteLog();
+	strncpy(localprefs->logfilename, 	_rcfile.getDebugLog().c_str(), 			 254);
+	localprefs->logparser 			= _rcfile.useParserDump();
+	localprefs->logswf    			= _rcfile.useActionDump();
+	localprefs->logmalformedswf 	= _rcfile.showMalformedSWFErrors();
+	localprefs->logactionscript		= _rcfile.showASCodingErrors();
+#if 0
+	localprefs->loglocalconn		= _rcfile.getLCTrace();
+#endif
+	localprefs->connectlocalhost	= _rcfile.useLocalHost();
+	localprefs->connectlocaldomain	= _rcfile.useLocalDomain();
+	localprefs->disablessl			= _rcfile.insecureSSL();
+	strncpy(localprefs->sharedobjdir, 	_rcfile.getSOLSafeDir().c_str(), 		 254);
+	localprefs->dontwriteso			= _rcfile.getSOLReadOnly();
+	localprefs->onlylocalso			= _rcfile.getSOLLocalDomain();
+	localprefs->disablelocal		= _rcfile.getLocalConnection();
+	localprefs->nettimeout			= _rcfile.getStreamsTimeout();
+	localprefs->usesound			= _rcfile.useSound();
+	localprefs->savemedia			= _rcfile.saveStreamingMedia();
+	localprefs->savedynamic			= _rcfile.saveLoadedMedia();
+	strncpy(localprefs->savemediadir, 	_rcfile.getMediaDir().c_str(), 			 254);
+	strncpy(localprefs->playerversion, 	_rcfile.getFlashVersionString().c_str(), 31);
+	strncpy(localprefs->detectedos, 	_rcfile.getFlashSystemOS().c_str(), 	 31);
+	strncpy(localprefs->urlopener, 		_rcfile.getURLOpenerFormat().c_str(),	 254);
+	localprefs->maxsizemovielib		= _rcfile.getMovieLibraryLimit();
+	localprefs->startpaused			= _rcfile.startStopped();
+	return localprefs;
+}
+
+} // namespace gnash
+

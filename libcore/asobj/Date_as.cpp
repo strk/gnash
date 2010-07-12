@@ -1366,7 +1366,7 @@ makeTimeValue(GnashTime& t)
     // Now work out the years from 1970 in days.
 
     // Use a temporary 1970-based year for clarity.
-    const int32_t ouryear = t.year - 70;
+    const boost::int32_t ouryear = t.year - 70;
     
     // Count the leap years between 1970-1-1 and the beginning of our year.
     // 1970 - 1972: no leap years

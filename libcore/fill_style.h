@@ -181,7 +181,7 @@ public:
     }
 
     /// Get fill type, see SWF::fill_style_type
-    uint8_t get_type() const {
+    boost::uint8_t get_type() const {
         return m_type;
     }
 
@@ -254,7 +254,7 @@ private:
     SWF::gradient_interpolation_mode m_interpolation;
 
     /// Fill type, see SWF::fill_style_type
-    uint8_t m_type;
+    boost::uint8_t m_type;
 
     // Only for BITMAP type
     //

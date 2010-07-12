@@ -25,7 +25,6 @@
 #include "SoundInfo.h"
 #include "EmbedSound.h"
 #include "AuxStream.h" // for use..
-#include "../../libcore/vm/VM.h"
 
 #include "log.h" // will import boost::format too
 #include "GnashException.h" // for SoundException
