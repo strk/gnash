@@ -691,7 +691,6 @@ movie_root::mouseClick(bool mouse_pressed)
 bool
 movie_root::fire_mouse_event()
 {
-//    GNASH_REPORT_FUNCTION;
 
     assert(testInvariant());
 

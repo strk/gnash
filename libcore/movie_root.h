@@ -269,17 +269,12 @@ public:
     /// This currently also change the display scale
     /// but we should instead only do it if rescaling
     /// is allowed.
-    ///
     void set_display_viewport(int x0, int y0, int w, int h);
 
-    /// \brief
-    /// Return the notional width of the stage, value depending
-    /// on scaleMode
+    /// Notional width of the stage, actual value depending on scaleMode
     unsigned getStageWidth() const;
 
-    /// \brief
-    /// Return the notional height of the stage, actual value depending
-    /// on scaleMode
+    /// Notional height of the stage, actual value depending on scaleMode
     unsigned getStageHeight() const;
 
     /// Inform the Stage that the mouse has moved.
@@ -292,13 +287,13 @@ public:
     ///
     /// TODO: take twips (or float pixels), or we won't be able to
     ///       support sub-pixel accuracy in collision detection.
-    bool mouseMoved(boost::int32_t x, boost::int32_t y);
+    DSOEXPORT bool mouseMoved(boost::int32_t x, boost::int32_t y);
 
     /// Inform the Stage that a mouse click has occurred.
     //
     /// @param press    true for a mouse click, false for a release
     /// @return         true if any action triggered requires a redraw.
-    bool mouseClick(bool press);
+    DSOEXPORT bool mouseClick(bool press);
 
     /// Inform the Stage that a mouse wheel has moved.
     //
@@ -306,17 +301,14 @@ public:
     ///                 for down. Although values from about -3 to 3 are
     ///                 documented, only -1 and 1 have been observed.
     /// @return         true if any action triggered requires a redraw.
-    bool mouseWheel(int delta);
+    DSOEXPORT bool mouseWheel(int delta);
 
-    /// \brief
-    /// The host app can use this to tell the movie when
-    /// user pressed or released a key.
+    /// Tell the movie when the user pressed or released a key.
     //
-    /// This function should return TRUE iff any action triggered
+    /// This function should return TRUE if any action triggered
     /// by the event requires redraw, see \ref events_handling for
     /// more info.
-    ///
-    bool notify_key_event(key::code k, bool down);
+    DSOEXPORT bool notify_key_event(key::code k, bool down);
 
     /// Use this to retrieve the last state of the mouse.
     //
@@ -464,17 +456,11 @@ public:
     /// Get a unique number for unnamed instances.
     size_t nextUnnamedInstance();
 
-    /// Notify still loaded DisplayObject listeners for key events
-    DSOEXPORT void notify_key_listeners(key::code k, bool down);
-
     /// Push a new DisplayObject listener for key events
     void add_key_listener(InteractiveObject* listener);
 
     /// Remove a DisplayObject listener for key events
     void remove_key_listener(InteractiveObject* listener);
-
-    /// Notify still loaded DisplayObject listeners for mouse events
-    DSOEXPORT void notify_mouse_listeners(const event_id& event);
 
     /// Get the DisplayObject having focus
     //
@@ -956,6 +942,14 @@ private:
     ///
     void setRootMovie(Movie* movie);
 
+    /// Handle mouse events.
+    void notify_mouse_listeners(const event_id& event);
+    
+    /// This function should return TRUE iff any action triggered
+    /// by the event requires redraw, see \ref events_handling for
+    /// more info.
+    bool fire_mouse_event();
+
     const RunResources& _runResources; 
 
     /// The URL of the original root movie.
@@ -994,11 +988,6 @@ private:
 
     /// Cleanup references to unloaded DisplayObjects and run the GC.
     void cleanupAndCollect();
-    
-    /// This function should return TRUE iff any action triggered
-    /// by the event requires redraw, see \ref events_handling for
-    /// more info.
-    bool fire_mouse_event();
 
     /// \brief
     /// Return the topmost entity covering the given point
