@@ -523,10 +523,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
     assert(inputSize);
 
-    //static const unsigned int bufsize = 
-    //(AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
-
-    static const unsigned int bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    const size_t bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
 	// TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
     boost::uint8_t* output;
