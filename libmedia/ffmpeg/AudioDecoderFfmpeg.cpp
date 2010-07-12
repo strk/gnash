@@ -523,10 +523,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
     assert(inputSize);
 
-    //static const unsigned int bufsize = 
-    //(AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
-
-    static const unsigned int bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    const size_t bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
 	// TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
     boost::uint8_t* output;
@@ -575,7 +572,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
                     "ffmpeg/libavcodec might fix this issue."), tmp);
 		outputSize = 0;
 
-		if (output)
+		if (NEEDS_ALIGNED_MEMORY)
 		    av_free(output);
 		else
 		    delete [] output;
@@ -589,7 +586,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 			        outputSize, inputSize);
 		outputSize = 0;
 
-		if (output)
+		if (NEEDS_ALIGNED_MEMORY)
 		    av_free(output);
 		else
 		    delete [] output;
@@ -669,6 +666,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 	    boost::uint8_t* newOutput = new boost::uint8_t[outSize];
 	    memcpy(newOutput, output, outSize);
 	    outPtr = reinterpret_cast<boost::int16_t*>(newOutput);
+        av_free(output);
 	}
 
 	outputSize = outSize;
