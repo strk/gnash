@@ -28,6 +28,7 @@ aos4_gnash_SOURCES = $(GUI_SRCS) aos4_gnash_prefs.cpp aos4_gnash_prefs.h gui_aos
 aos4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 #aos4_gnash_DEPENDENCIES = .configline
 aos4_gnash_LDADD = \
+	$(top_builddir)/librender/libgnashrender.la \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
@@ -35,22 +36,19 @@ aos4_gnash_LDADD = \
 
 # if BUILD_OGL_RENDERER
 # aos4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-# aos4_gnash_LDADD += $(top_builddir)/librender/libgnashogl.la \
 # 	$(OPENGL_LIBS)
 # aos4_gnash_SOURCES += aos4_ogl_glue.cpp aos4_ogl_glue.h 
 # endif
 
 if BUILD_AGG_RENDERER
 aos4_gnash_CPPFLAGS += $(AGG_CFLAGS)
-aos4_gnash_LDADD += $(top_builddir)/librender/libgnashagg.la \
-	$(AGG_LIBS)
+aos4_gnash_LDADD += $(AGG_LIBS)
 aos4_gnash_SOURCES += aos4_agg_glue.cpp aos4_agg_glue.h 
 endif
 
 if BUILD_CAIRO_RENDERER
 aos4_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-aos4_gnash_LDADD += $(top_builddir)/librender/libgnashcairo.la \
-	$(CAIRO_LIBS) 
+aos4_gnash_LDADD += $(CAIRO_LIBS) 
 aos4_gnash_SOURCES += aos4_cairo_glue.cpp aos4_cairo_glue.h 
 endif
 endif
