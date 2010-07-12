@@ -597,8 +597,25 @@ movie_root::notify_key_event(key::code k, bool down)
         _unreleasedKeys.set(keycode, down);
     }
 
-    // Notify built-in key listeners for clip key events
-    notify_key_listeners(k, down);
+    Listeners copy = _keyListeners;
+
+    for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
+            iter != itEnd; ++iter) {
+
+        // sprite, button & input_edit_text DisplayObjects
+        InteractiveObject* const ch = *iter;
+        if (!ch->unloaded()) {
+            if (down) {
+                // KEY_UP and KEY_DOWN events are unrelated to any key!
+                ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
+                // Pass the unique Gnash key code!
+                ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
+            }
+            else {
+                ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
+            }
+        }
+    }
 
     // Broadcast event to Key._listeners.
     as_object* key = getBuiltinObject(*this, NSV::CLASS_KEY);
@@ -986,40 +1003,6 @@ movie_root::display()
     }
 
     renderer->end_display();
-}
-
-
-
-void
-movie_root::notify_key_listeners(key::code k, bool down)
-{
-
-    Listeners copy = _keyListeners;
-    for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
-            iter != itEnd; ++iter)
-    {
-        // sprite, button & input_edit_text DisplayObjects
-        InteractiveObject* const ch = *iter;
-        if (!ch->unloaded()) {
-            if (down) {
-                // KEY_UP and KEY_DOWN events are unrelated to any key!
-                ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
-                // Pass the unique Gnash key code!
-                ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
-            }
-            else {
-                ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
-            }
-        }
-    }
-
-    assert(testInvariant());
-    
-    if (!copy.empty()) {
-        // process actions queued in the above step
-        processActionQueue();
-    }
-
 }
 
 void
