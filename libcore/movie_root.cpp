@@ -640,9 +640,9 @@ movie_root::keyEvent(key::code k, bool down)
     }
 
     // If we're focused on an editable text field, finally the text is updated
-    TextField* tf = dynamic_cast<TextField*>(_currentFocus);
-    if (tf) {
-        tf->notifyEvent(event_id(event_id::KEY_PRESS, k));
+    if (down) {
+        TextField* tf = dynamic_cast<TextField*>(_currentFocus);
+        if (tf) tf->notifyEvent(event_id(event_id::KEY_PRESS, k));
     }
 
     processActionQueue();
