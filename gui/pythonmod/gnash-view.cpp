@@ -320,7 +320,7 @@ key_press_event_cb(GtkWidget */*widget*/, GdkEventKey *event, gpointer data)
     gnash::key::code c = gdk_to_gnash_key(event->keyval);
     
     if (c != gnash::key::INVALID) {
-        if( view->stage->notify_key_event(c, true) )
+        if( view->stage->keyEvent(c, true) )
             gnash_view_display(view);
         return TRUE;
     }
@@ -339,7 +339,7 @@ key_release_event_cb(GtkWidget */*widget*/, GdkEventKey *event, gpointer data)
     gnash::key::code c = gdk_to_gnash_key(event->keyval);
     
     if (c != gnash::key::INVALID) {
-        if( view->stage->notify_key_event(c, false) )
+        if( view->stage->keyEvent(c, false) )
             gnash_view_display(view);
         return TRUE;
     }

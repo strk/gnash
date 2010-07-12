@@ -678,7 +678,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
     
     if (_stopped) return;
     
-    if (_stage->notify_key_event(k, pressed)) {
+    if (_stage->keyEvent(k, pressed)) {
         // any action triggered by the
         // event required screen refresh
         display(_stage);

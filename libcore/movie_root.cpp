@@ -41,6 +41,7 @@
 #include "RunResources.h"
 #include "Renderer.h"
 #include "ExternalInterface.h"
+#include "TextField.h"
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -564,10 +565,8 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
     m_viewport_height = h;
 
     if (_scaleMode == SCALEMODE_NOSCALE) {
-        //log_debug("Rescaling disabled");
         as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
         if (stage) {
-            log_debug("notifying Stage listeners about a resize");
             callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onResize");
         }
 
@@ -583,14 +582,12 @@ movie_root::mouseMoved(boost::int32_t x, boost::int32_t y)
 
     _mouseX = x;
     _mouseY = y;
-    notify_mouse_listeners(event_id::MOUSE_MOVE);
-    return fire_mouse_event();
-
+    return notify_mouse_listeners(event_id::MOUSE_MOVE);
 }
 
 
 bool
-movie_root::notify_key_event(key::code k, bool down)
+movie_root::keyEvent(key::code k, bool down)
 {
     _lastKeyEvent = k;
     const size_t keycode = key::codeMap[k][key::KEY];
@@ -598,11 +595,27 @@ movie_root::notify_key_event(key::code k, bool down)
         _unreleasedKeys.set(keycode, down);
     }
 
-    // Notify DisplayObject key listeners for clip key events
-    notify_key_listeners(k, down);
+    Listeners copy = _keyListeners;
 
-    // Notify both DisplayObject and non-DisplayObject Key listeners
-    //    for user defined handers.
+    for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
+            iter != itEnd; ++iter) {
+
+        // sprite, button & input_edit_text DisplayObjects
+        InteractiveObject* const ch = *iter;
+        if (!ch->unloaded()) {
+            if (down) {
+                // KEY_UP and KEY_DOWN events are unrelated to any key!
+                ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
+                // Pass the unique Gnash key code!
+                ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
+            }
+            else {
+                ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
+            }
+        }
+    }
+
+    // Broadcast event to Key._listeners.
     as_object* key = getBuiltinObject(*this, NSV::CLASS_KEY);
     if (key) {
 
@@ -626,9 +639,15 @@ movie_root::notify_key_event(key::code k, bool down)
         }
     }
 
+    // If we're focused on an editable text field, finally the text is updated
+    if (down) {
+        TextField* tf = dynamic_cast<TextField*>(_currentFocus);
+        if (tf) tf->notifyEvent(event_id(event_id::KEY_PRESS, k));
+    }
+
     processActionQueue();
 
-    return false; // should return true if needs updatee ...
+    return false; 
 }
 
 bool
@@ -657,20 +676,15 @@ movie_root::mouseClick(bool mouse_pressed)
     _mouseButtonState.isDown = mouse_pressed;
 
     if (mouse_pressed) {
-        notify_mouse_listeners(event_id(event_id::MOUSE_DOWN));
+        return notify_mouse_listeners(event_id(event_id::MOUSE_DOWN));
     }
-    else {
-        notify_mouse_listeners(event_id(event_id::MOUSE_UP));
-    }
-
-    return fire_mouse_event();
+    return notify_mouse_listeners(event_id(event_id::MOUSE_UP));
 }
 
 
 bool
 movie_root::fire_mouse_event()
 {
-//    GNASH_REPORT_FUNCTION;
 
     assert(testInvariant());
 
@@ -984,40 +998,7 @@ movie_root::display()
     renderer->end_display();
 }
 
-
-
-void
-movie_root::notify_key_listeners(key::code k, bool down)
-{
-
-    Listeners copy = _keyListeners;
-    for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
-            iter != itEnd; ++iter)
-    {
-        // sprite, button & input_edit_text DisplayObjects
-        InteractiveObject* const ch = *iter;
-        if (!ch->unloaded()) {
-            if (down) {
-                // KEY_UP and KEY_DOWN events are unrelated to any key!
-                ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
-                // Pass the unique Gnash key code!
-                ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
-            }
-            else {
-                ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
-            }
-        }
-    }
-
-    assert(testInvariant());
-
-    if (!copy.empty()) {
-        // process actions queued in the above step
-        processActionQueue();
-    }
-}
-
-void
+bool
 movie_root::notify_mouse_listeners(const event_id& event)
 {
 
@@ -1055,6 +1036,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
         // process actions queued in the above step
         processActionQueue();
     }
+    return fire_mouse_event();
 }
 
 DisplayObject*
@@ -1306,7 +1288,6 @@ movie_root::setStageScaleMode(ScaleMode sm)
     if (notifyResize) {
         as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
         if (stage) {
-            log_debug("notifying Stage listeners about a resize");
             callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onResize");
         }
     }
@@ -1319,7 +1300,6 @@ movie_root::setStageDisplayState(const DisplayState ds)
 
     as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
     if (stage) {
-        log_debug("notifying Stage listeners about fullscreen state");
         const bool fs = _displayState == DISPLAYSTATE_FULLSCREEN;
         callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onFullScreen", fs);
     }

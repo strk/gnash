@@ -2610,10 +2610,6 @@ TextField::handleFocus()
 
     m_has_focus = true;
 
-    // why should we add to the key listener list every time
-    // we call setFocus()???
-    stage().add_key_listener(this);
-
     m_cursor = _text.size();
     format_text();
     return true;
@@ -2629,7 +2625,6 @@ TextField::killFocus()
     set_invalidated();
     m_has_focus = false;
 
-    stage().remove_key_listener(this);
     format_text(); // is this needed ?
 
 }

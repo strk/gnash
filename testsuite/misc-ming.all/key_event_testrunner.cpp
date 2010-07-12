@@ -46,7 +46,7 @@ main(int /*argc*/, char** /*argv*/)
   MovieClip* root = tester.getRootMovie();
   assert(root);
 
-  check_equals(root->get_frame_count(), 23);
+  check_equals(root->get_frame_count(), 24);
   check_equals(root->get_current_frame(), 0);
 
   tester.advance();
@@ -180,6 +180,14 @@ main(int /*argc*/, char** /*argv*/)
   tester.releaseKey(key::K);
   tester.advance();
 
+  // Select the text field
+  tester.movePointerTo(310, 25);
+  tester.click();
+
+  // Enter 'i'
+  tester.pressKey(key::i);
+  tester.advance();
+
   // reached frame23, test finished
-  check_equals(root->get_current_frame(), 22);
+  check_equals(root->get_current_frame(), 23);
 }

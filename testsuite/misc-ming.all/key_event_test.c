@@ -322,8 +322,29 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo);  // _root frame22
  
   check_equals(mo, "test5", "'0+ls3+ls2+ls1+obj1+ls1+obj2+ls2+obj3+obj1+obj2+obj3'");
-  add_actions(mo, "totals(); stop();");
+
+  add_actions(mo,
+     "o = new Object();"
+     "_root.t = '';"
+     "o.onKeyDown = function() { t = _root.ff.text; play(); };"
+     "Key.addListener(o);"
+     "_root.createTextField('ff', 987, 300, 20, 200, 40);"
+     "_root.ff.type = 'input';"
+     "_root.ff.text = 'Input here';"
+     "_root.ff.border = true;"
+    "_root.note('10. Click on the TextField and type \"i\"');"
+    "stop();"
+  );
+  
   SWFMovie_nextFrame(mo);  // _root frame23
+
+  // The listener is called before text is updated!
+  check_equals(mo, "_root.t", "'Input here'");
+  check_equals(mo, "_root.ff.text", "'Input herei'");
+
+
+  add_actions(mo, "totals(); stop();");
+  SWFMovie_nextFrame(mo);  // _root frame24
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
