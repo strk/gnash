@@ -109,12 +109,17 @@ namespace {
 // Utility classes
 namespace {
 
-class FindTarget
+/// Identify and delete ExecutableCode that matches a particular target.
+class RemoveTargetCode
 {
 public:
-    FindTarget(DisplayObject* target) : _target(target) {}
+    RemoveTargetCode(DisplayObject* target) : _target(target) {}
     bool operator()(ExecutableCode* c) const {
-        return _target == c->target();
+        if (_target == c->target()) {
+            delete c;
+            return true;
+        }
+        return false;
     }
 private:
     DisplayObject* _target;
@@ -1462,7 +1467,7 @@ movie_root::removeQueuedConstructor(DisplayObject* target)
 {
     ActionQueue& pr = _actionQueue[PRIORITY_CONSTRUCT];
     
-    pr.erase(std::remove_if(pr.begin(), pr.end(), FindTarget(target)),
+    pr.erase(std::remove_if(pr.begin(), pr.end(), RemoveTargetCode(target)),
             pr.end());
 }
 

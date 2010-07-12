@@ -73,6 +73,8 @@ SharedMem::SharedMem(size_t size)
 
 SharedMem::~SharedMem()
 {
+    // Nothing to do if we were never attached.
+    if (!_addr) return;
 #ifndef _WIN32
     if (::shmdt(_addr) < 0) {
         const int err = errno;
