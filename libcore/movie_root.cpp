@@ -41,6 +41,7 @@
 #include "RunResources.h"
 #include "Renderer.h"
 #include "ExternalInterface.h"
+#include "TextField.h"
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -564,10 +565,8 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
     m_viewport_height = h;
 
     if (_scaleMode == SCALEMODE_NOSCALE) {
-        //log_debug("Rescaling disabled");
         as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
         if (stage) {
-            log_debug("notifying Stage listeners about a resize");
             callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onResize");
         }
 
@@ -598,11 +597,10 @@ movie_root::notify_key_event(key::code k, bool down)
         _unreleasedKeys.set(keycode, down);
     }
 
-    // Notify DisplayObject key listeners for clip key events
+    // Notify built-in key listeners for clip key events
     notify_key_listeners(k, down);
 
-    // Notify both DisplayObject and non-DisplayObject Key listeners
-    //    for user defined handers.
+    // Broadcast event to Key._listeners.
     as_object* key = getBuiltinObject(*this, NSV::CLASS_KEY);
     if (key) {
 
@@ -626,9 +624,15 @@ movie_root::notify_key_event(key::code k, bool down)
         }
     }
 
+    // If we're focused on an editable text field, finally the text is updated
+    TextField* tf = dynamic_cast<TextField*>(_currentFocus);
+    if (tf) {
+        tf->notifyEvent(event_id(event_id::KEY_PRESS, k));
+    }
+
     processActionQueue();
 
-    return false; // should return true if needs updatee ...
+    return false; 
 }
 
 bool
@@ -1010,11 +1014,12 @@ movie_root::notify_key_listeners(key::code k, bool down)
     }
 
     assert(testInvariant());
-
+    
     if (!copy.empty()) {
         // process actions queued in the above step
         processActionQueue();
     }
+
 }
 
 void
@@ -1306,7 +1311,6 @@ movie_root::setStageScaleMode(ScaleMode sm)
     if (notifyResize) {
         as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
         if (stage) {
-            log_debug("notifying Stage listeners about a resize");
             callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onResize");
         }
     }
@@ -1319,7 +1323,6 @@ movie_root::setStageDisplayState(const DisplayState ds)
 
     as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
     if (stage) {
-        log_debug("notifying Stage listeners about fullscreen state");
         const bool fs = _displayState == DISPLAYSTATE_FULLSCREEN;
         callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onFullScreen", fs);
     }
