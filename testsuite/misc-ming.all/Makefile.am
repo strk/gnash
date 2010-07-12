@@ -176,7 +176,9 @@ check_PROGRAMS = \
 	duplicate_movie_clip_test2 \
 	event_handler_scope_test \
 	masks_testrunner \
+	KeyEventOrder \
 	key_event_test \
+	KeyEventOrderRunner \
 	key_event_testrunner \
 	static_vs_dynamic1 \
 	static_vs_dynamic2 \
@@ -815,6 +817,28 @@ key_event_testrunner_CXXFLAGS = \
 	$(NULL)
 key_event_testrunner_DEPENDENCIES = \
 	key_event_test.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
+KeyEventOrder_SOURCES = KeyEventOrder.c
+KeyEventOrder_LDADD = libgnashmingutils.la
+
+KeyEventOrder.swf: KeyEventOrder
+	./KeyEventOrder $(abs_mediadir)
+
+KeyEventOrderRunner_SOURCES = \
+	KeyEventOrderRunner.cpp \
+	$(NULL)
+KeyEventOrderRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+KeyEventOrderRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+KeyEventOrderRunner_DEPENDENCIES = \
+	KeyEventOrder.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
@@ -2186,6 +2210,7 @@ TEST_CASES = \
 	event_handler_scope_testrunner \
 	masks_testrunner \
 	masks_test2runner \
+	KeyEventOrderRunner \
 	key_event_testrunner \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
