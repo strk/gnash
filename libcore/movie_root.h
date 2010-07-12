@@ -943,7 +943,7 @@ private:
     void setRootMovie(Movie* movie);
 
     /// Handle mouse events.
-    void notify_mouse_listeners(const event_id& event);
+    bool notify_mouse_listeners(const event_id& event);
     
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for

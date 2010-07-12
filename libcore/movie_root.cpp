@@ -582,9 +582,7 @@ movie_root::mouseMoved(boost::int32_t x, boost::int32_t y)
 
     _mouseX = x;
     _mouseY = y;
-    notify_mouse_listeners(event_id::MOUSE_MOVE);
-    return fire_mouse_event();
-
+    return notify_mouse_listeners(event_id::MOUSE_MOVE);
 }
 
 
@@ -678,13 +676,9 @@ movie_root::mouseClick(bool mouse_pressed)
     _mouseButtonState.isDown = mouse_pressed;
 
     if (mouse_pressed) {
-        notify_mouse_listeners(event_id(event_id::MOUSE_DOWN));
+        return notify_mouse_listeners(event_id(event_id::MOUSE_DOWN));
     }
-    else {
-        notify_mouse_listeners(event_id(event_id::MOUSE_UP));
-    }
-
-    return fire_mouse_event();
+    return notify_mouse_listeners(event_id(event_id::MOUSE_UP));
 }
 
 
@@ -1004,7 +998,7 @@ movie_root::display()
     renderer->end_display();
 }
 
-void
+bool
 movie_root::notify_mouse_listeners(const event_id& event)
 {
 
@@ -1042,6 +1036,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
         // process actions queued in the above step
         processActionQueue();
     }
+    return fire_mouse_event();
 }
 
 DisplayObject*
