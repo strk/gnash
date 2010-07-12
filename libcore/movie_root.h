@@ -308,7 +308,7 @@ public:
     /// This function should return TRUE if any action triggered
     /// by the event requires redraw, see \ref events_handling for
     /// more info.
-    DSOEXPORT bool notify_key_event(key::code k, bool down);
+    DSOEXPORT bool keyEvent(key::code k, bool down);
 
     /// Use this to retrieve the last state of the mouse.
     //

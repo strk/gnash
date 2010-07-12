@@ -587,7 +587,7 @@ movie_root::mouseMoved(boost::int32_t x, boost::int32_t y)
 
 
 bool
-movie_root::notify_key_event(key::code k, bool down)
+movie_root::keyEvent(key::code k, bool down)
 {
     _lastKeyEvent = k;
     const size_t keycode = key::codeMap[k][key::KEY];

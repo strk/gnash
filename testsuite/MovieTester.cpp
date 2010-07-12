@@ -431,7 +431,7 @@ MovieTester::scrollMouse(int delta)
 void
 MovieTester::pressKey(key::code code)
 {
-    if ( _movie_root->notify_key_event(code, true) ) {
+    if ( _movie_root->keyEvent(code, true) ) {
 	render();
     }
 }
@@ -439,7 +439,7 @@ MovieTester::pressKey(key::code code)
 void
 MovieTester::releaseKey(key::code code)
 {
-    if ( _movie_root->notify_key_event(code, false) ) {
+    if ( _movie_root->keyEvent(code, false) ) {
 	render();
     }
 }
