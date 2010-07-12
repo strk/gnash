@@ -61,7 +61,7 @@ main(int argc, char** argv)
   SWFMovieClip mc, dejagnuclip;
   SWFButtonRecord br;
   SWFButton bu;
-  SWFDisplayItem it;
+  SWFDisplayItem it1, it, it2;
   SWFShape sh1, sh2;
 
   const char *srcdir=".";
@@ -87,7 +87,6 @@ main(int argc, char** argv)
 
   add_actions(mo,
           "_root.order = '';"
-          "trace('hi' + _root.note);"
           "_root.note('Press \"a\" then \"b\"');"
           "_root.note('Do not press any other keys!');"
           );
@@ -117,8 +116,8 @@ main(int argc, char** argv)
           newSWFAction("trace('button1'); _root.order += 'button1,';"),
 		  SWFBUTTON_KEYPRESS('a'));
 
-  it = SWFMovie_add(mo, (SWFBlock)bu);
-  SWFDisplayItem_setName(it, "button");
+  it1 = SWFMovie_add(mo, (SWFBlock)bu);
+  SWFDisplayItem_setName(it, "button1");
 
   SWFMovie_add(mo, newSWFAction(
               "o1 = {};"
@@ -156,7 +155,7 @@ main(int argc, char** argv)
           newSWFAction("trace('button2'); _root.order += 'button2,';"),
 		  SWFBUTTON_KEYPRESS('a'));
 
-  it = SWFMovie_add(mo, (SWFBlock)bu);
+  it2 = SWFMovie_add(mo, (SWFBlock)bu);
   SWFDisplayItem_setName(it, "button2");
   
   bu = newSWFButton();
@@ -196,6 +195,24 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
+  xcheck_equals(mo, "_root.order",
+          "'mc2,mc1,o1,o2,button1,mc2,mc1,o1,o2,button3,'");
+  
+  SWFMovie_nextFrame(mo);
+
+  SWFDisplayItem_remove(it2);
+  
+  add_actions(mo,
+          "_root.order = '';"
+          "_root.note('Press \"a\" then \"b\" again');"
+          "_root.note('Do not press any other keys!');"
+          "stop();"
+          );
+  SWFMovie_nextFrame(mo);
+
+  // Check that removing the second button associated with 'a' does not
+  // remove the key trigger for button2. There's no reason to think it should,
+  // but it could happen if it's implemented badly!
   xcheck_equals(mo, "_root.order",
           "'mc2,mc1,o1,o2,button1,mc2,mc1,o1,o2,button3,'");
 

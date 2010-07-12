@@ -46,7 +46,7 @@ main(int /*argc*/, char** /*argv*/)
   MovieClip* root = tester.getRootMovie();
   assert(root);
 
-  check_equals(root->get_frame_count(), 4);
+  check_equals(root->get_frame_count(), 6);
   check_equals(root->get_current_frame(), 0);
 
   tester.advance();
@@ -63,6 +63,18 @@ main(int /*argc*/, char** /*argv*/)
   
   tester.advance();
   tester.advance();
-  check_equals(root->get_current_frame(), 3);
+
+  check_equals(root->get_current_frame(), 4);
+
+  // provide a key press to continue the test
+  tester.pressKey(key::a);
+  tester.releaseKey(key::a);
+  
+  tester.pressKey(key::b);
+  tester.releaseKey(key::b);
+  
+  tester.advance();
+  tester.advance();
+  check_equals(root->get_current_frame(), 5);
   
 }
