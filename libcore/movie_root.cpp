@@ -95,9 +95,6 @@ namespace {
     as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
     void advanceLiveChar(MovieClip* ch);
 
-    /// Erase unloaded DisplayObjects from the given listeners list
-    void cleanupListeners(movie_root::Listeners& ll);
-
     /// Push a DisplayObject listener to the front of given container, if not
     /// already present
     void add_listener(movie_root::Listeners& ll, Button* elem);
@@ -293,7 +290,6 @@ movie_root::cleanupAndCollect()
     // Cleanup the stack.
     _vm.getStack().clear();
 
-    cleanupUnloadedListeners();
     cleanupDisplayList();
     GC::get().fuzzyCollect();
 }
@@ -1917,7 +1913,6 @@ movie_root::ExternalCallback::call(const std::vector<as_value>& args)
 void
 movie_root::cleanupUnloadedListeners()
 {
-    cleanupListeners(_keyListeners);
 }
 
 void
@@ -2610,55 +2605,6 @@ remove_listener(movie_root::Listeners& ll, Button* listener)
 {
     assert(listener);
     ll.remove_if(std::bind2nd(std::equal_to<Button*>(), listener));
-}
-
-void
-cleanupListeners(movie_root::Listeners& ll)
-{
-    bool needScan;
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-    int scansCount = 0;
-#endif
-
-    do
-    {
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-      scansCount++;
-      int cleaned =0;
-#endif
-
-      needScan=false;
-
-      // remove unloaded DisplayObject listeners from movie_root
-      for (movie_root::Listeners::iterator iter = ll.begin();
-              iter != ll.end(); ) {
-          Button* const ch = *iter;
-          if ( ch->unloaded() )
-          {
-            if ( ! ch->isDestroyed() )
-            {
-              ch->destroy();
-              needScan=true; // ->destroy() might mark already-scanned chars as unloaded
-            }
-            iter = ll.erase(iter);
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-            cleaned++;
-#endif
-
-          }
-
-          else ++iter;
-      }
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-      cout << " Scan " << scansCount << " cleaned " << cleaned << " instances" << endl;
-#endif
-
-    } while (needScan);
-    
 }
 
 
