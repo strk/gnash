@@ -58,9 +58,7 @@
 ///
 /// - bool movie_root::notify_mouse_moved(int x, int y);
 /// - bool movie_root::notify_mouse_clicked(bool mouse_pressed, int mask);
-/// - bool movie_root::notify_key_event(key::code k, bool down);
-/// 
-/// 
+/// - bool keyEvent(key::code k, bool down);
 
 
 #ifndef GNASH_MOVIE_ROOT_H
@@ -114,6 +112,7 @@ namespace gnash {
     class VirtualClock;
     class IOChannel;
     class RunResources;
+    class Button;
 }
 
 namespace gnash
@@ -150,7 +149,7 @@ class DSOEXPORT movie_root : boost::noncopyable
 public:
     
     /// Listeners container
-    typedef std::list<InteractiveObject*> Listeners;
+    typedef std::list<Button*> Listeners;
 
     class LoadCallback {
     public:
@@ -457,10 +456,10 @@ public:
     size_t nextUnnamedInstance();
 
     /// Push a new DisplayObject listener for key events
-    void add_key_listener(InteractiveObject* listener);
+    void add_key_listener(Button* listener);
 
     /// Remove a DisplayObject listener for key events
-    void remove_key_listener(InteractiveObject* listener);
+    void remove_key_listener(Button* listener);
 
     /// Get the DisplayObject having focus
     //

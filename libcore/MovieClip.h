@@ -728,14 +728,6 @@ private:
 
     void stopStreamSound();
 
-    /// Register this sprite as a listener of core broadcasters
-    //
-    /// This is currently only used for key events broadcaster
-    /// and it's supposed to be called only once (or should we
-    /// also call it whenever onKey* user-defined function is defined ?
-    ///
-    void registerAsListener();
-
     /// Return value of the 'enabled' property cast to a boolean value.
     //
     /// This is true if not found (undefined to bool evaluates to false).

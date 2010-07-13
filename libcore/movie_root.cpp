@@ -42,6 +42,7 @@
 #include "Renderer.h"
 #include "ExternalInterface.h"
 #include "TextField.h"
+#include "Button.h"
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -99,10 +100,10 @@ namespace {
 
     /// Push a DisplayObject listener to the front of given container, if not
     /// already present
-    void add_listener(movie_root::Listeners& ll, InteractiveObject* elem);
+    void add_listener(movie_root::Listeners& ll, Button* elem);
 
     /// Remove a listener from the list
-    void remove_listener(movie_root::Listeners& ll, InteractiveObject* elem);
+    void remove_listener(movie_root::Listeners& ll, Button* elem);
 
 }
 
@@ -600,9 +601,8 @@ movie_root::keyEvent(key::code k, bool down)
         _unreleasedKeys.set(keycode, down);
     }
 
-    Listeners copy = _keyListeners;
-
-    for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
+    LiveChars copy = _liveChars;
+    for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
             iter != itEnd; ++iter) {
 
         // sprite, button & input_edit_text DisplayObjects
@@ -643,6 +643,27 @@ movie_root::keyEvent(key::code k, bool down)
             clearActionQueue();
         }
     }
+    
+    // Then any button keys are notified.
+    Listeners lcopy = _keyListeners;
+    for (Listeners::iterator iter = lcopy.begin(), itEnd = lcopy.end();
+            iter != itEnd; ++iter) {
+
+        // sprite, button & input_edit_text DisplayObjects
+        Button* const ch = *iter;
+        if (!ch->unloaded()) {
+            if (down) {
+                // KEY_UP and KEY_DOWN events are unrelated to any key!
+                ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
+                // Pass the unique Gnash key code!
+                ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
+            }
+            else {
+                ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
+            }
+        }
+    }
+
 
     // If we're focused on an editable text field, finally the text is updated
     if (down) {
@@ -1900,14 +1921,14 @@ movie_root::cleanupUnloadedListeners()
 }
 
 void
-movie_root::add_key_listener(InteractiveObject* listener)
+movie_root::add_key_listener(Button* listener)
 {
     add_listener(_keyListeners, listener);
 }
 
 /// Remove a DisplayObject listener for key events
 void
-movie_root::remove_key_listener(InteractiveObject* listener)
+movie_root::remove_key_listener(Button* listener)
 {
     remove_listener(_keyListeners, listener);
 }
@@ -2573,7 +2594,7 @@ advanceLiveChar(MovieClip* mo)
 }
 
 void
-add_listener(movie_root::Listeners& ll, InteractiveObject* listener)
+add_listener(movie_root::Listeners& ll, Button* listener)
 {
     assert(listener);
 
@@ -2585,10 +2606,10 @@ add_listener(movie_root::Listeners& ll, InteractiveObject* listener)
 
 
 void
-remove_listener(movie_root::Listeners& ll, InteractiveObject* listener)
+remove_listener(movie_root::Listeners& ll, Button* listener)
 {
     assert(listener);
-    ll.remove_if(std::bind2nd(std::equal_to<InteractiveObject*>(), listener));
+    ll.remove_if(std::bind2nd(std::equal_to<Button*>(), listener));
 }
 
 void
@@ -2613,7 +2634,7 @@ cleanupListeners(movie_root::Listeners& ll)
       // remove unloaded DisplayObject listeners from movie_root
       for (movie_root::Listeners::iterator iter = ll.begin();
               iter != ll.end(); ) {
-          InteractiveObject* const ch = *iter;
+          Button* const ch = *iter;
           if ( ch->unloaded() )
           {
             if ( ! ch->isDestroyed() )
