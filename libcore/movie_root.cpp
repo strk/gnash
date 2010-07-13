@@ -603,16 +603,14 @@ movie_root::keyEvent(key::code k, bool down)
 
         // sprite, button & input_edit_text DisplayObjects
         InteractiveObject* const ch = *iter;
-        if (!ch->unloaded()) {
-            if (down) {
-                // KEY_UP and KEY_DOWN events are unrelated to any key!
-                ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
-                // Pass the unique Gnash key code!
-                ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
-            }
-            else {
-                ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
-            }
+        if (ch->unloaded()) continue;
+
+        if (down) {
+            ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
+            ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
+        }
+        else {
+            ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
         }
     }
 
@@ -647,16 +645,14 @@ movie_root::keyEvent(key::code k, bool down)
 
         // sprite, button & input_edit_text DisplayObjects
         Button* const ch = *iter;
-        if (!ch->unloaded()) {
-            if (down) {
-                // KEY_UP and KEY_DOWN events are unrelated to any key!
-                ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
-                // Pass the unique Gnash key code!
-                ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
-            }
-            else {
-                ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
-            }
+        if (ch->unloaded()) continue;
+
+        if (down) {
+            ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
+            ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
+        }
+        else {
+            ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
         }
     }
 
