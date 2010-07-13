@@ -1735,8 +1735,6 @@ movie_root::markReachableResources() const
     }
 #endif
     
-    // NOTE: cleanupUnloadedListeners() should have cleaned up all unloaded
-    // key listeners. The remaining ones should be marked by their parents
 #if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
     for (Listeners::const_iterator i=_keyListeners.begin(),
             e=_keyListeners.end(); i!=e; ++i) {
@@ -1908,11 +1906,6 @@ movie_root::ExternalCallback::call(const std::vector<as_value>& args)
 #endif
     
     return as_value();
-}
-
-void
-movie_root::cleanupUnloadedListeners()
-{
 }
 
 void

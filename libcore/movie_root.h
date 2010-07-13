@@ -982,9 +982,6 @@ private:
     /// Execute expired timers
     void executeTimers();
 
-    /// Remove unloaded key and mouselisteners.
-    void cleanupUnloadedListeners();
-
     /// Cleanup references to unloaded DisplayObjects and run the GC.
     void cleanupAndCollect();
 
