@@ -213,7 +213,7 @@ main(int argc, char** argv)
   // Check that removing the second button associated with 'a' does not
   // remove the key trigger for button2. There's no reason to think it should,
   // but it could happen if it's implemented badly!
-  xcheck_equals(mo, "_root.order",
+  check_equals(mo, "_root.order",
           "'mc2,mc1,o1,o2,button1,mc2,mc1,o1,o2,button3,'");
 
   SWFMovie_add(mo, newSWFAction("stop();"));
