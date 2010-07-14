@@ -58,9 +58,7 @@
 ///
 /// - bool movie_root::notify_mouse_moved(int x, int y);
 /// - bool movie_root::notify_mouse_clicked(bool mouse_pressed, int mask);
-/// - bool movie_root::notify_key_event(key::code k, bool down);
-/// 
-/// 
+/// - bool keyEvent(key::code k, bool down);
 
 
 #ifndef GNASH_MOVIE_ROOT_H
@@ -114,6 +112,7 @@ namespace gnash {
     class VirtualClock;
     class IOChannel;
     class RunResources;
+    class Button;
 }
 
 namespace gnash
@@ -150,7 +149,7 @@ class DSOEXPORT movie_root : boost::noncopyable
 public:
     
     /// Listeners container
-    typedef std::list<InteractiveObject*> Listeners;
+    typedef std::list<Button*> Listeners;
 
     class LoadCallback {
     public:
@@ -208,8 +207,8 @@ public:
     /// SWF playback, so for normal playback this pointer should not be
     /// used.
     Movie* init(movie_definition* def,
-		const MovieClip::MovieVariables& variables,
-		const MovieClip::MovieVariables& scriptables);
+            const MovieClip::MovieVariables& variables,
+            const MovieClip::MovieVariables& scriptables);
 
     /// Return the movie at the given level (0 if unloaded level).
     //
@@ -457,10 +456,10 @@ public:
     size_t nextUnnamedInstance();
 
     /// Push a new DisplayObject listener for key events
-    void add_key_listener(InteractiveObject* listener);
+    void add_key_listener(Button* listener);
 
     /// Remove a DisplayObject listener for key events
-    void remove_key_listener(InteractiveObject* listener);
+    void remove_key_listener(Button* listener);
 
     /// Get the DisplayObject having focus
     //
@@ -601,19 +600,14 @@ public:
 
     /// Action priority levels
     enum ActionPriorityLevel {
-	
         /// Init actions, Init event handlers
         PRIORITY_INIT,
-	
         /// Construct event handlers
         PRIORITY_CONSTRUCT,
-
         /// Frame actions, load handlers, unload handlers
         PRIORITY_DOACTION,
-
         /// Last element used to easy computation of size...
         PRIORITY_SIZE
-        
     };
 
     /// Push an executable code to the ActionQueue
@@ -888,11 +882,11 @@ public:
     void getCharacterTree(tree<StringPair>& tr, tree<StringPair>::iterator it);
 #endif
 
-	/// Get URL of the SWF movie used to initialize this VM
-	//
-	/// This information will be used for security checks
-	///
-	const std::string& getOriginalURL() const { return _originalURL; }
+    /// Get URL of the SWF movie used to initialize this VM
+    //
+    /// This information will be used for security checks
+    ///
+    const std::string& getOriginalURL() const { return _originalURL; }
 
     const RunResources& runResources() const { return _runResources; }
 
@@ -982,9 +976,6 @@ private:
     
     /// Execute expired timers
     void executeTimers();
-
-    /// Remove unloaded key and mouselisteners.
-    void cleanupUnloadedListeners();
 
     /// Cleanup references to unloaded DisplayObjects and run the GC.
     void cleanupAndCollect();
@@ -1117,8 +1108,7 @@ private:
     /// @todo fold this into m_mouse_button_state?
     drag_state m_drag_state;
 
-    typedef MovieClip* LevelMovie;
-    typedef std::map<int, LevelMovie> Levels;
+    typedef std::map<int, MovieClip*> Levels;
 
     /// The movie instance wrapped by this movie_root
     //
@@ -1137,14 +1127,14 @@ private:
 
     /// This is set to true if execution of scripts
     /// aborted due to action limit set or whatever else
-    bool		_disableScripts;
-    int			_processingActionLevel;
+    bool _disableScripts;
+    int _processingActionLevel;
     
     /// filedescriptor to write to for host application requests
     //
     /// -1 if none
-    int			_hostfd;
-    int			_controlfd;
+    int _hostfd;
+    int _controlfd;
 
     /// The display quality of the entire movie.
     //
@@ -1153,10 +1143,10 @@ private:
     Quality _quality;
 
     /// The alignment of the Stage
-    std::bitset<4u>	_alignMode;
+    std::bitset<4u> _alignMode;
 
     AllowScriptAccessMode _allowScriptAccess;
-    bool		_marshallExceptions;
+    bool _marshallExceptions;
 
     /// Whether to show the menu or not.
     bool _showMenu;
@@ -1168,10 +1158,10 @@ private:
     DisplayState _displayState;
     
     // Maximum number of recursions set in the ScriptLimits tag.
-    boost::uint16_t	_recursionLimit;
+    boost::uint16_t _recursionLimit;
 
     // Timeout in seconds for script execution, set in the ScriptLimits tag.
-    boost::uint16_t	_timeoutLimit;
+    boost::uint16_t _timeoutLimit;
 
     // delay between movie advancement, in milliseconds
     size_t _movieAdvancementDelay;

@@ -42,6 +42,7 @@
 #include "Renderer.h"
 #include "ExternalInterface.h"
 #include "TextField.h"
+#include "Button.h"
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -94,15 +95,12 @@ namespace {
     as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
     void advanceLiveChar(MovieClip* ch);
 
-    /// Erase unloaded DisplayObjects from the given listeners list
-    void cleanupListeners(movie_root::Listeners& ll);
-
     /// Push a DisplayObject listener to the front of given container, if not
     /// already present
-    void add_listener(movie_root::Listeners& ll, InteractiveObject* elem);
+    void add_listener(movie_root::Listeners& ll, Button* elem);
 
     /// Remove a listener from the list
-    void remove_listener(movie_root::Listeners& ll, InteractiveObject* elem);
+    void remove_listener(movie_root::Listeners& ll, Button* elem);
 
 }
 
@@ -292,7 +290,6 @@ movie_root::cleanupAndCollect()
     // Cleanup the stack.
     _vm.getStack().clear();
 
-    cleanupUnloadedListeners();
     cleanupDisplayList();
     GC::get().fuzzyCollect();
 }
@@ -315,7 +312,7 @@ movie_root::setLevel(unsigned int num, Movie* movie)
     {
         // don't leak overloaded levels
 
-        LevelMovie lm = it->second;
+        MovieClip* lm = it->second;
         if (lm == _rootMovie)
         {
             // NOTE: this is not enough to trigger
@@ -600,23 +597,20 @@ movie_root::keyEvent(key::code k, bool down)
         _unreleasedKeys.set(keycode, down);
     }
 
-    Listeners copy = _keyListeners;
-
-    for (Listeners::iterator iter = copy.begin(), itEnd=copy.end();
+    LiveChars copy = _liveChars;
+    for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
             iter != itEnd; ++iter) {
 
         // sprite, button & input_edit_text DisplayObjects
         InteractiveObject* const ch = *iter;
-        if (!ch->unloaded()) {
-            if (down) {
-                // KEY_UP and KEY_DOWN events are unrelated to any key!
-                ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
-                // Pass the unique Gnash key code!
-                ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
-            }
-            else {
-                ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
-            }
+        if (ch->unloaded()) continue;
+
+        if (down) {
+            ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
+            ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
+        }
+        else {
+            ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
         }
     }
 
@@ -643,6 +637,25 @@ movie_root::keyEvent(key::code k, bool down)
             clearActionQueue();
         }
     }
+    
+    // Then any button keys are notified.
+    Listeners lcopy = _keyListeners;
+    for (Listeners::iterator iter = lcopy.begin(), itEnd = lcopy.end();
+            iter != itEnd; ++iter) {
+
+        // sprite, button & input_edit_text DisplayObjects
+        Button* const ch = *iter;
+        if (ch->unloaded()) continue;
+
+        if (down) {
+            ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
+            ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
+        }
+        else {
+            ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
+        }
+    }
+
 
     // If we're focused on an editable text field, finally the text is updated
     if (down) {
@@ -1718,8 +1731,6 @@ movie_root::markReachableResources() const
     }
 #endif
     
-    // NOTE: cleanupUnloadedListeners() should have cleaned up all unloaded
-    // key listeners. The remaining ones should be marked by their parents
 #if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
     for (Listeners::const_iterator i=_keyListeners.begin(),
             e=_keyListeners.end(); i!=e; ++i) {
@@ -1894,20 +1905,14 @@ movie_root::ExternalCallback::call(const std::vector<as_value>& args)
 }
 
 void
-movie_root::cleanupUnloadedListeners()
-{
-    cleanupListeners(_keyListeners);
-}
-
-void
-movie_root::add_key_listener(InteractiveObject* listener)
+movie_root::add_key_listener(Button* listener)
 {
     add_listener(_keyListeners, listener);
 }
 
 /// Remove a DisplayObject listener for key events
 void
-movie_root::remove_key_listener(InteractiveObject* listener)
+movie_root::remove_key_listener(Button* listener)
 {
     remove_listener(_keyListeners, listener);
 }
@@ -2251,9 +2256,8 @@ movie_root::getCharacterTree(tree<StringPair>& tr,
                 os.str()));
 
     /// Live DisplayObjects tree
-    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
-                                                               i != e; ++i)
-    {
+    for (LiveChars::const_iterator i = _liveChars.begin(), e = _liveChars.end();
+            i != e; ++i) {
         (*i)->getMovieInfo(tr, localIter);
     }
 
@@ -2573,7 +2577,7 @@ advanceLiveChar(MovieClip* mo)
 }
 
 void
-add_listener(movie_root::Listeners& ll, InteractiveObject* listener)
+add_listener(movie_root::Listeners& ll, Button* listener)
 {
     assert(listener);
 
@@ -2585,59 +2589,10 @@ add_listener(movie_root::Listeners& ll, InteractiveObject* listener)
 
 
 void
-remove_listener(movie_root::Listeners& ll, InteractiveObject* listener)
+remove_listener(movie_root::Listeners& ll, Button* listener)
 {
     assert(listener);
-    ll.remove_if(std::bind2nd(std::equal_to<InteractiveObject*>(), listener));
-}
-
-void
-cleanupListeners(movie_root::Listeners& ll)
-{
-    bool needScan;
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-    int scansCount = 0;
-#endif
-
-    do
-    {
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-      scansCount++;
-      int cleaned =0;
-#endif
-
-      needScan=false;
-
-      // remove unloaded DisplayObject listeners from movie_root
-      for (movie_root::Listeners::iterator iter = ll.begin();
-              iter != ll.end(); ) {
-          InteractiveObject* const ch = *iter;
-          if ( ch->unloaded() )
-          {
-            if ( ! ch->isDestroyed() )
-            {
-              ch->destroy();
-              needScan=true; // ->destroy() might mark already-scanned chars as unloaded
-            }
-            iter = ll.erase(iter);
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-            cleaned++;
-#endif
-
-          }
-
-          else ++iter;
-      }
-
-#ifdef GNASH_DEBUG_DLIST_CLEANUP
-      cout << " Scan " << scansCount << " cleaned " << cleaned << " instances" << endl;
-#endif
-
-    } while (needScan);
-    
+    ll.remove_if(std::bind2nd(std::equal_to<Button*>(), listener));
 }
 
 

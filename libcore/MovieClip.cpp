@@ -379,9 +379,6 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
 MovieClip::~MovieClip()
 {
     stopStreamSound();
-
-    stage().remove_key_listener(this);
-
     deleteChecked(_loadVariableRequests.begin(), _loadVariableRequests.end());
 }
 
@@ -1713,14 +1710,6 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 }
 
 
-/// Register DisplayObjects as key listeners if they have clip key events
-/// defined. Don't call twice for the same character.
-void
-MovieClip::registerAsListener()
-{
-    stage().add_key_listener(this);
-}
-
 void
 MovieClip::constructAsScriptObject()
 {
@@ -1778,9 +1767,6 @@ MovieClip::construct(as_object* initObj)
 
     // Register this movieclip as a live one
     stage().addLiveChar(this);
-
-    // Register this movieclip as a core broadcasters listener
-    registerAsListener();
 
     // It seems it's legal to place 0-framed movieclips on stage.
     // See testsuite/misc-swfmill.all/zeroframe_definemovieclip.swf
