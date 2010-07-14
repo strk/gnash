@@ -27,8 +27,12 @@
 
 #include <map>
 #include <string>
+#include <algorithm>
+#include <iterator>
+#include <boost/utility/enable_if.hpp>
 
 #include "dsodefs.h"
+#include "GnashAlgorithm.h"
 
 namespace gnash {
 
@@ -68,6 +72,19 @@ public:
     static GnashFactory& instance() {
         static GnashFactory m;
         return m;
+    }
+
+    /// Dump the registered keys to the iterator.
+    //
+    /// Only usable with output iterators.
+    template<typename Iterator>
+    void listKeys(Iterator i, typename boost::enable_if<boost::is_same<
+              typename std::iterator_traits<Iterator>::iterator_category,
+              std::output_iterator_tag> >::type* dummy = 0) {
+        static_cast<void>(dummy);
+        std::transform(_handlers.begin(), _handlers.end(), i,
+                FirstElement<typename Handlers::value_type>());
+
     }
 
     /// Return a MediaHandler identified by a name.

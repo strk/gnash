@@ -41,6 +41,7 @@
 #include "GnashNumeric.h" // for clamp
 #include "GnashException.h"
 #include "bzrversion.h"
+#include "MediaHandler.h"
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
@@ -87,8 +88,11 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 static void
 usage()
 {
+    std::ostringstream handlers;
+    gnash::media::MediaFactory::instance().listKeys(
+            std::ostream_iterator<std::string>(handlers, " "));
 
-cout << _("Usage: gnash [options] movie_file.swf\n")
+    cout << _("Usage: gnash [options] movie_file.swf\n")
     << "\n"
     << _("Plays a SWF (Shockwave Flash) movie\n")
     << _("Options:\n")
@@ -122,8 +126,8 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("                           1 enable rendering, disable sound\n") 
     << _("                           2 enable sound, disable rendering\n") 
     << _("                           3 enable rendering and sound (default)\n") 
-    << _("  -M,  --media <handler>   The media handler to use, e.g. gst or\n"
-        "                            ffmpeg.\n")
+    << _("  -M,  --media < ") << handlers.str() << ">\n"
+    << _("                           The media handler to use\n")
     // Only list the renderers that were configured in for this build
     << _("  -R,  --renderer <")
 #ifdef RENDERER_OPENGL
