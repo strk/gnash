@@ -931,7 +931,8 @@ AC_ARG_ENABLE(media,
       if test "x$val" = "x$enableval"; then
         break;
       fi
-    done
+    done,
+    [build_media_gst=yes; media_handler_specified=true]
 )
 
 
