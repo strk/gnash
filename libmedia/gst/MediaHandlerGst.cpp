@@ -18,6 +18,8 @@
 
 #include "MediaHandler.h"
 
+#include <sstream>
+
 #include "VideoDecoderGst.h"
 #include "AudioDecoderGst.h"
 #include "MediaParserGst.h"
@@ -52,6 +54,15 @@ namespace gst {
 class DSOEXPORT MediaHandlerGst : public MediaHandler
 {
 public:
+
+    virtual std::string description() const {
+        guint major, minor, micro, nano;
+        gst_version(&major, &minor, &micro, &nano);
+        std::ostringstream s;
+        s << _("Gstreamer Media Handler, gst version: ") <<  major << "." 
+            << minor << "." << micro;
+        return s.str();
+    }
 
 	virtual std::auto_ptr<MediaParser>
         createMediaParser(std::auto_ptr<IOChannel> stream);

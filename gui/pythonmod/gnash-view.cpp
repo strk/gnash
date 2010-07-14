@@ -42,12 +42,6 @@
 #include "NamingPolicy.h"
 #include "StreamProvider.h"
 
-#ifdef USE_FFMPEG
-# include "MediaHandlerFfmpeg.h"
-#elif defined(USE_GST)
-# include "MediaHandlerGst.h"
-#endif
-
 enum
 {
 	PROP_0,
@@ -217,21 +211,15 @@ gnash_view_init(GnashView *view)
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setVerbosity(3);
 
-    // Init media
-#ifdef USE_FFMPEG
-    view->media_handler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
-    gnash::media::MediaHandler::set(view->media_handler);
-#elif defined(USE_GST)
-    view->media_handler.reset( new gnash::media::gst::MediaHandlerGst() );
-    gnash::media::MediaHandler::set(view->media_handler);
-#else
-    gnash::log_error(_("No media support compiled in"));
-#endif    
+    // Use the default media handler.
+    // TODO: allow setting this.
+    _mediaHandler.reset(MediaFactory::instance().get("");
 
     // Init sound
 #ifdef SOUND_SDL
     try {
-        view->sound_handler.reset(gnash::sound::create_sound_handler_sdl(""));
+        view->sound_handler.reset(gnash::sound::create_sound_handler_sdl(
+                _mediaHandler""));
     } catch (gnash::SoundException& ex) {
         gnash::log_error(_("Could not create sound handler: %s."
                            " Will continue w/out sound."), ex.what());

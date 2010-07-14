@@ -40,6 +40,10 @@ class DSOEXPORT MediaHandlerFfmpeg : public MediaHandler
 {
 public:
 
+    virtual std::string description() const {
+        return "FFmpeg Media Handler";
+    }
+
 	virtual std::auto_ptr<MediaParser>
         createMediaParser(std::auto_ptr<IOChannel> stream);
 

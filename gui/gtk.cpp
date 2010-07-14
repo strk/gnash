@@ -1881,6 +1881,8 @@ GtkGui::showAboutDialog()
 
     std::string comments = _("Gnash is the GNU SWF Player based on GameSWF.");
 
+    media::MediaHandler* m = _runResources.mediaHandler();
+
     comments.append(_("\nRenderer: "));
     comments.append(RENDERER_CONFIG);
     comments.append(_("\nHardware Acceleration: "));
@@ -1888,18 +1890,7 @@ GtkGui::showAboutDialog()
     comments.append(_("\nGUI: "));
     comments.append("GTK2"); // gtk of course!
     comments.append(_("\nMedia: "));
-    comments.append(MEDIA_CONFIG" ");
-#ifdef HAVE_GST_GST_H
-    comments.append(_("\nBuilt against gstreamer version: "));
-    std::ostringstream ss;
-    ss << GST_VERSION_MAJOR << "." << GST_VERSION_MINOR << "." <<
-        GST_VERSION_MICRO;
-    comments.append(ss.str());
-#endif
-#ifdef HAVE_FFMPEG_AVCODEC_H
-    comments.append(_("\nBuilt against ffmpeg version: "));
-    comments.append(LIBAVCODEC_IDENT);
-#endif
+    comments.append(m ? m->description() : "no media handler");
 
     gtk_about_dialog_set_url_hook(NULL, NULL, NULL);
     GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");

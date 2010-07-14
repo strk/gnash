@@ -42,6 +42,10 @@ class DSOEXPORT MediaHandlerHaiku : public MediaHandler
 {
 public:
 
+    virtual std::string description() const {
+        return "Haiku Media Handler";
+    }
+
 	virtual std::auto_ptr<MediaParser>
         createMediaParser(std::auto_ptr<IOChannel> stream);
 

@@ -190,7 +190,9 @@ build_options()
 	 << _("   Configured with: ") << CONFIG_CONFIG << endl
 	 << _("   CXXFLAGS: ") << CXXFLAGS << endl
 	 << "   Version: "  << BRANCH_NICK << ":" << BRANCH_REVNO << endl;
-    
+ 
+// TODO: query the media handlers for the following.   
+#if 0
 #ifdef USE_FFMPEG
     cout << _("Built against ffmpeg version: ") << LIBAVCODEC_IDENT << endl;
 #endif
@@ -201,6 +203,7 @@ build_options()
     gst_version(&major, &minor, &micro, &nano);
     cout << _("Linked against gstreamer version: ") << major << "."
         << minor << "." << micro << endl;
+#endif
 #endif
 }
 

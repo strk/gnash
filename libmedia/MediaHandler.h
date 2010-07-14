@@ -66,6 +66,9 @@ public:
 
     virtual ~MediaHandler() {}
 
+    /// Return a description of this media handler.
+    virtual std::string description() const = 0;
+
     /// Return an appropriate MediaParser for given input
     //
     /// @param stream
