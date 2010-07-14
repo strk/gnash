@@ -49,14 +49,6 @@
 #include "SystemClock.h"
 #include "ExternalInterface.h"
 
-#ifdef USE_FFMPEG
-# include "MediaHandlerFfmpeg.h"
-#elif defined(USE_GST)
-# include "MediaHandlerGst.h"
-#elif defined(USE_HAIKU_ENGINE)
-# include "MediaHandlerHaiku.h"
-#endif
-
 #include "GnashSystemIOHeaders.h" // for write() 
 #include "log.h"
 #include <iostream>
@@ -342,16 +334,9 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Set the Renderer resource, opengl, agg, or cairo
     _runResources->setRenderBackend(_renderer);
 
-#ifdef USE_FFMPEG
-    _mediaHandler.reset(new media::ffmpeg::MediaHandlerFfmpeg());
-#elif defined(USE_GST)
-    _mediaHandler.reset(new media::gst::MediaHandlerGst());
-#elif defined(USE_HAIKU_ENGINE)
-    _mediaHandler.reset(new media::haiku::MediaHandlerHaiku());
-#else
-    log_error(_("No media support compiled in"));
-#endif
-    
+    _mediaHandler.reset(media::MediaFactory::instance().get(""));
+    assert(_mediaHandler.get());
+
     _runResources->setMediaHandler(_mediaHandler);
     
     init_sound();

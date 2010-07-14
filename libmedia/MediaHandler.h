@@ -28,7 +28,6 @@
 #include <memory>
 #include <map>
 #include <string>
-#include <boost/scoped_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -64,10 +63,7 @@ public:
     typedef std::map<std::string, CreateHandler> Handlers;
 
     /// Get the MediaFactory singleton.
-    static MediaFactory& get() {
-        if (!_factory.get()) _factory.reset(new MediaFactory());
-        return *_factory;
-    }
+    static MediaFactory& instance();
 
     /// Return a MediaHandler identified by a name.
     //
@@ -86,8 +82,22 @@ public:
     void registerHandler(const std::string& name, CreateHandler r);
 
 private:
-    static boost::scoped_ptr<MediaFactory> _factory;
+
     Handlers _handlers;
+
+};
+
+template<typename Derived>
+struct
+RegisterMediaHandler
+{
+    static MediaHandler* createHandler() {
+        return new Derived();
+    }
+
+    RegisterMediaHandler(const std::string& name) {
+        MediaFactory::instance().registerHandler(name, createHandler);
+    }
 };
 
 /// The MediaHandler class acts as a factory to provide parser and decoders

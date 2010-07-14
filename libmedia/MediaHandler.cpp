@@ -34,8 +34,13 @@
 
 namespace gnash {
 namespace media {
-    
-boost::scoped_ptr<MediaFactory> MediaFactory::_factory;
+ 
+MediaFactory&
+MediaFactory::instance()
+{
+    static MediaFactory m;
+    return m;
+}
 
 MediaHandler*
 MediaFactory::get(const std::string& name)
@@ -47,8 +52,8 @@ MediaFactory::get(const std::string& name)
     Handlers::const_iterator it = _handlers.find(name);
     if (it == _handlers.end()) return 0;
     return it->second();
-    
 }
+
 void
 MediaFactory::registerHandler(const std::string& name, CreateHandler r)
 {
