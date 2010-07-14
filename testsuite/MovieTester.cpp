@@ -36,6 +36,9 @@
 #include "StreamProvider.h" // for passing to RunResources
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
+
+#include "MediaHandler.h"
+
 #ifdef RENDERER_CAIRO
 # include "Renderer_cairo.h"
 #endif
@@ -575,7 +578,7 @@ void
 MovieTester::initTestingMediaHandlers()
 {
     // TODO: allow selection.
-    _mediaHandler.reset(MediaFactory::instance.get(""));
+    _mediaHandler.reset(media::MediaFactory::instance().get(""));
 }
 
 void
