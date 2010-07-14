@@ -25,6 +25,11 @@
 #include "dsodefs.h" // for DSOEXPORT
 
 namespace gnash {
+
+namespace media {
+    class MediaHandler;
+}
+
 namespace sound {
 
 /// Null sound_handler, for testing 
@@ -34,6 +39,8 @@ namespace sound {
 class DSOEXPORT NullSoundHandler : public sound_handler
 {
 public:
+    NullSoundHandler(media::MediaHandler* m) : sound_handler(m) {}
+
 };
 	
 } // gnash.sound namespace 

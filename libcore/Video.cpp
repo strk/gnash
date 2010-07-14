@@ -34,6 +34,7 @@
 #include "namedStrings.h"
 #include "Global_as.h"
 #include "Renderer.h"
+#include "RunResources.h"
 
 // Define this to get debug logging during embedded video decoding
 //#define DEBUG_EMBEDDED_VIDEO_DECODING
@@ -66,40 +67,30 @@ Video::Video(as_object* object,
 {
     assert(object);
     assert(def);
-    initializeDecoder();
-}
 
-Video::~Video()
-{
-}
-
-void
-Video::initializeDecoder()
-{
-
-	media::MediaHandler* mh = media::MediaHandler::get();
-	if ( ! mh )
-	{
+    media::MediaHandler* mh = getRunResources(*object).mediaHandler();
+	if (!mh) {
 		LOG_ONCE( log_error(_("No Media handler registered, "
 			"won't be able to decode embedded video")) );
 		return;
 	}
 
 	media::VideoInfo* info = m_def->getVideoInfo();
-	if ( ! info )
-	{
+	if (!info) {
 		log_error(_("No Video info in video definition"));
 		return;
 	}
 
-    try
-    {
+    try {
 	    _decoder = mh->createVideoDecoder(*info);
 	}
-	catch (MediaException &e)
-	{
+	catch (MediaException &e) {
 	    log_error("Could not create Video Decoder: %s", e.what());
 	}
+}
+
+Video::~Video()
+{
 }
 
 int

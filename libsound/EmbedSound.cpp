@@ -47,10 +47,7 @@ EmbedSound::append(boost::uint8_t* data, unsigned int size)
     // Remember size of this block, indexing by offset
     m_frames_size[_buf->size()] = size;
 
-    // Make sure we're always appropriately padded...
-    media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
-    const size_t paddingBytes = mh ? mh->getInputPaddingSize() : 0;
-    _buf->reserve(_buf->size()+size+paddingBytes);
+    _buf->reserve(_buf->size() + size + _paddingBytes);
     _buf->append(data, size);
 
     // since ownership was transferred...
@@ -58,18 +55,16 @@ EmbedSound::append(boost::uint8_t* data, unsigned int size)
 }
 
 EmbedSound::EmbedSound(std::auto_ptr<SimpleBuffer> data,
-        std::auto_ptr<media::SoundInfo> info, int nVolume)
+        std::auto_ptr<media::SoundInfo> info, int nVolume, size_t paddingBytes)
     :
     _buf(data),
     soundinfo(info),
-    volume(nVolume)
+    volume(nVolume),
+    _paddingBytes(paddingBytes)
 {
     if ( _buf.get() )
     {
-        // Make sure we're appropriately padded (this is an event sound)
-        media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
-        const size_t paddingBytes = mh ? mh->getInputPaddingSize() : 0;
-        if ( _buf->capacity() - _buf->size() < paddingBytes ) {
+        if (_buf->capacity() - _buf->size() < paddingBytes) {
             log_error("EmbedSound creator didn't appropriately pad sound data. "
                 "We'll do now, but will cost memory copies.");
             _buf->reserve(_buf->size()+paddingBytes);

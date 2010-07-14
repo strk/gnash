@@ -39,7 +39,9 @@
 #include "debugger.h"
 #include "arg_parser.h"
 #include "GnashNumeric.h" // for clamp
+#include "GnashException.h"
 #include "bzrversion.h"
+#include "MediaHandler.h"
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
@@ -86,8 +88,11 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 static void
 usage()
 {
+    std::ostringstream handlers;
+    gnash::media::MediaFactory::instance().listKeys(
+            std::ostream_iterator<std::string>(handlers, " "));
 
-cout << _("Usage: gnash [options] movie_file.swf\n")
+    cout << _("Usage: gnash [options] movie_file.swf\n")
     << "\n"
     << _("Plays a SWF (Shockwave Flash) movie\n")
     << _("Options:\n")
@@ -105,7 +110,7 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("  -vp                      Be (very) verbose about parsing\n") 
 #endif
     << _("  -A <file>                Audio dump file (wave format)\n") 
-    << _("  --hwaccel <none|vaapi||xv> Hardware Video Accelerator to use\n") 
+    << _("  --hwaccel <none|vaapi|xv> Hardware Video Accelerator to use\n") 
     << _("                           none|vaapi|xv|omap (default: none)\n") 
     << _("  -x,  --xid <ID>          X11 Window ID for display\n") 
     << _("  -w,  --writelog          Produce the disk based debug log\n") 
@@ -116,13 +121,15 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("  -1,  --once              Exit when/if movie reaches the last "
             "frame\n") 
     << _("  -g,  --debugger          Turn on the SWF debugger\n") 
-    << _("  -r,  --render-mode <0|1|2|3|agg|cairo|opengl>\n") 
+    << _("  -r,  --render-mode <0|1|2|3>\n") 
     << _("                           0 disable rendering and sound\n") 
     << _("                           1 enable rendering, disable sound\n") 
     << _("                           2 enable sound, disable rendering\n") 
     << _("                           3 enable rendering and sound (default)\n") 
+    << _("  -M,  --media < ") << handlers.str() << ">\n"
+    << _("                           The media handler to use\n")
     // Only list the renderers that were configured in for this build
-    << _("  -R,  --Renderer <")
+    << _("  -R,  --renderer <")
 #ifdef RENDERER_OPENGL
      << _(" opengl")
 #endif
@@ -190,18 +197,6 @@ build_options()
 	 << _("   Configured with: ") << CONFIG_CONFIG << endl
 	 << _("   CXXFLAGS: ") << CXXFLAGS << endl
 	 << "   Version: "  << BRANCH_NICK << ":" << BRANCH_REVNO << endl;
-    
-#ifdef USE_FFMPEG
-    cout << _("Built against ffmpeg version: ") << LIBAVCODEC_IDENT << endl;
-#endif
-#ifdef USE_GST
-    cout << _("Built against gstreamer version: ") << GST_VERSION_MAJOR << "."
-	 << GST_VERSION_MINOR << "." << GST_VERSION_MICRO << endl;
-    guint major, minor, micro, nano;
-    gst_version(&major, &minor, &micro, &nano);
-    cout << _("Linked against gstreamer version: ") << major << "."
-        << minor << "." << micro << endl;
-#endif
 }
 
 static void
@@ -221,7 +216,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'c', 0,                   Arg_parser::no  },
         { 'd', "delay",             Arg_parser::yes },
         { 'x', "xid",               Arg_parser::yes },
-        { 'R', "Renderer",          Arg_parser::yes },
+        { 'R', "renderer",          Arg_parser::yes },
+        { 'M', "media",             Arg_parser::yes },
         { 'r', "render-mode",       Arg_parser::yes },
         { 't', "timeout",           Arg_parser::yes },        
         { '1', "once",              Arg_parser::no  },        
@@ -408,6 +404,9 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     cout << rcfile.getFlashVersionString() << endl;
                     exit(EXIT_SUCCESS);          
                     break;
+             case 'M':
+                    player.setMedia(parser.argument(i));
+                    break;
 #if defined(RENDERER_AGG) || defined(RENDERER_OPENGL) || defined(RENDERER_CAIRO)
              case 'R':
                     switch (parser.argument<char>(i)) {
@@ -583,5 +582,13 @@ gnash_main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    return player.run(argc, argv, infiles.front(), url);
+    // We only expect GnashExceptions here. No others should be thrown!
+    try {
+        player.run(argc, argv, infiles.front(), url);
+    }
+    catch (const gnash::GnashException& ex) {
+        std::cerr << "Error: " << ex.what() << "\n";
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }

@@ -181,6 +181,7 @@ noinst_HEADERS = \
 	arg_parser.h \
 	getclocktime.hpp \
 	GnashAlgorithm.h \
+	GnashFactory.h \
 	$(NULL)
 
 if USE_PNG

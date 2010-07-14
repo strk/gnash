@@ -65,7 +65,9 @@ public:
     ///
     /// @param nVolume initial volume (0..100). Optional, defaults to 100.
     ///
-    EmbedSound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> info, int nVolume=100);
+    EmbedSound(std::auto_ptr<SimpleBuffer> data,
+            std::auto_ptr<media::SoundInfo> info, int nVolume,
+            size_t paddingBytes);
 
     ~EmbedSound();
 
@@ -245,6 +247,8 @@ public:
     /// @todo make private and mark EmbedSoundInst as friend ?
     ///
     void eraseActiveSound(EmbedSoundInst* inst);
+
+    const size_t _paddingBytes;
 };
 
 } // gnash.sound namespace 

@@ -104,7 +104,7 @@ NetStream_as::NetStream_as(as_object* owner)
     _playHead(_playbackClock.get()), 
 
     _soundHandler(getRunResources(*owner).soundHandler()),
-    _mediaHandler(media::MediaHandler::get()),
+    _mediaHandler(getRunResources(*owner).mediaHandler()),
     _audioStreamer(_soundHandler),
     _statusCode(invalidStatus)
 {

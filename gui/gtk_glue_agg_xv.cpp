@@ -58,7 +58,7 @@ GtkAggXvGlue::GtkAggXvGlue()
     _window_height(0),
     _movie_width(0),
     _movie_height(0),
-    _mediaHandler(media::MediaHandler::get()),
+    //_mediaHandler(media::MediaHandler::get()),
     _shm_info(0)    
 {
     memset(&_xv_format, 0, sizeof(XvImageFormatValues));

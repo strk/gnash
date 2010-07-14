@@ -49,14 +49,6 @@
 #include "SystemClock.h"
 #include "ExternalInterface.h"
 
-#ifdef USE_FFMPEG
-# include "MediaHandlerFfmpeg.h"
-#elif defined(USE_GST)
-# include "MediaHandlerGst.h"
-#elif defined(USE_HAIKU_ENGINE)
-# include "MediaHandlerHaiku.h"
-#endif
-
 #include "GnashSystemIOHeaders.h" // for write() 
 #include "log.h"
 #include <iostream>
@@ -189,13 +181,14 @@ Player::init_sound()
     if (_doSound) {
         try {
 #ifdef SOUND_SDL
-            _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
-#elif defined(SOUND_GST)
-            _soundHandler.reset(media::create_sound_handler_gst());
+            _soundHandler.reset(sound::create_sound_handler_sdl(
+                        _mediaHandler.get(), _audioDump));
 #elif defined(SOUND_AHI)
-            _soundHandler.reset(sound::create_sound_handler_aos4(_audioDump));
+            _soundHandler.reset(sound::create_sound_handler_aos4(
+                        _mediaHandler.get(), _audioDump));
 #elif defined(SOUND_MKIT)
-            _soundHandler.reset(sound::create_sound_handler_mkit(_audioDump));
+            _soundHandler.reset(sound::create_sound_handler_mkit(
+                        _mediaHandler.get(), _audioDump));
 #else
             log_error(_("Sound requested but no sound support compiled in"));
             return;
@@ -212,24 +205,6 @@ Player::init_sound()
         }
     }
 }
-
-void
-Player::init_media()
-{
-#ifdef USE_FFMPEG
-        _mediaHandler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
-#elif defined(USE_GST)
-        _mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
-#elif defined(USE_HAIKU_ENGINE)
-        _mediaHandler.reset( new gnash::media::haiku::MediaHandlerHaiku() );
-#else
-        log_error(_("No media support compiled in"));
-        return;
-#endif
-        
-        gnash::media::MediaHandler::set(_mediaHandler);
-}
-
 
 void
 Player::init_gui()
@@ -309,7 +284,7 @@ Player::load_movie()
 }
 
 /// \brief Run, used to open a new flash file. Using previous initialization
-int
+void
 Player::run(int argc, char* argv[], const std::string& infile,
         const std::string& url)
 {
@@ -317,8 +292,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // a cache of setting some parameter before calling us...
     // (example: setDoSound(), setWindowId() etc.. ) 
     init_logfile();
-    init_media();
-    init_sound();
    
     // gnash.cpp should check that a filename is supplied.
     assert (!infile.empty());
@@ -344,10 +317,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     Params::const_iterator it = _params.find("base");
     const URL baseURL = (it == _params.end()) ? _baseurl :
                                                URL(it->second, _baseurl);
-
     /// The RunResources should be populated before parsing.
     _runResources.reset(new RunResources(baseURL.str()));
-    _runResources->setSoundHandler(_soundHandler);
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
@@ -362,6 +333,20 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _runResources->setHWAccelBackend(_hwaccel);
     // Set the Renderer resource, opengl, agg, or cairo
     _runResources->setRenderBackend(_renderer);
+
+    _mediaHandler.reset(media::MediaFactory::instance().get(_media));
+
+    if (!_mediaHandler.get()) {
+        boost::format fmt =
+            boost::format(_("Non-existent media handler %1% specified"))
+            % _media;
+        throw GnashException(fmt.str());
+    }
+
+    _runResources->setMediaHandler(_mediaHandler);
+    
+    init_sound();
+    _runResources->setSoundHandler(_soundHandler);
     
     init_gui();
 
@@ -369,8 +354,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // note that this will also initialize the renderer
     // which is *required* during movie loading
     if (!_gui->init(argc, &argv)) {
-        std::cerr << "Could not initialize gui." << std::endl;
-        return EXIT_FAILURE;
+        throw GnashException("Could not initialize GUI");
     }
 
     // Parse querystring (before FlashVars, see
@@ -399,7 +383,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Load the actual movie.
     _movieDef = load_movie();
     if (!_movieDef) {
-        return EXIT_FAILURE;
+        throw GnashException("Could not load movie!");
     }
 
     // Get info about the width & height of the movie.
@@ -438,7 +422,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Register Player to receive FsCommand events from the core.
     root.registerFSCommandCallback(_callbacksHandler.get());
 
-    gnash::log_debug("Player Host FD #%d, Player Control FD #%d", 
+    log_debug("Player Host FD #%d, Player Control FD #%d", 
                      _hostfd, _controlfd);
     
     // Set host requests fd (if any)
@@ -580,7 +564,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
 
-    return EXIT_SUCCESS;
 }
 
 void

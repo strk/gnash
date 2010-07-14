@@ -74,7 +74,7 @@ public:
     ///        movie path/url.
     ///           
     ///
-    int run(int argc, char* argv[],
+    void run(int argc, char* argv[],
             const std::string& infile, const std::string& url = "");
     
     float setScale(float s);
@@ -144,6 +144,10 @@ public:
     
     int getHostFD() const {
         return _hostfd;
+    }
+
+    void setMedia(const std::string& media) {
+        _media = media;
     }
 
     void setControlFD(int fd) {
@@ -261,8 +265,6 @@ private:
     
     void init_sound();
     
-    void init_media();
-    
     void init_logfile();
     
     void init_gui();
@@ -314,7 +316,7 @@ private:
     ///         needing a RunResources.
     boost::shared_ptr<sound::sound_handler> _soundHandler;
     
-    std::auto_ptr<media::MediaHandler> _mediaHandler;
+    boost::shared_ptr<media::MediaHandler> _mediaHandler;
     
     /// Handlers (for sound etc) for a libcore run.
     //
@@ -367,6 +369,11 @@ private:
     //
     /// If empty, a default is used.
     std::string _screenshotFile;
+
+    /// The identifier for the media handler.
+    //
+    /// If empty, a default is used.
+    std::string _media;
 
 };
  

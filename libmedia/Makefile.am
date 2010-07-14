@@ -21,6 +21,8 @@ EXTRA_DIST =
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
+AM_CXXFLAGS = $(CXXFLAGS) -DREGISTER_MEDIA_HANDLERS
+
 #if INSTALL_LTDL
 #LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
 #endif
@@ -99,7 +101,6 @@ if USE_GST_ENGINE
 	$(NULL)
 
    noinst_HEADERS += \
-	gst/MediaHandlerGst.h \
 	gst/AudioDecoderGst.h \
 	gst/VideoDecoderGst.h \
 	gst/MediaParserGst.h \
@@ -141,7 +142,6 @@ if USE_FFMPEG_ENGINE
 	$(NULL)
 
    noinst_HEADERS += \
-	ffmpeg/MediaHandlerFfmpeg.h \
 	ffmpeg/MediaParserFfmpeg.h \
 	ffmpeg/AudioDecoderFfmpeg.h \
 	ffmpeg/VideoDecoderFfmpeg.h \
@@ -183,7 +183,6 @@ if USE_HAIKU_ENGINE
 	$(NULL)
 
    noinst_HEADERS += \
-	haiku/MediaHandlerHaiku.h \
 	haiku/MediaParserHaiku.h \
 	haiku/AudioDecoderHaiku.h \
 	haiku/VideoDecoderHaiku.h \
@@ -232,7 +231,7 @@ if WIN32
 endif
 
 if ENABLE_PCH
-AM_CXXFLAGS = $(PCH_FLAGS)
+AM_CXXFLAGS += $(PCH_FLAGS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support

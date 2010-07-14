@@ -123,8 +123,10 @@ SDL_sound_handler::closeAudio()
 }
 
 
-SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
+SDL_sound_handler::SDL_sound_handler(media::MediaHandler* m,
+        const std::string& wavefile)
     :
+    sound_handler(m),
     _audioOpened(false)
 {
 
@@ -144,8 +146,9 @@ SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
 
 }
 
-SDL_sound_handler::SDL_sound_handler()
+SDL_sound_handler::SDL_sound_handler(media::MediaHandler* m)
     :
+    sound_handler(m),
     _audioOpened(false)
 {
     initAudio();
@@ -259,17 +262,15 @@ SDL_sound_handler::tell(int soundHandle)
 }
 
 sound_handler*
-create_sound_handler_sdl()
-// Factory.
+create_sound_handler_sdl(media::MediaHandler* m)
 {
-    return new SDL_sound_handler;
+    return new SDL_sound_handler(m);
 }
 
 sound_handler*
-create_sound_handler_sdl(const std::string& wave_file)
-// Factory.
+create_sound_handler_sdl(media::MediaHandler* m, const std::string& wave_file)
 {
-    return new SDL_sound_handler(wave_file);
+    return new SDL_sound_handler(m, wave_file);
 }
 
 // write a wave header, using the current audioSpec settings

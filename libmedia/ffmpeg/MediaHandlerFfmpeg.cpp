@@ -18,7 +18,8 @@
 //
 
 
-#include "MediaHandlerFfmpeg.h"
+#include "MediaHandler.h"
+#include "MediaParser.h"
 #include "MediaParserFfmpeg.h"
 #include "VideoDecoderFfmpeg.h"
 #include "AudioDecoderFfmpeg.h"
@@ -29,11 +30,42 @@
 #include "AudioInputFfmpeg.h"
 
 #include "IOChannel.h" // for visibility of destructor
-#include "MediaParser.h" // for visibility of destructor
 
 namespace gnash { 
 namespace media {
 namespace ffmpeg {
+
+/// FFMPEG based MediaHandler
+class DSOEXPORT MediaHandlerFfmpeg : public MediaHandler
+{
+public:
+
+    virtual std::string description() const {
+        return "FFmpeg Media Handler";
+    }
+
+	virtual std::auto_ptr<MediaParser>
+        createMediaParser(std::auto_ptr<IOChannel> stream);
+
+	virtual std::auto_ptr<VideoDecoder>
+        createVideoDecoder(const VideoInfo& info);
+	
+	virtual std::auto_ptr<VideoConverter>
+		createVideoConverter(ImgBuf::Type4CC srcFormat,
+                ImgBuf::Type4CC dstFormat);
+
+	virtual std::auto_ptr<AudioDecoder>
+        createAudioDecoder(const AudioInfo& info);
+
+    virtual size_t getInputPaddingSize() const;
+    
+    virtual VideoInput* getVideoInput(size_t index);
+    
+    virtual AudioInput* getAudioInput(size_t index);
+
+    virtual void cameraNames(std::vector<std::string>& names) const;
+
+};
 
 std::auto_ptr<MediaParser>
 MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
@@ -142,6 +174,13 @@ MediaHandlerFfmpeg::getInputPaddingSize() const
     return FF_INPUT_BUFFER_PADDING_SIZE;
 }
 
+#ifdef REGISTER_MEDIA_HANDLERS
+namespace {
+    MediaFactory::RegisterHandler<MediaHandlerFfmpeg> reg("ffmpeg");
+}
+#endif
+
 } // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // gnash namespace
+

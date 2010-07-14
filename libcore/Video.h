@@ -108,12 +108,6 @@ protected:
 
 private:
 
-	/// Initialize decoder for embedded video 
-	//
-	/// Call only if given a non-null video definition.
-	///
-	void initializeDecoder();
-
 	/// Get video frame to be displayed
 	GnashImage* getVideoFrame();
 

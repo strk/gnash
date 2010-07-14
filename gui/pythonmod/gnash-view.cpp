@@ -42,12 +42,6 @@
 #include "NamingPolicy.h"
 #include "StreamProvider.h"
 
-#ifdef USE_FFMPEG
-# include "MediaHandlerFfmpeg.h"
-#elif defined(USE_GST)
-# include "MediaHandlerGst.h"
-#endif
-
 enum
 {
 	PROP_0,
@@ -61,7 +55,7 @@ struct _GnashView {
     const gchar *uri;
     guint advance_timer;
 
-    std::auto_ptr<gnash::media::MediaHandler> media_handler;
+    boost::shared_ptr<gnash::media::MediaHandler> media_handler;
     boost::shared_ptr<gnash::sound::sound_handler> sound_handler;
 
     /// Handlers (for sound etc) for a libcore run.
@@ -217,28 +211,19 @@ gnash_view_init(GnashView *view)
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setVerbosity(3);
 
-    // Init media
-#ifdef USE_FFMPEG
-    view->media_handler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
-    gnash::media::MediaHandler::set(view->media_handler);
-#elif defined(USE_GST)
-    view->media_handler.reset( new gnash::media::gst::MediaHandlerGst() );
-    gnash::media::MediaHandler::set(view->media_handler);
-#else
-    gnash::log_error(_("No media support compiled in"));
-#endif    
+    // Use the default media handler.
+    // TODO: allow setting this.
+    view->media_handler.reset(gnash::media::MediaFactory::instance().get(""));
 
     // Init sound
 #ifdef SOUND_SDL
     try {
-        view->sound_handler.reset(gnash::sound::create_sound_handler_sdl(""));
+        view->sound_handler.reset(gnash::sound::create_sound_handler_sdl(
+                view->media_handler.get(), ""));
     } catch (gnash::SoundException& ex) {
         gnash::log_error(_("Could not create sound handler: %s."
                            " Will continue w/out sound."), ex.what());
     }
-#elif defined(SOUND_GST)
-    view->sound_handler.reset(media::create_sound_handler_gst());
-#else
     gnash::log_error(_("Sound requested but no sound support compiled in"));
 #endif
 

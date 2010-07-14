@@ -23,9 +23,12 @@
 #include "MediaParser.h" // for videoCodecType and audioCodecType enums
 #include "dsodefs.h" // DSOEXPORT
 #include "VideoConverter.h"
+#include "GnashFactory.h"
 
 #include <vector>
 #include <memory>
+#include <map>
+#include <string>
 
 // Forward declarations
 namespace gnash {
@@ -37,6 +40,7 @@ namespace gnash {
         class VideoInfo;
         class VideoInput;
         class AudioInput;
+        class MediaHandler;
     }
 }
 
@@ -50,13 +54,10 @@ namespace gnash {
 /// The subsystem's entry point is a MediaHandler instance, which acts
 /// as a factory for parsers, decoders and encoders.
 ///
-/// Theoretically, it should be possible for actual MediaHandler
-/// implementations to be loaded at runtime, altought this is not yet
-/// implemented at time of writing (2008/10/27).
-///
 /// @todo fix http://wiki.gnashdev.org/wiki/index.php/Libmedia, is obsoleted
-///
 namespace media {
+
+typedef GnashFactory<MediaHandler> MediaFactory;
 
 /// The MediaHandler class acts as a factory to provide parser and decoders
 class DSOEXPORT MediaHandler
@@ -65,17 +66,8 @@ public:
 
     virtual ~MediaHandler() {}
 
-    /// Return currently registered MediaHandler, possibly null.
-    static MediaHandler* get()
-    {
-        return _handler.get();
-    }
-
-    /// Register a MediaHandler to use
-    static void set(std::auto_ptr<MediaHandler> mh)
-    {
-        _handler = mh;
-    }
+    /// Return a description of this media handler.
+    virtual std::string description() const = 0;
 
     /// Return an appropriate MediaParser for given input
     //
@@ -164,11 +156,10 @@ protected:
     /// If this cannot read the necessary 3 bytes, it throws an IOException.
     bool isFLV(IOChannel& stream) throw (IOException);
 
+protected:
+
     MediaHandler() {}
 
-private:
-
-    static std::auto_ptr<MediaHandler> _handler;
 };
 
 

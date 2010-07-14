@@ -23,11 +23,6 @@
 #endif
 
 #include "NullSoundHandler.h"
-#ifdef USE_FFMPEG
-# include "ffmpeg/MediaHandlerFfmpeg.h"
-#elif defined(USE_GST)
-# include "gst/MediaHandlerGst.h"
-#endif
 
 #include <ios>
 #include <iostream>
@@ -355,20 +350,11 @@ main(int argc, char *argv[])
     }
 
 
-    std::auto_ptr<gnash::media::MediaHandler> mediaHandler;
+    boost::shared_ptr<gnash::media::MediaHandler> mediaHandler;
     boost::shared_ptr<sound::sound_handler> soundHandler;
 
-#ifdef USE_FFMPEG
-    mediaHandler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
-#elif defined(USE_GST)
-    mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
-#endif
-
-    if ( mediaHandler.get() )
-    {
-        gnash::media::MediaHandler::set(mediaHandler);
-        soundHandler.reset( new sound::NullSoundHandler() );
-    }
+    mediaHandler.reset(media::MediaFactory::instance().get(""));
+    soundHandler.reset(new sound::NullSoundHandler(mediaHandler.get()));
 
     boost::shared_ptr<StreamProvider> sp(new StreamProvider);
 
@@ -383,6 +369,7 @@ main(int argc, char *argv[])
 
         RunResources runResources(*i);
         runResources.setSoundHandler(soundHandler);
+        runResources.setMediaHandler(mediaHandler);
         runResources.setStreamProvider(sp);
         runResources.setTagLoaders(loaders);
 

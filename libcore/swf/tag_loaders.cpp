@@ -870,10 +870,11 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
         // then the amount allocated at *data (it may grow)
         const unsigned dataLength = in.get_tag_end_position() - in.tell();
 
-        // Allocate MediaHandler::getInputPadding() bytes more for the SimpleBuffer 
+        // Allocate MediaHandler::getInputPaddingSize() bytes more for the
+        // SimpleBuffer 
         size_t allocSize = dataLength;
-        media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
-        if ( mh ) allocSize += mh->getInputPaddingSize();
+        media::MediaHandler* mh = r.mediaHandler();
+        if (mh) allocSize += mh->getInputPaddingSize();
 
         std::auto_ptr<SimpleBuffer> data( new SimpleBuffer(allocSize) );
 

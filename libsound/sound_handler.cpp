@@ -309,7 +309,9 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 {
     assert(sinfo.get());
 
-    std::auto_ptr<EmbedSound> sounddata ( new EmbedSound(data, sinfo) );
+    std::auto_ptr<EmbedSound> sounddata(
+            new EmbedSound(data, sinfo, 100,
+                _mediaHandler ? _mediaHandler->getInputPaddingSize() : 0));
 
     int sound_id = _sounds.size();
 
@@ -364,12 +366,10 @@ sound_handler::swfToOutSamples(const media::SoundInfo& sinfo,
 
 
 void
-sound_handler::playSound(int sound_handle, int loopCount,
-                         unsigned int inPoint,
-                         unsigned int outPoint,
-                         StreamBlockId blockId,
-                         const SoundEnvelopes* envelopes,
-                         bool allowMultiples)
+sound_handler::playSound(int sound_handle,
+        int loopCount, unsigned int inPoint, unsigned int outPoint,
+        StreamBlockId blockId, const SoundEnvelopes* envelopes,
+        bool allowMultiples)
 {
     assert (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size());
 

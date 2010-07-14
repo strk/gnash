@@ -902,29 +902,42 @@ dnl --------------------------------------------------------
 
 media_handler_specified=false
 AC_ARG_ENABLE(media,
- AC_HELP_STRING([--enable-media=handler], [Enable media handling support using the specified handler: gst, ffmpeg or none (no sound) [[gst]] ]),
- [case "${enableval}" in
-   GST|gst)
-     media_handler=gst
-     media_handler_specified=true
-     ;;
-   ffmpeg|FFMPEG)
-     media_handler=ffmpeg
-     media_handler_specified=true
-     ;;
-   no|NO|none)
-     media_handler=none
-     media_handler_specified=true
-     ;;
-   *) AC_MSG_ERROR([bad value ${enableval} for --enable-media option]) ;;
-  esac],
- [media_handler=gst; media_handler_specified=true]
+  AC_HELP_STRING([--enable-media=handler],
+    [Enable media handling support using the specified handler: gst, ffmpeg or none (no sound) [[gst]] ]),
+  
+    if test -n ${enableval}; then
+      enableval=`echo ${enableval} | tr '\054' ' ' `
+    fi
+    while test -n "${enableval}"; do
+      val=`echo ${enableval} | cut -d ' ' -f 1`
+      [case "${val}" in
+        GST|gst)
+          build_media_gst=yes
+          media_handler_specified=true
+          ;;
+        FFMPEG|ffmpeg)
+          build_media_ffmpeg=yes
+          media_handler_specified=true
+          ;;
+        no|NO|none)
+          media_handler_specified=true
+          ;;
+        *)
+          AC_MSG_ERROR([bad value ${enableval} for --enable-media option])
+          ;;
+     
+      esac]
+      enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+      if test "x$val" = "x$enableval"; then
+        break;
+      fi
+    done
 )
+
 
 dnl If we're on Haiku, there is only one supported media handler.
 if test x"${build_haiku}" = xyes; then
-     media_handler=ffmpeg
-     media_handler_specified=true
+    build_media_haiku=true
 fi
 
 AC_ARG_ENABLE(lirc, AC_HELP_STRING([--enable-lirc], [Disable support for Lirc]),
@@ -2043,7 +2056,7 @@ AM_CONDITIONAL([QT_OS9],     [test "$platform" = "OS9"])
 AM_CONDITIONAL([QT_WIN32],   [test "$platform" = "Win32"])
 
 dnl Need GLIB for both GTK and GST
-if test x"${build_gtk}" = xyes -o x"${media_handler}" = xgst; then
+if test x"${build_gtk}" = xyes -o x"${build_media_gst}" = xyes; then
   GNASH_PATH_GLIB
 fi
 
@@ -2184,7 +2197,7 @@ if test x$glext = xno -a x$build_ogl = xyes; then
 fi
 
 missing_codecs=""
-if test "$media_handler" = "gst"; then
+if test x"$build_media_gst" = "xyes"; then
   AC_PATH_PROG(GST_INSPECT, gst-inspect, ,[${pathlist}])
   if test "x$GST_INSPECT" != "x" -a x"${darwin}" = xno ; then
     AC_PATH_PROG(GST_INSPECT, gst-inspect-0.10, ,[${pathlist}])
@@ -2221,18 +2234,19 @@ if test "$media_handler" = "gst"; then
   if test x"${media_handler_specified}" = xfalse; then
     if test x"$GSTREAMER_LIBS" = x; then
        AC_MSG_WARN([No appropriate gstreamer library found, will try using ffmpeg.])
-       media_handler=ffmpeg
+       build_media_gst=no
+       build_media_ffmpeg=yes
     fi
   fi
 fi
 
-if test x"$media_handler" = x"ffmpeg"; then
+if test x"$build_media_ffmpeg" = x"yes"; then
   GNASH_PATH_FFMPEG
   if test x"${media_handler_specified}" = xfalse; then
      # If the library is not found, or its version is not ok, we'll try gst
      if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version_check}" != xok; then
        AC_MSG_WARN([No appropriate ffmpeg library found, disabling media handling.])
-       media_handler=none
+       build_media_ffmpeg=no
      fi
   fi
 fi
@@ -2269,11 +2283,11 @@ dnl AM_CONDITIONAL(HAVE_OPENGL, test x"${has_opengl}" = xyes)
 AM_CONDITIONAL(USE_SOUND_SDL, test x$build_sound_sdl = xyes)
 AM_CONDITIONAL(USE_SOUND_AHI, test x$build_sound_ahi = xyes)
 AM_CONDITIONAL(USE_SOUND_MKIT, test x$build_sound_mkit = xyes)
-AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
-AM_CONDITIONAL(USE_GST_ENGINE, test x"$media_handler" = xgst)
+AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"${build_media_ffmpeg}" = x"yes")
+AM_CONDITIONAL(USE_GST_ENGINE, test x"${build_media_gst}" = x"yes")
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
 dnl for now the Haiku media handler is experimental
-AM_CONDITIONAL(USE_HAIKU_ENGINE, test x"$media_handler" = xno)
+AM_CONDITIONAL(USE_HAIKU_ENGINE, test x"$build_media_haiku" = xyes)
 
 if test x$build_sound_mkit = xyes; then
   if test x"${haiku}" != xyes; then
@@ -2294,14 +2308,6 @@ if test x"${build_sound_ahi}" = xyes; then
     AC_DEFINE([SOUND_AHI],  [1], [Use AmigaOS AHI for sound handling])
   fi
 fi
-
-case "${media_handler}" in
-  ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
-  gst)  AC_DEFINE([USE_GST],  [1], [Use gstreamer for media decoding]) ;;
-  *)
-esac
-dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_GST, test x$media_handler = xgst)
 
 if test x$build_fltk = xyes; then
   GNASH_PKG_FIND(fltk2, [fltk/FL_API.h], [Fast Light Toolkit], fl_window_flush)
@@ -2369,7 +2375,7 @@ AC_ARG_ENABLE(hwaccel,
 
 dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
 dnl restrict using HW Accel to using ffmpeg directly.
-if test x"${media_handler}" = x"gst" -a x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg_vaapi}" = x"yes"; then
+if test x"${build_media_ffmpeg}" = x"no" -a x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg_vaapi}" = x"yes"; then
   AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
 fi
 
@@ -3162,7 +3168,7 @@ if test x$build_gtk = xyes; then #{
 
 fi
 
-if test "$media_handler" = "gst"; then
+if test x"$build_media_gst" = x"yes"; then
   if test x"$missing_codecs" != x; then   
       echo "        Your Gstreamer installation is missing these codecs: $missing_codecs"
       echo "        Please install the gstreamer-ffmpeg for Gstreamer"
@@ -3194,7 +3200,7 @@ if test "$media_handler" = "gst"; then
   fi
 fi
 
-  if test x"$media_handler" = x"ffmpeg"; then
+  if test x"${build_media_ffmpeg}" = x"yes"; then
     if test x"$FFMPEG_LIBS" != x; then
       echo "        MP3 and video support enabled through ffmpeg"
       if test x"${ffmpeg_version_check}" != xok; then

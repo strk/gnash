@@ -412,19 +412,17 @@ public:
 protected:
 
 
-    sound_handler()
+    sound_handler(media::MediaHandler* m)
         :
         _soundsStarted(0),
         _soundsStopped(0),
         _paused(false),
         _muted(false),
-        _mediaHandler(media::MediaHandler::get()),
         _volume(100),
         _sounds(),
-        _inputStreams()
+        _inputStreams(),
+        _mediaHandler(m)
     {
-        // for now, we rely on this being always available
-        assert(_mediaHandler);
     }
 
     /// Plug an InputStream to the mixer
@@ -482,9 +480,6 @@ private:
     /// True if sound is muted
     bool _muted;
 
-    /// The registered MediaHandler at construction time
-    media::MediaHandler* _mediaHandler;
-
     /// Final output volume
     int _volume;
 
@@ -506,6 +501,8 @@ private:
     /// Elements owned by this class.
     ///
     InputStreams _inputStreams;
+
+    media::MediaHandler* _mediaHandler;
 
     /// Unplug any completed input stream
     void unplugCompletedInputStreams();
@@ -575,23 +572,26 @@ private:
 
 #ifdef SOUND_SDL
 /// @throw a SoundException if fails to initialize audio card.
-DSOEXPORT sound_handler* create_sound_handler_sdl();
+DSOEXPORT sound_handler* create_sound_handler_sdl(media::MediaHandler* m);
 
 /// @throw a SoundException if fails to initialize audio card.
-DSOEXPORT sound_handler* create_sound_handler_sdl(const std::string& wave_file);
+DSOEXPORT sound_handler* create_sound_handler_sdl(media::MediaHandler* m,
+        const std::string& wave_file);
 #elif defined(SOUND_AHI)
 /// @throw a SoundException if fails to initialize audio card.
-DSOEXPORT sound_handler* create_sound_handler_aos4();
+DSOEXPORT sound_handler* create_sound_handler_aos4(media::MediaHandler* m);
 
 /// @throw a SoundException if fails to initialize audio card.
-DSOEXPORT sound_handler* create_sound_handler_aos4(const std::string& wave_file);
+DSOEXPORT sound_handler* create_sound_handler_aos4(media::MediaHandler* m
+        const std::string& wave_file);
 
 #elif defined(SOUND_MKIT)
 /// @throw a SoundException if fails to create node.
-DSOEXPORT sound_handler* create_sound_handler_mkit();
+DSOEXPORT sound_handler* create_sound_handler_mkit(media::MediaHandler* m);
 
 /// @throw a SoundException if fails to create node.
-DSOEXPORT sound_handler* create_sound_handler_mkit(const std::string& wave_file);
+DSOEXPORT sound_handler* create_sound_handler_mkit(media::MediaHandler* m,
+        const std::string& wave_file);
 #endif
 
 } // gnash.sound namespace 
