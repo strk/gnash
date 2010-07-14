@@ -34,6 +34,8 @@ namespace sound {
 class DSOEXPORT NullSoundHandler : public sound_handler
 {
 public:
+    NullSoundHandler() : sound_handler(0) {}
+
 };
 	
 } // gnash.sound namespace 

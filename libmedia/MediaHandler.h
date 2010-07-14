@@ -65,18 +65,6 @@ public:
 
     virtual ~MediaHandler() {}
 
-    /// Return currently registered MediaHandler, possibly null.
-    static MediaHandler* get()
-    {
-        return _handler.get();
-    }
-
-    /// Register a MediaHandler to use
-    static void set(std::auto_ptr<MediaHandler> mh)
-    {
-        _handler = mh;
-    }
-
     /// Return an appropriate MediaParser for given input
     //
     /// @param stream
@@ -164,11 +152,10 @@ protected:
     /// If this cannot read the necessary 3 bytes, it throws an IOException.
     bool isFLV(IOChannel& stream) throw (IOException);
 
+protected:
+
     MediaHandler() {}
 
-private:
-
-    static std::auto_ptr<MediaHandler> _handler;
 };
 
 

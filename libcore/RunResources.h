@@ -32,6 +32,9 @@ namespace gnash {
     namespace sound {
         class sound_handler;
     }
+    namespace media {
+        class MediaHandler;
+    }
 }
 
 namespace gnash {
@@ -45,7 +48,6 @@ namespace gnash {
 /// This must be kept alive for the entire duration of a run (presently
 /// until the last SWFMovieDefinition has been destroyed).
 /// @todo Check the lifetime and update documentation if it changes.
-/// @todo   Add MediaHandler.
 class RunResources
 {
 public:
@@ -67,8 +69,7 @@ public:
     /// Set the StreamProvider.
     //
     /// This can probably be changed during a run without ill effects.
-    void setStreamProvider(boost::shared_ptr<StreamProvider> sp)
-    {
+    void setStreamProvider(boost::shared_ptr<StreamProvider> sp) {
         _streamProvider = sp;
     }
 
@@ -100,6 +101,14 @@ public:
     ///             has yet been set.
     sound::sound_handler* soundHandler() const {
         return _soundHandler.get();
+    }
+
+    void setMediaHandler(boost::shared_ptr<media::MediaHandler> s) {
+        _mediaHandler = s;
+    }
+
+    media::MediaHandler* mediaHandler() const {
+        return _mediaHandler.get();
     }
 
     void setRenderer(boost::shared_ptr<Renderer> r) {
@@ -146,6 +155,8 @@ private:
     boost::shared_ptr<StreamProvider> _streamProvider;
 
     boost::shared_ptr<sound::sound_handler> _soundHandler;
+    
+    boost::shared_ptr<media::MediaHandler> _mediaHandler;
 
     boost::shared_ptr<Renderer> _renderer;
 

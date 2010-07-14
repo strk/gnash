@@ -35,8 +35,6 @@
 namespace gnash {
 namespace media {
 
-std::auto_ptr<MediaHandler> MediaHandler::_handler;
-
 bool
 MediaHandler::isFLV(IOChannel& stream) throw (IOException)
 {

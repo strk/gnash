@@ -253,7 +253,7 @@ Sound_as::Sound_as(as_object* owner)
     externalSound(false),
     isStreaming(false),
     _soundHandler(getRunResources(*owner).soundHandler()),
-    _mediaHandler(media::MediaHandler::get()),
+    _mediaHandler(getRunResources(*owner).mediaHandler()),
     _startTime(0),
     _leftOverData(),
     _leftOverPtr(0),

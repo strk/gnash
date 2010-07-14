@@ -105,7 +105,7 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("  -vp                      Be (very) verbose about parsing\n") 
 #endif
     << _("  -A <file>                Audio dump file (wave format)\n") 
-    << _("  --hwaccel <none|vaapi||xv> Hardware Video Accelerator to use\n") 
+    << _("  --hwaccel <none|vaapi|xv> Hardware Video Accelerator to use\n") 
     << _("                           none|vaapi|xv|omap (default: none)\n") 
     << _("  -x,  --xid <ID>          X11 Window ID for display\n") 
     << _("  -w,  --writelog          Produce the disk based debug log\n") 
@@ -116,13 +116,13 @@ cout << _("Usage: gnash [options] movie_file.swf\n")
     << _("  -1,  --once              Exit when/if movie reaches the last "
             "frame\n") 
     << _("  -g,  --debugger          Turn on the SWF debugger\n") 
-    << _("  -r,  --render-mode <0|1|2|3|agg|cairo|opengl>\n") 
+    << _("  -r,  --render-mode <0|1|2|3>\n") 
     << _("                           0 disable rendering and sound\n") 
     << _("                           1 enable rendering, disable sound\n") 
     << _("                           2 enable sound, disable rendering\n") 
     << _("                           3 enable rendering and sound (default)\n") 
     // Only list the renderers that were configured in for this build
-    << _("  -R,  --Renderer <")
+    << _("  -R,  --renderer <")
 #ifdef RENDERER_OPENGL
      << _(" opengl")
 #endif
@@ -221,7 +221,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'c', 0,                   Arg_parser::no  },
         { 'd', "delay",             Arg_parser::yes },
         { 'x', "xid",               Arg_parser::yes },
-        { 'R', "Renderer",          Arg_parser::yes },
+        { 'R', "renderer",          Arg_parser::yes },
         { 'r', "render-mode",       Arg_parser::yes },
         { 't', "timeout",           Arg_parser::yes },        
         { '1', "once",              Arg_parser::no  },        

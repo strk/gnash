@@ -189,13 +189,14 @@ Player::init_sound()
     if (_doSound) {
         try {
 #ifdef SOUND_SDL
-            _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
-#elif defined(SOUND_GST)
-            _soundHandler.reset(media::create_sound_handler_gst());
+            _soundHandler.reset(sound::create_sound_handler_sdl(
+                        _mediaHandler.get(), _audioDump));
 #elif defined(SOUND_AHI)
-            _soundHandler.reset(sound::create_sound_handler_aos4(_audioDump));
+            _soundHandler.reset(sound::create_sound_handler_aos4(
+                        _mediaHandler.get(), _audioDump));
 #elif defined(SOUND_MKIT)
-            _soundHandler.reset(sound::create_sound_handler_mkit(_audioDump));
+            _soundHandler.reset(sound::create_sound_handler_mkit(
+                        _mediaHandler.get(), _audioDump));
 #else
             log_error(_("Sound requested but no sound support compiled in"));
             return;
@@ -212,24 +213,6 @@ Player::init_sound()
         }
     }
 }
-
-void
-Player::init_media()
-{
-#ifdef USE_FFMPEG
-        _mediaHandler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
-#elif defined(USE_GST)
-        _mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
-#elif defined(USE_HAIKU_ENGINE)
-        _mediaHandler.reset( new gnash::media::haiku::MediaHandlerHaiku() );
-#else
-        log_error(_("No media support compiled in"));
-        return;
-#endif
-        
-        gnash::media::MediaHandler::set(_mediaHandler);
-}
-
 
 void
 Player::init_gui()
@@ -317,8 +300,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // a cache of setting some parameter before calling us...
     // (example: setDoSound(), setWindowId() etc.. ) 
     init_logfile();
-    init_media();
-    init_sound();
    
     // gnash.cpp should check that a filename is supplied.
     assert (!infile.empty());
@@ -344,10 +325,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     Params::const_iterator it = _params.find("base");
     const URL baseURL = (it == _params.end()) ? _baseurl :
                                                URL(it->second, _baseurl);
-
     /// The RunResources should be populated before parsing.
     _runResources.reset(new RunResources(baseURL.str()));
-    _runResources->setSoundHandler(_soundHandler);
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
@@ -362,6 +341,21 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _runResources->setHWAccelBackend(_hwaccel);
     // Set the Renderer resource, opengl, agg, or cairo
     _runResources->setRenderBackend(_renderer);
+
+#ifdef USE_FFMPEG
+    _mediaHandler.reset(new media::ffmpeg::MediaHandlerFfmpeg());
+#elif defined(USE_GST)
+    _mediaHandler.reset(new media::gst::MediaHandlerGst());
+#elif defined(USE_HAIKU_ENGINE)
+    _mediaHandler.reset(new media::haiku::MediaHandlerHaiku());
+#else
+    log_error(_("No media support compiled in"));
+#endif
+    
+    _runResources->setMediaHandler(_mediaHandler);
+    
+    init_sound();
+    _runResources->setSoundHandler(_soundHandler);
     
     init_gui();
 

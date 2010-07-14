@@ -355,7 +355,7 @@ main(int argc, char *argv[])
     }
 
 
-    std::auto_ptr<gnash::media::MediaHandler> mediaHandler;
+    boost::shared_ptr<gnash::media::MediaHandler> mediaHandler;
     boost::shared_ptr<sound::sound_handler> soundHandler;
 
 #ifdef USE_FFMPEG
@@ -364,9 +364,8 @@ main(int argc, char *argv[])
     mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
 #endif
 
-    if ( mediaHandler.get() )
+    if (mediaHandler.get())
     {
-        gnash::media::MediaHandler::set(mediaHandler);
         soundHandler.reset( new sound::NullSoundHandler() );
     }
 
@@ -383,6 +382,7 @@ main(int argc, char *argv[])
 
         RunResources runResources(*i);
         runResources.setSoundHandler(soundHandler);
+        runResources.setMediaHandler(mediaHandler);
         runResources.setStreamProvider(sp);
         runResources.setTagLoaders(loaders);
 

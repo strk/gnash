@@ -99,9 +99,9 @@ private:
 
 public:
 
-    SDL_sound_handler();
+    SDL_sound_handler(media::MediaHandler* m);
 
-    SDL_sound_handler(const std::string& wave_file);
+    SDL_sound_handler(media::MediaHandler* m, const std::string& wave_file);
 
     ~SDL_sound_handler();
 

@@ -88,6 +88,7 @@ MovieTester::MovieTester(const std::string& url)
     
     _runResources.reset(new RunResources(url));
     _runResources->setSoundHandler(_sound_handler);
+    _runResources->setMediaHandler(_mediaHandler);
     
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
@@ -569,10 +570,8 @@ MovieTester::initTestingSoundHandlers()
     // Currently, SoundHandler can't be constructed
     // w/out a registered MediaHandler .
     // Should be fixed though...
-    //
-    if ( gnash::media::MediaHandler::get() ) {
-        log_error("MediaHandler::get returns: %s",
-            gnash::media::MediaHandler::get());
+    if (_mediaHandler.get()) {
+        log_error("MediaHandler::get returns: %s", _mediaHandler.get());
         _sound_handler.reset( new sound::NullSoundHandler() );
     }
 }
@@ -580,18 +579,16 @@ MovieTester::initTestingSoundHandlers()
 void
 MovieTester::initTestingMediaHandlers()
 {
-    std::auto_ptr<media::MediaHandler> handler;
     
 #ifdef USE_FFMPEG
-    handler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
+    _mediaHandler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
 #elif defined(USE_GST)
-    handler.reset( new gnash::media::gst::MediaHandlerGst() );
+    _mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
 #else
     std::cerr << "Neigther SOUND_SDL nor SOUND_GST defined" << std::endl;
     return;
 #endif
 
-    gnash::media::MediaHandler::set(handler);
 }
 
 void

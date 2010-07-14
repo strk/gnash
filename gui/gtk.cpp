@@ -1883,7 +1883,7 @@ GtkGui::showAboutDialog()
 
     comments.append(_("\nRenderer: "));
     comments.append(RENDERER_CONFIG);
-    comments.append(_("\nHardwar Acceleration:: "));
+    comments.append(_("\nHardware Acceleration: "));
     comments.append(HWACCEL_CONFIG);
     comments.append(_("\nGUI: "));
     comments.append("GTK2"); // gtk of course!

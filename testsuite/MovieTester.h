@@ -332,6 +332,8 @@ private:
 
     boost::shared_ptr<sound::sound_handler> _sound_handler;
 
+    boost::shared_ptr<media::MediaHandler> _mediaHandler;
+
     std::auto_ptr<RunResources> _runResources;
 	/// Current pointer position - X ordinate
 	int _x;

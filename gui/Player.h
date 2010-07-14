@@ -261,8 +261,6 @@ private:
     
     void init_sound();
     
-    void init_media();
-    
     void init_logfile();
     
     void init_gui();
@@ -314,7 +312,7 @@ private:
     ///         needing a RunResources.
     boost::shared_ptr<sound::sound_handler> _soundHandler;
     
-    std::auto_ptr<media::MediaHandler> _mediaHandler;
+    boost::shared_ptr<media::MediaHandler> _mediaHandler;
     
     /// Handlers (for sound etc) for a libcore run.
     //

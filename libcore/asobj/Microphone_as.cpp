@@ -31,8 +31,9 @@
 #include "AudioInput.h"
 #include "MediaHandler.h"
 #include "Relay.h"
-
+#include "RunResources.h"
 #include "namedStrings.h"
+
 #include <algorithm>
 
 namespace gnash {
@@ -253,8 +254,9 @@ microphone_get(const fn_call& fn)
     // meant, not a new object each time. It will be necessary to query
     // the MediaHandler for this, and possibly to store the as_objects
     // somewhere.
-    //
-    media::MediaHandler* handler = media::MediaHandler::get();
+    const RunResources& r = getRunResources(getGlobal(fn));
+    media::MediaHandler* handler = r.mediaHandler();
+
     if (!handler) {
         log_error(_("No MediaHandler exists! Cannot create a Microphone "
                     "object"));
