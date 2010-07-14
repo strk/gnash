@@ -284,7 +284,7 @@ Player::load_movie()
 }
 
 /// \brief Run, used to open a new flash file. Using previous initialization
-int
+void
 Player::run(int argc, char* argv[], const std::string& infile,
         const std::string& url)
 {
@@ -337,8 +337,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _mediaHandler.reset(media::MediaFactory::instance().get(_media));
 
     if (!_mediaHandler.get()) {
-        log_error("Non-existent media handler %s specified", _media);
-        return EXIT_FAILURE;
+        boost::format fmt =
+            boost::format(_("Non-existent media handler %1% specified"))
+            % _media;
+        throw GnashException(fmt.str());
     }
 
     _runResources->setMediaHandler(_mediaHandler);
@@ -352,8 +354,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // note that this will also initialize the renderer
     // which is *required* during movie loading
     if (!_gui->init(argc, &argv)) {
-        std::cerr << "Could not initialize gui." << std::endl;
-        return EXIT_FAILURE;
+        throw GnashException("Could not initialize GUI");
     }
 
     // Parse querystring (before FlashVars, see
@@ -382,7 +383,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Load the actual movie.
     _movieDef = load_movie();
     if (!_movieDef) {
-        return EXIT_FAILURE;
+        throw GnashException("Could not load movie!");
     }
 
     // Get info about the width & height of the movie.
@@ -563,7 +564,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
 
-    return EXIT_SUCCESS;
 }
 
 void

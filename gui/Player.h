@@ -74,7 +74,7 @@ public:
     ///        movie path/url.
     ///           
     ///
-    int run(int argc, char* argv[],
+    void run(int argc, char* argv[],
             const std::string& infile, const std::string& url = "");
     
     float setScale(float s);

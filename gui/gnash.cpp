@@ -39,6 +39,7 @@
 #include "debugger.h"
 #include "arg_parser.h"
 #include "GnashNumeric.h" // for clamp
+#include "GnashException.h"
 #include "bzrversion.h"
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -575,5 +576,13 @@ gnash_main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    return player.run(argc, argv, infiles.front(), url);
+    // We only expect GnashExceptions here. No others should be thrown!
+    try {
+        player.run(argc, argv, infiles.front(), url);
+    }
+    catch (const gnash::GnashException& ex) {
+        std::cerr << "Error: " << ex.what() << "\n";
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
