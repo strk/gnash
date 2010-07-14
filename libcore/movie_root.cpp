@@ -312,7 +312,7 @@ movie_root::setLevel(unsigned int num, Movie* movie)
     {
         // don't leak overloaded levels
 
-        LevelMovie lm = it->second;
+        MovieClip* lm = it->second;
         if (lm == _rootMovie)
         {
             // NOTE: this is not enough to trigger
@@ -2256,9 +2256,8 @@ movie_root::getCharacterTree(tree<StringPair>& tr,
                 os.str()));
 
     /// Live DisplayObjects tree
-    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
-                                                               i != e; ++i)
-    {
+    for (LiveChars::const_iterator i = _liveChars.begin(), e = _liveChars.end();
+            i != e; ++i) {
         (*i)->getMovieInfo(tr, localIter);
     }
 
