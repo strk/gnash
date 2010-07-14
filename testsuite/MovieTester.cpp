@@ -570,7 +570,7 @@ MovieTester::initTestingSoundHandlers()
     // Should be fixed though...
     if (_mediaHandler.get()) {
         log_error("MediaHandler::get returns: %s", _mediaHandler.get());
-        _sound_handler.reset( new sound::NullSoundHandler() );
+        _sound_handler.reset(new sound::NullSoundHandler(_mediaHandler.get()));
     }
 }
 

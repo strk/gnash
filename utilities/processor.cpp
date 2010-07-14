@@ -353,7 +353,8 @@ main(int argc, char *argv[])
     boost::shared_ptr<gnash::media::MediaHandler> mediaHandler;
     boost::shared_ptr<sound::sound_handler> soundHandler;
 
-    soundHandler.reset(new sound::NullSoundHandler());
+    mediaHandler.reset(media::MediaFactory::instance().get(""));
+    soundHandler.reset(new sound::NullSoundHandler(mediaHandler.get()));
 
     boost::shared_ptr<StreamProvider> sp(new StreamProvider);
 

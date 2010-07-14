@@ -311,7 +311,7 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 
     std::auto_ptr<EmbedSound> sounddata(
             new EmbedSound(data, sinfo, 100,
-                _mediaHandler->getInputPaddingSize()));
+                _mediaHandler ? _mediaHandler->getInputPaddingSize() : 0));
 
     int sound_id = _sounds.size();
 
