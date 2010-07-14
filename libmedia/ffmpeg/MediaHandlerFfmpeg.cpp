@@ -172,7 +172,7 @@ MediaHandlerFfmpeg::getInputPaddingSize() const
 
 #ifdef REGISTER_MEDIA_HANDLERS
 namespace {
-    RegisterMediaHandler<MediaHandlerFfmpeg> reg("ffmpeg");
+    MediaFactory::RegisterHandler<MediaHandlerFfmpeg> reg("ffmpeg");
 }
 #endif
 

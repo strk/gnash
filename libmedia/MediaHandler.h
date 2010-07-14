@@ -23,6 +23,7 @@
 #include "MediaParser.h" // for videoCodecType and audioCodecType enums
 #include "dsodefs.h" // DSOEXPORT
 #include "VideoConverter.h"
+#include "GnashFactory.h"
 
 #include <vector>
 #include <memory>
@@ -56,49 +57,7 @@ namespace gnash {
 /// @todo fix http://wiki.gnashdev.org/wiki/index.php/Libmedia, is obsoleted
 namespace media {
 
-class DSOEXPORT MediaFactory
-{
-public:
-    typedef MediaHandler*(*CreateHandler)();
-    typedef std::map<std::string, CreateHandler> Handlers;
-
-    /// Get the MediaFactory singleton.
-    static MediaFactory& instance();
-
-    /// Return a MediaHandler identified by a name.
-    //
-    /// @param name     The name of the handler to return. An empty string
-    ///                 will return the first available handler. If the
-    ///                 string is not empty and no match is found, a null
-    ///                 pointer will be returned.
-    MediaHandler* get(const std::string& name);
-
-    /// Register a MediaHandler with a particular name.
-    //
-    /// @param name     The name to register the MediaHandler under. Duplicated
-    ///                 names will replace previous handlers!
-    /// @param r        A pointer to a function that will return the 
-    ///                 MediaHandler when called.
-    void registerHandler(const std::string& name, CreateHandler r);
-
-private:
-
-    Handlers _handlers;
-
-};
-
-template<typename Derived>
-struct
-RegisterMediaHandler
-{
-    static MediaHandler* createHandler() {
-        return new Derived();
-    }
-
-    RegisterMediaHandler(const std::string& name) {
-        MediaFactory::instance().registerHandler(name, createHandler);
-    }
-};
+typedef GnashFactory<MediaHandler> MediaFactory;
 
 /// The MediaHandler class acts as a factory to provide parser and decoders
 class DSOEXPORT MediaHandler

@@ -212,7 +212,7 @@ MediaHandlerGst::cameraNames(std::vector<std::string>& names) const
 
 #ifdef REGISTER_MEDIA_HANDLERS
 namespace {
-    RegisterMediaHandler<MediaHandlerGst> reg("gst");
+    MediaFactory::RegisterHandler<MediaHandlerGst> reg("gst");
 }
 #endif
 
