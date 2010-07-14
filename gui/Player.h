@@ -146,6 +146,10 @@ public:
         return _hostfd;
     }
 
+    void setMedia(const std::string& media) {
+        _media = media;
+    }
+
     void setControlFD(int fd) {
         _controlfd = fd;
     }
@@ -365,6 +369,11 @@ private:
     //
     /// If empty, a default is used.
     std::string _screenshotFile;
+
+    /// The identifier for the media handler.
+    //
+    /// If empty, a default is used.
+    std::string _media;
 
 };
  

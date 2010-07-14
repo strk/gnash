@@ -18,6 +18,7 @@
 //
 
 
+#include "MediaHandler.h"
 #include "MediaParser.h"
 #include "MediaParserFfmpeg.h"
 #include "VideoDecoderFfmpeg.h"

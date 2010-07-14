@@ -47,11 +47,6 @@
 #endif
 
 #include "MediaHandler.h"
-#ifdef USE_FFMPEG
-# include "ffmpeg/MediaHandlerFfmpeg.h"
-#elif defined(USE_GST)
-# include "gst/MediaHandlerGst.h"
-#endif
 
 #include <cstdio>
 #include <string>
@@ -579,16 +574,8 @@ MovieTester::initTestingSoundHandlers()
 void
 MovieTester::initTestingMediaHandlers()
 {
-    
-#ifdef USE_FFMPEG
-    _mediaHandler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
-#elif defined(USE_GST)
-    _mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
-#else
-    std::cerr << "Neigther SOUND_SDL nor SOUND_GST defined" << std::endl;
-    return;
-#endif
-
+    // TODO: allow selection.
+    _mediaHandler.reset(MediaFactory::instance.get(""));
 }
 
 void

@@ -334,8 +334,12 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Set the Renderer resource, opengl, agg, or cairo
     _runResources->setRenderBackend(_renderer);
 
-    _mediaHandler.reset(media::MediaFactory::instance().get(""));
-    assert(_mediaHandler.get());
+    _mediaHandler.reset(media::MediaFactory::instance().get(_media));
+
+    if (!_mediaHandler.get()) {
+        log_error("Non-existent media handler %s specified", _media);
+        return EXIT_FAILURE;
+    }
 
     _runResources->setMediaHandler(_mediaHandler);
     
@@ -417,7 +421,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Register Player to receive FsCommand events from the core.
     root.registerFSCommandCallback(_callbacksHandler.get());
 
-    gnash::log_debug("Player Host FD #%d, Player Control FD #%d", 
+    log_debug("Player Host FD #%d, Player Control FD #%d", 
                      _hostfd, _controlfd);
     
     // Set host requests fd (if any)

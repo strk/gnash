@@ -222,6 +222,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'd', "delay",             Arg_parser::yes },
         { 'x', "xid",               Arg_parser::yes },
         { 'R', "renderer",          Arg_parser::yes },
+        { 'M', "media",             Arg_parser::yes },
         { 'r', "render-mode",       Arg_parser::yes },
         { 't', "timeout",           Arg_parser::yes },        
         { '1', "once",              Arg_parser::no  },        
@@ -407,6 +408,9 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                 case 262:
                     cout << rcfile.getFlashVersionString() << endl;
                     exit(EXIT_SUCCESS);          
+                    break;
+             case 'M':
+                    player.setMedia(parser.argument(i));
                     break;
 #if defined(RENDERER_AGG) || defined(RENDERER_OPENGL) || defined(RENDERER_CAIRO)
              case 'R':

@@ -915,8 +915,8 @@ AC_ARG_ENABLE(media,
           build_media_gst=yes
           media_handler_specified=true
           ;;
-        ffmpeg|FFMPEG)
-          build_media_ffmeg=ffmpeg
+        FFMPEG|ffmpeg)
+          build_media_ffmpeg=yes
           media_handler_specified=true
           ;;
         no|NO|none)
@@ -931,10 +931,9 @@ AC_ARG_ENABLE(media,
       if test "x$val" = "x$enableval"; then
         break;
       fi
-    done,
-    dnl Defaults:
-    [build_media_gst=true; media_handler_specified=false]
+    done
 )
+
 
 dnl If we're on Haiku, there is only one supported media handler.
 if test x"${build_haiku}" = xyes; then
@@ -2284,8 +2283,8 @@ dnl AM_CONDITIONAL(HAVE_OPENGL, test x"${has_opengl}" = xyes)
 AM_CONDITIONAL(USE_SOUND_SDL, test x$build_sound_sdl = xyes)
 AM_CONDITIONAL(USE_SOUND_AHI, test x$build_sound_ahi = xyes)
 AM_CONDITIONAL(USE_SOUND_MKIT, test x$build_sound_mkit = xyes)
-AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$build_media_ffmpeg" = xyes)
-AM_CONDITIONAL(USE_GST_ENGINE, test x"$build_media_gst" = xyes)
+AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"${build_media_ffmpeg}" = x"yes")
+AM_CONDITIONAL(USE_GST_ENGINE, test x"${build_media_gst}" = x"yes")
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
 dnl for now the Haiku media handler is experimental
 AM_CONDITIONAL(USE_HAIKU_ENGINE, test x"$build_media_haiku" = xyes)
@@ -2309,14 +2308,6 @@ if test x"${build_sound_ahi}" = xyes; then
     AC_DEFINE([SOUND_AHI],  [1], [Use AmigaOS AHI for sound handling])
   fi
 fi
-
-case "${media_handler}" in
-  ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
-  gst)  AC_DEFINE([USE_GST],  [1], [Use gstreamer for media decoding]) ;;
-  *)
-esac
-dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_GST, test x$media_handler = xgst)
 
 if test x$build_fltk = xyes; then
   GNASH_PKG_FIND(fltk2, [fltk/FL_API.h], [Fast Light Toolkit], fl_window_flush)
@@ -2384,7 +2375,7 @@ AC_ARG_ENABLE(hwaccel,
 
 dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
 dnl restrict using HW Accel to using ffmpeg directly.
-if test x"${media_handler}" = x"gst" -a x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg_vaapi}" = x"yes"; then
+if test x"${build_media_ffmpeg}" = x"no" -a x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg_vaapi}" = x"yes"; then
   AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
 fi
 
@@ -3177,7 +3168,7 @@ if test x$build_gtk = xyes; then #{
 
 fi
 
-if test "$media_handler" = "gst"; then
+if test x"$build_media_gst" = x"yes"; then
   if test x"$missing_codecs" != x; then   
       echo "        Your Gstreamer installation is missing these codecs: $missing_codecs"
       echo "        Please install the gstreamer-ffmpeg for Gstreamer"
@@ -3209,7 +3200,7 @@ if test "$media_handler" = "gst"; then
   fi
 fi
 
-  if test x"$media_handler" = x"ffmpeg"; then
+  if test x"${build_media_ffmpeg}" = x"yes"; then
     if test x"$FFMPEG_LIBS" != x; then
       echo "        MP3 and video support enabled through ffmpeg"
       if test x"${ffmpeg_version_check}" != xok; then
