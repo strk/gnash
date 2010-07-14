@@ -34,6 +34,26 @@
 
 namespace gnash {
 namespace media {
+    
+boost::scoped_ptr<MediaFactory> MediaFactory::_factory;
+
+MediaHandler*
+MediaFactory::get(const std::string& name)
+{
+    if (name.empty()) {
+        return _handlers.empty() ? 0 : _handlers.begin()->second();
+    }
+
+    Handlers::const_iterator it = _handlers.find(name);
+    if (it == _handlers.end()) return 0;
+    return it->second();
+    
+}
+void
+MediaFactory::registerHandler(const std::string& name, CreateHandler r)
+{
+    _handlers[name] = r;
+}
 
 bool
 MediaHandler::isFLV(IOChannel& stream) throw (IOException)

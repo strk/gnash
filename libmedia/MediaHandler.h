@@ -26,6 +26,9 @@
 
 #include <vector>
 #include <memory>
+#include <map>
+#include <string>
+#include <boost/scoped_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -37,6 +40,7 @@ namespace gnash {
         class VideoInfo;
         class VideoInput;
         class AudioInput;
+        class MediaHandler;
     }
 }
 
@@ -50,13 +54,41 @@ namespace gnash {
 /// The subsystem's entry point is a MediaHandler instance, which acts
 /// as a factory for parsers, decoders and encoders.
 ///
-/// Theoretically, it should be possible for actual MediaHandler
-/// implementations to be loaded at runtime, altought this is not yet
-/// implemented at time of writing (2008/10/27).
-///
 /// @todo fix http://wiki.gnashdev.org/wiki/index.php/Libmedia, is obsoleted
-///
 namespace media {
+
+class DSOEXPORT MediaFactory
+{
+public:
+    typedef MediaHandler*(*CreateHandler)();
+    typedef std::map<std::string, CreateHandler> Handlers;
+
+    /// Get the MediaFactory singleton.
+    static MediaFactory& get() {
+        if (!_factory.get()) _factory.reset(new MediaFactory());
+        return *_factory;
+    }
+
+    /// Return a MediaHandler identified by a name.
+    //
+    /// @param name     The name of the handler to return. An empty string
+    ///                 will return the first available handler. If the
+    ///                 string is not empty and no match is found, a null
+    ///                 pointer will be returned.
+    MediaHandler* get(const std::string& name);
+
+    /// Register a MediaHandler with a particular name.
+    //
+    /// @param name     The name to register the MediaHandler under. Duplicated
+    ///                 names will replace previous handlers!
+    /// @param r        A pointer to a function that will return the 
+    ///                 MediaHandler when called.
+    void registerHandler(const std::string& name, CreateHandler r);
+
+private:
+    static boost::scoped_ptr<MediaFactory> _factory;
+    Handlers _handlers;
+};
 
 /// The MediaHandler class acts as a factory to provide parser and decoders
 class DSOEXPORT MediaHandler
