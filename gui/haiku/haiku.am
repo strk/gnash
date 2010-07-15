@@ -16,22 +16,29 @@
 # 
 
 #
-# Build the FB gui
+# Build the Haiku gui
 #
-if BUILD_FB_GUI
-bin_PROGRAMS += fb-gnash
-fb_gnash_SOURCES = $(GUI_SRCS) gui_fb.cpp fb.cpp fbsup.h
-fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
-	$(AM_CPPFLAGS) 
-fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-#fb_gnash_DEPENDENCIES = .configline
-fb_gnash_LDADD = \
-	$(top_builddir)/librender/libgnashrender.la \
-	$(GNASH_LIBS) 
+
+if BUILD_HAIKU_GUI
+bin_PROGRAMS += haiku-gnash
+haiku_gnash_SOURCES = $(GUI_SRCS) \
+     haiku/gui_haiku.cpp \
+     haiku/haiku.cpp \
+     haiku/haikusup.h
+haiku_gnash_CPPFLAGS = -DGUI_HAIKU -DGUI_CONFIG=\"HAIKU\" \
+	$(AM_CPPFLAGS) $(HAIKU_CFLAGS)
+haiku_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+haiku_gnash_LDADD = $(GNASH_LIBS)
+# all-local: haiku-gnash$(EXEEXT)
+# 	echo
 
 if BUILD_AGG_RENDERER
-fb_gnash_CPPFLAGS += $(AGG_CFLAGS)
-fb_gnash_LDADD += $(AGG_LIBS)
+haiku_gnash_CPPFLAGS += $(AGG_CFLAGS)
+# -lbe must be after -lagg
+haiku_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
+	$(AGG_LIBS) $(HAIKU_LIBS)
+haiku_gnash_SOURCES += haiku/haiku_agg_glue.cpp haiku/haiku_agg_glue.h
 endif				# BUILD_AGG_RENDERER
-endif				# BUILD_FB_GUI
+
+endif				# BUILD_HAIKU_GUI
 

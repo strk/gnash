@@ -22,7 +22,7 @@ if BUILD_FLTK_GUI
 bin_PROGRAMS += fltk-gnash
 fltk_gnash_CPPFLAGS = -DGUI_FLTK -DGUI_CONFIG=\"FLTK\" \
 	$(AM_CPPFLAGS) $(FLTK2_CFLAGS)
-fltk_gnash_SOURCES = $(GUI_SRCS) gui_fltk.cpp
+fltk_gnash_SOURCES = $(GUI_SRCS) fltk/gui_fltk.cpp
 fltk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 if WIN32
   fltk_gnash_LDFLAGS += -no-undefined
@@ -31,24 +31,25 @@ endif
 fltk_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
+    $(X!!_LIBS) \
 	$(AM_LDFLAGS)
 # if BUILD_OGL_RENDERER
 #	fltk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-# 	fltk_gnash_LDADD += $(top_builddir)/librender/libgnashogl.la
+# 	fltk_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la
 #	$(SDL_LIBS) $(OPENGL_LIBS)
-# 	fltk_gnash_SOURCES += fltk_glue_ogl.cpp fltk_glue_ogl.h \
-# 	 	fltk.cpp fltksup.h 
+# 	fltk_gnash_SOURCES += fltk/fltk_glue_ogl.cpp fltk/fltk_glue_ogl.h \
+# 	 	fltk/fltk.cpp fltk/fltksup.h 
 # endif
 if BUILD_AGG_RENDERER
 fltk_gnash_CPPFLAGS += $(AGG_CFLAGS)
 fltk_gnash_LDADD += \
-	$(top_builddir)/librender/libgnashagg.la \
+	$(top_builddir)/librender/libgnashrender.la \
 	$(FLTK2_LIBS) $(AGG_LIBS) $(XFT_LIBS) $(X11_LIBS)
 if WIN32
   fltk_gnash_LDADD += $(top_builddir)/libcore/libgnashcore.la
 endif
-fltk_gnash_SOURCES += fltk_glue_agg.cpp fltk_glue_agg.h \
-	 	fltk.cpp fltksup.h 
+fltk_gnash_SOURCES += fltk/fltk_glue_agg.cpp fltk/fltk_glue_agg.h \
+	 	fltk/fltk.cpp fltk/fltksup.h 
 endif
 if WIN32
   fltk_gnash_LDADD += -lgdi32 -lole32 -luuid -lws2_32 -lmsimg32

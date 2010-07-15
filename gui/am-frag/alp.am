@@ -25,7 +25,7 @@
 
 if BUILD_ALP_GUI
 pkglib_LTLIBRARIES = libgnashalp.la
-libgnashalp_la_SOURCES =  $(GUI_SRCS) gui_gtk.cpp
+libgnashalp_la_SOURCES =  $(GUI_SRCS) gtk/gui_gtk.cpp
 libgnashalp_la_CPPFLAGS =  $(gtk_gnash_CPPFLAGS)\
 	 $(ALP_CFLAGS) -DGUI_ALP -DGUI_CONFIG=\"ALP\" \
 	 -DALP_BUILD=ALP_BUILD_DEBUG
@@ -33,20 +33,20 @@ libgnashalp_la_LDFLAGS = -module -avoid-version
 libgnashalp_la_LIBADD = $(gtk_gnash_LDADD) $(ALP_LIBS)
 if BUILD_OGL_RENDERER
 libgnashalp_la_CPPFLAGS += $(OPENGL_CFLAGS)
-libgnashalp_la_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
-		gtk.cpp gtksup.h gtk_glue.h
+libgnashalp_la_SOURCES += gtk/gtk_glue_gtkglext.cpp gtk/gtk_glue_gtkglext.h \
+		gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h
 libgnashalp_la_LIBADD += $(OPENGL_LIBS)
 endif				# BUILD_OGL_RENDERER
 if BUILD_AGG_RENDERER
 libgnashalp_la_CPPFLAGS += $(AGG_CFLAGS)
-libgnashalp_la_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
-		gtk.cpp gtksup.h gtk_glue.h
+libgnashalp_la_SOURCES += gtk/gtk_glue_agg.cpp gtk/gtk_glue_agg.h \
+		gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h
 libgnashalp_la_LIBADD += $(AGG_LIBS)
 endif				# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
 libgnashalp_la_CPPFLAGS += $(CAIRO_CFLAGS)
-libgnashalp_la_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
-		gtk.cpp gtksup.h gtk_glue.h
+libgnashalp_la_SOURCES += gtk/gtk_glue_cairo.cpp gtk/gtk_glue_cairo.h \
+		gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h
 libgnashalp_la_LIBADD += $(CAIRO_LIBS)
 endif				# BUILD_CAIRO_RENDERER
 

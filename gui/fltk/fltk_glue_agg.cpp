@@ -29,6 +29,7 @@
 
 #include "Renderer.h"
 #include "Renderer_agg.h"
+#include "GnashException.h"
 
 using namespace std;
 

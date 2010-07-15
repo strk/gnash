@@ -104,7 +104,6 @@ cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
 
 libcygnal_la_SOURCES = \
 	crc.cpp \
-	cvm.cpp \
 	rtmp_server.cpp \
 	http_server.cpp \
 	proc.cpp \

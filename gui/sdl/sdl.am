@@ -15,40 +15,42 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-EXTRA_DIST += aos4_ogl_glue.cpp aos4_ogl_glue.h
-
 #
-# Build the AOS4 gui
+# Build the SDL gui
 #
-if BUILD_AMIGAOS4_GUI
-bin_PROGRAMS += aos4-gnash
-aos4_gnash_CPPFLAGS = -DGUI_AOS4 -DGUI_CONFIG=\"AOS4\" \
-	 $(AM_CPPFLAGS) $(AOS4_CFLAGS) 
-aos4_gnash_SOURCES = $(GUI_SRCS) aos4_gnash_prefs.cpp aos4_gnash_prefs.h gui_aos4.cpp aos4.cpp aos4sup.h aos4_glue.h 
-aos4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-#aos4_gnash_DEPENDENCIES = .configline
-aos4_gnash_LDADD = \
+if BUILD_SDL_GUI
+bin_PROGRAMS += sdl-gnash
+sdl_gnash_CPPFLAGS = -DGUI_SDL -DGUI_CONFIG=\"SDL\" \
+	 $(AM_CPPFLAGS) $(SDL_CFLAGS) 
+sdl_gnash_SOURCES = $(GUI_SRCS) \
+	sdl/gui_sdl.cpp \
+	sdl/sdl.cpp \
+	sdl/sdlsup.h \
+	sdl/sdl_glue.h
+sdl_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+#sdl_gnash_DEPENDENCIES = .configline
+sdl_gnash_LDADD = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
-	$(AOS4_LIBS)
+	$(SDL_LIBS)
 
-# if BUILD_OGL_RENDERER
-# aos4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-# 	$(OPENGL_LIBS)
-# aos4_gnash_SOURCES += aos4_ogl_glue.cpp aos4_ogl_glue.h 
-# endif
+if BUILD_OGL_RENDERER
+sdl_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+sdl_gnash_LDADD += $(OPENGL_LIBS)
+sdl_gnash_SOURCES += sdl/sdl_ogl_glue.cpp sdl/sdl_ogl_glue.h 
+endif
 
 if BUILD_AGG_RENDERER
-aos4_gnash_CPPFLAGS += $(AGG_CFLAGS)
-aos4_gnash_LDADD += $(AGG_LIBS)
-aos4_gnash_SOURCES += aos4_agg_glue.cpp aos4_agg_glue.h 
+sdl_gnash_CPPFLAGS += $(AGG_CFLAGS)
+sdl_gnash_LDADD += $(AGG_LIBS)
+sdl_gnash_SOURCES += sdl/sdl_agg_glue.cpp sdl/sdl_agg_glue.h 
 endif
 
 if BUILD_CAIRO_RENDERER
-aos4_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-aos4_gnash_LDADD += $(CAIRO_LIBS) 
-aos4_gnash_SOURCES += aos4_cairo_glue.cpp aos4_cairo_glue.h 
+sdl_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
+sdl_gnash_LDADD += $(CAIRO_LIBS) 
+sdl_gnash_SOURCES += sdl/sdl_cairo_glue.cpp sdl/sdl_cairo_glue.h 
 endif
 endif

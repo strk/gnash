@@ -33,7 +33,11 @@ pluginsdir = $(libdir)/gnash/plugins
 # noinst_LTLIBRARIES = libgnashgui.la
 BUILT_SOURCES = .configline
 
-EXTRA_DIST = gnash.in klash3.moc.in Kde4Gui.moc.in Kde4Glue.moc.in am-frag
+EXTRA_DIST = gnash.in \
+	kde/klash3.moc.in \
+	kde/Kde4Gui.moc.in \
+	kde/Kde4Glue.moc.in \
+	am-frag
 
 # If python support is enabled, built that too
 if HAS_PYTHON
@@ -205,40 +209,40 @@ endif
 
 # Build the QTOPIA gui
 if BUILD_QTOPIA3_GUI
-include $(srcdir)/am-frag/qtopia3.am
+include $(srcdir)/kde/qtopia3.am
 endif
 
 # Build the KDE3 gui
 if BUILD_KDE3_GUI
 BUILT_SOURCES += klash3.moc 
-include $(srcdir)/am-frag/kde3.am
+include $(srcdir)/kde/kde3.am
 endif
 
 # Build the KDE4 gui
 if BUILD_KDE4_GUI
 BUILT_SOURCES += Kde4Gui.moc
 BUILT_SOURCES += Kde4Glue.moc
-include $(srcdir)/am-frag/kde4.am
+include $(srcdir)/kde/kde4.am
 endif
 
 # Build the SDL gui
 if BUILD_SDL_GUI
-include $(srcdir)/am-frag/sdl.am
+include $(srcdir)/sdl/sdl.am
 endif
 
 # Build the AmigaOS4 gui
 if BUILD_AMIGAOS4_GUI
-include $(srcdir)/am-frag/aos4.am
+include $(srcdir)/aos4/aos4.am
 endif
 
 # Build the Haiku gui
 if BUILD_HAIKU_GUI
-include $(srcdir)/am-frag/haiku.am
+include $(srcdir)/haiku/haiku.am
 endif
 
 # Build the FLTK gui
 if BUILD_FLTK_GUI
-include $(srcdir)/am-frag/fltk.am
+include $(srcdir)/fltk/fltk.am
 endif
 
 # Build the AQUA gui
@@ -248,7 +252,7 @@ endif
 
 # Build the GTK gui
 if BUILD_GTK_GUI
-include $(srcdir)/am-frag/gtk.am
+include $(srcdir)/gtk/gtk.am
 endif
 
 # if ALP				# Access Linux Platform
@@ -273,7 +277,7 @@ endif
 
 # Build the FB gui
 if BUILD_FB_GUI
-include $(srcdir)/am-frag/fb.am
+include $(srcdir)/fb/fb.am
 endif
 
 # Build the RISCOS gui

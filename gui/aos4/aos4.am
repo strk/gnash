@@ -1,0 +1,60 @@
+# 
+#   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
+EXTRA_DIST += aos4/aos4_ogl_glue.cpp aos4/aos4_ogl_glue.h
+
+#
+# Build the AOS4 gui
+#
+if BUILD_AMIGAOS4_GUI
+bin_PROGRAMS += aos4-gnash
+aos4_gnash_CPPFLAGS = -DGUI_AOS4 -DGUI_CONFIG=\"AOS4\" \
+	 $(AM_CPPFLAGS) $(AOS4_CFLAGS) 
+aos4_gnash_SOURCES = $(GUI_SRCS) \
+    aos4/aos4_gnash_prefs.cpp \
+    aos4/aos4_gnash_prefs.h \
+    aos4/gui_aos4.cpp \
+    aos4/aos4.cpp \
+    aos4/aos4sup.h \
+    aos4/aos4_glue.h 
+aos4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+#aos4_gnash_DEPENDENCIES = .configline
+aos4_gnash_LDADD = \
+	$(top_builddir)/librender/libgnashrender.la \
+	$(MYSQL_LIBS) \
+	$(GNASH_LIBS) \
+	$(AM_LDFLAGS) \
+	$(AOS4_LIBS)
+
+# if BUILD_OGL_RENDERER
+# aos4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+# 	$(OPENGL_LIBS)
+# aos4_gnash_SOURCES += aos4/aos4_ogl_glue.cpp aos4/aos4_ogl_glue.h 
+# endif
+
+if BUILD_AGG_RENDERER
+aos4_gnash_CPPFLAGS += $(AGG_CFLAGS)
+aos4_gnash_LDADD += $(AGG_LIBS)
+aos4_gnash_SOURCES += aos4/aos4_agg_glue.cpp aos4/aos4_agg_glue.h 
+endif
+
+if BUILD_CAIRO_RENDERER
+aos4_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
+aos4_gnash_LDADD += $(CAIRO_LIBS) 
+aos4_gnash_SOURCES += aos4/aos4_cairo_glue.cpp aos4/aos4_cairo_glue.h 
+endif
+endif
