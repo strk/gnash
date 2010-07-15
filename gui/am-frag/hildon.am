@@ -20,7 +20,7 @@
 #
 if BUILD_HILDON_GUI
 bin_PROGRAMS += hildon-gnash
-hildon_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
+hildon_gnash_SOURCES = $(GUI_SRCS) gtk/gui_gtk.cpp
 hildon_gnash_CPPFLAGS = -DGUI_GTK -DGUI_HILDON -DGUI_CONFIG=\"HILDON\" \
 	$(AM_CPPFLAGS) $(GTK_CFLAGS) $(HILDON_CFLAGS)
 hildon_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
@@ -28,23 +28,23 @@ hildon_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 
 if BUILD_OGL_RENDERER
 hildon_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-hildon_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
-		gtk.cpp gtksup.h gtk_glue.h
+hildon_gnash_SOURCES += gtk/gtk_glue_gtkglext.cpp gtk/gtk_glue_gtkglext.h \
+		gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h
 hildon_gnash_LDADD = $(top_builddir)/librender/libgnashogl.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS) $(HILDON_LIBS)
 endif				# BUILD_OGL_RENDERER
 if BUILD_AGG_RENDERER
 hildon_gnash_CPPFLAGS += $(AGG_CFLAGS) $(HILDON_CFLAGS)
-hildon_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
-		gtk.cpp gtksup.h gtk_glue.h
+hildon_gnash_SOURCES += gtk/gtk_glue_agg.cpp gtk/gtk_glue_agg.h \
+		gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h
 hildon_gnash_LDADD = $(top_builddir)/librender/libgnashagg.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(HILDON_LIBS)
 
 endif				# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
 hildon_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-hildon_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
-		gtk.cpp gtksup.h gtk_glue.h
+hildon_gnash_SOURCES += gtk/gtk_glue_cairo.cpp gtk/gtk_glue_cairo.h \
+		gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h
 hildon_gnash_LDADD = $(top_builddir)/librender/libgnashcairo.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS) $(HILDON_LIBS)
 endif				# BUILD_CAIRO_RENDERER
@@ -55,7 +55,7 @@ endif				# BUILD_GTK_HILDON
 # #
 # if BUILD_HILDON_GUI
 # bin_PROGRAMS += hildon-gnash
-# hildon_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
+# hildon_gnash_SOURCES = $(GUI_SRCS) gtk/gui_gtk.cpp
 # hildon_gnash_CPPFLAGS = -DGUI_GTK -DGUI_HILDON -DGUI_CONFIG=\"HILDON\" \
 # 	$(AM_CPPFLAGS) $(GTK_CFLAGS) $(HILDON_CFLAGS)
 # hildon_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
@@ -63,23 +63,23 @@ endif				# BUILD_GTK_HILDON
 
 # if BUILD_OGL_RENDERER
 # hildon_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-# hildon_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
-# 		gtk.cpp gtksup.h gtk_glue.h
+# hildon_gnash_SOURCES += gtk/gtk_glue_gtkglext.cpp gtk/gtk_glue_gtkglext.h \
+# 		gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h
 # hildon_gnash_LDADD = $(top_builddir)/librender/libgnashogl.la \
 # 		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS) $(HILDON_LIBS)
 # endif				# BUILD_OGL_RENDERER
 # if BUILD_AGG_RENDERER
 # hildon_gnash_CPPFLAGS += $(AGG_CFLAGS) $(HILDON_CFLAGS)
-# hildon_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
-# 		gtk.cpp gtksup.h gtk_glue.h
+# hildon_gnash_SOURCES += gtk/gtk_glue_agg.cpp gtk/gtk_glue_agg.h \
+# 		gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h
 # hildon_gnash_LDADD = $(top_builddir)/librender/libgnashagg.la \
 # 		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(HILDON_LIBS)
 
 # endif				# BUILD_AGG_RENDERER
 # if BUILD_CAIRO_RENDERER
 # hildon_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-# hildon_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
-# 		gtk.cpp gtksup.h gtk_glue.h
+# hildon_gnash_SOURCES += gtk/gtk_glue_cairo.cpp gtk/gtk_glue_cairo.h \
+# 		gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h
 # hildon_gnash_LDADD = $(top_builddir)/librender/libgnashcairo.la \
 # 		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS) $(HILDON_LIBS)
 # endif				# BUILD_CAIRO_RENDERER

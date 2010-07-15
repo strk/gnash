@@ -20,6 +20,7 @@ pkgpyexecdir = $(pyexecdir)/gtk-2.0
 
 GNASH_INCLUDES = \
 	-I$(top_srcdir)/gui \
+	-I$(top_srcdir)/gui/gtk \
 	-I$(top_srcdir)/gui/pythonmod \
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/librender	\
@@ -60,18 +61,18 @@ instdir = $(includedir)/gnash
 inst_HEADERS = gnash-view.h
 
 if BUILD_OGL_RENDERER
-RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_gtkglext.cpp
+RENDERER_GLUE = $(top_srcdir)/gui/gtk/gtk_glue_gtkglext.cpp
 INCLUDES += $(GLEXT_CFLAGS)
 endif
 if BUILD_AGG_RENDERER
-RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_agg.cpp
+RENDERER_GLUE = $(top_srcdir)/gui/gtk/gtk_glue_agg.cpp
 if HAVE_XV
-RENDERER_GLUE += $(top_srcdir)/gui/gtk_glue_agg_xv.cpp
+RENDERER_GLUE += $(top_srcdir)/gui/gtk/gtk_glue_agg_xv.cpp
 gnash_la_LIBADD += $(X11_LIBS)
 endif               # HAVE_XV
 endif
 if BUILD_CAIRO_RENDERER
-RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_cairo.cpp
+RENDERER_GLUE = $(top_srcdir)/gui/gtk/gtk_glue_cairo.cpp
 endif
 
 if USE_PYTHON
@@ -84,7 +85,7 @@ nodist_gnash_la_SOURCES = $(BUILT_SOURCES)
 gnash_la_SOURCES = \
 	gnashmodule.c \
 	gnash-view.cpp \
-	$(top_srcdir)/gui/gtk_canvas.cpp \
+	$(top_srcdir)/gui/gtk/gtk_canvas.cpp \
 	$(RENDERER_GLUE)
 
 gnash.c: gnash.defs gnash.override
