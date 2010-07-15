@@ -900,7 +900,6 @@ dnl --------------------------------------------------------
 dnl  Select media handler
 dnl --------------------------------------------------------
 
-media_handler_specified=false
 AC_ARG_ENABLE(media,
   AC_HELP_STRING([--enable-media=handler],
     [Enable media handling support using the specified handler: gst, ffmpeg or none (no sound) [[gst]] ]),
@@ -913,14 +912,14 @@ AC_ARG_ENABLE(media,
       [case "${val}" in
         GST|gst)
           build_media_gst=yes
-          media_handler_specified=true
+          media_list="${media_list}gst "
           ;;
         FFMPEG|ffmpeg)
           build_media_ffmpeg=yes
-          media_handler_specified=true
+          media_list="${media_list}ffmpeg "
           ;;
         no|NO|none)
-          media_handler_specified=true
+          media_list="none"
           ;;
         *)
           AC_MSG_ERROR([bad value ${enableval} for --enable-media option])
@@ -932,9 +931,11 @@ AC_ARG_ENABLE(media,
         break;
       fi
     done,
-    [build_media_gst=yes; media_handler_specified=true]
+    [build_media_gst=yes]
 )
 
+MEDIA_CONFIG="${media_list}"
+AC_SUBST(MEDIA_CONFIG)
 
 dnl If we're on Haiku, there is only one supported media handler.
 if test x"${build_haiku}" = xyes; then
@@ -2232,24 +2233,10 @@ if test x"$build_media_gst" = "xyes"; then
     GSTREAMER_LIBS="-lgstinterfaces-0.10 $GSTREAMER_LIBS"
     AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], "Has the Gstreamer Plugin Dev package installed.")
   fi
-  if test x"${media_handler_specified}" = xfalse; then
-    if test x"$GSTREAMER_LIBS" = x; then
-       AC_MSG_WARN([No appropriate gstreamer library found, will try using ffmpeg.])
-       build_media_gst=no
-       build_media_ffmpeg=yes
-    fi
-  fi
 fi
 
 if test x"$build_media_ffmpeg" = x"yes"; then
   GNASH_PATH_FFMPEG
-  if test x"${media_handler_specified}" = xfalse; then
-     # If the library is not found, or its version is not ok, we'll try gst
-     if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version_check}" != xok; then
-       AC_MSG_WARN([No appropriate ffmpeg library found, disabling media handling.])
-       build_media_ffmpeg=no
-     fi
-  fi
 fi
 
 if test x$build_cairo = xyes; then
@@ -2724,9 +2711,6 @@ fi
 SUPPORTED_GUIS="`echo ${SUPPORTED_GUIS} | sed 's/,//'`" # Strip leading comma
 AC_SUBST(SUPPORTED_GUIS)
 
-MEDIA_CONFIG=${media_handler}
-AC_SUBST(MEDIA_CONFIG)
-
 dnl AC_CONFIG_LINKS(doc/C/images)
 dnl AC_CONFIG_LINKS(gnashconfig.h,libltdl/config.h)
 AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all/cygnalrc.in)
@@ -3015,28 +2999,6 @@ else
   echo "                     or .rpm users: yum install libpng-devel" >&4
 fi
 
-dnl if test x"$OGG_LIBS" != x; then
-dnl   if test x"$OGG_CFLAGS" != x; then
-dnl     echo "        Ogg flags are: $OGG_CFLAGS"
-dnl   else
-dnl     echo "        Ogg flags are: default include path"
-dnl   fi
-dnl   echo "        Ogg libs are: $OGG_LIBS"
-dnl else
-dnl   echo "        ERROR: No Ogg Vorbis development package installed!" >&3
-dnl fi
-
-dnl if test x"$VORBIS_LIBS" != x; then
-dnl   if test x"$VORBIS_CFLAGS" != x; then
-dnl     echo "        VORBIS flags are: $VORBIS_CFLAGS"
-dnl   else
-dnl     echo "        VORBIS flags are: default include path"
-dnl   fi
-dnl   echo "        VORBIS libs are: $VORBIS_LIBS"
-dnl else
-dnl   echo "        ERROR: No VORBIS Vorbis development package installed!" >&3
-dnl fi
-
 if test x"${build_ogl}" = x"yes"; then
   if test x"$OPENGL_LIBS" != x; then
     if test x"$OPENGL_CFLAGS" != x; then
@@ -3308,8 +3270,6 @@ if $need_sdl; then
     echo "               or .rpm users: yum install SDL-devel" >&3
     test x$build_sdl = xyes &&
 	echo "               or select a different GUI with --enable-gui= " >&3
-    test x"$media_handler" = x"ffmpeg" &&
-	echo "               or use --enable-media=gst" >&3
   fi
 fi
 unset need_sdl
@@ -3718,7 +3678,7 @@ if test x"${build_alp}" = xyes; then
 fi
 
 dnl Haiku
-if test x"${build_haiku}" = xyes -o x"${build_sound_mkit}" = xyes -o x"${media_handler}" = x"mkit"; then
+if test x"${build_haiku}" = xyes -o x"${build_sound_mkit}" = xyes -o x"${build_media_haiku}" = x"yes"; then
     echo "        Haiku libs are: $HAIKU_LIBS"
 fi
  
@@ -3842,7 +3802,7 @@ fi
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${renderer_list}"
 echo "        Hardware Acceleration: ${hwaccel_list}"
-echo "        Media handler: "$media_handler
+echo "        Media handlers: ${media_list}"
 echo "        Using ${add_sound} for sound handling"
 echo "        Using $with_shm mode for shared memory"
 

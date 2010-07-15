@@ -359,7 +359,7 @@ endif
 	@echo "legit value"
 	@echo ""
 	@echo "Configurable options are:"
-	@echo "	Media handler: $(MEDIA_CONFIG)"
+	@echo "	Media handlers: $(MEDIA_CONFIG)"
 	@echo "	Renderer engines: $(RENDERER_CONFIG)"
 	@echo "	Hardware Acceleration: $(HWACCEL_CONFIG)"
 
