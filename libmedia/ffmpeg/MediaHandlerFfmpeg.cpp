@@ -19,6 +19,9 @@
 
 
 #include "MediaHandler.h"
+
+#include <sstream>
+
 #include "MediaParser.h"
 #include "MediaParserFfmpeg.h"
 #include "VideoDecoderFfmpeg.h"
@@ -28,20 +31,24 @@
 #include "VideoConverterFfmpeg.h"
 #include "VideoInputFfmpeg.h"
 #include "AudioInputFfmpeg.h"
-
-#include "IOChannel.h" // for visibility of destructor
+#include "IOChannel.h" 
 
 namespace gnash { 
 namespace media {
 namespace ffmpeg {
 
 /// FFMPEG based MediaHandler
-class DSOEXPORT MediaHandlerFfmpeg : public MediaHandler
+class MediaHandlerFfmpeg : public MediaHandler
 {
 public:
 
     virtual std::string description() const {
-        return "FFmpeg Media Handler";
+        std::ostringstream ss;
+        const boost::uint32_t ver = avcodec_version();
+        ss << "FFmpeg (avcodec version: " << (ver >> 16) << "."
+                                          << (ver & 0xff00 >> 8)  << "."
+                                          << (ver & 0xff) << ")";
+        return ss.str();
     }
 
 	virtual std::auto_ptr<MediaParser>

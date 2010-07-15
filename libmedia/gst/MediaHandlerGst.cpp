@@ -50,8 +50,7 @@ namespace gst {
 /// It uses gstreamer: http://gstreamer.freedesktop.org/
 ///
 /// Starting point is MediaHandlerGst.
-/// 
-class DSOEXPORT MediaHandlerGst : public MediaHandler
+class MediaHandlerGst : public MediaHandler
 {
 public:
 
@@ -59,8 +58,7 @@ public:
         guint major, minor, micro, nano;
         gst_version(&major, &minor, &micro, &nano);
         std::ostringstream s;
-        s << _("Gstreamer Media Handler, gst version: ") <<  major << "." 
-            << minor << "." << micro;
+        s << _("Gstreamer ") <<  major << "." << minor << "." << micro;
         return s.str();
     }
 
