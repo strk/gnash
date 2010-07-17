@@ -931,7 +931,8 @@ AC_ARG_ENABLE(media,
         break;
       fi
     done,
-    [build_media_gst=yes]
+    [build_media_gst=yes
+     media_list="gst"]
 )
 
 MEDIA_CONFIG="${media_list}"
