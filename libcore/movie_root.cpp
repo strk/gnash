@@ -1634,12 +1634,21 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 	exit(0);
     } else if (invoke->name == "SetVariable") {
 	// SetVariable doesn't send a response
+        MovieClip *mc = getLevel(0);
+        as_object *obj = getObject(mc);
+        string_table &st = getStringTable(*obj);
+        std::string var = invoke->args[0].to_string();
+        as_value &val = invoke->args[1] ;
+        obj->set_member(st.find(var), val);
     } else if (invoke->name == "GetVariable") {
 	// GetVariable sends the value of the variable
-#if 1
-	as_value val("Hello World");
-	// FIXME: need to use a real value
-#else
+        MovieClip *mc = getLevel(0);
+        as_object *obj = getObject(mc);
+        string_table &st = getStringTable(*obj);
+        std::string var = invoke->args[0].to_string();
+        as_value val;
+        obj->get_member(st.find(var), &val);
+#if 0
         as_object::SortedPropertyList props;
         enumerateProperties(o, props);
 #endif
