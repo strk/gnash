@@ -98,8 +98,10 @@ typedef struct{
 namespace gnash {
 namespace sound {
 
-AOS4_sound_handler::AOS4_sound_handler(const std::string& wavefile)
+AOS4_sound_handler::AOS4_sound_handler(media::MediaHandler* m,
+		const std::string& wavefile)
     :
+    sound_handler(m),
     _audioOpened(false),
 	_closing(false)
 {
@@ -120,8 +122,9 @@ AOS4_sound_handler::AOS4_sound_handler(const std::string& wavefile)
 
 }
 
-AOS4_sound_handler::AOS4_sound_handler()
+AOS4_sound_handler::AOS4_sound_handler(media::MediaHandler* m)
     :
+    sound_handler(m),
     _audioOpened(false),
 	_closing(false)
 {
@@ -310,17 +313,17 @@ AOS4_sound_handler::tell(int soundHandle)
 }
 
 sound_handler*
-create_sound_handler_aos4()
+create_sound_handler_aos4(media::MediaHandler* m)
 // Factory.
 {
-    return new AOS4_sound_handler;
+    return new AOS4_sound_handler(m);
 }
 
 sound_handler*
-create_sound_handler_aos4(const std::string& wave_file)
+create_sound_handler_aos4(media::MediaHandler* m, const std::string& wave_file)
 // Factory.
 {
-    return new AOS4_sound_handler(wave_file);
+    return new AOS4_sound_handler(m, wave_file);
 }
 
 void

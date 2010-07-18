@@ -582,7 +582,7 @@ DSOEXPORT sound_handler* create_sound_handler_sdl(media::MediaHandler* m,
 DSOEXPORT sound_handler* create_sound_handler_aos4(media::MediaHandler* m);
 
 /// @throw a SoundException if fails to initialize audio card.
-DSOEXPORT sound_handler* create_sound_handler_aos4(media::MediaHandler* m
+DSOEXPORT sound_handler* create_sound_handler_aos4(media::MediaHandler* m,
         const std::string& wave_file);
 
 #elif defined(SOUND_MKIT)

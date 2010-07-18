@@ -110,9 +110,9 @@ private:
 
 public:
 
-    AOS4_sound_handler();
+    AOS4_sound_handler(media::MediaHandler* m);
 
-    AOS4_sound_handler(const std::string& wave_file);
+    AOS4_sound_handler(media::MediaHandler* m, const std::string& wave_file);
 
     ~AOS4_sound_handler();
 
