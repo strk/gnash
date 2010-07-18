@@ -145,6 +145,8 @@
 
 
 #include <vector>
+#include <boost/noncopyable.hpp>
+
 #include "dsodefs.h" // for DSOEXPORT
 
 #include "FileTypes.h"
@@ -186,7 +188,7 @@ namespace gnash {
 /// instance to the core (RunResources) *before* any SWF parsing begins.
 ///
 /// For more info see page \ref Renderer_intro.
-class DSOEXPORT Renderer
+class DSOEXPORT Renderer : boost::noncopyable
 {
 public:
 
