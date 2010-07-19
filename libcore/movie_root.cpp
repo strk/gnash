@@ -134,8 +134,6 @@ movie_root::movie_root(const movie_definition& def,
     _vm(VM::init(def.get_version(), *this, clock)),
     _interfaceHandler(0),
     _fsCommandHandler(0),
-    m_viewport_x0(0),
-    m_viewport_y0(0),
     m_viewport_width(1),
     m_viewport_height(1),
     m_background_color(255, 255, 255, 255),
@@ -231,8 +229,6 @@ movie_root::setRootMovie(Movie* movie)
 {
     _rootMovie = movie;
 
-    m_viewport_x0 = 0;
-    m_viewport_y0 = 0;
     const movie_definition* md = movie->definition();
     float fps = md->get_frame_rate();
     _movieAdvancementDelay = static_cast<int>(1000/fps);
@@ -561,8 +557,6 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 {
     assert(testInvariant());
 
-    m_viewport_x0 = x0;
-    m_viewport_y0 = y0;
     m_viewport_width = w;
     m_viewport_height = h;
 
