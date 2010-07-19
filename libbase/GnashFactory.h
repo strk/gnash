@@ -69,7 +69,7 @@ public:
     typedef T*(*CreateHandler)();
     typedef std::map<std::string, CreateHandler> Handlers;
 
-    /// Get the MediaFactory singleton.
+    /// Get the GnashFactory singleton.
     static GnashFactory& instance() {
         static GnashFactory m;
         return m;
@@ -88,7 +88,7 @@ public:
 
     }
 
-    /// Return a MediaHandler identified by a name.
+    /// Return a Handler identified by a name.
     //
     /// @param name     The name of the handler to return. An empty string
     ///                 will return the first available handler. If the
@@ -104,12 +104,12 @@ public:
         return it->second();
     }
 
-    /// Register a MediaHandler with a particular name.
+    /// Register a Handler with a particular name.
     //
-    /// @param name     The name to register the MediaHandler under. Duplicated
+    /// @param name     The name to register the Handler under. Duplicated
     ///                 names will replace previous handlers!
     /// @param r        A pointer to a function that will return the 
-    ///                 MediaHandler when called.
+    ///                 Handler when called.
     void registerHandler(const Key& name, CreateHandler r) {
         _handlers[name] = r;
     }
