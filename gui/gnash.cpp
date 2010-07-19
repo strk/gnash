@@ -191,8 +191,8 @@ build_options()
     cout << _("Build options ") << VERSION << endl
 	 << _("   Renderers: ") << RENDERER_CONFIG << endl
 	 << _("   Hardware Acceleration: ") << HWACCEL_CONFIG << endl
-	 << _("   GUI: ") << GUI_CONFIG
-	 << _(" - Media handler: ") << MEDIA_CONFIG << endl
+	 << _("   GUI: ") << GUI_CONFIG << endl
+	 << _("   Media handlers: ") << MEDIA_CONFIG << endl
         
 	 << _("   Configured with: ") << CONFIG_CONFIG << endl
 	 << _("   CXXFLAGS: ") << CXXFLAGS << endl
