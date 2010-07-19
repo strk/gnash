@@ -1880,7 +1880,7 @@ movie_root::ExternalCallback::setReachable() const
 }
 
 as_value
-movie_root::ExternalCallback::call(const std::vector<as_value>& args)
+movie_root::ExternalCallback::call(const std::vector<as_value>& /*args*/)
 {
     GNASH_REPORT_FUNCTION;
 
