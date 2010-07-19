@@ -62,7 +62,7 @@ enum SortFlags {
     SORT_NUMERIC = (1<<4) // 16
 };
 
-class indexed_as_value;
+struct indexed_as_value;
 
 typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 

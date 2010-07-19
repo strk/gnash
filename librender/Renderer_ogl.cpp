@@ -594,7 +594,7 @@ for_each(C& container, R (T::*pmf)(const A&),const A& arg)
 
 
 
-class DSOEXPORT Renderer_ogl : public Renderer, boost::noncopyable
+class DSOEXPORT Renderer_ogl : public Renderer
 {
 public: 
   Renderer_ogl()
