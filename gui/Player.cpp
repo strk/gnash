@@ -624,6 +624,7 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         return "";
     }
 
+
     if (event == "Stage.resize") {
         if ( _gui.isPlugin() ) {
             log_debug("Player doing nothing on Stage.resize as we're a plugin");
@@ -636,6 +637,40 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         sscanf(arg.c_str(), "%dx%d", &width, &height);
         _gui.resizeWindow(width, height);
 
+        return "";
+    }
+
+    if (event == "ExternalInterface.Play") {
+        _gui.play();
+        return "";
+    }
+
+    if (event == "ExternalInterface.StopPlay") {
+        _gui.pause();
+        return "";
+    }
+
+    if (event == "ExternalInterface.Rewind") {
+        _gui.restart();
+        return "";
+    }
+
+    if (event == "ExternalInterface.Pan") {
+	log_unimpl("ExternalInterface.Pan");
+        return "";
+    }
+
+    if (event == "ExternalInterface.IsPlaying") {
+	return (_gui.isStopped()) ? "false" : "true";
+    }
+
+    if (event == "ExternalInterface.SetZoomRect") {
+	log_unimpl("ExternalInterface.SetZoomRect");
+        return "";
+    }
+
+    if (event == "ExternalInterface.Zoom") {
+	log_unimpl("ExternalInterface.Zoom");
         return "";
     }
 
