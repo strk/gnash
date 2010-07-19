@@ -104,8 +104,17 @@ public:
 	typedef std::vector<boost::intrusive_ptr<SWF::ControlTag> > PlayList;
 
 	virtual int	get_version() const = 0;
-	virtual float get_width_pixels() const = 0;
-	virtual float get_height_pixels() const = 0;
+
+    /// Frame width in pixels.
+    //
+    /// The frame size is in twips and may be rounded up.
+	virtual size_t get_width_pixels() const = 0;
+    
+    /// Frame height in pixels.
+    //
+    /// The frame size is in twips and may be rounded up.
+	virtual size_t get_height_pixels() const = 0;
+
 	virtual size_t get_frame_count() const = 0;
 	virtual float get_frame_rate() const = 0;
 

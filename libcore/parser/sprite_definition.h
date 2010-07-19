@@ -94,13 +94,13 @@ public:
     }
 
 	// overload from movie_definition
-	virtual float	get_width_pixels() const { return 1; }
+	virtual size_t get_width_pixels() const { return 1; }
 
 	// overload from movie_definition
-	virtual float	get_height_pixels() const { return 1; }
+	virtual size_t get_height_pixels() const { return 1; }
 
 	// overload from movie_definition
-	virtual size_t	get_frame_count() const { return m_frame_count; }
+	virtual size_t get_frame_count() const { return m_frame_count; }
 
 	/// \brief
 	/// Return total bytes of the movie from which this sprite

@@ -30,7 +30,8 @@ namespace gnash {
 const boost::int32_t SWFRect::rectNull;
 const boost::int32_t SWFRect::rectMax;
 
-void SWFRect::read(SWFStream& in)
+void
+SWFRect::read(SWFStream& in)
 {
     in.align();
     in.ensureBits(5);
@@ -46,7 +47,7 @@ void SWFRect::read(SWFStream& in)
     if (_xMax < _xMin || _yMax < _yMin)
     {
         // We set invalid rectangles to NULL, but we might instead
-        // want to actually swap the values IFF the proprietary player
+        // want to actually swap the values if the proprietary player
         // does so. TODO: check it out.
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror("Invalid rectangle: "

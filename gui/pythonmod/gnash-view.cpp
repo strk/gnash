@@ -259,7 +259,7 @@ gnash_view_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
     gtk_widget_size_allocate (GTK_BIN(widget)->child, allocation);
 
     if( view->stage.get() != NULL) {
-    	view->stage->set_display_viewport(0, 0, allocation->width, allocation->height);
+    	view->stage->setDimensions(allocation->width, allocation->height);
 
         boost::shared_ptr<gnash::Renderer> renderer = gnash_canvas_get_renderer(view->canvas);
         float xscale = allocation->width / view->movie_definition->get_width_pixels();
