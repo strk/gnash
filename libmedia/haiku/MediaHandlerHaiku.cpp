@@ -17,6 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "MediaHandler.h"
 #include "MediaParser.h"
 
 #include "log.h"
@@ -38,7 +39,7 @@ namespace media {
 namespace haiku {
 
 /// Haiku based MediaHandler
-class DSOEXPORT MediaHandlerHaiku : public MediaHandler
+class MediaHandlerHaiku : public MediaHandler
 {
 public:
 
@@ -179,7 +180,7 @@ MediaHandlerHaiku::cameraNames(std::vector<std::string>& /*names*/) const
 
 #ifdef REGISTER_MEDIA_HANDLERS
 namespace {
-    RegisterMediaHandler<MediaHandlerHaiku> reg("haiku");
+    MediaFactory::RegisterHandler<MediaHandlerHaiku> reg("haiku");
 }
 #endif
 

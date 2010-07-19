@@ -78,9 +78,9 @@ class Mkit_sound_handler : public sound_handler
     void MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, boost::uint32_t len, int volume);
 
 public:
-    Mkit_sound_handler();
+    Mkit_sound_handler(media::MediaHandler* m);
 
-    Mkit_sound_handler(const std::string& wave_file);
+    Mkit_sound_handler(media::MediaHandler* m, const std::string& wave_file);
 
     ~Mkit_sound_handler();
 

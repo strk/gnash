@@ -931,17 +931,18 @@ AC_ARG_ENABLE(media,
         break;
       fi
     done,
-    [build_media_gst=yes
-     media_list="gst"]
+    [if test x"${build_haiku}" = xyes; then
+        build_media_ffmpeg=yes
+        build_media_haiku=yes
+        media_list="ffmpeg haiku"
+     else
+        build_media_gst=yes
+        media_list="gst"
+    fi]
 )
 
 MEDIA_CONFIG="${media_list}"
 AC_SUBST(MEDIA_CONFIG)
-
-dnl If we're on Haiku, there is only one supported media handler.
-if test x"${build_haiku}" = xyes; then
-    build_media_haiku=true
-fi
 
 AC_ARG_ENABLE(lirc, AC_HELP_STRING([--enable-lirc], [Disable support for Lirc]),
 [case "${enableval}" in
