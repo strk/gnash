@@ -74,13 +74,17 @@ typedef struct{
 namespace gnash {
 namespace sound {
 
-Mkit_sound_handler::Mkit_sound_handler()
-: _audioopen(false)
+Mkit_sound_handler::Mkit_sound_handler(media::MediaHandler* m)
+    :
+    sound_handler(m),
+    _audioopen(false)
 {
 }
 
-Mkit_sound_handler::Mkit_sound_handler(const std::string& wavefile)
-: _audioopen(false)
+Mkit_sound_handler::Mkit_sound_handler(media::MediaHandler* m, const std::string& wavefile)
+    :
+    sound_handler(m),
+    _audioopen(false)
 {
     if (! wavefile.empty() ) {
         file_stream.open(wavefile.c_str());
@@ -436,17 +440,17 @@ Mkit_sound_handler::unpause()
 
 
 sound_handler*
-create_sound_handler_mkit()
+create_sound_handler_mkit(media::MediaHandler* m)
 // Factory.
 {
-    return new Mkit_sound_handler;
+    return new Mkit_sound_handler(m);
 }
 
 sound_handler*
-create_sound_handler_mkit(const std::string& wave_file)
+create_sound_handler_mkit(media::MediaHandler* m, const std::string& wave_file)
 // Factory.
 {
-    return new Mkit_sound_handler(wave_file);
+    return new Mkit_sound_handler(m, wave_file);
 }
 
 
