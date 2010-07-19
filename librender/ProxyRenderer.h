@@ -67,7 +67,6 @@ namespace gnash {
 		/// See Renderer::begin_display (in backend/Renderer.h)
 		void	begin_display(
 			const rgba& background_color,
-			int viewport_x0, int viewport_y0,
 			int viewport_width, int viewport_height,
 			float x0, float x1, float y0, float y1);
 

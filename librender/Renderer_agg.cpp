@@ -852,7 +852,6 @@ public:
 
   void begin_display(
       const gnash::rgba& bg,
-      int /*viewport_x0*/, int /*viewport_y0*/,
       int /*viewport_width*/, int /*viewport_height*/,
       float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {

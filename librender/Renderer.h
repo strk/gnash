@@ -362,8 +362,8 @@ public:
     /// coordinates of the movie that correspond to the viewport
     /// bounds.
     ///
-    virtual void begin_display(const rgba& background_color, int viewport_x0,
-                    int viewport_y0, int viewport_width, int viewport_height,
+    virtual void begin_display(const rgba& background_color, 
+                    int viewport_width, int viewport_height,
                     float x0, float x1, float y0, float y1) = 0;
 
     virtual void end_display() = 0;
