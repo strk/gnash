@@ -68,11 +68,11 @@ public:
 
     struct NameExtractor
     {
-        typedef const ObjectURI& result_type;
-        const result_type operator()(const value_type& r) const {
+        typedef ObjectURI result_type;
+        const result_type& operator()(const value_type& r) const {
             return r.first.uri();
         }
-        const result_type operator()(value_type& r) {
+        const result_type& operator()(value_type& r) {
             return r.first.uri();
         }
     };
