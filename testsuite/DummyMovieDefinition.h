@@ -104,11 +104,11 @@ public:
 		return _version;
 	}
 
-	virtual float	get_width_pixels() const {
+	virtual size_t get_width_pixels() const {
 		return _framesize.width()/20;
 	}
 
-	virtual float	get_height_pixels() const {
+	virtual size_t get_height_pixels() const {
 		return _framesize.height()/20;
 	}
 

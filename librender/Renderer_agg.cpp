@@ -462,12 +462,13 @@ class EmptyVideoRenderer
 public:
 
     /// Render the pixels using this renderer
-    typedef typename agg::renderer_base<PixelFormat>    Renderer;
-    typedef agg::rasterizer_scanline_aa<>               Rasterizer;
+    typedef typename agg::renderer_base<PixelFormat> Renderer;
+    typedef agg::rasterizer_scanline_aa<> Rasterizer;
 
     EmptyVideoRenderer(const ClipBounds& clipbounds)
-        : _clipbounds(clipbounds)
-        {}
+        :
+        _clipbounds(clipbounds)
+    {}
 
     void render(agg::path_storage& path, Renderer& rbase,
         const AlphaMasks& masks)
@@ -852,7 +853,6 @@ public:
 
   void begin_display(
       const gnash::rgba& bg,
-      int /*viewport_x0*/, int /*viewport_y0*/,
       int /*viewport_width*/, int /*viewport_height*/,
       float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {

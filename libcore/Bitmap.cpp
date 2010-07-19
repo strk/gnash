@@ -48,8 +48,8 @@ Bitmap::Bitmap(movie_root& mr, as_object* object,
     _def(def),
     _bitmapData(0),
     _bitmapInfo(0),
-    _width(twipsToPixels(def->get_frame_size().width())),
-    _height(twipsToPixels(def->get_frame_size().height()))
+    _width(def->get_width_pixels()),
+    _height(def->get_height_pixels())
 {
     _shape.setBounds(def->get_frame_size());
 }

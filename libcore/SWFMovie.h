@@ -65,11 +65,11 @@ public:
         return _def->get_frame_rate();
     }
 
-    virtual float widthPixels() const {
+    virtual size_t widthPixels() const {
         return _def->get_width_pixels();
     }
 
-    virtual float heightPixels() const {
+    virtual size_t heightPixels() const {
         return _def->get_height_pixels();
     }
 

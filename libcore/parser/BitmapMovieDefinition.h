@@ -65,11 +65,11 @@ public:
 		return _version;
 	}
 
-	virtual float get_width_pixels() const {
+	virtual size_t get_width_pixels() const {
 		return std::ceil(twipsToPixels(_framesize.width()));
 	}
 
-	virtual float get_height_pixels() const {
+	virtual size_t get_height_pixels() const {
 		return std::ceil(twipsToPixels(_framesize.height()));
 	}
 

@@ -859,11 +859,10 @@ private:
 public:
   virtual void  begin_display(
     const rgba& bg_color,
-    int viewport_x0, int viewport_y0,
     int viewport_width, int viewport_height,
     float x0, float x1, float y0, float y1)
   {
-    glViewport(viewport_x0, viewport_y0, viewport_width, viewport_height);
+    glViewport(0, 0, viewport_width, viewport_height);
     glLoadIdentity();
 
     gluOrtho2D(x0, x1, y0, y1);

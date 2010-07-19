@@ -424,9 +424,8 @@ Gui::resize_view(int width, int height)
 	if ( VM::isInitialized() )
 	{
 
-		if ( _stage && _started )
-		{
-			_stage->set_display_viewport(0, 0, width, height);
+		if (_stage && _started) {
+			_stage->setDimensions(width, height);
 		}
 
 	}

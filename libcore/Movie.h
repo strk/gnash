@@ -61,9 +61,9 @@ public:
 
     virtual float frameRate() const = 0;
 
-    virtual float widthPixels() const = 0;
+    virtual size_t widthPixels() const = 0;
 
-    virtual float heightPixels() const = 0;
+    virtual size_t heightPixels() const = 0;
 
     virtual bool ensureFrameLoaded(size_t /*frameNo*/) const {
         return true;

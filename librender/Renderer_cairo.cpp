@@ -548,7 +548,6 @@ Renderer_cairo::set_invalidated_regions(const InvalidatedRanges& ranges)
 
 void
 Renderer_cairo::begin_display(const rgba& bg_color,
-            int /*viewport_x0*/, int /*viewport_y0*/,
             int /*viewport_width*/, int /*viewport_height*/,
             float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
 {

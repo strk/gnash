@@ -263,18 +263,20 @@ public:
     ///   after loading into it.
     void dropLevel(int depth);
 
-    /// Change display viewport coordinates
+    /// Change stage size
     //
-    /// This currently also change the display scale
-    /// but we should instead only do it if rescaling
-    /// is allowed.
-    void set_display_viewport(int x0, int y0, int w, int h);
+    /// This may be smaller than the size of the root movie. It determines
+    /// how much of the movie is visible.
+    //
+    /// @param w    The width of the stage
+    /// @param h    The height of the stage.
+    void setDimensions(size_t w, size_t h);
 
     /// Notional width of the stage, actual value depending on scaleMode
-    unsigned getStageWidth() const;
+    size_t getStageWidth() const;
 
     /// Notional height of the stage, actual value depending on scaleMode
-    unsigned getStageHeight() const;
+    size_t getStageHeight() const;
 
     /// Inform the Stage that the mouse has moved.
     //
@@ -1069,10 +1071,9 @@ private:
     /// Process all actions in the queue
     void processActionQueue();
 
-    int m_viewport_x0, m_viewport_y0;
-
     /// Width and height of viewport, in pixels
-    int m_viewport_width, m_viewport_height;
+    size_t _stageWidth;
+    size_t _stageHeight;
 
     rgba m_background_color;
     bool m_background_color_set;

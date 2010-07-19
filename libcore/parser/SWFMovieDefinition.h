@@ -186,11 +186,11 @@ public:
         return m_frame_size;
     }
 
-    float get_width_pixels() const {
+    size_t get_width_pixels() const {
         return std::ceil(twipsToPixels(m_frame_size.width()));
     }
 
-    float get_height_pixels() const {
+    size_t get_height_pixels() const {
         return std::ceil(twipsToPixels(m_frame_size.height()));
     }
 

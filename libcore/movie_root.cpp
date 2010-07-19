@@ -134,10 +134,8 @@ movie_root::movie_root(const movie_definition& def,
     _vm(VM::init(def.get_version(), *this, clock)),
     _interfaceHandler(0),
     _fsCommandHandler(0),
-    m_viewport_x0(0),
-    m_viewport_y0(0),
-    m_viewport_width(1),
-    m_viewport_height(1),
+    _stageWidth(1),
+    _stageHeight(1),
     m_background_color(255, 255, 255, 255),
     m_background_color_set(false),
     _mouseX(0),
@@ -231,16 +229,14 @@ movie_root::setRootMovie(Movie* movie)
 {
     _rootMovie = movie;
 
-    m_viewport_x0 = 0;
-    m_viewport_y0 = 0;
     const movie_definition* md = movie->definition();
     float fps = md->get_frame_rate();
     _movieAdvancementDelay = static_cast<int>(1000/fps);
 
     _lastMovieAdvancement = _vm.getTime();
 
-    m_viewport_width = static_cast<int>(md->get_width_pixels());
-    m_viewport_height = static_cast<int>(md->get_height_pixels());
+    _stageWidth = static_cast<int>(md->get_width_pixels());
+    _stageHeight = static_cast<int>(md->get_height_pixels());
 
     // assert(movie->get_depth() == 0); ?
     movie->set_depth(DisplayObject::staticDepthOffset);
@@ -342,14 +338,13 @@ movie_root::setLevel(unsigned int num, Movie* movie)
             // ^^^ not confirmed in this date, I think other levels 
             //     are dropped too! (strk)
 
-            m_viewport_width = static_cast<int>(movie->widthPixels());
-            m_viewport_height = static_cast<int>(movie->heightPixels());
+            _stageWidth = movie->widthPixels();
+            _stageHeight = movie->heightPixels();
 
             // notify  stage replacement
-            if ( _interfaceHandler )
-            {
+            if (_interfaceHandler) {
                 std::stringstream ss;
-                ss << m_viewport_width << "x" << m_viewport_height;
+                ss << _stageWidth << "x" << _stageHeight;
                 _interfaceHandler->call("Stage.resize", ss.str());
             }
         }
@@ -557,14 +552,12 @@ movie_root::clear()
 }
 
 void
-movie_root::set_display_viewport(int x0, int y0, int w, int h)
+movie_root::setDimensions(size_t w, size_t h)
 {
     assert(testInvariant());
 
-    m_viewport_x0 = x0;
-    m_viewport_y0 = y0;
-    m_viewport_width = w;
-    m_viewport_height = h;
+    _stageWidth = w;
+    _stageHeight = h;
 
     if (_scaleMode == SCALEMODE_NOSCALE) {
         as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
@@ -986,8 +979,7 @@ movie_root::display()
 
     renderer->begin_display(
         m_background_color,
-        m_viewport_x0, m_viewport_y0,
-        m_viewport_width, m_viewport_height,
+        _stageWidth, _stageHeight,
         frame_size.get_x_min(), frame_size.get_x_max(),
         frame_size.get_y_min(), frame_size.get_y_max());
 
@@ -1173,28 +1165,28 @@ movie_root::setQuality(Quality q)
 
 /// Get actionscript width of stage, in pixels. The width
 /// returned depends on the scale mode.
-unsigned int
+size_t
 movie_root::getStageWidth() const
 {
     if (_scaleMode == SCALEMODE_NOSCALE) {
-        return m_viewport_width;    
+        return _stageWidth;    
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<unsigned int>(_rootMovie->widthPixels());
+    return static_cast<size_t>(_rootMovie->widthPixels());
 }
 
 /// Get actionscript height of stage, in pixels. The height
 /// returned depends on the scale mode.
-unsigned int
+size_t
 movie_root::getStageHeight() const
 {
     if (_scaleMode == SCALEMODE_NOSCALE) {
-        return m_viewport_height;    
+        return _stageHeight;    
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<unsigned int>(_rootMovie->heightPixels());
+    return static_cast<size_t>(_rootMovie->heightPixels());
 }
 
 /// Takes a short int bitfield: the four bits correspond
@@ -1290,11 +1282,11 @@ movie_root::setStageScaleMode(ScaleMode sm)
 
         const movie_definition* md = _rootMovie->definition();
         log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d "
-                "Def:%dx%d", m_viewport_width, m_viewport_height,
+                "Def:%dx%d", _stageWidth, _stageHeight,
                 md->get_width_pixels(), md->get_height_pixels());
 
-        if ( m_viewport_width != md->get_width_pixels()
-             || m_viewport_height != md->get_height_pixels() )
+        if ( _stageWidth != md->get_width_pixels()
+             || _stageHeight != md->get_height_pixels() )
         {
             notifyResize = true;
         }
@@ -2224,7 +2216,7 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 
     /// Stage: rendered dimensions.
     os.str("");
-    os << m_viewport_width << "x" << m_viewport_height;
+    os << _stageWidth << "x" << _stageHeight;
     localIter = tr.append_child(it, StringPair("Rendered dimensions", os.str()));
 
 #if 0
