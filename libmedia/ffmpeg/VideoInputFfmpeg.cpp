@@ -40,7 +40,7 @@ VideoInputFfmpeg::VideoInputFfmpeg()
 
 void
 VideoInputFfmpeg::requestMode(size_t width, size_t height, double fps,
-        bool favorArea)
+        bool /*favorArea*/)
 {
     // TODO: check what mode is available and set the best match.
     _width = width;
