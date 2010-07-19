@@ -656,6 +656,7 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
     }
 
     if (event == "ExternalInterface.Pan") {
+	// FIXME: the 3 args are encoded as 1:2:0
 	log_unimpl("ExternalInterface.Pan");
         return "";
     }
@@ -665,12 +666,15 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
     }
 
     if (event == "ExternalInterface.SetZoomRect") {
+	// FIXME: the 4 arguments are encoded as 1:2:0:1
 	log_unimpl("ExternalInterface.SetZoomRect");
         return "";
     }
 
     if (event == "ExternalInterface.Zoom") {
-	log_unimpl("ExternalInterface.Zoom");
+	// The 1 argument is a percentage to zoom
+	int percent = strtol(arg.c_str(), NULL, 0);
+	log_unimpl("ExternalInterface.Zoom(%d)", percent);
         return "";
     }
 

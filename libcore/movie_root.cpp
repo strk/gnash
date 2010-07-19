@@ -1660,7 +1660,14 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 	// LoadMovie doesn't send a response
     } else if (invoke->name == "Pan") {
 	// Pan doesn't send a response
-        callInterface("ExternalInterface.Pan");
+        std::string arg = invoke->args[0].to_string();
+        arg += ":";
+        arg += invoke->args[0].to_string();
+        arg += ":";
+        arg += invoke->args[1].to_string();
+        arg += ":";
+        arg += invoke->args[2].to_string();
+        callInterface("ExternalInterface.Pan", arg);
     } else if (invoke->name == "PercentLoaded") {
 	// PercentLoaded sends the percentage
         MovieClip *mc = getLevel(0);
@@ -1675,13 +1682,23 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         callInterface("ExternalInterface.Rewind");
 	// Rewind doesn't send a response
     } else if (invoke->name == "SetZoomRect") {
-        callInterface("ExternalInterface.SetZoomRect");
+        std::string arg = invoke->args[0].to_string();
+        arg += ":";
+        arg += invoke->args[0].to_string();
+        arg += ":";
+        arg += invoke->args[1].to_string();
+        arg += ":";
+        arg += invoke->args[2].to_string();
+        arg += ":";
+        arg += invoke->args[3].to_string();
+        callInterface("ExternalInterface.SetZoomRect", arg);
 	// SetZoomRect doesn't send a response
     } else if (invoke->name == "StopPlay") {
         callInterface("ExternalInterface.SetZoomRect");
 	// StopPlay doesn't send a response
     } else if (invoke->name == "Zoom") {
-        callInterface("ExternalInterface.Zoom");
+        std::string var = invoke->args[0].to_string();
+        callInterface("ExternalInterface.Zoom", var);
 	// Zoom doesn't send a response
     } else if (invoke->name == "TotalFrames") {
 	// TotalFrames sends the number of frames in the movie
