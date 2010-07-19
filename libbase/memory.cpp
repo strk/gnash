@@ -31,6 +31,7 @@
 
 #include "log.h"
 #include "gmemory.h"
+#include "getclocktime.hpp"
 
 using namespace std;
 
