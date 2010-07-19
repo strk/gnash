@@ -348,22 +348,11 @@ Pan (NPObject *npobj, NPIdentifier /* name */, const NPVariant *args,
 // Receives something like this:
 //      <number>33</number>
 bool
-PercentLoaded (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-               uint32_t /* argCount */, NPVariant *result)
+PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
+               uint32_t argCount, NPVariant *result)
 {   
 //    log_debug(__PRETTY_FUNCTION__);
     
-#if 1
-    static int counter = 0;
-//    log_error("%s: %d ; %d\n", __FUNCTION__, gpso->getControlFD(), counter);
-    INT32_TO_NPVARIANT(counter, *result);
-    if (counter >= 100) {
-        counter = 0;
-    } else {
-        counter += 20;
-    }
-    return true;
-#else
     GnashPluginScriptObject *gpso = (GnashPluginScriptObject *)npobj;
 
     if (argCount == 0) {
@@ -385,9 +374,9 @@ PercentLoaded (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant *
             return false;
         }
         
-        NPVariant *value = ei.parseXML(data);
-        if (NPVARIANT_IS_INT32(*value)) {
-            INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(*value), *result);
+        GnashNPVariant value = ExternalInterface::parseXML(data);
+        if (NPVARIANT_IS_INT32(value.get())) {
+            INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(value.get()), *result);
         } else {
             INT32_TO_NPVARIANT(0, *result);
         }
@@ -397,7 +386,6 @@ PercentLoaded (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant *
     
     BOOLEAN_TO_NPVARIANT(false, *result);
     return false;
-#endif
 }
 
 // Play();

@@ -1561,46 +1561,76 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 
     } else if (invoke->name == "SetVariable") {
 	// SetVariable doesn't send a response
+        MovieClip *mc = getLevel(0);
+        as_object *obj = getObject(mc);
+        string_table &st = getStringTable(*obj);
+        std::string var = invoke->args[0].to_string();
+        as_value &val = invoke->args[1] ;
+        obj->set_member(st.find(var), val);
     } else if (invoke->name == "GetVariable") {
 	// GetVariable sends the value of the variable
-#if 1
-	as_value val("Hello World");
-	// FIXME: need to use a real value
-#else
-        as_object::SortedPropertyList props;
-        enumerateProperties(o, props);
-#endif
+        MovieClip *mc = getLevel(0);
+        as_object *obj = getObject(mc);
+        string_table &st = getStringTable(*obj);
+        std::string var = invoke->args[0].to_string();
+        as_value val;
+        obj->get_member(st.find(var), &val);
 	ss << ExternalInterface::toXML(val);
     } else if (invoke->name == "GotoFrame") {
 	// GotoFrame doesn't send a response
     } else if (invoke->name == "IsPlaying") {
-	// IsPlaying sends true or false
-	as_value val(true);
-	// FIXME: need to use a real value
+        std::string result = callInterface("ExternalInterface.IsPlaying");
+        as_value val((result == "true") ? true : false);
 	ss << ExternalInterface::toXML(val);	
     } else if (invoke->name == "LoadMovie") {
+        log_unimpl("ExternalInterface::LoadMovie()");
 	// LoadMovie doesn't send a response
     } else if (invoke->name == "Pan") {
 	// Pan doesn't send a response
+        std::string arg = invoke->args[0].to_string();
+        arg += ":";
+        arg += invoke->args[0].to_string();
+        arg += ":";
+        arg += invoke->args[1].to_string();
+        arg += ":";
+        arg += invoke->args[2].to_string();
+        callInterface("ExternalInterface.Pan", arg);
     } else if (invoke->name == "PercentLoaded") {
 	// PercentLoaded sends the percentage
-	as_value val(100);
-	// FIXME: need to use a real value
+        MovieClip *mc = getLevel(0);
+        int loaded = mc->get_bytes_loaded();
+        int total = mc->get_bytes_total();
+	as_value val((loaded/total) * 100);
 	ss << ExternalInterface::toXML(val);	
     } else if (invoke->name == "Play") {
+        callInterface("ExternalInterface.Play");
 	// Play doesn't send a response
     } else if (invoke->name == "Rewind") {
+        callInterface("ExternalInterface.Rewind");
 	// Rewind doesn't send a response
     } else if (invoke->name == "SetZoomRect") {
+        std::string arg = invoke->args[0].to_string();
+        arg += ":";
+        arg += invoke->args[0].to_string();
+        arg += ":";
+        arg += invoke->args[1].to_string();
+        arg += ":";
+        arg += invoke->args[2].to_string();
+        arg += ":";
+        arg += invoke->args[3].to_string();
+        callInterface("ExternalInterface.SetZoomRect", arg);
 	// SetZoomRect doesn't send a response
     } else if (invoke->name == "StopPlay") {
+        callInterface("ExternalInterface.SetZoomRect");
 	// StopPlay doesn't send a response
     } else if (invoke->name == "Zoom") {
+        std::string var = invoke->args[0].to_string();
+        callInterface("ExternalInterface.Zoom", var);
 	// Zoom doesn't send a response
     } else if (invoke->name == "TotalFrames") {
+        MovieClip *mc = getLevel(0);
+        as_value val(mc->get_loaded_frames());
 	// TotalFrames sends the number of frames in the movie
-	as_value val(100);
-	// FIXME: need to use a real value
 	ss << ExternalInterface::toXML(val);
     } else {
         std::string result = callExternalCallback(invoke->name, invoke->args);
