@@ -1656,11 +1656,6 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         as_value val((result == "true") ? true : false);
 	ss << ExternalInterface::toXML(val);	
     } else if (invoke->name == "LoadMovie") {
-	// SetVariable doesn't send a response
-        // MovieClip *mc = getLevel(0);
-        // as_object *obj = getObject(mc);
-        // string_table &st = getStringTable(*obj);
-        // std::string var = invoke->args[0].to_string();
         log_unimpl("ExternalInterface::LoadMovie()");
 	// LoadMovie doesn't send a response
     } else if (invoke->name == "Pan") {
