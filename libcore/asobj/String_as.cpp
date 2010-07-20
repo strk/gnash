@@ -653,7 +653,7 @@ string_toUpperCase(const fn_call& fn)
         );
     }
 
-#if !defined(__HAIKU__)
+#if !defined(__HAIKU__) && !defined(__amigaos4__)
     try {
         boost::to_upper(wstr, currentLocale);
     }
@@ -708,7 +708,7 @@ string_toLowerCase(const fn_call& fn)
         );
     }
 
-#if !defined(__HAIKU__)
+#if !defined(__HAIKU__) && !defined(__amigaos4__)
     try {
         boost::to_lower(wstr, currentLocale);
     }
