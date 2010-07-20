@@ -185,6 +185,7 @@ if USE_HAIKU_ENGINE
 	$(NULL)
 
    noinst_HEADERS += \
+	haiku/MediaHandlerHaiku.h \
 	haiku/MediaParserHaiku.h \
 	haiku/AudioDecoderHaiku.h \
 	haiku/VideoDecoderHaiku.h \

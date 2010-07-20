@@ -76,8 +76,6 @@ public:
     typedef std::map<std::string, CreateHandler> Handlers;
 
     /// Get the GnashFactory singleton.
-    //
-    /// This also initializes the factory if an Init argument was provided.
     static GnashFactory& instance() {
         static GnashFactory m;
         return m;
