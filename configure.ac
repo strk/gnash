@@ -2279,6 +2279,18 @@ AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
 dnl for now the Haiku media handler is experimental
 AM_CONDITIONAL(USE_HAIKU_ENGINE, test x"$build_media_haiku" = xyes)
 
+if test x"${build_media_ffmpeg}" = x"yes"; then
+  AC_DEFINE([ENABLE_FFMPEG_MEDIA],  [1], [Use FFmpeg for media decoding])
+fi
+
+if test x"${build_media_gst}" = x"yes"; then
+  AC_DEFINE([ENABLE_GST_MEDIA],  [1], [Use gstreamer for media decoding])
+fi
+
+if test x"${build_media_haiku}" = x"yes"; then
+  AC_DEFINE([ENABLE_HAIKU_MEDIA],  [1], [Use haiku for media decoding])
+fi
+
 if test x$build_sound_mkit = xyes; then
   if test x"${haiku}" != xyes; then
     AC_MSG_ERROR([Media Kit sound handling is supported only under Haiku]);

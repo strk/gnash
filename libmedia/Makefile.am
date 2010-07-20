@@ -101,6 +101,7 @@ if USE_GST_ENGINE
 	$(NULL)
 
    noinst_HEADERS += \
+	gst/MediaHandlerGst.h \
 	gst/AudioDecoderGst.h \
 	gst/VideoDecoderGst.h \
 	gst/MediaParserGst.h \
@@ -142,6 +143,7 @@ if USE_FFMPEG_ENGINE
 	$(NULL)
 
    noinst_HEADERS += \
+	ffmpeg/MediaHandlerFfmpeg.h \
 	ffmpeg/MediaParserFfmpeg.h \
 	ffmpeg/AudioDecoderFfmpeg.h \
 	ffmpeg/VideoDecoderFfmpeg.h \

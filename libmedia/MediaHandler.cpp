@@ -111,7 +111,38 @@ MediaHandler::createFlashAudioDecoder(const AudioInfo& info)
     }
 }
 
+} // namespace media 
+} // namespace gnash
 
-} // end of gnash::media namespace
-} // end of gnash namespace
+/// Here follows handler registration code.
 
+#ifdef ENABLE_FFMPEG_MEDIA
+#include "ffmpeg/MediaHandlerFfmpeg.h"
+#endif
+#ifdef ENABLE_GST_MEDIA
+#include "gst/MediaHandlerGst.h"
+#endif
+#ifdef ENABLE_HAIKU_MEDIA
+#include "haiku/MediaHandlerHaiku.h"
+#endif
+
+namespace gnash {
+namespace media {
+
+RegisterAllHandlers::RegisterAllHandlers()
+{
+#ifdef ENABLE_FFMPEG_MEDIA
+    static const MediaFactory::RegisterHandler<ffmpeg::MediaHandlerFfmpeg>
+        ffmpeg("ffmpeg");
+#endif
+#ifdef ENABLE_GST_MEDIA
+    static const MediaFactory::RegisterHandler<gst::MediaHandlerGst> gst("gst");
+#endif
+#ifdef ENABLE_HAIKU_MEDIA
+    static const MediaFactory::RegisterHandler<haiku::MediaHandlerHaiku>
+        haiku("haiku");
+#endif
+}
+
+} // namespace media
+} // namespace gnash
