@@ -18,7 +18,7 @@
 //
 
 
-#include "MediaHandler.h"
+#include "MediaHandlerFfmpeg.h"
 
 #include <sstream>
 
@@ -36,43 +36,17 @@
 namespace gnash { 
 namespace media {
 namespace ffmpeg {
-
-/// FFMPEG based MediaHandler
-class MediaHandlerFfmpeg : public MediaHandler
+    
+std::string
+MediaHandlerFfmpeg::description() const
 {
-public:
-
-    virtual std::string description() const {
-        std::ostringstream ss;
-        const boost::uint32_t ver = avcodec_version();
-        ss << "FFmpeg (avcodec version: " << (ver >> 16) << "."
-                                          << (ver & 0xff00 >> 8)  << "."
-                                          << (ver & 0xff) << ")";
-        return ss.str();
-    }
-
-	virtual std::auto_ptr<MediaParser>
-        createMediaParser(std::auto_ptr<IOChannel> stream);
-
-	virtual std::auto_ptr<VideoDecoder>
-        createVideoDecoder(const VideoInfo& info);
-	
-	virtual std::auto_ptr<VideoConverter>
-		createVideoConverter(ImgBuf::Type4CC srcFormat,
-                ImgBuf::Type4CC dstFormat);
-
-	virtual std::auto_ptr<AudioDecoder>
-        createAudioDecoder(const AudioInfo& info);
-
-    virtual size_t getInputPaddingSize() const;
-    
-    virtual VideoInput* getVideoInput(size_t index);
-    
-    virtual AudioInput* getAudioInput(size_t index);
-
-    virtual void cameraNames(std::vector<std::string>& names) const;
-
-};
+    std::ostringstream ss;
+    const boost::uint32_t ver = avcodec_version();
+    ss << "FFmpeg (avcodec version: " << (ver >> 16) << "."
+                      << (ver & 0xff00 >> 8)  << "."
+                      << (ver & 0xff) << ")";
+    return ss.str();
+}
 
 std::auto_ptr<MediaParser>
 MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
@@ -180,12 +154,6 @@ MediaHandlerFfmpeg::getInputPaddingSize() const
 {
     return FF_INPUT_BUFFER_PADDING_SIZE;
 }
-
-#ifdef REGISTER_MEDIA_HANDLERS
-namespace {
-    MediaFactory::RegisterHandler<MediaHandlerFfmpeg> reg("ffmpeg");
-}
-#endif
 
 } // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 

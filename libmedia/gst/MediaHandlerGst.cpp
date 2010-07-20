@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "MediaHandler.h"
+#include "MediaHandlerGst.h"
 
 #include <sstream>
 
@@ -42,46 +42,15 @@ namespace gnash {
 namespace media {
 namespace gst {
 
-/// GST based MediaHandler
-//
-/// The module implements the MediaHandler factory as required
-/// by Gnash core for a loadable media handler module.
-///
-/// It uses gstreamer: http://gstreamer.freedesktop.org/
-///
-/// Starting point is MediaHandlerGst.
-class MediaHandlerGst : public MediaHandler
+std::string
+MediaHandlerGst::description() const
 {
-public:
-
-    virtual std::string description() const {
-        guint major, minor, micro, nano;
-        gst_version(&major, &minor, &micro, &nano);
-        std::ostringstream s;
-        s << _("Gstreamer ") <<  major << "." << minor << "." << micro;
-        return s.str();
-    }
-
-	virtual std::auto_ptr<MediaParser>
-        createMediaParser(std::auto_ptr<IOChannel> stream);
-
-	virtual std::auto_ptr<VideoDecoder>
-        createVideoDecoder(const VideoInfo& info);
-
-	virtual std::auto_ptr<AudioDecoder>
-        createAudioDecoder(const AudioInfo& info);
-	
-	virtual std::auto_ptr<VideoConverter>
-        createVideoConverter(ImgBuf::Type4CC srcFormat,
-                ImgBuf::Type4CC dstFormat);
-    
-    virtual VideoInput* getVideoInput(size_t index);
-
-    virtual AudioInput* getAudioInput(size_t index);
-
-    virtual void cameraNames(std::vector<std::string>& names) const;
-};
-
+    guint major, minor, micro, nano;
+    gst_version(&major, &minor, &micro, &nano);
+    std::ostringstream s;
+    s << "Gstreamer " <<  major << "." << minor << "." << micro;
+    return s.str();
+}
 
 std::auto_ptr<MediaParser>
 MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)

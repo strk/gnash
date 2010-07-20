@@ -57,7 +57,12 @@ namespace gnash {
 /// @todo fix http://wiki.gnashdev.org/wiki/index.php/Libmedia, is obsoleted
 namespace media {
 
-typedef GnashFactory<MediaHandler> MediaFactory;
+struct RegisterAllHandlers
+{
+    RegisterAllHandlers();
+};
+
+typedef GnashFactory<MediaHandler, RegisterAllHandlers> MediaFactory;
 
 /// The MediaHandler class acts as a factory to provide parser and decoders
 class DSOEXPORT MediaHandler

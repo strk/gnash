@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "MediaHandler.h"
+#include "MediaHandlerHaiku.h"
 #include "MediaParser.h"
 
 #include "log.h"
@@ -38,37 +38,6 @@ namespace gnash {
 namespace media {
 namespace haiku {
 
-/// Haiku based MediaHandler
-class MediaHandlerHaiku : public MediaHandler
-{
-public:
-
-    virtual std::string description() const {
-        return "Haiku Media Handler";
-    }
-
-	virtual std::auto_ptr<MediaParser>
-        createMediaParser(std::auto_ptr<IOChannel> stream);
-
-	virtual std::auto_ptr<VideoDecoder>
-        createVideoDecoder(const VideoInfo& info);
-	
-	virtual std::auto_ptr<VideoConverter>
-		createVideoConverter(ImgBuf::Type4CC srcFormat,
-                ImgBuf::Type4CC dstFormat);
-
-	virtual std::auto_ptr<AudioDecoder>
-        createAudioDecoder(const AudioInfo& info);
-
-//    virtual size_t getInputPaddingSize() const;
-    
-    virtual VideoInput* getVideoInput(size_t index);
-    
-    virtual AudioInput* getAudioInput(size_t index);
-
-    virtual void cameraNames(std::vector<std::string>& names) const;
-
-};
 
 std::auto_ptr<MediaParser>
 MediaHandlerHaiku::createMediaParser(std::auto_ptr<IOChannel> stream)
