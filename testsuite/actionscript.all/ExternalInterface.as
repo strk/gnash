@@ -62,8 +62,9 @@ if (EI.hasOwnProperty("available")) {
 }
 
 // Create a test function for the callback
-function TestASMethod () {
-    note("TestASMethod called!");
+function TestASMethod (msg) {
+    note("TestASMethod called! " + msg);
+    return "I am here!";
 }
 
 // ExternalInterface::available is always false when run standalone,
