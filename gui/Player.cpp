@@ -667,7 +667,6 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         return "";
     }
 
-
     if (event == "System.capabilities.screenResolutionX") {
         std::ostringstream ss;
         ss << _gui.getScreenResX();

@@ -1560,23 +1560,24 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         if (_interfaceHandler) _interfaceHandler->exit();
 
     } else if (invoke->name == "SetVariable") {
-	// SetVariable doesn't send a response
         MovieClip *mc = getLevel(0);
         as_object *obj = getObject(mc);
         string_table &st = getStringTable(*obj);
         std::string var = invoke->args[0].to_string();
         as_value &val = invoke->args[1] ;
         obj->set_member(st.find(var), val);
+	// SetVariable doesn't send a response
     } else if (invoke->name == "GetVariable") {
-	// GetVariable sends the value of the variable
         MovieClip *mc = getLevel(0);
         as_object *obj = getObject(mc);
         string_table &st = getStringTable(*obj);
         std::string var = invoke->args[0].to_string();
         as_value val;
         obj->get_member(st.find(var), &val);
+	// GetVariable sends the value of the variable
 	ss << ExternalInterface::toXML(val);
     } else if (invoke->name == "GotoFrame") {
+        log_unimpl("ExternalInterface::GotoFrame()");
 	// GotoFrame doesn't send a response
     } else if (invoke->name == "IsPlaying") {
         std::string result = callInterface("ExternalInterface.IsPlaying");
@@ -1586,7 +1587,6 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         log_unimpl("ExternalInterface::LoadMovie()");
 	// LoadMovie doesn't send a response
     } else if (invoke->name == "Pan") {
-	// Pan doesn't send a response
         std::string arg = invoke->args[0].to_string();
         arg += ":";
         arg += invoke->args[0].to_string();
@@ -1595,12 +1595,13 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         arg += ":";
         arg += invoke->args[2].to_string();
         callInterface("ExternalInterface.Pan", arg);
+	// Pan doesn't send a response
     } else if (invoke->name == "PercentLoaded") {
-	// PercentLoaded sends the percentage
         MovieClip *mc = getLevel(0);
         int loaded = mc->get_bytes_loaded();
         int total = mc->get_bytes_total();
 	as_value val((loaded/total) * 100);
+	// PercentLoaded sends the percentage
 	ss << ExternalInterface::toXML(val);	
     } else if (invoke->name == "Play") {
         callInterface("ExternalInterface.Play");
@@ -1621,7 +1622,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         callInterface("ExternalInterface.SetZoomRect", arg);
 	// SetZoomRect doesn't send a response
     } else if (invoke->name == "StopPlay") {
-        callInterface("ExternalInterface.SetZoomRect");
+        callInterface("ExternalInterface.StopPlay");
 	// StopPlay doesn't send a response
     } else if (invoke->name == "Zoom") {
         std::string var = invoke->args[0].to_string();
@@ -1806,10 +1807,15 @@ void
 movie_root::addExternalCallback(as_object *obj, const std::string &name,
                                 as_object *callback)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
-    _externalCallbacks.push_back(ExternalCallback(obj, name, callback));
+    MovieClip *mc = getLevel(0);
+    as_object *me = getObject(mc);
+    string_table &st = getStringTable(*me);
+    obj->set_member(st.find(name), callback);
 
+    // When an external callback is added, we have to notify the plugin
+    // that this method is available.
     if (_hostfd) {
         std::vector<as_value> fnargs;
         fnargs.push_back(name);
@@ -1841,8 +1847,8 @@ std::string
 movie_root::callExternalJavascript(const std::string &name, 
                                    const std::vector<as_value> &fnargs)
 {
+    // GNASH_REPORT_FUNCTION;
     std::string result;
-    ExternalCallbacks::const_iterator it;
     // If the browser is connected, we send an Invoke message to the
     // browser.
     if (_controlfd && _hostfd) {
@@ -1868,62 +1874,54 @@ std::string
 movie_root::callExternalCallback(const std::string &name, 
 				 const std::vector<as_value> &fnargs)
 {
+    // GNASH_REPORT_FUNCTION;
+
+    MovieClip *mc = getLevel(0);
+    as_object *obj = getObject(mc);
+    string_table &st = getStringTable(*obj);
+    string_table::key key = st.find(name);
+    // FIXME: there has got to be a better way of handling the variable
+    // length arg list
+    as_value val;
+    switch (fnargs.size()) {
+      case 0:
+          val = callMethod(obj, st.find(name));
+          break;
+      case 1:
+          val = callMethod(obj, st.find(name), fnargs[0]);
+          break;
+      case 2:
+          val = callMethod(obj, st.find(name), fnargs[0], fnargs[1]);
+          break;
+      case 3:
+          val = callMethod(obj, st.find(name), fnargs[0], fnargs[1],
+                           fnargs[2]);
+          break;
+      default:
+          val = callMethod(obj, st.find(name));
+          break;
+    }
+    
+
     std::string result;
-    ExternalCallbacks::const_iterator it;
-    for (it=_externalCallbacks.begin(); it != _externalCallbacks.end(); it++) {
-        ExternalCallback ec = *it;
-        log_debug("Checking %s against method name: %s", name, ec.methodName());
-
-        // FIXME: call the AS method here!
-
-        as_value val;
-        if (name == ec.methodName()) {
-            std::string result;
-            val = ec.call(fnargs);
-        }
+    if (val.is_null()) {
+        // Return an error
+        result = ExternalInterface::makeString("Error");
+    } else {
+        result = ExternalInterface::toXML(val);
+    }
         
-        if (val.is_null()) {
-            // Return an error
-            result = ExternalInterface::makeString("Error");
-        } else {
-            result = ExternalInterface::toXML(val);
-        }
-        
-        // If the browser is connected, we send an Invoke message to the
-        // browser.
-        if (_hostfd) {
-            const size_t ret = ExternalInterface::writeBrowser(_hostfd, result);
-            if (ret != result.size()) {
-                log_error(_("Could not write to browser fd #%d: %s"),
-                          _hostfd, std::strerror(errno));
-            }
+    // If the browser is connected, we send an Invoke message to the
+    // browser.
+    if (_hostfd) {
+        const size_t ret = ExternalInterface::writeBrowser(_hostfd, result);
+        if (ret != result.size()) {
+            log_error(_("Could not write to browser fd #%d: %s"),
+                      _hostfd, std::strerror(errno));
         }
     }
 
     return result;
-}
-
-void
-movie_root::ExternalCallback::setReachable() const
-{
-    _caller->setReachable();
-}
-
-as_value
-movie_root::ExternalCallback::call(const std::vector<as_value>& /*args*/)
-{
-    GNASH_REPORT_FUNCTION;
-
-#if 0
-    as_environment env(VM::get());
-    fn_call::Args newargs;
-    as_function *as_func = _callback->to_function();    
-    fn_call fn(0, env, newargs);
-
-    as_func->call(fn);
-#endif
-    
-    return as_value();
 }
 
 void

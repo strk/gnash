@@ -165,25 +165,7 @@ public:
         SimpleBuffer _buf;
         as_object* _obj;
     };
-    typedef std::list<LoadCallback> LoadCallbacks;
-        
-    class ExternalCallback {
-    public:
-        ExternalCallback(as_object *obj, const std::string &name,
-                         as_object *callback)
-            : _name(name),
-              _caller(obj),
-              _callback(callback)
-        {}
-        std::string &methodName() { return _name; };
-        as_value call(const std::vector<as_value>& args);
-        void setReachable() const;
-    private:
-        std::string     _name;
-        as_object       *_caller;
-        as_object       *_callback;
-    };        
-    typedef std::list<ExternalCallback> ExternalCallbacks;
+    typedef std::list<LoadCallback> LoadCallbacks;        
 
     typedef std::bitset<key::KEYCOUNT> Keys;
 
@@ -1089,8 +1071,6 @@ private:
 
     LoadCallbacks _loadCallbacks;
     
-    ExternalCallbacks _externalCallbacks;
-
     typedef std::map<int, Timer*> TimerMap;
     TimerMap _intervalTimers;
     unsigned int _lastTimerId;
