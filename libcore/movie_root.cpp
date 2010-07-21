@@ -1878,30 +1878,29 @@ movie_root::callExternalCallback(const std::string &name,
 
     MovieClip *mc = getLevel(0);
     as_object *obj = getObject(mc);
-    string_table &st = getStringTable(*obj);
-    string_table::key key = st.find(name);
+
+    string_table& st = getStringTable(*obj);
+    const string_table::key key = st.find(name);
     // FIXME: there has got to be a better way of handling the variable
     // length arg list
     as_value val;
     switch (fnargs.size()) {
       case 0:
-          val = callMethod(obj, st.find(name));
+          val = callMethod(obj, key);
           break;
       case 1:
-          val = callMethod(obj, st.find(name), fnargs[0]);
+          val = callMethod(obj, key, fnargs[0]);
           break;
       case 2:
-          val = callMethod(obj, st.find(name), fnargs[0], fnargs[1]);
+          val = callMethod(obj, key, fnargs[0], fnargs[1]);
           break;
       case 3:
-          val = callMethod(obj, st.find(name), fnargs[0], fnargs[1],
-                           fnargs[2]);
+          val = callMethod(obj, key, fnargs[0], fnargs[1], fnargs[2]);
           break;
       default:
-          val = callMethod(obj, st.find(name));
+          val = callMethod(obj, key);
           break;
     }
-    
 
     std::string result;
     if (val.is_null()) {
