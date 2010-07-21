@@ -1970,7 +1970,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     // name. We copy the string so we can assign to it if necessary.
     std::string parsedName = variableName;
     std::string path, var;
-    if (as_environment::parse_path(variableName, path, var))
+    if (parsePath(variableName, path, var))
     {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("Variable text Path: %s, Var: %s"), path, var);

@@ -132,7 +132,7 @@ as_environment::get_variable(const std::string& varname,
     std::string path;
     std::string var;
 
-    if (parse_path(varname, path, var))
+    if (parsePath(varname, path, var))
     {
         // TODO: let find_target return generic as_objects, or use 'with' stack,
         //       see player2.swf or bug #18758 (strip.swf)
@@ -368,7 +368,7 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
     std::string var;
     //log_debug(_("set_variable(%s, %s)"), varname, val);
 
-    if (parse_path(varname, path, var)) {
+    if (parsePath(varname, path, var)) {
         target = find_object(path, &scopeStack); 
         if (target)
         {
@@ -472,59 +472,13 @@ as_environment::declare_local(const std::string& varname)
     }
 }
 
-/* public static */
-bool
-as_environment::parse_path(const std::string& var_path_in, std::string& path,
-        std::string& var)
-{
-#ifdef DEBUG_TARGET_FINDING 
-    log_debug("parse_path(%s)", var_path_in);
-#endif
-
-    size_t lastDotOrColon = var_path_in.find_last_of(":.");
-    if (lastDotOrColon == std::string::npos) return false;
-
-    std::string thePath, theVar;
-
-    thePath.assign(var_path_in, 0, lastDotOrColon);
-    theVar.assign(var_path_in, lastDotOrColon+1, var_path_in.length());
-
-#ifdef DEBUG_TARGET_FINDING 
-    log_debug("path: %s, var: %s", thePath, theVar);
-#endif
-
-    if (thePath.empty()) return false;
-
-    // this check should be performed by callers (getvariable/setvariable
-    // in particular)
-    size_t pathlen = thePath.length();
-    size_t i = pathlen - 1;
-    size_t consecutiveColons = 0;
-    while (i && thePath[i--] == ':')
-    {
-        if (++consecutiveColons > 1)
-        {
-#ifdef DEBUG_TARGET_FINDING 
-            log_debug("path '%s' ends with too many colon chars, not "
-                    "considering a path", thePath);
-#endif
-            return false;
-        }
-    }
-
-    path = thePath;
-    var = theVar;
-
-    return true;
-}
-
 bool
 as_environment::parse_path(const std::string& var_path, as_object** target,
         as_value& val)
 {
     std::string path;
     std::string var;
-    if (!parse_path(var_path, path, var)) return false;
+    if (!parsePath(var_path, path, var)) return false;
     as_object* target_ptr = find_object(path); 
     if ( ! target_ptr ) return false;
 
@@ -990,6 +944,31 @@ as_environment::markReachableResources() const
 
 }
 #endif // GNASH_USE_GC
+
+bool
+parsePath(const std::string& var_path_in, std::string& path, std::string& var)
+{
+
+    const size_t lastDotOrColon = var_path_in.find_last_of(":.");
+    if (lastDotOrColon == std::string::npos) return false;
+
+    const std::string p(var_path_in, 0, lastDotOrColon);
+    const std::string v(var_path_in, lastDotOrColon + 1, var_path_in.size());
+
+#ifdef DEBUG_TARGET_FINDING 
+    log_debug("path: %s, var: %s", p, v);
+#endif
+
+    if (p.empty()) return false;
+
+    // The path may apparently not end with more than one colon.
+    if (p.size() > 1 && !p.compare(p.size() - 2, 2, "::")) return false;
+
+    path = p;
+    var = v;
+
+    return true;
+}
 
 string_table&
 getStringTable(const as_environment& env)

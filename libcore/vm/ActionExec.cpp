@@ -715,12 +715,10 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 as_object*
 ActionExec::getTarget()
 {
-    if (!_withStack.empty()) {
-        return _withStack.back().object();
-    }
-    else {
+    if (_withStack.empty()) {
         return getObject(env.get_target());
     }
+    return _withStack.back().object();
 }
 
 void

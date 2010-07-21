@@ -377,13 +377,10 @@ public:
 	/// A better, cleaner and less error-prone approach
 	/// would be providing a callFunction() method in
 	/// ActionExec. This will likely help debugger too
-	/// 
-	///
 	as_object* getTarget();
 
 	/// Execute.
-	void operator() ();
-
+	void operator()();
 
     // TODO: cut down these accessors.
     bool atActionTag(SWF::ActionType t) { return code[pc] == t; }

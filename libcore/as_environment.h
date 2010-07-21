@@ -348,28 +348,6 @@ public:
     ///
     int get_version() const;
 
-    /// See if the given variable name is actually a sprite path
-    /// followed by a variable name.  These come in the format:
-    ///
-    /// /path/to/some/sprite/:varname
-    ///
-    /// (or same thing, without the last '/')
-    ///
-    /// or
-    /// path.to.some.var
-    ///
-    /// If that's the format, puts the path part (no colon or
-    /// trailing slash) in *path, and the varname part (no colon, no dot)
-    /// in *var and returns true.
-    ///
-    /// If no colon or dot, returns false and leaves *path & *var alone.
-    ///
-    /// TODO: return an integer: 0 not a path, 1 a slash-based path, 2 a
-    /// dot-based path
-    ///
-    static bool parse_path(const std::string& var_path, std::string& path,
-            std::string& var);
-
     /// \brief
     /// Try to parse a string as a variable path
     //
@@ -534,6 +512,28 @@ private:
     static as_value undefVal;
         
 };
+
+/// See if the given variable name is actually a sprite path
+/// followed by a variable name.  These come in the format:
+///
+/// /path/to/some/sprite/:varname
+///
+/// (or same thing, without the last '/')
+///
+/// or
+/// path.to.some.var
+///
+/// If that's the format, puts the path part (no colon or
+/// trailing slash) in *path, and the varname part (no colon, no dot)
+/// in *var and returns true.
+///
+/// If no colon or dot, returns false and leaves *path & *var alone.
+///
+/// TODO: return an integer: 0 not a path, 1 a slash-based path, 2 a
+/// dot-based path
+///
+bool parsePath(const std::string& var_path, std::string& path,
+        std::string& var);
 
 inline VM&
 getVM(const as_environment& env)
