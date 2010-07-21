@@ -57,7 +57,6 @@ noinst_HEADERS = \
 	CodeStream.h \
 	ActionExec.h \
 	ExecutableCode.h \
-	with_stack_entry.h \
 	$(NULL)
 
 EXTENSIONS_API = \

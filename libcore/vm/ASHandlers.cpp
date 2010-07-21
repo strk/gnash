@@ -52,7 +52,6 @@
 #include "as_environment.h"
 #include "as_value.h"
 #include "RunResources.h"
-#include "with_stack_entry.h"
 #include "ObjectURI.h"
 
 #include <string>
@@ -3654,7 +3653,7 @@ ActionWith(ActionExec& thread)
     // where does the 'with' block end?
     const size_t block_end = thread.getNextPC() + block_length;
 
-    if (!thread.pushWithEntry(with_stack_entry(with_obj, block_end)))
+    if (!thread.pushWith(With(with_obj, block_end)))
     {
         // skip the full block
         thread.adjustNextPC(block_length);

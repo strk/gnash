@@ -32,34 +32,6 @@ namespace gnash {
 //
 
 /// The "with" stack is for Pascal-like with-scoping.
-class with_stack_entry
-{
-public:	
-
-	with_stack_entry(as_object* obj, size_t end)
-		:
-		_object(obj),
-		_block_end_pc(end)
-	{
-	}
-
-	size_t end_pc() const
-	{
-		return _block_end_pc;
-	}
-
-	as_object* object() const
-	{
-		return _object;
-	}
-
-private:
-
-	as_object* _object;
-	
-	size_t _block_end_pc;
-
-};
 
 }	// end namespace gnash
 

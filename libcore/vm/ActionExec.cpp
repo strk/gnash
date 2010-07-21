@@ -36,7 +36,6 @@
 #include "as_environment.h"
 #include "debugger.h"
 #include "SystemClock.h"
-#include "with_stack_entry.h"
 
 #include <sstream>
 #include <string>
@@ -647,7 +646,7 @@ ActionExec::skip_actions(size_t offset)
 }
 
 bool
-ActionExec::pushWithEntry(const with_stack_entry& entry)
+ActionExec::pushWith(const With& entry)
 {
     // See comment in header about _withStackLimit
     if (_withStack.size() >= _withStackLimit)
