@@ -104,7 +104,7 @@ private:
 
     static key::code os4_to_gnash_key(struct IntuiMessage *imsg);
     static int os4_to_gnash_modifier(int state);
-	double OS4_GetTicks();
+	uint32 OS4_GetTicks();
 	void PrintMsg( CONST_STRPTR text );
 	void TimerExit(void);
 	bool TimerInit(void);

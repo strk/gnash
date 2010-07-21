@@ -19,7 +19,6 @@
 //
 
 #include "aos4_agg_glue.h"
-#include "gnash.h"
 #include "log.h"
 #undef ACTION_END
 #include "Renderer.h"
@@ -235,6 +234,7 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
 			WA_MaxWidth,		~0,
 			WA_MaxHeight,		~0,
 			WA_SmartRefresh, 	TRUE,
+			WA_NoCareRefresh,	TRUE,
 			WA_RMBTrap, 		FALSE,
 			WA_ReportMouse, 	TRUE,
 			WA_IDCMP, 			IDCMP_MOUSEBUTTONS|
@@ -369,7 +369,6 @@ AOS4AggGlue::render(int minx, int miny, int maxx, int maxy)
 								maxx - minx ,
 								maxy - miny);
 	
-
 /*
 	IGraphics->BltBitMapTags(
 					BLITA_Source,			_offscreenbuf,

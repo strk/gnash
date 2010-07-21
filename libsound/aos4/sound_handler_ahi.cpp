@@ -497,7 +497,7 @@ AOS4_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, u
 	    boost::uint8_t *out = reinterpret_cast<boost::uint8_t*>(outSamples);
     	boost::uint8_t* in = reinterpret_cast<boost::uint8_t*>(inSamples);
 
-	    MixAudio(out, in, nBytes, MIX_MAXVOLUME*volume);
+	    MixAudio(out, in, nBytes, static_cast<int>(MIX_MAXVOLUME*volume));
 	}
 }
 

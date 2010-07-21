@@ -57,6 +57,7 @@ extern Object *Objects[OBJ_NUM];
 extern int audioTaskID;
 
 #define GAD(x) (struct Gadget *)Objects[x]
+#define OBJ(x) Objects[x]
 
 #define RESET_TIME 30 * 1000 
 
@@ -340,85 +341,85 @@ AOS4Gui::run()
 																					done=TRUE;
 																				break;
 																				case OBJ_OK:
-																					IIntuition->GetAttr(SCROLLER_Top, (Object *)GAD(OBJ_SCROLLER), &iValue);
+																					IIntuition->GetAttr(SCROLLER_Top, OBJ(OBJ_SCROLLER), &iValue);
 																					_rcfile.verbosityLevel(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGTOFILE), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_LOGTOFILE), &iValue);
 																					_rcfile.useWriteLog(iValue);
 																					
-																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_LOGFILENAME_VALUE), &sValue);
+																					IIntuition->GetAttr(STRINGA_TextVal, OBJ(OBJ_LOGFILENAME_VALUE), &sValue);
 																			        tmp.assign((const char *)sValue);
 																					_rcfile.setDebugLog(tmp);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGPARSER), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_LOGPARSER), &iValue);
 																					_rcfile.useParserDump(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGSWF), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_LOGSWF), &iValue);
 																					_rcfile.useActionDump(iValue);
 																					
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGMALFORMEDSWF), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_LOGMALFORMEDSWF), &iValue);
 																					_rcfile.showMalformedSWFErrors(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGACTIONSCRIPT), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_LOGACTIONSCRIPT), &iValue);
 																					_rcfile.showASCodingErrors(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_LOGLOCALCONNECTION), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_LOGLOCALCONNECTION), &iValue);
 																					_rcfile.setLCTrace(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_CONNECTLOCALHOST), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_CONNECTLOCALHOST), &iValue);
 																					_rcfile.useLocalHost(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_CONNECTLOCALDOMAIN), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_CONNECTLOCALDOMAIN), &iValue);
 																					_rcfile.useLocalDomain(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_DISABLESSL), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_DISABLESSL), &iValue);
 																					_rcfile.insecureSSL(iValue);
 
-																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_SHAREDOBJDIR_VALUE), &sValue);
+																					IIntuition->GetAttr(STRINGA_TextVal, OBJ(OBJ_SHAREDOBJDIR_VALUE), &sValue);
 																			        tmp.assign((const char *)sValue);
 																					_rcfile.setSOLSafeDir(tmp);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_DONTWRITESHAREDOBJ), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_DONTWRITESHAREDOBJ), &iValue);
 																					_rcfile.setSOLReadOnly(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_ONLYLOCALSHAREDOBJ), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_ONLYLOCALSHAREDOBJ), &iValue);
 																					_rcfile.setSOLLocalDomain(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_DISABLELOCALCONNOBJ), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_DISABLELOCALCONNOBJ), &iValue);
 																					_rcfile.setLocalConnection(iValue);
 
-																					IIntuition->GetAttr(INTEGER_Number, (Object *)GAD(OBJ_NETWORKTIMEOUT), &iValue);
+																					IIntuition->GetAttr(INTEGER_Number, OBJ(OBJ_NETWORKTIMEOUT), &iValue);
 																					_rcfile.setStreamsTimeout(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_USESOUNDHANDLER), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_USESOUNDHANDLER), &iValue);
 																					_rcfile.useSound(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_SAVEMEDIASTREAMS), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_SAVEMEDIASTREAMS), &iValue);
 																					_rcfile.saveStreamingMedia(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_SEVEDYNAMICSTREAMS), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_SEVEDYNAMICSTREAMS), &iValue);
 																					_rcfile.saveLoadedMedia(iValue);
 
-																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_MEDIASAVEDIR_VALUE), &sValue);
+																					IIntuition->GetAttr(STRINGA_TextVal, OBJ(OBJ_MEDIASAVEDIR_VALUE), &sValue);
 																			        tmp.assign((const char *)sValue);
 																					_rcfile.setMediaDir(tmp);
 
-																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_PLAYERVERSION_VALUE), &sValue);
+																					IIntuition->GetAttr(STRINGA_TextVal, OBJ(OBJ_PLAYERVERSION_VALUE), &sValue);
 																			        tmp.assign((const char *)sValue);
 																					_rcfile.setFlashVersionString(tmp);
 
-																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_OS_VALUE), &sValue);
+																					IIntuition->GetAttr(STRINGA_TextVal, OBJ(OBJ_OS_VALUE), &sValue);
 																			        tmp.assign((const char *)sValue);
 																					_rcfile.setFlashSystemOS(tmp);
 
-																					IIntuition->GetAttr(STRINGA_TextVal, (Object *)GAD(OBJ_URLOPENER_VALUE), &sValue);
+																					IIntuition->GetAttr(STRINGA_TextVal, OBJ(OBJ_URLOPENER_VALUE), &sValue);
 																			        tmp.assign((const char *)sValue);
 																					_rcfile.setURLOpenerFormat(tmp);
 
-																					IIntuition->GetAttr(INTEGER_Number, (Object *)GAD(OBJ_SIZEMOVIELIB), &iValue);
+																					IIntuition->GetAttr(INTEGER_Number, OBJ(OBJ_SIZEMOVIELIB), &iValue);
 																					_rcfile.setMovieLibraryLimit(iValue);
 
-																					IIntuition->GetAttr(CHECKBOX_Checked, (Object *)GAD(OBJ_STARTINPAUSE), &iValue);
+																					IIntuition->GetAttr(CHECKBOX_Checked, OBJ(OBJ_STARTINPAUSE), &iValue);
 																					_rcfile.startStopped(iValue);
 
 																			    	_rcfile.updateFile();
@@ -829,15 +830,17 @@ AOS4Gui::key_event(gnash::key::code key, int state, bool down)
     }
 }
 
-double
+uint32
 AOS4Gui::OS4_GetTicks()
 {
 	struct TimeVal cur;
-
+	uint32 result = 0;
+	
 	ITimer->GetSysTime(&cur);
 	ITimer->SubTime(&cur, &os4timer_starttime);
+	result = cur.Seconds * 1000 + cur.Microseconds / 1000;
 
-	return cur.Seconds * 1000 + cur.Microseconds / 1000;
+	return result;
 }
 
 void
@@ -877,7 +880,7 @@ AOS4Gui::showAboutDialog(void)
 #endif
 						"\n\nCopyright (C) 2005, 2006, 2007, "
             			"2008, 2009, 2010 The Free Software Foundation"
-						"\n\nAmigaOS4 Version by Andrea Palmatè - http://www.amigasoft.net";
+						"\n\nAmigaOS4 Version by Andrea Palmate' - http://www.amigasoft.net";
 
 	PrintMsg(about);
 }
