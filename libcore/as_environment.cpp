@@ -494,8 +494,9 @@ next_slash_or_dot(const char* word)
 {
     for (const char* p = word; *p; p++) {
         if (*p == '.' && p[1] == '.') {
-            p++;
-        } else if (*p == '.' || *p == '/' || *p == ':') {
+            ++p;
+        }
+        else if (*p == '.' || *p == '/' || *p == ':') {
             return p;
         }
     }
@@ -529,87 +530,77 @@ as_environment::find_object(const std::string& path,
     string_table& st = vm.getStringTable();
     const int swfVersion = vm.getSWFVersion();
 
-    as_object* env = getObject(m_target); 
-
     bool firstElementParsed = false;
     bool dot_allowed = true;
 
+    // This points to the current object being used for lookup.
+    as_object* env; 
     const char* p = path.c_str();
-    if (*p == '/')
-    {
-        // Absolute path.  Start at the (AS) root (handle _lockroot)
+
+    // Check if it's an absolute path
+    if (*p == '/') {
+
         MovieClip* root = 0;
         if (m_target) root = m_target->getAsRoot();
         else {
             if (_original_target) {
-                log_debug("current target is undefined on "
-                        "as_environment::find_object, we'll use original");
                 root = _original_target->getAsRoot();
             }
-            else {
-                log_debug("both current and original target are undefined "
-                        "on as_environment::find_object, we'll return 0");
-                return 0;
-            }
+            return 0;
         }
 
-        if (!*(++p)) {
-#ifdef DEBUG_TARGET_FINDING 
-            log_debug(_("Path is '/', return the root (%p)"), (void*)root);
-#endif
-            return getObject(root); // that's all folks.. 
-        }
+        // If the path is just "/" return the root.
+        if (!*(++p)) return getObject(root);
 
+        // Otherwise we start at the root for lookup.
         env = getObject(root);
         firstElementParsed = true;
         dot_allowed = false;
 
-#ifdef DEBUG_TARGET_FINDING 
-        log_debug(_("Absolute path, start at the root (%p)"), (void*)env);
-#endif
-
     }
-#ifdef DEBUG_TARGET_FINDING 
     else {
-        log_debug(_("Relative path, start at (%s)"), m_target->getTarget());
+        env = getObject(m_target);
     }
-#endif
     
     assert (*p);
 
     std::string subpart;
-    while (1)
-    {
+    while (1) {
+
+        // Skip past all colons (why?)
         while (*p == ':') ++p;
 
-        // No more components to scan
         if (!*p) {
-#ifdef DEBUG_TARGET_FINDING 
-            log_debug(_("Path is %s, returning whatever we were up to"), path);
-#endif
+            // No more components to scan, so return the currently found
+            // object.
             return env;
         }
 
-
+        // Search for the next '/', ':' or '.'.
         const char* next_slash = next_slash_or_dot(p);
         subpart = p;
+
+        // Check whether p was pointing to one of those characters already.
         if (next_slash == p) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("invalid path '%s' (p=next_slash=%s)"),
                 path, next_slash);
             );
-            return NULL;
+            return 0;
         }
-        else if (next_slash) {
-            if (*next_slash == '.')
-            {
+
+        if (next_slash) {
+            if (*next_slash == '.') {
+
                 if (!dot_allowed) {
                     IF_VERBOSE_ASCODING_ERRORS(
-                    log_aserror(_("invalid path '%s' (dot not allowed "
-                            "after having seen a slash)"), path);
+                        log_aserror(_("invalid path '%s' (dot not allowed "
+                                "after having seen a slash)"), path);
                     );
-                    return NULL;
+                    return 0;
                 }
+                // No dot allowed after a double-dot.
+                if (next_slash[1] == '.') dot_allowed = false;
             }
             else if (*next_slash == '/') {
                 dot_allowed = false;
@@ -622,14 +613,9 @@ as_environment::find_object(const std::string& path,
         assert(subpart[0] != ':');
 
         // No more components to scan
-        if (subpart.empty()) {
-#ifdef DEBUG_TARGET_FINDING 
-            log_debug(_("No more subparts, env is %p"), (void*)env);
-#endif
-            break;
-        }
+        if (subpart.empty()) break;
 
-        string_table::key subpartKey = st.find(subpart);
+        const string_table::key subpartKey = st.find(subpart);
 
         if (!firstElementParsed) {
             as_object* element(0);
@@ -637,8 +623,7 @@ as_environment::find_object(const std::string& path,
             do {
                 // Try scope stack
                 if (scopeStack) {
-                    for (size_t i = scopeStack->size(); i > 0; --i)
-                    {
+                    for (size_t i = scopeStack->size(); i > 0; --i) {
                         as_object* obj = (*scopeStack)[i-1];
                         
                         element = getElement(obj, subpartKey);
@@ -656,12 +641,15 @@ as_environment::find_object(const std::string& path,
 
                 // Looking for _global ?
                 as_object* global = _vm.getGlobal();
-                if (swfVersion > 5 && subpartKey == NSV::PROP_uGLOBAL)
-                {
+                const bool nocase = caseless(*global);
+
+                if (swfVersion > 5 &&
+                        equal(st, subpartKey, NSV::PROP_uGLOBAL, nocase)) {
                     element = global;
                     break;
                 }
-                // Try globals
+
+                // Look for globals.
                 element = getElement(global, subpartKey);
 
             } while (0);
