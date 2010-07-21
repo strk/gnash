@@ -520,23 +520,16 @@ as_object*
 as_environment::find_object(const std::string& path,
         const ScopeStack* scopeStack) const
 {
-#ifdef DEBUG_TARGET_FINDING 
-    log_debug(_("find_object(%s) called"), path);
-#endif
 
     if (path.empty()) {
-#ifdef DEBUG_TARGET_FINDING 
-        log_debug(_("Returning m_target (empty path)"));
-#endif
-        return getObject(m_target); // or should we return the *original* path ?
+        return getObject(m_target);
     }
     
     VM& vm = _vm;
     string_table& st = vm.getStringTable();
-    int swfVersion = vm.getSWFVersion();
+    const int swfVersion = vm.getSWFVersion();
 
-    as_object* env = 0;
-    env = getObject(m_target); 
+    as_object* env = getObject(m_target); 
 
     bool firstElementParsed = false;
     bool dot_allowed = true;
