@@ -237,18 +237,40 @@ public:
 	/// Return a native function or null
 	NativeFunction* getNative(unsigned int x, unsigned int y) const;
 
-    const as_value* getRegister(size_t num);
+    /// Return the value at a specified register
+    //
+    /// @param index    The index of the register to retrieve.
+    /// @return         A pointer to the as_value at the specified position, or
+    ///                 0 if the index is invalid
+    const as_value* getRegister(size_t index);
 
-    void setRegister(size_t num, const as_value& val);
+    /// Set the value at the specified register
+    //
+    /// @param index    The index of the global register to set. If the index
+    ///                 is invalid, this is a no-op.
+    /// @param val      The value to set the register to.
+    void setRegister(size_t index, const as_value& val);
 
+    /// Add a function call to the call frame.
+    //
+    /// This should be called for all user-defined functions before the
+    /// function is executed
     void pushCallFrame(UserFunction& f);
 
+    /// Remove a function call from the call frame.
+    //
+    /// This should be called on return from the function.
     void popCallFrame();
 
+    /// Return the CallFrame of the currently executing function.
+    //
+    /// Callers must ensure that there is a current function before calling
+    /// this!
     CallFrame& currentCall();
 
-    size_t callDepth() const {
-        return _callStack.size();
+    /// Whether a function call is in progress.
+    bool calling() const {
+        return !_callStack.empty();
     }
 
 #ifdef GNASH_USE_GC

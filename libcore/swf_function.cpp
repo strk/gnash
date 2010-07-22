@@ -106,7 +106,7 @@ swf_function::call(const fn_call& fn)
     // Extract caller before pushing ourself on the call stack
     VM& vm = getVM(fn); 
 
-    as_object* caller = vm.callDepth() ? &vm.currentCall().function() : 0;
+    as_object* caller = vm.calling() ? &vm.currentCall().function() : 0;
 
 	// Set up local stack frame, for parameters and locals.
 	FrameGuard guard(getVM(fn), *this);

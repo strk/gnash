@@ -457,7 +457,7 @@ as_environment::declare_local(const std::string& varname)
     if ( ! findLocal(varname, tmp) )
     {
         // Not in frame; create a new local var.
-        assert(_vm.callDepth());
+        assert(_vm.calling());
         assert( ! varname.empty() );    // null varnames are invalid!
         as_object& locals = _vm.currentCall().locals();
         locals.set_member(_vm.getStringTable().find(varname), as_value());
@@ -763,7 +763,7 @@ bool
 as_environment::findLocal(const std::string& varname, as_value& ret,
         as_object** retTarget) const
 {
-    if (!_vm.callDepth()) return false;
+    if (!_vm.calling()) return false;
 
     as_object& locals = _vm.currentCall().locals();
 
@@ -778,14 +778,14 @@ as_environment::findLocal(const std::string& varname, as_value& ret,
 bool
 as_environment::delLocal(const std::string& varname)
 {
-    if (!_vm.callDepth()) return false;
+    if (!_vm.calling()) return false;
     return deleteLocal(_vm.currentCall().locals(), varname);
 }
 
 bool
 as_environment::setLocal(const std::string& varname, const as_value& val)
 {
-    if (!_vm.callDepth()) return false;
+    if (!_vm.calling()) return false;
 
     // If this name is not qualified, the compiler fails to look beyond
     // as_environment::setLocal.
@@ -804,7 +804,7 @@ void
 as_environment::add_local(const std::string& varname, const as_value& val)
 {
     assert(!varname.empty());   
-    assert(_vm.callDepth());
+    assert(_vm.calling());
 
     as_object& locals = _vm.currentCall().locals();
     locals.set_member(_vm.getStringTable().find(varname), val);
@@ -839,7 +839,7 @@ as_environment::setRegister(unsigned int regnum, const as_value& v)
 {
     // If there is a call frame and it has registers, the value must be
     // set there.
-    if (_vm.callDepth()) {
+    if (_vm.calling()) {
         CallFrame& fr = _vm.currentCall();
         if (fr.hasRegisters()) {
             _vm.currentCall().setRegister(regnum, v);
@@ -856,7 +856,7 @@ as_environment::getRegister(size_t regnum)
 {
     // If there is a call frame and it has registers, the value must be
     // sought there.
-    if (_vm.callDepth()) {
+    if (_vm.calling()) {
         const CallFrame& fr = _vm.currentCall();
         if (fr.hasRegisters()) return fr.getRegister(regnum);
     }
