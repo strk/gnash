@@ -75,7 +75,6 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
     _func(&func),
     _this_ptr(this_ptr),
     _initialStackSize(0),
-    _initialCallStackDepth(0),
     _originalTarget(0),
     _origExecSWFVersion(0),
     _tryList(),
@@ -125,7 +124,6 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
     _withStackLimit(7),
     _func(0),
     _initialStackSize(0),
-    _initialCallStackDepth(0),
     _originalTarget(0),
     _origExecSWFVersion(0),
     _tryList(),
@@ -163,8 +161,6 @@ ActionExec::operator()()
     _originalTarget = env.get_target();
 
     _initialStackSize = env.stack_size();
-
-    _initialCallStackDepth = env.callStackDepth();
 
 #if DEBUG_STACK
     IF_VERBOSE_ACTION (

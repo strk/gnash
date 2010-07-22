@@ -374,12 +374,6 @@ public:
         return _localFrames.back();
     }
 
-    /// Return the depth of call stack
-    size_t callStackDepth()
-    {
-        return _localFrames.size();
-    }
-
 private:
 
     VM& _vm;

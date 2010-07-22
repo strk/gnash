@@ -206,9 +206,6 @@ private:
 	/// Stack size at start of execution
 	size_t _initialStackSize;
 
-	/// Call stack depth at start of execution
-	size_t _initialCallStackDepth;
-
 	DisplayObject* _originalTarget;
 
 	int _origExecSWFVersion;
