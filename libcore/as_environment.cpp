@@ -690,75 +690,6 @@ as_environment::get_version() const
     return _vm.getSWFVersion();
 }
 
-void
-as_environment::dump_local_registers(std::ostream& out) const
-{
-#if 0
-    if ( _localFrames.empty() ) return;
-    out << "Local registers: ";
-    for (CallStack::const_iterator it=_localFrames.begin(),
-            itEnd=_localFrames.end(); it != itEnd; ++it) {
-        if (it != _localFrames.begin()) out << " | ";
-        out << *it;
-    }
-    out << std::endl;
-#endif
-}
-
-static void
-dump(as_object& locals, std::ostream& out)
-{
-    typedef std::map<std::string, as_value> PropMap;
-    PropMap props;
-    locals.dump_members(props);
-    
-    int count = 0;
-    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i) {
-        if (count++) out << ", ";
-        // TODO: define output operator for as_value !
-        out << i->first << "==" << i->second;
-    }
-    out << std::endl;
-}
-
-void
-as_environment::dump_local_variables(std::ostream& out) const
-{
-#if 0
-    if ( _localFrames.empty() ) return;
-    out << "Local variables: ";
-    for (CallStack::iterator it=_localFrames.begin(),
-            itEnd=_localFrames.end(); it != itEnd; ++it) {
-
-        if ( it != _localFrames.begin() ) out << " | ";
-        dump(it->locals(), out);
-    }
-    out << std::endl;
-#endif
-}
-
-void
-as_environment::dump_global_registers(std::ostream& out) const
-{
-    std::string registers;
-
-    std::stringstream ss;
-
-    ss << "Global registers: ";
-    int defined=0;
-    for (unsigned int i = 0; i < 4; ++i)
-    {
-        const as_value* v = _vm.getRegister(i);
-        if (!v) continue;
-
-        if (defined++) ss <<  ", ";
-
-        ss << i << ":" << *v;
-
-    }
-    if ( defined ) out << ss.str() << std::endl;
-}
-
 bool
 as_environment::findLocal(const std::string& varname, as_value& ret,
         as_object** retTarget) const
@@ -810,27 +741,6 @@ as_environment::add_local(const std::string& varname, const as_value& val)
     locals.set_member(_vm.getStringTable().find(varname), val);
 }
 
-void
-as_environment::dump_stack(std::ostream& out, unsigned int limit) const
-{
-    unsigned int si=0, n=_stack.size();
-    if ( limit && n > limit )
-    {
-        si=n-limit;
-        out << "Stack (last " << limit << " of " << n << " items): ";
-    }
-    else
-    {
-        out << "Stack: ";
-    }
-
-    for (unsigned int i=si; i<n; i++)
-    {
-        if (i!=si) out << " | ";
-        out << '"' << _stack.value(i) << '"';
-    }
-    out << std::endl;
-}
 
 #ifdef GNASH_USE_GC
 

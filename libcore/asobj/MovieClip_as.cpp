@@ -2228,7 +2228,7 @@ movieclip_attachBitmap(const fn_call& fn)
 
 
 as_value
-movieclip_as2_ctor(const fn_call& fn)
+movieclip_as2_ctor(const fn_call& /*fn*/)
 {
     return as_value();
 }

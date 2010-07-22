@@ -23,6 +23,15 @@
 #endif
 
 #include "VM.h"
+
+#include <iostream>
+#include <memory>
+#include <boost/random.hpp> // for random generator
+#include <cstdlib> // std::getenv
+#ifdef HAVE_SYS_UTSNAME_H
+# include <sys/utsname.h> // For system information
+#endif
+
 #include "SharedObject_as.h" // for SharedObjectLibrary
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "NativeFunction.h"
@@ -36,13 +45,6 @@
 #include "namedStrings.h"
 #include "VirtualClock.h" // for getTime()
 
-#ifdef HAVE_SYS_UTSNAME_H
-# include <sys/utsname.h> // For system information
-#endif
-
-#include <memory>
-#include <boost/random.hpp> // for random generator
-#include <cstdlib> // std::getenv
 
 namespace {
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -340,6 +342,63 @@ VM::getNative(unsigned int x, unsigned int y) const
     return f;
 }
 
+namespace {
+    void dumpObject(as_object& locals, std::ostream& out);
+}
+
+void
+VM::dumpState(std::ostream& out, size_t limit)
+{
+
+    // Dump stack:
+    size_t si = 0;
+    const size_t n = _stack.size();
+
+    if (limit && n > limit) {
+        si = n - limit;
+        out << "Stack (last " << limit << " of " << n << " items): ";
+    }
+    else {
+        out << "Stack: ";
+    }
+
+    for (size_t i = si; i < n; ++i) {
+        if (i != si) out << " | ";
+        out << '"' << _stack.value(i) << '"';
+    }
+    out << "\n";
+
+    out << "Global registers: ";
+    for (GlobalRegisters::const_iterator it = _globalRegisters.begin(),
+            e = _globalRegisters.end(); it != e; ++it) {
+        const as_value& v = *it;
+        if (v.is_undefined()) continue;
+        if (it != _globalRegisters.begin()) out <<  ", ";
+
+        out << (it - _globalRegisters.begin()) << ":" << v;
+    }
+
+    // Now local registers and variables from the call stack.
+    if (_callStack.empty()) return;
+
+    out << "Local registers: ";
+    for (CallStack::const_iterator it = _callStack.begin(),
+            e = _callStack.end(); it != e; ++it) {
+        if (it != _callStack.begin()) out << " | ";
+        out << *it;
+    }
+    out << "\n";
+
+    out << "Local variables: ";
+    for (CallStack::iterator it = _callStack.begin(), e = _callStack.end();
+            it != e; ++it) {
+        if (it != _callStack.begin()) out << " | ";
+        dumpObject(it->locals(), out);
+    }
+    out << std::endl;
+}
+
+
 ///////////////////////////////////////////////////////////////////////
 //
 // Value ops
@@ -437,6 +496,24 @@ newLessThan(const as_value& op1, const as_value& op2, VM& /*vm*/)
     return as_value(num1 < num2);
 }
 
+namespace {
+
+void
+dumpObject(as_object& locals, std::ostream& out)
+{
+    typedef std::map<std::string, as_value> PropMap;
+    PropMap props;
+    locals.dump_members(props);
+    
+    int count = 0;
+    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i) {
+        if (count++) out << ", ";
+        out << i->first << "==" << i->second;
+    }
+    out << std::endl;
+}
+
+}
 
 } // end of namespace gnash
 

@@ -22,11 +22,9 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_value.h" // for composition (vector + frame_slot)
 #include "SafeStack.h"
-#include "CallStack.h" // for composition
 
 #include <string> // for frame_slot name
 #include <vector>
-#include <iostream> // for dump_stack inline
 
 namespace gnash {
 
@@ -273,32 +271,9 @@ public:
     /// Supports both /slash/syntax and dot.syntax
     /// Case insensitive for SWF up to 6, sensitive from 7 up
     ///
-    as_object* find_object(const std::string& path, const ScopeStack* scopeStack=NULL) const;
+    as_object* find_object(const std::string& path,
+            const ScopeStack* scopeStack = 0) const;
     
-    /// Dump content of the stack to a std::ostream
-    //
-    /// @param out
-    /// The output stream, standard error if omitted.
-    ///
-    /// @param limit
-    /// If > 0, limit number of printed item by the given amount (from the top).
-    /// Unlimited by default;
-    ///
-    void dump_stack(std::ostream& out=std::cerr, unsigned int limit=0) const;
-
-    /// Dump the local registers to a std::ostream
-    //
-    /// NOTE that nothing will be written to the stream if NO local registers
-    ///      are set
-    ///
-    void dump_local_registers(std::ostream& out=std::cerr) const;
-
-    /// Dump the global registers to a std::ostream
-    void dump_global_registers(std::ostream& out=std::cerr) const;
-
-    /// Dump the local variables to a std::ostream
-    void dump_local_variables(std::ostream& out=std::cerr) const;
-
     /// Return the SWF version we're running for.
     //
     /// NOTE: this is the version encoded in the first loaded

@@ -168,10 +168,7 @@ ActionExec::operator()()
                    ", stop_pc=%d, code.size=%d, func=%d, codeVersion=%d"),
                 pc, stop_pc, code.size(), _func ? _func : 0, codeVersion);
         std::stringstream ss;
-        env.dump_stack(ss, STACK_DUMP_LIMIT);
-        env.dump_global_registers(ss);
-        env.dump_local_registers(ss);
-        env.dump_local_variables(ss);
+        getVM(env).dumpState(ss, STACK_DUMP_LIMIT);
         log_action("%s", ss.str());
     );
 #endif
@@ -314,10 +311,7 @@ ActionExec::operator()()
                 log_action(_("After execution: PC %d, next PC %d, "
                         "stack follows"), pc, next_pc);
                 std::stringstream ss;
-                env.dump_stack(ss, STACK_DUMP_LIMIT);
-                env.dump_global_registers(ss);
-                env.dump_local_registers(ss);
-                env.dump_local_variables(ss);
+                getVM(env).dumpState(ss, STACK_DUMP_LIMIT);
                 log_action("%s", ss.str());
             );
 #endif

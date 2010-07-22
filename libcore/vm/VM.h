@@ -273,6 +273,9 @@ public:
         return !_callStack.empty();
     }
 
+    /// Print stack, call stack, and registers to the specified ostream
+    void dumpState(std::ostream& o, size_t limit = 0);
+
 #ifdef GNASH_USE_GC
 	void addStatic(GcResource* res)
 	{
@@ -339,7 +342,8 @@ private:
 
 	SafeStack<as_value>	_stack;
 
-    boost::array<as_value, 4> _globalRegisters;
+    typedef boost::array<as_value, 4> GlobalRegisters;
+    GlobalRegisters _globalRegisters;
 
 	CallStack _callStack;
 
