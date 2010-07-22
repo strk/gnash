@@ -342,10 +342,6 @@ VM::getNative(unsigned int x, unsigned int y) const
     return f;
 }
 
-namespace {
-    void dumpObject(as_object& locals, std::ostream& out);
-}
-
 void
 VM::dumpState(std::ostream& out, size_t limit)
 {
@@ -377,6 +373,7 @@ VM::dumpState(std::ostream& out, size_t limit)
 
         out << (it - _globalRegisters.begin()) << ":" << v;
     }
+    out << "\n";
 
     // Now local registers and variables from the call stack.
     if (_callStack.empty()) return;
@@ -389,13 +386,6 @@ VM::dumpState(std::ostream& out, size_t limit)
     }
     out << "\n";
 
-    out << "Local variables: ";
-    for (CallStack::iterator it = _callStack.begin(), e = _callStack.end();
-            it != e; ++it) {
-        if (it != _callStack.begin()) out << " | ";
-        dumpObject(it->locals(), out);
-    }
-    out << std::endl;
 }
 
 
@@ -494,25 +484,6 @@ newLessThan(const as_value& op1, const as_value& op2, VM& /*vm*/)
         return as_value();
     }
     return as_value(num1 < num2);
-}
-
-namespace {
-
-void
-dumpObject(as_object& locals, std::ostream& out)
-{
-    typedef std::map<std::string, as_value> PropMap;
-    PropMap props;
-    locals.dump_members(props);
-    
-    int count = 0;
-    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i) {
-        if (count++) out << ", ";
-        out << i->first << "==" << i->second;
-    }
-    out << std::endl;
-}
-
 }
 
 } // end of namespace gnash
