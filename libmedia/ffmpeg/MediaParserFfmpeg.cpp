@@ -352,10 +352,18 @@ MediaParserFfmpeg::initializeParser()
 			     "format");
     }
     
+// av_alloc_format_context was deprecated on
+// 2009-02-08 (r17047) in favor of avformat_alloc_context() 
+#if !defined (LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 52
     _formatCtx = av_alloc_format_context();
+#else
+    _formatCtx = avformat_alloc_context();
+#endif
+
     assert(_formatCtx);
     
-    // Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
+    // Setup the filereader/seeker mechanism.
+    // 7th argument (NULL) is the writer function,
     // which isn't needed.
     _byteIOBuffer.reset( new unsigned char[byteIOBufferSize] );
     init_put_byte(&_byteIOCxt,
