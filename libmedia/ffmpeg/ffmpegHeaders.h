@@ -62,8 +62,25 @@ extern "C" {
 #endif
 
 
-#if defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_FFMPEG_SWSCALE_H)
-# define HAVE_SWSCALE_H 1
+#ifdef HAVE_SWSCALE_H
+extern "C" {
+#include <swscale.h>
+}
 #endif
+
+#ifdef HAVE_FFMPEG_SWSCALE_H
+extern "C" {
+#include <ffmpeg/swscale.h>
+}
+#define HAVE_SWSCALE_H 1
+#endif
+
+#ifdef HAVE_LIBSWSCALE_SWSCALE_H
+extern "C" {
+#include <libswscale/swscale.h>
+}
+#define HAVE_SWSCALE_H 1
+#endif
+
 
 #endif // GNASH_MEDIA_FFMPEG_HEADERS_H

@@ -21,13 +21,6 @@
 #include "ffmpegHeaders.h"
 #include "VideoConverter.h"
 
-#if HAVE_SWSCALE_H
-extern "C" {
-#include <libswscale/swscale.h>
-}
-#endif
-
-
 namespace gnash {
 namespace media {
 namespace ffmpeg {

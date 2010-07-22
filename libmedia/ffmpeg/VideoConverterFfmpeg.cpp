@@ -20,22 +20,9 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_FFMPEG_SWSCALE_H
-extern "C" {
-#include <ffmpeg/swscale.h>
-}
-#define HAVE_SWSCALE_H 1
-#endif
-
-#ifdef HAVE_LIBSWSCALE_SWSCALE_H
-extern "C" {
-#include <libswscale/swscale.h>
-}
-#define HAVE_SWSCALE_H 1
-#endif
-
 #include "VideoConverterFfmpeg.h"
 #include "GnashException.h"
+#include "ffmpegHeaders.h"
 #include "log.h"
 
 namespace gnash {
