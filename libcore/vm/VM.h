@@ -279,7 +279,9 @@ public:
     //
     /// This should be called for all user-defined functions before the
     /// function is executed
-    void pushCallFrame(UserFunction& f);
+    //
+    /// @return     The pushed CallFrame. This is identical to currentCall().
+    CallFrame& pushCallFrame(UserFunction& f);
 
     /// Remove a function call from the call frame.
     //
@@ -382,20 +384,26 @@ private:
 class FrameGuard
 {
 public:
+
     FrameGuard(VM& vm, UserFunction& func)
         :
-        _vm(vm)
+        _vm(vm),
+        _callFrame(_vm.pushCallFrame(func))
     {
-        _vm.pushCallFrame(func);
     }
 
-    ~FrameGuard()
-    {
+    /// Get the CallFrame we've just pushed.
+    CallFrame& callFrame() {
+        return _callFrame;
+    }
+
+    ~FrameGuard() {
         _vm.popCallFrame();
     }
 
 private:
     VM& _vm;
+    CallFrame& _callFrame;
 };
 
 /////////////////////////////////////////////////////////////////////////////

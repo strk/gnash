@@ -71,12 +71,12 @@ public:
         return *_func;
     }
 
-    const as_value* getRegister(size_t i) const {
+    const as_value* getLocalRegister(size_t i) const {
         if (i >= _registers.size()) return 0;
         return &_registers[i];
     }
 
-    bool setRegister(size_t i, const as_value& val) {
+    bool setLocalRegister(size_t i, const as_value& val) {
         if (i >= _registers.size()) return false;
         _registers[i] = val;
         return true;

@@ -268,7 +268,7 @@ VM::getRegister(size_t index)
     // sought there.
     if (!_callStack.empty()) {
         const CallFrame& fr = currentCall();
-        if (fr.hasRegisters()) return fr.getRegister(index);
+        if (fr.hasRegisters()) return fr.getLocalRegister(index);
     }
 
     // Otherwise it can be in the global registers.
@@ -284,7 +284,7 @@ VM::setRegister(size_t index, const as_value& val)
     if (!_callStack.empty()) {
         CallFrame& fr = currentCall();
         if (fr.hasRegisters()) {
-            currentCall().setRegister(index, val);
+            currentCall().setLocalRegister(index, val);
             return;
         }
     }
@@ -300,7 +300,7 @@ VM::currentCall()
     return _callStack.back();
 }
 
-void
+CallFrame&
 VM::pushCallFrame(UserFunction& func)
 {
 
@@ -322,7 +322,7 @@ VM::pushCallFrame(UserFunction& func)
     }
 
     _callStack.push_back(CallFrame(&func));
-
+    return _callStack.back();
 }
 
 void 

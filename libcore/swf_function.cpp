@@ -22,11 +22,11 @@
 #include "MovieClip.h"
 #include "action_buffer.h"
 #include "ActionExec.h" // for operator()
-#include "VM.h" // for storing _global in a local register
-#include "NativeFunction.h" // for Function constructor
+#include "VM.h" 
+#include "NativeFunction.h" 
 #include "Global_as.h" 
 #include "namedStrings.h"
-
+#include "CallStack.h"
 #include <typeinfo>
 #include <iostream>
 #include <string>
@@ -74,13 +74,14 @@ swf_function::swf_function(const action_buffer& ab, as_environment& env,
 /// in as_environment seems bogus, see setProperty.as, the 
 /// failure of setTarget("") construct in SWF5.
 ///
-struct TargetGuard {
+struct TargetGuard
+{
 	as_environment& env;
 	DisplayObject* from;
 	DisplayObject* from_orig;
 
 	// @param ch : target to set temporarely
-	// @param och : original target to set temporarely
+	// @param och : original target to set temporarily
 	TargetGuard(as_environment& e, DisplayObject* ch, DisplayObject* och)
 		:
 		env(e),
@@ -183,6 +184,10 @@ swf_function::call(const fn_call& fn)
 		// intro.swf movie fail to play correctly.
         size_t current_reg(1);
 
+        // This is us. TODO: why do we have to query the VM to get
+        // what are effectively our own resources?
+        CallFrame& cf = guard.callFrame();
+
         // If this is not suppressed it is either placed in a register
         // or set as a local variable, but not both.
 		if (!(_function2Flags & SUPPRESS_THIS)) {
@@ -190,7 +195,7 @@ swf_function::call(const fn_call& fn)
                 // preload 'this' into a register.
                 // TODO: check whether it should be undefined or null
                 // if this_ptr is null.
-                getVM(_env).setRegister(current_reg, fn.this_ptr); 
+                cf.setLocalRegister(current_reg, fn.this_ptr); 
                 ++current_reg;
             }
             else {
@@ -215,7 +220,7 @@ swf_function::call(const fn_call& fn)
 
             if (_function2Flags & PRELOAD_ARGUMENTS) {
                 // preload 'arguments' into a register.
-                getVM(_env).setRegister(current_reg, args);
+                cf.setLocalRegister(current_reg, args);
                 ++current_reg;
             }
             else {
@@ -235,7 +240,7 @@ swf_function::call(const fn_call& fn)
                 fn.this_ptr ? fn.this_ptr->get_super() : 0;
 
             if (super && (_function2Flags & PRELOAD_SUPER)) {
-				getVM(_env).setRegister(current_reg, super);
+				cf.setLocalRegister(current_reg, super);
 				current_reg++;
 			}
             else if (super) {
@@ -249,7 +254,7 @@ swf_function::call(const fn_call& fn)
 			if (tgtch) {
 				// NOTE: _lockroot will be handled by getAsRoot()
 				as_object* r = getObject(tgtch->getAsRoot());
-				getVM(_env).setRegister(current_reg, r);
+				cf.setLocalRegister(current_reg, r);
 				++current_reg;
 			}
 		}
@@ -258,7 +263,7 @@ swf_function::call(const fn_call& fn)
 			DisplayObject* tgtch = _env.get_target();
             if (tgtch) {
                 as_object* parent = getObject(tgtch->get_parent());
-                getVM(_env).setRegister(current_reg, parent);
+                cf.setLocalRegister(current_reg, parent);
                 ++current_reg;
             }
 		}
@@ -266,7 +271,7 @@ swf_function::call(const fn_call& fn)
 		if (_function2Flags & PRELOAD_GLOBAL) {
 			// Put '_global' in a register.
 			as_object* global = vm.getGlobal();
-			getVM(_env).setRegister(current_reg, global);
+			cf.setLocalRegister(current_reg, global);
 			++current_reg;
 		}
 
@@ -292,7 +297,7 @@ swf_function::call(const fn_call& fn)
 				if (i < fn.nargs) {
 					// Pass argument into a register.
 					const int reg = _args[i].reg;
-					getVM(_env).setRegister(reg, fn.arg(i));
+					cf.setLocalRegister(reg, fn.arg(i));
 				}
                 // If no argument was passed, no need to setup a register
                 // I guess.
@@ -303,15 +308,13 @@ swf_function::call(const fn_call& fn)
 	// Execute the actions.
 	// Do this in a try block to proper drop the pushed call frame 
 	// in case of problems (most interesting action limits)
-	try 
-	{
+	try {
         as_value result;
 		ActionExec exec(*this, _env, &result, fn.this_ptr);
 		exec();
         return result;
 	}
-	catch (ActionLimitException& ale) // expected and sane 
-	{
+	catch (ActionLimitException& ale) {
 		throw;
 	}
 }
