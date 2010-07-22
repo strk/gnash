@@ -2047,7 +2047,7 @@ ActionPushData(ActionExec& thread)
             {
                 const size_t reg = code[3 + i];
                 ++i;
-                const as_value* v = env.getRegister(reg);
+                const as_value* v = getVM(env).getRegister(reg);
                 if (!v) {
                     IF_VERBOSE_MALFORMED_SWF(
                         log_swferror(_("Invalid register %d in ActionPush"),
@@ -3766,7 +3766,7 @@ ActionSetRegister(ActionExec& thread)
     const size_t reg = code[thread.getCurrentPC() + 3];
 
     // Save top of stack in specified register.
-    env.setRegister(reg, env.top(0));
+    getVM(env).setRegister(reg, env.top(0));
 }
 
 

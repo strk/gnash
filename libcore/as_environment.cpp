@@ -745,37 +745,6 @@ as_environment::add_local(const std::string& varname, const as_value& val)
 #ifdef GNASH_USE_GC
 
 void
-as_environment::setRegister(unsigned int regnum, const as_value& v)
-{
-    // If there is a call frame and it has registers, the value must be
-    // set there.
-    if (_vm.calling()) {
-        CallFrame& fr = _vm.currentCall();
-        if (fr.hasRegisters()) {
-            _vm.currentCall().setRegister(regnum, v);
-            return;
-        }
-    }
-
-    // May do nothing if the index is out of bounds.
-    _vm.setRegister(regnum, v);
-}
-
-const as_value*
-as_environment::getRegister(size_t regnum)
-{
-    // If there is a call frame and it has registers, the value must be
-    // sought there.
-    if (_vm.calling()) {
-        const CallFrame& fr = _vm.currentCall();
-        if (fr.hasRegisters()) return fr.getRegister(regnum);
-    }
-
-    // Otherwise it can be in the global registers.
-    return _vm.getRegister(regnum);
-}
-
-void
 as_environment::markReachableResources() const
 {
     if (m_target) m_target->setReachable();

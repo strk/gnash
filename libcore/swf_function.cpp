@@ -190,7 +190,7 @@ swf_function::call(const fn_call& fn)
                 // preload 'this' into a register.
                 // TODO: check whether it should be undefined or null
                 // if this_ptr is null.
-                _env.setRegister(current_reg, fn.this_ptr); 
+                getVM(_env).setRegister(current_reg, fn.this_ptr); 
                 ++current_reg;
             }
             else {
@@ -215,7 +215,7 @@ swf_function::call(const fn_call& fn)
 
             if (_function2Flags & PRELOAD_ARGUMENTS) {
                 // preload 'arguments' into a register.
-                _env.setRegister(current_reg, args);
+                getVM(_env).setRegister(current_reg, args);
                 ++current_reg;
             }
             else {
@@ -235,7 +235,7 @@ swf_function::call(const fn_call& fn)
                 fn.this_ptr ? fn.this_ptr->get_super() : 0;
 
             if (super && (_function2Flags & PRELOAD_SUPER)) {
-				_env.setRegister(current_reg, super);
+				getVM(_env).setRegister(current_reg, super);
 				current_reg++;
 			}
             else if (super) {
@@ -249,7 +249,7 @@ swf_function::call(const fn_call& fn)
 			if (tgtch) {
 				// NOTE: _lockroot will be handled by getAsRoot()
 				as_object* r = getObject(tgtch->getAsRoot());
-				_env.setRegister(current_reg, r);
+				getVM(_env).setRegister(current_reg, r);
 				++current_reg;
 			}
 		}
@@ -258,7 +258,7 @@ swf_function::call(const fn_call& fn)
 			DisplayObject* tgtch = _env.get_target();
             if (tgtch) {
                 as_object* parent = getObject(tgtch->get_parent());
-                _env.setRegister(current_reg, parent);
+                getVM(_env).setRegister(current_reg, parent);
                 ++current_reg;
             }
 		}
@@ -266,7 +266,7 @@ swf_function::call(const fn_call& fn)
 		if (_function2Flags & PRELOAD_GLOBAL) {
 			// Put '_global' in a register.
 			as_object* global = vm.getGlobal();
-			_env.setRegister(current_reg, global);
+			getVM(_env).setRegister(current_reg, global);
 			++current_reg;
 		}
 
@@ -292,7 +292,7 @@ swf_function::call(const fn_call& fn)
 				if (i < fn.nargs) {
 					// Pass argument into a register.
 					const int reg = _args[i].reg;
-					_env.setRegister(reg, fn.arg(i));
+					getVM(_env).setRegister(reg, fn.arg(i));
 				}
                 // If no argument was passed, no need to setup a register
                 // I guess.

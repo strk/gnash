@@ -237,16 +237,40 @@ public:
 	/// Return a native function or null
 	NativeFunction* getNative(unsigned int x, unsigned int y) const;
 
-    /// Return the value at a specified register
+    /// Get value of a register (local or global).
+    //
+    /// When not in a function context the selected register will be
+    /// global or not at all (if index is not in the valid range
+    /// of global registers).
+    ///
+    /// When in a function context defining no registers, 
+    /// we'll behave the same as for a non-function context.
+    ///
+    /// When in a function context defining non-zero number
+    /// of local registers, the register set will be either local
+    /// or not at all (if index is not in the valid range of local
+    /// registers).
     //
     /// @param index    The index of the register to retrieve.
     /// @return         A pointer to the as_value at the specified position, or
     ///                 0 if the index is invalid
     const as_value* getRegister(size_t index);
 
-    /// Set the value at the specified register
+    /// Set value of a register (local or global).
     //
-    /// @param index    The index of the global register to set. If the index
+    /// When not in a function context the set register will be
+    /// global or not at all (if index is not in the valid range
+    /// of global registers).
+    ///
+    /// When in a function context defining no registers, 
+    /// we'll behave the same as for a non-function context.
+    ///
+    /// When in a function context defining non-zero number
+    /// of local registers, the register set will be either local
+    /// or not at all (if index is not in the valid range of local
+    /// registers).
+    ///
+    /// @param index    The index of the register to set. If the index
     ///                 is invalid, this is a no-op.
     /// @param val      The value to set the register to.
     void setRegister(size_t index, const as_value& val);

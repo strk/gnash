@@ -209,46 +209,6 @@ public:
     /// Create the specified local var if it doesn't exist already.
     void declare_local(const std::string& varname);
 
-    /// Set value of a register (local or global).
-    //
-    /// When not in a function context the register will be
-    /// global or none (if regnum is not in the valid range
-    /// of global registers).
-    ///
-    /// When in a function context defining NO registers, 
-    /// we'll behave the same as for a non-function context.
-    ///
-    /// When in a function context defining non-zero number
-    /// of local registers, the register set will be local
-    /// or none (if regnum is not in the valid range of local
-    /// registers).
-    ///
-    /// @param regnum
-    /// Register number
-    ///
-    /// @param v
-    /// Value to assign to the register
-    void setRegister(unsigned int regnum, const as_value& v);
-
-    /// Get value of a register (local or global).
-    //
-    /// When not in a function context the register will be
-    /// global or none (if regnum is not in the valid range
-    /// of global registers).
-    ///
-    /// When in a function context defining NO registers, 
-    /// we'll behave the same as for a non-function context.
-    ///
-    /// When in a function context defining non-zero number
-    /// of local registers, the register set will be local
-    /// or none (if regnum is not in the valid range of local
-    /// registers).
-    ///
-    /// @param regnum   Register number
-    /// @return         A pointer to the register value or 0 if the register
-    ///                 was invalid. 
-    const as_value* getRegister(size_t regnum);
-
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources.
     //

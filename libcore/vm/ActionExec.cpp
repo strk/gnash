@@ -406,7 +406,7 @@ ActionExec::processExceptions(TryBlock& t)
                     as_value ex = env.pop();
                     ex.unflag_exception();
                     
-                    env.setRegister(t._registerIndex, ex);
+                    getVM(env).setRegister(t._registerIndex, ex);
                 }
             }
             else

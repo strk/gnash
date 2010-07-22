@@ -264,6 +264,14 @@ VM::markReachableResources() const
 const as_value*
 VM::getRegister(size_t index)
 {
+    // If there is a call frame and it has registers, the value must be
+    // sought there.
+    if (!_callStack.empty()) {
+        const CallFrame& fr = currentCall();
+        if (fr.hasRegisters()) return fr.getRegister(index);
+    }
+
+    // Otherwise it can be in the global registers.
     if (index < _globalRegisters.size()) return &_globalRegisters[index];
     return 0;
 }
@@ -271,6 +279,17 @@ VM::getRegister(size_t index)
 void
 VM::setRegister(size_t index, const as_value& val)
 {
+    // If there is a call frame and it has registers, the value must be
+    // set there.
+    if (!_callStack.empty()) {
+        CallFrame& fr = currentCall();
+        if (fr.hasRegisters()) {
+            currentCall().setRegister(index, val);
+            return;
+        }
+    }
+
+    // Do nothing if the index is out of bounds.
     if (index < _globalRegisters.size()) _globalRegisters[index] = val;
 }
 
