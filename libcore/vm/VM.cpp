@@ -225,6 +225,8 @@ VM::getTime() const
 void
 VM::markReachableResources() const
 {
+    std::for_each(_globalRegisters.begin(), _globalRegisters.end(), 
+            std::mem_fun_ref(&as_value::setReachable));
 
 	_rootMovie.markReachableResources();
 
@@ -256,6 +258,19 @@ VM::markReachableResources() const
     assert (_stack.totalSize() == 0);
 #endif
 
+}
+
+const as_value*
+VM::getRegister(size_t index)
+{
+    if (index < _globalRegisters.size()) return &_globalRegisters[index];
+    return 0;
+}
+
+void
+VM::setRegister(size_t index, const as_value& val)
+{
+    if (index < _globalRegisters.size()) _globalRegisters[index] = val;
 }
 
 void

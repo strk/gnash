@@ -26,39 +26,54 @@
 // Forward declarations
 namespace gnash {
     class as_object;
-    class as_function;
+    class UserFunction;
 }
 
 namespace gnash {
 
-/// An element of a CallStack
-class CallFrame 
+/// A CallFrame is an element of a CallStack.
+//
+/// A CallFrame exists for the duration of a UserFunction call. NativeFunctions
+/// have no call frame.
+//
+/// The CallFrame provides space for local registers and local variables.
+/// These values are discarded when the CallFrame is destroyed at the end of
+/// a function call.
+class CallFrame
 {
 public:
 
     typedef std::vector<as_value> Registers;
 
-    CallFrame(as_function* func);
-
+    CallFrame(UserFunction* func);
+    
+    /// Copy constructor for containers
     CallFrame(const CallFrame& other)
         :
         _locals(other._locals),
-        _registers(other._registers),
-        _func(other._func)
+        _func(other._func),
+        _registers(other._registers)
     {}
+
+    /// Assignment operator for containers.
+    CallFrame& operator=(const CallFrame& other) {
+        _locals = other._locals;
+        _func = other._func;
+        _registers = other._registers;
+        return *this;
+    }
 
     as_object& locals() {
         return *_locals;
     }
 
-    as_function& function() {
+    UserFunction& function() {
         return *_func;
     }
 
-    bool getRegister(size_t i, as_value& val) const {
-        if (i >= _registers.size()) return false;
-        val = _registers[i];
-        return true;
+    const as_value* getRegister(size_t i) const {
+        if (i >= _registers.size()) return 0;
+        return &_registers[i];
     }
 
     bool setRegister(size_t i, const as_value& val) {
@@ -67,10 +82,10 @@ public:
         return true;
     }
 
-    void resizeRegisters(size_t i) {
-        _registers.resize(i);
-    }
-
+    /// Set the number of registers for this CallFrame.
+    //
+    /// The number of registers may only be set once! This is to ensure
+    /// that pointers to the register values are always valid.
     bool hasRegisters() const {
         return !_registers.empty();
     }
@@ -86,13 +101,13 @@ private:
 
     friend std::ostream& operator<<(std::ostream&, const CallFrame&);
 
-    /// function use this 
+    /// Local variables.
     as_object* _locals;
 
-    /// function2 also use this
+    UserFunction* _func;
+    
+    /// Local registers.
     Registers _registers;
-
-    as_function* _func;
 
 };
 

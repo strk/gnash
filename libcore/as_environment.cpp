@@ -28,7 +28,6 @@
 #include "Property.h"
 #include "as_object.h"
 #include "namedStrings.h"
-#include "as_function.h" 
 #include "CallStack.h"
 #include "Global_as.h"
 
@@ -750,13 +749,14 @@ as_environment::dump_global_registers(std::ostream& out) const
 
     ss << "Global registers: ";
     int defined=0;
-    for (unsigned int i = 0; i < numGlobalRegisters; ++i)
+    for (unsigned int i = 0; i < 4; ++i)
     {
-        if ( m_global_register[i].is_undefined() ) continue;
+        const as_value* v = _vm.getRegister(i);
+        if (!v) continue;
 
-        if ( defined++ ) ss <<  ", ";
+        if (defined++) ss <<  ", ";
 
-        ss << i << ":" << m_global_register[i];
+        ss << i << ":" << *v;
 
     }
     if ( defined ) out << ss.str() << std::endl;
@@ -796,7 +796,7 @@ as_environment::setLocal(const std::string& varname, const as_value& val)
 }
 
 void
-as_environment::pushCallFrame(as_function& func)
+as_environment::pushCallFrame(UserFunction& func)
 {
 
     // The stack size can be changed by the ScriptLimits
@@ -804,7 +804,7 @@ as_environment::pushCallFrame(as_function& func)
     // TODO: override from gnashrc.
     
     // A stack size of 0 is apparently legitimate.
-    const boost::uint16_t recursionLimit = getRoot(func).getRecursionLimit();
+    const boost::uint16_t recursionLimit = _vm.getRoot().getRecursionLimit();
 
     // Don't proceed if local call frames would reach the recursion limit.
     if (_localFrames.size() + 1 >= recursionLimit) {
@@ -868,7 +868,7 @@ as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 
 #ifdef GNASH_USE_GC
 
-unsigned int
+void
 as_environment::setRegister(unsigned int regnum, const as_value& v)
 {
     // If there is a call frame and it has registers, the value must be
@@ -876,48 +876,46 @@ as_environment::setRegister(unsigned int regnum, const as_value& v)
     if (!_localFrames.empty()) {
         CallFrame& fr = _localFrames.back();
         if (fr.hasRegisters()) {
-            if (_localFrames.back().setRegister(regnum, v)) return 2;
-            return 0;
+            _localFrames.back().setRegister(regnum, v);
+            return;
         }
     }
 
-    if (regnum < numGlobalRegisters) {
-        m_global_register[regnum] = v;
-        return 1;
-    }
-
-    return 0;
+    // May do nothing if the index is out of bounds.
+    _vm.setRegister(regnum, v);
 }
 
-unsigned int
-as_environment::getRegister(unsigned int regnum, as_value& v)
+const as_value*
+as_environment::global_register(unsigned int n)
+{
+    // May return 0
+    return _vm.getRegister(n);
+}
+
+void
+as_environment::set_global_register(boost::uint8_t n, as_value &val)
+{
+    _vm.setRegister(n, val);
+}
+
+const as_value*
+as_environment::getRegister(size_t regnum)
 {
     // If there is a call frame and it has registers, the value must be
     // sought there.
     if (!_localFrames.empty()) {
         const CallFrame& fr = _localFrames.back();
-        if (fr.hasRegisters()) {
-            if (fr.getRegister(regnum, v)) return 2;
-            return 0;
-        }
+        if (fr.hasRegisters()) return fr.getRegister(regnum);
     }
 
     // Otherwise it can be in the global registers.
-    if (regnum < numGlobalRegisters) {
-        v = m_global_register[regnum];
-        return 1;
-    }
-
-    return 0;
+    return _vm.getRegister(regnum);
 }
 
 void
 as_environment::markReachableResources() const
 {
-    for (size_t i = 0; i < 4; ++i) {
-        m_global_register[i].setReachable();
-    }
-
+    
     if (m_target) m_target->setReachable();
     if (_original_target) _original_target->setReachable();
 

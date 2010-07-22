@@ -2045,16 +2045,17 @@ ActionPushData(ActionExec& thread)
 
             case pushRegister: // 4
             {
-                unsigned int reg = code[3 + i];
+                const size_t reg = code[3 + i];
                 ++i;
-                as_value v;
-                if (!env.getRegister(reg, v)) {
+                const as_value* v = env.getRegister(reg);
+                if (!v) {
                     IF_VERBOSE_MALFORMED_SWF(
                         log_swferror(_("Invalid register %d in ActionPush"),
                             reg);
                     );
+                    env.push(as_value());
                 }
-                env.push(v);
+                else env.push(*v);
                 break;
             }
 
@@ -3765,35 +3766,7 @@ ActionSetRegister(ActionExec& thread)
     const size_t reg = code[thread.getCurrentPC() + 3];
 
     // Save top of stack in specified register.
-    const int ret = env.setRegister(reg, env.top(0));
-
-    switch (ret) {
-        default:
-        case 0:
-        {
-            IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("Invalid register %d in ActionSetRegister"),
-                    reg);
-            );
-            break;
-        }
-        case 1:
-        {
-            IF_VERBOSE_ACTION (
-                log_action(_("-------------- global register[%d] = '%s'"),
-                    reg, env.top(0));
-            );
-            break;
-        }
-        case 2:
-        {
-            IF_VERBOSE_ACTION (
-                log_action(_("-------------- local register[%d] = '%s'"),
-                    reg, env.top(0));
-            );
-            break;
-        }
-    }
+    env.setRegister(reg, env.top(0));
 }
 
 

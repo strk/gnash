@@ -36,6 +36,7 @@ class VM;
 class Global_as;
 class movie_root;
 class string_table;
+class UserFunction;
 
 /// ActionScript execution environment.
 class as_environment
@@ -210,15 +211,6 @@ public:
     /// Create the specified local var if it doesn't exist already.
     void declare_local(const std::string& varname);
 
-    /// Add 'count' local registers (add space to end)
-    //
-    /// Local registers are only meaningful within a function2 context.
-    ///
-    void add_local_registers(unsigned int register_count) {
-        assert(!_localFrames.empty());
-        return _localFrames.back().resizeRegisters(register_count);
-    }
-
     /// Set value of a register (local or global).
     //
     /// When not in a function context the register will be
@@ -238,12 +230,7 @@ public:
     ///
     /// @param v
     /// Value to assign to the register
-    ///
-    /// @return 0 if register num is invalid
-    ///         1 if a global register was set
-    ///         2 if a local register was set
-    ///
-    unsigned int setRegister(unsigned int regnum, const as_value& v);
+    void setRegister(unsigned int regnum, const as_value& v);
 
     /// Get value of a register (local or global).
     //
@@ -259,18 +246,10 @@ public:
     /// or none (if regnum is not in the valid range of local
     /// registers).
     ///
-    /// @param regnum
-    /// Register number
-    ///
-    /// @param v
-    /// Output parameter, will be set to register
-    ///     value or untouched if 0 is returned.
-    ///
-    /// @return 0 if register num is invalid (v unmodified in this case)
-    ///         1 if a global register was set
-    ///         2 if a local register was set
-    ///
-    unsigned int getRegister(unsigned int regnum, as_value& v);
+    /// @param regnum   Register number
+    /// @return         A pointer to the register value or 0 if the register
+    ///                 was invalid. 
+    const as_value* getRegister(size_t regnum);
 
     /// Set the Nth local register to something
     void set_local_register(boost::uint8_t n, as_value &val) {
@@ -280,17 +259,10 @@ public:
     }
 
     /// Return a reference to the Nth global register.
-    as_value& global_register(unsigned int n) {
-        assert(n<4);
-        return m_global_register[n];
-    }
+    const as_value* global_register(unsigned int n);
 
     /// Set the Nth local register to something
-    void set_global_register(boost::uint8_t n, as_value &val) {
-        if (n <= 4) {
-            m_global_register[n] = val;
-        }
-    }
+    void set_global_register(boost::uint8_t n, as_value &val);
 
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources.
@@ -381,7 +353,7 @@ public:
         as_environment& _env;
 
     public:
-        FrameGuard(as_environment& env, as_function& func)
+        FrameGuard(as_environment& env, UserFunction& func)
             :
             _env(env)
         {
@@ -415,11 +387,7 @@ private:
     /// Stack of as_values in this environment
     SafeStack<as_value>& _stack;
 
-    static const short unsigned int numGlobalRegisters = 4;
-
     CallStack& _localFrames;
-
-    as_value m_global_register[numGlobalRegisters];
 
     /// Movie target. 
     DisplayObject* m_target;
@@ -438,7 +406,7 @@ private:
     /// @param func
     /// The function being called
     ///
-    void pushCallFrame(as_function& func);
+    void pushCallFrame(UserFunction& func);
 
     /// Remove current call frame from the stack
     //

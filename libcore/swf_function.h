@@ -19,24 +19,23 @@
 #ifndef GNASH_SWF_FUNCTION_H
 #define GNASH_SWF_FUNCTION_H
 
-#include "as_function.h" // for inheritance
-
-#include "smart_ptr.h"
 #include <vector>
 #include <cassert>
 #include <string>
 
+#include "UserFunction.h"
+#include "smart_ptr.h"
+
 // Forward declarations
 namespace gnash {
     class action_buffer;
-    class as_environmnet;
     class as_object;
 }
 
 namespace gnash {
 
 /// SWF-defined Function 
-class swf_function : public as_function
+class swf_function : public UserFunction
 {
 
 public:
@@ -114,6 +113,10 @@ public:
 	}
 
 	void set_is_function2() { _isFunction2 = true; }
+
+    size_t registers() const {
+        return _registerCount;
+    }
 
 	void set_local_register_count(boost::uint8_t ct) {
         assert(_isFunction2);

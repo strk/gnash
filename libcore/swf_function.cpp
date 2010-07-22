@@ -46,7 +46,7 @@ namespace {
 swf_function::swf_function(const action_buffer& ab, as_environment& env,
 			size_t start, const ScopeStack& scopeStack)
 	:
-	as_function(getGlobal(env)),
+	UserFunction(getGlobal(env)),
 	m_action_buffer(ab),
 	_env(env),
 	_scopeStack(scopeStack),
@@ -178,9 +178,6 @@ swf_function::call(const fn_call& fn)
 	else
 	{
 		// function2: most args go in registers; any others get pushed.
-		
-		// Create local registers.
-		_env.add_local_registers(_registerCount);
 
 		// Handle the implicit args.
 		// @@ why start at 1 ? Note that starting at 0 makes	

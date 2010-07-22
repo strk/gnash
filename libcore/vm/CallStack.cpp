@@ -18,17 +18,18 @@
 
 #include "CallStack.h"
 #include "as_object.h"
-#include "as_function.h" 
+#include "UserFunction.h" 
 #include "Global_as.h" 
 
 #include <ostream>
 
 namespace gnash {
 
-CallFrame::CallFrame(as_function* f)
+CallFrame::CallFrame(UserFunction* f)
     :
     _locals(new as_object(getGlobal(*f))),
-    _func(f)
+    _func(f),
+    _registers(_func->registers())
 {
     assert(_func);
 }
@@ -40,7 +41,6 @@ CallFrame::CallFrame(as_function* f)
 void
 CallFrame::markReachableResources() const
 {
-    // Func is always valid.
     assert(_func);
     _func->setReachable();
 

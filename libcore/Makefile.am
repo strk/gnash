@@ -244,6 +244,7 @@ EXTENSIONS_API = \
 	PropFlags.h	\
 	CharacterProxy.h \
 	builtin_function.h \
+	UserFunction.h \
 	NativeFunction.h \
 	as_function.h \
 	namedStrings.h \

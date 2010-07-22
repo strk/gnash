@@ -24,12 +24,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "GC.h"
-#include "string_table.h"
-#include "SafeStack.h"
-#include "CallStack.h"
-#include "smart_ptr.h"
-
 #include <map>
 #include <vector>
 #include <memory> 
@@ -38,6 +32,14 @@
 #include <boost/random.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/array.hpp>
+
+#include "GC.h"
+#include "string_table.h"
+#include "SafeStack.h"
+#include "CallStack.h"
+#include "smart_ptr.h"
+#include "as_value.h"
 
 // Forward declarations
 namespace gnash {
@@ -261,6 +263,10 @@ public:
 	/// Return a native function or null
 	NativeFunction* getNative(unsigned int x, unsigned int y) const;
 
+    const as_value* getRegister(size_t num);
+
+    void setRegister(size_t num, const as_value& val);
+
 #ifdef GNASH_USE_GC
 	void addStatic(GcResource* res)
 	{
@@ -326,6 +332,8 @@ private:
 	VirtualClock& _clock;
 
 	SafeStack<as_value>	_stack;
+
+    boost::array<as_value, 4> _globalRegisters;
 
 	CallStack _callStack;
 

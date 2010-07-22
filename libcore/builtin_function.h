@@ -19,7 +19,7 @@
 #ifndef GNASH_BUILTIN_FUNCTION_H
 #define GNASH_BUILTIN_FUNCTION_H
 
-#include "as_function.h" 
+#include "UserFunction.h" 
 #include "as_environment.h"
 #include "fn_call.h"
 
@@ -36,7 +36,7 @@ namespace gnash {
 //
 /// They are distinct from NativeFunctions, which are part of the player and
 /// do not go through the ActionScript interpreter.
-class builtin_function : public as_function
+class builtin_function : public UserFunction
 {
     typedef as_value (*ASFunction)(const fn_call& fn);
 
@@ -51,10 +51,17 @@ public:
 	/// 	For classes, the function pointer is the constructor.
 	builtin_function(Global_as& gl, ASFunction func)
 		:
-		as_function(gl),
+		UserFunction(gl),
 		_func(func)
 	{
 	}
+
+    /// Return the number of registers required for function execution
+    //
+    /// Gnash's C++ implementations of AS functions don't need any registers!
+    virtual size_t registers() const {
+        return 0;
+    }
 
 	/// Invoke this function or this Class constructor
 	virtual as_value call(const fn_call& fn)
