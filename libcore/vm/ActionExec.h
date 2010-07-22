@@ -19,14 +19,14 @@
 #ifndef GNASH_ACTIONEXEC_H
 #define GNASH_ACTIONEXEC_H
 
-#include "with_stack_entry.h"
-#include "as_environment.h" // for ScopeStack
-#include "SWF.h"
-#include "action_buffer.h"
-
 #include <string>
 #include <list>
 #include <vector>
+#include <boost/noncopyable.hpp>
+
+#include "as_environment.h" 
+#include "SWF.h"
+#include "action_buffer.h"
 
 // Forward declarations
 namespace gnash {
@@ -88,8 +88,33 @@ private:
 	as_value _lastThrow;
 };
 
+class With
+{
+public:	
+
+	With(as_object* obj, size_t end)
+		:
+		_object(obj),
+		_block_end_pc(end)
+	{
+	}
+
+	size_t end_pc() const {
+		return _block_end_pc;
+	}
+
+	as_object* object() const {
+		return _object;
+	}
+
+private:
+	as_object* _object;
+	size_t _block_end_pc;
+};
+
 /// Executor of an action_buffer 
-class ActionExec {
+class ActionExec : boost::noncopyable
+{
 
 private: 
 
@@ -142,7 +167,7 @@ private:
 	void cleanupAfterRun();
 
 	/// the 'with' stack associated with this execution thread
-	std::vector<with_stack_entry> _withStack;
+	std::vector<With> _withStack;
 
 	typedef as_environment::ScopeStack ScopeStack;
 
@@ -260,47 +285,20 @@ public:
 	/// Is this execution thread a function call ?
 	bool isFunction() const { return _func != 0; }
 
-    /// Get a pointer of the function being executed (if any)
-    const swf_function* getThisFunction() const { return _func; }
-
 	/// Get the current 'this' pointer, for use in function calls
 	as_object* getThisPointer();
 
 	/// Returns the scope stack associated with this execution thread
-	//
-	/// TODO: return by const ref instead
-	///
 	const ScopeStack& getScopeStack() const
 	{
 		return _scopeStack;
 	}
 
-	/// Return the maximum allowed 'with' stack limit.
-	//
-	/// See http://sswf.sourceforge.net/SWFalexref.html#action_with
-	/// for more info.
-	///
-	/// Note that Gnash have NO limit on the number of 'with'
-	/// stack entries, this information will only be used to
-	/// generate useful warnings for coders (if ActionScript errors
-	/// verbosity is enabled).
-	///
-	size_t getWithStackLimit() const 
-	{
-		return _withStackLimit;
-	}
-
 	/// Push an entry to the with stack
 	//
-	/// @return
-	///	true if the entry was pushed, false otherwise.
-	///	Note that false will *never* be returned as Gnash
-	///	removed the 'with' stack limit. If the documented
-	///	limit for stack (SWF# bound) is reached, and ActionScript
-	///	errors verbosity is enabled, a warning will be raised,
-	///	but the call will still succeed.
-	///	
-	bool pushWithEntry(const with_stack_entry& entry);
+	/// @return     true if the entry was pushed, false otherwise. This
+    ///             depends on the with stack limit.
+	bool pushWith(const With& entry);
 
 	/// Skip the specified number of action tags 
 	//
@@ -379,13 +377,10 @@ public:
 	/// A better, cleaner and less error-prone approach
 	/// would be providing a callFunction() method in
 	/// ActionExec. This will likely help debugger too
-	/// 
-	///
 	as_object* getTarget();
 
 	/// Execute.
-	void operator() ();
-
+	void operator()();
 
     // TODO: cut down these accessors.
     bool atActionTag(SWF::ActionType t) { return code[pc] == t; }

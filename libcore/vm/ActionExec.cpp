@@ -36,7 +36,6 @@
 #include "as_environment.h"
 #include "debugger.h"
 #include "SystemClock.h"
-#include "with_stack_entry.h"
 
 #include <sstream>
 #include <string>
@@ -647,7 +646,7 @@ ActionExec::skip_actions(size_t offset)
 }
 
 bool
-ActionExec::pushWithEntry(const with_stack_entry& entry)
+ActionExec::pushWith(const With& entry)
 {
     // See comment in header about _withStackLimit
     if (_withStack.size() >= _withStackLimit)
@@ -716,12 +715,10 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 as_object*
 ActionExec::getTarget()
 {
-    if (!_withStack.empty()) {
-        return _withStack.back().object();
-    }
-    else {
+    if (_withStack.empty()) {
         return getObject(env.get_target());
     }
+    return _withStack.back().object();
 }
 
 void

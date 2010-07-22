@@ -52,7 +52,6 @@
 #include "as_environment.h"
 #include "as_value.h"
 #include "RunResources.h"
-#include "with_stack_entry.h"
 #include "ObjectURI.h"
 
 #include <string>
@@ -2217,7 +2216,7 @@ ActionCallFrame(ActionExec& thread)
     std::string frame_var;
 
     DisplayObject* target = 0;
-    if (env.parse_path(target_frame, target_path, frame_var)) {
+    if (parsePath(target_frame, target_path, frame_var)) {
         target = env.find_target(target_path);
     }
     else {
@@ -2270,7 +2269,7 @@ ActionGotoExpression(ActionExec& thread)
     std::string frame_var;
 
     DisplayObject* target = NULL;
-    if (env.parse_path(target_frame, target_path, frame_var)) {
+    if (parsePath(target_frame, target_path, frame_var)) {
         target = env.find_target(target_path);
     }
 
@@ -2352,7 +2351,7 @@ ActionDelete(ActionExec& thread)
         }
 
         std::string path, var;
-        if (!as_environment::parse_path(propertyname, path, var))
+        if (!parsePath(propertyname, path, var))
         {
             // It's not a path. For SWF 7 and above, don't delete. Otherwise
             // assume it's a variable and try to delete.
@@ -2409,7 +2408,7 @@ ActionDelete2(ActionExec& thread)
 
     // If it's not a path, delete it as a variable.
     std::string path, var;
-    if (!as_environment::parse_path(propertyname, path, var)) {
+    if (!parsePath(propertyname, path, var)) {
         // See bug #18482, this works fine now (assuming the bug
         // report is correct)
         env.top(0) = thread.delVariable(propertyname);
@@ -3654,7 +3653,7 @@ ActionWith(ActionExec& thread)
     // where does the 'with' block end?
     const size_t block_end = thread.getNextPC() + block_length;
 
-    if (!thread.pushWithEntry(with_stack_entry(with_obj, block_end)))
+    if (!thread.pushWith(With(with_obj, block_end)))
     {
         // skip the full block
         thread.adjustNextPC(block_length);
