@@ -110,7 +110,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
         // We assume that the swf_function () operator already initialized
         // its environment so that its activation object is now in the
         // top element of the CallFrame stack
-        CallFrame& topFrame = newEnv.topCallFrame();
+        CallFrame& topFrame = getVM(newEnv).currentCall();
         assert(&topFrame.function() == &func);
         _scopeStack.push_back(&topFrame.locals());
     }

@@ -251,19 +251,6 @@ public:
     ///                 was invalid. 
     const as_value* getRegister(size_t regnum);
 
-    /// Set the Nth local register to something
-    void set_local_register(boost::uint8_t n, as_value &val) {
-        if (! _localFrames.empty()) {
-            _localFrames.back().setRegister(n, val);
-        }
-    }
-
-    /// Return a reference to the Nth global register.
-    const as_value* global_register(unsigned int n);
-
-    /// Set the Nth local register to something
-    void set_global_register(boost::uint8_t n, as_value &val);
-
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources.
     //
@@ -345,35 +332,6 @@ public:
     ///
     bool parse_path(const std::string& var_path, as_object** target, as_value& val);
 
-    /// A class to wrap frame access.  Stack allocating a frame guard
-    /// will ensure that all CallFrame pushes have a corresponding
-    /// CallFrame pop, even in the presence of extraordinary returns.
-    class FrameGuard
-    {
-        as_environment& _env;
-
-    public:
-        FrameGuard(as_environment& env, UserFunction& func)
-            :
-            _env(env)
-        {
-            _env.pushCallFrame(func);
-        }
-
-        ~FrameGuard()
-        {
-            _env.popCallFrame();
-        }
-    };
-
-    /// Get top element of the call stack
-    //
-    CallFrame& topCallFrame()
-    {
-        assert(!_localFrames.empty());
-        return _localFrames.back();
-    }
-
 private:
 
     VM& _vm;
@@ -381,33 +339,12 @@ private:
     /// Stack of as_values in this environment
     SafeStack<as_value>& _stack;
 
-    CallStack& _localFrames;
-
     /// Movie target. 
     DisplayObject* m_target;
 
     /// Movie target. 
     DisplayObject* _original_target;
 
-    /// Push a frame on the calls stack.
-    //
-    /// This should happen right before calling an ActionScript
-    /// function. Function local registers and variables
-    /// must be set *after* pushCallFrame has been invoked
-    ///
-    /// Call popCallFrame() at ActionScript function return.
-    ///
-    /// @param func
-    /// The function being called
-    ///
-    void pushCallFrame(UserFunction& func);
-
-    /// Remove current call frame from the stack
-    //
-    /// This should happen when an ActionScript function returns.
-    ///
-    void popCallFrame();
-    
     /// Given a variable name, set its value (no support for path)
     //
     /// If no variable with that name is found, a new one

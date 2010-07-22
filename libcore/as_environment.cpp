@@ -111,7 +111,6 @@ as_environment::as_environment(VM& vm)
     :
     _vm(vm),
     _stack(_vm.getStack()),
-    _localFrames(_vm.getCallStack()),
     m_target(0),
     _original_target(0)
 {
@@ -436,21 +435,15 @@ as_environment::set_variable_raw(const std::string& varname,
 void
 as_environment::set_local(const std::string& varname, const as_value& val)
 {
-    // why would you want to set a local if there's no call frame on the
-    // stack ?
-    assert( ! _localFrames.empty() );
-
     string_table::key varkey = _vm.getStringTable().find(varname);
     // Is it in the current frame already?
-    if ( setLocal(varname, val) )
-    {
+    if (setLocal(varname, val)) {
         return;
     }
-    else
-    {
+    else {
         // Not in frame; create a new local var.
         assert(!varname.empty()); // null varnames are invalid!
-        as_object& locals = _localFrames.back().locals();
+        as_object& locals = _vm.currentCall().locals();
         //locals.push_back(as_environment::frame_slot(varname, val));
         locals.set_member(varkey, val);
     }
@@ -464,9 +457,9 @@ as_environment::declare_local(const std::string& varname)
     if ( ! findLocal(varname, tmp) )
     {
         // Not in frame; create a new local var.
-        assert(!_localFrames.empty());
+        assert(_vm.callDepth());
         assert( ! varname.empty() );    // null varnames are invalid!
-        as_object& locals = _localFrames.back().locals();
+        as_object& locals = _vm.currentCall().locals();
         locals.set_member(_vm.getStringTable().find(varname), as_value());
     }
 }
@@ -700,6 +693,7 @@ as_environment::get_version() const
 void
 as_environment::dump_local_registers(std::ostream& out) const
 {
+#if 0
     if ( _localFrames.empty() ) return;
     out << "Local registers: ";
     for (CallStack::const_iterator it=_localFrames.begin(),
@@ -708,6 +702,7 @@ as_environment::dump_local_registers(std::ostream& out) const
         out << *it;
     }
     out << std::endl;
+#endif
 }
 
 static void
@@ -729,6 +724,7 @@ dump(as_object& locals, std::ostream& out)
 void
 as_environment::dump_local_variables(std::ostream& out) const
 {
+#if 0
     if ( _localFrames.empty() ) return;
     out << "Local variables: ";
     for (CallStack::iterator it=_localFrames.begin(),
@@ -738,6 +734,7 @@ as_environment::dump_local_variables(std::ostream& out) const
         dump(it->locals(), out);
     }
     out << std::endl;
+#endif
 }
 
 void
@@ -766,9 +763,9 @@ bool
 as_environment::findLocal(const std::string& varname, as_value& ret,
         as_object** retTarget) const
 {
-    if (_localFrames.empty()) return false;
+    if (!_vm.callDepth()) return false;
 
-    as_object& locals = _localFrames.back().locals();
+    as_object& locals = _vm.currentCall().locals();
 
     if (getLocal(locals, varname, ret)) {
         if (retTarget) *retTarget = &locals;
@@ -781,51 +778,20 @@ as_environment::findLocal(const std::string& varname, as_value& ret,
 bool
 as_environment::delLocal(const std::string& varname)
 {
-    if (_localFrames.empty()) return false;
-    return deleteLocal(_localFrames.back().locals(), varname);
+    if (!_vm.callDepth()) return false;
+    return deleteLocal(_vm.currentCall().locals(), varname);
 }
 
 bool
 as_environment::setLocal(const std::string& varname, const as_value& val)
 {
-    if (_localFrames.empty()) return false;
+    if (!_vm.callDepth()) return false;
 
     // If this name is not qualified, the compiler fails to look beyond
     // as_environment::setLocal.
-    return gnash::setLocal(_localFrames.back().locals(), varname, val);
+    return gnash::setLocal(_vm.currentCall().locals(), varname, val);
 }
 
-void
-as_environment::pushCallFrame(UserFunction& func)
-{
-
-    // The stack size can be changed by the ScriptLimits
-    // tag. There is *no* difference between SWF versions.
-    // TODO: override from gnashrc.
-    
-    // A stack size of 0 is apparently legitimate.
-    const boost::uint16_t recursionLimit = _vm.getRoot().getRecursionLimit();
-
-    // Don't proceed if local call frames would reach the recursion limit.
-    if (_localFrames.size() + 1 >= recursionLimit) {
-
-        std::ostringstream ss;
-        ss << boost::format(_("Recursion limit reached (%u)")) % recursionLimit;
-
-        // throw something
-        throw ActionLimitException(ss.str()); 
-    }
-
-    _localFrames.push_back(CallFrame(&func));
-
-}
-
-void 
-as_environment::popCallFrame()
-{
-    assert(!_localFrames.empty());
-    _localFrames.pop_back();
-}
     
 void
 as_environment::set_target(DisplayObject* target)
@@ -838,9 +804,9 @@ void
 as_environment::add_local(const std::string& varname, const as_value& val)
 {
     assert(!varname.empty());   
-    assert(!_localFrames.empty());
+    assert(_vm.callDepth());
 
-    as_object& locals = _localFrames.back().locals();
+    as_object& locals = _vm.currentCall().locals();
     locals.set_member(_vm.getStringTable().find(varname), val);
 }
 
@@ -873,10 +839,10 @@ as_environment::setRegister(unsigned int regnum, const as_value& v)
 {
     // If there is a call frame and it has registers, the value must be
     // set there.
-    if (!_localFrames.empty()) {
-        CallFrame& fr = _localFrames.back();
+    if (_vm.callDepth()) {
+        CallFrame& fr = _vm.currentCall();
         if (fr.hasRegisters()) {
-            _localFrames.back().setRegister(regnum, v);
+            _vm.currentCall().setRegister(regnum, v);
             return;
         }
     }
@@ -886,25 +852,12 @@ as_environment::setRegister(unsigned int regnum, const as_value& v)
 }
 
 const as_value*
-as_environment::global_register(unsigned int n)
-{
-    // May return 0
-    return _vm.getRegister(n);
-}
-
-void
-as_environment::set_global_register(boost::uint8_t n, as_value &val)
-{
-    _vm.setRegister(n, val);
-}
-
-const as_value*
 as_environment::getRegister(size_t regnum)
 {
     // If there is a call frame and it has registers, the value must be
     // sought there.
-    if (!_localFrames.empty()) {
-        const CallFrame& fr = _localFrames.back();
+    if (_vm.callDepth()) {
+        const CallFrame& fr = _vm.currentCall();
         if (fr.hasRegisters()) return fr.getRegister(regnum);
     }
 
@@ -915,12 +868,8 @@ as_environment::getRegister(size_t regnum)
 void
 as_environment::markReachableResources() const
 {
-    
     if (m_target) m_target->setReachable();
     if (_original_target) _original_target->setReachable();
-
-    // _localFrames and _stack are taken care of by VM
-
 }
 #endif // GNASH_USE_GC
 

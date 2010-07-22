@@ -66,8 +66,7 @@ public:
 	/// Invoke this function or this Class constructor
 	virtual as_value call(const fn_call& fn)
 	{
-        as_environment env = fn.env();
-		as_environment::FrameGuard guard(env, *this);
+		FrameGuard guard(getVM(fn), *this);
 
 		assert(_func);
 		return _func(fn);

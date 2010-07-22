@@ -273,6 +273,45 @@ VM::setRegister(size_t index, const as_value& val)
     if (index < _globalRegisters.size()) _globalRegisters[index] = val;
 }
 
+CallFrame&
+VM::currentCall()
+{
+    assert(!_callStack.empty());
+    return _callStack.back();
+}
+
+void
+VM::pushCallFrame(UserFunction& func)
+{
+
+    // The stack size can be changed by the ScriptLimits
+    // tag. There is *no* difference between SWF versions.
+    // TODO: override from gnashrc.
+    
+    // A stack size of 0 is apparently legitimate.
+    const boost::uint16_t recursionLimit = getRoot().getRecursionLimit();
+
+    // Don't proceed if local call frames would reach the recursion limit.
+    if (_callStack.size() + 1 >= recursionLimit) {
+
+        std::ostringstream ss;
+        ss << boost::format(_("Recursion limit reached (%u)")) % recursionLimit;
+
+        // throw something
+        throw ActionLimitException(ss.str()); 
+    }
+
+    _callStack.push_back(CallFrame(&func));
+
+}
+
+void 
+VM::popCallFrame()
+{
+    assert(!_callStack.empty());
+    _callStack.pop_back();
+}
+
 void
 VmGcRoot::markReachableResources() const
 {

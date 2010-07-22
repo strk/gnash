@@ -52,6 +52,7 @@ namespace gnash {
 	class as_value;
 	class as_object;
 	class VirtualClock;
+    class UserFunction;
 }
 
 namespace gnash {
@@ -121,10 +122,6 @@ public:
 
 	SafeStack<as_value>& getStack() {
 		return _stack;
-	}
-
-	CallStack& getCallStack() {
-		return _callStack;
 	}
 
     /// Get the VM clock
@@ -267,6 +264,16 @@ public:
 
     void setRegister(size_t num, const as_value& val);
 
+    void pushCallFrame(UserFunction& f);
+
+    void popCallFrame();
+
+    CallFrame& currentCall();
+
+    size_t callDepth() const {
+        return _callStack.size();
+    }
+
 #ifdef GNASH_USE_GC
 	void addStatic(GcResource* res)
 	{
@@ -348,6 +355,28 @@ private:
     /// the correct object prototypes etc.
     AVMVersion _avmVersion;
 
+};
+
+/// A class to wrap frame access.  Stack allocating a frame guard
+/// will ensure that all CallFrame pushes have a corresponding
+/// CallFrame pop, even in the presence of extraordinary returns.
+class FrameGuard
+{
+public:
+    FrameGuard(VM& vm, UserFunction& func)
+        :
+        _vm(vm)
+    {
+        _vm.pushCallFrame(func);
+    }
+
+    ~FrameGuard()
+    {
+        _vm.popCallFrame();
+    }
+
+private:
+    VM& _vm;
 };
 
 /////////////////////////////////////////////////////////////////////////////
