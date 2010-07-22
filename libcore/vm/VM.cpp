@@ -93,8 +93,7 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 	_swfversion(version),
 	_clock(clock),
 	_stack(),
-    _shLib(new SharedObjectLibrary(*this)),
-    _avmVersion(AVM1)
+    _shLib(new SharedObjectLibrary(*this))
 {
 	_clock.restart();
 }

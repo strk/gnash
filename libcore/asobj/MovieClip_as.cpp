@@ -2230,7 +2230,6 @@ movieclip_attachBitmap(const fn_call& fn)
 as_value
 movieclip_as2_ctor(const fn_call& fn)
 {
-    assert(!isAS3(fn));
     return as_value();
 }
 

@@ -1718,7 +1718,7 @@ MovieClip::constructAsScriptObject()
     // A MovieClip should always have an associated object.
     assert(mc);
 
-    if (!isAS3(getVM(*mc)) && !get_parent()) {
+    if (!get_parent()) {
         mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
     }
 

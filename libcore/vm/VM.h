@@ -68,26 +68,22 @@ private:
     VM& _vm;
 };
 
-/// The virtual machine
+/// The AVM1 virtual machine
 //
-/// This is the machine that executes all actions in the 
-/// main movie, including the actions in movies loaded by
-/// it.
-///
-/// Note that the target SWF version of the "main" movie
-/// (the first movie loaded, the 'root' movie) drives
-/// the operation, as depending on that version the Virtual
-/// Machine acts differently, for backward compatibility.
-/// 
-/// The VM is initialized once for each "stage" (main movie).
-/// Gnash currently only supports a *single* VM as it uses
-/// gloabls a lot. Definition of this class is aimed at
-/// grouping the globals into a specific VM instance that
-/// we might pass around in the future to allow multiple
-/// movies runs.
-/// For the moment, it will be a singleton, providing one-time
-/// initialization.
-///
+/// The VM class has no code for execution, but rather stores the resources
+/// needed for execution:
+//
+/// 1. The stack
+/// 2. Global registers
+/// 3. The call stack.
+//
+/// Actual execution is done by ActionExec.
+//
+/// This header also contains a few utility functions for ActionScript
+/// operations.
+//
+/// Currently the VM is a singleton, but this usage is deprecated. In future
+/// is should be fully re-entrant.
 class DSOEXPORT VM : boost::noncopyable
 {
 
@@ -95,12 +91,6 @@ public:
 
 	typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 
-    enum AVMVersion
-    {
-        AVM1,
-        AVM2
-    };
-	
     /// \brief
 	/// Initialize the virtual machine singleton with the given
 	/// movie definition and return a reference to it.
@@ -166,19 +156,6 @@ public:
 
 	/// Set SWF version of the currently executing code
 	void setSWFVersion(int v);
-
-    /// Get the version of the currently executing VM
-    //
-    /// Note: this value changes according to the current execution context;
-    /// do not use it to determine what VM version a particular SWF uses.
-    AVMVersion getAVMVersion() const {
-        return _avmVersion;
-    }
-
-    /// Set the version of the currently executing VM.
-    void setAVMVersion(AVMVersion v) {
-        _avmVersion = v;
-    }
 
 	/// Get the number of milliseconds since VM was started
 	unsigned long int getTime() const;
@@ -347,14 +324,6 @@ private:
 	/// Library of SharedObjects. Owned by the VM.
     std::auto_ptr<SharedObjectLibrary> _shLib;
 
-    /// The currently executing machine
-    //
-    /// This is a hack like switching the SWF version, but without this
-    /// there is no way for AS functions to know which version of the
-    /// virtual machine called them. This is necessary e.g. for initializing
-    /// the correct object prototypes etc.
-    AVMVersion _avmVersion;
-
 };
 
 /// A class to wrap frame access.  Stack allocating a frame guard
@@ -417,13 +386,6 @@ void subtract(as_value& op1, const as_value& op2, VM& vm);
 /// @param op2      The second comparand.
 /// @param vm       The VM executing the operation.
 as_value newLessThan(const as_value& op1, const as_value& op2, VM& vm);
-
-/// Return true if the VM is executing AS3 (ABC bytecode).
-inline bool
-isAS3(VM& vm)
-{
-    return vm.getAVMVersion() == VM::AVM2;
-}
 
 } // namespace gnash
 
