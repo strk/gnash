@@ -151,7 +151,7 @@ swf_function::call(const fn_call& fn)
 		{
 			assert(_args[i].reg == 0);
 			if (i < fn.nargs) {
-                addLocal(cf, _args[i].name, fn.arg(i));
+                setLocal(cf, _args[i].name, fn.arg(i));
 			}
 			else {
 				// Still declare named arguments, even if
@@ -162,21 +162,21 @@ swf_function::call(const fn_call& fn)
 		}
 
 		// Add 'this'
-        addLocal(cf, NSV::PROP_THIS, fn.this_ptr ? fn.this_ptr : as_value());
+        setLocal(cf, NSV::PROP_THIS, fn.this_ptr ? fn.this_ptr : as_value());
 
         as_object* super = fn.super ? fn.super :
             fn.this_ptr ? fn.this_ptr->get_super() : 0;
 
 		// Add 'super' (SWF6+ only)
 		if (super && swfversion > 5) {
-            addLocal(cf, NSV::PROP_SUPER, super);
+            setLocal(cf, NSV::PROP_SUPER, super);
 		}
 
 		// Add 'arguments'
         as_object* args = getGlobal(fn).createArray();
         string_table& st = getStringTable(fn);
         // Put 'arguments' in a local var.
-        addLocal(cf, st.find("arguments"),
+        setLocal(cf, st.find("arguments"),
                 getArguments(*this, *args, fn, caller));
 	}
 	else
@@ -203,7 +203,7 @@ swf_function::call(const fn_call& fn)
             }
             else {
                 // Put 'this' in a local var.
-                addLocal(cf, NSV::PROP_THIS,
+                setLocal(cf, NSV::PROP_THIS,
                         fn.this_ptr ? fn.this_ptr : as_value());
             }
         }
@@ -230,7 +230,7 @@ swf_function::call(const fn_call& fn)
             else {
                 string_table& st = getStringTable(fn);
                 // Put 'arguments' in a local var.
-                addLocal(cf, st.find("arguments"), args);
+                setLocal(cf, st.find("arguments"), args);
             }
 
         }
@@ -249,7 +249,7 @@ swf_function::call(const fn_call& fn)
 				current_reg++;
 			}
             else if (super) {
-                addLocal(cf, NSV::PROP_SUPER, super);
+                setLocal(cf, NSV::PROP_SUPER, super);
             }
 		}
 
@@ -289,7 +289,7 @@ swf_function::call(const fn_call& fn)
 			if (!_args[i].reg) {
 				if (i < fn.nargs) {
 					// Conventional arg passing: create a local var.
-					addLocal(cf, _args[i].name, fn.arg(i));
+					setLocal(cf, _args[i].name, fn.arg(i));
 				}
 				else {
 					// Still declare named arguments, even if

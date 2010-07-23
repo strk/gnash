@@ -114,7 +114,7 @@ private:
 
 void declareLocal(CallFrame& c, string_table::key name);
 
-void addLocal(CallFrame& c, string_table::key name, const as_value& val);
+void setLocal(CallFrame& c, string_table::key name, const as_value& val);
 
 typedef std::vector<CallFrame> CallStack;
 

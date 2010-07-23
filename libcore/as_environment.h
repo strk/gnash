@@ -182,33 +182,6 @@ public:
     void set_variable(const std::string& path, const as_value& val,
         const ScopeStack& scopeStack);
 
-    /// Set/initialize the value of the local variable.
-    //
-    /// If no *local* variable with that name is found, a new one
-    /// will be created.
-    ///
-    /// @param varname
-    /// Variable name. Can not contain path elements.
-    /// TODO: should be case-insensitive up to SWF6.
-    ///
-    /// @param val
-    /// The value to assign to the variable. 
-    ///
-    void set_local(const std::string& varname, const as_value& val);
-
-    /// \brief
-    /// Add a local var with the given name and value to our
-    /// current local frame. 
-    ///
-    /// Use this when you know the var
-    /// doesn't exist yet, since it's faster than set_local();
-    /// e.g. when setting up args for a function.
-    ///
-    void add_local(const std::string& varname, const as_value& val);
-
-    /// Create the specified local var if it doesn't exist already.
-    void declare_local(const std::string& varname);
-
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources.
     //
@@ -330,18 +303,6 @@ private:
     /// @return true if the variable was found and deleted, false otherwise
     ///
     bool delLocal(const std::string& varname);
-
-    /// Set a local variable, if it exists.
-    //
-    /// @param varname
-    /// Name of the local variable
-    ///
-    /// @param val
-    /// Value to assign to the variable
-    ///
-    /// @return true if the variable was found, false otherwise
-    ///
-    bool setLocal(const std::string& varname, const as_value& val);
 
     static as_value undefVal;
         

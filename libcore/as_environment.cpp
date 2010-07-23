@@ -415,7 +415,9 @@ as_environment::set_variable_raw(const std::string& varname,
     }
     
     const int swfVersion = vm.getSWFVersion();
-    if (swfVersion < 6 && setLocal(varname, val)) return;
+    if (swfVersion < 6 && _vm.calling()) {
+       if (setLocal(_vm.currentCall().locals(), varname, val)) return;
+    }
     
     // TODO: shouldn't m_target be in the scope chain ?
     if (m_target) getObject(m_target)->set_member(varkey, val);
@@ -680,17 +682,6 @@ as_environment::delLocal(const std::string& varname)
     return deleteLocal(_vm.currentCall().locals(), varname);
 }
 
-bool
-as_environment::setLocal(const std::string& varname, const as_value& val)
-{
-    if (!_vm.calling()) return false;
-
-    // If this name is not qualified, the compiler fails to look beyond
-    // as_environment::setLocal.
-    return gnash::setLocal(_vm.currentCall().locals(), varname, val);
-}
-
-    
 void
 as_environment::set_target(DisplayObject* target)
 {

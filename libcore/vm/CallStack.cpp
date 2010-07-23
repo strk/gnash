@@ -20,6 +20,7 @@
 #include "as_object.h"
 #include "UserFunction.h" 
 #include "Global_as.h" 
+#include "Property.h"
 
 #include <ostream>
 
@@ -61,7 +62,7 @@ declareLocal(CallFrame& c, string_table::key name)
 }
 
 void
-addLocal(CallFrame& c, string_table::key name, const as_value& val)
+setLocal(CallFrame& c, string_table::key name, const as_value& val)
 {
     as_object& locals = c.locals();
 

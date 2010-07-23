@@ -696,7 +696,7 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
     if (isFunction()) {
         string_table& st = getStringTable(env);
         // TODO: set local in the function object?
-        addLocal(getVM(env).currentCall(), st.find(name), val);
+        setLocal(getVM(env).currentCall(), st.find(name), val);
     } else {
         // TODO: set target member  ?
         //       what about 'with' stack ?
