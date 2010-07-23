@@ -1909,7 +1909,6 @@ ActionStrictMode(ActionExec& thread)
 void
 ActionWaitForFrameExpression(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
@@ -2137,8 +2136,6 @@ ActionPushData(ActionExec& thread)
 void
 ActionBranchAlways(ActionExec& thread)
 {
-    
-
     boost::int16_t offset = thread.code.read_int16(thread.getCurrentPC()+3);
     thread.adjustNextPC(offset);
     // @@ TODO range checks
@@ -2147,7 +2144,6 @@ ActionBranchAlways(ActionExec& thread)
 void
 ActionGetUrl2(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     const action_buffer& code = thread.code;
@@ -2173,8 +2169,6 @@ ActionGetUrl2(ActionExec& thread)
 void
 ActionBranchIfTrue(ActionExec& thread)
 {
-
-    // Alias these
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
@@ -2206,7 +2200,6 @@ ActionBranchIfTrue(ActionExec& thread)
 void
 ActionCallFrame(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
     const std::string& target_frame = env.top(0).to_string();
@@ -2239,12 +2232,10 @@ ActionCallFrame(ActionExec& thread)
 void
 ActionGotoExpression(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
-
 
     // From Alexis SWF ref:
     //
@@ -2257,7 +2248,6 @@ ActionGotoExpression(ActionExec& thread)
     // When f_play is ON, the action is to play as soon as
     // that frame is reached. Otherwise, the
     // frame is shown in stop mode.
-
     unsigned char play_flag = code[pc + 3];
     const MovieClip::PlayState state = 
         play_flag ? MovieClip::PLAYSTATE_PLAY : MovieClip::PLAYSTATE_STOP;
@@ -2307,7 +2297,6 @@ ActionGotoExpression(ActionExec& thread)
 void
 ActionDelete(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -2368,7 +2357,7 @@ ActionDelete(ActionExec& thread)
     }
     else {
         // Don't create an object! Only get the value if it is an object
-        // alreay.
+        // already.
         if (env.top(1).is_object()) {
             obj = toObject(getGlobal(thread.env), env.top(1));
         }
