@@ -589,9 +589,6 @@ ActionExec::cleanupAfterRun()
     // Have movie_root flush any newly pushed actions in higher priority queues
     getRoot(env).flushHigherPriorityActionQueues();
 
-//    log_debug("After cleanup of ActionExec %p, env %p has "
-//        "stack size of %d and callStackDepth of %d",
-//        (void*)this, (void*)&env, env.stack_size(), env.callStackDepth());
 }
 
 void
@@ -714,7 +711,7 @@ ActionExec::getTarget()
 }
 
 void
-ActionExec::pushTryBlock(TryBlock& t)
+ActionExec::pushTryBlock(TryBlock t)
 {
     // The current block should end at the end of the try block.
     t._savedEndOffset = stop_pc;

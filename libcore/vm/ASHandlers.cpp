@@ -3559,19 +3559,17 @@ ActionTry(ActionExec& thread)
     if (!doFinally) finallySize = 0;
     if (!doCatch) catchSize = 0;
 
-    if (!catchInRegister)
-    {
+    if (!catchInRegister) {
         catchName = code.read_string(i);
         i += strlen(catchName) + 1;
-        TryBlock t(i, trySize, catchSize, finallySize, catchName);
-        thread.pushTryBlock(t);
+        thread.pushTryBlock(
+                TryBlock(i, trySize, catchSize, finallySize, catchName));
     }
-    else
-    {
+    else {
         catchRegister = code[i];
         ++i;
-        TryBlock t(i, trySize, catchSize, finallySize, catchRegister);
-        thread.pushTryBlock(t);
+        thread.pushTryBlock(
+                TryBlock(i, trySize, catchSize, finallySize, catchRegister));
     }
 
     thread.setNextPC(i); // Proceed into the try block.

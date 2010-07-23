@@ -231,7 +231,7 @@ public:
 	/// \brief
 	/// Use this to push a try block.
 	/// t will be copied
-	void pushTryBlock(TryBlock& t);
+	void pushTryBlock(TryBlock t);
 
 	/// \brief
 	/// Set the return value.
