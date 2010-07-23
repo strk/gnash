@@ -450,21 +450,6 @@ as_environment::set_variable_raw(const std::string& varname,
     }
 }
 
-bool
-as_environment::parse_path(const std::string& var_path, as_object** target,
-        as_value& val)
-{
-    std::string path;
-    std::string var;
-    if (!parsePath(var_path, path, var)) return false;
-    as_object* target_ptr = find_object(path); 
-    if ( ! target_ptr ) return false;
-
-    target_ptr->get_member(_vm.getStringTable().find(var), &val);
-    *target = target_ptr;
-    return true;
-}
-
 // Search for next '.' or '/' DisplayObject in this word.  Return
 // a pointer to it, or to NULL if it wasn't found.
 static const char*

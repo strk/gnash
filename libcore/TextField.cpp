@@ -34,7 +34,7 @@
 #include "MovieClip.h"
 #include "TextField.h"
 #include "movie_root.h"     // for killing focus
-#include "as_environment.h" // for parse_path
+#include "as_environment.h" 
 #include "Font.h" 
 #include "fontlib.h" 
 #include "namedStrings.h"

@@ -2274,7 +2274,7 @@ ActionGotoExpression(ActionExec& thread)
         target = env.find_target(target_path);
     }
 
-    // 4.11 would make parse_path above return true,
+    // 4.11 would make parsePath above return true,
     // we should check if a sprite named '4' is supposed to work
     // in that case
     if (!target) {

@@ -215,31 +215,6 @@ public:
     ///
     int get_version() const;
 
-    /// \brief
-    /// Try to parse a string as a variable path
-    //
-    /// Variable paths come in the form:
-    ///
-    ///     /path/to/some/sprite/:varname
-    ///
-    /// or
-    ///
-    ///     /path/to/some/sprite 
-    ///
-    /// or
-    /// path.to.some.var
-    ///
-    /// If there's no dot nor colon, or if the 'path' part
-    /// does not resolve to an object, this function returns false.
-    /// Otherwise, true is returned and 'target' and 'val'
-    /// parameters are appropriaterly set.
-    ///
-    /// Note that if the parser variable name doesn't exist in the found
-    /// target, the 'val' will be undefined, but no other way to tell whether
-    /// the variable existed or not from the caller...
-    ///
-    bool parse_path(const std::string& var_path, as_object** target, as_value& val);
-
 private:
 
     VM& _vm;
