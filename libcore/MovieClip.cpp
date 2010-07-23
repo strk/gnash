@@ -36,7 +36,6 @@
 #include "swf_event.h"
 #include "sprite_definition.h"
 #include "ActionExec.h"
-#include "builtin_function.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "VM.h"
 #include "Range2d.h" // for getBounds
