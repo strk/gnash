@@ -70,6 +70,9 @@ static Debugger& debugger = Debugger::getDefaultInstance();
 ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
         as_value* nRetVal, as_object* this_ptr)
     :
+    code(func.getActionBuffer()),
+    env(newEnv),
+    retval(nRetVal),
     _withStack(),
     _scopeStack(func.getScopeStack()),
     _withStackLimit(7),
@@ -83,10 +86,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
     _abortOnUnload(false),
     pc(func.getStartPC()),
     next_pc(pc),
-    stop_pc(pc + func.getLength()),
-    code(func.getActionBuffer()),
-    env(newEnv),
-    retval(nRetVal)
+    stop_pc(pc + func.getLength())
 {
     assert(stop_pc < code.size());
 
@@ -120,8 +120,11 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
 ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
         bool abortOnUnloaded)
     :
+    code(abuf),
+    env(newEnv),
+    retval(0),
     _withStack(),
-    _scopeStack(), // TODO: initialize the scope stack somehow
+    _scopeStack(),
     _withStackLimit(7),
     _func(0),
     _initialStackSize(0),
@@ -132,10 +135,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
     _abortOnUnload(abortOnUnloaded),
     pc(0),
     next_pc(0),
-    stop_pc(abuf.size()),
-    code(abuf),
-    env(newEnv),
-    retval(0)
+    stop_pc(abuf.size())
 {
     /// See comment in header
     // TODO: stack limit dependent on function version or VM version ?
@@ -589,9 +589,6 @@ ActionExec::cleanupAfterRun()
     // Have movie_root flush any newly pushed actions in higher priority queues
     getRoot(env).flushHigherPriorityActionQueues();
 
-//    log_debug("After cleanup of ActionExec %p, env %p has "
-//        "stack size of %d and callStackDepth of %d",
-//        (void*)this, (void*)&env, env.stack_size(), env.callStackDepth());
 }
 
 void
@@ -714,7 +711,7 @@ ActionExec::getTarget()
 }
 
 void
-ActionExec::pushTryBlock(TryBlock& t)
+ActionExec::pushTryBlock(TryBlock t)
 {
     // The current block should end at the end of the try block.
     t._savedEndOffset = stop_pc;
@@ -743,12 +740,6 @@ ActionExec::adjustNextPC(int offset)
         return;
     }
     next_pc += offset;
-}
-
-bool
-ActionExec::isFunction2() const
-{
-    return _func ? _func->isFunction2() : false;
 }
 
 void

@@ -1749,8 +1749,6 @@ ActionChr(ActionExec& thread)
 void
 ActionGetTimer(ActionExec& thread)
 {
-    
-    
     as_environment& env = thread.env;
 
     const VM& vm = getVM(env);
@@ -1760,7 +1758,6 @@ ActionGetTimer(ActionExec& thread)
 void
 ActionMbSubString(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     const as_value& arg0 = env.top(0);
@@ -1912,7 +1909,6 @@ ActionStrictMode(ActionExec& thread)
 void
 ActionWaitForFrameExpression(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
@@ -2140,8 +2136,6 @@ ActionPushData(ActionExec& thread)
 void
 ActionBranchAlways(ActionExec& thread)
 {
-    
-
     boost::int16_t offset = thread.code.read_int16(thread.getCurrentPC()+3);
     thread.adjustNextPC(offset);
     // @@ TODO range checks
@@ -2150,7 +2144,6 @@ ActionBranchAlways(ActionExec& thread)
 void
 ActionGetUrl2(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     const action_buffer& code = thread.code;
@@ -2176,8 +2169,6 @@ ActionGetUrl2(ActionExec& thread)
 void
 ActionBranchIfTrue(ActionExec& thread)
 {
-
-    // Alias these
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
@@ -2209,7 +2200,6 @@ ActionBranchIfTrue(ActionExec& thread)
 void
 ActionCallFrame(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
     const std::string& target_frame = env.top(0).to_string();
@@ -2242,12 +2232,10 @@ ActionCallFrame(ActionExec& thread)
 void
 ActionGotoExpression(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
-
 
     // From Alexis SWF ref:
     //
@@ -2260,7 +2248,6 @@ ActionGotoExpression(ActionExec& thread)
     // When f_play is ON, the action is to play as soon as
     // that frame is reached. Otherwise, the
     // frame is shown in stop mode.
-
     unsigned char play_flag = code[pc + 3];
     const MovieClip::PlayState state = 
         play_flag ? MovieClip::PLAYSTATE_PLAY : MovieClip::PLAYSTATE_STOP;
@@ -2310,7 +2297,6 @@ ActionGotoExpression(ActionExec& thread)
 void
 ActionDelete(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -2343,8 +2329,7 @@ ActionDelete(ActionExec& thread)
     //
     // In both cases, if there are two or more items on the stack, they
     // have to be property and object.
-    if (stackSize < 2)
-    {
+    if (stackSize < 2) {
         if (version > 6) {
             env.top(1).set_bool(false);
             env.drop(1);
@@ -2352,34 +2337,33 @@ ActionDelete(ActionExec& thread)
         }
 
         std::string path, var;
-        if (!parsePath(propertyname, path, var))
-        {
+        if (!parsePath(propertyname, path, var)) {
             // It's not a path. For SWF 7 and above, don't delete. Otherwise
             // assume it's a variable and try to delete.
             env.top(1).set_bool(thread.delVariable(propertyname));
+            env.drop(1);
+            return;
         }
-        else
-        {
+        else {
             as_value target = thread.getVariable(path);
-
-            if ( target.is_object() ) // Don't syntetize one otherwise !!
-            {
+  
+            // Don't create an object! Only get the value if it is an object
+            // already.
+            if (target.is_object()) {
                 obj = toObject(getGlobal(thread.env), target);
-
                 propertyname = var;
             }
         }
     }
-    else
-    {
-        if ( env.top(1).is_object() ) // Don't syntetize one otherwise !!
-        {
+    else {
+        // Don't create an object! Only get the value if it is an object
+        // already.
+        if (env.top(1).is_object()) {
             obj = toObject(getGlobal(thread.env), env.top(1));
         }
     }
 
-    if (!obj)
-    {
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("delete %s.%s: no object found to delete"),
                         env.top(1), env.top(0));
@@ -3575,19 +3559,17 @@ ActionTry(ActionExec& thread)
     if (!doFinally) finallySize = 0;
     if (!doCatch) catchSize = 0;
 
-    if (!catchInRegister)
-    {
+    if (!catchInRegister) {
         catchName = code.read_string(i);
         i += strlen(catchName) + 1;
-        TryBlock t(i, trySize, catchSize, finallySize, catchName);
-        thread.pushTryBlock(t);
+        thread.pushTryBlock(
+                TryBlock(i, trySize, catchSize, finallySize, catchName));
     }
-    else
-    {
+    else {
         catchRegister = code[i];
         ++i;
-        TryBlock t(i, trySize, catchSize, finallySize, catchRegister);
-        thread.pushTryBlock(t);
+        thread.pushTryBlock(
+                TryBlock(i, trySize, catchSize, finallySize, catchRegister));
     }
 
     thread.setNextPC(i); // Proceed into the try block.

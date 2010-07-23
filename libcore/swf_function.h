@@ -107,11 +107,6 @@ public:
 		return _length;
 	}
 
-	bool isFunction2() const
-	{
-		return _isFunction2;
-	}
-
 	void set_is_function2() { _isFunction2 = true; }
 
     size_t registers() const {
@@ -173,8 +168,8 @@ private:
 
 	struct Argument
 	{
-        Argument(int r, string_table::key n) : reg(r), name(n) {}
-		int reg;
+        Argument(boost::uint8_t r, string_table::key n) : reg(r), name(n) {}
+        boost::uint8_t reg;
         string_table::key name;
 	};
 
@@ -193,6 +188,5 @@ private:
 
 } // end of gnash namespace
 
-// __GNASH_SWF_FUNCTION_H__
 #endif
 

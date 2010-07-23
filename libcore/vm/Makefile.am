@@ -47,14 +47,12 @@ libgnashvm_la_SOURCES = \
 
 if ENABLE_AVM2
 libgnashvm_la_SOURCES += \
-	CodeStream.cpp \
 	Machine.cpp
 	$(NULL)
 endif
 
 noinst_HEADERS = \
 	ASHandlers.h \
-	CodeStream.h \
 	ActionExec.h \
 	ExecutableCode.h \
 	$(NULL)
