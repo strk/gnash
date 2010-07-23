@@ -162,19 +162,22 @@ swf_function::call(const fn_call& fn)
 		}
 
 		// Add 'this'
-		_env.set_local("this", fn.this_ptr ? fn.this_ptr : as_value());
+        addLocal(cf, NSV::PROP_THIS, fn.this_ptr ? fn.this_ptr : as_value());
 
         as_object* super = fn.super ? fn.super :
             fn.this_ptr ? fn.this_ptr->get_super() : 0;
 
 		// Add 'super' (SWF6+ only)
 		if (super && swfversion > 5) {
-			_env.set_local("super", super);
+            addLocal(cf, NSV::PROP_SUPER, super);
 		}
 
 		// Add 'arguments'
         as_object* args = getGlobal(fn).createArray();
-		_env.set_local("arguments", getArguments(*this, *args, fn, caller));
+        string_table& st = getStringTable(fn);
+        // Put 'arguments' in a local var.
+        addLocal(cf, st.find("arguments"),
+                getArguments(*this, *args, fn, caller));
 	}
 	else
 	{

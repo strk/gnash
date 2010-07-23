@@ -36,6 +36,7 @@
 #include "as_environment.h"
 #include "debugger.h"
 #include "SystemClock.h"
+#include "CallStack.h"
 
 #include <sstream>
 #include <string>
@@ -692,9 +693,10 @@ ActionExec::getVariable(const std::string& name, as_object** target)
 void
 ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 {
-    if ( isFunction() ) {
+    if (isFunction()) {
+        string_table& st = getStringTable(env);
         // TODO: set local in the function object?
-        env.set_local(name, val);
+        addLocal(getVM(env).currentCall(), st.find(name), val);
     } else {
         // TODO: set target member  ?
         //       what about 'with' stack ?
