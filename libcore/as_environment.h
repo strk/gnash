@@ -276,25 +276,6 @@ private:
     as_value get_variable_raw(const std::string& varname,
         const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
 
-    /// \brief
-    /// Get a local variable given its name,
-    //
-    /// @param varname
-    /// Name of the local variable
-    ///
-    /// @param ret
-    /// If a variable is found it's assigned to this parameter.
-    /// Untouched if the variable is not found.
-    ///
-    /// @param retTarget
-    /// If not NULL, the pointer will be set to the actual object containing the
-    /// found variable (if found).
-    ///
-    /// @return true if the variable was found, false otherwise
-    ///
-    bool findLocal(const std::string& varname, as_value& ret,
-            as_object** retTarget = 0) const;
-
     /// Delete a variable from the given as_object
     //
     /// @param varname

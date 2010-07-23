@@ -63,6 +63,19 @@ getLocal(as_object& locals, const std::string& name, as_value& ret)
     return locals.get_member(st.find(name), &ret);
 }
 
+bool
+findLocal(as_object& locals, const std::string& varname, as_value& ret,
+        as_object** retTarget) 
+{
+
+    if (getLocal(locals, varname, ret)) {
+        if (retTarget) *retTarget = &locals;
+        return true;
+    }
+
+    return false;
+}
+
 /// Delete a local variable
 //
 /// @param varname
@@ -237,7 +250,11 @@ as_environment::get_variable_raw(const std::string& varname,
 
     // Check locals for getting them
     // for SWF6 and up locals should be in the scope stack
-    if (swfVersion < 6 && findLocal(varname, val, retTarget)) return val;
+    if (swfVersion < 6 && _vm.calling()) {
+       if (findLocal(_vm.currentCall().locals(), varname, val, retTarget)) {
+           return val;
+       }
+    }
 
     // Check current target members. TODO: shouldn't target be in scope stack ?
     if (m_target)
@@ -659,21 +676,6 @@ as_environment::get_version() const
     return _vm.getSWFVersion();
 }
 
-bool
-as_environment::findLocal(const std::string& varname, as_value& ret,
-        as_object** retTarget) const
-{
-    if (!_vm.calling()) return false;
-
-    as_object& locals = _vm.currentCall().locals();
-
-    if (getLocal(locals, varname, ret)) {
-        if (retTarget) *retTarget = &locals;
-        return true;
-    }
-
-    return false;
-}
 
 bool
 as_environment::delLocal(const std::string& varname)
