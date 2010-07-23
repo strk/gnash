@@ -147,7 +147,6 @@ as_environment::get_variable(const std::string& varname,
     {
         // TODO: let find_target return generic as_objects, or use 'with' stack,
         //       see player2.swf or bug #18758 (strip.swf)
-        // @@ TODO: should we use scopeStack here too ?
         as_object* target = find_object(path, &scopeStack); 
 
         if (target)
@@ -422,7 +421,7 @@ as_environment::set_variable_raw(const std::string& varname,
 
     // in SWF5 and lower, scope stack should just contain 'with' elements 
 
-    // Check the with-stack.
+    // Check the scope stack.
     for (size_t i = scopeStack.size(); i > 0; --i)
     {
         as_object* obj = scopeStack[i-1];
