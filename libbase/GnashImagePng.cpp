@@ -145,33 +145,25 @@ PngImageInput::read()
     // Set our user-defined reader function
     png_set_read_fn(_pngPtr, _inStream.get(), &readData);
 
-
     png_read_info(_pngPtr, _infoPtr);
 
     png_byte type = png_get_color_type(_pngPtr, _infoPtr);
     png_byte bitDepth = png_get_bit_depth(_pngPtr, _infoPtr);
     
     // Convert indexed images to RGB
-    if (type == PNG_COLOR_TYPE_PALETTE)
-    {
+    if (type == PNG_COLOR_TYPE_PALETTE) {
         log_debug("Converting palette PNG to RGB(A)");
         png_set_palette_to_rgb(_pngPtr);
     }
     
     // Convert less-than-8-bit greyscale to 8 bit.
-    if (type == PNG_COLOR_TYPE_GRAY && bitDepth < 8)
-    {
+    if (type == PNG_COLOR_TYPE_GRAY && bitDepth < 8) {
         log_debug("Setting grey bit depth(%d) to 8", bitDepth);
-#if PNG_LIBPNG_VER_MINOR == 4
         png_set_expand_gray_1_2_4_to_8(_pngPtr);
-#else
-        png_set_gray_1_2_4_to_8(_pngPtr);
-#endif
     }
 
     // Apply the transparency block if it exists.
-    if (png_get_valid(_pngPtr, _infoPtr, PNG_INFO_tRNS))
-    {
+    if (png_get_valid(_pngPtr, _infoPtr, PNG_INFO_tRNS)) {
         log_debug("Applying transparency block, image is RGBA");
         png_set_tRNS_to_alpha(_pngPtr);
         _type = GNASH_IMAGE_RGBA;
