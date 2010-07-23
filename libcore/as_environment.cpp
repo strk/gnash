@@ -431,39 +431,6 @@ as_environment::set_variable_raw(const std::string& varname,
     }
 }
 
-// Set/initialize the value of the local variable.
-void
-as_environment::set_local(const std::string& varname, const as_value& val)
-{
-    string_table::key varkey = _vm.getStringTable().find(varname);
-    // Is it in the current frame already?
-    if (setLocal(varname, val)) {
-        return;
-    }
-    else {
-        // Not in frame; create a new local var.
-        assert(!varname.empty()); // null varnames are invalid!
-        as_object& locals = _vm.currentCall().locals();
-        //locals.push_back(as_environment::frame_slot(varname, val));
-        locals.set_member(varkey, val);
-    }
-}
-    
-// Create the specified local var if it doesn't exist already.
-void
-as_environment::declare_local(const std::string& varname)
-{
-    assert(_vm.calling());
-    as_value tmp;
-    as_object& locals = _vm.currentCall().locals();
-    if (!getLocal(locals, varname, tmp))
-    {
-        // Not in frame; create a new local var.
-        assert(!varname.empty());    // null varnames are invalid!
-        locals.set_member(_vm.getStringTable().find(varname), as_value());
-    }
-}
-
 bool
 as_environment::parse_path(const std::string& var_path, as_object** target,
         as_value& val)
@@ -730,17 +697,6 @@ as_environment::set_target(DisplayObject* target)
     if (!_original_target) _original_target = target;
     m_target = target;
 }
-
-void
-as_environment::add_local(const std::string& varname, const as_value& val)
-{
-    assert(!varname.empty());   
-    assert(_vm.calling());
-
-    as_object& locals = _vm.currentCall().locals();
-    locals.set_member(_vm.getStringTable().find(varname), val);
-}
-
 
 #ifdef GNASH_USE_GC
 
