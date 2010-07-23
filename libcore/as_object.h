@@ -910,9 +910,6 @@ int getSWFVersion(const as_object& o);
 /// Get the Global object from an as_object.
 Global_as& getGlobal(const as_object& o);
 
-/// Return whether the object is an AS3 object.
-bool isAS3(const as_object& o);
-
 /// Return whether property matching is caseless
 inline bool caseless(const as_object& o) {
     return getSWFVersion(o) < 7;

@@ -697,14 +697,6 @@ textfield_setTextFormat(const fn_call& fn)
         return as_value();
     }
 
-    if (isAS3(fn)) {
-        // TODO: current font finding assumes we have a parent, which isn't
-        // necessarily the case in AS3. It seems the AS2 implementation is
-        // wrong anyway.
-        log_unimpl("fonts in AS3 TextField.setTextFormat");
-        return as_value();
-    }
-
     if (tf->font())
     {
         const std::string& fontName = *tf->font();
@@ -1088,13 +1080,6 @@ textfield_removeTextField(const fn_call& fn)
 as_value
 textfield_ctor(const fn_call& fn)
 {
-
-    if (isAS3(fn)) {
-        as_object* obj = ensure<ValidThis>(fn);
-        SWFRect nullRect;
-        obj->setDisplayObject(new TextField(obj, 0, nullRect));
-        return as_value();
-    }
 
     as_object* obj = ensure<ValidThis>(fn);
     

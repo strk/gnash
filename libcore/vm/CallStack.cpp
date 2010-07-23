@@ -17,18 +17,22 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "CallStack.h"
-#include "as_object.h"
-#include "as_function.h" 
-#include "Global_as.h" 
 
 #include <ostream>
 
+#include "as_object.h"
+#include "UserFunction.h" 
+#include "Global_as.h" 
+#include "Property.h"
+#include "log.h"
+
 namespace gnash {
 
-CallFrame::CallFrame(as_function* f)
+CallFrame::CallFrame(UserFunction* f)
     :
     _locals(new as_object(getGlobal(*f))),
-    _func(f)
+    _func(f),
+    _registers(_func->registers())
 {
     assert(_func);
 }
@@ -40,14 +44,53 @@ CallFrame::CallFrame(as_function* f)
 void
 CallFrame::markReachableResources() const
 {
-    // Func is always valid.
     assert(_func);
     _func->setReachable();
 
     std::for_each(_registers.begin(), _registers.end(),
             std::mem_fun_ref(&as_value::setReachable));
 
-    if (_locals) _locals->setReachable();
+    assert(_locals);
+    _locals->setReachable();
+}
+
+void
+CallFrame::setLocalRegister(size_t i, const as_value& val)
+{
+    if (i >= _registers.size()) return;
+
+    _registers[i] = val;
+
+    IF_VERBOSE_ACTION(
+        log_action(_("-------------- local register[%d] = '%s'"),
+            i, val);
+    );
+
+}
+
+void
+declareLocal(CallFrame& c, string_table::key name)
+{
+    as_object& locals = c.locals();
+    if (!locals.hasOwnProperty(name)) {
+        locals.set_member(name, as_value());
+    }
+}
+
+void
+setLocal(CallFrame& c, string_table::key name, const as_value& val)
+{
+    as_object& locals = c.locals();
+
+    // This way avoids searching the prototype chain, though it seems
+    // unlikely that it is an optimization.
+    Property* prop = locals.getOwnProperty(name);
+    if (prop) {
+        prop->setValue(locals, val);
+        return;
+    }
+
+    locals.set_member(name, val);
 }
 
 std::ostream&

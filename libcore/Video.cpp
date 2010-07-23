@@ -25,7 +25,6 @@
 #include "fn_call.h"
 #include "as_value.h"
 #include "NetStream_as.h"
-#include "builtin_function.h" // for getter/setter properties
 #include "NativeFunction.h" 
 #include "movie_root.h"
 #include "VM.h"

@@ -319,16 +319,6 @@ ensure(const fn_call& fn)
     return ret;
 }
 
-/// Check whether the currently executing code is AS3 (ABC)
-//
-/// This is a non-member, non-friend function for better encapsulation.
-/// TODO: drop these when there is a better design!
-inline bool
-isAS3(const fn_call& fn)
-{
-    return fn.getVM().getAVMVersion() == VM::AVM2;
-}
-
 inline string_table&
 getStringTable(const fn_call& fn)
 {

@@ -28,7 +28,6 @@
 #include "Property.h"
 #include "as_object.h"
 #include "namedStrings.h"
-#include "as_function.h" 
 #include "CallStack.h"
 #include "Global_as.h"
 
@@ -62,6 +61,19 @@ getLocal(as_object& locals, const std::string& name, as_value& ret)
 {
     string_table& st = getStringTable(locals);
     return locals.get_member(st.find(name), &ret);
+}
+
+bool
+findLocal(as_object& locals, const std::string& varname, as_value& ret,
+        as_object** retTarget) 
+{
+
+    if (getLocal(locals, varname, ret)) {
+        if (retTarget) *retTarget = &locals;
+        return true;
+    }
+
+    return false;
 }
 
 /// Delete a local variable
@@ -112,7 +124,6 @@ as_environment::as_environment(VM& vm)
     :
     _vm(vm),
     _stack(_vm.getStack()),
-    _localFrames(_vm.getCallStack()),
     m_target(0),
     _original_target(0)
 {
@@ -136,7 +147,6 @@ as_environment::get_variable(const std::string& varname,
     {
         // TODO: let find_target return generic as_objects, or use 'with' stack,
         //       see player2.swf or bug #18758 (strip.swf)
-        // @@ TODO: should we use scopeStack here too ?
         as_object* target = find_object(path, &scopeStack); 
 
         if (target)
@@ -239,7 +249,11 @@ as_environment::get_variable_raw(const std::string& varname,
 
     // Check locals for getting them
     // for SWF6 and up locals should be in the scope stack
-    if (swfVersion < 6 && findLocal(varname, val, retTarget)) return val;
+    if (swfVersion < 6 && _vm.calling()) {
+       if (findLocal(_vm.currentCall().locals(), varname, val, retTarget)) {
+           return val;
+       }
+    }
 
     // Check current target members. TODO: shouldn't target be in scope stack ?
     if (m_target)
@@ -333,7 +347,7 @@ as_environment::delVariableRaw(const std::string& varname,
     }
 
     // Check locals for deletion.
-    if ( delLocal(varname) )
+    if (_vm.calling() && deleteLocal(_vm.currentCall().locals(), varname))
     {
         return true;
     }
@@ -407,7 +421,7 @@ as_environment::set_variable_raw(const std::string& varname,
 
     // in SWF5 and lower, scope stack should just contain 'with' elements 
 
-    // Check the with-stack.
+    // Check the scope stack.
     for (size_t i = scopeStack.size(); i > 0; --i)
     {
         as_object* obj = scopeStack[i-1];
@@ -417,7 +431,9 @@ as_environment::set_variable_raw(const std::string& varname,
     }
     
     const int swfVersion = vm.getSWFVersion();
-    if (swfVersion < 6 && setLocal(varname, val)) return;
+    if (swfVersion < 6 && _vm.calling()) {
+       if (setLocal(_vm.currentCall().locals(), varname, val)) return;
+    }
     
     // TODO: shouldn't m_target be in the scope chain ?
     if (m_target) getObject(m_target)->set_member(varkey, val);
@@ -431,60 +447,6 @@ as_environment::set_variable_raw(const std::string& varname,
            "can't set the variable",
            this, varname, val);
     }
-}
-
-// Set/initialize the value of the local variable.
-void
-as_environment::set_local(const std::string& varname, const as_value& val)
-{
-    // why would you want to set a local if there's no call frame on the
-    // stack ?
-    assert( ! _localFrames.empty() );
-
-    string_table::key varkey = _vm.getStringTable().find(varname);
-    // Is it in the current frame already?
-    if ( setLocal(varname, val) )
-    {
-        return;
-    }
-    else
-    {
-        // Not in frame; create a new local var.
-        assert(!varname.empty()); // null varnames are invalid!
-        as_object& locals = _localFrames.back().locals();
-        //locals.push_back(as_environment::frame_slot(varname, val));
-        locals.set_member(varkey, val);
-    }
-}
-    
-// Create the specified local var if it doesn't exist already.
-void
-as_environment::declare_local(const std::string& varname)
-{
-    as_value tmp;
-    if ( ! findLocal(varname, tmp) )
-    {
-        // Not in frame; create a new local var.
-        assert(!_localFrames.empty());
-        assert( ! varname.empty() );    // null varnames are invalid!
-        as_object& locals = _localFrames.back().locals();
-        locals.set_member(_vm.getStringTable().find(varname), as_value());
-    }
-}
-
-bool
-as_environment::parse_path(const std::string& var_path, as_object** target,
-        as_value& val)
-{
-    std::string path;
-    std::string var;
-    if (!parsePath(var_path, path, var)) return false;
-    as_object* target_ptr = find_object(path); 
-    if ( ! target_ptr ) return false;
-
-    target_ptr->get_member(_vm.getStringTable().find(var), &val);
-    *target = target_ptr;
-    return true;
 }
 
 // Search for next '.' or '/' DisplayObject in this word.  Return
@@ -699,230 +661,19 @@ as_environment::get_version() const
 }
 
 void
-as_environment::dump_local_registers(std::ostream& out) const
-{
-    if ( _localFrames.empty() ) return;
-    out << "Local registers: ";
-    for (CallStack::const_iterator it=_localFrames.begin(),
-            itEnd=_localFrames.end(); it != itEnd; ++it) {
-        if (it != _localFrames.begin()) out << " | ";
-        out << *it;
-    }
-    out << std::endl;
-}
-
-static void
-dump(as_object& locals, std::ostream& out)
-{
-    typedef std::map<std::string, as_value> PropMap;
-    PropMap props;
-    locals.dump_members(props);
-    
-    int count = 0;
-    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i) {
-        if (count++) out << ", ";
-        // TODO: define output operator for as_value !
-        out << i->first << "==" << i->second;
-    }
-    out << std::endl;
-}
-
-void
-as_environment::dump_local_variables(std::ostream& out) const
-{
-    if ( _localFrames.empty() ) return;
-    out << "Local variables: ";
-    for (CallStack::iterator it=_localFrames.begin(),
-            itEnd=_localFrames.end(); it != itEnd; ++it) {
-
-        if ( it != _localFrames.begin() ) out << " | ";
-        dump(it->locals(), out);
-    }
-    out << std::endl;
-}
-
-void
-as_environment::dump_global_registers(std::ostream& out) const
-{
-    std::string registers;
-
-    std::stringstream ss;
-
-    ss << "Global registers: ";
-    int defined=0;
-    for (unsigned int i = 0; i < numGlobalRegisters; ++i)
-    {
-        if ( m_global_register[i].is_undefined() ) continue;
-
-        if ( defined++ ) ss <<  ", ";
-
-        ss << i << ":" << m_global_register[i];
-
-    }
-    if ( defined ) out << ss.str() << std::endl;
-}
-
-bool
-as_environment::findLocal(const std::string& varname, as_value& ret,
-        as_object** retTarget) const
-{
-    if (_localFrames.empty()) return false;
-
-    as_object& locals = _localFrames.back().locals();
-
-    if (getLocal(locals, varname, ret)) {
-        if (retTarget) *retTarget = &locals;
-        return true;
-    }
-
-    return false;
-}
-
-bool
-as_environment::delLocal(const std::string& varname)
-{
-    if (_localFrames.empty()) return false;
-    return deleteLocal(_localFrames.back().locals(), varname);
-}
-
-bool
-as_environment::setLocal(const std::string& varname, const as_value& val)
-{
-    if (_localFrames.empty()) return false;
-
-    // If this name is not qualified, the compiler fails to look beyond
-    // as_environment::setLocal.
-    return gnash::setLocal(_localFrames.back().locals(), varname, val);
-}
-
-void
-as_environment::pushCallFrame(as_function& func)
-{
-
-    // The stack size can be changed by the ScriptLimits
-    // tag. There is *no* difference between SWF versions.
-    // TODO: override from gnashrc.
-    
-    // A stack size of 0 is apparently legitimate.
-    const boost::uint16_t recursionLimit = getRoot(func).getRecursionLimit();
-
-    // Don't proceed if local call frames would reach the recursion limit.
-    if (_localFrames.size() + 1 >= recursionLimit) {
-
-        std::ostringstream ss;
-        ss << boost::format(_("Recursion limit reached (%u)")) % recursionLimit;
-
-        // throw something
-        throw ActionLimitException(ss.str()); 
-    }
-
-    _localFrames.push_back(CallFrame(&func));
-
-}
-
-void 
-as_environment::popCallFrame()
-{
-    assert(!_localFrames.empty());
-    _localFrames.pop_back();
-}
-    
-void
 as_environment::set_target(DisplayObject* target)
 {
     if (!_original_target) _original_target = target;
     m_target = target;
 }
 
-void
-as_environment::add_local(const std::string& varname, const as_value& val)
-{
-    assert(!varname.empty());   
-    assert(!_localFrames.empty());
-
-    as_object& locals = _localFrames.back().locals();
-    locals.set_member(_vm.getStringTable().find(varname), val);
-}
-
-void
-as_environment::dump_stack(std::ostream& out, unsigned int limit) const
-{
-    unsigned int si=0, n=_stack.size();
-    if ( limit && n > limit )
-    {
-        si=n-limit;
-        out << "Stack (last " << limit << " of " << n << " items): ";
-    }
-    else
-    {
-        out << "Stack: ";
-    }
-
-    for (unsigned int i=si; i<n; i++)
-    {
-        if (i!=si) out << " | ";
-        out << '"' << _stack.value(i) << '"';
-    }
-    out << std::endl;
-}
-
 #ifdef GNASH_USE_GC
-
-unsigned int
-as_environment::setRegister(unsigned int regnum, const as_value& v)
-{
-    // If there is a call frame and it has registers, the value must be
-    // set there.
-    if (!_localFrames.empty()) {
-        CallFrame& fr = _localFrames.back();
-        if (fr.hasRegisters()) {
-            if (_localFrames.back().setRegister(regnum, v)) return 2;
-            return 0;
-        }
-    }
-
-    if (regnum < numGlobalRegisters) {
-        m_global_register[regnum] = v;
-        return 1;
-    }
-
-    return 0;
-}
-
-unsigned int
-as_environment::getRegister(unsigned int regnum, as_value& v)
-{
-    // If there is a call frame and it has registers, the value must be
-    // sought there.
-    if (!_localFrames.empty()) {
-        const CallFrame& fr = _localFrames.back();
-        if (fr.hasRegisters()) {
-            if (fr.getRegister(regnum, v)) return 2;
-            return 0;
-        }
-    }
-
-    // Otherwise it can be in the global registers.
-    if (regnum < numGlobalRegisters) {
-        v = m_global_register[regnum];
-        return 1;
-    }
-
-    return 0;
-}
 
 void
 as_environment::markReachableResources() const
 {
-    for (size_t i = 0; i < 4; ++i) {
-        m_global_register[i].setReachable();
-    }
-
     if (m_target) m_target->setReachable();
     if (_original_target) _original_target->setReachable();
-
-    // _localFrames and _stack are taken care of by VM
-
 }
 #endif // GNASH_USE_GC
 

@@ -36,6 +36,7 @@
 #include "as_environment.h"
 #include "debugger.h"
 #include "SystemClock.h"
+#include "CallStack.h"
 
 #include <sstream>
 #include <string>
@@ -75,7 +76,6 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
     _func(&func),
     _this_ptr(this_ptr),
     _initialStackSize(0),
-    _initialCallStackDepth(0),
     _originalTarget(0),
     _origExecSWFVersion(0),
     _tryList(),
@@ -111,7 +111,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
         // We assume that the swf_function () operator already initialized
         // its environment so that its activation object is now in the
         // top element of the CallFrame stack
-        CallFrame& topFrame = newEnv.topCallFrame();
+        CallFrame& topFrame = getVM(newEnv).currentCall();
         assert(&topFrame.function() == &func);
         _scopeStack.push_back(&topFrame.locals());
     }
@@ -125,7 +125,6 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
     _withStackLimit(7),
     _func(0),
     _initialStackSize(0),
-    _initialCallStackDepth(0),
     _originalTarget(0),
     _origExecSWFVersion(0),
     _tryList(),
@@ -164,18 +163,13 @@ ActionExec::operator()()
 
     _initialStackSize = env.stack_size();
 
-    _initialCallStackDepth = env.callStackDepth();
-
 #if DEBUG_STACK
     IF_VERBOSE_ACTION (
             log_action(_("at ActionExec operator() start, pc=%d"
                    ", stop_pc=%d, code.size=%d, func=%d, codeVersion=%d"),
                 pc, stop_pc, code.size(), _func ? _func : 0, codeVersion);
         std::stringstream ss;
-        env.dump_stack(ss, STACK_DUMP_LIMIT);
-        env.dump_global_registers(ss);
-        env.dump_local_registers(ss);
-        env.dump_local_variables(ss);
+        getVM(env).dumpState(ss, STACK_DUMP_LIMIT);
         log_action("%s", ss.str());
     );
 #endif
@@ -318,10 +312,7 @@ ActionExec::operator()()
                 log_action(_("After execution: PC %d, next PC %d, "
                         "stack follows"), pc, next_pc);
                 std::stringstream ss;
-                env.dump_stack(ss, STACK_DUMP_LIMIT);
-                env.dump_global_registers(ss);
-                env.dump_local_registers(ss);
-                env.dump_local_variables(ss);
+                getVM(env).dumpState(ss, STACK_DUMP_LIMIT);
                 log_action("%s", ss.str());
             );
 #endif
@@ -416,7 +407,7 @@ ActionExec::processExceptions(TryBlock& t)
                     as_value ex = env.pop();
                     ex.unflag_exception();
                     
-                    env.setRegister(t._registerIndex, ex);
+                    getVM(env).setRegister(t._registerIndex, ex);
                 }
             }
             else
@@ -702,9 +693,10 @@ ActionExec::getVariable(const std::string& name, as_object** target)
 void
 ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 {
-    if ( isFunction() ) {
+    if (isFunction()) {
+        string_table& st = getStringTable(env);
         // TODO: set local in the function object?
-        env.set_local(name, val);
+        setLocal(getVM(env).currentCall(), st.find(name), val);
     } else {
         // TODO: set target member  ?
         //       what about 'with' stack ?

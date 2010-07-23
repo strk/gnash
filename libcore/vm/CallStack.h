@@ -22,55 +22,85 @@
 #include <vector>
 
 #include "as_value.h"
+#include "string_table.h"
 
 // Forward declarations
 namespace gnash {
     class as_object;
-    class as_function;
+    class UserFunction;
 }
 
 namespace gnash {
 
-/// An element of a CallStack
-class CallFrame 
+/// A CallFrame is an element of a CallStack.
+//
+/// A CallFrame exists for the duration of a UserFunction call. NativeFunctions
+/// have no call frame.
+//
+/// The CallFrame provides space for local registers and local variables.
+/// These values are discarded when the CallFrame is destroyed at the end of
+/// a function call. It provides a scope for the function's execution.
+class CallFrame
 {
 public:
 
     typedef std::vector<as_value> Registers;
 
-    CallFrame(as_function* func);
-
+    /// Construct a CallFrame for a specific UserFunction
+    //
+    /// @param func     The UserFunction to create the CallFrame for. This
+    ///                 must provide information about the amount of registers
+    ///                 to allocate.
+    CallFrame(UserFunction* func);
+    
+    /// Copy constructor for containers
     CallFrame(const CallFrame& other)
         :
         _locals(other._locals),
-        _registers(other._registers),
-        _func(other._func)
+        _func(other._func),
+        _registers(other._registers)
     {}
 
+    /// Assignment operator for containers.
+    CallFrame& operator=(const CallFrame& other) {
+        _locals = other._locals;
+        _func = other._func;
+        _registers = other._registers;
+        return *this;
+    }
+
+    /// Access the local variables for this function call.
     as_object& locals() {
         return *_locals;
     }
 
-    as_function& function() {
+    /// Get the function for which this CallFrame provides a scope.
+    UserFunction& function() {
         return *_func;
     }
 
-    bool getRegister(size_t i, as_value& val) const {
-        if (i >= _registers.size()) return false;
-        val = _registers[i];
-        return true;
+    /// Get a specific register in this CallFrame
+    //
+    /// @param i    The index of the register to return.
+    /// @return     A pointer to the value in the register or 0 if no such
+    ///             register exists.
+    const as_value* getLocalRegister(size_t i) const {
+        if (i >= _registers.size()) return 0;
+        return &_registers[i];
     }
 
-    bool setRegister(size_t i, const as_value& val) {
-        if (i >= _registers.size()) return false;
-        _registers[i] = val;
-        return true;
-    }
+    /// Set a specific register in this CallFrame
+    //
+    /// If the register doesn't exist, nothing happens.
+    //
+    /// @param i    The index of the register to set.
+    /// @param val  The value to set the register to.
+    void setLocalRegister(size_t i, const as_value& val);
 
-    void resizeRegisters(size_t i) {
-        _registers.resize(i);
-    }
-
+    /// Set the number of registers for this CallFrame.
+    //
+    /// The number of registers may only be set once! This is to ensure
+    /// that pointers to the register values are always valid.
     bool hasRegisters() const {
         return !_registers.empty();
     }
@@ -86,15 +116,32 @@ private:
 
     friend std::ostream& operator<<(std::ostream&, const CallFrame&);
 
-    /// function use this 
+    /// Local variables.
     as_object* _locals;
 
-    /// function2 also use this
+    UserFunction* _func;
+    
+    /// Local registers.
     Registers _registers;
 
-    as_function* _func;
-
 };
+
+/// Declare a local variable in this CallFrame
+//
+/// The variable is declared and set to undefined if it doesn't exist already.
+//
+/// @param c    The CallFrame to set the variable in.
+/// @param name The name of the variable to declare.
+void declareLocal(CallFrame& c, string_table::key name);
+
+/// Set a local variable in this CallFrame
+//
+/// If the variable does not already exist, it is created.
+//
+/// @param c    The CallFrame to set the variable in.
+/// @param name The name of the variable to set.
+/// @param val  The value to set the variable to.
+void setLocal(CallFrame& c, string_table::key name, const as_value& val);
 
 typedef std::vector<CallFrame> CallStack;
 

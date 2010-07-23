@@ -22,11 +22,11 @@
 #include "MovieClip.h"
 #include "action_buffer.h"
 #include "ActionExec.h" // for operator()
-#include "VM.h" // for storing _global in a local register
-#include "NativeFunction.h" // for Function constructor
+#include "VM.h" 
+#include "NativeFunction.h" 
 #include "Global_as.h" 
 #include "namedStrings.h"
-
+#include "CallStack.h"
 #include <typeinfo>
 #include <iostream>
 #include <string>
@@ -46,7 +46,7 @@ namespace {
 swf_function::swf_function(const action_buffer& ab, as_environment& env,
 			size_t start, const ScopeStack& scopeStack)
 	:
-	as_function(getGlobal(env)),
+	UserFunction(getGlobal(env)),
 	m_action_buffer(ab),
 	_env(env),
 	_scopeStack(scopeStack),
@@ -74,13 +74,14 @@ swf_function::swf_function(const action_buffer& ab, as_environment& env,
 /// in as_environment seems bogus, see setProperty.as, the 
 /// failure of setTarget("") construct in SWF5.
 ///
-struct TargetGuard {
+struct TargetGuard
+{
 	as_environment& env;
 	DisplayObject* from;
 	DisplayObject* from_orig;
 
 	// @param ch : target to set temporarely
-	// @param och : original target to set temporarely
+	// @param och : original target to set temporarily
 	TargetGuard(as_environment& e, DisplayObject* ch, DisplayObject* och)
 		:
 		env(e),
@@ -105,12 +106,12 @@ swf_function::call(const fn_call& fn)
 {
     // Extract caller before pushing ourself on the call stack
     VM& vm = getVM(fn); 
-    CallStack& cs = vm.getCallStack();
 
-    as_object* caller = cs.empty() ? 0 : &cs.back().function();
+    as_object* caller = vm.calling() ? &vm.currentCall().function() : 0;
 
 	// Set up local stack frame, for parameters and locals.
-	as_environment::FrameGuard guard(_env, *this);
+	FrameGuard guard(getVM(fn), *this);
+    CallFrame& cf = guard.callFrame();
 
 	DisplayObject* target = _env.get_target();
 	DisplayObject* orig_target = _env.get_original_target();
@@ -150,42 +151,45 @@ swf_function::call(const fn_call& fn)
 		{
 			assert(_args[i].reg == 0);
 			if (i < fn.nargs) {
-				_env.add_local(_args[i].name, fn.arg(i));
+                setLocal(cf, _args[i].name, fn.arg(i));
 			}
 			else {
 				// Still declare named arguments, even if
 				// they are not passed from caller
 				// See bug #22203
-				_env.declare_local(_args[i].name);
+                declareLocal(cf, _args[i].name);
 			}
 		}
 
 		// Add 'this'
-		_env.set_local("this", fn.this_ptr ? fn.this_ptr : as_value());
+        setLocal(cf, NSV::PROP_THIS, fn.this_ptr ? fn.this_ptr : as_value());
 
         as_object* super = fn.super ? fn.super :
             fn.this_ptr ? fn.this_ptr->get_super() : 0;
 
 		// Add 'super' (SWF6+ only)
 		if (super && swfversion > 5) {
-			_env.set_local("super", super);
+            setLocal(cf, NSV::PROP_SUPER, super);
 		}
 
 		// Add 'arguments'
         as_object* args = getGlobal(fn).createArray();
-		_env.set_local("arguments", getArguments(*this, *args, fn, caller));
+        string_table& st = getStringTable(fn);
+        // Put 'arguments' in a local var.
+        setLocal(cf, st.find("arguments"),
+                getArguments(*this, *args, fn, caller));
 	}
 	else
 	{
 		// function2: most args go in registers; any others get pushed.
-		
-		// Create local registers.
-		_env.add_local_registers(_registerCount);
 
 		// Handle the implicit args.
 		// @@ why start at 1 ? Note that starting at 0 makes	
 		// intro.swf movie fail to play correctly.
         size_t current_reg(1);
+
+        // This is us. TODO: why do we have to query the VM to get
+        // what are effectively our own resources?
 
         // If this is not suppressed it is either placed in a register
         // or set as a local variable, but not both.
@@ -194,12 +198,13 @@ swf_function::call(const fn_call& fn)
                 // preload 'this' into a register.
                 // TODO: check whether it should be undefined or null
                 // if this_ptr is null.
-                _env.setRegister(current_reg, fn.this_ptr); 
+                cf.setLocalRegister(current_reg, fn.this_ptr); 
                 ++current_reg;
             }
             else {
                 // Put 'this' in a local var.
-                _env.add_local("this", fn.this_ptr ? fn.this_ptr : as_value());
+                setLocal(cf, NSV::PROP_THIS,
+                        fn.this_ptr ? fn.this_ptr : as_value());
             }
         }
 
@@ -219,12 +224,13 @@ swf_function::call(const fn_call& fn)
 
             if (_function2Flags & PRELOAD_ARGUMENTS) {
                 // preload 'arguments' into a register.
-                _env.setRegister(current_reg, args);
+                cf.setLocalRegister(current_reg, args);
                 ++current_reg;
             }
             else {
+                string_table& st = getStringTable(fn);
                 // Put 'arguments' in a local var.
-                _env.add_local("arguments", args);
+                setLocal(cf, st.find("arguments"), args);
             }
 
         }
@@ -239,11 +245,11 @@ swf_function::call(const fn_call& fn)
                 fn.this_ptr ? fn.this_ptr->get_super() : 0;
 
             if (super && (_function2Flags & PRELOAD_SUPER)) {
-				_env.setRegister(current_reg, super);
+				cf.setLocalRegister(current_reg, super);
 				current_reg++;
 			}
             else if (super) {
-                _env.add_local("super", super);
+                setLocal(cf, NSV::PROP_SUPER, super);
             }
 		}
 
@@ -253,7 +259,7 @@ swf_function::call(const fn_call& fn)
 			if (tgtch) {
 				// NOTE: _lockroot will be handled by getAsRoot()
 				as_object* r = getObject(tgtch->getAsRoot());
-				_env.setRegister(current_reg, r);
+				cf.setLocalRegister(current_reg, r);
 				++current_reg;
 			}
 		}
@@ -262,7 +268,7 @@ swf_function::call(const fn_call& fn)
 			DisplayObject* tgtch = _env.get_target();
             if (tgtch) {
                 as_object* parent = getObject(tgtch->get_parent());
-                _env.setRegister(current_reg, parent);
+                cf.setLocalRegister(current_reg, parent);
                 ++current_reg;
             }
 		}
@@ -270,7 +276,7 @@ swf_function::call(const fn_call& fn)
 		if (_function2Flags & PRELOAD_GLOBAL) {
 			// Put '_global' in a register.
 			as_object* global = vm.getGlobal();
-			_env.setRegister(current_reg, global);
+			cf.setLocalRegister(current_reg, global);
 			++current_reg;
 		}
 
@@ -283,20 +289,20 @@ swf_function::call(const fn_call& fn)
 			if (!_args[i].reg) {
 				if (i < fn.nargs) {
 					// Conventional arg passing: create a local var.
-					_env.add_local(_args[i].name, fn.arg(i));
+					setLocal(cf, _args[i].name, fn.arg(i));
 				}
 				else {
 					// Still declare named arguments, even if
 					// they are not passed from caller
 					// See bug #22203
-					_env.declare_local(_args[i].name);
+                    declareLocal(cf, _args[i].name);
 				}
 			}
 			else {
 				if (i < fn.nargs) {
 					// Pass argument into a register.
 					const int reg = _args[i].reg;
-					_env.setRegister(reg, fn.arg(i));
+					cf.setLocalRegister(reg, fn.arg(i));
 				}
                 // If no argument was passed, no need to setup a register
                 // I guess.
@@ -307,15 +313,13 @@ swf_function::call(const fn_call& fn)
 	// Execute the actions.
 	// Do this in a try block to proper drop the pushed call frame 
 	// in case of problems (most interesting action limits)
-	try 
-	{
+	try {
         as_value result;
 		ActionExec exec(*this, _env, &result, fn.this_ptr);
 		exec();
         return result;
 	}
-	catch (ActionLimitException& ale) // expected and sane 
-	{
+	catch (ActionLimitException& ale) {
 		throw;
 	}
 }

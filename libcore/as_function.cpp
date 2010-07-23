@@ -21,7 +21,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
 #include "as_function.h"
-#include "builtin_function.h" // for _global.Function
 #include "as_value.h"
 #include "Array_as.h"
 #include "Global_as.h"

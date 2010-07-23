@@ -315,13 +315,6 @@ as_object::call(const fn_call& /*fn*/)
 const std::string&
 as_object::stringValue() const
 {
-    // TODO: AS3 returns a string describing the type of object, e.g.
-    // "[object MyObject]"
-    if (isAS3(*this)) {
-        static const std::string str("[object Object]");
-        return str;
-    }
-
     static const std::string str("[object Object]");
     return str;
 }
@@ -1209,12 +1202,6 @@ Global_as&
 getGlobal(const as_object& o)
 {
     return *o.vm().getGlobal();
-}
-
-bool
-isAS3(const as_object& o)
-{
-    return isAS3(getVM(o));
 }
 
 } // end of gnash namespace

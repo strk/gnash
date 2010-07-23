@@ -23,10 +23,18 @@
 #endif
 
 #include "VM.h"
+
+#include <iostream>
+#include <memory>
+#include <boost/random.hpp> // for random generator
+#include <cstdlib> // std::getenv
+#ifdef HAVE_SYS_UTSNAME_H
+# include <sys/utsname.h> // For system information
+#endif
+
 #include "SharedObject_as.h" // for SharedObjectLibrary
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "NativeFunction.h"
-#include "builtin_function.h"
 #include "movie_definition.h"
 #include "Movie.h"
 #include "movie_root.h"
@@ -36,13 +44,6 @@
 #include "namedStrings.h"
 #include "VirtualClock.h" // for getTime()
 
-#ifdef HAVE_SYS_UTSNAME_H
-# include <sys/utsname.h> // For system information
-#endif
-
-#include <memory>
-#include <boost/random.hpp> // for random generator
-#include <cstdlib> // std::getenv
 
 namespace {
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -93,8 +94,7 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 	_swfversion(version),
 	_clock(clock),
 	_stack(),
-    _shLib(new SharedObjectLibrary(*this)),
-    _avmVersion(AVM1)
+    _shLib(new SharedObjectLibrary(*this))
 {
 	_clock.restart();
 }
@@ -225,6 +225,8 @@ VM::getTime() const
 void
 VM::markReachableResources() const
 {
+    std::for_each(_globalRegisters.begin(), _globalRegisters.end(), 
+            std::mem_fun_ref(&as_value::setReachable));
 
 	_rootMovie.markReachableResources();
 
@@ -258,6 +260,83 @@ VM::markReachableResources() const
 
 }
 
+const as_value*
+VM::getRegister(size_t index)
+{
+    // If there is a call frame and it has registers, the value must be
+    // sought there.
+    if (!_callStack.empty()) {
+        const CallFrame& fr = currentCall();
+        if (fr.hasRegisters()) return fr.getLocalRegister(index);
+    }
+
+    // Otherwise it can be in the global registers.
+    if (index < _globalRegisters.size()) return &_globalRegisters[index];
+    return 0;
+}
+
+void
+VM::setRegister(size_t index, const as_value& val)
+{
+    // If there is a call frame and it has registers, the value must be
+    // set there.
+    if (!_callStack.empty()) {
+        CallFrame& fr = currentCall();
+        if (fr.hasRegisters()) {
+            currentCall().setLocalRegister(index, val);
+            return;
+        }
+    }
+
+    // Do nothing if the index is out of bounds.
+    if (index < _globalRegisters.size()) _globalRegisters[index] = val;
+
+    IF_VERBOSE_ACTION(
+        log_action(_("-------------- global register[%d] = '%s'"),
+            index, val);
+    );
+
+}
+
+CallFrame&
+VM::currentCall()
+{
+    assert(!_callStack.empty());
+    return _callStack.back();
+}
+
+CallFrame&
+VM::pushCallFrame(UserFunction& func)
+{
+
+    // The stack size can be changed by the ScriptLimits
+    // tag. There is *no* difference between SWF versions.
+    // TODO: override from gnashrc.
+    
+    // A stack size of 0 is apparently legitimate.
+    const boost::uint16_t recursionLimit = getRoot().getRecursionLimit();
+
+    // Don't proceed if local call frames would reach the recursion limit.
+    if (_callStack.size() + 1 >= recursionLimit) {
+
+        std::ostringstream ss;
+        ss << boost::format(_("Recursion limit reached (%u)")) % recursionLimit;
+
+        // throw something
+        throw ActionLimitException(ss.str()); 
+    }
+
+    _callStack.push_back(CallFrame(&func));
+    return _callStack.back();
+}
+
+void 
+VM::popCallFrame()
+{
+    assert(!_callStack.empty());
+    _callStack.pop_back();
+}
+
 void
 VmGcRoot::markReachableResources() const
 {
@@ -286,6 +365,53 @@ VM::getNative(unsigned int x, unsigned int y) const
             as_function::getFunctionConstructor());
     return f;
 }
+
+void
+VM::dumpState(std::ostream& out, size_t limit)
+{
+
+    // Dump stack:
+    size_t si = 0;
+    const size_t n = _stack.size();
+
+    if (limit && n > limit) {
+        si = n - limit;
+        out << "Stack (last " << limit << " of " << n << " items): ";
+    }
+    else {
+        out << "Stack: ";
+    }
+
+    for (size_t i = si; i < n; ++i) {
+        if (i != si) out << " | ";
+        out << '"' << _stack.value(i) << '"';
+    }
+    out << "\n";
+
+    out << "Global registers: ";
+    for (GlobalRegisters::const_iterator it = _globalRegisters.begin(),
+            e = _globalRegisters.end(); it != e; ++it) {
+        const as_value& v = *it;
+        if (v.is_undefined()) continue;
+        if (it != _globalRegisters.begin()) out <<  ", ";
+
+        out << (it - _globalRegisters.begin()) << ":" << v;
+    }
+    out << "\n";
+
+    // Now local registers and variables from the call stack.
+    if (_callStack.empty()) return;
+
+    out << "Local registers: ";
+    for (CallStack::const_iterator it = _callStack.begin(),
+            e = _callStack.end(); it != e; ++it) {
+        if (it != _callStack.begin()) out << " | ";
+        out << *it;
+    }
+    out << "\n";
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -383,7 +509,6 @@ newLessThan(const as_value& op1, const as_value& op2, VM& /*vm*/)
     }
     return as_value(num1 < num2);
 }
-
 
 } // end of namespace gnash
 

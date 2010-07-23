@@ -24,12 +24,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "GC.h"
-#include "string_table.h"
-#include "SafeStack.h"
-#include "CallStack.h"
-#include "smart_ptr.h"
-
 #include <map>
 #include <vector>
 #include <memory> 
@@ -38,6 +32,14 @@
 #include <boost/random.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/array.hpp>
+
+#include "GC.h"
+#include "string_table.h"
+#include "SafeStack.h"
+#include "CallStack.h"
+#include "smart_ptr.h"
+#include "as_value.h"
 
 // Forward declarations
 namespace gnash {
@@ -50,6 +52,7 @@ namespace gnash {
 	class as_value;
 	class as_object;
 	class VirtualClock;
+    class UserFunction;
 }
 
 namespace gnash {
@@ -65,26 +68,22 @@ private:
     VM& _vm;
 };
 
-/// The virtual machine
+/// The AVM1 virtual machine
 //
-/// This is the machine that executes all actions in the 
-/// main movie, including the actions in movies loaded by
-/// it.
-///
-/// Note that the target SWF version of the "main" movie
-/// (the first movie loaded, the 'root' movie) drives
-/// the operation, as depending on that version the Virtual
-/// Machine acts differently, for backward compatibility.
-/// 
-/// The VM is initialized once for each "stage" (main movie).
-/// Gnash currently only supports a *single* VM as it uses
-/// gloabls a lot. Definition of this class is aimed at
-/// grouping the globals into a specific VM instance that
-/// we might pass around in the future to allow multiple
-/// movies runs.
-/// For the moment, it will be a singleton, providing one-time
-/// initialization.
-///
+/// The VM class has no code for execution, but rather stores the resources
+/// needed for execution:
+//
+/// 1. The stack
+/// 2. Global registers
+/// 3. The call stack.
+//
+/// Actual execution is done by ActionExec.
+//
+/// This header also contains a few utility functions for ActionScript
+/// operations.
+//
+/// Currently the VM is a singleton, but this usage is deprecated. In future
+/// is should be fully re-entrant.
 class DSOEXPORT VM : boost::noncopyable
 {
 
@@ -92,12 +91,6 @@ public:
 
 	typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 
-    enum AVMVersion
-    {
-        AVM1,
-        AVM2
-    };
-	
     /// \brief
 	/// Initialize the virtual machine singleton with the given
 	/// movie definition and return a reference to it.
@@ -119,10 +112,6 @@ public:
 
 	SafeStack<as_value>& getStack() {
 		return _stack;
-	}
-
-	CallStack& getCallStack() {
-		return _callStack;
 	}
 
     /// Get the VM clock
@@ -167,19 +156,6 @@ public:
 
 	/// Set SWF version of the currently executing code
 	void setSWFVersion(int v);
-
-    /// Get the version of the currently executing VM
-    //
-    /// Note: this value changes according to the current execution context;
-    /// do not use it to determine what VM version a particular SWF uses.
-    AVMVersion getAVMVersion() const {
-        return _avmVersion;
-    }
-
-    /// Set the version of the currently executing VM.
-    void setAVMVersion(AVMVersion v) {
-        _avmVersion = v;
-    }
 
 	/// Get the number of milliseconds since VM was started
 	unsigned long int getTime() const;
@@ -261,6 +237,71 @@ public:
 	/// Return a native function or null
 	NativeFunction* getNative(unsigned int x, unsigned int y) const;
 
+    /// Get value of a register (local or global).
+    //
+    /// When not in a function context the selected register will be
+    /// global or not at all (if index is not in the valid range
+    /// of global registers).
+    ///
+    /// When in a function context defining no registers, 
+    /// we'll behave the same as for a non-function context.
+    ///
+    /// When in a function context defining non-zero number
+    /// of local registers, the register set will be either local
+    /// or not at all (if index is not in the valid range of local
+    /// registers).
+    //
+    /// @param index    The index of the register to retrieve.
+    /// @return         A pointer to the as_value at the specified position, or
+    ///                 0 if the index is invalid
+    const as_value* getRegister(size_t index);
+
+    /// Set value of a register (local or global).
+    //
+    /// When not in a function context the set register will be
+    /// global or not at all (if index is not in the valid range
+    /// of global registers).
+    ///
+    /// When in a function context defining no registers, 
+    /// we'll behave the same as for a non-function context.
+    ///
+    /// When in a function context defining non-zero number
+    /// of local registers, the register set will be either local
+    /// or not at all (if index is not in the valid range of local
+    /// registers).
+    ///
+    /// @param index    The index of the register to set. If the index
+    ///                 is invalid, this is a no-op.
+    /// @param val      The value to set the register to.
+    void setRegister(size_t index, const as_value& val);
+
+    /// Add a function call to the call frame.
+    //
+    /// This should be called for all user-defined functions before the
+    /// function is executed
+    //
+    /// @return     The pushed CallFrame. This is identical to currentCall().
+    CallFrame& pushCallFrame(UserFunction& f);
+
+    /// Remove a function call from the call frame.
+    //
+    /// This should be called on return from the function.
+    void popCallFrame();
+
+    /// Return the CallFrame of the currently executing function.
+    //
+    /// Callers must ensure that there is a current function before calling
+    /// this!
+    CallFrame& currentCall();
+
+    /// Whether a function call is in progress.
+    bool calling() const {
+        return !_callStack.empty();
+    }
+
+    /// Print stack, call stack, and registers to the specified ostream
+    void dumpState(std::ostream& o, size_t limit = 0);
+
 #ifdef GNASH_USE_GC
 	void addStatic(GcResource* res)
 	{
@@ -327,19 +368,42 @@ private:
 
 	SafeStack<as_value>	_stack;
 
+    typedef boost::array<as_value, 4> GlobalRegisters;
+    GlobalRegisters _globalRegisters;
+
 	CallStack _callStack;
 
 	/// Library of SharedObjects. Owned by the VM.
     std::auto_ptr<SharedObjectLibrary> _shLib;
 
-    /// The currently executing machine
-    //
-    /// This is a hack like switching the SWF version, but without this
-    /// there is no way for AS functions to know which version of the
-    /// virtual machine called them. This is necessary e.g. for initializing
-    /// the correct object prototypes etc.
-    AVMVersion _avmVersion;
+};
 
+/// A class to wrap frame access.  Stack allocating a frame guard
+/// will ensure that all CallFrame pushes have a corresponding
+/// CallFrame pop, even in the presence of extraordinary returns.
+class FrameGuard
+{
+public:
+
+    FrameGuard(VM& vm, UserFunction& func)
+        :
+        _vm(vm),
+        _callFrame(_vm.pushCallFrame(func))
+    {
+    }
+
+    /// Get the CallFrame we've just pushed.
+    CallFrame& callFrame() {
+        return _callFrame;
+    }
+
+    ~FrameGuard() {
+        _vm.popCallFrame();
+    }
+
+private:
+    VM& _vm;
+    CallFrame& _callFrame;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -380,13 +444,6 @@ void subtract(as_value& op1, const as_value& op2, VM& vm);
 /// @param op2      The second comparand.
 /// @param vm       The VM executing the operation.
 as_value newLessThan(const as_value& op1, const as_value& op2, VM& vm);
-
-/// Return true if the VM is executing AS3 (ABC bytecode).
-inline bool
-isAS3(VM& vm)
-{
-    return vm.getAVMVersion() == VM::AVM2;
-}
 
 } // namespace gnash
 

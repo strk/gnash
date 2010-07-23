@@ -19,24 +19,23 @@
 #ifndef GNASH_SWF_FUNCTION_H
 #define GNASH_SWF_FUNCTION_H
 
-#include "as_function.h" // for inheritance
-
-#include "smart_ptr.h"
 #include <vector>
 #include <cassert>
 #include <string>
 
+#include "UserFunction.h"
+#include "smart_ptr.h"
+
 // Forward declarations
 namespace gnash {
     class action_buffer;
-    class as_environmnet;
     class as_object;
 }
 
 namespace gnash {
 
 /// SWF-defined Function 
-class swf_function : public as_function
+class swf_function : public UserFunction
 {
 
 public:
@@ -115,6 +114,10 @@ public:
 
 	void set_is_function2() { _isFunction2 = true; }
 
+    size_t registers() const {
+        return _registerCount;
+    }
+
 	void set_local_register_count(boost::uint8_t ct) {
         assert(_isFunction2);
         _registerCount = ct;
@@ -125,7 +128,7 @@ public:
         _function2Flags = flags;
     }
 
-	void add_arg(int arg_register, const char* name)
+	void add_arg(boost::uint8_t arg_register, string_table::key name)
 	{
 		assert(arg_register == 0 || _isFunction2 == true);
         _args.push_back(Argument(arg_register, name));
@@ -170,9 +173,9 @@ private:
 
 	struct Argument
 	{
-        Argument(int r, const std::string& n) : reg(r), name(n) {}
+        Argument(int r, string_table::key n) : reg(r), name(n) {}
 		int reg;
-		std::string name;
+        string_table::key name;
 	};
 
 	std::vector<Argument> _args;

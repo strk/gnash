@@ -36,7 +36,6 @@
 #include "swf_event.h"
 #include "sprite_definition.h"
 #include "ActionExec.h"
-#include "builtin_function.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "VM.h"
 #include "Range2d.h" // for getBounds
@@ -1718,7 +1717,7 @@ MovieClip::constructAsScriptObject()
     // A MovieClip should always have an associated object.
     assert(mc);
 
-    if (!isAS3(getVM(*mc)) && !get_parent()) {
+    if (!get_parent()) {
         mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
     }
 

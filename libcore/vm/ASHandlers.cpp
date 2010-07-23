@@ -2045,16 +2045,17 @@ ActionPushData(ActionExec& thread)
 
             case pushRegister: // 4
             {
-                unsigned int reg = code[3 + i];
+                const size_t reg = code[3 + i];
                 ++i;
-                as_value v;
-                if (!env.getRegister(reg, v)) {
+                const as_value* v = getVM(env).getRegister(reg);
+                if (!v) {
                     IF_VERBOSE_MALFORMED_SWF(
                         log_swferror(_("Invalid register %d in ActionPush"),
                             reg);
                     );
+                    env.push(as_value());
                 }
-                env.push(v);
+                else env.push(*v);
                 break;
             }
 
@@ -2273,7 +2274,7 @@ ActionGotoExpression(ActionExec& thread)
         target = env.find_target(target_path);
     }
 
-    // 4.11 would make parse_path above return true,
+    // 4.11 would make parsePath above return true,
     // we should check if a sprite named '4' is supposed to work
     // in that case
     if (!target) {
@@ -2456,7 +2457,6 @@ ActionCallFunction(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
-    std::string function_name;
 
     // Let's consider it a as a string and lookup the function.
     //
@@ -2464,8 +2464,6 @@ ActionCallFunction(ActionExec& thread)
     // null or numbers, are converted to a string and the corresponding
     // function is called. If it is undefined, nothing happens, even if
     // there is a function called 'undefined'.
-    //
-    // Using to_string() would produce the wrong behaviour.
     //
     // In all cases, even undefined, the specified number of arguments
     // is dropped from the stack.
@@ -2618,14 +2616,16 @@ ActionVar(ActionExec& thread)
     as_environment& env = thread.env;
     
     const std::string& varname = env.top(0).to_string();
-    if ( thread.isFunction() )
-    {
-       env.declare_local(varname);
+    const string_table::key name = getStringTable(env).find(varname);
+    VM& vm = getVM(env);
+
+    if (vm.calling()) {
+        declareLocal(vm.currentCall(), name);
     }
-    else
-    {
+    else {
        IF_VERBOSE_ASCODING_ERRORS(
-       log_aserror(_("The 'var whatever' syntax in timeline context is a no-op."));
+       log_aserror(_("The 'var whatever' syntax in timeline context is a "
+               "no-op."));
        );
     }
     env.drop(1);
@@ -3473,6 +3473,8 @@ ActionDefineFunction2(ActionExec& thread)
 
     func->set_function2_flags(flags);
 
+    string_table& st = getStringTable(env);
+
     // Get the register assignments and names of the arguments.
     for (unsigned n = 0; n < nargs; n++)
     {
@@ -3480,10 +3482,10 @@ ActionDefineFunction2(ActionExec& thread)
         ++i;
 
         // @@ security: watch out for possible missing terminator here!
-        const char* arg = code.read_string(i);
+        const std::string arg(code.read_string(i));
 
-        func->add_arg(arg_register, arg);
-        i += strlen(arg)+1;
+        func->add_arg(arg_register, st.find(arg));
+        i += arg.size() + 1;
     }
 
     // Get the length of the actual function code.
@@ -3691,16 +3693,18 @@ ActionDefineFunction(ActionExec& thread)
     // Get number of arguments.
     unsigned nargs = code.read_int16(i);
     i += 2;
+    
+    string_table& st = getStringTable(env);
 
     // Get the names of the arguments.
     for (unsigned n = 0; n < nargs; n++)
     {
-        const char* arg = code.read_string(i);
+        const std::string arg(code.read_string(i));
 
         // @@ security: watch out for possible missing terminator here!
-        func->add_arg(0, arg);
+        func->add_arg(0, st.find(arg));
         // wouldn't it be simpler to use strlen(arg)+1 ?
-        i += strlen(arg)+1; // func->m_args.back().m_name.length() + 1;
+        i += arg.size() + 1; 
     }
 
     // Get the length of the actual function code.
@@ -3765,35 +3769,7 @@ ActionSetRegister(ActionExec& thread)
     const size_t reg = code[thread.getCurrentPC() + 3];
 
     // Save top of stack in specified register.
-    const int ret = env.setRegister(reg, env.top(0));
-
-    switch (ret) {
-        default:
-        case 0:
-        {
-            IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("Invalid register %d in ActionSetRegister"),
-                    reg);
-            );
-            break;
-        }
-        case 1:
-        {
-            IF_VERBOSE_ACTION (
-                log_action(_("-------------- global register[%d] = '%s'"),
-                    reg, env.top(0));
-            );
-            break;
-        }
-        case 2:
-        {
-            IF_VERBOSE_ACTION (
-                log_action(_("-------------- local register[%d] = '%s'"),
-                    reg, env.top(0));
-            );
-            break;
-        }
-    }
+    getVM(env).setRegister(reg, env.top(0));
 }
 
 
