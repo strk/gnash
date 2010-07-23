@@ -276,15 +276,6 @@ private:
     as_value get_variable_raw(const std::string& varname,
         const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
 
-    /// Delete a variable from the given as_object
-    //
-    /// @param varname
-    /// Name of the local variable
-    ///
-    /// @return true if the variable was found and deleted, false otherwise
-    ///
-    bool delLocal(const std::string& varname);
-
     static as_value undefVal;
         
 };

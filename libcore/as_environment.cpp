@@ -348,7 +348,7 @@ as_environment::delVariableRaw(const std::string& varname,
     }
 
     // Check locals for deletion.
-    if ( delLocal(varname) )
+    if (_vm.calling() && deleteLocal(_vm.currentCall().locals(), varname))
     {
         return true;
     }
@@ -674,14 +674,6 @@ int
 as_environment::get_version() const
 {
     return _vm.getSWFVersion();
-}
-
-
-bool
-as_environment::delLocal(const std::string& varname)
-{
-    if (!_vm.calling()) return false;
-    return deleteLocal(_vm.currentCall().locals(), varname);
 }
 
 void
