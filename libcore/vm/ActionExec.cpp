@@ -745,12 +745,6 @@ ActionExec::adjustNextPC(int offset)
     next_pc += offset;
 }
 
-bool
-ActionExec::isFunction2() const
-{
-    return _func ? _func->isFunction2() : false;
-}
-
 void
 ActionExec::dumpActions(size_t from, size_t to, std::ostream& os)
 {

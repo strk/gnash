@@ -276,9 +276,6 @@ public:
 	///
 	ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr);
 
-	/// Is this execution thread a function2 call ?
-	bool isFunction2() const;
-
 	/// Is this execution thread a function call ?
 	bool isFunction() const { return _func != 0; }
 

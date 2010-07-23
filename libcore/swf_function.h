@@ -107,11 +107,6 @@ public:
 		return _length;
 	}
 
-	bool isFunction2() const
-	{
-		return _isFunction2;
-	}
-
 	void set_is_function2() { _isFunction2 = true; }
 
     size_t registers() const {
