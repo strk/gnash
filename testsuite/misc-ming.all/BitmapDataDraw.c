@@ -32,7 +32,7 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc;
+    SWFMovieClip mc, mc3;
     SWFMovieClip dejagnuclip;
     SWFShape sh;
     SWFDisplayItem it;
@@ -89,6 +89,78 @@ main(int argc, char** argv)
     SWFDisplayItem_setName(it, "mc1");
     
     SWFMovie_nextFrame(mo);
+
+    add_actions(mo,
+            "_root.b = new flash.display.BitmapData(100, 100, false);"
+            "b.draw(mc1);"
+            "c = _root.createEmptyMovieClip('dynmc', 88);"
+            "_root.dynmc._x = 200;"
+            "_root.dynmc.attachBitmap(b, 24);"
+            );
+
+    // Dimensions are restricted to the BitmapData's size.
+    check_equals(mo, "b.width", "100");
+    check_equals(mo, "b.height", "100");
+    
+    // TODO: Check pixels!
+    
+    // Do the same with double width and height.
+    add_actions(mo,
+            "b = new flash.display.BitmapData(100, 100, false);"
+            "b.draw(mc1, new flash.geom.Matrix(2, 0, 0, 2, 34, 34));"
+            "_root.createEmptyMovieClip('dynmc2', 89);"
+            "_root.dynmc2._x = 200;"
+            "_root.dynmc2.attachBitmap(b, 24);"
+            );
+
+    // Dimensions are restricted to the BitmapData's size.
+    check_equals(mo, "b.width", "100");
+    check_equals(mo, "b.height", "100");
+
+    // TODO: Check pixels!
+    
+    // Add with a different matrix
+    it = SWFMovie_add(mo, (SWFBlock)mc);
+    SWFDisplayItem_setMatrix(it, 0.5f, 0.f, 0.f, 2.0f, 0.f, 200.f);
+    SWFDisplayItem_setName(it, "mc2");
+    
+    // Check that the BitmapData ignores PlaceObject matrix.
+    add_actions(mo,
+            "b = new flash.display.BitmapData(400, 400, false);"
+            "b.draw(mc2);"
+            "_root.createEmptyMovieClip('dynmc2', 88);"
+            "_root.dynmc2._y = 200;"
+            "_root.dynmc2._x = 200;"
+            "_root.dynmc2.attachBitmap(b, 28);"
+            );
+    
+    // This is a sanity check more than anything else.
+    check_equals(mo, "b.width", "400");
+    check_equals(mo, "b.height", "400");
+
+    SWFMovie_nextFrame(mo);
+    
+    // Create a nested MovieClip. The clip mc3 contains a
+    // copy of mc with a funny translation.
+    mc3 = newSWFMovieClip();
+    it = SWFMovieClip_add(mc3, (SWFBlock)mc);
+    SWFDisplayItem_setName(it, "mc3_mc1");
+    SWFDisplayItem_setMatrix(it, 0.5f, 0.1f, -0.1f, 0.5f, 20.f, 20.f);
+    SWFMovieClip_nextFrame(mc3);
+
+    it = SWFMovie_add(mo, (SWFBlock)mc3);
+    SWFDisplayItem_setName(it, "mc3");
+
+    // This shows that the matrix of sub-clips is used. 
+    add_actions(mo,
+            "b = new flash.display.BitmapData(400, 400, false);"
+            "b.draw(mc3);"
+
+            // Re-use an earlier dynamic clip.
+            "_root.dynmc2._y = 200;"
+            "_root.dynmc2._x = 200;"
+            "_root.dynmc2.attachBitmap(b, 28);"
+            );
 
     add_actions(mo, "stop();");
 
