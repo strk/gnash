@@ -94,15 +94,29 @@ check_equals(o.b, undefined);
 /* Check deleting a single variable with delete and delete2. This should fail
    with delete */
 o = 5;
+
+var reto;
+
+// This tests opcode delete called with only one stack item. The
+// result is pushed to a register, then assigned to reto. A normal
+// setvariable call needs the variable to be on the stack before the
+// value, but the the stack would have two items for the delete call...
 asm {
    push 'o'
    delete
+   setregister r:3
+   push 'reto'
+   push r:3
+   setvariable
    pop
 };
+
 #if OUTPUT_VERSION < 7
  check_equals(o, undefined)
+ check_equals(reto, true)
 #else
  check_equals(o, 5);
+ check_equals(reto, false)
 #endif
 
 o = 5;
@@ -245,7 +259,7 @@ asm {
 check_equals(o.b.c, 5);
 
 
-totals(27+14);
+totals(27+15);
 
 #else
 
