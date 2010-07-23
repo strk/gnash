@@ -27,25 +27,6 @@
 
 const char* mediadir=".";
 
-void
-addRedSquareExport(SWFMovie mo)
-{
-    SWFShape sh;
-    SWFMovieClip mc;
-
-    sh = make_fill_square (0, 0, 60, 60, 255, 0, 0, 255, 0, 0);
-    mc = newSWFMovieClip();
-
-    SWFMovieClip_add(mc, (SWFBlock)sh);
-    /* This is here just to turn the clip into an active one */
-    add_clip_actions(mc, "onRollOver = function() {};");
-    SWFMovieClip_nextFrame(mc);
-
-    SWFMovie_addExport(mo, (SWFBlock)mc, "redsquare");
-
-    SWFMovie_writeExports(mo);
-}
-
 
 int
 main(int argc, char** argv)
@@ -53,8 +34,9 @@ main(int argc, char** argv)
     SWFMovie mo;
     SWFMovieClip mc;
     SWFMovieClip dejagnuclip;
-    SWFShape shape;
+    SWFShape sh;
     SWFDisplayItem it;
+    SWFFillStyle fill;
 
     if (argc > 1) mediadir = argv[1];
     else {
@@ -74,6 +56,45 @@ main(int argc, char** argv)
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
  
     SWFMovie_nextFrame(mo);
+    
+    mc = newSWFMovieClip();
+
+    // Two shapes.
+
+    // Shape 1
+    sh = newSWFShape();
+    fill = newSWFSolidFillStyle(0x00, 0xff, 0xff, 0xff);
+    SWFShape_setRightFillStyle(sh, fill);
+    SWFShape_drawLine(sh, 100.0, 0.0);
+    SWFShape_drawLine(sh, 0.0, 100.0);
+    SWFShape_drawLine(sh, -100.0, 0.0);
+    SWFShape_drawLine(sh, 0.0, -100.0);
+    SWFMovieClip_add(mc, (SWFBlock)sh);
+
+    // Shape 2
+    sh = newSWFShape();
+    fill = newSWFSolidFillStyle(0xff, 0x00, 0xff, 0xff);
+    SWFShape_setRightFillStyle(sh, fill);
+    SWFShape_movePenTo(sh, 80.0, 80.0);
+    SWFShape_drawLine(sh, 50.0, 0.0);
+    SWFShape_drawLine(sh, 0.0, 50.0);
+    SWFShape_drawLine(sh, -50.0, 0.0);
+    SWFShape_drawLine(sh, 0.0, -50.0);
+    SWFMovieClip_add(mc, (SWFBlock)sh);
+
+    // Show frame for static MovieClip
+    SWFMovieClip_nextFrame(mc);
+
+    it = SWFMovie_add(mo, (SWFBlock)mc);
+    SWFDisplayItem_setName(it, "mc1");
+    
+    SWFMovie_nextFrame(mo);
+
+    add_actions(mo, "stop();");
+
+    // Output movie
+    puts("Saving " OUTPUT_FILENAME);
+    SWFMovie_save(mo, OUTPUT_FILENAME);
 
     return EXIT_SUCCESS;
 }
