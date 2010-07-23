@@ -195,6 +195,7 @@ check_PROGRAMS = \
 	new_child_in_unload_test \
 	instanceNameTest \
 	BitmapDataTest \
+	BitmapDataDraw \
 	BitmapSmoothingTest \
 	$(NULL)
 
@@ -1571,6 +1572,20 @@ BitmapDataTest_LDADD = libgnashmingutils.la
 
 BitmapDataTest.swf: BitmapDataTest
 	./BitmapDataTest $(abs_mediadir)
+
+
+BitmapDataDraw_SOURCES = \
+	BitmapDataDraw.c \
+	$(NULL)
+
+BitmapDataDraw_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+BitmapDataDraw_LDADD = libgnashmingutils.la
+
+BitmapDataDraw.swf: BitmapDataDraw
+	./BitmapDataDraw $(abs_mediadir)
 
 EmbeddedSoundTest_SOURCES = \
 	EmbeddedSoundTest.c \
