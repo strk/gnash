@@ -2457,7 +2457,6 @@ ActionCallFunction(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
-    std::string function_name;
 
     // Let's consider it a as a string and lookup the function.
     //
@@ -2465,8 +2464,6 @@ ActionCallFunction(ActionExec& thread)
     // null or numbers, are converted to a string and the corresponding
     // function is called. If it is undefined, nothing happens, even if
     // there is a function called 'undefined'.
-    //
-    // Using to_string() would produce the wrong behaviour.
     //
     // In all cases, even undefined, the specified number of arguments
     // is dropped from the stack.
