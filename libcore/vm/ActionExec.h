@@ -116,117 +116,34 @@ private:
 class ActionExec : boost::noncopyable
 {
 
-private: 
-
-	/// \brief
-	/// Debugging function:
-	/// print opcodes from start (included) to end (not-included) PCs.
-	//
-	/// @param start
-	///	First opcode to dump
-	///
-	/// @param end
-	///	One-past last opcode to dump
-	///
-	/// @param os
-	///	Output stream to dump to
-	///
-	void dumpActions(size_t start, size_t end, std::ostream& os);
-
-    /// Processes the current try - catch - finally block
-    //
-    /// This function is called after each stage of a
-    /// try/catch/finally block. It ensures it is called
-    /// after each stage by setting stop_pc to the appropriate
-    /// number. If an exception is on the stack at any stage,
-    /// it takes the appropriate action (catch, set register
-    /// values, return, or leave it on the stack). Return
-    /// false means that the action processing loop should be
-    /// interrupted.
-    //
-    /// @return whether to continue executing the buffer
-    //
-    /// @param t the try block to process.
-    bool processExceptions(TryBlock& t);
-
-	/// Run after a complete run, or after an run interrupted by 
-	/// a bail-out exception (ActionLimitException, for example)
-	//
-	/// The method restores original target of the as_environment,
-	/// checks for stack smashing (stack contains less entries
-	/// then it had at time of execution start) or leftovers
-	/// (stack contains more entries then it had at time of execution
-	/// start) and finally gives movie_root a chance to execute
-	/// actions queued in higher priority action queues.
-	///
-	/// The higher priority action queue flush is needed to allow
-	/// initialize/construct/initactions queued by effect of gotoFrame
-	/// calls in DOACTION block before frame actions queued by the same
-	/// cause (the latter would be pushed in the same level gotoFrame is
-	/// found)
-	void cleanupAfterRun();
-
-	/// the 'with' stack associated with this execution thread
-	std::vector<With> _withStack;
-
-	typedef as_environment::ScopeStack ScopeStack;
-
-	/// the scope stack associated with this execution thread
-	ScopeStack _scopeStack;
-
-	/// Limit of with stack
-	//
-	/// This is 7 for SWF up to 5 and 15 for SWF 6 and up
-	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
-	///
-	/// Actually, there's likely NO point in using the limit.
-	/// The spec say that a player6 is ensured to provide at least 15 elements
-	/// in a 'with' stack, while player5 can support at most 7.
-	/// There is no provision of a limit though.
-	///
-	/// Gnash will use this information only to generate useful
-	/// warnings for coders (if ActionScript errors verbosity is
-	/// enabled).
-	///
-	size_t _withStackLimit;
-
-	/// A pointer to the function being executed, or NULL
-	/// for non-function execution
-	///
-	/// TODO: 
-	/// This should likely be put in a larger
-	/// structure including return address 
-	/// and maintained in a stack (the call stack)
-	///
-	const swf_function* _func;
-
-	/// The 'this' pointer, if this is a function call
-	as_object* _this_ptr;
-
-	/// Stack size at start of execution
-	size_t _initialStackSize;
-
-	DisplayObject* _originalTarget;
-
-	int _origExecSWFVersion;
-
-	std::list<TryBlock> _tryList;
-
-	bool _returning;
-
-	bool _abortOnUnload;
-
-    /// Program counter (offset of current action tag)
-	size_t pc;
-
-	/// Offset to next action tag
-	size_t next_pc;
-
-	/// End of current function execution
-	/// Used for try/throw/catch blocks.
-	size_t stop_pc;
+    typedef as_environment::ScopeStack ScopeStack;
 
 public:
+
+	/// Create an execution thread 
+	//
+	/// @param abuf
+	///	the action code
+	///
+	/// @param newEnv
+	///	the execution environment (variables scope, stack etc.)
+	///
+	/// @param abortOnUnloaded
+	///	If true (the default) execution aborts as soon as the target
+    /// sprite is unloaded.
+	///	NOTE: original target is fetched from the environment.
+	///
+	ActionExec(const action_buffer& abuf, as_environment& newEnv,
+            bool abortOnUnloaded = true);
+
+	/// Create an execution thread for a function call.
+	//
+	/// @param func     The function 
+	/// @param newEnv   The execution environment (variables scope, stack etc.)
+	/// @param nRetval  Where to return a value. If NULL any return will
+    /// be discarded.
+	ActionExec(const swf_function& func, as_environment& newEnv,
+            as_value* nRetVal, as_object* this_ptr);
 
 	/// \brief
 	/// Use this to push a try block.
@@ -248,33 +165,6 @@ public:
 
 	/// TODO: provide a setter and make private ?
 	as_value* retval;
-
-	/// Create an execution thread 
-	//
-	/// @param abuf
-	///	the action code
-	///
-	/// @param newEnv
-	///	the execution environment (variables scope, stack etc.)
-	///
-	/// @param abortOnUnloaded
-	///	If true (the default) execution aborts as soon as the target sprite is unloaded.
-	///	NOTE: original target is fetched from the environment.
-	///
-	ActionExec(const action_buffer& abuf, as_environment& newEnv, bool abortOnUnloaded=true);
-
-	/// Create an execution thread for a function call.
-	//
-	/// @param func
-	///	The function 
-	///
-	/// @param newEnv
-	///	The execution environment (variables scope, stack etc.)
-	///
-	/// @param nRetval
-	///	Where to return a value. If NULL any return will be discarded.
-	///
-	ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr);
 
 	/// Is this execution thread a function call ?
 	bool isFunction() const { return _func != 0; }
@@ -391,6 +281,114 @@ public:
 	
 	size_t getStopPC() const { return stop_pc; }
 	
+private: 
+
+	/// \brief
+	/// Debugging function:
+	/// print opcodes from start (included) to end (not-included) PCs.
+	//
+	/// @param start
+	///	First opcode to dump
+	///
+	/// @param end
+	///	One-past last opcode to dump
+	///
+	/// @param os
+	///	Output stream to dump to
+	///
+	void dumpActions(size_t start, size_t end, std::ostream& os);
+
+    /// Processes the current try - catch - finally block
+    //
+    /// This function is called after each stage of a
+    /// try/catch/finally block. It ensures it is called
+    /// after each stage by setting stop_pc to the appropriate
+    /// number. If an exception is on the stack at any stage,
+    /// it takes the appropriate action (catch, set register
+    /// values, return, or leave it on the stack). Return
+    /// false means that the action processing loop should be
+    /// interrupted.
+    //
+    /// @return whether to continue executing the buffer
+    //
+    /// @param t the try block to process.
+    bool processExceptions(TryBlock& t);
+
+	/// Run after a complete run, or after an run interrupted by 
+	/// a bail-out exception (ActionLimitException, for example)
+	//
+	/// The method restores original target of the as_environment,
+	/// checks for stack smashing (stack contains less entries
+	/// then it had at time of execution start) or leftovers
+	/// (stack contains more entries then it had at time of execution
+	/// start) and finally gives movie_root a chance to execute
+	/// actions queued in higher priority action queues.
+	///
+	/// The higher priority action queue flush is needed to allow
+	/// initialize/construct/initactions queued by effect of gotoFrame
+	/// calls in DOACTION block before frame actions queued by the same
+	/// cause (the latter would be pushed in the same level gotoFrame is
+	/// found)
+	void cleanupAfterRun();
+
+	/// the 'with' stack associated with this execution thread
+	std::vector<With> _withStack;
+
+	/// the scope stack associated with this execution thread
+	ScopeStack _scopeStack;
+
+	/// Limit of with stack
+	//
+	/// This is 7 for SWF up to 5 and 15 for SWF 6 and up
+	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
+	///
+	/// Actually, there's likely NO point in using the limit.
+	/// The spec say that a player6 is ensured to provide at least 15 elements
+	/// in a 'with' stack, while player5 can support at most 7.
+	/// There is no provision of a limit though.
+	///
+	/// Gnash will use this information only to generate useful
+	/// warnings for coders (if ActionScript errors verbosity is
+	/// enabled).
+	///
+	size_t _withStackLimit;
+
+	/// A pointer to the function being executed, or NULL
+	/// for non-function execution
+	///
+	/// TODO: 
+	/// This should likely be put in a larger
+	/// structure including return address 
+	/// and maintained in a stack (the call stack)
+	///
+	const swf_function* _func;
+
+	/// The 'this' pointer, if this is a function call
+	as_object* _this_ptr;
+
+	/// Stack size at start of execution
+	size_t _initialStackSize;
+
+	DisplayObject* _originalTarget;
+
+	int _origExecSWFVersion;
+
+	std::list<TryBlock> _tryList;
+
+	bool _returning;
+
+	bool _abortOnUnload;
+
+    /// Program counter (offset of current action tag)
+	size_t pc;
+
+	/// Offset to next action tag
+	size_t next_pc;
+
+	/// End of current function execution
+	/// Used for try/throw/catch blocks.
+	size_t stop_pc;
+
 };
 
 } // namespace gnash
