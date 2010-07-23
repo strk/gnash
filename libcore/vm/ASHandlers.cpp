@@ -1749,8 +1749,6 @@ ActionChr(ActionExec& thread)
 void
 ActionGetTimer(ActionExec& thread)
 {
-    
-    
     as_environment& env = thread.env;
 
     const VM& vm = getVM(env);
@@ -1760,7 +1758,6 @@ ActionGetTimer(ActionExec& thread)
 void
 ActionMbSubString(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     const as_value& arg0 = env.top(0);
@@ -2343,8 +2340,7 @@ ActionDelete(ActionExec& thread)
     //
     // In both cases, if there are two or more items on the stack, they
     // have to be property and object.
-    if (stackSize < 2)
-    {
+    if (stackSize < 2) {
         if (version > 6) {
             env.top(1).set_bool(false);
             env.drop(1);
@@ -2352,34 +2348,33 @@ ActionDelete(ActionExec& thread)
         }
 
         std::string path, var;
-        if (!parsePath(propertyname, path, var))
-        {
+        if (!parsePath(propertyname, path, var)) {
             // It's not a path. For SWF 7 and above, don't delete. Otherwise
             // assume it's a variable and try to delete.
             env.top(1).set_bool(thread.delVariable(propertyname));
+            env.drop(1);
+            return;
         }
-        else
-        {
+        else {
             as_value target = thread.getVariable(path);
-
-            if ( target.is_object() ) // Don't syntetize one otherwise !!
-            {
+  
+            // Don't create an object! Only get the value if it is an object
+            // already.
+            if (target.is_object()) {
                 obj = toObject(getGlobal(thread.env), target);
-
                 propertyname = var;
             }
         }
     }
-    else
-    {
-        if ( env.top(1).is_object() ) // Don't syntetize one otherwise !!
-        {
+    else {
+        // Don't create an object! Only get the value if it is an object
+        // alreay.
+        if (env.top(1).is_object()) {
             obj = toObject(getGlobal(thread.env), env.top(1));
         }
     }
 
-    if (!obj)
-    {
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("delete %s.%s: no object found to delete"),
                         env.top(1), env.top(0));
