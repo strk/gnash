@@ -47,7 +47,24 @@ CallFrame::markReachableResources() const
     std::for_each(_registers.begin(), _registers.end(),
             std::mem_fun_ref(&as_value::setReachable));
 
-    if (_locals) _locals->setReachable();
+    assert(_locals);
+    _locals->setReachable();
+}
+
+void
+declareLocal(CallFrame& c, string_table::key name)
+{
+    as_object& locals = c.locals();
+    if (!locals.hasOwnProperty(name)) {
+        locals.set_member(name, as_value());
+    }
+}
+
+void
+addLocal(CallFrame& c, string_table::key name, const as_value& val)
+{
+    as_object& locals = c.locals();
+    locals.set_member(name, val);
 }
 
 std::ostream&

@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "as_value.h"
+#include "string_table.h"
 
 // Forward declarations
 namespace gnash {
@@ -110,6 +111,10 @@ private:
     Registers _registers;
 
 };
+
+void declareLocal(CallFrame& c, string_table::key name);
+
+void addLocal(CallFrame& c, string_table::key name, const as_value& val);
 
 typedef std::vector<CallFrame> CallStack;
 

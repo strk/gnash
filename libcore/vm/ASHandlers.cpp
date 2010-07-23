@@ -2619,14 +2619,16 @@ ActionVar(ActionExec& thread)
     as_environment& env = thread.env;
     
     const std::string& varname = env.top(0).to_string();
-    if ( thread.isFunction() )
-    {
-       env.declare_local(varname);
+    const string_table::key name = getStringTable(env).find(varname);
+    VM& vm = getVM(env);
+
+    if (vm.calling()) {
+        declareLocal(vm.currentCall(), name);
     }
-    else
-    {
+    else {
        IF_VERBOSE_ASCODING_ERRORS(
-       log_aserror(_("The 'var whatever' syntax in timeline context is a no-op."));
+       log_aserror(_("The 'var whatever' syntax in timeline context is a "
+               "no-op."));
        );
     }
     env.drop(1);
@@ -3474,6 +3476,8 @@ ActionDefineFunction2(ActionExec& thread)
 
     func->set_function2_flags(flags);
 
+    string_table& st = getStringTable(env);
+
     // Get the register assignments and names of the arguments.
     for (unsigned n = 0; n < nargs; n++)
     {
@@ -3481,10 +3485,10 @@ ActionDefineFunction2(ActionExec& thread)
         ++i;
 
         // @@ security: watch out for possible missing terminator here!
-        const char* arg = code.read_string(i);
+        const std::string arg(code.read_string(i));
 
-        func->add_arg(arg_register, arg);
-        i += strlen(arg)+1;
+        func->add_arg(arg_register, st.find(arg));
+        i += arg.size() + 1;
     }
 
     // Get the length of the actual function code.
@@ -3692,16 +3696,18 @@ ActionDefineFunction(ActionExec& thread)
     // Get number of arguments.
     unsigned nargs = code.read_int16(i);
     i += 2;
+    
+    string_table& st = getStringTable(env);
 
     // Get the names of the arguments.
     for (unsigned n = 0; n < nargs; n++)
     {
-        const char* arg = code.read_string(i);
+        const std::string arg(code.read_string(i));
 
         // @@ security: watch out for possible missing terminator here!
-        func->add_arg(0, arg);
+        func->add_arg(0, st.find(arg));
         // wouldn't it be simpler to use strlen(arg)+1 ?
-        i += strlen(arg)+1; // func->m_args.back().m_name.length() + 1;
+        i += arg.size() + 1; 
     }
 
     // Get the length of the actual function code.

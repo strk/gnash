@@ -111,6 +111,7 @@ swf_function::call(const fn_call& fn)
 
 	// Set up local stack frame, for parameters and locals.
 	FrameGuard guard(getVM(fn), *this);
+    CallFrame& cf = guard.callFrame();
 
 	DisplayObject* target = _env.get_target();
 	DisplayObject* orig_target = _env.get_original_target();
@@ -150,13 +151,13 @@ swf_function::call(const fn_call& fn)
 		{
 			assert(_args[i].reg == 0);
 			if (i < fn.nargs) {
-				_env.add_local(_args[i].name, fn.arg(i));
+                addLocal(cf, _args[i].name, fn.arg(i));
 			}
 			else {
 				// Still declare named arguments, even if
 				// they are not passed from caller
 				// See bug #22203
-				_env.declare_local(_args[i].name);
+                declareLocal(cf, _args[i].name);
 			}
 		}
 
@@ -186,7 +187,6 @@ swf_function::call(const fn_call& fn)
 
         // This is us. TODO: why do we have to query the VM to get
         // what are effectively our own resources?
-        CallFrame& cf = guard.callFrame();
 
         // If this is not suppressed it is either placed in a register
         // or set as a local variable, but not both.
@@ -200,7 +200,8 @@ swf_function::call(const fn_call& fn)
             }
             else {
                 // Put 'this' in a local var.
-                _env.add_local("this", fn.this_ptr ? fn.this_ptr : as_value());
+                addLocal(cf, NSV::PROP_THIS,
+                        fn.this_ptr ? fn.this_ptr : as_value());
             }
         }
 
@@ -224,8 +225,9 @@ swf_function::call(const fn_call& fn)
                 ++current_reg;
             }
             else {
+                string_table& st = getStringTable(fn);
                 // Put 'arguments' in a local var.
-                _env.add_local("arguments", args);
+                addLocal(cf, st.find("arguments"), args);
             }
 
         }
@@ -244,7 +246,7 @@ swf_function::call(const fn_call& fn)
 				current_reg++;
 			}
             else if (super) {
-                _env.add_local("super", super);
+                addLocal(cf, NSV::PROP_SUPER, super);
             }
 		}
 
@@ -284,13 +286,13 @@ swf_function::call(const fn_call& fn)
 			if (!_args[i].reg) {
 				if (i < fn.nargs) {
 					// Conventional arg passing: create a local var.
-					_env.add_local(_args[i].name, fn.arg(i));
+					addLocal(cf, _args[i].name, fn.arg(i));
 				}
 				else {
 					// Still declare named arguments, even if
 					// they are not passed from caller
 					// See bug #22203
-					_env.declare_local(_args[i].name);
+                    declareLocal(cf, _args[i].name);
 				}
 			}
 			else {

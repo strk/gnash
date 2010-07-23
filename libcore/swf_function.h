@@ -128,7 +128,7 @@ public:
         _function2Flags = flags;
     }
 
-	void add_arg(int arg_register, const char* name)
+	void add_arg(boost::uint8_t arg_register, string_table::key name)
 	{
 		assert(arg_register == 0 || _isFunction2 == true);
         _args.push_back(Argument(arg_register, name));
@@ -173,9 +173,9 @@ private:
 
 	struct Argument
 	{
-        Argument(int r, const std::string& n) : reg(r), name(n) {}
+        Argument(int r, string_table::key n) : reg(r), name(n) {}
 		int reg;
-		std::string name;
+        string_table::key name;
 	};
 
 	std::vector<Argument> _args;
