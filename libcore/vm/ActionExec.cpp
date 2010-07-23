@@ -121,7 +121,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
         bool abortOnUnloaded)
     :
     _withStack(),
-    _scopeStack(), // TODO: initialize the scope stack somehow
+    _scopeStack(),
     _withStackLimit(7),
     _func(0),
     _initialStackSize(0),
