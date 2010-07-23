@@ -453,13 +453,13 @@ as_environment::set_local(const std::string& varname, const as_value& val)
 void
 as_environment::declare_local(const std::string& varname)
 {
+    assert(_vm.calling());
     as_value tmp;
-    if ( ! findLocal(varname, tmp) )
+    as_object& locals = _vm.currentCall().locals();
+    if (!getLocal(locals, varname, tmp))
     {
         // Not in frame; create a new local var.
-        assert(_vm.calling());
-        assert( ! varname.empty() );    // null varnames are invalid!
-        as_object& locals = _vm.currentCall().locals();
+        assert(!varname.empty());    // null varnames are invalid!
         locals.set_member(_vm.getStringTable().find(varname), as_value());
     }
 }
