@@ -77,11 +77,7 @@ public:
         return &_registers[i];
     }
 
-    bool setLocalRegister(size_t i, const as_value& val) {
-        if (i >= _registers.size()) return false;
-        _registers[i] = val;
-        return true;
-    }
+    void setLocalRegister(size_t i, const as_value& val);
 
     /// Set the number of registers for this CallFrame.
     //

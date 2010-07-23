@@ -290,6 +290,12 @@ VM::setRegister(size_t index, const as_value& val)
 
     // Do nothing if the index is out of bounds.
     if (index < _globalRegisters.size()) _globalRegisters[index] = val;
+
+    IF_VERBOSE_ACTION(
+        log_action(_("-------------- global register[%d] = '%s'"),
+            index, val);
+    );
+
 }
 
 CallFrame&

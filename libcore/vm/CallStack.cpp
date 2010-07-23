@@ -17,12 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "CallStack.h"
+
+#include <ostream>
+
 #include "as_object.h"
 #include "UserFunction.h" 
 #include "Global_as.h" 
 #include "Property.h"
-
-#include <ostream>
+#include "log.h"
 
 namespace gnash {
 
@@ -50,6 +52,20 @@ CallFrame::markReachableResources() const
 
     assert(_locals);
     _locals->setReachable();
+}
+
+void
+CallFrame::setLocalRegister(size_t i, const as_value& val)
+{
+    if (i >= _registers.size()) return;
+
+    _registers[i] = val;
+
+    IF_VERBOSE_ACTION(
+        log_action(_("-------------- local register[%d] = '%s'"),
+            i, val);
+    );
+
 }
 
 void
