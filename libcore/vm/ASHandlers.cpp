@@ -412,8 +412,7 @@ SWFHandlers::SWFHandlers()
             ActionConstantPool, ARG_DECL_DICT);
     _handlers[ACTION_DEFINEFUNCTION2] = ActionHandler(ACTION_DEFINEFUNCTION2,
             ActionDefineFunction2, ARG_FUNCTION2);
-    _handlers[ACTION_TRY] = ActionHandler(ACTION_TRY,
-            ActionTry, ARG_FUNCTION2);
+    _handlers[ACTION_TRY] = ActionHandler(ACTION_TRY, ActionTry, ARG_FUNCTION2);
     _handlers[ACTION_WITH] = ActionHandler(ACTION_WITH,
             ActionWith, ARG_U16);
     _handlers[ACTION_DEFINEFUNCTION] = ActionHandler(ACTION_DEFINEFUNCTION,
