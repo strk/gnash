@@ -337,22 +337,6 @@ private:
 	/// the scope stack associated with this execution thread
 	ScopeStack _scopeStack;
 
-	/// Limit of with stack
-	//
-	/// This is 7 for SWF up to 5 and 15 for SWF 6 and up
-	/// See: http://sswf.sourceforge.net/SWFalexref.html#action_with
-	///
-	/// Actually, there's likely NO point in using the limit.
-	/// The spec say that a player6 is ensured to provide at least 15 elements
-	/// in a 'with' stack, while player5 can support at most 7.
-	/// There is no provision of a limit though.
-	///
-	/// Gnash will use this information only to generate useful
-	/// warnings for coders (if ActionScript errors verbosity is
-	/// enabled).
-	///
-	size_t _withStackLimit;
-
 	/// A pointer to the function being executed, or NULL
 	/// for non-function execution
 	///
