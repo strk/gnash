@@ -2801,11 +2801,13 @@ cygnal/testsuite/cygnal.all/Makefile
 
 cerr=/tmp/gnash-configure-errors.$$
 cwarn=/tmp/gnash-configure-warnings.$$
+crec=/tmp/gnash-configure-recommended.$$
 echo ""
 
 #trap 'rm cerr' 0 # trap isn't a good idea, might override other traps
 exec 3> $cerr 
 exec 4> $cwarn
+exec 5> $crec
 
 echo "Configurable options are:"
 
@@ -3006,11 +3008,11 @@ if test x"${PNG_LIBS}" != x ; then
   fi
   echo "        PNG libs are: $PNG_LIBS"
 else
-  echo "        RECOMMENDED: No PNG library development package installed!" >&4
-  echo "                     Gnash will be built without support for dynamic loading of PNG files." >&4
-  echo "                     Install it from http://www.libpng.org" >&4
-  echo "                     or .deb users: apt-get install libpng12-dev" >&4
-  echo "                     or .rpm users: yum install libpng-devel" >&4
+  echo "        RECOMMENDED: No PNG library development package installed!" >&5
+  echo "                     Gnash will be built without support for dynamic loading of PNG files." >&5
+  echo "                     Install it from http://www.libpng.org" >&5
+  echo "                     or .deb users: apt-get install libpng12-dev" >&5
+  echo "                     or .rpm users: yum install libpng-devel" >&5
 fi
 
 if test x"${build_ogl}" = x"yes"; then
@@ -3158,15 +3160,15 @@ if test x"$build_media_gst" = x"yes"; then
     fi
     echo "        Gstreamer libs are: $GSTREAMER_LIBS"
     if test x"$has_modern_gstpbutils" = "xno"; then
-      echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&4
-      echo "                     Gstreamer can pop up a message prompting them to." >&4
-      echo "                     Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled" >&4
-      echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
+      echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&5
+      echo "                     Gstreamer can pop up a message prompting them to." >&5
+      echo "                     Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled" >&5
+      echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&5
     fi
     if test x"$has_gstreamer_plugins_base" = "xno"; then
-      echo "                        Install gstreamer-plugins-base from http://www.gstreamer.net" >&3
-      echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&3
-      echo "                        or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
+      echo "                        Install gstreamer-plugins-base from http://www.gstreamer.net" >&5
+      echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&5
+      echo "                        or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&5
     fi
   else
     echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >&3
@@ -3347,11 +3349,11 @@ if test x"$CURL_LIBS" != x; then
   fi
     echo "        CURL libs are: $CURL_LIBS"
 else
-  echo "        RECOMMENDED: If you install the CURL library, Gnash will be able to" >&4
-  echo "                     display remote content (streaming from URLs) using CURL." >&4
-  echo "                     Install libcurl from http://curl.haxx.se/libcurl" >&4
-  echo "                     or .deb users: apt-get install libcurl-dev" >&4
-  echo "                     or .rpm users: yum install curl-devel" >&4
+  echo "        RECOMMENDED: If you install the CURL library, Gnash will be able to" >&5
+  echo "                     display remote content (streaming from URLs) using CURL." >&5
+  echo "                     Install libcurl from http://curl.haxx.se/libcurl" >&5
+  echo "                     or .deb users: apt-get install libcurl-dev" >&5
+  echo "                     or .rpm users: yum install curl-devel" >&5
 fi
 
 if test x"$SPEEX_LIBS" != x; then
@@ -3362,11 +3364,11 @@ if test x"$SPEEX_LIBS" != x; then
   fi
     echo "        Speex libs are: $SPEEX_LIBS"
 else
-  echo "        RECOMMENDED: If you install the Speex library, Gnash will be able to" >&4
-  echo "                     decoded Speex encoded audio in FLV files." >&4
-  echo "                     Install libspeex from http://speex.org" >&4
-  echo "                     or .deb users: apt-get install libspeex-dev" >&4
-  echo "                     or .rpm users: yum install speex-devel" >&4
+  echo "        RECOMMENDED: If you install the Speex library, Gnash will be able to" >&5
+  echo "                     decoded Speex encoded audio in FLV files." >&5
+  echo "                     Install libspeex from http://speex.org" >&5
+  echo "                     or .deb users: apt-get install libspeex-dev" >&5
+  echo "                     or .rpm users: yum install speex-devel" >&5
 fi
 
 if test x"$ext_dbus" = xyes; then
@@ -3575,13 +3577,13 @@ if test x"$Z_LIBS" != x; then
   fi
   echo "        Z libs are: $Z_LIBS"
 else
-  echo "        RECOMMENDED: You need to have the zlib development packages installed" >&4
-  echo "                     to play compressed SWF (most of them from version 6 up)" >&4
-  echo "                     and to display some kinds of JPEG files." >&4
-  echo "                     Install it from http://www.zlib.net" >&4
-  echo "                     or .deb users: apt-get install zlib1g-dev" >&4
-  echo "                     or .rpm users: yum install zlib-devel." >&4
-  echo "                     It may still be possible to configure without zlib." >&4
+  echo "        RECOMMENDED: You need to have the zlib development packages installed" >&5
+  echo "                     to play compressed SWF (most of them from version 6 up)" >&5
+  echo "                     and to display some kinds of JPEG files." >&5
+  echo "                     Install it from http://www.zlib.net" >&5
+  echo "                     or .deb users: apt-get install zlib1g-dev" >&5
+  echo "                     or .rpm users: yum install zlib-devel." >&5
+  echo "                     It may still be possible to configure without zlib." >&5
 fi
 
 if test x"$FREETYPE2_LIBS" != x; then
@@ -3592,12 +3594,12 @@ if test x"$FREETYPE2_LIBS" != x; then
   fi
   echo "        FreeType libs are: $FREETYPE2_LIBS"
 else
-  echo "        RECOMMENDED: You need to have the freetype development packages installed" >&4
-  echo "                     to use device fonts." >&4
-  echo "                     Install it from http://www.freetype.org" >&4
-  echo "                     or .deb users: apt-get install libfreetype6-dev" >&4
-  echo "                     or .rpm users: yum install freetype-devel" >&4
-  echo "                     It may still be possible to configure without freetype." >&4
+  echo "        RECOMMENDED: You need to have the freetype development packages installed" >&5
+  echo "                     to use device fonts." >&5
+  echo "                     Install it from http://www.freetype.org" >&5
+  echo "                     or .deb users: apt-get install libfreetype6-dev" >&5
+  echo "                     or .rpm users: yum install freetype-devel" >&5
+  echo "                     It may still be possible to configure without freetype." >&5
 fi
 
 if test x"$FONTCONFIG_LIBS" != x; then
@@ -3608,12 +3610,12 @@ if test x"$FONTCONFIG_LIBS" != x; then
   fi
   echo "        Fontconfig libs are: $FONTCONFIG_LIBS"
 else
-  echo "        RECOMMENDED: You need to have the fontconfig development packages installed" >&4
-  echo "                     to use device fonts." >&4
-  echo "                     Install it from http://www.fontconfig.org" >&4
-  echo "                     or .deb users: apt-get install libfontconfig1-dev" >&4
-  echo "                     or .rpm users: yum install fontconfig-devel" >&4
-  echo "                     It may still be possible to configure without fontconfig." >&4
+  echo "        RECOMMENDED: You need to have the fontconfig development packages installed" >&5
+  echo "                     to use device fonts." >&5
+  echo "                     Install it from http://www.fontconfig.org" >&5
+  echo "                     or .deb users: apt-get install libfontconfig1-dev" >&5
+  echo "                     or .rpm users: yum install fontconfig-devel" >&5
+  echo "                     It may still be possible to configure without fontconfig." >&5
 fi
 
 if test x$ext_mysql = xyes; then
@@ -3838,6 +3840,14 @@ if test -s $cwarn; then
   echo ""
   echo "Gnash should still compile even with these warnings."
   echo "If it doesn't, report the warnings as a bug."
+fi
+
+if test -s $crec; then
+  echo ""
+  cat $crec
+  rm $crec
+  echo ""
+  echo "Gnash should still compile, but you'll miss important support"
 fi
 
 dnl If anything critical is missing, don't bother to continue
