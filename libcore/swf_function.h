@@ -51,7 +51,13 @@ private:
 
 };
 
-/// SWF-defined Function 
+/// A simple SWF-defined Function
+//
+/// This represents a callable Function defined in a SWF. The basic version
+/// creates a scope in which and 'arguments' array, 'this', 'super', and the
+/// expected argument names are defined.
+//
+/// For a more advanced function, see Function2.
 class swf_function : public UserFunction
 {
 

@@ -34,7 +34,14 @@ namespace gnash {
 
 namespace gnash {
 
-/// SWF-defined Function 
+/// Function2 adds extra sauce to ordinary Functions.
+//
+/// The Function2 was introduced in version 6 of the player. Differences from
+/// ordinary functions are:
+/// 1. Up to 256 local registers.
+/// 2. Ability to suppress super, this, arguments
+/// 3. Ability to store super, this, arguments, _global, _root, and _parent
+///    in registers.
 class Function2 : public swf_function
 {
 
