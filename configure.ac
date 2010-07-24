@@ -272,6 +272,52 @@ fi
 SOLDIR=${soldir}
 AC_SUBST(SOLDIR)
 
+AC_ARG_ENABLE(doublebuf,
+  AC_HELP_STRING([--enable-doublebuf], [Enable support for double buffering when rendering]),
+  [case "${enableval}" in
+    yes) doublebuf=yes ;;
+    no)  doublebuf=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-doublebuf option]) ;;
+  esac], doublebuf=no
+)
+AM_CONDITIONAL(ENABLE_DBUF, [test x"$doublebuf" = xyes])
+if test x$doublebuf = xyes; then
+    AC_DEFINE(ENABLE_DOUBLE_BUFFERING, [1], [Enable double buffering])
+fi
+
+dnl This enables rendering to an offscreen buffer, instead of directly to window
+AC_ARG_ENABLE(offscreen,
+  AC_HELP_STRING([--enable-offscreen], [Enable support for rendering offscreen]),
+  [case "${enableval}" in
+    yes) offscreen=yes ;;
+    no)  offscreen=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-offscreen option]) ;;
+  esac], offscreen=yes
+)
+
+dnl We can use Xephyr or fbe to create a fake framebuffer instead of real
+dnl video memory. This lets us test on a desktop machine.
+AC_ARG_WITH(fakefb,
+AC_HELP_STRING([--with-fakefb],
+ [specify a file to be mapped instead of a real framebuffer]),
+ with_fakefb=${withval})
+
+fakefb=
+if test x"${with_fakefb}" = xyes; then
+  dnl This is the default file name fbe uses.
+  fakefb=/tmp/fbe_buffer
+else
+  if test x"${with_fakefb}" != x; then
+    fakefb=${with_fakefb}
+  fi
+fi
+FAKEFB=${fakefb}
+AC_SUBST(FAKEFB)
+
+if test x"${fakefb}" != x; then
+    AC_DEFINE(ENABLE_FAKE_FRAMEBUFFER, [1], [Enable using a file instead of a real framebuffer])
+fi
+
 AC_ARG_ENABLE(avm2,
   AC_HELP_STRING([--enable-avm2], [Enable support for AS3]),
   [case "${enableval}" in
@@ -698,13 +744,13 @@ operating system." >&3
 fi
 
 dnl By default, we want to to build all renderers
-build_ovg=no
-build_gles=no
-build_ogl=yes
-build_agg=yes
-build_cairo=yes
-renderer_list="OpenGL AGG Cairo"
-nrender=3
+build_gles=no   dnl OpenGL-ES 1.1 and 2.x
+build_ovg=yes   dnl OpenVG
+build_ogl=yes   dnl OpenGL
+build_agg=yes   dnl AntiGrain
+build_cairo=yes dnl Cairo
+renderer_list="OpenGL OpenVG AGG Cairo"
+nrender=4
 AC_ARG_ENABLE(renderer,
   AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|gles|cairo|agg|all, default=all)]),
   if test -n ${enableval}; then
@@ -757,7 +803,7 @@ AC_ARG_ENABLE(renderer,
         ;;
       ovg|OVG|OpenVG|openvg)
         renderer_list="${renderer_list} OpenVG"
-        build_ogv=yes
+        build_ovg=yes
         nrender=$((nrender+1))
         ;;
       agg|AGG)
@@ -894,6 +940,18 @@ if test x$pixelformat = xall; then
       AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32 pixel format])
     #fi
   fi
+fi
+
+dnl For now, always enable offscreeen rendering for AGG, as that's how it
+dnl currently works.
+AC_DEFINE(ENABLE_AGG_OFFSCREEN, [1], [Enable offscreen rendering for AGG])
+dnl OpenVG uses EGL for the device layer, currently we only support
+dnl rendering directly to a window.
+if test x"${build_ovg}" = xyes; then
+   offscreen=no
+fi
+if test x"${build_ovg}" = xyes -a x"${offscreen}" = xyes; then
+  AC_DEFINE(ENABLE_EGL_OFFSCREEN, [1], [Enable offscreen rendering for EGL])
 fi
 
 dnl --------------------------------------------------------
@@ -1095,8 +1153,12 @@ AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
 dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
 
+dnl DejaGnu is only used for testing.
 AC_PATH_PROG(DEJAGNU, runtest)
 
+dnl These conditionals are triggers only when the selected Renderers
+dnl are chosen to be built, and not on whether they are actually
+dnl supported. So if configure fails, make will fail at build time.
 AM_CONDITIONAL(BUILD_OVG_RENDERER, [ test x$build_ovg = xyes ])
 AM_CONDITIONAL(BUILD_GLES_RENDERER, [ test x$build_gles = xyes ])
 AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes])
@@ -1277,9 +1339,20 @@ fi
 SECURITY_LIST="$security_list"
 AC_SUBST(SECURITY_LIST)
 
+if test x"${build_agg}" = xyes; then
+  AC_DEFINE([RENDERER_AGG], [1], [Use AntiGrain renderer])
+fi
 
-if test x$build_agg = xyes; then
-  AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
+if test x"${build_ovg}" = xyes; then
+  AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
+fi
+
+if test x"${build_gles}" = xyes; then
+  AC_DEFINE([RENDERER_GLES], [1], [Use the OpenGL-ES 1.1 renderer])
+fi
+
+if test x"${build_gles}" = xyes; then
+  AC_DEFINE([RENDERER_GLES2], [1], [Use the OpenGL-ES 2.x renderer])
 fi
 
 dnl For Haiku, we know the sysroot is in a non-standard place
@@ -2139,9 +2212,12 @@ if test x"${build_gles}" = xyes; then
   GNASH_PATH_GLES
 fi
 
-if test x"${build_ogv}" = xyes; then
+dnl The current version of OpenVG supported by most ARM platforms
+dnl is OpenVG 1.1. Mesa 7.8.x implements only OpenVG 1.0.1, so
+dnl some features like Masks and Fonts are missing on the desktop.
+if test x"${build_ovg}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
-  GNASH_PKG_FIND(OpenVG, [vg/openvg.h], [OpenVG library], vgDrawImage)
+  GNASH_PKG_FIND(OpenVG, [VG/openvg.h], [OpenVG library], vgDrawImage)
 fi
 
 if test x"${build_ogl}" = xyes; then
@@ -3827,6 +3903,13 @@ if test x"$docbook" = x"yes"; then
   fi
 else
   echo "        DocBook document processing disabled (default)"
+fi
+
+if test x"${offscreen}" = xyes; then
+  echo "        Using offscreen rendering"
+fi
+if test x"${doublebuf}" = xyes; then
+  echo "        Using double buffering when rendering"
 fi
 
 if test -s $cwarn; then
