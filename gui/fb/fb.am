@@ -20,8 +20,11 @@
 #
 if BUILD_FB_GUI
 bin_PROGRAMS += fb-gnash
-fb_gnash_SOURCES = $(GUI_SRCS) fb/gui_fb.cpp fb/fb.cpp fb/fbsup.h
-fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
+fb_gnash_SOURCES = $(GUI_SRCS) \
+	fb/gui_fb.cpp \
+	fb/fb.cpp \
+	fb/fbsup.h
+fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" -DFAKEFB=\"$(FAKEFB)\" \
 	$(AM_CPPFLAGS) 
 fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 #fb_gnash_DEPENDENCIES = .configline
@@ -29,9 +32,26 @@ fb_gnash_LDADD = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(GNASH_LIBS) 
 
+# Build support for AntiGrain.
 if BUILD_AGG_RENDERER
+fb_gnash_SOURCES += fb/fb_glue_agg.cpp fb/fb_glue_agg.h
 fb_gnash_CPPFLAGS += $(AGG_CFLAGS)
 fb_gnash_LDADD += $(AGG_LIBS)
-endif				# BUILD_AGG_RENDERER
-endif				# BUILD_FB_GUI
+endif	# BUILD_AGG_RENDERER
+
+# Build support for OpenVG.
+if BUILD_OVG_RENDERER
+fb_gnash_SOURCES += fb/fb_glue_ovg.cpp fb/fb_glue_ovg.h
+fb_gnash_CPPFLAGS += $(OPENVG_CFLAGS) $(EGL_CFLAGS)
+fb_gnash_LDADD += $(OPENVG_LIBS) $(EGL_LIBS)
+endif	# BUILD_OVG_RENDERER
+
+# This supports only OpenGL-ES 1.1 with EGL support.
+if BUILD_GLES_RENDERER
+fb_gnash_SOURCES += fb/fb_glue_gles.cpp fb/fb_glue_gles.h
+fb_gnash_CPPFLAGS += $(GLES_CFLAGS)
+fb_gnash_LDADD += $(GLES__LIBS)
+endif	# BUILD_OVG_RENDERER
+
+endif	# BUILD_FB_GUI
 

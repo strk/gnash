@@ -16,7 +16,6 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-
 ## Process this file with automake to generate Makefile.in
 
 AUTOMAKE_OPTIONS =
@@ -58,8 +57,10 @@ GNASH_LIBS = \
 
 noinst_HEADERS = \
 	Renderer.h \
+	Renderer_ovg.h \
 	Renderer_agg.h \
 	Renderer_agg_bitmap.h \
+	Renderer_ovg_bitmap.h \
 	Renderer_agg_style.h \
 	Renderer_cairo.h \
 	Renderer_ogl.h \
@@ -79,6 +80,11 @@ libgnashrender_la_SOURCES += Renderer_agg.cpp
 libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
+if  BUILD_OVG_RENDERER
+libgnashrender_la_SOURCES += Renderer_ovg.cpp 
+libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
+endif
+
 if  BUILD_CAIRO_RENDERER
 libgnashrender_la_SOURCES += Renderer_cairo.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
@@ -91,7 +97,6 @@ mudflap:
 
 clean-hook:
 	-rm -f core.*
-
 
 if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)

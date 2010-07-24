@@ -36,25 +36,29 @@
 // OpenGL support for rendering in the canvas. This also requires
 // the GtkGL widget for GTK2.
 #ifdef HAVE_GTK_GTKGL_H
-#include "gtk_glue_gtkglext.h"
+# include "gtk_glue_gtkglext.h"
+#endif
+
+#ifdef HAVE_VG_OPENVG_H
+# include "gtk_glue_egl.h"
 #endif
 
 // Cairo support for rendering in the canvas.
 #ifdef HAVE_CAIRO_H
-#include "gtk_glue_cairo.h"
+# include "gtk_glue_cairo.h"
 #endif
 
 // This uses the Xv extension to X11, which has widespread support
 // for Hw video scaling.
 #ifdef HAVE_XV
-#include "gtk_glue_agg_xv.h"
+# include "gtk_glue_agg_xv.h"
 #endif
 
 // AGG support, which is the default, for rendering in the canvas.
 #include "gtk_glue_agg.h"
 
 #ifdef HAVE_VA_VA_H
-#include "gtk_glue_agg_vaapi.h"
+# include "gtk_glue_agg_vaapi.h"
 #endif
 
 struct _GnashCanvas
@@ -80,6 +84,7 @@ namespace {
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
+// allocate memory for GtkCanvas
 GtkWidget *
 gnash_canvas_new ()
 {
@@ -87,6 +92,7 @@ gnash_canvas_new ()
     return GTK_WIDGET(g_object_new (GNASH_TYPE_CANVAS, NULL));
 }
 
+// Initialize canvas,set allocate, expose, comfigure, realize event handlers
 static void
 gnash_canvas_class_init(GnashCanvasClass *gnash_canvas_class)
 {
@@ -101,6 +107,7 @@ gnash_canvas_class_init(GnashCanvasClass *gnash_canvas_class)
     widget_class->realize = gnash_canvas_realize;
 }
 
+// Disable double bufferinf in the canvas, add reaize event handlers
 static void
 gnash_canvas_init(GnashCanvas *canvas)
 {
@@ -163,6 +170,7 @@ static void
 gnash_canvas_realize(GtkWidget *widget)
 {
     GNASH_REPORT_FUNCTION;
+    
     GnashCanvas *canvas = GNASH_CANVAS(widget);
     GdkWindowAttr attributes;
     gint attributes_mask;
@@ -197,6 +205,7 @@ static void
 gnash_canvas_after_realize(GtkWidget *widget)
 {
     GNASH_REPORT_FUNCTION;
+    
     GnashCanvas *canvas = GNASH_CANVAS(widget);
 
     canvas->renderer.reset(canvas->glue->createRenderHandler());
@@ -205,14 +214,14 @@ gnash_canvas_after_realize(GtkWidget *widget)
                                         widget->allocation.height);
 }
 
+// Select renderer and hwaccel, prep canvas for drawing
 void
 gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         std::string& renderer, int argc, char **argv[])
 {
-
     GNASH_REPORT_FUNCTION;
 
-    // Order should be VAAPI, Xv, X11
+    // Order should be VAAPI, Xv, Omap
     bool initialized_renderer = false;
 
     // If a renderer hasn't been defined in gnashrc, or on the command
@@ -230,6 +239,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
     std::string next_hwaccel = hwaccel;
 
     while (!initialized_renderer) {
+        gnash::log_debug("Trying Renderer %s, and HWAccel %s", renderer, hwaccel);
         renderer = next_renderer;
         hwaccel = next_hwaccel;
 #ifdef HAVE_VA_VA_H
@@ -260,6 +270,17 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             // streaming video over a network connection just fine,
             // anything below about 600Mhz CPU may have buffering and
             // rendering performance issues.
+        }
+#endif
+#ifdef RENDERER_OPENVG
+	// Use OpenVG, which uses EGL as the display API. This works with
+	// Mesa on desktop unix systems, and on ARM based devices running
+	// Linux, often with manufacturer provided SDKs.
+        if (renderer == "openvg") {
+            canvas->glue.reset(new gnash::GtkEGLGlue);
+            // Set the renderer to the next one to try if initializing
+            // fails.
+            next_renderer = "agg";
         }
 #endif
         if (renderer == "agg") {
@@ -297,9 +318,13 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
                 (hwaccel == "none")) {
             break;
         }
+        if (!initialized_renderer) {
+            gnash::log_debug("Trying to find new Renderer %s, and HWAccel %s",
+                             renderer, hwaccel);
+        }
     }
         
-    if (initialized_renderer && renderer == "opengl") {
+    if (initialized_renderer && (renderer == "opengl" || renderer == "openvg")) {
         // OpenGL glue needs to prepare the drawing area for OpenGL
         // rendering before
         // widgets are realized and before the configure event is fired.
@@ -312,12 +337,16 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
 void
 gnash_canvas_before_rendering(GnashCanvas *canvas)
 {
+    // GNASH_REPORT_FUNCTION;
+
     canvas->glue->beforeRendering();
 }
 
 boost::shared_ptr<gnash::Renderer>
 gnash_canvas_get_renderer(GnashCanvas *canvas)
 {
+    // GNASH_REPORT_FUNCTION;
+
     return canvas->renderer;
 }
 

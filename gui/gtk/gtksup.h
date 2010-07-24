@@ -47,7 +47,6 @@ extern "C" {
 namespace gnash
 {
 
-
 class GtkGui : public Gui
 {
 public:
@@ -187,3 +186,8 @@ private:
 } // namespace gnash
 
 #endif
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

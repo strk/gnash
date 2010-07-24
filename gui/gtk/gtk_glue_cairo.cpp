@@ -53,6 +53,8 @@ void
 GtkCairoGlue::prepDrawingArea(GtkWidget *drawing_area)
 {
     _drawing_area = drawing_area;
+    // Disable double buffering, otherwise gtk tries to update widget
+    // contents from its internal offscreen buffer at the end of expose event
     gtk_widget_set_double_buffered(_drawing_area, FALSE);
 }
 
