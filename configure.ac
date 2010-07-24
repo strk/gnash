@@ -3189,6 +3189,8 @@ fi
         fi
         echo "               This setup isn't supported!" >&3
         echo "               Version 51.11.0 or newer is required, enabling swscale if >= 52.0.0." >&3
+        echo "               You can install libswscale from http://ffmpeg.org" >&3
+        echo "               or .deb users: apt-get install libswscale-dev" >&3
       else
 	if test x"${avformat_h}" = x; then
           echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >&3
