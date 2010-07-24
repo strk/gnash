@@ -492,7 +492,6 @@ SWFHandlers::~SWFHandlers()
 {
 }
 
-
 std::vector<ActionHandler> &
 SWFHandlers::get_handlers()
 {
@@ -762,9 +761,7 @@ ActionWaitForFrame(ActionExec& thread)
     // Actually *wait* for target frame, and never skip any action
 
     size_t lastloaded = target_sprite->get_loaded_frames();
-    if ( lastloaded < framenum )
-    {
-        //log_debug(_("%s: frame %u not reached yet (loaded %u for sprite %s), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, target_sprite->getTarget(), skip);
+    if (lastloaded < framenum) {
         // better delegate this to ActionExec
         thread.skip_actions(skip);
     }
@@ -774,7 +771,6 @@ ActionWaitForFrame(ActionExec& thread)
 void
 ActionSetTarget(ActionExec& thread)
 {
-
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
 
@@ -783,7 +779,7 @@ ActionSetTarget(ActionExec& thread)
 #endif
 
     // Change the movie we're working on.
-    std::string target_name ( code.read_string(pc+3) );
+    const std::string target_name(code.read_string(pc+3));
 
     commonSetTarget(thread, target_name);
 }
@@ -791,20 +787,17 @@ ActionSetTarget(ActionExec& thread)
 void
 ActionGotoLabel(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
     const char* frame_label = code.read_string(thread.getCurrentPC()+3);
     DisplayObject *target = env.get_target();
     MovieClip *target_sprite = target ? target->to_movie() : 0;
-    if ( ! target_sprite )
-    {
-        log_error(_("%s: environment target is null or not a MovieClip"),
-            __FUNCTION__);
+    if (!target_sprite) {
+        log_error(_("GotoLabel: environment target is null or not a "
+                    "MovieClip"));
     }
-    else
-    {
+    else {
         target_sprite->goto_labeled_frame(frame_label);
     }
 }
@@ -812,7 +805,6 @@ ActionGotoLabel(ActionExec& thread)
 void
 ActionAdd(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     const double operand2 = env.top(0).to_number();
@@ -832,7 +824,6 @@ ActionSubtract(ActionExec& thread)
 void
 ActionMultiply(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     const double operand2 = env.top(0).to_number();
@@ -849,14 +840,12 @@ ActionMultiply(ActionExec& thread)
 void
 ActionDivide(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     const double operand2 = env.top(0).to_number();
     const double operand1 = env.top(1).to_number();
 
-    if (operand2 == 0)
-    {
+    if (operand2 == 0) {
         if (env.get_version() < 5) {
             env.top(1).set_string("#ERROR#");
         }
@@ -874,8 +863,7 @@ ActionDivide(ActionExec& thread)
         }
 
     }
-    else
-    {
+    else {
         env.top(1) = operand1 / operand2;
     }
     env.drop(1);
@@ -884,7 +872,6 @@ ActionDivide(ActionExec& thread)
 void
 ActionEqual(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -914,7 +901,7 @@ ActionLessThan(ActionExec& thread)
     env.top(1).set_bool(d2 < d1);
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
+    if (env.get_version() < 5) convertToNumber(env.top(1), getVM(env));
 
     env.drop(1);
 }
@@ -942,7 +929,6 @@ ActionLogicalOr(ActionExec& thread)
 void
 ActionLogicalNot(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     env.top(0).set_bool(! env.top(0).to_bool());
@@ -954,7 +940,6 @@ ActionLogicalNot(ActionExec& thread)
 void
 ActionStringEq(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     const int version = env.get_version();
@@ -989,7 +974,6 @@ ActionStringLength(ActionExec& thread)
 void
 ActionSubString(ActionExec& thread)
 {
-
     // substring("string",  base,  size) 
     // SWF4 function, deprecated in favour of String.substring.
     // 1-based (String object methods are 0-based).
@@ -1006,9 +990,7 @@ ActionSubString(ActionExec& thread)
     const std::wstring wstr = utf8::decodeCanonicalString(
                                 strval.to_string(version), version);
     
-
-    if (size < 0)
-    {
+    if (size < 0) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Negative size passed to ActionSubString, "
             "taking as whole length"));
@@ -1025,8 +1007,7 @@ ActionSubString(ActionExec& thread)
 
     // TODO: if 'start' or 'size' do not evaluate to numbers return
     //       the empty string (how do we check if they evaluate ??)
-    if ( start < 1 )
-    {
+    if (start < 1) {
         IF_VERBOSE_ASCODING_ERRORS (
             log_aserror(_("Start is less then 1 in ActionSubString, "
             "setting to 1."));
@@ -1036,8 +1017,7 @@ ActionSubString(ActionExec& thread)
 
     // If start is longer than the string length, return empty
     // string
-    else if (static_cast<unsigned int>(start) > wstr.length() )
-    {
+    else if (static_cast<unsigned int>(start) > wstr.length() ) {
         IF_VERBOSE_ASCODING_ERRORS (
             log_aserror(_("Start goes beyond input string in ActionSubString, "
             "returning the empty string."));
@@ -1050,11 +1030,10 @@ ActionSubString(ActionExec& thread)
     // Adjust the start for our own use.
     --start;
 
-    if (static_cast<unsigned int>(start + size) > wstr.length())
-    {
+    if (static_cast<unsigned int>(start + size) > wstr.length()) {
         IF_VERBOSE_ASCODING_ERRORS (
-            log_aserror(_("start + size goes beyond input string in ActionSubString, "
-            "adjusting size"));
+            log_aserror(_("start + size goes beyond input string in "
+                    "ActionSubString, adjusting size"));
         );
         size = wstr.length() - start;
     }
@@ -1073,10 +1052,7 @@ ActionSubString(ActionExec& thread)
 void
 ActionPop(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-    // this is an overhead only if SWF is malformed.
-    
     env.drop(1);
 }
 
@@ -1090,7 +1066,6 @@ ActionInt(ActionExec& thread)
 void
 ActionGetVariable(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     as_value& top_value = env.top(0);
@@ -1127,7 +1102,6 @@ ActionGetVariable(ActionExec& thread)
 void
 ActionSetVariable(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     const std::string& name = env.top(1).to_string();
@@ -1155,11 +1129,9 @@ ActionSetVariable(ActionExec& thread)
     env.drop(2);
 }
 
-// See: http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
 void
 ActionSetTargetExpression(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     // we don't ues the target sprite directly, instead we fetch the
@@ -1192,22 +1164,19 @@ ActionStringConcat(ActionExec& thread)
 void
 ActionGetProperty(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     as_value& tgt_val = env.top(1);
     std::string tgt_str = tgt_val.to_string();
     DisplayObject *target = NULL;
-    if ( tgt_str.empty() )
-    {
+    if (tgt_str.empty()) {
         target = get<DisplayObject>(thread.getTarget());
         if (!target) {
             log_error(_("ActionGetProperty(<empty>) called, but current "
                         "target is not a DisplayObject"));
         }
     }
-    else
-    {
+    else {
         target = env.find_target(tgt_str);
     }
  
@@ -1219,12 +1188,11 @@ ActionGetProperty(ActionExec& thread)
     if (target) {
         getIndexedProperty(prop_number, *target, env.top(1));
     }
-    else
-    {
+    else {
         // ASCODING error ? (well, last time it was a gnash error ;)
-        IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_("Could not find GetProperty target (%s)"),
-                tgt_val);
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Could not find GetProperty target (%s)"),
+                    tgt_val);
         );
         env.top(1) = as_value();
     }
@@ -1234,7 +1202,6 @@ ActionGetProperty(ActionExec& thread)
 void
 ActionSetProperty(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     DisplayObject *target = env.find_target(env.top(2).to_string());
@@ -1247,11 +1214,10 @@ ActionSetProperty(ActionExec& thread)
     if (target) {
         setIndexedProperty(prop_number, *target, prop_val);
     }
-    else
-    {
-        IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_("ActionSetProperty: can't find target %s for setting property %s"),
-            env.top(2), prop_number);
+    else {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("ActionSetProperty: can't find target %s for "
+                    "setting property %s"), env.top(2), prop_number);
         )
     }
     env.drop(3);
@@ -1260,20 +1226,21 @@ ActionSetProperty(ActionExec& thread)
 void
 ActionDuplicateClip(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
     // Movies should be attachable from -16384 to 2130690044. See
     // Tests in misc-ming.all/DepthLimitsTest.c.
-    const double depth = env.top(0).to_number() + DisplayObject::staticDepthOffset;
+    const double depth = env.top(0).to_number() +
+        DisplayObject::staticDepthOffset;
   
     // This also checks for overflow, as both numbers are expressible as
     // boost::int32_t.
     if (depth < DisplayObject::lowerAccessibleBound ||
-      depth > DisplayObject::upperAccessibleBound)
-    {
+      depth > DisplayObject::upperAccessibleBound) {
+
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("duplicateMovieClip: invalid depth %d passed; not duplicating"), depth);
+            log_aserror(_("duplicateMovieClip: invalid depth %d passed; "
+                    "not duplicating"), depth);
         );  
         env.drop(3);
         return;
@@ -1285,10 +1252,10 @@ ActionDuplicateClip(ActionExec& thread)
     const std::string& path = env.top(2).to_string();
 
     DisplayObject* ch = env.find_target(path);
-    if ( ! ch )
-    {
+    if (!ch) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Path given to duplicateMovieClip(%s) doesn't point to a DisplayObject"),
+            log_aserror(_("Path given to duplicateMovieClip(%s) doesn't "
+                    "point to a DisplayObject"),
                 path);
         );
         env.drop(3);
@@ -1296,8 +1263,7 @@ ActionDuplicateClip(ActionExec& thread)
     }
 
     MovieClip* sprite = ch->to_movie();
-    if ( ! sprite )
-    {
+    if (!sprite) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Path given to duplicateMovieClip(%s) is not a sprite"),
             path);
@@ -1313,31 +1279,28 @@ ActionDuplicateClip(ActionExec& thread)
 void
 ActionRemoveClip(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     const std::string path = env.pop().to_string();
 
     DisplayObject* ch = env.find_target(path);
-    if ( ! ch )
-    {
+    if (!ch) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Path given to removeMovieClip(%s) doesn't point to a DisplayObject"),
-            path);
+            log_aserror(_("Path given to removeMovieClip(%s) doesn't "
+                    "point to a DisplayObject"),
+                path);
         );
         return;
     }
 
     MovieClip* sprite = ch->to_movie();
-    if ( ! sprite )
-    {
+    if (!sprite) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Path given to removeMovieClip(%s) is not a sprite"),
             path);
         );
         return;
     }
-
     sprite->removeMovieClip();
 }
 
@@ -1345,9 +1308,7 @@ ActionRemoveClip(ActionExec& thread)
 void
 ActionTrace(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-
     const std::string val = env.pop().to_string();
     
     // Logging with a std::string here fails the swfdec testsuite,
@@ -1367,69 +1328,56 @@ ActionStartDragMovie(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_STARTDRAGMOVIE));
 #endif
 
-    
-
     drag_state st;
-
     DisplayObject* tgt = env.find_target(env.top(0).to_string());
-    if ( tgt )
-    {
+    if (tgt) {
         // mark this DisplayObject as script transformed.
         tgt->transformedByScript();
         st.setCharacter( tgt );
     }
-    else
-    {
+    else {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("startDrag: unknown target '%s'"),
-            env.top(0));
+            log_aserror(_("startDrag: unknown target '%s'"), env.top(0));
         );
     }
 
-    st.setLockCentered( env.top(1).to_bool() );
-    if ( env.top(2).to_bool() ) // has bounds !
-    {
+    st.setLockCentered(env.top(1).to_bool());
+
+    // Handle bounds.
+    if (env.top(2).to_bool()) {
         // strk: this works if we didn't drop any before, in
         // a contrary case (if we used pop(), which I suggest)
         // we must remember to updated this as required
-        
-
         boost::int32_t y1 = pixelsToTwips(env.top(3).to_number());
         boost::int32_t x1 = pixelsToTwips(env.top(4).to_number());
         boost::int32_t y0 = pixelsToTwips(env.top(5).to_number());
         boost::int32_t x0 = pixelsToTwips(env.top(6).to_number());
 
         // check for swapped values
-        if ( y1 < y0 )
-        {
+        if (y1 < y0) {
             IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Y values in ActionStartDrag swapped, fixing"));
+                log_swferror(_("Y values in ActionStartDrag swapped, fixing"));
             );
             std::swap(y1, y0);
         }
 
-        if ( x1 < x0 )
-        {
+        if (x1 < x0) {
             IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("X values in ActionStartDrag swapped, fixing"));
+                log_swferror(_("X values in ActionStartDrag swapped, fixing"));
             );
             std::swap(x1, x0);
         }
-
-        SWFRect bounds(x0, y0, x1, y1);
+        const SWFRect bounds(x0, y0, x1, y1);
         st.setBounds(bounds);
-
         env.drop(4);
     }
 
     env.drop(3);
 
-    if (tgt)
-    {
+    if (tgt) {
         VM& vm = getVM(env);
         vm.getRoot().set_drag_state(st);
     }
-
 }
 
 void
@@ -3197,13 +3145,11 @@ ActionNewMethod(ActionExec& thread)
         env.push(as_value());
         return;
     }
-
 }
 
 void
 ActionInstanceOf(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     // Get the "super" function
@@ -3233,7 +3179,6 @@ ActionInstanceOf(ActionExec& thread)
 void
 ActionEnum2(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     // Get the object.
@@ -3262,8 +3207,8 @@ ActionBitwiseAnd(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    int operand1 = toInt(env.top(1));
-    int operand2 = toInt(env.top(0));
+    const int operand1 = toInt(env.top(1));
+    const int operand2 = toInt(env.top(0));
 
     env.top(1) = operand1 & operand2;
     env.drop(1);
@@ -3272,11 +3217,10 @@ ActionBitwiseAnd(ActionExec& thread)
 void
 ActionBitwiseOr(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
-    int operand1 = toInt(env.top(1));
-    int operand2 = toInt(env.top(0));
+    const int operand1 = toInt(env.top(1));
+    const int operand2 = toInt(env.top(0));
 
     env.top(1) = operand1|operand2;
     env.drop(1);
@@ -3285,11 +3229,10 @@ ActionBitwiseOr(ActionExec& thread)
 void
 ActionBitwiseXor(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
-    int operand1 = toInt(env.top(1));
-    int operand2 = toInt(env.top(0));
+    const int operand1 = toInt(env.top(1));
+    const int operand2 = toInt(env.top(0));
 
     env.top(1) = operand1^operand2;
     env.drop(1);
@@ -3333,7 +3276,6 @@ ActionShiftRight(ActionExec& thread)
 void
 ActionShiftRight2(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     boost::uint32_t amount = toInt(env.top(0)); 
@@ -3352,7 +3294,7 @@ ActionStrictEq(ActionExec& thread)
     as_environment& env = thread.env;
     
     env.top(1).set_bool(env.top(1).strictly_equals(env.top(0)));
-        env.drop(1);
+    env.drop(1);
 }
 
 void
@@ -3670,7 +3612,7 @@ ActionDefineFunction(ActionExec& thread)
 
     // Extract name.
     // @@ security: watch out for possible missing terminator here!
-    std::string name = code.read_string(i);
+    const std::string name = code.read_string(i);
     i += name.length() + 1;
 
     // Get number of arguments.
