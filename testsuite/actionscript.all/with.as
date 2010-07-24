@@ -543,12 +543,94 @@ check_equals(typeof(mc.child), 'movieclip');
 check_equals(child, "rootChild");
 #endif // OUTPUT_VERSION > 5
 
+var a = {};
+a.b = {};
+a.b.c = {};
+a.b.c.d = {};
+a.b.c.d.e = {};
+a.b.c.d.e.f = {};
+a.b.c.d.e.f.g = {};
+a.b.c.d.e.f.g.h = {};
+a.b.c.d.e.f.g.h.i = {};
+a.b.c.d.e.f.g.h.i.j = {};
+a.b.c.d.e.f.g.h.i.j.k = {};
+a.b.c.d.e.f.g.h.i.j.k.l = {};
+a.b.c.d.e.f.g.h.i.j.k.l.m = {};
+a.b.c.d.e.f.g.h.i.j.k.l.m.n = {};
+a.b.c.d.e.f.g.h.i.j.k.l.m.n.o = {};
+a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p = {};
+a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q = {};
+a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r = {};
+a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s = {};
+
+withs = "";
+
+with(a) {
+ withs += "a";
+ check_equals(typeof(b), "object");
+ with(b) {
+  withs += "b";
+  with(c) {
+   withs += "c";
+   with(d) {
+    withs += "d";
+    with(e) {
+     withs += "e";
+     with(f) {
+      withs += "f";
+      with(g) {
+       withs += "g";
+       with(h) {
+        withs += "h";
+        with(i) {
+         withs += "i";
+         with(j) {
+          withs += "j";
+          with(k) {
+           withs += "k";
+           with(l) {
+            withs += "l";
+            with(m) {
+             withs += "m";
+             with(n) {
+              withs += "n";
+              with(o) {
+               withs += "o";
+               with(p) {
+                withs += "p";
+                with(q) {
+                 withs += "q";
+                 with(r) {
+                  withs += "r";
+                 }
+                }
+               }
+              }
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}
+
+// There are 13 levels for all versions!
+check_equals(withs, "abcdefghijklm");
+
+
 //---------------------------------------------------------
 // END OF TESTS
 //---------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- check_totals(41);
+ check_totals(43);
 #else
- check_totals(99);
+ check_totals(101);
 #endif
