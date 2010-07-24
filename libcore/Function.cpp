@@ -34,8 +34,8 @@ Function::Function(const action_buffer& ab, as_environment& env,
 			size_t start, const ScopeStack& scopeStack)
 	:
 	UserFunction(getGlobal(env)),
-	_action_buffer(ab),
 	_env(env),
+	_action_buffer(ab),
 	_scopeStack(scopeStack),
 	_startPC(start),
 	_length(0)

@@ -127,12 +127,23 @@ public:
 #endif // GNASH_USE_GC
 
 protected:
+	
+    struct Argument
+	{
+        Argument(boost::uint8_t r, string_table::key n) : reg(r), name(n) {}
+        boost::uint8_t reg;
+        string_table::key name;
+	};
 
-	/// Action buffer containing the function definition
-	const action_buffer& _action_buffer;
+	std::vector<Argument> _args;
 
 	/// @@ might need some kind of ref count here, but beware cycles
 	as_environment& _env;
+
+private:
+
+	/// Action buffer containing the function definition
+	const action_buffer& _action_buffer;
 
 	/// Scope stack on function definition.
 	ScopeStack _scopeStack;
@@ -149,14 +160,6 @@ protected:
 	/// to a DoAction block
 	size_t _length;
 
-	struct Argument
-	{
-        Argument(boost::uint8_t r, string_table::key n) : reg(r), name(n) {}
-        boost::uint8_t reg;
-        string_table::key name;
-	};
-
-	std::vector<Argument> _args;
 
 };
 
