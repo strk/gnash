@@ -35,7 +35,7 @@
 #include "zlib_adapter.h"
 #include "sprite_definition.h"
 #include "MovieClip.h"
-#include "swf_function.h"
+#include "Function.h"
 #include "as_function.h"
 #include "SWFMovieDefinition.h"
 #include "SWF.h"

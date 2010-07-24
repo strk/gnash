@@ -330,6 +330,8 @@ enum ActionType
 
 };
 
+std::ostream& operator<<(std::ostream& o, ActionType a);
+
 enum abc_action_type
 {
     /// AS3 Actions go below here.
