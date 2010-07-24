@@ -30,7 +30,7 @@
 #include "ASHandlers.h"
 #include "movie_definition.h"
 #include "NativeFunction.h"
-#include "swf_function.h"
+#include "Function.h"
 #include "as_function.h"
 #include "Function2.h"
 #include "fn_call.h"
@@ -3445,30 +3445,29 @@ ActionDefineFunction2(ActionExec& thread)
 
     // Extract name.
     // @@ security: watch out for possible missing terminator here!
-    std::string name = code.read_string(i);
+    const std::string name = code.read_string(i);
     i += name.length() + 1; // add NULL-termination
 
     // Get number of arguments.
-    const unsigned nargs = code.read_int16(i);
+    const boost::uint16_t nargs = code.read_uint16(i);
     i += 2;
 
     // Get the count of local registers used by this function.
-    boost::uint8_t register_count = code[i];
-    i++;
+    const boost::uint8_t register_count = code[i];
+    ++i;
 
-    func->set_local_register_count(register_count);
+    func->setRegisterCount(register_count);
 
     // Flags, for controlling register assignment of implicit args.
-    boost::uint16_t    flags = code.read_int16(i);
+    const boost::uint16_t flags = code.read_uint16(i);
     i += 2;
 
-    func->set_function2_flags(flags);
+    func->setFlags(flags);
 
     string_table& st = getStringTable(env);
 
     // Get the register assignments and names of the arguments.
-    for (unsigned n = 0; n < nargs; n++)
-    {
+    for (size_t n = 0; n < nargs; ++n) {
         boost::uint8_t arg_register = code[i];
         ++i;
 
@@ -3483,9 +3482,8 @@ ActionDefineFunction2(ActionExec& thread)
     boost::uint16_t code_size = code.read_int16(i);
 
     // Check code_size value consistency
-    size_t actionbuf_size = thread.code.size();
-    if ( thread.getNextPC() + code_size > actionbuf_size )
-    {
+    const size_t actionbuf_size = thread.code.size();
+    if (thread.getNextPC() + code_size > actionbuf_size) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("function2 code len (%u) "
                 "overflows DOACTION tag boundaries "
@@ -3499,7 +3497,7 @@ ActionDefineFunction2(ActionExec& thread)
     }
 
     i += 2;
-    func->set_length(code_size);
+    func->setLength(code_size);
 
     // Skip the function body (don't interpret it now).
     thread.adjustNextPC(code_size);
@@ -3507,8 +3505,7 @@ ActionDefineFunction2(ActionExec& thread)
     // If we have a name, then save the function in this
     // environment under that name.
     as_value function_value(func);
-    if (!name.empty())
-    {
+    if (!name.empty()) {
         IF_VERBOSE_ACTION(
             log_action(_("DefineFunction2: named function '%s' "
                         "starts at PC %d"), name, func->getStartPC());
@@ -3518,22 +3515,13 @@ ActionDefineFunction2(ActionExec& thread)
     }
 
     // Otherwise push the function literal on the stack
-    else
-    {
+    else {
         IF_VERBOSE_ACTION(
             log_action(_("DefineFunction2: anonymous function starts at "
                         "PC %d"), func->getStartPC());
         );
         env.push(function_value);
     }
-#ifdef USE_DEBUGGER
-    // WARNING: toObject(getGlobal(thread.env), function_value) can return a newly allocated
-    //          thing into the intrusive_ptr, so the debugger
-    //          will be left with a deleted object !!
-    //          Rob: we don't want to use void pointers here..
-    boost::intrusive_ptr<as_object> o = toObject(getGlobal(thread.env), function_value);
-    debugger.addSymbol(o.get(), name);
-#endif
 }
 
 void
@@ -3655,7 +3643,6 @@ ActionWith(ActionExec& thread)
 void
 ActionDefineFunction(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
@@ -3665,11 +3652,11 @@ ActionDefineFunction(ActionExec& thread)
     assert( length >= 0 );
 #endif
 
-    // Create a new swf_function
+    // Create a new Function
     // Code starts at thread.getNextPC() as the DefineFunction tag
     // contains name and args, while next tag is first tag
     // of the function body.
-    swf_function* func = new swf_function(code, env, thread.getNextPC(),
+    Function* func = new Function(code, env, thread.getNextPC(),
             thread.getScopeStack());
     
     // We're stuck initializing our own prototype at the moment.
@@ -3687,27 +3674,22 @@ ActionDefineFunction(ActionExec& thread)
     i += name.length() + 1;
 
     // Get number of arguments.
-    unsigned nargs = code.read_int16(i);
+    const size_t nargs = code.read_uint16(i);
     i += 2;
     
     string_table& st = getStringTable(env);
 
     // Get the names of the arguments.
-    for (unsigned n = 0; n < nargs; n++)
-    {
+    for (size_t n = 0; n < nargs; ++n) {
         const std::string arg(code.read_string(i));
-
-        // @@ security: watch out for possible missing terminator here!
         func->add_arg(0, st.find(arg));
-        // wouldn't it be simpler to use strlen(arg)+1 ?
         i += arg.size() + 1; 
     }
 
     // Get the length of the actual function code.
-    boost::int16_t code_size = code.read_int16(i);
+    const boost::uint16_t code_size = code.read_uint16(i);
 
-    func->set_length(code_size);
-
+    func->setLength(code_size);
 
     // Skip the function body (don't interpret it now).
     // getNextPC() is assumed to point to first action of
@@ -3717,7 +3699,7 @@ ActionDefineFunction(ActionExec& thread)
 
     // If we have a name, then save the function in this
     // environment under that name.
-    as_value    function_value(func);
+    as_value function_value(func);
     if (!name.empty())
     {
         IF_VERBOSE_ACTION(
@@ -3750,14 +3732,11 @@ ActionDefineFunction(ActionExec& thread)
 
         env.push(function_value);
     }
-
-    //env.dump_stack();
 }
 
 void
 ActionSetRegister(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     const action_buffer& code = thread.code;

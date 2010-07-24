@@ -35,7 +35,7 @@ namespace gnash {
 Function2::Function2(const action_buffer& ab, as_environment& env,
 			size_t start, const ScopeStack& scopeStack)
 	:
-	swf_function(ab, env, start, scopeStack),
+	Function(ab, env, start, scopeStack),
 	_registerCount(0),
 	_function2Flags(0)
 {

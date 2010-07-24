@@ -23,7 +23,7 @@
 #include <cassert>
 #include <string>
 
-#include "swf_function.h"
+#include "Function.h"
 #include "smart_ptr.h"
 
 // Forward declarations
@@ -42,65 +42,57 @@ namespace gnash {
 /// 2. Ability to suppress super, this, arguments
 /// 3. Ability to store super, this, arguments, _global, _root, and _parent
 ///    in registers.
-class Function2 : public swf_function
+class Function2 : public Function
 {
 
 public:
 
-	enum SWFDefineFunction2Flags
+	enum DefineFunction2Flags
 	{
 		/// Bind one register to "this" 
-		PRELOAD_THIS = 0x01, // 1
+		PRELOAD_THIS = 0x01,
 
-		/// No "this" variable accessible by-name 
-		SUPPRESS_THIS = 0x02, // 2
+		/// No "this" variable accessible by name 
+		SUPPRESS_THIS = 0x02,
 
 		/// Bind one register to "arguments" 
-		PRELOAD_ARGUMENTS = 0x04, // 4
+		PRELOAD_ARGUMENTS = 0x04,
 
-		/// No "argument" variable accessible by-name 
-		SUPPRESS_ARGUMENTS = 0x08, // 8
+		/// No "argument" variable accessible by name 
+		SUPPRESS_ARGUMENTS = 0x08,
 
 		/// Bind one register to "super" 
-		PRELOAD_SUPER = 0x10, // 16
+		PRELOAD_SUPER = 0x10,
 
-		/// No "super" variable accessible by-name 
-		SUPPRESS_SUPER = 0x20, // 32
+		/// No "super" variable accessible by name 
+		SUPPRESS_SUPER = 0x20,
 
 		/// Bind one register to "_root" 
-		PRELOAD_ROOT = 0x40, // 64
+		PRELOAD_ROOT = 0x40, 
 
 		/// Bind one register to "_parent" 
-		PRELOAD_PARENT = 0x80, // 128
+		PRELOAD_PARENT = 0x80,
 
 		/// Bind one register to "_global" 
-		//
-		/// TODO: check this.
-        /// See:
-        /// http://www.m2osw.com/swf_alexref.html#action_declare_function2
-		///       Looks like flags would look swapped
-		PRELOAD_GLOBAL = 256 // 0x100
-
+		PRELOAD_GLOBAL = 256
 	};
 
-	/// \brief
-	/// Create an ActionScript function as defined in an
-	/// action_buffer starting at offset 'start'
-	//
+    // Create a function defined in a DefineFunction2 opcode.
 	Function2(const action_buffer& ab, as_environment& env, size_t start,
 		const ScopeStack& with_stack);
 
 	virtual ~Function2() {}
 
-    virtual size_t registers() const {
+    /// Return the number of registers to allocate for this function.
+    virtual boost::uint8_t registers() const {
         return _registerCount;
     }
 
-	void set_local_register_count(boost::uint8_t ct) {
+	void setRegisterCount(boost::uint8_t ct) {
         _registerCount = ct;
     }
 
-	void set_function2_flags(boost::uint16_t flags) {
+	void setFlags(boost::uint16_t flags) {
         _function2Flags = flags;
     }
 
@@ -109,12 +101,10 @@ public:
 
 private:
 
+    /// The number of registers required.
 	boost::uint8_t _registerCount;
 
-	/// used by function2 to control implicit arg register assignments
-	// 
-	/// See
-    /// http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
+	/// Used to control implicit arg register assignments
 	boost::uint16_t	_function2Flags;
 
 };

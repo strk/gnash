@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "log.h"
-#include "swf_function.h"
+#include "Function.h"
 #include "fn_call.h"
 #include "action_buffer.h"
 #include "ActionExec.h" 
@@ -30,17 +30,17 @@
 
 namespace gnash {
 
-swf_function::swf_function(const action_buffer& ab, as_environment& env,
+Function::Function(const action_buffer& ab, as_environment& env,
 			size_t start, const ScopeStack& scopeStack)
 	:
 	UserFunction(getGlobal(env)),
-	m_action_buffer(ab),
+	_action_buffer(ab),
 	_env(env),
 	_scopeStack(scopeStack),
 	_startPC(start),
 	_length(0)
 {
-	assert( _startPC < m_action_buffer.size() );
+	assert( _startPC < _action_buffer.size() );
 }
 
 TargetGuard::TargetGuard(as_environment& e, DisplayObject* ch,
@@ -63,7 +63,7 @@ TargetGuard::~TargetGuard()
 
 // Dispatch.
 as_value
-swf_function::call(const fn_call& fn)
+Function::call(const fn_call& fn)
 {
     // Extract caller before pushing ourself on the call stack
     VM& vm = getVM(fn); 
@@ -153,15 +153,14 @@ swf_function::call(const fn_call& fn)
 }
 
 void
-swf_function::set_length(int len)
+Function::setLength(size_t len)
 {
-	assert(len >= 0);
-	assert(_startPC+len <= m_action_buffer.size());
+	assert(_startPC + len <= _action_buffer.size());
 	_length = len;
 }
 
 void
-swf_function::markReachableResources() const
+Function::markReachableResources() const
 {
 	// Mark scope stack objects
 	for (ScopeStack::const_iterator i = _scopeStack.begin(),
@@ -177,7 +176,7 @@ swf_function::markReachableResources() const
 }
 
 as_object*
-getArguments(swf_function& callee, as_object& args, const fn_call& fn,
+getArguments(Function& callee, as_object& args, const fn_call& fn,
         as_object* caller)
 { 
 

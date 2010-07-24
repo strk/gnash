@@ -25,7 +25,7 @@
 
 #include "ActionExec.h"
 #include "action_buffer.h"
-#include "swf_function.h"
+#include "Function.h"
 #include "log.h"
 #include "VM.h"
 #include "GnashException.h"
@@ -67,7 +67,7 @@ namespace gnash {
 static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
 
-ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
+ActionExec::ActionExec(const Function& func, as_environment& newEnv,
         as_value* nRetVal, as_object* this_ptr)
     :
     code(func.getActionBuffer()),
@@ -101,7 +101,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
     //              push 'i' getvariable
     //              get var: i=[undefined] 
     if (code.getDefinitionVersion() > 5) {
-        // We assume that the swf_function () operator already initialized
+        // We assume that the Function () operator already initialized
         // its environment so that its activation object is now in the
         // top element of the CallFrame stack
         CallFrame& topFrame = getVM(newEnv).currentCall();

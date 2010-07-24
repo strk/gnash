@@ -58,7 +58,7 @@ private:
 /// expected argument names are defined.
 //
 /// For a more advanced function, see Function2.
-class swf_function : public UserFunction
+class Function : public UserFunction
 {
 
 public:
@@ -69,17 +69,17 @@ public:
 	/// Create an ActionScript function as defined in an
 	/// action_buffer starting at offset 'start'
 	//
-	swf_function(const action_buffer& ab, as_environment& env, size_t start,
+	Function(const action_buffer& ab, as_environment& env, size_t start,
 		const ScopeStack& with_stack);
 
-	virtual ~swf_function() {}
+	virtual ~Function() {}
 
 	const ScopeStack& getScopeStack() const {
 		return _scopeStack;
 	}
 
 	const action_buffer& getActionBuffer() const {
-		return m_action_buffer;
+		return _action_buffer;
 	}
 
 	size_t getStartPC() const {
@@ -90,16 +90,29 @@ public:
 		return _length;
 	}
 
-    virtual size_t registers() const {
+    /// Get the number of registers required for function execution.
+    //
+    /// For ordinary Functions this is always 0.
+    virtual boost::uint8_t registers() const {
         return 0;
     }
 
-	void add_arg(boost::uint8_t arg_register, string_table::key name)
-	{
-        _args.push_back(Argument(arg_register, name));
+    /// Add an expected argument for the function.
+    //
+    /// For ordinary Functions the register is disregarded. This is only
+    /// relevant for Function2s.
+    //
+    /// All argument names are declared as variables in the function scope,
+    /// whether the argument is passed or not.
+    //
+    /// @param reg      The register for the argument.
+    /// @param name     The name of the argument.
+	void add_arg(boost::uint8_t reg, string_table::key name) {
+        _args.push_back(Argument(reg, name));
 	}
 
-	void set_length(int len);
+    /// Set the length in bytes of the function code.
+	void setLength(size_t len);
 
 	/// Dispatch.
 	virtual as_value call(const fn_call& fn);
@@ -116,7 +129,7 @@ public:
 protected:
 
 	/// Action buffer containing the function definition
-	const action_buffer& m_action_buffer;
+	const action_buffer& _action_buffer;
 
 	/// @@ might need some kind of ref count here, but beware cycles
 	as_environment& _env;
@@ -151,7 +164,7 @@ protected:
 //
 /// The 'arguments' variable is an array with an additional
 /// 'callee' member, set to the function being called.
-as_object* getArguments(swf_function& callee, as_object& args, 
+as_object* getArguments(Function& callee, as_object& args, 
         const fn_call& fn, as_object* caller);
 
 

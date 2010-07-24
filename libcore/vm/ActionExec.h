@@ -31,7 +31,7 @@
 // Forward declarations
 namespace gnash {
 	class as_value;
-	class swf_function;
+	class Function;
 	class ActionExec;
 }
 
@@ -142,7 +142,7 @@ public:
 	/// @param newEnv   The execution environment (variables scope, stack etc.)
 	/// @param nRetval  Where to return a value. If NULL any return will
     /// be discarded.
-	ActionExec(const swf_function& func, as_environment& newEnv,
+	ActionExec(const Function& func, as_environment& newEnv,
             as_value* nRetVal, as_object* this_ptr);
 
 	/// \brief
@@ -345,7 +345,7 @@ private:
 	/// structure including return address 
 	/// and maintained in a stack (the call stack)
 	///
-	const swf_function* _func;
+	const Function* _func;
 
 	/// The 'this' pointer, if this is a function call
 	as_object* _this_ptr;
