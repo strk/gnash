@@ -180,7 +180,7 @@ disasm_instruction(const unsigned char* instruction_data,
         ss << "<unknown>[0x]" <<  action_id << endl;
     }
     else {
-        ss << ash[action_id].getName();
+        ss << ash[action_id].getType();
     }
     
     // Show instruction argument(s).

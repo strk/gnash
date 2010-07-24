@@ -223,42 +223,19 @@ namespace {
 }
 
 namespace SWF { 
+
 ActionHandler::ActionHandler()
     :
-    _name("unsupported"),
     _callback(ActionUnsupported),
-    _debug(false),
     _arg_format(ARG_NONE)
 {
 }
 
-ActionHandler::ActionHandler(ActionType type, ActionCallback func)
+ActionHandler::ActionHandler(ActionType type, ActionCallback func,
+        ArgumentType format)
     :
     _type(type),
     _callback(func),
-    _debug(false),
-    _arg_format(ARG_NONE)
-{
-}
-
-ActionHandler::ActionHandler(ActionType type, std::string name,
-                             ActionCallback func)
-    :
-    _type(type),
-    _name(name),
-    _callback(func),
-    _debug(false),
-    _arg_format(ARG_NONE)
-{
-}
-
-ActionHandler::ActionHandler(ActionType type, std::string name,
-                             ActionCallback func, ArgumentType format)
-    :
-    _type(type),
-    _name(name),
-    _callback(func),
-    _debug(false),
     _arg_format(format)
 {
 }
@@ -270,233 +247,183 @@ ActionHandler::execute(ActionExec& thread) const
 }
 
 SWFHandlers::SWFHandlers()
+    :
+    _handlers(255)
 {
 
-    container_type & handlers = get_handlers();
-
-    handlers[ACTION_END] = ActionHandler(ACTION_END,
-             "End", ActionEnd);
-    handlers[ACTION_NEXTFRAME] = ActionHandler(ACTION_NEXTFRAME,
-             "NextFrame", ActionNextFrame);
-    handlers[ACTION_PREVFRAME] =  ActionHandler(ACTION_PREVFRAME,
-             "PreviousFrame", ActionPrevFrame);
-    handlers[ACTION_PLAY] = ActionHandler(ACTION_PLAY,
-             "Play", ActionPlay);
-    handlers[ACTION_STOP] = ActionHandler(ACTION_STOP,
-             "Stop", ActionStop);
-    handlers[ACTION_TOGGLEQUALITY] = ActionHandler(ACTION_TOGGLEQUALITY,
-             "ToggleQuality", ActionToggleQuality);
-    handlers[ACTION_STOPSOUNDS] = ActionHandler(ACTION_STOPSOUNDS,
-             "StopSounds", ActionStopSounds);
-    handlers[ACTION_GOTOFRAME] = ActionHandler(ACTION_GOTOFRAME,
-             "GotoFrame", ActionGotoFrame, ARG_U16);
-    handlers[ACTION_GETURL] = ActionHandler(ACTION_GETURL,
-             "GetUrl", ActionGetUrl, ARG_STR);
-    handlers[ACTION_WAITFORFRAME] = ActionHandler(ACTION_WAITFORFRAME,
-             "WaitForFrame", ActionWaitForFrame, ARG_HEX);
-    handlers[ACTION_SETTARGET] = ActionHandler(ACTION_SETTARGET,
-             "SetTarget", ActionSetTarget, ARG_STR);
-    handlers[ACTION_GOTOLABEL] = ActionHandler(ACTION_GOTOLABEL,
-             "GotoLabel", ActionGotoLabel, ARG_STR);
-    handlers[ACTION_ADD] = ActionHandler(ACTION_ADD,
-             "Add", ActionAdd);
-    handlers[ACTION_SUBTRACT] = ActionHandler(ACTION_SUBTRACT,
-             "Subtract", ActionSubtract);
-    handlers[ACTION_MULTIPLY] = ActionHandler(ACTION_MULTIPLY,
-             "Multiply", ActionMultiply);
-    handlers[ACTION_DIVIDE] = ActionHandler(ACTION_DIVIDE,
-             "Divide", ActionDivide);
-    handlers[ACTION_EQUAL] = ActionHandler(ACTION_EQUAL,
-             "Equal", ActionEqual);
-    handlers[ACTION_LESSTHAN] = ActionHandler(ACTION_LESSTHAN,
-             "LessThan", ActionLessThan);
-    handlers[ACTION_LOGICALAND] = ActionHandler(ACTION_LOGICALAND,
-             "LogicalAnd", ActionLogicalAnd);
-    handlers[ACTION_LOGICALOR] = ActionHandler(ACTION_LOGICALOR,
-             "LogicalOr", ActionLogicalOr);
-    handlers[ACTION_LOGICALNOT] = ActionHandler(ACTION_LOGICALNOT,
-             "LogicalNot", ActionLogicalNot);
-    handlers[ACTION_STRINGEQ] = ActionHandler(ACTION_STRINGEQ,
-             "StringEq", ActionStringEq);
-    handlers[ACTION_STRINGLENGTH] = ActionHandler(ACTION_STRINGLENGTH,
-             "ActionStringLength", ActionStringLength);
-    handlers[ACTION_SUBSTRING] = ActionHandler(ACTION_SUBSTRING,
-             "ActionSubString", ActionSubString);
-    handlers[ACTION_POP] = ActionHandler(ACTION_POP,
-             "ActionPop", ActionPop);
-    handlers[ACTION_INT] = ActionHandler(ACTION_INT,
-             "ActionInt", ActionInt);
-    handlers[ACTION_GETVARIABLE] = ActionHandler(ACTION_GETVARIABLE,
-             "ActionGetVariable", ActionGetVariable);
-    handlers[ACTION_SETVARIABLE] = ActionHandler(ACTION_SETVARIABLE,
-             "ActionSetVariable", ActionSetVariable);
-    handlers[ACTION_SETTARGETEXPRESSION] =
-        ActionHandler(ACTION_SETTARGETEXPRESSION,
-             "ActionSetTargetExpression",
+    _handlers[ACTION_END] = ActionHandler(ACTION_END, ActionEnd);
+    _handlers[ACTION_NEXTFRAME] = ActionHandler(ACTION_NEXTFRAME,
+             ActionNextFrame);
+    _handlers[ACTION_PREVFRAME] =  ActionHandler(ACTION_PREVFRAME,
+             ActionPrevFrame);
+    _handlers[ACTION_PLAY] = ActionHandler(ACTION_PLAY, ActionPlay);
+    _handlers[ACTION_STOP] = ActionHandler(ACTION_STOP, ActionStop);
+    _handlers[ACTION_TOGGLEQUALITY] = ActionHandler(ACTION_TOGGLEQUALITY,
+             ActionToggleQuality);
+    _handlers[ACTION_STOPSOUNDS] = ActionHandler(ACTION_STOPSOUNDS,
+             ActionStopSounds);
+    _handlers[ACTION_GOTOFRAME] = ActionHandler(ACTION_GOTOFRAME,
+             ActionGotoFrame, ARG_U16);
+    _handlers[ACTION_GETURL] = ActionHandler(ACTION_GETURL,
+             ActionGetUrl, ARG_STR);
+    _handlers[ACTION_WAITFORFRAME] = ActionHandler(ACTION_WAITFORFRAME,
+             ActionWaitForFrame, ARG_HEX);
+    _handlers[ACTION_SETTARGET] = ActionHandler(ACTION_SETTARGET,
+             ActionSetTarget, ARG_STR);
+    _handlers[ACTION_GOTOLABEL] = ActionHandler(ACTION_GOTOLABEL,
+             ActionGotoLabel, ARG_STR);
+    _handlers[ACTION_ADD] = ActionHandler(ACTION_ADD, ActionAdd);
+    _handlers[ACTION_SUBTRACT] = ActionHandler(ACTION_SUBTRACT, ActionSubtract);
+    _handlers[ACTION_MULTIPLY] = ActionHandler(ACTION_MULTIPLY, ActionMultiply);
+    _handlers[ACTION_DIVIDE] = ActionHandler(ACTION_DIVIDE, ActionDivide);
+    _handlers[ACTION_EQUAL] = ActionHandler(ACTION_EQUAL, ActionEqual);
+    _handlers[ACTION_LESSTHAN] = ActionHandler(ACTION_LESSTHAN, ActionLessThan);
+    _handlers[ACTION_LOGICALAND] = ActionHandler(ACTION_LOGICALAND,
+             ActionLogicalAnd);
+    _handlers[ACTION_LOGICALOR] = ActionHandler(ACTION_LOGICALOR,
+             ActionLogicalOr);
+    _handlers[ACTION_LOGICALNOT] = ActionHandler(ACTION_LOGICALNOT,
+             ActionLogicalNot);
+    _handlers[ACTION_STRINGEQ] = ActionHandler(ACTION_STRINGEQ,
+             ActionStringEq);
+    _handlers[ACTION_STRINGLENGTH] = ActionHandler(ACTION_STRINGLENGTH,
+             ActionStringLength);
+    _handlers[ACTION_SUBSTRING] = ActionHandler(ACTION_SUBSTRING,
+             ActionSubString);
+    _handlers[ACTION_POP] = ActionHandler(ACTION_POP, ActionPop);
+    _handlers[ACTION_INT] = ActionHandler(ACTION_INT, ActionInt);
+    _handlers[ACTION_GETVARIABLE] = ActionHandler(ACTION_GETVARIABLE,
+             ActionGetVariable);
+    _handlers[ACTION_SETVARIABLE] = ActionHandler(ACTION_SETVARIABLE,
+             ActionSetVariable);
+    _handlers[ACTION_SETTARGETEXPRESSION] =
+        ActionHandler(ACTION_SETTARGETEXPRESSION, 
              ActionSetTargetExpression);
-    handlers[ACTION_STRINGCONCAT] = ActionHandler(ACTION_STRINGCONCAT,
-             "ActionStringConcat", ActionStringConcat);
-    handlers[ACTION_GETPROPERTY] = ActionHandler(ACTION_GETPROPERTY,
-             "ActionGetProperty", ActionGetProperty);
-    handlers[ACTION_SETPROPERTY] = ActionHandler(ACTION_SETPROPERTY,
-             "ActionSetProperty", ActionSetProperty);
-    handlers[ACTION_DUPLICATECLIP] = ActionHandler(ACTION_DUPLICATECLIP,
-             "ActionDuplicateClip", ActionDuplicateClip);
-    handlers[ACTION_REMOVECLIP] = ActionHandler(ACTION_REMOVECLIP,
-             "ActionRemoveClip", ActionRemoveClip);
-    handlers[ACTION_TRACE] = ActionHandler(ACTION_TRACE,
-             "ActionTrace", ActionTrace);
-    handlers[ACTION_STARTDRAGMOVIE] = ActionHandler(ACTION_STARTDRAGMOVIE,
-             "ActionStartDragMovie", ActionStartDragMovie);
-    handlers[ACTION_STOPDRAGMOVIE] = ActionHandler(ACTION_STOPDRAGMOVIE,
-             "ActionStopDragMovie", ActionStopDragMovie);
-    handlers[ACTION_STRINGCOMPARE] = ActionHandler(ACTION_STRINGCOMPARE,
-             "ActionStringCompare", ActionStringCompare);
-    handlers[ACTION_THROW] = ActionHandler(ACTION_THROW,
-             "ActionThrow", ActionThrow);
-    handlers[ACTION_CASTOP] = ActionHandler(ACTION_CASTOP,
-             "ActionCastOp", ActionCastOp);
-    handlers[ACTION_IMPLEMENTSOP] = ActionHandler(ACTION_IMPLEMENTSOP,
-             "ActionImplementsOp", ActionImplementsOp);
-    handlers[ACTION_FSCOMMAND2] = ActionHandler(ACTION_FSCOMMAND2,
-             "ActionFscommand2", ActionFscommand2);
-    handlers[ACTION_RANDOM] = ActionHandler(ACTION_RANDOM,
-             "ActionRandom", ActionRandom);
-    handlers[ACTION_MBLENGTH] = ActionHandler(ACTION_MBLENGTH,
-             "ActionMbLength", ActionMbLength);
-    handlers[ACTION_ORD] = ActionHandler(ACTION_ORD,
-             "ActionOrd", ActionOrd);
-    handlers[ACTION_CHR] = ActionHandler(ACTION_CHR,
-             "ActionChr", ActionChr);
-    handlers[ACTION_GETTIMER] = ActionHandler(ACTION_GETTIMER,
-             "ActionGetTimer", ActionGetTimer);
-    handlers[ACTION_MBSUBSTRING] = ActionHandler(ACTION_MBSUBSTRING,
-             "ActionMbSubString", ActionMbSubString);
-    handlers[ACTION_MBORD] = ActionHandler(ACTION_MBORD,
-             "ActionMbOrd", ActionMbOrd);
-    handlers[ACTION_MBCHR] = ActionHandler(ACTION_MBCHR,
-             "ActionMbChr", ActionMbChr);
-    handlers[ACTION_STRICTMODE] = ActionHandler(ACTION_STRICTMODE,
-             "ActionStrictMode", ActionStrictMode, ARG_U8);
-    handlers[ACTION_WAITFORFRAMEEXPRESSION] =
+    _handlers[ACTION_STRINGCONCAT] = ActionHandler(ACTION_STRINGCONCAT,
+             ActionStringConcat);
+    _handlers[ACTION_GETPROPERTY] = ActionHandler(ACTION_GETPROPERTY,
+             ActionGetProperty);
+    _handlers[ACTION_SETPROPERTY] = ActionHandler(ACTION_SETPROPERTY,
+             ActionSetProperty);
+    _handlers[ACTION_DUPLICATECLIP] = ActionHandler(ACTION_DUPLICATECLIP,
+             ActionDuplicateClip);
+    _handlers[ACTION_REMOVECLIP] = ActionHandler(ACTION_REMOVECLIP,
+             ActionRemoveClip);
+    _handlers[ACTION_TRACE] = ActionHandler(ACTION_TRACE, ActionTrace);
+    _handlers[ACTION_STARTDRAGMOVIE] = ActionHandler(ACTION_STARTDRAGMOVIE,
+             ActionStartDragMovie);
+    _handlers[ACTION_STOPDRAGMOVIE] = ActionHandler(ACTION_STOPDRAGMOVIE,
+             ActionStopDragMovie);
+    _handlers[ACTION_STRINGCOMPARE] = ActionHandler(ACTION_STRINGCOMPARE,
+             ActionStringCompare);
+    _handlers[ACTION_THROW] = ActionHandler(ACTION_THROW, ActionThrow);
+    _handlers[ACTION_CASTOP] = ActionHandler(ACTION_CASTOP, ActionCastOp);
+    _handlers[ACTION_IMPLEMENTSOP] = ActionHandler(ACTION_IMPLEMENTSOP,
+             ActionImplementsOp);
+    _handlers[ACTION_FSCOMMAND2] = ActionHandler(ACTION_FSCOMMAND2,
+             ActionFscommand2);
+    _handlers[ACTION_RANDOM] = ActionHandler(ACTION_RANDOM, ActionRandom);
+    _handlers[ACTION_MBLENGTH] = ActionHandler(ACTION_MBLENGTH, ActionMbLength);
+    _handlers[ACTION_ORD] = ActionHandler(ACTION_ORD, ActionOrd);
+    _handlers[ACTION_CHR] = ActionHandler(ACTION_CHR, ActionChr);
+    _handlers[ACTION_GETTIMER] = ActionHandler(ACTION_GETTIMER, ActionGetTimer);
+    _handlers[ACTION_MBSUBSTRING] = ActionHandler(ACTION_MBSUBSTRING,
+             ActionMbSubString);
+    _handlers[ACTION_MBORD] = ActionHandler(ACTION_MBORD, ActionMbOrd);
+    _handlers[ACTION_MBCHR] = ActionHandler(ACTION_MBCHR, ActionMbChr);
+    _handlers[ACTION_STRICTMODE] = ActionHandler(ACTION_STRICTMODE,
+             ActionStrictMode, ARG_U8);
+    _handlers[ACTION_WAITFORFRAMEEXPRESSION] =
         ActionHandler(ACTION_WAITFORFRAMEEXPRESSION,
-             "ActionWaitForFrameExpression",
              ActionWaitForFrameExpression, ARG_HEX);
-    handlers[ACTION_PUSHDATA] = ActionHandler(ACTION_PUSHDATA,
-             "ActionPushData", ActionPushData, ARG_PUSH_DATA);
-    handlers[ACTION_BRANCHALWAYS] = ActionHandler(ACTION_BRANCHALWAYS,
-             "ActionBranchAlways", ActionBranchAlways, ARG_S16);
-    handlers[ACTION_GETURL2] = ActionHandler(ACTION_GETURL2,
-             "ActionGetUrl2", ActionGetUrl2, ARG_HEX);
-    handlers[ACTION_BRANCHIFTRUE] = ActionHandler(ACTION_BRANCHIFTRUE,
-             "ActionBranchIfTrue", ActionBranchIfTrue, ARG_S16);
-    handlers[ACTION_CALLFRAME] = ActionHandler(ACTION_CALLFRAME,
-             "ActionCallFrame", ActionCallFrame, ARG_HEX);
-    handlers[ACTION_GOTOEXPRESSION] = ActionHandler(ACTION_GOTOEXPRESSION,
-             "ActionGotoExpression",
-             ActionGotoExpression, ARG_HEX);
-    handlers[ACTION_DELETE] = ActionHandler(ACTION_DELETE,
-             "ActionDelete", ActionDelete);
-    handlers[ACTION_DELETE2] = ActionHandler(ACTION_DELETE2,
-             "ActionDelete2", ActionDelete2);
-    handlers[ACTION_VAREQUALS] = ActionHandler(ACTION_VAREQUALS,
-             "ActionVarEquals", ActionVarEquals);
-    handlers[ACTION_CALLFUNCTION] = ActionHandler(ACTION_CALLFUNCTION,
-             "ActionCallFunction", ActionCallFunction);
-    handlers[ACTION_RETURN] = ActionHandler(ACTION_RETURN,
-             "ActionReturn", ActionReturn);
-    handlers[ACTION_MODULO] = ActionHandler(ACTION_MODULO,
-             "ActionModulo", ActionModulo);
-    handlers[ACTION_NEW] = ActionHandler(ACTION_NEW,
-             "ActionNew", ActionNew);
-    handlers[ACTION_VAR] = ActionHandler(ACTION_VAR,
-             "ActionVar", ActionVar);
-    handlers[ACTION_INITARRAY] = ActionHandler(ACTION_INITARRAY,
-             "ActionInitArray", ActionInitArray);
-    handlers[ACTION_INITOBJECT] = ActionHandler(ACTION_INITOBJECT,
-             "ActionInitObject", ActionInitObject);
-    handlers[ACTION_TYPEOF] = ActionHandler(ACTION_TYPEOF,
-             "ActionTypeOf", ActionTypeOf);
-    handlers[ACTION_TARGETPATH] = ActionHandler(ACTION_TARGETPATH,
-             "ActionTargetPath", ActionTargetPath);
-    handlers[ACTION_ENUMERATE] = ActionHandler(ACTION_ENUMERATE,
-             "ActionEnumerate", ActionEnumerate);
-    handlers[ACTION_NEWADD] = ActionHandler(ACTION_NEWADD,
-             "ActionNewAdd", ActionNewAdd);
-    handlers[ACTION_NEWLESSTHAN] = ActionHandler(ACTION_NEWLESSTHAN,
-             "ActionNewLessThan", ActionNewLessThan);
-    handlers[ACTION_NEWEQUALS] = ActionHandler(ACTION_NEWEQUALS,
-             "ActionNewEquals", ActionNewEquals);
-    handlers[ACTION_TONUMBER] = ActionHandler(ACTION_TONUMBER,
-             "ActionToNumber", ActionToNumber);
-    handlers[ACTION_TOSTRING] = ActionHandler(ACTION_TOSTRING,
-             "ActionToString", ActionToString);
-    handlers[ACTION_DUP] = ActionHandler(ACTION_DUP,
-             "ActionDup", ActionDup);
-    handlers[ACTION_SWAP] = ActionHandler(ACTION_SWAP,
-             "ActionSwap", ActionSwap);
-    handlers[ACTION_GETMEMBER] = ActionHandler(ACTION_GETMEMBER,
-             "ActionGetMember", ActionGetMember);
-    handlers[ACTION_SETMEMBER] = ActionHandler(ACTION_SETMEMBER,
-             "ActionSetMember", ActionSetMember);
-    handlers[ACTION_INCREMENT] = ActionHandler(ACTION_INCREMENT,
-             "ActionIncrement", ActionIncrement);
-    handlers[ACTION_DECREMENT] = ActionHandler(ACTION_DECREMENT,
-             "ActionDecrement", ActionDecrement);
-    handlers[ACTION_CALLMETHOD] = ActionHandler(ACTION_CALLMETHOD,
-             "ActionCallMethod", ActionCallMethod);
-    handlers[ACTION_NEWMETHOD] = ActionHandler(ACTION_NEWMETHOD,
-             "ActionNewMethod", ActionNewMethod);
-    handlers[ACTION_INSTANCEOF] = ActionHandler(ACTION_INSTANCEOF,
-             "ActionInstanceOf", ActionInstanceOf);
-    handlers[ACTION_ENUM2] = ActionHandler(ACTION_ENUM2,
-             "ActionEnum2", ActionEnum2);
-    handlers[ACTION_BITWISEAND] = ActionHandler(ACTION_BITWISEAND,
-             "ActionBitwiseAnd", ActionBitwiseAnd);
-    handlers[ACTION_BITWISEOR] = ActionHandler(ACTION_BITWISEOR,
-             "ActionBitwiseOr", ActionBitwiseOr);
-    handlers[ACTION_BITWISEXOR] = ActionHandler(ACTION_BITWISEXOR,
-             "ActionBitwiseXor", ActionBitwiseXor);
-    handlers[ACTION_SHIFTLEFT] = ActionHandler(ACTION_SHIFTLEFT,
-             "ActionShiftLeft", ActionShiftLeft);
-    handlers[ACTION_SHIFTRIGHT] = ActionHandler(ACTION_SHIFTRIGHT,
-             "ActionShiftRight", ActionShiftRight);
-    handlers[ACTION_SHIFTRIGHT2] = ActionHandler(ACTION_SHIFTRIGHT2,
-             "ActionShiftRight2", ActionShiftRight2);
-    handlers[ACTION_STRICTEQ] = ActionHandler(ACTION_STRICTEQ,
-             "ActionStrictEq", ActionStrictEq);
-    handlers[ACTION_GREATER] = ActionHandler(ACTION_GREATER,
-             "ActionGreater", ActionGreater);
-    handlers[ACTION_STRINGGREATER] = ActionHandler(ACTION_STRINGGREATER,
-             "ActionStringGreater", ActionStringGreater);
-    handlers[ACTION_EXTENDS] = ActionHandler(ACTION_EXTENDS,
-             "ActionExtends", ActionExtends);
-    handlers[ACTION_CONSTANTPOOL] = ActionHandler(ACTION_CONSTANTPOOL,
-             "ActionConstantPool", ActionConstantPool,
-             ARG_DECL_DICT);
-    handlers[ACTION_DEFINEFUNCTION2] = ActionHandler(ACTION_DEFINEFUNCTION2,
-             "ActionDefineFunction2", ActionDefineFunction2,
-             ARG_FUNCTION2);
-    handlers[ACTION_TRY] = ActionHandler(ACTION_TRY,
-             "ActionTry", ActionTry, ARG_FUNCTION2);
-    handlers[ACTION_WITH] = ActionHandler(ACTION_WITH,
-             "ActionWith", ActionWith, ARG_U16);
-    handlers[ACTION_DEFINEFUNCTION] = ActionHandler(ACTION_DEFINEFUNCTION,
-             "ActionDefineFunction", ActionDefineFunction,
-             ARG_HEX);
-    handlers[ACTION_SETREGISTER] = ActionHandler(ACTION_SETREGISTER,
-             "ActionSetRegister", ActionSetRegister, ARG_U8);
+    _handlers[ACTION_PUSHDATA] = ActionHandler(ACTION_PUSHDATA, ActionPushData,
+            ARG_PUSH_DATA);
+    _handlers[ACTION_BRANCHALWAYS] = ActionHandler(ACTION_BRANCHALWAYS,
+             ActionBranchAlways, ARG_S16);
+    _handlers[ACTION_GETURL2] = ActionHandler(ACTION_GETURL2, ActionGetUrl2,
+            ARG_HEX);
+    _handlers[ACTION_BRANCHIFTRUE] = ActionHandler(ACTION_BRANCHIFTRUE,
+             ActionBranchIfTrue, ARG_S16);
+    _handlers[ACTION_CALLFRAME] = ActionHandler(ACTION_CALLFRAME,
+            ActionCallFrame, ARG_HEX);
+    _handlers[ACTION_GOTOEXPRESSION] = ActionHandler(ACTION_GOTOEXPRESSION,
+            ActionGotoExpression, ARG_HEX);
+    _handlers[ACTION_DELETE] = ActionHandler(ACTION_DELETE, ActionDelete);
+    _handlers[ACTION_DELETE2] = ActionHandler(ACTION_DELETE2, ActionDelete2);
+    _handlers[ACTION_VAREQUALS] = ActionHandler(ACTION_VAREQUALS,
+            ActionVarEquals);
+    _handlers[ACTION_CALLFUNCTION] = ActionHandler(ACTION_CALLFUNCTION,
+            ActionCallFunction);
+    _handlers[ACTION_RETURN] = ActionHandler(ACTION_RETURN, ActionReturn);
+    _handlers[ACTION_MODULO] = ActionHandler(ACTION_MODULO, ActionModulo);
+    _handlers[ACTION_NEW] = ActionHandler(ACTION_NEW, ActionNew);
+    _handlers[ACTION_VAR] = ActionHandler(ACTION_VAR, ActionVar);
+    _handlers[ACTION_INITARRAY] = ActionHandler(ACTION_INITARRAY,
+            ActionInitArray);
+    _handlers[ACTION_INITOBJECT] = ActionHandler(ACTION_INITOBJECT,
+            ActionInitObject);
+    _handlers[ACTION_TYPEOF] = ActionHandler(ACTION_TYPEOF, ActionTypeOf);
+    _handlers[ACTION_TARGETPATH] = ActionHandler(ACTION_TARGETPATH,
+            ActionTargetPath);
+    _handlers[ACTION_ENUMERATE] = ActionHandler(ACTION_ENUMERATE,
+            ActionEnumerate);
+    _handlers[ACTION_NEWADD] = ActionHandler(ACTION_NEWADD, ActionNewAdd);
+    _handlers[ACTION_NEWLESSTHAN] = ActionHandler(ACTION_NEWLESSTHAN,
+            ActionNewLessThan);
+    _handlers[ACTION_NEWEQUALS] = ActionHandler(ACTION_NEWEQUALS,
+            ActionNewEquals);
+    _handlers[ACTION_TONUMBER] = ActionHandler(ACTION_TONUMBER, ActionToNumber);
+    _handlers[ACTION_TOSTRING] = ActionHandler(ACTION_TOSTRING, ActionToString);
+    _handlers[ACTION_DUP] = ActionHandler(ACTION_DUP, ActionDup);
+    _handlers[ACTION_SWAP] = ActionHandler(ACTION_SWAP, ActionSwap);
+    _handlers[ACTION_GETMEMBER] = ActionHandler(ACTION_GETMEMBER, 
+            ActionGetMember);
+    _handlers[ACTION_SETMEMBER] = ActionHandler(ACTION_SETMEMBER,
+            ActionSetMember);
+    _handlers[ACTION_INCREMENT] = ActionHandler(ACTION_INCREMENT,
+            ActionIncrement);
+    _handlers[ACTION_DECREMENT] = ActionHandler(ACTION_DECREMENT,
+            ActionDecrement);
+    _handlers[ACTION_CALLMETHOD] = ActionHandler(ACTION_CALLMETHOD,
+            ActionCallMethod);
+    _handlers[ACTION_NEWMETHOD] = ActionHandler(ACTION_NEWMETHOD,
+            ActionNewMethod);
+    _handlers[ACTION_INSTANCEOF] = ActionHandler(ACTION_INSTANCEOF,
+            ActionInstanceOf);
+    _handlers[ACTION_ENUM2] = ActionHandler(ACTION_ENUM2, ActionEnum2);
+    _handlers[ACTION_BITWISEAND] = ActionHandler(ACTION_BITWISEAND,
+            ActionBitwiseAnd);
+    _handlers[ACTION_BITWISEOR] = ActionHandler(ACTION_BITWISEOR,
+            ActionBitwiseOr);
+    _handlers[ACTION_BITWISEXOR] = ActionHandler(ACTION_BITWISEXOR,
+            ActionBitwiseXor);
+    _handlers[ACTION_SHIFTLEFT] = ActionHandler(ACTION_SHIFTLEFT,
+            ActionShiftLeft);
+    _handlers[ACTION_SHIFTRIGHT] = ActionHandler(ACTION_SHIFTRIGHT,
+            ActionShiftRight);
+    _handlers[ACTION_SHIFTRIGHT2] = ActionHandler(ACTION_SHIFTRIGHT2,
+            ActionShiftRight2);
+    _handlers[ACTION_STRICTEQ] = ActionHandler(ACTION_STRICTEQ, ActionStrictEq);
+    _handlers[ACTION_GREATER] = ActionHandler(ACTION_GREATER, ActionGreater);
+    _handlers[ACTION_STRINGGREATER] = ActionHandler(ACTION_STRINGGREATER,
+            ActionStringGreater);
+    _handlers[ACTION_EXTENDS] = ActionHandler(ACTION_EXTENDS, ActionExtends);
+    _handlers[ACTION_CONSTANTPOOL] = ActionHandler(ACTION_CONSTANTPOOL,
+            ActionConstantPool, ARG_DECL_DICT);
+    _handlers[ACTION_DEFINEFUNCTION2] = ActionHandler(ACTION_DEFINEFUNCTION2,
+            ActionDefineFunction2, ARG_FUNCTION2);
+    _handlers[ACTION_TRY] = ActionHandler(ACTION_TRY,
+            ActionTry, ARG_FUNCTION2);
+    _handlers[ACTION_WITH] = ActionHandler(ACTION_WITH,
+            ActionWith, ARG_U16);
+    _handlers[ACTION_DEFINEFUNCTION] = ActionHandler(ACTION_DEFINEFUNCTION,
+            ActionDefineFunction, ARG_HEX);
+    _handlers[ACTION_SETREGISTER] = ActionHandler(ACTION_SETREGISTER,
+            ActionSetRegister, ARG_U8);
 }
 
 SWFHandlers::~SWFHandlers()
 {
-}
-
-std::vector<ActionHandler> &
-SWFHandlers::get_handlers()
-{
-    static container_type handlers(255);
-    return handlers;
 }
 
 const SWFHandlers&
@@ -510,7 +437,7 @@ void
 SWFHandlers::execute(ActionType type, ActionExec& thread) const
 {
     try {
-        get_handlers()[type].execute(thread);
+        _handlers[type].execute(thread);
     }
     catch (ActionParserException& e) {
         log_swferror(_("Malformed action code: %s"), e.what());
@@ -520,23 +447,6 @@ SWFHandlers::execute(ActionType type, ActionExec& thread) const
 	std::abort();
     }
 }
-
-const char*
-SWFHandlers::action_name(ActionType x) const
-{
-    if (static_cast<size_t>(x) > get_handlers().size())
-    {
-        log_error(_("at SWFHandlers::action_name(%d) call time, "
-                    "_handlers size is %d"),
-                    x, get_handlers().size());
-        return NULL;
-    }
-    else
-    {
-        return get_handlers()[x].getName().c_str();
-    }
-}
-
 
 } // namespace SWF
 
@@ -1771,8 +1681,6 @@ ActionMbSubString(ActionExec& thread)
         );
         size = length - start;
     }
-
-    //log_debug("Adjusted start:%d size:%d", start, size);
 
     if (encoding == ENCGUESS_OTHER)
     {

@@ -20,10 +20,123 @@
 #include <iostream>
 
 namespace gnash {
-namespace SWF { // gnash::SWF
+namespace SWF { 
 
 std::ostream&
-operator<< (std::ostream& os, const abc_action_type& opcode)
+operator<<(std::ostream& o, ActionType a)
+{
+    switch (a) {
+        case ACTION_END: return o << "End";
+        case ACTION_NEXTFRAME: return o << "NextFrame";
+        case ACTION_PREVFRAME: return o << "PreviousFrame";
+        case ACTION_PLAY: return o << "Play";
+        case ACTION_STOP: return o << "Stop";
+        case ACTION_TOGGLEQUALITY: return o << "ToggleQuality";
+        case ACTION_STOPSOUNDS: return o << "StopSounds";
+        case ACTION_GOTOFRAME: return o << "GotoFrame";
+        case ACTION_GETURL: return o << "GetUrl";
+        case ACTION_WAITFORFRAME: return o << "WaitForFrame";
+        case ACTION_SETTARGET: return o << "SetTarget";
+        case ACTION_GOTOLABEL: return o << "GotoLabel";
+        case ACTION_ADD: return o << "Add";
+        case ACTION_SUBTRACT: return o << "Subtract";
+        case ACTION_MULTIPLY: return o << "Multiply";
+        case ACTION_DIVIDE: return o << "Divide";
+        case ACTION_EQUAL: return o << "Equal";
+        case ACTION_LESSTHAN: return o << "LessThan";
+        case ACTION_LOGICALAND: return o << "LogicalAnd";
+        case ACTION_LOGICALOR: return o << "LogicalOr";
+        case ACTION_LOGICALNOT: return o << "LogicalNot";
+        case ACTION_STRINGEQ: return o << "StringEq";
+        case ACTION_STRINGLENGTH: return o << "ActionStringLength";
+        case ACTION_SUBSTRING: return o << "ActionSubString";
+        case ACTION_POP: return o << "ActionPop";
+        case ACTION_INT: return o << "ActionInt";
+        case ACTION_GETVARIABLE: return o << "ActionGetVariable";
+        case ACTION_SETVARIABLE: return o << "ActionSetVariable";
+        case ACTION_SETTARGETEXPRESSION:
+             return o << "ActionSetTargetExpression";
+        case ACTION_STRINGCONCAT: return o << "ActionStringConcat";
+        case ACTION_GETPROPERTY: return o << "ActionGetProperty";
+        case ACTION_SETPROPERTY: return o << "ActionSetProperty";
+        case ACTION_DUPLICATECLIP: return o << "ActionDuplicateClip";
+        case ACTION_REMOVECLIP: return o << "ActionRemoveClip";
+        case ACTION_TRACE: return o << "ActionTrace";
+        case ACTION_STARTDRAGMOVIE: return o << "ActionStartDragMovie";
+        case ACTION_STOPDRAGMOVIE: return o << "ActionStopDragMovie";
+        case ACTION_STRINGCOMPARE: return o << "ActionStringCompare";
+        case ACTION_THROW: return o << "ActionThrow";
+        case ACTION_CASTOP: return o << "ActionCastOp";
+        case ACTION_IMPLEMENTSOP: return o << "ActionImplementsOp";
+        case ACTION_FSCOMMAND2: return o << "ActionFscommand2";
+        case ACTION_RANDOM: return o << "ActionRandom";
+        case ACTION_MBLENGTH: return o << "ActionMbLength";
+        case ACTION_ORD: return o << "ActionOrd";
+        case ACTION_CHR: return o << "ActionChr";
+        case ACTION_GETTIMER: return o << "ActionGetTimer";
+        case ACTION_MBSUBSTRING: return o << "ActionMbSubString";
+        case ACTION_MBORD: return o << "ActionMbOrd";
+        case ACTION_MBCHR: return o << "ActionMbChr";
+        case ACTION_STRICTMODE: return o << "ActionStrictMode";
+        case ACTION_WAITFORFRAMEEXPRESSION:
+            return o << "ActionWaitForFrameExpression";
+        case ACTION_PUSHDATA: return o << "ActionPushData";
+        case ACTION_BRANCHALWAYS: return o << "ActionBranchAlways";
+        case ACTION_GETURL2: return o << "ActionGetUrl2";
+        case ACTION_BRANCHIFTRUE: return o << "ActionBranchIfTrue";
+        case ACTION_CALLFRAME: return o << "ActionCallFrame";
+        case ACTION_GOTOEXPRESSION: return o << "ActionGotoExpression";
+        case ACTION_DELETE: return o << "ActionDelete";
+        case ACTION_DELETE2: return o << "ActionDelete2";
+        case ACTION_VAREQUALS: return o << "ActionVarEquals";
+        case ACTION_CALLFUNCTION: return o << "ActionCallFunction";
+        case ACTION_RETURN: return o << "ActionReturn";
+        case ACTION_MODULO: return o << "ActionModulo";
+        case ACTION_NEW: return o << "ActionNew";
+        case ACTION_VAR: return o << "ActionVar";
+        case ACTION_INITARRAY: return o << "ActionInitArray";
+        case ACTION_INITOBJECT: return o << "ActionInitObject";
+        case ACTION_TYPEOF: return o << "ActionTypeOf";
+        case ACTION_TARGETPATH: return o << "ActionTargetPath";
+        case ACTION_ENUMERATE: return o << "ActionEnumerate";
+        case ACTION_NEWADD: return o << "ActionNewAdd";
+        case ACTION_NEWLESSTHAN: return o << "ActionNewLessThan";
+        case ACTION_NEWEQUALS: return o << "ActionNewEquals";
+        case ACTION_TONUMBER: return o << "ActionToNumber";
+        case ACTION_TOSTRING: return o << "ActionToString";
+        case ACTION_DUP: return o << "ActionDup";
+        case ACTION_SWAP: return o << "ActionSwap";
+        case ACTION_GETMEMBER: return o << "ActionGetMember";
+        case ACTION_SETMEMBER: return o << "ActionSetMember";
+        case ACTION_INCREMENT: return o << "ActionIncrement";
+        case ACTION_DECREMENT: return o << "ActionDecrement";
+        case ACTION_CALLMETHOD: return o << "ActionCallMethod";
+        case ACTION_NEWMETHOD: return o << "ActionNewMethod";
+        case ACTION_INSTANCEOF: return o << "ActionInstanceOf";
+        case ACTION_ENUM2: return o << "ActionEnum2";
+        case ACTION_BITWISEAND: return o << "ActionBitwiseAnd";
+        case ACTION_BITWISEOR: return o << "ActionBitwiseOr";
+        case ACTION_BITWISEXOR: return o << "ActionBitwiseXor";
+        case ACTION_SHIFTLEFT: return o << "ActionShiftLeft";
+        case ACTION_SHIFTRIGHT: return o << "ActionShiftRight";
+        case ACTION_SHIFTRIGHT2: return o << "ActionShiftRight2";
+        case ACTION_STRICTEQ: return o << "ActionStrictEq";
+        case ACTION_GREATER: return o << "ActionGreater";
+        case ACTION_STRINGGREATER: return o << "ActionStringGreater";
+        case ACTION_EXTENDS: return o << "ActionExtends";
+        case ACTION_CONSTANTPOOL: return o << "ActionConstantPool";
+        case ACTION_DEFINEFUNCTION2: return o << "ActionDefineFunction2";
+        case ACTION_TRY: return o << "ActionTry";
+        case ACTION_WITH: return o << "ActionWith";
+        case ACTION_DEFINEFUNCTION: return o << "ActionDefineFunction";
+        case ACTION_SETREGISTER: return o << "ActionSetRegister";
+        default: return o << "Unknown ActionType";
+    }
+    return o;
+}
+
+std::ostream&
+operator<<(std::ostream& os, const abc_action_type& opcode)
 {
     switch (opcode)
     {
