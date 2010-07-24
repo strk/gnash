@@ -2141,7 +2141,10 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         boost::replace_all(command, "%u", safeurl);
         
         log_debug (_("Launching URL: %s"), command);
-        std::system(command.c_str());
+        int ret = std::system(command.c_str());
+        if ( -1 == ret ) {
+            log_error(_("Fork failed launching url opener '%s'"), command);
+        }
         return;
     }
 
