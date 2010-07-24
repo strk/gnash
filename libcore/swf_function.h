@@ -34,6 +34,23 @@ namespace gnash {
 
 namespace gnash {
 
+class TargetGuard
+{
+public:
+
+	// @param ch : target to set temporarely
+	// @param och : original target to set temporarily
+	TargetGuard(as_environment& e, DisplayObject* ch, DisplayObject* och);
+	~TargetGuard();
+
+private:
+
+    as_environment& env;
+    DisplayObject* from;
+    DisplayObject* from_orig;
+
+};
+
 /// SWF-defined Function 
 class swf_function : public UserFunction
 {
@@ -41,42 +58,6 @@ class swf_function : public UserFunction
 public:
 
 	typedef std::vector<as_object*> ScopeStack;
-
-	enum SWFDefineFunction2Flags
-	{
-		/// Bind one register to "this" 
-		PRELOAD_THIS = 0x01, // 1
-
-		/// No "this" variable accessible by-name 
-		SUPPRESS_THIS = 0x02, // 2
-
-		/// Bind one register to "arguments" 
-		PRELOAD_ARGUMENTS = 0x04, // 4
-
-		/// No "argument" variable accessible by-name 
-		SUPPRESS_ARGUMENTS = 0x08, // 8
-
-		/// Bind one register to "super" 
-		PRELOAD_SUPER = 0x10, // 16
-
-		/// No "super" variable accessible by-name 
-		SUPPRESS_SUPER = 0x20, // 32
-
-		/// Bind one register to "_root" 
-		PRELOAD_ROOT = 0x40, // 64
-
-		/// Bind one register to "_parent" 
-		PRELOAD_PARENT = 0x80, // 128
-
-		/// Bind one register to "_global" 
-		//
-		/// TODO: check this.
-        /// See:
-        /// http://www.m2osw.com/swf_alexref.html#action_declare_function2
-		///       Looks like flags would look swapped
-		PRELOAD_GLOBAL = 256 // 0x100
-
-	};
 
 	/// \brief
 	/// Create an ActionScript function as defined in an
@@ -87,45 +68,28 @@ public:
 
 	virtual ~swf_function() {}
 
-	const ScopeStack& getScopeStack() const
-	{
+	const ScopeStack& getScopeStack() const {
 		return _scopeStack;
 	}
 
-	const action_buffer& getActionBuffer() const
-	{
+	const action_buffer& getActionBuffer() const {
 		return m_action_buffer;
 	}
 
-	size_t getStartPC() const
-	{
+	size_t getStartPC() const {
 		return _startPC;
 	}
 
-	size_t getLength() const
-	{
+	size_t getLength() const {
 		return _length;
 	}
 
-	void set_is_function2() { _isFunction2 = true; }
-
-    size_t registers() const {
-        return _registerCount;
-    }
-
-	void set_local_register_count(boost::uint8_t ct) {
-        assert(_isFunction2);
-        _registerCount = ct;
-    }
-
-	void set_function2_flags(boost::uint16_t flags) {
-        assert(_isFunction2);
-        _function2Flags = flags;
+    virtual size_t registers() const {
+        return 0;
     }
 
 	void add_arg(boost::uint8_t arg_register, string_table::key name)
 	{
-		assert(arg_register == 0 || _isFunction2 == true);
         _args.push_back(Argument(arg_register, name));
 	}
 
@@ -143,7 +107,7 @@ public:
 	virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
 
-private:
+protected:
 
 	/// Action buffer containing the function definition
 	const action_buffer& m_action_buffer;
@@ -174,16 +138,15 @@ private:
 	};
 
 	std::vector<Argument> _args;
-	bool _isFunction2;
-	boost::uint8_t _registerCount;
-
-	/// used by function2 to control implicit arg register assignments
-	// 
-	/// See
-    /// http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
-	boost::uint16_t	_function2Flags;
 
 };
+
+/// Add properties to an 'arguments' object.
+//
+/// The 'arguments' variable is an array with an additional
+/// 'callee' member, set to the function being called.
+as_object* getArguments(swf_function& callee, as_object& args, 
+        const fn_call& fn, as_object* caller);
 
 
 } // end of gnash namespace

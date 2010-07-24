@@ -29,8 +29,10 @@
 #include "rc.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"
+#include "NativeFunction.h"
 #include "swf_function.h"
 #include "as_function.h"
+#include "Function2.h"
 #include "fn_call.h"
 #include "ActionExec.h"
 #include "MovieClip.h"
@@ -3429,10 +3431,15 @@ ActionDefineFunction2(ActionExec& thread)
     // Code starts at thread.getNextPC() as the DefineFunction tag
     // contains name and args, while next tag is first tag
     // of the function body.
-    swf_function* func = new swf_function(code, env, thread.getNextPC(),
+    Function2* func = new Function2(code, env, thread.getNextPC(),
             thread.getScopeStack());
 
-    func->set_is_function2();
+    // We're stuck initializing our own prototype at the moment.
+    as_object* proto = getGlobal(env).createObject();
+    proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
+    func->init_member(NSV::PROP_PROTOTYPE, proto);
+	func->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor());
 
     size_t i = thread.getCurrentPC() + 3; // skip tag id and length
 
@@ -3664,6 +3671,13 @@ ActionDefineFunction(ActionExec& thread)
     // of the function body.
     swf_function* func = new swf_function(code, env, thread.getNextPC(),
             thread.getScopeStack());
+    
+    // We're stuck initializing our own prototype at the moment.
+    as_object* proto = getGlobal(env).createObject();
+    proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
+    func->init_member(NSV::PROP_PROTOTYPE, proto);
+	func->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor());
 
     size_t i = thread.getCurrentPC() + 3;
 

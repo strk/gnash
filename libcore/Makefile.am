@@ -119,6 +119,7 @@ libgnashcore_la_SOURCES = \
 	swf/SetTabIndexTag.cpp \
 	swf/StreamSoundBlockTag.cpp \
 	swf_function.cpp \
+	Function2.cpp \
 	Video.cpp \
 	StreamProvider.cpp \
 	Button.cpp \
@@ -214,6 +215,7 @@ noinst_HEADERS = \
 	swf/ScriptLimitsTag.h \
 	swf_event.h \
 	swf_function.h \
+	Function2.h \
 	Timers.h \
 	Video.h \
 	MovieLoader.h \
