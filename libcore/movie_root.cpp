@@ -891,11 +891,20 @@ movie_root::advance()
             //   now - _lastMovieAdvancement
             // gives you actual lateness in milliseconds
             //
-            _lastMovieAdvancement += _movieAdvancementDelay;
+            // TODO: make 'catchup' setting user-settable
+            //       as it helps A/V sync but sacrifices 
+            //       smoothness of animation which is very
+            //       important for games.
+            static const bool catchup = true;
+            if (catchup) {
+                _lastMovieAdvancement += _movieAdvancementDelay;
+            } else {
+                _lastMovieAdvancement = now;
+            }
 
         }
 
-        //log_debug("Latenss: %d", now-_lastMovieAdvancement);
+        //log_debug("Lateness: %d", now-_lastMovieAdvancement);
         
         executeAdvanceCallbacks();
         
