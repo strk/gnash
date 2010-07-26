@@ -24,9 +24,16 @@
 #endif
 
 #include <vector>
+#include <linux/fb.h>
 
 #include "gui.h"
-#include <linux/fb.h>
+#ifdef HAVE_TSLIB_H
+# include <tslib.h>
+#endif
+#if defined(ENABLE_TSLIB) && defined(!HAVE_TSLIB_H)
+# warning "No tslib.h! Disabling touchscreen support"
+# undef ENABLE_TSLIB
+#endif
 
 #define PIXELFORMAT_LUT8
 #define CMAP_SIZE (256*2)
@@ -37,16 +44,21 @@
 // (strongly suggested)
 #define DOUBLE_BUFFER
 
-
-// TODO: Make this configurable via ./configure!
-
-
 // Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
 // emulated by the Kernel) 
 //#define USE_MOUSE_PS2
 
 // Define this to read from /dev/input/event0 (new generic input subsystem)
-#define USE_INPUT_EVENTS
+#ifdef ENABLE_TSLIB
+// Either use environment variable or hardcoded value
+// Hint: /dev/ts can be a symlink to the real ts device.
+// TSLIB_DEVICE environment variable should point to the
+// touchscreen device the library is using.
+# define TSLIB_DEVICE_ENV       "TSLIB_TSDEVICE"
+# define TSLIB_DEVICE_NAME      "/dev/ts"
+#else
+# define USE_INPUT_EVENTS
+#endif
 
 // Define this to support eTurboTouch / eGalax touchscreens. When reading from
 // a serial device, it must be initialized (stty) externally. 
@@ -60,15 +72,12 @@
 #define MOUSE_DEVICE "/dev/usb/tkpanel0"
 #endif
 
-
 // Define this to request a new virtual terminal at startup. This doesn't always
 // work and probably is not necessary anyway
 //#define REQUEST_NEW_VT
 
-
 namespace gnash
 {
-
 
 /// A Framebuffer-based GUI for Gnash.
 /// ----------------------------------
@@ -131,7 +140,13 @@ class FBGui : public Gui
   	int mouse_x, mouse_y, mouse_btn;
   	unsigned char mouse_buf[256];
   	int mouse_buf_size;
-  	
+
+#ifdef ENABLE_TSLIB
+        struct tsdev *tsDev;
+        bool init_tslib(); 
+        void check_tslib();
+#endif
+
   	// Keyboard SHIFT/CTRL/ALT states (left + right)
   	bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
 
