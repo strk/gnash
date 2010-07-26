@@ -195,6 +195,7 @@ check_PROGRAMS = \
 	new_child_in_unload_test \
 	instanceNameTest \
 	BitmapDataTest \
+	BitmapDataTestRunner \
 	BitmapDataDraw \
 	BitmapSmoothingTest \
 	$(NULL)
@@ -1573,6 +1574,24 @@ BitmapDataTest_LDADD = libgnashmingutils.la
 BitmapDataTest.swf: BitmapDataTest
 	./BitmapDataTest $(abs_mediadir)
 
+BitmapDataTestRunner_SOURCES = \
+	BitmapDataTestRunner.cpp \
+	$(NULL)
+
+BitmapDataTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+BitmapDataTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+
+BitmapDataTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	BitmapDataTest.swf	\
+	$(NULL)
 
 BitmapDataDraw_SOURCES = \
 	BitmapDataDraw.c \
@@ -2160,6 +2179,7 @@ clean-local:
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
+	BitmapDataTestRunner \
 	LoadVarsTestRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
