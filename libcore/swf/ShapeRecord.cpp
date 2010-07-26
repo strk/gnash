@@ -614,16 +614,17 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
         //       the bounds as edges are parsed.
         computeBounds(_bounds, _paths, _lineStyles, m.get_version());
     }
+
 #ifdef GNASH_DEBUG_SHAPE_BOUNDS
     else
     {
         SWFRect computedBounds;
-        computeBounds(computedBounds, _paths, _lineStyles, m->get_version());
-        if ( computedBounds != m_bounds )
+        computeBounds(computedBounds, _paths, _lineStyles, m.get_version());
+        if ( computedBounds != _bounds )
         {
             log_debug("Shape object read for tag %d contained embedded "
                     "bounds %s, while we computed bounds %s",
-                    tag, m_bound, computedBounds);
+                    tag, _bounds, computedBounds);
         }
     }
 #endif
@@ -723,6 +724,13 @@ computeBounds(SWFRect& bounds, const ShapeRecord::Paths& paths,
 
 
 } // anonymous namespace
+
+std::ostream&
+operator<<(std::ostream& o, const ShapeRecord& sh)
+{
+    o << "Shape Record: bounds " << sh.getBounds();
+    return o;
+}
 
 } // namespace SWF
 } // namespace gnash

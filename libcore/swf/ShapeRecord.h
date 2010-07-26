@@ -156,6 +156,8 @@ private:
 
 };
 
+std::ostream& operator<<(std::ostream& o, const ShapeRecord& sh);
+
 } // namespace SWF
 } // namespace gnash
 
