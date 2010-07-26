@@ -566,26 +566,30 @@ GNASH_PKG_CLASSFILE
 
 dnl Add support for a touchscreen. Note that this replaces the existing input
 dnl device for events. This currently only works with the framebuffer GUI.
-AC_ARG_ENABLE(tslib,
-  AC_HELP_STRING([--enable-tslib], [specify touchcreen device for the framebuffer display (ett or tslib)]),
-  [ case "${enableval}" in
+AC_ARG_WITH(tslib,
+  AC_HELP_STRING([--with-tslib], [specify touchcreen device for the framebuffer display (ett or tslib)]),
+  [ case "${withval}" in
       e*) tslib="eTurboTouch / eGalax touchscreen"
         AC_DEFINE(USE_ETT_TSLIB, [1], [Using eTurboTouch touchscreen])
         ;;
       t*) tslib="tslib touchscreen" ;; 
-      yes) tslib="tslib touchscreen" ;; dnl the default if nothing is specified
-      *)  AC_MSG_ERROR([bad value ${enableval} for enable-tslib option (tslib or ett)])
+      yes) tslib="tslib touchscreen" ;;
+      *)  AC_MSG_ERROR([bad value ${withval} for with-tslib option (tslib or ett)])
         ;;
        esac
    ], tslib=
 )
 AM_CONDITIONAL(ENABLE_TSLIB, [test x"$tslib" != x])
-if test x"${tslib}" = xyes; then
+if test x"${tslib}" != x; then
   AC_DEFINE(USE_TSLIB, [1], [Using tslib supported touchscreen])
+  GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
 fi
 
 dnl Add an option for double buffering when rendering, currently only used by
 dnl the frmaebuffer GUI.
+dnl If defined, an internal software-buffer is used for rendering and is then
+dnl copied to the video RAM. This avoids flicker and is faster for complex 
+dnl graphics, as video RAM access is usually slower. (strongly suggested)
 AC_ARG_ENABLE(doublebuf,
   AC_HELP_STRING([--enable-doublebuf], [Enable support for double buffering when rendering]),
   [case "${enableval}" in
@@ -634,6 +638,9 @@ fi
 
 dnl Specify a mouse type, currently only a PS/2 style (standard nouse) is
 dnl supported.
+dnl Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
+dnl emulated by the Kernel) 
+dnl Define this to read from /dev/input/event0 (new generic input subsystem)
 AC_ARG_ENABLE(mouse,
   AC_HELP_STRING([--enable-mouse], [specify mouse for framebuffer display (default ps2]),
   [case "${enableval}" in
@@ -645,6 +652,10 @@ AC_ARG_ENABLE(mouse,
 )
 if test x"${mouse}" != x; then
   AC_DEFINE(USE_MOUSE_PS2, [1], [Using a standard PS/2 mouse with the framebuffer])
+fi
+
+if test x"${mouse}" != x -o x"${tslib}" != x; then
+  AC_DEFINE(USE_INPUT_EVENTS, [1], [Whether to use input events, mouse, keyboard, or touchscreen])
 fi
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
@@ -2214,8 +2225,6 @@ AM_CONDITIONAL(BUILD_HAIKU_GUI,    [ test x$build_haiku = xyes ])
 AM_CONDITIONAL(NPAPI,   [test x"${npapi}" = xyes])
 AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
 AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
-
-GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
 
 if test x"${build_gles}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)

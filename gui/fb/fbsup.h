@@ -38,17 +38,6 @@
 #define PIXELFORMAT_LUT8
 #define CMAP_SIZE (256*2)
 
-// If defined, an internal software-buffer is used for rendering and is then
-// copied to the video RAM. This avoids flicker and is faster for complex 
-// graphics, as video RAM access is usually slower. 
-// (strongly suggested)
-#define DOUBLE_BUFFER
-
-// Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
-// emulated by the Kernel) 
-//#define USE_MOUSE_PS2
-
-// Define this to read from /dev/input/event0 (new generic input subsystem)
 #ifdef ENABLE_TSLIB
 // Either use environment variable or hardcoded value
 // Hint: /dev/ts can be a symlink to the real ts device.
@@ -56,19 +45,15 @@
 // touchscreen device the library is using.
 # define TSLIB_DEVICE_ENV       "TSLIB_TSDEVICE"
 # define TSLIB_DEVICE_NAME      "/dev/ts"
-#else
-# define USE_INPUT_EVENTS
 #endif
-
-// Define this to support eTurboTouch / eGalax touchscreens. When reading from
-// a serial device, it must be initialized (stty) externally. 
-//#define USE_MOUSE_ETT
 
 #ifdef USE_MOUSE_PS2
-#define MOUSE_DEVICE "/dev/input/mice"
+# define MOUSE_DEVICE "/dev/input/mice"
 #endif
 
-#ifdef USE_MOUSE_ETT
+// FIXME: this should really be TSLIB_DEVICE_NAME, but I don't have the
+// ETT SDK, so for now, leave it the way it was.
+#ifdef USE_ETT_TSLIB
 #define MOUSE_DEVICE "/dev/usb/tkpanel0"
 #endif
 
@@ -125,7 +110,7 @@ private:
     int original_kd;       // keyboard mode at startup
     int own_vt;            // virtual terminal we are running in   
     unsigned char *fbmem;  // framebuffer memory
-#ifdef DOUBLE_BUFFER
+#ifdef ENABLE_DOUBLE_BUFFERING
     unsigned char *buffer; // offscreen buffer
 #endif		
     
@@ -140,12 +125,19 @@ private:
     int mouse_x, mouse_y, mouse_btn;
     unsigned char mouse_buf[256];
     int mouse_buf_size;
-    
+
 #ifdef ENABLE_TSLIB
     struct tsdev *tsDev;
     bool init_tslib(); 
     void check_tslib();
 #endif
+#ifdef USE_INPUT_EVENTS
+    /// Initializes mouse routines
+    bool init_mouse();
+    
+    /// Checks for and processes any mouse activity. Returns true on activity.
+    bool check_mouse();
+#endif    
     
     // Keyboard SHIFT/CTRL/ALT states (left + right)
     bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
@@ -178,12 +170,6 @@ private:
     
     /// Fills the mouse data input buffer with fresh data
     void read_mouse_data();  	
-    
-    /// Initializes mouse routines
-    bool init_mouse();
-    
-    /// Checks for and processes any mouse activity. Returns true on activity.
-    bool check_mouse();
     
     /// Initializes keyboard routines 
     bool init_keyboard();

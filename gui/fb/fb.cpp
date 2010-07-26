@@ -24,15 +24,10 @@
 /// Linux Input Subsystem (/dev/input/event*). Both standard mice and 
 /// touchscreen devices are supported.
 ///
-/// Make sure the USE_INPUT_EVENTS macro is defined in fbsup.h so that
-/// the events system is enabled for the FB GUI (this may be configurable
-/// at runtime sometime).
-///
 /// Since there can be multiple input devices in /dev/input/ you have to
 /// specify which device to use using the 
 ///  POINTING_DEVICE environment variable for the mouse and
 ///  KEYBOARD_DEVICE environment variable for the keyboard
-   
 
 /// \page fb_calibration FB GUI Touchscreen Calibration
 ///
@@ -173,7 +168,7 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
 {
     fd      = -1;
     fbmem   = NULL;
-#ifdef DOUBLE_BUFFER
+#ifdef ENABLE_DOUBLE_BUFFERING
     buffer  = NULL;
 #endif
 
@@ -193,7 +188,7 @@ FBGui::~FBGui()
   
     close(input_fd);
 
-#ifdef DOUBLE_BUFFER
+#ifdef ENABLE_DOUBLE_BUFFERING
     if (buffer) {
         log_debug(_("Free'ing offscreen buffer"));
         free(buffer);
@@ -241,12 +236,14 @@ FBGui::set_grayscale_lut8()
 bool
 FBGui::init(int /*argc*/, char *** /*argv*/)
 {
+#if defined(USE_MOUSE_PS2) || (USE_ETT_TSLIB)
     // Initialize mouse (don't abort if no mouse found)
     if (!init_mouse()) {
         // just report to the user, keep on going...
         log_debug(_("You won't have any pointing input device, sorry."));
     }
-  
+#endif
+    
     // Initialize keyboard (still not critical)
     if (!init_keyboard()) {   
         log_debug(_("You won't have any keyboard input device, sorry."));
@@ -271,7 +268,7 @@ FBGui::init(int /*argc*/, char *** /*argv*/)
     fbmem = (unsigned char *)
         mmap(0, fix_screeninfo.smem_len, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
 
-#ifdef DOUBLE_BUFFER
+#ifdef ENABLE_DOUBLE_BUFFERING
     // allocate offscreen buffer
     buffer = (unsigned char*)malloc(fix_screeninfo.smem_len);
     memset(buffer, 0, fix_screeninfo.smem_len);
@@ -306,7 +303,7 @@ FBGui::initialize_renderer()
   
     _validbounds.setTo(0, 0, width - 1, height - 1);    
   
-#ifdef DOUBLE_BUFFER
+#ifdef ENABLE_DOUBLE_BUFFERING
     log_debug(_("Double buffering enabled"));
     mem = buffer;
 #else
@@ -380,7 +377,9 @@ FBGui::run()
         // "advance" faster than the "heartbeat" interval)? - Udo
   
         // check input devices
+#if defined(USE_MOUSE_PS2) || (USE_ETT_TSLIB)
         check_mouse();
+#endif
         check_keyboard();
   
         // advance movie  
@@ -396,8 +395,7 @@ FBGui::renderBuffer()
 {
     if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
-#ifdef DOUBLE_BUFFER
-
+#ifdef ENABLE_DOUBLE_BUFFERING
     // Size of a pixel in bytes
     // NOTE: +7 to support 15 bpp
     const unsigned int pixel_size = (var_screeninfo.bits_per_pixel+7)/8;
@@ -926,7 +924,7 @@ FBGui::check_mouse()
 }
 #endif
 
-#ifdef USE_MOUSE_ETT    
+#ifdef USE_ETT_TSLIB
 bool FBGui::init_mouse()
 {
   // Try to open mouse device, be error tolerant (FD is kept open all the time)
@@ -956,7 +954,7 @@ bool FBGui::init_mouse()
 } 
 #endif
 
-#ifdef USE_MOUSE_ETT    
+#ifdef USE_ETT_TSLIB    
 bool
 FBGui::check_mouse() 
 {
