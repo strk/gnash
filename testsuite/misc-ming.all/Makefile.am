@@ -263,6 +263,7 @@ check_PROGRAMS += EmbeddedSoundTest-Runner
 endif
 
 check_SCRIPTS = \
+	BitmapDataDrawRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
 	TextSnapshotTest-Runner \
@@ -1606,6 +1607,10 @@ BitmapDataDraw_LDADD = libgnashmingutils.la
 BitmapDataDraw.swf: BitmapDataDraw
 	./BitmapDataDraw $(abs_mediadir)
 
+BitmapDataDrawRunner: $(srcdir)/../generic-testrunner.sh BitmapDataDraw.swf
+	sh $< $(top_builddir) BitmapDataDraw.swf > $@
+	chmod 755 $@
+
 EmbeddedSoundTest_SOURCES = \
 	EmbeddedSoundTest.c \
 	$(NULL)
@@ -2180,6 +2185,7 @@ clean-local:
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	BitmapDataTestRunner \
+	BitmapDataDrawRunner \
 	LoadVarsTestRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
