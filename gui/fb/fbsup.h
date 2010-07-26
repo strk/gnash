@@ -38,13 +38,13 @@
 #define PIXELFORMAT_LUT8
 #define CMAP_SIZE (256*2)
 
-#ifdef ENABLE_TSLIB
+#ifdef USE_TSLIB
 // Either use environment variable or hardcoded value
 // Hint: /dev/ts can be a symlink to the real ts device.
 // TSLIB_DEVICE environment variable should point to the
 // touchscreen device the library is using.
-# define TSLIB_DEVICE_ENV       "TSLIB_TSDEVICE"
-# define TSLIB_DEVICE_NAME      "/dev/ts"
+# define TSLIB_DEVICE_ENV "TSLIB_TSDEVICE"
+# define TSLIB_DEVICE_NAME "/dev/ts"
 #endif
 
 #ifdef USE_MOUSE_PS2
@@ -110,9 +110,7 @@ private:
     int original_kd;       // keyboard mode at startup
     int own_vt;            // virtual terminal we are running in   
     unsigned char *fbmem;  // framebuffer memory
-#ifdef ENABLE_DOUBLE_BUFFERING
     unsigned char *buffer; // offscreen buffer
-#endif		
     
     std::vector< geometry::Range2d<int> > _drawbounds;
     
@@ -126,17 +124,65 @@ private:
     unsigned char mouse_buf[256];
     int mouse_buf_size;
 
-#ifdef ENABLE_TSLIB
+    // Although the value is only set when using a touchscreen, it takes up little
+    // memory to initialize a pointer top avoid lots op fmessy ifdefs.
     struct tsdev *tsDev;
+    
+#ifdef USE_TSLIB
     bool init_tslib(); 
     void check_tslib();
 #endif
-#ifdef USE_INPUT_EVENTS
-    /// Initializes mouse routines
+
+    // FIXME: This mouse handling code is a mess, and should really be made
+    // made more C++ like, with a base Mouse class, then have device specific
+    // derived classes. For now this just makes the old code work with the new
+    // configure settings.
+    
+    /// Initializes mouse
+    ///
+    /// @return true if initialized, false if not or the mouse doesn't exist
     bool init_mouse();
+
+    /// Checks for and processes any mouse activity.
+    ///
+    /// @return true if activity, false if not or the mouse doesn't exist
+    bool check_mouse();
+    
+    /// Initializes keyboard routines 
+    ///
+    /// @return true if initialized, false if not or the keyboard doesn't exist
+    bool init_keyboard();
+    
+    /// Checks for and processes any keyboard activity.
+    ///
+    /// @return true if activity, false if not or the keyboard doesn't exist
+    bool check_keyboard();
+    
+#ifdef USE_MOUSE_PS2
+    bool init_ps2_mouse();
     
     /// Checks for and processes any mouse activity. Returns true on activity.
-    bool check_mouse();
+    bool check_ps2_mouse();    
+#endif
+    
+#ifdef USE_ETT_TSLIOB
+    bool init_ett_mouse();
+
+    /// Checks for and processes any mouse activity. Returns true on activity.
+    bool check_ett_mouse();
+#endif
+    
+#ifdef USE_INPUT_EVENTS
+    bool init_input_events();
+    
+    /// Fills the mouse data input buffer with fresh data
+    void read_mouse_data();  	
+    
+    /// Translates a scancode from the Linux Input Subsystem to a Gnash key code 
+    gnash::key::code scancode_to_gnash_key(int code, bool shift);
+    
+    /// Applies builtin touchscreen calibration
+    void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
 #endif    
     
     // Keyboard SHIFT/CTRL/ALT states (left + right)
@@ -168,23 +214,6 @@ private:
     bool mouse_command(unsigned char cmd, unsigned char *buf, int count);
 #endif
     
-    /// Fills the mouse data input buffer with fresh data
-    void read_mouse_data();  	
-    
-    /// Initializes keyboard routines 
-    bool init_keyboard();
-    
-    /// Translates a scancode from the Linux Input Subsystem to a Gnash key code 
-    gnash::key::code scancode_to_gnash_key(int code, bool shift);
-    
-    /// Checks for and processes any keyboard activity. Returns true on activity.
-    bool check_keyboard();
-    
-#ifdef USE_INPUT_EVENTS  	
-    /// Applies builtin touchscreen calibration
-    void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
-#endif
-    
     int valid_x(int x);
     int valid_y(int y);
     
@@ -214,7 +243,14 @@ public:
 // end of namespace gnash
 }
 
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+/// Simulate the ioctls used to get information from the framebuffer driver.
+///
+/// Since this is an emulator, we have to set these fields to a reasonable default.
+int fakefb_ioctl(int fd, int request, void *data);
 #endif
+
+#endif  // end of GNASH_FBSUP_H
 
 // local Variables:
 // mode: C++

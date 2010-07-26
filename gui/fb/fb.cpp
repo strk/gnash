@@ -60,6 +60,19 @@
 /// commas (X,Y,X,Y), like this: 
 ///   TSCALIB=491,1635,1581,639 gnash yourmovie.swf    
 
+///
+/// 10-4-2008  N. Coesel
+/// Added support for tslib. Tslib is a library which allows to create
+/// a stack / cascade of filters to filter and scale touch-screen output.
+/// The source doesn't come with much documentation, but writing your
+/// own filter based on an existing filter is really easy. Tslib can 
+/// deal with old style H3600 style touchscreens and the newer event 
+/// interface. See http://tslib.berlios.de/ to get the source. 
+///
+/// The check_tslib() routine assumes filtering for movement and presses
+/// is properly setup. Scaling is supposed to be performed by tslib or
+/// the underlying touchscreen driver.
+
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
@@ -77,6 +90,14 @@
 #include "GnashSystemIOHeaders.h"
 #include <csignal>
 #include <cstdlib> // getenv
+
+#ifdef HAVE_TSLIB_H
+# include <tslib.h>
+#endif
+#if defined(ENABLE_TSLIB) && !defined(HAVE_TSLIB_H)
+# warning "No tslib.h! Disabling touchscreen support"
+# undef ENABLE_TSLIB
+#endif
 
 #include "gnash.h"
 #include "gui.h"
@@ -151,9 +172,8 @@ profile()
     
 }
 #endif
-//---------------
 
-int terminate_request=false;  // global scope to avoid GUI access
+int terminate_request = false;  // global scope to avoid GUI access
 
 /// Called on CTRL-C and alike
 void
@@ -161,19 +181,30 @@ terminate_signal(int /*signo*/) {
     terminate_request = true;
 }
 
-//---------------
-
 FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
-  : Gui(xid, scale, loop, r)
+    : Gui(xid, scale, loop, r),
+      fd(-1),
+      original_vt(-1),
+      original_kd(-1),
+      own_vt(-1),
+      fbmem(0),
+      buffer(0),                // the real value is set by ENABLE_DOUBLE_BUFFERING
+      m_stage_width(0),
+      m_stage_height(0),
+      m_rowsize(0),
+      input_fd(-1),
+      keyb_fd(-1),
+      mouse_x(0),
+      mouse_y(0),
+      mouse_btn(0),
+      mouse_buf_size(0),
+      tsDev(0)                // the real value is set by ENABLE_DOUBLE_BUFFERING
 {
-    fd      = -1;
-    fbmem   = NULL;
-#ifdef ENABLE_DOUBLE_BUFFERING
-    buffer  = NULL;
-#endif
-
-    input_fd=-1;
-  
+    // initializing to zero helps with debugging and prevents weird bugs
+    memset(mouse_buf, 0, 256);
+    memset(&var_screeninfo, 0, sizeof(fb_var_screeninfo));
+    memset(&fix_screeninfo, 0, sizeof(fb_fix_screeninfo));
+    
     signal(SIGINT, terminate_signal);
     signal(SIGTERM, terminate_signal);
 }
@@ -185,9 +216,17 @@ FBGui::~FBGui()
         log_debug(_("Closing framebuffer device"));
         close(fd);
     }
-  
-    close(input_fd);
 
+    if (input_fd) {
+        close(input_fd);
+    }
+    
+#ifdef USE_TSLIB
+    if (tsDev) {
+        ts_close(tsDev);
+    }
+#endif
+    
 #ifdef ENABLE_DOUBLE_BUFFERING
     if (buffer) {
         log_debug(_("Free'ing offscreen buffer"));
@@ -223,7 +262,12 @@ FBGui::set_grayscale_lut8()
         cmap.blue[i] = TO_16BIT(b);
     }
 
-    if (ioctl(fd, FBIOPUTCMAP, &cmap)) {
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+    if (fakefb_ioctl(fd, FBIOPUTCMAP, &cmap))
+#else
+    if (ioctl(fd, FBIOPUTCMAP, &cmap))
+#endif
+    {
         log_error(_("LUT8: Error setting colormap: %s"), strerror(errno));
         return false;
     }
@@ -233,32 +277,53 @@ FBGui::set_grayscale_lut8()
 #undef TO_16BIT
 }
 
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+bool
+FBGui::init_mouse()
+{
+    return false;
+}
+#endif
+
 bool
 FBGui::init(int /*argc*/, char *** /*argv*/)
 {
-#if defined(USE_MOUSE_PS2) || (USE_ETT_TSLIB)
     // Initialize mouse (don't abort if no mouse found)
     if (!init_mouse()) {
         // just report to the user, keep on going...
         log_debug(_("You won't have any pointing input device, sorry."));
     }
-#endif
     
     // Initialize keyboard (still not critical)
     if (!init_keyboard()) {   
         log_debug(_("You won't have any keyboard input device, sorry."));
     }
 
+#ifdef USE_TSLIB
+    if (init_tslib() == false) {
+        log_debug("You won't have any tslib input device, sorry.");
+    }
+#endif
+
     // Open the framebuffer device
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+    fd = open(FAKEFB, O_RDWR);
+#else
     fd = open("/dev/fb0", O_RDWR);
-    if (fd<0) {
+#endif
+    if (fd < 0) {
         fatal_error("Could not open framebuffer device: %s", strerror(errno));
         return false;
     }
   
     // Load framebuffer properties
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+    fakefb_ioctl(fd, FBIOGET_VSCREENINFO, &var_screeninfo);
+    fakefb_ioctl(fd, FBIOGET_FSCREENINFO, &fix_screeninfo);
+#else
     ioctl(fd, FBIOGET_VSCREENINFO, &var_screeninfo);
     ioctl(fd, FBIOGET_FSCREENINFO, &fix_screeninfo);
+#endif
     log_debug(_("Framebuffer device uses %d bytes of memory."),
               fix_screeninfo.smem_len);
     log_debug(_("Video mode: %dx%d with %d bits per pixel."),
@@ -359,6 +424,10 @@ FBGui::run()
 
     double start_timer;
   
+#ifdef USE_TSLIB
+    int ts_loop_count;
+#endif
+    
     if (!gettimeofday(&tv, NULL)) {
         start_timer = static_cast<double>(tv.tv_sec) +
             static_cast<double>(tv.tv_usec) / 1000000.0;
@@ -382,9 +451,13 @@ FBGui::run()
 #endif
         check_keyboard();
   
+#ifdef USE_TSLIB
+        check_tslib();
+        ts_loop_count++; //increase loopcount
+#endif        
+        
         // advance movie  
         Gui::advance_movie(this);
-    
     }
   
     return true;
@@ -780,14 +853,14 @@ FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count)
 
 #ifdef USE_MOUSE_PS2    
 bool
-FBGui::init_mouse() 
+FBGui::init_ps2_mouse() 
 {
     // see http://www.computer-engineering.org/ps2mouse/ 
     
     // Try to open mouse device, be error tolerant (FD is kept open all the time)
     input_fd = open(MOUSE_DEVICE, O_RDWR);
     
-    if (input_fd<0) {
+    if (input_fd < 0) {
         log_debug(_("Could not open " MOUSE_DEVICE ": %s"), strerror(errno));    
         return false;
     }
@@ -838,11 +911,9 @@ FBGui::init_mouse()
   
     return true;
 }
-#endif
 
-#ifdef USE_MOUSE_PS2    
 bool
-FBGui::check_mouse() 
+FBGui::check_ps2_mouse() 
 {
     if (input_fd < 0) {
         return false;   // no mouse available
@@ -922,241 +993,8 @@ FBGui::check_mouse()
         return true;
     }  
 }
-#endif
-
-#ifdef USE_ETT_TSLIB
-bool FBGui::init_mouse()
-{
-  // Try to open mouse device, be error tolerant (FD is kept open all the time)
-  input_fd = open(MOUSE_DEVICE, O_RDWR);
-  
-  if (input_fd < 0) {
-    log_debug(_("Could not open " MOUSE_DEVICE ": %s"), strerror(errno));    
-    return false;
-  }
-  
-  unsigned char buf[10];
-
-  if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
-    log_error("Could not set non-blocking mode for touchpad device: %s", strerror(errno));
-    close(input_fd);
-    input_fd = -1;
-    return false; 
-  }
-  
-  // Clear input buffer
-  while ( read(input_fd, buf, sizeof buf) > 0 ) { }
-  
-  mouse_buf_size = 0;
-  
-  log_debug(_("Touchpad enabled."));
-  return true;
-} 
-#endif
-
-#ifdef USE_ETT_TSLIB    
 bool
-FBGui::check_mouse() 
-{
-    bool activity = false;
-  
-    if (input_fd < 0) {
-        return false;   // no mouse available
-    }
-  
-    read_mouse_data();
-  
-    // resync
-    int pos = -1;
-    int i;
-    for (i=0; i<mouse_buf_size; i++)
-        if (mouse_buf[i] & 0x80) { 
-            pos = i;
-            break;    
-        }
-    if (pos<0) return false; // no sync or no data
-  
-    if (pos>0) {
-        //printf("touchscreen: removing %d bytes garbage!\n", pos);  
-        memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
-        mouse_buf_size -= pos;
-    }
-    
-    // packet complete?
-    while (mouse_buf_size > 4) {
-        /*
-          eTurboTouch version??
-          mouse_btn = ((mouse_buf[0] >> 4) & 1);
-          mouse_x = (mouse_buf[1] << 4) | (mouse_buf[2] >> 3);
-          mouse_y = (mouse_buf[3] << 4) | (mouse_buf[4] >> 3);
-        */
-
-        int new_btn = (mouse_buf[0] & 1);
-        int new_x = (mouse_buf[1] << 7) | (mouse_buf[2]);
-        int new_y = (mouse_buf[3] << 7) | (mouse_buf[4]);
-    
-        /*
-          printf("touchscreen: %02x %02x %02x %02x %02x | status %d, pos: %d/%d\n",
-          mouse_buf[0], mouse_buf[1], mouse_buf[2], mouse_buf[3], mouse_buf[4],   
-          new_btn, new_x, new_y);
-        */    
-    
-        new_x = static_cast<int>(((static_cast<double>(new_x )- 355) / (1702 - 355)
-                                  * 1536 + 256));
-        new_y = static_cast<int>(((static_cast<double>(new_y) - 482) / (1771 - 482)
-                                  * 1536 + 256));
-    
-        new_x = new_x * m_stage_width / 2048;
-        new_y = (2048-new_y) * m_stage_height / 2048;
-    
-        if ((new_x!=mouse_x) || (new_y!=mouse_y)) {
-            mouse_x = new_x;
-            mouse_y = new_y;
-            notifyMouseMove(mouse_x, mouse_y);
-            activity = true;
-        }
-    
-        if (new_btn != mouse_btn) {
-            mouse_btn = new_btn;      
-            printf("clicked: %d\n", mouse_btn);      
-            notifyMouseClick(mouse_btn);  // mask=?
-            activity = true;
-        }
-    
-        // remove from buffer
-        pos=5;
-        memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
-        mouse_buf_size -= pos;    
-    }
-  
-    return activity;  
-}
-#endif
-
-#ifdef USE_INPUT_EVENTS   
-bool
-FBGui::init_mouse()
-{
-    std::string dev;
-
-    char* devname = std::getenv("POINTING_DEVICE");
-    if (devname) dev = devname;
-    else dev = "/dev/input/event0";
-
-    // Try to open mouse device, be error tolerant (FD is kept open all the time)
-    input_fd = open(dev.c_str(), O_RDONLY);
-  
-    if (input_fd<0) {
-        log_debug(_("Could not open %s: %s"), dev.c_str(), strerror(errno));    
-        return false;
-    }
-  
-    log_debug(_("Pointing device %s open"), dev.c_str());
-  
-    if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
-        log_error(_("Could not set non-blocking mode for pointing device: %s"), strerror(errno));
-        close(input_fd);
-        input_fd=-1;
-        return false; 
-    }
-  
-    return true;
-
-} //init_mouse
-
-void
-FBGui::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
-{
-    /*
-      <UdoG>:
-      This is a *very* simple method to translate raw touchscreen coordinates to
-      the screen coordinates. We simply to linear interpolation between two points.
-      Note this won't work well when the touchscreen is not perfectly aligned to
-      the screen (ie. slightly rotated). Standard touchscreen calibration uses
-      5 calibration points (or even 25). If someone can give me the formula, tell
-      me! I'm too lazy right now to do the math myself... ;)  
-  
-      And sorry for the quick-and-dirty implementation! I'm in a hurry...
-    */
-
-    float ref1x = m_stage_width  / 5 * 1;
-    float ref1y = m_stage_height / 5 * 1;
-    float ref2x = m_stage_width  / 5 * 4;
-    float ref2y = m_stage_height / 5 * 4;
-  
-    static float cal1x = 2048/5*1;   // very approximative default values
-    static float cal1y = 2048/5*4;
-    static float cal2x = 2048/5*4;
-    static float cal2y = 2048/5*1;
-  
-    static bool initialized=false; // woohooo.. better don't look at this code...
-    if (!initialized) {
-        initialized=true;
-    
-        char* settings = std::getenv("TSCALIB");
-    
-        if (settings) {
-    
-            // expected format: 
-            // 491,1635,1581,646      (cal1x,cal1y,cal2x,cal2y; all integers)
-
-            char buffer[1024];      
-            char* p1;
-            char* p2;
-            bool ok = false;
-      
-            snprintf(buffer, sizeof buffer, "%s", settings);
-            p1 = buffer;
-      
-            do {
-                // cal1x        
-                p2 = strchr(p1, ',');
-                if (!p2) continue; // stop here
-                *p2 = 0;
-                cal1x = atoi(p1);        
-                p1=p2+1;
-        
-                // cal1y        
-                p2 = strchr(p1, ',');
-                if (!p2) continue; // stop here
-                *p2 = 0;
-                cal1y = atoi(p1);        
-                p1=p2+1;
-        
-                // cal2x        
-                p2 = strchr(p1, ',');
-                if (!p2) continue; // stop here
-                *p2 = 0;
-                cal2x = atoi(p1);        
-                p1=p2+1;
-        
-                // cal2y        
-                cal2y = atoi(p1);
-        
-                ok = true;        
-        
-            } while (0);
-      
-            if (!ok)
-                log_debug(_("WARNING: Error parsing calibration data!"));
-      
-            log_debug(_("Using touchscreen calibration data: %.0f / %.0f / %.0f / %.0f"),
-                      cal1x, cal1y, cal2x, cal2y);
-        } else {
-            log_debug(_("WARNING: No touchscreen calibration settings found. "
-                        "The mouse pointer most probably won't work precisely. Set "
-                        "TSCALIB environment variable with correct values for better results"));
-        }
-    
-    } //!initialized
-
-    // real duty: 
-    *cx = (rawx-cal1x) / (cal2x-cal1x) * (ref2x-ref1x) + ref1x;
-    *cy = (rawy-cal1y) / (cal2y-cal1y) * (ref2y-ref1y) + ref1y;
-}
-
-bool
-FBGui::check_mouse()
+FBGui::check_ps2_mouse()
 {
     bool activity = false;
   
@@ -1256,24 +1094,267 @@ FBGui::check_mouse()
     }
   
     return activity;
- 
-} //check_mouse
-#endif
+} // check_ps2_mouse
+#endif  // end of USE_MOUSE_PS2
+
+#ifdef USE_ETT_TSLIB
+bool FBGui::init_ett_mouse()
+{
+  // Try to open mouse device, be error tolerant (FD is kept open all the time)
+  input_fd = open(MOUSE_DEVICE, O_RDWR);
+  
+  if (input_fd < 0) {
+    log_debug(_("Could not open " MOUSE_DEVICE ": %s"), strerror(errno));    
+    return false;
+  }
+  
+  unsigned char buf[10];
+
+  if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK) < 0) {
+    log_error("Could not set non-blocking mode for touchpad device: %s", strerror(errno));
+    close(input_fd);
+    input_fd = -1;
+    return false; 
+  }
+  
+  // Clear input buffer
+  while ( read(input_fd, buf, sizeof buf) > 0 ) { }
+  
+  mouse_buf_size = 0;
+  
+  log_debug(_("Touchpad enabled."));
+  return true;
+} 
+
+bool
+FBGui::check_ett_mouse()
+{
+    bool activity = false;
+  
+    if (input_fd < 0) {
+        return false;   // no mouse available
+    }
+  
+    read_mouse_data();
+  
+    // resync
+    int pos = -1;
+    int i;
+    for (i=0; i<mouse_buf_size; i++)
+        if (mouse_buf[i] & 0x80) { 
+            pos = i;
+            break;    
+        }
+    if (pos<0) return false; // no sync or no data
+  
+    if (pos>0) {
+        //printf("touchscreen: removing %d bytes garbage!\n", pos);  
+        memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
+        mouse_buf_size -= pos;
+    }
+    
+    // packet complete?
+    while (mouse_buf_size > 4) {
+        /*
+          eTurboTouch version??
+          mouse_btn = ((mouse_buf[0] >> 4) & 1);
+          mouse_x = (mouse_buf[1] << 4) | (mouse_buf[2] >> 3);
+          mouse_y = (mouse_buf[3] << 4) | (mouse_buf[4] >> 3);
+        */
+
+        int new_btn = (mouse_buf[0] & 1);
+        int new_x = (mouse_buf[1] << 7) | (mouse_buf[2]);
+        int new_y = (mouse_buf[3] << 7) | (mouse_buf[4]);
+    
+        /*
+          printf("touchscreen: %02x %02x %02x %02x %02x | status %d, pos: %d/%d\n",
+          mouse_buf[0], mouse_buf[1], mouse_buf[2], mouse_buf[3], mouse_buf[4],   
+          new_btn, new_x, new_y);
+        */    
+    
+        new_x = static_cast<int>(((static_cast<double>(new_x )- 355) / (1702 - 355)
+                                  * 1536 + 256));
+        new_y = static_cast<int>(((static_cast<double>(new_y) - 482) / (1771 - 482)
+                                  * 1536 + 256));
+    
+        new_x = new_x * m_stage_width / 2048;
+        new_y = (2048-new_y) * m_stage_height / 2048;
+    
+        if ((new_x!=mouse_x) || (new_y!=mouse_y)) {
+            mouse_x = new_x;
+            mouse_y = new_y;
+            notifyMouseMove(mouse_x, mouse_y);
+            activity = true;
+        }
+    
+        if (new_btn != mouse_btn) {
+            mouse_btn = new_btn;      
+            printf("clicked: %d\n", mouse_btn);      
+            notifyMouseClick(mouse_btn);  // mask=?
+            activity = true;
+        }
+    
+        // remove from buffer
+        pos=5;
+        memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
+        mouse_buf_size -= pos;    
+    }
+  
+    return activity;  
+}
+#endif  // end of USE_ETT_TSLIB
+
+#ifdef USE_INPUT_EVENTS   
+bool
+FBGui::init_input_events()
+{
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+    return false;
+#else    
+    std::string dev;
+
+    char* devname = std::getenv("POINTING_DEVICE");
+    if (devname) dev = devname;
+    else dev = "/dev/input/event0";
+
+    // Try to open mouse device, be error tolerant (FD is kept open all the time)
+    input_fd = open(dev.c_str(), O_RDONLY);
+  
+    if (input_fd<0) {
+        log_debug(_("Could not open %s: %s"), dev.c_str(), strerror(errno));    
+        return false;
+    }
+  
+    log_debug(_("Pointing device %s open"), dev.c_str());
+  
+    if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
+        log_error(_("Could not set non-blocking mode for pointing device: %s"), strerror(errno));
+        close(input_fd);
+        input_fd = -1;
+        return false; 
+    }
+  
+    return true;
+#endif  // end of ENABLE_FAKE_FRAMEBUFFER
+} // end of init_events()
+#endif  // end of USE_INPUT_EVENTS
+
+void
+FBGui::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
+{
+    /*
+      <UdoG>:
+      This is a *very* simple method to translate raw touchscreen coordinates to
+      the screen coordinates. We simply to linear interpolation between two points.
+      Note this won't work well when the touchscreen is not perfectly aligned to
+      the screen (ie. slightly rotated). Standard touchscreen calibration uses
+      5 calibration points (or even 25). If someone can give me the formula, tell
+      me! I'm too lazy right now to do the math myself... ;)  
+  
+      And sorry for the quick-and-dirty implementation! I'm in a hurry...
+    */
+
+    float ref1x = m_stage_width  / 5 * 1;
+    float ref1y = m_stage_height / 5 * 1;
+    float ref2x = m_stage_width  / 5 * 4;
+    float ref2y = m_stage_height / 5 * 4;
+  
+    static float cal1x = 2048/5*1;   // very approximative default values
+    static float cal1y = 2048/5*4;
+    static float cal2x = 2048/5*4;
+    static float cal2y = 2048/5*1;
+  
+    static bool initialized=false; // woohooo.. better don't look at this code...
+    if (!initialized) {
+        initialized=true;
+    
+        char* settings = std::getenv("TSCALIB");
+    
+        if (settings) {
+    
+            // expected format: 
+            // 491,1635,1581,646      (cal1x,cal1y,cal2x,cal2y; all integers)
+
+            char buffer[1024];      
+            char* p1;
+            char* p2;
+            bool ok = false;
+      
+            snprintf(buffer, sizeof buffer, "%s", settings);
+            p1 = buffer;
+      
+            do {
+                // cal1x        
+                p2 = strchr(p1, ',');
+                if (!p2) continue; // stop here
+                *p2 = 0;
+                cal1x = atoi(p1);        
+                p1=p2+1;
+        
+                // cal1y        
+                p2 = strchr(p1, ',');
+                if (!p2) continue; // stop here
+                *p2 = 0;
+                cal1y = atoi(p1);        
+                p1=p2+1;
+        
+                // cal2x        
+                p2 = strchr(p1, ',');
+                if (!p2) continue; // stop here
+                *p2 = 0;
+                cal2x = atoi(p1);        
+                p1=p2+1;
+        
+                // cal2y        
+                cal2y = atoi(p1);
+        
+                ok = true;        
+        
+            } while (0);
+      
+            if (!ok)
+                log_debug(_("WARNING: Error parsing calibration data!"));
+      
+            log_debug(_("Using touchscreen calibration data: %.0f / %.0f / %.0f / %.0f"),
+                      cal1x, cal1y, cal2x, cal2y);
+        } else {
+            log_debug(_("WARNING: No touchscreen calibration settings found. "
+                        "The mouse pointer most probably won't work precisely. Set "
+                        "TSCALIB environment variable with correct values for better results"));
+        }
+    
+    } //!initialized
+
+    // real duty: 
+    *cx = (rawx-cal1x) / (cal2x-cal1x) * (ref2x-ref1x) + ref1x;
+    *cy = (rawy-cal1y) / (cal2y-cal1y) * (ref2y-ref1y) + ref1y;
+}
 
 bool
 FBGui::init_keyboard() 
 {
     std::string dev;
 
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+    return false;
+#else
     char* devname = std::getenv("KEYBOARD_DEVICE");
-    if (devname) dev = devname;
-    else dev = "/dev/input/event0";
+    if (devname) {
+        dev = devname;
+    } else {
+        dev = "/dev/input/event0";
+    }
 
     // Try to open keyboard device, be error tolerant (FD is kept open all the time)
     keyb_fd = open(dev.c_str(), O_RDONLY);
   
-    if (keyb_fd<0) {
-        log_debug(_("Could not open %s: %s"), dev.c_str(), strerror(errno));    
+    if (keyb_fd < 0) {
+        // 
+        if (keyb_fd == EACCES) {
+            keyfb_fb = -1;
+        } else {
+            log_debug(_("Could not open %s: %s"), dev.c_str(), strerror(errno));
+        }
         return false;
     }
   
@@ -1282,13 +1363,15 @@ FBGui::init_keyboard()
     if (fcntl(keyb_fd, F_SETFL, fcntl(keyb_fd, F_GETFL) | O_NONBLOCK)<0) {
         log_error(_("Could not set non-blocking mode for keyboard device: %s"), strerror(errno));
         close(keyb_fd);
-        keyb_fd=-1;
+        keyb_fd = -1;
         return false; 
     }
-  
+#endif  // end of NABLE_FAKE_FRAMEBUFFER
+    
     return true;
 }
 
+#ifdef USE_INPUT_EVENTS
 gnash::key::code
 FBGui::scancode_to_gnash_key(int code, bool shift)
 { 
@@ -1408,10 +1491,14 @@ FBGui::scancode_to_gnash_key(int code, bool shift)
   
     return gnash::key::INVALID;  
 }
+#endif  // end of USE_INPUT_EVENTS
 
 bool
 FBGui::check_keyboard()
 {
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+    return false;
+#else    
     bool activity = false;
   
     if (keyb_fd < 0) {
@@ -1472,10 +1559,183 @@ FBGui::check_keyboard()
     } //while
   
     return activity;
+#endif  // ENABLE_FAKE_FRAMEBUFFER
 }
+
+#ifdef USE_TSLIB
+bool
+FBGui::init_tslib()
+{
+    char *devname = getenv(TSLIB_DEVICE_ENV);
+    if (!devname) {
+        devname = const_cast<char *>(TSLIB_DEVICE_NAME);
+    }
+    
+    tsDev = ts_open(devname, 1);  //Open tslib non-blocking
+    if (tsDev == 0) {
+        log_debug("Could not open touchscreen %s: %s", devname, strerror(errno));
+        return false;
+    }
+    
+    ts_config(tsDev); 
+    if (ts_fd(tsDev) < 0) {
+        log_debug("Could not get touchscreen fd %s: %s", devname, strerror(errno));
+        return false;
+    }
+    
+    log_debug("Using TSLIB on %s", devname);
+    return true;
+}
+
+void
+FBGui::check_tslib()
+{
+    //Read events from the touchscreen and transport them into Gnash
+    //Tslib should be setup so the output is pretty clean.
+    struct ts_sample event;
+    int                    n;
+    unsigned long   flags;
+    unsigned long   buttons;
+    
+    if (tsDev == 0) {
+        return;           //No tslib device initialized, exit!
+    }
+    
+    n = ts_read(tsDev, &event, 1);     //read one event
+
+    //Did we read an event?
+    if (n == 1) {
+#if 0
+        if (event.pressure > 0) {
+            //the screen is touched
+            if (event.x > m_stage_width ) {
+                event.x = m_stage_width;
+            }
+            if (event.y > m_stage_height) {
+                event.y = m_stage_height;
+            }
+            notify_mouse_moved(int(event.x / getXScale()), int(event.y / getYScale()));
+            notify_mouse_clicked(true, 1);  //fire mouse click event into Gnash
+            log_debug("Touched x: %d y: %d width: %d height: %d",event.x , event.y, m_stage_width, m_stage_height); //debug
+        } else {
+            notify_mouse_clicked(false, 1);  //button released
+            log_debug("lifted x: %d y: %d",event.x , event.y); //debug
+        }
+#endif
+    }
+}
+#endif         //end USE_TSLIB
 
 // end of namespace gnash
 }
+
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+// Simulate the ioctls used to get information from the framebuffer
+// driver. Since this is an emulator, we have to set these fields
+// to a reasonable default.
+int
+fakefb_ioctl(int /* fd */, int request, void *data)
+{
+    // GNASH_REPORT_FUNCTION;
+    
+    switch (request) {
+      case FBIOGET_VSCREENINFO:
+      {
+          struct fb_var_screeninfo *ptr =
+              reinterpret_cast<struct fb_var_screeninfo *>(data);
+          // If we are using a simulated framebuffer, the default for
+          // fbe us 640x480, 8bits. So use that as a sensible
+          // default. Note that the fake framebuffer is only used for
+          // debugging and development.
+          ptr->xres          = 640; // visible resolution
+          ptr->xres_virtual  = 640; // virtual resolution
+          ptr->yres          = 480; // visible resolution
+          ptr->yres_virtual  = 480; // virtual resolution
+          ptr->width         = 640; // width of picture in mm
+          ptr->height        = 480; // height of picture in mm
+
+          // Android and fbe use a 16bit 5/6/5 framebuffer
+          ptr->bits_per_pixel = 16;
+          ptr->red.length    = 5;
+          ptr->red.offset    = 11;
+          ptr->green.length  = 6;
+          ptr->green.offset  = 5;
+          ptr->blue.length   = 5;
+          ptr->blue.offset   = 0;
+          ptr->transp.offset = 0;
+          ptr->transp.length = 0;
+          // 8bit framebuffer
+          // ptr->bits_per_pixel = 8;
+          // ptr->red.length    = 8;
+          // ptr->red.offset    = 0;
+          // ptr->green.length  = 8;
+          // ptr->green.offset  = 0;
+          // ptr->blue.length   = 8;
+          // ptr->blue.offset   = 0;
+          // ptr->transp.offset = 0;
+          // ptr->transp.length = 0;
+          ptr->grayscale     = 1; // != 0 Graylevels instead of color
+          
+          break;
+      }
+      case FBIOGET_FSCREENINFO:
+      {
+          struct fb_fix_screeninfo *ptr =
+              reinterpret_cast<struct fb_fix_screeninfo *>(data);
+          ptr->smem_len = 307200; // Length of frame buffer mem
+          ptr->type = FB_TYPE_PACKED_PIXELS; // see FB_TYPE_*
+          ptr->visual = FB_VISUAL_PSEUDOCOLOR; // see FB_VISUAL_*
+          ptr->xpanstep = 0;      // zero if no hardware panning
+          ptr->ypanstep = 0;      // zero if no hardware panning
+          ptr->ywrapstep = 0;     // zero if no hardware panning
+          ptr->accel = FB_ACCEL_NONE; // Indicate to driver which specific
+                                  // chip/card we have
+          break;
+      }
+      case FBIOPUTCMAP:
+      {
+          // Fbe uses this name for the fake framebuffer, so in this
+          // case assume we're using fbe, so write to the known fbe
+          // cmap file.
+          std::string str = FAKEFB;
+          if (str == "/tmp/fbe_buffer") {
+              int fd = open("/tmp/fbe_cmap", O_WRONLY);
+              if (fd) {
+                  write(fd, data, sizeof(struct fb_cmap));
+                  close(fd);
+              } else {
+                  gnash::log_error("Couldn't write to the fake cmap!");
+                  return -1;
+              }
+          } else {
+              gnash::log_error("Couldn't write to the fake cmap, unknown type!");
+              return -1;
+          }
+          // If we send a SIGUSR1 signal to fbe, it'll reload the
+          // color map.
+          int fd = open("/tmp/fbe.pid", O_RDONLY);
+          char buf[10];
+          if (fd) {
+              if (read(fd, buf, 10) == 0) {
+                  close(fd);
+                  return -1;
+              } else {
+                  pid_t pid = strtol(buf, 0, NULL);
+                  kill(pid, SIGUSR1);
+                  gnash::log_debug("Signaled fbe to reload it's colormap.");
+              }
+              close(fd);
+          }
+          break;
+      }
+      default:
+          gnash::log_unimpl("fakefb_ioctl(%d)", request);
+          break;
+    }
+
+    return 0;
+}
+#endif  // ENABLE_FAKE_FRAMEBUFFER
 
 // Local Variables:
 // mode: C++
