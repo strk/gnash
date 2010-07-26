@@ -21,7 +21,7 @@
 if BUILD_FB_GUI
 bin_PROGRAMS += fb-gnash
 fb_gnash_SOURCES = $(GUI_SRCS) fb/gui_fb.cpp fb/fb.cpp fb/fbsup.h
-fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
+fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" -DFAKEFB=\"$(FAKEFB)\" \
 	$(AM_CPPFLAGS) 
 fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 #fb_gnash_DEPENDENCIES = .configline
