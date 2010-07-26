@@ -566,18 +566,85 @@ GNASH_PKG_CLASSFILE
 
 dnl Add support for a touchscreen. Note that this replaces the existing input
 dnl device for events. This currently only works with the framebuffer GUI.
-tslib=no
 AC_ARG_ENABLE(tslib,
-  AC_HELP_STRING([--enable-tslib], [Enable support for a touchscreen]),
-  [case "${enableval}" in
-    yes) tslib=yes ;;
-    no)  tslib=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-tslib option]) ;;
-  esac], tslib=no
+  AC_HELP_STRING([--enable-tslib], [specify touchcreen device for the framebuffer display (ett or tslib)]),
+  [ case "${enableval}" in
+      e*) tslib="eTurboTouch / eGalax touchscreen"
+        AC_DEFINE(USE_ETT_TSLIB, [1], [Using eTurboTouch touchscreen])
+        ;;
+      t*) tslib="tslib touchscreen" ;; 
+      yes) tslib="tslib touchscreen" ;; dnl the default if nothing is specified
+      *)  AC_MSG_ERROR([bad value ${enableval} for enable-tslib option (tslib or ett)])
+        ;;
+       esac
+   ], tslib=
 )
-AM_CONDITIONAL(ENABLE_TSLIB, [test x"$tslib" = xyes])
-if test x$tslib = xyes; then
-    AC_DEFINE(ENABLE_TSLIB, [1], [Enable TSLIB for touchscreen support])
+AM_CONDITIONAL(ENABLE_TSLIB, [test x"$tslib" != x])
+if test x"${tslib}" = xyes; then
+  AC_DEFINE(USE_TSLIB, [1], [Using tslib supported touchscreen])
+fi
+
+dnl Add an option for double buffering when rendering, currently only used by
+dnl the frmaebuffer GUI.
+AC_ARG_ENABLE(doublebuf,
+  AC_HELP_STRING([--enable-doublebuf], [Enable support for double buffering when rendering]),
+  [case "${enableval}" in
+    yes) doublebuf=yes ;;
+    no)  doublebuf=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-doublebuf option]) ;;
+  esac], doublebuf=no
+)
+AM_CONDITIONAL(ENABLE_DBUF, [test x"$doublebuf" = xyes])
+if test x$doublebuf = xyes; then
+    AC_DEFINE(ENABLE_DOUBLE_BUFFERING, [1], [Enable double buffering])
+fi
+
+dnl This enables rendering to an offscreen buffer, instead of directly to window
+AC_ARG_ENABLE(offscreen,
+  AC_HELP_STRING([--enable-offscreen], [Enable support for rendering offscreen]),
+  [case "${enableval}" in
+    yes) offscreen=yes ;;
+    no)  offscreen=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-offscreen option]) ;;
+  esac], offscreen=no
+)
+
+dnl We can use Xephyr or fbe to create a fake framebuffer instead of real
+dnl video memory. This lets us test on a desktop machine.
+AC_ARG_WITH(fakefb,
+AC_HELP_STRING([--with-fakefb],
+ [specify a file to be mapped instead of a real framebuffer]),
+ with_fakefb=${withval})
+
+fakefb=
+if test x"${with_fakefb}" = xyes; then
+  dnl This is the default file name fbe uses.
+  fakefb=/tmp/fbe_buffer
+else
+  if test x"${with_fakefb}" != x; then
+    fakefb=${with_fakefb}
+  fi
+fi
+FAKEFB=${fakefb}
+AC_SUBST(FAKEFB)
+
+if test x"${fakefb}" != x; then
+    AC_DEFINE(ENABLE_FAKE_FRAMEBUFFER, [1], [Enable using a file instead of a real framebuffer])
+fi
+
+dnl Specify a mouse type, currently only a PS/2 style (standard nouse) is
+dnl supported.
+AC_ARG_ENABLE(mouse,
+  AC_HELP_STRING([--enable-mouse], [specify mouse for framebuffer display (default ps2]),
+  [case "${enableval}" in
+    p*) mouse="PS/2 mouse" ;;
+    no) mouse= ;;
+    yes) mouse="PS/2 mouse" ;;
+    *)  AC_MSG_ERROR([bad value ${enableval} for enable-mouse option (ps2)]) ;;
+  esac], mouse=
+)
+if test x"${mouse}" != x; then
+  AC_DEFINE(USE_NIUSE_PS2, [1], [Using a standard PS/2 mouse with the framebuffer])
 fi
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
@@ -3847,6 +3914,22 @@ if test x"$docbook" = x"yes"; then
   fi
 else
   echo "        DocBook document processing disabled (default)"
+fi
+
+if test x"${tslib}" != x; then
+  echo "        Using ${tslib} as the touchscreen type"
+fi
+if test x"${mouse}" != x; then
+  echo "        Using ${mouse} as the mouse type"
+fi
+if test x"${fakefb}" != x; then
+  echo "        Using shared memory as a fake framebuffer"
+fi
+if test x"${offscreen}" = xyes; then
+  echo "        Using offscreen rendering"
+fi
+if test x"${doublebuf}" = xyes; then
+  echo "        Using double buffering when rendering"
 fi
 
 if test -s $cwarn; then
