@@ -30,7 +30,7 @@
 #ifdef HAVE_TSLIB_H
 # include <tslib.h>
 #endif
-#if defined(ENABLE_TSLIB) && defined(!HAVE_TSLIB_H)
+#if defined(ENABLE_TSLIB) && !defined(HAVE_TSLIB_H)
 # warning "No tslib.h! Disabling touchscreen support"
 # undef ENABLE_TSLIB
 #endif
