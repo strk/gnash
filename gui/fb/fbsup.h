@@ -119,91 +119,91 @@ namespace gnash
 ///   to /dev/input/mice
 class FBGui : public Gui
 {
-	private:
-		int fd;
-		int original_vt;       // virtual terminal that was active at startup
-		int original_kd;       // keyboard mode at startup
-		int own_vt;            // virtual terminal we are running in   
-		unsigned char *fbmem;  // framebuffer memory
+private:
+    int fd;
+    int original_vt;       // virtual terminal that was active at startup
+    int original_kd;       // keyboard mode at startup
+    int own_vt;            // virtual terminal we are running in   
+    unsigned char *fbmem;  // framebuffer memory
 #ifdef DOUBLE_BUFFER
-		unsigned char *buffer; // offscreen buffer
+    unsigned char *buffer; // offscreen buffer
 #endif		
-
+    
     std::vector< geometry::Range2d<int> > _drawbounds;
-
+    
     int m_stage_width;
     int m_stage_height;
     unsigned m_rowsize;
-
-  	int input_fd; /// file descriptor for /dev/input/mice
-  	int keyb_fd; /// file descriptor for /dev/input/event* (keyboard)
-  	int mouse_x, mouse_y, mouse_btn;
-  	unsigned char mouse_buf[256];
-  	int mouse_buf_size;
-
+    
+    int input_fd; /// file descriptor for /dev/input/mice
+    int keyb_fd; /// file descriptor for /dev/input/event* (keyboard)
+    int mouse_x, mouse_y, mouse_btn;
+    unsigned char mouse_buf[256];
+    int mouse_buf_size;
+    
 #ifdef ENABLE_TSLIB
-        struct tsdev *tsDev;
-        bool init_tslib(); 
-        void check_tslib();
+    struct tsdev *tsDev;
+    bool init_tslib(); 
+    void check_tslib();
 #endif
-
-  	// Keyboard SHIFT/CTRL/ALT states (left + right)
-  	bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
-
+    
+    // Keyboard SHIFT/CTRL/ALT states (left + right)
+    bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
+    
     struct fb_var_screeninfo var_screeninfo;
-  	struct fb_fix_screeninfo fix_screeninfo;
-
-	/// For 8 bit (palette / LUT) modes, sets a grayscale palette.
-	//
-	/// This GUI currently does not support palette modes. 
-	///
-  	bool set_grayscale_lut8();
-  	
-  	bool initialize_renderer();
-  	
-  	/// Tries to find a accessible tty
-  	char* find_accessible_tty(int no);
-  	char* find_accessible_tty(const char* format, int no);
-  	
-  	/// switches from text mode to graphics mode (disables the text terminal)
-  	bool disable_terminal();
-  	
-  	/// reverts disable_terminal() changes
-  	bool enable_terminal();
-
+    struct fb_fix_screeninfo fix_screeninfo;
+    
+    /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
+    //
+    /// This GUI currently does not support palette modes. 
+    ///
+    bool set_grayscale_lut8();
+    
+    bool initialize_renderer();
+    
+    /// Tries to find a accessible tty
+    char* find_accessible_tty(int no);
+    char* find_accessible_tty(const char* format, int no);
+    
+    /// switches from text mode to graphics mode (disables the text terminal)
+    bool disable_terminal();
+    
+    /// reverts disable_terminal() changes
+    bool enable_terminal();
+    
 #ifdef USE_MOUSE_PS2  	
-  	/// Sends a command to the mouse and waits for the response
-  	bool mouse_command(unsigned char cmd, unsigned char *buf, int count);
+    /// Sends a command to the mouse and waits for the response
+    bool mouse_command(unsigned char cmd, unsigned char *buf, int count);
 #endif
-
+    
     /// Fills the mouse data input buffer with fresh data
     void read_mouse_data();  	
-  	
-  	/// Initializes mouse routines
-  	bool init_mouse();
-  	
-  	/// Checks for and processes any mouse activity. Returns true on activity.
-  	bool check_mouse();
-  	
-  	/// Initializes keyboard routines 
-  	bool init_keyboard();
-  	  	
-  	/// Translates a scancode from the Linux Input Subsystem to a Gnash key code 
+    
+    /// Initializes mouse routines
+    bool init_mouse();
+    
+    /// Checks for and processes any mouse activity. Returns true on activity.
+    bool check_mouse();
+    
+    /// Initializes keyboard routines 
+    bool init_keyboard();
+    
+    /// Translates a scancode from the Linux Input Subsystem to a Gnash key code 
     gnash::key::code scancode_to_gnash_key(int code, bool shift);
-  	
-  	/// Checks for and processes any keyboard activity. Returns true on activity.
-  	bool check_keyboard();
-  	
+    
+    /// Checks for and processes any keyboard activity. Returns true on activity.
+    bool check_keyboard();
+    
 #ifdef USE_INPUT_EVENTS  	
     /// Applies builtin touchscreen calibration
-  	void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
+    void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
 #endif
-  	
-  	int valid_x(int x);
-  	int valid_y(int y);
-  	  	
-	public:
-		FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
+    
+    int valid_x(int x);
+    int valid_y(int y);
+    
+public:
+    FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~FBGui();
     virtual bool init(int argc, char ***argv);
     virtual bool createWindow(const char *title, int width, int height,
@@ -230,3 +230,7 @@ class FBGui : public Gui
 
 #endif
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
