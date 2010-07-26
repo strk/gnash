@@ -559,10 +559,26 @@ AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
 dnl The class file is an optional file that if it is specified at configure time
 dnl with --with-classfile=, then only those classes are compiled and built into the
-dnl class library used for Gnash. THis is designed for small systems that execute the
+dnl class library used for Gnash. This is designed for small systems that execute the
 dnl same swf file over and over, and don't need the same level of functionality that
 dnl a browser plugin does.
 GNASH_PKG_CLASSFILE
+
+dnl Add support for a touchscreen. Note that this replaces the existing input
+dnl device for events. This currently only works with the framebuffer GUI.
+tslib=no
+AC_ARG_ENABLE(tslib,
+  AC_HELP_STRING([--enable-tslib], [Enable support for a touchscreen]),
+  [case "${enableval}" in
+    yes) tslib=yes ;;
+    no)  tslib=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-tslib option]) ;;
+  esac], tslib=no
+)
+AM_CONDITIONAL(ENABLE_TSLIB, [test x"$tslib" = xyes])
+if test x$tslib = xyes; then
+    AC_DEFINE(ENABLE_TSLIB, [1], [Enable TSLIB for touchscreen support])
+fi
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
 
