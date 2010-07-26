@@ -34,8 +34,9 @@
 
 // Forward declarations
 namespace gnash {
-	class SWFStream; // for read signature
-	class as_function; // for registerClass/getRegisteredClass
+	class SWFStream;
+	class as_function;
+    class RunResources;
 }
 
 namespace gnash

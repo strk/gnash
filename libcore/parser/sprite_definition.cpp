@@ -22,8 +22,8 @@
 #include "MovieClip.h"
 #include "sprite_definition.h"
 #include "ControlTag.h" // for dtor visibility
-#include "as_function.h" // for dtor visibility
-#include "SWFStream.h" // for use
+#include "as_function.h"
+#include "SWFStream.h"
 #include "GnashAlgorithm.h"
 #include "SWFParser.h"
 #include "namedStrings.h"
@@ -130,11 +130,6 @@ sprite_definition::sprite_definition(movie_definition& m, SWFStream& in,
 	read(in, runResources);
 }
 
-/*
- * This function is not inlined to avoid having to include as_function.h
- * from sprite_definition.h. We need as_function.h for visibility of
- * as_function destructor by boost::intrusive_ptr
- */
 void
 sprite_definition::registerClass(as_function* the_class)
 {
