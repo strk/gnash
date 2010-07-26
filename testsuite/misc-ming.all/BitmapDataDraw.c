@@ -65,10 +65,11 @@ main(int argc, char** argv)
     sh = newSWFShape();
     fill = newSWFSolidFillStyle(0x00, 0xff, 0xff, 0xff);
     SWFShape_setRightFillStyle(sh, fill);
-    SWFShape_drawLine(sh, 100.0, 0.0);
-    SWFShape_drawLine(sh, 0.0, 100.0);
-    SWFShape_drawLine(sh, -100.0, 0.0);
-    SWFShape_drawLine(sh, 0.0, -100.0);
+    SWFShape_movePenTo(sh, 10.0, 10.0);
+    SWFShape_drawLine(sh, 90.0, 0.0);
+    SWFShape_drawLine(sh, 0.0, 90.0);
+    SWFShape_drawLine(sh, -90.0, 0.0);
+    SWFShape_drawLine(sh, 0.0, -90.0);
     SWFMovieClip_add(mc, (SWFBlock)sh);
 
     // Shape 2
@@ -102,8 +103,21 @@ main(int argc, char** argv)
     check_equals(mo, "b.width", "100");
     check_equals(mo, "b.height", "100");
     
-    // TODO: Check pixels!
-    
+    // The original MovieClip has:
+    // 1. a cyan (0x00ffff) square (10, 10) to (100, 100) and
+    // 2. a magenta (0xff00ff) square (80, 80) to (130, 130).
+
+    // Pixel checking
+    // Top left corner is white
+    check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
+    check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
+    // Cyan square
+    check_equals(mo, "b.getPixel(12, 12)", "0x00ffff");
+    check_equals(mo, "b.getPixel(12, 98)", "0x00ffff");
+    check_equals(mo, "b.getPixel(98, 12)", "0x00ffff");
+    // Magenta square
+    check_equals(mo, "b.getPixel(82, 82)", "0xff00ff");
+
     // Do the same with double width and height.
     add_actions(mo,
             "b = new flash.display.BitmapData(100, 100, false);"
@@ -116,9 +130,18 @@ main(int argc, char** argv)
     // Dimensions are restricted to the BitmapData's size.
     check_equals(mo, "b.width", "100");
     check_equals(mo, "b.height", "100");
-
-    // TODO: Check pixels!
     
+    // Pixel checking
+    // Top left corner is white
+    check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
+    check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
+    // Cyan square is scaled and translated to start at (54, 54)
+    // (10 * 2 + 34)
+    check_equals(mo, "b.getPixel(12, 12)", "0xffffff");
+    check_equals(mo, "b.getPixel(52, 52)", "0xffffff");
+    check_equals(mo, "b.getPixel(56, 56)", "0x00ffff");
+    // Magenta square isn't there because it doesn't fit.
+
     // Add with a different matrix
     it = SWFMovie_add(mo, (SWFBlock)mc);
     SWFDisplayItem_setMatrix(it, 0.5f, 0.f, 0.f, 2.0f, 0.f, 200.f);
@@ -137,6 +160,22 @@ main(int argc, char** argv)
     // This is a sanity check more than anything else.
     check_equals(mo, "b.width", "400");
     check_equals(mo, "b.height", "400");
+    
+    // Pixel checking (Bitmap is now 400x400)
+    // Top left corner is white
+    check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
+    check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
+    // Cyan square
+    check_equals(mo, "b.getPixel(12, 12)", "0x00ffff");
+    check_equals(mo, "b.getPixel(12, 98)", "0x00ffff");
+    check_equals(mo, "b.getPixel(98, 12)", "0x00ffff");
+    check_equals(mo, "b.getPixel(12, 102)", "0xffffff");
+    check_equals(mo, "b.getPixel(102, 12)", "0xffffff");
+    // Magenta square
+    check_equals(mo, "b.getPixel(82, 82)", "0xff00ff");
+    check_equals(mo, "b.getPixel(128, 128)", "0xff00ff");
+    check_equals(mo, "b.getPixel(132, 132)", "0xffffff");
+    check_equals(mo, "b.getPixel(78, 78)", "0x00ffff");
 
     SWFMovie_nextFrame(mo);
     
@@ -161,6 +200,26 @@ main(int argc, char** argv)
             "_root.dynmc2._x = 200;"
             "_root.dynmc2.attachBitmap(b, 28);"
             );
+    
+    // Top left corner is white
+    check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
+    check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
+    // Cyan square top left corner
+    check_equals(mo, "b.getPixel(25, 28)", "0x00ffff");
+    check_equals(mo, "b.getPixel(20, 30)", "0xffffff");
+    check_equals(mo, "b.getPixel(25, 25)", "0xffffff");
+    // Cyan square bottom left (Check that it's rotated).
+    check_equals(mo, "b.getPixel(18, 68)", "0x00ffff");
+    // Cyan square top right 
+    check_equals(mo, "b.getPixel(64, 36)", "0x00ffff");
+    check_equals(mo, "b.getPixel(64, 32)", "0xffffff");
+    // Magenta square top left
+    check_equals(mo, "b.getPixel(54, 71)", "0xff00ff");
+    check_equals(mo, "b.getPixel(54, 67)", "0x00ffff");
+    check_equals(mo, "b.getPixel(50, 71)", "0x00ffff");
+    // Magenta square bottom right
+    check_equals(mo, "b.getPixel(74, 94)", "0xffffff");
+    check_equals(mo, "b.getPixel(70, 94)", "0xff00ff");
 
     add_actions(mo, "stop();");
 
