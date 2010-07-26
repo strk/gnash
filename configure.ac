@@ -644,7 +644,7 @@ AC_ARG_ENABLE(mouse,
   esac], mouse=
 )
 if test x"${mouse}" != x; then
-  AC_DEFINE(USE_NIUSE_PS2, [1], [Using a standard PS/2 mouse with the framebuffer])
+  AC_DEFINE(USE_MOUSE_PS2, [1], [Using a standard PS/2 mouse with the framebuffer])
 fi
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
