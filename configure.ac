@@ -657,6 +657,7 @@ fi
 if test x"${mouse}" != x -o x"${tslib}" != x; then
   AC_DEFINE(USE_INPUT_EVENTS, [1], [Whether to use input events, mouse, keyboard, or touchscreen])
 fi
+AM_CONDITIONAL(USE_INPUT_EVENTS, [test x"${mouse}" != x -o x"${tslib}" != x])
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
 
