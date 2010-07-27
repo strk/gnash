@@ -31,7 +31,7 @@ namespace gnash {
 static const char *MOUSE_DEVICE = "/dev/usb/tkpanel0";
 
 bool
-KeyboardDevice::init(const std::string &filespec, size_t size)
+EventDevice::init(const std::string &filespec, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -72,7 +72,7 @@ KeyboardDevice::init(const std::string &filespec, size_t size)
 }
 
 bool
-KeyboardDevice::check()
+EventDevice::check()
 {
     GNASH_REPORT_FUNCTION;
 #ifdef ENABLE_FAKE_FRAMEBUFFER
@@ -142,7 +142,7 @@ KeyboardDevice::check()
 }
 
 gnash::key::code
-KeyboardDevice::scancode_to_gnash_key(int code, bool shift)
+EventDevice::scancode_to_gnash_key(int code, bool shift)
 { 
     // NOTE: Scancodes are mostly keyboard oriented (ie. Q, W, E, R, T, ...)
     // while Gnash codes are mostly ASCII-oriented (A, B, C, D, ...) so no
