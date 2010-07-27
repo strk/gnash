@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ming.h>
+#include <string.h>
 
 #include "ming_utils.h"
 
@@ -32,11 +33,13 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc, mc3;
+    SWFMovieClip mc, mc3, mc4, mc5;
     SWFMovieClip dejagnuclip;
     SWFShape sh;
     SWFDisplayItem it;
     SWFFillStyle fill;
+    SWFBitmap bp;
+    SWFInput inp;
 
     if (argc > 1) mediadir = argv[1];
     else {
@@ -220,6 +223,35 @@ main(int argc, char** argv)
     // Magenta square bottom right
     check_equals(mo, "b.getPixel(74, 94)", "0xffffff");
     xcheck_equals(mo, "b.getPixel(70, 94)", "0xff00ff");
+    
+    SWFMovie_nextFrame(mo);
+
+    // Add a MovieClip with an image.
+
+    char file[] = "/green.jpg";
+    if (strlen(mediadir) > 1024) {
+        fprintf(stderr, "Path to media dir too long! Fix the testcase");
+    }
+    char path[1024 + sizeof file];
+    strcpy(path, mediadir);
+    strcat(path, file);
+
+    inp = newSWFInput_filename(path);
+    bp = (SWFBitmap)newSWFJpegBitmap_fromInput(inp);
+    
+    // Image clip
+    mc5 = newSWFMovieClip();
+    SWFMovieClip_add(mc5, (SWFBlock)bp);
+    SWFMovieClip_nextFrame(mc5);
+
+    // Container clip for image clip.
+    mc4 = newSWFMovieClip();
+    it = SWFMovieClip_add(mc4, (SWFBlock)mc5);
+    SWFDisplayItem_setMatrix(it, 0.75f, -0.2f, 0.3f, 0.35f, 20, 30);
+    SWFMovieClip_nextFrame(mc4);
+
+    it = SWFMovie_add(mo, (SWFBlock)mc4);
+    SWFDisplayItem_setName(it, "mc4");
 
     add_actions(mo, "stop();");
 
