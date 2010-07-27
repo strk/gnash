@@ -197,10 +197,22 @@ gnash: gnash.in
 	cp $< $@
 	chmod +x $@
 
+if USE_INPUT_EVENTS
+DEVICES = \
+	InputDevice.cpp InputDevice.h \
+	TouchDevice.cpp TouchDevice.h \
+	MouseDevice.cpp MouseDevice.h
+	KeyboardDevice.cpp KeyboardDevice.h
+else
+DEVICES =
+endif
+
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
 	Player.cpp Player.h \
-	NullGui.cpp NullGui.h
+	NullGui.cpp NullGui.h \
+	$(DEVICES) \
+	$(NULL)
 
 if BUILD_AQUA_GUI
 BUILT_SOURCES += bundle
