@@ -31,9 +31,11 @@ namespace gnash {
 static const char *MOUSE_DEVICE = "/dev/usb/tkpanel0";
 
 bool
-TouchDevice::init(InputDevice::devicetype_e type, const std::string &filespec, size_t size)
+TouchDevice::init(const std::string &filespec, size_t size)
 {
     GNASH_REPORT_FUNCTION;
+
+    _type = TouchDevice::TOUCHSCREEN;
     
     // Try to open mouse device, be error tolerant (FD is kept open all the time)
     _fd = open(MOUSE_DEVICE, O_RDWR);

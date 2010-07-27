@@ -31,13 +31,15 @@ namespace gnash {
 static const char *MOUSE_DEVICE = "/dev/usb/tkpanel0";
 
 bool
-KeyboardDevice::init(InputDevice::devicetype_e type, const std::string &filespec,
-                     size_t size)
+KeyboardDevice::init(const std::string &filespec, size_t size)
 {
     GNASH_REPORT_FUNCTION;
+    
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     return false;
 #endif
+    
+    _type = TouchDevice::KEYBOARD;
     
     std::string dev;
 

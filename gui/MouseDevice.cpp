@@ -32,11 +32,11 @@ namespace gnash {
 static const char *MOUSE_DEVICE = "/dev/input/mice";
 
 bool
-MouseDevice::init(InputDevice::devicetype_e type, const std::string &filespec, size_t size)
+MouseDevice::init(const std::string &filespec, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 
-    _type = type;
+    _type = PS2_MOUSE;
     _filespec = filespec;    
     _buffer.reset(new boost::uint8_t[size]);
 

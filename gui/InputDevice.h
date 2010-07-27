@@ -51,7 +51,8 @@ public:
     bool init(devicetype_e type);
     bool init(devicetype_e type, size_t size);
     bool init(devicetype_e type, const std::string &filespec);
-    virtual bool init(devicetype_e type, const std::string &filespec, size_t size) = 0;
+    bool init(devicetype_e type, const std::string &filespec, size_t size);
+    virtual bool init(const std::string &filespec, size_t size) = 0;
     virtual bool check() = 0;
 
     // Read data into the Device input buffer.
@@ -82,7 +83,7 @@ protected:
 
 class MouseDevice : public InputDevice
 {
-    virtual bool init(InputDevice::devicetype_e type, const std::string &filespec, size_t size);
+    virtual bool init(const std::string &filespec, size_t size);
 
     virtual bool check();
 
@@ -92,7 +93,7 @@ class MouseDevice : public InputDevice
 
 class TouchDevice : public InputDevice
 {
-    virtual bool init(InputDevice::devicetype_e type, const std::string &filespec, size_t size);
+    virtual bool init(const std::string &filespec, size_t size);
 
     void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
 
@@ -101,7 +102,7 @@ class TouchDevice : public InputDevice
 
 class KeyboardDevice : public InputDevice
 {
-    virtual bool init(InputDevice::devicetype_e type, const std::string &filespec, size_t size);
+    virtual bool init(const std::string &filespec, size_t size);
 
     gnash::key::code scancode_to_gnash_key(int code, bool shift);
     

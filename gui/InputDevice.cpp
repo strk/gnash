@@ -57,11 +57,14 @@ InputDevice::init(InputDevice::devicetype_e type, size_t size)
 }
 
 bool
-InputDevice::init(InputDevice::devicetype_e type, const std::string &filespec)
+InputDevice::init(InputDevice::devicetype_e type, const std::string &filespec,
+                  size_t size)
 {
     GNASH_REPORT_FUNCTION;
 
-    return init(type, filespec, DEFAULT_BUFFER_SIZE);
+    _type = type;
+    
+    return init(std::string(), size);
 }
 
 // Read data into the Device input buffer.
