@@ -3951,12 +3951,6 @@ dnl The Framebuffer GUI has several other settings. As it doesn't have X11,
 dnl we have to handle input devices ourselves.
 if test x"${build_fb}" = xyes; then
 echo "        Using ${input_events} for Input"
-  if test x"${tslib}" != x; then
-    echo "        Using ${tslib} as the touchscreen type"
-  fi
-  if test x"${mouse}" != x; then
-    echo "        Using ${mouse} as the mouse type"
-  fi
   if test x"${fakefb}" != x; then
     echo "        Using shared memory as a fake framebuffer"
   fi
