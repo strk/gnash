@@ -202,7 +202,7 @@ DEVICES = \
 	InputDevice.cpp InputDevice.h \
 	TouchDevice.cpp TouchDevice.h \
 	MouseDevice.cpp MouseDevice.h
-	KeyboardDevice.cpp KeyboardDevice.h
+	EventDevice.cpp EventDevice.h
 else
 DEVICES =
 endif
