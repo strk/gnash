@@ -640,7 +640,6 @@ dnl Specify a mouse type, currently only a PS/2 style (standard nouse) is
 dnl supported.
 dnl Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
 dnl emulated by the Kernel) 
-dnl Define this to read from /dev/input/event0 (new generic input subsystem)
 AC_ARG_ENABLE(mouse,
   AC_HELP_STRING([--enable-mouse], [specify mouse for framebuffer display (default ps2]),
   [case "${enableval}" in
@@ -654,6 +653,7 @@ if test x"${mouse}" != x; then
   AC_DEFINE(USE_MOUSE_PS2, [1], [Using a standard PS/2 mouse with the framebuffer])
 fi
 
+dnl Define this to read from /dev/input/event0 (new generic input subsystem)
 if test x"${mouse}" != x -o x"${tslib}" != x; then
   AC_DEFINE(USE_INPUT_EVENTS, [1], [Whether to use input events, mouse, keyboard, or touchscreen])
 fi
