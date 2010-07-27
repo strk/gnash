@@ -197,11 +197,14 @@ gnash: gnash.in
 	cp $< $@
 	chmod +x $@
 
+# These are used to handle input events from a keyboard, mouse, or
+# touchscreen. These are only used by the Framebuffer GUI, as without
+# X11, it has no event handling.
 if USE_INPUT_EVENTS
 DEVICES = \
 	InputDevice.cpp InputDevice.h \
 	TouchDevice.cpp TouchDevice.h \
-	MouseDevice.cpp MouseDevice.h
+	MouseDevice.cpp MouseDevice.h \
 	EventDevice.cpp EventDevice.h
 else
 DEVICES =

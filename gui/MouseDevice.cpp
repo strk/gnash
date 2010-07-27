@@ -21,6 +21,7 @@
 #endif
 
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 
 #include "GnashSleep.h"
@@ -31,26 +32,109 @@ namespace gnash {
 
 static const char *MOUSE_DEVICE = "/dev/input/mice";
 
+MouseDevice::MouseDevice()
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+MouseDevice::MouseDevice(Gui *gui)
+{
+    // GNASH_REPORT_FUNCTION;
+
+    _gui = gui;
+}
+
+std::vector<boost::shared_ptr<InputDevice> >
+MouseDevice::scanForDevices(Gui *gui)
+{
+    // GNASH_REPORT_FUNCTION;
+
+    struct stat st;
+
+    std::vector<boost::shared_ptr<InputDevice> > devices;
+
+    // Look for these files for mouse input
+    struct mouse_types {
+        InputDevice::devicetype_e type;
+        const char *filespec;
+    };
+
+    // Debug strings to make output more readable
+    const char *debug[] = {
+        "UNKNOWN",
+        "Keyboard",
+        "PS2 Mouse",
+        "eTurboTouch Mouse",
+        "Touchscreen",
+        "Power Button"
+    };
+    
+    struct mouse_types mice[] = {
+        InputDevice::PS2_MOUSE, "/dev/input/mice",      // PS/2 Mouse
+#ifdef MULTIPLE_DEVICES
+        InputDevice::PS2_MOUSE, "/dev/input/mouse0",
+        InputDevice::PS2_MOUSE, "/dev/input/mouse1",
+        InputDevice::ETT_MOUSE, "/dev/usb/tkpanel0",    // eTurboTouch touchscreen
+#endif
+        InputDevice::UNKNOWN, 0
+    };
+
+    int i = 0;
+    while (mice[i].type != InputDevice::UNKNOWN) {
+        int fd = 0;
+        if (stat(mice[i].filespec, &st) == 0) {
+            // Then see if we can open it
+            if ((fd = open(mice[i].filespec, O_RDWR)) < 0) {
+                log_error("You don't have the proper permissions to open %s",
+                          mice[i].filespec);
+                i++;
+                continue;
+            } // open()
+            log_debug("Found a %s device for mouse input using %s",
+                      debug[mice[i].type], mice[i].filespec);
+            
+            boost::shared_ptr<InputDevice> dev;
+#if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
+            dev = boost::shared_ptr<InputDevice>(new MouseDevice(gui));
+            if (dev->init(mice[i].filespec, DEFAULT_BUFFER_SIZE)) {
+                devices.push_back(dev);
+            }
+            dev->dump();
+#endif
+        }     // stat()
+        close(fd);
+        i++;
+    }         // while()
+    
+    return devices;
+}
+
+bool
+MouseDevice::init()
+{
+    GNASH_REPORT_FUNCTION;
+
+    return init(MOUSE_DEVICE, DEFAULT_BUFFER_SIZE);
+}
+
 bool
 MouseDevice::init(const std::string &filespec, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 
     _type = PS2_MOUSE;
-    _filespec = filespec;    
+    _filespec = filespec;
     _buffer.reset(new boost::uint8_t[size]);
 
     // see http://www.computer-engineering.org/ps2mouse/ 
     
     // Try to open mouse device, be error tolerant (FD is kept open all the time)
-    _fd = open(MOUSE_DEVICE, O_RDWR);
+    _fd = open(filespec.c_str(), O_RDWR);
     
     if (_fd < 0) {
-        log_debug("Could not open %s: %s", gnash::MOUSE_DEVICE, strerror(errno));
+        log_debug("Could not open %s: %s", filespec, strerror(errno));
         return false;
     }
-    
-    unsigned char buf[10], byte;
     
     if (fcntl(_fd, F_SETFL, fcntl(_fd, F_GETFL) | O_NONBLOCK) < 0) {
         log_error("Could not set non-blocking mode for mouse device: %s", strerror(errno));
@@ -60,6 +144,7 @@ MouseDevice::init(const std::string &filespec, size_t size)
     }
     
     // Clear input buffer
+    unsigned char buf[10], byte;
     while (read(_fd, buf, sizeof buf) > 0 ) { }
     
     // Reset mouse
@@ -96,11 +181,15 @@ bool
 MouseDevice::check()
 {
     GNASH_REPORT_FUNCTION;
+
+    return false;
 }
 
 bool
 MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
 {
+    GNASH_REPORT_FUNCTION;
+
     int n;
     
     // flush input buffer

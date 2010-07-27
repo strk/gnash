@@ -21,46 +21,90 @@
 #endif
 
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
+
+#ifdef HAVE_TSLIB_H
+# include <tslib.h>
+#endif
+#if defined(ENABLE_TSLIB) && !defined(HAVE_TSLIB_H)
+# warning "No tslib.h! Disabling touchscreen support"
+# undef ENABLE_TSLIB
+#endif
 
 #include "log.h"
 #include "InputDevice.h"
 
+#ifdef USE_TSLIB
+// Either use environment variable or hardcoded value
+// Hint: /dev/ts can be a symlink to the real ts device.
+// TSLIB_DEVICE environment variable should point to the
+// touchscreen device the library is using.
+static const char *TSLIB_DEVICE_ENV = "TSLIB_TSDEVICE";
+static const char *TSLIB_DEVICE_NAME = "/dev/ts";
+#endif
+
 namespace gnash {
 
-static const char *MOUSE_DEVICE = "/dev/usb/tkpanel0";
+//static const char *MOUSE_DEVICE = "/dev/usb/tkpanel0";
+
+TouchDevice::TouchDevice()
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+TouchDevice::TouchDevice(Gui *gui)
+{
+    GNASH_REPORT_FUNCTION;
+
+    _gui = gui;
+}
+
+TouchDevice::~TouchDevice()
+{
+    if (_tsDev) {
+        ts_close(_tsDev);
+    }
+}    
 
 bool
-TouchDevice::init(const std::string &filespec, size_t size)
+TouchDevice::init()
+{
+    return init(TSLIB_DEVICE_NAME, DEFAULT_BUFFER_SIZE);
+}
+
+bool
+TouchDevice::init(const std::string &filespec, size_t /* size */)
 {
     GNASH_REPORT_FUNCTION;
 
     _type = TouchDevice::TOUCHSCREEN;
+    _filespec = filespec;
     
-    // Try to open mouse device, be error tolerant (FD is kept open all the time)
-    _fd = open(MOUSE_DEVICE, O_RDWR);
+    char *devname = getenv(TSLIB_DEVICE_ENV);
+    if (!devname) {
+        devname = const_cast<char *>(TSLIB_DEVICE_NAME);
+    } else {
+        if (!filespec.empty()) {
+            devname = const_cast<char *>(_filespec.c_str());
+        } else {
+            log_error("No filespec specified for the touchscreen device.");
+        }
+    }
     
-    if (_fd < 0) {
-        log_debug("Could not open %s: %s", MOUSE_DEVICE, strerror(errno));
+    _tsDev = ts_open(devname, 1);  //Open tslib non-blocking
+    if (_tsDev == 0) {
+        log_debug("Could not open touchscreen %s: %s", devname, strerror(errno));
         return false;
     }
     
-    unsigned char buf[10];
-    
-    if (fcntl(_fd, F_SETFL, fcntl(_fd, F_GETFL) | O_NONBLOCK) < 0) {
-        log_error("Could not set non-blocking mode for touchpad device: %s", strerror(errno));
-        close(_fd);
-        _fd = -1;
-        return false; 
-    }
-
-    if (_buffer) {
-        // Clear input buffer
-        while (read(_fd, _buffer.get(), DEFAULT_BUFFER_SIZE) > 0 ) { }
+    ts_config(_tsDev); 
+    if (ts_fd(_tsDev) < 0) {
+        log_debug("Could not get touchscreen fd %s: %s", devname, strerror(errno));
+        return false;
     }
     
-    log_debug(_("Touchpad enabled."));
-    
+    log_debug("Using TSLIB on %s", devname);
     return true;
 }
 
@@ -69,85 +113,44 @@ TouchDevice::check()
 {
     GNASH_REPORT_FUNCTION;
 
-    // If we don't have a GUi attached, then we can't propogate the events
-    if (!_gui) {
-        return false;
+    // Read events from the touchscreen and transport them into Gnash
+    // Tslib should be setup so the output is pretty clean.
+    struct ts_sample event;
+    // unsigned long    flags;
+    // unsigned long    buttons;
+    
+    if (_tsDev == 0) {
+        return false;           // No tslib device initialized, exit!
     }
     
-    bool activity = false;
-  
-    if (_fd < 0) {
-        return false;   // no mouse available
-    }
-  
-    readData();
-  
-    // resync
-    int pos = -1;
-    int i;
-    for (i=0; i<_position; i++)
-        if (_buffer[i] & 0x80) { 
-            pos = i;
-            break;    
-        }
-    if (pos < 0) {
-        return false; // no sync or no data
-    }
-  
-    if (pos > 0) {
-        //printf("touchscreen: removing %d bytes garbage!\n", pos);  
-        memmove(_buffer.get(), _buffer.get() + pos, _position - pos);
-        _position -= pos;
-    }
-    
-    // packet complete?
-    while (DEFAULT_BUFFER_SIZE > 4) {
-        /*
-          eTurboTouch version??
-          mouse_btn = ((mouse_buf[0] >> 4) & 1);
-          mouse_x = (mouse_buf[1] << 4) | (mouse_buf[2] >> 3);
-          mouse_y = (mouse_buf[3] << 4) | (mouse_buf[4] >> 3);
-        */
+    int n = ts_read(_tsDev, &event, 1);     // read one event
 
-        int new_btn = (_buffer[0] & 1);
-        int new_x = (_buffer[1] << 7) | (_buffer[2]);
-        int new_y = (_buffer[3] << 7) | (_buffer[4]);
-    
-        /*
-          printf("touchscreen: %02x %02x %02x %02x %02x | status %d, pos: %d/%d\n",
-          mouse_buf[0], mouse_buf[1], mouse_buf[2], mouse_buf[3], mouse_buf[4],   
-          new_btn, new_x, new_y);
-        */    
-    
-        new_x = static_cast<int>(((static_cast<double>(new_x )- 355) / (1702 - 355)
-                                  * 1536 + 256));
-        new_y = static_cast<int>(((static_cast<double>(new_y) - 482) / (1771 - 482)
-                                  * 1536 + 256));
-    
-        new_x = new_x * _gui->getScreenResX() / 2048;
-        new_y = (2048-new_y) * _gui->getScreenResY() / 2048;
-
-        if ((new_x != _x) || (new_y != _y)) {
-            _x = new_x;
-            _y = new_y;
-            _gui->notifyMouseMove(_x, _y);
-            activity = true;
+    // Did we read an event?
+    if (n == 1) {
+        if (event.pressure > 0) {
+            // the screen is touched
+            if (event.x > static_cast<int>(_gui->getStage()->getStageWidth())) {
+                event.x = static_cast<int>(_gui->getStage()->getStageWidth());
+            }
+            if (event.y > static_cast<int>(_gui->getStage()->getStageHeight())) {
+                event.y = static_cast<int>(_gui->getStage()->getStageHeight());
+            }
+            // FIXME: the API for these mouse events has changed, so this needs to be
+            // updated.
+            _gui->notifyMouseMove(int(event.x / _gui->getXScale()),
+                                  int(event.y / _gui->getYScale()));
+            _gui->notifyMouseClick(true);  //fire mouse click event into Gnash
+            
+            log_debug("Touched x: %d y: %d width: %d height: %d",
+                      event.x , event.y, _gui->getStage()->getStageWidth(),
+                      _gui->getStage()->getStageHeight());
+        } else {
+            _gui->notifyMouseClick(false);  //button released
+            log_debug("lifted x: %d y: %d", event.x, event.y); //debug
         }
-    
-        if (new_btn != _button) {
-            _button = new_btn;      
-            printf("clicked: %d\n", _button);
-            _gui->notifyMouseClick(_button);  // mask=?
-            activity = true;
-        }
-    
-        // remove from buffer
-        pos=5;
-        memmove(_buffer.get(), _buffer.get() + pos, _position - pos);
-        _position -= pos;    
     }
-  
-    return activity;  
+
+    return true;
 }
 
 void
@@ -165,10 +168,10 @@ TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
       And sorry for the quick-and-dirty implementation! I'm in a hurry...
     */
 
-    float ref1x = _gui->getScreenResX() / 5 * 1;
-    float ref1y = _gui->getScreenResY() / 5 * 1;
-    float ref2x = _gui->getScreenResX() / 5 * 4;
-    float ref2y = _gui->getScreenResY() / 5 * 4;
+    float ref1x = _gui->getStage()->getStageWidth() / 5 * 1;
+    float ref1y = _gui->getStage()->getStageHeight() / 5 * 1;
+    float ref2x = _gui->getStage()->getStageWidth() / 5 * 4;
+    float ref2y = _gui->getStage()->getStageHeight() / 5 * 4;
   
     static float cal1x = 2048/5*1;   // very approximative default values
     static float cal1y = 2048/5*4;
@@ -239,6 +242,60 @@ TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
     // real duty: 
     *cx = (rawx-cal1x) / (cal2x-cal1x) * (ref2x-ref1x) + ref1x;
     *cy = (rawy-cal1y) / (cal2y-cal1y) * (ref2y-ref1y) + ref1y;
+}
+
+std::vector<boost::shared_ptr<InputDevice> >
+TouchDevice::scanForDevices(Gui *gui)
+{
+    // GNASH_REPORT_FUNCTION;
+
+    struct stat st;
+
+    std::vector<boost::shared_ptr<InputDevice> > devices;
+
+    // Debug strings to make output more readable
+    const char *debug[] = {
+        "TSlib"
+    };
+    
+    // Look for these files for mouse input
+    struct ts_types {
+        InputDevice::devicetype_e type;
+        const char *filespec;
+    };
+
+    struct ts_types touch[] = {
+        InputDevice::TOUCHSCREEN, "/dev/ts",
+        InputDevice::UNKNOWN, 0
+    };
+
+    int i = 0;
+    while (touch[i].type != InputDevice::UNKNOWN) {
+        int fd = 0;
+        if (stat(touch[i].filespec, &st) == 0) {
+            // Then see if we can open it
+            if ((fd = open(touch[i].filespec, O_RDWR)) < 0) {
+                log_error("You don't have the proper permissions to open %s",
+                          touch[i].filespec);
+                i++;
+                continue;
+            } // open()
+            log_debug("Found a %s device for mouse input using %s",
+                      debug[touch[i].type], touch[i].filespec);
+            boost::shared_ptr<InputDevice> dev;
+            dev = boost::shared_ptr<InputDevice>(new TouchDevice(gui));
+            if (dev->init(touch[i].filespec, DEFAULT_BUFFER_SIZE)) {
+                devices.push_back(dev);
+            }
+            dev->dump();
+            
+            devices.push_back(dev);
+        }     // stat()
+        close(fd);
+        i++;
+    }         // while()
+    
+    return devices;
 }
 
 // end of namespace

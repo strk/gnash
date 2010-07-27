@@ -23,29 +23,15 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/scoped_array.hpp>
 #include <vector>
 #include <linux/fb.h>
 
 #include "gui.h"
-#ifdef HAVE_TSLIB_H
-# include <tslib.h>
-#endif
-#if defined(ENABLE_TSLIB) && !defined(HAVE_TSLIB_H)
-# warning "No tslib.h! Disabling touchscreen support"
-# undef ENABLE_TSLIB
-#endif
+#include "InputDevice.h"
 
 #define PIXELFORMAT_LUT8
 #define CMAP_SIZE (256*2)
-
-#ifdef USE_TSLIB
-// Either use environment variable or hardcoded value
-// Hint: /dev/ts can be a symlink to the real ts device.
-// TSLIB_DEVICE environment variable should point to the
-// touchscreen device the library is using.
-# define TSLIB_DEVICE_ENV "TSLIB_TSDEVICE"
-# define TSLIB_DEVICE_NAME "/dev/ts"
-#endif
 
 #ifdef USE_MOUSE_PS2
 # define MOUSE_DEVICE "/dev/input/mice"
@@ -118,76 +104,16 @@ private:
     int m_stage_height;
     unsigned m_rowsize;
     
+    std::vector<boost::shared_ptr<InputDevice> > _inputs;
+
+#if 0
     int input_fd; /// file descriptor for /dev/input/mice
     int keyb_fd; /// file descriptor for /dev/input/event* (keyboard)
     int mouse_x, mouse_y, mouse_btn;
     unsigned char mouse_buf[256];
     int mouse_buf_size;
-
-    // Although the value is only set when using a touchscreen, it takes up little
-    // memory to initialize a pointer top avoid lots op fmessy ifdefs.
-    struct tsdev *tsDev;
-    
-#ifdef USE_TSLIB
-    bool init_tslib(); 
-    void check_tslib();
-#endif
-
-    // FIXME: This mouse handling code is a mess, and should really be made
-    // made more C++ like, with a base Mouse class, then have device specific
-    // derived classes. For now this just makes the old code work with the new
-    // configure settings.
-    
-    /// Initializes mouse
-    ///
-    /// @return true if initialized, false if not or the mouse doesn't exist
-    bool init_mouse();
-
-    /// Checks for and processes any mouse activity.
-    ///
-    /// @return true if activity, false if not or the mouse doesn't exist
-    bool check_mouse();
-    
-    /// Initializes keyboard routines 
-    ///
-    /// @return true if initialized, false if not or the keyboard doesn't exist
-    bool init_keyboard();
-    
-    /// Checks for and processes any keyboard activity.
-    ///
-    /// @return true if activity, false if not or the keyboard doesn't exist
-    bool check_keyboard();
-    
-#ifdef USE_MOUSE_PS2
-    bool init_ps2_mouse();
-    
-    /// Checks for and processes any mouse activity. Returns true on activity.
-    bool check_ps2_mouse();    
-#endif
-    
-#ifdef USE_ETT_TSLIOB
-    bool init_ett_mouse();
-
-    /// Checks for and processes any mouse activity. Returns true on activity.
-    bool check_ett_mouse();
-#endif
-    
-#ifdef USE_INPUT_EVENTS
-    bool init_input_events();
-    
-    /// Fills the mouse data input buffer with fresh data
-    void read_mouse_data();  	
-    
-    /// Translates a scancode from the Linux Input Subsystem to a Gnash key code 
-    gnash::key::code scancode_to_gnash_key(int code, bool shift);
-    
-    /// Applies builtin touchscreen calibration
-    void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
 #endif    
-    
-    // Keyboard SHIFT/CTRL/ALT states (left + right)
-    bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
-    
+
     struct fb_var_screeninfo var_screeninfo;
     struct fb_fix_screeninfo fix_screeninfo;
     
@@ -208,11 +134,6 @@ private:
     
     /// reverts disable_terminal() changes
     bool enable_terminal();
-    
-#ifdef USE_MOUSE_PS2  	
-    /// Sends a command to the mouse and waits for the response
-    bool mouse_command(unsigned char cmd, unsigned char *buf, int count);
-#endif
     
     int valid_x(int x);
     int valid_y(int y);

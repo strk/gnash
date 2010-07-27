@@ -20,6 +20,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "gui.h"
 #include "log.h"
 #include "InputDevice.h"
 
@@ -31,14 +32,35 @@ InputDevice::InputDevice()
       _x(0),
       _y(0),
       _button(0),
-      _position(0)
+      _position(0),
+      _gui(0)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+}
+
+InputDevice::InputDevice(Gui *gui)
+    : _type(InputDevice::UNKNOWN),
+      _fd(-1),
+      _x(0),
+      _y(0),
+      _button(0),
+      _position(0),
+      _gui(gui)
+{
+    // GNASH_REPORT_FUNCTION;
 }
 
 InputDevice::~InputDevice()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+}
+
+bool
+InputDevice::init()
+{
+    // GNASH_REPORT_FUNCTION;
+    
+    return true;
 }
 
 bool
@@ -63,8 +85,9 @@ InputDevice::init(InputDevice::devicetype_e type, const std::string &filespec,
     GNASH_REPORT_FUNCTION;
 
     _type = type;
+    _filespec = filespec;
     
-    return init(std::string(), size);
+    return init(filespec, size);
 }
 
 // Read data into the Device input buffer.
@@ -101,6 +124,74 @@ InputDevice::readData()
 
     return count;
 }   
+
+void
+InputDevice::dump()
+{
+    // Debug strings to make output more readable
+    const char *debug[] = {
+        "UNKNOWN",
+        "Keyboard",
+        "PS2 Mouse",
+        "eTurboTouch Mouse",
+        "Touchscreen",
+        "Power Button"
+    };    
+
+    std::cerr << "Device type is: " << debug[_type] << std::endl;
+    std::cerr << "\tfilespec is: " << _filespec
+              << ", fd #" << _fd << std::endl;
+    std::cerr << "\tX is: " << _x << ", Y is: " << _y << std::endl;
+}
+
+// Scan for all the possible input devices. This aggregates all
+// the devices from each type into a single big vector.
+std::vector<boost::shared_ptr<InputDevice> >
+InputDevice::scanForDevices(Gui *gui)
+{
+    // GNASH_REPORT_FUNCTION;
+
+    std::vector<boost::shared_ptr<InputDevice> > devices;
+    
+    std::vector<boost::shared_ptr<InputDevice> > id;
+    std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+#ifdef USE_INPUT_EVENT
+    id = EventDevice::scanForDevices(gui);
+    for (it=id.begin(); it!=id.end(); ++it) {
+        devices.push_back(*it);
+    }
+#endif
+#if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
+    id = MouseDevice::scanForDevices(gui);
+    for (it=id.begin(); it!=id.end(); ++it) {
+        devices.push_back(*it);
+    }
+#endif
+#ifdef USE_TSLIB
+    id = TouchDevice::scanForDevices(gui);
+    for (it=id.begin(); it!=id.end(); ++it) {
+        devices.push_back(*it);
+    }
+#endif
+
+    return devices;
+}
+
+#ifdef USE_TSLIB
+boost::shared_ptr<InputDevice>
+createTSlibDevice(Gui *gui)
+{
+    return boost::shared_ptr<InputDevice>(new TouchDevice(gui));
+}
+#endif
+
+#ifdef USE_INPUT_EVENT
+boost::shared_ptr<InputDevice>
+createEventDevice(Gui *gui)
+{
+    return boost::shared_ptr<InputDevice>(new EventDevice(gui));
+}
+#endif
 
 // end of gnash namespace
 }

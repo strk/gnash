@@ -191,17 +191,10 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
       buffer(0),                // the real value is set by ENABLE_DOUBLE_BUFFERING
       m_stage_width(0),
       m_stage_height(0),
-      m_rowsize(0),
-      input_fd(-1),
-      keyb_fd(-1),
-      mouse_x(0),
-      mouse_y(0),
-      mouse_btn(0),
-      mouse_buf_size(0),
-      tsDev(0)                // the real value is set by ENABLE_DOUBLE_BUFFERING
+      m_rowsize(0)
 {
     // initializing to zero helps with debugging and prevents weird bugs
-    memset(mouse_buf, 0, 256);
+//    memset(mouse_buf, 0, 256);
     memset(&var_screeninfo, 0, sizeof(fb_var_screeninfo));
     memset(&fix_screeninfo, 0, sizeof(fb_fix_screeninfo));
     
@@ -217,15 +210,9 @@ FBGui::~FBGui()
         close(fd);
     }
 
-    if (input_fd) {
-        close(input_fd);
-    }
-    
-#ifdef USE_TSLIB
-    if (tsDev) {
-        ts_close(tsDev);
-    }
-#endif
+    // if (input_fd) {
+    //     close(input_fd);
+    // }
     
 #ifdef ENABLE_DOUBLE_BUFFERING
     if (buffer) {
@@ -277,34 +264,39 @@ FBGui::set_grayscale_lut8()
 #undef TO_16BIT
 }
 
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-bool
-FBGui::init_mouse()
-{
-    return false;
-}
-#endif
-
 bool
 FBGui::init(int /*argc*/, char *** /*argv*/)
 {
+    GNASH_REPORT_FUNCTION;
+
+    // Initialize all the input devices
+
+    // Look for Mice that use the PS/2 mouse protocol
+    _inputs = InputDevice::scanForDevices(this);
+    if (_inputs.empty()) {
+        log_error("Found no accessible input event devices");
+    }
+    
+#if 0
     // Initialize mouse (don't abort if no mouse found)
-    if (!init_mouse()) {
+    _mouse = getDeviceHandle(this);
+
+    if (!_mouse->init()) {
         // just report to the user, keep on going...
         log_debug(_("You won't have any pointing input device, sorry."));
     }
-    
+
     // Initialize keyboard (still not critical)
-    if (!init_keyboard()) {   
+    if (!_input_event.init()) {   
         log_debug(_("You won't have any keyboard input device, sorry."));
     }
-
-#ifdef USE_TSLIB
-    if (init_tslib() == false) {
+    
+    // Initialize the touchscreen, if there is one
+    if (_touchscreen.init() == false) {
         log_debug("You won't have any tslib input device, sorry.");
     }
 #endif
-
+    
     // Open the framebuffer device
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     fd = open(FAKEFB, O_RDWR);
@@ -445,14 +437,14 @@ FBGui::run()
         // up early because of some Linux signal sent to our process (and thus
         // "advance" faster than the "heartbeat" interval)? - Udo
   
+#if 0
         // check input devices
-#if defined(USE_MOUSE_PS2) || (USE_ETT_TSLIB)
-        check_mouse();
+        _mouse->check();
+        _input_event.check();
+        _touchscreen.check();
 #endif
-        check_keyboard();
-  
+        
 #ifdef USE_TSLIB
-        check_tslib();
         ts_loop_count++; //increase loopcount
 #endif        
         
@@ -665,7 +657,6 @@ FBGui::disable_terminal()
     log_debug(_("Original TTY NO = %d"), original_vt);   
   
 #ifdef REQUEST_NEW_VT
-  
     // Request a new VT number
     if (ioctl(fd, VT_OPENQRY, &own_vt) == -1) {
         log_debug(_("WARNING: Could not request a new VT"));
@@ -791,72 +782,9 @@ FBGui::enable_terminal()
     return true;
 }
 
-void
-FBGui::read_mouse_data()
+#ifdef USE_ETT_TSLIB
+bool FBGui::init_ett_mouse()
 {
-    if (input_fd<0) return;   // no mouse available
-    
-    int count;  
-    
-    unsigned char *ptr;
-    
-    ptr = mouse_buf + mouse_buf_size;
-    
-    count = read(input_fd, mouse_buf + mouse_buf_size, 
-                 sizeof(mouse_buf) - mouse_buf_size);
-    
-    if (count<=0) return;
-    
-    /*
-      printf("read data: ");
-      int i;
-      for (i=0; i<count; i++) 
-      printf("%02x ", ptr[i]);
-      printf("\n");
-    */
-    
-    mouse_buf_size += count;
-}
-
-#ifdef USE_MOUSE_PS2    
-bool
-FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count)
-{
-    int n;
-    
-    // flush input buffer
-    char trash[16];
-    do {
-        n = read(input_fd, trash, sizeof trash);
-        if (n>0) 
-            log_debug(_("mouse_command: discarded %d bytes from input buffer"), n);
-    } while (n>0);
-    
-    // send command
-    write(input_fd, &cmd, 1);
-    
-    // read response (if any)
-    while (count>0) {
-        gnashSleep(250*1000); // 250 ms inter-char timeout (simple method)
-        // TODO: use select() instead
-        
-        n = read(input_fd, buf, count);
-        if (n<=0) return false;
-        count-=n;
-        buf+=n;
-    }
-    
-    return true;
-    
-} //command()
-#endif
-
-#ifdef USE_MOUSE_PS2    
-bool
-FBGui::init_ps2_mouse() 
-{
-    // see http://www.computer-engineering.org/ps2mouse/ 
-    
     // Try to open mouse device, be error tolerant (FD is kept open all the time)
     input_fd = open(MOUSE_DEVICE, O_RDWR);
     
@@ -865,265 +793,22 @@ FBGui::init_ps2_mouse()
         return false;
     }
     
-    unsigned char buf[10], byte;
+    unsigned char buf[10];
     
-    if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
-        log_error("Could not set non-blocking mode for mouse device: %s", strerror(errno));
+    if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK) < 0) {
+        log_error("Could not set non-blocking mode for touchpad device: %s", strerror(errno));
         close(input_fd);
-        input_fd=-1;
+        input_fd = -1;
         return false; 
     }
     
     // Clear input buffer
     while ( read(input_fd, buf, sizeof buf) > 0 ) { }
     
-    // Reset mouse
-    if ((!mouse_command(0xFF, buf, 3)) || (buf[0]!=0xFA)) {
-        log_debug(_("Mouse reset failed"));
-        close(input_fd);
-        input_fd=-1;
-        return false; 
-    }
+    mouse_buf_size = 0;
     
-    // Get Device ID (not crucial, debug only)
-    if ((!mouse_command(0xF2, buf, 2)) || (buf[0]!=0xFA)) {
-        log_debug(_("WARNING: Could not detect mouse device ID"));
-    } else {
-        unsigned char devid = buf[1];
-        if (devid!=0)
-            log_debug(_("WARNING: Non-standard mouse device ID %d"), devid);
-    }
-    
-    // Enable mouse data reporting
-    if ((!mouse_command(0xF4, &byte, 1)) || (byte!=0xFA)) {
-        log_debug(_("Could not activate Data Reporting mode for mouse"));
-        close(input_fd);
-        input_fd=-1;
-        return false; 
-    }
-  
-  
-    log_debug(_("Mouse enabled."));
-      
-    mouse_x = 0;
-    mouse_y = 0;
-    mouse_btn = 0;
-  
+    log_debug(_("Touchpad enabled."));
     return true;
-}
-
-bool
-FBGui::check_ps2_mouse() 
-{
-    if (input_fd < 0) {
-        return false;   // no mouse available
-    }
-  
-    int i;
-    int xmove, ymove, btn, btn_changed;
-  
-    read_mouse_data();
-  
-    // resync
-    int pos = -1;
-    for (i=0; i<mouse_buf_size; i++) {
-        if (mouse_buf[i] & 8) { // bit 3 must be high for the first byte
-            pos = i;
-            break;    
-        }
-    }
-    
-    if (pos < 0) {
-        return false; // no sync or no data
-    }
-  
-    if (pos > 0) {
-        // remove garbage:
-        memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
-        mouse_buf_size -= pos;
-    }  
-  
-    if (mouse_buf_size >= 3) {
-  
-        xmove = mouse_buf[1];
-        ymove = mouse_buf[2];
-        btn = mouse_buf[0] & 1;
-    
-        if (mouse_buf[0] & 0x10) xmove = -(256-xmove);
-        if (mouse_buf[0] & 0x20) ymove = -(256-ymove);
-    
-        ymove *= -1; // vertical movement is upside-down
-    
-        log_debug(_("x/y %d/%d btn %d"), xmove, ymove, btn);
-
-        // movement    
-        mouse_x += xmove;
-        mouse_y += ymove;
-    
-        if (mouse_x<0) {
-            mouse_x = 0;
-        }
-        if (mouse_y<0) {
-            mouse_y = 0;
-        }
-        if (mouse_x>m_stage_width) {
-            mouse_x = m_stage_width;
-        }
-        if (mouse_y>m_stage_height) {
-            mouse_y = m_stage_height;
-        }
-    
-        //log_debug(_("mouse @ %d / %d, btn %d"), mouse_x, mouse_y, mouse_btn);
-    
-        notifyMouseMove(mouse_x, mouse_y);
-    
-        // button
-        if (btn != mouse_btn) {
-            mouse_btn = btn;
-            printf("clicked: %d\n", btn);      
-            notifyMouseClick(btn);  // mark=??
-            //log_debug(_("mouse click! %d"), btn);
-        }    
-
-        // remove from buffer
-        pos = 3;
-        memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
-        mouse_buf_size -= pos;  
-    
-        return true;
-    }  
-}
-bool
-FBGui::check_ps2_mouse()
-{
-    bool activity = false;
-  
-    if (input_fd < 0) return false;
-
-    struct input_event ev;  // time,type,code,value
-  
-    static int new_mouse_x = 0; // all uncalibrated!
-    static int new_mouse_y = 0;
-    static int new_mouse_btn = 0;
-  
-    int notify_x=0;     // coordinate to be sent via notifyMouseMove()
-    int notify_y=0;
-    bool move_pending = false;  // true: notifyMouseMove() should be called
-  
-    // this is necessary for our quick'n'dirty touchscreen calibration: 
-    static int coordinatedebug = std::getenv("DUMP_RAW")!=NULL;
-  
-    // The while loop is limited because the kernel tends to send us hundreds
-    // of events while the touchscreen is touched. We don't loose any 
-    // information if we stop reading because the kernel will stop
-    // sending redundant information.
-    int loops=0;  
-  
-    // Assuming we will never read less than one full struct...  
-  
-    while ((loops++ < 100) && (read(input_fd, &ev, sizeof ev) == (sizeof ev))) {
-
-        if (ev.type == EV_SYN) {    // synchronize (apply information)
-            if ((new_mouse_x != mouse_x) || (new_mouse_y != mouse_y)) {
-      
-                mouse_x = new_mouse_x;
-                mouse_y = new_mouse_y;
-        
-                float cx, cy;
-        
-                if (std::getenv("TSCALIB"))  // ONLY convert when requested
-                    apply_ts_calibration(&cx, &cy, mouse_x, mouse_y);
-                else
-                    { cx=mouse_x; cy=mouse_y; }
-              
-                // Don't call notifyMouseMove() here because this would lead to
-                // lots of calls, especially for touchscreens. Instead we save the
-                // coordinate and call notifyMouseMove() only once.
-                notify_x = cx;
-                notify_y = cy;
-                move_pending = true;        
-            }
-      
-            if (new_mouse_btn != mouse_btn) {
-      
-                if (move_pending) {
-                    notifyMouseMove(notify_x, notify_y);
-                    activity = true;
-                    move_pending = false;
-                }
-      
-                mouse_btn = new_mouse_btn;
-                notifyMouseClick(mouse_btn);  // mark=??
-                activity = true;
-            }
-
-            if (coordinatedebug)
-                printf("DEBUG: % 5d / % 5d / % 5d\n", mouse_x, mouse_y, mouse_btn);
-      
-        }
-  
-        if (ev.type == EV_KEY) {    // button down/up
-    
-            // don't care which button, we support only one...
-            new_mouse_btn = ev.value;      
-      
-        }
-      
-        if (ev.type == EV_ABS) {    // absolute coordinate
-            if (ev.code == ABS_X) new_mouse_x = ev.value;
-            if (ev.code == ABS_Y) new_mouse_y = ev.value;
-            if (ev.code == ABS_PRESSURE) new_mouse_btn = ev.value >= 128;
-        }
-    
-        if (ev.type == EV_REL) {    // relative movement
-            if (ev.code == REL_X) new_mouse_x += ev.value;
-            if (ev.code == REL_Y) new_mouse_y += ev.value;
-      
-            if (new_mouse_x < 0) new_mouse_x=0;
-            if (new_mouse_y < 0) new_mouse_y=0;
-      
-            if (new_mouse_x > m_stage_width ) new_mouse_x = m_stage_width;
-            if (new_mouse_y > m_stage_height) new_mouse_y = m_stage_height;
-        }      
-  
-    } 
-  
-    if (move_pending) {
-        notifyMouseMove(notify_x, notify_y);
-        activity = true;
-    }
-  
-    return activity;
-} // check_ps2_mouse
-#endif  // end of USE_MOUSE_PS2
-
-#ifdef USE_ETT_TSLIB
-bool FBGui::init_ett_mouse()
-{
-  // Try to open mouse device, be error tolerant (FD is kept open all the time)
-  input_fd = open(MOUSE_DEVICE, O_RDWR);
-  
-  if (input_fd < 0) {
-    log_debug(_("Could not open " MOUSE_DEVICE ": %s"), strerror(errno));    
-    return false;
-  }
-  
-  unsigned char buf[10];
-
-  if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK) < 0) {
-    log_error("Could not set non-blocking mode for touchpad device: %s", strerror(errno));
-    close(input_fd);
-    input_fd = -1;
-    return false; 
-  }
-  
-  // Clear input buffer
-  while ( read(input_fd, buf, sizeof buf) > 0 ) { }
-  
-  mouse_buf_size = 0;
-  
-  log_debug(_("Touchpad enabled."));
-  return true;
 } 
 
 bool
@@ -1203,428 +888,6 @@ FBGui::check_ett_mouse()
     return activity;  
 }
 #endif  // end of USE_ETT_TSLIB
-
-#ifdef USE_INPUT_EVENTS   
-bool
-FBGui::init_input_events()
-{
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    return false;
-#else    
-    std::string dev;
-
-    char* devname = std::getenv("POINTING_DEVICE");
-    if (devname) dev = devname;
-    else dev = "/dev/input/event0";
-
-    // Try to open mouse device, be error tolerant (FD is kept open all the time)
-    input_fd = open(dev.c_str(), O_RDONLY);
-  
-    if (input_fd<0) {
-        log_debug(_("Could not open %s: %s"), dev.c_str(), strerror(errno));    
-        return false;
-    }
-  
-    log_debug(_("Pointing device %s open"), dev.c_str());
-  
-    if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
-        log_error(_("Could not set non-blocking mode for pointing device: %s"), strerror(errno));
-        close(input_fd);
-        input_fd = -1;
-        return false; 
-    }
-  
-    return true;
-#endif  // end of ENABLE_FAKE_FRAMEBUFFER
-} // end of init_events()
-#endif  // end of USE_INPUT_EVENTS
-
-void
-FBGui::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
-{
-    /*
-      <UdoG>:
-      This is a *very* simple method to translate raw touchscreen coordinates to
-      the screen coordinates. We simply to linear interpolation between two points.
-      Note this won't work well when the touchscreen is not perfectly aligned to
-      the screen (ie. slightly rotated). Standard touchscreen calibration uses
-      5 calibration points (or even 25). If someone can give me the formula, tell
-      me! I'm too lazy right now to do the math myself... ;)  
-  
-      And sorry for the quick-and-dirty implementation! I'm in a hurry...
-    */
-
-    float ref1x = m_stage_width  / 5 * 1;
-    float ref1y = m_stage_height / 5 * 1;
-    float ref2x = m_stage_width  / 5 * 4;
-    float ref2y = m_stage_height / 5 * 4;
-  
-    static float cal1x = 2048/5*1;   // very approximative default values
-    static float cal1y = 2048/5*4;
-    static float cal2x = 2048/5*4;
-    static float cal2y = 2048/5*1;
-  
-    static bool initialized=false; // woohooo.. better don't look at this code...
-    if (!initialized) {
-        initialized=true;
-    
-        char* settings = std::getenv("TSCALIB");
-    
-        if (settings) {
-    
-            // expected format: 
-            // 491,1635,1581,646      (cal1x,cal1y,cal2x,cal2y; all integers)
-
-            char buffer[1024];      
-            char* p1;
-            char* p2;
-            bool ok = false;
-      
-            snprintf(buffer, sizeof buffer, "%s", settings);
-            p1 = buffer;
-      
-            do {
-                // cal1x        
-                p2 = strchr(p1, ',');
-                if (!p2) continue; // stop here
-                *p2 = 0;
-                cal1x = atoi(p1);        
-                p1=p2+1;
-        
-                // cal1y        
-                p2 = strchr(p1, ',');
-                if (!p2) continue; // stop here
-                *p2 = 0;
-                cal1y = atoi(p1);        
-                p1=p2+1;
-        
-                // cal2x        
-                p2 = strchr(p1, ',');
-                if (!p2) continue; // stop here
-                *p2 = 0;
-                cal2x = atoi(p1);        
-                p1=p2+1;
-        
-                // cal2y        
-                cal2y = atoi(p1);
-        
-                ok = true;        
-        
-            } while (0);
-      
-            if (!ok)
-                log_debug(_("WARNING: Error parsing calibration data!"));
-      
-            log_debug(_("Using touchscreen calibration data: %.0f / %.0f / %.0f / %.0f"),
-                      cal1x, cal1y, cal2x, cal2y);
-        } else {
-            log_debug(_("WARNING: No touchscreen calibration settings found. "
-                        "The mouse pointer most probably won't work precisely. Set "
-                        "TSCALIB environment variable with correct values for better results"));
-        }
-    
-    } //!initialized
-
-    // real duty: 
-    *cx = (rawx-cal1x) / (cal2x-cal1x) * (ref2x-ref1x) + ref1x;
-    *cy = (rawy-cal1y) / (cal2y-cal1y) * (ref2y-ref1y) + ref1y;
-}
-
-bool
-FBGui::init_keyboard() 
-{
-    std::string dev;
-
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    return false;
-#else
-    char* devname = std::getenv("KEYBOARD_DEVICE");
-    if (devname) {
-        dev = devname;
-    } else {
-        dev = "/dev/input/event0";
-    }
-
-    // Try to open keyboard device, be error tolerant (FD is kept open all the time)
-    keyb_fd = open(dev.c_str(), O_RDONLY);
-  
-    if (keyb_fd < 0) {
-        // 
-        if (keyb_fd == EACCES) {
-            keyfb_fb = -1;
-        } else {
-            log_debug(_("Could not open %s: %s"), dev.c_str(), strerror(errno));
-        }
-        return false;
-    }
-  
-    log_debug(_("Keyboard device %s open"), dev.c_str());
-  
-    if (fcntl(keyb_fd, F_SETFL, fcntl(keyb_fd, F_GETFL) | O_NONBLOCK)<0) {
-        log_error(_("Could not set non-blocking mode for keyboard device: %s"), strerror(errno));
-        close(keyb_fd);
-        keyb_fd = -1;
-        return false; 
-    }
-#endif  // end of NABLE_FAKE_FRAMEBUFFER
-    
-    return true;
-}
-
-#ifdef USE_INPUT_EVENTS
-gnash::key::code
-FBGui::scancode_to_gnash_key(int code, bool shift)
-{ 
-    // NOTE: Scancodes are mostly keyboard oriented (ie. Q, W, E, R, T, ...)
-    // while Gnash codes are mostly ASCII-oriented (A, B, C, D, ...) so no
-    // direct conversion is possible.
-    
-    // TODO: This is a very *incomplete* list and I also dislike this method
-    // very much because it depends on the keyboard layout (ie. pressing "Z"
-    // on a german keyboard will print "Y" instead). So we need some 
-    // alternative...
-    
-    switch (code) {
-      case KEY_1      : return !shift ? gnash::key::_1 : gnash::key::EXCLAM;
-      case KEY_2      : return !shift ? gnash::key::_2 : gnash::key::DOUBLE_QUOTE; 
-      case KEY_3      : return !shift ? gnash::key::_3 : gnash::key::HASH; 
-      case KEY_4      : return !shift ? gnash::key::_4 : gnash::key::DOLLAR; 
-      case KEY_5      : return !shift ? gnash::key::_5 : gnash::key::PERCENT; 
-      case KEY_6      : return !shift ? gnash::key::_6 : gnash::key::AMPERSAND; 
-      case KEY_7      : return !shift ? gnash::key::_7 : gnash::key::SINGLE_QUOTE; 
-      case KEY_8      : return !shift ? gnash::key::_8 : gnash::key::PAREN_LEFT; 
-      case KEY_9      : return !shift ? gnash::key::_9 : gnash::key::PAREN_RIGHT; 
-      case KEY_0      : return !shift ? gnash::key::_0 : gnash::key::ASTERISK;
-                            
-      case KEY_A      : return shift ? gnash::key::A : gnash::key::a;
-      case KEY_B      : return shift ? gnash::key::B : gnash::key::b;
-      case KEY_C      : return shift ? gnash::key::C : gnash::key::c;
-      case KEY_D      : return shift ? gnash::key::D : gnash::key::d;
-      case KEY_E      : return shift ? gnash::key::E : gnash::key::e;
-      case KEY_F      : return shift ? gnash::key::F : gnash::key::f;
-      case KEY_G      : return shift ? gnash::key::G : gnash::key::g;
-      case KEY_H      : return shift ? gnash::key::H : gnash::key::h;
-      case KEY_I      : return shift ? gnash::key::I : gnash::key::i;
-      case KEY_J      : return shift ? gnash::key::J : gnash::key::j;
-      case KEY_K      : return shift ? gnash::key::K : gnash::key::k;
-      case KEY_L      : return shift ? gnash::key::L : gnash::key::l;
-      case KEY_M      : return shift ? gnash::key::M : gnash::key::m;
-      case KEY_N      : return shift ? gnash::key::N : gnash::key::n;
-      case KEY_O      : return shift ? gnash::key::O : gnash::key::o;
-      case KEY_P      : return shift ? gnash::key::P : gnash::key::p;
-      case KEY_Q      : return shift ? gnash::key::Q : gnash::key::q;
-      case KEY_R      : return shift ? gnash::key::R : gnash::key::r;
-      case KEY_S      : return shift ? gnash::key::S : gnash::key::s;
-      case KEY_T      : return shift ? gnash::key::T : gnash::key::t;
-      case KEY_U      : return shift ? gnash::key::U : gnash::key::u;
-      case KEY_V      : return shift ? gnash::key::V : gnash::key::v;
-      case KEY_W      : return shift ? gnash::key::W : gnash::key::w;
-      case KEY_X      : return shift ? gnash::key::X : gnash::key::x;
-      case KEY_Y      : return shift ? gnash::key::Y : gnash::key::y;
-      case KEY_Z      : return shift ? gnash::key::Z : gnash::key::z;
-
-      case KEY_F1     : return gnash::key::F1; 
-      case KEY_F2     : return gnash::key::F2; 
-      case KEY_F3     : return gnash::key::F3; 
-      case KEY_F4     : return gnash::key::F4; 
-      case KEY_F5     : return gnash::key::F5; 
-      case KEY_F6     : return gnash::key::F6; 
-      case KEY_F7     : return gnash::key::F7; 
-      case KEY_F8     : return gnash::key::F8; 
-      case KEY_F9     : return gnash::key::F9;
-      case KEY_F10    : return gnash::key::F10;
-      case KEY_F11    : return gnash::key::F11;
-      case KEY_F12    : return gnash::key::F12;
-    
-      case KEY_KP0    : return gnash::key::KP_0; 
-      case KEY_KP1    : return gnash::key::KP_1; 
-      case KEY_KP2    : return gnash::key::KP_2; 
-      case KEY_KP3    : return gnash::key::KP_3; 
-      case KEY_KP4    : return gnash::key::KP_4; 
-      case KEY_KP5    : return gnash::key::KP_5; 
-      case KEY_KP6    : return gnash::key::KP_6; 
-      case KEY_KP7    : return gnash::key::KP_7; 
-      case KEY_KP8    : return gnash::key::KP_8; 
-      case KEY_KP9    : return gnash::key::KP_9;
-
-      case KEY_KPMINUS       : return gnash::key::KP_SUBTRACT;
-      case KEY_KPPLUS        : return gnash::key::KP_ADD;
-      case KEY_KPDOT         : return gnash::key::KP_DECIMAL;
-      case KEY_KPASTERISK    : return gnash::key::KP_MULTIPLY;
-      case KEY_KPENTER       : return gnash::key::KP_ENTER;
-    
-      case KEY_ESC           : return gnash::key::ESCAPE;
-      case KEY_MINUS         : return gnash::key::MINUS;
-      case KEY_EQUAL         : return gnash::key::EQUALS;
-      case KEY_BACKSPACE     : return gnash::key::BACKSPACE;
-      case KEY_TAB           : return gnash::key::TAB;
-      case KEY_LEFTBRACE     : return gnash::key::LEFT_BRACE;
-      case KEY_RIGHTBRACE    : return gnash::key::RIGHT_BRACE;
-      case KEY_ENTER         : return gnash::key::ENTER;
-      case KEY_LEFTCTRL      : return gnash::key::CONTROL;
-      case KEY_SEMICOLON     : return gnash::key::SEMICOLON;
-          //case KEY_APOSTROPHE    : return gnash::key::APOSTROPHE;  
-          //case KEY_GRAVE         : return gnash::key::GRAVE;
-      case KEY_LEFTSHIFT     : return gnash::key::SHIFT;
-      case KEY_BACKSLASH     : return gnash::key::BACKSLASH;
-      case KEY_COMMA         : return gnash::key::COMMA;
-      case KEY_SLASH         : return gnash::key::SLASH;
-      case KEY_RIGHTSHIFT    : return gnash::key::SHIFT;
-      case KEY_LEFTALT       : return gnash::key::ALT;
-      case KEY_SPACE         : return gnash::key::SPACE;
-      case KEY_CAPSLOCK      : return gnash::key::CAPSLOCK;
-      case KEY_NUMLOCK       : return gnash::key::NUM_LOCK;
-          //case KEY_SCROLLLOCK    : return gnash::key::SCROLLLOCK;
-    
-      case KEY_UP            : return gnash::key::UP;
-      case KEY_DOWN          : return gnash::key::DOWN;
-      case KEY_LEFT          : return gnash::key::LEFT;
-      case KEY_RIGHT         : return gnash::key::RIGHT;
-      case KEY_PAGEUP        : return gnash::key::PGUP;
-      case KEY_PAGEDOWN      : return gnash::key::PGDN;
-      case KEY_INSERT        : return gnash::key::INSERT;
-      case KEY_DELETE        : return gnash::key::DELETEKEY;
-      case KEY_HOME          : return gnash::key::HOME;
-      case KEY_END           : return gnash::key::END;
-    
-    }
-  
-    return gnash::key::INVALID;  
-}
-#endif  // end of USE_INPUT_EVENTS
-
-bool
-FBGui::check_keyboard()
-{
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    return false;
-#else    
-    bool activity = false;
-  
-    if (keyb_fd < 0) {
-        return false;           // no keyboard
-    }
-
-    struct input_event ev;  // time,type,code,value
-  
-    while (read(keyb_fd, &ev, sizeof ev) == (sizeof ev)) {  
-        if (ev.type == EV_KEY) {
-    
-            // code == scan code of the key (KEY_xxxx defines in input.h)
-      
-            // value == 0  key has been released
-            // value == 1  key has been pressed
-            // value == 2  repeated key reporting (while holding the key) 
-
-            if (ev.code==KEY_LEFTSHIFT) {
-                keyb_lshift = ev.value;
-            } else if (ev.code==KEY_RIGHTSHIFT) {
-                keyb_rshift = ev.value;
-            } else if (ev.code==KEY_LEFTCTRL) {
-                keyb_lctrl = ev.value;
-            } else if (ev.code==KEY_RIGHTCTRL) {
-                keyb_rctrl = ev.value;
-            } else if (ev.code==KEY_LEFTALT) {
-                keyb_lalt = ev.value;
-            } else if (ev.code==KEY_RIGHTALT) {
-                keyb_ralt = ev.value;
-            } else {
-                gnash::key::code  c = scancode_to_gnash_key(ev.code, 
-                                                    keyb_lshift || keyb_rshift);
-                // build modifier
-                int modifier = gnash::key::GNASH_MOD_NONE;
-                
-                if (keyb_lshift || keyb_rshift) {
-                    modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
-                }
-                
-                if (keyb_lctrl || keyb_rctrl) {
-                    modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
-                }
-                
-                if (keyb_lalt || keyb_ralt) {
-                    modifier = modifier | gnash::key::GNASH_MOD_ALT;
-                }
-                
-                // send event
-                if (c != gnash::key::INVALID) {
-                    Gui::notify_key_event(c, modifier, ev.value);
-                    activity=true;
-                }
-                
-            } //if normal key
-
-        } //if EV_KEY      
-  
-    } //while
-  
-    return activity;
-#endif  // ENABLE_FAKE_FRAMEBUFFER
-}
-
-#ifdef USE_TSLIB
-bool
-FBGui::init_tslib()
-{
-    char *devname = getenv(TSLIB_DEVICE_ENV);
-    if (!devname) {
-        devname = const_cast<char *>(TSLIB_DEVICE_NAME);
-    }
-    
-    tsDev = ts_open(devname, 1);  //Open tslib non-blocking
-    if (tsDev == 0) {
-        log_debug("Could not open touchscreen %s: %s", devname, strerror(errno));
-        return false;
-    }
-    
-    ts_config(tsDev); 
-    if (ts_fd(tsDev) < 0) {
-        log_debug("Could not get touchscreen fd %s: %s", devname, strerror(errno));
-        return false;
-    }
-    
-    log_debug("Using TSLIB on %s", devname);
-    return true;
-}
-
-void
-FBGui::check_tslib()
-{
-    //Read events from the touchscreen and transport them into Gnash
-    //Tslib should be setup so the output is pretty clean.
-    struct ts_sample event;
-    int                    n;
-    unsigned long   flags;
-    unsigned long   buttons;
-    
-    if (tsDev == 0) {
-        return;           //No tslib device initialized, exit!
-    }
-    
-    n = ts_read(tsDev, &event, 1);     //read one event
-
-    //Did we read an event?
-    if (n == 1) {
-#if 0
-        if (event.pressure > 0) {
-            //the screen is touched
-            if (event.x > m_stage_width ) {
-                event.x = m_stage_width;
-            }
-            if (event.y > m_stage_height) {
-                event.y = m_stage_height;
-            }
-            notify_mouse_moved(int(event.x / getXScale()), int(event.y / getYScale()));
-            notify_mouse_clicked(true, 1);  //fire mouse click event into Gnash
-            log_debug("Touched x: %d y: %d width: %d height: %d",event.x , event.y, m_stage_width, m_stage_height); //debug
-        } else {
-            notify_mouse_clicked(false, 1);  //button released
-            log_debug("lifted x: %d y: %d",event.x , event.y); //debug
-        }
-#endif
-    }
-}
-#endif         //end USE_TSLIB
 
 // end of namespace gnash
 }

@@ -20,54 +20,150 @@
 #include "gnashconfig.h"
 #endif
 
-#include <sys/types.h>
-#include <fcntl.h>
-
 #include "log.h"
 #include "InputDevice.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <linux/input.h>
+#include <linux/kd.h>
+
 namespace gnash {
 
-static const char *MOUSE_DEVICE = "/dev/usb/tkpanel0";
+static const char *INPUT_DEVICE = "/dev/input/event0";
+
+EventDevice::EventDevice()
+{
+    // GNASH_REPORT_FUNCTION;
+}
+
+EventDevice::EventDevice(Gui *gui)
+{
+    // GNASH_REPORT_FUNCTION;
+
+    _gui = gui;
+}
 
 bool
-EventDevice::init(const std::string &filespec, size_t size)
+EventDevice::init()
+{
+    GNASH_REPORT_FUNCTION;
+
+    return init(INPUT_DEVICE, DEFAULT_BUFFER_SIZE);
+}
+
+bool
+EventDevice::init(const std::string &filespec, size_t /* size */)
 {
     GNASH_REPORT_FUNCTION;
     
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    return false;
-#endif
+    _filespec = filespec;
     
-    _type = TouchDevice::KEYBOARD;
-    
-    std::string dev;
-
-    char* devname = std::getenv("POINTING_DEVICE");
-    if (devname) {
-        dev = devname;
-    } else {
-        dev = "/dev/input/event0";
-    }
-
     // Try to open mouse device, be error tolerant (FD is kept open all the time)
-    _fd = open(dev.c_str(), O_RDONLY);
+    _fd = open(filespec.c_str(), O_RDONLY);
   
     if (_fd < 0) {
-        log_debug(_("Could not open %s: %s"), dev.c_str(), strerror(errno));    
+        log_debug(_("Could not open %s: %s"), filespec.c_str(), strerror(errno));    
         return false;
     }
   
-    log_debug(_("Pointing device %s open"), dev.c_str());
-  
-    if (fcntl(_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK) < 0) {
+    if (fcntl(_fd, F_SETFL, fcntl(_fd, F_GETFL) | O_NONBLOCK) < 0) {
         log_error(_("Could not set non-blocking mode for pointing device: %s"),
                   strerror(errno));
         close(_fd);
         _fd = -1;
         return false; 
     }
-  
+
+    // Get the version number of the input event subsystem
+    int version;
+    if (ioctl(_fd, EVIOCGVERSION, &version)) {
+        perror("evdev ioctl");
+    }
+    log_debug("evdev driver version is %d.%d.%d",
+              version >> 16, (version >> 8) & 0xff,
+              version & 0xff);
+    
+    if(ioctl(_fd, EVIOCGID, &_device_info)) {
+        perror("evdev ioctl");
+    }
+    
+    char name[256]= "Unknown";
+    if(ioctl(_fd, EVIOCGNAME(sizeof(name)), name) < 0) {
+        perror("evdev ioctl");
+    }
+    log_debug("The device on %s says its name is %s", filespec, name);
+    
+    log_debug("vendor %04hx product %04hx version %04hx",
+              _device_info.vendor, _device_info.product,
+              _device_info.version);
+    switch (_device_info.bustype) {
+      case BUS_PCI:
+          log_unimpl("is a PCI bus type");
+          break;
+      case BUS_ISAPNP:
+          log_unimpl("is a PNP bus type");
+          break;          
+      case BUS_USB:
+          log_unimpl("is on a Universal Serial Bus");
+          // FIXME: this needs to separate out the various types of
+          // USB devices.
+          // vendor 046d product c001 version 0100
+          _type = InputDevice::PS2_MOUSE;
+          break;
+      case BUS_HIL:
+          log_unimpl("is a HIL bus type");
+          break;
+      case BUS_BLUETOOTH:
+          log_unimpl("is Bluetooth bus type ");
+          break;
+      case BUS_VIRTUAL:
+          log_unimpl("is a Virtual bus type ");
+          break;
+      case BUS_ISA:
+          log_unimpl("is an ISA bus type");
+          break;
+      case BUS_I8042:
+          // This is for keyboards and mice with a PS/2 round connector
+          log_debug("is an I8042 bus type");
+          _type = InputDevice::KEYBOARD;
+          break;
+      case BUS_XTKBD:
+          log_unimpl("is an XTKBD bus type");
+          break;
+      case BUS_RS232:
+          log_unimpl("is a serial port bus type");
+          break;
+      case BUS_GAMEPORT:
+          log_unimpl("is a gameport bus type");
+          break;
+      case BUS_PARPORT:
+          log_unimpl("is a parallel port bus type");
+          break;
+      case BUS_AMIGA:
+          log_unimpl("is an Amiga bus type");
+          break;
+      case BUS_ADB:
+          log_unimpl("is an AOB bus type");
+          break;
+      case BUS_I2C:
+          log_unimpl("is an i2C bus type ");
+          break;
+      case BUS_HOST:
+          log_debug("is Host bus type");
+          _type = InputDevice::POWERBUTTON;
+          break;
+      case BUS_GSC:
+          log_unimpl("is a GSC bus type");
+          break;
+      case BUS_ATARI:
+          log_unimpl("is an Atari bus type");
+          break;
+      default:
+          log_error("Unknown bus type %d!", _device_info.bustype);
+    }
+    
     return true;
 }
 
@@ -75,6 +171,7 @@ bool
 EventDevice::check()
 {
     GNASH_REPORT_FUNCTION;
+
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     return false;
 #endif
@@ -86,58 +183,79 @@ EventDevice::check()
     }
 
     struct input_event ev;  // time,type,code,value
-  
-    while (read(_fd, &ev, sizeof ev) == (sizeof ev)) {  
-        if (ev.type == EV_KEY) {
     
-            // code == scan code of the key (KEY_xxxx defines in input.h)
-      
-            // value == 0  key has been released
-            // value == 1  key has been pressed
-            // value == 2  repeated key reporting (while holding the key) 
-
-            if (ev.code==KEY_LEFTSHIFT) {
-                keyb_lshift = ev.value;
-            } else if (ev.code==KEY_RIGHTSHIFT) {
-                keyb_rshift = ev.value;
-            } else if (ev.code==KEY_LEFTCTRL) {
-                keyb_lctrl = ev.value;
-            } else if (ev.code==KEY_RIGHTCTRL) {
-                keyb_rctrl = ev.value;
-            } else if (ev.code==KEY_LEFTALT) {
-                keyb_lalt = ev.value;
-            } else if (ev.code==KEY_RIGHTALT) {
-                keyb_ralt = ev.value;
-            } else {
-                gnash::key::code  c = scancode_to_gnash_key(ev.code, 
-                                                    keyb_lshift || keyb_rshift);
-                // build modifier
-                int modifier = gnash::key::GNASH_MOD_NONE;
-                
-                if (keyb_lshift || keyb_rshift) {
-                    modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
-                }
-                
-                if (keyb_lctrl || keyb_rctrl) {
-                    modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
-                }
-                
-                if (keyb_lalt || keyb_ralt) {
-                    modifier = modifier | gnash::key::GNASH_MOD_ALT;
-                }
-                
-                // send event
-                if (c != gnash::key::INVALID) {
-                    Gui::notify_key_event(c, modifier, ev.value);
-                    activity=true;
-                }
-                
-            } // if normal key
-
-        } // if EV_KEY      
-  
+    while (read(_fd, &ev, sizeof ev) == (sizeof ev)) {  
+        switch (ev.type) {
+            // Keyboard
+          case EV_KEY:
+          {
+              // code == scan code of the key (KEY_xxxx defines in input.h)
+              
+              // value == 0  key has been released
+              // value == 1  key has been pressed
+              // value == 2  repeated key reporting (while holding the key) 
+              
+              if (ev.code == KEY_LEFTSHIFT) {
+                  keyb_lshift = ev.value;
+              } else if (ev.code == KEY_RIGHTSHIFT) {
+                  keyb_rshift = ev.value;
+              } else if (ev.code == KEY_LEFTCTRL) {
+                  keyb_lctrl = ev.value;
+              } else if (ev.code == KEY_RIGHTCTRL) {
+                  keyb_rctrl = ev.value;
+              } else if (ev.code == KEY_LEFTALT) {
+                  keyb_lalt = ev.value;
+              } else if (ev.code == KEY_RIGHTALT) {
+                  keyb_ralt = ev.value;
+              } else {
+                  gnash::key::code  c = scancode_to_gnash_key(ev.code, 
+                                                              keyb_lshift || keyb_rshift);
+                  // build modifier
+                  int modifier = gnash::key::GNASH_MOD_NONE;
+                  
+                  if (keyb_lshift || keyb_rshift) {
+                      modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
+                  }
+                  
+                  if (keyb_lctrl || keyb_rctrl) {
+                      modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
+                  }
+                  
+                  if (keyb_lalt || keyb_ralt) {
+                      modifier = modifier | gnash::key::GNASH_MOD_ALT;
+                    }
+                  
+                  // send event
+                  if (c != gnash::key::INVALID) {
+                      _gui->notify_key_event(c, modifier, ev.value);
+                      activity=true;
+                  }
+              } // if normal key
+          } // case EV_KEY
+              // Mouse
+          case EV_REL:
+              log_unimpl("Relative move event from Input Event Device");
+              // Touchscreen or joystick
+          case EV_ABS:
+              log_unimpl("Absolute move event from Input Event Device");
+          case EV_MSC:
+              log_unimpl("Misc event from Input Event Device");
+          case EV_LED:
+              log_unimpl("LED event from Input Event Device");
+          case EV_SND:
+              log_unimpl("Sound event from Input Event Device");
+          case EV_REP:
+              log_unimpl("Key autorepeat event from Input Event Device");
+          case EV_FF:
+              log_unimpl("Force Feedback event from Input Event Device");
+          case EV_FF_STATUS:  
+              log_unimpl("Force Feedback status event from Input Event Device");
+          case EV_PWR:
+              log_unimpl("Power event from Input Event Device");
+             break;
+        }
     } // while
-  
+    
     return activity;
 }
 
@@ -259,6 +377,76 @@ EventDevice::scancode_to_gnash_key(int code, bool shift)
     }
   
     return gnash::key::INVALID;  
+}
+
+// This looks in the input event devices for all the ones that match
+// the specified type.
+std::vector<boost::shared_ptr<InputDevice> > 
+EventDevice::scanForDevices(Gui *gui)
+{
+    // GNASH_REPORT_FUNCTION;
+
+    struct stat st;
+
+    int total = 0;
+    std::vector<boost::shared_ptr<InputDevice> > devices;
+    
+    // The default path for input event devices.
+    char *filespec = strdup("/dev/input/eventX");
+    int len = strlen(filespec) - 1;
+
+    // Walk through all the input event devices for the ones that
+    // match the type we want. There can be multiple devices of the same
+    // type, so we return the ID of the event devices.
+    filespec[len] = '0';
+    int fd = 0;
+    while (fd >= 0) {
+        // First see if the file exists
+        if (stat(filespec, &st) == 0) {
+            // Then see if we can open it
+            if ((fd = open(filespec, O_RDWR)) < 0) {
+                log_error("You don't have the proper permissions to open %s", filespec);
+                // Try the next input event device file
+                total++;
+                filespec[len] = '0' + total;
+                fd = 0;
+                continue;
+            }
+        } else {
+            // No more device files to try, so we're done scanning
+            break;
+        }
+
+        char name[256]= "Unknown";
+        if(ioctl(fd, EVIOCGNAME(sizeof(name)), name) < 0) {
+            perror("evdev ioctl");
+        }
+        log_debug("The device on %s says its name is %s", filespec, name);
+
+        struct input_id device_info;
+        if(ioctl(fd, EVIOCGID, &device_info)) {
+            perror("evdev ioctl");
+        }
+        log_debug("vendor %04hx product %04hx version %04hx",
+                  device_info.vendor, device_info.product,
+                  device_info.version);
+        close(fd);
+        boost::shared_ptr<InputDevice> dev;
+        dev = boost::shared_ptr<InputDevice>(new EventDevice(gui));
+        if (dev->init(filespec, DEFAULT_BUFFER_SIZE)) {
+            devices.push_back(dev);
+        }
+
+        dev->dump();
+        
+        // setup the next device filespec to try
+        total++;
+        filespec[len] = '0' + total;
+    }
+    
+    free (filespec);
+    
+    return devices;
 }
 
 // end of namespace
