@@ -29,6 +29,12 @@
 const char* mediadir=".";
 
 
+/// The test shows the following:
+//
+/// The MovieClip itself is drawn with no transformation, i.e. identity matrix.
+/// Any contained MovieClips keep their transformation.
+/// BitmapData.draw draws on top of what's in the BitmapData already.
+/// Dynamically loaded images are not drawn.
 int
 main(int argc, char** argv)
 {
@@ -253,6 +259,26 @@ main(int argc, char** argv)
     it = SWFMovie_add(mo, (SWFBlock)mc4);
     SWFDisplayItem_setName(it, "mc4");
 
+    // Draw on top of the old Bitmap!
+    add_actions(mo, "b.draw(mc4);");
+    
+    check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
+    check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
+    // Cyan square top left corner
+    // Note: The following pixels shouldn't suffer from antialiasing,
+    // but not sure how accurate Gnash will be.
+    xcheck_equals(mo, "b.getPixel(27, 30)", "0x000010");
+    // Cyan square bottom left
+    xcheck_equals(mo, "b.getPixel(18, 68)", "0x00ffff");
+    // Cyan square top right 
+    xcheck_equals(mo, "b.getPixel(65, 36)", "0xfffffd");
+    // Magenta square top left
+    xcheck_equals(mo, "b.getPixel(62, 71)", "0x1000f");
+    xcheck_equals(mo, "b.getPixel(50, 71)", "0x00ffff");
+    // Magenta square bottom right
+    check_equals(mo, "b.getPixel(74, 94)", "0xffffff");
+    xcheck_equals(mo, "b.getPixel(70, 94)", "0xff00ff");
+    
     add_actions(mo, "stop();");
 
     // Output movie
