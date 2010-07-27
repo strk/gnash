@@ -61,13 +61,6 @@ public:
     /// Attach the GUI to this device for propogating events.
     void attachGUI(Gui *gui) { _gui.reset(gui); };
 
-    // // accessors
-    // devicetype_e getType()      { return _type; };
-    // std::string getFilespec()   { return _filespec; };
-    //  int getFileDescriptor()     { return _fd; };
-    // int getX()                  { return _x; };
-    // int getY()                  { return _y; };
-    // int getButton()             { return _button; };
 protected:
     devicetype_e        _type;
     std::string         _filespec;
