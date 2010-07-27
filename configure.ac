@@ -573,6 +573,7 @@ dnl attached.
 dnl By default, don't build any of these, as they are only for the Framebuffer
 dnl running without X11.
 build_ps2mouse=no
+build_ettmouse=no
 build_ps2keyboard=no
 build_input_event=no
 build_tslib=no
@@ -590,12 +591,17 @@ AC_ARG_ENABLE(input,
         input_events="${input_events}, PS/2 Mouse"
         AC_DEFINE(USE_MOUSE_PS2, [1], [Add support for a directly using a PS/2 Mouse])
         ;;
+      et*|ET*)                  dnl an eTurboTouch touchscreen style mouse
+        build_ettmouse=yes
+        input_events="${input_events}, eTurboTouch Mouse/Touchscreen"
+        AC_DEFINE(USE_MOUSE_ETT, [1], [Add support for a directly using a an eTurboTouch touchscreen])
+        ;;
       ps2k*|PS2K*|k*|K*)        dnl a PS/2 style keyboard
         build_ps2keyboard=yes
         input_events="${input_events}, PS/2 Keyboard"
         AC_DEFINE(USE_KEYBOARD_PS2, [1], [Add support for directly using a PS/2 Keyboard])
         ;;
-      e*|E*|i*|I*)    dnl use the new Input Event, which supports both
+      i*|I*|ev*|Ev*)    dnl use the new Input Event, which supports both
         input_events="${input_events}, Input Event Device"
         build_input_event=yes
         AC_DEFINE(USE_INPUT_EVENT, [1], [Add support for using the new Input Event devices])
@@ -614,14 +620,6 @@ AC_ARG_ENABLE(input,
     fi
   done],
 )
-
-dnl Sanity check the configuration of input devices.
-if test x"${build_input_event}" = xyes -a x"${build_ps2mouse}" = xyes; then
-  AC_MSG_WARN([You can't use a PS/2 mouse at the same time as input events!])
-fi
-if test x"${build_input_event}" = xyes -a x"${build_ps2keyboard}" = xyes; then
-  AC_MSG_WARN([You can't use a PS/2 keyboard at the same time as input events!])
-fi
 
 AM_CONDITIONAL(ENABLE_TSLIB, [test x"$tslib" != x])
 AM_CONDITIONAL(USE_INPUT_EVENTS, [test x"${build_input_event}" = xyes])
