@@ -564,24 +564,68 @@ dnl same swf file over and over, and don't need the same level of functionality 
 dnl a browser plugin does.
 GNASH_PKG_CLASSFILE
 
-dnl Add support for a touchscreen. Note that this replaces the existing input
-dnl device for events. This currently only works with the framebuffer GUI.
-AC_ARG_WITH(tslib,
-  AC_HELP_STRING([--with-tslib], [specify touchcreen device for the framebuffer display (ett or tslib)]),
-  [ case "${withval}" in
-      e*) tslib="eTurboTouch / eGalax touchscreen"
-        AC_DEFINE(USE_ETT_TSLIB, [1], [Using eTurboTouch touchscreen])
+dnl Multiple input devices are supported. These can all work in varying combinations,
+dnl so several may be listed. These are only required when using the Framebuffer,
+dnl as without the X11 desktop, Gnash has to handle all these internally. This can get
+dnl messy, as one might want to use a touchscreen with a normal mouse or keyboard
+dnl attached. 
+
+dnl By default, don't build any of these, as they are only for the Framebuffer
+dnl running without X11.
+build_ps2mouse=no
+build_ps2keyboard=no
+build_input_event=no
+build_tslib=no
+input_events=
+AC_ARG_ENABLE(input,
+  AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
+  [if test -n ${enableval}; then
+    enableval=`echo ${enableval} | tr '\054' ' ' `
+  fi
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
+    case "${val}" in
+      ps2m*|PS2m*|m*|M*)        dnl a PS/2 style mouse
+        build_ps2mouse=yes
+        input_events="${input_events}, PS/2 Mouse"
+        AC_DEFINE(USE_MOUSE_PS2, [1], [Add support for a directly using a PS/2 Mouse])
         ;;
-      t*) tslib="tslib touchscreen" ;; 
-      yes) tslib="tslib touchscreen" ;;
-      *)  AC_MSG_ERROR([bad value ${withval} for with-tslib option (tslib or ett)])
+      ps2k*|PS2K*|k*|K*)        dnl a PS/2 style keyboard
+        build_ps2keyboard=yes
+        input_events="${input_events}, PS/2 Keyboard"
+        AC_DEFINE(USE_KEYBOARD_PS2, [1], [Add support for directly using a PS/2 Keyboard])
         ;;
-       esac
-   ], tslib=
+      e*|E*|i*|I*)    dnl use the new Input Event, which supports both
+        input_events="${input_events}, Input Event Device"
+        build_input_event=yes
+        AC_DEFINE(USE_INPUT_EVENT, [1], [Add support for using the new Input Event devices])
+        ;;
+      t*|T*) dnl use a touchscreen with tslib, which works like a mouse
+        build_tslib=yes
+        input_events="${input_events}, Touchscreen"
+        AC_DEFINE(USE_TSLIB, [1], [Use a tslib supported touchscreen])
+        ;;
+      *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
+         ;;
+      esac
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$enableval"; then
+      break;
+    fi
+  done],
 )
+
+dnl Sanity check the configuration of input devices.
+if test x"${build_input_event}" = xyes -a x"${build_ps2mouse}" = xyes; then
+  AC_MSG_WARN([You can't use a PS/2 mouse at the same time as input events!])
+fi
+if test x"${build_input_event}" = xyes -a x"${build_ps2keyboard}" = xyes; then
+  AC_MSG_WARN([You can't use a PS/2 keyboard at the same time as input events!])
+fi
+
 AM_CONDITIONAL(ENABLE_TSLIB, [test x"$tslib" != x])
-if test x"${tslib}" != x; then
-  AC_DEFINE(USE_TSLIB, [1], [Using tslib supported touchscreen])
+AM_CONDITIONAL(USE_INPUT_EVENTS, [test x"${build_input_event}" = xyes])
+if test x"${build_tslib}" = xyes; then
   GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
 fi
 
@@ -635,29 +679,6 @@ AC_SUBST(FAKEFB)
 if test x"${fakefb}" != x; then
     AC_DEFINE(ENABLE_FAKE_FRAMEBUFFER, [1], [Enable using a file instead of a real framebuffer])
 fi
-
-dnl Specify a mouse type, currently only a PS/2 style (standard nouse) is
-dnl supported.
-dnl Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
-dnl emulated by the Kernel) 
-AC_ARG_ENABLE(mouse,
-  AC_HELP_STRING([--enable-mouse], [specify mouse for framebuffer display (default ps2]),
-  [case "${enableval}" in
-    p*) mouse="PS/2 mouse" ;;
-    no) mouse= ;;
-    yes) mouse="PS/2 mouse" ;;
-    *)  AC_MSG_ERROR([bad value ${enableval} for enable-mouse option (ps2)]) ;;
-  esac], mouse=
-)
-if test x"${mouse}" != x; then
-  AC_DEFINE(USE_MOUSE_PS2, [1], [Using a standard PS/2 mouse with the framebuffer])
-fi
-
-dnl Define this to read from /dev/input/event0 (new generic input subsystem)
-if test x"${mouse}" != x -o x"${tslib}" != x; then
-  AC_DEFINE(USE_INPUT_EVENTS, [1], [Whether to use input events, mouse, keyboard, or touchscreen])
-fi
-AM_CONDITIONAL(USE_INPUT_EVENTS, [test x"${mouse}" != x -o x"${tslib}" != x])
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
 
@@ -3926,20 +3947,25 @@ else
   echo "        DocBook document processing disabled (default)"
 fi
 
-if test x"${tslib}" != x; then
-  echo "        Using ${tslib} as the touchscreen type"
-fi
-if test x"${mouse}" != x; then
-  echo "        Using ${mouse} as the mouse type"
-fi
-if test x"${fakefb}" != x; then
-  echo "        Using shared memory as a fake framebuffer"
-fi
-if test x"${offscreen}" = xyes; then
-  echo "        Using offscreen rendering"
-fi
-if test x"${doublebuf}" = xyes; then
-  echo "        Using double buffering when rendering"
+dnl The Framebuffer GUI has several other settings. As it doesn't have X11,
+dnl we have to handle input devices ourselves.
+if test x"${build_fb}" = xyes; then
+echo "        Using ${input_events} for Input"
+  if test x"${tslib}" != x; then
+    echo "        Using ${tslib} as the touchscreen type"
+  fi
+  if test x"${mouse}" != x; then
+    echo "        Using ${mouse} as the mouse type"
+  fi
+  if test x"${fakefb}" != x; then
+    echo "        Using shared memory as a fake framebuffer"
+  fi
+  if test x"${offscreen}" = xyes; then
+    echo "        Using offscreen rendering"
+  fi
+  if test x"${doublebuf}" = xyes; then
+    echo "        Using double buffering when rendering"
+  fi
 fi
 
 if test -s $cwarn; then
