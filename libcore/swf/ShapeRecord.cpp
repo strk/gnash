@@ -161,6 +161,16 @@ ShapeRecord::ShapeRecord(const ShapeRecord& other)
     _bounds(other._bounds)
 {
 }
+    
+ShapeRecord&
+ShapeRecord::operator=(const ShapeRecord& other)
+{
+    _fillStyles = other._fillStyles;
+    _lineStyles = other._lineStyles;
+    _paths = other._paths;
+    _bounds = other._bounds;
+    return *this;
+}
 
 void
 ShapeRecord::clear()

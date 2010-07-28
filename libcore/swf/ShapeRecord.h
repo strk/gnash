@@ -58,6 +58,8 @@ public:
 
     /// Construct a ShapeRecord.
     //
+    /// This should only really be used for DynamicShapes.
+    //
     /// Ideally all immutable ShapeRecords should be constructed with the
     /// ctor taking an SWFStream, but some tag formats do not allow this.
     ShapeRecord();
@@ -68,7 +70,11 @@ public:
     ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m,
             const RunResources& r);
 
+    /// Copy constructor
     ShapeRecord(const ShapeRecord& other);
+    
+    /// Assignment operator
+    ShapeRecord& operator=(const ShapeRecord& other);
 
     ~ShapeRecord();
 
@@ -127,7 +133,7 @@ public:
     }
 
 private:
-    
+
     /// Shape record flags for use in parsing.
     enum ShapeRecordFlags {
         SHAPE_END = 0x00,
