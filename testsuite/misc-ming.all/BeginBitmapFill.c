@@ -32,6 +32,7 @@
 ///    is passed.
 /// 2. It repeats by default.
 /// 3. If repeat is false, the edge colours are used for the fill.
+/// 4. Changes to the BitmapData affect all fills.
 const char* mediadir=".";
 
 int
@@ -167,6 +168,28 @@ main(int argc, char** argv)
             "};"
         );
 
+    // Change the Bitmap afterwards
+    add_actions(mo,
+            "b = new flash.display.BitmapData(20, 20, false);"
+            "b.fillRect(new flash.geom.Rectangle(0, 0, 10, 10), 0x000000);"
+            "b.fillRect(new flash.geom.Rectangle(10, 10, 10, 10), 0xaaff00);"
+            "b.fillRect(new flash.geom.Rectangle(10, 0, 10, 10), 0xaaff00);"
+            "b.fillRect(new flash.geom.Rectangle(0, 10, 10, 10), 0xaaffaa);"
+            "mc = _root.createEmptyMovieClip('mc4', 111);"
+            "with(mc) {"
+            "   x = 10;"
+            "   y = 450;"
+            "   moveTo(x + 0, y + 0);"
+            "   m = new flash.geom.Matrix();"
+            "   m.tx = 0;"
+            "   m.ty = 450;"
+            "   beginBitmapFill(b, m, false);"
+            "   lineTo(x + 0, y + 100);"
+            "   lineTo(x + 150, y + 100);"
+            "   lineTo(x + 150, y + 0);"
+            "};"
+            "b.fillRect(new flash.geom.Rectangle(0, 0, 20, 20), 0xff0000);"
+            );
 
     SWFMovie_nextFrame(mo);
 
