@@ -194,6 +194,7 @@ check_PROGRAMS = \
 	runtime_vm_stack_test \
 	new_child_in_unload_test \
 	instanceNameTest \
+	BeginBitmapFill \
 	BitmapDataTest \
 	BitmapDataTestRunner \
 	BitmapDataDraw \
@@ -1610,6 +1611,19 @@ BitmapDataDraw.swf: BitmapDataDraw
 BitmapDataDrawRunner: $(srcdir)/../generic-testrunner.sh BitmapDataDraw.swf
 	sh $< $(top_builddir) BitmapDataDraw.swf > $@
 	chmod 755 $@
+
+BeginBitmapFill_SOURCES = \
+	BeginBitmapFill.c \
+	$(NULL)
+
+BeginBitmapFill_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+BeginBitmapFill_LDADD = libgnashmingutils.la
+
+BeginBitmapFill.swf: BeginBitmapFill
+	./BeginBitmapFill $(abs_mediadir)
 
 EmbeddedSoundTest_SOURCES = \
 	EmbeddedSoundTest.c \
