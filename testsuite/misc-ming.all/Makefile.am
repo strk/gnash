@@ -195,6 +195,7 @@ check_PROGRAMS = \
 	new_child_in_unload_test \
 	instanceNameTest \
 	BeginBitmapFill \
+	BeginBitmapFillRunner \
 	BitmapDataTest \
 	BitmapDataTestRunner \
 	BitmapDataDraw \
@@ -1625,6 +1626,20 @@ BeginBitmapFill_LDADD = libgnashmingutils.la
 BeginBitmapFill.swf: BeginBitmapFill
 	./BeginBitmapFill $(abs_mediadir)
 
+BeginBitmapFillRunner_SOURCES = \
+	BeginBitmapFillRunner.cpp \
+	$(NULL)
+
+BeginBitmapFillRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+BeginBitmapFillRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+
 EmbeddedSoundTest_SOURCES = \
 	EmbeddedSoundTest.c \
 	$(NULL)
@@ -2198,6 +2213,7 @@ clean-local:
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
+	BeginBitmapFillRunner \
 	BitmapDataTestRunner \
 	BitmapDataDrawRunner \
 	LoadVarsTestRunner \
