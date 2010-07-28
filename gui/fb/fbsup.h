@@ -72,7 +72,7 @@ namespace gnash
 /// touchscreens but will make it difficult for standard mice. This will be 
 /// fixed in near time.
 //
-/// Supported graphics modes:
+// Supported graphics modes:
 ///
 ///   Resolution: any
 ///
@@ -105,14 +105,6 @@ private:
     unsigned m_rowsize;
     
     std::vector<boost::shared_ptr<InputDevice> > _inputs;
-
-#if 0
-    int input_fd; /// file descriptor for /dev/input/mice
-    int keyb_fd; /// file descriptor for /dev/input/event* (keyboard)
-    int mouse_x, mouse_y, mouse_btn;
-    unsigned char mouse_buf[256];
-    int mouse_buf_size;
-#endif    
 
     struct fb_var_screeninfo var_screeninfo;
     struct fb_fix_screeninfo fix_screeninfo;
@@ -159,6 +151,8 @@ public:
     
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     virtual bool want_multiple_regions() { return true; }
+
+    bool checkForData();    
 };
 
 // end of namespace gnash
