@@ -50,7 +50,6 @@
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
 #include "LineStyle.h"
-#include "fill_style.h"
 #include "PlaceObject2Tag.h" 
 #include "flash/geom/Matrix_as.h"
 #include "GnashNumeric.h"
