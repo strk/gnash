@@ -75,7 +75,7 @@ public:
     InputDevice::devicetype_e getType() { return _type; };
 
     // Read data into the Device input buffer.
-    boost::shared_array<boost::uint8_t> readData();
+    boost::shared_array<boost::uint8_t> readData(size_t size);
 
     void dump();
     

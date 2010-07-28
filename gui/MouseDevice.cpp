@@ -222,7 +222,8 @@ MouseDevice::check()
     
     int i;
     int xmove, ymove, btn, btn_changed;
-    boost::shared_array<boost::uint8_t> buf = readData();
+    // PS/2 Mouse packets are always 3 bytes
+    boost::shared_array<boost::uint8_t> buf = readData(3);
     if (!buf) {
         return false;
     }

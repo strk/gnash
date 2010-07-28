@@ -92,7 +92,7 @@ InputDevice::init(InputDevice::devicetype_e type, const std::string &filespec,
 
 // Read data into the Device input buffer.
 boost::shared_array<boost::uint8_t>
-InputDevice::readData()
+InputDevice::readData(size_t size)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -120,18 +120,11 @@ InputDevice::readData()
         return inbuf;
     }
 
-    int bytes = 0;
-    ioctl(_fd, FIONREAD, &bytes);
-    if (bytes) {
-        std::cerr << "FIXME: " << bytes << std::endl;
-    }
-    
-    // PS/2 Mouse packets are always 3 bytes
-    inbuf.reset(new boost::uint8_t[3]);
+    inbuf.reset(new boost::uint8_t[size]);
     // Since we know how bytes are in the input buffer, allocate
     // some memory to read the data.
     // terminate incase we want to treat the data like a string.
-    ret = ::read(_fd, inbuf.get(), 3);
+    ret = ::read(_fd, inbuf.get(), size);
     if (ret) {
         log_debug("Read %d bytes, %s", ret, hexify(inbuf.get(), ret, true));
     }

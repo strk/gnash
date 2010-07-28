@@ -183,83 +183,101 @@ EventDevice::check()
     bool activity = false;
   
     if (_fd < 0) {
-        return false;           // no keyboard
+        return false;           // no device
     }
 
-    struct input_event ev;  // time,type,code,value
+    // Try to read something from the device
+    boost::shared_array<boost::uint8_t> buf = readData(sizeof( struct input_event));
+    // time,type,code,value
+    if (!buf) {
+        return false;
+    }
     
-    while (read(_fd, &ev, sizeof ev) == (sizeof ev)) {  
-        switch (ev.type) {
-            // Keyboard
-          case EV_KEY:
-          {
-              // code == scan code of the key (KEY_xxxx defines in input.h)
-              
-              // value == 0  key has been released
-              // value == 1  key has been pressed
-              // value == 2  repeated key reporting (while holding the key) 
-              
-              if (ev.code == KEY_LEFTSHIFT) {
-                  keyb_lshift = ev.value;
-              } else if (ev.code == KEY_RIGHTSHIFT) {
-                  keyb_rshift = ev.value;
-              } else if (ev.code == KEY_LEFTCTRL) {
-                  keyb_lctrl = ev.value;
-              } else if (ev.code == KEY_RIGHTCTRL) {
-                  keyb_rctrl = ev.value;
-              } else if (ev.code == KEY_LEFTALT) {
-                  keyb_lalt = ev.value;
-              } else if (ev.code == KEY_RIGHTALT) {
-                  keyb_ralt = ev.value;
-              } else {
-                  gnash::key::code  c = scancode_to_gnash_key(ev.code, 
-                                                              keyb_lshift || keyb_rshift);
+    struct input_event *ev = reinterpret_cast<struct input_event *>(buf.get());
+    // log_debug("Type is: %hd, Code is: %hd, Val us: %d", ev->type, ev->code,
+    //           ev->value);
+    switch (ev->type) {
+      case EV_SYN:
+          log_unimpl("Sync event from Input Event Device");
+          break;
+        // Keyboard event
+      case EV_KEY:
+      {
+          // code == scan code of the key (KEY_xxxx defines in input.h)
+          
+          // value == 0  key has been released
+          // value == 1  key has been pressed
+          // value == 2  repeated key reporting (while holding the key) 
+          
+          if (ev->code == KEY_LEFTSHIFT) {
+              keyb_lshift = ev->value;
+          } else if (ev->code == KEY_RIGHTSHIFT) {
+              keyb_rshift = ev->value;
+          } else if (ev->code == KEY_LEFTCTRL) {
+              keyb_lctrl = ev->value;
+          } else if (ev->code == KEY_RIGHTCTRL) {
+              keyb_rctrl = ev->value;
+          } else if (ev->code == KEY_LEFTALT) {
+              keyb_lalt = ev->value;
+          } else if (ev->code == KEY_RIGHTALT) {
+              keyb_ralt = ev->value;
+          } else {
+              gnash::key::code  c = scancode_to_gnash_key(ev->code,
+                                            keyb_lshift || keyb_rshift);
                   // build modifier
-                  int modifier = gnash::key::GNASH_MOD_NONE;
-                  
-                  if (keyb_lshift || keyb_rshift) {
-                      modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
-                  }
-                  
-                  if (keyb_lctrl || keyb_rctrl) {
-                      modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
-                  }
-                  
-                  if (keyb_lalt || keyb_ralt) {
-                      modifier = modifier | gnash::key::GNASH_MOD_ALT;
-                    }
-                  
-                  // send event
-                  if (c != gnash::key::INVALID) {
-                      _gui->notify_key_event(c, modifier, ev.value);
-                      activity=true;
-                  }
-              } // if normal key
-          } // case EV_KEY
-              // Mouse
-          case EV_REL:
-              log_unimpl("Relative move event from Input Event Device");
-              // Touchscreen or joystick
-          case EV_ABS:
-              log_unimpl("Absolute move event from Input Event Device");
-          case EV_MSC:
-              log_unimpl("Misc event from Input Event Device");
-          case EV_LED:
-              log_unimpl("LED event from Input Event Device");
-          case EV_SND:
-              log_unimpl("Sound event from Input Event Device");
-          case EV_REP:
-              log_unimpl("Key autorepeat event from Input Event Device");
-          case EV_FF:
-              log_unimpl("Force Feedback event from Input Event Device");
-          case EV_FF_STATUS:  
-              log_unimpl("Force Feedback status event from Input Event Device");
-          case EV_PWR:
-              log_unimpl("Power event from Input Event Device");
-             break;
-        }
-    } // while
-    
+              int modifier = gnash::key::GNASH_MOD_NONE;
+              
+              if (keyb_lshift || keyb_rshift) {
+                  modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
+              }
+              
+              if (keyb_lctrl || keyb_rctrl) {
+                  modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
+              }
+              
+              if (keyb_lalt || keyb_ralt) {
+                  modifier = modifier | gnash::key::GNASH_MOD_ALT;
+              }
+              
+              // send event
+              if (c != gnash::key::INVALID) {
+                  _gui->notify_key_event(c, modifier, ev->value);
+                  activity = true;
+              }
+          } // if normal key
+          break;
+      } // case EV_KEY
+      // Mouse
+      case EV_REL:
+          log_unimpl("Relative move event from Input Event Device");
+          // Touchscreen or joystick
+          break;
+      case EV_ABS:
+          log_unimpl("Absolute move event from Input Event Device");
+          break;
+      case EV_MSC:
+          log_unimpl("Misc event from Input Event Device");
+          break;
+      case EV_LED:
+          log_unimpl("LED event from Input Event Device");
+          break;
+      case EV_SND:
+          log_unimpl("Sound event from Input Event Device");
+          break;
+      case EV_REP:
+          log_unimpl("Key autorepeat event from Input Event Device");
+          break;
+      case EV_FF:
+          log_unimpl("Force Feedback event from Input Event Device");
+          break;
+      case EV_FF_STATUS:  
+          log_unimpl("Force Feedback status event from Input Event Device");
+          break;
+      case EV_PWR:
+          log_unimpl("Power event from Input Event Device");
+          break;
+    }
+
     return activity;
 }
 
