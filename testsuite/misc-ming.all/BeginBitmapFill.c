@@ -25,6 +25,13 @@
 #define OUTPUT_VERSION 8
 #define OUTPUT_FILENAME "BeginBitmapFill.swf"
 
+
+/// The beginBitmapFill test shows that:
+//
+/// 1. The fill always starts at 0, 0 of the MovieClip unless a matrix argument
+///    is passed.
+/// 2. It repeats by default.
+/// 3. If repeat is false, the edge colours are used for the fill.
 const char* mediadir=".";
 
 int
@@ -101,6 +108,62 @@ main(int argc, char** argv)
             "   lineTo(x + 100, y + 100);"
             "   lineTo(x + 100, y + 0);"
             "   transform.matrix = new flash.geom.Matrix(2, -1.3, 2.4, 1, 20, 200);"
+            "};"
+        );
+    
+    /// Now with matrix argument. Repeat is true by default
+    add_actions(mo,
+            "b = new flash.display.BitmapData(150, 150, false);"
+            "b.fillRect(new flash.geom.Rectangle(10, 10, 10, 130), 0x000000);"
+            "b.fillRect(new flash.geom.Rectangle(25, 10, 10, 130), 0xaaff00);"
+            "b.fillRect(new flash.geom.Rectangle(40, 10, 10, 130), 0x00ccff);"
+            "mc = _root.createEmptyMovieClip('mc3', 77);"
+            "with(mc) {"
+            "   x = 0;"
+            "   y = 300;"
+            "   moveTo(x + 0, y + 0);"
+            "   matrix = new flash.geom.Matrix();"
+            "   matrix.rotate(Math.PI / 2);"
+            "   beginBitmapFill(b, matrix, true);"
+            "   lineTo(x + 0, y + 100);"
+            "   lineTo(x + 200, y + 100);"
+            "   lineTo(x + 200, y + 0);"
+            "};"
+        );
+
+    // Now with repeat set to false
+    add_actions(mo,
+            "b = new flash.display.BitmapData(20, 20, false);"
+            "b.fillRect(new flash.geom.Rectangle(0, 0, 10, 10), 0x000000);"
+            "b.fillRect(new flash.geom.Rectangle(10, 10, 10, 10), 0xaaff00);"
+            "b.fillRect(new flash.geom.Rectangle(10, 0, 10, 10), 0xaaff00);"
+            "b.fillRect(new flash.geom.Rectangle(0, 10, 10, 10), 0xaaffaa);"
+            "mc = _root.createEmptyMovieClip('mc4', 88);"
+            "with(mc) {"
+            "   x = 300;"
+            "   y = 300;"
+            "   moveTo(x + 0, y + 0);"
+            "   m = new flash.geom.Matrix();"
+            "   m.tx = 350;"
+            "   m.ty = 350;"
+            "   beginBitmapFill(b, m, false);"
+            "   lineTo(x + 0, y + 100);"
+            "   lineTo(x + 150, y + 100);"
+            "   lineTo(x + 150, y + 0);"
+            "};"
+            
+            "mc = _root.createEmptyMovieClip('mc5', 99);"
+            "with(mc) {"
+            "   x = 500;"
+            "   y = 300;"
+            "   moveTo(x + 0, y + 0);"
+            "   m = new flash.geom.Matrix();"
+            "   m.tx = 550;"
+            "   m.ty = 550;"
+            "   beginBitmapFill(b, m, true);"
+            "   lineTo(x + 0, y + 100);"
+            "   lineTo(x + 150, y + 100);"
+            "   lineTo(x + 150, y + 0);"
             "};"
         );
 
