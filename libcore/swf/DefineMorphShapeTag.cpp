@@ -32,6 +32,7 @@
 #include "RunResources.h"
 #include "Global_as.h"
 #include "Renderer.h"
+#include "fill_style.h"
 
 namespace gnash {
 namespace SWF {

@@ -42,6 +42,7 @@
 #include "swf/ShapeRecord.h"
 #include "Renderer_cairo.h"
 #include "utility.h"
+#include "fill_style.h"
 
 #include <cmath>
 #include <cairo/cairo.h>

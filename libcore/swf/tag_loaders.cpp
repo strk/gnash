@@ -18,10 +18,17 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
+
+#include "tag_loaders.h"
+
+#include <set>
+#include <limits>
+#include <cassert>
+#include <utility> // for std::make_pair
+#include <boost/static_assert.hpp>
 
 #include "IOChannel.h" // for StreamAdapter inheritance
 #include "utility.h"
@@ -52,15 +59,11 @@
 #include "RunResources.h"
 #include "Renderer.h"
 #include "Movie.h"
+#include "BitmapInfo.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #endif
-#include <set>
-#include <limits>
-#include <cassert>
-#include <utility> // for std::make_pair
-#include <boost/static_assert.hpp>
 
 namespace gnash {
 

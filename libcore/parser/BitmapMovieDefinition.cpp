@@ -27,6 +27,7 @@
 #include "Renderer.h"
 #include "Global_as.h"
 #include "namedStrings.h"
+#include "BitmapInfo.h"
 
 namespace gnash {
 

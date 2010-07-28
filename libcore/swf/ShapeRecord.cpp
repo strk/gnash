@@ -145,6 +145,38 @@ ShapeRecord::ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m,
     read(in, tag, m, r);
 }
 
+ShapeRecord::ShapeRecord()
+{
+}
+
+ShapeRecord::~ShapeRecord()
+{
+}
+
+ShapeRecord::ShapeRecord(const ShapeRecord& other)
+    :
+    _fillStyles(other._fillStyles),
+    _lineStyles(other._lineStyles),
+    _paths(other._paths),
+    _bounds(other._bounds)
+{
+}
+
+void
+ShapeRecord::clear()
+{
+    _fillStyles.clear();
+    _lineStyles.clear();
+    _paths.clear();
+    _bounds.set_null();
+}
+
+void
+ShapeRecord::addFillStyle(const fill_style& fs)
+{
+    _fillStyles.push_back(fs);
+}
+
 void
 ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
         const double ratio)
