@@ -204,16 +204,12 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
 
 FBGui::~FBGui()
 {  
-    if (fd>0) {
+    if (fd > 0) {
         enable_terminal();
         log_debug(_("Closing framebuffer device"));
         close(fd);
     }
 
-    // if (input_fd) {
-    //     close(input_fd);
-    // }
-    
 #ifdef ENABLE_DOUBLE_BUFFERING
     if (buffer) {
         log_debug(_("Free'ing offscreen buffer"));
@@ -277,26 +273,6 @@ FBGui::init(int /*argc*/, char *** /*argv*/)
         log_error("Found no accessible input event devices");
     }
     
-#if 0
-    // Initialize mouse (don't abort if no mouse found)
-    _mouse = getDeviceHandle(this);
-
-    if (!_mouse->init()) {
-        // just report to the user, keep on going...
-        log_debug(_("You won't have any pointing input device, sorry."));
-    }
-
-    // Initialize keyboard (still not critical)
-    if (!_input_event.init()) {   
-        log_debug(_("You won't have any keyboard input device, sorry."));
-    }
-    
-    // Initialize the touchscreen, if there is one
-    if (_touchscreen.init() == false) {
-        log_debug("You won't have any tslib input device, sorry.");
-    }
-#endif
-    
     // Open the framebuffer device
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     fd = open(FAKEFB, O_RDWR);
@@ -346,6 +322,8 @@ FBGui::init(int /*argc*/, char *** /*argv*/)
 bool
 FBGui::initialize_renderer()
 {
+    GNASH_REPORT_FUNCTION;
+
     const int width    = var_screeninfo.xres;
     const int height   = var_screeninfo.yres;
     const int bpp = var_screeninfo.bits_per_pixel;
@@ -412,6 +390,8 @@ FBGui::initialize_renderer()
 bool
 FBGui::run()
 {
+    GNASH_REPORT_FUNCTION;
+
     struct timeval tv;
 
     double start_timer;
@@ -430,23 +410,20 @@ FBGui::run()
     // let the GUI recompute the x/y scale factors to best fit the whole screen
     resize_view(_validbounds.width(), _validbounds.height());
 
+    // This loops endlessly at the frame rate
     while (!terminate_request) {  
         // wait the "heartbeat" inteval
         gnashSleep(_interval * 1000);    
         // TODO: Do we need to check the real time slept or is it OK when we woke
         // up early because of some Linux signal sent to our process (and thus
         // "advance" faster than the "heartbeat" interval)? - Udo
-  
-#if 0
-        // check input devices
-        _mouse->check();
-        _input_event.check();
-        _touchscreen.check();
-#endif
-        
+
 #ifdef USE_TSLIB
         ts_loop_count++; //increase loopcount
 #endif        
+        
+        // check input devices
+        checkForData();
         
         // advance movie  
         Gui::advance_movie(this);
@@ -458,6 +435,8 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
+    GNASH_REPORT_FUNCTION;
+
     if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
 #ifdef ENABLE_DOUBLE_BUFFERING
@@ -642,7 +621,7 @@ FBGui::disable_terminal()
     // it later)
     
     fd = open(tty, O_RDWR);
-    if (fd<0) {
+    if (fd < 0) {
         log_debug(_("WARNING: Could not open %s"), tty);
         return false;
     }
@@ -665,8 +644,10 @@ FBGui::disable_terminal()
     }
   
     log_debug(_("Own TTY NO = %d"), own_vt);
-  
-    close(fd);
+
+    if (fd > 0) {
+        close(fd);
+    }
   
     // Activate our new VT
     tty = find_accessible_tty(own_vt);
@@ -697,7 +678,9 @@ FBGui::disable_terminal()
 
     own_vt = original_vt;   // keep on using the original VT
   
-    close(fd);
+    if (fd > 0) {
+        close(fd);
+    }
   
     // Activate our new VT
     tty = find_accessible_tty(own_vt);
@@ -730,8 +713,10 @@ FBGui::disable_terminal()
     if (ioctl(fd, KDSETMODE, KD_GRAPHICS) == -1) {
         log_debug(_("WARNING: Could not switch to graphics mode on new VT"));
     }
-   
-    close(fd);
+
+    if (fd > 0) {
+        close(fd);
+    }
   
     log_debug(_("VT %d ready"), own_vt);  
   
@@ -754,7 +739,7 @@ FBGui::enable_terminal()
     }
 
     int fd = open(tty, O_RDWR);
-    if (fd<0) {
+    if (fd < 0) {
         log_debug(_("WARNING: Could not open %s"), tty);
         return false;
     }
@@ -776,8 +761,10 @@ FBGui::enable_terminal()
     if (ioctl(fd, KDSETMODE, original_kd)) {
         log_debug(_("WARNING: Could not restore keyboard mode"));
     }  
-  
-    close(fd);
+
+    if (fd > 0) {
+        close(fd);
+    }
   
     return true;
 }
@@ -874,13 +861,13 @@ FBGui::check_ett_mouse()
     
         if (new_btn != mouse_btn) {
             mouse_btn = new_btn;      
-            printf("clicked: %d\n", mouse_btn);      
+            log_debug("mouse clicked: %d\n", mouse_btn);
             notifyMouseClick(mouse_btn);  // mask=?
             activity = true;
         }
     
         // remove from buffer
-        pos=5;
+        pos = 5;
         memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
         mouse_buf_size -= pos;    
     }
@@ -888,6 +875,18 @@ FBGui::check_ett_mouse()
     return activity;  
 }
 #endif  // end of USE_ETT_TSLIB
+
+bool
+FBGui::checkForData()
+{
+    GNASH_REPORT_FUNCTION;
+
+    std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+
+    for (it=_inputs.begin(); it!=_inputs.end(); ++it) {
+        (*it)->check();
+    }
+}
 
 // end of namespace gnash
 }

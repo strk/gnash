@@ -56,3 +56,35 @@ FLTK:
 Framebuffer:
 - Working with any hi- or truecolor framebuffer device (/dev/fb0). Supports
   PS/2 compatible mice and eGalax touchscreens.
+
+8706:1] 19:10:26: DEBUG: virtual bool gnash::MouseDevice::init(const std::string&, size_t) returning
+8706:1] 19:10:26: DEBUG: Framebuffer device uses 5242880 bytes of memory.
+8706:1] 19:10:26: DEBUG: Video mode: 1280x1024 with 32 bits per pixel.
+8706:1] 19:10:26: DEBUG: bool gnash::FBGui::initialize_renderer() enter
+8706:1] 19:10:26: DEBUG: Double buffering disabled
+8706:1] 19:10:26: DEBUG: red channel: 16 / 8
+8706:1] 19:10:26: DEBUG: green channel: 8 / 8
+8706:1] 19:10:26: DEBUG: blue channel: 0 / 8
+8706:1] 19:10:26: DEBUG: Total bits per pixel: 32
+8706:1] 19:10:26: DEBUG: Framebuffer pixel format is BGRA32 (little-endian host)
+8706:1] 19:10:26: DEBUG: Initialized AGG buffer <0xb3f7b000>, 5242880 bytes, 1280x1024, rowsize is 5120 bytes
+8706:1] 19:10:26: DEBUG: Original TTY NO = 1
+8706:1] 19:10:26: DEBUG: VT 1 ready
+8706:1] 19:10:26: DEBUG: bool gnash::FBGui::initialize_renderer() returning
+
+(gdb) p this->var_screeninfo
+$3 = {xres = 1280, yres = 1024, xres_virtual = 1280, yres_virtual = 1024, 
+  xoffset = 0, yoffset = 0, bits_per_pixel = 32, grayscale = 0, red = {
+    offset = 16, length = 8, msb_right = 0}, green = {offset = 8, length = 8, 
+    msb_right = 0}, blue = {offset = 0, length = 8, msb_right = 0}, transp = {
+    offset = 0, length = 0, msb_right = 0}, nonstd = 0, activate = 0, 
+  height = 4294967295, width = 4294967295, accel_flags = 0, pixclock = 0, 
+  left_margin = 0, right_margin = 0, upper_margin = 0, lower_margin = 0, 
+  hsync_len = 0, vsync_len = 0, sync = 0, vmode = 0, rotate = 0, reserved = {
+    0, 0, 0, 0, 0}}
+(gdb) p this->fix_screeninfo
+$4 = {id = "inteldrmfb\000\000\000\000\000", smem_start = 4043309056, 
+  smem_len = 5242880, type = 0, type_aux = 0, visual = 2, xpanstep = 1, 
+  ypanstep = 1, ywrapstep = 0, line_length = 5120, mmio_start = 4289200128, 
+  mmio_len = 524288, accel = 0, reserved = {0, 0, 0}}
+(gdb) 

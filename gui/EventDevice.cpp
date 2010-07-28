@@ -110,7 +110,7 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           // FIXME: this needs to separate out the various types of
           // USB devices.
           // vendor 046d product c001 version 0100
-          _type = InputDevice::PS2_MOUSE;
+          _type = InputDevice::MOUSE;
           break;
       case BUS_HIL:
           log_unimpl("is a HIL bus type");
@@ -125,9 +125,15 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           log_unimpl("is an ISA bus type");
           break;
       case BUS_I8042:
-          // This is for keyboards and mice with a PS/2 round connector
+          // This is for keyboards and mice
           log_debug("is an I8042 bus type");
-          _type = InputDevice::KEYBOARD;
+          if (strstr(name, "keyboard") != 0) {
+              _type = InputDevice::KEYBOARD;
+          } else {
+              if (strstr(name, "Mouse") != 0) {
+                  _type = InputDevice::MOUSE;
+              }
+          }
           break;
       case BUS_XTKBD:
           log_unimpl("is an XTKBD bus type");
@@ -164,6 +170,8 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           log_error("Unknown bus type %d!", _device_info.bustype);
     }
     
+    log_debug("Event enabled for %s on fd #%d", _filespec, _fd);
+    
     return true;
 }
 
@@ -171,10 +179,6 @@ bool
 EventDevice::check()
 {
     GNASH_REPORT_FUNCTION;
-
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    return false;
-#endif
     
     bool activity = false;
   
@@ -379,8 +383,7 @@ EventDevice::scancode_to_gnash_key(int code, bool shift)
     return gnash::key::INVALID;  
 }
 
-// This looks in the input event devices for all the ones that match
-// the specified type.
+// This looks in the input event devices
 std::vector<boost::shared_ptr<InputDevice> > 
 EventDevice::scanForDevices(Gui *gui)
 {
@@ -405,7 +408,8 @@ EventDevice::scanForDevices(Gui *gui)
         if (stat(filespec, &st) == 0) {
             // Then see if we can open it
             if ((fd = open(filespec, O_RDWR)) < 0) {
-                log_error("You don't have the proper permissions to open %s", filespec);
+                log_error("You don't have the proper permissions to open %s",
+                          filespec);
                 // Try the next input event device file
                 total++;
                 filespec[len] = '0' + total;
@@ -417,7 +421,7 @@ EventDevice::scanForDevices(Gui *gui)
             break;
         }
 
-        char name[256]= "Unknown";
+        char name[256] = "Unknown";
         if(ioctl(fd, EVIOCGNAME(sizeof(name)), name) < 0) {
             perror("evdev ioctl");
         }
@@ -433,11 +437,16 @@ EventDevice::scanForDevices(Gui *gui)
         close(fd);
         boost::shared_ptr<InputDevice> dev;
         dev = boost::shared_ptr<InputDevice>(new EventDevice(gui));
+        // For now we only want keyboards, as the mouse interface
+        // default of /dev/input/mice supports hotpluging devices,
+        // unlike the regular event.
         if (dev->init(filespec, DEFAULT_BUFFER_SIZE)) {
-            devices.push_back(dev);
+            if ((dev->getType() == InputDevice::KEYBOARD)) {
+                devices.push_back(dev);
+            }
         }
 
-        dev->dump();
+//        dev->dump();
         
         // setup the next device filespec to try
         total++;

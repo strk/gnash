@@ -63,18 +63,17 @@ MouseDevice::scanForDevices(Gui *gui)
     const char *debug[] = {
         "UNKNOWN",
         "Keyboard",
-        "PS2 Mouse",
-        "eTurboTouch Mouse",
+        "Mouse",
         "Touchscreen",
         "Power Button"
     };
     
     struct mouse_types mice[] = {
-        InputDevice::PS2_MOUSE, "/dev/input/mice",      // PS/2 Mouse
+        InputDevice::MOUSE, "/dev/input/mice",      // PS/2 Mouse
 #ifdef MULTIPLE_DEVICES
-        InputDevice::PS2_MOUSE, "/dev/input/mouse0",
-        InputDevice::PS2_MOUSE, "/dev/input/mouse1",
-        InputDevice::ETT_MOUSE, "/dev/usb/tkpanel0",    // eTurboTouch touchscreen
+        InputDevice::MOUSE, "/dev/input/mouse0",
+        InputDevice::MOUSE, "/dev/input/mouse1",
+        InputDevice::MOUSE, "/dev/usb/tkpanel0",    // eTurboTouch touchscreen
 #endif
         InputDevice::UNKNOWN, 0
     };
@@ -89,7 +88,8 @@ MouseDevice::scanForDevices(Gui *gui)
                           mice[i].filespec);
                 i++;
                 continue;
-            } // open()
+            }
+            close(fd);
             log_debug("Found a %s device for mouse input using %s",
                       debug[mice[i].type], mice[i].filespec);
             
@@ -99,10 +99,9 @@ MouseDevice::scanForDevices(Gui *gui)
             if (dev->init(mice[i].filespec, DEFAULT_BUFFER_SIZE)) {
                 devices.push_back(dev);
             }
-            dev->dump();
+//            dev->dump();
 #endif
         }     // stat()
-        close(fd);
         i++;
     }         // while()
     
@@ -122,7 +121,7 @@ MouseDevice::init(const std::string &filespec, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 
-    _type = PS2_MOUSE;
+    _type = MOUSE;
     _filespec = filespec;
     _buffer.reset(new boost::uint8_t[size]);
 
@@ -172,17 +171,112 @@ MouseDevice::init(const std::string &filespec, size_t size)
         return false; 
     }  
   
-    log_debug(_("Mouse enabled."));
+    log_debug("Mouse enabled for %s on fd #%d", _filespec, _fd);
       
     return true;
 }
 
+// From http://www.computer-engineering.org/ps2mouse
+//
+// PS/2 Mouse mouse data is always in a 3 byte packet that looks like this:
+//
+//  	       Bit 7       Bit 6         Bit 5        Bit 4      Bit 3     Bit 2    Bit 1   Bit 0
+// Byte 1 | Y overflow | X overflow | Y sign bit | X sign bit | Always 1 | Middle | Right | Left
+// Byte 2                               X movement
+// Byte 3                               Y movement
+//
+// The movement values are 9-bit 2's complement integers, where the
+// most significant bit appears as a "sign" bit in byte 1 of the
+// movement data packet. Their value represents the mouse's offset
+// relative to its position when the previous packet was sent, in
+// units determined by the current resolution. The range of values
+// that can be expressed is -255 to +255. If this range is exceeded,
+// the appropriate overflow bit is set.
+//
+// Note that reporting is disabled by default. The mouse will not
+// actually issue any movement data packets until it receives the
+// "Enable Data Reporting" (0xF4) command. 
+//
+// Stream mode is the default operating mode, and is otherwise set
+// using the "Set Stream Mode" (0xEA) command.
+//
+// In remote mode the mouse reads its inputs and updates its
+// counters/flags at the current sample rate, but it does not
+// automatically issue data packets when movement has
+// occured. Instead, the host polls the mouse using the "Read Data"
+// (0xEB) command. Upon receiving this command the mouse will issue a
+// single movement data packet and reset its movement counters. 
+
+// The mouse enters remote mode upon receiving the "Set Remote Mode"
+// (0xF0) command.
 bool
 MouseDevice::check()
 {
     GNASH_REPORT_FUNCTION;
 
-    return false;
+    static size_t mouse_buf_size = DEFAULT_BUFFER_SIZE;
+    
+    if (_fd < 0) {
+        return false;   // no mouse available
+    }
+    
+    int i;
+    int xmove, ymove, btn, btn_changed;
+    boost::shared_array<boost::uint8_t> buf = readData();
+    if (!buf) {
+        return false;
+    }
+    
+    // resync
+    if (!buf[0] & 8) { // bit 3 us always set in the first byte
+        log_error("No sync in first byte!");
+        return false;
+    }
+  
+    xmove = buf[1];
+    ymove = buf[2];
+    btn   = buf[0] & 1;
+    
+    if (buf[0] & 0x10) {
+        xmove = -(256-xmove);
+    }
+    if (buf[0] & 0x20) {
+        ymove = -(256-ymove);
+    }
+    
+    ymove *= -1; // vertical movement is upside-down
+    
+    log_debug(_("x/y %d/%d button %d"), xmove, ymove, btn);
+    
+    // movement    
+    _x += xmove;
+    _y += ymove;
+    
+    if (_x < 0) {
+        _x = 0;
+    }
+    if (_y < 0) {
+        _y = 0;
+    }
+    if (_x > _gui->getStage()->getStageWidth()) {
+        _x = _gui->getStage()->getStageWidth();
+    }
+    if (_y > _gui->getStage()->getStageHeight()) {
+        _y = _gui->getStage()->getStageHeight();
+    }
+    
+    log_debug(_("read mouse @ %d / %d, btn %d"), _x, _y, _button);
+    _gui->notifyMouseMove(_x, _y);
+    
+    // button
+    if (btn != _button) {
+        _button = btn;
+        log_debug("clicked: %d", btn); 
+        _gui->notifyMouseClick(btn); 
+        log_debug(_("mouse click! %d"), btn);
+    }
+    
+    return true;
 }
 
 bool

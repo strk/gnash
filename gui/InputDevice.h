@@ -54,8 +54,7 @@ public:
     typedef enum {
         UNKNOWN,
         KEYBOARD,
-        PS2_MOUSE,
-        ETT_MOUSE,
+        MOUSE,
         TOUCHSCREEN,
         POWERBUTTON
     } devicetype_e;
@@ -72,9 +71,11 @@ public:
     virtual bool check() = 0;
 
     static std::vector<boost::shared_ptr<InputDevice> > scanForDevices(Gui *gui);
-    
+
+    InputDevice::devicetype_e getType() { return _type; };
+
     // Read data into the Device input buffer.
-    int readData();
+    boost::shared_array<boost::uint8_t> readData();
 
     void dump();
     

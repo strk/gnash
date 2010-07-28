@@ -91,38 +91,52 @@ InputDevice::init(InputDevice::devicetype_e type, const std::string &filespec,
 }
 
 // Read data into the Device input buffer.
-int
+boost::shared_array<boost::uint8_t>
 InputDevice::readData()
 {
     GNASH_REPORT_FUNCTION;
 
-    if (_fd < 0) {
-        return 0;   // no mouse available
-    }
-    
-    int count;  
-    
-    unsigned char *ptr;
-    
-    ptr = _buffer.get() + _position;
-    
-    count = read(_fd, _buffer.get() + _position, _position - DEFAULT_BUFFER_SIZE);
-    
-    if (count <= 0) {
-        return count;
-    }
-    
-    /*
-      printf("read data: ");
-      int i;
-      for (i=0; i<count; i++) 
-      printf("%02x ", ptr[i]);
-      printf("\n");
-    */
-    
-    _position += count;
+    boost::shared_array<boost::uint8_t> inbuf;
 
-    return count;
+    if (_fd < 0) {
+        return inbuf;   // no mouse available
+    }
+
+    fd_set fdset;
+    FD_ZERO(&fdset);
+    FD_SET(_fd, &fdset);
+    struct timeval tval;
+    tval.tv_sec  = 0;
+    tval.tv_usec = 100;
+    errno = 0;
+    int ret = ::select(_fd+1, &fdset, NULL, NULL, &tval);
+    if (ret == 0) {
+//            log_debug ("The pipe for fd #%d timed out waiting to read", fd);
+        return inbuf;
+    } else if (ret == 1) {
+        log_debug ("The device for fd #%d is ready", _fd);
+    } else {
+        log_error("The device has this error: %s", strerror(errno));
+        return inbuf;
+    }
+
+    int bytes = 0;
+    ioctl(_fd, FIONREAD, &bytes);
+    if (bytes) {
+        std::cerr << "FIXME: " << bytes << std::endl;
+    }
+    
+    // PS/2 Mouse packets are always 3 bytes
+    inbuf.reset(new boost::uint8_t[3]);
+    // Since we know how bytes are in the input buffer, allocate
+    // some memory to read the data.
+    // terminate incase we want to treat the data like a string.
+    ret = ::read(_fd, inbuf.get(), 3);
+    if (ret) {
+        log_debug("Read %d bytes, %s", ret, hexify(inbuf.get(), ret, true));
+    }
+
+    return inbuf;
 }   
 
 void
@@ -132,8 +146,7 @@ InputDevice::dump()
     const char *debug[] = {
         "UNKNOWN",
         "Keyboard",
-        "PS2 Mouse",
-        "eTurboTouch Mouse",
+        "Mouse",
         "Touchscreen",
         "Power Button"
     };    
@@ -176,22 +189,6 @@ InputDevice::scanForDevices(Gui *gui)
 
     return devices;
 }
-
-#ifdef USE_TSLIB
-boost::shared_ptr<InputDevice>
-createTSlibDevice(Gui *gui)
-{
-    return boost::shared_ptr<InputDevice>(new TouchDevice(gui));
-}
-#endif
-
-#ifdef USE_INPUT_EVENT
-boost::shared_ptr<InputDevice>
-createEventDevice(Gui *gui)
-{
-    return boost::shared_ptr<InputDevice>(new EventDevice(gui));
-}
-#endif
 
 // end of gnash namespace
 }
