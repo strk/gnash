@@ -37,6 +37,8 @@
 
 namespace gnash {
 
+namespace {
+
 #if 1
 struct ConstMatrix : public boost::static_visitor<const SWFMatrix&>
 {
@@ -51,6 +53,56 @@ struct ConstMatrix : public boost::static_visitor<const SWFMatrix&>
     }
 };
 #endif
+
+class SetLerp : public boost::static_visitor<>
+{
+public:
+    SetLerp(const fill_style::Fill& a, const fill_style::Fill& b, double ratio)
+        :
+        _a(a),
+        _b(b),
+        _ratio(ratio)
+    {
+    }
+
+    void operator()(SolidFill& f) const {
+        const SolidFill& a = boost::get<SolidFill>(_a);
+        const SolidFill& b = boost::get<SolidFill>(_b);
+        f.color.set_lerp(a.color, b.color, _ratio);
+    }
+
+    void operator()(GradientFill& f) const {
+        const GradientFill& a = boost::get<GradientFill>(_a);
+        const GradientFill& b = boost::get<GradientFill>(_b);
+        f.color.set_lerp(a.color, b.color, _ratio);
+        
+        // fill style gradients
+        assert(f.gradients.size() == a.gradients.size());
+        assert(f.gradients.size() == b.gradients.size());
+        for (size_t i = 0, e = f.gradients.size(); i < e; ++i) {
+            f.gradients[i].m_ratio = frnd(flerp(a.gradients[i].m_ratio,
+                        b.gradients[i].m_ratio, _ratio));
+            f.gradients[i].m_color.set_lerp(a.gradients[i].m_color,
+                    b.gradients[i].m_color, _ratio);
+        }
+        f.gradientBitmap = 0;
+        f.matrix.set_lerp(a.matrix, b.matrix, _ratio);
+    }
+
+    void operator()(BitmapFill& f) const {
+        const BitmapFill& a = boost::get<BitmapFill>(_a);
+        const BitmapFill& b = boost::get<BitmapFill>(_b);
+        f.bitmapInfo = a.bitmapInfo;
+        f.matrix.set_lerp(a.matrix, b.matrix, _ratio);
+    }
+
+
+private:
+    const fill_style::Fill& _a;
+    const fill_style::Fill& _b;
+    const double _ratio;
+
+};
 
 struct Matrix : public boost::static_visitor<SWFMatrix&>
 {
@@ -73,7 +125,7 @@ struct ConstColor : public boost::static_visitor<const rgba&>
     const rgba& operator()(const SolidFill& f) const {
         return f.color;
     }
-    rgba& operator()(const BitmapFill&) const {
+    const rgba& operator()(const BitmapFill&) const {
         throw boost::bad_visit();
     }
 
@@ -93,19 +145,21 @@ struct Color : public boost::static_visitor<rgba&>
 
 };
 
+}
+
 rgba
 fill_style::get_color() const
 try {
     return boost::apply_visitor(ConstColor(), _fill);
 }
 catch (const boost::bad_visit&) {
-    return rgba();
+    return rgba(128, 128, 0, 0);
 }
 
 void
 fill_style::set_color(rgba new_color)
 try {
-    boost::apply_visitor<Color>(Color(), _fill) = new_color;
+    boost::apply_visitor(Color(), _fill) = new_color;
 }
 catch (const boost::bad_visit&) {
 }
@@ -119,6 +173,9 @@ gradient_record::read(SWFStream& in, SWF::TagType tag)
 }
 
 fill_style::fill_style()
+    :
+    _fill(SolidFill(rgba(255, 255, 255, 255))),
+    m_type(SWF::FILL_SOLID)
 {
 }
 
@@ -142,12 +199,12 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
         case SWF::FILL_SOLID:
         {
+            log_debug("Fill Solid!");
             rgba color;
 
             // 0x00: solid fill
             if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4
                 || t == SWF::DEFINESHAPE4_ || is_morph) {
-
                 color.read_rgba(in);
                 if (is_morph) {
                     rgba othercolor;
@@ -165,7 +222,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                 log_parse("  color: %s", color);
             );
             _fill = SolidFill(color);
-            break;
+            return;
         }
 
         case SWF::FILL_LINEAR_GRADIENT:
@@ -321,7 +378,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                         pOther->need_gradient_bitmap(*renderer);
                 }
             }
-            break;
+            return;
         }
 
         case SWF::FILL_TILED_BITMAP_HARD:
@@ -388,7 +445,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                log_parse("SWFMatrix: %s", bf.matrix);
             );
             _fill = bf;
-            break;
+            return;
         }
 
         default:
@@ -605,76 +662,13 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
 {
     assert(t >= 0 && t <= 1);
 
-    // fill style type
     m_type = a.get_type();
+    
+    // TODO: set type better
+    _fill = a._fill;
     assert(m_type == b.get_type());
+    boost::apply_visitor(SetLerp(a._fill, b._fill, t), _fill);
 
-    bool usesMatrix = false;
-
-    switch (m_type)
-    {
-        case SWF::FILL_SOLID:
-        {
-            rgba& color = boost::apply_visitor(Color(), _fill);
-            color.set_lerp(boost::apply_visitor(ConstColor(), a._fill), 
-                        boost::apply_visitor(ConstColor(), b._fill), t);
-            break;
-        }
-
-        case SWF::FILL_LINEAR_GRADIENT:
-        case SWF::FILL_RADIAL_GRADIENT:
-        case SWF::FILL_FOCAL_GRADIENT:
-        {
-            rgba& color = boost::apply_visitor(Color(), _fill);
-            color.set_lerp(boost::apply_visitor(ConstColor(), a._fill), 
-                        boost::apply_visitor(ConstColor(), b._fill), t);
-
-            usesMatrix = true;
-
-            GradientFill& us = boost::get<GradientFill>(_fill);
-            const GradientFill& fa = boost::get<GradientFill>(a._fill);
-            const GradientFill& fb = boost::get<GradientFill>(b._fill);
-
-
-            // fill style gradients
-            assert(us.gradients.size() == fa.gradients.size());
-            assert(us.gradients.size() == fb.gradients.size());
-            for (size_t j=0, nj=us.gradients.size(); j<nj; ++j)
-            {
-                us.gradients[j].m_ratio =
-                    (boost::uint8_t) frnd( flerp(fa.gradients[j].m_ratio,
-                            fb.gradients[j].m_ratio, t)
-                        );
-                us.gradients[j].m_color.set_lerp(fa.gradients[j].m_color,
-                        fb.gradients[j].m_color, t);
-            }
-            us.gradientBitmap = 0;
-            break;
-        }
-
-        case SWF::FILL_TILED_BITMAP:
-        case SWF::FILL_CLIPPED_BITMAP:
-        case SWF::FILL_TILED_BITMAP_HARD:
-        case SWF::FILL_CLIPPED_BITMAP_HARD:
-        {
-            usesMatrix = true;
-
-            // fill style bitmap ID
-            boost::get<BitmapFill>(_fill).bitmapInfo =
-                boost::get<BitmapFill>(a._fill).bitmapInfo;
-            //assert(_bitmapInfo == b._bitmapInfo);
-            break;
-        }
-
-        default:
-            break;
-    }
-
-    SWFMatrix& m = boost::apply_visitor(Matrix(), _fill);
-
-    // fill style bitmap or gradient SWFMatrix
-    if (usesMatrix) m.set_lerp(boost::apply_visitor(ConstMatrix(), a._fill),
-            boost::apply_visitor(ConstMatrix(), b._fill), t);
 }
 
 size_t

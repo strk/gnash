@@ -122,6 +122,8 @@ class DSOEXPORT fill_style
 {
 public:
 
+    typedef boost::variant<BitmapFill, SolidFill, GradientFill> Fill;
+
     /// Create a solid opaque white fill.
     fill_style();
 
@@ -253,7 +255,7 @@ public:
 
 private:
 
-    boost::variant<BitmapFill, SolidFill, GradientFill> _fill;
+    Fill _fill;
 
     /// Return the color at the specified ratio into our gradient.
     //
