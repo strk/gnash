@@ -156,25 +156,23 @@ TouchDevice::check()
 void
 TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
 {
-    /*
-      <UdoG>:
-      This is a *very* simple method to translate raw touchscreen coordinates to
-      the screen coordinates. We simply to linear interpolation between two points.
-      Note this won't work well when the touchscreen is not perfectly aligned to
-      the screen (ie. slightly rotated). Standard touchscreen calibration uses
-      5 calibration points (or even 25). If someone can give me the formula, tell
-      me! I'm too lazy right now to do the math myself... ;)  
-  
-      And sorry for the quick-and-dirty implementation! I'm in a hurry...
-    */
+    // This method use 3 points calibration
+    // it is described in http://www.embedded.com/story/OEG20020529S0046
+    
+    float k,a,b,c,d,e,f;
+    
+    float ref0x = _gui->getStage()->getStageWidth() / 5 * 1;
+    float ref0y = _gui->getStage()->getStageHeight() / 5 * 1;
+    float ref1x = _gui->getStage()->getStageWidth() / 5 * 4;
 
-    float ref1x = _gui->getStage()->getStageWidth() / 5 * 1;
     float ref1y = _gui->getStage()->getStageHeight() / 5 * 1;
     float ref2x = _gui->getStage()->getStageWidth() / 5 * 4;
     float ref2y = _gui->getStage()->getStageHeight() / 5 * 4;
   
-    static float cal1x = 2048/5*1;   // very approximative default values
-    static float cal1y = 2048/5*4;
+    static float cal0x = 2048/5*1;   // very approximative default values
+    static float cal0y = 2048/5*4;
+    static float cal1x = 2048/5*1;
+    static float cal1y = 2048/5*1;
     static float cal2x = 2048/5*4;
     static float cal2y = 2048/5*1;
   
@@ -187,8 +185,8 @@ TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
         if (settings) {
     
             // expected format: 
-            // 491,1635,1581,646      (cal1x,cal1y,cal2x,cal2y; all integers)
-
+            // 491,1635,451,537,1581,646
+            // (cal0x,cal0y,cal1x,cal1y,cal2x,cal2y; all integers)
             char buffer[1024];      
             char* p1;
             char* p2;
@@ -198,6 +196,19 @@ TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
             p1 = buffer;
       
             do {
+                p2 = strchr(p1, ',');
+                if (!p2) continue; // stop here
+                *p2 = 0;
+                cal0x = atoi(p1);        
+                p1=p2+1;
+                
+                // cal0y        
+                p2 = strchr(p1, ',');
+                if (!p2) continue; // stop here
+                *p2 = 0;
+                cal0y = atoi(p1);        
+                p1=p2+1;
+                
                 // cal1x        
                 p2 = strchr(p1, ',');
                 if (!p2) continue; // stop here
@@ -229,8 +240,8 @@ TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
             if (!ok)
                 log_debug(_("WARNING: Error parsing calibration data!"));
       
-            log_debug(_("Using touchscreen calibration data: %.0f / %.0f / %.0f / %.0f"),
-                      cal1x, cal1y, cal2x, cal2y);
+            log_debug(_("Using touchscreen calibration data: %.0f / %.0f / %.0f / %.0f / %.0f / %.0f"),
+                      cal0x, cal0y, cal1x, cal1y, cal2x, cal2y);
         } else {
             log_debug(_("WARNING: No touchscreen calibration settings found. "
                         "The mouse pointer most probably won't work precisely. Set "
@@ -239,9 +250,18 @@ TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
     
     } //!initialized
 
-    // real duty: 
-    *cx = (rawx-cal1x) / (cal2x-cal1x) * (ref2x-ref1x) + ref1x;
-    *cy = (rawy-cal1y) / (cal2y-cal1y) * (ref2y-ref1y) + ref1y;
+      // calcul of K, A, B, C, D, E and F
+    k = (cal0x - cal2x) * (cal1y - cal2y) - (cal1x - cal2x) * (cal0y - cal2y);
+    a = ((ref0x - ref2x) * (cal1y - cal2y) - (ref1x - ref2x) * (cal0y - cal2y)) / k;
+    b = ((ref1x - ref2x) * (cal0x - cal2x) - (ref0x - ref2x) * (cal1x - cal2x)) / k;
+    c = (cal0y * (cal2x * ref1x - cal1x * ref2x) + cal1y * (cal0x * ref2x - cal2x * ref0x) + cal2y * (cal1x * ref0x - cal0x * ref1x)) / k;
+    d = ((ref0y - ref2y) * (cal1y - cal2y) - (ref1y - ref2y) * (cal0y - cal2y)) / k;
+    e = ((ref1y - ref2y) * (cal0x - cal2x) - (ref0y - ref2y) * (cal1x - cal2x)) / k;
+    f = (cal0y * (cal2x * ref1y - cal1x * ref2y) + cal1y * (cal0x * ref2y - cal2x * ref0y) + cal2y * (cal1x * ref0y - cal0x * ref1y)) / k;
+    
+    // real duty:
+    *cx = a * rawx + b * rawy + c;
+    *cy = d * rawx + e * rawy + f;
 }
 
 std::vector<boost::shared_ptr<InputDevice> >
