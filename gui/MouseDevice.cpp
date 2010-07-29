@@ -65,9 +65,13 @@ MouseDevice::scanForDevices(Gui *gui)
         "Keyboard",
         "Mouse",
         "Touchscreen",
-        "Power Button"
-    };
-    
+        "Touchscreen Mouse",
+        "Power Button",
+        "Sleep Button",
+        "Serial-USB Adapter",
+        "Infrared Receiver"
+    };    
+
     struct mouse_types mice[] = {
         InputDevice::MOUSE, "/dev/input/mice",      // PS/2 Mouse
 #ifdef MULTIPLE_DEVICES
@@ -145,33 +149,36 @@ MouseDevice::init(const std::string &filespec, size_t size)
     // Clear input buffer
     unsigned char buf[10], byte;
     while (read(_fd, buf, sizeof buf) > 0 ) { }
-    
-    // Reset mouse
-    if ((!command(0xFF, buf, 3)) || (buf[0] != 0xFA)) {
-        log_debug(_("Mouse reset failed"));
-        close(_fd);
-        _fd = -1;
-        return false; 
+
+    // A touchscreen works similar to a Mouse, but not exactly...
+    if (_type == InputDevice::MOUSE) {
+        // Reset mouse
+        if ((!command(0xFF, buf, 3)) || (buf[0] != 0xFA)) {
+            log_debug(_("Mouse reset failed"));
+            close(_fd);
+            _fd = -1;
+            return false; 
+        }
+        
+        // Get Device ID (not crucial, debug only)
+        if ((!command(0xF2, buf, 2)) || (buf[0] != 0xFA)) {
+            log_debug(_("WARNING: Could not detect mouse device ID"));
+        } else {
+            unsigned char devid = buf[1];
+            if (devid != 0)
+                log_debug(_("WARNING: Non-standard mouse device ID %d"), devid);
+        }
+        
+        // Enable mouse data reporting
+        if ((!command(0xF4, &byte, 1)) || (byte != 0xFA)) {
+            log_debug(_("Could not activate Data Reporting mode for mouse"));
+            close(_fd);
+            _fd = -1;
+            return false; 
+        }  
+        
+        log_debug("Mouse enabled for %s on fd #%d", _filespec, _fd);
     }
-    
-    // Get Device ID (not crucial, debug only)
-    if ((!command(0xF2, buf, 2)) || (buf[0] != 0xFA)) {
-        log_debug(_("WARNING: Could not detect mouse device ID"));
-    } else {
-        unsigned char devid = buf[1];
-        if (devid != 0)
-            log_debug(_("WARNING: Non-standard mouse device ID %d"), devid);
-    }
-    
-    // Enable mouse data reporting
-    if ((!command(0xF4, &byte, 1)) || (byte != 0xFA)) {
-        log_debug(_("Could not activate Data Reporting mode for mouse"));
-        close(_fd);
-        _fd = -1;
-        return false; 
-    }  
-  
-    log_debug("Mouse enabled for %s on fd #%d", _filespec, _fd);
       
     return true;
 }
@@ -214,16 +221,21 @@ MouseDevice::check()
 {
     GNASH_REPORT_FUNCTION;
 
-    static size_t mouse_buf_size = DEFAULT_BUFFER_SIZE;
-    
     if (_fd < 0) {
         return false;   // no mouse available
     }
     
     int i;
     int xmove, ymove, btn, btn_changed;
-    // PS/2 Mouse packets are always 3 bytes
-    boost::shared_array<boost::uint8_t> buf = readData(3);
+    boost::shared_array<boost::uint8_t> buf;
+    if (_type == InputDevice::TOUCHMOUSE) {
+        // The eTurboTouch has a 4 byte packet
+        buf = readData(4);
+    } else {
+        // PS/2 Mouse packets are always 3 bytes
+        buf = readData(3);
+    }
+    
     if (!buf) {
         return false;
     }
@@ -233,38 +245,59 @@ MouseDevice::check()
         log_error("No sync in first byte!");
         return false;
     }
-  
-    xmove = buf[1];
-    ymove = buf[2];
+
+    // A Touchscreen works similar to a Mouse, but not exactly.
+    // At least for the eTurboTouch, it has a different layout
+    // in the packet for the location as it has an additional byte
     btn   = buf[0] & 1;
+    if (_type == InputDevice::TOUCHMOUSE) {
+        xmove = (buf[1] << 7) | (buf[2]);
+        ymove = (buf[3] << 7) | (buf[4]);
+        /*
+          printf("touchscreen: %02x %02x %02x %02x %02x | status %d, pos: %d/%d\n",
+          mouse_buf[0], mouse_buf[1], mouse_buf[2], mouse_buf[3], mouse_buf[4],   
+          new_btn, new_x, new_y);
+        */    
+        
+        xmove = static_cast<int>(((static_cast<double>(xmove)- 355) / (1702 - 355)
+                                  * 1536 + 256));
+        ymove = static_cast<int>(((static_cast<double>(ymove) - 482) / (1771 - 482)
+                                  * 1536 + 256));
+        
+        xmove = xmove * _gui->getStage()->getStageWidth() / 2048;
+        ymove = (2048-ymove) * _gui->getStage()->getStageHeight() / 2048;
+    } else {                    // end of InputDevice::MOUSE
+        xmove = buf[1];
+        ymove = buf[2];
     
-    if (buf[0] & 0x10) {
-        xmove = -(256-xmove);
-    }
-    if (buf[0] & 0x20) {
-        ymove = -(256-ymove);
-    }
-    
-    ymove *= -1; // vertical movement is upside-down
-    
-    log_debug(_("x/y %d/%d button %d"), xmove, ymove, btn);
-    
-    // movement    
-    _x += xmove;
-    _y += ymove;
-    
-    if (_x < 0) {
-        _x = 0;
-    }
-    if (_y < 0) {
-        _y = 0;
-    }
-    if (_x > _gui->getStage()->getStageWidth()) {
-        _x = _gui->getStage()->getStageWidth();
-    }
-    if (_y > _gui->getStage()->getStageHeight()) {
-        _y = _gui->getStage()->getStageHeight();
-    }
+        if (buf[0] & 0x10) {
+            xmove = -(256-xmove);
+        }
+        if (buf[0] & 0x20) {
+            ymove = -(256-ymove);
+        }
+        
+        ymove *= -1; // vertical movement is upside-down
+        
+        log_debug(_("x/y %d/%d button %d"), xmove, ymove, btn);
+        
+        // movement    
+        _x += xmove;
+        _y += ymove;
+        
+        if (_x < 0) {
+            _x = 0;
+        }
+        if (_y < 0) {
+            _y = 0;
+        }
+        if (_x > _gui->getStage()->getStageWidth()) {
+            _x = _gui->getStage()->getStageWidth();
+        }
+        if (_y > _gui->getStage()->getStageHeight()) {
+            _y = _gui->getStage()->getStageHeight();
+        }
+    } // end of InputDevice::MOUSE
     
     log_debug(_("read mouse @ %d / %d, btn %d"), _x, _y, _button);
     _gui->notifyMouseMove(_x, _y);

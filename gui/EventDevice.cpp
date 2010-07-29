@@ -106,11 +106,25 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           log_unimpl("is a PNP bus type");
           break;          
       case BUS_USB:
-          log_unimpl("is on a Universal Serial Bus");
-          // FIXME: this needs to separate out the various types of
-          // USB devices.
-          // vendor 046d product c001 version 0100
-          _type = InputDevice::MOUSE;
+          // FIXME: this probably needs a better way of checking what
+          // device things truly are.          
+          log_debug("is on a Universal Serial Bus");
+          // ID 0eef:0001 D-WAV Scientific Co., Ltd eGalax TouchScreen
+          if ((_device_info.product == 0x0001) && (_device_info.vendor == 0x0eef)) {
+              _type = InputDevice::TOUCHMOUSE;
+              // ID 046d:c001 Logitech, Inc. N48/M-BB48 [FirstMouse Plus]
+          } else if ((_device_info.product == 0xc001) && (_device_info.vendor == 0x046d)) {
+              _type = InputDevice::MOUSE;
+              // ID 0001:0001 AT Translated Set 2 keyboard
+          } else if ((_device_info.product == 0x0001) && (_device_info.vendor == 0x0001)) {
+              _type = InputDevice::MOUSE;
+              // ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+          } else if ((_device_info.product == 0x2303) && (_device_info.vendor == 0x067b)) {
+              _type = InputDevice::SERIALUSB ;
+                  // ID 0471:0815 Philips (or NXP) eHome Infrared Receiver
+          } else if ((_device_info.product == 0x0815) && (_device_info.vendor == 0x0471)) {
+              _type = InputDevice::INFRARED;
+          }
           break;
       case BUS_HIL:
           log_unimpl("is a HIL bus type");
@@ -203,12 +217,10 @@ EventDevice::check()
         // Keyboard event
       case EV_KEY:
       {
-          // code == scan code of the key (KEY_xxxx defines in input.h)
-          
+          // code == scan code of the key (KEY_xxxx defines in input.h)         
           // value == 0  key has been released
           // value == 1  key has been pressed
-          // value == 2  repeated key reporting (while holding the key) 
-          
+          // value == 2  repeated key reporting (while holding the key)
           if (ev->code == KEY_LEFTSHIFT) {
               keyb_lshift = ev->value;
           } else if (ev->code == KEY_RIGHTSHIFT) {

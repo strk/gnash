@@ -56,7 +56,11 @@ public:
         KEYBOARD,
         MOUSE,
         TOUCHSCREEN,
-        POWERBUTTON
+        TOUCHMOUSE,
+        POWERBUTTON,
+        SLEEPBUTTON,
+        SERIALUSB,
+        INFRARED
     } devicetype_e;
     InputDevice();
     InputDevice(Gui *gui);

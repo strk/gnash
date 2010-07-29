@@ -107,7 +107,7 @@ InputDevice::readData(size_t size)
     FD_SET(_fd, &fdset);
     struct timeval tval;
     tval.tv_sec  = 0;
-    tval.tv_usec = 100;
+    tval.tv_usec = 1;
     errno = 0;
     int ret = ::select(_fd+1, &fdset, NULL, NULL, &tval);
     if (ret == 0) {
@@ -119,14 +119,13 @@ InputDevice::readData(size_t size)
         log_error("The device has this error: %s", strerror(errno));
         return inbuf;
     }
-
+    
     inbuf.reset(new boost::uint8_t[size]);
-    // Since we know how bytes are in the input buffer, allocate
-    // some memory to read the data.
-    // terminate incase we want to treat the data like a string.
     ret = ::read(_fd, inbuf.get(), size);
-    if (ret) {
-        log_debug("Read %d bytes, %s", ret, hexify(inbuf.get(), ret, true));
+    if (ret > 0) {
+        log_debug("Read %d bytes, %s", ret, hexify(inbuf.get(), ret, false));
+    } else {
+        inbuf.reset();
     }
 
     return inbuf;
@@ -141,7 +140,11 @@ InputDevice::dump()
         "Keyboard",
         "Mouse",
         "Touchscreen",
-        "Power Button"
+        "Touchscreen Mouse",
+        "Power Button",
+        "Sleep Button",
+        "Serial-USB Adapter",
+        "Infrared Receiver"
     };    
 
     std::cerr << "Device type is: " << debug[_type] << std::endl;
