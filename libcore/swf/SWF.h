@@ -1515,8 +1515,8 @@ std::ostream& operator<< (std::ostream& os, const abc_action_type& typ);
 //
 /// For more info see:
 /// http://sswf.sourceforge.net/SWFalexref.html#swf_fill_style
-///
-enum fill_style_type {
+enum FillType
+{
     FILL_SOLID                   = 0x00,
     FILL_LINEAR_GRADIENT         = 0x10,
     FILL_RADIAL_GRADIENT         = 0x12,
@@ -1529,18 +1529,19 @@ enum fill_style_type {
 
     /// swf8 (alexis is wrong), non-smoothed / hard edges
     FILL_CLIPPED_BITMAP_HARD     = 0x43
-
 };
 
-enum gradient_spread_mode {
-        GRADIENT_SPREAD_PAD,
-        GRADIENT_SPREAD_REFLECT,
-        GRADIENT_SPREAD_REPEAT
+enum SpreadMode
+{
+    GRADIENT_SPREAD_PAD,
+    GRADIENT_SPREAD_REFLECT,
+    GRADIENT_SPREAD_REPEAT
 };
 
-enum gradient_interpolation_mode {
-        GRADIENT_INTERPOL_NORMAL,
-        GRADIENT_INTERPOL_LINEAR
+enum InterpolationMode
+{
+    GRADIENT_INTERPOLATION_NORMAL,
+    GRADIENT_INTERPOLATION_LINEAR
 };
 
 

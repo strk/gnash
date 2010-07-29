@@ -102,12 +102,26 @@ struct BitmapFill
 
 struct GradientFill
 {
+    enum GradientType
+    {
+        LINEAR,
+        RADIAL,
+        FOCAL
+    };
+
+    explicit GradientFill(GradientType t) : type(t) {}
+    GradientFill() {}
+
+    const BitmapInfo* createBitmap(Renderer& r) const;
+
+    GradientType type;
+
     boost::intrusive_ptr<const BitmapInfo> gradientBitmap;
     SWFMatrix matrix;
     float focalPoint;
     std::vector<gradient_record> gradients;
-    SWF::gradient_spread_mode spreadMode;
-    SWF::gradient_interpolation_mode interpolation;
+    SWF::SpreadMode spreadMode;
+    SWF::InterpolationMode interpolation;
     rgba color;
 };
 
@@ -203,11 +217,11 @@ public:
         return m_type;
     }
 
-    SWF::gradient_spread_mode get_gradient_spread_mode() const {
+    SWF::SpreadMode get_gradient_spread_mode() const {
         return boost::get<GradientFill>(_fill).spreadMode;
     }
 
-    SWF::gradient_interpolation_mode get_gradient_interpolation_mode() const {
+    SWF::InterpolationMode get_gradient_interpolation_mode() const {
         return boost::get<GradientFill>(_fill).interpolation;
     }
     

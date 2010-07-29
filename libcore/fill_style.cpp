@@ -85,6 +85,7 @@ public:
     void operator()(GradientFill& f) const {
         const GradientFill& a = boost::get<GradientFill>(_a);
         const GradientFill& b = boost::get<GradientFill>(_b);
+        f.type = a.type;
         f.color.set_lerp(a.color, b.color, _ratio);
         
         // fill style gradients
@@ -247,11 +248,12 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
             GradientFill gf;
 
-            SWFMatrix  input_matrix;
+            SWFMatrix input_matrix;
             input_matrix.read(in);
 
             // shouldn't this be in initializer's list ?
             if (m_type == SWF::FILL_LINEAR_GRADIENT) {
+                gf.type = GradientFill::LINEAR;
                 gf.matrix.set_translation(128, 0);
                 gf.matrix.set_scale(1.0/128, 1.0/128);
             }
@@ -259,6 +261,8 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                 // FILL_RADIAL_GRADIENT or FILL_FOCAL_GRADIENT
                 gf.matrix.set_translation(32, 32);
                 gf.matrix.set_scale(1.0/512, 1.0/512);
+                gf.type = m_type == SWF::FILL_FOCAL_GRADIENT ?
+                    GradientFill::FOCAL : GradientFill::RADIAL;
             }
 
             SWFMatrix m = input_matrix;
@@ -306,10 +310,10 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                 const boost::uint8_t interpolation = (grad_props >> 4) & 3;
                 switch (interpolation) {
                     case 0: 
-                        gf.interpolation = SWF::GRADIENT_INTERPOL_NORMAL;
+                        gf.interpolation = SWF::GRADIENT_INTERPOLATION_NORMAL;
                         break;
                     case 1:
-                        gf.interpolation = SWF::GRADIENT_INTERPOL_LINEAR;
+                        gf.interpolation = SWF::GRADIENT_INTERPOLATION_LINEAR;
                         break;
                     default:
                         IF_VERBOSE_MALFORMED_SWF(
@@ -364,8 +368,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             }
         
             IF_VERBOSE_PARSE(
-               log_parse("  gradients: num_gradients = %d",
-                   static_cast<int>(num_gradients));
+               log_parse("  gradients: num_gradients = %d", +num_gradients);
             );
         
             // @@ hack. What is it supposed to do?
@@ -384,7 +387,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             Renderer* renderer = r.renderer();
             if (renderer) {
 
-                gf.gradientBitmap = create_gradient_bitmap(*renderer);
+                gf.gradientBitmap = gf.createBitmap(*renderer);
                 if (is_morph) {
                     boost::get<GradientFill>(pOther->_fill).gradientBitmap =
                         pOther->need_gradient_bitmap(*renderer);
@@ -509,30 +512,26 @@ fill_style::getGradientMatrix() const
 }
 
 const BitmapInfo*
-fill_style::create_gradient_bitmap(Renderer& renderer) const
+GradientFill::createBitmap(Renderer& renderer) const
 {
-    assert(m_type == SWF::FILL_LINEAR_GRADIENT
-        || m_type == SWF::FILL_RADIAL_GRADIENT
-        || m_type == SWF::FILL_FOCAL_GRADIENT);
-
+    
     std::auto_ptr<ImageRGBA> im;
-    const GradientFill& gf = boost::get<GradientFill>(_fill);
 
-    switch (m_type)
+    switch (type)
     {
-        case SWF::FILL_LINEAR_GRADIENT:
+        case LINEAR:
             // Linear gradient.
             im.reset(new ImageRGBA(256, 1));
 
             for (size_t i = 0; i < im->width(); i++) {
 
-                rgba sample = sampleGradient(gf, i);
+                rgba sample = sampleGradient(*this, i);
                 im->setPixel(i, 0, sample.m_r, sample.m_g,
                         sample.m_b, sample.m_a);
             }
             break;
 
-        case SWF::FILL_RADIAL_GRADIENT:
+        case GradientFill::RADIAL:
             // Radial gradient.
             im.reset(new ImageRGBA(64, 64));
 
@@ -541,19 +540,18 @@ fill_style::create_gradient_bitmap(Renderer& renderer) const
                     float radius = (im->height() - 1) / 2.0f;
                     float y = (j - radius) / radius;
                     float x = (i - radius) / radius;
-                    int ratio = static_cast<int>(
-                            std::floor(255.5f * std::sqrt(x * x + y * y)));
+                    int ratio = std::floor(255.5f * std::sqrt(x * x + y * y));
                     if (ratio > 255) {
                         ratio = 255;
                     }
-                    rgba sample = sampleGradient(gf, ratio);
+                    rgba sample = sampleGradient(*this, ratio);
                     im->setPixel(i, j, sample.m_r, sample.m_g,
                             sample.m_b, sample.m_a);
                 }
             }
             break;
 
-        case SWF::FILL_FOCAL_GRADIENT:
+        case GradientFill::FOCAL:
             // Focal gradient.
             im.reset(new ImageRGBA(64, 64));
 
@@ -562,20 +560,20 @@ fill_style::create_gradient_bitmap(Renderer& renderer) const
                 for (size_t i = 0; i < im->width(); i++)
                 {
                     float radiusy = (im->height() - 1) / 2.0f;
-                    float radiusx = radiusy + std::abs(radiusy *
-                            boost::get<GradientFill>(_fill).focalPoint);
+                    float radiusx = radiusy + std::abs(radiusy * focalPoint);
                     float y = (j - radiusy) / radiusy;
                     float x = (i - radiusx) / radiusx;
-                    int ratio = static_cast<int>(std::floor(255.5f *
-                                std::sqrt(x*x + y*y)));
+                    int ratio = std::floor(255.5f * std::sqrt(x*x + y*y));
                     
                     if (ratio > 255) ratio = 255;
 
-                    rgba sample = sampleGradient(gf, ratio);
+                    rgba sample = sampleGradient(*this, ratio);
                     im->setPixel(i, j, sample.m_r, sample.m_g,
                             sample.m_b, sample.m_a);
                 }
             }
+            break;
+        default:
             break;
     }
 
@@ -593,7 +591,7 @@ fill_style::need_gradient_bitmap(Renderer& renderer) const
             boost::get<GradientFill>(_fill));
 
     if (!gf.gradientBitmap) {
-        gf.gradientBitmap = create_gradient_bitmap(renderer);
+        gf.gradientBitmap = gf.createBitmap(renderer);
     }
     return gf.gradientBitmap.get();
 
@@ -661,7 +659,7 @@ fill_style::setLinearGradient(const std::vector<gradient_record>& gradients,
 
     m_type = SWF::FILL_LINEAR_GRADIENT;
 
-    GradientFill gf;
+    GradientFill gf(GradientFill::LINEAR);
 
     gf.gradients = gradients;
 
@@ -686,7 +684,7 @@ fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
     
     m_type = SWF::FILL_RADIAL_GRADIENT;
 
-    GradientFill gf;
+    GradientFill gf(GradientFill::RADIAL);
     gf.gradients = gradients;
 
     gf.matrix = mat;
