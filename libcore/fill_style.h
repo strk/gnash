@@ -125,7 +125,6 @@ struct GradientFill
 
     Type type;
 
-    boost::intrusive_ptr<const BitmapInfo> gradientBitmap;
     SWFMatrix matrix;
     float focalPoint;
     std::vector<gradient_record> gradients;
@@ -206,16 +205,6 @@ public:
     /// currently opened tag for reading. See stream::ensureBytes()
     void read(SWFStream& in, SWF::TagType t, movie_definition& m,
             const RunResources& r, fill_style *pOther = 0);
-
-    /// \brief
-    /// Make a BitmapInfo* corresponding to our gradient.
-    /// We can use this to set the gradient fill style.
-    const BitmapInfo* create_gradient_bitmap(Renderer& renderer) const;
-    
-    /// \brief
-    /// Makes sure that _gradientBitmapInfo is not NULL. Calls 
-    /// create_gradient_bitmap() if necessary and returns _gradientBitmapInfo.
-    const BitmapInfo* need_gradient_bitmap(Renderer& renderer) const; 
     
     rgba get_color() const;
 
@@ -276,9 +265,9 @@ public:
         boost::get<GradientFill>(_fill).focalPoint = f;
     }
 
-private:
-
     Fill _fill;
+
+private:
 
     /// Fill type, see SWF::fill_style_type
     boost::uint8_t m_type;

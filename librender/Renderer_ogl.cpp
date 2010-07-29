@@ -109,6 +109,12 @@
 
 namespace gnash {
 
+namespace {
+    const BitmapInfo* createGradientBitmap(const GradientFill& gf,
+            Renderer& renderer);
+}
+
+
 #ifdef OSMESA_TESTING
 
 class OSRenderMesa : public boost::noncopyable
@@ -1316,7 +1322,8 @@ public:
         {
                     
           const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
-                      style.need_gradient_bitmap(*this));       
+              createGradientBitmap(
+                  boost::get<GradientFill>(style._fill), *this));       
 
           SWFMatrix m = style.getGradientMatrix();
           
@@ -1842,16 +1849,141 @@ Renderer* create_Renderer_ogl(bool init)
   }
   return renderer;
 }
-  
-  
+ 
+namespace {
+
+rgba
+sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
+{
+
+    const std::vector<gradient_record>& r = fill.gradients;
+
+    if (r.empty()) {
+        static const rgba black;
+        return black;
+    }
+
+    // By specs, first gradient should *always* be 0, 
+    // anyway a malformed SWF could break this,
+    // so we cannot rely on that information...
+    if (ratio < r[0].m_ratio) {
+        IF_VERBOSE_MALFORMED_SWF(
+            LOG_ONCE(log_swferror(_("First gradient in a fill_style "
+                    "has position==%d (expected 0). This seems to be common, "
+                    "so will warn only once."), +r[0].m_ratio);
+            );
+        );
+        return r[0].m_color;
+    }
+
+    if (ratio >= r.back().m_ratio) {
+        return r.back().m_color;
+    }
+        
+    for (size_t i = 1, n = r.size(); i < n; ++i) {
+
+        const gradient_record& gr1 = r[i];
+        if (gr1.m_ratio < ratio) continue;
+
+        const gradient_record& gr0 = r[i - 1];
+        if (gr0.m_ratio > ratio) continue;
+
+        float f = 0.0f;
+
+        if (gr0.m_ratio != gr1.m_ratio) {
+            f = (ratio - gr0.m_ratio) / float(gr1.m_ratio - gr0.m_ratio);
+        }
+        else {
+            // Ratios are equal IFF first and second gradient_record
+            // have the same ratio. This would be a malformed SWF.
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("two gradients in a fill_style "
+                    "have the same position/ratio: %d"),
+                    gr0.m_ratio);
+            );
+        }
+
+        rgba result;
+        result.set_lerp(gr0.m_color, gr1.m_color, f);
+        return result;
+    }
+
+    // Assuming gradients are ordered by m_ratio? see start comment
+    return r.back().m_color;
+}
+
+const BitmapInfo*
+createGradientBitmap(const GradientFill& gf, Renderer& renderer)
+{
+    std::auto_ptr<ImageRGBA> im;
+
+    switch (gf.type)
+    {
+        case GradientFill::LINEAR:
+            // Linear gradient.
+            im.reset(new ImageRGBA(256, 1));
+
+            for (size_t i = 0; i < im->width(); i++) {
+
+                rgba sample = sampleGradient(gf, i);
+                im->setPixel(i, 0, sample.m_r, sample.m_g,
+                        sample.m_b, sample.m_a);
+            }
+            break;
+
+        case GradientFill::RADIAL:
+            // Radial gradient.
+            im.reset(new ImageRGBA(64, 64));
+
+            for (size_t j = 0; j < im->height(); j++) {
+                for (size_t i = 0; i < im->width(); i++) {
+                    float radius = (im->height() - 1) / 2.0f;
+                    float y = (j - radius) / radius;
+                    float x = (i - radius) / radius;
+                    int ratio = std::floor(255.5f * std::sqrt(x * x + y * y));
+                    if (ratio > 255) {
+                        ratio = 255;
+                    }
+                    rgba sample = sampleGradient(gf, ratio);
+                    im->setPixel(i, j, sample.m_r, sample.m_g,
+                            sample.m_b, sample.m_a);
+                }
+            }
+            break;
+
+        case GradientFill::FOCAL:
+            // Focal gradient.
+            im.reset(new ImageRGBA(64, 64));
+
+            for (size_t j = 0; j < im->height(); j++)
+            {
+                for (size_t i = 0; i < im->width(); i++)
+                {
+                    float radiusy = (im->height() - 1) / 2.0f;
+                    float radiusx = radiusy + std::abs(radiusy * gf.focalPoint);
+                    float y = (j - radiusy) / radiusy;
+                    float x = (i - radiusx) / radiusx;
+                    int ratio = std::floor(255.5f * std::sqrt(x*x + y*y));
+                    
+                    if (ratio > 255) ratio = 255;
+
+                    rgba sample = sampleGradient(gf, ratio);
+                    im->setPixel(i, j, sample.m_r, sample.m_g,
+                            sample.m_b, sample.m_a);
+                }
+            }
+            break;
+        default:
+            break;
+    }
+
+    const BitmapInfo* bi = renderer.createBitmapInfo(
+                    static_cast<std::auto_ptr<GnashImage> >(im));
+
+    return bi;
+}
+
+} 
   
 } // namespace gnash
-
-
-/*
-
-Markus: A. A. I still miss you and the easter 2006, you know.
-  A. J. I miss you too, but you'll probably not read this code ever... :/
-
-*/
 
