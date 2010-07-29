@@ -93,6 +93,15 @@ struct BitmapFill
 
     };
     
+    enum Type {
+        CLIPPED,
+        TILED,
+        CLIPPED_HARD,
+        TILED_HARD
+    };
+
+    Type type;
+
     boost::intrusive_ptr<const BitmapInfo> bitmapInfo;
 
     SmoothingPolicy smoothingPolicy;
@@ -102,19 +111,19 @@ struct BitmapFill
 
 struct GradientFill
 {
-    enum GradientType
+    enum Type
     {
         LINEAR,
         RADIAL,
         FOCAL
     };
 
-    explicit GradientFill(GradientType t) : type(t) {}
+    explicit GradientFill(Type t) : type(t) {}
     GradientFill() {}
 
     const BitmapInfo* createBitmap(Renderer& r) const;
 
-    GradientType type;
+    Type type;
 
     boost::intrusive_ptr<const BitmapInfo> gradientBitmap;
     SWFMatrix matrix;
