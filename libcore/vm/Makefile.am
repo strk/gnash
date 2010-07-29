@@ -67,7 +67,6 @@ EXTENSIONS_API = \
 
 if ENABLE_AVM2
 noinst_HEADERS += \
-	CodeStream.h \
 	Machine.h \
 	$(NULL)
 endif
