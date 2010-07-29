@@ -198,10 +198,26 @@ AC_DEFUN([GNASH_PATH_KDE4],
       esac
     fi
 
-    KDE4_PLUGINDIR="${KDE4_PREFIX}/lib/kde4"
-    KDE4_SERVICESDIR="${KDE4_PREFIX}/share/kde4/services"
-    KDE4_CONFIGDIR="${KDE4_PREFIX}/share/kde4/config"
-    KDE4_APPSDATADIR="${KDE4_PREFIX}/share/kde4/apps/klash"
+    if test x"${with_kde4_plugindir}" != x ; then 
+      KDE4_PLUGINDIR="${with_kde4_plugindir}/lib/kde4"
+    else
+      KDE4_PLUGINDIR="${KDE4_PREFIX}/lib/kde4"
+    fi
+    if test x"${with_kde4_servicesdir}" != x ; then 
+      KDE4_SERVICESDIR="${with_kde4_servicesdir}/share/kde4/services"
+    else
+      KDE4_SERVICESDIR="${KDE4_PREFIX}/share/kde4/services"
+    fi
+    if test x"${KDE4_CONFIGDIR}" != x ; then 
+      KDE4_CONFIGDIR="${KDE4_CONFIGDIR}}/share/kde4/config"
+    else
+      KDE4_CONFIGDIR="${KDE4_PREFIX}}/share/kde4/config"
+    fi
+    if test x"${KDE4_APPSDATADIR}" != x ; then 
+      KDE4_APPSDATADIR="${KDE4_APPSDATADIR}/share/kde4/apps/klash"
+    else
+      KDE4_APPSDATADIR="${KDE4_PREFIX}/share/kde4/apps/klash"
+    fi
   fi                            dnl end of build_kparts4
 
   if test x"${ac_cv_path_kde4_incl}" != x ; then
