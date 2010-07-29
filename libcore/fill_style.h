@@ -26,8 +26,9 @@
 #include "SWF.h"
 #include "RGBA.h" // for rgba type
 
-#include <vector> // for composition
-#include <iosfwd> // for output operator forward declarations
+#include <boost/variant.hpp>
+#include <vector> 
+#include <iosfwd> 
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -60,22 +61,15 @@ public:
     rgba m_color;
 };
 
-
-/// For the interior of outline shapes.
-class DSOEXPORT fill_style 
+struct BitmapFill
 {
-public:
-
-    /// Bitmap smoothing policy
-    enum BitmapSmoothingPolicy {
-
+    enum SmoothingPolicy {
         /// Only smooth when _quality >= BEST
         //
         /// This is the policy for bitmap fills
         /// defined by SWF up to version 7:
         ///  - SWF::FILL_CLIPPED_BITMAP
         ///  - SWF::FILL_TILED_BITMAP
-        ///
         BITMAP_SMOOTHING_UNSPECIFIED,
 
         /// Always smooth if _quality > LOW
@@ -84,7 +78,6 @@ public:
         /// defined by SWF 8 and higher:
         ///  - SWF::FILL_CLIPPED_BITMAP
         ///  - SWF::FILL_TILED_BITMAP
-        ///
         BITMAP_SMOOTHING_ON,
 
         /// Never smooth
@@ -96,11 +89,21 @@ public:
         /// introduced in SWF 8:
         ///  - SWF::FILL_CLIPPED_BITMAP_HARD
         ///  - SWF::FILL_TILED_BITMAP_HARD
-        ///
-        ///
         BITMAP_SMOOTHING_OFF
+
     };
     
+    boost::intrusive_ptr<const BitmapInfo> bitmapInfo;
+
+    SmoothingPolicy smoothingPolicy;
+
+    SWFMatrix matrix;
+};
+
+/// For the interior of outline shapes.
+class DSOEXPORT fill_style 
+{
+public:
 
     /// Create a solid opaque white fill.
     fill_style();
@@ -208,8 +211,8 @@ public:
     ///
     const BitmapInfo* get_bitmap_info(Renderer& renderer) const;
 
-    BitmapSmoothingPolicy getBitmapSmoothingPolicy() const {
-        return _bitmapSmoothingPolicy;
+    BitmapFill::SmoothingPolicy getBitmapSmoothingPolicy() const {
+        return boost::get<BitmapFill>(_fill).smoothingPolicy;
     }
     
     /// Returns the bitmap transformation SWFMatrix
@@ -232,6 +235,8 @@ public:
 
 private:
 
+    boost::variant<BitmapFill> _fill;
+
     /// Return the color at the specified ratio into our gradient.
     //
     /// @param ratio
@@ -241,7 +246,6 @@ private:
     // For BITMAP or GRADIENT types 
     SWFMatrix _matrix;
 
-    // For BITMAP or GRADIENT types
     boost::intrusive_ptr<const BitmapInfo> _bitmapInfo;
 
     // For SOLID type (and arguably GRADIENT too)
@@ -256,22 +260,14 @@ private:
     /// Fill type, see SWF::fill_style_type
     boost::uint8_t m_type;
 
-    // Only for BITMAP type
-    //
-    // 0: unspecified (smooth with _quality >= BEST)
-    // 1: smooth (smooth with _quality >= MEDIUM)
-    // 2: don't smooth, can be forced with .forceSmoothing, in
-    //    which case it becomes as policy 1
-    BitmapSmoothingPolicy _bitmapSmoothingPolicy;
 };
 
-DSOEXPORT std::ostream& operator << (std::ostream& os,
-    const fill_style::BitmapSmoothingPolicy& p);
+DSOEXPORT std::ostream& operator<<(std::ostream& os,
+        const BitmapFill::SmoothingPolicy& p);
 
 } // namespace gnash
 
-
-#endif // GNASH_FILL_STYLE_H
+#endif 
 
 
 // Local Variables:
