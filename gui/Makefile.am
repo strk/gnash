@@ -197,10 +197,29 @@ gnash: gnash.in
 	cp $< $@
 	chmod +x $@
 
+# These are used to handle input events from a keyboard, mouse, or
+# touchscreen. These are only used by the Framebuffer GUI, as without
+# X11, it has no event handling. We do it this way so the optionally
+# built source files still get included in the source tarball.
+DEVICES = \
+	InputDevice.cpp InputDevice.h \
+	TouchDevice.cpp \
+	MouseDevice.cpp \
+	EventDevice.cpp
+EXTRA_DIST += $(DEVICES)
+
+if USE_INPUT_EVENTS
+INPUTDEVS = $(DEVICES)
+else
+INPUTDEVS = 
+endif
+
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
 	Player.cpp Player.h \
-	NullGui.cpp NullGui.h
+	NullGui.cpp NullGui.h \
+	$(INPUTDEVS) \
+	$(NULL)
 
 if BUILD_AQUA_GUI
 BUILT_SOURCES += bundle

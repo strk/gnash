@@ -23,52 +23,32 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/scoped_array.hpp>
 #include <vector>
+#include <linux/fb.h>
 
 #include "gui.h"
-#include <linux/fb.h>
+#include "InputDevice.h"
 
 #define PIXELFORMAT_LUT8
 #define CMAP_SIZE (256*2)
 
-// If defined, an internal software-buffer is used for rendering and is then
-// copied to the video RAM. This avoids flicker and is faster for complex 
-// graphics, as video RAM access is usually slower. 
-// (strongly suggested)
-#define DOUBLE_BUFFER
-
-
-// TODO: Make this configurable via ./configure!
-
-
-// Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
-// emulated by the Kernel) 
-//#define USE_MOUSE_PS2
-
-// Define this to read from /dev/input/event0 (new generic input subsystem)
-#define USE_INPUT_EVENTS
-
-// Define this to support eTurboTouch / eGalax touchscreens. When reading from
-// a serial device, it must be initialized (stty) externally. 
-//#define USE_MOUSE_ETT
-
 #ifdef USE_MOUSE_PS2
-#define MOUSE_DEVICE "/dev/input/mice"
+# define MOUSE_DEVICE "/dev/input/mice"
 #endif
 
-#ifdef USE_MOUSE_ETT
+// FIXME: this should really be TSLIB_DEVICE_NAME, but I don't have the
+// ETT SDK, so for now, leave it the way it was.
+#ifdef USE_ETT_TSLIB
 #define MOUSE_DEVICE "/dev/usb/tkpanel0"
 #endif
-
 
 // Define this to request a new virtual terminal at startup. This doesn't always
 // work and probably is not necessary anyway
 //#define REQUEST_NEW_VT
 
-
 namespace gnash
 {
-
 
 /// A Framebuffer-based GUI for Gnash.
 /// ----------------------------------
@@ -92,7 +72,7 @@ namespace gnash
 /// touchscreens but will make it difficult for standard mice. This will be 
 /// fixed in near time.
 //
-/// Supported graphics modes:
+// Supported graphics modes:
 ///
 ///   Resolution: any
 ///
@@ -110,85 +90,48 @@ namespace gnash
 ///   to /dev/input/mice
 class FBGui : public Gui
 {
-	private:
-		int fd;
-		int original_vt;       // virtual terminal that was active at startup
-		int original_kd;       // keyboard mode at startup
-		int own_vt;            // virtual terminal we are running in   
-		unsigned char *fbmem;  // framebuffer memory
-#ifdef DOUBLE_BUFFER
-		unsigned char *buffer; // offscreen buffer
-#endif		
-
+private:
+    int fd;
+    int original_vt;       // virtual terminal that was active at startup
+    int original_kd;       // keyboard mode at startup
+    int own_vt;            // virtual terminal we are running in   
+    unsigned char *fbmem;  // framebuffer memory
+    unsigned char *buffer; // offscreen buffer
+    
     std::vector< geometry::Range2d<int> > _drawbounds;
-
+    
     int m_stage_width;
     int m_stage_height;
     unsigned m_rowsize;
-
-  	int input_fd; /// file descriptor for /dev/input/mice
-  	int keyb_fd; /// file descriptor for /dev/input/event* (keyboard)
-  	int mouse_x, mouse_y, mouse_btn;
-  	unsigned char mouse_buf[256];
-  	int mouse_buf_size;
-  	
-  	// Keyboard SHIFT/CTRL/ALT states (left + right)
-  	bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
+    
+    std::vector<boost::shared_ptr<InputDevice> > _inputs;
 
     struct fb_var_screeninfo var_screeninfo;
-  	struct fb_fix_screeninfo fix_screeninfo;
-
-	/// For 8 bit (palette / LUT) modes, sets a grayscale palette.
-	//
-	/// This GUI currently does not support palette modes. 
-	///
-  	bool set_grayscale_lut8();
-  	
-  	bool initialize_renderer();
-  	
-  	/// Tries to find a accessible tty
-  	char* find_accessible_tty(int no);
-  	char* find_accessible_tty(const char* format, int no);
-  	
-  	/// switches from text mode to graphics mode (disables the text terminal)
-  	bool disable_terminal();
-  	
-  	/// reverts disable_terminal() changes
-  	bool enable_terminal();
-
-#ifdef USE_MOUSE_PS2  	
-  	/// Sends a command to the mouse and waits for the response
-  	bool mouse_command(unsigned char cmd, unsigned char *buf, int count);
-#endif
-
-    /// Fills the mouse data input buffer with fresh data
-    void read_mouse_data();  	
-  	
-  	/// Initializes mouse routines
-  	bool init_mouse();
-  	
-  	/// Checks for and processes any mouse activity. Returns true on activity.
-  	bool check_mouse();
-  	
-  	/// Initializes keyboard routines 
-  	bool init_keyboard();
-  	  	
-  	/// Translates a scancode from the Linux Input Subsystem to a Gnash key code 
-    gnash::key::code scancode_to_gnash_key(int code, bool shift);
-  	
-  	/// Checks for and processes any keyboard activity. Returns true on activity.
-  	bool check_keyboard();
-  	
-#ifdef USE_INPUT_EVENTS  	
-    /// Applies builtin touchscreen calibration
-  	void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
-#endif
-  	
-  	int valid_x(int x);
-  	int valid_y(int y);
-  	  	
-	public:
-		FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
+    struct fb_fix_screeninfo fix_screeninfo;
+    
+    /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
+    //
+    /// This GUI currently does not support palette modes. 
+    ///
+    bool set_grayscale_lut8();
+    
+    bool initialize_renderer();
+    
+    /// Tries to find a accessible tty
+    char* find_accessible_tty(int no);
+    char* find_accessible_tty(const char* format, int no);
+    
+    /// switches from text mode to graphics mode (disables the text terminal)
+    bool disable_terminal();
+    
+    /// reverts disable_terminal() changes
+    bool enable_terminal();
+    
+    int valid_x(int x);
+    int valid_y(int y);
+    
+public:
+    FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~FBGui();
     virtual bool init(int argc, char ***argv);
     virtual bool createWindow(const char *title, int width, int height,
@@ -208,10 +151,23 @@ class FBGui : public Gui
     
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     virtual bool want_multiple_regions() { return true; }
+
+    bool checkForData();    
 };
 
 // end of namespace gnash
 }
 
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+/// Simulate the ioctls used to get information from the framebuffer driver.
+///
+/// Since this is an emulator, we have to set these fields to a reasonable default.
+int fakefb_ioctl(int fd, int request, void *data);
 #endif
 
+#endif  // end of GNASH_FBSUP_H
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

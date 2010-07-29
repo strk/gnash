@@ -559,10 +559,61 @@ AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
 dnl The class file is an optional file that if it is specified at configure time
 dnl with --with-classfile=, then only those classes are compiled and built into the
-dnl class library used for Gnash. THis is designed for small systems that execute the
+dnl class library used for Gnash. This is designed for small systems that execute the
 dnl same swf file over and over, and don't need the same level of functionality that
 dnl a browser plugin does.
 GNASH_PKG_CLASSFILE
+
+dnl Add an option for double buffering when rendering, currently only used by
+dnl the frmaebuffer GUI.
+dnl If defined, an internal software-buffer is used for rendering and is then
+dnl copied to the video RAM. This avoids flicker and is faster for complex 
+dnl graphics, as video RAM access is usually slower. (strongly suggested)
+AC_ARG_ENABLE(doublebuf,
+  AC_HELP_STRING([--enable-doublebuf], [Enable support for double buffering when rendering]),
+  [case "${enableval}" in
+    yes) doublebuf=yes ;;
+    no)  doublebuf=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-doublebuf option]) ;;
+  esac], doublebuf=no
+)
+AM_CONDITIONAL(ENABLE_DBUF, [test x"$doublebuf" = xyes])
+if test x$doublebuf = xyes; then
+    AC_DEFINE(ENABLE_DOUBLE_BUFFERING, [1], [Enable double buffering])
+fi
+
+dnl This enables rendering to an offscreen buffer, instead of directly to window
+AC_ARG_ENABLE(offscreen,
+  AC_HELP_STRING([--enable-offscreen], [Enable support for rendering offscreen]),
+  [case "${enableval}" in
+    yes) offscreen=yes ;;
+    no)  offscreen=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-offscreen option]) ;;
+  esac], offscreen=no
+)
+
+dnl We can use Xephyr or fbe to create a fake framebuffer instead of real
+dnl video memory. This lets us test on a desktop machine.
+AC_ARG_WITH(fakefb,
+AC_HELP_STRING([--with-fakefb],
+ [specify a file to be mapped instead of a real framebuffer]),
+ with_fakefb=${withval})
+
+fakefb=
+if test x"${with_fakefb}" = xyes; then
+  dnl This is the default file name fbe uses.
+  fakefb=/tmp/fbe_buffer
+else
+  if test x"${with_fakefb}" != x; then
+    fakefb=${with_fakefb}
+  fi
+fi
+FAKEFB=${fakefb}
+AC_SUBST(FAKEFB)
+
+if test x"${fakefb}" != x; then
+    AC_DEFINE(ENABLE_FAKE_FRAMEBUFFER, [1], [Enable using a file instead of a real framebuffer])
+fi
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
 
@@ -696,6 +747,80 @@ if test x"${build_haiku}" = xyes; then
 operating system." >&3
   fi
 fi
+
+dnl Multiple input devices are supported. These can all work in varying combinations,
+dnl so several may be listed. These are only required when using the Framebuffer,
+dnl as without the X11 desktop, Gnash has to handle all these internally. This can get
+dnl messy, as one might want to use a touchscreen with a normal mouse or keyboard
+dnl attached. 
+
+dnl By default, don't build any of these, as they are only for the Framebuffer
+dnl running without X11.
+if test x"${build_fb}" = xyes; then
+build_ps2mouse=yes
+build_ps2keyboard=no
+build_input_events=yes
+build_tslib=yes
+input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
+else
+build_ps2mouse=no
+build_ps2keyboard=no
+build_input_events=no
+build_tslib=no
+input_events=
+fi
+AC_ARG_ENABLE(input,
+  AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
+  [if test -n ${enableval}; then
+    enableval=`echo ${enableval} | tr '\054' ' ' `
+  fi
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
+    case "${val}" in
+      ps2m*|PS2m*|m*|M*)        dnl a PS/2 style mouse
+        build_ps2mouse=yes
+        input_events="${input_events}, PS/2 Mouse"
+        ;;
+      ps2k*|PS2K*|k*|K*)        dnl a PS/2 style keyboard
+        build_ps2keyboard=yes
+        input_events="${input_events}, PS/2 Keyboard"
+        ;;
+      i*|I*|ev*|Ev*)    dnl use the new Input Event, which supports both
+        input_events="${input_events}, Input Event Device"
+        build_input_events=yes
+        ;;
+      t*|T*) dnl use a touchscreen with tslib, which works like a mouse
+        build_tslib=yes
+        input_events="${input_events}, Touchscreen"
+        ;;
+      *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
+         ;;
+      esac
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$enableval"; then
+      break;
+    fi
+  done],
+)
+
+if test x"${build_tslib}" = xyes; then
+  AC_DEFINE(USE_TSLIB, [1], [Use a tslib supported touchscreen])
+  GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
+fi
+AM_CONDITIONAL(ENABLE_TSLIB, [test x"$build_tslib" = xyes])
+
+if test x"${build_ps2mouse}" = xyes; then
+  AC_DEFINE(USE_MOUSE_PS2, [1], [Add support for a directly using a PS/2 Mouse])
+fi
+AM_CONDITIONAL(USE_PS2_MOUSE, [test x"${build_ps2mouse}" = xyes])
+
+if test x"${build_ps2keyboard}" = xyes; then
+  AC_DEFINE(USE_KEYBOARD_PS2, [1], [Add support for directly using a PS/2 Keyboard])
+fi
+if test x"${build_input_events}" = xyes; then
+  AC_DEFINE(USE_INPUT_EVENTS, [1], [Add support for a directly using Linux Input Event Devices])
+fi
+AM_CONDITIONAL(USE_INPUT_EVENTS, [test x"${build_input_events}" = xyes])
 
 dnl By default, we want to to build all renderers
 build_ovg=no
@@ -2131,8 +2256,6 @@ AM_CONDITIONAL(BUILD_HAIKU_GUI,    [ test x$build_haiku = xyes ])
 AM_CONDITIONAL(NPAPI,   [test x"${npapi}" = xyes])
 AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
 AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
-
-GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
 
 if test x"${build_gles}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
@@ -3831,6 +3954,21 @@ if test x"$docbook" = x"yes"; then
   fi
 else
   echo "        DocBook document processing disabled (default)"
+fi
+
+dnl The Framebuffer GUI has several other settings. As it doesn't have X11,
+dnl we have to handle input devices ourselves.
+if test x"${build_fb}" = xyes; then
+echo "        Using ${input_events} for Input"
+  if test x"${fakefb}" != x; then
+    echo "        Using shared memory as a fake framebuffer"
+  fi
+  if test x"${offscreen}" = xyes; then
+    echo "        Using offscreen rendering"
+  fi
+  if test x"${doublebuf}" = xyes; then
+    echo "        Using double buffering when rendering"
+  fi
 fi
 
 if test -s $cwarn; then

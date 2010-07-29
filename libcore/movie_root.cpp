@@ -979,11 +979,9 @@ movie_root::display()
     Renderer* renderer = _runResources.renderer();
     if (!renderer) return;
 
-    renderer->begin_display(
-        m_background_color,
-        _stageWidth, _stageHeight,
-        frame_size.get_x_min(), frame_size.get_x_max(),
-        frame_size.get_y_min(), frame_size.get_y_max());
+    renderer->begin_display(m_background_color, _stageWidth, _stageHeight,
+                            frame_size.get_x_min(), frame_size.get_x_max(),
+                            frame_size.get_y_min(), frame_size.get_y_max());
 
 
     for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
@@ -1175,7 +1173,11 @@ movie_root::getStageWidth() const
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<size_t>(_rootMovie->widthPixels());
+    if (_rootMovie) {
+        return static_cast<size_t>(_rootMovie->widthPixels());
+    } else {
+        return 0;
+    }
 }
 
 /// Get actionscript height of stage, in pixels. The height
@@ -1188,7 +1190,11 @@ movie_root::getStageHeight() const
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<size_t>(_rootMovie->heightPixels());
+    if (_rootMovie) {
+        return static_cast<size_t>(_rootMovie->heightPixels());
+    } else {
+        return 0;
+    }
 }
 
 /// Takes a short int bitfield: the four bits correspond
