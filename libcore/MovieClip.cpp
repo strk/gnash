@@ -49,7 +49,7 @@
 #include "ExecutableCode.h" // for inheritance of ConstructEvent
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
-#include "LineStyle.h" // for CapStyle and JoinStyle enums
+#include "LineStyle.h"
 #include "PlaceObject2Tag.h" 
 #include "flash/geom/Matrix_as.h"
 #include "GnashNumeric.h"

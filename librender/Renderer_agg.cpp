@@ -127,6 +127,7 @@ AGG resources
 #include "GnashNumeric.h"
 #include "GC.h"
 #include "cxform.h"
+#include "fill_style.h"
 
 #ifdef HAVE_VA_VA_H
 #include "GnashVaapiImage.h"

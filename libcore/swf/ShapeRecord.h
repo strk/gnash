@@ -20,7 +20,6 @@
 #define GNASH_SWF_SHAPERECORD_H
 
 #include "Geometry.h"
-#include "fill_style.h"
 #include "LineStyle.h"
 #include "SWFRect.h"
 
@@ -30,6 +29,7 @@
 namespace gnash {
     class movie_definition;
     class RunResources;
+    class fill_style;
 }
 
 namespace gnash {
@@ -58,9 +58,11 @@ public:
 
     /// Construct a ShapeRecord.
     //
+    /// This should only really be used for DynamicShapes.
+    //
     /// Ideally all immutable ShapeRecords should be constructed with the
     /// ctor taking an SWFStream, but some tag formats do not allow this.
-    ShapeRecord() {}
+    ShapeRecord();
 
     /// Construct a ShapeRecord from a SWFStream.
     //
@@ -68,13 +70,13 @@ public:
     ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m,
             const RunResources& r);
 
-    ShapeRecord(const ShapeRecord& other)
-        :
-        _fillStyles(other._fillStyles),
-        _lineStyles(other._lineStyles),
-        _paths(other._paths),
-        _bounds(other._bounds)
-    {}
+    /// Copy constructor
+    ShapeRecord(const ShapeRecord& other);
+    
+    /// Assignment operator
+    ShapeRecord& operator=(const ShapeRecord& other);
+
+    ~ShapeRecord();
 
     /// Parse path data from a SWFStream.
     //
@@ -114,16 +116,9 @@ public:
             const double ratio);
 
     /// Reset all shape data.
-    void clear() {
-        _fillStyles.clear();
-        _lineStyles.clear();
-        _paths.clear();
-        _bounds.set_null();
-    }
+    void clear();
 
-    void addFillStyle(const fill_style& fs) {
-        _fillStyles.push_back(fs);
-    }
+    void addFillStyle(const fill_style& fs);
 
     void addPath(const Path& path) {
         _paths.push_back(path);
@@ -138,7 +133,7 @@ public:
     }
 
 private:
-    
+
     /// Shape record flags for use in parsing.
     enum ShapeRecordFlags {
         SHAPE_END = 0x00,

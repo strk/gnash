@@ -35,6 +35,7 @@
 #include "utility.h"
 #include "Range2d.h"
 #include "cxform.h"
+#include "fill_style.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #  include <Windows.h>

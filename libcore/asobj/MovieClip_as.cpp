@@ -17,9 +17,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "MovieClip_as.h"
+
+#include <boost/lexical_cast.hpp>
+
 #include "MovieClip.h"
 #include "Movie.h"
-#include "MovieClip_as.h"
 #include "display/BitmapData_as.h"
 #include "NetStream_as.h"
 #include "movie_root.h"
@@ -33,9 +36,8 @@
 #include "NativeFunction.h" 
 #include "Bitmap.h"
 #include "Array_as.h"
-
+#include "fill_style.h"
 #include "namedStrings.h"
-#include <boost/lexical_cast.hpp>
 
 namespace gnash {
 

@@ -28,6 +28,7 @@ namespace gnash {
     class DisplayObject;
     class Renderer;
     class fill_style;
+    class gradient_record;
 }
 
 namespace gnash {

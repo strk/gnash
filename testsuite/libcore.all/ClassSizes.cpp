@@ -35,6 +35,7 @@
 #include "Shape.h"
 #include "TextField.h"
 #include "SWFStream.h"
+#include "fill_style.h"
 #include "swf/DefineFontAlignZonesTag.h"
 #include "swf/DefineShapeTag.h"
 #include "swf/DefineButtonCxformTag.h"

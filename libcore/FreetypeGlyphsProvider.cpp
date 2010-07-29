@@ -27,6 +27,7 @@
 #include "GnashException.h"
 #include "ShapeRecord.h"
 #include "log.h"
+#include "fill_style.h"
 
 #ifdef USE_FREETYPE 
 # include <ft2build.h>
