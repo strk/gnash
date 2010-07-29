@@ -100,6 +100,23 @@ struct BitmapFill
     SWFMatrix matrix;
 };
 
+struct GradientFill
+{
+    boost::intrusive_ptr<const BitmapInfo> gradientBitmap;
+    SWFMatrix matrix;
+    float focalPoint;
+    std::vector<gradient_record> gradients;
+    SWF::gradient_spread_mode spreadMode;
+    SWF::gradient_interpolation_mode interpolation;
+    rgba color;
+};
+
+struct SolidFill
+{
+    explicit SolidFill(const rgba& c) : color(c) {}
+    rgba color;
+};
+
 /// For the interior of outline shapes.
 class DSOEXPORT fill_style 
 {
@@ -175,13 +192,9 @@ public:
     /// create_gradient_bitmap() if necessary and returns _gradientBitmapInfo.
     const BitmapInfo* need_gradient_bitmap(Renderer& renderer) const; 
     
-    rgba get_color() const {
-        return m_color;
-    }
+    rgba get_color() const;
 
-    void set_color(rgba new_color) {
-        m_color = new_color;
-    }
+    void set_color(rgba new_color);
 
     /// Get fill type, see SWF::fill_style_type
     boost::uint8_t get_type() const {
@@ -189,11 +202,11 @@ public:
     }
 
     SWF::gradient_spread_mode get_gradient_spread_mode() const {
-        return m_spread_mode;
+        return boost::get<GradientFill>(_fill).spreadMode;
     }
 
     SWF::gradient_interpolation_mode get_gradient_interpolation_mode() const {
-        return m_interpolation;
+        return boost::get<GradientFill>(_fill).interpolation;
     }
     
     /// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
@@ -230,32 +243,23 @@ public:
     /// Get and set the focal point for gradient focal fills.
     /// This should be from -1.0 to 1.0, representing the left
     /// and right edges of the rectangle.
-    float get_focal_point() const { return m_focal_point; }
-    void set_focal_point(float f) { m_focal_point = f; }
+    float get_focal_point() const {
+        return boost::get<GradientFill>(_fill).focalPoint;
+    }
+    
+    void set_focal_point(float f) {
+        boost::get<GradientFill>(_fill).focalPoint = f;
+    }
 
 private:
 
-    boost::variant<BitmapFill> _fill;
+    boost::variant<BitmapFill, SolidFill, GradientFill> _fill;
 
     /// Return the color at the specified ratio into our gradient.
     //
     /// @param ratio
     ///    Ratio is in the range [0, 255].
     rgba sample_gradient(boost::uint8_t ratio) const;
-
-    // For BITMAP or GRADIENT types 
-    SWFMatrix _matrix;
-
-    boost::intrusive_ptr<const BitmapInfo> _bitmapInfo;
-
-    // For SOLID type (and arguably GRADIENT too)
-    rgba m_color;
-
-    // Only for GRADIENT type
-    float m_focal_point; // For focal fill gradients.
-    std::vector<gradient_record> m_gradients;
-    SWF::gradient_spread_mode m_spread_mode;
-    SWF::gradient_interpolation_mode m_interpolation;
 
     /// Fill type, see SWF::fill_style_type
     boost::uint8_t m_type;
