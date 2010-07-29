@@ -1469,10 +1469,10 @@ public:
              // TODO: if forceSmoothing is true, smooth !
              switch ( fill_styles[fno].getBitmapSmoothingPolicy() )
              {
-                case BitmapFill::BITMAP_SMOOTHING_UNSPECIFIED:
+                case BitmapFill::SMOOTHING_UNSPECIFIED:
                     if ( _quality >= QUALITY_BEST ) smooth = true;
                     break;
-                case BitmapFill::BITMAP_SMOOTHING_ON:
+                case BitmapFill::SMOOTHING_ON:
                     smooth = true;
                     break;
                 default: break;

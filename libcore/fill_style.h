@@ -70,7 +70,7 @@ struct BitmapFill
         /// defined by SWF up to version 7:
         ///  - SWF::FILL_CLIPPED_BITMAP
         ///  - SWF::FILL_TILED_BITMAP
-        BITMAP_SMOOTHING_UNSPECIFIED,
+        SMOOTHING_UNSPECIFIED,
 
         /// Always smooth if _quality > LOW
         //
@@ -78,18 +78,18 @@ struct BitmapFill
         /// defined by SWF 8 and higher:
         ///  - SWF::FILL_CLIPPED_BITMAP
         ///  - SWF::FILL_TILED_BITMAP
-        BITMAP_SMOOTHING_ON,
+        SMOOTHING_ON,
 
         /// Never smooth
         ///
         /// MovieClip.forceSmoothing can force this to
-        /// behave like BITMAP_SMOOTHING_ON 
+        /// behave like SMOOTHING_ON 
         ///
         /// This is the policy for hard bitmap fills
         /// introduced in SWF 8:
         ///  - SWF::FILL_CLIPPED_BITMAP_HARD
         ///  - SWF::FILL_TILED_BITMAP_HARD
-        BITMAP_SMOOTHING_OFF
+        SMOOTHING_OFF
 
     };
     
@@ -256,12 +256,6 @@ public:
 private:
 
     Fill _fill;
-
-    /// Return the color at the specified ratio into our gradient.
-    //
-    /// @param ratio
-    ///    Ratio is in the range [0, 255].
-    rgba sample_gradient(boost::uint8_t ratio) const;
 
     /// Fill type, see SWF::fill_style_type
     boost::uint8_t m_type;

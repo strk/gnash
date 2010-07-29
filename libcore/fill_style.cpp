@@ -37,6 +37,11 @@
 
 namespace gnash {
 
+// Forward declarations
+namespace {
+    rgba sampleGradient(const GradientFill& fill, boost::uint8_t ratio);
+}
+
 namespace {
 
 #if 1
@@ -54,6 +59,10 @@ struct ConstMatrix : public boost::static_visitor<const SWFMatrix&>
 };
 #endif
 
+/// Create a lerped version of two other fill_styles.
+//
+/// The two fill styles must have exactly the same types. Callers are 
+/// responsible for ensuring this.
 class SetLerp : public boost::static_visitor<>
 {
 public:
@@ -65,12 +74,14 @@ public:
     {
     }
 
+    /// Create a lerped SolidFill.
     void operator()(SolidFill& f) const {
         const SolidFill& a = boost::get<SolidFill>(_a);
         const SolidFill& b = boost::get<SolidFill>(_b);
         f.color.set_lerp(a.color, b.color, _ratio);
     }
 
+    /// Create a lerped GradientFill.
     void operator()(GradientFill& f) const {
         const GradientFill& a = boost::get<GradientFill>(_a);
         const GradientFill& b = boost::get<GradientFill>(_b);
@@ -89,6 +100,7 @@ public:
         f.matrix.set_lerp(a.matrix, b.matrix, _ratio);
     }
 
+    /// Create a lerped BitmapFill.
     void operator()(BitmapFill& f) const {
         const BitmapFill& a = boost::get<BitmapFill>(_a);
         const BitmapFill& b = boost::get<BitmapFill>(_b);
@@ -153,7 +165,7 @@ try {
     return boost::apply_visitor(ConstColor(), _fill);
 }
 catch (const boost::bad_visit&) {
-    return rgba(128, 128, 0, 0);
+    return rgba();
 }
 
 void
@@ -395,13 +407,13 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
             if (m_type == SWF::FILL_TILED_BITMAP_HARD ||
                  m_type == SWF::FILL_CLIPPED_BITMAP_HARD) {
-                bf.smoothingPolicy = BitmapFill::BITMAP_SMOOTHING_OFF;
+                bf.smoothingPolicy = BitmapFill::SMOOTHING_OFF;
             }
             else if (md.get_version() >= 8) {
-                bf.smoothingPolicy = BitmapFill::BITMAP_SMOOTHING_ON;
+                bf.smoothingPolicy = BitmapFill::SMOOTHING_ON;
             }
             else {
-                bf.smoothingPolicy = BitmapFill::BITMAP_SMOOTHING_UNSPECIFIED;
+                bf.smoothingPolicy = BitmapFill::SMOOTHING_UNSPECIFIED;
             }
 
             in.ensureBytes(2);
@@ -496,77 +508,6 @@ fill_style::getGradientMatrix() const
     return boost::apply_visitor(ConstMatrix(), _fill);
 }
 
-rgba
-fill_style::sample_gradient(boost::uint8_t ratio) const
-{
-    assert(m_type == SWF::FILL_LINEAR_GRADIENT
-        || m_type == SWF::FILL_RADIAL_GRADIENT
-        || m_type == SWF::FILL_FOCAL_GRADIENT);
-
-    const std::vector<gradient_record>& r = boost::get<GradientFill>(_fill).gradients;
-
-    if (r.empty()) {
-        static const rgba black;
-        return black;
-    }
-
-    // By specs, first gradient should *always* be 0, 
-    // anyway a malformed SWF could break this,
-    // so we cannot rely on that information...
-    if (ratio < r[0].m_ratio)
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-            LOG_ONCE(
-                log_swferror(
-                    _("First gradient in a fill_style "
-                    "have position==%d (expected 0)."
-                    " This seems to be common, so will"
-                    " warn only once."),
-                    static_cast<int>(r[0].m_ratio));
-            );
-        );
-        return r[0].m_color;
-    }
-
-    if (ratio >= r.back().m_ratio) {
-        return r.back().m_color;
-    }
-        
-    for (size_t i = 1, n = r.size(); i < n; ++i)
-    {
-        const gradient_record& gr1 = r[i];
-        if (gr1.m_ratio < ratio) continue;
-
-        const gradient_record& gr0 = r[i - 1];
-        if (gr0.m_ratio > ratio) continue;
-
-        float f = 0.0f;
-
-        if ( gr0.m_ratio != gr1.m_ratio )
-        {
-            f = (ratio - gr0.m_ratio) / float(gr1.m_ratio - gr0.m_ratio);
-        }
-        else
-        {
-            // Ratios are equal IFF first and second gradient_record
-            // have the same ratio. This would be a malformed SWF.
-            IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(
-                    _("two gradients in a fill_style "
-                    "have the same position/ratio: %d"),
-                    gr0.m_ratio);
-            );
-        }
-
-        rgba result;
-        result.set_lerp(gr0.m_color, gr1.m_color, f);
-        return result;
-    }
-
-    // Assuming gradients are ordered by m_ratio? see start comment
-    return r.back().m_color;
-}
-
 const BitmapInfo*
 fill_style::create_gradient_bitmap(Renderer& renderer) const
 {
@@ -575,6 +516,7 @@ fill_style::create_gradient_bitmap(Renderer& renderer) const
         || m_type == SWF::FILL_FOCAL_GRADIENT);
 
     std::auto_ptr<ImageRGBA> im;
+    const GradientFill& gf = boost::get<GradientFill>(_fill);
 
     switch (m_type)
     {
@@ -583,7 +525,8 @@ fill_style::create_gradient_bitmap(Renderer& renderer) const
             im.reset(new ImageRGBA(256, 1));
 
             for (size_t i = 0; i < im->width(); i++) {
-                rgba sample = sample_gradient(i);
+
+                rgba sample = sampleGradient(gf, i);
                 im->setPixel(i, 0, sample.m_r, sample.m_g,
                         sample.m_b, sample.m_a);
             }
@@ -603,7 +546,7 @@ fill_style::create_gradient_bitmap(Renderer& renderer) const
                     if (ratio > 255) {
                         ratio = 255;
                     }
-                    rgba sample = sample_gradient(ratio);
+                    rgba sample = sampleGradient(gf, ratio);
                     im->setPixel(i, j, sample.m_r, sample.m_g,
                             sample.m_b, sample.m_a);
                 }
@@ -628,7 +571,7 @@ fill_style::create_gradient_bitmap(Renderer& renderer) const
                     
                     if (ratio > 255) ratio = 255;
 
-                    rgba sample = sample_gradient(ratio);
+                    rgba sample = sampleGradient(gf, ratio);
                     im->setPixel(i, j, sample.m_r, sample.m_g,
                             sample.m_b, sample.m_a);
                 }
@@ -751,17 +694,81 @@ fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
     _fill = gf;
 }
 
+namespace {
+
+rgba
+sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
+{
+
+    const std::vector<gradient_record>& r = fill.gradients;
+
+    if (r.empty()) {
+        static const rgba black;
+        return black;
+    }
+
+    // By specs, first gradient should *always* be 0, 
+    // anyway a malformed SWF could break this,
+    // so we cannot rely on that information...
+    if (ratio < r[0].m_ratio) {
+        IF_VERBOSE_MALFORMED_SWF(
+            LOG_ONCE(log_swferror(_("First gradient in a fill_style "
+                    "has position==%d (expected 0). This seems to be common, "
+                    "so will warn only once."), +r[0].m_ratio);
+            );
+        );
+        return r[0].m_color;
+    }
+
+    if (ratio >= r.back().m_ratio) {
+        return r.back().m_color;
+    }
+        
+    for (size_t i = 1, n = r.size(); i < n; ++i) {
+
+        const gradient_record& gr1 = r[i];
+        if (gr1.m_ratio < ratio) continue;
+
+        const gradient_record& gr0 = r[i - 1];
+        if (gr0.m_ratio > ratio) continue;
+
+        float f = 0.0f;
+
+        if (gr0.m_ratio != gr1.m_ratio) {
+            f = (ratio - gr0.m_ratio) / float(gr1.m_ratio - gr0.m_ratio);
+        }
+        else {
+            // Ratios are equal IFF first and second gradient_record
+            // have the same ratio. This would be a malformed SWF.
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("two gradients in a fill_style "
+                    "have the same position/ratio: %d"),
+                    gr0.m_ratio);
+            );
+        }
+
+        rgba result;
+        result.set_lerp(gr0.m_color, gr1.m_color, f);
+        return result;
+    }
+
+    // Assuming gradients are ordered by m_ratio? see start comment
+    return r.back().m_color;
+}
+
+}
+
 std::ostream&
 operator<<(std::ostream& os, const BitmapFill::SmoothingPolicy& p)
 {
     switch (p) {
-        case BitmapFill::BITMAP_SMOOTHING_UNSPECIFIED:
+        case BitmapFill::SMOOTHING_UNSPECIFIED:
             os << "unspecified";
             break;
-        case BitmapFill::BITMAP_SMOOTHING_ON:
+        case BitmapFill::SMOOTHING_ON:
             os << "on";
             break;
-        case BitmapFill::BITMAP_SMOOTHING_OFF:
+        case BitmapFill::SMOOTHING_OFF:
             os << "off";
             break;
         default:
