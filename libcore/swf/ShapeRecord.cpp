@@ -24,7 +24,6 @@
 #include "fill_style.h"
 #include "Geometry.h"
 #include "GnashNumeric.h"
-#include "RunResources.h"
 #include "log.h"
 
 #include <vector>
@@ -35,9 +34,9 @@ namespace SWF {
 // Forward declarations
 namespace {
     void readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md, const RunResources& r);
+        SWF::TagType tag, movie_definition& md, const RunResources& /*r*/);
     void readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md, const RunResources& r);
+        SWF::TagType tag, movie_definition& md, const RunResources& /*r*/);
     void computeBounds(SWFRect& bounds, const ShapeRecord::Paths& paths,
         const ShapeRecord::LineStyles& lineStyles, int swfVersion);
 }
@@ -677,7 +676,7 @@ namespace {
 // Read fill styles, and push them onto the given style array.
 void
 readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
-                 SWF::TagType tag, movie_definition& m, const RunResources& r)
+         SWF::TagType tag, movie_definition& m, const RunResources& /*r*/)
 {
     in.ensureBytes(1);
     boost::uint16_t fill_style_count = in.read_u8();
@@ -698,9 +697,8 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
     styles.reserve(styles.size()+fill_style_count);
     for (boost::uint16_t i = 0; i < fill_style_count; ++i) {
         // TODO: add a fill_style constructor directly reading from stream
-        fill_style fs;
-        fs.read(in, tag, m, r);
-        styles.push_back(fs);
+        OptionalFillPair fp = readFills(in, tag, m, false);
+        styles.push_back(fp.first);
     }
 }
 

@@ -40,9 +40,10 @@ namespace gnash {
 // Forward declarations
 namespace {
     rgba sampleGradient(const GradientFill& fill, boost::uint8_t ratio);
-    SolidFill readSolidFill(SWFStream& in, SWF::TagType t, fill_style* morph);
-    BitmapFill readBitmapFill(SWFStream& in, SWF::FillType type,
-            movie_definition& md, fill_style* morph);
+    OptionalFillPair readSolidFill(SWFStream& in, SWF::TagType t,
+            bool readMorph);
+    OptionalFillPair readBitmapFill(SWFStream& in, SWF::FillType type,
+            movie_definition& md, bool readMorph);
 }
 
 namespace {
@@ -158,11 +159,9 @@ gradient_record::read(SWFStream& in, SWF::TagType tag)
     m_color.read(in, tag);
 }
 
-void
-fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
-        const RunResources& /*r*/, fill_style *pOther)
+OptionalFillPair
+readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
 {
-    const bool is_morph = (pOther != NULL);
 
     in.ensureBytes(1);
     const SWF::FillType type = static_cast<SWF::FillType>(in.read_u8());
@@ -174,20 +173,19 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     switch (type) {
 
         case SWF::FILL_SOLID:
-            fill = readSolidFill(in, t, pOther);
-            return;
+            return readSolidFill(in, t, readMorph);
 
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
-            fill = readBitmapFill(in, type, md, pOther);
-            return;
+            return readBitmapFill(in, type, md, readMorph);
 
         case SWF::FILL_LINEAR_GRADIENT:
         case SWF::FILL_RADIAL_GRADIENT:
         case SWF::FILL_FOCAL_GRADIENT:
         {
+            boost::optional<fill_style> morph;
 
             GradientFill gf;
 
@@ -208,9 +206,9 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
             // Set base transform for both matrices.
             gf.matrix = base;
-            if (is_morph) {
-                pOther->fill = GradientFill();
-                boost::get<GradientFill>(pOther->fill).matrix = base;
+            if (readMorph) {
+                morph = fill_style(GradientFill());
+                boost::get<GradientFill>(morph->fill).matrix = base;
             }
 
             SWFMatrix m;
@@ -219,11 +217,11 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
             gf.matrix.concatenate(m);
             
-            if (is_morph) {
+            if (readMorph) {
                 SWFMatrix m2;
                 m2.read(in);
                 m2.invert();
-                boost::get<GradientFill>(pOther->fill).matrix.concatenate(m2);
+                boost::get<GradientFill>(morph->fill).matrix.concatenate(m2);
             }
             
             // GRADIENT
@@ -239,20 +237,19 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                 IF_VERBOSE_MALFORMED_SWF(
                     log_swferror(_("No gradients!"));
                 );
-                return;
+                throw ParserException();
             }
         
-            if (is_morph) {
-                boost::get<GradientFill>(pOther->fill).gradients.resize(
+            if (readMorph) {
+                boost::get<GradientFill>(morph->fill).gradients.resize(
                         num_gradients);
             }
         
             gf.gradients.resize(num_gradients);
             for (size_t i = 0; i < num_gradients; ++i) {
                 gf.gradients[i].read(in, t);
-                if (is_morph) {
-                    boost::get<GradientFill>(pOther->fill).gradients[i].read(
-                            in, t);
+                if (readMorph) {
+                    boost::get<GradientFill>(morph->fill).gradients[i].read(in, t);
                 }
             }
         
@@ -262,13 +259,13 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             // case the renderer will bork if there is only 1 stop in a 
             // GradientFill.
             if (num_gradients == 1) {
-                fill = SolidFill(gf.gradients[0].m_color);
-                if (pOther) {
-                    const rgba c = boost::get<GradientFill>(
-                            pOther->fill).gradients[0].m_color;
-                    pOther->fill = SolidFill(c);
+                const rgba c1 = gf.gradients[0].m_color;
+                if (readMorph) {
+                    const rgba c2 =
+                        boost::get<GradientFill>(morph->fill).gradients[0].m_color;
+                    morph = fill_style(SolidFill(c2));
                 }
-                return;
+                return std::make_pair(SolidFill(c1), morph);
             }
         
             if (t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_) {
@@ -313,13 +310,12 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                else if (gf.focalPoint > 1.0f) gf.focalPoint = 1.0f;
             }
         
-            if (is_morph) {
-                boost::get<GradientFill>(pOther->fill).focalPoint =
+            if (readMorph) {
+                boost::get<GradientFill>(morph->fill).focalPoint =
                     gf.focalPoint;
             }
 
-            fill = gf;
-            return;
+            return std::make_pair(fill_style(gf), morph);
         }
 
         default:
@@ -344,19 +340,21 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
 
 namespace {
 
-SolidFill
-readSolidFill(SWFStream& in, SWF::TagType t, fill_style* morph)
+OptionalFillPair
+readSolidFill(SWFStream& in, SWF::TagType t, bool readMorph)
 {
     rgba color;
+
+    boost::optional<fill_style> morph;
 
     // 0x00: solid fill
     if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4 ||
             t == SWF::DEFINESHAPE4_ || morph) {
         color.read_rgba(in);
-        if (morph) {
+        if (readMorph) {
             rgba othercolor;
             othercolor.read_rgba(in);
-            morph->fill = SolidFill(othercolor);
+            morph = fill_style(SolidFill(othercolor));
         }
     }
     else {
@@ -368,12 +366,12 @@ readSolidFill(SWFStream& in, SWF::TagType t, fill_style* morph)
     IF_VERBOSE_PARSE(
         log_parse("  color: %s", color);
     );
-    return SolidFill(color);
+    return std::make_pair(fill_style(SolidFill(color)), morph);
 }
 
-BitmapFill
+OptionalFillPair
 readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
-        fill_style* morph)
+        bool readMorph)
 {
 
     in.ensureBytes(2);
@@ -382,17 +380,18 @@ readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
     SWFMatrix m;
     m.read(in);
 
-    if (morph) {
+    boost::optional<fill_style> morph;
+    if (readMorph) {
         SWFMatrix m2;
         m2.read(in);
         m2.invert();
-        morph->fill = BitmapFill(type, &md, id, m2);
+        morph = fill_style(BitmapFill(type, &md, id, m2));
     }
 
     // For some reason, it looks like they store the inverse of the
     // TWIPS-to-texcoords SWFMatrix.
     m.invert();
-    return BitmapFill(type, &md, id, m);
+    return std::make_pair(BitmapFill(type, &md, id, m), morph);
 }
 
 }

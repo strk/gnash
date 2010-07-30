@@ -29,7 +29,7 @@
 #include <boost/variant.hpp>
 #include <vector> 
 #include <iosfwd> 
-
+#include <boost/optional.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 namespace gnash {
@@ -250,21 +250,29 @@ class DSOEXPORT fill_style
 public:
 
     typedef boost::variant<BitmapFill, SolidFill, GradientFill> Fill;
-    fill_style(const Fill& f = SolidFill(rgba())) : fill(f) {}
-
-    /// Read the fill style from a stream
-    //
-    /// Throw a ParserException if there's no enough bytes in the
-    /// currently opened tag for reading. See stream::ensureBytes()
-    void read(SWFStream& in, SWF::TagType t, movie_definition& m,
-            const RunResources& r, fill_style *pOther = 0);
     
+    fill_style(const Fill& f) : fill(f) {}
+
+    fill_style(const fill_style& other)
+        :
+        fill(other.fill)
+    {}
+
     /// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
     void set_lerp(const fill_style& a, const fill_style& b, float t);
 
     Fill fill;
 
 };
+
+/// Either a single or a morph-pair fill_style.
+typedef std::pair<fill_style, boost::optional<fill_style> > OptionalFillPair;
+
+/// Read fill_styles from a stream
+//
+/// Read either single or morph-pair fill styles from a stream. 
+OptionalFillPair readFills(SWFStream& in, SWF::TagType t, movie_definition& m,
+        bool readMorph);
 
 DSOEXPORT std::ostream& operator<<(std::ostream& os,
         const BitmapFill::SmoothingPolicy& p);

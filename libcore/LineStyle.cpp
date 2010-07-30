@@ -68,7 +68,7 @@ LineStyle::LineStyle()
 
 void
 LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
-    const RunResources& r, LineStyle *pOther)
+    const RunResources& /*r*/, LineStyle *pOther)
 {
     if (t == SWF::DEFINEMORPHSHAPE)
     {
@@ -103,13 +103,12 @@ LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
         _miterLimitFactor = in.read_short_ufixed();
     }
     if (has_fill) {
-        fill_style f, g;
-        f.read(in, t, md, r, &g);
+        OptionalFillPair fp = readFills(in, t, md, true);
 
         // TODO: store a fill style properly, removing the need for the 
         // visitor.
-        m_color = boost::apply_visitor(GetColor(), f.fill);
-        pOther->m_color = boost::apply_visitor(GetColor(), g.fill);
+        m_color = boost::apply_visitor(GetColor(), fp.first.fill);
+        pOther->m_color = boost::apply_visitor(GetColor(), fp.second->fill);
     }
     else {
         m_color.read(in, t);
@@ -119,7 +118,7 @@ LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
 
 void
 LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
-        const RunResources& r)
+        const RunResources& /*r*/)
 {
     if (!(t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_))
     {
@@ -152,9 +151,8 @@ LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     if (has_fill) {
         // TODO: store a fill style properly, removing the need for the 
         // visitor.
-        fill_style f;
-        f.read(in, t, md, r);
-        m_color = boost::apply_visitor(GetColor(), f.fill);
+        OptionalFillPair fp = readFills(in, t, md, false);
+        m_color = boost::apply_visitor(GetColor(), fp.first.fill);
     }
     else {
         m_color.read(in, t);
