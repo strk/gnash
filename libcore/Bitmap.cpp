@@ -168,7 +168,9 @@ Bitmap::makeBitmapShape()
 
     SWFMatrix mat;
     mat.set_scale(1.0 / 20, 1.0 / 20);
-    fill_style fill(bitmap(), mat);
+
+    // Can this be tiled?
+    fill_style fill(BitmapFill(BitmapFill::CLIPPED, bitmap(), mat));
     const size_t fillLeft = _shape.add_fill_style(fill);
 
     Path bmpath(w, h, fillLeft, 0, 0, false);

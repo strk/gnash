@@ -64,49 +64,69 @@ public:
 struct BitmapFill
 {
     enum SmoothingPolicy {
-        /// Only smooth when _quality >= BEST
-        //
-        /// This is the policy for bitmap fills
-        /// defined by SWF up to version 7:
-        ///  - SWF::FILL_CLIPPED_BITMAP
-        ///  - SWF::FILL_TILED_BITMAP
         SMOOTHING_UNSPECIFIED,
-
-        /// Always smooth if _quality > LOW
-        //
-        /// This is the policy for non-hard bitmap fills
-        /// defined by SWF 8 and higher:
-        ///  - SWF::FILL_CLIPPED_BITMAP
-        ///  - SWF::FILL_TILED_BITMAP
         SMOOTHING_ON,
-
-        /// Never smooth
-        ///
-        /// MovieClip.forceSmoothing can force this to
-        /// behave like SMOOTHING_ON 
-        ///
-        /// This is the policy for hard bitmap fills
-        /// introduced in SWF 8:
-        ///  - SWF::FILL_CLIPPED_BITMAP_HARD
-        ///  - SWF::FILL_TILED_BITMAP_HARD
         SMOOTHING_OFF
-
     };
     
     enum Type {
         CLIPPED,
-        TILED,
-        CLIPPED_HARD,
-        TILED_HARD
+        TILED
     };
 
-    Type type;
+    /// Construct a BitmapFill from arbitrary bitmap data.
+    BitmapFill(Type t, const BitmapInfo* bi, const SWFMatrix& m)
+        :
+        type(t),
+        matrix(m),
+        _bitmapInfo(bi),
+        _md(0),
+        _id(0)
+    {}
 
-    boost::intrusive_ptr<const BitmapInfo> bitmapInfo;
+    /// Construct a static BitmapFill using a SWF tag.
+    BitmapFill(Type t, movie_definition* md, boost::uint16_t id,
+            const SWFMatrix& m)
+        :
+        type(t),
+        matrix(m),
+        _bitmapInfo(0),
+        _md(md),
+        _id(id)
+    {}
+
+    /// Copy a BitmapFill
+    //
+    /// The copied BitmapFill refers to the same bitmap id in the same
+    /// movie_definition as the original.
+    BitmapFill(const BitmapFill& other)
+        :
+        type(other.type),
+        matrix(other.matrix),
+        _bitmapInfo(other._bitmapInfo),
+        _md(other._md),
+        _id(other._id)
+    {}
+
+    Type type;
 
     SmoothingPolicy smoothingPolicy;
 
     SWFMatrix matrix;
+
+    /// Get the bitmap.
+    const BitmapInfo* bitmap() const;
+
+private:
+
+    /// A Bitmap, used for dynamic fills and to cache parsed bitmaps.
+    mutable boost::intrusive_ptr<const BitmapInfo> _bitmapInfo;
+
+    /// The movie definition containing the bitmap
+    movie_definition* _md;
+
+    // The id of the tag containing the bitmap
+    boost::uint16_t _id;
 };
 
 struct GradientFill
@@ -118,14 +138,27 @@ struct GradientFill
         FOCAL
     };
 
-    explicit GradientFill(Type t) : type(t) {}
+    typedef std::vector<gradient_record> GradientRecords;
+
+    GradientFill(Type t, const GradientRecords& recs, const SWFMatrix& m)
+        :
+        type(t),
+        gradients(recs),
+        matrix(m),
+        focalPoint(0.0),
+        spreadMode(SWF::GRADIENT_SPREAD_PAD),
+        interpolation(SWF::GRADIENT_INTERPOLATION_NORMAL)
+    {
+        assert(recs.size() > 1);
+    }
+
     GradientFill() {}
 
     Type type;
 
+    GradientRecords gradients;
     SWFMatrix matrix;
-    float focalPoint;
-    std::vector<gradient_record> gradients;
+    double focalPoint;
     SWF::SpreadMode spreadMode;
     SWF::InterpolationMode interpolation;
     rgba color;
@@ -133,7 +166,16 @@ struct GradientFill
 
 struct SolidFill
 {
-    explicit SolidFill(const rgba& c) : color(c) {}
+    explicit SolidFill(const rgba& c)
+        :
+        color(c)
+    {}
+
+    SolidFill(const SolidFill& other)
+        :
+        color(other.color)
+    {}
+
     rgba color;
 };
 
@@ -143,58 +185,8 @@ class DSOEXPORT fill_style
 public:
 
     typedef boost::variant<BitmapFill, SolidFill, GradientFill> Fill;
+    fill_style(const Fill& f = SolidFill(rgba())) : fill(f) {}
 
-    /// Create a solid opaque white fill.
-    fill_style();
-
-    /// Construct a clipped bitmap fill style, for
-    /// use by bitmap shape DisplayObject.
-    ///
-    /// TODO: use a subclass for this
-    /// TODO: provide a setBitmap, for consisteny with other setType() methods
-    ///
-    /// @param bitmap
-    ///    The bitmap DisplayObject definition to use with this bitmap fill.
-    ///
-    /// @param mat
-    ///    The SWFMatrix to apply to the bitmap.
-    ///
-    fill_style(const BitmapInfo* const bitmap, const SWFMatrix& mat);
-
-    ~fill_style() {}
-
-    /// Turn this fill style into a solid fill.
-    //
-    /// This is used for dynamic gradient generation.
-    //
-    void setSolid(const rgba& color);
-
-    /// Turn this fill style into a linear gradient
-    //
-    /// This is used for dynamic gradient generation.
-    //
-    /// Note: passing only one gradient record will result in a solid fill
-    /// style, not a gradient. This is for compatibility with dynamic
-    /// fill style generation.
-    //
-    /// @param gradients    Gradient records.
-    /// @param mat          Gradient SWFMatrix.
-    void setLinearGradient(const std::vector<gradient_record>& gradients, 
-            const SWFMatrix& mat);
-
-    /// Turn this fill style into a radial gradient
-    //
-    /// This is used for dynamic gradient generation.
-    //
-    /// Note: passing only one gradient record will result in a solid fill
-    /// style, not a gradient. This is for compatibility with dynamic
-    /// fill style generation.
-    //
-    /// @param gradients    Gradient records.
-    /// @param mat          Gradient SWFMatrix.
-    void setRadialGradient(const std::vector<gradient_record>& gradients,
-            const SWFMatrix& mat);
-    
     /// Read the fill style from a stream
     //
     /// TODO: use a subclass for this (swf_fill_style?)
@@ -204,67 +196,10 @@ public:
     void read(SWFStream& in, SWF::TagType t, movie_definition& m,
             const RunResources& r, fill_style *pOther = 0);
     
-    rgba get_color() const;
-
-    void set_color(rgba new_color);
-
-    /// Get fill type, see SWF::fill_style_type
-    boost::uint8_t get_type() const {
-        return m_type;
-    }
-
-    SWF::SpreadMode get_gradient_spread_mode() const {
-        return boost::get<GradientFill>(_fill).spreadMode;
-    }
-
-    SWF::InterpolationMode get_gradient_interpolation_mode() const {
-        return boost::get<GradientFill>(_fill).interpolation;
-    }
-    
     /// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
     void set_lerp(const fill_style& a, const fill_style& b, float t);
-    
-    /// Returns the bitmap info for all styles except solid fills
-    //
-    /// NOTE: calling this method against a solid fill style will
-    ///       result in a failed assertion.
-    /// 
-    /// NOTE2: this function can return NULL if the DisplayObject_id
-    ///        specified for the style in the SWF does not resolve
-    ///        to a DisplayObject defined in the DisplayObjects dictionary.
-    ///        (it happens..)
-    ///
-    const BitmapInfo* get_bitmap_info(Renderer& renderer) const;
 
-    BitmapFill::SmoothingPolicy getBitmapSmoothingPolicy() const {
-        return boost::get<BitmapFill>(_fill).smoothingPolicy;
-    }
-    
-    /// Returns the bitmap transformation SWFMatrix
-    const SWFMatrix& getBitmapMatrix() const; 
-    
-    /// Returns the gradient transformation SWFMatrix
-    const SWFMatrix& getGradientMatrix() const; 
-    
-    /// Returns the number of color stops in the gradient
-    size_t get_color_stop_count() const;
-    
-    /// Returns the color stop value at a specified index
-    const gradient_record& get_color_stop(size_t index) const;
-
-    /// Get and set the focal point for gradient focal fills.
-    /// This should be from -1.0 to 1.0, representing the left
-    /// and right edges of the rectangle.
-    float get_focal_point() const {
-        return boost::get<GradientFill>(_fill).focalPoint;
-    }
-    
-    Fill _fill;
-
-private:
-
-    /// Fill type, see SWF::fill_style_type
-    boost::uint8_t m_type;
+    Fill fill;
 
 };
 

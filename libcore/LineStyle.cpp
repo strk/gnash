@@ -33,6 +33,24 @@
 
 namespace gnash {
 
+namespace {
+
+class GetColor : public boost::static_visitor<rgba>
+{
+public:
+    rgba operator()(const SolidFill& f) const {
+        return f.color;
+    }
+    rgba operator()(const GradientFill& f) const {
+        return f.color;
+    }
+    rgba operator()(const BitmapFill&) const {
+        return rgba();
+    }
+};
+
+}
+
 LineStyle::LineStyle()
     :
     m_width(0),
@@ -84,17 +102,16 @@ LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
         in.ensureBytes(2);
         _miterLimitFactor = in.read_short_ufixed();
     }
-    if (has_fill)
-    {
-        // read fill styles for strokes.
-        // TODO: don't throw away this information, should be passed to renderer.
+    if (has_fill) {
         fill_style f, g;
         f.read(in, t, md, r, &g);
-        m_color = f.get_color();
-        pOther->m_color = g.get_color();
+
+        // TODO: store a fill style properly, removing the need for the 
+        // visitor.
+        m_color = boost::apply_visitor(GetColor(), f.fill);
+        pOther->m_color = boost::apply_visitor(GetColor(), g.fill);
     }
-    else
-    {
+    else {
         m_color.read(in, t);
         pOther->m_color.read(in, t);
     }
@@ -128,21 +145,18 @@ LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     _noClose = flags2 & (1 << 2);
     _endCapStyle = (CapStyle) (flags2 & 0x03); 
 
-    if (_joinStyle == JOIN_MITER) 
-    {
+    if (_joinStyle == JOIN_MITER) {
         in.ensureBytes(2);
         _miterLimitFactor = in.read_short_ufixed();
     }
-    if (has_fill)
-    {
-        // read fill styles for strokes.
-        // TODO: don't throw away this information, should be passed to renderer.
+    if (has_fill) {
+        // TODO: store a fill style properly, removing the need for the 
+        // visitor.
         fill_style f;
         f.read(in, t, md, r);
-        m_color = f.get_color();
+        m_color = boost::apply_visitor(GetColor(), f.fill);
     }
-    else
-    {
+    else {
         m_color.read(in, t);
     }
 }
@@ -163,8 +177,7 @@ LineStyle::set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio)
     }
 }
 
-// end of namespace
-}
+} // namespace gnash
 
 
 // Local Variables:

@@ -51,80 +51,14 @@
 
 namespace gnash {
 
-// Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
-static void
-rgb_to_cairo_rgb24(boost::uint8_t* dst, const GnashImage* im)
-{
-    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
-    for (size_t y = 0;  y < im->height();  y++)
-    {
-        const boost::uint8_t* src = im->scanlinePointer(y);
-        for (size_t x = 0;  x < im->width();  x++, src += 3) {
-            *dst32++ = (src[0] << 16) | (src[1] << 8) | src[2];
-        }
-    }
+namespace {
+    void pattern_add_color_stops(const GradientFill& f,
+            cairo_pattern_t* pattern, const cxform& cx);
+    void init_cairo_matrix(cairo_matrix_t* cairo_matrix,
+            const SWFMatrix& gnash_matrix);
 }
 
-// Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
-static void
-rgba_to_cairo_argb(boost::uint8_t* dst, const GnashImage* im)
-{
-    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
-    for (size_t y = 0;  y < im->height();  y++)
-    {
-        const boost::uint8_t* src = im->scanlinePointer(y);
-        for (size_t x = 0;  x < im->width();  x++, src += 4)
-        {
-            const boost::uint8_t& r = src[0],
-                                  g = src[1],
-                                  b = src[2],
-                                  a = src[3];
-
-            if (a) {  
-                *dst32++ = (a << 24) | (r << 16) | (g << 8) | b;       
-            } else {
-                *dst32++ = 0;
-            }
-        }
-    }
-}
-
-
-static void
-snap_to_half_pixel(cairo_t* cr, double& x, double& y)
-{
-    cairo_user_to_device(cr, &x, &y);
-
-    x = std::floor(x + 0.5) + 0.5;
-    y = std::floor(y + 0.5) + 0.5;
-
-    cairo_device_to_user(cr, &x, &y);
-}
-
-static void
-init_cairo_matrix(cairo_matrix_t* cairo_matrix, const SWFMatrix& gnash_matrix)
-{
-    cairo_matrix_init(cairo_matrix,
-                      gnash_matrix.sx/65536.0, gnash_matrix.shx/65536.0,
-                      gnash_matrix.shy/65536.0, gnash_matrix.sy/65536.0,
-                      gnash_matrix.tx, gnash_matrix.ty);
-}
-
-void
-pattern_add_color_stops(const fill_style& style, cairo_pattern_t* pattern,
-                        const cxform& cx)
-{      
-    for (size_t index = 0; index < style.get_color_stop_count(); ++index) {
-        const gradient_record& grad = style.get_color_stop(index);
-        
-        rgba c = cx.transform(grad.m_color);
-
-        cairo_pattern_add_color_stop_rgba (pattern,
-            grad.m_ratio / 255.0, c.m_r / 255.0, c.m_g / 255.0,
-            c.m_b / 255.0, c.m_a / 255.0);
-    }
-}
-
+namespace {
 
 class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
 {
@@ -187,86 +121,152 @@ class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
     cairo_pattern_t* _pattern;
 };
 
-static cairo_pattern_t*
-get_cairo_pattern(Renderer_cairo& renderer, const fill_style& style, const cxform& cx)
+
+/// Style handler
+//
+/// Transfer fill_styles to agg styles.
+struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
 {
-  int fill_type = style.get_type();
-  cairo_pattern_t* pattern = NULL;
-      
-  switch (fill_type) {
+    StyleHandler(const cxform& c)
+        :
+        _cx(c)
+    {}
 
-    case SWF::FILL_LINEAR_GRADIENT:
-    {
-      SWFMatrix m = style.getGradientMatrix();
-    
-      cairo_matrix_t mat;
-      init_cairo_matrix(&mat, m);
+    cairo_pattern_t* operator()(const GradientFill& f) const {
+        SWFMatrix m = f.matrix;
+        switch (f.type) {
+            case GradientFill::LINEAR:
+            {
+                cairo_matrix_t mat;
+                init_cairo_matrix(&mat, m);
       
-      pattern = cairo_pattern_create_linear(0, 0, 256.0, 0);
-      cairo_pattern_set_matrix (pattern, &mat);
+                cairo_pattern_t* pattern =
+                    cairo_pattern_create_linear(0, 0, 256.0, 0);
+                cairo_pattern_set_matrix (pattern, &mat);
 
-      pattern_add_color_stops(style, pattern, cx);
-                                                  
-      break;
+                pattern_add_color_stops(f, pattern, _cx);
+                return pattern;
+            }
+            case GradientFill::RADIAL:
+            case GradientFill::FOCAL:
+            {
+              
+                // Undo the translation our parser applied.
+                gnash::SWFMatrix transl;
+                transl.concatenate_translation(-32, -32);
+                transl.concatenate(m);
+
+                cairo_matrix_t mat;
+                init_cairo_matrix(&mat, transl);
+
+                double focal_pos = 0;
+
+                if (f.type == GradientFill::FOCAL) {
+                    focal_pos = 32.0f * f.focalPoint;
+                }
+
+                cairo_pattern_t* pattern =
+                    cairo_pattern_create_radial(focal_pos, 0.0, 0.0,
+                            0.0, 0.0, 32.0f);
+
+                cairo_pattern_set_matrix (pattern, &mat);          
+              
+                pattern_add_color_stops(f, pattern, _cx);
+                return pattern;
+            }
+        }
+        // We should never get here.
+        return 0;
     }
-    case SWF::FILL_RADIAL_GRADIENT:
-    case SWF::FILL_FOCAL_GRADIENT:
-    {
-      SWFMatrix m = style.getGradientMatrix();
-      
-      // Undo the translation our parser applied.
-      gnash::SWFMatrix transl;
-      transl.concatenate_translation(-32, -32);
-      transl.concatenate(m);
 
-      cairo_matrix_t mat;
-      init_cairo_matrix(&mat, transl);
-
-      double focal_pos = 0;
-
-      if (fill_type == SWF::FILL_FOCAL_GRADIENT) {
-        focal_pos = 32.0f * style.get_focal_point();
-      }
-
-      pattern = cairo_pattern_create_radial(focal_pos, 0.0, 0.0, 0.0, 0.0, 32.0f);
-
-      cairo_pattern_set_matrix (pattern, &mat);          
-      
-      pattern_add_color_stops(style, pattern, cx);
-      break;
+    cairo_pattern_t* operator()(const SolidFill& f) const {
+        rgba c = _cx.transform(f.color);
+        cairo_pattern_t* pattern =
+            cairo_pattern_create_rgba (c.m_r / 255.0, c.m_g / 255.0,
+                                    c.m_b / 255.0, c.m_a / 255.0);
+        return pattern;
     }
-    case SWF::FILL_TILED_BITMAP_HARD:
-    case SWF::FILL_TILED_BITMAP:
-    case SWF::FILL_CLIPPED_BITMAP:
-    case SWF::FILL_CLIPPED_BITMAP_HARD:
-    {
-      SWFMatrix m = style.getBitmapMatrix();        
+
+    cairo_pattern_t* operator()(const BitmapFill& f) const {
+        SWFMatrix m = f.matrix;
       
-      const bitmap_info_cairo* binfo
-        = dynamic_cast<const bitmap_info_cairo*>(style.get_bitmap_info(renderer));
+        const bitmap_info_cairo* binfo =
+            dynamic_cast<const bitmap_info_cairo*>(f.bitmap());
 
-      if (!binfo) {
-        return NULL;
-      }
+        if (!binfo) return 0;
       
-      cairo_matrix_t mat;
-      init_cairo_matrix(&mat, m);       
+        cairo_matrix_t mat;
+        init_cairo_matrix(&mat, m);       
 
-      pattern = binfo->apply(&mat, fill_type);
-      break;
-    } 
-
-    case SWF::FILL_SOLID:
-    {            
-      rgba c = cx.transform(style.get_color());
-      pattern = cairo_pattern_create_rgba (c.m_r / 255.0, c.m_g / 255.0,
-                                            c.m_b / 255.0, c.m_a / 255.0);
-      break;
+        // TODO: the second argument should be fill_type but is unused.
+        cairo_pattern_t* pattern = binfo->apply(&mat, 0);
+        return pattern;
     }
-    
-  } // switch
+
+private:
+    const cxform& _cx;
+};  
+
+}
+
+// Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
+static void
+rgb_to_cairo_rgb24(boost::uint8_t* dst, const GnashImage* im)
+{
+    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
+    for (size_t y = 0;  y < im->height();  y++)
+    {
+        const boost::uint8_t* src = im->scanlinePointer(y);
+        for (size_t x = 0;  x < im->width();  x++, src += 3) {
+            *dst32++ = (src[0] << 16) | (src[1] << 8) | src[2];
+        }
+    }
+}
+
+// Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
+static void
+rgba_to_cairo_argb(boost::uint8_t* dst, const GnashImage* im)
+{
+    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
+    for (size_t y = 0;  y < im->height();  y++)
+    {
+        const boost::uint8_t* src = im->scanlinePointer(y);
+        for (size_t x = 0;  x < im->width();  x++, src += 4)
+        {
+            const boost::uint8_t& r = src[0],
+                                  g = src[1],
+                                  b = src[2],
+                                  a = src[3];
+
+            if (a) {  
+                *dst32++ = (a << 24) | (r << 16) | (g << 8) | b;       
+            } else {
+                *dst32++ = 0;
+            }
+        }
+    }
+}
+
+
+static void
+snap_to_half_pixel(cairo_t* cr, double& x, double& y)
+{
+    cairo_user_to_device(cr, &x, &y);
+
+    x = std::floor(x + 0.5) + 0.5;
+    y = std::floor(y + 0.5) + 0.5;
+
+    cairo_device_to_user(cr, &x, &y);
+}
+
+static cairo_pattern_t*
+get_cairo_pattern(Renderer_cairo& renderer, const fill_style& style,
+        const cxform& cx)
+{
+    StyleHandler st(cx);
+    cairo_pattern_t* pattern = boost::apply_visitor(st, style.fill);
   
-  return pattern;
+    return pattern;
 
 }
 
@@ -985,8 +985,7 @@ Renderer_cairo::drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
     cxform dummy_cx;
     std::vector<fill_style> glyph_fs;
     
-    fill_style coloring;
-    coloring.setSolid(color);
+    fill_style coloring = fill_style(SolidFill(color));
     
     glyph_fs.push_back(coloring);
     
@@ -1080,6 +1079,35 @@ Renderer_cairo::getPixel(rgba& color_return, int x, int y) const
     color_return.m_b = ptr[0];
 
     return true;
+}
+
+namespace {
+
+void
+pattern_add_color_stops(const GradientFill& f, cairo_pattern_t* pattern,
+                        const cxform& cx)
+{      
+    for (size_t index = 0; index < f.gradients.size(); ++index) {
+        const gradient_record& grad = f.gradients[index];
+        
+        rgba c = cx.transform(grad.m_color);
+
+        cairo_pattern_add_color_stop_rgba (pattern,
+            grad.m_ratio / 255.0, c.m_r / 255.0, c.m_g / 255.0,
+            c.m_b / 255.0, c.m_a / 255.0);
+    }
+}
+
+void
+init_cairo_matrix(cairo_matrix_t* cairo_matrix, const SWFMatrix& gnash_matrix)
+{
+    cairo_matrix_init(cairo_matrix,
+                      gnash_matrix.sx/65536.0, gnash_matrix.shx/65536.0,
+                      gnash_matrix.shy/65536.0, gnash_matrix.sy/65536.0,
+                      gnash_matrix.tx, gnash_matrix.ty);
+}
+
+
 }
 
 

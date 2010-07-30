@@ -44,21 +44,6 @@ namespace {
 
 namespace {
 
-#if 1
-struct ConstMatrix : public boost::static_visitor<const SWFMatrix&>
-{
-    const SWFMatrix& operator()(const GradientFill& f) const {
-        return f.matrix;
-    }
-    const SWFMatrix& operator()(const BitmapFill& f) const {
-        return f.matrix;
-    }
-    const SWFMatrix& operator()(const SolidFill&) const {
-        throw boost::bad_visit();
-    }
-};
-#endif
-
 /// Create a lerped version of two other fill_styles.
 //
 /// The two fill styles must have exactly the same types. Callers are 
@@ -104,7 +89,6 @@ public:
     void operator()(BitmapFill& f) const {
         const BitmapFill& a = boost::get<BitmapFill>(_a);
         const BitmapFill& b = boost::get<BitmapFill>(_b);
-        f.bitmapInfo = a.bitmapInfo;
         f.matrix.set_lerp(a.matrix, b.matrix, _ratio);
     }
 
@@ -116,64 +100,17 @@ private:
 
 };
 
-struct Matrix : public boost::static_visitor<SWFMatrix&>
+}
+
+const BitmapInfo*
+BitmapFill::bitmap() const
 {
-    SWFMatrix& operator()(GradientFill& f) const {
-        return f.matrix;
-    }
-    SWFMatrix& operator()(BitmapFill& f) const {
-        return f.matrix;
-    }
-    SWFMatrix& operator()(SolidFill&) const {
-        throw boost::bad_visit();
-    }
-};
+    if (_bitmapInfo) return _bitmapInfo.get();
+    if (!_md) return 0;
+    _bitmapInfo = _md->getBitmap(_id);
 
-struct ConstColor : public boost::static_visitor<const rgba&>
-{
-    const rgba& operator()(const GradientFill& f) const {
-        return f.color;
-    }
-    const rgba& operator()(const SolidFill& f) const {
-        return f.color;
-    }
-    const rgba& operator()(const BitmapFill&) const {
-        throw boost::bad_visit();
-    }
-
-};
-
-struct Color : public boost::static_visitor<rgba&>
-{
-    rgba& operator()(GradientFill& f) const {
-        return f.color;
-    }
-    rgba& operator()(SolidFill& f) const {
-        return f.color;
-    }
-    rgba& operator()(BitmapFill&) const {
-        throw boost::bad_visit();
-    }
-
-};
-
-}
-
-rgba
-fill_style::get_color() const
-try {
-    return boost::apply_visitor(ConstColor(), _fill);
-}
-catch (const boost::bad_visit&) {
-    return rgba();
-}
-
-void
-fill_style::set_color(rgba new_color)
-try {
-    boost::apply_visitor(Color(), _fill) = new_color;
-}
-catch (const boost::bad_visit&) {
+    // May still be 0!
+    return _bitmapInfo.get();
 }
 
 void
@@ -184,11 +121,31 @@ gradient_record::read(SWFStream& in, SWF::TagType tag)
     m_color.read(in, tag);
 }
 
-fill_style::fill_style()
-    :
-    _fill(SolidFill(rgba(255, 255, 255, 255))),
-    m_type(SWF::FILL_SOLID)
+SolidFill
+readSolidFill(SWFStream& in, SWF::TagType t, fill_style* morph)
 {
+    rgba color;
+
+    // 0x00: solid fill
+    if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4 ||
+            t == SWF::DEFINESHAPE4_ || morph) {
+        color.read_rgba(in);
+        if (morph) {
+            rgba othercolor;
+            othercolor.read_rgba(in);
+            morph->fill = SolidFill(othercolor);
+        }
+    }
+    else {
+        // For DefineMorphShape tags we should use morphfill_style 
+        assert(t == SWF::DEFINESHAPE || t == SWF::DEFINESHAPE2);
+        color.read_rgb(in);
+    }
+
+    IF_VERBOSE_PARSE(
+        log_parse("  color: %s", color);
+    );
+    return SolidFill(color);
 }
 
 void
@@ -198,87 +155,57 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     const bool is_morph = (pOther != NULL);
 
     in.ensureBytes(1);
-    m_type = in.read_u8();
-    if (is_morph) {
-        pOther->m_type = m_type;
-    }
+    const boost::uint8_t type = in.read_u8();
         
     IF_VERBOSE_PARSE(
-        log_parse("  fill_style read type = 0x%X", +m_type);
+        log_parse("  fill_style read type = 0x%X", +type);
     );
 
-    switch (m_type) {
-
+    switch (type) {
         case SWF::FILL_SOLID:
-        {
-            log_debug("Fill Solid!");
-            rgba color;
-
-            // 0x00: solid fill
-            if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4
-                || t == SWF::DEFINESHAPE4_ || is_morph) {
-                color.read_rgba(in);
-                if (is_morph) {
-                    rgba othercolor;
-                    othercolor.read_rgba(in);
-                    pOther->_fill = SolidFill(othercolor);
-                }
-            }
-            else {
-                // For DefineMorphShape tags we should use morph_fill_style 
-                assert(t == SWF::DEFINESHAPE || t == SWF::DEFINESHAPE2);
-                color.read_rgb(in);
-            }
-
-            IF_VERBOSE_PARSE(
-                log_parse("  color: %s", color);
-            );
-            _fill = SolidFill(color);
+            fill = readSolidFill(in, t, pOther);
             return;
-        }
 
         case SWF::FILL_LINEAR_GRADIENT:
         case SWF::FILL_RADIAL_GRADIENT:
         case SWF::FILL_FOCAL_GRADIENT:
         {
-            // 0x10: linear gradient fill
-            // 0x12: radial gradient fill
-            // 0x13: focal gradient fill
 
             GradientFill gf;
 
-            SWFMatrix input_matrix;
-            input_matrix.read(in);
+            SWFMatrix base;
 
-            // shouldn't this be in initializer's list ?
-            if (m_type == SWF::FILL_LINEAR_GRADIENT) {
+            if (type == SWF::FILL_LINEAR_GRADIENT) {
                 gf.type = GradientFill::LINEAR;
-                gf.matrix.set_translation(128, 0);
-                gf.matrix.set_scale(1.0/128, 1.0/128);
+                base.set_translation(128, 0);
+                base.set_scale(1.0 / 128, 1.0 / 128);
             }
             else {
                 // FILL_RADIAL_GRADIENT or FILL_FOCAL_GRADIENT
-                gf.matrix.set_translation(32, 32);
-                gf.matrix.set_scale(1.0/512, 1.0/512);
-                gf.type = m_type == SWF::FILL_FOCAL_GRADIENT ?
+                base.set_translation(32, 32);
+                base.set_scale(1.0 / 512, 1.0 / 512);
+                gf.type = type == SWF::FILL_FOCAL_GRADIENT ?
                     GradientFill::FOCAL : GradientFill::RADIAL;
             }
 
-            SWFMatrix m = input_matrix;
-            m.invert();
-
+            // Set base transform for both matrices.
+            gf.matrix = base;
             if (is_morph) {
-                pOther->_fill = GradientFill();
-                boost::get<GradientFill>(pOther->_fill).matrix = gf.matrix;
+                pOther->fill = GradientFill();
+                boost::get<GradientFill>(pOther->fill).matrix = base;
             }
+
+            SWFMatrix m;
+            m.read(in);
+            m.invert();
 
             gf.matrix.concatenate(m);
             
             if (is_morph) {
-                input_matrix.read(in);
-                m = input_matrix;
-                m.invert();
-                boost::get<GradientFill>(pOther->_fill).matrix.concatenate(m);
+                SWFMatrix m2;
+                m2.read(in);
+                m2.invert();
+                boost::get<GradientFill>(pOther->fill).matrix.concatenate(m2);
             }
             
             // GRADIENT
@@ -340,7 +267,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             }
         
             if (is_morph) {
-                boost::get<GradientFill>(pOther->_fill).gradients.resize(
+                boost::get<GradientFill>(pOther->fill).gradients.resize(
                         num_gradients);
             }
                     
@@ -348,13 +275,13 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             for (size_t i = 0; i < num_gradients; ++i) {
                 gf.gradients[i].read(in, t);
                 if (is_morph) {
-                    boost::get<GradientFill>(pOther->_fill).gradients[i].read(
+                    boost::get<GradientFill>(pOther->fill).gradients[i].read(
                             in, t);
                 }
             }
         
             // A focal gradient also has a focal point.
-            if (m_type == SWF::FILL_FOCAL_GRADIENT) {
+            if (type == SWF::FILL_FOCAL_GRADIENT) {
                in.ensureBytes(2);
                gf.focalPoint = in.read_short_sfixed();
                if (gf.focalPoint < -1.0f) gf.focalPoint = -1.0f;
@@ -362,7 +289,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             }
         
             if (is_morph) {
-                boost::get<GradientFill>(pOther->_fill).focalPoint =
+                boost::get<GradientFill>(pOther->fill).focalPoint =
                     gf.focalPoint;
             }
         
@@ -374,14 +301,14 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             if (num_gradients > 0) {
                 gf.color = gf.gradients[0].m_color;
                 if (is_morph) {
-                    boost::get<GradientFill>(pOther->_fill).color =
+                    boost::get<GradientFill>(pOther->fill).color =
                         boost::get<GradientFill>(
-                                pOther->_fill).gradients[0].m_color;
+                                pOther->fill).gradients[0].m_color;
                 }
             }
             
             // Do this before creating bitmap!
-            _fill = gf;
+            fill = gf;
         
             return;
         }
@@ -391,45 +318,43 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
         {
-            BitmapFill bf;
+
+            // TODO: this is a bit ugly.
+            BitmapFill::Type t;
+            switch (type) {
+                case SWF::FILL_TILED_BITMAP_HARD:
+                case SWF::FILL_TILED_BITMAP:
+                    t = BitmapFill::TILED;
+                    break;
+                case SWF::FILL_CLIPPED_BITMAP_HARD:
+                case SWF::FILL_CLIPPED_BITMAP:
+                    t = BitmapFill::CLIPPED;
+                    break;
+            }
 
             // 0x40: tiled bitmap fill
             // 0x41: clipped bitmap fill
             // 0x42: tiled bitmap fill with hard edges
             // 0x43: clipped bitmap fill with hard edges
 
-            if (m_type == SWF::FILL_TILED_BITMAP_HARD ||
-                 m_type == SWF::FILL_CLIPPED_BITMAP_HARD) {
-                bf.smoothingPolicy = BitmapFill::SMOOTHING_OFF;
+            BitmapFill::SmoothingPolicy pol;
+
+            if (type == SWF::FILL_TILED_BITMAP_HARD ||
+                 type == SWF::FILL_CLIPPED_BITMAP_HARD) {
+                pol = BitmapFill::SMOOTHING_OFF;
             }
             else if (md.get_version() >= 8) {
-                bf.smoothingPolicy = BitmapFill::SMOOTHING_ON;
+                pol = BitmapFill::SMOOTHING_ON;
             }
             else {
-                bf.smoothingPolicy = BitmapFill::SMOOTHING_UNSPECIFIED;
+                pol = BitmapFill::SMOOTHING_UNSPECIFIED;
             }
 
             in.ensureBytes(2);
-            int bitmap_char_id = in.read_u16();
+            const boost::uint16_t id = in.read_u16();
             IF_VERBOSE_PARSE(
                 log_parse("  bitmap_char = %d, smoothing_policy = %s",
-                    bitmap_char_id, bf.smoothingPolicy);
-            );
-
-            // Look up the bitmap DisplayObject.
-            bf.bitmapInfo = md.getBitmap(bitmap_char_id);
-            IF_VERBOSE_MALFORMED_SWF(
-                if (!bf.bitmapInfo) {
-                    LOG_ONCE(
-                        log_swferror(_("Bitmap fill specifies '%d' as associated"
-                            " bitmap DisplayObject id,"
-                            " but that DisplayObject is not found"
-                            " in the Characters Dictionary."
-                            " It seems common to find such "
-                            " malformed SWF, so we'll only warn once "
-                            "about this."), bitmap_char_id);
-                    );
-                }
+                    id, pol);
             );
 
             SWFMatrix m;
@@ -437,26 +362,26 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
             // For some reason, it looks like they store the inverse of the
             // TWIPS-to-texcoords SWFMatrix.
-            bf.matrix = m.invert();
+            m.invert();
+            fill = BitmapFill(t, &md, id, m);
 
             if (is_morph) {
-                pOther->_fill = BitmapFill();
-                boost::get<BitmapFill>(pOther->_fill).bitmapInfo = bf.bitmapInfo;
-                m.read(in);
-                boost::get<BitmapFill>(pOther->_fill).matrix = m.invert();
+                SWFMatrix m2;
+                m2.read(in);
+                m2.invert();
+                pOther->fill = BitmapFill(t, &md, id, m2);
             }
 
             IF_VERBOSE_PARSE(
-               log_parse("SWFMatrix: %s", bf.matrix);
+               log_parse("SWFMatrix: %s", m);
             );
-            _fill = bf;
             return;
         }
 
         default:
         {
             std::stringstream ss;
-            ss << "Unknown fill style type " << m_type;    
+            ss << "Unknown fill style type " << +type;    
             // This is a fatal error, we'll be leaving the stream
             // read pointer in an unknown position.
             throw ParserException(ss.str()); 
@@ -464,135 +389,15 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     }
 }
 
-
-const BitmapInfo* 
-fill_style::get_bitmap_info(Renderer& /*renderer*/) const 
-{    
-    assert(m_type != SWF::FILL_SOLID);
-
-    switch (m_type)
-    {
-        case SWF::FILL_TILED_BITMAP:
-        case SWF::FILL_CLIPPED_BITMAP:
-        case SWF::FILL_TILED_BITMAP_HARD:
-        case SWF::FILL_CLIPPED_BITMAP_HARD:
-            return boost::get<BitmapFill>(_fill).bitmapInfo.get();
-        default:
-            log_error(_("Unknown fill style %d"), m_type);
-            // Seems a bit drastic...
-            std::abort();
-    }
-}
-
-const SWFMatrix&
-fill_style::getBitmapMatrix() const 
-{
-    return boost::get<BitmapFill>(_fill).matrix;
-}
-
-const SWFMatrix&
-fill_style::getGradientMatrix() const 
-{
-    // TODO: Why do we separate bitmap and gradient matrices? 
-    return boost::apply_visitor(ConstMatrix(), _fill);
-}
-
-
 // Sets this style to a blend of a and b.  t = [0,1]
 void
 fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
 {
     assert(t >= 0 && t <= 1);
-
-    m_type = a.get_type();
-    
-    // TODO: set type better
-    _fill = a._fill;
-    assert(m_type == b.get_type());
-    boost::apply_visitor(SetLerp(a._fill, b._fill, t), _fill);
-
+    fill = a.fill;
+    boost::apply_visitor(SetLerp(a.fill, b.fill, t), fill);
 }
 
-size_t
-fill_style::get_color_stop_count() const 
-{
-    return boost::get<GradientFill>(_fill).gradients.size();
-}
-
-const gradient_record& 
-fill_style::get_color_stop(size_t index) const
-{
-    const GradientFill& gf = boost::get<GradientFill>(_fill);
-    assert(index < gf.gradients.size());
-    return gf.gradients[index];
-}
-
-fill_style::fill_style(const BitmapInfo* const bitmap, const SWFMatrix& mat)
-    :
-    _fill(BitmapFill()),
-    m_type(SWF::FILL_CLIPPED_BITMAP)
-{
-    boost::get<BitmapFill>(_fill).matrix = mat;
-    boost::get<BitmapFill>(_fill).bitmapInfo = bitmap;
-}
-
-void
-fill_style::setSolid(const rgba& color)
-{
-    m_type = SWF::FILL_SOLID;
-    _fill = SolidFill(color);
-}
-
-void
-fill_style::setLinearGradient(const std::vector<gradient_record>& gradients,
-        const SWFMatrix& mat)
-{
-
-    assert(!gradients.empty());
-    
-    // We must ensure that all gradients have more than one colour stop
-    // because asking renderers to render a gradient with one colour
-    // can cause them to invoke UB.
-    if (gradients.size() < 2) {
-        setSolid(gradients[0].m_color);
-        return;
-    }
-
-    m_type = SWF::FILL_LINEAR_GRADIENT;
-
-    GradientFill gf(GradientFill::LINEAR);
-
-    gf.gradients = gradients;
-
-    gf.matrix = mat;
-    _fill = gf;
-}
-
-void
-fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
-        const SWFMatrix& mat)
-{
-    assert(!gradients.empty());
-    
-    // We must ensure that all gradients have more than one colour stop
-    // because asking renderers to render a gradient with one colour
-    // can cause them to invoke UB.
-    if (gradients.size() < 2) {
-        setSolid(gradients[0].m_color);
-        return;
-    }
-    
-    m_type = SWF::FILL_RADIAL_GRADIENT;
-
-    GradientFill gf(GradientFill::RADIAL);
-    gf.gradients = gradients;
-
-    gf.matrix = mat;
-    _fill = gf;
-}
-
-namespace {
-}
 
 std::ostream&
 operator<<(std::ostream& os, const BitmapFill::SmoothingPolicy& p)

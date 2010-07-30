@@ -98,8 +98,8 @@ public:
         _x(0),
         _y(0)
     {
+        /// A default fill style is solid white.
         fill_style f;
-        f.setSolid(rgba(255, 255, 255, 255));
         _shape.addFillStyle(f);
         _shape.addPath(Path(_x, _y, 1, 0, 0, true));
         _currPath = &_shape.currentPath();

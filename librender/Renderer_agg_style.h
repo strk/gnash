@@ -179,9 +179,8 @@ class agg_style_gradient : public agg_style_base
 {
 public:
 
-  agg_style_gradient(const gnash::fill_style& fs,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx,
-        int norm_size)
+  agg_style_gradient(const GradientFill& fs, const SWFMatrix& mat,
+          const cxform& cx, int norm_size)
     :
     agg_style_base(false),
     m_cx(cx),
@@ -196,7 +195,7 @@ public:
     // Build gradient lookup table
     m_gradient_lut.remove_all(); 
     
-    const size_t size = fs.get_color_stop_count();
+    const size_t size = fs.gradients.size();
     
     // It is essential that at least two colours are added; otherwise agg
     // will use uninitialized values.
@@ -204,7 +203,7 @@ public:
 
     for (int i = 0; i != size; ++i) {
     
-      const gradient_record& gr = fs.get_color_stop(i); 
+      const gradient_record& gr = fs.gradients[i]; 
       rgba trans_color = m_cx.transform(gr.m_color);
       if (trans_color.m_a < 255) m_need_premultiply = true;    
       
@@ -572,7 +571,7 @@ public:
     
     // === GRADIENT ===
 
-    void add_gradient_linear(const gnash::fill_style& fs,
+    void add_gradient_linear(const GradientFill& fs,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
     
@@ -601,7 +600,7 @@ public:
     }
     
 
-    void add_gradient_radial(const gnash::fill_style& fs,
+    void add_gradient_radial(const GradientFill& fs,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
     
@@ -636,7 +635,7 @@ public:
       m_styles.push_back(st);
     }
 
-    void add_gradient_focal(const gnash::fill_style& fs,
+    void add_gradient_focal(const GradientFill& fs,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
       typedef agg::rgba8 color_type;
@@ -662,7 +661,7 @@ public:
       
       // re-initialize focal gradient settings
       gradient_adaptor_type& adaptor = st->get_gradient_adaptor();
-      adaptor.init(32.0, fs.get_focal_point()*32.0, 0.0);
+      adaptor.init(32.0, fs.focalPoint * 32.0, 0.0);
     
       m_styles.push_back(st);
     }

@@ -114,6 +114,50 @@ namespace {
             Renderer& renderer);
 }
 
+namespace {
+
+/// Style handler
+//
+/// Transfer fill_styles to the ogl renderer.
+struct StyleHandler : boost::static_visitor<>
+{
+    StyleHandler(const cxform& c, Renderer& r)
+        :
+        _cx(c),
+        _renderer(r)
+    {}
+
+    void operator()(const GradientFill& f) const {
+
+        const rgba c = _cx.transform(f.color);
+        glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
+                
+        const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
+            createGradientBitmap(f, _renderer));  
+
+        SWFMatrix m = f.matrix;
+        binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
+    }
+
+    void operator()(const SolidFill& f) const {
+        const rgba c = _cx.transform(f.color);
+        glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
+    }
+
+    void operator()(const BitmapFill& f) const {
+        const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
+                   f.bitmap());
+        binfo->apply(f.matrix, f.type == BitmapFill::TILED ?
+                bitmap_info_ogl::WRAP_REPEAT : bitmap_info_ogl::WRAP_CLAMP);
+    }
+
+private:
+    const cxform& _cx;
+    Renderer& _renderer;
+};  
+
+}
+
 
 #ifdef OSMESA_TESTING
 
@@ -1102,8 +1146,7 @@ public:
     cxform dummy_cx;
     std::vector<fill_style> dummy_fs;
     
-    fill_style coloring;
-    coloring.setSolid(rgba(0,0,0,0));
+    fill_style coloring = fill_style(SolidFill(rgba(0, 0, 0, 0)));
     
     dummy_fs.push_back(coloring);
     
@@ -1307,62 +1350,8 @@ public:
 
   void apply_fill_style(const fill_style& style, const SWFMatrix& /* mat */, const cxform& cx)
   {
-      int fill_type = style.get_type();
-      
-      rgba c = cx.transform(style.get_color());
-
-      glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
-          
-          
-      switch (fill_type) {
-
-        case SWF::FILL_LINEAR_GRADIENT:
-        case SWF::FILL_RADIAL_GRADIENT:
-        case SWF::FILL_FOCAL_GRADIENT:
-        {
-                    
-          const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
-              createGradientBitmap(
-                  boost::get<GradientFill>(style._fill), *this));       
-
-          SWFMatrix m = style.getGradientMatrix();
-          
-          binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
-          
-          break;
-        }        
-        case SWF::FILL_TILED_BITMAP_HARD:
-        case SWF::FILL_TILED_BITMAP:
-        {
-            const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
-                    style.get_bitmap_info(*this));
-
-          binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_REPEAT);
-          break;
-        }
-                
-        case SWF::FILL_CLIPPED_BITMAP:
-        // smooth=true;
-        case SWF::FILL_CLIPPED_BITMAP_HARD:
-        {     
-          const bitmap_info_ogl* binfo = dynamic_cast<const bitmap_info_ogl*>(
-                  style.get_bitmap_info(*this));
-          
-          assert(binfo);
-
-          binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_CLAMP);
-          
-          break;
-        } 
-
-        case SWF::FILL_SOLID:
-        {
-          rgba c = cx.transform(style.get_color());
-
-          glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
-        }
-        
-      } // switch
+      const StyleHandler st(cx, *this);
+      boost::apply_visitor(st, style.fill);
   }
   
   
@@ -1669,20 +1658,25 @@ public:
         _tesselator.endContour();
       }
       
-
-      
       apply_fill_style(fill_styles[i], mat, cx);
 
-      if (fill_styles[i].get_type() != SWF::FILL_SOLID) {     
-        // Apply alpha premultiplication.
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      // This is terrible, but since the renderer is half dead I don't care.
+      try {
+          boost::get<SolidFill>(fill_styles[i].fill);
+      }
+      catch (const boost::bad_get&) {
+          // For non solid fills...
+          glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
       }
       
       _tesselator.tesselate();
       
-      if (fill_styles[i].get_type() != SWF::FILL_SOLID) {    
-        // restore to original.
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      try {
+          boost::get<SolidFill>(fill_styles[i].fill);
+      }
+      catch (const boost::bad_get&) {
+          // Restore to original.
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       }
       
       glDisable(GL_TEXTURE_GEN_S);
@@ -1762,8 +1756,7 @@ public:
     cxform dummy_cx;
     std::vector<fill_style> glyph_fs;
     
-    fill_style coloring;
-    coloring.setSolid(c);
+    fill_style coloring = fill_style(SolidFill(c));
     
     glyph_fs.push_back(coloring);
     

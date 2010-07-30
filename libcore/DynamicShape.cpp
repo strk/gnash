@@ -94,7 +94,7 @@ DynamicShape::beginFill(const rgba& color)
 	endFill();
 
 	// Add the new fill style and set as current
-	fill_style style; style.setSolid(color);
+	fill_style style = fill_style(SolidFill(color));
 	_currfill = add_fill_style(style);
 
 	// TODO: how to know wheter the fill should be set
@@ -105,15 +105,24 @@ DynamicShape::beginFill(const rgba& color)
 }
 
 void
-DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
+DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad,
+        const SWFMatrix& mat)
 {
-	// Add the new fill style and set as current
-	fill_style style;
-    style.setLinearGradient(grad, mat);
+    assert(!grad.empty());
 
 	endFill();
 
-	_currfill = add_fill_style(style);
+    // A Gradient fill must have at least two colour stops!
+    if (grad.size() > 1) {
+        // Add the new fill style and set as current
+        fill_style style(GradientFill(GradientFill::LINEAR, grad, mat));
+        _currfill = add_fill_style(style);
+    }
+    else {
+        fill_style style(SolidFill(grad[0].m_color));
+        _currfill = add_fill_style(style);
+    }
+
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
@@ -129,7 +138,7 @@ DynamicShape::beginRadialGradientFill(const std::vector<gradient_record>& grad, 
 	endFill();
 
 	// Add the new fill style and set as current
-	fill_style style; style.setRadialGradient(grad, mat);
+	fill_style style(GradientFill(GradientFill::RADIAL, grad, mat));
 	_currfill = add_fill_style(style);
 
 	// TODO: how to know wheter the fill should be set

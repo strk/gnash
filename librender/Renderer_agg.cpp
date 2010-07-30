@@ -670,6 +670,96 @@ private:
     /// Whether smoothing is required.
     bool _smoothing;
 };    
+  
+
+/// Style handler
+//
+/// Transfer fill_styles to agg styles.
+struct StyleHandler : boost::static_visitor<>
+{
+    StyleHandler(SWFMatrix stage, SWFMatrix fill, const cxform& c,
+            agg_style_handler& sh, Quality q)
+        :
+        _stageMatrix(stage.invert()),
+        _fillMatrix(fill.invert()),
+        _cx(c),
+        _sh(sh),
+        _quality(q)
+    {}
+
+    void operator()(const GradientFill& f) const {
+          SWFMatrix m = f.matrix;
+          
+          m.concatenate(_fillMatrix);
+          m.concatenate(_stageMatrix);
+          switch (f.type) {
+              case GradientFill::LINEAR:
+                  _sh.add_gradient_linear(f, m, _cx);
+                  break;
+              case GradientFill::RADIAL:
+                  _sh.add_gradient_radial(f, m, _cx);
+                  break;
+              case GradientFill::FOCAL:
+                  _sh.add_gradient_focal(f, m, _cx);
+                  break;
+          }
+    }
+
+    void operator()(const SolidFill& f) const {
+        const rgba color = _cx.transform(f.color);
+
+        // add the color to our self-made style handler (basically
+        // just a list)
+        _sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b,
+                  color.m_a));
+    }
+
+    void operator()(const BitmapFill& f) const {
+        SWFMatrix m = f.matrix;
+        m.concatenate(_fillMatrix);
+        m.concatenate(_stageMatrix);
+
+        // Smoothing policy:
+        //
+        // - If unspecified, smooth when _quality >= BEST
+        // - If ON or forced, smooth when _quality > LOW
+        // - If OFF, don't smooth
+        //
+        // TODO: take a forceBitmapSmoothing parameter.
+        //       which should be computed by the VM looking
+        //       at MovieClip.forceSmoothing.
+        bool smooth = false;
+        if (_quality > QUALITY_LOW) {
+            // TODO: if forceSmoothing is true, smooth !
+            switch (f.smoothingPolicy) {
+                case BitmapFill::SMOOTHING_UNSPECIFIED:
+                    if (_quality >= QUALITY_BEST) smooth = true;
+                    break;
+                case BitmapFill::SMOOTHING_ON:
+                    smooth = true;
+                    break;
+                default: break;
+            }
+        }
+
+        const bool tiled = (f.type == BitmapFill::TILED);
+
+        _sh.add_bitmap(
+            dynamic_cast<const agg_bitmap_info*>(f.bitmap()), m, _cx, tiled,
+            smooth);
+    }
+
+private:
+
+    /// The inverted stage matrix.
+    const SWFMatrix _stageMatrix;
+    
+    /// The inverted fill matrix.
+    const SWFMatrix _fillMatrix;
+    const cxform& _cx;
+    agg_style_handler& _sh;
+    const Quality _quality;
+};  
             
 }
 
@@ -1030,12 +1120,11 @@ public:
     AggPaths agg_paths;    
     buildPaths(agg_paths, paths);
  
-    // make sure m_single_fill_styles contains the required color 
-    need_single_fill_style(color);
+    std::vector<fill_style> v(1, fill_style(SolidFill(color)));
 
     // prepare style handler
     agg_style_handler sh;
-    build_agg_styles(sh, m_single_fill_styles, mat, cxform());
+    build_agg_styles(sh, v, mat, cxform());
     
     draw_shape(-1, paths, agg_paths, sh, false);
     
@@ -1384,126 +1473,23 @@ public:
     
     }
   } //buildPaths_rounded
-    
-  // Initializes the internal styles class for AGG renderer
-  void build_agg_styles(agg_style_handler& sh, 
-    const std::vector<fill_style>& fill_styles,
-    const SWFMatrix& fillstyle_matrix,
-    const cxform& cx) {
-    
-    SWFMatrix inv_stage_matrix = stage_matrix;
-    inv_stage_matrix.invert();
-    
-    const size_t fcount = fill_styles.size();
-    for (size_t fno=0; fno<fcount; ++fno) {
-    
-      int fill_type = fill_styles[fno].get_type();
-      
-      switch (fill_type) {
 
-        case SWF::FILL_LINEAR_GRADIENT:
-        {    
-          SWFMatrix m = fill_styles[fno].getGradientMatrix();
-          SWFMatrix cm = fillstyle_matrix;
-          cm.invert();
-          
-          m.concatenate(cm);
-          m.concatenate(inv_stage_matrix);
-          
-          sh.add_gradient_linear(fill_styles[fno], m, cx);
-          break;
+    // Initializes the internal styles class for AGG renderer
+    void build_agg_styles(agg_style_handler& sh,
+        const std::vector<fill_style>& fill_styles,
+        const SWFMatrix& fillstyle_matrix, const cxform& cx) {
+    
+        SWFMatrix inv_stage_matrix = stage_matrix;
+        inv_stage_matrix.invert();
+    
+        const size_t fcount = fill_styles.size();
+
+        for (size_t fno = 0; fno < fcount; ++fno) {
+            const StyleHandler st(stage_matrix, fillstyle_matrix, cx, sh,
+                    _quality);
+            boost::apply_visitor(st, fill_styles[fno].fill);
         } 
-
-        case SWF::FILL_RADIAL_GRADIENT:
-        {
-          SWFMatrix m = fill_styles[fno].getGradientMatrix();
-          SWFMatrix cm = fillstyle_matrix;
-          cm.invert();
-          
-          m.concatenate(cm);
-          m.concatenate(inv_stage_matrix);
-          
-          sh.add_gradient_radial(fill_styles[fno], m, cx);
-          break;
-        } 
-
-        case SWF::FILL_FOCAL_GRADIENT:
-        {
-          SWFMatrix m = fill_styles[fno].getGradientMatrix();
-          SWFMatrix cm = fillstyle_matrix;
-          cm.invert();
-          
-          m.concatenate(cm);
-          m.concatenate(inv_stage_matrix);
-          
-          sh.add_gradient_focal(fill_styles[fno], m, cx);
-          break;
-        }
-
-        case SWF::FILL_TILED_BITMAP:
-        case SWF::FILL_CLIPPED_BITMAP:
-        case SWF::FILL_TILED_BITMAP_HARD:
-        case SWF::FILL_CLIPPED_BITMAP_HARD:
-        {    
-          SWFMatrix m = fill_styles[fno].getBitmapMatrix();
-          SWFMatrix cm = fillstyle_matrix;
-          cm.invert();
-          
-          m.concatenate(cm);
-          m.concatenate(inv_stage_matrix);
-
-          //
-          // Smoothing policy:
-          //
-          // - If unspecified, smooth when _quality >= BEST
-          // - If ON or forced, smooth when _quality > LOW
-          // - If OFF, don't smooth
-          //
-          // TODO: take a forceBitmapSmoothing parameter.
-          //       which should be computed by the VM looking
-          //       at MovieClip.forceSmoothing.
-          //
-          bool smooth = false;
-          if ( _quality > QUALITY_LOW ) // never smooth in LOW quality
-          {
-             // TODO: if forceSmoothing is true, smooth !
-             switch ( fill_styles[fno].getBitmapSmoothingPolicy() )
-             {
-                case BitmapFill::SMOOTHING_UNSPECIFIED:
-                    if ( _quality >= QUALITY_BEST ) smooth = true;
-                    break;
-                case BitmapFill::SMOOTHING_ON:
-                    smooth = true;
-                    break;
-                default: break;
-             }
-          }
-
-          sh.add_bitmap(dynamic_cast<const agg_bitmap_info*> 
-            (fill_styles[fno].get_bitmap_info(*this)), m, cx, 
-            (fill_type==SWF::FILL_TILED_BITMAP) ||
-            (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth);
-
-          break;
-        } 
-
-        case SWF::FILL_SOLID:
-        default:
-        {            
-          rgba color = cx.transform(fill_styles[fno].get_color());
-
-          // add the color to our self-made style handler (basically
-          // just a list)
-          sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b,
-                      color.m_a));
-        } 
-        
-      } // switch
-        
-    } // for
-    
-  } //build_agg_styles
+    } 
   
 
   /// Draws the given path using the given fill style and color transform.
@@ -2154,20 +2140,6 @@ public:
   
 private:  // private variables
     
-  /// Sets m_single_fill_styles to one solid fill with the given color 
-    void need_single_fill_style(const rgba& color)
-    {
-
-        if (m_single_fill_styles.size() == 0)
-        { 
-            fill_style dummy;
-            m_single_fill_styles.push_back(dummy);
-        }
-
-        m_single_fill_styles[0].set_color(color);
-
-    } 
-
     typedef agg::renderer_base<PixelFormat> renderer_base;
 
     // renderer base
