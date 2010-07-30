@@ -258,12 +258,16 @@ public:
         fill(other.fill)
     {}
 
-    /// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
-    void set_lerp(const fill_style& a, const fill_style& b, float t);
 
     Fill fill;
 
 };
+ 
+/// Set the fill_style to a lerp of a and b.
+//
+/// Callers must ensure that all fill_styles have exactly the same type! Most
+/// errors are caught by type-checking and will throw an unhandled exception.
+void setLerp(fill_style& f, const fill_style& a, const fill_style& b, double t);
 
 /// Either a single or a morph-pair fill_style.
 typedef std::pair<fill_style, boost::optional<fill_style> > OptionalFillPair;

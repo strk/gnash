@@ -58,7 +58,7 @@ public:
 
     void operator()(typename T::value_type& st)
     {
-        st.set_lerp(*_style1, *_style2, _ratio);
+        setLerp(st, *_style1, *_style2, _ratio);
         ++_style1, ++_style2;
     }
 

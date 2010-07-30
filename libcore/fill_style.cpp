@@ -331,11 +331,11 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
 
 // Sets this style to a blend of a and b.  t = [0,1]
 void
-fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
+setLerp(fill_style& f, const fill_style& a, const fill_style& b, double t)
 {
     assert(t >= 0 && t <= 1);
-    fill = a.fill;
-    boost::apply_visitor(SetLerp(a.fill, b.fill, t), fill);
+    f.fill = a.fill;
+    boost::apply_visitor(SetLerp(a.fill, b.fill, t), f.fill);
 }
 
 namespace {
@@ -349,7 +349,7 @@ readSolidFill(SWFStream& in, SWF::TagType t, bool readMorph)
 
     // 0x00: solid fill
     if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4 ||
-            t == SWF::DEFINESHAPE4_ || morph) {
+            t == SWF::DEFINESHAPE4_ || readMorph) {
         color.read_rgba(in);
         if (readMorph) {
             rgba othercolor;
