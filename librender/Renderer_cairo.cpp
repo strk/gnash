@@ -180,15 +180,15 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
     }
 
     cairo_pattern_t* operator()(const SolidFill& f) const {
-        rgba c = _cx.transform(f.color);
+        rgba c = _cx.transform(f.color());
         cairo_pattern_t* pattern =
-            cairo_pattern_create_rgba (c.m_r / 255.0, c.m_g / 255.0,
+            cairo_pattern_create_rgba(c.m_r / 255.0, c.m_g / 255.0,
                                     c.m_b / 255.0, c.m_a / 255.0);
         return pattern;
     }
 
     cairo_pattern_t* operator()(const BitmapFill& f) const {
-        SWFMatrix m = f.matrix;
+        SWFMatrix m = f.matrix();
       
         const bitmap_info_cairo* binfo =
             dynamic_cast<const bitmap_info_cairo*>(f.bitmap());
@@ -260,8 +260,7 @@ snap_to_half_pixel(cairo_t* cr, double& x, double& y)
 }
 
 static cairo_pattern_t*
-get_cairo_pattern(Renderer_cairo& renderer, const fill_style& style,
-        const cxform& cx)
+get_cairo_pattern(const fill_style& style, const cxform& cx)
 {
     StyleHandler st(cx);
     cairo_pattern_t* pattern = boost::apply_visitor(st, style.fill);
@@ -287,7 +286,7 @@ public:
   virtual void prepareFill(int fill_index, const cxform& cx)
   {
     if (!_pattern) {
-      _pattern = get_cairo_pattern(_renderer, _fill_styles[fill_index-1], cx);
+      _pattern = get_cairo_pattern(_fill_styles[fill_index-1], cx);
     }
   }
   virtual void terminateFill(int fill_style)

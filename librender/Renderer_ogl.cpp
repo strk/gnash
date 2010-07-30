@@ -137,14 +137,14 @@ struct StyleHandler : boost::static_visitor<>
     }
 
     void operator()(const SolidFill& f) const {
-        const rgba c = _cx.transform(f.color);
+        const rgba c = _cx.transform(f.color());
         glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
     }
 
     void operator()(const BitmapFill& f) const {
         const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
                    f.bitmap());
-        binfo->apply(f.matrix, f.type == BitmapFill::TILED ?
+        binfo->apply(f.matrix(), f.type() == BitmapFill::TILED ?
                 bitmap_info_ogl::WRAP_REPEAT : bitmap_info_ogl::WRAP_CLAMP);
     }
 

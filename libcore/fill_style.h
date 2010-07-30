@@ -61,8 +61,9 @@ public:
     rgba m_color;
 };
 
-struct BitmapFill
+class BitmapFill
 {
+public:
     enum SmoothingPolicy {
         SMOOTHING_UNSPECIFIED,
         SMOOTHING_ON,
@@ -75,25 +76,22 @@ struct BitmapFill
     };
 
     /// Construct a BitmapFill from arbitrary bitmap data.
+    //
+    /// TODO: check the smoothing policy here!
     BitmapFill(Type t, const BitmapInfo* bi, const SWFMatrix& m)
         :
-        type(t),
-        matrix(m),
+        _type(t),
+        _smoothingPolicy(SMOOTHING_UNSPECIFIED),
+        _matrix(m),
         _bitmapInfo(bi),
         _md(0),
         _id(0)
-    {}
+    {
+    }
 
     /// Construct a static BitmapFill using a SWF tag.
-    BitmapFill(Type t, movie_definition* md, boost::uint16_t id,
-            const SWFMatrix& m)
-        :
-        type(t),
-        matrix(m),
-        _bitmapInfo(0),
-        _md(md),
-        _id(id)
-    {}
+    BitmapFill(SWF::FillType t, movie_definition* md, boost::uint16_t id,
+            const SWFMatrix& m);
 
     /// Copy a BitmapFill
     //
@@ -101,24 +99,44 @@ struct BitmapFill
     /// movie_definition as the original.
     BitmapFill(const BitmapFill& other)
         :
-        type(other.type),
-        matrix(other.matrix),
+        _type(other._type),
+        _smoothingPolicy(other._smoothingPolicy),
+        _matrix(other._matrix),
         _bitmapInfo(other._bitmapInfo),
         _md(other._md),
         _id(other._id)
     {}
 
-    Type type;
+    void setLerp(const BitmapFill& a, const BitmapFill& b, double ratio);
 
-    SmoothingPolicy smoothingPolicy;
+    /// Get the Type of this BitmapFill
+    //
+    /// BitmapFills are either tiled or clipped.
+    Type type() const {
+        return _type;
+    }
 
-    SWFMatrix matrix;
+    /// Get the smoothing policy of this BitmapFill.
+    SmoothingPolicy smoothingPolicy() const {
+        return _smoothingPolicy;
+    }
 
-    /// Get the bitmap.
+    /// Get the actual Bitmap data.
     const BitmapInfo* bitmap() const;
+
+    /// Get the matrix of this BitmapFill.
+    const SWFMatrix& matrix() const {
+        return _matrix;
+    }
 
 private:
 
+    Type _type;
+
+    SmoothingPolicy _smoothingPolicy;
+
+    SWFMatrix _matrix;
+    
     /// A Bitmap, used for dynamic fills and to cache parsed bitmaps.
     mutable boost::intrusive_ptr<const BitmapInfo> _bitmapInfo;
 
@@ -129,8 +147,10 @@ private:
     boost::uint16_t _id;
 };
 
-struct GradientFill
+class GradientFill
 {
+public:
+
     enum Type
     {
         LINEAR,
@@ -151,6 +171,8 @@ struct GradientFill
     {
         assert(recs.size() > 1);
     }
+    
+    void setLerp(const GradientFill& a, const GradientFill& b, double ratio);
 
     GradientFill() {}
 
@@ -165,17 +187,27 @@ struct GradientFill
 
 struct SolidFill
 {
+public:
     explicit SolidFill(const rgba& c)
         :
-        color(c)
+        _color(c)
     {}
 
     SolidFill(const SolidFill& other)
         :
-        color(other.color)
+        _color(other._color)
     {}
 
-    rgba color;
+    void setLerp(const SolidFill& a, const SolidFill& b, double ratio) {
+        _color.set_lerp(a.color(), b.color(), ratio);
+    }
+
+    rgba color() const {
+        return _color;
+    }
+
+private:
+    rgba _color;
 };
 
 /// For the interior of outline shapes.

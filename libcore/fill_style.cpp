@@ -62,38 +62,11 @@ public:
     {
     }
 
-    /// Create a lerped SolidFill.
-    void operator()(SolidFill& f) const {
-        const SolidFill& a = boost::get<SolidFill>(_a);
-        const SolidFill& b = boost::get<SolidFill>(_b);
-        f.color.set_lerp(a.color, b.color, _ratio);
+    template<typename T> void operator()(T& f) const {
+        const T& a = boost::get<T>(_a);
+        const T& b = boost::get<T>(_b);
+        f.setLerp(a, b, _ratio);
     }
-
-    /// Create a lerped GradientFill.
-    void operator()(GradientFill& f) const {
-        const GradientFill& a = boost::get<GradientFill>(_a);
-        const GradientFill& b = boost::get<GradientFill>(_b);
-        f.type = a.type;
-        
-        // fill style gradients
-        assert(f.gradients.size() == a.gradients.size());
-        assert(f.gradients.size() == b.gradients.size());
-        for (size_t i = 0, e = f.gradients.size(); i < e; ++i) {
-            f.gradients[i].m_ratio = frnd(flerp(a.gradients[i].m_ratio,
-                        b.gradients[i].m_ratio, _ratio));
-            f.gradients[i].m_color.set_lerp(a.gradients[i].m_color,
-                    b.gradients[i].m_color, _ratio);
-        }
-        f.matrix.set_lerp(a.matrix, b.matrix, _ratio);
-    }
-
-    /// Create a lerped BitmapFill.
-    void operator()(BitmapFill& f) const {
-        const BitmapFill& a = boost::get<BitmapFill>(_a);
-        const BitmapFill& b = boost::get<BitmapFill>(_b);
-        f.matrix.set_lerp(a.matrix, b.matrix, _ratio);
-    }
-
 
 private:
     const fill_style::Fill& _a;
@@ -102,6 +75,45 @@ private:
 
 };
 
+}
+    
+BitmapFill::BitmapFill(SWF::FillType t, movie_definition* md,
+        boost::uint16_t id, const SWFMatrix& m)
+    :
+    _type(),
+    _smoothingPolicy(),
+    _matrix(m),
+    _bitmapInfo(0),
+    _md(md),
+    _id(id)
+{
+    assert(md);
+
+    _smoothingPolicy = md->get_version() >= 8 ? 
+        BitmapFill::SMOOTHING_ON : BitmapFill::SMOOTHING_UNSPECIFIED;
+
+    switch (t) {
+        case SWF::FILL_TILED_BITMAP_HARD:
+            _type = BitmapFill::TILED;
+            _smoothingPolicy = BitmapFill::SMOOTHING_OFF;
+            break;
+
+        case SWF::FILL_TILED_BITMAP:
+            _type = BitmapFill::TILED;
+            break;
+
+        case SWF::FILL_CLIPPED_BITMAP_HARD:
+            _type = BitmapFill::CLIPPED;
+            _smoothingPolicy = BitmapFill::SMOOTHING_OFF;
+            break;
+
+        case SWF::FILL_CLIPPED_BITMAP:
+            _type = BitmapFill::CLIPPED;
+            break;
+
+        default:
+            std::abort();
+    }
 }
 
 const BitmapInfo*
@@ -113,6 +125,29 @@ BitmapFill::bitmap() const
 
     // May still be 0!
     return _bitmapInfo.get();
+}
+    
+void
+GradientFill::setLerp(const GradientFill& a, const GradientFill& b,
+        double ratio)
+{
+    assert(type == a.type);
+    assert(gradients.size() == a.gradients.size());
+    assert(gradients.size() == b.gradients.size());
+
+    for (size_t i = 0, e = gradients.size(); i < e; ++i) {
+        gradients[i].m_ratio = frnd(flerp(a.gradients[i].m_ratio,
+                    b.gradients[i].m_ratio, ratio));
+        gradients[i].m_color.set_lerp(a.gradients[i].m_color,
+                b.gradients[i].m_color, ratio);
+    }
+    matrix.set_lerp(a.matrix, b.matrix, ratio);
+}
+    
+void
+BitmapFill::setLerp(const BitmapFill& a, const BitmapFill& b, double ratio)
+{
+    _matrix.set_lerp(a.matrix(), b.matrix(), ratio);
 }
 
 void
@@ -340,38 +375,8 @@ readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
         fill_style* morph)
 {
 
-    BitmapFill::Type t;
-    BitmapFill::SmoothingPolicy pol = md.get_version() >= 8 ? 
-        BitmapFill::SMOOTHING_ON : BitmapFill::SMOOTHING_UNSPECIFIED;
-
-    switch (type) {
-        case SWF::FILL_TILED_BITMAP_HARD:
-            t = BitmapFill::TILED;
-            pol = BitmapFill::SMOOTHING_OFF;
-            break;
-
-        case SWF::FILL_TILED_BITMAP:
-            t = BitmapFill::TILED;
-            break;
-
-        case SWF::FILL_CLIPPED_BITMAP_HARD:
-            t = BitmapFill::CLIPPED;
-            pol = BitmapFill::SMOOTHING_OFF;
-            break;
-
-        case SWF::FILL_CLIPPED_BITMAP:
-            t = BitmapFill::CLIPPED;
-            break;
-
-        default:
-            std::abort();
-    }
-
     in.ensureBytes(2);
     const boost::uint16_t id = in.read_u16();
-    IF_VERBOSE_PARSE(
-        log_parse("  Bitmap id = %d, smoothing policy = %s", id, pol);
-    );
 
     SWFMatrix m;
     m.read(in);
@@ -380,13 +385,13 @@ readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
         SWFMatrix m2;
         m2.read(in);
         m2.invert();
-        morph->fill = BitmapFill(t, &md, id, m2);
+        morph->fill = BitmapFill(type, &md, id, m2);
     }
 
     // For some reason, it looks like they store the inverse of the
     // TWIPS-to-texcoords SWFMatrix.
     m.invert();
-    return BitmapFill(t, &md, id, m);
+    return BitmapFill(type, &md, id, m);
 }
 
 }

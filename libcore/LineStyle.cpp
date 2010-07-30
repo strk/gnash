@@ -39,7 +39,7 @@ class GetColor : public boost::static_visitor<rgba>
 {
 public:
     rgba operator()(const SolidFill& f) const {
-        return f.color;
+        return f.color();
     }
     rgba operator()(const GradientFill&) const {
         return rgba();

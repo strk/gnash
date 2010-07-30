@@ -706,7 +706,7 @@ struct StyleHandler : boost::static_visitor<>
     }
 
     void operator()(const SolidFill& f) const {
-        const rgba color = _cx.transform(f.color);
+        const rgba color = _cx.transform(f.color());
 
         // add the color to our self-made style handler (basically
         // just a list)
@@ -715,7 +715,7 @@ struct StyleHandler : boost::static_visitor<>
     }
 
     void operator()(const BitmapFill& f) const {
-        SWFMatrix m = f.matrix;
+        SWFMatrix m = f.matrix();
         m.concatenate(_fillMatrix);
         m.concatenate(_stageMatrix);
 
@@ -731,7 +731,7 @@ struct StyleHandler : boost::static_visitor<>
         bool smooth = false;
         if (_quality > QUALITY_LOW) {
             // TODO: if forceSmoothing is true, smooth !
-            switch (f.smoothingPolicy) {
+            switch (f.smoothingPolicy()) {
                 case BitmapFill::SMOOTHING_UNSPECIFIED:
                     if (_quality >= QUALITY_BEST) smooth = true;
                     break;
@@ -742,7 +742,7 @@ struct StyleHandler : boost::static_visitor<>
             }
         }
 
-        const bool tiled = (f.type == BitmapFill::TILED);
+        const bool tiled = (f.type() == BitmapFill::TILED);
 
         _sh.add_bitmap(
             dynamic_cast<const agg_bitmap_info*>(f.bitmap()), m, _cx, tiled,
