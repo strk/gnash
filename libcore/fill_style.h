@@ -168,6 +168,10 @@ private:
     boost::uint16_t _id;
 };
 
+
+/// A GradientFill
+//
+/// TODO: clean this up!
 class DSOEXPORT GradientFill
 {
 public:

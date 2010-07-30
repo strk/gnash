@@ -229,66 +229,24 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             // GRADIENT
             in.ensureBytes(1);
             const boost::uint8_t grad_props = in.read_u8();
-        
-            if (t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_) {
-
-                const boost::uint8_t spread_mode = grad_props >> 6;
-                switch(spread_mode) {
-                    case 0:
-                        gf.spreadMode = SWF::GRADIENT_SPREAD_PAD;
-                        break;
-                    case 1:
-                        gf.spreadMode = SWF::GRADIENT_SPREAD_REFLECT;
-                        break;
-                    case 2:
-                        gf.spreadMode = SWF::GRADIENT_SPREAD_REPEAT;
-                        break;
-                    default: 
-                        IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror("Illegal spread mode in gradient "
-                                "definition.");
-                        );
-                }
-        
-                // TODO: handle in GradientFill.
-                const boost::uint8_t interpolation = (grad_props >> 4) & 3;
-                switch (interpolation) {
-                    case 0: 
-                        gf.interpolation = SWF::GRADIENT_INTERPOLATION_NORMAL;
-                        break;
-                    case 1:
-                        gf.interpolation = SWF::GRADIENT_INTERPOLATION_LINEAR;
-                        break;
-                    default:
-                        IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror("Illegal interpolation mode in "
-                                "gradient definition.");
-                        );
-                }
-            }
-        
+            
             const boost::uint8_t num_gradients = grad_props & 0xF;
+            IF_VERBOSE_PARSE(
+               log_parse("  gradients: num_gradients = %d", +num_gradients);
+            );
+        
             if (!num_gradients) {
                 IF_VERBOSE_MALFORMED_SWF(
-                    log_swferror(_("num gradients 0"));
+                    log_swferror(_("No gradients!"));
                 );
                 return;
-            }
-        
-            if (num_gradients > 8 + ((t == SWF::DEFINESHAPE4 ||
-                t == SWF::DEFINESHAPE4_) ? 7 : 0)) {
-               // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
-                IF_VERBOSE_MALFORMED_SWF(
-                    log_swferror(_("Unexpected num gradients (%d), "
-                            "expected 1 to 8"), static_cast<int>(num_gradients));
-                );
             }
         
             if (is_morph) {
                 boost::get<GradientFill>(pOther->fill).gradients.resize(
                         num_gradients);
             }
-                    
+        
             gf.gradients.resize(num_gradients);
             for (size_t i = 0; i < num_gradients; ++i) {
                 gf.gradients[i].read(in, t);
@@ -298,6 +256,55 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                 }
             }
         
+            // A GradientFill may never have fewer than 2 colour stops. We've
+            // no tests to show what happens in that case for static fills.
+            // Dynamic fills are tested to display as a solid fill. In either
+            // case the renderer will bork if there is only 1 stop in a 
+            // GradientFill.
+            if (num_gradients == 1) {
+                fill = SolidFill(gf.gradients[0].m_color);
+                if (pOther) {
+                    const rgba c = boost::get<GradientFill>(
+                            pOther->fill).gradients[0].m_color;
+                    pOther->fill = SolidFill(c);
+                }
+                return;
+            }
+        
+            if (t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_) {
+
+                const SWF::SpreadMode spread =
+                    static_cast<SWF::SpreadMode>(grad_props >> 6);
+
+                switch (spread) {
+                    case SWF::GRADIENT_SPREAD_PAD:
+                    case SWF::GRADIENT_SPREAD_REFLECT:
+                    case SWF::GRADIENT_SPREAD_REPEAT:
+                        gf.spreadMode = spread;
+                        break;
+                    default: 
+                        IF_VERBOSE_MALFORMED_SWF(
+                            log_swferror("Illegal spread mode in gradient "
+                                "definition.");
+                        );
+                }
+        
+                // TODO: handle in GradientFill.
+                const SWF::InterpolationMode i =
+                    static_cast<SWF::InterpolationMode>((grad_props >> 4) & 3);
+
+                switch (i) {
+                    case SWF::GRADIENT_INTERPOLATION_NORMAL:
+                    case SWF::GRADIENT_INTERPOLATION_LINEAR:
+                        gf.interpolation = i;
+                    default:
+                        IF_VERBOSE_MALFORMED_SWF(
+                            log_swferror("Illegal interpolation mode in "
+                                "gradient definition.");
+                        );
+                }
+            }
+
             // A focal gradient also has a focal point.
             if (type == SWF::FILL_FOCAL_GRADIENT) {
                in.ensureBytes(2);
@@ -310,14 +317,8 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                 boost::get<GradientFill>(pOther->fill).focalPoint =
                     gf.focalPoint;
             }
-        
-            IF_VERBOSE_PARSE(
-               log_parse("  gradients: num_gradients = %d", +num_gradients);
-            );
-        
-            // Do this before creating bitmap!
+
             fill = gf;
-        
             return;
         }
 
