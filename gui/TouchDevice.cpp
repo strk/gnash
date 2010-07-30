@@ -27,13 +27,14 @@
 #ifdef HAVE_TSLIB_H
 # include <tslib.h>
 #endif
-#if defined(ENABLE_TSLIB) && !defined(HAVE_TSLIB_H)
+#if defined(USE_TSLIB) && !defined(HAVE_TSLIB_H)
 # warning "No tslib.h! Disabling touchscreen support"
-# undef ENABLE_TSLIB
 #endif
 
 #include "log.h"
 #include "InputDevice.h"
+
+namespace gnash {
 
 #ifdef USE_TSLIB
 // Either use environment variable or hardcoded value
@@ -43,8 +44,6 @@
 static const char *TSLIB_DEVICE_ENV = "TSLIB_TSDEVICE";
 static const char *TSLIB_DEVICE_NAME = "/dev/ts";
 #endif
-
-namespace gnash {
 
 //static const char *MOUSE_DEVICE = "/dev/usb/tkpanel0";
 

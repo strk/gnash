@@ -109,6 +109,7 @@ AM_LDFLAGS =  \
 	$(LIRC_LIBS) \
 	$(MYSQL_LIBS) \
 	$(INTLLIBS) \
+	$(TSLIB_LIBS)
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -201,24 +202,35 @@ gnash: gnash.in
 # touchscreen. These are only used by the Framebuffer GUI, as without
 # X11, it has no event handling. We do it this way so the optionally
 # built source files still get included in the source tarball.
-DEVICES = \
-	InputDevice.cpp InputDevice.h \
+DEVICES =
+if ENABLE_INPUT_DEVICES
+DEVICES += InputDevice.cpp InputDevice.h
+
+# Touchscreen
+if ENABLE_TSLIB
+DEVICES += TouchDevice.cpp
+endif
+# PS/2 Mouse
+if ENABLE_MOUSE
+DEVICES += MouseDevice.cpp
+endif
+# Linux input events
+if ENABLE_INPUT_EVENTS
+DEVICES += EventDevice.cpp
+endif
+endif
+
+# Always include the device files in the source tarball
+EXTRA_DIST += \
 	TouchDevice.cpp \
 	MouseDevice.cpp \
 	EventDevice.cpp
-EXTRA_DIST += $(DEVICES)
-
-if USE_INPUT_EVENTS
-INPUTDEVS = $(DEVICES)
-else
-INPUTDEVS = 
-endif
 
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
 	Player.cpp Player.h \
 	NullGui.cpp NullGui.h \
-	$(INPUTDEVS) \
+	$(DEVICES) \
 	$(NULL)
 
 if BUILD_AQUA_GUI

@@ -807,12 +807,12 @@ if test x"${build_tslib}" = xyes; then
   AC_DEFINE(USE_TSLIB, [1], [Use a tslib supported touchscreen])
   GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
 fi
-AM_CONDITIONAL(ENABLE_TSLIB, [test x"$build_tslib" = xyes])
+AM_CONDITIONAL(ENABLE_TSLIB, [test x${ac_cv_header_tslib_h} != xno])
 
 if test x"${build_ps2mouse}" = xyes; then
   AC_DEFINE(USE_MOUSE_PS2, [1], [Add support for a directly using a PS/2 Mouse])
 fi
-AM_CONDITIONAL(USE_PS2_MOUSE, [test x"${build_ps2mouse}" = xyes])
+AM_CONDITIONAL(ENABLE_MOUSE, [test x"${build_ps2mouse}" = xyes])
 
 if test x"${build_ps2keyboard}" = xyes; then
   AC_DEFINE(USE_KEYBOARD_PS2, [1], [Add support for directly using a PS/2 Keyboard])
@@ -820,8 +820,11 @@ fi
 if test x"${build_input_events}" = xyes; then
   AC_DEFINE(USE_INPUT_EVENTS, [1], [Add support for a directly using Linux Input Event Devices])
 fi
-AM_CONDITIONAL(USE_INPUT_EVENTS, [test x"${build_input_events}" = xyes])
+AM_CONDITIONAL(ENABLE_INPUT_EVENTS, [test x"${build_input_events}" = xyes])
+dnl this is enabled if we have any input devices at all
+AM_CONDITIONAL(ENABLE_INPUT_DEVICES, [test x"${input_events}" != x])
 
+input_events=
 dnl By default, we want to to build all renderers
 build_ovg=no
 build_gles=no

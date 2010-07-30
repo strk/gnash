@@ -176,7 +176,7 @@ InputDevice::scanForDevices(Gui *gui)
         devices.push_back(*it);
     }
 #endif
-#ifdef USE_TSLIB
+#if defined(HAVE_TSLIB_H) && defined(USE_TSLIB)
     id = TouchDevice::scanForDevices(gui);
     for (it=id.begin(); it!=id.end(); ++it) {
         devices.push_back(*it);
