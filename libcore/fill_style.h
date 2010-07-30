@@ -258,7 +258,6 @@ public:
         fill(other.fill)
     {}
 
-
     Fill fill;
 
 };
