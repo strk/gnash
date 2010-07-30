@@ -121,8 +121,6 @@ struct GradientFill
     explicit GradientFill(Type t) : type(t) {}
     GradientFill() {}
 
-    const BitmapInfo* createBitmap(Renderer& r) const;
-
     Type type;
 
     SWFMatrix matrix;
@@ -261,10 +259,6 @@ public:
         return boost::get<GradientFill>(_fill).focalPoint;
     }
     
-    void set_focal_point(float f) {
-        boost::get<GradientFill>(_fill).focalPoint = f;
-    }
-
     Fill _fill;
 
 private:
