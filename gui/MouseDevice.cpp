@@ -73,13 +73,13 @@ MouseDevice::scanForDevices(Gui *gui)
     };    
 
     struct mouse_types mice[] = {
-        InputDevice::MOUSE, "/dev/input/mice",      // PS/2 Mouse
+        {InputDevice::MOUSE, "/dev/input/mice"},      // PS/2 Mouse
 #ifdef MULTIPLE_DEVICES
-        InputDevice::MOUSE, "/dev/input/mouse0",
-        InputDevice::MOUSE, "/dev/input/mouse1",
-        InputDevice::MOUSE, "/dev/usb/tkpanel0",    // eTurboTouch touchscreen
+        {InputDevice::MOUSE, "/dev/input/mouse0"},
+        {InputDevice::MOUSE, "/dev/input/mouse1"},
+        {InputDevice::MOUSE, "/dev/usb/tkpanel0"},    // eTurboTouch touchscreen
 #endif
-        InputDevice::UNKNOWN, 0
+        {InputDevice::UNKNOWN, 0}
     };
 
     int i = 0;
@@ -225,8 +225,7 @@ MouseDevice::check()
         return false;   // no mouse available
     }
     
-    int i;
-    int xmove, ymove, btn, btn_changed;
+    int xmove, ymove, btn;
     boost::shared_array<boost::uint8_t> buf;
     if (_type == InputDevice::TOUCHMOUSE) {
         // The eTurboTouch has a 4 byte packet
@@ -291,11 +290,11 @@ MouseDevice::check()
         if (_y < 0) {
             _y = 0;
         }
-        if (_x > _gui->getStage()->getStageWidth()) {
-            _x = _gui->getStage()->getStageWidth();
+        if (_x > static_cast<int>(_gui->getStage()->getStageWidth())) {
+            _x = static_cast<int>(_gui->getStage()->getStageWidth());
         }
-        if (_y > _gui->getStage()->getStageHeight()) {
-            _y = _gui->getStage()->getStageHeight();
+        if (_y > static_cast<int>(_gui->getStage()->getStageHeight())) {
+            _y = static_cast<int>(_gui->getStage()->getStageHeight());
         }
     } // end of InputDevice::MOUSE
     
