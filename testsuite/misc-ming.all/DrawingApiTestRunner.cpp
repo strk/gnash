@@ -22,8 +22,6 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "DisplayObject.h"
-#include "DisplayList.h"
 #include "log.h"
 #include "GnashKey.h" // for gnash::key::code
 
@@ -1000,6 +998,20 @@ main(int /*argc*/, char** /*argv*/)
     // Shape 13
     y += 100;
     x = 0;
+    check_pixel(x + 7, y + 2, 2, green, 2);
+    check_pixel(x + 7, y + 90 - 2, 2, green, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, green, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, green, 2);
+
+    // Shape 14
+    x += 100;
+    check_pixel(x + 7, y + 2, 2, red, 2);
+    check_pixel(x + 7, y + 90 - 2, 2, red, 2);
+    check_pixel(x + 90 - 2, y + 2, 2, red, 2);
+    check_pixel(x + 90 - 2, y + 90 - 2, 2, red, 2);
+
+    // Shape 15
+    x += 100;
     check_pixel(x + 7, y + 2, 2, green, 2);
     check_pixel(x + 7, y + 90 - 2, 2, green, 2);
     check_pixel(x + 90 - 2, y + 2, 2, green, 2);

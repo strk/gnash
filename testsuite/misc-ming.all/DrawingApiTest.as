@@ -901,6 +901,32 @@ with(grad) {
     beginGradientFill(fillType, colors, alphas, ratios, matrix);
     draw100x100Box(x, y, grad);
    
+
+    // Shape 14
+    x += 100;
+
+    // Test a linear gradient with one stop
+    fillType = "linear";
+    colors = [0xff0000];
+    alphas = [100];
+    ratios = [0];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+   
+
+    // Shape 15
+    x += 100;
+
+    // Test a linear gradient with one stop
+    fillType = "radial";
+    colors = [0x00ff00];
+    alphas = [100];
+    ratios = [0];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+
     _visible = false;
 
 };
