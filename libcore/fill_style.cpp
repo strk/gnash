@@ -40,6 +40,9 @@ namespace gnash {
 // Forward declarations
 namespace {
     rgba sampleGradient(const GradientFill& fill, boost::uint8_t ratio);
+    SolidFill readSolidFill(SWFStream& in, SWF::TagType t, fill_style* morph);
+    BitmapFill readBitmapFill(SWFStream& in, SWF::FillType type,
+            movie_definition& md, fill_style* morph);
 }
 
 namespace {
@@ -120,87 +123,6 @@ gradient_record::read(SWFStream& in, SWF::TagType tag)
     m_color.read(in, tag);
 }
 
-SolidFill
-readSolidFill(SWFStream& in, SWF::TagType t, fill_style* morph)
-{
-    rgba color;
-
-    // 0x00: solid fill
-    if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4 ||
-            t == SWF::DEFINESHAPE4_ || morph) {
-        color.read_rgba(in);
-        if (morph) {
-            rgba othercolor;
-            othercolor.read_rgba(in);
-            morph->fill = SolidFill(othercolor);
-        }
-    }
-    else {
-        // For DefineMorphShape tags we should use morphfill_style 
-        assert(t == SWF::DEFINESHAPE || t == SWF::DEFINESHAPE2);
-        color.read_rgb(in);
-    }
-
-    IF_VERBOSE_PARSE(
-        log_parse("  color: %s", color);
-    );
-    return SolidFill(color);
-}
-
-BitmapFill
-readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
-        fill_style* morph)
-{
-
-    BitmapFill::Type t;
-    BitmapFill::SmoothingPolicy pol = md.get_version() >= 8 ? 
-        BitmapFill::SMOOTHING_ON : BitmapFill::SMOOTHING_UNSPECIFIED;
-
-    switch (type) {
-        case SWF::FILL_TILED_BITMAP_HARD:
-            t = BitmapFill::TILED;
-            pol = BitmapFill::SMOOTHING_OFF;
-            break;
-
-        case SWF::FILL_TILED_BITMAP:
-            t = BitmapFill::TILED;
-            break;
-
-        case SWF::FILL_CLIPPED_BITMAP_HARD:
-            t = BitmapFill::CLIPPED;
-            pol = BitmapFill::SMOOTHING_OFF;
-            break;
-
-        case SWF::FILL_CLIPPED_BITMAP:
-            t = BitmapFill::CLIPPED;
-            break;
-
-        default:
-            std::abort();
-    }
-
-    in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
-    IF_VERBOSE_PARSE(
-        log_parse("  Bitmap id = %d, smoothing policy = %s", id, pol);
-    );
-
-    SWFMatrix m;
-    m.read(in);
-
-    if (morph) {
-        SWFMatrix m2;
-        m2.read(in);
-        m2.invert();
-        morph->fill = BitmapFill(t, &md, id, m2);
-    }
-
-    // For some reason, it looks like they store the inverse of the
-    // TWIPS-to-texcoords SWFMatrix.
-    m.invert();
-    return BitmapFill(t, &md, id, m);
-}
-
 void
 fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         const RunResources& /*r*/, fill_style *pOther)
@@ -215,8 +137,16 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     );
 
     switch (type) {
+
         case SWF::FILL_SOLID:
             fill = readSolidFill(in, t, pOther);
+            return;
+
+        case SWF::FILL_TILED_BITMAP_HARD:
+        case SWF::FILL_CLIPPED_BITMAP_HARD:
+        case SWF::FILL_TILED_BITMAP:
+        case SWF::FILL_CLIPPED_BITMAP:
+            fill = readBitmapFill(in, type, md, pOther);
             return;
 
         case SWF::FILL_LINEAR_GRADIENT:
@@ -356,13 +286,6 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             return;
         }
 
-        case SWF::FILL_TILED_BITMAP_HARD:
-        case SWF::FILL_CLIPPED_BITMAP_HARD:
-        case SWF::FILL_TILED_BITMAP:
-        case SWF::FILL_CLIPPED_BITMAP:
-            fill = readBitmapFill(in, type, md, pOther);
-            return;
-
         default:
         {
             std::stringstream ss;
@@ -383,6 +306,90 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     boost::apply_visitor(SetLerp(a.fill, b.fill, t), fill);
 }
 
+namespace {
+
+SolidFill
+readSolidFill(SWFStream& in, SWF::TagType t, fill_style* morph)
+{
+    rgba color;
+
+    // 0x00: solid fill
+    if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4 ||
+            t == SWF::DEFINESHAPE4_ || morph) {
+        color.read_rgba(in);
+        if (morph) {
+            rgba othercolor;
+            othercolor.read_rgba(in);
+            morph->fill = SolidFill(othercolor);
+        }
+    }
+    else {
+        // For DefineMorphShape tags we should use morphfill_style 
+        assert(t == SWF::DEFINESHAPE || t == SWF::DEFINESHAPE2);
+        color.read_rgb(in);
+    }
+
+    IF_VERBOSE_PARSE(
+        log_parse("  color: %s", color);
+    );
+    return SolidFill(color);
+}
+
+BitmapFill
+readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
+        fill_style* morph)
+{
+
+    BitmapFill::Type t;
+    BitmapFill::SmoothingPolicy pol = md.get_version() >= 8 ? 
+        BitmapFill::SMOOTHING_ON : BitmapFill::SMOOTHING_UNSPECIFIED;
+
+    switch (type) {
+        case SWF::FILL_TILED_BITMAP_HARD:
+            t = BitmapFill::TILED;
+            pol = BitmapFill::SMOOTHING_OFF;
+            break;
+
+        case SWF::FILL_TILED_BITMAP:
+            t = BitmapFill::TILED;
+            break;
+
+        case SWF::FILL_CLIPPED_BITMAP_HARD:
+            t = BitmapFill::CLIPPED;
+            pol = BitmapFill::SMOOTHING_OFF;
+            break;
+
+        case SWF::FILL_CLIPPED_BITMAP:
+            t = BitmapFill::CLIPPED;
+            break;
+
+        default:
+            std::abort();
+    }
+
+    in.ensureBytes(2);
+    const boost::uint16_t id = in.read_u16();
+    IF_VERBOSE_PARSE(
+        log_parse("  Bitmap id = %d, smoothing policy = %s", id, pol);
+    );
+
+    SWFMatrix m;
+    m.read(in);
+
+    if (morph) {
+        SWFMatrix m2;
+        m2.read(in);
+        m2.invert();
+        morph->fill = BitmapFill(t, &md, id, m2);
+    }
+
+    // For some reason, it looks like they store the inverse of the
+    // TWIPS-to-texcoords SWFMatrix.
+    m.invert();
+    return BitmapFill(t, &md, id, m);
+}
+
+}
 
 std::ostream&
 operator<<(std::ostream& os, const BitmapFill::SmoothingPolicy& p)
