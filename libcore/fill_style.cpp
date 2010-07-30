@@ -148,6 +148,60 @@ readSolidFill(SWFStream& in, SWF::TagType t, fill_style* morph)
     return SolidFill(color);
 }
 
+BitmapFill
+readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
+        fill_style* morph)
+{
+
+    BitmapFill::Type t;
+    BitmapFill::SmoothingPolicy pol = md.get_version() >= 8 ? 
+        BitmapFill::SMOOTHING_ON : BitmapFill::SMOOTHING_UNSPECIFIED;
+
+    switch (type) {
+        case SWF::FILL_TILED_BITMAP_HARD:
+            t = BitmapFill::TILED;
+            pol = BitmapFill::SMOOTHING_OFF;
+            break;
+
+        case SWF::FILL_TILED_BITMAP:
+            t = BitmapFill::TILED;
+            break;
+
+        case SWF::FILL_CLIPPED_BITMAP_HARD:
+            t = BitmapFill::CLIPPED;
+            pol = BitmapFill::SMOOTHING_OFF;
+            break;
+
+        case SWF::FILL_CLIPPED_BITMAP:
+            t = BitmapFill::CLIPPED;
+            break;
+
+        default:
+            std::abort();
+    }
+
+    in.ensureBytes(2);
+    const boost::uint16_t id = in.read_u16();
+    IF_VERBOSE_PARSE(
+        log_parse("  Bitmap id = %d, smoothing policy = %s", id, pol);
+    );
+
+    SWFMatrix m;
+    m.read(in);
+
+    if (morph) {
+        SWFMatrix m2;
+        m2.read(in);
+        m2.invert();
+        morph->fill = BitmapFill(t, &md, id, m2);
+    }
+
+    // For some reason, it looks like they store the inverse of the
+    // TWIPS-to-texcoords SWFMatrix.
+    m.invert();
+    return BitmapFill(t, &md, id, m);
+}
+
 void
 fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         const RunResources& /*r*/, fill_style *pOther)
@@ -155,7 +209,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     const bool is_morph = (pOther != NULL);
 
     in.ensureBytes(1);
-    const boost::uint8_t type = in.read_u8();
+    const SWF::FillType type = static_cast<SWF::FillType>(in.read_u8());
         
     IF_VERBOSE_PARSE(
         log_parse("  fill_style read type = 0x%X", +type);
@@ -317,66 +371,8 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
-        {
-
-            // TODO: this is a bit ugly.
-            BitmapFill::Type t;
-            switch (type) {
-                case SWF::FILL_TILED_BITMAP_HARD:
-                case SWF::FILL_TILED_BITMAP:
-                    t = BitmapFill::TILED;
-                    break;
-                case SWF::FILL_CLIPPED_BITMAP_HARD:
-                case SWF::FILL_CLIPPED_BITMAP:
-                    t = BitmapFill::CLIPPED;
-                    break;
-            }
-
-            // 0x40: tiled bitmap fill
-            // 0x41: clipped bitmap fill
-            // 0x42: tiled bitmap fill with hard edges
-            // 0x43: clipped bitmap fill with hard edges
-
-            BitmapFill::SmoothingPolicy pol;
-
-            if (type == SWF::FILL_TILED_BITMAP_HARD ||
-                 type == SWF::FILL_CLIPPED_BITMAP_HARD) {
-                pol = BitmapFill::SMOOTHING_OFF;
-            }
-            else if (md.get_version() >= 8) {
-                pol = BitmapFill::SMOOTHING_ON;
-            }
-            else {
-                pol = BitmapFill::SMOOTHING_UNSPECIFIED;
-            }
-
-            in.ensureBytes(2);
-            const boost::uint16_t id = in.read_u16();
-            IF_VERBOSE_PARSE(
-                log_parse("  bitmap_char = %d, smoothing_policy = %s",
-                    id, pol);
-            );
-
-            SWFMatrix m;
-            m.read(in);
-
-            // For some reason, it looks like they store the inverse of the
-            // TWIPS-to-texcoords SWFMatrix.
-            m.invert();
-            fill = BitmapFill(t, &md, id, m);
-
-            if (is_morph) {
-                SWFMatrix m2;
-                m2.read(in);
-                m2.invert();
-                pOther->fill = BitmapFill(t, &md, id, m2);
-            }
-
-            IF_VERBOSE_PARSE(
-               log_parse("SWFMatrix: %s", m);
-            );
+            fill = readBitmapFill(in, type, md, pOther);
             return;
-        }
 
         default:
         {
