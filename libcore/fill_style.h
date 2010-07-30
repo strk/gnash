@@ -61,15 +61,35 @@ public:
     rgba m_color;
 };
 
-class BitmapFill
+
+/// A BitmapFill
+//
+/// BitmapFills can refer to a parsed bitmap tag or be constructed from
+/// bitmap data. They are used for Bitmap characters.
+//
+/// Presently all members are immutable after construction. It is of course
+/// possible to change the appearance of the fill by changing the BitmapInfo
+/// it refers to.
+//
+/// TODO: check the following:
+//
+/// It may be necessary to allow setting the smoothing policy; the use of
+/// this should certainly be extended to non-static BitmapFills.
+class DSOEXPORT BitmapFill
 {
 public:
+
+    /// How to smooth the bitmap.
     enum SmoothingPolicy {
         SMOOTHING_UNSPECIFIED,
         SMOOTHING_ON,
         SMOOTHING_OFF
     };
     
+    /// Whether the fill is tiled or clipped.
+    //
+    /// Clipped fills use the edge pixels to fill any area outside the bounds
+    /// of the image.
     enum Type {
         CLIPPED,
         TILED
@@ -107,6 +127,7 @@ public:
         _id(other._id)
     {}
 
+    /// Set this fill to a lerp of two other BitmapFills.
     void setLerp(const BitmapFill& a, const BitmapFill& b, double ratio);
 
     /// Get the Type of this BitmapFill
@@ -147,7 +168,7 @@ private:
     boost::uint16_t _id;
 };
 
-class GradientFill
+class DSOEXPORT GradientFill
 {
 public:
 
@@ -172,6 +193,7 @@ public:
         assert(recs.size() > 1);
     }
     
+    /// Set this fill to a lerp of two other GradientFills.
     void setLerp(const GradientFill& a, const GradientFill& b, double ratio);
 
     GradientFill() {}
@@ -185,23 +207,31 @@ public:
     SWF::InterpolationMode interpolation;
 };
 
-struct SolidFill
+/// A SolidFill containing one color.
+//
+/// SolidFills are the simplest fill, containing only a single color.
+struct DSOEXPORT SolidFill
 {
 public:
+
+    /// Construct a SolidFill.
     explicit SolidFill(const rgba& c)
         :
         _color(c)
     {}
 
+    /// Copy a SolidFill.
     SolidFill(const SolidFill& other)
         :
         _color(other._color)
     {}
 
+    /// Set this fill to a lerp of two other SolidFills.
     void setLerp(const SolidFill& a, const SolidFill& b, double ratio) {
         _color.set_lerp(a.color(), b.color(), ratio);
     }
 
+    /// Get the color of the fill.
     rgba color() const {
         return _color;
     }
@@ -220,8 +250,6 @@ public:
 
     /// Read the fill style from a stream
     //
-    /// TODO: use a subclass for this (swf_fill_style?)
-    ///
     /// Throw a ParserException if there's no enough bytes in the
     /// currently opened tag for reading. See stream::ensureBytes()
     void read(SWFStream& in, SWF::TagType t, movie_definition& m,
