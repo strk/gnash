@@ -161,7 +161,6 @@ struct GradientFill
     double focalPoint;
     SWF::SpreadMode spreadMode;
     SWF::InterpolationMode interpolation;
-    rgba color;
 };
 
 struct SolidFill

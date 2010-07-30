@@ -71,7 +71,6 @@ public:
         const GradientFill& a = boost::get<GradientFill>(_a);
         const GradientFill& b = boost::get<GradientFill>(_b);
         f.type = a.type;
-        f.color.set_lerp(a.color, b.color, _ratio);
         
         // fill style gradients
         assert(f.gradients.size() == a.gradients.size());
@@ -351,16 +350,6 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                log_parse("  gradients: num_gradients = %d", +num_gradients);
             );
         
-            // @@ hack. What is it supposed to do?
-            if (num_gradients > 0) {
-                gf.color = gf.gradients[0].m_color;
-                if (is_morph) {
-                    boost::get<GradientFill>(pOther->fill).color =
-                        boost::get<GradientFill>(
-                                pOther->fill).gradients[0].m_color;
-                }
-            }
-            
             // Do this before creating bitmap!
             fill = gf;
         

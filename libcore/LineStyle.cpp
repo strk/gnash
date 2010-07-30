@@ -41,8 +41,8 @@ public:
     rgba operator()(const SolidFill& f) const {
         return f.color;
     }
-    rgba operator()(const GradientFill& f) const {
-        return f.color;
+    rgba operator()(const GradientFill&) const {
+        return rgba();
     }
     rgba operator()(const BitmapFill&) const {
         return rgba();

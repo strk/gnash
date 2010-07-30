@@ -129,9 +129,6 @@ struct StyleHandler : boost::static_visitor<>
 
     void operator()(const GradientFill& f) const {
 
-        const rgba c = _cx.transform(f.color);
-        glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
-                
         const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
             createGradientBitmap(f, _renderer));  
 
