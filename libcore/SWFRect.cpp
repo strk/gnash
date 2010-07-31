@@ -134,16 +134,17 @@ SWFRect::expand_to_transformed_rect(const SWFMatrix& m, const SWFRect& r)
     expand_to(p3.x, p3.y);
 }
 
-void    SWFRect::set_lerp(const SWFRect& a, const SWFRect& b, float t)
+void
+SWFRect::set_lerp(const SWFRect& a, const SWFRect& b, float t)
 // Set this to the lerp of a and b.
 {
     assert( !a.is_null() );
     assert( !b.is_null() );
     
-    _xMin = (boost::int32_t)(flerp(a.get_x_min(), b.get_x_min(), t));
-    _yMin = (boost::int32_t)(flerp(a.get_y_min(), b.get_y_min(), t));
-    _xMax = (boost::int32_t)(flerp(a.get_x_max(), b.get_x_max(), t));
-    _yMax = (boost::int32_t)(flerp(a.get_y_max(), b.get_y_max(), t));
+    _xMin = lerp<float>(a.get_x_min(), b.get_x_min(), t);
+    _yMin = lerp<float>(a.get_y_min(), b.get_y_min(), t);
+    _xMax = lerp<float>(a.get_x_max(), b.get_x_max(), t);
+    _yMax = lerp<float>(a.get_y_max(), b.get_y_max(), t);
 }
 
 void

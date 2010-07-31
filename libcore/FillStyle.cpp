@@ -177,7 +177,7 @@ GradientFill::setLerp(const GradientFill& a, const GradientFill& b,
     for (size_t i = 0, e = _gradients.size(); i < e; ++i) {
         const GradientRecord& ra = a.record(i);
         const GradientRecord& rb = b.record(i);
-        _gradients[i].m_ratio = frnd(flerp(ra.m_ratio, rb.m_ratio, ratio));
+        _gradients[i].m_ratio = frnd(lerp<float>(ra.m_ratio, rb.m_ratio, ratio));
         _gradients[i].m_color.set_lerp(ra.m_color, rb.m_color, ratio);
     }
     _matrix.set_lerp(a.matrix(), b.matrix(), ratio);

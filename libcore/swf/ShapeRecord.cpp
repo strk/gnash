@@ -223,8 +223,8 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
         const Path& p1 = i < paths1.size() ? paths1[i] : empty_path;
         const Path& p2 = n < paths2.size() ? paths2[n] : empty_path;
 
-        const float new_ax = flerp(p1.ap.x, p2.ap.x, ratio);
-        const float new_ay = flerp(p1.ap.y, p2.ap.y, ratio);
+        const float new_ax = lerp<float>(p1.ap.x, p2.ap.x, ratio);
+        const float new_ay = lerp<float>(p1.ap.y, p2.ap.y, ratio);
 
         p.reset(new_ax, new_ay, p1.getLeftFill(),
                 p2.getRightFill(), p1.getLineStyle());
@@ -240,10 +240,10 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
 
             const Edge& e2 = k < p2.size() ? p2[k] : empty_edge;
 
-            e.cp.x = static_cast<int>(flerp(e1.cp.x, e2.cp.x, ratio));
-            e.cp.y = static_cast<int>(flerp(e1.cp.y, e2.cp.y, ratio));
-            e.ap.x = static_cast<int>(flerp(e1.ap.x, e2.ap.x, ratio));
-            e.ap.y = static_cast<int>(flerp(e1.ap.y, e2.ap.y, ratio));
+            e.cp.x = static_cast<int>(lerp<float>(e1.cp.x, e2.cp.x, ratio));
+            e.cp.y = static_cast<int>(lerp<float>(e1.cp.y, e2.cp.y, ratio));
+            e.ap.x = static_cast<int>(lerp<float>(e1.ap.x, e2.ap.x, ratio));
+            e.ap.y = static_cast<int>(lerp<float>(e1.ap.y, e2.ap.y, ratio));
             ++k;
 
             if (p2.size() <= k) {

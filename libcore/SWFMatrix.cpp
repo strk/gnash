@@ -196,16 +196,16 @@ SWFMatrix::concatenate_scale(double xscale, double yscale)
     sy  = Fixed16Mul(sy, DoubleToFixed16(yscale)); 
 }
 
+// Set this SWFMatrix to a blend of m1 and m2, parameterized by t.
 void
 SWFMatrix::set_lerp(const SWFMatrix& m1, const SWFMatrix& m2, float t)
-// Set this SWFMatrix to a blend of m1 and m2, parameterized by t.
 {
-    sx = flerp(m1.sx, m2.sx, t);
-    shx = flerp(m1.shx, m2.shx, t);
-    shy = flerp(m1.shy, m2.shy, t);
-    sy = flerp(m1.sy, m2.sy, t);
-    tx = flerp(m1.tx, m2.tx, t);
-    ty = flerp(m1.ty, m2.ty, t);
+    sx = lerp<float>(m1.sx, m2.sx, t);
+    shx = lerp<float>(m1.shx, m2.shx, t);
+    shy = lerp<float>(m1.shy, m2.shy, t);
+    sy = lerp<float>(m1.sy, m2.sy, t);
+    tx = lerp<float>(m1.tx, m2.tx, t);
+    ty = lerp<float>(m1.ty, m2.ty, t);
 }
 
 void

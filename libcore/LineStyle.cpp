@@ -163,7 +163,7 @@ void
 LineStyle::set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio)
 {
     m_width = static_cast<boost::uint16_t>(
-        frnd(flerp(ls1.getThickness(), ls2.getThickness(), ratio)));
+        frnd(lerp<float>(ls1.getThickness(), ls2.getThickness(), ratio)));
     m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
     if ( ls1._scaleVertically != ls2._scaleVertically )
     {
