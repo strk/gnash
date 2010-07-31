@@ -1673,7 +1673,6 @@ movieclip_beginFill(const fn_call& fn)
         return as_value();
     }
 
-
     // 2^24 is the max here
     const boost::uint32_t rgbval =
         clamp<float>(fn.arg(0).to_number(), 0, 16777216);
@@ -1713,32 +1712,32 @@ movieclip_beginGradientFill(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): invalid call: 5 arguments "
-                "needed"),
-            movieclip->getTarget(), ss.str());
+                "needed"), movieclip->getTarget(), ss.str());
         );
         return as_value();
     }
 
-    // There are optional arguments that we do not implement!
-    if (fn.nargs > 5) {
-        std::stringstream ss; fn.dump_args(ss);
-        LOG_ONCE(log_unimpl(_("MovieClip.beginGradientFill(%s): args after "
-                        "the first five will be discarded"), ss.str()));
+    const size_t maxargs = getSWFVersion(fn) >= 8 ? 8 : 5;
+
+    if (fn.nargs > maxargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("%s.beginGradientFill(%s): extra arguments "
+                    "invalidate call!"));
+            );
+        return as_value();
     }
 
     GradientFill::Type t;
 
     std::string typeStr = fn.arg(0).to_string();
 
-    // Case-sensitive comparison needed for this ...
+    // An unexpected fill type results in no fill in all versions.
     if (typeStr == "radial") {
         t = GradientFill::RADIAL;
     }
     else if (typeStr == "linear") {
         t = GradientFill::LINEAR;
-    }
-    else if (typeStr == "focal") {
-        t = GradientFill::FOCAL;
     }
     else {
         IF_VERBOSE_ASCODING_ERRORS(
