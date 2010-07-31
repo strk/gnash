@@ -1088,7 +1088,7 @@ pattern_add_color_stops(const GradientFill& f, cairo_pattern_t* pattern,
         rgba c = cx.transform(grad.m_color);
 
         cairo_pattern_add_color_stop_rgba (pattern,
-            grad.m_ratio / 255.0, c.m_r / 255.0, c.m_g / 255.0,
+            grad.ratio / 255.0, c.m_r / 255.0, c.m_g / 255.0,
             c.m_b / 255.0, c.m_a / 255.0);
     }
 }

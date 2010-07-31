@@ -1874,7 +1874,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         const as_value& ratVal = ratios->getMember(key);
         const boost::uint32_t minRatio =
             gradients.empty() ? 0 :
-            std::min<boost::uint32_t>(gradients[i - 1].m_ratio + step, 0xff);
+            std::min<boost::uint32_t>(gradients[i - 1].ratio + step, 0xff);
 
         boost::uint8_t rat = ratVal.is_number() ? 
             clamp<boost::uint32_t>(toInt(ratVal), minRatio, 0xff) : minRatio;
@@ -1882,8 +1882,8 @@ movieclip_beginGradientFill(const fn_call& fn)
         // The renderer may expect successively larger ratios; failure to
         // do this can lead to memory errors.
         if (!gradients.empty()) {
-            assert((rat != 0xff && rat > gradients[i - 1].m_ratio) ||
-                    (rat >= gradients[i - 1].m_ratio));
+            assert((rat != 0xff && rat > gradients[i - 1].ratio) ||
+                    (rat >= gradients[i - 1].ratio));
         }
 
         rgba color;

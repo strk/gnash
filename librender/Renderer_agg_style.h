@@ -207,7 +207,7 @@ public:
       rgba trans_color = m_cx.transform(gr.m_color);
       if (trans_color.m_a < 255) m_need_premultiply = true;    
       
-      m_gradient_lut.add_color(gr.m_ratio/255.0, agg::rgba8(trans_color.m_r, 
+      m_gradient_lut.add_color(gr.ratio/255.0, agg::rgba8(trans_color.m_r, 
         trans_color.m_g, trans_color.m_b, trans_color.m_a));
         
     } // for

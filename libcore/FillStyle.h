@@ -43,12 +43,12 @@ public:
 
     GradientRecord(boost::uint8_t ratio, const rgba& color)
         :
-        m_ratio(ratio),
+        ratio(ratio),
         m_color(color)
     {}
     
     //data:
-    boost::uint8_t m_ratio;
+    boost::uint8_t ratio;
     rgba m_color;
 };
 

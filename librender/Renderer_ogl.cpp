@@ -1851,26 +1851,26 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
     // By specs, first gradient should *always* be 0, 
     // anyway a malformed SWF could break this,
     // so we cannot rely on that information...
-    if (ratio < fill.record(0).m_ratio) {
+    if (ratio < fill.record(0).ratio) {
         return fill.record(0).m_color;
     }
 
-    if (ratio >= fill.record(fill.recordCount() - 1).m_ratio) {
+    if (ratio >= fill.record(fill.recordCount() - 1).ratio) {
         return fill.record(fill.recordCount() - 1).m_color;
     }
         
     for (size_t i = 1, n = fill.recordCount(); i < n; ++i) {
 
         const GradientRecord& gr1 = fill.record(i);
-        if (gr1.m_ratio < ratio) continue;
+        if (gr1.ratio < ratio) continue;
 
         const GradientRecord& gr0 = fill.record(i - 1);
-        if (gr0.m_ratio > ratio) continue;
+        if (gr0.ratio > ratio) continue;
 
         float f = 0.0f;
 
-        if (gr0.m_ratio != gr1.m_ratio) {
-            f = (ratio - gr0.m_ratio) / float(gr1.m_ratio - gr0.m_ratio);
+        if (gr0.ratio != gr1.ratio) {
+            f = (ratio - gr0.ratio) / float(gr1.ratio - gr0.ratio);
         }
         else {
             // Ratios are equal IFF first and second GradientRecord
@@ -1878,7 +1878,7 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
             IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("two gradients in a FillStyle "
                     "have the same position/ratio: %d"),
-                    gr0.m_ratio);
+                    gr0.ratio);
             );
         }
 
@@ -1887,7 +1887,7 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
         return result;
     }
 
-    // Assuming gradients are ordered by m_ratio? see start comment
+    // Assuming gradients are ordered by ratio? see start comment
     return fill.record(fill.recordCount() - 1).m_color;
 }
 
