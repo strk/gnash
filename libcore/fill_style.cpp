@@ -44,6 +44,7 @@ namespace {
             bool readMorph);
     OptionalFillPair readBitmapFill(SWFStream& in, SWF::FillType type,
             movie_definition& md, bool readMorph);
+    gradient_record readGradientRecord(SWFStream& in, SWF::TagType tag);
 }
 
 namespace {
@@ -182,14 +183,6 @@ BitmapFill::setLerp(const BitmapFill& a, const BitmapFill& b, double ratio)
     _matrix.set_lerp(a.matrix(), b.matrix(), ratio);
 }
 
-void
-gradient_record::read(SWFStream& in, SWF::TagType tag)
-{
-    in.ensureBytes(1);
-    m_ratio = in.read_u8();
-    m_color.read(in, tag);
-}
-
 OptionalFillPair
 readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
 {
@@ -245,7 +238,6 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                 morph = fill_style(GradientFill(gr, m2));
             }
             
-            // GRADIENT
             in.ensureBytes(1);
             const boost::uint8_t grad_props = in.read_u8();
             
@@ -261,16 +253,16 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                 throw ParserException();
             }
         
-            if (readMorph) {
-                boost::get<GradientFill>(morph->fill).gradients.resize(
-                        num_gradients);
-            }
-        
-            gf.gradients.resize(num_gradients);
+            GradientFill::GradientRecords recs;
+            recs.reserve(num_gradients);
+
+            GradientFill::GradientRecords morphrecs;
+            morphrecs.reserve(num_gradients);
+
             for (size_t i = 0; i < num_gradients; ++i) {
-                gf.gradients[i].read(in, t);
+                recs.push_back(readGradientRecord(in, t));
                 if (readMorph) {
-                    boost::get<GradientFill>(morph->fill).gradients[i].read(in, t);
+                    morphrecs.push_back(readGradientRecord(in, t));
                 }
             }
         
@@ -280,15 +272,20 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
             // case the renderer will bork if there is only 1 stop in a 
             // GradientFill.
             if (num_gradients == 1) {
-                const rgba c1 = gf.gradients[0].m_color;
+                const rgba c1 = recs[0].m_color;
                 if (readMorph) {
-                    const rgba c2 =
-                        boost::get<GradientFill>(morph->fill).gradients[0].m_color;
+                    const rgba c2 = morphrecs[0].m_color;
                     morph = fill_style(SolidFill(c2));
                 }
                 return std::make_pair(SolidFill(c1), morph);
             }
         
+            gf.setRecords(recs);
+            if (readMorph) {
+                boost::get<GradientFill>(morph->fill).setRecords(morphrecs);
+            }
+
+
             if (t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_) {
 
                 const SWF::SpreadMode spread =
@@ -415,7 +412,17 @@ readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
     return std::make_pair(BitmapFill(type, &md, id, m), morph);
 }
 
+gradient_record
+readGradientRecord(SWFStream& in, SWF::TagType tag)
+{
+    in.ensureBytes(1);
+    const boost::uint8_t ratio = in.read_u8();
+    rgba color;
+    color.read(in, tag);
+    return gradient_record(ratio, color);
 }
+
+} // anonymous namespace
 
 std::ostream&
 operator<<(std::ostream& os, const BitmapFill::SmoothingPolicy& p)
@@ -438,7 +445,7 @@ operator<<(std::ostream& os, const BitmapFill::SmoothingPolicy& p)
     return os;
 }
 
-} // end of namespace
+} // namespace gnash
 
 
 // Local Variables:

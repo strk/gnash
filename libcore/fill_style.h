@@ -40,19 +40,12 @@ class RunResources;
 class gradient_record
 {
 public:
-    gradient_record()
-        :
-        m_ratio(0),
-        m_color()
-    {}
 
     gradient_record(boost::uint8_t ratio, const rgba& color)
         :
         m_ratio(ratio),
         m_color(color)
     {}
-
-    void read(SWFStream& in, SWF::TagType tag);
     
     //data:
     boost::uint8_t m_ratio;
