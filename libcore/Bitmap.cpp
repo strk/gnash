@@ -171,7 +171,7 @@ Bitmap::makeBitmapShape()
 
     // Can this be tiled?
     FillStyle fill(BitmapFill(BitmapFill::CLIPPED, bitmap(), mat));
-    const size_t fillLeft = _shape.add_FillStyle(fill);
+    const size_t fillLeft = _shape.addFillStyle(fill);
 
     Path bmpath(w, h, fillLeft, 0, 0, false);
     bmpath.drawLineTo(w, 0);

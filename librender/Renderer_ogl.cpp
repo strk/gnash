@@ -1842,40 +1842,29 @@ Renderer* create_Renderer_ogl(bool init)
  
 namespace {
 
+// TODO: this function is rubbish and shouldn't survive a rewritten OGL
+// renderer.
 rgba
 sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
 {
 
-    const std::vector<GradientRecord>& r = fill.gradients;
-
-    if (r.empty()) {
-        static const rgba black;
-        return black;
-    }
-
     // By specs, first gradient should *always* be 0, 
     // anyway a malformed SWF could break this,
     // so we cannot rely on that information...
-    if (ratio < r[0].m_ratio) {
-        IF_VERBOSE_MALFORMED_SWF(
-            LOG_ONCE(log_swferror(_("First gradient in a FillStyle "
-                    "has position==%d (expected 0). This seems to be common, "
-                    "so will warn only once."), +r[0].m_ratio);
-            );
-        );
-        return r[0].m_color;
+    if (ratio < fill.record(0).m_ratio) {
+        return fill.record(0).m_color;
     }
 
-    if (ratio >= r.back().m_ratio) {
-        return r.back().m_color;
+    if (ratio >= fill.record(fill.recordCount() - 1).m_ratio) {
+        return fill.record(fill.recordCount() - 1).m_color;
     }
         
-    for (size_t i = 1, n = r.size(); i < n; ++i) {
+    for (size_t i = 1, n = fill.recordCount(); i < n; ++i) {
 
-        const GradientRecord& gr1 = r[i];
+        const GradientRecord& gr1 = fill.record(i);
         if (gr1.m_ratio < ratio) continue;
 
-        const GradientRecord& gr0 = r[i - 1];
+        const GradientRecord& gr0 = fill.record(i - 1);
         if (gr0.m_ratio > ratio) continue;
 
         float f = 0.0f;
@@ -1899,7 +1888,7 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
     }
 
     // Assuming gradients are ordered by m_ratio? see start comment
-    return r.back().m_color;
+    return fill.record(fill.recordCount() - 1).m_color;
 }
 
 const BitmapInfo*

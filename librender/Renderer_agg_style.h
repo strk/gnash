@@ -195,7 +195,7 @@ public:
     // Build gradient lookup table
     m_gradient_lut.remove_all(); 
     
-    const size_t size = fs.gradients.size();
+    const size_t size = fs.recordCount();
     
     // It is essential that at least two colours are added; otherwise agg
     // will use uninitialized values.
@@ -203,7 +203,7 @@ public:
 
     for (int i = 0; i != size; ++i) {
     
-      const GradientRecord& gr = fs.gradients[i]; 
+      const GradientRecord& gr = fs.record(i); 
       rgba trans_color = m_cx.transform(gr.m_color);
       if (trans_color.m_a < 255) m_need_premultiply = true;    
       

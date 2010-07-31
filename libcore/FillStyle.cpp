@@ -101,10 +101,10 @@ gradientMatrix(GradientFill::Type t, const SWFMatrix& m)
 GradientFill::GradientFill(Type t, const SWFMatrix& m,
         const GradientRecords& recs)
     :
-    gradients(recs),
     focalPoint(0.0),
     spreadMode(SWF::GRADIENT_SPREAD_PAD),
     interpolation(SWF::GRADIENT_INTERPOLATION_NORMAL),
+    _gradients(recs),
     _type(t),
     _matrix(gradientMatrix(t, m))
 {
@@ -165,14 +165,14 @@ GradientFill::setLerp(const GradientFill& a, const GradientFill& b,
         double ratio)
 {
     assert(type() == a.type());
-    assert(gradients.size() == a.gradients.size());
-    assert(gradients.size() == b.gradients.size());
+    assert(_gradients.size() == a.recordCount());
+    assert(_gradients.size() == b.recordCount());
 
-    for (size_t i = 0, e = gradients.size(); i < e; ++i) {
-        gradients[i].m_ratio = frnd(flerp(a.gradients[i].m_ratio,
-                    b.gradients[i].m_ratio, ratio));
-        gradients[i].m_color.set_lerp(a.gradients[i].m_color,
-                b.gradients[i].m_color, ratio);
+    for (size_t i = 0, e = _gradients.size(); i < e; ++i) {
+        const GradientRecord& ra = a.record(i);
+        const GradientRecord& rb = b.record(i);
+        _gradients[i].m_ratio = frnd(flerp(ra.m_ratio, rb.m_ratio, ratio));
+        _gradients[i].m_color.set_lerp(ra.m_color, rb.m_color, ratio);
     }
     _matrix.set_lerp(a.matrix(), b.matrix(), ratio);
 }

@@ -198,15 +198,29 @@ public:
     
     void setRecords(const GradientRecords& recs) {
         assert(recs.size() > 1);
-        gradients = recs;
+        _gradients = recs;
     }
 
-    GradientRecords gradients;
+    /// Get the number of records in this GradientFill
+    size_t recordCount() const {
+        return _gradients.size();
+    }
+
+    /// Query the GradientRecord at the specified index
+    //
+    /// There are recordCount() records.
+    const GradientRecord& record(size_t i) const {
+        assert(i < _gradients.size());
+        return _gradients[i];
+    }
+
     double focalPoint;
     SWF::SpreadMode spreadMode;
     SWF::InterpolationMode interpolation;
 
 private:
+
+    GradientRecords _gradients;
     Type _type;
     SWFMatrix _matrix;
 };
