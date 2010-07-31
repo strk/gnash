@@ -132,7 +132,7 @@ struct StyleHandler : boost::static_visitor<>
         const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
             createGradientBitmap(f, _renderer));  
 
-        SWFMatrix m = f.matrix;
+        SWFMatrix m = f.matrix();
         binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
     }
 
@@ -1907,7 +1907,7 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
 {
     std::auto_ptr<ImageRGBA> im;
 
-    switch (gf.type)
+    switch (gf.type())
     {
         case GradientFill::LINEAR:
             // Linear gradient.

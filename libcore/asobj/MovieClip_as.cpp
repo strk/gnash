@@ -1791,24 +1791,6 @@ movieclip_beginGradientFill(const fn_call& fn)
         stops = 15;
     }
 
-    SWFMatrix mat;
-
-    // TODO: move matrix stuff to the GradientFill ctor.
-    if (t == GradientFill::RADIAL || t == GradientFill::FOCAL) {
-        // A gradient box extends from (-16384, -16384) to (16384, 16384),
-        // so we have set scale and translation to convert our radial
-        // (0, 0)-(64, 64) range to a -16384 - 16384 square.
-        mat.concatenate_translation(32, 32);
-        mat.set_scale(1 / 512., 1 / 512.);
-    }
-    else {
-        // A gradient box extends from (-16384, -16384) to (16384, 16384),
-        // so we have set scale and translation to convert our linear 0-256
-        // range to -16384 - 16384.
-        mat.concatenate_translation(128, 0);
-        mat.set_scale(1 / 128., 1 / 128.);
-    }
-
     SWFMatrix input_matrix;
 
     // This is case sensitive.
@@ -1859,8 +1841,6 @@ movieclip_beginGradientFill(const fn_call& fn)
         input_matrix.ty = valTY;
     }
     
-    mat.concatenate(input_matrix.invert());
-
     // ----------------------------
     // Create the gradients vector
     // ----------------------------
@@ -1912,7 +1892,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         gradients.push_back(gradient_record(rat, color));
     }
 
-    movieclip->graphics().beginGradientFill(t, gradients, mat);
+    movieclip->graphics().beginGradientFill(t, gradients, input_matrix.invert());
 
     return as_value();
 }

@@ -688,11 +688,11 @@ struct StyleHandler : boost::static_visitor<>
     {}
 
     void operator()(const GradientFill& f) const {
-          SWFMatrix m = f.matrix;
+          SWFMatrix m = f.matrix();
           
           m.concatenate(_fillMatrix);
           m.concatenate(_stageMatrix);
-          switch (f.type) {
+          switch (f.type()) {
               case GradientFill::LINEAR:
                   _sh.add_gradient_linear(f, m, _cx);
                   break;

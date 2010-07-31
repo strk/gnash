@@ -133,8 +133,8 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
     {}
 
     cairo_pattern_t* operator()(const GradientFill& f) const {
-        SWFMatrix m = f.matrix;
-        switch (f.type) {
+        const SWFMatrix m = f.matrix();
+        switch (f.type()) {
             case GradientFill::LINEAR:
             {
                 cairo_matrix_t mat;
@@ -161,7 +161,7 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
 
                 double focal_pos = 0;
 
-                if (f.type == GradientFill::FOCAL) {
+                if (f.type() == GradientFill::FOCAL) {
                     focal_pos = 32.0f * f.focalPoint;
                 }
 

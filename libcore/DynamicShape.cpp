@@ -120,8 +120,9 @@ DynamicShape::beginGradientFill(GradientFill::Type t,
 	endFill();
 
 	// Add the new fill style and set as current
-	const fill_style::Fill f = GradientFill(t, grad, mat);
-	_currfill = add_fill_style(f);
+	GradientFill f = GradientFill(t, mat);
+    f.setRecords(grad);
+	_currfill = add_fill_style(fill_style(f));
 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?

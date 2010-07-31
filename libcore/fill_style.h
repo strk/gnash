@@ -185,30 +185,39 @@ public:
 
     typedef std::vector<gradient_record> GradientRecords;
 
-    GradientFill(Type t, const GradientRecords& recs, const SWFMatrix& m)
-        :
-        type(t),
-        gradients(recs),
-        matrix(m),
-        focalPoint(0.0),
-        spreadMode(SWF::GRADIENT_SPREAD_PAD),
-        interpolation(SWF::GRADIENT_INTERPOLATION_NORMAL)
-    {
-        assert(recs.size() > 1);
+    /// Construct a GradientFill
+    //
+    /// Optionally the records can be passed here.
+    //
+    /// The actual matrix of the gradient depends on the type; the constructor
+    /// handles this, and users should just pass the user matrix.
+    GradientFill(Type t, const SWFMatrix& m,
+            const GradientRecords& = GradientRecords());
+
+    Type type() const {
+        return _type;
     }
-    
+
+    const SWFMatrix& matrix() const {
+        return _matrix;
+    }
+
     /// Set this fill to a lerp of two other GradientFills.
     void setLerp(const GradientFill& a, const GradientFill& b, double ratio);
-
-    GradientFill() {}
-
-    Type type;
+    
+    void setRecords(const GradientRecords& recs) {
+        assert(recs.size() > 1);
+        gradients = recs;
+    }
 
     GradientRecords gradients;
-    SWFMatrix matrix;
     double focalPoint;
     SWF::SpreadMode spreadMode;
     SWF::InterpolationMode interpolation;
+
+private:
+    Type _type;
+    SWFMatrix _matrix;
 };
 
 /// A SolidFill containing one color.

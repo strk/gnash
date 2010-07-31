@@ -77,6 +77,37 @@ private:
 };
 
 }
+
+SWFMatrix
+gradientMatrix(GradientFill::Type t, const SWFMatrix& m)
+{
+    SWFMatrix base;
+    switch (t) {
+        case GradientFill::LINEAR:
+            base.set_translation(128, 0);
+            base.set_scale(1.0 / 128, 1.0 / 128);
+            break;
+        case GradientFill::FOCAL:
+        case GradientFill::RADIAL:
+            base.set_translation(32, 32);
+            base.set_scale(1.0 / 512, 1.0 / 512);
+            break;
+    }
+    base.concatenate(m);
+    return base;
+}
+
+GradientFill::GradientFill(Type t, const SWFMatrix& m,
+        const GradientRecords& recs)
+    :
+    gradients(recs),
+    focalPoint(0.0),
+    spreadMode(SWF::GRADIENT_SPREAD_PAD),
+    interpolation(SWF::GRADIENT_INTERPOLATION_NORMAL),
+    _type(t),
+    _matrix(gradientMatrix(t, m))
+{
+}
     
 BitmapFill::BitmapFill(SWF::FillType t, movie_definition* md,
         boost::uint16_t id, const SWFMatrix& m)
@@ -132,7 +163,7 @@ void
 GradientFill::setLerp(const GradientFill& a, const GradientFill& b,
         double ratio)
 {
-    assert(type == a.type);
+    assert(type() == a.type());
     assert(gradients.size() == a.gradients.size());
     assert(gradients.size() == b.gradients.size());
 
@@ -142,7 +173,7 @@ GradientFill::setLerp(const GradientFill& a, const GradientFill& b,
         gradients[i].m_color.set_lerp(a.gradients[i].m_color,
                 b.gradients[i].m_color, ratio);
     }
-    matrix.set_lerp(a.matrix, b.matrix, ratio);
+    _matrix.set_lerp(a.matrix(), b.matrix(), ratio);
 }
     
 void
@@ -185,43 +216,33 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
         case SWF::FILL_RADIAL_GRADIENT:
         case SWF::FILL_FOCAL_GRADIENT:
         {
-            boost::optional<fill_style> morph;
 
-            GradientFill gf;
-
-            SWFMatrix base;
-
-            if (type == SWF::FILL_LINEAR_GRADIENT) {
-                gf.type = GradientFill::LINEAR;
-                base.set_translation(128, 0);
-                base.set_scale(1.0 / 128, 1.0 / 128);
-            }
-            else {
-                // FILL_RADIAL_GRADIENT or FILL_FOCAL_GRADIENT
-                base.set_translation(32, 32);
-                base.set_scale(1.0 / 512, 1.0 / 512);
-                gf.type = type == SWF::FILL_FOCAL_GRADIENT ?
-                    GradientFill::FOCAL : GradientFill::RADIAL;
-            }
-
-            // Set base transform for both matrices.
-            gf.matrix = base;
-            if (readMorph) {
-                morph = fill_style(GradientFill());
-                boost::get<GradientFill>(morph->fill).matrix = base;
+            GradientFill::Type gr;
+            switch (type) {
+                case SWF::FILL_LINEAR_GRADIENT:
+                    gr = GradientFill::LINEAR;
+                    break;
+                case SWF::FILL_RADIAL_GRADIENT:
+                    gr = GradientFill::RADIAL;
+                    break;
+                case SWF::FILL_FOCAL_GRADIENT:
+                    gr = GradientFill::FOCAL;
+                    break;
+                default:
+                    std::abort();
             }
 
             SWFMatrix m;
             m.read(in);
             m.invert();
+            GradientFill gf(gr, m);
 
-            gf.matrix.concatenate(m);
-            
+            boost::optional<fill_style> morph;
             if (readMorph) {
                 SWFMatrix m2;
                 m2.read(in);
                 m2.invert();
-                boost::get<GradientFill>(morph->fill).matrix.concatenate(m2);
+                morph = fill_style(GradientFill(gr, m2));
             }
             
             // GRADIENT
