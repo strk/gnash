@@ -15,9 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
-
-
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
 

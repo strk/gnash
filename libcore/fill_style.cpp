@@ -17,10 +17,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
+#include "fill_style.h"
+
+#include <iostream> 
+#include <boost/variant.hpp>
+#include <boost/optional.hpp>
 
 #include "smart_ptr.h"
-#include "fill_style.h"
 #include "log.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
@@ -31,9 +34,6 @@
 #include "RunResources.h"
 #include "GnashImage.h"
 
-#include <cmath> // sqrt, floor
-#include <iostream> // for output operator
-#include <boost/variant.hpp>
 
 namespace gnash {
 
