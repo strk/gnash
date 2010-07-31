@@ -65,11 +65,7 @@ public:
                  boost::int32_t ax, boost::int32_t ay, int swfVersion);
 
 	/// Start drawing with a solid fill
-	void beginFill(const rgba& color);
-
-	/// Start drawing with a linear gradient fill
-	void beginGradientFill(GradientFill::Type t,
-            const std::vector<gradient_record>& grad, const SWFMatrix& mat);
+	void beginFill(const fill_style& f);
 
 	/// Close an existing filled path, if any.
 	void endFill();

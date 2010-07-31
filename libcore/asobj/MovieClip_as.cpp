@@ -1688,7 +1688,8 @@ movieclip_beginFill(const fn_call& fn)
 
     rgba color(r, g, b, a);
 
-    movieclip->graphics().beginFill(color);
+    const fill_style f = fill_style(SolidFill(color));
+    movieclip->graphics().beginFill(f);
 
     return as_value();
 }
@@ -1791,7 +1792,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         stops = 15;
     }
 
-    SWFMatrix input_matrix;
+    SWFMatrix mat;
 
     // This is case sensitive.
     if (matrix->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
@@ -1811,12 +1812,12 @@ movieclip_beginGradientFill(const fn_call& fn)
         const double c = -std::sin(rot) * valW * 2;
         const double d = std::cos(rot) * valH * 2;
 
-        input_matrix.sx = a; 
-        input_matrix.shx = b;
-        input_matrix.shy = c;
-        input_matrix.sy = d; 
-        input_matrix.tx = valX + valW / 2.0;
-        input_matrix.ty = valY + valH / 2.0;
+        mat.sx = a; 
+        mat.shx = b;
+        mat.shy = c;
+        mat.sy = d; 
+        mat.tx = valX + valW / 2.0;
+        mat.ty = valY + valH / 2.0;
         
     }
     else {
@@ -1833,12 +1834,12 @@ movieclip_beginGradientFill(const fn_call& fn)
         const boost::int32_t valTY = pixelsToTwips(
                 matrix->getMember(NSV::PROP_TY).to_number());
 
-        input_matrix.sx = valA; 
-        input_matrix.shx = valB;
-        input_matrix.shy = valC;
-        input_matrix.sy = valD; 
-        input_matrix.tx = valTX; 
-        input_matrix.ty = valTY;
+        mat.sx = valA; 
+        mat.shx = valB;
+        mat.shy = valC;
+        mat.sy = valD; 
+        mat.tx = valTX; 
+        mat.ty = valTY;
     }
     
     // ----------------------------
@@ -1849,7 +1850,7 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     std::vector<gradient_record> gradients;
     gradients.reserve(stops);
-    for (size_t i=0; i < stops; ++i) {
+    for (size_t i = 0; i < stops; ++i) {
 
         string_table::key key = st.find(boost::lexical_cast<std::string>(i));
 
@@ -1892,7 +1893,12 @@ movieclip_beginGradientFill(const fn_call& fn)
         gradients.push_back(gradient_record(rat, color));
     }
 
-    movieclip->graphics().beginGradientFill(t, gradients, input_matrix.invert());
+    // Make sure we don't try to construct a GradientFill with only 1 stop!
+    const fill_style f = stops > 1 ? 
+        fill_style(GradientFill(t, mat, gradients)) :
+        fill_style(SolidFill(gradients[0].m_color));
+
+    movieclip->graphics().beginFill(f);
 
     return as_value();
 }

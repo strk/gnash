@@ -88,41 +88,12 @@ DynamicShape::endFill()
 }
 
 void
-DynamicShape::beginFill(const rgba& color)
+DynamicShape::beginFill(const fill_style& f)
 {
 	// End previous fill
 	endFill();
 
-	// Add the new fill style and set as current
-    const fill_style::Fill f = SolidFill(color);
 	_currfill = add_fill_style(f);
-
-	// TODO: how to know wheter the fill should be set
-	//       as *left* or *right* fill ?
-	//       A quick test shows that *left* always work fine !
-	Path newPath(_x, _y, _currfill, 0, _currline, true); 
-	add_path(newPath);
-}
-
-void
-DynamicShape::beginGradientFill(GradientFill::Type t, 
-        const std::vector<gradient_record>& grad, const SWFMatrix& mat)
-{
-    
-    assert(!grad.empty());
-
-    if (grad.size() < 2) {
-        beginFill(grad[0].m_color);
-        return;
-    }
-
-	// End previous fill
-	endFill();
-
-	// Add the new fill style and set as current
-	GradientFill f = GradientFill(t, mat);
-    f.setRecords(grad);
-	_currfill = add_fill_style(fill_style(f));
 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
