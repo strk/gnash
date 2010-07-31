@@ -1894,11 +1894,22 @@ movieclip_beginGradientFill(const fn_call& fn)
     }
 
     // Make sure we don't try to construct a GradientFill with only 1 stop!
-    const FillStyle f = stops > 1 ? 
-        FillStyle(GradientFill(t, mat, gradients)) :
-        FillStyle(SolidFill(gradients[0].m_color));
+    if (stops < 2) {
+        const FillStyle f = FillStyle(SolidFill(gradients[0].m_color));
+        movieclip->graphics().beginFill(f);
+        return as_value();
+    }
 
-    movieclip->graphics().beginFill(f);
+    GradientFill fd(t, mat, gradients);
+
+    /// TODO: set interpolation mode and spread mode.
+
+    /// Add a focus if present.
+    if (fn.nargs > 7) {
+        fd.focalPoint = fn.arg(7).to_number();
+    }
+
+    movieclip->graphics().beginFill(FillStyle(fd));
 
     return as_value();
 }

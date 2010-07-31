@@ -1911,26 +1911,6 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
             break;
 
         case GradientFill::RADIAL:
-            // Radial gradient.
-            im.reset(new ImageRGBA(64, 64));
-
-            for (size_t j = 0; j < im->height(); j++) {
-                for (size_t i = 0; i < im->width(); i++) {
-                    float radius = (im->height() - 1) / 2.0f;
-                    float y = (j - radius) / radius;
-                    float x = (i - radius) / radius;
-                    int ratio = std::floor(255.5f * std::sqrt(x * x + y * y));
-                    if (ratio > 255) {
-                        ratio = 255;
-                    }
-                    rgba sample = sampleGradient(gf, ratio);
-                    im->setPixel(i, j, sample.m_r, sample.m_g,
-                            sample.m_b, sample.m_a);
-                }
-            }
-            break;
-
-        case GradientFill::FOCAL:
             // Focal gradient.
             im.reset(new ImageRGBA(64, 64));
 

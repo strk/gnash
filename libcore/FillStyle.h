@@ -167,11 +167,13 @@ class DSOEXPORT GradientFill
 {
 public:
 
+    /// The type of GradientFill
+    //
+    /// A Focal fill is a gradient fill with a focal point.
     enum Type
     {
         LINEAR,
-        RADIAL,
-        FOCAL
+        RADIAL
     };
 
     typedef std::vector<GradientRecord> GradientRecords;

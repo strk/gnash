@@ -148,7 +148,6 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
                 return pattern;
             }
             case GradientFill::RADIAL:
-            case GradientFill::FOCAL:
             {
               
                 // Undo the translation our parser applied.
@@ -159,11 +158,8 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
                 cairo_matrix_t mat;
                 init_cairo_matrix(&mat, transl);
 
-                double focal_pos = 0;
-
-                if (f.type() == GradientFill::FOCAL) {
-                    focal_pos = 32.0f * f.focalPoint;
-                }
+                /// This is 0 for radial gradients.
+                const double focal_pos = 32.0f * f.focalPoint;
 
                 cairo_pattern_t* pattern =
                     cairo_pattern_create_radial(focal_pos, 0.0, 0.0,

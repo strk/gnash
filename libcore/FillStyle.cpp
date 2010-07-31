@@ -88,7 +88,6 @@ gradientMatrix(GradientFill::Type t, const SWFMatrix& m)
             base.set_translation(128, 0);
             base.set_scale(1.0 / 128, 1.0 / 128);
             break;
-        case GradientFill::FOCAL:
         case GradientFill::RADIAL:
             base.set_translation(32, 32);
             base.set_scale(1.0 / 512, 1.0 / 512);
@@ -108,6 +107,7 @@ GradientFill::GradientFill(Type t, const SWFMatrix& m,
     _type(t),
     _matrix(gradientMatrix(t, m))
 {
+    assert(recs.size() > 1);
 }
     
 BitmapFill::BitmapFill(SWF::FillType t, movie_definition* md,
@@ -216,10 +216,8 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                     gr = GradientFill::LINEAR;
                     break;
                 case SWF::FILL_RADIAL_GRADIENT:
-                    gr = GradientFill::RADIAL;
-                    break;
                 case SWF::FILL_FOCAL_GRADIENT:
-                    gr = GradientFill::FOCAL;
+                    gr = GradientFill::RADIAL;
                     break;
                 default:
                     std::abort();

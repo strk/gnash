@@ -697,10 +697,12 @@ struct StyleHandler : boost::static_visitor<>
                   _sh.add_gradient_linear(f, m, _cx);
                   break;
               case GradientFill::RADIAL:
-                  _sh.add_gradient_radial(f, m, _cx);
-                  break;
-              case GradientFill::FOCAL:
-                  _sh.add_gradient_focal(f, m, _cx);
+                  if (f.focalPoint) {
+                      _sh.add_gradient_focal(f, m, _cx);
+                  }
+                  else {
+                      _sh.add_gradient_radial(f, m, _cx);
+                  }
                   break;
           }
     }
