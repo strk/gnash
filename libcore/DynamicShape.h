@@ -23,13 +23,12 @@
 #include <vector>
 #include "LineStyle.h" 
 #include "ShapeRecord.h"
-#include "fill_style.h"
 
 namespace gnash {
     class DisplayObject;
     class Renderer;
-    class fill_style;
-    class gradient_record;
+    class FillStyle;
+    class GradientRecord;
 }
 
 namespace gnash {
@@ -65,7 +64,7 @@ public:
                  boost::int32_t ax, boost::int32_t ay, int swfVersion);
 
 	/// Start drawing with a solid fill
-	void beginFill(const fill_style& f);
+	void beginFill(const FillStyle& f);
 
 	/// Close an existing filled path, if any.
 	void endFill();
@@ -122,7 +121,7 @@ public:
 	///	This offset is the one required to properly
 	///	reference it in gnash::path instances.
 	///
-	size_t add_fill_style(const fill_style& stl);
+	size_t addFillStyle(const FillStyle& stl);
 
 	/// \brief
 	/// Add a line style, possibly reusing an existing

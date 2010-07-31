@@ -1,4 +1,4 @@
-// fill_style.cpp:  Graphical region filling styles, for Gnash.
+// FillStyle.cpp:  Graphical region filling styles, for Gnash.
 // 
 //   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "fill_style.h"
+#include "FillStyle.h"
 
 #include <iostream> 
 #include <boost/variant.hpp>
@@ -44,19 +44,19 @@ namespace {
             bool readMorph);
     OptionalFillPair readBitmapFill(SWFStream& in, SWF::FillType type,
             movie_definition& md, bool readMorph);
-    gradient_record readGradientRecord(SWFStream& in, SWF::TagType tag);
+    GradientRecord readGradientRecord(SWFStream& in, SWF::TagType tag);
 }
 
 namespace {
 
-/// Create a lerped version of two other fill_styles.
+/// Create a lerped version of two other FillStyles.
 //
 /// The two fill styles must have exactly the same types. Callers are 
 /// responsible for ensuring this.
 class SetLerp : public boost::static_visitor<>
 {
 public:
-    SetLerp(const fill_style::Fill& a, const fill_style::Fill& b, double ratio)
+    SetLerp(const FillStyle::Fill& a, const FillStyle::Fill& b, double ratio)
         :
         _a(a),
         _b(b),
@@ -71,8 +71,8 @@ public:
     }
 
 private:
-    const fill_style::Fill& _a;
-    const fill_style::Fill& _b;
+    const FillStyle::Fill& _a;
+    const FillStyle::Fill& _b;
     const double _ratio;
 
 };
@@ -191,7 +191,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
     const SWF::FillType type = static_cast<SWF::FillType>(in.read_u8());
         
     IF_VERBOSE_PARSE(
-        log_parse("  fill_style read type = 0x%X", +type);
+        log_parse("  FillStyle read type = 0x%X", +type);
     );
 
     switch (type) {
@@ -230,12 +230,12 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
             m.invert();
             GradientFill gf(gr, m);
 
-            boost::optional<fill_style> morph;
+            boost::optional<FillStyle> morph;
             if (readMorph) {
                 SWFMatrix m2;
                 m2.read(in);
                 m2.invert();
-                morph = fill_style(GradientFill(gr, m2));
+                morph = FillStyle(GradientFill(gr, m2));
             }
             
             in.ensureBytes(1);
@@ -275,7 +275,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                 const rgba c1 = recs[0].m_color;
                 if (readMorph) {
                     const rgba c2 = morphrecs[0].m_color;
-                    morph = fill_style(SolidFill(c2));
+                    morph = FillStyle(SolidFill(c2));
                 }
                 return std::make_pair(SolidFill(c1), morph);
             }
@@ -333,7 +333,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                     gf.focalPoint;
             }
 
-            return std::make_pair(fill_style(gf), morph);
+            return std::make_pair(FillStyle(gf), morph);
         }
 
         default:
@@ -349,7 +349,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
 
 // Sets this style to a blend of a and b.  t = [0,1]
 void
-setLerp(fill_style& f, const fill_style& a, const fill_style& b, double t)
+setLerp(FillStyle& f, const FillStyle& a, const FillStyle& b, double t)
 {
     assert(t >= 0 && t <= 1);
     f.fill = a.fill;
@@ -363,7 +363,7 @@ readSolidFill(SWFStream& in, SWF::TagType t, bool readMorph)
 {
     rgba color;
 
-    boost::optional<fill_style> morph;
+    boost::optional<FillStyle> morph;
 
     // 0x00: solid fill
     if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4 ||
@@ -372,11 +372,11 @@ readSolidFill(SWFStream& in, SWF::TagType t, bool readMorph)
         if (readMorph) {
             rgba othercolor;
             othercolor.read_rgba(in);
-            morph = fill_style(SolidFill(othercolor));
+            morph = FillStyle(SolidFill(othercolor));
         }
     }
     else {
-        // For DefineMorphShape tags we should use morphfill_style 
+        // For DefineMorphShape tags we should use morphFillStyle 
         assert(t == SWF::DEFINESHAPE || t == SWF::DEFINESHAPE2);
         color.read_rgb(in);
     }
@@ -384,7 +384,7 @@ readSolidFill(SWFStream& in, SWF::TagType t, bool readMorph)
     IF_VERBOSE_PARSE(
         log_parse("  color: %s", color);
     );
-    return std::make_pair(fill_style(SolidFill(color)), morph);
+    return std::make_pair(FillStyle(SolidFill(color)), morph);
 }
 
 OptionalFillPair
@@ -398,12 +398,12 @@ readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
     SWFMatrix m;
     m.read(in);
 
-    boost::optional<fill_style> morph;
+    boost::optional<FillStyle> morph;
     if (readMorph) {
         SWFMatrix m2;
         m2.read(in);
         m2.invert();
-        morph = fill_style(BitmapFill(type, &md, id, m2));
+        morph = FillStyle(BitmapFill(type, &md, id, m2));
     }
 
     // For some reason, it looks like they store the inverse of the
@@ -412,14 +412,14 @@ readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
     return std::make_pair(BitmapFill(type, &md, id, m), morph);
 }
 
-gradient_record
+GradientRecord
 readGradientRecord(SWFStream& in, SWF::TagType tag)
 {
     in.ensureBytes(1);
     const boost::uint8_t ratio = in.read_u8();
     rgba color;
     color.read(in, tag);
-    return gradient_record(ratio, color);
+    return GradientRecord(ratio, color);
 }
 
 } // anonymous namespace

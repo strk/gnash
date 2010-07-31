@@ -47,7 +47,7 @@ namespace gnash {
     class swf_event;
     class drag_state;
     class LoadVariablesThread;
-    class gradient_record;
+    class GradientRecord;
     class TextField;
     class BitmapData_as;
     class BitmapInfo;

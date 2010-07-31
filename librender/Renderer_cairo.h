@@ -87,7 +87,7 @@ public:
 
     void draw_subshape(const PathVec& path_vec,
                        const SWFMatrix& mat, const cxform& cx,
-                       const std::vector<fill_style>& fill_styles,
+                       const std::vector<FillStyle>& FillStyles,
                        const std::vector<LineStyle>& line_styles);
 
     void draw_mask(const PathVec& path_vec);

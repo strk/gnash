@@ -164,7 +164,7 @@ namespace gnash {
     class rgba;
     class SWFMatrix;
     class cxform;
-    class fill_style;
+    class FillStyle;
     class LineStyle;
 
     // XXX: GnashImageProxy (delayed image rendering)
@@ -219,7 +219,7 @@ public:
     
     /// \brief
     /// Given an image, returns a pointer to a bitmap_info class
-    /// that can later be passed to fill_styleX_bitmap(), to set a
+    /// that can later be passed to FillStyleX_bitmap(), to set a
     /// bitmap fill style.
     virtual BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im) = 0;
 

@@ -21,7 +21,7 @@
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "smart_ptr.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 #include "Geometry.h"
 #include "GnashNumeric.h"
 #include "log.h"
@@ -181,7 +181,7 @@ ShapeRecord::clear()
 }
 
 void
-ShapeRecord::addFillStyle(const fill_style& fs)
+ShapeRecord::addFillStyle(const FillStyle& fs)
 {
     _fillStyles.push_back(fs);
 }
@@ -394,7 +394,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             }
             if ((flags & SHAPE_FILLSTYLE0_CHANGE) && num_fill_bits > 0)
             {
-                // fill_style_0_change = 1;
+                // FillStyle_0_change = 1;
                 if (! current_path.empty())
                 {
                     _paths.push_back(current_path);
@@ -445,7 +445,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             }
             if ((flags & SHAPE_FILLSTYLE1_CHANGE) && num_fill_bits > 0)
             {
-                // fill_style_1_change = 1;
+                // FillStyle_1_change = 1;
                 if (! current_path.empty())
                 {
                     _paths.push_back(current_path);
@@ -679,24 +679,24 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
          SWF::TagType tag, movie_definition& m, const RunResources& /*r*/)
 {
     in.ensureBytes(1);
-    boost::uint16_t fill_style_count = in.read_u8();
+    boost::uint16_t FillStyle_count = in.read_u8();
     if (tag != SWF::DEFINESHAPE)
     {
-        if (fill_style_count == 0xFF)
+        if (FillStyle_count == 0xFF)
         {
             in.ensureBytes(2);
-            fill_style_count = in.read_u16();
+            FillStyle_count = in.read_u16();
         }
     }
 
     IF_VERBOSE_PARSE (
-        log_parse(_("  readFillStyles: count = %u"), fill_style_count);
+        log_parse(_("  readFillStyles: count = %u"), FillStyle_count);
     );
 
     // Read the styles.
-    styles.reserve(styles.size()+fill_style_count);
-    for (boost::uint16_t i = 0; i < fill_style_count; ++i) {
-        // TODO: add a fill_style constructor directly reading from stream
+    styles.reserve(styles.size()+FillStyle_count);
+    for (boost::uint16_t i = 0; i < FillStyle_count; ++i) {
+        // TODO: add a FillStyle constructor directly reading from stream
         OptionalFillPair fp = readFills(in, tag, m, false);
         styles.push_back(fp.first);
     }

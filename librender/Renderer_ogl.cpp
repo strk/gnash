@@ -35,7 +35,7 @@
 #include "utility.h"
 #include "Range2d.h"
 #include "cxform.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #  include <Windows.h>
@@ -118,7 +118,7 @@ namespace {
 
 /// Style handler
 //
-/// Transfer fill_styles to the ogl renderer.
+/// Transfer FillStyles to the ogl renderer.
 struct StyleHandler : boost::static_visitor<>
 {
     StyleHandler(const cxform& c, Renderer& r)
@@ -1141,9 +1141,9 @@ public:
   add_paths(const PathVec& path_vec)
   {
     cxform dummy_cx;
-    std::vector<fill_style> dummy_fs;
+    std::vector<FillStyle> dummy_fs;
     
-    fill_style coloring = fill_style(SolidFill(rgba(0, 0, 0, 0)));
+    FillStyle coloring = FillStyle(SolidFill(rgba(0, 0, 0, 0)));
     
     dummy_fs.push_back(coloring);
     
@@ -1345,7 +1345,7 @@ public:
     }    
   }
 
-  void apply_fill_style(const fill_style& style, const SWFMatrix& /* mat */, const cxform& cx)
+  void apply_FillStyle(const FillStyle& style, const SWFMatrix& /* mat */, const cxform& cx)
   {
       const StyleHandler st(cx, *this);
       boost::apply_visitor(st, style.fill);
@@ -1357,7 +1357,7 @@ public:
   {
   //  GNASH_REPORT_FUNCTION;
      
-    // In case GL_TEXTURE_2D was enabled by apply_fill_style(), disable it now.
+    // In case GL_TEXTURE_2D was enabled by apply_FillStyle(), disable it now.
     // FIXME: this sucks
     glDisable(GL_TEXTURE_2D);
     
@@ -1455,7 +1455,7 @@ public:
   void
   draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints,
 		const SWFMatrix& mat, const cxform& cx,
-		const std::vector<fill_style>& /* fill_styles */,
+		const std::vector<FillStyle>& /* FillStyles */,
                 const std::vector<LineStyle>& line_styles)
   {
   
@@ -1619,13 +1619,13 @@ public:
   draw_subshape(const PathVec& path_vec,
     const SWFMatrix& mat,
     const cxform& cx,
-    const std::vector<fill_style>& fill_styles,
+    const std::vector<FillStyle>& FillStyles,
     const std::vector<LineStyle>& line_styles)
   {
     PathVec normalized = normalize_paths(path_vec);
     PathPointMap pathpoints = getPathPoints(normalized);
     
-    for (size_t i = 0; i < fill_styles.size(); ++i) {
+    for (size_t i = 0; i < FillStyles.size(); ++i) {
       PathPtrVec paths = paths_by_style(normalized, i+1);
       
       if (!paths.size()) {
@@ -1655,11 +1655,11 @@ public:
         _tesselator.endContour();
       }
       
-      apply_fill_style(fill_styles[i], mat, cx);
+      apply_FillStyle(FillStyles[i], mat, cx);
 
       // This is terrible, but since the renderer is half dead I don't care.
       try {
-          boost::get<SolidFill>(fill_styles[i].fill);
+          boost::get<SolidFill>(FillStyles[i].fill);
       }
       catch (const boost::bad_get&) {
           // For non solid fills...
@@ -1669,7 +1669,7 @@ public:
       _tesselator.tesselate();
       
       try {
-          boost::get<SolidFill>(fill_styles[i].fill);
+          boost::get<SolidFill>(FillStyles[i].fill);
       }
       catch (const boost::bad_get&) {
           // Restore to original.
@@ -1682,7 +1682,7 @@ public:
       glDisable(GL_TEXTURE_2D);      
     }
     
-    draw_outlines(normalized, pathpoints, mat, cx, fill_styles, line_styles);
+    draw_outlines(normalized, pathpoints, mat, cx, FillStyles, line_styles);
   }
   
 // Drawing procedure:
@@ -1729,7 +1729,7 @@ public:
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
-    const std::vector<fill_style>& fill_styles = shape.fillStyles();
+    const std::vector<FillStyle>& FillStyles = shape.fillStyles();
     const std::vector<LineStyle>& line_styles = shape.lineStyles();
     
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
@@ -1741,7 +1741,7 @@ public:
         subshape_paths.push_back(*subshapes[i]);
       }
       
-      draw_subshape(subshape_paths, mat, cx, fill_styles,
+      draw_subshape(subshape_paths, mat, cx, FillStyles,
                     line_styles);
     }
   }
@@ -1751,9 +1751,9 @@ public:
   {
     if (_drawing_mask) abort();
     cxform dummy_cx;
-    std::vector<fill_style> glyph_fs;
+    std::vector<FillStyle> glyph_fs;
     
-    fill_style coloring = fill_style(SolidFill(c));
+    FillStyle coloring = FillStyle(SolidFill(c));
     
     glyph_fs.push_back(coloring);
     
@@ -1846,7 +1846,7 @@ rgba
 sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
 {
 
-    const std::vector<gradient_record>& r = fill.gradients;
+    const std::vector<GradientRecord>& r = fill.gradients;
 
     if (r.empty()) {
         static const rgba black;
@@ -1858,7 +1858,7 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
     // so we cannot rely on that information...
     if (ratio < r[0].m_ratio) {
         IF_VERBOSE_MALFORMED_SWF(
-            LOG_ONCE(log_swferror(_("First gradient in a fill_style "
+            LOG_ONCE(log_swferror(_("First gradient in a FillStyle "
                     "has position==%d (expected 0). This seems to be common, "
                     "so will warn only once."), +r[0].m_ratio);
             );
@@ -1872,10 +1872,10 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
         
     for (size_t i = 1, n = r.size(); i < n; ++i) {
 
-        const gradient_record& gr1 = r[i];
+        const GradientRecord& gr1 = r[i];
         if (gr1.m_ratio < ratio) continue;
 
-        const gradient_record& gr0 = r[i - 1];
+        const GradientRecord& gr0 = r[i - 1];
         if (gr0.m_ratio > ratio) continue;
 
         float f = 0.0f;
@@ -1884,10 +1884,10 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
             f = (ratio - gr0.m_ratio) / float(gr1.m_ratio - gr0.m_ratio);
         }
         else {
-            // Ratios are equal IFF first and second gradient_record
+            // Ratios are equal IFF first and second GradientRecord
             // have the same ratio. This would be a malformed SWF.
             IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("two gradients in a fill_style "
+                log_swferror(_("two gradients in a FillStyle "
                     "have the same position/ratio: %d"),
                     gr0.m_ratio);
             );

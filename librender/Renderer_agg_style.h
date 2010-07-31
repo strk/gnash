@@ -203,7 +203,7 @@ public:
 
     for (int i = 0; i != size; ++i) {
     
-      const gradient_record& gr = fs.gradients[i]; 
+      const GradientRecord& gr = fs.gradients[i]; 
       rgba trans_color = m_cx.transform(gr.m_color);
       if (trans_color.m_a < 255) m_need_premultiply = true;    
       

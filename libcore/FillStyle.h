@@ -37,11 +37,11 @@ class movie_definition;
 class Renderer;
 class RunResources;
 
-class gradient_record
+class GradientRecord
 {
 public:
 
-    gradient_record(boost::uint8_t ratio, const rgba& color)
+    GradientRecord(boost::uint8_t ratio, const rgba& color)
         :
         m_ratio(ratio),
         m_color(color)
@@ -174,7 +174,7 @@ public:
         FOCAL
     };
 
-    typedef std::vector<gradient_record> GradientRecords;
+    typedef std::vector<GradientRecord> GradientRecords;
 
     /// Construct a GradientFill
     //
@@ -245,15 +245,15 @@ private:
 };
 
 /// For the interior of outline shapes.
-class DSOEXPORT fill_style 
+class DSOEXPORT FillStyle 
 {
 public:
 
     typedef boost::variant<BitmapFill, SolidFill, GradientFill> Fill;
     
-    fill_style(const Fill& f) : fill(f) {}
+    FillStyle(const Fill& f) : fill(f) {}
 
-    fill_style(const fill_style& other)
+    FillStyle(const FillStyle& other)
         :
         fill(other.fill)
     {}
@@ -262,16 +262,16 @@ public:
 
 };
  
-/// Set the fill_style to a lerp of a and b.
+/// Set the FillStyle to a lerp of a and b.
 //
-/// Callers must ensure that all fill_styles have exactly the same type! Most
+/// Callers must ensure that all FillStyles have exactly the same type! Most
 /// errors are caught by type-checking and will throw an unhandled exception.
-void setLerp(fill_style& f, const fill_style& a, const fill_style& b, double t);
+void setLerp(FillStyle& f, const FillStyle& a, const FillStyle& b, double t);
 
-/// Either a single or a morph-pair fill_style.
-typedef std::pair<fill_style, boost::optional<fill_style> > OptionalFillPair;
+/// Either a single or a morph-pair FillStyle.
+typedef std::pair<FillStyle, boost::optional<FillStyle> > OptionalFillPair;
 
-/// Read fill_styles from a stream
+/// Read FillStyles from a stream
 //
 /// Read either single or morph-pair fill styles from a stream. 
 OptionalFillPair readFills(SWFStream& in, SWF::TagType t, movie_definition& m,

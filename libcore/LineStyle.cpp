@@ -28,7 +28,7 @@
 #include "movie_definition.h"
 #include "SWF.h"
 #include "GnashException.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 #include "GnashNumeric.h"
 
 namespace gnash {

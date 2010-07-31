@@ -1514,7 +1514,7 @@ std::ostream& operator<< (std::ostream& os, const abc_action_type& typ);
 /// SWF fill style types. Symbolic names copied from Ming.
 //
 /// For more info see:
-/// http://sswf.sourceforge.net/SWFalexref.html#swf_fill_style
+/// http://sswf.sourceforge.net/SWFalexref.html#swf_FillStyle
 enum FillType
 {
     FILL_SOLID                   = 0x00,

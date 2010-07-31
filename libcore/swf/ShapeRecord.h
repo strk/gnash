@@ -29,7 +29,7 @@
 namespace gnash {
     class movie_definition;
     class RunResources;
-    class fill_style;
+    class FillStyle;
 }
 
 namespace gnash {
@@ -52,7 +52,7 @@ class ShapeRecord
 {
 public:
 
-    typedef std::vector<fill_style> FillStyles;
+    typedef std::vector<FillStyle> FillStyles;
     typedef std::vector<LineStyle> LineStyles;
     typedef std::vector<Path> Paths;
 
@@ -118,7 +118,7 @@ public:
     /// Reset all shape data.
     void clear();
 
-    void addFillStyle(const fill_style& fs);
+    void addFillStyle(const FillStyle& fs);
 
     void addPath(const Path& path) {
         _paths.push_back(path);

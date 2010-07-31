@@ -36,7 +36,7 @@
 #include "NativeFunction.h" 
 #include "Bitmap.h"
 #include "Array_as.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 #include "namedStrings.h"
 
 namespace gnash {
@@ -1688,7 +1688,7 @@ movieclip_beginFill(const fn_call& fn)
 
     rgba color(r, g, b, a);
 
-    const fill_style f = fill_style(SolidFill(color));
+    const FillStyle f = FillStyle(SolidFill(color));
     movieclip->graphics().beginFill(f);
 
     return as_value();
@@ -1848,7 +1848,7 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     string_table& st = getStringTable(fn);
 
-    std::vector<gradient_record> gradients;
+    std::vector<GradientRecord> gradients;
     gradients.reserve(stops);
     for (size_t i = 0; i < stops; ++i) {
 
@@ -1890,13 +1890,13 @@ movieclip_beginGradientFill(const fn_call& fn)
         color.parseRGB(col);
         color.m_a = alp;
 
-        gradients.push_back(gradient_record(rat, color));
+        gradients.push_back(GradientRecord(rat, color));
     }
 
     // Make sure we don't try to construct a GradientFill with only 1 stop!
-    const fill_style f = stops > 1 ? 
-        fill_style(GradientFill(t, mat, gradients)) :
-        fill_style(SolidFill(gradients[0].m_color));
+    const FillStyle f = stops > 1 ? 
+        FillStyle(GradientFill(t, mat, gradients)) :
+        FillStyle(SolidFill(gradients[0].m_color));
 
     movieclip->graphics().beginFill(f);
 

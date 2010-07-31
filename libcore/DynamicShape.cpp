@@ -17,7 +17,7 @@
 
 #include "smart_ptr.h"
 #include "DynamicShape.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 #include "Renderer.h"
 #include "DisplayObject.h"
 
@@ -88,12 +88,12 @@ DynamicShape::endFill()
 }
 
 void
-DynamicShape::beginFill(const fill_style& f)
+DynamicShape::beginFill(const FillStyle& f)
 {
 	// End previous fill
 	endFill();
 
-	_currfill = add_fill_style(f);
+	_currfill = addFillStyle(f);
 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
@@ -239,7 +239,7 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 }
 
 size_t
-DynamicShape::add_fill_style(const fill_style& stl)
+DynamicShape::addFillStyle(const FillStyle& stl)
 {
     _shape.addFillStyle(stl);
     return _shape.fillStyles().size();

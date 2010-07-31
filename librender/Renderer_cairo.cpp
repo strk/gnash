@@ -42,7 +42,7 @@
 #include "swf/ShapeRecord.h"
 #include "Renderer_cairo.h"
 #include "utility.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 
 #include <cmath>
 #include <cairo/cairo.h>
@@ -124,7 +124,7 @@ class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
 
 /// Style handler
 //
-/// Transfer fill_styles to agg styles.
+/// Transfer FillStyles to agg styles.
 struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
 {
     StyleHandler(const cxform& c)
@@ -260,7 +260,7 @@ snap_to_half_pixel(cairo_t* cr, double& x, double& y)
 }
 
 static cairo_pattern_t*
-get_cairo_pattern(const fill_style& style, const cxform& cx)
+get_cairo_pattern(const FillStyle& style, const cxform& cx)
 {
     StyleHandler st(cx);
     cairo_pattern_t* pattern = boost::apply_visitor(st, style.fill);
@@ -274,24 +274,24 @@ class CairoPathRunner : public PathParser
 public:
   CairoPathRunner(Renderer_cairo& renderer,
                   const std::vector<Path>& paths,
-                  const std::vector<fill_style>& fill_styles, cairo_t* context)
-  : PathParser(paths, fill_styles.size()),
+                  const std::vector<FillStyle>& FillStyles, cairo_t* context)
+  : PathParser(paths, FillStyles.size()),
     _renderer(renderer),
     _cr(context),
     _pattern(0),
-    _fill_styles(fill_styles)
+    _FillStyles(FillStyles)
   {
   }
   
   virtual void prepareFill(int fill_index, const cxform& cx)
   {
     if (!_pattern) {
-      _pattern = get_cairo_pattern(_fill_styles[fill_index-1], cx);
+      _pattern = get_cairo_pattern(_FillStyles[fill_index-1], cx);
     }
   }
-  virtual void terminateFill(int fill_style)
+  virtual void terminateFill(int FillStyle)
   {
-    UNUSED(fill_style);
+    UNUSED(FillStyle);
 
     if (!_pattern) {
       cairo_new_path(_cr);
@@ -355,7 +355,7 @@ private:
   Renderer_cairo& _renderer;
   cairo_t* _cr;
   cairo_pattern_t* _pattern;
-  const std::vector<fill_style>& _fill_styles;
+  const std::vector<FillStyle>& _FillStyles;
 };
 
 
@@ -869,10 +869,10 @@ Renderer_cairo::draw_outlines(const PathVec& path_vec,
 void
 Renderer_cairo::draw_subshape(const PathVec& path_vec, const SWFMatrix& mat,
                               const cxform& cx,
-                              const std::vector<fill_style>& fill_styles,
+                              const std::vector<FillStyle>& FillStyles,
                               const std::vector<LineStyle>& line_styles)
 { 
-    CairoPathRunner runner(*this, path_vec, fill_styles, _cr);
+    CairoPathRunner runner(*this, path_vec, FillStyles, _cr);
     runner.run(cx, mat);
 
     draw_outlines(path_vec, line_styles, cx, mat);
@@ -960,7 +960,7 @@ Renderer_cairo::drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
-    const std::vector<fill_style>& fill_styles = shape.fillStyles();
+    const std::vector<FillStyle>& FillStyles = shape.fillStyles();
     const std::vector<LineStyle>& line_styles = shape.lineStyles();
 
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
@@ -972,7 +972,7 @@ Renderer_cairo::drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
             subshape_paths.push_back(*subshapes[i]);
         }
         
-        draw_subshape(subshape_paths, mat, cx, fill_styles,
+        draw_subshape(subshape_paths, mat, cx, FillStyles,
                       line_styles);
     }
 }
@@ -982,9 +982,9 @@ Renderer_cairo::drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
                           const SWFMatrix& mat)
 {
     cxform dummy_cx;
-    std::vector<fill_style> glyph_fs;
+    std::vector<FillStyle> glyph_fs;
     
-    fill_style coloring = fill_style(SolidFill(color));
+    FillStyle coloring = FillStyle(SolidFill(color));
     
     glyph_fs.push_back(coloring);
     
@@ -1087,7 +1087,7 @@ pattern_add_color_stops(const GradientFill& f, cairo_pattern_t* pattern,
                         const cxform& cx)
 {      
     for (size_t index = 0; index < f.gradients.size(); ++index) {
-        const gradient_record& grad = f.gradients[index];
+        const GradientRecord& grad = f.gradients[index];
         
         rgba c = cx.transform(grad.m_color);
 

@@ -127,7 +127,7 @@ AGG resources
 #include "GnashNumeric.h"
 #include "GC.h"
 #include "cxform.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 
 #ifdef HAVE_VA_VA_H
 #include "GnashVaapiImage.h"
@@ -674,7 +674,7 @@ private:
 
 /// Style handler
 //
-/// Transfer fill_styles to agg styles.
+/// Transfer FillStyles to agg styles.
 struct StyleHandler : boost::static_visitor<>
 {
     StyleHandler(SWFMatrix stage, SWFMatrix fill, const cxform& c,
@@ -776,7 +776,7 @@ class Renderer_agg : public Renderer_agg_base
 public:
 
     // Given an image, returns a pointer to a bitmap_info class
-    // that can later be passed to fill_styleX_bitmap(), to set a
+    // that can later be passed to FillStyleX_bitmap(), to set a
     // bitmap fill style.
     gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
     {        
@@ -1120,7 +1120,7 @@ public:
     AggPaths agg_paths;    
     buildPaths(agg_paths, paths);
  
-    std::vector<fill_style> v(1, fill_style(SolidFill(color)));
+    std::vector<FillStyle> v(1, FillStyle(SolidFill(color)));
 
     // prepare style handler
     agg_style_handler sh;
@@ -1208,7 +1208,7 @@ public:
         drawShape(fillStyles, lineStyles, paths, worldMat, cx);
     }
 
-    void drawShape(const std::vector<fill_style>& fill_styles,
+    void drawShape(const std::vector<FillStyle>& FillStyles,
         const std::vector<LineStyle>& line_styles,
         const std::vector<Path>& objpaths, const SWFMatrix& mat,
         const cxform& cx)
@@ -1259,7 +1259,7 @@ public:
 
         // prepare fill styles
         agg_style_handler sh;
-        if (have_shape) build_agg_styles(sh, fill_styles, mat, cx);
+        if (have_shape) build_agg_styles(sh, FillStyles, mat, cx);
 
         // We need to separate sub-shapes during rendering. 
         const unsigned int subshape_count = count_sub_shapes(paths);
@@ -1476,18 +1476,18 @@ public:
 
     // Initializes the internal styles class for AGG renderer
     void build_agg_styles(agg_style_handler& sh,
-        const std::vector<fill_style>& fill_styles,
+        const std::vector<FillStyle>& FillStyles,
         const SWFMatrix& fillstyle_matrix, const cxform& cx) {
     
         SWFMatrix inv_stage_matrix = stage_matrix;
         inv_stage_matrix.invert();
     
-        const size_t fcount = fill_styles.size();
+        const size_t fcount = FillStyles.size();
 
         for (size_t fno = 0; fno < fcount; ++fno) {
             const StyleHandler st(stage_matrix, fillstyle_matrix, cx, sh,
                     _quality);
-            boost::apply_visitor(st, fill_styles[fno].fill);
+            boost::apply_visitor(st, FillStyles[fno].fill);
         } 
     } 
   
@@ -2170,7 +2170,7 @@ private:  // private variables
     AlphaMasks _alphaMasks;
     
     /// Cached fill style list with just one entry used for font rendering
-    std::vector<fill_style> m_single_fill_styles;
+    std::vector<FillStyle> m_single_FillStyles;
 
 
 };
