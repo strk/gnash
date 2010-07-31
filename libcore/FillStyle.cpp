@@ -239,7 +239,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                 SWFMatrix m2;
                 m2.read(in);
                 m2.invert();
-                morph = FillStyle(GradientFill(gr, m2));
+                morph = GradientFill(gr, m2);
             }
             
             in.ensureBytes(1);
@@ -279,7 +279,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                 const rgba c1 = recs[0].color;
                 if (readMorph) {
                     const rgba c2 = morphrecs[0].color;
-                    morph = FillStyle(SolidFill(c2));
+                    morph = SolidFill(c2);
                 }
                 return std::make_pair(SolidFill(c1), morph);
             }
@@ -335,7 +335,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                     setFocalPoint(gf.focalPoint());
             }
 
-            return std::make_pair(FillStyle(gf), morph);
+            return std::make_pair(gf, morph);
         }
 
         default:
@@ -374,7 +374,7 @@ readSolidFill(SWFStream& in, SWF::TagType t, bool readMorph)
         if (readMorph) {
             rgba othercolor;
             othercolor.read_rgba(in);
-            morph = FillStyle(SolidFill(othercolor));
+            morph = SolidFill(othercolor);
         }
     }
     else {
@@ -386,7 +386,7 @@ readSolidFill(SWFStream& in, SWF::TagType t, bool readMorph)
     IF_VERBOSE_PARSE(
         log_parse("  color: %s", color);
     );
-    return std::make_pair(FillStyle(SolidFill(color)), morph);
+    return std::make_pair(SolidFill(color), morph);
 }
 
 OptionalFillPair
@@ -405,7 +405,7 @@ readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
         SWFMatrix m2;
         m2.read(in);
         m2.invert();
-        morph = FillStyle(BitmapFill(type, &md, id, m2));
+        morph = BitmapFill(type, &md, id, m2);
     }
 
     // For some reason, it looks like they store the inverse of the

@@ -266,14 +266,23 @@ private:
     rgba _color;
 };
 
-/// For the interior of outline shapes.
+/// FillStyle describes the various fill styles for shapes
+//
+/// The FillStyle class is effectively a boost::variant, but to allow passing
+/// FillStyles using a forward declaration (and reducing compile times),
+/// it's necessary to use a class.
 class DSOEXPORT FillStyle 
 {
 public:
 
     typedef boost::variant<BitmapFill, SolidFill, GradientFill> Fill;
     
-    FillStyle(const Fill& f) : fill(f) {}
+    /// Construct a FillStyle from any Fill.
+    //
+    /// The non-explicit templated contructor allows the same syntax as a
+    /// simple boost::variant:
+    ///     FillStyle f = GradientFill();
+    template<typename T> FillStyle(const T& f) : fill(f) {}
 
     FillStyle(const FillStyle& other)
         :

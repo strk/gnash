@@ -1688,7 +1688,7 @@ movieclip_beginFill(const fn_call& fn)
 
     rgba color(r, g, b, a);
 
-    const FillStyle f = FillStyle(SolidFill(color));
+    const FillStyle f = SolidFill(color);
     movieclip->graphics().beginFill(f);
 
     return as_value();
@@ -1895,7 +1895,7 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     // Make sure we don't try to construct a GradientFill with only 1 stop!
     if (stops < 2) {
-        const FillStyle f = FillStyle(SolidFill(gradients[0].color));
+        const FillStyle f = SolidFill(gradients[0].color);
         movieclip->graphics().beginFill(f);
         return as_value();
     }
@@ -1909,7 +1909,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         fd.setFocalPoint(fn.arg(7).to_number());
     }
 
-    movieclip->graphics().beginFill(FillStyle(fd));
+    movieclip->graphics().beginFill(fd);
 
     return as_value();
 }
