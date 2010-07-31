@@ -21,16 +21,17 @@
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
 
-#include "SWFMatrix.h"
-#include "BitmapInfo.h"
-#include "SWF.h"
-#include "RGBA.h" // for rgba type
-
 #include <boost/variant.hpp>
 #include <vector> 
 #include <iosfwd> 
 #include <boost/optional.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <cassert>
+
+#include "SWFMatrix.h"
+#include "BitmapInfo.h"
+#include "SWF.h"
+#include "RGBA.h" // for rgba type
 
 namespace gnash {
 
