@@ -1919,7 +1919,7 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
                 for (size_t i = 0; i < im->width(); i++)
                 {
                     float radiusy = (im->height() - 1) / 2.0f;
-                    float radiusx = radiusy + std::abs(radiusy * gf.focalPoint);
+                    float radiusx = radiusy + std::abs(radiusy * gf.focalPoint());
                     float y = (j - radiusy) / radiusy;
                     float x = (i - radiusx) / radiusx;
                     int ratio = std::floor(255.5f * std::sqrt(x*x + y*y));

@@ -216,12 +216,18 @@ public:
         return _gradients[i];
     }
 
-    double focalPoint;
+    void setFocalPoint(double d);
+
+    double focalPoint() const {
+        return _focalPoint;
+    }
+
     SWF::SpreadMode spreadMode;
     SWF::InterpolationMode interpolation;
 
 private:
 
+    double _focalPoint;
     GradientRecords _gradients;
     Type _type;
     SWFMatrix _matrix;

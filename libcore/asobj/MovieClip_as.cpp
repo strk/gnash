@@ -1900,13 +1900,13 @@ movieclip_beginGradientFill(const fn_call& fn)
         return as_value();
     }
 
-    GradientFill fd(t, mat, gradients);
+    GradientFill fd(t, mat.invert(), gradients);
 
     /// TODO: set interpolation mode and spread mode.
 
     /// Add a focus if present.
     if (fn.nargs > 7) {
-        fd.focalPoint = fn.arg(7).to_number();
+        fd.setFocalPoint(fn.arg(7).to_number());
     }
 
     movieclip->graphics().beginFill(FillStyle(fd));

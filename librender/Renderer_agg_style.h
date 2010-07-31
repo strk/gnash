@@ -661,7 +661,7 @@ public:
       
       // re-initialize focal gradient settings
       gradient_adaptor_type& adaptor = st->get_gradient_adaptor();
-      adaptor.init(32.0, fs.focalPoint * 32.0, 0.0);
+      adaptor.init(32.0, fs.focalPoint() * 32.0, 0.0);
     
       m_styles.push_back(st);
     }

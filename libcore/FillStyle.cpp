@@ -100,14 +100,20 @@ gradientMatrix(GradientFill::Type t, const SWFMatrix& m)
 GradientFill::GradientFill(Type t, const SWFMatrix& m,
         const GradientRecords& recs)
     :
-    focalPoint(0.0),
     spreadMode(SWF::GRADIENT_SPREAD_PAD),
     interpolation(SWF::GRADIENT_INTERPOLATION_NORMAL),
+    _focalPoint(0.0),
     _gradients(recs),
     _type(t),
     _matrix(gradientMatrix(t, m))
 {
     assert(recs.size() > 1);
+}
+    
+void
+GradientFill::setFocalPoint(double d)
+{
+    _focalPoint = clamp<float>(d, -1, 1); 
 }
     
 BitmapFill::BitmapFill(SWF::FillType t, movie_definition* md,
@@ -321,14 +327,12 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
             // A focal gradient also has a focal point.
             if (type == SWF::FILL_FOCAL_GRADIENT) {
                in.ensureBytes(2);
-               gf.focalPoint = in.read_short_sfixed();
-               if (gf.focalPoint < -1.0f) gf.focalPoint = -1.0f;
-               else if (gf.focalPoint > 1.0f) gf.focalPoint = 1.0f;
+               gf.setFocalPoint(in.read_short_sfixed());
             }
         
             if (readMorph) {
-                boost::get<GradientFill>(morph->fill).focalPoint =
-                    gf.focalPoint;
+                boost::get<GradientFill>(morph->fill).
+                    setFocalPoint(gf.focalPoint());
             }
 
             return std::make_pair(FillStyle(gf), morph);

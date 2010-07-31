@@ -159,7 +159,7 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
                 init_cairo_matrix(&mat, transl);
 
                 /// This is 0 for radial gradients.
-                const double focal_pos = 32.0f * f.focalPoint;
+                const double focal_pos = 32.0f * f.focalPoint();
 
                 cairo_pattern_t* pattern =
                     cairo_pattern_create_radial(focal_pos, 0.0, 0.0,
