@@ -703,10 +703,7 @@ MovieClip::pathElement(string_table::key key)
     obj = getObject(getDisplayListObject(key));
     if (obj) return obj;
 
-    std::string name = getStringTable(*getObject(this)).value(key);
- 
     obj = getObject(this);
-
     assert(obj);
 
     // See if it's a member
