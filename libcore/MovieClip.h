@@ -559,73 +559,10 @@ public:
             const SWFRect& clipRect = SWFRect(),
             bool smooth = false);
 
-    /// @name Drawing API
-    /// @{ 
-    
-    void lineStyle(boost::uint16_t thickness, const rgba& color,
-        bool vScale=true, bool hScale=true,
-        bool pixelHinting=false,
-        bool noClose=false,
-        CapStyle startCapStyle=CAP_ROUND,
-        CapStyle endCapStyle=CAP_ROUND,
-        JoinStyle joinStyle=JOIN_ROUND,
-        float miterLimitFactor=1.0f)
-    {
-        _drawable.lineStyle(thickness, color, vScale, hScale,
-            pixelHinting, noClose,
-            startCapStyle, endCapStyle, joinStyle,
-            miterLimitFactor);
-    }
-
-    void resetLineStyle()
-    {
-        _drawable.resetLineStyle();
-    }
-
-    void beginFill(const rgba& color)
-    {
-        _drawable.beginFill(color);
-    }
-
-    void beginLinearGradientFill(const std::vector<gradient_record>& grad,
-            const SWFMatrix& mat)
-    {
-        _drawable.beginLinearGradientFill(grad, mat);
-    }
-
-    void beginRadialGradientFill(const std::vector<gradient_record>& grad,
-            const SWFMatrix& mat)
-    {
-        _drawable.beginRadialGradientFill(grad, mat);
-    }
-
-    void endFill()
-    {
-        _drawable.endFill();
-    }
-
-    void moveTo(boost::int32_t x, boost::int32_t y)
-    {
-        _drawable.moveTo(x, y);
-    }
-
-    void lineTo(boost::int32_t x, boost::int32_t y)
-    {
+    /// Direct access to the Graphics object for drawing.
+    DynamicShape& graphics() {
         set_invalidated();
-        _drawable.lineTo(x, y, getDefinitionVersion());
-    }
-
-    void curveTo(boost::int32_t cx, boost::int32_t cy, 
-                 boost::int32_t ax, boost::int32_t ay)
-    {
-        set_invalidated();
-        _drawable.curveTo(cx, cy, ax, ay, getDefinitionVersion());
-    }
-
-    void clear()
-    {
-        set_invalidated();
-        _drawable.clear();
+        return _drawable;
     }
 
     /// Set focus to this MovieClip

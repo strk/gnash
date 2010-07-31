@@ -23,6 +23,7 @@
 #include <vector>
 #include "LineStyle.h" 
 #include "ShapeRecord.h"
+#include "fill_style.h"
 
 namespace gnash {
     class DisplayObject;
@@ -67,12 +68,8 @@ public:
 	void beginFill(const rgba& color);
 
 	/// Start drawing with a linear gradient fill
-	void beginLinearGradientFill(const std::vector<gradient_record>& grad,
-            const SWFMatrix& mat);
-
-	/// Start drawing with a radial gradient fill
-	void beginRadialGradientFill(const std::vector<gradient_record>& grad,
-            const SWFMatrix& mat);
+	void beginGradientFill(GradientFill::Type t,
+            const std::vector<gradient_record>& grad, const SWFMatrix& mat);
 
 	/// Close an existing filled path, if any.
 	void endFill();
