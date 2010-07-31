@@ -1085,7 +1085,7 @@ pattern_add_color_stops(const GradientFill& f, cairo_pattern_t* pattern,
     for (size_t index = 0; index < f.recordCount(); ++index) {
         const GradientRecord& grad = f.record(index);
         
-        rgba c = cx.transform(grad.m_color);
+        rgba c = cx.transform(grad.color);
 
         cairo_pattern_add_color_stop_rgba (pattern,
             grad.ratio / 255.0, c.m_r / 255.0, c.m_g / 255.0,

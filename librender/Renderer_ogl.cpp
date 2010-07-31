@@ -1852,11 +1852,11 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
     // anyway a malformed SWF could break this,
     // so we cannot rely on that information...
     if (ratio < fill.record(0).ratio) {
-        return fill.record(0).m_color;
+        return fill.record(0).color;
     }
 
     if (ratio >= fill.record(fill.recordCount() - 1).ratio) {
-        return fill.record(fill.recordCount() - 1).m_color;
+        return fill.record(fill.recordCount() - 1).color;
     }
         
     for (size_t i = 1, n = fill.recordCount(); i < n; ++i) {
@@ -1883,12 +1883,12 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
         }
 
         rgba result;
-        result.set_lerp(gr0.m_color, gr1.m_color, f);
+        result.set_lerp(gr0.color, gr1.color, f);
         return result;
     }
 
     // Assuming gradients are ordered by ratio? see start comment
-    return fill.record(fill.recordCount() - 1).m_color;
+    return fill.record(fill.recordCount() - 1).color;
 }
 
 const BitmapInfo*

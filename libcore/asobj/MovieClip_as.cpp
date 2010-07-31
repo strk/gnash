@@ -1895,7 +1895,7 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     // Make sure we don't try to construct a GradientFill with only 1 stop!
     if (stops < 2) {
-        const FillStyle f = FillStyle(SolidFill(gradients[0].m_color));
+        const FillStyle f = FillStyle(SolidFill(gradients[0].color));
         movieclip->graphics().beginFill(f);
         return as_value();
     }

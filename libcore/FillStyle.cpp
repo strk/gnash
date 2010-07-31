@@ -178,7 +178,7 @@ GradientFill::setLerp(const GradientFill& a, const GradientFill& b,
         const GradientRecord& ra = a.record(i);
         const GradientRecord& rb = b.record(i);
         _gradients[i].ratio = frnd(lerp<float>(ra.ratio, rb.ratio, ratio));
-        _gradients[i].m_color.set_lerp(ra.m_color, rb.m_color, ratio);
+        _gradients[i].color.set_lerp(ra.color, rb.color, ratio);
     }
     _matrix.set_lerp(a.matrix(), b.matrix(), ratio);
 }
@@ -276,9 +276,9 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
             // case the renderer will bork if there is only 1 stop in a 
             // GradientFill.
             if (num_gradients == 1) {
-                const rgba c1 = recs[0].m_color;
+                const rgba c1 = recs[0].color;
                 if (readMorph) {
-                    const rgba c2 = morphrecs[0].m_color;
+                    const rgba c2 = morphrecs[0].color;
                     morph = FillStyle(SolidFill(c2));
                 }
                 return std::make_pair(SolidFill(c1), morph);
