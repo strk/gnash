@@ -107,7 +107,7 @@ GradientFill::GradientFill(Type t, const SWFMatrix& m,
     _type(t),
     _matrix(gradientMatrix(t, m))
 {
-    assert(recs.size() > 1);
+    assert(recs.empty() || recs.size() > 1);
 }
     
 void
