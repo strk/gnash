@@ -101,7 +101,7 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, TagType tag)
 	assert(tag == DEFINETEXT || tag == DEFINETEXT2);
 
 	_rect.read(in);
-	_matrix.read(in);
+	_matrix = readSWFMatrix(in);
 
 	in.ensureBytes(2); // glyph_bits + advance_bits
 	int glyphBits = in.read_u8();

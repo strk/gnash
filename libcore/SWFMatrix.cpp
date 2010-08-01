@@ -51,37 +51,29 @@ Fixed16Mul(boost::int32_t a, boost::int32_t b)
 
 } // anonymous namepace
 
-SWFMatrix::SWFMatrix()
-{
-    // Default to identity.
-    sx = sy = 65536;
-    shx = shy = tx = ty = 0;
-}
-
-void
-SWFMatrix::read(SWFStream& in)
-// Initialize from the stream.
+SWFMatrix
+readSWFMatrix(SWFStream& in)
 {
     in.align();
 
-    set_identity();
-
     in.ensureBits(1);
-    bool    has_scale = in.read_bit(); 
-    if (has_scale)
-    {
-        in.ensureBits(5);
-        int scale_nbits = in.read_uint(5);
+    const bool has_scale = in.read_bit(); 
 
+    boost::int32_t sx = 65536;
+    boost::int32_t sy = 65536;
+    if (has_scale) {
+        in.ensureBits(5);
+        const boost::uint8_t scale_nbits = in.read_uint(5);
         in.ensureBits(scale_nbits * 2);
         sx = in.read_sint(scale_nbits);
         sy = in.read_sint(scale_nbits);
     }
 
     in.ensureBits(1);
-    bool  has_rotate = in.read_bit();
-    if (has_rotate)
-    {
+    const bool has_rotate = in.read_bit();
+    boost::int32_t shx = 0;
+    boost::int32_t shy = 0;
+    if (has_rotate) {
         in.ensureBits(5);
         int rotate_nbits = in.read_uint(5);
 
@@ -91,21 +83,15 @@ SWFMatrix::read(SWFStream& in)
     }
 
     in.ensureBits(5);
-    int translate_nbits = in.read_uint(5);
-    if (translate_nbits > 0)
-    {
+    const boost::uint8_t translate_nbits = in.read_uint(5);
+    boost::int32_t tx = 0;
+    boost::int32_t ty = 0;
+    if (translate_nbits) {
         in.ensureBits(translate_nbits * 2);
         tx = in.read_sint(translate_nbits);
         ty = in.read_sint(translate_nbits);
     }
-}
-
-bool
-SWFMatrix::is_valid() const
-{
-    // The integer SWFMatrix is always valid now from outside.
-    // swallow it if anything wrong inside this class.
-    return true;
+    return SWFMatrix(sx, shx, shy, sy, tx, ty);
 }
 
 void
@@ -120,8 +106,8 @@ SWFMatrix::transform(geometry::Point2d& p) const
 void
 SWFMatrix::transform(boost::int32_t& x, boost::int32_t& y) const
 {
-    boost::int32_t  t0 = Fixed16Mul(sx, x) + Fixed16Mul(shy, y) + tx;
-    boost::int32_t  t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy,  y) + ty;
+    const boost::int32_t t0 = Fixed16Mul(sx, x) + Fixed16Mul(shy, y) + tx;
+    const boost::int32_t t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy,  y) + ty;
     x = t0;
     y = t1;
 }
@@ -129,10 +115,10 @@ SWFMatrix::transform(boost::int32_t& x, boost::int32_t& y) const
 void
 SWFMatrix::transform(geometry::Range2d<boost::int32_t>& r) const
 {
-    boost::int32_t xmin = r.getMinX(),
-                   xmax = r.getMaxX(),
-                   ymin = r.getMinY(),
-                   ymax = r.getMaxY();
+    const boost::int32_t xmin = r.getMinX();
+    const boost::int32_t xmax = r.getMaxX();
+    const boost::int32_t ymin = r.getMinY();
+    const boost::int32_t ymax = r.getMaxY();
 
     point p0(xmin, ymin);
     point p1(xmin, ymax);
@@ -152,7 +138,6 @@ SWFMatrix::transform(geometry::Range2d<boost::int32_t>& r) const
 
 void
 SWFMatrix::set_identity()
-// Set the SWFMatrix to identity.
 {
     sx = sy = 65536;
     shx = shy = tx = ty = 0;
@@ -160,11 +145,8 @@ SWFMatrix::set_identity()
 
 void
 SWFMatrix::concatenate(const SWFMatrix& m)
-// Concatenate m's transform onto ours.  When
-// transforming points, m happens first, then our
-// original SWFMatrix.
 {
-    SWFMatrix  t;
+    SWFMatrix t;
     t.sx =  Fixed16Mul(sx, m.sx)  + Fixed16Mul(shy, m.shx);
     t.shx = Fixed16Mul(shx, m.sx) + Fixed16Mul(sy, m.shx);
     t.shy = Fixed16Mul(sx, m.shy) + Fixed16Mul(shy, m.sy);
@@ -213,8 +195,8 @@ SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 // Set the scale & rotation part of the SWFMatrix.
 // angle in radians.
 {
-    double   cos_angle = std::cos(angle);
-    double   sin_angle = std::sin(angle);
+    const double cos_angle = std::cos(angle);
+    const double sin_angle = std::sin(angle);
     sx  = DoubleToFixed16(x_scale * cos_angle);
     shy = DoubleToFixed16(y_scale * -sin_angle);
     shx = DoubleToFixed16(x_scale * sin_angle);
@@ -224,40 +206,43 @@ SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 void
 SWFMatrix::set_x_scale(double xscale)
 {
-    double rot_x = std::atan2(static_cast<double>(shx), static_cast<double>(sx));
-    sx  =  DoubleToFixed16(xscale * std::cos(rot_x));
-    shx =  DoubleToFixed16(xscale * std::sin(rot_x)); 
+    const double rot_x =
+        std::atan2(static_cast<double>(shx), static_cast<double>(sx));
+    sx = DoubleToFixed16(xscale * std::cos(rot_x));
+    shx = DoubleToFixed16(xscale * std::sin(rot_x)); 
 }
 
 void
 SWFMatrix::set_y_scale(double yscale)
 {
-    double rot_y = std::atan2(static_cast<double>(-shy), static_cast<double>(sy));
+    const double rot_y =
+        std::atan2(static_cast<double>(-shy), static_cast<double>(sy));
 
     shy = -DoubleToFixed16(yscale * std::sin(rot_y));
-    sy  =  DoubleToFixed16(yscale * std::cos(rot_y));
+    sy = DoubleToFixed16(yscale * std::cos(rot_y));
 }
 
 void
 SWFMatrix::set_scale(double xscale, double yscale)
 {
-    double rotation = get_rotation();
+    const double rotation = get_rotation();
     set_scale_rotation(xscale, yscale, rotation); 
 }
 
 void
 SWFMatrix::set_rotation(double rotation)
 {   
-    double rot_x = std::atan2(static_cast<double>(shx), static_cast<double>(sx));
-    double rot_y = std::atan2(static_cast<double>(-shy),
-    static_cast<double>(sy));
-    double scale_x = get_x_scale();
-    double scale_y = get_y_scale();
+    const double rot_x =
+        std::atan2(static_cast<double>(shx), static_cast<double>(sx));
+    const double rot_y =
+        std::atan2(static_cast<double>(-shy), static_cast<double>(sy));
+    const double scale_x = get_x_scale();
+    const double scale_y = get_y_scale();
  
-    sx  = DoubleToFixed16(scale_x * std::cos(rotation));
+    sx = DoubleToFixed16(scale_x * std::cos(rotation));
     shx = DoubleToFixed16(scale_x * std::sin(rotation)); 
     shy = -DoubleToFixed16(scale_y * std::sin(rot_y - rot_x + rotation));
-    sy  =  DoubleToFixed16(scale_y * std::cos(rot_y - rot_x + rotation));
+    sy = DoubleToFixed16(scale_y * std::cos(rot_y - rot_x + rotation));
 }
 
 void
@@ -273,12 +258,12 @@ SWFMatrix::transform(point* result, const point& p) const
 void 
 SWFMatrix::transform(SWFRect& r) const
 {
-    if ( r.is_null() ) return;
+    if (r.is_null()) return;
 
-    boost::int32_t x1 = r.get_x_min();
-    boost::int32_t y1 = r.get_y_min();
-    boost::int32_t x2 = r.get_x_max();
-    boost::int32_t y2 = r.get_y_max();
+    const boost::int32_t x1 = r.get_x_min();
+    const boost::int32_t y1 = r.get_y_min();
+    const boost::int32_t x2 = r.get_x_max();
+    const boost::int32_t y2 = r.get_y_max();
 
     point p0(x1, y1);
     point p1(x2, y1);
@@ -300,29 +285,24 @@ SWFMatrix::transform(SWFRect& r) const
 SWFMatrix&
 SWFMatrix::invert()
 {
-    boost::int64_t det = determinant();
-    if(det == 0)
-    {
-        //log_debug("Matrix not invertible, setting to identity on invert request");
-        // tested in misc-ming.all/SWFMatrix_test.c (seek "SWFMatrix inversion")
+    const boost::int64_t det = determinant();
+    if (det == 0) {
         set_identity();
+        return *this;
     }
-    else
-    {
-        double  d = 65536.0 * 65536.0 / det;
-        boost::int32_t t0, t4;
-        
-        t0  = (boost::int32_t)(sy * d);
-        sy  = (boost::int32_t)(sx * d);
-        shy = (boost::int32_t)(-shy * d);
-        shx = (boost::int32_t)(-shx * d);
 
-        t4 = - ( Fixed16Mul(tx, t0) + Fixed16Mul(ty, shy) );
-        ty = - ( Fixed16Mul(tx, shx)+ Fixed16Mul(ty, sy) );
+    const double d = 65536.0 * 65536.0 / det;
+    
+    const boost::int32_t t0 = (boost::int32_t)(sy * d);
+    sy  = (boost::int32_t)(sx * d);
+    shy = (boost::int32_t)(-shy * d);
+    shx = (boost::int32_t)(-shx * d);
 
-        sx = t0;
-        tx = t4;
-    }
+    const boost::int32_t t4 = - (Fixed16Mul(tx, t0) + Fixed16Mul(ty, shy));
+    ty = - (Fixed16Mul(tx, shx) + Fixed16Mul(ty, sy));
+
+    sx = t0;
+    tx = t4;
 
     return *this;
 }

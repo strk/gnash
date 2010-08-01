@@ -229,16 +229,12 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                     std::abort();
             }
 
-            SWFMatrix m;
-            m.read(in);
-            m.invert();
+            SWFMatrix m = readSWFMatrix(in).invert();
             GradientFill gf(gr, m);
 
             boost::optional<FillStyle> morph;
             if (readMorph) {
-                SWFMatrix m2;
-                m2.read(in);
-                m2.invert();
+                SWFMatrix m2 = readSWFMatrix(in).invert();
                 morph = GradientFill(gr, m2);
             }
             
@@ -397,20 +393,16 @@ readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
     in.ensureBytes(2);
     const boost::uint16_t id = in.read_u16();
 
-    SWFMatrix m;
-    m.read(in);
+    SWFMatrix m = readSWFMatrix(in).invert();
 
     boost::optional<FillStyle> morph;
     if (readMorph) {
-        SWFMatrix m2;
-        m2.read(in);
-        m2.invert();
+        SWFMatrix m2 = readSWFMatrix(in).invert();
         morph = BitmapFill(type, &md, id, m2);
     }
 
     // For some reason, it looks like they store the inverse of the
     // TWIPS-to-texcoords SWFMatrix.
-    m.invert();
     return std::make_pair(BitmapFill(type, &md, id, m), morph);
 }
 

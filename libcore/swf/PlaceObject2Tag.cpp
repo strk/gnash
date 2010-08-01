@@ -52,7 +52,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
 
     if (in.tell() < in.get_tag_end_position())
     {
-        m_matrix.read(in);
+        m_matrix = readSWFMatrix(in);
         m_has_flags2 |= HAS_MATRIX_MASK;
         if (in.tell() < in.get_tag_end_position())
         {
@@ -270,7 +270,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
 
     if ( hasMatrix() )
     {
-        m_matrix.read(in);
+        m_matrix = readSWFMatrix(in);
     }
 
     if ( hasCxform() )
@@ -358,7 +358,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     }
 
     if (hasMatrix()) {
-        m_matrix.read(in);
+        m_matrix = readSWFMatrix(in);
     }
 
     if (hasCxform()) {
