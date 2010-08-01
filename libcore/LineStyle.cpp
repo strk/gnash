@@ -75,8 +75,8 @@ LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
         in.ensureBytes(2 + 2);
         m_width = in.read_u16();
         pOther->m_width = in.read_u16();
-        m_color.read(in, t);
-        pOther->m_color.read(in, t);
+        m_color = readRGBA(in);
+        pOther->m_color = readRGBA(in);
         return;
     }
 
@@ -111,8 +111,8 @@ LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
         pOther->m_color = boost::apply_visitor(GetColor(), fp.second->fill);
     }
     else {
-        m_color.read(in, t);
-        pOther->m_color.read(in, t);
+        m_color = readRGBA(in);
+        pOther->m_color = readRGBA(in);
     }
 }
 
@@ -124,7 +124,7 @@ LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     {
         in.ensureBytes(2);
         m_width = in.read_u16();
-        m_color.read(in, t);
+        m_color = readRGBA(in, t);
         return;
     }
 
@@ -155,7 +155,7 @@ LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         m_color = boost::apply_visitor(GetColor(), fp.first.fill);
     }
     else {
-        m_color.read(in, t);
+        m_color = readRGBA(in);
     }
 }
 

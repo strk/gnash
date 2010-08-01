@@ -370,17 +370,17 @@ readSolidFill(SWFStream& in, SWF::TagType t, bool readMorph)
     // 0x00: solid fill
     if (t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4 ||
             t == SWF::DEFINESHAPE4_ || readMorph) {
-        color.read_rgba(in);
+        color = readRGBA(in);
         if (readMorph) {
             rgba othercolor;
-            othercolor.read_rgba(in);
+            othercolor = readRGBA(in);
             morph = SolidFill(othercolor);
         }
     }
     else {
         // For DefineMorphShape tags we should use morphFillStyle 
         assert(t == SWF::DEFINESHAPE || t == SWF::DEFINESHAPE2);
-        color.read_rgb(in);
+        color = readRGB(in);
     }
 
     IF_VERBOSE_PARSE(
@@ -419,8 +419,7 @@ readGradientRecord(SWFStream& in, SWF::TagType tag)
 {
     in.ensureBytes(1);
     const boost::uint8_t ratio = in.read_u8();
-    rgba color;
-    color.read(in, tag);
+    const rgba color = readRGBA(in, tag);
     return GradientRecord(ratio, color);
 }
 

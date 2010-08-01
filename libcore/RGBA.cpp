@@ -26,49 +26,26 @@
 
 namespace gnash {
 
-void
-rgba::read(SWFStream& in, SWF::TagType tag)
+rgba
+readRGBA(SWFStream& in, SWF::TagType tag)
 {
-    switch (tag)
-    {
+    switch (tag) {
         case SWF::DEFINESHAPE:
         case SWF::DEFINESHAPE2:
-            read_rgb(in);
+            return readRGB(in);
             break;
         default:
         case SWF::DEFINESHAPE3:
-            read_rgba(in);
+            return readRGBA(in);
             break;
     }
-}
-
-void
-rgba::read_rgba(SWFStream& in)
-{
-    read_rgb(in);
-    in.ensureBytes(1);
-    m_a = in.read_u8();
-}
-
-/// Can throw ParserException on premature end of input stream
-void
-rgba::read_rgb(SWFStream& in)
-{
-    in.ensureBytes(3);
-    m_r = in.read_u8();
-    m_g = in.read_u8();
-    m_b = in.read_u8();
-    m_a = 0x0FF;
 }
 
 std::string
 rgba::toShortString() const
 {
     std::stringstream ss;
-    ss << (unsigned)m_r << ","
-        << (unsigned)m_g << ","
-        << (unsigned)m_b << ","
-        << (unsigned)m_a;
+    ss << +m_r << "," << +m_g << "," << +m_b << "," << +m_a;
     return ss.str();
 }
 
@@ -79,6 +56,29 @@ rgba::set_lerp(const rgba& a, const rgba& b, float f)
     m_g = frnd(lerp<float>(a.m_g, b.m_g, f));
     m_b = frnd(lerp<float>(a.m_b, b.m_b, f));
     m_a = frnd(lerp<float>(a.m_a, b.m_a, f));
+}
+
+rgba
+readRGBA(SWFStream& in)
+{
+    in.ensureBytes(4);
+    const boost::uint8_t r = in.read_u8();
+    const boost::uint8_t g = in.read_u8();
+    const boost::uint8_t b = in.read_u8();
+    const boost::uint8_t a = in.read_u8();
+    return rgba(r, b, g, a);
+}
+
+/// Can throw ParserException on premature end of input stream
+rgba
+readRGB(SWFStream& in)
+{
+    in.ensureBytes(3);
+    const boost::uint8_t r = in.read_u8();
+    const boost::uint8_t g = in.read_u8();
+    const boost::uint8_t b = in.read_u8();
+    const boost::uint8_t a = 0xff;
+    return rgba(r, b, g, a);
 }
 
 rgba
@@ -101,11 +101,8 @@ colorFromHexString(const std::string& color)
 std::ostream&
 operator<<(std::ostream& os, const rgba& r)
 {
-    return os << "rgba: "
-        << static_cast<unsigned>(r.m_r) << ","
-        << static_cast<unsigned>(r.m_g) << ","
-        << static_cast<unsigned>(r.m_b) << ","
-        << static_cast<unsigned>(r.m_a);
+    return os << "rgba: " << +r.m_r << "," << +r.m_g << "," << +r.m_b << ","
+        << +r.m_a;
 }
 
 } // namespace gnash
