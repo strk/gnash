@@ -51,7 +51,7 @@ readRGBA(SWFStream& in)
     const boost::uint8_t g = in.read_u8();
     const boost::uint8_t b = in.read_u8();
     const boost::uint8_t a = in.read_u8();
-    return rgba(r, b, g, a);
+    return rgba(r, g, b, a);
 }
 
 /// Can throw ParserException on premature end of input stream
@@ -63,7 +63,7 @@ readRGB(SWFStream& in)
     const boost::uint8_t g = in.read_u8();
     const boost::uint8_t b = in.read_u8();
     const boost::uint8_t a = 0xff;
-    return rgba(r, b, g, a);
+    return rgba(r, g, b, a);
 }
 
 rgba
