@@ -26,21 +26,6 @@
 
 namespace gnash {
 
-rgba
-readRGBA(SWFStream& in, SWF::TagType tag)
-{
-    switch (tag) {
-        case SWF::DEFINESHAPE:
-        case SWF::DEFINESHAPE2:
-            return readRGB(in);
-            break;
-        default:
-        case SWF::DEFINESHAPE3:
-            return readRGBA(in);
-            break;
-    }
-}
-
 std::string
 rgba::toShortString() const
 {

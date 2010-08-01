@@ -80,6 +80,8 @@ LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
         return;
     }
 
+    assert(t == SWF::DEFINEMORPHSHAPE2 || t == SWF::DEFINEMORPHSHAPE2_);
+
     // MorphShape 2 from here down.
     in.ensureBytes(4 + 2);
 
@@ -121,18 +123,18 @@ LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         const RunResources& /*r*/)
 {
     switch (t) {
+
+        default:
+            in.ensureBytes(2);
+            m_width = in.read_u16();
+            m_color = readRGBA(in);
+            return;
+
         case SWF::DEFINESHAPE:
         case SWF::DEFINESHAPE2:
             in.ensureBytes(2);
             m_width = in.read_u16();
             m_color = readRGB(in);
-            return;
-
-        case SWF::DEFINESHAPE3:
-        default:
-            in.ensureBytes(2);
-            m_width = in.read_u16();
-            m_color = readRGBA(in);
             return;
 
         case SWF::DEFINESHAPE4:

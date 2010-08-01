@@ -419,7 +419,18 @@ readGradientRecord(SWFStream& in, SWF::TagType tag)
 {
     in.ensureBytes(1);
     const boost::uint8_t ratio = in.read_u8();
-    const rgba color = readRGBA(in, tag);
+
+    switch (tag) {
+        case SWF::DEFINESHAPE:
+        case SWF::DEFINESHAPE2:
+        {
+            const rgba color = readRGB(in);
+            return GradientRecord(ratio, color);
+        }
+        default:
+            break;
+    }
+    const rgba color = readRGBA(in);
     return GradientRecord(ratio, color);
 }
 

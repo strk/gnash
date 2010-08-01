@@ -135,17 +135,6 @@ public:
 
 std::ostream& operator<< (std::ostream& os, const rgba& r);
 
-/// Initialize from input stream.
-//
-/// @param in   The input SWFStream
-///
-/// @param t    The tag type, used to determine whether to read an RGB
-///             or RGBA record.
-//
-/// Throw a ParserException if there are not enough bytes in the
-/// currently opened tag for reading. See SWFStream::ensureBytes()
-rgba readRGBA(SWFStream& in, SWF::TagType t);
-
 /// Initialize from input stream (reads RGBA)
 //
 /// Throw a ParserException if there's no enough bytes in the
