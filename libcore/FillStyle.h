@@ -216,8 +216,14 @@ public:
         return _gradients[i];
     }
 
+    /// Set the focal point.
+    //
+    /// Value will be clamped to the range -1..1; callers don't need to check.
     void setFocalPoint(double d);
 
+    /// Get the focal point of this GradientFill
+    //
+    /// If the focal point is 0.0, it is a simple radial fill.
     double focalPoint() const {
         return _focalPoint;
     }
