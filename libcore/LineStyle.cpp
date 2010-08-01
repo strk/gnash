@@ -120,42 +120,55 @@ void
 LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         const RunResources& /*r*/)
 {
-    if (!(t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_))
-    {
-        in.ensureBytes(2);
-        m_width = in.read_u16();
-        m_color = readRGBA(in, t);
-        return;
-    }
+    switch (t) {
+        case SWF::DEFINESHAPE:
+        case SWF::DEFINESHAPE2:
+            in.ensureBytes(2);
+            m_width = in.read_u16();
+            m_color = readRGB(in);
+            return;
 
-    // TODO: Unfinished. Temporary to allow DefineShape4 to work in many
-    // cases, but does not work correctly in all cases.
-    in.ensureBytes(2+2);
-    m_width = in.read_u16();
+        case SWF::DEFINESHAPE3:
+        default:
+            in.ensureBytes(2);
+            m_width = in.read_u16();
+            m_color = readRGBA(in);
+            return;
 
-    int flags1 = in.read_u8();
-    int flags2 = in.read_u8();
-    _startCapStyle =  (CapStyle)((flags1 & 0xC0) >> 6);
-    _joinStyle     = (JoinStyle)((flags1 & 0x30) >> 4);
-    bool has_fill      =   flags1 & (1 << 3);
-    _scaleHorizontally = !(flags1 & (1 << 2));
-    _scaleVertically   = !(flags1 & (1 << 1));
-    _pixelHinting      =   flags1 & (1 << 0);
-    _noClose = flags2 & (1 << 2);
-    _endCapStyle = (CapStyle) (flags2 & 0x03); 
+        case SWF::DEFINESHAPE4:
+        case SWF::DEFINESHAPE4_:
+        {
+            // TODO: Unfinished. Temporary to allow DefineShape4 to work in
+            // many cases, but does not work correctly in all cases.
+            in.ensureBytes(2+2);
+            m_width = in.read_u16();
 
-    if (_joinStyle == JOIN_MITER) {
-        in.ensureBytes(2);
-        _miterLimitFactor = in.read_short_ufixed();
-    }
-    if (has_fill) {
-        // TODO: store a fill style properly, removing the need for the 
-        // visitor.
-        OptionalFillPair fp = readFills(in, t, md, false);
-        m_color = boost::apply_visitor(GetColor(), fp.first.fill);
-    }
-    else {
-        m_color = readRGBA(in);
+            const boost::uint8_t flags1 = in.read_u8();
+            const boost::uint8_t flags2 = in.read_u8();
+
+            _startCapStyle = (CapStyle)((flags1 & 0xC0) >> 6);
+            _joinStyle = (JoinStyle)((flags1 & 0x30) >> 4);
+            const bool has_fill  =   flags1 & (1 << 3);
+            _scaleHorizontally = !(flags1 & (1 << 2));
+            _scaleVertically   = !(flags1 & (1 << 1));
+            _pixelHinting      =   flags1 & (1 << 0);
+            _noClose = flags2 & (1 << 2);
+            _endCapStyle = (CapStyle) (flags2 & 0x03); 
+
+            if (_joinStyle == JOIN_MITER) {
+                in.ensureBytes(2);
+                _miterLimitFactor = in.read_short_ufixed();
+            }
+            if (has_fill) {
+                // TODO: store a fill style properly, removing the need for the 
+                // visitor.
+                OptionalFillPair fp = readFills(in, t, md, false);
+                m_color = boost::apply_visitor(GetColor(), fp.first.fill);
+            }
+            else {
+                m_color = readRGBA(in);
+            }
+        }
     }
 }
 
