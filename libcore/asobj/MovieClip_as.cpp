@@ -38,6 +38,8 @@
 #include "Array_as.h"
 #include "FillStyle.h"
 #include "namedStrings.h"
+#include "Renderer.h"
+#include "RunResources.h"
 
 namespace gnash {
 
@@ -2001,8 +2003,83 @@ as_value
 movieclip_beginBitmapFill(const fn_call& fn)
 {
     MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    if (fn.nargs < 1) {
+        return as_value();
+    }
+
+    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+    BitmapData_as* bd;
+
+    if (!isNativeType(obj, bd)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_debug("MovieClip.attachBitmap: first argument should be a "
+                "BitmapData", fn.arg(1));
+        );
+        return as_value();
+    }
+    
+    const size_t width = bd->getWidth();
+    const size_t height = bd->getHeight();
+    const BitmapData_as::BitmapArray& data = bd->getBitmapData();
+    
+    std::auto_ptr<GnashImage> im(new ImageRGBA(width, height)); 
+    log_debug("Width: %s, height %s", width, height);
+
+    for (size_t i = 0; i < height; ++i) {
+
+        boost::uint8_t* row = im->scanline(i);
+
+        for (size_t j = 0; j < width; ++j) {
+            const BitmapData_as::BitmapArray::value_type pixel =
+                data[i * width + j];
+            row[j * 4] = (pixel & 0x00ff0000) >> 16;
+            row[j * 4 + 1] = (pixel & 0x0000ff00) >> 8;
+            row[j * 4 + 2] = (pixel & 0x000000ff);
+            row[j * 4 + 3] = (pixel & 0xff000000) >> 24;
+        }
+    }
+
+    Renderer* renderer = getRunResources(*obj).renderer();
+    if (!renderer) return as_value();
+
+    BitmapInfo* bi = renderer->createBitmapInfo(im);
+    
+    SWFMatrix mat;
+    mat.set_scale(20, 20);
+
+    if (fn.nargs > 1) {
+        as_object* matrix = fn.arg(1).to_object(getGlobal(fn));
+        if (matrix) {
+
+            // Convert input matrix to SWFMatrix.
+            const double factor = 65536.0;
+            const double valA = matrix->getMember(NSV::PROP_A).to_number() * factor;
+            const double valB = matrix->getMember(NSV::PROP_B).to_number() * factor;
+            const double valC = matrix->getMember(NSV::PROP_C).to_number() * factor;
+            const double valD = matrix->getMember(NSV::PROP_D).to_number() * factor;
+
+            const boost::int32_t valTX = pixelsToTwips(
+                    matrix->getMember(NSV::PROP_TX).to_number());
+            const boost::int32_t valTY = pixelsToTwips(
+                    matrix->getMember(NSV::PROP_TY).to_number());
+            
+            SWFMatrix user(valA, valB, valC, valD, valTX, valTY);
+            mat.concatenate(user);
+
+        }
+    }
+
+    BitmapFill::Type t = BitmapFill::TILED;
+    if (fn.nargs > 2) {
+        const bool repeat = fn.arg(2).to_bool();
+        if (!repeat) t = BitmapFill::CLIPPED;
+    }
+
+    mat.invert();
+    log_debug("Matrix: %s", mat);
+
+    ptr->graphics().beginFill(BitmapFill(t, bi, mat));
+
     return as_value();
 }
 

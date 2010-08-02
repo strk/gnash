@@ -20,10 +20,12 @@
 #ifndef GNASH_BITMAP_INFO_H
 #define GNASH_BITMAP_INFO_H
 
-#include "ref_counted.h" // for inheritance
+#include "ref_counted.h"
 #include "dsodefs.h"
 
 namespace gnash {
+
+class GnashImage;
 
 /// Your Renderer creates BitmapInfos for gnash.  You
 /// need to subclass BitmapInfo in order to add the
@@ -34,6 +36,8 @@ class DSOEXPORT BitmapInfo : public ref_counted
 public:
 
 	BitmapInfo() {}
+
+    virtual GnashImage& image() = 0;
 
     virtual ~BitmapInfo() {}
 };

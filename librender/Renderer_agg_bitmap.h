@@ -37,6 +37,10 @@ public:
       _bpp(_image->type() == GNASH_IMAGE_RGB ? 24 : 32)
   {
   }
+
+  GnashImage& image() {
+      return *_image;
+  }
  
   int get_width() const { return _image->width(); }  
   int get_height() const { return _image->height();  }  
