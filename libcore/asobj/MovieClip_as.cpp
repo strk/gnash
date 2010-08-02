@@ -2045,7 +2045,6 @@ movieclip_beginBitmapFill(const fn_call& fn)
     BitmapInfo* bi = renderer->createBitmapInfo(im);
     
     SWFMatrix mat;
-    mat.set_scale(20, 20);
 
     if (fn.nargs > 1) {
         as_object* matrix = fn.arg(1).to_object(getGlobal(fn));
@@ -2058,10 +2057,10 @@ movieclip_beginBitmapFill(const fn_call& fn)
             const double valC = matrix->getMember(NSV::PROP_C).to_number() * factor;
             const double valD = matrix->getMember(NSV::PROP_D).to_number() * factor;
 
-            const boost::int32_t valTX = pixelsToTwips(
-                    matrix->getMember(NSV::PROP_TX).to_number());
-            const boost::int32_t valTY = pixelsToTwips(
-                    matrix->getMember(NSV::PROP_TY).to_number());
+            const boost::int32_t valTX = 
+                matrix->getMember(NSV::PROP_TX).to_number();
+            const boost::int32_t valTY = 
+                    matrix->getMember(NSV::PROP_TY).to_number();
             
             SWFMatrix user(valA, valB, valC, valD, valTX, valTY);
             mat.concatenate(user);
@@ -2075,8 +2074,11 @@ movieclip_beginBitmapFill(const fn_call& fn)
         if (!repeat) t = BitmapFill::CLIPPED;
     }
 
+    // This is needed to get the bitmap to the right size and have it in the
+    // correct place. Maybe it would be better handled somewhere else, as it's
+    // not exactly intuitive.
     mat.invert();
-    log_debug("Matrix: %s", mat);
+    mat.set_scale(1 / 20., 1 / 20.);
 
     ptr->graphics().beginFill(BitmapFill(t, bi, mat));
 
