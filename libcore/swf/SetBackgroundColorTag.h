@@ -54,7 +54,7 @@ private:
 	void read(SWFStream& in)
 	{
 		// may throw ParserException
-		m_color.read_rgb(in);
+		m_color = readRGB(in);
 
 		IF_VERBOSE_PARSE(
             log_parse(_("  SetBackgroundColor: %s"), m_color);

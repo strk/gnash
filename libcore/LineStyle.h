@@ -186,6 +186,12 @@ private:
 
     float _miterLimitFactor;
 };
+    
+inline void
+setLerp(LineStyle& s, const LineStyle& ls1, const LineStyle& ls2, double ratio) 
+{
+    s.set_lerp(ls1, ls2, ratio);
+}
 
 } // namespace gnash
 

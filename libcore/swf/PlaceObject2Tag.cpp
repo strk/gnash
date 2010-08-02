@@ -52,7 +52,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
 
     if (in.tell() < in.get_tag_end_position())
     {
-        m_matrix.read(in);
+        m_matrix = readSWFMatrix(in);
         m_has_flags2 |= HAS_MATRIX_MASK;
         if (in.tell() < in.get_tag_end_position())
         {
@@ -270,7 +270,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
 
     if ( hasMatrix() )
     {
-        m_matrix.read(in);
+        m_matrix = readSWFMatrix(in);
     }
 
     if ( hasCxform() )
@@ -281,7 +281,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
     if ( hasRatio() )
     {
         in.ensureBytes(2);
-        m_ratio = in.read_u16();
+        _ratio = in.read_u16();
     }
 
     if ( hasName() ) 
@@ -316,7 +316,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
         {
             log_parse(_("  cxform: %s"), m_color_transform);
         }
-        if ( hasRatio() ) log_parse(_("  ratio: %d"), m_ratio);
+        if ( hasRatio() ) log_parse(_("  ratio: %d"), _ratio);
         if ( hasName() ) log_parse(_("  name = %s"), m_name.c_str());
         if ( hasClipDepth() ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-DisplayObject::staticDepthOffset);
         log_parse(_(" m_place_type: %d"), getPlaceType() );
@@ -358,7 +358,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     }
 
     if (hasMatrix()) {
-        m_matrix.read(in);
+        m_matrix = readSWFMatrix(in);
     }
 
     if (hasCxform()) {
@@ -367,7 +367,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 
     if (hasRatio()) {
         in.ensureBytes(2);
-        m_ratio = in.read_u16();
+        _ratio = in.read_u16();
     }
     
     if (hasName()) {
@@ -423,7 +423,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         if (hasCharacter()) log_parse(_("  char id = %d"), _id);
         if (hasMatrix()) log_parse(_("  SWFMatrix: %s"), m_matrix);
         if (hasCxform()) log_parse(_("  cxform: %d"), m_color_transform);
-        if (hasRatio()) log_parse(_("  ratio: %d"), m_ratio);
+        if (hasRatio()) log_parse(_("  ratio: %d"), _ratio);
         if (hasName()) log_parse(_("  name = %s"), m_name);
         if (hasClassName()) log_parse(_("  class name = %s"), className);
         if (hasClipDepth()) log_parse(_("  clip_depth = %d (%d)"),

@@ -73,7 +73,7 @@ namespace SWF {
 /// m_matrix:
 /// The SWFMatrix transform to apply to the newly created instance.
 ///
-/// m_ratio
+/// _ratio
 ///
 /// m_clip_depth:
 /// If != DisplayObject::noClipDepthValue, mark the created instance
@@ -94,7 +94,7 @@ public:
         m_has_flags2(0),
         m_has_flags3(0),
         _id(0),
-        m_ratio(0),
+        _ratio(0),
         m_clip_depth(0),
         _blendMode(0),
         _movie_def(def)
@@ -116,7 +116,7 @@ public:
         return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK);
     } 
 
-    int getRatio()     const { return m_ratio; }
+    int getRatio()     const { return _ratio; }
     int getClipDepth() const { return m_clip_depth; }
     boost::uint16_t getID()        const { return _id; }
     const std::string& getName() const { return m_name; }
@@ -165,7 +165,7 @@ private:
     boost::uint16_t _id;
     cxform  m_color_transform;
     SWFMatrix  m_matrix;
-    int     m_ratio;
+    int     _ratio;
     std::string m_name;
     int     m_clip_depth;
     

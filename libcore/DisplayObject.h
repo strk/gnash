@@ -339,12 +339,12 @@ public:
         }
     }
 
-    int get_ratio() const { return m_ratio; }
+    int get_ratio() const { return _ratio; }
 
     void set_ratio(int r)
     {
-        if (r != m_ratio) set_invalidated(__FILE__, __LINE__); 
-        m_ratio = r;       
+        if (r != _ratio) set_invalidated(__FILE__, __LINE__); 
+        _ratio = r;       
     }
 
     /// Returns the clipping depth (if any) of this DisplayObject.
@@ -1050,7 +1050,7 @@ private:
     ///
     int _volume;
 
-    int m_ratio;
+    int _ratio;
     int m_clip_depth;
 
     /// The DisplayObject masking this instance (if any)

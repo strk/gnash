@@ -21,10 +21,9 @@
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "smart_ptr.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 #include "Geometry.h"
 #include "GnashNumeric.h"
-#include "RunResources.h"
 #include "log.h"
 
 #include <vector>
@@ -35,9 +34,9 @@ namespace SWF {
 // Forward declarations
 namespace {
     void readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md, const RunResources& r);
+        SWF::TagType tag, movie_definition& md, const RunResources& /*r*/);
     void readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
-        SWF::TagType tag, movie_definition& md, const RunResources& r);
+        SWF::TagType tag, movie_definition& md, const RunResources& /*r*/);
     void computeBounds(SWFRect& bounds, const ShapeRecord::Paths& paths,
         const ShapeRecord::LineStyles& lineStyles, int swfVersion);
 }
@@ -59,7 +58,7 @@ public:
 
     void operator()(typename T::value_type& st)
     {
-        st.set_lerp(*_style1, *_style2, _ratio);
+        setLerp(st, *_style1, *_style2, _ratio);
         ++_style1, ++_style2;
     }
 
@@ -182,7 +181,7 @@ ShapeRecord::clear()
 }
 
 void
-ShapeRecord::addFillStyle(const fill_style& fs)
+ShapeRecord::addFillStyle(const FillStyle& fs)
 {
     _fillStyles.push_back(fs);
 }
@@ -224,8 +223,8 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
         const Path& p1 = i < paths1.size() ? paths1[i] : empty_path;
         const Path& p2 = n < paths2.size() ? paths2[n] : empty_path;
 
-        const float new_ax = flerp(p1.ap.x, p2.ap.x, ratio);
-        const float new_ay = flerp(p1.ap.y, p2.ap.y, ratio);
+        const float new_ax = lerp<float>(p1.ap.x, p2.ap.x, ratio);
+        const float new_ay = lerp<float>(p1.ap.y, p2.ap.y, ratio);
 
         p.reset(new_ax, new_ay, p1.getLeftFill(),
                 p2.getRightFill(), p1.getLineStyle());
@@ -241,10 +240,10 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
 
             const Edge& e2 = k < p2.size() ? p2[k] : empty_edge;
 
-            e.cp.x = static_cast<int>(flerp(e1.cp.x, e2.cp.x, ratio));
-            e.cp.y = static_cast<int>(flerp(e1.cp.y, e2.cp.y, ratio));
-            e.ap.x = static_cast<int>(flerp(e1.ap.x, e2.ap.x, ratio));
-            e.ap.y = static_cast<int>(flerp(e1.ap.y, e2.ap.y, ratio));
+            e.cp.x = static_cast<int>(lerp<float>(e1.cp.x, e2.cp.x, ratio));
+            e.cp.y = static_cast<int>(lerp<float>(e1.cp.y, e2.cp.y, ratio));
+            e.ap.x = static_cast<int>(lerp<float>(e1.ap.x, e2.ap.x, ratio));
+            e.ap.y = static_cast<int>(lerp<float>(e1.ap.y, e2.ap.y, ratio));
             ++k;
 
             if (p2.size() <= k) {
@@ -395,7 +394,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             }
             if ((flags & SHAPE_FILLSTYLE0_CHANGE) && num_fill_bits > 0)
             {
-                // fill_style_0_change = 1;
+                // FillStyle_0_change = 1;
                 if (! current_path.empty())
                 {
                     _paths.push_back(current_path);
@@ -446,7 +445,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             }
             if ((flags & SHAPE_FILLSTYLE1_CHANGE) && num_fill_bits > 0)
             {
-                // fill_style_1_change = 1;
+                // FillStyle_1_change = 1;
                 if (! current_path.empty())
                 {
                     _paths.push_back(current_path);
@@ -677,30 +676,29 @@ namespace {
 // Read fill styles, and push them onto the given style array.
 void
 readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
-                 SWF::TagType tag, movie_definition& m, const RunResources& r)
+         SWF::TagType tag, movie_definition& m, const RunResources& /*r*/)
 {
     in.ensureBytes(1);
-    boost::uint16_t fill_style_count = in.read_u8();
+    boost::uint16_t FillStyle_count = in.read_u8();
     if (tag != SWF::DEFINESHAPE)
     {
-        if (fill_style_count == 0xFF)
+        if (FillStyle_count == 0xFF)
         {
             in.ensureBytes(2);
-            fill_style_count = in.read_u16();
+            FillStyle_count = in.read_u16();
         }
     }
 
     IF_VERBOSE_PARSE (
-        log_parse(_("  readFillStyles: count = %u"), fill_style_count);
+        log_parse(_("  readFillStyles: count = %u"), FillStyle_count);
     );
 
     // Read the styles.
-    styles.reserve(styles.size()+fill_style_count);
-    for (boost::uint16_t i = 0; i < fill_style_count; ++i) {
-        // TODO: add a fill_style constructor directly reading from stream
-        fill_style fs;
-        fs.read(in, tag, m, r);
-        styles.push_back(fs);
+    styles.reserve(styles.size()+FillStyle_count);
+    for (boost::uint16_t i = 0; i < FillStyle_count; ++i) {
+        // TODO: add a FillStyle constructor directly reading from stream
+        OptionalFillPair fp = readFills(in, tag, m, false);
+        styles.push_back(fp.first);
     }
 }
 

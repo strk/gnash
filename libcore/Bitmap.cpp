@@ -19,7 +19,7 @@
 #include "Bitmap.h"
 #include "flash/display/BitmapData_as.h"
 #include "GnashImage.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 #include "DynamicShape.h"
 #include "SWFRect.h"
 #include "Renderer.h"
@@ -168,8 +168,10 @@ Bitmap::makeBitmapShape()
 
     SWFMatrix mat;
     mat.set_scale(1.0 / 20, 1.0 / 20);
-    fill_style fill(bitmap(), mat);
-    const size_t fillLeft = _shape.add_fill_style(fill);
+
+    // Can this be tiled?
+    FillStyle fill(BitmapFill(BitmapFill::CLIPPED, bitmap(), mat));
+    const size_t fillLeft = _shape.addFillStyle(fill);
 
     Path bmpath(w, h, fillLeft, 0, 0, false);
     bmpath.drawLineTo(w, 0);

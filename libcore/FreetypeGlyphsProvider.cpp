@@ -27,7 +27,7 @@
 #include "GnashException.h"
 #include "ShapeRecord.h"
 #include "log.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 
 #ifdef USE_FREETYPE 
 # include <ft2build.h>
@@ -98,8 +98,8 @@ public:
         _x(0),
         _y(0)
     {
-        fill_style f;
-        f.setSolid(rgba(255, 255, 255, 255));
+        /// A default fill style is solid white.
+        FillStyle f = SolidFill(rgba());
         _shape.addFillStyle(f);
         _shape.addPath(Path(_x, _y, 1, 0, 0, true));
         _currPath = &_shape.currentPath();

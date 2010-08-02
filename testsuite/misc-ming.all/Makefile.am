@@ -37,6 +37,7 @@ EXTRA_DIST = \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
+	GradientFillTest.as \
 	LC-Receive.as \
 	LC-Send.as \
 	FlashVarsTest.as \
@@ -2012,6 +2013,9 @@ XMLSocketTester: $(srcdir)/XMLSocketTester.sh XMLSocketTest.swf
 	sh $< -c "ENDOFTEST" $(top_builddir) $(top_srcdir) $(PERL) \
 		XMLSocketTest.swf > $@
 	chmod 755 $@
+
+GradientFillTest.swf: $(srcdir)/GradientFillTest.as 
+	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/GradientFillTest.as
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as

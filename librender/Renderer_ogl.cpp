@@ -35,7 +35,7 @@
 #include "utility.h"
 #include "Range2d.h"
 #include "cxform.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #  include <Windows.h>
@@ -108,6 +108,53 @@
 
 
 namespace gnash {
+
+namespace {
+    const BitmapInfo* createGradientBitmap(const GradientFill& gf,
+            Renderer& renderer);
+}
+
+namespace {
+
+/// Style handler
+//
+/// Transfer FillStyles to the ogl renderer.
+struct StyleHandler : boost::static_visitor<>
+{
+    StyleHandler(const cxform& c, Renderer& r)
+        :
+        _cx(c),
+        _renderer(r)
+    {}
+
+    void operator()(const GradientFill& f) const {
+
+        const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
+            createGradientBitmap(f, _renderer));  
+
+        SWFMatrix m = f.matrix();
+        binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
+    }
+
+    void operator()(const SolidFill& f) const {
+        const rgba c = _cx.transform(f.color());
+        glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
+    }
+
+    void operator()(const BitmapFill& f) const {
+        const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
+                   f.bitmap());
+        binfo->apply(f.matrix(), f.type() == BitmapFill::TILED ?
+                bitmap_info_ogl::WRAP_REPEAT : bitmap_info_ogl::WRAP_CLAMP);
+    }
+
+private:
+    const cxform& _cx;
+    Renderer& _renderer;
+};  
+
+}
+
 
 #ifdef OSMESA_TESTING
 
@@ -1094,10 +1141,9 @@ public:
   add_paths(const PathVec& path_vec)
   {
     cxform dummy_cx;
-    std::vector<fill_style> dummy_fs;
+    std::vector<FillStyle> dummy_fs;
     
-    fill_style coloring;
-    coloring.setSolid(rgba(0,0,0,0));
+    FillStyle coloring = FillStyle(SolidFill(rgba(0, 0, 0, 0)));
     
     dummy_fs.push_back(coloring);
     
@@ -1299,63 +1345,10 @@ public:
     }    
   }
 
-  void apply_fill_style(const fill_style& style, const SWFMatrix& /* mat */, const cxform& cx)
+  void apply_FillStyle(const FillStyle& style, const SWFMatrix& /* mat */, const cxform& cx)
   {
-      int fill_type = style.get_type();
-      
-      rgba c = cx.transform(style.get_color());
-
-      glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
-          
-          
-      switch (fill_type) {
-
-        case SWF::FILL_LINEAR_GRADIENT:
-        case SWF::FILL_RADIAL_GRADIENT:
-        case SWF::FILL_FOCAL_GRADIENT:
-        {
-                    
-          const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
-                      style.need_gradient_bitmap(*this));       
-
-          SWFMatrix m = style.getGradientMatrix();
-          
-          binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
-          
-          break;
-        }        
-        case SWF::FILL_TILED_BITMAP_HARD:
-        case SWF::FILL_TILED_BITMAP:
-        {
-            const bitmap_info_ogl* binfo = static_cast<const bitmap_info_ogl*>(
-                    style.get_bitmap_info(*this));
-
-          binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_REPEAT);
-          break;
-        }
-                
-        case SWF::FILL_CLIPPED_BITMAP:
-        // smooth=true;
-        case SWF::FILL_CLIPPED_BITMAP_HARD:
-        {     
-          const bitmap_info_ogl* binfo = dynamic_cast<const bitmap_info_ogl*>(
-                  style.get_bitmap_info(*this));
-          
-          assert(binfo);
-
-          binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_CLAMP);
-          
-          break;
-        } 
-
-        case SWF::FILL_SOLID:
-        {
-          rgba c = cx.transform(style.get_color());
-
-          glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
-        }
-        
-      } // switch
+      const StyleHandler st(cx, *this);
+      boost::apply_visitor(st, style.fill);
   }
   
   
@@ -1364,7 +1357,7 @@ public:
   {
   //  GNASH_REPORT_FUNCTION;
      
-    // In case GL_TEXTURE_2D was enabled by apply_fill_style(), disable it now.
+    // In case GL_TEXTURE_2D was enabled by apply_FillStyle(), disable it now.
     // FIXME: this sucks
     glDisable(GL_TEXTURE_2D);
     
@@ -1462,7 +1455,7 @@ public:
   void
   draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints,
 		const SWFMatrix& mat, const cxform& cx,
-		const std::vector<fill_style>& /* fill_styles */,
+		const std::vector<FillStyle>& /* FillStyles */,
                 const std::vector<LineStyle>& line_styles)
   {
   
@@ -1626,13 +1619,13 @@ public:
   draw_subshape(const PathVec& path_vec,
     const SWFMatrix& mat,
     const cxform& cx,
-    const std::vector<fill_style>& fill_styles,
+    const std::vector<FillStyle>& FillStyles,
     const std::vector<LineStyle>& line_styles)
   {
     PathVec normalized = normalize_paths(path_vec);
     PathPointMap pathpoints = getPathPoints(normalized);
     
-    for (size_t i = 0; i < fill_styles.size(); ++i) {
+    for (size_t i = 0; i < FillStyles.size(); ++i) {
       PathPtrVec paths = paths_by_style(normalized, i+1);
       
       if (!paths.size()) {
@@ -1662,20 +1655,25 @@ public:
         _tesselator.endContour();
       }
       
+      apply_FillStyle(FillStyles[i], mat, cx);
 
-      
-      apply_fill_style(fill_styles[i], mat, cx);
-
-      if (fill_styles[i].get_type() != SWF::FILL_SOLID) {     
-        // Apply alpha premultiplication.
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      // This is terrible, but since the renderer is half dead I don't care.
+      try {
+          boost::get<SolidFill>(FillStyles[i].fill);
+      }
+      catch (const boost::bad_get&) {
+          // For non solid fills...
+          glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
       }
       
       _tesselator.tesselate();
       
-      if (fill_styles[i].get_type() != SWF::FILL_SOLID) {    
-        // restore to original.
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      try {
+          boost::get<SolidFill>(FillStyles[i].fill);
+      }
+      catch (const boost::bad_get&) {
+          // Restore to original.
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       }
       
       glDisable(GL_TEXTURE_GEN_S);
@@ -1684,7 +1682,7 @@ public:
       glDisable(GL_TEXTURE_2D);      
     }
     
-    draw_outlines(normalized, pathpoints, mat, cx, fill_styles, line_styles);
+    draw_outlines(normalized, pathpoints, mat, cx, FillStyles, line_styles);
   }
   
 // Drawing procedure:
@@ -1731,7 +1729,7 @@ public:
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
-    const std::vector<fill_style>& fill_styles = shape.fillStyles();
+    const std::vector<FillStyle>& FillStyles = shape.fillStyles();
     const std::vector<LineStyle>& line_styles = shape.lineStyles();
     
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
@@ -1743,7 +1741,7 @@ public:
         subshape_paths.push_back(*subshapes[i]);
       }
       
-      draw_subshape(subshape_paths, mat, cx, fill_styles,
+      draw_subshape(subshape_paths, mat, cx, FillStyles,
                     line_styles);
     }
   }
@@ -1753,10 +1751,9 @@ public:
   {
     if (_drawing_mask) abort();
     cxform dummy_cx;
-    std::vector<fill_style> glyph_fs;
+    std::vector<FillStyle> glyph_fs;
     
-    fill_style coloring;
-    coloring.setSolid(c);
+    FillStyle coloring = FillStyle(SolidFill(c));
     
     glyph_fs.push_back(coloring);
     
@@ -1842,16 +1839,110 @@ Renderer* create_Renderer_ogl(bool init)
   }
   return renderer;
 }
-  
-  
+ 
+namespace {
+
+// TODO: this function is rubbish and shouldn't survive a rewritten OGL
+// renderer.
+rgba
+sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
+{
+
+    // By specs, first gradient should *always* be 0, 
+    // anyway a malformed SWF could break this,
+    // so we cannot rely on that information...
+    if (ratio < fill.record(0).ratio) {
+        return fill.record(0).color;
+    }
+
+    if (ratio >= fill.record(fill.recordCount() - 1).ratio) {
+        return fill.record(fill.recordCount() - 1).color;
+    }
+        
+    for (size_t i = 1, n = fill.recordCount(); i < n; ++i) {
+
+        const GradientRecord& gr1 = fill.record(i);
+        if (gr1.ratio < ratio) continue;
+
+        const GradientRecord& gr0 = fill.record(i - 1);
+        if (gr0.ratio > ratio) continue;
+
+        float f = 0.0f;
+
+        if (gr0.ratio != gr1.ratio) {
+            f = (ratio - gr0.ratio) / float(gr1.ratio - gr0.ratio);
+        }
+        else {
+            // Ratios are equal IFF first and second GradientRecord
+            // have the same ratio. This would be a malformed SWF.
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("two gradients in a FillStyle "
+                    "have the same position/ratio: %d"),
+                    gr0.ratio);
+            );
+        }
+
+        rgba result;
+        result.set_lerp(gr0.color, gr1.color, f);
+        return result;
+    }
+
+    // Assuming gradients are ordered by ratio? see start comment
+    return fill.record(fill.recordCount() - 1).color;
+}
+
+const BitmapInfo*
+createGradientBitmap(const GradientFill& gf, Renderer& renderer)
+{
+    std::auto_ptr<ImageRGBA> im;
+
+    switch (gf.type())
+    {
+        case GradientFill::LINEAR:
+            // Linear gradient.
+            im.reset(new ImageRGBA(256, 1));
+
+            for (size_t i = 0; i < im->width(); i++) {
+
+                rgba sample = sampleGradient(gf, i);
+                im->setPixel(i, 0, sample.m_r, sample.m_g,
+                        sample.m_b, sample.m_a);
+            }
+            break;
+
+        case GradientFill::RADIAL:
+            // Focal gradient.
+            im.reset(new ImageRGBA(64, 64));
+
+            for (size_t j = 0; j < im->height(); j++)
+            {
+                for (size_t i = 0; i < im->width(); i++)
+                {
+                    float radiusy = (im->height() - 1) / 2.0f;
+                    float radiusx = radiusy + std::abs(radiusy * gf.focalPoint());
+                    float y = (j - radiusy) / radiusy;
+                    float x = (i - radiusx) / radiusx;
+                    int ratio = std::floor(255.5f * std::sqrt(x*x + y*y));
+                    
+                    if (ratio > 255) ratio = 255;
+
+                    rgba sample = sampleGradient(gf, ratio);
+                    im->setPixel(i, j, sample.m_r, sample.m_g,
+                            sample.m_b, sample.m_a);
+                }
+            }
+            break;
+        default:
+            break;
+    }
+
+    const BitmapInfo* bi = renderer.createBitmapInfo(
+                    static_cast<std::auto_ptr<GnashImage> >(im));
+
+    return bi;
+}
+
+} 
   
 } // namespace gnash
-
-
-/*
-
-Markus: A. A. I still miss you and the easter 2006, you know.
-  A. J. I miss you too, but you'll probably not read this code ever... :/
-
-*/
 

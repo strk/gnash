@@ -35,7 +35,7 @@
 #include "Shape.h"
 #include "TextField.h"
 #include "SWFStream.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 #include "swf/DefineFontAlignZonesTag.h"
 #include "swf/DefineShapeTag.h"
 #include "swf/DefineButtonCxformTag.h"
@@ -74,7 +74,7 @@ using namespace gnash::SWF;
 (int) (float) (long) (double) \
 (Property*) (auto_ptr<Property>) (scoped_ptr<Property>) \
 (shared_ptr<Property>) (intrusive_ptr<as_object>) (GcResource) \
-(rgba) (SWFMatrix) (SWFRect) (LineStyle) (fill_style) (cxform) \
+(rgba) (SWFMatrix) (SWFRect) (LineStyle) (FillStyle) (cxform) \
 (as_value) \
 (DynamicShape)(ShapeRecord)(TextRecord) \
 (Property) (PropertyList) \

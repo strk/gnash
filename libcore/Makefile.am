@@ -124,7 +124,7 @@ libgnashcore_la_SOURCES = \
 	StreamProvider.cpp \
 	Button.cpp \
 	DisplayList.cpp \
-	fill_style.cpp \
+	FillStyle.cpp \
 	Font.cpp \
 	fontlib.cpp \
 	impl.cpp \
@@ -277,7 +277,7 @@ EXTENSIONS_API = \
 	swf/TagLoadersTable.h \
 	swf/SWF.h \
 	MovieFactory.h \
-	fill_style.h \
+	FillStyle.h \
 	LineStyle.h \
 	BitmapInfo.h \
 	RGBA.h	\

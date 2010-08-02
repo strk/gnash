@@ -428,8 +428,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
     in.ensureBytes(2);
     _buttonLayer = in.read_u16();
 
-    // SWFMatrix::read() checks the length of the stream
-    _matrix.read(in);
+    _matrix = readSWFMatrix(in);
 
     if (t == SWF::DEFINEBUTTON2) {
         _cxform.read_rgba(in);

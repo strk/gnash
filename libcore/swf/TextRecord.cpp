@@ -81,8 +81,8 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 
     if (hasColor)
     {
-        if (tag == DEFINETEXT) _color.read_rgb(in);
-        else _color.read_rgba(in);
+        if (tag == DEFINETEXT) _color = readRGB(in);
+        else _color = readRGBA(in);
 
         IF_VERBOSE_PARSE(
             log_parse(_("  hasColor"));

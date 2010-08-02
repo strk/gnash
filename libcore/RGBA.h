@@ -101,17 +101,6 @@ public:
         return toRGB() + (m_a << 24);
     }
 
-    /// Initialize from input stream.
-    //
-    /// @param in   The input SWFStream
-    ///
-    /// @param t    The tag type, used to determine whether to read an RGB
-    ///             or RGBA record.
-    //
-    /// Throw a ParserException if there are not enough bytes in the
-    /// currently opened tag for reading. See SWFStream::ensureBytes()
-    void read(SWFStream& in, SWF::TagType t);
-
     /// Set r, g, b, a values
     void set(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b,
             boost::uint8_t a) {
@@ -126,15 +115,6 @@ public:
 
     /// Neater string output (example: "0,0,0,255")
     std::string toShortString() const;
-
-    /// Initialize from input stream (reads RGBA)
-    //
-    /// Throw a ParserException if there's no enough bytes in the
-    /// currently opened tag for reading. See SWFStream::ensureBytes()
-    void read_rgba(SWFStream& in);
-
-    /// Initialize from intput stream (reads RGB)
-    void read_rgb(SWFStream& in);
 
     friend std::ostream& operator<< (std::ostream& os, const rgba& r);
 
@@ -154,6 +134,15 @@ public:
 };
 
 std::ostream& operator<< (std::ostream& os, const rgba& r);
+
+/// Initialize from input stream (reads RGBA)
+//
+/// Throw a ParserException if there's no enough bytes in the
+/// currently opened tag for reading. See SWFStream::ensureBytes()
+rgba readRGBA(SWFStream& in);
+
+/// Initialize from intput stream (reads RGB)
+rgba readRGB(SWFStream& in);
     
 /// Create an RGBA value from a hex string (e.g. FF0000)
 //
