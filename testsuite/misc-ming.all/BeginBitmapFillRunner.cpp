@@ -97,10 +97,24 @@ main(int /*argc*/, char** /*argv*/)
     // Shape 5
     check_pixel(30, 315, 1, black, 8);
     check_pixel(70, 315, 1, black, 8);
+    check_pixel(140, 315, 1, white, 8);
+    check_pixel(170, 315, 1, black, 8);
     check_pixel(30, 330, 1, lightgreen, 8);
     check_pixel(70, 330, 1, lightgreen, 8);
+    check_pixel(140, 330, 1, white, 8);
+    check_pixel(170, 330, 1, lightgreen, 8);
     check_pixel(30, 345, 1, funnycyan, 8);
     check_pixel(70, 345, 1, funnycyan, 8);
+    check_pixel(140, 345, 1, white, 8);
+    check_pixel(170, 345, 1, funnycyan, 8);
+
+    // Shape 6
+    
+    // Shape 7
+    
+    // Shape 8
+    // This should change with the BitmapData.
+    xcheck_pixel(20, 465, 1, red, 8);
 
 }
 
