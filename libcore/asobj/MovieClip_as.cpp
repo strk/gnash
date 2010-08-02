@@ -2003,22 +2003,7 @@ movieclip_beginBitmapFill(const fn_call& fn)
     if (fn.nargs > 1) {
         as_object* matrix = fn.arg(1).to_object(getGlobal(fn));
         if (matrix) {
-
-            // Convert input matrix to SWFMatrix.
-            const double factor = 65536.0;
-            const double valA = matrix->getMember(NSV::PROP_A).to_number() * factor;
-            const double valB = matrix->getMember(NSV::PROP_B).to_number() * factor;
-            const double valC = matrix->getMember(NSV::PROP_C).to_number() * factor;
-            const double valD = matrix->getMember(NSV::PROP_D).to_number() * factor;
-
-            const boost::int32_t valTX = 
-                matrix->getMember(NSV::PROP_TX).to_number();
-            const boost::int32_t valTY = 
-                    matrix->getMember(NSV::PROP_TY).to_number();
-            
-            SWFMatrix user(valA, valB, valC, valD, valTX, valTY);
-            mat.concatenate(user);
-
+            mat = asToSWFMatrix(*matrix);
         }
     }
 
@@ -2032,7 +2017,9 @@ movieclip_beginBitmapFill(const fn_call& fn)
     // correct place. Maybe it would be better handled somewhere else, as it's
     // not exactly intuitive.
     mat.invert();
-    mat.set_scale(1 / 20., 1 / 20.);
+    mat.concatenate_scale(1 / 20., 1 / 20.);
+    mat.tx /= 20;
+    mat.ty /= 20;
 
     ptr->graphics().beginFill(BitmapFill(t, bi, mat));
 
