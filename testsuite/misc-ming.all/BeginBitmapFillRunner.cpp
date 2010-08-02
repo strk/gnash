@@ -45,6 +45,7 @@ main(int /*argc*/, char** /*argv*/)
     MovieClip* root = tester.getRootMovie();
     assert(root);
 
+    const rgba black(0, 0, 0, 255);
     const rgba white(255, 255, 255, 255);
     const rgba blue(0, 0, 255, 255);
     const rgba cyan(0, 255, 255, 255);
@@ -52,6 +53,8 @@ main(int /*argc*/, char** /*argv*/)
     const rgba yellow(255, 255, 0, 255);
     const rgba magenta(255, 0, 255, 255);
     const rgba red(255, 0, 0, 255);
+    const rgba lightgreen(0xaa, 0xff, 0x00, 0xff);
+    const rgba funnycyan(0x00, 0xcc, 0xff, 0xff);
     
     tester.advance();
     check_pixel(1, 1, 1, white, 8);
@@ -90,6 +93,14 @@ main(int /*argc*/, char** /*argv*/)
     check_pixel(345, 15, 1, white, 8);
     // Cut due to the shape.
     check_pixel(345, 85, 1, blue, 8);
+
+    // Shape 5
+    check_pixel(30, 315, 1, black, 8);
+    check_pixel(70, 315, 1, black, 8);
+    check_pixel(30, 330, 1, lightgreen, 8);
+    check_pixel(70, 330, 1, lightgreen, 8);
+    check_pixel(30, 345, 1, funnycyan, 8);
+    check_pixel(70, 345, 1, funnycyan, 8);
 
 }
 
