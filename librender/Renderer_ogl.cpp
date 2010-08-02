@@ -487,12 +487,10 @@ bool isEven(const size_t& n)
   return n % 2 == 0;
 }
 
-// Use the image class copy constructor; it's not important any more
-// what kind of image it is.
-bitmap_info_ogl::bitmap_info_ogl(GnashImage* image, GLenum pixelformat,
-                                 bool ogl_accessible)
+bitmap_info_ogl::bitmap_info_ogl(std::auto_ptr<GnashImage> image,
+        GLenum pixelformat, bool ogl_accessible)
 :
-  _img(image->clone()),
+  _img(image),
   _pixel_format(pixelformat),
   _ogl_img_type(_img->height() == 1 ? GL_TEXTURE_1D : GL_TEXTURE_2D),
   _ogl_accessible(ogl_accessible),
@@ -723,9 +721,9 @@ public:
       switch (im->type())
       {
           case GNASH_IMAGE_RGB:
-              return new bitmap_info_ogl(im.get(), GL_RGB, ogl_accessible());
+              return new bitmap_info_ogl(im, GL_RGB, ogl_accessible());
           case GNASH_IMAGE_RGBA:
-                return new bitmap_info_ogl(im.get(), GL_RGBA, ogl_accessible());
+                return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
           default:
                 std::abort();
       }

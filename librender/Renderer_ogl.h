@@ -162,7 +162,7 @@ class bitmap_info_ogl : public BitmapInfo
       WRAP_CLAMP
     };
     
-    bitmap_info_ogl(GnashImage* image, GLenum pixelformat,
+    bitmap_info_ogl(std::auto_ptr<GnashImage> image, GLenum pixelformat,
                     bool ogl_accessible);
     ~bitmap_info_ogl();
 

@@ -28,11 +28,12 @@
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
-#include <memory> // for auto_ptr
+#include <memory> 
 
 #include "FileTypes.h"
 #include "log.h"
 #include "dsodefs.h"
+#include "BitmapInfo.h"
 
 
 // Forward declarations
@@ -65,26 +66,11 @@ enum ImageLocation
 /// @todo document layout of the image, like pixel data
 ///       order in the raw array (rows or columns first?)
 ///
-class DSOEXPORT GnashImage
+class DSOEXPORT GnashImage : boost::noncopyable
 {
 public:
 
-    /// Copy an GnashImage.
-    GnashImage(const GnashImage& o) throw (std::bad_alloc)
-        :
-        _type(o._type),
-        _location(o._location),
-        _size(o.size()),
-        _width(o.width()),
-        _height(o.height()),
-        _pitch(o._pitch),
-        _data(new boost::uint8_t[_size])
-    {
-        update(o);
-    }
-    
-    /// \brief Construct an GnashImage from a data buffer,
-    /// taking ownership of the data.
+    /// Construct a GnashImage from a data buffer, taking ownership of the data.
     //
     /// @param data     The raw image data. This class takes ownership.
     /// @param width    The width of the image in pixels.
@@ -189,11 +175,6 @@ public:
 
     virtual ~GnashImage() {}
 
-    /// Clone the GnashImage.
-    //
-    /// @return     A copy of the GnashImage, owned by the caller.
-    virtual std::auto_ptr<GnashImage> clone() = 0;
-
 protected:
 
     const ImageType _type;
@@ -217,8 +198,11 @@ protected:
     /// while for an RGB this is 3 times the _width.
     const size_t _pitch;
 
-    /// Data bytes, geometry defined by members below
+    /// Data if held in this class
     boost::scoped_array<boost::uint8_t> _data;
+
+    /// Data if cached in the renderer
+    boost::shared_ptr<BitmapInfo> _cache;
 
 };
 
@@ -230,22 +214,12 @@ public:
 
     ImageRGB(int width, int height);
 
-    ImageRGB(const ImageRGB& o)
-        :
-        GnashImage(o)
-    {}
-
     ImageRGB(boost::uint8_t* data, int width, int height, int stride)
         :
         GnashImage(data, width, height, stride, GNASH_IMAGE_RGB)
     {}
 
     ~ImageRGB();
-
-    virtual std::auto_ptr<GnashImage> clone()
-    {
-        return std::auto_ptr<GnashImage>(new ImageRGB(*this));
-    };
 
 };
 
@@ -256,11 +230,6 @@ class DSOEXPORT ImageRGBA : public GnashImage
 public:
 
     ImageRGBA(int width, int height);
-
-    ImageRGBA(const ImageRGBA& o)
-        :
-        GnashImage(o)
-    {}
 
     ImageRGBA(boost::uint8_t* data, int width, int height, int stride)
         :
@@ -276,11 +245,6 @@ public:
     void setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
 
     void mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength);
-
-    virtual std::auto_ptr<GnashImage> clone()
-    {
-        return std::auto_ptr<GnashImage>(new ImageRGBA(*this));
-    };
 
 };
 

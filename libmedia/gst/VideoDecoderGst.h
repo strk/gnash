@@ -58,10 +58,6 @@ public:
   {
     return GST_BUFFER_DATA(_buffer);
   }
-  std::auto_ptr<GnashImage> clone() const
-  {
-    return std::auto_ptr<GnashImage>(new ImageRGB(*this));
-  }
 
 private:
   GstBuffer* _buffer;

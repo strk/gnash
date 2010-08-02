@@ -213,6 +213,7 @@ EXTENSIONS_API = \
 	NetworkAdapter.h \
 	NamingPolicy.h \
 	GnashImageJpeg.h \
+	BitmapInfo.h \
 	GnashImage.h \
 	$(NULL)
 
