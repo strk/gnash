@@ -712,12 +712,6 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_kde4=yes
         build_qt4=yes
         build_sdl=yes
-dnl        build_qtopia=yes
-dnl        build_hildon=yes
-dnl        build_alp=yes
-dnl        build_riscos=yes
-dnl        build_aos4=yes
-dnl        build_haiku=yes        
         ;;
       *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump|aos4|haiku)])
          ;;
@@ -748,166 +742,6 @@ operating system." >&3
   fi
 fi
 
-dnl Multiple input devices are supported. These can all work in varying combinations,
-dnl so several may be listed. These are only required when using the Framebuffer,
-dnl as without the X11 desktop, Gnash has to handle all these internally. This can get
-dnl messy, as one might want to use a touchscreen with a normal mouse or keyboard
-dnl attached. 
-
-dnl By default, don't build any of these, as they are only for the Framebuffer
-dnl running without X11.
-if test x"${build_fb}" = xyes; then
-build_ps2mouse=yes
-build_ps2keyboard=no
-build_input_events=yes
-build_tslib=yes
-input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
-else
-build_ps2mouse=no
-build_ps2keyboard=no
-build_input_events=no
-build_tslib=no
-input_events=
-fi
-AC_ARG_ENABLE(input,
-  AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
-  [if test -n ${enableval}; then
-    enableval=`echo ${enableval} | tr '\054' ' ' `
-  fi
-  while test -n "${enableval}" ; do
-    val=`echo ${enableval} | cut -d ' ' -f 1`
-    case "${val}" in
-      ps2m*|PS2m*|m*|M*)        dnl a PS/2 style mouse
-        build_ps2mouse=yes
-        input_events="${input_events}, PS/2 Mouse"
-        ;;
-      ps2k*|PS2K*|k*|K*)        dnl a PS/2 style keyboard
-        build_ps2keyboard=yes
-        input_events="${input_events}, PS/2 Keyboard"
-        ;;
-      i*|I*|ev*|Ev*)    dnl use the new Input Event, which supports both
-        input_events="${input_events}, Input Event Device"
-        build_input_events=yes
-        ;;
-      t*|T*) dnl use a touchscreen with tslib, which works like a mouse
-        build_tslib=yes
-        input_events="${input_events}, Touchscreen"
-        ;;
-      *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
-         ;;
-      esac
-    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
-    if test "x$val" = "x$enableval"; then
-      break;
-    fi
-  done],
-)
-
-if test x"${build_tslib}" = xyes; then
-  AC_DEFINE(USE_TSLIB, [1], [Use a tslib supported touchscreen])
-  GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
-fi
-AM_CONDITIONAL(ENABLE_TSLIB, [test x${ac_cv_header_tslib_h} != xno])
-
-if test x"${build_ps2mouse}" = xyes; then
-  AC_DEFINE(USE_MOUSE_PS2, [1], [Add support for a directly using a PS/2 Mouse])
-fi
-AM_CONDITIONAL(ENABLE_MOUSE, [test x"${build_ps2mouse}" = xyes])
-
-if test x"${build_ps2keyboard}" = xyes; then
-  AC_DEFINE(USE_KEYBOARD_PS2, [1], [Add support for directly using a PS/2 Keyboard])
-fi
-if test x"${build_input_events}" = xyes; then
-  AC_DEFINE(USE_INPUT_EVENTS, [1], [Add support for a directly using Linux Input Event Devices])
-fi
-AM_CONDITIONAL(ENABLE_INPUT_EVENTS, [test x"${build_input_events}" = xyes])
-dnl this is enabled if we have any input devices at all
-AM_CONDITIONAL(ENABLE_INPUT_DEVICES, [test x"${input_events}" != x])
-
-input_events=
-dnl By default, we want to to build all renderers
-build_ovg=no
-build_gles=no
-build_ogl=yes
-build_agg=yes
-build_cairo=yes
-renderer_list="OpenGL AGG Cairo"
-nrender=3
-AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|gles|cairo|agg|all, default=all)]),
-  if test -n ${enableval}; then
-    if test "x${enableval}" != "xno" -o "x${enableval}" != "xnone" ; then
-      renderer_list="none"
-      enableval=`echo ${enableval} | tr '\054' ' ' `
-    else
-      renderer_list=""
-      enableval=""
-    fi
-  fi
-  renderer_list=""
-  nrender=0
-  build_ovg=no
-  build_ogl=no
-  build_gles=no
-  build_agg=no
-  build_cairo=no
-  while test -n "${enableval}" ; do
-    val=`echo ${enableval} | cut -d ' ' -f 1`
-    [case "${val}" in
-      no*|NO*)
-        renderer_list="none"
-        build_ovg=no
-        build_ogl=no
-        build_gles=no
-        build_agg=no
-        build_cairo=no
-        nrender=1
-        ;;
-      all|ALL)
-        renderer_list="OpenGL, Cairo, AGG"
-        build_ogl=yes
-        build_agg=yes
-        build_cairo=yes
-        build_ovg=yes
-        nrender=4
-        ;;
-      ogl|OGL|OpenGL|opengl)
-        renderer_list="${renderer_list} OpenGL"
-        build_gles=no
-        build_ogl=yes
-        nrender=$((nrender+1))
-        ;;
-      gles|GLES|GL-ES|gl-es)
-        renderer_list="${renderer_list} OpenGL-ES"
-        build_gles=yes
-        build_ogl=no
-        nrender=$((nrender+1))
-        ;;
-      ovg|OVG|OpenVG|openvg)
-        renderer_list="${renderer_list} OpenVG"
-        build_ogv=yes
-        nrender=$((nrender+1))
-        ;;
-      agg|AGG)
-        renderer_list="${renderer_list} AGG"
-        build_agg=yes
-        nrender=$((nrender+1))
-        ;;
-      cairo|CAIRO|Cairo*)
-        renderer_list="${renderer_list} Cairo"
-        build_cairo=yes
-        nrender=$((nrender+1))
-        ;;
-      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (ogl|cairo|agg|all)])
-        ;;
-      esac]
-    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
-    if test "x$val" = "x$enableval"; then
-      break;
-    fi
-  done
-)
-
 add_sound=
 build_sound_sdl=no
 build_sound_ahi=no
@@ -937,92 +771,6 @@ AC_ARG_ENABLE(sound,
    fi]
 )
 
-if test x"${build_ogl}" = xyes; then
-dnl  if test x$build_fb = xyes; then
-dnl    AC_MSG_ERROR([OpenGL renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
-dnl  fi
-dnl  if test x$build_fltk = xyes; then
-dnl    AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
-dnl  fi
-dnl  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
-dnl    AC_MSG_ERROR([OpenGL renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
-dnl  fi
-   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
-fi
-
-dnl 16 bit: RGB555, RGB565
-dnl 24 bit: RGB24, BGR24
-dnl 32 bit: RGBA32, BGRA32
-pixelformat=all
-AC_ARG_WITH(pixelformat,
-  AC_HELP_STRING([--with-pixelformat=], [Use the specified pixel format for AGG (default=all)]),
-  [if test -n ${withval}; then
-    pixelformat="${withval}"
-    withval=`echo ${withval} | tr '\054' ' ' `
-  fi
-  while test -n "${withval}" ; do
-    val=`echo ${withval} | cut -d ' ' -f 1`
-    case "${val}" in
-      all)
-        # allow special value "all" set by user (handled below)
-        ;; 
-      argb32|ARGB32)
-        AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32])
-        ;;
-      abgr32|ABGR32)
-        AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32])
-        ;;
-      bgra32|BGRA32)
-        AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
-        ;;
-      bgr24|BGR24)
-        AC_DEFINE(PIXELFORMAT_BGR24, [1], [BGR24])
-        ;;
-      rgba32|RGBA32)
-        AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32])
-        ;;
-      rgb24|RGB24)
-        AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24])
-        ;;
-      rgb555|RGB555)
-        AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555])
-        ;;
-      rgb565|RGB565)
-        AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565])
-        ;;
-      *) AC_MSG_ERROR([invalid pixel format ${withval} given (accept: all|RGB555|RGB565|RGB24|BGR24|BGRA32|RGBA32|ARGB32|ABGR32)])
-         ;;
-      esac
-    withval=`echo ${withval} | cut -d ' ' -f 2-6`
-    if test "x$val" = "x$withval"; then
-      break;
-    fi
-  done],
-  [if test x$build_haiku = xyes -a x$build_sdl != xyes; then
-	AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
-        pixelformat=BGRA32
-   fi]
-)
-
-if test x$pixelformat = xall; then
-  if test x$build_agg = xyes; then
-    ### The fact that we're building GTK doesn't mean we're not also
-    ### building KDE or SDL, each needing its own pixel format !
-    #if test x$build_gtk = xyes; then
-    #  AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
-    #  pixelformat="RGB24"
-    #else
-      AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555 pixel format])
-      AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565 pixel format])
-      AC_DEFINE(PIXELFORMAT_RGB24,  [1], [RGB24 pixel format])
-      AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
-      AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32 pixel format])
-      AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
-      AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32 pixel format])
-      AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32 pixel format])
-    #fi
-  fi
-fi
 
 dnl --------------------------------------------------------
 dnl  Select media handler
@@ -1225,12 +973,6 @@ dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_sha
 
 AC_PATH_PROG(DEJAGNU, runtest)
 
-AM_CONDITIONAL(BUILD_OVG_RENDERER, [ test x$build_ovg = xyes ])
-AM_CONDITIONAL(BUILD_GLES_RENDERER, [ test x$build_gles = xyes ])
-AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes])
-AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
-AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
-
 dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
 dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
 
@@ -1405,11 +1147,6 @@ fi
 SECURITY_LIST="$security_list"
 AC_SUBST(SECURITY_LIST)
 
-
-if test x$build_agg = xyes; then
-  AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
-fi
-
 dnl For Haiku, we know the sysroot is in a non-standard place
 dnl it is important that -lagg comes before -lbe
 if test x"${haiku}" = xyes; then
@@ -1504,6 +1241,382 @@ dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
+
+
+dnl Multiple input devices are supported. These can all work in varying combinations,
+dnl so several may be listed. These are only required when using the Framebuffer,
+dnl as without the X11 desktop, Gnash has to handle all these internally. This can get
+dnl messy, as one might want to use a touchscreen with a normal mouse or keyboard
+dnl attached. 
+
+dnl By default, don't build any of these, as they are only for the Framebuffer
+dnl running without X11.
+if test x"${build_fb}" = xyes; then
+build_ps2mouse=yes
+build_ps2keyboard=no
+build_input_events=yes
+build_tslib=yes
+input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
+else
+build_ps2mouse=no
+build_ps2keyboard=no
+build_input_events=no
+build_tslib=no
+input_events=
+fi
+AC_ARG_ENABLE(input,
+  AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
+  [if test -n ${enableval}; then
+    enableval=`echo ${enableval} | tr '\054' ' ' `
+  fi
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
+    case "${val}" in
+      ps2m*|PS2m*|m*|M*)        dnl a PS/2 style mouse
+        build_ps2mouse=yes
+        input_events="${input_events}, PS/2 Mouse"
+        ;;
+      ps2k*|PS2K*|k*|K*)        dnl a PS/2 style keyboard
+        build_ps2keyboard=yes
+        input_events="${input_events}, PS/2 Keyboard"
+        ;;
+      i*|I*|ev*|Ev*)    dnl use the new Input Event, which supports both
+        input_events="${input_events}, Input Event Device"
+        build_input_events=yes
+        ;;
+      t*|T*) dnl use a touchscreen with tslib, which works like a mouse
+        build_tslib=yes
+        input_events="${input_events}, Touchscreen"
+        ;;
+      *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
+         ;;
+      esac
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$enableval"; then
+      break;
+    fi
+  done],
+)
+
+if test x"${build_tslib}" = xyes; then
+  AC_DEFINE(USE_TSLIB, [1], [Use a tslib supported touchscreen])
+  GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
+fi
+AM_CONDITIONAL(ENABLE_TSLIB, [test x${ac_cv_header_tslib_h} != xno])
+
+if test x"${build_ps2mouse}" = xyes; then
+  AC_DEFINE(USE_MOUSE_PS2, [1], [Add support for a directly using a PS/2 Mouse])
+fi
+AM_CONDITIONAL(ENABLE_MOUSE, [test x"${build_ps2mouse}" = xyes])
+
+if test x"${build_ps2keyboard}" = xyes; then
+  AC_DEFINE(USE_KEYBOARD_PS2, [1], [Add support for directly using a PS/2 Keyboard])
+fi
+if test x"${build_input_events}" = xyes; then
+  AC_DEFINE(USE_INPUT_EVENTS, [1], [Add support for a directly using Linux Input Event Devices])
+fi
+AM_CONDITIONAL(ENABLE_INPUT_EVENTS, [test x"${build_input_events}" = xyes])
+dnl this is enabled if we have any input devices at all
+AM_CONDITIONAL(ENABLE_INPUT_DEVICES, [test x"${input_events}" != x])
+
+dnl -------------------------------
+dnl Renderer Selection
+dnl -------------------------------
+
+input_events=
+dnl By default, we want to to build all renderers
+build_ovg=no
+build_gles=no
+build_ogl=yes
+build_agg=yes
+build_cairo=yes
+renderer_list="OpenGL AGG Cairo"
+nrender=3
+AC_ARG_ENABLE(renderer,
+  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|gles|cairo|agg|all, default=all)]),
+  if test -n ${enableval}; then
+    if test "x${enableval}" != "xno" -o "x${enableval}" != "xnone" ; then
+      renderer_list="none"
+      enableval=`echo ${enableval} | tr '\054' ' ' `
+    else
+      renderer_list=""
+      enableval=""
+    fi
+  fi
+  renderer_list=""
+  nrender=0
+  build_ovg=no
+  build_ogl=no
+  build_gles=no
+  build_agg=no
+  build_cairo=no
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      no*|NO*)
+        renderer_list="none"
+        build_ovg=no
+        build_ogl=no
+        build_gles=no
+        build_agg=no
+        build_cairo=no
+        nrender=1
+        ;;
+      all|ALL)
+        renderer_list="OpenGL, Cairo, AGG"
+        build_ogl=yes
+        build_agg=yes
+        build_cairo=yes
+        build_ovg=yes
+        nrender=4
+        ;;
+      ogl|OGL|OpenGL|opengl)
+        renderer_list="${renderer_list} OpenGL"
+        build_gles=no
+        build_ogl=yes
+        nrender=$((nrender+1))
+        ;;
+      gles|GLES|GL-ES|gl-es)
+        renderer_list="${renderer_list} OpenGL-ES"
+        build_gles=yes
+        build_ogl=no
+        nrender=$((nrender+1))
+        ;;
+      ovg|OVG|OpenVG|openvg)
+        renderer_list="${renderer_list} OpenVG"
+        build_ogv=yes
+        nrender=$((nrender+1))
+        ;;
+      agg|AGG)
+        renderer_list="${renderer_list} AGG"
+        build_agg=yes
+        nrender=$((nrender+1))
+        ;;
+      cairo|CAIRO|Cairo*)
+        renderer_list="${renderer_list} Cairo"
+        build_cairo=yes
+        nrender=$((nrender+1))
+        ;;
+      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (ogl|cairo|agg|all)])
+        ;;
+      esac]
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$enableval"; then
+      break;
+    fi
+  done
+)
+dnl 16 bit: RGB555, RGB565
+dnl 24 bit: RGB24, BGR24
+dnl 32 bit: RGBA32, BGRA32
+pixelformat=all
+AC_ARG_WITH(pixelformat,
+  AC_HELP_STRING([--with-pixelformat=], [Use the specified pixel format for AGG (default=all)]),
+  [if test -n ${withval}; then
+    pixelformat="${withval}"
+    withval=`echo ${withval} | tr '\054' ' ' `
+  fi
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    case "${val}" in
+      all)
+        # allow special value "all" set by user (handled below)
+        ;; 
+      argb32|ARGB32)
+        AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32])
+        ;;
+      abgr32|ABGR32)
+        AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32])
+        ;;
+      bgra32|BGRA32)
+        AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
+        ;;
+      bgr24|BGR24)
+        AC_DEFINE(PIXELFORMAT_BGR24, [1], [BGR24])
+        ;;
+      rgba32|RGBA32)
+        AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32])
+        ;;
+      rgb24|RGB24)
+        AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24])
+        ;;
+      rgb555|RGB555)
+        AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555])
+        ;;
+      rgb565|RGB565)
+        AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565])
+        ;;
+      *) AC_MSG_ERROR([invalid pixel format ${withval} given (accept: all|RGB555|RGB565|RGB24|BGR24|BGRA32|RGBA32|ARGB32|ABGR32)])
+         ;;
+      esac
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$withval"; then
+      break;
+    fi
+  done],
+  [if test x$build_haiku = xyes -a x$build_sdl != xyes; then
+	AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
+        pixelformat=BGRA32
+   fi]
+)
+
+if test x$pixelformat = xall; then
+  if test x$build_agg = xyes; then
+    ### The fact that we're building GTK doesn't mean we're not also
+    ### building KDE or SDL, each needing its own pixel format !
+    #if test x$build_gtk = xyes; then
+    #  AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
+    #  pixelformat="RGB24"
+    #else
+      AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGB24,  [1], [RGB24 pixel format])
+      AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32 pixel format])
+      AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
+      AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32 pixel format])
+      AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32 pixel format])
+    #fi
+  fi
+fi
+
+AM_CONDITIONAL(BUILD_OVG_RENDERER, [ test x$build_ovg = xyes ])
+AM_CONDITIONAL(BUILD_GLES_RENDERER, [ test x$build_gles = xyes ])
+AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes])
+AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
+AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
+
+if test x"${build_ogl}" = xyes; then
+   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
+fi
+
+if test x"$build_agg" = xyes; then
+  AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
+fi
+
+if test x"$build_cairo" = xyes; then
+  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+  AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
+fi
+
+if test x"${build_agg}" = xyes; then
+   GNASH_PATH_AGG
+fi
+
+build_xv=yes
+build_vaapi=yes
+hwaccel_list="VAAPI XVideo"
+nhwaccel=2
+AC_ARG_ENABLE(hwaccel,
+  AC_HELP_STRING([--enable-hwaccel], [Specify which accleration to support to enable (none,vaapi,omap)]),
+  if test -z ${enableval}; then
+      hwaccel_list="none"
+      nhwaccel=1
+      enableval=""
+  fi
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      no*|NO*)
+        hwaccel_list="none"
+        build_vaapi=no
+        build_omap=no
+        dnl build_xv=no
+        nhwaccel=0
+        ;;
+      va*|VA*)
+        hwaccel_list="${hwaccel_list} vaapi"
+        build_vaapi=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      xv*|XV*|Xv*)
+        hwaccel_list="${hwaccel_list} XVideo"
+        dnl build_xv=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      all|ALL)
+        hwaccel_list="XVideo VAAPI OMAP"
+        nhwaccel=3
+        build_omap=yes
+        build_vaapi=yes
+        dnl build_xv=yes
+        ;;
+      omap*|OMAP*)
+        hwaccel_list="${hwaccel_list} omap"
+        build_omap=yes
+        nhwaccel=$((nhwaccel+1))
+        ;;
+      *) AC_MSG_ERROR([invalid hwaccel feature specified: ${enableval} given (accept: none,vaapi,omap)])
+        ;;
+      esac]
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$enableval"; then
+      break;
+    fi
+  done
+)
+
+dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
+dnl restrict using HW Accel to using ffmpeg directly.
+if test x"${build_media_ffmpeg}" = x"no" -a x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg_vaapi}" = x"yes"; then
+  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
+fi
+
+if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
+  use_libva=no
+  use_libva_x11=no
+  use_libva_glx=no
+  dnl if the version of ffmpeg is recent enough, (r20957, 52.45.0), then
+  dnl look for VAAPI support so we can use use the VAAPI enabled ffmpeg.
+  if test x"${have_ffmpeg_vaapi}" = xyes; then
+    use_libva=yes
+    GNASH_PKG_FIND([libva],
+      [va/va.h],
+      [Video Acceleration API],
+      vaInitialize
+    )
+
+    use_libva_x11=yes
+    GNASH_PKG_FIND([libva_x11],
+      [va/va_x11.h],
+      [VA API (X11 display)],
+      vaGetDisplay,
+      [], [-lva-x11]
+    )
+
+    if test x$build_ogl = xyes; then
+      use_libva_glx=yes
+      GNASH_PKG_FIND([libva_glx],
+        [va/va_glx.h],
+        [VA API (GLX display)],
+        vaGetDisplayGLX,
+        [], [-lva-glx]
+      )
+    fi
+  fi
+fi
+
+dnl libVA drivers. We declare conditional for both the option being
+dnl selected, as well as whether or not it's found. This we can
+dnl generate better error handling if it's not found.
+AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
+AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
+
+dnl Only build the vaapi support if we have a version of ffmpeg that
+dnl supports it.
+if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${found_libva_incl}" = xyes; then
+  build_vaapi=yes
+  hwaccel_list="VAAPI XVideo"
+  nhwaccel=2
+else
+  build_vaapi=no
+  hwaccel_list="XVideo"
+  nhwaccel=1
+fi
+
+AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
+AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
+AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
 
 
 dnl Look for python, which is optional. If enabled, a python loadable
@@ -2367,30 +2480,6 @@ if test x"$build_media_ffmpeg" = x"yes"; then
   GNASH_PATH_FFMPEG
 fi
 
-if test x$build_cairo = xyes; then
-    GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
-dnl   if test x"${CAIRO_CFLAGS}" != x; then
-dnl      CAIRO_CFLAGS=`echo ${CAIRO_CFLAGS} | sed -e 's/ *//'`
-dnl      CAIRO_CFLAGS="${CAIRO_CFLAGS} ${CAIRO_CFLAGS}/cairo"
-dnl   fi
-dnl  if test x$build_fb = xyes; then
-dnl    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-dnl  fi
-dnl   if test x$build_sdl = xyes; then
-dnl     AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-dnl   fi
-dnl  if test x$build_fltk = xyes; then
-dnl    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-dnl  fi
-dnl  if test x$build_kde3 = xyes; then
-dnl    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-dnl  fi
-dnl  if test x"${build_dump}" = xyes -o x"${build_haiku}" = xyes; then
-dnl    AC_MSG_ERROR([Cairo renderer is not supported by this gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-dnl  fi
-  AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
-fi
-
 AM_CONDITIONAL(HAVE_CAIRO, [true])
 dnl AM_CONDITIONAL(HAVE_CAIRO, [test x"${has_cairo}" = xyes])
 AM_CONDITIONAL(HAVE_OPENGL, [true])
@@ -2443,125 +2532,6 @@ fi
 
 AM_CONDITIONAL(HAVE_FLTK2, [ test x$has_fltk2 = xyes ])
 AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
-
-if test x"${build_agg}" = xyes; then
-   GNASH_PATH_AGG
-fi
-
-build_xv=yes
-build_vaapi=yes
-hwaccel_list="VAAPI XVideo"
-nhwaccel=2
-AC_ARG_ENABLE(hwaccel,
-  AC_HELP_STRING([--enable-hwaccel], [Specify which accleration to support to enable (none,vaapi,omap)]),
-  if test -z ${enableval}; then
-      hwaccel_list="none"
-      nhwaccel=1
-      enableval=""
-  fi
-  while test -n "${enableval}" ; do
-    val=`echo ${enableval} | cut -d ' ' -f 1`
-    [case "${val}" in
-      no*|NO*)
-        hwaccel_list="none"
-        build_vaapi=no
-        build_omap=no
-        dnl build_xv=no
-        nhwaccel=0
-        ;;
-      va*|VA*)
-        hwaccel_list="${hwaccel_list} vaapi"
-        build_vaapi=yes
-        nhwaccel=$((nhwaccel+1))
-        ;;
-      xv*|XV*|Xv*)
-        hwaccel_list="${hwaccel_list} XVideo"
-        dnl build_xv=yes
-        nhwaccel=$((nhwaccel+1))
-        ;;
-      all|ALL)
-        hwaccel_list="XVideo VAAPI OMAP"
-        nhwaccel=3
-        build_omap=yes
-        build_vaapi=yes
-        dnl build_xv=yes
-        ;;
-      omap*|OMAP*)
-        hwaccel_list="${hwaccel_list} omap"
-        build_omap=yes
-        nhwaccel=$((nhwaccel+1))
-        ;;
-      *) AC_MSG_ERROR([invalid hwaccel feature specified: ${enableval} given (accept: none,vaapi,omap)])
-        ;;
-      esac]
-    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
-    if test "x$val" = "x$enableval"; then
-      break;
-    fi
-  done
-)
-
-dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
-dnl restrict using HW Accel to using ffmpeg directly.
-if test x"${build_media_ffmpeg}" = x"no" -a x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg_vaapi}" = x"yes"; then
-  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
-fi
-
-if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
-  use_libva=no
-  use_libva_x11=no
-  use_libva_glx=no
-  dnl if the version of ffmpeg is recent enough, (r20957, 52.45.0), then
-  dnl look for VAAPI support so we can use use the VAAPI enabled ffmpeg.
-  if test x"${have_ffmpeg_vaapi}" = xyes; then
-    use_libva=yes
-    GNASH_PKG_FIND([libva],
-      [va/va.h],
-      [Video Acceleration API],
-      vaInitialize
-    )
-
-    use_libva_x11=yes
-    GNASH_PKG_FIND([libva_x11],
-      [va/va_x11.h],
-      [VA API (X11 display)],
-      vaGetDisplay,
-      [], [-lva-x11]
-    )
-
-    if test x$build_ogl = xyes; then
-      use_libva_glx=yes
-      GNASH_PKG_FIND([libva_glx],
-        [va/va_glx.h],
-        [VA API (GLX display)],
-        vaGetDisplayGLX,
-        [], [-lva-glx]
-      )
-    fi
-  fi
-fi
-
-dnl libVA drivers. We declare conditional for both the option being
-dnl selected, as well as whether or not it's found. This we can
-dnl generate better error handling if it's not found.
-AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
-AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
-
-dnl Only build the vaapi support if we have a version of ffmpeg that
-dnl supports it.
-if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${found_libva_incl}" = xyes; then
-  build_vaapi=yes
-  hwaccel_list="VAAPI XVideo"
-  nhwaccel=2
-else
-  build_vaapi=no
-  hwaccel_list="XVideo"
-  nhwaccel=1
-fi
-
-AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
-AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
-AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
 
 GNASH_DOCBOOK
 AM_CONDITIONAL(ENABLE_INFO, test x${INSTALL_INFO} != x)
