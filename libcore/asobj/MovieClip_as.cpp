@@ -1826,10 +1826,14 @@ movieclip_beginGradientFill(const fn_call& fn)
 
         // Convert input matrix to SWFMatrix.
         const double factor = 65536.0;
-        const double valA = matrix->getMember(NSV::PROP_A).to_number() * factor;
-        const double valB = matrix->getMember(NSV::PROP_B).to_number() * factor;
-        const double valC = matrix->getMember(NSV::PROP_C).to_number() * factor;
-        const double valD = matrix->getMember(NSV::PROP_D).to_number() * factor;
+        const boost::int32_t valA = truncateWithFactor<65536>(
+                matrix->getMember(NSV::PROP_A).to_number());
+        const boost::int32_t valB = truncateWithFactor<65536>(
+                matrix->getMember(NSV::PROP_B).to_number());
+        const boost::int32_t valC = truncateWithFactor<65536>(
+                matrix->getMember(NSV::PROP_C).to_number());
+        const boost::int32_t valD = truncateWithFactor<65536>(
+                matrix->getMember(NSV::PROP_D).to_number());
 
         const boost::int32_t valTX = pixelsToTwips(
                 matrix->getMember(NSV::PROP_TX).to_number());
