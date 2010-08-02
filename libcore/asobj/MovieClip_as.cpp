@@ -105,6 +105,8 @@ namespace {
     as_value movieclip_loadVariables(const fn_call& fn);
     as_value movieclip_dropTarget(const fn_call& fn);
 
+    SWFMatrix asToSWFMatrix(as_object& o);
+
 }
 
 // extern (used by Global.cpp)
@@ -1794,60 +1796,8 @@ movieclip_beginGradientFill(const fn_call& fn)
         stops = 15;
     }
 
-    SWFMatrix mat;
+    SWFMatrix mat = asToSWFMatrix(*matrix);
 
-    // This is case sensitive.
-    if (matrix->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
-        
-        const double valX = pixelsToTwips(
-                matrix->getMember(NSV::PROP_X).to_number()); 
-        const double valY = pixelsToTwips(
-                matrix->getMember(NSV::PROP_Y).to_number()); 
-        const double valW = pixelsToTwips(
-                matrix->getMember(NSV::PROP_W).to_number()); 
-        const double valH = pixelsToTwips(
-                matrix->getMember(NSV::PROP_H).to_number()); 
-        const double rot = matrix->getMember(NSV::PROP_R).to_number(); 
-
-        const double a = std::cos(rot) * valW * 2;
-        const double b = std::sin(rot) * valH * 2;
-        const double c = -std::sin(rot) * valW * 2;
-        const double d = std::cos(rot) * valH * 2;
-
-        mat.sx = a; 
-        mat.shx = b;
-        mat.shy = c;
-        mat.sy = d; 
-        mat.tx = valX + valW / 2.0;
-        mat.ty = valY + valH / 2.0;
-        
-    }
-    else {
-
-        // Convert input matrix to SWFMatrix.
-        const double factor = 65536.0;
-        const boost::int32_t valA = truncateWithFactor<65536>(
-                matrix->getMember(NSV::PROP_A).to_number());
-        const boost::int32_t valB = truncateWithFactor<65536>(
-                matrix->getMember(NSV::PROP_B).to_number());
-        const boost::int32_t valC = truncateWithFactor<65536>(
-                matrix->getMember(NSV::PROP_C).to_number());
-        const boost::int32_t valD = truncateWithFactor<65536>(
-                matrix->getMember(NSV::PROP_D).to_number());
-
-        const boost::int32_t valTX = pixelsToTwips(
-                matrix->getMember(NSV::PROP_TX).to_number());
-        const boost::int32_t valTY = pixelsToTwips(
-                matrix->getMember(NSV::PROP_TY).to_number());
-
-        mat.sx = valA; 
-        mat.shx = valB;
-        mat.shy = valC;
-        mat.sy = valD; 
-        mat.tx = valTX; 
-        mat.ty = valTY;
-    }
-    
     // ----------------------------
     // Create the gradients vector
     // ----------------------------
@@ -2196,6 +2146,44 @@ movieclip_lockroot(const fn_call& fn)
     
     ptr->setLockRoot(fn.arg(0).to_bool());
     return as_value();
+}
+    
+SWFMatrix
+asToSWFMatrix(as_object& m)
+{
+    // This is case sensitive.
+    if (m.getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
+        
+        const double x = pixelsToTwips(m.getMember(NSV::PROP_X).to_number());
+        const double y = pixelsToTwips(m.getMember(NSV::PROP_Y).to_number());
+        const double w = pixelsToTwips(m.getMember(NSV::PROP_W).to_number());
+        const double h = pixelsToTwips(m.getMember(NSV::PROP_H).to_number()); 
+        const double r = m.getMember(NSV::PROP_R).to_number();
+        const double a = std::cos(r) * w * 2;
+        const double b = std::sin(r) * h * 2;
+        const double c = -std::sin(r) * w * 2;
+        const double d = std::cos(r) * h * 2;
+
+        return SWFMatrix(a, b, c, d, x + w / 2.0, y + h / 2.0);
+        
+    }
+
+    // Convert input matrix to SWFMatrix.
+    const boost::int32_t a = truncateWithFactor<65536>(
+            m.getMember(NSV::PROP_A).to_number());
+    const boost::int32_t b = truncateWithFactor<65536>(
+            m.getMember(NSV::PROP_B).to_number());
+    const boost::int32_t c = truncateWithFactor<65536>(
+            m.getMember(NSV::PROP_C).to_number());
+    const boost::int32_t d = truncateWithFactor<65536>(
+            m.getMember(NSV::PROP_D).to_number());
+
+    const boost::int32_t tx = pixelsToTwips(
+            m.getMember(NSV::PROP_TX).to_number());
+    const boost::int32_t ty = pixelsToTwips(
+            m.getMember(NSV::PROP_TY).to_number());
+    return SWFMatrix(a, b, c, d, tx, ty);
+
 }
 
 } // anonymous namespace 
