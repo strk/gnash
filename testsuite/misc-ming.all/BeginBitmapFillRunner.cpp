@@ -53,11 +53,43 @@ main(int /*argc*/, char** /*argv*/)
     const rgba magenta(255, 0, 255, 255);
     const rgba red(255, 0, 0, 255);
     
-    // Only one frame 
     tester.advance();
     check_pixel(1, 1, 1, white, 8);
 
-    // TODO: add real tests!
+    // Shape 1
+    // Red stripe
+    check_pixel(15, 15, 1, red, 8);
+    check_pixel(15, 85, 1, red, 8);
+    // Green stripe
+    check_pixel(30, 15, 1, green, 8);
+    check_pixel(30, 85, 1, green, 8);
+    // Blue
+    check_pixel(45, 15, 1, blue, 8);
+    check_pixel(45, 85, 1, blue, 8);
+    
+    // Shape 2
+    // Red stripe
+    check_pixel(165, 15, 1, red, 8);
+    check_pixel(165, 85, 1, red, 8);
+    // Green stripe
+    check_pixel(180, 15, 1, green, 8);
+    check_pixel(180, 85, 1, green, 8);
+    // Blue
+    check_pixel(195, 15, 1, blue, 8);
+    // Cut due to the shape.
+    check_pixel(195, 87, 1, white, 8);
+    
+    // Shape 3
+    // Red stripe
+    check_pixel(315, 14, 1, white, 8);
+    check_pixel(315, 85, 1, red, 8);
+    // Green stripe
+    check_pixel(330, 15, 1, white, 8);
+    check_pixel(330, 85, 1, green, 8);
+    // Blue
+    check_pixel(345, 15, 1, white, 8);
+    // Cut due to the shape.
+    check_pixel(345, 85, 1, blue, 8);
 
 }
 
