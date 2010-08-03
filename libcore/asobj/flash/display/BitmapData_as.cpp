@@ -140,7 +140,7 @@ BitmapData_as::updateAttachedBitmaps()
 boost::int32_t
 BitmapData_as::getPixel(int x, int y, bool transparency) const
 {
-    assert(!bitmapData());
+    assert(bitmapData());
 
     // A value of 0, 0 is inside the bitmap.
     if (x < 0 || y < 0) return 0;
@@ -204,6 +204,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     
     argb_iterator e = it + _width * h;
     
+    // TODO: fix!
     while (it < e) {
         // Fill from x for the width of the rectangle.
         std::fill_n(it + x, w, color);
