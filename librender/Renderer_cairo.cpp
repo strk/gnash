@@ -47,6 +47,7 @@
 #include <cmath>
 #include <cairo/cairo.h>
 #include <boost/scoped_array.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
 
 namespace gnash {
@@ -60,25 +61,104 @@ namespace {
 
 namespace {
 
+// Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
+static void
+rgb_to_cairo_rgb24(boost::uint8_t* dst, const GnashImage* im)
+{
+    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
+    for (size_t y = 0;  y < im->height();  y++)
+    {
+        const boost::uint8_t* src = scanline(*im, y);
+        for (size_t x = 0;  x < im->width();  x++, src += 3) {
+            *dst32++ = (src[0] << 16) | (src[1] << 8) | src[2];
+        }
+    }
+}
+
+// Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
+static void
+rgba_to_cairo_argb(boost::uint8_t* dst, const GnashImage* im)
+{
+    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
+    for (size_t y = 0;  y < im->height();  y++)
+    {
+        const boost::uint8_t* src = scanline(*im, y);
+        for (size_t x = 0;  x < im->width();  x++, src += 4)
+        {
+            const boost::uint8_t& r = src[0],
+                                  g = src[1],
+                                  b = src[2],
+                                  a = src[3];
+
+            if (a) {  
+                *dst32++ = (a << 24) | (r << 16) | (g << 8) | b;       
+            } else {
+                *dst32++ = 0;
+            }
+        }
+    }
+}
+
 class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
 {
   public:
     bitmap_info_cairo(boost::uint8_t* data, int width, int height,
                            size_t bpp, cairo_format_t format)
-    : _data(data),
-      _width(width),
-      _height(height),
-      _bytes_per_pixel(bpp),
-      _format(format),
-      _surface(cairo_image_surface_create_for_data(_data.get(),
-               format, width, height, width * bpp)),
-      _pattern(cairo_pattern_create_for_surface (_surface))
+        :
+        _data(data),
+        _width(width),
+        _height(height),
+        _bytes_per_pixel(bpp),
+        _format(format),
+        _surface(cairo_image_surface_create_for_data(_data.get(),
+                 format, width, height, width * bpp)),
+        _pattern(cairo_pattern_create_for_surface (_surface))
     {
       
       assert(cairo_surface_status(_surface) == CAIRO_STATUS_SUCCESS);
       assert(cairo_pattern_status(_pattern) == CAIRO_STATUS_SUCCESS);
     }
     
+    GnashImage& image() {
+        if (_image.get()) return *_image;
+
+        switch (_format) {
+            case CAIRO_FORMAT_RGB24:
+                _image.reset(new ImageRGB(_width, _height));
+                break;
+
+            case CAIRO_FORMAT_ARGB32:
+                _image.reset(new ImageRGBA(_width, _height));
+                break;
+
+            default:
+                std::abort();
+        }
+
+        // We assume that cairo uses machine-endian order, as that's what
+        // the existing conversion functions do.
+        boost::uint32_t* start =
+            reinterpret_cast<boost::uint32_t*>(_data.get());
+        const size_t sz = _width * _height;
+        std::copy(start, start + sz, _image->argb_begin());
+        return *_image;
+    }
+
+    void update() const {
+        if (!_image.get()) return;
+        switch (_format) {
+            case CAIRO_FORMAT_RGB24:
+                rgb_to_cairo_rgb24(_data.get(), _image.get());
+                break;
+            case CAIRO_FORMAT_ARGB32:
+                rgba_to_cairo_argb(_data.get(), _image.get());
+                break;
+            default:
+                break;
+        }
+        _image.reset();
+    }
+
     ~bitmap_info_cairo()
     {
       cairo_surface_destroy(_surface);
@@ -89,6 +169,7 @@ class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
     {
       assert(mat);
       assert(_pattern);
+      update();
       cairo_pattern_set_matrix(_pattern, mat);
       
       cairo_extend_t extend = CAIRO_EXTEND_REPEAT;
@@ -112,6 +193,7 @@ class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
     }
    
   private:
+    mutable boost::scoped_ptr<GnashImage> _image;
     boost::scoped_array<boost::uint8_t> _data;
     int _width;
     int _height;
@@ -203,44 +285,6 @@ private:
     const cxform& _cx;
 };  
 
-}
-
-// Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
-static void
-rgb_to_cairo_rgb24(boost::uint8_t* dst, const GnashImage* im)
-{
-    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
-    for (size_t y = 0;  y < im->height();  y++)
-    {
-        const boost::uint8_t* src = im->scanlinePointer(y);
-        for (size_t x = 0;  x < im->width();  x++, src += 3) {
-            *dst32++ = (src[0] << 16) | (src[1] << 8) | src[2];
-        }
-    }
-}
-
-// Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
-static void
-rgba_to_cairo_argb(boost::uint8_t* dst, const GnashImage* im)
-{
-    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
-    for (size_t y = 0;  y < im->height();  y++)
-    {
-        const boost::uint8_t* src = im->scanlinePointer(y);
-        for (size_t x = 0;  x < im->width();  x++, src += 4)
-        {
-            const boost::uint8_t& r = src[0],
-                                  g = src[1],
-                                  b = src[2],
-                                  a = src[3];
-
-            if (a) {  
-                *dst32++ = (a << 24) | (r << 16) | (g << 8) | b;       
-            } else {
-                *dst32++ = 0;
-            }
-        }
-    }
 }
 
 
