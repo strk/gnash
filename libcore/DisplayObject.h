@@ -633,7 +633,6 @@ public:
     //
     /// notifyEvent(id) will be called by execution of the queued
     /// action
-    ///
     void queueEvent(const event_id& id, int lvl);
 
     /// Return true if an handler for the given event is defined
@@ -643,7 +642,6 @@ public:
     /// this in a non-virtual function. Main use for this method
     /// is for being called by ::unload() to verify an Unload handler
     /// is available.
-    ///
     bool hasEventHandler(const event_id& id) const;
 
 	/// DisplayObjects are not a mouse entity by default.
@@ -658,7 +656,6 @@ public:
     /// point and is not the DisplayObject being dragged or any of its childs.
     //
     /// Point coordinates in global twips.
-    ///
     virtual const DisplayObject* findDropTarget(boost::int32_t x, 
             boost::int32_t y, DisplayObject* dragging) const
     {
@@ -679,9 +676,10 @@ public:
         return _child_invalidated;
     }
 
-    virtual void update() {}
-
-    /// @}
+    /// Notify a change in the DisplayObject's appearance.
+    virtual void update() {
+        set_invalidated();
+    }
 
     /// \brief
     /// This function marks the DisplayObject as being modified in aspect
