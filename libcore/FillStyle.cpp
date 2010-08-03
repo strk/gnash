@@ -171,7 +171,6 @@ BitmapFill::bitmap() const
     
 BitmapFill::~BitmapFill()
 {
-    log_debug("BitmapFill dtor");
 }
     
 void
