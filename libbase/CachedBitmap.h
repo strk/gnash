@@ -35,38 +35,31 @@ class GnashImage;
 class DSOEXPORT CachedBitmap : public ref_counted
 {
 public:
-	CachedBitmap() : _disposed(false) {}
+
+    CachedBitmap() {}
+
+    virtual ~CachedBitmap() {}
 
     /// Return a GnashImage for manipulation.
     //
     /// The changes to the data must be cached before the next rendering.
     virtual GnashImage& image() = 0;
 
-    virtual ~CachedBitmap() {}
-
     /// Free the memory associated with this CachedBitmap.
     //
     /// This allows ActionScript a little bit of control over memory.
-    void dispose() {
-        _disposed = true;
-    }
+    virtual void dispose() = 0;
 
     /// Whether the CachedBitmap has been disposed.
     //
     /// A disposed CachedBitmap has no data and should not be rendered.
-    bool disposed() const {
-        return _disposed;
-    }
+    virtual bool disposed() const = 0;
 
-private:
-
-    bool _disposed;
 };
 	
+} // namespace gnash
 
-}	// namespace gnash
-
-#endif // GNASH_BITMAP_INFO_H
+#endif
 
 
 // Local Variables:

@@ -28,30 +28,39 @@ namespace gnash {
 class agg_bitmap_info : public CachedBitmap
 {
 public:
-
-  agg_bitmap_info(std::auto_ptr<GnashImage> im)
-      :
-      _image(im.release()),
-      _bpp(_image->type() == GNASH_IMAGE_RGB ? 24 : 32)
-  {
-  }
-
-  GnashImage& image() {
-      return *_image;
-  }
- 
-  int get_width() const { return _image->width(); }  
-  int get_height() const { return _image->height();  }  
-  int get_bpp() const { return _bpp; }  
-  int get_rowlen() const { return _image->stride(); }  
-  boost::uint8_t* get_data() const { return _image->begin(); }
   
-private:
+    agg_bitmap_info(std::auto_ptr<GnashImage> im)
+        :
+        _image(im.release()),
+        _bpp(_image->type() == GNASH_IMAGE_RGB ? 24 : 32)
+    {
+    }
+  
+    virtual GnashImage& image() {
+        assert(!disposed());
+        return *_image;
+    }
+  
+    virtual void dispose() {
+        _image.reset();
+    }
 
-  boost::scoped_ptr<GnashImage> _image;
-
-  int _bpp;
+    virtual bool disposed() const {
+        return !_image.get();
+    }
+   
+    int get_width() const { return _image->width(); }  
+    int get_height() const { return _image->height();  }  
+    int get_bpp() const { return _bpp; }  
+    int get_rowlen() const { return _image->stride(); }  
+    boost::uint8_t* get_data() const { return _image->begin(); }
     
+private:
+  
+    boost::scoped_ptr<GnashImage> _image;
+  
+    int _bpp;
+      
 };
 
 

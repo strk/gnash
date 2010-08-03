@@ -118,6 +118,16 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
       assert(cairo_surface_status(_surface) == CAIRO_STATUS_SUCCESS);
       assert(cairo_pattern_status(_pattern) == CAIRO_STATUS_SUCCESS);
     }
+
+    virtual void dispose() {
+        _image.reset();
+        _data.reset();
+    }
+
+    virtual bool disposed() const {
+        return !_data.get();
+    }
+   
     
     GnashImage& image() {
         if (_image.get()) return *_image;
