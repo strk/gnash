@@ -151,36 +151,6 @@ private:
 };
 
 
-class bitmap_info_ogl : public CachedBitmap
-{
-  public:
-  
-    /// Set line and fill styles for mesh & line_strip rendering.
-    enum bitmap_wrap_mode
-    {
-      WRAP_REPEAT,
-      WRAP_CLAMP
-    };
-    
-    bitmap_info_ogl(std::auto_ptr<GnashImage> image, GLenum pixelformat,
-                    bool ogl_accessible);
-    ~bitmap_info_ogl();
-
-    void apply(const gnash::SWFMatrix& bitmap_matrix,
-               bitmap_wrap_mode wrap_mode) const;
-  private:
-    inline bool ogl_accessible() const;
-    void setup() const;    
-    void upload(boost::uint8_t* data, size_t width, size_t height) const;
-    
-    mutable std::auto_ptr<GnashImage> _img;
-    GLenum _pixel_format;
-    GLenum _ogl_img_type;
-    mutable bool _ogl_accessible;  
-    mutable GLuint _texture_id;
-    size_t _orig_width;
-    size_t _orig_height;
-};
 
 
 DSOEXPORT Renderer* create_Renderer_ogl(bool init = true);
@@ -190,5 +160,5 @@ DSOEXPORT Renderer* create_Renderer_ogl(bool init = true);
 } // namespace gnash
 
 
-#endif // __RENDER_HANDLER_OGL_H__
+#endif
 
