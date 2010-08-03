@@ -1987,6 +1987,9 @@ movieclip_beginBitmapFill(const fn_call& fn)
         if (!repeat) t = BitmapFill::CLIPPED;
     }
 
+    BitmapFill::SmoothingPolicy p = BitmapFill::SMOOTHING_OFF;
+    if (fn.nargs > 3 && fn.arg(3).to_bool()) p = BitmapFill::SMOOTHING_ON;
+
     // This is needed to get the bitmap to the right size and have it in the
     // correct place. Maybe it would be better handled somewhere else, as it's
     // not exactly intuitive.
@@ -1995,7 +1998,7 @@ movieclip_beginBitmapFill(const fn_call& fn)
     mat.tx /= 20;
     mat.ty /= 20;
 
-    ptr->graphics().beginFill(BitmapFill(t, bd->bitmapInfo(), mat));
+    ptr->graphics().beginFill(BitmapFill(t, bd->bitmapInfo(), mat, p));
     bd->attach(ptr);
 
     return as_value();

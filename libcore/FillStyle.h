@@ -89,10 +89,11 @@ public:
     /// Construct a BitmapFill from arbitrary bitmap data.
     //
     /// TODO: check the smoothing policy here!
-    BitmapFill(Type t, const CachedBitmap* bi, const SWFMatrix& m)
+    BitmapFill(Type t, const CachedBitmap* bi, const SWFMatrix& m,
+            SmoothingPolicy pol)
         :
         _type(t),
-        _smoothingPolicy(SMOOTHING_UNSPECIFIED),
+        _smoothingPolicy(pol),
         _matrix(m),
         _bitmapInfo(bi),
         _md(0),

@@ -82,8 +82,10 @@ Bitmap::construct(as_object* /*init*/)
     SWFMatrix mat;
     mat.set_scale(1.0 / 20, 1.0 / 20);
 
-    // Can this be tiled?
-    FillStyle fill(BitmapFill(BitmapFill::CLIPPED, bitmap(), mat));
+    // Can this be tiled? And smoothing?
+    FillStyle fill = BitmapFill(BitmapFill::CLIPPED, bitmap(), mat,
+            BitmapFill::SMOOTHING_UNSPECIFIED);
+
     const size_t fillLeft = _shape.addFillStyle(fill);
 
     Path bmpath(w, h, fillLeft, 0, 0, false);
