@@ -145,7 +145,6 @@ Bitmap::update()
         _bitmapData = 0;
         _shape.clear();
     }
-    log_debug("Updated");
 }
 
 }
