@@ -34,11 +34,16 @@ Bitmap::Bitmap(movie_root& mr, as_object* object, BitmapData_as* bd,
     :
     DisplayObject(mr, object, parent),
     _bitmapData(bd),
-    _bitmapInfo(0),
+    _bitmapInfo(bd->bitmapInfo()),
     _width(_bitmapData->getWidth()),
     _height(_bitmapData->getHeight())
 {
-    _shape.setBounds(SWFRect(0, 0, pixelsToTwips(_width), pixelsToTwips(_height)));
+    _shape.setBounds(SWFRect(0, 0,
+                pixelsToTwips(_width), pixelsToTwips(_height)));
+    assert(bd);
+    assert(bd->bitmapInfo());
+    set_invalidated();
+    makeBitmapShape();
 }
 
 Bitmap::Bitmap(movie_root& mr, as_object* object,
@@ -62,14 +67,13 @@ const BitmapInfo*
 Bitmap::bitmap() const
 {
     if (_def) return _def->bitmap();
-    return _bitmapInfo.get();
+    return _bitmapData->bitmapInfo();
 }
 
 void
 Bitmap::construct(as_object* /*init*/)
 {
-    if (_bitmapData) _bitmapData->registerBitmap(this);
-    update();
+    if (_bitmapData) _bitmapData->attach(this);
 }
 
 bool
@@ -83,6 +87,8 @@ Bitmap::display(Renderer& renderer)
 {
     /// Don't display cleared Bitmaps.
     if (!_def && !_bitmapData) return;
+
+    checkBitmapData();
 
     _shape.display(renderer, *this);
     clear_invalidated();
@@ -108,45 +114,15 @@ Bitmap::getBounds() const
 }
 
 void
-Bitmap::makeBitmap()
-{
-
-    const BitmapData_as::BitmapArray& data = _bitmapData->getBitmapData();
-
-    std::auto_ptr<GnashImage> im(new ImageRGBA(_width, _height)); 
-
-    for (size_t i = 0; i < _height; ++i) {
-
-        boost::uint8_t* row = im->scanline(i);
-
-        for (size_t j = 0; j < _width; ++j) {
-            const BitmapData_as::BitmapArray::value_type pixel =
-                data[i * _width + j];
-            row[j * 4] = (pixel & 0x00ff0000) >> 16;
-            row[j * 4 + 1] = (pixel & 0x0000ff00) >> 8;
-            row[j * 4 + 2] = (pixel & 0x000000ff);
-            row[j * 4 + 3] = (pixel & 0xff000000) >> 24;
-        }
-    }
-
-    Renderer* renderer = stage().runResources().renderer();
-    if (renderer) _bitmapInfo = renderer->createBitmapInfo(im);
-
-}
-
-
-void
 Bitmap::checkBitmapData()
 {
 
     /// Nothing to do for disposed bitmaps.
     if (_def && !_bitmapData) return;
 
-    const BitmapData_as::BitmapArray& data = _bitmapData->getBitmapData();
-
     /// In this case, dispose() was called. It seems like a good idea to
     /// set _bitmapData to 0 to avoid any further interaction.
-    if (data.empty()) {
+    if (!_bitmapData->bitmapInfo()) {
         _bitmapData = 0;
         _shape.clear();
         return;
@@ -158,8 +134,6 @@ Bitmap::makeBitmapShape()
 {
 
     if (!_def && !_bitmapData) return;
-
-    if (_bitmapData) makeBitmap();
 
     // Width and height are a maximum of 2880, so there is no risk of 
     // overflow 
@@ -183,14 +157,6 @@ Bitmap::makeBitmapShape()
 
     _shape.finalize();
 
-}
-
-void
-Bitmap::update()
-{
-    set_invalidated();
-    checkBitmapData();
-    makeBitmapShape();
 }
 
 }

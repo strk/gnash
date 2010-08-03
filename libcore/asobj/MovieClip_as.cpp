@@ -1972,32 +1972,6 @@ movieclip_beginBitmapFill(const fn_call& fn)
         return as_value();
     }
     
-    const size_t width = bd->getWidth();
-    const size_t height = bd->getHeight();
-    const BitmapData_as::BitmapArray& data = bd->getBitmapData();
-    
-    std::auto_ptr<GnashImage> im(new ImageRGBA(width, height)); 
-    log_debug("Width: %s, height %s", width, height);
-
-    for (size_t i = 0; i < height; ++i) {
-
-        boost::uint8_t* row = im->scanline(i);
-
-        for (size_t j = 0; j < width; ++j) {
-            const BitmapData_as::BitmapArray::value_type pixel =
-                data[i * width + j];
-            row[j * 4] = (pixel & 0x00ff0000) >> 16;
-            row[j * 4 + 1] = (pixel & 0x0000ff00) >> 8;
-            row[j * 4 + 2] = (pixel & 0x000000ff);
-            row[j * 4 + 3] = (pixel & 0xff000000) >> 24;
-        }
-    }
-
-    Renderer* renderer = getRunResources(*obj).renderer();
-    if (!renderer) return as_value();
-
-    BitmapInfo* bi = renderer->createBitmapInfo(im);
-    
     SWFMatrix mat;
 
     if (fn.nargs > 1) {
@@ -2021,7 +1995,8 @@ movieclip_beginBitmapFill(const fn_call& fn)
     mat.tx /= 20;
     mat.ty /= 20;
 
-    ptr->graphics().beginFill(BitmapFill(t, bi, mat));
+    ptr->graphics().beginFill(BitmapFill(t, bd->bitmapInfo(), mat));
+    bd->attach(ptr);
 
     return as_value();
 }

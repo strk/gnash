@@ -62,6 +62,89 @@ enum ImageLocation
     GNASH_IMAGE_GPU
 };
 
+class RGBAOutput
+{
+public:
+
+    RGBAOutput(boost::uint8_t* i, size_t c) : _it(i), _c(c) {}
+    
+    /// Writes a 32-bit unsigned value in ARGB byte order to the image
+    //
+    /// Take note of the different byte order!
+    RGBAOutput& operator=(boost::uint32_t pixel) {
+        switch (_c) {
+            case 4:
+                // alpha
+                *(_it + 3) = (pixel & 0xff000000) >> 24;
+            case 3:
+                *_it = (pixel & 0x00ff0000) >> 16;
+                *(_it + 1) = (pixel & 0x0000ff00) >> 8;
+                *(_it + 2) = (pixel & 0x000000ff);
+            default:
+                break;
+        }
+        return *this;
+    }
+
+private:
+    boost::uint8_t* _it;
+    size_t _c;
+};
+
+struct argb_iterator :
+    public boost::iterator_facade<argb_iterator,
+                                  boost::uint32_t,
+                                  std::random_access_iterator_tag,
+                                  RGBAOutput>
+{
+    argb_iterator(boost::uint8_t* it, size_t c)
+        :
+        _it(it),
+        _c(c)
+    {}
+ 
+    boost::uint32_t toARGB() const {
+        boost::uint32_t ret = 0;
+        switch (_c) {
+            case 4:
+                // alpha
+                ret |= *(_it + 3) << 24;
+            case 3:
+                ret |= (*_it << 16 | (*_it + 1) << 8 | *(_it + 2));
+            default:
+                break;
+        }
+        return ret;
+    }
+
+private:
+
+    friend class boost::iterator_core_access;
+
+    RGBAOutput dereference() const {
+        return RGBAOutput(_it, _c);
+    }
+
+    void increment() {
+        _it += _c;
+    }
+
+    bool equal(const argb_iterator& o) const {
+        return o._it == _it;
+    }
+
+    difference_type distance_to(const argb_iterator& o) const {
+        return (o._it - _it) / _c;
+    }
+
+    void advance(difference_type n) {
+        _it += n * _c;
+    }
+
+
+    boost::uint8_t* _it;
+    size_t _c;
+};
 
 /// Base class for different types of bitmaps
 //
@@ -192,8 +275,20 @@ public:
         return data();
     }
 
+    iterator end() {
+        return data() + size();
+    }
+
     const_iterator end() const {
         return data() + size();
+    }
+
+    argb_iterator abegin() {
+        return argb_iterator(begin(), pixelSize());
+    }
+    
+    argb_iterator aend() {
+        return argb_iterator(end(), pixelSize());
     }
 
     /// Get a pointer to a given row
@@ -407,81 +502,6 @@ protected:
 
 };
 
-class RGBAOutput
-{
-public:
-    RGBAOutput(GnashImage::iterator i, size_t c) : _it(i), _c(c) {}
-    
-    /// Writes a 32-bit unsigned value in ARGB byte order to the image
-    //
-    /// Take note of the different byte order!
-    RGBAOutput& operator=(boost::uint32_t pixel) {
-        switch (_c) {
-            case 4:
-                // alpha
-                *(_it + 3) = (pixel & 0xff000000) >> 24;
-            case 3:
-                *_it = (pixel & 0x00ff0000) >> 16;
-                *(_it + 1) = (pixel & 0x0000ff00) >> 8;
-                *(_it + 2) = (pixel & 0x000000ff);
-            default:
-                break;
-        }
-        return *this;
-    }
-
-private:
-    GnashImage::iterator _it;
-    size_t _c;
-};
-
-struct argb_iterator :
-    public boost::iterator_facade<argb_iterator,
-                                  boost::uint32_t,
-                                  std::output_iterator_tag,
-                                  RGBAOutput>
-{
-    explicit argb_iterator(GnashImage& im)
-        :
-        _im(&im),
-        _it(_im->begin()),
-        _c(_im->pixelSize())
-    {}
-    
-    argb_iterator()
-        :
-        _im(0),
-        _it(0),
-        _c(0)
-    {}
-
-private:
-
-    friend class boost::iterator_core_access;
-
-    RGBAOutput dereference() const {
-        return RGBAOutput(_it, _c);
-    }
-
-    void increment() {
-        if (!_im) return;
-        _it += _c;
-        if (_it == _im->end()) {
-            _im = 0;
-        }
-    }
-
-    bool equal(argb_iterator& o) const {
-        if (!_im) {
-            return !o._im;
-        }
-        return (o._im && o._it == _it);
-    }
-
-    GnashImage* _im;
-    GnashImage::iterator _it;
-    size_t _c;
-};
 
 } // namespace gnash
 

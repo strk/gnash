@@ -86,9 +86,6 @@ private:
     /// It comes either from the definition or the BitmapData_as.
     const BitmapInfo* bitmap() const;
 
-    /// This updates _bitmapInfo from the BitmapData_as
-    void makeBitmap();
-
     /// Checks whether an attached BitmapData_as is disposed.
     //
     /// If the BitmapData_as has been disposed, deletes _bitmapData.
@@ -106,7 +103,7 @@ private:
     BitmapData_as* _bitmapData;
 
     /// The current bitmap information is stored here.
-    boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
+    boost::intrusive_ptr<const BitmapInfo> _bitmapInfo;
 
     /// A shape to hold the bitmap fill.
     DynamicShape _shape;

@@ -19,10 +19,14 @@
 //
 
 #include "BitmapData_as.h"
+
+#include <vector>
+#include <sstream>
+#include <algorithm>
+
 #include "MovieClip.h"
 #include "GnashImage.h"
-#include "Bitmap.h"
-#include "flash/geom/Rectangle_as.h" // for BitmapData.rectangle
+#include "DisplayObject.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -31,11 +35,9 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "VM.h" // for addStatics
-
+#include "Renderer.h"
+#include "RunResources.h"
 #include "namedStrings.h"
-#include <vector>
-#include <sstream>
-#include <algorithm>
 
 namespace gnash {
 
@@ -79,53 +81,66 @@ namespace {
 
 
 BitmapData_as::BitmapData_as(as_object* owner, size_t width, size_t height,
-              bool transparent, boost::uint32_t fillColor)
+              bool transparent, boost::uint32_t fillColor, Renderer& r)
     :
     _owner(owner),
     _width(width),
     _height(height),
     _transparent(transparent),
-    _bitmapData(width * height, fillColor + (0xff << 24))
+    _bitmapData(0)
 {
+    std::auto_ptr<GnashImage> im(transparent ?
+                static_cast<GnashImage*>(new ImageRGBA(width, height)) :
+                static_cast<GnashImage*>(new ImageRGB(width, height)));
+    
+    std::fill(im->abegin(), im->aend(), fillColor | (0xff << 24));
+
+    _bitmapData.reset(r.createBitmapInfo(im));
 }
 
 void
 BitmapData_as::setReachable() 
 {
-    std::for_each(_attachedBitmaps.begin(), _attachedBitmaps.end(),
+    std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
             std::mem_fun(&DisplayObject::setReachable));
     _owner->setReachable();
 }
 
+void
+BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color)
+{
+    assert(bitmapData());
+    argb_iterator it = _bitmapData->image().abegin();
+    std::advance(it, x * _width + y);
+    *it = color;
+}
+
+void
+BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color)
+{
+    assert(bitmapData());
+    argb_iterator it = _bitmapData->image().abegin() + x * _width + y;
+
+    const boost::uint32_t val = it.toARGB();
+    
+    *it = color | (val & 0xff000000);
+}
 
 /// This function should write RGBA data to the _bitmapData array.
 //
 /// TODO: it needs to know what to do about transparency.
 void
-BitmapData_as::update(const boost::uint8_t* data)
-{
-    for (size_t i = 0; i < _width * _height; ++i) {
-        boost::uint32_t pixel = (*(data++) << 16);
-        pixel |= (*(data++) << 8);
-        pixel |= (*(data++));
-        pixel |= (0xff << 24);
-        _bitmapData[i] = pixel;
-    }
-}
-   
-
-void
 BitmapData_as::updateAttachedBitmaps()
 {
-    log_debug("Updating %d attached bitmaps", _attachedBitmaps.size());
-    std::for_each(_attachedBitmaps.begin(), _attachedBitmaps.end(),
-            std::mem_fun(&Bitmap::update));
+    log_debug("Updating %d attached bitmaps", _attachedObjects.size());
+    std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
+            std::mem_fun(&DisplayObject::set_invalidated));
 }
 
 boost::int32_t
 BitmapData_as::getPixel(int x, int y, bool transparency) const
 {
-    assert(!_bitmapData.empty());
+    assert(!bitmapData());
 
     // A value of 0, 0 is inside the bitmap.
     if (x < 0 || y < 0) return 0;
@@ -137,12 +152,12 @@ BitmapData_as::getPixel(int x, int y, bool transparency) const
 
     const size_t pixelIndex = y * _width + x;
 
-    assert ( pixelIndex < _bitmapData.size());
+    assert (pixelIndex < bitmapData()->size());
     
-    const boost::uint32_t pixel = _bitmapData[pixelIndex];
+    const boost::uint32_t pixel = 
+        (_bitmapData->image().abegin() + pixelIndex).toARGB();
     
-    if (transparency)
-    {
+    if (transparency) {
         return static_cast<boost::int32_t>(pixel);
     }
     
@@ -156,7 +171,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 {
 
     // This also catches disposed BitmapDatas.
-    assert(_bitmapData.size() == _width * _height);
+    //assert(bitmapData()->size() == _width * _height);
 
     if (w < 0 || h < 0) return;
 
@@ -185,16 +200,11 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     w = std::min<size_t>(_width - x, w);
     h = std::min<size_t>(_height - y, h);
     
-    BitmapArray::iterator it = _bitmapData.begin() + y * _width;
+    argb_iterator it = _bitmapData->image().abegin() + y * _width;
     
-    // This cannot be past .end() because h + y is no larger than the
-    // height of the image.
-    const BitmapArray::iterator e = it + _width * h;
+    argb_iterator e = it + _width * h;
     
-    // Make colour non-transparent if the image doesn't support it.
-    if (!_transparent) color |= 0xff000000;
-    
-    while (it != e) {
+    while (it < e) {
         // Fill from x for the width of the rectangle.
         std::fill_n(it + x, w, color);
         // Move to the next line
@@ -208,7 +218,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 void
 BitmapData_as::dispose()
 {
-    _bitmapData.clear();
+    _bitmapData.reset();
     updateAttachedBitmaps();
 }
 
@@ -317,7 +327,7 @@ bitmapdata_draw(const fn_call& fn)
         return as_value();
     }
 
-    ptr->update(im->data());
+    //ptr->update(im->data());
 
 	return as_value();
 }
@@ -709,7 +719,8 @@ bitmapdata_ctor(const fn_call& fn)
     }
 
     ptr->setRelay(
-            new BitmapData_as(ptr, width, height, transparent, fillColor));
+            new BitmapData_as(ptr, width, height, transparent, fillColor,
+                *getRunResources(*ptr).renderer()));
 
 	return as_value(); 
 }
