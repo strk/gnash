@@ -196,6 +196,7 @@ main(int argc, char** argv)
             "b.fillRect(new flash.geom.Rectangle(0, 0, 20, 20), 0xff0000);"
             );
 
+    add_actions(mo, "stop();");
     SWFMovie_nextFrame(mo);
 
     //Output movie
