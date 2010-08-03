@@ -29,6 +29,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <cassert>
 #include "GnashImage.h"
+#include "smart_ptr.h"
 #include <boost/intrusive_ptr.hpp>
 
 namespace gnash {
@@ -42,54 +43,59 @@ namespace gnash {
 
 /// Implements the BitmapData native type.
 //
-/// This holds a vector of bitmap data. The vector's size does not change
-/// from construction until disposal. Disposal is signified by the clearing
-/// of the vector. All callers should check whether the BitmapData has been
-/// disposed before attempting to access any stored pixel data.
+/// All functions can be called if the BitmapData has been disposed. Callers
+/// do not need to check.
 class BitmapData_as : public Relay
 {
 
 public:
 
-    // The constructor sets the fill colour and the
-    // immutable size of the bitmap, as well as whether
-    // it can handle transparency or not.
+    /// Construct a BitmapData.
+    //
+    /// The constructor sets the fill colour and the immutable size of the
+    /// bitmap, as well as whether it can handle transparency or not.
 	BitmapData_as(as_object* owner, size_t width, size_t height,
 	              bool transparent, boost::uint32_t fillColor,
                   Renderer* r);
 
-    size_t getWidth() const { return _width; }
-    size_t getHeight() const { return _height; }
-    bool isTransparent() const { return _transparent; }
- 
+    ~BitmapData_as();
+
+    /// Return the width of the image
+    size_t width() const {
+        return data() ? data()->width() : 0;
+    }
+    
+    /// Return the height of the image
+    //
+    /// The unusual int type for a size is there to mirror the AS interface.
+    size_t height() const {
+        return data() ? data()->height() : 0;
+    }
+
+    bool transparent() const {
+        return _transparent;
+    }
+
     const BitmapInfo* bitmapInfo() const {
         return _bitmapData.get();
     }
 
     /// Set a specified pixel to the specified color.
     //
-    /// Callers must make sure the pixel is in range and that the
-    /// BitmapData has not been disposed. Retains transparency
-    /// (which is opaque, for non-transparent BitmapData objects).
+    /// Retains transparency value for BitmapDatas with transparency.
     void setPixel(size_t x, size_t y, boost::uint32_t color);
 
     /// Set a specified pixel to the specified color.
-    //
-    /// Callers must make sure the pixel is in range and that the BitmapData
-    /// has not been disposed. Set to opaque for non-transparent BitmapData
-    /// objects
     void setPixel32(size_t x, size_t y, boost::uint32_t color);
 
     /// Returns the value of the pixel at (x, y) optionally with transparency.
     //
-    /// Callers must make that dispose() has not been called.
-    /// Returns 0 if the pixel is out of range.
-    boost::int32_t getPixel(int x, int y, bool transparency) const;
+    /// Returns 0 if the pixel is out of range or the image has been disposed.
+    boost::uint32_t getPixel(size_t x, size_t y) const;
 
     /// Fill the bitmap with a colour starting at x, y
     //
-    /// Callers must check that arguments are within the BitmapData's range
-    /// and that dispose() has not been called.
+    /// Negative values are handled correctly.
     void fillRect(int x, int y, int w, int h, boost::uint32_t color);
     
     // Free the bitmap data (clear the array)
@@ -101,24 +107,23 @@ public:
 
     /// Overrides Relay::setReachable().
     virtual void setReachable();
+
+    /// Whether the BitmapData has been disposed.
+    bool disposed() const {
+        return !data();
+    }
+
+private:
     
     GnashImage* data() const {
         return _bitmapData.get() ? &_bitmapData->image() : _image.get();
     }
-
-private:
 
     void updateAttachedBitmaps();
 
     /// The object to which this native type class belongs to.
     as_object* _owner;
 
-    // The width of the image, max 2880. This is immutable.
-    const size_t _width;
-    
-    // The height of the image, max 2880. This is immutable.
-    const size_t _height;
-    
     // Whether the image is transparent. This is immutable.
     const bool _transparent;
 
@@ -129,13 +134,6 @@ private:
     std::list<DisplayObject*> _attachedObjects;
 
 };
-
-inline bool
-disposed(const BitmapData_as& bm)
-{
-    return !bm.data();
-}
-
 
 /// Initialize the global BitmapData class
 void bitmapdata_class_init(as_object& where, const ObjectURI& uri);

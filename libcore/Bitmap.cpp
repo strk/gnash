@@ -34,12 +34,13 @@ Bitmap::Bitmap(movie_root& mr, as_object* object, BitmapData_as* bd,
     :
     DisplayObject(mr, object, parent),
     _bitmapData(bd),
-    _width(_bitmapData->getWidth()),
-    _height(_bitmapData->getHeight())
+    _width(_bitmapData->width()),
+    _height(_bitmapData->height())
 {
     _shape.setBounds(SWFRect(0, 0,
                 pixelsToTwips(_width), pixelsToTwips(_height)));
     assert(bd);
+    assert(!bd->disposed());
 }
 
 Bitmap::Bitmap(movie_root& mr, as_object* object,
@@ -109,8 +110,6 @@ Bitmap::display(Renderer& renderer)
     /// Don't display cleared Bitmaps.
     if (!_def && !_bitmapData) return;
 
-    checkBitmapData();
-
     _shape.display(renderer, *this);
     clear_invalidated();
 }
@@ -135,18 +134,18 @@ Bitmap::getBounds() const
 }
 
 void
-Bitmap::checkBitmapData()
+Bitmap::update()
 {
     /// Nothing to do for disposed bitmaps.
     if (!_bitmapData) return;
+    
+    set_invalidated();
 
-    /// In this case, dispose() was called. It seems like a good idea to
-    /// set _bitmapData to 0 to avoid any further interaction.
-    if (disposed(*_bitmapData)) {
+    if (_bitmapData->disposed()) {
         _bitmapData = 0;
         _shape.clear();
-        return;
     }
+    log_debug("Updated");
 }
 
 }

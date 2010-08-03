@@ -166,6 +166,11 @@ BitmapFill::bitmap() const
     return _bitmapInfo.get();
 }
     
+BitmapFill::~BitmapFill()
+{
+    log_debug("BitmapFill dtor");
+}
+    
 void
 GradientFill::setLerp(const GradientFill& a, const GradientFill& b,
         double ratio)

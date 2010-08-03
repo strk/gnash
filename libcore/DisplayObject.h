@@ -679,6 +679,8 @@ public:
         return _child_invalidated;
     }
 
+    virtual void update() {}
+
     /// @}
 
     /// \brief

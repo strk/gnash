@@ -61,7 +61,7 @@ public:
     //
     /// For non-dynamic bitmaps, this should only be called once (for
     /// efficiency - there are no harmful side-effects)
-    void update();
+    virtual void update();
 
     virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 

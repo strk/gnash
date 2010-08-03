@@ -1964,10 +1964,10 @@ movieclip_beginBitmapFill(const fn_call& fn)
     as_object* obj = fn.arg(0).to_object(getGlobal(fn));
     BitmapData_as* bd;
 
-    if (!isNativeType(obj, bd)) {
+    if (!isNativeType(obj, bd) || bd->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_debug("MovieClip.attachBitmap: first argument should be a "
-                "BitmapData", fn.arg(1));
+                "valid BitmapData", fn.arg(1));
         );
         return as_value();
     }
@@ -2039,10 +2039,10 @@ movieclip_attachBitmap(const fn_call& fn)
     as_object* obj = fn.arg(0).to_object(getGlobal(fn));
     BitmapData_as* bd;
 
-    if (!isNativeType(obj, bd)) {
+    if (!isNativeType(obj, bd) || bd->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_debug("MovieClip.attachBitmap: first argument should be a "
-                "BitmapData", fn.arg(1));
+                "valid BitmapData", fn.arg(1));
         );
         return as_value();
     }

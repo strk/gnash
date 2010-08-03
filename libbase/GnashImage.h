@@ -104,13 +104,13 @@ struct argb_iterator :
     {}
  
     boost::uint32_t toARGB() const {
-        boost::uint32_t ret = 0;
+        boost::uint32_t ret = 0xff000000;
         switch (_c) {
             case 4:
                 // alpha
-                ret |= *(_it + 3) << 24;
+                ret = *(_it + 3) << 24;
             case 3:
-                ret |= (*_it << 16 | (*_it + 1) << 8 | *(_it + 2));
+                ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
             default:
                 break;
         }

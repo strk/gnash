@@ -118,6 +118,8 @@ public:
         _id(other._id)
     {}
 
+    ~BitmapFill();
+
     /// Set this fill to a lerp of two other BitmapFills.
     void setLerp(const BitmapFill& a, const BitmapFill& b, double ratio);
 

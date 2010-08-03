@@ -19,21 +19,19 @@
 #ifndef BACKEND_RENDER_HANDLER_AGG_BITMAP_H
 #define BACKEND_RENDER_HANDLER_AGG_BITMAP_H
 
+#include <boost/scoped_ptr.hpp>
+
 // This include file used only to make Renderer_agg more readable.
 
 namespace gnash {
 
-/// The class itself uses a template. Currently this is unnecessary and it may
-/// be removed but an older implementation required this method and it may be
-/// necessary again when the last missing parts of the renderer will be
-/// implemented. And when might that be? I don't think I'll wait.
 class agg_bitmap_info : public BitmapInfo
 {
 public:
 
   agg_bitmap_info(std::auto_ptr<GnashImage> im)
       :
-      _image(im),
+      _image(im.release()),
       _bpp(_image->type() == GNASH_IMAGE_RGB ? 24 : 32)
   {
   }
@@ -50,7 +48,7 @@ public:
   
 private:
 
-  std::auto_ptr<GnashImage> _image;
+  boost::scoped_ptr<GnashImage> _image;
 
   int _bpp;
     
