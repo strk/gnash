@@ -52,7 +52,7 @@
 
 #include "Renderer.h"
 #include "Geometry.h"
-#include "BitmapInfo.h"
+#include "CachedBitmap.h"
 
 #include <map>
 
@@ -151,7 +151,7 @@ private:
 };
 
 
-class bitmap_info_ogl : public BitmapInfo
+class bitmap_info_ogl : public CachedBitmap
 {
   public:
   

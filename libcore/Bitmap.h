@@ -26,7 +26,7 @@
 #include "DynamicShape.h"
 
 namespace gnash {
-    class BitmapInfo;
+    class CachedBitmap;
 }
 
 
@@ -87,7 +87,7 @@ private:
     /// Return the bitmap used for this Bitmap DisplayObject.
     //
     /// It comes either from the definition or the BitmapData_as.
-    const BitmapInfo* bitmap() const;
+    const CachedBitmap* bitmap() const;
 
     /// Checks whether an attached BitmapData_as is disposed.
     //

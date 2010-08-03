@@ -256,10 +256,10 @@ public:
     Font* get_font(const std::string& name, bool bold, bool italic) const;
 
     // See dox in movie_definition.h
-    BitmapInfo* getBitmap(int DisplayObject_id) const;
+    CachedBitmap* getBitmap(int DisplayObject_id) const;
 
     // See dox in movie_definition.h
-    void addBitmap(int DisplayObject_id, boost::intrusive_ptr<BitmapInfo> im);
+    void addBitmap(int DisplayObject_id, boost::intrusive_ptr<CachedBitmap> im);
 
     // See dox in movie_definition.h
     sound_sample* get_sound_sample(int DisplayObject_id) const;
@@ -425,7 +425,7 @@ private:
     typedef std::map<int, boost::intrusive_ptr<Font> > FontMap;
     FontMap m_fonts;
 
-    typedef std::map<int, boost::intrusive_ptr<BitmapInfo> > Bitmaps;
+    typedef std::map<int, boost::intrusive_ptr<CachedBitmap> > Bitmaps;
     Bitmaps _bitmaps;
 
     typedef std::map<int, boost::intrusive_ptr<sound_sample> > SoundSampleMap;

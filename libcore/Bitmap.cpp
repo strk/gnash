@@ -59,7 +59,7 @@ Bitmap::~Bitmap()
 {
 }
 
-const BitmapInfo*
+const CachedBitmap*
 Bitmap::bitmap() const
 {
     if (_def) return _def->bitmap();

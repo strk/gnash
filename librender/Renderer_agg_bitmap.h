@@ -25,7 +25,7 @@
 
 namespace gnash {
 
-class agg_bitmap_info : public BitmapInfo
+class agg_bitmap_info : public CachedBitmap
 {
 public:
 

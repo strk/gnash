@@ -155,7 +155,7 @@ BitmapFill::BitmapFill(SWF::FillType t, movie_definition* md,
     }
 }
 
-const BitmapInfo*
+const CachedBitmap*
 BitmapFill::bitmap() const
 {
     if (_bitmapInfo) {

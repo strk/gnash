@@ -50,7 +50,7 @@ namespace gnash {
     class GradientRecord;
     class TextField;
     class BitmapData_as;
-    class BitmapInfo;
+    class CachedBitmap;
     class GnashImage;
     namespace SWF {
         class PlaceObject2Tag;

@@ -30,7 +30,7 @@
 #include <memory>
 
 #include "Relay.h"
-#include "BitmapInfo.h"
+#include "CachedBitmap.h"
 #include "GnashImage.h"
 
 namespace gnash {
@@ -81,7 +81,7 @@ public:
         return (data()->type() == GNASH_IMAGE_RGBA);
     }
 
-    const BitmapInfo* bitmapInfo() const {
+    const CachedBitmap* bitmapInfo() const {
         return _cachedBitmap.get();
     }
 
@@ -133,7 +133,7 @@ private:
     /// The object to which this native type class belongs to.
     as_object* _owner;
 
-    boost::intrusive_ptr<BitmapInfo> _cachedBitmap;
+    boost::intrusive_ptr<CachedBitmap> _cachedBitmap;
 
     boost::scoped_ptr<GnashImage> _image;
 

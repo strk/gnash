@@ -99,7 +99,7 @@ rgba_to_cairo_argb(boost::uint8_t* dst, const GnashImage* im)
     }
 }
 
-class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
+class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
 {
   public:
     bitmap_info_cairo(boost::uint8_t* data, int width, int height,
@@ -442,8 +442,8 @@ Renderer_cairo::~Renderer_cairo()
     cairo_destroy(_cr);
 }
 
-BitmapInfo*
-Renderer_cairo::createBitmapInfo(std::auto_ptr<GnashImage> im) 
+CachedBitmap*
+Renderer_cairo::createCachedBitmap(std::auto_ptr<GnashImage> im) 
 {
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];

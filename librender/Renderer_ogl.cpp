@@ -110,7 +110,7 @@
 namespace gnash {
 
 namespace {
-    const BitmapInfo* createGradientBitmap(const GradientFill& gf,
+    const CachedBitmap* createGradientBitmap(const GradientFill& gf,
             Renderer& renderer);
 }
 
@@ -716,7 +716,7 @@ public:
 #endif
   }    
 
-  virtual BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
+  virtual CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im)
   {
       switch (im->type())
       {
@@ -1889,7 +1889,7 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
     return fill.record(fill.recordCount() - 1).color;
 }
 
-const BitmapInfo*
+const CachedBitmap*
 createGradientBitmap(const GradientFill& gf, Renderer& renderer)
 {
     std::auto_ptr<ImageRGBA> im;
@@ -1934,7 +1934,7 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
             break;
     }
 
-    const BitmapInfo* bi = renderer.createBitmapInfo(
+    const CachedBitmap* bi = renderer.createCachedBitmap(
                     static_cast<std::auto_ptr<GnashImage> >(im));
 
     return bi;

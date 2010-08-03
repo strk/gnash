@@ -64,7 +64,7 @@
 
 // Forward declarations
 namespace gnash {
-	class BitmapInfo;
+	class CachedBitmap;
 	class Movie;
 	class MovieClip;
 	namespace SWF {
@@ -340,7 +340,7 @@ public:
 	///
 	/// The default implementation returns 0.
 	///
-	virtual BitmapInfo* getBitmap(int /*DisplayObject_id*/) const
+	virtual CachedBitmap* getBitmap(int /*DisplayObject_id*/) const
 	{
 		return 0;
 	}
@@ -351,7 +351,7 @@ public:
 	//
 	/// The default implementation is a no-op (deletes the image data).
 	///
-	virtual void addBitmap(int /*id*/, boost::intrusive_ptr<BitmapInfo> /*im*/)
+	virtual void addBitmap(int /*id*/, boost::intrusive_ptr<CachedBitmap> /*im*/)
 	{
 	}
 

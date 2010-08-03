@@ -52,7 +52,7 @@
 #include "Global_as.h"
 #include "namedStrings.h"
 #include "as_function.h"
-#include "BitmapInfo.h"
+#include "CachedBitmap.h"
 
 // Debug frames load
 #undef DEBUG_FRAMES_LOAD
@@ -224,7 +224,7 @@ SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic)
     return 0;
 }
 
-BitmapInfo*
+CachedBitmap*
 SWFMovieDefinition::getBitmap(int id) const
 {
     const Bitmaps::const_iterator it = _bitmaps.find(id);
@@ -233,7 +233,7 @@ SWFMovieDefinition::getBitmap(int id) const
 }
 
 void
-SWFMovieDefinition::addBitmap(int id, boost::intrusive_ptr<BitmapInfo> im)
+SWFMovieDefinition::addBitmap(int id, boost::intrusive_ptr<CachedBitmap> im)
 {
     assert(im);
     _bitmaps.insert(std::make_pair(id, im));

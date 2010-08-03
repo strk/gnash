@@ -92,7 +92,7 @@ BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
     
     // If there is a renderer, cache the image there, otherwise we store it.
     Renderer* r = getRunResources(*_owner).renderer();
-    if (r) _cachedBitmap.reset(r->createBitmapInfo(im));
+    if (r) _cachedBitmap.reset(r->createCachedBitmap(im));
     else _image.reset(im.release());
 }
     

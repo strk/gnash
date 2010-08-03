@@ -780,7 +780,7 @@ public:
     // Given an image, returns a pointer to a bitmap_info class
     // that can later be passed to FillStyleX_bitmap(), to set a
     // bitmap fill style.
-    gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
+    gnash::CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im)
     {        
         return new agg_bitmap_info(im);
     }
