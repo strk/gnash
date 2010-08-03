@@ -195,6 +195,31 @@ main(int argc, char** argv)
             "};"
             "b.fillRect(new flash.geom.Rectangle(0, 0, 20, 20), 0xff0000);"
             );
+    
+    // Dispose of the bitmap afterwards
+    add_actions(mo,
+            // Shape 9
+            "b = new flash.display.BitmapData(20, 20, false);"
+            "b.fillRect(new flash.geom.Rectangle(0, 0, 10, 10), 0x000000);"
+            "b.fillRect(new flash.geom.Rectangle(10, 10, 10, 10), 0xaaff00);"
+            "b.fillRect(new flash.geom.Rectangle(10, 0, 10, 10), 0xaaff00);"
+            "b.fillRect(new flash.geom.Rectangle(0, 10, 10, 10), 0xaaffaa);"
+            "mc = _root.createEmptyMovieClip('mc9', 222);"
+            "with(mc) {"
+            "   x = 450;"
+            "   y = 450;"
+            "   moveTo(x + 0, y + 0);"
+            "   m = new flash.geom.Matrix();"
+            "   m.tx = 0;"
+            "   m.ty = 450;"
+            "   beginBitmapFill(b, m, false);"
+            "   lineTo(x + 0, y + 100);"
+            "   lineTo(x + 150, y + 100);"
+            "   lineTo(x + 150, y + 0);"
+            "};"
+            "b.dispose();"
+            );
+    check_equals(mo, "_root.mc9._width", "150");
 
     add_actions(mo, "stop();");
     SWFMovie_nextFrame(mo);
