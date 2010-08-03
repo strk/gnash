@@ -49,8 +49,8 @@ namespace {
 //
 
 /// Create an image taking ownership of the given buffer height*pitch bytes
-GnashImage::GnashImage(iterator data, size_t width,
-        size_t height, size_t pitch, ImageType type, ImageLocation location)
+GnashImage::GnashImage(iterator data, size_t width, size_t height,
+        size_t pitch, ImageType type, ImageLocation location)
     :
     _type(type),
     _location(location),
@@ -63,23 +63,28 @@ GnashImage::GnashImage(iterator data, size_t width,
 }
 
 /// Create an image allocating a buffer of height*pitch bytes
-GnashImage::GnashImage(size_t width, size_t height,
-        size_t pitch, ImageType type, ImageLocation location)
+GnashImage::GnashImage(size_t width, size_t height, size_t pitch,
+        ImageType type, ImageLocation location)
     :
     _type(type),
     _location(location),
     _size(height*pitch),
     _width(width),
     _height(height),
-    _pitch(pitch),
-    _data(new value_type[_size])
+    _pitch(pitch)
 {
+    const size_t max = std::numeric_limits<boost::int32_t>::max();
+    if (_size > max) {
+        throw std::bad_alloc();
+    }
+    _data.reset(new value_type[_size]);
     assert(pitch >= width);
 }
 
-void GnashImage::update(const_iterator data)
+void
+GnashImage::update(const_iterator data)
 {
-    std::memcpy(this->data(), data, _size);
+    std::copy(data, data + _size, _data.get());
 }
 
 void
@@ -106,15 +111,9 @@ GnashImage::scanlinePointer(size_t y) const
     return data() + _pitch * y;
 }
 
-
-//
-// ImageRGB
-//
-
 ImageRGB::ImageRGB(size_t width, size_t height)
     :
-    GnashImage( width, height,
-        width * 3, GNASH_IMAGE_RGB)
+    GnashImage(width, height, width * 3, GNASH_IMAGE_RGB)
 {
     assert(width > 0);
     assert(height > 0);
@@ -189,8 +188,7 @@ ImageOutput::writeImageData(FileType type,
             
     std::auto_ptr<ImageOutput> outChannel;
 
-    switch (type)
-    {
+    switch (type) {
 #ifdef USE_PNG
         case GNASH_FILETYPE_PNG:
             outChannel = PngImageOutput::create(out, width, height, quality);
@@ -204,8 +202,7 @@ ImageOutput::writeImageData(FileType type,
             break;
     }
 
-    switch (image.type())
-    {
+    switch (image.type()) {
         case GNASH_IMAGE_RGB:
             outChannel->writeImageRGB(image.data());
             break;
@@ -225,8 +222,7 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     std::auto_ptr<GnashImage> im;
     std::auto_ptr<ImageInput> inChannel;
 
-    switch (type)
-    {
+    switch (type) {
 #ifdef USE_PNG
         case GNASH_FILETYPE_PNG:
             inChannel = PngImageInput::create(in);
@@ -249,10 +245,8 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     const size_t height = inChannel->getHeight();
     const size_t width = inChannel->getWidth();
 
-    try
-    {
-        switch (inChannel->imageType())
-        {
+    try {
+        switch (inChannel->imageType()) {
             case GNASH_IMAGE_RGB:
                 im.reset(new ImageRGB(width, height));
                 break;
@@ -264,8 +258,7 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
                 return im;
         }
     }
-    catch (std::bad_alloc& e)
-    {
+    catch (std::bad_alloc& e) {
         // This should be caught here because ~JpegImageInput can also
         // throw an exception on stack unwinding and this confuses
         // remote catchers.
@@ -274,9 +267,12 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
         return im;
     }
     
+    log_debug("Reading scanlines");
+
     for (size_t i = 0; i < height; ++i) {
         inChannel->readScanline(im->scanline(i));
     }
+    log_debug("Processing alpha");
 
     // The renderers expect RGBA data to be preprocessed. JPEG images are
     // never transparent, but the addition of alpha data stored elsewhere
@@ -313,13 +309,11 @@ ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
     boost::scoped_array<GnashImage::value_type> line(
             new GnashImage::value_type[3 * width]);
 
-    for (size_t y = 0; y < height; ++y) 
-    {
+    for (size_t y = 0; y < height; ++y) {
         j_in->readScanline(line.get());
 
         GnashImage::iterator data = im->scanline(y);
-        for (size_t x = 0; x < width; ++x) 
-        {
+        for (size_t x = 0; x < width; ++x) {
             data[4*x+0] = line[3*x+0];
             data[4*x+1] = line[3*x+1];
             data[4*x+2] = line[3*x+2];

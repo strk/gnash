@@ -167,14 +167,13 @@ public:
     /// @param height   The height of the image in pixels.
     /// @param pitch    The pitch (rowstride) of the image in bytes.
     /// @param type     The ImageType of the image.
-    GnashImage(iterator data, size_t width, size_t height,
-               size_t pitch, ImageType type,
-               ImageLocation location = GNASH_IMAGE_CPU);
+    GnashImage(iterator data, size_t width, size_t height, size_t pitch,
+            ImageType type, ImageLocation location = GNASH_IMAGE_CPU);
 
     /// Construct an empty GnashImage
     //
-    /// Once constructed, this image must be updated with update() before
-    /// use.
+    /// Note: there is an arbitrary limit of boost::int32_t::max bytes for the
+    /// total size of the bitmap constructed with this constructor.
     //
     /// @param width    The width of the image in pixels.
     /// @param height   The height of the image in pixels.
