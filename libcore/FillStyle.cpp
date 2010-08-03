@@ -159,18 +159,13 @@ const CachedBitmap*
 BitmapFill::bitmap() const
 {
     if (_bitmapInfo) {
-        if (_bitmapInfo->disposed()) return 0;
-        return _bitmapInfo.get();
+        return  _bitmapInfo->disposed() ? 0 : _bitmapInfo.get();
     }
     if (!_md) return 0;
     _bitmapInfo = _md->getBitmap(_id);
 
     // May still be 0!
     return _bitmapInfo.get();
-}
-    
-BitmapFill::~BitmapFill()
-{
 }
     
 void
