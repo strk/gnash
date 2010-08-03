@@ -41,7 +41,7 @@ namespace gnash
 {
 
 namespace {
-    void processAlpha(GnashImage::value_type* imageData, size_t pixels);
+    void processAlpha(GnashImage::iterator imageData, size_t pixels);
 }
 
 //
@@ -77,7 +77,7 @@ GnashImage::GnashImage(size_t width, size_t height,
     assert(pitch >= width);
 }
 
-void GnashImage::update(const value_type* data)
+void GnashImage::update(const_iterator data)
 {
     std::memcpy(this->data(), data, _size);
 }
@@ -193,13 +193,11 @@ ImageOutput::writeImageData(FileType type,
     {
 #ifdef USE_PNG
         case GNASH_FILETYPE_PNG:
-            outChannel = PngImageOutput::create(out, width,
-                    height, quality);
+            outChannel = PngImageOutput::create(out, width, height, quality);
             break;
 #endif
         case GNASH_FILETYPE_JPEG:
-            outChannel = JpegImageOutput::create(out, width,
-                    height, quality);
+            outChannel = JpegImageOutput::create(out, width, height, quality);
             break;
         default:
             log_error("Requested to write image as unsupported filetype");
@@ -224,7 +222,7 @@ ImageOutput::writeImageData(FileType type,
 std::auto_ptr<GnashImage>
 ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 {
-    std::auto_ptr<GnashImage> im (NULL);
+    std::auto_ptr<GnashImage> im;
     std::auto_ptr<ImageInput> inChannel;
 
     switch (type)

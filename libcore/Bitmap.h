@@ -96,14 +96,9 @@ private:
     //
     /// It should be called every time the underlying bitmap changes; for
     /// non-dynamic Bitmaps, this is only on construction.
-    void makeBitmapShape();
-
     const boost::intrusive_ptr<const BitmapMovieDefinition> _def;
 
     BitmapData_as* _bitmapData;
-
-    /// The current bitmap information is stored here.
-    boost::intrusive_ptr<const BitmapInfo> _bitmapInfo;
 
     /// A shape to hold the bitmap fill.
     DynamicShape _shape;

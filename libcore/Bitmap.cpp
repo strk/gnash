@@ -34,15 +34,12 @@ Bitmap::Bitmap(movie_root& mr, as_object* object, BitmapData_as* bd,
     :
     DisplayObject(mr, object, parent),
     _bitmapData(bd),
-    _bitmapInfo(bd->bitmapInfo()),
     _width(_bitmapData->getWidth()),
     _height(_bitmapData->getHeight())
 {
     _shape.setBounds(SWFRect(0, 0,
                 pixelsToTwips(_width), pixelsToTwips(_height)));
     assert(bd);
-    set_invalidated();
-    makeBitmapShape();
 }
 
 Bitmap::Bitmap(movie_root& mr, as_object* object,
@@ -51,7 +48,6 @@ Bitmap::Bitmap(movie_root& mr, as_object* object,
     DisplayObject(mr, object, parent),
     _def(def),
     _bitmapData(0),
-    _bitmapInfo(0),
     _width(def->get_width_pixels()),
     _height(def->get_height_pixels())
 {
@@ -66,13 +62,39 @@ const BitmapInfo*
 Bitmap::bitmap() const
 {
     if (_def) return _def->bitmap();
-    return _bitmapData->bitmapInfo();
+    if (_bitmapData) return _bitmapData->bitmapInfo();
+    return 0;
 }
 
 void
 Bitmap::construct(as_object* /*init*/)
 {
     if (_bitmapData) _bitmapData->attach(this);
+
+    if (!_def && !_bitmapData) return;
+
+    // Width and height are a maximum of 2880, so there is no risk of 
+    // overflow 
+    const int w = pixelsToTwips(_width);
+    const int h = pixelsToTwips(_height);
+
+    SWFMatrix mat;
+    mat.set_scale(1.0 / 20, 1.0 / 20);
+
+    // Can this be tiled?
+    FillStyle fill(BitmapFill(BitmapFill::CLIPPED, bitmap(), mat));
+    const size_t fillLeft = _shape.addFillStyle(fill);
+
+    Path bmpath(w, h, fillLeft, 0, 0, false);
+    bmpath.drawLineTo(w, 0);
+    bmpath.drawLineTo(0, 0);
+    bmpath.drawLineTo(0, h);
+    bmpath.drawLineTo(w, h);
+
+    _shape.add_path(bmpath);
+    _shape.finalize();
+
+    set_invalidated();
 }
 
 bool
@@ -115,47 +137,16 @@ Bitmap::getBounds() const
 void
 Bitmap::checkBitmapData()
 {
-
     /// Nothing to do for disposed bitmaps.
-    if (_def && !_bitmapData) return;
+    if (!_bitmapData) return;
 
     /// In this case, dispose() was called. It seems like a good idea to
     /// set _bitmapData to 0 to avoid any further interaction.
-    if (!_bitmapData->bitmapInfo()) {
+    if (disposed(*_bitmapData)) {
         _bitmapData = 0;
         _shape.clear();
         return;
     }
-}
-
-void
-Bitmap::makeBitmapShape()
-{
-
-    if (!_def && !_bitmapData) return;
-
-    // Width and height are a maximum of 2880, so there is no risk of 
-    // overflow 
-    const int w = pixelsToTwips(_width);
-    const int h = pixelsToTwips(_height);
-
-    SWFMatrix mat;
-    mat.set_scale(1.0 / 20, 1.0 / 20);
-
-    // Can this be tiled?
-    FillStyle fill(BitmapFill(BitmapFill::CLIPPED, bitmap(), mat));
-    const size_t fillLeft = _shape.addFillStyle(fill);
-
-    Path bmpath(w, h, fillLeft, 0, 0, false);
-    bmpath.drawLineTo(w, 0);
-    bmpath.drawLineTo(0, 0);
-    bmpath.drawLineTo(0, h);
-    bmpath.drawLineTo(w, h);
-
-    _shape.add_path(bmpath);
-
-    _shape.finalize();
-
 }
 
 }

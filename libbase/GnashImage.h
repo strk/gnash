@@ -242,7 +242,7 @@ public:
     ///
     /// @param data buffer to copy data from.
     ///
-    void update(const value_type* data);
+    void update(const_iterator data);
 
     /// Copy image data from another image data
     //
@@ -256,14 +256,14 @@ public:
     /// Get access to the underlying data
     //
     /// @return     A pointer to the raw image data.
-    virtual value_type* data() {
+    virtual iterator data() {
         return _data.get();
     }
 
     /// Get read-only access to the underlying data
     //
     /// @return     A read-only pointer to the raw image data.
-    virtual const value_type* data() const {
+    virtual const_iterator data() const {
         return _data.get();
     }
 
@@ -295,14 +295,14 @@ public:
     //
     /// @param y    The index of the required row.
     /// @return     A pointer to the first byte of the specified row.
-    value_type* scanline(size_t y);
+    iterator scanline(size_t y);
 
     /// Get a read-only pointer to a given row
     //
     /// @param y    The index of the required row.
     /// @return     A read-only pointer to the first byte of the specified
     ///             row.
-    DSOEXPORT const value_type* scanlinePointer(size_t y) const;
+    DSOEXPORT const_iterator scanlinePointer(size_t y) const;
 
 protected:
 
@@ -340,7 +340,7 @@ public:
 
     ImageRGB(size_t width, size_t height);
 
-    ImageRGB(value_type* data, size_t width, size_t height, size_t stride)
+    ImageRGB(iterator data, size_t width, size_t height, size_t stride)
         :
         GnashImage(data, width, height, stride, GNASH_IMAGE_RGB)
     {}
@@ -357,7 +357,7 @@ public:
 
     ImageRGBA(size_t width, size_t height);
 
-    ImageRGBA(value_type* data, size_t width, size_t height, size_t stride)
+    ImageRGBA(iterator data, size_t width, size_t height, size_t stride)
         :
         GnashImage(data, width, height, stride, GNASH_IMAGE_RGBA)
     {}
