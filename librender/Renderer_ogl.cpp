@@ -581,9 +581,6 @@ bitmap_info_ogl::setup() const
     glGenTextures(1, &_texture_id);
     glBindTexture(_ogl_img_type, _texture_id);
   
-    log_debug("Setting up for %sx%s (%s)", _img->width(), _img->height(),
-            _img->size());
-
     bool resize = false;
     if (_img->height() == 1) {
         if (!isEven(_img->width())) {
