@@ -41,7 +41,7 @@ namespace gnash
 {
 
 namespace {
-    void processAlpha(boost::uint8_t* imageData, size_t pixels);
+    void processAlpha(GnashImage::value_type* imageData, size_t pixels);
 }
 
 //
@@ -49,8 +49,8 @@ namespace {
 //
 
 /// Create an image taking ownership of the given buffer height*pitch bytes
-GnashImage::GnashImage(boost::uint8_t* data, int width,
-        int height, int pitch, ImageType type, ImageLocation location)
+GnashImage::GnashImage(iterator data, size_t width,
+        size_t height, size_t pitch, ImageType type, ImageLocation location)
     :
     _type(type),
     _location(location),
@@ -63,8 +63,8 @@ GnashImage::GnashImage(boost::uint8_t* data, int width,
 }
 
 /// Create an image allocating a buffer of height*pitch bytes
-GnashImage::GnashImage(int width, int height,
-        int pitch, ImageType type, ImageLocation location)
+GnashImage::GnashImage(size_t width, size_t height,
+        size_t pitch, ImageType type, ImageLocation location)
     :
     _type(type),
     _location(location),
@@ -72,17 +72,18 @@ GnashImage::GnashImage(int width, int height,
     _width(width),
     _height(height),
     _pitch(pitch),
-    _data(new boost::uint8_t[_size])
+    _data(new value_type[_size])
 {
     assert(pitch >= width);
 }
 
-void GnashImage::update(const boost::uint8_t* data)
+void GnashImage::update(const value_type* data)
 {
     std::memcpy(this->data(), data, _size);
 }
 
-void GnashImage::update(const GnashImage& from)
+void
+GnashImage::update(const GnashImage& from)
 {
     assert(from._pitch == _pitch);
     assert(_size <= from._size);
@@ -91,13 +92,15 @@ void GnashImage::update(const GnashImage& from)
     std::memcpy(data(), from.data(), _size);
 }
 
-boost::uint8_t* GnashImage::scanline(size_t y)
+GnashImage::iterator
+GnashImage::scanline(size_t y)
 {
     assert(y < _height);
     return data() + _pitch * y;
 }
 
-const boost::uint8_t* GnashImage::scanlinePointer(size_t y) const
+GnashImage::const_iterator
+GnashImage::scanlinePointer(size_t y) const
 {
     assert(y < _height);
     return data() + _pitch * y;
@@ -108,7 +111,7 @@ const boost::uint8_t* GnashImage::scanlinePointer(size_t y) const
 // ImageRGB
 //
 
-ImageRGB::ImageRGB(int width, int height)
+ImageRGB::ImageRGB(size_t width, size_t height)
     :
     GnashImage( width, height,
         width * 3, GNASH_IMAGE_RGB)
@@ -121,18 +124,10 @@ ImageRGB::~ImageRGB()
 {
 }
 
-
-//
-// ImageRGBA
-//
-
-
-ImageRGBA::ImageRGBA(int width, int height)
+ImageRGBA::ImageRGBA(size_t width, size_t height)
     :
     GnashImage(width, height, width * 4, GNASH_IMAGE_RGBA)
 {
-    assert(width > 0);
-    assert(height > 0);
     assert(_pitch >= _width * 4);
     assert((_pitch & 3) == 0);
 }
@@ -141,31 +136,29 @@ ImageRGBA::~ImageRGBA()
 {
 }
 
-
 void
-ImageRGBA::setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g,
-        boost::uint8_t b, boost::uint8_t a)
+ImageRGBA::setPixel(size_t x, size_t y, value_type r, value_type g,
+        value_type b, value_type a)
 {
     assert(x < _width);
     assert(y < _height);
 
-    boost::uint8_t* data = scanline(y) + 4 * x;
+    iterator data = scanline(y) + 4 * x;
 
-    data[0] = r;
-    data[1] = g;
-    data[2] = b;
-    data[3] = a;
+    *data = r;
+    *(data + 1) = g;
+    *(data + 2) = b;
+    *(data + 3) = a;
 }
 
 
 void
-ImageRGBA::mergeAlpha(const boost::uint8_t* alphaData,
-        const size_t bufferLength)
+ImageRGBA::mergeAlpha(const_iterator alphaData, const size_t bufferLength)
 {
     assert (bufferLength * 4 <= _size);
 
     // Point to the first alpha byte
-    boost::uint8_t* p = data();
+    iterator p = data();
 
     // Set each 4th byte to the correct alpha value and adjust the
     // other values.
@@ -319,13 +312,14 @@ ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 
     im.reset(new ImageRGBA(width, height));
 
-    boost::scoped_array<boost::uint8_t> line(new boost::uint8_t[3 * width]);
+    boost::scoped_array<GnashImage::value_type> line(
+            new GnashImage::value_type[3 * width]);
 
     for (size_t y = 0; y < height; ++y) 
     {
         j_in->readScanline(line.get());
 
-        boost::uint8_t* data = im->scanline(y);
+        GnashImage::iterator data = im->scanline(y);
         for (size_t x = 0; x < width; ++x) 
         {
             data[4*x+0] = line[3*x+0];
@@ -341,12 +335,11 @@ ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 namespace {
 
 void
-processAlpha(boost::uint8_t* imageData, size_t pixels)
+processAlpha(GnashImage::iterator imageData, size_t pixels)
 {
-
-    boost::uint8_t* p = imageData;
+    GnashImage::iterator p = imageData;
     for (size_t i = 0; i < pixels; ++i) {
-        boost::uint8_t alpha = *(p + 3);
+        GnashImage::value_type alpha = *(p + 3);
         *p = std::min(*p, alpha);
         ++p;
         *p = std::min(*p, alpha);

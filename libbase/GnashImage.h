@@ -29,6 +29,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
 #include <memory> 
+#include <boost/iterator/iterator_facade.hpp>
+#include <iterator>
 
 #include "FileTypes.h"
 #include "log.h"
@@ -70,6 +72,11 @@ class DSOEXPORT GnashImage : boost::noncopyable
 {
 public:
 
+    typedef boost::uint8_t value_type;
+    typedef boost::scoped_array<value_type> container_type;
+    typedef value_type* iterator;
+    typedef const value_type* const_iterator;
+
     /// Construct a GnashImage from a data buffer, taking ownership of the data.
     //
     /// @param data     The raw image data. This class takes ownership.
@@ -77,8 +84,8 @@ public:
     /// @param height   The height of the image in pixels.
     /// @param pitch    The pitch (rowstride) of the image in bytes.
     /// @param type     The ImageType of the image.
-    GnashImage(boost::uint8_t *data, int width, int height,
-               int pitch, ImageType type,
+    GnashImage(iterator data, size_t width, size_t height,
+               size_t pitch, ImageType type,
                ImageLocation location = GNASH_IMAGE_CPU);
 
     /// Construct an empty GnashImage
@@ -90,46 +97,59 @@ public:
     /// @param height   The height of the image in pixels.
     /// @param pitch    The pitch (rowstride) of the image in bytes.
     /// @param type     The ImageType of the image.
-    GnashImage(int width, int height, int pitch, ImageType type,
+    GnashImage(size_t width, size_t height, size_t pitch, ImageType type,
                ImageLocation location = GNASH_IMAGE_CPU);
+
+    virtual ~GnashImage() {}
 
     /// Return the ImageType of the image.
     //
     /// This saves guessing when dynamic_cast is used.
-    ImageType type() const { return _type; }
+    ImageType type() const {
+        return _type;
+    }
 
     /// Return the ImageLocation of the image.
     //
     /// This saves guessing when dynamic_cast is used.
-    ImageLocation location() const { return _location; }
+    ImageLocation location() const {
+        return _location;
+    }
 
     /// Get the size of the image buffer
     //
     /// @return     The size of the buffer in bytes
-    size_t size() const { return _size; }
+    size_t size() const {
+        return _size;
+    }
 
     /// Get the pitch of the image buffer
     //
     /// @return     The pitch of the buffer in bytes
-    size_t pitch() const { return _pitch; }
+    size_t pitch() const {
+        return _pitch;
+    }
 
     /// Get size of a single pixel
     //
     /// @return     The size of a single pixel in bytes.
-    size_t pixelSize() const
-    {
+    size_t pixelSize() const {
         return _pitch / _width;
     }
 
     /// Get the image's width
     //
     /// @return     The image's width in pixels.
-    size_t width() const { return _width; }
+    size_t width() const {
+        return _width;
+    }
 
     /// Get the image's width
     //
     /// @return     The image's height in pixels.
-    size_t height() const { return _height; }
+    size_t height() const {
+        return _height;
+    }
 
     /// Copy image data from a buffer.
     //
@@ -139,7 +159,7 @@ public:
     ///
     /// @param data buffer to copy data from.
     ///
-    void update(const boost::uint8_t* data);
+    void update(const value_type* data);
 
     /// Copy image data from another image data
     //
@@ -153,27 +173,41 @@ public:
     /// Get access to the underlying data
     //
     /// @return     A pointer to the raw image data.
-    virtual boost::uint8_t* data() { return _data.get(); }
+    virtual value_type* data() {
+        return _data.get();
+    }
 
     /// Get read-only access to the underlying data
     //
     /// @return     A read-only pointer to the raw image data.
-    virtual const boost::uint8_t* data() const { return _data.get(); }
+    virtual const value_type* data() const {
+        return _data.get();
+    }
+
+    iterator begin() {
+        return data();
+    }
+
+    const_iterator begin() const {
+        return data();
+    }
+
+    const_iterator end() const {
+        return data() + size();
+    }
 
     /// Get a pointer to a given row
     //
     /// @param y    The index of the required row.
     /// @return     A pointer to the first byte of the specified row.
-    boost::uint8_t* scanline(size_t y);
+    value_type* scanline(size_t y);
 
     /// Get a read-only pointer to a given row
     //
     /// @param y    The index of the required row.
     /// @return     A read-only pointer to the first byte of the specified
     ///             row.
-    DSOEXPORT const boost::uint8_t* scanlinePointer(size_t y) const;
-
-    virtual ~GnashImage() {}
+    DSOEXPORT const value_type* scanlinePointer(size_t y) const;
 
 protected:
 
@@ -199,10 +233,7 @@ protected:
     const size_t _pitch;
 
     /// Data if held in this class
-    boost::scoped_array<boost::uint8_t> _data;
-
-    /// Data if cached in the renderer
-    boost::shared_ptr<BitmapInfo> _cache;
+    container_type _data;
 
 };
 
@@ -212,9 +243,9 @@ class DSOEXPORT ImageRGB : public GnashImage
 
 public:
 
-    ImageRGB(int width, int height);
+    ImageRGB(size_t width, size_t height);
 
-    ImageRGB(boost::uint8_t* data, int width, int height, int stride)
+    ImageRGB(value_type* data, size_t width, size_t height, size_t stride)
         :
         GnashImage(data, width, height, stride, GNASH_IMAGE_RGB)
     {}
@@ -229,9 +260,9 @@ class DSOEXPORT ImageRGBA : public GnashImage
 
 public:
 
-    ImageRGBA(int width, int height);
+    ImageRGBA(size_t width, size_t height);
 
-    ImageRGBA(boost::uint8_t* data, int width, int height, int stride)
+    ImageRGBA(value_type* data, size_t width, size_t height, size_t stride)
         :
         GnashImage(data, width, height, stride, GNASH_IMAGE_RGBA)
     {}
@@ -242,9 +273,10 @@ public:
     //
     /// TODO: move in base class ?
     ///
-    void setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
+    void setPixel(size_t x, size_t y, value_type r, value_type g, value_type b,
+            value_type a);
 
-    void mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength);
+    void mergeAlpha(const_iterator alphaData, const size_t bufferLength);
 
 };
 
@@ -375,8 +407,82 @@ protected:
 
 };
 
+class RGBAOutput
+{
+public:
+    RGBAOutput(GnashImage::iterator i, size_t c) : _it(i), _c(c) {}
+    
+    /// Writes a 32-bit unsigned value in ARGB byte order to the image
+    //
+    /// Take note of the different byte order!
+    RGBAOutput& operator=(boost::uint32_t pixel) {
+        switch (_c) {
+            case 4:
+                // alpha
+                *(_it + 3) = (pixel & 0xff000000) >> 24;
+            case 3:
+                *_it = (pixel & 0x00ff0000) >> 16;
+                *(_it + 1) = (pixel & 0x0000ff00) >> 8;
+                *(_it + 2) = (pixel & 0x000000ff);
+            default:
+                break;
+        }
+        return *this;
+    }
+
+private:
+    GnashImage::iterator _it;
+    size_t _c;
+};
+
+struct argb_iterator :
+    public boost::iterator_facade<argb_iterator,
+                                  boost::uint32_t,
+                                  std::output_iterator_tag,
+                                  RGBAOutput>
+{
+    explicit argb_iterator(GnashImage& im)
+        :
+        _im(&im),
+        _it(_im->begin()),
+        _c(_im->pixelSize())
+    {}
+    
+    argb_iterator()
+        :
+        _im(0),
+        _it(0),
+        _c(0)
+    {}
+
+private:
+
+    friend class boost::iterator_core_access;
+
+    RGBAOutput dereference() const {
+        return RGBAOutput(_it, _c);
+    }
+
+    void increment() {
+        if (!_im) return;
+        _it += _c;
+        if (_it == _im->end()) {
+            _im = 0;
+        }
+    }
+
+    bool equal(argb_iterator& o) const {
+        if (!_im) {
+            return !o._im;
+        }
+        return (o._im && o._it == _it);
+    }
+
+    GnashImage* _im;
+    GnashImage::iterator _it;
+    size_t _c;
+};
+
 } // namespace gnash
-
-
 
 #endif
