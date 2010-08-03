@@ -41,7 +41,6 @@ Bitmap::Bitmap(movie_root& mr, as_object* object, BitmapData_as* bd,
     _shape.setBounds(SWFRect(0, 0,
                 pixelsToTwips(_width), pixelsToTwips(_height)));
     assert(bd);
-    assert(bd->bitmapInfo());
     set_invalidated();
     makeBitmapShape();
 }

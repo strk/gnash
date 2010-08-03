@@ -56,15 +56,11 @@ public:
     // it can handle transparency or not.
 	BitmapData_as(as_object* owner, size_t width, size_t height,
 	              bool transparent, boost::uint32_t fillColor,
-                  Renderer& r);
+                  Renderer* r);
 
     size_t getWidth() const { return _width; }
     size_t getHeight() const { return _height; }
     bool isTransparent() const { return _transparent; }
-    
-    const GnashImage* bitmapData() const {
-        return _bitmapData.get() ? &_bitmapData->image() : 0;
-    }
  
     const BitmapInfo* bitmapInfo() const {
         return _bitmapData.get();
@@ -105,6 +101,10 @@ public:
 
     /// Overrides Relay::setReachable().
     virtual void setReachable();
+    
+    GnashImage* data() const {
+        return _bitmapData.get() ? &_bitmapData->image() : _image.get();
+    }
 
 private:
 
@@ -124,6 +124,8 @@ private:
 
     boost::intrusive_ptr<BitmapInfo> _bitmapData;
 
+    boost::scoped_ptr<GnashImage> _image;
+
     std::list<DisplayObject*> _attachedObjects;
 
 };
@@ -131,7 +133,7 @@ private:
 inline bool
 disposed(const BitmapData_as& bm)
 {
-    return !bm.bitmapData();
+    return !bm.data();
 }
 
 

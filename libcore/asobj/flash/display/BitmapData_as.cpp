@@ -81,7 +81,7 @@ namespace {
 
 
 BitmapData_as::BitmapData_as(as_object* owner, size_t width, size_t height,
-              bool transparent, boost::uint32_t fillColor, Renderer& r)
+              bool transparent, boost::uint32_t fillColor, Renderer* r)
     :
     _owner(owner),
     _width(width),
@@ -95,7 +95,13 @@ BitmapData_as::BitmapData_as(as_object* owner, size_t width, size_t height,
     
     std::fill(im->abegin(), im->aend(), fillColor | (0xff << 24));
 
-    _bitmapData.reset(r.createBitmapInfo(im));
+    
+    if (!r) {
+        _image.reset(im.release());
+        return;
+    }
+
+    _bitmapData.reset(r->createBitmapInfo(im));
 }
 
 void
@@ -109,8 +115,8 @@ BitmapData_as::setReachable()
 void
 BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color)
 {
-    assert(bitmapData());
-    argb_iterator it = _bitmapData->image().abegin();
+    assert(data());
+    argb_iterator it = data()->abegin();
     std::advance(it, x * _width + y);
     *it = color;
 }
@@ -118,8 +124,8 @@ BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color)
 void
 BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color)
 {
-    assert(bitmapData());
-    argb_iterator it = _bitmapData->image().abegin() + x * _width + y;
+    assert(data());
+    argb_iterator it = data()->abegin() + x * _width + y;
 
     const boost::uint32_t val = it.toARGB();
     
@@ -140,7 +146,7 @@ BitmapData_as::updateAttachedBitmaps()
 boost::int32_t
 BitmapData_as::getPixel(int x, int y, bool transparency) const
 {
-    assert(bitmapData());
+    assert(data());
 
     // A value of 0, 0 is inside the bitmap.
     if (x < 0 || y < 0) return 0;
@@ -152,10 +158,10 @@ BitmapData_as::getPixel(int x, int y, bool transparency) const
 
     const size_t pixelIndex = y * _width + x;
 
-    assert (pixelIndex < bitmapData()->size());
+    // TODO: size is in bytes!
+    assert (pixelIndex < data()->size());
     
-    const boost::uint32_t pixel = 
-        (_bitmapData->image().abegin() + pixelIndex).toARGB();
+    const boost::uint32_t pixel = (data()->abegin() + pixelIndex).toARGB();
     
     if (transparency) {
         return static_cast<boost::int32_t>(pixel);
@@ -200,7 +206,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     w = std::min<size_t>(_width - x, w);
     h = std::min<size_t>(_height - y, h);
     
-    argb_iterator it = _bitmapData->image().abegin() + y * _width;
+    argb_iterator it = data()->abegin() + y * _width;
     
     argb_iterator e = it + _width * h;
     
@@ -220,6 +226,7 @@ void
 BitmapData_as::dispose()
 {
     _bitmapData.reset();
+    _image.reset();
     updateAttachedBitmaps();
 }
 
@@ -721,7 +728,7 @@ bitmapdata_ctor(const fn_call& fn)
 
     ptr->setRelay(
             new BitmapData_as(ptr, width, height, transparent, fillColor,
-                *getRunResources(*ptr).renderer()));
+                getRunResources(*ptr).renderer()));
 
 	return as_value(); 
 }
