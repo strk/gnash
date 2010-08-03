@@ -469,7 +469,7 @@ JpegImageInput::readSWFJpeg2WithTables(JpegImageInput& loader)
             new ImageRGB(loader.getWidth(), loader.getHeight()));
 
     for (size_t y = 0, height = loader.getHeight(); y < height; y++) {
-        loader.readScanline(im->scanline(y));
+        loader.readScanline(scanline(*im, y));
     }
 
     loader.finishImage();

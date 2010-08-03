@@ -646,8 +646,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
     inflate_wrapper(in, buffer.get(), bufSize);
     assert(in.tell() <= in.get_tag_end_position());
 
-    switch (bitmap_format)
-    {
+    switch (bitmap_format) {
 
         case 3:
         {
@@ -659,7 +658,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
                 boost::uint8_t* inRow = buffer.get() + 
                     colorTableSize * channels + j * pitch;
 
-                boost::uint8_t*    outRow = image->scanline(j);
+                boost::uint8_t* outRow = scanline(*image, j);
                 for (int i = 0; i < width; i++)
                 {
                     boost::uint8_t pixel = inRow[i * bytes_per_pixel];
@@ -681,7 +680,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
             for (int j = 0; j < height; j++)
             {
                 boost::uint8_t* inRow = buffer.get() + j * pitch;
-                boost::uint8_t* outRow = image->scanline(j);
+                boost::uint8_t* outRow = scanline(*image, j);
                 for (int i = 0; i < width; i++)
                 {
                     boost::uint16_t pixel = inRow[i * 2] |
@@ -708,7 +707,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
             for (int j = 0; j < height; j++)
             {
                 boost::uint8_t* inRow = buffer.get() + j * pitch;
-                boost::uint8_t* outRow = image->scanline(j);
+                boost::uint8_t* outRow = scanline(*image, j);
                 const int inChannels = 4;
 
                 for (int i = 0; i < width; ++i)

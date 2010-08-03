@@ -583,8 +583,8 @@ public:
     VideoRenderer(const ClipBounds& clipbounds, GnashImage& frame,
             Matrix& mat, Quality quality, bool smooth)
         :
-        _buf(frame.data(), frame.width(), frame.height(),
-                frame.pitch()),
+        _buf(frame.begin(), frame.width(), frame.height(),
+                frame.stride()),
         _pixf(_buf),
         _accessor(_pixf),
         _interpolator(mat),

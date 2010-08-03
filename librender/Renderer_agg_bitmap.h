@@ -43,8 +43,8 @@ public:
   int get_width() const { return _image->width(); }  
   int get_height() const { return _image->height();  }  
   int get_bpp() const { return _bpp; }  
-  int get_rowlen() const { return _image->pitch(); }  
-  boost::uint8_t* get_data() const { return _image->data(); }
+  int get_rowlen() const { return _image->stride(); }  
+  boost::uint8_t* get_data() const { return _image->begin(); }
   
 private:
 

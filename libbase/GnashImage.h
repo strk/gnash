@@ -29,14 +29,13 @@
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
 #include <memory> 
-#include <boost/iterator/iterator_facade.hpp>
-#include <iterator>
 
 #include "FileTypes.h"
 #include "log.h"
 #include "dsodefs.h"
 #include "BitmapInfo.h"
-
+#include <boost/iterator/iterator_facade.hpp>
+#include <iterator>
 
 // Forward declarations
 namespace gnash {
@@ -44,8 +43,7 @@ namespace gnash {
     class JpegImageInput;
 }
 
-namespace gnash
-{
+namespace gnash {
 
 /// The types of images handled in Gnash.
 enum ImageType
@@ -62,21 +60,39 @@ enum ImageLocation
     GNASH_IMAGE_GPU
 };
 
-class RGBAOutput
+inline size_t
+numChannels(ImageType t)
+{
+    switch (t) {
+        case GNASH_IMAGE_RGBA:
+            return 4;
+        case GNASH_IMAGE_RGB:
+            return 3;
+        default:
+            std::abort();
+    }
+}
+
+template<typename Iterator>
+class ARGB
 {
 public:
 
-    RGBAOutput(boost::uint8_t* i, size_t c) : _it(i), _c(c) {}
+    ARGB(Iterator i, ImageType t)
+        :
+        _it(i),
+        _t(t)
+    {}
     
     /// Writes a 32-bit unsigned value in ARGB byte order to the image
     //
     /// Take note of the different byte order!
-    RGBAOutput& operator=(boost::uint32_t pixel) {
-        switch (_c) {
-            case 4:
+    ARGB& operator=(boost::uint32_t pixel) {
+        switch (_t) {
+            case GNASH_IMAGE_RGBA:
                 // alpha
                 *(_it + 3) = (pixel & 0xff000000) >> 24;
-            case 3:
+            case GNASH_IMAGE_RGB:
                 *_it = (pixel & 0x00ff0000) >> 16;
                 *(_it + 1) = (pixel & 0x0000ff00) >> 8;
                 *(_it + 2) = (pixel & 0x000000ff);
@@ -87,29 +103,33 @@ public:
     }
 
 private:
-    boost::uint8_t* _it;
-    size_t _c;
+    Iterator _it;
+    ImageType _t;
 };
 
-struct argb_iterator :
-    public boost::iterator_facade<argb_iterator,
+template<typename Iterator, typename Pixel>
+struct pixel_iterator :
+    public boost::iterator_facade<pixel_iterator<Iterator, Pixel>,
                                   boost::uint32_t,
                                   std::random_access_iterator_tag,
-                                  RGBAOutput>
+                                  Pixel>
 {
-    argb_iterator(boost::uint8_t* it, size_t c)
+
+    typedef std::ptrdiff_t difference_type;
+
+    pixel_iterator(Iterator it, ImageType t)
         :
         _it(it),
-        _c(c)
+        _t(t)
     {}
  
     boost::uint32_t toARGB() const {
         boost::uint32_t ret = 0xff000000;
-        switch (_c) {
-            case 4:
+        switch (_t) {
+            case GNASH_IMAGE_RGBA:
                 // alpha
                 ret = *(_it + 3) << 24;
-            case 3:
+            case GNASH_IMAGE_RGB:
                 ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
             default:
                 break;
@@ -121,36 +141,34 @@ private:
 
     friend class boost::iterator_core_access;
 
-    RGBAOutput dereference() const {
-        return RGBAOutput(_it, _c);
+    Pixel dereference() const {
+        return Pixel(_it, _t);
     }
 
     void increment() {
-        _it += _c;
+        _it += numChannels(_t);
     }
 
-    bool equal(const argb_iterator& o) const {
+    bool equal(const pixel_iterator& o) const {
         return o._it == _it;
     }
 
-    difference_type distance_to(const argb_iterator& o) const {
-        return (o._it - _it) / _c;
+    difference_type distance_to(const pixel_iterator& o) const {
+        return (o._it - _it) / numChannels(_t);
     }
 
     void advance(difference_type n) {
-        _it += n * _c;
+        _it += n * numChannels(_t);
     }
 
-
-    boost::uint8_t* _it;
-    size_t _c;
+    Iterator _it;
+    ImageType _t;
 };
 
 /// Base class for different types of bitmaps
 //
-/// @todo document layout of the image, like pixel data
-///       order in the raw array (rows or columns first?)
-///
+/// 1. Bytes are packed in RGB(A) order.
+/// 2. Rowstride is equal to channels * width
 class DSOEXPORT GnashImage : boost::noncopyable
 {
 public:
@@ -160,27 +178,7 @@ public:
     typedef value_type* iterator;
     typedef const value_type* const_iterator;
 
-    /// Construct a GnashImage from a data buffer, taking ownership of the data.
-    //
-    /// @param data     The raw image data. This class takes ownership.
-    /// @param width    The width of the image in pixels.
-    /// @param height   The height of the image in pixels.
-    /// @param pitch    The pitch (rowstride) of the image in bytes.
-    /// @param type     The ImageType of the image.
-    GnashImage(iterator data, size_t width, size_t height, size_t pitch,
-            ImageType type, ImageLocation location = GNASH_IMAGE_CPU);
-
-    /// Construct an empty GnashImage
-    //
-    /// Note: there is an arbitrary limit of boost::int32_t::max bytes for the
-    /// total size of the bitmap constructed with this constructor.
-    //
-    /// @param width    The width of the image in pixels.
-    /// @param height   The height of the image in pixels.
-    /// @param pitch    The pitch (rowstride) of the image in bytes.
-    /// @param type     The ImageType of the image.
-    GnashImage(size_t width, size_t height, size_t pitch, ImageType type,
-               ImageLocation location = GNASH_IMAGE_CPU);
+    typedef pixel_iterator<iterator, ARGB<iterator> > argb_iterator;
 
     virtual ~GnashImage() {}
 
@@ -202,21 +200,21 @@ public:
     //
     /// @return     The size of the buffer in bytes
     size_t size() const {
-        return _size;
+        return stride() * _height;
     }
 
     /// Get the pitch of the image buffer
     //
-    /// @return     The pitch of the buffer in bytes
-    size_t pitch() const {
-        return _pitch;
+    /// @return     The rowstride of the buffer in bytes
+    size_t stride() const {
+        return _width * channels();
     }
 
-    /// Get size of a single pixel
+    /// Get the number of channels
     //
-    /// @return     The size of a single pixel in bytes.
-    size_t pixelSize() const {
-        return _pitch / _width;
+    /// @return     The number of channels
+    size_t channels() const {
+        return numChannels(_type);
     }
 
     /// Get the image's width
@@ -235,83 +233,79 @@ public:
 
     /// Copy image data from a buffer.
     //
-    /// Note that this buffer MUST have the same _pitch, or unexpected things
-    /// will happen. In general, it is only safe to copy from another GnashImage
-    /// (or derivative thereof) or unexpected things will happen. 
+    /// Note that this buffer MUST have the same rowstride and type, or
+    /// unexpected things will happen. In general, it is only safe to copy
+    /// from another GnashImage or unexpected things will happen. 
     ///
-    /// @param data buffer to copy data from.
-    ///
+    /// @param data     buffer to copy data from.
     void update(const_iterator data);
 
     /// Copy image data from another image data
     //
-    /// Note that this buffer MUST have the same _pitch and _type
-    /// or an assertion will fail.
+    /// Note that this buffer must have the same rowstride and type
     ///
-    /// @param from image to copy data from.
-    ///
+    /// @param from     image to copy data from.
     void update(const GnashImage& from);
     
-    /// Get access to the underlying data
-    //
-    /// @return     A pointer to the raw image data.
-    virtual iterator data() {
-        return _data.get();
-    }
-
-    /// Get read-only access to the underlying data
-    //
-    /// @return     A read-only pointer to the raw image data.
-    virtual const_iterator data() const {
-        return _data.get();
-    }
-
+    /// Access the raw data.
     iterator begin() {
-        return data();
+        return _data.get();
     }
 
+    /// Access the raw data
     const_iterator begin() const {
-        return data();
+        return _data.get();
     }
 
+    /// An iterator to the end of the data.
     iterator end() {
-        return data() + size();
+        return begin() + size();
     }
 
+    /// An iterator to the end of the data.
     const_iterator end() const {
-        return data() + size();
+        return begin() + size();
     }
 
-    argb_iterator abegin() {
-        return argb_iterator(begin(), pixelSize());
+    /// An iterator to write data in ARGB format to the bitmap
+    argb_iterator argb_begin() {
+        return argb_iterator(begin(), _type);
     }
     
-    argb_iterator aend() {
-        return argb_iterator(end(), pixelSize());
+    /// An argb_iterator to the end of the data.
+    argb_iterator argb_end() {
+        return argb_iterator(end(), _type);
     }
-
-    /// Get a pointer to a given row
-    //
-    /// @param y    The index of the required row.
-    /// @return     A pointer to the first byte of the specified row.
-    iterator scanline(size_t y);
-
-    /// Get a read-only pointer to a given row
-    //
-    /// @param y    The index of the required row.
-    /// @return     A read-only pointer to the first byte of the specified
-    ///             row.
-    DSOEXPORT const_iterator scanlinePointer(size_t y) const;
 
 protected:
 
+    /// Construct a GnashImage from a data buffer, taking ownership of the data.
+    //
+    /// @param data     The raw image data. This class takes ownership.
+    /// @param width    The width of the image in pixels.
+    /// @param height   The height of the image in pixels.
+    /// @param pitch    The pitch (rowstride) of the image in bytes.
+    /// @param type     The ImageType of the image.
+    GnashImage(iterator data, size_t width, size_t height, ImageType type,
+            ImageLocation location = GNASH_IMAGE_CPU);
+
+    /// Construct an empty GnashImage
+    //
+    /// Note: there is an arbitrary limit of boost::int32_t::max bytes for the
+    /// total size of the bitmap constructed with this constructor.
+    //
+    /// @param width    The width of the image in pixels.
+    /// @param height   The height of the image in pixels.
+    /// @param type     The ImageType of the image.
+    GnashImage(size_t width, size_t height, ImageType type,
+               ImageLocation location = GNASH_IMAGE_CPU);
+
+
+    /// The type of the image: RGBA or RGB.
     const ImageType _type;
 
     /// Image data location (CPU or GPU)
     const ImageLocation _location;
-
-    /// Size of image buffer in bytes.
-    const size_t _size;
 
     /// Width of image, in pixels
     const size_t _width;
@@ -319,46 +313,44 @@ protected:
     /// Height of image, in pixels
     const size_t _height;
 
-    /// Byte offset from one row to the next
-    //
-    /// This is basically width in bytes of each line.
-    /// For example, in an alpha image type this is equal to _width
-    /// while for an RGB this is 3 times the _width.
-    const size_t _pitch;
-
     /// Data if held in this class
     container_type _data;
 
 };
 
-/// 24-bit RGB image.  Packed data, red byte first (RGBRGB...)
+/// 24-bit RGB bitmap
+//
+/// Channels are in RGB order.
 class DSOEXPORT ImageRGB : public GnashImage
 {
-
 public:
 
+    /// Create an empty RGB image with uninitialized data.
     ImageRGB(size_t width, size_t height);
 
-    ImageRGB(iterator data, size_t width, size_t height, size_t stride)
+    /// Create an ImageRGB taking ownership of the data.
+    ImageRGB(iterator data, size_t width, size_t height)
         :
-        GnashImage(data, width, height, stride, GNASH_IMAGE_RGB)
+        GnashImage(data, width, height, GNASH_IMAGE_RGB)
     {}
 
-    ~ImageRGB();
-
+    virtual ~ImageRGB();
 };
 
-/// 32-bit RGBA image.  Packed data, red byte first (RGBARGBA...)
+/// 32-bit RGBA bitmap
+//
+/// Channels are in RGBA order.
 class DSOEXPORT ImageRGBA : public GnashImage
 {
 
 public:
 
+    /// Create an empty RGB image with uninitialized data.
     ImageRGBA(size_t width, size_t height);
 
-    ImageRGBA(iterator data, size_t width, size_t height, size_t stride)
+    ImageRGBA(iterator data, size_t width, size_t height)
         :
-        GnashImage(data, width, height, stride, GNASH_IMAGE_RGBA)
+        GnashImage(data, width, height, GNASH_IMAGE_RGBA)
     {}
     
     ~ImageRGBA();
@@ -377,7 +369,6 @@ public:
 /// The base class for reading image data. 
 class ImageInput : boost::noncopyable
 {
-
 public:
 
     /// Construct an ImageInput object to read from an IOChannel.
@@ -385,7 +376,8 @@ public:
     /// @param in   The stream to read data from. Ownership is shared
     ///             between caller and ImageInput, so it is freed
     ///             automatically when the last owner is destroyed.
-    ImageInput(boost::shared_ptr<IOChannel> in) :
+    ImageInput(boost::shared_ptr<IOChannel> in)
+        :
         _inStream(in),
         _type(GNASH_IMAGE_INVALID)
     {}
@@ -458,11 +450,12 @@ public:
     ///                 is shared.
     /// @param width    The width of the resulting image
     /// @param height   The height of the resulting image.
-    ImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height) :
+    ImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height)
+        :
         _width(width),
         _height(height),
         _outStream(out)
-        {}
+    {}
 
     virtual ~ImageOutput() {}
     
@@ -490,7 +483,6 @@ public:
             boost::shared_ptr<gnash::IOChannel> out, const GnashImage& image,
             int quality);
 
-
 protected:
 
     const size_t _width;
@@ -501,6 +493,27 @@ protected:
 
 };
 
+/// Get a pointer to a given row of any image.
+//
+/// @param row    The index of the required row.
+/// @return     A pointer to the first byte of the specified row.
+inline GnashImage::iterator
+scanline(GnashImage& im, size_t row)
+{
+    assert(row < im.height());
+    return im.begin() + im.stride() * row;
+}
+
+/// Get a read-only pointer to a given row of any image.
+//
+/// @param y    The index of the required row.
+/// @return     A read-only pointer to the first byte of the specified row.
+inline GnashImage::const_iterator
+scanline(const GnashImage& im, size_t row)
+{
+    assert(row < im.height());
+    return im.begin() + im.stride() * row;
+}
 
 } // namespace gnash
 

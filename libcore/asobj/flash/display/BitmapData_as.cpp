@@ -94,7 +94,7 @@ BitmapData_as::BitmapData_as(as_object* owner, size_t width, size_t height,
                 static_cast<GnashImage*>(new ImageRGBA(width, height)) :
                 static_cast<GnashImage*>(new ImageRGB(width, height)));
     
-    std::fill(im->abegin(), im->aend(), fillColor | (0xff << 24));
+    std::fill(im->argb_begin(), im->argb_end(), fillColor | (0xff << 24));
     
     if (!r) {
         _image.reset(im.release());
@@ -125,7 +125,7 @@ BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color)
     if (!data()) return;
     if (x >= width() || y >= height()) return;
 
-    argb_iterator it = data()->abegin() + x * width() + y;
+    GnashImage::argb_iterator it = data()->argb_begin() + x * width() + y;
     *it = color;
 }
 
@@ -135,7 +135,7 @@ BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color)
     if (!data()) return;
     if (x >= width() || y >= height()) return;
 
-    argb_iterator it = data()->abegin() + x * width() + y;
+    GnashImage::argb_iterator it = data()->argb_begin() + x * width() + y;
     const boost::uint32_t val = it.toARGB();
     *it = (color & 0xffffff) | (val & 0xff000000);
 }
@@ -157,7 +157,7 @@ BitmapData_as::getPixel(size_t x, size_t y) const
     if (x >= width() || y >= height()) return 0;
 
     const size_t pixelIndex = y * width() + x;
-    return (data()->abegin() + pixelIndex).toARGB();
+    return (data()->argb_begin() + pixelIndex).toARGB();
 
 }
 
@@ -192,9 +192,9 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     w = std::min<size_t>(width() - x, w);
     h = std::min<size_t>(height() - y, h);
     
-    argb_iterator it = data()->abegin() + y * width();
+    GnashImage::argb_iterator it = data()->argb_begin() + y * width();
     
-    argb_iterator e = it + width() * h;
+    GnashImage::argb_iterator e = it + width() * h;
     
     // TODO: fix!
     while (it < e) {

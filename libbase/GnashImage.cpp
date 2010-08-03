@@ -44,79 +44,53 @@ namespace {
     void processAlpha(GnashImage::iterator imageData, size_t pixels);
 }
 
-//
-// GnashImage
-//
-
-/// Create an image taking ownership of the given buffer height*pitch bytes
 GnashImage::GnashImage(iterator data, size_t width, size_t height,
-        size_t pitch, ImageType type, ImageLocation location)
+        ImageType type, ImageLocation location)
     :
     _type(type),
     _location(location),
-    _size(height*pitch),
     _width(width),
     _height(height),
-    _pitch(pitch),
     _data(data)
 {
 }
 
 /// Create an image allocating a buffer of height*pitch bytes
-GnashImage::GnashImage(size_t width, size_t height, size_t pitch,
-        ImageType type, ImageLocation location)
+GnashImage::GnashImage(size_t width, size_t height, ImageType type,
+        ImageLocation location)
     :
     _type(type),
     _location(location),
-    _size(height*pitch),
     _width(width),
-    _height(height),
-    _pitch(pitch)
+    _height(height)
 {
     const size_t max = std::numeric_limits<boost::int32_t>::max();
-    if (_size > max) {
+    if (size() > max) {
         throw std::bad_alloc();
     }
-    _data.reset(new value_type[_size]);
-    assert(pitch >= width);
+    _data.reset(new value_type[size()]);
 }
 
 void
 GnashImage::update(const_iterator data)
 {
-    std::copy(data, data + _size, _data.get());
+    std::copy(data, data + size(), _data.get());
 }
 
 void
 GnashImage::update(const GnashImage& from)
 {
-    assert(from._pitch == _pitch);
-    assert(_size <= from._size);
+    assert(size() <= from.size());
+    assert(width() == from.width());
     assert(_type == from._type);
     assert(_location == from._location);
-    std::memcpy(data(), from.data(), _size);
-}
-
-GnashImage::iterator
-GnashImage::scanline(size_t y)
-{
-    assert(y < _height);
-    return data() + _pitch * y;
-}
-
-GnashImage::const_iterator
-GnashImage::scanlinePointer(size_t y) const
-{
-    assert(y < _height);
-    return data() + _pitch * y;
+    std::memcpy(begin(), from.begin(), size());
 }
 
 ImageRGB::ImageRGB(size_t width, size_t height)
     :
-    GnashImage(width, height, width * 3, GNASH_IMAGE_RGB)
+    GnashImage(width, height, GNASH_IMAGE_RGB)
 {
-    assert(width > 0);
-    assert(height > 0);
 }
 
 ImageRGB::~ImageRGB()
@@ -125,10 +99,8 @@ ImageRGB::~ImageRGB()
 
 ImageRGBA::ImageRGBA(size_t width, size_t height)
     :
-    GnashImage(width, height, width * 4, GNASH_IMAGE_RGBA)
+    GnashImage(width, height, GNASH_IMAGE_RGBA)
 {
-    assert(_pitch >= _width * 4);
-    assert((_pitch & 3) == 0);
 }
 
 ImageRGBA::~ImageRGBA()
@@ -142,7 +114,7 @@ ImageRGBA::setPixel(size_t x, size_t y, value_type r, value_type g,
     assert(x < _width);
     assert(y < _height);
 
-    iterator data = scanline(y) + 4 * x;
+    iterator data = scanline(*this, y) + 4 * x;
 
     *data = r;
     *(data + 1) = g;
@@ -154,10 +126,10 @@ ImageRGBA::setPixel(size_t x, size_t y, value_type r, value_type g,
 void
 ImageRGBA::mergeAlpha(const_iterator alphaData, const size_t bufferLength)
 {
-    assert (bufferLength * 4 <= _size);
+    assert(bufferLength * 4 <= size());
 
     // Point to the first alpha byte
-    iterator p = data();
+    iterator p = begin();
 
     // Set each 4th byte to the correct alpha value and adjust the
     // other values.
@@ -204,10 +176,10 @@ ImageOutput::writeImageData(FileType type,
 
     switch (image.type()) {
         case GNASH_IMAGE_RGB:
-            outChannel->writeImageRGB(image.data());
+            outChannel->writeImageRGB(image.begin());
             break;
         case GNASH_IMAGE_RGBA:
-            outChannel->writeImageRGBA(image.data());
+            outChannel->writeImageRGBA(image.begin());
             break;
         default:
             break;
@@ -269,7 +241,7 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     
 
     for (size_t i = 0; i < height; ++i) {
-        inChannel->readScanline(im->scanline(i));
+        inChannel->readScanline(scanline(*im, i));
     }
 
     // The renderers expect RGBA data to be preprocessed. JPEG images are
@@ -277,7 +249,7 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     // in the SWF is possible; in that case, the processing happens during
     // mergeAlpha().
     if (im->type() == GNASH_IMAGE_RGBA) {
-        processAlpha(im->data(), width * height);
+        processAlpha(im->begin(), width * height);
     }
     return im;
 }
@@ -310,7 +282,7 @@ ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
     for (size_t y = 0; y < height; ++y) {
         j_in->readScanline(line.get());
 
-        GnashImage::iterator data = im->scanline(y);
+        GnashImage::iterator data = scanline(*im, y);
         for (size_t x = 0; x < width; ++x) {
             data[4*x+0] = line[3*x+0];
             data[4*x+1] = line[3*x+1];

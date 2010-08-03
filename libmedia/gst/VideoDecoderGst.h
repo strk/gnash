@@ -40,7 +40,7 @@ class gnashGstBuffer : public ImageRGB
 {
 public:
   gnashGstBuffer(GstBuffer* buf, int width, int height)
-  : ImageRGB(NULL, width, height, (width * 3 + 3) & ~3),
+  : ImageRGB(NULL, width, height),
     _buffer(buf)
   {}
   
