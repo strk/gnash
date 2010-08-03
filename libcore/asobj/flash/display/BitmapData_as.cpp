@@ -79,37 +79,23 @@ namespace {
 
 }
 
-
-BitmapData_as::BitmapData_as(as_object* owner, size_t width, size_t height,
-              bool transparent, boost::uint32_t fillColor, Renderer* r)
+BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
+        boost::uint32_t fillColor)
     :
     _owner(owner),
-    _transparent(transparent),
     _bitmapData(0)
 {
-    assert(width > 0 && width <= 2880);
-    assert(height > 0 && height <= 2880);
+    assert(im->width() <= 2880);
+    assert(im->width() <= 2880);
 
-    std::auto_ptr<GnashImage> im(transparent ?
-                static_cast<GnashImage*>(new ImageRGBA(width, height)) :
-                static_cast<GnashImage*>(new ImageRGB(width, height)));
-    
     std::fill(im->argb_begin(), im->argb_end(), fillColor | (0xff << 24));
     
-    if (!r) {
-        _image.reset(im.release());
-        return;
-    }
-
-    _bitmapData.reset(r->createBitmapInfo(im));
+    // If there is a renderer, cache the image there, otherwise we store it.
+    Renderer* r = getRunResources(*_owner).renderer();
+    if (r) _bitmapData.reset(r->createBitmapInfo(im));
+    else _image.reset(im.release());
 }
     
-BitmapData_as::~BitmapData_as()
-{
-    updateAttachedBitmaps();
-    log_debug("BitmapData_as dtor");
-}
-
 void
 BitmapData_as::setReachable() 
 {
@@ -122,7 +108,7 @@ BitmapData_as::setReachable()
 void
 BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color)
 {
-    if (!data()) return;
+    if (disposed()) return;
     if (x >= width() || y >= height()) return;
 
     GnashImage::argb_iterator it = data()->argb_begin() + x * width() + y;
@@ -132,7 +118,7 @@ BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color)
 void
 BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color)
 {
-    if (!data()) return;
+    if (disposed()) return;
     if (x >= width() || y >= height()) return;
 
     GnashImage::argb_iterator it = data()->argb_begin() + x * width() + y;
@@ -141,7 +127,7 @@ BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color)
 }
 
 void
-BitmapData_as::updateAttachedBitmaps()
+BitmapData_as::updateObjects()
 {
     log_debug("Updating %d attached objects", _attachedObjects.size());
     std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
@@ -153,7 +139,7 @@ BitmapData_as::updateAttachedBitmaps()
 boost::uint32_t
 BitmapData_as::getPixel(size_t x, size_t y) const
 {
-    if (!data()) return 0;
+    if (disposed()) return 0;
     if (x >= width() || y >= height()) return 0;
 
     const size_t pixelIndex = y * width() + x;
@@ -165,7 +151,7 @@ void
 BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 {
 
-    if (!data()) return;
+    if (disposed()) return;
 
     if (w < 0 || h < 0) return;
     if (x >= static_cast<int>(width()) || y >= static_cast<int>(height())) {
@@ -202,7 +188,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
         it += width();
     }
 
-    updateAttachedBitmaps();
+    updateObjects();
 
 }
 
@@ -211,7 +197,7 @@ BitmapData_as::dispose()
 {
     _bitmapData.reset();
     _image.reset();
-    updateAttachedBitmaps();
+    updateObjects();
 }
 
 // extern 
@@ -690,9 +676,15 @@ bitmapdata_ctor(const fn_call& fn)
         throw ActionTypeError();
     }
 
-    ptr->setRelay(
-            new BitmapData_as(ptr, width, height, transparent, fillColor,
-                getRunResources(*ptr).renderer()));
+    std::auto_ptr<GnashImage> im;
+    if (transparent) {
+        im.reset(new ImageRGBA(width, height));
+    }
+    else {
+        im.reset(new ImageRGB(width, height));
+    }
+
+    ptr->setRelay(new BitmapData_as(ptr, im, fillColor));
 
 	return as_value(); 
 }

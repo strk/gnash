@@ -21,22 +21,23 @@
 #ifndef GNASH_ASOBJ_BITMAPDATA_H
 #define GNASH_ASOBJ_BITMAPDATA_H
 
-#include "Relay.h"
-
 #include <list>
-#include <vector>
 #include <boost/cstdint.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <cassert>
-#include "GnashImage.h"
 #include "smart_ptr.h"
 #include <boost/intrusive_ptr.hpp>
+#include <memory>
+
+#include "Relay.h"
+#include "BitmapInfo.h"
+#include "GnashImage.h"
 
 namespace gnash {
     class as_object;
     struct ObjectURI;
     class DisplayObject;
-    class Renderer;
+    class GnashImage;
 }
 
 namespace gnash {
@@ -54,26 +55,30 @@ public:
     //
     /// The constructor sets the fill colour and the immutable size of the
     /// bitmap, as well as whether it can handle transparency or not.
-	BitmapData_as(as_object* owner, size_t width, size_t height,
-	              bool transparent, boost::uint32_t fillColor,
-                  Renderer* r);
+	BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
+	              boost::uint32_t fillColor);
 
-    ~BitmapData_as();
+    virtual ~BitmapData_as() {}
 
     /// Return the width of the image
+    //
+    /// Do not call if disposed!
     size_t width() const {
-        return data() ? data()->width() : 0;
+        assert(data());
+        return data()->width();
     }
     
     /// Return the height of the image
     //
-    /// The unusual int type for a size is there to mirror the AS interface.
+    /// Do not call if disposed!
     size_t height() const {
-        return data() ? data()->height() : 0;
+        assert(data());
+        return data()->height();
     }
 
     bool transparent() const {
-        return _transparent;
+        assert(data());
+        return (data()->type() == GNASH_IMAGE_RGBA);
     }
 
     const BitmapInfo* bitmapInfo() const {
@@ -88,7 +93,7 @@ public:
     /// Set a specified pixel to the specified color.
     void setPixel32(size_t x, size_t y, boost::uint32_t color);
 
-    /// Returns the value of the pixel at (x, y) optionally with transparency.
+    /// Returns the value of the pixel at (x, y).
     //
     /// Returns 0 if the pixel is out of range or the image has been disposed.
     boost::uint32_t getPixel(size_t x, size_t y) const;
@@ -98,9 +103,12 @@ public:
     /// Negative values are handled correctly.
     void fillRect(int x, int y, int w, int h, boost::uint32_t color);
     
-    // Free the bitmap data (clear the array)
+    /// Free the bitmap data
     void dispose();
 
+    /// Attach this BitmapData to an object
+    //
+    /// This may be either as a fill or an attached Bitmap.
     void attach(DisplayObject* obj) {
         _attachedObjects.push_back(obj);
     }
@@ -119,13 +127,11 @@ private:
         return _bitmapData.get() ? &_bitmapData->image() : _image.get();
     }
 
-    void updateAttachedBitmaps();
+    /// Inform any attached objects that the data has changed.
+    void updateObjects();
 
     /// The object to which this native type class belongs to.
     as_object* _owner;
-
-    // Whether the image is transparent. This is immutable.
-    const bool _transparent;
 
     boost::intrusive_ptr<BitmapInfo> _bitmapData;
 

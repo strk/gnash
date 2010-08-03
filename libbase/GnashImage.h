@@ -33,7 +33,6 @@
 #include "FileTypes.h"
 #include "log.h"
 #include "dsodefs.h"
-#include "BitmapInfo.h"
 #include <boost/iterator/iterator_facade.hpp>
 #include <iterator>
 
