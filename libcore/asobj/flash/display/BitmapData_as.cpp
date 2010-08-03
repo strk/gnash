@@ -195,6 +195,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 void
 BitmapData_as::dispose()
 {
+    if (_cachedBitmap) _cachedBitmap->dispose();
     _cachedBitmap.reset();
     _image.reset();
     updateObjects();

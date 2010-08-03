@@ -34,12 +34,23 @@ class GnashImage;
 class DSOEXPORT BitmapInfo : public ref_counted
 {
 public:
-
-	BitmapInfo() {}
+	BitmapInfo() : _disposed(false) {}
 
     virtual GnashImage& image() = 0;
 
     virtual ~BitmapInfo() {}
+
+    void dispose() {
+        _disposed = true;
+    }
+
+    bool disposed() const {
+        return _disposed;
+    }
+
+private:
+
+    bool _disposed;
 };
 	
 
