@@ -114,7 +114,7 @@ main(int /*argc*/, char** /*argv*/)
     
     // Shape 8
     // This should change with the BitmapData.
-    xcheck_pixel(20, 465, 1, red, 8);
+    check_pixel(20, 465, 1, red, 8);
 
 }
 
