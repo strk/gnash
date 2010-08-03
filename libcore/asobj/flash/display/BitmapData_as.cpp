@@ -196,8 +196,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     
     GnashImage::argb_iterator e = it + width() * h;
     
-    // TODO: fix!
-    while (it < e) {
+    while (it != e) {
         // Fill from x for the width of the rectangle.
         std::fill_n(it + x, w, color);
         it += width();
@@ -210,7 +209,6 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 void
 BitmapData_as::dispose()
 {
-    log_debug("Dispose");
     _bitmapData.reset();
     _image.reset();
     updateAttachedBitmaps();
