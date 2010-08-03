@@ -267,12 +267,10 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
         return im;
     }
     
-    log_debug("Reading scanlines");
 
     for (size_t i = 0; i < height; ++i) {
         inChannel->readScanline(im->scanline(i));
     }
-    log_debug("Processing alpha");
 
     // The renderers expect RGBA data to be preprocessed. JPEG images are
     // never transparent, but the addition of alpha data stored elsewhere

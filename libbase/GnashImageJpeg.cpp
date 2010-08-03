@@ -252,7 +252,6 @@ JpegImageInput::JpegImageInput(boost::shared_ptr<IOChannel> in)
 
 JpegImageInput::~JpegImageInput()
 {
-    log_debug("~JpegImageInput");
     finishImage();
 
     rw_source_IOChannel* src =
@@ -333,8 +332,6 @@ JpegImageInput::read()
         throw ParserException(ss.str());
     }
 
-    log_debug("JpegImageInput::read");
-
     // hack, FIXME
     static const int stateReady = 202;    /* found SOS, ready for start_decompress */
     while (m_cinfo.global_state != stateReady) {
@@ -363,10 +360,8 @@ JpegImageInput::read()
         ss << _("Internal jpeg error during header parsing: ") << _errorOccurred;
         throw ParserException(ss.str());
     }
-    log_debug("JpegImageInput start decompress");
 
     jpeg_start_decompress(&m_cinfo);
-    log_debug("JpegImageInput started decompress");
 
     if (_errorOccurred) {
         std::stringstream ss;
@@ -375,7 +370,6 @@ JpegImageInput::read()
     }
 
     _compressorOpened = true;
-    log_debug("JpegImageInput compressor opened");
     
     // Until this point the type should be GNASH_IMAGE_INVALID.
     // It's possible to create transparent JPEG data by merging an
@@ -387,7 +381,6 @@ JpegImageInput::read()
 void
 JpegImageInput::finishImage()
 {
-    log_debug("finishImage");
     if (setjmp(_jmpBuf)) {
         std::stringstream ss;
         ss << _("Internal jpeg error: ") << _errorOccurred;
