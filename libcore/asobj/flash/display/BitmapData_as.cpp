@@ -83,7 +83,7 @@ BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
         boost::uint32_t fillColor)
     :
     _owner(owner),
-    _bitmapData(0)
+    _cachedBitmap(0)
 {
     assert(im->width() <= 2880);
     assert(im->width() <= 2880);
@@ -92,7 +92,7 @@ BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
     
     // If there is a renderer, cache the image there, otherwise we store it.
     Renderer* r = getRunResources(*_owner).renderer();
-    if (r) _bitmapData.reset(r->createBitmapInfo(im));
+    if (r) _cachedBitmap.reset(r->createBitmapInfo(im));
     else _image.reset(im.release());
 }
     
@@ -195,7 +195,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 void
 BitmapData_as::dispose()
 {
-    _bitmapData.reset();
+    _cachedBitmap.reset();
     _image.reset();
     updateObjects();
 }

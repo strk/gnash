@@ -82,7 +82,7 @@ public:
     }
 
     const BitmapInfo* bitmapInfo() const {
-        return _bitmapData.get();
+        return _cachedBitmap.get();
     }
 
     /// Set a specified pixel to the specified color.
@@ -124,7 +124,7 @@ public:
 private:
     
     GnashImage* data() const {
-        return _bitmapData.get() ? &_bitmapData->image() : _image.get();
+        return _cachedBitmap.get() ? &_cachedBitmap->image() : _image.get();
     }
 
     /// Inform any attached objects that the data has changed.
@@ -133,7 +133,7 @@ private:
     /// The object to which this native type class belongs to.
     as_object* _owner;
 
-    boost::intrusive_ptr<BitmapInfo> _bitmapData;
+    boost::intrusive_ptr<BitmapInfo> _cachedBitmap;
 
     boost::scoped_ptr<GnashImage> _image;
 
