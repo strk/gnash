@@ -132,8 +132,6 @@ BitmapData_as::updateObjects()
     log_debug("Updating %d attached objects", _attachedObjects.size());
     std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
             std::mem_fun(&DisplayObject::update));
-    std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
-            std::mem_fun(&DisplayObject::set_invalidated));
 }
 
 boost::uint32_t

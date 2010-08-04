@@ -29,12 +29,12 @@
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
 #include <memory> 
+#include <boost/iterator/iterator_facade.hpp>
+#include <iterator>
 
 #include "FileTypes.h"
 #include "log.h"
 #include "dsodefs.h"
-#include <boost/iterator/iterator_facade.hpp>
-#include <iterator>
 
 // Forward declarations
 namespace gnash {
@@ -107,11 +107,11 @@ private:
 };
 
 template<typename Iterator, typename Pixel>
-struct pixel_iterator :
-    public boost::iterator_facade<pixel_iterator<Iterator, Pixel>,
-                                  boost::uint32_t,
-                                  std::random_access_iterator_tag,
-                                  Pixel>
+struct pixel_iterator : public boost::iterator_facade<
+                            pixel_iterator<Iterator, Pixel>,
+                            boost::uint32_t,
+                            std::random_access_iterator_tag,
+                            Pixel>
 {
 
     typedef std::ptrdiff_t difference_type;
