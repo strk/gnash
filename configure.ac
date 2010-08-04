@@ -1214,14 +1214,6 @@ AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
 AC_PATH_PROG(CSOUND, csound)
 AM_CONDITIONAL(HAVE_CSOUND, test x"$CSOUND" != x)
 
-if test x$ext_dbus = xyes; then
-  GNASH_PATH_DBUS
-fi
-
-if test x$ext_mysql = xyes; then
-  GNASH_PATH_MYSQL
-fi
-
 dnl -------------------------------------
 dnl LIRC
 dnl -------------------------------------
@@ -1326,6 +1318,14 @@ AC_ARG_ENABLE(extensions,
   EXTENSIONS_LIST="$extensions_list"
   AC_SUBST(EXTENSIONS_LIST)
 )
+
+if test x$ext_dbus = xyes; then
+  GNASH_PATH_DBUS
+fi
+
+if test x$ext_mysql = xyes; then
+  GNASH_PATH_MYSQL
+fi
 
 AM_CONDITIONAL(BUILD_DEJAGNU_EXT, [ test x$ext_dejagnu = xyes ])
 AM_CONDITIONAL(BUILD_FILEIO_EXT, [ test x$ext_fileio = xyes ])
