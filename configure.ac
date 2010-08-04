@@ -1242,6 +1242,10 @@ dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
 
+if test x"$build_media_ffmpeg" = x"yes"; then
+  GNASH_PATH_FFMPEG
+fi
+
 
 dnl Multiple input devices are supported. These can all work in varying combinations,
 dnl so several may be listed. These are only required when using the Framebuffer,
@@ -1502,6 +1506,16 @@ fi
 if test x"${build_agg}" = xyes; then
    GNASH_PATH_AGG
 fi
+
+dnl VA API is used by default for all H.264 videos. HW requirements:
+dnl     * AMD GPUs with UVD2 and xvba-video VA driver
+dnl     * NVIDIA GPUs with vdpau-video VA driver
+dnl     * All HW with a VA driver supporting the VA/GLX extensions or
+dnl     vaPutSurface(Pixmap,...). This may include the Intel
+dnl     Moorestown platform and future G45 VA driver.
+dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
+dnl GMA500 but you currently will have to build the AGG renderer
+dnl instead of the OGL (OpenGL) one. 
 
 build_xv=yes
 build_vaapi=yes
@@ -1869,16 +1883,6 @@ GNASH_PATH_FIREFOX
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
-
-dnl VA API is used by default for all H.264 videos. HW requirements:
-dnl     * AMD GPUs with UVD2 and xvba-video VA driver
-dnl     * NVIDIA GPUs with vdpau-video VA driver
-dnl     * All HW with a VA driver supporting the VA/GLX extensions or
-dnl     vaPutSurface(Pixmap,...). This may include the Intel
-dnl     Moorestown platform and future G45 VA driver.
-dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
-dnl GMA500 but you currently will have to build the AGG renderer
-dnl instead of the OGL (OpenGL) one. 
 
 dnl IRIX-hack.
 case $host in
@@ -2474,10 +2478,6 @@ if test x"$build_media_gst" = "xyes"; then
     GSTREAMER_LIBS="-lgstinterfaces-0.10 $GSTREAMER_LIBS"
     AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], "Has the Gstreamer Plugin Dev package installed.")
   fi
-fi
-
-if test x"$build_media_ffmpeg" = x"yes"; then
-  GNASH_PATH_FFMPEG
 fi
 
 AM_CONDITIONAL(HAVE_CAIRO, [true])
