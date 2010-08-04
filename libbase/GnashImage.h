@@ -205,7 +205,7 @@ public:
     /// Get the pitch of the image buffer
     //
     /// @return     The rowstride of the buffer in bytes
-    size_t stride() const {
+    virtual size_t stride() const {
         return _width * channels();
     }
 
@@ -247,12 +247,12 @@ public:
     void update(const GnashImage& from);
     
     /// Access the raw data.
-    iterator begin() {
+    virtual iterator begin() {
         return _data.get();
     }
 
     /// Access the raw data
-    const_iterator begin() const {
+    virtual const_iterator begin() const {
         return _data.get();
     }
 

@@ -49,12 +49,16 @@ public:
     gst_buffer_unref(_buffer);
   }
   
-  boost::uint8_t* data()
+  virtual size_t stride() const {
+      return (width() * channels() + 3) &~ 3;
+  }
+
+  virtual iterator begin()
   {
     return GST_BUFFER_DATA(_buffer);
   }
 
-  const boost::uint8_t* data() const
+  virtual const_iterator begin() const
   {
     return GST_BUFFER_DATA(_buffer);
   }

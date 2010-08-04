@@ -39,29 +39,9 @@ static boost::uint64_t get_ticks_usec(void)
 #endif
 }
 
-/// Get scanline pitch for the specified image type
-static inline int get_pitch(int width, ImageType type)
-{
-    int bytes_per_pixel;
-
-    switch (type) {
-    case GNASH_IMAGE_RGB:
-        bytes_per_pixel = 3;
-        break;
-    case GNASH_IMAGE_RGBA:
-        bytes_per_pixel = 4;
-        break;
-    default:
-        assert(0);
-        bytes_per_pixel = 0;
-        break;
-    }
-    return width * bytes_per_pixel;
-}
-
 GnashVaapiImage::GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface, ImageType type)
-    : GnashImage(NULL, surface->width(), surface->height(), get_pitch(surface->width(), type),
-                 type, GNASH_IMAGE_GPU)
+    : GnashImage(NULL, surface->width(), surface->height(), type,
+            GNASH_IMAGE_GPU)
     , _surface(surface)
     , _creation_time(get_ticks_usec())
 {
@@ -69,28 +49,10 @@ GnashVaapiImage::GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface, ImageT
           _surface->get(), _width, _height);
 }
 
-GnashVaapiImage::GnashVaapiImage(const GnashVaapiImage& o)
-    : GnashImage(NULL, o.width(), o.height(), get_pitch(o.width(), o.type()),
-                 o.type(), GNASH_IMAGE_GPU)
-    , _surface(o.surface())
-    , _creation_time(get_ticks_usec())
-{
-    log_debug("GnashVaapiImage::GnashVaapiImage(): VA image %p\n", &o);
-
-    update(o);
-}
-
 GnashVaapiImage::~GnashVaapiImage()
 {
     log_debug("GnashVaapiImage::~GnashVaapiImage(): surface 0x%08x\n",
           _surface->get());
-}
-
-std::auto_ptr<GnashImage> GnashVaapiImage::clone()
-{
-    log_debug("GnashVaapiImage::clone(): image %p\n", this);
-
-    return std::auto_ptr<GnashImage>(new GnashVaapiImage(*this));
 }
 
 void GnashVaapiImage::update(boost::shared_ptr<VaapiSurface> surface)
@@ -109,13 +71,13 @@ void GnashVaapiImage::update(boost::uint8_t* data)
 
 void GnashVaapiImage::update(const GnashImage& from)
 {
-    assert(_pitch == from.pitch());
-    assert(_size <= from.size());
-    assert(_type == from.type());
+    assert(stride() == from.stride());
+    assert(size() <= from.size());
+    assert(type() == from.type());
 
     switch (from.location()) {
     case GNASH_IMAGE_CPU:
-        this->update(const_cast<boost::uint8_t *>(from.data()));
+        this->update(const_cast<boost::uint8_t *>(from.begin()));
         break;
     case GNASH_IMAGE_GPU:
         this->update(static_cast<const GnashVaapiImage &>(from).surface());
@@ -141,7 +103,8 @@ bool GnashVaapiImage::transfer()
 }
 
 // Get access to the underlying data
-boost::uint8_t* GnashVaapiImage::data()
+GnashImage::iterator
+GnashVaapiImage::begin()
 {
     log_debug("GnashVaapiImage::data(): surface 0x%08x\n", _surface->get());
     log_debug("  -> %u usec from creation\n",
@@ -155,7 +118,8 @@ boost::uint8_t* GnashVaapiImage::data()
 }
 
 // Get read-only access to the underlying data
-const boost::uint8_t* GnashVaapiImage::data() const
+GnashImage::const_iterator
+GnashVaapiImage::begin() const
 {
     log_debug("GnashVaapiImage::data() const: surface 0x%08x\n", _surface->get());
     log_debug("  -> %u usec from creation\n",
