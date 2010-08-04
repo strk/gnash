@@ -84,14 +84,12 @@ namespace {
 GtkWidget *
 gnash_canvas_new ()
 {
-    GNASH_REPORT_FUNCTION;
     return GTK_WIDGET(g_object_new (GNASH_TYPE_CANVAS, NULL));
 }
 
 static void
 gnash_canvas_class_init(GnashCanvasClass *gnash_canvas_class)
 {
-    GNASH_REPORT_FUNCTION;
     GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(gnash_canvas_class);
 
     parent_class = (GObjectClass *)g_type_class_peek_parent(gnash_canvas_class);
@@ -105,7 +103,6 @@ gnash_canvas_class_init(GnashCanvasClass *gnash_canvas_class)
 static void
 gnash_canvas_init(GnashCanvas *canvas)
 {
-    GNASH_REPORT_FUNCTION;
 
     canvas->renderer.reset();
 
@@ -122,7 +119,6 @@ gnash_canvas_init(GnashCanvas *canvas)
 static void
 gnash_canvas_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 {
-    GNASH_REPORT_FUNCTION;
     GnashCanvas *canvas = GNASH_CANVAS(widget);
 
     gnash::log_debug("gnash_canvas_size_allocate %d %d", allocation->width,
@@ -152,7 +148,6 @@ gnash_canvas_expose_event(GtkWidget *widget, GdkEventExpose *event)
 static gboolean
 gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigure *event)
 {
-    GNASH_REPORT_FUNCTION;
     GnashCanvas *canvas = GNASH_CANVAS(widget);
 
     canvas->glue->configure(widget, event);
@@ -163,7 +158,6 @@ gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigure *event)
 static void
 gnash_canvas_realize(GtkWidget *widget)
 {
-    GNASH_REPORT_FUNCTION;
     GnashCanvas *canvas = GNASH_CANVAS(widget);
     GdkWindowAttr attributes;
     gint attributes_mask;
@@ -197,7 +191,6 @@ gnash_canvas_realize(GtkWidget *widget)
 static void
 gnash_canvas_after_realize(GtkWidget *widget)
 {
-    GNASH_REPORT_FUNCTION;
     GnashCanvas *canvas = GNASH_CANVAS(widget);
 
     canvas->renderer.reset(canvas->glue->createRenderHandler());
@@ -210,8 +203,6 @@ void
 gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         std::string& renderer, int argc, char **argv[])
 {
-
-    GNASH_REPORT_FUNCTION;
 
     // Order should be VAAPI, Xv, X11
     bool initialized_renderer = false;
@@ -266,18 +257,18 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             canvas->glue.reset(new gnash::GtkAggVaapiGlue);
             // Set the hardware acclerator to the next one to try
             // if initializing fails.
-        } 
+        } else
 #endif
 #ifdef RENDERER_AGG
 #ifdef HAVE_XV
-        else if (hwaccel == "xv") {
+        if (hwaccel == "xv") {
             // Use the X11 XV extension, which works on most GPUs.
             canvas->glue.reset(new gnash::GtkAggXvGlue);
             // Set the hardware acclerator to the next one to try
             // if initializing fails.
-        } 
+        } else 
 #endif
-        else {
+        {
             canvas->glue.reset(new gnash::GtkAggGlue);
         }
 #endif
