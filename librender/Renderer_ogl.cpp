@@ -23,8 +23,9 @@
 
 #include <cstring>
 #include <cmath>
+#include <boost/scoped_ptr.hpp>
 
-#include <smart_ptr.h>
+#include "smart_ptr.h"
 #include "swf/ShapeRecord.h"
 #include "gnash.h"
 #include "RGBA.h"
@@ -110,11 +111,70 @@
 namespace gnash {
 
 namespace {
-    const BitmapInfo* createGradientBitmap(const GradientFill& gf,
+    const CachedBitmap* createGradientBitmap(const GradientFill& gf,
             Renderer& renderer);
 }
 
 namespace {
+
+class bitmap_info_ogl : public CachedBitmap
+{
+public:
+  
+    /// Set line and fill styles for mesh & line_strip rendering.
+    enum bitmap_wrap_mode
+    {
+      WRAP_REPEAT,
+      WRAP_CLAMP
+    };
+
+    bitmap_info_ogl(std::auto_ptr<GnashImage> image, GLenum pixelformat,
+                    bool ogl_accessible);
+
+    ~bitmap_info_ogl();
+ 
+    /// TODO: implement this meaningfully.
+    virtual void dispose() {
+        _disposed = true;
+    }
+
+    virtual bool disposed() const {
+        return _disposed;
+    }
+
+    virtual GnashImage& image() {
+        if (_cache.get()) return *_cache;
+        switch (_pixel_format) {
+            case GL_RGB:
+                _cache.reset(new ImageRGB(_orig_width, _orig_height));
+                break;
+            case GL_RGBA:
+                _cache.reset(new ImageRGBA(_orig_width, _orig_height));
+                break;
+            default:
+                std::abort();
+        }
+        std::fill(_cache->begin(), _cache->end(), 0xff);
+        return *_cache;
+    }
+
+    void apply(const gnash::SWFMatrix& bitmap_matrix,
+               bitmap_wrap_mode wrap_mode) const;
+private:
+    inline bool ogl_accessible() const;
+    void setup() const;    
+    void upload(boost::uint8_t* data, size_t width, size_t height) const;
+    
+    mutable boost::scoped_ptr<GnashImage> _img;
+    mutable boost::scoped_ptr<GnashImage> _cache;
+    GLenum _pixel_format;
+    GLenum _ogl_img_type;
+    mutable bool _ogl_accessible;  
+    mutable GLuint _texture_id;
+    size_t _orig_width;
+    size_t _orig_height;
+    bool _disposed;
+};
 
 /// Style handler
 //
@@ -487,18 +547,18 @@ bool isEven(const size_t& n)
   return n % 2 == 0;
 }
 
-// Use the image class copy constructor; it's not important any more
-// what kind of image it is.
-bitmap_info_ogl::bitmap_info_ogl(GnashImage* image, GLenum pixelformat,
-                                 bool ogl_accessible)
+
+bitmap_info_ogl::bitmap_info_ogl(std::auto_ptr<GnashImage> image,
+        GLenum pixelformat, bool ogl_accessible)
 :
-  _img(image->clone()),
+  _img(image.release()),
   _pixel_format(pixelformat),
   _ogl_img_type(_img->height() == 1 ? GL_TEXTURE_1D : GL_TEXTURE_2D),
   _ogl_accessible(ogl_accessible),
   _texture_id(0),
   _orig_width(_img->width()),
-  _orig_height(_img->height())
+  _orig_height(_img->height()),
+  _disposed(false)
 {   
   if (!_ogl_accessible) {
     return;      
@@ -516,50 +576,50 @@ bitmap_info_ogl::~bitmap_info_ogl()
 void
 bitmap_info_ogl::setup() const
 {      
-  oglScopeEnable enabler(_ogl_img_type);
+    oglScopeEnable enabler(_ogl_img_type);
   
-  glGenTextures(1, &_texture_id);
-  glBindTexture(_ogl_img_type, _texture_id);
+    glGenTextures(1, &_texture_id);
+    glBindTexture(_ogl_img_type, _texture_id);
   
-  bool resize = false;
-  if (_img->height() == 1) {
-    if ( !isEven( _img->width() ) ) {
-      resize = true;
+    bool resize = false;
+    if (_img->height() == 1) {
+        if (!isEven(_img->width())) {
+            resize = true;
+        }
+    } 
+    else {
+        if (!isEven(_img->width()) || !isEven(_img->height())) {
+            resize = true;
+        }     
     }
-  } else {
-    if (!isEven( _img->width() ) || !isEven(_img->height()) ) {
-      resize = true;
-    }     
-  }
   
-  if (!resize) {
-    upload(_img->data(), _img->width(), _img->height());
-  } else {     
+    if (!resize) {
+        upload(_img->begin(), _img->width(), _img->height());
+    } 
+    else {     
     
-    size_t w = 1; while (w < _img->width()) { w <<= 1; }
-    size_t h = 1;
-    if (_img->height() != 1) {
-      while (h < _img->height()) { h <<= 1; }
+        size_t w = 1; while (w < _img->width()) { w <<= 1; }
+        size_t h = 1;
+        if (_img->height() != 1) {
+            while (h < _img->height()) { h <<= 1; }
+        }
+    
+        boost::scoped_array<boost::uint8_t> resized_data(
+                new boost::uint8_t[w * h * _img->channels()]);
+        // Q: Would mipmapping these textures aid in performance?
+    
+        GLint rv = gluScaleImage(_pixel_format, _img->width(),
+                _img->height(), GL_UNSIGNED_BYTE, _img->begin(), w, h,
+                GL_UNSIGNED_BYTE, resized_data.get());
+        if (rv != 0) {
+            Tesselator::error(rv);
+            assert(0);
+        }
+    
+        upload(resized_data.get(), w, h);
     }
-    
-    boost::scoped_array<boost::uint8_t> resized_data(new boost::uint8_t[w*h*_img->pixelSize()]);
-    // Q: Would mipmapping these textures aid in performance?
-    
-    GLint rv = gluScaleImage(_pixel_format, _img->width(),
-      _img->height(), GL_UNSIGNED_BYTE, _img->data(), w, h,
-      GL_UNSIGNED_BYTE, resized_data.get());
-    if (rv != 0) {
-      Tesselator::error(rv);
-      assert(0);
-    }
-    
-    upload(resized_data.get(), w, h);
-  }
   
-  // _img (or a modified version thereof) has been uploaded to OpenGL. We
-  // no longer need to keep it around. Of course this goes against the
-  // principles of auto_ptr...
-  _img.reset();
+    _img.reset();
 }
 
 void
@@ -584,6 +644,9 @@ void
 bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_matrix,
                        bitmap_wrap_mode wrap_mode) const
 {
+    // TODO: use the altered data. Currently it doesn't display anything,
+    // so I don't feel obliged to implement this!
+
   glEnable(_ogl_img_type);
 
   glEnable(GL_TEXTURE_GEN_S);
@@ -718,14 +781,23 @@ public:
 #endif
   }    
 
-  virtual BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
+  virtual CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im)
   {
-      switch (im->type())
-      {
+      switch (im->type()) {
           case GNASH_IMAGE_RGB:
-              return new bitmap_info_ogl(im.get(), GL_RGB, ogl_accessible());
+          {
+              std::auto_ptr<GnashImage> rgba(
+                      new ImageRGBA(im->width(), im->height()));
+
+              GnashImage::iterator it = rgba->begin();
+              for (size_t i = 0; i < im->size(); ++i) {
+                  *it++ = *(im->begin() + i);
+                  if (!(i % 3)) *it++ = 0xff;
+              }
+              im = rgba;
+          }
           case GNASH_IMAGE_RGBA:
-                return new bitmap_info_ogl(im.get(), GL_RGBA, ogl_accessible());
+                return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
           default:
                 std::abort();
       }
@@ -827,7 +899,7 @@ public:
 
     switch (frame->location()) {
     case GNASH_IMAGE_CPU:
-        texture->update(frame->data());
+        texture->update(frame->begin());
         break;
 #ifdef HAVE_VA_VA_GLX_H
     case GNASH_IMAGE_GPU:
@@ -1891,7 +1963,7 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
     return fill.record(fill.recordCount() - 1).color;
 }
 
-const BitmapInfo*
+const CachedBitmap*
 createGradientBitmap(const GradientFill& gf, Renderer& renderer)
 {
     std::auto_ptr<ImageRGBA> im;
@@ -1936,7 +2008,7 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
             break;
     }
 
-    const BitmapInfo* bi = renderer.createBitmapInfo(
+    const CachedBitmap* bi = renderer.createCachedBitmap(
                     static_cast<std::auto_ptr<GnashImage> >(im));
 
     return bi;

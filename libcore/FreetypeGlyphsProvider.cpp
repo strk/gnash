@@ -23,7 +23,6 @@
 
 #include "FreetypeGlyphsProvider.h"
 #include "smart_ptr.h" // for intrusive_ptr
-#include "GnashImage.h" // for create_alpha
 #include "GnashException.h"
 #include "ShapeRecord.h"
 #include "log.h"

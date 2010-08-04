@@ -40,7 +40,7 @@ class gnashGstBuffer : public ImageRGB
 {
 public:
   gnashGstBuffer(GstBuffer* buf, int width, int height)
-  : ImageRGB(NULL, width, height, (width * 3 + 3) & ~3),
+  : ImageRGB(NULL, width, height),
     _buffer(buf)
   {}
   
@@ -49,18 +49,18 @@ public:
     gst_buffer_unref(_buffer);
   }
   
-  boost::uint8_t* data()
+  virtual size_t stride() const {
+      return (width() * channels() + 3) &~ 3;
+  }
+
+  virtual iterator begin()
   {
     return GST_BUFFER_DATA(_buffer);
   }
 
-  const boost::uint8_t* data() const
+  virtual const_iterator begin() const
   {
     return GST_BUFFER_DATA(_buffer);
-  }
-  std::auto_ptr<GnashImage> clone() const
-  {
-    return std::auto_ptr<GnashImage>(new ImageRGB(*this));
   }
 
 private:

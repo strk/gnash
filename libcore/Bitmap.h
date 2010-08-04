@@ -26,7 +26,7 @@
 #include "DynamicShape.h"
 
 namespace gnash {
-    class BitmapInfo;
+    class CachedBitmap;
 }
 
 
@@ -49,28 +49,31 @@ class Bitmap : public DisplayObject
 {
 public:
 
+    /// Construct a Bitmap character from a BitmapData.
 	Bitmap(movie_root& mr, as_object* object, BitmapData_as* bd,
             DisplayObject* parent);
 	
+    /// Construct a Bitmap character from a loaded image.
     Bitmap(movie_root& mr, as_object* object, const BitmapMovieDefinition* def,
             DisplayObject* parent);
 
-    ~Bitmap();
+    virtual ~Bitmap();
 
-    /// Called to update the Bitmap's DynamicShape for display.
-    //
-    /// For non-dynamic bitmaps, this should only be called once (for
-    /// efficiency - there are no harmful side-effects)
-    void update();
+    /// Notify the Bitmap that it's been updated during ActionScript execution
+    virtual void update();
 
     virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
+    /// Display this Bitmap
     virtual void display(Renderer& renderer);
 
+    /// Get the bounds of the Bitmap
     virtual SWFRect getBounds() const;
 
+    /// Test whether a point is in the Bitmap's bounds.
     virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
+    /// Called when the object is placed on stage.
     virtual void construct(as_object* init = 0);
 
 protected:
@@ -84,10 +87,7 @@ private:
     /// Return the bitmap used for this Bitmap DisplayObject.
     //
     /// It comes either from the definition or the BitmapData_as.
-    const BitmapInfo* bitmap() const;
-
-    /// This updates _bitmapInfo from the BitmapData_as
-    void makeBitmap();
+    const CachedBitmap* bitmap() const;
 
     /// Checks whether an attached BitmapData_as is disposed.
     //
@@ -99,14 +99,9 @@ private:
     //
     /// It should be called every time the underlying bitmap changes; for
     /// non-dynamic Bitmaps, this is only on construction.
-    void makeBitmapShape();
-
     const boost::intrusive_ptr<const BitmapMovieDefinition> _def;
 
     BitmapData_as* _bitmapData;
-
-    /// The current bitmap information is stored here.
-    boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
 
     /// A shape to hold the bitmap fill.
     DynamicShape _shape;

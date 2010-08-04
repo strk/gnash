@@ -26,7 +26,7 @@
 #include <cassert>
 
 #include "SWFMatrix.h"
-#include "BitmapInfo.h"
+#include "CachedBitmap.h"
 #include "SWF.h"
 #include "RGBA.h" // for rgba type
 
@@ -59,7 +59,7 @@ public:
 /// bitmap data. They are used for Bitmap characters.
 //
 /// Presently all members are immutable after construction. It is of course
-/// possible to change the appearance of the fill by changing the BitmapInfo
+/// possible to change the appearance of the fill by changing the CachedBitmap
 /// it refers to.
 //
 /// TODO: check the following:
@@ -89,10 +89,11 @@ public:
     /// Construct a BitmapFill from arbitrary bitmap data.
     //
     /// TODO: check the smoothing policy here!
-    BitmapFill(Type t, const BitmapInfo* bi, const SWFMatrix& m)
+    BitmapFill(Type t, const CachedBitmap* bi, const SWFMatrix& m,
+            SmoothingPolicy pol)
         :
         _type(t),
-        _smoothingPolicy(SMOOTHING_UNSPECIFIED),
+        _smoothingPolicy(pol),
         _matrix(m),
         _bitmapInfo(bi),
         _md(0),
@@ -134,7 +135,7 @@ public:
     }
 
     /// Get the actual Bitmap data.
-    const BitmapInfo* bitmap() const;
+    const CachedBitmap* bitmap() const;
 
     /// Get the matrix of this BitmapFill.
     const SWFMatrix& matrix() const {
@@ -150,7 +151,7 @@ private:
     SWFMatrix _matrix;
     
     /// A Bitmap, used for dynamic fills and to cache parsed bitmaps.
-    mutable boost::intrusive_ptr<const BitmapInfo> _bitmapInfo;
+    mutable boost::intrusive_ptr<const CachedBitmap> _bitmapInfo;
 
     /// The movie definition containing the bitmap
     movie_definition* _md;

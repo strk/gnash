@@ -125,9 +125,9 @@ public:
     /// @param in   The IOChannel to read JPEG data from.
     static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<ImageInput> ret ( new JpegImageInput(in) );
+        std::auto_ptr<ImageInput> ret(new JpegImageInput(in));
         // might throw an exception (I guess)
-        if ( ret.get() ) ret->read();
+        if (ret.get()) ret->read();
         return ret;
     }
 
@@ -150,9 +150,9 @@ public:
     static std::auto_ptr<JpegImageInput> createSWFJpeg2HeaderOnly(
             boost::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
     {
-        std::auto_ptr<JpegImageInput> ret ( new JpegImageInput(in) );
+        std::auto_ptr<JpegImageInput> ret (new JpegImageInput(in));
         // might throw an exception
-        if ( ret.get() ) ret->readHeader(maxHeaderBytes);
+        if (ret.get()) ret->readHeader(maxHeaderBytes);
         return ret;
     }
 

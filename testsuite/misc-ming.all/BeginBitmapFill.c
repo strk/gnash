@@ -86,7 +86,7 @@ main(int argc, char** argv)
             "   lineTo(x + 100, y + 100);"
             "   lineTo(x + 0, y + 100);"
 
-            // Shape 2
+            // Shape 3
             "   x = 300;"
             "   y = 0;"
             "   moveTo(x + 0, y + 0);"
@@ -95,6 +95,7 @@ main(int argc, char** argv)
             "   lineTo(x + 0, y + 100);"
             "};"
             
+            // Shape 4
             "b = new flash.display.BitmapData(150, 150, false);"
             "b.fillRect(new flash.geom.Rectangle(10, 10, 10, 130), 0xff00ff);"
             "b.fillRect(new flash.geom.Rectangle(25, 10, 10, 130), 0xffff00);"
@@ -114,6 +115,7 @@ main(int argc, char** argv)
     
     /// Now with matrix argument. Repeat is true by default
     add_actions(mo,
+            // Shape 5
             "b = new flash.display.BitmapData(150, 150, false);"
             "b.fillRect(new flash.geom.Rectangle(10, 10, 10, 130), 0x000000);"
             "b.fillRect(new flash.geom.Rectangle(25, 10, 10, 130), 0xaaff00);"
@@ -134,6 +136,7 @@ main(int argc, char** argv)
 
     // Now with repeat set to false
     add_actions(mo,
+            // Shape 6
             "b = new flash.display.BitmapData(20, 20, false);"
             "b.fillRect(new flash.geom.Rectangle(0, 0, 10, 10), 0x000000);"
             "b.fillRect(new flash.geom.Rectangle(10, 10, 10, 10), 0xaaff00);"
@@ -153,6 +156,7 @@ main(int argc, char** argv)
             "   lineTo(x + 150, y + 0);"
             "};"
             
+            // Shape 7
             "mc = _root.createEmptyMovieClip('mc5', 99);"
             "with(mc) {"
             "   x = 500;"
@@ -170,6 +174,7 @@ main(int argc, char** argv)
 
     // Change the Bitmap afterwards
     add_actions(mo,
+            // Shape 8
             "b = new flash.display.BitmapData(20, 20, false);"
             "b.fillRect(new flash.geom.Rectangle(0, 0, 10, 10), 0x000000);"
             "b.fillRect(new flash.geom.Rectangle(10, 10, 10, 10), 0xaaff00);"
@@ -190,7 +195,33 @@ main(int argc, char** argv)
             "};"
             "b.fillRect(new flash.geom.Rectangle(0, 0, 20, 20), 0xff0000);"
             );
+    
+    // Dispose of the bitmap afterwards
+    add_actions(mo,
+            // Shape 9
+            "b = new flash.display.BitmapData(20, 20, false);"
+            "b.fillRect(new flash.geom.Rectangle(0, 0, 10, 10), 0x000000);"
+            "b.fillRect(new flash.geom.Rectangle(10, 10, 10, 10), 0xaaff00);"
+            "b.fillRect(new flash.geom.Rectangle(10, 0, 10, 10), 0xaaff00);"
+            "b.fillRect(new flash.geom.Rectangle(0, 10, 10, 10), 0xaaffaa);"
+            "mc = _root.createEmptyMovieClip('mc9', 222);"
+            "with(mc) {"
+            "   x = 450;"
+            "   y = 450;"
+            "   moveTo(x + 0, y + 0);"
+            "   m = new flash.geom.Matrix();"
+            "   m.tx = 0;"
+            "   m.ty = 450;"
+            "   beginBitmapFill(b, m, false);"
+            "   lineTo(x + 0, y + 100);"
+            "   lineTo(x + 150, y + 100);"
+            "   lineTo(x + 150, y + 0);"
+            "};"
+            "b.dispose();"
+            );
+    check_equals(mo, "_root.mc9._width", "150");
 
+    add_actions(mo, "stop();");
     SWFMovie_nextFrame(mo);
 
     //Output movie

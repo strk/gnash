@@ -160,7 +160,7 @@
 
 // Forward declarations.
 namespace gnash {
-    class BitmapInfo;
+    class CachedBitmap;
     class rgba;
     class SWFMatrix;
     class cxform;
@@ -221,7 +221,7 @@ public:
     /// Given an image, returns a pointer to a bitmap_info class
     /// that can later be passed to FillStyleX_bitmap(), to set a
     /// bitmap fill style.
-    virtual BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im) = 0;
+    virtual CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im) = 0;
 
 
     /// ==================================================================

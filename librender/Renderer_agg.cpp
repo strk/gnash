@@ -583,8 +583,8 @@ public:
     VideoRenderer(const ClipBounds& clipbounds, GnashImage& frame,
             Matrix& mat, Quality quality, bool smooth)
         :
-        _buf(frame.data(), frame.width(), frame.height(),
-                frame.pitch()),
+        _buf(frame.begin(), frame.width(), frame.height(),
+                frame.stride()),
         _pixf(_buf),
         _accessor(_pixf),
         _interpolator(mat),
@@ -780,7 +780,7 @@ public:
     // Given an image, returns a pointer to a bitmap_info class
     // that can later be passed to FillStyleX_bitmap(), to set a
     // bitmap fill style.
-    gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
+    gnash::CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im)
     {        
         return new agg_bitmap_info(im);
     }

@@ -118,7 +118,7 @@ public:
 		return 1;
 	}
 
-    const BitmapInfo* bitmap() const {
+    const CachedBitmap* bitmap() const {
         return _bitmap.get();
     }
 
@@ -134,7 +134,7 @@ private:
 
 	size_t _bytesTotal;
 
-    boost::intrusive_ptr<BitmapInfo> _bitmap;
+    boost::intrusive_ptr<CachedBitmap> _bitmap;
 };
 
 } // namespace gnash

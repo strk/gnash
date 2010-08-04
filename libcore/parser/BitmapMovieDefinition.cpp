@@ -27,7 +27,7 @@
 #include "Renderer.h"
 #include "Global_as.h"
 #include "namedStrings.h"
-#include "BitmapInfo.h"
+#include "CachedBitmap.h"
 
 namespace gnash {
 
@@ -47,7 +47,7 @@ BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
 	_framerate(12),
 	_url(url),
 	_bytesTotal(image->size()),
-	_bitmap(renderer ? renderer->createBitmapInfo(image) : 0)
+	_bitmap(renderer ? renderer->createCachedBitmap(image) : 0)
 {
 }
 

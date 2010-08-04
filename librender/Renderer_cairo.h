@@ -38,7 +38,7 @@ public:
     Renderer_cairo();
     ~Renderer_cairo();
 
-    BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im);
+    CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im);
 
     void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
                                 const SWFRect* bounds, bool smooth);

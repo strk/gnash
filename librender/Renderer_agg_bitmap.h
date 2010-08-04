@@ -19,37 +19,48 @@
 #ifndef BACKEND_RENDER_HANDLER_AGG_BITMAP_H
 #define BACKEND_RENDER_HANDLER_AGG_BITMAP_H
 
+#include <boost/scoped_ptr.hpp>
+
 // This include file used only to make Renderer_agg more readable.
 
 namespace gnash {
 
-/// The class itself uses a template. Currently this is unnecessary and it may
-/// be removed but an older implementation required this method and it may be
-/// necessary again when the last missing parts of the renderer will be
-/// implemented. And when might that be? I don't think I'll wait.
-class agg_bitmap_info : public BitmapInfo
+class agg_bitmap_info : public CachedBitmap
 {
 public:
-
-  agg_bitmap_info(std::auto_ptr<GnashImage> im)
-      :
-      _image(im),
-      _bpp(_image->type() == GNASH_IMAGE_RGB ? 24 : 32)
-  {
-  }
- 
-  int get_width() const { return _image->width(); }  
-  int get_height() const { return _image->height();  }  
-  int get_bpp() const { return _bpp; }  
-  int get_rowlen() const { return _image->pitch(); }  
-  boost::uint8_t* get_data() const { return _image->data(); }
   
-private:
+    agg_bitmap_info(std::auto_ptr<GnashImage> im)
+        :
+        _image(im.release()),
+        _bpp(_image->type() == GNASH_IMAGE_RGB ? 24 : 32)
+    {
+    }
+  
+    virtual GnashImage& image() {
+        assert(!disposed());
+        return *_image;
+    }
+  
+    virtual void dispose() {
+        _image.reset();
+    }
 
-  std::auto_ptr<GnashImage> _image;
-
-  int _bpp;
+    virtual bool disposed() const {
+        return !_image.get();
+    }
+   
+    int get_width() const { return _image->width(); }  
+    int get_height() const { return _image->height();  }  
+    int get_bpp() const { return _bpp; }  
+    int get_rowlen() const { return _image->stride(); }  
+    boost::uint8_t* get_data() const { return _image->begin(); }
     
+private:
+  
+    boost::scoped_ptr<GnashImage> _image;
+  
+    int _bpp;
+      
 };
 
 

@@ -55,7 +55,7 @@
 #include "RunResources.h"
 #include "Renderer.h"
 #include "Movie.h"
-#include "BitmapInfo.h"
+#include "CachedBitmap.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -322,7 +322,7 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
         IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
         return;
     }    
-    boost::intrusive_ptr<BitmapInfo> bi = renderer->createBitmapInfo(im);
+    boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(im);
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -384,7 +384,7 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
         IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
         return;
     }    
-    boost::intrusive_ptr<BitmapInfo> bi = renderer->createBitmapInfo(im);
+    boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(im);
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -539,8 +539,8 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
         IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
         return;
     }    
-    boost::intrusive_ptr<BitmapInfo> bi =
-        renderer->createBitmapInfo(static_cast<std::auto_ptr<GnashImage> >(im));
+    boost::intrusive_ptr<CachedBitmap> bi =
+        renderer->createCachedBitmap(static_cast<std::auto_ptr<GnashImage> >(im));
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -646,8 +646,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
     inflate_wrapper(in, buffer.get(), bufSize);
     assert(in.tell() <= in.get_tag_end_position());
 
-    switch (bitmap_format)
-    {
+    switch (bitmap_format) {
 
         case 3:
         {
@@ -659,7 +658,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
                 boost::uint8_t* inRow = buffer.get() + 
                     colorTableSize * channels + j * pitch;
 
-                boost::uint8_t*    outRow = image->scanline(j);
+                boost::uint8_t* outRow = scanline(*image, j);
                 for (int i = 0; i < width; i++)
                 {
                     boost::uint8_t pixel = inRow[i * bytes_per_pixel];
@@ -681,7 +680,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
             for (int j = 0; j < height; j++)
             {
                 boost::uint8_t* inRow = buffer.get() + j * pitch;
-                boost::uint8_t* outRow = image->scanline(j);
+                boost::uint8_t* outRow = scanline(*image, j);
                 for (int i = 0; i < width; i++)
                 {
                     boost::uint16_t pixel = inRow[i * 2] |
@@ -708,7 +707,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
             for (int j = 0; j < height; j++)
             {
                 boost::uint8_t* inRow = buffer.get() + j * pitch;
-                boost::uint8_t* outRow = image->scanline(j);
+                boost::uint8_t* outRow = scanline(*image, j);
                 const int inChannels = 4;
 
                 for (int i = 0; i < width; ++i)
@@ -732,7 +731,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
         IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
         return;
     }    
-    boost::intrusive_ptr<BitmapInfo> bi = renderer->createBitmapInfo(image);
+    boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(image);
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);

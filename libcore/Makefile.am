@@ -279,7 +279,6 @@ EXTENSIONS_API = \
 	MovieFactory.h \
 	FillStyle.h \
 	LineStyle.h \
-	BitmapInfo.h \
 	RGBA.h	\
 	Geometry.h	\
 	Video.h \
