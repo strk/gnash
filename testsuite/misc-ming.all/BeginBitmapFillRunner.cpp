@@ -100,7 +100,7 @@ main(int /*argc*/, char** /*argv*/)
     check_pixel(100, 200, 1, magenta, 2);
     check_pixel(150, 200, 1, yellow, 2);
     check_pixel(230, 200, 1, cyan, 2);
-    check_pixel(265, 250, 1, magenta, 2);
+    check_pixel(235, 250, 1, magenta, 2);
     check_pixel(315, 250, 1, yellow, 2);
     check_pixel(395, 250, 1, white, 2);
 
