@@ -335,8 +335,6 @@ GtkGui::init(int argc, char **argv[])
 bool
 GtkGui::run()
 {
-    //GNASH_REPORT_FUNCTION;
-
     // Kick-start before setting the interval timeout
     advance_movie(this);
     
@@ -944,8 +942,6 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
 bool
 GtkGui::createWindow(int width, int height)
 {
-    //GNASH_REPORT_FUNCTION;
-    
     assert(_width>0);
     assert(_height>0);
     
@@ -2127,8 +2123,6 @@ GtkGui::createViewMenu(GtkWidget *obj)
 void
 GtkGui::createQualityMenu(GtkWidget *obj)
 {
-    GNASH_REPORT_FUNCTION;
-
     GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_Quality"));
     gtk_widget_show (menuitem);
     gtk_container_add (GTK_CONTAINER (obj), menuitem);
