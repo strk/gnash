@@ -42,10 +42,11 @@ class StyleHandler;
 namespace {
 
     /// Creates 8 bitmap functions
-    template<typename Wrap, typename Pixel> void storeBitmap(StyleHandler& st,
-            const agg_bitmap_info* bi, const SWFMatrix& mat, const cxform& cx,
+    template<typename FillMode, typename Pixel>
+            void storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
+            const SWFMatrix& mat, const cxform& cx,
             bool smooth);
-    template<typename Wrap> void storeBitmap(StyleHandler& st,
+    template<typename FillMode> void storeBitmap(StyleHandler& st,
             const agg_bitmap_info* bi, const SWFMatrix& mat, const cxform& cx,
             bool smooth);
 
@@ -97,8 +98,8 @@ namespace {
 struct Tile
 {
     template<typename P> struct Type {
-        typedef agg::wrap_mode_repeat Repeat;
-        typedef agg::image_accessor_wrap<P, Repeat, Repeat> type; 
+        typedef agg::wrap_mode_repeat Wrap;
+        typedef agg::image_accessor_wrap<P, Wrap, Wrap> type; 
     };
 };
 
@@ -601,9 +602,8 @@ struct AddStyles : boost::static_visitor<>
 
         const bool tiled = (f.type() == BitmapFill::TILED);
 
-        _sh.add_bitmap(
-            dynamic_cast<const agg_bitmap_info*>(f.bitmap()), m, _cx, tiled,
-            smooth);
+        _sh.add_bitmap(dynamic_cast<const agg_bitmap_info*>(f.bitmap()),
+                m, _cx, tiled, smooth);
     }
 
 private:
@@ -620,19 +620,19 @@ private:
 
 namespace {
 
-template<typename Wrap, typename Pixel>
+template<typename FillMode, typename Pixel>
 void
 storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
         const SWFMatrix& mat, const cxform& cx, bool smooth)
 {
     if (smooth) {
-        st.addBitmap<AA<Pixel, Wrap> >(bi, mat, cx);
+        st.addBitmap<AA<Pixel, FillMode> >(bi, mat, cx);
         return;
     }
-    st.addBitmap<NN<Pixel, Wrap> >(bi, mat, cx);
+    st.addBitmap<NN<Pixel, FillMode> >(bi, mat, cx);
 }
 
-template<typename Wrap>
+template<typename FillMode>
 void
 storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
         const SWFMatrix& mat, const cxform& cx, bool smooth)
@@ -642,9 +642,10 @@ storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
     typedef agg::pixfmt_rgb24_pre RGB;
 
     if (bi->get_bpp() == 24) {
-        storeBitmap<Wrap, RGB>(st, bi, mat, cx, smooth);
+        storeBitmap<FillMode, RGB>(st, bi, mat, cx, smooth);
+        return;
     }
-    else storeBitmap<Wrap, RGBA>(st, bi, mat, cx, smooth);
+    storeBitmap<FillMode, RGBA>(st, bi, mat, cx, smooth);
 }
 
 template<typename Spread, typename Interpolation>
