@@ -31,56 +31,260 @@
 // for debugging hidden characters.
 //#define DEBUG_LIMIT_COLOR_ALPHA 
 
+#include "GnashAlgorithm.h"
+#include "FillStyle.h"
 
 namespace gnash {
+
+class StyleHandler;
+
+// Forward declarations.
+namespace {
+
+    /// Creates 8 bitmap functions
+    template<typename Wrap, typename Pixel> void storeBitmap(StyleHandler& st,
+            const agg_bitmap_info* bi, const SWFMatrix& mat, const cxform& cx,
+            bool smooth);
+    template<typename Wrap> void storeBitmap(StyleHandler& st,
+            const agg_bitmap_info* bi, const SWFMatrix& mat, const cxform& cx,
+            bool smooth);
+
+    /// Creates many (should be 18) gradient functions.
+    void storeGradient(StyleHandler& st, const GradientFill& fs,
+            const SWFMatrix& mat, const cxform& cx);
+    template<typename Spread> void storeGradient(StyleHandler& st,
+            const GradientFill& fs, const SWFMatrix& mat, const cxform& cx);
+    template<typename Spread, typename Interpolation>
+            void storeGradient(StyleHandler& st, const GradientFill& fs,
+            const SWFMatrix& mat, const cxform& cx);
+}
 
 /// Internal style class that represents a fill style. Roughly speaking, AGG 
 /// computes the fill areas of a flash composite shape and calls generate_span
 /// to generate small horizontal pixel rows. generate_span provides whatever
 /// fill pattern for that coordinate. 
-class agg_style_base 
+class AggStyle 
 {
 public:
-
-  agg_style_base(bool solid, const agg::rgba8& color = agg::rgba8(0,0,0,0))
-    :
-    _solid(solid),
-    _color(color)
-  {
-  }
+    AggStyle(bool solid, const agg::rgba8& color = agg::rgba8(0,0,0,0))
+      :
+      _solid(solid),
+      _color(color)
+    {
+    }
+    
+    // Everytime a class has a virtual method it should
+    // also have a virtual destructor. This will ensure
+    // that the destructor for the *derived* class is invoked
+    // when deleting a pointer to base class !!
+    virtual ~AggStyle() {}
+    bool solid() const { return _solid; }
+    agg::rgba8 color() const { return _color; }
   
-  // Everytime a class has a virtual method it should
-  // also have a virtual destructor. This will ensure
-  // that the destructor for the *derived* class is invoked
-  // when deleting a pointer to base class !!
-  virtual ~agg_style_base() {}
-
-  bool solid() const { return _solid; }
-
-  agg::rgba8 color() const { return _color; }
-
-  // for non-solid styles:
-  virtual void generate_span(agg::rgba8* span, int x, int y, unsigned len) = 0;
-
+    // for non-solid styles:
+    virtual void generate_span(agg::rgba8* span, int x, int y,
+            unsigned len) = 0;
+  
 private:
+    // for solid styles:
+    const bool _solid;
+    const agg::rgba8 _color; 
+};
 
-  // for solid styles:
-  const bool _solid;
+namespace {
 
-  const agg::rgba8 _color; 
+/// Tile bitmap fills.
+struct Tile
+{
+    template<typename P> struct Type {
+        typedef agg::wrap_mode_repeat Repeat;
+        typedef agg::image_accessor_wrap<P, Repeat, Repeat> type; 
+    };
+};
+
+/// Clip bitmap fills.
+struct Clip
+{
+    template<typename P> struct Type {
+        typedef agg::image_accessor_clone<P> type; 
+    };
+};
+
+/// Base class for filter types.
+template<typename P, typename W>
+struct FilterType
+{
+    typedef P PixelFormat;
+    typedef typename W::template Type<PixelFormat>::type SourceType;
+    typedef agg::span_allocator<PixelFormat> Allocator;
+    typedef agg::span_interpolator_linear<agg::trans_affine> Interpolator;
+};
+
+/// Nearest Neighbour filter type for quick, lower quality scaling.
+template<typename P, typename W>
+struct NN : public FilterType<P, W>
+{
+    typedef FilterType<P, W> BaseType;
+    typedef agg::span_image_filter_rgb_nn<
+                typename BaseType::SourceType,
+                typename BaseType::Interpolator> Generator;
+};
+
+/// Bilinear filter type for higher quality scaling.
+template<typename P, typename W>
+struct AA : public FilterType<P, W>
+{
+    typedef FilterType<P, W> BaseType;
+    typedef agg::span_image_filter_rgb_bilinear<
+                typename BaseType::SourceType,
+                typename BaseType::Interpolator> Generator;
+};
+
+/// A reflecting adaptor for Gradients.
+struct Reflect
+{
+    template<typename T> struct Type {
+        typedef agg::gradient_reflect_adaptor<T> type;
+    };
+};
+
+/// A repeating adaptor for Gradients.
+struct Repeat
+{
+    template<typename T> struct Type {
+        typedef agg::gradient_repeat_adaptor<T> type;
+    };
+};
+
+/// A padding (default) adaptor for Gradients.
+struct Pad
+{
+    template<typename T> struct Type {
+        typedef T type;
+    };
+};
+
+/// The default RGB color interpolator
+struct InterpolatorRGB
+{
+    template<typename Pixel> struct Type {
+        typedef agg::gradient_lut<agg::color_interpolator<Pixel>, 256> type;
+    };
+};
+
+/// AGG gradient fill style. Don't use Gnash texture bitmaps as this is slower
+/// and less accurate. Even worse, the bitmap fill would need to be tweaked
+/// to have non-repeating gradients (first and last color stops continue 
+/// forever on each side). This class can be used for any kind of gradient, so
+/// even focal gradients should be possible. 
+template <class Color, class Allocator, class Interpolator, class GradientType,
+         class Adaptor, class ColorInterpolator, class SpanGenerator>
+class GradientStyle : public AggStyle
+{
+public:
   
+    GradientStyle(const GradientFill& fs, const SWFMatrix& mat,
+            const cxform& cx, int norm_size, GradientType gr = GradientType())
+        :
+        AggStyle(false),
+        m_cx(cx),
+        m_tr(mat.sx / 65536.0, mat.shx/65536.0, mat.shy / 65536.0,
+              mat.sy / 65536.0, mat.tx, mat.ty),
+        m_span_interpolator(m_tr),
+        m_gradient_adaptor(gr),
+        m_sg(m_span_interpolator, m_gradient_adaptor, m_gradient_lut, 0,
+                norm_size),
+      
+        m_need_premultiply(false)
+    {
+        // Build gradient lookup table
+        m_gradient_lut.remove_all(); 
+        const size_t size = fs.recordCount();
+      
+        // It is essential that at least two colours are added; otherwise agg
+        // will use uninitialized values.
+        assert(size > 1);
+    
+        for (size_t i = 0; i != size; ++i) { 
+            const GradientRecord& gr = fs.record(i); 
+            const rgba tr = m_cx.transform(gr.color);
+            if (tr.m_a < 255) m_need_premultiply = true;    
+            m_gradient_lut.add_color(gr.ratio/255.0,
+                    agg::rgba8(tr.m_r, tr.m_g, tr.m_b, tr.m_a));
+        } 
+        m_gradient_lut.build_lut();
+        
+    } // GradientStyle constructor
+  
+    virtual ~GradientStyle() { }
+  
+    void generate_span(Color* span, int x, int y, unsigned len) {
+        m_sg.generate(span, x, y, len);
+        if (!m_need_premultiply) return;
+        
+        while (len--) {
+            span->premultiply();
+            ++span;
+        }
+    }
+    
+protected:
+    
+    // Color transform
+    gnash::cxform m_cx;
+    
+    // Span allocator
+    Allocator m_sa;
+    
+    // Transformer
+    agg::trans_affine m_tr;
+    
+    // Span interpolator
+    Interpolator m_span_interpolator;
+    
+    // Gradient adaptor
+    Adaptor m_gradient_adaptor;  
+    
+    // Gradient LUT
+    ColorInterpolator m_gradient_lut;
+    
+    // Span generator
+    SpanGenerator m_sg;  
+  
+    // premultiplication necessary?
+    bool m_need_premultiply;
+}; 
+
+/// A set of typedefs for a Gradient
+//
+/// @tparam G       An agg gradient type
+/// @tparam A       The type of Adaptor: see Reflect, Repeat, Pad
+/// @tparam I       The type of ColorInterpolator: see InterpolatorRGB
+template<typename G, typename A, typename I>
+struct Gradient
+{
+    typedef agg::rgba8 Color;            
+    typedef G GradientType;
+    typedef typename A::template Type<G>::type Adaptor;
+    typedef typename I::template Type<Color>::type ColorInterpolator;
+    typedef agg::span_allocator<Color> Allocator;
+    typedef agg::span_interpolator_linear<agg::trans_affine> Interpolator;
+    typedef agg::span_gradient<Color, Interpolator, Adaptor,
+            ColorInterpolator> Generator;
+    typedef GradientStyle<Color, Allocator, Interpolator, GradientType,
+                             Adaptor, ColorInterpolator, Generator> Type;
 };
 
 
 /// Solid AGG fill style. generate_span is not used in this case as AGG does
 /// solid fill styles internally.
-class agg_style_solid : public agg_style_base 
+class SolidStyle : public AggStyle 
 {
 public:
 
-  agg_style_solid(const agg::rgba8& color)
+  SolidStyle(const agg::rgba8& color)
     :
-    agg_style_base(true, color)
+    AggStyle(true, color)
   {
   }
 
@@ -92,23 +296,20 @@ public:
 };
 
 
-#define image_accessor_clip_transp agg::image_accessor_clone
-
-
 /// AGG bitmap fill style. There are quite a few combinations possible and so
 /// the class types are defined outside. The bitmap can be tiled or clipped.
 /// It can have any transformation SWFMatrix and color transform. Any pixel format
 /// can be used, too. 
-template <class PixelFormat, class span_allocator_type, class img_source_type,
-       class interpolator_type, class sg_type>
-class agg_style_bitmap : public agg_style_base
+template <class PixelFormat, class Allocator, class SourceType,
+       class Interpolator, class Generator>
+class BitmapStyle : public AggStyle
 {
 public:
     
-  agg_style_bitmap(int width, int height, int rowlen, boost::uint8_t* data, 
+  BitmapStyle(int width, int height, int rowlen, boost::uint8_t* data, 
     const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     :
-    agg_style_base(false),
+    AggStyle(false),
     m_cx(cx),
     m_rbuf(data, width, height, rowlen),  
     m_pixf(m_rbuf),
@@ -125,7 +326,7 @@ public:
     // class as this should be faster (avoid type conversion).
   }
   
-  virtual ~agg_style_bitmap() {
+  virtual ~BitmapStyle() {
   }
     
     void generate_span(agg::rgba8* span, int x, int y, unsigned len)
@@ -134,7 +335,7 @@ public:
         // Apply color transform
         // TODO: Check if this can be optimized
         if (m_cx.is_identity()) return;
-        for (unsigned int i=0; i<len; i++) {
+        for (unsigned int i=0; i < len; i++) {
             m_cx.transform(span->r, span->g, span->b, span->a);
             span->premultiply();
             ++span;
@@ -143,136 +344,30 @@ public:
   
 private:
 
-  // Color transform
-  gnash::cxform m_cx;
+    // Color transform
+    gnash::cxform m_cx;
 
-  // Pixel access
-  agg::rendering_buffer m_rbuf;
-  PixelFormat m_pixf;
+    // Pixel access
+    agg::rendering_buffer m_rbuf;
+    PixelFormat m_pixf;
   
-  // Span allocator
-  span_allocator_type m_sa;
+    // Span allocator
+    Allocator m_sa;
   
-  // Image accessor
-  img_source_type m_img_src;
+    // Image accessor
+    SourceType m_img_src;
   
-  // Transformer
-  agg::trans_affine m_tr;
+    // Transformer
+    agg::trans_affine m_tr;
   
-  // Interpolator
-  interpolator_type m_interpolator;
+    // Interpolator
+    Interpolator m_interpolator;
   
-  // Span generator
-  sg_type m_sg;  
+    // Span generator
+    Generator m_sg;  
 };
 
-
-/// AGG gradient fill style. Don't use Gnash texture bitmaps as this is slower
-/// and less accurate. Even worse, the bitmap fill would need to be tweaked
-/// to have non-repeating gradients (first and last color stops continue 
-/// forever on each side). This class can be used for any kind of gradient, so
-/// even focal gradients should be possible. 
-template <class color_type, class span_allocator_type, class interpolator_type, 
-  class gradient_func_type, class gradient_adaptor_type, class color_func_type, 
-  class sg_type>
-class agg_style_gradient : public agg_style_base
-{
-public:
-
-  agg_style_gradient(const GradientFill& fs, const SWFMatrix& mat,
-          const cxform& cx, int norm_size)
-    :
-    agg_style_base(false),
-    m_cx(cx),
-    m_tr(mat.sx / 65536.0, mat.shx/65536.0, mat.shy / 65536.0,
-            mat.sy / 65536.0, mat.tx, mat.ty),
-    m_span_interpolator(m_tr),
-    m_gradient_func(),
-    m_gradient_adaptor(m_gradient_func),
-    m_sg(m_span_interpolator, m_gradient_adaptor, m_gradient_lut, 0, norm_size),
-    m_need_premultiply(false)
-  {
-    // Build gradient lookup table
-    m_gradient_lut.remove_all(); 
-    
-    const size_t size = fs.recordCount();
-    
-    // It is essential that at least two colours are added; otherwise agg
-    // will use uninitialized values.
-    assert(size > 1);
-
-    for (int i = 0; i != size; ++i) {
-    
-      const GradientRecord& gr = fs.record(i); 
-      rgba trans_color = m_cx.transform(gr.color);
-      if (trans_color.m_a < 255) m_need_premultiply = true;    
-      
-      m_gradient_lut.add_color(gr.ratio/255.0, agg::rgba8(trans_color.m_r, 
-        trans_color.m_g, trans_color.m_b, trans_color.m_a));
-        
-    } // for
-    
-    m_gradient_lut.build_lut();
-    
-  } // agg_style_gradient constructor
-
-
-  virtual ~agg_style_gradient() 
-  {
-  }
-
-
-  void generate_span(color_type* span, int x, int y, unsigned len) 
-  {
-    m_sg.generate(span, x, y, len);
-    
-    if (!m_need_premultiply) return;
-      
-    while (len--) {
-        span->premultiply();
-        ++span;
-    }
-  }
-  
-  // Provide access to our gradient adaptor to allow re-initialization of
-  // focal gradients. I wanted to do this using partial template specialization
-  // but it became too complex for something that can be solved in a very easy
-  // (slightly unelegant) way. 
-  gradient_adaptor_type& get_gradient_adaptor() {
-    return m_gradient_adaptor;
-  }
-  
-protected:
-  
-  // Color transform
-  gnash::cxform m_cx;
-  
-  // Span allocator
-  span_allocator_type m_sa;
-  
-  // Transformer
-  agg::trans_affine m_tr;
-  
-  // Span interpolator
-  interpolator_type m_span_interpolator;
-  
-  gradient_func_type m_gradient_func;
-  
-  // Gradient adaptor
-  gradient_adaptor_type m_gradient_adaptor;  
-  
-  // Gradient LUT
-  color_func_type m_gradient_lut;
-  
-  // Span generator
-  sg_type m_sg;  
-
-  // premultiplication necessary?
-  bool m_need_premultiply;
-  
-}; // agg_style_gradient
-
-
+}
 
 
 // --- AGG HELPER CLASSES ------------------------------------------------------
@@ -280,397 +375,101 @@ protected:
 /// Style handler for AGG's compound rasterizer. This is the class which is
 /// called by AGG itself. It provides an interface to the various fill style
 /// classes defined above.
-class agg_style_handler
+class StyleHandler
 {
 public:
 
-    agg_style_handler() : 
+    StyleHandler() : 
         m_transparent(0, 0, 0, 0)        
     {}
     
-    ~agg_style_handler() {
-      int styles_size = m_styles.size(); 
-      for (int i=0; i<styles_size; i++)
-        delete m_styles[i]; 
+    ~StyleHandler() {
+        deleteChecked(_styles.begin(), _styles.end());
     }
 
     /// Called by AGG to ask if a certain style is a solid color
     bool is_solid(unsigned style) const {
-      assert(style < m_styles.size());
-      return m_styles[style]->solid(); 
+      assert(style < _styles.size());
+      return _styles[style]->solid(); 
     }
     
     /// Adds a new solid fill color style
     void add_color(const agg::rgba8& color) {
-      agg_style_solid *st = new agg_style_solid(color);
-      m_styles.push_back(st);
+      SolidStyle *st = new SolidStyle(color);
+      _styles.push_back(st);
     }
-    
+
     /// Adds a new bitmap fill style
     void add_bitmap(const agg_bitmap_info* bi, const gnash::SWFMatrix& mat,
-        const gnash::cxform& cx, bool repeat, bool smooth)
+        const gnash::cxform& cx, bool repeat, bool smooth) {
+
+        if (!bi) {
+            // See server/styles.h comments about when NULL return is possible.
+            // Don't warn here, we already warn at parse-time
+            add_color(agg::rgba8_pre(0,0,0,0));
+            return;
+        }
+
+        // Tiled
+        if (repeat) {
+            storeBitmap<Tile>(*this, bi, mat, cx, smooth);
+        }
+        storeBitmap<Clip>(*this, bi, mat, cx, smooth);
+        
+    } 
+
+    template<typename T>
+    void addLinearGradient(const GradientFill& fs, const gnash::SWFMatrix& mat,
+            const gnash::cxform& cx)
     {
-
-      if (!bi) {
-        // See server/styles.h comments about when NULL return is possible.
-        // Don't warn here, we already warn at parse-time
-        //log_debug("WARNING: add_bitmap called with bi=NULL");
-        add_color(agg::rgba8_pre(0,0,0,0));
-        return;
-      }
-
-      // Whew! There are 8 bitmap combinations (bpp, smooth, repeat) possible
-      // and AGG uses templates, so... 
-      // I'd need to pass "span_image_filter_rgba_nn" (because span_image_xxx
-      // dependends on the pixel format) without passing the template 
-      // parameters, but AFAIK this can't be done. But hey, this is my first 
-      // C++ code (the whole AGG backend) and I immediately had to start with 
-      // templates. I'm giving up and write eight versions of add_bitmap_xxx. 
-      // So, if anyone has a better solution, for heaven's sake, implement it!! 
-        
-      if (repeat) {
-        if (smooth) {
-        
-          if (bi->get_bpp()==24)
-            add_bitmap_repeat_aa_rgb24 (bi, mat, cx);      
-          else
-          if (bi->get_bpp()==32)
-            add_bitmap_repeat_aa_rgba32 (bi, mat, cx);      
-          else
-            abort();
-            
-        } else {
-        
-          if (bi->get_bpp()==24)
-            add_bitmap_repeat_nn_rgb24 (bi, mat, cx);      
-          else
-          if (bi->get_bpp()==32)
-            add_bitmap_repeat_nn_rgba32 (bi, mat, cx);      
-          else
-            abort();
-            
-        } // if smooth
-      } else {
-        if (smooth) {
-        
-          if (bi->get_bpp()==24)
-            add_bitmap_clip_aa_rgb24 (bi, mat, cx);      
-          else
-          if (bi->get_bpp()==32)
-            add_bitmap_clip_aa_rgba32 (bi, mat, cx);      
-          else
-            abort();
-            
-        } else {
-        
-          if (bi->get_bpp()==24)
-            add_bitmap_clip_nn_rgb24 (bi, mat, cx);      
-          else
-          if (bi->get_bpp()==32)
-            add_bitmap_clip_nn_rgba32 (bi, mat, cx);      
-          else
-            abort();
-            
-        } // if smooth
-      } // if repeat
-      
-    } // add_bitmap 
-
-
-    // === RGB24 ===
-    
-
-    void add_bitmap_repeat_nn_rgb24(const agg_bitmap_info* bi,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
-    {
-
-      // tiled, nearest neighbor method (faster)   
-
-      typedef agg::pixfmt_rgb24_pre PixelFormat;
-      typedef agg::span_allocator<PixelFormat> span_allocator_type;
-      typedef agg::wrap_mode_repeat wrap_type;
-      typedef agg::image_accessor_wrap<PixelFormat, wrap_type, wrap_type> img_source_type; 
-      typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
-      typedef agg::span_image_filter_rgb_nn<img_source_type, interpolator_type> sg_type;
-       
-      typedef agg_style_bitmap<PixelFormat, span_allocator_type, img_source_type, 
-        interpolator_type, sg_type> st_type;
-      
-      st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);       
-        
-      m_styles.push_back(st);
-    }
-        
-        
-    
-    
-    void add_bitmap_clip_nn_rgb24(const agg_bitmap_info* bi,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
-    {
-
-      // clipped, nearest neighbor method (faster)   
-
-      typedef agg::pixfmt_rgb24_pre PixelFormat;
-      typedef agg::span_allocator<PixelFormat> span_allocator_type;
-      typedef image_accessor_clip_transp<PixelFormat> img_source_type; 
-      typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
-      typedef agg::span_image_filter_rgb_nn<img_source_type, interpolator_type> sg_type;
-       
-      typedef agg_style_bitmap<PixelFormat, span_allocator_type, img_source_type, 
-        interpolator_type, sg_type> st_type;
-      
-      st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);       
-        
-      m_styles.push_back(st);
+        // NOTE: The value 256 is based on the bitmap texture used by other
+        // Gnash renderers which is normally 256x1 pixels for linear gradients.
+        typename T::Type* st = new typename T::Type(fs, mat, cx, 256);
+        _styles.push_back(st);
     }
     
-    
-    
-    void add_bitmap_repeat_aa_rgb24(const agg_bitmap_info* bi,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    template<typename T>
+    void addFocalGradient(const GradientFill& fs, const gnash::SWFMatrix& mat,
+            const gnash::cxform& cx)
     {
+        // move the center of the radial fill to where it should be
+        SWFMatrix transl;
+        transl.set_translation(-32, -32);
+        transl.concatenate(mat);    
 
-      // tiled, bilinear method (better quality)   
-
-      typedef agg::pixfmt_rgb24_pre PixelFormat;
-      typedef agg::span_allocator<PixelFormat> span_allocator_type;
-      typedef agg::wrap_mode_repeat wrap_type;
-      typedef agg::image_accessor_wrap<PixelFormat, wrap_type, wrap_type> img_source_type; 
-      typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
-      typedef agg::span_image_filter_rgb_bilinear<img_source_type, interpolator_type> sg_type;
-       
-      typedef agg_style_bitmap<PixelFormat, span_allocator_type, img_source_type, 
-        interpolator_type, sg_type> st_type;
-      
-      st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);       
+        typename T::GradientType gr;
+        gr.init(32.0, fs.focalPoint() * 32.0, 0.0);
         
-      m_styles.push_back(st);
-    }
+        // div 2 because we need radius, not diameter      
+        typename T::Type* st = new typename T::Type(fs, transl, cx, 64/2, gr); 
         
-    
-    void add_bitmap_clip_aa_rgb24(const agg_bitmap_info* bi,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
-    {
-
-      // clipped, bilinear method (better quality)   
-
-      typedef agg::pixfmt_rgb24_pre PixelFormat;
-      typedef agg::span_allocator<PixelFormat> span_allocator_type;
-      typedef image_accessor_clip_transp<PixelFormat> img_source_type; 
-      typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
-      typedef agg::span_image_filter_rgb_bilinear<img_source_type, interpolator_type> sg_type;
-       
-      typedef agg_style_bitmap<PixelFormat, span_allocator_type, img_source_type, 
-        interpolator_type, sg_type> st_type;
-      
-      st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);       
-        
-      m_styles.push_back(st);
+        // NOTE: The value 64 is based on the bitmap texture used by other
+        // Gnash renderers which is normally 64x64 pixels for radial gradients.
+        _styles.push_back(st);
     }
     
-       
-    
-    // === RGBA32 ===    
-
-    void add_bitmap_repeat_nn_rgba32(const agg_bitmap_info* bi,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    template<typename T>
+    void addRadialGradient(const GradientFill& fs, const gnash::SWFMatrix& mat,
+            const gnash::cxform& cx)
     {
-    
-      // tiled, nearest neighbor method (faster)   
+        // move the center of the radial fill to where it should be
+        SWFMatrix transl;
+        transl.set_translation(-32, -32);
+        transl.concatenate(mat);    
 
-      typedef agg::pixfmt_rgba32_pre PixelFormat;
-      typedef agg::span_allocator<PixelFormat> span_allocator_type;
-      typedef agg::wrap_mode_repeat wrap_type;
-      typedef agg::image_accessor_wrap<PixelFormat, wrap_type, wrap_type> img_source_type; 
-      typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
-      typedef agg::span_image_filter_rgba_nn<img_source_type, interpolator_type> sg_type;
-       
-      typedef agg_style_bitmap<PixelFormat, span_allocator_type, img_source_type, 
-        interpolator_type, sg_type> st_type;
-      
-      st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);
+        // div 2 because we need radius, not diameter      
+        typename T::Type* st = new typename T::Type(fs, transl, cx, 64 / 2); 
           
-      m_styles.push_back(st);
-    }
-        
-        
-    
-    
-    void add_bitmap_clip_nn_rgba32(const agg_bitmap_info* bi,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
-    {
-
-      // clipped, nearest neighbor method (faster)   
-
-      typedef agg::pixfmt_rgba32_pre PixelFormat;
-      typedef agg::span_allocator<PixelFormat> span_allocator_type;
-      typedef image_accessor_clip_transp<PixelFormat> img_source_type; 
-      typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
-      typedef agg::span_image_filter_rgba_nn<img_source_type, interpolator_type> sg_type;
-       
-      typedef agg_style_bitmap<PixelFormat, span_allocator_type, img_source_type, 
-        interpolator_type, sg_type> st_type;
-      
-      st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);
-          
-      m_styles.push_back(st);
-    }
-    
-    
-    
-    void add_bitmap_repeat_aa_rgba32(const agg_bitmap_info* bi,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
-    {
-
-      // tiled, bilinear method (better quality)   
-
-      typedef agg::pixfmt_rgba32_pre PixelFormat;
-      typedef agg::span_allocator<PixelFormat> span_allocator_type;
-      typedef agg::wrap_mode_repeat wrap_type;
-      typedef agg::image_accessor_wrap<PixelFormat, wrap_type, wrap_type> img_source_type; 
-      typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
-      typedef agg::span_image_filter_rgba_bilinear<img_source_type, interpolator_type> sg_type;
-       
-      typedef agg_style_bitmap<PixelFormat, span_allocator_type, img_source_type, 
-        interpolator_type, sg_type> st_type;
-      
-      st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);       
-        
-      m_styles.push_back(st);
-    }
-        
-    
-    void add_bitmap_clip_aa_rgba32(const agg_bitmap_info* bi,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
-    {
-
-      // clipped, bilinear method (better quality)   
-
-      typedef agg::pixfmt_rgba32_pre PixelFormat;
-      typedef agg::span_allocator<PixelFormat> span_allocator_type;
-      typedef image_accessor_clip_transp<PixelFormat> img_source_type; 
-      typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
-      typedef agg::span_image_filter_rgba_bilinear<img_source_type, interpolator_type> sg_type;
-       
-      typedef agg_style_bitmap<PixelFormat, span_allocator_type, img_source_type, 
-        interpolator_type, sg_type> st_type;
-      
-      st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);       
-        
-      m_styles.push_back(st);
-    }
-    
-    
-    // === GRADIENT ===
-
-    void add_gradient_linear(const GradientFill& fs,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
-    {
-    
-      typedef agg::rgba8 color_type;            
-      typedef agg::span_allocator<color_type> span_allocator_type;
-      typedef agg::span_interpolator_linear<agg::trans_affine> interpolator_type;
-      typedef agg::gradient_x gradient_func_type;
-      //typedef agg::gradient_repeat_adaptor<gradient_func_type> gradient_adaptor_type;
-      typedef gradient_func_type gradient_adaptor_type;
-      typedef agg::gradient_lut<agg::color_interpolator<color_type>, 256> color_func_type;
-      typedef agg::span_gradient<color_type,
-                                 interpolator_type,
-                                 gradient_adaptor_type,
-                                 color_func_type> sg_type;
-       
-      typedef agg_style_gradient<color_type, span_allocator_type, 
-        interpolator_type, gradient_func_type, gradient_adaptor_type, 
-        color_func_type, sg_type> st_type;
-      
-      st_type* st = new st_type(fs, mat, cx, 256);
-      
-      // NOTE: The value 256 is based on the bitmap texture used by other
-      // Gnash renderers which is normally 256x1 pixels for linear gradients.       
-        
-      m_styles.push_back(st);
-    }
-    
-
-    void add_gradient_radial(const GradientFill& fs,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
-    {
-    
-      typedef agg::rgba8 color_type;            
-      typedef agg::span_allocator<color_type> span_allocator_type;
-      typedef agg::span_interpolator_linear<agg::trans_affine> 
-          interpolator_type;
-      typedef agg::gradient_radial gradient_func_type;
-      typedef gradient_func_type gradient_adaptor_type;
-      typedef agg::gradient_lut<agg::color_interpolator<color_type>, 256> 
-          color_func_type;
-      typedef agg::span_gradient<color_type,
-                                 interpolator_type,
-                                 gradient_adaptor_type,
-                                 color_func_type> sg_type;
-       
-      typedef agg_style_gradient<color_type, span_allocator_type, 
-        interpolator_type, gradient_func_type, gradient_adaptor_type, 
-        color_func_type, sg_type> st_type;
-      
-      // move the center of the radial fill to where it should be
-      gnash::SWFMatrix transl;
-      transl.set_translation(-32, -32);
-      transl.concatenate(mat);    
-
-      // div 2 because we need radius, not diameter      
-      st_type* st = new st_type(fs, transl, cx, 64/2); 
-        
-      // NOTE: The value 64 is based on the bitmap texture used by other
-      // Gnash renderers which is normally 64x64 pixels for radial gradients.       
-        
-      m_styles.push_back(st);
-    }
-
-    void add_gradient_focal(const GradientFill& fs,
-        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
-    {
-      typedef agg::rgba8 color_type;
-      typedef agg::span_allocator<color_type> span_allocator_type;
-      typedef agg::span_interpolator_linear<agg::trans_affine> interpolator_type;
-      typedef agg::gradient_radial_focus gradient_func_type;
-      typedef gradient_func_type gradient_adaptor_type;
-      typedef agg::gradient_lut<agg::color_interpolator<color_type>, 256> color_func_type;
-      typedef agg::span_gradient<color_type, interpolator_type,
-        gradient_adaptor_type, color_func_type> sg_type;
-    
-      typedef agg_style_gradient<color_type, span_allocator_type,
-        interpolator_type, gradient_func_type, gradient_adaptor_type,
-        color_func_type, sg_type> st_type;
-            
-      // move the center of the focal fill (not its focal point) to where it 
-      // should be.
-      gnash::SWFMatrix transl;      
-      transl.set_translation(-32, -32);
-      transl.concatenate(mat);
-      
-      st_type* st = new st_type(fs, transl, cx, 64/2); 
-      
-      // re-initialize focal gradient settings
-      gradient_adaptor_type& adaptor = st->get_gradient_adaptor();
-      adaptor.init(32.0, fs.focalPoint() * 32.0, 0.0);
-    
-      m_styles.push_back(st);
+        // NOTE: The value 64 is based on the bitmap texture used by other
+        // Gnash renderers which is normally 64x64 pixels for radial gradients.
+        _styles.push_back(st);
     }
 
     /// Returns the color of a certain fill style (solid)
     agg::rgba8 color(unsigned style) const 
     {
-        if (style < m_styles.size())
-            return m_styles[style]->color();
+        if (style < _styles.size())
+            return _styles[style]->color();
 
         return m_transparent;
     }
@@ -679,16 +478,37 @@ public:
     void generate_span(agg::rgba8* span, int x, int y,
         unsigned len, unsigned style)
     {
-      m_styles[style]->generate_span(span,x,y,len);
+      _styles[style]->generate_span(span,x,y,len);
     }
 
 
-private:
-    std::vector<agg_style_base*> m_styles;
-    agg::rgba8          m_transparent;
-};  // class agg_style_handler
+    /// Add a bitmap with the specified filter
+    //
+    /// @tparam Filter      The FilterType to use. This affects scaling
+    ///                     quality, pixel type etc.
+    template<typename Filter> void
+    addBitmap(const agg_bitmap_info* bi, const gnash::SWFMatrix& mat,
+            const gnash::cxform& cx)
+    {
+        typedef typename Filter::PixelFormat PixelFormat;
+        typedef typename Filter::Generator Generator;
+        typedef typename Filter::Allocator Allocator;
+        typedef typename Filter::SourceType SourceType;
+        typedef typename Filter::Interpolator Interpolator;
 
+        typedef BitmapStyle<PixelFormat, Allocator,
+                SourceType, Interpolator, Generator> Style;
+      
+        Style* st = new Style(bi->get_width(), bi->get_height(),
+          bi->get_rowlen(), bi->get_data(), mat, cx);       
+        
+        _styles.push_back(st);
+    }
 
+    std::vector<AggStyle*> _styles;
+    agg::rgba8 m_transparent;
+
+}; 
 
 class agg_mask_style_handler 
 {
@@ -720,6 +540,174 @@ private:
   
 };  // class agg_mask_style_handler
 
+/// Style handler
+//
+/// Transfer FillStyles to agg styles.
+struct AddStyles : boost::static_visitor<>
+{
+    AddStyles(SWFMatrix stage, SWFMatrix fill, const cxform& c,
+            StyleHandler& sh, Quality q)
+        :
+        _stageMatrix(stage.invert()),
+        _fillMatrix(fill.invert()),
+        _cx(c),
+        _sh(sh),
+        _quality(q)
+    {}
+
+    void operator()(const GradientFill& f) const {
+          SWFMatrix m = f.matrix();
+          m.concatenate(_fillMatrix);
+          m.concatenate(_stageMatrix);
+          storeGradient(_sh, f, m, _cx);
+    }
+
+    void operator()(const SolidFill& f) const {
+        const rgba color = _cx.transform(f.color());
+
+        // add the color to our self-made style handler (basically
+        // just a list)
+        _sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b,
+                  color.m_a));
+    }
+
+    void operator()(const BitmapFill& f) const {
+        SWFMatrix m = f.matrix();
+        m.concatenate(_fillMatrix);
+        m.concatenate(_stageMatrix);
+
+        // Smoothing policy:
+        //
+        // - If unspecified, smooth when _quality >= BEST
+        // - If ON or forced, smooth when _quality > LOW
+        // - If OFF, don't smooth
+        //
+        // TODO: take a forceBitmapSmoothing parameter.
+        //       which should be computed by the VM looking
+        //       at MovieClip.forceSmoothing.
+        bool smooth = false;
+        if (_quality > QUALITY_LOW) {
+            // TODO: if forceSmoothing is true, smooth !
+            switch (f.smoothingPolicy()) {
+                case BitmapFill::SMOOTHING_UNSPECIFIED:
+                    if (_quality >= QUALITY_BEST) smooth = true;
+                    break;
+                case BitmapFill::SMOOTHING_ON:
+                    smooth = true;
+                    break;
+                default: break;
+            }
+        }
+
+        const bool tiled = (f.type() == BitmapFill::TILED);
+
+        _sh.add_bitmap(
+            dynamic_cast<const agg_bitmap_info*>(f.bitmap()), m, _cx, tiled,
+            smooth);
+    }
+
+private:
+
+    /// The inverted stage matrix.
+    const SWFMatrix _stageMatrix;
+    
+    /// The inverted fill matrix.
+    const SWFMatrix _fillMatrix;
+    const cxform& _cx;
+    StyleHandler& _sh;
+    const Quality _quality;
+};  
+
+namespace {
+
+template<typename Wrap, typename Pixel>
+void
+storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
+        const SWFMatrix& mat, const cxform& cx, bool smooth)
+{
+    if (smooth) {
+        st.addBitmap<AA<Pixel, Wrap> >(bi, mat, cx);
+        return;
+    }
+    st.addBitmap<NN<Pixel, Wrap> >(bi, mat, cx);
+}
+
+template<typename Wrap>
+void
+storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
+        const SWFMatrix& mat, const cxform& cx, bool smooth)
+{
+    // Local typedefs for the handled formats.
+    typedef agg::pixfmt_rgba32_pre RGBA;
+    typedef agg::pixfmt_rgb24_pre RGB;
+
+    if (bi->get_bpp() == 24) {
+        storeBitmap<Wrap, RGBA>(st, bi, mat, cx, smooth);
+    }
+    else storeBitmap<Wrap, RGB>(st, bi, mat, cx, smooth);
+}
+
+template<typename Spread, typename Interpolation>
+void
+storeGradient(StyleHandler& st, const GradientFill& fs, const SWFMatrix& mat,
+        const cxform& cx)
+{
+      
+    typedef agg::gradient_x Linear;
+    typedef agg::gradient_radial Radial;
+    typedef agg::gradient_radial_focus Focal;
+
+    typedef Gradient<Linear, Spread, Interpolation> LinearGradient;
+    typedef Gradient<Focal, Spread, Interpolation> FocalGradient;
+    typedef Gradient<Radial, Spread, Interpolation> RadialGradient;
+
+    switch (fs.type()) {
+        case GradientFill::LINEAR:
+            st.addLinearGradient<LinearGradient>(fs, mat, cx);
+            return;
+      
+        case GradientFill::RADIAL:
+            if (fs.focalPoint()) {
+                st.addFocalGradient<FocalGradient>(fs, mat, cx);
+                return;
+            }
+            st.addRadialGradient<RadialGradient>(fs, mat, cx);
+    }
+}
+
+template<typename Spread>
+void
+storeGradient(StyleHandler& st, const GradientFill& fs, const SWFMatrix& mat,
+        const cxform& cx)
+{
+    // TODO: provide and use a linearRGB interpolator.
+    switch (fs.interpolation) {
+        default:
+          storeGradient<Spread, InterpolatorRGB>(st, fs, mat, cx);
+          break;
+    }
+
+}
+
+void
+storeGradient(StyleHandler& st, const GradientFill& fs, const SWFMatrix& mat,
+        const cxform& cx)
+{   
+
+      switch (fs.spreadMode) {
+          case GradientFill::PAD:
+              storeGradient<Pad>(st, fs, mat, cx);
+              break;
+          case GradientFill::REFLECT:
+              storeGradient<Reflect>(st, fs, mat, cx);
+              break;
+          case GradientFill::REPEAT:
+              storeGradient<Repeat>(st, fs, mat, cx);
+              break;
+      }
+}
+
+}
 
 } // namespace gnash
 

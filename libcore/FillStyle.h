@@ -171,10 +171,15 @@ public:
     /// The type of GradientFill
     //
     /// A Focal fill is a gradient fill with a focal point.
-    enum Type
-    {
+    enum Type {
         LINEAR,
         RADIAL
+    };
+
+    enum SpreadMode {
+        PAD,
+        REPEAT,
+        REFLECT
     };
 
     typedef std::vector<GradientRecord> GradientRecords;
@@ -229,7 +234,7 @@ public:
         return _focalPoint;
     }
 
-    SWF::SpreadMode spreadMode;
+    SpreadMode spreadMode;
     SWF::InterpolationMode interpolation;
 
 private:

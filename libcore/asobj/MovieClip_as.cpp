@@ -1858,6 +1858,15 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     GradientFill fd(t, mat.invert(), gradients);
 
+    // Set spread mode if present. Defaults to "pad", which is GradientFill's
+    // default.
+    if (fn.nargs > 5) {
+        const std::string& spread = fn.arg(5).to_string();
+        if (spread == "reflect") fd.spreadMode = GradientFill::REFLECT;
+        else if (spread == "repeat") fd.spreadMode = GradientFill::REPEAT;
+        else assert(fd.spreadMode == GradientFill::PAD);
+    }
+
     /// TODO: set interpolation mode and spread mode.
 
     /// Add a focus if present.

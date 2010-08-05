@@ -100,7 +100,7 @@ gradientMatrix(GradientFill::Type t, const SWFMatrix& m)
 GradientFill::GradientFill(Type t, const SWFMatrix& m,
         const GradientRecords& recs)
     :
-    spreadMode(SWF::GRADIENT_SPREAD_PAD),
+    spreadMode(PAD),
     interpolation(SWF::GRADIENT_INTERPOLATION_NORMAL),
     _focalPoint(0.0),
     _gradients(recs),
@@ -295,9 +295,13 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
 
                 switch (spread) {
                     case SWF::GRADIENT_SPREAD_PAD:
+                        gf.spreadMode = GradientFill::PAD;
+                        break;
                     case SWF::GRADIENT_SPREAD_REFLECT:
+                        gf.spreadMode = GradientFill::REFLECT;
+                        break;
                     case SWF::GRADIENT_SPREAD_REPEAT:
-                        gf.spreadMode = spread;
+                        gf.spreadMode = GradientFill::REPEAT;
                         break;
                     default: 
                         IF_VERBOSE_MALFORMED_SWF(

@@ -299,7 +299,7 @@ with(grad) {
     // Shape 22
     x += 100;
     
-    // Test a radial gradient with SWF8 args
+    // Test a focal gradient with SWF8 args
     fillType = "radial";
     colors = [0xffff00, 0x0000ff, 0x00ffff];
     alphas = [100, 100, 100];
