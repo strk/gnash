@@ -20,7 +20,7 @@
 # without automake complaining.
 AUTOMAKE_OPTIONS = 1.6.0 -Wno-portability
 
-ACLOCAL_AMFLAGS = -I macros
+ACLOCAL_AMFLAGS = -I macros -I cygnal
 noinst_SCRIPT = autogen.sh
 
 ##
