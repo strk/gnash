@@ -111,7 +111,7 @@ EXTENSIONS_API = \
 
 CLEANFILES = *classes.h
 
-instdir = $(includedir)/gnash
+instdir = $(includedir)/gnash/asobj
 inst_HEADERS = $(EXTENSIONS_API)
 
 libgnashasobjs_la_LIBADD = \

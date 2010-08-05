@@ -65,7 +65,7 @@ EXTENSIONS_API = \
 	movie_definition.h \
 	$(NULL)
 
-instdir = $(includedir)/gnash
+instdir = $(includedir)/gnash/parser
 inst_HEADERS = $(EXTENSIONS_API)
 
 libgnashparser_la_LIBADD = \

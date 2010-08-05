@@ -71,7 +71,7 @@ noinst_HEADERS += \
 	$(NULL)
 endif
 
-instdir = $(includedir)/gnash
+instdir = $(includedir)/gnash/vm
 inst_HEADERS = $(EXTENSIONS_API)
 
 libgnashvm_la_LIBADD = \

@@ -152,7 +152,9 @@ else
 MALLOC = 
 endif
 
-noinst_HEADERS = \
+noinst_HEADERS =
+
+inst_HEADERS = \
 	$(LIBLTDLHEAD) \
 	SimpleBuffer.h \
 	extension.h \
@@ -218,7 +220,7 @@ EXTENSIONS_API = \
 	$(NULL)
 
 instdir = $(includedir)/gnash
-inst_HEADERS = $(EXTENSIONS_API)
+inst_HEADERS += $(EXTENSIONS_API)
 
 libgnashbase_la_LDFLAGS = -release $(VERSION) 
 libgnashbase_la_DEPENDENCIES = $(LIBLTDLLIB)
