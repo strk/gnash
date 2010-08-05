@@ -51,7 +51,7 @@ libgnashvm_la_SOURCES += \
 	$(NULL)
 endif
 
-noinst_HEADERS = \
+inst_HEADERS = \
 	ASHandlers.h \
 	ActionExec.h \
 	ExecutableCode.h \
@@ -66,13 +66,13 @@ EXTENSIONS_API = \
 	$(NULL)
 
 if ENABLE_AVM2
-noinst_HEADERS += \
+inst_HEADERS += \
 	Machine.h \
 	$(NULL)
 endif
 
 instdir = $(includedir)/gnash/vm
-inst_HEADERS = $(EXTENSIONS_API)
+inst_HEADERS += $(EXTENSIONS_API)
 
 libgnashvm_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 
