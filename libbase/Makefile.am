@@ -217,12 +217,8 @@ EXTENSIONS_API = \
 	GnashImage.h \
 	$(NULL)
 
-if SDKINSTALL
-noinst_HEADERS += $(EXTENSIONS_API)
-else
 instdir = $(includedir)/gnash
 inst_HEADERS = $(EXTENSIONS_API)
-endif
 
 libgnashbase_la_LDFLAGS = -release $(VERSION) 
 libgnashbase_la_DEPENDENCIES = $(LIBLTDLLIB)

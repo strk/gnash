@@ -71,12 +71,8 @@ noinst_HEADERS += \
 	$(NULL)
 endif
 
-if SDKINSTALL
-noinst_HEADERS += $(EXTENSIONS_API)
-else
 instdir = $(includedir)/gnash
 inst_HEADERS = $(EXTENSIONS_API)
-endif
 
 libgnashvm_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 

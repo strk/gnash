@@ -111,12 +111,8 @@ EXTENSIONS_API = \
 
 CLEANFILES = *classes.h
 
-if SDKINSTALL
-noinst_HEADERS += $(EXTENSIONS_API)
-else
 instdir = $(includedir)/gnash
 inst_HEADERS = $(EXTENSIONS_API)
-endif
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libmedia/libgnashmedia.la \

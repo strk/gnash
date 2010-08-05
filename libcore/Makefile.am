@@ -290,12 +290,8 @@ EXTENSIONS_API = \
 include $(srcdir)/asobj/flash.am
 libgnashcore_la_SOURCES += $(libgnashasobjs_la_SOURCES)
 
-if SDKINSTALL
-noinst_HEADERS += $(EXTENSIONS_API)
-else
 instdir = $(includedir)/gnash
 inst_HEADERS = $(EXTENSIONS_API)
-endif
 
 libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
