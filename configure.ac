@@ -1146,12 +1146,11 @@ AC_ARG_ENABLE(hwaccel,
 
 dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
 dnl restrict using HW Accel to using ffmpeg directly.
-if test x"${build_media_ffmpeg}" = x"no" -a x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg_vaapi}" = x"yes"; then
+if test x"${build_vaapi}" = x"yes" -a "(" x"${build_media_ffmpeg}" != x"yes" -o x"${have_ffmpeg_vaapi}" != x"yes" ")"; then
   AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
 fi
 
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
-  AC_MSG_CHECKING(some shit)
   use_libva=no
   use_libva_x11=no
   use_libva_glx=no
