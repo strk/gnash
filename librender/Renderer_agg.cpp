@@ -1591,17 +1591,6 @@ public:
     typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> rasc_type;  
     rasc_type rasc;
     
-    // renderer base
-    renderer_base& rbase = _alphaMasks.back()->get_rbase();
-    
-    // solid fills
-    typedef agg::renderer_scanline_aa_solid< renderer_base > ren_sl_type;
-    ren_sl_type ren_sl(rbase);
-    
-    // span allocator
-    typedef agg::span_allocator<agg::gray8> alloc_type;
-    alloc_type alloc; 
-      
 
     // activate even-odd filling rule
     if (even_odd) rasc.filling_rule(agg::fill_even_odd);
@@ -1633,6 +1622,14 @@ public:
       rasc.add_path(curve);
     
     } // for path
+    
+    // renderer base
+    renderer_base& rbase = _alphaMasks.back()->get_rbase();
+    
+    // span allocator
+    typedef agg::span_allocator<agg::gray8> alloc_type;
+    alloc_type alloc; 
+      
     
     // now render that thing!
     agg::render_scanlines_compound_layered (rasc, sl, rbase, alloc, sh);
