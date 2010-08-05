@@ -40,7 +40,7 @@
 #include "arg_parser.h"
 #include "GnashNumeric.h" // for clamp
 #include "GnashException.h"
-#include "bzrversion.h"
+#include "revno.h"
 #include "MediaHandler.h"
 
 #ifdef HAVE_FFMPEG_AVCODEC_H

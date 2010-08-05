@@ -47,7 +47,7 @@ snapshot: snapshot-src snapshot-configure snapshot-build snapshot-install snapsh
 # from Automake. This uses the default version for Gnash. which is
 # 'trunk'. Then it gets renamed from the default version from 'trunk'
 # to a branch-revno stamped version instead of trunk.
-snapshot-src: bzrversion.h distdir
+snapshot-src: revno.h distdir
 
 snapshot-configure:
 	-@now=`date "+%Y%m%d"`; \

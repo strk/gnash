@@ -17,7 +17,7 @@
 
 # Build a Debian/Ubuntu .deb GNU/Linux package
 
-deb: bzrversion.h snapshot-src setup-deb snapshot-deb
+deb: revno.h snapshot-src setup-deb snapshot-deb
 
 # Build a .deb snapshot, which means we have to munge the release data
 # into the proper files to build a package with the version in
