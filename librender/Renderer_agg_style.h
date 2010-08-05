@@ -115,10 +115,45 @@ struct Clip
 template<typename P, typename W>
 struct FilterType
 {
-    typedef P PixelFormat;
+    typedef typename P::PixelFormat PixelFormat;
     typedef typename W::template Type<PixelFormat>::type SourceType;
     typedef agg::span_allocator<PixelFormat> Allocator;
-    typedef agg::span_interpolator_linear<agg::trans_affine> Interpolator;
+    typedef agg::span_interpolator_linear<agg::trans_affine>
+        Interpolator;
+};
+
+/// Class with typedefs for RGBA operations.
+struct RGBA 
+{
+    typedef agg::pixfmt_rgba32_pre PixelFormat;
+
+    template<typename SourceType, typename Interpolator>
+    struct Simple {
+        typedef agg::span_image_filter_rgba_nn<SourceType, Interpolator> type;
+    };
+
+    template<typename SourceType, typename Interpolator>
+    struct AntiAlias {
+        typedef agg::span_image_filter_rgba_bilinear<SourceType, Interpolator>
+            type;
+    };
+};
+
+/// Class with typedefs for RGB operations.
+struct RGB 
+{
+    typedef agg::pixfmt_rgb24_pre PixelFormat;
+
+    template<typename SourceType, typename Interpolator>
+    struct Simple {
+        typedef agg::span_image_filter_rgb_nn<SourceType, Interpolator> type;
+    };
+
+    template<typename SourceType, typename Interpolator>
+    struct AntiAlias {
+        typedef agg::span_image_filter_rgb_bilinear<SourceType, Interpolator>
+            type;
+    };
 };
 
 /// Nearest Neighbour filter type for quick, lower quality scaling.
@@ -126,9 +161,9 @@ template<typename P, typename W>
 struct NN : public FilterType<P, W>
 {
     typedef FilterType<P, W> BaseType;
-    typedef agg::span_image_filter_rgb_nn<
+    typedef typename P::template Simple<
                 typename BaseType::SourceType,
-                typename BaseType::Interpolator> Generator;
+                typename BaseType::Interpolator>::type Generator;
 };
 
 /// Bilinear filter type for higher quality scaling.
@@ -136,9 +171,9 @@ template<typename P, typename W>
 struct AA : public FilterType<P, W>
 {
     typedef FilterType<P, W> BaseType;
-    typedef agg::span_image_filter_rgb_bilinear<
+    typedef typename P::template AntiAlias<
                 typename BaseType::SourceType,
-                typename BaseType::Interpolator> Generator;
+                typename BaseType::Interpolator>::type Generator;
 };
 
 /// A reflecting adaptor for Gradients.
@@ -636,9 +671,6 @@ void
 storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
         const SWFMatrix& mat, const cxform& cx, bool smooth)
 {
-    // Local typedefs for the handled formats.
-    typedef agg::pixfmt_rgba32_pre RGBA;
-    typedef agg::pixfmt_rgb24_pre RGB;
 
     if (bi->get_bpp() == 24) {
         storeBitmap<FillMode, RGB>(st, bi, mat, cx, smooth);
