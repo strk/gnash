@@ -642,9 +642,9 @@ storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
     typedef agg::pixfmt_rgb24_pre RGB;
 
     if (bi->get_bpp() == 24) {
-        storeBitmap<Wrap, RGBA>(st, bi, mat, cx, smooth);
+        storeBitmap<Wrap, RGB>(st, bi, mat, cx, smooth);
     }
-    else storeBitmap<Wrap, RGB>(st, bi, mat, cx, smooth);
+    else storeBitmap<Wrap, RGBA>(st, bi, mat, cx, smooth);
 }
 
 template<typename Spread, typename Interpolation>
