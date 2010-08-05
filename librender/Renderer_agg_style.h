@@ -405,8 +405,6 @@ public:
         const gnash::cxform& cx, bool repeat, bool smooth) {
 
         if (!bi) {
-            // See server/styles.h comments about when NULL return is possible.
-            // Don't warn here, we already warn at parse-time
             add_color(agg::rgba8_pre(0,0,0,0));
             return;
         }
@@ -414,9 +412,10 @@ public:
         // Tiled
         if (repeat) {
             storeBitmap<Tile>(*this, bi, mat, cx, smooth);
+            return;
         }
+
         storeBitmap<Clip>(*this, bi, mat, cx, smooth);
-        
     } 
 
     template<typename T>
