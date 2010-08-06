@@ -109,7 +109,7 @@ AM_LDFLAGS =  \
 	$(LIRC_LIBS) \
 	$(MYSQL_LIBS) \
 	$(INTLLIBS) \
-	$(TSLIB_LIBS)
+	$(TS_LIBS)
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
