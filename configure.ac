@@ -3670,12 +3670,6 @@ fi
 if test x"$testsuite" = x"yes"; then
   if test x"$CSOUND" != x; then
     echo "        CSOUND is $CSOUND"
-  else
-    echo "        WARNING: You need to have csound installed" >&4
-    echo "                 to have real fun." >&4
-    echo "                 Install it from http://www.csounds.com/" >&4
-    echo "                 or .deb users: apt-get install csound" >&4
-    echo "                 or .rpm users: yum install csound" >&4
   fi
 fi
 
