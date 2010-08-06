@@ -770,6 +770,8 @@ AC_ARG_ENABLE(sound,
 dnl --------------------------------------------------------
 dnl  Media handler selection
 dnl --------------------------------------------------------
+build_media_gst=yes
+build_media_ffmpeg=no
 AC_ARG_ENABLE(media,
   AC_HELP_STRING([--enable-media=handler],
     [Enable media handling support using the specified handler: gst, ffmpeg or none (no sound) [[gst]] ]),
@@ -1144,12 +1146,6 @@ AC_ARG_ENABLE(hwaccel,
   done
 )
 
-dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
-dnl restrict using HW Accel to using ffmpeg directly.
-if test x"${build_vaapi}" = x"yes" -a "(" x"${build_media_ffmpeg}" != x"yes" -o x"${have_ffmpeg_vaapi}" != x"yes" ")"; then
-  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
-fi
-
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
   use_libva=no
   use_libva_x11=no
@@ -1200,6 +1196,13 @@ else
   build_vaapi=no
   hwaccel_list="XVideo"
   nhwaccel=1
+fi
+
+dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
+dnl restrict using HW Accel to using ffmpeg directly.
+dnl test xyes = xyes -a ( x != xyes -o x != xyes )
+if test x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg}" != x"yes"; then
+  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
 fi
 
 AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
