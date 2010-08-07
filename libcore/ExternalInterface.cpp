@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_array.hpp>
 #include <algorithm>
 
 #include "StringPredicates.h"
@@ -325,6 +326,7 @@ ExternalInterface::ExternalEventCheck(int fd)
     boost::shared_ptr<ExternalInterface::invoke_t> error;
 
     if (fd > 0) {
+#if 0
         fd_set fdset;
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
@@ -332,33 +334,36 @@ ExternalInterface::ExternalEventCheck(int fd)
         tval.tv_sec  = 0;
         tval.tv_usec = 100;
         errno = 0;
-        int ret = ::select(fd+1, &fdset, NULL, NULL, &tval);
-        if (ret == 0) {
+        int ret1 = ::select(fd+1, &fdset, NULL, NULL, &tval);
+        if (ret1 == 0) {
 //            log_debug ("The pipe for fd #%d timed out waiting to read", fd);
             return error;
-        } else if (ret == 1) {
+        } else if (ret1 == 1) {
             log_debug ("The pipe for fd #%d is ready", fd);
         } else {
             log_error("The pipe has this error: %s", strerror(errno));
             return error;
         }
-
+#endif
+        
         int bytes = 0;
 #ifndef _WIN32
         ioctl(fd, FIONREAD, &bytes);
 #else
         ioctlSocket(fd, FIONREAD, &bytes);
 #endif
+        if (bytes == 0) {
+            return error;
+        }
         log_debug("There are %d bytes in the network buffer", bytes);
-
-        char *buf = new char[bytes+1];
+        boost::scoped_array<char> buffer(new char[bytes+1]);
         // Since we know how bytes are in the network buffer, allocate
         // some memory to read the data.
         // terminate incase we want to treat the data like a string.
-        buf[bytes+1] = 0;
-        ret = ::read(fd, buf, bytes);
+        buffer[bytes+1] = 0;
+        int ret = ::read(fd, buffer.get(), bytes);
         if (ret) {
-            return parseInvoke(buf);
+            return parseInvoke(buffer.get());
         }
     }
 
