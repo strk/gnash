@@ -2,9 +2,9 @@
                    "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "0.8">
+  <!ENTITY appversion "0.8.8">
   <!ENTITY manrevision "0.4">
-  <!ENTITY date "Feb 2010">
+  <!ENTITY date "Aug 2010">
   <!ENTITY app "<application>Gnash</application>">
   <!ENTITY appname "Gnash">
   <!ENTITY version "0.8">
@@ -217,10 +217,12 @@ gnash [option]... [URL]
 
   <varlistentry>
     <term>-F</term>
-    <term>--fd</term>
+    <term>--fd x:y</term>
     <listitem>
       <para>
-	Set filedescriptor to use for external communications.
+	Set file descriptors to use for external communications. x is
+	use by the player to send commands to the plugin, y is used
+	by the plugin to send commands to the standalone player.
       </para>
     </listitem>
   </varlistentry>
