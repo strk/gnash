@@ -770,7 +770,7 @@ AC_ARG_ENABLE(sound,
 dnl --------------------------------------------------------
 dnl  Media handler selection
 dnl --------------------------------------------------------
-build_media_gst=yes
+build_media_gst=no
 build_media_ffmpeg=no
 AC_ARG_ENABLE(media,
   AC_HELP_STRING([--enable-media=handler],
@@ -815,6 +815,11 @@ AC_ARG_ENABLE(media,
 
 MEDIA_CONFIG="${media_list}"
 AC_SUBST(MEDIA_CONFIG)
+
+dnl if no media handler is selected, default to Gstreamer.
+if test x"$build_media_ffmpeg" = x"no" -a x"$build_media_gst" = x"no"; then
+   build_media_gst=yes
+fi
 
 if test x"$build_media_ffmpeg" = x"yes"; then
   GNASH_PATH_FFMPEG
