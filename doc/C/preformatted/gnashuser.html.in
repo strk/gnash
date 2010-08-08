@@ -1,5 +1,5 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash User Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div lang="en" class="book" title="Gnash User Manual"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash User Manual</h1></div><div><p class="releaseinfo">
-        This manual describes version 0.8.6 of Gnash.
+        This manual describes version 0.8.8 of Gnash.
     </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation</p></div><div><div class="legalnotice" title="Legal Notice"><a name="legalnotice"></a><p>
     Permission is granted to copy, distribute and/or modify this document
     under the terms of the <a class="link" href="#fdl" title="Appendix A. GNU Free Documentation License"><em class="citetitle">GNU
@@ -512,7 +512,7 @@
 	      </td></tr><tr><td align="left">Darwin (MacOS X)
 	      </td><td align="left">PowerPC and x86-32 
 	      </td></tr><tr><td align="left">Windows XP, Windows Vista</td><td align="left">x86-32</td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect2" title="Software Requirements"><div class="titlepage"><div><div><h3 class="title"><a name="software"></a>Software Requirements</h3></div></div></div><p>
-	The 0.8.6 release of Gnash has been designed to run on
+	The 0.8.8 release of Gnash has been designed to run on
 	UNIX/Linux variants, and has been run on most of the free ones.
 	However, Gnash has successfully run on Windows, Darwin (Mac OS X),
 	Irix, Solaris, BeOs, OS/2, and Haiku.  Gnash has also run on the
