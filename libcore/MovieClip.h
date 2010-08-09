@@ -52,7 +52,6 @@ namespace gnash {
     class BitmapData_as;
     class CachedBitmap;
     class GnashImage;
-    class Transform;
     namespace SWF {
         class PlaceObject2Tag;
     }
