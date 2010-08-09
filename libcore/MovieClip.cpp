@@ -58,6 +58,7 @@
 #include "Global_as.h"
 #include "RunResources.h"
 #include "GnashImage.h"
+#include "Transform.h"
 
 #include <vector>
 #include <string>
@@ -1090,10 +1091,12 @@ MovieClip::display(Renderer& renderer)
     // on its parent: i.e. if its parent is a mask, this DisplayObject
     // should be rendered to the mask buffer even it is invisible.
     
+    // Draw everything with our own transform.
+    Transform tr(getWorldMatrix(), get_world_cxform());
+
     // render drawable (ActionScript generated graphics)
     _drawable.finalize();
-    _drawable.display(renderer, *this);
-    
+    _drawable.display(renderer, tr);
     
     // descend the display list
     _displayList.display(renderer);

@@ -29,6 +29,7 @@ namespace gnash {
     class Renderer;
     class FillStyle;
     class GradientRecord;
+    class Transform;
 }
 
 namespace gnash {
@@ -78,28 +79,19 @@ public:
     }
 
     /// Display a DynamicShape object.
-    void display(Renderer& renderer, const DisplayObject& inst) const;
+    void display(Renderer& renderer, const Transform& c) const;
 
 	/// Set current line style and start a new path.
 	//
 	/// @param thickness
-	///
 	/// @param color
-	///
 	/// @param vScale
-	///
 	/// @param hScale
-	///
 	/// @param noClose
-	///
 	/// @param startCapStyle
-	///
 	/// @param endCapStyle
-	///
 	/// @param joinStyle
-	///
 	/// @param miterLimitFactor
-	///
 	void lineStyle(boost::uint16_t thickness, const rgba& color,
 		bool vScale=true, bool hScale=true,
 		bool pixelHinting=false,

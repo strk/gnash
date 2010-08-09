@@ -64,23 +64,6 @@ namespace gnash {
 
 namespace gnash {
 
-class Transform
-{
-public:
-    Transform(const SWFMatrix& m = SWFMatrix(), const cxform& cx = cxform(),
-            const SWFRect& r = SWFRect())
-        :
-        matrix(m),
-        colorTransform(cx),
-        rect(r)
-    {}
-
-    SWFMatrix matrix;
-    cxform colorTransform;
-    SWFRect rect;
-};
-
-
 /// Returns true if the DisplayObject is referenceable in ActionScript
 //
 /// A DisplayObject is referenceable if it has an associated object.

@@ -20,6 +20,7 @@
 #include "FillStyle.h"
 #include "Renderer.h"
 #include "DisplayObject.h"
+#include "Transform.h"
 
 #include <vector>
 
@@ -45,9 +46,9 @@ DynamicShape::clear()
 }
 
 void
-DynamicShape::display(Renderer& renderer, const DisplayObject& inst) const
+DynamicShape::display(Renderer& renderer, const Transform& c) const
 {
-    renderer.drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
+    renderer.drawShape(_shape, c.colorTransform, c.matrix);
 }
 
 void

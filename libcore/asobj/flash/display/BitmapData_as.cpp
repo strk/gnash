@@ -41,6 +41,7 @@
 #include "MovieClip_as.h"
 #include "Movie.h"
 #include "movie_definition.h"
+#include "Transform.h"
 
 namespace gnash {
 

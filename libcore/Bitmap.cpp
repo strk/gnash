@@ -26,6 +26,7 @@
 #include "VM.h"
 #include "movie_root.h"
 #include "RunResources.h"
+#include "Transform.h"
 
 namespace gnash {
 
@@ -111,8 +112,10 @@ Bitmap::display(Renderer& renderer)
 {
     /// Don't display cleared Bitmaps.
     if (!_def && !_bitmapData) return;
+    
+    Transform tr(getWorldMatrix(), get_world_cxform());
 
-    _shape.display(renderer, *this);
+    _shape.display(renderer, tr);
     clear_invalidated();
 }
 
