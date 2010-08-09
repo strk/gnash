@@ -57,6 +57,7 @@ namespace gnash {
     class as_object;
     class as_value;
     class as_environment;
+    class Transform;
     namespace SWF {
         class TextRecord;
     }
@@ -467,7 +468,7 @@ public:
     /// Render the DisplayObject.
     //
     /// All DisplayObjects must have a display() function.
-	virtual void display(Renderer& renderer) = 0;
+	virtual void display(Renderer& renderer, const Transform& xform) = 0;
 
     /// Search for StaticText objects
     //

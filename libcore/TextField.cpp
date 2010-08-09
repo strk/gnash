@@ -47,6 +47,7 @@
 #include "MouseButtonState.h"
 #include "Global_as.h"
 #include "Renderer.h"
+#include "Transform.h"
 
 #include <algorithm> 
 #include <string>
@@ -287,14 +288,16 @@ TextField::cursorRecord()
 }
 
 void
-TextField::display(Renderer& renderer)
+TextField::display(Renderer& renderer, const Transform& base)
 {
     registerTextVariable();
 
     const bool drawBorder = getDrawBorder();
     const bool drawBackground = getDrawBackground();
 
-    const SWFMatrix& wmat = getWorldMatrix();
+    Transform xform = base;
+    xform.matrix.concatenate(getMatrix());
+    xform.colorTransform.concatenate(get_cxform());
 
     if ((drawBorder || drawBackground) && !_bounds.is_null())
     {
@@ -315,7 +318,7 @@ TextField::display(Renderer& renderer)
         rgba backgroundColor = drawBackground ? getBackgroundColor() :
                                                 rgba(0,0,0,0);
 
-        cxform cx = get_world_cxform();
+        cxform cx = xform.colorTransform;
             
         if (drawBorder) borderColor = cx.transform(borderColor);
          
@@ -326,7 +329,7 @@ TextField::display(Renderer& renderer)
 #endif
 
         renderer.draw_poly(&coords.front(), 4, backgroundColor, 
-                borderColor, wmat, true);
+                borderColor, xform.matrix, true);
         
     }
 
@@ -335,7 +338,7 @@ TextField::display(Renderer& renderer)
     // A cleaner implementation is likely correctly setting the
     // _xOffset and _yOffset memebers in glyph records.
     // Anyway, see bug #17954 for a testcase.
-    SWFMatrix m = getWorldMatrix();
+    SWFMatrix m = xform.matrix;
 
     if (!_bounds.is_null()) {
         m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
@@ -367,15 +370,14 @@ TextField::display(Renderer& renderer)
     SWF::TextRecord::displayRecords(renderer, m, get_world_cxform(),
             _displayRecords, _embedFonts);
 
-    if (m_has_focus && !isReadOnly()) show_cursor(renderer, wmat);
+    if (m_has_focus && !isReadOnly()) show_cursor(renderer, xform.matrix);
     
     clear_invalidated();
 }
 
 
 void
-TextField::add_invalidated_bounds(InvalidatedRanges& ranges, 
-    bool force)
+TextField::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
     if (!force && !invalidated()) return; // no need to redraw
     

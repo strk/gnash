@@ -34,6 +34,7 @@
 #include "Global_as.h"
 #include "Renderer.h"
 #include "RunResources.h"
+#include "Transform.h"
 
 // Define this to get debug logging during embedded video decoding
 //#define DEBUG_EMBEDDED_VIDEO_DECODING
@@ -118,16 +119,15 @@ Video::clear()
 }
 
 void
-Video::display(Renderer& renderer)
+Video::display(Renderer& renderer, const Transform& base)
 {
 	assert(m_def);
 
-	SWFMatrix m = getWorldMatrix();
+	SWFMatrix m = base.matrix;
 	const SWFRect& bounds = m_def->bounds();
 
 	GnashImage* img = getVideoFrame();
-	if (img)
-	{
+	if (img) {
 		renderer.drawVideoFrame(img, &m, &bounds, _smoothing);
 	}
 

@@ -59,7 +59,7 @@ public:
     virtual ~InteractiveObject() {}
 
     /// Render this InteractiveObject
-    virtual void display(Renderer& renderer) = 0;
+	virtual void display(Renderer& renderer, const Transform& xform) = 0;
 
     /// Whether the DisplayObject can handle a mouse event.
     //

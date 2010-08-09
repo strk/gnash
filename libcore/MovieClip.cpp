@@ -1081,7 +1081,7 @@ MovieClip::goto_labeled_frame(const std::string& label)
 }
 
 void
-MovieClip::display(Renderer& renderer)
+MovieClip::display(Renderer& renderer, const Transform& base)
 {
 
     // Note: 
@@ -1092,14 +1092,16 @@ MovieClip::display(Renderer& renderer)
     // should be rendered to the mask buffer even it is invisible.
     
     // Draw everything with our own transform.
-    Transform tr(getWorldMatrix(), get_world_cxform());
+    Transform xform = base;
+    xform.matrix.concatenate(getMatrix());
+    xform.colorTransform.concatenate(get_cxform());
 
     // render drawable (ActionScript generated graphics)
     _drawable.finalize();
-    _drawable.display(renderer, tr);
+    _drawable.display(renderer, xform);
     
     // descend the display list
-    _displayList.display(renderer);
+    _displayList.display(renderer, xform);
      
     clear_invalidated();
 }

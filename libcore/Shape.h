@@ -58,7 +58,7 @@ public:
 	    assert(_def);
 	}
 
-	virtual void display(Renderer& renderer);
+	virtual void display(Renderer& renderer, const Transform& xform);
 
     virtual SWFRect getBounds() const {
         return _def ? _def->bounds() : _shape->getBounds();

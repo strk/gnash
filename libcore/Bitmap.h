@@ -65,7 +65,7 @@ public:
     virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
     /// Display this Bitmap
-    virtual void display(Renderer& renderer);
+	virtual void display(Renderer& renderer, const Transform& xform);
 
     /// Get the bounds of the Bitmap
     virtual SWFRect getBounds() const;

@@ -30,6 +30,7 @@
 #include "GnashAlgorithm.h"
 #include "Global_as.h"
 #include "movie_definition.h"
+#include "Transform.h"
 
 #include <algorithm>
 #include <numeric>
@@ -122,13 +123,12 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, TagType tag)
 }
 
 void
-DefineTextTag::display(Renderer& renderer, const StaticText& inst) const
+DefineTextTag::display(Renderer& renderer, const Transform& base) const
 {
+    Transform xform = base;
+    xform.matrix.concatenate(_matrix);
 
-    SWFMatrix mat = inst.getWorldMatrix();
-    mat.concatenate(_matrix);
-
-    TextRecord::displayRecords(renderer, mat, inst.get_world_cxform(),
+    TextRecord::displayRecords(renderer, xform.matrix, xform.colorTransform,
             _textRecords);
 }
 

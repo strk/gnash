@@ -108,14 +108,16 @@ Bitmap::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 }
 
 void
-Bitmap::display(Renderer& renderer)
+Bitmap::display(Renderer& renderer, const Transform& base)
 {
     /// Don't display cleared Bitmaps.
     if (!_def && !_bitmapData) return;
     
-    Transform tr(getWorldMatrix(), get_world_cxform());
+    Transform xform = base;
+    xform.matrix.concatenate(getMatrix());
+    xform.colorTransform.concatenate(get_cxform());
 
-    _shape.display(renderer, tr);
+    _shape.display(renderer, xform);
     clear_invalidated();
 }
 

@@ -31,6 +31,7 @@ namespace gnash {
     class SWFStream;
     class RunResources;
     class StaticText;
+    class Transform;
 }
 
 namespace gnash {
@@ -50,7 +51,7 @@ public:
             const RunResources& r);
 
 	/// Draw the string.
-	void display(Renderer& renderer, const StaticText& inst) const;
+    void display(Renderer& renderer, const Transform& xform) const;
 	
 	const SWFRect& bounds() const {
         // TODO: There is a _matrix field in the definition(!) that's

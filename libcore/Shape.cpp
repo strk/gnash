@@ -55,12 +55,15 @@ Shape::pointInShape(boost::int32_t x, boost::int32_t y) const
 }
 
 void  
-Shape::display(Renderer& renderer)
+Shape::display(Renderer& renderer, const Transform& base)
 {
-    Transform tr(getWorldMatrix(), get_world_cxform());
 
-    if (_def) _def->display(renderer, *this);
-    else _shape->display(renderer, tr);
+    Transform xform = base;
+    xform.matrix.concatenate(getMatrix());
+    xform.colorTransform.concatenate(get_cxform());
+
+    if (_def) _def->display(renderer, xform);
+    else _shape->display(renderer, xform);
     clear_invalidated();
 }
 

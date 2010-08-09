@@ -196,7 +196,7 @@ public:
     virtual void setHeight(double height);
 
 	/// Draw the dynamic string.
-	void display(Renderer& renderer);
+	virtual void display(Renderer& renderer, const Transform& xform);
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 

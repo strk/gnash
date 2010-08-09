@@ -33,6 +33,7 @@
 #include "Global_as.h"
 #include "Renderer.h"
 #include "FillStyle.h"
+#include "Transform.h"
 
 namespace gnash {
 namespace SWF {
@@ -68,10 +69,10 @@ DefineMorphShapeTag::createDisplayObject(Global_as& gl,
 }
 
 void
-DefineMorphShapeTag::display(Renderer& renderer, const MorphShape& inst) const
+DefineMorphShapeTag::display(Renderer& renderer, const ShapeRecord& shape,
+        const Transform& base) const
 {
-    renderer.drawShape(inst.shape(), inst.get_world_cxform(),
-            inst.getWorldMatrix());
+    renderer.drawShape(shape, base.colorTransform, base.matrix);
 }
 
 

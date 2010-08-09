@@ -631,7 +631,7 @@ DisplayList::destroy()
 // Display the referenced DisplayObjects. Lower depths
 // are obscured by higher depths.
 void
-DisplayList::display(Renderer& renderer)
+DisplayList::display(Renderer& renderer, const Transform& base)
 {
     testInvariant();
 
@@ -650,12 +650,16 @@ DisplayList::display(Renderer& renderer)
         {
             renderer.begin_submit_mask();
             
-            if (mask->boundsInClippingArea(renderer)) mask->display(renderer);
+            if (mask->boundsInClippingArea(renderer)) {
+                mask->display(renderer, base);
+            }
             else mask->omit_display();
               
             renderer.end_submit_mask();
             
-            if (ch->boundsInClippingArea(renderer)) ch->display(renderer);
+            if (ch->boundsInClippingArea(renderer)) {
+                ch->display(renderer, base);
+            }
             else ch->omit_display();
               
             renderer.disable_mask();
@@ -701,7 +705,9 @@ DisplayList::display(Renderer& renderer)
             renderer.begin_submit_mask();
         }
         
-        if (ch->boundsInClippingArea(renderer)) ch->display(renderer);
+        if (ch->boundsInClippingArea(renderer)) {
+            ch->display(renderer, base);
+        }
         else ch->omit_display();
         
         // Notify the renderer that mask drawing has finished.

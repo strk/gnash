@@ -34,6 +34,7 @@ namespace gnash {
 	class RunResources;
     class MorphShape;
     class Renderer;
+    class Transform;
 }
 
 namespace gnash {
@@ -53,7 +54,8 @@ public:
 	virtual DisplayObject* createDisplayObject(Global_as& gl,
             DisplayObject* parent) const;
 
-    virtual void display(Renderer& renderer, const MorphShape& inst) const;
+    void display(Renderer& renderer, const ShapeRecord& shape,
+            const Transform& base) const;
 
     const ShapeRecord& shape1() const { 
         return _shape1;

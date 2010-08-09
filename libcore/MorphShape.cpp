@@ -23,10 +23,9 @@
 #include "swf/ShapeRecord.h"
 #include "Geometry.h"
 #include "SWFMatrix.h"
+#include "Transform.h"
 
-namespace gnash
-{
-
+namespace gnash {
 
 MorphShape::MorphShape(movie_root& mr, as_object* object,
         const SWF::DefineMorphShapeTag* def, DisplayObject* parent)
@@ -62,10 +61,14 @@ MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 }
 
 void  
-MorphShape::display(Renderer& renderer)
+MorphShape::display(Renderer& renderer, const Transform& base)
 {
     morph();
-    _def->display(renderer, *this); 
+    Transform xform = base;
+    xform.matrix.concatenate(getMatrix());
+    xform.colorTransform.concatenate(get_cxform());
+
+    _def->display(renderer, _shape, xform); 
     clear_invalidated();
 }
 

@@ -236,10 +236,10 @@ public:
     ///                 owner.
     void addDisplayObject(DisplayObject* obj);
 
-	/// \brief
-	/// Display the referenced DisplayObjects.
+	/// Display the list's DisplayObjects.
+    //
 	/// Lower depths are obscured by higher depths.
-	void display(Renderer& renderer);
+	void display(Renderer& renderer, const Transform& xform);
 	
 	void omit_display();
 

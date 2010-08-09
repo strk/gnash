@@ -223,11 +223,7 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
     }
 
     // TODO: write a proper interface for this (and other transforms).
-    const SWFMatrix backup = mc.getMatrix();
-    mc.setMatrix(transform.matrix);
-    mc.display(*internal);
-    mc.setMatrix(backup);
-    
+    mc.display(*internal, transform);
 }
 
 // extern 

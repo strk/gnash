@@ -43,6 +43,7 @@
 #include "ExternalInterface.h"
 #include "TextField.h"
 #include "Button.h"
+#include "Transform.h"
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -995,13 +996,12 @@ movie_root::display()
         // null frame size ? don't display !
         const SWFRect& sub_frame_size = movie->get_frame_size();
 
-        if ( sub_frame_size.is_null() )
-        {
+        if (sub_frame_size.is_null()) {
             log_debug("_level%u has null frame size, skipping", i->first);
             continue;
         }
 
-        movie->display(*renderer);
+        movie->display(*renderer, Transform());
 
     }
 }

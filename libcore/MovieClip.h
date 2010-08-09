@@ -52,6 +52,7 @@ namespace gnash {
     class BitmapData_as;
     class CachedBitmap;
     class GnashImage;
+    class Transform;
     namespace SWF {
         class PlaceObject2Tag;
     }
@@ -262,8 +263,8 @@ public:
     /// Look up the labeled frame, and jump to it.
     bool goto_labeled_frame(const std::string& label);
         
-    /// Display (render?) this Sprite/MovieClip, unless invisible
-    void display(Renderer& renderer);
+    /// Render this MovieClip.
+    virtual void display(Renderer& renderer, const Transform& xform);
     
     void omit_display();
 
