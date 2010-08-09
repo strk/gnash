@@ -1,10 +1,10 @@
 Name:           gnash
 # This next field gets edited by "make gnash.spec" when building an rpm
-Version:        trunk
+Version:        0.8.8
 Release:        0
 Epoch: 		1
 # This next field gets edited by "make gnash.spec" when building an rpm
-Distribution:	fc12
+Distribution:	fc13
 Summary:        GNU SWF player
 
 Group:          Applications/Multimedia
@@ -205,15 +205,17 @@ sh ./configure \
 	$RENDERER \
 	$OTHER \
 	$OPTIONAL \
-	--disable-dependency-tracking \
-	--disable-rpath \
-	--enable-cygnal \
-	--enable-sdkinstall \
-	--disable-testsuite \
         --prefix=/usr \
 	--mandir=%{_prefix}/share/man \
 	--infodir=%{_prefix}/share/info \
-	--with-plugins-install=system
+	--disable-dependency-tracking \
+	--disable-testsuite \
+	--disable-rpath \
+	--enable-renderers=agg,cairo \
+	--enable-cygnal \
+	--enable-python \
+	--with-plugins-install=system \
+	--enable-extensions=all
 
 make $MAKEFLAGS dumpconfig all LDFLAGS="-Wl,--build-id"
 %endif
@@ -309,7 +311,10 @@ scrollkeeper-update -q || :
 %{_datadir}/man/man1/cygnal.1.gz
 
 %files devel
-%{_prefix}/include/gnash/*.h
+%{_prefix}/include/gnash/*.h*
+%{_prefix}/include/gnash/vm/*.h
+%{_prefix}/include/gnash/asobj/*.h
+%{_prefix}/include/gnash/parser/*.h
 %{_prefix}/lib/pkgconfig/gnash.pc
 
 %files widget
