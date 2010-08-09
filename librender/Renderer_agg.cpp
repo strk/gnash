@@ -881,7 +881,7 @@ public:
     m_drawing_mask = false;
   }
   
-  virtual Renderer& startInternalRender(GnashImage& im) {
+  virtual Renderer* startInternalRender(GnashImage& im) {
 
       std::auto_ptr<Renderer_agg_base> in;
 
@@ -901,7 +901,7 @@ public:
       in->init_buffer(im.begin(), width * height, width, height, stride);
 
       _external.reset(in.release());
-      return *_external;
+      return _external.get();
   }
 
   virtual void endInternalRender() {

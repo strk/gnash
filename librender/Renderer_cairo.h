@@ -50,8 +50,8 @@ public:
 
     void set_invalidated_regions(const InvalidatedRanges& ranges);
       
-    virtual Renderer& startInternalRender(GnashImage& /*im*/) {
-        return *this;
+    virtual Renderer* startInternalRender(GnashImage& /*im*/) {
+        return 0;
     }
 
     virtual void endInternalRender() {}

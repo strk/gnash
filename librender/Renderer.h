@@ -599,7 +599,7 @@ public:
         Internal(Renderer& r, GnashImage& im)
             :
             _r(r),
-            _ext(&_r.startInternalRender(im))
+            _ext(_r.startInternalRender(im))
         {
         }
 
@@ -644,7 +644,9 @@ private:
     /// Setup the renderer to draw to an internal buffer.
     //
     /// Implementations are free to return a new renderer if they choose.
-    virtual Renderer& startInternalRender(GnashImage& buffer) = 0;
+    //
+    /// @return         0 if the renderer does not support this.
+    virtual Renderer* startInternalRender(GnashImage& buffer) = 0;
 
     /// Finish internal rendering.
     //

@@ -978,8 +978,8 @@ private:
 
 public:
       
-    virtual Renderer& startInternalRender(GnashImage& /*im*/) {
-        return *this;
+    virtual Renderer* startInternalRender(GnashImage& /*im*/) {
+        return 0;
     }
 
     virtual void endInternalRender() {}
