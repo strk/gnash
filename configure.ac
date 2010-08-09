@@ -1559,7 +1559,7 @@ AC_ARG_ENABLE(testsuite,
   yes) testsuite=yes ;;
   no)  testsuite=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-testsuite option]) ;;
-esac],testsuite=no)
+esac],testsuite=yes)
 
 if test x"$testsuite" = x"yes"; then
   AC_DEFINE([USE_TESTSUITE], [], [Testsuite support, maintainers option only])
