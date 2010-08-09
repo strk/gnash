@@ -125,12 +125,12 @@ public:
     bool disposed() const {
         return !data();
     }
-
-private:
     
     GnashImage* data() const {
         return _cachedBitmap.get() ? &_cachedBitmap->image() : _image.get();
     }
+
+private:
 
     /// Inform any attached objects that the data has changed.
     void updateObjects();

@@ -39,6 +39,8 @@
 #include "RunResources.h"
 #include "namedStrings.h"
 #include "MovieClip_as.h"
+#include "Movie.h"
+#include "movie_definition.h"
 
 namespace gnash {
 
@@ -646,10 +648,49 @@ bitmapdata_width(const fn_call& fn)
 as_value
 bitmapdata_loadBitmap(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("BitmapData.loadBitmap requires one argument");
+        );
+        return as_value();
+    }
+
+    const std::string linkage = fn.arg(0).to_string();
+    DisplayObject* tgt = fn.env().get_target();
+    if (!tgt) return as_value();
+
+    Movie* root = tgt->get_root();
+    assert(root);
+
+    const movie_definition* def = root->definition();
+
+    const boost::uint16_t id = def->exportID(linkage);
+    CachedBitmap* bit = def->getBitmap(id);
+
+    if (!bit) return as_value();
+
+    GnashImage& im = bit->image();
+    
+    // If it's not found construction will fail.
+    as_value rectangle(fn.env().find_object("flash.display.BitmapData"));
+    boost::intrusive_ptr<as_function> rectCtor = rectangle.to_function();
+
+    if (!rectCtor) {
+        log_error("Failed to construct flash.display.BitmapData!");
+        return -1;
+    }
+
+    fn_call::Args args;
+    args += im.width(), im.height(), (im.type() == GNASH_IMAGE_RGBA);
+
+    as_object* newRect = constructInstance(*rectCtor, fn.env(), args);
+	
+    BitmapData_as* ptr;
+    if (!isNativeType(newRect, ptr)) { return as_value(); }
+    ptr->data()->update(im);
+
+	return as_value(newRect);
 }
 
 
