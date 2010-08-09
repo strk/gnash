@@ -103,7 +103,9 @@ setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control
 deb-rename-build:
 	@echo "Building package in: $(BUILD_DIR)..."
 	@if test -d gnash-$(PACKAGE_VERSION); then \
-	  mv -f gnash-$(PACKAGE_VERSION) $(BUILD_DIR); \
+	  if test ! -d $(BUILD_DIR); then \
+	    mv -f gnash-$(PACKAGE_VERSION) $(BUILD_DIR); \
+	  fi; \
 	fi
 
 # Once the directory has been renamed, we copy over the Debian packaging
