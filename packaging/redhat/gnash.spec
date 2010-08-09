@@ -1,6 +1,6 @@
 Name:           gnash
 # This next field gets edited by "make gnash.spec" when building an rpm
-Version:        0.8.8
+Version:        trunk
 Release:        0
 Epoch: 		1
 # This next field gets edited by "make gnash.spec" when building an rpm
