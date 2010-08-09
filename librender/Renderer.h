@@ -590,6 +590,24 @@ public:
     private:
         Renderer& _r;
     };
+    
+    class Internal 
+    {
+    public:
+
+        /// Prepare the renderer for internal rendering
+        Internal(Renderer& r, GnashImage& im) : _r(r)
+        {
+            _r.startInternalRender(im);
+        }
+
+        ~Internal() {
+            _r.endInternalRender();
+        }
+
+    private:
+        Renderer& _r;
+    };
 
 protected:
 
@@ -615,6 +633,17 @@ private:
                     float x0, float x1, float y0, float y1) = 0;
 
     virtual void end_display() = 0;
+
+    /// Setup the renderer to draw to an internal buffer.
+    //
+    /// Implementations are free to return a new renderer if they choose.
+    virtual Renderer& startInternalRender(GnashImage& buffer) = 0;
+
+    /// Finish internal rendering.
+    //
+    /// Any rendering after this function has been called must apply to the
+    /// external buffer.
+    virtual void endInternalRender() = 0;
 
 }; 
 

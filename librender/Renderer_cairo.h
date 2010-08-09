@@ -49,12 +49,18 @@ public:
     void set_color(const rgba& c);
 
     void set_invalidated_regions(const InvalidatedRanges& ranges);
+      
+    virtual Renderer& startInternalRender(GnashImage& /*im*/) {
+        return *this;
+    }
 
-    void begin_display(const rgba& bg_color,
+    virtual void endInternalRender() {}
+
+    virtual void begin_display(const rgba& bg_color,
                        int viewport_width, int viewport_height,
                        float x0, float x1, float y0, float y1);
 
-    void end_display();
+    virtual void end_display();
 
     void set_scale(float xscale, float yscale);
 

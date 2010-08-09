@@ -977,6 +977,13 @@ private:
   }
 
 public:
+      
+    virtual Renderer& startInternalRender(GnashImage& /*im*/) {
+        return *this;
+    }
+
+    virtual void endInternalRender() {}
+
   virtual void  begin_display(
     const rgba& bg_color,
     int viewport_width, int viewport_height,

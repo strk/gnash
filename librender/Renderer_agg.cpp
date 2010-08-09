@@ -854,8 +854,7 @@ public:
   }
   
 
-  void begin_display(
-      const gnash::rgba& bg,
+  void begin_display(const gnash::rgba& bg,
       int /*viewport_width*/, int /*viewport_height*/,
       float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {
@@ -882,6 +881,12 @@ public:
     m_drawing_mask = false;
   }
   
+  virtual Renderer& startInternalRender(GnashImage& /*im*/) {
+      return *this;
+  }
+
+  virtual void endInternalRender() {}
+
     // renderer_base.clear() does no clipping which clears the
     // whole framebuffer even if we update just a small portion
     // of the screen. The result would be still correct, but slower. 
