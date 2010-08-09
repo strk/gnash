@@ -1960,16 +1960,6 @@ public:
     set_invalidated_regions(ranges);
   }
   
-  virtual void set_invalidated_region(const SWFRect& bounds) {
-  
-    // NOTE: Both single and multi ranges are supported by AGG renderer.
-    
-    InvalidatedRanges ranges;
-    ranges.add(bounds.getRange());
-    set_invalidated_regions(ranges);
-  
-  }
-    
   virtual void set_invalidated_regions(const InvalidatedRanges& ranges) {
     using gnash::geometry::Range2d;
     
