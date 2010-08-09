@@ -65,7 +65,7 @@ MorphShape::display(Renderer& renderer, const Transform& base)
 {
     morph();
 
-    const Transform xform = base.concatenate(transform());
+    const Transform xform = base * transform();
 
     _def->display(renderer, _shape, xform); 
     clear_invalidated();

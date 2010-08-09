@@ -295,7 +295,7 @@ TextField::display(Renderer& renderer, const Transform& base)
     const bool drawBorder = getDrawBorder();
     const bool drawBackground = getDrawBackground();
 
-    Transform xform = base.concatenate(transform());
+    Transform xform = base * transform();
 
     // This is a hack to handle device fonts, which are not affected by
     // color transform.

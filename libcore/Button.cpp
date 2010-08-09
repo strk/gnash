@@ -359,7 +359,7 @@ Button::handleFocus() {
 void
 Button::display(Renderer& renderer, const Transform& base)
 {
-    const Transform xform = base.concatenate(transform());
+    const Transform xform = base * transform();
 
     DisplayObjects actChars;
     getActiveCharacters(actChars);

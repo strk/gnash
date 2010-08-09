@@ -58,7 +58,7 @@ StaticText::pointInShape(boost::int32_t /*x*/, boost::int32_t /*y*/) const
 void  
 StaticText::display(Renderer& renderer, const Transform& base)
 {
-    const Transform xform = base.concatenate(transform());
+    const Transform xform = base * transform();
     _def->display(renderer, xform);
     clear_invalidated();
 }

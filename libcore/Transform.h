@@ -23,21 +23,25 @@ public:
         colorTransform(other.colorTransform)
     {}
 
-    /// Concatenate a Transform.
-    //
-    /// This produces a new Transform.
-    Transform concatenate(const Transform& other) const
-    {
-        Transform ret(*this);
-        ret.matrix.concatenate(other.matrix);
-        ret.colorTransform.concatenate(other.colorTransform);
-        return ret;
+    Transform& operator*=(const Transform& other) {
+        matrix.concatenate(other.matrix);
+        colorTransform.concatenate(other.colorTransform);
+        return *this;
     }
 
     SWFMatrix matrix;
     cxform colorTransform;
 };
 
+/// Concatenate two transforms.
+inline Transform
+operator*(const Transform& a, const Transform& b)
+{
+    Transform ret(a);
+    ret *= b;
+    return ret;
 }
+
+} // namespace gnash
 
 #endif

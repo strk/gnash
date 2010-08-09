@@ -113,7 +113,7 @@ Bitmap::display(Renderer& renderer, const Transform& base)
     /// Don't display cleared Bitmaps.
     if (!_def && !_bitmapData) return;
     
-    const Transform xform = base.concatenate(transform());
+    const Transform xform = base * transform();
 
     _shape.display(renderer, xform);
     clear_invalidated();
