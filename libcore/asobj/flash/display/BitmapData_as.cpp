@@ -222,8 +222,7 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
         return;
     }
 
-    // TODO: write a proper interface for this (and other transforms).
-    mc.display(*internal, transform);
+    mc.draw(*internal, transform);
 }
 
 // extern 

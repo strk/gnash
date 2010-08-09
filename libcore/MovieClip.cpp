@@ -1081,6 +1081,12 @@ MovieClip::goto_labeled_frame(const std::string& label)
 }
 
 void
+MovieClip::draw(Renderer& renderer, const Transform& xform)
+{
+    _displayList.display(renderer, xform);
+}
+
+void
 MovieClip::display(Renderer& renderer, const Transform& base)
 {
 

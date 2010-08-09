@@ -266,6 +266,12 @@ public:
     /// Render this MovieClip.
     virtual void display(Renderer& renderer, const Transform& xform);
     
+    /// Draw this MovieClip
+    //
+    /// This is effectively the same as display(), but uses only the passed
+    /// transform and omits the drawable.
+    void draw(Renderer& renderer, const Transform& xform);
+
     void omit_display();
 
     /// Swap depth of the given DisplayObjects in the DisplayList
