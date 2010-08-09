@@ -11,17 +11,31 @@ namespace gnash {
 class Transform
 {
 public:
-    Transform(const SWFMatrix& m = SWFMatrix(), const cxform& cx = cxform(),
-            const SWFRect& r = SWFRect())
+    Transform(const SWFMatrix& m = SWFMatrix(), const cxform& cx = cxform())
         :
         matrix(m),
-        colorTransform(cx),
-        rect(r)
+        colorTransform(cx)
     {}
+
+    Transform(const Transform& other)
+        :
+        matrix(other.matrix),
+        colorTransform(other.colorTransform)
+    {}
+
+    /// Concatenate a Transform.
+    //
+    /// This produces a new Transform.
+    Transform concatenate(const Transform& other) const
+    {
+        Transform ret(*this);
+        ret.matrix.concatenate(other.matrix);
+        ret.colorTransform.concatenate(other.colorTransform);
+        return ret;
+    }
 
     SWFMatrix matrix;
     cxform colorTransform;
-    SWFRect rect;
 };
 
 }

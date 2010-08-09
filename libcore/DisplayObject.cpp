@@ -421,18 +421,17 @@ void
 DisplayObject::setMatrix(const SWFMatrix& m, bool updateCache)
 {
 
-    if (m == m_matrix) return;
+    if (m == _transform.matrix) return;
 
     //log_debug("setting SWFMatrix to: %s", m);
     set_invalidated(__FILE__, __LINE__);
-    m_matrix = m;
+    _transform.matrix = m;
 
     // don't update caches if SWFMatrix wasn't updated too
-    if (updateCache) 
-    {
-        _xscale = m_matrix.get_x_scale() * 100.0;
-        _yscale = m_matrix.get_y_scale() * 100.0;
-        _rotation = m_matrix.get_rotation() * 180.0 / PI;
+    if (updateCache) {
+        _xscale = _transform.matrix.get_x_scale() * 100.0;
+        _yscale = _transform.matrix.get_y_scale() * 100.0;
+        _rotation = _transform.matrix.get_rotation() * 180.0 / PI;
     }
 
 }

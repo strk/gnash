@@ -24,6 +24,14 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
+#include <vector>
+#include <map>
+#include <string>
+#include <cassert>
+#include <boost/cstdint.hpp> // For C99 int types
+#include <boost/noncopyable.hpp>
+
+#include "Transform.h"
 #include "event_id.h" 
 #include "SWFRect.h"
 #include "SWFMatrix.h"
@@ -35,12 +43,6 @@
 # include "tree.hh"
 #endif
 
-#include <vector>
-#include <map>
-#include <string>
-#include <cassert>
-#include <boost/cstdint.hpp> // For C99 int types
-#include <boost/noncopyable.hpp>
 
 //#define DEBUG_SET_INVALIDATED 1
 
@@ -57,7 +59,6 @@ namespace gnash {
     class as_object;
     class as_value;
     class as_environment;
-    class Transform;
     namespace SWF {
         class TextRecord;
     }
@@ -273,7 +274,7 @@ public:
     }
 
     /// Get local transform SWFMatrix for this DisplayObject
-    const SWFMatrix& getMatrix() const { return m_matrix; }
+    const SWFMatrix& getMatrix() const { return _transform.matrix; }
 
     /// Set local transform SWFMatrix for this DisplayObject
     //
@@ -330,21 +331,20 @@ public:
     ///
     virtual void setHeight(double height);
 
-    const cxform& get_cxform() const { return m_color_transform; }
+    const cxform& get_cxform() const { return _transform.colorTransform; }
 
     void set_cxform(const cxform& cx) 
     {       
-        if (cx != m_color_transform) {
-            set_invalidated(__FILE__, __LINE__);
-            m_color_transform = cx;
+        if (_transform.colorTransform != cx) {
+            set_invalidated();
+            _transform.colorTransform = cx;
         }
     }
 
     int get_ratio() const { return _ratio; }
 
-    void set_ratio(int r)
-    {
-        if (r != _ratio) set_invalidated(__FILE__, __LINE__); 
+    void set_ratio(int r) {
+        if (r != _ratio) set_invalidated(); 
         _ratio = r;       
     }
 
@@ -1027,9 +1027,7 @@ private:
     /// The movie_root to which this DisplayObject belongs.
     movie_root& _stage;
 
-    cxform m_color_transform;
-    
-    SWFMatrix m_matrix;
+    Transform _transform;
     
     Events _event_handlers;
 
