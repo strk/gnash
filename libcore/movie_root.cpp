@@ -979,10 +979,10 @@ movie_root::display()
     Renderer* renderer = _runResources.renderer();
     if (!renderer) return;
 
-    renderer->begin_display(m_background_color, _stageWidth, _stageHeight,
-                            frame_size.get_x_min(), frame_size.get_x_max(),
-                            frame_size.get_y_min(), frame_size.get_y_max());
-
+    Renderer::External ex(*renderer, m_background_color,
+            _stageWidth, _stageHeight,
+            frame_size.get_x_min(), frame_size.get_x_max(),
+            frame_size.get_y_min(), frame_size.get_y_max());
 
     for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
     {
@@ -1004,8 +1004,6 @@ movie_root::display()
         movie->display(*renderer);
 
     }
-
-    renderer->end_display();
 }
 
 bool
