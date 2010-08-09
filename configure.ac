@@ -16,7 +16,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
 AC_PREREQ(2.50)
-AC_INIT(gnash, 0.8.8)
+AC_INIT(gnash, trunk)
 AC_CONFIG_SRCDIR([libcore/gnash.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
 
@@ -1559,7 +1559,7 @@ AC_ARG_ENABLE(testsuite,
   yes) testsuite=yes ;;
   no)  testsuite=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-testsuite option]) ;;
-esac],testsuite=yes)
+esac],testsuite=no)
 
 if test x"$testsuite" = x"yes"; then
   AC_DEFINE([USE_TESTSUITE], [], [Testsuite support, maintainers option only])
