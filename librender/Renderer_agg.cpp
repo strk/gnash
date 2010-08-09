@@ -847,10 +847,6 @@ public:
     
     // by default allow drawing everywhere
     set_invalidated_region_world();
-    
-    log_debug(_("Initialized AGG buffer <%p>, %d bytes, %dx%d, "
-                "rowsize is %d bytes"), 
-      (void*)mem, size, x, y, rowstride);
   }
   
 
