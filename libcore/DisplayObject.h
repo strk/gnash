@@ -24,11 +24,11 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
-#include "event_id.h" // for inlines
-#include "SWFRect.h" // for composition (invalidated bounds)
-#include "SWFMatrix.h" // for composition
-#include "cxform.h" // for composition
-#include "dsodefs.h" //for DSOEXPORT
+#include "event_id.h" 
+#include "SWFRect.h"
+#include "SWFMatrix.h"
+#include "cxform.h"
+#include "dsodefs.h" 
 #include "snappingrange.h"
 #include "VM.h"
 #ifdef USE_SWFTREE
@@ -63,6 +63,23 @@ namespace gnash {
 }
 
 namespace gnash {
+
+class Transform
+{
+public:
+    Transform(const SWFMatrix& m = SWFMatrix(), const cxform& cx = cxform(),
+            const SWFRect& r = SWFRect())
+        :
+        matrix(m),
+        colorTransform(cx),
+        rect(r)
+    {}
+
+    SWFMatrix matrix;
+    cxform colorTransform;
+    SWFRect rect;
+};
+
 
 /// Returns true if the DisplayObject is referenceable in ActionScript
 //

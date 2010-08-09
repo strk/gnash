@@ -201,14 +201,6 @@ BitmapData_as::dispose()
     updateObjects();
 }
 
-struct Transform
-{
-    Transform() {}
-    SWFMatrix matrix;
-    cxform colorTransform;
-    SWFRect rect;
-};
-
 void
 BitmapData_as::draw(MovieClip& mc, const Transform& transform)
 {
