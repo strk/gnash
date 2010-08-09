@@ -111,30 +111,14 @@ AGG resources
 #include "gnashconfig.h"
 #endif
 
-#include <vector>
-#include <cmath>
-
-#include "gnash.h"
-#include "RGBA.h"
-#include "GnashImage.h"
-#include "log.h"
 #include "Renderer.h"
 #include "Renderer_agg.h" 
-#include "Range2d.h"
-#include "smart_ptr.h"
-#include "swf/ShapeRecord.h" 
-#include "DefineShapeTag.h" 
-#include "GnashNumeric.h"
-#include "GC.h"
-#include "cxform.h"
-#include "FillStyle.h"
 
-#ifdef HAVE_VA_VA_H
-#include "GnashVaapiImage.h"
-#include "GnashVaapiImageProxy.h"
-#endif
-
+#include <vector>
+#include <cmath>
 #include <climits>
+#include <boost/scoped_array.hpp>
+#include <boost/bind.hpp>
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
 #include <agg_pixfmt_rgb.h>
@@ -170,11 +154,28 @@ AGG resources
 #include <agg_gradient_lut.h>
 #include <agg_alpha_mask_u8.h>
 
+#include "gnash.h"
+#include "RGBA.h"
+#include "GnashImage.h"
+#include "log.h"
+#include "Range2d.h"
+#include "smart_ptr.h"
+#include "swf/ShapeRecord.h" 
+#include "DefineShapeTag.h" 
+#include "GnashNumeric.h"
+#include "GC.h"
+#include "cxform.h"
+#include "FillStyle.h"
+#include "Transform.h"
+
+#ifdef HAVE_VA_VA_H
+#include "GnashVaapiImage.h"
+#include "GnashVaapiImageProxy.h"
+#endif
+
 #include "Renderer_agg_bitmap.h"
 #include "Renderer_agg_style.h"
 
-#include <boost/scoped_array.hpp>
-#include <boost/bind.hpp>
 #ifndef round
 #  define round(x) rint(x)
 #endif
@@ -735,7 +736,7 @@ public:
         vr.render(path, rbase, _alphaMasks);
     }
 
-    void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
+    void drawVideoFrame(GnashImage* frame, const Transform& xform,
         const SWFRect* bounds, bool smooth)
     {
     
@@ -743,7 +744,7 @@ public:
         // TODO: keep heavy instances alive accross frames for performance!
         // TODO: Maybe implement specialization for 1:1 scaled videos
         SWFMatrix mat = stage_matrix;
-        mat.concatenate(*source_mat);
+        mat.concatenate(xform.matrix);
         
         // compute video scaling relative to video object size
         double vscaleX = bounds->width() /
@@ -1118,13 +1119,12 @@ public:
     }
   }
 
-    void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
-            const SWFMatrix& worldMat)
+    void drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
     {
         // check if the character needs to be rendered at all
         SWFRect cur_bounds;
 
-        cur_bounds.expand_to_transformed_rect(worldMat, shape.getBounds());
+        cur_bounds.expand_to_transformed_rect(xform.matrix, shape.getBounds());
                 
         if (!Renderer::bounds_in_clipping_area(cur_bounds))
         {
@@ -1136,10 +1136,11 @@ public:
         const SWF::ShapeRecord::Paths& paths = shape.paths();
         
         // select ranges
-        select_clipbounds(shape.getBounds(), worldMat);
+        select_clipbounds(shape.getBounds(), xform.matrix);
 
         // render the DisplayObject's shape.
-        drawShape(fillStyles, lineStyles, paths, worldMat, cx);
+        drawShape(fillStyles, lineStyles, paths, xform.matrix,
+                xform.colorTransform);
     }
 
     void drawShape(const std::vector<FillStyle>& FillStyles,

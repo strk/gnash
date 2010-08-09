@@ -79,7 +79,7 @@ public:
     }
 
     /// Display a DynamicShape object.
-    void display(Renderer& renderer, const Transform& c) const;
+    void display(Renderer& renderer, const Transform& xform) const;
 
 	/// Set current line style and start a new path.
 	//

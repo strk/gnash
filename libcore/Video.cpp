@@ -123,12 +123,12 @@ Video::display(Renderer& renderer, const Transform& base)
 {
 	assert(m_def);
 
-	SWFMatrix m = base.matrix;
+    const Transform xform = base * transform();
 	const SWFRect& bounds = m_def->bounds();
 
 	GnashImage* img = getVideoFrame();
 	if (img) {
-		renderer.drawVideoFrame(img, &m, &bounds, _smoothing);
+		renderer.drawVideoFrame(img, xform, &bounds, _smoothing);
 	}
 
 	clear_invalidated();

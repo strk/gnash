@@ -162,8 +162,8 @@
 namespace gnash {
     class CachedBitmap;
     class rgba;
+    class Transform;
     class SWFMatrix;
-    class cxform;
     class FillStyle;
     class LineStyle;
 
@@ -249,7 +249,7 @@ public:
     ///   The width and height determine the size of the Flash video instance
     ///   on the stage (in TWIPS) prior to SWFMatrix transformations.         
     ///
-    virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
+    virtual void drawVideoFrame(GnashImage* frame, const Transform& xform,
             const SWFRect* bounds, bool smooth) = 0;
 
     /// Draw a line-strip directly, using a thin, solid line.
@@ -285,8 +285,8 @@ public:
         const rgba& fill, const rgba& outline, const SWFMatrix& mat,
         bool masked) = 0;
         
-    virtual void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
-            const SWFMatrix& worldMat) = 0;
+    virtual void drawShape(const SWF::ShapeRecord& shape,
+            const Transform& xform) = 0;
         
     /// \brief
     /// Draws a glyph (font character).
@@ -304,7 +304,6 @@ public:
     /// @param color
     virtual void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
            const SWFMatrix& mat) = 0;
-
 
     /// Draw the current rendering buffer to an image file.
     //

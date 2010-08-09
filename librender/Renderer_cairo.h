@@ -40,7 +40,7 @@ public:
 
     CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im);
 
-    void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
+    void drawVideoFrame(GnashImage* baseframe, const Transform& xform,
                                 const SWFRect* bounds, bool smooth);
 
     geometry::Range2d<int> world_to_pixel(const SWFRect& worldbounds);
@@ -102,8 +102,7 @@ public:
 
     void apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat);
 
-    void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
-                   const SWFMatrix& mat);
+    void drawShape(const SWF::ShapeRecord& shape, const Transform& xform);
 
     void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
                    const SWFMatrix& mat);

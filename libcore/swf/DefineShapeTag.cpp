@@ -92,7 +92,7 @@ DefineShapeTag::DefineShapeTag(SWFStream& in, TagType tag,
 void
 DefineShapeTag::display(Renderer& renderer, const Transform& xform) const
 {
-    renderer.drawShape(_shape, xform.colorTransform, xform.matrix);
+    renderer.drawShape(_shape, xform);
 }
 
 } // namespace SWF

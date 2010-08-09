@@ -37,6 +37,7 @@
 #include "Range2d.h"
 #include "cxform.h"
 #include "FillStyle.h"
+#include "Transform.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #  include <Windows.h>
@@ -878,7 +879,7 @@ public:
   // anti-aliased with the rest of the drawing. Since display lists cannot be
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
-  virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* m,
+  virtual void drawVideoFrame(GnashImage* frame, const Transform& xform,
           const SWFRect* bounds, bool /*smooth*/)
   {
     GLint index;
@@ -919,7 +920,7 @@ public:
     glNewList(index, GL_COMPILE);
     _render_indices.push_back(index);
 
-    reallyDrawVideoFrame(texture, m, bounds);
+    reallyDrawVideoFrame(texture, &xform.matrix, bounds);
 
     glEndList();
 
@@ -1776,9 +1777,7 @@ public:
 // 4. ...
 // 5. Profit!
 
-  virtual void
-  drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
-          const SWFMatrix& mat)
+  virtual void drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
   {
   
     const PathVec& path_vec = shape.paths();
@@ -1791,7 +1790,7 @@ public:
     if (_drawing_mask) {
       PathVec scaled_path_vec = path_vec;
       
-      apply_matrix_to_paths(scaled_path_vec, mat);
+      apply_matrix_to_paths(scaled_path_vec, xform.matrix);
       draw_mask(scaled_path_vec); 
       return;
     }    
@@ -1804,7 +1803,7 @@ public:
       return; // invisible character
     }    
     
-    oglScopeMatrix scope_mat(mat);
+    oglScopeMatrix scope_mat(xform.matrix);
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
@@ -1820,8 +1819,8 @@ public:
         subshape_paths.push_back(*subshapes[i]);
       }
       
-      draw_subshape(subshape_paths, mat, cx, FillStyles,
-                    line_styles);
+      draw_subshape(subshape_paths, xform.matrix, xform.colorTransform,
+              FillStyles, line_styles);
     }
   }
 

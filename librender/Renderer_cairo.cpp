@@ -482,7 +482,7 @@ Renderer_cairo::createCachedBitmap(std::auto_ptr<GnashImage> im)
 }
 
 void
-Renderer_cairo::drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
+Renderer_cairo::drawVideoFrame(GnashImage* baseframe, const Transform& xform,
                                const SWFRect* bounds, bool /*smooth*/)
 {
 
@@ -540,7 +540,7 @@ Renderer_cairo::drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
     cairo_set_source(_cr, pattern);
     
     geometry::Range2d<boost::int32_t> range = bounds->getRange();
-    m->transform(range);
+    xform.matrix.transform(range);
   
     cairo_rectangle(_cr, range.getMinX(), range.getMinY(), range.width(),
                     range.height());
@@ -987,8 +987,7 @@ Renderer_cairo::apply_matrix_to_paths(std::vector<Path>& paths,
 }
   
 void
-Renderer_cairo::drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
-                          const SWFMatrix& mat)
+Renderer_cairo::drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
 {
     const PathVec& path_vec = shape.paths();
     
@@ -1001,12 +1000,12 @@ Renderer_cairo::drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
     if (_drawing_mask) {      
         PathVec scaled_path_vec = path_vec;
         
-        apply_matrix_to_paths(scaled_path_vec, mat);
+        apply_matrix_to_paths(scaled_path_vec, xform.matrix);
         draw_mask(scaled_path_vec); 
         return;
     }
     
-    CairoScopeMatrix mat_transformer(_cr, mat);
+    CairoScopeMatrix mat_transformer(_cr, xform.matrix);
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
@@ -1022,8 +1021,8 @@ Renderer_cairo::drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
             subshape_paths.push_back(*subshapes[i]);
         }
         
-        draw_subshape(subshape_paths, mat, cx, FillStyles,
-                      line_styles);
+        draw_subshape(subshape_paths, xform.matrix, xform.colorTransform,
+                FillStyles, line_styles);
     }
 }
   

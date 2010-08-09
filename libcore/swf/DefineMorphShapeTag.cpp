@@ -70,11 +70,10 @@ DefineMorphShapeTag::createDisplayObject(Global_as& gl,
 
 void
 DefineMorphShapeTag::display(Renderer& renderer, const ShapeRecord& shape,
-        const Transform& base) const
+        const Transform& xform) const
 {
-    renderer.drawShape(shape, base.colorTransform, base.matrix);
+    renderer.drawShape(shape, xform);
 }
-
 
 void
 DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
