@@ -38,6 +38,7 @@
 #include "Renderer.h"
 #include "RunResources.h"
 #include "namedStrings.h"
+#include "MovieClip_as.h"
 
 namespace gnash {
 
@@ -102,7 +103,6 @@ BitmapData_as::setReachable()
     std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
             std::mem_fun(&DisplayObject::setReachable));
     _owner->setReachable();
-    log_debug("BitmapData_as::setReachable");
 }
 
 void
@@ -216,8 +216,11 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
     GnashImage& im = *data();
 
     Renderer* base = getRunResources(*_owner).renderer();
+    if (!base) return;
+
     Renderer::Internal in(*base, im);
     Renderer* internal = in.renderer();
+    if (!internal) return;
 
     // Matrix must start from identity
     const SWFMatrix backup = mc.getMatrix();
@@ -301,42 +304,19 @@ as_value
 bitmapdata_draw(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-    UNUSED(ptr);
+    if (!fn.nargs) return as_value();
 
-    std::ostringstream os;
-    fn.dump_args(os);
-    log_unimpl("BitmapData.draw(%s)", os.str());
+    as_object* o = fn.arg(0).to_object(getGlobal(fn));
+    MovieClip* mc = get<MovieClip>(o);
+    if (!mc) return as_value();
 
-    if (!fn.nargs) {
-        //log error
-        return as_value();
+    Transform t;
+    if (fn.nargs > 1) {
+        as_object* o = fn.arg(1).to_object(getGlobal(fn));
+        if (o) t.matrix = asToSWFMatrix(*o);
     }
 
-    MovieClip* mc = fn.arg(0).toMovieClip();
-
-    if (!mc) {
-        // log error
-        return as_value();
-    }
-
-    /// TODO: pass the other arguments for transform.
-    std::auto_ptr<GnashImage> im = mc->drawToBitmap();
-
-    if (!im.get()) { 
-        // log error
-        return as_value();
-    }
-
-    const size_t width = im->width();
-    const size_t height = im->height();
-
-    if (width > 2880 || height > 2880) {
-        log_error("Height (%d) or width (%d) exceed 2880", height, width);
-        return as_value();
-    }
-
-    //ptr->update(im->data());
-
+    ptr->draw(*mc, t);
 	return as_value();
 }
 
