@@ -295,12 +295,13 @@ TextField::display(Renderer& renderer, const Transform& base)
     const bool drawBorder = getDrawBorder();
     const bool drawBackground = getDrawBackground();
 
-    Transform xform = base;
-    xform.matrix.concatenate(getMatrix(*this));
-    xform.colorTransform = getEmbedFonts() ? cxform() : get_world_cxform();
+    Transform xform = base.concatenate(transform());
 
-    if ((drawBorder || drawBackground) && !_bounds.is_null())
-    {
+    // This is a hack to handle device fonts, which are not affected by
+    // color transform.
+    if (getEmbedFonts()) xform.colorTransform = cxform();
+
+    if ((drawBorder || drawBackground) && !_bounds.is_null()) {
 
         std::vector<point> coords(4);
 
