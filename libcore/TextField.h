@@ -119,9 +119,6 @@ public:
 	/// @param y y-coordinate
 	InteractiveObject* topmostMouseEntity(boost::int32_t x, boost::int32_t y);
 
-	// Text fields need to handle cxform specially 
-	virtual cxform get_world_cxform() const;
-	
     /// Return the version of the SWF this was parsed from.
     //
     /// TODO: work out what this means for dynamic TextFields.

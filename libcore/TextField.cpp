@@ -297,7 +297,7 @@ TextField::display(Renderer& renderer, const Transform& base)
 
     Transform xform = base;
     xform.matrix.concatenate(getMatrix());
-    xform.colorTransform.concatenate(get_cxform());
+    xform.colorTransform = getEmbedFonts() ? cxform() : get_world_cxform();
 
     if ((drawBorder || drawBackground) && !_bounds.is_null())
     {
@@ -338,10 +338,9 @@ TextField::display(Renderer& renderer, const Transform& base)
     // A cleaner implementation is likely correctly setting the
     // _xOffset and _yOffset memebers in glyph records.
     // Anyway, see bug #17954 for a testcase.
-    SWFMatrix m = xform.matrix;
-
     if (!_bounds.is_null()) {
-        m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
+        xform.matrix.concatenate_translation(_bounds.get_x_min(),
+                _bounds.get_y_min()); 
     }
 
     _displayRecords.clear();
@@ -355,7 +354,8 @@ TextField::display(Renderer& renderer, const Transform& base)
     for (size_t i = 0; i < _textRecords.size(); ++i) {
         recordline = 0;
         //find the line the record is on
-        while (recordline < _line_starts.size() && _line_starts[recordline] <= _recordStarts[i]) {
+        while (recordline < _line_starts.size() && 
+                _line_starts[recordline] <= _recordStarts[i]) {
             ++recordline;
         }
         //offset the line
@@ -367,8 +367,8 @@ TextField::display(Renderer& renderer, const Transform& base)
         }
     }
         
-    SWF::TextRecord::displayRecords(renderer, m, get_world_cxform(),
-            _displayRecords, _embedFonts);
+    SWF::TextRecord::displayRecords(renderer, xform, _displayRecords,
+            _embedFonts);
 
     if (m_has_focus && !isReadOnly()) show_cursor(renderer, xform.matrix);
     
@@ -2380,19 +2380,6 @@ TextField::setWordWrap(bool wrap)
         _wordWrap = wrap;
         format_text();
     }
-}
-
-cxform    
-TextField::get_world_cxform() const
-{
-    // This is not automatically tested. See testsuite/samples/input-fields.swf
-    // for a manual check.
-
-    // If using a device font (PP compatibility), do not take parent cxform
-    // into account.
-    if (!getEmbedFonts()) return cxform();
-
-    return DisplayObject::get_world_cxform();
 }
 
 void

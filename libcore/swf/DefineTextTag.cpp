@@ -128,8 +128,7 @@ DefineTextTag::display(Renderer& renderer, const Transform& base) const
     Transform xform = base;
     xform.matrix.concatenate(_matrix);
 
-    TextRecord::displayRecords(renderer, xform.matrix, xform.colorTransform,
-            _textRecords);
+    TextRecord::displayRecords(renderer, xform, _textRecords);
 }
 
 

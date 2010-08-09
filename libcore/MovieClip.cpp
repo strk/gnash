@@ -1098,9 +1098,7 @@ MovieClip::display(Renderer& renderer, const Transform& base)
     // should be rendered to the mask buffer even it is invisible.
     
     // Draw everything with our own transform.
-    Transform xform = base;
-    xform.matrix.concatenate(getMatrix());
-    xform.colorTransform.concatenate(get_cxform());
+    const Transform xform = base.concatenate(transform());
 
     // render drawable (ActionScript generated graphics)
     _drawable.finalize();

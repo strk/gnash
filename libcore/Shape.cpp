@@ -57,10 +57,7 @@ Shape::pointInShape(boost::int32_t x, boost::int32_t y) const
 void  
 Shape::display(Renderer& renderer, const Transform& base)
 {
-
-    Transform xform = base;
-    xform.matrix.concatenate(getMatrix());
-    xform.colorTransform.concatenate(get_cxform());
+    const Transform xform = base.concatenate(transform());
 
     if (_def) _def->display(renderer, xform);
     else _shape->display(renderer, xform);

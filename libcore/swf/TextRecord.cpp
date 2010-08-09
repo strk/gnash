@@ -159,9 +159,12 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 /// The proprietary player does not display rotated or skewed device fonts.
 /// Gnash does.
 void
-TextRecord::displayRecords(Renderer& renderer, const SWFMatrix& mat,
-        const cxform& cx, const TextRecords& records, bool embedded)
+TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
+        const TextRecords& records, bool embedded)
 {
+
+    const cxform& cx = xform.colorTransform;
+    const SWFMatrix& mat = xform.matrix;
 
     // Starting positions.
     double x = 0.0;

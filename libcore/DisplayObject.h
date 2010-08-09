@@ -432,7 +432,7 @@ public:
     /// times our cxform). 
     ///
     /// Maps from our local space into normal color space.
-    virtual cxform get_world_cxform() const;
+    cxform get_world_cxform() const;
 
     /// Get the built-in function handlers code for the given event
     //
@@ -964,6 +964,10 @@ protected:
     
     virtual bool unloadChildren() { return false; }
 
+    const Transform& transform() const {
+        return _transform;
+    }
+
     /// Get the movie_root to which this DisplayObject belongs.
     movie_root& stage() const {
         return _stage;
@@ -979,7 +983,6 @@ protected:
     {
         _origTarget=getTarget();
     }
-
 
     const Events& get_event_handlers() const
     {

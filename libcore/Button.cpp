@@ -359,9 +359,7 @@ Button::handleFocus() {
 void
 Button::display(Renderer& renderer, const Transform& base)
 {
-    Transform xform = base;
-    xform.matrix.concatenate(getMatrix());
-    xform.colorTransform.concatenate(get_cxform());
+    const Transform xform = base.concatenate(transform());
 
     DisplayObjects actChars;
     getActiveCharacters(actChars);
