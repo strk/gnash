@@ -252,7 +252,7 @@ sh ./configure \
 	--enable-cygnal \
 	--enable-python \
 	--with-plugins-install=system \
-	--enable-extensions=all
+	--enable-extensions=fileio,lirc,dejagnu,mysql
 
 make $MAKEFLAGS dumpconfig all LDFLAGS="-Wl,--build-id"
 %endif
