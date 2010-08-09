@@ -76,13 +76,19 @@ public:
         _movieClip(movieClip)
     {}
 
-    SWFMatrix getWorldMatrix() const {
+    SWFMatrix worldMatrix() const {
         return _movieClip.getWorldMatrix();
     }
-    const SWFMatrix& getMatrix() const { return _movieClip.getMatrix(); }
-    const cxform& getColorTransform() const { return _movieClip.get_cxform(); }
+    
+    const SWFMatrix& matrix() const {
+        return getMatrix(_movieClip);
+    }
+    
+    const cxform& colorTransform() const {
+        return getCxForm(_movieClip);
+    }
 
-    cxform getWorldColorTransform() const {
+    cxform worldColorTransform() const {
         return _movieClip.get_world_cxform();
     }
 
@@ -137,7 +143,7 @@ transform_colorTransform(const fn_call& fn)
         }
 
         // Construct a ColorTransform from the sprite cxform.
-        const cxform& c = relay->getColorTransform();
+        const cxform& c = relay->colorTransform();
 
         fn_call::Args args;
         args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,
@@ -223,7 +229,7 @@ transform_concatenatedColorTransform(const fn_call& fn)
         }
 
         // Construct a ColorTransform from the sprite cxform.
-        const cxform& c = relay->getWorldColorTransform();
+        const cxform& c = relay->worldColorTransform();
 
         fn_call::Args args;
         args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,
@@ -259,7 +265,7 @@ transform_concatenatedMatrix(const fn_call& fn)
             return as_value();
         }
 
-        const SWFMatrix& m = relay->getWorldMatrix();
+        const SWFMatrix& m = relay->worldMatrix();
 
         fn_call::Args args;
         args += m.sx / factor,
@@ -303,7 +309,7 @@ transform_matrix(const fn_call& fn)
             return as_value();
         }
 
-        const SWFMatrix& m = relay->getMatrix();
+        const SWFMatrix& m = relay->matrix();
 
         fn_call::Args args;
         args += m.sx / factor,

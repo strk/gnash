@@ -342,9 +342,9 @@ public:
 
     void operator() (DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
-        if ( ch->unloaded() ) return;
+        if (ch->unloaded()) return;
         SWFRect chb = ch->getBounds();
-        SWFMatrix m = ch->getMatrix();
+        SWFMatrix m = getMatrix(*ch);
         _bounds.expand_to_transformed_rect(m, chb);
     }
 
@@ -568,8 +568,8 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     // Copy drawable
     newmovieclip->_drawable = _drawable;
     
-    newmovieclip->set_cxform(get_cxform());    
-    newmovieclip->setMatrix(getMatrix(), true); 
+    newmovieclip->set_cxform(getCxForm(*this));
+    newmovieclip->setMatrix(getMatrix(*this), true); 
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
@@ -1408,8 +1408,8 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         else return NULL;
     }
 
-    SWFMatrix    m = getMatrix();
-    point    pp(x, y);
+    SWFMatrix m = getMatrix(*this);
+    point pp(x, y);
     m.invert().transform(pp);
 
     MouseEntityFinder finder(wp, pp);
@@ -1685,8 +1685,7 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 {
 
     // nothing to do if this movieclip is not visible
-    if (!visible() || get_cxform().is_invisible() )
-    {
+    if (!visible() || getCxForm(*this).is_invisible()) {
         ranges.add(m_old_invalidated_ranges); // (in case we just hided)
         return;
     }

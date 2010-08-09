@@ -823,9 +823,11 @@ movie_root::doMouseDrag()
     // Place our origin so that it coincides with the mouse coords
     // in our parent frame.
     // TODO: add a DisplayObject::set_translation ?
-    SWFMatrix    local = dragChar->getMatrix();
+    SWFMatrix local = getMatrix(*dragChar);
     local.set_translation(world_mouse.x, world_mouse.y);
-    dragChar->setMatrix(local); //no need to update caches when only changing translation
+     
+    // no need to update caches when only changing translation
+    dragChar->setMatrix(local);
 }
 
 

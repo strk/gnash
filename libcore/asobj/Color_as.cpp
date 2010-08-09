@@ -106,7 +106,7 @@ color_getrgb(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	const cxform& trans = sp->get_cxform();
+	const cxform& trans = getCxForm(*sp);
 
     const int r = trans.rb;
     const int g = trans.gb;
@@ -125,7 +125,7 @@ color_gettransform(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	const cxform& cx = sp->get_cxform();
+	const cxform& cx = getCxForm(*sp);
 
 	// Convert to as_object
 
@@ -166,7 +166,7 @@ color_setrgb(const fn_call& fn)
 	const int g = (color & 0x00ff00) >> 8;
 	const int b = (color & 0x0000ff);
 
-	cxform newTrans = sp->get_cxform();
+	cxform newTrans = getCxForm(*sp);
 	newTrans.rb = static_cast<boost::int16_t>(r);
 	newTrans.gb = static_cast<boost::int16_t>(g);
 	newTrans.bb = static_cast<boost::int16_t>(b);
@@ -206,7 +206,7 @@ color_settransform(const fn_call& fn)
 
 	string_table& st = getStringTable(*obj);
 
-	cxform newTrans = sp->get_cxform();
+	cxform newTrans = getCxForm(*sp);
 
 	// multipliers
 	parseColorTransProp(*trans, st.find("ra"), newTrans.ra, true);

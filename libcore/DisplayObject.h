@@ -272,9 +272,11 @@ public:
     virtual int getDefinitionVersion() const {
         return -1;
     }
+    
+    const Transform& transform() const {
+        return _transform;
+    }
 
-    /// Get local transform SWFMatrix for this DisplayObject
-    const SWFMatrix& getMatrix() const { return _transform.matrix; }
 
     /// Set local transform SWFMatrix for this DisplayObject
     //
@@ -330,8 +332,6 @@ public:
     /// @param h new height, in TWIPS. 
     ///
     virtual void setHeight(double height);
-
-    const cxform& get_cxform() const { return _transform.colorTransform; }
 
     void set_cxform(const cxform& cx) 
     {       
@@ -964,10 +964,6 @@ protected:
     
     virtual bool unloadChildren() { return false; }
 
-    const Transform& transform() const {
-        return _transform;
-    }
-
     /// Get the movie_root to which this DisplayObject belongs.
     movie_root& stage() const {
         return _stage;
@@ -1102,6 +1098,20 @@ private:
 
 
 };
+
+/// Get local transform SWFMatrix for this DisplayObject
+inline const SWFMatrix&
+getMatrix(const DisplayObject& o)
+{ 
+    return o.transform().matrix;
+}
+
+inline const cxform&
+getCxForm(const DisplayObject& o) 
+{
+    return o.transform().colorTransform;
+}
+
 
 inline bool
 isReferenceable(const DisplayObject& d)

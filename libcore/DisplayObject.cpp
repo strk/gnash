@@ -155,7 +155,7 @@ DisplayObject::getWorldMatrix(bool includeRoot) const
 	if (_parent) {
 	    m = _parent->getWorldMatrix(includeRoot);
 	}
-    if (_parent || includeRoot) m.concatenate(getMatrix());
+    if (_parent || includeRoot) m.concatenate(getMatrix(*this));
 
 	return m;
 }
@@ -180,7 +180,7 @@ DisplayObject::get_world_cxform() const
 	{
 	    m = _parent->get_world_cxform();
 	}
-	m.concatenate(get_cxform());
+	m.concatenate(getCxForm(*this));
 
 	return m;
 }
@@ -372,7 +372,7 @@ DisplayObject::setWidth(double newwidth)
     const double xscale = oldwidth ? (newwidth / oldwidth) : 0; 
     const double rotation = _rotation * PI / 180.0;
 
-    SWFMatrix m = getMatrix();
+    SWFMatrix m = getMatrix(*this);
     const double yscale = m.get_y_scale(); 
     m.set_scale_rotation(xscale, yscale, rotation);
     setMatrix(m, true); 
@@ -382,7 +382,7 @@ as_value
 getHeight(DisplayObject& o)
 {
 	SWFRect bounds = o.getBounds();
-    const SWFMatrix m = o.getMatrix();
+    const SWFMatrix m = getMatrix(o);
     m.transform(bounds);
     return twipsToPixels(bounds.height());      
 }
@@ -411,7 +411,7 @@ DisplayObject::setHeight(double newheight)
     const double yscale = oldheight ? (newheight / oldheight) : 0;
     const double rotation = _rotation * PI / 180.0;
 
-    SWFMatrix m = getMatrix();
+    SWFMatrix m = getMatrix(*this);
     const double xscale = m.get_x_scale();
     m.set_scale_rotation(xscale, yscale, rotation);
     setMatrix(m, true);
@@ -552,7 +552,7 @@ DisplayObject::set_x_scale(double scale_percent)
     // we don't need to recompute the SWFMatrix from the 
     // caches.
 
-	SWFMatrix m = getMatrix();
+	SWFMatrix m = getMatrix(*this);
 
     m.set_x_scale(xscale);
 
@@ -576,7 +576,7 @@ DisplayObject::set_rotation(double rot)
 
     if (_xscale < 0 ) rotation += PI; 
 
-	SWFMatrix m = getMatrix();
+	SWFMatrix m = getMatrix(*this);
     m.set_rotation(rotation);
 
     // Update the matrix from the cached x scale to avoid accumulating
@@ -608,7 +608,7 @@ DisplayObject::set_y_scale(double scale_percent)
 
 	_yscale = scale_percent;
 
-	SWFMatrix m = getMatrix();
+	SWFMatrix m = getMatrix(*this);
     m.set_y_scale(yscale);
 	setMatrix(m); // we updated the cache ourselves
 
@@ -1125,7 +1125,7 @@ setY(DisplayObject& o, const as_value& val)
         return;
     }
 
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
     m.set_y_translation(pixelsToTwips(infinite_to_zero(newy)));
     o.setMatrix(m); 
@@ -1135,7 +1135,7 @@ setY(DisplayObject& o, const as_value& val)
 as_value
 getY(DisplayObject& o)
 {
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     return twipsToPixels(m.get_y_translation());
 }
 
@@ -1156,7 +1156,7 @@ setX(DisplayObject& o, const as_value& val)
         return;
     }
 
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
     m.set_x_translation(pixelsToTwips(infinite_to_zero(newx)));
     o.setMatrix(m); 
@@ -1166,7 +1166,7 @@ setX(DisplayObject& o, const as_value& val)
 as_value
 getX(DisplayObject& o)
 {
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     return twipsToPixels(m.get_x_translation());
 }
 
@@ -1260,7 +1260,7 @@ setVisible(DisplayObject& o, const as_value& val)
 as_value
 getAlpha(DisplayObject& o)
 {
-    return as_value(o.get_cxform().aa / 2.56);
+    return as_value(getCxForm(o).aa / 2.56);
 }
 
 void
@@ -1282,7 +1282,7 @@ setAlpha(DisplayObject& o, const as_value& val)
         return;
     }
 
-    cxform cx = o.get_cxform();
+    cxform cx = getCxForm(o);
 
     // Overflows are *not* truncated, but set to -32768.
     if (newAlpha > std::numeric_limits<boost::int16_t>::max() ||
@@ -1398,7 +1398,7 @@ as_value
 getWidth(DisplayObject& o)
 {
 	SWFRect bounds = o.getBounds();
-    const SWFMatrix& m = o.getMatrix();
+    const SWFMatrix& m = getMatrix(o);
     m.transform(bounds);
     return twipsToPixels(bounds.width());
 }

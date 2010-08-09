@@ -282,12 +282,12 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
     
         if (use_old_cxform) {
             // Use the cxform from the old DisplayObject.
-            ch->set_cxform(oldch->get_cxform());
+            ch->set_cxform(getCxForm(*oldch));
         }
 
         if (use_old_matrix) {
             // Use the SWFMatrix from the old DisplayObject.
-            ch->setMatrix(oldch->getMatrix(), true); 
+            ch->setMatrix(getMatrix(*oldch), true); 
         }
         
         // remember bounds of old char
@@ -953,8 +953,8 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     // replace the transformation SWFMatrix if the old
                     // DisplayObject accepts static transformation.
                     if (chOld->get_accept_anim_moves()) {
-                        chOld->setMatrix(chNew->getMatrix(), true); 
-                        chOld->set_cxform(chNew->get_cxform());
+                        chOld->setMatrix(getMatrix(*chNew), true); 
+                        chOld->set_cxform(getCxForm(*chNew));
                     }
                     chNew->unload();
                     chNew->destroy();

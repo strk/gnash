@@ -296,7 +296,7 @@ TextField::display(Renderer& renderer, const Transform& base)
     const bool drawBackground = getDrawBackground();
 
     Transform xform = base;
-    xform.matrix.concatenate(getMatrix());
+    xform.matrix.concatenate(getMatrix(*this));
     xform.colorTransform = getEmbedFonts() ? cxform() : get_world_cxform();
 
     if ((drawBorder || drawBackground) && !_bounds.is_null())
@@ -529,7 +529,7 @@ TextField::notifyEvent(const event_id& ev)
             boost::int32_t x_mouse, y_mouse;
             root.get_mouse_state(x_mouse, y_mouse);
 			
-			SWFMatrix m = getMatrix();
+			SWFMatrix m = getMatrix(*this);
 			
 			x_mouse -= m.get_x_translation();
 			y_mouse -= m.get_y_translation();
@@ -778,7 +778,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     // Not selectable, so don't catch mouse events!
     if (!_selectable) return 0;
 
-    SWFMatrix m = getMatrix();
+    SWFMatrix m = getMatrix(*this);
     point p(x, y);
     m.invert().transform(p);
 
@@ -1104,7 +1104,6 @@ TextField::format_text()
     // FIXME: I don't think we should query the definition
     // to find the appropriate font to use, as ActionScript
     // code should be able to change the font of a TextField
-    //
     if (!_font) {
         log_error(_("No font for TextField!"));
         return;

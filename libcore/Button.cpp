@@ -397,7 +397,7 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     {
         std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-        SWFMatrix  m = getMatrix();
+        SWFMatrix m = getMatrix(*this);
         point  p(x, y);
         m.invert().transform(p);
 
@@ -757,7 +757,7 @@ Button::getBounds() const
         const DisplayObject* ch = *i;
         // Child bounds need be transformed in our coordinate space
         SWFRect lclBounds = ch->getBounds();
-        SWFMatrix m = ch->getMatrix();
+        SWFMatrix m = getMatrix(*ch);
         allBounds.expand_to_transformed_rect(m, lclBounds);
     }
 
