@@ -199,6 +199,36 @@ BitmapData_as::dispose()
     updateObjects();
 }
 
+struct Transform
+{
+    Transform() {}
+    SWFMatrix matrix;
+    cxform colorTransform;
+    SWFRect rect;
+};
+
+void
+BitmapData_as::draw(MovieClip& mc, const Transform& transform)
+{
+
+    if (disposed()) return;
+
+    GnashImage& im = *data();
+
+    Renderer* base = getRunResources(*_owner).renderer();
+    Renderer::Internal in(*base, im);
+    Renderer* internal = in.renderer();
+
+    // Matrix must start from identity
+    const SWFMatrix backup = mc.getMatrix();
+    mc.setMatrix(transform.matrix);
+
+    mc.display(*internal);
+
+    mc.setMatrix(backup);
+    
+}
+
 // extern 
 void
 bitmapdata_class_init(as_object& where, const ObjectURI& uri)

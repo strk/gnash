@@ -881,11 +881,32 @@ public:
     m_drawing_mask = false;
   }
   
-  virtual Renderer& startInternalRender(GnashImage& /*im*/) {
-      return *this;
+  virtual Renderer& startInternalRender(GnashImage& im) {
+
+      std::auto_ptr<Renderer_agg_base> in;
+
+      switch (im.type()) {
+          case GNASH_IMAGE_RGB:
+                in.reset(new Renderer_agg<typename RGB::PixelFormat>(32));
+              break;
+          case GNASH_IMAGE_RGBA:
+                in.reset(new Renderer_agg<typename RGBA::PixelFormat>(24));
+              break;
+      }
+ 
+      const size_t width = im.width();
+      const size_t height = im.height();
+      const size_t stride = width * (im.type() == GNASH_IMAGE_RGBA ? 4 : 3);
+
+      in->init_buffer(im.begin(), width * height, width, height, stride);
+
+      _external.reset(in.release());
+      return *_external;
   }
 
-  virtual void endInternalRender() {}
+  virtual void endInternalRender() {
+      _external.reset();
+  }
 
     // renderer_base.clear() does no clipping which clears the
     // whole framebuffer even if we update just a small portion
@@ -2047,7 +2068,10 @@ private:  // private variables
     typedef agg::renderer_base<PixelFormat> renderer_base;
 
     // renderer base
-    std::auto_ptr<renderer_base> m_rbase;
+    boost::scoped_ptr<renderer_base> m_rbase;
+ 
+    // An external renderer.   
+    boost::scoped_ptr<Renderer> _external;
 
     int xres;
     int yres;

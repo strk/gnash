@@ -36,6 +36,8 @@
 namespace gnash {
     class as_object;
     struct ObjectURI;
+    class MovieClip;
+    struct Transform;
     class DisplayObject;
     class GnashImage;
 }
@@ -105,6 +107,9 @@ public:
     
     /// Free the bitmap data
     void dispose();
+    
+    /// Draw a MovieClip to a BitmapData
+    void draw(MovieClip& mc, const Transform& transform);
 
     /// Attach this BitmapData to an object
     //

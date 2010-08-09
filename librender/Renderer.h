@@ -596,9 +596,15 @@ public:
     public:
 
         /// Prepare the renderer for internal rendering
-        Internal(Renderer& r, GnashImage& im) : _r(r)
+        Internal(Renderer& r, GnashImage& im)
+            :
+            _r(r),
+            _ext(&_r.startInternalRender(im))
         {
-            _r.startInternalRender(im);
+        }
+
+        Renderer* renderer() const {
+            return _ext;
         }
 
         ~Internal() {
@@ -607,6 +613,7 @@ public:
 
     private:
         Renderer& _r;
+        Renderer* _ext;
     };
 
 protected:
