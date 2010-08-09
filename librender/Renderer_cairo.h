@@ -27,6 +27,11 @@
 #include "Geometry.h"
 
 namespace gnash {
+    class Transform;
+    class cxform;
+}
+
+namespace gnash {
 
     typedef std::vector<Path> PathVec;
     typedef std::vector<const Path*> PathPtrVec;

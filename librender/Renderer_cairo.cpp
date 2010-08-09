@@ -43,6 +43,7 @@
 #include "Renderer_cairo.h"
 #include "utility.h"
 #include "FillStyle.h"
+#include "Transform.h"
 
 #include <cmath>
 #include <cairo/cairo.h>
@@ -511,7 +512,7 @@ Renderer_cairo::drawVideoFrame(GnashImage* baseframe, const Transform& xform,
 
     // Now apply transformation to video
     cairo_matrix_t frame_mat;
-    init_cairo_matrix(&frame_mat, *m);
+    init_cairo_matrix(&frame_mat, xform.matrix);
 
     cairo_matrix_multiply(&mat, &mat, &frame_mat);
 
