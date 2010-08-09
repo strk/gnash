@@ -328,82 +328,82 @@ d.lineTo(50, 50);
 b = new Bitmap(100, 100, false);
 b.draw(d);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // Hard ref
 b.draw(_level0.tar);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // User-defined translation makes no difference.
 d._x = 500;
 b.draw(d);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // User defined transform makes no difference.
 d._height = 30;
 b.draw(d);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // User defined transform makes no difference.
 d._width = 30;
 b.draw(d);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // Color transform the old way (no difference).
 c = new Color("_level0.tar");  
 c.setRGB(0xff5500);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // Color transform the new way.
 var tr = d.transform;
 tr.colorTransform = new flash.geom.ColorTransform(0.5, 0.5, 0.5, 0.5, 34, 34, 34, 34);
 d.transform = tr;
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 dom = new flash.geom.Matrix();
 dom.rotate(Math.PI / 4);
 tr.matrix = dom;
 d.transform = tr;
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 
 //-------------------------------------------------------------
