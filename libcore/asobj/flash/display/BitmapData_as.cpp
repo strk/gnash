@@ -210,24 +210,27 @@ struct Transform
 void
 BitmapData_as::draw(MovieClip& mc, const Transform& transform)
 {
-
     if (disposed()) return;
 
     GnashImage& im = *data();
 
     Renderer* base = getRunResources(*_owner).renderer();
-    if (!base) return;
+    if (!base) {
+        log_debug(_("BitmapData.draw() called without an active renderer"));
+        return;
+    }
 
     Renderer::Internal in(*base, im);
     Renderer* internal = in.renderer();
-    if (!internal) return;
+    if (!internal) {
+        log_debug(_("Current renderer does not support internal rendering"));
+        return;
+    }
 
-    // Matrix must start from identity
+    // TODO: write a proper interface for this (and other transforms).
     const SWFMatrix backup = mc.getMatrix();
     mc.setMatrix(transform.matrix);
-
     mc.display(*internal);
-
     mc.setMatrix(backup);
     
 }
@@ -304,11 +307,28 @@ as_value
 bitmapdata_draw(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-    if (!fn.nargs) return as_value();
+
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("BitmapData.draw(%s) requires at least one argument",
+                ss.str());
+        );
+        return as_value();
+    }
 
     as_object* o = fn.arg(0).to_object(getGlobal(fn));
     MovieClip* mc = get<MovieClip>(o);
-    if (!mc) return as_value();
+    if (!mc) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("BitmapData.draw(%s): first argument must be a "
+                "MovieClip", ss.str());
+        );
+        return as_value();
+    }
 
     Transform t;
     if (fn.nargs > 1) {
@@ -334,8 +354,7 @@ bitmapdata_fillRect(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.deltaTransformPoint(%s): needs an object",
-                ss.str());
+            log_aserror("BitmapData.fillRect(%s): needs an object", ss.str());
         );
         return as_value();
     }
