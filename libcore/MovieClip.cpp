@@ -1083,15 +1083,15 @@ MovieClip::goto_labeled_frame(const std::string& label)
 void
 MovieClip::draw(Renderer& renderer, const Transform& xform)
 {
+    _drawable.finalize();
+    _drawable.display(renderer, xform);
     _displayList.display(renderer, xform);
 }
 
 void
 MovieClip::display(Renderer& renderer, const Transform& base)
 {
-
-    // Note: 
-    // DisplayList::Display() will take care of the visibility checking.
+    // Note: DisplayList::display() will take care of the visibility checking.
     //
     // Whether a DisplayObject should be rendered or not is dependent
     // on its parent: i.e. if its parent is a mask, this DisplayObject
@@ -1099,14 +1099,7 @@ MovieClip::display(Renderer& renderer, const Transform& base)
     
     // Draw everything with our own transform.
     const Transform xform = base * transform();
-
-    // render drawable (ActionScript generated graphics)
-    _drawable.finalize();
-    _drawable.display(renderer, xform);
-    
-    // descend the display list
-    _displayList.display(renderer, xform);
-     
+    draw(renderer, xform);
     clear_invalidated();
 }
 

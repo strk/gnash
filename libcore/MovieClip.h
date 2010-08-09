@@ -269,7 +269,7 @@ public:
     /// Draw this MovieClip
     //
     /// This is effectively the same as display(), but uses only the passed
-    /// transform and omits the drawable.
+    /// transform.
     void draw(Renderer& renderer, const Transform& xform);
 
     void omit_display();
