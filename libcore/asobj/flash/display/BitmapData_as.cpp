@@ -222,6 +222,7 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
     }
 
     mc.draw(*internal, transform);
+    updateObjects();
 }
 
 // extern 
