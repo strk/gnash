@@ -1301,17 +1301,17 @@ class BitmapData_as {
         bmp.floodFill(10, 10, 0x0000ff00);
         //xcheck_equals(bmp.getPixel(10, 10), 0x0000ff00);
         if (bmp.getPixel(10,10) == 0x0000ff00) {
-            DejaGnu.xpass("floodFill correctly set the pixel (10, 10) to 0x0000ff00");
+            DejaGnu.pass("floodFill correctly set the pixel (10, 10) to 0x0000ff00");
         } else {
-            DejaGnu.xfail("[ln:"+here.lineNumber+"]floodFill did not correctly set pixel (10, 10); value is: "+bmp.getPixel(10,10));
+            DejaGnu.fail("[ln:"+here.lineNumber+"]floodFill did not correctly set pixel (10, 10); value is: "+bmp.getPixel(10,10));
         }
         
         bmp.floodFill(5, 5, 0x000000ff);
         //xcheck_equals(bmp.getPixel(10, 0), 0x000000ff);
         if (bmp.getPixel(10,0) == 0x000000ff) {
-            DejaGnu.xpass("flodFill correctly set the pixel (10, 0) to 0x000000ff");
+            DejaGnu.pass("flodFill correctly set the pixel (10, 0) to 0x000000ff");
         } else {
-            DejaGnu.xfail("[ln:"+here.lineNumber+"]floodFill did not correctly set pixel (10, 0); value is: "+bmp.getPixel(10,0));
+            DejaGnu.fail("[ln:"+here.lineNumber+"]floodFill did not correctly set pixel (10, 0); value is: "+bmp.getPixel(10,0));
         }
         
     
