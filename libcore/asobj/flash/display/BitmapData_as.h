@@ -105,6 +105,9 @@ public:
     //
     /// Negative values are handled correctly.
     void fillRect(int x, int y, int w, int h, boost::uint32_t color);
+
+    void floodFill(size_t x, size_t y, boost::uint32_t old,
+            boost::uint32_t fill);
     
     /// Free the bitmap data
     void dispose();

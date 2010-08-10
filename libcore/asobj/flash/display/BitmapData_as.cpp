@@ -23,6 +23,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <stack>
 
 #include "MovieClip.h"
 #include "GnashImage.h"
@@ -84,6 +85,9 @@ namespace {
     void attachBitmapDataStaticProperties(as_object& o);
     as_value get_flash_display_bitmap_data_constructor(const fn_call& fn);
 
+    BitmapData_as::iterator pixelAt(const BitmapData_as& bd, size_t x,
+            size_t y);
+
 }
 
 BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
@@ -117,7 +121,7 @@ BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color) const
     if (disposed()) return;
     if (x >= width() || y >= height()) return;
 
-    iterator it = begin() + x * width() + y;
+    iterator it = pixelAt(*this, x, y);
     *it = color;
 }
 
@@ -127,7 +131,7 @@ BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color) const
     if (disposed()) return;
     if (x >= width() || y >= height()) return;
 
-    iterator it = begin() + x * width() + y;
+    iterator it = pixelAt(*this, x, y);
     const boost::uint32_t val = *it;
     *it = (color & 0xffffff) | (val & 0xff000000);
 }
@@ -145,10 +149,7 @@ BitmapData_as::getPixel(size_t x, size_t y) const
 {
     if (disposed()) return 0;
     if (x >= width() || y >= height()) return 0;
-
-    const size_t pixelIndex = y * width() + x;
-    return *(begin() + pixelIndex);
-
+    return *pixelAt(*this, x, y);
 }
 
 void
@@ -185,6 +186,8 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     iterator it = begin() + y * width();
     iterator e = it + width() * h;
     
+    assert(e <= end());
+
     while (it != e) {
         // Fill from x for the width of the rectangle.
         std::fill_n(it + x, w, color);
@@ -225,6 +228,37 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
     }
 
     mc.draw(*internal, transform);
+    updateObjects();
+}
+
+void
+BitmapData_as::floodFill(size_t sx, size_t sy, boost::uint32_t old,
+        boost::uint32_t fill)
+{
+    if (sx >= width() || sy >= height()) return;
+
+    std::stack<std::pair<size_t, size_t> > stack;
+    stack.push(std::make_pair(sx, sy));
+
+    while (!stack.empty()) {
+
+        std::pair<size_t, size_t> p = stack.top();
+        stack.pop();
+
+        const size_t x = p.first;
+        const size_t y = p.second;
+
+        iterator pix = pixelAt(*this, x, y);
+        assert(pix != end());
+
+        if (*pix == old) {
+            *pix = fill;
+            if (y + 1 < height()) stack.push(std::make_pair(x, y + 1));
+            if (y > 0) stack.push(std::make_pair(x, y - 1));
+            if (x + 1 < width()) stack.push(std::make_pair(x + 1, y));
+            if (x > 0) stack.push(std::make_pair(x - 1, y));
+        }
+    }
     updateObjects();
 }
 
@@ -420,8 +454,30 @@ as_value
 bitmapdata_floodFill(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+    
+    if (fn.nargs < 3) {
+        return as_value();
+    }
+
+    if (ptr->disposed()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("floodFill called on disposed BitmapData!");
+        );
+        return as_value();
+    }
+    
+    const int x = toInt(fn.arg(0));
+    const int y = toInt(fn.arg(1));
+
+    if (x < 0 || y < 0) {
+        return as_value();
+    }
+
+    const boost::uint32_t fill = toInt(fn.arg(2));
+    const boost::uint32_t old = *pixelAt(*ptr, x, y);
+
+    ptr->floodFill(x, y, old, fill);
+    
 	return as_value();
 }
 
@@ -825,6 +881,13 @@ attachBitmapDataStaticProperties(as_object& o)
     o.init_member("GREEN_CHANNEL", 2.0);
     o.init_member("BLUE_CHANNEL", 4.0);
     o.init_member("ALPHA_CHANNEL", 8.0);
+}
+    
+BitmapData_as::iterator
+pixelAt(const BitmapData_as& bd, size_t x, size_t y)
+{
+    if (x >= bd.width() || y >= bd.height()) return bd.end();
+    return (bd.begin() + y * bd.width() + x);
 }
 
 } // anonymous namespace

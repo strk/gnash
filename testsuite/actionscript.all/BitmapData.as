@@ -207,9 +207,9 @@ check_equals(ntr.getPixel32(6, 6), -12303292);
 bmp = new Bitmap(20, 20, false);
 bmp.floodFill(10, 10, 0x0000ff00);
 
-xcheck_equals(bmp.getPixel(10, 10), 0x0000ff00);
+check_equals(bmp.getPixel(10, 10), 0x0000ff00);
 bmp.floodFill(5, 5, 0x000000ff);
-xcheck_equals(bmp.getPixel(10, 0), 0x000000ff);
+check_equals(bmp.getPixel(10, 0), 0x000000ff);
 
 mc = this.createEmptyMovieClip("mc", this.getNextHighestDepth());
 mc.attachBitmap(bmp, this.getNextHighestDepth());
