@@ -23,7 +23,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
-#include <stack>
+#include <queue>
 
 #include "MovieClip.h"
 #include "GnashImage.h"
@@ -232,18 +232,18 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
 }
 
 void
-BitmapData_as::floodFill(size_t sx, size_t sy, boost::uint32_t old,
+BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
         boost::uint32_t fill)
 {
-    if (sx >= width() || sy >= height()) return;
+    if (startx >= width() || starty >= height()) return;
 
-    std::stack<std::pair<size_t, size_t> > stack;
-    stack.push(std::make_pair(sx, sy));
+    std::queue<std::pair<size_t, size_t> > pixelQueue;
+    pixelQueue.push(std::make_pair(startx, starty));
 
-    while (!stack.empty()) {
+    while (!pixelQueue.empty()) {
 
-        std::pair<size_t, size_t> p = stack.top();
-        stack.pop();
+        std::pair<size_t, size_t> p = pixelQueue.front();
+        pixelQueue.pop();
 
         const size_t x = p.first;
         const size_t y = p.second;
@@ -251,14 +251,48 @@ BitmapData_as::floodFill(size_t sx, size_t sy, boost::uint32_t old,
         iterator pix = pixelAt(*this, x, y);
         assert(pix != end());
 
-        if (*pix == old) {
-            *pix = fill;
-            if (y + 1 < height()) stack.push(std::make_pair(x, y + 1));
-            if (y > 0) stack.push(std::make_pair(x, y - 1));
-            if (x + 1 < width()) stack.push(std::make_pair(x + 1, y));
-            if (x > 0) stack.push(std::make_pair(x - 1, y));
+        if (*pix != old) continue;
+
+        if (x + 1 < width()) {
+            // Go east!
+            iterator east(pix + 1);
+            const iterator eaststop(pix + (width() - x));
+            while (east != eaststop && *east == old) ++east;
+            std::fill(pix, east, fill);
+            const size_t edone = (east - pix);
+
+            // Add north pixels
+            if (y > 0) {
+                const size_t ny = y - 1;
+                for (size_t nx = x; nx != (x + edone); ++nx) {
+                    if (*pixelAt(*this, nx, ny) == old) {
+                        pixelQueue.push(std::make_pair(nx, ny));
+                    }
+                }
+            }
         }
+
+        if (x > 0) {
+            // Go west!
+            iterator west(pix - 1);
+            const iterator weststop(pix - x);
+            while (west != weststop && *west == old) --west;
+            std::fill(west, pix, fill); 
+            const size_t wdone = (pix - west);
+             
+            // Add south pixels
+            if (y + 1 < height()) {
+                const size_t sy = y + 1;
+                for (size_t sx = x; sx != x - wdone; --sx) {
+                    if (*pixelAt(*this, sx, sy) == old) {
+                        pixelQueue.push(std::make_pair(sx, sy));
+                    }
+                }
+            }
+        }
+
     }
+
     updateObjects();
 }
 
