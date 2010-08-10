@@ -40,6 +40,7 @@
 #include "namedStrings.h"
 #include "Renderer.h"
 #include "RunResources.h"
+#include "ASConversions.h"
 
 namespace gnash {
 
@@ -181,44 +182,6 @@ registerMovieClipNative(as_object& where)
     vm.registerNative(movieclip_beginMeshFill, 901, 10);
     vm.registerNative(movieclip_beginBitmapFill, 901, 11);
     vm.registerNative(movieclip_scale9Grid, 901, 12);
-
-}
-
-SWFMatrix
-asToSWFMatrix(as_object& m)
-{
-    // This is case sensitive.
-    if (m.getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
-        
-        const double x = pixelsToTwips(m.getMember(NSV::PROP_X).to_number());
-        const double y = pixelsToTwips(m.getMember(NSV::PROP_Y).to_number());
-        const double w = pixelsToTwips(m.getMember(NSV::PROP_W).to_number());
-        const double h = pixelsToTwips(m.getMember(NSV::PROP_H).to_number()); 
-        const double r = m.getMember(NSV::PROP_R).to_number();
-        const double a = std::cos(r) * w * 2;
-        const double b = std::sin(r) * h * 2;
-        const double c = -std::sin(r) * w * 2;
-        const double d = std::cos(r) * h * 2;
-
-        return SWFMatrix(a, b, c, d, x + w / 2.0, y + h / 2.0);
-        
-    }
-
-    // Convert input matrix to SWFMatrix.
-    const boost::int32_t a = truncateWithFactor<65536>(
-            m.getMember(NSV::PROP_A).to_number());
-    const boost::int32_t b = truncateWithFactor<65536>(
-            m.getMember(NSV::PROP_B).to_number());
-    const boost::int32_t c = truncateWithFactor<65536>(
-            m.getMember(NSV::PROP_C).to_number());
-    const boost::int32_t d = truncateWithFactor<65536>(
-            m.getMember(NSV::PROP_D).to_number());
-
-    const boost::int32_t tx = pixelsToTwips(
-            m.getMember(NSV::PROP_TX).to_number());
-    const boost::int32_t ty = pixelsToTwips(
-            m.getMember(NSV::PROP_TY).to_number());
-    return SWFMatrix(a, b, c, d, tx, ty);
 
 }
 
@@ -1833,7 +1796,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         stops = 15;
     }
 
-    SWFMatrix mat = asToSWFMatrix(*matrix);
+    SWFMatrix mat = toSWFMatrix(*matrix);
 
     // ----------------------------
     // Create the gradients vector
@@ -1942,34 +1905,32 @@ movieclip_startDrag(const fn_call& fn)
 
             // check for infinite values
             bool gotinf = false;
-            if (!isFinite(x0) ) { x0=0; gotinf=true; }
-            if (!isFinite(y0) ) { y0=0; gotinf=true; }
-            if (!isFinite(x1) ) { x1=0; gotinf=true; }
-            if (!isFinite(y1) ) { y1=0; gotinf=true; }
+            if (!isFinite(x0)) { x0=0; gotinf=true; }
+            if (!isFinite(y0)) { y0=0; gotinf=true; }
+            if (!isFinite(x1)) { x1=0; gotinf=true; }
+            if (!isFinite(y1)) { y1=0; gotinf=true; }
 
             // check for swapped values
             bool swapped = false;
-            if ( y1 < y0 )
-            {
+            if (y1 < y0) {
                 std::swap(y1, y0);
                 swapped = true;
             }
 
-            if ( x1 < x0 )
-            {
+            if (x1 < x0) {
                 std::swap(x1, x0);
                 swapped = true;
             }
 
             IF_VERBOSE_ASCODING_ERRORS(
-                if ( gotinf || swapped ) {
+                if (gotinf || swapped) {
                     std::stringstream ss; fn.dump_args(ss);
                     if ( swapped ) { 
                         log_aserror(_("min/max bbox values in "
                             "MovieClip.startDrag(%s) swapped, fixing"),
                             ss.str());
                     }
-                    if ( gotinf ) {
+                    if (gotinf) {
                         log_aserror(_("non-finite bbox values in "
                             "MovieClip.startDrag(%s), took as zero"),
                             ss.str());
@@ -2023,7 +1984,7 @@ movieclip_beginBitmapFill(const fn_call& fn)
     if (fn.nargs > 1) {
         as_object* matrix = fn.arg(1).to_object(getGlobal(fn));
         if (matrix) {
-            mat = asToSWFMatrix(*matrix);
+            mat = toSWFMatrix(*matrix);
         }
     }
 

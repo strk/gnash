@@ -27,21 +27,21 @@
 #include "MovieClip.h"
 #include "GnashImage.h"
 #include "DisplayObject.h"
-#include "as_object.h" // for inheritance
+#include "as_object.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
-#include "VM.h" // for addStatics
+#include "smart_ptr.h" 
+#include "builtin_function.h"
+#include "GnashException.h" 
+#include "VM.h" 
 #include "Renderer.h"
 #include "RunResources.h"
 #include "namedStrings.h"
-#include "MovieClip_as.h"
 #include "Movie.h"
 #include "movie_definition.h"
 #include "Transform.h"
+#include "ASConversions.h"
 
 namespace gnash {
 
@@ -323,7 +323,7 @@ bitmapdata_draw(const fn_call& fn)
     Transform t;
     if (fn.nargs > 1) {
         as_object* o = fn.arg(1).to_object(getGlobal(fn));
-        if (o) t.matrix = asToSWFMatrix(*o);
+        if (o) t.matrix = toSWFMatrix(*o);
     }
 
     ptr->draw(*mc, t);

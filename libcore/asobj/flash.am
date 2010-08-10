@@ -26,6 +26,7 @@ BUILT_SOURCES =
 # pkglib_LTLIBRARIES += libgnashasobjs.la 
 
 libgnashasobjs_la_SOURCES = \
+	asobj/ASConversions.cpp \
 	asobj/AsBroadcaster.cpp \
 	asobj/Array_as.cpp \
 	asobj/Boolean_as.cpp \
@@ -66,6 +67,7 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Object.cpp
 
 inst_HEADERS = \
+	asobj/ASConversions.h \
 	asobj/AsBroadcaster.h \
 	asobj/Boolean_as.h \
 	asobj/Color_as.h	\
