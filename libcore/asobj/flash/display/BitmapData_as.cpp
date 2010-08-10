@@ -114,7 +114,7 @@ BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color) const
     if (disposed()) return;
     if (x >= width() || y >= height()) return;
 
-    GnashImage::argb_iterator it = begin() + x * width() + y;
+    iterator it = begin() + x * width() + y;
     *it = color;
 }
 
@@ -124,7 +124,7 @@ BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color) const
     if (disposed()) return;
     if (x >= width() || y >= height()) return;
 
-    GnashImage::argb_iterator it = begin() + x * width() + y;
+    iterator it = begin() + x * width() + y;
     const boost::uint32_t val = *it;
     *it = (color & 0xffffff) | (val & 0xff000000);
 }
@@ -179,9 +179,8 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     w = std::min<size_t>(width() - x, w);
     h = std::min<size_t>(height() - y, h);
     
-    GnashImage::argb_iterator it = begin() + y * width();
-    
-    GnashImage::argb_iterator e = it + width() * h;
+    iterator it = begin() + y * width();
+    iterator e = it + width() * h;
     
     while (it != e) {
         // Fill from x for the width of the rectangle.

@@ -52,6 +52,8 @@ class BitmapData_as : public Relay
 {
 public:
 
+    typedef GnashImage::argb_iterator iterator;
+
     /// Construct a BitmapData.
     //
     /// The constructor sets the fill colour and the immutable size of the
@@ -125,12 +127,12 @@ public:
         return !data();
     }
  
-    GnashImage::argb_iterator begin() const {
+    iterator begin() const {
         assert(!disposed());
         return data()->argb_begin();
     }
     
-    GnashImage::argb_iterator end() const {
+    iterator end() const {
         assert(!disposed());
         return data()->argb_end();
     }
