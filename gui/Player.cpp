@@ -367,19 +367,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
         setFlashVars(fv->second);
     }
 
-#if 0
-    // Add Scriptable Variables. These values become the default, but
-    // they can be reset from JavaScript via ExternalInterface. These
-    // are passed to Gnash using the '-P' option, and have nothing to
-    // to do with 'flashVars'.
-    fv = _params.begin();
-    for (fv=_params.begin(); fv != _params.end(); fv++) {
-        if (fv->first != "flashvars") {
-            setScriptableVar(fv->first, fv->second);
-        }
-    }
-#endif
-    
     // Load the actual movie.
     _movieDef = load_movie();
     if (!_movieDef) {
@@ -387,8 +374,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     }
 
     // Get info about the width & height of the movie.
-    int movie_width = static_cast<int>(_movieDef->get_width_pixels());
-    int movie_height = static_cast<int>(_movieDef->get_height_pixels());
+    const size_t movie_width = _movieDef->get_width_pixels();
+    const size_t movie_height = _movieDef->get_height_pixels();
 
     if (! _width) {
         _width = static_cast<size_t>(movie_width * _scale);
@@ -397,7 +384,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
         _height = static_cast<size_t>(movie_height * _scale);
     }
 
-    if (! _width || ! _height) {
+    if (!_width || !_height) {
         log_debug(_("Input movie has collapsed dimensions "
                     "%d/%d. Setting to 1/1 and going on."),
                      _width, _height);
