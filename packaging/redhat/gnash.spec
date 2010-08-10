@@ -110,6 +110,43 @@ Requires:  gnash, gnash-common
 The Gnash widgets can be used to embed Gnash into any Gtk or Python-Gtk
 application.
 
+%package fileio-extension
+Summary:   Fileio extension for Gnash
+Group:     Applications/Multimedia
+Requires:  gnash-commo
+
+%description fileio-extension
+This extension allows SWF files being played within Gnash to have direct access
+to the file system. The API is similar to the C library one.
+
+%package lirc-extension
+Summary:   LIRC extension for Gnash
+Group:     Applications/Multimedia
+Requires:  gnash-common
+
+%description lirc-extension
+This extension allows SWF files being played within Gnash to have direct access
+to a LIRC based remote control device. The API is similar to the standard
+LIRC one.
+
+%package dejagnu-extension
+Summary:   DejaGnu extension for Gnash
+Group:     Applications/Multimedia
+Requires:  gnash-common
+
+%description dejagnu-extension
+This extension allows SWF files to have a simple unit testing API. The API
+is similar to the DejaGnu unit testing one.
+
+%package mysql-extension
+Summary:   MySQL extension for Gnash
+Group:     Applications/Multimedia
+Requires:  gnash-common
+
+%description mysql-extension
+This extension allows SWF files being played within Gnash to have direct access
+to a MySQL database. The API is similar to the standard MySQL one.
+
 %prep
 %setup -q
 
@@ -215,7 +252,7 @@ sh ./configure \
 	--enable-cygnal \
 	--enable-python \
 	--with-plugins-install=system \
-	--enable-extensions=all
+	--enable-extensions=fileio,lirc,dejagnu,mysql
 
 make $MAKEFLAGS dumpconfig all LDFLAGS="-Wl,--build-id"
 %endif
@@ -329,6 +366,18 @@ scrollkeeper-update -q || :
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo
 %{_prefix}/share/kde4/services/klash_part.desktop
+
+%files fileio-extension
+%{_libdir}/gnash/plugins/fileio.so
+
+%files lirc-extension
+%{_libdir}/gnash/plugins/lirc.so
+
+%files dejagnu-extension
+%{_libdir}/gnash/plugins/dejagnu.so
+
+%files mysql-extension
+%{_libdir}/gnash/plugins/mysql.so
 
 %changelog
 * Sat Mar 27 2010 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
