@@ -284,8 +284,7 @@ check_equals(btx.gb, 127);
 check_equals(btx.bb, 0);
 check_equals(btx.ab, 0);
 
-#if 0
-
+// A fake color transform doesn't work.
 ct = {};
 ct.redMultiplier = 1;
 ct.blueMultiplier = 1;
@@ -300,10 +299,8 @@ tr = d.transform;
 tr.colorTransform = ct;
 d.transform = tr;
 
-ct11 = d.transform.colorTransform;
-check_equals(ct11.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=255, alphaOffset=0)")
+ctfake = d.transform.colorTransform;
+check_equals(ct11.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=0, greenOffset=127, blueOffset=0, alphaOffset=0)");
 
-#endif
-
-totals(94);
+totals(95);
 #endif

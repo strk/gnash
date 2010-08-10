@@ -169,8 +169,7 @@ transform_colorTransform(const fn_call& fn)
     }
 
     as_object* obj = fn.arg(0).to_object(getGlobal(fn));
-    if (!obj)
-    {
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
