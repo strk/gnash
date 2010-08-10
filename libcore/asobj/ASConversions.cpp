@@ -22,6 +22,7 @@
 
 #include <boost/cstdint.hpp>
 #include <cmath>
+#include <limits>
 
 #include "as_object.h"
 #include "log.h"
@@ -31,8 +32,14 @@
 #include "as_value.h"
 #include "SWFMatrix.h"
 #include "SWFCxForm.h"
+#include "flash/geom/ColorTransform_as.h"
 
 namespace gnash {
+
+namespace {
+    // Handle overflows from AS ColorTransform double.
+    inline boost::int16_t truncateDouble(double d);
+}
 
 SWFMatrix
 toSWFMatrix(as_object& m)
@@ -73,33 +80,36 @@ toSWFMatrix(as_object& m)
 }
 
 SWFCxForm
-toCxForm(as_object& o)
+toCxForm(const ColorTransform_as& tr)
 {
-    string_table& st = getStringTable(o);
+    const int factor = 256;
+    SWFCxForm c;
+    c.ra = truncateDouble(tr.getRedMultiplier() * factor);
+    c.ga = truncateDouble(tr.getGreenMultiplier() * factor);
+    c.ba = truncateDouble(tr.getBlueMultiplier() * factor);
+    c.aa = truncateDouble(tr.getAlphaMultiplier() * factor);
+    c.rb = truncateDouble(tr.getRedOffset());
+    c.gb = truncateDouble(tr.getGreenOffset());
+    c.bb = truncateDouble(tr.getBlueOffset());
+    c.ab = truncateDouble(tr.getAlphaOffset());
+    return c;
+}
 
-    const as_value& am = o.getMember(st.find("alphaMultiplier"));
-    const as_value& ao = o.getMember(st.find("alphaOffset"));
-    const as_value& bm = o.getMember(st.find("blueMultiplier"));
-    const as_value& bo = o.getMember(st.find("blueOffset"));
-    const as_value& gm = o.getMember(st.find("greenMultiplier"));
-    const as_value& go = o.getMember(st.find("greenOffset"));
-    const as_value& rm = o.getMember(st.find("redMultiplier"));
-    const as_value& ro = o.getMember(st.find("redOffset"));
+namespace {
 
-    SWFCxForm cx;
+inline boost::int16_t
+truncateDouble(double d)
+{
 
-    const size_t factor = 256;
-
-    cx.aa = toInt(am) * factor;
-    cx.ra = toInt(rm) * factor;
-    cx.ba = toInt(bm) * factor;
-    cx.ga = toInt(gm) * factor;
-    cx.ab = toInt(ao);
-    cx.rb = toInt(ro);
-    cx.bb = toInt(bo);
-    cx.gb = toInt(go);
-    return cx;
+    if (d > std::numeric_limits<boost::int16_t>::max() ||
+        d < std::numeric_limits<boost::int16_t>::min())
+    {
+       return std::numeric_limits<boost::int16_t>::min();
+    }
+    return static_cast<boost::int16_t>(d);
+}
 
 }
+
 
 } // namespace gnash 

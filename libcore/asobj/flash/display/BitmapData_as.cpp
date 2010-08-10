@@ -327,7 +327,10 @@ bitmapdata_draw(const fn_call& fn)
     }
     if (fn.nargs > 2) {
         as_object* o = fn.arg(2).to_object(getGlobal(fn));
-        if (o) t.colorTransform = toCxForm(*o);
+        ColorTransform_as* tr;
+        if (isNativeType(o, tr)) {
+            t.colorTransform = toCxForm(*tr);
+        }
     }
 
     ptr->draw(*mc, t);

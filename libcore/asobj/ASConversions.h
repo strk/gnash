@@ -25,6 +25,7 @@ namespace gnash {
     class as_object;
     class SWFMatrix;
     class SWFCxForm;
+    class ColorTransform_as;
 }
 
 namespace gnash {
@@ -32,8 +33,8 @@ namespace gnash {
 /// Convert an object to a SWFMatrix.
 SWFMatrix toSWFMatrix(as_object& o);
 
-/// Convert an as_object to a SWFCxForm
-SWFCxForm toCxForm(as_object& o);
+/// Convert a ColorTransform_as to a SWFCxForm record.
+SWFCxForm toCxForm(const ColorTransform_as& tr);
 
 } // namespace gnash
 

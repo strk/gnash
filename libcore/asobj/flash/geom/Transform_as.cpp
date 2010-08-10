@@ -35,7 +35,6 @@
 
 #include "namedStrings.h"
 #include <sstream>
-#include <limits>
 
 namespace gnash {
 
@@ -51,18 +50,6 @@ namespace {
     as_object* getTransformInterface();
     as_value get_flash_geom_transform_constructor(const fn_call& fn);
     
-    // Handle overflows from AS ColorTransform double.
-    inline boost::int16_t
-    truncateDouble(double d)
-    {
-
-        if (d > std::numeric_limits<boost::int16_t>::max() ||
-            d < std::numeric_limits<boost::int16_t>::min())
-        {
-           return std::numeric_limits<boost::int16_t>::min();
-        }
-        return static_cast<boost::int16_t>(d);
-    }
 }
 
 
@@ -193,17 +180,8 @@ transform_colorTransform(const fn_call& fn)
         );
         return as_value();
     }
-    
-    SWFCxForm c;
-    c.ra = truncateDouble(transform->getRedMultiplier() * factor);
-    c.ga = truncateDouble(transform->getGreenMultiplier() * factor);
-    c.ba = truncateDouble(transform->getBlueMultiplier() * factor);
-    c.aa = truncateDouble(transform->getAlphaMultiplier() * factor);
-    c.rb = truncateDouble(transform->getRedOffset());
-    c.gb = truncateDouble(transform->getGreenOffset());
-    c.bb = truncateDouble(transform->getBlueOffset());
-    c.ab = truncateDouble(transform->getAlphaOffset());
   
+    const SWFCxForm c = toCxForm(*transform);
     relay->setColorTransform(c);
     
     return as_value();
