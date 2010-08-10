@@ -195,7 +195,7 @@ private:
     }
 
     difference_type distance_to(const pixel_iterator& o) const {
-        return (o._it - _it) / numChannels(_t);
+        return (o._it - _it) / static_cast<int>(numChannels(_t));
     }
 
     void advance(difference_type n) {
