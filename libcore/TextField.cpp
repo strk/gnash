@@ -299,7 +299,7 @@ TextField::display(Renderer& renderer, const Transform& base)
 
     // This is a hack to handle device fonts, which are not affected by
     // color transform.
-    if (getEmbedFonts()) xform.colorTransform = cxform();
+    if (getEmbedFonts()) xform.colorTransform = SWFCxForm();
 
     if ((drawBorder || drawBackground) && !_bounds.is_null()) {
 
@@ -319,7 +319,7 @@ TextField::display(Renderer& renderer, const Transform& base)
         rgba backgroundColor = drawBackground ? getBackgroundColor() :
                                                 rgba(0,0,0,0);
 
-        cxform cx = xform.colorTransform;
+        SWFCxForm cx = xform.colorTransform;
             
         if (drawBorder) borderColor = cx.transform(borderColor);
          

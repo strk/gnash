@@ -55,7 +55,7 @@ namespace gnash {
 
 namespace {
     void pattern_add_color_stops(const GradientFill& f,
-            cairo_pattern_t* pattern, const cxform& cx);
+            cairo_pattern_t* pattern, const SWFCxForm& cx);
     void init_cairo_matrix(cairo_matrix_t* cairo_matrix,
             const SWFMatrix& gnash_matrix);
 }
@@ -220,7 +220,7 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
 /// Transfer FillStyles to agg styles.
 struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
 {
-    StyleHandler(const cxform& c)
+    StyleHandler(const SWFCxForm& c)
         :
         _cx(c)
     {}
@@ -293,7 +293,7 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
     }
 
 private:
-    const cxform& _cx;
+    const SWFCxForm& _cx;
 };  
 
 }
@@ -311,7 +311,7 @@ snap_to_half_pixel(cairo_t* cr, double& x, double& y)
 }
 
 static cairo_pattern_t*
-get_cairo_pattern(const FillStyle& style, const cxform& cx)
+get_cairo_pattern(const FillStyle& style, const SWFCxForm& cx)
 {
     StyleHandler st(cx);
     cairo_pattern_t* pattern = boost::apply_visitor(st, style.fill);
@@ -334,7 +334,7 @@ public:
   {
   }
   
-  virtual void prepareFill(int fill_index, const cxform& cx)
+  virtual void prepareFill(int fill_index, const SWFCxForm& cx)
   {
     if (!_pattern) {
       _pattern = get_cairo_pattern(_FillStyles[fill_index-1], cx);
@@ -826,7 +826,7 @@ Renderer_cairo::add_path(cairo_t* cr, const Path& cur_path)
 }
 
 void
-Renderer_cairo::apply_line_style(const LineStyle& style, const cxform& cx,
+Renderer_cairo::apply_line_style(const LineStyle& style, const SWFCxForm& cx,
                                  const SWFMatrix& /*mat*/)
 {
     cairo_line_join_t join_style = CAIRO_LINE_JOIN_MITER;
@@ -900,7 +900,7 @@ Renderer_cairo::apply_line_style(const LineStyle& style, const cxform& cx,
 void
 Renderer_cairo::draw_outlines(const PathVec& path_vec,
                               const std::vector<LineStyle>& line_styles,
-                              const cxform& cx,
+                              const SWFCxForm& cx,
                               const SWFMatrix& mat)
 {
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
@@ -919,7 +919,7 @@ Renderer_cairo::draw_outlines(const PathVec& path_vec,
 
 void
 Renderer_cairo::draw_subshape(const PathVec& path_vec, const SWFMatrix& mat,
-                              const cxform& cx,
+                              const SWFCxForm& cx,
                               const std::vector<FillStyle>& FillStyles,
                               const std::vector<LineStyle>& line_styles)
 { 
@@ -1031,7 +1031,7 @@ void
 Renderer_cairo::drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
                           const SWFMatrix& mat)
 {
-    cxform dummy_cx;
+    SWFCxForm dummy_cx;
     std::vector<FillStyle> glyph_fs;
     
     FillStyle coloring = FillStyle(SolidFill(color));
@@ -1134,7 +1134,7 @@ namespace {
 
 void
 pattern_add_color_stops(const GradientFill& f, cairo_pattern_t* pattern,
-                        const cxform& cx)
+                        const SWFCxForm& cx)
 {      
     for (size_t index = 0; index < f.recordCount(); ++index) {
         const GradientRecord& grad = f.record(index);

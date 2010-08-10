@@ -281,8 +281,8 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
         InvalidatedRanges old_ranges;
     
         if (use_old_cxform) {
-            // Use the cxform from the old DisplayObject.
-            ch->set_cxform(getCxForm(*oldch));
+            // Use the SWFCxForm from the old DisplayObject.
+            ch->setCxForm(getCxForm(*oldch));
         }
 
         if (use_old_matrix) {
@@ -320,7 +320,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
 // Updates the transform properties of the DisplayObject at
 // the specified depth.
 void
-DisplayList::moveDisplayObject( int depth, const cxform* color_xform,
+DisplayList::moveDisplayObject( int depth, const SWFCxForm* color_xform,
         const SWFMatrix* mat, int* ratio, int* /* clip_depth */)
 {
     testInvariant();
@@ -347,7 +347,7 @@ DisplayList::moveDisplayObject( int depth, const cxform* color_xform,
         return;
     }
 
-    if (color_xform) ch->set_cxform(*color_xform);
+    if (color_xform) ch->setCxForm(*color_xform);
     if (mat) ch->setMatrix(*mat, true);
     if (ratio) ch->set_ratio(*ratio);
 
@@ -954,7 +954,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     // DisplayObject accepts static transformation.
                     if (chOld->get_accept_anim_moves()) {
                         chOld->setMatrix(getMatrix(*chNew), true); 
-                        chOld->set_cxform(getCxForm(*chNew));
+                        chOld->setCxForm(getCxForm(*chNew));
                     }
                     chNew->unload();
                     chNew->destroy();

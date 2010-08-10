@@ -35,7 +35,7 @@
 #include "event_id.h" 
 #include "SWFRect.h"
 #include "SWFMatrix.h"
-#include "cxform.h"
+#include "SWFCxForm.h"
 #include "dsodefs.h" 
 #include "snappingrange.h"
 #include "VM.h"
@@ -333,7 +333,7 @@ public:
     ///
     virtual void setHeight(double height);
 
-    void set_cxform(const cxform& cx) 
+    void setCxForm(const SWFCxForm& cx) 
     {       
         if (_transform.colorTransform != cx) {
             set_invalidated();
@@ -429,10 +429,10 @@ public:
 
     /// \brief
     /// Get our concatenated color transform (all our ancestor transforms,
-    /// times our cxform). 
+    /// times our SWFCxForm). 
     ///
     /// Maps from our local space into normal color space.
-    cxform get_world_cxform() const;
+    SWFCxForm getWorldCxForm() const;
 
     /// Get the built-in function handlers code for the given event
     //
@@ -1106,7 +1106,7 @@ getMatrix(const DisplayObject& o)
     return o.transform().matrix;
 }
 
-inline const cxform&
+inline const SWFCxForm&
 getCxForm(const DisplayObject& o) 
 {
     return o.transform().colorTransform;

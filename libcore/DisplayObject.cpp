@@ -172,13 +172,13 @@ DisplayObject::getWorldVolume() const
 	return volume;
 }
 
-cxform
-DisplayObject::get_world_cxform() const
+SWFCxForm
+DisplayObject::getWorldCxForm() const
 {
-	cxform	m;
+	SWFCxForm	m;
 	if (_parent != NULL)
 	{
-	    m = _parent->get_world_cxform();
+	    m = _parent->getWorldCxForm();
 	}
 	m.concatenate(getCxForm(*this));
 
@@ -1282,7 +1282,7 @@ setAlpha(DisplayObject& o, const as_value& val)
         return;
     }
 
-    cxform cx = getCxForm(o);
+    SWFCxForm cx = getCxForm(o);
 
     // Overflows are *not* truncated, but set to -32768.
     if (newAlpha > std::numeric_limits<boost::int16_t>::max() ||
@@ -1293,7 +1293,7 @@ setAlpha(DisplayObject& o, const as_value& val)
         cx.aa = static_cast<boost::int16_t>(newAlpha);
     }
 
-    o.set_cxform(cx);
+    o.setCxForm(cx);
     o.transformedByScript();  
 
 }

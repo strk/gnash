@@ -15,7 +15,7 @@
 
 namespace gnash {
 	class SWFStream;
-	class cxform;
+	class SWFCxForm;
     class Shape;
 	class SWFMatrix;
 	class RunResources;

@@ -26,7 +26,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
-#include "cxform.h" // for composition
+#include "SWFCxForm.h" // for composition
 #include "VM.h"
 #include "MovieClip.h"
 
@@ -106,7 +106,7 @@ color_getrgb(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	const cxform& trans = getCxForm(*sp);
+	const SWFCxForm& trans = getCxForm(*sp);
 
     const int r = trans.rb;
     const int g = trans.gb;
@@ -125,7 +125,7 @@ color_gettransform(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	const cxform& cx = getCxForm(*sp);
+	const SWFCxForm& cx = getCxForm(*sp);
 
 	// Convert to as_object
 
@@ -166,7 +166,7 @@ color_setrgb(const fn_call& fn)
 	const int g = (color & 0x00ff00) >> 8;
 	const int b = (color & 0x0000ff);
 
-	cxform newTrans = getCxForm(*sp);
+	SWFCxForm newTrans = getCxForm(*sp);
 	newTrans.rb = static_cast<boost::int16_t>(r);
 	newTrans.gb = static_cast<boost::int16_t>(g);
 	newTrans.bb = static_cast<boost::int16_t>(b);
@@ -174,7 +174,7 @@ color_setrgb(const fn_call& fn)
 	newTrans.ga = 0;
 	newTrans.ba = 0;
 
-    sp->set_cxform(newTrans);
+    sp->setCxForm(newTrans);
 
 	return as_value();
 }
@@ -206,7 +206,7 @@ color_settransform(const fn_call& fn)
 
 	string_table& st = getStringTable(*obj);
 
-	cxform newTrans = getCxForm(*sp);
+	SWFCxForm newTrans = getCxForm(*sp);
 
 	// multipliers
 	parseColorTransProp(*trans, st.find("ra"), newTrans.ra, true);
@@ -220,7 +220,7 @@ color_settransform(const fn_call& fn)
 	parseColorTransProp(*trans, st.find("bb"), newTrans.bb, false);
 	parseColorTransProp(*trans, st.find("ab"), newTrans.ab, false);
 
-	sp->set_cxform(newTrans);
+	sp->setCxForm(newTrans);
 
 	return as_value();
 }

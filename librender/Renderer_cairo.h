@@ -28,7 +28,7 @@
 
 namespace gnash {
     class Transform;
-    class cxform;
+    class SWFCxForm;
 }
 
 namespace gnash {
@@ -86,18 +86,18 @@ public:
 
     void add_path(cairo_t* cr, const Path& cur_path);
 
-    void apply_line_style(const LineStyle& style, const cxform& cx,
+    void apply_line_style(const LineStyle& style, const SWFCxForm& cx,
                           const SWFMatrix& mat);
 
     void draw_outlines(const PathVec& path_vec,
                        const std::vector<LineStyle>& line_styles,
-                       const cxform& cx,
+                       const SWFCxForm& cx,
                        const SWFMatrix& mat);
 
     std::vector<PathVec::const_iterator> find_subshapes(const PathVec& path_vec);
 
     void draw_subshape(const PathVec& path_vec,
-                       const SWFMatrix& mat, const cxform& cx,
+                       const SWFMatrix& mat, const SWFCxForm& cx,
                        const std::vector<FillStyle>& FillStyles,
                        const std::vector<LineStyle>& line_styles);
 

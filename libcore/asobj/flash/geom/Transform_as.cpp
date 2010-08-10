@@ -84,16 +84,16 @@ public:
         return getMatrix(_movieClip);
     }
     
-    const cxform& colorTransform() const {
+    const SWFCxForm& colorTransform() const {
         return getCxForm(_movieClip);
     }
 
-    cxform worldColorTransform() const {
-        return _movieClip.get_world_cxform();
+    SWFCxForm worldColorTransform() const {
+        return _movieClip.getWorldCxForm();
     }
 
     void setMatrix(const SWFMatrix& mat) { _movieClip.setMatrix(mat); }
-    void setColorTransform(const cxform& cx) { _movieClip.set_cxform(cx); }
+    void setColorTransform(const SWFCxForm& cx) { _movieClip.setCxForm(cx); }
 
 protected:
 
@@ -142,8 +142,8 @@ transform_colorTransform(const fn_call& fn)
             return as_value();
         }
 
-        // Construct a ColorTransform from the sprite cxform.
-        const cxform& c = relay->colorTransform();
+        // Construct a ColorTransform from the sprite SWFCxForm.
+        const SWFCxForm& c = relay->colorTransform();
 
         fn_call::Args args;
         args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,
@@ -194,7 +194,7 @@ transform_colorTransform(const fn_call& fn)
         return as_value();
     }
     
-    cxform c;
+    SWFCxForm c;
     c.ra = truncateDouble(transform->getRedMultiplier() * factor);
     c.ga = truncateDouble(transform->getGreenMultiplier() * factor);
     c.ba = truncateDouble(transform->getBlueMultiplier() * factor);
@@ -228,8 +228,8 @@ transform_concatenatedColorTransform(const fn_call& fn)
             return as_value();
         }
 
-        // Construct a ColorTransform from the sprite cxform.
-        const cxform& c = relay->worldColorTransform();
+        // Construct a ColorTransform from the sprite SWFCxForm.
+        const SWFCxForm& c = relay->worldColorTransform();
 
         fn_call::Args args;
         args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,

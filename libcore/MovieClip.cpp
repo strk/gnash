@@ -568,7 +568,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     // Copy drawable
     newmovieclip->_drawable = _drawable;
     
-    newmovieclip->set_cxform(getCxForm(*this));
+    newmovieclip->setCxForm(getCxForm(*this));
     newmovieclip->setMatrix(getMatrix(*this), true); 
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
@@ -1120,14 +1120,6 @@ MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObj)
     return true; 
 }
 
-std::auto_ptr<GnashImage>
-MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-            DisplayObject::BlendMode /* bm */, const SWFRect& /* clipRect */,
-            bool /* smooth */)
-{
-    return std::auto_ptr<GnashImage>();
-}
-
 DisplayObject*
 MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
@@ -1178,7 +1170,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     }
 
     // TODO: check if we should check those has_xxx flags first.
-    ch->set_cxform(tag->getCxform());
+    ch->setCxForm(tag->getCxform());
     ch->setMatrix(tag->getMatrix(), true); // update caches
     ch->set_ratio(tag->getRatio());
     ch->set_clip_depth(tag->getClipDepth());
@@ -1254,7 +1246,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
         ch->set_ratio(tag->getRatio());
     }
     if (tag->hasCxform()) {
-        ch->set_cxform(tag->getCxform());
+        ch->setCxForm(tag->getCxform());
     }
     if (tag->hasMatrix()) {
         ch->setMatrix(tag->getMatrix(), true); 

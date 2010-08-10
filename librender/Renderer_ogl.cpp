@@ -35,7 +35,7 @@
 #include "log.h"
 #include "utility.h"
 #include "Range2d.h"
-#include "cxform.h"
+#include "SWFCxForm.h"
 #include "FillStyle.h"
 #include "Transform.h"
 
@@ -182,7 +182,7 @@ private:
 /// Transfer FillStyles to the ogl renderer.
 struct StyleHandler : boost::static_visitor<>
 {
-    StyleHandler(const cxform& c, Renderer& r)
+    StyleHandler(const SWFCxForm& c, Renderer& r)
         :
         _cx(c),
         _renderer(r)
@@ -210,7 +210,7 @@ struct StyleHandler : boost::static_visitor<>
     }
 
 private:
-    const cxform& _cx;
+    const SWFCxForm& _cx;
     Renderer& _renderer;
 };  
 
@@ -1220,7 +1220,7 @@ public:
   void
   add_paths(const PathVec& path_vec)
   {
-    cxform dummy_cx;
+    SWFCxForm dummy_cx;
     std::vector<FillStyle> dummy_fs;
     
     FillStyle coloring = FillStyle(SolidFill(rgba(0, 0, 0, 0)));
@@ -1425,7 +1425,7 @@ public:
     }    
   }
 
-  void apply_FillStyle(const FillStyle& style, const SWFMatrix& /* mat */, const cxform& cx)
+  void apply_FillStyle(const FillStyle& style, const SWFMatrix& /* mat */, const SWFCxForm& cx)
   {
       const StyleHandler st(cx, *this);
       boost::apply_visitor(st, style.fill);
@@ -1433,7 +1433,7 @@ public:
   
   
   
-  bool apply_line_style(const LineStyle& style, const cxform& cx, const SWFMatrix& mat)
+  bool apply_line_style(const LineStyle& style, const SWFCxForm& cx, const SWFMatrix& mat)
   {
   //  GNASH_REPORT_FUNCTION;
      
@@ -1534,7 +1534,7 @@ public:
     
   void
   draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints,
-		const SWFMatrix& mat, const cxform& cx,
+		const SWFMatrix& mat, const SWFCxForm& cx,
 		const std::vector<FillStyle>& /* FillStyles */,
                 const std::vector<LineStyle>& line_styles)
   {
@@ -1698,7 +1698,7 @@ public:
   void
   draw_subshape(const PathVec& path_vec,
     const SWFMatrix& mat,
-    const cxform& cx,
+    const SWFCxForm& cx,
     const std::vector<FillStyle>& FillStyles,
     const std::vector<LineStyle>& line_styles)
   {
@@ -1828,7 +1828,7 @@ public:
          const SWFMatrix& mat)
   {
     if (_drawing_mask) abort();
-    cxform dummy_cx;
+    SWFCxForm dummy_cx;
     std::vector<FillStyle> glyph_fs;
     
     FillStyle coloring = FillStyle(SolidFill(c));

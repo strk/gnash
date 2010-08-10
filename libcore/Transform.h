@@ -21,14 +21,14 @@
 #define GNASH_TRANSFORM_H
 
 #include "SWFMatrix.h"
-#include "cxform.h"
+#include "SWFCxForm.h"
 
 namespace gnash {
 
 class Transform
 {
 public:
-    Transform(const SWFMatrix& m = SWFMatrix(), const cxform& cx = cxform())
+    Transform(const SWFMatrix& m = SWFMatrix(), const SWFCxForm& cx = SWFCxForm())
         :
         matrix(m),
         colorTransform(cx)
@@ -47,7 +47,7 @@ public:
     }
 
     SWFMatrix matrix;
-    cxform colorTransform;
+    SWFCxForm colorTransform;
 };
 
 /// Concatenate two transforms.

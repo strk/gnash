@@ -32,7 +32,7 @@ namespace gnash {
 namespace gnash {
 
 /// Color Transformation Record
-class DSOEXPORT cxform
+class DSOEXPORT SWFCxForm
 {
 public:
 
@@ -46,14 +46,14 @@ public:
     boost::int16_t ab; // AlphaAddTerm   16 bit integer(no fraction)
     
     /// Initialize to the identity color transform (no transform)
-    cxform();
+    SWFCxForm();
     
-    /// Concatenate cxform c onto ours. 
+    /// Concatenate SWFCxForm c onto ours. 
     //
     /// When transforming colors, c's transform is applied
     /// first, then ours.
     ///
-    void concatenate(const cxform& c);
+    void concatenate(const SWFCxForm& c);
     
     /// Transform the given color, return the result.
     rgba transform(const rgba& in) const;
@@ -61,7 +61,7 @@ public:
     /// Transform the given color.
     void transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const;    
 
-	/// Store the cxform record to an external array.
+	/// Store the SWFCxForm record to an external array.
     void  store_to(boost::int16_t * dst) const
     {
         *dst++ = ra; *dst++ = rb; 
@@ -70,8 +70,8 @@ public:
         *dst++ = aa; *dst++ = ab; 
     }
 
-	/// Load an cxform record from an external array.
-    cxform & load_from(float * src)
+	/// Load an SWFCxForm record from an external array.
+    SWFCxForm & load_from(float * src)
     {
     	// enbrace the overflows intentionally.
         ra = static_cast<boost::int16_t>((*src++) * 2.56f);
@@ -85,10 +85,10 @@ public:
         return *this;
     }
     
-    /// Returns true when the cxform equals identity (no transform).
+    /// Returns true when the SWFCxForm equals identity (no transform).
     bool is_identity() const;
     
-    /// Returns true when the cxform leads to alpha == 0
+    /// Returns true when the SWFCxForm leads to alpha == 0
     //
     /// Not the _alpha property, but the visible alpha related to dislpay. 
     /// The two might be completely diffrent. eg. mc._alpha ranges in [-32768, 32767]
@@ -101,10 +101,10 @@ public:
     /// Read RGBA from the SWF input stream.
     void read_rgba(SWFStream& in);
 
-    friend bool operator== (const cxform&, const cxform&);
-    friend bool operator!= (const cxform&, const cxform&);
+    friend bool operator== (const SWFCxForm&, const SWFCxForm&);
+    friend bool operator!= (const SWFCxForm&, const SWFCxForm&);
 	
-    friend std::ostream& operator<< (std::ostream& os, const cxform& cx);
+    friend std::ostream& operator<< (std::ostream& os, const SWFCxForm& cx);
 
 	std::string toString() const;
 
@@ -112,7 +112,7 @@ public:
 
 
 inline bool
-operator== (const cxform& a, const cxform& b)
+operator== (const SWFCxForm& a, const SWFCxForm& b)
 {
 	return	a.ra == b.ra &&
             a.rb == b.rb &&
@@ -125,7 +125,7 @@ operator== (const cxform& a, const cxform& b)
 }
 
 inline bool
-operator!=(const cxform& a, const cxform& b)
+operator!=(const SWFCxForm& a, const SWFCxForm& b)
 {
     return !(a == b);
 }

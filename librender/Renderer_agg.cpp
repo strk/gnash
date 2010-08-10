@@ -164,7 +164,7 @@ AGG resources
 #include "DefineShapeTag.h" 
 #include "GnashNumeric.h"
 #include "GC.h"
-#include "cxform.h"
+#include "SWFCxForm.h"
 #include "FillStyle.h"
 #include "Transform.h"
 
@@ -1059,7 +1059,7 @@ public:
 
     // prepare style handler
     StyleHandler sh;
-    build_agg_styles(sh, v, mat, cxform());
+    build_agg_styles(sh, v, mat, SWFCxForm());
     
     draw_shape(-1, paths, agg_paths, sh, false);
     
@@ -1146,7 +1146,7 @@ public:
     void drawShape(const std::vector<FillStyle>& FillStyles,
         const std::vector<LineStyle>& line_styles,
         const std::vector<Path>& objpaths, const SWFMatrix& mat,
-        const cxform& cx)
+        const SWFCxForm& cx)
     {
 
         bool have_shape, have_outline;
@@ -1412,7 +1412,7 @@ public:
     // Initializes the internal styles class for AGG renderer
     void build_agg_styles(StyleHandler& sh,
         const std::vector<FillStyle>& FillStyles,
-        const SWFMatrix& fillstyle_matrix, const cxform& cx) {
+        const SWFMatrix& fillstyle_matrix, const SWFCxForm& cx) {
     
         SWFMatrix inv_stage_matrix = stage_matrix;
         inv_stage_matrix.invert();
@@ -1664,7 +1664,7 @@ public:
   /// Just like draw_shapes() except that it draws an outline.
   void draw_outlines(int subshape_id, const GnashPaths &paths,
     const AggPaths& agg_paths,
-    const std::vector<LineStyle> &line_styles, const cxform& cx,
+    const std::vector<LineStyle> &line_styles, const SWFCxForm& cx,
     const SWFMatrix& linestyle_matrix) {
     
     if (_alphaMasks.empty()) {
@@ -1698,7 +1698,7 @@ public:
   template <class scanline_type>
   void draw_outlines_impl(int subshape_id, const GnashPaths &paths,
     const AggPaths& agg_paths,
-    const std::vector<LineStyle> &line_styles, const cxform& cx, 
+    const std::vector<LineStyle> &line_styles, const SWFCxForm& cx, 
     const SWFMatrix& linestyle_matrix, scanline_type& sl) {
     
     assert(m_pixf.get());

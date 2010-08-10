@@ -19,7 +19,7 @@
 #include "TextRecord.h"
 #include "SWFStream.h"
 #include "SWFMatrix.h"
-#include "cxform.h"
+#include "SWFCxForm.h"
 #include "smart_ptr.h"
 #include "movie_definition.h"
 #include "DisplayObject.h"
@@ -163,7 +163,7 @@ TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
         const TextRecords& records, bool embedded)
 {
 
-    const cxform& cx = xform.colorTransform;
+    const SWFCxForm& cx = xform.colorTransform;
     const SWFMatrix& mat = xform.matrix;
 
     // Starting positions.

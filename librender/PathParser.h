@@ -22,7 +22,7 @@
 #include "Geometry.h"
 #include <vector>
 #include <deque>
-#include "cxform.h"
+#include "SWFCxForm.h"
 
 namespace gnash
 {
@@ -70,11 +70,11 @@ public:
   /// appropriate.
   /// @param cx the color transform that will be passed to prepareFill.
   /// @param mat the SWFMatrix that will be passed to prepareFill.
-  void run(const cxform& cx, const SWFMatrix& mat);
+  void run(const SWFCxForm& cx, const SWFMatrix& mat);
 
   /// Prepare the fill style for subsequent use for filling one or more shapes.
   /// @param fill_style fill style number, as indicated by class Path.
-  virtual void prepareFill(int fill_style, const cxform& cx) = 0;
+  virtual void prepareFill(int fill_style, const SWFCxForm& cx) = 0;
   
   /// Terminates the fill style, that is, precludes the fill style from further
   /// use, which may be freed or otherwise cleaned up. Most renderers should
@@ -105,7 +105,7 @@ private:
     
   void append(const UnivocalPath& append_path);
   
-  void start_shapes(int fill_style, const cxform& cx);
+  void start_shapes(int fill_style, const SWFCxForm& cx);
 
   void end_shapes(int fill_style);
 

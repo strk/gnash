@@ -44,20 +44,20 @@ namespace {
     /// Creates 8 bitmap functions
     template<typename FillMode, typename Pixel>
             void storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
-            const SWFMatrix& mat, const cxform& cx,
+            const SWFMatrix& mat, const SWFCxForm& cx,
             bool smooth);
     template<typename FillMode> void storeBitmap(StyleHandler& st,
-            const agg_bitmap_info* bi, const SWFMatrix& mat, const cxform& cx,
+            const agg_bitmap_info* bi, const SWFMatrix& mat, const SWFCxForm& cx,
             bool smooth);
 
     /// Creates many (should be 18) gradient functions.
     void storeGradient(StyleHandler& st, const GradientFill& fs,
-            const SWFMatrix& mat, const cxform& cx);
+            const SWFMatrix& mat, const SWFCxForm& cx);
     template<typename Spread> void storeGradient(StyleHandler& st,
-            const GradientFill& fs, const SWFMatrix& mat, const cxform& cx);
+            const GradientFill& fs, const SWFMatrix& mat, const SWFCxForm& cx);
     template<typename Spread, typename Interpolation>
             void storeGradient(StyleHandler& st, const GradientFill& fs,
-            const SWFMatrix& mat, const cxform& cx);
+            const SWFMatrix& mat, const SWFCxForm& cx);
 }
 
 /// Internal style class that represents a fill style. Roughly speaking, AGG 
@@ -220,7 +220,7 @@ class GradientStyle : public AggStyle
 public:
   
     GradientStyle(const GradientFill& fs, const SWFMatrix& mat,
-            const cxform& cx, int norm_size, GradientType gr = GradientType())
+            const SWFCxForm& cx, int norm_size, GradientType gr = GradientType())
         :
         AggStyle(false),
         m_cx(cx),
@@ -267,7 +267,7 @@ public:
 protected:
     
     // Color transform
-    gnash::cxform m_cx;
+    gnash::SWFCxForm m_cx;
     
     // Span allocator
     Allocator m_sa;
@@ -343,7 +343,7 @@ class BitmapStyle : public AggStyle
 public:
     
   BitmapStyle(int width, int height, int rowlen, boost::uint8_t* data, 
-    const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    const gnash::SWFMatrix& mat, const gnash::SWFCxForm& cx)
     :
     AggStyle(false),
     m_cx(cx),
@@ -381,7 +381,7 @@ public:
 private:
 
     // Color transform
-    gnash::cxform m_cx;
+    gnash::SWFCxForm m_cx;
 
     // Pixel access
     agg::rendering_buffer m_rbuf;
@@ -437,7 +437,7 @@ public:
 
     /// Adds a new bitmap fill style
     void add_bitmap(const agg_bitmap_info* bi, const gnash::SWFMatrix& mat,
-        const gnash::cxform& cx, bool repeat, bool smooth) {
+        const gnash::SWFCxForm& cx, bool repeat, bool smooth) {
 
         if (!bi) {
             add_color(agg::rgba8_pre(0,0,0,0));
@@ -455,7 +455,7 @@ public:
 
     template<typename T>
     void addLinearGradient(const GradientFill& fs, const gnash::SWFMatrix& mat,
-            const gnash::cxform& cx)
+            const gnash::SWFCxForm& cx)
     {
         // NOTE: The value 256 is based on the bitmap texture used by other
         // Gnash renderers which is normally 256x1 pixels for linear gradients.
@@ -465,7 +465,7 @@ public:
     
     template<typename T>
     void addFocalGradient(const GradientFill& fs, const gnash::SWFMatrix& mat,
-            const gnash::cxform& cx)
+            const gnash::SWFCxForm& cx)
     {
         // move the center of the radial fill to where it should be
         SWFMatrix transl;
@@ -485,7 +485,7 @@ public:
     
     template<typename T>
     void addRadialGradient(const GradientFill& fs, const gnash::SWFMatrix& mat,
-            const gnash::cxform& cx)
+            const gnash::SWFCxForm& cx)
     {
         // move the center of the radial fill to where it should be
         SWFMatrix transl;
@@ -523,7 +523,7 @@ public:
     ///                     quality, pixel type etc.
     template<typename Filter> void
     addBitmap(const agg_bitmap_info* bi, const gnash::SWFMatrix& mat,
-            const gnash::cxform& cx)
+            const gnash::SWFCxForm& cx)
     {
         typedef typename Filter::PixelFormat PixelFormat;
         typedef typename Filter::Generator Generator;
@@ -580,7 +580,7 @@ private:
 /// Transfer FillStyles to agg styles.
 struct AddStyles : boost::static_visitor<>
 {
-    AddStyles(SWFMatrix stage, SWFMatrix fill, const cxform& c,
+    AddStyles(SWFMatrix stage, SWFMatrix fill, const SWFCxForm& c,
             StyleHandler& sh, Quality q)
         :
         _stageMatrix(stage.invert()),
@@ -647,7 +647,7 @@ private:
     
     /// The inverted fill matrix.
     const SWFMatrix _fillMatrix;
-    const cxform& _cx;
+    const SWFCxForm& _cx;
     StyleHandler& _sh;
     const Quality _quality;
 };  
@@ -657,7 +657,7 @@ namespace {
 template<typename FillMode, typename Pixel>
 void
 storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
-        const SWFMatrix& mat, const cxform& cx, bool smooth)
+        const SWFMatrix& mat, const SWFCxForm& cx, bool smooth)
 {
     if (smooth) {
         st.addBitmap<AA<Pixel, FillMode> >(bi, mat, cx);
@@ -669,7 +669,7 @@ storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
 template<typename FillMode>
 void
 storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
-        const SWFMatrix& mat, const cxform& cx, bool smooth)
+        const SWFMatrix& mat, const SWFCxForm& cx, bool smooth)
 {
 
     if (bi->get_bpp() == 24) {
@@ -682,7 +682,7 @@ storeBitmap(StyleHandler& st, const agg_bitmap_info* bi,
 template<typename Spread, typename Interpolation>
 void
 storeGradient(StyleHandler& st, const GradientFill& fs, const SWFMatrix& mat,
-        const cxform& cx)
+        const SWFCxForm& cx)
 {
       
     typedef agg::gradient_x Linear;
@@ -710,7 +710,7 @@ storeGradient(StyleHandler& st, const GradientFill& fs, const SWFMatrix& mat,
 template<typename Spread>
 void
 storeGradient(StyleHandler& st, const GradientFill& fs, const SWFMatrix& mat,
-        const cxform& cx)
+        const SWFCxForm& cx)
 {
     // TODO: provide and use a linearRGB interpolator.
     switch (fs.interpolation) {
@@ -723,7 +723,7 @@ storeGradient(StyleHandler& st, const GradientFill& fs, const SWFMatrix& mat,
 
 void
 storeGradient(StyleHandler& st, const GradientFill& fs, const SWFMatrix& mat,
-        const cxform& cx)
+        const SWFCxForm& cx)
 {   
 
       switch (fs.spreadMode) {
