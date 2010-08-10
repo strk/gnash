@@ -82,19 +82,11 @@ public:
         _it(i),
         _t(t)
     {}
-    
-    operator boost::uint32_t() const {
-        boost::uint32_t ret = 0xff000000;
-        switch (_t) {
-            case GNASH_IMAGE_RGBA:
-                // alpha
-                ret = *(_it + 3) << 24;
-            case GNASH_IMAGE_RGB:
-                ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
-            default:
-                break;
-        }
-        return ret;
+
+    /// Standard assignment converts to boost::uint32_t
+    const ARGB& operator=(const ARGB& other) const {
+        *this = +other;
+        return *this;
     }
     
     /// Writes a 32-bit unsigned value in ARGB byte order to the image
@@ -113,6 +105,21 @@ public:
                 break;
         }
         return *this;
+    }
+    
+    /// Convert to uint32_t in ARGB order
+    operator boost::uint32_t() const {
+        boost::uint32_t ret = 0xff000000;
+        switch (_t) {
+            case GNASH_IMAGE_RGBA:
+                // alpha
+                ret = *(_it + 3) << 24;
+            case GNASH_IMAGE_RGB:
+                ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
+            default:
+                break;
+        }
+        return ret;
     }
 
 private:

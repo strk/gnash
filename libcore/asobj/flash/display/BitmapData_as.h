@@ -50,7 +50,6 @@ namespace gnash {
 /// do not need to check.
 class BitmapData_as : public Relay
 {
-
 public:
 
     /// Construct a BitmapData.
@@ -90,10 +89,10 @@ public:
     /// Set a specified pixel to the specified color.
     //
     /// Retains transparency value for BitmapDatas with transparency.
-    void setPixel(size_t x, size_t y, boost::uint32_t color);
+    void setPixel(size_t x, size_t y, boost::uint32_t color) const;
 
     /// Set a specified pixel to the specified color.
-    void setPixel32(size_t x, size_t y, boost::uint32_t color);
+    void setPixel32(size_t x, size_t y, boost::uint32_t color) const;
 
     /// Returns the value of the pixel at (x, y).
     //
@@ -125,12 +124,22 @@ public:
     bool disposed() const {
         return !data();
     }
+ 
+    GnashImage::argb_iterator begin() const {
+        assert(!disposed());
+        return data()->argb_begin();
+    }
+    
+    GnashImage::argb_iterator end() const {
+        assert(!disposed());
+        return data()->argb_end();
+    }
+
+private:
     
     GnashImage* data() const {
         return _cachedBitmap.get() ? &_cachedBitmap->image() : _image.get();
     }
-
-private:
 
     /// Inform any attached objects that the data has changed.
     void updateObjects();
