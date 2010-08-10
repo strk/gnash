@@ -1665,29 +1665,23 @@ MovieClip::getDisplayListObject(string_table::key key)
 }
 
 void 
-MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, 
-    bool force)
+MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
 
     // nothing to do if this movieclip is not visible
-    if (!visible() || getCxForm(*this).is_invisible()) {
-        ranges.add(m_old_invalidated_ranges); // (in case we just hided)
+    if (!visible() || invisible(getCxForm(*this))) {
+        ranges.add(m_old_invalidated_ranges); 
         return;
     }
 
-    if ( ! invalidated() && ! childInvalidated() && ! force )
-    {
-        return;
-    }
+    if (!invalidated() && !childInvalidated() && !force) return;
     
  
     // m_child_invalidated does not require our own bounds
-    if (invalidated() || force)            
-    {
+    if (invalidated() || force) {
         // Add old invalidated bounds
         ranges.add(m_old_invalidated_ranges); 
     }
-    
     
     _displayList.add_invalidated_bounds(ranges, force || invalidated());
 

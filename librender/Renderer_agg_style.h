@@ -267,7 +267,7 @@ public:
 protected:
     
     // Color transform
-    gnash::SWFCxForm m_cx;
+    SWFCxForm m_cx;
     
     // Span allocator
     Allocator m_sa;
@@ -343,7 +343,7 @@ class BitmapStyle : public AggStyle
 public:
     
   BitmapStyle(int width, int height, int rowlen, boost::uint8_t* data, 
-    const gnash::SWFMatrix& mat, const gnash::SWFCxForm& cx)
+    const SWFMatrix& mat, const SWFCxForm& cx)
     :
     AggStyle(false),
     m_cx(cx),
@@ -357,7 +357,7 @@ public:
   {
     
     // Convert the transformation SWFMatrix to AGG's class. It's basically the
-    // same and we could even use gnash::SWFMatrix since AGG does not require
+    // same and we could even use SWFMatrix since AGG does not require
     // a real AGG descendant (templates!). However, it's better to use AGG's
     // class as this should be faster (avoid type conversion).
   }
@@ -368,10 +368,8 @@ public:
     void generate_span(agg::rgba8* span, int x, int y, unsigned len)
     {
         m_sg.generate(span, x, y, len);
-        // Apply color transform
-        // TODO: Check if this can be optimized
-        if (m_cx.is_identity()) return;
-        for (unsigned int i=0; i < len; i++) {
+        if (m_cx == SWFCxForm()) return;
+        for (size_t i = 0; i < len; ++i) {
             m_cx.transform(span->r, span->g, span->b, span->a);
             span->premultiply();
             ++span;
@@ -381,7 +379,7 @@ public:
 private:
 
     // Color transform
-    gnash::SWFCxForm m_cx;
+    SWFCxForm m_cx;
 
     // Pixel access
     agg::rendering_buffer m_rbuf;
@@ -436,8 +434,8 @@ public:
     }
 
     /// Adds a new bitmap fill style
-    void add_bitmap(const agg_bitmap_info* bi, const gnash::SWFMatrix& mat,
-        const gnash::SWFCxForm& cx, bool repeat, bool smooth) {
+    void add_bitmap(const agg_bitmap_info* bi, const SWFMatrix& mat,
+        const SWFCxForm& cx, bool repeat, bool smooth) {
 
         if (!bi) {
             add_color(agg::rgba8_pre(0,0,0,0));
@@ -454,8 +452,8 @@ public:
     } 
 
     template<typename T>
-    void addLinearGradient(const GradientFill& fs, const gnash::SWFMatrix& mat,
-            const gnash::SWFCxForm& cx)
+    void addLinearGradient(const GradientFill& fs, const SWFMatrix& mat,
+            const SWFCxForm& cx)
     {
         // NOTE: The value 256 is based on the bitmap texture used by other
         // Gnash renderers which is normally 256x1 pixels for linear gradients.
@@ -464,8 +462,8 @@ public:
     }
     
     template<typename T>
-    void addFocalGradient(const GradientFill& fs, const gnash::SWFMatrix& mat,
-            const gnash::SWFCxForm& cx)
+    void addFocalGradient(const GradientFill& fs, const SWFMatrix& mat,
+            const SWFCxForm& cx)
     {
         // move the center of the radial fill to where it should be
         SWFMatrix transl;
@@ -484,8 +482,8 @@ public:
     }
     
     template<typename T>
-    void addRadialGradient(const GradientFill& fs, const gnash::SWFMatrix& mat,
-            const gnash::SWFCxForm& cx)
+    void addRadialGradient(const GradientFill& fs, const SWFMatrix& mat,
+            const SWFCxForm& cx)
     {
         // move the center of the radial fill to where it should be
         SWFMatrix transl;
@@ -522,8 +520,8 @@ public:
     /// @tparam Filter      The FilterType to use. This affects scaling
     ///                     quality, pixel type etc.
     template<typename Filter> void
-    addBitmap(const agg_bitmap_info* bi, const gnash::SWFMatrix& mat,
-            const gnash::SWFCxForm& cx)
+    addBitmap(const agg_bitmap_info* bi, const SWFMatrix& mat,
+            const SWFCxForm& cx)
     {
         typedef typename Filter::PixelFormat PixelFormat;
         typedef typename Filter::Generator Generator;

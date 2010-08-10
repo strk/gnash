@@ -31,19 +31,13 @@ namespace gnash {
 using boost::uint8_t;
 using boost::int16_t;
 
-SWFCxForm::SWFCxForm()
-// Initialize to identity transform.    
-{
-    ra = ga = ba = aa = 256;
-    rb = gb = bb = ab = 0;
-}
-
 // Concatenate SWFCxForm c onto ours.  When
 // transforming colors, c's transform is applied
 // first, then ours.  
-void    SWFCxForm::concatenate(const SWFCxForm& c)  
+void
+SWFCxForm::concatenate(const SWFCxForm& c)  
 {
-	// enbrace all the overflows intentionally.
+	// embrace all the overflows intentionally.
     rb += (ra * c.rb >> 8);
     gb += (ga * c.gb >> 8);
     bb += (ba * c.bb >> 8);
@@ -56,17 +50,19 @@ void    SWFCxForm::concatenate(const SWFCxForm& c)
 }
 
 
-rgba    SWFCxForm::transform(const rgba& in) const
-// Apply our transform to the given color; return the result.
+rgba
+SWFCxForm::transform(const rgba& in) const
 {
-    rgba    result(in.m_r, in.m_g, in.m_b, in.m_a);
+    rgba result(in.m_r, in.m_g, in.m_b, in.m_a);
     
     transform(result.m_r, result.m_g, result.m_b, result.m_a);
     return result;
 }
 
 // transform the given color with our SWFCxForm.
-void    SWFCxForm::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const
+void
+SWFCxForm::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b,
+        boost::uint8_t& a) const
 {
     // force conversion to int16 first, kind of optimization.
     int16_t rt = (int16_t)r;
@@ -85,7 +81,8 @@ void    SWFCxForm::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_
     a = (uint8_t)(clamp<int16_t>(at, 0, 255));
 }
 
-void    SWFCxForm::read_rgb(SWFStream& in)
+void
+SWFCxForm::read_rgb(SWFStream& in)
 {
     in.align();
 
@@ -124,7 +121,8 @@ void    SWFCxForm::read_rgb(SWFStream& in)
     }
 }
 
-void    SWFCxForm::read_rgba(SWFStream& in)
+void
+SWFCxForm::read_rgba(SWFStream& in)
 {
     in.align();
 
@@ -163,16 +161,8 @@ void    SWFCxForm::read_rgba(SWFStream& in)
     }
 }
 
-std::string
-SWFCxForm::toString() const
-{
-    std::stringstream ss;
-    ss << *this;
-    return ss.str();
-}
-
 std::ostream&
-operator<< (std::ostream& os, const SWFCxForm& cx) 
+operator<<(std::ostream& os, const SWFCxForm& cx) 
 {
     // For integers up to 256
     const short fieldWidth = 3;
@@ -194,28 +184,8 @@ operator<< (std::ostream& os, const SWFCxForm& cx)
     return os;
 }
 
-bool    SWFCxForm::is_identity() const
-// Returns true when the SWFCxForm equals identity (no transform)
-{      
-    return 
-        ra == 256 &&
-        rb == 0   &&
-        ga == 256 &&
-        gb == 0   &&
-        ba == 256 &&
-        bb == 0   &&
-        aa == 256 &&
-        ab == 0;
-}
 
-bool    SWFCxForm::is_invisible() const
-// Returns true when the SWFCxForm leads to alpha == 0
-{
-    return (255 * aa >> 8) + ab == 0;    
-}
-
-
-}   // end namespace gnash
+} // namespace gnash
 
 
 // Local Variables:

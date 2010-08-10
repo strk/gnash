@@ -22,7 +22,7 @@
 
 #include <string>
 #include <iosfwd>
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <boost/cstdint.hpp> 
 
 namespace gnash {
 	class rgba;
@@ -31,22 +31,33 @@ namespace gnash {
 
 namespace gnash {
 
-/// Color Transformation Record
+/// Color transformation record
 class DSOEXPORT SWFCxForm
 {
 public:
 
+    /// Construct an identity CxForm
+    SWFCxForm()
+        :
+        ra(256),
+        ga(256),
+        ba(256),
+        aa(256),
+        rb(0),
+        gb(0),
+        bb(0),
+        ab(0)
+    {
+    }
+
     boost::int16_t ra; // RedMultTerm,   8.8 fixed point
-    boost::int16_t rb; // RedAddTerm,    16 bit integer(no fraction)
     boost::int16_t ga; // GreenMultTerm  8.8 fixed point
-    boost::int16_t gb; // GreenAddTerm   16 bit integer(no fraction)
     boost::int16_t ba; // BlueMultTerm   8.8 fixed point
-    boost::int16_t bb; // BlueAddTerm    16 bit integer(no fraction)
     boost::int16_t aa; // AlphaMultTerm  8.8 fixed point
+    boost::int16_t rb; // RedAddTerm,    16 bit integer(no fraction)
+    boost::int16_t gb; // GreenAddTerm   16 bit integer(no fraction)
+    boost::int16_t bb; // BlueAddTerm    16 bit integer(no fraction)
     boost::int16_t ab; // AlphaAddTerm   16 bit integer(no fraction)
-    
-    /// Initialize to the identity color transform (no transform)
-    SWFCxForm();
     
     /// Concatenate SWFCxForm c onto ours. 
     //
@@ -59,41 +70,8 @@ public:
     rgba transform(const rgba& in) const;
     
     /// Transform the given color.
-    void transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const;    
-
-	/// Store the SWFCxForm record to an external array.
-    void  store_to(boost::int16_t * dst) const
-    {
-        *dst++ = ra; *dst++ = rb; 
-        *dst++ = ga; *dst++ = gb; 
-        *dst++ = ba; *dst++ = bb; 
-        *dst++ = aa; *dst++ = ab; 
-    }
-
-	/// Load an SWFCxForm record from an external array.
-    SWFCxForm & load_from(float * src)
-    {
-    	// enbrace the overflows intentionally.
-        ra = static_cast<boost::int16_t>((*src++) * 2.56f);
-        rb = static_cast<boost::int16_t>(*src++);
-        ga = static_cast<boost::int16_t>((*src++) * 2.56f);
-        gb = static_cast<boost::int16_t>(*src++);
-        ba = static_cast<boost::int16_t>((*src++) * 2.56f);
-        bb = static_cast<boost::int16_t>(*src++);
-        aa = static_cast<boost::int16_t>((*src++) * 2.56f);
-        ab = static_cast<boost::int16_t>(*src++);
-        return *this;
-    }
-    
-    /// Returns true when the SWFCxForm equals identity (no transform).
-    bool is_identity() const;
-    
-    /// Returns true when the SWFCxForm leads to alpha == 0
-    //
-    /// Not the _alpha property, but the visible alpha related to dislpay. 
-    /// The two might be completely diffrent. eg. mc._alpha ranges in [-32768, 32767]
-    /// But the alpha on screen ranges in [0, 255]
-    bool is_invisible() const;
+    void transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b,
+            boost::uint8_t& a) const;    
     
     /// Read RGB from the SWF input stream.
     void read_rgb(SWFStream& in);
@@ -101,27 +79,19 @@ public:
     /// Read RGBA from the SWF input stream.
     void read_rgba(SWFStream& in);
 
-    friend bool operator== (const SWFCxForm&, const SWFCxForm&);
-    friend bool operator!= (const SWFCxForm&, const SWFCxForm&);
-	
-    friend std::ostream& operator<< (std::ostream& os, const SWFCxForm& cx);
-
-	std::string toString() const;
-
 };
 
-
 inline bool
-operator== (const SWFCxForm& a, const SWFCxForm& b)
+operator==(const SWFCxForm& a, const SWFCxForm& b)
 {
-	return	a.ra == b.ra &&
-            a.rb == b.rb &&
-            a.ga == b.ga &&
-            a.gb == b.gb &&
-            a.ba == b.ba &&
-            a.bb == b.bb &&
-            a.aa == b.aa &&
-            a.ab == b.ab;
+	return a.ra == b.ra &&
+           a.rb == b.rb &&
+           a.ga == b.ga &&
+           a.gb == b.gb &&
+           a.ba == b.ba &&
+           a.bb == b.bb &&
+           a.aa == b.aa &&
+           a.ab == b.ab;
 }
 
 inline bool
@@ -130,9 +100,22 @@ operator!=(const SWFCxForm& a, const SWFCxForm& b)
     return !(a == b);
 }
 
-}	// namespace gnash
+/// Returns true when the SWFCxForm leads to alpha == 0
+//
+/// Not the _alpha property, but the visible alpha related to dislpay. 
+/// The two might be completely different. eg. mc._alpha ranges in
+/// [-32768, 32767], but the alpha on screen ranges in [0, 255]
+inline bool
+invisible(const SWFCxForm& cx)
+{
+    return (255 * cx.aa >> 8) + cx.ab == 0;    
+}
 
-#endif // GNASHCXFORM_H
+std::ostream& operator<<(std::ostream& os, const SWFCxForm& cx);
+
+} // namespace gnash
+
+#endif 
 
 
 // Local Variables:
