@@ -42,6 +42,7 @@
 #include "movie_definition.h"
 #include "Transform.h"
 #include "ASConversions.h"
+#include "flash/geom/ColorTransform_as.h"
 
 namespace gnash {
 

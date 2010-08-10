@@ -16,25 +16,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
-
 
 #include "Transform_as.h"
-#include "as_object.h" // for inheritance
+
+#include <sstream>
+
+#include "as_object.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "smart_ptr.h" 
+#include "builtin_function.h" 
+#include "GnashException.h"
 #include "VM.h"
-#include "MovieClip.h" // For MovieClip
+#include "MovieClip.h"
 #include "ColorTransform_as.h"
-#include "GnashNumeric.h"
 #include "ASConversions.h"
-
+#include "GnashNumeric.h"
 #include "namedStrings.h"
-#include <sstream>
 
 namespace gnash {
 
