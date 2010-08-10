@@ -57,6 +57,11 @@
 #include "StreamProvider.h"
 #include "RunResources.h"
 
+#ifdef RENDERER_AGG
+#include "Renderer.h"
+#include "Renderer_agg.h"
+#endif
+
 extern "C"{
 #ifdef HAVE_GETOPT_H
 	#include <getopt.h>
@@ -362,6 +367,12 @@ main(int argc, char *argv[])
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
 
+#ifdef RENDERER_AGG
+    boost::shared_ptr<Renderer_agg_base> r(create_Renderer_agg("RGBA32"));
+    unsigned char buf[1];
+    r->init_buffer(buf, 1, 1, 1, 1);
+#endif
+
     // Play through all the movies.
     for (std::vector<std::string>::const_iterator i = infiles.begin(), 
             e = infiles.end(); i != e; ++i)
@@ -372,6 +383,9 @@ main(int argc, char *argv[])
         runResources.setMediaHandler(mediaHandler);
         runResources.setStreamProvider(sp);
         runResources.setTagLoaders(loaders);
+#ifdef RENDERER_AGG
+        runResources.setRenderer(r);
+#endif
 
 	    bool success = play_movie(*i, runResources);
 	    if (!success) {

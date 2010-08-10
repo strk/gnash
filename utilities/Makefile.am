@@ -28,6 +28,7 @@ GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
+	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
 if LIBLTDL2
