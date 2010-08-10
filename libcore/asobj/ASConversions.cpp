@@ -72,4 +72,34 @@ toSWFMatrix(as_object& m)
 
 }
 
+SWFCxForm
+toCxForm(as_object& o)
+{
+    string_table& st = getStringTable(o);
+
+    const as_value& am = o.getMember(st.find("alphaMultiplier"));
+    const as_value& ao = o.getMember(st.find("alphaOffset"));
+    const as_value& bm = o.getMember(st.find("blueMultiplier"));
+    const as_value& bo = o.getMember(st.find("blueOffset"));
+    const as_value& gm = o.getMember(st.find("greenMultiplier"));
+    const as_value& go = o.getMember(st.find("greenOffset"));
+    const as_value& rm = o.getMember(st.find("redMultiplier"));
+    const as_value& ro = o.getMember(st.find("redOffset"));
+
+    SWFCxForm cx;
+
+    const size_t factor = 256;
+
+    cx.aa = toInt(am) * factor;
+    cx.ra = toInt(rm) * factor;
+    cx.ba = toInt(bm) * factor;
+    cx.ga = toInt(gm) * factor;
+    cx.ab = toInt(ao);
+    cx.rb = toInt(ro);
+    cx.bb = toInt(bo);
+    cx.gb = toInt(go);
+    return cx;
+
+}
+
 } // namespace gnash 

@@ -325,6 +325,10 @@ bitmapdata_draw(const fn_call& fn)
         as_object* o = fn.arg(1).to_object(getGlobal(fn));
         if (o) t.matrix = toSWFMatrix(*o);
     }
+    if (fn.nargs > 2) {
+        as_object* o = fn.arg(2).to_object(getGlobal(fn));
+        if (o) t.colorTransform = toCxForm(*o);
+    }
 
     ptr->draw(*mc, t);
 	return as_value();

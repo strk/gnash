@@ -31,6 +31,7 @@
 #include "MovieClip.h" // For MovieClip
 #include "ColorTransform_as.h"
 #include "GnashNumeric.h"
+#include "ASConversions.h"
 
 #include "namedStrings.h"
 #include <sstream>
@@ -349,24 +350,8 @@ transform_matrix(const fn_call& fn)
         return as_value();
     }
     
-    // TODO: does this have to be an AS matrix or can it be any object
-    // (more likely)? 
-    as_value a, b, c, d, tx, ty;
-    obj->get_member(NSV::PROP_A, &a);
-    obj->get_member(NSV::PROP_B, &b);
-    obj->get_member(NSV::PROP_C, &c);
-    obj->get_member(NSV::PROP_D, &d);
-    obj->get_member(NSV::PROP_TX, &tx);
-    obj->get_member(NSV::PROP_TY, &ty);
 
-    SWFMatrix m;
-    m.sx = a.to_number() * factor;
-    m.shx = b.to_number() * factor;
-    m.shy = c.to_number() * factor;
-    m.sy = d.to_number() * factor;
-    m.set_x_translation(pixelsToTwips(tx.to_number()));
-    m.set_y_translation(pixelsToTwips(ty.to_number()));
-
+    const SWFMatrix m = toSWFMatrix(*obj);
     relay->setMatrix(m);
 
     return as_value();

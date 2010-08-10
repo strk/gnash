@@ -279,6 +279,26 @@ main(int argc, char** argv)
     check_equals(mo, "b.getPixel(74, 94)", "0xffffff");
     check_equals(mo, "b.getPixel(70, 94)", "0xff00ff");
     
+    // Test color transform
+    add_actions(mo,
+            "b = new flash.display.BitmapData(100, 100, false);"
+            "cx = new flash.geom.ColorTransform(0.5, 0, 0, 1, -255, 255, 0, 0);"
+            "trace(cx);"
+            "b.draw(mc1, new flash.geom.Matrix(2, 0, 0, 2, 34, 34), cx);"
+            "_root.createEmptyMovieClip('dynmc87', 333);"
+            "_root.dynmc87._x = 400;"
+            "_root.dynmc87._y = 400;"
+            "_root.dynmc87.attachBitmap(b, 1200);"
+            );
+
+    // Pixel checking
+    // Top left corner is white
+    check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
+    check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
+    // Cyan square is now green.
+    check_equals(mo, "b.getPixel(12, 12)", "0xffffff");
+    check_equals(mo, "b.getPixel(52, 52)", "0xffffff");
+    check_equals(mo, "b.getPixel(56, 56)", "0x00ff00");
     add_actions(mo, "stop();");
 
     // Output movie
