@@ -329,7 +329,6 @@ SWFMatrix::get_rotation() const
 // private
 boost::int64_t
 SWFMatrix::determinant() const
-// Return the 32.32 fixed point determinant of this SWFMatrix.
 {
     // | sx	shy	tx |
     // | shx	sy	ty |   = T. Using the Leibniz formula:
@@ -342,7 +341,8 @@ SWFMatrix::determinant() const
     return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
 }
 
-std::ostream& operator<< (std::ostream& o, const SWFMatrix& m)
+std::ostream&
+operator<<(std::ostream& o, const SWFMatrix& m)
 {
     // 8 digits and a decimal point.
     const short fieldWidth = 9;
