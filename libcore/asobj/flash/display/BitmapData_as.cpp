@@ -125,7 +125,7 @@ BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color)
     if (x >= width() || y >= height()) return;
 
     GnashImage::argb_iterator it = data()->argb_begin() + x * width() + y;
-    const boost::uint32_t val = it.toARGB();
+    const boost::uint32_t val = *it;
     *it = (color & 0xffffff) | (val & 0xff000000);
 }
 
@@ -144,7 +144,7 @@ BitmapData_as::getPixel(size_t x, size_t y) const
     if (x >= width() || y >= height()) return 0;
 
     const size_t pixelIndex = y * width() + x;
-    return (data()->argb_begin() + pixelIndex).toARGB();
+    return *(data()->argb_begin() + pixelIndex);
 
 }
 

@@ -77,16 +77,30 @@ class ARGB
 {
 public:
 
-    ARGB(Iterator i, ImageType t)
+    ARGB(Iterator& i, ImageType t)
         :
         _it(i),
         _t(t)
     {}
     
+    operator boost::uint32_t() const {
+        boost::uint32_t ret = 0xff000000;
+        switch (_t) {
+            case GNASH_IMAGE_RGBA:
+                // alpha
+                ret = *(_it + 3) << 24;
+            case GNASH_IMAGE_RGB:
+                ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
+            default:
+                break;
+        }
+        return ret;
+    }
+    
     /// Writes a 32-bit unsigned value in ARGB byte order to the image
     //
     /// Take note of the different byte order!
-    ARGB& operator=(boost::uint32_t pixel) {
+    const ARGB& operator=(boost::uint32_t pixel) const {
         switch (_t) {
             case GNASH_IMAGE_RGBA:
                 // alpha
@@ -102,8 +116,8 @@ public:
     }
 
 private:
-    Iterator _it;
-    ImageType _t;
+    Iterator& _it;
+    const ImageType _t;
 };
 
 template<typename Iterator, typename Pixel>
@@ -119,29 +133,30 @@ struct pixel_iterator : public boost::iterator_facade<
     pixel_iterator(Iterator it, ImageType t)
         :
         _it(it),
-        _t(t)
+        _t(t),
+        _p(_it, _t)
     {}
- 
-    boost::uint32_t toARGB() const {
-        boost::uint32_t ret = 0xff000000;
-        switch (_t) {
-            case GNASH_IMAGE_RGBA:
-                // alpha
-                ret = *(_it + 3) << 24;
-            case GNASH_IMAGE_RGB:
-                ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
-            default:
-                break;
-        }
-        return ret;
+    
+    pixel_iterator(const pixel_iterator& other)
+        :
+        _it(other._it),
+        _t(other._t),
+        _p(_it, _t)
+    {}
+    
+    pixel_iterator& operator=(const pixel_iterator& other)
+    {
+        _it = other._it;
+        _t = other._t;
+        _p = Pixel(_it, _t);
     }
-
+ 
 private:
 
     friend class boost::iterator_core_access;
 
-    Pixel dereference() const {
-        return Pixel(_it, _t);
+    const Pixel& dereference() const {
+        return _p;
     }
 
     void increment() {
@@ -162,6 +177,7 @@ private:
 
     Iterator _it;
     ImageType _t;
+    Pixel _p;
 };
 
 /// Base class for different types of bitmaps
