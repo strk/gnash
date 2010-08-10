@@ -43,6 +43,7 @@
 #include "Transform.h"
 #include "ASConversions.h"
 #include "flash/geom/ColorTransform_as.h"
+#include "NativeFunction.h"
 
 namespace gnash {
 
@@ -76,6 +77,7 @@ namespace {
     as_value bitmapdata_transparent(const fn_call& fn);
     as_value bitmapdata_width(const fn_call& fn);
     as_value bitmapdata_loadBitmap(const fn_call& fn);
+    as_value bitmapdata_compare(const fn_call& fn);
     as_value bitmapdata_ctor(const fn_call& fn);
 
     void attachBitmapDataInterface(as_object& o);
@@ -236,6 +238,43 @@ bitmapdata_class_init(as_object& where, const ObjectURI& uri)
             get_flash_display_bitmap_data_constructor, flags);
 }
 
+void
+registerBitmapDataNative(as_object& global)
+{
+    VM& vm = getVM(global);
+    vm.registerNative(bitmapdata_getPixel, 1100, 1);
+    vm.registerNative(bitmapdata_setPixel, 1100, 2);
+    vm.registerNative(bitmapdata_fillRect, 1100, 3);
+    vm.registerNative(bitmapdata_copyPixels, 1100, 4);
+    vm.registerNative(bitmapdata_applyFilter, 1100, 5);
+    vm.registerNative(bitmapdata_scroll, 1100, 6);
+    vm.registerNative(bitmapdata_threshold, 1100, 7);
+    vm.registerNative(bitmapdata_draw, 1100, 8);
+    vm.registerNative(bitmapdata_pixelDissolve, 1100, 9);
+    vm.registerNative(bitmapdata_getPixel32, 1100, 10);
+    vm.registerNative(bitmapdata_setPixel32, 1100, 11);
+    vm.registerNative(bitmapdata_floodFill, 1100, 12);
+    vm.registerNative(bitmapdata_getColorBoundsRect, 1100, 13);
+    vm.registerNative(bitmapdata_perlinNoise, 1100, 14);
+    vm.registerNative(bitmapdata_colorTransform, 1100, 15);
+    vm.registerNative(bitmapdata_hitTest, 1100, 16);
+    vm.registerNative(bitmapdata_paletteMap, 1100, 17);
+    vm.registerNative(bitmapdata_merge, 1100, 18);
+    vm.registerNative(bitmapdata_noise, 1100, 19);
+    vm.registerNative(bitmapdata_copyChannel, 1100, 20);
+    vm.registerNative(bitmapdata_clone, 1100, 21);
+    vm.registerNative(bitmapdata_dispose, 1100, 22);
+    vm.registerNative(bitmapdata_generateFilterRect, 1100, 23);
+    vm.registerNative(bitmapdata_compare, 1100, 24);
+    
+    vm.registerNative(bitmapdata_width, 1100, 100);
+    vm.registerNative(bitmapdata_height, 1100, 101);
+    vm.registerNative(bitmapdata_rectangle, 1100, 102);
+    vm.registerNative(bitmapdata_transparent, 1100, 103);
+    
+    vm.registerNative(bitmapdata_loadBitmap, 1100, 40);
+
+}
 
 namespace {
 
@@ -564,6 +603,15 @@ bitmapdata_setPixel32(const fn_call& fn)
 }
 
 as_value
+bitmapdata_compare(const fn_call& fn)
+{
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+as_value
 bitmapdata_threshold(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
@@ -573,17 +621,35 @@ bitmapdata_threshold(const fn_call& fn)
 }
 
 as_value
+bitmapdata_width(const fn_call& fn)
+{
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    
+    // Returns the immutable width of the bitmap or -1 if dispose() has
+    // been called.
+    if (ptr->disposed()) return -1;
+	return as_value(ptr->width());
+}
+
+as_value
 bitmapdata_height(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-
-    // Read-only
-    if (fn.nargs) return as_value();
     
     // Returns the immutable height of the bitmap or -1 if dispose() has
     // been called.
     if (ptr->disposed()) return -1;
 	return as_value(ptr->height());
+}
+
+as_value
+bitmapdata_transparent(const fn_call& fn)
+{
+	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    
+    // Returns whether bitmap is transparent or -1 if dispose() has been called.
+    if (ptr->disposed()) return -1;
+	return as_value(ptr->transparent());
 }
 
 as_value
@@ -607,39 +673,10 @@ bitmapdata_rectangle(const fn_call& fn)
     fn_call::Args args;
     args += 0.0, 0.0, ptr->width(), ptr->height();
 
-    boost::intrusive_ptr<as_object> newRect =
-            constructInstance(*rectCtor, fn.env(), args);
+    as_object* newRect = constructInstance(*rectCtor, fn.env(), args);
 
-    return as_value(newRect.get());
+    return as_value(newRect);
 }
-
-as_value
-bitmapdata_transparent(const fn_call& fn)
-{
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-
-    // Read-only
-    if (fn.nargs) return as_value();
-    
-    // Returns whether bitmap is transparent or -1 if dispose() has been called.
-    if (ptr->disposed()) return -1;
-	return as_value(ptr->transparent());
-}
-
-as_value
-bitmapdata_width(const fn_call& fn)
-{
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-
-    // Read-only
-    if (fn.nargs) return as_value();
-    
-    // Returns the immutable width of the bitmap or -1 if dispose() has
-    // been called.
-    if (ptr->disposed()) return -1;
-	return as_value(ptr->width());
-}
-
 
 as_value
 bitmapdata_loadBitmap(const fn_call& fn)
@@ -743,47 +780,46 @@ bitmapdata_ctor(const fn_call& fn)
 void
 attachBitmapDataInterface(as_object& o)
 {
-    Global_as& gl = getGlobal(o);
-    o.init_member("applyFilter", gl.createFunction(bitmapdata_applyFilter));
-    o.init_member("clone", gl.createFunction(bitmapdata_clone));
-    o.init_member("colorTransform", gl.createFunction(
-                bitmapdata_colorTransform));
-    o.init_member("copyChannel", gl.createFunction(bitmapdata_copyChannel));
-    o.init_member("copyPixels", gl.createFunction(bitmapdata_copyPixels));
-    o.init_member("dispose", gl.createFunction(bitmapdata_dispose));
-    o.init_member("draw", gl.createFunction(bitmapdata_draw));
-    o.init_member("fillRect", gl.createFunction(bitmapdata_fillRect));
-    o.init_member("floodFill", gl.createFunction(bitmapdata_floodFill));
-    o.init_member("generateFilterRect", gl.createFunction(
-                bitmapdata_generateFilterRect));
-    o.init_member("getColorBoundsRect", gl.createFunction(
-                bitmapdata_getColorBoundsRect));
-    o.init_member("getPixel", gl.createFunction(bitmapdata_getPixel));
-    o.init_member("getPixel32", gl.createFunction(bitmapdata_getPixel32));
-    o.init_member("hitTest", gl.createFunction(bitmapdata_hitTest));
-    o.init_member("merge", gl.createFunction(bitmapdata_merge));
-    o.init_member("noise", gl.createFunction(bitmapdata_noise));
-    o.init_member("paletteMap", gl.createFunction(bitmapdata_paletteMap));
-    o.init_member("perlinNoise", gl.createFunction(bitmapdata_perlinNoise));
-    o.init_member("pixelDissolve", gl.createFunction(
-                bitmapdata_pixelDissolve));
-    o.init_member("scroll", gl.createFunction(bitmapdata_scroll));
-    o.init_member("setPixel", gl.createFunction(bitmapdata_setPixel));
-    o.init_member("setPixel32", gl.createFunction(bitmapdata_setPixel32));
-    o.init_member("threshold", gl.createFunction(bitmapdata_threshold));
-    o.init_property("height", bitmapdata_height, bitmapdata_height);
-    o.init_property("rectangle", bitmapdata_rectangle, bitmapdata_rectangle);
-    o.init_property("transparent", bitmapdata_transparent,
-            bitmapdata_transparent);
-    o.init_property("width", bitmapdata_width, bitmapdata_width);
+    const int flags = PropFlags::onlySWF8Up;
+
+    VM& vm = getVM(o);
+    o.init_member("getPixel", vm.getNative(1100, 1));
+    o.init_member("setPixel", vm.getNative(1100, 2));
+    o.init_member("fillRect", vm.getNative(1100, 3));
+    o.init_member("copyPixels", vm.getNative(1100, 4));
+    o.init_member("applyFilter", vm.getNative(1100, 5));
+    o.init_member("scroll", vm.getNative(1100, 6));
+    o.init_member("threshold", vm.getNative(1100, 7));
+    o.init_member("draw", vm.getNative(1100, 8));
+    o.init_member("pixelDissolve", vm.getNative(1100, 9));
+    o.init_member("getPixel32", vm.getNative(1100, 10));
+    o.init_member("setPixel32", vm.getNative(1100, 11));
+    o.init_member("floodFill", vm.getNative(1100, 12));
+    o.init_member("getColorBoundsRect", vm.getNative(1100, 13));
+    o.init_member("perlinNoise", vm.getNative(1100, 14));
+    o.init_member("colorTransform", vm.getNative(1100, 15));
+    o.init_member("hitTest", vm.getNative(1100, 16));
+    o.init_member("paletteMap", vm.getNative(1100, 17));
+    o.init_member("merge", vm.getNative(1100, 18));
+    o.init_member("noise", vm.getNative(1100, 19));
+    o.init_member("copyChannel", vm.getNative(1100, 20));
+    o.init_member("clone", vm.getNative(1100, 21));
+    o.init_member("dispose", vm.getNative(1100, 22));
+    o.init_member("generateFilterRect", vm.getNative(1100, 23));
+    o.init_member("compare", vm.getNative(1100, 24));
+    o.init_readonly_property("width", *vm.getNative(1100, 100), flags);
+    o.init_readonly_property("height", *vm.getNative(1100, 101), flags);
+    o.init_readonly_property("rectangle", *vm.getNative(1100, 102), flags);
+    o.init_readonly_property("transparent", *vm.getNative(1100, 103), flags);
 
 }
 
 void
 attachBitmapDataStaticProperties(as_object& o)
 {
-    Global_as& gl = getGlobal(o);
-    o.init_member("loadBitmap", gl.createFunction(bitmapdata_loadBitmap));
+    VM& vm = getVM(o);
+
+    o.init_member("loadBitmap", vm.getNative(1100, 40));
 
     o.init_member("RED_CHANNEL", 1.0);
     o.init_member("GREEN_CHANNEL", 2.0);

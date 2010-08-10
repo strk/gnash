@@ -160,6 +160,8 @@ private:
 /// Initialize the global BitmapData class
 void bitmapdata_class_init(as_object& where, const ObjectURI& uri);
 
+void registerBitmapDataNative(as_object& global);
+
 } // end of gnash namespace
 
 #endif
