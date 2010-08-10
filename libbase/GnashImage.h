@@ -31,6 +31,7 @@
 #include <memory> 
 #include <boost/iterator/iterator_facade.hpp>
 #include <iterator>
+#include <algorithm>
 
 #include "FileTypes.h"
 #include "log.h"
@@ -77,15 +78,27 @@ class ARGB
 {
 public:
 
+    /// Construct an ARGB pixel helper
     ARGB(Iterator& i, ImageType t)
         :
         _it(i),
         _t(t)
     {}
 
-    /// Standard assignment converts to boost::uint32_t
+    /// Standard assignment simply copies bytes
+    //
+    /// It is assumed that the bytes are in ARGB order (why else would you
+    /// use an argb_iterator?)
     const ARGB& operator=(const ARGB& other) const {
-        *this = +other;
+        switch (_t) {
+            case GNASH_IMAGE_RGBA:
+                // alpha
+                *(_it + 3) = *(other._it + 3);
+            case GNASH_IMAGE_RGB:
+                std::copy(other._it, other._it + 3, _it);
+            default:
+                break;
+        }
         return *this;
     }
     
@@ -130,13 +143,13 @@ private:
 template<typename Iterator, typename Pixel>
 struct pixel_iterator : public boost::iterator_facade<
                             pixel_iterator<Iterator, Pixel>,
-                            boost::uint32_t,
-                            std::random_access_iterator_tag,
-                            Pixel>
+                            const Pixel,
+                            std::random_access_iterator_tag>
 {
 
     typedef std::ptrdiff_t difference_type;
 
+    /// Construct a pixel_iterator
     pixel_iterator(Iterator it, ImageType t)
         :
         _it(it),
@@ -144,6 +157,7 @@ struct pixel_iterator : public boost::iterator_facade<
         _p(_it, _t)
     {}
     
+    /// Copy a pixel_iterator
     pixel_iterator(const pixel_iterator& other)
         :
         _it(other._it),
@@ -151,11 +165,13 @@ struct pixel_iterator : public boost::iterator_facade<
         _p(_it, _t)
     {}
     
+    /// Assign to a pixel_iterator
     pixel_iterator& operator=(const pixel_iterator& other)
     {
         _it = other._it;
         _t = other._t;
         _p = Pixel(_it, _t);
+        return *this;
     }
  
 private:
@@ -168,6 +184,10 @@ private:
 
     void increment() {
         _it += numChannels(_t);
+    }
+    
+    void decrement() {
+        _it -= numChannels(_t);
     }
 
     bool equal(const pixel_iterator& o) const {
@@ -321,7 +341,6 @@ protected:
     /// @param type     The ImageType of the image.
     GnashImage(size_t width, size_t height, ImageType type,
                ImageLocation location = GNASH_IMAGE_CPU);
-
 
     /// The type of the image: RGBA or RGB.
     const ImageType _type;
