@@ -212,17 +212,20 @@ xcheck_equals(mcOld.transform.matrix.toString(), "(a=4, b=0.300000011920929, c=0
 
 // Concatenated transform. Does this make any sense?
 
+// The following group of tests was updated on 2010-08-10 to match
+// FP 9,0,0,115 results (Linux)
+
 conc1 = _root.createEmptyMovieClip("conc1", getNextHighestDepth());
 conc2 = conc1.createEmptyMovieClip("conc2", getNextHighestDepth());
 
 conc1._x = 1.5;
 conc2._x = 0.3;
-xcheck_equals(conc1.transform.concatenatedMatrix.toString(), "(a=0.993750035762787, b=0, c=0, d=0.993750035762787, tx=1.5, ty=2)");
-xcheck_equals(conc2.transform.concatenatedMatrix.toString(), "(a=0.993750035762787, b=0, c=0, d=0.993750035762787, tx=1.75, ty=2)");
+check_equals(conc1.transform.concatenatedMatrix.toString(), "(a=1, b=0, c=0, d=1, tx=1.5, ty=0)");
+xcheck_equals(conc2.transform.concatenatedMatrix.toString(), "(a=1, b=0, c=0, d=1, tx=1.75, ty=0)");
 conc2._width = 3;
 conc1._height = 0.6;
-xcheck_equals(conc1.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=2)");
-xcheck_equals(conc2.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=2)");
+xcheck_equals(conc1.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=0)");
+xcheck_equals(conc2.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=0)");
 
 
 d = _root.createEmptyMovieClip("tar", 600);
@@ -280,6 +283,27 @@ check_equals(btx.rb, 0);
 check_equals(btx.gb, 127);
 check_equals(btx.bb, 0);
 check_equals(btx.ab, 0);
+
+#if 0
+
+ct = {};
+ct.redMultiplier = 1;
+ct.blueMultiplier = 1;
+ct.greenMultiplier = 1;
+ct.alphaMultiplier = 1;
+ct.redOffset = 255;
+ct.blueOffet = 0;
+ct.greenOffset = 255;
+ct.alphaOffset = 0;
+
+tr = d.transform;
+tr.colorTransform = ct;
+d.transform = tr;
+
+ct11 = d.transform.colorTransform;
+check_equals(ct11.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=255, alphaOffset=0)")
+
+#endif
 
 totals(94);
 #endif
