@@ -775,6 +775,11 @@ attachBitmapDataStaticProperties(as_object& o)
 {
     Global_as& gl = getGlobal(o);
     o.init_member("loadBitmap", gl.createFunction(bitmapdata_loadBitmap));
+
+    o.init_member("RED_CHANNEL", 1.0);
+    o.init_member("GREEN_CHANNEL", 2.0);
+    o.init_member("BLUE_CHANNEL", 4.0);
+    o.init_member("ALPHA_CHANNEL", 8.0);
 }
 
 } // anonymous namespace

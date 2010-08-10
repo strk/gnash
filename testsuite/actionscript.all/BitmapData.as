@@ -64,6 +64,11 @@ check(Bitmap.prototype.hasOwnProperty("width"));
 check(Bitmap.prototype.hasOwnProperty("rectangle"));
 check(Bitmap.prototype.hasOwnProperty("transparent"));
 
+check(Bitmap.hasOwnProperty("RED_CHANNEL"));
+check(Bitmap.hasOwnProperty("GREEN_CHANNEL"));
+check(Bitmap.hasOwnProperty("BLUE_CHANNEL"));
+check(Bitmap.hasOwnProperty("ALPHA_CHANNEL"));
+
 check(!Bitmap.prototype.hasOwnProperty('loadBitmap'));
 check(Bitmap.hasOwnProperty('loadBitmap'));
 
@@ -410,6 +415,6 @@ check_equals(b.getPixel(55, 55), 0xff0000);
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(169);
+totals(173);
 
 #endif // OUTPUT_VERSION >= 8
