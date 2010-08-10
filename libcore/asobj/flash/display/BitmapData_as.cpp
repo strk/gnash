@@ -237,6 +237,8 @@ BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
 {
     if (startx >= width() || starty >= height()) return;
 
+    assert(old != fill);
+
     std::queue<std::pair<size_t, size_t> > pixelQueue;
     pixelQueue.push(std::make_pair(startx, starty));
 
@@ -277,7 +279,7 @@ BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
             iterator west(pix - 1);
             const iterator weststop(pix - x);
             while (west != weststop && *west == old) --west;
-            std::fill(west, pix, fill); 
+            std::fill(west + 1, pix, fill); 
             const size_t wdone = (pix - west);
              
             // Add south pixels
@@ -510,7 +512,7 @@ bitmapdata_floodFill(const fn_call& fn)
     const boost::uint32_t fill = toInt(fn.arg(2));
     const boost::uint32_t old = *pixelAt(*ptr, x, y);
 
-    ptr->floodFill(x, y, old, fill);
+    if (fill != old) ptr->floodFill(x, y, old, fill);
     
 	return as_value();
 }
