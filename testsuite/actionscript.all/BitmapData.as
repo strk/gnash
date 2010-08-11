@@ -230,6 +230,8 @@ b.fillRect(new Rectangle(130, 110, 10, 10), 0xff00ff);
 check_equals(b.getPixel(1, 1), 0xffffff);
 check_equals(b.getPixel(135, 105), 0xffffff);
 
+// This is done twice deliberately to make sure Gnash doesn't hang!
+b.floodFill(0, 0, 0);
 b.floodFill(0, 0, 0);
 check_equals(b.getPixel(1, 1), 0x0);
 check_equals(b.getPixel(190, 190), 0x0);

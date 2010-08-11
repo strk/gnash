@@ -514,8 +514,12 @@ bitmapdata_floodFill(const fn_call& fn)
         return as_value();
     }
 
-    const boost::uint32_t fill = toInt(fn.arg(2));
+    const boost::uint32_t fill =
+        static_cast<boost::uint32_t>(toInt(fn.arg(2)))
+        | (ptr->transparent() ? 0 : 0xff000000);
+
     const boost::uint32_t old = *pixelAt(*ptr, x, y);
+    log_debug("Fill: %s, old: %s", fill, old);
 
     if (fill != old) ptr->floodFill(x, y, old, fill);
     
