@@ -78,12 +78,40 @@ main(int argc, char** argv)
 
     SWFMovie_writeExports(mo);
     
+    // For some reason some values are very slightly different, even though
+    // the bytes should be taken directly from the embedded DefineBits tag.
+    // We'd better not worry about it too much; they're very close.
+    add_actions(mo, 
+            // 24-bit RGB checker
+            "near = function(bitmap, x, y, val) {"
+            "   tol = 2;"
+            "   col = bitmap.getPixel(x, y);"
+            "   col_r = (col & 0xff0000) >> 16;"
+            "   col_g = (col & 0xff00) >> 8;"
+            "   col_b = (col & 0xff);"
+            "   val_r = (val & 0xff0000) >> 16;"
+            "   val_g = (val & 0xff00) >> 8;"
+            "   val_b = (val & 0xff);"
+            "   if (Math.abs(col_r - val_r) > tol) return false;"
+            "   if (Math.abs(col_b - val_b) > tol) return false;"
+            "   if (Math.abs(col_g - val_g) > tol) return false;"
+            "   return true;"
+            "};"
+            );
+
     add_actions(mo, 
             "f = flash.display.BitmapData.loadBitmap('img1');");
     check_equals(mo, "typeof(f)", "'object'");
     check_equals(mo, "f.__proto__", "flash.display.BitmapData.prototype");
     check(mo, "f.__proto__ === flash.display.BitmapData.prototype");
     check_equals(mo, "f.transparent", "false");
+
+    // Pixel checking
+    check(mo, "near(f, 1, 1, 0x05)");
+    check(mo, "near(f, 8, 8, 0x010010)");
+    check(mo, "near(f, 12, 12, 0x05030e)");
+    check(mo, "near(f, 52, 52, 0x020109)");
+    check(mo, "near(f, 56, 56, 0x010010)");
 
     // Now do weird things with the class to see what's called where.
     add_actions(mo, 
@@ -103,7 +131,7 @@ main(int argc, char** argv)
             // Works
             "c = o.func('img1');"
 
-            // Doesn't work.
+            // Doesn't work. Not sure why; maybe because 'this' is a level.
             "d = func('img1');"
 
             "o.prototype = backup.prototype;"
@@ -128,18 +156,6 @@ main(int argc, char** argv)
 
     add_actions(mo, "stop();");
     
-#if 0
-    // Pixel checking
-    // Top left corner is white
-    check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
-    check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
-    // Cyan square is now green.
-    check_equals(mo, "b.getPixel(12, 12)", "0xffffff");
-    check_equals(mo, "b.getPixel(52, 52)", "0xffffff");
-    check_equals(mo, "b.getPixel(56, 56)", "0x00ff00");
-    add_actions(mo, "stop();");
-#endif
-
     // Output movie
     puts("Saving " OUTPUT_FILENAME);
     SWFMovie_save(mo, OUTPUT_FILENAME);
