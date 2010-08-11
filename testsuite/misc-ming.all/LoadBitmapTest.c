@@ -113,14 +113,14 @@ main(int argc, char** argv)
 
             );
 
-    check_equals(mo, "typeof(c)", "'object'");
+    xcheck_equals(mo, "typeof(c)", "'object'");
     check_equals(mo, "c.__proto__", "undefined");
-    check_equals(mo, "typeof(d)", "'undefined'");
+    xcheck_equals(mo, "typeof(d)", "'undefined'");
     
     // The __proto__ member is the prototype of the parent object.
-    check_equals(mo, "typeof(e)", "'object'");
+    xcheck_equals(mo, "typeof(e)", "'object'");
     check_equals(mo, "typeof(e.__proto__)", "'object'");
-    check_equals(mo, "e.__proto__", "backup.prototype");
+    xcheck_equals(mo, "e.__proto__", "backup.prototype");
     check_equals(mo, "typeof(e.constructor)", "'function'");
     check(mo, "e.constructor != backup.constructor");
     
