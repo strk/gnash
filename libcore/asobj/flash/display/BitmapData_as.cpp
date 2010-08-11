@@ -257,39 +257,43 @@ BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
         if (*pix != old) continue;
 
         // Go east!
+        iterator east(pix);
         if (x + 1 < width()) {
-            iterator east(pix + 1);
+            ++east;
             const iterator eaststop(pix + (width() - x));
             while (east != eaststop && *east == old) ++east;
             std::fill(pix, east, fill);
-            const size_t edone = (east - pix);
+        }
+        size_t edone = (east - pix);
+        if (!edone) ++edone;
 
-            // Add north pixels
-            if (y > 0) {
-                const size_t ny = y - 1;
-                for (size_t nx = x; nx != (x + edone); ++nx) {
-                    if (*pixelAt(*this, nx, ny) == old) {
-                        pixelQueue.push(std::make_pair(nx, ny));
-                    }
+        // Add north pixels
+        if (y > 0) {
+            const size_t ny = y - 1;
+            for (size_t nx = x; nx != (x + edone); ++nx) {
+                if (*pixelAt(*this, nx, ny) == old) {
+                    pixelQueue.push(std::make_pair(nx, ny));
                 }
             }
         }
 
         // Go west!
+        iterator west(pix);
         if (x > 0) {
-            iterator west(pix - 1);
+            --west;
             const iterator weststop(pix - x);
             while (west != weststop && *west == old) --west;
-            std::fill(west + 1, pix, fill); 
-            const size_t wdone = (pix - west);
-             
-            // Add south pixels
-            if (y + 1 < height()) {
-                const size_t sy = y + 1;
-                for (size_t sx = x; sx != x - wdone; --sx) {
-                    if (*pixelAt(*this, sx, sy) == old) {
-                        pixelQueue.push(std::make_pair(sx, sy));
-                    }
+            std::fill(west + 1, pix, fill);
+        }
+        size_t wdone = (pix - west);
+        if (!wdone) ++wdone;
+         
+        // Add south pixels
+        if (y + 1 < height()) {
+            const size_t sy = y + 1;
+            for (size_t sx = x; sx != x - wdone; --sx) {
+                if (*pixelAt(*this, sx, sy) == old) {
+                    pixelQueue.push(std::make_pair(sx, sy));
                 }
             }
         }
