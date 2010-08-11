@@ -652,8 +652,10 @@ DisplayList::display(Renderer& renderer, const Transform& base)
             
             if (mask->boundsInClippingArea(renderer)) {
 
-                // Note: this is ugly and only necessary because masks are
-                // renderered out of turn.
+                // Note: this is necessary because masks are rendered out of
+                // turn.
+                // Note: this doesn't work for BitmapData.draw, but it's not
+                // clear why. 
                 DisplayObject* p = mask->get_parent();
                 const Transform tr = p ?
                     Transform(p->getWorldMatrix(), p->getWorldCxForm()) :
