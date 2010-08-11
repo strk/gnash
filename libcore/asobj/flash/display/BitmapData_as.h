@@ -32,6 +32,7 @@
 #include "Relay.h"
 #include "CachedBitmap.h"
 #include "GnashImage.h"
+#include "ImageIterators.h"
 
 namespace gnash {
     class as_object;
@@ -52,7 +53,7 @@ class BitmapData_as : public Relay
 {
 public:
 
-    typedef GnashImage::argb_iterator iterator;
+    typedef image::pixel_iterator<image::ARGB> iterator;
 
     /// Construct a BitmapData.
     //
@@ -132,12 +133,12 @@ public:
  
     iterator begin() const {
         assert(!disposed());
-        return data()->argb_begin();
+        return image::begin<image::ARGB>(*data());
     }
     
     iterator end() const {
         assert(!disposed());
-        return data()->argb_end();
+        return image::end<image::ARGB>(*data());
     }
 
 private:

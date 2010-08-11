@@ -99,7 +99,8 @@ BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
     assert(im->width() <= 2880);
     assert(im->width() <= 2880);
 
-    std::fill(im->argb_begin(), im->argb_end(), fillColor | (0xff << 24));
+    std::fill(image::begin<image::ARGB>(*im), image::end<image::ARGB>(*im),
+            fillColor | (0xff << 24));
     
     // If there is a renderer, cache the image there, otherwise we store it.
     Renderer* r = getRunResources(*_owner).renderer();
@@ -813,7 +814,8 @@ bitmapdata_loadBitmap(const fn_call& fn)
 	
     BitmapData_as* ptr;
     if (!isNativeType(newRect, ptr)) { return as_value(); }
-    std::copy(im.argb_begin(), im.argb_end(), ptr->begin());
+    std::copy(image::begin<image::ARGB>(im), image::end<image::ARGB>(im),
+            ptr->begin());
 
 	return as_value(newRect);
 }

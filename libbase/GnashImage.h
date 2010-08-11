@@ -29,9 +29,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
 #include <memory> 
-#include <boost/iterator/iterator_facade.hpp>
-#include <iterator>
-#include <algorithm>
 
 #include "FileTypes.h"
 #include "log.h"
@@ -73,140 +70,6 @@ numChannels(ImageType t)
     }
 }
 
-template<typename Iterator>
-class ARGB
-{
-public:
-
-    /// Construct an ARGB pixel helper
-    ARGB(Iterator& i, ImageType t)
-        :
-        _it(i),
-        _t(t)
-    {}
-
-    /// Standard assignment simply copies bytes
-    //
-    /// It is assumed that the bytes are in ARGB order (why else would you
-    /// use an argb_iterator?)
-    const ARGB& operator=(const ARGB& other) const {
-        switch (_t) {
-            case GNASH_IMAGE_RGBA:
-                // alpha
-                *(_it + 3) = *(other._it + 3);
-            case GNASH_IMAGE_RGB:
-                std::copy(other._it, other._it + 3, _it);
-            default:
-                break;
-        }
-        return *this;
-    }
-    
-    /// Writes a 32-bit unsigned value in ARGB byte order to the image
-    //
-    /// Take note of the different byte order!
-    const ARGB& operator=(boost::uint32_t pixel) const {
-        switch (_t) {
-            case GNASH_IMAGE_RGBA:
-                // alpha
-                *(_it + 3) = (pixel & 0xff000000) >> 24;
-            case GNASH_IMAGE_RGB:
-                *_it = (pixel & 0x00ff0000) >> 16;
-                *(_it + 1) = (pixel & 0x0000ff00) >> 8;
-                *(_it + 2) = (pixel & 0x000000ff);
-            default:
-                break;
-        }
-        return *this;
-    }
-    
-    /// Convert to uint32_t in ARGB order
-    operator boost::uint32_t() const {
-        boost::uint32_t ret = 0xff000000;
-        switch (_t) {
-            case GNASH_IMAGE_RGBA:
-                // alpha
-                ret = *(_it + 3) << 24;
-            case GNASH_IMAGE_RGB:
-                ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
-            default:
-                break;
-        }
-        return ret;
-    }
-
-private:
-    Iterator& _it;
-    const ImageType _t;
-};
-
-template<typename Iterator, typename Pixel>
-struct pixel_iterator : public boost::iterator_facade<
-                            pixel_iterator<Iterator, Pixel>,
-                            const Pixel,
-                            std::random_access_iterator_tag>
-{
-
-    typedef std::ptrdiff_t difference_type;
-
-    /// Construct a pixel_iterator
-    pixel_iterator(Iterator it, ImageType t)
-        :
-        _it(it),
-        _t(t),
-        _p(_it, _t)
-    {}
-    
-    /// Copy a pixel_iterator
-    pixel_iterator(const pixel_iterator& other)
-        :
-        _it(other._it),
-        _t(other._t),
-        _p(_it, _t)
-    {}
-    
-    /// Assign to a pixel_iterator
-    pixel_iterator& operator=(const pixel_iterator& other)
-    {
-        _it = other._it;
-        _t = other._t;
-        _p = Pixel(_it, _t);
-        return *this;
-    }
- 
-private:
-
-    friend class boost::iterator_core_access;
-
-    const Pixel& dereference() const {
-        return _p;
-    }
-
-    void increment() {
-        _it += numChannels(_t);
-    }
-    
-    void decrement() {
-        _it -= numChannels(_t);
-    }
-
-    bool equal(const pixel_iterator& o) const {
-        return o._it == _it;
-    }
-
-    difference_type distance_to(const pixel_iterator& o) const {
-        return (o._it - _it) / static_cast<int>(numChannels(_t));
-    }
-
-    void advance(difference_type n) {
-        _it += n * numChannels(_t);
-    }
-
-    Iterator _it;
-    ImageType _t;
-    Pixel _p;
-};
-
 /// Base class for different types of bitmaps
 //
 /// 1. Bytes are packed in RGB(A) order.
@@ -219,8 +82,6 @@ public:
     typedef boost::scoped_array<value_type> container_type;
     typedef value_type* iterator;
     typedef const value_type* const_iterator;
-
-    typedef pixel_iterator<iterator, ARGB<iterator> > argb_iterator;
 
     virtual ~GnashImage() {}
 
@@ -307,16 +168,6 @@ public:
     /// An iterator to the end of the data.
     const_iterator end() const {
         return begin() + size();
-    }
-
-    /// An iterator to write data in ARGB format to the bitmap
-    argb_iterator argb_begin() {
-        return argb_iterator(begin(), _type);
-    }
-    
-    /// An argb_iterator to the end of the data.
-    argb_iterator argb_end() {
-        return argb_iterator(end(), _type);
     }
 
 protected:

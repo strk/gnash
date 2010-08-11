@@ -44,6 +44,7 @@
 #include "utility.h"
 #include "FillStyle.h"
 #include "Transform.h"
+#include "ImageIterators.h"
 
 #include <cmath>
 #include <cairo/cairo.h>
@@ -151,7 +152,7 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
         boost::uint32_t* start =
             reinterpret_cast<boost::uint32_t*>(_data.get());
         const size_t sz = _width * _height;
-        std::copy(start, start + sz, _image->argb_begin());
+        std::copy(start, start + sz, image::begin<image::ARGB>(*_image));
         return *_image;
     }
 
