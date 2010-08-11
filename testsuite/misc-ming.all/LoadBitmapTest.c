@@ -39,11 +39,7 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc, mc3, mc4, mc5;
     SWFMovieClip dejagnuclip;
-    SWFShape sh;
-    SWFDisplayItem it;
-    SWFFillStyle fill;
     SWFBitmap bp;
     SWFInput inp;
 
@@ -78,18 +74,61 @@ main(int argc, char** argv)
 
     inp = newSWFInput_filename(path);
     bp = (SWFBitmap)newSWFJpegBitmap_fromInput(inp);
-
     SWFMovie_addExport(mo, (SWFBlock)bp, "img1");
 
+    SWFMovie_writeExports(mo);
+    
     add_actions(mo, 
-            "b = flash.display.BitmapData.loadBitmap('img1');"
-            "_root.attachBitmap(b, 67);"
-            "trace(b);"
-            "stop();"
+            "f = flash.display.BitmapData.loadBitmap('img1');");
+    check_equals(mo, "typeof(f)", "'object'");
+    check_equals(mo, "f.__proto__", "flash.display.BitmapData.prototype");
+    check(mo, "f.__proto__ === flash.display.BitmapData.prototype");
+    check_equals(mo, "f.transparent", "false");
+
+    // Now do weird things with the class to see what's called where.
+    add_actions(mo, 
+
+            // A static property of an object
+            "o = {};"
+            "ASSetPropFlags(o, null, 0, 1);"
+            "o.func = flash.display.BitmapData.loadBitmap;"
+
+            // Plain function
+            "func = flash.display.BitmapData.loadBitmap;"
+
+            // Overwrite flash.display.BitmapData
+            "backup = flash.display.BitmapData;"
+            "_global.flash.display.BitmapData = 67;"
+
+            // Works
+            "c = o.func('img1');"
+
+            // Doesn't work.
+            "d = func('img1');"
+
+            "o.prototype = backup.prototype;"
+            "e = o.func('img1');"
+
+            "_root.attachBitmap(c, 67);"
+
             );
+
+    check_equals(mo, "typeof(c)", "'object'");
+    check_equals(mo, "c.__proto__", "undefined");
+    check_equals(mo, "typeof(d)", "'undefined'");
+    
+    // The __proto__ member is the prototype of the parent object.
+    check_equals(mo, "typeof(e)", "'object'");
+    check_equals(mo, "typeof(e.__proto__)", "'object'");
+    check_equals(mo, "e.__proto__", "backup.prototype");
+    check_equals(mo, "typeof(e.constructor)", "'function'");
+    check(mo, "e.constructor != backup.constructor");
+    
+    add_actions(mo, "_global.flash.display.BitmapData = backup;");
+
+    add_actions(mo, "stop();");
     
 #if 0
-
     // Pixel checking
     // Top left corner is white
     check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
