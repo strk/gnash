@@ -72,6 +72,8 @@ check(Bitmap.hasOwnProperty("ALPHA_CHANNEL"));
 check(!Bitmap.prototype.hasOwnProperty('loadBitmap'));
 check(Bitmap.hasOwnProperty('loadBitmap'));
 
+Rectangle = flash.geom.Rectangle;
+
 //-------------------------------------------------------------
 // Test constructor
 //-------------------------------------------------------------
@@ -214,7 +216,36 @@ check_equals(bmp.getPixel(10, 0), 0x000000ff);
 mc = this.createEmptyMovieClip("mc", this.getNextHighestDepth());
 mc.attachBitmap(bmp, this.getNextHighestDepth());
 
-Rectangle = flash.geom.Rectangle;
+b = new Bitmap(200, 200, false, 0xffffff);
+b.fillRect(new Rectangle(10, 10, 10, 10), 0x00ff00);
+b.fillRect(new Rectangle(50, 20, 10, 10), 0x00ff00);
+b.fillRect(new Rectangle(50, 70, 20, 20), 0x00ff00);
+b.fillRect(new Rectangle(50, 70, 20, 20), 0x00ff00);
+
+b.fillRect(new Rectangle(120, 100, 10, 10), 0x0000ff);
+b.fillRect(new Rectangle(130, 90, 10, 10), 0xffff00);
+b.fillRect(new Rectangle(140, 100, 10, 10), 0x00ffff);
+b.fillRect(new Rectangle(130, 110, 10, 10), 0xff00ff);
+
+check_equals(b.getPixel(1, 1), 0xffffff);
+check_equals(b.getPixel(135, 105), 0xffffff);
+
+b.floodFill(0, 0, 0);
+check_equals(b.getPixel(1, 1), 0x0);
+check_equals(b.getPixel(190, 190), 0x0);
+check_equals(b.getPixel(135, 105), 0xffffff);
+
+b.floodFill(135, 105, 0xee1111);
+check_equals(b.getPixel(1, 1), 0x0);
+check_equals(b.getPixel(190, 190), 0x0);
+check_equals(b.getPixel(135, 105), 0xee1111);
+
+mc2 = this.createEmptyMovieClip("mc2", this.getNextHighestDepth());
+mc2.attachBitmap(b, this.getNextHighestDepth());
+mc2._x = 300;
+mc2._y = 300;
+
+// fillRect
 
 bmp = new Bitmap(20, 20, false);
 r = new Rectangle(2, 2, 5, 5);
@@ -415,6 +446,6 @@ check_equals(b.getPixel(55, 55), 0xff0000);
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(173);
+totals(181);
 
 #endif // OUTPUT_VERSION >= 8
