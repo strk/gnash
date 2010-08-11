@@ -57,10 +57,10 @@ public:
 
     /// Construct a BitmapData.
     //
-    /// The constructor sets the fill colour and the immutable size of the
+    /// The constructor sets the immutable size of the
     /// bitmap, as well as whether it can handle transparency or not.
-	BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
-	              boost::uint32_t fillColor);
+	BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im);
+	
 
     virtual ~BitmapData_as() {}
 

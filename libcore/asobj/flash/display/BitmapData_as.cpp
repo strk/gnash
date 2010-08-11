@@ -90,17 +90,14 @@ namespace {
 
 }
 
-BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
-        boost::uint32_t fillColor)
+BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im)
+   
     :
     _owner(owner),
     _cachedBitmap(0)
 {
     assert(im->width() <= 2880);
     assert(im->width() <= 2880);
-
-    std::fill(image::begin<image::ARGB>(*im), image::end<image::ARGB>(*im),
-            fillColor | (0xff << 24));
     
     // If there is a renderer, cache the image there, otherwise we store it.
     Renderer* r = getRunResources(*_owner).renderer();
@@ -781,6 +778,9 @@ bitmapdata_rectangle(const fn_call& fn)
 as_value
 bitmapdata_loadBitmap(const fn_call& fn)
 {
+    // This is a static method, but still requires a parent object for
+    // the prototype.
+	as_object* ptr = ensure<ValidThis>(fn);
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -804,27 +804,30 @@ bitmapdata_loadBitmap(const fn_call& fn)
     if (!bit) return as_value();
 
     GnashImage& im = bit->image();
-    
-    // If it's not found construction will fail.
-    as_value rectangle(fn.env().find_object("flash.display.BitmapData"));
-    boost::intrusive_ptr<as_function> rectCtor = rectangle.to_function();
+    const size_t width = im.width();
+    const size_t height = im.height();
 
-    if (!rectCtor) {
-        log_error("Failed to construct flash.display.BitmapData!");
-        return -1;
+    if (width > 2880 || height > 2880) {
+        return as_value();
     }
+ 
+    std::auto_ptr<GnashImage> newImage;
+    if (im.type() == GNASH_IMAGE_RGBA) {
+        newImage.reset(new ImageRGBA(width, height));
+    }
+    else {
+        newImage.reset(new ImageRGB(width, height));
+    }
+    
+    // The properties come from the 'this' object.
+    Global_as& gl = getGlobal(fn);
+    as_object* ret = gl.createObject();
+    ret->set_member(NSV::PROP_uuPROTOuu, ptr->getMember(NSV::PROP_PROTOTYPE));
+    
+    newImage->update(im.begin());
+    ret->setRelay(new BitmapData_as(ret, newImage));
 
-    fn_call::Args args;
-    args += im.width(), im.height(), (im.type() == GNASH_IMAGE_RGBA);
-
-    as_object* newRect = constructInstance(*rectCtor, fn.env(), args);
-	
-    BitmapData_as* ptr;
-    if (!isNativeType(newRect, ptr)) { return as_value(); }
-    std::copy(image::begin<image::ARGB>(im), image::end<image::ARGB>(im),
-            ptr->begin());
-
-	return as_value(newRect);
+	return as_value(ret);
 }
 
 
@@ -873,7 +876,10 @@ bitmapdata_ctor(const fn_call& fn)
         im.reset(new ImageRGB(width, height));
     }
 
-    ptr->setRelay(new BitmapData_as(ptr, im, fillColor));
+    std::fill(image::begin<image::ARGB>(*im), image::end<image::ARGB>(*im),
+            fillColor | (0xff << 24));
+
+    ptr->setRelay(new BitmapData_as(ptr, im));
 
 	return as_value(); 
 }
