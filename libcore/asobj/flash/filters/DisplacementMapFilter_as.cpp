@@ -186,7 +186,7 @@ displacementmapfilter_scaleY(const fn_call& fn)
 as_value
 displacementmapfilter_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+	boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
 	obj->setRelay(new DisplacementMapFilter_as);
     return as_value(); 
 }

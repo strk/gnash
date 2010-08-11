@@ -247,7 +247,7 @@ gradientglowfilter_type(const fn_call& fn)
 as_value
 gradientglowfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
     obj->setRelay(new GradientGlowFilter_as);
     return as_value();
 }
