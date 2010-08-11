@@ -651,7 +651,15 @@ DisplayList::display(Renderer& renderer, const Transform& base)
             renderer.begin_submit_mask();
             
             if (mask->boundsInClippingArea(renderer)) {
-                mask->display(renderer, base);
+
+                // Note: this is ugly and only necessary because masks are
+                // renderered out of turn.
+                DisplayObject* p = mask->get_parent();
+                const Transform tr = p ?
+                    Transform(p->getWorldMatrix(), p->getWorldCxForm()) :
+                    Transform();
+
+                mask->display(renderer, tr);
             }
             else mask->omit_display();
               
@@ -700,7 +708,7 @@ DisplayList::display(Renderer& renderer, const Transform& base)
 
         // Push a new mask to the masks stack
     	if (ch->isMaskLayer()) {
-            int clipDepth = ch->get_clip_depth();
+            const int clipDepth = ch->get_clip_depth();
             clipDepthStack.push(clipDepth);
             renderer.begin_submit_mask();
         }
