@@ -238,7 +238,9 @@ BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
 {
     if (startx >= width() || starty >= height()) return;
 
-    assert(old != fill);
+    // We never compare alpha for RGB images.
+    if (!transparent()) fill |= 0xff000000;
+    if (old == fill) return;
 
     std::queue<std::pair<size_t, size_t> > pixelQueue;
     pixelQueue.push(std::make_pair(startx, starty));
@@ -514,14 +516,11 @@ bitmapdata_floodFill(const fn_call& fn)
         return as_value();
     }
 
-    const boost::uint32_t fill =
-        static_cast<boost::uint32_t>(toInt(fn.arg(2)))
-        | (ptr->transparent() ? 0 : 0xff000000);
-
+    const boost::uint32_t fill = toInt(fn.arg(2));
     const boost::uint32_t old = *pixelAt(*ptr, x, y);
-    log_debug("Fill: %s, old: %s", fill, old);
 
-    if (fill != old) ptr->floodFill(x, y, old, fill);
+    // This checks whether the colours are the same.
+    ptr->floodFill(x, y, old, fill);
     
 	return as_value();
 }
