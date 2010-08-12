@@ -290,6 +290,8 @@ TextField::cursorRecord()
 void
 TextField::display(Renderer& renderer, const Transform& base)
 {
+    const DisplayObject::MaskRenderer mr(renderer, *this);
+
     registerTextVariable();
 
     const bool drawBorder = getDrawBorder();

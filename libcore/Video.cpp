@@ -123,6 +123,8 @@ Video::display(Renderer& renderer, const Transform& base)
 {
 	assert(m_def);
 
+    const DisplayObject::MaskRenderer mr(renderer, *this);
+
     const Transform xform = base * transform();
 	const SWFRect& bounds = m_def->bounds();
 

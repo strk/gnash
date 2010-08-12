@@ -645,38 +645,6 @@ DisplayList::display(Renderer& renderer, const Transform& base)
         DisplayObject* ch = *it;
         assert(!ch->isDestroyed());
 
-        DisplayObject* mask = ch->getMask();
-        if (mask && ch->visible() && ! mask->unloaded())
-        {
-            renderer.begin_submit_mask();
-            
-            if (mask->boundsInClippingArea(renderer)) {
-
-                // Note: this is necessary because masks are rendered out of
-                // turn.
-                // Note: this doesn't work for BitmapData.draw, but it's not
-                // clear why. 
-                DisplayObject* p = mask->get_parent();
-                const Transform tr = p ?
-                    Transform(p->getWorldMatrix(), p->getWorldCxForm()) :
-                    Transform();
-
-                mask->display(renderer, tr);
-            }
-            else mask->omit_display();
-              
-            renderer.end_submit_mask();
-            
-            if (ch->boundsInClippingArea(renderer)) {
-                ch->display(renderer, base);
-            }
-            else ch->omit_display();
-              
-            renderer.disable_mask();
-            
-            continue;
-        }
-
         // Don't display dynamic masks
         if (ch->isDynamicMask()) continue;
 

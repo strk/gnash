@@ -1010,7 +1010,28 @@ setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     string_table& st = getStringTable(*getObject(&obj));
     return doSet(st.noCase(key), obj, val);
 }
+    
+DisplayObject::MaskRenderer::MaskRenderer(Renderer& r, const DisplayObject& o)
+    :
+    _renderer(r),
+    _mask(o.visible() && o.getMask() && !o.getMask()->unloaded() ? o.getMask()
+                                                                 : 0)
+{
+    if (!_mask) return;
 
+    _renderer.begin_submit_mask();
+    DisplayObject* p = _mask->get_parent();
+    const Transform tr = p ?
+        Transform(p->getWorldMatrix(), p->getWorldCxForm()) : Transform(); 
+    _mask->display(_renderer, tr);
+    _renderer.end_submit_mask();
+}
+
+DisplayObject::MaskRenderer::~MaskRenderer()
+{
+    if (_mask) _renderer.disable_mask();
+}
+        
 namespace {
 
 as_value

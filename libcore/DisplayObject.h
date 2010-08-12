@@ -962,6 +962,17 @@ public:
 
 protected:
     
+    /// Renderer any dynamic masks
+    class MaskRenderer
+    {
+    public:
+        MaskRenderer(Renderer& r, const DisplayObject& o);
+        ~MaskRenderer();
+    private:
+        Renderer& _renderer;
+        DisplayObject* _mask;
+    };
+
     virtual bool unloadChildren() { return false; }
 
     /// Get the movie_root to which this DisplayObject belongs.

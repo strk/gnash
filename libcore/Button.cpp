@@ -359,6 +359,8 @@ Button::handleFocus() {
 void
 Button::display(Renderer& renderer, const Transform& base)
 {
+    const DisplayObject::MaskRenderer mr(renderer, *this);
+
     const Transform xform = base * transform();
 
     DisplayObjects actChars;
