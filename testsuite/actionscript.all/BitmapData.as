@@ -443,11 +443,126 @@ check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
 check_equals(b.getPixel(55, 55), 0xff0000);
 
+// Test behaviour of BitmapData.draw with masks.
+
+// 1. The MovieClip is drawn with the custom transform
+// 2. The mask is drawn with its current transform
+
+mc = _root.createEmptyMovieClip("mc", 1009);
+a = mc.createEmptyMovieClip("a", 1090);
+b = mc.createEmptyMovieClip("b", 1091);
+
+mask = _root.createEmptyMovieClip("mask", 1150);
+
+with(a) {
+    beginFill(0xff0000);
+    moveTo(0, 0);
+    lineTo(10, 0);
+    lineTo(10, 40);
+    lineTo(0, 40);
+    lineTo(0, 0);
+
+    beginFill(0x00ff00);
+    moveTo(10, 0);
+    lineTo(20, 0);
+    lineTo(20, 40);
+    lineTo(10, 40);
+    lineTo(10, 0);
+
+    beginFill(0x0000ff);
+    moveTo(20, 0);
+    lineTo(30, 0);
+    lineTo(30, 40);
+    lineTo(20, 40);
+    lineTo(20, 0);
+
+};
+
+with(mask) {
+    beginFill(0x000000);
+    moveTo(10, 10);
+    lineTo(20, 10);
+    lineTo(20, 20);
+    lineTo(10, 20);
+    lineTo(10, 10);
+};
+
+// Only for visual checking.
+disp = _root.createEmptyMovieClip("disp", 1300);
+disp._x = 200;
+disp._y = 200;
+
+mc.setMask(mask);
+
+// Mask and MovieClip with neutral transform
+bm = new flash.display.BitmapData(50, 50, false);
+bm.draw(mc);
+
+// A square of the green stripe is visible.
+check_equals(bm.getPixel(5, 5), 0xffffff);
+check_equals(bm.getPixel(5, 15), 0xffffff);
+check_equals(bm.getPixel(5, 25), 0xffffff);
+check_equals(bm.getPixel(15, 5), 0xffffff);
+check_equals(bm.getPixel(15, 15), 0x00ff00);
+check_equals(bm.getPixel(15, 25), 0xffffff);
+check_equals(bm.getPixel(25, 5), 0xffffff);
+check_equals(bm.getPixel(25, 15), 0xffffff);
+check_equals(bm.getPixel(25, 25), 0xffffff);
+
+// Mask with neutral transform, MovieClip with different transform
+mc._width = 30;
+mc._height = 200;
+mc._x = -39;
+bm = new flash.display.BitmapData(50, 50, false);
+bm.draw(mc);
+disp.attachBitmap(bm, 400);
+
+// A square of the green stripe is visible.
+check_equals(bm.getPixel(5, 5), 0xffffff);
+check_equals(bm.getPixel(5, 15), 0xffffff);
+check_equals(bm.getPixel(5, 25), 0xffffff);
+check_equals(bm.getPixel(15, 5), 0xffffff);
+check_equals(bm.getPixel(15, 15), 0x00ff00);
+check_equals(bm.getPixel(15, 25), 0xffffff);
+check_equals(bm.getPixel(25, 5), 0xffffff);
+check_equals(bm.getPixel(25, 15), 0xffffff);
+check_equals(bm.getPixel(25, 25), 0xffffff);
+
+// Mask with different transform, MovieClip with different transform
+mask._x = 10;
+bm = new flash.display.BitmapData(50, 50, false);
+bm.draw(mc);
+
+// A square of the blue stripe is visible.
+check_equals(bm.getPixel(5, 5), 0xffffff);
+check_equals(bm.getPixel(5, 15), 0xffffff);
+check_equals(bm.getPixel(5, 25), 0xffffff);
+check_equals(bm.getPixel(15, 5), 0xffffff);
+check_equals(bm.getPixel(15, 15), 0xffffff);
+check_equals(bm.getPixel(15, 25), 0xffffff);
+check_equals(bm.getPixel(25, 5), 0xffffff);
+check_equals(bm.getPixel(25, 15), 0x0000ff);
+check_equals(bm.getPixel(25, 25), 0xffffff);
+
+bm = new flash.display.BitmapData(50, 50, false);
+bm.draw(mc, new flash.geom.Matrix(1, 0, 0, 1, 5, 5));
+
+// A square of the blue stripe is visible.
+check_equals(bm.getPixel(5, 5), 0xffffff);
+check_equals(bm.getPixel(5, 15), 0xffffff);
+check_equals(bm.getPixel(5, 25), 0xffffff);
+check_equals(bm.getPixel(15, 5), 0xffffff);
+check_equals(bm.getPixel(15, 15), 0xffffff);
+check_equals(bm.getPixel(15, 25), 0xffffff);
+check_equals(bm.getPixel(25, 5), 0xffffff);
+check_equals(bm.getPixel(25, 15), 0x0000ff);
+check_equals(bm.getPixel(25, 25), 0xffffff);
+
 
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(181);
+totals(217);
 
 #endif // OUTPUT_VERSION >= 8
