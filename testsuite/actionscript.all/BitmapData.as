@@ -447,6 +447,20 @@ check_equals(b.getPixel(55, 55), 0xff0000);
 
 // 1. The MovieClip is drawn with the custom transform
 // 2. The mask is drawn with its current transform
+near = function(bitmap, x, y, val) {
+   tol = 2;
+   col = bitmap.getPixel(x, y);
+   col_r = (col & 0xff0000) >> 16;
+   col_g = (col & 0xff00) >> 8;
+   col_b = (col & 0xff);
+   val_r = (val & 0xff0000) >> 16;
+   val_g = (val & 0xff00) >> 8;
+   val_b = (val & 0xff);
+   if (Math.abs(col_r - val_r) > tol) return false;
+   if (Math.abs(col_b - val_b) > tol) return false;
+   if (Math.abs(col_g - val_g) > tol) return false;
+   return true;
+};
 
 mc = _root.createEmptyMovieClip("mc", 1009);
 a = mc.createEmptyMovieClip("a", 1090);
@@ -499,15 +513,15 @@ bm = new flash.display.BitmapData(50, 50, false);
 bm.draw(mc);
 
 // A square of the green stripe is visible.
-check_equals(bm.getPixel(5, 5), 0xffffff);
-check_equals(bm.getPixel(5, 15), 0xffffff);
-check_equals(bm.getPixel(5, 25), 0xffffff);
-check_equals(bm.getPixel(15, 5), 0xffffff);
-check_equals(bm.getPixel(15, 15), 0x00ff00);
-check_equals(bm.getPixel(15, 25), 0xffffff);
-check_equals(bm.getPixel(25, 5), 0xffffff);
-check_equals(bm.getPixel(25, 15), 0xffffff);
-check_equals(bm.getPixel(25, 25), 0xffffff);
+check(near(bm, 5, 5, 0xffffff));
+check(near(bm, 5, 15, 0xffffff));
+check(near(bm, 5, 25, 0xffffff));
+check(near(bm, 15, 5, 0xffffff));
+check(near(bm, 15, 15, 0x00ff00));
+check(near(bm, 15, 25, 0xffffff));
+check(near(bm, 25, 5, 0xffffff));
+check(near(bm, 25, 15, 0xffffff));
+check(near(bm, 25, 25, 0xffffff));
 
 // Mask with neutral transform, MovieClip with different transform
 mc._width = 30;
@@ -515,18 +529,19 @@ mc._height = 200;
 mc._x = -39;
 bm = new flash.display.BitmapData(50, 50, false);
 bm.draw(mc);
-disp.attachBitmap(bm, 400);
 
 // A square of the green stripe is visible.
-check_equals(bm.getPixel(5, 5), 0xffffff);
-check_equals(bm.getPixel(5, 15), 0xffffff);
-check_equals(bm.getPixel(5, 25), 0xffffff);
-check_equals(bm.getPixel(15, 5), 0xffffff);
-check_equals(bm.getPixel(15, 15), 0x00ff00);
-check_equals(bm.getPixel(15, 25), 0xffffff);
-check_equals(bm.getPixel(25, 5), 0xffffff);
-check_equals(bm.getPixel(25, 15), 0xffffff);
-check_equals(bm.getPixel(25, 25), 0xffffff);
+check(near(bm, 5, 5, 0xffffff));
+check(near(bm, 5, 15, 0xffffff));
+check(near(bm, 5, 25, 0xffffff));
+check(near(bm, 15, 5, 0xffffff));
+check(near(bm, 15, 15, 0x00ff00));
+check(near(bm, 15, 25, 0xffffff));
+check(near(bm, 25, 5, 0xffffff));
+check(near(bm, 25, 15, 0xffffff));
+check(near(bm, 25, 25, 0xffffff));
+
+disp.attachBitmap(bm, 400);
 
 // Mask with different transform, MovieClip with different transform
 mask._x = 10;
@@ -534,35 +549,36 @@ bm = new flash.display.BitmapData(50, 50, false);
 bm.draw(mc);
 
 // A square of the blue stripe is visible.
-check_equals(bm.getPixel(5, 5), 0xffffff);
-check_equals(bm.getPixel(5, 15), 0xffffff);
-check_equals(bm.getPixel(5, 25), 0xffffff);
-check_equals(bm.getPixel(15, 5), 0xffffff);
-check_equals(bm.getPixel(15, 15), 0xffffff);
-check_equals(bm.getPixel(15, 25), 0xffffff);
-check_equals(bm.getPixel(25, 5), 0xffffff);
-check_equals(bm.getPixel(25, 15), 0x0000ff);
-check_equals(bm.getPixel(25, 25), 0xffffff);
+check(near(bm, 5, 5, 0xffffff));
+check(near(bm, 5, 15, 0xffffff));
+check(near(bm, 5, 25, 0xffffff));
+check(near(bm, 15, 5, 0xffffff));
+check(near(bm, 15, 15, 0xffffff));
+check(near(bm, 15, 25, 0xffffff));
+check(near(bm, 25, 5, 0xffffff));
+check(near(bm, 25, 15, 0x0000ff));
+check(near(bm, 25, 25, 0xffffff));
 
 bm = new flash.display.BitmapData(50, 50, false);
 bm.draw(mc, new flash.geom.Matrix(1, 0, 0, 1, 5, 5));
 
-// A square of the blue stripe is visible.
-check_equals(bm.getPixel(5, 5), 0xffffff);
-check_equals(bm.getPixel(5, 15), 0xffffff);
-check_equals(bm.getPixel(5, 25), 0xffffff);
-check_equals(bm.getPixel(15, 5), 0xffffff);
-check_equals(bm.getPixel(15, 15), 0xffffff);
-check_equals(bm.getPixel(15, 25), 0xffffff);
-check_equals(bm.getPixel(25, 5), 0xffffff);
-check_equals(bm.getPixel(25, 15), 0x0000ff);
-check_equals(bm.getPixel(25, 25), 0xffffff);
+// A bit of the blue and green blue stripe is visible.
+check(near(bm, 5, 5, 0xffffff));
+check(near(bm, 5, 15, 0xffffff));
+check(near(bm, 5, 25, 0xffffff));
+check(near(bm, 15, 5, 0xffffff));
+check(near(bm, 15, 15, 0xffffff));
+check(near(bm, 15, 25, 0xffffff));
+check(near(bm, 25, 5, 0xffffff));
+check(near(bm, 23, 15, 0x00ff00));
+check(near(bm, 25, 15, 0x0000ff));
+check(near(bm, 25, 25, 0xffffff));
 
 
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(217);
+totals(218);
 
 #endif // OUTPUT_VERSION >= 8
