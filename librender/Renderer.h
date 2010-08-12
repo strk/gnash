@@ -157,7 +157,6 @@
 #include "log.h"
 #include "snappingrange.h"
 #include "SWFRect.h"
-#include "SWFMatrix.h"
 
 // Forward declarations.
 namespace gnash {
@@ -596,15 +595,10 @@ public:
     public:
 
         /// Prepare the renderer for internal rendering
-        //
-        /// @param r    The base renderer
-        /// @param im   The image to render to
-        /// @param m    The matrix to use for scaling and translation while
-        ///             rendering.
-        Internal(Renderer& r, GnashImage& im, const SWFMatrix& m)
+        Internal(Renderer& r, GnashImage& im)
             :
             _r(r),
-            _ext(_r.startInternalRender(im, m))
+            _ext(_r.startInternalRender(im))
         {
         }
 
@@ -651,8 +645,7 @@ private:
     /// Implementations are free to return a new renderer if they choose.
     //
     /// @return         0 if the renderer does not support this.
-    virtual Renderer* startInternalRender(GnashImage& buffer,
-            const SWFMatrix& m) = 0;
+    virtual Renderer* startInternalRender(GnashImage& buffer) = 0;
 
     /// Finish internal rendering.
     //

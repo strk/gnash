@@ -979,8 +979,7 @@ private:
 
 public:
       
-    virtual Renderer* startInternalRender(GnashImage& /*im*/,
-            const SWFMatrix& /*m*/) {
+    virtual Renderer* startInternalRender(GnashImage& /*im*/) {
         return 0;
     }
 

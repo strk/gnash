@@ -965,9 +965,7 @@ protected:
     /// Render a dynamic mask for a specified DisplayObject
     //
     /// Dynamic masks are rendered out-of-turn when the object they are masking
-    /// is drawn. Masks are also always rendered with their current transform,
-    /// even when the masked object temporarily has a different transform, 
-    /// e.g. during BitmapData.draw.
+    /// is drawn. 
     //
     /// A MaskRenderer object should be constructed at the beginning of
     /// relevant display() functions; it then takes care of rendering the

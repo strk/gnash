@@ -218,17 +218,14 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
         return;
     }
 
-    Renderer::Internal in(*base, im, transform.matrix);
+    Renderer::Internal in(*base, im);
     Renderer* internal = in.renderer();
     if (!internal) {
         log_debug(_("Current renderer does not support internal rendering"));
         return;
     }
 
-    // We let the renderer handle transform, so draw with a neutral matrix
-    const Transform t(SWFMatrix(), transform.colorTransform);
-
-    mc.draw(*internal, t);
+    mc.draw(*internal, transform);
     updateObjects();
 }
 
