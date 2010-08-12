@@ -218,14 +218,18 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
         return;
     }
 
-    Renderer::Internal in(*base, im);
+    SWFMatrix m = transform.matrix;
+    m.set_translation(m.get_x_translation() / 20., m.get_y_translation() / 20.);
+    Renderer::Internal in(*base, im, m);
     Renderer* internal = in.renderer();
     if (!internal) {
         log_debug(_("Current renderer does not support internal rendering"));
         return;
     }
 
-    mc.draw(*internal, transform);
+    Transform t(SWFMatrix(), transform.colorTransform);
+
+    mc.draw(*internal, t);
     updateObjects();
 }
 

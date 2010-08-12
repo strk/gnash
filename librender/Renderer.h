@@ -157,6 +157,7 @@
 #include "log.h"
 #include "snappingrange.h"
 #include "SWFRect.h"
+#include "SWFMatrix.h"
 
 // Forward declarations.
 namespace gnash {
@@ -595,11 +596,14 @@ public:
     public:
 
         /// Prepare the renderer for internal rendering
-        Internal(Renderer& r, GnashImage& im)
+        Internal(Renderer& r, GnashImage& im, const SWFMatrix& m)
             :
             _r(r),
             _ext(_r.startInternalRender(im))
         {
+            if (!_ext) return;
+            _ext->set_scale(m.get_x_scale(), m.get_y_scale());
+            _ext->set_translation(m.get_x_translation(), m.get_y_translation());
         }
 
         Renderer* renderer() const {
