@@ -19,7 +19,8 @@ NOW := $(shell date "+%Y%m%d")
 
 # this is used for Debian style naming conventions
 NEXT_RELEASE = 0.8.9
-SNAPSHOT_VERSION := $(NEXT_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
+SNAPSHOT_VERSION := $(NEXT_RELEASE)~git.$(BRANCH_REVNO)
+# SNAPSHOT_VERSION := $(NEXT_RELEASE)~git.$(BRANCH_NICK)$(BRANCH_REVNO)
 
 # these is the directories where the snapshot gets built. Sources are
 # in the top level, the build goes in a _build subdirectory
