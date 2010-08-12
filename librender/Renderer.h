@@ -596,14 +596,16 @@ public:
     public:
 
         /// Prepare the renderer for internal rendering
+        //
+        /// @param r    The base renderer
+        /// @param im   The image to render to
+        /// @param m    The matrix to use for scaling and translation while
+        ///             rendering.
         Internal(Renderer& r, GnashImage& im, const SWFMatrix& m)
             :
             _r(r),
-            _ext(_r.startInternalRender(im))
+            _ext(_r.startInternalRender(im, m))
         {
-            if (!_ext) return;
-            _ext->set_scale(m.get_x_scale(), m.get_y_scale());
-            _ext->set_translation(m.get_x_translation(), m.get_y_translation());
         }
 
         Renderer* renderer() const {
@@ -649,7 +651,8 @@ private:
     /// Implementations are free to return a new renderer if they choose.
     //
     /// @return         0 if the renderer does not support this.
-    virtual Renderer* startInternalRender(GnashImage& buffer) = 0;
+    virtual Renderer* startInternalRender(GnashImage& buffer,
+            const SWFMatrix& m) = 0;
 
     /// Finish internal rendering.
     //

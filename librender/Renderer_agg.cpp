@@ -878,7 +878,7 @@ public:
     m_drawing_mask = false;
   }
   
-  virtual Renderer* startInternalRender(GnashImage& im) {
+  virtual Renderer* startInternalRender(GnashImage& im, const SWFMatrix& m) {
 
       std::auto_ptr<Renderer_agg_base> in;
 
@@ -898,6 +898,11 @@ public:
       in->init_buffer(im.begin(), width * height, width, height, stride);
 
       _external.reset(in.release());
+
+      _external->set_scale(m.get_x_scale(), m.get_y_scale());
+      _external->set_translation(twipsToPixels(m.get_x_translation()),
+              twipsToPixels(m.get_y_translation()));
+
       return _external.get();
   }
 

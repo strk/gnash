@@ -55,7 +55,8 @@ public:
 
     void set_invalidated_regions(const InvalidatedRanges& ranges);
       
-    virtual Renderer* startInternalRender(GnashImage& /*im*/) {
+    virtual Renderer* startInternalRender(GnashImage& /*im*/,
+            const SWFMatrix& /*m*/) {
         return 0;
     }
 
