@@ -141,8 +141,8 @@ revno.h: Makefile.in
             if test x"$${status}" = x"0"; then \
               echo "Generating revno.h"; \
               $(RM) -f revno.h; \
-              revno=`(cd $(srcdir) && git describe --tags | cut -d '-' -f 2-3 | tr a- a_)`; \
-              nick=`basename $(top_srcdir)`; \
+              revno="`(cd $(srcdir) && git describe --tags | cut -d '-' -f 2-3 | tr a- a.)`"; \
+              nick="`basename $(top_srcdir) | tr a_ a.`"; \
 	    fi; \
           else \
             revno="${NOW}"; \
