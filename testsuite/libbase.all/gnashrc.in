@@ -105,3 +105,9 @@ set CertDir /test/etc/pki/tls/
 
 # Stage.showMenu ignore behavior
 set ignoreShowMenu false
+
+# Use default renderer
+set Renderer
+
+# Use default media handler
+set MediaHandler

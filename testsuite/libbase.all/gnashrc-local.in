@@ -7,5 +7,8 @@ append blacklist www.gnashdev.org www.wikipedia.de
 
 append localSandboxPath /tmp/gnash
 
-# Use XVideo
-set XVideo true
+# Use arbitrary renderer
+set Renderer fakeRenderer
+
+# Use arbitrary renderer
+set MediaHandler fakeMediaHandler

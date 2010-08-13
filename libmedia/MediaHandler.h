@@ -90,7 +90,7 @@ public:
     /// Create a VideoDecoder for decoding what's specified in the VideoInfo
     //
     /// @param info VideoInfo class with all the info needed to decode
-    ///             the sound correctly.
+    ///             the image stream correctly.
     /// @return     Will always return a valid VideoDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
     virtual std::auto_ptr<VideoDecoder>

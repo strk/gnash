@@ -143,9 +143,8 @@ CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
 	--infodir=/usr/share/info \
 	--disable-testsuite \
 	--disable-rpath \
-	--enable-renderers=agg,cairo \
+	--enable-renderer=agg,cairo \
 	--enable-cygnal \
-	--enable-docbook \
 	--enable-python \
 	--with-plugins-install=system \
 	--disable-dependency-tracking \

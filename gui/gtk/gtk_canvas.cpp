@@ -215,7 +215,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
 #elif defined (RENDERER_CAIRO)
         renderer = "cairo";
 #elif defined (RENDERER_OGL)
-        renderer = "ogl";
+        renderer = "opengl";
 #endif
     }
 
@@ -229,27 +229,36 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
     // Global enable VA-API, if requested
     gnash::vaapi_set_is_enabled(hwaccel == "vaapi");
 #endif
+
     // Use the Cairo renderer. Cairo is also used by GTK2, so using
     // Cairo makes much sense. Unfortunately, our implementation seems
     // to have serious performance issues, although it does work.
-#ifdef RENDERER_CAIRO
     if (renderer == "cairo") {
+#ifdef RENDERER_CAIRO
         canvas->glue.reset(new gnash::GtkCairoGlue);
-    }
+#else
+        boost::format fmt = boost::format("Support for renderer %1% "
+                " was not built") % renderer;
+        throw gnash::GnashException(fmt.str());
 #endif
+    }
 
+    else if (renderer == "opengl") {
 #ifdef RENDERER_OPENGL
-    if (renderer == "opengl") {
         canvas->glue.reset(new gnash::GtkGlExtGlue);
+#else
+        boost::format fmt = boost::format("Support for renderer %1% "
+                " was not built") % renderer;
+        throw gnash::GnashException(fmt.str());
+#endif
+    }
+    else if (renderer == "agg") {
         // Use the AGG software library for rendering. While this runs
         // on any hardware platform, it does have performance issues
         // on low-end platforms without a GPU. So while AGG may render
         // streaming video over a network connection just fine,
         // anything below about 600Mhz CPU may have buffering and
         // rendering performance issues.
-    }
-#endif
-    if (renderer == "agg") {
         // Use LibVva, which works on Nvidia, AT, or Intel 965 GPUs
         // with AGG or OpenGL.
 #ifdef HAVE_VA_VA_H
@@ -267,11 +276,20 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             // Set the hardware acclerator to the next one to try
             // if initializing fails.
         } else 
-#endif
+#endif // HAVE_XV
         {
             canvas->glue.reset(new gnash::GtkAggGlue);
         }
+#else // ndef RENDERER_AGG
+        boost::format fmt = boost::format("Support for renderer %1% "
+                "was not built") % renderer;
+        throw gnash::GnashException(fmt.str());
 #endif
+    }
+    else {
+        boost::format fmt = boost::format("Non-existent renderer %1% "
+            "specified") % renderer;
+        throw gnash::GnashException(fmt.str());
     }
 
     // Initialize the canvas for rendering into
