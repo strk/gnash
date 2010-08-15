@@ -158,6 +158,7 @@ noinst_HEADERS = \
 	ManualClock.h \
 	Bitmap.h \
 	BitmapMovie.h \
+	Transform.h \
 	Button.h \
 	debugger.h \
 	TextField.h \
