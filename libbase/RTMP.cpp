@@ -19,6 +19,7 @@
 #include <cstring>
 #include <cassert>
 #include <cstdio>
+#include <unistd.h>
 
 #include <boost/lexical_cast.hpp>
 
