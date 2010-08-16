@@ -45,6 +45,7 @@
 # include <sys/select.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
+# include <sys/socket.h>
 #endif
 #include "npapi.h"
 #include "npruntime.h"
