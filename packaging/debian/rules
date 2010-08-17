@@ -143,12 +143,11 @@ CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
 	--infodir=/usr/share/info \
 	--disable-testsuite \
 	--disable-rpath \
+	--enable-renderer=agg,cairo \
 	--enable-cygnal \
-	--enable-docbook \
+	--enable-python \
 	--with-plugins-install=system \
 	--disable-dependency-tracking \
-	--enable-python \
-	--enable-sdkinstall \
 	--enable-extensions=all \
 	$(BUILD_FLAGS)
 
@@ -328,8 +327,8 @@ binary-arch: install
 	dh_builddeb
 
 VERSION_DATE = $(shell /bin/date --utc +%0Y%0m%0d.%0k%0M)
-BRANCH_NICK   = `grep "NICK" $(BUILD_DIRECTORY)/bzrversion.h | cut -d '"' -f 2`
-BRANCH_REVNO  = `grep "REVNO" $(BUILD_DIRECTORY)/bzrversion.h | cut -d '"' -f 2`
+BRANCH_NICK   = `grep "NICK" $(BUILD_DIRECTORY)/revno.h | cut -d '"' -f 2`
+BRANCH_REVNO  = `grep "REVNO" $(BUILD_DIRECTORY)/revno.h | cut -d '"' -f 2`
 #VERSION_ID = 0.8.8+bzr.trunk$(VERSION_DATE)
 VERSION_ID = 0.8.8+bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
 get-bzr-source:

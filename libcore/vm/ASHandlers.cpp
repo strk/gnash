@@ -29,8 +29,10 @@
 #include "rc.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"
-#include "swf_function.h"
+#include "NativeFunction.h"
+#include "Function.h"
 #include "as_function.h"
+#include "Function2.h"
 #include "fn_call.h"
 #include "ActionExec.h"
 #include "MovieClip.h"
@@ -221,42 +223,19 @@ namespace {
 }
 
 namespace SWF { 
+
 ActionHandler::ActionHandler()
     :
-    _name("unsupported"),
     _callback(ActionUnsupported),
-    _debug(false),
     _arg_format(ARG_NONE)
 {
 }
 
-ActionHandler::ActionHandler(ActionType type, ActionCallback func)
+ActionHandler::ActionHandler(ActionType type, ActionCallback func,
+        ArgumentType format)
     :
     _type(type),
     _callback(func),
-    _debug(false),
-    _arg_format(ARG_NONE)
-{
-}
-
-ActionHandler::ActionHandler(ActionType type, std::string name,
-                             ActionCallback func)
-    :
-    _type(type),
-    _name(name),
-    _callback(func),
-    _debug(false),
-    _arg_format(ARG_NONE)
-{
-}
-
-ActionHandler::ActionHandler(ActionType type, std::string name,
-                             ActionCallback func, ArgumentType format)
-    :
-    _type(type),
-    _name(name),
-    _callback(func),
-    _debug(false),
     _arg_format(format)
 {
 }
@@ -268,234 +247,182 @@ ActionHandler::execute(ActionExec& thread) const
 }
 
 SWFHandlers::SWFHandlers()
+    :
+    _handlers(255)
 {
 
-    container_type & handlers = get_handlers();
-
-    handlers[ACTION_END] = ActionHandler(ACTION_END,
-             "End", ActionEnd);
-    handlers[ACTION_NEXTFRAME] = ActionHandler(ACTION_NEXTFRAME,
-             "NextFrame", ActionNextFrame);
-    handlers[ACTION_PREVFRAME] =  ActionHandler(ACTION_PREVFRAME,
-             "PreviousFrame", ActionPrevFrame);
-    handlers[ACTION_PLAY] = ActionHandler(ACTION_PLAY,
-             "Play", ActionPlay);
-    handlers[ACTION_STOP] = ActionHandler(ACTION_STOP,
-             "Stop", ActionStop);
-    handlers[ACTION_TOGGLEQUALITY] = ActionHandler(ACTION_TOGGLEQUALITY,
-             "ToggleQuality", ActionToggleQuality);
-    handlers[ACTION_STOPSOUNDS] = ActionHandler(ACTION_STOPSOUNDS,
-             "StopSounds", ActionStopSounds);
-    handlers[ACTION_GOTOFRAME] = ActionHandler(ACTION_GOTOFRAME,
-             "GotoFrame", ActionGotoFrame, ARG_U16);
-    handlers[ACTION_GETURL] = ActionHandler(ACTION_GETURL,
-             "GetUrl", ActionGetUrl, ARG_STR);
-    handlers[ACTION_WAITFORFRAME] = ActionHandler(ACTION_WAITFORFRAME,
-             "WaitForFrame", ActionWaitForFrame, ARG_HEX);
-    handlers[ACTION_SETTARGET] = ActionHandler(ACTION_SETTARGET,
-             "SetTarget", ActionSetTarget, ARG_STR);
-    handlers[ACTION_GOTOLABEL] = ActionHandler(ACTION_GOTOLABEL,
-             "GotoLabel", ActionGotoLabel, ARG_STR);
-    handlers[ACTION_ADD] = ActionHandler(ACTION_ADD,
-             "Add", ActionAdd);
-    handlers[ACTION_SUBTRACT] = ActionHandler(ACTION_SUBTRACT,
-             "Subtract", ActionSubtract);
-    handlers[ACTION_MULTIPLY] = ActionHandler(ACTION_MULTIPLY,
-             "Multiply", ActionMultiply);
-    handlers[ACTION_DIVIDE] = ActionHandler(ACTION_DIVIDE,
-             "Divide", ActionDivide);
-    handlers[ACTION_EQUAL] = ActionHandler(ACTION_EQUAL,
-             "Equal", ActionEqual);
-    handlers[ACTION_LESSTHAN] = ActionHandler(ACTION_LESSTHAN,
-             "LessThan", ActionLessThan);
-    handlers[ACTION_LOGICALAND] = ActionHandler(ACTION_LOGICALAND,
-             "LogicalAnd", ActionLogicalAnd);
-    handlers[ACTION_LOGICALOR] = ActionHandler(ACTION_LOGICALOR,
-             "LogicalOr", ActionLogicalOr);
-    handlers[ACTION_LOGICALNOT] = ActionHandler(ACTION_LOGICALNOT,
-             "LogicalNot", ActionLogicalNot);
-    handlers[ACTION_STRINGEQ] = ActionHandler(ACTION_STRINGEQ,
-             "StringEq", ActionStringEq);
-    handlers[ACTION_STRINGLENGTH] = ActionHandler(ACTION_STRINGLENGTH,
-             "ActionStringLength", ActionStringLength);
-    handlers[ACTION_SUBSTRING] = ActionHandler(ACTION_SUBSTRING,
-             "ActionSubString", ActionSubString);
-    handlers[ACTION_POP] = ActionHandler(ACTION_POP,
-             "ActionPop", ActionPop);
-    handlers[ACTION_INT] = ActionHandler(ACTION_INT,
-             "ActionInt", ActionInt);
-    handlers[ACTION_GETVARIABLE] = ActionHandler(ACTION_GETVARIABLE,
-             "ActionGetVariable", ActionGetVariable);
-    handlers[ACTION_SETVARIABLE] = ActionHandler(ACTION_SETVARIABLE,
-             "ActionSetVariable", ActionSetVariable);
-    handlers[ACTION_SETTARGETEXPRESSION] =
-        ActionHandler(ACTION_SETTARGETEXPRESSION,
-             "ActionSetTargetExpression",
+    _handlers[ACTION_END] = ActionHandler(ACTION_END, ActionEnd);
+    _handlers[ACTION_NEXTFRAME] = ActionHandler(ACTION_NEXTFRAME,
+             ActionNextFrame);
+    _handlers[ACTION_PREVFRAME] =  ActionHandler(ACTION_PREVFRAME,
+             ActionPrevFrame);
+    _handlers[ACTION_PLAY] = ActionHandler(ACTION_PLAY, ActionPlay);
+    _handlers[ACTION_STOP] = ActionHandler(ACTION_STOP, ActionStop);
+    _handlers[ACTION_TOGGLEQUALITY] = ActionHandler(ACTION_TOGGLEQUALITY,
+             ActionToggleQuality);
+    _handlers[ACTION_STOPSOUNDS] = ActionHandler(ACTION_STOPSOUNDS,
+             ActionStopSounds);
+    _handlers[ACTION_GOTOFRAME] = ActionHandler(ACTION_GOTOFRAME,
+             ActionGotoFrame, ARG_U16);
+    _handlers[ACTION_GETURL] = ActionHandler(ACTION_GETURL,
+             ActionGetUrl, ARG_STR);
+    _handlers[ACTION_WAITFORFRAME] = ActionHandler(ACTION_WAITFORFRAME,
+             ActionWaitForFrame, ARG_HEX);
+    _handlers[ACTION_SETTARGET] = ActionHandler(ACTION_SETTARGET,
+             ActionSetTarget, ARG_STR);
+    _handlers[ACTION_GOTOLABEL] = ActionHandler(ACTION_GOTOLABEL,
+             ActionGotoLabel, ARG_STR);
+    _handlers[ACTION_ADD] = ActionHandler(ACTION_ADD, ActionAdd);
+    _handlers[ACTION_SUBTRACT] = ActionHandler(ACTION_SUBTRACT, ActionSubtract);
+    _handlers[ACTION_MULTIPLY] = ActionHandler(ACTION_MULTIPLY, ActionMultiply);
+    _handlers[ACTION_DIVIDE] = ActionHandler(ACTION_DIVIDE, ActionDivide);
+    _handlers[ACTION_EQUAL] = ActionHandler(ACTION_EQUAL, ActionEqual);
+    _handlers[ACTION_LESSTHAN] = ActionHandler(ACTION_LESSTHAN, ActionLessThan);
+    _handlers[ACTION_LOGICALAND] = ActionHandler(ACTION_LOGICALAND,
+             ActionLogicalAnd);
+    _handlers[ACTION_LOGICALOR] = ActionHandler(ACTION_LOGICALOR,
+             ActionLogicalOr);
+    _handlers[ACTION_LOGICALNOT] = ActionHandler(ACTION_LOGICALNOT,
+             ActionLogicalNot);
+    _handlers[ACTION_STRINGEQ] = ActionHandler(ACTION_STRINGEQ,
+             ActionStringEq);
+    _handlers[ACTION_STRINGLENGTH] = ActionHandler(ACTION_STRINGLENGTH,
+             ActionStringLength);
+    _handlers[ACTION_SUBSTRING] = ActionHandler(ACTION_SUBSTRING,
+             ActionSubString);
+    _handlers[ACTION_POP] = ActionHandler(ACTION_POP, ActionPop);
+    _handlers[ACTION_INT] = ActionHandler(ACTION_INT, ActionInt);
+    _handlers[ACTION_GETVARIABLE] = ActionHandler(ACTION_GETVARIABLE,
+             ActionGetVariable);
+    _handlers[ACTION_SETVARIABLE] = ActionHandler(ACTION_SETVARIABLE,
+             ActionSetVariable);
+    _handlers[ACTION_SETTARGETEXPRESSION] =
+        ActionHandler(ACTION_SETTARGETEXPRESSION, 
              ActionSetTargetExpression);
-    handlers[ACTION_STRINGCONCAT] = ActionHandler(ACTION_STRINGCONCAT,
-             "ActionStringConcat", ActionStringConcat);
-    handlers[ACTION_GETPROPERTY] = ActionHandler(ACTION_GETPROPERTY,
-             "ActionGetProperty", ActionGetProperty);
-    handlers[ACTION_SETPROPERTY] = ActionHandler(ACTION_SETPROPERTY,
-             "ActionSetProperty", ActionSetProperty);
-    handlers[ACTION_DUPLICATECLIP] = ActionHandler(ACTION_DUPLICATECLIP,
-             "ActionDuplicateClip", ActionDuplicateClip);
-    handlers[ACTION_REMOVECLIP] = ActionHandler(ACTION_REMOVECLIP,
-             "ActionRemoveClip", ActionRemoveClip);
-    handlers[ACTION_TRACE] = ActionHandler(ACTION_TRACE,
-             "ActionTrace", ActionTrace);
-    handlers[ACTION_STARTDRAGMOVIE] = ActionHandler(ACTION_STARTDRAGMOVIE,
-             "ActionStartDragMovie", ActionStartDragMovie);
-    handlers[ACTION_STOPDRAGMOVIE] = ActionHandler(ACTION_STOPDRAGMOVIE,
-             "ActionStopDragMovie", ActionStopDragMovie);
-    handlers[ACTION_STRINGCOMPARE] = ActionHandler(ACTION_STRINGCOMPARE,
-             "ActionStringCompare", ActionStringCompare);
-    handlers[ACTION_THROW] = ActionHandler(ACTION_THROW,
-             "ActionThrow", ActionThrow);
-    handlers[ACTION_CASTOP] = ActionHandler(ACTION_CASTOP,
-             "ActionCastOp", ActionCastOp);
-    handlers[ACTION_IMPLEMENTSOP] = ActionHandler(ACTION_IMPLEMENTSOP,
-             "ActionImplementsOp", ActionImplementsOp);
-    handlers[ACTION_FSCOMMAND2] = ActionHandler(ACTION_FSCOMMAND2,
-             "ActionFscommand2", ActionFscommand2);
-    handlers[ACTION_RANDOM] = ActionHandler(ACTION_RANDOM,
-             "ActionRandom", ActionRandom);
-    handlers[ACTION_MBLENGTH] = ActionHandler(ACTION_MBLENGTH,
-             "ActionMbLength", ActionMbLength);
-    handlers[ACTION_ORD] = ActionHandler(ACTION_ORD,
-             "ActionOrd", ActionOrd);
-    handlers[ACTION_CHR] = ActionHandler(ACTION_CHR,
-             "ActionChr", ActionChr);
-    handlers[ACTION_GETTIMER] = ActionHandler(ACTION_GETTIMER,
-             "ActionGetTimer", ActionGetTimer);
-    handlers[ACTION_MBSUBSTRING] = ActionHandler(ACTION_MBSUBSTRING,
-             "ActionMbSubString", ActionMbSubString);
-    handlers[ACTION_MBORD] = ActionHandler(ACTION_MBORD,
-             "ActionMbOrd", ActionMbOrd);
-    handlers[ACTION_MBCHR] = ActionHandler(ACTION_MBCHR,
-             "ActionMbChr", ActionMbChr);
-    handlers[ACTION_STRICTMODE] = ActionHandler(ACTION_STRICTMODE,
-             "ActionStrictMode", ActionStrictMode, ARG_U8);
-    handlers[ACTION_WAITFORFRAMEEXPRESSION] =
+    _handlers[ACTION_STRINGCONCAT] = ActionHandler(ACTION_STRINGCONCAT,
+             ActionStringConcat);
+    _handlers[ACTION_GETPROPERTY] = ActionHandler(ACTION_GETPROPERTY,
+             ActionGetProperty);
+    _handlers[ACTION_SETPROPERTY] = ActionHandler(ACTION_SETPROPERTY,
+             ActionSetProperty);
+    _handlers[ACTION_DUPLICATECLIP] = ActionHandler(ACTION_DUPLICATECLIP,
+             ActionDuplicateClip);
+    _handlers[ACTION_REMOVECLIP] = ActionHandler(ACTION_REMOVECLIP,
+             ActionRemoveClip);
+    _handlers[ACTION_TRACE] = ActionHandler(ACTION_TRACE, ActionTrace);
+    _handlers[ACTION_STARTDRAGMOVIE] = ActionHandler(ACTION_STARTDRAGMOVIE,
+             ActionStartDragMovie);
+    _handlers[ACTION_STOPDRAGMOVIE] = ActionHandler(ACTION_STOPDRAGMOVIE,
+             ActionStopDragMovie);
+    _handlers[ACTION_STRINGCOMPARE] = ActionHandler(ACTION_STRINGCOMPARE,
+             ActionStringCompare);
+    _handlers[ACTION_THROW] = ActionHandler(ACTION_THROW, ActionThrow);
+    _handlers[ACTION_CASTOP] = ActionHandler(ACTION_CASTOP, ActionCastOp);
+    _handlers[ACTION_IMPLEMENTSOP] = ActionHandler(ACTION_IMPLEMENTSOP,
+             ActionImplementsOp);
+    _handlers[ACTION_FSCOMMAND2] = ActionHandler(ACTION_FSCOMMAND2,
+             ActionFscommand2);
+    _handlers[ACTION_RANDOM] = ActionHandler(ACTION_RANDOM, ActionRandom);
+    _handlers[ACTION_MBLENGTH] = ActionHandler(ACTION_MBLENGTH, ActionMbLength);
+    _handlers[ACTION_ORD] = ActionHandler(ACTION_ORD, ActionOrd);
+    _handlers[ACTION_CHR] = ActionHandler(ACTION_CHR, ActionChr);
+    _handlers[ACTION_GETTIMER] = ActionHandler(ACTION_GETTIMER, ActionGetTimer);
+    _handlers[ACTION_MBSUBSTRING] = ActionHandler(ACTION_MBSUBSTRING,
+             ActionMbSubString);
+    _handlers[ACTION_MBORD] = ActionHandler(ACTION_MBORD, ActionMbOrd);
+    _handlers[ACTION_MBCHR] = ActionHandler(ACTION_MBCHR, ActionMbChr);
+    _handlers[ACTION_STRICTMODE] = ActionHandler(ACTION_STRICTMODE,
+             ActionStrictMode, ARG_U8);
+    _handlers[ACTION_WAITFORFRAMEEXPRESSION] =
         ActionHandler(ACTION_WAITFORFRAMEEXPRESSION,
-             "ActionWaitForFrameExpression",
              ActionWaitForFrameExpression, ARG_HEX);
-    handlers[ACTION_PUSHDATA] = ActionHandler(ACTION_PUSHDATA,
-             "ActionPushData", ActionPushData, ARG_PUSH_DATA);
-    handlers[ACTION_BRANCHALWAYS] = ActionHandler(ACTION_BRANCHALWAYS,
-             "ActionBranchAlways", ActionBranchAlways, ARG_S16);
-    handlers[ACTION_GETURL2] = ActionHandler(ACTION_GETURL2,
-             "ActionGetUrl2", ActionGetUrl2, ARG_HEX);
-    handlers[ACTION_BRANCHIFTRUE] = ActionHandler(ACTION_BRANCHIFTRUE,
-             "ActionBranchIfTrue", ActionBranchIfTrue, ARG_S16);
-    handlers[ACTION_CALLFRAME] = ActionHandler(ACTION_CALLFRAME,
-             "ActionCallFrame", ActionCallFrame, ARG_HEX);
-    handlers[ACTION_GOTOEXPRESSION] = ActionHandler(ACTION_GOTOEXPRESSION,
-             "ActionGotoExpression",
-             ActionGotoExpression, ARG_HEX);
-    handlers[ACTION_DELETE] = ActionHandler(ACTION_DELETE,
-             "ActionDelete", ActionDelete);
-    handlers[ACTION_DELETE2] = ActionHandler(ACTION_DELETE2,
-             "ActionDelete2", ActionDelete2);
-    handlers[ACTION_VAREQUALS] = ActionHandler(ACTION_VAREQUALS,
-             "ActionVarEquals", ActionVarEquals);
-    handlers[ACTION_CALLFUNCTION] = ActionHandler(ACTION_CALLFUNCTION,
-             "ActionCallFunction", ActionCallFunction);
-    handlers[ACTION_RETURN] = ActionHandler(ACTION_RETURN,
-             "ActionReturn", ActionReturn);
-    handlers[ACTION_MODULO] = ActionHandler(ACTION_MODULO,
-             "ActionModulo", ActionModulo);
-    handlers[ACTION_NEW] = ActionHandler(ACTION_NEW,
-             "ActionNew", ActionNew);
-    handlers[ACTION_VAR] = ActionHandler(ACTION_VAR,
-             "ActionVar", ActionVar);
-    handlers[ACTION_INITARRAY] = ActionHandler(ACTION_INITARRAY,
-             "ActionInitArray", ActionInitArray);
-    handlers[ACTION_INITOBJECT] = ActionHandler(ACTION_INITOBJECT,
-             "ActionInitObject", ActionInitObject);
-    handlers[ACTION_TYPEOF] = ActionHandler(ACTION_TYPEOF,
-             "ActionTypeOf", ActionTypeOf);
-    handlers[ACTION_TARGETPATH] = ActionHandler(ACTION_TARGETPATH,
-             "ActionTargetPath", ActionTargetPath);
-    handlers[ACTION_ENUMERATE] = ActionHandler(ACTION_ENUMERATE,
-             "ActionEnumerate", ActionEnumerate);
-    handlers[ACTION_NEWADD] = ActionHandler(ACTION_NEWADD,
-             "ActionNewAdd", ActionNewAdd);
-    handlers[ACTION_NEWLESSTHAN] = ActionHandler(ACTION_NEWLESSTHAN,
-             "ActionNewLessThan", ActionNewLessThan);
-    handlers[ACTION_NEWEQUALS] = ActionHandler(ACTION_NEWEQUALS,
-             "ActionNewEquals", ActionNewEquals);
-    handlers[ACTION_TONUMBER] = ActionHandler(ACTION_TONUMBER,
-             "ActionToNumber", ActionToNumber);
-    handlers[ACTION_TOSTRING] = ActionHandler(ACTION_TOSTRING,
-             "ActionToString", ActionToString);
-    handlers[ACTION_DUP] = ActionHandler(ACTION_DUP,
-             "ActionDup", ActionDup);
-    handlers[ACTION_SWAP] = ActionHandler(ACTION_SWAP,
-             "ActionSwap", ActionSwap);
-    handlers[ACTION_GETMEMBER] = ActionHandler(ACTION_GETMEMBER,
-             "ActionGetMember", ActionGetMember);
-    handlers[ACTION_SETMEMBER] = ActionHandler(ACTION_SETMEMBER,
-             "ActionSetMember", ActionSetMember);
-    handlers[ACTION_INCREMENT] = ActionHandler(ACTION_INCREMENT,
-             "ActionIncrement", ActionIncrement);
-    handlers[ACTION_DECREMENT] = ActionHandler(ACTION_DECREMENT,
-             "ActionDecrement", ActionDecrement);
-    handlers[ACTION_CALLMETHOD] = ActionHandler(ACTION_CALLMETHOD,
-             "ActionCallMethod", ActionCallMethod);
-    handlers[ACTION_NEWMETHOD] = ActionHandler(ACTION_NEWMETHOD,
-             "ActionNewMethod", ActionNewMethod);
-    handlers[ACTION_INSTANCEOF] = ActionHandler(ACTION_INSTANCEOF,
-             "ActionInstanceOf", ActionInstanceOf);
-    handlers[ACTION_ENUM2] = ActionHandler(ACTION_ENUM2,
-             "ActionEnum2", ActionEnum2);
-    handlers[ACTION_BITWISEAND] = ActionHandler(ACTION_BITWISEAND,
-             "ActionBitwiseAnd", ActionBitwiseAnd);
-    handlers[ACTION_BITWISEOR] = ActionHandler(ACTION_BITWISEOR,
-             "ActionBitwiseOr", ActionBitwiseOr);
-    handlers[ACTION_BITWISEXOR] = ActionHandler(ACTION_BITWISEXOR,
-             "ActionBitwiseXor", ActionBitwiseXor);
-    handlers[ACTION_SHIFTLEFT] = ActionHandler(ACTION_SHIFTLEFT,
-             "ActionShiftLeft", ActionShiftLeft);
-    handlers[ACTION_SHIFTRIGHT] = ActionHandler(ACTION_SHIFTRIGHT,
-             "ActionShiftRight", ActionShiftRight);
-    handlers[ACTION_SHIFTRIGHT2] = ActionHandler(ACTION_SHIFTRIGHT2,
-             "ActionShiftRight2", ActionShiftRight2);
-    handlers[ACTION_STRICTEQ] = ActionHandler(ACTION_STRICTEQ,
-             "ActionStrictEq", ActionStrictEq);
-    handlers[ACTION_GREATER] = ActionHandler(ACTION_GREATER,
-             "ActionGreater", ActionGreater);
-    handlers[ACTION_STRINGGREATER] = ActionHandler(ACTION_STRINGGREATER,
-             "ActionStringGreater", ActionStringGreater);
-    handlers[ACTION_EXTENDS] = ActionHandler(ACTION_EXTENDS,
-             "ActionExtends", ActionExtends);
-    handlers[ACTION_CONSTANTPOOL] = ActionHandler(ACTION_CONSTANTPOOL,
-             "ActionConstantPool", ActionConstantPool,
-             ARG_DECL_DICT);
-    handlers[ACTION_DEFINEFUNCTION2] = ActionHandler(ACTION_DEFINEFUNCTION2,
-             "ActionDefineFunction2", ActionDefineFunction2,
-             ARG_FUNCTION2);
-    handlers[ACTION_TRY] = ActionHandler(ACTION_TRY,
-             "ActionTry", ActionTry, ARG_FUNCTION2);
-    handlers[ACTION_WITH] = ActionHandler(ACTION_WITH,
-             "ActionWith", ActionWith, ARG_U16);
-    handlers[ACTION_DEFINEFUNCTION] = ActionHandler(ACTION_DEFINEFUNCTION,
-             "ActionDefineFunction", ActionDefineFunction,
-             ARG_HEX);
-    handlers[ACTION_SETREGISTER] = ActionHandler(ACTION_SETREGISTER,
-             "ActionSetRegister", ActionSetRegister, ARG_U8);
+    _handlers[ACTION_PUSHDATA] = ActionHandler(ACTION_PUSHDATA, ActionPushData,
+            ARG_PUSH_DATA);
+    _handlers[ACTION_BRANCHALWAYS] = ActionHandler(ACTION_BRANCHALWAYS,
+             ActionBranchAlways, ARG_S16);
+    _handlers[ACTION_GETURL2] = ActionHandler(ACTION_GETURL2, ActionGetUrl2,
+            ARG_HEX);
+    _handlers[ACTION_BRANCHIFTRUE] = ActionHandler(ACTION_BRANCHIFTRUE,
+             ActionBranchIfTrue, ARG_S16);
+    _handlers[ACTION_CALLFRAME] = ActionHandler(ACTION_CALLFRAME,
+            ActionCallFrame, ARG_HEX);
+    _handlers[ACTION_GOTOEXPRESSION] = ActionHandler(ACTION_GOTOEXPRESSION,
+            ActionGotoExpression, ARG_HEX);
+    _handlers[ACTION_DELETE] = ActionHandler(ACTION_DELETE, ActionDelete);
+    _handlers[ACTION_DELETE2] = ActionHandler(ACTION_DELETE2, ActionDelete2);
+    _handlers[ACTION_VAREQUALS] = ActionHandler(ACTION_VAREQUALS,
+            ActionVarEquals);
+    _handlers[ACTION_CALLFUNCTION] = ActionHandler(ACTION_CALLFUNCTION,
+            ActionCallFunction);
+    _handlers[ACTION_RETURN] = ActionHandler(ACTION_RETURN, ActionReturn);
+    _handlers[ACTION_MODULO] = ActionHandler(ACTION_MODULO, ActionModulo);
+    _handlers[ACTION_NEW] = ActionHandler(ACTION_NEW, ActionNew);
+    _handlers[ACTION_VAR] = ActionHandler(ACTION_VAR, ActionVar);
+    _handlers[ACTION_INITARRAY] = ActionHandler(ACTION_INITARRAY,
+            ActionInitArray);
+    _handlers[ACTION_INITOBJECT] = ActionHandler(ACTION_INITOBJECT,
+            ActionInitObject);
+    _handlers[ACTION_TYPEOF] = ActionHandler(ACTION_TYPEOF, ActionTypeOf);
+    _handlers[ACTION_TARGETPATH] = ActionHandler(ACTION_TARGETPATH,
+            ActionTargetPath);
+    _handlers[ACTION_ENUMERATE] = ActionHandler(ACTION_ENUMERATE,
+            ActionEnumerate);
+    _handlers[ACTION_NEWADD] = ActionHandler(ACTION_NEWADD, ActionNewAdd);
+    _handlers[ACTION_NEWLESSTHAN] = ActionHandler(ACTION_NEWLESSTHAN,
+            ActionNewLessThan);
+    _handlers[ACTION_NEWEQUALS] = ActionHandler(ACTION_NEWEQUALS,
+            ActionNewEquals);
+    _handlers[ACTION_TONUMBER] = ActionHandler(ACTION_TONUMBER, ActionToNumber);
+    _handlers[ACTION_TOSTRING] = ActionHandler(ACTION_TOSTRING, ActionToString);
+    _handlers[ACTION_DUP] = ActionHandler(ACTION_DUP, ActionDup);
+    _handlers[ACTION_SWAP] = ActionHandler(ACTION_SWAP, ActionSwap);
+    _handlers[ACTION_GETMEMBER] = ActionHandler(ACTION_GETMEMBER, 
+            ActionGetMember);
+    _handlers[ACTION_SETMEMBER] = ActionHandler(ACTION_SETMEMBER,
+            ActionSetMember);
+    _handlers[ACTION_INCREMENT] = ActionHandler(ACTION_INCREMENT,
+            ActionIncrement);
+    _handlers[ACTION_DECREMENT] = ActionHandler(ACTION_DECREMENT,
+            ActionDecrement);
+    _handlers[ACTION_CALLMETHOD] = ActionHandler(ACTION_CALLMETHOD,
+            ActionCallMethod);
+    _handlers[ACTION_NEWMETHOD] = ActionHandler(ACTION_NEWMETHOD,
+            ActionNewMethod);
+    _handlers[ACTION_INSTANCEOF] = ActionHandler(ACTION_INSTANCEOF,
+            ActionInstanceOf);
+    _handlers[ACTION_ENUM2] = ActionHandler(ACTION_ENUM2, ActionEnum2);
+    _handlers[ACTION_BITWISEAND] = ActionHandler(ACTION_BITWISEAND,
+            ActionBitwiseAnd);
+    _handlers[ACTION_BITWISEOR] = ActionHandler(ACTION_BITWISEOR,
+            ActionBitwiseOr);
+    _handlers[ACTION_BITWISEXOR] = ActionHandler(ACTION_BITWISEXOR,
+            ActionBitwiseXor);
+    _handlers[ACTION_SHIFTLEFT] = ActionHandler(ACTION_SHIFTLEFT,
+            ActionShiftLeft);
+    _handlers[ACTION_SHIFTRIGHT] = ActionHandler(ACTION_SHIFTRIGHT,
+            ActionShiftRight);
+    _handlers[ACTION_SHIFTRIGHT2] = ActionHandler(ACTION_SHIFTRIGHT2,
+            ActionShiftRight2);
+    _handlers[ACTION_STRICTEQ] = ActionHandler(ACTION_STRICTEQ, ActionStrictEq);
+    _handlers[ACTION_GREATER] = ActionHandler(ACTION_GREATER, ActionGreater);
+    _handlers[ACTION_STRINGGREATER] = ActionHandler(ACTION_STRINGGREATER,
+            ActionStringGreater);
+    _handlers[ACTION_EXTENDS] = ActionHandler(ACTION_EXTENDS, ActionExtends);
+    _handlers[ACTION_CONSTANTPOOL] = ActionHandler(ACTION_CONSTANTPOOL,
+            ActionConstantPool, ARG_DECL_DICT);
+    _handlers[ACTION_DEFINEFUNCTION2] = ActionHandler(ACTION_DEFINEFUNCTION2,
+            ActionDefineFunction2, ARG_FUNCTION2);
+    _handlers[ACTION_TRY] = ActionHandler(ACTION_TRY, ActionTry, ARG_FUNCTION2);
+    _handlers[ACTION_WITH] = ActionHandler(ACTION_WITH,
+            ActionWith, ARG_U16);
+    _handlers[ACTION_DEFINEFUNCTION] = ActionHandler(ACTION_DEFINEFUNCTION,
+            ActionDefineFunction, ARG_HEX);
+    _handlers[ACTION_SETREGISTER] = ActionHandler(ACTION_SETREGISTER,
+            ActionSetRegister, ARG_U8);
 }
 
 SWFHandlers::~SWFHandlers()
 {
-}
-
-
-std::vector<ActionHandler> &
-SWFHandlers::get_handlers()
-{
-    static container_type handlers(255);
-    return handlers;
 }
 
 const SWFHandlers&
@@ -509,7 +436,7 @@ void
 SWFHandlers::execute(ActionType type, ActionExec& thread) const
 {
     try {
-        get_handlers()[type].execute(thread);
+        _handlers[type].execute(thread);
     }
     catch (ActionParserException& e) {
         log_swferror(_("Malformed action code: %s"), e.what());
@@ -519,23 +446,6 @@ SWFHandlers::execute(ActionType type, ActionExec& thread) const
 	std::abort();
     }
 }
-
-const char*
-SWFHandlers::action_name(ActionType x) const
-{
-    if (static_cast<size_t>(x) > get_handlers().size())
-    {
-        log_error(_("at SWFHandlers::action_name(%d) call time, "
-                    "_handlers size is %d"),
-                    x, get_handlers().size());
-        return NULL;
-    }
-    else
-    {
-        return get_handlers()[x].getName().c_str();
-    }
-}
-
 
 } // namespace SWF
 
@@ -760,9 +670,7 @@ ActionWaitForFrame(ActionExec& thread)
     // Actually *wait* for target frame, and never skip any action
 
     size_t lastloaded = target_sprite->get_loaded_frames();
-    if ( lastloaded < framenum )
-    {
-        //log_debug(_("%s: frame %u not reached yet (loaded %u for sprite %s), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, target_sprite->getTarget(), skip);
+    if (lastloaded < framenum) {
         // better delegate this to ActionExec
         thread.skip_actions(skip);
     }
@@ -772,7 +680,6 @@ ActionWaitForFrame(ActionExec& thread)
 void
 ActionSetTarget(ActionExec& thread)
 {
-
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
 
@@ -781,7 +688,7 @@ ActionSetTarget(ActionExec& thread)
 #endif
 
     // Change the movie we're working on.
-    std::string target_name ( code.read_string(pc+3) );
+    const std::string target_name(code.read_string(pc+3));
 
     commonSetTarget(thread, target_name);
 }
@@ -789,20 +696,17 @@ ActionSetTarget(ActionExec& thread)
 void
 ActionGotoLabel(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
     const char* frame_label = code.read_string(thread.getCurrentPC()+3);
     DisplayObject *target = env.get_target();
     MovieClip *target_sprite = target ? target->to_movie() : 0;
-    if ( ! target_sprite )
-    {
-        log_error(_("%s: environment target is null or not a MovieClip"),
-            __FUNCTION__);
+    if (!target_sprite) {
+        log_error(_("GotoLabel: environment target is null or not a "
+                    "MovieClip"));
     }
-    else
-    {
+    else {
         target_sprite->goto_labeled_frame(frame_label);
     }
 }
@@ -810,7 +714,6 @@ ActionGotoLabel(ActionExec& thread)
 void
 ActionAdd(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     const double operand2 = env.top(0).to_number();
@@ -830,7 +733,6 @@ ActionSubtract(ActionExec& thread)
 void
 ActionMultiply(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     const double operand2 = env.top(0).to_number();
@@ -847,14 +749,12 @@ ActionMultiply(ActionExec& thread)
 void
 ActionDivide(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     const double operand2 = env.top(0).to_number();
     const double operand1 = env.top(1).to_number();
 
-    if (operand2 == 0)
-    {
+    if (operand2 == 0) {
         if (env.get_version() < 5) {
             env.top(1).set_string("#ERROR#");
         }
@@ -872,8 +772,7 @@ ActionDivide(ActionExec& thread)
         }
 
     }
-    else
-    {
+    else {
         env.top(1) = operand1 / operand2;
     }
     env.drop(1);
@@ -882,7 +781,6 @@ ActionDivide(ActionExec& thread)
 void
 ActionEqual(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -912,7 +810,7 @@ ActionLessThan(ActionExec& thread)
     env.top(1).set_bool(d2 < d1);
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) convertToNumber(env.top(1), getVM(env));
+    if (env.get_version() < 5) convertToNumber(env.top(1), getVM(env));
 
     env.drop(1);
 }
@@ -940,7 +838,6 @@ ActionLogicalOr(ActionExec& thread)
 void
 ActionLogicalNot(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     env.top(0).set_bool(! env.top(0).to_bool());
@@ -952,7 +849,6 @@ ActionLogicalNot(ActionExec& thread)
 void
 ActionStringEq(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     
     const int version = env.get_version();
@@ -987,7 +883,6 @@ ActionStringLength(ActionExec& thread)
 void
 ActionSubString(ActionExec& thread)
 {
-
     // substring("string",  base,  size) 
     // SWF4 function, deprecated in favour of String.substring.
     // 1-based (String object methods are 0-based).
@@ -1004,9 +899,7 @@ ActionSubString(ActionExec& thread)
     const std::wstring wstr = utf8::decodeCanonicalString(
                                 strval.to_string(version), version);
     
-
-    if (size < 0)
-    {
+    if (size < 0) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Negative size passed to ActionSubString, "
             "taking as whole length"));
@@ -1023,8 +916,7 @@ ActionSubString(ActionExec& thread)
 
     // TODO: if 'start' or 'size' do not evaluate to numbers return
     //       the empty string (how do we check if they evaluate ??)
-    if ( start < 1 )
-    {
+    if (start < 1) {
         IF_VERBOSE_ASCODING_ERRORS (
             log_aserror(_("Start is less then 1 in ActionSubString, "
             "setting to 1."));
@@ -1034,8 +926,7 @@ ActionSubString(ActionExec& thread)
 
     // If start is longer than the string length, return empty
     // string
-    else if (static_cast<unsigned int>(start) > wstr.length() )
-    {
+    else if (static_cast<unsigned int>(start) > wstr.length() ) {
         IF_VERBOSE_ASCODING_ERRORS (
             log_aserror(_("Start goes beyond input string in ActionSubString, "
             "returning the empty string."));
@@ -1048,11 +939,10 @@ ActionSubString(ActionExec& thread)
     // Adjust the start for our own use.
     --start;
 
-    if (static_cast<unsigned int>(start + size) > wstr.length())
-    {
+    if (static_cast<unsigned int>(start + size) > wstr.length()) {
         IF_VERBOSE_ASCODING_ERRORS (
-            log_aserror(_("start + size goes beyond input string in ActionSubString, "
-            "adjusting size"));
+            log_aserror(_("start + size goes beyond input string in "
+                    "ActionSubString, adjusting size"));
         );
         size = wstr.length() - start;
     }
@@ -1071,10 +961,7 @@ ActionSubString(ActionExec& thread)
 void
 ActionPop(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-    // this is an overhead only if SWF is malformed.
-    
     env.drop(1);
 }
 
@@ -1088,7 +975,6 @@ ActionInt(ActionExec& thread)
 void
 ActionGetVariable(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     as_value& top_value = env.top(0);
@@ -1125,7 +1011,6 @@ ActionGetVariable(ActionExec& thread)
 void
 ActionSetVariable(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     const std::string& name = env.top(1).to_string();
@@ -1153,11 +1038,9 @@ ActionSetVariable(ActionExec& thread)
     env.drop(2);
 }
 
-// See: http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
 void
 ActionSetTargetExpression(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     // we don't ues the target sprite directly, instead we fetch the
@@ -1190,22 +1073,19 @@ ActionStringConcat(ActionExec& thread)
 void
 ActionGetProperty(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     as_value& tgt_val = env.top(1);
     std::string tgt_str = tgt_val.to_string();
     DisplayObject *target = NULL;
-    if ( tgt_str.empty() )
-    {
+    if (tgt_str.empty()) {
         target = get<DisplayObject>(thread.getTarget());
         if (!target) {
             log_error(_("ActionGetProperty(<empty>) called, but current "
                         "target is not a DisplayObject"));
         }
     }
-    else
-    {
+    else {
         target = env.find_target(tgt_str);
     }
  
@@ -1217,12 +1097,11 @@ ActionGetProperty(ActionExec& thread)
     if (target) {
         getIndexedProperty(prop_number, *target, env.top(1));
     }
-    else
-    {
+    else {
         // ASCODING error ? (well, last time it was a gnash error ;)
-        IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_("Could not find GetProperty target (%s)"),
-                tgt_val);
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Could not find GetProperty target (%s)"),
+                    tgt_val);
         );
         env.top(1) = as_value();
     }
@@ -1232,7 +1111,6 @@ ActionGetProperty(ActionExec& thread)
 void
 ActionSetProperty(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     DisplayObject *target = env.find_target(env.top(2).to_string());
@@ -1245,11 +1123,10 @@ ActionSetProperty(ActionExec& thread)
     if (target) {
         setIndexedProperty(prop_number, *target, prop_val);
     }
-    else
-    {
-        IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_("ActionSetProperty: can't find target %s for setting property %s"),
-            env.top(2), prop_number);
+    else {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("ActionSetProperty: can't find target %s for "
+                    "setting property %s"), env.top(2), prop_number);
         )
     }
     env.drop(3);
@@ -1258,20 +1135,21 @@ ActionSetProperty(ActionExec& thread)
 void
 ActionDuplicateClip(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
     // Movies should be attachable from -16384 to 2130690044. See
     // Tests in misc-ming.all/DepthLimitsTest.c.
-    const double depth = env.top(0).to_number() + DisplayObject::staticDepthOffset;
+    const double depth = env.top(0).to_number() +
+        DisplayObject::staticDepthOffset;
   
     // This also checks for overflow, as both numbers are expressible as
     // boost::int32_t.
     if (depth < DisplayObject::lowerAccessibleBound ||
-      depth > DisplayObject::upperAccessibleBound)
-    {
+      depth > DisplayObject::upperAccessibleBound) {
+
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("duplicateMovieClip: invalid depth %d passed; not duplicating"), depth);
+            log_aserror(_("duplicateMovieClip: invalid depth %d passed; "
+                    "not duplicating"), depth);
         );  
         env.drop(3);
         return;
@@ -1283,10 +1161,10 @@ ActionDuplicateClip(ActionExec& thread)
     const std::string& path = env.top(2).to_string();
 
     DisplayObject* ch = env.find_target(path);
-    if ( ! ch )
-    {
+    if (!ch) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Path given to duplicateMovieClip(%s) doesn't point to a DisplayObject"),
+            log_aserror(_("Path given to duplicateMovieClip(%s) doesn't "
+                    "point to a DisplayObject"),
                 path);
         );
         env.drop(3);
@@ -1294,8 +1172,7 @@ ActionDuplicateClip(ActionExec& thread)
     }
 
     MovieClip* sprite = ch->to_movie();
-    if ( ! sprite )
-    {
+    if (!sprite) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Path given to duplicateMovieClip(%s) is not a sprite"),
             path);
@@ -1311,31 +1188,28 @@ ActionDuplicateClip(ActionExec& thread)
 void
 ActionRemoveClip(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     const std::string path = env.pop().to_string();
 
     DisplayObject* ch = env.find_target(path);
-    if ( ! ch )
-    {
+    if (!ch) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Path given to removeMovieClip(%s) doesn't point to a DisplayObject"),
-            path);
+            log_aserror(_("Path given to removeMovieClip(%s) doesn't "
+                    "point to a DisplayObject"),
+                path);
         );
         return;
     }
 
     MovieClip* sprite = ch->to_movie();
-    if ( ! sprite )
-    {
+    if (!sprite) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Path given to removeMovieClip(%s) is not a sprite"),
             path);
         );
         return;
     }
-
     sprite->removeMovieClip();
 }
 
@@ -1343,9 +1217,7 @@ ActionRemoveClip(ActionExec& thread)
 void
 ActionTrace(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-
     const std::string val = env.pop().to_string();
     
     // Logging with a std::string here fails the swfdec testsuite,
@@ -1365,69 +1237,56 @@ ActionStartDragMovie(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_STARTDRAGMOVIE));
 #endif
 
-    
-
     drag_state st;
-
     DisplayObject* tgt = env.find_target(env.top(0).to_string());
-    if ( tgt )
-    {
+    if (tgt) {
         // mark this DisplayObject as script transformed.
         tgt->transformedByScript();
         st.setCharacter( tgt );
     }
-    else
-    {
+    else {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("startDrag: unknown target '%s'"),
-            env.top(0));
+            log_aserror(_("startDrag: unknown target '%s'"), env.top(0));
         );
     }
 
-    st.setLockCentered( env.top(1).to_bool() );
-    if ( env.top(2).to_bool() ) // has bounds !
-    {
+    st.setLockCentered(env.top(1).to_bool());
+
+    // Handle bounds.
+    if (env.top(2).to_bool()) {
         // strk: this works if we didn't drop any before, in
         // a contrary case (if we used pop(), which I suggest)
         // we must remember to updated this as required
-        
-
         boost::int32_t y1 = pixelsToTwips(env.top(3).to_number());
         boost::int32_t x1 = pixelsToTwips(env.top(4).to_number());
         boost::int32_t y0 = pixelsToTwips(env.top(5).to_number());
         boost::int32_t x0 = pixelsToTwips(env.top(6).to_number());
 
         // check for swapped values
-        if ( y1 < y0 )
-        {
+        if (y1 < y0) {
             IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Y values in ActionStartDrag swapped, fixing"));
+                log_swferror(_("Y values in ActionStartDrag swapped, fixing"));
             );
             std::swap(y1, y0);
         }
 
-        if ( x1 < x0 )
-        {
+        if (x1 < x0) {
             IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("X values in ActionStartDrag swapped, fixing"));
+                log_swferror(_("X values in ActionStartDrag swapped, fixing"));
             );
             std::swap(x1, x0);
         }
-
-        SWFRect bounds(x0, y0, x1, y1);
+        const SWFRect bounds(x0, y0, x1, y1);
         st.setBounds(bounds);
-
         env.drop(4);
     }
 
     env.drop(3);
 
-    if (tgt)
-    {
+    if (tgt) {
         VM& vm = getVM(env);
         vm.getRoot().set_drag_state(st);
     }
-
 }
 
 void
@@ -1821,8 +1680,6 @@ ActionMbSubString(ActionExec& thread)
         );
         size = length - start;
     }
-
-    //log_debug("Adjusted start:%d size:%d", start, size);
 
     if (encoding == ENCGUESS_OTHER)
     {
@@ -3195,13 +3052,11 @@ ActionNewMethod(ActionExec& thread)
         env.push(as_value());
         return;
     }
-
 }
 
 void
 ActionInstanceOf(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
     // Get the "super" function
@@ -3231,7 +3086,6 @@ ActionInstanceOf(ActionExec& thread)
 void
 ActionEnum2(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     // Get the object.
@@ -3260,8 +3114,8 @@ ActionBitwiseAnd(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    int operand1 = toInt(env.top(1));
-    int operand2 = toInt(env.top(0));
+    const int operand1 = toInt(env.top(1));
+    const int operand2 = toInt(env.top(0));
 
     env.top(1) = operand1 & operand2;
     env.drop(1);
@@ -3270,11 +3124,10 @@ ActionBitwiseAnd(ActionExec& thread)
 void
 ActionBitwiseOr(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
 
-    int operand1 = toInt(env.top(1));
-    int operand2 = toInt(env.top(0));
+    const int operand1 = toInt(env.top(1));
+    const int operand2 = toInt(env.top(0));
 
     env.top(1) = operand1|operand2;
     env.drop(1);
@@ -3283,11 +3136,10 @@ ActionBitwiseOr(ActionExec& thread)
 void
 ActionBitwiseXor(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
-    int operand1 = toInt(env.top(1));
-    int operand2 = toInt(env.top(0));
+    const int operand1 = toInt(env.top(1));
+    const int operand2 = toInt(env.top(0));
 
     env.top(1) = operand1^operand2;
     env.drop(1);
@@ -3331,7 +3183,6 @@ ActionShiftRight(ActionExec& thread)
 void
 ActionShiftRight2(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     boost::uint32_t amount = toInt(env.top(0)); 
@@ -3350,7 +3201,7 @@ ActionStrictEq(ActionExec& thread)
     as_environment& env = thread.env;
     
     env.top(1).set_bool(env.top(1).strictly_equals(env.top(0)));
-        env.drop(1);
+    env.drop(1);
 }
 
 void
@@ -3429,39 +3280,43 @@ ActionDefineFunction2(ActionExec& thread)
     // Code starts at thread.getNextPC() as the DefineFunction tag
     // contains name and args, while next tag is first tag
     // of the function body.
-    swf_function* func = new swf_function(code, env, thread.getNextPC(),
+    Function2* func = new Function2(code, env, thread.getNextPC(),
             thread.getScopeStack());
 
-    func->set_is_function2();
+    // We're stuck initializing our own prototype at the moment.
+    as_object* proto = getGlobal(env).createObject();
+    proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
+    func->init_member(NSV::PROP_PROTOTYPE, proto);
+	func->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor());
 
     size_t i = thread.getCurrentPC() + 3; // skip tag id and length
 
     // Extract name.
     // @@ security: watch out for possible missing terminator here!
-    std::string name = code.read_string(i);
+    const std::string name = code.read_string(i);
     i += name.length() + 1; // add NULL-termination
 
     // Get number of arguments.
-    const unsigned nargs = code.read_int16(i);
+    const boost::uint16_t nargs = code.read_uint16(i);
     i += 2;
 
     // Get the count of local registers used by this function.
-    boost::uint8_t register_count = code[i];
-    i++;
+    const boost::uint8_t register_count = code[i];
+    ++i;
 
-    func->set_local_register_count(register_count);
+    func->setRegisterCount(register_count);
 
     // Flags, for controlling register assignment of implicit args.
-    boost::uint16_t    flags = code.read_int16(i);
+    const boost::uint16_t flags = code.read_uint16(i);
     i += 2;
 
-    func->set_function2_flags(flags);
+    func->setFlags(flags);
 
     string_table& st = getStringTable(env);
 
     // Get the register assignments and names of the arguments.
-    for (unsigned n = 0; n < nargs; n++)
-    {
+    for (size_t n = 0; n < nargs; ++n) {
         boost::uint8_t arg_register = code[i];
         ++i;
 
@@ -3476,9 +3331,8 @@ ActionDefineFunction2(ActionExec& thread)
     boost::uint16_t code_size = code.read_int16(i);
 
     // Check code_size value consistency
-    size_t actionbuf_size = thread.code.size();
-    if ( thread.getNextPC() + code_size > actionbuf_size )
-    {
+    const size_t actionbuf_size = thread.code.size();
+    if (thread.getNextPC() + code_size > actionbuf_size) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("function2 code len (%u) "
                 "overflows DOACTION tag boundaries "
@@ -3492,7 +3346,7 @@ ActionDefineFunction2(ActionExec& thread)
     }
 
     i += 2;
-    func->set_length(code_size);
+    func->setLength(code_size);
 
     // Skip the function body (don't interpret it now).
     thread.adjustNextPC(code_size);
@@ -3500,8 +3354,7 @@ ActionDefineFunction2(ActionExec& thread)
     // If we have a name, then save the function in this
     // environment under that name.
     as_value function_value(func);
-    if (!name.empty())
-    {
+    if (!name.empty()) {
         IF_VERBOSE_ACTION(
             log_action(_("DefineFunction2: named function '%s' "
                         "starts at PC %d"), name, func->getStartPC());
@@ -3511,22 +3364,13 @@ ActionDefineFunction2(ActionExec& thread)
     }
 
     // Otherwise push the function literal on the stack
-    else
-    {
+    else {
         IF_VERBOSE_ACTION(
             log_action(_("DefineFunction2: anonymous function starts at "
                         "PC %d"), func->getStartPC());
         );
         env.push(function_value);
     }
-#ifdef USE_DEBUGGER
-    // WARNING: toObject(getGlobal(thread.env), function_value) can return a newly allocated
-    //          thing into the intrusive_ptr, so the debugger
-    //          will be left with a deleted object !!
-    //          Rob: we don't want to use void pointers here..
-    boost::intrusive_ptr<as_object> o = toObject(getGlobal(thread.env), function_value);
-    debugger.addSymbol(o.get(), name);
-#endif
 }
 
 void
@@ -3648,7 +3492,6 @@ ActionWith(ActionExec& thread)
 void
 ActionDefineFunction(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
@@ -3658,42 +3501,44 @@ ActionDefineFunction(ActionExec& thread)
     assert( length >= 0 );
 #endif
 
-    // Create a new swf_function
+    // Create a new Function
     // Code starts at thread.getNextPC() as the DefineFunction tag
     // contains name and args, while next tag is first tag
     // of the function body.
-    swf_function* func = new swf_function(code, env, thread.getNextPC(),
+    Function* func = new Function(code, env, thread.getNextPC(),
             thread.getScopeStack());
+    
+    // We're stuck initializing our own prototype at the moment.
+    as_object* proto = getGlobal(env).createObject();
+    proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
+    func->init_member(NSV::PROP_PROTOTYPE, proto);
+	func->init_member(NSV::PROP_CONSTRUCTOR,
+            as_function::getFunctionConstructor());
 
     size_t i = thread.getCurrentPC() + 3;
 
     // Extract name.
     // @@ security: watch out for possible missing terminator here!
-    std::string name = code.read_string(i);
+    const std::string name = code.read_string(i);
     i += name.length() + 1;
 
     // Get number of arguments.
-    unsigned nargs = code.read_int16(i);
+    const size_t nargs = code.read_uint16(i);
     i += 2;
     
     string_table& st = getStringTable(env);
 
     // Get the names of the arguments.
-    for (unsigned n = 0; n < nargs; n++)
-    {
+    for (size_t n = 0; n < nargs; ++n) {
         const std::string arg(code.read_string(i));
-
-        // @@ security: watch out for possible missing terminator here!
         func->add_arg(0, st.find(arg));
-        // wouldn't it be simpler to use strlen(arg)+1 ?
         i += arg.size() + 1; 
     }
 
     // Get the length of the actual function code.
-    boost::int16_t code_size = code.read_int16(i);
+    const boost::uint16_t code_size = code.read_uint16(i);
 
-    func->set_length(code_size);
-
+    func->setLength(code_size);
 
     // Skip the function body (don't interpret it now).
     // getNextPC() is assumed to point to first action of
@@ -3703,7 +3548,7 @@ ActionDefineFunction(ActionExec& thread)
 
     // If we have a name, then save the function in this
     // environment under that name.
-    as_value    function_value(func);
+    as_value function_value(func);
     if (!name.empty())
     {
         IF_VERBOSE_ACTION(
@@ -3736,14 +3581,11 @@ ActionDefineFunction(ActionExec& thread)
 
         env.push(function_value);
     }
-
-    //env.dump_stack();
 }
 
 void
 ActionSetRegister(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
 
     const action_buffer& code = thread.code;

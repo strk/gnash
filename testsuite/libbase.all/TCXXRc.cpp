@@ -264,6 +264,42 @@ main (int /*argc*/, char** /*argv*/) {
         }
     }
 
+    if (rc.getURLOpenerFormat() == "lynx %u") {
+        runtest.pass ("getURLOpenerFormat");
+    } else {
+        runtest.fail ("getURLOpenerFormat");
+    }
+
+    if (rc.getSOLSafeDir() == "/tmp/SharedObjects") {
+        runtest.pass ("getSOLSafeDir");
+    } else {
+        runtest.fail ("getSOLSafeDir");
+    }
+
+    if (rc.getSOLReadOnly() == true) {
+        runtest.pass ("getSOLReadOnly");
+    } else {
+        runtest.fail ("getSOLReadOnly");
+    }
+    
+    if (rc.ignoreShowMenu() == false) {
+        runtest.pass ("ignoreShowMenu");
+    } else {
+        runtest.fail ("ignoreShowMenu");
+    }
+
+    if ( rc.getRenderer().empty() ) {
+        runtest.pass ("getRenderer gives empty string");
+    } else {
+        runtest.fail ("getRenderer gives " + rc.getRenderer() );
+    }
+
+    if ( rc.getMediaHandler().empty() ) {
+        runtest.pass ("getMediaHandler gives empty string");
+    } else {
+        runtest.fail ("getMediaHandler gives " + rc.getMediaHandler() );
+    }
+
     // Parse a second file
     if (rc.parseFile("gnashrc-local")) {
 
@@ -304,30 +340,18 @@ main (int /*argc*/, char** /*argv*/) {
             }
         }
 
-    }
+        if ( rc.getRenderer() == std::string("fakeRenderer") ) {
+            runtest.pass ("getRenderer gives " + rc.getRenderer() );
+        } else {
+            runtest.fail ("getRenderer gives " + rc.getRenderer() );
+        }
 
-    if (rc.getURLOpenerFormat() == "lynx %u") {
-        runtest.pass ("getURLOpenerFormat");
-    } else {
-        runtest.fail ("getURLOpenerFormat");
-    }
+        if ( rc.getMediaHandler() == std::string("fakeMediaHandler") ) {
+            runtest.pass ("getMediaHandler gives " + rc.getMediaHandler() );
+        } else {
+            runtest.fail ("getMediaHandler gives " + rc.getMediaHandler() );
+        }
 
-    if (rc.getSOLSafeDir() == "/tmp/SharedObjects") {
-        runtest.pass ("getSOLSafeDir");
-    } else {
-        runtest.fail ("getSOLSafeDir");
-    }
-
-    if (rc.getSOLReadOnly() == true) {
-        runtest.pass ("getSOLReadOnly");
-    } else {
-        runtest.fail ("getSOLReadOnly");
-    }
-    
-    if (rc.ignoreShowMenu() == false) {
-        runtest.pass ("ignoreShowMenu");
-    } else {
-        runtest.fail ("ignoreShowMenu");
     }
 }
 

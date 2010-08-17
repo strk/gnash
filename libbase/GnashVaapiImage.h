@@ -43,7 +43,6 @@ public:
     GnashVaapiImage(const GnashVaapiImage& o);
     ~GnashVaapiImage();
 
-    virtual std::auto_ptr<GnashImage> clone();
     virtual void update(boost::shared_ptr<VaapiSurface> surface);
     virtual void update(boost::uint8_t* data);
     virtual void update(const GnashImage& from);
@@ -59,12 +58,12 @@ public:
     /// NOTE: This function shall not be used
     //
     /// @return     NULL.
-    virtual boost::uint8_t* data();
+    virtual iterator begin();
 
     /// Get read-only access to the underlying data
     //
     /// @return     A read-only pointer to the raw image data.
-    virtual const boost::uint8_t* data() const;
+    virtual const_iterator begin() const;
 };
 
 } // gnash namespace

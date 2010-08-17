@@ -32,6 +32,7 @@
 #include "RunResources.h"
 #include "Global_as.h"
 #include "Renderer.h"
+#include "FillStyle.h"
 
 namespace gnash {
 namespace SWF {
@@ -106,11 +107,10 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
     // Next line will throw ParserException on malformed SWF
     const boost::uint16_t fillCount = in.read_variable_count();
     
-    fill_style fs1, fs2;
     for (size_t i = 0; i < fillCount; ++i) {
-        fs1.read(in, tag, md, r, &fs2);
-        _shape1.addFillStyle(fs1);
-        _shape2.addFillStyle(fs2);
+        OptionalFillPair fp = readFills(in, tag, md, true);
+        _shape1.addFillStyle(fp.first);
+        _shape2.addFillStyle(*fp.second);
     }
 
     const boost::uint16_t lineCount = in.read_variable_count();

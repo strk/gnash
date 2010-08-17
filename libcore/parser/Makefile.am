@@ -65,12 +65,8 @@ EXTENSIONS_API = \
 	movie_definition.h \
 	$(NULL)
 
-if SDKINSTALL
-noinst_HEADERS += $(EXTENSIONS_API)
-else
-instdir = $(includedir)/gnash
+instdir = $(includedir)/gnash/parser
 inst_HEADERS = $(EXTENSIONS_API)
-endif
 
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la

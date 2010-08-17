@@ -901,6 +901,70 @@ with(grad) {
     beginGradientFill(fillType, colors, alphas, ratios, matrix);
     draw100x100Box(x, y, grad);
    
+
+    // Shape 14
+    x += 100;
+
+    // Test a linear gradient with one stop
+    fillType = "linear";
+    colors = [0xff0000];
+    alphas = [100];
+    ratios = [0];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+   
+
+    // Shape 15
+    x += 100;
+
+    // Test a linear gradient with one stop
+    fillType = "radial";
+    colors = [0x00ff00];
+    alphas = [100];
+    ratios = [0];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+    
+    // Shape 16
+    x += 100;
+
+    // Bad fill style results in no fill.
+    fillType = "rodial";
+    colors = [0x0000ff, 0xffffff, 0x00ff00];
+    alphas = [100, 100, 100];
+    ratios = [0, 0x10, 0x05];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix);
+    draw100x100Box(x, y, grad);
+
+    // Shape 17
+    x += 100;
+
+    // Extra arguments result in no fill for SWF6
+    fillType = "radial";
+    colors = [0x0000ff, 0xffffff, 0x00ff00];
+    alphas = [100, 100, 100];
+    ratios = [0, 0x10, 0x05];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix, "pad");
+    draw100x100Box(x, y, grad);
+
+    x = 0;
+    y += 100;
+
+    // Shape 18
+
+    // 4 arguments result in no fill for SWF6
+    fillType = "radial";
+    colors = [0x0000ff, 0xffffff, 0x00ff00];
+    alphas = [100, 100, 100];
+    ratios = [0, 0x10, 0x05];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios);
+    draw100x100Box(x, y, grad);
+
     _visible = false;
 
 };

@@ -118,12 +118,13 @@ libgnashcore_la_SOURCES = \
 	swf/StartSoundTag.cpp \
 	swf/SetTabIndexTag.cpp \
 	swf/StreamSoundBlockTag.cpp \
-	swf_function.cpp \
+	Function.cpp \
+	Function2.cpp \
 	Video.cpp \
 	StreamProvider.cpp \
 	Button.cpp \
 	DisplayList.cpp \
-	fill_style.cpp \
+	FillStyle.cpp \
 	Font.cpp \
 	fontlib.cpp \
 	impl.cpp \
@@ -213,7 +214,8 @@ noinst_HEADERS = \
 	swf/StreamSoundBlockTag.h \
 	swf/ScriptLimitsTag.h \
 	swf_event.h \
-	swf_function.h \
+	Function.h \
+	Function2.h \
 	Timers.h \
 	Video.h \
 	MovieLoader.h \
@@ -275,9 +277,8 @@ EXTENSIONS_API = \
 	swf/TagLoadersTable.h \
 	swf/SWF.h \
 	MovieFactory.h \
-	fill_style.h \
+	FillStyle.h \
 	LineStyle.h \
-	BitmapInfo.h \
 	RGBA.h	\
 	Geometry.h	\
 	Video.h \
@@ -289,12 +290,8 @@ EXTENSIONS_API = \
 include $(srcdir)/asobj/flash.am
 libgnashcore_la_SOURCES += $(libgnashasobjs_la_SOURCES)
 
-if SDKINSTALL
-noinst_HEADERS += $(EXTENSIONS_API)
-else
-instdir = $(includedir)/gnash
-inst_HEADERS = $(EXTENSIONS_API)
-endif
+instdir = $(includedir)/gnash/asobj
+inst_HEADERS += $(EXTENSIONS_API)
 
 libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \

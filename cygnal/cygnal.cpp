@@ -35,7 +35,7 @@
 #include <fcntl.h>
 
 #include "GnashSleep.h"
-#include "bzrversion.h"
+#include "revno.h"
 
 //#include "cvm.h"
 

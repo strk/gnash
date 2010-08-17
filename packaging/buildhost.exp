@@ -544,7 +544,7 @@ proc bzr_update {} {
 proc bzr_revno {} {
     global inp outp timeout objdir
     changedir $objdir
-    set ret [local_exec "grep REVNO bzrversion.h" $inp $outp $timeout]
+    set ret [local_exec "grep REVNO revno.h" $inp $outp $timeout]
     set status [lindex $ret 0]
     set output [lindex $ret 1]
 
@@ -565,7 +565,7 @@ proc bzr_revno {} {
 proc bzr_branch {} {
     global inp outp timeout verbose srcdir objdir
     changedir $objdir
-    set ret [local_exec "grep NICK bzrversion.h" $inp $outp $timeout]
+    set ret [local_exec "grep NICK revno.h" $inp $outp $timeout]
     incr verbose
     set status [lindex $ret 0]
     set output [lindex $ret 1]

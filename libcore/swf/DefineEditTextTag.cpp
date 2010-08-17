@@ -122,9 +122,8 @@ DefineEditTextTag::read(SWFStream& in, movie_definition& m)
                 fontClassName);
 	}
 	
-	if (hasColor)
-	{
-		_color.read_rgba(in);
+	if (hasColor) {
+		_color = readRGBA(in);
 	}
 
 	if (hasMaxChars)

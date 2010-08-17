@@ -60,7 +60,7 @@ xpi-configure: force
 	  --enable-static \
 	  --disable-shared \
 	  $(CONFIG_OPTS));
-	-cp bzrversion.h $(SNAPSHOT_BUILD)
+	-cp revno.h $(SNAPSHOT_BUILD)
 
 # build the xpi package bundle. snapshot-build and snapshot-install need to
 # have been run already. If you wish the automatic dependency checking, use

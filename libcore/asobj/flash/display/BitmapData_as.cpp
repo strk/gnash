@@ -19,10 +19,14 @@
 //
 
 #include "BitmapData_as.h"
+
+#include <vector>
+#include <sstream>
+#include <algorithm>
+
 #include "MovieClip.h"
 #include "GnashImage.h"
-#include "Bitmap.h"
-#include "flash/geom/Rectangle_as.h" // for BitmapData.rectangle
+#include "DisplayObject.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -31,11 +35,9 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "VM.h" // for addStatics
-
+#include "Renderer.h"
+#include "RunResources.h"
 #include "namedStrings.h"
-#include <vector>
-#include <sstream>
-#include <algorithm>
 
 namespace gnash {
 
@@ -77,77 +79,69 @@ namespace {
 
 }
 
-
-BitmapData_as::BitmapData_as(as_object* owner, size_t width, size_t height,
-              bool transparent, boost::uint32_t fillColor)
+BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
+        boost::uint32_t fillColor)
     :
     _owner(owner),
-    _width(width),
-    _height(height),
-    _transparent(transparent),
-    _bitmapData(width * height, fillColor + (0xff << 24))
+    _cachedBitmap(0)
 {
-}
+    assert(im->width() <= 2880);
+    assert(im->width() <= 2880);
 
+    std::fill(im->argb_begin(), im->argb_end(), fillColor | (0xff << 24));
+    
+    // If there is a renderer, cache the image there, otherwise we store it.
+    Renderer* r = getRunResources(*_owner).renderer();
+    if (r) _cachedBitmap = r->createCachedBitmap(im);
+    else _image.reset(im.release());
+}
+    
 void
 BitmapData_as::setReachable() 
 {
-    std::for_each(_attachedBitmaps.begin(), _attachedBitmaps.end(),
+    std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
             std::mem_fun(&DisplayObject::setReachable));
     _owner->setReachable();
+    log_debug("BitmapData_as::setReachable");
 }
-
-
-/// This function should write RGBA data to the _bitmapData array.
-//
-/// TODO: it needs to know what to do about transparency.
-void
-BitmapData_as::update(const boost::uint8_t* data)
-{
-    for (size_t i = 0; i < _width * _height; ++i) {
-        boost::uint32_t pixel = (*(data++) << 16);
-        pixel |= (*(data++) << 8);
-        pixel |= (*(data++));
-        pixel |= (0xff << 24);
-        _bitmapData[i] = pixel;
-    }
-}
-   
 
 void
-BitmapData_as::updateAttachedBitmaps()
+BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color)
 {
-    log_debug("Updating %d attached bitmaps", _attachedBitmaps.size());
-    std::for_each(_attachedBitmaps.begin(), _attachedBitmaps.end(),
-            std::mem_fun(&Bitmap::update));
+    if (disposed()) return;
+    if (x >= width() || y >= height()) return;
+
+    GnashImage::argb_iterator it = data()->argb_begin() + x * width() + y;
+    *it = color;
 }
 
-boost::int32_t
-BitmapData_as::getPixel(int x, int y, bool transparency) const
+void
+BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color)
 {
-    assert(!_bitmapData.empty());
+    if (disposed()) return;
+    if (x >= width() || y >= height()) return;
 
-    // A value of 0, 0 is inside the bitmap.
-    if (x < 0 || y < 0) return 0;
-    
-    // A value of _width, _height is outside the bitmap.
-    if (static_cast<size_t>(x) >= _width || static_cast<size_t>(y) >= _height) {
-        return 0;
-    }
+    GnashImage::argb_iterator it = data()->argb_begin() + x * width() + y;
+    const boost::uint32_t val = it.toARGB();
+    *it = (color & 0xffffff) | (val & 0xff000000);
+}
 
-    const size_t pixelIndex = y * _width + x;
+void
+BitmapData_as::updateObjects()
+{
+    log_debug("Updating %d attached objects", _attachedObjects.size());
+    std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
+            std::mem_fun(&DisplayObject::update));
+}
 
-    assert ( pixelIndex < _bitmapData.size());
-    
-    const boost::uint32_t pixel = _bitmapData[pixelIndex];
-    
-    if (transparency)
-    {
-        return static_cast<boost::int32_t>(pixel);
-    }
-    
-    // Without transparency
-    return static_cast<boost::int32_t>(pixel & 0x00ffffff);
+boost::uint32_t
+BitmapData_as::getPixel(size_t x, size_t y) const
+{
+    if (disposed()) return 0;
+    if (x >= width() || y >= height()) return 0;
+
+    const size_t pixelIndex = y * width() + x;
+    return (data()->argb_begin() + pixelIndex).toARGB();
 
 }
 
@@ -155,15 +149,12 @@ void
 BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 {
 
-    // This also catches disposed BitmapDatas.
-    assert(_bitmapData.size() == _width * _height);
+    if (disposed()) return;
 
     if (w < 0 || h < 0) return;
-
-    // Nothing to do if x or y are outside the image (negative height
-    // or width are not allowed). The cast to int is fine as neither
-    // dimension can be more than 2880 pixels.
-    if (x >= static_cast<int>(_width) || y >= static_cast<int>(_height)) return;
+    if (x >= static_cast<int>(width()) || y >= static_cast<int>(height())) {
+        return;
+    }
 
     // If x or y is less than 0, make a rectangle of the
     // intersection with the bitmap.    
@@ -182,34 +173,30 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     // the bitmap.    
     if (w <= 0 || h <= 0) return;
 
-    w = std::min<size_t>(_width - x, w);
-    h = std::min<size_t>(_height - y, h);
+    w = std::min<size_t>(width() - x, w);
+    h = std::min<size_t>(height() - y, h);
     
-    BitmapArray::iterator it = _bitmapData.begin() + y * _width;
+    GnashImage::argb_iterator it = data()->argb_begin() + y * width();
     
-    // This cannot be past .end() because h + y is no larger than the
-    // height of the image.
-    const BitmapArray::iterator e = it + _width * h;
-    
-    // Make colour non-transparent if the image doesn't support it.
-    if (!_transparent) color |= 0xff000000;
+    GnashImage::argb_iterator e = it + width() * h;
     
     while (it != e) {
         // Fill from x for the width of the rectangle.
         std::fill_n(it + x, w, color);
-        // Move to the next line
-        std::advance(it, _width);
+        it += width();
     }
 
-    updateAttachedBitmaps();
+    updateObjects();
 
 }
 
 void
 BitmapData_as::dispose()
 {
-    _bitmapData.clear();
-    updateAttachedBitmaps();
+    if (_cachedBitmap) _cachedBitmap->dispose();
+    _cachedBitmap = 0;
+    _image.reset();
+    updateObjects();
 }
 
 // extern 
@@ -284,6 +271,7 @@ as_value
 bitmapdata_draw(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
 
     std::ostringstream os;
     fn.dump_args(os);
@@ -317,7 +305,7 @@ bitmapdata_draw(const fn_call& fn)
         return as_value();
     }
 
-    ptr->update(im->data());
+    //ptr->update(im->data());
 
 	return as_value();
 }
@@ -328,13 +316,6 @@ bitmapdata_fillRect(const fn_call& fn)
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 2) return as_value();
-    
-    if (disposed(*ptr)) {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("fillRect called on disposed BitmapData!");
-        );
-        return as_value();
-    }
     
     const as_value& arg = fn.arg(0);
     
@@ -405,18 +386,19 @@ bitmapdata_getPixel(const fn_call& fn)
         return as_value();
     }
 
-    if (disposed(*ptr)) {
+    if (ptr->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("getPixel called on disposed BitmapData!");
         );
         return as_value();
     }
     
-    // TODO: what happens when the pixel is outside the image?
     const int x = toInt(fn.arg(0));
     const int y = toInt(fn.arg(1));
     
-    return ptr->getPixel(x, y, false);
+    // Will return 0 if the pixel is outside the image or the image has
+    // been disposed.
+    return static_cast<boost::int32_t>(ptr->getPixel(x, y) & 0xffffff);
 }
 
 as_value
@@ -428,7 +410,7 @@ bitmapdata_getPixel32(const fn_call& fn)
         return as_value();
     }
 
-    if (disposed(*ptr)) {
+    if (ptr->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("getPixel32 called on disposed BitmapData!");
         );
@@ -439,7 +421,7 @@ bitmapdata_getPixel32(const fn_call& fn)
     const int x = toInt(fn.arg(0));
     const int y = toInt(fn.arg(1));
     
-    return ptr->getPixel(x, y, true);
+    return static_cast<boost::int32_t>(ptr->getPixel(x, y));
 }
 
 
@@ -515,22 +497,15 @@ bitmapdata_setPixel(const fn_call& fn)
         return as_value();
     }
 
-    if (disposed(*ptr)) {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("setPixel called on disposed BitmapData!");
-        );
-        return as_value();
-    }
-
     const double x = fn.arg(0).to_number();
     const double y = fn.arg(1).to_number();
     if (isNaN(x) || isNaN(y) || x < 0 || y < 0) return as_value();
-    if (x >= ptr->getWidth() || y >= ptr->getHeight()) {
+    if (x >= ptr->width() || y >= ptr->height()) {
         return as_value();
     }
 
     // Ignore any transparency here.
-    const boost::uint32_t color = toInt(fn.arg(2)) & 0xffffff;
+    const boost::uint32_t color = toInt(fn.arg(2));
 
     ptr->setPixel(x, y, color);
 
@@ -546,17 +521,10 @@ bitmapdata_setPixel32(const fn_call& fn)
         return as_value();
     }
 
-    if (disposed(*ptr)) {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("setPixel32 called on disposed BitmapData!");
-        );
-        return as_value();
-    }
-
     const double x = fn.arg(0).to_number();
     const double y = fn.arg(1).to_number();
     if (isNaN(x) || isNaN(y) || x < 0 || y < 0) return as_value();
-    if (x >= ptr->getWidth() || y >= ptr->getHeight()) {
+    if (x >= ptr->width() || y >= ptr->height()) {
         return as_value();
     }
 
@@ -587,8 +555,8 @@ bitmapdata_height(const fn_call& fn)
     
     // Returns the immutable height of the bitmap or -1 if dispose() has
     // been called.
-    if (disposed(*ptr)) return -1;
-	return as_value(ptr->getHeight());
+    if (ptr->disposed()) return -1;
+	return as_value(ptr->height());
 }
 
 as_value
@@ -598,7 +566,7 @@ bitmapdata_rectangle(const fn_call& fn)
 
     // Returns the immutable rectangle of the bitmap or -1 if dispose()
     // has been called.
-    if (disposed(*ptr)) return -1;
+    if (ptr->disposed()) return -1;
 
     // If it's not found construction will fail.
     as_value rectangle(fn.env().find_object("flash.geom.Rectangle"));
@@ -610,7 +578,7 @@ bitmapdata_rectangle(const fn_call& fn)
     }
 
     fn_call::Args args;
-    args += 0.0, 0.0, ptr->getWidth(), ptr->getHeight();
+    args += 0.0, 0.0, ptr->width(), ptr->height();
 
     boost::intrusive_ptr<as_object> newRect =
             constructInstance(*rectCtor, fn.env(), args);
@@ -627,8 +595,8 @@ bitmapdata_transparent(const fn_call& fn)
     if (fn.nargs) return as_value();
     
     // Returns whether bitmap is transparent or -1 if dispose() has been called.
-    if (disposed(*ptr)) return -1;
-	return as_value(ptr->isTransparent());
+    if (ptr->disposed()) return -1;
+	return as_value(ptr->transparent());
 }
 
 as_value
@@ -641,8 +609,8 @@ bitmapdata_width(const fn_call& fn)
     
     // Returns the immutable width of the bitmap or -1 if dispose() has
     // been called.
-    if (disposed(*ptr)) return -1;
-	return as_value(ptr->getWidth());
+    if (ptr->disposed()) return -1;
+	return as_value(ptr->width());
 }
 
 
@@ -680,26 +648,11 @@ bitmapdata_ctor(const fn_call& fn)
         throw ActionTypeError();
 	}
 
-    size_t width, height;
-    bool transparent = true;
-    boost::uint32_t fillColor = 0xffffff;
-
-    switch (fn.nargs)
-    {
-        default:
-            // log AS coding error
-        case 4:
-            fillColor = toInt(fn.arg(3));
-        case 3:
-            transparent = fn.arg(2).to_bool();
-        case 2:
-            // Is to_int correct?
-            height = toInt(fn.arg(1));
-            width = toInt(fn.arg(0));
-            break;
-    }
+    size_t width = toInt(fn.arg(0));
+    size_t height = toInt(fn.arg(1));
+    bool transparent = fn.nargs > 2 ? fn.arg(2).to_bool() : true;
+    boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3)) : 0xffffff;
     
-    // FIXME: Should fail to construct the object.
     if (width > 2880 || height > 2880 || width < 1 || height < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
              log_aserror("BitmapData width and height must be between "
@@ -708,8 +661,15 @@ bitmapdata_ctor(const fn_call& fn)
         throw ActionTypeError();
     }
 
-    ptr->setRelay(
-            new BitmapData_as(ptr, width, height, transparent, fillColor));
+    std::auto_ptr<GnashImage> im;
+    if (transparent) {
+        im.reset(new ImageRGBA(width, height));
+    }
+    else {
+        im.reset(new ImageRGB(width, height));
+    }
+
+    ptr->setRelay(new BitmapData_as(ptr, im, fillColor));
 
 	return as_value(); 
 }

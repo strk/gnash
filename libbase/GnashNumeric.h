@@ -68,8 +68,9 @@ clamp(T i, T min, T max)
 	return std::max<T>(min, std::min<T>(i, max));
 }
 
-inline float
-flerp(float a, float b, float f)
+template<typename T>
+inline T
+lerp(T a, T b, T f)
 {
     return (b - a) * f + a;
 }

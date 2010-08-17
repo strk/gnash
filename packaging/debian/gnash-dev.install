@@ -1,4 +1,4 @@
-usr/include
+usr/include/gnash
 usr/lib/gnash/lib*.a
 usr/lib/gnash/*.la
 usr/lib/pkgconfig/*

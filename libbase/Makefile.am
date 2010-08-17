@@ -152,7 +152,9 @@ else
 MALLOC = 
 endif
 
-noinst_HEADERS = \
+noinst_HEADERS =
+
+inst_HEADERS = \
 	$(LIBLTDLHEAD) \
 	SimpleBuffer.h \
 	extension.h \
@@ -213,15 +215,12 @@ EXTENSIONS_API = \
 	NetworkAdapter.h \
 	NamingPolicy.h \
 	GnashImageJpeg.h \
+	CachedBitmap.h \
 	GnashImage.h \
 	$(NULL)
 
-if SDKINSTALL
-noinst_HEADERS += $(EXTENSIONS_API)
-else
 instdir = $(includedir)/gnash
-inst_HEADERS = $(EXTENSIONS_API)
-endif
+inst_HEADERS += $(EXTENSIONS_API)
 
 libgnashbase_la_LDFLAGS = -release $(VERSION) 
 libgnashbase_la_DEPENDENCIES = $(LIBLTDLLIB)

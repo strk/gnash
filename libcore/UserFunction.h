@@ -30,7 +30,7 @@ namespace gnash {
 //
 /// Gnash has two types of UserFunction:
 //
-/// 1. swf_function: functions parsed from a SWF
+/// 1. Function: functions parsed from a SWF
 /// 2. builtin_function: functions implemented in C++ as though they were
 ///    These are used to implement what the API functions that the proprietary
 ///    player implements in a startup script.
@@ -42,7 +42,7 @@ public:
     //
     /// Only Function2 functions require local registers; for all others
     /// the value should be 0.
-    virtual size_t registers() const = 0;
+    virtual boost::uint8_t registers() const = 0;
 
 protected:
 

@@ -30,6 +30,7 @@
 #include "VirtualClock.h"
 #include "SystemClock.h"
 #include "gnash.h" // for Quality
+#include "movie_root.h"
 
 #ifdef USE_SWFTREE
 #include "tree.hh" // for tree
@@ -470,6 +471,9 @@ public:
     /// Set the stage to advance/display
     void setStage(movie_root* stage);
 
+    /// The root movie, or "Stage"
+    movie_root *getStage() { return _stage; };
+    
     /// Handle error message from the core
     //
     /// @param msg        The error message recieved
@@ -487,6 +491,12 @@ public:
     /// The default implementation always returns true.
     ///
     virtual bool yesno(const std::string& question);
+
+    /// Width of a window pixel, in stage pseudopixel units.
+    float getXScale() { return _xscale; };
+
+    /// Height of a window pixel, in stage pseudopixel units.
+    float getYScale() { return _yscale; };
 
 protected:
 

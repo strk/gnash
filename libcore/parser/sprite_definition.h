@@ -34,8 +34,9 @@
 
 // Forward declarations
 namespace gnash {
-	class SWFStream; // for read signature
-	class as_function; // for registerClass/getRegisteredClass
+	class SWFStream;
+	class as_function;
+    class RunResources;
 }
 
 namespace gnash
@@ -155,13 +156,13 @@ public:
 	}
 
 	/// Delegate call to associated root movie
-	virtual BitmapInfo* getBitmap(int id) const
+	virtual CachedBitmap* getBitmap(int id) const
 	{
 		return m_movie_def.getBitmap(id);
 	}
 
 	/// Overridden just for complaining  about malformed SWF
-	virtual void addBitmap(int /*id*/, boost::intrusive_ptr<BitmapInfo> /*im*/)
+	virtual void addBitmap(int /*id*/, boost::intrusive_ptr<CachedBitmap> /*im*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
 		log_swferror(_("add_bitmap_SWF::DefinitionTag appears in sprite tags"));

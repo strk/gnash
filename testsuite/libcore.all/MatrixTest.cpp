@@ -79,7 +79,6 @@ main(int /*argc*/, char** /*argv*/)
     //  Test identity SWFMatrix.
     // 
     SWFMatrix identity; 
-    check(identity.is_valid());
     check_equals(identity.get_x_scale(), 1);
     check_equals(identity.get_y_scale(), 1);
     check_equals(identity.get_rotation(), 0);

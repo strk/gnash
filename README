@@ -1,12 +1,12 @@
 
-		    Gnash: the GNU SWF Player
+	            Gnash: the GNU SWF Player
 
 Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
 (SWF) format.  It can be run as a graphical application, as a Web browser
 plugin, or as a library used by other programs.  It is not yet complete;
 it does not correctly handle every SWF file.
 
-This is the README file for the Gnash-0.8.7 release (or bzr snapshot).
+This is the README file for the Gnash-0.8.7 release (or snapshot).
 
 Gnash is originally based on the code of GameSWF, by Thatcher Ulrich.
 GameSWF was the most advanced among free SWF players; it implemented a
@@ -21,7 +21,6 @@ useful improvements.  We thank Thatcher Ulrich for the great start,
 Rob Savoye and John Gilmore for organizing the project, and the Gnash
 volunteers for making Gnash what it is today.
 
-
 SWF Support:
 --------------
 
@@ -30,50 +29,27 @@ SWF movies that are used for browser navigation may fail. Almost all
 SWF-based web-site navigation should work.
 
 Gnash supports practically all SWF opcodes and most ActionScript classes up
-to SWF version 7. Gnash also supports some of the most important SWF
-version 8 ActionScript classes. There is currently no real support for
-ActionScript 3 (ABC blocks) and AVM2, which were introduced in SWF version 9.
-Despite this, Gnash can play most SWF8 and many SWF9 movies, because not all
-rely on unimplemented features.
+to SWF version 8. There is currently no real support for ActionScript
+3 (ABC blocks) and AVM2, which were introduced in SWF version
+9. Despite this, Gnash can play most SWF8 and many SWF9 movies,
+because not all rely on unimplemented features.
 
 All unimplemented opcodes and ActionScript methods should print a warning
-when using -v with gnash or gprocessor. Running gprocessor -v is often an
+when using -vv with gnash or gprocessor. Running gprocessor -vv is often an
 easy way to see why a movie isn't playing correctly.
-
 
 Plugin:	
 -------
 
 The plugin correctly installs itself into Mozilla, Firefox, or Konqueror.
 It can play some SWF files in cooperation with the browser. It
-should work with any browser that supports Mozilla's NSPR API and
-plugin SDK. It has been tested with Mozilla 1.7.13 with gtk2 (won't work with
-gtk1 due to the NSAPI used), Firefox 1.0.x, Firefox 1.5.x, Firefox 2.x,
-Firefox 3.x, Iceweasel 2.0.0.6 and Epiphany.
-
-Gnash runs equally well in 32-bit and 64-bit environments, so works without
-any issues as a 64-bit plugin.
-
-Occasionally, web pages may have Internet Explorer-specific Javascript that
-fails in other browsers, thus preventing the plugin from being loaded. These
-cases are now extremely rare, because web developers are more knowledgable
-about supporting multiple browsers and because free, standardised
-flash-embedding scripts are widely used. If you do encounter faulty javascript,
-"view source" and then use wget to grab the movie for testing.
-
-The plugin works by forking and running the standalone player, so whichever
-graphics library Gnash uses will also be used by the plugin. As an alternate
-to SDL, Gnash also now has FLTK2 support.
-
-The GTK version has full event handling, and supports a right-click
-mouse menu to control the movie. The SDL version has no event
-handling, which means mouse clicks and keys pressed get ignored. Also
-the windows don't resize, and occasionally they overrun their
-boundaries. The GTK version requires GtkGlExt, and defaults to SDL if
-GtkGlExt is not installed, or if --disable-glext is passed to configure.
+should work with any browser that supports Mozilla's NPAPI API plugin
+SDK. Gnash is know to work with Mozilla, Firefox, Iceweasel, Icecat,
+Epiphany, Galeon, Opera, and Chromium. Gnash runs equally well in
+32-bit and 64-bit environments.
 
 Configure with --with-plugindir= to set the directory that "make
-install" will install the plugin in. By default it will be installed
+install-plugin" will install the plugin in. By default it will be installed
 in the user's .mozilla/plugins directory, even if you install using
 sudo.
 
@@ -83,15 +59,16 @@ Platforms Supported:
 Gnash has been ported to a wide variety of hardware and operating
 systems. Primary platforms that get the most support are most of
 the GNU/Linux distributions, but Ubuntu, Fedora, and Debian primarily.
-OpenBSD is also adequately maintained, but Gnash is known to run on
-FreeBSD and NetBSD systems as well. There are also ports to Beos,
-Haiku, OS/2, Irix, Solaris, and OpenEmbedded.
+Gnash is known to run on most BSD derived systems as well. There are
+also ports to Beos, Haiku, OS/2, Irix, Solaris, Sylllable, and
+OpenEmbedded.
 
-There are ports of the standalone player to Darwin and Win32. Both
-require adding the dependent libraries Gnash needs. Work has started
-on a native Darwin (Aqua/Carbon/OpenGL) GUI so most of these packages
-won't be required. The win32 player can be built with Mingw32 and ought
-to be compilable with VC++ (but this has not been confirmed recently). 
+There are also ports of the standalone player to Darwin and
+Win32. Both require adding the dependent libraries Gnash needs. Work
+has started on a native Darwin (Aqua/Carbon/OpenGL) GUI so most of
+these packages won't be required. The win32 player can be built with
+Mingw32 and ought to be compilable with VC++ (but this has not been
+confirmed recently). 
 
 Gnash has also been ported to a variety of embedded devices, most
 running variations of OpenEmbedded. These include several custom
@@ -102,7 +79,7 @@ Pepper Pad 3, the latter two running a trimmed down Fedora.
 
 Gnash has been known to run on these 64-bit systems: the Itanium,
 UltraSparc, PowerPC, AMD64, MIPS. Embedded processors include several
-ARM variants, MIPS, and the Geode GX.
+ARM variants, MIPS, and the Geode LX/GX.
 
 Building Gnash:
 ---------------
@@ -120,16 +97,17 @@ Gnash has three main options: choice of renderer (graphics library used
 to render the SWF movie), choice(s) of GUI toolkit (gtk, kde, etc), and choice
 of multimedia backend (audio and video decoder).
 
-Gnash supports multiple renderers.
-By default it'll build them all in the rendering library, or you can
-select which ones you want:
+Gnash supports multiple renderers. By default it'll build them all in
+the rendering library, or you can select which ones you want:
 
    --enable-renderer=opengl
    --enable-renderer=cairo
    --enable-renderer=agg
 or --enable-renderer=all (default)
 
-Gnash can use different multimedia back-ends for sound and/or video:
+Gnash can use different multimedia back-ends for sound and/or
+video. By default it'll build both ffmpeg and Gstreamer, which you
+can select at runtime. To select only one media handler use:
 
    --enable-media=GST			Gstreamer (default)
 or --enable-media=ffmpeg		Ffmpeg/SDL
@@ -144,12 +122,13 @@ Gnash supports multiple graphics toolkits, and will build multiple
 executables:
 
    --enable-gui=gtk
-   --enable-gui=kde
-or --enable-gui=gtk,kde (default)
+   --enable-gui=kde4
+or --enable-gui=gtk,kde4 (default)
 
-Other guis: dump, fb, fltk, kde3, kde4, gtk, sdl, qtopia, hildon, alp, riscos,
-aqua. Some guis are very specialized (dump writes out raw frames to a disk
-file). Other guis are not very well supported and may not even compile (aqua).
+Other guis: dump, raw framebuffer, fltk, kde3, kde4, gtk, sdl, qtopia,
+hildon, alp, riscos, aqua. Some guis are very specialized (dump writes
+out raw frames to a disk file). Other guis are not very well supported
+and may not even compile (aqua). 
 
 Different options will cause gnash to require different libraries.  The
 configure script does a good job of telling you how to get these libraries.
@@ -159,7 +138,7 @@ support has fewer dependencies on other packages. The AGG backend
 gives better quality results, and works on devices with only a
 framebuffer.  Performance is better with the OpenGL backend, but
 only if an accelerated graphics driver installed. This may require the
-use of a non-free driver, so it's not for everyone.
+use of a non-free driver, so it's not for everyone. 
 
 Other required packages are libjpeg.
 
@@ -170,8 +149,11 @@ mutexes and threading.
 
 If you select gstreamer as the media backend, gnash requires version 0.10
 because earlier versions wouldn't let you insert clips into an existing
-sound stream, as Gnash needs to do. If you use Gstreamer, you still need
-the ffmeg decoders, and the ffmpeg plugin for Gstreamer.
+sound stream, as Gnash needs to do. If you compile gnash to use
+Gstreamer, users who want to view Flash videos while running gnash 
+will need to install the ffmpeg plugin for gstreamer. Flash uses
+MPEG4, MP3, FLV, ACC, and Sorenson primarily. Gnash supports any codec
+supported by ffmpeg and Gstreamer.
 
 Building the Gnash plugin for browsers:
 --------------------------------------

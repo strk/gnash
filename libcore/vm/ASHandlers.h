@@ -53,25 +53,19 @@ class ActionHandler
 public:
 
     ActionHandler();
-    ActionHandler(ActionType type, ActionCallback func);
-    ActionHandler(ActionType type, std::string name, 
-                  ActionCallback func);
-    ActionHandler(ActionType type, std::string name, 
-                  ActionCallback func, ArgumentType format);
+    ActionHandler(ActionType type, ActionCallback func,
+            ArgumentType format = ARG_NONE);
 
     /// Execute the action
     void execute(ActionExec& thread) const;
 
-    void toggleDebug(bool state) const { _debug = state; }
     ActionType getType()   const { return _type; }
-    std::string getName()   const { return _name; }
     ArgumentType getArgFormat() const { return _arg_format; }
 
 private:
+
     ActionType _type;
-    std::string _name;
     ActionCallback _callback;
-    mutable bool _debug;
     ArgumentType _arg_format;
 };
 
@@ -80,42 +74,34 @@ class SWFHandlers
 {
 public:
 
-	// Indexed by action id
-	typedef std::vector<ActionHandler> container_type;
-
 	/// Return the singleton instance of SWFHandlers class
 	static const SWFHandlers& instance();
 
 	/// Execute the action identified by 'type' action type
 	void execute(ActionType type, ActionExec& thread) const;
 
-	void toggleDebug(bool state) { _debug = state; }
+	size_t size() const { return _handlers.size(); }
 
-	size_t size() const { return get_handlers().size(); }
-
-	ActionType lastType() const
-	{
+	ActionType lastType() const {
 		return ACTION_GOTOEXPRESSION;
 	}
 
-	const ActionHandler &operator[] (ActionType x) const
-	{
-		return get_handlers()[x];
+	const ActionHandler& operator[](ActionType x) const {
+		return _handlers[x];
 	}
 
-	const char* action_name(ActionType x) const;
-
 private:
-
-	static container_type & get_handlers();
-
-	bool _debug;
 
 	// Use the ::instance() method to get a reference
 	SWFHandlers();
 
 	// You won't destroy a singleton
 	~SWFHandlers();
+	
+    // Indexed by action id
+	typedef std::vector<ActionHandler> container_type;
+
+    container_type _handlers;
 
 };
 

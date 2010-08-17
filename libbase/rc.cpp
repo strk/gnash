@@ -500,6 +500,11 @@ RcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
             
+            if(noCaseCompare(variable, "MediaHandler")) {
+                _mediahandler = value;
+                continue;
+            }
+            
             if (noCaseCompare(variable, "CertDir") ) {
                 expandPath(value);
                 _certdir = value;

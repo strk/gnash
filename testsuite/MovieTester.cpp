@@ -160,7 +160,7 @@ MovieTester::render(boost::shared_ptr<Renderer> h,
     
     // This is a bit dangerous, as there isn't really support for swapping
     // renderers during runtime; though the only problem is likely to be
-    // that BitmapInfos are missing.
+    // that CachedBitmaps are missing.
     _runResources->setRenderer(h);
     
     h->set_invalidated_regions(invalidated_regions);

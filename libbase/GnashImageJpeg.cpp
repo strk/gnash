@@ -73,7 +73,6 @@ jpeg_error_exit(j_common_ptr cinfo)
     
     in->errorOccurred(cinfo->err->jpeg_message_table[cinfo->err->msg_code]); 
 
-    //log_error("failing to abort jpeg parser here (would need a long-jump call)");
 }
 
 
@@ -255,7 +254,9 @@ JpegImageInput::~JpegImageInput()
 {
     finishImage();
 
-    rw_source_IOChannel* src = reinterpret_cast<rw_source_IOChannel*>(m_cinfo.src);
+    rw_source_IOChannel* src =
+        reinterpret_cast<rw_source_IOChannel*>(m_cinfo.src);
+
     delete src;
     m_cinfo.src = NULL;
 
@@ -279,26 +280,27 @@ JpegImageInput::discardPartialBuffer()
 void
 JpegImageInput::readHeader(unsigned int maxHeaderBytes)
 {
-    if ( setjmp(_jmpBuf) )
-    {
+    if (setjmp(_jmpBuf)) {
         std::stringstream ss;
         ss << _("Internal jpeg error: ") << _errorOccurred;
         throw ParserException(ss.str());
     }
 
-    if ( maxHeaderBytes )
-    {
+    if (maxHeaderBytes) {
         // Read the encoding tables.
         // TODO: how to limit reads ?
         int ret = jpeg_read_header(&m_cinfo, FALSE);
-        switch (ret)
-        {
-            case JPEG_SUSPENDED: // suspended due to lack of data
-                throw ParserException(_("Lack of data during JPEG header parsing"));
+        switch (ret) {
+            case JPEG_SUSPENDED: 
+                // suspended due to lack of data
+                throw ParserException(_("Lack of data during JPEG "
+                            "header parsing"));
                 break;
-            case JPEG_HEADER_OK: // Found valid image datastream
+            case JPEG_HEADER_OK: 
+                // Found valid image datastream
                 break;
-            case JPEG_HEADER_TABLES_ONLY: // Found valid table-specs-only datastream
+            case JPEG_HEADER_TABLES_ONLY:
+                // Found valid table-specs-only datastream
                 break;
             default:
                 log_debug(_("unexpected: jpeg_read_header returned %d [%s:%d]"),
@@ -306,8 +308,7 @@ JpegImageInput::readHeader(unsigned int maxHeaderBytes)
                 break;
         }
 
-        if (_errorOccurred)
-        {
+        if (_errorOccurred) {
             std::stringstream ss;
             ss << _("Internal jpeg error: ") << _errorOccurred;
             throw ParserException(ss.str());
@@ -325,27 +326,27 @@ JpegImageInput::read()
 {
     assert(!_compressorOpened);
 
-    if ( setjmp(_jmpBuf) )
-    {
+    if (setjmp(_jmpBuf)) {
         std::stringstream ss;
         ss << _("Internal jpeg error: ") << _errorOccurred;
         throw ParserException(ss.str());
     }
 
-
     // hack, FIXME
     static const int stateReady = 202;    /* found SOS, ready for start_decompress */
-    while (m_cinfo.global_state != stateReady)
-    {
+    while (m_cinfo.global_state != stateReady) {
         int ret = jpeg_read_header(&m_cinfo, FALSE);
-        switch (ret)
-        {
-            case JPEG_SUSPENDED: // suspended due to lack of data
-                throw ParserException(_("lack of data during JPEG header parsing"));
+        switch (ret) {
+            case JPEG_SUSPENDED: 
+                // suspended due to lack of data
+                throw ParserException(_("lack of data during JPEG "
+                            "header parsing"));
                 break;
-            case JPEG_HEADER_OK: // Found valid image datastream
+            case JPEG_HEADER_OK: 
+                // Found valid image datastream
                 break;
-            case JPEG_HEADER_TABLES_ONLY: // Found valid table-specs-only datastream
+            case JPEG_HEADER_TABLES_ONLY: 
+                // Found valid table-specs-only datastream
                 break;
             default:
                 log_debug(_("unexpected: jpeg_read_header returned %d [%s:%d]"),
@@ -354,8 +355,7 @@ JpegImageInput::read()
         }
     }
 
-    if (_errorOccurred)
-    {
+    if (_errorOccurred) {
         std::stringstream ss;
         ss << _("Internal jpeg error during header parsing: ") << _errorOccurred;
         throw ParserException(ss.str());
@@ -363,8 +363,7 @@ JpegImageInput::read()
 
     jpeg_start_decompress(&m_cinfo);
 
-    if (_errorOccurred)
-    {
+    if (_errorOccurred) {
         std::stringstream ss;
         ss << _("Internal jpeg error during decompression: ") << _errorOccurred;
         throw ParserException(ss.str());
@@ -382,15 +381,13 @@ JpegImageInput::read()
 void
 JpegImageInput::finishImage()
 {
-    if ( setjmp(_jmpBuf) )
-    {
+    if (setjmp(_jmpBuf)) {
         std::stringstream ss;
         ss << _("Internal jpeg error: ") << _errorOccurred;
         throw ParserException(ss.str());
     }
 
-    if (_compressorOpened)
-    {
+    if (_compressorOpened) {
         jpeg_finish_decompress(&m_cinfo);
         _compressorOpened = false;
     }
@@ -427,19 +424,17 @@ void
 JpegImageInput::readScanline(unsigned char* rgb_data)
 {
     assert(_compressorOpened);
-
     assert(m_cinfo.output_scanline < m_cinfo.output_height);
-    int    lines_read = jpeg_read_scanlines(&m_cinfo, &rgb_data, 1);
+
+    const int lines_read = jpeg_read_scanlines(&m_cinfo, &rgb_data, 1);
     assert(lines_read == 1);
-    lines_read = lines_read;    // avoid warning in NDEBUG
+
     // Expand grayscale to RGB
-    if (m_cinfo.out_color_space == JCS_GRAYSCALE)
-    {
+    if (m_cinfo.out_color_space == JCS_GRAYSCALE) {
         size_t w = getWidth();
         unsigned char* src = rgb_data + w - 1;
         unsigned char* dst = rgb_data + (w * 3) - 1;
-        for (;  w;  w--, src--)
-        {
+        for (;  w;  w--, src--) {
             *dst-- = *src;
             *dst-- = *src;
             *dst-- = *src;
@@ -461,11 +456,11 @@ JpegImageInput::errorOccurred(const char* msg)
     std::longjmp(_jmpBuf, 1);
 }
 
-std::auto_ptr<GnashImage>
-JpegImageInput::readSWFJpeg2WithTables(JpegImageInput& loader)
 // Create and read a new image, using a input object that
 // already has tables loaded.  The IJG documentation describes
 // this as "abbreviated" format.
+std::auto_ptr<GnashImage>
+JpegImageInput::readSWFJpeg2WithTables(JpegImageInput& loader)
 {
 
     loader.read();
@@ -474,7 +469,7 @@ JpegImageInput::readSWFJpeg2WithTables(JpegImageInput& loader)
             new ImageRGB(loader.getWidth(), loader.getHeight()));
 
     for (size_t y = 0, height = loader.getHeight(); y < height; y++) {
-        loader.readScanline(im->scanline(y));
+        loader.readScanline(scanline(*im, y));
     }
 
     loader.finishImage();
@@ -627,9 +622,11 @@ JpegImageOutput::writeImageRGB(const unsigned char* rgbData)
 
 
 std::auto_ptr<ImageOutput>
-JpegImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
+JpegImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
+        size_t height, int quality)
 {
-    std::auto_ptr<ImageOutput> outChannel(new JpegImageOutput(out, width, height, quality));
+    std::auto_ptr<ImageOutput> outChannel(
+            new JpegImageOutput(out, width, height, quality));
     return outChannel;
 }
 

@@ -17,7 +17,7 @@
 
 # Build a Debian/Ubuntu .deb GNU/Linux package
 
-deb: bzrversion.h snapshot-src setup-deb snapshot-deb
+deb: revno.h snapshot-src setup-deb snapshot-deb
 
 # Build a .deb snapshot, which means we have to munge the release data
 # into the proper files to build a package with the version in
@@ -87,7 +87,7 @@ BUILD_VERSION := $(shell \
 PACKAGES := $(shell grep Package $(srcdir)/packaging/debian/control | sed -e 's/Package://')
 
 # SNAPSHOT_VERSION is the name that gets used for the packages. By default
-# it is "$(NEXT_RELEASE)~bzr.$(BRANCH_NICK)$(BRANCH_REVNO)", but when
+# it is "$(NEXT_RELEASE)~git.$(BRANCH_NICK)$(BRANCH_REVNO)", but when
 # building alternate packages, we want to rename them so there isn't a
 # name collision.
 
@@ -103,7 +103,9 @@ setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control
 deb-rename-build:
 	@echo "Building package in: $(BUILD_DIR)..."
 	@if test -d gnash-$(PACKAGE_VERSION); then \
-	  mv -f gnash-$(PACKAGE_VERSION) $(BUILD_DIR); \
+	  if test ! -d $(BUILD_DIR); then \
+	    mv -f gnash-$(PACKAGE_VERSION) $(BUILD_DIR); \
+	  fi; \
 	fi
 
 # Once the directory has been renamed, we copy over the Debian packaging

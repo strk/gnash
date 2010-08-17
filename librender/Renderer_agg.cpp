@@ -127,6 +127,7 @@ AGG resources
 #include "GnashNumeric.h"
 #include "GC.h"
 #include "cxform.h"
+#include "FillStyle.h"
 
 #ifdef HAVE_VA_VA_H
 #include "GnashVaapiImage.h"
@@ -582,8 +583,8 @@ public:
     VideoRenderer(const ClipBounds& clipbounds, GnashImage& frame,
             Matrix& mat, Quality quality, bool smooth)
         :
-        _buf(frame.data(), frame.width(), frame.height(),
-                frame.pitch()),
+        _buf(frame.begin(), frame.width(), frame.height(),
+                frame.stride()),
         _pixf(_buf),
         _accessor(_pixf),
         _interpolator(mat),
@@ -669,6 +670,8 @@ private:
     /// Whether smoothing is required.
     bool _smoothing;
 };    
+  
+
             
 }
 
@@ -685,9 +688,9 @@ class Renderer_agg : public Renderer_agg_base
 public:
 
     // Given an image, returns a pointer to a bitmap_info class
-    // that can later be passed to fill_styleX_bitmap(), to set a
+    // that can later be passed to FillStyleX_bitmap(), to set a
     // bitmap fill style.
-    gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
+    gnash::CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im)
     {        
         return new agg_bitmap_info(im);
     }
@@ -1029,12 +1032,11 @@ public:
     AggPaths agg_paths;    
     buildPaths(agg_paths, paths);
  
-    // make sure m_single_fill_styles contains the required color 
-    need_single_fill_style(color);
+    std::vector<FillStyle> v(1, FillStyle(SolidFill(color)));
 
     // prepare style handler
-    agg_style_handler sh;
-    build_agg_styles(sh, m_single_fill_styles, mat, cxform());
+    StyleHandler sh;
+    build_agg_styles(sh, v, mat, cxform());
     
     draw_shape(-1, paths, agg_paths, sh, false);
     
@@ -1118,7 +1120,7 @@ public:
         drawShape(fillStyles, lineStyles, paths, worldMat, cx);
     }
 
-    void drawShape(const std::vector<fill_style>& fill_styles,
+    void drawShape(const std::vector<FillStyle>& FillStyles,
         const std::vector<LineStyle>& line_styles,
         const std::vector<Path>& objpaths, const SWFMatrix& mat,
         const cxform& cx)
@@ -1168,8 +1170,8 @@ public:
         }
 
         // prepare fill styles
-        agg_style_handler sh;
-        if (have_shape) build_agg_styles(sh, fill_styles, mat, cx);
+        StyleHandler sh;
+        if (have_shape) build_agg_styles(sh, FillStyles, mat, cx);
 
         // We need to separate sub-shapes during rendering. 
         const unsigned int subshape_count = count_sub_shapes(paths);
@@ -1383,126 +1385,23 @@ public:
     
     }
   } //buildPaths_rounded
-    
-  // Initializes the internal styles class for AGG renderer
-  void build_agg_styles(agg_style_handler& sh, 
-    const std::vector<fill_style>& fill_styles,
-    const SWFMatrix& fillstyle_matrix,
-    const cxform& cx) {
-    
-    SWFMatrix inv_stage_matrix = stage_matrix;
-    inv_stage_matrix.invert();
-    
-    const size_t fcount = fill_styles.size();
-    for (size_t fno=0; fno<fcount; ++fno) {
-    
-      int fill_type = fill_styles[fno].get_type();
-      
-      switch (fill_type) {
 
-        case SWF::FILL_LINEAR_GRADIENT:
-        {    
-          SWFMatrix m = fill_styles[fno].getGradientMatrix();
-          SWFMatrix cm = fillstyle_matrix;
-          cm.invert();
-          
-          m.concatenate(cm);
-          m.concatenate(inv_stage_matrix);
-          
-          sh.add_gradient_linear(fill_styles[fno], m, cx);
-          break;
+    // Initializes the internal styles class for AGG renderer
+    void build_agg_styles(StyleHandler& sh,
+        const std::vector<FillStyle>& FillStyles,
+        const SWFMatrix& fillstyle_matrix, const cxform& cx) {
+    
+        SWFMatrix inv_stage_matrix = stage_matrix;
+        inv_stage_matrix.invert();
+    
+        const size_t fcount = FillStyles.size();
+
+        for (size_t fno = 0; fno < fcount; ++fno) {
+            const AddStyles st(stage_matrix, fillstyle_matrix, cx, sh,
+                    _quality);
+            boost::apply_visitor(st, FillStyles[fno].fill);
         } 
-
-        case SWF::FILL_RADIAL_GRADIENT:
-        {
-          SWFMatrix m = fill_styles[fno].getGradientMatrix();
-          SWFMatrix cm = fillstyle_matrix;
-          cm.invert();
-          
-          m.concatenate(cm);
-          m.concatenate(inv_stage_matrix);
-          
-          sh.add_gradient_radial(fill_styles[fno], m, cx);
-          break;
-        } 
-
-        case SWF::FILL_FOCAL_GRADIENT:
-        {
-          SWFMatrix m = fill_styles[fno].getGradientMatrix();
-          SWFMatrix cm = fillstyle_matrix;
-          cm.invert();
-          
-          m.concatenate(cm);
-          m.concatenate(inv_stage_matrix);
-          
-          sh.add_gradient_focal(fill_styles[fno], m, cx);
-          break;
-        }
-
-        case SWF::FILL_TILED_BITMAP:
-        case SWF::FILL_CLIPPED_BITMAP:
-        case SWF::FILL_TILED_BITMAP_HARD:
-        case SWF::FILL_CLIPPED_BITMAP_HARD:
-        {    
-          SWFMatrix m = fill_styles[fno].getBitmapMatrix();
-          SWFMatrix cm = fillstyle_matrix;
-          cm.invert();
-          
-          m.concatenate(cm);
-          m.concatenate(inv_stage_matrix);
-
-          //
-          // Smoothing policy:
-          //
-          // - If unspecified, smooth when _quality >= BEST
-          // - If ON or forced, smooth when _quality > LOW
-          // - If OFF, don't smooth
-          //
-          // TODO: take a forceBitmapSmoothing parameter.
-          //       which should be computed by the VM looking
-          //       at MovieClip.forceSmoothing.
-          //
-          bool smooth = false;
-          if ( _quality > QUALITY_LOW ) // never smooth in LOW quality
-          {
-             // TODO: if forceSmoothing is true, smooth !
-             switch ( fill_styles[fno].getBitmapSmoothingPolicy() )
-             {
-                case fill_style::BITMAP_SMOOTHING_UNSPECIFIED:
-                    if ( _quality >= QUALITY_BEST ) smooth = true;
-                    break;
-                case fill_style::BITMAP_SMOOTHING_ON:
-                    smooth = true;
-                    break;
-                default: break;
-             }
-          }
-
-          sh.add_bitmap(dynamic_cast<const agg_bitmap_info*> 
-            (fill_styles[fno].get_bitmap_info(*this)), m, cx, 
-            (fill_type==SWF::FILL_TILED_BITMAP) ||
-            (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth);
-
-          break;
-        } 
-
-        case SWF::FILL_SOLID:
-        default:
-        {            
-          rgba color = cx.transform(fill_styles[fno].get_color());
-
-          // add the color to our self-made style handler (basically
-          // just a list)
-          sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b,
-                      color.m_a));
-        } 
-        
-      } // switch
-        
-    } // for
-    
-  } //build_agg_styles
+    } 
   
 
   /// Draws the given path using the given fill style and color transform.
@@ -1522,7 +1421,7 @@ public:
   ///
   void draw_shape(int subshape_id, const GnashPaths &paths,
     const AggPaths& agg_paths,  
-    agg_style_handler& sh, bool even_odd) {
+    StyleHandler& sh, bool even_odd) {
     
     if (_alphaMasks.empty()) {
     
@@ -1556,7 +1455,7 @@ public:
   template <class scanline_type>
   void draw_shape_impl(int subshape_id, const GnashPaths &paths,
     const AggPaths& agg_paths,
-    agg_style_handler& sh, bool even_odd, scanline_type& sl) {
+    StyleHandler& sh, bool even_odd, scanline_type& sl) {
     /*
     Fortunately, AGG provides a rasterizer that fits perfectly to the flash
     data model. So we just have to feed AGG with all data and we're done. :-)
@@ -1692,17 +1591,6 @@ public:
     typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> rasc_type;  
     rasc_type rasc;
     
-    // renderer base
-    renderer_base& rbase = _alphaMasks.back()->get_rbase();
-    
-    // solid fills
-    typedef agg::renderer_scanline_aa_solid< renderer_base > ren_sl_type;
-    ren_sl_type ren_sl(rbase);
-    
-    // span allocator
-    typedef agg::span_allocator<agg::gray8> alloc_type;
-    alloc_type alloc; 
-      
 
     // activate even-odd filling rule
     if (even_odd) rasc.filling_rule(agg::fill_even_odd);
@@ -1734,6 +1622,14 @@ public:
       rasc.add_path(curve);
     
     } // for path
+    
+    // renderer base
+    renderer_base& rbase = _alphaMasks.back()->get_rbase();
+    
+    // span allocator
+    typedef agg::span_allocator<agg::gray8> alloc_type;
+    alloc_type alloc; 
+      
     
     // now render that thing!
     agg::render_scanlines_compound_layered (rasc, sl, rbase, alloc, sh);
@@ -2153,20 +2049,6 @@ public:
   
 private:  // private variables
     
-  /// Sets m_single_fill_styles to one solid fill with the given color 
-    void need_single_fill_style(const rgba& color)
-    {
-
-        if (m_single_fill_styles.size() == 0)
-        { 
-            fill_style dummy;
-            m_single_fill_styles.push_back(dummy);
-        }
-
-        m_single_fill_styles[0].set_color(color);
-
-    } 
-
     typedef agg::renderer_base<PixelFormat> renderer_base;
 
     // renderer base
@@ -2197,7 +2079,7 @@ private:  // private variables
     AlphaMasks _alphaMasks;
     
     /// Cached fill style list with just one entry used for font rendering
-    std::vector<fill_style> m_single_fill_styles;
+    std::vector<FillStyle> m_single_FillStyles;
 
 
 };

@@ -68,7 +68,7 @@ CLEANFILES = \
 install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 	test -d "$(DESTDIR)$(pluginsdir)" || $(mkinstalldirs) "$(DESTDIR)$(pluginsdir)"
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugins_LTLIBRARIES) "$(DESTDIR)$(pluginsdir)/$(plugins_LTLIBRARIES)"
-	$(RM) $(DESTDIR)$(pluginsdir)/*.a 
+	$(RM) $(DESTDIR)$(pluginsdir)/*.*a 
 
 test: $(srcdir)/../../testsuite/generic-testrunner.sh test.swf
 	GNASH_PLUGINS=$(PWD)/.libs GNASHRC=$(srcdir)/../gnashrc sh $< $(top_builddir) test.swf > $@

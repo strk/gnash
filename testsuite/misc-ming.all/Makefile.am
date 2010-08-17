@@ -37,6 +37,7 @@ EXTRA_DIST = \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
+	GradientFillTest.as \
 	LC-Receive.as \
 	LC-Send.as \
 	FlashVarsTest.as \
@@ -194,7 +195,11 @@ check_PROGRAMS = \
 	runtime_vm_stack_test \
 	new_child_in_unload_test \
 	instanceNameTest \
+	BeginBitmapFill \
+	BeginBitmapFillRunner \
 	BitmapDataTest \
+	BitmapDataTestRunner \
+	BitmapDataDraw \
 	BitmapSmoothingTest \
 	$(NULL)
 
@@ -261,6 +266,7 @@ check_PROGRAMS += EmbeddedSoundTest-Runner
 endif
 
 check_SCRIPTS = \
+	BitmapDataDrawRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
 	TextSnapshotTest-Runner \
@@ -1572,6 +1578,74 @@ BitmapDataTest_LDADD = libgnashmingutils.la
 BitmapDataTest.swf: BitmapDataTest
 	./BitmapDataTest $(abs_mediadir)
 
+BitmapDataTestRunner_SOURCES = \
+	BitmapDataTestRunner.cpp \
+	$(NULL)
+
+BitmapDataTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+BitmapDataTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+
+BitmapDataTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	BitmapDataTest.swf	\
+	$(NULL)
+
+BitmapDataDraw_SOURCES = \
+	BitmapDataDraw.c \
+	$(NULL)
+
+BitmapDataDraw_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+BitmapDataDraw_LDADD = libgnashmingutils.la
+
+BitmapDataDraw.swf: BitmapDataDraw
+	./BitmapDataDraw $(abs_mediadir)
+
+BitmapDataDrawRunner: $(srcdir)/../generic-testrunner.sh BitmapDataDraw.swf
+	sh $< $(top_builddir) BitmapDataDraw.swf > $@
+	chmod 755 $@
+
+BeginBitmapFill_SOURCES = \
+	BeginBitmapFill.c \
+	$(NULL)
+
+BeginBitmapFill_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+BeginBitmapFill_LDADD = libgnashmingutils.la
+
+BeginBitmapFill.swf: BeginBitmapFill
+	./BeginBitmapFill $(abs_mediadir)
+
+BeginBitmapFillRunner_SOURCES = \
+	BeginBitmapFillRunner.cpp \
+	$(NULL)
+
+BeginBitmapFillRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+BeginBitmapFillRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+
+BeginBitmapFillRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	BeginBitmapFill.swf	\
+	$(NULL)
+
 EmbeddedSoundTest_SOURCES = \
 	EmbeddedSoundTest.c \
 	$(NULL)
@@ -1940,6 +2014,9 @@ XMLSocketTester: $(srcdir)/XMLSocketTester.sh XMLSocketTest.swf
 		XMLSocketTest.swf > $@
 	chmod 755 $@
 
+GradientFillTest.swf: $(srcdir)/GradientFillTest.as 
+	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/GradientFillTest.as
+
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
 
@@ -2145,6 +2222,9 @@ clean-local:
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
+	BeginBitmapFillRunner \
+	BitmapDataTestRunner \
+	BitmapDataDrawRunner \
 	LoadVarsTestRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \

@@ -49,7 +49,7 @@
 #include "ExecutableCode.h" // for inheritance of ConstructEvent
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
-#include "LineStyle.h" // for CapStyle and JoinStyle enums
+#include "LineStyle.h"
 #include "PlaceObject2Tag.h" 
 #include "flash/geom/Matrix_as.h"
 #include "GnashNumeric.h"
@@ -703,10 +703,7 @@ MovieClip::pathElement(string_table::key key)
     obj = getObject(getDisplayListObject(key));
     if (obj) return obj;
 
-    std::string name = getStringTable(*getObject(this)).value(key);
- 
     obj = getObject(this);
-
     assert(obj);
 
     // See if it's a member

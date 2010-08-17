@@ -61,14 +61,14 @@ public:
     /// Xshear, 16.16 fixed point. yx in swfdec. 'b' in AS Matrix.
     int shx;
 
-    /// Xtranslation, TWIPS. x0 in swfdec. 'tx' in AS Matrix.
-    int tx; 
+    /// Yshear, 16.16 fixed point. xy in swfdec. 'c' in AS Matrix.
+    int shy;
 
     /// Yscale, 16.16 fixed point. yy in swfdec. 'd' in AS Matrix.
     int sy; 
 
-    /// Yshear, 16.16 fixed point. xy in swfdec. 'c' in AS Matrix.
-    int shy;
+    /// Xtranslation, TWIPS. x0 in swfdec. 'tx' in AS Matrix.
+    int tx; 
 
     /// Ytranslation, TWIPS. y0 in swfdec. 'ty' in AS Matrix.
     int ty; 
@@ -76,14 +76,30 @@ public:
     friend bool operator== (const SWFMatrix&, const SWFMatrix&);
     friend std::ostream& operator<< (std::ostream&, const SWFMatrix&);
     
-    /// Defaults to identity
-    SWFMatrix();
+    /// Construct an identity SWFMatrix
+    SWFMatrix()
+        :
+        sx(65536),
+        shx(0),
+        shy(0),
+        sy(65536),
+        tx(0),
+        ty(0)
+    {}
 
-    /// Check validity of the SWFMatrix values
-    bool    is_valid() const;
+    /// Construct a SWFMatrix with all values.
+    SWFMatrix(int a, int b, int c, int d, int x, int y)
+        :
+        sx(a),
+        shx(b),
+        shy(c),
+        sy(d),
+        tx(x),
+        ty(y)
+    {}
 
     /// Set the SWFMatrix to identity.
-    void    set_identity();
+    void set_identity();
 
     /// Concatenate m's transform onto ours. 
     //
@@ -143,9 +159,6 @@ public:
         ty = y;
     }
 
-    /// Initialize from the SWF input stream.
-    void    read(SWFStream& in);
-
     /// Transform a given point by our SWFMatrix
     void transform(geometry::Point2d& p) const;
 
@@ -196,6 +209,9 @@ private:
     boost::int64_t  determinant() const;
 
 }; //end of SWFMatrix
+
+/// Read from input stream.
+SWFMatrix readSWFMatrix(SWFStream& in);
 
 inline bool operator== (const SWFMatrix& a, const SWFMatrix& b)
 {

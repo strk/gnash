@@ -489,7 +489,7 @@ public:
     ///    The fill index (1-based).
     ///    When this path is added to a DefineShapeTag,
     ///    the index (decremented by 1) will reference an element
-    ///    in the fill_style vector defined for that shape.
+    ///    in the FillStyle vector defined for that shape.
     ///    If zero, no fill will be active.
     ///
     void setLeftFill(unsigned f)
@@ -508,7 +508,7 @@ public:
     ///    The fill index (1-based).
     ///    When this path is added to a DefineShapeTag,
     ///    the index (decremented by 1) will reference an element
-    ///    in the fill_style vector defined for that shape.
+    ///    in the FillStyle vector defined for that shape.
     ///    If zero, no fill will be active.
     ///
     void setRightFill(unsigned f)

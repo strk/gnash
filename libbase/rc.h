@@ -1,3 +1,4 @@
+// rc.h:  "Run Command" configuration file declarations, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
@@ -246,11 +247,17 @@ public:
     // Set the name of the hardware acclerator to use for video
     void setHWAccel(const std::string &x) { _hwaccel = x; }
 
-    // Get the name of the hardware acclerator to use for video
+    // Get the name of the renderer to draw the display
     const std::string& getRenderer() const { return _renderer; }
 
-    // Set the name of the hardware acclerator to use for video
+    // Set the name of the renderer to draw the display
     void setRenderer(const std::string& x) { _renderer = x; }
+
+    // Get the name of the media handler to use for video/audio
+    const std::string& getMediaHandler() const { return _mediahandler; }
+
+    // Set the name of the media handler to use for video/audio
+    void setMediaHandler(const std::string& x) { _mediahandler = x; }
 
     // Get the location of the sandbox for .sol files
     const std::string &getSOLSafeDir() const { return _solsandbox; }
@@ -580,15 +587,19 @@ protected:
     /// default value is true
     bool _ignoreShowMenu;
 
-    /// Whether to ue HW video decoding support, no value means disabled.
-    /// The only currently supported values are: none, vaapi,  or xv (omap)
-    /// support coming. 
+    /// Whether to use HW video decoding support, no value means disabled.
+    /// The only currently supported values are: none, vaapi, or xv.  omap
+    /// support is coming. 
     std::string _hwaccel;
 
     /// Which renderer backend to use, no value means use the default.
     /// The currently supported values are agg, opengl, or cairo. AGG
     /// being the default.
     std::string _renderer;
+
+    /// Which media player backend to use, no value means use the default.
+    /// The default is set in the MediaFactory initialization table.
+    std::string _mediahandler;
 };
 
 // End of gnash namespace 

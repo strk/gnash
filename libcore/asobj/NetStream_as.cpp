@@ -341,7 +341,6 @@ void NetStream_as::pause(PauseMode mode)
 
 void NetStream_as::close()
 {
-    GNASH_REPORT_FUNCTION;
 
     // Delete any samples in the audio queue.
     _audioStreamer.cleanAudioQueue();

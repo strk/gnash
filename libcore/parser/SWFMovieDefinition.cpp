@@ -22,9 +22,18 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
+#include "SWFMovieDefinition.h"
+
+#include <boost/bind.hpp>
+#include <boost/version.hpp>
+#include <boost/thread.hpp>
+#include <iomanip>
+#include <memory>
+#include <string>
+#include <algorithm> // std::make_pair
+
 #include "GnashSleep.h"
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "SWFMovieDefinition.h"
 #include "movie_definition.h" // for inheritance
 #include "zlib_adapter.h"
 #include "IOChannel.h" // for use
@@ -43,14 +52,7 @@
 #include "Global_as.h"
 #include "namedStrings.h"
 #include "as_function.h"
-
-#include <boost/bind.hpp>
-#include <boost/version.hpp>
-#include <boost/thread.hpp>
-#include <iomanip>
-#include <memory>
-#include <string>
-#include <algorithm> // std::make_pair
+#include "CachedBitmap.h"
 
 // Debug frames load
 #undef DEBUG_FRAMES_LOAD
@@ -222,7 +224,7 @@ SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic)
     return 0;
 }
 
-BitmapInfo*
+CachedBitmap*
 SWFMovieDefinition::getBitmap(int id) const
 {
     const Bitmaps::const_iterator it = _bitmaps.find(id);
@@ -231,7 +233,7 @@ SWFMovieDefinition::getBitmap(int id) const
 }
 
 void
-SWFMovieDefinition::addBitmap(int id, boost::intrusive_ptr<BitmapInfo> im)
+SWFMovieDefinition::addBitmap(int id, boost::intrusive_ptr<CachedBitmap> im)
 {
     assert(im);
     _bitmaps.insert(std::make_pair(id, im));

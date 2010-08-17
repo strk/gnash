@@ -17,9 +17,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "MovieClip_as.h"
+
+#include <boost/lexical_cast.hpp>
+
 #include "MovieClip.h"
 #include "Movie.h"
-#include "MovieClip_as.h"
 #include "display/BitmapData_as.h"
 #include "NetStream_as.h"
 #include "movie_root.h"
@@ -33,9 +36,10 @@
 #include "NativeFunction.h" 
 #include "Bitmap.h"
 #include "Array_as.h"
-
+#include "FillStyle.h"
 #include "namedStrings.h"
-#include <boost/lexical_cast.hpp>
+#include "Renderer.h"
+#include "RunResources.h"
 
 namespace gnash {
 
@@ -100,6 +104,8 @@ namespace {
     as_value movieclip_getSWFVersion(const fn_call& fn);
     as_value movieclip_loadVariables(const fn_call& fn);
     as_value movieclip_dropTarget(const fn_call& fn);
+
+    SWFMatrix asToSWFMatrix(as_object& o);
 
 }
 
@@ -1428,19 +1434,7 @@ as_value
 movieclip_endFill(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
-
-    IF_VERBOSE_ASCODING_ERRORS(
-    if ( fn.nargs )
-    {
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.endFill(%s): args will be discarded"),
-            ss.str());
-    }
-    );
-#ifdef DEBUG_DRAWING_API
-    log_debug("%s.endFill();", movieclip->getTarget());
-#endif
-    movieclip->endFill();
+    movieclip->graphics().endFill();
     return as_value();
 }
 
@@ -1449,52 +1443,24 @@ movieclip_lineTo(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    if ( fn.nargs < 2 )
-    {
+    if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("MovieClip.lineTo() needs at least two arguments"));
         );
         return as_value();
     }
 
-    IF_VERBOSE_ASCODING_ERRORS(
-    if ( fn.nargs > 2 )
-    {
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.lineTo(%s): args after the first two "
-                        "will be discarded"), ss.str());
-    }
-    );
-
     double x = fn.arg(0).to_number();
     double y = fn.arg(1).to_number();
         
-    if (!isFinite(x) )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.lineTo(%s) : non-finite first argument (%s), "
-            "converted to zero"), movieclip->getTarget(),
-            ss.str(), fn.arg(0));
-        );
-        x = 0;
-    }
-     
-    if (!isFinite(y) )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.lineTo(%s) : non-finite second argument (%s), "
-            "converted to zero"), movieclip->getTarget(),
-            ss.str(), fn.arg(1));
-        );
-        y = 0;
-    }
+    if (!isFinite(x)) x = 0;
+    if (!isFinite(y)) y = 0;
 
 #ifdef DEBUG_DRAWING_API
     log_debug("%s.lineTo(%g,%g);", movieclip->getTarget(), x, y);
 #endif
-    movieclip->lineTo(pixelsToTwips(x), pixelsToTwips(y));
+    movieclip->graphics().lineTo(pixelsToTwips(x), pixelsToTwips(y),
+            movieclip->getDefinitionVersion());
     return as_value();
 }
 
@@ -1503,52 +1469,20 @@ movieclip_moveTo(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    if ( fn.nargs < 2 )
-    {
+    if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("MovieClip.moveTo() takes two args"));
         );
         return as_value();
     }
 
-    IF_VERBOSE_ASCODING_ERRORS(
-    if ( fn.nargs > 2 )
-    {
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.moveTo(%s): args after the first two will "
-                        "be discarded"), ss.str());
-    }
-    );
-
     double x = fn.arg(0).to_number();
     double y = fn.arg(1).to_number();
      
-    if (!isFinite(x) )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.moveTo(%s) : non-finite first argument (%s), "
-            "converted to zero"), movieclip->getTarget(),
-            ss.str(), fn.arg(0));
-        );
-        x = 0;
-    }
-     
-    if (!isFinite(y) )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.moveTo(%s) : non-finite second argument (%s), "
-            "converted to zero"), movieclip->getTarget(),
-            ss.str(), fn.arg(1));
-        );
-        y = 0;
-    }
+    if (!isFinite(x)) x = 0;
+    if (!isFinite(y)) y = 0;
 
-#ifdef DEBUG_DRAWING_API
-    log_debug(_("%s.moveTo(%g,%g);"), movieclip->getTarget(), x, y);
-#endif
-    movieclip->moveTo(pixelsToTwips(x), pixelsToTwips(y));
+    movieclip->graphics().moveTo(pixelsToTwips(x), pixelsToTwips(y));
     return as_value();
 }
 
@@ -1563,9 +1497,8 @@ movieclip_lineStyle(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    if ( ! fn.nargs )
-    {
-        movieclip->resetLineStyle();
+    if (!fn.nargs) {
+        movieclip->graphics().resetLineStyle();
         return as_value();
     }
 
@@ -1585,8 +1518,7 @@ movieclip_lineStyle(const fn_call& fn)
     int arguments = fn.nargs;
 
     const int swfVersion = getSWFVersion(fn);
-    if (swfVersion < 8 && fn.nargs > 3)
-    {
+    if (swfVersion < 8 && fn.nargs > 3) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
@@ -1596,15 +1528,8 @@ movieclip_lineStyle(const fn_call& fn)
         arguments = 3;
     }
 
-    switch (arguments)
-    {
+    switch (arguments) {
         default:
-            IF_VERBOSE_ASCODING_ERRORS(
-                std::ostringstream ss;
-                fn.dump_args(ss);
-                log_aserror(_("MovieClip.lineStyle(%s): args after the "
-                              "first eight will be discarded"), ss.str());
-                );
         case 8:
             miterLimitFactor = clamp<int>(toInt(fn.arg(7)), 1, 255);
         case 7:
@@ -1613,8 +1538,7 @@ movieclip_lineStyle(const fn_call& fn)
             if (joinStyleStr == "miter") joinStyle = JOIN_MITER;
             else if (joinStyleStr == "round") joinStyle = JOIN_ROUND;
             else if (joinStyleStr == "bevel") joinStyle = JOIN_BEVEL;
-            else
-            {
+            else {
                 IF_VERBOSE_ASCODING_ERRORS(
                     std::ostringstream ss;
                     fn.dump_args(ss);
@@ -1630,8 +1554,7 @@ movieclip_lineStyle(const fn_call& fn)
             if (capStyleStr == "none") capStyle = CAP_NONE;
             else if (capStyleStr == "round") capStyle = CAP_ROUND;
             else if (capStyleStr == "square") capStyle = CAP_SQUARE;
-            else
-            {
+            else {
                 IF_VERBOSE_ASCODING_ERRORS(
                     std::ostringstream ss;
                     fn.dump_args(ss);
@@ -1646,21 +1569,17 @@ movieclip_lineStyle(const fn_call& fn)
             // Both values to be set here are true, so just set the
             // appropriate values to false.
             const std::string noScaleString = fn.arg(4).to_string();
-            if (noScaleString == "none")
-            {
+            if (noScaleString == "none") {
                 scaleThicknessVertically = false;
                 scaleThicknessHorizontally = false;
             }
-            else if (noScaleString == "vertical")
-            {
+            else if (noScaleString == "vertical") {
                 scaleThicknessVertically = false;
             }
-            else if (noScaleString == "horizontal")
-            {
+            else if (noScaleString == "horizontal") {
                 scaleThicknessHorizontally = false;
             }
-            else if (noScaleString != "normal")
-            {
+            else if (noScaleString != "normal") {
                 IF_VERBOSE_ASCODING_ERRORS(
                     std::ostringstream ss;
                     fn.dump_args(ss);
@@ -1698,12 +1617,9 @@ movieclip_lineStyle(const fn_call& fn)
 
     rgba color(r, g, b, a);
 
-#ifdef DEBUG_DRAWING_API
-    log_debug("%s.lineStyle(%d,%d,%d,%d);", movieclip->getTarget(), thickness, r, g, b);
-#endif
-    movieclip->lineStyle(thickness, color,
-    scaleThicknessVertically, scaleThicknessHorizontally,
-    pixelHinting, noClose, capStyle, capStyle, joinStyle, miterLimitFactor);
+    movieclip->graphics().lineStyle(thickness, color,
+        scaleThicknessVertically, scaleThicknessHorizontally,
+        pixelHinting, noClose, capStyle, capStyle, joinStyle, miterLimitFactor);
 
     return as_value();
 }
@@ -1713,78 +1629,30 @@ movieclip_curveTo(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    if ( fn.nargs < 4 )
-    {
+    if (fn.nargs < 4) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("MovieClip.curveTo() takes four args"));
         );
         return as_value();
     }
 
-    IF_VERBOSE_ASCODING_ERRORS(
-    if ( fn.nargs > 4 )
-    {
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.curveTo(%s): args after the first four "
-                "will be discarded"), ss.str());
-    }
-    );
-
     double cx = fn.arg(0).to_number();
     double cy = fn.arg(1).to_number();
     double ax = fn.arg(2).to_number();
     double ay = fn.arg(3).to_number();
 
-    if (!isFinite(cx))
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.curveTo(%s) : non-finite first argument (%s), "
-            "converted to zero"), movieclip->getTarget(),
-            ss.str(), fn.arg(0));
-        );
-        cx = 0;
-    }
-     
-    if (!isFinite(cy))
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.curveTo(%s) : non-finite second argument (%s), "
-            "converted to zero"), movieclip->getTarget(),
-            ss.str(), fn.arg(1));
-        );
-        cy = 0;
-    }
-
-    if (!isFinite(ax))
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.curveTo(%s) : non-finite third argument (%s), "
-            "converted to zero"), movieclip->getTarget(),
-            ss.str(), fn.arg(0));
-        );
-        ax = 0;
-    }
-     
-    if (!isFinite(ay))
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.curveTo(%s) : non-finite fourth argument (%s), "
-            "converted to zero"), movieclip->getTarget(),
-            ss.str(), fn.arg(1));
-        );
-        ay = 0;
-    }
+    if (!isFinite(cx)) cx = 0;
+    if (!isFinite(cy)) cy = 0;
+    if (!isFinite(ax)) ax = 0;
+    if (!isFinite(ay)) ay = 0;
 
 #ifdef DEBUG_DRAWING_API
     log_debug(_("%s.curveTo(%g,%g,%g,%g);"), movieclip->getTarget(),
             cx, cy, ax, ay);
 #endif
-    movieclip->curveTo(pixelsToTwips(cx), pixelsToTwips(cy),
-            pixelsToTwips(ax), pixelsToTwips(ay));
+    movieclip->graphics().curveTo(pixelsToTwips(cx), pixelsToTwips(cy),
+            pixelsToTwips(ax), pixelsToTwips(ay),
+            movieclip->getDefinitionVersion());
 
     return as_value();
 }
@@ -1793,21 +1661,7 @@ as_value
 movieclip_clear(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
-
-    IF_VERBOSE_ASCODING_ERRORS(
-    if ( fn.nargs )
-    {
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.clear(%s): args will be discarded"),
-            ss.str());
-    }
-    );
-
-#ifdef DEBUG_DRAWING_API
-    log_debug(_("%s.clear();"), movieclip->getTarget());
-#endif
-    movieclip->clear();
-
+    movieclip->graphics().clear();
     return as_value();
 }
 
@@ -1816,46 +1670,30 @@ movieclip_beginFill(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    if ( fn.nargs < 1 )
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("beginFill() with no args is a no-op");
+            log_aserror("beginFill() with no args is a no-op");
         );
         return as_value();
     }
 
-    boost::uint8_t r = 0;
-    boost::uint8_t g = 0;
-    boost::uint8_t b = 0;
+    // 2^24 is the max here
+    const boost::uint32_t rgbval =
+        clamp<float>(fn.arg(0).to_number(), 0, 16777216);
+
+    const boost::uint8_t r = (rgbval & 0xFF0000) >> 16;
+    const boost::uint8_t g = (rgbval & 0x00FF00) >> 8;
+    const boost::uint8_t b = rgbval & 0x0000FF;
     boost::uint8_t a = 255;
 
-
-    // 2^24 is the max here
-    boost::uint32_t rgbval = boost::uint32_t(
-            clamp<float>(fn.arg(0).to_number(), 0, 16777216));
-    r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
-    g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
-    b = boost::uint8_t( (rgbval&0x0000FF) );
-
-    if ( fn.nargs > 1 )
-    {
+    if (fn.nargs > 1) {
         a = 255 * clamp<int>(toInt(fn.arg(1)), 0, 100) / 100;
-        IF_VERBOSE_ASCODING_ERRORS(
-        if ( fn.nargs > 2 )
-        {
-            std::stringstream ss; fn.dump_args(ss);
-            log_aserror(_("MovieClip.beginFill(%s): args after the "
-                    "first will be discarded"), ss.str());
-        }
-        );
     }
 
     rgba color(r, g, b, a);
 
-#ifdef DEBUG_DRAWING_API
-    log_debug(_("%s.beginFill(%d,%d,%d);"), movieclip->getTarget(), r, g, b);
-#endif
-    movieclip->beginFill(color);
+    const FillStyle f = SolidFill(color);
+    movieclip->graphics().beginFill(f);
 
     return as_value();
 }
@@ -1879,41 +1717,49 @@ movieclip_beginGradientFill(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): invalid call: 5 arguments "
-                "needed"),
-            movieclip->getTarget(), ss.str());
+                "needed"), movieclip->getTarget(), ss.str());
         );
         return as_value();
     }
 
-    // There are optional arguments that we do not implement!
-    if (fn.nargs > 5) {
-        std::stringstream ss; fn.dump_args(ss);
-        LOG_ONCE(log_unimpl(_("MovieClip.beginGradientFill(%s): args after "
-                        "the first five will be discarded"), ss.str()));
+    const size_t maxargs = getSWFVersion(fn) >= 8 ? 8 : 5;
+
+    if (fn.nargs > maxargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("%s.beginGradientFill(%s): extra arguments "
+                    "invalidate call!"));
+            );
+        return as_value();
     }
 
-    bool radial = false;
+    GradientFill::Type t;
+
     std::string typeStr = fn.arg(0).to_string();
 
-    // Case-sensitive comparison needed for this ...
-    if (typeStr == "radial") radial = true;
-    else if (typeStr == "linear") radial = false;
+    // An unexpected fill type results in no fill in all versions.
+    if (typeStr == "radial") {
+        t = GradientFill::RADIAL;
+    }
+    else if (typeStr == "linear") {
+        t = GradientFill::LINEAR;
+    }
     else {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.beginGradientFill(%s): first arg must be "
-            "'radial' or 'linear'"),
-            movieclip->getTarget(), ss.str());
-        );
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("%s.beginGradientFill(%s): first arg must be "
+                "'radial', 'focal', or 'linear'"),
+                movieclip->getTarget(), ss.str());
+            );
         return as_value();
     }
 
     typedef boost::intrusive_ptr<as_object> ObjPtr;
-
-    ObjPtr colors = fn.arg(1).to_object(getGlobal(fn));
-    ObjPtr alphas = fn.arg(2).to_object(getGlobal(fn));
-    ObjPtr ratios = fn.arg(3).to_object(getGlobal(fn));
-    ObjPtr matrix = fn.arg(4).to_object(getGlobal(fn));
+    Global_as& gl = getGlobal(fn);
+    ObjPtr colors = fn.arg(1).to_object(gl);
+    ObjPtr alphas = fn.arg(2).to_object(gl);
+    ObjPtr ratios = fn.arg(3).to_object(gl);
+    ObjPtr matrix = fn.arg(4).to_object(gl);
 
     if (!colors || !alphas || !ratios || !matrix) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1950,74 +1796,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         stops = 15;
     }
 
-    SWFMatrix mat;
-
-    if (radial) {
-        // A gradient box extends from (-16384, -16384) to (16384, 16384),
-        // so we have set scale and translation to convert our radial
-        // (0, 0)-(64, 64) range to a -16384 - 16384 square.
-        mat.concatenate_translation(32, 32);
-        mat.set_scale(1 / 512., 1 / 512.);
-    }
-    else {
-        // A gradient box extends from (-16384, -16384) to (16384, 16384),
-        // so we have set scale and translation to convert our linear 0-256
-        // range to -16384 - 16384.
-        mat.concatenate_translation(128, 0);
-        mat.set_scale(1 / 128., 1 / 128.);
-    }
-
-    SWFMatrix input_matrix;
-
-    // This is case sensitive.
-    if (matrix->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
-        
-        const double valX = pixelsToTwips(
-                matrix->getMember(NSV::PROP_X).to_number()); 
-        const double valY = pixelsToTwips(
-                matrix->getMember(NSV::PROP_Y).to_number()); 
-        const double valW = pixelsToTwips(
-                matrix->getMember(NSV::PROP_W).to_number()); 
-        const double valH = pixelsToTwips(
-                matrix->getMember(NSV::PROP_H).to_number()); 
-        const double rot = matrix->getMember(NSV::PROP_R).to_number(); 
-
-        const double a = std::cos(rot) * valW * 2;
-        const double b = std::sin(rot) * valH * 2;
-        const double c = -std::sin(rot) * valW * 2;
-        const double d = std::cos(rot) * valH * 2;
-
-        input_matrix.sx = a; 
-        input_matrix.shx = b;
-        input_matrix.shy = c;
-        input_matrix.sy = d; 
-        input_matrix.tx = valX + valW / 2.0;
-        input_matrix.ty = valY + valH / 2.0;
-        
-    }
-    else {
-
-        // Convert input matrix to SWFMatrix.
-        const double factor = 65536.0;
-        const double valA = matrix->getMember(NSV::PROP_A).to_number() * factor;
-        const double valB = matrix->getMember(NSV::PROP_B).to_number() * factor;
-        const double valC = matrix->getMember(NSV::PROP_C).to_number() * factor;
-        const double valD = matrix->getMember(NSV::PROP_D).to_number() * factor;
-
-        const boost::int32_t valTX = pixelsToTwips(
-                matrix->getMember(NSV::PROP_TX).to_number());
-        const boost::int32_t valTY = pixelsToTwips(
-                matrix->getMember(NSV::PROP_TY).to_number());
-
-        input_matrix.sx = valA; 
-        input_matrix.shx = valB;
-        input_matrix.shy = valC;
-        input_matrix.sy = valD; 
-        input_matrix.tx = valTX; 
-        input_matrix.ty = valTY;
-    }
-    
-    mat.concatenate(input_matrix.invert());
+    SWFMatrix mat = asToSWFMatrix(*matrix);
 
     // ----------------------------
     // Create the gradients vector
@@ -2025,9 +1804,9 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     string_table& st = getStringTable(fn);
 
-    std::vector<gradient_record> gradients;
+    std::vector<GradientRecord> gradients;
     gradients.reserve(stops);
-    for (size_t i=0; i < stops; ++i) {
+    for (size_t i = 0; i < stops; ++i) {
 
         string_table::key key = st.find(boost::lexical_cast<std::string>(i));
 
@@ -2051,7 +1830,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         const as_value& ratVal = ratios->getMember(key);
         const boost::uint32_t minRatio =
             gradients.empty() ? 0 :
-            std::min<boost::uint32_t>(gradients[i - 1].m_ratio + step, 0xff);
+            std::min<boost::uint32_t>(gradients[i - 1].ratio + step, 0xff);
 
         boost::uint8_t rat = ratVal.is_number() ? 
             clamp<boost::uint32_t>(toInt(ratVal), minRatio, 0xff) : minRatio;
@@ -2059,23 +1838,43 @@ movieclip_beginGradientFill(const fn_call& fn)
         // The renderer may expect successively larger ratios; failure to
         // do this can lead to memory errors.
         if (!gradients.empty()) {
-            assert((rat != 0xff && rat > gradients[i - 1].m_ratio) ||
-                    (rat >= gradients[i - 1].m_ratio));
+            assert((rat != 0xff && rat > gradients[i - 1].ratio) ||
+                    (rat >= gradients[i - 1].ratio));
         }
 
         rgba color;
         color.parseRGB(col);
         color.m_a = alp;
 
-        gradients.push_back(gradient_record(rat, color));
+        gradients.push_back(GradientRecord(rat, color));
     }
 
-    if (radial) {
-        movieclip->beginRadialGradientFill(gradients, mat);
+    // Make sure we don't try to construct a GradientFill with only 1 stop!
+    if (stops < 2) {
+        const FillStyle f = SolidFill(gradients[0].color);
+        movieclip->graphics().beginFill(f);
+        return as_value();
     }
-    else {
-        movieclip->beginLinearGradientFill(gradients, mat);
+
+    GradientFill fd(t, mat.invert(), gradients);
+
+    // Set spread mode if present. Defaults to "pad", which is GradientFill's
+    // default.
+    if (fn.nargs > 5) {
+        const std::string& spread = fn.arg(5).to_string();
+        if (spread == "reflect") fd.spreadMode = GradientFill::REFLECT;
+        else if (spread == "repeat") fd.spreadMode = GradientFill::REPEAT;
+        else assert(fd.spreadMode == GradientFill::PAD);
     }
+
+    /// TODO: set interpolation mode and spread mode.
+
+    /// Add a focus if present.
+    if (fn.nargs > 7) {
+        fd.setFocalPoint(fn.arg(7).to_number());
+    }
+
+    movieclip->graphics().beginFill(fd);
 
     return as_value();
 }
@@ -2167,8 +1966,50 @@ as_value
 movieclip_beginBitmapFill(const fn_call& fn)
 {
     MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    if (fn.nargs < 1) {
+        return as_value();
+    }
+
+    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+    BitmapData_as* bd;
+
+    if (!isNativeType(obj, bd) || bd->disposed()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_debug("MovieClip.attachBitmap: first argument should be a "
+                "valid BitmapData", fn.arg(1));
+        );
+        return as_value();
+    }
+    
+    SWFMatrix mat;
+
+    if (fn.nargs > 1) {
+        as_object* matrix = fn.arg(1).to_object(getGlobal(fn));
+        if (matrix) {
+            mat = asToSWFMatrix(*matrix);
+        }
+    }
+
+    BitmapFill::Type t = BitmapFill::TILED;
+    if (fn.nargs > 2) {
+        const bool repeat = fn.arg(2).to_bool();
+        if (!repeat) t = BitmapFill::CLIPPED;
+    }
+
+    BitmapFill::SmoothingPolicy p = BitmapFill::SMOOTHING_OFF;
+    if (fn.nargs > 3 && fn.arg(3).to_bool()) p = BitmapFill::SMOOTHING_ON;
+
+    // This is needed to get the bitmap to the right size and have it in the
+    // correct place. Maybe it would be better handled somewhere else, as it's
+    // not exactly intuitive.
+    mat.invert();
+    mat.concatenate_scale(1 / 20., 1 / 20.);
+    mat.tx /= 20;
+    mat.ty /= 20;
+
+    ptr->graphics().beginFill(BitmapFill(t, bd->bitmapInfo(), mat, p));
+    bd->attach(ptr);
+
     return as_value();
 }
 
@@ -2210,10 +2051,10 @@ movieclip_attachBitmap(const fn_call& fn)
     as_object* obj = fn.arg(0).to_object(getGlobal(fn));
     BitmapData_as* bd;
 
-    if (!isNativeType(obj, bd)) {
+    if (!isNativeType(obj, bd) || bd->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_debug("MovieClip.attachBitmap: first argument should be a "
-                "BitmapData", fn.arg(1));
+                "valid BitmapData", fn.arg(1));
         );
         return as_value();
     }
@@ -2279,6 +2120,44 @@ movieclip_lockroot(const fn_call& fn)
     
     ptr->setLockRoot(fn.arg(0).to_bool());
     return as_value();
+}
+    
+SWFMatrix
+asToSWFMatrix(as_object& m)
+{
+    // This is case sensitive.
+    if (m.getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box") {
+        
+        const double x = pixelsToTwips(m.getMember(NSV::PROP_X).to_number());
+        const double y = pixelsToTwips(m.getMember(NSV::PROP_Y).to_number());
+        const double w = pixelsToTwips(m.getMember(NSV::PROP_W).to_number());
+        const double h = pixelsToTwips(m.getMember(NSV::PROP_H).to_number()); 
+        const double r = m.getMember(NSV::PROP_R).to_number();
+        const double a = std::cos(r) * w * 2;
+        const double b = std::sin(r) * h * 2;
+        const double c = -std::sin(r) * w * 2;
+        const double d = std::cos(r) * h * 2;
+
+        return SWFMatrix(a, b, c, d, x + w / 2.0, y + h / 2.0);
+        
+    }
+
+    // Convert input matrix to SWFMatrix.
+    const boost::int32_t a = truncateWithFactor<65536>(
+            m.getMember(NSV::PROP_A).to_number());
+    const boost::int32_t b = truncateWithFactor<65536>(
+            m.getMember(NSV::PROP_B).to_number());
+    const boost::int32_t c = truncateWithFactor<65536>(
+            m.getMember(NSV::PROP_C).to_number());
+    const boost::int32_t d = truncateWithFactor<65536>(
+            m.getMember(NSV::PROP_D).to_number());
+
+    const boost::int32_t tx = pixelsToTwips(
+            m.getMember(NSV::PROP_TX).to_number());
+    const boost::int32_t ty = pixelsToTwips(
+            m.getMember(NSV::PROP_TY).to_number());
+    return SWFMatrix(a, b, c, d, tx, ty);
+
 }
 
 } // anonymous namespace 

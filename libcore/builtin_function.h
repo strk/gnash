@@ -59,7 +59,7 @@ public:
     /// Return the number of registers required for function execution
     //
     /// Gnash's C++ implementations of AS functions don't need any registers!
-    virtual size_t registers() const {
+    virtual boost::uint8_t registers() const {
         return 0;
     }
 

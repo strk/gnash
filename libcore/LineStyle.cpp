@@ -28,10 +28,28 @@
 #include "movie_definition.h"
 #include "SWF.h"
 #include "GnashException.h"
-#include "fill_style.h"
+#include "FillStyle.h"
 #include "GnashNumeric.h"
 
 namespace gnash {
+
+namespace {
+
+class GetColor : public boost::static_visitor<rgba>
+{
+public:
+    rgba operator()(const SolidFill& f) const {
+        return f.color();
+    }
+    rgba operator()(const GradientFill&) const {
+        return rgba();
+    }
+    rgba operator()(const BitmapFill&) const {
+        return rgba();
+    }
+};
+
+}
 
 LineStyle::LineStyle()
     :
@@ -50,17 +68,19 @@ LineStyle::LineStyle()
 
 void
 LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
-    const RunResources& r, LineStyle *pOther)
+    const RunResources& /*r*/, LineStyle *pOther)
 {
     if (t == SWF::DEFINEMORPHSHAPE)
     {
         in.ensureBytes(2 + 2);
         m_width = in.read_u16();
         pOther->m_width = in.read_u16();
-        m_color.read(in, t);
-        pOther->m_color.read(in, t);
+        m_color = readRGBA(in);
+        pOther->m_color = readRGBA(in);
         return;
     }
+
+    assert(t == SWF::DEFINEMORPHSHAPE2 || t == SWF::DEFINEMORPHSHAPE2_);
 
     // MorphShape 2 from here down.
     in.ensureBytes(4 + 2);
@@ -84,66 +104,73 @@ LineStyle::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
         in.ensureBytes(2);
         _miterLimitFactor = in.read_short_ufixed();
     }
-    if (has_fill)
-    {
-        // read fill styles for strokes.
-        // TODO: don't throw away this information, should be passed to renderer.
-        fill_style f, g;
-        f.read(in, t, md, r, &g);
-        m_color = f.get_color();
-        pOther->m_color = g.get_color();
+    if (has_fill) {
+        OptionalFillPair fp = readFills(in, t, md, true);
+
+        // TODO: store a fill style properly, removing the need for the 
+        // visitor.
+        m_color = boost::apply_visitor(GetColor(), fp.first.fill);
+        pOther->m_color = boost::apply_visitor(GetColor(), fp.second->fill);
     }
-    else
-    {
-        m_color.read(in, t);
-        pOther->m_color.read(in, t);
+    else {
+        m_color = readRGBA(in);
+        pOther->m_color = readRGBA(in);
     }
 }
 
 void
 LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
-        const RunResources& r)
+        const RunResources& /*r*/)
 {
-    if (!(t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_))
-    {
-        in.ensureBytes(2);
-        m_width = in.read_u16();
-        m_color.read(in, t);
-        return;
-    }
+    switch (t) {
 
-    // TODO: Unfinished. Temporary to allow DefineShape4 to work in many
-    // cases, but does not work correctly in all cases.
-    in.ensureBytes(2+2);
-    m_width = in.read_u16();
+        default:
+            in.ensureBytes(2);
+            m_width = in.read_u16();
+            m_color = readRGBA(in);
+            return;
 
-    int flags1 = in.read_u8();
-    int flags2 = in.read_u8();
-    _startCapStyle =  (CapStyle)((flags1 & 0xC0) >> 6);
-    _joinStyle     = (JoinStyle)((flags1 & 0x30) >> 4);
-    bool has_fill      =   flags1 & (1 << 3);
-    _scaleHorizontally = !(flags1 & (1 << 2));
-    _scaleVertically   = !(flags1 & (1 << 1));
-    _pixelHinting      =   flags1 & (1 << 0);
-    _noClose = flags2 & (1 << 2);
-    _endCapStyle = (CapStyle) (flags2 & 0x03); 
+        case SWF::DEFINESHAPE:
+        case SWF::DEFINESHAPE2:
+            in.ensureBytes(2);
+            m_width = in.read_u16();
+            m_color = readRGB(in);
+            return;
 
-    if (_joinStyle == JOIN_MITER) 
-    {
-        in.ensureBytes(2);
-        _miterLimitFactor = in.read_short_ufixed();
-    }
-    if (has_fill)
-    {
-        // read fill styles for strokes.
-        // TODO: don't throw away this information, should be passed to renderer.
-        fill_style f;
-        f.read(in, t, md, r);
-        m_color = f.get_color();
-    }
-    else
-    {
-        m_color.read(in, t);
+        case SWF::DEFINESHAPE4:
+        case SWF::DEFINESHAPE4_:
+        {
+            // TODO: Unfinished. Temporary to allow DefineShape4 to work in
+            // many cases, but does not work correctly in all cases.
+            in.ensureBytes(2+2);
+            m_width = in.read_u16();
+
+            const boost::uint8_t flags1 = in.read_u8();
+            const boost::uint8_t flags2 = in.read_u8();
+
+            _startCapStyle = (CapStyle)((flags1 & 0xC0) >> 6);
+            _joinStyle = (JoinStyle)((flags1 & 0x30) >> 4);
+            const bool has_fill  =   flags1 & (1 << 3);
+            _scaleHorizontally = !(flags1 & (1 << 2));
+            _scaleVertically   = !(flags1 & (1 << 1));
+            _pixelHinting      =   flags1 & (1 << 0);
+            _noClose = flags2 & (1 << 2);
+            _endCapStyle = (CapStyle) (flags2 & 0x03); 
+
+            if (_joinStyle == JOIN_MITER) {
+                in.ensureBytes(2);
+                _miterLimitFactor = in.read_short_ufixed();
+            }
+            if (has_fill) {
+                // TODO: store a fill style properly, removing the need for the 
+                // visitor.
+                OptionalFillPair fp = readFills(in, t, md, false);
+                m_color = boost::apply_visitor(GetColor(), fp.first.fill);
+            }
+            else {
+                m_color = readRGBA(in);
+            }
+        }
     }
 }
 
@@ -151,7 +178,7 @@ void
 LineStyle::set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio)
 {
     m_width = static_cast<boost::uint16_t>(
-        frnd(flerp(ls1.getThickness(), ls2.getThickness(), ratio)));
+        frnd(lerp<float>(ls1.getThickness(), ls2.getThickness(), ratio)));
     m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
     if ( ls1._scaleVertically != ls2._scaleVertically )
     {
@@ -163,8 +190,7 @@ LineStyle::set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio)
     }
 }
 
-// end of namespace
-}
+} // namespace gnash
 
 
 // Local Variables:

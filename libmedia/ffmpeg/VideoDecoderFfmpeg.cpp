@@ -316,7 +316,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     // Let ffmpeg write directly to the GnashImage data. It is an uninitialized
     // buffer here, so do not return the image if there is any error in
     // conversion.
-    avpicture_fill(&picture, im->data(), pixFmt, width, height);
+    avpicture_fill(&picture, im->begin(), pixFmt, width, height);
 
 #ifndef HAVE_SWSCALE_H
     img_convert(&picture, PIX_FMT_RGB24, (AVPicture*)srcFrame,

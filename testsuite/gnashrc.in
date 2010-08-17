@@ -47,4 +47,10 @@ set blacklist www.blacklistedserver.org
 # LocalConnection must be enabled for testing.
 set localconnection false
 
+# Use the default Renderer
+set Renderer
+
+# Use the default MediaHandler
+set MediaHandler
+
 # TODO: enable extensions ?

@@ -101,8 +101,10 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
+    have_ffmpeg=no
     AC_MSG_RESULT(none found)
   else
+    have_ffmpeg=yes
     AC_MSG_RESULT(${ac_cv_path_ffmpeg_incl})
   fi
 

@@ -27,7 +27,8 @@
 namespace gnash {
     class DisplayObject;
     class Renderer;
-    class fill_style;
+    class FillStyle;
+    class GradientRecord;
 }
 
 namespace gnash {
@@ -63,15 +64,7 @@ public:
                  boost::int32_t ax, boost::int32_t ay, int swfVersion);
 
 	/// Start drawing with a solid fill
-	void beginFill(const rgba& color);
-
-	/// Start drawing with a linear gradient fill
-	void beginLinearGradientFill(const std::vector<gradient_record>& grad,
-            const SWFMatrix& mat);
-
-	/// Start drawing with a radial gradient fill
-	void beginRadialGradientFill(const std::vector<gradient_record>& grad,
-            const SWFMatrix& mat);
+	void beginFill(const FillStyle& f);
 
 	/// Close an existing filled path, if any.
 	void endFill();
@@ -128,7 +121,7 @@ public:
 	///	This offset is the one required to properly
 	///	reference it in gnash::path instances.
 	///
-	size_t add_fill_style(const fill_style& stl);
+	size_t addFillStyle(const FillStyle& stl);
 
 	/// \brief
 	/// Add a line style, possibly reusing an existing

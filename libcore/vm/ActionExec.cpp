@@ -25,7 +25,7 @@
 
 #include "ActionExec.h"
 #include "action_buffer.h"
-#include "swf_function.h"
+#include "Function.h"
 #include "log.h"
 #include "VM.h"
 #include "GnashException.h"
@@ -67,7 +67,7 @@ namespace gnash {
 static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
 
-ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
+ActionExec::ActionExec(const Function& func, as_environment& newEnv,
         as_value* nRetVal, as_object* this_ptr)
     :
     code(func.getActionBuffer()),
@@ -75,7 +75,6 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
     retval(nRetVal),
     _withStack(),
     _scopeStack(func.getScopeStack()),
-    _withStackLimit(7),
     _func(&func),
     _this_ptr(this_ptr),
     _initialStackSize(0),
@@ -90,12 +89,6 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
 {
     assert(stop_pc < code.size());
 
-    // See comment in header
-    // TODO: stack limit dependent on function version or VM version ?
-    if ( env.get_version() > 5 ) {
-        _withStackLimit = 15;
-    }
-
     // Functions defined in SWF version 6 and higher pushes
     // the activation object to the scope stack
     // NOTE: if we query env.get_version() we get version of the calling
@@ -108,7 +101,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv,
     //              push 'i' getvariable
     //              get var: i=[undefined] 
     if (code.getDefinitionVersion() > 5) {
-        // We assume that the swf_function () operator already initialized
+        // We assume that the Function () operator already initialized
         // its environment so that its activation object is now in the
         // top element of the CallFrame stack
         CallFrame& topFrame = getVM(newEnv).currentCall();
@@ -125,7 +118,6 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
     retval(0),
     _withStack(),
     _scopeStack(),
-    _withStackLimit(7),
     _func(0),
     _initialStackSize(0),
     _originalTarget(0),
@@ -137,11 +129,6 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
     next_pc(0),
     stop_pc(abuf.size())
 {
-    /// See comment in header
-    // TODO: stack limit dependent on function version or VM version ?
-    if (env.get_version() > 5) {
-        _withStackLimit = 15;
-    }
 }
 
 void
@@ -636,16 +623,13 @@ ActionExec::skip_actions(size_t offset)
 bool
 ActionExec::pushWith(const With& entry)
 {
-    // See comment in header about _withStackLimit
-    if (_withStack.size() >= _withStackLimit)
-    {
-        IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_("'With' stack depth (%d) "
-            "exceeds the allowed limit for current SWF "
-            "target version (%d for version %d)."
-            " Don't expect this movie to work with all players."),
-            _withStack.size()+1, _withStackLimit,
-            env.get_version());
+    // The maximum number of withs supported is 13, regardless of the
+    // other documented figures. See actionscript.all/with.as.
+    const size_t withLimit = 13;
+
+    if (_withStack.size() == withLimit) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("With stack limit of %s exceeded");
         );
         return false;
     }

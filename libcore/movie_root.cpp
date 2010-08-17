@@ -54,7 +54,6 @@
 #include <sstream>
 #include <map>
 #include <bitset>
-#include <typeinfo>
 #include <cassert>
 #include <functional> // std::bind2nd, std::equal_to
 #include <boost/algorithm/string/case_conv.hpp>
@@ -368,7 +367,7 @@ movie_root::swapLevels(MovieClip* movie, int depth)
 
 //#define GNASH_DEBUG_LEVELS_SWAPPING 1
 
-    int oldDepth = movie->get_depth();
+    const int oldDepth = movie->get_depth();
 
 #ifdef GNASH_DEBUG_LEVELS_SWAPPING
     log_debug("Before swapLevels (source depth %d, target depth %d) "
@@ -380,9 +379,8 @@ movie_root::swapLevels(MovieClip* movie, int depth)
                 i->second->get_depth());
     }
 #endif
-
-    if ( oldDepth < DisplayObject::staticDepthOffset ) // should include _level0 !
-    {
+    // should include _level0 !
+    if (oldDepth < DisplayObject::staticDepthOffset) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below "
                 "static depth zone (%d), won't swap its depth"),
@@ -392,8 +390,7 @@ movie_root::swapLevels(MovieClip* movie, int depth)
         return;
     }
 
-    if ( oldDepth >= 0 ) 
-    {
+    if (oldDepth >= 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below "
                 "static depth zone (%d), won't swap its depth"),
@@ -403,25 +400,22 @@ movie_root::swapLevels(MovieClip* movie, int depth)
         return;
     }
 
-    int oldNum = oldDepth; // -DisplayObject::staticDepthOffset;
+    const int oldNum = oldDepth; 
     Levels::iterator oldIt = _movies.find(oldNum);
-    if ( oldIt == _movies.end() )
-    {
+    if (oldIt == _movies.end()) {
         log_debug("%s.swapDepth(%d): target depth (%d) contains no movie",
             movie->getTarget(), depth, oldNum);
         return;
     }
 
-    int newNum = depth; // -DisplayObject::staticDepthOffset;
+    const int newNum = depth; 
     movie->set_depth(depth);
     Levels::iterator targetIt = _movies.find(newNum);
-    if ( targetIt == _movies.end() )
-    {
+    if (targetIt == _movies.end()) {
         _movies.erase(oldIt);
         _movies[newNum] = movie;
     }
-    else
-    {
+    else {
         MovieClip* otherMovie = targetIt->second;
         otherMovie->set_depth(oldDepth);
         oldIt->second = otherMovie;
@@ -452,21 +446,20 @@ void
 movie_root::dropLevel(int depth)
 {
     // should be checked by caller
-    assert ( depth >= 0 && depth <= 1048575 );
+    // TODO: don't use a magic number! See MovieClip::removeMovieClip().
+    assert(depth >= 0 && depth <= 1048575);
 
     Levels::iterator it = _movies.find(depth);
-    if ( it == _movies.end() )
-    {
+    if (it == _movies.end()) {
         log_error("movie_root::dropLevel called against a movie not "
                 "found in the levels container");
         return;
     }
 
     MovieClip* mo = it->second;
-    if (mo == _rootMovie)
-    {
+    if (mo == _rootMovie) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Original root movie can't be removed"));
+            log_aserror(_("Original root movie can't be removed"));
         );
         return;
     }
@@ -484,10 +477,10 @@ movie_root::replaceLevel(unsigned int num, Movie* extern_movie)
 {
     extern_movie->set_depth(num + DisplayObject::staticDepthOffset);
     Levels::iterator it = _movies.find(extern_movie->get_depth());
-    if ( it == _movies.end() )
-    {
-        log_error("TESTME: loadMovie called on level %d which is not available at load time, skipped placement for now");
-        return; // skip
+    if (it == _movies.end()) {
+        log_error("TESTME: loadMovie called on level %d which is not "
+                "available at load time, skipped placement for now");
+        return; 
     }
 
     // TODO: rework this to avoid the double scan 
@@ -509,7 +502,7 @@ void
 movie_root::reset()
 {
     sound::sound_handler* sh = _runResources.soundHandler();
-    if ( sh ) sh->reset();
+    if (sh) sh->reset();
     clear();
     _disableScripts = false;
 }
@@ -891,11 +884,20 @@ movie_root::advance()
             //   now - _lastMovieAdvancement
             // gives you actual lateness in milliseconds
             //
-            _lastMovieAdvancement += _movieAdvancementDelay;
+            // TODO: make 'catchup' setting user-settable
+            //       as it helps A/V sync but sacrifices 
+            //       smoothness of animation which is very
+            //       important for games.
+            static const bool catchup = true;
+            if (catchup) {
+                _lastMovieAdvancement += _movieAdvancementDelay;
+            } else {
+                _lastMovieAdvancement = now;
+            }
 
         }
 
-        //log_debug("Latenss: %d", now-_lastMovieAdvancement);
+        //log_debug("Lateness: %d", now-_lastMovieAdvancement);
         
         executeAdvanceCallbacks();
         
@@ -977,11 +979,9 @@ movie_root::display()
     Renderer* renderer = _runResources.renderer();
     if (!renderer) return;
 
-    renderer->begin_display(
-        m_background_color,
-        _stageWidth, _stageHeight,
-        frame_size.get_x_min(), frame_size.get_x_max(),
-        frame_size.get_y_min(), frame_size.get_y_max());
+    renderer->begin_display(m_background_color, _stageWidth, _stageHeight,
+                            frame_size.get_x_min(), frame_size.get_x_max(),
+                            frame_size.get_y_min(), frame_size.get_y_max());
 
 
     for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
@@ -1173,7 +1173,11 @@ movie_root::getStageWidth() const
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<size_t>(_rootMovie->widthPixels());
+    if (_rootMovie) {
+        return static_cast<size_t>(_rootMovie->widthPixels());
+    } else {
+        return 0;
+    }
 }
 
 /// Get actionscript height of stage, in pixels. The height
@@ -1186,7 +1190,11 @@ movie_root::getStageHeight() const
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<size_t>(_rootMovie->heightPixels());
+    if (_rootMovie) {
+        return static_cast<size_t>(_rootMovie->heightPixels());
+    } else {
+        return 0;
+    }
 }
 
 /// Takes a short int bitfield: the four bits correspond
@@ -2141,7 +2149,10 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         boost::replace_all(command, "%u", safeurl);
         
         log_debug (_("Launching URL: %s"), command);
-        std::system(command.c_str());
+        int ret = std::system(command.c_str());
+        if ( -1 == ret ) {
+            log_error(_("Fork failed launching url opener '%s'"), command);
+        }
         return;
     }
 

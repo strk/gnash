@@ -411,7 +411,8 @@ MediaParser::parserLoop()
 	while (!parserThreadKillRequested())
 	{
 		parseNextChunk();
-        	gnashSleep(100); // no rush....
+		boost::mutex::scoped_lock lock(_qMutex);
+		waitIfNeeded(lock);
 	}
 }
 

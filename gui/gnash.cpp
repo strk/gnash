@@ -24,8 +24,10 @@
 
 #include <string>
 #include <iostream>
+#include <iterator>
 #include <ios>
 #include <boost/format.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include <cstdlib>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -40,7 +42,7 @@
 #include "arg_parser.h"
 #include "GnashNumeric.h" // for clamp
 #include "GnashException.h"
-#include "bzrversion.h"
+#include "revno.h"
 #include "MediaHandler.h"
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -88,9 +90,8 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 static void
 usage()
 {
-    std::ostringstream handlers;
-    gnash::media::MediaFactory::instance().listKeys(
-            std::ostream_iterator<std::string>(handlers, " "));
+    std::vector<std::string> handlers;
+    gnash::media::MediaFactory::instance().listKeys(back_inserter(handlers));
 
     cout << _("Usage: gnash [options] movie_file.swf\n")
     << "\n"
@@ -126,8 +127,9 @@ usage()
     << _("                           1 enable rendering, disable sound\n") 
     << _("                           2 enable sound, disable rendering\n") 
     << _("                           3 enable rendering and sound (default)\n") 
-    << _("  -M,  --media < ") << handlers.str() << ">\n"
-    << _("                           The media handler to use\n")
+    << _("  -M,  --media <") << boost::join(handlers, "|") << ">\n"
+    << _("                           The media handler to use")
+    << " (default " << handlers.front() << ")\n"
     // Only list the renderers that were configured in for this build
     << _("  -R,  --renderer <")
 #ifdef RENDERER_OPENGL
@@ -404,38 +406,12 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     cout << rcfile.getFlashVersionString() << endl;
                     exit(EXIT_SUCCESS);          
                     break;
-             case 'M':
+              case 'M':
                     player.setMedia(parser.argument(i));
                     break;
-#if defined(RENDERER_AGG) || defined(RENDERER_OPENGL) || defined(RENDERER_CAIRO)
-             case 'R':
-                    switch (parser.argument<char>(i)) {
-                            // See if a renderer was specified
-#ifdef RENDERER_AGG
-                        case 'a':
-                            // Enable AGG as the rendering backend
-                            player.setRenderer("agg");
-                            break;
-#endif
-#ifdef RENDERER_OPENGL
-                        case 'o':
-                            // Enable OpenGL as the rendering backend
-                            player.setRenderer("opengl");
-                            break;
-#endif
-#ifdef RENDERER_CAIRO
-                        case 'c':
-                            // Enable Cairo as the rendering backend
-                            player.setRenderer("cairo");
-                            break;
-#endif
-                        default:
-                            gnash::log_error(_("ERROR: -R (--Renderer) must be followed by "
-                                               "agg, opengl, or cairo"));
-                            break;
-                    }
-                  break;
-#endif	// any RENDERER_* set
+              case 'R':
+                    player.setRenderer(parser.argument(i));
+                    break;
               case 'r':
                     renderflag = true;
                     switch (parser.argument<char>(i)) {

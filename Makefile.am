@@ -20,7 +20,7 @@
 # without automake complaining.
 AUTOMAKE_OPTIONS = 1.6.0 -Wno-portability
 
-ACLOCAL_AMFLAGS = -I macros
+ACLOCAL_AMFLAGS = -I macros -I cygnal
 noinst_SCRIPT = autogen.sh
 
 ##
@@ -100,7 +100,7 @@ EXTRA_DIST =  \
 	packaging/rpm.am \
 	packaging/gnash.xpm \
 	packaging/klash.xpm \
-	bzrversion.h
+	revno.h
 
 
 # dist-hook:
@@ -116,33 +116,73 @@ CLEANFILES =
 # and when building binary packages from multiple branches.
 # Note that this is only rebuilt after "make clean", if the Makefile
 # has changed, or the source tree gets reconfigured. So unless you do
-# a make clean, or nuke the bzrversion.h file, this can get slightly
+# a make clean, or nuke the revno.h file, this can get slightly
 # behind the current version. Currently Gnash doesn't have this info
 # so it'll be an improvement anyway. Bzr is amazing slow producing
 # the info, which is why we don't want to do it all the time.
 #
-CLEANFILES += bzrversion.h
-BUILT_SOURCES = bzrversion.h
-bzrversion.h: Makefile.in
-	@status=`which bzr 2>&1 | grep -c " no bz"`; \
-	if test x"$${status}" = x"0"; then \
-	   echo "Generating bzrversion.h"; \
-	   $(RM) -f bzrversion.h; \
-	   revno=`(cd $(srcdir) && bzr revno)`; \
-	   nick=`basename $(top_srcdir)`; \
+CLEANFILES += revno.h
+BUILT_SOURCES = revno.h
+revno.h: Makefile.in
+	@echo "Generating revno.h"
+	-@if test -d $(srcdir)/.bzr; then \
+	  status=`which bzr 2>&1 | grep -c " no bzr"`; \
+	  if test x"$${status}" = x"0"; then \
+	    echo "Generating revno.h"; \
+	    $(RM) -f revno.h; \
+	    revno=`(cd $(srcdir) && bzr revno)`; \
+	    nick=`basename $(top_srcdir)`; \
+	  else \
+	    revno="${NOW}"; \
+	  fi; \
 	else \
-	   revno="${NOW}"; \
-	   nick="none"; \
+	  if test -d $(srcdir)/.git; then \
+            status=`which git 2>&1 | grep -c " no git"`; \
+            if test x"$${status}" = x"0"; then \
+              echo "Generating revno.h"; \
+              $(RM) -f revno.h; \
+              revno="`(cd $(srcdir) && git describe --tags | cut -d '-' -f 2-3 | tr a- a.)`"; \
+              nick="`basename $(top_srcdir) | tr a_ a.`"; \
+	    fi; \
+          else \
+            revno="${NOW}"; \
+            nick="none"; \
+	  fi; \
 	fi; \
-	echo "Generating bzrversion.h"; \
-	echo "static const char *BRANCH_REVNO  = \"$${revno}\";" > bzrversion.h; \
-	echo "static const char *BRANCH_NICK = \"$${nick}\";" >> bzrversion.h;
+	echo "static const char *BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
+	echo "static const char *BRANCH_NICK = \"$${nick}\";" >> revno.h;
 
 # The branch nickname and revision number must be set before including
 # the other Makefile fragments used for package building, as they use
 # these values.
-BRANCH_REVNO  := $(shell grep "REVNO" bzrversion.h | cut -d '"' -f 2)
-BRANCH_NICK   := $(shell grep "NICK" bzrversion.h | cut -d '"' -f 2)
+BRANCH_REVNO  := $(shell grep "REVNO" revno.h | cut -d '"' -f 2)
+BRANCH_NICK   := $(shell grep "NICK" revno.h | cut -d '"' -f 2)
+
+
+# Extract info from the repository to include in the build. If
+# GIT (git) isn't installed, just print stubs, as this is only
+# used for display purposes. It's primarily used by the testsuites
+# and when building binary packages from multiple branches.
+# Note that this is only rebuilt after "make clean", if the Makefile
+# has changed, or the source tree gets reconfigured. So unless you do
+# a make clean, or nuke the revno.h file, this can get slightly
+# behind the current version. Currently Gnash doesn't have this info
+# so it'll be an improvement anyway. 
+
+revno.h: Makefile.in
+        @status=`which git 2>&1 | grep -c " no bzr"`; \
+        if test x"$${status}" = x"0"; then \
+           echo "Generating revno.h"; \
+           $(RM) -f revno.h; \
+           revno=`(cd $(srcdir) && git describe --tags | cut -d '-' -f 2-3)`; \
+           nick=`basename $(top_srcdir)`; \
+        else \
+           revno="${NOW}"; \
+           nick="none"; \
+        fi; \
+        echo "Generating revno.h"; \
+        echo "static const char *BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
+        echo "static const char *BRANCH_NICK = \"$${nick}\";" >> revno.h;
 
 #
 # Precompiled header support
