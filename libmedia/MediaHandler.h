@@ -57,7 +57,7 @@ namespace gnash {
 /// @todo fix http://wiki.gnashdev.org/wiki/index.php/Libmedia, is obsoleted
 namespace media {
 
-struct RegisterAllHandlers
+struct DSOEXPORT RegisterAllHandlers
 {
     RegisterAllHandlers();
 };
