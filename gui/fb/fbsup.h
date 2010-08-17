@@ -31,17 +31,6 @@
 #define PIXELFORMAT_LUT8
 #define CMAP_SIZE (256*2)
 
-// Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
-// emulated by the Kernel) 
-//#define USE_MOUSE_PS2
-
-// Define this to read from /dev/input/event0 (new generic input subsystem)
-#define USE_INPUT_EVENTS
-
-// Define this to support eTurboTouch / eGalax touchscreens. When reading from
-// a serial device, it must be initialized (stty) externally. 
-//#define USE_MOUSE_ETT
-
 #ifdef USE_MOUSE_PS2
 #define MOUSE_DEVICE "/dev/input/mice"
 #endif
