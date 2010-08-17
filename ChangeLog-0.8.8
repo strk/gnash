@@ -1,0 +1,6274 @@
+2010-08-13  Sandro Santilli  <strk@keybit.net>
+
+	Simplify -R handling, make gtk gui more robust on rendering handling.
+	Other guis seem just to be ignoring that switch... a RendererFactory would be nice to think about
+
+2010-08-12  Sandro Santilli  <strk@keybit.net>
+
+	Make list of available media handlers in --help string consistent with other multi-choices and show the default.
+
+2010-08-12  Sandro Santilli  <strk@keybit.net>
+
+	Add MediaHandler rc directive, thanks to John Gilmore. Add test for MediaHandler and Renderer rc directives and drop obsoleted XVideo from testcase
+
+2010-08-12  Sandro Santilli  <strk@keybit.net>
+
+	Check for wait conditions at the end of every parse "chunk". Seems to be the safest bet to ensure parser thread gets to sleep at parse end. 
+
+2010-08-08  Rob Savoye  <rob@welcomehome.org>
+
+	don't build gst when only ffmpeg is selected.
+
+2010-08-06  Rob Savoye  <rob@welcomehome.org>
+
+	use scoped_array instead of char *, and don't use select() for now
+
+2010-08-06  Rob Savoye  <rob@welcomehome.org>
+
+	has been replaced by flash.am
+
+2010-08-06  Rob Savoye  <rob@welcomehome.org>
+
+	fix spelling of TS_LIBS so the guis link with touchscreen support.
+
+2010-08-06  Rob Savoye  <rob@welcomehome.org>
+
+	drop csound warning as a distraction.
+
+2010-08-06  Rob Savoye  <rob@welcomehome.org>
+
+	fix ffmpeg vaapi
+
+2010-08-06  Rob Savoye  <rob@welcomehome.org>
+
+	update to reality
+
+2010-08-05  Rob Savoye  <rob@welcomehome.org>
+
+	install the asobj headers too.
+
+2010-08-05  Rob Savoye  <rob@welcomehome.org>
+
+	put libcore subdirectory headers in a subdirectory when installing.
+
+2010-08-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use the correct span generator.
+
+2010-08-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Typedef RGB and RGBA for better reuse.
+
+2010-08-05  Sandro Santilli  <strk@keybit.net>
+
+	Fix aclocal call issued by 'make' when configuring with --enable-maintainer-mode (CYGNAL_PATHS not found)
+
+2010-08-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use intrusive_ptr<>::operator== because reset() didn't exist in earlier
+	versions of boost.
+	
+	Drop an unused variable in agg.
+
+2010-08-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop useless bits.
+
+2010-08-05  Rob Savoye  <rob@welcomehome.org>
+
+	always install all the headers
+
+2010-08-05  Rob Savoye  <rob@welcomehome.org>
+
+	rename the generated bzeversion.h to revno.h
+
+2010-08-05  Rob Savoye  <rob@welcomehome.org>
+
+	fix vaapi support
+
+2010-08-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add support for spread modes in the AGG renderer. Implement for static and
+	dynamic gradients.
+
+2010-08-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't forget the return (thanks testsuite!).
+
+2010-08-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename some types.
+
+2010-08-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Get pixel formats the right way round.
+
+2010-08-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add support for all spread modes in static and dynamic gradients.
+
+2010-08-04  Rob Savoye  <rob@welcomehome.org>
+
+	move tests for extension dependencies below where the extensions actually get enabled.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence some debugging messages.
+	
+	Select a sensible default if no hwaccel or renderer is passed, but otherwise
+	don't. This only really affects hwaccel, as the renderer choice is 
+	parsed before.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop more debugging that isn't directly useful.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle ifdefs properly, drop debugging.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fail if the requested renderer / hwaccel combination isn't initialized
+	properly.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix VAAPI checks, which broke when the CPP check was fixed. Move related
+	things under the same heading, so that such problems are easier to avoid.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tidy up configure so that related checks are all in the same place. This
+	might prevent bugs like the broken vaapi check, which relied on an 
+	ffmpeg macro that was called miles away from the media checks.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix the vaapi tests.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Implement beginBitmapFill with all arguments:
+	
+	1. User matrix
+	2. Repeat (agg only, as the cairo renderer has never supported tiled bitmaps)
+	3. Smoothing
+	
+	Rename BitmapInfo to CachedBitmap and provide functions to retrieve the
+	CachedBitmap from the renderer when required.
+	
+	Implement BitmapData with an internal CachedBitmap (or GnashImage if no
+	renderer is present) to allow a permanenent link with BitmapFills and
+	reduce the image processing needed for attachBitmap.
+	
+	Add an argb_iterator to GnashImage to allow BitmapData to work fairly
+	transparently with it. It's also useful for cairo.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add some hacks to get the Gst subclass and the Vaapi subclass to work again.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanups.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix expected result.
+
+2010-08-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add tests for all shapes and reduce tolerance.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanups.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanups.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop debugging.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	OGL can't, and never could, handle Gnash's RGB format, which causes problems
+	now that some bitmaps have that format. Convert it to RGBA in another
+	hack.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop debugging.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make functions virtual and implement some reasonable behaviour.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Blind implementation of smoothing for beginBitmapFill().
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename BitmapInfo to CachedBitmap and add documentation.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle disposing BitmapInfos by adding a dispose() function. This needs
+	more thought.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add test for dispose.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Allow retrieving a GnashImage from the cairo bitmap_info.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Expect pass now.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop debugging.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add documentation to a possibly unnecessary function.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename member.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More cleanups.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanups.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up GnashImage.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Various fixes and changes to make sure shapes are invalidated at the 
+	correct time.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add stop() to test.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop debugging.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Place an arbitrary limit on the size of bitmaps to avoid really large ones
+	being loaded (tested by corrupt jpeg in swfdec testsuite).
+	
+	This worked previously because dimensions were converted to int, which meant
+	that large values became negative, causing a bad allocation when re-converted
+	to size_t. Now we do it explicitly.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanup of GnashImage and Bitmap.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Hack so BitmapData works without a renderer.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix silly typo.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Implement BitmapData using a BitmapInfo and GnashImage. Seems to work for
+	all cases, but needs a lot of cleaning up.
+
+2010-08-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add an output iterator.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More tests.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More tests.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Pixel tests for three shapes.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use the common AS to SWF matrix function and adapt the result. Box matrix
+	still not tested.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a separate function to convert AS to SWF matrix.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Truncate safely.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Get the bitmap in the correct place without very neat code.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rough implementation of beginBitmapFill that gets the following right:
+	
+	1. scale
+	2. tiled or clipped fill
+	3. user matrix
+	4. colours.
+	
+	and the following wrong:
+	
+	1. BitmapData->BitmapFill link (broken on construction)
+	2. translation of fill (not sure why)
+	3. box matrices (probably, if they are the same as Gradient fills, but neither
+	tested nor implemented.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make GnashImages non-copyable to encourage sharing and reduce the interface.
+	The only copy was a pointless one in the ogl renderer.
+	
+	Add a shared_ptr to a BitmapInfo in GnashImage itself. This would crash if
+	used because BitmapInfo is held by intrusive_ptr.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rewrite fill style handling to make it easier to extend. Fix bug #26670
+	and improve SWF8 gradient fills, including implementing dynamic focal
+	fills.
+
+2010-08-01  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move SWFMatrix reading outside class, provide constructor. Inline simple
+	constructors. Drop is_valid(), because it is. Const correct.
+
+2010-08-01  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix typo so that colours are correct!
+
+2010-08-01  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop extra readRGBA now logic is handled in callers. Add more safety
+	checks.
+
+2010-08-01  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle RGB/RGBA logic in LineStyle.
+
+2010-08-01  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move rgba read out of class to make the code cleaner and allow more
+	compiler optimizations (return by value).
+
+2010-08-01  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Adapt the ctor of FillStyle so that the class acts like a boost::variant
+	while still being forward declarable.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename GradientRecord::m_color to color.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename GradientRecord::m_ratio to ratio.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename PlaceObject2Tag::m_ratio to _ratio.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename DisplayObject::m_ratio to _ratio.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make flerp a templated lerp function. Stop the silly casting.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add another case to the assertion so we don't crash if the records aren't
+	passed on construction.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Implement focal point for dynamic fills. Fix matrix bug from previous commit.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	A focal fill is just a radial fill with a focus, so drop the separate
+	focal type.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tidy up access to GradientFill
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename some classes.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Pass a fill style to beginFill.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanup of gradient records.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor header cleanups.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Include required headers.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tidy up GradientFill a bit.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle invalid calls correctly for each version.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add visual test for SWF8 gradients, test invalid SWF6 gradients better.
+
+2010-07-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Allow direct access to the drawable of MovieClip, sacrificing fine-grained
+	control over invalidation for a cleaner interface.
+	
+	Clean up drawing API methods, dropping the AS error warnings for excess
+	arguments and some other relatively normal cases.
+	
+	Add possibility for supporting focal gradients.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add tests to make sure Gnash doesn't crash when illegal gradients are
+	requested.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup, fix potential error.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix an error in previous commit.
+	
+	Make setLerp a non-member function to make the fill_style class almost useless.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop the default constructor of fill_style. Use an optional type to handle
+	the variable return of morphs styles.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Reorder things a bit.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add documentation.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use classes and accessors.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rearrangements.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop color member of GradientFill, as it's logically unnecessary and
+	apparently unused (possibly for a hack in the ogl renderer, but the
+	available tests show no difference).
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move BitmapFill reading into its own function.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use the variant properly, including in renderer code. This commit is
+	verified to have the same behaviour for dynamic and static fills as
+	before the commit.
+	
+	Fix bug #26670 by retrieving the bitmap on access, not during parsing.
+
+2010-07-30  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop obsolete functions.
+
+2010-07-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't create gradient bitmaps for the renderers that don't need them! Move
+	the code to the ogl renderer, which also surely has a better way to do it.
+
+2010-07-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add Bitmap type enum.
+
+2010-07-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Some renaming, use local enumeration.
+
+2010-07-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move function out of class definition.
+	
+	Make enum names shorter.
+
+2010-07-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use the variant better. Fix some uninitialized variable errors.
+
+2010-07-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Switch completely to boost::variant without yet using it to make the code
+	cleaner.
+
+2010-07-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Start a rewrite of fill_style to handle different fill types more elegantly.
+
+2010-08-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move new configure checks to somewhere where they don't break large parts of
+	the testsuite by messing up the CPP check (as a note in configure.ac warns).
+
+2010-07-31  Sandro Santilli  <strk@keybit.net>
+
+	Drop unused variable and assignment
+
+2010-07-30  Rob Savoye  <rob@welcomehome.org>
+
+	cleanup a few warnings.
+
+2010-07-30  Rob Savoye  <rob@welcomehome.org>
+
+	Don't try to use tslib, even if it's enabled, but not installed.
+	Improve input device configure tests for automake conditionals.
+
+2010-07-29  Rob Savoye  <rob@welcomehome.org>
+
+	Refactored input device support for the framebuffer GUI.
+	Improved configure support for the framebuffer GUI.
+
+2010-07-29  Rob Savoye  <rob@welcomehome.org>
+
+	change from 2 point to 3 point calibration for touchscreens.
+
+2010-07-29  Rob Savoye  <rob@welcomehome.org>
+
+	move eTurboTouch support from fb.cpp to the new MouseDevice driver.
+
+2010-07-28  Rob Savoye  <rob@welcomehome.org>
+
+	Read variable size packets.
+	Break after handling each event, don't cascade.
+	Handle keyboard events.
+
+2010-07-28  Rob Savoye  <rob@welcomehome.org>
+
+	read the data from a PS/2 mouse.
+
+2010-07-28  Rob Savoye  <rob@welcomehome.org>
+
+	read the data from a PS/2 mouse.
+
+2010-07-28  Rob Savoye  <rob@welcomehome.org>
+
+	make sure _rooMovie is set before trying to access a method.
+
+2010-07-27  Rob Savoye  <rob@welcomehome.org>
+
+	Cleanup input device handling.
+	Scan for attached devices.
+	Initial support for multiple devices of the same type.
+
+2010-07-27  Rob Savoye  <rob@welcomehome.org>
+
+	access the Stage and the X & Y scale from the gui.
+
+2010-07-27  Rob Savoye  <rob@welcomehome.org>
+
+	add eTurboTouch mouse
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	drop old config option prints
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	add --enable-input= which takes a list of input devices instead of many separate options.
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	drop unused accessors
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	remame KeyboardDevice to EventDevice
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	remame KeyboardDevice to EventDevice
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	rename as this also supports mice.
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	change how types get set
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	add comment
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	Add new *Device files to build optionally.
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	add conditional for reading input events.
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	add new device specific files.
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	add new device specific files.
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	merge in the rest of the patch. Add support for faking out ioctl() calls to our fake framebuffer.
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	add cflags for tslib
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	more cleanup of framebuffer config options.
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	fix typo in define name
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	fix conditional test
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	add some frambuffer specific options. These were all marked with a TODO in the source, so I figured I might as well get it done...
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	fix indenting and a little formatting
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	fix indenting
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	add an option to enable touchscreen support.
+
+2010-07-26  Rob Savoye  <rob@welcomehome.org>
+
+	add support for touchscreens using tslib.
+
+2010-07-29  Rob Savoye  <rob@welcomehome.org>
+
+	Honor the config options if set
+
+2010-07-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add testcases.
+	
+	Reduce inclusions of fill_style.h for easier refactoring. Include some headers
+	explicitly that were previously relying on secondary inclusions from
+	fill_style.h.
+
+2010-07-28  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	fill_style include in MovieClip.h no longer needed.
+
+2010-07-28  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add explicit assignment operator.
+
+2010-07-28  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't inline so many fill_style functions so that it doesn't have to be
+	included in headers. 
+	
+	Include headers properly where they're required rather than relying on
+	fill_style.h to be everywhere.
+
+2010-07-28  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More tests.
+
+2010-07-28  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add runner framework, but without any pixel tests. These will have to wait
+	until there's an implementation.
+
+2010-07-28  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More tests.
+
+2010-07-28  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add SWF with MovieClip.beginBitmapFill.
+
+2010-07-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add pixel tests.
+
+2010-07-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add a bitmap.
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Expect failures in Gnash.
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add proper tests to BitmapDataDraw.c.
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Run the BitmapDataDraw test.
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add automatic testing for BitmapData (for existing manual test).
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add more cases, but not yet many tests.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add things to BitmapData.draw test.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add BitmapDataDraw test
+
+2010-07-28  Rob Savoye  <rob@welcomehome.org>
+
+	CodeStream.h is in abc, not vm
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanups; nothing important.
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused include. Various minor cleanups.
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add output operator for ShapeRecords, drop obsolete code, clean up
+	includes.
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop the ProxyRenderer code because it no longer works with the current
+	renderer design. A proper Renderer subclass is needed for it to work again.
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanup of includes.
+
+2010-07-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add an ostream operator<< for ShapeRecords.
+
+2010-07-25  strk  <strk@xtp>
+
+	Use a variable to switch between 'catch-up-time' mode and 'smooth-animation' mode.
+	There are really two different use cases for those two modes:
+	- A/V sync will benefit from first
+	- gaming (interaction) will benefit from second due to smoothness
+	
+	Not sure we can find a compromise here, but PP is reported to take the latter
+	choice (aka 'elastic time'). 
+	
+	The variable is to make it easier for developers to see the effect
+	against their movies and eventually expose it as a compile-time or
+	build-time configuration.
+	
+	The default is the current "catch-up-time" (for A/V sync) but maybe
+	we should change or think about a mixed approach
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Code cleanups and rearrangements to simplify design.
+	
+	Split swf_function into Function and Function2 but preserve same functionality.
+	
+	Documentation.
+	
+	No new features or functional changes.
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Restrict access more. This still isn't very clean.
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tiny cleanup.
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanup of ASHandlers. We only need two ctors (and the default only because
+	they are stored in a vector). Don't store names in the handlers, as this
+	can be done in a more convenient ostream operator<<.
+	
+	Drop static container as it's already in a static singleton SWFHandlers
+	instance.
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Const correctness, don't waste space.
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up function parsing. Rename swf_function to Function.
+	
+	Add some documentation.
+	
+	Be consistent about reading and storing in unsigned values; previously it
+	was a mixture.
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add documentation.
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a separate derived class for Function2, which just adds a bit of
+	functionality on top of the older Function (swf_function).
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Actually test the with stack limit. It's 13. Drop the version dependent
+	code and data member.
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test the with stack limit, drop version-dependent limit and use a single,
+	tested, documented, hard-coded one.
+
+2010-07-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test with stack limit. It's always 13.
+
+2010-07-24  strk  <strk@xtp>
+
+	Use return from std::sytem, hushing compile-time warning
+
+2010-07-24  strk  <strk@xtp>
+
+	Print RECOMMENDED lines *after* WARNING lines, to reduce scroll-back problems
+
+2010-07-24  strk  <strk@xtp>
+
+	Suggest installing libswscale-dev when needed by ffmpeg
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Code cleanups, drop unused variables and functions.
+	
+	Minor fix and additional test for delete behaviour.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Put ActionExec definition into the accepted order.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Pass temporary TryBlock by value for clarity and easier compiler
+	optimizations.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanups.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't overwrite the (correct) result of a weird delete case. 
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test a delete case that looked suspicious in ASHandlers, and indeed was.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't enlarge the type unnecessarily.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't support PNG 1.1.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move CodeStream to libcore/abc and don't build unless AVM2 is enabled (which
+	it isn't).
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	We shouldn't, and indeed don't, care whether a function call is a Function2
+	or not outside swf_function.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Extensive cleanup of VM code, with no functionality changes (yet).
+	
+	Drop about half of the horrible as_enviroment class. Use other, more
+	appropriate classes to do the work instead of forwarding function calls
+	interminably.
+	
+	Start documenting the various classes involved in action execution, including
+	what their tasks are and why they exist, so that the VM isn't quite so
+	impenetrable. This doesn't include as_environment; I'm not sure what it's for.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Readd action logging. Don't return bool as we don't care whether the
+	register was set or not.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	It's the scope stack, not the with stack.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused non-static member function parse_path.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused string and nonsense comment.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move another function out of as_environment.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove findLocal from as_environment class as it's only used internally.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename addLocal to setLocal to reflect what it does.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop function definitions to make sure they're really not used.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use addLocal in more places, making its name inappropriate.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use string_table::key for function arguments. Move logic from the
+	as_environment class to free functions on a CallFrame, since the
+	functionality only applies to a CallFrame.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a less complex function to do the same thing.
+
+2010-07-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add copyright, documentation, and clean up includes.
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename CallFrame::setRegister to setLocalRegister for easier grepping.
+	
+	Return just-pushed CallFrame and make available through FrameGuard to
+	make the relationship between a function call and its resulting frame
+	clear (beforehand we had to go through the VM and assume the most
+	recent frame was the current function).
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove more proxies from as_environment.
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't dump local variables; we never used to do it either.
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop various dump functions from as_environment. Use just one function in
+	VM; can be split up later if necessary.
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add some documentation.
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up AVM2-related VM code.
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use the VM for VM-like things such as the call stack without proxying through
+	as_environment.
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop useless variable and the function used to set it.
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Document various classes and functions that are central to how the VM
+	runs, but had no explanation whatsoever.
+	
+	Simplify various functions, currently at the cost of providing action logging
+	(but this can be restored later).
+	
+	Move global registers to the VM instead of the horrible as_enviroment class,
+	which additionally means they aren't recreated for every new as_environment.
+	
+	Introduce the UserFunction as a base for swf_function and builtin_function;
+	these are identical in the reference implementation.
+
+2010-07-22  Sandro Santilli  <strk@keybit.net>
+
+	Fix warning when building with libavformat >= 52 (tested with older and newer)
+
+2010-07-22  Sandro Santilli  <strk@keybit.net>
+
+	Look for swscale.h in top-level ffmpeg include dir too. Put all swscale.h header inclusion in the ad-hoc ffmpegHeaders.h file. Tested with official ubuntu-8.10 ffmpeg packages and ffmpeg svn 
+
+2010-07-22  Sandro Santilli  <strk@keybit.net>
+
+	Print informations about swscale.h detector
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Updates to old function documentation, various cleanups and rearranging
+	to make the code easy to refactor.
+
+2010-07-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop with_stack_entry header.
+
+2010-07-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up.
+
+2010-07-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop messy debugging. Clean up.
+
+2010-07-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move parse_path out of as_environment as it doesn't have anything to
+	do with that class.
+
+2010-07-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Update documentation. Drop unused functions. Move with stack class to
+	the only place it's used. Make ActionExec noncopyable.
+
+2010-07-22  Andrea Palmat?  <andrea@amigasoft.net>
+
+	Fixing some OS4 functions
+
+2010-07-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix unused variable warning by using the variable.
+
+2010-07-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix unused variable warning by using the variable.
+
+2010-07-20  Andrea Palmat?  <andrea@amigasoft.net>
+
+	Small change to String_as to reflect Haiku implementation..
+
+2010-07-20  Rob Savoye  <rob@welcomehome.org>
+
+	implement calling Actionscript methods from Javascript.
+
+2010-07-20  Rob Savoye  <rob@welcomehome.org>
+
+	add an argument too, and a return value from the test AS method to make sure this fully works.
+
+2010-07-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup, add header to Makefile.
+
+2010-07-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Return of the ifdefs. Register media handlers explicitly to avoid the
+	problem with static initialization.
+	
+	Media handlers are still selectable at runtime, and all ifdefs are in one
+	place.
+	
+	This unfortunately means more intervention into the libmedia and
+	configure code when adding new handlers, but is unavoidable if we want
+	portable code.
+
+2010-07-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Explicitly register factory functions, as there's no guarantee otherwise that
+	the static initialization will ever occur.
+
+2010-07-19  Rob Savoye  <rob@welcomehome.org>
+
+	Implement the "server side" in movie_root and Player for the ExternalInterface
+	commands SetVariable, GetVariable, IsPlaying, PercentLoaded, Play, Rewind,
+	TotalFrames, and StopPlay.
+	Don't fake out PercentLoaded in the plugin, since it now works correctly.
+
+2010-07-19  Rob Savoye  <rob@welcomehome.org>
+
+	handle the arguments for Pan, Zoom, and SetZoomRect.
+
+2010-07-19  Rob Savoye  <rob@welcomehome.org>
+
+	cleanup, LoadMovie is unimplemented for now.
+
+2010-07-19  Rob Savoye  <rob@welcomehome.org>
+
+	use callInterface() to implement the player control part of ExternalInterface.
+
+2010-07-18  Rob Savoye  <rob@welcomehome.org>
+
+	actually set and get the variables used by Javascript via ExternalInterface.
+
+2010-07-19  Andrea Palmat?  <andrea@amigasoft.net>
+
+	Add a missing getclocktime.hpp include to avoid a compilation error when clock_gettime() function is not present
+
+2010-07-19  Rob Savoye  <rob@welcomehome.org>
+
+	Haiku patches for recent media handling changes.
+
+2010-07-19  Adrian Panasiuk  <adek336@gmail.com>
+
+	GnashFactory comments: the factory is now generic
+
+2010-07-19  Adrian Panasiuk  <adek336@gmail.com>
+
+	Haiku sound handler: pass media handler to constructor
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence some warnings.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence warning.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix warning.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Keep same class-key.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	The whole renderer is noncopyable; no need to do the same for OGL.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove the obviously silly arguments from Renderer::begin_display and 
+	do some cleanups that follow on from it.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix testsuite.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Be consistent using an integral types for stage width in pixels as it is
+	logically and programmatically an integer from start to finish.
+	
+	Rename set_display_viewport to setDimensions and drop the two silly arguments.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Viewport x and y are always 0 and only used for the OGL renderer anyway, so
+	drop them.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tiny coding style change.
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop two useless arguments from begin_display().
+
+2010-07-19  Sandro Santilli  <strk@keybit.net>
+
+	Minor output style change
+
+2010-07-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Avoid forming a reference to a reference to fix compile in older versions
+	of GCC or boost.
+
+2010-07-18  Andrea Palmat?  <andrea@amigasoft.net>
+
+	Fixing AHI audio handler
+
+2010-07-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Prevent accidental copying of renderers.
+
+2010-07-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Renderers are currently not copyable.
+
+2010-07-17  Sandro Santilli  <strk@keybit.net>
+
+	Properly set the default media_list when not explictly specified
+
+2010-07-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor improvements to media handler reporting.
+
+2010-07-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Improve version reporting.
+
+2010-07-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Improve configure.
+
+2010-07-14  Rob Savoye  <rob@welcomehome.org>
+
+	reorganize gui files into sub-directories, no other changes.
+
+2010-07-14  Rob Savoye  <rob@welcomehome.org>
+
+	move most gui code to sub-directories for better organization.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Missing include.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't forget the default.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Allow selection of media handlers at runtime. If none is selected, the
+	first ordered handler will be chosen as a default. If there is only one media
+	handler, behaviour is as before.
+	
+	Selection is command line only with the option -M. Rcfile selection is not
+	yet implemented.
+	
+	Testing does not yet support selection, but rather chooses the default.
+	
+	Change renderer selection from --Renderer to --renderer for consistency.
+	
+	Show media handler information in gtk. Fix some typos.
+	
+	All sound_handlers need a MediaHandler on construction. This isn't an
+	ideal situation (though better than using a singleton media handler), but
+	sound_handler needs redesigning to fix it.
+	
+	XVideo is probably broken.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add to Makefile. Add support for listing registered keys. Use for usage().
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add options in usage().
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle errors more nicely with exceptions.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Pass media handler also to NullSoundHandler.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix testsuite.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop code from gnash.cpp.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Query media handlers for description.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a generic factory instead.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix typo in configure so that ffmpeg is actually built.
+	
+	Fix various compile errors, fix testsuite again.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Allow building multiple media handlers, add them to the factory.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add a factory for MediaHandlers.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't use a singleton for the MediaHandler. The xv gtk gui does something
+	bizarre with it, and is consequently now broken.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test key events especially for buttons, showing that they should be handled
+	differently from how Gnash does it.
+	
+	Drop most 'key listeners', only handling Buttons like this. It is the
+	same behaviour as before and still incorrect.
+	
+	Drop various obsolete functions.
+
+2010-07-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove tabs.
+
+2010-07-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanups.
+
+2010-07-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove listener cleanup code.
+
+2010-07-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't cleanup listeners (only Buttons now).
+
+2010-07-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Only add Buttons as key_listeners as an intermediate step.
+
+2010-07-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	The second test passes.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Another test.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test key event order better.
+
+2010-07-13  Andrea Palmat?  <andrea@amigasoft.net>
+
+	Fixing small linking problems on AmigaOS4
+
+2010-07-12  Andrea Palmat?  <andrea@amigasoft.net>
+
+	Fixing small compilation problems. Fixed a broken os4 gui file that was cut..
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Memory fixes.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't leak removed constructors.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't try to detach shared memory if it was never attached, or the
+	shm system calls use uninitialized values.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test key events more carefully. Minor fix to event order.
+	
+	More cleanups of event handling.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't send key releases to TextFields.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename notify_key_event() to keyEvent() to match the mouse notifiers.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Call fire_mouse_event() from notify_mouse_listeners() as it's part of the
+	same process, and relying on callers to do it is odd.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation, restrict access to functions.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	There's no real need to split key events into two functions, or to 
+	process the action queue twice.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't register TextField as a key listener; notify a textfield separately
+	if it's in focus, as the update happens at a different point.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Check order of textfield update and key listener notification.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix huge memory leak in ffmpeg audio decoder, as well as some typos that
+	would lead to the wrong deallocation function being called.
+
+2010-07-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanup.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix some typos resulting in memory leaks. All the code round there is terrible.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix uninitialized variable bug.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't forget to initialize _name now that it's not a std::string.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop notes on c++0x.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Various cleanups. Add a way to exit properly from movie_root.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add exit() to the host interface and call it from movie_root to quit.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop mystery m_timer member.
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop isMouseOverActiveEntity() as it's only ued in testing and is easily
+	implementable using getActiveEntityUnderPointer().
+
+2010-07-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move things out of the movie_root interface to make it less cluttered and
+	help refactoring.
+
+2010-07-10  Rob Savoye  <rob@welcomehome.org>
+
+	add improved Haiku support.
+
+2010-07-09  Rob Savoye  <rob@welcomehome.org>
+
+	new patch for Haiku support.
+
+2010-07-06  Adrian Panasiuk  <adek336@gmail.com>
+
+	Haiku Gui: do not use a low resolution timer
+
+2010-07-06  Adrian Panasiuk  <adek336@gmail.com>
+
+	Haiku Gui: fix mmap usage
+
+2010-07-06  Adrian Panasiuk  <adek336@gmail.com>
+
+	plugin: add Haiku support to npapi headers
+
+2010-07-06  Adrian Panasiuk  <adek336@gmail.com>
+
+	Haiku: wstring: revert to using char
+	
+	* wchar_t solution makes Gnash unstable.
+
+2010-07-06  Adrian Panasiuk  <adek336@gmail.com>
+
+	Haiku GUI: fix build
+
+2010-07-06  Adrian Panasiuk  <adek336@gmail.com>
+
+	plugin: fix config file lookup code to work under Haiku
+
+2010-07-06  Adrian Panasiuk  <adek336@gmail.com>
+
+	configure.ac: HAIKU conditional
+
+2010-07-06  Adrian Panasiuk  <adek336@gmail.com>
+
+	configure.ac: Haiku GUI: default pixelformat
+
+2010-07-06  Adrian Panasiuk  <adek336@gmail.com>
+
+	bzr ignore bzrversion.h gnash.pc testsuite/libbase.all/gnashrc testuite/libbase.all/gnashrc-local
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanups, simplification and rationalization of DisplayObjects and movie_root.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop mouse listeners.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Mouse listeners are now identical to live chars, so use the latter.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unnecessary const_casts.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop some unused functions.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More cleanup of DisplayObjects.
+	
+	Only MovieClip and derived classes now require an advance() function.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Neither ffmpeg nor gst need an advance() call, so that live chars can be
+	MovieClips only.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use InteractiveObject.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Listeners are all InteractiveObjects.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	No need to duplicate mouse button state.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop disabled code (and comment explaining why it's disabled, since it's
+	not there any more).
+
+2010-07-10  Rob Savoye  <rob@welcomehome.org>
+
+	add packages for Gnash extensions.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up mouse event handling. Add support for onMouseWheel, implemented only
+	in gtk.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add some automated tests for onMouseWheel.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Always send entity argument.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add MovieTester support.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Implement mouse scroll support in GTK gui.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add support for mouse wheel. Drop out-parameter from get_mouse_state().
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop mask argument. Rename functions.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	ActionScript cares not a jot if you press the right mouse button. Drop masks
+	and use simple up/down boolean.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove another phantom propflag. Fix the small number of properties that were
+	relying on it.
+	
+	Correct Sound class properties, clean up class. Embedded sounds are
+	still not individually trackable, so this isn't very clean.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop another useless member.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop more useless members.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop useless members.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add documentation, const correct.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move Sound_as class out of header.
+
+2010-07-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused functions. Start probe timer for embedded sounds too for the
+	duration update. Unfortunately there's no way yet of stopping it.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Reset samplesFetched on loop so that position is correct.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Another test for duration. Fix properties a bit, though the Sound class is
+	overcomplicated and still undertested.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop test for phantom property.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove another phantom prop flag. Do Sound properties a bit better (still
+	not properly tested), as they were relying on the phantom flag.
+
+2010-07-09  Rob Savoye  <rob@welcomehome.org>
+
+	Link in X11 libs with GTK. Update descriptions for debian packages.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop some odd and incorrect things from core code that were intended to get
+	AVM2 working without doing it properly.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Line break.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't pollute everything with useless namespaces.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused functions.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Simplify Property interface. Drop invented "static" prop flag, which neither
+	exists in reality nor serves any useful purpose (was a hack to adapt AVM1
+	for AVM2).
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused functions.
+
+2010-07-09  Rob Savoye  <rob@welcomehome.org>
+
+	don't enable avm2, or it won't build.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Include <map>.
+
+2010-07-09  John Wimer  <john@god.vtic.net>
+
+	add -D__STDC_CONSTANT_MACROS to ffmpeg cflags
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop AS3 stubs and other AVM2 code that was in the wrong place.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop text stubs.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop ui stubs.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop xml stubs.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop AS3-only classes.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop net and system AS3 stubs.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop media AS3 stubs.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop more AS3 stubs.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop a load of AS3-only stubs.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop more AVM2.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix the long-standing property case problem. The string_table is always
+	case-sensitive. Properties are looked up differently according to version.
+	
+	Tests pass in swfdec and actionscript.all.
+	
+	Drop core code that misused AVM1 facilities, including the PropertyList,
+	to try and implement AVM2. Disable AVM2 by default.
+	
+	Gnash will currently fail to compile when AVM2 is enabled. This may be fixed
+	in later commits.
+
+2010-07-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Disable AVM2 by default. Drop AVM2 code.
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Disable avm2 by default, drop various hideous and incorrect AVM2 functions.
+
+2010-07-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Merge from trunk for testsuite fixes.
+
+2010-07-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	If it's really necessary to provide trivial wrappers (which it isn't here),
+	they should be local free functions.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unneeded return value. Make Property values mutable to reflect the
+	weird Property semantics and remove need to const_cast in PropertyList so
+	much.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test interface by using its expected behaviour, not by relying on a silly
+	interface.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Restore thread-safety.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Write useful tests for string_table.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a caseless index to speed up property lookup for lower versions.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add some more templates to GnashAlgorithm.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't try to access non-existent objects.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use string_table::key for DisplayLists too, simplifying some of the code.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use caseless().
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop silly const_casts.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Improve handling of case-sensitivity
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	It's a class, not a property.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add a more descriptive way of checking whether property comparison should
+	be caseless.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop PROP_iSTAGE, replace with the correct CLASS_STAGE. Re-add PROP_COLOR,
+	as there is no clash any more. Add PROP_THIS.
+
+2010-07-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up and add documentation.
+
+2010-07-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop ill thought-out optimization; either property could be non-lower
+	case, so there's no point just testing one.
+
+2010-07-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop version from loadStrings().
+
+2010-07-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up string_table.
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop declaration.
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop function.
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Slightly improve lookup, drop VM::get().
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Allow lookup of caseless property in the string table.
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use the index for case-sensitive lookup, speeding it up massively.
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Reintroduce a different multi-index container.
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Reduce duplication in string_table.
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up types.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove some const_casting.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Another pass.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Map case for SWF6.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unnecessary mComp member, make indices unique.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passing swfdec tests.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop some unnecessary members.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passes in actionscript.all (case).
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a std::list instead of a std::vector, as in at least one case we store
+	a pointer to a list element while changes can be made to the property list.
+	The elements have to have a stable address. Fixes the failure in the
+	swfdec testsuite.
+	
+	This also improves the speed of deletion from the middle of the property
+	list.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle "this" according to version. Fixes actionscript.all failures.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use case insensitive comparison for SWF versions below 7. Use also for
+	display object special properties, fixing most of the broken tests.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop case insensitivity. Add function for case-insenstive comparison.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't use a case-insenstive string table; check in the property lookup
+	instead. This is considerably slower in some cases and fails cases (likely
+	path lookup, which doesn't handle case sensitivity).
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't use property order as it's inherent to the container.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Enumerate in the correct order. Fixes most, if not all tests again.
+
+2010-07-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a simple container (currently vector) for properties to replace the
+	boost::multiindex. A small number of tests fail.
+
+2010-07-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix testsuite.
+
+2010-07-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add tests to make sure that dynamic transforms don't affect BitmapData.draw.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Initial tests for BitmapData.draw.
+
+2010-07-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop extra comma to fix warning.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop has_looped() from the MovieClip interface. It probably shouldn't even
+	be used internally, and we don't want external users to start using it!
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanups from removing the user cxform.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop overrides in MovieClip.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add some simple tests for color transform, including interaction of
+	MovieClip.transform and the Color class. Drop "user cxform" of MovieClip,
+	fixing both old and new tests.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop useless user cxform.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passes in the swfdec testsuite.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passes in actionscript.all (including some old tests).
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't use the extra "user-defined" cxform for MovieClip. Tests - especially
+	the interaction of MovieClip.transform and the Color class - show it can't
+	be correct, and both new and old tests pass when it's bypassed.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add totals.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Color doesn't just check the user transform.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Return by ref-to-const.
+
+2010-06-29  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tests for interaction of color transform methods.
+
+2010-06-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanups only: drop duplicated function. Drop DisplayItem typedef. Add some
+	assertions to help DisplayList cleanup. Drop unnecessary check in as_value.
+
+2010-06-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Simplify chain of functions.
+
+2010-06-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop silly extra check.
+
+2010-06-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop DisplayItem typedef, especially as it's a pointer and requires pointer
+	semantics.
+
+2010-06-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add some assertions and more handling of destroyed objects.
+
+2010-06-24  Rob Savoye  <rob@welcomehome.org>
+
+	Don't add all the flashVars to the scriptables yet, till implementing GetVariable
+	and SetVariable actually do something.
+
+2010-06-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fixes to visibility: bug #30241.
+
+2010-06-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix for bug #30238: don't try to load "undefined" or any other non-string
+	value in MovieClipLoader.loadClip. 
+	
+	Add tests for this behaviour.
+
+2010-06-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Return false and do not attempt to load any non-string URLs in
+	MovieClipLoader.loadClip. Passes the new tests. Fixes bug #30238.
+
+2010-06-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add tests showing that loadClip must be called with a string or it returns
+	false. Manual tests show that a return of false means there was no load
+	attempt.
+
+2010-06-23  Rob Savoye  <rob@welcomehome.org>
+
+	Fix a few typos. fix version string.
+
+2010-06-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't return destroyed DisplayObjects from the DisplayList. A
+	less-than-optimal fix for bug #28563. A better fix needs more investigation.
+	
+	Test passes in misc-ming.all/ActionOrder{3,4,5}.swf and RegisterClass4.swf.
+
+2010-06-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Instead of cleaning the display list at different times, just don't return
+	destroyed objects when searched for. This means other cases won't slip 
+	though the net. Add notes on why it's necessary and how to do it better.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	No need to add to DisplayList's interface.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	No need to touch anything outside DisplayList.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passing tests.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean the DisplayList of destroyed characters when restoring so that destroyed
+	characters at a lower depth don't override non-destroyed ones. Fixes many
+	tests in misc-ming.all. Needs cleaning up.
+
+2010-06-22  Rob Savoye  <rob@welcomehome.org>
+
+	improve OpenGLES1 & 2 support configure. Add configure support for OpenVG. Change _ANDROID to ANDROID.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Give imported fonts at least a chance of working.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Do importing of fonts in a way that's likely to work. There are no tests for
+	this, neither is it easy to do.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Formatting and cleanups only: no functional changes.
+	
+	Drop unused members, drop duplicated functionality. Fix indentation in 
+	fn_call.h.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Formatting.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix spacing in fn_call.h. Drop dump_args overload and use the one true way
+	everywhere.
+
+2010-06-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove mystery members _mouseFlags and _lastMouseFlags.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Various compatibility improvements. Simplify and correct equality tests
+	(new passes in swfdec testsuite and actionscript.all). The as_value::equals
+	function is now almost readable, which is an added benefit.
+	
+	Simplify and correct Function.call (passes in swfdec testsuite and
+	actionscript.all).
+	
+	Corrections to ColorTransform, implement ColorTransform.concat. Passes in
+	the swfdec testsuite.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tidy up more.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Simplify, drop debugging.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use number hint, not "default primitive".
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Reduce more duplication.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move same type test first so we know all subsequent tests are for different
+	types.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop duplicated check for object equality, as this is handled by
+	equalsSameType.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Reorder equality algorithm to make it cleaner.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle null and undefined just like strings and numbers. Tests still pass.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Reduce code duplication in as_value.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	New swfdec passes.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passing equality tests.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Improve equality so that the swfdec tests pass.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passing function call tests.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passes due to corrected equality.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Objects that don't convert to primitives are equal to undefined.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tidy up Function.call.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove unnecessary verbiage in as_value.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix Function.call arguments (to be cleaned up).
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passes in swfdec testsuite.
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Correct ColorTransform properties, implement concat().
+
+2010-06-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop left-over code from previous fix.
+
+2010-06-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Check that localtime_r succeeds and return 0 if it doesn't. This prevents
+	use of uninitialized data when a large value is passed.
+	
+	Add tests for StaticText hits (Gnash fails).
+
+2010-06-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Update runner for automatic tests. We now no longer expect the Test to
+	reach the final frame because there are no click events.
+
+2010-06-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add tests for events on static text.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Check the return of localtime_r and don't use it when it fails! Prevents
+	some memory errors for very large values.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Correct Point. New test passes.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passing tests.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix construction and stringifying Point.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	No functional changes: only const correctness and formatting.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unnecessary const_casts.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Const correct.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor fixes to and implementation of flash.geom class functions. Some new
+	passes in the swfdec testsuite.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle undefineds. This would be much easier actually written in AS.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use correct results!
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passing swfdec tests.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Do Matrix construction and stringify compatibly.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Passing swfdec tests.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tests pass in actionscript.all.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Implement Rectangle.setEmpty(). Construct and stringify Rectangles as expected.
+	Tests in swfdec testsuite pass.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Implement containsPoint.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More containsPoint tests.
+
+2010-06-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rectangle containsPoint tests.
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Stop tree.hh taking over Gnash's documentation.
+
+2010-06-18  Rob Savoye  <rob@welcomehome.org>
+
+	drop debug message
+
+2010-06-18  Rob Savoye  <rob@welcomehome.org>
+
+	migrate from branch. Error handling now works, and remote functions are now accessible to Javascript
+
+2010-06-17  Rob Savoye  <rob@welcomehome.org>
+
+	minor documentation
+
+2010-06-17  Rob Savoye  <rob@welcomehome.org>
+
+	only pass the arguments, we already know the name.
+
+2010-06-17  Rob Savoye  <rob@welcomehome.org>
+
+	handle a null object as a result.
+
+2010-06-17  Rob Savoye  <rob@welcomehome.org>
+
+	handle a null object as a result.
+
+2010-06-17  Rob Savoye  <rob@welcomehome.org>
+
+	cleanup compiler warnings
+
+2010-06-17  Rob Savoye  <rob@welcomehome.org>
+
+	pass proper parameters to callbacks.
+
+2010-06-17  Rob Savoye  <rob@welcomehome.org>
+
+	call javascript callback handler instead of actionscript one.
+
+2010-06-17  Rob Savoye  <rob@welcomehome.org>
+
+	add method to handle javascript callbacks separate from actionscript ones.
+
+2010-06-17  Rob Savoye  <rob@welcomehome.org>
+
+	Only have one plugin loaded. Initialize test case as embed first.
+
+2010-06-16  Rob Savoye  <rob@welcomehome.org>
+
+	Send an addMethod message to the plugin when adding callback on the flash side.
+	These get handled differently than the default methods, so add a new callback.
+	Parse the message from gnash and add the method to the plugin.
+
+2010-06-16  Rob Savoye  <rob@welcomehome.org>
+
+	add callback for all flash added methods propogated to the plugin.
+
+2010-06-15  Rob Savoye  <rob@welcomehome.org>
+
+	merge from trunk.
+
+2010-06-15  Rob Savoye  <rob@welcomehome.org>
+
+	less verbose.
+
+2010-06-15  Rob Savoye  <rob@welcomehome.org>
+
+	Send the Invoke to the browser for ExternalInterface:call().
+	Send the result back to the player, add error handling on both ends.
+
+2010-06-15  Rob Savoye  <rob@welcomehome.org>
+
+	start implementing the callback supoport for ExternalInterface.
+
+2010-06-15  Rob Savoye  <rob@welcomehome.org>
+
+	check the security of the URL. Don't do anything if not running under the browser.
+
+2010-06-15  Rob Savoye  <rob@welcomehome.org>
+
+	-F option takes two paramaters.
+
+2010-06-15  Rob Savoye  <rob@welcomehome.org>
+
+	set allowScriptAccess param. Change the names of the JS and AS callback functions.
+
+2010-06-15  Rob Savoye  <rob@welcomehome.org>
+
+	Tweak so the call() tests work online or offline, as this changes the behaviour.
+	Use available property to adjust the tests.
+	call() test still fails even with Adobe, so I assume the HTML code is incorrect.
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Initialize some class members that weren't. Reorder classes to allow more
+	efficient packing. Make more members of DisplayObject private to restrict
+	fiddling with them.
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanup of class member access, order and initialization. Drop unused
+	member from TextField. Initialize _linesindisplay, which was left
+	uninitialized before.
+	
+	By grouping small types together we allow more efficient padding, saving
+	16 bytes for every DisplayObject, 32 for MovieClips, and even 56 for
+	TextFields.
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add minor cleanup commit missing from last revision (make functions
+	protected).
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make unloadChildren() protected.
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add more tests for unloading DisplayObjects. Correct unloading for various
+	passes in the swfdec testsuite, misc-ming.all, and the new tests in
+	actionscript.all.
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Revert to old behaviour of calling destroy() in callers. We're not sure what
+	destroy() is for, and until the model is understood properly it's best to
+	make as few changes as possible.
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence debugging.
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add automatic tests for unload handling.
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't always destroy when there is no unload handler. Now all tests pass!
+
+2010-06-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Stop removing children as soon as an unLoad handler is encountered. This
+	is verified to be correct at least in some cases.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Revert accidental change (again) and corresponding test passes.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Simplify DisplayList::destroy(). Same tests still fail.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Small cleanup.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Expect passes.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle destroy() more centrally, accidentally get a lot of XPASSes and only
+	a couple of FAILs. We'll commit this and sort out why it works and how to
+	fix the failures later.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move unloaded() to cpp for easier refactoring.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Handle all unloading through DisplayObject::unload().
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make it easier to use the tests for debugging as well as testing.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add onEnterFrame for debugging, but don't test.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Trace output as we run the test so that debugging order is easier.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add tests for action order. Minor cleanup to previous test. Remove debugging
+	from MovieClip to make the code legible.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Expect failures in ActionOrderTest5.swf.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Expect failures in ActionOrderTest4.swf.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename, expect failures in ActionOrderTest3.c.
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add more action order tests (incorrectly named InitAction).
+
+2010-06-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add InitActionTest3.
+
+2010-06-16  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop debugging so the logic is readable.
+
+2010-06-16  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add traces showing that onLoad is called at the wrong time.
+
+2010-06-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Some VM operations relied on the order of evaluation of function arguments,
+	which is not specified by the C++ standard and varies between compilers. This
+	commit fixes those problems.
+
+2010-06-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More evaluation order.
+
+2010-06-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More evaluation order.
+
+2010-06-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Argument evaluation order.
+
+2010-06-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix more function argument order.
+
+2010-06-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't rely on order of evaluation of function arguments, as this is
+	unspecified.
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add tests showing some timeline bugs (see bug #28563).
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add more tests to isolate the problem (Gnash passes).
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix the tests so we can expected failures in some of them.
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove onEnterFrame.
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More sanity checks.
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Revert testing change accidentally committed.
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test properly and automatically.
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Some improvements.
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove duplicated export.
+
+2010-06-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add test code for register classes.
+
+2010-06-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop duplicated initialization of Object properties. Thanks to Sandro
+	Santilli for pointing it out.
+
+2010-06-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't initialize Object properties twice!
+
+2010-06-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused code.
+
+2010-06-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop clone() functions again as they aren't used or needed. Make
+	ExecutableCode non-copyable.
+
+2010-06-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop markMappedResources as it's no longer needed.
+
+2010-06-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix loading of bitmap movies again. There should really be an automatic
+	test for this!
+	
+	Minor comment correction in testsuite.
+
+2010-06-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add missing construct() call, fixing bug introduced with revision 12225
+	(loaded bitmaps not displayed).
+
+2010-06-13  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Correct frame number in comment.
+
+2010-06-12  Rob Savoye  <rob@welcomehome.org>
+
+	Fix type so libintl actually gets linked into the gui.
+	Add gles option to --enable-renderer= to enable currently non-existant
+	OpenGL-ES support. Currently works with Android and the Linux versions,
+	not enabled by default.
+
+2010-06-12  Rob Savoye  <rob@welcomehome.org>
+
+	add configure support for using OpenGL-ES as a renderer.
+
+2010-06-12  john  <john@rock>
+
+	Fix --with-qt4-incl to add subdirectories to include search path (same behaviour as pkg-config).
+	Properly add library search path when using --with-x11-lib
+	Thanks to Thomas Koeller for initial patch. Fixes bug #30057.
+
+2010-06-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation and cleanups only: move tags to their own files, document
+	id and how it is used.
+
+2010-06-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add more documentation.
+
+2010-06-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add documentation for why we have to pass an id too.
+
+2010-06-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add file.
+
+2010-06-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add file.
+
+2010-06-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop leftover stuff.
+
+2010-06-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move Export loader into its own file.
+
+2010-06-12  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Put ImportAssets into its own file.
+
+2010-06-11  Rob Savoye  <rob@welcomehome.org>
+
+	update comments
+
+2010-06-11  Rob Savoye  <rob@welcomehome.org>
+
+	also send the data for GET and POST requests. Fix getURL(POST), improve testcase.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence debug logging.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't use int when we meant boost::uint16_t. Cleanups only.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More uint16_t.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More uint16_t for char ids.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use uint16_t more consistently for character ids.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence debug logging.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Change the way exports and initactions are handled.
+	
+	This involves:
+	
+	1. Creating a runtime "dictionary" of parsed characters to track definitions
+	an initialization.
+	2. Executing ExportAssets, ImportAssets, and DefinitionTags to allow
+	runtime tracking.
+	3. Dropping the ExportableResource class, so not relying on RTTI for
+	exports.
+	4. Waiting for parsing to advance only in import, not in export as well.
+	5. Only executing initactions and performing attachMovie for known characters
+	(fixes swfdec/ExportAssets-swf and misc-ming.all/InitActions2.swf).
+	
+	This allows better separation of immutable definitions from AS runtime objects.
+	
+	Left for later commits are:
+	
+	1. Renaming of ControlTag and DefinitionTag to something less similar to
+	the SWF spec concepts (which are different).
+	2. Possible optimizations by using ownership rather than refcounting for
+	ControlTags.
+	3. Moving Export and Import parsing to their own files.
+	
+	Make the naptime for imports shorter, which speeds up the actionscript.all
+	testsuite by a factor of 3.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make ImportTag into a proper ControlTag so that it also adds characters on
+	execution.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add copyright.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add documentation for export functions and rename exportMap to exportTable.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make ImportAssets tag into something more sensible again.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use correct macro name.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add TODOs.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make debug message into a swferror.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More documentation.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add more documentation.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add documentation for the runtime 'dictionary'.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop ExportableResource class. Add notes for places to check whether
+	ownership would be better than refcounting.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add DefinitionTag.cpp.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix ref_counting issues.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make DefinitionTag also a Control tag, marking characters as known when
+	executed. This is a complicated way of faking something far simpler and
+	crashes due to refcounting.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make all DefinitionTags store their id. Make it always a uint16_t.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Debug logging.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup.
+
+2010-06-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make sure export case is ignored again, fixing swfdec tests.
+
+2010-06-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Stop handling and storing exports themselves in definitions.
+
+2010-06-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Expect passes for InitActions so we don't forget them when fixing the other
+	tests.
+
+2010-06-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move exported character location to SWFMovie.
+	
+	Various init_action and export tests fail at this stage.
+
+2010-06-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Track characters properly in SWFMovie.
+
+2010-06-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop bogus check for parsing ExportAssets tag. It should always be parsed.
+
+2010-06-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Merge from trunk, fix conflicts.
+
+2010-06-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use exportID() for finding sound exports.
+
+2010-06-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop obsolete comments.
+
+2010-06-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up SWFMovieDefinition.
+
+2010-06-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix compiler warning (finally).
+
+2010-06-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Expect pass.
+
+2010-06-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up registerClass.
+
+2010-06-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix all tests, XPASS in swfdec.
+
+2010-06-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Separate exporting into two steps: creation of an export map (symbol to id,
+	parse time) and lookup of character (runtime, should be in Movie).
+	
+	Import now looks up a corresponding symbol in the external movie using its
+	export map. Waiting is done while importing, not exporting.
+	
+	One XPASS, one FAIL in swfdec. Waiting seems to take longer.
+
+2010-06-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Do import and export at runtime to see what happens.
+
+2010-06-11  Sandro Santilli  <strk@keybit.net>
+
+	Someone please revoke my commit access for a week or so :-!
+
+2010-06-11  Sandro Santilli  <strk@keybit.net>
+
+	Oops, sorry for the silly scan rewrite (infinite loop).
+	Wasn't really needed anyway, the new concept I'm using won't need that
+
+2010-06-10  Sandro Santilli  <strk@keybit.net>
+
+	More ignores
+
+2010-06-10  Sandro Santilli  <strk@keybit.net>
+
+	rewrite reslist scan to be safe in case of list change on delete of GcResources
+
+2010-06-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix silly initialization.
+
+2010-06-09  Sandro Santilli  <strk@keybit.net>
+
+	Pass media dir to test generators as absolute path. Fixes a bug exposed when building from source tree while being in it via virtual (vs. physical) path. Very corner case, I know :>
+
+2010-06-09  Sandro Santilli  <strk@keybit.net>
+
+	GC cleanups: drop unneeded reachability markers
+
+2010-06-09  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix silly return.
+
+2010-06-08  Markus Gothe  <markusg@milgram.sth.aptilo.com>
+
+	DSOEXPORTs
+
+2010-06-08  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add tests showing that init actions are exected after a character has been
+	placed on stage, even it it it has been removed again.
+
+2010-06-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Simple test to make sure init actions for non-existent characters aren't
+	executed.
+
+2010-06-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Comments about wrong behaviour.
+
+2010-06-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Update comments for DoInitActions.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Do not construct MovieClips that have no onUnload handler if they are placed
+	and removed in skipped frames.
+	
+	This involves two changes: a) allow all ExecutableCode to be identified
+	by its target, and b) allow removal of queued constructors by target.
+	
+	Tests in misc-ming.all/RegisterClass3Test pass.
+	
+	Fixes bug #29771.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Correct comments.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Check that onInitialize events are correct too (they are).
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add comments.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Merge fix for bogus construct events on skipped frames.
+
+2010-06-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add another test for getTextExtent.height to catch a Gnash bug.
+
+2010-06-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make trace message in test more accurate in case someone looks at it.
+
+2010-06-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop duplicated check for unload handler.
+
+2010-06-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleaner implementation; handle in DisplayObject::unload(). Revert messier
+	changes from initial implementation.
+
+2010-06-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tests pass.
+
+2010-06-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Naive fix for MovieClips wrongly constructed after removal: remove from
+	construct action queue if there is no onUnload handler.
+
+2010-06-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make Executable code always store a target DisplayObject.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up, testsuite passes as before.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Construct more as expected.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't pass things round more than necessary.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop function declaration.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Construct objects as expected.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't do construction in DisplayList.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop proxy function.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Split construction away from stage placement.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation and consistency of interface.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add documentation.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add default argument for consistency.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move DisplayObject construction out of DisplayList to avoid passing
+	the init object around. This commit has various intermediate changes to
+	construction by separating stage placement and construction, but in the
+	end united them again under the DisplayObject::construct() function.
+	
+	Test and correct construction of exported Buttons (test requires ming 0.4.4).
+	
+	Change font file and misc-ming.all/TextSnapshotTest.c to work with ming CVS
+	after changes to the handling of kerning values as well as older versions
+	of ming.
+
+2010-06-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Keep the frame count the same for all ming versions to avoid failing
+	the sanity check.
+
+2010-06-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Update four test results to work with the changed fdb file. This should
+	behave the same for the pre- and post-font-change ming.
+
+2010-06-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop kerning information from Bitstream-Vera-Sans.fdb. This is a manually
+	edited fdb file!
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	We have 6 frames now.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Check ming version for exporting button.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add some characters to make the Button more exiting.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test passes.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't use the init object when constructing buttons (can be passed when
+	attachMovie is called with an exported button type).
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test init object for Buttons used with attachMovie (requires current ming CVS).
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add more tests for duplicateMovieClip.
+
+2010-06-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Do all stage placement in construct().
+
+2010-06-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup from investigating clang++ compile failure: move function
+	outside class as it needs no access to the class member at all.
+
+2010-06-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Update tree.hh to latest version, also fixing clang++ warnings (unused
+	variable for post-inc operators).
+
+2010-06-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix more clang++ warnings as well as conforming to coding style by using
+	class for a class with private members.
+
+2010-06-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Change forward declaration of ObjectURI from class to struct because
+	clang++ issues a warning in this case, which is unhelpful but annoying
+	and obscures other warnings. Apologies for the noise.
+
+2010-06-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence old debug messages for things not actively being worked on.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Correct ExternalInterface properties, drop old code from header.
+	
+	Swfdec test passes.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tests suggest that properties are not initialized with SWF8 flags.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test passes.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused class.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop non-existent marshallExceptions property.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Correct ExternalInterface properties: make some native.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a different header guard or it will wrongly prevent inclusions.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix warnings in movie_root (unsigned/signed comparison, unused variable).
+	Remove unused variables.
+
+2010-06-04  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix crash in plugin (boost::format) and some other bogus log_debug calls.
+
+2010-06-03  Rob Savoye  <rob@welcomehome.org>
+
+	drop using namespace std; and optimize a few methods to return simple strings instead of a stringstream.
+
+2010-06-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Formatting, comments, drop obsolete code.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop obsolete code.
+
+2010-05-27  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Comments.
+
+2010-06-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix logic error in TextFormat.getTextExtent() to make the height value more
+	correct (though still not right).
+	
+	Use a single variable for embeddedness to make changes easier.
+
+2010-05-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix TextFormat width bug.
+
+2010-05-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence debugging.
+
+2010-05-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix bug in TextFormat for limited width.
+
+2010-05-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a const bool for embeddedness.
+
+2010-06-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix compiler warnings in testsuite, merge and revert disabling of AVM2 (it's
+	still enabled, that is).
+
+2010-05-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix compiler warnings in testsuite.
+
+2010-05-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Merge disabling of AVM2.
+
+2010-06-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Merge improvements to TextFormat tests.
+
+2010-05-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Merge improved TextFormat tests.
+
+2010-06-03  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Merge various minor changes.
+	
+	Change expected result for System.hasIME because, although it's documented,
+	shows no signs of existence on any player.
+	
+	Drop hasIME member for Gnash.
+	
+	Commit fix from Bernhard Rosenkraenzer for bug #29937
+
+2010-05-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Merge various fixes.
+
+2010-05-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Merge various minor code bits.
+
+2010-06-02  Rob Savoye  <rob@welcomehome.org>
+
+	go back to the old behaviour.
+
+2010-06-02  Rob Savoye  <rob@welcomehome.org>
+
+	100% only reformatting and indenting changes to conform to the rest of the code style used in Gnash.
+
+2010-06-02  Rob Savoye  <rob@welcomehome.org>
+
+	merge from branch all ExternalInterface refactoring.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	add some explanation of the hokey test setup.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	make the building of ghsell optional till it's more complete.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	don't try to do any external callbacks if there is np browser connected.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	return null is the call fails because the method doesn't exist.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	these methods have been moved to movie_root.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	delete the temporary pointer.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	ExternalInterface methods are static now.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	ExternalInterface methods are static now. Add a Quit message to the player when closing the pipe.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	ExternalInterface methods are static now.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	everything is static, so we don't need a constructor or destructor that did nothing anyway.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	add a Gnash specific Quit Invoke message so the browser can tell the player to die.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	make all methods static.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	process Invoke messages from the standalone player. GetURL and FSCommand now also use this format.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	add static methods for creating Invoke XML messages for the browser. Add methods for reading and writing the socket to the browser.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	implement having ExternalInterface::call() send Invoke messages to the browser.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	return a result from calling a JavaScript function.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	use standard Invoke for fsCommand instead of hacked INVOKE keyword.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	the beginnings of an NPAPI shell to load the plugin for testing.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	marshallExcemptions and XML message parsing moved to movie_root. 
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	process the invoke messages from the browser.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	use the stored file descriptors instead of passing them in all the time.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	move marshall Exemption from ExternalInterface to movie_root.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	make sure the value function pointers are set before trying to jump to them.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	don't quit if there is network data on the control FD
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	call test is bogus for now as it needs a browser. add comment to about this.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	set the Host FD too. add optional non-blocking support, disabled for now.
+
+2010-05-31  Rob Savoye  <rob@welcomehome.org>
+
+	store the hostfd too, so we can read data from the player without using the gio watch.
+
+2010-05-29  Rob Savoye  <rob@welcomehome.org>
+
+	externalInterface doesn't need an installable callback.
+
+2010-05-29  Rob Savoye  <rob@welcomehome.org>
+
+	add ExternalInterface files to build.
+
+2010-05-29  Rob Savoye  <rob@welcomehome.org>
+
+	simple getURL() test case.
+
+2010-05-29  Rob Savoye  <rob@welcomehome.org>
+
+	move static methods to libcore.
+
+2010-05-29  Rob Savoye  <rob@welcomehome.org>
+
+	move static methods for XML processing to here from the AS class definition.
+
+2010-05-28  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Silence sign-mixed comparison warning.
+
+2010-05-28  Rob Savoye  <rob@welcomehome.org>
+
+	build packages for each of the extensions.
+
+2010-05-28  Rob Savoye  <rob@welcomehome.org>
+
+	use HAVE_VAAPI instead of USE_VAAPI.
+
+2010-05-27  Rob Savoye  <rob@welcomehome.org>
+
+	Rename amf namespace to cygnal where used.
+
+2010-05-27  Rob Savoye  <rob@welcomehome.org>
+
+	only free the cookie if it's been set.
+
+2010-05-27  Rob Savoye  <rob@welcomehome.org>
+
+	fix mass breakage of cygnal due to a namespace conflict. Rename amf namespace to cygnal, change everywhere it was referenced.
+
+2010-05-27  Rob Savoye  <rob@welcomehome.org>
+
+	init() takes a 2nd argument now. Fixes python mod build.
+
+2010-05-27  Rob Savoye  <rob@welcomehome.org>
+
+	write the cookie file and use NPAPI to read the cookie if it's a recent enough version.
+
+2010-05-25  Rob Savoye  <rob@welcomehome.org>
+
+	write the cookies to a file so they can be used by Curl from Gnash.
+
+2010-05-25  Rob Savoye  <rob@welcomehome.org>
+
+	Add support for Cookie handling functions in NPAPI. Fix code style
+
+2010-05-25  Rob Savoye  <rob@welcomehome.org>
+
+	Add support for Cookie handling functions in NPAPI. Fix code style
+
+2010-05-25  Rob Savoye  <rob@welcomehome.org>
+
+	fix indenting
+
+2010-05-27  Markus Gothe  <markusg@milgram.sth.aptilo.com>
+
+	Change CFLAGS & LIBS so that we catch ffmpeg if installed
+
+2010-05-25  Rob Savoye  <rob@welcomehome.org>
+
+	Don't use ActiveRelay for ExternalInterface.
+	Implement the Argument to XML methods.
+	Correct test case to pass with Adobe player.
+	Don't send GetVariable($version) to Gnash, just have the plugin return the
+	expected value till ExternalInterface::update() actually does something. Otherwise
+	the browser hangs momentarily.
+
+2010-05-24  Rob Savoye  <rob@welcomehome.org>
+
+	add a handler to look for messages from the browser.
+
+2010-05-24  Rob Savoye  <rob@welcomehome.org>
+
+	add a handler to look for messages from the browser.
+
+2010-05-24  Rob Savoye  <rob@welcomehome.org>
+
+	fix some of the undocumented methods to match the pp.
+
+2010-05-24  Rob Savoye  <rob@welcomehome.org>
+
+	remove extra blank lines.
+
+2010-05-24  Rob Savoye  <rob@welcomehome.org>
+
+	fix _argumentsToXML test. 
+
+2010-05-24  Rob Savoye  <rob@welcomehome.org>
+
+	remove debug line
+
+2010-05-24  Rob Savoye  <rob@welcomehome.org>
+
+	tweak results to match pp.
+
+2010-05-24  Rob Savoye  <rob@welcomehome.org>
+
+	Don't use ActiveRelay. Cleanup up object construction.
+
+2010-05-23  Rob Savoye  <rob@welcomehome.org>
+
+	OpenEmbedded bbfile for the last official release.
+
+2010-05-21  Rob Savoye  <rob@welcomehome.org>
+
+	loadPolicyFile and allowInsecureDomain don't exist until swf v7.
+
+2010-05-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Undo most of the damage outside ExternalInterface. The testsuite now passes
+	again for the System class.
+	
+	Confine ugly hacks to the ExternalInterface code, instead of spreading
+	errors to the rest of Gnash.
+	
+	The testsuite failed before and still fails after this commit for various
+	ExternalInterface tests.
+
+2010-05-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make only base class non-copyable.
+
+2010-05-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix compile after changes.
+
+2010-05-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Replace one ugly hack with another to get ExternalInterface working. This
+	has the advantage of keeping the ugly hacks out of the rest of Gnash's
+	code.
+
+2010-05-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make Relays non-copyable to prevent errors like in the ExternalInterface
+	code.
+
+2010-05-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Revert changes to the coding style used everywhere in Gnash but for Rob's
+	code.
+
+2010-05-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused and incorrect allowDomain code. Drop test that didn't really
+	test anything.
+
+2010-05-20  Rob Savoye  <rob@welcomehome.org>
+
+	merge from branch. ExternalInterface is now mostly complete other than actually setting the variables and calling method.
+
+2010-05-20  rsavoye  <rob@welcomehome.org>
+
+	assume all numbers are doubles.
+
+2010-05-20  rsavoye  <rob@welcomehome.org>
+
+	Drop unused code. Use c_str() fpr data instead of data().
+
+2010-05-20  rsavoye  <rob@welcomehome.org>
+
+	make less verbose.
+
+2010-05-20  rsavoye  <rob@welcomehome.org>
+
+	add methods for parsing the XML Invoke messages.
+
+2010-05-20  rsavoye  <rob@welcomehome.org>
+
+	make less verbose.
+
+2010-05-20  rsavoye  <rob@welcomehome.org>
+
+	make less verbose.
+
+2010-05-20  rsavoye  <rob@welcomehome.org>
+
+	add bogus return vaue for _write() tp eliminate warning messages.
+
+2010-05-20  rsavoye  <rob@welcomehome.org>
+
+	remove debug messages.
+
+2010-05-18  rsavoye  <rob@welcomehome.org>
+
+	set the correct file descriptor for the control pipe.
+
+2010-05-08  Rob Savoye  <rob@welcomehome.org>
+
+	merge from trunk to get recent patches.
+
+2010-05-08  Rob Savoye  <rob@welcomehome.org>
+
+	start working on IO with the standalone player.
+
+2010-05-08  Rob Savoye  <rob@welcomehome.org>
+
+	fix callback tests.
+
+2010-05-08  Rob Savoye  <rob@welcomehome.org>
+
+	implement ::call(), marshallExceptions.
+
+2010-05-08  Rob Savoye  <rob@welcomehome.org>
+
+	fix indenting.
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	initialize the +controlfd.
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	make ExternalInterface_as a static class. Set up the advance callback.
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	don't try to use the owner if it isn't set.
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	movie_root::init now has an additional argument for the scriptable variables.
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	Move support for marshallExceptions to movie_root.
+	Cleanup object instantiation.
+	Handle objectID correctly, based on the name and/or id parameter.
+	Make ExternalInterface_as class an ActiveRelay.
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting.
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	add the scriptables to the variables list along with the flashVars. Move the marshallException flag from ExternalInterface to movie_root.
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	make indenting consistent.
+
+2010-04-25  Rob Savoye  <rob@welcomehome.org>
+
+	add support for storing all the -P params for use later by ExternalInterface. Currently all but flashVars are ignored.
+
+2010-04-22  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting
+
+2010-04-22  Rob Savoye  <rob@welcomehome.org>
+
+	move some methods from the header to the source file.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	delete duplicate lines.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Simplify tag execution.
+	
+	Make DoInitAction parsing compatible.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tests passing.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Update comments, don't parse DoInitAction tags unless the character ID is
+	already in the dictionary. This is tested to be the case.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanups.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Comments.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tabs to spaces.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanups and comments.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename export_resource to exportResource. Move export logic to
+	SWFMovieDefinition rather than tag_loaders and pass a character id instead
+	of the ExportedResource pointer. SWFMovieDefinition is in a better position
+	to look up exports.
+	
+	Remove ExportedResource.h include from tag_loaders.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Correct comment.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Declare function definition in header inline.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename virtual member functions to make their purpose clearer.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Simplify Action and State tag handing by using virtual dispatch only.
+	
+	Remove is_action_tag(); give ControlTags either an execute_state or an
+	execute function, but don't implement both.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Comments.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Check that InitActions in skipped frame are executed.
+
+2010-05-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup.
+
+2010-05-19  rsavoye  <rob@welcomehome.org>
+
+	add patches to vaapi support.
+
+2010-05-19  rsavoye  <rob@welcomehome.org>
+
+	Android doesn't support mbstowcs, so return the string size instead for that platform.
+
+2010-05-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Coding style.
+
+2010-05-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix testsuite.
+
+2010-05-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename some enums in accordance with coding guidelines.
+
+2010-05-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Indentation, remove semicolon from switch statement.
+
+2010-05-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused functions.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused accessors.
+
+2010-05-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Quiet debugging.
+
+2010-05-19  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence try debugging.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Testsuite fixes.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix misc-ming.all testsuite.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add init_action_testrunner back into scripts as it seems to have got
+	dropped somewhere.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Some fixes to LocalConnection and shared memory.
+	
+	Minor cleanups and renames for coding style.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Compile failure fixed.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove some mess.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused and unimplemented render_class_manager class.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix more compile.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix compile.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Namespaces should be in lowercase.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Do some error handling.
+
+2010-05-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add comments and handle potential overflow in LocalConnection.
+
+2010-05-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tests for InitAction execution.
+
+2010-05-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test exports and initactions.
+
+2010-05-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make proper test, start to work out what the requirements are.
+
+2010-05-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Comment.
+
+2010-05-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Swap two tests as the names referred to what the other one was testing.
+
+2010-05-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Base code for showing all sorts of bugs with Gnash.
+
+2010-05-07  Sandro Santilli  <strk@keybit.net>
+
+	Don't mix -r and -R
+
+2010-05-07  Rob Savoye  <rob@welcomehome.org>
+
+	Change all occurances of --with-renderer to --enable-renderer.
+	Drop extraneous \n in debug statement.
+	Fix getUrl().
+	Use socketpair instead of pipe.
+
+2010-05-07  Sandro Santilli  <strk@keybit.net>
+
+	Update information about renderers
+
+2010-05-07  Sandro Santilli  <strk@keybit.net>
+
+	Bring back renderer switch to be --enable-renderer (for consistency with --enable-gui and backward compatibility). Tweak help message for it.
+
+2010-05-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Some cleanups of action code.
+
+2010-05-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove ControlTag::execute_action(), do it locally.
+
+2010-05-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop default argument for one pushAction function as it's always specified,
+	and drop the level argument for the other as it's always DOACTION.
+
+2010-05-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove unused "enter frame" priority.
+
+2010-05-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused class.
+
+2010-05-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused pushAction overload.
+
+2010-05-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use size_t for unsigned values.
+
+2010-05-07  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename enum.
+
+2010-05-06  Sandro Santilli  <strk@keybit.net>
+
+	Ignores
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix and expand test.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix test so that it actually does reproduce the problem.
+	
+	Stage placement should probably be skipped for objects that are placed
+	then removed during gotoAndStop, even when the removal happens in the target
+	frame.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Style.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Formatting.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Do not use log_trace except for tracing player output, firstly because
+	it's not for any other purpose, and secondly because it breaks the
+	testsuite.
+	
+	The ExternalInterface tests are still broken.
+	
+	Add some code (not yet a testcase) reproducing bug #29771.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More bogus log_traces.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More bogus log_traces.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Another bogus log_trace.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Coding style.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't use log_trace except for tracing, as it breaks the testsuite.
+
+2010-05-06  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add code (not yet a test) reproducing the register class problem.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	fix crash when auto-detecting the driver, and minor reformatting changes from branch.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	gcc 4.4.3 complains about the string.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	enable vaapi support only if ffmpeg is recent enough.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	add Android to the long list of ifdefs around some headers.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	use log_trace() instead of log_debug() for GNASH_REPORT_FUNCTION.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	fix indendting, tabs to spaces too.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	minor style cleanup and reformatting.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	fix autodetection of the graphics driver.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	Cross compiling needs libintl too.
+
+2010-05-04  Rob Savoye  <rob@welcomehome.org>
+
+	use stringstream instead of shifting which gcc 4.5.0 doesn't like.
+
+2010-05-02  Rob Savoye  <rob@welcomehome.org>
+
+	add support for Android when determining which headers to include.
+
+2010-05-01  Sandro Santilli  <strk@keybit.net>
+
+	Fix building script for singular renderers (sounds like a dejavu)
+
+2010-04-22  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove extra writePlayer overloads.
+
+2010-04-22  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	A first attempt at an ownership model for NPVariants. Also simplify APIs,
+	fix quite a few bugs and introduce a small measure of const-correctness.
+
+2010-04-22  Markus Gothe  <markusg@milgram.sth.aptilo.com>
+
+	_scriptObject must be declared as long as its used in the initializer-vector...
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	merge from branch. Make ExternalInterface::available based on if AllowScriptAccess was passed in the parameters.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	we don't need a private dats for available, we get it from the movie_root now.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	make ExternalInterface::available be based on the movie root setting, for sameDomain, actually compare the domains.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	add support to process AllowScriptAccess when set from the browser.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	Yes, I do read your emails, and often agree.
+	Merge from branch.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	_objectToAS is incomplete, so is expected to fail.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	make most methods static.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	make formatting consistent.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	put the 2 deleted tests back in
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	use PropFlags to set the supported versions.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	adjust namespaces.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	rearrange namespaces.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	put everything in the gnash namespace.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	merge from trunk.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	add test for ObjectToAS().
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	Start adding support for parsing properties in XML.
+	Minor reformatting.
+	Add map to store methods for the callbacks.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting.
+
+2010-04-21  Rob Savoye  <rob@welcomehome.org>
+
+	add a controlfd to go with the hostfd.
+
+2010-04-21  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove unnecessary reinterpret_casts.
+
+2010-04-21  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Adjust swapBytes' signature to match the way it's used.
+
+2010-04-21  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Cleanup pass. Make sure attempts at copying an NPVariant also copy the
+	contained "value".
+	
+	This code still lacks an ownership model, which will lead to nasty bugs.
+
+2010-04-21  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unnecessary includes.
+
+2010-04-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop more unneeded headers.
+
+2010-04-14  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop some unused headers.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	implemented most of the methods used by the ExternalInterface AS class.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	set the controlfd in the root movie.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	get ther controlfd from the p[layer.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	minor reindenting to 4 spaces
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	add support and tests for encoding XML to an as_value.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	fix handling og null or undefined objects when converting to XML
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	implement the argument handling functions, add more tests.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	implement some of the XML encoding functionality, and add tests for each one.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	get escapeXML and unescapeXML woring using XMLDOcument functions for this internally.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	make unescapeXML public like escapeXML already is.
+
+2010-04-20  Rob Savoye  <rob@welcomehome.org>
+
+	start modifying the existing non-implementation to actually start working.
+
+2010-04-19  Rob Savoye  <rob@welcomehome.org>
+
+	partial scriptable support. fixes Go Upgrade YouTube problem.
+
+2010-04-19  Rob Savoye  <rob@welcomehome.org>
+
+	use URL.encode() rather than esacaping piles of stuff ourselves.
+
+2010-04-19  Rob Savoye  <rob@welcomehome.org>
+
+	look for the trailing > instead of a space to end the tag.
+
+2010-04-19  Rob Savoye  <rob@welcomehome.org>
+
+	use GLib's IO API instead of handling it ourselves.
+
+2010-04-19  Rob Savoye  <rob@welcomehome.org>
+
+	use a socketpair instead of two sets of pipes. The -F option now holds both file descriptors. 
+
+2010-04-19  Rob Savoye  <rob@welcomehome.org>
+
+	Use GnashPluginScriptObject instead of NPObject for _scriptObject.
+
+2010-04-19  Rob Savoye  <rob@welcomehome.org>
+
+	Process the -F message, which is now host:control instead of using -G for the other file descriptor.
+
+2010-04-19  Rob Savoye  <rob@welcomehome.org>
+
+	improvements to test page by olleolleolle.
+
+2010-04-17  Rob Savoye  <rob@welcomehome.org>
+
+	use a socketpair instead of named pipe. Use GIOChannels too for I/O.
+
+2010-04-17  Rob Savoye  <rob@welcomehome.org>
+
+	add a log_trace
+
+2010-04-17  Rob Savoye  <rob@welcomehome.org>
+
+	parse an XML invoke message.
+
+2010-04-17  Rob Savoye  <rob@welcomehome.org>
+
+	add a default for the existing socket connection.
+
+2010-04-17  Rob Savoye  <rob@welcomehome.org>
+
+	add a default for the existing socket connection.
+
+2010-04-16  Rob Savoye  <rob@welcomehome.org>
+
+	add a named pipe between the plugin and the standalone player.
+
+2010-04-16  Rob Savoye  <rob@welcomehome.org>
+
+	add comments
+
+2010-04-16  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting
+
+2010-04-16  Rob Savoye  <rob@welcomehome.org>
+
+	enable scriptable support by default.
+
+2010-04-16  Rob Savoye  <rob@welcomehome.org>
+
+	merge from trunk
+
+2010-04-19  Rob Savoye  <rob@welcomehome.org>
+
+	Also look in /usr/lib/kde4/devel for kde4 files so this works on fedora 13.
+
+2010-04-16  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting.
+
+2010-04-16  Rob Savoye  <rob@welcomehome.org>
+
+	all minor reformatting.
+
+2010-04-15  Rob Savoye  <rob@welcomehome.org>
+
+	more invoke methods tests and support
+
+2010-04-15  Rob Savoye  <rob@welcomehome.org>
+
+	documentation moved to the header files in doxygen format.
+
+2010-04-15  Rob Savoye  <rob@welcomehome.org>
+
+	add support for parsing the arguments for an Invoke call, plus a test case for it.
+
+2010-04-14  Rob Savoye  <rob@welcomehome.org>
+
+	parse properties of array and object, building a vector of NPVariant pointers.
+
+2010-04-14  Rob Savoye  <rob@welcomehome.org>
+
+	add XML to NPVariant parsing tests.
+
+2010-04-14  Rob Savoye  <rob@welcomehome.org>
+
+	build and run the test at check time.
+
+2010-04-14  Rob Savoye  <rob@welcomehome.org>
+
+	add support for Arrays and Objects.
+
+2010-04-14  Rob Savoye  <rob@welcomehome.org>
+
+	new files for handing the XML protocol for ExternalInterface.
+
+2010-04-14  Rob Savoye  <rob@welcomehome.org>
+
+	add test for the ExternalInterface XML based protocol.
+
+2010-04-14  Rob Savoye  <rob@welcomehome.org>
+
+	move the callbacks to a separate file.
+
+2010-04-14  Rob Savoye  <rob@welcomehome.org>
+
+	Port a trimmed down version of the log_error() and log_debug() functions
+	to the plugin so we don't have to link in libbase to use the same functions.
+	Cleanup logging, which was a mix of iostreams, GnashLog* and printf().
+	Move GNASH_PLUGIN_DEBUG to plugin.h so logging can be used in more than
+	one file conditionally.
+
+2010-04-13  Rob Savoye  <rob@welcomehome.org>
+
+	fix handling of returning doubles and strings.
+
+2010-04-13  Rob Savoye  <rob@welcomehome.org>
+
+	Use NPPAI functions for memory allocation and destruction.
+	Hack PercentLoaded() to return something ofor now.
+	Always return a value NPVariant, and don't forget to delete the temporary ones.
+	Be less verbose.
+
+2010-04-12  Rob Savoye  <rob@welcomehome.org>
+
+	always return an allocated object frpom SetVariable so firefox doesn't segfault. Don't try to write to an unopened control fd.
+
+2010-04-10  Rob Savoye  <rob@welcomehome.org>
+
+	make scriptable disabled by default till it gets more testing.
+
+2010-04-10  Rob Savoye  <rob@welcomehome.org>
+
+	make sure it stills builds with scriptable disabled.
+
+2010-04-10  Rob Savoye  <rob@welcomehome.org>
+
+	Implement the client side of a network interface to Gnash for Scriptable support.
+
+2010-04-10  Rob Savoye  <rob@welcomehome.org>
+
+	implement the other methods.
+
+2010-04-10  Rob Savoye  <rob@welcomehome.org>
+
+	add more comments for the methods and how the interface works.
+
+2010-04-10  Rob Savoye  <rob@welcomehome.org>
+
+	add a network interface for testing. Add support for the GetVariable and SetVariable methods.
+
+2010-04-10  Rob Savoye  <rob@welcomehome.org>
+
+	expand the test case to support all required methods for scriptable plugins.
+
+2010-04-10  Rob Savoye  <rob@welcomehome.org>
+
+	add response packets.
+
+2010-04-10  Rob Savoye  <rob@welcomehome.org>
+
+	add some documentation on the protocol used for Scriptable Support.
+
+2010-04-09  Rob Savoye  <rob@welcomehome.org>
+
+	add crude support for JavaScript/Flash Variables. This is a work in progress...
+
+2010-04-09  Rob Savoye  <rob@welcomehome.org>
+
+	add stubs for Enumerate and COnstruct. Add minimal implementation of Variables, which currently are stored locally instead of talking to the player. Add the default methods from the Adobe spec.
+
+2010-04-09  Rob Savoye  <rob@welcomehome.org>
+
+	add simple test for Variables.
+
+2010-04-09  Rob Savoye  <rob@welcomehome.org>
+
+	only try to close _controlfd if it'
+
+2010-04-08  Rob Savoye  <rob@welcomehome.org>
+
+	merge from trunk
+
+2010-04-08  Rob Savoye  <rob@welcomehome.org>
+
+	add a greatly enhanced version of patch #6821, for scriptable support in the plugin.
+
+2010-04-08  Rob Savoye  <rob@welcomehome.org>
+
+	add default list of proporties possible expected to be fouind by the other player.
+
+2010-04-08  Rob Savoye  <rob@welcomehome.org>
+
+	methods can now be added dynamically and invoked.
+
+2010-04-08  Rob Savoye  <rob@welcomehome.org>
+
+	major refactoring, Properties now fully work within the scriptable instance.
+
+2010-04-08  Rob Savoye  <rob@welcomehome.org>
+
+	add a method test too.
+
+2010-04-07  Rob Savoye  <rob@welcomehome.org>
+
+	minimal test case for scriptable support.
+
+2010-04-07  Rob Savoye  <rob@welcomehome.org>
+
+	clean up verbosity
+
+2010-04-07  Rob Savoye  <rob@welcomehome.org>
+
+	add minimal scriptable plugin support
+
+2010-04-07  Rob Savoye  <rob@welcomehome.org>
+
+	conditionally compile the scriptable plugin files.
+
+2010-04-07  Rob Savoye  <rob@welcomehome.org>
+
+	add option for scriptable plugin support
+
+2010-04-07  Rob Savoye  <rob@welcomehome.org>
+
+	scriptable plugin support files
+
+2010-04-08  Rob Savoye  <rob@welcomehome.org>
+
+	edit the new distro field to match the host system
+
+2010-04-08  Rob Savoye  <rob@welcomehome.org>
+
+	use a distro field we can edit later.
+
+2010-04-05  Rob Savoye  <rob@welcomehome.org>
+
+	Don't print an error if using gst but libva exists, just ignore libva
+
+2010-04-05  Rob Savoye  <rob@welcomehome.org>
+
+	Make libva support optional if it doesn't exist when using ffmpeg.
+
+2010-04-04  Rob Savoye  <rob@welcomehome.org>
+
+	Use HAVE_* constant instead of USE_*, so VAAPI is disabled if libva isn't installed.
+
+2010-04-04  Rob Savoye  <rob@welcomehome.org>
+
+	uninstall the manpage too.
+
+2010-04-04  Rob Savoye  <rob@welcomehome.org>
+
+	cleanup the configuration info printed by --version.
+
+2010-04-04  Rob Savoye  <rob@welcomehome.org>
+
+	Move settings to the end of the debug section, after all the flags.
+	Enable vaapi if it exists and ffmpeg is new enough to support it.
+
+2010-04-04  Rob Savoye  <rob@welcomehome.org>
+
+	enable a flag is the ffmpeg version is new enough to support vaapi.
+
+2010-04-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop signal handler and flag.
+
+2010-04-05  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop signal handler now there is a proper way to exit cleanly.
+
+2010-04-04  Rob Savoye  <rob@welcomehome.org>
+
+	add qt OpenGL dependencies
+
+2010-04-04  Rob Savoye  <rob@welcomehome.org>
+
+	it's now --with-renderer instead of --enable-renderer.
+
+2010-04-04  Rob Savoye  <rob@welcomehome.org>
+
+	add braces for if () {}.
+
+2010-04-04  Sandro Santilli  <strk@keybit.net>
+
+	Fix build of python module
+
+2010-04-04  Sandro Santilli  <strk@keybit.net>
+
+	Hack to fix the swfdec testcase
+
+2010-04-04  Sandro Santilli  <strk@keybit.net>
+
+	Build quitely by default if supported by automake
+
+2010-04-03  Sandro Santilli  <strk@keybit.net>
+
+	Fix regression playing simpleguess.swf (strk.keybit.net/tmp/simpleguess.swf).
+	This breaks a couple of testcases in swfdec testsuite.
+
+2010-04-03  Sandro Santilli  <strk@keybit.net>
+
+	Handle cleanup of gnash w/out registering a timer. Fixes firefox crashes here.
+
+2010-04-02  Sandro Santilli  <strk@keybit.net>
+
+	Revert the plugin advertised version increment. Looks like this would break webbls and isn't really giving much help to others. 
+
+2010-03-31  Sandro Santilli  <strk@keybit.net>
+
+	Advertise 8.0.0 version by default. This should be the safest bet for avoiding AVM2 (youtube works fine with this)
+
+2010-03-31  Rob Savoye  <rob@welcomehome.org>
+
+	need to include gnashconfig.h if including a configure tested header file.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Move forward declaration to the correct namespace.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix compiler warnings. Try to make new code adhere to guidelines.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence warning.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix cairo warnings.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence warning.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence compiler warning; use log_error, not std::cout.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Forward declare vaapi functions and move the definitions to the end of the
+	file to make it less messy.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use an anonymous namespace, not static.
+	
+	Make some attempt to use existing coding style in the new code.
+	
+	Don't check for null pointer before deleting.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Coding style. Use 0 not NULL. Fix warnings for non-vaapi build.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix careless spacing.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up, const correct, and log to silence warnings (also to check if
+	the parsing is correct; I have no idea).
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Coding style cleanups, fix compiler warnings.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Coding style.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Get rid of silly and useless comment.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Coding style, typo.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make as_object::_vm private again; it shouldn't be exposed directly because
+	its future status as a member isn't clear. This also fixes the compiler
+	warnings about initialization order.
+
+2010-03-31  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Coding style.
+
+2010-03-30  Rob Savoye  <rob@welcomehome.org>
+
+	remove extra \
+
+2010-03-30  Rob Savoye  <rob@welcomehome.org>
+
+	make functions inline to avoid link errors.
+
+2010-03-28  Rob Savoye  <rob@welcomehome.org>
+
+	adjust the Requires so loading the plugin pulls in the other Gnash packages with no conflicts.
+
+2010-03-27  Rob Savoye  <rob@welcomehome.org>
+
+	build gnash-commong package to seperate gtk and kde dependencies
+
+2010-03-27  Rob Savoye  <rob@welcomehome.org>
+
+	edit the Distribution field in the spec file too.
+
+2010-03-26  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Give the child process one second to go away by itself, without
+	blocking the main thread. Apparently DestroyStream is not guaranteed
+	to be called before the plugin instance is closed, so force the file
+	descriptor closed when that happens.
+
+2010-03-26  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Forcibly kill the child process if all else fails. Fix another std::string bug.
+
+2010-03-26  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Don't pass zero to std::string().
+
+2010-03-24  Rob Savoye  <rob@welcomehome.org>
+
+	use EXTRA_DIST instead of DIST_SUBDIRS, so it stops trying to execute a Makefile in a directory with none.
+
+2010-03-24  Rob Savoye  <rob@welcomehome.org>
+
+	regenerate the all-includes.h.gch file if one of the specified headers changes.
+
+2010-03-24  Rob Savoye  <rob@welcomehome.org>
+
+	uninstall the manpages.
+
+2010-03-25  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Upgrade NPAPI/Mozilla SDK to Mozilla trunk. Update our plugin code to
+	match.
+
+2010-03-24  Rob Savoye  <rob@welcomehome.org>
+
+	don't try to add the nonexistance pch directory to SUBDIRS.
+
+2010-03-24  Rob Savoye  <rob@welcomehome.org>
+
+	Rename pch/Makefile.am to pch.am in the top level, and remove the directory.
+	Built the all-includes files in the top level.
+	Don't build the all-includes files if it's not enabled.
+	Don't try to configure pch/Makefile.am.
+
+2010-03-24  John Wimer  <john@god.vtic.net>
+
+	Add fd to mainloop to allow shutdown in Kde4 gui.
+	Some whitespace cleanup as well.
+
+2010-03-24  Rob Savoye  <rob@welcomehome.org>
+
+	add bzrversion.h as a dependency of deb, so it always gets updated if need be.
+
+2010-03-24  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove a bunch of DSOEXPORTs, which do not seem to contribute to anything
+	except the risk of symbol collision.
+	npp_gate.cpp: Attempt to slightly increase robustness.
+
+2010-03-24  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Removing mozilla-sdk's Makefile.am, because no targets depend on it or
+	libmozsdk. The SDK only contains header files which are directly included
+	in the plugin code.
+
+2010-03-24  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	The NPAPI file move resulted in the loss of file history in mozilla-sdk/.
+	This should redo the move, but leave the history intact. There should be
+	no code changes.
+
+2010-03-24  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Restore mozilla-sdk Makefile.am.
+
+2010-03-24  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove defunct Makefile location.
+
+2010-03-24  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Build system part of NPAPI move.
+
+2010-03-24  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Move the plugin files to npapi.
+
+2010-03-24  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Move the mozilla SDK to a director in npapi.
+
+2010-03-24  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Attempt to undo npapi move.
+
+2010-03-23  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Reduce usage of VM::get(), in particular:
+	
+	as_object.{h,cpp}: Remove the default constructor and add a protected one
+	for subclasses.
+	Globals.{h,cpp}: Remove _vm, as one is inherited from as_object.
+
+2010-03-22  John Wimer  <john@god.vtic.net>
+
+	Add support for switchable renderers in the Kde4 gui.
+
+2010-03-22  John Wimer  <john@god.vtic.net>
+
+	Suppress compiler warning and whitespace cleanup
+
+2010-03-22  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Use registerBuiltinClass rather than relying on statics.
+
+2010-03-22  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Inherit from Relay instead of as_object.
+
+2010-03-22  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Fix compilation.
+
+2010-03-22  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Inherit Camera_as from Relay instead of as_object.
+
+2010-03-21  Sandro Santilli  <strk@keybit.net>
+
+	Add tip about using GNASH_PLUGIN_DESCRIPTION env variable
+
+2010-03-21  Sandro Santilli  <strk@keybit.net>
+
+	Some line breaks in default plugin description
+
+2010-03-21  Sandro Santilli  <strk@keybit.net>
+
+	drop. dont' comment out
+
+2010-03-21  Sandro Santilli  <strk@keybit.net>
+
+	Drop unused header
+
+2010-03-21  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	plugin.cpp: Print a warning when the plugin is attempted to be used with
+	a non-GTK browser.
+	Moveclip.cpp, LoadableObject.cpp: Add missing includes.
+
+2010-03-21  Sandro Santilli  <strk@keybit.net>
+
+	Drop more XPCOM (and NSPR)
+
+2010-03-20  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Make sure the GIOChannel isn't destroyed twice (replace a hack to that
+	effect). Whitespace fixes.
+
+2010-03-20  Sandro Santilli  <strk@keybit.net>
+
+	Not sure what this commit will do, I'm basically fighting with bazaar.
+
+2010-03-20  Sandro Santilli  <strk@keybit.net>
+
+	Don't give up references too early. Fixes plugin/firefox crashes (double destruction)
+
+2010-03-20  Sandro Santilli  <strk@keybit.net>
+
+	Merge from trunk
+
+2010-03-19  Sandro Santilli  <strk@keybit.net>
+
+	Restore adding params to launcher
+
+2010-03-19  Sandro Santilli  <strk@keybit.net>
+
+	Drop extraneous include dirs
+
+2010-03-20  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Fix bustage, and the warning it was intended to fix.
+
+2010-03-20  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Fixed comparsion between signed and unsigned integers
+
+2010-03-20  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Added Leopard includes for X11
+
+2010-03-19  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Fix compilation without VAAPI
+
+2010-03-19  Sandro Santilli  <strk@keybit.net>
+
+	Move NPAPI plugin under its own directory
+
+2010-03-19  Sandro Santilli  <strk@keybit.net>
+
+	Add --flash-version switch to gnash standalone
+
+2010-03-19  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	The plugin should be built with -fvisibility=hidden, if possible. As the
+	plugin is loaded into the browser's namespace on equal footing with other
+	plugins, there is no guarantee that when our plugin calls an internal
+	function that is exported, the browser namespace won't override it.
+
+2010-03-19  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove 'using namespace std' from the global namespace.
+
+2010-03-19  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove unused functions and minor cleanup.
+
+2010-03-19  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Further cleanup. Don't bother closing file descriptors in the child process that will be closed automatically anyway.
+
+2010-03-19  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	plugin.cpp: Restore debugging level.
+	gui/gui.cpp: Don't convert range from int to float.
+	gui/gui.h: Add some documentation for FD watching API.
+	gui/gtksup.h: Remove defunct documentation.
+
+2010-03-19  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Cleanup pass. Make sure that both NewStream and SetWindow have been called prior to creating the new process.
+
+2010-03-17  Sandro Santilli  <strk@keybit.net>
+
+	Don't miss a return. The watchFD function should really be documented !!!
+
+2010-03-17  Sandro Santilli  <strk@keybit.net>
+
+	Return string references as const
+
+2010-03-17  Sandro Santilli  <strk@keybit.net>
+
+	Drop obsoleted script
+
+2010-03-17  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Clean up the plugin code somewhat. Remove the XPCOM/XPI code since it's
+	being deprecated.
+
+2010-03-17  Sandro Santilli  <strk@keybit.net>
+
+	Add libltdlc.la to libbase.la LDADD. Fixes bug #29237
+
+2010-03-16  John Wimer  <john@god.vtic.net>
+
+	Include only glib for the plugin as gtk isn't needed
+
+2010-03-16  Sandro Santilli  <strk@keybit.net>
+
+	Throw an exception rather than aborting on invalid url
+
+2010-03-16  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Stop relying on signals to kill gnash when launched from the plugin. 
+	Instead, add another file descriptor (pipe) argument to gnash, which the 
+	(plugin-compatible) GUI monitors for SIGHUP. Additionally:
+	
+	plugin/plugin.cpp: Don't leak the GIOChannel.
+	gui/gtk.cpp: Remove LIRC callback that does nothing.
+
+2010-03-16  Rob Savoye  <rob@welcomehome.org>
+
+	don't try to build Xv support if it's not supported.
+
+2010-03-15  Rob Savoye  <rob@welcomehome.org>
+
+	use the Haiku stubs for the shm* and sem* functions.
+
+2010-03-15  Rob Savoye  <rob@welcomehome.org>
+
+	add gtkglext as a dependency, as we now build all renderers.
+
+2010-03-15  Rob Savoye  <rob@welcomehome.org>
+
+	add -fexception and a constant for Android builds.
+
+2010-03-15  Sandro Santilli  <strk@keybit.net>
+
+	Fix build of dump and fb guis
+
+2010-03-15  Rob Savoye  <rob@welcomehome.org>
+
+	install librender so it can be found at runtime.
+
+2010-03-15  Sandro Santilli  <strk@keybit.net>
+
+	Missing libgnashrender.la link
+
+2010-03-15  Rob Savoye  <rob@welcomehome.org>
+
+	add patch #6863
+
+2010-03-15  Rob Savoye  <rob@welcomehome.org>
+
+	missed renaming backend to librender.
+
+2010-03-15  Rob Savoye  <rob@welcomehome.org>
+
+	add Xv dependencies, change backlend to librender.
+
+2010-03-15  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove the alpha GnashImage type, which apparently goes unused.
+
+2010-03-14  Rob Savoye  <rob@welcomehome.org>
+
+	use either libltdl3-dev or libltdl7-dev. Add x11proto-video-dev for Xvideo extension.
+
+2010-03-14  Rob Savoye  <rob@welcomehome.org>
+
+	add a deb-build-clean option to help maintainers deal with restarting partial builds.
+
+2010-03-14  Rob Savoye  <rob@welcomehome.org>
+
+	add libgnashrender.la and libltdl where needed. Add more missing headers.
+
+2010-03-14  Sandro Santilli  <strk@keybit.net>
+
+	Add missing include
+
+2010-03-14  Sandro Santilli  <strk@keybit.net>
+
+	Drop references to unexisting libgnashcairo and libgnashogl libs
+
+2010-03-14  Rob Savoye  <rob@welcomehome.org>
+
+	add libgnashrender.la where needed.
+
+2010-03-14  Sandro Santilli  <strk@keybit.net>
+
+	Add missing headers
+
+2010-03-14  Rob Savoye  <rob@welcomehome.org>
+
+	fix Android conditional for the NDK
+
+2010-03-14  Sandro Santilli  <strk@keybit.net>
+
+	Missing header...
+
+2010-03-14  Sandro Santilli  <strk@keybit.net>
+
+	Do not check gui-renderer compatibility, should be handled at runtime. Do check for Cairo libs when cairo build is requested.
+
+2010-03-14  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Add a URL that triggers an assertion.
+
+2010-03-14  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Fix compilation.
+
+2010-03-14  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	More forward declares and assorted header shuffling.
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	big merge from hwaccel branch
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	big merge from trunk to get ready to merge this branch back to trunk.
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	make it possible to build a subset of all possible renderers, including only one, which mimics the old behaviour.
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	adjust hwaccel test
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	Still build if vaapi isn't enabled
+
+2010-03-13  Sandro Santilli  <strk@keybit.net>
+
+	Don't complain for usupported gui/renderer combinations. We want this handled at runtime.
+
+2010-03-13  Sandro Santilli  <strk@keybit.net>
+
+	Do not build same sources multiple times
+
+2010-03-12  Rob Savoye  <rob@welcomehome.org>
+
+	don't build the kde4 files multiple times.
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	we need ffmeg libs if built with vaapi support.
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	reformatting changes only, get the indents right...
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	use --libs instead of --libs-only-l.
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	don't build Kde file multiple times.
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	add libva libraries to the link
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	rename backend to librender everywhere.
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	improve error message for -R
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	fix typo
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	change from using -r to -R (--Renderer) to specific the renderer backend to use.
+
+2010-03-09  Rob Savoye  <rob@welcomehome.org>
+
+	renanme backend to librender
+
+2010-03-02  Rob Savoye  <rob@welcomehome.org>
+
+	use next_hwaccel for the state change.
+
+2010-03-02  Rob Savoye  <rob@welcomehome.org>
+
+	remove tabs, work without vaapi.
+
+2010-03-02  Rob Savoye  <rob@welcomehome.org>
+
+	minor patch for warnings
+
+2010-03-02  Rob Savoye  <rob@welcomehome.org>
+
+	Fixed emacs indent for tabs to nil. - rob
+	Author: Gwenole Beauchesne <gbeauchesne@splitted-desktop.com>
+	Date:   Tue Mar 2 12:30:03 2010 +0000
+	Drop libvaapi/vaapi.{cpp,h}.
+	Date:   Tue Mar 2 12:22:14 2010 +0000
+	Fix SW fallback if VA-API is built-in.
+	Date:   Tue Mar 2 11:07:46 2010 +0000
+	Fix VA-API configure summary.
+
+2010-03-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Tabs to spaces.
+
+2010-03-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Indentation.
+
+2010-03-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Indentation, fix return bug.
+
+2010-03-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix indentation, tabs to spaces.
+
+2010-03-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Indentation and tabs to spaces.
+
+2010-03-02  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix indentation.
+
+2010-03-01  Rob Savoye  <rob@welcomehome.org>
+
+	before using OpenGL or XVideo, make sure our X server supports those extensions.
+
+2010-03-01  Rob Savoye  <rob@welcomehome.org>
+
+	Initial shot at making renderers load at runtime.
+	--remote-mode option enhanced to also take none, agg, opengl, or cairo.
+	--hwaccell options added to set the hardware video decoding support, handles
+	none, vaapi, and XV for now.
+	Build all the backends in one pass at the same time into one big library.
+
+2010-03-01  Rob Savoye  <rob@welcomehome.org>
+
+	initial shot a configurable at runtie ability to switch between no hw acceleration, vaapi, or xv using gnashrc options or command line options.
+
+2010-03-01  Rob Savoye  <rob@welcomehome.org>
+
+	update new xv setting for HWAccell, and add new Renderer option.
+
+2010-03-01  Rob Savoye  <rob@welcomehome.org>
+
+	use the gnash config file setting for which style of hardware acceleration to use.
+
+2010-02-28  Rob Savoye  <rob@welcomehome.org>
+
+	change --enable-vaapi tp --with-hwaccel=vaapi
+
+2010-02-28  Rob Savoye  <rob@welcomehome.org>
+
+	bring up to coding style guidelines.
+
+2010-02-28  Rob Savoye  <rob@welcomehome.org>
+
+	use log_debug instead od d(bug()) macro.
+
+2010-02-28  Rob Savoye  <rob@welcomehome.org>
+
+	add HWAccel documentation
+
+2010-02-28  Rob Savoye  <rob@welcomehome.org>
+
+	add an option for specifying the type (if enabled) of Hardware accelerated video decoding.
+
+2010-02-28  Rob Savoye  <rob@welcomehome.org>
+
+	merge
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	include va_x11 too.
+
+2010-02-28  Rob Savoye  <rob@welcomehome.org>
+
+	use Gnash log_debug instead of homegrown D(bug()) macro.
+
+2010-02-28  Rob Savoye  <rob@welcomehome.org>
+
+	link in libVA libs.
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	big merge from trunk after the 0.8.7 release.
+
+2010-02-05  Rob Savoye  <rob@welcomehome.org>
+
+	big merge from trunk.
+
+2010-01-27  Rob Savoye  <rob@welcomehome.org>
+
+	don't link in libvaavpi unless it's enabled.
+
+2010-01-27  Rob Savoye  <rob@welcomehome.org>
+
+	fix for one file with bad patch.
+
+2010-01-27  Rob Savoye  <rob@welcomehome.org>
+
+	checkin latest patch.
+
+2010-01-24  Rob Savoye  <rob@welcomehome.org>
+
+	applied newer version of patch, now has AGG support.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	use the new names for all the vaapi,h headers so we get the right ones at the right time.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	rename to avoid conflicts. These names could be improved further.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	must be a bad patch, it's SWFRect, not rect as a data type.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	remove old junk from installable libltdl.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	applied the rest of the patch as it was, plus a few tweaks so it builds more Gnash style.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	add libva interface library 
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	add the new files from the patch.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	don't reset CPPFLAGS and LDFLAGS.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	add support for the vendor specific vdpau and xvba libraries.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	cleanup libva tests.
+
+2010-01-21  Rob Savoye  <rob@welcomehome.org>
+
+	add support for finding all the libVA libraries.
+
+2010-03-14  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Renderer.h: Improve comment for set_translation().
+	SWF.h: Twiddle header.
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	openbsd uses libpng instead of png.
+
+2010-03-13  Rob Savoye  <rob@welcomehome.org>
+
+	pass the rtmp handle to the handler
+
+2010-03-14  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	More header shuffling.
+
+2010-03-13  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove unused includes, add forward declarations.
+
+2010-03-13  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	A bit more header shuffling, and add more forward declarations.
+
+2010-03-13  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Fix for ambigousity on AMF
+
+2010-03-13  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Move Matrix::transform(point) back into the source file.
+
+2010-03-13  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Repeat the conditions for header inclusion.
+
+2010-03-12  Rob Savoye  <rob@welcomehome.org>
+
+	fix typo on cross compile for android test
+
+2010-03-12  Rob Savoye  <rob@welcomehome.org>
+
+	add support for building for Android.
+
+2010-03-12  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Fix compilation.
+
+2010-03-12  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	A few more forward declarations. Remove included smart_ptr.h where it is not being used.
+
+2010-03-12  Markus Gothe  <markusg@milgram.sth.aptilo.com>
+
+	Include gnash.h since we implement those functions here
+
+2010-03-12  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Add another forward declaration.
+
+2010-03-11  Rob Savoye  <rob@welcomehome.org>
+
+	force GPG signing of all rpm packages.
+
+2010-03-11  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Fix error: ?_? was not declared in this scope
+
+2010-03-11  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	More forward declarations.
+
+2010-03-11  Rob Savoye  <rob@welcomehome.org>
+
+	include map and RunResources
+
+2010-03-11  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Header shuffling and correcting.
+
+2010-03-11  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Don't ignore --with-glib-incl.
+
+2010-03-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fixes and documentation for XMLSocket and Socket.
+
+2010-03-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Log port error.
+
+2010-03-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence debugging.
+
+2010-03-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use _socket, not connected() to check whether a connection is underway. 
+
+2010-03-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix bugs preventing Sockets from reconnecting.
+
+2010-03-11  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Always use ready() internally. Call close when the server closes the
+	connection to ensure our socket is in a state to be reopened.
+
+2010-03-11  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove some includes, and forward-declare one. Put TagLoadersTable in the correct namespace.
+
+2010-03-11  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Fix compilation.
+
+2010-03-11  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Another header shuffle:
+	- Add includes for libstdc++ types in files where they are actually used.
+	- Remove unused includes; move them to .cpp files where appropriate.
+	- Forward-declare some classes instead of including their headers. Add 
+	these include directives to .cpp files as needed.
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	update to match trunk. libamf has moved, rtmpget came back to life.
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	add rtmpget back in
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	add vector header back in.
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	add more missing header files back in.
+
+2010-03-10  Rob Savoye  <rob@welcomehome.org>
+
+	still needs std::vector
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix XMLSocket mess up.
+	
+	Use non-blocking sockets for improved compatibility. Also fixes bug #28638 now
+	networking is done properly.
+	
+	Implement XMLSocket.onClose.
+	
+	Make the XMLSocket test automatic so no one else can break it.
+	
+	Adapt RTMP to use the non-blocking interface. There are minor but
+	important changes to the way the RTMP class behaves. These are reflected
+	in utilities/rtmpget.cpp.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add Socket tester script.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop failing test for now (it's not stable in either pp or Gnash).
+	
+	Fix end (don't make grep wait for ever) and add consistency.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix bugs in XMLSocket.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make tests more stable.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Allow reading buffered data even if the Socket has an error.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rewrite XMLSocketTest and so that it works.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Implement onClose.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up and silence debugging.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	RTMP appears to be working with the non-blocking socket.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Half-way to adapting RTMP implementation to non-blocking socket.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make Socket non-blocking. misc-ming.all/XMLSocketTest now passes, should fix
+	the swfdec crashes.
+	
+	Document Socket interface to reflect new behaviour (the interface itself is
+	hardly changed).
+	
+	Pass hostname and port to connect().
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Put a load of headers back in so Gnash builds.
+
+2010-03-10  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove unused libstdc++ include directives.
+
+2010-03-10  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove unused include directives.
+
+2010-03-10  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Fix leak by giving NetStats a virtual dtor.
+
+2010-03-10  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix build.
+
+2010-03-09  Rob Savoye  <rob@welcomehome.org>
+
+	add libamf and libnet to DIST_SUBDIRS
+
+2010-03-09  Rob Savoye  <rob@welcomehome.org>
+
+	don't use libnet anywhere.
+
+2010-03-09  Rob Savoye  <rob@welcomehome.org>
+
+	Move libamf and libnet back to Cygnal where they started life.
+	Move testsuite/libamf.all and testsuite/libnet.all back to cygnal/testsuite.
+	Remove all references to libamf and libnet from all but cygnal.
+	Fix all paths in Cygnal for libamf and libnet.
+	Make building lirc conditional like it always should have been.
+	Don't build flvdumper or soldumper, nobody uses them anyway.
+	Drop libnet from XML_Socket, leave broken for now.
+	Make packaging have bzrversion.h as a dependency, or sometimes it gets the
+	nickname and revno wrong.
+
+2010-03-09  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Disable PCH support for gui/ and utilities/, because the precompiled header
+	is currently built with PIC, but both directories contain programs.
+
+2010-03-09  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	* configure.ac: Define the PCH flags just once and include them everywhere
+	else. Add -Winvalid-pch to print reasons for a failed PCH build.
+	* pch/Makefile.am: Add PTHREAD_CFLAGS to the precompiled header. This
+	should feed the precompiled header the same macros as a regular
+	compilation unit.
+	* elsewhere: use PCH_FLAGS.
+
+2010-03-09  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Add some frequently used headers to the precompiled header.
+
+2010-03-09  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Minor cleanups.
+
+2010-03-09  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove some more 'using namespace ...' from the global namespace.
+
+2010-03-09  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Re-enable --as-needed, which was disabled by mistake.
+
+2010-03-09  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Add support for GCC precompiled headers.
+
+2010-03-08  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor changes for swfmill version and other cleanups.
+
+2010-03-08  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Lower swfmill version requirement a bit.
+
+2010-03-08  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup.
+
+2010-03-08  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Revert AMF.h mess.
+
+2010-03-08  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Include GnashImage.h to fix compile.
+
+2010-03-08  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Revert AMF mess and cleanup libamf includes and linker flags.
+
+2010-03-08  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Assert instead of segfault.
+
+2010-03-08  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Forward-declare JpegImageInput; remove include.
+
+2010-03-08  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Remove ignored and unnecessary DSOEXPORT.
+
+2010-03-08  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Fix namespace collisions by avoiding 'using namespace ...' in global scope.
+
+2010-03-07  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Following element.h's typedfing of enums
+
+2010-03-07  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Removed errornous extra ';' found by gcc
+
+2010-03-07  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Fix for 'g++ -pedtantic -std=c++98' yeileding 'error: comma at end of enumerator list'
+
+2010-03-06  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Change InvalidatedRanges to using floats, because that's all we ever
+	use it for. Update callers.
+
+2010-03-06  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Fix testsuite compilation by remove an apparently unnecessary include.
+
+2010-03-05  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Prevent rounding errors that were causing some rendering artifacts that
+	occurred as a result of anti-aliasing.
+
+2010-03-05  Bastiaan Jacques  <bastiaan@bjacques.org>
+
+	Don't use the character matrix to adjust "hair" width lines. Transform
+	the line width according to the inverted stage matrix, so these lines
+	do not scale. Fixes bug #21566.
+
+2010-03-03  Rob Savoye  <rob@welcomehome.org>
+
+	addlibsdl1.2-dev to Build-Depends
+
+2010-02-26  Rob Savoye  <rob@welcomehome.org>
+
+	pick a better default directory for the build.
+
+2010-02-26  Rob Savoye  <rob@welcomehome.org>
+
+	specify a default snapshot directory and version.
+
+2010-02-26  Rob Savoye  <rob@welcomehome.org>
+
+	refactor debian packaging building to be easier to maintain, and also now supports building multiple binary packages.
+
+2010-02-26  Rob Savoye  <rob@welcomehome.org>
+
+	rearrange the order of some of the included fragments, so we can use the default values everywhere.
+
+2010-02-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fixes to Font tag.
+
+2010-02-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor cleanup.
+
+2010-02-26  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanup and add comment to DefineFont.
+	
+	Most importantly, stop returning ascent, descent, and leading as bools! The
+	consequences are a bit unpredictable, but the testsuite passes.
+	
+	Store integral values as integers, not floats.
+
+2010-02-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Read advance value as an unsigned int. As pointed out by Jan_Flanders a
+	signed short can't represent many twip-based values. A manual testcase shows
+	that using a signed int indeed wrongly makes negative advances.
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	correctly use the _() macro
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	start a simple summary logfile, which later will feed data to the web page.
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	add initial version of automated package building script.
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	merge in haiku support from branch.
+
+2010-02-24  Rob Savoye  <rob@welcomehome.org>
+
+	minor reformatting, fix typo.
+
+2010-02-24  Rob Savoye  <rob@welcomehome.org>
+
+	rename libsound/haiku to libsound/mkit.
+
+2010-02-24  Rob Savoye  <rob@welcomehome.org>
+
+	rename libsound/haiku to libsound/mkit.
+
+2010-02-23  Rob Savoye  <rob@welcomehome.org>
+
+	rename head from haiku to mkit
+
+2010-02-23  Rob Savoye  <rob@welcomehome.org>
+
+	corrections to KDE so it still compiles.
+
+2010-02-23  Rob Savoye  <rob@welcomehome.org>
+
+	oops, missed a fi
+
+2010-02-23  Rob Savoye  <rob@welcomehome.org>
+
+	add second of two big patches.
+
+2010-02-23  Rob Savoye  <rob@welcomehome.org>
+
+	convert to ASCII.
+
+2010-02-23  Rob Savoye  <rob@welcomehome.org>
+
+	add first of two big patches.
+
+2010-02-17  Rob Savoye  <rob@welcomehome.org>
+
+	add libbe to LIBS when building on Haiku.
+
+2010-02-17  Rob Savoye  <rob@welcomehome.org>
+
+	add haiku to the list of supported GUIs.
+
+2010-02-17  Rob Savoye  <rob@welcomehome.org>
+
+	look in include/agg as well as include/agg2.
+
+2010-02-17  Rob Savoye  <rob@welcomehome.org>
+
+	add another missed file.
+
+2010-02-17  Rob Savoye  <rob@welcomehome.org>
+
+	sigh, put some headers back in, wrape HAIKU ifdefs around a few more headers.
+
+2010-02-17  Rob Savoye  <rob@welcomehome.org>
+
+	don't include any headers, it's just a stub.
+
+2010-02-17  Rob Savoye  <rob@welcomehome.org>
+
+	missed part of the patch.
+
+2010-02-17  Rob Savoye  <rob@welcomehome.org>
+
+	check in more of the donated patch from Adrian Panasiuk. 
+
+2010-02-17  Rob Savoye  <rob@welcomehome.org>
+
+	add stubs for shared memory support, Haiku doesn't seem to have any.
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	minor cleanup
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	add the haiku directory to EXTRA_DIST
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	missed a file in the patch
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	tweak a few CONDITIONAL names for Haiku.
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	add Haiku support to libcore
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	add Haiku specific sound handler
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	add Haiku specific sound handler
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	merge in Haiku patch for libbase and libmedia
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	add Haiku specific media handler, currently unused.
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	add build conditional for Haiku GUI.
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	add support for building the Haiku GUI.
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	add Haiku Makefile fragment.
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	Add Haiku GUI support files.
+
+2010-02-16  Rob Savoye  <rob@welcomehome.org>
+
+	add Haiku support.
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	only create the build directory if if doesn't exist. Edit the changelog from srcdir if it isn't in debian/
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	don't install dumpshm manpage, dumpsh isn't being built right now.
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	merge from local screwup
+
+2009-05-21  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Added DSOEXPORT
+
+2009-04-11  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Patch as suggested by Rob
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	merge in changes from SID packaging files.
+
+2010-02-25  Rob Savoye  <rob@welcomehome.org>
+
+	add support for multiple configurations
+
+2010-02-25  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Lines should be no more than 80 characters, even after you add DSOEXPORT.
+
+2010-02-24  Sandro Santilli  <strk@keybit.net>
+
+	Add an SWFMILL_FUNCTION2_FLAGS_ORDER_CORRECT conditional based on swfmill version, skip tests in trace-as2 if that's not met
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop another unnecessary member.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop m_stream_id; it should be stored in libcore, not RTMP. Implement in
+	rtmpget's FakeNC.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Make copy ctor non-explicit to fix gcc-3.4 build.
+
+2010-02-24  Rob Savoye  <rob@welcomehome.org>
+
+	add gnash libs to LDFLAGS so --as-needed works.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Improvements to rtmpget (these are relevant to the core implementation, not
+	to RTMP). Don't invoke _checkbw because some servers don't like it. Read
+	the stream ID correctly. videolectures.net now also responds, but unfortunately
+	uses AS3.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Read stream ID correctly.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Exit when stream not found.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	The velblod server doesn't like it if we send _checkbw, so don't. The
+	tagesschau servers are happy with it, but it's not necessary for 
+	downloading video.
+	
+	Exit when the stream isn't found.
+
+2010-02-24  Markus Gothe  <markusg@milgram.sth.aptilo.com>
+
+	Added DSOEXPORT's, letting it compiling on Fedora 12
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Update usage for rtmpget.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Update usage.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix funny indentation.
+	
+	Use correct includes.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add a simple RTMP implementation that is usable in Gnash core. Implement
+	rtmpget to mimic the behaviour of a SWF for downloading video files.
+	
+	The RTMP implementation correctly communicates with an RTMP server. This
+	interface is complete enough to use.  Its interface for retrieving
+	messages for the core (metadata, remote calls, and FLV packages) is
+	incomplete, and currently only for use with rtmpget.
+	
+	The Socket class currently blocks; this needs work to prevent Gnash from
+	hanging.
+	
+	Socket and RTMP both use non-portable system calls, which need to be
+	implemented for other platforms.
+	
+	rtmpget works only for rtmp streams. Its FLV writing powers only write
+	recorded streams correctly; this seems to be a bug with the FLV processing,
+	not with the packets received via RTMP.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Do verbosity properly.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Silence debugging.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanup, indentation.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Allow fetching video packets. Like getMessage(), this is a temporary
+	interface.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Revert struct change.
+
+2010-02-24  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Replace rtmpget.
+
+2010-02-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Some test URLs.
+
+2010-02-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Allow very quick downloading by specifying buffer time.
+	
+	Add seek and length options.
+
+2010-02-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Store packet time properly.
+
+2010-02-23  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add a basic and working RTMP implementation.
+
+2010-02-23  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	struct -> class reconstruction
+
+2010-02-23  Rob Savoye  <rob@welcomehome.org>
+
+	fix URL for ftp server.
+
+2010-02-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop a load of unused functions that were cluttering the IOChannel interface.
+	They may be reimplemented as free functions using the existing interface in
+	the unlikely event that they are ever needed.
+	
+	Split AMF implementation into low-level (basic types, no VM needed) and
+	high-level (as_value and as_object, VM needed) parts.
+
+2010-02-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use read_byte, not read8.
+
+2010-02-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Unused functions.
+
+2010-02-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Unused function.
+
+2010-02-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Unused function.
+
+2010-02-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Unused function.
+
+2010-02-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Unused function.
+
+2010-02-22  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop unused function.
+
+2010-02-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix typo affecting string encoding.
+
+2010-02-20  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Split AMF handling into low-level (string, boolean, number only),
+	and high-level (conversion of as_value) functions.
+	
+	Writing complex objects is possible using only low-level functions.
+
+2010-02-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Minor changes.
+
+2010-02-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Rename.
+
+2010-02-18  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Expose basic reading functions for AMF buffers.
+
+2010-02-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Test references.
+
+2010-02-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More tests, notes.
+
+2010-02-17  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Object reference tests.
+
+2010-02-15  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	make it compile
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation for as_object.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Update documentation and formatting.
+
+2010-02-15  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	libamf is necessary for some compile-options
+
+2010-02-15  Rob Savoye  <rob@welcomehome.org>
+
+	adjust the Distribution version when making the spec file.
+
+2010-02-15  Rob Savoye  <rob@welcomehome.org>
+
+	up the next release version number now that 0.8.7 is out.
+
+2010-02-15  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	look for sys/epoll.h not epoll.h
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Split the gigantic TextField file into separate DisplayObject and ActionScript
+	implementations. TextField.cpp is stil gigantic.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Split TextField into AS and core implementation.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	More tests for LocalConnection and SharedObject, fixes to
+	SharedObject.getSize() and removal of empty SharedObjects.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Documentation.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Need a string table rather than a VM.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Clean up includes.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add a stress test for LocalConnection, which sends 1000 calls with complex
+	arguments as fast as it can in both directions. Gnash passes.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Split header and data more usefully, so that the data size matches the
+	size field in the header.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Fix typos to make sure header and size is written correctly.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Expect failure that was marked fixed by accident.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use foreachSecond.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Don't test getSize for SWF5 (it's undefined).
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Size is now correct.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Remove empty SharedObjects as expected instead of writing a 0-size file.
+	This also cuts down on bogus error messages about truncated SOL files.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use a separate function for encoding the header.
+	
+	Get size correct in most cases.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Get size more correct.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Const correct.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Proper tests.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Add size tests.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop some confused mess.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Cleanup of includes.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Use proper members for filename and object name.
+
+2010-02-15  Benjamin Wolsey  <bwy@benjaminwolsey.de>
+
+	Drop functions and data members that are either unused or don't do anything
+	useful.
+
+2010-02-15  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Fix --enable-debugger
+
+2010-02-14  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Fix a traversion bug in finding paths for headers
+
+2010-02-14  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	Fix detection of pkg-config --cflags & --libs
+
+2010-02-14  Rob Savoye  <rob@welcomehome.org>
+
+	updated ChangeLog from the release.
+
+2010-02-13  Rob Savoye  <rob@welcomehome.org>
+
+	use PACKAGE_VERSION instead of just hardcoding trunk.
+
+2010-02-13  Rob Savoye  <rob@welcomehome.org>
+
+	add support for php as a file type.
+
+2010-02-13  Rob Savoye  <rob@welcomehome.org>
+
+	adjust dependencies so they work with fc11 and fc12.
+
+2010-02-13  Rob Savoye  <rob@welcomehome.org>
+
+	Remove dupmshm for now.
+	Pass --build-id to ld to keep fc11 happy when building packages.
+	Make boost-date-time and boost-thread not a dependency for fc11, as
+	it only uses one big package for all the boost libraries.
+
+2010-02-13  Rob Savoye  <rob@welcomehome.org>
+
+	remove extra blank line as it's a syntax error. Don't package dumpshm, it's been temporarily commented out.
+
