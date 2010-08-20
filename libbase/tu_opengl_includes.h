@@ -60,17 +60,17 @@
 # include <GL/glu.h>
 #endif // WIN32
 
-#ifdef __MACH__
+#ifdef __APPLE__
 # include <OpenGL/gl.h>
 # include <OpenGL/glu.h>
 # define APIENTRY
-#endif // __MACH__
+#endif // __APPLE__
 
-#if !defined(WIN32) && (!defined(__MACH__) || defined(GUI_GTK))
+#if !defined(WIN32) && (!defined(__APPLE__) || defined(GUI_GTK))
 #ifndef GL_GLEXT_PROTOTYPES
 # define GL_GLEXT_PROTOTYPES 1
 #endif
-#ifdef __MACH__
+#ifdef __APPLE__
 # include <OpenGL/glext.h>
 #else
 # include <GL/gl.h>

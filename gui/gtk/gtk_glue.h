@@ -24,7 +24,7 @@
 #include <cassert>
 
 #include <gtk/gtk.h>
-#if !defined(_WIN32) && !defined(__MACH__)
+#if !defined(_WIN32) && !defined(__APPLE__)
 #include <gdk/gdkx.h>
 #else
 #include <gdk/gdk.h>
