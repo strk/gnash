@@ -1430,7 +1430,7 @@ esac],jemalloc=yes)
 
 dnl There is some weird stuff going on with NetBSD and jemalloc, so don't 
 dnl build it for now.
-if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes" -o x"${haiku}" = x"yes"; then
+if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes" -o x"${haiku}" = x"yes" -o x"${gnu}" = x"yes"; then
   jemalloc=no
 fi
 dnl If the compiler doesn't have local thread storage enabled, don't try to
