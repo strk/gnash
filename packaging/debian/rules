@@ -11,7 +11,6 @@
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-DEB_HOST_ARCH_OS    ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 SNAPSHOT_VERSION = $(shell head -n 1 debian/changelog | cut '-d ' -f 2 | sed 's/[()]//g')
@@ -69,9 +68,7 @@ patch-stamp:
 # These flags are the defaults Gnash uses when configuring, but we pass
 # them here explicitly because it makes it easier for non Gnash developers
 # to know what those defaults are.
-ifneq "$(DEB_HOST_ARCH_OS)" "hurd"
-	BUILD_FLAGS = --enable-jemalloc
-endif
+BUILD_FLAGS = --enable-jemalloc
 
 # this is where all the objects and executables go. We have to
 # redfine this, instead of just appending the path elements, as
