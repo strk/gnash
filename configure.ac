@@ -106,6 +106,10 @@ case "${host}" in
     DEFAULT_FLASH_PLATFORM_ID="HAIKU"
     DEFAULT_FLASH_SYSTEM_OS="Haiku"
     ;;    
+  *-gnu*)
+    DEFAULT_FLASH_PLATFORM_ID="GNU"
+    DEFAULT_FLASH_SYSTEM_OS="GNU/HURD"
+    ;;    
   *)
     DEFAULT_FLASH_PLATFORM_ID="UNK"
     DEFAULT_FLASH_SYSTEM_OS="Unknown"
@@ -179,6 +183,10 @@ case "${host}" in
   *-*haiku*)
     haiku=yes
     AC_DEFINE([HAIKU_HOST], [1], [this is a Haiku platform])
+    ;;
+  *-gnu*)
+    gnu=yes
+    AC_DEFINE([GNU_HOST], [1], [this is a GNU platform])
     ;;
 esac
 
