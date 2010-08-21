@@ -84,7 +84,12 @@ BUILD_VERSION := $(shell \
 	echo "$${snapshot_version}")
 
 # This is a list of all the packages in the control file.
-PACKAGES := $(shell grep Package $(srcdir)/packaging/debian/control | sed -e 's/Package://')
+PACKAGES := \
+	if test -d $(srcdir)/packaging; then \
+	  $(shell grep Package $(srcdir)/packaging/debian/control | sed -e 's/Package://') \
+	else \
+	  echo "gnash"; \
+	fi
 
 # SNAPSHOT_VERSION is the name that gets used for the packages. By default
 # it is "$(NEXT_RELEASE)~git.$(BRANCH_NICK)$(BRANCH_REVNO)", but when
