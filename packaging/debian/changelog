@@ -1,6 +1,13 @@
 gnash (trunk) distro; urgency=low
 
   * local package, many tweaks to be more standards compliant.
+     - updated for the 0.8.8 release.
+
+ -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Sun, 22 Aug 2010 04:20:00 +0100
+
+gnash (35.g231dca9) unstable; urgency=low
+
+  * local package, many tweaks to be more standards compliant.
     - Drop depend on gstreamer0.10-alsa, it is not needed as long as
       gstreamer0.10-plugins-bad depend on it.
     - Reorder control entries to match the ordering used in the sid package.
