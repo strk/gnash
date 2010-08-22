@@ -1,11 +1,11 @@
-'\" -*- coding: us-ascii -*-
+.\" -*- coding: us-ascii -*-
 .if \n(.g .ds T< \\FC
 .if \n(.g .ds T> \\F[\n[.fam]]
 .de URL
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH gnash 1 "10 February 2010" "" ""
+.TH gnash 1 "22 August 2010" "" ""
 .SH NAME
 gnash, gtk-gnash, kde4-gnash \- GNU Flash (SWF) Player
 .SH Synopsis
@@ -80,8 +80,10 @@ defaults to movie url)
 -P param, --param param
 Set parameter (ie. "FlashVars=A=1&b=2")
 .TP 
--F, --fd
-Set filedescriptor to use for external communications.
+-F, --fd x:y
+Set file descriptors to use for external communications. x is
+use by the player to send commands to the plugin, y is used
+by the plugin to send commands to the standalone player.
 .TP 
 --version
 Print the version number, and the configuration, of the
