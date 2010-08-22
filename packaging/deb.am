@@ -85,8 +85,7 @@ BUILD_VERSION := $(shell \
 
 # This is a list of all the packages in the control file.
 PACKAGES := \
-	if test -d $(srcdir)/packaging; then \
-	  $(shell grep Package $(srcdir)/packaging/debian/control | sed -e 's/Package://') \
+	  $(shell if test -f $(srcdir)/packaging/control; then grep Package $(srcdir)/packaging/debian/control | sed -e 's/Package://'; fi) \
 	else \
 	  echo "gnash"; \
 	fi
