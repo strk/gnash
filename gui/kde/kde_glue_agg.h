@@ -28,6 +28,7 @@
 
 #include "kde_glue.h"
 #include <vector>
+#include <memory>
 #include <boost/scoped_array.hpp>
 
 
