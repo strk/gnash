@@ -25,10 +25,19 @@
 
 namespace gnash {
 
+/// The Transform class expresses a stage in a cumulative transformation
+//
+/// All DisplayObjects have a color transform and a matrix, which is
+/// concatenated with its parent's transform to produce the actual transform.
 class Transform
 {
 public:
-    Transform(const SWFMatrix& m = SWFMatrix(), const SWFCxForm& cx = SWFCxForm())
+
+    /// Construct a Transform
+    //
+    /// Any arguments not supplied are identity transformations.
+    explicit Transform(const SWFMatrix& m = SWFMatrix(),
+            const SWFCxForm& cx = SWFCxForm())
         :
         matrix(m),
         colorTransform(cx)
