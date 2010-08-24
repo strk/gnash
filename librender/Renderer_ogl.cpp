@@ -714,6 +714,8 @@ public:
       _drawing_mask(false)
   {
   }
+
+  std::string description() const { return "OpenGL"; }
   
   void init()
   {
