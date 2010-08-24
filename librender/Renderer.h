@@ -199,6 +199,9 @@ public:
 
     virtual ~Renderer() {}
 
+    /// Return a description of this renderer.
+    virtual std::string description() const = 0;
+
     /// ==================================================================
     /// Interfaces for adjusting renderer output.
     /// ==================================================================

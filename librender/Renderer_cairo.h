@@ -43,6 +43,8 @@ public:
     Renderer_cairo();
     ~Renderer_cairo();
 
+    std::string description() const { return "Cairo"; }
+
     CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im);
 
     void drawVideoFrame(GnashImage* baseframe, const Transform& xform,

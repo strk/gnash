@@ -1880,7 +1880,7 @@ GtkGui::showAboutDialog()
     media::MediaHandler* m = _runResources.mediaHandler();
 
     comments.append(_("\nRenderer: "));
-    comments.append(RENDERER_CONFIG);
+    comments.append(_renderer->description());
     comments.append(_("\nHardware Acceleration: "));
     comments.append(HWACCEL_CONFIG);
     comments.append(_("\nGUI: "));

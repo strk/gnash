@@ -688,6 +688,11 @@ class Renderer_agg : public Renderer_agg_base
   
 public:
 
+    std::string description() const {
+        // TODO: make an effort to express pixel format
+        return "AGG";
+    }
+
     // Given an image, returns a pointer to a bitmap_info class
     // that can later be passed to FillStyleX_bitmap(), to set a
     // bitmap fill style.
