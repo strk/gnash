@@ -272,7 +272,7 @@ bevelfilter_type(const fn_call& fn)
 as_value
 bevelfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+    as_object* obj = ensure<ValidThis>(fn);
     obj->setRelay(new BevelFilter_as);
     return as_value();
 }

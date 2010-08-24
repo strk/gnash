@@ -58,6 +58,7 @@
 #include "Global_as.h"
 #include "RunResources.h"
 #include "GnashImage.h"
+#include "Transform.h"
 
 #include <vector>
 #include <string>
@@ -341,9 +342,9 @@ public:
 
     void operator() (DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
-        if ( ch->unloaded() ) return;
+        if (ch->unloaded()) return;
         SWFRect chb = ch->getBounds();
-        SWFMatrix m = ch->getMatrix();
+        SWFMatrix m = getMatrix(*ch);
         _bounds.expand_to_transformed_rect(m, chb);
     }
 
@@ -567,8 +568,8 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     // Copy drawable
     newmovieclip->_drawable = _drawable;
     
-    newmovieclip->set_cxform(get_cxform());    
-    newmovieclip->setMatrix(getMatrix(), true); 
+    newmovieclip->setCxForm(getCxForm(*this));
+    newmovieclip->setMatrix(getMatrix(*this), true); 
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
@@ -1080,24 +1081,27 @@ MovieClip::goto_labeled_frame(const std::string& label)
 }
 
 void
-MovieClip::display(Renderer& renderer)
+MovieClip::draw(Renderer& renderer, const Transform& xform)
 {
+    const DisplayObject::MaskRenderer mr(renderer, *this);
 
-    // Note: 
-    // DisplayList::Display() will take care of the visibility checking.
+    _drawable.finalize();
+    _drawable.display(renderer, xform);
+    _displayList.display(renderer, xform);
+}
+
+void
+MovieClip::display(Renderer& renderer, const Transform& base)
+{
+    // Note: DisplayList::display() will take care of the visibility checking.
     //
     // Whether a DisplayObject should be rendered or not is dependent
     // on its parent: i.e. if its parent is a mask, this DisplayObject
     // should be rendered to the mask buffer even it is invisible.
     
-    // render drawable (ActionScript generated graphics)
-    _drawable.finalize();
-    _drawable.display(renderer, *this);
-    
-    
-    // descend the display list
-    _displayList.display(renderer);
-     
+    // Draw everything with our own transform.
+    const Transform xform = base * transform();
+    draw(renderer, xform);
     clear_invalidated();
 }
 
@@ -1116,14 +1120,6 @@ MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObj)
 
     // FIXME: check return from placeDisplayObject above ?
     return true; 
-}
-
-std::auto_ptr<GnashImage>
-MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-            DisplayObject::BlendMode /* bm */, const SWFRect& /* clipRect */,
-            bool /* smooth */)
-{
-    return std::auto_ptr<GnashImage>();
 }
 
 DisplayObject*
@@ -1176,7 +1172,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     }
 
     // TODO: check if we should check those has_xxx flags first.
-    ch->set_cxform(tag->getCxform());
+    ch->setCxForm(tag->getCxform());
     ch->setMatrix(tag->getMatrix(), true); // update caches
     ch->set_ratio(tag->getRatio());
     ch->set_clip_depth(tag->getClipDepth());
@@ -1252,7 +1248,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
         ch->set_ratio(tag->getRatio());
     }
     if (tag->hasCxform()) {
-        ch->set_cxform(tag->getCxform());
+        ch->setCxForm(tag->getCxform());
     }
     if (tag->hasMatrix()) {
         ch->setMatrix(tag->getMatrix(), true); 
@@ -1399,8 +1395,8 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         else return NULL;
     }
 
-    SWFMatrix    m = getMatrix();
-    point    pp(x, y);
+    SWFMatrix m = getMatrix(*this);
+    point pp(x, y);
     m.invert().transform(pp);
 
     MouseEntityFinder finder(wp, pp);
@@ -1671,30 +1667,23 @@ MovieClip::getDisplayListObject(string_table::key key)
 }
 
 void 
-MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, 
-    bool force)
+MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
 
     // nothing to do if this movieclip is not visible
-    if (!visible() || get_cxform().is_invisible() )
-    {
-        ranges.add(m_old_invalidated_ranges); // (in case we just hided)
+    if (!visible() || invisible(getCxForm(*this))) {
+        ranges.add(m_old_invalidated_ranges); 
         return;
     }
 
-    if ( ! invalidated() && ! childInvalidated() && ! force )
-    {
-        return;
-    }
+    if (!invalidated() && !childInvalidated() && !force) return;
     
  
     // m_child_invalidated does not require our own bounds
-    if (invalidated() || force)            
-    {
+    if (invalidated() || force) {
         // Add old invalidated bounds
         ranges.add(m_old_invalidated_ranges); 
     }
-    
     
     _displayList.add_invalidated_bounds(ranges, force || invalidated());
 

@@ -21,7 +21,7 @@
 #include "DisplayListTag.h" // for inheritance
 #include "SWF.h" // for TagType definition
 #include "SWFMatrix.h" // for composition
-#include "cxform.h" // for composition 
+#include "SWFCxForm.h" // for composition 
 #include <string>
 #include <vector>
 
@@ -121,7 +121,7 @@ public:
     boost::uint16_t getID()        const { return _id; }
     const std::string& getName() const { return m_name; }
     const SWFMatrix& getMatrix()    const { return m_matrix; }
-    const cxform& getCxform()    const { return m_color_transform; }
+    const SWFCxForm& getCxform()    const { return m_color_transform; }
     const EventHandlers& getEventHandlers() const { return _eventHandlers; }
     
     bool hasClipActions() const { return m_has_flags2 & HAS_CLIP_ACTIONS_MASK; }
@@ -163,7 +163,7 @@ private:
     boost::uint8_t m_has_flags2;
     boost::uint8_t m_has_flags3;
     boost::uint16_t _id;
-    cxform  m_color_transform;
+    SWFCxForm  m_color_transform;
     SWFMatrix  m_matrix;
     int     _ratio;
     std::string m_name;

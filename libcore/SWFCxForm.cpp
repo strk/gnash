@@ -19,7 +19,7 @@
 // 
 //
 
-#include "cxform.h"
+#include "SWFCxForm.h"
 #include "RGBA.h" 
 #include "SWFStream.h" // for reading from SWF
 #include "log.h"
@@ -28,22 +28,13 @@
 
 namespace gnash {
 
-using boost::uint8_t;
-using boost::int16_t;
-
-cxform::cxform()
-// Initialize to identity transform.    
-{
-    ra = ga = ba = aa = 256;
-    rb = gb = bb = ab = 0;
-}
-
-// Concatenate cxform c onto ours.  When
+// Concatenate SWFCxForm c onto ours.  When
 // transforming colors, c's transform is applied
 // first, then ours.  
-void    cxform::concatenate(const cxform& c)  
+void
+SWFCxForm::concatenate(const SWFCxForm& c)  
 {
-	// enbrace all the overflows intentionally.
+	// embrace all the overflows intentionally.
     rb += (ra * c.rb >> 8);
     gb += (ga * c.gb >> 8);
     bb += (ba * c.bb >> 8);
@@ -56,36 +47,39 @@ void    cxform::concatenate(const cxform& c)
 }
 
 
-rgba    cxform::transform(const rgba& in) const
-// Apply our transform to the given color; return the result.
+rgba
+SWFCxForm::transform(const rgba& in) const
 {
-    rgba    result(in.m_r, in.m_g, in.m_b, in.m_a);
+    rgba result(in.m_r, in.m_g, in.m_b, in.m_a);
     
     transform(result.m_r, result.m_g, result.m_b, result.m_a);
     return result;
 }
 
-// transform the given color with our cxform.
-void    cxform::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const
+// transform the given color with our SWFCxForm.
+void
+SWFCxForm::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b,
+        boost::uint8_t& a) const
 {
     // force conversion to int16 first, kind of optimization.
-    int16_t rt = (int16_t)r;
-    int16_t gt = (int16_t)g;
-    int16_t bt = (int16_t)b;
-    int16_t at = (int16_t)a;
+    boost::int16_t rt = (boost::int16_t)r;
+    boost::int16_t gt = (boost::int16_t)g;
+    boost::int16_t bt = (boost::int16_t)b;
+    boost::int16_t at = (boost::int16_t)a;
     
     rt = (rt * ra >> 8) + rb;
     gt = (gt * ga >> 8) + gb;
     bt = (bt * ba >> 8) + bb;
     at = (at * aa >> 8) + ab;
 
-    r = (uint8_t)(clamp<int16_t>(rt, 0, 255));
-    g = (uint8_t)(clamp<int16_t>(gt, 0, 255));
-    b = (uint8_t)(clamp<int16_t>(bt, 0, 255));
-    a = (uint8_t)(clamp<int16_t>(at, 0, 255));
+    r = (boost::uint8_t)(clamp<boost::int16_t>(rt, 0, 255));
+    g = (boost::uint8_t)(clamp<boost::int16_t>(gt, 0, 255));
+    b = (boost::uint8_t)(clamp<boost::int16_t>(bt, 0, 255));
+    a = (boost::uint8_t)(clamp<boost::int16_t>(at, 0, 255));
 }
 
-void    cxform::read_rgb(SWFStream& in)
+void
+SWFCxForm::read_rgb(SWFStream& in)
 {
     in.align();
 
@@ -124,7 +118,8 @@ void    cxform::read_rgb(SWFStream& in)
     }
 }
 
-void    cxform::read_rgba(SWFStream& in)
+void
+SWFCxForm::read_rgba(SWFStream& in)
 {
     in.align();
 
@@ -163,16 +158,8 @@ void    cxform::read_rgba(SWFStream& in)
     }
 }
 
-std::string
-cxform::toString() const
-{
-    std::stringstream ss;
-    ss << *this;
-    return ss.str();
-}
-
 std::ostream&
-operator<< (std::ostream& os, const cxform& cx) 
+operator<<(std::ostream& os, const SWFCxForm& cx) 
 {
     // For integers up to 256
     const short fieldWidth = 3;
@@ -194,28 +181,8 @@ operator<< (std::ostream& os, const cxform& cx)
     return os;
 }
 
-bool    cxform::is_identity() const
-// Returns true when the cxform equals identity (no transform)
-{      
-    return 
-        ra == 256 &&
-        rb == 0   &&
-        ga == 256 &&
-        gb == 0   &&
-        ba == 256 &&
-        bb == 0   &&
-        aa == 256 &&
-        ab == 0;
-}
 
-bool    cxform::is_invisible() const
-// Returns true when the cxform leads to alpha == 0
-{
-    return (255 * aa >> 8) + ab == 0;    
-}
-
-
-}   // end namespace gnash
+} // namespace gnash
 
 
 // Local Variables:

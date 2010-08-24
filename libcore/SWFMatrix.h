@@ -36,7 +36,7 @@ namespace gnash {
     class SWFRect;
     namespace geometry {
         class Point2d;
-        template <typename T> class Range2d;
+        template<typename T> class Range2d;
     }
 }
 
@@ -56,26 +56,23 @@ class DSOEXPORT SWFMatrix
 public:
 
     /// Xscale, 16.16 fixed point. xx in swfdec. 'a' in AS Matrix.
-    int sx; 
+    boost::int32_t sx; 
 
     /// Xshear, 16.16 fixed point. yx in swfdec. 'b' in AS Matrix.
-    int shx;
+    boost::int32_t shx;
 
     /// Yshear, 16.16 fixed point. xy in swfdec. 'c' in AS Matrix.
-    int shy;
+    boost::int32_t shy;
 
     /// Yscale, 16.16 fixed point. yy in swfdec. 'd' in AS Matrix.
-    int sy; 
+    boost::int32_t sy; 
 
     /// Xtranslation, TWIPS. x0 in swfdec. 'tx' in AS Matrix.
-    int tx; 
+    boost::int32_t tx; 
 
     /// Ytranslation, TWIPS. y0 in swfdec. 'ty' in AS Matrix.
-    int ty; 
+    boost::int32_t ty; 
              
-    friend bool operator== (const SWFMatrix&, const SWFMatrix&);
-    friend std::ostream& operator<< (std::ostream&, const SWFMatrix&);
-    
     /// Construct an identity SWFMatrix
     SWFMatrix()
         :
@@ -105,56 +102,50 @@ public:
     //
     /// When transforming points, m happens first,
     /// then our original xform.
-    ///
-    void    concatenate(const SWFMatrix& m);
+    void concatenate(const SWFMatrix& m);
 
     /// Concatenate a translation onto the front of our SWFMatrix.
     //
     /// When transforming points, the translation
     /// happens first, then our original xform.
-    ///
-    void    concatenate_translation(int tx, int ty);
+    void concatenate_translation(int tx, int ty);
 
     /// Concatenate scale x and y to the front of our SWFMatrix 
     //
     /// When transforming points, these scales happen first, then
     /// our original SWFMatrix. 
-    /// 
-    void    concatenate_scale(double x, double y);
+    void concatenate_scale(double x, double y);
 
     /// Set this SWFMatrix to a blend of m1 and m2, parameterized by t.
-    void    set_lerp(const SWFMatrix& m1, const SWFMatrix& m2, float t);
+    void set_lerp(const SWFMatrix& m1, const SWFMatrix& m2, float t);
 
     /// Set the scale & rotation part of the SWFMatrix. angle in radians.
-    void    set_scale_rotation(double x_scale, double y_scale, double rotation);
+    void set_scale_rotation(double x_scale, double y_scale, double rotation);
 
     /// Set x and y scales, rotation is unchanged.
-    void    set_scale(double x_scale, double y_scale);
+    void set_scale(double x_scale, double y_scale);
 
     /// Set x scale, rotation any y scale are unchanged.
-    void    set_x_scale(double scale);
+    void set_x_scale(double scale);
 
     /// Set y scale, rotation and x scale are unchanged.
-    void    set_y_scale(double scale);
+    void set_y_scale(double scale);
 
     /// Set rotation in radians, scales component are unchanged.
-    void    set_rotation(double rotation);
+    void set_rotation(double rotation);
 
     /// Set x translation in TWIPS
-    void set_x_translation(int x)
-    {
+    void set_x_translation(int x) {
         tx = x;
     }
 
     /// Set y translation in TWIPS.
-    void set_y_translation(int y)
-    {
+    void set_y_translation(int y) {
         ty = y;
     }
 
     /// Set x and y translation in TWIPS.
-    void set_translation(int x, int y)
-    {
+    void set_translation(int x, int y) {
         tx = x;
         ty = y;
     }
@@ -169,8 +160,7 @@ public:
     //
     /// Put the result in *result.
     ///
-    void    transform(geometry::Point2d* result,
-                      const geometry::Point2d& p) const;
+    void transform(geometry::Point2d* result, const geometry::Point2d& p) const;
 
     /// Transform Range2d<float> 'r' by our SWFMatrix. 
     //
@@ -178,33 +168,32 @@ public:
     ///
     void transform(geometry::Range2d<boost::int32_t>& r) const;
 
-    void    transform(SWFRect& r) const;
+    void transform(SWFRect& r) const;
     
     /// Invert this SWFMatrix and return the result.
     SWFMatrix& invert();
     
     /// return the magnitude scale of our x coord output
-    double   get_x_scale() const;
+    double get_x_scale() const;
 
     /// return the magnitude scale of our y coord output
-    double   get_y_scale() const;
+    double get_y_scale() const;
 
     /// return rotation component in radians.
-    double   get_rotation() const;
+    double get_rotation() const;
 
     /// return x translation n TWIPS unit.
-    int   get_x_translation() const
-    {
+    int get_x_translation() const {
         return tx;
     }
 
     /// return y translation in TWIPS unit.
-    int   get_y_translation() const
-    {
+    int get_y_translation() const {
         return ty;
     }
 
 private: 
+
     /// Return the determinant of this SWFMatrix in 32.32 fixed point format.
     boost::int64_t  determinant() const;
 
@@ -213,7 +202,8 @@ private:
 /// Read from input stream.
 SWFMatrix readSWFMatrix(SWFStream& in);
 
-inline bool operator== (const SWFMatrix& a, const SWFMatrix& b)
+inline bool
+operator==(const SWFMatrix& a, const SWFMatrix& b)
 {
     return  
         a.sx  == b.sx  &&
@@ -224,9 +214,11 @@ inline bool operator== (const SWFMatrix& a, const SWFMatrix& b)
         a.ty  == b.ty;
 }
 
-}   // namespace gnash
+std::ostream& operator<<(std::ostream& o, const SWFMatrix& m);
 
-#endif // GNASH_MATRIX_H
+} // namespace gnash
+
+#endif 
 
 
 // Local Variables:

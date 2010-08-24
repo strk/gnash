@@ -1,4 +1,4 @@
-// DefineButtonCxformTag.h: parse SWF2 button cxform tag.
+// DefineButtonCxformTag.h: parse SWF2 button SWFCxForm tag.
 // 
 //   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
@@ -29,7 +29,7 @@ namespace gnash {
 namespace gnash {
 namespace SWF {
     
-/// A simple rgb cxform for SWF2 buttons, superseded by DefineButton2.
+/// A simple rgb SWFCxForm for SWF2 buttons, superseded by DefineButton2.
 //
 /// The loader directly modifies a previous DefineButton tag.
 /// TODO: should it also modify a DefineButton2 tag? Probably, but not

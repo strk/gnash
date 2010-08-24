@@ -1,6 +1,7 @@
-// MovieClip_as.h:  ActionScript "MovieClip" class, for Gnash.
+// ASConversions.h	Conversions between AS and SWF types.
 //
-//   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+//   Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,30 +18,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ3_MOVIECLIP_H
-#define GNASH_ASOBJ3_MOVIECLIP_H
+#ifndef GNASH_ASCONVERSIONS_H
+#define GNASH_ASCONVERSIONS_H
 
+namespace gnash {
+    class as_object;
+    class SWFMatrix;
+    class SWFCxForm;
+    class ColorTransform_as;
+}
 
 namespace gnash {
 
-// Forward declarations
-class as_object;
-struct ObjectURI;
-class DisplayObject;
-class SWFMatrix;
+/// Convert an object to a SWFMatrix.
+SWFMatrix toSWFMatrix(as_object& o);
 
-/// Initialize the global MovieClip class
-void movieclip_class_init(as_object& where, const ObjectURI& uri);
+/// Convert a ColorTransform_as to a SWFCxForm record.
+SWFCxForm toCxForm(const ColorTransform_as& tr);
 
-/// Register ASNative MovieClip methods (AS2 only).
-void registerMovieClipNative(as_object& where);
-
-} // gnash namespace
+} // namespace gnash
 
 #endif
-
-// local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:
-

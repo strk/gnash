@@ -217,6 +217,7 @@ EXTENSIONS_API = \
 	GnashImageJpeg.h \
 	CachedBitmap.h \
 	GnashImage.h \
+	ImageIterators.h \
 	$(NULL)
 
 instdir = $(includedir)/gnash

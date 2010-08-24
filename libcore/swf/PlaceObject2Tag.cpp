@@ -67,7 +67,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
             	_depth, _depth - DisplayObject::staticDepthOffset,
             	_id);
             if (hasMatrix()) log_parse("  SWFMatrix: %s", m_matrix);
-            if (hasCxform()) log_parse(_("  cxform: %s"), m_color_transform);
+            if (hasCxform()) log_parse(_("  SWFCxForm: %s"), m_color_transform);
     );
 
     
@@ -314,7 +314,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
         }
         if ( hasCxform() )
         {
-            log_parse(_("  cxform: %s"), m_color_transform);
+            log_parse(_("  SWFCxForm: %s"), m_color_transform);
         }
         if ( hasRatio() ) log_parse(_("  ratio: %d"), _ratio);
         if ( hasName() ) log_parse(_("  name = %s"), m_name.c_str());
@@ -422,7 +422,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
             _depth - DisplayObject::staticDepthOffset);
         if (hasCharacter()) log_parse(_("  char id = %d"), _id);
         if (hasMatrix()) log_parse(_("  SWFMatrix: %s"), m_matrix);
-        if (hasCxform()) log_parse(_("  cxform: %d"), m_color_transform);
+        if (hasCxform()) log_parse(_("  SWFCxForm: %d"), m_color_transform);
         if (hasRatio()) log_parse(_("  ratio: %d"), _ratio);
         if (hasName()) log_parse(_("  name = %s"), m_name);
         if (hasClassName()) log_parse(_("  class name = %s"), className);

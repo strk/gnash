@@ -46,7 +46,7 @@ PathParser::PathParser(const std::vector<Path>& paths, size_t numstyles)
 {}
 
 void
-PathParser::run(const cxform& cx, const SWFMatrix& /*mat*/)
+PathParser::run(const SWFCxForm& cx, const SWFMatrix& /*mat*/)
 {
   // Since we frequently remove an element from the front or the back, we use
   // a double ended queue here.
@@ -157,7 +157,7 @@ PathParser::line_to(const Edge& curve)
 }
 
 void
-PathParser::start_shapes(int fill_style, const cxform& cx)
+PathParser::start_shapes(int fill_style, const SWFCxForm& cx)
 {
   prepareFill(fill_style, cx);
 }

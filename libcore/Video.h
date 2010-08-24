@@ -66,7 +66,7 @@ public:
 	/// Register this video instance as a live DisplayObject
 	virtual void construct(as_object* init = 0);
 
-	void display(Renderer& renderer);
+	virtual void display(Renderer& renderer, const Transform& xform);
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 

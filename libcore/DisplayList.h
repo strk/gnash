@@ -41,7 +41,7 @@
 #endif
 
 namespace gnash {
-	class cxform;
+	class SWFCxForm;
 	class Renderer;
 }
 
@@ -102,8 +102,8 @@ public:
 	///	depth to be replaced
 	///
 	/// @param use_old_cxform
-	/// true:  set the new DisplayObject's cxform to the old one.
-	/// false: keep the new DisplayObject's cxform.
+	/// true:  set the new DisplayObject's SWFCxForm to the old one.
+	/// false: keep the new DisplayObject's SWFCxForm.
 	///
 	/// @param use_old_matrix
 	/// true:  set the new DisplayObject's transformation SWFMatrix to the old one.
@@ -157,7 +157,7 @@ public:
 	/// @clip_depth
 	/// Not used at the moment.
 	/// 
-	void moveDisplayObject( int depth, const cxform* color_xform,
+	void moveDisplayObject( int depth, const SWFCxForm* color_xform,
             const SWFMatrix* mat, int* ratio, int* clip_depth);
 
 	/// Removes the object at the specified depth.
@@ -236,10 +236,10 @@ public:
     ///                 owner.
     void addDisplayObject(DisplayObject* obj);
 
-	/// \brief
-	/// Display the referenced DisplayObjects.
+	/// Display the list's DisplayObjects.
+    //
 	/// Lower depths are obscured by higher depths.
-	void display(Renderer& renderer);
+	void display(Renderer& renderer, const Transform& xform);
 	
 	void omit_display();
 

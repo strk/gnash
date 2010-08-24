@@ -64,8 +64,15 @@ check(Bitmap.prototype.hasOwnProperty("width"));
 check(Bitmap.prototype.hasOwnProperty("rectangle"));
 check(Bitmap.prototype.hasOwnProperty("transparent"));
 
+check(Bitmap.hasOwnProperty("RED_CHANNEL"));
+check(Bitmap.hasOwnProperty("GREEN_CHANNEL"));
+check(Bitmap.hasOwnProperty("BLUE_CHANNEL"));
+check(Bitmap.hasOwnProperty("ALPHA_CHANNEL"));
+
 check(!Bitmap.prototype.hasOwnProperty('loadBitmap'));
 check(Bitmap.hasOwnProperty('loadBitmap'));
+
+Rectangle = flash.geom.Rectangle;
 
 //-------------------------------------------------------------
 // Test constructor
@@ -202,14 +209,45 @@ check_equals(ntr.getPixel32(6, 6), -12303292);
 bmp = new Bitmap(20, 20, false);
 bmp.floodFill(10, 10, 0x0000ff00);
 
-xcheck_equals(bmp.getPixel(10, 10), 0x0000ff00);
+check_equals(bmp.getPixel(10, 10), 0x0000ff00);
 bmp.floodFill(5, 5, 0x000000ff);
-xcheck_equals(bmp.getPixel(10, 0), 0x000000ff);
+check_equals(bmp.getPixel(10, 0), 0x000000ff);
 
 mc = this.createEmptyMovieClip("mc", this.getNextHighestDepth());
 mc.attachBitmap(bmp, this.getNextHighestDepth());
 
-Rectangle = flash.geom.Rectangle;
+b = new Bitmap(200, 200, false, 0xffffff);
+b.fillRect(new Rectangle(10, 10, 10, 10), 0x00ff00);
+b.fillRect(new Rectangle(50, 20, 10, 10), 0x00ff00);
+b.fillRect(new Rectangle(50, 70, 20, 20), 0x00ff00);
+b.fillRect(new Rectangle(50, 70, 20, 20), 0x00ff00);
+
+b.fillRect(new Rectangle(120, 100, 10, 10), 0x0000ff);
+b.fillRect(new Rectangle(130, 90, 10, 10), 0xffff00);
+b.fillRect(new Rectangle(140, 100, 10, 10), 0x00ffff);
+b.fillRect(new Rectangle(130, 110, 10, 10), 0xff00ff);
+
+check_equals(b.getPixel(1, 1), 0xffffff);
+check_equals(b.getPixel(135, 105), 0xffffff);
+
+// This is done twice deliberately to make sure Gnash doesn't hang!
+b.floodFill(0, 0, 0);
+b.floodFill(0, 0, 0);
+check_equals(b.getPixel(1, 1), 0x0);
+check_equals(b.getPixel(190, 190), 0x0);
+check_equals(b.getPixel(135, 105), 0xffffff);
+
+b.floodFill(135, 105, 0xee1111);
+check_equals(b.getPixel(1, 1), 0x0);
+check_equals(b.getPixel(190, 190), 0x0);
+check_equals(b.getPixel(135, 105), 0xee1111);
+
+mc2 = this.createEmptyMovieClip("mc2", this.getNextHighestDepth());
+mc2.attachBitmap(b, this.getNextHighestDepth());
+mc2._x = 300;
+mc2._y = 300;
+
+// fillRect
 
 bmp = new Bitmap(20, 20, false);
 r = new Rectangle(2, 2, 5, 5);
@@ -328,88 +366,218 @@ d.lineTo(50, 50);
 b = new Bitmap(100, 100, false);
 b.draw(d);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // Hard ref
 b.draw(_level0.tar);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // User-defined translation makes no difference.
 d._x = 500;
 b.draw(d);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // User defined transform makes no difference.
 d._height = 30;
 b.draw(d);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // User defined transform makes no difference.
 d._width = 30;
 b.draw(d);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // Color transform the old way (no difference).
 c = new Color("_level0.tar");  
 c.setRGB(0xff5500);
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 // Color transform the new way.
 var tr = d.transform;
 tr.colorTransform = new flash.geom.ColorTransform(0.5, 0.5, 0.5, 0.5, 34, 34, 34, 34);
 d.transform = tr;
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
 dom = new flash.geom.Matrix();
 dom.rotate(Math.PI / 4);
 tr.matrix = dom;
 d.transform = tr;
 check_equals(b.getPixel(1, 1), 0xffffff);
-xcheck_equals(b.getPixel(21, 21), 0x00ff00);
+check_equals(b.getPixel(21, 21), 0x00ff00);
 check_equals(b.getPixel(19, 20), 0xffffff);
-xcheck_equals(b.getPixel(79, 79), 0x00ff00);
+check_equals(b.getPixel(79, 79), 0x00ff00);
 check_equals(b.getPixel(50, 25), 0xffffff);
-xcheck_equals(b.getPixel(55, 55), 0xff0000);
+check_equals(b.getPixel(55, 55), 0xff0000);
 
+// Test behaviour of BitmapData.draw with masks.
+
+// 1. The MovieClip is drawn with the custom transform
+// 2. The mask is drawn with its current transform
+near = function(bitmap, x, y, val) {
+   tol = 2;
+   col = bitmap.getPixel(x, y);
+   col_r = (col & 0xff0000) >> 16;
+   col_g = (col & 0xff00) >> 8;
+   col_b = (col & 0xff);
+   val_r = (val & 0xff0000) >> 16;
+   val_g = (val & 0xff00) >> 8;
+   val_b = (val & 0xff);
+   if (Math.abs(col_r - val_r) > tol) return false;
+   if (Math.abs(col_b - val_b) > tol) return false;
+   if (Math.abs(col_g - val_g) > tol) return false;
+   return true;
+};
+
+mc = _root.createEmptyMovieClip("mc", 1009);
+a = mc.createEmptyMovieClip("a", 1090);
+b = mc.createEmptyMovieClip("b", 1091);
+
+mask = _root.createEmptyMovieClip("mask", 1150);
+
+with(a) {
+    beginFill(0xff0000);
+    moveTo(0, 0);
+    lineTo(10, 0);
+    lineTo(10, 40);
+    lineTo(0, 40);
+    lineTo(0, 0);
+
+    beginFill(0x00ff00);
+    moveTo(10, 0);
+    lineTo(20, 0);
+    lineTo(20, 40);
+    lineTo(10, 40);
+    lineTo(10, 0);
+
+    beginFill(0x0000ff);
+    moveTo(20, 0);
+    lineTo(30, 0);
+    lineTo(30, 40);
+    lineTo(20, 40);
+    lineTo(20, 0);
+
+};
+
+with(mask) {
+    beginFill(0x000000);
+    moveTo(10, 10);
+    lineTo(20, 10);
+    lineTo(20, 20);
+    lineTo(10, 20);
+    lineTo(10, 10);
+};
+
+// Only for visual checking.
+disp = _root.createEmptyMovieClip("disp", 1300);
+disp._x = 200;
+disp._y = 200;
+
+mc.setMask(mask);
+
+// Mask and MovieClip with neutral transform
+bm = new flash.display.BitmapData(50, 50, false);
+bm.draw(mc);
+
+// A square of the green stripe is visible.
+check(near(bm, 5, 5, 0xffffff));
+check(near(bm, 5, 15, 0xffffff));
+check(near(bm, 5, 25, 0xffffff));
+check(near(bm, 15, 5, 0xffffff));
+check(near(bm, 15, 15, 0x00ff00));
+check(near(bm, 15, 25, 0xffffff));
+check(near(bm, 25, 5, 0xffffff));
+check(near(bm, 25, 15, 0xffffff));
+check(near(bm, 25, 25, 0xffffff));
+
+// Mask with neutral transform, MovieClip with different transform
+mc._width = 30;
+mc._height = 200;
+mc._x = -39;
+bm = new flash.display.BitmapData(50, 50, false);
+bm.draw(mc);
+
+// A square of the green stripe is visible.
+check(near(bm, 5, 5, 0xffffff));
+check(near(bm, 5, 15, 0xffffff));
+check(near(bm, 5, 25, 0xffffff));
+check(near(bm, 15, 5, 0xffffff));
+xcheck(near(bm, 15, 15, 0x00ff00));
+check(near(bm, 15, 25, 0xffffff));
+check(near(bm, 25, 5, 0xffffff));
+check(near(bm, 25, 15, 0xffffff));
+check(near(bm, 25, 25, 0xffffff));
+
+disp.attachBitmap(bm, 400);
+
+// Mask with different transform, MovieClip with different transform
+mask._x = 10;
+bm = new flash.display.BitmapData(50, 50, false);
+bm.draw(mc);
+
+// A square of the blue stripe is visible.
+check(near(bm, 5, 5, 0xffffff));
+check(near(bm, 5, 15, 0xffffff));
+check(near(bm, 5, 25, 0xffffff));
+check(near(bm, 15, 5, 0xffffff));
+check(near(bm, 15, 15, 0xffffff));
+check(near(bm, 15, 25, 0xffffff));
+check(near(bm, 25, 5, 0xffffff));
+xcheck(near(bm, 25, 15, 0x0000ff));
+check(near(bm, 25, 25, 0xffffff));
+
+bm = new flash.display.BitmapData(50, 50, false);
+bm.draw(mc, new flash.geom.Matrix(1, 0, 0, 1, 5, 5));
+
+// A bit of the blue and green blue stripe is visible.
+check(near(bm, 5, 5, 0xffffff));
+check(near(bm, 5, 15, 0xffffff));
+check(near(bm, 5, 25, 0xffffff));
+check(near(bm, 15, 5, 0xffffff));
+check(near(bm, 15, 15, 0xffffff));
+check(near(bm, 15, 25, 0xffffff));
+check(near(bm, 25, 5, 0xffffff));
+xcheck(near(bm, 23, 15, 0x00ff00));
+xcheck(near(bm, 25, 15, 0x0000ff));
+check(near(bm, 25, 25, 0xffffff));
 
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(169);
+totals(218);
 
 #endif // OUTPUT_VERSION >= 8

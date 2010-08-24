@@ -43,6 +43,7 @@
 #include "ExternalInterface.h"
 #include "TextField.h"
 #include "Button.h"
+#include "Transform.h"
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -822,9 +823,11 @@ movie_root::doMouseDrag()
     // Place our origin so that it coincides with the mouse coords
     // in our parent frame.
     // TODO: add a DisplayObject::set_translation ?
-    SWFMatrix    local = dragChar->getMatrix();
+    SWFMatrix local = getMatrix(*dragChar);
     local.set_translation(world_mouse.x, world_mouse.y);
-    dragChar->setMatrix(local); //no need to update caches when only changing translation
+     
+    // no need to update caches when only changing translation
+    dragChar->setMatrix(local);
 }
 
 
@@ -979,10 +982,10 @@ movie_root::display()
     Renderer* renderer = _runResources.renderer();
     if (!renderer) return;
 
-    renderer->begin_display(m_background_color, _stageWidth, _stageHeight,
-                            frame_size.get_x_min(), frame_size.get_x_max(),
-                            frame_size.get_y_min(), frame_size.get_y_max());
-
+    Renderer::External ex(*renderer, m_background_color,
+            _stageWidth, _stageHeight,
+            frame_size.get_x_min(), frame_size.get_x_max(),
+            frame_size.get_y_min(), frame_size.get_y_max());
 
     for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
     {
@@ -995,17 +998,14 @@ movie_root::display()
         // null frame size ? don't display !
         const SWFRect& sub_frame_size = movie->get_frame_size();
 
-        if ( sub_frame_size.is_null() )
-        {
+        if (sub_frame_size.is_null()) {
             log_debug("_level%u has null frame size, skipping", i->first);
             continue;
         }
 
-        movie->display(*renderer);
+        movie->display(*renderer, Transform());
 
     }
-
-    renderer->end_display();
 }
 
 bool

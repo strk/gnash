@@ -74,7 +74,7 @@ using namespace gnash::SWF;
 (int) (float) (long) (double) \
 (Property*) (auto_ptr<Property>) (scoped_ptr<Property>) \
 (shared_ptr<Property>) (intrusive_ptr<as_object>) (GcResource) \
-(rgba) (SWFMatrix) (SWFRect) (LineStyle) (FillStyle) (cxform) \
+(rgba) (SWFMatrix) (SWFRect) (LineStyle) (FillStyle) (SWFCxForm) \
 (as_value) \
 (DynamicShape)(ShapeRecord)(TextRecord) \
 (Property) (PropertyList) \

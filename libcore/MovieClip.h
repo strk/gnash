@@ -262,9 +262,15 @@ public:
     /// Look up the labeled frame, and jump to it.
     bool goto_labeled_frame(const std::string& label);
         
-    /// Display (render?) this Sprite/MovieClip, unless invisible
-    void display(Renderer& renderer);
+    /// Render this MovieClip.
+    virtual void display(Renderer& renderer, const Transform& xform);
     
+    /// Draw this MovieClip
+    //
+    /// This is effectively the same as display(), but uses only the passed
+    /// transform.
+    void draw(Renderer& renderer, const Transform& xform);
+
     void omit_display();
 
     /// Swap depth of the given DisplayObjects in the DisplayList
@@ -548,16 +554,6 @@ public:
     ///
     /// testsuite/misc-ming.all/displaylist_depths_test.swf
     void removeMovieClip();
-
-    /// Render this MovieClip to a GnashImage using the passed transform
-    //
-    /// @return     The GnashImage with the MovieClip drawn onto it.
-    virtual std::auto_ptr<GnashImage> drawToBitmap(
-            const SWFMatrix& mat = SWFMatrix(), 
-            const cxform& cx = cxform(),
-            DisplayObject::BlendMode bm = DisplayObject::BLENDMODE_NORMAL,
-            const SWFRect& clipRect = SWFRect(),
-            bool smooth = false);
 
     /// Direct access to the Graphics object for drawing.
     DynamicShape& graphics() {

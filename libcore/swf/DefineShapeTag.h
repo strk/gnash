@@ -15,11 +15,12 @@
 
 namespace gnash {
 	class SWFStream;
-	class cxform;
+	class SWFCxForm;
     class Shape;
 	class SWFMatrix;
 	class RunResources;
 	class Renderer;
+    class Transform;
 }
 
 namespace gnash {
@@ -38,7 +39,7 @@ public:
     virtual ~DefineShapeTag() {};
 
     // Display a Shape character.
-    virtual void display(Renderer& renderer, const DisplayObject& inst) const;
+    virtual void display(Renderer& renderer, const Transform& xform) const;
 
     // Create a Shape DisplayObject.
 	virtual DisplayObject* createDisplayObject(Global_as& gl,

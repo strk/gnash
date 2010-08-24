@@ -47,6 +47,7 @@
 #include "MouseButtonState.h"
 #include "Global_as.h"
 #include "Renderer.h"
+#include "Transform.h"
 
 #include <algorithm> 
 #include <string>
@@ -287,17 +288,22 @@ TextField::cursorRecord()
 }
 
 void
-TextField::display(Renderer& renderer)
+TextField::display(Renderer& renderer, const Transform& base)
 {
+    const DisplayObject::MaskRenderer mr(renderer, *this);
+
     registerTextVariable();
 
     const bool drawBorder = getDrawBorder();
     const bool drawBackground = getDrawBackground();
 
-    const SWFMatrix& wmat = getWorldMatrix();
+    Transform xform = base * transform();
 
-    if ((drawBorder || drawBackground) && !_bounds.is_null())
-    {
+    // This is a hack to handle device fonts, which are not affected by
+    // color transform.
+    if (getEmbedFonts()) xform.colorTransform = SWFCxForm();
+
+    if ((drawBorder || drawBackground) && !_bounds.is_null()) {
 
         std::vector<point> coords(4);
 
@@ -315,7 +321,7 @@ TextField::display(Renderer& renderer)
         rgba backgroundColor = drawBackground ? getBackgroundColor() :
                                                 rgba(0,0,0,0);
 
-        cxform cx = get_world_cxform();
+        SWFCxForm cx = xform.colorTransform;
             
         if (drawBorder) borderColor = cx.transform(borderColor);
          
@@ -326,7 +332,7 @@ TextField::display(Renderer& renderer)
 #endif
 
         renderer.draw_poly(&coords.front(), 4, backgroundColor, 
-                borderColor, wmat, true);
+                borderColor, xform.matrix, true);
         
     }
 
@@ -335,10 +341,9 @@ TextField::display(Renderer& renderer)
     // A cleaner implementation is likely correctly setting the
     // _xOffset and _yOffset memebers in glyph records.
     // Anyway, see bug #17954 for a testcase.
-    SWFMatrix m = getWorldMatrix();
-
     if (!_bounds.is_null()) {
-        m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
+        xform.matrix.concatenate_translation(_bounds.get_x_min(),
+                _bounds.get_y_min()); 
     }
 
     _displayRecords.clear();
@@ -352,7 +357,8 @@ TextField::display(Renderer& renderer)
     for (size_t i = 0; i < _textRecords.size(); ++i) {
         recordline = 0;
         //find the line the record is on
-        while (recordline < _line_starts.size() && _line_starts[recordline] <= _recordStarts[i]) {
+        while (recordline < _line_starts.size() && 
+                _line_starts[recordline] <= _recordStarts[i]) {
             ++recordline;
         }
         //offset the line
@@ -364,18 +370,17 @@ TextField::display(Renderer& renderer)
         }
     }
         
-    SWF::TextRecord::displayRecords(renderer, m, get_world_cxform(),
-            _displayRecords, _embedFonts);
+    SWF::TextRecord::displayRecords(renderer, xform, _displayRecords,
+            _embedFonts);
 
-    if (m_has_focus && !isReadOnly()) show_cursor(renderer, wmat);
+    if (m_has_focus && !isReadOnly()) show_cursor(renderer, xform.matrix);
     
     clear_invalidated();
 }
 
 
 void
-TextField::add_invalidated_bounds(InvalidatedRanges& ranges, 
-    bool force)
+TextField::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
     if (!force && !invalidated()) return; // no need to redraw
     
@@ -527,7 +532,7 @@ TextField::notifyEvent(const event_id& ev)
             boost::int32_t x_mouse, y_mouse;
             root.get_mouse_state(x_mouse, y_mouse);
 			
-			SWFMatrix m = getMatrix();
+			SWFMatrix m = getMatrix(*this);
 			
 			x_mouse -= m.get_x_translation();
 			y_mouse -= m.get_y_translation();
@@ -776,7 +781,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     // Not selectable, so don't catch mouse events!
     if (!_selectable) return 0;
 
-    SWFMatrix m = getMatrix();
+    SWFMatrix m = getMatrix(*this);
     point p(x, y);
     m.invert().transform(p);
 
@@ -1102,7 +1107,6 @@ TextField::format_text()
     // FIXME: I don't think we should query the definition
     // to find the appropriate font to use, as ActionScript
     // code should be able to change the font of a TextField
-    //
     if (!_font) {
         log_error(_("No font for TextField!"));
         return;
@@ -2378,19 +2382,6 @@ TextField::setWordWrap(bool wrap)
         _wordWrap = wrap;
         format_text();
     }
-}
-
-cxform    
-TextField::get_world_cxform() const
-{
-    // This is not automatically tested. See testsuite/samples/input-fields.swf
-    // for a manual check.
-
-    // If using a device font (PP compatibility), do not take parent cxform
-    // into account.
-    if (!getEmbedFonts()) return cxform();
-
-    return DisplayObject::get_world_cxform();
 }
 
 void

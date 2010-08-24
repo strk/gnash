@@ -24,23 +24,25 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
-#include "event_id.h" // for inlines
-#include "SWFRect.h" // for composition (invalidated bounds)
-#include "SWFMatrix.h" // for composition
-#include "cxform.h" // for composition
-#include "dsodefs.h" //for DSOEXPORT
-#include "snappingrange.h"
-#include "VM.h"
-#ifdef USE_SWFTREE
-# include "tree.hh"
-#endif
-
 #include <vector>
 #include <map>
 #include <string>
 #include <cassert>
 #include <boost/cstdint.hpp> // For C99 int types
 #include <boost/noncopyable.hpp>
+
+#include "Transform.h"
+#include "event_id.h" 
+#include "SWFRect.h"
+#include "SWFMatrix.h"
+#include "SWFCxForm.h"
+#include "dsodefs.h" 
+#include "snappingrange.h"
+#include "VM.h"
+#ifdef USE_SWFTREE
+# include "tree.hh"
+#endif
+
 
 //#define DEBUG_SET_INVALIDATED 1
 
@@ -270,9 +272,11 @@ public:
     virtual int getDefinitionVersion() const {
         return -1;
     }
+    
+    const Transform& transform() const {
+        return _transform;
+    }
 
-    /// Get local transform SWFMatrix for this DisplayObject
-    const SWFMatrix& getMatrix() const { return m_matrix; }
 
     /// Set local transform SWFMatrix for this DisplayObject
     //
@@ -329,21 +333,18 @@ public:
     ///
     virtual void setHeight(double height);
 
-    const cxform& get_cxform() const { return m_color_transform; }
-
-    void set_cxform(const cxform& cx) 
+    void setCxForm(const SWFCxForm& cx) 
     {       
-        if (cx != m_color_transform) {
-            set_invalidated(__FILE__, __LINE__);
-            m_color_transform = cx;
+        if (_transform.colorTransform != cx) {
+            set_invalidated();
+            _transform.colorTransform = cx;
         }
     }
 
     int get_ratio() const { return _ratio; }
 
-    void set_ratio(int r)
-    {
-        if (r != _ratio) set_invalidated(__FILE__, __LINE__); 
+    void set_ratio(int r) {
+        if (r != _ratio) set_invalidated(); 
         _ratio = r;       
     }
 
@@ -428,10 +429,10 @@ public:
 
     /// \brief
     /// Get our concatenated color transform (all our ancestor transforms,
-    /// times our cxform). 
+    /// times our SWFCxForm). 
     ///
     /// Maps from our local space into normal color space.
-    virtual cxform get_world_cxform() const;
+    SWFCxForm getWorldCxForm() const;
 
     /// Get the built-in function handlers code for the given event
     //
@@ -467,7 +468,7 @@ public:
     /// Render the DisplayObject.
     //
     /// All DisplayObjects must have a display() function.
-	virtual void display(Renderer& renderer) = 0;
+	virtual void display(Renderer& renderer, const Transform& xform) = 0;
 
     /// Search for StaticText objects
     //
@@ -961,6 +962,24 @@ public:
 
 protected:
     
+    /// Render a dynamic mask for a specified DisplayObject
+    //
+    /// Dynamic masks are rendered out-of-turn when the object they are masking
+    /// is drawn. 
+    //
+    /// A MaskRenderer object should be constructed at the beginning of
+    /// relevant display() functions; it then takes care of rendering the
+    /// mask with the appropriate transform and cleaning up afterwards.
+    class MaskRenderer
+    {
+    public:
+        MaskRenderer(Renderer& r, const DisplayObject& o);
+        ~MaskRenderer();
+    private:
+        Renderer& _renderer;
+        DisplayObject* _mask;
+    };
+
     virtual bool unloadChildren() { return false; }
 
     /// Get the movie_root to which this DisplayObject belongs.
@@ -978,7 +997,6 @@ protected:
     {
         _origTarget=getTarget();
     }
-
 
     const Events& get_event_handlers() const
     {
@@ -1026,9 +1044,7 @@ private:
     /// The movie_root to which this DisplayObject belongs.
     movie_root& _stage;
 
-    cxform m_color_transform;
-    
-    SWFMatrix m_matrix;
+    Transform _transform;
     
     Events _event_handlers;
 
@@ -1100,6 +1116,20 @@ private:
 
 
 };
+
+/// Get local transform SWFMatrix for this DisplayObject
+inline const SWFMatrix&
+getMatrix(const DisplayObject& o)
+{ 
+    return o.transform().matrix;
+}
+
+inline const SWFCxForm&
+getCxForm(const DisplayObject& o) 
+{
+    return o.transform().colorTransform;
+}
+
 
 inline bool
 isReferenceable(const DisplayObject& d)

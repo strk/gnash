@@ -240,7 +240,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
             e = _textFields.end(); field != e; ++field) {
 
         const Records& rec = field->second;
-        const SWFMatrix& mat = field->first->getMatrix();
+        const SWFMatrix& mat = getMatrix(*field->first);
         const boost::dynamic_bitset<>& selected = field->first->getSelected();
 
         const std::string::size_type fieldStartIndex = pos;

@@ -22,8 +22,11 @@
 #include "gnashconfig.h" // USE_SWF_TREE
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "Button.h"
+
+#include <boost/bind.hpp>
+
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "DefineButtonTag.h"
 #include "as_value.h"
 #include "Button.h"
@@ -41,8 +44,7 @@
 #include "Global_as.h" 
 #include "RunResources.h"
 #include "sound_definition.h"
-
-#include <boost/bind.hpp>
+#include "Transform.h"
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -355,8 +357,11 @@ Button::handleFocus() {
 
 
 void
-Button::display(Renderer& renderer)
+Button::display(Renderer& renderer, const Transform& base)
 {
+    const DisplayObject::MaskRenderer mr(renderer, *this);
+
+    const Transform xform = base * transform();
 
     DisplayObjects actChars;
     getActiveCharacters(actChars);
@@ -366,7 +371,7 @@ Button::display(Renderer& renderer)
 
     for (DisplayObjects::iterator it = actChars.begin(), e = actChars.end();
             it != e; ++it) {
-        (*it)->display(renderer);
+        (*it)->display(renderer, xform);
     }
 
     clear_invalidated();
@@ -394,7 +399,7 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     {
         std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-        SWFMatrix  m = getMatrix();
+        SWFMatrix m = getMatrix(*this);
         point  p(x, y);
         m.invert().transform(p);
 
@@ -754,7 +759,7 @@ Button::getBounds() const
         const DisplayObject* ch = *i;
         // Child bounds need be transformed in our coordinate space
         SWFRect lclBounds = ch->getBounds();
-        SWFMatrix m = ch->getMatrix();
+        SWFMatrix m = getMatrix(*ch);
         allBounds.expand_to_transformed_rect(m, lclBounds);
     }
 

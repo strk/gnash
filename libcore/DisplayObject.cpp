@@ -155,7 +155,7 @@ DisplayObject::getWorldMatrix(bool includeRoot) const
 	if (_parent) {
 	    m = _parent->getWorldMatrix(includeRoot);
 	}
-    if (_parent || includeRoot) m.concatenate(getMatrix());
+    if (_parent || includeRoot) m.concatenate(getMatrix(*this));
 
 	return m;
 }
@@ -172,15 +172,15 @@ DisplayObject::getWorldVolume() const
 	return volume;
 }
 
-cxform
-DisplayObject::get_world_cxform() const
+SWFCxForm
+DisplayObject::getWorldCxForm() const
 {
-	cxform	m;
+	SWFCxForm	m;
 	if (_parent != NULL)
 	{
-	    m = _parent->get_world_cxform();
+	    m = _parent->getWorldCxForm();
 	}
-	m.concatenate(get_cxform());
+	m.concatenate(getCxForm(*this));
 
 	return m;
 }
@@ -372,7 +372,7 @@ DisplayObject::setWidth(double newwidth)
     const double xscale = oldwidth ? (newwidth / oldwidth) : 0; 
     const double rotation = _rotation * PI / 180.0;
 
-    SWFMatrix m = getMatrix();
+    SWFMatrix m = getMatrix(*this);
     const double yscale = m.get_y_scale(); 
     m.set_scale_rotation(xscale, yscale, rotation);
     setMatrix(m, true); 
@@ -382,7 +382,7 @@ as_value
 getHeight(DisplayObject& o)
 {
 	SWFRect bounds = o.getBounds();
-    const SWFMatrix m = o.getMatrix();
+    const SWFMatrix m = getMatrix(o);
     m.transform(bounds);
     return twipsToPixels(bounds.height());      
 }
@@ -411,7 +411,7 @@ DisplayObject::setHeight(double newheight)
     const double yscale = oldheight ? (newheight / oldheight) : 0;
     const double rotation = _rotation * PI / 180.0;
 
-    SWFMatrix m = getMatrix();
+    SWFMatrix m = getMatrix(*this);
     const double xscale = m.get_x_scale();
     m.set_scale_rotation(xscale, yscale, rotation);
     setMatrix(m, true);
@@ -421,18 +421,17 @@ void
 DisplayObject::setMatrix(const SWFMatrix& m, bool updateCache)
 {
 
-    if (m == m_matrix) return;
+    if (m == _transform.matrix) return;
 
     //log_debug("setting SWFMatrix to: %s", m);
     set_invalidated(__FILE__, __LINE__);
-    m_matrix = m;
+    _transform.matrix = m;
 
     // don't update caches if SWFMatrix wasn't updated too
-    if (updateCache) 
-    {
-        _xscale = m_matrix.get_x_scale() * 100.0;
-        _yscale = m_matrix.get_y_scale() * 100.0;
-        _rotation = m_matrix.get_rotation() * 180.0 / PI;
+    if (updateCache) {
+        _xscale = _transform.matrix.get_x_scale() * 100.0;
+        _yscale = _transform.matrix.get_y_scale() * 100.0;
+        _rotation = _transform.matrix.get_rotation() * 180.0 / PI;
     }
 
 }
@@ -553,7 +552,7 @@ DisplayObject::set_x_scale(double scale_percent)
     // we don't need to recompute the SWFMatrix from the 
     // caches.
 
-	SWFMatrix m = getMatrix();
+	SWFMatrix m = getMatrix(*this);
 
     m.set_x_scale(xscale);
 
@@ -577,7 +576,7 @@ DisplayObject::set_rotation(double rot)
 
     if (_xscale < 0 ) rotation += PI; 
 
-	SWFMatrix m = getMatrix();
+	SWFMatrix m = getMatrix(*this);
     m.set_rotation(rotation);
 
     // Update the matrix from the cached x scale to avoid accumulating
@@ -609,7 +608,7 @@ DisplayObject::set_y_scale(double scale_percent)
 
 	_yscale = scale_percent;
 
-	SWFMatrix m = getMatrix();
+	SWFMatrix m = getMatrix(*this);
     m.set_y_scale(yscale);
 	setMatrix(m); // we updated the cache ourselves
 
@@ -1011,7 +1010,28 @@ setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     string_table& st = getStringTable(*getObject(&obj));
     return doSet(st.noCase(key), obj, val);
 }
+    
+DisplayObject::MaskRenderer::MaskRenderer(Renderer& r, const DisplayObject& o)
+    :
+    _renderer(r),
+    _mask(o.visible() && o.getMask() && !o.getMask()->unloaded() ? o.getMask()
+                                                                 : 0)
+{
+    if (!_mask) return;
 
+    _renderer.begin_submit_mask();
+    DisplayObject* p = _mask->get_parent();
+    const Transform tr = p ?
+        Transform(p->getWorldMatrix(), p->getWorldCxForm()) : Transform(); 
+    _mask->display(_renderer, tr);
+    _renderer.end_submit_mask();
+}
+
+DisplayObject::MaskRenderer::~MaskRenderer()
+{
+    if (_mask) _renderer.disable_mask();
+}
+        
 namespace {
 
 as_value
@@ -1126,7 +1146,7 @@ setY(DisplayObject& o, const as_value& val)
         return;
     }
 
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
     m.set_y_translation(pixelsToTwips(infinite_to_zero(newy)));
     o.setMatrix(m); 
@@ -1136,7 +1156,7 @@ setY(DisplayObject& o, const as_value& val)
 as_value
 getY(DisplayObject& o)
 {
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     return twipsToPixels(m.get_y_translation());
 }
 
@@ -1157,7 +1177,7 @@ setX(DisplayObject& o, const as_value& val)
         return;
     }
 
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
     m.set_x_translation(pixelsToTwips(infinite_to_zero(newx)));
     o.setMatrix(m); 
@@ -1167,7 +1187,7 @@ setX(DisplayObject& o, const as_value& val)
 as_value
 getX(DisplayObject& o)
 {
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     return twipsToPixels(m.get_x_translation());
 }
 
@@ -1261,7 +1281,7 @@ setVisible(DisplayObject& o, const as_value& val)
 as_value
 getAlpha(DisplayObject& o)
 {
-    return as_value(o.get_cxform().aa / 2.56);
+    return as_value(getCxForm(o).aa / 2.56);
 }
 
 void
@@ -1283,7 +1303,7 @@ setAlpha(DisplayObject& o, const as_value& val)
         return;
     }
 
-    cxform cx = o.get_cxform();
+    SWFCxForm cx = getCxForm(o);
 
     // Overflows are *not* truncated, but set to -32768.
     if (newAlpha > std::numeric_limits<boost::int16_t>::max() ||
@@ -1294,7 +1314,7 @@ setAlpha(DisplayObject& o, const as_value& val)
         cx.aa = static_cast<boost::int16_t>(newAlpha);
     }
 
-    o.set_cxform(cx);
+    o.setCxForm(cx);
     o.transformedByScript();  
 
 }
@@ -1399,7 +1419,7 @@ as_value
 getWidth(DisplayObject& o)
 {
 	SWFRect bounds = o.getBounds();
-    const SWFMatrix& m = o.getMatrix();
+    const SWFMatrix& m = getMatrix(o);
     m.transform(bounds);
     return twipsToPixels(bounds.width());
 }

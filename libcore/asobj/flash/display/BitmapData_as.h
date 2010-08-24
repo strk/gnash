@@ -32,10 +32,13 @@
 #include "Relay.h"
 #include "CachedBitmap.h"
 #include "GnashImage.h"
+#include "ImageIterators.h"
 
 namespace gnash {
     class as_object;
     struct ObjectURI;
+    class MovieClip;
+    struct Transform;
     class DisplayObject;
     class GnashImage;
 }
@@ -48,15 +51,16 @@ namespace gnash {
 /// do not need to check.
 class BitmapData_as : public Relay
 {
-
 public:
+
+    typedef image::pixel_iterator<image::ARGB> iterator;
 
     /// Construct a BitmapData.
     //
-    /// The constructor sets the fill colour and the immutable size of the
+    /// The constructor sets the immutable size of the
     /// bitmap, as well as whether it can handle transparency or not.
-	BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im,
-	              boost::uint32_t fillColor);
+	BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im);
+	
 
     virtual ~BitmapData_as() {}
 
@@ -88,10 +92,10 @@ public:
     /// Set a specified pixel to the specified color.
     //
     /// Retains transparency value for BitmapDatas with transparency.
-    void setPixel(size_t x, size_t y, boost::uint32_t color);
+    void setPixel(size_t x, size_t y, boost::uint32_t color) const;
 
     /// Set a specified pixel to the specified color.
-    void setPixel32(size_t x, size_t y, boost::uint32_t color);
+    void setPixel32(size_t x, size_t y, boost::uint32_t color) const;
 
     /// Returns the value of the pixel at (x, y).
     //
@@ -102,9 +106,15 @@ public:
     //
     /// Negative values are handled correctly.
     void fillRect(int x, int y, int w, int h, boost::uint32_t color);
+
+    void floodFill(size_t x, size_t y, boost::uint32_t old,
+            boost::uint32_t fill);
     
     /// Free the bitmap data
     void dispose();
+    
+    /// Draw a MovieClip to a BitmapData
+    void draw(MovieClip& mc, const Transform& transform);
 
     /// Attach this BitmapData to an object
     //
@@ -119,6 +129,16 @@ public:
     /// Whether the BitmapData has been disposed.
     bool disposed() const {
         return !data();
+    }
+ 
+    iterator begin() const {
+        assert(!disposed());
+        return image::begin<image::ARGB>(*data());
+    }
+    
+    iterator end() const {
+        assert(!disposed());
+        return image::end<image::ARGB>(*data());
     }
 
 private:
@@ -143,6 +163,8 @@ private:
 
 /// Initialize the global BitmapData class
 void bitmapdata_class_init(as_object& where, const ObjectURI& uri);
+
+void registerBitmapDataNative(as_object& global);
 
 } // end of gnash namespace
 

@@ -233,19 +233,6 @@ private:
 };
 
 
-/// Check that the 'this' pointer is a particular type
-//
-/// NB: this function and is deprecated.
-template<typename T>
-struct ThisIs
-{
-    typedef T value_type;
-    value_type* operator()(as_object* o) const {
-        return dynamic_cast<value_type*>(o);
-    }
-};
-
-
 /// Check that the 'this' pointer has a particular native type ('Relay').
 //
 /// This is the most likely of the cases to reflect AS behaviour.

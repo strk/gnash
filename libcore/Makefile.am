@@ -67,7 +67,7 @@ libgnashcore_la_SOURCES = \
 	DisplayObjectContainer.cpp \
 	DisplayObject.cpp \
 	CharacterProxy.cpp \
-	cxform.cpp \
+	SWFCxForm.cpp \
 	Geometry.cpp \
 	DynamicShape.cpp	\
 	Bitmap.cpp \
@@ -158,6 +158,7 @@ noinst_HEADERS = \
 	ManualClock.h \
 	Bitmap.h \
 	BitmapMovie.h \
+	Transform.h \
 	Button.h \
 	debugger.h \
 	TextField.h \
@@ -268,7 +269,7 @@ EXTENSIONS_API = \
 	StreamProvider.h \
 	event_id.h \
 	SWFMatrix.h \
-	cxform.h \
+	SWFCxForm.h \
 	DisplayList.h	\
 	DynamicShape.h	\
 	swf/ControlTag.h \

@@ -21,7 +21,6 @@
 #ifndef GNASH_ASOBJ_COLORTRANSFORM_H
 #define GNASH_ASOBJ_COLORTRANSFORM_H
 
-
 #include "Relay.h"
 
 namespace gnash {

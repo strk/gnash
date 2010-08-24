@@ -29,8 +29,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
 #include <memory> 
-#include <boost/iterator/iterator_facade.hpp>
-#include <iterator>
 
 #include "FileTypes.h"
 #include "log.h"
@@ -72,98 +70,6 @@ numChannels(ImageType t)
     }
 }
 
-template<typename Iterator>
-class ARGB
-{
-public:
-
-    ARGB(Iterator i, ImageType t)
-        :
-        _it(i),
-        _t(t)
-    {}
-    
-    /// Writes a 32-bit unsigned value in ARGB byte order to the image
-    //
-    /// Take note of the different byte order!
-    ARGB& operator=(boost::uint32_t pixel) {
-        switch (_t) {
-            case GNASH_IMAGE_RGBA:
-                // alpha
-                *(_it + 3) = (pixel & 0xff000000) >> 24;
-            case GNASH_IMAGE_RGB:
-                *_it = (pixel & 0x00ff0000) >> 16;
-                *(_it + 1) = (pixel & 0x0000ff00) >> 8;
-                *(_it + 2) = (pixel & 0x000000ff);
-            default:
-                break;
-        }
-        return *this;
-    }
-
-private:
-    Iterator _it;
-    ImageType _t;
-};
-
-template<typename Iterator, typename Pixel>
-struct pixel_iterator : public boost::iterator_facade<
-                            pixel_iterator<Iterator, Pixel>,
-                            boost::uint32_t,
-                            std::random_access_iterator_tag,
-                            Pixel>
-{
-
-    typedef std::ptrdiff_t difference_type;
-
-    pixel_iterator(Iterator it, ImageType t)
-        :
-        _it(it),
-        _t(t)
-    {}
- 
-    boost::uint32_t toARGB() const {
-        boost::uint32_t ret = 0xff000000;
-        switch (_t) {
-            case GNASH_IMAGE_RGBA:
-                // alpha
-                ret = *(_it + 3) << 24;
-            case GNASH_IMAGE_RGB:
-                ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
-            default:
-                break;
-        }
-        return ret;
-    }
-
-private:
-
-    friend class boost::iterator_core_access;
-
-    Pixel dereference() const {
-        return Pixel(_it, _t);
-    }
-
-    void increment() {
-        _it += numChannels(_t);
-    }
-
-    bool equal(const pixel_iterator& o) const {
-        return o._it == _it;
-    }
-
-    difference_type distance_to(const pixel_iterator& o) const {
-        return (o._it - _it) / numChannels(_t);
-    }
-
-    void advance(difference_type n) {
-        _it += n * numChannels(_t);
-    }
-
-    Iterator _it;
-    ImageType _t;
-};
-
 /// Base class for different types of bitmaps
 //
 /// 1. Bytes are packed in RGB(A) order.
@@ -176,8 +82,6 @@ public:
     typedef boost::scoped_array<value_type> container_type;
     typedef value_type* iterator;
     typedef const value_type* const_iterator;
-
-    typedef pixel_iterator<iterator, ARGB<iterator> > argb_iterator;
 
     virtual ~GnashImage() {}
 
@@ -266,16 +170,6 @@ public:
         return begin() + size();
     }
 
-    /// An iterator to write data in ARGB format to the bitmap
-    argb_iterator argb_begin() {
-        return argb_iterator(begin(), _type);
-    }
-    
-    /// An argb_iterator to the end of the data.
-    argb_iterator argb_end() {
-        return argb_iterator(end(), _type);
-    }
-
 protected:
 
     /// Construct a GnashImage from a data buffer, taking ownership of the data.
@@ -298,7 +192,6 @@ protected:
     /// @param type     The ImageType of the image.
     GnashImage(size_t width, size_t height, ImageType type,
                ImageLocation location = GNASH_IMAGE_CPU);
-
 
     /// The type of the image: RGBA or RGB.
     const ImageType _type;

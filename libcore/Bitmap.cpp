@@ -26,6 +26,7 @@
 #include "VM.h"
 #include "movie_root.h"
 #include "RunResources.h"
+#include "Transform.h"
 
 namespace gnash {
 
@@ -107,12 +108,14 @@ Bitmap::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 }
 
 void
-Bitmap::display(Renderer& renderer)
+Bitmap::display(Renderer& renderer, const Transform& base)
 {
     /// Don't display cleared Bitmaps.
     if (!_def && !_bitmapData) return;
+    
+    const Transform xform = base * transform();
 
-    _shape.display(renderer, *this);
+    _shape.display(renderer, xform);
     clear_invalidated();
 }
 

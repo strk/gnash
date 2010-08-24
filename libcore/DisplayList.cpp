@@ -281,13 +281,13 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
         InvalidatedRanges old_ranges;
     
         if (use_old_cxform) {
-            // Use the cxform from the old DisplayObject.
-            ch->set_cxform(oldch->get_cxform());
+            // Use the SWFCxForm from the old DisplayObject.
+            ch->setCxForm(getCxForm(*oldch));
         }
 
         if (use_old_matrix) {
             // Use the SWFMatrix from the old DisplayObject.
-            ch->setMatrix(oldch->getMatrix(), true); 
+            ch->setMatrix(getMatrix(*oldch), true); 
         }
         
         // remember bounds of old char
@@ -320,7 +320,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
 // Updates the transform properties of the DisplayObject at
 // the specified depth.
 void
-DisplayList::moveDisplayObject( int depth, const cxform* color_xform,
+DisplayList::moveDisplayObject( int depth, const SWFCxForm* color_xform,
         const SWFMatrix* mat, int* ratio, int* /* clip_depth */)
 {
     testInvariant();
@@ -347,7 +347,7 @@ DisplayList::moveDisplayObject( int depth, const cxform* color_xform,
         return;
     }
 
-    if (color_xform) ch->set_cxform(*color_xform);
+    if (color_xform) ch->setCxForm(*color_xform);
     if (mat) ch->setMatrix(*mat, true);
     if (ratio) ch->set_ratio(*ratio);
 
@@ -631,7 +631,7 @@ DisplayList::destroy()
 // Display the referenced DisplayObjects. Lower depths
 // are obscured by higher depths.
 void
-DisplayList::display(Renderer& renderer)
+DisplayList::display(Renderer& renderer, const Transform& base)
 {
     testInvariant();
 
@@ -644,24 +644,6 @@ DisplayList::display(Renderer& renderer)
     {
         DisplayObject* ch = *it;
         assert(!ch->isDestroyed());
-
-        DisplayObject* mask = ch->getMask();
-        if (mask && ch->visible() && ! mask->unloaded())
-        {
-            renderer.begin_submit_mask();
-            
-            if (mask->boundsInClippingArea(renderer)) mask->display(renderer);
-            else mask->omit_display();
-              
-            renderer.end_submit_mask();
-            
-            if (ch->boundsInClippingArea(renderer)) ch->display(renderer);
-            else ch->omit_display();
-              
-            renderer.disable_mask();
-            
-            continue;
-        }
 
         // Don't display dynamic masks
         if (ch->isDynamicMask()) continue;
@@ -696,12 +678,14 @@ DisplayList::display(Renderer& renderer)
 
         // Push a new mask to the masks stack
     	if (ch->isMaskLayer()) {
-            int clipDepth = ch->get_clip_depth();
+            const int clipDepth = ch->get_clip_depth();
             clipDepthStack.push(clipDepth);
             renderer.begin_submit_mask();
         }
         
-        if (ch->boundsInClippingArea(renderer)) ch->display(renderer);
+        if (ch->boundsInClippingArea(renderer)) {
+            ch->display(renderer, base);
+        }
         else ch->omit_display();
         
         // Notify the renderer that mask drawing has finished.
@@ -947,8 +931,8 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     // replace the transformation SWFMatrix if the old
                     // DisplayObject accepts static transformation.
                     if (chOld->get_accept_anim_moves()) {
-                        chOld->setMatrix(chNew->getMatrix(), true); 
-                        chOld->set_cxform(chNew->get_cxform());
+                        chOld->setMatrix(getMatrix(*chNew), true); 
+                        chOld->setCxForm(getCxForm(*chNew));
                     }
                     chNew->unload();
                     chNew->destroy();

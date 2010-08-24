@@ -54,7 +54,6 @@ namespace {
 }
 
 
-
 ColorTransform_as::ColorTransform_as(double rm, double gm,
                                      double bm, double am,
                                      double ro, double go,
@@ -111,6 +110,7 @@ registerColorTransformNative(as_object& global)
     vm.registerNative(colortransform_blueOffset, 1105, 108);
     vm.registerNative(colortransform_rgb, 1105, 109);
 }
+
 
 namespace {
 

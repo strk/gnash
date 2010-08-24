@@ -50,6 +50,7 @@
 #include "Camera_as.h"
 #include "Stage_as.h"
 #include "MovieClip_as.h"
+#include "flash/display/BitmapData_as.h"
 #include "flash/filters/BitmapFilter_as.h"
 #include "flash/geom/ColorTransform_as.h"
 #include "LocalConnection_as.h"
@@ -1248,6 +1249,7 @@ registerNatives(as_object& global)
     registerBitmapFilterNative(global);
     registerColorTransformNative(global);
     registerExternalInterfaceNative(global);
+    registerBitmapDataNative(global);
 
     AsBroadcaster::registerNative(global);
     registerTextFormatNative(global);

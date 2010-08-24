@@ -20,6 +20,7 @@
 
 #include "smart_ptr.h"
 #include "Shape.h"
+#include "Transform.h"
 
 namespace gnash
 {
@@ -54,10 +55,12 @@ Shape::pointInShape(boost::int32_t x, boost::int32_t y) const
 }
 
 void  
-Shape::display(Renderer& renderer)
+Shape::display(Renderer& renderer, const Transform& base)
 {
-    if (_def) _def->display(renderer, *this);
-    else _shape->display(renderer, *this);
+    const Transform xform = base * transform();
+
+    if (_def) _def->display(renderer, xform);
+    else _shape->display(renderer, xform);
     clear_invalidated();
 }
 

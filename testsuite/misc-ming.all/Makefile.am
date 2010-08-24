@@ -200,6 +200,7 @@ check_PROGRAMS = \
 	BitmapDataTest \
 	BitmapDataTestRunner \
 	BitmapDataDraw \
+	LoadBitmapTest \
 	BitmapSmoothingTest \
 	$(NULL)
 
@@ -266,6 +267,7 @@ check_PROGRAMS += EmbeddedSoundTest-Runner
 endif
 
 check_SCRIPTS = \
+	LoadBitmapTestRunner \
 	BitmapDataDrawRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
@@ -1614,6 +1616,23 @@ BitmapDataDrawRunner: $(srcdir)/../generic-testrunner.sh BitmapDataDraw.swf
 	sh $< $(top_builddir) BitmapDataDraw.swf > $@
 	chmod 755 $@
 
+LoadBitmapTest_SOURCES = \
+	LoadBitmapTest.c \
+	$(NULL)
+
+LoadBitmapTest_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+LoadBitmapTest_LDADD = libgnashmingutils.la
+
+LoadBitmapTest.swf: LoadBitmapTest
+	./LoadBitmapTest $(abs_mediadir)
+
+LoadBitmapTestRunner: $(srcdir)/../generic-testrunner.sh LoadBitmapTest.swf
+	sh $< $(top_builddir) LoadBitmapTest.swf > $@
+	chmod 755 $@
+
 BeginBitmapFill_SOURCES = \
 	BeginBitmapFill.c \
 	$(NULL)
@@ -2225,6 +2244,7 @@ TEST_CASES = \
 	BeginBitmapFillRunner \
 	BitmapDataTestRunner \
 	BitmapDataDrawRunner \
+	LoadBitmapTestRunner \
 	LoadVarsTestRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \

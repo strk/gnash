@@ -27,6 +27,11 @@
 #include "Geometry.h"
 
 namespace gnash {
+    class Transform;
+    class SWFCxForm;
+}
+
+namespace gnash {
 
     typedef std::vector<Path> PathVec;
     typedef std::vector<const Path*> PathPtrVec;
@@ -40,7 +45,7 @@ public:
 
     CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im);
 
-    void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
+    void drawVideoFrame(GnashImage* baseframe, const Transform& xform,
                                 const SWFRect* bounds, bool smooth);
 
     geometry::Range2d<int> world_to_pixel(const SWFRect& worldbounds);
@@ -49,12 +54,18 @@ public:
     void set_color(const rgba& c);
 
     void set_invalidated_regions(const InvalidatedRanges& ranges);
+      
+    virtual Renderer* startInternalRender(GnashImage& /*im*/) {
+        return 0;
+    }
 
-    void begin_display(const rgba& bg_color,
+    virtual void endInternalRender() {}
+
+    virtual void begin_display(const rgba& bg_color,
                        int viewport_width, int viewport_height,
                        float x0, float x1, float y0, float y1);
 
-    void end_display();
+    virtual void end_display();
 
     void set_scale(float xscale, float yscale);
 
@@ -75,18 +86,18 @@ public:
 
     void add_path(cairo_t* cr, const Path& cur_path);
 
-    void apply_line_style(const LineStyle& style, const cxform& cx,
+    void apply_line_style(const LineStyle& style, const SWFCxForm& cx,
                           const SWFMatrix& mat);
 
     void draw_outlines(const PathVec& path_vec,
                        const std::vector<LineStyle>& line_styles,
-                       const cxform& cx,
+                       const SWFCxForm& cx,
                        const SWFMatrix& mat);
 
     std::vector<PathVec::const_iterator> find_subshapes(const PathVec& path_vec);
 
     void draw_subshape(const PathVec& path_vec,
-                       const SWFMatrix& mat, const cxform& cx,
+                       const SWFMatrix& mat, const SWFCxForm& cx,
                        const std::vector<FillStyle>& FillStyles,
                        const std::vector<LineStyle>& line_styles);
 
@@ -96,8 +107,7 @@ public:
 
     void apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat);
 
-    void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
-                   const SWFMatrix& mat);
+    void drawShape(const SWF::ShapeRecord& shape, const Transform& xform);
 
     void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
                    const SWFMatrix& mat);

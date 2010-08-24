@@ -157,20 +157,20 @@ SWFMatrix::concatenate(const SWFMatrix& m)
     *this = t;
 }
 
-void
-SWFMatrix::concatenate_translation(int xoffset, int yoffset)
 // Concatenate a translation onto the front of our
 // SWFMatrix.  When transforming points, the translation
 // happens first, then our original xform.
+void
+SWFMatrix::concatenate_translation(int xoffset, int yoffset)
 {
     tx += Fixed16Mul(sx,  xoffset) + Fixed16Mul(shy, yoffset);
     ty += Fixed16Mul(shx, xoffset) + Fixed16Mul(sy, yoffset);
 }
 
-void
-SWFMatrix::concatenate_scale(double xscale, double yscale)
 // Concatenate scales to our SWFMatrix. When transforming points, these 
 // scales happen first, then our matirx.
+void
+SWFMatrix::concatenate_scale(double xscale, double yscale)
 {
     sx  = Fixed16Mul(sx, DoubleToFixed16(xscale));
     shy = Fixed16Mul(shy,DoubleToFixed16(yscale));
@@ -190,10 +190,10 @@ SWFMatrix::set_lerp(const SWFMatrix& m1, const SWFMatrix& m2, float t)
     ty = lerp<float>(m1.ty, m2.ty, t);
 }
 
-void
-SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 // Set the scale & rotation part of the SWFMatrix.
 // angle in radians.
+void
+SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 {
     const double cos_angle = std::cos(angle);
     const double sin_angle = std::sin(angle);
@@ -245,9 +245,9 @@ SWFMatrix::set_rotation(double rotation)
     sy = DoubleToFixed16(scale_y * std::cos(rot_y - rot_x + rotation));
 }
 
+// Transform point 'p' by our SWFMatrix.  Put the result in *result.
 void
 SWFMatrix::transform(point* result, const point& p) const
-// Transform point 'p' by our SWFMatrix.  Put the result in *result.
 {
     assert(result);
 
@@ -310,13 +310,15 @@ SWFMatrix::invert()
 double
 SWFMatrix::get_x_scale() const
 {
-    return std::sqrt((static_cast<double>(sx) * sx + static_cast<double>(shx) * shx)) / 65536.0;
+    return std::sqrt((static_cast<double>(sx) * sx +
+                static_cast<double>(shx) * shx)) / 65536.0;
 }
 
 double
 SWFMatrix::get_y_scale() const
 {
-    return std::sqrt((static_cast<double>(sy) * sy + static_cast<double>(shy) * shy)) / 65536.0;
+    return std::sqrt((static_cast<double>(sy) * sy +
+                static_cast<double>(shy) * shy)) / 65536.0;
 }
 
 double
@@ -329,7 +331,6 @@ SWFMatrix::get_rotation() const
 // private
 boost::int64_t
 SWFMatrix::determinant() const
-// Return the 32.32 fixed point determinant of this SWFMatrix.
 {
     // | sx	shy	tx |
     // | shx	sy	ty |   = T. Using the Leibniz formula:
@@ -342,7 +343,8 @@ SWFMatrix::determinant() const
     return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
 }
 
-std::ostream& operator<< (std::ostream& o, const SWFMatrix& m)
+std::ostream&
+operator<<(std::ostream& o, const SWFMatrix& m)
 {
     // 8 digits and a decimal point.
     const short fieldWidth = 9;
