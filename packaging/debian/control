@@ -4,7 +4,6 @@ Maintainer: Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>
 Build-Depends: dpkg-dev (>= 1.13.19),
 	       debhelper (>= 7.0.0), 
 	       autoconf, automake, libtool,
-	       libltdl3-dev | libltdl-dev, libltdl3 | libltdl7,
 	       libxmu-dev,
 	       autotools-dev,
 	       libjpeg-dev,
