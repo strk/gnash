@@ -2101,8 +2101,6 @@ TextField::parseHTML(std::wstring& tag,
         const std::wstring::const_iterator& e,
         bool& selfclosing) const
 {
-    std::string attname;
-    std::string attvalue;
     while (it != e && *it != ' ') {
         if (*it == '/') {
             ++it;
@@ -2152,6 +2150,10 @@ TextField::parseHTML(std::wstring& tag,
             return false;
         }
     }
+
+    std::string attname;
+    std::string attvalue;
+
     //attributes
     while (it != e && *it != '>') {
         while (it != e && *it != '=' && *it != ' ') {
@@ -2174,19 +2176,18 @@ TextField::parseHTML(std::wstring& tag,
         while (it != e && (*it == ' ' || *it == '=')) {
             ++it; //skip over spaces and '='
         }
-        if (it != e) {
-            if (*it != '"') { //make sure attribute value is opened with '"'
-                log_error("attribute value must be opened with \'\"\' "
-                        "(did you remember escape char?)");
-                while (it != e) {
-                    ++it;
-                }
-                return false;
-            } else {
-                ++it; //skip (")
-            }
+
+        if (it == e) return false;
+        const char q = *it;
+        if (q != '"' && q != '\'') { 
+            // This is not an attribute.
+            while (it != e) ++it;
+            return false;
         }
-        while (it != e && *it != '"') { //get attribute value
+
+        // Advance past attribute opener    
+        ++it; 
+        while (it != e && *it != q) {
 
             if (*it == 0) {
                 log_error("found NULL character in htmlText");
@@ -2196,21 +2197,21 @@ TextField::parseHTML(std::wstring& tag,
             attvalue.push_back(std::toupper(*it));
             ++it;
         }
-        if (it != e) {
-            if (*it != '"') { //make sure attribute value is closed with '"'
-                log_error("attribute value must be closed with \'\"\' "
-                        "(did you remember escape char?)");
-                while (it != e) {
-                    ++it;
-                }
-                return false;
-            } else {
-                ++it; //skip (")
-            }
-        }
+        
+        if (it == e) return false;
+    
+        if (*it != q) { 
+            while (it != e) ++it;
+            return false;
+        } 
+
+        // Skip attribute closer.
+        ++it;
+
         attributes.insert(std::make_pair(attname, attvalue));
-        attname = "";
-        attvalue = "";
+        attname.clear();
+        attvalue.clear();
+
         if ((*it != ' ') && (*it != '/') && (*it != '>')) {
             log_error("malformed HTML tag, invalid attribute value");
             while (it != e) {
