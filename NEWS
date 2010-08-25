@@ -1,5 +1,18 @@
-Gnash 0.8.9
-YYYY/MM/DD
+Gnash 0.8.8
+2010/08/17
+
+ * Renderers are able to be switched at runtime between Cairo,
+   OpenGL, and AGG. 
+ * Media handlers can be switched at runtime between ffmpeg and
+   Gstreamer.
+ * Hardware video decoding support via VAAPI for Nvidia, ATI, and
+   Intel GPUs. 
+ * Android specific support.
+ * Gnash now compiles faster due to reduce internal dependencies.
+ * Mostly complete Scriptable Plugin support which works with the
+   ExternalInterface class.
+ * Improved input device handling when using a raw framebuffer.
+ * 100% of all YouTube videos should work 
 
 Gnash 0.8.8
 2010/08/17

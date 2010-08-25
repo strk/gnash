@@ -113,7 +113,7 @@ application.
 %package fileio-extension
 Summary:   Fileio extension for Gnash
 Group:     Applications/Multimedia
-Requires:  gnash-commo
+Requires:  gnash-common
 
 %description fileio-extension
 This extension allows SWF files being played within Gnash to have direct access

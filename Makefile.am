@@ -84,6 +84,8 @@ endif
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
 EXTRA_DIST =  \
+	README \
+	README.git \
 	autogen.sh \
 	config.rpath \
 	macros/incllist macros/libslist \
@@ -92,6 +94,10 @@ EXTRA_DIST =  \
 	ChangeLog-0.8.2 \
 	ChangeLog-0.8.3 \
 	ChangeLog-0.8.4 \
+	ChangeLog-0.8.5 \
+	ChangeLog-0.8.6 \
+	ChangeLog-0.8.7 \
+	ChangeLog-0.8.8 \
 	packaging/deb.am \
 	packaging/snapshot.am \
 	packaging/alp.am \
