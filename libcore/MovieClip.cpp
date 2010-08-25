@@ -538,7 +538,7 @@ MovieClip*
 MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         as_object* initObject)
 {
-    DisplayObject* parent_ch = get_parent();
+    DisplayObject* parent_ch = parent();
     if (!parent_ch) {
         log_error(_("Can't clone root of the movie"));
         return NULL;
@@ -653,7 +653,7 @@ MovieClip::notifyEvent(const event_id& id)
         do
         {
             // we don't skip calling user-defined onLoad for top-level movies 
-            if ( ! get_parent() ) break;
+            if ( ! parent() ) break;
             // nor if there are clip-defined handler
             if ( ! get_event_handlers().empty() ) break; 
             // nor if it's dynamic  
@@ -1346,8 +1346,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 inline bool
 MovieClip::hitTestDrawable(boost::int32_t x, boost::int32_t y) const
 {
-    SWFMatrix wm = getWorldMatrix();
-    wm.invert();
+    const SWFMatrix wm = getWorldMatrix(*this).invert();
     point lp(x, y);
     wm.transform(lp);
     if (!_drawable.getBounds().point_test(lp.x, lp.y)) return false;
@@ -1378,15 +1377,14 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 
     // point is in parent's space, we need to convert it in world space
     point wp(x, y);
-    DisplayObject* parent = get_parent();
-    if ( parent ) 
-    {
+    DisplayObject* p = parent();
+    if (p) {
         // WARNING: if we have NO parent, our parent is the Stage (movie_root)
         //          so, in case we'll add a "stage" matrix, we'll need to take
         //          it into account here.
         // TODO: actually, why are we insisting in using parent's
         //          coordinates for this method at all ?
-        parent->getWorldMatrix().transform(wp);
+        getWorldMatrix(*p).transform(wp);
     }
 
     if (mouseEnabled())
@@ -1396,8 +1394,9 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     }
 
     SWFMatrix m = getMatrix(*this);
+    m.invert();
     point pp(x, y);
-    m.invert().transform(pp);
+    m.transform(pp);
 
     MouseEntityFinder finder(wp, pp);
     _displayList.visitAll(finder);
@@ -1689,7 +1688,9 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 
     /// Add drawable.
     SWFRect bounds;
-    bounds.expand_to_transformed_rect(getWorldMatrix(), _drawable.getBounds());
+    bounds.expand_to_transformed_rect(getWorldMatrix(*this),
+            _drawable.getBounds());
+
     ranges.add(bounds.getRange());
 
 }
@@ -1703,7 +1704,7 @@ MovieClip::constructAsScriptObject()
     // A MovieClip should always have an associated object.
     assert(mc);
 
-    if (!get_parent()) {
+    if (!parent()) {
         mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
     }
 
@@ -1764,7 +1765,7 @@ MovieClip::construct(as_object* initObj)
     // See misc-ming.all/action_execution_order_test4.{c,swf}
     //
     assert(!_callingFrameActions); // or will not be queuing actions
-    if (!get_parent()) {
+    if (!parent()) {
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
                 SWF::ControlTag::TAG_ACTION);
         if (getSWFVersion(*getObject(this)) > 5) {
@@ -1846,10 +1847,9 @@ MovieClip::unloadChildren()
 void
 MovieClip::getLoadedMovie(Movie* extern_movie)
 {
-    DisplayObject* parent = get_parent();
-    if (parent)
-    {
-        extern_movie->set_parent(parent);
+    DisplayObject* p = parent();
+    if (p) {
+        extern_movie->set_parent(p);
 
         // Copy own lockroot value
         extern_movie->setLockRoot(getLockRoot());
@@ -1874,7 +1874,7 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
         //       could as well be a button I guess...
         //       At most we should require it to be a
         //       DisplayObjectContainer and log an error if it's not.
-        MovieClip* parent_sp = parent->to_movie();
+        MovieClip* parent_sp = p->to_movie();
         assert(parent_sp);
         parent_sp->_displayList.replaceDisplayObject(extern_movie, get_depth(),
                 true, true);
@@ -1994,15 +1994,13 @@ MovieClip::removeMovieClip()
         return;
     }
 
-    MovieClip* parent = dynamic_cast<MovieClip*>(get_parent());
-    if (parent)
-    {
+    MovieClip* p = dynamic_cast<MovieClip*>(parent());
+    if (p) {
         // second argument is arbitrary, see comments above
         // the function declaration in MovieClip.h
-        parent->remove_display_object(depth, 0);
+        p->remove_display_object(depth, 0);
     }
-    else
-    {
+    else {
         // removing _level#
         stage().dropLevel(depth);
         // I guess this can only happen if someone uses 
@@ -2139,8 +2137,8 @@ MovieClip::getAsRoot()
     //                then recursion.
     //                
 
-    DisplayObject* parent = get_parent();
-    if ( ! parent ) return this; // no parent, we're the root
+    DisplayObject* p = parent();
+    if (!p) return this; // no parent, we're the root
 
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
@@ -2151,7 +2149,7 @@ MovieClip::getAsRoot()
         if (getLockRoot()) return this;
     }
 
-    return parent->getAsRoot();
+    return p->getAsRoot();
 }
 
 

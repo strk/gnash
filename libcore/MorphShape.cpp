@@ -39,10 +39,9 @@ MorphShape::MorphShape(movie_root& mr, as_object* object,
 bool
 MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-    SWFMatrix wm = getWorldMatrix();
-    SWFMatrix wm_inverse = wm.invert();
+    const SWFMatrix wm = getWorldMatrix(*this).invert();
     point lp(x, y);
-    wm_inverse.transform(lp);
+    wm.transform(lp);
     
     // FIXME: if the shape contains non-scaled strokes
     //        we can't rely on boundary itself for a quick

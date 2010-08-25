@@ -28,7 +28,7 @@ namespace gnash
 bool
 Shape::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-    SWFMatrix wm = getWorldMatrix();
+    SWFMatrix wm = getWorldMatrix(*this);
     wm.invert();
     point lp(x, y);
     wm.transform(lp);

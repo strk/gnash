@@ -56,7 +56,7 @@ DisplayObjectContainer::addChild(DisplayObject* obj)
 {
     // TODO: parent should be a DisplayObjectContainer; remove dynamic_cast.
     DisplayObjectContainer* parent =
-        dynamic_cast<DisplayObjectContainer*>(obj->get_parent());
+        dynamic_cast<DisplayObjectContainer*>(obj->parent());
     if (parent) parent->removeChild(obj);
 
     _displayList.addDisplayObject(obj);
@@ -70,7 +70,7 @@ DisplayObjectContainer::addChildAt(DisplayObject* obj, int index)
 {
     // TODO: parent should be a DisplayObjectContainer; remove dynamic_cast.
     DisplayObjectContainer* parent =
-        dynamic_cast<DisplayObjectContainer*>(obj->get_parent());
+        dynamic_cast<DisplayObjectContainer*>(obj->parent());
     if (parent) parent->removeChild(obj);
     
     _displayList.insertDisplayObject(obj, index);

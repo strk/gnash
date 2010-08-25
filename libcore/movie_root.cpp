@@ -767,7 +767,7 @@ movie_root::set_drag_state(const drag_state& st)
     {
         // Get coordinates of the DisplayObject's origin
         point origin(0, 0);
-        SWFMatrix chmat = ch->getWorldMatrix();
+        SWFMatrix chmat = getWorldMatrix(*ch);
         point world_origin;
         chmat.transform(&world_origin, origin);
 
@@ -797,11 +797,10 @@ movie_root::doMouseDrag()
 
     point world_mouse(pixelsToTwips(_mouseX), pixelsToTwips(_mouseY));
 
-    SWFMatrix    parent_world_mat;
-    DisplayObject* parent = dragChar->get_parent();
-    if (parent != NULL)
-    {
-        parent_world_mat = parent->getWorldMatrix();
+    SWFMatrix parent_world_mat;
+    DisplayObject* p = dragChar->parent();
+    if (p) {
+        parent_world_mat = getWorldMatrix(*p);
     }
 
     if (! m_drag_state.isLockCentered())
@@ -2575,7 +2574,7 @@ getNearestObject(const DisplayObject* o)
     while (1) {
         assert(o);
         if (isReferenceable(*o)) return o;
-        o = o->get_parent();
+        o = o->parent();
     }
 }
 

@@ -64,7 +64,7 @@ public:
     {}
 
     SWFMatrix worldMatrix() const {
-        return _movieClip.getWorldMatrix();
+        return getWorldMatrix(_movieClip);
     }
     
     const SWFMatrix& matrix() const {
@@ -76,7 +76,7 @@ public:
     }
 
     SWFCxForm worldColorTransform() const {
-        return _movieClip.getWorldCxForm();
+        return getWorldCxForm(_movieClip);
     }
 
     void setMatrix(const SWFMatrix& mat) { _movieClip.setMatrix(mat); }
