@@ -287,9 +287,9 @@ attachButtonInterface(as_object& o)
 }
 
 Button::Button(as_object* object, const SWF::DefineButtonTag* def,
-        DisplayObject* p)
+        DisplayObject* parent)
     :
-    InteractiveObject(object, p),
+    InteractiveObject(object, parent),
     _mouseState(MOUSESTATE_UP),
     _def(def)
 {

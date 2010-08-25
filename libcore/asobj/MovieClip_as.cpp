@@ -1230,8 +1230,8 @@ movieclip_getBounds(const fn_call& fn)
             return as_value();
         }
 
-        const SWFMatrix tgtwmat = getWorldMatrix(*target);
-        const SWFMatrix srcwmat = getWorldMatrix(*movieclip).invert();
+        const SWFMatrix tgtwmat = getWorldMatrix(*target).invert();
+        const SWFMatrix srcwmat = getWorldMatrix(*movieclip);
 
         srcwmat.transform(bounds);
         tgtwmat.transform(bounds);

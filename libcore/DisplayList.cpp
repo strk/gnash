@@ -443,7 +443,7 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
         ch2->set_depth(srcdepth);
 
         // TODO: we're not actually invalidated ourselves, rather 
-        // our p is...
+        // our parent is...
         ch2->set_invalidated();
 
         // We won't accept static transforms after a depth swap.
@@ -466,7 +466,7 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
     // we'll need it to assign to the new DisplayObject
     ch1->set_depth(newdepth);
 
-    // TODO: we're not actually invalidated ourselves, rather our p is...
+    // TODO: we're not actually invalidated ourselves, rather our parent is...
     //             UdoG ? Want to verify this ?
     ch1->set_invalidated();
 
