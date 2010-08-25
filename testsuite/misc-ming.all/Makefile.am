@@ -200,13 +200,19 @@ check_PROGRAMS = \
 	BitmapDataTest \
 	BitmapDataTestRunner \
 	BitmapDataDraw \
-	LoadBitmapTest \
 	BitmapSmoothingTest \
 	$(NULL)
+	
+if MING_VERSION_0_4_4
+check_PROGRAMS += \
+	LoadBitmapTest \
+	$(NULL)
+endif
 
 if MING_VERSION_0_4_3
 check_PROGRAMS += \
 	EmbeddedSoundTest \
+	EmbeddedSoundTest-Runner \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
 	$(NULL)
@@ -262,12 +268,7 @@ check_PROGRAMS += \
 	$(NULL)
 endif
 
-if MING_VERSION_0_4_3
-check_PROGRAMS += EmbeddedSoundTest-Runner
-endif
-
 check_SCRIPTS = \
-	LoadBitmapTestRunner \
 	BitmapDataDrawRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
@@ -342,6 +343,12 @@ check_SCRIPTS = \
 	ActionOrderTest4Runner \
 	ActionOrderTest5Runner \
 	$(NULL)
+	
+if MING_VERSION_0_4_4
+check_SCRIPTS += \
+	LoadBitmapTestRunner \
+	$(NULL)
+endif
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 check_SCRIPTS += VarAndCharClashTest-Runner \
@@ -357,8 +364,6 @@ if ENABLE_HTTP_TESTSUITE
 check_SCRIPTS += remotingTestRunner
 endif
 endif
-
-# check_SCRIPTS += netstreamTestRunner
 
 if MING_VERSION_0_4
 check_SCRIPTS += \
