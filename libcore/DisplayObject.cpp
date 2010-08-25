@@ -1007,24 +1007,6 @@ DisplayObject::MaskRenderer::~MaskRenderer()
     if (_mask) _renderer.disable_mask();
 }
 
-SWFMatrix
-getWorldMatrix(const DisplayObject& d, bool includeRoot)
-{
-	SWFMatrix m = d.parent() ?
-        getWorldMatrix(*d.parent(), includeRoot) : SWFMatrix();
-
-    if (d.parent() || includeRoot) m.concatenate(getMatrix(d));
-	return m;
-}
-
-SWFCxForm
-getWorldCxForm(const DisplayObject& d) 
-{
-	SWFCxForm cx = d.parent() ? getWorldCxForm(*d.parent()) : SWFCxForm();
-	cx.concatenate(getCxForm(d));
-	return cx;
-}
-        
 namespace {
 
 as_value

@@ -126,8 +126,7 @@ void copyMatrix(const DisplayObject& from, DisplayObject& to);
 /// @param includeRoot      Whether the transform of the Stage (_root)
 ///                         should be concatenated. This is required to be
 ///                         false for pointInBounds.
-DSOEXPORT SWFMatrix getWorldMatrix(const DisplayObject& d,
-        bool includeRoot = true);
+SWFMatrix getWorldMatrix(const DisplayObject& d, bool includeRoot = true);
 
 /// Get concatenated color transform of a DisplayObject
 //
@@ -1127,6 +1126,23 @@ getCxForm(const DisplayObject& o)
     return o.transform().colorTransform;
 }
 
+inline SWFMatrix
+getWorldMatrix(const DisplayObject& d, bool includeRoot)
+{
+    SWFMatrix m = d.parent() ?
+        getWorldMatrix(*d.parent(), includeRoot) : SWFMatrix();
+
+    if (d.parent() || includeRoot) m.concatenate(getMatrix(d));
+    return m;
+}
+
+inline SWFCxForm
+getWorldCxForm(const DisplayObject& d)
+{
+    SWFCxForm cx = d.parent() ? getWorldCxForm(*d.parent()) : SWFCxForm();
+    cx.concatenate(getCxForm(d));
+    return cx;
+}
 
 inline bool
 isReferenceable(const DisplayObject& d)
