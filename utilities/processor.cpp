@@ -370,7 +370,12 @@ main(int argc, char *argv[])
 
 #ifdef RENDERER_AGG
     boost::shared_ptr<Renderer_agg_base> r(create_Renderer_agg("RGBA32"));
-    unsigned char buf[1];
+
+    // Yes, this leaks. On some systems (e.g. Debian Lenny) the data is
+    // evidently accessed after main() returns. Rather than bothering to
+    // work out why, we let this byte leak, as it's returned to the system on
+    // exit anyway.
+    unsigned char* buf = new unsigned char[1];
     r->init_buffer(buf, 1, 1, 1, 1);
 #endif
 

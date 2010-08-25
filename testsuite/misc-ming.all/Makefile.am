@@ -2249,7 +2249,6 @@ TEST_CASES = \
 	BeginBitmapFillRunner \
 	BitmapDataTestRunner \
 	BitmapDataDrawRunner \
-	LoadBitmapTestRunner \
 	LoadVarsTestRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
@@ -2394,6 +2393,12 @@ if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 TEST_CASES += \
 	ButtonPropertiesTestRunner \
 	ButtonEventsTest-Runner \
+	$(NULL)
+endif
+
+if MING_VERSION_0_4_4
+TEST_CASES += \
+	LoadBitmapTestRunner \
 	$(NULL)
 endif
 
