@@ -30,7 +30,7 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "RemoveObject2Test.swf"
 
-SWFShape
+static SWFShape
 make_square(int x, int y, int width, int height, byte r, byte g, byte b)
 {
 	SWFShape sh = newSWFShape();
@@ -45,12 +45,14 @@ make_square(int x, int y, int width, int height, byte r, byte g, byte b)
 }
 
 int
-main(int argc, char **argv)
+main(int argc, char ** argv)
 {
 	SWFMovie mo;
 	SWFDisplayItem it1, it2, it3;
 	SWFShape sh1, sh2, sh3;
 	int framenum;
+
+	argc=argc; argv=argv; /* unused... */
 
 	/*********************************************
 	 *
