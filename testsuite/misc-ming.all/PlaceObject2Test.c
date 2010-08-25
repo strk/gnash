@@ -123,7 +123,7 @@ main(int argc, char** argv)
   // replace the shape with another one
   if ( SWFMovie_replace(mo, it1, (SWFBlock)sh2) )
   {
-    abort(); 
+    return 1;
   }
   SWFMovie_nextFrame(mo); // frame 6
   
