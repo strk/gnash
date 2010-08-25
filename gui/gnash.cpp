@@ -28,6 +28,8 @@
 #include <ios>
 #include <boost/format.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <cstdlib>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -93,6 +95,10 @@ usage()
     std::vector<std::string> handlers;
     gnash::media::MediaFactory::instance().listKeys(back_inserter(handlers));
 
+    std::vector<std::string> renderers;
+    boost::split(renderers, RENDERER_CONFIG,
+        boost::is_any_of(" "), boost::token_compress_on);
+
     cout << _("Usage: gnash [options] movie_file.swf\n")
     << "\n"
     << _("Plays a SWF (Shockwave Flash) movie\n")
@@ -129,20 +135,10 @@ usage()
     << _("                           3 enable rendering and sound (default)\n") 
     << _("  -M,  --media <") << boost::join(handlers, "|") << ">\n"
     << _("                           The media handler to use")
-    << " (default " << handlers.front() << ")\n"
-    // Only list the renderers that were configured in for this build
-    << _("  -R,  --renderer <")
-#ifdef RENDERER_OPENGL
-     << _(" opengl")
-#endif
-#ifdef RENDERER_CAIRO
-     << _(" cairo")
-#endif
-#ifdef RENDERER_AGG
-    << _(" agg > (default: agg)\n")
-#else
-    << " >\n"
-#endif
+    << " (default: " << handlers.front() << ")\n"
+    << _("  -R,  --renderer <") << boost::join(renderers, "|") << ">\n"
+    << _("                           The renderer to use")
+    << " (default: agg)\n"
     << _("  -t,  --timeout <sec>     Exit after the specified number of "
             "seconds\n") 
     << _("  -u,  --real-url <url>    Set \"real\" URL of the movie\n") 

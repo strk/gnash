@@ -60,14 +60,14 @@
     </sect2>
 
     <sect2 id="sourcecvs">
-      <title>Bzr Access</title>
+      <title>Git Access</title>
       <para>
-	The latest &app; development sources are available via bzr.
+	The latest &app; development sources are available via git.
 	Use the following commands to check them out:
 	<programlisting>
 	mkdir gnash
 	cd gnash
-	bzr branch http://bzr.savannah.gnu.org/r/gnash/trunk
+	git clone git://git.sv.gnu.org/gnash.git
 	</programlisting>
 	At any time, other temporary development branches may also
 	be available. Replace <emphasis>trunk</emphasis> with the
@@ -76,7 +76,7 @@
 	repository using:
 	<programlisting>
 	  cd trunk
-	  bzr pull
+	  git pull
 	</programlisting>
       </para>
       <para>

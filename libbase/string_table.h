@@ -164,7 +164,7 @@ private:
 /// @param b        The other key to check
 /// @param caseless Whether to compare in a case-insensitive way.
 /// @return         True if the keys are equivalent.
-bool equal(string_table& st, string_table::key a, string_table::key b,
+DSOEXPORT bool equal(string_table& st, string_table::key a, string_table::key b,
         bool caseless);
 
 }
