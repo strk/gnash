@@ -769,7 +769,7 @@ FBGui::enable_terminal()
     return true;
 }
 
-bool
+void
 FBGui::checkForData()
 {
     GNASH_REPORT_FUNCTION;

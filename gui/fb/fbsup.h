@@ -152,7 +152,7 @@ public:
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     virtual bool want_multiple_regions() { return true; }
 
-    bool checkForData();    
+    void checkForData();    
 };
 
 // end of namespace gnash
