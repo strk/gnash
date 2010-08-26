@@ -118,6 +118,21 @@ void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
 /// @param to       The DisplayObject to copy to.
 void copyMatrix(const DisplayObject& from, DisplayObject& to);
 
+/// Get concatenated SWFMatrix (all ancestor transforms and our SWFMatrix)
+//
+/// Maps from our local space into "world" space
+/// (i.e. root movie space).
+//
+/// @param includeRoot      Whether the transform of the Stage (_root)
+///                         should be concatenated. This is required to be
+///                         false for pointInBounds.
+SWFMatrix getWorldMatrix(const DisplayObject& d, bool includeRoot = true);
+
+/// Get concatenated color transform of a DisplayObject
+//
+/// Maps from our local space into normal color space.
+SWFCxForm getWorldCxForm(const DisplayObject& d);
+
 /// DisplayObject is the base class for all DisplayList objects.
 //
 /// It represents a single active element in a movie. This class does not
@@ -233,7 +248,7 @@ public:
     /// \brief
     /// Return the parent of this DisplayObject, or NULL if
     /// the DisplayObject has no parent.
-    DisplayObject* get_parent() const
+    DisplayObject* parent() const
     {
         return _parent;
     }
@@ -415,25 +430,6 @@ public:
 
     string_table::key get_name() const { return _name; }
 
-    /// \brief
-    /// Get our concatenated SWFMatrix (all our ancestor transforms,
-    /// times our SWFMatrix). 
-    ///
-    /// Maps from our local space into "world" space
-    /// (i.e. root movie space).
-    //
-    /// @param includeRoot      Whether the transform of the Stage (_root)
-    ///                         should be concatenated. This is required to be
-    ///                         false for pointInBounds.
-    DSOEXPORT SWFMatrix getWorldMatrix(bool includeRoot = true) const;
-
-    /// \brief
-    /// Get our concatenated color transform (all our ancestor transforms,
-    /// times our SWFCxForm). 
-    ///
-    /// Maps from our local space into normal color space.
-    SWFCxForm getWorldCxForm() const;
-
     /// Get the built-in function handlers code for the given event
     //
     /// NOTE: this function is only for getting statically-defined
@@ -491,7 +487,7 @@ public:
     bool pointInBounds(boost::int32_t x, boost::int32_t y) const
     {
         SWFRect bounds = getBounds();
-        SWFMatrix wm = getWorldMatrix(false);
+        const SWFMatrix wm = getWorldMatrix(*this, false);
         wm.transform(bounds);
         return bounds.point_test(x, y);
     }
@@ -532,7 +528,7 @@ public:
     /// against this DisplayObject's parent.
     ///
     virtual Movie* get_root() const {
-        return get_parent()->get_root();
+        return parent()->get_root();
     }
 
     /// Return the _root ActionScript property of this DisplayObject.
@@ -1130,6 +1126,23 @@ getCxForm(const DisplayObject& o)
     return o.transform().colorTransform;
 }
 
+inline SWFMatrix
+getWorldMatrix(const DisplayObject& d, bool includeRoot)
+{
+    SWFMatrix m = d.parent() ?
+        getWorldMatrix(*d.parent(), includeRoot) : SWFMatrix();
+
+    if (d.parent() || includeRoot) m.concatenate(getMatrix(d));
+    return m;
+}
+
+inline SWFCxForm
+getWorldCxForm(const DisplayObject& d)
+{
+    SWFCxForm cx = d.parent() ? getWorldCxForm(*d.parent()) : SWFCxForm();
+    cx.concatenate(getCxForm(d));
+    return cx;
+}
 
 inline bool
 isReferenceable(const DisplayObject& d)

@@ -420,13 +420,12 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     // Find hit DisplayObjects
     if ( _hitCharacters.empty() ) return 0;
 
-    // point is in parent's space,
+    // point is in p's space,
     // we need to convert it in world space
     point  wp(x,y);
-    DisplayObject* parent = get_parent();
-    if ( parent )
-    {
-        parent->getWorldMatrix().transform(wp);
+    DisplayObject* p = parent();
+    if (p) {
+        getWorldMatrix(*p).transform(wp);
     }
 
     for (DisplayObjects::const_iterator i = _hitCharacters.begin(),

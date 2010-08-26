@@ -169,8 +169,8 @@ Function2::call(const fn_call& fn)
     if (_function2Flags & PRELOAD_PARENT) {
         DisplayObject* tgtch = _env.get_target();
         if (tgtch) {
-            as_object* parent = getObject(tgtch->get_parent());
-            cf.setLocalRegister(current_reg, parent);
+            as_object* p = getObject(tgtch->parent());
+            cf.setLocalRegister(current_reg, p);
             ++current_reg;
         }
     }

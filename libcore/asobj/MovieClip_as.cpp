@@ -601,7 +601,7 @@ movieclip_swapDepths(const fn_call& fn)
         return as_value();
     }
 
-    MovieClip* this_parent = dynamic_cast<MovieClip*>(movieclip->get_parent());
+    MovieClip* this_parent = dynamic_cast<MovieClip*>(movieclip->parent());
 
     //CharPtr target = NULL;
     int target_depth = 0;
@@ -619,7 +619,7 @@ movieclip_swapDepths(const fn_call& fn)
         }
 
         MovieClip* target_parent =
-            dynamic_cast<MovieClip*>(movieclip->get_parent());
+            dynamic_cast<MovieClip*>(movieclip->parent());
 
         if (this_parent != target_parent) {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -999,11 +999,11 @@ movieclip_hitTest(const fn_call& fn)
             }
 
             SWFRect thisbounds = movieclip->getBounds();
-            SWFMatrix thismat = movieclip->getWorldMatrix();
+            const SWFMatrix thismat = getWorldMatrix(*movieclip);
             thismat.transform(thisbounds);
 
             SWFRect tgtbounds = target->getBounds();
-            SWFMatrix tgtmat = target->getWorldMatrix();
+            SWFMatrix tgtmat = getWorldMatrix(*target);
             tgtmat.transform(tgtbounds);
 
             return thisbounds.getRange().intersects(tgtbounds.getRange());
@@ -1230,11 +1230,11 @@ movieclip_getBounds(const fn_call& fn)
             return as_value();
         }
 
-        SWFMatrix tgtwmat = target->getWorldMatrix();
-        SWFMatrix srcwmat = movieclip->getWorldMatrix();
+        const SWFMatrix tgtwmat = getWorldMatrix(*target).invert();
+        const SWFMatrix srcwmat = getWorldMatrix(*movieclip);
 
         srcwmat.transform(bounds);
-        tgtwmat.invert().transform(bounds);
+        tgtwmat.transform(bounds);
     }
 
     double xMin, yMin, xMax, yMax;
@@ -1314,8 +1314,8 @@ movieclip_globalToLocal(const fn_call& fn)
     y = pixelsToTwips(tmp.to_number());
 
     point    pt(x, y);
-    SWFMatrix world_mat = movieclip->getWorldMatrix();
-    world_mat.invert().transform(pt);
+    const SWFMatrix world_mat = getWorldMatrix(*movieclip).invert();
+    world_mat.transform(pt);
 
     obj->set_member(NSV::PROP_X, twipsToPixels(pt.x));
     obj->set_member(NSV::PROP_Y, twipsToPixels(pt.y));
@@ -1375,8 +1375,8 @@ movieclip_localToGlobal(const fn_call& fn)
     }
     y = pixelsToTwips(tmp.to_number());
 
-    point    pt(x, y);
-    SWFMatrix world_mat = movieclip->getWorldMatrix();
+    point pt(x, y);
+    const SWFMatrix world_mat = getWorldMatrix(*movieclip);
     world_mat.transform(pt);
 
     obj->set_member(NSV::PROP_X, twipsToPixels(pt.x));

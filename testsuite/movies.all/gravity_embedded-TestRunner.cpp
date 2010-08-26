@@ -66,7 +66,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	const DisplayObject* loaded = tester.findDisplayItemByDepth(*root, 0); // depends on getNextHighestDepth
 	check(loaded);
-	check_equals(loaded->get_parent(), root);
+	check_equals(loaded->parent(), root);
 
 	string_table& st = VM::get().getStringTable();
 	string_table::key xscale = st.find("_xscale");
