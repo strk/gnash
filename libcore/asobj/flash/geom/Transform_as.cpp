@@ -46,7 +46,6 @@ namespace {
     as_value transform_pixelBounds(const fn_call& fn);
     as_value transform_ctor(const fn_call& fn);
     void attachTransformInterface(as_object& o);
-    as_object* getTransformInterface();
     as_value get_flash_geom_transform_constructor(const fn_call& fn);
     
 }

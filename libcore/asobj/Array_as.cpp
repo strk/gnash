@@ -66,7 +66,6 @@ struct indexed_as_value;
 
 typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 
-as_object* getArrayInterface();
 void attachArrayInterface(as_object& proto);
 void attachArrayStatics(as_object& proto);
 

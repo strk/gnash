@@ -69,7 +69,6 @@ namespace {
     as_value sound_start(const fn_call& fn);
     as_value sound_stop(const fn_call& fn);
     as_value checkPolicyFile_getset(const fn_call& fn);
-    as_value sound_ctor(const fn_call& fn);
     void attachSoundInterface(as_object& o);
 }
 
@@ -1223,14 +1222,6 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
     // naive test shows this always being undefined..
     //
     LOG_ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
-    return as_value();
-}
-
-as_value
-sound_ctor(const fn_call& fn)
-{
-    as_object* obj = fn.this_ptr;
-    obj->setRelay(new Sound_as(obj));
     return as_value();
 }
 

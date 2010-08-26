@@ -31,13 +31,9 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value accessibility_ctor(const fn_call& fn);
     void attachAccessibilityStaticInterface(as_object& o);
-    void attachAccessibilityAS3StaticInterface(as_object& o);
-    as_object* getAccessibilityInterface();
 
     as_value accessibility_isActive(const fn_call& fn);
-    as_value accessibility_active(const fn_call& fn);
     as_value accessibility_updateProperties(const fn_call& fn);
     as_value accessibility_sendEvent(const fn_call& fn);
 }
@@ -75,13 +71,6 @@ registerAccessibilityNative(as_object& global)
 namespace {
 
 void
-attachAccessibilityAS3StaticInterface(as_object& o)
-{
-    Global_as& gl = getGlobal(o);
-    o.init_member("active", gl.createFunction(accessibility_active));
-}
-
-void
 attachAccessibilityStaticInterface(as_object& o)
 {
     const int flags = PropFlags::dontDelete |
@@ -99,13 +88,6 @@ accessibility_isActive(const fn_call& /*fn*/)
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
-}
-
-as_value
-accessibility_active(const fn_call& /*fn*/)
-{
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value(false);
 }
 
 as_value

@@ -58,7 +58,6 @@ as_value externalInterfaceConstructor(const fn_call& fn);
 as_value externalinterface_addCallback(const fn_call& fn);
 as_value externalinterface_call(const fn_call& fn);
 as_value externalinterface_available(const fn_call& fn);
-as_value externalinterface_marshallExceptions(const fn_call& fn);
 as_value externalinterface_objectID(const fn_call& fn);
 
 as_value externalinterface_uArgumentsToXML(const fn_call& fn);
@@ -347,21 +346,6 @@ externalinterface_available(const fn_call& fn)
     }
     
     return as_value(mode);
-}
-
-as_value
-externalinterface_marshallExceptions(const fn_call& fn)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    movie_root& m = getRoot(fn);
-    if (fn.nargs) {
-        m.setMarshallExceptions(fn.arg(0).to_bool());
-    } else {
-        return as_value(m.getMarshallExceptions());
-    }
-    
-    return as_value(true);
 }
 
 as_value

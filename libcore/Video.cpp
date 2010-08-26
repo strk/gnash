@@ -42,7 +42,6 @@
 namespace gnash {
 
 namespace {    
-    as_object* getVideoInterface(as_object& where);
     void attachPrototypeProperties(as_object& o);
     void attachVideoInterface(as_object& o);
     as_value video_ctor(const fn_call& fn);

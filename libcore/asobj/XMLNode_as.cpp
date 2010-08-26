@@ -75,7 +75,6 @@ namespace {
     as_value xmlnode_localName(const fn_call& fn);
     as_value xmlnode_prefix(const fn_call& fn);
     void attachXMLNodeInterface(as_object& o);
-    void attachXMLNodeStaticInterface(as_object& o);
 }
 
 XMLNode_as::XMLNode_as(Global_as& gl)

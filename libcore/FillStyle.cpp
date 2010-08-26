@@ -39,7 +39,6 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    rgba sampleGradient(const GradientFill& fill, boost::uint8_t ratio);
     OptionalFillPair readSolidFill(SWFStream& in, SWF::TagType t,
             bool readMorph);
     OptionalFillPair readBitmapFill(SWFStream& in, SWF::FillType type,

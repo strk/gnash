@@ -196,7 +196,6 @@ namespace {
     void attachTextFormatInterface(as_object& o);
     const char* getAlignString(TextField::TextAlignment a);
 	const char* getDisplayString(TextField::TextFormatDisplay a);
-	TextField::TextAlignment parseAlignString(const std::string& align);
 	TextField::TextFormatDisplay parseDisplayString(const std::string& display);
 
     /// Align works a bit differently, so is currently not a template.
