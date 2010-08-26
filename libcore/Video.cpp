@@ -248,7 +248,7 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 	assert (m_def);
 
 	SWFRect bounds;	
-	bounds.expand_to_transformed_rect(getWorldMatrix(), m_def->bounds());
+	bounds.expand_to_transformed_rect(getWorldMatrix(*this), m_def->bounds());
 	
 	ranges.add(bounds.getRange());            
 }

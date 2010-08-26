@@ -654,12 +654,12 @@ DisplayList::display(Renderer& renderer, const Transform& base)
         // Characters acting as masks should always be rendered to the
         // mask buffer despite their visibility.
         //
-        DisplayObject* parent = ch->get_parent();
+        DisplayObject* p = ch->parent();
         bool renderAsMask = ch->isMaskLayer();
 
-        while (!renderAsMask && parent) {
-            renderAsMask = parent->isMaskLayer();
-            parent = parent->get_parent();
+        while (!renderAsMask && p) {
+            renderAsMask = p->isMaskLayer();
+            p = p->parent();
         }
         
         // check for non-mask hiden DisplayObjects

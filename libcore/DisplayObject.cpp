@@ -148,18 +148,6 @@ DisplayObject::getNextUnnamedInstanceName()
 }
 
 
-SWFMatrix
-DisplayObject::getWorldMatrix(bool includeRoot) const
-{
-	SWFMatrix m;
-	if (_parent) {
-	    m = _parent->getWorldMatrix(includeRoot);
-	}
-    if (_parent || includeRoot) m.concatenate(getMatrix(*this));
-
-	return m;
-}
-
 int
 DisplayObject::getWorldVolume() const
 {
@@ -172,19 +160,6 @@ DisplayObject::getWorldVolume() const
 	return volume;
 }
 
-SWFCxForm
-DisplayObject::getWorldCxForm() const
-{
-	SWFCxForm	m;
-	if (_parent != NULL)
-	{
-	    m = _parent->getWorldCxForm();
-	}
-	m.concatenate(getCxForm(*this));
-
-	return m;
-}
-
 
 as_object*
 DisplayObject::pathElement(string_table::key key)
@@ -193,7 +168,7 @@ DisplayObject::pathElement(string_table::key key)
     if (!obj) return 0;
 
     string_table& st = stage().getVM().getStringTable();
-    if (key == st.find("..")) return getObject(get_parent());
+    if (key == st.find("..")) return getObject(parent());
 	if (key == st.find(".")) return obj;
     
     // The check is case-insensitive for SWF6 and below.
@@ -254,7 +229,7 @@ DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     if (visible() && (_invalidated||force))
     {
         SWFRect bounds;        
-        bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds());
+        bounds.expand_to_transformed_rect(getWorldMatrix(*this), getBounds());
         ranges.add(bounds.getRange());                        
     }        
 }
@@ -633,7 +608,7 @@ DisplayObject::getTargetPath() const
     string_table& st = getStringTable(*getObject(this));
 	for (;;)
 	{
-		const DisplayObject* parent = ch->get_parent();
+		const DisplayObject* parent = ch->parent();
 
 		// Don't push the _root name on the stack
 		if (!parent) {
@@ -686,7 +661,7 @@ DisplayObject::getTarget() const
     string_table& st = stage().getVM().getStringTable();
 	for (;;)
 	{
-		const DisplayObject* parent = ch->get_parent();
+		const DisplayObject* parent = ch->parent();
 
 		// Don't push the _root name on the stack
 		if (!parent) {
@@ -838,10 +813,10 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 bool 
 DisplayObject::boundsInClippingArea(Renderer& renderer) const 
 {
-  SWFRect mybounds = getBounds();
-  getWorldMatrix().transform(mybounds);
+    SWFRect mybounds = getBounds();
+    getWorldMatrix(*this).transform(mybounds);
   
-  return renderer.bounds_in_clipping_area(mybounds.getRange());  
+    return renderer.bounds_in_clipping_area(mybounds.getRange());  
 }
 
 #ifdef USE_SWFTREE
@@ -1020,9 +995,9 @@ DisplayObject::MaskRenderer::MaskRenderer(Renderer& r, const DisplayObject& o)
     if (!_mask) return;
 
     _renderer.begin_submit_mask();
-    DisplayObject* p = _mask->get_parent();
+    DisplayObject* p = _mask->parent();
     const Transform tr = p ?
-        Transform(p->getWorldMatrix(), p->getWorldCxForm()) : Transform(); 
+        Transform(getWorldMatrix(*p), getWorldCxForm(*p)) : Transform(); 
     _mask->display(_renderer, tr);
     _renderer.end_submit_mask();
 }
@@ -1031,7 +1006,7 @@ DisplayObject::MaskRenderer::~MaskRenderer()
 {
     if (_mask) _renderer.disable_mask();
 }
-        
+
 namespace {
 
 as_value
@@ -1326,7 +1301,7 @@ getMouseX(DisplayObject& o)
 	boost::int32_t x, y;
 	getRoot(*getObject(&o)).get_mouse_state(x, y);
 
-	SWFMatrix m = o.getWorldMatrix();
+	SWFMatrix m = getWorldMatrix(o);
     point a(pixelsToTwips(x), pixelsToTwips(y));
     
     m.invert().transform(a);
@@ -1340,7 +1315,7 @@ getMouseY(DisplayObject& o)
 	boost::int32_t x, y;
 	getRoot(*getObject(&o)).get_mouse_state(x, y);
 
-	SWFMatrix m = o.getWorldMatrix();
+	SWFMatrix m = getWorldMatrix(o);
     point a(pixelsToTwips(x), pixelsToTwips(y));
     m.invert().transform(a);
     return as_value(twipsToPixels(a.y));
@@ -1377,7 +1352,7 @@ setRotation(DisplayObject& o, const as_value& val)
 as_value
 getParent(DisplayObject& o)
 {
-    as_object* p = getObject(o.get_parent());
+    as_object* p = getObject(o.parent());
     return p ? p : as_value();
 }
 

@@ -226,15 +226,14 @@ TextField::removeTextField()
         return;
     }
 
-    DisplayObject* parent = get_parent();
-    assert(parent); // every TextField must have a parent, right ?
+    DisplayObject* p = parent();
+    assert(p); // every TextField must have a parent, right ?
 
-    MovieClip* parentSprite = parent->to_movie();
+    MovieClip* parentSprite = p->to_movie();
 
-    if (!parentSprite)
-    {
+    if (!parentSprite) {
         log_error("FIXME: attempt to remove a TextField being a child of a %s",
-                typeName(*parent));
+                typeName(*p));
         return;
     }
 
@@ -386,7 +385,7 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     
     ranges.add(m_old_invalidated_ranges);
 
-    const SWFMatrix& wm = getWorldMatrix();
+    const SWFMatrix& wm = getWorldMatrix(*this);
 
     SWFRect bounds = getBounds();
     bounds.expand_to_rect(m_text_bounding_box); 
@@ -2280,9 +2279,9 @@ TextField::set_variable_name(const std::string& newname)
 bool
 TextField::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-    SWFMatrix wm = getWorldMatrix();
+    const SWFMatrix wm = getWorldMatrix(*this).invert();
     point lp(x, y);
-    wm.invert().transform(lp);
+    wm.transform(lp);
     return _bounds.point_test(lp.x, lp.y);
 }
 
