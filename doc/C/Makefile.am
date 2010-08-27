@@ -20,7 +20,7 @@
 
 htmldir = ${prefix}/share/doc/gnash
 infodir = ${prefix}/share/info
-man1dir = ${prefix}/share/man/man1
+man1dir = ${mandir}/man1
 docname = gnash
 lang = C
 omffile = gnash-C.omf
