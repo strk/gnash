@@ -38,7 +38,7 @@ namespace gnash {
     class as_object;
     struct ObjectURI;
     class MovieClip;
-    struct Transform;
+    class Transform;
     class DisplayObject;
     class GnashImage;
 }

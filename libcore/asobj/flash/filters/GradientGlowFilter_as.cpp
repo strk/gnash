@@ -32,7 +32,6 @@ namespace {
     as_value gradientglowfilter_colors(const fn_call& fn);
     as_value gradientglowfilter_alphas(const fn_call& fn);
     as_value gradientglowfilter_ratios(const fn_call& fn);
-    as_value gradientglowfilter_shadowAlpha(const fn_call& fn);
     as_value gradientglowfilter_blurX(const fn_call& fn);
     as_value gradientglowfilter_blurY(const fn_call& fn);
     as_value gradientglowfilter_strength(const fn_call& fn);

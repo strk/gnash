@@ -36,7 +36,6 @@ namespace {
     as_value boolean_valueof(const fn_call& fn);
     as_value boolean_ctor(const fn_call& fn);
     void attachBooleanInterface(as_object& o);
-    as_object* getBooleanInterface();
 }
 
 class Boolean_as: public Relay

@@ -47,8 +47,6 @@ namespace {
     as_value loadvars_tostring(const fn_call& fn);
     as_value loadvars_ctor(const fn_call& fn);
 	as_value loadvars_onLoad(const fn_call& fn);
-	as_value loadvars_getBytesLoaded(const fn_call& fn);
-	as_value loadvars_getBytesTotal(const fn_call& fn);
 	as_value loadvars_onData(const fn_call& fn);
 	void attachLoadVarsInterface(as_object& o);
 }

@@ -56,11 +56,6 @@ namespace {
     void attachSystemCapabilitiesInterface(as_object& o);
     void attachSystemInterface(as_object& proto);
 
-    // AS3 functions.
-    as_value system_gc(const fn_call& fn);
-    as_value system_pause(const fn_call& fn);
-    as_value system_resume(const fn_call& fn);
-
 }
 
 void
@@ -355,28 +350,6 @@ system_showsettings(const fn_call& /*fn*/)
     LOG_ONCE(log_unimpl ("System.showSettings") );
     return as_value();
 }
-
-as_value
-system_gc(const fn_call& /*fn*/)
-{
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-system_pause(const fn_call& /*fn*/)
-{
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-system_resume(const fn_call& /*fn*/)
-{
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
 
 // FIXME: should return true if shared object files
 // are stored under an exact domain name (www.gnashdev.org or

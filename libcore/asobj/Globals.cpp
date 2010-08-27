@@ -128,7 +128,6 @@ namespace {
     as_value global_asconstructor(const fn_call& fn);
     as_value global_updateAfterEvent(const fn_call& fn);
     as_value global_setTimeout(const fn_call& fn);
-    as_value global_clearTimeout(const fn_call& fn);
     as_value global_clearInterval(const fn_call& fn);
     as_value global_setInterval(const fn_call& fn);
     

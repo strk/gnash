@@ -34,7 +34,6 @@ namespace {
     as_value customactions_install(const fn_call& fn);
     as_value customactions_list(const fn_call& fn);
     as_value customactions_uninstall(const fn_call& fn);
-    as_value customactions_ctor(const fn_call& fn);
     void attachCustomActionsInterface(as_object& o);
 
 }

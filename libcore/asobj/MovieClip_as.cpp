@@ -104,7 +104,6 @@ namespace {
     as_value movieclip_meth(const fn_call& fn);
     as_value movieclip_getSWFVersion(const fn_call& fn);
     as_value movieclip_loadVariables(const fn_call& fn);
-    as_value movieclip_dropTarget(const fn_call& fn);
 
 }
 
