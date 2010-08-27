@@ -40,7 +40,7 @@ DefineFontTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == DEFINEFONT || tag == DEFINEFONT2 || tag == DEFINEFONT3);
 
     in.ensureBytes(2);
-    boost::uint16_t fontID = in.read_u16();
+    const boost::uint16_t fontID = in.read_u16();
 
     std::auto_ptr<DefineFontTag> ft(new DefineFontTag(in, m, tag, r));
 
@@ -54,29 +54,25 @@ void
 DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
         bool wideCodes, size_t glyphCount)
 {
-    IF_VERBOSE_PARSE (
-    log_parse(_("reading code table at offset %lu"), in.tell());
+    IF_VERBOSE_PARSE(
+        log_parse(_("reading code table at offset %lu"), in.tell());
     );
 
     // Good. We can only do this once.
     assert(table.empty());
 
-    if (wideCodes)
-    {
+    if (wideCodes) {
         in.ensureBytes(2 * glyphCount);
         // Code table is made of boost::uint16_t's.
-        for (size_t i=0; i < glyphCount; ++i)
-        {
+        for (size_t i=0; i < glyphCount; ++i) {
             boost::uint16_t code = in.read_u16();
             table.insert(std::make_pair(code, i));
         }
     }
-    else
-    {
+    else {
         // Code table is made of bytes.
         in.ensureBytes(1 * glyphCount);
-        for (size_t i=0; i < glyphCount; ++i)
-        {
+        for (size_t i = 0; i < glyphCount; ++i) {
             boost::uint8_t code = in.read_u8();
             table.insert(std::make_pair(code, i));
         }
@@ -354,11 +350,10 @@ DefineFontInfoTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == DEFINEFONTINFO || tag == DEFINEFONTINFO2); 
 
     in.ensureBytes(2);
-    boost::uint16_t fontID = in.read_u16();
+    const boost::uint16_t fontID = in.read_u16();
 
     Font* f = m.get_font(fontID);
-    if (!f)
-    {
+    if (!f) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("DefineFontInfo tag loader: "
                    "can't find font with id %d"), fontID);
@@ -366,8 +361,7 @@ DefineFontInfoTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
 
-    if (tag == DEFINEFONTINFO2)
-    {
+    if (tag == DEFINEFONTINFO2) {
         // See: SWFalexref/SWFalexref.html#tag_definefont2
         LOG_ONCE(log_unimpl(_("DefineFontInfo2 partially implemented")));
     }
@@ -376,9 +370,9 @@ DefineFontInfoTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     in.read_string_with_length(name);
 
     in.ensureBytes(1);
-    boost::uint8_t flags = in.read_u8();
+    const boost::uint8_t flags = in.read_u8();
 
-    bool wideCodes = flags & (1 << 0);
+    const bool wideCodes = flags & (1 << 0);
 
     std::auto_ptr<Font::CodeTable> table(new Font::CodeTable);
 
