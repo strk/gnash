@@ -889,10 +889,10 @@ public:
 
       switch (im.type()) {
           case GNASH_IMAGE_RGB:
-                in.reset(new Renderer_agg<typename RGB::PixelFormat>(32));
+                in.reset(new Renderer_agg<typename RGB::PixelFormat>(24));
               break;
           case GNASH_IMAGE_RGBA:
-                in.reset(new Renderer_agg<typename RGBA::PixelFormat>(24));
+                in.reset(new Renderer_agg<typename RGBA::PixelFormat>(32));
               break;
       }
  
