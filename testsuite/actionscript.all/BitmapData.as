@@ -578,25 +578,25 @@ bm = new flash.display.BitmapData(10, 10, true, 0x5010eeff);
 xcheck_equals(bm.getPixel32(5, 5), 0x5010efff);
 
 bm = new flash.display.BitmapData(10, 10, true, 0xee11efff);
-xcheck_equals(bm.getPixel32(5, 5), -300814337);
+check_equals(bm.getPixel32(5, 5), -300814337);
 
 bm = new flash.display.BitmapData(10, 10, true, 0x00011010);
-xcheck_equals(bm.getPixel32(5, 5), 0x00000000);
+check_equals(bm.getPixel32(5, 5), 0x00000000);
 
 bm = new flash.display.BitmapData(10, 10, true, 0x0000ffff);
-xcheck_equals(bm.getPixel32(5, 5), 0x00000000);
+check_equals(bm.getPixel32(5, 5), 0x00000000);
 
 bm = new flash.display.BitmapData(10, 10, true, 0x000000ff);
-xcheck_equals(bm.getPixel32(5, 5), 0x00000000);
+check_equals(bm.getPixel32(5, 5), 0x00000000);
 
 bm = new flash.display.BitmapData(10, 10, true, 0x010000ff);
-xcheck_equals(bm.getPixel32(5, 5), 0x010000ff);
+check_equals(bm.getPixel32(5, 5), 0x010000ff);
 
 bm = new flash.display.BitmapData(10, 10, true, 0x300000ff);
-xcheck_equals(bm.getPixel32(5, 5), 0x300000ff);
+check_equals(bm.getPixel32(5, 5), 0x300000ff);
 
 bm = new flash.display.BitmapData(10, 10, true, 0x30ffffff);
-xcheck_equals(bm.getPixel32(5, 5), 0x30ffffff);
+check_equals(bm.getPixel32(5, 5), 0x30ffffff);
 
 //-------------------------------------------------------------
 // END OF TEST

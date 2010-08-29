@@ -857,7 +857,7 @@ bitmapdata_ctor(const fn_call& fn)
     size_t width = toInt(fn.arg(0));
     size_t height = toInt(fn.arg(1));
     bool transparent = fn.nargs > 2 ? fn.arg(2).to_bool() : true;
-    boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3)) : 0xffffff;
+    boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3)) : 0xffffffff;
     
     if (width > 2880 || height > 2880 || width < 1 || height < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -875,8 +875,13 @@ bitmapdata_ctor(const fn_call& fn)
         im.reset(new ImageRGB(width, height));
     }
 
+    // There is one special case for completely transparent colours. This
+    // might be a part of a more general pre-treatment as other colours
+    // vary slightly, but we haven't worked it out yet.
+    if (transparent && !(fillColor & 0xff000000)) fillColor = 0;
+
     std::fill(image::begin<image::ARGB>(*im), image::end<image::ARGB>(*im),
-            fillColor | (0xff << 24));
+            fillColor);
 
     ptr->setRelay(new BitmapData_as(ptr, im));
 
