@@ -856,7 +856,7 @@ bitmapdata_ctor(const fn_call& fn)
 
     size_t width = toInt(fn.arg(0));
     size_t height = toInt(fn.arg(1));
-    bool transparent = fn.nargs > 2 ? fn.arg(2).to_bool() : true;
+    const bool transparent = fn.nargs > 2 ? fn.arg(2).to_bool() : true;
     boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3)) : 0xffffffff;
     
     if (width > 2880 || height > 2880 || width < 1 || height < 1) {
