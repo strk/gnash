@@ -3951,7 +3951,7 @@ guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
     }
 
     // It's something else.
-#ifdef _ANDROID
+#ifdef ANDROID
     length = str.size();
 #else
     length = std::mbstowcs(NULL, str.c_str(), 0);
