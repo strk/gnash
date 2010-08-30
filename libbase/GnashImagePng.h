@@ -37,9 +37,12 @@ extern "C" {
 }
 
 // Forward declarations
-namespace gnash { class IOChannel; }
+namespace gnash {
+    class IOChannel;
+}
 
 namespace gnash {
+namespace image {
 
 class PngImageInput : public ImageInput
 {
@@ -139,6 +142,7 @@ private:
     
 };
 
+} // namespace image
 } // namespace gnash
 
 

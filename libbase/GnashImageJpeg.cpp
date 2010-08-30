@@ -61,8 +61,8 @@ typedef jpeg_boolean jpeg_bool_t;
 typedef jpeg::boolean jpeg_bool_t;
 #endif
 
-namespace gnash
-{
+namespace gnash {
+namespace image {
 
 static void
 jpeg_error_exit(j_common_ptr cinfo)
@@ -630,6 +630,7 @@ JpegImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
     return outChannel;
 }
 
+} // namespace image
 } // namespace gnash
 
 

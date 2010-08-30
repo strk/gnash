@@ -166,6 +166,8 @@ namespace gnash {
     class SWFMatrix;
     class FillStyle;
     class LineStyle;
+    class Shape;
+    class MorphShape;
 
     // XXX: GnashImageProxy (delayed image rendering)
     class GnashVaapiImageProxy;
@@ -173,11 +175,9 @@ namespace gnash {
     namespace SWF {
         class ShapeRecord;
     }
-
-    class Shape;
-    class MorphShape;
-
-    class GnashImage;
+    namespace image {
+        class GnashImage;
+    }
 }
 
 namespace gnash {
@@ -224,7 +224,8 @@ public:
     /// Given an image, returns a pointer to a bitmap_info class
     /// that can later be passed to FillStyleX_bitmap(), to set a
     /// bitmap fill style.
-    virtual CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im) = 0;
+    virtual CachedBitmap* createCachedBitmap(
+            std::auto_ptr<image::GnashImage> im) = 0;
 
 
     /// ==================================================================
@@ -252,8 +253,8 @@ public:
     ///   The width and height determine the size of the Flash video instance
     ///   on the stage (in TWIPS) prior to SWFMatrix transformations.         
     ///
-    virtual void drawVideoFrame(GnashImage* frame, const Transform& xform,
-            const SWFRect* bounds, bool smooth) = 0;
+    virtual void drawVideoFrame(image::GnashImage* frame,
+            const Transform& xform, const SWFRect* bounds, bool smooth) = 0;
 
     /// Draw a line-strip directly, using a thin, solid line.
     //
@@ -598,7 +599,7 @@ public:
     public:
 
         /// Prepare the renderer for internal rendering
-        Internal(Renderer& r, GnashImage& im)
+        Internal(Renderer& r, image::GnashImage& im)
             :
             _r(r),
             _ext(_r.startInternalRender(im))
@@ -648,7 +649,7 @@ private:
     /// Implementations are free to return a new renderer if they choose.
     //
     /// @return         0 if the renderer does not support this.
-    virtual Renderer* startInternalRender(GnashImage& buffer) = 0;
+    virtual Renderer* startInternalRender(image::GnashImage& buffer) = 0;
 
     /// Finish internal rendering.
     //

@@ -33,6 +33,7 @@ extern "C" {
 }
 
 namespace gnash {
+namespace image {
 
 static int
 readData(GifFileType* ft, GifByteType* data, int length)
@@ -216,6 +217,7 @@ GifImageInput::read()
 
 }
 
+} // namespace image
 } // namespace gnash
 
 // Local Variables:

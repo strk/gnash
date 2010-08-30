@@ -36,6 +36,7 @@ extern "C" {
 namespace gnash { class IOChannel; }
 
 namespace gnash {
+namespace image {
 
 class GifImageInput : public ImageInput
 {
@@ -108,6 +109,7 @@ private:
 
 };
 
+} // namespace image
 } // namespace gnash
 
 

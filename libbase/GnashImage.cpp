@@ -37,8 +37,8 @@
 #include "IOChannel.h"
 #include "log.h"
 
-namespace gnash
-{
+namespace gnash {
+namespace image {
 
 namespace {
     void processAlpha(GnashImage::iterator imageData, size_t pixels);
@@ -124,12 +124,13 @@ ImageRGBA::setPixel(size_t x, size_t y, value_type r, value_type g,
 
 
 void
-ImageRGBA::mergeAlpha(const_iterator alphaData, const size_t bufferLength)
+mergeAlpha(ImageRGBA& im, GnashImage::const_iterator alphaData,
+        const size_t bufferLength)
 {
-    assert(bufferLength * 4 <= size());
+    assert(bufferLength * 4 <= im.size());
 
     // Point to the first alpha byte
-    iterator p = begin();
+    GnashImage::iterator p = im.begin();
 
     // Premultiplication is also done at rendering time (at least by the
     // agg renderer).
@@ -313,6 +314,6 @@ processAlpha(GnashImage::iterator imageData, size_t pixels)
 }
 
 } // anonymous namespace
-
+} // namespace image
 } // namespace gnash
 

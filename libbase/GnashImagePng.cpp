@@ -29,8 +29,11 @@
 #include <boost/scoped_array.hpp>
 
 namespace gnash {
+namespace image {
 
-static void
+namespace {
+
+void
 error(png_struct*, const char* msg)
 {
     std::ostringstream ss;
@@ -38,13 +41,13 @@ error(png_struct*, const char* msg)
     throw ParserException(ss.str());
 }
 
-static void
+void
 warning(png_struct*, const char* msg)
 {
     log_debug(_("PNG warning: %s"), msg);
 }
 
-static void
+void
 readData(png_structp pngptr, png_bytep data, png_size_t length)
 {
     // Do not call unless the PNG exists.
@@ -53,7 +56,7 @@ readData(png_structp pngptr, png_bytep data, png_size_t length)
     in->read(reinterpret_cast<char*>(data), length);
 }
 
-static void
+void
 writeData(png_structp pngptr, png_bytep data, png_size_t length)
 {
     // Do not call unless the PNG exists.
@@ -62,11 +65,12 @@ writeData(png_structp pngptr, png_bytep data, png_size_t length)
     out->write(reinterpret_cast<char*>(data), length);
 }
 
-static void
+void
 flushData(png_structp /*pngptr*/)
 {
-
 }
+
+} // unnamed namespace
 
 PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
     ImageInput(in),
@@ -321,7 +325,7 @@ PngImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
     return outChannel;
 }
 
-
+} // namespace image
 } // namespace gnash
 
 // Local Variables:

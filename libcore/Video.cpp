@@ -127,7 +127,7 @@ Video::display(Renderer& renderer, const Transform& base)
     const Transform xform = base * transform();
 	const SWFRect& bounds = m_def->bounds();
 
-	GnashImage* img = getVideoFrame();
+    image::GnashImage* img = getVideoFrame();
 	if (img) {
 		renderer.drawVideoFrame(img, xform, &bounds, _smoothing);
 	}
@@ -135,7 +135,7 @@ Video::display(Renderer& renderer, const Transform& base)
 	clear_invalidated();
 }
 
-GnashImage*
+image::GnashImage*
 Video::getVideoFrame()
 {
 
@@ -144,7 +144,7 @@ Video::getVideoFrame()
     // frame from there.
 	if (_ns)
 	{
-		std::auto_ptr<GnashImage> tmp = _ns->get_video();
+		std::auto_ptr<image::GnashImage> tmp = _ns->get_video();
 		if ( tmp.get() ) _lastDecodedVideoFrame = tmp;
 	}
 

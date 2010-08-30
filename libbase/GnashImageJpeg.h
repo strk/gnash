@@ -45,8 +45,8 @@ extern "C" {
 // Forward declarations
 namespace gnash { class IOChannel; }
 
-namespace gnash
-{
+namespace gnash {
+namespace image {
 
 /// Class for reading JPEG image data. 
 //
@@ -205,8 +205,8 @@ private:
     
 };
 
+} // namespace image
 } // namespace gnash
-
 
 #endif // JPEG_H
 

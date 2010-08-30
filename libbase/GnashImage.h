@@ -42,6 +42,9 @@ namespace gnash {
 
 namespace gnash {
 
+/// Image handling functions and classes.
+namespace image {
+
 /// The types of images handled in Gnash.
 enum ImageType
 {
@@ -253,9 +256,6 @@ public:
     ///
     void setPixel(size_t x, size_t y, value_type r, value_type g, value_type b,
             value_type a);
-
-    void mergeAlpha(const_iterator alphaData, const size_t bufferLength);
-
 };
 
 /// The base class for reading image data. 
@@ -407,6 +407,10 @@ scanline(const GnashImage& im, size_t row)
     return im.begin() + im.stride() * row;
 }
 
+void mergeAlpha(ImageRGBA& im, GnashImage::const_iterator alphaData,
+        const size_t bufferLength);
+
+} // namespace image
 } // namespace gnash
 
 #endif

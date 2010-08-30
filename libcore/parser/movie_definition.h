@@ -72,7 +72,9 @@ namespace gnash {
     }
     class Font;
     class sound_sample;
-    class JpegImageInput;
+    namespace image {
+        class JpegImageInput;
+    }
 }
 
 namespace gnash
@@ -307,7 +309,7 @@ public:
 	/// *is* performed, and it is deleting the jpeg::input instance since
 	/// it is passed in an auto_ptr...
 	///
-	virtual void set_jpeg_loader(std::auto_ptr<JpegImageInput> /*j_in*/)
+	virtual void set_jpeg_loader(std::auto_ptr<image::JpegImageInput> /*j_in*/)
 	{
 	}
 
@@ -322,7 +324,7 @@ public:
 	///
 	/// NOTE: ownership of the returned object is NOT transferred
 	///
-	virtual JpegImageInput* get_jpeg_loader() const
+	virtual image::JpegImageInput* get_jpeg_loader() const
 	{
 		return NULL;
 	}

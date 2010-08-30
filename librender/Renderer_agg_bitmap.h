@@ -29,14 +29,14 @@ class agg_bitmap_info : public CachedBitmap
 {
 public:
   
-    agg_bitmap_info(std::auto_ptr<GnashImage> im)
+    agg_bitmap_info(std::auto_ptr<image::GnashImage> im)
         :
         _image(im.release()),
-        _bpp(_image->type() == GNASH_IMAGE_RGB ? 24 : 32)
+        _bpp(_image->type() == image::GNASH_IMAGE_RGB ? 24 : 32)
     {
     }
   
-    virtual GnashImage& image() {
+    virtual image::GnashImage& image() {
         assert(!disposed());
         return *_image;
     }
@@ -57,7 +57,7 @@ public:
     
 private:
   
-    boost::scoped_ptr<GnashImage> _image;
+    boost::scoped_ptr<image::GnashImage> _image;
   
     int _bpp;
       
