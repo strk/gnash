@@ -44,19 +44,19 @@ namespace gnash {
 namespace gnash {
 namespace image {
 
-class PngImageInput : public ImageInput
+class PngInput : public ImageInput
 {
 
 public:
 
-    /// Construct a PngImageInput object to read from an IOChannel.
+    /// Construct a PngInput object to read from an IOChannel.
     //
     /// @param in   The stream to read PNG data from. Ownership is shared
-    ///             between caller and JpegImageInput, so it is freed
+    ///             between caller and JpegInput, so it is freed
     ///             automatically when the last owner is destroyed.
-    PngImageInput(boost::shared_ptr<IOChannel> in);
+    PngInput(boost::shared_ptr<IOChannel> in);
     
-    ~PngImageInput();
+    ~PngInput();
     
     /// Begin processing the image data.
     void read();
@@ -78,13 +78,13 @@ public:
     /// @param rgbData  The buffer for writing raw RGB data to.
     void readScanline(unsigned char* imageData);
 
-    /// Create a PngImageInput and transfer ownership to the caller.
+    /// Create a PngInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read PNG data from.
     DSOEXPORT static std::auto_ptr<ImageInput> create(
             boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<ImageInput> ret ( new PngImageInput(in) );
+        std::auto_ptr<ImageInput> ret ( new PngInput(in) );
         if (ret.get()) ret->read();
         return ret;
     }

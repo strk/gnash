@@ -239,7 +239,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
                 currPos);
     }
 
-    std::auto_ptr<image::JpegImageInput> input;
+    std::auto_ptr<image::JpegInput> input;
 
     try
     {
@@ -252,8 +252,8 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
     //
         boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                     std::numeric_limits<std::streamsize>::max()).release());
-        //  transfer ownership to the image::JpegImageInput
-        input = image::JpegImageInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
+        //  transfer ownership to the image::JpegInput
+        input = image::JpegInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 
     }
     catch (std::exception& e)
@@ -271,7 +271,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 
 // A JPEG image without included tables; those should be in an
-// existing image::JpegImageInput object stored in the movie.
+// existing image::JpegInput object stored in the movie.
 void
 define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunResources& r)
@@ -291,7 +291,7 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     // Read the image data.
-    image::JpegImageInput* j_in = m.get_jpeg_loader();
+    image::JpegInput* j_in = m.get_jpeg_loader();
     if ( ! j_in )
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -305,7 +305,7 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
     
     std::auto_ptr<image::GnashImage> im;
     try {
-        im = image::JpegImageInput::readSWFJpeg2WithTables(*j_in);
+        im = image::JpegInput::readSWFJpeg2WithTables(*j_in);
     }
     catch (std::exception& e) {
         IF_VERBOSE_MALFORMED_SWF(

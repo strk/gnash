@@ -292,7 +292,7 @@ public:
 
     /// Set an input object for later loading DefineBits
     /// images (JPEG images without the table info).
-    void set_jpeg_loader(std::auto_ptr<image::JpegImageInput> j_in) {
+    void set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in) {
         if (m_jpeg_in.get()) {
             /// There should be only one JPEGTABLES tag in an SWF (see: 
             /// http://www.m2osw.com/en/swf_alexref.html#tag_jpegtables)
@@ -308,7 +308,7 @@ public:
     }
 
     // See dox in movie_definition.h
-    image::JpegImageInput* get_jpeg_loader() const {
+    image::JpegInput* get_jpeg_loader() const {
         return m_jpeg_in.get();
     }
 
@@ -496,7 +496,7 @@ private:
 
     boost::uint32_t m_file_length;
 
-    std::auto_ptr<image::JpegImageInput> m_jpeg_in;
+    std::auto_ptr<image::JpegInput> m_jpeg_in;
 
     std::string _url;
 

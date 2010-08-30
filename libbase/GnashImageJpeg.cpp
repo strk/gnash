@@ -69,7 +69,7 @@ jpeg_error_exit(j_common_ptr cinfo)
 {
 
     // Set a flag to stop parsing 
-    JpegImageInput* in = static_cast<JpegImageInput*>(cinfo->client_data);
+    JpegInput* in = static_cast<JpegInput*>(cinfo->client_data);
     
     in->errorOccurred(cinfo->err->jpeg_message_table[cinfo->err->msg_code]); 
 
@@ -233,7 +233,7 @@ private:
 };
 
 
-JpegImageInput::JpegImageInput(boost::shared_ptr<IOChannel> in)
+JpegInput::JpegInput(boost::shared_ptr<IOChannel> in)
     :
     ImageInput(in),
     _errorOccurred(0),
@@ -250,7 +250,7 @@ JpegImageInput::JpegImageInput(boost::shared_ptr<IOChannel> in)
 }
 
 
-JpegImageInput::~JpegImageInput()
+JpegInput::~JpegInput()
 {
     finishImage();
 
@@ -265,7 +265,7 @@ JpegImageInput::~JpegImageInput()
 
 
 void
-JpegImageInput::discardPartialBuffer()
+JpegInput::discardPartialBuffer()
 {
     rw_source_IOChannel* src = (rw_source_IOChannel*) m_cinfo.src;
 
@@ -278,7 +278,7 @@ JpegImageInput::discardPartialBuffer()
 
 
 void
-JpegImageInput::readHeader(unsigned int maxHeaderBytes)
+JpegInput::readHeader(unsigned int maxHeaderBytes)
 {
     if (setjmp(_jmpBuf)) {
         std::stringstream ss;
@@ -322,7 +322,7 @@ JpegImageInput::readHeader(unsigned int maxHeaderBytes)
 
 
 void
-JpegImageInput::read()
+JpegInput::read()
 {
     assert(!_compressorOpened);
 
@@ -379,7 +379,7 @@ JpegImageInput::read()
 
 
 void
-JpegImageInput::finishImage()
+JpegInput::finishImage()
 {
     if (setjmp(_jmpBuf)) {
         std::stringstream ss;
@@ -396,7 +396,7 @@ JpegImageInput::finishImage()
 
 // Return the height of the image.  Take the data from our m_cinfo struct.
 size_t
-JpegImageInput::getHeight() const
+JpegInput::getHeight() const
 {
     assert(_compressorOpened);
     return m_cinfo.output_height;
@@ -405,7 +405,7 @@ JpegImageInput::getHeight() const
 
 // Return the width of the image.  Take the data from our m_cinfo struct.
 size_t
-JpegImageInput::getWidth() const
+JpegInput::getWidth() const
 {
     assert(_compressorOpened);
     return m_cinfo.output_width;
@@ -413,7 +413,7 @@ JpegImageInput::getWidth() const
 
 
 size_t
-JpegImageInput::getComponents() const
+JpegInput::getComponents() const
 {
     assert(_compressorOpened);
     return m_cinfo.output_components;
@@ -421,7 +421,7 @@ JpegImageInput::getComponents() const
 
 
 void
-JpegImageInput::readScanline(unsigned char* rgb_data)
+JpegInput::readScanline(unsigned char* rgb_data)
 {
     assert(_compressorOpened);
     assert(m_cinfo.output_scanline < m_cinfo.output_height);
@@ -444,7 +444,7 @@ JpegImageInput::readScanline(unsigned char* rgb_data)
 
 
 void
-JpegImageInput::errorOccurred(const char* msg)
+JpegInput::errorOccurred(const char* msg)
 {
     log_debug("Long jump: banzaaaaaai!");
     _errorOccurred = msg;
@@ -460,7 +460,7 @@ JpegImageInput::errorOccurred(const char* msg)
 // already has tables loaded.  The IJG documentation describes
 // this as "abbreviated" format.
 std::auto_ptr<GnashImage>
-JpegImageInput::readSWFJpeg2WithTables(JpegImageInput& loader)
+JpegInput::readSWFJpeg2WithTables(JpegInput& loader)
 {
 
     loader.read();
@@ -569,7 +569,7 @@ public:
 
 private:    
 
-    // Source stream, owned in this context by JpegImageInput
+    // Source stream, owned in this context by JpegInput
     IOChannel& m_out_stream;    
 
     JOCTET m_buffer[IO_BUF_SIZE];        /* start of buffer */

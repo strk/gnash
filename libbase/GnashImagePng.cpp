@@ -72,7 +72,7 @@ flushData(png_structp /*pngptr*/)
 
 } // unnamed namespace
 
-PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
+PngInput::PngInput(boost::shared_ptr<IOChannel> in) :
     ImageInput(in),
     _pngPtr(0),
     _infoPtr(0),
@@ -83,34 +83,34 @@ PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
     init();
 }
 
-PngImageInput::~PngImageInput()
+PngInput::~PngInput()
 {
     png_destroy_read_struct(&_pngPtr, &_infoPtr,
                     static_cast<png_infopp>(NULL));
 }
 
 size_t
-PngImageInput::getHeight() const
+PngInput::getHeight() const
 {
     assert (_pngPtr && _infoPtr);
     return png_get_image_height(_pngPtr, _infoPtr);
 }
 
 size_t
-PngImageInput::getWidth() const
+PngInput::getWidth() const
 {
     assert (_pngPtr && _infoPtr);
     return png_get_image_width(_pngPtr, _infoPtr);
 }
 
 size_t
-PngImageInput::getComponents() const
+PngInput::getComponents() const
 {
     return png_get_channels(_pngPtr, _infoPtr);
 }
 
 void
-PngImageInput::readScanline(unsigned char* imageData)
+PngInput::readScanline(unsigned char* imageData)
 {
     assert (_currentRow < getHeight());
     assert (_rowPtrs);
@@ -125,7 +125,7 @@ PngImageInput::readScanline(unsigned char* imageData)
 
 
 void
-PngImageInput::init()
+PngInput::init()
 {
     // Initialize png library.
     _pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
@@ -144,7 +144,7 @@ PngImageInput::init()
 }
 
 void
-PngImageInput::read()
+PngInput::read()
 {
     // Set our user-defined reader function
     png_set_read_fn(_pngPtr, _inStream.get(), &readData);

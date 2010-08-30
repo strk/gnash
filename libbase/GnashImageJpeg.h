@@ -51,7 +51,7 @@ namespace image {
 /// Class for reading JPEG image data. 
 //
 /// This uses the IJG jpeglib to implement the ImageInput interface.
-class JpegImageInput : public ImageInput
+class JpegInput : public ImageInput
 {
 
 private:
@@ -68,12 +68,12 @@ private:
 
 public:
 
-    /// Construct a JpegImageInput object to read from an IOChannel.
+    /// Construct a JpegInput object to read from an IOChannel.
     //
     /// @param in   The stream to read JPEG data from. Ownership is shared
-    ///             between caller and JpegImageInput, so it is freed
+    ///             between caller and JpegInput, so it is freed
     ///             automatically when the last owner is destroyed.
-    DSOEXPORT JpegImageInput(boost::shared_ptr<IOChannel> in);
+    DSOEXPORT JpegInput(boost::shared_ptr<IOChannel> in);
 
     /// Read the JPEG header information only.
     //
@@ -82,7 +82,7 @@ public:
     ///                         early.
     void DSOEXPORT readHeader(unsigned int maxHeaderBytes);
 
-    ~JpegImageInput();
+    ~JpegInput();
 
     /// Begin processing the image data.
     void read();
@@ -120,12 +120,12 @@ public:
     /// @param rgbData  The buffer for writing raw RGB data to.
     void readScanline(unsigned char* rgbData);
 
-    /// Create a JpegImageInput and transfer ownership to the caller.
+    /// Create a JpegInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read JPEG data from.
     static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<ImageInput> ret(new JpegImageInput(in));
+        std::auto_ptr<ImageInput> ret(new JpegInput(in));
         // might throw an exception (I guess)
         if (ret.get()) ret->read();
         return ret;
@@ -135,11 +135,11 @@ public:
     /// For reading SWF JPEG2-style image data, using pre-loaded
     /// headers stored in the given jpeg::input object.
     //
-    /// @param loader   The JpegImageInput object to use for reading the
+    /// @param loader   The JpegInput object to use for reading the
     ///                 data. This should have been constructed with
     ///                 createSWFJpeg2HeaderOnly().
     DSOEXPORT static std::auto_ptr<GnashImage> readSWFJpeg2WithTables(
-            JpegImageInput& loader);
+            JpegInput& loader);
 
     /// Create a JPEG 'loader' object by reading a JPEG header.
     //
@@ -147,10 +147,10 @@ public:
     //
     /// @param in               The channel to read JPEG header data from.
     /// @param maxHeaderBytes   The maximum number of bytes to read.
-    static std::auto_ptr<JpegImageInput> createSWFJpeg2HeaderOnly(
+    static std::auto_ptr<JpegInput> createSWFJpeg2HeaderOnly(
             boost::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
     {
-        std::auto_ptr<JpegImageInput> ret (new JpegImageInput(in));
+        std::auto_ptr<JpegInput> ret (new JpegInput(in));
         // might throw an exception
         if (ret.get()) ret->readHeader(maxHeaderBytes);
         return ret;

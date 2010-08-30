@@ -199,16 +199,16 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     switch (type) {
 #ifdef USE_PNG
         case GNASH_FILETYPE_PNG:
-            inChannel = PngImageInput::create(in);
+            inChannel = PngInput::create(in);
             break;
 #endif
 #ifdef USE_GIF                
         case GNASH_FILETYPE_GIF:
-            inChannel = GifImageInput::create(in);
+            inChannel = GifInput::create(in);
             break;
 #endif
         case GNASH_FILETYPE_JPEG:
-            inChannel = JpegImageInput::create(in);
+            inChannel = JpegInput::create(in);
             break;
         default:
             break;
@@ -233,7 +233,7 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
         }
     }
     catch (std::bad_alloc& e) {
-        // This should be caught here because ~JpegImageInput can also
+        // This should be caught here because ~JpegInput can also
         // throw an exception on stack unwinding and this confuses
         // remote catchers.
         log_error("Out of memory while trying to create %dx%d image",
@@ -265,8 +265,8 @@ ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
     std::auto_ptr<ImageRGBA> im;
 
     // Calling with headerBytes as 0 has a special effect...
-    std::auto_ptr<JpegImageInput> j_in(
-            JpegImageInput::createSWFJpeg2HeaderOnly(in, 0));
+    std::auto_ptr<JpegInput> j_in(
+            JpegInput::createSWFJpeg2HeaderOnly(in, 0));
 
     // If this isn't true, we should have thrown.
     assert(j_in.get());

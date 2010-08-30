@@ -45,35 +45,35 @@ readData(GifFileType* ft, GifByteType* data, int length)
 }
 
 
-GifImageInput::GifImageInput(boost::shared_ptr<IOChannel> in) :
+GifInput::GifInput(boost::shared_ptr<IOChannel> in) :
     ImageInput(in),
     _gif(NULL),
     _currentRow(0)
 {
 }
 
-GifImageInput::~GifImageInput()
+GifInput::~GifInput()
 {
     // Clean up allocated data.
     DGifCloseFile(_gif);
 }
 
 size_t
-GifImageInput::getHeight() const
+GifInput::getHeight() const
 {
     assert (_gif);
     return _gif->SHeight;
 }
 
 size_t
-GifImageInput::getWidth() const
+GifInput::getWidth() const
 {
     assert (_gif);
     return _gif->SWidth;
 }
 
 void
-GifImageInput::readScanline(unsigned char* rgbData)
+GifInput::readScanline(unsigned char* rgbData)
 {
 
     ColorMapObject* colormap = (_gif->Image.ColorMap) ?
@@ -97,7 +97,7 @@ GifImageInput::readScanline(unsigned char* rgbData)
 }
 
 void
-GifImageInput::read()
+GifInput::read()
 {
     _gif = DGifOpen(_inStream.get(), &readData); 
 
