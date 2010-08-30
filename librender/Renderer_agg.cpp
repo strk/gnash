@@ -713,7 +713,7 @@ public:
             }
         }
         
-        image::ImageOutput::writeImageData(type, io, im, 100);
+        image::Output::writeImageData(type, io, im, 100);
     }
 
     template<typename SourceFormat, typename Matrix>

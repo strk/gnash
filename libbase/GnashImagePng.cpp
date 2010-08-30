@@ -73,7 +73,7 @@ flushData(png_structp /*pngptr*/)
 } // unnamed namespace
 
 PngInput::PngInput(boost::shared_ptr<IOChannel> in) :
-    ImageInput(in),
+    Input(in),
     _pngPtr(0),
     _infoPtr(0),
     _rowPtrs(0),
@@ -231,9 +231,9 @@ PngInput::read()
 /// PNG output
 ///
 
-PngImageOutput::PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int /* quality */)
+PngOutput::PngOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int /* quality */)
     :
-    ImageOutput(out, width, height),
+    Output(out, width, height),
     _pngPtr(0),
     _infoPtr(0)
 {
@@ -241,14 +241,14 @@ PngImageOutput::PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width, s
 }
 
 
-PngImageOutput::~PngImageOutput()
+PngOutput::~PngOutput()
 {
     png_destroy_write_struct(&_pngPtr, &_infoPtr);
 }
 
 
 void
-PngImageOutput::init()
+PngOutput::init()
 {
     // Initialize png library.
     _pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
@@ -265,7 +265,7 @@ PngImageOutput::init()
 }
 
 void
-PngImageOutput::writeImageRGBA(const unsigned char* rgbaData)
+PngOutput::writeImageRGBA(const unsigned char* rgbaData)
 {
     png_set_write_fn(_pngPtr, _outStream.get(), &writeData, &flushData);
 
@@ -291,7 +291,7 @@ PngImageOutput::writeImageRGBA(const unsigned char* rgbaData)
 
 
 void
-PngImageOutput::writeImageRGB(const unsigned char* rgbData)
+PngOutput::writeImageRGB(const unsigned char* rgbData)
 {
     png_set_write_fn(_pngPtr, _outStream.get(), &writeData, &flushData);
 
@@ -316,12 +316,12 @@ PngImageOutput::writeImageRGB(const unsigned char* rgbData)
 }
 
 
-std::auto_ptr<ImageOutput>
-PngImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
+std::auto_ptr<Output>
+PngOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
                        size_t height, int quality)
 {
-    std::auto_ptr<ImageOutput> outChannel(
-                new PngImageOutput(out, width, height, quality));
+    std::auto_ptr<Output> outChannel(
+                new PngOutput(out, width, height, quality));
     return outChannel;
 }
 

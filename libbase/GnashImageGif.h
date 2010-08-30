@@ -38,7 +38,7 @@ namespace gnash { class IOChannel; }
 namespace gnash {
 namespace image {
 
-class GifInput : public ImageInput
+class GifInput : public Input
 {
 
 public:
@@ -81,10 +81,10 @@ public:
     /// Create a GifInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read GIF data from.
-    DSOEXPORT static std::auto_ptr<ImageInput> create(
+    DSOEXPORT static std::auto_ptr<Input> create(
             boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<ImageInput> ret ( new GifInput(in) );
+        std::auto_ptr<Input> ret ( new GifInput(in) );
         if ( ret.get() ) ret->read();
         return ret;
     }

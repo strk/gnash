@@ -259,22 +259,22 @@ public:
 };
 
 /// The base class for reading image data. 
-class ImageInput : boost::noncopyable
+class Input : boost::noncopyable
 {
 public:
 
-    /// Construct an ImageInput object to read from an IOChannel.
+    /// Construct an Input object to read from an IOChannel.
     //
     /// @param in   The stream to read data from. Ownership is shared
-    ///             between caller and ImageInput, so it is freed
+    ///             between caller and Input, so it is freed
     ///             automatically when the last owner is destroyed.
-    ImageInput(boost::shared_ptr<IOChannel> in)
+    Input(boost::shared_ptr<IOChannel> in)
         :
         _inStream(in),
         _type(GNASH_IMAGE_INVALID)
     {}
 
-    virtual ~ImageInput() {}
+    virtual ~Input() {}
 
     /// Begin processing the image data.
     virtual void read() = 0;
@@ -331,25 +331,25 @@ protected:
 };
 
 // Base class for writing image data.
-class ImageOutput : boost::noncopyable
+class Output : boost::noncopyable
 {
 
 public:
 
-    /// Construct an ImageOutput for writing to an IOChannel
+    /// Construct an Output for writing to an IOChannel
     //
     /// @param out      The gnash::IOChannel to write the image to. Ownership
     ///                 is shared.
     /// @param width    The width of the resulting image
     /// @param height   The height of the resulting image.
-    ImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height)
+    Output(boost::shared_ptr<IOChannel> out, size_t width, size_t height)
         :
         _width(width),
         _height(height),
         _outStream(out)
     {}
 
-    virtual ~ImageOutput() {}
+    virtual ~Output() {}
     
     /// Write RGB image data using the parameters supplied at construction.
     //

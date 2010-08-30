@@ -46,7 +46,7 @@ readData(GifFileType* ft, GifByteType* data, int length)
 
 
 GifInput::GifInput(boost::shared_ptr<IOChannel> in) :
-    ImageInput(in),
+    Input(in),
     _gif(NULL),
     _currentRow(0)
 {

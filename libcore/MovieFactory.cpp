@@ -155,7 +155,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
     try {
         std::auto_ptr<image::GnashImage> im(
-                image::ImageInput::readImageData(imageData, type));
+                image::Input::readImageData(imageData, type));
 
         if (!im.get()) {
             log_error(_("Can't read image file from %s"), url);

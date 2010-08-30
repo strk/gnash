@@ -153,23 +153,23 @@ mergeAlpha(ImageRGBA& im, GnashImage::const_iterator alphaData,
 
 // Write the given image to the given out stream, in jpeg format.
 void
-ImageOutput::writeImageData(FileType type,
+Output::writeImageData(FileType type,
     boost::shared_ptr<IOChannel> out, const GnashImage& image, int quality)
 {
     
     const size_t width = image.width();
     const size_t height = image.height();
             
-    std::auto_ptr<ImageOutput> outChannel;
+    std::auto_ptr<Output> outChannel;
 
     switch (type) {
 #ifdef USE_PNG
         case GNASH_FILETYPE_PNG:
-            outChannel = PngImageOutput::create(out, width, height, quality);
+            outChannel = PngOutput::create(out, width, height, quality);
             break;
 #endif
         case GNASH_FILETYPE_JPEG:
-            outChannel = JpegImageOutput::create(out, width, height, quality);
+            outChannel = JpegOutput::create(out, width, height, quality);
             break;
         default:
             log_error("Requested to write image as unsupported filetype");
@@ -191,10 +191,10 @@ ImageOutput::writeImageData(FileType type,
 
 // See gnash.h for file types.
 std::auto_ptr<GnashImage>
-ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
+Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 {
     std::auto_ptr<GnashImage> im;
-    std::auto_ptr<ImageInput> inChannel;
+    std::auto_ptr<Input> inChannel;
 
     switch (type) {
 #ifdef USE_PNG
@@ -259,7 +259,7 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 // For reading SWF JPEG3-style image data, like ordinary JPEG, 
 // but stores the data in ImageRGBA format.
 std::auto_ptr<ImageRGBA>
-ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
+Input::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 {
 
     std::auto_ptr<ImageRGBA> im;

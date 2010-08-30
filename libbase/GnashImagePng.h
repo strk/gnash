@@ -44,7 +44,7 @@ namespace gnash {
 namespace gnash {
 namespace image {
 
-class PngInput : public ImageInput
+class PngInput : public Input
 {
 
 public:
@@ -81,10 +81,10 @@ public:
     /// Create a PngInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read PNG data from.
-    DSOEXPORT static std::auto_ptr<ImageInput> create(
+    DSOEXPORT static std::auto_ptr<Input> create(
             boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<ImageInput> ret ( new PngInput(in) );
+        std::auto_ptr<Input> ret ( new PngInput(in) );
         if (ret.get()) ret->read();
         return ret;
     }
@@ -109,7 +109,7 @@ private:
 };
 
 // Class object for writing PNG image data.
-class PngImageOutput : public ImageOutput
+class PngOutput : public Output
 {
 
 public:
@@ -119,16 +119,16 @@ public:
     /// @param out      The IOChannel used for output. Must be kept alive
     ///                 throughout
     /// @param quality Unused in PNG output
-    PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width,
+    PngOutput(boost::shared_ptr<IOChannel> out, size_t width,
             size_t height, int quality);
     
-    ~PngImageOutput();
+    ~PngOutput();
 
     void writeImageRGB(const unsigned char* rgbData);
     
     void writeImageRGBA(const unsigned char* rgbaData);
 
-    static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out,
+    static std::auto_ptr<Output> create(boost::shared_ptr<IOChannel> out,
             size_t width, size_t height, int quality);
     
 private:

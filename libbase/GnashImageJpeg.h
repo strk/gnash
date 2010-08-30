@@ -50,8 +50,8 @@ namespace image {
 
 /// Class for reading JPEG image data. 
 //
-/// This uses the IJG jpeglib to implement the ImageInput interface.
-class JpegInput : public ImageInput
+/// This uses the IJG jpeglib to implement the Input interface.
+class JpegInput : public Input
 {
 
 private:
@@ -123,9 +123,9 @@ public:
     /// Create a JpegInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read JPEG data from.
-    static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
+    static std::auto_ptr<Input> create(boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<ImageInput> ret(new JpegInput(in));
+        std::auto_ptr<Input> ret(new JpegInput(in));
         // might throw an exception (I guess)
         if (ret.get()) ret->read();
         return ret;
@@ -168,34 +168,34 @@ public:
 };
 
 // Class for writing JPEG image data.
-class JpegImageOutput : public ImageOutput
+class JpegOutput : public Output
 {
 
 public:
 
-    /// Constract a JpegImageOutput for writing to an IOChannel
+    /// Constract a JpegOutput for writing to an IOChannel
     //
     /// @param out      The gnash::IOChannel to write the image to
     /// @param width    The width of the resulting image
     /// @param height   The height of the resulting image.
     /// @param quality  The quality of the created image, from 1-100.
-    JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width,
+    JpegOutput(boost::shared_ptr<IOChannel> out, size_t width,
             size_t height, int quality);
     
-    ~JpegImageOutput();
+    ~JpegOutput();
 
     /// Write RGB image data using the parameters supplied at construction.
     //
     /// @param rgbData  The raw RGB image data to write as a JPEG.
     void writeImageRGB(const unsigned char* rgbData);
 
-    /// Create a JpegImageOutput, transferring ownership to the caller.
+    /// Create a JpegOutput, transferring ownership to the caller.
     //
     /// @param out      The gnash::IOChannel to write the image to
     /// @param width    The width of the resulting image
     /// @param height   The height of the resulting image.
     /// @param quality  The quality of the created image, from 1-100.
-    static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out,
+    static std::auto_ptr<Output> create(boost::shared_ptr<IOChannel> out,
             size_t width, size_t height, int quality);
     
 private:

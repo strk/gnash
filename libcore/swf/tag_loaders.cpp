@@ -375,7 +375,7 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
     boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                 in.get_tag_end_position()).release() );
 
-    std::auto_ptr<image::GnashImage> im (image::ImageInput::readImageData(ad, ft));
+    std::auto_ptr<image::GnashImage> im (image::Input::readImageData(ad, ft));
 
     Renderer* renderer = r.renderer();
     if (!renderer) {
@@ -510,7 +510,7 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     // Read rgb data.
     boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                 alpha_position).release());
-    std::auto_ptr<image::ImageRGBA> im = image::ImageInput::readSWFJpeg3(ad);
+    std::auto_ptr<image::ImageRGBA> im = image::Input::readSWFJpeg3(ad);
     
     /// Failure to read the jpeg.
     if (!im.get()) return;

@@ -235,7 +235,7 @@ private:
 
 JpegInput::JpegInput(boost::shared_ptr<IOChannel> in)
     :
-    ImageInput(in),
+    Input(in),
     _errorOccurred(0),
     _compressorOpened(false)
 {
@@ -577,9 +577,9 @@ private:
 };
 
 
-JpegImageOutput::JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
+JpegOutput::JpegOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
     :
-    ImageOutput(out, width, height)
+    Output(out, width, height)
 {
     m_cinfo.err = jpeg_std_error(&m_jerr);
 
@@ -598,7 +598,7 @@ JpegImageOutput::JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width,
 }
 
 
-JpegImageOutput::~JpegImageOutput()
+JpegOutput::~JpegOutput()
 {
     jpeg_finish_compress(&m_cinfo);
     jpeg_destroy_compress(&m_cinfo);
@@ -606,7 +606,7 @@ JpegImageOutput::~JpegImageOutput()
 
 
 void
-JpegImageOutput::writeImageRGB(const unsigned char* rgbData)
+JpegOutput::writeImageRGB(const unsigned char* rgbData)
 {
     // RGB...
     const size_t components = 3;
@@ -621,12 +621,12 @@ JpegImageOutput::writeImageRGB(const unsigned char* rgbData)
 }
 
 
-std::auto_ptr<ImageOutput>
-JpegImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
+std::auto_ptr<Output>
+JpegOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
         size_t height, int quality)
 {
-    std::auto_ptr<ImageOutput> outChannel(
-            new JpegImageOutput(out, width, height, quality));
+    std::auto_ptr<Output> outChannel(
+            new JpegOutput(out, width, height, quality));
     return outChannel;
 }
 
