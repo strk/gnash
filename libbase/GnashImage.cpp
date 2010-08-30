@@ -131,8 +131,9 @@ ImageRGBA::mergeAlpha(const_iterator alphaData, const size_t bufferLength)
     // Point to the first alpha byte
     iterator p = begin();
 
-    // Set each 4th byte to the correct alpha value and adjust the
-    // other values.
+    // Premultiplication is also done at rendering time (at least by the
+    // agg renderer).
+    // TODO: use BitmapData.loadBitmap to check whether it's also done here.
     for (size_t i = 0; i < bufferLength; ++i, ++alphaData) {
         *p = std::min(*p, *alphaData);
         ++p;
