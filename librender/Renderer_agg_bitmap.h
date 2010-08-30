@@ -32,7 +32,7 @@ public:
     agg_bitmap_info(std::auto_ptr<image::GnashImage> im)
         :
         _image(im.release()),
-        _bpp(_image->type() == image::GNASH_IMAGE_RGB ? 24 : 32)
+        _bpp(_image->type() == image::TYPE_RGB ? 24 : 32)
     {
     }
   

@@ -49,8 +49,8 @@ namespace image {
 enum ImageType
 {
     GNASH_IMAGE_INVALID,
-    GNASH_IMAGE_RGB,
-    GNASH_IMAGE_RGBA
+    TYPE_RGB,
+    TYPE_RGBA
 };
 
 /// The locations of images handled in Gnash.
@@ -64,9 +64,9 @@ inline size_t
 numChannels(ImageType t)
 {
     switch (t) {
-        case GNASH_IMAGE_RGBA:
+        case TYPE_RGBA:
             return 4;
-        case GNASH_IMAGE_RGB:
+        case TYPE_RGB:
             return 3;
         default:
             std::abort();
@@ -226,7 +226,7 @@ public:
     /// Create an ImageRGB taking ownership of the data.
     ImageRGB(iterator data, size_t width, size_t height)
         :
-        GnashImage(data, width, height, GNASH_IMAGE_RGB)
+        GnashImage(data, width, height, TYPE_RGB)
     {}
 
     virtual ~ImageRGB();
@@ -245,7 +245,7 @@ public:
 
     ImageRGBA(iterator data, size_t width, size_t height)
         :
-        GnashImage(data, width, height, GNASH_IMAGE_RGBA)
+        GnashImage(data, width, height, TYPE_RGBA)
     {}
     
     ~ImageRGBA();

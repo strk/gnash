@@ -84,7 +84,7 @@ public:
 
     bool transparent() const {
         assert(data());
-        return (data()->type() == image::GNASH_IMAGE_RGBA);
+        return (data()->type() == image::TYPE_RGBA);
     }
 
     const CachedBitmap* bitmapInfo() const {

@@ -89,7 +89,7 @@ GnashImage::update(const GnashImage& from)
 
 ImageRGB::ImageRGB(size_t width, size_t height)
     :
-    GnashImage(width, height, GNASH_IMAGE_RGB)
+    GnashImage(width, height, TYPE_RGB)
 {
 }
 
@@ -99,7 +99,7 @@ ImageRGB::~ImageRGB()
 
 ImageRGBA::ImageRGBA(size_t width, size_t height)
     :
-    GnashImage(width, height, GNASH_IMAGE_RGBA)
+    GnashImage(width, height, TYPE_RGBA)
 {
 }
 
@@ -177,10 +177,10 @@ ImageOutput::writeImageData(FileType type,
     }
 
     switch (image.type()) {
-        case GNASH_IMAGE_RGB:
+        case TYPE_RGB:
             outChannel->writeImageRGB(image.begin());
             break;
-        case GNASH_IMAGE_RGBA:
+        case TYPE_RGBA:
             outChannel->writeImageRGBA(image.begin());
             break;
         default:
@@ -221,10 +221,10 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 
     try {
         switch (inChannel->imageType()) {
-            case GNASH_IMAGE_RGB:
+            case TYPE_RGB:
                 im.reset(new ImageRGB(width, height));
                 break;
-            case GNASH_IMAGE_RGBA:
+            case TYPE_RGBA:
                 im.reset(new ImageRGBA(width, height));
                 break;
             default:
@@ -250,7 +250,7 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     // never transparent, but the addition of alpha data stored elsewhere
     // in the SWF is possible; in that case, the processing happens during
     // mergeAlpha().
-    if (im->type() == GNASH_IMAGE_RGBA) {
+    if (im->type() == TYPE_RGBA) {
         processAlpha(im->begin(), width * height);
     }
     return im;

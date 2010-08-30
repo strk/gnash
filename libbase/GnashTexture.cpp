@@ -119,11 +119,11 @@ static bool check_extension(const char *name, const char *ext)
 GnashTextureFormat::GnashTextureFormat(image::ImageType type)
 {
     switch (type) {
-        case image::GNASH_IMAGE_RGB:
+        case image::TYPE_RGB:
             _internal_format = GL_RGB;
             _format = GL_RGB;
             break;
-        case image::GNASH_IMAGE_RGBA:
+        case image::TYPE_RGBA:
             _internal_format = GL_RGBA;
             _format = GL_BGRA;
             break;

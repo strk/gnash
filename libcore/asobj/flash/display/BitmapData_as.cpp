@@ -812,7 +812,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
     }
  
     std::auto_ptr<image::GnashImage> newImage;
-    if (im.type() == image::GNASH_IMAGE_RGBA) {
+    if (im.type() == image::TYPE_RGBA) {
         newImage.reset(new image::ImageRGBA(width, height));
     }
     else {

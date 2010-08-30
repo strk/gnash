@@ -213,7 +213,7 @@ GifImageInput::read()
 
     // Set the type to RGB
     // TODO: implement RGBA!
-    _type = GNASH_IMAGE_RGB;
+    _type = TYPE_RGB;
 
 }
 

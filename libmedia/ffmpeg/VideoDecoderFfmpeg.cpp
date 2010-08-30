@@ -263,7 +263,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
             im.reset();
             return im;
         }
-        im.reset(new GnashVaapiImage(vaSurface->get(), image::GNASH_IMAGE_RGBA));
+        im.reset(new GnashVaapiImage(vaSurface->get(), image::TYPE_RGBA));
         return im;
     }
 #endif

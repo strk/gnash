@@ -787,7 +787,7 @@ public:
   virtual CachedBitmap* createCachedBitmap(std::auto_ptr<image::GnashImage> im)
   {
       switch (im->type()) {
-          case image::GNASH_IMAGE_RGB:
+          case image::TYPE_RGB:
           {
               std::auto_ptr<image::GnashImage> rgba(
                       new image::ImageRGBA(im->width(), im->height()));
@@ -799,7 +799,7 @@ public:
               }
               im = rgba;
           }
-          case image::GNASH_IMAGE_RGBA:
+          case image::TYPE_RGBA:
                 return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
           default:
                 std::abort();

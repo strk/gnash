@@ -170,7 +170,7 @@ PngImageInput::read()
     if (png_get_valid(_pngPtr, _infoPtr, PNG_INFO_tRNS)) {
         log_debug("Applying transparency block, image is RGBA");
         png_set_tRNS_to_alpha(_pngPtr);
-        _type = GNASH_IMAGE_RGBA;
+        _type = TYPE_RGBA;
     }
 
     // Make 16-bit data into 8-bit data
@@ -182,12 +182,12 @@ PngImageInput::read()
         if (type & PNG_COLOR_MASK_ALPHA)
         {
             log_debug("Loading PNG image with alpha");
-            _type = GNASH_IMAGE_RGBA;
+            _type = TYPE_RGBA;
         }
         else
         {
             log_debug("Loading PNG image without alpha");
-            _type = GNASH_IMAGE_RGB;
+            _type = TYPE_RGB;
         }
     }
 
@@ -206,8 +206,8 @@ PngImageInput::read()
     const size_t components = getComponents();
 
     // We must have 3 or 4-channel data by this point.
-    assert((_type == GNASH_IMAGE_RGB && components == 3) ||
-           (_type == GNASH_IMAGE_RGBA && components == 4));
+    assert((_type == TYPE_RGB && components == 3) ||
+           (_type == TYPE_RGBA && components == 4));
 
     // Allocate space for the data
     _pixelData.reset(new png_byte[width * height * components]);

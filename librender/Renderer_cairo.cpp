@@ -462,7 +462,7 @@ Renderer_cairo::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
 
     switch (im->type())
     {
-        case image::GNASH_IMAGE_RGB:
+        case image::TYPE_RGB:
         {
             rgb_to_cairo_rgb24(buffer, im.get());
     
@@ -470,7 +470,7 @@ Renderer_cairo::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
                                  CAIRO_FORMAT_RGB24);
         }
         
-        case image::GNASH_IMAGE_RGBA:
+        case image::TYPE_RGBA:
         {
             rgba_to_cairo_argb(buffer, im.get());
     
@@ -488,7 +488,7 @@ Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xf
                                const SWFRect* bounds, bool /*smooth*/)
 {
 
-    if (baseframe->type() == image::GNASH_IMAGE_RGBA)
+    if (baseframe->type() == image::TYPE_RGBA)
     {
         LOG_ONCE(log_error(_("Can't render videos with alpha")));
         return;

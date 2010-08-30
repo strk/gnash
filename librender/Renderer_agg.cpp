@@ -799,10 +799,10 @@ public:
 
         switch (frame->type())
         {
-            case image::GNASH_IMAGE_RGBA:
+            case image::TYPE_RGBA:
                 renderVideo<agg::pixfmt_rgba32_pre>(*frame, mtx, path, smooth);
                 break;
-            case image::GNASH_IMAGE_RGB:
+            case image::TYPE_RGB:
                 renderVideo<agg::pixfmt_rgb24_pre>(*frame, mtx, path, smooth);
                 break;
             default:
@@ -889,17 +889,17 @@ public:
         std::auto_ptr<Renderer_agg_base> in;
     
         switch (im.type()) {
-            case image::GNASH_IMAGE_RGB:
+            case image::TYPE_RGB:
                 in.reset(new Renderer_agg<typename RGB::PixelFormat>(24));
                 break;
-            case image::GNASH_IMAGE_RGBA:
+            case image::TYPE_RGBA:
                 in.reset(new Renderer_agg<typename RGBA::PixelFormat>(32));
                 break;
         }
  
         const size_t width = im.width();
         const size_t height = im.height();
-        const size_t stride = width * (im.type() == image::GNASH_IMAGE_RGBA ? 4 : 3);
+        const size_t stride = width * (im.type() == image::TYPE_RGBA ? 4 : 3);
 
         in->init_buffer(im.begin(), width * height, width, height, stride);
         _external.reset(in.release());
