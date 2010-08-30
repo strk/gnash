@@ -19,17 +19,19 @@
 #define GNASH_BITMAPMOVIEDEFINITION_H
 
 #include "movie_definition.h" // for inheritance
-#include "SWFRect.h" // for composition
+#include "SWFRect.h" 
 #include "GnashNumeric.h"
 
 #include <boost/intrusive_ptr.hpp>
 #include <string>
-#include <memory> // for auto_ptr
+#include <memory> 
 
 // Forward declarations
 namespace gnash {
     class Renderer;
-    class GnashImage;
+    namespace image {
+        class GnashImage;
+    }
 }
 
 namespace gnash
@@ -55,8 +57,8 @@ public:
 	///  - image->size() bytes (for get_bytes_loaded()/get_bytes_total())
 	///  - provided url
 	///
-	BitmapMovieDefinition(std::auto_ptr<GnashImage> image, Renderer* renderer,
-            const std::string& url);
+	BitmapMovieDefinition(std::auto_ptr<image::GnashImage> image,
+            Renderer* renderer, const std::string& url);
 
     virtual DisplayObject* createDisplayObject(Global_as&, DisplayObject*)
         const;

@@ -45,9 +45,9 @@ public:
 
     std::string description() const { return "Cairo"; }
 
-    CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im);
+    CachedBitmap* createCachedBitmap(std::auto_ptr<image::GnashImage> im);
 
-    void drawVideoFrame(GnashImage* baseframe, const Transform& xform,
+    void drawVideoFrame(image::GnashImage* baseframe, const Transform& xform,
                                 const SWFRect* bounds, bool smooth);
 
     geometry::Range2d<int> world_to_pixel(const SWFRect& worldbounds);
@@ -57,7 +57,7 @@ public:
 
     void set_invalidated_regions(const InvalidatedRanges& ranges);
       
-    virtual Renderer* startInternalRender(GnashImage& /*im*/) {
+    virtual Renderer* startInternalRender(image::GnashImage& /*im*/) {
         return 0;
     }
 

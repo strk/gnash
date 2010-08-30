@@ -239,7 +239,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
                 currPos);
     }
 
-    std::auto_ptr<JpegImageInput> input;
+    std::auto_ptr<image::JpegInput> input;
 
     try
     {
@@ -252,8 +252,8 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
     //
         boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                     std::numeric_limits<std::streamsize>::max()).release());
-        //  transfer ownership to the JpegImageInput
-        input = JpegImageInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
+        //  transfer ownership to the image::JpegInput
+        input = image::JpegInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 
     }
     catch (std::exception& e)
@@ -271,7 +271,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 
 // A JPEG image without included tables; those should be in an
-// existing JpegImageInput object stored in the movie.
+// existing image::JpegInput object stored in the movie.
 void
 define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunResources& r)
@@ -291,7 +291,7 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     // Read the image data.
-    JpegImageInput* j_in = m.get_jpeg_loader();
+    image::JpegInput* j_in = m.get_jpeg_loader();
     if ( ! j_in )
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -303,13 +303,11 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     j_in->discardPartialBuffer();
     
-    std::auto_ptr<GnashImage> im;
-    try
-    {
-        im = JpegImageInput::readSWFJpeg2WithTables(*j_in);
+    std::auto_ptr<image::GnashImage> im;
+    try {
+        im = image::JpegInput::readSWFJpeg2WithTables(*j_in);
     }
-    catch (std::exception& e)
-    {
+    catch (std::exception& e) {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror("Error reading jpeg2 with headers for DisplayObject "
             "id %d: %s", id, e.what());
@@ -377,7 +375,7 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
     boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                 in.get_tag_end_position()).release() );
 
-    std::auto_ptr<GnashImage> im (ImageInput::readImageData(ad, ft));
+    std::auto_ptr<image::GnashImage> im (image::Input::readImageData(ad, ft));
 
     Renderer* renderer = r.renderer();
     if (!renderer) {
@@ -510,9 +508,9 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     //
 
     // Read rgb data.
-    boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in,
-                alpha_position).release() );
-    std::auto_ptr<ImageRGBA> im = ImageInput::readSWFJpeg3(ad);
+    boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
+                alpha_position).release());
+    std::auto_ptr<image::ImageRGBA> im = image::Input::readSWFJpeg3(ad);
     
     /// Failure to read the jpeg.
     if (!im.get()) return;
@@ -531,8 +529,7 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     // TESTING:
     // magical trevor contains this tag
     //  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
-    im->mergeAlpha(buffer.get(), bufferLength);
-
+    image::mergeAlpha(*im, buffer.get(), bufferLength);
 
     Renderer* renderer = r.renderer();
     if (!renderer) {
@@ -540,7 +537,7 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }    
     boost::intrusive_ptr<CachedBitmap> bi =
-        renderer->createCachedBitmap(static_cast<std::auto_ptr<GnashImage> >(im));
+        renderer->createCachedBitmap(static_cast<std::auto_ptr<image::GnashImage> >(im));
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
@@ -595,17 +592,17 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 #else
 
     unsigned short channels;
-    std::auto_ptr<GnashImage> image;
+    std::auto_ptr<image::GnashImage> image;
     bool alpha = false;
 
     switch (tag)
     {
         case SWF::DEFINELOSSLESS:
-            image.reset(new ImageRGB(width, height));
+            image.reset(new image::ImageRGB(width, height));
             channels = 3;
             break;
         case SWF::DEFINELOSSLESS2:
-            image.reset(new ImageRGBA(width, height));
+            image.reset(new image::ImageRGBA(width, height));
             channels = 4;
             alpha = true;
             break;

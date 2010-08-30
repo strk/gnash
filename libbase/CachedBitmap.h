@@ -25,7 +25,9 @@
 
 namespace gnash {
 
-class GnashImage;
+namespace image {
+    class GnashImage;
+}
 
 /// A CachedBitmap is created by the renderer in a format of its choosing.
 //
@@ -43,7 +45,7 @@ public:
     /// Return a GnashImage for manipulation.
     //
     /// The changes to the data must be cached before the next rendering.
-    virtual GnashImage& image() = 0;
+    virtual image::GnashImage& image() = 0;
 
     /// Free the memory associated with this CachedBitmap.
     //

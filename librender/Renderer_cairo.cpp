@@ -65,7 +65,7 @@ namespace {
 
 // Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
-rgb_to_cairo_rgb24(boost::uint8_t* dst, const GnashImage* im)
+rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::GnashImage* im)
 {
     boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
     for (size_t y = 0;  y < im->height();  y++)
@@ -79,7 +79,7 @@ rgb_to_cairo_rgb24(boost::uint8_t* dst, const GnashImage* im)
 
 // Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
 static void
-rgba_to_cairo_argb(boost::uint8_t* dst, const GnashImage* im)
+rgba_to_cairo_argb(boost::uint8_t* dst, const image::GnashImage* im)
 {
     boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
     for (size_t y = 0;  y < im->height();  y++)
@@ -131,16 +131,16 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
     }
    
     
-    GnashImage& image() {
+    image::GnashImage& image() {
         if (_image.get()) return *_image;
 
         switch (_format) {
             case CAIRO_FORMAT_RGB24:
-                _image.reset(new ImageRGB(_width, _height));
+                _image.reset(new image::ImageRGB(_width, _height));
                 break;
 
             case CAIRO_FORMAT_ARGB32:
-                _image.reset(new ImageRGBA(_width, _height));
+                _image.reset(new image::ImageRGBA(_width, _height));
                 break;
 
             default:
@@ -205,7 +205,7 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
     }
    
   private:
-    mutable boost::scoped_ptr<GnashImage> _image;
+    mutable boost::scoped_ptr<image::GnashImage> _image;
     boost::scoped_array<boost::uint8_t> _data;
     int _width;
     int _height;
@@ -455,14 +455,14 @@ Renderer_cairo::~Renderer_cairo()
 }
 
 CachedBitmap*
-Renderer_cairo::createCachedBitmap(std::auto_ptr<GnashImage> im) 
+Renderer_cairo::createCachedBitmap(std::auto_ptr<image::GnashImage> im) 
 {
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];
 
     switch (im->type())
     {
-        case GNASH_IMAGE_RGB:
+        case image::TYPE_RGB:
         {
             rgb_to_cairo_rgb24(buffer, im.get());
     
@@ -470,7 +470,7 @@ Renderer_cairo::createCachedBitmap(std::auto_ptr<GnashImage> im)
                                  CAIRO_FORMAT_RGB24);
         }
         
-        case GNASH_IMAGE_RGBA:
+        case image::TYPE_RGBA:
         {
             rgba_to_cairo_argb(buffer, im.get());
     
@@ -484,17 +484,17 @@ Renderer_cairo::createCachedBitmap(std::auto_ptr<GnashImage> im)
 }
 
 void
-Renderer_cairo::drawVideoFrame(GnashImage* baseframe, const Transform& xform,
+Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xform,
                                const SWFRect* bounds, bool /*smooth*/)
 {
 
-    if (baseframe->type() == GNASH_IMAGE_RGBA)
+    if (baseframe->type() == image::TYPE_RGBA)
     {
         LOG_ONCE(log_error(_("Can't render videos with alpha")));
         return;
     }
 
-    ImageRGB* frame = dynamic_cast<ImageRGB*>(baseframe);
+    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
 
     assert(frame);
 

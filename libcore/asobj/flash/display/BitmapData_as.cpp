@@ -90,7 +90,8 @@ namespace {
 
 }
 
-BitmapData_as::BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im)
+BitmapData_as::BitmapData_as(as_object* owner,
+        std::auto_ptr<image::GnashImage> im)
    
     :
     _owner(owner),
@@ -209,7 +210,7 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
 {
     if (disposed()) return;
 
-    GnashImage& im = *data();
+    image::GnashImage& im = *data();
 
     Renderer* base = getRunResources(*_owner).renderer();
     if (!base) {
@@ -802,7 +803,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
 
     if (!bit) return as_value();
 
-    GnashImage& im = bit->image();
+    image::GnashImage& im = bit->image();
     const size_t width = im.width();
     const size_t height = im.height();
 
@@ -810,12 +811,12 @@ bitmapdata_loadBitmap(const fn_call& fn)
         return as_value();
     }
  
-    std::auto_ptr<GnashImage> newImage;
-    if (im.type() == GNASH_IMAGE_RGBA) {
-        newImage.reset(new ImageRGBA(width, height));
+    std::auto_ptr<image::GnashImage> newImage;
+    if (im.type() == image::TYPE_RGBA) {
+        newImage.reset(new image::ImageRGBA(width, height));
     }
     else {
-        newImage.reset(new ImageRGB(width, height));
+        newImage.reset(new image::ImageRGB(width, height));
     }
     
     // The properties come from the 'this' object.
@@ -856,8 +857,8 @@ bitmapdata_ctor(const fn_call& fn)
 
     size_t width = toInt(fn.arg(0));
     size_t height = toInt(fn.arg(1));
-    bool transparent = fn.nargs > 2 ? fn.arg(2).to_bool() : true;
-    boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3)) : 0xffffff;
+    const bool transparent = fn.nargs > 2 ? fn.arg(2).to_bool() : true;
+    boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3)) : 0xffffffff;
     
     if (width > 2880 || height > 2880 || width < 1 || height < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -867,16 +868,21 @@ bitmapdata_ctor(const fn_call& fn)
         throw ActionTypeError();
     }
 
-    std::auto_ptr<GnashImage> im;
+    std::auto_ptr<image::GnashImage> im;
     if (transparent) {
-        im.reset(new ImageRGBA(width, height));
+        im.reset(new image::ImageRGBA(width, height));
     }
     else {
-        im.reset(new ImageRGB(width, height));
+        im.reset(new image::ImageRGB(width, height));
     }
 
+    // There is one special case for completely transparent colours. This
+    // might be a part of a more general pre-treatment as other colours
+    // vary slightly, but we haven't worked it out yet.
+    if (transparent && !(fillColor & 0xff000000)) fillColor = 0;
+
     std::fill(image::begin<image::ARGB>(*im), image::end<image::ARGB>(*im),
-            fillColor | (0xff << 24));
+            fillColor);
 
     ptr->setRelay(new BitmapData_as(ptr, im));
 

@@ -55,7 +55,7 @@ public:
     
     void push(const EncodedVideoFrame& buffer);
 
-    std::auto_ptr<GnashImage> pop();
+    std::auto_ptr<image::GnashImage> pop();
     
     bool peek();
 
@@ -80,16 +80,16 @@ private:
     ///         caller owns that pointer, which must be freed with delete [].
     ///         It is advised to wrap the pointer in a boost::scoped_array.
     ///         If conversion fails, AVPicture::data[0] will be NULL.
-    std::auto_ptr<GnashImage> frameToImage(AVCodecContext* srcCtx,
+    std::auto_ptr<image::GnashImage> frameToImage(AVCodecContext* srcCtx,
             const AVFrame& srcFrame);
 
     void init(enum CodecID format, int width, int height,
             boost::uint8_t* extradata=0, int extradataSize=0);
 
-    std::auto_ptr<GnashImage> decode(const boost::uint8_t* input,
+    std::auto_ptr<image::GnashImage> decode(const boost::uint8_t* input,
             boost::uint32_t input_size);
 
-    std::auto_ptr<GnashImage> decode(const EncodedVideoFrame* vf)
+    std::auto_ptr<image::GnashImage> decode(const EncodedVideoFrame* vf)
     {
     	return decode(vf->data(), vf->dataSize());
     }

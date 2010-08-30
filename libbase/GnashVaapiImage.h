@@ -30,7 +30,7 @@ class VaapiSurface;
 class VaapiSurfaceProxy;
 
 /// GnashImage implementation using a VA surface
-class DSOEXPORT GnashVaapiImage : public GnashImage
+class DSOEXPORT GnashVaapiImage : public image::GnashImage
 {
     boost::shared_ptr<VaapiSurface> _surface;
     boost::uint64_t _creation_time;
@@ -39,13 +39,14 @@ class DSOEXPORT GnashVaapiImage : public GnashImage
     bool transfer();
 
 public:
-    GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface, ImageType type);
+    GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface,
+            image::ImageType type);
     GnashVaapiImage(const GnashVaapiImage& o);
     ~GnashVaapiImage();
 
     virtual void update(boost::shared_ptr<VaapiSurface> surface);
     virtual void update(boost::uint8_t* data);
-    virtual void update(const GnashImage& from);
+    virtual void update(const image::GnashImage& from);
 
     /// Get access to the underlying surface
     //

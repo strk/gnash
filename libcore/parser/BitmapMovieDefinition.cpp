@@ -38,7 +38,8 @@ BitmapMovieDefinition::createMovie(Global_as& gl, DisplayObject* parent)
     return new BitmapMovie(o, this, parent);
 }
 
-BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
+BitmapMovieDefinition::BitmapMovieDefinition(
+        std::auto_ptr<image::GnashImage> image,
 		Renderer* renderer, const std::string& url)
 	:
 	_version(6),

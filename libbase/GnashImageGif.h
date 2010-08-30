@@ -36,20 +36,21 @@ extern "C" {
 namespace gnash { class IOChannel; }
 
 namespace gnash {
+namespace image {
 
-class GifImageInput : public ImageInput
+class GifInput : public Input
 {
 
 public:
 
-    /// Construct a GifImageInput object to read from an IOChannel.
+    /// Construct a GifInput object to read from an IOChannel.
     //
     /// @param in   The stream to read GIF data from. Ownership is shared
-    ///             between caller and GifImageInput, so it is freed
+    ///             between caller and GifInput, so it is freed
     ///             automatically when the last owner is destroyed.
-    GifImageInput(boost::shared_ptr<IOChannel> in);
+    GifInput(boost::shared_ptr<IOChannel> in);
     
-    ~GifImageInput();
+    ~GifInput();
 
     /// Begin processing the image data.
     void read();
@@ -77,13 +78,13 @@ public:
     void readScanline(unsigned char* rgb_data);
 
 
-    /// Create a GifImageInput and transfer ownership to the caller.
+    /// Create a GifInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read GIF data from.
-    DSOEXPORT static std::auto_ptr<ImageInput> create(
+    DSOEXPORT static std::auto_ptr<Input> create(
             boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<ImageInput> ret ( new GifImageInput(in) );
+        std::auto_ptr<Input> ret ( new GifInput(in) );
         if ( ret.get() ) ret->read();
         return ret;
     }
@@ -108,6 +109,7 @@ private:
 
 };
 
+} // namespace image
 } // namespace gnash
 
 
