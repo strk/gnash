@@ -574,10 +574,34 @@ xcheck(near(bm, 23, 15, 0x00ff00));
 xcheck(near(bm, 25, 15, 0x0000ff));
 check(near(bm, 25, 25, 0xffffff));
 
+bm = new flash.display.BitmapData(10, 10, true, 0x5010eeff);
+xcheck_equals(bm.getPixel32(5, 5), 0x5010efff);
+
+bm = new flash.display.BitmapData(10, 10, true, 0xee11efff);
+check_equals(bm.getPixel32(5, 5), -300814337);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x00011010);
+check_equals(bm.getPixel32(5, 5), 0x00000000);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x0000ffff);
+check_equals(bm.getPixel32(5, 5), 0x00000000);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x000000ff);
+check_equals(bm.getPixel32(5, 5), 0x00000000);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x010000ff);
+check_equals(bm.getPixel32(5, 5), 0x010000ff);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x300000ff);
+check_equals(bm.getPixel32(5, 5), 0x300000ff);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x30ffffff);
+check_equals(bm.getPixel32(5, 5), 0x30ffffff);
+
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(218);
+totals(226);
 
 #endif // OUTPUT_VERSION >= 8
