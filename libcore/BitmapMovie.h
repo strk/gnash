@@ -24,9 +24,7 @@
 #include "Movie.h" // for inheritance
 
 // Forward declarations
-namespace gnash
-{
-    class GnashImage;
+namespace gnash {
     class DisplayObject;
 }
 

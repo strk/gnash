@@ -51,7 +51,6 @@ namespace gnash {
     class TextField;
     class BitmapData_as;
     class CachedBitmap;
-    class GnashImage;
     namespace SWF {
         class PlaceObject2Tag;
     }
