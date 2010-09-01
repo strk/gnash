@@ -378,6 +378,8 @@ bitmapdata_clone(const fn_call& fn)
     else {
         im.reset(new image::ImageRGB(width, height));
     }
+    // Note that it would be much faster to copy the pixels, but BitmapData
+    // currently doesn't expose a way to do this.
     std::copy(bm->begin(), bm->end(), image::begin<image::ARGB>(*im));
 
     Global_as& gl = getGlobal(fn);
