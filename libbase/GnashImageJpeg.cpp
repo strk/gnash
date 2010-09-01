@@ -26,72 +26,61 @@
 #include "gnashconfig.h"
 #endif
 
+#include "GnashImageJpeg.h"
+
+#include <sstream>
+#include <csetjmp>
+#include <boost/noncopyable.hpp>
+#include <algorithm>
+
 #include "utility.h"
 #include "GnashImage.h"
 #include "IOChannel.h"
 #include "log.h"
 #include "GnashException.h"
-#include "GnashImageJpeg.h"
 
-#include <sstream>
-#include <csetjmp>
 
-/// \brief A namespace solely for avoiding name 
-/// conflicts with other external headers.
-namespace jpeg {
-
-// jpeglib.h redefines HAVE_STDLIB_H. This silences
-// the warnings, but it's not good.
+// jpeglib.h redefines HAVE_STDLIB_H.
 #undef HAVE_STDLIB_H
 extern "C" {
 # include <jpeglib.h>
 }		
 #undef HAVE_STDLIB_H
 
-}
-
-// jpeglib.h is included in the namespace jpeg because otherwise it
-// causes horrible conflicts with qt includes. How do C coders sustain
-// the will to live?
-using namespace jpeg;
-
 #ifdef _WIN32
 typedef jpeg_boolean jpeg_bool_t;
 #else
-typedef jpeg::boolean jpeg_bool_t;
+typedef boolean jpeg_bool_t;
 #endif
 
 namespace gnash {
 namespace image {
 
-static void
+namespace {
+
+void
 jpeg_error_exit(j_common_ptr cinfo)
 {
-
     // Set a flag to stop parsing 
     JpegInput* in = static_cast<JpegInput*>(cinfo->client_data);
-    
     in->errorOccurred(cinfo->err->jpeg_message_table[cinfo->err->msg_code]); 
-
 }
 
 
 // Set up some error handlers for the jpeg lib.
-static void
+void
 setup_jpeg_err(jpeg_error_mgr* jerr)
 {
     // Set up defaults.
     jpeg_std_error(jerr);
-
     jerr->error_exit = jpeg_error_exit;
 }
 
-// Helper object for reading jpeg image data.  Basically a thin
 static const int IO_BUF_SIZE = 4096;
 
 // A jpeglib source manager that reads from a IOChannel.  Paraphrased
 // from IJG jpeglib jdatasrc.c.
-class rw_source_IOChannel
+class rw_source_IOChannel : boost::noncopyable
 {
 public:
     jpeg_source_mgr    m_pub;        /* public fields */
@@ -112,7 +101,7 @@ public:
 
     static void init_source(j_decompress_ptr cinfo)
     {
-        rw_source_IOChannel*    src = (rw_source_IOChannel*) cinfo->src;
+        rw_source_IOChannel* src = (rw_source_IOChannel*) cinfo->src;
         src->m_start_of_file = true;
     }
 
@@ -120,10 +109,10 @@ public:
     // when it needs more data from the file.
     static jpeg_bool_t fill_input_buffer(j_decompress_ptr cinfo)
     {
-        rw_source_IOChannel*    src = (rw_source_IOChannel*) cinfo->src;
+        rw_source_IOChannel* src = (rw_source_IOChannel*) cinfo->src;
 
         // TODO: limit read as requested by caller
-        size_t    bytes_read = src->m_in_stream->read(src->m_buffer, IO_BUF_SIZE);
+        size_t bytes_read = src->m_in_stream->read(src->m_buffer, IO_BUF_SIZE);
 
         if (bytes_read <= 0) {
             // Is the file completely empty?
@@ -132,26 +121,23 @@ public:
                 log_error(_("JPEG: Empty jpeg source stream."));
                 return false;
             }
-            // warn("jpeg end-of-stream");
 
             // Insert a fake EOI marker.
-            src->m_buffer[0] = (JOCTET) 0xFF;
-            src->m_buffer[1] = (JOCTET) JPEG_EOI;
+            src->m_buffer[0] = 0xFF;
+            src->m_buffer[1] = JPEG_EOI;
             bytes_read = 2;
         }
 
         // Hack to work around SWF bug: sometimes data
         // starts with FFD9FFD8, when it should be
         // FFD8FFD9!
-        if (src->m_start_of_file && bytes_read >= 4)
-        {
-            if (src->m_buffer[0] == 0xFF
-                && src->m_buffer[1] == 0xD9 
-                && src->m_buffer[2] == 0xFF
-                && src->m_buffer[3] == 0xD8)
-            {
-                src->m_buffer[1] = 0xD8;
-                src->m_buffer[3] = 0xD9;
+        if (src->m_start_of_file && bytes_read >= 4) {
+
+            const JOCTET wrong[] = { 0xff, 0xd9, 0xff, 0xd8 };
+
+            if (std::equal(src->m_buffer, src->m_buffer + 4, wrong)) {
+                log_debug("Wrong bytes");
+                std::swap(src->m_buffer[1], src->m_buffer[3]);
             }
         }
 
@@ -165,7 +151,7 @@ public:
 
     // Called by client when it wants to advance past some
     // uninteresting data.
-    static void    skip_input_data(j_decompress_ptr cinfo, long num_bytes)
+    static void skip_input_data(j_decompress_ptr cinfo, long num_bytes)
     {
         rw_source_IOChannel* src = (rw_source_IOChannel*) cinfo->src;
 
@@ -188,7 +174,7 @@ public:
     }
 
 
-    void    discardPartialBuffer()
+    void discardPartialBuffer()
     {
         // Discard existing bytes in our buffer.
         m_pub.bytes_in_buffer = 0;
@@ -201,9 +187,9 @@ public:
     /// @param instream
     ///     Stream to read from. Ownership always shared with caller.
     ///
-    static void setup(jpeg_decompress_struct* cinfo, boost::shared_ptr<IOChannel> instream)
+    static void setup(jpeg_decompress_struct* cinfo,
+            boost::shared_ptr<IOChannel> instream)
     {
-        // assert(cinfo->src == NULL);
         rw_source_IOChannel* source = new rw_source_IOChannel(instream);
         cinfo->src = (jpeg_source_mgr*)source;
     }
@@ -216,22 +202,23 @@ private:
         m_pub.init_source = init_source;
         m_pub.fill_input_buffer = fill_input_buffer;
         m_pub.skip_input_data = skip_input_data;
-        m_pub.resync_to_restart = jpeg_resync_to_restart;    // use default method
+        // use default method
+        m_pub.resync_to_restart = jpeg_resync_to_restart;
         m_pub.term_source = term_source;
         m_pub.bytes_in_buffer = 0;
         m_pub.next_input_byte = NULL;
     }
 
-    bool _ownSourceStream;
+    const bool _ownSourceStream;
     
     // Source stream
     boost::shared_ptr<IOChannel> m_in_stream;
-    bool    m_start_of_file;        /* have we gotten any data yet? */
-    JOCTET    m_buffer[IO_BUF_SIZE];        /* start of buffer */
-
+    bool m_start_of_file;
+    JOCTET m_buffer[IO_BUF_SIZE];
 
 };
 
+} // unnamed namespace
 
 JpegInput::JpegInput(boost::shared_ptr<IOChannel> in)
     :
@@ -270,8 +257,7 @@ JpegInput::discardPartialBuffer()
     rw_source_IOChannel* src = (rw_source_IOChannel*) m_cinfo.src;
 
     // We only have to discard the input buffer after reading the tables.
-    if (src)
-    {
+    if (src) {
         src->discardPartialBuffer();
     }
 }
@@ -289,7 +275,7 @@ JpegInput::readHeader(unsigned int maxHeaderBytes)
     if (maxHeaderBytes) {
         // Read the encoding tables.
         // TODO: how to limit reads ?
-        int ret = jpeg_read_header(&m_cinfo, FALSE);
+        const int ret = jpeg_read_header(&m_cinfo, FALSE);
         switch (ret) {
             case JPEG_SUSPENDED: 
                 // suspended due to lack of data
@@ -303,8 +289,7 @@ JpegInput::readHeader(unsigned int maxHeaderBytes)
                 // Found valid table-specs-only datastream
                 break;
             default:
-                log_debug(_("unexpected: jpeg_read_header returned %d [%s:%d]"),
-                            ret, __FILE__, __LINE__);
+                log_debug(_("unexpected: jpeg_read_header returned %d"), ret);
                 break;
         }
 
@@ -333,9 +318,10 @@ JpegInput::read()
     }
 
     // hack, FIXME
-    static const int stateReady = 202;    /* found SOS, ready for start_decompress */
+    // found SOS, ready for start_decompress
+    static const int stateReady = 202;
     while (m_cinfo.global_state != stateReady) {
-        int ret = jpeg_read_header(&m_cinfo, FALSE);
+        const int ret = jpeg_read_header(&m_cinfo, FALSE);
         switch (ret) {
             case JPEG_SUSPENDED: 
                 // suspended due to lack of data
@@ -484,7 +470,8 @@ JpegInput::readSWFJpeg2WithTables(JpegInput& loader)
 class rw_dest_IOChannel
 {
 public:
-    struct jpeg_destination_mgr    m_pub;    /* public fields */
+
+    struct jpeg_destination_mgr m_pub; 
 
     /// Constructor. 
     //
@@ -509,7 +496,7 @@ public:
 
     static void init_destination(j_compress_ptr cinfo)
     {
-        rw_dest_IOChannel*    dest = (rw_dest_IOChannel*) cinfo->dest;
+        rw_dest_IOChannel* dest = (rw_dest_IOChannel*) cinfo->dest;
         assert(dest);
 
         dest->m_pub.next_output_byte = dest->m_buffer;
@@ -526,13 +513,13 @@ public:
     /// Write the output buffer into the stream.
     static jpeg_bool_t empty_output_buffer(j_compress_ptr cinfo)
     {
-        rw_dest_IOChannel*    dest = (rw_dest_IOChannel*) cinfo->dest;
+        rw_dest_IOChannel* dest = (rw_dest_IOChannel*) cinfo->dest;
         assert(dest);
 
-        if (dest->m_out_stream.write(dest->m_buffer, IO_BUF_SIZE) != IO_BUF_SIZE)
-        {
+        if (dest->m_out_stream.write(dest->m_buffer, IO_BUF_SIZE)
+                != IO_BUF_SIZE) {
             // Error.
-            log_error(_("jpeg::rw_dest_IOChannel couldn't write data."));
+            log_error(_("rw_dest_IOChannel couldn't write data."));
             return false;
         }
 
@@ -557,7 +544,7 @@ public:
             if (dest->m_out_stream.write(dest->m_buffer, datacount) != datacount)
             {
                 // Error.
-                log_error(_("jpeg::rw_dest_IOChannel::term_destination "
+                log_error(_("rw_dest_IOChannel::term_destination "
                             "couldn't write data."));
             }
         }
@@ -577,7 +564,8 @@ private:
 };
 
 
-JpegOutput::JpegOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
+JpegOutput::JpegOutput(boost::shared_ptr<IOChannel> out, size_t width,
+        size_t height, int quality)
     :
     Output(out, width, height)
 {
@@ -611,10 +599,8 @@ JpegOutput::writeImageRGB(const unsigned char* rgbData)
     // RGB...
     const size_t components = 3;
 
-    for (size_t y = 0; y < _height; ++y)
-    {
+    for (size_t y = 0; y < _height; ++y) {
         const unsigned char* ypos = &rgbData[y * _width * components];
-
         // JPEG needs non-const data.
         jpeg_write_scanlines(&m_cinfo, const_cast<unsigned char**>(&ypos), 1);
     }
@@ -622,11 +608,10 @@ JpegOutput::writeImageRGB(const unsigned char* rgbData)
 
 
 std::auto_ptr<Output>
-JpegOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
-        size_t height, int quality)
+JpegOutput::create(boost::shared_ptr<IOChannel> o, size_t width, size_t height,
+        int quality)
 {
-    std::auto_ptr<Output> outChannel(
-            new JpegOutput(out, width, height, quality));
+    std::auto_ptr<Output> outChannel(new JpegOutput(o, width, height, quality));
     return outChannel;
 }
 
