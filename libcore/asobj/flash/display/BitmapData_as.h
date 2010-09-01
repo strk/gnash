@@ -62,7 +62,6 @@ public:
     /// The constructor sets the immutable size of the
     /// bitmap, as well as whether it can handle transparency or not.
 	BitmapData_as(as_object* owner, std::auto_ptr<image::GnashImage> im);
-	
 
     virtual ~BitmapData_as() {}
 
