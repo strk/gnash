@@ -37,8 +37,8 @@
 #include "IOChannel.h"
 #include "log.h"
 
-namespace gnash
-{
+namespace gnash {
+namespace image {
 
 namespace {
     void processAlpha(GnashImage::iterator imageData, size_t pixels);
@@ -89,7 +89,7 @@ GnashImage::update(const GnashImage& from)
 
 ImageRGB::ImageRGB(size_t width, size_t height)
     :
-    GnashImage(width, height, GNASH_IMAGE_RGB)
+    GnashImage(width, height, TYPE_RGB)
 {
 }
 
@@ -99,7 +99,7 @@ ImageRGB::~ImageRGB()
 
 ImageRGBA::ImageRGBA(size_t width, size_t height)
     :
-    GnashImage(width, height, GNASH_IMAGE_RGBA)
+    GnashImage(width, height, TYPE_RGBA)
 {
 }
 
@@ -124,12 +124,13 @@ ImageRGBA::setPixel(size_t x, size_t y, value_type r, value_type g,
 
 
 void
-ImageRGBA::mergeAlpha(const_iterator alphaData, const size_t bufferLength)
+mergeAlpha(ImageRGBA& im, GnashImage::const_iterator alphaData,
+        const size_t bufferLength)
 {
-    assert(bufferLength * 4 <= size());
+    assert(bufferLength * 4 <= im.size());
 
     // Point to the first alpha byte
-    iterator p = begin();
+    GnashImage::iterator p = im.begin();
 
     // Premultiplication is also done at rendering time (at least by the
     // agg renderer).
@@ -152,23 +153,23 @@ ImageRGBA::mergeAlpha(const_iterator alphaData, const size_t bufferLength)
 
 // Write the given image to the given out stream, in jpeg format.
 void
-ImageOutput::writeImageData(FileType type,
+Output::writeImageData(FileType type,
     boost::shared_ptr<IOChannel> out, const GnashImage& image, int quality)
 {
     
     const size_t width = image.width();
     const size_t height = image.height();
             
-    std::auto_ptr<ImageOutput> outChannel;
+    std::auto_ptr<Output> outChannel;
 
     switch (type) {
 #ifdef USE_PNG
         case GNASH_FILETYPE_PNG:
-            outChannel = PngImageOutput::create(out, width, height, quality);
+            outChannel = PngOutput::create(out, width, height, quality);
             break;
 #endif
         case GNASH_FILETYPE_JPEG:
-            outChannel = JpegImageOutput::create(out, width, height, quality);
+            outChannel = JpegOutput::create(out, width, height, quality);
             break;
         default:
             log_error("Requested to write image as unsupported filetype");
@@ -176,10 +177,10 @@ ImageOutput::writeImageData(FileType type,
     }
 
     switch (image.type()) {
-        case GNASH_IMAGE_RGB:
+        case TYPE_RGB:
             outChannel->writeImageRGB(image.begin());
             break;
-        case GNASH_IMAGE_RGBA:
+        case TYPE_RGBA:
             outChannel->writeImageRGBA(image.begin());
             break;
         default:
@@ -190,24 +191,24 @@ ImageOutput::writeImageData(FileType type,
 
 // See gnash.h for file types.
 std::auto_ptr<GnashImage>
-ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
+Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 {
     std::auto_ptr<GnashImage> im;
-    std::auto_ptr<ImageInput> inChannel;
+    std::auto_ptr<Input> inChannel;
 
     switch (type) {
 #ifdef USE_PNG
         case GNASH_FILETYPE_PNG:
-            inChannel = PngImageInput::create(in);
+            inChannel = PngInput::create(in);
             break;
 #endif
 #ifdef USE_GIF                
         case GNASH_FILETYPE_GIF:
-            inChannel = GifImageInput::create(in);
+            inChannel = GifInput::create(in);
             break;
 #endif
         case GNASH_FILETYPE_JPEG:
-            inChannel = JpegImageInput::create(in);
+            inChannel = JpegInput::create(in);
             break;
         default:
             break;
@@ -220,10 +221,10 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 
     try {
         switch (inChannel->imageType()) {
-            case GNASH_IMAGE_RGB:
+            case TYPE_RGB:
                 im.reset(new ImageRGB(width, height));
                 break;
-            case GNASH_IMAGE_RGBA:
+            case TYPE_RGBA:
                 im.reset(new ImageRGBA(width, height));
                 break;
             default:
@@ -232,7 +233,7 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
         }
     }
     catch (std::bad_alloc& e) {
-        // This should be caught here because ~JpegImageInput can also
+        // This should be caught here because ~JpegInput can also
         // throw an exception on stack unwinding and this confuses
         // remote catchers.
         log_error("Out of memory while trying to create %dx%d image",
@@ -249,7 +250,7 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     // never transparent, but the addition of alpha data stored elsewhere
     // in the SWF is possible; in that case, the processing happens during
     // mergeAlpha().
-    if (im->type() == GNASH_IMAGE_RGBA) {
+    if (im->type() == TYPE_RGBA) {
         processAlpha(im->begin(), width * height);
     }
     return im;
@@ -258,14 +259,14 @@ ImageInput::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 // For reading SWF JPEG3-style image data, like ordinary JPEG, 
 // but stores the data in ImageRGBA format.
 std::auto_ptr<ImageRGBA>
-ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
+Input::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 {
 
     std::auto_ptr<ImageRGBA> im;
 
     // Calling with headerBytes as 0 has a special effect...
-    std::auto_ptr<JpegImageInput> j_in(
-            JpegImageInput::createSWFJpeg2HeaderOnly(in, 0));
+    std::auto_ptr<JpegInput> j_in(
+            JpegInput::createSWFJpeg2HeaderOnly(in, 0));
 
     // If this isn't true, we should have thrown.
     assert(j_in.get());
@@ -313,6 +314,6 @@ processAlpha(GnashImage::iterator imageData, size_t pixels)
 }
 
 } // anonymous namespace
-
+} // namespace image
 } // namespace gnash
 

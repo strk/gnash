@@ -132,9 +132,11 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
       case BUS_BLUETOOTH:
           log_unimpl("is Bluetooth bus type ");
           break;
+#ifdef BUS_VIRTUAL
       case BUS_VIRTUAL:
           log_unimpl("is a Virtual bus type ");
           break;
+#endif
       case BUS_ISA:
           log_unimpl("is an ISA bus type");
           break;
@@ -177,9 +179,11 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
       case BUS_GSC:
           log_unimpl("is a GSC bus type");
           break;
+#ifdef BUS_ATARI
       case BUS_ATARI:
           log_unimpl("is an Atari bus type");
           break;
+#endif
       default:
           log_error("Unknown bus type %d!", _device_info.bustype);
     }

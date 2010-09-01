@@ -21,11 +21,11 @@
 #endif
 
 #include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST) && !defined(_ANDROID)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST) && !defined(ANDROID)
 # include <sys/shm.h>
 # include <sys/sem.h>
 # include <sys/ipc.h>
-#elif !defined(__riscos__) && !defined(__OS2__) && !defined(_ANDROID)
+#elif !defined(__riscos__) && !defined(__OS2__) && !defined(ANDROID)
 # include <windows.h>
 # include <process.h>
 # include <io.h>
@@ -34,7 +34,7 @@
 #include <vector>
 #include <cerrno>
 
-#ifdef _ANDROID
+#ifdef ANDROID
 # include <linux/shm.h>
 # include <linux/sem.h>
 extern int shmctl (int __shmid, int __cmd, struct shmid_ds *__buf);
@@ -49,7 +49,7 @@ extern int semctl (int __semid, int __semnum, int __cmd, ...);
 #include "log.h"
 #include "SharedMem.h"
 
-#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32) || defined(_ANDROID)
+#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32) || defined(ANDROID)
 # define ENABLE_SHARED_MEM 1
 #else
 # undef ENABLE_SHARED_MEM

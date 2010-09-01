@@ -195,7 +195,7 @@ NetStream_as::newFrameReady()
     return false;
 }
 
-std::auto_ptr<GnashImage>
+std::auto_ptr<image::GnashImage>
 NetStream_as::get_video()
 {
     boost::mutex::scoped_lock lock(image_mutex);
@@ -556,12 +556,12 @@ NetStream_as::startPlayback()
 }
 
 
-std::auto_ptr<GnashImage> 
+std::auto_ptr<image::GnashImage> 
 NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 {
     assert(_videoDecoder.get()); 
 
-    std::auto_ptr<GnashImage> video;
+    std::auto_ptr<image::GnashImage> video;
 
     assert(m_parser.get());
     if ( ! m_parser.get() )
@@ -642,10 +642,10 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
         return video;
     }
 
-    std::auto_ptr<GnashImage> 
+    std::auto_ptr<image::GnashImage> 
     NetStream_as::decodeNextVideoFrame()
     {
-        std::auto_ptr<GnashImage> video;
+        std::auto_ptr<image::GnashImage> video;
 
         if ( ! m_parser.get() )
         {
@@ -1169,7 +1169,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 #endif 
 
     // Get next decoded video frame from parser, will have the lowest timestamp
-    std::auto_ptr<GnashImage> video = getDecodedVideoFrame(curPos);
+    std::auto_ptr<image::GnashImage> video = getDecodedVideoFrame(curPos);
 
     // to be decoded or we're out of data
     if (!video.get())

@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef _ANDROID
+#ifdef ANDROID
 #include <sys/select.h>
 #endif
 

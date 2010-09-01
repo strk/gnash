@@ -581,7 +581,7 @@ public:
 
     typedef agg::trans_affine Matrix;
 
-    VideoRenderer(const ClipBounds& clipbounds, GnashImage& frame,
+    VideoRenderer(const ClipBounds& clipbounds, image::GnashImage& frame,
             Matrix& mat, Quality quality, bool smooth)
         :
         _buf(frame.begin(), frame.width(), frame.height(),
@@ -696,7 +696,7 @@ public:
     // Given an image, returns a pointer to a bitmap_info class
     // that can later be passed to FillStyleX_bitmap(), to set a
     // bitmap fill style.
-    gnash::CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im)
+    gnash::CachedBitmap* createCachedBitmap(std::auto_ptr<image::GnashImage> im)
     {        
         return new agg_bitmap_info(im);
     }
@@ -705,7 +705,7 @@ public:
             FileType type) const
     {
         log_debug("New image: %sx%s", xres, yres);
-        ImageRGBA im(xres, yres);
+        image::ImageRGBA im(xres, yres);
         for (int x = 0; x < xres; ++x) {
             for (int y = 0; y < yres; ++y) {
                 typename PixelFormat::color_type t = m_pixf->pixel(x, y);
@@ -713,11 +713,11 @@ public:
             }
         }
         
-        ImageOutput::writeImageData(type, io, im, 100);
+        image::Output::writeImageData(type, io, im, 100);
     }
 
     template<typename SourceFormat, typename Matrix>
-    void renderVideo(GnashImage& frame, Matrix& img_mtx,
+    void renderVideo(image::GnashImage& frame, Matrix& img_mtx,
             agg::path_storage path, bool smooth)
     {
 
@@ -741,7 +741,7 @@ public:
         vr.render(path, rbase, _alphaMasks);
     }
 
-    void drawVideoFrame(GnashImage* frame, const Transform& xform,
+    void drawVideoFrame(image::GnashImage* frame, const Transform& xform,
         const SWFRect* bounds, bool smooth)
     {
     
@@ -784,7 +784,7 @@ public:
         path.line_to(a.x, a.y);
 
 #ifdef HAVE_VA_VA_H
-        if (frame->location() == GNASH_IMAGE_GPU) {
+        if (frame->location() == image::GNASH_IMAGE_GPU) {
             RenderImage image;
             image.reset(new GnashVaapiImageProxy(
                             static_cast<GnashVaapiImage *>(frame),
@@ -799,10 +799,10 @@ public:
 
         switch (frame->type())
         {
-            case GNASH_IMAGE_RGBA:
+            case image::TYPE_RGBA:
                 renderVideo<agg::pixfmt_rgba32_pre>(*frame, mtx, path, smooth);
                 break;
-            case GNASH_IMAGE_RGB:
+            case image::TYPE_RGB:
                 renderVideo<agg::pixfmt_rgb24_pre>(*frame, mtx, path, smooth);
                 break;
             default:
@@ -884,22 +884,22 @@ public:
   }
   
  
-    virtual Renderer* startInternalRender(GnashImage& im) {
+    virtual Renderer* startInternalRender(image::GnashImage& im) {
     
         std::auto_ptr<Renderer_agg_base> in;
     
         switch (im.type()) {
-            case GNASH_IMAGE_RGB:
+            case image::TYPE_RGB:
                 in.reset(new Renderer_agg<typename RGB::PixelFormat>(24));
                 break;
-            case GNASH_IMAGE_RGBA:
+            case image::TYPE_RGBA:
                 in.reset(new Renderer_agg<typename RGBA::PixelFormat>(32));
                 break;
         }
  
         const size_t width = im.width();
         const size_t height = im.height();
-        const size_t stride = width * (im.type() == GNASH_IMAGE_RGBA ? 4 : 3);
+        const size_t stride = width * (im.type() == image::TYPE_RGBA ? 4 : 3);
 
         in->init_buffer(im.begin(), width * height, width, height, stride);
         _external.reset(in.release());

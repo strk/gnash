@@ -37,23 +37,26 @@ extern "C" {
 }
 
 // Forward declarations
-namespace gnash { class IOChannel; }
+namespace gnash {
+    class IOChannel;
+}
 
 namespace gnash {
+namespace image {
 
-class PngImageInput : public ImageInput
+class PngInput : public Input
 {
 
 public:
 
-    /// Construct a PngImageInput object to read from an IOChannel.
+    /// Construct a PngInput object to read from an IOChannel.
     //
     /// @param in   The stream to read PNG data from. Ownership is shared
-    ///             between caller and JpegImageInput, so it is freed
+    ///             between caller and JpegInput, so it is freed
     ///             automatically when the last owner is destroyed.
-    PngImageInput(boost::shared_ptr<IOChannel> in);
+    PngInput(boost::shared_ptr<IOChannel> in);
     
-    ~PngImageInput();
+    ~PngInput();
     
     /// Begin processing the image data.
     void read();
@@ -75,13 +78,13 @@ public:
     /// @param rgbData  The buffer for writing raw RGB data to.
     void readScanline(unsigned char* imageData);
 
-    /// Create a PngImageInput and transfer ownership to the caller.
+    /// Create a PngInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read PNG data from.
-    DSOEXPORT static std::auto_ptr<ImageInput> create(
+    DSOEXPORT static std::auto_ptr<Input> create(
             boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<ImageInput> ret ( new PngImageInput(in) );
+        std::auto_ptr<Input> ret ( new PngInput(in) );
         if (ret.get()) ret->read();
         return ret;
     }
@@ -106,7 +109,7 @@ private:
 };
 
 // Class object for writing PNG image data.
-class PngImageOutput : public ImageOutput
+class PngOutput : public Output
 {
 
 public:
@@ -116,16 +119,16 @@ public:
     /// @param out      The IOChannel used for output. Must be kept alive
     ///                 throughout
     /// @param quality Unused in PNG output
-    PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width,
+    PngOutput(boost::shared_ptr<IOChannel> out, size_t width,
             size_t height, int quality);
     
-    ~PngImageOutput();
+    ~PngOutput();
 
     void writeImageRGB(const unsigned char* rgbData);
     
     void writeImageRGBA(const unsigned char* rgbaData);
 
-    static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out,
+    static std::auto_ptr<Output> create(boost::shared_ptr<IOChannel> out,
             size_t width, size_t height, int quality);
     
 private:
@@ -139,6 +142,7 @@ private:
     
 };
 
+} // namespace image
 } // namespace gnash
 
 

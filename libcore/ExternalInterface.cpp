@@ -361,7 +361,7 @@ ExternalInterface::ExternalEventCheck(int fd)
         // some memory to read the data.
         // terminate incase we want to treat the data like a string.
         buffer[bytes+1] = 0;
-        int ret = ::read(fd, buffer.get(), bytes);
+        int ret = read(fd, buffer.get(), bytes);
         if (ret) {
             return parseInvoke(buffer.get());
         }
@@ -651,7 +651,7 @@ size_t
 ExternalInterface::writeBrowser(int fd, const std::string &data)
 {
     if (fd > 0) {
-        return ::write(fd, data.c_str(), data.size());
+        return write(fd, data.c_str(), data.size());
     }
 
     return -1;
@@ -688,7 +688,7 @@ ExternalInterface::readBrowser(int fd)
 
     std::string buf(bytes, '\0');
 
-    int ret = ::read(fd, &buf[0], bytes);
+    int ret = read(fd, &buf[0], bytes);
     if (ret <= 0) {
         return empty;
     }

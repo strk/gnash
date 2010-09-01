@@ -27,7 +27,9 @@
 // Forward declarations
 namespace gnash {
 	class NetStream_as;
-    class GnashImage;
+    namespace image {
+        class GnashImage;
+    }
     struct ObjectURI;
     namespace SWF {
         class DefineVideoStreamTag;
@@ -109,7 +111,7 @@ protected:
 private:
 
 	/// Get video frame to be displayed
-	GnashImage* getVideoFrame();
+    image::GnashImage* getVideoFrame();
 
 	const boost::intrusive_ptr<const SWF::DefineVideoStreamTag> m_def;
 
@@ -123,7 +125,7 @@ private:
 	boost::int32_t _lastDecodedVideoFrameNum;
 
 	/// Last decoded frame 
-	std::auto_ptr<GnashImage> _lastDecodedVideoFrame;
+	std::auto_ptr<image::GnashImage> _lastDecodedVideoFrame;
 
 	/// The decoder used to decode the video frames
 	std::auto_ptr<media::VideoDecoder> _decoder;

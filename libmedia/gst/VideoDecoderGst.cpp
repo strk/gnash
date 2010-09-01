@@ -182,13 +182,13 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
 }
   
 
-std::auto_ptr<GnashImage>
+std::auto_ptr<image::GnashImage>
 VideoDecoderGst::pop()
 {
     GstBuffer * buffer = swfdec_gst_decoder_pull (&_decoder);
 
     if (!buffer) {
-        return std::auto_ptr<GnashImage>();
+        return std::auto_ptr<image::GnashImage>();
     }
   
     GstCaps* caps = gst_buffer_get_caps(buffer);
@@ -202,7 +202,7 @@ VideoDecoderGst::pop()
 
     gst_caps_unref(caps);
   
-    std::auto_ptr<GnashImage> ret(new gnashGstBuffer(buffer, _width, _height));
+    std::auto_ptr<image::GnashImage> ret(new gnashGstBuffer(buffer, _width, _height));
   
     return ret;
 }

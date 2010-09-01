@@ -29,8 +29,11 @@
 #include <boost/scoped_array.hpp>
 
 namespace gnash {
+namespace image {
 
-static void
+namespace {
+
+void
 error(png_struct*, const char* msg)
 {
     std::ostringstream ss;
@@ -38,13 +41,13 @@ error(png_struct*, const char* msg)
     throw ParserException(ss.str());
 }
 
-static void
+void
 warning(png_struct*, const char* msg)
 {
     log_debug(_("PNG warning: %s"), msg);
 }
 
-static void
+void
 readData(png_structp pngptr, png_bytep data, png_size_t length)
 {
     // Do not call unless the PNG exists.
@@ -53,7 +56,7 @@ readData(png_structp pngptr, png_bytep data, png_size_t length)
     in->read(reinterpret_cast<char*>(data), length);
 }
 
-static void
+void
 writeData(png_structp pngptr, png_bytep data, png_size_t length)
 {
     // Do not call unless the PNG exists.
@@ -62,14 +65,15 @@ writeData(png_structp pngptr, png_bytep data, png_size_t length)
     out->write(reinterpret_cast<char*>(data), length);
 }
 
-static void
+void
 flushData(png_structp /*pngptr*/)
 {
-
 }
 
-PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
-    ImageInput(in),
+} // unnamed namespace
+
+PngInput::PngInput(boost::shared_ptr<IOChannel> in) :
+    Input(in),
     _pngPtr(0),
     _infoPtr(0),
     _rowPtrs(0),
@@ -79,34 +83,34 @@ PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
     init();
 }
 
-PngImageInput::~PngImageInput()
+PngInput::~PngInput()
 {
     png_destroy_read_struct(&_pngPtr, &_infoPtr,
                     static_cast<png_infopp>(NULL));
 }
 
 size_t
-PngImageInput::getHeight() const
+PngInput::getHeight() const
 {
     assert (_pngPtr && _infoPtr);
     return png_get_image_height(_pngPtr, _infoPtr);
 }
 
 size_t
-PngImageInput::getWidth() const
+PngInput::getWidth() const
 {
     assert (_pngPtr && _infoPtr);
     return png_get_image_width(_pngPtr, _infoPtr);
 }
 
 size_t
-PngImageInput::getComponents() const
+PngInput::getComponents() const
 {
     return png_get_channels(_pngPtr, _infoPtr);
 }
 
 void
-PngImageInput::readScanline(unsigned char* imageData)
+PngInput::readScanline(unsigned char* imageData)
 {
     assert (_currentRow < getHeight());
     assert (_rowPtrs);
@@ -121,7 +125,7 @@ PngImageInput::readScanline(unsigned char* imageData)
 
 
 void
-PngImageInput::init()
+PngInput::init()
 {
     // Initialize png library.
     _pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
@@ -140,7 +144,7 @@ PngImageInput::init()
 }
 
 void
-PngImageInput::read()
+PngInput::read()
 {
     // Set our user-defined reader function
     png_set_read_fn(_pngPtr, _inStream.get(), &readData);
@@ -166,7 +170,7 @@ PngImageInput::read()
     if (png_get_valid(_pngPtr, _infoPtr, PNG_INFO_tRNS)) {
         log_debug("Applying transparency block, image is RGBA");
         png_set_tRNS_to_alpha(_pngPtr);
-        _type = GNASH_IMAGE_RGBA;
+        _type = TYPE_RGBA;
     }
 
     // Make 16-bit data into 8-bit data
@@ -178,12 +182,12 @@ PngImageInput::read()
         if (type & PNG_COLOR_MASK_ALPHA)
         {
             log_debug("Loading PNG image with alpha");
-            _type = GNASH_IMAGE_RGBA;
+            _type = TYPE_RGBA;
         }
         else
         {
             log_debug("Loading PNG image without alpha");
-            _type = GNASH_IMAGE_RGB;
+            _type = TYPE_RGB;
         }
     }
 
@@ -202,8 +206,8 @@ PngImageInput::read()
     const size_t components = getComponents();
 
     // We must have 3 or 4-channel data by this point.
-    assert((_type == GNASH_IMAGE_RGB && components == 3) ||
-           (_type == GNASH_IMAGE_RGBA && components == 4));
+    assert((_type == TYPE_RGB && components == 3) ||
+           (_type == TYPE_RGBA && components == 4));
 
     // Allocate space for the data
     _pixelData.reset(new png_byte[width * height * components]);
@@ -227,9 +231,9 @@ PngImageInput::read()
 /// PNG output
 ///
 
-PngImageOutput::PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int /* quality */)
+PngOutput::PngOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int /* quality */)
     :
-    ImageOutput(out, width, height),
+    Output(out, width, height),
     _pngPtr(0),
     _infoPtr(0)
 {
@@ -237,14 +241,14 @@ PngImageOutput::PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width, s
 }
 
 
-PngImageOutput::~PngImageOutput()
+PngOutput::~PngOutput()
 {
     png_destroy_write_struct(&_pngPtr, &_infoPtr);
 }
 
 
 void
-PngImageOutput::init()
+PngOutput::init()
 {
     // Initialize png library.
     _pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
@@ -261,7 +265,7 @@ PngImageOutput::init()
 }
 
 void
-PngImageOutput::writeImageRGBA(const unsigned char* rgbaData)
+PngOutput::writeImageRGBA(const unsigned char* rgbaData)
 {
     png_set_write_fn(_pngPtr, _outStream.get(), &writeData, &flushData);
 
@@ -287,7 +291,7 @@ PngImageOutput::writeImageRGBA(const unsigned char* rgbaData)
 
 
 void
-PngImageOutput::writeImageRGB(const unsigned char* rgbData)
+PngOutput::writeImageRGB(const unsigned char* rgbData)
 {
     png_set_write_fn(_pngPtr, _outStream.get(), &writeData, &flushData);
 
@@ -312,16 +316,16 @@ PngImageOutput::writeImageRGB(const unsigned char* rgbData)
 }
 
 
-std::auto_ptr<ImageOutput>
-PngImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
+std::auto_ptr<Output>
+PngOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
                        size_t height, int quality)
 {
-    std::auto_ptr<ImageOutput> outChannel(
-                new PngImageOutput(out, width, height, quality));
+    std::auto_ptr<Output> outChannel(
+                new PngOutput(out, width, height, quality));
     return outChannel;
 }
 
-
+} // namespace image
 } // namespace gnash
 
 // Local Variables:
