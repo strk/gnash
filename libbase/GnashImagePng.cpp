@@ -72,7 +72,8 @@ flushData(png_structp /*pngptr*/)
 
 } // unnamed namespace
 
-PngInput::PngInput(boost::shared_ptr<IOChannel> in) :
+PngInput::PngInput(boost::shared_ptr<IOChannel> in)
+    :
     Input(in),
     _pngPtr(0),
     _infoPtr(0),
@@ -85,21 +86,20 @@ PngInput::PngInput(boost::shared_ptr<IOChannel> in) :
 
 PngInput::~PngInput()
 {
-    png_destroy_read_struct(&_pngPtr, &_infoPtr,
-                    static_cast<png_infopp>(NULL));
+    png_destroy_read_struct(&_pngPtr, &_infoPtr, 0);
 }
 
 size_t
 PngInput::getHeight() const
 {
-    assert (_pngPtr && _infoPtr);
+    assert(_pngPtr && _infoPtr);
     return png_get_image_height(_pngPtr, _infoPtr);
 }
 
 size_t
 PngInput::getWidth() const
 {
-    assert (_pngPtr && _infoPtr);
+    assert(_pngPtr && _infoPtr);
     return png_get_image_width(_pngPtr, _infoPtr);
 }
 
@@ -112,8 +112,8 @@ PngInput::getComponents() const
 void
 PngInput::readScanline(unsigned char* imageData)
 {
-    assert (_currentRow < getHeight());
-    assert (_rowPtrs);
+    assert(_currentRow < getHeight());
+    assert(_rowPtrs);
 
     // Data packed as RGB / RGBA
     const size_t size = getWidth() * getComponents();
@@ -128,17 +128,15 @@ void
 PngInput::init()
 {
     // Initialize png library.
-    _pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-                                        NULL, &error, &warning);
+    _pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, &error,
+            &warning);
+
     if (!_pngPtr) return;
 
     _infoPtr = png_create_info_struct(_pngPtr);
 
-    if (!_infoPtr)
-    {
-        png_destroy_read_struct(&_pngPtr,
-                    static_cast<png_infopp>(NULL),
-                    static_cast<png_infopp>(NULL));
+    if (!_infoPtr) {
+        png_destroy_read_struct(&_pngPtr, 0, 0);
         return;
     }
 }
@@ -151,8 +149,8 @@ PngInput::read()
 
     png_read_info(_pngPtr, _infoPtr);
 
-    png_byte type = png_get_color_type(_pngPtr, _infoPtr);
-    png_byte bitDepth = png_get_bit_depth(_pngPtr, _infoPtr);
+    const png_byte type = png_get_color_type(_pngPtr, _infoPtr);
+    const png_byte bitDepth = png_get_bit_depth(_pngPtr, _infoPtr);
     
     // Convert indexed images to RGB
     if (type == PNG_COLOR_TYPE_PALETTE) {
@@ -177,23 +175,19 @@ PngInput::read()
     if (bitDepth == 16) png_set_strip_16(_pngPtr);
 
     // Set the type of the image if it hasn't been set already.
-    if (_type == GNASH_IMAGE_INVALID)
-    {
-        if (type & PNG_COLOR_MASK_ALPHA)
-        {
+    if (_type == GNASH_IMAGE_INVALID) {
+        if (type & PNG_COLOR_MASK_ALPHA) {
             log_debug("Loading PNG image with alpha");
             _type = TYPE_RGBA;
         }
-        else
-        {
+        else {
             log_debug("Loading PNG image without alpha");
             _type = TYPE_RGB;
         }
     }
 
     // Convert 1-channel grey images to 3-channel RGB.
-    if (type == PNG_COLOR_TYPE_GRAY || type == PNG_COLOR_TYPE_GRAY_ALPHA)
-    {
+    if (type == PNG_COLOR_TYPE_GRAY || type == PNG_COLOR_TYPE_GRAY_ALPHA) {
         log_debug("Converting greyscale PNG to RGB(A)");
         png_set_gray_to_rgb(_pngPtr);
     }
@@ -202,7 +196,6 @@ PngInput::read()
 
     const size_t height = getHeight();
     const size_t width = getWidth();
-
     const size_t components = getComponents();
 
     // We must have 3 or 4-channel data by this point.
@@ -217,8 +210,7 @@ PngInput::read()
     _rowPtrs.reset(new png_bytep[height]);
     
     // Fill in the row pointers.
-    for (size_t y = 0; y < height; ++y)
-    {
+    for (size_t y = 0; y < height; ++y) {
         _rowPtrs[y] = _pixelData.get() + y * width * components;
     }
 
@@ -231,7 +223,8 @@ PngInput::read()
 /// PNG output
 ///
 
-PngOutput::PngOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int /* quality */)
+PngOutput::PngOutput(boost::shared_ptr<IOChannel> out, size_t width,
+        size_t height, int /*quality*/)
     :
     Output(out, width, height),
     _pngPtr(0),
@@ -257,8 +250,7 @@ PngOutput::init()
 
     _infoPtr = png_create_info_struct(_pngPtr);
 
-    if (!_infoPtr)
-    {
+    if (!_infoPtr) {
         png_destroy_write_struct(&_pngPtr, static_cast<png_infopp>(NULL));
         return;
     }
@@ -274,8 +266,7 @@ PngOutput::writeImageRGBA(const unsigned char* rgbaData)
     // RGBA
     const size_t components = 4;
 
-    for (size_t y = 0; y < _height; ++y)
-    {
+    for (size_t y = 0; y < _height; ++y) {
         rows[y] = rgbaData + _width * y * components;
     }
 
@@ -300,8 +291,7 @@ PngOutput::writeImageRGB(const unsigned char* rgbData)
     // RGB
     const size_t components = 3;
 
-    for (size_t y = 0; y < _height; ++y)
-    {
+    for (size_t y = 0; y < _height; ++y) {
         rows[y] = rgbData + _width * y * components;
     }
 
@@ -317,11 +307,10 @@ PngOutput::writeImageRGB(const unsigned char* rgbData)
 
 
 std::auto_ptr<Output>
-PngOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
+PngOutput::create(boost::shared_ptr<IOChannel> o, size_t width,
                        size_t height, int quality)
 {
-    std::auto_ptr<Output> outChannel(
-                new PngOutput(out, width, height, quality));
+    std::auto_ptr<Output> outChannel(new PngOutput(o, width, height, quality));
     return outChannel;
 }
 
