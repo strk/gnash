@@ -20,19 +20,20 @@
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2002
 
-#include <cstring>
-#include <memory>        // for auto_ptr
+#include "GnashImage.h"
+
+#include <memory> 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
+#include <algorithm>
 
-#include "FileTypes.h"
-#include "GnashImage.h"
 #ifdef USE_PNG
 # include "GnashImagePng.h"
 #endif
 #ifdef USE_GIF
 # include "GnashImageGif.h"
 #endif
+#include "FileTypes.h"
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "log.h"
@@ -84,7 +85,7 @@ GnashImage::update(const GnashImage& from)
     assert(width() == from.width());
     assert(_type == from._type);
     assert(_location == from._location);
-    std::memcpy(begin(), from.begin(), size());
+    std::copy(from.begin(), from.begin() + size(), begin());
 }
 
 ImageRGB::ImageRGB(size_t width, size_t height)
