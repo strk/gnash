@@ -41,7 +41,7 @@ SdlCairoGlue::~SdlCairoGlue()
 }
 
 bool
-SdlCairoGlue::init(int argc, char** argv[])
+SdlCairoGlue::init(int /*argc*/, char** /*argv*/[])
 {
 //    GNASH_REPORT_FUNCTION;
     return true;
@@ -61,7 +61,7 @@ SdlCairoGlue::createRenderHandler(int depth)
 
 /// Not implemented, Fixme
 void
-SdlCairoGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
+SdlCairoGlue::setInvalidatedRegions(const InvalidatedRanges& /*ranges*/)
 {
 }
 
