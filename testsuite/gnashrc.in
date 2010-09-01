@@ -53,4 +53,7 @@ set Renderer
 # Use the default MediaHandler
 set MediaHandler
 
+# Use a custom key to prevent conflicts with a running plugin
+set LCShmkey 138765373
+
 # TODO: enable extensions ?
