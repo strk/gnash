@@ -529,7 +529,7 @@ private:
         _bytes_loaded=bytes;
     }
 
-    /// A flag set to true when load cancelation is requested
+    /// A flag set to true when load cancellation is requested
     bool _loadingCanceled;
 
     /// Movies we import resources from
