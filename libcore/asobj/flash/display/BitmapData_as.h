@@ -40,7 +40,9 @@ namespace gnash {
     class MovieClip;
     class Transform;
     class DisplayObject;
-    class GnashImage;
+    namespace image {
+        class GnashImage;
+    }
 }
 
 namespace gnash {
@@ -59,8 +61,7 @@ public:
     //
     /// The constructor sets the immutable size of the
     /// bitmap, as well as whether it can handle transparency or not.
-	BitmapData_as(as_object* owner, std::auto_ptr<GnashImage> im);
-	
+	BitmapData_as(as_object* owner, std::auto_ptr<image::GnashImage> im);
 
     virtual ~BitmapData_as() {}
 
@@ -82,7 +83,7 @@ public:
 
     bool transparent() const {
         assert(data());
-        return (data()->type() == GNASH_IMAGE_RGBA);
+        return (data()->type() == image::TYPE_RGBA);
     }
 
     const CachedBitmap* bitmapInfo() const {
@@ -143,7 +144,7 @@ public:
 
 private:
     
-    GnashImage* data() const {
+    image::GnashImage* data() const {
         return _cachedBitmap.get() ? &_cachedBitmap->image() : _image.get();
     }
 
@@ -155,7 +156,7 @@ private:
 
     boost::intrusive_ptr<CachedBitmap> _cachedBitmap;
 
-    boost::scoped_ptr<GnashImage> _image;
+    boost::scoped_ptr<image::GnashImage> _image;
 
     std::list<DisplayObject*> _attachedObjects;
 

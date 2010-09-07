@@ -153,10 +153,9 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
     // to transfer ownership.
     boost::shared_ptr<IOChannel> imageData(in.release());
 
-    try
-    {
-        std::auto_ptr<GnashImage> im(
-                ImageInput::readImageData(imageData, type));
+    try {
+        std::auto_ptr<image::GnashImage> im(
+                image::Input::readImageData(imageData, type));
 
         if (!im.get()) {
             log_error(_("Can't read image file from %s"), url);
@@ -170,8 +169,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         return ret;
 
     }
-    catch (ParserException& e)
-    {
+    catch (ParserException& e) {
         log_error(_("Parsing error: %s"), e.what());
         return ret;
     }

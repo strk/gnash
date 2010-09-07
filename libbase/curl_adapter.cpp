@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef _ANDROID
+#ifdef ANDROID
 #include <sys/select.h>
 #endif
 
@@ -678,7 +678,7 @@ CurlStreamFile::fillCache(std::streamsize size)
         {
             if ( errno == EINTR )
             {
-                // we got interupted by a signal
+                // we got interrupted by a signal
                 // let's consider this as a timeout
 #ifdef GNASH_CURL_VERBOSE
                 log_debug("select() was interrupted by a signal");

@@ -368,10 +368,19 @@ public:
     void generate_span(agg::rgba8* span, int x, int y, unsigned len)
     {
         m_sg.generate(span, x, y, len);
-        if (m_cx == SWFCxForm()) return;
+
+        const bool transform = (m_cx != SWFCxForm());
+
         for (size_t i = 0; i < len; ++i) {
-            m_cx.transform(span->r, span->g, span->b, span->a);
-            span->premultiply();
+            // We must always do this because dynamic bitmaps (BitmapData)
+            // can have any values. Loaded bitmaps are handled when loaded.
+            span->r = std::min(span->r, span->a);
+            span->g = std::min(span->g, span->a);
+            span->b = std::min(span->b, span->a);
+            if (transform) {
+                m_cx.transform(span->r, span->g, span->b, span->a);
+                span->premultiply();
+            }
             ++span;
         }  
     }

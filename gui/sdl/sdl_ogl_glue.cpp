@@ -45,7 +45,7 @@ SdlOglGlue::~SdlOglGlue()
 
 }
 
-bool SdlOglGlue::init(int argc, char **argv[])
+bool SdlOglGlue::init(int /*argc*/, char ** /*argv*/ [])
 {
 //    GNASH_REPORT_FUNCTION;
 #ifdef FIX_I810_LOD_BIAS
@@ -77,7 +77,7 @@ SdlOglGlue::createRenderHandler(int depth)
 
 /// Not implemented, Fixme
 void
-SdlOglGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
+SdlOglGlue::setInvalidatedRegions(const InvalidatedRanges& /*ranges*/)
 {
 }
 

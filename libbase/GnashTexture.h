@@ -36,7 +36,7 @@ class DSOEXPORT GnashTextureFormat {
     unsigned int        _format;
 
 public:
-    GnashTextureFormat(ImageType type);
+    GnashTextureFormat(image::ImageType type);
 
     /// Return GL internal format
     unsigned int internal_format() const
@@ -68,7 +68,8 @@ private:
     bool init();
 
 public:
-    GnashTexture(unsigned int width, unsigned int height, ImageType type);
+    GnashTexture(unsigned int width, unsigned int height,
+            image::ImageType type);
     virtual ~GnashTexture();
 
     /// Return texture flags

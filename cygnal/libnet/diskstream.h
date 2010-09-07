@@ -106,7 +106,7 @@ public:
     /// @param statistics The optional data structure to use for
     ///		collecting statistics on this stream.
     ///
-    /// @return True if the file was opened sucessfully, false if not.
+    /// @return True if the file was opened successfully, false if not.
     DSOEXPORT bool open(const std::string &filespec);
     DSOEXPORT bool open(const std::string &filespec, int netfd);
     DSOEXPORT bool open(const std::string &filespec, int netfd, gnash::Statistics  &statistics);
@@ -117,7 +117,7 @@ public:
     ///
     /// @param flag True to play the entire file, false to play part.
     ///
-    /// @return True if the data was streamed sucessfully, false if not.
+    /// @return True if the data was streamed successfully, false if not.
     bool play();
     bool play(bool flag);
     bool play(int netfd, bool flag);
@@ -132,7 +132,7 @@ public:
     ///
     /// @param quantity The number of frames to stream..
     ///
-    /// @return True if the thumbnails were streamed sucessfully, false if not.
+    /// @return True if the thumbnails were streamed successfully, false if not.
     bool preview(const std::string &filespec, int frames);
     
     /// \brief Stream a series of thumbnails.
@@ -145,12 +145,12 @@ public:
     ///
     /// @param quantity The number of thumbnails to stream..
     ///
-    /// @return True if the thumbnails were streamed sucessfully, false if not.
+    /// @return True if the thumbnails were streamed successfully, false if not.
     bool thumbnail(const std::string &filespec, int quantity);
     
     /// \brief Pause the stream currently being played.
     ///
-    /// @return True if the stream was paused sucessfully, false if not.
+    /// @return True if the stream was paused successfully, false if not.
     bool pause();
     
     /// \brief Seek within the stream.
@@ -169,7 +169,7 @@ public:
     ///
     /// @param filespec The file name for the data to be written.
     ///
-    /// @return True if the file was uploaded sucessfully, false if not.
+    /// @return True if the file was uploaded successfully, false if not.
     bool upload(const std::string &filespec);
     
     // Stream a single "real-time" source.

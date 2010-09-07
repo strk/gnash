@@ -33,7 +33,8 @@ class DSOEXPORT GnashVaapiTexture : public GnashTexture {
     std::auto_ptr<VaapiSurfaceGLX> _surface;
 
 public:
-    GnashVaapiTexture(unsigned int width, unsigned int height, ImageType type);
+    GnashVaapiTexture(unsigned int width, unsigned int height, 
+            image::ImageType type);
     ~GnashVaapiTexture();
 
     /// Copy texture data from a VA surface.

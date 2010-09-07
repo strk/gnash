@@ -574,10 +574,103 @@ xcheck(near(bm, 23, 15, 0x00ff00));
 xcheck(near(bm, 25, 15, 0x0000ff));
 check(near(bm, 25, 25, 0xffffff));
 
+bm = new flash.display.BitmapData(10, 10, true, 0x5010eeff);
+xcheck_equals(bm.getPixel32(5, 5), 0x5010efff);
+
+bm = new flash.display.BitmapData(10, 10, true, 0xee11efff);
+check_equals(bm.getPixel32(5, 5), -300814337);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x00011010);
+check_equals(bm.getPixel32(5, 5), 0x00000000);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x0000ffff);
+check_equals(bm.getPixel32(5, 5), 0x00000000);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x000000ff);
+check_equals(bm.getPixel32(5, 5), 0x00000000);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x010000ff);
+check_equals(bm.getPixel32(5, 5), 0x010000ff);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x300000ff);
+check_equals(bm.getPixel32(5, 5), 0x300000ff);
+
+bm = new flash.display.BitmapData(10, 10, true, 0x30ffffff);
+check_equals(bm.getPixel32(5, 5), 0x30ffffff);
+
+// clone();
+
+orig = new flash.display.BitmapData(10, 10, false, 0x00ff10);
+orig.a = 7;
+orig.setPixel(5, 5, 0x0000ff);
+
+// Cloning doesn't clone non-native properties.
+cl = orig.clone();
+check_equals(cl.a, undefined);
+check_equals(cl.width, 10);
+check_equals(cl.height, 10);
+check_equals(cl.getPixel(2, 2), 0x00ff10);
+check_equals(cl.getPixel(5, 5), 0x0000ff);
+check_equals(typeof(cl.__proto__), "object");
+check_equals(cl.__proto__, orig.__proto__);
+check_equals(typeof(cl.constructor), "function");
+check_equals(cl.constructor, orig.constructor);
+
+// The constructor is irrelevant.
+orig.constructor = 10;
+check_equals(orig.constructor, 10);
+cl = orig.clone();
+check_equals(typeof(cl.__proto__), "object");
+check_equals(typeof(cl.constructor), "function");
+
+// The prototype is important.
+orig.__proto__ = 8;
+check_equals(orig.__proto__, 8);
+cl = orig.clone();
+check_equals(cl.__proto__, undefined);
+check_equals(cl.constructor, undefined);
+
+// What kind of prototype makes this work?
+o = {};
+o.constructor = 25;
+o.clone = flash.display.BitmapData.prototype.clone;
+orig.__proto__ = o;
+o.width = 20;
+o.height = 21;
+o.getPixel = flash.display.BitmapData.prototype.getPixel;
+
+cl = orig.clone();
+check_equals(cl.__proto__, o);
+check_equals(cl.constructor, 25);
+check_equals(cl.width, 20);
+check_equals(cl.height, 21);
+cl.__proto__ = flash.display.BitmapData.prototype;
+check_equals(cl.width, 10);
+check_equals(cl.height, 10);
+
+e = flash.display.BitmapData.prototype;
+orig.__proto__ = e;
+flash.display.BitmapData.prototype = 8;
+check_equals(flash.display.BitmapData.prototype, 8);
+cl = orig.clone();
+check_equals(typeof(cl.__proto__), "object");
+check_equals(typeof(cl.constructor), "function");
+
+// The constructor property comes from the original __proto__.
+cb = e.constructor;
+e.constructor = 98;
+cl = orig.clone();
+check_equals(typeof(cl.__proto__), "object");
+check_equals(cl.constructor, 98);
+
+// Restore to original state!
+e.constructor = cb;
+flash.display.BitmapData.prototype = e;
+
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(218);
+totals(252);
 
 #endif // OUTPUT_VERSION >= 8

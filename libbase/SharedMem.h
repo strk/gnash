@@ -28,7 +28,7 @@
 #include <sys/types.h>
 #if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__)
 # include <sys/ipc.h>
-#ifdef _ANDROID
+#ifdef ANDROID
 # include <linux/shm.h>
 #else
 # include <sys/shm.h>

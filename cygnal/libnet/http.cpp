@@ -219,7 +219,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 		    }
 		    log_debug("Requesting file: \"%s\"", _filespec);
 
-		    // HTTP 1.1 enables persistant network connections
+		    // HTTP 1.1 enables persistent network connections
 		    // by default.
 		    if (_version.minor > 0) {
 			log_debug("Enabling Keep Alive by default for HTTP > 1.0");

@@ -18,23 +18,28 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "utility.h"
 #include "GnashImageGif.h"
-#include "log.h"
-#include "GnashException.h"
-#include "IOChannel.h"
 
 #include <sstream>
-#include <cstring> // std::memcpy
+#include <algorithm>
 #include <boost/scoped_array.hpp>
 
 extern "C" {
 #include <gif_lib.h>
 }
 
-namespace gnash {
+#include "utility.h"
+#include "log.h"
+#include "GnashException.h"
+#include "IOChannel.h"
 
-static int
+
+namespace gnash {
+namespace image {
+
+namespace {
+
+int
 readData(GifFileType* ft, GifByteType* data, int length)
 {
     // Do not read until opened.
@@ -43,49 +48,52 @@ readData(GifFileType* ft, GifByteType* data, int length)
     return in->read(reinterpret_cast<char*>(data), length);
 }
 
+}
 
-GifImageInput::GifImageInput(boost::shared_ptr<IOChannel> in) :
-    ImageInput(in),
-    _gif(NULL),
+GifInput::GifInput(boost::shared_ptr<IOChannel> in)
+    :
+    Input(in),
+    _gif(0),
     _currentRow(0)
 {
 }
 
-GifImageInput::~GifImageInput()
+GifInput::~GifInput()
 {
     // Clean up allocated data.
     DGifCloseFile(_gif);
 }
 
 size_t
-GifImageInput::getHeight() const
+GifInput::getHeight() const
 {
     assert (_gif);
     return _gif->SHeight;
 }
 
 size_t
-GifImageInput::getWidth() const
+GifInput::getWidth() const
 {
     assert (_gif);
     return _gif->SWidth;
 }
 
 void
-GifImageInput::readScanline(unsigned char* rgbData)
+GifInput::readScanline(unsigned char* rgbData)
 {
 
-    ColorMapObject* colormap = (_gif->Image.ColorMap) ?
-                            _gif->Image.ColorMap :
-                            _gif->SColorMap;
+    const ColorMapObject* const colormap = (_gif->Image.ColorMap) ?
+                            _gif->Image.ColorMap : _gif->SColorMap;
 
     assert(colormap);
 
     unsigned char* ptr = rgbData;
 
-    for (size_t i = 0, e = getWidth(); i < e; ++i)
-    {
-        GifColorType* mapentry = &colormap->Colors[_gifData[_currentRow][i]];
+    for (size_t i = 0, e = getWidth(); i < e; ++i) {
+
+        const GifColorType* const mapentry =
+            &colormap->Colors[_gifData[_currentRow][i]];
+
         *ptr++ = mapentry->Red;
         *ptr++ = mapentry->Green;
         *ptr++ = mapentry->Blue;
@@ -96,7 +104,7 @@ GifImageInput::readScanline(unsigned char* rgbData)
 }
 
 void
-GifImageInput::read()
+GifInput::read()
 {
     _gif = DGifOpen(_inStream.get(), &readData); 
 
@@ -135,8 +143,8 @@ GifImageInput::read()
                     // Set the width dimension of the array
                     _gifData[i].reset(new GifPixelType[screenWidth]);
                     // Fill all the pixels with the background color.
-                    std::memset(_gifData[i].get(), backgroundColor,
-                            screenWidth);
+                    std::fill_n(_gifData[i].get(), screenWidth,
+                            backgroundColor);
                 }
                 
                 // The position of the image on the GIF 'screen'
@@ -157,10 +165,8 @@ GifImageInput::read()
                             screenWidth, screenHeight);
 
                     // The order of interlaced GIFs.
-                    static const int interlacedOffsets[] =
-                                            { 0, 4, 2, 1 };
-                    static const int interlacedJumps[] =
-                                            { 8, 8, 4, 2 };
+                    const int interlacedOffsets[] = { 0, 4, 2, 1 };
+                    const int interlacedJumps[] = { 8, 8, 4, 2 };
 
                     for (size_t i = 0; i < 4; ++i) {
 
@@ -212,10 +218,11 @@ GifImageInput::read()
 
     // Set the type to RGB
     // TODO: implement RGBA!
-    _type = GNASH_IMAGE_RGB;
+    _type = TYPE_RGB;
 
 }
 
+} // namespace image
 } // namespace gnash
 
 // Local Variables:

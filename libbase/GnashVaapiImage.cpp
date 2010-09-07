@@ -39,11 +39,13 @@ static boost::uint64_t get_ticks_usec(void)
 #endif
 }
 
-GnashVaapiImage::GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface, ImageType type)
-    : GnashImage(NULL, surface->width(), surface->height(), type,
-            GNASH_IMAGE_GPU)
-    , _surface(surface)
-    , _creation_time(get_ticks_usec())
+GnashVaapiImage::GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface,
+        image::ImageType type)
+    :
+    image::GnashImage(NULL, surface->width(), surface->height(), type,
+            image::GNASH_IMAGE_GPU),
+    _surface(surface),
+    _creation_time(get_ticks_usec())
 {
     log_debug("GnashVaapiImage::GnashVaapiImage(): surface 0x%08x, size %dx%d\n",
           _surface->get(), _width, _height);
@@ -69,22 +71,22 @@ void GnashVaapiImage::update(boost::uint8_t* data)
     _creation_time = get_ticks_usec();
 }
 
-void GnashVaapiImage::update(const GnashImage& from)
+void GnashVaapiImage::update(const image::GnashImage& from)
 {
     assert(stride() == from.stride());
     assert(size() <= from.size());
     assert(type() == from.type());
 
     switch (from.location()) {
-    case GNASH_IMAGE_CPU:
-        this->update(const_cast<boost::uint8_t *>(from.begin()));
-        break;
-    case GNASH_IMAGE_GPU:
-        this->update(static_cast<const GnashVaapiImage &>(from).surface());
-        break;
-    default:
-        assert(0);
-        break;
+        case image::GNASH_IMAGE_CPU:
+            this->update(const_cast<boost::uint8_t*>(from.begin()));
+            break;
+        case image::GNASH_IMAGE_GPU:
+            this->update(static_cast<const GnashVaapiImage&>(from).surface());
+            break;
+        default:
+            assert(0);
+            break;
     }
 }
 
@@ -103,7 +105,7 @@ bool GnashVaapiImage::transfer()
 }
 
 // Get access to the underlying data
-GnashImage::iterator
+image::GnashImage::iterator
 GnashVaapiImage::begin()
 {
     log_debug("GnashVaapiImage::data(): surface 0x%08x\n", _surface->get());
@@ -118,7 +120,7 @@ GnashVaapiImage::begin()
 }
 
 // Get read-only access to the underlying data
-GnashImage::const_iterator
+image::GnashImage::const_iterator
 GnashVaapiImage::begin() const
 {
     log_debug("GnashVaapiImage::data() const: surface 0x%08x\n", _surface->get());

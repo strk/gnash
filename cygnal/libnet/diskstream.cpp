@@ -591,7 +591,7 @@ DiskStream::writeToDisk(const std::string &filespec, boost::uint8_t *data, size_
 /// @param filespec The full path and file name for the data to be
 ///	read.
 ///
-/// @return True if the file was opened sucessfully, false if not.
+/// @return True if the file was opened successfully, false if not.
 bool
 DiskStream::open(const string &filespec)
 {
@@ -607,7 +607,7 @@ DiskStream::open(const string &filespec)
 ///
 /// @param netfd An optional file descriptor to read data from
 ///
-/// @return True if the file was opened sucessfully, false if not.
+/// @return True if the file was opened successfully, false if not.
 bool
 DiskStream::open(const string &filespec, int /*netfd*/)
 {
@@ -628,7 +628,7 @@ DiskStream::open(const string &filespec, int /*netfd*/)
 /// @param statistics The optional data structure to use for
 ///	collecting statistics on this stream.
 ///
-/// @return True if the file was opened sucessfully, false if not.
+/// @return True if the file was opened successfully, false if not.
 bool
 DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 {
@@ -679,7 +679,7 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 
 /// \brief Stream the file that has been loaded,
 ///
-/// @return True if the data was streamed sucessfully, false if not.
+/// @return True if the data was streamed successfully, false if not.
 bool
 DiskStream::play()
 {
@@ -702,7 +702,7 @@ DiskStream::play(bool flag)
 ///
 /// @param flag True to only send the first packet, False plays entire file.
 ///
-/// @return True if the data was streamed sucessfully, false if not.
+/// @return True if the data was streamed successfully, false if not.
 bool
 DiskStream::play(int netfd, bool flag)
 {
@@ -831,7 +831,7 @@ DiskStream::play(int netfd, bool flag)
 ///
 /// @param quantity The number of frames to stream..
 ///
-/// @return True if the thumbnails were streamed sucessfully, false if not.
+/// @return True if the thumbnails were streamed successfully, false if not.
 bool
 DiskStream::preview(const string & /*filespec*/, int /*frames*/)
 {
@@ -852,7 +852,7 @@ DiskStream::preview(const string & /*filespec*/, int /*frames*/)
 ///
 /// @param quantity The number of thumbnails to stream..
 ///
-/// @return True if the thumbnails were streamed sucessfully, false if not.
+/// @return True if the thumbnails were streamed successfully, false if not.
 bool
 DiskStream::thumbnail(const string & /*filespec*/, int /*quantity*/)
 {
@@ -865,7 +865,7 @@ DiskStream::thumbnail(const string & /*filespec*/, int /*quantity*/)
 
 /// \brief Pause the stream currently being played.
 ///
-/// @return True if the stream was paused sucessfully, false if not.
+/// @return True if the stream was paused successfully, false if not.
 bool
 DiskStream::pause()
 {
@@ -899,7 +899,7 @@ DiskStream::seek(off_t offset)
 ///
 /// @param filespec The file name for the data to be written.
 ///
-/// @return True if the file was uploaded sucessfully, false if not.
+/// @return True if the file was uploaded successfully, false if not.
 bool
 DiskStream::upload(const string & /*filespec*/)
 {

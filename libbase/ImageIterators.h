@@ -50,9 +50,9 @@ public:
     /// Underlying bytes are really in RGBA order, so we use that.
     const ARGB& operator=(const ARGB& other) const {
         switch (_t) {
-            case GNASH_IMAGE_RGBA:
+            case TYPE_RGBA:
                 // RGBA to RGBA
-                if (other._t == GNASH_IMAGE_RGBA) {
+                if (other._t == TYPE_RGBA) {
                     std::copy(other._it, other._it + 4, _it);
                     break;
                 }
@@ -62,7 +62,7 @@ public:
                 *(_it + 3) = 0xff;
                 break;
 
-            case GNASH_IMAGE_RGB:
+            case TYPE_RGB:
                 // It doesn't matter what the other image is.
                 std::copy(other._it, other._it + 3, _it);
 
@@ -77,10 +77,10 @@ public:
     /// Take note of the different byte order!
     const ARGB& operator=(boost::uint32_t pixel) const {
         switch (_t) {
-            case GNASH_IMAGE_RGBA:
+            case TYPE_RGBA:
                 // alpha
                 *(_it + 3) = (pixel & 0xff000000) >> 24;
-            case GNASH_IMAGE_RGB:
+            case TYPE_RGB:
                 *_it = (pixel & 0x00ff0000) >> 16;
                 *(_it + 1) = (pixel & 0x0000ff00) >> 8;
                 *(_it + 2) = (pixel & 0x000000ff);
@@ -94,10 +94,10 @@ public:
     operator boost::uint32_t() const {
         boost::uint32_t ret = 0xff000000;
         switch (_t) {
-            case GNASH_IMAGE_RGBA:
+            case TYPE_RGBA:
                 // alpha
                 ret = *(_it + 3) << 24;
-            case GNASH_IMAGE_RGB:
+            case TYPE_RGB:
                 ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
             default:
                 break;

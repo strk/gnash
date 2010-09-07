@@ -18,8 +18,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-#include "log.h"
 #include "TextFormat_as.h"
+
+#include <boost/optional.hpp>
+
+#include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "builtin_function.h" 
@@ -126,7 +129,7 @@ TwipsToPixels
 /// @tparam F       The function to call to store the value.
 /// @tparam P       A function object to be applied to the argument before
 ///                 storing the value.
-template<typename T, typename U, void(T::*F)(const Optional<U>&), typename P>
+template<typename T, typename U, void(T::*F)(const boost::optional<U>&), typename P>
 struct Set
 {
     static as_value set(const fn_call& fn) {
@@ -139,7 +142,7 @@ struct Set
         // Undefined doesn't do anything.
 
         if (arg.is_undefined() || arg.is_null()) {
-            (relay->*F)(Optional<U>());
+            (relay->*F)(boost::optional<U>());
             return as_value();
         }
 
@@ -159,13 +162,13 @@ struct Set
 /// @tparam F       The function to call to retrieve the value.
 /// @tparam P       A function object to be applied to the argument before
 ///                 returning the value.
-template<typename T, typename U, const Optional<U>&(T::*F)() const,
+template<typename T, typename U, const boost::optional<U>&(T::*F)() const,
     typename P = Nothing>
 struct Get
 {
     static as_value get(const fn_call& fn) {
         T* relay = ensure<ThisIsNative<T> >(fn);
-        const Optional<U>& opt = (relay->*F)();
+        const boost::optional<U>& opt = (relay->*F)();
 		if (opt) return as_value(P()(*opt));
 		
         as_value null;

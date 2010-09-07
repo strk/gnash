@@ -166,7 +166,7 @@ SWFMovieDefinition::SWFMovieDefinition(const RunResources& runResources)
 
 SWFMovieDefinition::~SWFMovieDefinition()
 {
-    // Request cancelation of the loading thread
+    // Request cancellation of the loading thread
     _loadingCanceled = true;
 }
 
@@ -486,7 +486,7 @@ SWFMovieDefinition::read_all_swf()
         while (left) {
 
             if (_loadingCanceled) {
-                log_debug("Loading thread cancelation requested, "
+                log_debug("Loading thread cancellation requested, "
                         "returning from read_all_swf");
                 return;
             }

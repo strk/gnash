@@ -24,8 +24,10 @@
 
 namespace gnash {
 
-GnashVaapiTexture::GnashVaapiTexture(unsigned int width, unsigned int height, ImageType type)
-    : GnashTexture(width, height, type)
+GnashVaapiTexture::GnashVaapiTexture(unsigned int width, unsigned int height,
+        image::ImageType type)
+    :
+    GnashTexture(width, height, type)
 {
     _flags |= GNASH_TEXTURE_VAAPI;
 
