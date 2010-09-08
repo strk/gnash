@@ -106,24 +106,20 @@ MediaHandlerFfmpeg::createAudioDecoder(const AudioInfo& info)
 
 	std::auto_ptr<AudioDecoder> ret;
 
-    try
-    {
+    try {
         ret.reset(new AudioDecoderFfmpeg(info));
     }
-    catch (MediaException& ex)
-    {
-        if ( info.type != FLASH ) throw ex;
+    catch (const MediaException& ex) {
 
-        try
-        {
+        if (info.type != FLASH) throw;
+
+        try {
             ret = createFlashAudioDecoder(info);
         } 
-        catch (MediaException& ex2)
-        {
+        catch (const MediaException& ex2) {
             boost::format err = boost::format(
                 _("MediaHandlerFfmpeg::createAudioDecoder: %s "
-                  "-- %s")) %
-                ex.what() % ex2.what();
+                  "-- %s")) % ex.what() % ex2.what();
             throw MediaException(err.str());
         }
     }

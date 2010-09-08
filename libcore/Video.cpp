@@ -83,7 +83,7 @@ Video::Video(as_object* object,
     try {
 	    _decoder = mh->createVideoDecoder(*info);
 	}
-	catch (MediaException &e) {
+	catch (const MediaException& e) {
 	    log_error("Could not create Video Decoder: %s", e.what());
 	}
 }

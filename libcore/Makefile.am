@@ -75,15 +75,7 @@ libgnashcore_la_SOURCES = \
 	MorphShape.cpp \
 	StaticText.cpp \
 	TextField.cpp \
-        BlurFilter.cpp \
-        GlowFilter.cpp \
-        DropShadowFilter.cpp \
-        ConvolutionFilter.cpp \
-        ColorMatrixFilter.cpp \
-        GradientGlowFilter.cpp \
-        BevelFilter.cpp \
-        GradientBevelFilter.cpp \
-        parser/filter_factory.cpp \
+	parser/filter_factory.cpp \
 	InteractiveObject.cpp \
 	ExternalInterface.cpp \
 	SWFMatrix.cpp \
