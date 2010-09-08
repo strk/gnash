@@ -406,7 +406,7 @@ NetStream_as::play(const std::string& c_url)
     // Reset any previously active playback
     close();
 
-    log_security( _("Connecting to movie: %s"), url );
+    log_security(_("Connecting to movie: %s"), url);
 
     _inputStream = _netCon->getStream(url); 
 
