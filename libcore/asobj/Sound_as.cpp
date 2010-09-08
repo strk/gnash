@@ -377,7 +377,7 @@ Sound_as::probeAudio()
         try {
             _inputStream = attachAuxStreamerIfNeeded();
         } 
-        catch (MediaException& e) {
+        catch (const MediaException& e) {
             assert(!_inputStream);
             assert(!_audioDecoder.get());
             log_error(_("Could not create audio decoder: %s"), e.what());

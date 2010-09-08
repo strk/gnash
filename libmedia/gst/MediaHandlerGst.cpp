@@ -121,24 +121,20 @@ MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
     } else
 #endif
     {
-        try
-        {
+        try {
             ret.reset(new AudioDecoderGst(info));
         }
-        catch (MediaException& ex)
-        {
-            if ( info.type != FLASH ) throw ex;
+        catch (const MediaException& ex) {
 
-            try
-            {
+            if (info.type != FLASH) throw;
+
+            try {
                 ret = createFlashAudioDecoder(info);
             } 
-            catch (MediaException& ex2)
-            {
+            catch (const MediaException& ex2) {
                 boost::format err = boost::format(
                     _("MediaHandlerGst::createAudioDecoder: %s "
-                      "-- %s")) %
-                    ex.what() % ex2.what();
+                      "-- %s")) % ex.what() % ex2.what();
                 throw MediaException(err.str());
             }
         }

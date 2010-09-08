@@ -97,12 +97,10 @@ EmbedSoundInst::createDecoder(media::MediaHandler& mediaHandler)
         0, // duration unknown, does it matter ?
         media::FLASH);
 
-    try
-    {
+    try {
         _decoder = mediaHandler.createAudioDecoder(info);
     }
-    catch (MediaException& e)
-    {
+    catch (const MediaException& e) {
         log_error("AudioDecoder initialization failed: %s", e.what());
     }
 }
