@@ -47,12 +47,6 @@ extern "C" {
 }		
 #undef HAVE_STDLIB_H
 
-#ifdef _WIN32
-typedef jpeg_boolean jpeg_bool_t;
-#else
-typedef boolean jpeg_bool_t;
-#endif
-
 namespace gnash {
 namespace image {
 
@@ -107,7 +101,7 @@ public:
 
     // Read data into our input buffer.  Client calls this
     // when it needs more data from the file.
-    static jpeg_bool_t fill_input_buffer(j_decompress_ptr cinfo)
+    static boolean fill_input_buffer(j_decompress_ptr cinfo)
     {
         rw_source_IOChannel* src = (rw_source_IOChannel*) cinfo->src;
 
@@ -511,7 +505,7 @@ public:
     }
 
     /// Write the output buffer into the stream.
-    static jpeg_bool_t empty_output_buffer(j_compress_ptr cinfo)
+    static boolean empty_output_buffer(j_compress_ptr cinfo)
     {
         rw_dest_IOChannel* dest = (rw_dest_IOChannel*) cinfo->dest;
         assert(dest);
