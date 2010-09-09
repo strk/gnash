@@ -107,7 +107,6 @@ usage()
     << _("  -h,  --help              Print this help and exit\n")
     << _("  -V,  --version           Print version information and exit\n") 
     << _("  -s,  --scale <factor>    Scale the movie by the specified factor\n") 
-    << _("  -c                       Produce a core file instead of letting SDL trap it\n") 
     << _("  -d,  --delay num         Number of milliseconds to delay in main loop\n") 
     << _("  -v,  --verbose           Produce verbose output\n") 
 #if VERBOSE_ACTION
@@ -211,7 +210,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 256, "max-advances",      Arg_parser::yes },
         { 257, "fullscreen",        Arg_parser::no  },
         { 258, "hide-menubar",      Arg_parser::no  },                
-        { 'c', 0,                   Arg_parser::no  },
         { 'd', "delay",             Arg_parser::yes },
         { 'x', "xid",               Arg_parser::yes },
         { 'R', "renderer",          Arg_parser::yes },

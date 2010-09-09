@@ -23,19 +23,6 @@
 
 #include <cstdio>
 
-#if defined(_WIN32) || defined(WIN32)
-# include "getopt_win32.h"
-#else
-extern "C"{
-# ifdef HAVE_GETOPT_H
-#  include <getopt.h>
-# endif
-# ifndef __GNUC__
-  extern int getopt(int, char *const *, const char *);
-# endif
-}
-#endif // Win32
-
 #include "gnash.h"
 #include "log.h"
 #include "sdlsup.h"
@@ -156,15 +143,8 @@ SDLGui::setTimeout(unsigned int timeout)
 bool
 SDLGui::init(int argc, char **argv[])
 {
-    GNASH_REPORT_FUNCTION;
 
-    int c;
-    while ((c = getopt (argc, *argv, "m:c")) != -1) {
-        switch (c) {
-        case 'c':
-            disableCoreTrap();
-        }
-    }
+    disableCoreTrap();
 
     if (_xid) {
         char SDL_windowhack[32];
