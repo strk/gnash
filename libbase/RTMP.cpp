@@ -19,13 +19,17 @@
 #include <cstring>
 #include <cassert>
 #include <cstdio>
-#include <unistd.h>
-
 #include <boost/lexical_cast.hpp>
 
+#include "GnashSystemNetHeaders.h"
+
 // Replace!!
-#include <sys/times.h>
-#include <netinet/in.h>
+#ifndef _WIN32
+# include <sys/times.h>
+#else
+// TODO: use uptime properly on win32.
+# include <ctime>
+#endif
 
 #include "RTMP.h"
 #include "log.h"
@@ -1260,8 +1264,12 @@ encodeInt32(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
 boost::uint32_t
 getUptime()
 {
+#ifndef _WIN32
     struct tms t;
     return times(&t) * 1000 / sysconf(_SC_CLK_TCK);
+#else
+    return std::clock() * 100 / CLOCKS_PER_SEC;   
+#endif
 }
 
 } // anonymous namespace
