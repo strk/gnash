@@ -27,6 +27,8 @@
 #ifndef GNASH_SYSTEM_FD_HEADERS
 #define GNASH_SYSTEM_FD_HEADERS
 
+#include "gnashconfig.h"
+
 #ifdef HAVE_WINSOCK2_H
 # include <winsock2.h>
 namespace {
