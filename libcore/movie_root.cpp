@@ -45,8 +45,6 @@
 #include "Button.h"
 #include "Transform.h"
 
-#include <sys/ioctl.h>
-#include <sys/types.h>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -56,7 +54,7 @@
 #include <map>
 #include <bitset>
 #include <cassert>
-#include <functional> // std::bind2nd, std::equal_to
+#include <functional>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
 
