@@ -216,7 +216,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
     fi
 
-    ffmpeg_num_version=`printf %2.2d%2.2d%2.2d $ffmpeg_major_version $ffmpeg_minor_version $ffmpeg_micro_version`
+    ffmpeg_num_version=`printf %02d%02d%02d $ffmpeg_major_version $ffmpeg_minor_version $ffmpeg_micro_version`
 
     AC_MSG_RESULT($ffmpeg_version ($ffmpeg_num_version))
 
