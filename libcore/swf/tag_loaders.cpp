@@ -30,7 +30,9 @@
 #include <utility> // for std::make_pair
 #include <boost/static_assert.hpp>
 
-#include "IOChannel.h" // for StreamAdapter inheritance
+#include "IOChannel.h"
+#include "GnashImage.h"
+#include "GnashImageJpeg.h"
 #include "utility.h"
 #include "action_buffer.h"
 #include "Font.h"
@@ -536,8 +538,8 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
         IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
         return;
     }    
-    boost::intrusive_ptr<CachedBitmap> bi =
-        renderer->createCachedBitmap(static_cast<std::auto_ptr<image::GnashImage> >(im));
+    boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(
+            static_cast<std::auto_ptr<image::GnashImage> >(im));
 
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);

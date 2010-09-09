@@ -18,6 +18,9 @@
 //
 
 #include "MovieFactory.h"
+
+#include "FileTypes.h"
+#include "GnashImage.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "IOChannel.h"
 #include "utility.h"

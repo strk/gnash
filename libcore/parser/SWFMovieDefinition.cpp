@@ -30,15 +30,15 @@
 #include <iomanip>
 #include <memory>
 #include <string>
-#include <algorithm> // std::make_pair
+#include <algorithm> 
 
 #include "GnashSleep.h"
-#include "smart_ptr.h" // GNASH_USE_GC
-#include "movie_definition.h" // for inheritance
-#include "zlib_adapter.h"
-#include "IOChannel.h" // for use
-#include "SWFStream.h"
 #include "GnashImageJpeg.h"
+#include "smart_ptr.h" // GNASH_USE_GC
+#include "movie_definition.h" 
+#include "zlib_adapter.h"
+#include "IOChannel.h"
+#include "SWFStream.h"
 #include "RunResources.h"
 #include "Font.h"
 #include "VM.h"
@@ -608,6 +608,22 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
     return true;
 }
 
+void
+SWFMovieDefinition::set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in)
+{
+    if (m_jpeg_in.get()) {
+        /// There should be only one JPEGTABLES tag in an SWF (see: 
+        /// http://www.m2osw.com/en/swf_alexref.html#tag_jpegtables)
+        /// Discard any subsequent attempts to set the jpeg loader
+        /// to avoid crashing on very malformed SWFs. (No conclusive tests
+        /// for pp behaviour, though one version also crashes out on the
+        /// malformed SWF that triggers this assert in Gnash).
+        log_swferror(_("More than one JPEGTABLES tag found: not "
+                    "resetting JPEG loader"));
+        return;
+    }
+    m_jpeg_in = j_in;
+}
 
 boost::uint16_t
 SWFMovieDefinition::exportID(const std::string& symbol) const
