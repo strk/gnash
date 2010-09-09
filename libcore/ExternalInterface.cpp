@@ -18,18 +18,20 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "ExternalInterface.h"
+
 #include <map>
 #include <vector>
 #include <sstream>
-#include <sys/ioctl.h>
-#include <sys/types.h>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <algorithm>
 
+#include "GnashSystemNetHeaders.h"
+#include "GnashSystemFDHeaders.h"
+
 #include "StringPredicates.h"
-#include "ExternalInterface.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
@@ -347,11 +349,7 @@ ExternalInterface::ExternalEventCheck(int fd)
 #endif
         
         int bytes = 0;
-#ifndef _WIN32
-        ioctl(fd, FIONREAD, &bytes);
-#else
         ioctlSocket(fd, FIONREAD, &bytes);
-#endif
         if (bytes == 0) {
             return error;
         }
@@ -361,7 +359,7 @@ ExternalInterface::ExternalEventCheck(int fd)
         // some memory to read the data.
         // terminate incase we want to treat the data like a string.
         buffer[bytes+1] = 0;
-        int ret = read(fd, buffer.get(), bytes);
+        const int ret = ::read(fd, buffer.get(), bytes);
         if (ret) {
             return parseInvoke(buffer.get());
         }
@@ -651,7 +649,7 @@ size_t
 ExternalInterface::writeBrowser(int fd, const std::string &data)
 {
     if (fd > 0) {
-        return write(fd, data.c_str(), data.size());
+        return ::write(fd, data.c_str(), data.size());
     }
 
     return -1;
@@ -663,6 +661,7 @@ ExternalInterface::readBrowser(int fd)
     std::string empty;
     // Wait for some data from the player
     int bytes = 0;
+
     fd_set fdset;
     FD_ZERO(&fdset);
     FD_SET(fd, &fdset);
@@ -670,13 +669,9 @@ ExternalInterface::readBrowser(int fd)
     tval.tv_sec = 10;
     tval.tv_usec = 0;
     // log_debug("Waiting for data... ");
-    if (select(fd+1, &fdset, NULL, NULL, &tval)) {
+    if (::select(fd + 1, &fdset, NULL, NULL, &tval)) {
         // log_debug("There is data in the network");
-#ifndef _WIN32
-        ioctl(fd, FIONREAD, &bytes);
-#else
         ioctlSocket(fd, FIONREAD, &bytes);
-#endif
     }  
 
     // No data yet
@@ -688,7 +683,7 @@ ExternalInterface::readBrowser(int fd)
 
     std::string buf(bytes, '\0');
 
-    int ret = read(fd, &buf[0], bytes);
+    const int ret = ::read(fd, &buf[0], bytes);
     if (ret <= 0) {
         return empty;
     }

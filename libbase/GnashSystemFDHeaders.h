@@ -22,16 +22,38 @@
 // Include this file for file descriptor utilities:
 //
 // select()
+// ioctl() / ioctlsocket (use ioctlSocket())
 
 #ifndef GNASH_SYSTEM_FD_HEADERS
 #define GNASH_SYSTEM_FD_HEADERS
 
 #ifdef HAVE_WINSOCK2_H
 # include <winsock2.h>
+namespace {
+
+inline int ioctlSocket(int fd, int request, int* arg) {
+    unsigned long p = arg;
+    const int ret = ::ioctlsocket(fd, request, &p);
+    *arg = p;
+    return ret;
+}
+
+}
+
 #else
+
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <unistd.h>
+# include <sys/ioctl.h>
+
+namespace {
+
+inline int ioctlSocket(int fd, int request, int* arg) {
+    return ::ioctl(fd, request, arg);
+}
+
+}
 #endif
 
 #endif
