@@ -31,14 +31,11 @@
 #include <boost/static_assert.hpp>
 
 #include "IOChannel.h"
-#include "GnashImage.h"
-#include "GnashImageJpeg.h"
 #include "utility.h"
 #include "action_buffer.h"
 #include "Font.h"
 #include "log.h"
 #include "SWFStream.h"
-#include "GnashImage.h"
 #include "zlib_adapter.h"
 #include "sprite_definition.h"
 #include "MovieClip.h"
@@ -58,6 +55,8 @@
 #include "Renderer.h"
 #include "Movie.h"
 #include "CachedBitmap.h"
+#include "GnashImage.h"
+#include "GnashImageJpeg.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
