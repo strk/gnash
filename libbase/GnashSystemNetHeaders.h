@@ -24,6 +24,14 @@
 /// htons()
 /// ntohs()
 /// gethostname()
+/// gethostbyname()
+/// send()
+/// recv()
+/// close() (actually an FD function)
+/// socket()
+/// fcntl() (POSIX only!)
+/// inet_addr()
+/// setsockopt()
 
 #ifndef GNASH_NET_HEADERS_H
 #define GNASH_NET_HEADERS_H
@@ -45,6 +53,16 @@
 #else
 # include <unistd.h>
 # include <arpa/inet.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <sys/times.h>
+# include <unistd.h>
+# include <netinet/in.h>
+# include <netinet/tcp.h>
+# include <fcntl.h>
+
+// gethostbyname()
+# include <netdb.h>
 #endif
 
 #endif
