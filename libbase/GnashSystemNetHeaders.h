@@ -23,6 +23,7 @@
 //
 /// htons()
 /// ntohs()
+/// gethostname()
 
 #ifndef GNASH_NET_HEADERS_H
 #define GNASH_NET_HEADERS_H
@@ -38,9 +39,11 @@
 # include <windows.h>
 # include <io.h>
 # include <ws2tcpip.h>
+# include <fcntl.h>
 #elif defined(__amigaos4__) //maybe HAVE_NETINET_IN_H
 # include <netinet/in.h>
 #else
+# include <unistd.h>
 # include <arpa/inet.h>
 #endif
 
