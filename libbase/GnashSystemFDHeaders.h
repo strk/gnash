@@ -32,7 +32,7 @@
 namespace {
 
 inline int ioctlSocket(int fd, int request, int* arg) {
-    unsigned long p = arg;
+    unsigned long p = *arg;
     const int ret = ::ioctlsocket(fd, request, &p);
     *arg = p;
     return ret;
