@@ -72,7 +72,10 @@ Socket::connected() const
         if (ret > 0) {
             int val = 0;
             socklen_t len = sizeof(val);
-            if (::getsockopt(_socket, SOL_SOCKET, SO_ERROR, &val, &len) < 0) {
+            // NB: the cast to char* is needed for windows and is harmless
+            // for POSIX.
+            if (::getsockopt(_socket, SOL_SOCKET, SO_ERROR,
+                        reinterpret_cast<char*>(&val), &len) < 0) {
                 log_debug("Error");
                 _error = true;
                 return false;
@@ -177,15 +180,20 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     }
 
     // Magic timeout number. Use rcfile ?
-    struct timeval tv = { 120, 0 };
+    const struct timeval tv = { 120, 0 };
 
+    // NB: the cast to const char* is needed for windows and is harmless
+    // for POSIX.
     if (::setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO,
-                reinterpret_cast<char*>(&tv), sizeof(tv))) {
+                reinterpret_cast<const char*>(&tv), sizeof(tv))) {
         log_error("Setting socket timeout failed");
     }
 
     const int on = 1;
-    ::setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
+    // NB: the cast to const char* is needed for windows and is harmless
+    // for POSIX.
+    ::setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY,
+            reinterpret_cast<const char*>(&on), sizeof(on));
 
     assert(_socket);
     return true;
