@@ -148,36 +148,36 @@ public:
     // Fetching members from 'super' yelds a lookup on the associated prototype
     virtual bool get_member(const ObjectURI& uri, as_value* val)
 	{
-            as_object* proto = prototype();
-            if (proto) return proto->get_member(uri, val);
-            log_debug("Super has no associated prototype");
-            return false;
+        as_object* proto = prototype();
+        if (proto) return proto->get_member(uri, val);
+        log_debug("Super has no associated prototype");
+        return false;
 	}
 
     /// Dispatch.
     virtual as_value call(const fn_call& fn)
 	{
 
-            // TODO: this is a hack to make sure objects are constructed, not
-            // converted (fn.isInstantiation() must be true).
-            fn_call::Args::container_type argsIn(fn.getArgs());
-            fn_call::Args args;
-            args.swap(argsIn);
+        // TODO: this is a hack to make sure objects are constructed, not
+        // converted (fn.isInstantiation() must be true).
+        fn_call::Args::container_type argsIn(fn.getArgs());
+        fn_call::Args args;
+        args.swap(argsIn);
 
-            fn_call fn2(fn.this_ptr, fn.env(), args, fn.super, true);
-            assert(fn2.isInstantiation());
-            as_function* ctor = constructor();
-            if (ctor) return ctor->call(fn2);
-            log_debug("Super has no associated constructor");
-            return as_value();
+        fn_call fn2(fn.this_ptr, fn.env(), args, fn.super, true);
+        assert(fn2.isInstantiation());
+        as_function* ctor = constructor();
+        if (ctor) return ctor->call(fn2);
+        log_debug("Super has no associated constructor");
+        return as_value();
 	}
 
 protected:
 
     virtual void markReachableResources() const
 	{
-            if (_super) _super->setReachable();
-            markAsObjectReachable();
+        if (_super) _super->setReachable();
+        markAsObjectReachable();
 	}
 
 private:
@@ -267,7 +267,7 @@ public:
         _version(getSWFVersion(this_ptr)),
         _st(getStringTable(this_ptr)),
         _to(to)
-        { /* do nothing */ }
+    {}
 
     bool accept(const ObjectURI& uri, const as_value& val) {
         _to.push_front(std::make_pair(_st.value(getName(uri)),
@@ -312,11 +312,10 @@ as_object::call(const fn_call& /*fn*/)
     throw ActionTypeError();
 }
 
-const std::string&
+std::string
 as_object::stringValue() const
 {
-    static const std::string str("[object Object]");
-    return str;
+    return "[object Object]";
 }
 
 std::pair<bool,bool>
@@ -670,8 +669,8 @@ as_object::init_member(const ObjectURI& uri, const as_value& val, int flags)
     // Set (or create) a SimpleProperty 
     if (!_members.setValue(uri, val, flags)) {
         ObjectURI::Logger l(getStringTable(*this));
-        log_error(_("Attempt to initialize read-only property ``%s''"
-                    " on object ``%p'' twice"), l(uri), (void*)this);
+        log_error(_("Attempt to initialize read-only property '%s'"
+                    " on object '%p' twice"), l(uri), (void*)this);
         // We shouldn't attempt to initialize a member twice, should we ?
         abort();
     }
@@ -689,11 +688,7 @@ void
 as_object::init_property(const ObjectURI& uri, as_function& getter,
                          as_function& setter, int flags)
 {
-    as_value cacheValue;
-
-    // PropertyList::addGetterSetter always returns true (used to be
-    // an assert).
-    _members.addGetterSetter(uri, getter, &setter, cacheValue, flags);
+    _members.addGetterSetter(uri, getter, &setter, as_value(), flags);
 }
 
 void
@@ -708,8 +703,6 @@ void
 as_object::init_property(const ObjectURI& uri, as_c_function_ptr getter,
                          as_c_function_ptr setter, int flags)
 {
-    // PropertyList::addGetterSetter always returns true (used to be
-    // an assert).
     _members.addGetterSetter(uri, getter, setter, flags);
 }
 
@@ -717,18 +710,14 @@ bool
 as_object::init_destructive_property(const ObjectURI& uri, as_function& getter,
                                      int flags)
 {
-    // No case check, since we've already got the key.
-    bool success = _members.addDestructiveGetter(uri, getter, flags);
-    return success;
+    return _members.addDestructiveGetter(uri, getter, flags);
 }
 
 bool
 as_object::init_destructive_property(const ObjectURI& uri,
                                      as_c_function_ptr getter, int flags)
 {
-    // No case check, since we've already got the key.
-    bool success = _members.addDestructiveGetter(uri, getter, flags);
-    return success;
+    return _members.addDestructiveGetter(uri, getter, flags);
 }
 
 void
@@ -742,14 +731,6 @@ as_object::init_readonly_property(const std::string& key, as_function& getter,
 }
 
 void
-as_object::init_readonly_property(const ObjectURI& uri, as_function& getter,
-                                  int initflags)
-{
-    init_property(uri, getter, getter, initflags | PropFlags::readOnly);
-    assert(_members.getProperty(uri));
-}
-
-void
 as_object::init_readonly_property(const std::string& key,
                                   as_c_function_ptr getter, int initflags)
 {
@@ -758,15 +739,6 @@ as_object::init_readonly_property(const std::string& key,
     init_property(k, getter, getter, initflags | PropFlags::readOnly);
     assert(_members.getProperty(k));
 }
-
-void
-as_object::init_readonly_property(const ObjectURI& uri,
-                                  as_c_function_ptr getter, int initflags)
-{
-    init_property(uri, getter, getter, initflags | PropFlags::readOnly);
-    assert(_members.getProperty(uri));
-}
-
 
 void
 as_object::set_member_flags(const ObjectURI& uri, int setTrue, int setFalse)
@@ -857,10 +829,9 @@ as_object::prototypeOf(as_object& instance)
 
     std::set<as_object*> visited;
 
-    while (obj && visited.insert(obj.get()).second )
-	{
-            if ( obj->get_prototype() == this ) return true;
-            obj = obj->get_prototype(); 
+    while (obj && visited.insert(obj.get()).second ) {
+        if (obj->get_prototype() == this) return true;
+        obj = obj->get_prototype(); 
 	}
 
     // See actionscript.all/Inheritance.as for a way to trigger this
@@ -875,8 +846,8 @@ as_object::prototypeOf(as_object& instance)
 void
 as_object::dump_members() 
 {
-    log_debug(_("%d members of object %p follow"),
-              _members.size(), (const void*)this);
+    log_debug(_("%d members of object %p follow"), _members.size(),
+            static_cast<const void*>(this));
     _members.dump();
 }
 
@@ -1147,7 +1118,7 @@ Trigger::call(const as_value& oldval, const as_value& newval,
         return ret;
         
     }
-    catch (GnashException&) {
+    catch (const GnashException&) {
         _executing = false;
         throw;
     }
