@@ -21,6 +21,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 //#define DEBUG_STRING_TABLE 1
+//#define GNASH_PARANOIA_LEVEL 3
 
 #ifdef DEBUG_STRING_TABLE
 # include <iostream>
@@ -161,19 +162,40 @@ string_table::already_locked_insert(const std::string& to_insert)
     return ret;
 }
 
+void
+string_table::setHighestKnownLowercase(key k)
+{
+    _highestKnownLowercase = k;
+}
+
 string_table::key
 string_table::noCase(key a) const
 {
 #ifdef DEBUG_STRING_TABLE
     static KeyCaseLookup kcl(this);
-    kcl.check(a);
 #endif // DEBUG_STRING_TABLE
 
-    // The empty string (key 0) is equal to its lowercase version..
-    if ( ! a ) return a;
+    // Avoid checking keys known to be lowercase
+    if ( a <= _highestKnownLowercase ) {
+#if GNASH_PARANOIA_LEVEL > 2
+        assert(_caseTable.find(a) == _caseTable.end());
+#endif
+        return a;
+    }
+
+// MOVE this block around for special needs
+#ifdef DEBUG_STRING_TABLE
+    kcl.check(a);
+#endif 
+
+    // TODO: an even/odd based rule to tell what's lowercase already
+    //       would speed things up even for unknown 
+    //       strings.
 
     std::map<key, key>::const_iterator i = _caseTable.find(a);
-    return i == _caseTable.end() ? a : i->second;
+    if ( i != _caseTable.end() ) return i->second;
+
+    return a;
 }
 
 bool
