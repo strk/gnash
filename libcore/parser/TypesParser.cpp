@@ -20,6 +20,7 @@
 #include "TypesParser.h"
 
 #include <boost/optional.hpp>
+#include <utility>
 
 #include "GnashException.h"
 #include "SWF.h"
@@ -145,7 +146,7 @@ readRect(SWFStream& in)
         );
         return SWFRect();
     } 
-    return SWFRect(minx, maxx, miny, maxy);
+    return SWFRect(minx, miny, maxx, maxy);
 }
 
 OptionalFillPair
@@ -243,7 +244,6 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
             if (readMorph) {
                 boost::get<GradientFill>(morph->fill).setRecords(morphrecs);
             }
-
 
             if (t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_) {
 

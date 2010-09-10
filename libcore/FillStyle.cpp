@@ -24,7 +24,6 @@
 
 #include "smart_ptr.h"
 #include "CachedBitmap.h"
-#include "log.h"
 #include "movie_definition.h"
 #include "SWF.h"
 #include "GnashNumeric.h"

@@ -31,8 +31,6 @@
 
 namespace gnash {
     class movie_definition;
-    class Renderer;
-    class RunResources;
     class CachedBitmap;
 }
 
