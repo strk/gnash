@@ -1,3 +1,4 @@
+// FillStyle.h: variant fill styles
 // 
 //   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 // 
@@ -21,20 +22,18 @@
 #include <boost/variant.hpp>
 #include <vector> 
 #include <iosfwd> 
-#include <boost/optional.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <cassert>
 
 #include "SWFMatrix.h"
-#include "CachedBitmap.h"
 #include "SWF.h"
 #include "RGBA.h" 
 
 namespace gnash {
-    class SWFStream;
     class movie_definition;
     class Renderer;
     class RunResources;
+    class CachedBitmap;
 }
 
 namespace gnash {
@@ -64,6 +63,9 @@ public:
 /// possible to change the appearance of the fill by changing the CachedBitmap
 /// it refers to.
 //
+/// Special member functions (ctor, dtor etc) are not inlined to avoid 
+/// requiring the definition of movie_definition.
+//
 /// TODO: check the following:
 //
 /// It may be necessary to allow setting the smoothing policy; the use of
@@ -92,34 +94,22 @@ public:
     //
     /// TODO: check the smoothing policy here!
     BitmapFill(Type t, const CachedBitmap* bi, const SWFMatrix& m,
-            SmoothingPolicy pol)
-        :
-        _type(t),
-        _smoothingPolicy(pol),
-        _matrix(m),
-        _bitmapInfo(bi),
-        _md(0),
-        _id(0)
-    {
-    }
+            SmoothingPolicy pol);
 
     /// Construct a static BitmapFill using a SWF tag.
     BitmapFill(SWF::FillType t, movie_definition* md, boost::uint16_t id,
             const SWFMatrix& m);
 
+    /// Destructor
+    ~BitmapFill();
+
     /// Copy a BitmapFill
     //
     /// The copied BitmapFill refers to the same bitmap id in the same
     /// movie_definition as the original.
-    BitmapFill(const BitmapFill& other)
-        :
-        _type(other._type),
-        _smoothingPolicy(other._smoothingPolicy),
-        _matrix(other._matrix),
-        _bitmapInfo(other._bitmapInfo),
-        _md(other._md),
-        _id(other._id)
-    {}
+    BitmapFill(const BitmapFill& other);
+    
+    BitmapFill& operator=(const BitmapFill& other);
 
     /// Set this fill to a lerp of two other BitmapFills.
     void setLerp(const BitmapFill& a, const BitmapFill& b, double ratio);
@@ -161,7 +151,6 @@ private:
     // The id of the tag containing the bitmap
     boost::uint16_t _id;
 };
-
 
 /// A GradientFill
 //
@@ -312,15 +301,6 @@ public:
 /// Callers must ensure that all FillStyles have exactly the same type! Most
 /// errors are caught by type-checking and will throw an unhandled exception.
 void setLerp(FillStyle& f, const FillStyle& a, const FillStyle& b, double t);
-
-/// Either a single or a morph-pair FillStyle.
-typedef std::pair<FillStyle, boost::optional<FillStyle> > OptionalFillPair;
-
-/// Read FillStyles from a stream
-//
-/// Read either single or morph-pair fill styles from a stream. 
-OptionalFillPair readFills(SWFStream& in, SWF::TagType t, movie_definition& m,
-        bool readMorph);
 
 DSOEXPORT std::ostream& operator<<(std::ostream& os,
         const BitmapFill::SmoothingPolicy& p);

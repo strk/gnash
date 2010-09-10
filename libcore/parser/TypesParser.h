@@ -20,11 +20,18 @@
 #ifndef GNASH_TYPESPARSER_H
 #define GNASH_TYPESPARSER_H
 
+
+#include <boost/optional.hpp>
+
+#include "SWF.h"
+
 namespace gnash {
     class SWFStream;
     class SWFMatrix;
     class SWFRect;
     class rgba;
+    class movie_definition;
+    class FillStyle;
 }
 
 namespace gnash {
@@ -40,6 +47,16 @@ rgba readRGB(SWFStream& in);
     
 /// Read a bit-packed rectangle from an SWF stream
 SWFRect readRect(SWFStream& in);
+
+/// Either a single or a morph-pair FillStyle.
+typedef std::pair<FillStyle, boost::optional<FillStyle> > OptionalFillPair;
+
+/// Read FillStyles from a stream
+//
+/// Read either single or morph-pair fill styles from a stream. 
+OptionalFillPair readFills(SWFStream& in, SWF::TagType t, movie_definition& m,
+        bool readMorph);
+
 
 } // namespace gnash
 
