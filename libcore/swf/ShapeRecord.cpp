@@ -17,6 +17,8 @@
 
 
 #include "ShapeRecord.h"
+
+#include "TypesParser.h"
 #include "SWF.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
@@ -267,9 +269,9 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                             tag == SWF::DEFINESHAPE4 ||
                             tag == SWF::DEFINESHAPE4_);
 
-    if (styleInfo)
-    {
-        _bounds.read(in);
+    if (styleInfo) {
+
+        _bounds = readRect(in);
     
         IF_VERBOSE_PARSE(
             std::string b = _bounds.toString();
@@ -277,10 +279,8 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
         );
     
         // TODO: Store and use these. Unfinished.
-        if (tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_)
-        {
-            SWFRect tbound;
-            tbound.read(in);
+        if (tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_) {
+            const SWFRect tbound = readRect(in);
             in.ensureBytes(1);
             static_cast<void>(in.read_u8());
             LOG_ONCE(log_unimpl("DEFINESHAPE4 edge boundaries and scales"));

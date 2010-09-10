@@ -1,4 +1,3 @@
-// RGBA.cpp: RGBA color handling.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
@@ -21,7 +20,6 @@
 #include "RGBA.h"
 #include "GnashNumeric.h"
 #include "log.h"
-#include "SWFStream.h"
 #include <sstream> 
 
 namespace gnash {
@@ -41,29 +39,6 @@ rgba::set_lerp(const rgba& a, const rgba& b, float f)
     m_g = frnd(lerp<float>(a.m_g, b.m_g, f));
     m_b = frnd(lerp<float>(a.m_b, b.m_b, f));
     m_a = frnd(lerp<float>(a.m_a, b.m_a, f));
-}
-
-rgba
-readRGBA(SWFStream& in)
-{
-    in.ensureBytes(4);
-    const boost::uint8_t r = in.read_u8();
-    const boost::uint8_t g = in.read_u8();
-    const boost::uint8_t b = in.read_u8();
-    const boost::uint8_t a = in.read_u8();
-    return rgba(r, g, b, a);
-}
-
-/// Can throw ParserException on premature end of input stream
-rgba
-readRGB(SWFStream& in)
-{
-    in.ensureBytes(3);
-    const boost::uint8_t r = in.read_u8();
-    const boost::uint8_t g = in.read_u8();
-    const boost::uint8_t b = in.read_u8();
-    const boost::uint8_t a = 0xff;
-    return rgba(r, g, b, a);
 }
 
 rgba

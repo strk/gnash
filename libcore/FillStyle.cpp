@@ -23,6 +23,7 @@
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>
 
+#include "TypesParser.h"
 #include "smart_ptr.h"
 #include "log.h"
 #include "SWFStream.h"

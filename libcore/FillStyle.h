@@ -28,14 +28,16 @@
 #include "SWFMatrix.h"
 #include "CachedBitmap.h"
 #include "SWF.h"
-#include "RGBA.h" // for rgba type
+#include "RGBA.h" 
 
 namespace gnash {
+    class SWFStream;
+    class movie_definition;
+    class Renderer;
+    class RunResources;
+}
 
-class SWFStream;
-class movie_definition;
-class Renderer;
-class RunResources;
+namespace gnash {
 
 class GradientRecord
 {

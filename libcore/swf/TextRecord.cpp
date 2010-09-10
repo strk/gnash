@@ -17,6 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "TextRecord.h"
+
+#include <boost/assign/list_of.hpp>
+#include <vector>
+
+#include "TypesParser.h"
 #include "SWFStream.h"
 #include "SWFMatrix.h"
 #include "SWFCxForm.h"
@@ -28,8 +33,6 @@
 #include "Font.h"
 #include "Renderer.h"
 
-#include <boost/assign/list_of.hpp>
-#include <vector>
 
 namespace gnash {
 namespace SWF {    

@@ -18,12 +18,13 @@
 #ifndef GNASH_SWF_SETBACKGROUNDCOLOR_TAG_H
 #define GNASH_SWF_SETBACKGROUNDCOLOR_TAG_H
 
-#include "ControlTag.h" // for inheritance
-#include "SWF.h" // for TagType definition
-#include "MovieClip.h" // for inlines (execute)
-#include "movie_definition.h" // for inlines (loader)
-#include "log.h" // for log_parse
-#include "RGBA.h" // for rgba class
+#include "ControlTag.h" 
+#include "TypesParser.h"
+#include "SWF.h" 
+#include "MovieClip.h" 
+#include "movie_definition.h" 
+#include "log.h" 
+#include "RGBA.h" 
 
 // Forward declarations
 namespace gnash {

@@ -31,7 +31,6 @@
 // Forward decl
 namespace gnash {
     class SWFMatrix;
-    class SWFStream;
     namespace geometry {
         class Point2d;
     }
@@ -46,24 +45,6 @@ class SWFRect
 {
 
 public:
-    /// Read a bit-packed rectangle from an SWF stream
-    //
-    /// Format of the bit-packed rectangle is:
-    ///
-    /// bits  | name  | description
-    /// ------+-------+-------------------------
-    ///   5   | nbits | number of bits used in subsequent values
-    /// nbits | xmin  | minimum X value
-    /// nbits | xmax  | maximum X value
-    /// nbits | ymin  | minimum Y value
-    /// nbits | ymax  | maximum Y value
-    ///
-    /// If max values are less then min values the SWF is malformed;
-    /// in this case this method will raise an swf_error and set the
-    /// rectangle to the NULL rectangle. See is_null().
-    /// 
-    ///
-    void    read(SWFStream& in);
 
     static const boost::int32_t rectNull = 0x80000000;
     static const boost::int32_t rectMax = 0x7fffffff;
@@ -278,7 +259,7 @@ private:
 
 
 inline std::ostream&
-operator<< (std::ostream& os, const SWFRect& r)
+operator<<(std::ostream& os, const SWFRect& r)
 {
     if (!r.is_null()) {
         os << "RECT(" 
