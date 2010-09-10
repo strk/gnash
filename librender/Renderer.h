@@ -160,6 +160,7 @@
 
 // Forward declarations.
 namespace gnash {
+    class IOChannel;
     class CachedBitmap;
     class rgba;
     class Transform;
