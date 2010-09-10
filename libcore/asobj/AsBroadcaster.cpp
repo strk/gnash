@@ -86,9 +86,9 @@ public:
 
         as_value method;
         o->get_member(_eventKey, &method);
-        _fn.super = o->get_super(_eventKey);
 
         if (method.is_function()) {
+            _fn.super = o->get_super(_eventKey);
             _fn.this_ptr = o.get();
             method.to_function()->call(_fn);
         }
