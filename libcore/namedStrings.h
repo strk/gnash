@@ -46,9 +46,16 @@ class string_table; // Forward
 /// be used if you know their key value already.
 namespace NSV {
 
+/// All known lower-case names are grouped at the beginning
+/// of the enum, followed by INTERNAL_HIGHEST_LOWERCASE.
+/// WARNING: putting mixed-case names before
+///          INTERNAL_HIGHEST_LOWERCASE introduces bugs !
+/// (putting lower-case names after INTERNAL_HIGHEST_LOWERCASE
+///  is fine, except for performance)
+///
 enum NamedStrings {
         PROP_A = 1,
-        LOWERCASE,
+        PROP_ALIGN,
         PROP_ARGUMENTS,
         PROP_B,
         PROP_BOLD,
