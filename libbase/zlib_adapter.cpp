@@ -41,9 +41,9 @@ namespace zlib_adapter
 
 #else // HAVE_ZLIB_H
 
-
+extern "C" {
 #include <zlib.h>
-
+}
 
 namespace zlib_adapter
 {

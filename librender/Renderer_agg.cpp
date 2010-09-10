@@ -111,7 +111,6 @@ AGG resources
 #include "gnashconfig.h"
 #endif
 
-#include "Renderer.h"
 #include "Renderer_agg.h" 
 
 #include <vector>
@@ -155,6 +154,7 @@ AGG resources
 #include <agg_alpha_mask_u8.h>
 
 #include "gnash.h"
+#include "CachedBitmap.h"
 #include "RGBA.h"
 #include "GnashImage.h"
 #include "log.h"

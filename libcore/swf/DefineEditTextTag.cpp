@@ -15,8 +15,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "RunResources.h"
 #include "DefineEditTextTag.h"
+
+#include "TypesParser.h"
+#include "RunResources.h"
 #include "TextField_as.h"
 #include "TextField.h"
 #include "movie_definition.h"
@@ -58,7 +60,7 @@ void
 DefineEditTextTag::read(SWFStream& in, movie_definition& m)
 {
 
-	_rect.read(in);
+	_rect = readRect(in);
 
 	in.align();
 	in.ensureBytes(2);
@@ -70,9 +72,9 @@ DefineEditTextTag::read(SWFStream& in, movie_definition& m)
 	_password  = flags & (1 << 4);
 	_readOnly  = flags & (1 << 3); 
 
-    bool hasColor = flags & (1 << 2); 
-	bool hasMaxChars = flags & (1 << 1); 
-	bool hasFont = flags & (1 << 0); 
+    const bool hasColor = flags & (1 << 2); 
+	const bool hasMaxChars = flags & (1 << 1); 
+	const bool hasFont = flags & (1 << 0); 
 
     flags = in.read_u8();
 	// 0: no font class, 1 font class and height, can't be true if has_font was true

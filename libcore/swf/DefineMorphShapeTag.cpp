@@ -24,6 +24,10 @@
 // Vitalij Alexeev <tishka92@mail.ru> 2004.
 
 #include "DefineMorphShapeTag.h"
+
+#include <boost/cstdint.hpp>
+
+#include "TypesParser.h"
 #include "MorphShape.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
@@ -83,15 +87,13 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
         || tag == DEFINEMORPHSHAPE2
         || tag == DEFINEMORPHSHAPE2_);
 
-    SWFRect bounds1, bounds2;
-    bounds1.read(in);
-    bounds2.read(in);
+    const SWFRect bounds1 = readRect(in);
+    const SWFRect bounds2 = readRect(in);
 
     if (tag == DEFINEMORPHSHAPE2 || tag == DEFINEMORPHSHAPE2_) {
         // TODO: Use these values.
-        SWFRect innerBound1, innerBound2;
-        innerBound1.read(in);
-        innerBound2.read(in);
+        const SWFRect innerBound1 = readRect(in);
+        const SWFRect innerBound2 = readRect(in);
 
         // This should be used -- first 6 bits reserved, then
         // 'non-scaling' stroke, then 'scaling' stroke -- these can be
@@ -136,31 +138,6 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
 
     assert(_shape1.fillStyles().size() == _shape2.fillStyles().size());
     assert(_shape1.lineStyles().size() == _shape2.lineStyles().size());
-
-#if 0
-
-    const unsigned edges1 = PathList::computeNumberOfEdges(_shape1.paths());
-    const unsigned edges2 = PathList::computeNumberOfEdges(_shape2.paths());
-
-    IF_VERBOSE_PARSE(
-      log_parse("morph: "
-          "startShape(paths:%d, edges:%u), "
-          "endShape(paths:%d, edges:%u)",
-          _shape1.paths().size(), edges1,
-          _shape2.paths().size(), edges2);
-    );
-
-    IF_VERBOSE_MALFORMED_SWF(
-        // It is perfectly legal to have a different number of paths,
-        // edges count should be the same instead
-        if (edges1 != edges2) {
-            log_swferror(_("Different number of edges "
-                "in start (%u) and end (%u) shapes "
-                "of a morph"), edges1, edges1);
-        }
-
-    );
-#endif
 
 }
 

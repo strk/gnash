@@ -36,11 +36,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
   boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp"
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
-  boost_libs="thread date_time"
+  boost_libs="thread"
 
   dnl this is a list of *recommended* libraries. If any of these are missing, this
   dnl test will return a warning, and Gnash will build, but testing won't work.
-  extra_boost_libs="serialization"
+  extra_boost_libs="serialization date_time"
 #  extra_boost_libs="unit_test_framework"
 
   dnl this is the default list for paths to search. This gets

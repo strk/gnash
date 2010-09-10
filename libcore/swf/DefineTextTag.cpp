@@ -19,8 +19,13 @@
 
 // Derived from text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
 
-#include "RunResources.h"
 #include "DefineTextTag.h"
+
+#include <algorithm>
+#include <numeric>
+
+#include "TypesParser.h"
+#include "RunResources.h"
 #include "SWFStream.h"
 #include "log.h"
 #include "SWF.h"
@@ -31,9 +36,6 @@
 #include "Global_as.h"
 #include "movie_definition.h"
 #include "Transform.h"
-
-#include <algorithm>
-#include <numeric>
 
 namespace gnash {
 namespace SWF {
@@ -101,7 +103,7 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, TagType tag)
 {
 	assert(tag == DEFINETEXT || tag == DEFINETEXT2);
 
-	_rect.read(in);
+	_rect = readRect(in);
 	_matrix = readSWFMatrix(in);
 
 	in.ensureBytes(2); // glyph_bits + advance_bits

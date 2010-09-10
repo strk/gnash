@@ -26,15 +26,6 @@
 
 #include "dsodefs.h"
 
-
-namespace gnash {
-	class IOChannel;
-	class movie_definition; // for create_movie
-	class URL; // for set_base_url
-    class RunResources;
-}
-
-
 /// Freedom bites
 namespace gnash {
 

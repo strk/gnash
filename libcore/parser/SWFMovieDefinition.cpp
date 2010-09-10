@@ -33,7 +33,6 @@
 #include <algorithm> 
 
 #include "GnashSleep.h"
-#include "GnashImageJpeg.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h" 
 #include "zlib_adapter.h"
@@ -53,6 +52,8 @@
 #include "namedStrings.h"
 #include "as_function.h"
 #include "CachedBitmap.h"
+#include "TypesParser.h"
+#include "GnashImageJpeg.h"
 
 // Debug frames load
 #undef DEBUG_FRAMES_LOAD
@@ -322,12 +323,12 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 
     _str.reset(new SWFStream(_in.get()));
 
-    m_frame_size.read(*_str);
+    m_frame_size = readRect(*_str);
+
     // If the SWFRect is malformed, SWFRect::read would already 
     // print an error. We check again here just to give 
     // the error are better context.
-    if ( m_frame_size.is_null() )
-    {
+    if (m_frame_size.is_null()) {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror("non-finite movie bounds");
         );

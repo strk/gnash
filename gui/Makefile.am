@@ -46,24 +46,28 @@ endif
 DIST_SUBDIRS = pythonmod
 
 noinst_HEADERS =
-noinst_LTLIBRARIES = #libgnashgui.la
+noinst_LTLIBRARIES = 
+
+# top_builddir and top_srcdir are for revno.h; its location depends on
+# whether we're building from a snapshot or a checkout.
 AM_CPPFLAGS = \
-        -I../.. \
-        -I$(top_srcdir)/libnet \
-        -I$(top_srcdir)/libcore \
-        -I$(top_srcdir)/libcore/swf \
-        -I$(top_srcdir)/libcore/parser \
-        -I$(top_srcdir)/libcore/vm \
-        -I$(top_srcdir)/libcore/asobj \
+	-I$(top_builddir) \
+	-I$(top_srcdir) \
+	-I$(top_srcdir)/libnet \
+	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libcore/parser \
+	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libltdl \
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/librender \
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libmedia/ffmpeg \
 	-I$(top_srcdir)/libmedia/gst \
 	-I$(top_srcdir)/libmedia/haiku \
-       -DLOCALEDIR=\"$(localedir)\" \
+    -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
 	$(GLIB_CFLAGS) \

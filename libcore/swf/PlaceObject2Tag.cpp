@@ -18,11 +18,15 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "RunResources.h"
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
 #include "PlaceObject2Tag.h"
+
+#include <string>
+
+#include "TypesParser.h"
+#include "RunResources.h"
 #include "DisplayObject.h"
 #include "MovieClip.h"
 #include "swf_event.h"
@@ -440,16 +444,13 @@ PlaceObject2Tag::read(SWFStream& in, TagType tag)
 
     m_TagType = tag;
 
-    if (tag == SWF::PLACEOBJECT)
-    {
+    if (tag == SWF::PLACEOBJECT) {
         readPlaceObject(in);
     }
-    else if ( tag == SWF::PLACEOBJECT2 )
-    {
+    else if (tag == SWF::PLACEOBJECT2) {
         readPlaceObject2(in);
     }
-    else
-    {
+    else {
         readPlaceObject3(in);
     }
 }
@@ -485,12 +486,12 @@ PlaceObject2Tag::~PlaceObject2Tag()
     deleteChecked(_actionBuffers.begin(), _actionBuffers.end());
 }
 
-/* public static */
 void
 PlaceObject2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunResources& /*r*/)
 {
-    assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 || tag == SWF::PLACEOBJECT3);
+    assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 ||
+            tag == SWF::PLACEOBJECT3);
 
     // TODO: who owns and is going to remove this tag ?
     PlaceObject2Tag* ch = new PlaceObject2Tag(m);

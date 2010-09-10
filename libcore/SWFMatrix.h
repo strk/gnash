@@ -32,7 +32,6 @@
 
 // Forward declarations
 namespace gnash {
-    class SWFStream;
     class SWFRect;
     namespace geometry {
         class Point2d;
@@ -198,9 +197,6 @@ private:
     boost::int64_t  determinant() const;
 
 }; //end of SWFMatrix
-
-/// Read from input stream.
-SWFMatrix readSWFMatrix(SWFStream& in);
 
 inline bool
 operator==(const SWFMatrix& a, const SWFMatrix& b)
