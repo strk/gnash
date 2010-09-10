@@ -99,7 +99,7 @@ public:
     /// @param key  The key of the string to return. 
 	/// @return     The string which matches key or "" if an invalid key is
     ///             given.
-	const std::string& value(key to_find)
+	const std::string& value(key to_find) const
 	{
 		if (_table.empty() || !to_find) return _empty;
 
