@@ -150,14 +150,11 @@ public:
     /// will be invoked using the given as_object as 'this' pointer.
     /// If the property is not found a SimpleProperty will be created.
     ///
-    /// @param key
-    ///    Name of the property. Search is case-*sensitive*
+    /// @param uri
+    ///    Name of the property.
     /// @param value
     ///    a const reference to the as_value to use for setting
     ///    or creating the property. 
-    /// @param namespaceId
-    ///    The namespace in which this should be entered. If 0 is given,
-    ///    this will use the first value found, if it exists.
     /// @param flagsIfMissing
     ///    Flags to associate to the property if a new one is created.
     /// @return true if the value was successfully set, false
@@ -167,8 +164,7 @@ public:
 
     /// Get a property if it exists.
     //
-    /// @param key  Name of the property. Search is case-*sensitive*
-    /// @param nsId The id of the namespace to search
+    /// @param uri  Name of the property. 
     /// @return     A Property or 0, if no such property exists.
     ///             All Property objects are owned by this PropertyList. Do
     ///             not delete them.
@@ -177,8 +173,7 @@ public:
     /// Delete a Property, if existing and not protected from deletion.
     //
     ///
-    /// @param key      Name of the property.
-    /// @param nsId     Name of the namespace
+    /// @param uri      Name of the property.
     /// @return         a pair of boolean values expressing whether the property
     ///                 was found (first) and whether it was deleted (second).
     ///                 Of course a pair(false, true) would be invalid (deleted
@@ -192,7 +187,7 @@ public:
     //
     /// TODO: this function has far too many arguments.
     //
-    /// @param key      Name of the property. Search is case-*sensitive*
+    /// @param uri      Name of the property. 
     /// @param getter   A function to invoke when this property value is
     ///                 requested. 
     /// @param setter   A function to invoke when setting this property's value.
@@ -208,7 +203,7 @@ public:
 
     /// Add a getter/setter property, if not already existing
     //
-    /// @param key      Name of the property.
+    /// @param uri      Name of the property.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param setter   A function to invoke when setting this property's value.
@@ -219,7 +214,7 @@ public:
 
     /// Add a destructive getter property, if not already existant.
     //
-    /// @param key      Name of the property.
+    /// @param uri      Name of the property.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param flagsIfMissing Flags to associate to the property if a new
@@ -230,7 +225,7 @@ public:
 
     /// Add a destructive getter property, if not already existant.
     ///
-    /// @param key      Name of the property. Case-sensitive search.
+    /// @param uri      Name of the property. 
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     ///
@@ -243,7 +238,7 @@ public:
 
     /// Set the flags of a property.
     //
-    /// @param key      Name of the property. Search is case-*sensitive*
+    /// @param uri      Name of the property. 
     /// @param setTrue  The set of flags to set
     /// @param setFalse The set of flags to clear
     void setFlags(const ObjectURI& uri, int setTrue, int setFalse);
