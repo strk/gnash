@@ -17,7 +17,7 @@ need to compile it with something like this:
     --disable-nsapi \
     --disable-menus
 
-It *requires* AGG as the renderer and *ffmpeg* as the sound driver.
+It *requires* AGG as the renderer and *FFmpeg* as the sound driver.
 Although audio and video are separate (you can dump video, even if you
 choose gstreamer for audio output).
 
@@ -78,10 +78,10 @@ Things To Do
 
  o Investigate gstreamer for audio stream capture.
  o Let gnash send the bitmap data to places other than a file (eg, use
-   ffmpeg to encode on-the-fly).
+   FFmpeg to encode on-the-fly).
  o Have SDL output PCM data as fast as we can play the movie?
  o Use something other than a polling loop for driver method.
- o Use ffmpeg's swscale to convert AGG's RGB-only output to YUV, which
+ o Use FFmpeg's swscale to convert AGG's RGB-only output to YUV, which
    could then be sent to X11's XVideo extension for hardware scaling
    (ala Adobe's Flash 9).  This could be a raw X11-only gui, or an
    add-on to the gtk gui -- much in the same way that X11-shm is
