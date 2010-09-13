@@ -460,7 +460,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
 
     if test x"${libavformat}" = x; then
       if test -f ${top_lib_dir}/libavformat.a -o -f ${top_lib_dir}/libavformat.${shlibext}; then
-        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat" 
+        ac_cv_path_ffmpeg_lib="-lavformat ${ac_cv_path_ffmpeg_lib}" 
         AC_MSG_RESULT(${top_lib_dir}/libavformat)
       else
         AC_MSG_RESULT(no)
