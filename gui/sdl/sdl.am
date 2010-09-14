@@ -22,17 +22,17 @@ if BUILD_SDL_GUI
 bin_PROGRAMS += sdl-gnash
 sdl_gnash_CPPFLAGS = -DGUI_SDL -DGUI_CONFIG=\"SDL\" \
 	 $(AM_CPPFLAGS) $(SDL_CFLAGS) 
+
 sdl_gnash_SOURCES = $(GUI_SRCS) \
 	sdl/gui_sdl.cpp \
 	sdl/sdl.cpp \
 	sdl/sdlsup.h \
 	sdl/sdl_glue.h
+
 sdl_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-#sdl_gnash_DEPENDENCIES = .configline
 sdl_gnash_LDADD = \
-	$(top_builddir)/librender/libgnashrender.la \
-	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
+	$(MYSQL_LIBS) \
 	$(AM_LDFLAGS) \
 	$(SDL_LIBS)
 

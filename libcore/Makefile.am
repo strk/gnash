@@ -287,11 +287,11 @@ instdir = $(includedir)/gnash/asobj
 inst_HEADERS += $(EXTENSIONS_API)
 
 libgnashcore_la_LIBADD = \
-	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
+	$(top_builddir)/libbase/libgnashbase.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(FREETYPE2_LIBS) \
@@ -316,27 +316,6 @@ endif
 
 #libserver_la_LIBDADD =  #@DL_LIB@
 libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
-
-# if WIN32
-#   libgnashcore_la_LDFLAGS += -no-undefined
-#   libgnashcore_la_LIBADD += \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-MediaParser.lo \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo \
-# if USE_FFMPEG_ENGINE
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioInput.lo \
-# endif
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderNellymoser.lo \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSimple.lo \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioResampler.lo 
-# if HAVE_SPEEX
-#   libgnashcore_la_LIBADD += \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSpeex.lo
-# endif
-# else
-#   libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
-# 	$(top_builddir)/libsound/libgnashsound.la
-# endif
 
 if HAIKU
   libgnashcore_la_LIBADD += $(HAIKU_LIBS)
