@@ -106,14 +106,14 @@ the rendering library, or you can select which ones you want:
 or --enable-renderer=all (default)
 
 Gnash can use different multimedia back-ends for sound and/or
-video. By default it'll build both ffmpeg and Gstreamer, which you
+video. By default it'll build both FFmpeg and Gstreamer, which you
 can select at runtime. To select only one media handler use:
 
    --enable-media=GST			Gstreamer (default)
-or --enable-media=ffmpeg		Ffmpeg/SDL
+or --enable-media=ffmpeg		FFmpeg/SDL
 
 In some countries, the codecs needed to display audio and video are patented.
-The ffmpeg library implements these codecs.  If you link them directly into
+The FFmpeg library implements these codecs.  If you link them directly into
 Gnash, you will create an executable which contains patented software and
 requires a license for redistribution in those countries.  If, instead,
 you build using gstreamer, the user installs the codecs of their choice.
@@ -151,9 +151,9 @@ If you select gstreamer as the media backend, gnash requires version 0.10
 because earlier versions wouldn't let you insert clips into an existing
 sound stream, as Gnash needs to do. If you compile gnash to use
 Gstreamer, users who want to view Flash videos while running gnash 
-will need to install the ffmpeg plugin for gstreamer. Flash uses
+will need to install the FFmpeg plugin for gstreamer. Flash uses
 MPEG4, MP3, FLV, ACC, and Sorenson primarily. Gnash supports any codec
-supported by ffmpeg and Gstreamer.
+supported by FFmpeg and Gstreamer.
 
 Building the Gnash plugin for browsers:
 --------------------------------------
