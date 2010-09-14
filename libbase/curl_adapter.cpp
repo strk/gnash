@@ -74,7 +74,10 @@ NetworkAdapter::makeStream(const std::string& url,
 
 #else // def USE_CURL
 
+extern "C" {
 #include <curl/curl.h>
+}
+
 #include "utility.h"
 #include "GnashException.h"
 #include "rc.h"
@@ -604,6 +607,10 @@ CurlStreamFile::fillCache(std::streamsize size)
     }
 
     fd_set readfd, writefd, exceptfd;
+    FD_ZERO(&readfd);
+    FD_ZERO(&writefd);
+    FD_ZERO(&exceptfd);
+
     int maxfd;
     CURLMcode mcode;
     timeval tv;
@@ -673,7 +680,7 @@ CurlStreamFile::fillCache(std::streamsize size)
 
 // select() will always fail on OS/2 and AmigaOS4 as we can't select
 // on file descriptors, only on sockets
-#if !defined(__OS2__) && !defined(__amigaos4__)
+#if !defined(__OS2__) && !defined(__amigaos4__) && !defined(WIN32)
         if ( ret == -1 )
         {
             if ( errno == EINTR )
