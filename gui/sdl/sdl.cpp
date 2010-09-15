@@ -44,13 +44,11 @@ SDLGui::SDLGui(unsigned long xid, float scale, bool loop, RunResources& r)
 
 SDLGui::~SDLGui()
 {
-    GNASH_REPORT_FUNCTION;
 }
 
 bool
 SDLGui::run()
 {
-    GNASH_REPORT_FUNCTION;
     int x_old = -1;
     int y_old = -1;
     int button_state_old = -1;
@@ -177,7 +175,6 @@ bool
 SDLGui::createWindow(const char *title, int width, int height,
                      int /*xPosition*/, int /*yPosition*/)
 {
-    GNASH_REPORT_FUNCTION;
     _width = width;
     _height = height;
 
@@ -216,8 +213,6 @@ SDLGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 void
 SDLGui::renderBuffer()
 {
-    //GNASH_REPORT_FUNCTION;
-
     _glue.render();
 }
 
@@ -230,14 +225,12 @@ SDLGui::setInterval(unsigned int interval)
 bool
 SDLGui::createMenu()
 {
-    GNASH_REPORT_FUNCTION;
     return false;
 }
 
 bool
 SDLGui::setupEvents()
 {
-    GNASH_REPORT_FUNCTION;
     return false;
 }
 
