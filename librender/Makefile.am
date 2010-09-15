@@ -85,6 +85,11 @@ libgnashrender_la_SOURCES += Renderer_ovg.cpp
 libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
+if  BUILD_GLES_RENDERER
+libgnashrender_la_SOURCES += Renderer_gles.cpp 
+libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
+endif
+
 if  BUILD_CAIRO_RENDERER
 libgnashrender_la_SOURCES += Renderer_cairo.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)

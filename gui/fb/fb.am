@@ -49,8 +49,8 @@ endif	# BUILD_OVG_RENDERER
 # This supports only OpenGL-ES 1.1 with EGL support.
 if BUILD_GLES_RENDERER
 fb_gnash_SOURCES += fb/fb_glue_gles.cpp fb/fb_glue_gles.h
-fb_gnash_CPPFLAGS += $(GLES_CFLAGS)
-fb_gnash_LDADD += $(GLES__LIBS)
+fb_gnash_CPPFLAGS += $(GLES_CFLAGS) $(EGL_CFLAGS)
+fb_gnash_LDADD += $(GLES_LIBS) $(EGL_LIBS)
 endif	# BUILD_OVG_RENDERER
 
 endif	# BUILD_FB_GUI

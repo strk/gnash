@@ -41,14 +41,13 @@
 # include <GLES2/gl2ext.h>
 #endif
 
-#include "ogl_glue.h"
 #include "fbsup.h"
 #include "render_handler_gles.h"
 
 namespace gnash
 {
 
-class FBglesGlue: public FBGlue, public OglGlue
+    class FBglesGlue: public FBGlue // , public OglGlue
 {
 public:
     FBglesGlue() :
@@ -58,9 +57,11 @@ public:
     
     virtual bool init(int /*argc*/, char *** /*argv*/);
     
-    virtual render_handler* createRenderHandler() {
+    virtual Renderer* createRenderHandler() {
         //_render_handler = create_render_handler_ogl (true, this);
-        return _render_handler;
+        //        return _render_handler; FIXME: 
+        // error: invalid covariant return type for 'virtual gnash::render_handler* gnash::FBglesGlue::createRenderHandler()'
+
     }
     
     virtual void setInvalidatedRegions(const InvalidatedRanges& /* ranges */) {}

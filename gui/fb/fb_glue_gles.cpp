@@ -39,7 +39,7 @@
 #endif
 
 #include "log.h"
-#include "fb_gles_glue.h"
+#include "fb_glue_gles.h"
 
 namespace gnash
 {
@@ -111,8 +111,8 @@ FBglesGlue::init(int /*argc*/, char *** /*argv*/) {
     log_trace("EGL: pbuffer config ok");
     
     const EGLint pbuffer_attrib_list[] = {
-        EGL_WIDTH, PBUFFER_WIDTH,
-        EGL_HEIGHT, PBUFFER_HEIGHT,
+        EGL_WIDTH, EGL_MAX_PBUFFER_WIDTH,
+        EGL_HEIGHT, EGL_MAX_PBUFFER_HEIGHT,
         EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
         EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
         EGL_MIPMAP_TEXTURE, EGL_FALSE,
