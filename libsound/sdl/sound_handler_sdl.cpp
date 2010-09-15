@@ -25,6 +25,7 @@
 #include "SoundInfo.h"
 #include "EmbedSound.h"
 #include "AuxStream.h" // for use..
+#include "GnashSleep.h"
 
 #include "log.h" // will import boost::format too
 #include "GnashException.h" // for SoundException
@@ -78,8 +79,15 @@ SDL_sound_handler::initAudio()
     //       of throwing an exception on error (unavailable audio
     //       card). Normally we'd want to open the audio card only
     //       when needed (it has a cost in number of wakeups).
-    //
     openAudio();
+
+#ifdef WIN32
+    // SDL can hang on windows if SDL_CloseAudio() is called immediately
+    // after SDL_OpenAudio(). It's evidently to do with threading, but
+    // internal to SDL. This is a tacky solution, but it's only windows.
+    gnashSleep(1);
+#endif
+
     closeAudio();
 
 }
@@ -87,7 +95,7 @@ SDL_sound_handler::initAudio()
 void
 SDL_sound_handler::openAudio()
 {
-    if ( _audioOpened ) return; // nothing to do
+    if (_audioOpened) return; // nothing to do
 
     // This is our sound settings
     audioSpec.freq = 44100;
@@ -106,9 +114,8 @@ SDL_sound_handler::openAudio()
     //512 - not enough for  videostream
     audioSpec.samples = 2048;   
 
-    if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
-            boost::format fmt = boost::format(
-                _("Unable to open SDL audio: %s"))
+    if (SDL_OpenAudio(&audioSpec, NULL) < 0) {
+            boost::format fmt = boost::format(_("Couldn't open SDL audio: %s"))
                 % SDL_GetError();
         throw SoundException(fmt.str());
     }
@@ -133,14 +140,15 @@ SDL_sound_handler::SDL_sound_handler(media::MediaHandler* m,
 
     initAudio();
 
-    if (! wavefile.empty() ) {
+    if (!wavefile.empty()) {
         file_stream.open(wavefile.c_str());
         if (file_stream.fail()) {
             std::cerr << "Unable to write file '" << wavefile << std::endl;
-            exit(EXIT_FAILURE);
-        } else {
-                write_wave_header(file_stream);
-                std::cout << "# Created 44100 16Mhz stereo wave file:" << std::endl <<
+            std::exit(EXIT_FAILURE);
+        } 
+        else {
+            write_wave_header(file_stream);
+            std::cout << "# Created 44100 16Mhz stereo wave file:\n" <<
                     "AUDIOFILE=" << wavefile << std::endl;
         }
     }
@@ -342,16 +350,15 @@ SDL_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 
 // Callback invoked by the SDL audio thread.
 void
-SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *buf, int bufLenIn)
+SDL_sound_handler::sdl_audio_callback(void *udata, Uint8 *buf, int bufLenIn)
 {
-    if ( bufLenIn < 0 )
-    {
-        log_error(_("Negative buffer length in sdl_audio_callback (%d)"), bufLenIn);
+    if (bufLenIn < 0) {
+        log_error(_("Negative buffer length in sdl_audio_callback (%d)"),
+                bufLenIn);
         return;
     }
 
-    if ( bufLenIn == 0 )
-    {
+    if (bufLenIn == 0) {
         log_error(_("Zero buffer length in sdl_audio_callback"));
         return;
     }
@@ -425,15 +432,13 @@ void
 SDL_sound_handler::pause() 
 {
     closeAudio();
-
     sound_handler::pause();
 }
 
 void
 SDL_sound_handler::unpause() 
 {
-    if ( hasInputStreams() )
-    {
+    if (hasInputStreams()) {
         openAudio();
         SDL_PauseAudio(0);
     }
