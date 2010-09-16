@@ -464,14 +464,18 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
             return;        
         }
 
-        gst_pad_set_chain_function (parser->_audiosink, MediaParserGst::cb_chain_func_audio);
+        gst_pad_set_chain_function(parser->_audiosink,
+                MediaParserGst::cb_chain_func_audio);
         
-        g_object_set_data (G_OBJECT (parser->_audiosink), "mediaparser-obj", parser);
+        g_object_set_data(G_OBJECT (parser->_audiosink), "mediaparser-obj",
+                parser);
         
         LOG_ONCE(
-        log_unimpl("MediaParserGst won't set codec, sampleRate, sampleSize, stereo and duration in AudioInfo"); 
+            log_unimpl("MediaParserGst won't set codec, sampleRate, "
+                "sampleSize, stereo and duration in AudioInfo"); 
         );
-        AudioInfo* audioinfo = new AudioInfo(0, 0, 0, false, 0, CUSTOM);
+        AudioInfo* audioinfo = new AudioInfo(0, 0, 0, false, 0,
+                CODEC_TYPE_CUSTOM);
         audioinfo->extra.reset(new ExtraInfoGst(caps));
 
         parser->_audioInfo.reset(audioinfo);
@@ -484,11 +488,14 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
             return;        
         }        
         
-        gst_pad_set_chain_function (parser->_videosink, MediaParserGst::cb_chain_func_video);
+        gst_pad_set_chain_function(parser->_videosink,
+                MediaParserGst::cb_chain_func_video);
         
-        g_object_set_data (G_OBJECT (parser->_videosink), "mediaparser-obj", parser);
+        g_object_set_data(G_OBJECT(parser->_videosink), "mediaparser-obj",
+                parser);
 
-        VideoInfo* videoinfo = new VideoInfo(0, 0, 0, false, 0, CUSTOM);
+        VideoInfo* videoinfo = new VideoInfo(0, 0, 0, false, 0,
+                CODEC_TYPE_CUSTOM);
         videoinfo->extra.reset(new ExtraInfoGst(caps));
 
         parser->_videoInfo.reset(videoinfo);

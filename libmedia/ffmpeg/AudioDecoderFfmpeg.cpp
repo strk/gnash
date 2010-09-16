@@ -52,12 +52,12 @@ AudioDecoderFfmpeg::AudioDecoderFfmpeg(const AudioInfo& info)
 {
     setup(info);
 
-    if ( info.type == CUSTOM ) {
+    if (info.type == CODEC_TYPE_CUSTOM) {
         log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s)"),
             _audioCodec->id, _audioCodec->name);
     } else {
         log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s) "
-                    "for FLASH codec %d (%s)"),
+                    "for flash codec %d (%s)"),
             _audioCodec->id, _audioCodec->name,
             info.codec, (audioCodecType)info.codec);
     }
@@ -178,12 +178,12 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 	enum CodecID codec_id = CODEC_ID_NONE;
 
-	if (info.type == CUSTOM)
+	if (info.type == CODEC_TYPE_CUSTOM)
 	{
 		codec_id = static_cast<CodecID>(info.codec);
         _needsParsing=true; // @todo check this !
 	}
-	else if (info.type == FLASH)
+	else if (info.type == CODEC_TYPE_FLASH)
 	{
 
 		switch(info.codec)
@@ -218,7 +218,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 			default:
 			    boost::format err = boost::format(
-			        _("AudioDecoderFfmpeg: unsupported FLASH audio "
+			        _("AudioDecoderFfmpeg: unsupported flash audio "
                         "codec %d (%s)")) %
                         info.codec % (audioCodecType)info.codec;
 			    throw MediaException(err.str());
@@ -235,7 +235,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 	_audioCodec = avcodec_find_decoder(codec_id);
 	if (!_audioCodec)
 	{
-		if (info.type == FLASH) {
+		if (info.type == CODEC_TYPE_FLASH) {
 			boost::format err = boost::format(
 				_("AudioDecoderFfmpeg: libavcodec could not find a decoder "
                     "for codec %d (%s)")) %
@@ -258,8 +258,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
         _parser = av_parser_init(codec_id);
         if (!_parser) {
             boost::format err;
-            if ( info.type == FLASH )
-            {
+            if (info.type == CODEC_TYPE_FLASH) {
                 err = boost::format(
                     _("AudioDecoderFfmpeg: could not initialize a parser for "
                         "flash codec id %d (%s)")) %

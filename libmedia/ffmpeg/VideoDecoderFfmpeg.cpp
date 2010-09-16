@@ -129,7 +129,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
 
     CodecID codec_id = CODEC_ID_NONE;
 
-    if ( info.type == FLASH )
+    if ( info.type == CODEC_TYPE_FLASH )
     {
         codec_id = flashToFfmpegCodec(static_cast<videoCodecType>(info.codec));
     }

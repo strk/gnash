@@ -290,7 +290,7 @@ AudioDecoderSimple::AudioDecoderSimple(const AudioInfo& info)
 {
     setup(info);
 
-  	log_debug(_("AudioDecoderSimple: initialized FLASH codec %s (%d)"),
+  	log_debug(_("AudioDecoderSimple: initialized flash codec %s (%d)"),
 		(int)_codec, _codec);
 }
 
@@ -303,7 +303,7 @@ AudioDecoderSimple::AudioDecoderSimple(const SoundInfo& info)
 {
     setup(info);
 
-  	log_debug(_("AudioDecoderSimple: initialized FLASH codec %s (%d)"),
+  	log_debug(_("AudioDecoderSimple: initialized flash codec %s (%d)"),
 		(int)_codec, _codec);
 }
 
@@ -338,8 +338,7 @@ AudioDecoderSimple::setup(const SoundInfo& info)
 void
 AudioDecoderSimple::setup(const AudioInfo& info)
 {
-	if (info.type != FLASH)
-    {
+    if (info.type != CODEC_TYPE_FLASH) {
         boost::format err = boost::format(
             _("AudioDecoderSimple: unable to intepret custom audio codec id %s"))
             % info.codec;

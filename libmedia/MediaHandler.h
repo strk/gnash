@@ -146,17 +146,17 @@ protected:
     /// This is an abstract base class, so not instantiable anyway.
     MediaHandler() {}
 
-    /// Create an AudioDecoder for FLASH codecs 
+    /// Create an AudioDecoder for CODEC_TYPE_FLASH codecs 
     //
     /// This method is attempted as a fallback in case
     /// a mediahandler-specific audio decoder couldn't be created
-    /// for a FLASH codec.
+    /// for a CODEC_TYPE_FLASH codec.
     /// 
     /// @throws a MediaException if it can't create a decoder
     ///
     /// @param info
     ///     Informations about the audio. It is *required*
-    ///     for info.type to be media::FLASH (caller should check
+    ///     for info.type to be media::CODEC_TYPE_FLASH (caller should check
     ///     that before calling this).
     ///
     std::auto_ptr<AudioDecoder> createFlashAudioDecoder(const AudioInfo& info);

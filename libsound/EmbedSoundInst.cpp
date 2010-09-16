@@ -95,7 +95,7 @@ EmbedSoundInst::createDecoder(media::MediaHandler& mediaHandler)
         si.is16bit() ? 2 : 1, // sampleSizei
         si.isStereo(), // stereoi
         0, // duration unknown, does it matter ?
-        media::FLASH);
+        media::CODEC_TYPE_FLASH);
 
     try {
         _decoder = mediaHandler.createAudioDecoder(info);

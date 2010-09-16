@@ -102,7 +102,7 @@ MediaHandlerHaiku::createAudioDecoder(const AudioInfo& info)
     }
     catch (MediaException& ex)
     {
-        if ( info.type != FLASH ) throw ex;
+        if ( info.type != CODEC_TYPE_FLASH ) throw ex;
 
         try
         {

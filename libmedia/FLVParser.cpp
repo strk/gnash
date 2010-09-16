@@ -188,10 +188,10 @@ FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boos
 
 	// If this is the first audioframe no info about the
 	// audio format has been noted, so we do that now
-	if ( !_audioInfo.get() )
-	{
+	if (!_audioInfo.get()) {
 		_audioInfo.reset(new AudioInfo(audiotag.codec, audiotag.samplerate,
-                    audiotag.samplesize, audiotag.stereo, 0, FLASH) );
+                    audiotag.samplesize, audiotag.stereo, 0,
+                    CODEC_TYPE_FLASH));
 
         if (header) {
 
@@ -266,7 +266,8 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 	// If this is the first videoframe no info about the
 	// video format has been noted, so we do that now
 	if ( ! _videoInfo.get() ) {
-		_videoInfo.reset(new VideoInfo(videotag.codec, 0, 0, 0, 0, FLASH));
+		_videoInfo.reset(new VideoInfo(videotag.codec, 0, 0, 0, 0,
+                    CODEC_TYPE_FLASH));
 
 		if (header) {
             // The frame is 0-padded up to the end. It may be larger than

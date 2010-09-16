@@ -111,7 +111,7 @@ MediaHandlerFfmpeg::createAudioDecoder(const AudioInfo& info)
     }
     catch (const MediaException& ex) {
 
-        if (info.type != FLASH) throw;
+        if (info.type != CODEC_TYPE_FLASH) throw;
 
         try {
             ret = createFlashAudioDecoder(info);

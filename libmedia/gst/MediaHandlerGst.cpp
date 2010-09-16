@@ -81,7 +81,7 @@ MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
 std::auto_ptr<VideoDecoder>
 MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
 {
-    if (info.type != FLASH) {
+    if (info.type != CODEC_TYPE_FLASH) {
 
         ExtraInfoGst* extrainfo = dynamic_cast<ExtraInfoGst*>(info.extra.get());
 
@@ -116,7 +116,7 @@ MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
 
 #ifdef DECODING_SPEEX
     if (info.codec == AUDIO_CODEC_SPEEX) {
-        assert(info.type == FLASH);
+        assert(info.type == CODEC_TYPE_FLASH);
         ret.reset(new AudioDecoderSpeex);
     } else
 #endif
@@ -126,7 +126,7 @@ MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
         }
         catch (const MediaException& ex) {
 
-            if (info.type != FLASH) throw;
+            if (info.type != CODEC_TYPE_FLASH) throw;
 
             try {
                 ret = createFlashAudioDecoder(info);

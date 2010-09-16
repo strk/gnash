@@ -123,7 +123,8 @@ DefineVideoStreamTag::read(SWFStream& in)
 	}
 
 	_videoInfo.reset(new media::VideoInfo(m_codec_id, _width, _height,
-                0 /*framerate*/, 0 /*duration*/, media::FLASH /*typei*/));
+                0 /*framerate*/, 0 /*duration*/,
+                media::CODEC_TYPE_FLASH));
 }
 
 void
