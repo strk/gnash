@@ -20,8 +20,10 @@
 #ifndef GNASH_GNASHVAAPIIMAGE_H
 #define GNASH_GNASHVAAPIIMAGE_H
 
-#include "GnashImage.h"
 #include <boost/shared_ptr.hpp>
+
+#include "GnashImage.h"
+#include "dsodefs.h"
 
 namespace gnash {
 

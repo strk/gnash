@@ -21,10 +21,11 @@
 #ifndef GNASH_RGBA_H
 #define GNASH_RGBA_H
 
-#include "SWF.h"
-
 #include <string>
 #include <boost/cstdint.hpp> 
+
+#include "dsodefs.h"
+#include "SWF.h"
 
 namespace gnash {
 
@@ -32,7 +33,7 @@ namespace gnash {
 //
 /// This both represents a SWF RGBA record and is a basic Gnash type for
 /// color values.
-class rgba
+class DSOEXPORT rgba
 {
 public:
 
