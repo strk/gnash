@@ -74,7 +74,6 @@ gradientMatrix(GradientFill::Type t, const SWFMatrix& m)
             base.set_scale(1.0 / 128, 1.0 / 128);
             break;
         case GradientFill::RADIAL:
-            base.set_translation(32, 32);
             base.set_scale(1.0 / 512, 1.0 / 512);
             break;
     }

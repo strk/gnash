@@ -248,7 +248,6 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
               
                 // Undo the translation our parser applied.
                 gnash::SWFMatrix transl;
-                transl.concatenate_translation(-32, -32);
                 transl.concatenate(m);
 
                 cairo_matrix_t mat;
