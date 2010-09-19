@@ -162,7 +162,6 @@ inst_HEADERS = \
 	jemtree.h \
 	GnashSleep.h \
 	gmemory.h \
-	ogl.h \
 	SharedMem.h \
 	sharedlib.h \
 	tree.hh \
