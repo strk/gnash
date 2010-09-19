@@ -853,7 +853,6 @@ movieclip_getBytesTotal(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    // @@ horrible uh ?
     return as_value(movieclip->get_bytes_total());
 }
 
