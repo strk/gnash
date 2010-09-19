@@ -204,7 +204,7 @@ public:
     //
     /// This is dependent on the VM version and the type of object, function,
     /// or class.
-    virtual const std::string& stringValue() const;
+    virtual std::string stringValue() const;
 
     /// The most common flags for built-in properties.
     //
@@ -406,9 +406,6 @@ public:
     void init_readonly_property(const std::string& key, as_function& getter,
             int flags = DefaultFlags);
 
-    void init_readonly_property(const ObjectURI& uri,
-            as_function& getter, int flags = DefaultFlags);
-
     /// Use this method for read-only properties.
     //
     /// This method achieves the same as the above init_property method.
@@ -423,9 +420,6 @@ public:
     /// @param getter   The getter function
     /// @param flags    Property flags
     void init_readonly_property(const std::string& key,
-            as_c_function_ptr getter, int flags = DefaultFlags);
-
-    void init_readonly_property(const ObjectURI& uri,
             as_c_function_ptr getter, int flags = DefaultFlags);
 
     /// Enumerate all non-hidden property keys to the given as_environment.

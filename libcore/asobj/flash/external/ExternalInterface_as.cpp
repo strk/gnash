@@ -18,16 +18,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "ExternalInterface_as.h"
+
 #include <map>
 #include <vector>
 #include <sstream>
-#include <sys/ioctl.h>
-#include <sys/types.h>
 #include <boost/algorithm/string/erase.hpp>
 #include <algorithm>
+#include "GnashSystemNetHeaders.h"
 
 #include "ExternalInterface.h"
-#include "ExternalInterface_as.h"
 #include "NativeFunction.h"
 #include "StringPredicates.h"
 #include "as_object.h" // for inheritance
@@ -314,7 +314,7 @@ externalinterface_available(const fn_call& fn)
           char hostname[MAXHOSTNAMELEN];
           memset(hostname, 0, MAXHOSTNAMELEN);
           
-          if (gethostname(hostname, MAXHOSTNAMELEN) != 0) {
+          if (::gethostname(hostname, MAXHOSTNAMELEN) != 0) {
               mode = false;
           }
           

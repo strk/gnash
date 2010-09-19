@@ -474,6 +474,7 @@ XMLNode_as::setReachable()
     if (_object) _object->setReachable();
 
     if (_childNodes) _childNodes->setReachable();
+
 }
 
 void
@@ -970,7 +971,7 @@ xmlnode_parentNode(const fn_call& fn)
     rv.set_null();
 
     XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
-    XMLNode_as *node = ptr->getParent();
+    XMLNode_as* node = ptr->getParent();
     if (node) {
         rv = node->object();
     }

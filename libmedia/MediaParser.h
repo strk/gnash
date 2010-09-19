@@ -61,10 +61,10 @@ enum videoFrameType
 enum codecType
 {
 	/// The internal flash codec ids
-	FLASH,
+	CODEC_TYPE_FLASH,
 
 	/// Custom codecs ids
-	CUSTOM
+	CODEC_TYPE_CUSTOM
 };
 
 /// Video codec ids as defined in flash
@@ -202,7 +202,7 @@ public:
     /// @param codeci
     ///     Audio codec id.
     ///     To be interpreted as a media::audioCodecType if the typei
-    ///     parameter is FLASH; otherwise it's an opaque number to use
+    ///     parameter is CODEC_TYPE_FLASH; otherwise it's an opaque number to use
     ///     for codec information transfer between a MediaParser and a
     ///     AudioDecoder from the same %media handler module.
     ///
@@ -238,7 +238,7 @@ public:
 
 	/// Codec identifier
 	//
-	/// This has to be interpreted as audioCodecType if codecType type is FLASH
+	/// This has to be interpreted as audioCodecType if codecType type is CODEC_TYPE_FLASH
 	/// or interpretation is opaque and we rely on the assumption that the AudioInfo
 	/// creator and the AudioInfo user have a way to get a shared interpretation
 	///
@@ -287,7 +287,7 @@ public:
     /// @param codeci
     ///     Video codec id.
     ///     To be interpreted as a media::videoCodecType if the typei
-    ///     parameter is FLASH; otherwise it's an opaque number to use
+    ///     parameter is CODEC_TYPE_FLASH; otherwise it's an opaque number to use
     ///     for codec information transfer between a MediaParser and a
     ///     VideoDecoder from the same %media handler module.
     ///

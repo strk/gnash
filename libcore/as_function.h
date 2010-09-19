@@ -73,7 +73,7 @@ public:
     /// be called.
 	virtual as_value call(const fn_call& fn) = 0;
 
-    virtual const std::string& stringValue() const;
+    virtual std::string stringValue() const;
 
 	/// Run this function as a constructor on an object
     //

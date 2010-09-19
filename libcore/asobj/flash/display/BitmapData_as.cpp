@@ -364,10 +364,34 @@ bitmapdata_applyFilter(const fn_call& fn)
 as_value
 bitmapdata_clone(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+	as_object* obj = ensure<ValidThis>(fn);
+	BitmapData_as* bm = ensure<ThisIsNative<BitmapData_as> >(fn);
+    if (bm->disposed()) return as_value();
+
+    const size_t width = bm->width();
+    const size_t height = bm->height();
+
+    std::auto_ptr<image::GnashImage> im;
+    if (bm->transparent()) {
+        im.reset(new image::ImageRGBA(width, height));
+    }
+    else {
+        im.reset(new image::ImageRGB(width, height));
+    }
+    // Note that it would be much faster to copy the pixels, but BitmapData
+    // currently doesn't expose a way to do this.
+    std::copy(bm->begin(), bm->end(), image::begin<image::ARGB>(*im));
+
+    Global_as& gl = getGlobal(fn);
+    as_object* ret = gl.createObject();
+    const as_value& proto = obj->getMember(NSV::PROP_uuPROTOuu);
+    if (proto.is_object()) {
+        ret->set_member(NSV::PROP_uuPROTOuu, proto);
+    }
+
+    ret->setRelay(new BitmapData_as(ret, im));
+
+	return as_value(ret);
 }
 
 as_value

@@ -406,7 +406,7 @@ NetStream_as::play(const std::string& c_url)
     // Reset any previously active playback
     close();
 
-    log_security( _("Connecting to movie: %s"), url );
+    log_security(_("Connecting to movie: %s"), url);
 
     _inputStream = _netCon->getStream(url); 
 
@@ -440,7 +440,7 @@ NetStream_as::initVideoDecoder(const media::VideoInfo& info)
                 "video consumer");
         _playHead.setVideoConsumerAvailable();
     }
-    catch (MediaException& e) {
+    catch (const MediaException& e) {
         log_error("NetStream: Could not create Video decoder: %s", e.what());
 
         // This is important enough to let the user know.
@@ -468,7 +468,7 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
                 "audio consumer");
         _playHead.setAudioConsumerAvailable();
     }
-    catch (MediaException& e) {
+    catch (const MediaException& e) {
         log_error("Could not create Audio decoder: %s", e.what());
 
         // This is important enough to let the user know.

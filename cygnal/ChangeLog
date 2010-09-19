@@ -58,7 +58,7 @@
 	* cygnal.cpp: Run forever, restarting connections after the
 	disconnect.
 	* handler.cpp: Trap mutex errors.
-	* http.cpp: Tweak the handling of persistant connections.  Add
+	* http.cpp: Tweak the handling of persistent connections.  Add
 	statistics gathering.
 	
 	* buffer.cpp, cque.cpp: Turn off overly verbose debug now that

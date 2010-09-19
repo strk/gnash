@@ -269,18 +269,22 @@ ActionExec::operator()()
             DisplayObject* guardedChar = env.get_target();
 
             if (_abortOnUnload && guardedChar && guardedChar->unloaded()) {
-                // action_execution_order_test8.c shows that the opcode
-                // guard is not SWF version based (TODO: automate it!)
-                std::stringstream ss;
-                ss << "Target of action_buffer (" << guardedChar->getTarget() 
-                    << " of type " << typeName(*guardedChar) << ") unloaded "
-                    "by execution of opcode: " << std::endl;
 
-                dumpActions(pc, next_pc, ss);
-                ss << "Discarding " << stop_pc-next_pc
-                    << " bytes of remaining opcodes: " << std::endl;
-                dumpActions(next_pc, stop_pc, ss);
-                log_debug("%s", ss.str());
+                IF_VERBOSE_ACTION(
+                    // action_execution_order_test8.c shows that the opcode
+                    // guard is not SWF version based
+                    std::stringstream ss;
+                    ss << "Target of action_buffer (" <<
+                        guardedChar->getTarget() << " of type " <<
+                        typeName(*guardedChar) << ") unloaded "
+                        "by execution of opcode: " << std::endl;
+
+                    dumpActions(pc, next_pc, ss);
+                    ss << "Discarding " << stop_pc-next_pc
+                        << " bytes of remaining opcodes: " << std::endl;
+                    dumpActions(next_pc, stop_pc, ss);
+                    log_action("%s", ss.str());
+                );
                 break;
             }
 

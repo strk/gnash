@@ -216,7 +216,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
     fi
 
-    ffmpeg_num_version=`printf %2.2d%2.2d%2.2d $ffmpeg_major_version $ffmpeg_minor_version $ffmpeg_micro_version`
+    ffmpeg_num_version=`printf %02d%02d%02d $ffmpeg_major_version $ffmpeg_minor_version $ffmpeg_micro_version`
 
     AC_MSG_RESULT($ffmpeg_version ($ffmpeg_num_version))
 
@@ -460,7 +460,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
 
     if test x"${libavformat}" = x; then
       if test -f ${top_lib_dir}/libavformat.a -o -f ${top_lib_dir}/libavformat.${shlibext}; then
-        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat" 
+        ac_cv_path_ffmpeg_lib="-lavformat ${ac_cv_path_ffmpeg_lib}" 
         AC_MSG_RESULT(${top_lib_dir}/libavformat)
       else
         AC_MSG_RESULT(no)

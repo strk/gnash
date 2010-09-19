@@ -353,9 +353,9 @@ Network::newConnection(bool block, int fd)
             return 1;
         }
 	
-        // If interupted by a system call, try again
+        // If interrupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_debug(_("The accept() socket for fd #%d was interupted by a system call"), fd);
+            log_debug(_("The accept() socket for fd #%d was interrupted by a system call"), fd);
         }
 
         if (ret == -1) {
@@ -440,9 +440,9 @@ Network::connectSocket(const string &sockname)
 
         ret = ::select(_sockfd+1, &fdset, NULL, NULL, &tval);
 
-        // If interupted by a system call, try again
+        // If interrupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-	    log_debug(_("The connect() socket for fd %d was interupted by a system call"),
+	    log_debug(_("The connect() socket for fd %d was interrupted by a system call"),
 		      _sockfd);
 	    continue;
 	}
@@ -598,7 +598,7 @@ Network::createClient(const string &hostname, short port)
 
         ret = ::select(_sockfd+1, &fdset, NULL, NULL, &tval);
 
-        // If interupted by a system call, try again
+        // If interrupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
             log_debug(_("The connect() socket for fd %d was interrupted "
                         "by a system call"), _sockfd);
@@ -937,9 +937,9 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 #endif
 	}
 
-        // If interupted by a system call, try again
+        // If interrupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_error (_("The socket for fd #%d was interupted by a system call"), fd);
+            log_error (_("The socket for fd #%d was interrupted by a system call"), fd);
         }
 
         if (ret == -1) {
@@ -1111,9 +1111,9 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
         ret = select(fd+1, NULL, &fdset, NULL, &tval);
 #endif
 	
-        // If interupted by a system call, try again
+        // If interrupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_error (_("The socket for fd #%d was interupted by a system call"), fd);
+            log_error (_("The socket for fd #%d was interrupted by a system call"), fd);
         }
 
         if (ret == -1) {
@@ -1443,9 +1443,9 @@ Network::waitForNetData(int limit, fd_set files)
     tval.tv_usec = timeout * 1000; // was 1000000
     int ret = select(limit+1, &fdset, NULL, NULL, &tval);
 #endif
-    // If interupted by a system call, try again
+    // If interrupted by a system call, try again
     if (ret == -1 && errno == EINTR) {
-	log_error (_("Waiting for data was interupted by a system call"));
+	log_error (_("Waiting for data was interrupted by a system call"));
     }
     
     if (ret == -1) {

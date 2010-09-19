@@ -21,7 +21,7 @@ EXTRA_DIST =
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-AM_CXXFLAGS = $(CXXFLAGS) -DREGISTER_MEDIA_HANDLERS
+AM_CXXFLAGS = -DREGISTER_MEDIA_HANDLERS
 
 #if INSTALL_LTDL
 #LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
@@ -122,7 +122,7 @@ if USE_GST_ENGINE
 
    libgnashmedia_la_LIBADD += \
 	-lgstbase-0.10 \
-        $(GSTREAMER_APP_LIBS) \
+	$(GSTREAMER_APP_LIBS) \
 	$(GSTPBUTILS_LIBS) \
 	$(GSTREAMER_PLUGINS_BASE_LIBS) \
 	$(GSTREAMER_LIBS) \

@@ -30,8 +30,8 @@ libgnashsound_la_CPPFLAGS = \
 	$(NULL)
 
 libgnashsound_la_LIBADD = \
-	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libbase/libgnashbase.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(SDL_LIBS) \

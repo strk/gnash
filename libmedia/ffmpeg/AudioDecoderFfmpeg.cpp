@@ -1,4 +1,4 @@
-// AudioDecoderFfmpeg.cpp: Audio decoding using the FFMPEG library.
+// AudioDecoderFfmpeg.cpp: Audio decoding using the FFmpeg library.
 // 
 //   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 //
@@ -52,12 +52,12 @@ AudioDecoderFfmpeg::AudioDecoderFfmpeg(const AudioInfo& info)
 {
     setup(info);
 
-    if ( info.type == CUSTOM ) {
-        log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s)"),
+    if (info.type == CODEC_TYPE_CUSTOM) {
+        log_debug(_("AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s)"),
             _audioCodec->id, _audioCodec->name);
     } else {
-        log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s) "
-                    "for FLASH codec %d (%s)"),
+        log_debug(_("AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s) "
+                    "for flash codec %d (%s)"),
             _audioCodec->id, _audioCodec->name,
             info.codec, (audioCodecType)info.codec);
     }
@@ -71,7 +71,7 @@ AudioDecoderFfmpeg::AudioDecoderFfmpeg(SoundInfo& info)
 {
     setup(info);
 
-  	log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %s (%d)"),
+  	log_debug(_("AudioDecoderFfmpeg: initialized FFmpeg codec %s (%d)"),
 		_audioCodec->name, _audioCodec->id);
 }
 
@@ -145,7 +145,7 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 		_audioCodecCtx=0;
         boost::format err = boost::format(
             _("AudioDecoderFfmpeg: avcodec_open failed to initialize "
-            "FFMPEG codec %s (%d)")) % _audioCodec->name % (int)codec_id;
+            "FFmpeg codec %s (%d)")) % _audioCodec->name % (int)codec_id;
     	throw MediaException(err.str());
 	}
 
@@ -178,12 +178,12 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 	enum CodecID codec_id = CODEC_ID_NONE;
 
-	if (info.type == CUSTOM)
+	if (info.type == CODEC_TYPE_CUSTOM)
 	{
 		codec_id = static_cast<CodecID>(info.codec);
         _needsParsing=true; // @todo check this !
 	}
-	else if (info.type == FLASH)
+	else if (info.type == CODEC_TYPE_FLASH)
 	{
 
 		switch(info.codec)
@@ -218,7 +218,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 			default:
 			    boost::format err = boost::format(
-			        _("AudioDecoderFfmpeg: unsupported FLASH audio "
+			        _("AudioDecoderFfmpeg: unsupported flash audio "
                         "codec %d (%s)")) %
                         info.codec % (audioCodecType)info.codec;
 			    throw MediaException(err.str());
@@ -235,7 +235,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 	_audioCodec = avcodec_find_decoder(codec_id);
 	if (!_audioCodec)
 	{
-		if (info.type == FLASH) {
+		if (info.type == CODEC_TYPE_FLASH) {
 			boost::format err = boost::format(
 				_("AudioDecoderFfmpeg: libavcodec could not find a decoder "
                     "for codec %d (%s)")) %
@@ -258,8 +258,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
         _parser = av_parser_init(codec_id);
         if (!_parser) {
             boost::format err;
-            if ( info.type == FLASH )
-            {
+            if (info.type == CODEC_TYPE_FLASH) {
                 err = boost::format(
                     _("AudioDecoderFfmpeg: could not initialize a parser for "
                         "flash codec id %d (%s)")) %
@@ -335,7 +334,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 		boost::format err = boost::format(
 			_("AudioDecoderFfmpeg: avcodec_open failed to initialize "
-			"FFMPEG codec %s (%d)")) % _audioCodec->name % (int)codec_id;
+			"FFmpeg codec %s (%d)")) % _audioCodec->name % (int)codec_id;
 		throw MediaException(err.str());
 	}
 

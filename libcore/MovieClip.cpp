@@ -57,7 +57,6 @@
 #include "DisplayObjectContainer.h"
 #include "Global_as.h"
 #include "RunResources.h"
-#include "GnashImage.h"
 #include "Transform.h"
 
 #include <vector>

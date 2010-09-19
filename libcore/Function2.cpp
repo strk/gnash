@@ -130,9 +130,8 @@ Function2::call(const fn_call& fn)
             ++current_reg;
         }
         else {
-            string_table& st = getStringTable(fn);
             // Put 'arguments' in a local var.
-            setLocal(cf, st.find("arguments"), args);
+            setLocal(cf, NSV::PROP_ARGUMENTS, args);
         }
 
     }

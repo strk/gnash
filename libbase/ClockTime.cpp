@@ -84,13 +84,11 @@ clocktime::getTimeZoneOffset()
 
 #include <ctime> // for time_t, localtime
 
-#if !defined(HAVE_GETTIMEOFDAY) || (!defined(HAVE_TM_GMTOFF) && !defined(HAVE_TZSET))
 #ifdef HAVE_FTIME
 extern "C" {
-#  include <sys/types.h>    // for ftime()
-#  include <sys/timeb.h>    // for ftime()
+# include <sys/types.h>
+# include <sys/timeb.h>
 }
-#endif
 #endif
 
 #if !defined(HAVE_TM_GMTOFF)
@@ -223,7 +221,7 @@ clocktime::getTimeZoneOffset(double time)
     offset = -timezone / 60;
     //gnash::log_debug("Using tzset. Offset is %d", offset);
 
-# elif defined(HAVE_GETTIMEOFDAY)
+# elif !defined(WIN32) && defined(HAVE_GETTIMEOFDAY)
 
     // gettimeofday(3):
     // "The use of the timezone structure is obsolete; the tz argument

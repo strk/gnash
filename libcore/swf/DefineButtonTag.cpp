@@ -21,9 +21,11 @@
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
+#include "DefineButtonTag.h"
+
+#include "TypesParser.h"
 #include "RunResources.h"
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "DefineButtonTag.h"
 #include "DisplayObject.h"
 #include "Button.h" // for createDisplayObject()
 #include "DefineButtonCxformTag.h"
@@ -54,8 +56,7 @@ DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
     _trackAsMenu(false),
     _movieDef(m)
 {
-    switch (tag)
-    {
+    switch (tag) {
         default:
             std::abort();
             break;

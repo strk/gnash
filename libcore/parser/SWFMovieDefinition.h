@@ -28,7 +28,6 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "GnashImageJpeg.h"
 #include "movie_definition.h" // for inheritance
 #include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
 #include "StringPredicates.h" 
@@ -38,10 +37,10 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <vector>
-#include <map> // for CharacterDictionary
-#include <set> // for _importSources
+#include <map>
+#include <set> 
 #include <string>
-#include <memory> // for auto_ptr
+#include <memory> 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
@@ -49,6 +48,10 @@
 
 // Forward declarations
 namespace gnash {
+    namespace image {
+        class JpegInput;
+    }
+    class IOChannel;
     class SWFMovieDefinition;
     class SWFStream;
     class movie_root;
@@ -292,20 +295,7 @@ public:
 
     /// Set an input object for later loading DefineBits
     /// images (JPEG images without the table info).
-    void set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in) {
-        if (m_jpeg_in.get()) {
-            /// There should be only one JPEGTABLES tag in an SWF (see: 
-            /// http://www.m2osw.com/en/swf_alexref.html#tag_jpegtables)
-            /// Discard any subsequent attempts to set the jpeg loader
-            /// to avoid crashing on very malformed SWFs. (No conclusive tests
-            /// for pp behaviour, though one version also crashes out on the
-            /// malformed SWF that triggers this assert in Gnash).
-            log_swferror(_("More than one JPEGTABLES tag found: not "
-                        "resetting JPEG loader"));
-            return;
-        }
-        m_jpeg_in = j_in;
-    }
+    void set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in);
 
     // See dox in movie_definition.h
     image::JpegInput* get_jpeg_loader() const {
@@ -529,7 +519,7 @@ private:
         _bytes_loaded=bytes;
     }
 
-    /// A flag set to true when load cancelation is requested
+    /// A flag set to true when load cancellation is requested
     bool _loadingCanceled;
 
     /// Movies we import resources from

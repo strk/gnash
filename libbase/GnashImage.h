@@ -407,7 +407,7 @@ scanline(const GnashImage& im, size_t row)
     return im.begin() + im.stride() * row;
 }
 
-void mergeAlpha(ImageRGBA& im, GnashImage::const_iterator alphaData,
+DSOEXPORT void mergeAlpha(ImageRGBA& im, GnashImage::const_iterator alphaData,
         const size_t bufferLength);
 
 } // namespace image

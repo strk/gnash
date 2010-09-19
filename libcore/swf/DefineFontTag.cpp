@@ -19,6 +19,11 @@
 //
 
 #include "DefineFontTag.h"
+
+#include <memory>
+#include <string>
+
+#include "TypesParser.h"
 #include "SWFStream.h"
 #include "Font.h"
 #include "RunResources.h"
@@ -302,11 +307,10 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
             _glyphTable[i].advance = static_cast<float>(in.read_u16());
         }
 
-        // Bounds table.
-        {
-            SWFRect dummy_rect;
-            // TODO: shouldn't we log_unimpl here ??
-            for (size_t i = 0; i < nGlyphs; i++) dummy_rect.read(in);
+        // TODO: shouldn't we log_unimpl here ??
+        for (size_t i = 0; i < nGlyphs; i++) {
+            LOG_ONCE(log_unimpl("Bounds table in DefineFont2Tag"));
+            readRect(in);
         }
 
         // Kerning pairs.

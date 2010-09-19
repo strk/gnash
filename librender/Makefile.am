@@ -30,15 +30,15 @@ pluginsdir = $(libdir)/gnash/plugins
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 
 AM_CPPFLAGS = -I.. \
-        -I$(srcdir) \
-        -I$(top_srcdir) \
-        -I$(top_srcdir)/libcore \
-        -I$(top_srcdir)/libcore/parser \
-        -I$(top_srcdir)/libcore/swf \
-        -I$(top_srcdir)/libbase \
+	-I$(srcdir) \
+	-I$(top_srcdir) \
+	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libcore/parser \
+	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
 	$(PTHREAD_CFLAGS) \
-        $(SDL_CFLAGS) \
+	$(SDL_CFLAGS) \
 	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(ATK_CFLAGS) \
@@ -53,8 +53,8 @@ AM_CPPFLAGS = -I.. \
 	$(NULL)
 
 GNASH_LIBS = \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libcore/libgnashcore.la
+	$(top_builddir)/libcore/libgnashcore.la \
+	$(top_builddir)/libbase/libgnashbase.la 
 
 noinst_HEADERS = \
 	Renderer.h \

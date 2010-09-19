@@ -1085,7 +1085,7 @@ event_handler(Network::thread_params_t *args)
 			  hand->removeClient(args->netfd);
 			  done = true;
 		      } else {
-			  log_network("Not Done with HTTP connection for fd #%d, it's a persistant connection.", i);
+			  log_network("Not Done with HTTP connection for fd #%d, it's a persistent connection.", i);
 			  
 		      }
 		      continue;

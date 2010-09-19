@@ -130,7 +130,6 @@ CLEANFILES =
 CLEANFILES += revno.h
 BUILT_SOURCES = revno.h
 revno.h: Makefile.in
-	@echo "Generating revno.h"
 	-@if test -d $(srcdir)/.bzr; then \
 	  status=`which bzr 2>&1 | grep -c " no bzr"`; \
 	  if test x"$${status}" = x"0"; then \
@@ -142,12 +141,12 @@ revno.h: Makefile.in
 	    revno="${NOW}"; \
 	  fi; \
 	else \
-	  if test -d $(srcdir)/.git; then \
+	  if test -d $(top_srcdir)/.git; then \
             status=`which git 2>&1 | grep -c " no git"`; \
             if test x"$${status}" = x"0"; then \
               echo "Generating revno.h"; \
               $(RM) -f revno.h; \
-              revno="`(cd $(srcdir) && git describe --tags | cut -d '-' -f 2-3 | tr a- a.)`"; \
+              revno="`(cd $(top_srcdir) && git describe --tags | cut -d '-' -f 2-3 | tr a- a.)`"; \
               nick="`basename $(top_srcdir) | tr a_ a.`"; \
 	    fi; \
           else \
@@ -155,8 +154,8 @@ revno.h: Makefile.in
             nick="none"; \
 	  fi; \
 	fi; \
-	echo "static const char *BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
-	echo "static const char *BRANCH_NICK = \"$${nick}\";" >> revno.h;
+	echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
+	echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h;
 
 # The branch nickname and revision number must be set before including
 # the other Makefile fragments used for package building, as they use

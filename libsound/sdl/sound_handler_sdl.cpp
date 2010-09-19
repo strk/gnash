@@ -25,12 +25,14 @@
 #include "SoundInfo.h"
 #include "EmbedSound.h"
 #include "AuxStream.h" // for use..
+#include "GnashSleep.h"
 
 #include "log.h" // will import boost::format too
 #include "GnashException.h" // for SoundException
 
 #include <vector>
 #include <boost/scoped_array.hpp>
+#include <boost/cstdint.hpp>
 #include <SDL.h>
 
 // Define this to get debugging call about pausing/unpausing audio
@@ -45,23 +47,23 @@ namespace { // anonymous
 // http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
 typedef struct{
      char rID[4];            // 'RIFF'
-     long int rLen;        
+     boost::uint32_t rLen;        
      char wID[4];            // 'WAVE'
      char fId[4];            // 'fmt '
-     long int pcm_header_len;   // varies...
-     short int wFormatTag;
-     short int nChannels;      // 1,2 for stereo data is (l,r) pairs
-     long int nSamplesPerSec;
-     long int nAvgBytesPerSec;
-     short int nBlockAlign;      
-     short int nBitsPerSample;
+     boost::uint32_t pcm_header_len;   // varies...
+     boost::int16_t wFormatTag;
+     boost::int16_t nChannels;      // 1,2 for stereo data is (l,r) pairs
+     boost::uint32_t nSamplesPerSec;
+     boost::uint32_t nAvgBytesPerSec;
+     boost::int16_t nBlockAlign;      
+     boost::int16_t nBitsPerSample;
 } WAV_HDR;
 
 // Chunk of wave file
 // http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
 typedef struct{
     char dId[4];            // 'data' or 'fact'
-    long int dLen;
+    boost::uint32_t dLen;
 } CHUNK_HDR;
 
 } // end of anonymous namespace
@@ -77,8 +79,15 @@ SDL_sound_handler::initAudio()
     //       of throwing an exception on error (unavailable audio
     //       card). Normally we'd want to open the audio card only
     //       when needed (it has a cost in number of wakeups).
-    //
     openAudio();
+
+#ifdef WIN32
+    // SDL can hang on windows if SDL_CloseAudio() is called immediately
+    // after SDL_OpenAudio(). It's evidently to do with threading, but
+    // internal to SDL. This is a tacky solution, but it's only windows.
+    gnashSleep(1);
+#endif
+
     closeAudio();
 
 }
@@ -86,7 +95,7 @@ SDL_sound_handler::initAudio()
 void
 SDL_sound_handler::openAudio()
 {
-    if ( _audioOpened ) return; // nothing to do
+    if (_audioOpened) return; // nothing to do
 
     // This is our sound settings
     audioSpec.freq = 44100;
@@ -105,9 +114,8 @@ SDL_sound_handler::openAudio()
     //512 - not enough for  videostream
     audioSpec.samples = 2048;   
 
-    if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
-            boost::format fmt = boost::format(
-                _("Unable to open SDL audio: %s"))
+    if (SDL_OpenAudio(&audioSpec, NULL) < 0) {
+            boost::format fmt = boost::format(_("Couldn't open SDL audio: %s"))
                 % SDL_GetError();
         throw SoundException(fmt.str());
     }
@@ -132,14 +140,15 @@ SDL_sound_handler::SDL_sound_handler(media::MediaHandler* m,
 
     initAudio();
 
-    if (! wavefile.empty() ) {
+    if (!wavefile.empty()) {
         file_stream.open(wavefile.c_str());
         if (file_stream.fail()) {
             std::cerr << "Unable to write file '" << wavefile << std::endl;
-            exit(EXIT_FAILURE);
-        } else {
-                write_wave_header(file_stream);
-                std::cout << "# Created 44100 16Mhz stereo wave file:" << std::endl <<
+            std::exit(EXIT_FAILURE);
+        } 
+        else {
+            write_wave_header(file_stream);
+            std::cout << "# Created 44100 16Mhz stereo wave file:\n" <<
                     "AUDIOFILE=" << wavefile << std::endl;
         }
     }
@@ -341,16 +350,15 @@ SDL_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 
 // Callback invoked by the SDL audio thread.
 void
-SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *buf, int bufLenIn)
+SDL_sound_handler::sdl_audio_callback(void *udata, Uint8 *buf, int bufLenIn)
 {
-    if ( bufLenIn < 0 )
-    {
-        log_error(_("Negative buffer length in sdl_audio_callback (%d)"), bufLenIn);
+    if (bufLenIn < 0) {
+        log_error(_("Negative buffer length in sdl_audio_callback (%d)"),
+                bufLenIn);
         return;
     }
 
-    if ( bufLenIn == 0 )
-    {
+    if (bufLenIn == 0) {
         log_error(_("Zero buffer length in sdl_audio_callback"));
         return;
     }
@@ -424,15 +432,13 @@ void
 SDL_sound_handler::pause() 
 {
     closeAudio();
-
     sound_handler::pause();
 }
 
 void
 SDL_sound_handler::unpause() 
 {
-    if ( hasInputStreams() )
-    {
+    if (hasInputStreams()) {
         openAudio();
         SDL_PauseAudio(0);
     }

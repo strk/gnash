@@ -65,7 +65,7 @@ public:
     
 private:
     
-    /// Convert FLASH codec id to FFMPEG codec id
+    /// Convert CODEC_TYPE_FLASH codec id to FFMPEG codec id
     //
     /// @return CODEC_ID_NONE for unsupported flash codecs
     ///

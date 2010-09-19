@@ -21,6 +21,7 @@
 #define BACKEND_RENDER_HANDLER_AGG_H
 
 #include "dsodefs.h"
+#include "Renderer.h"
 
 namespace gnash {
 

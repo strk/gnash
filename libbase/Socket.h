@@ -123,7 +123,7 @@ private:
     mutable bool _connected;
 
     /// A cache for received data.
-    boost::uint8_t _cache[16384];
+    char _cache[16384];
 
     /// The socket ID.
     int _socket;

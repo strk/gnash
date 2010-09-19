@@ -21,14 +21,11 @@
 #ifndef GNASH_RGBA_H
 #define GNASH_RGBA_H
 
-#include "SWF.h"
-
 #include <string>
 #include <boost/cstdint.hpp> 
 
-namespace gnash {
-    class SWFStream;
-}
+#include "dsodefs.h"
+#include "SWF.h"
 
 namespace gnash {
 
@@ -36,7 +33,7 @@ namespace gnash {
 //
 /// This both represents a SWF RGBA record and is a basic Gnash type for
 /// color values.
-class rgba
+class DSOEXPORT rgba
 {
 public:
 
@@ -135,15 +132,6 @@ public:
 
 std::ostream& operator<< (std::ostream& os, const rgba& r);
 
-/// Initialize from input stream (reads RGBA)
-//
-/// Throw a ParserException if there's no enough bytes in the
-/// currently opened tag for reading. See SWFStream::ensureBytes()
-rgba readRGBA(SWFStream& in);
-
-/// Initialize from intput stream (reads RGB)
-rgba readRGB(SWFStream& in);
-    
 /// Create an RGBA value from a hex string (e.g. FF0000)
 //
 /// @param color    A hex string in 'rrbbgg' format. This must contain only

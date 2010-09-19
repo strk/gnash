@@ -20,8 +20,10 @@
 #ifndef GNASH_VAAPISURFACE_H
 #define GNASH_VAAPISURFACE_H
 
-#include "vaapi_common.h"
 #include <vector>
+
+#include "vaapi_common.h"
+#include "dsodefs.h"
 
 namespace gnash {
 
@@ -62,7 +64,8 @@ public:
 };
 
 /// VA surface abstraction
-class VaapiSurface {
+class DSOEXPORT VaapiSurface
+{
     std::auto_ptr<VaapiSurfaceImplBase> _impl;
     std::vector< boost::shared_ptr<VaapiSubpicture> > _subpictures;
 

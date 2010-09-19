@@ -120,7 +120,7 @@ CRcInitFile::loadFiles()
 ///
 /// @param filespec The path and file name of the disk file to parse.
 ///
-/// @return True if the file was parsed sucessfully, false if not.
+/// @return True if the file was parsed successfully, false if not.
 bool
 CRcInitFile::parseFile(const std::string& filespec)
 {

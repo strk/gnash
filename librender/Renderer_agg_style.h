@@ -474,16 +474,11 @@ public:
     void addFocalGradient(const GradientFill& fs, const SWFMatrix& mat,
             const SWFCxForm& cx)
     {
-        // move the center of the radial fill to where it should be
-        SWFMatrix transl;
-        transl.set_translation(-32, -32);
-        transl.concatenate(mat);    
-
         typename T::GradientType gr;
         gr.init(32.0, fs.focalPoint() * 32.0, 0.0);
         
         // div 2 because we need radius, not diameter      
-        typename T::Type* st = new typename T::Type(fs, transl, cx, 64/2, gr); 
+        typename T::Type* st = new typename T::Type(fs, mat, cx, 32.0, gr); 
         
         // NOTE: The value 64 is based on the bitmap texture used by other
         // Gnash renderers which is normally 64x64 pixels for radial gradients.
@@ -494,13 +489,9 @@ public:
     void addRadialGradient(const GradientFill& fs, const SWFMatrix& mat,
             const SWFCxForm& cx)
     {
-        // move the center of the radial fill to where it should be
-        SWFMatrix transl;
-        transl.set_translation(-32, -32);
-        transl.concatenate(mat);    
 
         // div 2 because we need radius, not diameter      
-        typename T::Type* st = new typename T::Type(fs, transl, cx, 64 / 2); 
+        typename T::Type* st = new typename T::Type(fs, mat, cx, 64 / 2); 
           
         // NOTE: The value 64 is based on the bitmap texture used by other
         // Gnash renderers which is normally 64x64 pixels for radial gradients.

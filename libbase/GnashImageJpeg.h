@@ -23,14 +23,10 @@
 #ifndef GNASH_IMAGE_JPEG_H
 #define GNASH_IMAGE_JPEG_H
 
+#include <csetjmp>
+
 #include "dsodefs.h"
-#include <csetjmp> // for jmp_buf
 #include "GnashImage.h"
-
-
-/// \brief A namespace solely for avoiding name 
-/// conflicts with other external headers.
-namespace jpeg {
 
 // jpeglib.h redefines HAVE_STDLIB_H. This silences
 // the warnings, but it's not good.
@@ -39,8 +35,6 @@ extern "C" {
 #include <jpeglib.h>
 }
 #undef HAVE_STDLIB_H
-
-}
 
 // Forward declarations
 namespace gnash { class IOChannel; }
@@ -61,8 +55,8 @@ private:
     std::jmp_buf _jmpBuf;
 
     // State needed for input.
-    jpeg::jpeg_decompress_struct m_cinfo;
-    jpeg::jpeg_error_mgr m_jerr;
+    jpeg_decompress_struct m_cinfo;
+    jpeg_error_mgr m_jerr;
 
     bool _compressorOpened;
 
@@ -133,7 +127,7 @@ public:
 
     /// \brief
     /// For reading SWF JPEG2-style image data, using pre-loaded
-    /// headers stored in the given jpeg::input object.
+    /// headers stored in the given JpegInput object.
     //
     /// @param loader   The JpegInput object to use for reading the
     ///                 data. This should have been constructed with
@@ -200,8 +194,8 @@ public:
     
 private:
 
-    jpeg::jpeg_compress_struct m_cinfo;
-    jpeg::jpeg_error_mgr m_jerr;
+    jpeg_compress_struct m_cinfo;
+    jpeg_error_mgr m_jerr;
     
 };
 

@@ -48,6 +48,7 @@ libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
 	BitmapMovieDefinition.cpp \
 	SWFParser.cpp \
+	TypesParser.cpp \
 	SWFMovieDefinition.cpp \
 	sound_definition.cpp \
 	sprite_definition.cpp
@@ -57,6 +58,7 @@ noinst_HEADERS = \
 	BitmapMovieDefinition.h \
 	movie_definition.h \
 	SWFParser.h \
+	TypesParser.h \
 	SWFMovieDefinition.h \
 	sound_definition.h \
 	sprite_definition.h

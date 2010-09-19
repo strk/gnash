@@ -1163,8 +1163,8 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
   use_libva=no
   use_libva_x11=no
   use_libva_glx=no
-  dnl if the version of ffmpeg is recent enough, (r20957, 52.45.0), then
-  dnl look for VAAPI support so we can use use the VAAPI enabled ffmpeg.
+  dnl if the version of FFmpeg is recent enough, (r20957, 52.45.0), then
+  dnl look for VAAPI support so we can use use the VAAPI enabled FFmpeg.
   if test x"${have_ffmpeg_vaapi}" = xyes; then
     use_libva=yes
     GNASH_PKG_FIND([libva],
@@ -1199,7 +1199,7 @@ dnl generate better error handling if it's not found.
 AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
 AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
 
-dnl Only build the vaapi support if we have a version of ffmpeg that
+dnl Only build the vaapi support if we have a version of FFmpeg that
 dnl supports it.
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${found_libva_incl}" = xyes; then
   build_vaapi=yes
@@ -1211,11 +1211,11 @@ else
   nhwaccel=1
 fi
 
-dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
-dnl restrict using HW Accel to using ffmpeg directly.
+dnl Until the hwaccel patches in FFmpeg wind up in the ffmpeg-plugin,
+dnl restrict using HW Accel to using FFmpeg directly.
 dnl test xyes = xyes -a ( x != xyes -o x != xyes )
 if test x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg}" != x"yes"; then
-  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
+  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using FFmpeg."])
 fi
 
 AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
@@ -2480,7 +2480,7 @@ if test x"$build_media_gst" = "xyes"; then
   fi
   if test "x$GST_INSPECT" != "x" -a x"${darwin}" = xno ; then
     dnl FIXME: there may be multiple acceptable plugins that are acceptable for
-    dnl our use. For example, mad or ffmpeg will play mp3.
+    dnl our use. For example, mad or FFmpeg will play mp3.
     codecs="ffdec_flv ffdec_flashsv ffdec_vp6f ffdec_flashsv mad vorbisdec ffdec_vp6"
     for i in $codecs; do
        hits="`$GST_INSPECT $i | grep -c 'Long name'`"
@@ -3306,9 +3306,9 @@ fi
 
   if test x"${build_media_ffmpeg}" = x"yes"; then
     if test x"$FFMPEG_LIBS" != x; then
-      echo "        MP3 and video support enabled through ffmpeg"
+      echo "        MP3 and video support enabled through FFmpeg"
       if test x"${ffmpeg_version_check}" != xok; then
-        echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed," >&3
+        echo "        ERROR: You have version ${ffmpeg_version} of FFmpeg installed," >&3
         if test x"${have_ffmpeg_swscale}" = "xno"; then
           echo "               with no swscale enabled." >&3
         else
@@ -3320,24 +3320,24 @@ fi
         echo "               or .deb users: apt-get install libswscale-dev" >&3
       else
 	if test x"${avformat_h}" = x; then
-          echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >&3
-          echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >&3
+          echo "        ERROR: FFmpeg's libavcodec header is installed but not libavformat." >&3
+          echo "               You can install FFmpeg from http://ffmpeg.org" >&3
           echo "               or .deb users: apt-get install libavformat-dev" >&3
           echo "               or YaST users: yast -i libavformat-api (but currently installs into /usr/lib64)" >&3
           echo "               or explicitly set the path using --with-ffmpeg-incl=" >&5
           echo "               or reconfigure with --enable-media=gst" >&3
 	else
           if test x"$FFMPEG_CFLAGS" != x; then
-            echo "        FFMPEG flags are: $FFMPEG_CFLAGS"
+            echo "        FFmpeg flags are: $FFMPEG_CFLAGS"
           else
-            echo "        FFMPEG flags are: default include path"
+            echo "        FFmpeg flags are: default include path"
           fi
-          echo "        FFMPEG libs are: $FFMPEG_LIBS"
+          echo "        FFmpeg libs are: $FFMPEG_LIBS"
 	fi
       fi
     else
-      echo "        ERROR: No FFMPEG development package installed!" >&3
-      echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >&3
+      echo "        ERROR: No FFmpeg development package installed!" >&3
+      echo "               You can install FFmpeg from http://ffmpeg.org" >&3
       echo "               or .deb users: apt-get install libavformat-dev" >&3
       echo "               or .rpm users: yum install ffmpeg-devel" >&3
       echo "               or reconfigure with --enable-media=gst" >&3

@@ -20,9 +20,11 @@
 #ifndef GNASH_VAAPISUBPICTURE_H
 #define GNASH_VAAPISUBPICTURE_H
 
+#include <vector>
+
 #include "vaapi_common.h"
 #include "VaapiImageFormat.h"
-#include <vector>
+#include "dsodefs.h"
 
 namespace gnash {
 
@@ -30,7 +32,8 @@ namespace gnash {
 class VaapiImage;
 
 /// VA subpicture abstraction
-class VaapiSubpicture {
+class DSOEXPORT VaapiSubpicture
+{
     boost::shared_ptr<VaapiImage>       _image;
     VASubpictureID                      _subpicture;
 
