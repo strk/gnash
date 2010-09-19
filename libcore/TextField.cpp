@@ -1456,7 +1456,6 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     bool selfclosing = false;
                     bool complete = parseHTML(discard, attributes, it, e, selfclosing);
                     std::string s(discard.begin(), discard.end());
-                    s.assign(discard.begin(), discard.end());
 
                     std::map<std::string,std::string>::const_iterator attloc;
                     
