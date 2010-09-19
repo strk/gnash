@@ -8,6 +8,8 @@
 #include "tu_file.h"
 #include "log.h"
 
+#include <boost/format.hpp>
+#include <cerrno>
 #include <cstdio>
 #include "GnashFileUtilities.h"
 
@@ -61,9 +63,12 @@ tu_file::seek(std::streampos pos)
 void
 tu_file::go_to_end()
 {
-    std::streampos s = std::fseek(static_cast<FILE*>(m_data), 0, SEEK_END);
-    if (s != static_cast<std::streampos>(EOF)) {
-        throw IOException("Error while seeking to end");
+    int err = std::fseek(static_cast<FILE*>(m_data), 0, SEEK_END);
+    if (-1 == err ) {
+        boost::format fmt = boost::format(
+                    _("Error while seeking to end: %1%")
+                ) % strerror(errno);
+        throw IOException(fmt.str());
     }
 }
 
