@@ -52,6 +52,10 @@
 #endif // _WIN32
 
 #ifdef __amigaos4__
+#include <stdio.h> //for FILE * in tu_file.h
+#include <fcntl.h> //for fcntl in Socket.cpp
+#include <netdb.h> //for hostent in Socket.cpp
+#include <netinet/tcp.h> //for TCP_NODELAY in Socket.cpp
 #undef UNUSED //to avoid "already defined" messages
 #define SHUT_RDWR 0
 
