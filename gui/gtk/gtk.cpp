@@ -31,9 +31,6 @@
 #include "Renderer.h"
 #include "RunResources.h"
 #include "VM.h"
-#ifdef USE_LIRC
-#include "lirc.h"
-#endif
 #include "gnash.h" // Quality
 
 #include <iostream>
@@ -310,13 +307,6 @@ GtkGui::init(int argc, char **argv[])
 #endif
     gtk_widget_show(_window);
     
-#ifdef USE_LIRC
-    lirc = new Lirc();
-    if (!lirc->init("/dev/lircd")) {
-        log_debug(_("LIRC daemon not running"));
-    }
-#endif
-
 #ifdef BUILD_CANVAS
     _renderer = gnash_canvas_get_renderer(GNASH_CANVAS(_canvas));
 #else
