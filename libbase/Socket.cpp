@@ -33,6 +33,7 @@ namespace {
 #include "URL.h"
 #include "Socket.h"
 #include "log.h"
+#include "utility.h"
 #include "GnashAlgorithm.h"
 
 namespace gnash {
