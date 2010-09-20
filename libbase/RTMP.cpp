@@ -1264,9 +1264,12 @@ encodeInt32(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
 boost::uint32_t
 getUptime()
 {
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__amigaos4__)
     struct tms t;
     return times(&t) * 1000 / sysconf(_SC_CLK_TCK);
+#elif defined(__amigaos4__)
+    struct tms t;
+    return times(&t) * 1000 / 50;
 #else
     return std::clock() * 100 / CLOCKS_PER_SEC;   
 #endif
