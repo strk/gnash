@@ -1451,7 +1451,7 @@ getFramesLoaded(DisplayObject& o)
     // This property only applies to MovieClips.
     MovieClip* mc = dynamic_cast<MovieClip*>(&o);
     if (!mc) return as_value();
-    return as_value(mc->get_frame_count());
+    return as_value(mc->get_loaded_frames());
 }
 
 as_value
@@ -1460,7 +1460,7 @@ getTotalFrames(DisplayObject& o)
     // This property only applies to MovieClips.
     MovieClip* mc = dynamic_cast<MovieClip*>(&o);
     if (!mc) return as_value();
-    return as_value(mc->get_loaded_frames());
+    return as_value(mc->get_frame_count());
 }
 
 
