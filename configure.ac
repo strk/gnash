@@ -2784,8 +2784,8 @@ AC_SUBST(HWACCEL_CONFIG)
 
 dnl check for missing libraries and disable them.
 if test x"$BOOST_LIBS" != x; then
-  if test x"${extra_missing_libs}" != x; then
-    for i in ${extra_missing_libs}; do
+  if test x"${cygnal_missing_libs}" != x; then
+    for i in ${cygnal_missing_libs}; do
       if test $i = serialization; then
         AC_DEFINE([BOOST_MULTI_INDEX_DISABLE_SERIALIZATION], ["1"], [if the library is missing, don't use it.])
       fi
@@ -3539,32 +3539,31 @@ if test x$build_agg = xyes; then # {
 fi # }
 
 if test x"$BOOST_LIBS" != x; then
-    dnl Only cygnal requires date_time at present, so it's OK if either
-    dnl you don't want cygnal or do have date_time installed.
-    dnl if test x"$cygnal" = xno; then
 	echo "        BOOST flags are: $BOOST_CFLAGS"
 	echo "        BOOST libs are: $BOOST_LIBS"
-	echo "        BOOST Extra libs are: $BOOST_EXTRA_LIBS"
+	echo "        BOOST libs for cygnal are: $BOOST_CYGNAL_LIBS"
     dnl fi
     if test x"${missing_headers}" != x; then
       for i in ${missing_headers}; do
-	# They have some boost libs but no date_time and want to compile cygnal.
 	echo "        ERROR: The BOOST $i header file is needed!" >&3
 	echo "               Install it from http://boost.org" >&3
 	echo "               or from a Boost development package" >&3
       done
     fi
-    if test x"${extra_missing_libs}" != x; then
-      for i in ${extra_missing_libs}; do
-	echo "        WARNING: The BOOST $i library is recommended!" >&4
-        echo "                 Install it from http://www.boost.org" >&4
-        echo "                 or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
-        echo "                 Gnash will compile anyway, but not all tests will work." >&4
-      done
+
+    if test x"${cygnal}" = x"yes"; then
+        if test x"${cygnal_missing_libs}" != x; then
+          for i in ${cygnal_missing_libs}; do
+            echo "          ERROR: The BOOST $i library is required for cygnal!" >&4
+            echo "                 Either configure with --disable-cygnal or" >&4
+            echo "                 install it from http://www.boost.org" >&4
+            echo "                 or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
+          done
+        fi
     fi
+
     if test x"${missing_libs}" != x; then
       for i in ${missing_libs}; do
-	# They have some boost libs but no date_time and want to compile cygnal.
 	echo "        ERROR: The BOOST $i library is needed!" >&3
 	echo "               Install it from http://boost.org" >&3
 	echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&3
