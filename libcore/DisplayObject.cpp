@@ -64,8 +64,8 @@ namespace {
     typedef void(*Setter)(DisplayObject&, const as_value&);
     typedef std::map<string_table::key, Setter> Setters;
 
-    const Getters displayObjectGetters();
-    const Setters displayObjectSetters();
+    const Getters& displayObjectGetters();
+    const Setters& displayObjectSetters();
 
     bool doSet(string_table::key prop, DisplayObject& o, const as_value& val);
     bool doGet(string_table::key prop, DisplayObject& o, as_value& val);
@@ -1545,7 +1545,7 @@ doSet(string_table::key prop, DisplayObject& o, const as_value& val)
     return true;
 }
 
-const Getters
+const Getters&
 displayObjectGetters()
 {
     static const Getters getters = boost::assign::map_list_of
@@ -1575,7 +1575,7 @@ displayObjectGetters()
     return getters;
 }
 
-const Setters
+const Setters&
 displayObjectSetters()
 {
     const Setter n = 0;
