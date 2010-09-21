@@ -150,12 +150,14 @@ SharedMem::attach()
 
     // First get semaphore.
     
+#ifndef __amigaos4__
     // Struct for semctl
     union semun {
         int val;
         struct semi_ds* buf;
         unsigned short* array;
     };
+#endif
 
     // Check if it exists already.
     _semid = semget(_shmkey, 1, 0600);
