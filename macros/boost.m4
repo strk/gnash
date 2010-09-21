@@ -27,7 +27,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   gnash_boost_libdir=""
   missing_headers=""
   missing_libs=""
-  extra_missing_libs=""
+  cygnal_missing_libs=""
   gcc_version=""
   dirname=""
   libname=""
@@ -36,12 +36,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
   boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp"
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
-  boost_libs="thread date_time"
+  boost_libs="thread"
 
   dnl this is a list of *recommended* libraries. If any of these are missing, this
   dnl test will return a warning, and Gnash will build, but testing won't work.
-  extra_boost_libs="serialization"
-#  extra_boost_libs="unit_test_framework"
+  cygnal_boost_libs="serialization date_time"
 
   dnl this is the default list for paths to search. This gets
   dnl redefined if --with-boost-incl= is specified.
@@ -145,19 +144,19 @@ AC_DEFUN([GNASH_PATH_BOOST],
         fi
       done
     done
-    for j in ${extra_boost_libs}; do
+    for j in ${cygnal_boost_libs}; do
       dirs="`ls -dr ${dirname}/libboost_${j}*.${shlibext} ${dirname}/libboost_${j}*.a 2>/dev/null`"
       if test -n "${dirs}"; then
           libname="`echo ${dirs} | sed -e 's:^.*/lib::' -e "s:\.${shlibext}::" -e "s:\.a::"`"
-        ac_cv_path_boost_extra_lib="${ac_cv_path_boost_extra_lib} -l${libname}"
+        ac_cv_path_boost_cygnal_lib="${ac_cv_path_boost_cygnal_lib} -l${libname}"
       else
-        extra_missing_libs="${extra_missing_libs} $j"
+        cygnal_missing_libs="${cygnal_missing_libs} $j"
       fi
     done
   fi
 
   if test x"${missing_libs}" != x ; then
-    AC_MSG_WARN([Libraries ${missing_libs} ${extra_missing_libs} aren't installed ])
+    AC_MSG_WARN([Libraries ${missing_libs} ${cygnal_missing_libs} aren't installed ])
   fi
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
 
@@ -169,8 +168,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
     BOOST_LIBS="$ac_cv_path_boost_lib"
   fi
 
-  if test x"${ac_cv_path_boost_extra_lib}" != x; then
-    BOOST_EXTRA_LIBS="$ac_cv_path_boost_extra_lib" 
+  if test x"${ac_cv_path_boost_cygnal_lib}" != x; then
+    BOOST_CYGNAL_LIBS="$ac_cv_path_boost_cygnal_lib" 
   fi
 
   dnl ------------------------------------------------------------------
@@ -179,7 +178,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   AC_SUBST(BOOST_CFLAGS)
   AC_SUBST(BOOST_LIBS)
-  AC_SUBST(BOOST_EXTRA_LIBS)
+  AC_SUBST(BOOST_CYGNAL_LIBS)
 
   dnl This isn't right: you don't need boot date-time installed unless u build
   dnl cygnal, and it is sometimes a separate package from Boost core and thread.
