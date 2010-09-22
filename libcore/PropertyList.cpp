@@ -72,7 +72,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		// create a new member
 		Property a(uri, val, flagsIfMissing);
 		// Non slot properties are negative ordering in insertion order
-		_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+		_props.push_back(std::make_pair(a, uri.noCase(st)));
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("Simple AS property %s inserted with flags %s",
@@ -199,7 +199,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 		// copy flags from previous member (even if it's a normal member ?)
 		a.setFlags(found->first.getFlags());
 		a.setCache(found->first.getCache());
-		_props.replace(found, std::make_pair(a, st.noCase(uri.name)));
+		_props.replace(found, std::make_pair(a, uri.noCase(st)));
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -211,7 +211,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 	else
 	{
 		a.setCache(cacheVal);
-		_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+		_props.push_back(std::make_pair(a, uri.noCase(st)));
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("AS GetterSetter %s inserted with flags %s", l(uri),
@@ -234,7 +234,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 	{
 		// copy flags from previous member (even if it's a normal member ?)
 		a.setFlags(found->first.getFlags());
-		_props.replace(found, std::make_pair(a, st.noCase(uri.name)));
+		_props.replace(found, std::make_pair(a, uri.noCase(st)));
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -245,7 +245,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 	}
 	else
 	{
-		_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+		_props.push_back(std::make_pair(a, uri.noCase(st)));
 #ifdef GNASH_DEBUG_PROPERTY
 		string_table& st = getStringTable(_owner);
 		log_debug("Native GetterSetter %s in namespace %s inserted with "
@@ -273,7 +273,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 	Property a(uri, &getter, (as_function*)0, flagsIfMissing, true);
 
     string_table& st = getStringTable(_owner);
-	_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+	_props.push_back(std::make_pair(a, uri.noCase(st)));
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
@@ -294,7 +294,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri,
 	// destructive getter don't need a setter
 	Property a(uri, getter, (as_c_function_ptr)0, flagsIfMissing, true);
     string_table& st = getStringTable(_owner);
-	_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+	_props.push_back(std::make_pair(a, uri.noCase(st)));
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
