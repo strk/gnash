@@ -20,10 +20,18 @@ struct ObjectURI
     /// Construct an ObjectURI from name and namespace.
     ObjectURI(string_table::key name)
         :
-        name(name)
+        name(name),
+        nameNoCase(0)
     {}
 
+    string_table::key noCase(string_table& st) const {
+        if ( ! nameNoCase ) nameNoCase = st.noCase(name);
+        return nameNoCase;
+    }
+
     string_table::key name;
+
+    mutable string_table::key nameNoCase;
 };
 
 /// ObjectURIs are equal if name is equal
