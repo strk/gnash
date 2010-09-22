@@ -5,6 +5,7 @@
 #include "string_table.h"
 #include <string>
 #include <ostream>
+#include <sstream>
 
 #define GNASH_DEBUG_OBJECT_URI_NOCASE 1
 
@@ -127,6 +128,18 @@ public:
         const string_table::key name = getName(uri);
         return _st.value(name);
     }
+
+    std::string debug(const ObjectURI& uri) const {
+        std::stringstream ss;
+        const string_table::key name = getName(uri);
+        const string_table::key nameNoCase = uri.noCase(_st);
+        ss << _st.value(name)
+           << "(" << name << ")/"
+           << _st.value(nameNoCase)
+           << "(" << nameNoCase << ")";
+        return ss.str();
+    }
+
 private:
     string_table& _st;
 };
