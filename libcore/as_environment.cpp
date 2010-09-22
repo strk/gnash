@@ -109,11 +109,11 @@ setLocal(as_object& locals, const std::string& varname, const as_value& val)
 }
 
 as_object*
-getElement(as_object* obj, string_table::key key)
+getElement(as_object* obj, const ObjectURI& uri)
 {
     DisplayObject* d = obj->displayObject();
-    if (d) return d->pathElement(key);
-    return obj->get_path_element(key);
+    if (d) return d->pathElement(uri);
+    return obj->get_path_element(uri);
 }
 
 }
@@ -483,7 +483,6 @@ as_object*
 as_environment::find_object(const std::string& path,
         const ScopeStack* scopeStack) const
 {
-
     if (path.empty()) {
         return getObject(m_target);
     }
@@ -491,6 +490,7 @@ as_environment::find_object(const std::string& path,
     VM& vm = _vm;
     string_table& st = vm.getStringTable();
     const int swfVersion = vm.getSWFVersion();
+    ObjectURI globalURI(NSV::PROP_uGLOBAL);
 
     bool firstElementParsed = false;
     bool dot_allowed = true;
@@ -577,7 +577,7 @@ as_environment::find_object(const std::string& path,
         // No more components to scan
         if (subpart.empty()) break;
 
-        const string_table::key subpartKey = st.find(subpart);
+        const ObjectURI subpartURI(st.find(subpart));
 
         if (!firstElementParsed) {
             as_object* element(0);
@@ -588,7 +588,7 @@ as_environment::find_object(const std::string& path,
                     for (size_t i = scopeStack->size(); i > 0; --i) {
                         as_object* obj = (*scopeStack)[i-1];
                         
-                        element = getElement(obj, subpartKey);
+                        element = getElement(obj, subpartURI);
                         if (element) break;
                     }
                     if (element) break;
@@ -597,7 +597,7 @@ as_environment::find_object(const std::string& path,
                 // Try current target  (if any)
                 assert(env == getObject(m_target));
                 if (env) {
-                    element = getElement(env, subpartKey);
+                    element = getElement(env, subpartURI);
                     if (element) break;
                 }
 
@@ -606,13 +606,13 @@ as_environment::find_object(const std::string& path,
                 const bool nocase = caseless(*global);
 
                 if (swfVersion > 5 &&
-                        equal(st, subpartKey, NSV::PROP_uGLOBAL, nocase)) {
+                        equals(st, subpartURI, globalURI, nocase)) {
                     element = global;
                     break;
                 }
 
                 // Look for globals.
-                element = getElement(global, subpartKey);
+                element = getElement(global, subpartURI);
 
             } while (0);
 
@@ -636,7 +636,7 @@ as_environment::find_object(const std::string& path,
                     "%p"), subpart, (void *)env);
 #endif
 
-            as_object* element = getElement(env, subpartKey);
+            as_object* element = getElement(env, subpartURI);
             if (!element) {
 #ifdef DEBUG_TARGET_FINDING 
                 log_debug(_("Path element %s not found in "

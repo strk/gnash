@@ -471,7 +471,7 @@ public:
     ///
     /// Main use if for getvariable and settarget resolution,
     /// currently implemented in as_environment.
-    virtual as_object* get_path_element(string_table::key key);
+    virtual as_object* get_path_element(const ObjectURI& uri);
 
     /// Get the super object of this object.
     ///

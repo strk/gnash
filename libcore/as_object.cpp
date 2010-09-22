@@ -979,22 +979,22 @@ as_object::getMember(const ObjectURI& uri)
 }
 
 as_object*
-as_object::get_path_element(string_table::key key)
+as_object::get_path_element(const ObjectURI& uri)
 {
 //#define DEBUG_TARGET_FINDING 1
 
     as_value tmp;
-    if (!get_member(key, &tmp)) {
+    if (!get_member(uri, &tmp)) {
 #ifdef DEBUG_TARGET_FINDING 
         log_debug("Member %s not found in object %p",
-                  getStringTable(*this).value(key), (void*)this);
+                  uri.toString(getStringTable(*this)), (void*)this);
 #endif
         return NULL;
     }
     if (!tmp.is_object()) {
 #ifdef DEBUG_TARGET_FINDING 
         log_debug("Member %s of object %p is not an object (%s)",
-                  getStringTable(*this).value(key), (void*)this, tmp);
+                  uri.toString(getStringTable(*this)), (void*)this, tmp);
 #endif
         return NULL;
     }

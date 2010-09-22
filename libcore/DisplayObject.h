@@ -558,7 +558,7 @@ public:
     /// In ActionScript 1.0, everything seems to be CASE
     /// INSENSITIVE.
     ///
-    virtual as_object* pathElement(string_table::key key);
+    virtual as_object* pathElement(const ObjectURI& uri);
 
     /// \brief
     /// Return true if PlaceObjects tag are allowed to move

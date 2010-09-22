@@ -162,17 +162,22 @@ DisplayObject::getWorldVolume() const
 
 
 as_object*
-DisplayObject::pathElement(string_table::key key)
+DisplayObject::pathElement(const ObjectURI& uri)
 {
     as_object* obj = getObject(this);
     if (!obj) return 0;
 
+    string_table::key key = getName(uri);
+
     string_table& st = stage().getVM().getStringTable();
+
+    // TODO: put ".." and "." in namedStrings
     if (key == st.find("..")) return getObject(parent());
 	if (key == st.find(".")) return obj;
     
     // The check is case-insensitive for SWF6 and below.
-    if (equal(st, key, NSV::PROP_THIS, caseless(*obj))) {
+    // TODO: cache ObjectURI(NSV::PROP_THIS) [as many others...]
+    if (equals(st, uri, ObjectURI(NSV::PROP_THIS), caseless(*obj))) {
         return obj;
     }
 	return 0;

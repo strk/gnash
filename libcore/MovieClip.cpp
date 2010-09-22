@@ -694,13 +694,13 @@ MovieClip::notifyEvent(const event_id& id)
 }
 
 as_object*
-MovieClip::pathElement(string_table::key key)
+MovieClip::pathElement(const ObjectURI& uri)
 {
-    as_object* obj = DisplayObject::pathElement(key);
+    as_object* obj = DisplayObject::pathElement(uri);
     if (obj) return obj;
 
     // See if we have a match on the display list.
-    obj = getObject(getDisplayListObject(key));
+    obj = getObject(getDisplayListObject(uri));
     if (obj) return obj;
 
     obj = getObject(this);
@@ -708,7 +708,7 @@ MovieClip::pathElement(string_table::key key)
 
     // See if it's a member
     as_value tmp;
-    if (!obj->as_object::get_member(key, &tmp)) {
+    if (!obj->as_object::get_member(uri, &tmp)) {
         return NULL;
     }
     if (!tmp.is_object()) {

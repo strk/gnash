@@ -465,7 +465,7 @@ public:
     DisplayObject* getDisplayListObject(const ObjectURI& uri);
 
     /// Overridden to look in DisplayList for a match
-    as_object* pathElement(string_table::key key);
+    as_object* pathElement(const ObjectURI& uri);
 
     /// Execute the actions for the specified frame. 
     //
