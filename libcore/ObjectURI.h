@@ -91,18 +91,18 @@ equalsNoCase(string_table& st, const ObjectURI& a, const ObjectURI& b)
     return a.noCase(st) == b.noCase(st);
 }
 
-inline bool
-equals(string_table& st, const ObjectURI& a, const ObjectURI& b, bool caseless)
-{
-    if ( caseless ) return equalsNoCase(st, a, b);
-    else return a == b;
-}
-
 /// ObjectURIs are equal if name is equal
 inline bool
 operator==(const ObjectURI& a, const ObjectURI& b)
 {
     return a.name == b.name;
+}
+
+inline bool
+equals(string_table& st, const ObjectURI& a, const ObjectURI& b, bool caseless)
+{
+    if ( caseless ) return equalsNoCase(st, a, b);
+    else return a == b;
 }
 
 /// Comparator for ObjectURI so it can serve as a key in stdlib containers.
