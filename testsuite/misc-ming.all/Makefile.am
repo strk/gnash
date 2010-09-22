@@ -2087,6 +2087,16 @@ remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
 	sh $< $(top_builddir) remoting.swf > $@
 	chmod 755 $@
 
+case6.swf: $(srcdir)/case6.as Makefile ../actionscript.all/check.as
+	$(MAKESWF) -v6 -o $@ -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 -I$(srcdir)/../actionscript.all $(srcdir)/case6.as 
+
+case7.swf: $(srcdir)/case7.as Makefile ../actionscript.all/check.as
+	$(MAKESWF) -v7 -o $@ -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 -I$(srcdir)/../actionscript.all $(srcdir)/case7.as 
+
+caseTestRunner: $(srcdir)/../generic-testrunner.sh case6.swf case7.swf Makefile
+	sh $< -f10 -r10 -c '#total' $(top_builddir) case6.swf case7.swf > $@
+	chmod 755 $@
+
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/DragDropTest.as
 
