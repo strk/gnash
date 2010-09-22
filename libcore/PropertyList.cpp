@@ -53,7 +53,7 @@ iterator_find(const PropertyList::container& p, const ObjectURI& uri, VM& vm)
     }
         
     string_table& st = vm.getStringTable();
-    const string_table::key nocase = st.noCase(uri.name);
+    const string_table::key nocase = uri.noCase(st); 
     return p.project<0>(p.get<2>().find(nocase));
 }
 
