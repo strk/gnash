@@ -24,6 +24,7 @@
 #include "Renderer.h"
 #include "StringPredicates.h"
 #include "MovieClip.h"
+#include "ObjectURI.h"
 
 #include <typeinfo>
 #include <iostream>
