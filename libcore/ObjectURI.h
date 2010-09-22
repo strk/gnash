@@ -35,6 +35,13 @@ struct ObjectURI
         return (name == 0) ? 0 : this;
     }
 
+    const std::string&
+    toString(string_table& st) const
+    {
+        return st.value(name);
+    }
+
+
     string_table::key noCase(string_table& st) const {
         if ( ! nameNoCase ) nameNoCase = st.noCase(name);
         return nameNoCase;
