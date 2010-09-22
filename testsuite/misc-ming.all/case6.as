@@ -25,10 +25,19 @@ if ( this == _root ) {
 			check_equals(swf7.A, 'a');
 			check_equals(swf7.c, 'C');
 			check_equals(swf7.C, 'C');
-			totals(6);
+
+			check_equals(typeof(swf7.mca), 'movieclip');
+			check_equals(typeof(swf7.mcA), 'movieclip');
+
+			check_equals(typeof(swf7.mcb), 'movieclip');
+			check_equals(typeof(swf7.mcB), 'movieclip');
+
+			totals(10);
 		}
 	};
 } else {
+	createEmptyMovieClip("mcA", 3);
+	createEmptyMovieClip("mcb", 4);
 	a='a';
 	B='B';
 	c='c';

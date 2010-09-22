@@ -27,11 +27,20 @@ if ( this == _root ) {
 			check_equals(swf6.C, undefined); 
 			check_equals(swf6.d, undefined); 
 			check_equals(swf6.D, 'd'); 
-			totals(8);
+
+			check_equals(typeof(swf6.mca), 'undefined');
+			check_equals(typeof(swf6.mcA), 'movieclip');
+
+			check_equals(typeof(swf6.mcb), 'movieclip');
+			check_equals(typeof(swf6.mcB), 'undefined');
+
+			totals(12);
 		}
 	};
 
 } else {
+	createEmptyMovieClip("mcA", 3);
+	createEmptyMovieClip("mcb", 4);
 	a='a';
 	A='A';
 	B='B';
