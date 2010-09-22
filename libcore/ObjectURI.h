@@ -6,6 +6,12 @@
 #include <string>
 #include <ostream>
 
+#define GNASH_DEBUG_OBJECT_URI_NOCASE 1
+
+#ifdef GNASH_DEBUG_OBJECT_URI_NOCASE
+# include <iostream>
+#endif
+
 namespace gnash {
 
 /// A URI for describing as_objects.
@@ -42,8 +48,25 @@ struct ObjectURI
     }
 
 
+#ifdef GNASH_DEBUG_OBJECT_URI_NOCASE
+    struct Counter {
+        Counter(): count(0) {}
+        int count;
+        void operator++() { ++count; }
+        ~Counter () {
+            std::cerr << "Skipped " << count << " calls to noCase "<< std::endl;
+        }
+    };
+#endif
+
     string_table::key noCase(string_table& st) const {
+#ifdef GNASH_DEBUG_OBJECT_URI_NOCASE
+        static Counter skips;
+#endif
         if ( ! nameNoCase ) nameNoCase = st.noCase(name);
+#ifdef GNASH_DEBUG_OBJECT_URI_NOCASE
+        else ++skips;
+#endif
         return nameNoCase;
     }
 
