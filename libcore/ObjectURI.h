@@ -56,7 +56,8 @@ struct ObjectURI
         void skip() { ++skips; }
         void doit() { ++dos; }
         ~Counter () {
-            std::cerr << "Skipped " << skips << "/" << dos << " (" << (skips/dos)
+            std::cerr << "Skipped " << skips << "/" << (skips+dos)
+                << " (" << (double(skips)/double(skips+dos))
                 << ") calls to noCase "<< std::endl;
         }
     };
