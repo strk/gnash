@@ -247,6 +247,16 @@ public:
 	DisplayObject* getDisplayObjectAtDepth(int depth) const;
 
 	/// If there are multiples, returns the *first* match only!
+	//
+	/// @param st
+	///     The string_table to use for finding
+	///     lowercase equivalent of names if
+	///     `caseless' parameter is true.
+	/// @param name
+	///     Query string
+	/// @param caseless
+	///     Wheter comparison must be case-insensitive.
+	///
 	DisplayObject* getDisplayObjectByName(string_table& st,
             string_table::key name, bool caseless) const;
 
