@@ -133,7 +133,7 @@ public:
 private:
     string_table& _st;
     const bool _caseless;
-    const ObjectURI _name;
+    const ObjectURI& _name;
 };
 
 } // anonymous namespace
