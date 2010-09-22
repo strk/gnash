@@ -31,6 +31,7 @@
 #include <boost/cstdint.hpp> // For C99 int types
 #include <boost/noncopyable.hpp>
 
+#include "ObjectURI.h" // for composition
 #include "Transform.h"
 #include "event_id.h" 
 #include "SWFRect.h"
@@ -424,11 +425,11 @@ public:
     void setMask(DisplayObject* mask);
 
     /// Set DisplayObject name, initializing the original target member
-    void set_name(string_table::key name) {
-        _name = name;
+    void set_name(const ObjectURI& uri) {
+        _name = uri;
     }
 
-    string_table::key get_name() const { return _name; }
+    const ObjectURI& get_name() const { return _name; }
 
     /// Get the built-in function handlers code for the given event
     //
@@ -1002,7 +1003,7 @@ protected:
     void set_event_handlers(const Events& copyfrom);
 
     /// Name of this DisplayObject (if any)
-    string_table::key _name;
+    ObjectURI _name; 
 
     DisplayObject* _parent;
 

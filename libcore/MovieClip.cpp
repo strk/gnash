@@ -1640,7 +1640,7 @@ MovieClip::get_textfield_variable(const std::string& name)
 
 
 DisplayObject*
-MovieClip::getDisplayListObject(string_table::key key)
+MovieClip::getDisplayListObject(const ObjectURI& uri)
 {
 
     as_object* obj = getObject(this);
@@ -1649,7 +1649,7 @@ MovieClip::getDisplayListObject(string_table::key key)
     string_table& st = getStringTable(*obj);
 
     // Try items on our display list.
-    DisplayObject* ch = _displayList.getDisplayObjectByName(st, key,
+    DisplayObject* ch = _displayList.getDisplayObjectByName(st, uri,
             caseless(*obj));
 
     if (!ch) return 0;
@@ -1862,7 +1862,7 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
 
         // Copy own name
         // TODO: check empty != none...
-        const string_table::key name = get_name();
+        const ObjectURI& name = get_name();
         if (name) extern_movie->set_name(name);
 
         // Copy own clip depth (TODO: check this)
@@ -2048,14 +2048,14 @@ public:
         // Don't enumerate unloaded DisplayObjects
         if (ch->unloaded()) return;
         
-        string_table::key name = ch->get_name();
+        const ObjectURI& name = ch->get_name();
         // Don't enumerate unnamed DisplayObjects
         if (!name) return;
         
         // Referenceable DisplayObject always have an object.
         assert(getObject(ch));
         string_table& st = getStringTable(*getObject(ch));
-        _env.push(st.value(name));
+        _env.push(name.toString(st));
     }
 };
 

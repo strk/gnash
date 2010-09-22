@@ -106,11 +106,11 @@ private:
 class NameEquals
 {
 public:
-    NameEquals(string_table& st, string_table::key name, bool caseless)
+    NameEquals(string_table& st, const ObjectURI& uri, bool caseless)
         :
         _st(st),
         _caseless(caseless),
-        _name(caseless ? _st.noCase(name) : name)
+        _name(uri)
     {}
 
     bool operator() (const DisplayObject* item) {
@@ -123,17 +123,17 @@ public:
         // destroyed DisplayObjects in the DisplayList.
         if (item->isDestroyed()) return false;
         
-        const string_table::key itname =
-            _caseless ? _st.noCase(item->get_name()) : item->get_name();
-
-        return itname == _name;
-
+        if ( _caseless ) { 
+            return equalsNoCase(_st, item->get_name(), _name);
+        } else {
+            return item->get_name() ==  _name;
+        }
     }
 
 private:
     string_table& _st;
     const bool _caseless;
-    const string_table::key _name;
+    const ObjectURI _name;
 };
 
 } // anonymous namespace
@@ -183,7 +183,7 @@ DisplayList::getDisplayObjectAtDepth(int depth) const
 
 
 DisplayObject*
-DisplayList::getDisplayObjectByName(string_table& st, string_table::key name,
+DisplayList::getDisplayObjectByName(string_table& st, const ObjectURI& uri,
         bool caseless) const
 {
     testInvariant();
@@ -191,7 +191,7 @@ DisplayList::getDisplayObjectByName(string_table& st, string_table::key name,
     const container_type::const_iterator e = _charsByDepth.end();
 
     container_type::const_iterator it =
-        std::find_if(_charsByDepth.begin(), e, NameEquals(st, name, caseless));
+        std::find_if(_charsByDepth.begin(), e, NameEquals(st, uri, caseless));
 
     if (it == e) return 0;
     

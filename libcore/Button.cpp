@@ -227,14 +227,14 @@ private:
 namespace {
     void addInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
-        const string_table::key name = d->get_name();
+        const ObjectURI& name = d->get_name();
         if (!name) return;
         getObject(&b)->init_member(name, getObject(d), 0);
     }
 
     void removeInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
-        const string_table::key name = d->get_name();
+        const ObjectURI& name = d->get_name();
         if (!name) return;
         getObject(&b)->delProperty(name);
     }

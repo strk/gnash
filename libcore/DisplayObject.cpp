@@ -616,7 +616,7 @@ DisplayObject::getTargetPath() const
 			break;
 		}
 
-		path.push_back(st.value(ch->get_name()));
+		path.push_back(ch->get_name().toString(st));
 		ch = parent;
 	} 
 
@@ -684,7 +684,7 @@ DisplayObject::getTarget() const
 			break;
 		}
 
-		path.push_back(st.value(ch->get_name()));
+		path.push_back(ch->get_name().toString(st));
 		ch = parent;
 	} 
 
@@ -1366,7 +1366,7 @@ as_value
 getNameProperty(DisplayObject& o)
 {
     string_table& st = getStringTable(*getObject(&o));
-    const std::string& name = st.value(o.get_name());
+    const std::string& name = o.get_name().toString(st);
     if (getSWFVersion(*getObject(&o)) < 6 && name.empty()) return as_value(); 
     return as_value(name);
 }

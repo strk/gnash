@@ -459,10 +459,10 @@ public:
     /// MovieClip object. They take priority over DisplayObject magic
     /// properties and inherited properties, but not over own properties.
     //
-    /// @param name     The name of the object. This function handles
+    /// @param name     Object identifier. This function handles
     ///                 case-sensitivity.
     /// @return         The object if found, otherwise 0.
-    DisplayObject* getDisplayListObject(string_table::key name);
+    DisplayObject* getDisplayListObject(const ObjectURI& uri);
 
     /// Overridden to look in DisplayList for a match
     as_object* pathElement(string_table::key key);
