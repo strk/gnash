@@ -914,7 +914,7 @@ getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
 ///    way to do it, but as it is done like this, this must be called here.
 ///    It will cause an infinite recursion otherwise.
 bool
-getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
+getDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         as_value& val)
 {
     
@@ -922,7 +922,7 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     assert(o);
 
     string_table& st = getStringTable(*o);
-    const std::string& propname = st.value(key);
+    const std::string& propname = uri.toString(st);
 
     // Check _level0.._level9
     movie_root& mr = getRoot(*getObject(&obj));
@@ -938,19 +938,19 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     
     MovieClip* mc = dynamic_cast<MovieClip*>(&obj);
     if (mc) {
-        DisplayObject* ch = mc->getDisplayListObject(key);
+        DisplayObject* ch = mc->getDisplayListObject(uri);
         if (ch) {
            val = getObject(ch);
            return true;
         }
     }
 
-    const string_table::key noCaseKey = st.noCase(key);
+    const string_table::key noCaseKey = uri.noCase(st);
 
     // These properties have normal case-sensitivity.
     // They are tested to exist for TextField, MovieClip, and Button
     // but do not belong to the inheritance chain.
-    switch (caseless(*o) ? noCaseKey : key)
+    switch (caseless(*o) ? noCaseKey : getName(uri))
     {
         default:
             break;
@@ -971,19 +971,19 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
 
     // Check MovieClip such as TextField variables.
     // TODO: check if there's a better way to find these properties.
-    if (mc && mc->getTextFieldVariables(key, val)) return true;
+    if (mc && mc->getTextFieldVariables(uri, val)) return true;
 
     return false;
 }
     
 
 bool
-setDisplayObjectProperty(DisplayObject& obj, string_table::key key, 
+setDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         const as_value& val)
 {
     // These magic properties are case insensitive in all versions!
     string_table& st = getStringTable(*getObject(&obj));
-    return doSet(st.noCase(key), obj, val);
+    return doSet(uri.noCase(st), obj, val);
 }
     
 DisplayObject::MaskRenderer::MaskRenderer(Renderer& r, const DisplayObject& o)

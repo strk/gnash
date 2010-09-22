@@ -80,7 +80,7 @@ bool isReferenceable(const DisplayObject& d);
 /// @param obj      The DisplayObject whose property should be set
 /// @param val      An as_value representing the new value of the property.
 ///                 Some values may be rejected.
-bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
+bool setDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         const as_value& val);
 
 /// Get special properties
@@ -88,10 +88,10 @@ bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
 /// This gets the magic properties of DisplayObjects and handles special
 /// MovieClip properties such as DisplayList members.
 //
-/// @param key      The string table key of the property to get.
+/// @param key      The uri of the property to get.
 /// @param obj      The DisplayObject whose property should be got
 /// @param val      An as_value to be set to the value of the property.
-bool getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
+bool getDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         as_value& val);
 
 /// Get a property by its numeric index.
