@@ -716,6 +716,11 @@ DisplayList::dump() const
 {
     //testInvariant();
 
+    if ( _charsByDepth.empty() ) return;
+
+    string_table& st = getStringTable(*getObject(_charsByDepth.front()));
+    ObjectURI::Logger l(st);
+
     int num=0;
     for (const_iterator it = _charsByDepth.begin(),
             endIt = _charsByDepth.end(); it != endIt; ++it) {
@@ -723,7 +728,7 @@ DisplayList::dump() const
         const DisplayObject* dobj = *it;
         log_debug(_("Item %d(%s) at depth %d (char name %s, type %s)"
                     "Destroyed: %s, unloaded: %s"),
-            num, dobj, dobj->get_depth(), dobj->get_name(), typeName(*dobj),
+            num, dobj, dobj->get_depth(), l.debug(dobj->get_name()), typeName(*dobj),
             dobj->isDestroyed(), dobj->unloaded());
         num++;
     }
@@ -1108,12 +1113,18 @@ std::ostream&
 operator<< (std::ostream& os, const DisplayList& dl)
 {
     os << "By depth: ";
+
+    if ( dl._charsByDepth.empty() ) return os;
+
+    string_table& st = getStringTable(*getObject(dl._charsByDepth.front()));
+    ObjectURI::Logger l(st);
+
     for (DisplayList::const_iterator it = dl._charsByDepth.begin(),
             itEnd = dl._charsByDepth.end(); it != itEnd; ++it) {
 
         const DisplayObject* item = *it; 
         if (it != dl._charsByDepth.begin()) os << " | ";
-        os << " name:" << item->get_name()
+        os << " name:" << l.debug(item->get_name())
            << " depth:" << item->get_depth();
     }
 

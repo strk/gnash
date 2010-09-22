@@ -38,8 +38,14 @@ struct ObjectURI
         nameNoCase(0)
     {}
 
+/*
     operator const void*() const {
         return (name == 0) ? 0 : this;
+    }
+*/
+
+    bool empty() const {
+        return (name == 0);
     }
 
     const std::string&

@@ -228,14 +228,14 @@ namespace {
     void addInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
         const ObjectURI& name = d->get_name();
-        if (!name) return;
+        if (name.empty()) return;
         getObject(&b)->init_member(name, getObject(d), 0);
     }
 
     void removeInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
         const ObjectURI& name = d->get_name();
-        if (!name) return;
+        if (name.empty()) return;
         getObject(&b)->delProperty(name);
     }
 }

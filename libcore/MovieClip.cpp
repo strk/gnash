@@ -1863,7 +1863,7 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
         // Copy own name
         // TODO: check empty != none...
         const ObjectURI& name = get_name();
-        if (name) extern_movie->set_name(name);
+        if (!name.empty()) extern_movie->set_name(name);
 
         // Copy own clip depth (TODO: check this)
         extern_movie->set_clip_depth(get_clip_depth());
@@ -2050,7 +2050,7 @@ public:
         
         const ObjectURI& name = ch->get_name();
         // Don't enumerate unnamed DisplayObjects
-        if (!name) return;
+        if (name.empty()) return;
         
         // Referenceable DisplayObject always have an object.
         assert(getObject(ch));
