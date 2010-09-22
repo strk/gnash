@@ -17,12 +17,23 @@ struct ObjectURI
 
     class Logger;
 
+    /// Default constructor, no name, no caseless name
+    ObjectURI()
+        :
+        name(0),
+        nameNoCase(0)
+    {}
+
     /// Construct an ObjectURI from name and namespace.
     ObjectURI(string_table::key name)
         :
         name(name),
         nameNoCase(0)
     {}
+
+    operator const void*() const {
+        return (name == 0) ? 0 : this;
+    }
 
     string_table::key noCase(string_table& st) const {
         if ( ! nameNoCase ) nameNoCase = st.noCase(name);
@@ -33,6 +44,12 @@ struct ObjectURI
 
     mutable string_table::key nameNoCase;
 };
+
+inline bool
+equalsNoCase(string_table& st, const ObjectURI& a, const ObjectURI& b)
+{
+    return a.noCase(st) == b.noCase(st);
+}
 
 /// ObjectURIs are equal if name is equal
 inline bool
