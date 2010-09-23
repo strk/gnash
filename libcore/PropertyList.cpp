@@ -137,7 +137,7 @@ PropertyList::getProperty(const ObjectURI& uri) const
     // HINT: can add a final arg to KeyLookup ctor, like NSV::PROP_ON_MOUSE_MOVE
     //       to have *that* property lookup drive dump triggers
     static stats::KeyLookup kcl("getProperty",
-        getStringTable(_owner), 10000000);
+        getStringTable(_owner), 10000000, NSV::PROP_uuPROTOuu, 10);
     kcl.check(uri.name);
 #endif // GNASH_STATS_PROPERTY_LOOKUPS
 	iterator found = iterator_find(_props, uri, getVM(_owner));
