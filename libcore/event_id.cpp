@@ -22,6 +22,7 @@
 #include "log.h"
 #include "event_id.h"
 #include "namedStrings.h"
+#include "ObjectURI.h"
 
 #include <map>
 #include <string>
@@ -63,10 +64,15 @@ event_id::functionName() const
     return it->second;
 }
 
-string_table::key
-event_id::functionKey() const
+const ObjectURI&
+event_id::functionURI() const
 {
-    typedef std::map<EventCode, string_table::key> EventFunctionMap;
+    typedef std::map<EventCode, ObjectURI> EventFunctionMap;
+
+    // TODO: make this table non-static, as
+    //       it contains string_table-dependent
+    //       mutable entries
+    //
     static const EventFunctionMap e = boost::assign::map_list_of
 		(PRESS, NSV::PROP_ON_PRESS)
 		(RELEASE, NSV::PROP_ON_RELEASE)

@@ -567,7 +567,7 @@ Button::mouseEvent(const event_id& event)
         mr.pushAction(code, movie_root::PRIORITY_DOACTION);
     }
 
-    callMethod(getObject(this), event.functionKey());
+    callMethod(getObject(this), event.functionURI());
 }
 
 

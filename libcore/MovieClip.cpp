@@ -683,7 +683,7 @@ MovieClip::notifyEvent(const event_id& id)
 
     // Check for member function.
     if (!isKeyEvent(id)) {
-        callMethod(getObject(this), id.functionKey());
+        callMethod(getObject(this), id.functionURI());
     }
 
     // TODO: if this was UNLOAD release as much memory as possible ?
