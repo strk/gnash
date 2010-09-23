@@ -27,6 +27,9 @@
 #include "VM.h" // For string_table
 #include "string_table.h"
 #include "GnashAlgorithm.h"
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // GNASH_STATS_PROPERTY_LOOKUPS
+#endif
 
 #include <utility> // for std::make_pair
 #include <boost/bind.hpp> 
@@ -67,6 +70,9 @@ iterator_find(const PropertyList::container& p, const ObjectURI& uri, VM& vm)
         return p.project<0>(p.get<1>().find(uri));
     }
         
+    ObjectURI uri2 = uri;
+    ObjectURI uri3 ( uri );
+
     string_table& st = vm.getStringTable();
     const string_table::key nocase = uri.noCase(st); 
     return p.project<0>(p.get<2>().find(nocase));

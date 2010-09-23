@@ -18,6 +18,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "string_table.h"
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // GNASH_STATS_STRING_TABLE_NOCASE
+#endif
+
 #include <boost/algorithm/string/case_conv.hpp>
 
 //#define DEBUG_STRING_TABLE 1
