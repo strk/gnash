@@ -54,6 +54,12 @@ inline
 PropertyList::const_iterator
 iterator_find(const PropertyList::container& p, const ObjectURI& uri, VM& vm)
 {
+#ifdef GNASH_STATS_PROPERTY_LOOKUPS
+    // HINT: can add a final arg to KeyLookup ctor, like NSV::PROP_ON_MOUSE_MOVE
+    //       to have *that* property lookup drive dump triggers
+    static stats::KeyLookup kcl("PropertyList::iterator_find", vm.getStringTable(), 10000);
+    kcl.check(uri.name);
+#endif // GNASH_STATS_PROPERTY_LOOKUPS
     
     const bool caseless = vm.getSWFVersion() < 7;
 
