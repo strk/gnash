@@ -21,9 +21,10 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 //#define DEBUG_STRING_TABLE 1
+//#define GNASH_STATS_STRING_TABLE_NOCASE 1
 //#define GNASH_PARANOIA_LEVEL 3
 
-#ifdef DEBUG_STRING_TABLE
+#ifdef GNASH_STATS_STRING_TABLE_NOCASE
 # include "Stats.h"
 #endif
 
@@ -138,9 +139,9 @@ string_table::setHighestKnownLowercase(key k)
 string_table::key
 string_table::noCase(key a) const
 {
-#ifdef DEBUG_STRING_TABLE
+#ifdef GNASH_STATS_STRING_TABLE_NOCASE
     static stats::KeyLookup kcl("string_table::noCase(maplookups)", *this);
-#endif // DEBUG_STRING_TABLE
+#endif // GNASH_STATS_STRING_TABLE_NOCASE
 
     // Avoid checking keys known to be lowercase
     if ( a <= _highestKnownLowercase ) {
@@ -151,7 +152,7 @@ string_table::noCase(key a) const
     }
 
 // MOVE this block around for special needs
-#ifdef DEBUG_STRING_TABLE
+#ifdef GNASH_STATS_STRING_TABLE_NOCASE
     kcl.check(a);
 #endif 
 
