@@ -7,9 +7,9 @@
 #include <ostream>
 #include <sstream>
 
-//#define GNASH_STATS_OBJECT_URI_NOCASE_SKIP 1
+//#define GNASH_STATS_OBJECT_URI_NOCASE 1
 
-#ifdef GNASH_STATS_OBJECT_URI_NOCASE_SKIP
+#ifdef GNASH_STATS_OBJECT_URI_NOCASE
 # include "Stats.h"
 #endif
 
@@ -58,12 +58,12 @@ struct ObjectURI
 
         if ( ! nameNoCase ) {
             nameNoCase = st.noCase(name);
-#ifdef GNASH_STATS_OBJECT_URI_NOCASE_SKIP
+#ifdef GNASH_STATS_OBJECT_URI_NOCASE
             static stats::KeyLookup statNonSkip("ObjectURI::noCase non-skips", st, 0, 0, 0);
             statNonSkip.check(name);
 #endif
         }
-#ifdef GNASH_STATS_OBJECT_URI_NOCASE_SKIP
+#ifdef GNASH_STATS_OBJECT_URI_NOCASE
         else {
             static stats::KeyLookup stat("ObjectURI::noCase skips", st, 0, 0, 0);
             stat.check(name);
