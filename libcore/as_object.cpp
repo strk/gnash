@@ -143,7 +143,7 @@ public:
 
     virtual bool isSuper() const { return true; }
 
-    virtual as_object* get_super(string_table::key fname = 0);
+    virtual as_object* get_super(const ObjectURI& fname);
 
     // Fetching members from 'super' yelds a lookup on the associated prototype
     virtual bool get_member(const ObjectURI& uri, as_value* val)
@@ -194,7 +194,7 @@ private:
 };
 
 as_object*
-as_super::get_super(string_table::key fname)
+as_super::get_super(const ObjectURI& fname)
 {
     // Super references the super class of our class prototype.
     // Our class prototype is __proto__.
@@ -204,7 +204,7 @@ as_super::get_super(string_table::key fname)
     as_object* proto = get_prototype(); 
     if (!proto) return new as_super(getGlobal(*this), 0);
 
-    if (!fname || getSWFVersion(*this) <= 6) {
+    if (fname.empty() || getSWFVersion(*this) <= 6) {
         return new as_super(getGlobal(*this), proto);
     }
 
@@ -231,7 +231,6 @@ as_super::get_super(string_table::key fname)
     return new as_super(getGlobal(*this), owner);
 
 }
-
 
 /// A PropertyList visitor copying properties to an object
 class PropsCopier : public AbstractPropertyVisitor
@@ -442,7 +441,7 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
 
 
 as_object*
-as_object::get_super(string_table::key fname)
+as_object::get_super(const ObjectURI& fname)
 {
     // Super references the super class of our class prototype.
     // Our class prototype is __proto__.
@@ -451,13 +450,23 @@ as_object::get_super(string_table::key fname)
     // Our class prototype is __proto__.
     as_object* proto = get_prototype();
 
-    if (fname && getSWFVersion(*this) > 6) {
+    if ( ! fname.empty() && getSWFVersion(*this) > 6) {
         as_object* owner = 0;
         findProperty(fname, &owner);
         // should be 0 if findProperty returned 0
         if (owner != this) proto = owner; 
     }
 
+    as_object* super = new as_super(getGlobal(*this), proto);
+
+    return super;
+}
+
+as_object*
+as_object::get_super()
+{
+    // Our class prototype is __proto__.
+    as_object* proto = get_prototype();
     as_object* super = new as_super(getGlobal(*this), proto);
 
     return super;
