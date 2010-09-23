@@ -31,9 +31,7 @@
 //#define GNASH_DEBUG_BROADCASTER 1
 
 #ifdef GNASH_DEBUG_BROADCASTER
-# include <iostream>
-# include <iomanip>
-# include <map>
+# include "Stats.h"
 #endif
 
 namespace gnash {
@@ -118,14 +116,13 @@ public:
     /// Call a method on the given value
     void operator()(const as_value& v)
     {
-#ifdef GNASH_DEBUG_BROADCASTER
-        static BroadcasterStats stats(getStringTable(_fn));
-#endif
 
         boost::intrusive_ptr<as_object> o = v.to_object(getGlobal(_fn));
         if ( ! o ) return;
 
 #ifdef GNASH_DEBUG_BROADCASTER
+        static stats::KeyLookup stats("BroadcasterVisitor call operator",
+            getStringTable(_fn), 1);
         stats.check(_eventURI.name);
 #endif
 
@@ -432,10 +429,6 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
 
     BroadcasterVisitor visitor(fn); 
     foreachArray(*listeners, visitor);
-#ifdef GNASH_DEBUG_BROADCASTER
-    std::cerr << "BradcasterVisitor dispatched to "
-        << visitor.eventDispatched() << " listeners" << std::endl;
-#endif
 
     const size_t dispatched = visitor.eventsDispatched();
 
