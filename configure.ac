@@ -377,7 +377,7 @@ AC_ARG_WITH(statistics,
         cache=yes
         nstatistics=4           dnl this must be incremented if you add anything
         ;;
-      *) AC_MSG_ERROR([invalid statistics feature specified: ${withval} given (accept: buffers|que|memory|all)])
+      *) AC_MSG_ERROR([invalid statistics feature specified: ${withval} given (accept: buffers|que|memory|cache|all)])
         ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
