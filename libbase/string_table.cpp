@@ -24,43 +24,10 @@
 //#define GNASH_PARANOIA_LEVEL 3
 
 #ifdef DEBUG_STRING_TABLE
-# include <iostream>
-# include <iomanip>
+# include "Stats.h"
 #endif
 
 namespace gnash {
-
-#ifdef DEBUG_STRING_TABLE
-    namespace {
-    class KeyCaseLookup {
-        typedef std::map<string_table::key, unsigned long int> Stat;
-        Stat stat;
-        const string_table* _st;
-    public:
-        KeyCaseLookup(const string_table* st) : _st(st) {}
-
-        void check(string_table::key k) {
-            ++stat[k];
-        }
-        ~KeyCaseLookup(){ 
-            typedef std::map<unsigned long int, string_table::key> Sorted;
-            Sorted sorted;
-            for (Stat::iterator i=stat.begin(), e=stat.end(); i!=e; ++i)
-                sorted[i->second] = i->first;
-            for (Sorted::reverse_iterator i=sorted.rbegin(), e=sorted.rend();
-                    i!=e; ++i)
-                std::cerr
-                          << std::setw(10)
-                          << i->first
-                          << ":"
-                          << _st->value(i->second) << "("
-                          << i->second << ")"
-                          << std::endl;
-        }
-    };
-    } // namespace anonymous
-#endif // DEBUG_STRING_TABLE
-
 
 const std::string string_table::_empty;
 
@@ -132,7 +99,7 @@ string_table::already_locked_insert(const std::string& to_insert)
 	const key ret = _table.insert(svt(to_insert, ++_highestKey)).first->id;
 
 #ifdef DEBUG_STRING_TABLE
-    int tscp = 20; // table size checkpoint
+    int tscp = 100; // table size checkpoint
     size_t ts = _table.size();
     if ( ! (ts % tscp) ) { std::cerr << "string_table size grew to " << ts << std::endl; }
 #endif
@@ -172,7 +139,7 @@ string_table::key
 string_table::noCase(key a) const
 {
 #ifdef DEBUG_STRING_TABLE
-    static KeyCaseLookup kcl(this);
+    static stats::KeyLookup kcl("string_table::noCase(maplookups)", *this);
 #endif // DEBUG_STRING_TABLE
 
     // Avoid checking keys known to be lowercase
