@@ -194,6 +194,7 @@ endif
 
 EXTENSIONS_API = \
 	StringPredicates.h \
+	Stats.h \
 	FileTypes.h \
 	smart_ptr.h \
 	string_table.h \
