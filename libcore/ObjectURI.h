@@ -3,6 +3,10 @@
 #define GNASH_OBJECTURI_H
 
 #include "string_table.h"
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // GNASH_STATS_OBJECT_URI_NOCASE
+#endif
+
 #include <string>
 #include <ostream>
 #include <sstream>
@@ -38,11 +42,6 @@ struct ObjectURI
         nameNoCase(0)
     {}
 
-/*
-    operator const void*() const {
-        return (name == 0) ? 0 : this;
-    }
-*/
 
     bool empty() const {
         return (name == 0);
