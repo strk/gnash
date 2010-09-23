@@ -338,7 +338,7 @@ buffers=no
 que=no
 memory=no
 cache=yes
-stat_proplookup=yes
+stat_proplookup=no
 AC_ARG_WITH(statistics,
   AC_HELP_STRING([--with-statistics=], [Specify which statistics features to enable]),
   if test -n ${withval}; then
