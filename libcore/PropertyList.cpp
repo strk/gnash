@@ -37,6 +37,15 @@
 // Define this to get verbosity of properties insertion and flags setting
 //#define GNASH_DEBUG_PROPERTY 1
 
+// Define this to get stats of property lookups 
+#define GNASH_STATS_PROPERTY_LOOKUPS 1
+
+
+#ifdef GNASH_STATS_PROPERTY_LOOKUPS
+# include "Stats.h"
+# include "namedStrings.h"
+#endif
+
 namespace gnash {
 
 namespace {
@@ -119,6 +128,12 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 Property*
 PropertyList::getProperty(const ObjectURI& uri) const
 {
+#ifdef GNASH_STATS_PROPERTY_LOOKUPS
+    // HINT: can add a final arg to KeyLookup ctor, like NSV::PROP_ON_MOUSE_MOVE
+    //       to have *that* property lookup drive dump triggers
+    static stats::KeyLookup kcl("getProperty", getStringTable(_owner), 10000);
+    kcl.check(uri.name);
+#endif // GNASH_STATS_PROPERTY_LOOKUPS
 	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found == _props.end()) return 0;
 	return const_cast<Property*>(&(found->first));
