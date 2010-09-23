@@ -7,10 +7,10 @@
 #include <ostream>
 #include <sstream>
 
-#define GNASH_DEBUG_OBJECT_URI_NOCASE 1
+//#define GNASH_STATS_OBJECT_URI_NOCASE_SKIP 1
 
-#ifdef GNASH_DEBUG_OBJECT_URI_NOCASE
-# include <iostream>
+#ifdef GNASH_STATS_OBJECT_URI_NOCASE_SKIP
+# include "Stats.h"
 #endif
 
 namespace gnash {
@@ -54,35 +54,22 @@ struct ObjectURI
         return st.value(name);
     }
 
-
-#ifdef GNASH_DEBUG_OBJECT_URI_NOCASE
-    struct Counter {
-        Counter(): skips(0), dos(0) {}
-        int skips;
-        int dos;
-        void skip() { ++skips; }
-        void doit() { ++dos; }
-        ~Counter () {
-            std::cerr << "Skipped " << skips << "/" << (skips+dos)
-                << " (" << (double(skips)/double(skips+dos))
-                << ") calls to noCase "<< std::endl;
-        }
-    };
-#endif
-
     string_table::key noCase(string_table& st) const {
-#ifdef GNASH_DEBUG_OBJECT_URI_NOCASE
-        static Counter stat;
-#endif
+
         if ( ! nameNoCase ) {
             nameNoCase = st.noCase(name);
-#ifdef GNASH_DEBUG_OBJECT_URI_NOCASE
-            stat.doit();
+#ifdef GNASH_STATS_OBJECT_URI_NOCASE_SKIP
+            static stats::KeyLookup statNonSkip("ObjectURI::noCase non-skips", st, 0, 0, 0);
+            statNonSkip.check(name);
 #endif
         }
-#ifdef GNASH_DEBUG_OBJECT_URI_NOCASE
-        else stat.skip();
+#ifdef GNASH_STATS_OBJECT_URI_NOCASE_SKIP
+        else {
+            static stats::KeyLookup stat("ObjectURI::noCase skips", st, 0, 0, 0);
+            stat.check(name);
+        }
 #endif
+
         return nameNoCase;
     }
 
