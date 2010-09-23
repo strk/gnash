@@ -329,29 +329,29 @@ as_object::add_property(const std::string& name, as_function& getter,
                         as_function* setter)
 {
     string_table& st = getStringTable(*this);
-    string_table::key k = st.find(name);
+    ObjectURI uri(st.find(name));
 
-    Property* prop = _members.getProperty(k);
+    Property* prop = _members.getProperty(uri);
 
     if (prop) {
         as_value cacheVal = prop->getCache();
         // Used to return the return value of addGetterSetter, but this
         // is always true.
-        _members.addGetterSetter(k, getter, setter, cacheVal);
+        _members.addGetterSetter(uri, getter, setter, cacheVal);
         return;
         // NOTE: watch triggers not called when adding a new
         // getter-setter property
     }
     else {
 
-        _members.addGetterSetter(k, getter, setter, as_value());
+        _members.addGetterSetter(uri, getter, setter, as_value());
 
         // Nothing more to do if there are no triggers.
         if (!_trigs.get()) return;
 
         // check if we have a trigger, if so, invoke it
         // and set val to its return
-        TriggerContainer::iterator trigIter = _trigs->find(k);
+        TriggerContainer::iterator trigIter = _trigs->find(uri);
 
         if (trigIter != _trigs->end()) {
 
@@ -363,7 +363,7 @@ as_object::add_property(const std::string& name, as_function& getter,
             // The trigger call could have deleted the property,
             // so we check for its existence again, and do NOT put
             // it back in if it was deleted
-            prop = _members.getProperty(k);
+            prop = _members.getProperty(uri);
             if (!prop) {
                 log_debug("Property %s deleted by trigger on create "
                           "(getter-setter)", name);
@@ -397,7 +397,7 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
     if (!prop) {
         if (displayObject()) {
             DisplayObject* d = displayObject();
-            if (getDisplayObjectProperty(*d, getName(uri), *val)) return true;
+            if (getDisplayObjectProperty(*d, uri, *val)) return true;
         }
         while (pr()) {
             if ((prop = pr.getProperty())) break;
