@@ -38,7 +38,7 @@
 //#define GNASH_DEBUG_PROPERTY 1
 
 // Define this to get stats of property lookups 
-#define GNASH_STATS_PROPERTY_LOOKUPS 1
+//#define GNASH_STATS_PROPERTY_LOOKUPS 1
 
 
 #ifdef GNASH_STATS_PROPERTY_LOOKUPS

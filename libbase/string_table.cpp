@@ -20,7 +20,7 @@
 #include "string_table.h"
 #include <boost/algorithm/string/case_conv.hpp>
 
-#define DEBUG_STRING_TABLE 1
+//#define DEBUG_STRING_TABLE 1
 //#define GNASH_PARANOIA_LEVEL 3
 
 #ifdef DEBUG_STRING_TABLE
