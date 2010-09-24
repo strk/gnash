@@ -43,6 +43,7 @@
 namespace gnash {
 	class SWFCxForm;
 	class Renderer;
+	class ObjectURI;
 }
 
 namespace gnash {
@@ -252,13 +253,13 @@ public:
 	///     The string_table to use for finding
 	///     lowercase equivalent of names if
 	///     `caseless' parameter is true.
-	/// @param name
-	///     Query string
+	/// @param uri
+	///     Object identifier
 	/// @param caseless
 	///     Wheter comparison must be case-insensitive.
 	///
 	DisplayObject* getDisplayObjectByName(string_table& st,
-            string_table::key name, bool caseless) const;
+            const ObjectURI& uri, bool caseless) const;
 
 	/// \brief 
 	/// Visit each DisplayObject in the list in depth order

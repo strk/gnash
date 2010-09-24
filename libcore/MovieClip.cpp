@@ -683,7 +683,7 @@ MovieClip::notifyEvent(const event_id& id)
 
     // Check for member function.
     if (!isKeyEvent(id)) {
-        callMethod(getObject(this), id.functionKey());
+        callMethod(getObject(this), id.functionURI());
     }
 
     // TODO: if this was UNLOAD release as much memory as possible ?
@@ -694,13 +694,13 @@ MovieClip::notifyEvent(const event_id& id)
 }
 
 as_object*
-MovieClip::pathElement(string_table::key key)
+MovieClip::pathElement(const ObjectURI& uri)
 {
-    as_object* obj = DisplayObject::pathElement(key);
+    as_object* obj = DisplayObject::pathElement(uri);
     if (obj) return obj;
 
     // See if we have a match on the display list.
-    obj = getObject(getDisplayListObject(key));
+    obj = getObject(getDisplayListObject(uri));
     if (obj) return obj;
 
     obj = getObject(this);
@@ -708,7 +708,7 @@ MovieClip::pathElement(string_table::key key)
 
     // See if it's a member
     as_value tmp;
-    if (!obj->as_object::get_member(key, &tmp)) {
+    if (!obj->as_object::get_member(uri, &tmp)) {
         return NULL;
     }
     if (!tmp.is_object()) {
@@ -1640,7 +1640,7 @@ MovieClip::get_textfield_variable(const std::string& name)
 
 
 DisplayObject*
-MovieClip::getDisplayListObject(string_table::key key)
+MovieClip::getDisplayListObject(const ObjectURI& uri)
 {
 
     as_object* obj = getObject(this);
@@ -1649,7 +1649,7 @@ MovieClip::getDisplayListObject(string_table::key key)
     string_table& st = getStringTable(*obj);
 
     // Try items on our display list.
-    DisplayObject* ch = _displayList.getDisplayObjectByName(st, key,
+    DisplayObject* ch = _displayList.getDisplayObjectByName(st, uri,
             caseless(*obj));
 
     if (!ch) return 0;
@@ -1862,8 +1862,8 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
 
         // Copy own name
         // TODO: check empty != none...
-        const string_table::key name = get_name();
-        if (name) extern_movie->set_name(name);
+        const ObjectURI& name = get_name();
+        if (!name.empty()) extern_movie->set_name(name);
 
         // Copy own clip depth (TODO: check this)
         extern_movie->set_clip_depth(get_clip_depth());
@@ -2048,14 +2048,14 @@ public:
         // Don't enumerate unloaded DisplayObjects
         if (ch->unloaded()) return;
         
-        string_table::key name = ch->get_name();
+        const ObjectURI& name = ch->get_name();
         // Don't enumerate unnamed DisplayObjects
-        if (!name) return;
+        if (name.empty()) return;
         
         // Referenceable DisplayObject always have an object.
         assert(getObject(ch));
         string_table& st = getStringTable(*getObject(ch));
-        _env.push(st.value(name));
+        _env.push(name.toString(st));
     }
 };
 

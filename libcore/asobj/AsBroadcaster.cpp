@@ -26,6 +26,13 @@
 #include "NativeFunction.h" 
 #include "Global_as.h"
 #include "namedStrings.h"
+#include "ObjectURI.h"
+
+//#define GNASH_DEBUG_BROADCASTER 1
+
+#ifdef GNASH_DEBUG_BROADCASTER
+# include "Stats.h"
+#endif
 
 namespace gnash {
 
@@ -42,6 +49,36 @@ namespace {
 /// Helper for notifying listeners
 namespace {
 
+#ifdef GNASH_DEBUG_BROADCASTER
+struct BroadcasterStats {
+    typedef std::map<string_table::key, unsigned long int> Stat;
+    Stat stat;
+    const string_table& _st;
+    BroadcasterStats(const string_table& st) : _st(st) {}
+    void check(string_table::key k) {
+        if ( ! (++stat[k] % 100) ) dump();
+    }
+    void dump() {
+        using namespace std;
+        typedef std::map<unsigned long int, string_table::key> Sorted;
+        Sorted sorted;
+        for (Stat::iterator i=stat.begin(), e=stat.end(); i!=e; ++i)
+            sorted[i->second] = i->first;
+        cerr << "Broadcaster stats follow:" << endl;
+        for (Sorted::reverse_iterator i=sorted.rbegin(), e=sorted.rend();
+                i!=e; ++i)
+            std::cerr
+                      << std::setw(10)
+                      << i->first
+                      << ":"
+                      << _st.value(i->second) << "("
+                      << i->second << ")"
+                      << std::endl;
+        
+    }
+};
+#endif // GNASH_DEBUG_BROADCASTER
+
 class BroadcasterVisitor
 {
     
@@ -49,7 +86,7 @@ class BroadcasterVisitor
     /// appropriately cased based on SWF version
     /// of the current VM
     std::string _eventName;
-    string_table::key _eventKey;
+    const ObjectURI& _eventURI;
 
     // These two will be needed for consistency checking
     //size_t _origEnvStackSize;
@@ -68,27 +105,32 @@ public:
     ///
     BroadcasterVisitor(const fn_call& fn)
         :
-        _eventName(),
-        _eventKey(0),
+        _eventName(fn.arg(0).to_string()),
+        _eventURI(getStringTable(fn).find(_eventName)),
         _dispatched(0),
         _fn(fn)
     {
-        _eventName = fn.arg(0).to_string();
-        _eventKey = getStringTable(fn).find(_eventName);
         _fn.drop_bottom();
     }
 
     /// Call a method on the given value
     void operator()(const as_value& v)
     {
+
         boost::intrusive_ptr<as_object> o = v.to_object(getGlobal(_fn));
         if ( ! o ) return;
 
+#ifdef GNASH_DEBUG_BROADCASTER
+        static stats::KeyLookup stats("BroadcasterVisitor call operator",
+            getStringTable(_fn), 1);
+        stats.check(_eventURI.name);
+#endif
+
         as_value method;
-        o->get_member(_eventKey, &method);
+        o->get_member(_eventURI, &method);
 
         if (method.is_function()) {
-            _fn.super = o->get_super(_eventKey);
+            _fn.super = o->get_super(_eventURI);
             _fn.this_ptr = o.get();
             method.to_function()->call(_fn);
         }

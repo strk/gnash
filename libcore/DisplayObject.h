@@ -31,6 +31,7 @@
 #include <boost/cstdint.hpp> // For C99 int types
 #include <boost/noncopyable.hpp>
 
+#include "ObjectURI.h" // for composition
 #include "Transform.h"
 #include "event_id.h" 
 #include "SWFRect.h"
@@ -79,7 +80,7 @@ bool isReferenceable(const DisplayObject& d);
 /// @param obj      The DisplayObject whose property should be set
 /// @param val      An as_value representing the new value of the property.
 ///                 Some values may be rejected.
-bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
+bool setDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         const as_value& val);
 
 /// Get special properties
@@ -87,10 +88,10 @@ bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
 /// This gets the magic properties of DisplayObjects and handles special
 /// MovieClip properties such as DisplayList members.
 //
-/// @param key      The string table key of the property to get.
+/// @param key      The uri of the property to get.
 /// @param obj      The DisplayObject whose property should be got
 /// @param val      An as_value to be set to the value of the property.
-bool getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
+bool getDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         as_value& val);
 
 /// Get a property by its numeric index.
@@ -424,11 +425,11 @@ public:
     void setMask(DisplayObject* mask);
 
     /// Set DisplayObject name, initializing the original target member
-    void set_name(string_table::key name) {
-        _name = name;
+    void set_name(const ObjectURI& uri) {
+        _name = uri;
     }
 
-    string_table::key get_name() const { return _name; }
+    const ObjectURI& get_name() const { return _name; }
 
     /// Get the built-in function handlers code for the given event
     //
@@ -557,7 +558,7 @@ public:
     /// In ActionScript 1.0, everything seems to be CASE
     /// INSENSITIVE.
     ///
-    virtual as_object* pathElement(string_table::key key);
+    virtual as_object* pathElement(const ObjectURI& uri);
 
     /// \brief
     /// Return true if PlaceObjects tag are allowed to move
@@ -1002,7 +1003,7 @@ protected:
     void set_event_handlers(const Events& copyfrom);
 
     /// Name of this DisplayObject (if any)
-    string_table::key _name;
+    ObjectURI _name; 
 
     DisplayObject* _parent;
 

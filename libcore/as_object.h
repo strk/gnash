@@ -471,7 +471,7 @@ public:
     ///
     /// Main use if for getvariable and settarget resolution,
     /// currently implemented in as_environment.
-    virtual as_object* get_path_element(string_table::key key);
+    virtual as_object* get_path_element(const ObjectURI& uri);
 
     /// Get the super object of this object.
     ///
@@ -479,7 +479,8 @@ public:
     /// itself, or __proto__.__proto__ if this is not a prototype
     /// object. This is only conceptual however, and may be more
     /// convoluted to obtain the actual super.
-    virtual as_object* get_super(string_table::key fname = 0);
+    virtual as_object* get_super(const ObjectURI& fname);
+    as_object* get_super();
 
     /// Get a member as_value by name in an AS-compatible way
     //
@@ -793,7 +794,7 @@ private:
     /// interfaces is generally small and the opcode rarely used anyway.
     std::vector<as_object*> _interfaces;
 
-    typedef std::map<ObjectURI, Trigger> TriggerContainer;
+    typedef std::map<ObjectURI, Trigger, ObjectURI::LessThan> TriggerContainer;
     boost::scoped_ptr<TriggerContainer> _trigs;
 };
 
