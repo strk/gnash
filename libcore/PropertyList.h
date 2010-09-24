@@ -64,30 +64,40 @@ class PropertyList : boost::noncopyable
 public:
 
     typedef std::set<ObjectURI> PropertyTracker;
-    typedef std::pair<Property, string_table::key> value_type;
+    typedef Property value_type;
 
-    struct NameExtractor
+    struct KeyExtractor
     {
         typedef ObjectURI result_type;
-        const result_type& operator()(const value_type& r) const {
-            return r.first.uri();
+        ObjectURI operator()(const value_type& v) {
+            return v.uri();
         }
-        const result_type& operator()(value_type& r) {
-            return r.first.uri();
+        ObjectURI operator()(const value_type& v) const {
+            return v.uri();
         }
     };
+
+    struct Case {};
+    struct NoCase {};
+
+    /// The case-sensitive index
+    typedef boost::multi_index::ordered_unique<
+        boost::multi_index::tag<Case>,
+        KeyExtractor,
+        ObjectURI::LessThan> CaseIndex;
     
-    typedef boost::multi_index::member<value_type, value_type::second_type,
-            &value_type::second> KeyExtractor;
+    /// The case-insensitive index
+    typedef boost::multi_index::ordered_non_unique<
+        boost::multi_index::tag<NoCase>,
+        KeyExtractor,
+        ObjectURI::LessThan> NoCaseIndex;
 
     typedef boost::multi_index_container<
         value_type,
         boost::multi_index::indexed_by<
-            boost::multi_index::sequenced<>,
-            boost::multi_index::ordered_unique<NameExtractor>,
-            boost::multi_index::ordered_non_unique<KeyExtractor>
-            >
+            boost::multi_index::sequenced<>, CaseIndex, NoCaseIndex>
         > container;
+
     typedef container::iterator iterator;
     typedef container::const_iterator const_iterator;
 
@@ -96,12 +106,7 @@ public:
     /// @param obj      The as_object to which this PropertyList belongs.
     ///                 This object is not fully constructed at this stage,
     ///                 so this constructor should not do anything with it!
-    PropertyList(as_object& obj)
-        :
-        _props(),
-        _owner(obj)
-    {
-    }
+    PropertyList(as_object& obj);
 
     /// Visit properties 
     //
@@ -127,9 +132,9 @@ public:
         for (const_iterator it = _props.begin(), ie = _props.end();
                 it != ie; ++it)
         {
-            if (!cmp(it->first)) continue;
-            as_value val = it->first.getValue(_owner);
-            if (!visitor.accept(it->first.uri(), val)) return;
+            if (!cmp(*it)) continue;
+            as_value val = it->getValue(_owner);
+            if (!visitor.accept(it->uri(), val)) return;
         }
     }
 

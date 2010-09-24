@@ -26,6 +26,22 @@ namespace gnash {
 struct ObjectURI
 {
 
+    struct LessThan
+    {
+        LessThan(string_table& st, bool caseless = false)
+            :
+            _st(st),
+            _caseless(caseless)
+        {}
+        bool operator()(const ObjectURI& a, const ObjectURI& b) const {
+            if (_caseless) return a.noCase(_st) < b.noCase(_st);
+            return a.name < b.name;
+        }
+    private:
+        string_table& _st;
+        const bool _caseless;
+    };
+
     class Logger;
 
     /// Default constructor, no name, no caseless name
