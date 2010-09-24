@@ -559,7 +559,7 @@ DisplayObject::set_rotation(double rot)
 
 	double rotation = rot * PI / 180.0;
 
-    if (_xscale < 0 ) rotation += PI; 
+    if (_xscale < 0) rotation += PI; 
 
 	SWFMatrix m = getMatrix(*this);
     m.set_rotation(rotation);
@@ -892,7 +892,7 @@ void
 setIndexedProperty(size_t index, DisplayObject& o, const as_value& val)
 {
     const Setter s = getGetterSetterByIndex(index).second;
-    if (!s ) return; // read-only (warn?)
+    if (!s) return; // read-only (warn?)
 
     if (val.is_undefined() || val.is_null()) {
         IF_VERBOSE_ASCODING_ERRORS(
