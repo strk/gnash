@@ -2102,9 +2102,10 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
         std::string part(tgtstr, from, to - from);
 
         // TODO: there is surely a cleaner way to implement path finding.
+        ObjectURI uri(st.find(part));
         o = o->displayObject() ?
-            o->displayObject()->pathElement(st.find(part)) :
-            o->get_path_element(st.find(part));
+            o->displayObject()->pathElement(uri) :
+            o->get_path_element(uri);
 
         if (!o) {
 #ifdef GNASH_DEBUG_TARGET_RESOLUTION

@@ -932,6 +932,10 @@ check_equals(typeof(result), "string");
 check_equals(result, "udef");
 check_equals(resolveCalled, 4);
 
+check_equals(g.cips, "passed");
+check_equals(result, "cips");
+check_equals(resolveCalled, 5);
+
 /// Check __proto__ and prototype during construction
 
 TestO = function() {};
@@ -1007,10 +1011,10 @@ o = new Object(b);
 check_equals(typeof(o), "undefined");
 
 #if OUTPUT_VERSION <= 5
-totals(134);
+totals(137);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(322);
+totals(325);
 #endif
 

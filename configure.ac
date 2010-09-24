@@ -338,6 +338,7 @@ buffers=no
 que=no
 memory=no
 cache=yes
+stat_proplookup=no
 AC_ARG_WITH(statistics,
   AC_HELP_STRING([--with-statistics=], [Specify which statistics features to enable]),
   if test -n ${withval}; then
@@ -370,14 +371,19 @@ AC_ARG_WITH(statistics,
         cache=yes
         nstatistics=$((nstatistics+1))
         ;;
+      proplookup)
+        stat_proplookup=yes
+        nstatistics=$((nstatistics+1))
+        ;;
       all|ALL)
         buffers=yes
         memory=yes
         queu=yes
         cache=yes
-        nstatistics=4           dnl this must be incremented if you add anything
+        stat_proplookup=yes
+        nstatistics=5           dnl this must be incremented if you add anything
         ;;
-      *) AC_MSG_ERROR([invalid statistics feature specified: ${withval} given (accept: buffers|que|memory|all)])
+      *) AC_MSG_ERROR([invalid statistics feature specified: ${withval} given (accept: buffers|que|memory|cache|proplookup|all)])
         ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
@@ -406,6 +412,13 @@ fi
 if test x${cache} = xyes; then
   statistics_list="${statistics_list} cache"
   AC_DEFINE(USE_STATS_CACHE, [1], [Support statistics collecting for the cache])
+fi
+
+if test x${stat_proplookup} = xyes; then
+  statistics_list="${statistics_list} proplookup"
+  AC_DEFINE(GNASH_STATS_OBJECT_URI_NOCASE, [1], [Collecting and report stats about ObjectURI case lookups])
+  AC_DEFINE(GNASH_STATS_PROPERTY_LOOKUPS, [1], [Collecting and report stats about property lookups])
+  AC_DEFINE(GNASH_STATS_STRING_TABLE_NOCASE, [1], [Collecting and report stats about string_table::key case lookups])
 fi
 
 dnl this is just so Makefile can print the same list

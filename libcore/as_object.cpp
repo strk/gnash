@@ -143,7 +143,7 @@ public:
 
     virtual bool isSuper() const { return true; }
 
-    virtual as_object* get_super(string_table::key fname = 0);
+    virtual as_object* get_super(const ObjectURI& fname);
 
     // Fetching members from 'super' yelds a lookup on the associated prototype
     virtual bool get_member(const ObjectURI& uri, as_value* val)
@@ -194,7 +194,7 @@ private:
 };
 
 as_object*
-as_super::get_super(string_table::key fname)
+as_super::get_super(const ObjectURI& fname)
 {
     // Super references the super class of our class prototype.
     // Our class prototype is __proto__.
@@ -204,7 +204,7 @@ as_super::get_super(string_table::key fname)
     as_object* proto = get_prototype(); 
     if (!proto) return new as_super(getGlobal(*this), 0);
 
-    if (!fname || getSWFVersion(*this) <= 6) {
+    if (fname.empty() || getSWFVersion(*this) <= 6) {
         return new as_super(getGlobal(*this), proto);
     }
 
@@ -231,7 +231,6 @@ as_super::get_super(string_table::key fname)
     return new as_super(getGlobal(*this), owner);
 
 }
-
 
 /// A PropertyList visitor copying properties to an object
 class PropsCopier : public AbstractPropertyVisitor
@@ -330,29 +329,29 @@ as_object::add_property(const std::string& name, as_function& getter,
                         as_function* setter)
 {
     string_table& st = getStringTable(*this);
-    string_table::key k = st.find(name);
+    ObjectURI uri(st.find(name));
 
-    Property* prop = _members.getProperty(k);
+    Property* prop = _members.getProperty(uri);
 
     if (prop) {
         as_value cacheVal = prop->getCache();
         // Used to return the return value of addGetterSetter, but this
         // is always true.
-        _members.addGetterSetter(k, getter, setter, cacheVal);
+        _members.addGetterSetter(uri, getter, setter, cacheVal);
         return;
         // NOTE: watch triggers not called when adding a new
         // getter-setter property
     }
     else {
 
-        _members.addGetterSetter(k, getter, setter, as_value());
+        _members.addGetterSetter(uri, getter, setter, as_value());
 
         // Nothing more to do if there are no triggers.
         if (!_trigs.get()) return;
 
         // check if we have a trigger, if so, invoke it
         // and set val to its return
-        TriggerContainer::iterator trigIter = _trigs->find(k);
+        TriggerContainer::iterator trigIter = _trigs->find(uri);
 
         if (trigIter != _trigs->end()) {
 
@@ -364,7 +363,7 @@ as_object::add_property(const std::string& name, as_function& getter,
             // The trigger call could have deleted the property,
             // so we check for its existence again, and do NOT put
             // it back in if it was deleted
-            prop = _members.getProperty(k);
+            prop = _members.getProperty(uri);
             if (!prop) {
                 log_debug("Property %s deleted by trigger on create "
                           "(getter-setter)", name);
@@ -398,7 +397,7 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
     if (!prop) {
         if (displayObject()) {
             DisplayObject* d = displayObject();
-            if (getDisplayObjectProperty(*d, getName(uri), *val)) return true;
+            if (getDisplayObjectProperty(*d, uri, *val)) return true;
         }
         while (pr()) {
             if ((prop = pr.getProperty())) break;
@@ -442,7 +441,7 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
 
 
 as_object*
-as_object::get_super(string_table::key fname)
+as_object::get_super(const ObjectURI& fname)
 {
     // Super references the super class of our class prototype.
     // Our class prototype is __proto__.
@@ -451,13 +450,23 @@ as_object::get_super(string_table::key fname)
     // Our class prototype is __proto__.
     as_object* proto = get_prototype();
 
-    if (fname && getSWFVersion(*this) > 6) {
+    if ( ! fname.empty() && getSWFVersion(*this) > 6) {
         as_object* owner = 0;
         findProperty(fname, &owner);
         // should be 0 if findProperty returned 0
         if (owner != this) proto = owner; 
     }
 
+    as_object* super = new as_super(getGlobal(*this), proto);
+
+    return super;
+}
+
+as_object*
+as_object::get_super()
+{
+    // Our class prototype is __proto__.
+    as_object* proto = get_prototype();
     as_object* super = new as_super(getGlobal(*this), proto);
 
     return super;
@@ -979,22 +988,26 @@ as_object::getMember(const ObjectURI& uri)
 }
 
 as_object*
-as_object::get_path_element(string_table::key key)
+as_object::get_path_element(const ObjectURI& uri)
 {
 //#define DEBUG_TARGET_FINDING 1
 
+#ifdef DEBUG_TARGET_FINDING 
+    ObjectURI::Logger l(getStringTable(*this));
+#endif
+
     as_value tmp;
-    if (!get_member(key, &tmp)) {
+    if (!get_member(uri, &tmp)) {
 #ifdef DEBUG_TARGET_FINDING 
         log_debug("Member %s not found in object %p",
-                  getStringTable(*this).value(key), (void*)this);
+                  l.debug(uri), (void*)this);
 #endif
         return NULL;
     }
     if (!tmp.is_object()) {
 #ifdef DEBUG_TARGET_FINDING 
         log_debug("Member %s of object %p is not an object (%s)",
-                  getStringTable(*this).value(key), (void*)this, tmp);
+                  l.debug(uri), (void*)this, tmp);
 #endif
         return NULL;
     }

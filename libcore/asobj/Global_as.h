@@ -231,7 +231,7 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 /// This is a macro to cope with a varying number of arguments. The function
 /// signature is as follows:
 //
-/// as_value callMethod(as_object* obj, string_table::key key,
+/// as_value callMethod(as_object* obj, const ObjectURI& uri,
 ///     const as_value& arg1, ..., const as_value& argN);
 //
 /// If the member function exists and is a function, invoke() is called on
@@ -247,11 +247,11 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 /// @return             The return value of the call (possibly undefined).
 #define CALL_METHOD(x, n, t) \
 inline as_value \
-callMethod(as_object* obj, string_table::key key BOOST_PP_COMMA_IF(n)\
+callMethod(as_object* obj, const ObjectURI& uri BOOST_PP_COMMA_IF(n)\
         BOOST_PP_REPEAT(n, VALUE_ARG, const as_value&)) {\
     if (!obj) return as_value();\
     as_value func;\
-    if (!obj->get_member(key, &func)) return as_value();\
+    if (!obj->get_member(uri, &func)) return as_value();\
     fn_call::Args args;\
     BOOST_PP_EXPR_IF(n, (args += BOOST_PP_REPEAT(n, VALUE_ARG, ));)\
     return invoke(func, as_environment(getVM(*obj)), obj, args);\

@@ -22,8 +22,12 @@
 #define GNASH_EVENT_ID_H
 
 #include <string>
-#include "string_table.h"
 #include "GnashKey.h"
+
+// Forward declarations
+namespace gnash {
+    class ObjectURI;
+}
 
 namespace gnash {
 
@@ -143,9 +147,9 @@ public:
     /// corresponding to this event.
     const std::string& functionName() const;
 
-    /// Return the string_table key of a method-handler function
+    /// Return the ObjectURI of a method-handler function
     /// corresponding to this event.
-    string_table::key functionKey() const;
+    const ObjectURI& functionURI() const;
     
     /// Return the keycode associated with this event_id.
     //

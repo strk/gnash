@@ -24,6 +24,7 @@
 #include "Renderer.h"
 #include "StringPredicates.h"
 #include "MovieClip.h"
+#include "ObjectURI.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -106,11 +107,10 @@ private:
 class NameEquals
 {
 public:
-    NameEquals(string_table& st, string_table::key name, bool caseless)
+    NameEquals(string_table& st, const ObjectURI& uri, bool caseless)
         :
-        _st(st),
-        _caseless(caseless),
-        _name(caseless ? _st.noCase(name) : name)
+        _ce(st, caseless),
+        _name(uri)
     {}
 
     bool operator() (const DisplayObject* item) {
@@ -123,17 +123,12 @@ public:
         // destroyed DisplayObjects in the DisplayList.
         if (item->isDestroyed()) return false;
         
-        const string_table::key itname =
-            _caseless ? _st.noCase(item->get_name()) : item->get_name();
-
-        return itname == _name;
-
+        return _ce(item->get_name(), _name);
     }
 
 private:
-    string_table& _st;
-    const bool _caseless;
-    const string_table::key _name;
+    const ObjectURI::CaseEquals _ce;
+    const ObjectURI& _name;
 };
 
 } // anonymous namespace
@@ -183,7 +178,7 @@ DisplayList::getDisplayObjectAtDepth(int depth) const
 
 
 DisplayObject*
-DisplayList::getDisplayObjectByName(string_table& st, string_table::key name,
+DisplayList::getDisplayObjectByName(string_table& st, const ObjectURI& uri,
         bool caseless) const
 {
     testInvariant();
@@ -191,7 +186,7 @@ DisplayList::getDisplayObjectByName(string_table& st, string_table::key name,
     const container_type::const_iterator e = _charsByDepth.end();
 
     container_type::const_iterator it =
-        std::find_if(_charsByDepth.begin(), e, NameEquals(st, name, caseless));
+        std::find_if(_charsByDepth.begin(), e, NameEquals(st, uri, caseless));
 
     if (it == e) return 0;
     
@@ -716,6 +711,11 @@ DisplayList::dump() const
 {
     //testInvariant();
 
+    if ( _charsByDepth.empty() ) return;
+
+    string_table& st = getStringTable(*getObject(_charsByDepth.front()));
+    ObjectURI::Logger l(st);
+
     int num=0;
     for (const_iterator it = _charsByDepth.begin(),
             endIt = _charsByDepth.end(); it != endIt; ++it) {
@@ -723,7 +723,7 @@ DisplayList::dump() const
         const DisplayObject* dobj = *it;
         log_debug(_("Item %d(%s) at depth %d (char name %s, type %s)"
                     "Destroyed: %s, unloaded: %s"),
-            num, dobj, dobj->get_depth(), dobj->get_name(), typeName(*dobj),
+            num, dobj, dobj->get_depth(), l.debug(dobj->get_name()), typeName(*dobj),
             dobj->isDestroyed(), dobj->unloaded());
         num++;
     }
@@ -1108,12 +1108,18 @@ std::ostream&
 operator<< (std::ostream& os, const DisplayList& dl)
 {
     os << "By depth: ";
+
+    if ( dl._charsByDepth.empty() ) return os;
+
+    string_table& st = getStringTable(*getObject(dl._charsByDepth.front()));
+    ObjectURI::Logger l(st);
+
     for (DisplayList::const_iterator it = dl._charsByDepth.begin(),
             itEnd = dl._charsByDepth.end(); it != itEnd; ++it) {
 
         const DisplayObject* item = *it; 
         if (it != dl._charsByDepth.begin()) os << " | ";
-        os << " name:" << item->get_name()
+        os << " name:" << l.debug(item->get_name())
            << " depth:" << item->get_depth();
     }
 
