@@ -350,8 +350,8 @@ endif
 	@echo "	CURL_LIBS is $(CURL_LIBS)"
 	@echo "	BOOST_CFLAGS is $(BOOST_CFLAGS)"
 	@echo "	BOOST_LIBS is $(BOOST_LIBS)"
-	@if test -n $(BOOST_EXTRA_LIBS); then \
-	  echo "	BOOST_EXTRA_LIBS is $(BOOST_EXTRA_LIBS)"; \
+	@if test -n $(BOOST_CYGNAL_LIBS); then \
+	  echo "	BOOST_CYGNAL_LIBS is $(BOOST_CYGNAL_LIBS)"; \
 	fi
 if ENABLE_MING
 	@echo "	MING_VERSION_CODE $(MING_VERSION_CODE) "

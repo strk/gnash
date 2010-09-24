@@ -56,6 +56,7 @@ AM_LDFLAGS = \
 	$(LIBINTL) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
+	$(BOOST_CYGNAL_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
