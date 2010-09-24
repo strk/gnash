@@ -18,22 +18,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "PropertyList.h"
-#include "Property.h" 
-#include "as_environment.h"
-#include "log.h"
-#include "as_function.h"
-#include "as_value.h" // for enumerateValues
-#include "VM.h" // For string_table
-#include "string_table.h"
-#include "GnashAlgorithm.h"
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // GNASH_STATS_PROPERTY_LOOKUPS
 #endif
 
+#include "PropertyList.h"
+
 #include <utility> 
 #include <boost/bind.hpp> 
 #include <boost/tuple/tuple.hpp>
+
+#include "Property.h" 
+#include "as_environment.h"
+#include "log.h"
+#include "as_function.h"
+#include "as_value.h" 
+#include "VM.h" 
+#include "string_table.h"
+#include "GnashAlgorithm.h"
 
 // Define the following to enable printing address of each property added
 //#define DEBUG_PROPERTY_ALLOC
@@ -43,7 +45,6 @@
 
 // Define this to get stats of property lookups 
 //#define GNASH_STATS_PROPERTY_LOOKUPS 1
-
 
 #ifdef GNASH_STATS_PROPERTY_LOOKUPS
 # include "Stats.h"
@@ -61,10 +62,12 @@ iterator_find(const PropertyList::container& p, const ObjectURI& uri, VM& vm)
     const bool caseless = vm.getSWFVersion() < 7;
 
     if (!caseless) {
-        return p.project<0>(p.get<PropertyList::Case>().find(uri));
+        return p.project<PropertyList::CreationOrder>(
+                p.get<PropertyList::Case>().find(uri));
     }
         
-    return p.project<0>(p.get<PropertyList::NoCase>().find(uri));
+    return p.project<PropertyList::CreationOrder>(
+            p.get<PropertyList::NoCase>().find(uri));
 }
 
 }

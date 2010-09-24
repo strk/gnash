@@ -66,25 +66,27 @@ public:
     typedef std::set<ObjectURI> PropertyTracker;
     typedef Property value_type;
 
-    struct KeyExtractor
-    {
-        typedef ObjectURI result_type;
-        ObjectURI operator()(const value_type& v) {
-            return v.uri();
-        }
-        ObjectURI operator()(const value_type& v) const {
-            return v.uri();
-        }
-    };
+    /// Identifier for the sequenced index
+    struct CreationOrder {};
 
+    /// The sequenced index in creation order.
+    typedef boost::multi_index::sequenced<
+        boost::multi_index::tag<CreationOrder> > SequencedIndex;
+    
+    typedef boost::multi_index::const_mem_fun<value_type, const ObjectURI&,
+            &value_type::uri> KeyExtractor;
+
+    /// Identifier for the case-sensitive index
     struct Case {};
-    struct NoCase {};
-
+    
     /// The case-sensitive index
     typedef boost::multi_index::ordered_unique<
         boost::multi_index::tag<Case>,
         KeyExtractor,
         ObjectURI::LessThan> CaseIndex;
+
+    /// Identifier for the case-insensitive index
+    struct NoCase {};
     
     /// The case-insensitive index
     typedef boost::multi_index::ordered_non_unique<
@@ -92,10 +94,10 @@ public:
         KeyExtractor,
         ObjectURI::LessThan> NoCaseIndex;
 
+    /// The container of the Properties.
     typedef boost::multi_index_container<
         value_type,
-        boost::multi_index::indexed_by<
-            boost::multi_index::sequenced<>, CaseIndex, NoCaseIndex>
+        boost::multi_index::indexed_by<SequencedIndex, CaseIndex, NoCaseIndex>
         > container;
 
     typedef container::iterator iterator;
@@ -104,8 +106,6 @@ public:
     /// Construct the PropertyList 
     //
     /// @param obj      The as_object to which this PropertyList belongs.
-    ///                 This object is not fully constructed at this stage,
-    ///                 so this constructor should not do anything with it!
     PropertyList(as_object& obj);
 
     /// Visit properties 
