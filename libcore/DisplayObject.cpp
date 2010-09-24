@@ -177,7 +177,8 @@ DisplayObject::pathElement(const ObjectURI& uri)
     
     // The check is case-insensitive for SWF6 and below.
     // TODO: cache ObjectURI(NSV::PROP_THIS) [as many others...]
-    if (ObjectURI::CaseEquals(st, caseless)(uri, ObjectURI(NSV::PROP_THIS))) {
+    if (ObjectURI::CaseEquals(st, caseless(*obj))
+            (uri, ObjectURI(NSV::PROP_THIS))) {
         return obj;
     }
 	return 0;
