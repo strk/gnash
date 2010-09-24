@@ -38,14 +38,16 @@ struct ObjectURI
     /// Log strings.
     class Logger;
 
-    /// Default constructor, no name, no caseless name
+    /// Default constructor.
+    //
+    /// This must be equivalent to an empty string.
     ObjectURI()
         :
         name(0),
         nameNoCase(0)
     {}
 
-    /// Construct an ObjectURI from name and namespace.
+    /// Construct an ObjectURI from name
     ObjectURI(string_table::key name)
         :
         name(name),
@@ -60,7 +62,7 @@ struct ObjectURI
     const std::string& toString(string_table& st) const {
         return st.value(name);
     }
-
+    
     string_table::key noCase(string_table& st) const {
 
         if (!name) return 0;
