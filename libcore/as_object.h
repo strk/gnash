@@ -794,7 +794,7 @@ private:
     /// interfaces is generally small and the opcode rarely used anyway.
     std::vector<as_object*> _interfaces;
 
-    typedef std::map<ObjectURI, Trigger> TriggerContainer;
+    typedef std::map<ObjectURI, Trigger, ObjectURI::LessThan> TriggerContainer;
     boost::scoped_ptr<TriggerContainer> _trigs;
 };
 

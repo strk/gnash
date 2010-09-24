@@ -60,10 +60,9 @@ namespace gnash {
 /// owner.
 class PropertyList : boost::noncopyable
 {
-
 public:
 
-    typedef std::set<ObjectURI> PropertyTracker;
+    typedef std::set<ObjectURI, ObjectURI::LessThan> PropertyTracker;
     typedef Property value_type;
 
     /// Identifier for the sequenced index
@@ -92,7 +91,7 @@ public:
     typedef boost::multi_index::ordered_non_unique<
         boost::multi_index::tag<NoCase>,
         KeyExtractor,
-        ObjectURI::LessThan> NoCaseIndex;
+        ObjectURI::CaseLessThan> NoCaseIndex;
 
     /// The container of the Properties.
     typedef boost::multi_index_container<

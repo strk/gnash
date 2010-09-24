@@ -26,22 +26,16 @@ namespace gnash {
 struct ObjectURI
 {
 
-    struct LessThan
-    {
-        LessThan(string_table& st, bool caseless = false)
-            :
-            _st(st),
-            _caseless(caseless)
-        {}
-        bool operator()(const ObjectURI& a, const ObjectURI& b) const {
-            if (_caseless) return a.noCase(_st) < b.noCase(_st);
-            return a.name < b.name;
-        }
-    private:
-        string_table& _st;
-        const bool _caseless;
-    };
+    /// Comparison taking case into account (or not).
+    class CaseLessThan;
 
+    /// Simple, case-sensitive less-than comparison for containers.
+    class LessThan;
+
+    /// Case-sensitive equality
+    class CaseEquals;
+
+    /// Log strings.
     class Logger;
 
     /// Default constructor, no name, no caseless name
@@ -97,39 +91,54 @@ private:
     mutable string_table::key nameNoCase;
 };
 
-inline bool
-equalsNoCase(string_table& st, const ObjectURI& a, const ObjectURI& b)
-{
-    return a.noCase(st) == b.noCase(st);
-}
-
-/// ObjectURIs are equal if name is equal
-inline bool
-operator==(const ObjectURI& a, const ObjectURI& b)
-{
-    return a.name == b.name;
-}
-
-inline bool
-equals(string_table& st, const ObjectURI& a, const ObjectURI& b, bool caseless)
-{
-    if ( caseless ) return equalsNoCase(st, a, b);
-    else return a == b;
-}
-
-/// Comparator for ObjectURI so it can serve as a key in stdlib containers.
-inline bool
-operator<(const ObjectURI& a, const ObjectURI& b)
-{
-    return a.name < b.name;
-}
-
 /// Get the name element of an ObjectURI
 inline string_table::key
 getName(const ObjectURI& o)
 {
     return o.name;
 }
+
+class ObjectURI::LessThan
+{
+public:
+    bool operator()(const ObjectURI& a, const ObjectURI& b) const {
+        return a.name < b.name;
+    }
+};
+
+class ObjectURI::CaseLessThan
+{
+public:
+    CaseLessThan(string_table& st, bool caseless = false)
+        :
+        _st(st),
+        _caseless(caseless)
+    {}
+    bool operator()(const ObjectURI& a, const ObjectURI& b) const {
+        if (_caseless) return a.noCase(_st) < b.noCase(_st);
+        return a.name < b.name;
+    }
+private:
+    string_table& _st;
+    const bool _caseless;
+};
+
+class ObjectURI::CaseEquals
+{
+public:
+    CaseEquals(string_table& st, bool caseless = false)
+        :
+        _st(st),
+        _caseless(caseless)
+    {}
+    bool operator()(const ObjectURI& a, const ObjectURI& b) const {
+        if (_caseless) return a.noCase(_st) == b.noCase(_st);
+        return a.name == b.name;
+    }
+private:
+    string_table& _st;
+    const bool _caseless;
+};
 
 class ObjectURI::Logger
 {

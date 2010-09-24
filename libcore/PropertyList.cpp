@@ -78,11 +78,11 @@ PropertyList::PropertyList(as_object& obj)
                 boost::tuple<>(),
                 boost::make_tuple(
                     KeyExtractor(),
-                    ObjectURI::LessThan(getStringTable(obj), false)
+                    ObjectURI::LessThan()
                 ),
                 boost::make_tuple(
                     KeyExtractor(),
-                    ObjectURI::LessThan(getStringTable(obj), true)
+                    ObjectURI::CaseLessThan(getStringTable(obj), true)
                 )
             )
         ),

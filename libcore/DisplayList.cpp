@@ -109,8 +109,7 @@ class NameEquals
 public:
     NameEquals(string_table& st, const ObjectURI& uri, bool caseless)
         :
-        _st(st),
-        _caseless(caseless),
+        _ce(st, caseless),
         _name(uri)
     {}
 
@@ -124,16 +123,11 @@ public:
         // destroyed DisplayObjects in the DisplayList.
         if (item->isDestroyed()) return false;
         
-        if ( _caseless ) { 
-            return equalsNoCase(_st, item->get_name(), _name);
-        } else {
-            return item->get_name() ==  _name;
-        }
+        return _ce(item->get_name(), _name);
     }
 
 private:
-    string_table& _st;
-    const bool _caseless;
+    const ObjectURI::CaseEquals _ce;
     const ObjectURI& _name;
 };
 

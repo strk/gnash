@@ -605,10 +605,12 @@ as_environment::find_object(const std::string& path,
                 as_object* global = _vm.getGlobal();
                 const bool nocase = caseless(*global);
 
-                if (swfVersion > 5 &&
-                        equals(st, subpartURI, globalURI, nocase)) {
-                    element = global;
-                    break;
+                if (swfVersion > 5) {
+                    const ObjectURI::CaseEquals ce(st, nocase);
+                    if (ce(subpartURI, globalURI)) {
+                        element = global;
+                        break;
+                    }
                 }
 
                 // Look for globals.
