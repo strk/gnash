@@ -63,24 +63,26 @@ struct ObjectURI
         return (name == 0);
     }
 
-    const std::string&
-    toString(string_table& st) const
-    {
+    const std::string& toString(string_table& st) const {
         return st.value(name);
     }
 
     string_table::key noCase(string_table& st) const {
 
-        if ( ! nameNoCase ) {
+        if (!name) return 0;
+
+        if (!nameNoCase) {
             nameNoCase = st.noCase(name);
 #ifdef GNASH_STATS_OBJECT_URI_NOCASE
-            static stats::KeyLookup statNonSkip("ObjectURI::noCase non-skips", st, 0, 0, 0);
+            static stats::KeyLookup statNonSkip("ObjectURI::noCase non-skips",
+                    st, 0, 0, 0);
             statNonSkip.check(name);
 #endif
         }
 #ifdef GNASH_STATS_OBJECT_URI_NOCASE
         else {
-            static stats::KeyLookup stat("ObjectURI::noCase skips", st, 0, 0, 0);
+            static stats::KeyLookup stat("ObjectURI::noCase skips",
+                    st, 0, 0, 0);
             stat.check(name);
         }
 #endif
@@ -89,6 +91,8 @@ struct ObjectURI
     }
 
     string_table::key name;
+
+private:
 
     mutable string_table::key nameNoCase;
 };
