@@ -16,15 +16,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-// 
 
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
+
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
+
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "MovieClip.h"
 #include "drag_state.h" // for do_mouse_drag (to be moved in movie_root)
@@ -37,14 +41,10 @@
 #include "GnashNumeric.h"
 #include "Global_as.h"
 #include "Renderer.h"
-
+#include "GnashAlgorithm.h"
 #ifdef USE_SWFTREE
 # include "tree.hh"
 #endif
-
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/bind.hpp>
 
 #undef set_invalidated
 
@@ -66,9 +66,14 @@ namespace {
     bool doSet(const ObjectURI& uri, DisplayObject& o, const as_value& val);
     bool doGet(const ObjectURI& uri, DisplayObject& o, as_value& val);
     const GetterSetter& getGetterSetterByIndex(size_t index);
+
     // NOTE: comparison will be case-insensitive
     const GetterSetter& getGetterSetterByURI(const ObjectURI& uri,
-                                                    string_table& st);
+            string_table& st);
+
+    // Convenience function to create a const URI-to-function map
+    template<typename Map> const Map getURIMap(
+            const typename Map::key_compare& cmp);
 }
 
 // Define static const members.
@@ -886,8 +891,8 @@ DisplayObject::getAsRoot()
 void
 setIndexedProperty(size_t index, DisplayObject& o, const as_value& val)
 {
-    Setter s = getGetterSetterByIndex(index).second;
-    if ( ! s ) return; // read-only (warn?)
+    const Setter s = getGetterSetterByIndex(index).second;
+    if (!s ) return; // read-only (warn?)
 
     if (val.is_undefined() || val.is_null()) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -903,8 +908,8 @@ setIndexedProperty(size_t index, DisplayObject& o, const as_value& val)
 void
 getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
 {
-    Getter s = getGetterSetterByIndex(index).first;
-    if ( ! s ) {
+    const Getter s = getGetterSetterByIndex(index).first;
+    if (!s) {
         val.set_undefined();
         return;
     }
@@ -1144,7 +1149,7 @@ setY(DisplayObject& o, const as_value& val)
 as_value
 getY(DisplayObject& o)
 {
-    SWFMatrix m = getMatrix(o);
+    const SWFMatrix m = getMatrix(o);
     return twipsToPixels(m.get_y_translation());
 }
 
@@ -1175,7 +1180,7 @@ setX(DisplayObject& o, const as_value& val)
 as_value
 getX(DisplayObject& o)
 {
-    SWFMatrix m = getMatrix(o);
+    const SWFMatrix m = getMatrix(o);
     return twipsToPixels(m.get_x_translation());
 }
 
@@ -1186,8 +1191,7 @@ setScaleX(DisplayObject& o, const as_value& val)
     const double scale_percent = val.to_number();
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
-    if (isNaN(scale_percent))
-    {
+    if (isNaN(scale_percent)) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set %s._xscale to %s "
             "(evaluating to number %g) refused"),
@@ -1214,8 +1218,7 @@ setScaleY(DisplayObject& o, const as_value& val)
     const double scale_percent = val.to_number();
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
-    if (isNaN(scale_percent))
-    {
+    if (isNaN(scale_percent)) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set %s._yscale to %s "
             "(evaluating to number %g) refused"),
@@ -1249,7 +1252,7 @@ setVisible(DisplayObject& o, const as_value& val)
     /// cast to bool, as string "0" should be converted to
     /// its numeric equivalent, not interpreted as 'true', which
     /// SWF7+ does for strings.
-    double d = val.to_number();
+    const double d = val.to_number();
 
     // Infinite or NaN is skipped
     if (isInf(d) || isNaN(d)) {
@@ -1349,8 +1352,7 @@ setRotation(DisplayObject& o, const as_value& val)
     const double rotation_val = val.to_number();
 
     // NaN is skipped, Infinity isn't
-    if (isNaN(rotation_val))
-    {
+    if (isNaN(rotation_val)) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set %s._rotation to %s "
             "(evaluating to number %g) refused"),
@@ -1476,72 +1478,38 @@ getTotalFrames(DisplayObject& o)
     return as_value(mc->get_frame_count());
 }
 
+
 /// @param uri     The property to search for. Note that all special
 ///                properties are lower-case.
 ///
 /// NOTE that all properties have getters so you can recognize a 
 /// 'not-found' condition by checking .first = 0
-///
 const GetterSetter&
 getGetterSetterByURI(const ObjectURI& uri, string_table& st)
 {
-    // 
-    typedef std::map<ObjectURI, GetterSetter, ObjectURI::CaseLessThan> TheMap;
+    typedef std::map<ObjectURI, GetterSetter, ObjectURI::CaseLessThan> 
+        GetterSetters;
 
-    static const Setter n = 0;
+    static const GetterSetters gs =
+        getURIMap<GetterSetters>(ObjectURI::CaseLessThan(st, true));
 
-    ObjectURI::CaseLessThan cmp(st, true);
-    static TheMap theMap(cmp);
-    if ( theMap.empty() ) {
-        theMap[NSV::PROP_uX] = GetterSetter(&getX, &setX);
-        theMap[NSV::PROP_uY] = GetterSetter(&getY, &setY);
-        theMap[NSV::PROP_uXSCALE] = GetterSetter(&getScaleX, &setScaleX);
-        theMap[NSV::PROP_uYSCALE] = GetterSetter(&getScaleY, &setScaleY);
-        theMap[NSV::PROP_uROTATION] = GetterSetter(&getRotation, &setRotation);
-        theMap[NSV::PROP_uHIGHQUALITY] = GetterSetter(&getHighQuality, &setHighQuality);
-        theMap[NSV::PROP_uQUALITY] = GetterSetter(&getQuality, &setQuality);
-        theMap[NSV::PROP_uALPHA] = GetterSetter(&getAlpha, &setAlpha);
-        theMap[NSV::PROP_uWIDTH] = GetterSetter(&getWidth, &setWidth);
-        theMap[NSV::PROP_uHEIGHT] = GetterSetter(&getHeight, &setHeight);
-        theMap[NSV::PROP_uNAME] = GetterSetter(&getNameProperty, &setName);
-        theMap[NSV::PROP_uVISIBLE] = GetterSetter(&getVisible, &setVisible);
-        theMap[NSV::PROP_uSOUNDBUFTIME] = GetterSetter(&getSoundBufTime, &setSoundBufTime);
-        theMap[NSV::PROP_uFOCUSRECT] = GetterSetter(&getFocusRect, &setFocusRect);
-        theMap[NSV::PROP_uDROPTARGET] = GetterSetter(&getDropTarget, n);
-        theMap[NSV::PROP_uCURRENTFRAME] = GetterSetter(&getCurrentFrame, n);
-        theMap[NSV::PROP_uFRAMESLOADED] = GetterSetter(&getFramesLoaded, n);
-        theMap[NSV::PROP_uTOTALFRAMES] = GetterSetter(&getTotalFrames, n);
-        theMap[NSV::PROP_uURL] = GetterSetter(&getURL, n);
-        theMap[NSV::PROP_uTARGET] = GetterSetter(&getTarget, n);
-        theMap[NSV::PROP_uXMOUSE] = GetterSetter(&getMouseX, n);
-        theMap[NSV::PROP_uYMOUSE] = GetterSetter(&getMouseY, n);
-        theMap[NSV::PROP_uPARENT] = GetterSetter(&getParent, n);
-    }
+    const GetterSetters::const_iterator it = gs.find(uri);
 
-    const TheMap::const_iterator it = theMap.find(uri);
-    if ( it == theMap.end() ) {
-        static const GetterSetter none((Getter)0,(Setter)0);
+    if (it == gs.end()) {
+        static const GetterSetter none(0, 0);
         return none;
     }
 
     return it->second;
 }
 
+
 const GetterSetter&
 getGetterSetterByIndex(size_t index)
 {
-    static const Setter n = 0;
+    const Setter n = 0;
 
-    // This is a magic number; defining it here makes sure that the
-    // table is really this size.
-    const size_t size = 22;
-
-    if (index >= size) {
-        static const GetterSetter none((Getter)0,(Setter)0);
-        return none;
-    }
-
-    static const GetterSetter props[size] = {
+    static const GetterSetter props[] = {
         GetterSetter(&getX, &setX),
         GetterSetter(&getY, &setY),
         GetterSetter(&getScaleX, &setScaleX),
@@ -1570,21 +1538,24 @@ getGetterSetterByIndex(size_t index)
         GetterSetter(&getMouseX, n),
         GetterSetter(&getMouseY, n)
 
-        //GetterSetter(&getParent, n) ??
-
     };
+
+    if (index >= arraySize(props)) {
+        const Getter ng = 0;
+        static const GetterSetter none(ng, n);
+        return none;
+    }
 
     return props[index];
 }
-
 
 
 bool
 doGet(const ObjectURI& uri, DisplayObject& o, as_value& val)
 {
     string_table& st = getStringTable(*getObject(&o));
-    Getter s = getGetterSetterByURI(uri, st).first;
-    if ( ! s ) return false;
+    const Getter s = getGetterSetterByURI(uri, st).first;
+    if (!s) return false;
 
     val = (*s)(o);
     return true;
@@ -1604,12 +1575,15 @@ doSet(const ObjectURI& uri, DisplayObject& o, const as_value& val)
 {
     string_table& st = getStringTable(*getObject(&o));
 
-    GetterSetter gs = getGetterSetterByURI(uri, st);
-    if ( ! gs.first ) return false; // not found (all props have getters)
+    const GetterSetter gs = getGetterSetterByURI(uri, st);
+     
+    // not found (all props have getters)
+    if (!gs.first) return false;
 
-    Setter s = gs.second;
+    const Setter s = gs.second;
+
     // read-only (TODO: aserror ?)
-    if ( ! s ) return true;
+    if (!s) return true;
 
     if (val.is_undefined() || val.is_null()) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1623,6 +1597,7 @@ doSet(const ObjectURI& uri, DisplayObject& o, const as_value& val)
     (*s)(o, val);
     return true;
 }
+
 
 const BlendModeMap&
 getBlendModeMap()
@@ -1649,6 +1624,7 @@ getBlendModeMap()
     return bm;
 }
 
+
 // Match a blend mode to its string.
 bool
 blendModeMatches(const BlendModeMap::value_type& val, const std::string& mode)
@@ -1658,7 +1634,60 @@ blendModeMatches(const BlendModeMap::value_type& val, const std::string& mode)
     return (val.second == mode);
 }
 
+/// Return a const map of property URI to function.
+//
+/// This function takes advantage of NRVO to allow the map to
+/// be constructed in the caller.
+template<typename Map>
+const Map
+getURIMap(const typename Map::key_compare& cmp)
+{
+    const Setter n = 0;
+
+    Map ret(cmp);
+    ret.insert(std::make_pair(NSV::PROP_uX, GetterSetter(&getX, &setX)));
+    ret.insert(std::make_pair(NSV::PROP_uY, GetterSetter(&getY, &setY)));
+    ret.insert(std::make_pair(NSV::PROP_uXSCALE,
+                GetterSetter(&getScaleX, &setScaleX)));
+    ret.insert(std::make_pair(NSV::PROP_uYSCALE,
+                GetterSetter(&getScaleY, &setScaleY)));
+    ret.insert(std::make_pair(NSV::PROP_uROTATION,
+                GetterSetter(&getRotation, &setRotation)));
+    ret.insert(std::make_pair(NSV::PROP_uHIGHQUALITY,
+                GetterSetter(&getHighQuality, &setHighQuality)));
+    ret.insert(std::make_pair(NSV::PROP_uQUALITY,
+                GetterSetter(&getQuality, &setQuality)));
+    ret.insert(std::make_pair(NSV::PROP_uALPHA,
+                GetterSetter(&getAlpha, &setAlpha)));
+    ret.insert(std::make_pair(NSV::PROP_uWIDTH,
+                GetterSetter(&getWidth, &setWidth)));
+    ret.insert(std::make_pair(NSV::PROP_uHEIGHT,
+                GetterSetter(&getHeight, &setHeight)));
+    ret.insert(std::make_pair(NSV::PROP_uNAME,
+                GetterSetter(&getNameProperty, &setName)));
+    ret.insert(std::make_pair(NSV::PROP_uVISIBLE,
+                GetterSetter(&getVisible, &setVisible)));
+    ret.insert(std::make_pair(NSV::PROP_uSOUNDBUFTIME,
+                GetterSetter(&getSoundBufTime, &setSoundBufTime)));
+    ret.insert(std::make_pair(NSV::PROP_uFOCUSRECT,
+                GetterSetter(&getFocusRect, &setFocusRect)));
+    ret.insert(std::make_pair(NSV::PROP_uDROPTARGET,
+                GetterSetter(&getDropTarget, n)));
+    ret.insert(std::make_pair(NSV::PROP_uCURRENTFRAME,
+                GetterSetter(&getCurrentFrame, n)));
+    ret.insert(std::make_pair(NSV::PROP_uFRAMESLOADED,
+                GetterSetter(&getFramesLoaded, n)));
+    ret.insert(std::make_pair(NSV::PROP_uTOTALFRAMES,
+                GetterSetter(&getTotalFrames, n)));
+    ret.insert(std::make_pair(NSV::PROP_uURL, GetterSetter(&getURL, n)));
+    ret.insert(std::make_pair(NSV::PROP_uTARGET, GetterSetter(&getTarget, n)));
+    ret.insert(std::make_pair(NSV::PROP_uXMOUSE, GetterSetter(&getMouseX, n)));
+    ret.insert(std::make_pair(NSV::PROP_uYMOUSE, GetterSetter(&getMouseY, n)));
+    ret.insert(std::make_pair(NSV::PROP_uPARENT, GetterSetter(&getParent, n)));
+    return ret;
 }
+
+} // anonymous namespace
 
 std::ostream&
 operator<<(std::ostream& o, DisplayObject::BlendMode bm)
@@ -1666,7 +1695,6 @@ operator<<(std::ostream& o, DisplayObject::BlendMode bm)
     const BlendModeMap& bmm = getBlendModeMap();
     return (o << bmm.find(bm)->second);
 }
-
 
 } // namespace gnash
 
