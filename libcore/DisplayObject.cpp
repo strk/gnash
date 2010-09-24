@@ -63,6 +63,7 @@ namespace {
     typedef std::map<string_table::key, Getter> Getters;
     typedef void(*Setter)(DisplayObject&, const as_value&);
     typedef std::map<string_table::key, Setter> Setters;
+    typedef std::pair<Getter, Setter> GetterSetter;
 
     const Getters& displayObjectGetters();
     const Setters& displayObjectSetters();
@@ -70,6 +71,7 @@ namespace {
     bool doSet(string_table::key prop, DisplayObject& o, const as_value& val);
     bool doGet(string_table::key prop, DisplayObject& o, as_value& val);
     string_table::key getPropertyByIndex(size_t index);
+    const GetterSetter& getGetterSetterByIndex(size_t index);
 }
 
 // Define static const members.
@@ -887,20 +889,29 @@ DisplayObject::getAsRoot()
 void
 setIndexedProperty(size_t index, DisplayObject& o, const as_value& val)
 {
-    string_table::key prop = getPropertyByIndex(index);
-    if (!prop) return;
-    doSet(prop, o, val);
+    Setter s = getGetterSetterByIndex(index).second;
+    if ( ! s ) return; // read-only (warn?)
+
+    if (val.is_undefined() || val.is_null()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Attempt to set property to %s, refused"),
+                o.getTarget(), val);
+        );
+        return;
+    }
+
+    (*s)(o, val);
 }
 
 void
 getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
 {
-    string_table::key prop = getPropertyByIndex(index);
-    if (!prop) {
+    Getter s = getGetterSetterByIndex(index).first;
+    if ( ! s ) {
         val.set_undefined();
         return;
     }
-    doGet(prop, o, val);
+    val = (*s)(o);
 }
 
 
@@ -1485,27 +1496,84 @@ getPropertyByIndex(size_t index)
         NSV::PROP_uY,
         NSV::PROP_uXSCALE,
         NSV::PROP_uYSCALE,
+
         NSV::PROP_uCURRENTFRAME,
         NSV::PROP_uTOTALFRAMES,
         NSV::PROP_uALPHA,
         NSV::PROP_uVISIBLE,
+
         NSV::PROP_uWIDTH,
         NSV::PROP_uHEIGHT,
         NSV::PROP_uROTATION, 
         NSV::PROP_uTARGET, 
+
         NSV::PROP_uFRAMESLOADED, 
         NSV::PROP_uNAME, 
         NSV::PROP_uDROPTARGET, 
         NSV::PROP_uURL, 
+
         NSV::PROP_uHIGHQUALITY, 
         NSV::PROP_uFOCUSRECT, 
         NSV::PROP_uSOUNDBUFTIME, 
         NSV::PROP_uQUALITY, 
+
         NSV::PROP_uXMOUSE, 
         NSV::PROP_uYMOUSE 
     };
     return props[index];
 }
+
+const GetterSetter&
+getGetterSetterByIndex(size_t index)
+{
+    static const Setter n = 0;
+
+    // This is a magic number; defining it here makes sure that the
+    // table is really this size.
+    const size_t size = 22;
+
+    if (index >= size) {
+        static const GetterSetter none((Getter)0,(Setter)0);
+        return none;
+    }
+
+    static const GetterSetter props[size] = {
+        GetterSetter(&getX, &setX),
+        GetterSetter(&getY, &setY),
+        GetterSetter(&getScaleX, &setScaleX),
+        GetterSetter(&getScaleY, &setScaleY),
+
+        GetterSetter(&getCurrentFrame, n),
+        GetterSetter(&getTotalFrames, n),
+        GetterSetter(&getAlpha, &setAlpha),
+        GetterSetter(&getVisible, &setVisible),
+
+        GetterSetter(&getWidth, &setWidth),
+        GetterSetter(&getHeight, &setHeight),
+        GetterSetter(&getRotation, &setRotation),
+        GetterSetter(&getTarget, n),
+
+        GetterSetter(&getFramesLoaded, n),
+        GetterSetter(&getNameProperty, &setName),
+        GetterSetter(&getDropTarget, n),
+        GetterSetter(&getURL, n),
+
+        GetterSetter(&getHighQuality, &setHighQuality),
+        GetterSetter(&getFocusRect, &setFocusRect),
+        GetterSetter(&getSoundBufTime, &setSoundBufTime),
+        GetterSetter(&getQuality, &setQuality),
+
+        GetterSetter(&getMouseX, n),
+        GetterSetter(&getMouseY, n)
+
+        //GetterSetter(&getParent, n) ??
+
+    };
+
+    return props[index];
+}
+
+
 
 bool
 doGet(string_table::key prop, DisplayObject& o, as_value& val)
