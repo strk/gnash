@@ -20,16 +20,16 @@
 #ifndef GNASH_GLOBAL_H
 #define GNASH_GLOBAL_H
 
-#include "as_object.h" // for inheritance
-#include "fn_call.h"
-#include "log.h"
-
 #include <string>
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
+
+#include "as_object.h" 
+#include "fn_call.h"
+#include "log.h"
 
 // Forward declarations
 namespace gnash {
