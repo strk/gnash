@@ -506,9 +506,9 @@ DisplayObject::hasEventHandler(const event_id& id) const
 
     if (!_object) return false;
 
-    as_value tmp;
-	if (_object->get_member(id.functionURI(), &tmp)) {
-		return tmp.to_function();
+    // Don't check resolve!
+	if (Property* prop = _object->findProperty(id.functionURI())) {
+		return prop->getValue(*_object).to_function();
 	}
 	return false;
 
