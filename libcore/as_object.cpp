@@ -408,17 +408,23 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
     // inheritance chain, try the __resolve property.
     if (!prop) {
 
-        prop = findProperty(NSV::PROP_uuRESOLVE);
-        if (!prop) return false;
+        Property* res = findProperty(NSV::PROP_uuRESOLVE);
+        
+        // No __resolve
+        if (!res) return false;
 
-        /// If __resolve exists, call it with the name of the undefined
-        /// property.
+        // If __resolve exists, call it with the name of the undefined
+        // property.
         string_table& st = getStringTable(*this);
         const std::string& undefinedName = st.value(getName(uri));
-        log_debug("__resolve exists, calling with '%s'", undefinedName);
 
-        // TODO: we've found the property, don't search for it again.
-        *val = callMethod(this, NSV::PROP_uuRESOLVE, undefinedName);
+        fn_call::Args args;
+        args += undefinedName;
+
+        // Invoke the __resolve property.
+        *val = invoke(res->getValue(*this), as_environment(getVM(*this)),
+                this, args);
+
         return true;
     }
 
