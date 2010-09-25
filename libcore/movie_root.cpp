@@ -784,10 +784,9 @@ void
 movie_root::doMouseDrag()
 {
     DisplayObject* dragChar = getDraggingCharacter(); 
-    if ( ! dragChar ) return; // nothing to do
+    if (!dragChar) return; // nothing to do
 
-    if ( dragChar->unloaded() )
-    {
+    if (dragChar->unloaded()) {
         // Reset drag state if dragging char was unloaded
         m_drag_state.reset();
         return; 
@@ -801,17 +800,16 @@ movie_root::doMouseDrag()
         parent_world_mat = getWorldMatrix(*p);
     }
 
-    if (! m_drag_state.isLockCentered())
-    {
+    if (!m_drag_state.isLockCentered()) {
         world_mouse.x -= m_drag_state.xOffset();
         world_mouse.y -= m_drag_state.yOffset();
     }
 
-    if ( m_drag_state.hasBounds() )
-    {
+    if (m_drag_state.hasBounds()) {
         SWFRect bounds;
         // bounds are in local coordinate space
-        bounds.enclose_transformed_rect(parent_world_mat, m_drag_state.getBounds());
+        bounds.enclose_transformed_rect(parent_world_mat,
+                m_drag_state.getBounds());
         // Clamp mouse coords within a defined SWFRect.
         bounds.clamp(world_mouse);
     }
@@ -826,7 +824,6 @@ movie_root::doMouseDrag()
     // no need to update caches when only changing translation
     dragChar->setMatrix(local);
 }
-
 
 unsigned int
 movie_root::add_interval_timer(std::auto_ptr<Timer> timer)
