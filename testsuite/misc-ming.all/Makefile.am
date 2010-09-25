@@ -84,6 +84,8 @@ AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
 endif
 
 check_PROGRAMS = \
+	ResolveEventsTest \
+	ResolveEventsTest-Runner \
 	SpriteButtonEventsTest \
 	SpriteButtonEventsTest-Runner \
 	DefineTextTest \
@@ -1823,6 +1825,27 @@ SpriteButtonEventsTest_Runner_CXXFLAGS = \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
 
+ResolveEventsTest_SOURCES =	\
+	ResolveEventsTest.c	\
+	$(NULL)
+ResolveEventsTest_LDADD = libgnashmingutils.la
+ResolveEventsTest.swf: ResolveEventsTest
+	./ResolveEventsTest $(abs_mediadir)
+ResolveEventsTest_Runner_SOURCES = \
+	ResolveEventsTest-Runner.cpp \
+	$(NULL)
+ResolveEventsTest_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+ResolveEventsTest_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	ResolveEventsTest.swf	\
+	$(NULL)
+ResolveEventsTest_Runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
 loadImageTest_SOURCES =	\
 	loadImageTest.c	\
 	$(NULL)
@@ -2268,6 +2291,7 @@ TEST_CASES = \
 	DefineEditTextTest-Runner \
 	RollOverOutTest-Runner \
 	SpriteButtonEventsTest-Runner \
+	ResolveEventsTest-Runner \
 	timeline_var_test-Runner \
 	root_stop_testrunner \
 	loop_test-Runner \
