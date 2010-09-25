@@ -803,6 +803,13 @@ private:
 /// This is used for broadcasting system events. The prototype search is
 /// carried out, but there is no call to __resolve and triggers
 /// are not processed.
+//
+/// The function is called with no arguments.
+//
+/// @param o    The object to send the event to.
+/// @param env  The environment to use, generally provided by the calling
+///             DisplayObject
+/// @param name The name of the function to call.
 void sendEvent(as_object& o, const as_environment& env, const ObjectURI& name);
 
 /// Function objects for visiting properties.
