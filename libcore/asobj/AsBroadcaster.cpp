@@ -81,22 +81,6 @@ struct BroadcasterStats {
 
 class BroadcasterVisitor
 {
-    
-    /// Name of the event being broadcasted
-    /// appropriately cased based on SWF version
-    /// of the current VM
-    std::string _eventName;
-    const ObjectURI& _eventURI;
-
-    // These two will be needed for consistency checking
-    //size_t _origEnvStackSize;
-    //size_t _origEnvCallStackSize;
-
-    /// Number of event dispatches
-    unsigned int _dispatched;
-
-    fn_call _fn;
-
 public:
 
     /// @param eName name of event, will be converted to lowercase if needed
@@ -105,8 +89,7 @@ public:
     ///
     BroadcasterVisitor(const fn_call& fn)
         :
-        _eventName(fn.arg(0).to_string()),
-        _eventURI(getStringTable(fn).find(_eventName)),
+        _eventURI(getStringTable(fn).find(fn.arg(0).to_string())),
         _dispatched(0),
         _fn(fn)
     {
@@ -118,14 +101,13 @@ public:
     {
 
         boost::intrusive_ptr<as_object> o = v.to_object(getGlobal(_fn));
-        if ( ! o ) return;
+        if (!o) return;
 
 #ifdef GNASH_DEBUG_BROADCASTER
         static stats::KeyLookup stats("BroadcasterVisitor call operator",
             getStringTable(_fn), 1);
         stats.check(_eventURI.name);
 #endif
-
         as_value method;
         o->get_member(_eventURI, &method);
 
@@ -138,11 +120,21 @@ public:
         ++_dispatched;
     }
 
-    /// Return number of events dispached since last reset()
-    unsigned int eventsDispatched() const { return _dispatched; }
+    /// Return number of events dispatched.
+    size_t eventsDispatched() const { return _dispatched; }
 
-    /// Reset count od dispatched events
-    void reset() { _dispatched=0; }
+private:
+    
+    /// Name of the event being broadcasted
+    /// appropriately cased based on SWF version
+    /// of the current VM
+    const ObjectURI& _eventURI;
+
+    /// Number of event dispatches
+    size_t _dispatched;
+
+    fn_call _fn;
+
 };
 
 }
