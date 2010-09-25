@@ -664,11 +664,11 @@ MovieClip::notifyEvent(const event_id& id)
             // must be a loaded movie (loadMovie doesn't mark it as 
             // "dynamic" - should it? no, or getBytesLoaded will always
             // return 0)  
-            if ( ! def ) break;
+            if (!def) break;
 
             // if it has a registered class it can have an onLoad 
             // in prototype...
-            if ( def->getRegisteredClass() ) break;
+            if (def->getRegisteredClass()) break;
 
 #ifdef GNASH_DEBUG
             log_debug(_("Sprite %s (depth %d) won't check for user-defined "
@@ -681,15 +681,10 @@ MovieClip::notifyEvent(const event_id& id)
             
     }
 
-    // Check for member function.
+    // Call the appropriate member function.
     if (!isKeyEvent(id)) {
-        callMethod(getObject(this), id.functionURI());
+        sendEvent(*getObject(this), get_environment(), id.functionURI());
     }
-
-    // TODO: if this was UNLOAD release as much memory as possible ?
-    // Verify if this is possible, in particular check order in
-    // which unload handlers of parent and childs is performed
-    // and whether unload of child can access members of parent.
 
 }
 

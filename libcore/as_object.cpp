@@ -478,7 +478,6 @@ as_object::get_super()
     return super;
 }
 
-/*private*/
 Property*
 as_object::findProperty(const ObjectURI& uri, as_object **owner)
 {
@@ -1123,15 +1122,14 @@ Trigger::call(const as_value& oldval, const as_value& newval,
     _executing = true;
     
     try {
-        as_environment env(getVM(this_obj));
+
+        const as_environment env(getVM(this_obj));
         
         fn_call::Args args;
         args += _propname, oldval, newval, _customArg;
         
         fn_call fn(&this_obj, env, args);
-        
         as_value ret = _func->call(fn);
-        
         _executing = false;
         
         return ret;
@@ -1140,6 +1138,16 @@ Trigger::call(const as_value& oldval, const as_value& newval,
     catch (const GnashException&) {
         _executing = false;
         throw;
+    }
+}
+
+void
+sendEvent(as_object& o, const as_environment& env, const ObjectURI& name)
+{
+    Property* prop = o.findProperty(name);
+    if (prop) {
+        fn_call::Args args;
+        invoke(prop->getValue(o), env, &o, args);
     }
 }
 

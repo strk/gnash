@@ -798,6 +798,13 @@ private:
     boost::scoped_ptr<TriggerContainer> _trigs;
 };
 
+/// Send a system event
+//
+/// This is used for broadcasting system events. The prototype search is
+/// carried out, but there is no call to __resolve and triggers
+/// are not processed.
+void sendEvent(as_object& o, const as_environment& env, const ObjectURI& name);
+
 /// Function objects for visiting properties.
 class IsVisible
 {
