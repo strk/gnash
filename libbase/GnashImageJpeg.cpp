@@ -130,7 +130,6 @@ public:
             const JOCTET wrong[] = { 0xff, 0xd9, 0xff, 0xd8 };
 
             if (std::equal(src->m_buffer, src->m_buffer + 4, wrong)) {
-                log_debug("Wrong bytes");
                 std::swap(src->m_buffer[1], src->m_buffer[3]);
             }
         }
