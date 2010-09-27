@@ -46,15 +46,11 @@ namespace {
     DisplayList::const_iterator beginNonRemoved(
             const DisplayList::container_type& c);
 
-	/// Return an iterator succeeding the last element in zone
-    /// (-16384, 0xffff-16384)
+    /// Return the first element in the DisplayList whose depth exceeds
+    /// 65535 (-16384).
     DisplayList::iterator dlistTagsEffectiveZoneEnd(
             DisplayList::container_type& c);
 	
-	/// Return an constant iterator succeeding the last element
-    /// in (-16384, 0xffff-16384)
-    DisplayList::const_iterator dlistTagsEffectiveZoneEnd(
-            const DisplayList::container_type& c);
 }
 
 /// Anonymous namespace for generic algorithm functors.
@@ -865,21 +861,27 @@ DisplayList::sort()
 }
 
 void
-DisplayList::mergeDisplayList(DisplayList & newList)
+DisplayList::mergeDisplayList(DisplayList& newList)
 {
     testInvariant();
+
+    log_debug("New list size: %s", newList.size());
 
     iterator itOld = beginNonRemoved(_charsByDepth);
     iterator itNew = beginNonRemoved(newList._charsByDepth);
 
     iterator itOldEnd = dlistTagsEffectiveZoneEnd(_charsByDepth);
-    iterator itNewEnd = newList._charsByDepth.end(); 
-    assert(itNewEnd == dlistTagsEffectiveZoneEnd(newList._charsByDepth) );
+
+    // There used to be an assertion here that no character in the new list
+    // is at depth 65535 or higher. There's no reason why the tags executed
+    // on the new list shouldn't do this though. Bug #29282 does this.
+    // TODO: check whether we should be ignoring that character.
+    iterator itNewEnd = dlistTagsEffectiveZoneEnd(newList._charsByDepth); 
 
     // step1. 
     // starting scanning both lists.
-    while (itOld != itOldEnd)
-    {
+    while (itOld != itOldEnd) {
+
         iterator itOldBackup = itOld;
         
         DisplayObject* chOld = *itOldBackup;
@@ -1089,13 +1091,6 @@ beginNonRemoved(const DisplayList::container_type& c)
 
 DisplayList::iterator
 dlistTagsEffectiveZoneEnd(DisplayList::container_type& c)
-{
-    return std::find_if(c.begin(), c.end(), 
-             DepthGreaterOrEqual(0xffff + DisplayObject::staticDepthOffset));
-}
-
-DisplayList::const_iterator
-dlistTagsEffectiveZoneEnd(const DisplayList::container_type& c)
 {
     return std::find_if(c.begin(), c.end(), 
              DepthGreaterOrEqual(0xffff + DisplayObject::staticDepthOffset));
