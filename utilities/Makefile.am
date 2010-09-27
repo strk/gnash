@@ -106,15 +106,18 @@ AM_CPPFLAGS += \
 	-I$(top_srcdir)/cygnal/libnet
 bin_PROGRAMS += soldumper flvdumper
 
+CYGNAL_LIBS = \
+	$(top_builddir)/cygnal/libamf/libgnashamf.la \
+	$(top_builddir)/cygnal/libnet/libgnashnet.la \
+	$(BOOST_CYGNAL_LIBS) \
+	$(NULL)
+
 soldumper_SOURCES = soldumper.cpp
-soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+soldumper_LDADD = $(GNASH_LIBS) $(CYGNAL_LIBS) $(AM_LDFLAGS)
 
 flvdumper_SOURCES = flvdumper.cpp
-flvdumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+flvdumper_LDADD = $(GNASH_LIBS) $(CYGNAL_LIBS) $(AM_LDFLAGS)
 
-GNASH_LIBS += \
-	$(top_builddir)/cygnal/libamf/libgnashamf.la \
-	$(top_builddir)/cygnal/libnet/libgnashnet.la
 endif
 
 #check_PROGRAMS = gdebug.swf
