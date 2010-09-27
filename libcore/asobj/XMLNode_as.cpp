@@ -464,6 +464,11 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
 void
 XMLNode_as::setReachable() 
 {
+    // If there is a parent, make sure its object is reachable. This goes
+    // up towards the root node of tree without marking the XMLNode
+    // resources (which would cause infinite recursion).
+    if (_parent && _parent->_object) _parent->_object->setReachable();
+
 	// Mark children
     std::for_each(_children.begin(), _children.end(),
             boost::mem_fn(&XMLNode_as::setReachable));
