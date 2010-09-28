@@ -1,0 +1,24 @@
+# gnash Desktop translation to German.
+# Copyright (C) 2009 Helge Kreutzmann.
+# This file is distributed under the same license as the gnash package.
+# Helge Kreutzmann <debian@helgefjell.de>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnash\n"
+"Report-Msgid-Bugs-To: gnash@packages.debian.org\n"
+"POT-Creation-Date: 2009-11-16 14:35+0100\n"
+"PO-Revision-Date: 2009-11-19 17:17+0200\n"
+"Last-Translator: Helge Kreutzmann <debian@helgefjell.de>\n"
+"Language-Team: de <debian-l10n-german@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../debian/gnash.desktop.in.h:1
+msgid "Gnash SWF Viewer"
+msgstr "Gnash-SWF-Betrachter"
+
+#: ../../debian/klash.desktop.in.h:1
+msgid "Gnash SWF Viewer for KDE"
+msgstr "Gnash-SWF-Betrachter für KDE"

@@ -1,0 +1,26 @@
+# Copyright (C) 2009
+# This file is distributed under the same license as the gnash package.
+#
+# Esko Arajärvi <edu@iki.fi>, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: gnash\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-08-06 00:12+0000\n"
+"PO-Revision-Date: 2009-11-17 23:02+0200\n"
+"Last-Translator: Esko Arajärvi <edu@iki.fi>\n"
+"Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../../debian/gnash.desktop.in.h:1
+msgid "Gnash SWF Viewer"
+msgstr "Gnash SWF-katselin"
+
+#: ../../debian/klash.desktop.in.h:1
+msgid "Gnash SWF Viewer for KDE"
+msgstr "Gnash SWF-katselin KDE:lle"
