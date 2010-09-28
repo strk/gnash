@@ -62,52 +62,53 @@ enum SortFlags {
     SORT_NUMERIC = (1<<4) // 16
 };
 
-struct indexed_as_value;
+    struct indexed_as_value;
 
-typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
+    typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 
-void attachArrayInterface(as_object& proto);
-void attachArrayStatics(as_object& proto);
+    void attachArrayInterface(as_object& proto);
+    void attachArrayStatics(as_object& proto);
 
-as_value join(as_object* array, const std::string& separator);
+    as_value join(as_object* array, const std::string& separator);
 
-as_value array_new(const fn_call& fn);
-as_value array_slice(const fn_call& fn);
-as_value array_concat(const fn_call& fn);
-as_value array_toString(const fn_call& fn);
-as_value array_join(const fn_call& fn);
-as_value array_reverse(const fn_call& fn);
-as_value array_shift(const fn_call& fn);
-as_value array_pop(const fn_call& fn);
-as_value array_unshift(const fn_call& fn);
-as_value array_push(const fn_call& fn);
-as_value array_sortOn(const fn_call& fn);
-as_value array_sort(const fn_call& fn);
-as_value array_splice(const fn_call& fn);
+    as_value array_new(const fn_call& fn);
+    as_value array_slice(const fn_call& fn);
+    as_value array_concat(const fn_call& fn);
+    as_value array_toString(const fn_call& fn);
+    as_value array_join(const fn_call& fn);
+    as_value array_reverse(const fn_call& fn);
+    as_value array_shift(const fn_call& fn);
+    as_value array_pop(const fn_call& fn);
+    as_value array_unshift(const fn_call& fn);
+    as_value array_push(const fn_call& fn);
+    as_value array_sortOn(const fn_call& fn);
+    as_value array_sort(const fn_call& fn);
+    as_value array_splice(const fn_call& fn);
 
-string_table::key getKey(const fn_call& fn, size_t i);
-int isIndex(const std::string& name);
+    string_table::key getKey(const fn_call& fn, size_t i);
+    int isIndex(const std::string& name);
 
-/// Implementation of foreachArray that takes a start and end range.
-template<typename T> void foreachArray(as_object& array, int start,
-				       int end, T& pred);
+    /// Implementation of foreachArray that takes a start and end range.
+    template<typename T> void foreachArray(as_object& array, int start,
+                           int end, T& pred);
 
-inline bool int_lt_or_eq (int a) {
-    return a <= 0;
-}
+    inline bool int_lt_or_eq (int a) {
+        return a <= 0;
+    }
 
-inline bool int_gt (int a) {
-    return a > 0;
-}
+    inline bool int_gt (int a) {
+        return a > 0;
+    }
 
-void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
+    void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
 
-void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
+    void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
 
-/// Set the length property of an object only if it is a genuine array.
-void setArrayLength(as_object& o, const int size);
+    /// Set the length property of an object only if it is a genuine array.
+    void setArrayLength(as_object& o, const int size);
 
     void resizeArray(as_object& o, const int size);
+
 }
 
 /// Function objects for foreachArray()
@@ -624,16 +625,18 @@ public:
     {
     }
 
-    bool operator() (const as_value& a, const as_value& b)
-    {
-        as_value av, bv;
+    bool operator()(const as_value& a, const as_value& b) const {
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object(getGlobal(_obj));
-        boost::intrusive_ptr<as_object> bo = b.to_object(getGlobal(_obj));
+        as_object* ao = a.to_object(getGlobal(_obj));
+        as_object* bo = b.to_object(getGlobal(_obj));
+
+        assert(ao);
+        assert(bo);
         
-        ao->get_member(_prop, &av);
-        bo->get_member(_prop, &bv);
+        const as_value& av = arrayProperty(*ao, _prop);
+        const as_value& bv = arrayProperty(*bo, _prop);
+
         return _comp(av, bv);
     }
 private:
@@ -680,10 +683,9 @@ public:
         
         for (Props::iterator pit = _prps.begin(), pend = _prps.end();
                 pit != pend; ++pit, ++cmp) {
-            as_value av, bv;
-
-            ao->get_member(*pit, &av);
-            bo->get_member(*pit, &bv);
+            
+            const as_value& av = arrayProperty(*ao, *pit);
+            const as_value& bv = arrayProperty(*bo, *pit);
 
             if ((*cmp)(av, bv)) return true;
             if ((*cmp)(bv, av)) return false;
@@ -707,9 +709,8 @@ public:
     {
     }
 
-    bool operator() (const as_value& a, const as_value& b)
-    {
-        if ( _cmps.empty() ) return false;
+    bool operator()(const as_value& a, const as_value& b) const {
+        if (_cmps.empty()) return false;
 
         Comps::const_iterator cmp = _cmps.begin();
 
@@ -720,11 +721,10 @@ public:
         for (Props::iterator pit = _prps.begin(), pend = _prps.end();
                 pit != pend; ++pit, ++cmp)
         {
-            as_value av, bv;
-            ao->get_member(*pit, &av);
-            bo->get_member(*pit, &bv);
+            const as_value& av = arrayProperty(*ao, *pit);
+            const as_value& bv = arrayProperty(*bo, *pit);
 
-            if ( !(*cmp)(av, bv) ) return false;
+            if (!(*cmp)(av, bv)) return false;
         }
         
         return true;
@@ -836,12 +836,20 @@ checkArrayLength(as_object& array, const ObjectURI& uri, const as_value& val)
 size_t
 arrayLength(as_object& array)
 {
+    // TODO: check whether this should use only ownProperty.
     as_value length;
     if (!array.get_member(NSV::PROP_LENGTH, &length)) return 0;
     
     const int size = toInt(length);
     if (size < 0) return 0;
     return size;
+}
+
+as_value
+arrayProperty(as_object& array, const ObjectURI& prop)
+{
+    Property* p = array.getOwnProperty(prop);
+    return p ? p->getValue(array) : as_value();
 }
 
 void
@@ -978,7 +986,7 @@ array_splice(const fn_call& fn)
     // Push removed elements to the new array.
     for (size_t i = 0; i < remove; ++i) {
         const size_t key = getKey(fn, start + i);
-        callMethod(ret, NSV::PROP_PUSH, array->getMember(key));
+        callMethod(ret, NSV::PROP_PUSH, arrayProperty(*array, key));
     }
 
     // Shift elements in 'this' array by simple assignment, not delete
@@ -1234,14 +1242,11 @@ array_unshift(const fn_call& fn)
 
     const size_t size = arrayLength(*array);
 
-    string_table& st = getStringTable(fn);
-    as_value ret = array->getMember(st.find("0"));
-    
     for (size_t i = size + shift - 1; i >= shift ; --i) {
         const string_table::key nextkey = getKey(fn, i - shift);
         const string_table::key currentkey = getKey(fn, i);
         array->delProperty(currentkey);
-        array->set_member(currentkey, array->getMember(nextkey));
+        array->set_member(currentkey, arrayProperty(*array, nextkey));
     }
 
     for (size_t i = shift; i > 0; --i) {
@@ -1265,7 +1270,7 @@ array_pop(const fn_call& fn)
     if (size < 1) return as_value();
 
     const string_table::key ind = getKey(fn, size - 1);
-    as_value ret = array->getMember(ind);
+    as_value ret = arrayProperty(*array, ind);
     array->delProperty(ind);
     
     setArrayLength(*array, size - 1);
@@ -1283,13 +1288,13 @@ array_shift(const fn_call& fn)
     // An array with no elements has nothing to return.
     if (size < 1) return as_value();
 
-    as_value ret = array->getMember(getKey(fn, 0));
+    as_value ret = arrayProperty(*array, getKey(fn, 0));
 
     for (size_t i = 0; i < static_cast<size_t>(size - 1); ++i) {
         const string_table::key nextkey = getKey(fn, i + 1);
         const string_table::key currentkey = getKey(fn, i);
         array->delProperty(currentkey);
-        array->set_member(currentkey, array->getMember(nextkey));
+        array->set_member(currentkey, arrayProperty(*array, nextkey));
     }
     
     setArrayLength(*array, size - 1);
@@ -1310,8 +1315,8 @@ array_reverse(const fn_call& fn)
     for (size_t i = 0; i < static_cast<size_t>(size) / 2; ++i) {
         const string_table::key bottomkey = getKey(fn, i);
         const string_table::key topkey = getKey(fn, size - i - 1);
-        const as_value top = array->getMember(topkey);
-        const as_value bottom = array->getMember(bottomkey);
+        const as_value top = arrayProperty(*array, topkey);
+        const as_value bottom = arrayProperty(*array, bottomkey);
         array->delProperty(topkey);
         array->delProperty(bottomkey);
         array->set_member(bottomkey, top);
@@ -1460,8 +1465,7 @@ join(as_object* array, const std::string& separator)
     for (size_t i = 0; i < size; ++i) {
         if (i) s += separator;
         const std::string& index = boost::lexical_cast<std::string>(i);
-        Property* prop = array->getOwnProperty(st.find(index));
-        const as_value& el = prop ? prop->getValue(*array) : as_value();
+        const as_value& el = arrayProperty(*array, st.find(index));
         s += el.to_string(version);
     }
     return as_value(s);
@@ -1495,7 +1499,7 @@ void foreachArray(as_object& array, int start, int end, T& pred)
     string_table& st = getStringTable(array);
 
     for (size_t i = start; i < static_cast<size_t>(end); ++i) {
-        pred(array.getMember(arrayKey(st, i)));
+        pred(arrayProperty(array, arrayKey(st, i)));
     }
 }
 

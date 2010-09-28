@@ -28,6 +28,17 @@ namespace gnash {
 
 namespace gnash {
 
+/// Get an own property of an array, or undefined if it doesn't exist.
+//
+/// Array functions do not search the prototype chain or call __resolve to
+/// find a property. There is no need to use this function directly; it is
+/// here for foreachArray().
+//
+/// @param array    The object whose array length is needed.
+/// @param prop     The property to find.
+/// @return         The value of the property, or undefined if it is not found.
+as_value arrayProperty(as_object& array, const ObjectURI& prop);
+
 /// Get the length of an object as though it were an array
 //
 /// It may well be an array, but this also works on normal objects with a 
@@ -83,7 +94,7 @@ void foreachArray(as_object& array, T& pred)
     string_table& st = getStringTable(array);
 
     for (size_t i = 0; i < static_cast<size_t>(size); ++i) {
-        pred(array.getMember(arrayKey(st, i)));
+        pred(arrayProperty(array, arrayKey(st, i)));
     }
 }
 

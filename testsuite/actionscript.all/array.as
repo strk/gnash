@@ -1646,6 +1646,12 @@ check_equals(t.join("/"), "zero/////five");
 #endif
 check_equals(rs, 1);
 
+// Same with other functions.
+t.sort();
+check_equals(rs, 1);
+t.reverse();
+check_equals(rs, 1);
+
 #if OUTPUT_VERSION > 5
 
 Empty = function() {};
@@ -1751,11 +1757,11 @@ check_equals(ar.__proto__, "string");
 
 
 #if OUTPUT_VERSION < 6
- check_totals(543);
+ check_totals(545);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(627);
+  check_totals(629);
 # else
-  check_totals(637);
+  check_totals(639);
 # endif
 #endif
