@@ -1640,11 +1640,11 @@ check_equals(t[2], "om");
 
 // But join() only uses own properties: no resolve, no chain.
 #if OUTPUT_VERSION > 6
-xcheck_equals(t.join("/"), "zero/undefined/undefined/undefined/undefined/five");
+check_equals(t.join("/"), "zero/undefined/undefined/undefined/undefined/five");
 #else
-xcheck_equals(t.join("/"), "zero/////five");
+check_equals(t.join("/"), "zero/////five");
 #endif
-xcheck_equals(rs, 1);
+check_equals(rs, 1);
 
 #if OUTPUT_VERSION > 5
 

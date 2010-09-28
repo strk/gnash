@@ -1458,11 +1458,10 @@ join(as_object* array, const std::string& separator)
     const int version = getSWFVersion(*array);
 
     for (size_t i = 0; i < size; ++i) {
-        std::ostringstream os;
-        os << i;
         if (i) s += separator;
-        as_value el;
-        array->get_member(st.find(os.str()), &el);
+        const std::string& index = boost::lexical_cast<std::string>(i);
+        Property* prop = array->getOwnProperty(st.find(index));
+        const as_value& el = prop ? prop->getValue(*array) : as_value();
         s += el.to_string(version);
     }
     return as_value(s);
