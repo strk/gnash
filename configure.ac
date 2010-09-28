@@ -2760,7 +2760,6 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
 
 CHECK_VISIBILITY_GCC_BUG
 
-
 if test x$ac_cv_gcc_visibility_bug = xno; then
   AC_LANG_PUSH(C++)
   AC_MSG_CHECKING([whether $CXX supports -fvisibility=hidden])
