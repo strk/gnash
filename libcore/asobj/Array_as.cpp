@@ -905,7 +905,7 @@ namespace {
 void
 attachArrayStatics(as_object& proto)
 {
-    int flags = 0; // these are not protected
+    const int flags = 0; // these are not protected
     proto.init_member("CASEINSENSITIVE", SORT_CASE_INSENSITIVE, flags);
     proto.init_member("DESCENDING", SORT_DESCENDING, flags);
     proto.init_member("UNIQUESORT", SORT_UNIQUE, flags);
