@@ -865,8 +865,6 @@ DisplayList::mergeDisplayList(DisplayList& newList)
 {
     testInvariant();
 
-    log_debug("New list size: %s", newList.size());
-
     iterator itOld = beginNonRemoved(_charsByDepth);
     iterator itNew = beginNonRemoved(newList._charsByDepth);
 
