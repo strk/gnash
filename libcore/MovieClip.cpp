@@ -737,7 +737,7 @@ MovieClip::setTextFieldVariables(const ObjectURI& uri, const as_value& val)
     if (!etc) return false;
 
     for (TextFields::iterator i=etc->begin(), e=etc->end(); i!=e; ++i) {
-        (*i)->updateText(val.to_string());
+        (*i)->updateText(val.to_string(getSWFVersion(*getObject(this))));
     }
     return true;
 }

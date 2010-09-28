@@ -770,7 +770,7 @@ mc45.createTextField("tf45", 0, 0, 100, 100, getNextHighestDepth());
 mc45.tf45.variable = "_root.mc45.vari";
 _root.mc45.vari = undefined;
 #if OUTPUT_VERSION < 7
-xcheck_equals(mc45.tf45.text, "");
+check_equals(mc45.tf45.text, "");
 #else
 check_equals(mc45.tf45.text, "undefined");
 #endif
