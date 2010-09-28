@@ -150,13 +150,6 @@ private:
 
 	private:
 
-		as_function* _getter;
-		as_function* _setter;
-
-		as_value _underlyingValue;
-
-		mutable bool _beingAccessed;
-
 		/// For SWF6 (not higher) a user-defined getter-setter would not
         /// be invoked while being set. This ScopedLock helps marking a
         /// Getter-Setter as being invoked in an exception-safe manner.
@@ -193,11 +186,16 @@ private:
 			bool _obtainedLock;
 
         };
+
+		as_function* _getter;
+		as_function* _setter;
+		as_value _underlyingValue;
+		mutable bool _beingAccessed;
     };
 
 	/// Native GetterSetter
-	class NativeGetterSetter {
-
+	class NativeGetterSetter
+    {
 	public:
 
 		NativeGetterSetter(as_c_function_ptr get, as_c_function_ptr set)
@@ -205,19 +203,16 @@ private:
 			_getter(get), _setter(set) {}
 
 		/// Invoke the getter
-		as_value get(fn_call& fn) const
-		{
+		as_value get(fn_call& fn) const {
 			return _getter(fn);
 		}
 
 		/// Invoke the setter
-		void set(fn_call& fn)
-		{
+		void set(fn_call& fn) {
 			_setter(fn);
 		}
 
 	private:
-
 		as_c_function_ptr _getter;
 		as_c_function_ptr _setter;
 	};
@@ -240,55 +235,55 @@ public:
 	Property(const ObjectURI& uri)
         : 
 		_bound(as_value()),
-        _destructive(false),
-        _uri(uri)
+        _uri(uri),
+        _destructive(false)
 	{}
 
 	Property(const ObjectURI& uri, const as_value& value,
             const PropFlags& flags = PropFlags())
         :
-		_flags(flags),
         _bound(value),
-        _destructive(false),
-		_uri(uri)
+		_uri(uri),
+		_flags(flags),
+        _destructive(false)
 	{}
 
 	Property(const ObjectURI& uri,
 		as_function *getter, as_function *setter, 
 		const PropFlags& flags, bool destroy = false)
         :
-		_flags(flags), 
         _bound(GetterSetter(getter, setter)),
-		_destructive(destroy),
-        _uri(uri)
+        _uri(uri),
+		_flags(flags), 
+		_destructive(destroy)
 	{}
 
 	Property(const ObjectURI& uri, as_function *getter, as_function *setter,
             bool destroy = false)
         :
-		_flags(),
         _bound(GetterSetter(getter, setter)),
-        _destructive(destroy),
-        _uri(uri)
+        _uri(uri),
+		_flags(),
+        _destructive(destroy)
 	{}
 
 	Property(const ObjectURI& uri, as_c_function_ptr getter,
             as_c_function_ptr setter, const PropFlags& flags,
             bool destroy = false)
 		:
-		_flags(flags),
         _bound(GetterSetter(getter, setter)),
-        _destructive(destroy),
-        _uri(uri)
+        _uri(uri),
+		_flags(flags),
+        _destructive(destroy)
 	{}
 	
     /// Copy constructor
 	Property(const Property& p)
         :
-		_flags(p._flags),
         _bound(p._bound),
-        _destructive(p._destructive),
-        _uri(p._uri)
+        _uri(p._uri),
+		_flags(p._flags),
+        _destructive(p._destructive)
 	{}
 
 	/// accessor to the properties flags
@@ -378,22 +373,22 @@ private:
         TYPE_GETTER_SETTER
     };
 
-	/// Properties flags
-	mutable PropFlags _flags;
-
 	// Store the various types of things that can be held.
 	typedef boost::variant<boost::blank, as_value, GetterSetter> BoundType;
 
     /// The value of the property.
 	mutable BoundType _bound;
+	
+    // TODO: this should be const, but the assignment operator is still needed 
+    ObjectURI _uri;
+
+	/// Properties flags
+	mutable PropFlags _flags;
 
 	// If true, as soon as getValue has been invoked once, the
 	// returned value becomes a fixed return (though it can be
 	// overwritten if not readOnly)
 	mutable bool _destructive;
-	
-    // TODO: this should be const, but the assignment operator is still needed 
-    ObjectURI _uri;
 
 };
 	
