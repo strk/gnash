@@ -49,16 +49,16 @@ BUILD_DIR := $(shell \
 	snapshot_dir=$(SNAPSHOT_DIR); \
 	if test $(OGL) -eq 1 -o $(FFMPEG) -eq 1 -o $(VAAPI) -eq 1; then \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 1; then \
-	    snapshot_dir=$(subst bzr,bzr.ogl.ffmpeg,$(SNAPSHOT_DIR)); \
+	    snapshot_dir=$(subst git,git.ogl.ffmpeg,$(SNAPSHOT_DIR)); \
 	  fi; \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 0; then \
-	    snapshot_dir=$(subst bzr,bzr.ogl,$(SNAPSHOT_DIR)); \
+	    snapshot_dir=$(subst git,git.ogl,$(SNAPSHOT_DIR)); \
 	  fi; \
 	  if test $(OGL) -eq 0 -a $(FFMPEG) -eq 1; then \
-	    snapshot_dir=$(subst bzr,bzr.ffmpeg,$(SNAPSHOT_DIR)); \
+	    snapshot_dir=$(subst git,git.ffmpeg,$(SNAPSHOT_DIR)); \
 	  fi; \
 	  if test $(VAAPI) -eq 1; then \
-	    snapshot_dir=$(subst bzr,bzr.vaapi,$(SNAPSHOT_DIR)); \
+	    snapshot_dir=$(subst git,git.vaapi,$(SNAPSHOT_DIR)); \
 	  fi; \
 	fi; \
 	echo "$${snapshot_dir}")
@@ -69,16 +69,16 @@ BUILD_VERSION := $(shell \
 	snapshot_version=$(SNAPSHOT_VERSION); \
 	if test $(OGL) -eq 1 -o $(FFMPEG) -eq 1 -o $(VAAPI) -eq 1; then \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 1; then \
-	    snapshot_version=$(subst bzr,bzr.ogl.ffmpeg,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst git,git.ogl.ffmpeg,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 0; then \
-	    snapshot_version=$(subst bzr,bzr.ogl,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst git,git.ogl,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	  if test $(OGL) -eq 0 -a $(FFMPEG) -eq 1; then \
-	    snapshot_version=$(subst bzr,bzr.ffmpeg,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst git,git.ffmpeg,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	  if test $(VAAPI) -eq 1; then \
-	    snapshot_version=$(subst bzr,bzr.vaapi,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst git,git.vaapi,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	fi; \
 	echo "$${snapshot_version}")
@@ -101,7 +101,7 @@ PACKAGES := \
 setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control deb-edit-utilities deb-edit-python deb-edit-mozilla
 
 # Rename the directory created by distdir to the snapshot. This is
-# usually something like "gnash-trunk" to "0.8.8~bzr.ogl.ffmpeg.trunk11977".
+# usually something like "gnash-trunk" to "0.8.8~git.ogl.ffmpeg.trunk11977".
 # This requires distdir to be run first, but it's not a dependency as we
 # don't want to always rebuild the source tree, just the dependencies.
 deb-rename-build:
