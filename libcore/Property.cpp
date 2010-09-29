@@ -25,6 +25,21 @@
 
 namespace gnash {
 
+namespace {
+
+struct GetCache : public boost::static_visitor<as_value>
+{
+    result_type operator()(as_value& val) const {
+        return val;
+    }
+    result_type operator()(GetterSetter& gs) const {
+        return gs.getCache();
+    }
+};
+
+}
+
+
 void
 GetterSetter::UserDefinedGetterSetter::markReachableResources() const
 {
@@ -131,14 +146,7 @@ Property::getValue(const as_object& this_ptr) const
 as_value
 Property::getCache() const
 {
-	switch (_bound.which())
-	{
-        case TYPE_VALUE:
-            return boost::get<as_value&>(_bound);
-        case TYPE_GETTER_SETTER:
-            return boost::get<GetterSetter&>(_bound).getCache();
-	} 
-    return as_value();
+    return boost::apply_visitor(GetCache(), _bound);
 }
 
 void

@@ -334,7 +334,7 @@ as_object::add_property(const std::string& name, as_function& getter,
     Property* prop = _members.getProperty(uri);
 
     if (prop) {
-        as_value cacheVal = prop->getCache();
+        const as_value& cacheVal = prop->getCache();
         // Used to return the return value of addGetterSetter, but this
         // is always true.
         _members.addGetterSetter(uri, getter, setter, cacheVal);
@@ -558,9 +558,8 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     // WARNING: getValue might itself invoke a trigger
     // (getter-setter)... ouch ?
     // TODO: in this case, return the underlying value !
-    as_value curVal = prop ? prop->getCache() : as_value(); 
-
-    as_value newVal = trig.call(curVal, val, *this);
+    const as_value& curVal = prop ? prop->getCache() : as_value(); 
+    const as_value& newVal = trig.call(curVal, val, *this);
     
     // This is a particularly clear and concise way of removing dead triggers.
     EraseIf(*_trigs, boost::bind(boost::mem_fn(&Trigger::dead), 
@@ -979,9 +978,9 @@ as_object::get_prototype() const
     if (!prop) return 0;
     if (!visible(*prop, swfVersion)) return 0;
     
-    as_value tmp = prop->getValue(*this);
+    const as_value& proto = prop->getValue(*this);
     
-    return tmp.to_object(getGlobal(*this));
+    return proto.to_object(getGlobal(*this));
 }
 
 as_value
