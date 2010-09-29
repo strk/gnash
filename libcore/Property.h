@@ -392,13 +392,12 @@ private:
 	void setDelayedValue(as_object& this_ptr, const as_value& value) const;
 
     enum Type {
-        TYPE_EMPTY,
         TYPE_VALUE,
         TYPE_GETTER_SETTER
     };
 
 	// Store the various types of things that can be held.
-	typedef boost::variant<boost::blank, as_value, GetterSetter> BoundType;
+	typedef boost::variant<as_value, GetterSetter> BoundType;
 
     /// The value of the property.
 	mutable BoundType _bound;

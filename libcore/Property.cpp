@@ -102,9 +102,6 @@ Property::setReachable() const
 {
 	switch (_bound.which())
 	{
-	    case TYPE_EMPTY: 
-		    break;
-
         case TYPE_VALUE: 
 		    boost::get<as_value>(_bound).setReachable();
 		    break;
@@ -123,8 +120,6 @@ Property::getValue(const as_object& this_ptr) const
 {
 	switch (_bound.which())
 	{
-        case TYPE_EMPTY:
-            return as_value();
         case TYPE_VALUE:
             return boost::get<as_value>(_bound);
         case TYPE_GETTER_SETTER: 
@@ -138,8 +133,6 @@ Property::getCache() const
 {
 	switch (_bound.which())
 	{
-        case TYPE_EMPTY:
-            return as_value();
         case TYPE_VALUE:
             return boost::get<as_value&>(_bound);
         case TYPE_GETTER_SETTER:
@@ -153,7 +146,6 @@ Property::setValue(as_object& this_ptr, const as_value &value) const
 {
 	switch (_bound.which())
 	{
-        case TYPE_EMPTY: 
         case TYPE_VALUE: 
             _bound = value;
             return;
@@ -173,7 +165,6 @@ Property::setCache(const as_value& value)
 {
 	switch (_bound.which())
 	{
-        case TYPE_EMPTY:
         case TYPE_VALUE: 
             _bound = value;
             return;
