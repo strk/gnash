@@ -22,6 +22,7 @@
 
 #include <boost/variant.hpp>
 #include <cassert>
+#include <boost/bind.hpp>
 
 #include "PropFlags.h"
 #include "as_value.h"
