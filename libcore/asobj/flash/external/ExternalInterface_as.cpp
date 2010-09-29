@@ -85,6 +85,8 @@ as_value externalinterface_ctor(const fn_call& fn);
 void attachExternalInterfaceStaticInterface(as_object& o);
 }
 
+namespace {
+
 /// Class used to serialize properties of an object to a buffer
 class PropsSerializer : public AbstractPropertyVisitor
 {
@@ -132,6 +134,8 @@ private:
     std::stringstream   _xml;
     std::vector<as_value>   _noprops;
 };
+
+}
 
 void
 registerExternalInterfaceNative(as_object& global)

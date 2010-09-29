@@ -50,6 +50,8 @@
 
 namespace gnash {
 
+namespace {
+
 /// Class used to serialize properties of an object to a buffer
 class PropsSerializer : public AbstractPropertyVisitor
 {
@@ -97,6 +99,8 @@ private:
     std::stringstream   _xml;
     std::vector<as_value>   _noprops;
 };
+
+}
 
 #if 0
 class ExternalExecutor: public movie_root::AbstractExternalCallback {
