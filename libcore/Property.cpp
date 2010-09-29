@@ -30,6 +30,7 @@ namespace gnash {
 
 namespace {
 
+/// Get the cache of a variant member.
 struct GetCache : public boost::static_visitor<as_value>
 {
     result_type operator()(as_value& val) const {
@@ -40,6 +41,7 @@ struct GetCache : public boost::static_visitor<as_value>
     }
 };
 
+/// Set the cache of a variant member.
 struct SetCache : public boost::static_visitor<>
 {
     result_type operator()(as_value& val, const as_value& n) const {
@@ -50,6 +52,7 @@ struct SetCache : public boost::static_visitor<>
     }
 };
 
+/// Mark the stored value reachable.
 struct SetReachable : public boost::static_visitor<>
 {
     result_type operator()(const as_value& val) const {
@@ -61,7 +64,6 @@ struct SetReachable : public boost::static_visitor<>
 };
 
 }
-
 
 void
 GetterSetter::UserDefinedGetterSetter::markReachableResources() const
@@ -97,44 +99,6 @@ GetterSetter::UserDefinedGetterSetter::set(const fn_call& fn)
 	_setter->call(fn);
 }
 
-as_value
-Property::getDelayedValue(const as_object& this_ptr) const
-{
-	const GetterSetter* a = boost::get<const GetterSetter>(&_bound);
-
-	as_environment env(getVM(this_ptr));
-	fn_call fn(const_cast<as_object*>(&this_ptr), env);
-	if (_destructive)
-	{
-		as_value ret = a->get(fn);
-		// The getter might have called the setter, and we should not override.
-		if (_destructive)
-		{
-			_bound = ret;
-			_destructive = false;
-		}
-		return ret;
-	}
-	return a->get(fn);
-
-}
-
-void
-Property::setDelayedValue(as_object& this_ptr, const as_value& value) const
-{
-	GetterSetter* a = boost::get<GetterSetter>(&_bound);
-
-	as_environment env(getVM(this_ptr));
-
-    fn_call::Args args;
-    args += value;
-
-	fn_call fn(&this_ptr, env, args);
-
-	a->set(fn);
-	a->setCache(value);
-}
-
 void
 Property::setReachable() const
 {
@@ -148,8 +112,25 @@ Property::getValue(const as_object& this_ptr) const
 	{
         case TYPE_VALUE:
             return boost::get<as_value>(_bound);
-        case TYPE_GETTER_SETTER: 
-            return getDelayedValue(this_ptr);
+        case TYPE_GETTER_SETTER:
+        {
+            const GetterSetter* a = boost::get<const GetterSetter>(&_bound);
+
+            as_environment env(getVM(this_ptr));
+            fn_call fn(const_cast<as_object*>(&this_ptr), env);
+            if (_destructive)
+            {
+                as_value ret = a->get(fn);
+                // The getter might have called the setter, and we
+                // should not override.
+                if (_destructive) {
+                    _bound = ret;
+                    _destructive = false;
+                }
+                return ret;
+            }
+            return a->get(fn);
+        }
 	} 
     return as_value();
 }
@@ -174,7 +155,19 @@ Property::setValue(as_object& this_ptr, const as_value &value) const
                 _destructive = false;
                 _bound = value;
             }
-            else setDelayedValue(this_ptr, value);
+            else {
+                GetterSetter* a = boost::get<GetterSetter>(&_bound);
+
+                as_environment env(getVM(this_ptr));
+
+                fn_call::Args args;
+                args += value;
+
+                fn_call fn(&this_ptr, env, args);
+
+                a->set(fn);
+                a->setCache(value);
+            }
             return;
         }
 }
