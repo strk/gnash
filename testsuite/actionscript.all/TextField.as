@@ -763,6 +763,18 @@ xcheck_equals(tf.text, "from object again"); // but updating o.t still doesn't t
 tf.text = "and forever back";
 check_equals(o.t, "and forever back"); // while updating textfield's text updates o.t
 
+// Test value of variable if the property is present but undefined.
+
+mc45 = _root.createEmptyMovieClip("mc45", getNextHighestDepth());
+mc45.createTextField("tf45", 0, 0, 100, 100, getNextHighestDepth());
+mc45.tf45.variable = "_root.mc45.vari";
+_root.mc45.vari = undefined;
+#if OUTPUT_VERSION < 7
+check_equals(mc45.tf45.text, "");
+#else
+check_equals(mc45.tf45.text, "undefined");
+#endif
+
 //-------------------------------------------------------------------------
 // TODO: check TextField.getDepth() 
 //-------------------------------------------------------------------------
@@ -1287,11 +1299,11 @@ o = new CTF();
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(525);
+     check_totals(526);
 #elif OUTPUT_VERSION == 7
- check_totals(549);
-#elif OUTPUT_VERSION == 8
  check_totals(550);
+#elif OUTPUT_VERSION == 8
+ check_totals(551);
 #endif
 
 #endif

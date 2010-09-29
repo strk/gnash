@@ -128,7 +128,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
-    int version = getSWFVersion(*object);
+    const int version = getSWFVersion(*object);
     
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
@@ -792,7 +792,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 TextField::updateText(const std::string& str)
 {
-    int version = getSWFVersion(*getObject(this));
+    const int version = getSWFVersion(*getObject(this));
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
     updateText(wstr);
 }
@@ -850,7 +850,7 @@ TextField::setHtmlTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = getSWFVersion(*getObject(this));
+            const int version = getSWFVersion(*getObject(this));
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -883,7 +883,7 @@ TextField::setTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = getSWFVersion(*getObject(this));
+            const int version = getSWFVersion(*getObject(this));
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -919,7 +919,7 @@ std::string
 TextField::get_htmltext_value() const
 {
     const_cast<TextField*>(this)->registerTextVariable();
-    int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
+    const int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
     return utf8::encodeCanonicalString(_htmlText, version);
 }
 

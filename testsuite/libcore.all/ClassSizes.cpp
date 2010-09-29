@@ -82,7 +82,7 @@ using namespace gnash::SWF;
 (as_object) \
 (DisplayObject) (StaticText) (MorphShape) (Shape) \
 (InteractiveObject) (MovieClip) (TextField) (Button) (Movie) \
-(movie_root) 
+(movie_root) (PropFlags) (ObjectURI)
 
 int
 main(int /*argc*/, char** /*argv*/)

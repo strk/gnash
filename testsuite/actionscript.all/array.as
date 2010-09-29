@@ -1618,6 +1618,40 @@ o.sort();
  xcheck_equals(traceProps(o), "5,4,3,2,1,sort,length,7,6,");
 #endif
 
+// Test __resolve with arrays
+
+rs = 0;
+t = [];
+o = new Object();
+o[2] = "om";
+o.__proto__ = t.__proto__;
+t.__proto__ = o;
+t.__resolve = function(a) { ++rs; return "resolved " + a; };
+
+t[0] = "zero";
+t[5] = "five";
+
+// Resolve works with normal property lookup.
+check_equals(t[3], "resolved 3");
+check_equals(rs, 1);
+
+// Prototype chain checked in property lookup.
+check_equals(t[2], "om");
+
+// But join() only uses own properties: no resolve, no chain.
+#if OUTPUT_VERSION > 6
+check_equals(t.join("/"), "zero/undefined/undefined/undefined/undefined/five");
+#else
+check_equals(t.join("/"), "zero/////five");
+#endif
+check_equals(rs, 1);
+
+// Same with other functions.
+t.sort();
+check_equals(rs, 1);
+t.reverse();
+check_equals(rs, 1);
+
 #if OUTPUT_VERSION > 5
 
 Empty = function() {};
@@ -1723,11 +1757,11 @@ check_equals(ar.__proto__, "string");
 
 
 #if OUTPUT_VERSION < 6
- check_totals(538);
+ check_totals(545);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(622);
+  check_totals(629);
 # else
-  check_totals(632);
+  check_totals(639);
 # endif
 #endif

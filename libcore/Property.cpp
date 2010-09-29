@@ -17,12 +17,28 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "Property.h"
+
 #include "VM.h"
 #include "as_function.h"
 #include "as_environment.h"
 #include "fn_call.h"
 
 namespace gnash {
+
+namespace {
+
+struct GetCache : public boost::static_visitor<as_value>
+{
+    result_type operator()(as_value& val) const {
+        return val;
+    }
+    result_type operator()(GetterSetter& gs) const {
+        return gs.getCache();
+    }
+};
+
+}
+
 
 void
 GetterSetter::UserDefinedGetterSetter::markReachableResources() const
@@ -33,7 +49,7 @@ GetterSetter::UserDefinedGetterSetter::markReachableResources() const
 }
 
 as_value
-GetterSetter::UserDefinedGetterSetter::get(fn_call& fn) const
+GetterSetter::UserDefinedGetterSetter::get(const fn_call& fn) const
 {
 	ScopedLock lock(*this);
 	if (!lock.obtainedLock()) {
@@ -47,7 +63,7 @@ GetterSetter::UserDefinedGetterSetter::get(fn_call& fn) const
 }
 
 void
-GetterSetter::UserDefinedGetterSetter::set(fn_call& fn)
+GetterSetter::UserDefinedGetterSetter::set(const fn_call& fn)
 {
 	ScopedLock lock(*this);
 	if (!lock.obtainedLock() || ! _setter) {
@@ -101,9 +117,6 @@ Property::setReachable() const
 {
 	switch (_bound.which())
 	{
-	    case TYPE_EMPTY: 
-		    break;
-
         case TYPE_VALUE: 
 		    boost::get<as_value>(_bound).setReachable();
 		    break;
@@ -122,8 +135,6 @@ Property::getValue(const as_object& this_ptr) const
 {
 	switch (_bound.which())
 	{
-        case TYPE_EMPTY:
-            return as_value();
         case TYPE_VALUE:
             return boost::get<as_value>(_bound);
         case TYPE_GETTER_SETTER: 
@@ -132,21 +143,10 @@ Property::getValue(const as_object& this_ptr) const
     return as_value();
 }
 
-const as_value&
+as_value
 Property::getCache() const
 {
-	static as_value undefVal;
-
-	switch (_bound.which())
-	{
-        case TYPE_EMPTY:
-            return undefVal;
-        case TYPE_VALUE:
-            return boost::get<as_value&>(_bound);
-        case TYPE_GETTER_SETTER:
-            return boost::get<GetterSetter&>(_bound).getCache();
-	} 
-    return undefVal;
+    return boost::apply_visitor(GetCache(), _bound);
 }
 
 void
@@ -154,7 +154,6 @@ Property::setValue(as_object& this_ptr, const as_value &value) const
 {
 	switch (_bound.which())
 	{
-        case TYPE_EMPTY: 
         case TYPE_VALUE: 
             _bound = value;
             return;
@@ -170,11 +169,10 @@ Property::setValue(as_object& this_ptr, const as_value &value) const
 }
 
 void
-Property::setCache(const as_value &value)
+Property::setCache(const as_value& value)
 {
 	switch (_bound.which())
 	{
-        case TYPE_EMPTY:
         case TYPE_VALUE: 
             _bound = value;
             return;
