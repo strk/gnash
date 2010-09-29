@@ -18,6 +18,9 @@
 
 #include "Property.h"
 
+#include <boost/variant.hpp>
+#include <boost/bind.hpp>
+
 #include "VM.h"
 #include "as_function.h"
 #include "as_environment.h"
@@ -34,6 +37,26 @@ struct GetCache : public boost::static_visitor<as_value>
     }
     result_type operator()(GetterSetter& gs) const {
         return gs.getCache();
+    }
+};
+
+struct SetCache : public boost::static_visitor<>
+{
+    result_type operator()(as_value& val, const as_value& n) const {
+        val = n;
+    }
+    result_type operator()(GetterSetter& gs, const as_value& n) const {
+        gs.setCache(n);
+    }
+};
+
+struct SetReachable : public boost::static_visitor<>
+{
+    result_type operator()(const as_value& val) const {
+        val.setReachable();
+    }
+    result_type operator()(const GetterSetter& gs) const {
+        return gs.markReachableResources();
     }
 };
 
@@ -115,19 +138,7 @@ Property::setDelayedValue(as_object& this_ptr, const as_value& value) const
 void
 Property::setReachable() const
 {
-	switch (_bound.which())
-	{
-        case TYPE_VALUE: 
-		    boost::get<as_value>(_bound).setReachable();
-		    break;
-
-	    case TYPE_GETTER_SETTER: 
-	    {
-		    const GetterSetter& a = boost::get<GetterSetter>(_bound);
-		    a.markReachableResources();
-		    break;
-	    }
-	}
+    return boost::apply_visitor(SetReachable(), _bound);
 }
 
 as_value
@@ -171,15 +182,7 @@ Property::setValue(as_object& this_ptr, const as_value &value) const
 void
 Property::setCache(const as_value& value)
 {
-	switch (_bound.which())
-	{
-        case TYPE_VALUE: 
-            _bound = value;
-            return;
-        case TYPE_GETTER_SETTER: 
-            boost::get<GetterSetter&>(_bound).setCache(value);
-            return;
-	}
+    boost::apply_visitor(boost::bind(SetCache(), _1, value), _bound);
 }
 
 } // namespace gnash
