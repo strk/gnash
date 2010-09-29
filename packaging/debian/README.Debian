@@ -1,0 +1,47 @@
+Gnash for Debian
+----------------
+
+Gnash supports the majority of Flash opcodes up to SWF version 7, and
+a wide sampling of ActionScript 2 classes for SWF version 8.5. Flash
+version 9 and ActionScript 3 support is being worked on.  All the
+core ones are implemented, and many of the newer ones work, but may be
+missing some of their methods. If the browser only displays a blank
+window, it is likely because of an unimplemented feature. All
+unimplemented opcodes and ActionScript classes and methods print a
+warning when using -v with gnash or gprocessor. Using gprocessor -v is
+a quick way to see why a movie isn't playing correctly.
+
+ -- Miriam Ruiz <little_miry@yahoo.es>  Thu, 12 Jun 2008 16:49:26 +0000
+
+Please make sure you  have a URL handling gstreamer plugin, such as
+gnomevfssrc, neonhttpsrc or souphttpsrc for playing NetStream playback.
+
+Note that if you use neonhttpsrc you must install it from Gstreamer
+CVS; otherwise it won't be compatible with youtube.
+
+For a nonexhaustive list of modules you will need, please see
+http://bjacques.org/gst-plugins:
+
+gnomevfs *or* souphttpsrc *or* [neonhttpsrc from gstreamer svn] *or* giosrc
+
+ffmpegcolorspace
+capsfilter
+videoscale
+fakesink
+autoaudiosink
+alsasink (or your preferred audio sink)
+audioconvert
+
+For FLV playback (YouTube and friends):
+mpegvideoparse (plugins-ugly)
+gst-ffmpeg
+
+For MP3 playback (YouTube and friends):
+mpegaudioparse (plugins-ugly)
+mad (plugins-ugly) *or* flump3dec
+
+In addition or instead of the above, Gnash is compatible with any other
+streamer audio and/or video codecs Gstreamer supports, such as Ogg 
+Theora-vorbis, dirac-vorbis etc.
+
+ -- Miriam Ruiz <little_miry@yahoo.es>  Tue, 12 Feb 2008 11:33:29 +0000
