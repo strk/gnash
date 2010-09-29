@@ -20,38 +20,37 @@
 #ifndef GNASH_PROPERTY_H
 #define GNASH_PROPERTY_H
 
+#include <boost/variant.hpp>
+#include <cassert>
+
 #include "PropFlags.h"
 #include "as_value.h"
 #include "ObjectURI.h"
 
-#include <boost/variant.hpp>
-#include <cassert>
+namespace gnash {
+    typedef as_value (*as_c_function_ptr)(const fn_call& fn);
+    class as_function;
+}
 
 namespace gnash {
-
-typedef as_value (*as_c_function_ptr)(const fn_call& fn);
-
-class as_function;
-class PropertyList;
 
 /// Holder for getter/setter functions
 //
 /// Getter setter can be user-defined or native ones.
 /// This class abstracts the two.
-///
 class GetterSetter
 {
+    class NativeGetterSetter;
+
     template<typename Arg, typename S>
     struct GetSetVisitor : public boost::static_visitor<typename S::result_type>
     {
-        GetSetVisitor(Arg& arg) : _arg(arg) {}
-
-        /// Called on each type.
+        GetSetVisitor(const Arg& arg) : _arg(arg) {}
         template<typename T> typename S::result_type operator()(T& t) const {
             return S()(t, _arg);
         };
     private:
-        Arg& _arg;
+        const Arg& _arg;
     };
 
     struct Set
@@ -66,10 +65,37 @@ class GetterSetter
     struct Get
     {
         typedef as_value result_type;
-
         template<typename T, typename Arg>
         result_type operator()(T& t, Arg& a) const {
             return t.get(a);
+        }
+    };
+
+    struct SetUnderlying : public boost::static_visitor<>
+    {
+        template<typename T>
+        result_type operator()(T& gs, const as_value& val) const {
+            gs.setUnderlying(val);
+        }
+        result_type operator()(NativeGetterSetter&, const as_value&) const {}
+    };
+    
+    struct GetUnderlying : public boost::static_visitor<as_value>
+    {
+        template<typename T>
+        result_type operator()(const T& gs) const {
+            return gs.getUnderlying();
+        }
+        result_type operator()(const NativeGetterSetter&) const {
+            return result_type();
+        }
+    };
+    
+    struct MarkReachable : public boost::static_visitor<>
+    {
+        template<typename T>
+        result_type operator()(const T& gs) const {
+            gs.markReachableResources();
         }
     };
 
@@ -88,49 +114,29 @@ public:
 	{}
 
 	/// Invoke the getter
-	as_value get(const fn_call& fn) const {
+	as_value get(fn_call& fn) const {
         GetSetVisitor<const fn_call, Get> s(fn);
         return boost::apply_visitor(s, _getset);
 	}
 
 	/// Invoke the setter
 	void set(const fn_call& fn) {
-        GetSetVisitor<const fn_call, Set> s(fn);
+        GetSetVisitor<fn_call, Set> s(fn);
         boost::apply_visitor(s, _getset);
 	}
 
 	/// Set the cache value (for user-defined getter-setters)
-	void setCache(const as_value& v)
-	{
-		switch ( _getset.which() )
-		{
-			case 0: // user-defined
-				boost::get<UserDefinedGetterSetter>(_getset).setUnderlying(v);
-				break;
-			case 1: // native 
-				// nothing to do for native
-				break;
-		}
-	}
+	void setCache(const as_value& v) {
+        boost::apply_visitor(boost::bind(SetUnderlying(), _1, v), _getset);
+    }
 
 	/// Get the cache value (for user-defined getter-setters)
-	as_value getCache() const
-	{
-		switch (_getset.which())
-		{
-			case 0: // user-defined
-				return boost::get<UserDefinedGetterSetter>(
-                        _getset).getUnderlying();
-		}
-        return as_value();
+	as_value getCache() const {
+        return boost::apply_visitor(GetUnderlying(), _getset);
 	}
 
-	void markReachableResources() const
-	{
-		if (_getset.which() == 0) {
-			boost::get<UserDefinedGetterSetter>(
-                    _getset).markReachableResources();
-		}
+	void markReachableResources() const {
+        boost::apply_visitor(MarkReachable(), _getset);
 	}
 
 private:
@@ -174,7 +180,7 @@ private:
         {
 		public:
 
-			ScopedLock(const UserDefinedGetterSetter& na)
+			explicit ScopedLock(const UserDefinedGetterSetter& na)
                 :
                 _a(na),
                 _obtainedLock(_a._beingAccessed ? false : true)
@@ -208,7 +214,7 @@ private:
     };
 
 	/// Native GetterSetter
-	class NativeGetterSetter
+	class NativeGetterSetter 
     {
 	public:
 
@@ -225,6 +231,9 @@ private:
 		void set(const fn_call& fn) {
 			_setter(fn);
 		}
+
+        /// Nothing to do for native setters.
+        void markReachableResources() const {}
 
 	private:
 		as_c_function_ptr _getter;
@@ -244,7 +253,6 @@ private:
 /// changed.
 class Property
 {
-
 public:
 
 	/// Default constructor
@@ -395,7 +403,7 @@ private:
     /// The value of the property.
 	mutable BoundType _bound;
 	
-    // TODO: this should be const, but the assignment operator is still needed 
+    /// The property identifier (name).
     ObjectURI _uri;
 
 	/// Properties flags

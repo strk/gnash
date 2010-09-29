@@ -17,6 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "Property.h"
+
 #include "VM.h"
 #include "as_function.h"
 #include "as_environment.h"
@@ -168,7 +169,7 @@ Property::setValue(as_object& this_ptr, const as_value &value) const
 }
 
 void
-Property::setCache(const as_value &value)
+Property::setCache(const as_value& value)
 {
 	switch (_bound.which())
 	{
