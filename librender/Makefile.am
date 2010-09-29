@@ -69,6 +69,8 @@ pkglib_LTLIBRARIES = libgnashrender.la
 libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
 libgnashrender_la_SOURCES = PathParser.cpp
 
+libgnashrender_la_LDFLAGS =  -release $(VERSION)
+
 if BUILD_OGL_RENDERER
 libgnashrender_la_SOURCES += Renderer_ogl.cpp
 libgnashrender_la_LIBADD += $(OPENGL_LIBS)
