@@ -385,12 +385,6 @@ public:
 	void setReachable() const;
 
 private:
-	
-    /// Get a value from a getter function.
-	as_value getDelayedValue(const as_object& this_ptr) const;
-
-	/// Set a value using a setter function.
-	void setDelayedValue(as_object& this_ptr, const as_value& value) const;
 
     enum Type {
         TYPE_VALUE,
