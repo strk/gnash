@@ -33,7 +33,7 @@ GetterSetter::UserDefinedGetterSetter::markReachableResources() const
 }
 
 as_value
-GetterSetter::UserDefinedGetterSetter::get(fn_call& fn) const
+GetterSetter::UserDefinedGetterSetter::get(const fn_call& fn) const
 {
 	ScopedLock lock(*this);
 	if (!lock.obtainedLock()) {
@@ -47,7 +47,7 @@ GetterSetter::UserDefinedGetterSetter::get(fn_call& fn) const
 }
 
 void
-GetterSetter::UserDefinedGetterSetter::set(fn_call& fn)
+GetterSetter::UserDefinedGetterSetter::set(const fn_call& fn)
 {
 	ScopedLock lock(*this);
 	if (!lock.obtainedLock() || ! _setter) {
@@ -132,21 +132,19 @@ Property::getValue(const as_object& this_ptr) const
     return as_value();
 }
 
-const as_value&
+as_value
 Property::getCache() const
 {
-	static as_value undefVal;
-
 	switch (_bound.which())
 	{
         case TYPE_EMPTY:
-            return undefVal;
+            return as_value();
         case TYPE_VALUE:
             return boost::get<as_value&>(_bound);
         case TYPE_GETTER_SETTER:
             return boost::get<GetterSetter&>(_bound).getCache();
 	} 
-    return undefVal;
+    return as_value();
 }
 
 void

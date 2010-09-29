@@ -41,6 +41,38 @@ class PropertyList;
 ///
 class GetterSetter
 {
+    template<typename Arg, typename S>
+    struct GetSetVisitor : public boost::static_visitor<typename S::result_type>
+    {
+        GetSetVisitor(Arg& arg) : _arg(arg) {}
+
+        /// Called on each type.
+        template<typename T> typename S::result_type operator()(T& t) const {
+            return S()(t, _arg);
+        };
+    private:
+        Arg& _arg;
+    };
+
+    struct Set
+    {
+        typedef void result_type;
+        template<typename T, typename Arg>
+        result_type operator()(T& t, Arg& a) const {
+            t.set(a);
+        }
+    };
+				
+    struct Get
+    {
+        typedef as_value result_type;
+
+        template<typename T, typename Arg>
+        result_type operator()(T& t, Arg& a) const {
+            return t.get(a);
+        }
+    };
+
 public:
 
 	/// Construct a user-defined getter-setter
@@ -56,32 +88,15 @@ public:
 	{}
 
 	/// Invoke the getter
-	as_value get(fn_call& fn) const
-	{
-		switch ( _getset.which() )
-		{
-			case 0: // user-defined
-				return boost::get<UserDefinedGetterSetter>(_getset).get(fn);
-				break;
-			case 1: // native 
-				return boost::get<NativeGetterSetter>(_getset).get(fn);
-				break;
-		}
-		return as_value(); // not reached (TODO: log error ? assert ?)
+	as_value get(const fn_call& fn) const {
+        GetSetVisitor<const fn_call, Get> s(fn);
+        return boost::apply_visitor(s, _getset);
 	}
 
 	/// Invoke the setter
-	void set(fn_call& fn)
-	{
-		switch ( _getset.which() )
-		{
-			case 0: // user-defined
-				boost::get<UserDefinedGetterSetter>(_getset).set(fn);
-				break;
-			case 1: // native 
-				boost::get<NativeGetterSetter>(_getset).set(fn);
-				break;
-		}
+	void set(const fn_call& fn) {
+        GetSetVisitor<const fn_call, Set> s(fn);
+        boost::apply_visitor(s, _getset);
 	}
 
 	/// Set the cache value (for user-defined getter-setters)
@@ -99,7 +114,7 @@ public:
 	}
 
 	/// Get the cache value (for user-defined getter-setters)
-	const as_value& getCache() const
+	as_value getCache() const
 	{
 		switch (_getset.which())
 		{
@@ -107,8 +122,7 @@ public:
 				return boost::get<UserDefinedGetterSetter>(
                         _getset).getUnderlying();
 		}
-		static as_value undefVal;
-		return undefVal;
+        return as_value();
 	}
 
 	void markReachableResources() const
@@ -135,10 +149,10 @@ private:
 		{}
 
 		/// Invoke the getter
-		as_value get(fn_call& fn) const;
+		as_value get(const fn_call& fn) const;
 
 		/// Invoke the setter
-		void set(fn_call& fn);
+		void set(const fn_call& fn);
 
 		/// Get the underlying value
 		const as_value& getUnderlying() const { return _underlyingValue; }
@@ -203,12 +217,12 @@ private:
 			_getter(get), _setter(set) {}
 
 		/// Invoke the getter
-		as_value get(fn_call& fn) const {
+		as_value get(const fn_call& fn) const {
 			return _getter(fn);
 		}
 
 		/// Invoke the setter
-		void set(fn_call& fn) {
+		void set(const fn_call& fn) {
 			_setter(fn);
 		}
 
@@ -230,7 +244,9 @@ private:
 /// changed.
 class Property
 {
+
 public:
+
 	/// Default constructor
 	Property(const ObjectURI& uri)
         : 
@@ -312,7 +328,7 @@ public:
 	/// to watch for infinitely recurse on calling the getter
 	/// or setter; Native getter-setter has no cache,
 	/// undefined will be returned for them.
-	const as_value& getCache() const;
+	as_value getCache() const;
 
 	/// Set internal cached value of this property
 	//
