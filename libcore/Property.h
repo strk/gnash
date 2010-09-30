@@ -273,6 +273,18 @@ private:
 /// changed.
 class Property
 {
+
+    /// Mark the stored value reachable.
+    struct SetReachable : boost::static_visitor<>
+    {
+        result_type operator()(const as_value& val) const {
+            val.setReachable();
+        }
+        result_type operator()(const GetterSetter& gs) const {
+            return gs.markReachableResources();
+        }
+    };
+
 public:
 
 	Property(const ObjectURI& uri, const as_value& value,
@@ -381,7 +393,9 @@ public:
     }
 
 	/// Mark this property as being reachable (for the GC)
-	void setReachable() const;
+	void setReachable() const {
+        return boost::apply_visitor(SetReachable(), _bound);
+    }
 
 private:
 
