@@ -16,7 +16,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
 AC_PREREQ(2.50)
-AC_INIT(gnash, trunk)
+AC_INIT(gnash, master)
 AC_CONFIG_SRCDIR([libcore/gnash.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
 
@@ -2759,7 +2759,6 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
 )
 
 CHECK_VISIBILITY_GCC_BUG
-
 
 if test x$ac_cv_gcc_visibility_bug = xno; then
   AC_LANG_PUSH(C++)

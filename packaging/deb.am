@@ -49,16 +49,16 @@ BUILD_DIR := $(shell \
 	snapshot_dir=$(SNAPSHOT_DIR); \
 	if test $(OGL) -eq 1 -o $(FFMPEG) -eq 1 -o $(VAAPI) -eq 1; then \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 1; then \
-	    snapshot_dir=$(subst bzr,bzr.ogl.ffmpeg,$(SNAPSHOT_DIR)); \
+	    snapshot_dir=$(subst git,git.ogl.ffmpeg,$(SNAPSHOT_DIR)); \
 	  fi; \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 0; then \
-	    snapshot_dir=$(subst bzr,bzr.ogl,$(SNAPSHOT_DIR)); \
+	    snapshot_dir=$(subst git,git.ogl,$(SNAPSHOT_DIR)); \
 	  fi; \
 	  if test $(OGL) -eq 0 -a $(FFMPEG) -eq 1; then \
-	    snapshot_dir=$(subst bzr,bzr.ffmpeg,$(SNAPSHOT_DIR)); \
+	    snapshot_dir=$(subst git,git.ffmpeg,$(SNAPSHOT_DIR)); \
 	  fi; \
 	  if test $(VAAPI) -eq 1; then \
-	    snapshot_dir=$(subst bzr,bzr.vaapi,$(SNAPSHOT_DIR)); \
+	    snapshot_dir=$(subst git,git.vaapi,$(SNAPSHOT_DIR)); \
 	  fi; \
 	fi; \
 	echo "$${snapshot_dir}")
@@ -69,16 +69,16 @@ BUILD_VERSION := $(shell \
 	snapshot_version=$(SNAPSHOT_VERSION); \
 	if test $(OGL) -eq 1 -o $(FFMPEG) -eq 1 -o $(VAAPI) -eq 1; then \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 1; then \
-	    snapshot_version=$(subst bzr,bzr.ogl.ffmpeg,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst git,git.ogl.ffmpeg,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	  if test $(OGL) -eq 1 -a $(FFMPEG) -eq 0; then \
-	    snapshot_version=$(subst bzr,bzr.ogl,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst git,git.ogl,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	  if test $(OGL) -eq 0 -a $(FFMPEG) -eq 1; then \
-	    snapshot_version=$(subst bzr,bzr.ffmpeg,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst git,git.ffmpeg,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	  if test $(VAAPI) -eq 1; then \
-	    snapshot_version=$(subst bzr,bzr.vaapi,$(SNAPSHOT_VERSION)); \
+	    snapshot_version=$(subst git,git.vaapi,$(SNAPSHOT_VERSION)); \
 	  fi; \
 	fi; \
 	echo "$${snapshot_version}")
@@ -98,10 +98,10 @@ PACKAGES := \
 # This gets more fun, as if we configure with ffmpeg, the two utilities that
 # deal with Gstreamer based input devices, findwebcam and findmicrophone,
 # don't get built. So we strip them out of the packages.
-setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control deb-edit-utilities deb-edit-python deb-edit-mozilla
+setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control deb-edit-utilities deb-edit-python deb-edit-browser
 
 # Rename the directory created by distdir to the snapshot. This is
-# usually something like "gnash-trunk" to "0.8.8~bzr.ogl.ffmpeg.trunk11977".
+# usually something like "gnash-master" to "0.8.8~git.ogl.ffmpeg.master11977".
 # This requires distdir to be run first, but it's not a dependency as we
 # don't want to always rebuild the source tree, just the dependencies.
 deb-rename-build:
@@ -143,23 +143,23 @@ deb-edit-python:
 	@ubuntu=`uname -a | grep -ci ubuntu`; \
 	 if test $${ubuntu} -eq 1; then \
 	   echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Ubuntu"; \
-	   if test -e $(BUILD_DIR)/debian/gtk-plugin-gnash.install; then \
-	     mv -f $(BUILD_DIR)/debian/gtk-plugin-gnash.install $(BUILD_DIR)/debian/gtk-plugin-gnash.install.orig; \
+	   if test -e $(BUILD_DIR)/debian/python-gtk-gnash.install; then \
+	     mv -f $(BUILD_DIR)/debian/python-gtk-gnash.install $(BUILD_DIR)/debian/python-gtk-gnash.install.orig; \
 	   fi; \
-	   sed -e 's:python2.5/site:python2.6/dist:' $(BUILD_DIR)/debian/gtk-plugin-gnash.install.orig > $(BUILD_DIR)/debian/gtk-plugin-gnash.install; \
-	   if test -e $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs; then \
-	     mv -f $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs.orig; \
+	   sed -e 's:python2.5/site:python2.6/dist:' $(BUILD_DIR)/debian/python-gtk-gnash.install.orig > $(BUILD_DIR)/debian/python-gtk-gnash.install; \
+	   if test -e $(BUILD_DIR)/debian/python-gtk-gnash.dirs; then \
+	     mv -f $(BUILD_DIR)/debian/python-gtk-gnash.dirs $(BUILD_DIR)/debian/python-gtk-gnash.dirs.orig; \
 	   fi; \
-	   sed -e "s:python2.5/site:python2.6/dist:" $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs.orig > $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs; \
+	   sed -e "s:python2.5/site:python2.6/dist:" $(BUILD_DIR)/debian/python-gtk-gnash.dirs.orig > $(BUILD_DIR)/debian/python-gtk-gnash.dirs; \
 	fi;
 
-deb-edit-mozilla:
+deb-edit-browser:
 	@if test `echo $(FIREFOX_PLUGINS) | grep -c mozilla` -eq 0; then \
-	   echo "Adjusting plugin path for a Mozilla browser"; \
-	   if test -e $(BUILD_DIR)/debian/mozilla-plugin-gnash.dirs; then \
-	     mv -f $(BUILD_DIR)/debian/mozilla-plugin-gnash.dirs $(BUILD_DIR)/debian/gtk-plugin-gnash.install.orig; \
+	   echo "Adjusting plugin path for a NPAPI compliant browser"; \
+	   if test -e $(BUILD_DIR)/debian/browser-plugin-gnash.dirs; then \
+	     mv -f $(BUILD_DIR)/debian/browser-plugin-gnash.dirs $(BUILD_DIR)/debian/python-gtk-gnash.install.orig; \
 	   fi; \
-	   echo $(FIREFOX_PLUGINS) | sed -e 's:/::' > $(BUILD_DIR)/debian/mozilla-plugin-gnash.dirs; \
+	   echo $(FIREFOX_PLUGINS) | sed -e 's:/::' > $(BUILD_DIR)/debian/browser-plugin-gnash.dirs; \
 	fi;
 
 # Edit the debian/changelog file. This is because the version in the top level
@@ -187,9 +187,9 @@ deb-edit-changelog:
 	fi; \
 	if test -e $(BUILD_DIR)/debian/changelog; then \
 	  mv -f $(BUILD_DIR)/debian/changelog $(BUILD_DIR)/debian/changelog.orig; \
-	  sed -e "s:trunk:$(BUILD_VERSION):" -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
+	  sed -e "s:master:$(BUILD_VERSION):" -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
 	else \
-	  sed -e "s:trunk:$(BUILD_VERSION):"  -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
+	  sed -e "s:master:$(BUILD_VERSION):"  -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
 	fi
 
 # Edit the configure scripts, so if somebody reconfigures from this tarball,
@@ -198,13 +198,13 @@ deb-edit-configure:
 	@echo "Editing configure.ac in $(BUILD_VERSION)..."
 	@if test ! -f $(BUILD_DIR)/configure.ac.orig; then \
 	  mv -f $(BUILD_DIR)/configure.ac $(BUILD_DIR)/configure.ac.orig; \
-	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $(BUILD_VERSION))/" \
+	  sed -e "s/AC_INIT(gnash, master)/AC_INIT(gnash, $(BUILD_VERSION))/" \
 	    $(BUILD_DIR)/configure.ac.orig > $(BUILD_DIR)/configure.ac; \
 	fi
 	@echo "Editing configure in $(BUILD_VERSION)..."
 	@if test ! -f $(BUILD_DIR)/configure.orig; then \
 	  mv -f $(BUILD_DIR)/configure $(BUILD_DIR)/configure.orig; \
-	  sed -e "s/ VERSION='trunk'/ VERSION='$(BUILD_VERSION)'/" \
+	  sed -e "s/ VERSION='master'/ VERSION='$(BUILD_VERSION)'/" \
 	    $(BUILD_DIR)/configure.orig > $(BUILD_DIR)/configure; \
 	   chmod u+x $(BUILD_DIR)/configure; \
 	fi
@@ -250,6 +250,6 @@ deb-build-clean:
 	done
 
 # these files are created when building packages
-CLEANFILES += *trunk*.deb *trunk*.gz *trunk*.bz2 *trunk*.changes deb-copy-stamp
+CLEANFILES += *master*.deb *.dsc *.gz *.bz2 *trunk*.changes deb-copy-stamp
 
-.PHONY : deb debian snapshot-deb setup-deb deb-edit-control deb-edit-changelog deb-copy-files deb-rename-build deb-edit-configure deb-edit-install deb-edit-utilities deb-edit-python deb-edit-mozilla deb-build-clean
+.PHONY : deb debian snapshot-deb setup-deb deb-edit-control deb-edit-changelog deb-copy-files deb-rename-build deb-edit-configure deb-edit-install deb-edit-utilities deb-edit-python deb-edit-browser deb-build-clean

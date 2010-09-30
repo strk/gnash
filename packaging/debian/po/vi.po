@@ -1,0 +1,25 @@
+# Vietnamese translation for Gnash Debian desktop file.
+# Copyright © 2010 Free Software Foundation, Inc.
+# Clytie Siddall <clytie@riverland.net.au>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnash\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-11-16 14:35+0100\n"
+"PO-Revision-Date: 2010-04-01 18:05+1030\n"
+"Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
+"Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: LocFactoryEditor 1.8\n"
+
+#: ../../debian/gnash.desktop.in.h:1
+msgid "Gnash SWF Viewer"
+msgstr "Bộ xem SWF Gnash"
+
+#: ../../debian/klash.desktop.in.h:1
+msgid "Gnash SWF Viewer for KDE"
+msgstr "Bộ xem SWF Gnash cho KDE"

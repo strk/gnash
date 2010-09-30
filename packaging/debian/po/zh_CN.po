@@ -1,0 +1,26 @@
+# Chinese translations for PACKAGE package
+# PACKAGE 软件包的简体中文翻译.
+# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# syq <wzssyqa@gmail.com>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-08-06 00:12+0000\n"
+"PO-Revision-Date: 2009-11-16 22:17+0800\n"
+"Last-Translator: 苏运强 <wzssyqa@gmail.com>\n"
+"Language-Team: Chinese (simplified)\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../debian/gnash.desktop.in.h:1
+msgid "Gnash SWF Viewer"
+msgstr "Gnash SWF 查看器"
+
+#: ../../debian/klash.desktop.in.h:1
+msgid "Gnash SWF Viewer for KDE"
+msgstr "KDE 上的Gnash SWF 查看器"

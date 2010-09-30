@@ -147,7 +147,7 @@ revno.h: Makefile.in
               echo "Generating revno.h"; \
               $(RM) -f revno.h; \
               revno="`(cd $(top_srcdir) && git describe --tags | cut -d '-' -f 2-3 | tr a- a.)`"; \
-              nick="`basename $(top_srcdir) | tr a_ a.`"; \
+              nick="`(cd $(top_srcdir) && git branch | grep "\*" | cut -d ' ' -f 2)`"; \
 	    fi; \
           else \
             revno="${NOW}"; \
