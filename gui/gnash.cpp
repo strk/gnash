@@ -107,7 +107,7 @@ usage()
     << _("  -h,  --help              Print this help and exit\n")
     << _("  -V,  --version           Print version information and exit\n") 
     << _("  -s,  --scale <factor>    Scale the movie by the specified factor\n") 
-    << _("  -d,  --delay num         Number of milliseconds to delay in main loop\n") 
+    << _("  -d,  --delay <num>       Number of milliseconds to delay in main loop\n") 
     << _("  -v,  --verbose           Produce verbose output\n") 
 #if VERBOSE_ACTION
     << _("  -va                      Be (very) verbose about action execution\n") 
@@ -148,10 +148,10 @@ usage()
     << _("  -F,  --fd <fd>:<fd>      Filedescriptor to use for external "
             "communications\n") 
 #ifdef GNASH_FPS_DEBUG
-    << _("  -f,  --debug-fps num     Print FPS every num seconds (float)\n") 
+    << _("  -f,  --debug-fps <num>   Print FPS every num seconds (float)\n") 
 #endif // def GNASH_FPS_DEBUG
     
-    << _("  --max-advances num       Exit after specified number of frame "
+    << _("  --max-advances <num>     Exit after specified number of frame "
             "advances\n") 
     << _("  --fullscreen             Start in fullscreen mode\n") 
     << _("  --hide-menubar           Start without displaying the menu bar\n") 
