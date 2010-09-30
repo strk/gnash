@@ -64,7 +64,7 @@ public:
         _original_target = target;
     }
 
-    DisplayObject* get_original_target() { return _original_target; }
+    DisplayObject* get_original_target() const { return _original_target; }
 
     // Reset target to its original value
     void reset_target() { m_target = _original_target; }
@@ -79,7 +79,8 @@ public:
     {
         try {
             return _stack.pop();
-        } catch (StackException&) {
+        }
+        catch (StackException&) {
             return undefVal;
         }
     }
@@ -90,7 +91,7 @@ public:
     ///
     /// Throw StackException if index is out of range
     ///
-    as_value& top(size_t dist)
+    as_value& top(size_t dist) const
     {
         try {
             return _stack.top(dist);
