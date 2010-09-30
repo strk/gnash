@@ -275,14 +275,6 @@ class Property
 {
 public:
 
-	/// Default constructor
-	Property(const ObjectURI& uri)
-        : 
-		_bound(as_value()),
-        _uri(uri),
-        _destructive(false)
-	{}
-
 	Property(const ObjectURI& uri, const as_value& value,
             const PropFlags& flags = PropFlags())
         :
