@@ -19,8 +19,6 @@
 #ifndef GNASH_PROPERTYLIST_H
 #define GNASH_PROPERTYLIST_H
 
-#include "Property.h" // for templated functions
-
 #include <set> 
 #include <map> 
 #include <string> // for use within map 
@@ -32,6 +30,10 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/key_extractors.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/bind.hpp>
+#include <algorithm>
+
+#include "Property.h" // for templated functions
 
 // Forward declaration
 namespace gnash {
@@ -279,9 +281,14 @@ public:
     ///
     void dump(std::map<std::string, as_value>& to);
 
-    /// Mark all simple properties, getters and setters
-    /// as being reachable (for the GC)
-    void setReachable() const;
+    /// Mark all properties reachable
+    //
+    /// This can be called very frequently, so is inlined to allow the
+    /// compiler to optimize it.
+    void setReachable() const {
+        std::for_each(_props.begin(), _props.end(),
+                boost::mem_fn(&Property::setReachable));
+    }
 
 private:
 
