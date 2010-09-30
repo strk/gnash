@@ -193,6 +193,9 @@ public:
     ///                 uses the resources of the Global object.
     explicit as_object(Global_as& global);
 
+    /// The as_object dtor does nothing special.
+    virtual ~as_object() {}
+
     /// Function dispatch
     //
     /// Various objects can be called, including functions and super objects.
