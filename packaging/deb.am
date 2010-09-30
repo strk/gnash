@@ -101,7 +101,7 @@ PACKAGES := \
 setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control deb-edit-utilities deb-edit-python deb-edit-browser
 
 # Rename the directory created by distdir to the snapshot. This is
-# usually something like "gnash-trunk" to "0.8.8~git.ogl.ffmpeg.trunk11977".
+# usually something like "gnash-master" to "0.8.8~git.ogl.ffmpeg.master11977".
 # This requires distdir to be run first, but it's not a dependency as we
 # don't want to always rebuild the source tree, just the dependencies.
 deb-rename-build:
@@ -198,13 +198,13 @@ deb-edit-configure:
 	@echo "Editing configure.ac in $(BUILD_VERSION)..."
 	@if test ! -f $(BUILD_DIR)/configure.ac.orig; then \
 	  mv -f $(BUILD_DIR)/configure.ac $(BUILD_DIR)/configure.ac.orig; \
-	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $(BUILD_VERSION))/" \
+	  sed -e "s/AC_INIT(gnash, master)/AC_INIT(gnash, $(BUILD_VERSION))/" \
 	    $(BUILD_DIR)/configure.ac.orig > $(BUILD_DIR)/configure.ac; \
 	fi
 	@echo "Editing configure in $(BUILD_VERSION)..."
 	@if test ! -f $(BUILD_DIR)/configure.orig; then \
 	  mv -f $(BUILD_DIR)/configure $(BUILD_DIR)/configure.orig; \
-	  sed -e "s/ VERSION='trunk'/ VERSION='$(BUILD_VERSION)'/" \
+	  sed -e "s/ VERSION='master'/ VERSION='$(BUILD_VERSION)'/" \
 	    $(BUILD_DIR)/configure.orig > $(BUILD_DIR)/configure; \
 	   chmod u+x $(BUILD_DIR)/configure; \
 	fi
@@ -250,6 +250,6 @@ deb-build-clean:
 	done
 
 # these files are created when building packages
-CLEANFILES += *trunk*.deb *trunk*.gz *trunk*.bz2 *trunk*.changes deb-copy-stamp
+CLEANFILES += *master*.deb *.dsc *.gz *.bz2 *trunk*.changes deb-copy-stamp
 
 .PHONY : deb debian snapshot-deb setup-deb deb-edit-control deb-edit-changelog deb-copy-files deb-rename-build deb-edit-configure deb-edit-install deb-edit-utilities deb-edit-python deb-edit-browser deb-build-clean
