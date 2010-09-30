@@ -72,8 +72,13 @@ public:
     typedef boost::multi_index::sequenced<
         boost::multi_index::tag<CreationOrder> > SequencedIndex;
     
-    typedef boost::multi_index::const_mem_fun<value_type, const ObjectURI&,
-            &value_type::uri> KeyExtractor;
+    struct KeyExtractor
+    {
+        typedef const ObjectURI& result_type;
+        result_type operator()(const Property& p) const {
+            return p.uri();
+        }
+    };
 
     /// Identifier for the case-sensitive index
     struct Case {};
