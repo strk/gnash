@@ -209,7 +209,6 @@ Package: gnash-mysql-extension
 Architecture: any
 Section: utils
 Priority: extra
-Build-Depends: libmysqlclient-dev
 Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: MySQL extension for Gnash
