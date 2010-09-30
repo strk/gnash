@@ -89,11 +89,6 @@ main(int /*argc*/, char** /*argv*/)
     dlist2.placeDisplayObject( ch2.get(), 1);
     dlist2.placeDisplayObject( ch1.get(), 2);
     
-    // Resort dlist1 as depth of it's chars has been changed
-    // by placeDisplayObject calls above :/
-    dlist1.sort();
-    
-    check_equals(dlist1, dlist2);
     
 }
 

@@ -62,25 +62,25 @@ public:
 
     DepthEquals(int depth) : _depth(depth) {}
 
-    bool operator() (const DisplayObject* item) {
+    bool operator() (const DisplayObject* item) const {
         if (!item) return false;
         return item->get_depth() == _depth;
     }
 
 private:
-    int _depth;
+    const int _depth;
 };
 
 struct DepthGreaterThan
 {
-    bool operator()(const DisplayObject* a, const DisplayObject* b) {
+    bool operator()(const DisplayObject* a, const DisplayObject* b) const {
         return a->get_depth() > b->get_depth();
     }
 };
 
 struct DepthLessThan
 {
-    bool operator()(const DisplayObject* a, const DisplayObject* b) {
+    bool operator()(const DisplayObject* a, const DisplayObject* b) const {
         return a->get_depth() < b->get_depth();
     }
 };
@@ -91,12 +91,12 @@ public:
 
     DepthGreaterOrEqual(int depth) : _depth(depth) {}
 
-    bool operator() (const DisplayObject* item) {
+    bool operator() (const DisplayObject* item) const {
         if (!item) return false;
         return item->get_depth() >= _depth;
     }
 private:
-    int _depth;
+    const int _depth;
 };
 
 
@@ -140,7 +140,7 @@ DisplayList::getNextHighestDepth() const
 
         DisplayObject* ch = *it;
 
-        int chdepth = ch->get_depth();
+        const int chdepth = ch->get_depth();
         if (chdepth >= nexthighestdepth) {
             nexthighestdepth = chdepth+1;
         }
@@ -232,7 +232,7 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
 void
 DisplayList::add(DisplayObject* ch, bool replace)
 {
-    int depth = ch->get_depth();
+    const int depth = ch->get_depth();
 
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
@@ -660,7 +660,7 @@ DisplayList::display(Renderer& renderer, const Transform& base)
             continue;
         }
     
-        int depth = ch->get_depth();
+        const int depth = ch->get_depth();
         // Discard useless masks
         while (!clipDepthStack.empty() && (depth > clipDepthStack.top())) {
             clipDepthStack.pop();
@@ -855,12 +855,6 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 }
 
 void
-DisplayList::sort()
-{
-    _charsByDepth.sort(DepthLessThan());
-}
-
-void
 DisplayList::mergeDisplayList(DisplayList& newList)
 {
     testInvariant();
@@ -1048,14 +1042,6 @@ DisplayList::removeUnloaded()
     _charsByDepth.remove_if(boost::mem_fn(&DisplayObject::unloaded));
 
     testInvariant();
-}
-
-bool
-DisplayList::isSorted() const
-{
-    if (_charsByDepth.empty()) return true;
-    return std::adjacent_find(_charsByDepth.begin(), _charsByDepth.end(),
-            DepthGreaterThan()) == _charsByDepth.end();
 }
 
 

@@ -28,6 +28,7 @@
 #include <iosfwd>
 #if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
 #include <set>  // for testInvariant
+#include <algorithm>
 #include "log.h"
 #endif
 
@@ -262,19 +263,6 @@ public:
             const ObjectURI& uri, bool caseless) const;
 
 	/// \brief 
-	/// Visit each DisplayObject in the list in depth order
-	/// (lower depth first).
-	//
-	/// The visitor functor will 
-	/// receive a DisplayObject pointer; must return true if
-	/// it wants next item or false to exit the loop.
-	///
-	/// NOTE: all elements in the list are visited, even
-	///       the removed ones (unloaded)
-	/// TODO: inspect if worth providing an arg to skip removed
-	template <class V> inline void visitForward(V& visitor);
-
-	/// \brief 
 	/// Visit each DisplayObject in the list in reverse depth
 	/// order (higher depth first).
 	//
@@ -328,18 +316,6 @@ public:
 	/// that is displayd above all others
 	///
 	int getNextHighestDepth() const;
-
-	/// Sort list by depth (lower depths first)
-	//
-	/// You only need calling this method if depth
-	/// of DisplayObjects on the list has been externally
-	/// changed. Usually it is DisplayList itself
-	/// assigning depths, so won't need to call it.
-	///
-	/// A notable use for this is backing up a specific
-	/// state and restoring it later. Restore step would
-	/// need reordering.
-	void sort();
 	
 	/// \brief
 	/// merge the given display list
@@ -373,7 +349,10 @@ public:
                 std::abort();
 			}
 		}
-		assert(isSorted()); // check we didn't screw up ordering
+        if (_charsByDepth.empty()) return;
+		// check we didn't screw up ordering
+        assert(std::adjacent_find(_charsByDepth.begin(), _charsByDepth.end(),
+            DepthGreaterThan()) == _charsByDepth.end());
 	}
 #else
     void testInvariant() const {}
@@ -394,20 +373,7 @@ private:
 	void reinsertRemovedCharacter(DisplayObject* ch);
 
 	container_type _charsByDepth;
-
-	/// Check that the list is sorted by depth
-	bool isSorted() const;
 };
-
-template <class V>
-void
-DisplayList::visitForward(V& visitor)
-{
-	for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
-		it != itEnd; ++it) {
-		if (!visitor(*it)) break;
-	}
-}
 
 template <class V>
 void
