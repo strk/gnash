@@ -146,8 +146,18 @@ public:
     ~as_value() {}
     
     /// Construct a primitive String value 
-    DSOEXPORT as_value(const char* str);
-    DSOEXPORT as_value(const std::string& str);
+    DSOEXPORT as_value(const char* str)
+        :
+        _type(STRING),
+        _value(std::string(str))
+    {}
+
+    /// Construct a primitive String value 
+    DSOEXPORT as_value(const std::string& str)
+        :
+        _type(STRING),
+        _value(std::string(str))
+    {}
     
     /// Construct a primitive Boolean value
     template <typename T>
@@ -161,18 +171,30 @@ public:
 	}
     
     /// Construct a primitive Number value
-    as_value(double val);
+    as_value(double num)
+        :
+        _type(NUMBER),
+        _value(num)
+    {}
     
     /// Construct a null, Object, or DisplayObject value
-    as_value(as_object* obj);
+    as_value(as_object* obj)
+        :
+        _type(UNDEFINED)
+    {
+        set_as_object(obj);
+    }
+    
+
+    /// Assign to an as_value.
+    DSOEXPORT void operator=(const as_value& v)
+    {
+        _type = v._type;
+        _value = v._value;
+    }
     
     /// Return the primitive type of this value as a string.
     const char* typeOf() const;
-    
-    /// Get the primitive type of this value
-    //
-    /// Only used in AVM2
-    primitive_types ptype() const;
     
     /// Return true if this value is a function
     bool is_function() const;
@@ -304,8 +326,6 @@ public:
     
     /// Set this value to the NULL value
     void set_null();
-    
-    DSOEXPORT void operator=(const as_value& v);
     
     bool is_undefined() const {
         return (_type == UNDEFINED);

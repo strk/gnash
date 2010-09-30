@@ -246,29 +246,6 @@ as_value::to_string(int version) const
     
 }
 
-/// This is only used in AVM2.
-primitive_types
-as_value::ptype() const
-{
-
-    switch (_type)
-    {
-        case STRING:
-            return PTYPE_STRING;
-        case NUMBER: 
-        case UNDEFINED:
-        case NULLTYPE:
-        case DISPLAYOBJECT:
-        case OBJECT:
-            return PTYPE_NUMBER;
-        case BOOLEAN:
-            return PTYPE_BOOLEAN;
-        default:
-            break;
-    }
-    return PTYPE_NUMBER;
-}
-
 as_value::AsType
 as_value::defaultPrimitive(int version) const
 {
@@ -757,13 +734,6 @@ as_value::toDebugString() const
 }
 
 void
-as_value::operator=(const as_value& v)
-{
-    _type = v._type;
-    _value = v._value;
-}
-
-void
 as_value::setReachable() const
 {
     switch (_type)
@@ -823,34 +793,6 @@ as_value::set_bool(bool val)
 {
     _type = BOOLEAN;
     _value = val;
-}
-
-as_value::as_value(const char* str)
-    :
-    _type(STRING),
-    _value(std::string(str))
-{
-}
-
-as_value::as_value(const std::string& str)
-    :
-    _type(STRING),
-    _value(str)
-{
-}
-
-as_value::as_value(double num)
-    :
-    _type(NUMBER),
-    _value(num)
-{
-}
-
-as_value::as_value(as_object* obj)
-    :
-    _type(UNDEFINED)
-{
-    set_as_object(obj);
 }
 
 bool
