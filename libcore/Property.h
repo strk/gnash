@@ -23,6 +23,7 @@
 #include <boost/variant.hpp>
 #include <cassert>
 #include <boost/bind.hpp>
+#include <typeinfo>
 
 #include "PropFlags.h"
 #include "as_value.h"
@@ -43,8 +44,17 @@ class GetterSetter
 {
     class NativeGetterSetter;
 
+    // The following helper structs define common operations on the 
+    // Two types of GetterSetter. Some operations are applicable only to
+    // one type.
+
+    /// Get or set a GetterSetter
+    //
+    /// @tparam S   A type that determines what operation to call on the
+    ///             GetterSetter
+    /// @param Arg  The type of the argument to the get or set function.
     template<typename Arg, typename S>
-    struct GetSetVisitor : public boost::static_visitor<typename S::result_type>
+    struct GetSetVisitor : boost::static_visitor<typename S::result_type>
     {
         GetSetVisitor(const Arg& arg) : _arg(arg) {}
         template<typename T> typename S::result_type operator()(T& t) const {
@@ -54,6 +64,7 @@ class GetterSetter
         const Arg& _arg;
     };
 
+    /// Set a GetterSetter
     struct Set
     {
         typedef void result_type;
@@ -63,6 +74,7 @@ class GetterSetter
         }
     };
 				
+    /// Get a GetterSetter
     struct Get
     {
         typedef as_value result_type;
@@ -72,7 +84,10 @@ class GetterSetter
         }
     };
 
-    struct SetUnderlying : public boost::static_visitor<>
+    /// Set the underlying value of a GetterSetter
+    //
+    /// This does not apply to NativeGetterSetters.
+    struct SetUnderlying : boost::static_visitor<>
     {
         template<typename T>
         result_type operator()(T& gs, const as_value& val) const {
@@ -81,7 +96,10 @@ class GetterSetter
         result_type operator()(NativeGetterSetter&, const as_value&) const {}
     };
     
-    struct GetUnderlying : public boost::static_visitor<as_value>
+    /// Get the underlying value of a GetterSetter
+    //
+    /// This does not apply to NativeGetterSetters.
+    struct GetUnderlying : boost::static_visitor<as_value>
     {
         template<typename T>
         result_type operator()(const T& gs) const {
@@ -92,7 +110,8 @@ class GetterSetter
         }
     };
     
-    struct MarkReachable : public boost::static_visitor<>
+    /// Mark a GetterSetter reachable
+    struct MarkReachable : boost::static_visitor<>
     {
         template<typename T>
         result_type operator()(const T& gs) const {
@@ -283,15 +302,6 @@ public:
 		_destructive(destroy)
 	{}
 
-	Property(const ObjectURI& uri, as_function *getter, as_function *setter,
-            bool destroy = false)
-        :
-        _bound(GetterSetter(getter, setter)),
-        _uri(uri),
-		_flags(),
-        _destructive(destroy)
-	{}
-
 	Property(const ObjectURI& uri, as_c_function_ptr getter,
             as_c_function_ptr setter, const PropFlags& flags,
             bool destroy = false)
@@ -301,7 +311,7 @@ public:
 		_flags(flags),
         _destructive(destroy)
 	{}
-	
+
     /// Copy constructor
 	Property(const Property& p)
         :
@@ -367,11 +377,8 @@ public:
 
 	/// Is this a getter/setter property?
 	bool isGetterSetter() const {
-        return _bound.which() == TYPE_GETTER_SETTER;
+        return _bound.type() == typeid(GetterSetter);
     }
-
-	/// is this a destructive property ?
-	bool isDestructive() const { return _destructive; }
 
 	/// Clear visibility flags
 	void clearVisible(int swfVersion) { _flags.clear_visible(swfVersion); }
@@ -385,11 +392,6 @@ public:
 	void setReachable() const;
 
 private:
-
-    enum Type {
-        TYPE_VALUE,
-        TYPE_GETTER_SETTER
-    };
 
 	// Store the various types of things that can be held.
 	typedef boost::variant<as_value, GetterSetter> BoundType;

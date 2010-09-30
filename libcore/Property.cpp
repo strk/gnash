@@ -30,8 +30,14 @@ namespace gnash {
 
 namespace {
 
+// TODO: drop this.
+enum Type {
+    TYPE_VALUE,
+    TYPE_GETTER_SETTER
+};
+
 /// Get the cache of a variant member.
-struct GetCache : public boost::static_visitor<as_value>
+struct GetCache : boost::static_visitor<as_value>
 {
     result_type operator()(as_value& val) const {
         return val;
@@ -42,7 +48,7 @@ struct GetCache : public boost::static_visitor<as_value>
 };
 
 /// Set the cache of a variant member.
-struct SetCache : public boost::static_visitor<>
+struct SetCache : boost::static_visitor<>
 {
     result_type operator()(as_value& val, const as_value& n) const {
         val = n;
@@ -53,7 +59,7 @@ struct SetCache : public boost::static_visitor<>
 };
 
 /// Mark the stored value reachable.
-struct SetReachable : public boost::static_visitor<>
+struct SetReachable : boost::static_visitor<>
 {
     result_type operator()(const as_value& val) const {
         val.setReachable();
