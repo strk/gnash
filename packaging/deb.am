@@ -98,7 +98,7 @@ PACKAGES := \
 # This gets more fun, as if we configure with ffmpeg, the two utilities that
 # deal with Gstreamer based input devices, findwebcam and findmicrophone,
 # don't get built. So we strip them out of the packages.
-setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control deb-edit-utilities deb-edit-python deb-edit-mozilla
+setup-deb: deb-copy-files deb-edit-changelog deb-edit-configure deb-edit-control deb-edit-utilities deb-edit-python deb-edit-browser
 
 # Rename the directory created by distdir to the snapshot. This is
 # usually something like "gnash-trunk" to "0.8.8~git.ogl.ffmpeg.trunk11977".
@@ -143,23 +143,23 @@ deb-edit-python:
 	@ubuntu=`uname -a | grep -ci ubuntu`; \
 	 if test $${ubuntu} -eq 1; then \
 	   echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Ubuntu"; \
-	   if test -e $(BUILD_DIR)/debian/gtk-plugin-gnash.install; then \
-	     mv -f $(BUILD_DIR)/debian/gtk-plugin-gnash.install $(BUILD_DIR)/debian/gtk-plugin-gnash.install.orig; \
+	   if test -e $(BUILD_DIR)/debian/python-gtk-gnash.install; then \
+	     mv -f $(BUILD_DIR)/debian/python-gtk-gnash.install $(BUILD_DIR)/debian/python-gtk-gnash.install.orig; \
 	   fi; \
-	   sed -e 's:python2.5/site:python2.6/dist:' $(BUILD_DIR)/debian/gtk-plugin-gnash.install.orig > $(BUILD_DIR)/debian/gtk-plugin-gnash.install; \
-	   if test -e $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs; then \
-	     mv -f $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs.orig; \
+	   sed -e 's:python2.5/site:python2.6/dist:' $(BUILD_DIR)/debian/python-gtk-gnash.install.orig > $(BUILD_DIR)/debian/python-gtk-gnash.install; \
+	   if test -e $(BUILD_DIR)/debian/python-gtk-gnash.dirs; then \
+	     mv -f $(BUILD_DIR)/debian/python-gtk-gnash.dirs $(BUILD_DIR)/debian/python-gtk-gnash.dirs.orig; \
 	   fi; \
-	   sed -e "s:python2.5/site:python2.6/dist:" $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs.orig > $(BUILD_DIR)/debian/gtk-plugin-gnash.dirs; \
+	   sed -e "s:python2.5/site:python2.6/dist:" $(BUILD_DIR)/debian/python-gtk-gnash.dirs.orig > $(BUILD_DIR)/debian/python-gtk-gnash.dirs; \
 	fi;
 
-deb-edit-mozilla:
+deb-edit-browser:
 	@if test `echo $(FIREFOX_PLUGINS) | grep -c mozilla` -eq 0; then \
-	   echo "Adjusting plugin path for a Mozilla browser"; \
-	   if test -e $(BUILD_DIR)/debian/mozilla-plugin-gnash.dirs; then \
-	     mv -f $(BUILD_DIR)/debian/mozilla-plugin-gnash.dirs $(BUILD_DIR)/debian/gtk-plugin-gnash.install.orig; \
+	   echo "Adjusting plugin path for a NPAPI compliant browser"; \
+	   if test -e $(BUILD_DIR)/debian/browser-plugin-gnash.dirs; then \
+	     mv -f $(BUILD_DIR)/debian/browser-plugin-gnash.dirs $(BUILD_DIR)/debian/python-gtk-gnash.install.orig; \
 	   fi; \
-	   echo $(FIREFOX_PLUGINS) | sed -e 's:/::' > $(BUILD_DIR)/debian/mozilla-plugin-gnash.dirs; \
+	   echo $(FIREFOX_PLUGINS) | sed -e 's:/::' > $(BUILD_DIR)/debian/browser-plugin-gnash.dirs; \
 	fi;
 
 # Edit the debian/changelog file. This is because the version in the top level
@@ -187,9 +187,9 @@ deb-edit-changelog:
 	fi; \
 	if test -e $(BUILD_DIR)/debian/changelog; then \
 	  mv -f $(BUILD_DIR)/debian/changelog $(BUILD_DIR)/debian/changelog.orig; \
-	  sed -e "s:trunk:$(BUILD_VERSION):" -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
+	  sed -e "s:master:$(BUILD_VERSION):" -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
 	else \
-	  sed -e "s:trunk:$(BUILD_VERSION):"  -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
+	  sed -e "s:master:$(BUILD_VERSION):"  -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
 	fi
 
 # Edit the configure scripts, so if somebody reconfigures from this tarball,
@@ -252,4 +252,4 @@ deb-build-clean:
 # these files are created when building packages
 CLEANFILES += *trunk*.deb *trunk*.gz *trunk*.bz2 *trunk*.changes deb-copy-stamp
 
-.PHONY : deb debian snapshot-deb setup-deb deb-edit-control deb-edit-changelog deb-copy-files deb-rename-build deb-edit-configure deb-edit-install deb-edit-utilities deb-edit-python deb-edit-mozilla deb-build-clean
+.PHONY : deb debian snapshot-deb setup-deb deb-edit-control deb-edit-changelog deb-copy-files deb-rename-build deb-edit-configure deb-edit-install deb-edit-utilities deb-edit-python deb-edit-browser deb-build-clean

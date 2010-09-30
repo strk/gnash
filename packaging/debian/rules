@@ -56,7 +56,7 @@ patch: patch-stamp
 patch-stamp:
 	dh_testdir
 	printf "\n == APPLYING PATCHES == \n\n"
-	printf "we have no patches, we're the developers!"
+#	"we have no patches, we're the developers!"
 #	$(MAKE) -f /usr/share/quilt/quilt.make patch
 	printf "\n ---- End of APPLYING PATCHES ---- \n\n"
 	touch $@
