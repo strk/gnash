@@ -825,20 +825,6 @@ as_value::set_bool(bool val)
     _value = val;
 }
 
-as_value::as_value()
-    :
-    _type(UNDEFINED),
-    _value(boost::blank())
-{
-}
-
-as_value::as_value(const as_value& v)
-    :
-    _type(v._type),
-    _value(v._value)
-{
-}
-
 as_value::as_value(const char* str)
     :
     _type(STRING),

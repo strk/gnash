@@ -128,7 +128,22 @@ public:
     };
     
     /// Construct an undefined value
-    DSOEXPORT as_value();
+    DSOEXPORT as_value()
+        :
+        _type(UNDEFINED),
+        _value(boost::blank())
+    {
+    }
+    
+    /// Copy constructor.
+    DSOEXPORT as_value(const as_value& v)
+        :
+        _type(v._type),
+        _value(v._value)
+    {
+    }
+
+    ~as_value() {}
     
     /// Construct a primitive String value 
     DSOEXPORT as_value(const char* str);
@@ -142,7 +157,7 @@ public:
         _type(BOOLEAN),
         _value(val)
 	{
-            UNUSED(dummy);
+        UNUSED(dummy);
 	}
     
     /// Construct a primitive Number value
@@ -150,9 +165,6 @@ public:
     
     /// Construct a null, Object, or DisplayObject value
     as_value(as_object* obj);
-    
-    /// Copy constructor.
-    DSOEXPORT as_value(const as_value& value);
     
     /// Return the primitive type of this value as a string.
     const char* typeOf() const;
