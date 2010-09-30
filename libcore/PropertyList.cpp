@@ -299,8 +299,8 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 		return false; // Already exists.
 	}
 
-	// destructive getter don't need a setter
-	Property a(uri, &getter, (as_function*)0, flagsIfMissing, true);
+	// destructive getter doesn't need a setter
+	Property a(uri, &getter, 0, flagsIfMissing, true);
 
 	_props.push_back(a);
 
@@ -320,8 +320,8 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri,
 	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end()) return false; 
 
-	// destructive getter don't need a setter
-	Property a(uri, getter, (as_c_function_ptr)0, flagsIfMissing, true);
+	// destructive getter doesn't need a setter
+	Property a(uri, getter, 0, flagsIfMissing, true);
 	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY

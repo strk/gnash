@@ -276,7 +276,7 @@ class Property
 public:
 
 	Property(const ObjectURI& uri, const as_value& value,
-            const PropFlags& flags = PropFlags())
+            const PropFlags& flags)
         :
         _bound(value),
 		_uri(uri),
@@ -285,7 +285,7 @@ public:
 	{}
 
 	Property(const ObjectURI& uri,
-		as_function *getter, as_function *setter, 
+		as_function* getter, as_function* setter, 
 		const PropFlags& flags, bool destroy = false)
         :
         _bound(GetterSetter(getter, setter)),
