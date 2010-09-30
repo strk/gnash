@@ -113,19 +113,7 @@ DisplayObject::DisplayObject(movie_root& mr, as_object* object,
     // This informs the core that the object is a DisplayObject.
     if (_object) _object->setDisplayObject(this);
 }
-
-as_object*
-DisplayObject::object() const
-{
-    return _object;
-}
     
-bool
-DisplayObject::unloaded() const
-{
-    return _unloaded;
-}
-
 void
 DisplayObject::getLoadedMovie(Movie* extern_movie)
 {

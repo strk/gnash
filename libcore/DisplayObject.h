@@ -793,7 +793,9 @@ public:
     virtual void getLoadedMovie(Movie* newMovie);
 
     /// Return true if this DisplayObject was unloaded from the stage
-    bool unloaded() const;
+    bool unloaded() const {
+        return _unloaded;
+    }
 
     /// Mark this DisplayObject as destroyed
     //
@@ -940,7 +942,9 @@ public:
         return _yscale;
     }
 
-    as_object* object() const;
+    as_object* object() const {
+        return _object;
+    }
 
     /// Getter-setter for blendMode.
     static as_value blendMode(const fn_call& fn);
