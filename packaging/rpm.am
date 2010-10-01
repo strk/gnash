@@ -78,11 +78,11 @@ rpm-install:
 setup-rpm: 
 	-snapshot_version="gnash-$(SNAPSHOT_VERSION)"; \
 	snapshot_version=`echo $${snapshot_version}|tr "~" "_"`; \
-	if test -d gnash-trunk; then \
-	  mv gnash-trunk $${snapshot_version}; \
+	if test -d gnash-master; then \
+	  mv gnash-master $${snapshot_version}; \
 	  if test ! -f $${snapshot_version}/configure.ac.orig; then \
 	    mv -f $${snapshot_version}/configure.ac $${snapshot_version}/configure.ac.orig; \
-	    sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $${snapshot_version})/" \
+	    sed -e "s/AC_INIT(gnash, master)/AC_INIT(gnash, $${snapshot_version})/" \
 	      $${snapshot_version}/configure.ac.orig > $${snapshot_version}/configure.ac; \
 	  fi; \
 	fi; \
