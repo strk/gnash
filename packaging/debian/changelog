@@ -7,7 +7,7 @@ gnash (master) distro; urgency=low
     - add source/format file
     - add gnash-dev package
 
- -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Sun, 22 Aug 2010 04:20:00 +0100
+ -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Wed, 29 Sep 2010 04:20:00 +0100
 
 gnash (1855.g39e91cf) distro; urgency=low
 
