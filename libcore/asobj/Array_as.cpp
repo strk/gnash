@@ -837,8 +837,8 @@ size_t
 arrayLength(as_object& array)
 {
     // TODO: check whether this should use only ownProperty.
-    as_value length;
-    if (!array.get_member(NSV::PROP_LENGTH, &length)) return 0;
+    const as_value& length = getOwnProperty(array, NSV::PROP_LENGTH);
+    if (length.is_undefined()) return 0;
     
     const int size = toInt(length);
     if (size < 0) return 0;
