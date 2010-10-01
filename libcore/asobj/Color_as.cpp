@@ -69,7 +69,7 @@ color_class_init(as_object& where, const ObjectURI& uri)
             attachColorInterface, 0, uri);
 
     as_object* proto =
-        cl->getMember(NSV::PROP_PROTOTYPE).to_object(getGlobal(where));
+        getMember(*cl, NSV::PROP_PROTOTYPE).to_object(getGlobal(where));
 
     if (!proto) return;
 
@@ -272,7 +272,7 @@ parseColorTransProp (as_object& obj, string_table::key key, boost::int16_t&
 inline MovieClip*
 getTarget(as_object* obj, const fn_call& fn)
 {
-    const as_value& target = obj->getMember(NSV::PROP_TARGET);
+    const as_value& target = getMember(*obj, NSV::PROP_TARGET);
     MovieClip* sp = target.toMovieClip();
     if (sp) return sp;
     DisplayObject* o = fn.env().find_target(target.to_string());

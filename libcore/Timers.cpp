@@ -108,7 +108,7 @@ Timer::execute()
     VM& vm = getVM(*_object);
 
     as_value timer_method = _function ? _function :
-                                        _object->getMember(_methodName);
+                                        getMember(*_object, _methodName);
 
     as_environment env(vm); 
 

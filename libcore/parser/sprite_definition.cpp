@@ -140,7 +140,7 @@ sprite_definition::registerClass(as_function* the_class)
 	log_debug(_("Registered class %p for sprite_def %p"),
             (void*)registeredClass.get(), (void*)this);
 	as_object* proto =
-        registeredClass->getMember(NSV::PROP_PROTOTYPE).to_object(
+        getMember(*registeredClass, NSV::PROP_PROTOTYPE).to_object(
                 getGlobal(*registeredClass));
 
 	log_debug(_(" Exported interface: "));

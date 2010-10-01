@@ -152,7 +152,9 @@ public:
 	//
 	/// This information will drive operations of the virtual machine
 	///
-	int getSWFVersion() const;
+	int getSWFVersion() const {
+        return _swfversion;
+    }
 
 	/// Set SWF version of the currently executing code
 	void setSWFVersion(int v);

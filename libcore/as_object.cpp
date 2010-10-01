@@ -956,17 +956,10 @@ enumerateProperties(as_object& obj, as_object::SortedPropertyList& to)
 
 }
 
-
 Property*
 as_object::getOwnProperty(const ObjectURI& uri)
 {
     return _members.getProperty(uri);
-}
-
-bool
-as_object::hasOwnProperty(const ObjectURI& uri)
-{
-    return getOwnProperty(uri);
 }
 
 as_object*
@@ -981,14 +974,6 @@ as_object::get_prototype() const
     const as_value& proto = prop->getValue(*this);
     
     return proto.to_object(getGlobal(*this));
-}
-
-as_value
-as_object::getMember(const ObjectURI& uri)
-{
-    as_value ret;
-    get_member(uri, &ret);
-    return ret;
 }
 
 as_object*
@@ -1153,9 +1138,9 @@ sendEvent(as_object& o, const as_environment& env, const ObjectURI& name)
 as_object*
 getObjectWithPrototype(Global_as& gl, string_table::key c)
 {
-    as_object* ctor = gl.getMember(c).to_object(gl);
+    as_object* ctor = getMember(gl, c).to_object(gl);
     as_object* proto = ctor ?
-        ctor->getMember(NSV::PROP_PROTOTYPE).to_object(gl) : 0;
+        getMember(*ctor, NSV::PROP_PROTOTYPE).to_object(gl) : 0;
 
     as_object* o = gl.createObject();
     o->set_prototype(proto ? proto : as_value());

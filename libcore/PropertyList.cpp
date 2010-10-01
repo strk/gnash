@@ -338,12 +338,5 @@ PropertyList::clear()
 	_props.clear();
 }
 
-void
-PropertyList::setReachable() const
-{
-    std::for_each(_props.begin(), _props.end(),
-            boost::mem_fn(&Property::setReachable));
-}
-
 } // namespace gnash
 

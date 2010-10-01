@@ -2517,7 +2517,7 @@ ActionInitObject(ActionExec& thread)
     Global_as& gl = getGlobal(env);
     as_object* obj = gl.createObject();
 
-    obj->init_member(NSV::PROP_CONSTRUCTOR, gl.getMember(NSV::CLASS_OBJECT));
+    obj->init_member(NSV::PROP_CONSTRUCTOR, getMember(gl, NSV::CLASS_OBJECT));
 
     string_table& st = getStringTable(env);
 
@@ -3252,7 +3252,7 @@ ActionExtends(ActionExec& thread)
     env.drop(2);
 
     as_object* newproto = new as_object(gl);
-    as_object* p = super->getMember(NSV::PROP_PROTOTYPE).to_object(gl);
+    as_object* p = getMember(*super, NSV::PROP_PROTOTYPE).to_object(gl);
     newproto->set_prototype(p);
 
     if (getSWFVersion(*super) > 5) {

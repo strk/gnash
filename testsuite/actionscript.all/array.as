@@ -1652,6 +1652,34 @@ check_equals(rs, 1);
 t.reverse();
 check_equals(rs, 1);
 
+// Check length property (not resolved).
+
+rescount = 0;
+
+t = {};
+p = {};
+t.__resolve = function(a) { ++rescount; return "resolved " + a; };
+t.__proto__ = p;
+
+t[0] = "zero";
+t[1] = "one";
+t[2] = "two";
+
+t.sort = Array.prototype.sort;
+t.toString = Array.prototype.toString;
+
+ret = "" + t.sort();
+check_equals(rescount, 0);
+check_equals(ret, "");
+
+// Check that length lookup doesn't recurse to prototype.
+
+p.length = 4;
+
+ret = "" + t.sort();
+check_equals(rescount, 0);
+check_equals(ret, "");
+
 #if OUTPUT_VERSION > 5
 
 Empty = function() {};
@@ -1757,11 +1785,11 @@ check_equals(ar.__proto__, "string");
 
 
 #if OUTPUT_VERSION < 6
- check_totals(545);
+ check_totals(549);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(629);
+  check_totals(633);
 # else
-  check_totals(639);
+  check_totals(643);
 # endif
 #endif

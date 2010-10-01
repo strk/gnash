@@ -108,8 +108,7 @@ gnash_view_call (GnashView *view, const gchar *func_name, const gchar *input_dat
     gnash::string_table& st = vm.getStringTable();
 	gnash::as_value obj;
 
-    gnash::as_value func = getObject(view->movie)->getMember(
-            st.find(func_name));
+    gnash::as_value func = getMember(*getObject(view->movie), st.find(func_name));
 
     if( !func.is_function() ) {
         return NULL;

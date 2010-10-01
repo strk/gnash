@@ -72,7 +72,7 @@ void
 declareLocal(CallFrame& c, string_table::key name)
 {
     as_object& locals = c.locals();
-    if (!locals.hasOwnProperty(name)) {
+    if (!hasOwnProperty(locals, name)) {
         locals.set_member(name, as_value());
     }
 }

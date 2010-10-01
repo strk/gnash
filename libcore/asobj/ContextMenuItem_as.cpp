@@ -66,16 +66,16 @@ contextmenuitem_copy(const fn_call& fn)
     string_table& st = getStringTable(fn);
 
     as_function* ctor =
-        gl.getMember(st.find("ContextMenuItem")).to_function();
+        getMember(gl, st.find("ContextMenuItem")).to_function();
 
     if (!ctor) return as_value();
 
     fn_call::Args args;
-    args += ptr->getMember(st.find("caption")),
-        ptr->getMember(NSV::PROP_ON_SELECT),
-        ptr->getMember(st.find("separatorBefore")),
-        ptr->getMember(NSV::PROP_ENABLED),
-        ptr->getMember(st.find("visible"));
+    args += getMember(*ptr, st.find("caption")),
+        getMember(*ptr, NSV::PROP_ON_SELECT),
+        getMember(*ptr, st.find("separatorBefore")),
+        getMember(*ptr, NSV::PROP_ENABLED),
+        getMember(*ptr, st.find("visible"));
 
     return constructInstance(*ctor, fn.env(), args);
 }

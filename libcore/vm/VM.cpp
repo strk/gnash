@@ -110,12 +110,6 @@ VM::clear()
     _shLib.reset();
 }
 
-int
-VM::getSWFVersion() const
-{
-	return _swfversion;
-}
-
 void
 VM::setSWFVersion(int v) 
 {

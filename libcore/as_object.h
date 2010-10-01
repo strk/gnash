@@ -193,6 +193,9 @@ public:
     ///                 uses the resources of the Global object.
     explicit as_object(Global_as& global);
 
+    /// The as_object dtor does nothing special.
+    virtual ~as_object() {}
+
     /// Function dispatch
     //
     /// Various objects can be called, including functions and super objects.
@@ -383,7 +386,7 @@ public:
     /// it destroys itself after setting its property to the return value of
     /// getValue.
     //
-    /// @param uri      name/namespace property identifier.
+    /// @param uri      Property identifier.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param flags    Flags for the new member. By default dontEnum.
@@ -435,7 +438,7 @@ public:
 
     /// Add a watch trigger, overriding any other defined for same name.
     //
-    /// @param uri      property namespace.
+    /// @param uri      property identifier
     /// @param trig     A function to invoke when this property value is
     ///                 assigned to. The function will be called with old
     ///                 val, new val and the custom value below. Its
@@ -452,10 +455,12 @@ public:
     ///                 otherwise (no such trigger exists).
     bool unwatch(const ObjectURI& uri);
 
-    /// Get a member as_value by name
+    /// Get a property by name if it exists.
     //
-    /// NOTE that this method is non-const because accessing a getter/setter
-    ///      property may modify the object.
+    /// NOTE: accessing a getter/setter property may modify the object.
+    //
+    /// See getMember() for a property accessor that corresponds to
+    /// ActionScript behaviour.
     //
     /// @param uri      Property identifier.
     /// @param val      Variable to assign an existing value to.
@@ -482,28 +487,11 @@ public:
     virtual as_object* get_super(const ObjectURI& fname);
     as_object* get_super();
 
-    /// Get a member as_value by name in an AS-compatible way
-    //
-    /// NOTE that this method is non-const becase a property
-    ///      could also be a getter/setter and we can't promise
-    ///      that the 'getter' won't change this object trough
-    ///      use of the 'this' reference. 
-    //
-    /// @param uri      Property identifier. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
-    /// @return         Value of the member (possibly undefined),
-    ///                 or undefined if not found. Use get_member if you
-    ///                 need to know whether it was found or not.
-    as_value getMember(const ObjectURI& uri);
-
     /// Delete a property of this object, unless protected from deletion.
     //
     /// This function does *not* recurse in this object's prototype.
     //
-    /// @param uri      Property identifier. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
+    /// @param uri      Property identifier. 
     /// @return         a pair of boolean values expressing whether the property
     ///                 was found (first) and whether it was deleted (second).
     ///                 Of course a pair(false, true) would be invalid (deleted
@@ -517,21 +505,10 @@ public:
     //
     /// This function does *not* recurse in this object's prototype.
     //
-    /// @param uri      The name and namespace of the property. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
+    /// @param uri      Property identifier. 
     /// @return         A Property pointer, or NULL if this object doesn't
     ///                 contain the named property.
     Property* getOwnProperty(const ObjectURI& uri);
-
-    /// Return true if this object has the named property
-    //
-    /// @param uri      Name and namespace of the property. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
-    ///
-    /// @return         true if the object has the property, false otherwise.
-    bool hasOwnProperty(const ObjectURI& uri);
 
     /// Set member flags (probably used by ASSetPropFlags)
     //
@@ -724,7 +701,6 @@ protected:
     /// @param vm The VM to associate the newly created as_object with.
     explicit as_object(VM& vm);
 
-
     /// Mark all reachable resources, override from GcResource.
     //
     /// The default implementation marks all properties
@@ -812,6 +788,47 @@ private:
 /// @param name The name of the function to call.
 void sendEvent(as_object& o, const as_environment& env, const ObjectURI& name);
 
+/// Get a member of an object using AS lookup rules
+//
+/// This is a wrapper round as_object::get_member that returns undefined if
+/// the member is not found.
+//
+/// Note: this is the only full lookup process available in ActionScript code.
+//
+//
+/// @param uri      Property identifier. 
+/// @param o        The object whose member is required.
+/// @return         Value of the member (possibly undefined),
+///                 or undefined if not found. Use get_member if you
+///                 need to know whether it was found or not.
+inline as_value
+getMember(as_object& o, const ObjectURI& uri)
+{
+    as_value ret;
+    o.get_member(uri, &ret);
+    return ret;
+}
+
+/// Get an own member of an object.
+//
+/// This is a wrapper round as_object::getOwnProperty that returns undefined if
+/// the member is not found.
+//
+/// Note: this requires two steps in ActionScript (hasOwnProperty + lookup), so
+/// is probably only for use in native functions.
+//
+/// @param uri      Property identifier.
+/// @param o        The object whose own member is required.
+/// @return         Value of the member (possibly undefined),
+///                 or undefined if not found. Use get_member if you
+///                 need to know whether it was found or not.
+inline as_value
+getOwnProperty(as_object& o, const ObjectURI& uri)
+{
+    Property* p = o.getOwnProperty(uri);
+    return p ? p->getValue(o) : as_value();
+}
+
 /// Function objects for visiting properties.
 class IsVisible
 {
@@ -866,6 +883,17 @@ get(as_object* o)
 {
     if (!o) return 0;
     return dynamic_cast<T*>(o->displayObject());
+}
+
+/// Return true if this object has the named property
+//
+/// @param o        The object whose property should be searched for.
+/// @param uri      Property identifier. 
+/// @return         true if the object has the property, false otherwise.
+inline bool
+hasOwnProperty(as_object& o, const ObjectURI& uri)
+{
+    return (o.getOwnProperty(uri));
 }
 
 as_object* getObjectWithPrototype(Global_as& gl, string_table::key c);

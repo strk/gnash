@@ -149,7 +149,7 @@ AsBroadcaster::initialize(as_object& o)
 
     // Find _global.AsBroadcaster.
     as_object* asb =
-        gl.getMember(NSV::CLASS_AS_BROADCASTER).to_object(gl);
+        getMember(gl, NSV::CLASS_AS_BROADCASTER).to_object(gl);
 
     // If it's not an object, these are left undefined, but they are
     // always attached to the initialized object.
@@ -158,8 +158,8 @@ AsBroadcaster::initialize(as_object& o)
     const int flags = as_object::DefaultFlags;
 
     if (asb) {
-        al = asb->getMember(NSV::PROP_ADD_LISTENER);
-        rl = asb->getMember(NSV::PROP_REMOVE_LISTENER);
+        al = getMember(*asb, NSV::PROP_ADD_LISTENER);
+        rl = getMember(*asb, NSV::PROP_REMOVE_LISTENER);
     }
     
     o.set_member(NSV::PROP_ADD_LISTENER, al);
@@ -358,14 +358,14 @@ asbroadcaster_removeListener(const fn_call& fn)
     
     // This is an ActionScript-like implementation, which is why it looks
     // like poor C++.
-    const int length = toInt(listeners->getMember(NSV::PROP_LENGTH));
+    const int length = toInt(getMember(*listeners, NSV::PROP_LENGTH));
     int i = 0;
     string_table& st = getStringTable(fn);
 
     while (i < length) {
         std::ostringstream s;
         s << i;
-        as_value el = listeners->getMember(st.find(s.str()));
+        as_value el = getMember(*listeners, st.find(s.str()));
         if (el.equals(listenerToRemove)) {
             callMethod(listeners, NSV::PROP_SPLICE, s.str(), 1);
             return as_value(true);

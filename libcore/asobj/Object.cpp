@@ -358,7 +358,7 @@ object_hasOwnProperty(const fn_call& fn)
         return as_value(false);
     }
 
-    const bool found = obj->hasOwnProperty(getStringTable(fn).find(propname));
+    const bool found = hasOwnProperty(*obj, getStringTable(fn).find(propname));
     return as_value(found);
 }
 

@@ -1502,7 +1502,7 @@ public:
     // Target renderer
     renderer_base& rbase = *m_rbase;
 
-    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> ras_type;
+    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_int> ras_type;
     ras_type rasc;  // flash-like renderer
 
     agg::renderer_scanline_aa_solid<
@@ -1616,7 +1616,7 @@ public:
     sh_type sh;                   
        
     // compound rasterizer used for flash shapes
-    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> rasc_type;  
+    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_int> rasc_type;
     rasc_type rasc;
     
 

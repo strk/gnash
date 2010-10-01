@@ -384,7 +384,7 @@ bitmapdata_clone(const fn_call& fn)
 
     Global_as& gl = getGlobal(fn);
     as_object* ret = gl.createObject();
-    const as_value& proto = obj->getMember(NSV::PROP_uuPROTOuu);
+    const as_value& proto = getMember(*obj, NSV::PROP_uuPROTOuu);
     if (proto.is_object()) {
         ret->set_member(NSV::PROP_uuPROTOuu, proto);
     }
@@ -846,7 +846,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
     // The properties come from the 'this' object.
     Global_as& gl = getGlobal(fn);
     as_object* ret = gl.createObject();
-    ret->set_member(NSV::PROP_uuPROTOuu, ptr->getMember(NSV::PROP_PROTOTYPE));
+    ret->set_member(NSV::PROP_uuPROTOuu, getMember(*ptr, NSV::PROP_PROTOTYPE));
     
     newImage->update(im.begin());
     ret->setRelay(new BitmapData_as(ret, newImage));

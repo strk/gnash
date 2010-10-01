@@ -124,9 +124,9 @@ XMLNode_as::object()
     if (!_object) {
         as_object* o = _global.createObject();
         as_object* xn =
-            _global.getMember(NSV::CLASS_XMLNODE).to_object(_global);
+            getMember(_global, NSV::CLASS_XMLNODE).to_object(_global);
         if (xn) {
-            o->set_prototype(xn->getMember(NSV::PROP_PROTOTYPE));
+            o->set_prototype(getMember(*xn, NSV::PROP_PROTOTYPE));
             o->init_member(NSV::PROP_CONSTRUCTOR, xn);
         }
         o->setRelay(this);

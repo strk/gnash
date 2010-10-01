@@ -58,17 +58,6 @@ struct SetCache : boost::static_visitor<>
     }
 };
 
-/// Mark the stored value reachable.
-struct SetReachable : boost::static_visitor<>
-{
-    result_type operator()(const as_value& val) const {
-        val.setReachable();
-    }
-    result_type operator()(const GetterSetter& gs) const {
-        return gs.markReachableResources();
-    }
-};
-
 }
 
 void
@@ -103,12 +92,6 @@ GetterSetter::UserDefinedGetterSetter::set(const fn_call& fn)
 	}
 
 	_setter->call(fn);
-}
-
-void
-Property::setReachable() const
-{
-    return boost::apply_visitor(SetReachable(), _bound);
 }
 
 as_value
