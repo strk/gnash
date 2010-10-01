@@ -634,8 +634,8 @@ public:
         assert(ao);
         assert(bo);
         
-        const as_value& av = arrayProperty(*ao, _prop);
-        const as_value& bv = arrayProperty(*bo, _prop);
+        const as_value& av = getOwnProperty(*ao, _prop);
+        const as_value& bv = getOwnProperty(*bo, _prop);
 
         return _comp(av, bv);
     }
@@ -684,8 +684,8 @@ public:
         for (Props::iterator pit = _prps.begin(), pend = _prps.end();
                 pit != pend; ++pit, ++cmp) {
             
-            const as_value& av = arrayProperty(*ao, *pit);
-            const as_value& bv = arrayProperty(*bo, *pit);
+            const as_value& av = getOwnProperty(*ao, *pit);
+            const as_value& bv = getOwnProperty(*bo, *pit);
 
             if ((*cmp)(av, bv)) return true;
             if ((*cmp)(bv, av)) return false;
@@ -721,8 +721,8 @@ public:
         for (Props::iterator pit = _prps.begin(), pend = _prps.end();
                 pit != pend; ++pit, ++cmp)
         {
-            const as_value& av = arrayProperty(*ao, *pit);
-            const as_value& bv = arrayProperty(*bo, *pit);
+            const as_value& av = getOwnProperty(*ao, *pit);
+            const as_value& bv = getOwnProperty(*bo, *pit);
 
             if (!(*cmp)(av, bv)) return false;
         }
@@ -843,13 +843,6 @@ arrayLength(as_object& array)
     const int size = toInt(length);
     if (size < 0) return 0;
     return size;
-}
-
-as_value
-arrayProperty(as_object& array, const ObjectURI& prop)
-{
-    Property* p = array.getOwnProperty(prop);
-    return p ? p->getValue(array) : as_value();
 }
 
 void
@@ -986,7 +979,7 @@ array_splice(const fn_call& fn)
     // Push removed elements to the new array.
     for (size_t i = 0; i < remove; ++i) {
         const size_t key = getKey(fn, start + i);
-        callMethod(ret, NSV::PROP_PUSH, arrayProperty(*array, key));
+        callMethod(ret, NSV::PROP_PUSH, getOwnProperty(*array, key));
     }
 
     // Shift elements in 'this' array by simple assignment, not delete
@@ -1246,7 +1239,7 @@ array_unshift(const fn_call& fn)
         const string_table::key nextkey = getKey(fn, i - shift);
         const string_table::key currentkey = getKey(fn, i);
         array->delProperty(currentkey);
-        array->set_member(currentkey, arrayProperty(*array, nextkey));
+        array->set_member(currentkey, getOwnProperty(*array, nextkey));
     }
 
     for (size_t i = shift; i > 0; --i) {
@@ -1270,7 +1263,7 @@ array_pop(const fn_call& fn)
     if (size < 1) return as_value();
 
     const string_table::key ind = getKey(fn, size - 1);
-    as_value ret = arrayProperty(*array, ind);
+    as_value ret = getOwnProperty(*array, ind);
     array->delProperty(ind);
     
     setArrayLength(*array, size - 1);
@@ -1288,13 +1281,13 @@ array_shift(const fn_call& fn)
     // An array with no elements has nothing to return.
     if (size < 1) return as_value();
 
-    as_value ret = arrayProperty(*array, getKey(fn, 0));
+    as_value ret = getOwnProperty(*array, getKey(fn, 0));
 
     for (size_t i = 0; i < static_cast<size_t>(size - 1); ++i) {
         const string_table::key nextkey = getKey(fn, i + 1);
         const string_table::key currentkey = getKey(fn, i);
         array->delProperty(currentkey);
-        array->set_member(currentkey, arrayProperty(*array, nextkey));
+        array->set_member(currentkey, getOwnProperty(*array, nextkey));
     }
     
     setArrayLength(*array, size - 1);
@@ -1315,8 +1308,8 @@ array_reverse(const fn_call& fn)
     for (size_t i = 0; i < static_cast<size_t>(size) / 2; ++i) {
         const string_table::key bottomkey = getKey(fn, i);
         const string_table::key topkey = getKey(fn, size - i - 1);
-        const as_value top = arrayProperty(*array, topkey);
-        const as_value bottom = arrayProperty(*array, bottomkey);
+        const as_value top = getOwnProperty(*array, topkey);
+        const as_value bottom = getOwnProperty(*array, bottomkey);
         array->delProperty(topkey);
         array->delProperty(bottomkey);
         array->set_member(bottomkey, top);
@@ -1465,7 +1458,7 @@ join(as_object* array, const std::string& separator)
     for (size_t i = 0; i < size; ++i) {
         if (i) s += separator;
         const std::string& index = boost::lexical_cast<std::string>(i);
-        const as_value& el = arrayProperty(*array, st.find(index));
+        const as_value& el = getOwnProperty(*array, st.find(index));
         s += el.to_string(version);
     }
     return as_value(s);
@@ -1499,7 +1492,7 @@ void foreachArray(as_object& array, int start, int end, T& pred)
     string_table& st = getStringTable(array);
 
     for (size_t i = start; i < static_cast<size_t>(end); ++i) {
-        pred(arrayProperty(array, arrayKey(st, i)));
+        pred(getOwnProperty(array, arrayKey(st, i)));
     }
 }
 

@@ -455,10 +455,12 @@ public:
     ///                 otherwise (no such trigger exists).
     bool unwatch(const ObjectURI& uri);
 
-    /// Get a member as_value by name
+    /// Get a property by name if it exists.
     //
-    /// NOTE that this method is non-const because accessing a getter/setter
-    ///      property may modify the object.
+    /// NOTE: accessing a getter/setter property may modify the object.
+    //
+    /// See getMember() for a property accessor that corresponds to
+    /// ActionScript behaviour.
     //
     /// @param uri      Property identifier.
     /// @param val      Variable to assign an existing value to.
@@ -795,6 +797,8 @@ void sendEvent(as_object& o, const as_environment& env, const ObjectURI& name);
 /// This is a wrapper round as_object::get_member that returns undefined if
 /// the member is not found.
 //
+/// Note: this is the only full lookup process available in ActionScript code.
+//
 //
 /// @param uri      Property identifier. Note that
 ///                 if you do not care about the namespace (AS2 does not),
@@ -809,6 +813,28 @@ getMember(as_object& o, const ObjectURI& uri)
     as_value ret;
     o.get_member(uri, &ret);
     return ret;
+}
+
+/// Get an own member of an object.
+//
+/// This is a wrapper round as_object::getOwnProperty that returns undefined if
+/// the member is not found.
+//
+/// Note: this requires two steps in ActionScript (hasOwnProperty + lookup), so
+/// is probably only for use in native functions.
+//
+/// @param uri      Property identifier. Note that
+///                 if you do not care about the namespace (AS2 does not),
+///                 you can call this function with the name key only.
+/// @param o        The object whose own member is required.
+/// @return         Value of the member (possibly undefined),
+///                 or undefined if not found. Use get_member if you
+///                 need to know whether it was found or not.
+inline as_value
+getOwnProperty(as_object& o, const ObjectURI& prop)
+{
+    Property* p = o.getOwnProperty(prop);
+    return p ? p->getValue(o) : as_value();
 }
 
 /// Function objects for visiting properties.
