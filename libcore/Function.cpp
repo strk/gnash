@@ -171,7 +171,7 @@ Function::markReachableResources() const
 	_env.markReachableResources();
 
 	// Invoke parent class marker
-	markAsObjectReachable(); 
+    as_object::markReachableResources(); 
 }
 
 as_object*

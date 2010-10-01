@@ -234,7 +234,7 @@ AVM1Global::markReachableResources() const
 {
     _classes.markReachableResources();
     _objectProto->setReachable();
-    markAsObjectReachable();
+    as_object::markReachableResources();
 }
 
 AVM1Global::AVM1Global(VM& vm)

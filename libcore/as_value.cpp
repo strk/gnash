@@ -693,7 +693,9 @@ as_value::toDebugString() const
         case OBJECT:
         {
             as_object* obj = getObj();
-            ret = boost::format("[object(%s):%p]") % typeName(*obj) %
+            assert(obj);
+            const char* desc = obj->array() ? "array" : "object";
+            ret = boost::format("[%s(%s):%p]") % desc % typeName(*obj) %
                                               static_cast<void*>(obj);
             return ret.str();
         }
