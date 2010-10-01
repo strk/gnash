@@ -1052,11 +1052,10 @@ operator<<(std::ostream& o, const as_value& v)
         {
             as_object* obj = v.getObj();
             assert(obj);
-            const char* desc = obj->array() ? "array" : "object";
-            boost::format ret =
-                boost::format("[%s(%s):%p]") % desc % typeName(*obj) %
-                                              static_cast<void*>(obj);
-            return o << ret.str();
+            const std::string desc = obj->array() ? "array" :
+                obj->relay() ? typeName(*obj->relay()) : typeName(*obj);
+            return o << "[object(" << desc << "):" << static_cast<void*>(obj)
+                                                       << "]";
         }
         case as_value::STRING:
             return o << "[string:" + v.getStr() + "]";
