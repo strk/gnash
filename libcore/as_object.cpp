@@ -177,7 +177,7 @@ protected:
     virtual void markReachableResources() const
 	{
         if (_super) _super->setReachable();
-        markAsObjectReachable();
+        as_object::markReachableResources();
 	}
 
 private:
@@ -525,7 +525,6 @@ as_object::set_prototype(const as_value& proto)
     // TODO: check what happens if __proto__ is set as a user-defined 
     // getter/setter
     // TODO: check triggers !!
-    // Note that this sets __proto__ in namespace 0
     _members.setValue(NSV::PROP_uuPROTOuu, proto, as_object::DefaultFlags);
 }
 
@@ -1067,7 +1066,7 @@ as_object::unwatch(const ObjectURI& uri)
 
 #ifdef GNASH_USE_GC
 void
-as_object::markAsObjectReachable() const
+as_object::markReachableResources() const
 {
     _members.setReachable();
 

@@ -1831,7 +1831,7 @@ ActionPushData(ActionExec& thread)
         "register",    // 4
         "bool",        // 5
         "double",    // 6
-        "boost::int32_t",    // 7
+        "int",    // 7
         "dict8",    // 8
         "dict16"    // 9
     };

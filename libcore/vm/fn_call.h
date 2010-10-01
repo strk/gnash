@@ -204,8 +204,8 @@ public:
     /// Dump arguments to given output stream
     void dump_args(std::ostream& os) const {
         for (size_t i = 0; i < nargs; ++i) {
-            if ( i ) os << ", ";
-            os << arg(i).toDebugString();
+            if (i) os << ", ";
+            os << arg(i);
         }
 	}
     

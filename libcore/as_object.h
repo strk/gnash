@@ -704,17 +704,11 @@ protected:
     /// Mark all reachable resources, override from GcResource.
     //
     /// The default implementation marks all properties
-    /// as being reachable, calling markAsObjectReachable().
     ///
     /// If a derived class provides access to more GC-managed
-    /// resources, it should override this method and call 
-    /// markAsObjectReachable() as the last step.
-    virtual void markReachableResources() const {
-        markAsObjectReachable();
-    }
-
-    /// Mark properties and triggers list as reachable (for the GC)
-    void markAsObjectReachable() const;
+    /// resources, it should override this function and call 
+    /// this function directly as the last step.
+    virtual void markReachableResources() const;
 
 private:
 
