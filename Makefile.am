@@ -160,9 +160,8 @@ revno.h: Makefile.in
 # The branch nickname and revision number must be set before including
 # the other Makefile fragments used for package building, as they use
 # these values.
-BRANCH_REVNO  := $(shell grep "REVNO" revno.h | cut -d '"' -f 2)
+BRANCH_REVNO  := $(shell grep "REVNO" revno.h | cut -d '"' -f 2 | cut -d '.' -f 1)
 BRANCH_NICK   := $(shell grep "NICK" revno.h | cut -d '"' -f 2)
-
 
 # Extract info from the repository to include in the build. If
 # GIT (git) isn't installed, just print stubs, as this is only
