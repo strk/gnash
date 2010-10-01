@@ -836,7 +836,7 @@ checkArrayLength(as_object& array, const ObjectURI& uri, const as_value& val)
 size_t
 arrayLength(as_object& array)
 {
-    // TODO: check whether this should use only ownProperty.
+    // Only the length property of the array object itself counts.
     const as_value& length = getOwnProperty(array, NSV::PROP_LENGTH);
     if (length.is_undefined()) return 0;
     
