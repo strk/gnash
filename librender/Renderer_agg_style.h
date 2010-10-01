@@ -355,11 +355,6 @@ public:
     m_interpolator(m_tr),
     m_sg(m_img_src, m_interpolator)
   {
-    
-    // Convert the transformation SWFMatrix to AGG's class. It's basically the
-    // same and we could even use SWFMatrix since AGG does not require
-    // a real AGG descendant (templates!). However, it's better to use AGG's
-    // class as this should be faster (avoid type conversion).
   }
   
   virtual ~BitmapStyle() {
