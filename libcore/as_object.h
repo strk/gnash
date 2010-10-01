@@ -386,7 +386,7 @@ public:
     /// it destroys itself after setting its property to the return value of
     /// getValue.
     //
-    /// @param uri      name/namespace property identifier.
+    /// @param uri      Property identifier.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param flags    Flags for the new member. By default dontEnum.
@@ -438,7 +438,7 @@ public:
 
     /// Add a watch trigger, overriding any other defined for same name.
     //
-    /// @param uri      property namespace.
+    /// @param uri      property identifier
     /// @param trig     A function to invoke when this property value is
     ///                 assigned to. The function will be called with old
     ///                 val, new val and the custom value below. Its
@@ -491,9 +491,7 @@ public:
     //
     /// This function does *not* recurse in this object's prototype.
     //
-    /// @param uri      Property identifier. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
+    /// @param uri      Property identifier. 
     /// @return         a pair of boolean values expressing whether the property
     ///                 was found (first) and whether it was deleted (second).
     ///                 Of course a pair(false, true) would be invalid (deleted
@@ -507,9 +505,7 @@ public:
     //
     /// This function does *not* recurse in this object's prototype.
     //
-    /// @param uri      The name and namespace of the property. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
+    /// @param uri      Property identifier. 
     /// @return         A Property pointer, or NULL if this object doesn't
     ///                 contain the named property.
     Property* getOwnProperty(const ObjectURI& uri);
@@ -800,9 +796,7 @@ void sendEvent(as_object& o, const as_environment& env, const ObjectURI& name);
 /// Note: this is the only full lookup process available in ActionScript code.
 //
 //
-/// @param uri      Property identifier. Note that
-///                 if you do not care about the namespace (AS2 does not),
-///                 you can call this function with the name key only.
+/// @param uri      Property identifier. 
 /// @param o        The object whose member is required.
 /// @return         Value of the member (possibly undefined),
 ///                 or undefined if not found. Use get_member if you
@@ -823,17 +817,15 @@ getMember(as_object& o, const ObjectURI& uri)
 /// Note: this requires two steps in ActionScript (hasOwnProperty + lookup), so
 /// is probably only for use in native functions.
 //
-/// @param uri      Property identifier. Note that
-///                 if you do not care about the namespace (AS2 does not),
-///                 you can call this function with the name key only.
+/// @param uri      Property identifier.
 /// @param o        The object whose own member is required.
 /// @return         Value of the member (possibly undefined),
 ///                 or undefined if not found. Use get_member if you
 ///                 need to know whether it was found or not.
 inline as_value
-getOwnProperty(as_object& o, const ObjectURI& prop)
+getOwnProperty(as_object& o, const ObjectURI& uri)
 {
-    Property* p = o.getOwnProperty(prop);
+    Property* p = o.getOwnProperty(uri);
     return p ? p->getValue(o) : as_value();
 }
 
@@ -896,10 +888,7 @@ get(as_object* o)
 /// Return true if this object has the named property
 //
 /// @param o        The object whose property should be searched for.
-/// @param uri      Name and namespace of the property. Note that
-///                 if you do not care about the namespace (AS2 does not),
-///                 you can call this function with the name key only.
-///
+/// @param uri      Property identifier. 
 /// @return         true if the object has the property, false otherwise.
 inline bool
 hasOwnProperty(as_object& o, const ObjectURI& uri)
