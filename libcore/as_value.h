@@ -185,13 +185,14 @@ public:
         set_as_object(obj);
     }
     
-
     /// Assign to an as_value.
     DSOEXPORT void operator=(const as_value& v)
     {
         _type = v._type;
         _value = v._value;
     }
+
+    friend std::ostream& operator<<(std::ostream& o, const as_value&);
     
     /// Return the primitive type of this value as a string.
     const char* typeOf() const;
@@ -288,10 +289,6 @@ public:
     /// Note that this performs no conversion, so returns 0 if the as_value
     /// is not a function.
     as_function* to_function() const;
-
-    // Used for operator<< to give useful information about an
-    // as_value object.
-    DSOEXPORT std::string toDebugString() const;
     
     AsType defaultPrimitive(int version) const;
     
@@ -498,9 +495,8 @@ as_value& convertToBoolean(as_value& v, VM& vm);
 /// Convert to primitive type
 as_value& convertToPrimitive(as_value& v, VM& vm);
 
-inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
-	return os << v.toDebugString();
-}
+/// Stream operator.
+std::ostream& operator<<(std::ostream& os, const as_value& v);
 
 /// Convert numeric value to string value, following ECMA-262 specification
 //

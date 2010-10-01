@@ -676,65 +676,6 @@ as_value::strictly_equals(const as_value& v) const
     return equalsSameType(v);
 }
 
-std::string
-as_value::toDebugString() const
-{
-    boost::format ret;
-
-    switch (_type)
-    {
-        case UNDEFINED:
-            return "[undefined]";
-        case NULLTYPE:
-            return "[null]";
-        case BOOLEAN:
-            ret = boost::format("[bool:%s]") % (getBool() ? "true" : "false");
-            return ret.str();
-        case OBJECT:
-        {
-            as_object* obj = getObj();
-            assert(obj);
-            const char* desc = obj->array() ? "array" : "object";
-            ret = boost::format("[%s(%s):%p]") % desc % typeName(*obj) %
-                                              static_cast<void*>(obj);
-            return ret.str();
-        }
-        case STRING:
-            return "[string:" + getStr() + "]";
-        case NUMBER:
-        {
-            std::stringstream stream;
-            stream << getNum();
-            return "[number:" + stream.str() + "]";
-        }
-        case DISPLAYOBJECT:
-        {
-            const CharacterProxy& sp = getCharacterProxy();
-            if (sp.isDangling()) {
-                DisplayObject* rebound = sp.get();
-                if (rebound) {
-                    ret = boost::format("[rebound %s(%s):%p]") % 
-                        typeName(*rebound) % sp.getTarget() %
-                        static_cast<void*>(rebound);
-                }
-                else {
-                    ret = boost::format("[dangling DisplayObject:%s]") % 
-                        sp.getTarget();
-                }
-            }
-            else {
-                DisplayObject* ch = sp.get();
-                ret = boost::format("[%s(%s):%p]") % typeName(*ch) %
-                                sp.getTarget() % static_cast<void*>(ch);
-            }
-            return ret.str();
-        }
-        default:
-            if (is_exception()) return "[exception]";
-            std::abort();
-    }
-}
-
 void
 as_value::setReachable() const
 {
@@ -1092,6 +1033,63 @@ truncateToInt(double d)
 }
 
 } // unnamed namespace
+
+std::ostream&
+operator<<(std::ostream& o, const as_value& v)
+{
+
+    switch (v._type)
+    {
+        case as_value::UNDEFINED:
+            return o << "[undefined]";
+        case as_value::NULLTYPE:
+            return o << "[null]";
+        case as_value::BOOLEAN:
+        {
+            return o << "[bool:" << std::boolalpha << v.getBool() << "]";
+        }
+        case as_value::OBJECT:
+        {
+            as_object* obj = v.getObj();
+            assert(obj);
+            const char* desc = obj->array() ? "array" : "object";
+            boost::format ret =
+                boost::format("[%s(%s):%p]") % desc % typeName(*obj) %
+                                              static_cast<void*>(obj);
+            return o << ret.str();
+        }
+        case as_value::STRING:
+            return o << "[string:" + v.getStr() + "]";
+        case as_value::NUMBER:
+            return o << "[number:" << v.getNum() << "]";
+        case as_value::DISPLAYOBJECT:
+        {
+            boost::format ret;
+            const CharacterProxy& sp = v.getCharacterProxy();
+            if (sp.isDangling()) {
+                DisplayObject* rebound = sp.get();
+                if (rebound) {
+                    ret = boost::format("[rebound %s(%s):%p]") % 
+                        typeName(*rebound) % sp.getTarget() %
+                        static_cast<void*>(rebound);
+                }
+                else {
+                    ret = boost::format("[dangling DisplayObject:%s]") % 
+                        sp.getTarget();
+                }
+            }
+            else {
+                DisplayObject* ch = sp.get();
+                ret = boost::format("[%s(%s):%p]") % typeName(*ch) %
+                                sp.getTarget() % static_cast<void*>(ch);
+            }
+            return o << ret.str();
+        }
+        default:
+            assert(v.is_exception());
+            return o << "[exception]";
+    }
+}
 
 
 } // namespace gnash
