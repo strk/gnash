@@ -403,7 +403,7 @@ xmlsocket_onData(const fn_call& fn)
 
 
     Global_as& gl = getGlobal(fn);
-    as_function* ctor = gl.getMember(NSV::CLASS_XML).to_function();
+    as_function* ctor = getMember(gl, NSV::CLASS_XML).to_function();
 
     fn_call::Args args;
     args += xmlin;

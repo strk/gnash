@@ -1808,11 +1808,11 @@ movieclip_beginGradientFill(const fn_call& fn)
 
         string_table::key key = st.find(boost::lexical_cast<std::string>(i));
 
-        as_value colVal = colors->getMember(key);
+        as_value colVal = getMember(*colors, key);
         boost::uint32_t col = colVal.is_number() ? toInt(colVal) : 0;
 
         /// Alpha is the range 0..100.
-        as_value alpVal = alphas->getMember(key);
+        as_value alpVal = getMember(*alphas, key);
         const double a = alpVal.is_number() ?
             clamp<double>(alpVal.to_number(), 0, 100) : 0;
         const boost::uint8_t alp = 0xff * (a / 100);
@@ -1825,7 +1825,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         // From looking it looks like the minimum adjustment is 2. Even 
         // steps of 1 appear to be adjusted.
         const int step = 2;
-        const as_value& ratVal = ratios->getMember(key);
+        const as_value& ratVal = getMember(*ratios, key);
         const boost::uint32_t minRatio =
             gradients.empty() ? 0 :
             std::min<boost::uint32_t>(gradients[i - 1].ratio + step, 0xff);

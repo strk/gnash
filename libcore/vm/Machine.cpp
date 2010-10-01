@@ -1441,7 +1441,7 @@ Machine::execute()
                     else {
 
                         as_value property =
-                            object->getMember(a.getGlobalName());
+                            getMember(*object, a.getGlobalName());
                     
                         if (!property.is_undefined() && !property.is_null()) {
                             log_abc("Calling method %s on object %s",
@@ -1552,7 +1552,7 @@ Machine::execute()
                         throw ASException();
                     }
 
-                    as_value c = super->getMember(NSV::PROP_CONSTRUCTOR);
+                    as_value c = getMember(*super, NSV::PROP_CONSTRUCTOR);
                     pushCall(c.to_function(), super, mIgnoreReturn,
                             argc, -1);
                     break;
@@ -1596,7 +1596,7 @@ Machine::execute()
                     string_table::key ns = a.getNamespace() ?
                         a.getNamespace()->getURI() : 0;
 
-                    as_value c = object->getMember(
+                    as_value c = getMember(*object, 
                             ObjectURI(a.getGlobalName(), ns));
 
                     // TODO: don't do this. Scriptes should not be functions;

@@ -208,13 +208,13 @@ AVM1Global::createArray()
 {
     as_object* array = new as_object(*this);
 
-    as_value ctor = getMember(NSV::CLASS_ARRAY);
+    as_value ctor = getMember(*this, NSV::CLASS_ARRAY);
     as_object* obj = ctor.to_object(*this);
     if (obj) {
         as_value proto;
         if (obj->get_member(NSV::PROP_PROTOTYPE, &proto)) {
             array->init_member(NSV::PROP_CONSTRUCTOR, ctor);
-            array->set_prototype(obj->getMember(NSV::PROP_PROTOTYPE));
+            array->set_prototype(getMember(*obj, NSV::PROP_PROTOTYPE));
         }
     }
 
@@ -292,7 +292,7 @@ AVM1Global::registerClasses()
     init_member("showRedrawRegions", vm.getNative(1021, 1));
     
     string_table& st = getStringTable(*this);
-    init_member("clearTimeout", getMember(st.find("clearInterval")));
+    init_member("clearTimeout", getMember(*this, st.find("clearInterval")));
 
     _classes.declareAll(avm1Classes());
 
@@ -964,7 +964,7 @@ global_assetuperror(const fn_call& fn)
 
         string_table& st = getStringTable(fn);
 
-        as_function* ctor = gl.getMember(NSV::CLASS_ERROR).to_function();
+        as_function* ctor = getMember(gl, NSV::CLASS_ERROR).to_function();
         if (ctor) {
             fn_call::Args args;
             as_object* proto = constructInstance(*ctor, fn.env(), args);

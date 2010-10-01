@@ -377,7 +377,7 @@ attachDateInterface(as_object& o)
     o.init_member("setUTCMilliseconds", vm.getNative(103, 143));
 
     string_table& st = getStringTable(o);
-    o.init_member("valueOf", o.getMember(st.find("getTime")));
+    o.init_member("valueOf", getMember(o, st.find("getTime")));
 
 }   
 
@@ -413,7 +413,7 @@ date_new(const fn_call& fn)
     // date.
     if (!fn.isInstantiation()) {
         Global_as& gl = getGlobal(fn);
-        as_function* ctor = gl.getMember(NSV::CLASS_DATE).to_function();
+        as_function* ctor = getMember(gl, NSV::CLASS_DATE).to_function();
         if (!ctor) return as_value();
         fn_call::Args args;
         return constructInstance(*ctor, fn.env(), args);

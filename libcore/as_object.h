@@ -485,21 +485,6 @@ public:
     virtual as_object* get_super(const ObjectURI& fname);
     as_object* get_super();
 
-    /// Get a member as_value by name in an AS-compatible way
-    //
-    /// NOTE that this method is non-const becase a property
-    ///      could also be a getter/setter and we can't promise
-    ///      that the 'getter' won't change this object trough
-    ///      use of the 'this' reference. 
-    //
-    /// @param uri      Property identifier. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
-    /// @return         Value of the member (possibly undefined),
-    ///                 or undefined if not found. Use get_member if you
-    ///                 need to know whether it was found or not.
-    as_value getMember(const ObjectURI& uri);
-
     /// Delete a property of this object, unless protected from deletion.
     //
     /// This function does *not* recurse in this object's prototype.
@@ -526,15 +511,6 @@ public:
     /// @return         A Property pointer, or NULL if this object doesn't
     ///                 contain the named property.
     Property* getOwnProperty(const ObjectURI& uri);
-
-    /// Return true if this object has the named property
-    //
-    /// @param uri      Name and namespace of the property. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
-    ///
-    /// @return         true if the object has the property, false otherwise.
-    bool hasOwnProperty(const ObjectURI& uri);
 
     /// Set member flags (probably used by ASSetPropFlags)
     //
@@ -727,7 +703,6 @@ protected:
     /// @param vm The VM to associate the newly created as_object with.
     explicit as_object(VM& vm);
 
-
     /// Mark all reachable resources, override from GcResource.
     //
     /// The default implementation marks all properties
@@ -815,6 +790,27 @@ private:
 /// @param name The name of the function to call.
 void sendEvent(as_object& o, const as_environment& env, const ObjectURI& name);
 
+/// Get a member of an object using AS lookup rules
+//
+/// This is a wrapper round as_object::get_member that returns undefined if
+/// the member is not found.
+//
+//
+/// @param uri      Property identifier. Note that
+///                 if you do not care about the namespace (AS2 does not),
+///                 you can call this function with the name key only.
+/// @param o        The object whose member is required.
+/// @return         Value of the member (possibly undefined),
+///                 or undefined if not found. Use get_member if you
+///                 need to know whether it was found or not.
+inline as_value
+getMember(as_object& o, const ObjectURI& uri)
+{
+    as_value ret;
+    o.get_member(uri, &ret);
+    return ret;
+}
+
 /// Function objects for visiting properties.
 class IsVisible
 {
@@ -869,6 +865,20 @@ get(as_object* o)
 {
     if (!o) return 0;
     return dynamic_cast<T*>(o->displayObject());
+}
+
+/// Return true if this object has the named property
+//
+/// @param o        The object whose property should be searched for.
+/// @param uri      Name and namespace of the property. Note that
+///                 if you do not care about the namespace (AS2 does not),
+///                 you can call this function with the name key only.
+///
+/// @return         true if the object has the property, false otherwise.
+inline bool
+hasOwnProperty(as_object& o, const ObjectURI& uri)
+{
+    return (o.getOwnProperty(uri));
 }
 
 as_object* getObjectWithPrototype(Global_as& gl, string_table::key c);

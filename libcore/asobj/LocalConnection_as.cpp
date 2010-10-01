@@ -896,7 +896,7 @@ executeAMFFunction(as_object& o, amf::Reader& rd)
 
     // Call the method on this LocalConnection object.
     string_table& st = getStringTable(o);
-    as_function* f = o.getMember(st.find(meth)).to_function();
+    as_function* f = getMember(o, st.find(meth)).to_function();
 
     invoke(f, as_environment(getVM(o)), &o, args);
 }

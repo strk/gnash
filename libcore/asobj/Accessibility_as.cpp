@@ -50,7 +50,7 @@ accessibility_class_init(as_object& where, const ObjectURI& uri)
     // This object has unusual properties.
     as_object* obj = gl.createObject();
     obj->set_member_flags(NSV::PROP_uuPROTOuu, flags);
-    obj->init_member(NSV::PROP_CONSTRUCTOR, gl.getMember(NSV::CLASS_OBJECT),
+    obj->init_member(NSV::PROP_CONSTRUCTOR, getMember(gl, NSV::CLASS_OBJECT),
             flags);
 
     attachAccessibilityStaticInterface(*obj);

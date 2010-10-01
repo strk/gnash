@@ -344,7 +344,7 @@ object_hasOwnProperty(const fn_call& fn)
     if ( fn.nargs < 1 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Object.hasOwnProperty() requires one arg"));
+        log_aserror(_("hasOwnProperty(Object, ) requires one arg"));
         );
         return as_value(false);
     }
@@ -353,12 +353,12 @@ object_hasOwnProperty(const fn_call& fn)
     if (arg.is_undefined() || propname.empty())
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Invalid call to Object.hasOwnProperty('%s')"), arg);
+        log_aserror(_("Invalid call to hasOwnProperty(Object, '%s')"), arg);
         );
         return as_value(false);
     }
 
-    const bool found = obj->hasOwnProperty(getStringTable(fn).find(propname));
+    const bool found = hasOwnProperty(*obj, getStringTable(fn).find(propname));
     return as_value(found);
 }
 

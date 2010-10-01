@@ -90,7 +90,7 @@ namespace {
 as_object*
 createTextFieldObject(Global_as& gl)
 {
-    as_value tf(gl.getMember(NSV::CLASS_TEXT_FIELD));
+    as_value tf(getMember(gl, NSV::CLASS_TEXT_FIELD));
     as_function* ctor = tf.to_function();
     if (!ctor) return 0;
     fn_call::Args args;
@@ -624,7 +624,7 @@ textfield_getTextFormat(const fn_call& fn)
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     Global_as& gl = getGlobal(fn);
-    as_function* ctor = gl.getMember(NSV::CLASS_TEXT_FORMAT).to_function();
+    as_function* ctor = getMember(gl, NSV::CLASS_TEXT_FORMAT).to_function();
 
     if (!ctor) return as_value();
 

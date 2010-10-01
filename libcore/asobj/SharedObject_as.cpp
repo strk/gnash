@@ -1005,7 +1005,7 @@ flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
 SharedObject_as*
 createSharedObject(Global_as& gl)
 {
-    as_function* ctor = gl.getMember(NSV::CLASS_SHARED_OBJECT).to_function();
+    as_function* ctor = getMember(gl, NSV::CLASS_SHARED_OBJECT).to_function();
     if (!ctor) return 0;
     as_environment env(getVM(gl));
     fn_call::Args args;
