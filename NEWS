@@ -1,6 +1,11 @@
 Gnash 0.8.9
 YYYY/MM/DD
 
+Improvements since 0.8.8 release are:
+
+ * Fixed swapped _framesloaded and _framestotal properties
+ * Improved ActionScript performance processing, especially
+   for interactive applications.
 
 Gnash 0.8.8
 2010/08/17
