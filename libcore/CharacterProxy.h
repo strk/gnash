@@ -21,6 +21,7 @@
 #define GNASH_CHARACTER_PROXY_H
 
 #include <string>
+#include "dsodefs.h"
 
 // Forward declarations
 namespace gnash {
@@ -45,7 +46,7 @@ class CharacterProxy {
 
 	/// If we still have a sprite pointer check if it was destroyed
 	/// in which case we drop the pointer and only keep the target.
-	void checkDangling() const;
+	DSOEXPORT void checkDangling() const;
 
 public:
 
