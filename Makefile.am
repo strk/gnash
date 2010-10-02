@@ -138,7 +138,7 @@ revno.h: Makefile.in
 	    revno=`(cd $(srcdir) && bzr revno)`; \
 	    nick=`basename $(top_srcdir)`; \
 	  else \
-	    revno="${NOW}"; \
+	    revno="$(NOW)"; \
 	  fi; \
 	else \
 	  if test -d $(top_srcdir)/.git; then \
@@ -150,8 +150,11 @@ revno.h: Makefile.in
               nick="`(cd $(top_srcdir) && git branch | grep "\*" | cut -d ' ' -f 2)`"; \
 	    fi; \
           else \
-            revno="${NOW}"; \
+            revno="$(NOW)"; \
             nick="none"; \
+	  fi; \
+	  if test x$$revno = x; then \
+	    revno="$(NOW)"; \
 	  fi; \
 	fi; \
 	echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
