@@ -607,10 +607,6 @@ CurlStreamFile::fillCache(std::streamsize size)
     }
 
     fd_set readfd, writefd, exceptfd;
-    FD_ZERO(&readfd);
-    FD_ZERO(&writefd);
-    FD_ZERO(&exceptfd);
-
     int maxfd;
     CURLMcode mcode;
     timeval tv;
@@ -642,6 +638,11 @@ CurlStreamFile::fillCache(std::streamsize size)
         //log_debug("cached: %d, size: %d", _cached, size);
 #endif
 
+        // Zero these out _before_ calling curl_multi_fdset!
+        FD_ZERO(&readfd);
+        FD_ZERO(&writefd);
+        FD_ZERO(&exceptfd);
+
         mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, 
                 &exceptfd, &maxfd);
 
@@ -668,10 +669,6 @@ CurlStreamFile::fillCache(std::streamsize size)
 		continue;
 	    }
 	}
-
-        FD_ZERO(&readfd);
-        FD_ZERO(&writefd);
-        FD_ZERO(&exceptfd);
 
         tv.tv_sec = 0;
         tv.tv_usec = maxSleepUsec;
@@ -710,7 +707,8 @@ CurlStreamFile::fillCache(std::streamsize size)
 #endif
         if ( ! ret )
         {
-            // timeout
+            // Timeout, check the clock to see
+            // if we expired the user Timeout
 #ifdef GNASH_CURL_VERBOSE
             log_debug("select() timed out, elapsed is %u",
                     lastProgress.elapsed());
@@ -725,17 +723,12 @@ CurlStreamFile::fillCache(std::streamsize size)
         }
         else
         {
+            // Activity, reset the timer...
 #ifdef GNASH_CURL_VERBOSE
             log_debug("FD activity, resetting progress timer");
 #endif
             lastProgress.restart();
         }
-
-
-        // TODO: check if we timedout or got some data
-        //       if we did timeout, check the clock to see
-        //       if we expired the user Timeout, otherwise
-        //       reset the timer...
 
     }
 
