@@ -661,10 +661,13 @@ CurlStreamFile::fillCache(std::streamsize size)
 #if GNASH_CURL_VERBOSE
             log_debug("curl_multi_fdset: maxfd == %1%", maxfd);
 #endif
-
+	    // As of libcurl 7.21.x, the DNS resolving appears to be going
+	    // on in the background, so curl_multi_fdset fails to return
+	    // anything useful. So we use the user timeout value to
+	    // give DNS enough time to resolve the lookup.
             if (userTimeout && lastProgress.elapsed() > userTimeout) {
                 log_error(_("FIXME: Timeout (%u milliseconds) while loading "
-                    "from url %s"), userTimeout, _url);
+			    "from url %s"), userTimeout, _url);
                 // TODO: should we set _error here ?
                 return;
             } else {
