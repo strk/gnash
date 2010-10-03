@@ -659,16 +659,18 @@ CurlStreamFile::fillCache(std::streamsize size)
         // A value of -1 means no file descriptors were added.
         if (maxfd < 0) {
 #if GNASH_CURL_VERBOSE
-            log_debug("No filedescriptors; breaking");
+            log_debug("curl_multi_fdset: maxfd == %1%", maxfd);
 #endif
-	    if (userTimeout && lastProgress.elapsed() > userTimeout) {
-		log_error(_("FIXME: Timeout (%u milliseconds) while loading "
-			    "from url %s"), userTimeout, _url);
-		break;
-	    } else {
-		continue;
-	    }
-	}
+
+            if (userTimeout && lastProgress.elapsed() > userTimeout) {
+                log_error(_("FIXME: Timeout (%u milliseconds) while loading "
+                    "from url %s"), userTimeout, _url);
+                // TODO: should we set _error here ?
+                return;
+            } else {
+                continue;
+            }
+        }
 
         tv.tv_sec = 0;
         tv.tv_usec = maxSleepUsec;
