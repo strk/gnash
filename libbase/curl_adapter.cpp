@@ -701,7 +701,8 @@ CurlStreamFile::fillCache(std::streamsize size)
 #endif
         if ( ! ret )
         {
-            // timeout
+            // Timeout, check the clock to see
+            // if we expired the user Timeout
 #ifdef GNASH_CURL_VERBOSE
             log_debug("select() timed out, elapsed is %u",
                     lastProgress.elapsed());
@@ -716,17 +717,12 @@ CurlStreamFile::fillCache(std::streamsize size)
         }
         else
         {
+            // Activity, reset the timer...
 #ifdef GNASH_CURL_VERBOSE
             log_debug("FD activity, resetting progress timer");
 #endif
             lastProgress.restart();
         }
-
-
-        // TODO: check if we timedout or got some data
-        //       if we did timeout, check the clock to see
-        //       if we expired the user Timeout, otherwise
-        //       reset the timer...
 
     }
 
