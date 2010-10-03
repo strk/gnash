@@ -660,8 +660,14 @@ CurlStreamFile::fillCache(std::streamsize size)
 #if GNASH_CURL_VERBOSE
             log_debug("No filedescriptors; breaking");
 #endif
-            break;
-        }
+	    if (userTimeout && lastProgress.elapsed() > userTimeout) {
+		log_error(_("FIXME: Timeout (%u milliseconds) while loading "
+			    "from url %s"), userTimeout, _url);
+		break;
+	    } else {
+		continue;
+	    }
+	}
 
         FD_ZERO(&readfd);
         FD_ZERO(&writefd);
