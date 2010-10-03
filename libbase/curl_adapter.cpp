@@ -607,10 +607,6 @@ CurlStreamFile::fillCache(std::streamsize size)
     }
 
     fd_set readfd, writefd, exceptfd;
-    FD_ZERO(&readfd);
-    FD_ZERO(&writefd);
-    FD_ZERO(&exceptfd);
-
     int maxfd;
     CURLMcode mcode;
     timeval tv;
@@ -642,6 +638,11 @@ CurlStreamFile::fillCache(std::streamsize size)
         //log_debug("cached: %d, size: %d", _cached, size);
 #endif
 
+        // Zero these out _before_ calling curl_multi_fdset!
+        FD_ZERO(&readfd);
+        FD_ZERO(&writefd);
+        FD_ZERO(&exceptfd);
+
         mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, 
                 &exceptfd, &maxfd);
 
@@ -662,10 +663,6 @@ CurlStreamFile::fillCache(std::streamsize size)
 #endif
             break;
         }
-
-        FD_ZERO(&readfd);
-        FD_ZERO(&writefd);
-        FD_ZERO(&exceptfd);
 
         tv.tv_sec = 0;
         tv.tv_usec = maxSleepUsec;
