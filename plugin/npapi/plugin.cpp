@@ -75,6 +75,8 @@
 
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/format.hpp>
 #include <sys/param.h>
 #include <csignal>
@@ -996,6 +998,46 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     }    
 }
 
+void
+nsPluginInstance::setupProxy(const std::string& url)
+{
+    // In pre xulrunner 1.9, (Firefox 3.1) this function does not exist,
+    // so we can't use it to read the proxy information.
+    if (!NPNFuncs.getvalueforurl) return;
+
+    char *proxy = 0;
+    uint32_t length = 0;
+    NPN_GetValueForURL(_instance, NPNURLVProxy, url.c_str(),
+                       &proxy, &length);
+    if (!proxy) {
+        gnash::log_debug("No proxy setting for %s", url);
+        return;
+    }
+
+    std::string nproxy (proxy, length);
+    NPN_MemFree(proxy);
+
+    gnash::log_debug("Proxy setting for %s is %s", url, nproxy);
+
+    std::vector<std::string> parts;
+    boost::split(parts, nproxy,
+        boost::is_any_of(" "), boost::token_compress_on);
+    if ( parts[0] == "DIRECT" ) {
+        // no proxy
+    }
+    else if ( parts[0] == "PROXY" ) {
+        if (setenv("http_proxy", parts[1].c_str(), 1) < 0) {
+            gnash::log_error(
+                "Couldn't set environment variable http_proxy to %s",
+                nproxy);
+        }
+    }
+    else {
+        gnash::log_error("Unknown proxy type: %s", nproxy);
+    }
+
+}
+
 std::vector<std::string>
 nsPluginInstance::getCmdLine(int hostfd, int controlfd)
 {
@@ -1020,6 +1062,7 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
     }
 
     setupCookies(pageurl);
+    setupProxy(pageurl);
 
     std::stringstream pars;
     pars << "-x "  <<  _window          // X window ID to render into
