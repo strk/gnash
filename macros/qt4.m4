@@ -68,7 +68,7 @@ dnl     fi
     if test x$cross_compiling = xno; then
       if test x"${PKG_CONFIG}" != x -a x"${ac_cv_path_qt4_incl}" = x; then
         ${PKG_CONFIG} --exists  QtOpenGL QtCore QtGui && ac_cv_path_qt4_incl="`$PKG_CONFIG --cflags-only-I QtOpenGL QtCore QtGui`"
-	gnash_qt4_topdir=`echo "${ac_cv_path_qt4_incl}" | sed -e 's/-I//g' | cut -d ' ' -f 1`
+	gnash_qt4_topdir=`echo "${ac_cv_path_qt4_incl}"`
       fi
     fi
 
