@@ -974,8 +974,8 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     uint32_t length = 0;
     NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
                        &cookie, &length);
-    std::string ncookie (cookie, length);
     if (cookie) {
+        std::string ncookie (cookie, length);
         gnash::log_debug("The Cookie for %s is %s", url, ncookie);
         std::ofstream cookiefile;
         std::stringstream ss;
