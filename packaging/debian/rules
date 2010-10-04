@@ -148,7 +148,7 @@ CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
 	--enable-python \
 	--with-plugins-install=system \
 	--disable-dependency-tracking \
-	--enable-extensions=all \
+	--enable-extension=fileio,lirc,mysql \
 	$(BUILD_FLAGS)
 
 config: config-stamp
