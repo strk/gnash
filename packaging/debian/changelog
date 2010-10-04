@@ -1,22 +1,17 @@
 gnash (master) distro; urgency=low
 
-  * local package, sync up with debian.
-    - rename mozilla-plugin-gnash* to browser-plugin-gnash*
-    - renmame gtk-plugin-gnash to python-gtk-gnash
-    - move overrides to it's own directory
-    - add source/format file
-    - add gnash-dev package
+  * local package. Add ffmpeg enabled builds
 
  -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Wed, 29 Sep 2010 04:20:00 +0100
 
-gnash (1855.g39e91cf) distro; urgency=low
+gnash (git.1934) distro; urgency=low
 
   * local package, many tweaks to be more standards compliant.
      - updated for the 0.8.8 release.
 
  -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Sun, 22 Aug 2010 04:20:00 +0100
 
-gnash (35.g231dca9) unstable; urgency=low
+gnash (git.35) unstable; urgency=low
 
   * local package, many tweaks to be more standards compliant.
     - Drop depend on gstreamer0.10-alsa, it is not needed as long as
