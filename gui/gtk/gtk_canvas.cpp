@@ -39,7 +39,7 @@
 # include "gtk_glue_gtkglext.h"
 #endif
 
-#ifdef HAVE_VG_OPENVG_H
+#ifdef RENDERER_OPENVG
 # include "gtk_glue_egl.h"
 #endif
 
