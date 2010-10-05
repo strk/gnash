@@ -101,8 +101,12 @@
 #include "fb_glue_ovg.h"
 #endif
 
-#ifdef RENDERER_GLES
-#include "fb_glue_gles.h"
+#ifdef RENDERER_GLES1
+#include "fb_glue_gles1.h"
+#endif
+
+#ifdef RENDERER_GLES2
+#include "fb_glue_gles2.h"
 #endif
 
 #include <linux/input.h>    // for /dev/input/event*
@@ -117,6 +121,7 @@
 
 namespace gnash
 {
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 FBGlue::FBGlue ()
 {
@@ -246,17 +251,67 @@ FBGui::init(int argc, char ***argv)
 	return false;
     }
 
-#ifdef RENDERER_AGG
-    fb_glue = new FBAggGlue(_fd);
-#endif
-// #ifdef RENDERER_OPENVG
-//     fb_glue = 0; // new FBOvgGlue(_fd);
-// #endif
-// #ifdef RENDERER_GLES
-//     fb_glue = new FBglesGlue(_fd);
-// #endif
+    // Get the value of the default renderer
+    std::string renderer = rcfile.getRenderer();
+    // If a renderer hasn't been defined in gnashrc, or on the command
+    // line, pick a sensible default.
+    if (renderer.empty()) {
+        renderer = "agg";
+    }
 
-    if (fb_glue == 0) {
+    // FIXME: This loop should handle fallback better
+    bool initialized_renderer = false;    
+    while (!initialized_renderer) {
+#ifdef RENDERER_OPENVG
+        // Use OpenVG, which uses EGL as the display API. This works with
+        // Mesa on desktop unix systems, and on ARM based devices running
+        // Linux, often with manufacturer provided SDKs.
+        if (renderer == "openvg") {
+            // FIXME: canvas->glue.reset(new gnash::GtkEGLGlue);
+            // Set the renderer to the next one to try if initializing
+            // fails.
+//            fb_glue.reset(new gnash::GtkEGLGlue);
+            break;
+        }
+#endif
+#ifdef RENDERER_GLES1
+        // Use OpenGLES 1. This works with Mesa on desktop unix
+        // systems, and on ARM based devices running Linux, often with
+        // manufacturer provided SDKs.
+        if (renderer == "gles1") {
+            // Set the renderer to the next one to try if initializing
+            // fails.
+            fb_glue.reset(new gnash::FBgles1Glue);
+            break;
+        }
+#endif
+#ifdef RENDERER_GLES2
+        // Use OpenGLES 2. This works with Mesa on desktop unix
+        // systems, and on ARM based devices running Linux, often with
+        // manufacturer provided SDKs.
+        if (renderer == "gles2") {
+            // FIXME: canvas->glue.reset(new gnash::GtkEGLGlue);
+            // Set the renderer to the next one to try if initializing
+            // fails.
+            fb_glue.reset(new FBgles2Glue);
+            break;
+        }
+#endif
+#ifdef RENDERER_AGG
+        // Use OpenVG, which uses EGL as the display API. This works with
+        // Mesa on desktop unix systems, and on ARM based devices running
+        // Linux, often with manufacturer provided SDKs.
+        if (renderer == "agg") {
+            // FIXME: canvas->glue.reset(new gnash::GtkEGLGlue);
+            // Set the renderer to the next one to try if initializing
+            // fails.
+            fb_glue.reset(new FBAggGlue(_fd));
+            initialized_renderer = true;
+        }
+#endif
+    }
+    
+    if (fb_glue) {
         log_error("No renderer created!");
         return false;
     } else if (!fb_glue->init(argc, argv)) {
