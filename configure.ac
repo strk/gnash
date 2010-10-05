@@ -1077,6 +1077,10 @@ AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes])
 AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
 AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
 
+if test x"${build_ovg}" = xyes; then
+   AC_DEFINE([RENDERER_OPENVG], [], [Use OpenVG renderer])
+fi
+
 if test x"${build_ogl}" = xyes; then
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
