@@ -389,6 +389,18 @@ if BUILD_OGL_RENDERER
 	@echo "	OPENGL_CFLAGS is $(OPENGL_CFLAGS)"
 	@echo "	OPENGL_LIBS is $(OPENGL_LIBS)"
 endif
+if BUILD_OVG_RENDERER
+	@echo "	OVG_CFLAGS is $(OVG_CFLAGS)"
+	@echo "	OVG_LIBS is $(OVG_LIBS)"
+endif
+if BUILD_GLES1_RENDERER
+	@echo "	GLES1_CFLAGS is $(GLES1_CFLAGS)"
+	@echo "	GLES1_LIBS is $(GLES1_LIBS)"
+endif
+if BUILD_GLES2_RENDERER
+	@echo "	GLES2_CFLAGS is $(GLES2_CFLAGS)"
+	@echo "	GLES2_LIBS is $(GLES2_LIBS)"
+endif
 if BUILD_AGG_RENDERER
 	@echo "	AGG_CFLAGS is $(AGG_CFLAGS)"
 	@echo "	AGG_LIBS is $(AGG_LIBS)"
