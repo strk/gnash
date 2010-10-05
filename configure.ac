@@ -1070,12 +1070,12 @@ if test x$pixelformat = xall; then
   fi
 fi
 
-AM_CONDITIONAL(BUILD_OVG_RENDERER, [ test x$build_ovg = xyes ])
-AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x$build_gles1 = xyes ])
-AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x$build_gles2 = xyes ])
-AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes])
-AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
-AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
+AM_CONDITIONAL(BUILD_OVG_RENDERER,   [ test x${build_ovg} = xyes ])
+AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x${build_gles1} = xyes ])
+AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x${build_gles2} = xyes ])
+AM_CONDITIONAL(BUILD_OGL_RENDERER,   [ test x${build_ogl} = xyes])
+AM_CONDITIONAL(BUILD_AGG_RENDERER,   [ test x${build_agg} = xyes ])
+AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x${build_cairo} = xyes ])
 
 if test x"${build_ovg}" = xyes; then
    AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
