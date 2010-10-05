@@ -46,12 +46,19 @@ fb_gnash_CPPFLAGS += $(OPENVG_CFLAGS) $(EGL_CFLAGS)
 fb_gnash_LDADD += $(OPENVG_LIBS) $(EGL_LIBS)
 endif	# BUILD_OVG_RENDERER
 
-# This supports only OpenGL-ES 1.1 with EGL support.
+# This supports only OpenGLES 1.1 with EGL support.
 if BUILD_GLES1_RENDERER
-fb_gnash_SOURCES += fb/fb_glue_gles.cpp fb/fb_glue_gles.h
-fb_gnash_CPPFLAGS += $(GLES_CFLAGS) $(EGL_CFLAGS)
-fb_gnash_LDADD += $(GLES_LIBS) $(EGL_LIBS)
-endif	# BUILD_OVG_RENDERER
+fb_gnash_SOURCES += fb/fb_glue_gles1.cpp fb/fb_glue_gles1.h
+fb_gnash_CPPFLAGS += $(GLES1_CFLAGS) $(EGL_CFLAGS)
+fb_gnash_LDADD += $(GLES1_LIBS) $(EGL_LIBS)
+endif	# BUILD_GLES1_RENDERER
+
+# This supports only OpenGLES 1.1 with EGL support.
+if BUILD_GLES2_RENDERER
+fb_gnash_SOURCES += fb/fb_glue_gles2.cpp fb/fb_glue_gles2.h
+fb_gnash_CPPFLAGS += $(GLES2_CFLAGS) $(EGL_CFLAGS)
+fb_gnash_LDADD += $(GLES2_LIBS) $(EGL_LIBS)
+endif	# BUILD_GLES2_RENDERER
 
 endif	# BUILD_FB_GUI
 
