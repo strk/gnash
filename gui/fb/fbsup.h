@@ -24,6 +24,7 @@
 #endif
 
 #include <vector>
+#include <boost/scoped_ptr.hpp>
 
 #include "gui.h"
 #include <linux/fb.h>
@@ -131,7 +132,7 @@ private:
     // Keyboard SHIFT/CTRL/ALT states (left + right)
     bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
     
-    FBGlue *fb_glue;
+    boost::scoped_ptr<FBGlue> fb_glue;
     
     /// Tries to find a accessible tty
     char* find_accessible_tty(int no);
