@@ -906,7 +906,8 @@ dnl -------------------------------
 input_events=
 dnl By default, we want to to build all renderers
 build_ovg=no
-build_gles=no
+build_gles1=no
+build_gles2=no
 build_ogl=yes
 build_agg=yes
 build_cairo=yes
@@ -927,7 +928,8 @@ AC_ARG_ENABLE(renderer,
   nrender=0
   build_ovg=no
   build_ogl=no
-  build_gles=no
+  build_gles1=no
+  build_gles2=no
   build_agg=no
   build_cairo=no
   while test -n "${enableval}" ; do
@@ -937,28 +939,36 @@ AC_ARG_ENABLE(renderer,
         renderer_list="none"
         build_ovg=no
         build_ogl=no
-        build_gles=no
+        build_gles1=no
+        build_gles2=no
         build_agg=no
         build_cairo=no
         nrender=1
         ;;
       all|ALL)
-        renderer_list="OpenGL, Cairo, AGG"
+        renderer_list="OpenGL, Cairo, AGG, OpenVG, OpenGLES1"
         build_ogl=yes
         build_agg=yes
         build_cairo=yes
         build_ovg=yes
-        nrender=4
+        build_gles1=yes
+        build_gles2=no
+        nrender=5
         ;;
       ogl|OGL|OpenGL|opengl)
         renderer_list="${renderer_list} OpenGL"
-        build_gles=no
         build_ogl=yes
         nrender=$((nrender+1))
         ;;
-      gles|GLES|GL-ES|gl-es)
-        renderer_list="${renderer_list} OpenGL-ES"
-        build_gles=yes
+      gles|GLES|gles1|GLES1)
+        renderer_list="${renderer_list} OpenGLES1"
+        build_gles1=yes
+        build_ogl=no
+        nrender=$((nrender+1))
+        ;;
+      gles2|GLES2)
+        renderer_list="${renderer_list} OpenGLES2"
+        build_gles2=yes
         build_ogl=no
         nrender=$((nrender+1))
         ;;
@@ -1061,7 +1071,8 @@ if test x$pixelformat = xall; then
 fi
 
 AM_CONDITIONAL(BUILD_OVG_RENDERER, [ test x$build_ovg = xyes ])
-AM_CONDITIONAL(BUILD_GLES_RENDERER, [ test x$build_gles = xyes ])
+AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x$build_gles1 = xyes ])
+AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x$build_gles2 = xyes ])
 AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes])
 AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
 AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
@@ -1745,7 +1756,8 @@ if test x"${build_alp}" = xyes; then
 dnl  build_gtk=yes
   build_kde3=no
   build_ogl=no
-  build_gles=no
+  build_gles1=no
+  build_gles2=no
   build_agg=yes
 fi
 
@@ -2391,7 +2403,7 @@ AM_CONDITIONAL(NPAPI,   [test x"${npapi}" = xyes])
 AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
 AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
 
-if test x"${build_gles}" = xyes; then
+if test x"${build_gles1}" = xyes -o x"${build_gles2}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
   GNASH_PATH_GLES
 fi
@@ -3142,16 +3154,28 @@ if test x"${build_ogl}" = x"yes"; then
   fi
 fi
 
-if test x"${build_gles}" = x"yes"; then
-  if test x"${has_gles}" != x; then
-    if test x"$GLES_CFLAGS" != x; then
-      echo "        OpenGL-ES flags are: $GLES_CFLAGS"
+if test x"${build_gles1}" = x"yes" -o x"${build_gles2}" = xyes; then
+  if test x"${has_gles1}" = xyes; then
+    if test x"${GLES1_CFLAGS}" != x; then
+      echo "        OpenGLES1 flags are: ${GLES1_CFLAGS}"
     else
-      echo "        OpenGL-ES flags are: default include path"
+      echo "        OpenGLES1 flags are: default include path"
     fi
-    echo "        OpenGL-ES libs are: $GLES_LIBS"
+    echo "        OpenGLES1 libs are: ${GLES1_LIBS}"
   else
-      echo "        ERROR: No OpenGL-ES development package installed!" >&3
+      echo "        ERROR: No OpenGLES1 development package installed!" >&3
+      echo "               You need to install the this from source proobably" >&3
+      echo "               or use a different renderer with --enable-renderer=" >&3
+  fi
+  if test x"${has_gles2}" = xyes; then
+    if test x"${GLES2_CFLAGS}" != x; then
+      echo "        OpenGLES2 flags are: ${GLES2_CFLAGS}"
+    else
+      echo "        OpenGLES2 flags are: default include path"
+    fi
+    echo "        OpenGLES2 libs are: ${GLES2_LIBS}"
+  else
+      echo "        ERROR: No OpenGLES2 development package installed!" >&3
       echo "               You need to install the this from source proobably" >&3
       echo "               or use a different renderer with --enable-renderer=" >&3
   fi
