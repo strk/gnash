@@ -1078,20 +1078,20 @@ AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
 AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
 
 if test x"${build_ovg}" = xyes; then
-   AC_DEFINE([RENDERER_OPENVG], [], [Use OpenVG renderer])
+   AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
 fi
 
 if test x"${build_ogl}" = xyes; then
-   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
+   AC_DEFINE([RENDERER_OPENGL], [1], [Use OpenGL renderer])
 fi
 
-if test x"$build_agg" = xyes; then
-  AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
+if test x"${build_agg}" = xyes; then
+  AC_DEFINE([RENDERER_AGG], [1], [Use AntiGrain renderer])
 fi
 
-if test x"$build_cairo" = xyes; then
+if test x"${build_cairo}" = xyes; then
   GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
-  AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
+  AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
 fi
 
 if test x"${build_agg}" = xyes; then
