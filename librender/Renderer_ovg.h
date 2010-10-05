@@ -28,7 +28,7 @@
 #include <VG/vgext.h>
 
 #include "Geometry.h"
-#include "BitmapInfo.h"
+//#include "BitmapInfo.h"
 #include "Renderer.h"
 
 namespace gnash {

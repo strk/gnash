@@ -35,6 +35,7 @@
 #include "smart_ptr.h"
 #include "GnashImage.h"
 #include "GnashNumeric.h"
+#include "FillStyle.h"
 #include "log.h"
 #include "utility.h"
 #include "Range2d.h"
@@ -165,8 +166,8 @@ bitmap_info_ovg::bitmap_info_ovg(GnashImage* img, VGImageFormat pixelformat, VGP
     if (_pixel_format == VG_sARGB_8888)
         _image = vgCreateImage(VG_sARGB_8888, _width, _height, GNASH_IMAGE_QUALITY);    
     
-    vgImageSubData(_image, _img->data(), _width * 4, VG_sARGB_8888,
-                   0, 0, _width, _height);
+    // vgImageSubData(_image, _img->data(), _width * 4, VG_sARGB_8888,
+    //                0, 0, _width, _height); FIXME
     
     tex_size += _width * _height * 4;
     log_debug("Add Texture size:%d (%d x %d x %dbpp)", _width * _height * 4, _width, _height, 4);
@@ -292,6 +293,8 @@ public:
 #endif
         }
 
+#if 0
+    FIXME
     // Given an image, returns a pointer to a bitmap_info class
     // that can later be passed to fill_styleX_bitmap(), to set a
     // bitmap fill style.
@@ -307,7 +310,8 @@ public:
               std::abort();
         }
     }
-
+#endif
+    
     // Since we store drawing operations in display lists, we take special care
     // to store video frame operations in their own display list, lest they be
     // anti-aliased with the rest of the drawing. Since display lists cannot be
@@ -576,11 +580,14 @@ public:
     void add_paths(const PathVec& path_vec)
     {
         cxform dummy_cx;
-    
-        fill_style coloring;
+#if 0
+      FIXME:
+        
+        FillStyle coloring
         coloring.setSolid(rgba(0,255,0,255));
             
         draw_submask(path_vec, SWFMatrix(), dummy_cx, coloring);
+#endif
     }
   
     void disable_mask()
@@ -737,10 +744,12 @@ public:
     
         }    
     }
-
-    void apply_fill_style(const fill_style& style, const SWFMatrix& /* mat */,
+    
+    void apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat */,
                           const cxform& cx)
     {
+#if 0
+        FIXME fill_style changed to FillStyle
         int fill_type = style.get_type();
       
         switch (fill_type) {
@@ -793,6 +802,7 @@ public:
           }
         
         } // switch
+#endif
     }
   
     bool apply_line_style(const LineStyle& style, const cxform& cx, const SWFMatrix& mat)
@@ -1017,7 +1027,7 @@ public:
     void draw_subshape(const PathVec& path_vec,
                       const SWFMatrix& mat,
                       const cxform& cx,
-                      const std::vector<fill_style>& fill_styles,
+                      const std::vector<FillStyle>& fill_styles,
                       const std::vector<LineStyle>& line_styles)
     {
         PathVec normalized = normalize_paths(path_vec);
@@ -1066,7 +1076,7 @@ public:
     void draw_submask(const PathVec& path_vec,
                       const SWFMatrix& /* mat */,
                       const cxform& /* cx */,
-                      const fill_style& /* f_style */)
+                      const FillStyle& /* f_style */)
     {
 
         PathVec normalized = normalize_paths(path_vec);
@@ -1144,7 +1154,7 @@ public:
 
         std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
-        const std::vector<fill_style>& fill_styles = shape.fillStyles();
+        const std::vector<FillStyle>& fill_styles = shape.fillStyles();
         const std::vector<LineStyle>& line_styles = shape.lineStyles();
     
         for (size_t i = 0; i < subshapes.size()-1; ++i) {
@@ -1171,13 +1181,15 @@ public:
         }
     
         cxform dummy_cx;
-        std::vector<fill_style> glyph_fs;
-    
-        fill_style coloring;
+        std::vector<FillStyle> glyph_fs;
+
+#if 0
+        FIXME fill_style is now FillStyle
+        FillStyle coloring;
         coloring.setSolid(c);
     
         glyph_fs.push_back(coloring);
-    
+#endif
         std::vector<LineStyle> dummy_ls;
     
         eglScopeMatrix scope_mat(mat);

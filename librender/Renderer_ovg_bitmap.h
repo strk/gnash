@@ -23,7 +23,7 @@
 #define GNASH_RENDER_HANDLER_OVG_BITMAP_H
 
 #include "Geometry.h"
-#include "BitmapInfo.h"
+//#include "BitmapInfo.h"
 #include "Renderer.h"
 
 namespace gnash {
@@ -32,7 +32,7 @@ namespace gnash {
 /// be removed but an older implementation required this method and it may be
 /// necessary again when the last missing parts of the renderer will be
 /// implemented. And when might that be? I don't think I'll wait.
-class bitmap_info_ovg : public BitmapInfo
+class bitmap_info_ovg // : public BitmapInfo
 {
 public:
   
