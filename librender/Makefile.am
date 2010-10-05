@@ -86,7 +86,7 @@ libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
 if  BUILD_GLES_RENDERER
-libgnashrender_la_SOURCES += Renderer_gles.cpp 
+libgnashrender_la_SOURCES += Renderer_gles1.cpp 
 libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
