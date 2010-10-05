@@ -21,12 +21,14 @@
 #endif
 
 // gles-1.0c for Linux
-#ifdef HAVE_GLES_GL_H
+#ifdef HAVE_GLES1_GL_H
 # include <GLES/gl.h>
 #endif
-#ifdef HAVE_GLES_EGL_H
+#ifdef HAVE_GLES1_EGL_H
 #include <GLES/egl.h>
 #endif
+
+#if 0
 // Mali Developer Tools for ARM 1.x
 #ifdef HAVE_EGL_EGL_H
 # include <EGL/egl.h>
@@ -36,6 +38,7 @@
 #ifdef HAVE_GLES2_GL2_H
 # include <GLES2/gl2.h>
 # include <GLES2/gl2ext.h>
+#endif
 #endif
 
 #include "log.h"
