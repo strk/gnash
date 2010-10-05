@@ -964,7 +964,7 @@ AC_ARG_ENABLE(renderer,
         ;;
       ovg|OVG|OpenVG|openvg)
         renderer_list="${renderer_list} OpenVG"
-        build_ogv=yes
+        build_ovg=yes
         nrender=$((nrender+1))
         ;;
       agg|AGG)
@@ -977,7 +977,7 @@ AC_ARG_ENABLE(renderer,
         build_cairo=yes
         nrender=$((nrender+1))
         ;;
-      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (ogl|cairo|agg|all)])
+      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (ogl|ovg|cairo|agg|all)])
         ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -2396,7 +2396,7 @@ if test x"${build_gles}" = xyes; then
   GNASH_PATH_GLES
 fi
 
-if test x"${build_ogv}" = xyes; then
+if test x"${build_ovg}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
   GNASH_PKG_FIND(OpenVG, [vg/openvg.h], [OpenVG library], vgDrawImage)
 fi
