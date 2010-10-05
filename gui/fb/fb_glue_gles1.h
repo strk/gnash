@@ -44,18 +44,19 @@
 #endif
 
 #include "fbsup.h"
-#include "render_handler_gles.h"
+//#include "render_handler_gles.h"
 
 namespace gnash
 {
+class render_handler;
 
-    class FBglesGlue: public FBGlue // , public OglGlue
+    class FBgles1Glue: public FBGlue // , public OglGlue
 {
 public:
-    FBglesGlue() :
+    FBgles1Glue() :
         _surface (EGL_NO_SURFACE),
         _pbuffer (EGL_NO_SURFACE) {}
-    virtual ~FBglesGlue();
+    virtual ~FBgles1Glue();
     
     virtual bool init(int /*argc*/, char *** /*argv*/);
     

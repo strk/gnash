@@ -47,6 +47,49 @@
 namespace gnash
 {
 
+FBgles2Glue::FBgles2Glue()
+{
+}
+
+FBgles2Glue::~FBgles2Glue () {
+}
+
+bool
+FBgles2Glue::init(int /*argc*/, char *** /*argv*/)
+{
+
+}
+
+Renderer*
+FBgles2Glue::createRenderHandler()
+{
+
+}
+
+int 
+FBgles2Glue::width() {
+}
+
+int
+FBgles2Glue::height() {
+}
+
+void
+FBgles2Glue::render() {
+}
+
+void 
+FBgles2Glue::render_to_pbuffer () {
+}
+
+void 
+FBgles2Glue::prepare_copy_from_pbuffer () {
+}
+
+void 
+FBgles2Glue::render_to_display () {
+}
+
 } // namespace gnash
 
 // Local Variables:

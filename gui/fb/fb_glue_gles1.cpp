@@ -48,7 +48,7 @@ namespace gnash
 {
 
 bool 
-FBglesGlue::init(int /*argc*/, char *** /*argv*/) {
+FBgles1Glue::init(int /*argc*/, char *** /*argv*/) {
     EGLint majorVersion, minorVersion;
     EGLint numOfConfigs = 0;
     EGLint result;
@@ -132,13 +132,13 @@ FBglesGlue::init(int /*argc*/, char *** /*argv*/) {
     return true;
 }
 
-FBglesGlue::~FBglesGlue () {
+FBgles1Glue::~FBgles1Glue () {
     eglMakeCurrent(_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     eglTerminate(_display);
 }
 
 int 
-FBglesGlue::width() {
+FBgles1Glue::width() {
     EGLint result;
     eglQuerySurface (_display, _surface, EGL_WIDTH, &result);
     log_trace("EGL: width %d", result);
@@ -146,7 +146,7 @@ FBglesGlue::width() {
 }
 
 int
-FBglesGlue::height() {
+FBgles1Glue::height() {
     EGLint result;
     eglQuerySurface (_display, _surface, EGL_HEIGHT, &result);
     log_trace("EGL: height %d", result);
@@ -154,24 +154,24 @@ FBglesGlue::height() {
 }
 
 void
-FBglesGlue::render() {
+FBgles1Glue::render() {
     eglSwapBuffers(_display, _surface);
 }
 
 void 
-FBglesGlue::render_to_pbuffer () {
+FBgles1Glue::render_to_pbuffer () {
     if (_pbuffer != EGL_NO_SURFACE)
         eglMakeCurrent(_display, _pbuffer, _pbuffer, _context);
 }
 
 void 
-FBglesGlue::prepare_copy_from_pbuffer () {
+FBgles1Glue::prepare_copy_from_pbuffer () {
     if (_pbuffer != EGL_NO_SURFACE)
         eglMakeCurrent(_display, _surface, _pbuffer, _context);
 }
 
 void 
-FBglesGlue::render_to_display () {
+FBgles1Glue::render_to_display () {
     if (_pbuffer != EGL_NO_SURFACE)
         eglMakeCurrent(_display, _surface, _surface, _context);
 }
