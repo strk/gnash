@@ -85,8 +85,13 @@ libgnashrender_la_SOURCES += Renderer_ovg.cpp
 libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
-if  BUILD_GLES_RENDERER
+if  BUILD_GLES1_RENDERER
 libgnashrender_la_SOURCES += Renderer_gles1.cpp 
+libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
+endif
+
+if  BUILD_GLES2_RENDERER
+libgnashrender_la_SOURCES += Renderer_gles2.cpp 
 libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 

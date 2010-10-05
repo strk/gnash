@@ -16,18 +16,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-#ifndef GNASH_RENDER_HANDLER_GLES_H
-#define GNASH_RENDER_HANDLER_GLES_H
+#ifndef GNASH_RENDER_HANDLER_GLES1_H
+#define GNASH_RENDER_HANDLER_GLES1_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
 // gles-1.0c for Linux
-#ifdef HAVE_GLES_GL_H
+#ifdef HAVE_GLES1_GL_H
 # include <GLES/gl.h>
 #endif
-#ifdef HAVE_GLES_EGL_H
+#ifdef HAVE_GLES1_EGL_H
 #include <GLES/egl.h>
 #endif
 
@@ -138,7 +138,7 @@ DSOEXPORT Renderer* create_Renderer_gles(bool init = true);
 
 } // namespace gnash
 
-#endif // __RENDER_HANDLER_GLES_H__
+#endif // __RENDER_HANDLER_GLES1_H__
 
 // local Variables:
 // mode: C++

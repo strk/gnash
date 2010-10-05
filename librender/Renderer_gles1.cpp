@@ -22,10 +22,10 @@
 #endif
 
 // gles-1.0c for Linux
-#ifdef HAVE_GLES_GL_H
+#ifdef HAVE_GLES1_GL_H
 # include <GLES/gl.h>
 #endif
-#ifdef HAVE_GLES_EGL_H
+#ifdef HAVE_GLES1_EGL_H
 # include <GLES/egl.h>
 #endif
 
