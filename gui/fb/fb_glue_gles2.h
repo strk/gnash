@@ -52,7 +52,7 @@ namespace gnash
     class FBgles2Glue: public FBGlue // , public OglGlue
 {
 public:
-    FBgles2Glue();
+    FBgles2Glue(int fd);
     virtual ~FBgles2Glue();
     
     virtual bool init(int /*argc*/, char *** /*argv*/);
@@ -67,6 +67,9 @@ public:
     virtual void render_to_pbuffer ();
     virtual void prepare_copy_from_pbuffer ();
     virtual void render_to_display ();
+protected:
+    int         _fd;
+
 private:
 };
 
