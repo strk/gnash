@@ -88,6 +88,7 @@ SharedMem::~SharedMem()
         log_error("Error during stat of shared memory segment: %s",
                 std::strerror(err));
     }
+#ifndef __amigaos4__
     else {
         // Note that this isn't completely reliable.
         if (!ds.shm_nattch) {
@@ -95,6 +96,7 @@ SharedMem::~SharedMem()
             ::shmctl(_shmid, IPC_RMID, 0);
         }
     }
+#endif
 #else
     // Windows code here.
 #endif

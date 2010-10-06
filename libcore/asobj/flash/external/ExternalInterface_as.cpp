@@ -50,6 +50,8 @@
 #include "movie_root.h"
 #include "log.h"
 
+#define MAXHOSTNAMELEN 256 // max hostname size. However this is defined in netdb.h
+
 namespace gnash {
 
 namespace {
@@ -314,7 +316,6 @@ externalinterface_available(const fn_call& fn)
       case movie_root::SCRIPT_ACCESS_SAME_DOMAIN:
       {
           const std::string& baseurl = m.getOriginalURL();
-          const int MAXHOSTNAMELEN = 128;
           char hostname[MAXHOSTNAMELEN];
           memset(hostname, 0, MAXHOSTNAMELEN);
           
