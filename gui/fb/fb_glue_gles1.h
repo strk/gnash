@@ -43,30 +43,24 @@
 #endif
 #endif
 
+#include <boost/scoped_ptr.hpp>
+
 #include "fbsup.h"
 //#include "render_handler_gles.h"
 
 namespace gnash
 {
 class render_handler;
+class Renderer;
 
-    class FBgles1Glue: public FBGlue // , public OglGlue
+class FBgles1Glue: public FBGlue
 {
 public:
-    FBgles1Glue() :
-        _surface (EGL_NO_SURFACE),
-        _pbuffer (EGL_NO_SURFACE) {}
+    FBgles1Glue(int fd);
     virtual ~FBgles1Glue();
+    virtual bool init(int argc, char ***);
     
-    virtual bool init(int /*argc*/, char *** /*argv*/);
-    
-    virtual Renderer* createRenderHandler() {
-        //_render_handler = create_render_handler_ogl (true, this);
-        //        return _render_handler; FIXME: 
-        // error: invalid covariant return type for 'virtual gnash::render_handler* gnash::FBglesGlue::createRenderHandler()'
-
-    }
-    
+    virtual Renderer* createRenderHandler();
     virtual void setInvalidatedRegions(const InvalidatedRanges& /* ranges */) {}
     
     virtual int width ();
@@ -77,14 +71,18 @@ public:
     virtual void prepare_copy_from_pbuffer ();
     virtual void render_to_display ();
     
+protected:
+    int         _fd;
+
 private:
-    render_handler* _render_handler;
-    EGLDisplay      _display;
-    EGLConfig       _config;
-    EGLContext      _context;
-    EGLSurface      _surface;
-    EGLConfig       _pbuffer_config;
-    EGLSurface      _pbuffer;
+    render_handler *_render_handler;
+    boost::scoped_ptr<Renderer> _renderer;
+    EGLDisplay  _display;
+    EGLConfig   _config;
+    EGLContext  _context;
+    EGLSurface  _surface;
+    EGLConfig   _pbuffer_config;
+    EGLSurface  _pbuffer;
 };
 
 } // namespace gnash
