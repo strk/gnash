@@ -78,6 +78,7 @@
 #include <linux/kd.h>
 #include <linux/vt.h>
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <boost/cstdint.hpp>
 #include <csignal>
@@ -238,9 +239,7 @@ FBGui::init(int argc, char ***argv)
     // Initialize keyboard (still not critical)
     if (!init_keyboard()) {   
 	log_debug(_("You won't have any keyboard input device, sorry."));
-    }
-    
-    // Open the framebuffer device
+    }    // Open the framebuffer device
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     _fd = open(FAKEFB, O_RDWR);
 #else
@@ -281,7 +280,7 @@ FBGui::init(int argc, char ***argv)
         if (renderer == "gles1") {
             // Set the renderer to the next one to try if initializing
             // fails.
-            fb_glue.reset(new gnash::FBgles1Glue);
+            fb_glue.reset(new gnash::FBgles1Glue(_fd));
             break;
         }
 #endif
@@ -293,7 +292,7 @@ FBGui::init(int argc, char ***argv)
             // FIXME: canvas->glue.reset(new gnash::GtkEGLGlue);
             // Set the renderer to the next one to try if initializing
             // fails.
-            fb_glue.reset(new FBgles2Glue);
+            fb_glue.reset(new FBgles2Glue(_fd));
             break;
         }
 #endif
@@ -310,14 +309,16 @@ FBGui::init(int argc, char ***argv)
         }
 #endif
     }
+
+    fb_glue->init(argc, argv);
     
     if (fb_glue) {
         log_error("No renderer created!");
-        return false;
-    } else if (!fb_glue->init(argc, argv)) {
-        return false;
+        //     return false;
+        // } else if (!fb_glue->init(argc, argv)) {
+        //     return false;
     }
-
+    
     m_stage_width = fb_glue->width();
     m_stage_height = fb_glue->height();
     _validbounds.setTo(0, 0, m_stage_width-1, m_stage_height-1);
