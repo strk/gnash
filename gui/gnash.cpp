@@ -444,6 +444,10 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                             // Enable OpenGL as the rendering backend
                             player.setRenderer("opengl");
                             break;
+                        case 'g':
+                            // Enable OpenGLES 1.x as the rendering backend
+                            player.setRenderer("gles1");
+                            break;
                         case 'c':
                             // Enable Cairo as the rendering backend
                             player.setRenderer("cairo");
