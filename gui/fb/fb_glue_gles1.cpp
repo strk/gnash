@@ -47,8 +47,39 @@
 namespace gnash
 {
 
+FBgles1Glue::FBgles1Glue(int fd)
+    : _fd (fd),
+      _surface (EGL_NO_SURFACE),
+      _pbuffer (EGL_NO_SURFACE)
+{
+    GNASH_REPORT_FUNCTION;    
+}
+
+FBgles1Glue::~FBgles1Glue ()
+{
+    GNASH_REPORT_FUNCTION;
+
+    eglMakeCurrent(_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    eglTerminate(_display);
+}
+
+Renderer *
+FBgles1Glue::createRenderHandler()
+{
+    GNASH_REPORT_FUNCTION;
+
+    //_render_handler = create_render_handler_ogl (true, this);
+    //        return _render_handler; FIXME: 
+    // error: invalid covariant return type for 'virtual gnash::render_handler* gnash::FBglesGlue::createRenderHandler()'
+    Renderer *rend = 0;
+    return rend;
+}
+
 bool 
-FBgles1Glue::init(int /*argc*/, char *** /*argv*/) {
+FBgles1Glue::init(int /*argc*/, char *** /*argv*/)
+{
+    GNASH_REPORT_FUNCTION;
+
     EGLint majorVersion, minorVersion;
     EGLint numOfConfigs = 0;
     EGLint result;
@@ -130,11 +161,6 @@ FBgles1Glue::init(int /*argc*/, char *** /*argv*/) {
     log_trace("EGL: pbuffer surface ok");
     
     return true;
-}
-
-FBgles1Glue::~FBgles1Glue () {
-    eglMakeCurrent(_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-    eglTerminate(_display);
 }
 
 int 
