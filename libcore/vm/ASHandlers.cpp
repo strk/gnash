@@ -821,7 +821,8 @@ ActionLogicalAnd(ActionExec& thread)
     as_environment& env = thread.env;
     
     // Note: the order of evaluation of the && operands is specified.
-    env.top(1).set_bool(env.top(1).to_bool() && env.top(0).to_bool());
+    env.top(1).set_bool(toBool(env.top(1), getVM(env)) &&
+            toBool(env.top(0), getVM(env)));
     env.drop(1);
 }
 
@@ -831,7 +832,8 @@ ActionLogicalOr(ActionExec& thread)
     as_environment& env = thread.env;
     
     // Note: the order of evaluation of the || operands is specified.
-    env.top(1).set_bool(env.top(1).to_bool() || env.top(0).to_bool());
+    env.top(1).set_bool(toBool(env.top(1), getVM(env)) ||
+            toBool(env.top(0), getVM(env)));
     env.drop(1);
 }
 
@@ -840,7 +842,7 @@ ActionLogicalNot(ActionExec& thread)
 {
     as_environment& env = thread.env;
     
-    env.top(0).set_bool(! env.top(0).to_bool());
+    env.top(0).set_bool(!toBool(env.top(0), getVM(env)));
 
     // Flash4 used 1 and 0 as return from this tag
     if (env.get_version() < 5) convertToNumber(env.top(0), getVM(env));
@@ -1249,10 +1251,10 @@ ActionStartDragMovie(ActionExec& thread)
         );
     }
 
-    st.setLockCentered(env.top(1).to_bool());
+    st.setLockCentered(toBool(env.top(1), getVM(env)));
 
     // Handle bounds.
-    if (env.top(2).to_bool()) {
+    if (toBool(env.top(2), getVM(env))) {
         // strk: this works if we didn't drop any before, in
         // a contrary case (if we used pop(), which I suggest)
         // we must remember to updated this as required
@@ -2037,9 +2039,8 @@ ActionBranchIfTrue(ActionExec& thread)
 
     boost::int16_t offset = code.read_int16(pc+3);
 
-    bool test = env.pop().to_bool();
-    if (test)
-    {
+    const bool test = toBool(env.pop(), getVM(env));
+    if (test) {
         thread.adjustNextPC(offset);
 
         if (nextPC > stopPC)
