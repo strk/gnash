@@ -194,7 +194,7 @@ gradientglowfilter_knockout(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_knockout );
     }
-    bool sp_knockout = fn.arg(0).to_bool ();
+    const bool sp_knockout = toBool(fn.arg(0), getVM(fn));
     ptr->m_knockout = sp_knockout;
     return as_value();
 }

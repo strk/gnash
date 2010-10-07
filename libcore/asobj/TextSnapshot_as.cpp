@@ -529,7 +529,7 @@ textsnapshot_findText(const fn_call& fn)
 
     /// Yes, the pp is case-insensitive by default. We don't write
     /// functions like that here.
-    bool ignoreCase = !fn.arg(2).to_bool();
+    const bool ignoreCase = !toBool(fn.arg(2), getVM(fn));
 
     return ts->findText(start, text, ignoreCase);
 }
@@ -581,7 +581,7 @@ textsnapshot_getSelectedText(const fn_call& fn)
         return as_value();
     }
 
-    bool newlines = fn.nargs ? fn.arg(0).to_bool() : false;
+    const bool newlines = fn.nargs ? toBool(fn.arg(0), getVM(fn)) : false;
 
     return as_value(ts->getSelectedText(newlines));
 }
@@ -605,7 +605,7 @@ textsnapshot_getText(const fn_call& fn)
     boost::int32_t start = toInt(fn.arg(0));
     boost::int32_t end = toInt(fn.arg(1));
 
-    const bool newline = (fn.nargs > 2) ? fn.arg(2).to_bool() : false;
+    const bool newline = (fn.nargs > 2) ? toBool(fn.arg(2), getVM(fn)) : false;
 
     return ts->getText(start, end, newline);
 
@@ -647,10 +647,10 @@ textsnapshot_setSelected(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max<boost::int32_t>(0, toInt(fn.arg(0)));
-    size_t end = std::max<boost::int32_t>(start, toInt(fn.arg(1)));
+    const size_t start = std::max<boost::int32_t>(0, toInt(fn.arg(0)));
+    const size_t end = std::max<boost::int32_t>(start, toInt(fn.arg(1)));
 
-    bool selected = (fn.nargs > 2) ? fn.arg(2).to_bool() : true;
+    const bool selected = (fn.nargs > 2) ? toBool(fn.arg(2), getVM(fn)) : true;
 
     ts->setSelected(start, end, selected);
 

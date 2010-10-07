@@ -311,10 +311,13 @@ bool
 Button::trackAsMenu()
 {
     // TODO: check whether the AS or the tag value takes precedence.
+    as_object* obj = getObject(this);
+    assert(obj);
+
     as_value track;
-    string_table& st = getStringTable(*getObject(this));
-    if (getObject(this)->get_member(st.find("trackAsMenu"), &track)) {
-        return track.to_bool();
+    string_table& st = getStringTable(*obj);
+    if (obj->get_member(st.find("trackAsMenu"), &track)) {
+        return toBool(track, getVM(*obj));
     }
     if (_def) return _def->trackAsMenu();
     return false;
@@ -323,10 +326,13 @@ Button::trackAsMenu()
 bool 
 Button::isEnabled()
 {
-    as_value enabled;
-    if (!getObject(this)->get_member(NSV::PROP_ENABLED, &enabled)) return false;
+    as_object* obj = getObject(this);
+    assert(obj);
 
-    return enabled.to_bool();
+    as_value enabled;
+    if (!obj->get_member(NSV::PROP_ENABLED, &enabled)) return false;
+
+    return toBool(enabled, getVM(*obj));
 }
 
 

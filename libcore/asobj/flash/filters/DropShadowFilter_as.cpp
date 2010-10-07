@@ -193,7 +193,7 @@ dropshadowfilter_knockout(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_knockout );
     }
-    bool sp_knockout = fn.arg(0).to_bool ();
+    const bool sp_knockout = toBool(fn.arg(0), getVM(fn));
     ptr->m_knockout = sp_knockout;
     return as_value();
 }
@@ -205,7 +205,7 @@ dropshadowfilter_inner(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_inner );
     }
-    bool sp_inner = fn.arg(0).to_bool ();
+    const bool sp_inner = toBool(fn.arg(0), getVM(fn));
     ptr->m_inner = sp_inner;
     return as_value();
 }
@@ -218,7 +218,7 @@ dropshadowfilter_hideObject(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_hideObject );
     }
-    bool sp_hideObject = fn.arg(0).to_bool ();
+    const bool sp_hideObject = toBool(fn.arg(0), getVM(fn));
     ptr->m_hideObject = sp_hideObject;
     return as_value();
 }

@@ -118,10 +118,10 @@ boolean_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) {
         if (!fn.nargs) return as_value();
-        return as_value(fn.arg(0).to_bool());
+        return as_value(toBool(fn.arg(0), getVM(fn)));
     }
 
-    const bool val = fn.nargs ? fn.arg(0).to_bool() : false;
+    const bool val = fn.nargs ? toBool(fn.arg(0), getVM(fn)) : false;
 
     as_object* obj = fn.this_ptr;
     obj->setRelay(new Boolean_as(val));

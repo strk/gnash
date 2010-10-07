@@ -188,7 +188,7 @@ ExternalInterface::toXML(const as_value &val)
     } else if (val.is_exception()) {
         ss << "<exception>" << val.to_string()<< "</exception>";
     } else if (val.is_bool()) {
-        ss << (val.to_bool() ? "<true/>" : "<false/>");
+        ss << (val.to_bool(8) ? "<true/>" : "<false/>");
         // Function also isn't listed, but it's the only other type
         // supported by as_value, so leaving it out doesn't seem right.
     } else if (val.is_function()) {

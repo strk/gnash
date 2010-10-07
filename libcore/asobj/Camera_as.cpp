@@ -299,7 +299,7 @@ camera_setmode(const fn_call& fn)
     const double width = nargs ? fn.arg(0).to_number() : 160;
     const double height = nargs > 1 ? fn.arg(1).to_number() : 120;
     const double fps = nargs >  2? fn.arg(2).to_number() : 15;
-    const bool favorArea = nargs > 3 ? fn.arg(3).to_bool() : true;
+    const bool favorArea = nargs > 3 ? toBool(fn.arg(3), getVM(fn)) : true;
 
     // TODO: handle overflow
     const size_t reqWidth = std::max<double>(width, 0);
@@ -586,7 +586,7 @@ camera_setLoopback(const fn_call& fn)
         log_aserror("%s: Too many arguments", "Camera.setLoopback");
     }
 
-    ptr->setLoopback(fn.arg(0).to_bool());
+    ptr->setLoopback(toBool(fn.arg(0), getVM(fn)));
     
     return as_value();
 }

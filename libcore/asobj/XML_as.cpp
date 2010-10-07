@@ -521,10 +521,13 @@ XML_as::ignoreWhite()
     const string_table::key propnamekey =
         getStringTable(_global).find("ignoreWhite");
     as_value val;
-    if (!object()->get_member(propnamekey, &val)) {
+
+    as_object* obj = object();
+
+    if (!obj->get_member(propnamekey, &val)) {
         return false;
     }
-    return val.to_bool();
+    return toBool(val, getVM(*obj));
 }
 
 // XML.prototype is assigned after the class has been constructed, so it
@@ -658,7 +661,7 @@ xml_loaded(const fn_call& fn)
         return as_value(static_cast<bool>(ls));
     }
     ptr->setLoaded(
-            static_cast<XML_as::LoadStatus>(fn.arg(0).to_bool()));
+            static_cast<XML_as::LoadStatus>(toBool(fn.arg(0), getVM(fn))));
     return as_value();
 }
 

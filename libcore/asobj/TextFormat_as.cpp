@@ -83,7 +83,7 @@ ToBool : SetBase
 {
     ToBool(const fn_call& fn) : SetBase(fn) {}
     bool operator()(const as_value& val) const {
-        return val.to_bool();
+        return toBool(val, getVM(fn()));
     }
 };
 
@@ -420,11 +420,11 @@ textformat_new(const fn_call& fn)
 	    case 7:
 	        tf->urlSet(fn.arg(6).to_string());
 	    case 6:
-	        tf->underlinedSet(fn.arg(5).to_bool());
+	        tf->underlinedSet(toBool(fn.arg(5), getVM(fn)));
 	    case 5:
-	        tf->italicSet(fn.arg(4).to_bool());
+	        tf->italicSet(toBool(fn.arg(4), getVM(fn)));
 	    case 4:
-	        tf->boldSet(fn.arg(3).to_bool());
+	        tf->boldSet(toBool(fn.arg(3), getVM(fn)));
 	    case 3:
 	    {
 	        rgba col;

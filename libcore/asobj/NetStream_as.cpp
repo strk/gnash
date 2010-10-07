@@ -1654,10 +1654,9 @@ netstream_pause(const fn_call& fn)
     
     // mode: -1 ==> toogle, 0==> pause, 1==> play
     NetStream_as::PauseMode mode = NetStream_as::pauseModeToggle;
-    if (fn.nargs > 0)
-    {
-        mode = fn.arg(0).to_bool() ? NetStream_as::pauseModePause :
-                                     NetStream_as::pauseModeUnPause;
+    if (fn.nargs > 0) {
+        mode = toBool(fn.arg(0), getVM(fn)) ? NetStream_as::pauseModePause :
+                                              NetStream_as::pauseModeUnPause;
     }
     
     // Toggle pause mode

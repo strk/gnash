@@ -465,7 +465,7 @@ microphone_setuseechosuppression(const fn_call& fn)
     if (!fn.nargs) {
         return as_value();
     }
-    ptr->setUseEchoSuppression(fn.arg(0).to_bool());
+    ptr->setUseEchoSuppression(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 

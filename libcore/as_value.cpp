@@ -424,13 +424,6 @@ as_value::to_number(const int swfversion) const
     }
 }
 
-bool
-as_value::to_bool() const
-{
-    const int version = VM::get().getSWFVersion();
-    return to_bool(version);
-}
-
 // Conversion to boolean 
 bool
 as_value::to_bool(const int version) const
@@ -960,9 +953,9 @@ convertToString(as_value& v, const VM& vm)
 
 /// Force type to bool.
 as_value&
-convertToBoolean(as_value& v, const VM& /*vm*/)
+convertToBoolean(as_value& v, const VM& vm)
 {
-    v.set_bool(v.to_bool());
+    v.set_bool(v.to_bool(vm.getSWFVersion()));
     return v;
 }
 

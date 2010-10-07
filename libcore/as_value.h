@@ -241,7 +241,6 @@ public:
     /// Conversion to boolean.
     //
     /// This function performs conversion if necessary.
-    bool to_bool() const;
     bool to_bool(int version) const;
     
     /// Return value as an object, converting primitive values as needed.

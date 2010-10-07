@@ -286,7 +286,7 @@ textfield_background(const fn_call& fn)
         return as_value(ptr->getDrawBackground());
     }
     else {
-        ptr->setDrawBackground(fn.arg(0).to_bool());
+        ptr->setDrawBackground(toBool(fn.arg(0), getVM(fn)));
     }
 
     return as_value();
@@ -301,7 +301,7 @@ textfield_border(const fn_call& fn)
         return as_value(ptr->getDrawBorder());
     }
     else {
-        ptr->setDrawBorder(fn.arg(0).to_bool());
+        ptr->setDrawBorder(toBool(fn.arg(0), getVM(fn)));
     }
 
     return as_value();
@@ -371,7 +371,7 @@ textfield_embedFonts(const fn_call& fn)
     }
 
     // Setter
-    ptr->setEmbedFonts(fn.arg(0).to_bool());
+    ptr->setEmbedFonts(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -384,7 +384,7 @@ textfield_wordWrap(const fn_call& fn)
         return as_value(ptr->doWordWrap());
     }
     else {
-        ptr->setWordWrap(fn.arg(0).to_bool());
+        ptr->setWordWrap(toBool(fn.arg(0), getVM(fn)));
     }
 
     return as_value();
@@ -399,7 +399,7 @@ textfield_html(const fn_call& fn)
         return as_value(ptr->doHtml());
     }
     else {
-        ptr->setHtml( fn.arg(0).to_bool() );
+        ptr->setHtml( toBool(fn.arg(0), getVM(fn)) );
     }
 
     return as_value();
@@ -416,7 +416,7 @@ textfield_selectable(const fn_call& fn)
     }
     else // setter
     {
-        ptr->setSelectable( fn.arg(0).to_bool() );
+        ptr->setSelectable( toBool(fn.arg(0), getVM(fn)) );
     }
 
     return as_value();
@@ -508,7 +508,7 @@ textfield_autoSize(const fn_call& fn)
     {
         const as_value& arg = fn.arg(0);
         if (arg.is_bool()) {
-            if (arg.to_bool()) {
+            if (toBool(arg, getVM(fn))) {
                 // True equates to left, every other bool to none.
                 ptr->setAutoSize(TextField::AUTOSIZE_LEFT);
             }
@@ -744,7 +744,7 @@ textfield_password(const fn_call& fn)
         return as_value(text->password());
     }
     // Setter
-    text->password(fn.arg(0).to_bool());
+    text->password(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -758,7 +758,7 @@ textfield_multiline(const fn_call& fn)
         return as_value(text->multiline());
     }
     // Setter
-    text->multiline(fn.arg(0).to_bool());
+    text->multiline(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 

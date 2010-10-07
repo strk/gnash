@@ -1157,7 +1157,7 @@ sound_loadsound(const fn_call& fn)
 
     bool streaming = false;
     if ( fn.nargs > 1 ) {
-        streaming = fn.arg(1).to_bool();
+        streaming = toBool(fn.arg(1), getVM(fn));
 
         IF_VERBOSE_ASCODING_ERRORS(
         if ( fn.nargs > 2 )

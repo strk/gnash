@@ -1019,11 +1019,13 @@ movieclip_hitTest(const fn_call& fn)
 
         case 3: // x, y, shapeFlag
         {
-             boost::int32_t x = pixelsToTwips(fn.arg(0).to_number());
-             boost::int32_t y = pixelsToTwips(fn.arg(1).to_number());
-             bool shapeFlag = fn.arg(2).to_bool();
+             const boost::int32_t x = pixelsToTwips(toNumber(fn.arg(0),
+                         getVM(fn)));
+             const boost::int32_t y = pixelsToTwips(toNumber(fn.arg(1),
+                         getVM(fn)));
+             const bool shapeFlag = toBool(fn.arg(2), getVM(fn));
 
-             if ( ! shapeFlag ) return movieclip->pointInBounds(x, y);
+             if (!shapeFlag) return movieclip->pointInBounds(x, y);
              else return movieclip->pointInHitableShape(x, y);
         }
 
@@ -1590,7 +1592,7 @@ movieclip_lineStyle(const fn_call& fn)
             }
         }
         case 4:
-            pixelHinting = fn.arg(3).to_bool();
+            pixelHinting = toBool(fn.arg(3), getVM(fn));
         case 3:
         {
             const float alphaval = clamp<float>(fn.arg(2).to_number(),
@@ -1892,7 +1894,7 @@ movieclip_startDrag(const fn_call& fn)
 
     if ( fn.nargs )
     {
-        st.setLockCentered( fn.arg(0).to_bool() );
+        st.setLockCentered(toBool(fn.arg(0), getVM(fn)));
 
         if ( fn.nargs >= 5)
         {
@@ -1988,12 +1990,14 @@ movieclip_beginBitmapFill(const fn_call& fn)
 
     BitmapFill::Type t = BitmapFill::TILED;
     if (fn.nargs > 2) {
-        const bool repeat = fn.arg(2).to_bool();
+        const bool repeat = toBool(fn.arg(2), getVM(fn));
         if (!repeat) t = BitmapFill::CLIPPED;
     }
 
     BitmapFill::SmoothingPolicy p = BitmapFill::SMOOTHING_OFF;
-    if (fn.nargs > 3 && fn.arg(3).to_bool()) p = BitmapFill::SMOOTHING_ON;
+    if (fn.nargs > 3 && toBool(fn.arg(3), getVM(fn))) {
+        p = BitmapFill::SMOOTHING_ON;
+    }
 
     // This is needed to get the bitmap to the right size and have it in the
     // correct place. Maybe it would be better handled somewhere else, as it's
@@ -2114,7 +2118,7 @@ movieclip_lockroot(const fn_call& fn)
         return as_value(ptr->getLockRoot());
     }
     
-    ptr->setLockRoot(fn.arg(0).to_bool());
+    ptr->setLockRoot(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
     

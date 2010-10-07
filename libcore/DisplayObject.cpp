@@ -739,15 +739,16 @@ DisplayObject::markReachableResources() const
 bool
 DisplayObject::allowHandCursor() const
 {
-    if (!getObject(this)) return false;
+    as_object* obj = getObject(this);
+    if (!obj) return false;
 
     if (!hasEventHandler(event_id::RELEASE)) return false;
 
     as_value val;
-    if (!getObject(this)->get_member(NSV::PROP_USEHANDCURSOR, &val)) {
+    if (!obj->get_member(NSV::PROP_USEHANDCURSOR, &val)) {
          return true;
     }
-    return val.to_bool();
+    return toBool(val, getVM(*obj));
 }
 
 void
