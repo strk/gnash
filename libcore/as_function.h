@@ -101,9 +101,6 @@ public:
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin() { return false; }
 
-	/// Return the built-in Function constructor
-	static NativeFunction* getFunctionConstructor();
-
 protected:
 	
     /// Construct a function with no interface

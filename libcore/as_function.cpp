@@ -80,25 +80,6 @@ as_function::stringValue() const
     return "[type Function]";
 }
 
-
-NativeFunction*
-as_function::getFunctionConstructor()
-{
-	static NativeFunction* func = 0;
-	if ( ! func )
-	{
-        Global_as& gl = *VM::get().getGlobal();
-		func = new NativeFunction(gl, function_ctor);
-        as_object* proto = getFunctionPrototype();
-
-        func->init_member(NSV::PROP_PROTOTYPE, proto);
-        func->init_member(NSV::PROP_CONSTRUCTOR, func);
-		proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
-		VM::get().addStatic(func);
-	}
-	return func;
-}
-
 as_object*
 constructInstance(as_function& ctor, const as_environment& env,
         fn_call::Args& args)
@@ -188,7 +169,13 @@ registerFunctionNative(as_object& global)
 void
 function_class_init(as_object& global, const ObjectURI& uri)
 {
-    NativeFunction* func = as_function::getFunctionConstructor();
+    Global_as& gl = *VM::get().getGlobal();
+    NativeFunction* func = new NativeFunction(gl, function_ctor);
+    as_object* proto = getFunctionPrototype();
+
+    func->init_member(NSV::PROP_PROTOTYPE, proto);
+    func->init_member(NSV::PROP_CONSTRUCTOR, func);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
 
 	// Register _global.Function, only visible for SWF6 up
 	int swf6flags = PropFlags::dontEnum | 
@@ -210,11 +197,6 @@ getFunctionPrototype()
 		// Initialize Function prototype
         proto = createObject(*VM::get().getGlobal());
         
-		// We initialize the __proto__ member separately, as getObjectInterface
-		// will end up calling getFunctionPrototype again and we want that
-		// call to return the still-not-completely-constructed prototype rather
-		// then create a new one. 
-
         VM& vm = VM::get();
 
 		vm.addStatic(proto.get());

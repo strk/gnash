@@ -359,9 +359,12 @@ VM::getNative(unsigned int x, unsigned int y) const
 
     as_function* func = getOwnProperty(gl, NSV::CLASS_FUNCTION).to_function();
     if (func) {
-        f->init_member(NSV::PROP_CONSTRUCTOR, func);
+        const int flags = PropFlags::dontDelete |
+                    PropFlags::dontEnum | 
+                    PropFlags::onlySWF6Up;
         f->init_member(NSV::PROP_uuPROTOuu, getMember(*func,
-                    NSV::PROP_PROTOTYPE));
+                    NSV::PROP_PROTOTYPE), flags);
+        f->init_member(NSV::PROP_CONSTRUCTOR, func);
     }
     return f;
 }
