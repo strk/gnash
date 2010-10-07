@@ -321,7 +321,7 @@ xmlsocket_connect(const fn_call& fn)
     
     as_value hostval = fn.arg(0);
     const std::string& host = hostval.to_string();
-    const double port = fn.arg(1).to_number();
+    const double port = toNumber(fn.arg(1), getVM(fn));
     
     // Port numbers above 65535 are rejected always, but not port numbers below
     // 0. It's not clear what happens with them.

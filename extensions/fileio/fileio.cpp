@@ -470,7 +470,7 @@ fileio_fputc(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     FileIO* ptr = ensure<ThisIsNative<FileIO> >(fn);
     assert(ptr);    
-    int c = (int) fn.arg(0).to_number();
+    int c = (int) toNumber(fn.arg(0), getVM(fn));
     return as_value(ptr->fputc(c));
 }
 
@@ -518,7 +518,7 @@ fileio_fseek(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     FileIO* ptr = ensure<ThisIsNative<FileIO> >(fn);
     assert(ptr);    
-    long c = static_cast<long>(fn.arg(0).to_number());
+    long c = static_cast<long>(toNumber(fn.arg(0), getVM(fn)));
     return as_value(ptr->fseek(c));
 }
 

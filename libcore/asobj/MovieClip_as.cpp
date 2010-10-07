@@ -461,7 +461,7 @@ movieclip_attachMovie(const fn_call& fn)
     // kirupa (http://www.kirupa.com/developer/actionscript/depths2.htm)
     // Tests in misc-ming.all/DepthLimitsTest.c show that 2130690044 is the
     // maximum valid depth.
-    const double depth = fn.arg(2).to_number();
+    const double depth = toNumber(fn.arg(2), getVM(fn));
     
     // This also checks for overflow, as both numbers are expressible as
     // boost::int32_t.
@@ -650,7 +650,7 @@ movieclip_swapDepths(const fn_call& fn)
     // movieclip.swapDepth(depth)
     else {
         
-        const double td = fn.arg(0).to_number();
+        const double td = toNumber(fn.arg(0), getVM(fn));
         if (isNaN(td)) {
             IF_VERBOSE_ASCODING_ERRORS(
                 std::stringstream ss; fn.dump_args(ss);
@@ -721,7 +721,7 @@ movieclip_duplicateMovieClip(const fn_call& fn)
     const std::string& newname = fn.arg(0).to_string();
 
     // Depth as in attachMovie
-    const double depth = fn.arg(1).to_number();
+    const double depth = toNumber(fn.arg(1), getVM(fn));
     
     // This also checks for overflow, as both numbers are expressible as
     // boost::int32_t.
@@ -1011,8 +1011,8 @@ movieclip_hitTest(const fn_call& fn)
 
         case 2: // x, y
         {
-            boost::int32_t x = pixelsToTwips(fn.arg(0).to_number());
-            boost::int32_t y = pixelsToTwips(fn.arg(1).to_number());
+            boost::int32_t x = pixelsToTwips(toNumber(fn.arg(0), getVM(fn)));
+            boost::int32_t y = pixelsToTwips(toNumber(fn.arg(1), getVM(fn)));
 
             return movieclip->pointInBounds(x, y);
         }
@@ -1450,8 +1450,8 @@ movieclip_lineTo(const fn_call& fn)
         return as_value();
     }
 
-    double x = fn.arg(0).to_number();
-    double y = fn.arg(1).to_number();
+    double x = toNumber(fn.arg(0), getVM(fn));
+    double y = toNumber(fn.arg(1), getVM(fn));
         
     if (!isFinite(x)) x = 0;
     if (!isFinite(y)) y = 0;
@@ -1476,8 +1476,8 @@ movieclip_moveTo(const fn_call& fn)
         return as_value();
     }
 
-    double x = fn.arg(0).to_number();
-    double y = fn.arg(1).to_number();
+    double x = toNumber(fn.arg(0), getVM(fn));
+    double y = toNumber(fn.arg(1), getVM(fn));
      
     if (!isFinite(x)) x = 0;
     if (!isFinite(y)) y = 0;
@@ -1595,7 +1595,7 @@ movieclip_lineStyle(const fn_call& fn)
             pixelHinting = toBool(fn.arg(3), getVM(fn));
         case 3:
         {
-            const float alphaval = clamp<float>(fn.arg(2).to_number(),
+            const float alphaval = clamp<float>(toNumber(fn.arg(2), getVM(fn)),
                                      0, 100);
             a = boost::uint8_t(255 * (alphaval / 100));
         }
@@ -1611,7 +1611,7 @@ movieclip_lineStyle(const fn_call& fn)
         }
         case 1:
             thickness = boost::uint16_t(pixelsToTwips(clamp<float>(
-                            fn.arg(0).to_number(), 0, 255)));
+                            toNumber(fn.arg(0), getVM(fn)), 0, 255)));
             break;
     }
 
@@ -1636,10 +1636,10 @@ movieclip_curveTo(const fn_call& fn)
         return as_value();
     }
 
-    double cx = fn.arg(0).to_number();
-    double cy = fn.arg(1).to_number();
-    double ax = fn.arg(2).to_number();
-    double ay = fn.arg(3).to_number();
+    double cx = toNumber(fn.arg(0), getVM(fn));
+    double cy = toNumber(fn.arg(1), getVM(fn));
+    double ax = toNumber(fn.arg(2), getVM(fn));
+    double ay = toNumber(fn.arg(3), getVM(fn));
 
     if (!isFinite(cx)) cx = 0;
     if (!isFinite(cy)) cy = 0;
@@ -1679,7 +1679,7 @@ movieclip_beginFill(const fn_call& fn)
 
     // 2^24 is the max here
     const boost::uint32_t rgbval =
-        clamp<float>(fn.arg(0).to_number(), 0, 16777216);
+        clamp<float>(toNumber(fn.arg(0), getVM(fn)), 0, 16777216);
 
     const boost::uint8_t r = (rgbval & 0xFF0000) >> 16;
     const boost::uint8_t g = (rgbval & 0x00FF00) >> 8;
@@ -1871,7 +1871,7 @@ movieclip_beginGradientFill(const fn_call& fn)
 
     /// Add a focus if present.
     if (fn.nargs > 7) {
-        fd.setFocalPoint(fn.arg(7).to_number());
+        fd.setFocalPoint(toNumber(fn.arg(7), getVM(fn)));
     }
 
     movieclip->graphics().beginFill(fd);
@@ -1898,10 +1898,10 @@ movieclip_startDrag(const fn_call& fn)
 
         if ( fn.nargs >= 5)
         {
-            double x0 = fn.arg(1).to_number();
-            double y0 = fn.arg(2).to_number();
-            double x1 = fn.arg(3).to_number();
-            double y1 = fn.arg(4).to_number();
+            double x0 = toNumber(fn.arg(1), getVM(fn));
+            double y0 = toNumber(fn.arg(2), getVM(fn));
+            double x1 = toNumber(fn.arg(3), getVM(fn));
+            double y1 = toNumber(fn.arg(4), getVM(fn));
 
             // check for infinite values
             bool gotinf = false;

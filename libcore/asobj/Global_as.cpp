@@ -456,7 +456,7 @@ global_isNaN(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value(static_cast<bool>(isNaN(fn.arg(0).to_number())));
+    return as_value(static_cast<bool>(isNaN(toNumber(fn.arg(0), getVM(fn)))));
 }
 
 
@@ -465,7 +465,7 @@ global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value(static_cast<bool>(isFinite(fn.arg(0).to_number())));
+    return as_value(static_cast<bool>(isFinite(toNumber(fn.arg(0), getVM(fn)))));
 }
 
 /// \brief Encode a string to URL-encoded format
@@ -683,7 +683,7 @@ global_assetpropflags(const fn_call& fn)
     // are used to determine whether the list of child names should be hidden,
     // un-hidden, protected from over-write, un-protected from over-write,
     // protected from deletion and un-protected from deletion
-    const int setTrue = int(fn.arg(2).to_number()) & flagsMask;
+    const int setTrue = int(toNumber(fn.arg(2), getVM(fn))) & flagsMask;
 
     // Is another integer bitmask that works like set_true,
     // except it sets the attributes to false. The
@@ -1053,7 +1053,7 @@ global_setInterval(const fn_call& fn)
 
 	// Get interval time
 	unsigned long ms =
-        static_cast<unsigned long>(fn.arg(timer_arg).to_number());
+        static_cast<unsigned long>(toNumber(fn.arg(timer_arg), getVM(fn)));
 	// TODO: check validity of interval time number ?
 
 	// Parse arguments 
@@ -1123,7 +1123,7 @@ global_setTimeout(const fn_call& fn)
 
 	// Get interval time
 	unsigned long ms =
-        static_cast<unsigned long>(fn.arg(timer_arg).to_number());
+        static_cast<unsigned long>(toNumber(fn.arg(timer_arg), getVM(fn)));
 
 	// Parse arguments 
     fn_call::Args args;
@@ -1155,7 +1155,7 @@ global_clearInterval(const fn_call& fn)
         return as_value();
     }
 
-	int id = int(fn.arg(0).to_number());
+	int id = int(toNumber(fn.arg(0), getVM(fn)));
 
 	movie_root& root = getRoot(fn);
 	bool ret = root.clear_interval_timer(id);

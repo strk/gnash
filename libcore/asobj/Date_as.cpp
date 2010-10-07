@@ -435,7 +435,7 @@ date_new(const fn_call& fn)
     }
     else if (fn.nargs == 1) {
         // Set the value in milliseconds since 1970 UTC
-        obj->setRelay(new Date_as(fn.arg(0).to_number()));
+        obj->setRelay(new Date_as(toNumber(fn.arg(0), getVM(fn))));
     }
     else {
         // Create a time from the supplied (at least 2) arguments.
@@ -729,7 +729,7 @@ date_setTime(const fn_call& fn)
     else {
         // returns a double
         const double magicMaxValue = 8.64e+15;
-        double d = fn.arg(0).to_number();
+        double d = toNumber(fn.arg(0), getVM(fn));
 
         if (!isFinite(d) || std::abs(d) > magicMaxValue) {
             date->setTimeValue(NaN);
@@ -887,7 +887,7 @@ date_setYear(const fn_call& fn)
 
         // TODO: Should truncation be done before or after subtracting 1900?
         
-        double year = fn.arg(0).to_number();
+        double year = toNumber(fn.arg(0), getVM(fn));
         if (year < 0 || year > 100) year -= 1900;
 
         truncateDouble(gt.year, year);
@@ -943,13 +943,13 @@ date_setmonth(const fn_call& fn)
 
         // It seems odd, but FlashPlayer takes all bad month values to mean
         // January
-        double monthvalue =  fn.arg(0).to_number();
+        double monthvalue =  toNumber(fn.arg(0), getVM(fn));
         if (isNaN(monthvalue) || isInf(monthvalue)) monthvalue = 0.0;
         truncateDouble(gt.month, monthvalue);
 
         // If the day-of-month value is invalid instead, the result is NaN.
         if (fn.nargs >= 2) {
-            double mdayvalue = fn.arg(1).to_number();
+            double mdayvalue = toNumber(fn.arg(1), getVM(fn));
             if (isNaN(mdayvalue) || isInf(mdayvalue)) {
                 date->setTimeValue(NaN);
                 return as_value(date->getTimeValue());
@@ -1160,7 +1160,7 @@ date_setMilliseconds(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
-        truncateDouble(gt.millisecond, fn.arg(0).to_number());
+        truncateDouble(gt.millisecond, toNumber(fn.arg(0), getVM(fn)));
 
         if (fn.nargs > 1) {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -1267,7 +1267,7 @@ date_UTC(const fn_call& fn) {
             gt.month = toInt(fn.arg(1));
             {
                 boost::int32_t year = 0;
-                truncateDouble(year, fn.arg(0).to_number());
+                truncateDouble(year, toNumber(fn.arg(0), getVM(fn)));
                 if (year < 100) gt.year = year;
                 else gt.year = year - 1900;
             }
@@ -1296,7 +1296,7 @@ rogue_date_args(const fn_call& fn, unsigned maxargs)
     if (fn.nargs < maxargs) maxargs = fn.nargs;
 
     for (unsigned int i = 0; i < maxargs; i++) {
-        double arg = fn.arg(i).to_number();
+        double arg = toNumber(fn.arg(i), getVM(fn));
 
         if (isNaN(arg)) return(NaN);
 

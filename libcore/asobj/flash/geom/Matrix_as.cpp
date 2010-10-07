@@ -272,11 +272,11 @@ matrix_createBox(const fn_call& fn)
         case 4:
             tx = fn.arg(3);
         case 3:
-            rotation = fn.arg(2).to_number();
+            rotation = toNumber(fn.arg(2), getVM(fn));
         case 2:
             // There must be a minimum of 2 arguments.
-            scaleY = fn.arg(1).to_number();
-            scaleX = fn.arg(0).to_number();
+            scaleY = toNumber(fn.arg(1), getVM(fn));
+            scaleX = toNumber(fn.arg(0), getVM(fn));
             break;
     }
     
@@ -332,11 +332,11 @@ matrix_createGradientBox(const fn_call& fn)
         case 4:
             tx = fn.arg(3);
         case 3:
-            rotation = fn.arg(2).to_number();
+            rotation = toNumber(fn.arg(2), getVM(fn));
         case 2:
             // There must be a minimum of 2 arguments.
-            widthY = fn.arg(1).to_number();
-            widthX = fn.arg(0).to_number();
+            widthY = toNumber(fn.arg(1), getVM(fn));
+            widthX = toNumber(fn.arg(0), getVM(fn));
             break;
     }
     
@@ -526,7 +526,7 @@ matrix_rotate(const fn_call& fn)
     // Make rotation matrix
     boost::numeric::ublas::c_matrix<double, 2, 2> transformMatrix;
     
-    const double rot = fn.arg(0).to_number();
+    const double rot = toNumber(fn.arg(0), getVM(fn));
     
     transformMatrix(0, 0) = std::cos(rot);
     transformMatrix(0, 1) = std::sin(rot);
@@ -600,8 +600,8 @@ matrix_scale(const fn_call& fn)
     // Make scale matrix
     boost::numeric::ublas::c_matrix<double, 2, 2> transformMatrix;
     
-    const double scaleX = fn.arg(0).to_number();
-    const double scaleY = fn.arg(1).to_number();
+    const double scaleX = toNumber(fn.arg(0), getVM(fn));
+    const double scaleY = toNumber(fn.arg(1), getVM(fn));
     
     transformMatrix(0, 0) = scaleX;
     transformMatrix(0, 1) = 0.0;
@@ -774,8 +774,8 @@ matrix_translate(const fn_call& fn)
         ptr->get_member(NSV::PROP_TX, &tx);
         ptr->get_member(NSV::PROP_TY, &ty);
 
-        double transX = fn.arg(0).to_number() + tx.to_number();
-        double transY = fn.arg(1).to_number() + ty.to_number();
+        double transX = toNumber(fn.arg(0), getVM(fn)) + tx.to_number();
+        double transY = toNumber(fn.arg(1), getVM(fn)) + ty.to_number();
                 
         ptr->set_member(NSV::PROP_TX, as_value(transX));
         ptr->set_member(NSV::PROP_TY, as_value(transY));

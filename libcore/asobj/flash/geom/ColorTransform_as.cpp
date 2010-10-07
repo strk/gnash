@@ -158,7 +158,7 @@ colortransform_alphaMultiplier(const fn_call& fn)
         return as_value(relay->getAlphaMultiplier());
     }
     
-    relay->setAlphaMultiplier(fn.arg(0).to_number());
+    relay->setAlphaMultiplier(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -170,7 +170,7 @@ colortransform_alphaOffset(const fn_call& fn)
         return as_value(relay->getAlphaOffset());
     }
     
-    relay->setAlphaOffset(fn.arg(0).to_number());
+    relay->setAlphaOffset(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -182,7 +182,7 @@ colortransform_blueMultiplier(const fn_call& fn)
         return as_value(relay->getBlueMultiplier());
     }
     
-    relay->setBlueMultiplier(fn.arg(0).to_number());
+    relay->setBlueMultiplier(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -194,7 +194,7 @@ colortransform_blueOffset(const fn_call& fn)
         return as_value(relay->getBlueOffset());
     }
     
-    relay->setBlueOffset(fn.arg(0).to_number());
+    relay->setBlueOffset(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -206,7 +206,7 @@ colortransform_greenMultiplier(const fn_call& fn)
         return as_value(relay->getGreenMultiplier());
     }
     
-    relay->setGreenMultiplier(fn.arg(0).to_number());
+    relay->setGreenMultiplier(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -219,7 +219,7 @@ colortransform_greenOffset(const fn_call& fn)
         return as_value(relay->getGreenOffset());
     }
     
-    relay->setGreenOffset(fn.arg(0).to_number());
+    relay->setGreenOffset(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -232,7 +232,7 @@ colortransform_redMultiplier(const fn_call& fn)
         return as_value(relay->getRedMultiplier());
     }
     
-    relay->setRedMultiplier(fn.arg(0).to_number());
+    relay->setRedMultiplier(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -247,7 +247,7 @@ colortransform_redOffset(const fn_call& fn)
     }
     
     // Setter
-    relay->setRedOffset(fn.arg(0).to_number());
+    relay->setRedOffset(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -386,14 +386,14 @@ colortransform_ctor(const fn_call& fn)
         );
     }
 
-	obj->setRelay(new ColorTransform_as(fn.arg(0).to_number(),
-                                        fn.arg(1).to_number(),
-                                        fn.arg(2).to_number(),
-                                        fn.arg(3).to_number(),
-                                        fn.arg(4).to_number(),
-                                        fn.arg(5).to_number(),
-                                        fn.arg(6).to_number(),
-                                        fn.arg(7).to_number()));
+	obj->setRelay(new ColorTransform_as(toNumber(fn.arg(0), getVM(fn)),
+                                        toNumber(fn.arg(1), getVM(fn)),
+                                        toNumber(fn.arg(2), getVM(fn)),
+                                        toNumber(fn.arg(3), getVM(fn)),
+                                        toNumber(fn.arg(4), getVM(fn)),
+                                        toNumber(fn.arg(5), getVM(fn)),
+                                        toNumber(fn.arg(6), getVM(fn)),
+                                        toNumber(fn.arg(7), getVM(fn))));
 
     return as_value();
 }

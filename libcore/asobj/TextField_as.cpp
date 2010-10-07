@@ -334,7 +334,7 @@ textfield_borderColor(const fn_call& fn)
     }
     else {
         rgba newColor;
-        newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_number()));
+        newColor.parseRGB(static_cast<boost::uint32_t>(toNumber(fn.arg(0), getVM(fn))));
         ptr->setBorderColor(newColor);
     }
 
@@ -354,7 +354,7 @@ textfield_textColor(const fn_call& fn)
 
     // Setter
     rgba newColor;
-    newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_number()));
+    newColor.parseRGB(static_cast<boost::uint32_t>(toNumber(fn.arg(0), getVM(fn))));
     ptr->setTextColor(newColor);
 
     return as_value();
@@ -797,7 +797,7 @@ textfield_bottomScroll(const fn_call& fn)
         return as_value(1 + text->getBottomScroll());
     }
     // Setter
-    //text->setBottomScroll(int(fn.arg(0).to_number())); READ-ONLY
+    //text->setBottomScroll(int(toNumber(fn.arg(0), getVM(fn)))); READ-ONLY
 
     return as_value();
 }
@@ -817,7 +817,7 @@ textfield_maxhscroll(const fn_call& fn)
         return as_value(text->getMaxHScroll());
     }
     // Setter
-    //text->setMaxHScroll(int(fn.arg(0).to_number())); READ-ONLY
+    //text->setMaxHScroll(int(toNumber(fn.arg(0), getVM(fn)))); READ-ONLY
 
     return as_value();
 }
@@ -935,7 +935,7 @@ textfield_scroll(const fn_call& fn)
         return as_value(1 + text->getScroll());
     }
     // Setter
-    text->setScroll(int(fn.arg(0).to_number()) - 1); 
+    text->setScroll(int(toNumber(fn.arg(0), getVM(fn))) - 1); 
 
     return as_value();
 }
@@ -953,7 +953,7 @@ textfield_hscroll(const fn_call& fn)
         return as_value(text->getHScroll());
     }
     // Setter
-    text->setHScroll(int(fn.arg(0).to_number()));
+    text->setHScroll(int(toNumber(fn.arg(0), getVM(fn))));
 
     return as_value();
 }

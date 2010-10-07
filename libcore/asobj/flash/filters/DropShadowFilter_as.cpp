@@ -97,7 +97,7 @@ dropshadowfilter_distance(const fn_call& fn)
         return as_value(ptr->m_distance );
     }
     
-    float sp_distance = fn.arg(0).to_number();
+    float sp_distance = toNumber(fn.arg(0), getVM(fn));
     ptr->m_distance = sp_distance;
     return as_value();
 }
@@ -109,7 +109,7 @@ dropshadowfilter_color(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_color);
     }
-    double sp_color = fn.arg(0).to_number();
+    double sp_color = toNumber(fn.arg(0), getVM(fn));
     ptr->m_color = sp_color;
     return as_value();
 }
@@ -121,7 +121,7 @@ dropshadowfilter_alpha(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_alpha);
     }
-    double sp_alpha = fn.arg(0).to_number();
+    double sp_alpha = toNumber(fn.arg(0), getVM(fn));
     ptr->m_alpha = sp_alpha;
     return as_value();
 }
@@ -133,7 +133,7 @@ dropshadowfilter_angle(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_angle);
     }
-    double sp_angle = fn.arg(0).to_number();
+    double sp_angle = toNumber(fn.arg(0), getVM(fn));
     ptr->m_angle = sp_angle;
     return as_value();
 }

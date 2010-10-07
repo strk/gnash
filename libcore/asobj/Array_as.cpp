@@ -1019,7 +1019,7 @@ array_sort(const fn_call& fn)
     boost::uint8_t flags = 0;
 
     if (fn.nargs == 1 && fn.arg(0).is_number()) {
-        flags = static_cast<boost::uint8_t>(fn.arg(0).to_number());
+        flags = static_cast<boost::uint8_t>(toNumber(fn.arg(0), getVM(fn)));
     }
     else if (fn.arg(0).is_function()) {
         // Get comparison function
@@ -1030,7 +1030,7 @@ array_sort(const fn_call& fn)
         bool (*icmp)(int);
     
         if (fn.nargs == 2 && fn.arg(1).is_number()) {
-            flags=static_cast<boost::uint8_t>(fn.arg(1).to_number());
+            flags=static_cast<boost::uint8_t>(toNumber(fn.arg(1), getVM(fn)));
         }
 
         if (flags & SORT_DESCENDING) icmp = &int_lt_or_eq;
@@ -1092,7 +1092,7 @@ array_sortOn(const fn_call& fn)
             st.find(fn.arg(0).to_string(version));
 
         if (fn.nargs > 1 && fn.arg(1).is_number()) {
-            flags = static_cast<boost::uint8_t>(fn.arg(1).to_number());
+            flags = static_cast<boost::uint8_t>(toNumber(fn.arg(1), getVM(fn)));
             flags = flag_preprocess(flags, &do_unique, &do_index);
         }
 

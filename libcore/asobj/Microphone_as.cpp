@@ -446,7 +446,7 @@ microphone_setsilencelevel(const fn_call& fn)
         return as_value();
     }
 
-    const double level = clamp<double>(fn.arg(0).to_number(), 0, 100);
+    const double level = clamp<double>(toNumber(fn.arg(0), getVM(fn)), 0, 100);
     ptr->setSilenceLevel(level);
     
     if (numargs > 1) {

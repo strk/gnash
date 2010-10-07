@@ -949,10 +949,10 @@ sound_start(const fn_call& fn)
     double secondOffset = 0;
 
     if (fn.nargs > 0) {
-        secondOffset = fn.arg(0).to_number();
+        secondOffset = toNumber(fn.arg(0), getVM(fn));
 
         if (fn.nargs > 1) {
-            loop = (int) fn.arg(1).to_number() - 1;
+            loop = (int) toNumber(fn.arg(1), getVM(fn)) - 1;
 
             // -1 means infinite playing of sound
             // sanity check
@@ -1199,7 +1199,7 @@ sound_setvolume(const fn_call& fn)
     }
 
     Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
-    int volume = (int) fn.arg(0).to_number();
+    int volume = (int) toNumber(fn.arg(0), getVM(fn));
 
     so->setVolume(volume);
     return as_value();

@@ -102,7 +102,7 @@ number_ctor(const fn_call& fn)
 {
     double val = 0;
     if (fn.nargs > 0) {
-        val = fn.arg(0).to_number();
+        val = toNumber(fn.arg(0), getVM(fn));
     }
 
     if (!fn.isInstantiation()) {

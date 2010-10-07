@@ -1698,7 +1698,7 @@ netstream_seek(const fn_call& fn)
     boost::uint32_t time = 0;
     if (fn.nargs > 0)
     {
-        time = static_cast<boost::uint32_t>(fn.arg(0).to_number());
+        time = static_cast<boost::uint32_t>(toNumber(fn.arg(0), getVM(fn)));
     }
     ns->seek(time);
 
@@ -1718,7 +1718,7 @@ netstream_setbuffertime(const fn_call& fn)
     double time = 0;
     if (fn.nargs > 0)
     {
-        time = fn.arg(0).to_number();
+        time = toNumber(fn.arg(0), getVM(fn));
     }
 
     // TODO: don't allow a limit < 100 

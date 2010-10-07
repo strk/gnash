@@ -674,7 +674,7 @@ xml_status(const fn_call& fn)
         return as_value(ptr->status());
     }
 
-    const double status = fn.arg(0).to_number();
+    const double status = toNumber(fn.arg(0), getVM(fn));
     if (isNaN(status) ||
             status > std::numeric_limits<boost::int32_t>::max() ||
             status < std::numeric_limits<boost::int32_t>::min()) {
