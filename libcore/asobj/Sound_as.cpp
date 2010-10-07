@@ -421,7 +421,7 @@ Sound_as::markSoundCompleted(bool completed)
 void
 Sound_as::attachCharacter(DisplayObject* attachTo) 
 {
-    _attachedCharacter.reset(new CharacterProxy(attachTo));
+    _attachedCharacter.reset(new CharacterProxy(attachTo, getRoot(owner())));
 }
 
 void

@@ -525,7 +525,7 @@ as_value::set_null()
 void
 as_value::set_as_object(as_object* obj)
 {
-    if ( ! obj )
+    if (!obj)
     {
         set_null();
         return;
@@ -534,7 +534,7 @@ as_value::set_as_object(as_object* obj)
         // The static cast is fine as long as the as_object is genuinely
         // a DisplayObject.
         _type = DISPLAYOBJECT;
-        _value = CharacterProxy(obj->displayObject());
+        _value = CharacterProxy(obj->displayObject(), getRoot(*obj));
         return;
     }
 

@@ -273,7 +273,7 @@ NetStream_as::getStatusObject(StatusCode code)
 void
 NetStream_as::setAudioController(DisplayObject* ch)
 {
-    _audioController.reset(new CharacterProxy(ch));
+    _audioController.reset(new CharacterProxy(ch, getRoot(owner())));
 }
 
 #ifdef GNASH_USE_GC
