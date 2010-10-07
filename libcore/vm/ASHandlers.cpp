@@ -3293,9 +3293,8 @@ ActionDefineFunction2(ActionExec& thread)
     as_function* f = getOwnProperty(gl, NSV::CLASS_FUNCTION).to_function();
     if (f) {
         const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
-        func->set_member(NSV::PROP_uuPROTOuu, getMember(*f,
-                    NSV::PROP_PROTOTYPE));
-        func->set_member_flags(NSV::PROP_uuPROTOuu, flags);
+        func->init_member(NSV::PROP_uuPROTOuu, getMember(*f,
+                    NSV::PROP_PROTOTYPE), flags);
         func->init_member(NSV::PROP_CONSTRUCTOR, f);
     }
 
@@ -3527,9 +3526,8 @@ ActionDefineFunction(ActionExec& thread)
     as_function* f = getOwnProperty(gl, NSV::CLASS_FUNCTION).to_function();
     if (f) {
         const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
-        func->set_member(NSV::PROP_uuPROTOuu, getMember(*f,
-                    NSV::PROP_PROTOTYPE));
-        func->set_member_flags(NSV::PROP_uuPROTOuu, flags);
+        func->init_member(NSV::PROP_uuPROTOuu, getMember(*f,
+                    NSV::PROP_PROTOTYPE), flags);
         func->init_member(NSV::PROP_CONSTRUCTOR, f);
     }
 

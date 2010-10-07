@@ -225,12 +225,6 @@ VM::markReachableResources() const
 
 	_global->setReachable();
 
-	/// Mark all static GcResources
-	for (ResVect::const_iterator i=_statics.begin(), e=_statics.end(); i!=e; ++i)
-	{
-		(*i)->setReachable();
-	}
-
     if (_shLib.get()) _shLib->markReachableResources();
 
 #ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
@@ -359,9 +353,7 @@ VM::getNative(unsigned int x, unsigned int y) const
 
     as_function* func = getOwnProperty(gl, NSV::CLASS_FUNCTION).to_function();
     if (func) {
-        const int flags = PropFlags::dontDelete |
-                    PropFlags::dontEnum | 
-                    PropFlags::onlySWF6Up;
+        const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
         f->init_member(NSV::PROP_uuPROTOuu, getMember(*func,
                     NSV::PROP_PROTOTYPE), flags);
         f->init_member(NSV::PROP_CONSTRUCTOR, func);

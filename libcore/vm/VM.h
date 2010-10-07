@@ -228,7 +228,6 @@ public:
 	//
 	/// - root movie / stage (_rootMovie)
 	/// - Global object (_global)
-	/// - registered static GcResources (_statics)
 	/// - Class Hierarchy object
 	///
 	///
@@ -304,17 +303,6 @@ public:
     /// Print stack, call stack, and registers to the specified ostream
     void dumpState(std::ostream& o, size_t limit = 0);
 
-#ifdef GNASH_USE_GC
-	void addStatic(GcResource* res)
-	{
-		_statics.push_back(res);
-	}
-#else  // ndef GNASH_USE_GC
-	// placeholder to avoid adding lots of
-	// compile-time switches in callers
-	void addStatic(as_object*) {}
-#endif
-
 private:
 
 	friend class VmGcRoot;
@@ -348,16 +336,6 @@ private:
 	/// Will be called by the init() function
 	/// 
 	void setGlobal(Global_as*);
-
-#ifdef GNASH_USE_GC
-	/// A vector of static GcResources (typically used for built-in
-    /// class constructors)
-	//
-	/// The resources in this list will always be marked as reachable
-	///
-	typedef std::vector< boost::intrusive_ptr<GcResource> > ResVect;
-	ResVect _statics;
-#endif
 
 	typedef std::map<unsigned int, as_c_function_ptr> FuncMap;
 	typedef std::map<unsigned int, FuncMap> AsNativeTable;

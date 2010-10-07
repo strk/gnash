@@ -169,9 +169,8 @@ Global_as::createFunction(Global_as::ASFunction function)
         gnash::getOwnProperty(*this, NSV::CLASS_FUNCTION).to_function();
     if (fun) {
         const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
-        f->set_member(NSV::PROP_uuPROTOuu, getMember(*fun,
-                    NSV::PROP_PROTOTYPE));
-        f->set_member_flags(NSV::PROP_uuPROTOuu, flags);
+        f->init_member(NSV::PROP_uuPROTOuu, getMember(*fun,
+                    NSV::PROP_PROTOTYPE), flags);
         f->init_member(NSV::PROP_CONSTRUCTOR, fun);
     }
     return f;
@@ -191,9 +190,8 @@ Global_as::createClass(Global_as::ASFunction ctor, as_object* prototype)
 
     if (fun) {
         const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
-        cl->set_member(NSV::PROP_uuPROTOuu, getMember(*fun,
-                    NSV::PROP_PROTOTYPE));
-        cl->set_member_flags(NSV::PROP_uuPROTOuu, flags);
+        cl->init_member(NSV::PROP_uuPROTOuu, getMember(*fun,
+                    NSV::PROP_PROTOTYPE), flags);
         cl->init_member(NSV::PROP_CONSTRUCTOR, fun);
     }
     return cl;
