@@ -1047,7 +1047,7 @@ _global.Function = 8;
 f = ASnative(1, 0);
 check_equals(typeof(f), "function");
 f.hasOwnProperty = Object.prototype.hasOwnProperty;
-xcheck(!f.hasOwnProperty("__proto__"));
+check(!f.hasOwnProperty("__proto__"));
 check(!f.hasOwnProperty("constructor"));
 
 
@@ -1057,7 +1057,7 @@ _global.Function = {};
 f = ASnative(1, 0);
 check_equals(typeof(f), "function");
 f.hasOwnProperty = Object.prototype.hasOwnProperty;
-xcheck(!f.hasOwnProperty("__proto__"));
+check(!f.hasOwnProperty("__proto__"));
 check(!f.hasOwnProperty("constructor"));
 
 called = 0;
