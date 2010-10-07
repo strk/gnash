@@ -415,7 +415,7 @@ VM::dumpState(std::ostream& out, size_t limit)
 ///////////////////////////////////////////////////////////////////////
 
 void
-newAdd(as_value& op1, const as_value& op2, VM& vm)
+newAdd(as_value& op1, const as_value& op2, const VM& vm)
 {
     // We can't change the original value.
     as_value r(op2);
@@ -444,22 +444,22 @@ newAdd(as_value& op1, const as_value& op2, VM& vm)
 	}
 
     // Otherwise use numeric semantic
-    const double num1 = op1.to_number();
-    const double num2 = r.to_number();
+    const double num1 = toNumber(op1, vm);
+    const double num2 = toNumber(r, vm);
     op1.set_double(num2 + num1); 
 
 }
 
 void
-subtract(as_value& op1, const as_value& op2, VM& /*vm*/)
+subtract(as_value& op1, const as_value& op2, const VM& vm)
 {
-	const double num2 = op2.to_number();
-	const double num1 = op1.to_number();
+	const double num2 = toNumber(op2, vm);
+	const double num1 = toNumber(op1, vm);
 	op1.set_double(num1 - num2);
 }
 
 as_value
-newLessThan(const as_value& op1, const as_value& op2, VM& /*vm*/)
+newLessThan(const as_value& op1, const as_value& op2, const VM& vm)
 {
 
     as_value operand1(op1);
@@ -496,13 +496,25 @@ newLessThan(const as_value& op1, const as_value& op2, VM& /*vm*/)
         return as_value(s1 < s2);
     }
 
-    const double num1 = operand1.to_number();
-    const double num2 = operand2.to_number();
+    const double num1 = toNumber(operand1, vm);
+    const double num2 = toNumber(operand2, vm);
 
     if (isNaN(num1) || isNaN(num2)) {
         return as_value();
     }
     return as_value(num1 < num2);
+}
+
+bool
+toBool(const as_value& v, const VM& vm)
+{
+    return v.to_bool(vm.getSWFVersion());
+}
+
+double
+toNumber(const as_value& v, const VM& vm)
+{
+    return v.to_number(vm.getSWFVersion());
 }
 
 } // end of namespace gnash

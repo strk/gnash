@@ -315,11 +315,15 @@ as_value::to_primitive(AsType hint) const
 double
 as_value::to_number() const
 {
-
     const int swfversion = VM::get().getSWFVersion();
+    return to_number(swfversion);
+}
 
-    switch (_type)
-    {
+double
+as_value::to_number(const int swfversion) const
+{
+
+    switch (_type) {
         case STRING:
         {
             const std::string& s = getStr();
@@ -420,12 +424,17 @@ as_value::to_number() const
     }
 }
 
-
-// Conversion to boolean 
 bool
 as_value::to_bool() const
 {
     const int version = VM::get().getSWFVersion();
+    return to_bool(version);
+}
+
+// Conversion to boolean 
+bool
+as_value::to_bool(const int version) const
+{
     switch (_type)
     {
         case STRING:
@@ -935,15 +944,15 @@ doubleToString(double val, int radix)
 
 /// Force type to number.
 as_value&
-convertToNumber(as_value& v, VM& /*vm*/)
+convertToNumber(as_value& v, const VM& vm)
 {
-    v.set_double(v.to_number());
+    v.set_double(v.to_number(vm.getSWFVersion()));
     return v;
 }
 
 /// Force type to string.
 as_value&
-convertToString(as_value& v, VM& vm)
+convertToString(as_value& v, const VM& vm)
 {
     v.set_string(v.to_string(vm.getSWFVersion()));
     return v;
@@ -951,14 +960,14 @@ convertToString(as_value& v, VM& vm)
 
 /// Force type to bool.
 as_value&
-convertToBoolean(as_value& v, VM& /*vm*/)
+convertToBoolean(as_value& v, const VM& /*vm*/)
 {
     v.set_bool(v.to_bool());
     return v;
 }
 
 as_value&
-convertToPrimitive(as_value& v, VM& vm)
+convertToPrimitive(as_value& v, const VM& vm)
 {
     const as_value::AsType t(v.defaultPrimitive(vm.getSWFVersion()));
     v = v.to_primitive(t);

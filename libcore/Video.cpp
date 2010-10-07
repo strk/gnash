@@ -381,8 +381,7 @@ video_smoothing(const fn_call& fn)
 
     if (!fn.nargs) return as_value(video->smoothing());
 
-    bool smooth = fn.arg(0).to_bool();
-
+    const bool smooth = toBool(fn.arg(0), getVM(fn));
     video->setSmoothing(smooth);
 
     return as_value();

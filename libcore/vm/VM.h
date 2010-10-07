@@ -409,21 +409,25 @@ private:
 /// TODO:           Consider whether it would be better to pass something
 ///                 other than the VM. But it is a VM operation, so it
 ///                 is logically sound.
-void newAdd(as_value& op1, const as_value& op2, VM& vm);
+void newAdd(as_value& op1, const as_value& op2, const VM& vm);
 
 /// Carry out ActionSubtract
 //
 /// @param op1      The as_value to subtract from.
 /// @param op2      The as_value to subtract.
 /// @param vm       The VM executing the operation.
-void subtract(as_value& op1, const as_value& op2, VM& vm);
+void subtract(as_value& op1, const as_value& op2, const VM& vm);
 
 /// Carry out ActionSubtract
 //
 /// @param op1      The first comparand.
 /// @param op2      The second comparand.
 /// @param vm       The VM executing the operation.
-as_value newLessThan(const as_value& op1, const as_value& op2, VM& vm);
+as_value newLessThan(const as_value& op1, const as_value& op2, const VM& vm);
+
+bool toBool(const as_value& v, const VM& vm);
+
+double toNumber(const as_value& v, const VM& vm);
 
 } // namespace gnash
 
