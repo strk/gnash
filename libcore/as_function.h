@@ -62,17 +62,21 @@ class as_function : public as_object
 {
 public:
 
-	/// Decrement refcount on the exported interface.
+    /// Destructor
 	virtual ~as_function() {}
 
-	// Avoid RTTI
-	as_function* to_function() { return this; }
+    /// Return this as_object as an as_function.
+	virtual as_function* to_function() { return this; }
 
-	/// Function dispatch.  //
+	/// Function dispatch.
+    //
     /// Override from as_object, although as_objects cannot generally 
     /// be called.
 	virtual as_value call(const fn_call& fn) = 0;
 
+    /// Return the string value of this as_object subclass
+    //
+    /// It's "function".
     virtual std::string stringValue() const;
 
 	/// Run this function as a constructor on an object
@@ -92,7 +96,7 @@ public:
 	/// @param args     Arguments for the constructor invocation
     /// @return         The constructed object. TODO: return void; currently
     ///                 there is a hack to cope with some remaining bogus
-    ///                 constructors (Microphone and Camera), which
+    ///                 constructors, which
     ///                 necessitates returning a different object from the
     ///                 passed 'this' pointer.
     as_object* construct(as_object& newobj, const as_environment& env,
@@ -103,10 +107,7 @@ public:
 
 protected:
 	
-    /// Construct a function with no interface
-	//
-	/// For SWF>5 the function object will have derive from Function.
-	///
+    /// Construct a function.
 	as_function(Global_as& gl);
 
 };
@@ -128,6 +129,8 @@ as_object* constructInstance(as_function& ctor, const as_environment& env,
 
 /// Initialize the global Function constructor
 void function_class_init(as_object& global, const ObjectURI& uri);
+
+/// Register Function native functions.
 void registerFunctionNative(as_object& global);
 
 } // gnash namespace
