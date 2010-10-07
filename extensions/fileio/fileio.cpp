@@ -35,7 +35,7 @@
 #include "fn_call.h"
 #include "as_object.h"
 #include "builtin_function.h" // need builtin_function
-#include "Globals.h"
+#include "Global_as.h"
 #include "fileio.h"
 #include "Array_as.h"  // used by scandir()
 
