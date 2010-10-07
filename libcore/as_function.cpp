@@ -66,10 +66,12 @@ as_function::as_function(Global_as& gl)
 	:
 	as_object(gl)
 {
+#if 1
 	int flags = PropFlags::dontDelete |
 	            PropFlags::dontEnum | 
 	            PropFlags::onlySWF6Up;
 	init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
+#endif
 }
 
 std::string
