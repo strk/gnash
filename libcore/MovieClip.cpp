@@ -460,18 +460,15 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 
     as_value str(fspecStr);
 
-    double num = str.to_number();
-
-    //log_debug("get_frame_number(%s), num: %g", frame_spec, num);
+    const double num = toNumber(str, getVM(*getObject(this)));
 
     if (!isFinite(num) || int(num) != num || num == 0)
     {
         bool ret = _def->get_labeled_frame(fspecStr, frameno);
-        //log_debug("get_labeled_frame(%s) returned %d, frameno is %d", fspecStr, ret, frameno);
         return ret;
     }
 
-    if ( num < 0 ) return false;
+    if (num < 0) return false;
 
     // all frame numbers > 0 are valid, but a valid frame number may still
     // reference a non-exist frame(eg. frameno > total_frames).
@@ -1285,12 +1282,15 @@ bool
 MovieClip::handleFocus()
 {
 
+    as_object* obj = getObject(this);
+    assert(obj);
+
     // For SWF6 and above: the MovieClip can always receive focus if
     // focusEnabled evaluates to true.
-    if (getSWFVersion(*getObject(this)) > 5) {
+    if (getSWFVersion(*obj) > 5) {
         as_value focusEnabled;
-        if (getObject(this)->get_member(NSV::PROP_FOCUS_ENABLED, &focusEnabled)) {
-            if (focusEnabled.to_bool() == true) return true; 
+        if (obj->get_member(NSV::PROP_FOCUS_ENABLED, &focusEnabled)) {
+            if (toBool(focusEnabled, getVM(*obj))) return true; 
         }
     }
         
@@ -1541,9 +1541,14 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
 bool
 MovieClip::trackAsMenu()
 {
+    as_object* obj = getObject(this);
+    assert(obj);
+
+    string_table& st = getStringTable(*obj);
+
     as_value track;
-    string_table& st = getStringTable(*getObject(this));
-    return (getObject(this)->get_member(st.find("trackAsMenu"), &track) && track.to_bool());
+    return (obj->get_member(st.find("trackAsMenu"), &track) &&
+            toBool(track, getVM(*obj)));
 }
 
 bool
@@ -2018,12 +2023,15 @@ MovieClip::getBounds() const
 bool
 MovieClip::isEnabled() const
 {
+    as_object* obj = getObject(this);
+    assert(obj);
+
     as_value enabled;
-    if (!getObject(this)->get_member(NSV::PROP_ENABLED, &enabled)) {
+    if (!obj->get_member(NSV::PROP_ENABLED, &enabled)) {
          // We're enabled if there's no 'enabled' member...
          return true;
     }
-    return enabled.to_bool();
+    return toBool(enabled, getVM(*obj));
 }
 
 class EnumerateVisitor {
