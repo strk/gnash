@@ -1028,7 +1028,7 @@ check(f.__proto__  === o);
 // Inherited property.
 check(f.p === "hi");
 check(f instanceOf _global.Function);
-xcheck(f.constructor === _global.Function);
+check(f.constructor === _global.Function);
 check(f.constructor !== _global.Function.prototype.constructor);
 
 
