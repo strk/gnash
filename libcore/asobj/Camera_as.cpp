@@ -279,7 +279,7 @@ camera_get(const fn_call& fn)
     // Normally the VM would furnish us with a newly instantiated object, if
     // a constructor were used. But we're in a factory, so we have to build
     // one for ourselves.
-    as_object* cam_obj = getGlobal(fn).createObject();
+    as_object* cam_obj = createObject(getGlobal(fn));
     cam_obj->set_prototype(proto);
     attachCameraInterface(*cam_obj);
     attachCameraProperties(*cam_obj);

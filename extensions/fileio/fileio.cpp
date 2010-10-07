@@ -603,7 +603,7 @@ fileio_class_init(as_object& where, const ObjectURI& /* uri */)
     //	GNASH_REPORT_FUNCTION;
     Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachInterface(*proto);
     as_object* cl = gl.createClass(&fileio_ctor, proto);
     

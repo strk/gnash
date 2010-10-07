@@ -48,7 +48,7 @@ accessibility_class_init(as_object& where, const ObjectURI& uri)
     const int flags = as_object::DefaultFlags | PropFlags::readOnly;
 
     // This object has unusual properties.
-    as_object* obj = gl.createObject();
+    as_object* obj = createObject(gl);
     obj->set_member_flags(NSV::PROP_uuPROTOuu, flags);
     obj->init_member(NSV::PROP_CONSTRUCTOR, getMember(gl, NSV::CLASS_OBJECT),
             flags);

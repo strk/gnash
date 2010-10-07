@@ -108,7 +108,7 @@ void
 dbus_class_init(as_object &obj)
 {
     Global_as& gl = getGlobal(obj);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachInterface(*proto);
     as_object* cl = gl.createClass(&dbus_ctor, proto);
 	

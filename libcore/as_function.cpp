@@ -206,7 +206,7 @@ getFunctionPrototype()
 	if (proto.get() == NULL) {
 
 		// Initialize Function prototype
-        proto = VM::get().getGlobal()->createObject();
+        proto = createObject(*VM::get().getGlobal());
         
 		// We initialize the __proto__ member separately, as getObjectInterface
 		// will end up calling getFunctionPrototype again and we want that

@@ -625,7 +625,7 @@ get_flash_geom_point_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Point class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&point_ctor, proto);
     attachPointInterface(*proto);
     attachPointStaticProperties(*cl);

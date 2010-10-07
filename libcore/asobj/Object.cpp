@@ -155,7 +155,12 @@ object_ctor(const fn_call& fn)
         return new as_object(gl);
     }
 
-    return gl.createObject();
+    if (fn.this_ptr) {
+        gl.makeObject(*fn.this_ptr);
+    }
+
+    return as_value();
+
 }
 
 /// Object.toString returns one of two values: [type Function] if it is a 

@@ -26,17 +26,19 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include "as_object.h" 
 #include "fn_call.h"
 #include "log.h"
+#include "ClassHierarchy.h"
 
 // Forward declarations
 namespace gnash {
-	class builtin_function;
-	class as_value;
-	class VM;
-	class ClassHierarchy;
+    class builtin_function;
+    class as_value;
+    class VM;
+    class Extension;
 }
 
 namespace gnash {
@@ -56,69 +58,52 @@ public:
     typedef as_value(*ASFunction)(const fn_call& fn);
     typedef void(*Properties)(as_object&);
 
-    virtual const ClassHierarchy& classHierarchy() const = 0;
-    virtual ClassHierarchy& classHierarchy() = 0;
+	explicit Global_as(VM& vm);
+	virtual ~Global_as();
+    
+    void registerClasses();
 
-    explicit Global_as(VM& vm)
-        :
-        as_object(vm)
-    {}
+    as_object* createString(const std::string& s);
 
+    as_object* createNumber(double d);
+
+    as_object* createBoolean(bool b);
+    
+    as_object* createArray();
+
+    VM& getVM() const {
+        return vm();
+    }
+    
     /// Create an ActionScript function
-    virtual builtin_function* createFunction(ASFunction function) = 0;
+    builtin_function* createFunction(Global_as::ASFunction function);
 
     /// Create an ActionScript class
     //
-    /// The type of a class is different in AS2 and AS3. In AS2 it is generally
-    /// a function (the constructor) with a prototype. In AS3 it is generally
-    /// an object (the prototype) with a constructor.
-    virtual as_object* createClass(ASFunction ctor, as_object* prototype) = 0;
+    /// An AS2 class is generally a function (the constructor) with a
+    /// prototype.
+    as_object* createClass(Global_as::ASFunction ctor,
+            as_object* prototype);
 
-    /// Create a String object
-    //
-    /// This calls the String constructor. If that has been changed, this
-    /// function may not produce a String object. This is generally
-    /// expected behaviour.
-    virtual as_object* createString(const std::string& s) = 0;
+    void makeObject(as_object& o) const;
 
-    /// Create a Number object
-    //
-    /// This calls the Number constructor. If that has been changed, this
-    /// function may not produce a Number object. This is generally
-    /// expected behaviour.
-    virtual as_object* createNumber(double d) = 0;
+protected:
+    
+    virtual void markReachableResources() const;
 
-    /// Create a Boolean object
-    //
-    /// This calls the Boolean constructor. If that has been changed, this
-    /// function may not produce a Boolean object. This is generally
-    /// expected behaviour.
-    virtual as_object* createBoolean(bool b) = 0;
+private:
 
-    /// Create an Array object
-    //
-    /// This creates an Array object without calling the Array constructor.
-    virtual as_object* createArray() = 0;
+    void loadExtensions();
+    boost::scoped_ptr<Extension> _et;
 
-    /// Create an Object
-    //
-    /// This function returns an Object with Object.prototype as its
-    /// __proto__ member. It should probably call the Object constructor,
-    /// but Gnash creates some of its classes on demand. If the Object class
-    /// has changed before this happens, Gnash's behaviour would differ from
-    /// the reference player's.
-    //
-    /// TODO: think whether it's better to return the original Object class,
-    /// a possibly altered one, or allow both.
-    virtual as_object* createObject() = 0;
+    ClassHierarchy _classes;
+    
+    as_object* _objectProto;
 
-    virtual Global_as& global() {
-        return *this;
-    }
-
-    virtual VM& getVM() const = 0;
 };
 
+as_object* createObject(const Global_as& gl);
+    
 
 /// Register a built-in object
 //
@@ -143,7 +128,7 @@ registerBuiltinObject(as_object& where, Global_as::Properties p,
 
     // This is going to be the global Mouse "class"/"function"
     Global_as& gl = getGlobal(where);
-    as_object* obj = gl.createObject();
+    as_object* obj = createObject(gl);
     if (p) p(*obj);
     
     where.init_member(uri, obj, as_object::DefaultFlags);
@@ -173,7 +158,7 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
         Global_as::Properties p, Global_as::Properties c, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(ctor, proto);
  
     // Attach class properties to class

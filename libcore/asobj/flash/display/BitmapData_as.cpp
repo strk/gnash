@@ -383,7 +383,7 @@ bitmapdata_clone(const fn_call& fn)
     std::copy(bm->begin(), bm->end(), image::begin<image::ARGB>(*im));
 
     Global_as& gl = getGlobal(fn);
-    as_object* ret = gl.createObject();
+    as_object* ret = createObject(gl);
     const as_value& proto = getMember(*obj, NSV::PROP_uuPROTOuu);
     if (proto.is_object()) {
         ret->set_member(NSV::PROP_uuPROTOuu, proto);
@@ -845,7 +845,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
     
     // The properties come from the 'this' object.
     Global_as& gl = getGlobal(fn);
-    as_object* ret = gl.createObject();
+    as_object* ret = createObject(gl);
     ret->set_member(NSV::PROP_uuPROTOuu, getMember(*ptr, NSV::PROP_PROTOTYPE));
     
     newImage->update(im.begin());
@@ -860,7 +860,7 @@ get_flash_display_bitmap_data_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.display.BitmapData class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachBitmapDataInterface(*proto);
     as_object* cl = gl.createClass(&bitmapdata_ctor, proto);
     attachBitmapDataStaticProperties(*cl);

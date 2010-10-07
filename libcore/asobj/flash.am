@@ -34,7 +34,7 @@ libgnashasobjs_la_SOURCES = \
 	asobj/CustomActions.cpp\
 	asobj/Date_as.cpp \
 	asobj/Error_as.cpp \
-	asobj/Globals.cpp \
+	asobj/Global_as.cpp \
 	asobj/LoadVars_as.cpp \
 	asobj/Math_as.cpp \
 	asobj/Number_as.cpp \
@@ -76,7 +76,6 @@ inst_HEADERS = \
 	asobj/Error_as.h	\
 	asobj/Math_as.h	\
 	asobj/Global_as.h\
-	asobj/Globals.h\
 	asobj/LoadVars_as.h \
 	asobj/MovieClipLoader.h \
 	asobj/Number_as.h \

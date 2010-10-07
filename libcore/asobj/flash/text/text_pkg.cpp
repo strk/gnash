@@ -35,7 +35,7 @@ get_flash_text_package(const fn_call& fn)
  
     Global_as& gl = getGlobal(fn);
 
-    as_object* pkg = gl.createObject();
+    as_object* pkg = createObject(gl);
     
     string_table& st = getStringTable(fn);
 

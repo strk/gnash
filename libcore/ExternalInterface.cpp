@@ -43,7 +43,6 @@
 #include "Array_as.h"
 #include "namedStrings.h"
 #include "Global_as.h"
-#include "Globals.h"
 #include "PropertyList.h"
 #include "movie_root.h"
 #include "log.h"

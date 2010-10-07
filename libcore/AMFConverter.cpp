@@ -517,7 +517,7 @@ Reader::readObject()
 {
 
     string_table& st = getStringTable(_global);
-    as_object* obj = _global.createObject(); 
+    as_object* obj = createObject(_global); 
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
     log_debug("amf0 starting read of OBJECT");

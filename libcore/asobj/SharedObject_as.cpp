@@ -596,7 +596,7 @@ void
 sharedobject_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachSharedObjectInterface(*proto);
     as_object* cl = gl.createClass(&sharedobject_ctor, proto);
     attachSharedObjectStaticInterface(*cl);
@@ -890,7 +890,7 @@ readSOL(VM& vm, const std::string& filespec)
     // The 'data' member is initialized only on getLocal() (and probably
     // getRemote()): i.e. when there is some data, or when it's ready to
     // be added.
-    as_object* data = gl.createObject();
+    as_object* data = createObject(gl);
 
     struct stat st;
 

@@ -735,7 +735,7 @@ NetConnection_as::notifyStatus(StatusCode code)
     getStatusCodeInfo(code, info);
 
     /// This is a new normal object each time (see NetConnection.as)
-    as_object* o = getGlobal(owner()).createObject();
+    as_object* o = createObject(getGlobal(owner()));
 
     const int flags = 0;
 

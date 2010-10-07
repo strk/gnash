@@ -41,7 +41,7 @@ get_flash_geom_package(const fn_call& fn)
     log_debug("Loading flash.geom package");
     Global_as& gl = getGlobal(fn);
 
-    as_object *pkg = gl.createObject();
+    as_object *pkg = createObject(gl);
 	
     string_table& st = getStringTable(fn);
 

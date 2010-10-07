@@ -89,7 +89,7 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
     }
     else proto = 0;
 
-    as_object* cl = gl.createClass(ctor, gl.createObject());
+    as_object* cl = gl.createClass(ctor, createObject(gl));
     if (proto) p(*proto);
 
     // The startup script overwrites the prototype assigned by ASconstructor,
@@ -117,7 +117,7 @@ getBitmapFilterConstructor(const fn_call& fn)
     Global_as& gl = getGlobal(fn);
     VM& vm = getVM(fn);
     
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = vm.getNative(1112, 0);
     cl->init_member(NSV::PROP_PROTOTYPE, proto);
     proto->init_member(NSV::PROP_CONSTRUCTOR, cl);

@@ -38,7 +38,6 @@
 #include "movie_definition.h"
 #include "Movie.h"
 #include "movie_root.h"
-#include "Globals.h"
 #include "Global_as.h"
 #include "rc.h" 
 #include "namedStrings.h"
@@ -65,7 +64,7 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 	assert(_singleton.get());
 	NSV::loadStrings(_singleton->_stringTable);
 
-    AVM1Global* gl(new AVM1Global(*_singleton));
+    Global_as* gl(new Global_as(*_singleton));
 
 	_singleton->setGlobal(gl);
     gl->registerClasses();

@@ -282,7 +282,7 @@ sound_class_init(as_object& where, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&sound_new, proto);
     attachSoundInterface(*proto);
     proto->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);

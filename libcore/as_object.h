@@ -191,7 +191,7 @@ public:
     /// @param  global  A reference to the Global object the new
     ///                 object ultimately belongs to. The created object
     ///                 uses the resources of the Global object.
-    explicit as_object(Global_as& global);
+    explicit as_object(const Global_as& global);
 
     /// The as_object dtor does nothing special.
     virtual ~as_object() {}

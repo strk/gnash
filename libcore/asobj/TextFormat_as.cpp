@@ -374,7 +374,7 @@ textformat_class_init(as_object& global, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(global);
-    as_object* proto = gl.createObject();;
+    as_object* proto = createObject(gl);;
     as_object* cl = gl.createClass(&textformat_new, proto);
 
 	global.init_member(uri, cl, as_object::DefaultFlags);

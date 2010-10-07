@@ -872,7 +872,7 @@ array_class_init(as_object& where, const ObjectURI& uri)
     VM& vm = getVM(where);
     Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
 
     as_object* cl = vm.getNative(252, 0);
 

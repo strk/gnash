@@ -109,7 +109,7 @@ contextmenu_hideBuiltInItems(const fn_call& fn)
     string_table& st = getStringTable(fn);
 
     Global_as& gl = getGlobal(fn);
-    as_object* builtIns = gl.createObject();
+    as_object* builtIns = createObject(gl);
     setBuiltInItems(*builtIns, false);
     ptr->set_member(st.find("builtInItems"), builtIns);
     return as_value();
@@ -185,7 +185,7 @@ contextmenu_ctor(const fn_call& fn)
     
     string_table& st = getStringTable(fn);
     Global_as& gl = getGlobal(fn);
-    as_object* builtInItems = gl.createObject();
+    as_object* builtInItems = createObject(gl);
     setBuiltInItems(*builtInItems, true);
     obj->set_member(st.find("builtInItems"), builtInItems);
 

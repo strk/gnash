@@ -45,7 +45,6 @@
 #include "Array_as.h"
 #include "namedStrings.h"
 #include "Global_as.h"
-#include "Globals.h"
 #include "PropertyList.h"
 #include "movie_root.h"
 #include "log.h"
@@ -400,7 +399,7 @@ externalInterfaceConstructor(const fn_call& fn)
 {
     log_debug("Loading flash.external.ExternalInterface class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&externalinterface_ctor, proto);
 
     attachExternalInterfaceStaticInterface(*cl);

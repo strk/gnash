@@ -285,7 +285,7 @@ private:
 
 const int as_object::DefaultFlags;
 
-as_object::as_object(Global_as& gl)
+as_object::as_object(const Global_as& gl)
     :
     _displayObject(0),
     _array(false),
@@ -1141,7 +1141,7 @@ getObjectWithPrototype(Global_as& gl, string_table::key c)
     as_object* proto = ctor ?
         getMember(*ctor, NSV::PROP_PROTOTYPE).to_object(gl) : 0;
 
-    as_object* o = gl.createObject();
+    as_object* o = createObject(gl);
     o->set_prototype(proto ? proto : as_value());
     return o;
 }

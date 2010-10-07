@@ -2515,7 +2515,7 @@ ActionInitObject(ActionExec& thread)
 
     // TODO: see if this could call the ASnative function(101, 9).
     Global_as& gl = getGlobal(env);
-    as_object* obj = gl.createObject();
+    as_object* obj = createObject(gl);
 
     obj->init_member(NSV::PROP_CONSTRUCTOR, getMember(gl, NSV::CLASS_OBJECT));
 
@@ -3284,7 +3284,7 @@ ActionDefineFunction2(ActionExec& thread)
             thread.getScopeStack());
 
     // We're stuck initializing our own prototype at the moment.
-    as_object* proto = getGlobal(env).createObject();
+    as_object* proto = createObject(getGlobal(env));
     proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
     func->init_member(NSV::PROP_PROTOTYPE, proto);
 	func->init_member(NSV::PROP_CONSTRUCTOR,
@@ -3509,7 +3509,7 @@ ActionDefineFunction(ActionExec& thread)
             thread.getScopeStack());
     
     // We're stuck initializing our own prototype at the moment.
-    as_object* proto = getGlobal(env).createObject();
+    as_object* proto = createObject(getGlobal(env));
     proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
     func->init_member(NSV::PROP_PROTOTYPE, proto);
 	func->init_member(NSV::PROP_CONSTRUCTOR,

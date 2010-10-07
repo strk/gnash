@@ -122,7 +122,7 @@ XMLNode_as::object()
     // but not quite. There is no __constructor__ property, and when we
     // override _global.XMLNode, we can show that it is not called.
     if (!_object) {
-        as_object* o = _global.createObject();
+        as_object* o = createObject(_global);
         as_object* xn =
             getMember(_global, NSV::CLASS_XMLNODE).to_object(_global);
         if (xn) {
@@ -500,7 +500,7 @@ void
 xmlnode_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachXMLNodeInterface(*proto);
     as_object* cl = gl.createClass(&xmlnode_new, proto);
 

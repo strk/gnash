@@ -207,7 +207,7 @@ date_class_init(as_object& global, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(global);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&date_new, proto);
     attachDateInterface(*proto);
     

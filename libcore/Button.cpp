@@ -920,7 +920,7 @@ button_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Button "class"/"function"
     Global_as& gl = getGlobal(global);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&button_ctor, proto);
     attachButtonInterface(*proto);
 

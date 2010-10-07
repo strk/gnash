@@ -114,7 +114,7 @@ void
 movieclip_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
 
     as_object* cl = gl.createClass(&movieclip_as2_ctor, proto);
     attachMovieClipAS2Interface(*proto);

@@ -895,7 +895,7 @@ get_flash_geom_matrix_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Matrix class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachMatrixInterface(*proto);
     return gl.createClass(&matrix_ctor, proto);
 }

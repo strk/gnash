@@ -404,7 +404,7 @@ get_flash_geom_color_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.ColorTransform class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&colortransform_ctor, proto);
     attachColorTransformInterface(*proto);
     return cl;

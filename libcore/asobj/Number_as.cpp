@@ -155,7 +155,7 @@ number_class_init(as_object& where, const ObjectURI& uri)
     VM& vm = getVM(where);
     Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = vm.getNative(106, 2);
     cl->init_member(NSV::PROP_PROTOTYPE, proto);
     proto->init_member(NSV::PROP_CONSTRUCTOR, cl);

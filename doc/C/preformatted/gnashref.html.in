@@ -2077,7 +2077,7 @@
               Global_as&amp; gl = getGlobal(where);
 
               // Create a prototype object
-              as_object* proto = gl.createObject();
+              as_object* proto = createObject(gl);
 
               // Create the class
               as_object* cl = gl.createClass(&amp;extension_ctor, proto);
