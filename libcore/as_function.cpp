@@ -307,7 +307,7 @@ function_apply(const fn_call& fn)
 
     return rv;
 }
-
+    
 as_value
 function_call(const fn_call& fn)
 {

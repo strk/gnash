@@ -101,13 +101,11 @@ as_value
 number_ctor(const fn_call& fn)
 {
     double val = 0;
-    if (fn.nargs > 0)
-    {
+    if (fn.nargs > 0) {
         val = fn.arg(0).to_number();
     }
 
-    if ( ! fn.isInstantiation() )
-    {
+    if (!fn.isInstantiation()) {
         return as_value(val);
     }
 

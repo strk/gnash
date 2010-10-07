@@ -354,8 +354,14 @@ VM::getNative(unsigned int x, unsigned int y) const
     Global_as::ASFunction fun = col->second;
 
     NativeFunction* f = new NativeFunction(*_global, fun);
-    f->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor());
+    
+    Global_as& gl = *_global;
+
+    as_object* func = getMember(gl, NSV::CLASS_FUNCTION).to_object(gl);
+    if (func) {
+        f->init_member(NSV::PROP_CONSTRUCTOR, getMember(*func,
+                    NSV::PROP_CONSTRUCTOR));
+    }
     return f;
 }
 
