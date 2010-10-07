@@ -430,15 +430,6 @@ private:
     ///
     bool equalsSameType(const as_value& v) const;
     
-    /// Conversion to boolean for SWF7 and up
-    bool to_bool_v7() const;
-    
-    /// Conversion to boolean for SWF6
-    bool to_bool_v6() const;
-    
-    /// Conversion to boolean up to SWF5
-    bool to_bool_v5() const;
-    
     AsType _type;
     
     AsValueType _value;

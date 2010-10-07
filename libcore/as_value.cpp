@@ -320,7 +320,7 @@ as_value::to_number() const
 }
 
 double
-as_value::to_number(const int swfversion) const
+as_value::to_number(const int version) const
 {
 
     switch (_type) {
@@ -328,10 +328,10 @@ as_value::to_number(const int swfversion) const
         {
             const std::string& s = getStr();
             if ( s.empty() ) {
-                return swfversion >= 5 ? NaN : 0.0;
+                return version >= 5 ? NaN : 0.0;
             }
             
-            if (swfversion <= 4)
+            if (version <= 4)
             {
                 // For SWF4, any valid number before non-numerical
                 // DisplayObjects is returned, including exponent, positive
@@ -344,7 +344,7 @@ as_value::to_number(const int swfversion) const
 
             try {
 
-                if (swfversion > 5) {
+                if (version > 5) {
                     double d;
                     // Will throw if invalid.
                     if (parseNonDecimalInt(s, d)) return d;
@@ -377,7 +377,7 @@ as_value::to_number(const int swfversion) const
         {
             // Evan: from my tests
             // Martin: FlashPlayer6 gives 0; FP9 gives NaN.
-            return (swfversion >= 7 ? NaN : 0);
+            return (version >= 7 ? NaN : 0);
         }
 
         case BOOLEAN: 
@@ -395,7 +395,7 @@ as_value::to_number(const int swfversion) const
             // Arrays and Movieclips should return NaN.
             try {
                 as_value ret = to_primitive(NUMBER);
-                return ret.to_number();
+                return ret.to_number(version);
             }
             catch (ActionTypeError& e)
             {
@@ -403,7 +403,7 @@ as_value::to_number(const int swfversion) const
                 log_debug(_("to_primitive(%s, NUMBER) threw an "
                             "ActionTypeError %s"), *this, e.what());
 #endif
-                if (is_function() && swfversion < 6) {
+                if (is_function() && version < 6) {
                     return 0;
                 }
                 
@@ -1002,7 +1002,8 @@ compareBoolean(const as_value& boolean, const as_value& other)
 }
 
 bool
-stringEqualsNumber(const as_value& str, const as_value& num) {
+stringEqualsNumber(const as_value& str, const as_value& num)
+{
     assert(num.is_number());
     assert(str.is_string());
     const double n = str.to_number();
