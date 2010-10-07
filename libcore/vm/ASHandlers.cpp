@@ -716,8 +716,8 @@ ActionAdd(ActionExec& thread)
 {
     as_environment& env = thread.env;
     
-    const double operand2 = env.top(0).to_number();
-    const double operand1 = env.top(1).to_number();
+    const double operand2 = toNumber(env.top(0), getVM(env));
+    const double operand1 = toNumber(env.top(1), getVM(env));
     env.top(1) = operand1 + operand2;
     env.drop(1);
 }
@@ -735,8 +735,8 @@ ActionMultiply(ActionExec& thread)
 {
     as_environment& env = thread.env;
     
-    const double operand2 = env.top(0).to_number();
-    const double operand1 = env.top(1).to_number();
+    const double operand2 = toNumber(env.top(0), getVM(env));
+    const double operand1 = toNumber(env.top(1), getVM(env));
     env.top(1) = operand1 * operand2;
     env.drop(1);
 }
@@ -751,8 +751,8 @@ ActionDivide(ActionExec& thread)
 {
     as_environment& env = thread.env;
     
-    const double operand2 = env.top(0).to_number();
-    const double operand1 = env.top(1).to_number();
+    const double operand2 = toNumber(env.top(0), getVM(env));
+    const double operand1 = toNumber(env.top(1), getVM(env));
 
     if (operand2 == 0) {
         if (env.get_version() < 5) {
@@ -787,8 +787,8 @@ ActionEqual(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_EQUAL)); // 0x0E
 #endif
 
-    const double op1 = env.top(0).to_number();
-    const double op2 = env.top(1).to_number();
+    const double op1 = toNumber(env.top(0), getVM(env));
+    const double op2 = toNumber(env.top(1), getVM(env));
 
     env.top(1).set_bool(op2 == op1);
 
@@ -804,8 +804,8 @@ ActionLessThan(ActionExec& thread)
     as_environment& env = thread.env;
     
     // NB: this unusual order is correct!
-    const double d2 = env.top(1).to_number();
-    const double d1 = env.top(0).to_number();
+    const double d2 = toNumber(env.top(1), getVM(env));
+    const double d1 = toNumber(env.top(0), getVM(env));
 
     env.top(1).set_bool(d2 < d1);
 
@@ -1091,8 +1091,7 @@ ActionGetProperty(ActionExec& thread)
  
     // FIXME: what happens when it's an invalid number? This will cause
     // undefined behaviour on overflow.
-    unsigned int prop_number =
-        static_cast<unsigned int>(env.top(0).to_number());
+    unsigned int prop_number = toNumber(env.top(0), getVM(env));
 
     if (target) {
         getIndexedProperty(prop_number, *target, env.top(1));
@@ -1116,7 +1115,7 @@ ActionSetProperty(ActionExec& thread)
     DisplayObject *target = env.find_target(env.top(2).to_string());
     // FIXME: what happens when it's an invalid number? This will cause
     // undefined behaviour on overflow.
-    unsigned int prop_number = (unsigned int)env.top(1).to_number();
+    unsigned int prop_number = toNumber(env.top(1), getVM(env));
 
     as_value prop_val = env.top(0);
 
@@ -1139,7 +1138,7 @@ ActionDuplicateClip(ActionExec& thread)
 
     // Movies should be attachable from -16384 to 2130690044. See
     // Tests in misc-ming.all/DepthLimitsTest.c.
-    const double depth = env.top(0).to_number() +
+    const double depth = toNumber(env.top(0), getVM(env)) +
         DisplayObject::staticDepthOffset;
   
     // This also checks for overflow, as both numbers are expressible as
@@ -1257,10 +1256,10 @@ ActionStartDragMovie(ActionExec& thread)
         // strk: this works if we didn't drop any before, in
         // a contrary case (if we used pop(), which I suggest)
         // we must remember to updated this as required
-        boost::int32_t y1 = pixelsToTwips(env.top(3).to_number());
-        boost::int32_t x1 = pixelsToTwips(env.top(4).to_number());
-        boost::int32_t y0 = pixelsToTwips(env.top(5).to_number());
-        boost::int32_t x0 = pixelsToTwips(env.top(6).to_number());
+        boost::int32_t y1 = pixelsToTwips(toNumber(env.top(3), getVM(env)));
+        boost::int32_t x1 = pixelsToTwips(toNumber(env.top(4), getVM(env)));
+        boost::int32_t y0 = pixelsToTwips(toNumber(env.top(5), getVM(env)));
+        boost::int32_t x0 = pixelsToTwips(toNumber(env.top(6), getVM(env)));
 
         // check for swapped values
         if (y1 < y0) {
@@ -1385,7 +1384,7 @@ ActionImplementsOp(ActionExec& thread)
 
     as_value objval = env.pop();
     as_object* obj = toObject(getGlobal(thread.env), objval);
-    int count = static_cast<int>(env.pop().to_number());
+    int count = toNumber(env.pop(), getVM(env));
 
     if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2334,7 +2333,7 @@ ActionCallFunction(ActionExec& thread)
     // Get number of args, modifying it if not enough values are on the stack.
     // TODO: this may cause undefined behaviour if the number on the stack
     // is too large. Fix it.
-    size_t nargs = static_cast<size_t>(env.pop().to_number());
+    size_t nargs = toNumber(env.pop(), getVM(env));
     const size_t available_args = env.stack_size(); 
     if (available_args < nargs) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -2393,12 +2392,11 @@ ActionModulo(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    as_value    result;
-    const double y = env.pop().to_number();
-    const double x = env.pop().to_number();
+    const double y = toNumber(env.pop(), getVM(env));
+    const double x = toNumber(env.pop(), getVM(env));
     // Don't need to check for y being 0 here - if it's zero,
     // fmod returns NaN, which is what flash would do too
-    result = std::fmod(x, y);
+    as_value result = std::fmod(x, y);
 
     env.push(result);
 }
@@ -2417,7 +2415,7 @@ ActionNew(ActionExec& thread)
             classname);
     );
 
-    unsigned nargs = unsigned(env.pop().to_number());
+    unsigned nargs = toNumber(env.pop(), getVM(env));
 
     as_value constructorval = thread.getVariable(classname);
     as_function* constructor = constructorval.to_function();
@@ -2787,14 +2785,14 @@ void
 ActionIncrement(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).set_double(env.top(0).to_number() + 1);
+    env.top(0).set_double(toNumber(env.top(0), getVM(env)) + 1);
 }
 
 void
 ActionDecrement(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).set_double(env.top(0).to_number() - 1);
+    env.top(0).set_double(toNumber(env.top(0), getVM(env)) - 1);
 }
 
 
@@ -2832,7 +2830,7 @@ ActionCallMethod(ActionExec& thread)
     as_value obj_value = env.pop();
 
     // Get number of args, modifying it if not enough values are on the stack.
-    size_t nargs = static_cast<size_t>(env.pop().to_number());
+    size_t nargs = toNumber(env.pop(), getVM(env));
     const size_t available_args = env.stack_size(); 
     if (available_args < nargs) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -2984,7 +2982,7 @@ ActionNewMethod(ActionExec& thread)
     as_value obj_val = env.pop();
 
     // Get number of args, modifying it if not enough values are on the stack.
-    unsigned nargs = unsigned(env.pop().to_number());
+    unsigned nargs = toNumber(env.pop(), getVM(env));
     unsigned available_args = env.stack_size(); // previous 3 entries popped
     if (available_args < nargs) {
         IF_VERBOSE_MALFORMED_SWF(
