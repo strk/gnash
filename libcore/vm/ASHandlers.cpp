@@ -3287,8 +3287,6 @@ ActionDefineFunction2(ActionExec& thread)
     as_object* proto = createObject(getGlobal(env));
     proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
     func->init_member(NSV::PROP_PROTOTYPE, proto);
-	func->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor());
     
     Global_as& gl = getGlobal(env);
     
@@ -3298,6 +3296,7 @@ ActionDefineFunction2(ActionExec& thread)
         func->set_member(NSV::PROP_uuPROTOuu, getMember(*f,
                     NSV::PROP_PROTOTYPE));
         func->set_member_flags(NSV::PROP_uuPROTOuu, flags);
+        func->init_member(NSV::PROP_CONSTRUCTOR, f);
     }
 
     size_t i = thread.getCurrentPC() + 3; // skip tag id and length
@@ -3531,6 +3530,7 @@ ActionDefineFunction(ActionExec& thread)
         func->set_member(NSV::PROP_uuPROTOuu, getMember(*f,
                     NSV::PROP_PROTOTYPE));
         func->set_member_flags(NSV::PROP_uuPROTOuu, flags);
+        func->init_member(NSV::PROP_CONSTRUCTOR, f);
     }
 
     size_t i = thread.getCurrentPC() + 3;
