@@ -357,7 +357,7 @@ VM::getNative(unsigned int x, unsigned int y) const
     
     Global_as& gl = *_global;
 
-    as_object* func = getOwnProperty(gl, NSV::CLASS_FUNCTION).to_object(gl);
+    as_function* func = getOwnProperty(gl, NSV::CLASS_FUNCTION).to_function();
     if (func) {
         f->init_member(NSV::PROP_CONSTRUCTOR, func);
         f->init_member(NSV::PROP_uuPROTOuu, getMember(*func,

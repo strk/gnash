@@ -3282,13 +3282,23 @@ ActionDefineFunction2(ActionExec& thread)
     // of the function body.
     Function2* func = new Function2(code, env, thread.getNextPC(),
             thread.getScopeStack());
-
+    
     // We're stuck initializing our own prototype at the moment.
     as_object* proto = createObject(getGlobal(env));
     proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
     func->init_member(NSV::PROP_PROTOTYPE, proto);
 	func->init_member(NSV::PROP_CONSTRUCTOR,
             as_function::getFunctionConstructor());
+    
+    Global_as& gl = getGlobal(env);
+    
+    as_function* f = getOwnProperty(gl, NSV::CLASS_FUNCTION).to_function();
+    if (f) {
+        const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+        func->set_member(NSV::PROP_uuPROTOuu, getMember(*f,
+                    NSV::PROP_PROTOTYPE));
+        func->set_member_flags(NSV::PROP_uuPROTOuu, flags);
+    }
 
     size_t i = thread.getCurrentPC() + 3; // skip tag id and length
 
@@ -3512,8 +3522,16 @@ ActionDefineFunction(ActionExec& thread)
     as_object* proto = createObject(getGlobal(env));
     proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
     func->init_member(NSV::PROP_PROTOTYPE, proto);
-	func->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor());
+    
+    Global_as& gl = getGlobal(env);
+    
+    as_function* f = getOwnProperty(gl, NSV::CLASS_FUNCTION).to_function();
+    if (f) {
+        const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+        func->set_member(NSV::PROP_uuPROTOuu, getMember(*f,
+                    NSV::PROP_PROTOTYPE));
+        func->set_member_flags(NSV::PROP_uuPROTOuu, flags);
+    }
 
     size_t i = thread.getCurrentPC() + 3;
 
