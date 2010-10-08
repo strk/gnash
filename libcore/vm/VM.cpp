@@ -27,7 +27,8 @@
 #include <iostream>
 #include <memory>
 #include <boost/random.hpp> // for random generator
-#include <cstdlib> // std::getenv
+#include <cstdlib> 
+#include <cmath>
 #ifdef HAVE_SYS_UTSNAME_H
 # include <sys/utsname.h> // For system information
 #endif
@@ -515,6 +516,20 @@ double
 toNumber(const as_value& v, const VM& vm)
 {
     return v.to_number(vm.getSWFVersion());
+}
+
+boost::int32_t
+toInt(const as_value& v, const VM& vm)
+{
+    const double d = val.to_number(vm.getSWFVersion());
+
+    if (!isFinite(d)) return 0;
+
+    if (d < 0) {   
+        return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
+    }
+    
+    return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
 }
 
 /// Force type to number.

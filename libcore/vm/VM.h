@@ -431,6 +431,11 @@ bool toBool(const as_value& v, const VM& vm);
 /// Convert an as_value to number type
 double toNumber(const as_value& v, const VM& vm);
 
+/// Convert an as_value to a 32-bit signed integer
+//
+/// Large numbers are truncated.
+boost::int32_t toInt(const as_value& val, const VM& vm);
+
 /// Force type to number.
 as_value& convertToNumber(as_value& v, const VM& vm);
 
