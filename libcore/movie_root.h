@@ -926,7 +926,7 @@ private:
 
     /// This initializes a SharedObjectLibrary, which requires 
     /// _originalURL, so that must be initialized first.
-    VM& _vm;
+    VM _vm;
 
     /// Registered Interface command handler, if any
     AbstractIfaceCallback* _interfaceHandler;

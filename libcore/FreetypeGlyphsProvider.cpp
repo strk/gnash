@@ -529,9 +529,12 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 
     FT_Outline_Decompose(outline, &walk, &walker);
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
+#if 0
+    // Don't use VM::get if this is to be re-enabled.
     SWFRect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
     log_debug("Decomposed glyph for DisplayObject '%c' has bounds %s",
             code, bound.toString());
+#endif
 #endif
 
     walker.finish();

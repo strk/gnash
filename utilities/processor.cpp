@@ -225,9 +225,6 @@ main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
 
-    /// Initialize gnash core library
-    gnashInit();
-
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
     std::setlocale (LC_ALL, "");

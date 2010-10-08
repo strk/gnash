@@ -51,40 +51,15 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 namespace gnash {
 
-// Pointer to our singleton
-std::auto_ptr<VM> VM::_singleton;
-
-VM&
-VM::init(int version, movie_root& root, VirtualClock& clock)
+void
+VM::init()
 {
-	// Don't call more then once !
-	assert(!_singleton.get());
+	NSV::loadStrings(_stringTable);
 
-	_singleton.reset(new VM(version, root, clock));
+    Global_as* gl(new Global_as(*this));
 
-	assert(_singleton.get());
-	NSV::loadStrings(_singleton->_stringTable);
-
-    Global_as* gl(new Global_as(*_singleton));
-
-	_singleton->setGlobal(gl);
+	setGlobal(gl);
     gl->registerClasses();
-
-	return *_singleton;
-}
-
-VM&
-VM::get()
-{
-	// Did you call VM::init ?
-	assert(_singleton.get());
-	return *_singleton;
-}
-
-bool
-VM::isInitialized()
-{
-	return _singleton.get();
 }
 
 VM::VM(int version, movie_root& root, VirtualClock& clock)
@@ -222,8 +197,6 @@ VM::markReachableResources() const
     std::for_each(_globalRegisters.begin(), _globalRegisters.end(), 
             std::mem_fun_ref(&as_value::setReachable));
 
-	_rootMovie.markReachableResources();
-
 	_global->setReachable();
 
     if (_shLib.get()) _shLib->markReachableResources();
@@ -323,12 +296,6 @@ VM::popCallFrame()
 {
     assert(!_callStack.empty());
     _callStack.pop_back();
-}
-
-void
-VmGcRoot::markReachableResources() const
-{
-	_vm.markReachableResources();
 }
 
 void

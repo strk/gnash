@@ -118,13 +118,13 @@ GtkAggXvGlue::createRenderHandler()
 }
 
 void
-GtkAggXvGlue::setupRendering()
+GtkAggXvGlue::setupRendering(movie_root* stage)
 {
     static bool first = true;
-    if (first && VM::isInitialized()) {
+    if (first && stage) {
         first = false;
         
-        const Movie& mi = VM::get().getRoot().getRootMovie();
+        const Movie& mi = stage->getRootMovie();
     
         _movie_width = mi.widthPixels();
         _movie_height = mi.heightPixels();        
@@ -166,9 +166,9 @@ GtkAggXvGlue::setupRendering()
 
 
 void 
-GtkAggXvGlue::beforeRendering()
+GtkAggXvGlue::beforeRendering(movie_root* stage)
 {
-    setupRendering();
+    setupRendering(stage);
     
     // We force the scale to its original state in case the GUI changed it (in
     // the event of a resize), because we want Xv to do the scaling for us.    

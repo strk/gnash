@@ -129,7 +129,7 @@ movie_root::movie_root(const movie_definition& def,
         VirtualClock& clock, const RunResources& runResources)
     :
     _runResources(runResources),
-    _vm(VM::init(def.get_version(), *this, clock)),
+    _vm(def.get_version(), *this, clock),
     _interfaceHandler(0),
     _fsCommandHandler(0),
     _stageWidth(1),
@@ -163,6 +163,8 @@ movie_root::movie_root(const movie_definition& def,
     _unnamedInstance(0),
     _movieLoader(*this)
 {
+    gnashInit(*this);
+    _vm.init();
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
 }
@@ -207,6 +209,8 @@ movie_root::~movie_root()
     clearActionQueue();
     clearIntervalTimers();
     _movieLoader.clear();
+
+    _vm.clear();
 
     assert(testInvariant());
 }
@@ -1707,6 +1711,8 @@ movie_root::executeTimers()
 void
 movie_root::markReachableResources() const
 {
+    _vm.markReachableResources();
+
     foreachSecond(_movies.rbegin(), _movies.rend(), &MovieClip::setReachable);
 
     // Mark original top-level movie

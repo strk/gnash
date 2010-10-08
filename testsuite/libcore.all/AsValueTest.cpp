@@ -111,7 +111,6 @@ main(int argc, char *argv[])
     }
 
     // Initialize gnash lib
-    gnashInit();
     
     RunResources runResources;
     runResources.setStreamProvider(
@@ -123,6 +122,7 @@ main(int argc, char *argv[])
     ManualClock clock;
 
     movie_root stage(*md, clock, runResources);
+    gnashInit(stage);
 
     MovieClip::MovieVariables v;
     // We pass 'v' twice, as the second one is for scriptable

@@ -27,6 +27,7 @@
 // Forward declarations.
 namespace gnash {
     class Renderer;
+    class movie_root;
 }
 
 G_BEGIN_DECLS
@@ -49,7 +50,7 @@ GType            gnash_canvas_get_type              ();
 GtkWidget       *gnash_canvas_new                   ();
 
 void             gnash_canvas_setup                 (GnashCanvas *canvas, std::string &hwaccel, std::string &renderer, int argc, char **argv[]);
-void             gnash_canvas_before_rendering      (GnashCanvas *canvas);
+void             gnash_canvas_before_rendering      (GnashCanvas *canvas, gnash::movie_root* stage);
 boost::shared_ptr<gnash::Renderer>  gnash_canvas_get_renderer   (GnashCanvas *canvas);
 
 G_END_DECLS

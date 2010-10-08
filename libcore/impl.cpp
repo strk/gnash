@@ -35,6 +35,7 @@
 #include "VM.h"
 #include "MovieLibrary.h"
 #include "gnash.h" // DSOEXPORTS
+#include "movie_root.h"
 
 #ifdef GNASH_USE_GC
 #include "GC.h"
@@ -72,8 +73,6 @@ void  clear()
     log_debug("Any segfault past this message is likely due to improper "
             "threads cleanup.");
 
-    VM::get().clear();
-
     MovieFactory::movieLibrary.clear();
     fontlib::clear();
 
@@ -92,21 +91,25 @@ class GnashGcRoot : public GcRoot
 
 public:
 
-  GnashGcRoot()
+  GnashGcRoot(movie_root& mr)
+      :
+      _mr(mr)
   {
   }
 
   void markReachableResources() const
   {
-    VM::get().markReachableResources();
+    _mr.markReachableResources();
   }
+private:
+  movie_root& _mr;
 };
 #endif
 
-void gnashInit()
+void gnashInit(movie_root& mr)
 {
 #ifdef GNASH_USE_GC
-  static GnashGcRoot gcRoot;
+  static GnashGcRoot gcRoot(mr);
   GC::init(gcRoot);
 #endif
 }

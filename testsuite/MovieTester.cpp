@@ -75,9 +75,6 @@ MovieTester::MovieTester(const std::string& url)
     _forceRedraw(true)
 {
     
-    // Initialize gnash code lib
-    gnashInit();
-    
     // Initialize the testing media handlers
     initTestingMediaHandlers();
     

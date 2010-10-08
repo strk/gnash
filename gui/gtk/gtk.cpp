@@ -946,7 +946,7 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::beforeRendering()
 {
-    gnash_canvas_before_rendering(GNASH_CANVAS(_canvas));
+    gnash_canvas_before_rendering(GNASH_CANVAS(_canvas), getStage());
 }
 
 void

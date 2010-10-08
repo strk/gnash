@@ -146,15 +146,12 @@ local_check(const std::string& path, const URL& baseUrl)
     assert( ! path.empty() );
 
     // Don't allow local access if starting movie is a network resource.
-    if ( VM::isInitialized() )
-    {
-       if (baseUrl.protocol() != "file") {
-          log_security(_("Load of file %s forbidden"
-              " (starting url %s is not a local resource)"),
-              path, baseUrl.str());
-          return false;
-       }
-    } // else we didn't start yet, so path *is* the starting movie
+   if (baseUrl.protocol() != "file") {
+      log_security(_("Load of file %s forbidden"
+          " (starting url %s is not a local resource)"),
+          path, baseUrl.str());
+      return false;
+   }
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     

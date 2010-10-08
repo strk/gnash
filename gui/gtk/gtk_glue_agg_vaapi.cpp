@@ -257,19 +257,18 @@ GtkAggVaapiGlue::setRenderHandlerSize(int width, int height)
 }
 
 void 
-GtkAggVaapiGlue::beforeRendering()
+GtkAggVaapiGlue::beforeRendering(movie_root* stage)
 {
     // Process all GDK pending operations
     gdk_flush();
 
     if (USE_HW_SCALING) {
-        movie_root & stage = VM::get().getRoot();
 
         static bool first = true;
-        if (first && VM::isInitialized()) {
+        if (first && stage) {
             first = false;
 
-            Movie const & mi = stage.getRootMovie();
+            Movie const & mi = stage->getRootMovie();
             const unsigned int width  = mi.widthPixels();
             const unsigned int height = mi.heightPixels();
             resetRenderSurface(width, height);

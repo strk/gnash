@@ -265,7 +265,7 @@ Gui::restart()
 void
 Gui::updateStageMatrix()
 {
-    if ( ! VM::isInitialized() ) {
+    if (!_stage) {
         // When VM initializes, we'll get a call to resize_view, which
         // would call us again.
         //log_debug("Can't update stage matrix till VM is initialized");
@@ -423,14 +423,9 @@ Gui::resize_view(int width, int height)
 	assert(width>0);
 	assert(height>0);
 
-	if ( VM::isInitialized() )
-	{
-
-		if (_stage && _started) {
-			_stage->setDimensions(width, height);
-		}
-
-	}
+    if (_stage && _started) {
+        _stage->setDimensions(width, height);
+    }
 
 	_width = width;
 	_height = height;
@@ -1099,7 +1094,7 @@ Gui::getMovieInfo() const
 {
     std::auto_ptr<InfoTree> tr;
 
-    if (! VM::isInitialized()) {
+    if (!_stage) {
         return tr;
     }
 

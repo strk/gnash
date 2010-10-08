@@ -71,7 +71,7 @@ class GtkGlue
     virtual void configure(GtkWidget *const widget,
             GdkEventConfigure *const event) = 0;
     
-    virtual void beforeRendering() {};
+    virtual void beforeRendering(movie_root*) {};
 
   protected:
     GtkWidget *_drawing_area;

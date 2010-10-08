@@ -65,9 +65,6 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
 
-	// Initialize gnash lib
-	gnashInit();
-
     // We don't care about the base URL.
     RunResources runResources;
     runResources.setStreamProvider(
@@ -83,6 +80,7 @@ main(int /*argc*/, char** /*argv*/)
 	ManualClock clock;
 
     movie_root root(*md5, clock, runResources);
+    gnashInit(root);
 
     // We pass MovieClip::MovieVariables() twice, as the second one is
     // for scriptable Variables, which isn't fully implemented yet.

@@ -47,7 +47,7 @@ class GtkAggXvGlue : public GtkGlue
     bool init(int argc, char **argv[]);
     void prepDrawingArea(GtkWidget *drawing_area);
     Renderer* createRenderHandler();
-    void beforeRendering();
+    virtual void beforeRendering(movie_root* stage);
     void render();
     void render(int minx, int miny, int maxx, int maxy);
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
@@ -58,7 +58,7 @@ class GtkAggXvGlue : public GtkGlue
     bool create_xv_image(unsigned int width, unsigned int height);
     bool create_xv_shmimage(unsigned int width, unsigned int height);
     void destroy_x_image();
-    void setupRendering();
+    void setupRendering(movie_root* stage);
     void decode_mask(unsigned long mask, unsigned int *shift, unsigned int *size);
     bool isFormatBetter(const XvImageFormatValues& oldformat,
                         const XvImageFormatValues& newformat);

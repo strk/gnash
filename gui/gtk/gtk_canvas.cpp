@@ -313,9 +313,9 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
 }
 
 void
-gnash_canvas_before_rendering(GnashCanvas *canvas)
+gnash_canvas_before_rendering(GnashCanvas *canvas, gnash::movie_root* stage)
 {
-    canvas->glue->beforeRendering();
+    canvas->glue->beforeRendering(stage);
 }
 
 boost::shared_ptr<gnash::Renderer>

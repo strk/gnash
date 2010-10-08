@@ -57,17 +57,6 @@ namespace gnash {
 
 namespace gnash {
 
-/// A GC root used to mark all reachable collectable pointers
-class VmGcRoot : public GcRoot 
-{
-public:
-	VmGcRoot(VM& vm) : _vm(vm) {}
-	virtual void markReachableResources() const;
-
-private:
-    VM& _vm;
-};
-
 /// The AVM1 virtual machine
 //
 /// The VM class has no code for execution, but rather stores the resources
@@ -90,6 +79,16 @@ class DSOEXPORT VM : boost::noncopyable
 public:
 
 	typedef as_value (*as_c_function_ptr)(const fn_call& fn);
+	
+    /// Use VM::get() to access the singleton
+	//
+	/// Initializes the GC singleton
+	///
+	VM(int version, movie_root& root, VirtualClock& clock);
+
+	/// Should deinitialize the GC singleton
+	/// If it doesn't is just because it corrupts memory :)
+	~VM();
 
     /// \brief
 	/// Initialize the virtual machine singleton with the given
@@ -108,7 +107,7 @@ public:
 	/// @param clock
 	///	Virtual clock used as system time.
 	///
-	static VM& init(int version, movie_root& root, VirtualClock& clock);
+	void init();
 
 	SafeStack<as_value>& getStack() {
 		return _stack;
@@ -125,9 +124,6 @@ public:
         return _clock;
     }
 
-	/// Return true if the singleton VM has been initialized
-	static bool isInitialized();
-
     /// Resets any VM members that must be cleared before the GC cleans up
     //
     /// At present, this is:
@@ -138,15 +134,6 @@ public:
     /// It is assumed that this is the last VM function called before the
     /// dtor.
     void clear();
-
-	/// Get the singleton instance of the virtual machine
-	//
-	/// Make sure you called VM::init() before trying to
-	/// get the singleton (an assertion would fail otherwise)
-	///
-	/// Use isInitialized() if you're unsure.
-	///
-	static VM& get();
 
 	/// Get SWF version context for the currently running actions.
 	//
@@ -304,23 +291,6 @@ public:
     void dumpState(std::ostream& o, size_t limit = 0);
 
 private:
-
-	friend class VmGcRoot;
-
-	/// Use VM::get() to access the singleton
-	//
-	/// Initializes the GC singleton
-	///
-	VM(int version, movie_root& root, VirtualClock& clock);
-
-	/// Should deinitialize the GC singleton
-	/// If it doesn't is just because it corrupts memory :)
-	~VM();
-
-	// We use an auto_ptr here to allow constructing
-	// the singleton when the init() function is called.
-	friend class std::auto_ptr<VM>;
-	static std::auto_ptr<VM> _singleton;
 
 	/// Stage associated with this VM
 	movie_root& _rootMovie;

@@ -206,7 +206,6 @@ gnash_view_init(GnashView *view)
 
     // Initializations that can happen before realization come here. The rest
     // come after realize, in gnash_view_realize_cb.
-    gnash::gnashInit();
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setVerbosity(3);
 
@@ -456,6 +455,8 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     view->system_clock.reset(new gnash::SystemClock());
     view->virtual_clock.reset(new gnash::InterruptableVirtualClock(*view->system_clock));
     view->stage.reset(new gnash::movie_root(*view->movie_definition, *view->virtual_clock, *view->run_info));
+    
+    gnash::gnashInit(*view->stage);
     view->movie_definition->completeLoad();
 
     view->advance_timer = g_timeout_add_full(G_PRIORITY_LOW, 10,
@@ -505,7 +506,7 @@ gnash_view_display(GnashView *view)
     renderer->set_invalidated_regions(changed_ranges);
     gdk_window_invalidate_rect(GTK_WIDGET(view->canvas)->window, NULL, false);
 
-    gnash_canvas_before_rendering(view->canvas);
+    gnash_canvas_before_rendering(view->canvas, view->stage.get());
 	view->stage->display();
 
     gdk_window_process_updates(GTK_WIDGET(view->canvas)->window, false);

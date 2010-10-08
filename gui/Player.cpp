@@ -107,7 +107,6 @@ Player::Player()
     _startFullscreen(false),
     _hideMenu(false)
 {
-    init();
 }
 
 float
@@ -116,14 +115,6 @@ Player::setScale(float newscale)
     float oldscale = _scale;
     _scale = newscale;
     return oldscale;
-}
-
-void
-Player::init()
-{
-    /// Initialize gnash core library
-    gnashInit();
-
 }
 
 void

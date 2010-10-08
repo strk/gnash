@@ -40,7 +40,7 @@ class GtkAggGlue : public GtkGlue
     void prepDrawingArea(GtkWidget *drawing_area);
     Renderer* createRenderHandler();
     void setRenderHandlerSize(int width, int height);
-    void beforeRendering();
+    virtual void beforeRendering(movie_root* stage);
     void render();
     void render(int minx, int miny, int maxx, int maxy);
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);

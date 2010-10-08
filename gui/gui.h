@@ -472,7 +472,7 @@ public:
     void setStage(movie_root* stage);
 
     /// The root movie, or "Stage"
-    movie_root *getStage() { return _stage; };
+    movie_root* getStage() { return _stage; };
     
     /// Handle error message from the core
     //

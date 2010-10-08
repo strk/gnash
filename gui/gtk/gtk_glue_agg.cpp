@@ -128,7 +128,7 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 }
 
 void 
-GtkAggGlue::beforeRendering()
+GtkAggGlue::beforeRendering(movie_root*)
 {
     if (_offscreenbuf && _offscreenbuf->type == GDK_IMAGE_SHARED) {
          gdk_flush();
