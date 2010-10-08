@@ -1012,6 +1012,16 @@ private:
 
     void handleActionLimitHit(const std::string& ref);
 
+    /// Buttons listening for key events
+    //
+    /// Note that Buttons (the only key listeners left) deregister themselves
+    /// on destruction. This isn't correct behaviour and also requires that
+    /// _keyListeners be alive longer than _gc so that deregistration doesn't
+    /// access a destroyed object.
+    //
+    /// TODO: fix it.
+    Listeners _keyListeners;
+
     GC _gc;
 
     const RunResources& _runResources; 
@@ -1074,9 +1084,6 @@ private:
     Keys _unreleasedKeys;   
 
     key::code _lastKeyEvent;
-
-    /// Characters for listening key events
-    Listeners _keyListeners;
 
     /// The DisplayObject currently holding focus, or 0 if no focus.
     DisplayObject* _currentFocus;
