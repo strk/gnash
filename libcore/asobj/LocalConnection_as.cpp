@@ -207,9 +207,7 @@ public:
     /// @param owner    The as_object that owns this Relay.
     LocalConnection_as(as_object* owner);
     
-    virtual ~LocalConnection_as() {
-        close();
-    }
+    virtual ~LocalConnection_as() {}
 
     /// Remove ourself as a listener (if connected).
     void close();

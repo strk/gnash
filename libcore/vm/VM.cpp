@@ -78,7 +78,6 @@ VM::setSWFVersion(int v)
 VM::RNG&
 VM::randomNumberGenerator() const
 {
-
 	static RNG rnd(_clock.elapsed());
 	return rnd;
 }

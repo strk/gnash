@@ -311,8 +311,6 @@ void adjust_volume(boost::int16_t* data, int size, int volume)
 
 NetStream_as::~NetStream_as()
 {
-    // close will also detach from sound handler
-    close();
 }
 
 
@@ -1042,7 +1040,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
         if ( ! audio->m_size )
         {
             // Don't bother pushing an empty frame
-            // to the audio queue...
+            // to the audio Queue...
             log_debug("pushDecodedAudioFrames(%d): Decoded audio frame "
                     "contains no samples");
             delete audio;
