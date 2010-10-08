@@ -68,9 +68,9 @@ main(int /*argc*/, char** /*argv*/)
 	check(loaded);
 	check_equals(loaded->parent(), root);
 
-    VM& vm = VM::get();
+    VM& vm = tester.vm();
 
-	string_table& st = VM::get().getStringTable();
+	string_table& st = vm.getStringTable();
 	string_table::key xscale = st.find("_xscale");
 	string_table::key yscale = st.find("_yscale");
 	// we need a const_cast as get_member *might* eventually

@@ -79,9 +79,9 @@ main(int /*argc*/, char** /*argv*/)
 	// check that the pixel under the mouse is white
 	check_pixel(100, 30, 2, rgba(255,255,255,255), 2);
 
-    VM& vm = VM::get();
+	VM& vm = tester.vm();
 
-	string_table& st = VM::get().getStringTable();
+	string_table& st = vm.getStringTable();
 
 	getObject(root)->get_member(st.find("mousedown"), &tmp);
 	check(tmp.is_undefined());

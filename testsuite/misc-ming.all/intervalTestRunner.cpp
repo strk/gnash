@@ -61,7 +61,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Now timers are set and counters initialized
 
-	VM& vm = VM::get();
+	VM& vm = tester.vm();
 	string_table& st = vm.getStringTable();
 	getObject(root)->get_member(st.find("this_counter"), &tmp);
 	check_equals(toNumber(tmp, vm), 0);

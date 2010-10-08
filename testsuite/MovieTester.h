@@ -207,6 +207,11 @@ public:
 	void checkPixel(int x, int y, unsigned radius, const rgba& color,
 			short unsigned tolerance, const std::string& label, bool expectFailure=false) const;
 
+    VM& vm() {
+        assert(_movie_root);
+        return _movie_root->getVM();
+    }
+
 	/// Notify mouse button was pressed
 	void pressMouseButton();
 

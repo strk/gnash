@@ -65,7 +65,7 @@ main(int /*argc*/, char** /*argv*/)
 	// When all possible tests are implemented as self-contained, we'll
 	// add tests that can't be self-contained.
 	//
-	string_table& st = VM::get().getStringTable();
+	string_table& st = tester.vm().getStringTable();
 	string_table::key k = st.find("startNotified");
 	as_value tmp;
 	while (!getObject(root)->get_member(k, &tmp) )
