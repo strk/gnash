@@ -105,8 +105,8 @@ generic_callback(GtkWidget * /*widget*/, gpointer data)
 	cerr << "event is: \"" << event << "\"" << endl;
     }
     
-    as_value	val;
-    as_environment env(VM::get());
+    as_value val;
+    as_environment env(getVM(*as_func));
 
     fn_call::Args args;
     args += handler, event, handler;
