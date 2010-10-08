@@ -475,18 +475,6 @@ private:
     
 };
 
-/// Force type to number.
-as_value& convertToNumber(as_value& v, const VM& vm);
-
-/// Force type to string.
-as_value& convertToString(as_value& v, const VM& vm);
-
-/// Force type to bool.
-as_value& convertToBoolean(as_value& v, const VM& vm);
-
-/// Convert to primitive type
-as_value& convertToPrimitive(as_value& v, const VM& vm);
-
 /// Stream operator.
 std::ostream& operator<<(std::ostream& os, const as_value& v);
 

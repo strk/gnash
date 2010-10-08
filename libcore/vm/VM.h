@@ -425,9 +425,23 @@ void subtract(as_value& op1, const as_value& op2, const VM& vm);
 /// @param vm       The VM executing the operation.
 as_value newLessThan(const as_value& op1, const as_value& op2, const VM& vm);
 
+/// Convert an as_value to boolean type
 bool toBool(const as_value& v, const VM& vm);
 
+/// Convert an as_value to number type
 double toNumber(const as_value& v, const VM& vm);
+
+/// Force type to number.
+as_value& convertToNumber(as_value& v, const VM& vm);
+
+/// Force type to string.
+as_value& convertToString(as_value& v, const VM& vm);
+
+/// Force type to bool.
+as_value& convertToBoolean(as_value& v, const VM& vm);
+
+/// Convert to primitive type
+as_value& convertToPrimitive(as_value& v, const VM& vm);
 
 } // namespace gnash
 

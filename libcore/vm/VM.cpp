@@ -517,6 +517,39 @@ toNumber(const as_value& v, const VM& vm)
     return v.to_number(vm.getSWFVersion());
 }
 
+/// Force type to number.
+as_value&
+convertToNumber(as_value& v, const VM& vm)
+{
+    v.set_double(v.to_number(vm.getSWFVersion()));
+    return v;
+}
+
+/// Force type to string.
+as_value&
+convertToString(as_value& v, const VM& vm)
+{
+    v.set_string(v.to_string(vm.getSWFVersion()));
+    return v;
+}
+
+/// Force type to bool.
+as_value&
+convertToBoolean(as_value& v, const VM& vm)
+{
+    v.set_bool(v.to_bool(vm.getSWFVersion()));
+    return v;
+}
+
+as_value&
+convertToPrimitive(as_value& v, const VM& vm)
+{
+    const as_value::AsType t(v.defaultPrimitive(vm.getSWFVersion()));
+    v = v.to_primitive(t);
+    return v;
+}
+
+
 } // end of namespace gnash
 
 
