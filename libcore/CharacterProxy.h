@@ -87,6 +87,7 @@ public:
 		sp.checkDangling();
 		_ptr = sp._ptr;
 		if (!_ptr) _tgt = sp._tgt;
+        _mr = sp._mr;
 		return *this;
 	}
 
