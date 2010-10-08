@@ -538,7 +538,7 @@ fileio_asyncmode(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     FileIO* ptr = ensure<ThisIsNative<FileIO> >(fn);
     assert(ptr);
-    bool b = (bool) fn.arg(0).to_bool();
+    bool b = toBool(fn.arg(0), getVM(fn));
     return as_value(ptr->asyncmode(b));
 }
 
