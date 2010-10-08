@@ -58,7 +58,8 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 	_swfversion(version),
 	_clock(clock),
 	_stack(),
-    _shLib(new SharedObjectLibrary(*this))
+    _shLib(new SharedObjectLibrary(*this)),
+    _rng(clock.elapsed())
 {
 	NSV::loadStrings(_stringTable);
     _global->registerClasses();
@@ -76,10 +77,9 @@ VM::setSWFVersion(int v)
 }
 
 VM::RNG&
-VM::randomNumberGenerator() const
+VM::randomNumberGenerator() 
 {
-	static RNG rnd(_clock.elapsed());
-	return rnd;
+	return _rng;
 }
 
 const std::string&

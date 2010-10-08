@@ -174,12 +174,7 @@ public:
 
 	// Get a pointer to the random number generator for
 	// use by Math.random() and random().
-	//
-	// The seed is the system time in milliseconds at the first call
-	// to a random function. This allows a potentially variable amount
-	// of time to elapse between starting gnash and initialization of
-	// the generator, so decreasing predictability.
-	RNG& randomNumberGenerator() const;
+	RNG& randomNumberGenerator();
 
 	/// Get a pointer to this VM's Root movie (stage)
 	movie_root& getRoot() const;
@@ -305,6 +300,8 @@ private:
 	/// Library of SharedObjects. Owned by the VM.
     std::auto_ptr<SharedObjectLibrary> _shLib;
 
+    RNG _rng;
+
 };
 
 /// A class to wrap frame access.  Stack allocating a frame guard
@@ -374,12 +371,33 @@ void subtract(as_value& op1, const as_value& op2, const VM& vm);
 /// @param vm       The VM executing the operation.
 as_value newLessThan(const as_value& op1, const as_value& op2, const VM& vm);
 
+/// Check if two values are equal
+//
+/// Note that conversions are performed as necessary, which can result in
+/// function calls, which can have any conceivable side effect. The order of
+/// the values affects the order the conversions are performed in, so can
+/// under some circumstances change the result of the comparison.
+//
+/// Equality comparisons depend strongly on the SWF version.
+//
+/// @param a    The first value to compare
+/// @param b    The second value to compare
+/// @param vm   The VM to use for the comparison.
+/// @return     Whether the values are considered equal.
 bool equals(const as_value& a, const as_value& b, const VM& vm);
 
 /// Convert an as_value to boolean type
+//
+/// @param val  The value to return as a boolean
+/// @param vm   The VM to use for the conversion.
+/// @return     The boolean value of the passed as_value.
 bool toBool(const as_value& v, const VM& vm);
 
-/// Convert an as_value to number type
+/// Convert an as_value to a double
+//
+/// @param val  The value to return as a double
+/// @param vm   The VM to use for the conversion.
+/// @return     The double value of the passed as_value.
 double toNumber(const as_value& v, const VM& vm);
 
 /// AS2-compatible conversion to 32bit integer
@@ -389,23 +407,43 @@ double toNumber(const as_value& v, const VM& vm);
 /// the stored number type.
 //
 /// This function calls to_number(), so performs a conversion if necessary.
+//
+/// @param val  The value to return as an int.
+/// @param vm   The VM to use for the conversion.
+/// @return     The integer value of the passed as_value.
 boost::int32_t toInt(const as_value& val, const VM& vm);
 
 /// Force type to number.
+//
+/// @param v    The value to change to a number type.
+/// @param vm   The VM to use for the conversion.
+/// @return     The value passed as v.
 as_value& convertToNumber(as_value& v, const VM& vm);
 
 /// Force type to string.
+//
+/// @param v    The value to change to a string type.
+/// @param vm   The VM to use for the conversion.
+/// @return     The value passed as v.
 as_value& convertToString(as_value& v, const VM& vm);
 
 /// Force type to bool.
+//
+/// @param v    The value to change to a bool type.
+/// @param vm   The VM to use for the conversion.
+/// @return     The value passed as v.
 as_value& convertToBoolean(as_value& v, const VM& vm);
 
-/// Convert to primitive type
+/// Convert to the appropriate primitive type
+//
+/// @param v    The value to change to a primitive type.
+/// @param vm   The VM to use for the conversion.
+/// @return     The value passed as v.
 as_value& convertToPrimitive(as_value& v, const VM& vm);
 
 } // namespace gnash
 
-#endif // GNASH_VM_H
+#endif
 
 // Local Variables:
 // mode: C++
