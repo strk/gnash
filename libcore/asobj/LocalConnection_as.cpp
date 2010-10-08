@@ -17,14 +17,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "LocalConnection_as.h"
+
+#include <boost/shared_ptr.hpp>
+#include <cerrno>
+#include <cstring>
+#include <boost/cstdint.hpp> // for boost::?int??_t
+#include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
+
 #include "GnashSystemIOHeaders.h"
 
 #include "VM.h"
 #include "movie_root.h"
-#include "URLAccessManager.h"
 #include "URL.h"
 #include "log.h"
-#include "LocalConnection_as.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "builtin_function.h"
@@ -36,13 +43,9 @@
 #include "AMFConverter.h"
 #include "ClockTime.h"
 #include "GnashAlgorithm.h"
+#include "RunResources.h"
+#include "StreamProvider.h"
 
-#include <boost/shared_ptr.hpp>
-#include <cerrno>
-#include <cstring>
-#include <boost/cstdint.hpp> // for boost::?int??_t
-#include <boost/assign/list_of.hpp>
-#include <boost/bind.hpp>
 
 /// From observing the behaviour of the pp, the following seem to be true.
 //
@@ -934,7 +937,7 @@ std::string
 getDomain(as_object& o)
 {
     
-    URL url(getRoot(o).getOriginalURL());
+    const URL& url = getRunResources(o).streamProvider().url();
 
     if (url.hostname().empty()) {
         return "localhost";

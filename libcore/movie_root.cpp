@@ -128,7 +128,6 @@ movie_root::movie_root(const movie_definition& def,
         VirtualClock& clock, const RunResources& runResources)
     :
     _runResources(runResources),
-    _originalURL(def.get_url()),
     _vm(VM::init(def.get_version(), *this, clock)),
     _interfaceHandler(0),
     _fsCommandHandler(0),

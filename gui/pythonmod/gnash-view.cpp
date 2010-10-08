@@ -427,7 +427,8 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     view->run_info->setSoundHandler(view->sound_handler);
 
     std::auto_ptr<gnash::NamingPolicy> np(new gnash::IncrementalRename(url));
-    boost::shared_ptr<gnash::StreamProvider> sp(new gnash::StreamProvider(np));
+    boost::shared_ptr<gnash::StreamProvider> sp(
+	    new gnash::StreamProvider(uri, np));
     view->run_info->setStreamProvider(sp);
 
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();

@@ -41,7 +41,7 @@ class DSOEXPORT StreamProvider
 
 public:
 
-	StreamProvider(std::auto_ptr<NamingPolicy> = 
+	StreamProvider(const std::string& url, std::auto_ptr<NamingPolicy> = 
             std::auto_ptr<NamingPolicy>(new NamingPolicy));
 
 	virtual ~StreamProvider() {}
@@ -80,22 +80,28 @@ public:
     //
     /// This is only used when cache file naming is requested in getStream()
     /// This StreamProvider owns the NamingPolicy instance.
-    void setNamingPolicy(std::auto_ptr<NamingPolicy> np)
-    {
+    void setNamingPolicy(std::auto_ptr<NamingPolicy> np) {
         _namingPolicy = np;
     }
 
     /// Return the currently selected policy for converting URL to filename
-    const NamingPolicy& namingPolicy() const
-    {
+    const NamingPolicy& namingPolicy() const {
         assert(_namingPolicy.get());
         return *_namingPolicy;
+    }
+
+    bool allow(const URL& url) const;
+
+    const URL& url() const {
+        return _url;
     }
 
 private:
 
     /// The current naming policy for cache files.
     std::auto_ptr<NamingPolicy> _namingPolicy;
+
+    const URL _url;
 
 };
 

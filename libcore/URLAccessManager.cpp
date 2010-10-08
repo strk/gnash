@@ -139,7 +139,7 @@ pathIsUnderDir(const std::string& path, const std::string& dir)
 /// Return true if we allow load of the local resource, false otherwise.
 //
 static bool
-local_check(const std::string& path)
+local_check(const std::string& path, const URL& baseUrl)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -148,9 +148,7 @@ local_check(const std::string& path)
     // Don't allow local access if starting movie is a network resource.
     if ( VM::isInitialized() )
     {
-       URL baseUrl(VM::get().getRoot().getOriginalURL());
-       if ( baseUrl.protocol() != "file" )
-       {
+       if (baseUrl.protocol() != "file") {
           log_security(_("Load of file %s forbidden"
               " (starting url %s is not a local resource)"),
               path, baseUrl.str());
@@ -275,7 +273,7 @@ allowXMLSocket(const std::string& host, short port)
 
 
 bool
-allow(const URL& url)
+allow(const URL& url, const URL& baseurl)
 {
 	log_security(_("Checking security of URL '%s'"), url);
 
@@ -292,7 +290,7 @@ allow(const URL& url)
             log_error(_("Network connection without hostname requested"));
             return false;
         }
-		return local_check(url.path());
+		return local_check(url.path(), baseurl);
 	}
 	return host_check(host);
 }

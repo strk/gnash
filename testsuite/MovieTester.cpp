@@ -93,8 +93,9 @@ MovieTester::MovieTester(const std::string& url)
     
     _runResources->setTagLoaders(loaders);
     
-    _runResources->setStreamProvider(boost::shared_ptr<StreamProvider>(
-						       new StreamProvider));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(url));
+
+    _runResources->setStreamProvider(sp);
 
     if ( url == "-" ) {
 	std::auto_ptr<IOChannel> in (

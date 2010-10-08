@@ -36,7 +36,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
-#include "URLAccessManager.h"
 #include "VM.h"
 #include "rc.h"
 #include "as_value.h"
@@ -48,6 +47,8 @@
 #include "PropertyList.h"
 #include "movie_root.h"
 #include "log.h"
+#include "RunResources.h"
+#include "StreamProvider.h"
 
 #define MAXHOSTNAMELEN 256 // max hostname size. However this is defined in netdb.h
 
@@ -314,9 +315,10 @@ externalinterface_available(const fn_call& fn)
           
       case movie_root::SCRIPT_ACCESS_SAME_DOMAIN:
       {
-          const std::string& baseurl = m.getOriginalURL();
+          const RunResources& r = m.runResources();
+          const std::string& baseurl = r.baseURL();
           char hostname[MAXHOSTNAMELEN];
-          memset(hostname, 0, MAXHOSTNAMELEN);
+          std::memset(hostname, 0, MAXHOSTNAMELEN);
           
           if (::gethostname(hostname, MAXHOSTNAMELEN) != 0) {
               mode = false;
@@ -326,7 +328,7 @@ externalinterface_available(const fn_call& fn)
           // a terminal, so we can assume the default of sameDomain applies.
           URL localPath(hostname, baseurl);
           // If the URL has a file protocol, then 
-          if (URLAccessManager::allow(localPath)) {
+          if (r.streamProvider().allow(localPath)) {
               return as_value(true);
           }
           if (localPath.hostname().empty()) {

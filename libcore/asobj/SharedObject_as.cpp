@@ -22,13 +22,18 @@
 #include "gnashconfig.h" 
 #endif
 
+#include "SharedObject_as.h"
+
+#include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
+#include <cstdio>
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "GnashSystemNetHeaders.h"
 #include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
 #include "as_value.h"
-#include "SharedObject_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -39,18 +44,14 @@
 #include "Property.h"
 #include "string_table.h"
 #include "rc.h" // for use of rcfile
-#include "URLAccessManager.h"
 #include "URL.h"
 #include "NetConnection_as.h"
 #include "Object.h"
 #include "AMFConverter.h"
 #include "GnashAlgorithm.h"
 #include "RunResources.h"
+#include "StreamProvider.h"
 #include "namedStrings.h"
-
-#include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
-#include <cstdio>
 
 namespace {
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -423,9 +424,7 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
     const movie_root& mr = _vm.getRoot();
-    const std::string& swfURL = mr.getOriginalURL();
-
-    URL url(swfURL);
+    const URL& url = mr.runResources().streamProvider().url();
 
     // Remember the hostname of our SWF URL. This can be empty if loaded
     // from the filesystem
@@ -506,7 +505,8 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     if (!root.empty()) {
 
         const movie_root& mr = _vm.getRoot();
-        const std::string& swfURL = mr.getOriginalURL();
+
+        const URL& swfURL = mr.runResources().streamProvider().url();
         // The specified root may or may not have a domain. If it doesn't,
         // this constructor will add the SWF's domain.
         URL localPath(root, swfURL);

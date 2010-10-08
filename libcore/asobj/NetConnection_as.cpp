@@ -30,7 +30,6 @@
 #include "builtin_function.h"
 #include "movie_root.h"
 #include "StreamProvider.h"
-#include "URLAccessManager.h"
 #include "URL.h"
 #include "VM.h"
 #include "SimpleBuffer.h"
@@ -712,13 +711,14 @@ std::string
 NetConnection_as::validateURL() const
 {
 
-    URL uri(_uri, getRunResources(owner()).baseURL());
+    const RunResources& r = getRunResources(owner());
+    URL uri(_uri, r.baseURL());
 
     std::string uriStr(uri.str());
     assert(uriStr.find("://") != std::string::npos);
 
     // Check if we're allowed to open url
-    if (!URLAccessManager::allow(uri)) {
+    if (!r.streamProvider().allow(uri)) {
         log_security(_("Gnash is not allowed to open this url: %s"), uriStr);
         return "";
     }
@@ -816,8 +816,9 @@ NetConnection_as::connect(const std::string& uri)
         notifyStatus(CONNECT_FAILED);
         return;
     }
-
-    URL url(uri, getRunResources(owner()).baseURL());
+    
+    const RunResources& r = getRunResources(owner());
+    URL url(_uri, r.baseURL());
 
     if ((url.protocol() != "rtmp")
         && (url.protocol() != "rtmpt")
@@ -835,7 +836,7 @@ NetConnection_as::connect(const std::string& uri)
     
     // This is for HTTP remoting
 
-    if (!URLAccessManager::allow(url)) {
+    if (!r.streamProvider().allow(url)) {
         log_security(_("Gnash is not allowed to NetConnection.connect "
                     "to %s"), url);
         notifyStatus(CONNECT_FAILED);

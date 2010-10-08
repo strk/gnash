@@ -36,7 +36,7 @@ namespace URLAccessManager {
 //
 /// Will use rc file for whitelist/blacklist and localSendbox.
 ///
-bool allow(const URL& url);
+bool allow(const URL& url, const URL& baseurl);
 
 //bool allowHost(const std::string& str);
 

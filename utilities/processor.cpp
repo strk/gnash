@@ -116,8 +116,8 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 #endif
 }
 
-static bool play_movie(
-        const std::string& filename, const RunResources& runResources);
+static bool play_movie(const std::string& filename,
+        const RunResources& runResources);
 
 static bool s_stop_on_errors = true;
 
@@ -362,7 +362,6 @@ main(int argc, char *argv[])
     mediaHandler.reset(media::MediaFactory::instance().get(mh));
     soundHandler.reset(new sound::NullSoundHandler(mediaHandler.get()));
 
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider);
 
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
@@ -375,7 +374,7 @@ main(int argc, char *argv[])
     // evidently accessed after main() returns. Rather than bothering to
     // work out why, we let this byte leak, as it's returned to the system on
     // exit anyway.
-    unsigned char* buf = new unsigned char[1];
+    unsigned char* buf = new unsigned char[8];
     r->init_buffer(buf, 1, 1, 1, 1);
 #endif
 
@@ -387,8 +386,10 @@ main(int argc, char *argv[])
         RunResources runResources(*i);
         runResources.setSoundHandler(soundHandler);
         runResources.setMediaHandler(mediaHandler);
-        runResources.setStreamProvider(sp);
         runResources.setTagLoaders(loaders);
+        boost::shared_ptr<StreamProvider> sp(new StreamProvider(*i));
+        runResources.setStreamProvider(sp);
+
 #ifdef RENDERER_AGG
         runResources.setRenderer(r);
 #endif
@@ -419,7 +420,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     quitrequested = false;
 
     URL url(filename);
-
+    
     try
     {
       if (filename == "-")
@@ -455,7 +456,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
         std::cerr << "error: can't play movie: "<< filename << std::endl;
 	    return false;
     }
-
+    
     float fps = md->get_frame_rate();
     long fpsDelay = long(1000000/fps);
     long clockAdvance = fpsDelay/1000;

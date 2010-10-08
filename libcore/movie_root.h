@@ -866,12 +866,6 @@ public:
     void getCharacterTree(tree<StringPair>& tr, tree<StringPair>::iterator it);
 #endif
 
-    /// Get URL of the SWF movie used to initialize this VM
-    //
-    /// This information will be used for security checks
-    ///
-    const std::string& getOriginalURL() const { return _originalURL; }
-
     const RunResources& runResources() const { return _runResources; }
 
     void addExternalCallback(as_object *obj, const std::string &name,
@@ -929,12 +923,6 @@ private:
     bool fire_mouse_event();
 
     const RunResources& _runResources; 
-
-    /// The URL of the original root movie.
-    //
-    /// This is a runtime constant because it must not change during a 
-    /// run.
-    const std::string _originalURL;
 
     /// This initializes a SharedObjectLibrary, which requires 
     /// _originalURL, so that must be initialized first.
