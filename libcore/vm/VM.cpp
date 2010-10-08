@@ -55,11 +55,8 @@ void
 VM::init()
 {
 	NSV::loadStrings(_stringTable);
-
-    Global_as* gl(new Global_as(*this));
-
-	setGlobal(gl);
-    gl->registerClasses();
+    setGlobal(new Global_as(*this));
+    _global->registerClasses();
 }
 
 VM::VM(int version, movie_root& root, VirtualClock& clock)

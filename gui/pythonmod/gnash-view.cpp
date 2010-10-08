@@ -456,7 +456,6 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     view->virtual_clock.reset(new gnash::InterruptableVirtualClock(*view->system_clock));
     view->stage.reset(new gnash::movie_root(*view->movie_definition, *view->virtual_clock, *view->run_info));
     
-    gnash::gnashInit(*view->stage);
     view->movie_definition->completeLoad();
 
     view->advance_timer = g_timeout_add_full(G_PRIORITY_LOW, 10,

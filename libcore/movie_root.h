@@ -79,6 +79,7 @@
 #include "SimpleBuffer.h" // for LoadCallback
 #include "MovieLoader.h"
 #include "ExternalInterface.h"
+#include "GC.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -144,7 +145,7 @@ struct DepthComparator
 /// hosting application.
 //
 /// The _root object is provided by getAsRoot().
-class DSOEXPORT movie_root : boost::noncopyable
+class DSOEXPORT movie_root : public GcRoot, boost::noncopyable
 {
 public:
     
@@ -887,6 +888,10 @@ public:
     /// onUnload handler.
     void removeQueuedConstructor(DisplayObject* target);
 
+    GC& gc() {
+        return _gc;
+    }
+
 private:
 
     /// Set the root movie, replacing the current one if any.
@@ -921,18 +926,6 @@ private:
     /// by the event requires redraw, see \ref events_handling for
     /// more info.
     bool fire_mouse_event();
-
-    const RunResources& _runResources; 
-
-    /// This initializes a SharedObjectLibrary, which requires 
-    /// _originalURL, so that must be initialized first.
-    VM _vm;
-
-    /// Registered Interface command handler, if any
-    AbstractIfaceCallback* _interfaceHandler;
-
-    /// Registered FsCommand handler, if any
-    AbstractFsCallback* _fsCommandHandler;
 
     /// Take care of dragging, if needed
     void doMouseDrag();
@@ -1018,6 +1011,20 @@ private:
             DisplayObject* dragging) const;
 
     void handleActionLimitHit(const std::string& ref);
+
+    GC _gc;
+
+    const RunResources& _runResources; 
+
+    /// This initializes a SharedObjectLibrary, which requires 
+    /// _originalURL, so that must be initialized first.
+    VM _vm;
+
+    /// Registered Interface command handler, if any
+    AbstractIfaceCallback* _interfaceHandler;
+
+    /// Registered FsCommand handler, if any
+    AbstractFsCallback* _fsCommandHandler;
 
     /// A list of AdvanceableCharacters
     //

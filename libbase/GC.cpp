@@ -28,29 +28,25 @@
 
 namespace gnash {
 
-GC* GC::_singleton = NULL;
-unsigned int GC::maxNewCollectablesCount = 64;
-
-GC&
-GC::init(GcRoot& root)
+GC::GC(GcRoot& root)
+    :
+    _maxNewCollectablesCount(0),
+    _resListSize(0),
+    _root(root),
+    _lastResCount(0)
+#ifdef GNASH_GC_DEBUG 
+    , _collectorRuns(0)
+#endif
 {
-    assert(!_singleton);
-    _singleton = new GC(root);
+#ifdef GNASH_GC_DEBUG 
+    log_debug(_("GC %p created"), (void*)this);
+#endif
     char *gcgap = std::getenv("GNASH_GC_TRIGGER_THRESHOLD");
-    if ( gcgap )
+    if (gcgap)
     {
-        unsigned int gap = strtoul(gcgap, NULL, 0);
-        _singleton->maxNewCollectablesCount = gap;
+        unsigned int gap = std::strtoul(gcgap, NULL, 0);
+        _maxNewCollectablesCount = gap;
     }
-    return *_singleton;
-}
-
-void
-GC::cleanup()
-{
-    assert(_singleton);
-    delete _singleton;
-    _singleton = NULL;
 }
 
 GC::~GC()
@@ -116,13 +112,8 @@ GC::runCycle()
 #endif
 
 #ifdef GNASH_GC_DEBUG 
-    log_debug(_("GC: collection cycle started - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, maxNewCollectablesCount, _lastResCount, _resListSize);
+    log_debug(_("GC: collection cycle started - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, _maxNewCollectablesCount, _lastResCount, _resListSize);
 #endif // GNASH_GC_DEBUG
-
-#ifndef NDEBUG
-    boost::thread self;
-    assert(self == mainThread);
-#endif
 
     // Mark all resources as reachable
     markReachable();

@@ -1169,7 +1169,7 @@ Gui::getMovieInfo() const
     //
     topIter = tr->insert(topIter, StringPair("GC Statistics", ""));
     GC::CollectablesCount cc;
-    GC::get().countCollectables(cc);
+    _stage->gc().countCollectables(cc);
     
     const std::string lbl = "GC managed ";
     for (GC::CollectablesCount::iterator i=cc.begin(), e=cc.end(); i!=e; ++i) {

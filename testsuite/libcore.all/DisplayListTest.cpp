@@ -49,7 +49,6 @@ main(int /*argc*/, char** /*argv*/)
     dbglogfile.setVerbosity();
     
     // Initialize gnash lib
-    gnashInit();
     
     RunResources ri;
     ri.setStreamProvider(
@@ -61,7 +60,6 @@ main(int /*argc*/, char** /*argv*/)
     
     ManualClock clock;
     movie_root stage(*md5, clock, ri);
-    gnashInit(stage);
     
     MovieClip::MovieVariables v;
     // We pass 'v' twice, as the second one is for scriptable

@@ -20,8 +20,6 @@
 #include "URL.h"
 #include "log.h"
 #include "StringPredicates.h" 
-#include "VM.h" 
-#include "movie_root.h" 
 #include "rc.h" // for rcfile
 #include "GnashSystemNetHeaders.h"
 

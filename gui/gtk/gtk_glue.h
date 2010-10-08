@@ -30,10 +30,12 @@
 #include <gdk/gdk.h>
 #endif
 
-namespace gnash
-{
+namespace gnash {
+    class Renderer;
+    class movie_root;
+}
 
-class Renderer;
+namespace gnash {
 
 class GtkGlue
 {

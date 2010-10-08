@@ -28,10 +28,6 @@
 
 /// Freedom bites
 namespace gnash {
-    class movie_root;
-}
-
-namespace gnash {
 
 /// The display quality.
 //
@@ -43,10 +39,6 @@ enum Quality
     QUALITY_HIGH,
     QUALITY_BEST
 };
-
-/// Initialize gnash core library
-//
-DSOEXPORT void gnashInit(movie_root& mr);
 
 /// Maximum release of resources. 
 //

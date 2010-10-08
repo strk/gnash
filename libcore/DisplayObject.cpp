@@ -86,6 +86,7 @@ const int DisplayObject::noClipDepthValue;
 DisplayObject::DisplayObject(movie_root& mr, as_object* object,
         DisplayObject* parent)
     :
+    GcResource(mr.gc()),
     _name(),
     _parent(parent),
     _object(object),

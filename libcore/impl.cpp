@@ -76,42 +76,6 @@ void  clear()
     MovieFactory::movieLibrary.clear();
     fontlib::clear();
 
-#ifdef GNASH_USE_GC 
-    GC::get().fuzzyCollect(); // why would this be needed ?
-
-    GC::cleanup();
-#endif
-
-}
-
-#ifdef GNASH_USE_GC
-/// A GC root used to mark all reachable collectable pointers
-class GnashGcRoot : public GcRoot 
-{
-
-public:
-
-  GnashGcRoot(movie_root& mr)
-      :
-      _mr(mr)
-  {
-  }
-
-  void markReachableResources() const
-  {
-    _mr.markReachableResources();
-  }
-private:
-  movie_root& _mr;
-};
-#endif
-
-void gnashInit(movie_root& mr)
-{
-#ifdef GNASH_USE_GC
-  static GnashGcRoot gcRoot(mr);
-  GC::init(gcRoot);
-#endif
 }
 
 } // namespace gnash

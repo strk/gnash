@@ -128,6 +128,7 @@ private:
 movie_root::movie_root(const movie_definition& def,
         VirtualClock& clock, const RunResources& runResources)
     :
+    _gc(*this),
     _runResources(runResources),
     _vm(def.get_version(), *this, clock),
     _interfaceHandler(0),
@@ -163,7 +164,6 @@ movie_root::movie_root(const movie_definition& def,
     _unnamedInstance(0),
     _movieLoader(*this)
 {
-    gnashInit(*this);
     _vm.init();
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
@@ -211,6 +211,7 @@ movie_root::~movie_root()
     _movieLoader.clear();
 
     _vm.clear();
+    _gc.fuzzyCollect();
 
     assert(testInvariant());
 }
@@ -289,7 +290,7 @@ movie_root::cleanupAndCollect()
     _vm.getStack().clear();
 
     cleanupDisplayList();
-    GC::get().fuzzyCollect();
+    _gc.fuzzyCollect();
 }
 
 /* private */
@@ -541,7 +542,7 @@ movie_root::clear()
 
 #ifdef GNASH_USE_GC
     // Run the garbage collector again
-    GC::get().fuzzyCollect();
+    _gc.fuzzyCollect();
 #endif
 
     setInvalidated();

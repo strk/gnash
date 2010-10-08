@@ -212,9 +212,6 @@ FsCommandExecutor execFsCommand;
 int
 vm_main(int argc, char *argv[])
 {
-    /// Initialize gnash core library
-    gnashInit();
-
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
     std::setlocale (LC_ALL, "");

@@ -93,7 +93,7 @@ public:
     /// The resource will be automatically registered with
     /// the garbage collector singleton.
     ///
-    GcResource();
+    GcResource(GC& gc);
 
     /// \brief
     /// Mark this resource as being reachable, possibly triggering
@@ -187,25 +187,11 @@ class DSOEXPORT GC
 
 public:
 
-    /// Init the singleton instance using the given GcRoot
-    //
-    static GC& init(GcRoot& r);
+    /// Create a garbage collector, using the given root
+    GC(GcRoot& root);
 
-    /// Delete the singleton. You'll need to call init() again
-    /// after this call, if you want to use the singleton.
-    //
-    /// See init(GcRoot&)
-    ///
-    static void cleanup();
-
-    /// Get the singleton 
-    //
-    /// An assertion will fail if the GC has not been initialized yet.
-    /// See init(GcRoot&).
-    ///
-    static GC& get() {
-        return *_singleton;
-    }
+    /// Destroy the collector, releasing all collectables.
+    ~GC();
 
     /// Add an heap object to the list of managed collectables
     //
@@ -227,8 +213,6 @@ public:
     void addCollectable(const GcResource* item)
     {
 #ifndef NDEBUG
-        boost::thread self;
-        assert(self == mainThread);
         assert(item);
         assert(! item->isReachable());
         // The following assertion is expensive ...
@@ -273,10 +257,12 @@ public:
         //    runtime analisys
         //
 
-        if ( _resListSize <  _lastResCount + maxNewCollectablesCount )
-        {
+        if (_resListSize <  _lastResCount + _maxNewCollectablesCount) {
 #if GNASH_GC_DEBUG  > 1
-            log_debug(_("GC: collection cycle skipped - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, maxNewCollectablesCount, _lastResCount, _resListSize);
+            log_debug(_("GC: collection cycle skipped - %d/%d new resources "
+                        "allocated since last run (from %d to %d)"),
+                    _resListSize-_lastResCount, _maxNewCollectablesCount,
+                    _lastResCount, _resListSize);
 #endif // GNASH_GC_DEBUG
             return;
         }
@@ -297,28 +283,6 @@ public:
 
 private:
 
-    /// Number of newly registered collectable since last collection run
-    /// triggering next collection.
-    static unsigned int maxNewCollectablesCount;
-
-    /// Create a garbage collector, using the given root
-    GC(GcRoot& root)
-        :
-        _resListSize(0),
-        _root(root),
-        _lastResCount(0)
-#ifdef GNASH_GC_DEBUG 
-        , _collectorRuns(0)
-#endif
-    {
-#ifdef GNASH_GC_DEBUG 
-        log_debug(_("GC %p created"), (void*)this);
-#endif
-    }
-
-    /// Destroy the collector, releasing all collectables.
-    ~GC();
-
     /// List of collectables
     typedef std::list<const GcResource *> ResList;
 
@@ -337,6 +301,10 @@ private:
     ///
     size_t cleanUnreachable();
 
+    /// Number of newly registered collectable since last collection run
+    /// triggering next collection.
+    size_t _maxNewCollectablesCount;
+
     /// List of collectable resources
     ResList _resList;
 
@@ -347,15 +315,6 @@ private:
     ResList::size_type _resListSize;
 
     GcRoot& _root;
-
-    static GC* _singleton;
-
-#ifndef NDEBUG
-    /// The thread that initialized the GC is 
-    /// the only one allowed to run the collector
-    /// and to register collectable objects
-    boost::thread mainThread;
-#endif
 
     /// Number of resources in collectable list at end of last
     /// collect() call.
@@ -368,11 +327,11 @@ private:
 };
 
 
-inline GcResource::GcResource()
+inline GcResource::GcResource(GC& gc)
     :
     _reachable(false)
 {
-    GC::get().addCollectable(this);
+    gc.addCollectable(this);
 }
 
 } // namespace gnash
