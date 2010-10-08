@@ -342,16 +342,6 @@ main(int argc, char *argv[])
 	    exit(EXIT_FAILURE);
     }
 
-    if (infiles.size() > 1)
-    {
-        // We're not ready for multiple runs yet.
-        std::cerr << "Multiple input files not supported." << std::endl;
-        usage(argv[0]);
-        dbglogfile.removeLog();
-        exit(EXIT_FAILURE);
-    }
-
-
     boost::shared_ptr<gnash::media::MediaHandler> mediaHandler;
     boost::shared_ptr<sound::sound_handler> soundHandler;
 
