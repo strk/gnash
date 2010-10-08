@@ -446,9 +446,9 @@ date_new(const fn_call& fn)
         gt.minute = 0;
         gt.hour = 0;
         gt.monthday = 1;
-        gt.month = toInt(fn.arg(1));
+        gt.month = toInt(fn.arg(1), getVM(fn));
     
-        int year = toInt(fn.arg(0));
+        int year = toInt(fn.arg(0), getVM(fn));
         
         // GnashTime.year is the value since 1900 (like struct tm)
         // negative value is a year before 1900. A year between 0
@@ -467,15 +467,15 @@ date_new(const fn_call& fn)
                 )
             case 7:
                 // fractions of milliseconds are ignored
-                gt.millisecond = toInt(fn.arg(6));
+                gt.millisecond = toInt(fn.arg(6), getVM(fn));
             case 6:
-                gt.second = toInt(fn.arg(5));
+                gt.second = toInt(fn.arg(5), getVM(fn));
             case 5:
-                gt.minute = toInt(fn.arg(4));
+                gt.minute = toInt(fn.arg(4), getVM(fn));
             case 4:
-                gt.hour = toInt(fn.arg(3));
+                gt.hour = toInt(fn.arg(3), getVM(fn));
             case 3:
-                gt.monthday = toInt(fn.arg(2));
+                gt.monthday = toInt(fn.arg(2), getVM(fn));
             case 2:
                 break;
                 // Done already
@@ -843,9 +843,9 @@ date_setfullyear(const fn_call& fn)
     else {
         GnashTime gt;
         dateToGnashTime(*date, gt, utc);
-        gt.year = toInt(fn.arg(0)) - 1900;
-        if (fn.nargs >= 2) gt.month = toInt(fn.arg(1));
-        if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2));
+        gt.year = toInt(fn.arg(0), getVM(fn)) - 1900;
+        if (fn.nargs >= 2) gt.month = toInt(fn.arg(1), getVM(fn));
+        if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2), getVM(fn));
         gnashTimeToDate(gt, *date, utc);
   }
   return as_value(date->getTimeValue());
@@ -892,8 +892,8 @@ date_setYear(const fn_call& fn)
 
         truncateDouble(gt.year, year);
 
-        if (fn.nargs >= 2) gt.month = toInt(fn.arg(1));
-        if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2));
+        if (fn.nargs >= 2) gt.month = toInt(fn.arg(1), getVM(fn));
+        if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2), getVM(fn));
         if (fn.nargs > 3) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.setYear was called with more than three "
@@ -991,7 +991,7 @@ date_setDate(const fn_call& fn)
     GnashTime gt;
 
     dateToGnashTime(*date, gt, utc);
-    gt.monthday = toInt(fn.arg(0));
+    gt.monthday = toInt(fn.arg(0), getVM(fn));
     gnashTimeToDate(gt, *date, utc);
   }
   if (fn.nargs > 1) {
@@ -1036,10 +1036,10 @@ date_setHours(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
-        gt.hour = toInt(fn.arg(0));
-        if (fn.nargs >= 2) gt.minute = toInt(fn.arg(1));
-        if (fn.nargs >= 3) gt.second = toInt(fn.arg(2));
-        if (fn.nargs >= 4) gt.millisecond = toInt(fn.arg(3));
+        gt.hour = toInt(fn.arg(0), getVM(fn));
+        if (fn.nargs >= 2) gt.minute = toInt(fn.arg(1), getVM(fn));
+        if (fn.nargs >= 3) gt.second = toInt(fn.arg(2), getVM(fn));
+        if (fn.nargs >= 4) gt.millisecond = toInt(fn.arg(3), getVM(fn));
         if (fn.nargs > 4) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.set%sHours was called with more than "
@@ -1081,9 +1081,9 @@ date_setMinutes(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
-        gt.minute = toInt(fn.arg(0));
-        if (fn.nargs >= 2) gt.second = toInt(fn.arg(1));
-        if (fn.nargs >= 3) gt.millisecond = toInt(fn.arg(2));
+        gt.minute = toInt(fn.arg(0), getVM(fn));
+        if (fn.nargs >= 2) gt.second = toInt(fn.arg(1), getVM(fn));
+        if (fn.nargs >= 3) gt.millisecond = toInt(fn.arg(2), getVM(fn));
         if (fn.nargs > 3) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.set%sMinutes was called with more than "
@@ -1125,8 +1125,8 @@ date_setSeconds(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
-        gt.second = toInt(fn.arg(0));
-        if (fn.nargs >= 2) gt.millisecond = toInt(fn.arg(1));
+        gt.second = toInt(fn.arg(0), getVM(fn));
+        if (fn.nargs >= 2) gt.millisecond = toInt(fn.arg(1), getVM(fn));
         if (fn.nargs > 2) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.set%sMinutes was called with more than "
@@ -1254,17 +1254,17 @@ date_UTC(const fn_call& fn) {
             )
         case 7:
             // millisecs is double, but fractions of millisecs are ignored.
-            gt.millisecond = toInt(fn.arg(6));
+            gt.millisecond = toInt(fn.arg(6), getVM(fn));
         case 6:
-            gt.second = toInt(fn.arg(5));
+            gt.second = toInt(fn.arg(5), getVM(fn));
         case 5:
-            gt.minute = toInt(fn.arg(4));
+            gt.minute = toInt(fn.arg(4), getVM(fn));
         case 4:
-            gt.hour = toInt(fn.arg(3));
+            gt.hour = toInt(fn.arg(3), getVM(fn));
         case 3:
-            gt.monthday = toInt(fn.arg(2));
+            gt.monthday = toInt(fn.arg(2), getVM(fn));
         case 2:   // these last two are always performed
-            gt.month = toInt(fn.arg(1));
+            gt.month = toInt(fn.arg(1), getVM(fn));
             {
                 boost::int32_t year = 0;
                 truncateDouble(year, toNumber(fn.arg(0), getVM(fn)));

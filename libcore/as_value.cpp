@@ -67,7 +67,6 @@ namespace {
     bool stringEqualsNumber(const as_value& str, const as_value& num);
     bool compareBoolean(const as_value& boolean, const as_value& other);
     inline bool findMethod(as_object& obj, string_table::key m, as_value& ret);
-    boost::int32_t truncateToInt(double d);
 }
 
 namespace {
@@ -780,17 +779,6 @@ as_value::writeAMF0(amf::Writer& w) const
     }
 }
 
-
-boost::int32_t
-toInt(const as_value& val) 
-{
-    const double d = val.to_number();
-
-    if (!isFinite(d)) return 0;
-
-    return truncateToInt(d);
-}
-
 bool
 parseNonDecimalInt(const std::string& s, double& d, bool whole)
 {
@@ -985,22 +973,6 @@ inline bool
 findMethod(as_object& obj, string_table::key m, as_value& ret)
 {
     return obj.get_member(m, &ret) && ret.is_object();
-}
-
-/// Truncates a double to a 32-bit unsigned int.
-//
-/// In fact, it is a 32-bit unsigned int with an additional sign, cast
-/// to an unsigned int. Not sure what the sense is, but that's how it works:
-//
-/// 0xffffffff is interpreted as -1, -0xffffffff as 1.
-boost::int32_t
-truncateToInt(double d)
-{
-    if (d < 0) {   
-        return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
-    }
-    
-    return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
 }
 
 } // unnamed namespace

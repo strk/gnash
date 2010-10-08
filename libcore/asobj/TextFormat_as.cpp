@@ -63,7 +63,7 @@ PositiveTwips : SetBase
 {
     PositiveTwips(const fn_call& fn) : SetBase(fn) {}
     int operator()(const as_value& val) const {
-        return pixelsToTwips(std::max<int>(toInt(val), 0));
+        return pixelsToTwips(std::max<int>(toInt(val, getVM(fn())), 0));
     }
 };
 
@@ -407,13 +407,13 @@ textformat_new(const fn_call& fn)
 	    default:
 	        log_error(_("Too many args (%d) passed to TextFormat"), args);
 	    case 13:
-	        tf->leadingSet(pixelsToTwips(toInt(fn.arg(12))));
+	        tf->leadingSet(pixelsToTwips(toInt(fn.arg(12), getVM(fn))));
 	    case 12:
-	        tf->indentSet(pixelsToTwips(toInt(fn.arg(11))));
+	        tf->indentSet(pixelsToTwips(toInt(fn.arg(11), getVM(fn))));
 	    case 11:
-	        tf->rightMarginSet(pixelsToTwips(toInt(fn.arg(10))));
+	        tf->rightMarginSet(pixelsToTwips(toInt(fn.arg(10), getVM(fn))));
 	    case 10:
-	        tf->leftMarginSet(pixelsToTwips(toInt(fn.arg(9))));
+	        tf->leftMarginSet(pixelsToTwips(toInt(fn.arg(9), getVM(fn))));
 	    case 9:
 	        tf->alignSet(fn.arg(8).to_string());
 	    case 8:
@@ -429,11 +429,11 @@ textformat_new(const fn_call& fn)
 	    case 3:
 	    {
 	        rgba col;
-	        col.parseRGB(toInt(fn.arg(2)));
+	        col.parseRGB(toInt(fn.arg(2), getVM(fn)));
 	        tf->colorSet(col);
 	    }
 	    case 2:
-	        tf->sizeSet(pixelsToTwips(toInt(fn.arg(1))));
+	        tf->sizeSet(pixelsToTwips(toInt(fn.arg(1), getVM(fn))));
 	    case 1:
 	        tf->fontSet(fn.arg(0).to_string());
 	        break;
@@ -514,7 +514,7 @@ textformat_color(const fn_call& fn)
 	}
 	else {
 		rgba newcolor;
-		newcolor.parseRGB(toInt(fn.arg(0)));
+		newcolor.parseRGB(toInt(fn.arg(0), getVM(fn)));
 		relay->colorSet(newcolor);
 	}
 

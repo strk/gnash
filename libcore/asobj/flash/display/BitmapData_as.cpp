@@ -505,9 +505,10 @@ bitmapdata_fillRect(const fn_call& fn)
     obj->get_member(NSV::PROP_WIDTH, &w);
     obj->get_member(NSV::PROP_HEIGHT, &h);    
 
-    const boost::uint32_t color = toInt(fn.arg(1));
+    const boost::uint32_t color = toInt(fn.arg(1), getVM(fn));
        
-    ptr->fillRect(toInt(x), toInt(y), toInt(w), toInt(h), color);
+    ptr->fillRect(toInt(x, getVM(fn)), toInt(y, getVM(fn)),
+            toInt(w, getVM(fn)), toInt(h, getVM(fn)), color);
     
 	return as_value();
 }
@@ -530,14 +531,14 @@ bitmapdata_floodFill(const fn_call& fn)
         return as_value();
     }
     
-    const int x = toInt(fn.arg(0));
-    const int y = toInt(fn.arg(1));
+    const int x = toInt(fn.arg(0), getVM(fn));
+    const int y = toInt(fn.arg(1), getVM(fn));
 
     if (x < 0 || y < 0) {
         return as_value();
     }
 
-    const boost::uint32_t fill = toInt(fn.arg(2));
+    const boost::uint32_t fill = toInt(fn.arg(2), getVM(fn));
     const boost::uint32_t old = *pixelAt(*ptr, x, y);
 
     // This checks whether the colours are the same.
@@ -580,8 +581,8 @@ bitmapdata_getPixel(const fn_call& fn)
         return as_value();
     }
     
-    const int x = toInt(fn.arg(0));
-    const int y = toInt(fn.arg(1));
+    const int x = toInt(fn.arg(0), getVM(fn));
+    const int y = toInt(fn.arg(1), getVM(fn));
     
     // Will return 0 if the pixel is outside the image or the image has
     // been disposed.
@@ -605,8 +606,8 @@ bitmapdata_getPixel32(const fn_call& fn)
     }
     
     // TODO: what happens when the pixel is outside the image?
-    const int x = toInt(fn.arg(0));
-    const int y = toInt(fn.arg(1));
+    const int x = toInt(fn.arg(0), getVM(fn));
+    const int y = toInt(fn.arg(1), getVM(fn));
     
     return static_cast<boost::int32_t>(ptr->getPixel(x, y));
 }
@@ -692,7 +693,7 @@ bitmapdata_setPixel(const fn_call& fn)
     }
 
     // Ignore any transparency here.
-    const boost::uint32_t color = toInt(fn.arg(2));
+    const boost::uint32_t color = toInt(fn.arg(2), getVM(fn));
 
     ptr->setPixel(x, y, color);
 
@@ -716,7 +717,7 @@ bitmapdata_setPixel32(const fn_call& fn)
     }
 
     // TODO: multiply.
-    const boost::uint32_t color = toInt(fn.arg(2));
+    const boost::uint32_t color = toInt(fn.arg(2), getVM(fn));
 
     ptr->setPixel32(x, y, color);
 
@@ -879,10 +880,10 @@ bitmapdata_ctor(const fn_call& fn)
         throw ActionTypeError();
 	}
 
-    size_t width = toInt(fn.arg(0));
-    size_t height = toInt(fn.arg(1));
+    size_t width = toInt(fn.arg(0), getVM(fn));
+    size_t height = toInt(fn.arg(1), getVM(fn));
     const bool transparent = fn.nargs > 2 ? toBool(fn.arg(2), getVM(fn)) : true;
-    boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3)) : 0xffffffff;
+    boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3), getVM(fn)) : 0xffffffff;
     
     if (width > 2880 || height > 2880 || width < 1 || height < 1) {
         IF_VERBOSE_ASCODING_ERRORS(

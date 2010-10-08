@@ -565,7 +565,7 @@ xmlnode_new(const fn_call& fn)
     }
 
     std::auto_ptr<XMLNode_as> xml(new XMLNode_as(getGlobal(fn)));
-    xml->nodeTypeSet(XMLNode_as::NodeType(toInt(fn.arg(0))));
+    xml->nodeTypeSet(XMLNode_as::NodeType(toInt(fn.arg(0), getVM(fn))));
 
     if (fn.nargs > 1) {
         const std::string& str = fn.arg(1).to_string();

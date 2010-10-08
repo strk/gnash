@@ -894,8 +894,8 @@ ActionSubString(ActionExec& thread)
     const as_value& strval = env.top(2);
 
     // Undefined values should resolve to 0.
-    int size = toInt(env.top(0));
-    int start = toInt(env.top(1));
+    int size = toInt(env.top(0), getVM(env));
+    int start = toInt(env.top(1), getVM(env));
 
     const int version = env.get_version();
     const std::wstring wstr = utf8::decodeCanonicalString(
@@ -971,7 +971,7 @@ void
 ActionInt(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    env.top(0).set_double(toInt(env.top(0)));
+    env.top(0).set_double(toInt(env.top(0), getVM(env)));
 }
 
 void
@@ -1469,7 +1469,7 @@ ActionFscommand2(ActionExec& thread)
 
     unsigned int off=0;
     
-    const unsigned int nargs = toInt(env.top(off++));
+    const unsigned int nargs = toInt(env.top(off++), getVM(env));
 
     std::string cmd = env.top(off++).to_string();
 
@@ -1502,7 +1502,7 @@ ActionRandom(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    int max = toInt(env.top(0));
+    int max = toInt(env.top(0), getVM(env));
 
     if (max < 1) max = 1;
 
@@ -1573,7 +1573,8 @@ ActionChr(ActionExec& thread)
     as_environment& env = thread.env;
     
     // Only handles values up to 65535
-    boost::uint16_t c = static_cast<boost::uint16_t>(toInt(env.top(0)));
+    const boost::uint16_t c =
+        static_cast<boost::uint16_t>(toInt(env.top(0), getVM(env)));
 
     // If the argument to chr() is '0', we return
     // nothing, not NULL
@@ -1624,8 +1625,8 @@ ActionMbSubString(ActionExec& thread)
     const as_value& arg1 = env.top(1);
 
     // Undefined values should resolve to 0.
-    int size = toInt(env.top(0));
-    int start = toInt(env.top(1));
+    int size = toInt(env.top(0), getVM(env));
+    int start = toInt(env.top(1), getVM(env));
 
     as_value& string_val = env.top(2);
 
@@ -1736,7 +1737,7 @@ ActionMbChr(ActionExec& thread)
     }
 
     // Cut to uint16, as characters above 65535 'wrap around'
-    const boost::uint16_t i = static_cast<boost::uint16_t> (toInt(env.top(0)));
+    const boost::uint16_t i = static_cast<boost::uint16_t> (toInt(env.top(0), getVM(env)));
     
     std::string out = utf8::encodeUnicodeCharacter(i);
     
@@ -2477,7 +2478,7 @@ ActionInitArray(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    const int array_size = toInt(env.pop());
+    const int array_size = toInt(env.pop(), getVM(env));
     assert(array_size >= 0); // TODO: trigger this !!
     
     Global_as& gl = getGlobal(env);
@@ -2510,7 +2511,7 @@ ActionInitObject(ActionExec& thread)
     //     [003]   Integer: 1
     //    SWFACTION_INITOBJECT
 
-    const int nmembers = toInt(env.pop());
+    const int nmembers = toInt(env.pop(), getVM(env));
 
     // TODO: see if this could call the ASnative function(101, 9).
     Global_as& gl = getGlobal(env);
@@ -3113,8 +3114,8 @@ ActionBitwiseAnd(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    const int operand1 = toInt(env.top(1));
-    const int operand2 = toInt(env.top(0));
+    const int operand1 = toInt(env.top(1), getVM(env));
+    const int operand2 = toInt(env.top(0), getVM(env));
 
     env.top(1) = operand1 & operand2;
     env.drop(1);
@@ -3125,8 +3126,8 @@ ActionBitwiseOr(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    const int operand1 = toInt(env.top(1));
-    const int operand2 = toInt(env.top(0));
+    const int operand1 = toInt(env.top(1), getVM(env));
+    const int operand2 = toInt(env.top(0), getVM(env));
 
     env.top(1) = operand1|operand2;
     env.drop(1);
@@ -3137,8 +3138,8 @@ ActionBitwiseXor(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    const int operand1 = toInt(env.top(1));
-    const int operand2 = toInt(env.top(0));
+    const int operand1 = toInt(env.top(1), getVM(env));
+    const int operand2 = toInt(env.top(0), getVM(env));
 
     env.top(1) = operand1^operand2;
     env.drop(1);
@@ -3153,10 +3154,10 @@ ActionShiftLeft(ActionExec& thread)
     /// A left shift of more than or equal to the size in
     /// bits of the left operand, or a negative shift, results
     /// in undefined behaviour in C++.
-    boost::int32_t amount = toInt(env.top(0)) % 32;
+    boost::int32_t amount = toInt(env.top(0), getVM(env)) % 32;
     if (amount < 0) amount += 32;
     
-    boost::int32_t value = toInt(env.top(1));
+    boost::int32_t value = toInt(env.top(1), getVM(env));
 
     value = value << amount;
 
@@ -3170,8 +3171,8 @@ ActionShiftRight(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = toInt(env.top(0));
-    boost::int32_t value = toInt(env.top(1));
+    boost::uint32_t amount = toInt(env.top(0), getVM(env));
+    boost::int32_t value = toInt(env.top(1), getVM(env));
 
     value = value >> amount;
 
@@ -3184,8 +3185,8 @@ ActionShiftRight2(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = toInt(env.top(0)); 
-    boost::int32_t value = toInt(env.top(1));
+    boost::uint32_t amount = toInt(env.top(0), getVM(env)); 
+    boost::int32_t value = toInt(env.top(1), getVM(env));
 
     value = boost::uint32_t(value) >> amount;
 

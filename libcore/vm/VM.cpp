@@ -43,7 +43,7 @@
 #include "rc.h" 
 #include "namedStrings.h"
 #include "VirtualClock.h" // for getTime()
-
+#include "GnashNumeric.h"
 
 namespace {
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -521,7 +521,7 @@ toNumber(const as_value& v, const VM& vm)
 boost::int32_t
 toInt(const as_value& v, const VM& vm)
 {
-    const double d = val.to_number(vm.getSWFVersion());
+    const double d = v.to_number(vm.getSWFVersion());
 
     if (!isFinite(d)) return 0;
 

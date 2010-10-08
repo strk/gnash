@@ -358,7 +358,8 @@ asbroadcaster_removeListener(const fn_call& fn)
     
     // This is an ActionScript-like implementation, which is why it looks
     // like poor C++.
-    const int length = toInt(getMember(*listeners, NSV::PROP_LENGTH));
+    const int length = toInt(getMember(*listeners, NSV::PROP_LENGTH),
+            getVM(fn));
     int i = 0;
     string_table& st = getStringTable(fn);
 

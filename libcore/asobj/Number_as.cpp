@@ -72,7 +72,7 @@ number_toString(const fn_call& fn)
 
     if ( fn.nargs ) 
     {
-        int userRadix = toInt(fn.arg(0));
+        int userRadix = toInt(fn.arg(0), getVM(fn));
         if ( userRadix >= 2 && userRadix <= 36 ) radix=userRadix;
         else
         {

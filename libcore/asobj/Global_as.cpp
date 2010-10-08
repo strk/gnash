@@ -560,7 +560,7 @@ global_parseint(const fn_call& fn)
     size_t base;
     if (fn.nargs > 1)
     {
-        base = toInt(fn.arg(1));
+        base = toInt(fn.arg(1), getVM(fn));
     
         // Bases from 2 to 36 are valid, otherwise return NaN
         if (base < 2 || base > 36) return as_value(NaN);
@@ -691,7 +691,7 @@ global_assetpropflags(const fn_call& fn)
 
     // ASSetPropFlags was exposed in Flash 5, however the fourth argument
     // 'set_false' was not required as it always defaulted to the value '~0'. 
-    const int setFalse = (fn.nargs < 4 ? 0 : toInt(fn.arg(3))) &
+    const int setFalse = (fn.nargs < 4 ? 0 : toInt(fn.arg(3), getVM(fn))) &
         flagsMask;
 
     obj->setPropFlags(props, setFalse, setTrue);
@@ -714,8 +714,8 @@ global_asconstructor(const fn_call& fn)
         return as_value();
     }
 
-    const int sx = toInt(fn.arg(0));
-    const int sy = toInt(fn.arg(1));
+    const int sx = toInt(fn.arg(0), getVM(fn));
+    const int sy = toInt(fn.arg(1), getVM(fn));
 
     if (sx < 0 || sy < 0) {
         IF_VERBOSE_ASCODING_ERRORS(    
@@ -759,8 +759,8 @@ global_asnative(const fn_call& fn)
         return as_value();
     }
 
-    const int sx = toInt(fn.arg(0));
-    const int sy = toInt(fn.arg(1));
+    const int sx = toInt(fn.arg(0), getVM(fn));
+    const int sy = toInt(fn.arg(1), getVM(fn));
 
     if (sx < 0 || sy < 0) {
         IF_VERBOSE_ASCODING_ERRORS(    
@@ -813,12 +813,12 @@ global_assetnative(const fn_call& fn)
         return as_value();
     }
 
-    const int major = toInt(fn.arg(1));
+    const int major = toInt(fn.arg(1), getVM(fn));
     if (major < 0) return as_value();
 
     const std::string& props = fn.arg(2).to_string();
     const int minor =
-        fn.nargs > 3 ? std::max<boost::int32_t>(toInt(fn.arg(3)), 0) : 0;
+        fn.nargs > 3 ? std::max<boost::int32_t>(toInt(fn.arg(3), getVM(fn)), 0) : 0;
 
     std::string::const_iterator pos = props.begin();
 
@@ -884,12 +884,12 @@ global_assetnativeaccessor(const fn_call& fn)
         return as_value();
     }
 
-    const int major = toInt(fn.arg(1));
+    const int major = toInt(fn.arg(1), getVM(fn));
     if (major < 0) return as_value();
 
     const std::string& props = fn.arg(2).to_string();
     const int minor =
-        fn.nargs > 3 ? std::max<boost::int32_t>(toInt(fn.arg(3)), 0) : 0;
+        fn.nargs > 3 ? std::max<boost::int32_t>(toInt(fn.arg(3), getVM(fn)), 0) : 0;
 
     std::string::const_iterator pos = props.begin();
 

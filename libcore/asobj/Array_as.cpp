@@ -600,7 +600,7 @@ public:
         args += b, a;
         ret = invoke(cmp_method, _env, _object, args);
 
-        return (*_zeroCmp)(toInt(ret));
+        return (*_zeroCmp)(toInt(ret, getVM(_env)));
     }
 };
 
@@ -764,23 +764,26 @@ private:
 class GetMultiFlags
 {
 public:
-    GetMultiFlags(std::vector<boost::uint8_t>& v)
+    GetMultiFlags(std::vector<boost::uint8_t>& v, const fn_call& fn)
         :
         _v(v),
         _i(0),
         _uniq(false),
-        _index(false)
+        _index(false),
+        _fn(fn)
     {}
     void operator()(const as_value& val) {
         // extract SORT_UNIQUE and SORT_RETURN_INDEX from first flag
         if (!_i) {
-            boost::uint8_t flag = static_cast<boost::uint8_t>(val.to_number());
+            boost::uint8_t flag =
+                static_cast<boost::uint8_t>(toNumber(val, getVM(_fn)));
             flag = flag_preprocess(flag, &_uniq, &_index);
             _v.push_back(flag);
             ++_i;
             return;
         }
-        boost::uint8_t flag = static_cast<boost::uint8_t>(val.to_number());
+        boost::uint8_t flag = 
+                static_cast<boost::uint8_t>(toNumber(val, getVM(_fn)));
         flag &= ~(SORT_RETURN_INDEX);
         flag &= ~(SORT_UNIQUE);
         _v.push_back(flag);
@@ -794,6 +797,7 @@ private:
     size_t _i;
     bool _uniq;
     bool _index;
+    const fn_call& _fn;
 };
 
 }
@@ -812,7 +816,7 @@ checkArrayLength(as_object& array, const ObjectURI& uri, const as_value& val)
 {
     const string_table::key name = getName(uri);
     if (name == NSV::PROP_LENGTH) {
-        resizeArray(array, toInt(val));
+        resizeArray(array, toInt(val, getVM(array)));
         return;
     }
 
@@ -833,7 +837,7 @@ arrayLength(as_object& array)
     const as_value& length = getOwnProperty(array, NSV::PROP_LENGTH);
     if (length.is_undefined()) return 0;
     
-    const int size = toInt(length);
+    const int size = toInt(length, getVM(array));
     if (size < 0) return 0;
     return size;
 }
@@ -937,7 +941,7 @@ array_splice(const fn_call& fn)
     // Get start offset
     //----------------
 
-    int start = toInt(fn.arg(0));
+    int start = toInt(fn.arg(0), getVM(fn));
     if (start < 0) start = size + start; 
     start = clamp<int>(start, 0, size);
 
@@ -945,7 +949,7 @@ array_splice(const fn_call& fn)
     size_t remove = size - start;
     
     if (fn.nargs > 1) {
-        int remval = toInt(fn.arg(1));
+        int remval = toInt(fn.arg(1), getVM(fn));
         if (remval < 0) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Array.splice(%d,%d): negative length "
@@ -1137,7 +1141,7 @@ array_sortOn(const fn_call& fn)
             if (farray->array() && arrayLength(*farray) == optnum) {
 
                 std::vector<boost::uint8_t> flgs;
-                GetMultiFlags mf(flgs);
+                GetMultiFlags mf(flgs, fn);
                 foreachArray(*farray, mf);
                 do_unique = mf.unique();
                 do_index = mf.index();
@@ -1163,7 +1167,7 @@ array_sortOn(const fn_call& fn)
         // case: sortOn(["prop1", "prop2"], Array.FLAG)
         else {
             boost::uint8_t flags = 
-                static_cast<boost::uint8_t>(toInt(fn.arg(1)));
+                static_cast<boost::uint8_t>(toInt(fn.arg(1), getVM(fn)));
             flags = flag_preprocess(flags, &do_unique, &do_index);
             as_cmp_fn c = get_basic_cmp(flags, fn);
 
@@ -1384,10 +1388,10 @@ array_slice(const fn_call& fn)
         );
     }
 
-    int startindex = fn.nargs ? toInt(fn.arg(0)) : 0;
+    int startindex = fn.nargs ? toInt(fn.arg(0), getVM(fn)) : 0;
 
     // if we sent at least two arguments, setup endindex
-    int endindex = fn.nargs > 1 ? toInt(fn.arg(1)) :
+    int endindex = fn.nargs > 1 ? toInt(fn.arg(1), getVM(fn)) :
         std::numeric_limits<int>::max();
 
     Global_as& gl = getGlobal(fn);
@@ -1417,7 +1421,7 @@ array_new(const fn_call& fn)
     }
 
     if (fn.nargs == 1 && fn.arg(0).is_number()) {
-        int newSize = toInt(fn.arg(0));
+        int newSize = toInt(fn.arg(0), getVM(fn));
         if (newSize < 0) newSize = 0;
         else {
             ao->set_member(NSV::PROP_LENGTH, newSize);

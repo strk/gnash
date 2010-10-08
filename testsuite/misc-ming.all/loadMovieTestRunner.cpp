@@ -198,7 +198,7 @@ main(int /*argc*/, char** /*argv*/)
 	check(endOfTestFound);
 	if ( endOfTestFound )
 	{
-		check_equals(eot.to_bool(), true);
+		check_equals(eot.to_bool(8), true);
 	}
 
 }

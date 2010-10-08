@@ -758,7 +758,7 @@ sharedobject_flush(const fn_call& fn)
 
     int space = 0;
     if (fn.nargs) {
-        space = toInt(fn.arg(0));
+        space = toInt(fn.arg(0), getVM(fn));
     }
 
     /// If there is no data member, returns undefined.

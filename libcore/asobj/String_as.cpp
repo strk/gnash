@@ -178,13 +178,13 @@ string_slice(const fn_call& fn)
 
     if (!checkArgs(fn, 1, 2, "String.slice()")) return as_value();
 
-    size_t start = validIndex(wstr, toInt(fn.arg(0)));
+    size_t start = validIndex(wstr, toInt(fn.arg(0), getVM(fn)));
 
     size_t end = wstr.length();
 
     if (fn.nargs >= 2)
     {
-        end = validIndex(wstr, toInt(fn.arg(1)));
+        end = validIndex(wstr, toInt(fn.arg(1), getVM(fn)));
 
     } 
 
@@ -260,7 +260,7 @@ string_split(const fn_call& fn)
         // SWF5
         if (fn.nargs > 1 && !fn.arg(1).is_undefined())
         {
-            int limit = toInt(fn.arg(1));
+            int limit = toInt(fn.arg(1), getVM(fn));
             if (limit < 1)
             {
                 // Return empty array.
@@ -293,7 +293,7 @@ string_split(const fn_call& fn)
         // the delimiter is defined.
         if (fn.nargs > 1 && !fn.arg(1).is_undefined())
         {
-            int limit = toInt(fn.arg(1));
+            int limit = toInt(fn.arg(1), getVM(fn));
             if (limit < 1) {
                 // Return empty array if 
                 return as_value(array);
@@ -351,7 +351,7 @@ string_lastIndexOf(const fn_call& fn)
     int start = str.size();
 
     if (fn.nargs >= 2) {
-        start = toInt(fn.arg(1));
+        start = toInt(fn.arg(1), getVM(fn));
     }
     
     if (start < 0) {
@@ -384,13 +384,13 @@ string_substr(const fn_call& fn)
 
     if (!checkArgs(fn, 1, 2, "String.substr()")) return as_value(str);
     
-    int start = validIndex(wstr, toInt(fn.arg(0)));
+    int start = validIndex(wstr, toInt(fn.arg(0), getVM(fn)));
 
     int num = wstr.length();
 
     if (fn.nargs >= 2 && !fn.arg(1).is_undefined())
     {
-        num = toInt(fn.arg(1));
+        num = toInt(fn.arg(1), getVM(fn));
         if ( num < 0 )
         {
             if ( -num <= start ) num = 0;
@@ -424,7 +424,7 @@ string_substring(const fn_call& fn)
 
     const as_value& s = fn.arg(0);
 
-    int start = toInt(s);
+    int start = toInt(s, getVM(fn));
     int end = wstr.size();
 
     if (s.is_undefined() || start < 0) {
@@ -436,7 +436,7 @@ string_substring(const fn_call& fn)
     }
 
     if (fn.nargs >= 2 && !fn.arg(1).is_undefined()) {
-        int num = toInt(fn.arg(1));
+        int num = toInt(fn.arg(1), getVM(fn));
 
         if (num < 0) {
             num = 0;
@@ -486,21 +486,19 @@ string_indexOf(const fn_call& fn)
     if (fn.nargs >= 2)
     {
         const as_value& saval = fn.arg(1); // start arg val
-        int start_arg = toInt(saval);
-        if ( start_arg > 0 ) start = (size_t) start_arg;
-    else
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        if ( start_arg < 0 )
-        {
-            log_aserror("String.indexOf(%s, %s): second argument casts to invalid offset (%d)",
-                tfarg, saval, start_arg);
+        int start_arg = toInt(saval, getVM(fn));
+        if (start_arg > 0) start = (size_t) start_arg;
+        else {
+            IF_VERBOSE_ASCODING_ERRORS(
+                if (start_arg < 0) {
+                    log_aserror("String.indexOf(%s, %s): second argument casts "
+                        "to invalid offset (%d)", tfarg, saval, start_arg);
+                }
+            );
         }
-        );
-    }
     }
 
-    size_t pos = wstr.find(toFind, start);
+    const size_t pos = wstr.find(toFind, start);
 
     if (pos == std::wstring::npos) {
         return as_value(-1);
@@ -524,11 +522,11 @@ string_fromCharCode(const fn_call& fn)
         for (unsigned int i = 0; i < fn.nargs; i++)
         {
             // Maximum 65535, as with all DisplayObject codes.
-            boost::uint16_t c = static_cast<boost::uint16_t>(toInt(fn.arg(i)));
+            const boost::uint16_t c = 
+                static_cast<boost::uint16_t>(toInt(fn.arg(i), getVM(fn)));
             
             // If more than 255, push 'overflow' byte.
-            if (c > 255)
-            {
+            if (c > 255) {
                 str.push_back(static_cast<unsigned char>(c >> 8));
             }
 
@@ -544,7 +542,8 @@ string_fromCharCode(const fn_call& fn)
 
     for (unsigned int i = 0; i < fn.nargs; i++)
     {
-        boost::uint16_t c = static_cast<boost::uint16_t>(toInt(fn.arg(i)));
+        const boost::uint16_t c = 
+            static_cast<boost::uint16_t>(toInt(fn.arg(i), getVM(fn)));
         if (c == 0) break;
         wstr.push_back(c);
     }
@@ -600,7 +599,7 @@ string_charAt(const fn_call& fn)
     if (!checkArgs(fn, 1, 1, "String.charAt()")) return as_value("");
 
     // to_int() makes this safe from overflows.
-    const size_t index = static_cast<size_t>(toInt(fn.arg(0)));
+    const size_t index = static_cast<size_t>(toInt(fn.arg(0), getVM(fn)));
 
     size_t currentIndex = 0;
 

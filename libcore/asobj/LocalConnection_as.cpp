@@ -867,11 +867,10 @@ executeAMFFunction(as_object& o, amf::Reader& rd)
         if (rd(a)) log_debug("First Number: %s", a);
 
         // Handle negative numbers.
-        const size_t count = std::max<int>(0, toInt(a));
+        const size_t count = std::max<int>(0, toInt(a, getVM(o)));
 
         // We don't know what the second number signifies.
         if (rd(a)) log_debug("Second Number: %s", a);
-
 
         for (size_t i = 0; i < count; ++i) {
             if (!rd(a)) {

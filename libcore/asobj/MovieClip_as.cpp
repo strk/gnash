@@ -319,7 +319,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
-    ptr->addDisplayListObject(mc, toInt(fn.arg(1)));
+    ptr->addDisplayListObject(mc, toInt(fn.arg(1), getVM(fn)));
     return as_value(o);
 }
 
@@ -900,7 +900,7 @@ movieclip_loadMovie(const fn_call& fn)
     // TODO: if GET/POST should send variables of *this* movie,
     // no matter if the target will be replaced by another movie !!
     const MovieClip::VariablesMethod method =
-        static_cast<MovieClip::VariablesMethod>(toInt(val));
+        static_cast<MovieClip::VariablesMethod>(toInt(val, getVM(fn)));
 
     std::string data;
 
@@ -957,7 +957,7 @@ movieclip_loadVariables(const fn_call& fn)
     }
 
     const MovieClip::VariablesMethod method =
-        static_cast<MovieClip::VariablesMethod>(toInt(val));
+        static_cast<MovieClip::VariablesMethod>(toInt(val, getVM(fn)));
 
     movieclip->loadVariables(urlstr, method);
     log_debug("MovieClip.loadVariables(%s) - TESTING ", urlstr);
@@ -1067,7 +1067,7 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
         return as_value();
     }
 
-    const int depth = toInt(fn.arg(0));
+    const int depth = toInt(fn.arg(0), getVM(fn));
 
     DisplayObject* ch = mc->getDisplayObjectAtDepth(depth);
  
@@ -1127,7 +1127,7 @@ movieclip_getURL(const fn_call& fn)
 
 
     MovieClip::VariablesMethod method =
-        static_cast<MovieClip::VariablesMethod>(toInt(val));
+        static_cast<MovieClip::VariablesMethod>(toInt(val, getVM(fn)));
 
     std::string vars;
 
@@ -1531,7 +1531,7 @@ movieclip_lineStyle(const fn_call& fn)
     switch (arguments) {
         default:
         case 8:
-            miterLimitFactor = clamp<int>(toInt(fn.arg(7)), 1, 255);
+            miterLimitFactor = clamp<int>(toInt(fn.arg(7), getVM(fn)), 1, 255);
         case 7:
         {
             std::string joinStyleStr = fn.arg(6).to_string();
@@ -1604,7 +1604,7 @@ movieclip_lineStyle(const fn_call& fn)
             // See pollock.swf for eventual regressions.
             // It sets color to a random number from
             // 0 to 160000000 (about 10 times more then the max).
-            boost::uint32_t rgbval = toInt(fn.arg(1));
+            boost::uint32_t rgbval = toInt(fn.arg(1), getVM(fn));
             r = boost::uint8_t((rgbval & 0xFF0000) >> 16);
             g = boost::uint8_t((rgbval & 0x00FF00) >> 8);
             b = boost::uint8_t((rgbval & 0x0000FF) );
@@ -1687,7 +1687,7 @@ movieclip_beginFill(const fn_call& fn)
     boost::uint8_t a = 255;
 
     if (fn.nargs > 1) {
-        a = 255 * clamp<int>(toInt(fn.arg(1)), 0, 100) / 100;
+        a = 255 * clamp<int>(toInt(fn.arg(1), getVM(fn)), 0, 100) / 100;
     }
 
     rgba color(r, g, b, a);
@@ -1811,7 +1811,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         string_table::key key = st.find(boost::lexical_cast<std::string>(i));
 
         as_value colVal = getMember(*colors, key);
-        boost::uint32_t col = colVal.is_number() ? toInt(colVal) : 0;
+        boost::uint32_t col = colVal.is_number() ? toInt(colVal, getVM(fn)) : 0;
 
         /// Alpha is the range 0..100.
         as_value alpVal = getMember(*alphas, key);
@@ -1833,7 +1833,8 @@ movieclip_beginGradientFill(const fn_call& fn)
             std::min<boost::uint32_t>(gradients[i - 1].ratio + step, 0xff);
 
         boost::uint8_t rat = ratVal.is_number() ? 
-            clamp<boost::uint32_t>(toInt(ratVal), minRatio, 0xff) : minRatio;
+            clamp<boost::uint32_t>(toInt(ratVal, getVM(fn)), minRatio, 0xff)
+            : minRatio;
 
         // The renderer may expect successively larger ratios; failure to
         // do this can lead to memory errors.
@@ -2059,7 +2060,7 @@ movieclip_attachBitmap(const fn_call& fn)
         return as_value();
     }
 
-    int depth = toInt(fn.arg(1));
+    int depth = toInt(fn.arg(1), getVM(fn));
 
     DisplayObject* bm = new Bitmap(getRoot(fn), 0, bd, ptr);
     ptr->attachCharacter(*bm, depth, 0);

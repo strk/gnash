@@ -511,15 +511,6 @@ std::string doubleToString(double val, int radix = 10);
 ///               parsed.
 bool parseNonDecimalInt(const std::string& s, double& d, bool whole = true);
 
-/// AS2-compatible conversion to 32bit integer
-//
-/// This truncates large numbers to fit in the 32-bit space. It is not a 
-/// proper function of as_value because it is simply a further operation on
-/// the stored number type.
-//
-/// This function calls to_number(), so performs a conversion if necessary.
-boost::int32_t toInt(const as_value& val);
-
 /// Set a value to NaN
 inline void
 setNaN(as_value& v) {

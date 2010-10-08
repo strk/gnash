@@ -294,7 +294,7 @@ microphone_setgain(const fn_call& fn)
         return as_value();
     } 
 
-    const boost::int32_t gain = clamp<boost::int32_t>(toInt(fn.arg(0)), 0, 100);
+    const boost::int32_t gain = clamp<boost::int32_t>(toInt(fn.arg(0), getVM(fn)), 0, 100);
     ptr->setGain(gain);
     return as_value();
 }
@@ -309,7 +309,7 @@ microphone_setrate(const fn_call& fn)
         log_error("Microphone.setRate: wrong number of parameters passed");
         return as_value();
     }
-    ptr->setRate(toInt(fn.arg(0)));
+    ptr->setRate(toInt(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -451,7 +451,7 @@ microphone_setsilencelevel(const fn_call& fn)
     
     if (numargs > 1) {
         // If it's less than 0, it's set to 0.
-        const int timeout = std::max<boost::int32_t>(toInt(fn.arg(1)), 0);
+        const int timeout = std::max<boost::int32_t>(toInt(fn.arg(1), getVM(fn)), 0);
         ptr->setSilenceTimeout(timeout);
     }
     return as_value();

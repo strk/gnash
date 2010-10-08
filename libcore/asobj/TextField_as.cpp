@@ -226,11 +226,11 @@ textfield_createTextField(const fn_call& fn)
     }
 
     const std::string& name = fn.arg(0).to_string();
-    const int depth = toInt(fn.arg(1));
-    const int x = toInt(fn.arg(2));
-    const int y = toInt(fn.arg(3));
+    const int depth = toInt(fn.arg(1), getVM(fn));
+    const int x = toInt(fn.arg(2), getVM(fn));
+    const int y = toInt(fn.arg(3), getVM(fn));
     
-    int width = toInt(fn.arg(4));
+    int width = toInt(fn.arg(4), getVM(fn));
     if (width < 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("createTextField: negative width (%d)"
@@ -239,7 +239,7 @@ textfield_createTextField(const fn_call& fn)
         width = -width;
     }
 
-    int height = toInt(fn.arg(5));
+    int height = toInt(fn.arg(5), getVM(fn));
     if ( height < 0 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -317,7 +317,7 @@ textfield_backgroundColor(const fn_call& fn)
     }
     else {
         rgba newColor;
-        newColor.parseRGB(static_cast<boost::uint32_t>(toInt(fn.arg(0))));
+        newColor.parseRGB(static_cast<boost::uint32_t>(toInt(fn.arg(0), getVM(fn))));
         ptr->setBackgroundColor(newColor);
     }
 
@@ -845,7 +845,7 @@ textfield_maxChars(const fn_call& fn)
         return as_value(maxChars);
     }
     // Setter
-    text->maxChars(toInt(fn.arg(0)));
+    text->maxChars(toInt(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -989,7 +989,7 @@ textfield_replaceText(const fn_call& fn)
         return as_value();
     }
 
-    int userEnd = toInt(fn.arg(1));
+    int userEnd = toInt(fn.arg(1), getVM(fn));
     if ( userEnd < 0 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1000,7 +1000,7 @@ textfield_replaceText(const fn_call& fn)
         return as_value();
     }
 
-    wstring::size_type start = toInt(fn.arg(0));
+    wstring::size_type start = toInt(fn.arg(0), getVM(fn));
     wstring::size_type end = userEnd;
 
     int version = getSWFVersion(fn);
