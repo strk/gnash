@@ -180,39 +180,6 @@ ClassHierarchy::declareAll(const NativeClasses& classes)
     std::for_each(classes.begin(), classes.end(), boost::bind(nf, this, _1));
 }
 
-void
-ClassHierarchy::markReachableResources() const
-{
-    // TODO
-}
-
-std::ostream&
-operator<<(std::ostream& os, const ClassHierarchy::NativeClass& c)
-{
-    string_table& st = VM::get().getStringTable();
-
-    os << "("
-        << " name:" << st.value(getName(c.uri))
-        << " version:" << c.version
-        << ")";
-
-    return os;
-}
-
-std::ostream&
-operator<<(std::ostream& os, const ClassHierarchy::ExtensionClass& c)
-{
-    string_table& st = VM::get().getStringTable();
-
-    os << "(file:" << c.file_name
-        << " init:" << c.init_name
-        << " name:" << st.value(getName(c.uri))
-        << " version:" << c.version
-        << ")";
-
-    return os;
-}
-
 } // end of namespace gnash
 
 // local Variables:

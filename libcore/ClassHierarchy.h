@@ -119,18 +119,12 @@ public:
 	void declareAll(const NativeClasses& classes);
 
 	/// Mark objects for garbage collector.
-	void markReachableResources() const;
+	void markReachableResources() const {}
 
 private:
 	as_object* mGlobal;
 	Extension* mExtension;
 };
-
-std::ostream&
-operator<<(std::ostream& os, const ClassHierarchy::NativeClass& c);
-
-std::ostream&
-operator<<(std::ostream& os, const ClassHierarchy::ExtensionClass& c);
 
 } 
 #endif 
