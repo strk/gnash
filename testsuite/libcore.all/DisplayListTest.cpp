@@ -52,7 +52,7 @@ main(int /*argc*/, char** /*argv*/)
     
     RunResources ri;
     ri.setStreamProvider(
-            boost::shared_ptr<StreamProvider>(new StreamProvider(URL("")));
+            boost::shared_ptr<StreamProvider>(new StreamProvider(URL(""))));
     
     // Initialize a VM
     boost::intrusive_ptr<movie_definition> md5(new DummyMovieDefinition(ri, 5));
