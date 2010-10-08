@@ -99,8 +99,7 @@ namespace {
 //
 
 // If it is called with two arguments, the valueOf method
-// (i.e. to_number()) of the second method is called, but 
-// not used. Strange, but true.
+// of the second method is called, but not used. Strange, but true.
 template<UnaryMathFunc Func>
 as_value
 unaryFunction(const fn_call& fn)

@@ -306,73 +306,72 @@ sortIndexed(as_object& array, AVCMP avc)
 // string comparison, ascending (default sort method)
 struct as_value_lt
 {
-    int _version;
+    as_value_lt(const fn_call& fn) : _fn(fn) {}
 
-    as_value_lt(int version) : _version(version) {}
-
-    inline int str_cmp(const as_value& a, const as_value& b)
+    int str_cmp(const as_value& a, const as_value& b) const 
     {
-        std::string s = a.to_string(_version);
-        return s.compare(b.to_string(_version));
+        std::string s = a.to_string(getSWFVersion(_fn));
+        return s.compare(b.to_string(getSWFVersion(_fn)));
     }
 
-    inline int str_nocase_cmp(const as_value& a, const as_value& b)
+    int str_nocase_cmp(const as_value& a, const as_value& b) const
     {
         using namespace boost::algorithm;
 
-        std::string c = to_upper_copy(a.to_string(_version));
-        std::string d = to_upper_copy(b.to_string(_version));
+        std::string c = to_upper_copy(a.to_string(getSWFVersion(_fn)));
+        std::string d = to_upper_copy(b.to_string(getSWFVersion(_fn)));
         return c.compare(d);
     }
 
-    inline bool as_value_numLT (const as_value& a, const as_value& b)
+    bool as_value_numLT(const as_value& a, const as_value& b) const
     {
         if (a.is_undefined()) return false;
         if (b.is_undefined()) return true;
         if (a.is_null()) return false;
         if (b.is_null()) return true;
-        double aval = a.to_number();
-        double bval = b.to_number();
+        const double aval = toNumber(a, getVM(_fn));
+        const double bval = toNumber(b, getVM(_fn));
         if (isNaN(aval)) return false;
         if (isNaN(bval)) return true;
         return aval < bval;
     }
 
-    inline bool as_value_numGT (const as_value& a, const as_value& b)
+    bool as_value_numGT(const as_value& a, const as_value& b) const
     {
         if (b.is_undefined()) return false;
         if (a.is_undefined()) return true;
         if (b.is_null()) return false;
         if (a.is_null()) return true;
-        double aval = a.to_number();
-        double bval = b.to_number();
+        const double aval = toNumber(a, getVM(_fn));
+        const double bval = toNumber(b, getVM(_fn));
         if (isNaN(bval)) return false;
         if (isNaN(aval)) return true;
         return aval > bval;
     }
 
-    inline bool as_value_numEQ (const as_value& a, const as_value& b)
+    inline bool as_value_numEQ(const as_value& a, const as_value& b) const
     {
         if (a.is_undefined() && b.is_undefined()) return true;
         if (a.is_null() && b.is_null()) return true;
-        double aval = a.to_number();
-        double bval = b.to_number();
+        double aval = toNumber(a, getVM(_fn));
+        double bval = toNumber(b, getVM(_fn));
         if (isNaN(aval) && isNaN(bval)) return true;
         return aval == bval;
     }
 
-    bool operator() (const as_value& a, const as_value& b)
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_cmp(a, b) < 0;
     }
+private:
+    const fn_call& _fn;
 };
 
 // string comparison, descending
 struct as_value_gt : public as_value_lt 
 {
-    as_value_gt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
-    {
+    as_value_gt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const {
         return str_cmp(a, b) > 0;
     }
 };
@@ -380,8 +379,8 @@ struct as_value_gt : public as_value_lt
 // string equality
 struct as_value_eq : public as_value_lt
 {
-    as_value_eq(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_eq(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_cmp(a, b) == 0;
     }
@@ -390,8 +389,8 @@ struct as_value_eq : public as_value_lt
 // case-insensitive string comparison, ascending
 struct as_value_nocase_lt : public as_value_lt
 {
-    as_value_nocase_lt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_nocase_lt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_nocase_cmp(a, b) < 0;
     }
@@ -400,8 +399,8 @@ struct as_value_nocase_lt : public as_value_lt
 // case-insensitive string comparison, descending
 struct as_value_nocase_gt : public as_value_lt
 {
-    as_value_nocase_gt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_nocase_gt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_nocase_cmp(a, b) > 0;
     }
@@ -410,8 +409,8 @@ struct as_value_nocase_gt : public as_value_lt
 // case-insensitive string equality
 struct as_value_nocase_eq : public as_value_lt
 {
-    as_value_nocase_eq(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_nocase_eq(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_nocase_cmp(a, b) == 0;
     }
@@ -420,11 +419,10 @@ struct as_value_nocase_eq : public as_value_lt
 // numeric comparison, ascending
 struct as_value_num_lt : public as_value_lt
 {
-    as_value_num_lt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_lt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_cmp(a, b) < 0;
+        if (a.is_string() || b.is_string()) return str_cmp(a, b) < 0;
         return as_value_numLT(a, b);
     }
 };
@@ -432,11 +430,10 @@ struct as_value_num_lt : public as_value_lt
 // numeric comparison, descending
 struct as_value_num_gt : public as_value_lt
 {
-    as_value_num_gt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_gt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_cmp(a, b) > 0;
+        if (a.is_string() || b.is_string()) return str_cmp(a, b) > 0;
         return as_value_numGT(a, b);
     }
 };
@@ -444,11 +441,10 @@ struct as_value_num_gt : public as_value_lt
 // numeric equality
 struct as_value_num_eq : public as_value_lt
 {
-    as_value_num_eq(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_eq(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_cmp(a, b) == 0;
+        if (a.is_string() || b.is_string()) return str_cmp(a, b) == 0;
         return as_value_numEQ(a, b);
     }
 };
@@ -456,11 +452,10 @@ struct as_value_num_eq : public as_value_lt
 // case-insensitive numeric comparison, ascending
 struct as_value_num_nocase_lt : public as_value_lt
 {
-    as_value_num_nocase_lt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_nocase_lt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_nocase_cmp(a, b) < 0;
+        if (a.is_string() || b.is_string()) return str_nocase_cmp(a, b) < 0;
         return as_value_numLT(a, b);
     }
 };
@@ -468,11 +463,10 @@ struct as_value_num_nocase_lt : public as_value_lt
 // case-insensitive numeric comparison, descending
 struct as_value_num_nocase_gt : public as_value_lt
 {
-    as_value_num_nocase_gt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_nocase_gt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_nocase_cmp(a, b) > 0;
+        if (a.is_string() || b.is_string()) return str_nocase_cmp(a, b) > 0;
         return as_value_numGT(a, b);
     }
 };
@@ -480,11 +474,10 @@ struct as_value_num_nocase_gt : public as_value_lt
 // case-insensitive numeric equality
 struct as_value_num_nocase_eq : public as_value_lt
 {
-    as_value_num_nocase_eq(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_nocase_eq(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator() (const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_nocase_cmp(a, b) == 0;
+        if (a.is_string() || b.is_string()) return str_nocase_cmp(a, b) == 0;
         return as_value_numEQ(a, b);
     }
 };
@@ -493,7 +486,7 @@ struct as_value_num_nocase_eq : public as_value_lt
 // Note:
 // SORT_UNIQUE and SORT_RETURN_INDEX must first be stripped from the flag
 as_cmp_fn
-get_basic_cmp(boost::uint8_t flags, int version)
+get_basic_cmp(boost::uint8_t flags, const fn_call& fn)
 {
     as_cmp_fn f;
 
@@ -504,44 +497,44 @@ get_basic_cmp(boost::uint8_t flags, int version)
     switch ( flags )
     {
         case 0: // default string comparison
-            f = as_value_lt(version);
+            f = as_value_lt(fn);
             return f;
 
         case SORT_DESCENDING:
-            f = as_value_gt(version);
+            f = as_value_gt(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE: 
-            f = as_value_nocase_lt(version);
+            f = as_value_nocase_lt(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE | 
                 SORT_DESCENDING:
-            f = as_value_nocase_gt(version);
+            f = as_value_nocase_gt(fn);
             return f;
 
         case SORT_NUMERIC: 
-            f = as_value_num_lt(version);
+            f = as_value_num_lt(fn);
             return f;
 
         case SORT_NUMERIC | SORT_DESCENDING:
-            f = as_value_num_gt(version);
+            f = as_value_num_gt(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE | 
                 SORT_NUMERIC:
-            f = as_value_num_nocase_lt(version);
+            f = as_value_num_nocase_lt(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE | 
                 SORT_NUMERIC |
                 SORT_DESCENDING:
-            f = as_value_num_nocase_gt(version);
+            f = as_value_num_nocase_gt(fn);
             return f;
 
         default:
-            log_unimpl(_("Unhandled sort flags: %d (0x%X)"), (int)flags, (int)flags);
-            f = as_value_lt(version);
+            log_unimpl(_("Unhandled sort flags: %d (0x%X)"), +flags, +flags);
+            f = as_value_lt(fn);
             return f;
     }
 }
@@ -550,32 +543,32 @@ get_basic_cmp(boost::uint8_t flags, int version)
 // Note:
 // SORT_UNIQUE and SORT_RETURN_INDEX must first be stripped from the flag
 as_cmp_fn
-get_basic_eq(boost::uint8_t flags, int version)
+get_basic_eq(boost::uint8_t flags, const fn_call& fn)
 {
     as_cmp_fn f;
     flags &= ~(SORT_DESCENDING);
 
-    switch ( flags )
+    switch (flags)
     {
         case 0: // default string comparison
-            f = as_value_eq(version);
+            f = as_value_eq(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE: 
-            f = as_value_nocase_eq(version);
+            f = as_value_nocase_eq(fn);
             return f;
 
         case SORT_NUMERIC: 
-            f = as_value_num_eq(version);
+            f = as_value_num_eq(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE | 
                 SORT_NUMERIC:
-            f = as_value_num_nocase_eq(version);
+            f = as_value_num_nocase_eq(fn);
             return f;
 
         default:
-            f = as_value_eq(version);
+            f = as_value_eq(fn);
             return f;
     }
 }
@@ -1007,10 +1000,8 @@ array_sort(const fn_call& fn)
 {
     as_object* array = ensure<ValidThis>(fn);
     
-    const int version = getSWFVersion(*array);
-    
     if (!fn.nargs) {
-        sort(*array, as_value_lt(version));
+        sort(*array, as_value_lt(fn));
         return as_value(array);
     }
     
@@ -1060,10 +1051,10 @@ array_sort(const fn_call& fn)
 
     bool do_unique, do_index;
     flags = flag_preprocess(flags, &do_unique, &do_index);
-    as_cmp_fn comp = get_basic_cmp(flags, version);
+    as_cmp_fn comp = get_basic_cmp(flags, fn);
 
     if (do_unique) {
-        as_cmp_fn eq = get_basic_eq(flags, version);
+        as_cmp_fn eq = get_basic_eq(flags, fn);
         if (do_index) return sortIndexed(*array, comp, eq);
         return sort(*array, comp, eq) ? as_value(array) : as_value(0.0);
     }
@@ -1096,11 +1087,11 @@ array_sortOn(const fn_call& fn)
             flags = flag_preprocess(flags, &do_unique, &do_index);
         }
 
-        as_value_prop avc(propField, get_basic_cmp(flags, version),
+        as_value_prop avc(propField, get_basic_cmp(flags, fn),
                 getGlobal(fn));
 
         if (do_unique) {
-            as_value_prop ave(propField, get_basic_eq(flags, version), 
+            as_value_prop ave(propField, get_basic_eq(flags, fn), 
                     getGlobal(fn));
             if (do_index)
                 return sortIndexed(*array, avc, ave);
@@ -1134,7 +1125,7 @@ array_sortOn(const fn_call& fn)
         // case: sortOn(["prop1", "prop2"])
         if (fn.nargs == 1) {
             // assign each cmp function to the standard cmp fn
-            as_cmp_fn c = get_basic_cmp(0, version);
+            as_cmp_fn c = get_basic_cmp(0, fn);
             cmp.assign(optnum, c);
         }
         // case: sortOn(["prop1", "prop2"], [Array.FLAG1, Array.FLAG2])
@@ -1155,17 +1146,17 @@ array_sortOn(const fn_call& fn)
                     flgs.begin();
 
                 while (it != flgs.end()) {
-                    cmp.push_back(get_basic_cmp(*it++, version));
+                    cmp.push_back(get_basic_cmp(*it++, fn));
                 }
 
                 if (do_unique) {
                     it = flgs.begin();
                     while (it != flgs.end())
-                        eq.push_back(get_basic_eq(*it++, version));
+                        eq.push_back(get_basic_eq(*it++, fn));
                 }
             }
             else {
-                as_cmp_fn c = get_basic_cmp(0, version);
+                as_cmp_fn c = get_basic_cmp(0, fn);
                 cmp.assign(optnum, c);
             }
         }
@@ -1174,12 +1165,12 @@ array_sortOn(const fn_call& fn)
             boost::uint8_t flags = 
                 static_cast<boost::uint8_t>(toInt(fn.arg(1)));
             flags = flag_preprocess(flags, &do_unique, &do_index);
-            as_cmp_fn c = get_basic_cmp(flags, version);
+            as_cmp_fn c = get_basic_cmp(flags, fn);
 
             cmp.assign(optnum, c);
             
             if (do_unique) {
-                as_cmp_fn e = get_basic_eq(flags, version);
+                as_cmp_fn e = get_basic_eq(flags, fn);
                 eq.assign(optnum, e);
             }
         }
