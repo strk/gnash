@@ -86,8 +86,7 @@ namespace {
     as_value matrix_transformPoint(const fn_call& fn);
     as_value matrix_translate(const fn_call& fn);
     void fillMatrix(MatrixType& matrix, as_object& matrixObject);
-    PointType transformPoint(as_object* const pointObject,
-            as_object* const matrixObject);
+    PointType transformPoint(as_object& pointObject, as_object& matrixObject);
 
     as_value get_flash_geom_matrix_constructor(const fn_call& fn);
     as_value matrix_ctor(const fn_call& fn);
@@ -408,7 +407,7 @@ matrix_deltaTransformPoint(const fn_call& fn)
     as_object* obj = arg.to_object(getGlobal(fn));
     assert(obj);
 
-    const PointType& point = transformPoint(obj, ptr);
+    const PointType& point = transformPoint(*obj, *ptr);
 
     // Construct a Point and set its properties.
     as_value pointClass(fn.env().find_object("flash.geom.Point"));
@@ -545,10 +544,10 @@ matrix_rotate(const fn_call& fn)
     ptr->get_member(NSV::PROP_TX, &tx);
     ptr->get_member(NSV::PROP_TY, &ty);
             
-    currentMatrix(0, 0) = a.to_number();
-    currentMatrix(0, 1) = b.to_number();
-    currentMatrix(1, 0) = c.to_number();
-    currentMatrix(1, 1) = d.to_number();
+    currentMatrix(0, 0) = toNumber(a, getVM(fn));
+    currentMatrix(0, 1) = toNumber(b, getVM(fn));
+    currentMatrix(1, 0) = toNumber(c, getVM(fn));
+    currentMatrix(1, 1) = toNumber(d, getVM(fn));
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
     log_debug("(Matrix.rotate) This matrix (pre-transform): %s", currentMatrix);
@@ -569,8 +568,8 @@ matrix_rotate(const fn_call& fn)
 
     // Do rotation separately.
     PointType translation;
-    translation(0) = tx.to_number();
-    translation(1) = ty.to_number();
+    translation(0) = toNumber(tx, getVM(fn));
+    translation(1) = toNumber(ty, getVM(fn));
     
     translation = boost::numeric::ublas::prod(translation, transformMatrix);
 
@@ -620,10 +619,10 @@ matrix_scale(const fn_call& fn)
     ptr->get_member(NSV::PROP_TX, &tx);
     ptr->get_member(NSV::PROP_TY, &ty);
             
-    currentMatrix(0, 0) = a.to_number();
-    currentMatrix(0, 1) = b.to_number();
-    currentMatrix(1, 0) = c.to_number();
-    currentMatrix(1, 1) = d.to_number();
+    currentMatrix(0, 0) = toNumber(a, getVM(fn));
+    currentMatrix(0, 1) = toNumber(b, getVM(fn));
+    currentMatrix(1, 0) = toNumber(c, getVM(fn));
+    currentMatrix(1, 1) = toNumber(d, getVM(fn));
     
 #ifdef GNASH_DEBUG_GEOM_MATRIX
     log_debug("(Matrix.scale) This matrix (pre-transform): %s", currentMatrix);
@@ -643,8 +642,8 @@ matrix_scale(const fn_call& fn)
     ptr->set_member(NSV::PROP_D, currentMatrix(1, 1));
 
     // This is just a simple multiplication, so do it separately.
-    ptr->set_member(NSV::PROP_TX, as_value(tx.to_number() * scaleX));
-    ptr->set_member(NSV::PROP_TY, as_value(ty.to_number() * scaleY));  
+    ptr->set_member(NSV::PROP_TX, as_value(toNumber(tx, getVM(fn)) * scaleX));
+    ptr->set_member(NSV::PROP_TY, as_value(toNumber(ty, getVM(fn)) * scaleY));  
 
     return as_value();
 }
@@ -730,7 +729,7 @@ matrix_transformPoint(const fn_call& fn)
     ptr->get_member(NSV::PROP_TX, &tx);
     ptr->get_member(NSV::PROP_TY, &ty);
     
-    const PointType& point = transformPoint(obj, ptr);
+    const PointType& point = transformPoint(*obj, *ptr);
 
     // Construct a Point and set its properties.
     as_value pointClass(fn.env().find_object("flash.geom.Point"));
@@ -743,7 +742,7 @@ matrix_transformPoint(const fn_call& fn)
     }
 
     fn_call::Args args;
-    args += point(0) + tx.to_number(), point(1) + ty.to_number();
+    args += point(0) + toNumber(tx, getVM(fn)), point(1) + toNumber(ty, getVM(fn));
 
     as_value ret = constructInstance(*pointCtor, fn.env(), args);
 
@@ -774,8 +773,8 @@ matrix_translate(const fn_call& fn)
         ptr->get_member(NSV::PROP_TX, &tx);
         ptr->get_member(NSV::PROP_TY, &ty);
 
-        double transX = toNumber(fn.arg(0), getVM(fn)) + tx.to_number();
-        double transY = toNumber(fn.arg(1), getVM(fn)) + ty.to_number();
+        double transX = toNumber(fn.arg(0), getVM(fn)) + toNumber(tx, getVM(fn));
+        double transY = toNumber(fn.arg(1), getVM(fn)) + toNumber(ty, getVM(fn));
                 
         ptr->set_member(NSV::PROP_TX, as_value(transX));
         ptr->set_member(NSV::PROP_TY, as_value(transY));
@@ -788,53 +787,46 @@ matrix_translate(const fn_call& fn)
 // (transformPoint) or not if not (deltaTransformPoint). Just
 // make sure the objects are what they're supposed to be.
 PointType
-transformPoint(as_object* const pointObject, as_object* const matrixObject)
+transformPoint(as_object& pointObject, as_object& matrixObject)
 {
     // Get the point co-ordinates.
     as_value x, y;
     
-    pointObject->get_member(NSV::PROP_X, &x);
-    pointObject->get_member(NSV::PROP_Y, &y);
+    pointObject.get_member(NSV::PROP_X, &x);
+    pointObject.get_member(NSV::PROP_Y, &y);
 
     // Get the matrix elements to use as a transformation matrix.
     as_value a, b, c, d;
 
-    matrixObject->get_member(NSV::PROP_A, &a);
-    matrixObject->get_member(NSV::PROP_B, &b);
-    matrixObject->get_member(NSV::PROP_C, &c);
-    matrixObject->get_member(NSV::PROP_D, &d);
+    matrixObject.get_member(NSV::PROP_A, &a);
+    matrixObject.get_member(NSV::PROP_B, &b);
+    matrixObject.get_member(NSV::PROP_C, &c);
+    matrixObject.get_member(NSV::PROP_D, &d);
+
+    VM& vm = getVM(pointObject);
 
     // Construct the matrix
     boost::numeric::ublas::c_matrix<double, 2, 2> transformMatrix;
-    transformMatrix(0, 0) = a.to_number();
-    transformMatrix(0, 1) = b.to_number();
-    transformMatrix(1, 0) = c.to_number();
-    transformMatrix(1, 1) = d.to_number();
+    transformMatrix(0, 0) = toNumber(a, vm);
+    transformMatrix(0, 1) = toNumber(b, vm);
+    transformMatrix(1, 0) = toNumber(c, vm);
+    transformMatrix(1, 1) = toNumber(d, vm);
 
     // Construct the point
     PointType point;
-    point(0) = x.to_number();
-    point(1) = y.to_number();
-
-#ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.{delta}TransformPoint) This matrix: %s", transformMatrix);
-    log_debug("(Matrix.{delta}TransformPoint) Point vector (pre-transform): %s", point);
-#endif
+    point(0) = toNumber(x, vm);
+    point(1) = toNumber(y, vm);
 
     // Transform
     point = boost::numeric::ublas::prod(point, transformMatrix);
-
-#ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.{delta}TransformPoint) Point vector (post-transform): %s", point);
-#endif
 
     return point;
 
 }
 
 // A helper function to create a boost matrix from a Matrix object
-void fillMatrix(MatrixType& matrix,
-                         as_object& matrixObject)
+void
+fillMatrix(MatrixType& matrix, as_object& matrixObject)
 {
 
     const double u = 0.0;
@@ -850,12 +842,14 @@ void fillMatrix(MatrixType& matrix,
     matrixObject.get_member(NSV::PROP_TX, &tx);
     matrixObject.get_member(NSV::PROP_TY, &ty);
 
-    matrix(0, 0) = a.to_number();
-    matrix(0, 1) = c.to_number();
-    matrix(0, 2) = tx.to_number();
-    matrix(1, 0) = b.to_number();
-    matrix(1, 1) = d.to_number();
-    matrix(1, 2) = ty.to_number();
+    VM& vm = getVM(matrixObject);
+
+    matrix(0, 0) = toNumber(a, vm);
+    matrix(0, 1) = toNumber(c, vm);
+    matrix(0, 2) = toNumber(tx, vm);
+    matrix(1, 0) = toNumber(b, vm);
+    matrix(1, 1) = toNumber(d, vm);
+    matrix(1, 2) = toNumber(ty, vm);
     matrix(2, 0) = u;
     matrix(2, 1) = v;
     matrix(2, 2) = w;
