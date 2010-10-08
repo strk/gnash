@@ -127,8 +127,6 @@ XMLSocket_as::XMLSocket_as(as_object* owner)
 
 XMLSocket_as::~XMLSocket_as()
 {
-    // Remove advance callback and close network connections.
-    close();
 }
 
 void
