@@ -220,7 +220,7 @@ point_equals(const fn_call& fn)
     o->get_member(NSV::PROP_X, &x1);
     o->get_member(NSV::PROP_Y, &y1);
 
-    return as_value(x.equals(x1) && y.equals(y1));
+    return as_value(equals(x, x1, getVM(fn)) && equals(y, y1, getVM(fn)));
 }
 
 as_value

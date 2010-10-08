@@ -367,7 +367,7 @@ asbroadcaster_removeListener(const fn_call& fn)
         std::ostringstream s;
         s << i;
         as_value el = getMember(*listeners, st.find(s.str()));
-        if (el.equals(listenerToRemove)) {
+        if (equals(el, listenerToRemove, getVM(fn))) {
             callMethod(listeners, NSV::PROP_SPLICE, s.str(), 1);
             return as_value(true);
         }

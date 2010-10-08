@@ -425,6 +425,8 @@ void subtract(as_value& op1, const as_value& op2, const VM& vm);
 /// @param vm       The VM executing the operation.
 as_value newLessThan(const as_value& op1, const as_value& op2, const VM& vm);
 
+bool equals(const as_value& a, const as_value& b, const VM& vm);
+
 /// Convert an as_value to boolean type
 bool toBool(const as_value& v, const VM& vm);
 

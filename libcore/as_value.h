@@ -235,7 +235,6 @@ public:
     /// Get a number representation for this value
     //
     /// This function performs conversion if necessary.
-    double to_number() const;
     double to_number(int version) const;
     
     /// Conversion to boolean.
@@ -375,7 +374,7 @@ public:
     ///	  evaluation of A and B.
     ///
     /// @param v     The as_value to compare to
-    bool equals(const as_value& v) const;
+    bool equals(const as_value& v, int version) const;
     
     /// Set any object value as reachable (for the GC)
     //

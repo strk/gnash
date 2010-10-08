@@ -63,9 +63,12 @@
 namespace gnash {
 
 namespace {
-    bool objectEqualsPrimitive(const as_value& obj, const as_value& prim);
-    bool stringEqualsNumber(const as_value& str, const as_value& num);
-    bool compareBoolean(const as_value& boolean, const as_value& other);
+    bool objectEqualsPrimitive(const as_value& obj, const as_value& prim,
+            int version);
+    bool stringEqualsNumber(const as_value& str, const as_value& num,
+            int version);
+    bool compareBoolean(const as_value& boolean, const as_value& other,
+            int version);
     inline bool findMethod(as_object& obj, string_table::key m, as_value& ret);
 }
 
@@ -312,13 +315,6 @@ as_value::to_primitive(AsType hint) const
 }
 
 double
-as_value::to_number() const
-{
-    const int swfversion = VM::get().getSWFVersion();
-    return to_number(swfversion);
-}
-
-double
 as_value::to_number(const int version) const
 {
 
@@ -432,7 +428,7 @@ as_value::to_bool(const int version) const
         case STRING:
         {
             if (version >= 7) return !getStr().empty();
-            const double num = to_number();
+            const double num = to_number(version);
             return num && !isNaN(num);
         }
         case NUMBER:
@@ -546,24 +542,24 @@ as_value::set_as_object(as_object* obj)
 }
 
 bool
-as_value::equals(const as_value& v) const
+as_value::equals(const as_value& v, int version) const
 {
 
     // First compare values of the same type.
     if (_type == v._type) return equalsSameType(v);
     
     // Then compare booleans.
-    if (is_bool()) return compareBoolean(*this, v);
-    if (v.is_bool()) return compareBoolean(v, *this);
+    if (is_bool()) return compareBoolean(*this, v, version);
+    if (v.is_bool()) return compareBoolean(v, *this, version);
 
     // Then compare any other primitive, including null and undefined, with
     // an object.
     if (!is_object() && v.is_object()) {
-        return objectEqualsPrimitive(v, *this);
+        return objectEqualsPrimitive(v, *this, version);
     }
 
     if (is_object() && !v.is_object()) {
-        return objectEqualsPrimitive(*this, v);
+        return objectEqualsPrimitive(*this, v, version);
     }
 
     // Remaining null or undefined values only equate to other null or
@@ -573,8 +569,12 @@ as_value::equals(const as_value& v) const
     if (null || v_null) return null == v_null;
 
     // Now compare a number with a string.
-    if (is_number() && v.is_string()) return stringEqualsNumber(v, *this);
-    if (is_string() && v.is_number()) return stringEqualsNumber(*this, v);
+    if (is_number() && v.is_string()) {
+        return stringEqualsNumber(v, *this, version);
+    }
+    if (is_string() && v.is_number()) {
+        return stringEqualsNumber(*this, v, version);
+    }
     
     // Finally compare non-identical objects.
     as_value p = *this;
@@ -595,7 +595,7 @@ as_value::equals(const as_value& v) const
         return false;
     }
     
-    return p.equals(vp);
+    return p.equals(vp, version);
 }
     
 const char*
@@ -934,7 +934,7 @@ namespace {
 //
 /// This is a function try-block.
 bool
-objectEqualsPrimitive(const as_value& obj, const as_value& prim)
+objectEqualsPrimitive(const as_value& obj, const as_value& prim, int version)
 try {
 
     assert(obj.is_object());
@@ -942,7 +942,7 @@ try {
 
     as_value tmp = obj.to_primitive(as_value::NUMBER);
     if (obj.strictly_equals(tmp)) return false;
-    return tmp.equals(prim);
+    return tmp.equals(prim, version);
 }
 catch (const ActionTypeError&) {
     return false;
@@ -951,18 +951,18 @@ catch (const ActionTypeError&) {
 /// @param boolean      A boolean as_value
 /// @param other        An as_value of any type.
 bool
-compareBoolean(const as_value& boolean, const as_value& other)
+compareBoolean(const as_value& boolean, const as_value& other, int version)
 {
     assert(boolean.is_bool());
-    return as_value(boolean.to_number()).equals(other); 
+    return as_value(boolean.to_number(version)).equals(other, version); 
 }
 
 bool
-stringEqualsNumber(const as_value& str, const as_value& num)
+stringEqualsNumber(const as_value& str, const as_value& num, int version)
 {
     assert(num.is_number());
     assert(str.is_string());
-    const double n = str.to_number();
+    const double n = str.to_number(version);
     if (!isFinite(n)) return false;
     return num.strictly_equals(n);
 }

@@ -507,6 +507,12 @@ newLessThan(const as_value& op1, const as_value& op2, const VM& vm)
 }
 
 bool
+equals(const as_value& a, const as_value& b, const VM& vm)
+{
+    return a.equals(b, vm.getSWFVersion());
+}
+
+bool
 toBool(const as_value& v, const VM& vm)
 {
     return v.to_bool(vm.getSWFVersion());

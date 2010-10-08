@@ -2649,12 +2649,12 @@ ActionNewEquals(ActionExec& thread)
                     op2, e.what());
         }
 
-        env.top(1).set_bool(op1.equals(op2));
+        env.top(1).set_bool(equals(op1, op2, getVM(env)));
     }
     else
     {
         /// ECMA-262 abstract equality comparison (sect 11.9.3)
-        env.top(1).set_bool(env.top(1).equals(env.top(0)));
+        env.top(1).set_bool(equals(env.top(1), env.top(0), getVM(env)));
     }
     env.drop(1);
 }
@@ -3197,7 +3197,6 @@ ActionShiftRight2(ActionExec& thread)
 void
 ActionStrictEq(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
     
     env.top(1).set_bool(env.top(1).strictly_equals(env.top(0)));
