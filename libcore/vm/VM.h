@@ -80,35 +80,21 @@ public:
 
 	typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 	
-    /// Use VM::get() to access the singleton
-	//
-	/// Initializes the GC singleton
-	///
+	/// Initializes the VM
+    //
+    /// @param version      The initial version of the VM
+    /// @param root         The movie_root that owns this VM
+    /// @param clock        The clock to use for advances.
 	VM(int version, movie_root& root, VirtualClock& clock);
 
-	/// Should deinitialize the GC singleton
-	/// If it doesn't is just because it corrupts memory :)
 	~VM();
 
-    /// \brief
-	/// Initialize the virtual machine singleton with the given
-	/// movie definition and return a reference to it.
-	//
-	/// The given movie will be only used to fetch SWF version from.
-	///
-	/// Don't call this function twice, and make sure you have
-	/// called this *before* you call VM::get()
-	///
-	/// @param movie
-	///	The definition for the root movie, only
-	///	used to fetch SWF version from.
-	///	TODO: take SWF version directly ?
-	///
-	/// @param clock
-	///	Virtual clock used as system time.
-	///
+    /// Initialize VM resources
 	void init();
 
+    /// Accessor for the VM's stack
+    //
+    /// TODO: drop
 	SafeStack<as_value>& getStack() {
 		return _stack;
 	}
@@ -119,7 +105,6 @@ public:
     /// but maybe accessing it trough VM isn't the best idea.
     /// TODO: consider making this accessible trough RunResources
     /// instead.
-    ///
     VirtualClock& getClock() {
         return _clock;
     }
@@ -163,12 +148,12 @@ public:
 	/// defined in gnashrc, that takes precedence. For Linux, the string
 	/// includes the kernel version (unname -sr). Only works for systems
 	/// with sys/utsname.h (POSIX 4.4).
-	const std::string getOSName();
+	std::string getOSName() const;
 	
 	/// Return the current language of the system. This is used for
 	/// System.capabilities.language. Only works for systems with 
 	/// a language environment variable.
-	const std::string getSystemLanguage();
+	std::string getSystemLanguage() const;
 	
 	// The boost Random Number Generator to use.
 	//
@@ -300,12 +285,6 @@ private:
 
 	/// Target SWF version
 	int _swfversion;
-
-	/// Set the _global Object for actions run by Virtual Machine
-	//
-	/// Will be called by the init() function
-	/// 
-	void setGlobal(Global_as*);
 
 	typedef std::map<unsigned int, as_c_function_ptr> FuncMap;
 	typedef std::map<unsigned int, FuncMap> AsNativeTable;

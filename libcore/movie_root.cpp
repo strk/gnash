@@ -164,7 +164,6 @@ movie_root::movie_root(const movie_definition& def,
     _unnamedInstance(0),
     _movieLoader(*this)
 {
-    _vm.init();
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
 }
@@ -209,9 +208,6 @@ movie_root::~movie_root()
     clearActionQueue();
     clearIntervalTimers();
     _movieLoader.clear();
-
-    _vm.clear();
-    _gc.fuzzyCollect();
 
     assert(testInvariant());
 }

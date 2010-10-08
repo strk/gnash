@@ -51,23 +51,17 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 namespace gnash {
 
-void
-VM::init()
-{
-	NSV::loadStrings(_stringTable);
-    setGlobal(new Global_as(*this));
-    _global->registerClasses();
-}
-
 VM::VM(int version, movie_root& root, VirtualClock& clock)
 	:
 	_rootMovie(root),
-	_global(0),
+	_global(new Global_as(*this)),
 	_swfversion(version),
 	_clock(clock),
 	_stack(),
     _shLib(new SharedObjectLibrary(*this))
 {
+	NSV::loadStrings(_stringTable);
+    _global->registerClasses();
 	_clock.restart();
 }
 
@@ -76,16 +70,9 @@ VM::~VM()
 }
 
 void
-VM::clear()
-{
-    /// Reset the SharedObjectLibrary, so that SOLs are flushed.
-    _shLib.reset();
-}
-
-void
 VM::setSWFVersion(int v) 
 {
-	_swfversion=v;
+	_swfversion = v;
 }
 
 VM::RNG&
@@ -104,24 +91,22 @@ VM::getPlayerVersion() const
 	return version;
 }
 
-const std::string
-VM::getOSName()
+std::string
+VM::getOSName() const
 {
 
 	// The directive in gnashrc must override OS detection.
-	if (rcfile.getFlashSystemOS() != "")
-	{
+	if (rcfile.getFlashSystemOS() != "") {
 		return rcfile.getFlashSystemOS();
 	}
-	else
-	{
+	else {
 #ifdef HAVE_SYS_UTSNAME_H
 // For Linux- or UNIX-based systems (POSIX 4.4 conformant)
 
 		struct utsname osname;
 		std::string tmp;
 		
-		uname (&osname);
+		uname(&osname);
 		
 		tmp = osname.sysname;
 		tmp += " ";
@@ -136,8 +121,8 @@ VM::getOSName()
 	}
 }
 
-const std::string
-VM::getSystemLanguage()
+std::string
+VM::getSystemLanguage() const
 {
 
 	char *loc;
@@ -147,20 +132,12 @@ VM::getSystemLanguage()
 	// This should work on most UNIX-like systems.
 	// Callers should work out what to do with it.
 	// TODO: Other OSs.
-	if ((loc = std::getenv("LANG")) ||
-		(loc = std::getenv("LANGUAGE")) ||
-		(loc = std::getenv("LC_MESSAGES"))
-		)
-	{
-		std::string lang = loc;
-		return lang;
+	if ((loc = std::getenv("LANG")) || (loc = std::getenv("LANGUAGE")) ||
+		(loc = std::getenv("LC_MESSAGES"))) {
+        return loc;
 	}
 	
-	else
-	{
-		// No string found
-		return "";
-	}
+    return std::string();
 }
 
 movie_root&
@@ -173,13 +150,6 @@ Global_as*
 VM::getGlobal() const
 {
 	return _global;
-}
-
-void
-VM::setGlobal(Global_as* o)
-{
-	assert(!_global);
-	_global = o;
 }
 
 unsigned long int
