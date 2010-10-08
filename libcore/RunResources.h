@@ -56,15 +56,7 @@ public:
     //
     /// @param baseURL  The base URL for the run. This cannot be changed after
     ///                 construction.
-    RunResources(const std::string& baseURL)
-        :
-        _baseURL(baseURL)
-    {}
-
-    /// Get the base URL for the run.
-    //
-    /// @return     The base URL set at construction.
-    const std::string& baseURL() const { return _baseURL; }
+    RunResources() {}
 
     /// Set the StreamProvider.
     //
@@ -149,8 +141,6 @@ public:
 #endif
 
 private:
-
-    const std::string _baseURL;
 
     boost::shared_ptr<StreamProvider> _streamProvider;
 

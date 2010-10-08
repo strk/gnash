@@ -531,7 +531,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     _startTime=0;
 
     const RunResources& rr = getRunResources(owner());
-    URL url(file, rr.baseURL());
+    URL url(file, rr.streamProvider().originalURL());
 
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 

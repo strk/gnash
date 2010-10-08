@@ -1895,12 +1895,14 @@ MovieClip::loadVariables(const std::string& urlstr,
     // (down by getStream, that is)
     
     const movie_root& mr = stage();
-    URL url(urlstr, mr.runResources().baseURL());
+    URL url(urlstr, mr.runResources().streamProvider().originalURL());
 
     std::string postdata;
     
     // Encode our vars for sending.
-    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(*getObject(this), postdata);
+    if (sendVarsMethod != METHOD_NONE) {
+        getURLEncodedVars(*getObject(this), postdata);
+    }
 
     try 
     {

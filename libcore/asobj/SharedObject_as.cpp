@@ -424,7 +424,7 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
     const movie_root& mr = _vm.getRoot();
-    const URL& url = mr.runResources().streamProvider().url();
+    const URL& url = mr.runResources().streamProvider().originalURL();
 
     // Remember the hostname of our SWF URL. This can be empty if loaded
     // from the filesystem
@@ -506,7 +506,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 
         const movie_root& mr = _vm.getRoot();
 
-        const URL& swfURL = mr.runResources().streamProvider().url();
+        const URL& swfURL = mr.runResources().streamProvider().originalURL();
         // The specified root may or may not have a domain. If it doesn't,
         // this constructor will add the SWF's domain.
         URL localPath(root, swfURL);

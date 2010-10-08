@@ -344,7 +344,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
 
     const RunResources& ri = getRunResources(*obj);
 
-    URL url(urlstr, ri.baseURL());
+    URL url(urlstr, ri.streamProvider().originalURL());
 
     std::auto_ptr<IOChannel> str;
 
@@ -437,13 +437,12 @@ loadableobject_load(const fn_call& fn)
     obj->set_member(NSV::PROP_LOADED, false);
 
     const RunResources& ri = getRunResources(*obj);
-    URL url(urlstr, ri.baseURL());
+
+    URL url(urlstr, ri.streamProvider().originalURL());
 
     // Checks whether access is allowed.
     std::auto_ptr<IOChannel> str(ri.streamProvider().getStream(url));
 
-    log_security(_("Loading from url: '%s'"), url.str());
-    
     movie_root& mr = getRoot(fn);
     mr.addLoadableObject(obj, str);
 

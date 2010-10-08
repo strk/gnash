@@ -31,6 +31,7 @@
 #include "PropFlags.h"
 #include "ManualClock.h"
 #include "RunResources.h"
+#include "StreamProvider.h"
 
 #include <iostream>
 #include <sstream>
@@ -68,7 +69,9 @@ main(int /*argc*/, char** /*argv*/)
 	gnashInit();
 
     // We don't care about the base URL.
-    RunResources runResources("");
+    RunResources runResources;
+    runResources.setStreamProvider(
+            boost::shared_ptr<StreamProvider>(new StreamProvider(URL(""))));
 	
     boost::intrusive_ptr<movie_definition> md5(
             new DummyMovieDefinition(runResources, 5));

@@ -316,7 +316,7 @@ externalinterface_available(const fn_call& fn)
       case movie_root::SCRIPT_ACCESS_SAME_DOMAIN:
       {
           const RunResources& r = m.runResources();
-          const std::string& baseurl = r.baseURL();
+          const std::string& baseurl = r.streamProvider().originalURL().str();
           char hostname[MAXHOSTNAMELEN];
           std::memset(hostname, 0, MAXHOSTNAMELEN);
           

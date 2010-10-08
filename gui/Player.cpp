@@ -318,7 +318,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     const URL baseURL = (it == _params.end()) ? _baseurl :
                                                URL(it->second, _baseurl);
     /// The RunResources should be populated before parsing.
-    _runResources.reset(new RunResources(baseURL.str()));
+    _runResources.reset(new RunResources());
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
@@ -327,7 +327,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
 
     /// The StreamProvider uses the actual URL of the loaded movie.
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(_url, np));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(baseURL, np));
 
     _runResources->setStreamProvider(sp);
 
@@ -535,7 +535,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
         // Use default if filename is empty.
         if (_screenshotFile.empty()) {
-            URL url(_runResources->baseURL());
+            URL url(_runResources->streamProvider().originalURL());
             std::string::size_type p = url.path().rfind('/');
             const std::string& name = (p == std::string::npos) ? url.path() :
                 url.path().substr(p + 1);

@@ -30,6 +30,7 @@
 #include "SWFStream.h"
 #include "MovieFactory.h"
 #include "log.h"
+#include "StreamProvider.h"
 
 namespace gnash {
 namespace SWF {
@@ -79,7 +80,7 @@ private:
         in.read_string(source_url);
 
         // Resolve relative urls against baseurl
-        URL abs_url(source_url, r.baseURL());
+        URL abs_url(source_url, r.streamProvider().originalURL());
 
         unsigned char import_version = 0;
 

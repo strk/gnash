@@ -22,8 +22,16 @@
 #include "gnashconfig.h"
 #endif
 
-#include "MovieClip.h"
 #include "gui.h"
+
+#include <vector>
+#include <cstdio>
+#include <cstring>
+#include <algorithm> 
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/lexical_cast.hpp>
+
+#include "MovieClip.h"
 #include "Renderer.h"
 #include "sound_handler.h"
 #include "movie_root.h"
@@ -32,18 +40,12 @@
 #include "tu_file.h"
 #include "gnash.h"
 #include "RunResources.h"
+#include "StreamProvider.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
 #include <boost/format.hpp>
 #endif
-
-#include <vector>
-#include <cstdio>
-#include <cstring>
-#include <algorithm> 
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/lexical_cast.hpp>
 
 /// Define this to make sure each frame is fully rendered from ground up
 /// even if no motion has been detected in the movie.
@@ -1026,7 +1028,7 @@ Gui::takeScreenShot()
     if (!_screenShotter.get()) {
         // If no ScreenShotter exists, none was requested at startup.
         // We use a default filename pattern.
-        URL url(_runResources.baseURL());
+        URL url(_runResources.streamProvider().originalURL());
         std::string::size_type p = url.path().rfind('/');
         const std::string& name = (p == std::string::npos) ? url.path() :
             url.path().substr(p + 1);

@@ -27,6 +27,7 @@
 #include "movie_definition.h"
 #include "dejagnu.h"
 #include "as_value.h"
+#include "StreamProvider.h"
 #include "as_object.h"
 #include "arg_parser.h"
 #include "Global_as.h"
@@ -112,7 +113,9 @@ main(int argc, char *argv[])
     // Initialize gnash lib
     gnashInit();
     
-    RunResources runResources("");
+    RunResources runResources;
+    runResources.setStreamProvider(
+            boost::shared_ptr<StreamProvider>(new StreamProvider(URL(""))));
 
     // Create a bogus movie with swf version 7 support
     movie_definition* md = new DummyMovieDefinition(runResources, 7);

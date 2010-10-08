@@ -18,9 +18,22 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-#include "GnashSystemIOHeaders.h" // write()
-
 #include "movie_root.h"
+
+#include <boost/algorithm/string/erase.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <utility>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <map>
+#include <bitset>
+#include <cassert>
+#include <functional>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/bind.hpp>
+
+#include "GnashSystemIOHeaders.h" // write()
 #include "log.h"
 #include "MovieClip.h"
 #include "Movie.h" // for implicit upcast to MovieClip
@@ -44,19 +57,7 @@
 #include "TextField.h"
 #include "Button.h"
 #include "Transform.h"
-
-#include <boost/algorithm/string/erase.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <utility>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <map>
-#include <bitset>
-#include <cassert>
-#include <functional>
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/bind.hpp>
+#include "StreamProvider.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -2127,7 +2128,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         /// If there is no hosting application, call the URL launcher. For
         /// safety, we resolve the URL against the base URL for this run.
         /// The data is not sent at all.
-        URL url(urlstr, _runResources.baseURL());
+        URL url(urlstr, _runResources.streamProvider().originalURL());
 
         gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
         std::string command = rcfile.getURLOpenerFormat();

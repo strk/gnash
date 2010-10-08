@@ -712,7 +712,7 @@ NetConnection_as::validateURL() const
 {
 
     const RunResources& r = getRunResources(owner());
-    URL uri(_uri, r.baseURL());
+    URL uri(_uri, r.streamProvider().originalURL());
 
     std::string uriStr(uri.str());
     assert(uriStr.find("://") != std::string::npos);
@@ -818,7 +818,7 @@ NetConnection_as::connect(const std::string& uri)
     }
     
     const RunResources& r = getRunResources(owner());
-    URL url(_uri, r.baseURL());
+    URL url(_uri, r.streamProvider().originalURL());
 
     if ((url.protocol() != "rtmp")
         && (url.protocol() != "rtmpt")
@@ -925,9 +925,9 @@ NetConnection_as::getStream(const std::string& name)
     // If name is a full or relative URL passed from NetStream.play(), it
     // must be constructed against the base URL, not the NetConnection uri,
     // which should always be null in this case.
-    const URL url(name, ri.baseURL());
-
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+    URL url(name, streamProvider.originalURL());
 
     return streamProvider.getStream(url, rcfile.saveStreamingMedia());
 

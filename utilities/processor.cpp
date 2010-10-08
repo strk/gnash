@@ -383,7 +383,7 @@ main(int argc, char *argv[])
             e = infiles.end(); i != e; ++i)
     {
 
-        RunResources runResources(*i);
+        RunResources runResources;
         runResources.setSoundHandler(soundHandler);
         runResources.setMediaHandler(mediaHandler);
         runResources.setTagLoaders(loaders);

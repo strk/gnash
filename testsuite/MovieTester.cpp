@@ -84,7 +84,7 @@ MovieTester::MovieTester(const std::string& url)
     // Initialize the sound handler(s)
     initTestingSoundHandlers();
     
-    _runResources.reset(new RunResources(url));
+    _runResources.reset(new RunResources());
     _runResources->setSoundHandler(_sound_handler);
     _runResources->setMediaHandler(_mediaHandler);
     

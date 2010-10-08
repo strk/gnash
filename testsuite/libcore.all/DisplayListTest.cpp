@@ -30,6 +30,7 @@
 #include "movie_definition.h"
 #include "ManualClock.h"
 #include "RunResources.h"
+#include "StreamProvider.h"
 
 #include <iostream>
 #include <sstream>
@@ -50,7 +51,9 @@ main(int /*argc*/, char** /*argv*/)
     // Initialize gnash lib
     gnashInit();
     
-    RunResources ri("");
+    RunResources ri;
+    ri.setStreamProvider(
+            boost::shared_ptr<StreamProvider>(new StreamProvider(URL("")));
     
     // Initialize a VM
     boost::intrusive_ptr<movie_definition> md5(new DummyMovieDefinition(ri, 5));

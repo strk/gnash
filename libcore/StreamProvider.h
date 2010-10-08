@@ -41,7 +41,7 @@ class DSOEXPORT StreamProvider
 
 public:
 
-	StreamProvider(const std::string& url, std::auto_ptr<NamingPolicy> = 
+	StreamProvider(const URL& url, std::auto_ptr<NamingPolicy> = 
             std::auto_ptr<NamingPolicy>(new NamingPolicy));
 
 	virtual ~StreamProvider() {}
@@ -90,9 +90,13 @@ public:
         return *_namingPolicy;
     }
 
+    /// Whether to allow access to a certain URL.
     bool allow(const URL& url) const;
 
-    const URL& url() const {
+    /// The genuine original URL used for loading the first SWF.
+    //
+    /// This is used to manage access to later URLs.
+    const URL& originalURL() const {
         return _url;
     }
 

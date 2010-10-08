@@ -36,8 +36,7 @@
 
 namespace gnash {
 
-StreamProvider::StreamProvider(const std::string& url,
-        std::auto_ptr<NamingPolicy> np)
+StreamProvider::StreamProvider(const URL& url, std::auto_ptr<NamingPolicy> np)
     :
     _namingPolicy(np),
     _url(url)
@@ -49,8 +48,6 @@ StreamProvider::allow(const URL& url) const
 {
     return URLAccessManager::allow(url, _url);
 }
-
-
 
 std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, bool namedCacheFile) const
