@@ -285,7 +285,7 @@ DisplayObject::blendMode(const fn_call& fn)
 
     // Numeric argument.
     if (bm.is_number()) {
-        double mode = bm.to_number();
+        double mode = toNumber(bm, getVM(fn));
 
         // Hardlight is the last known value. This also performs range checking
         // for float-to-int conversion.
@@ -363,7 +363,7 @@ getHeight(DisplayObject& o)
 void
 setHeight(DisplayObject& o, const as_value& val)
 {
-    const double newheight = pixelsToTwips(val.to_number());
+    const double newheight = pixelsToTwips(toNumber(val, getVM(*getObject(&o))));
     if (newheight <= 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Setting _height=%g of DisplayObject %s (%s)"),
@@ -1089,7 +1089,7 @@ setHighQuality(DisplayObject& o, const as_value& val)
 {
     movie_root& mr = getRoot(*getObject(&o));
 
-    const double q = val.to_number();
+    const double q = toNumber(val, getVM(*getObject(&o)));
 
     if (q < 0) mr.setQuality(QUALITY_HIGH);
     else if (q > 2) mr.setQuality(QUALITY_BEST);
@@ -1115,7 +1115,7 @@ void
 setY(DisplayObject& o, const as_value& val)
 {
 
-    const double newy = val.to_number();
+    const double newy = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite isn't
     if (isNaN(newy))
@@ -1146,7 +1146,7 @@ void
 setX(DisplayObject& o, const as_value& val)
 {
 
-    const double newx = val.to_number();
+    const double newx = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite isn't
     if (isNaN(newx))
@@ -1177,7 +1177,7 @@ void
 setScaleX(DisplayObject& o, const as_value& val)
 {
 
-    const double scale_percent = val.to_number();
+    const double scale_percent = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
     if (isNaN(scale_percent)) {
@@ -1204,7 +1204,7 @@ void
 setScaleY(DisplayObject& o, const as_value& val)
 {
 
-    const double scale_percent = val.to_number();
+    const double scale_percent = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
     if (isNaN(scale_percent)) {
@@ -1241,7 +1241,7 @@ setVisible(DisplayObject& o, const as_value& val)
     /// cast to bool, as string "0" should be converted to
     /// its numeric equivalent, not interpreted as 'true', which
     /// SWF7+ does for strings.
-    const double d = val.to_number();
+    const double d = toNumber(val, getVM(*getObject(&o)));
 
     // Infinite or NaN is skipped
     if (isInf(d) || isNaN(d)) {
@@ -1271,7 +1271,7 @@ setAlpha(DisplayObject& o, const as_value& val)
     // The new internal alpha value is input / 100.0 * 256.
     // We test for finiteness later, but the multiplication
     // won't make any difference.
-    const double newAlpha = val.to_number() * 2.56;
+    const double newAlpha = toNumber(val, getVM(*getObject(&o))) * 2.56;
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
     if (isNaN(newAlpha)) {
@@ -1338,7 +1338,7 @@ setRotation(DisplayObject& o, const as_value& val)
 {
 
     // input is in degrees
-    const double rotation_val = val.to_number();
+    const double rotation_val = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinity isn't
     if (isNaN(rotation_val)) {
@@ -1406,7 +1406,7 @@ getWidth(DisplayObject& o)
 void
 setWidth(DisplayObject& o, const as_value& val)
 {
-    const double newwidth = pixelsToTwips(val.to_number());
+    const double newwidth = pixelsToTwips(toNumber(val, getVM(*getObject(&o))));
     if (newwidth <= 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Setting _width=%g of DisplayObject %s (%s)"),

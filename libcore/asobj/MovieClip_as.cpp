@@ -1300,7 +1300,7 @@ movieclip_globalToLocal(const fn_call& fn)
         );
         return ret;
     }
-    x = pixelsToTwips(tmp.to_number());
+    x = pixelsToTwips(toNumber(tmp, getVM(fn)));
 
     if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
     {
@@ -1311,7 +1311,7 @@ movieclip_globalToLocal(const fn_call& fn)
         );
         return ret;
     }
-    y = pixelsToTwips(tmp.to_number());
+    y = pixelsToTwips(toNumber(tmp, getVM(fn)));
 
     point    pt(x, y);
     const SWFMatrix world_mat = getWorldMatrix(*movieclip).invert();
@@ -1362,7 +1362,7 @@ movieclip_localToGlobal(const fn_call& fn)
         );
         return ret;
     }
-    x = pixelsToTwips(tmp.to_number());
+    x = pixelsToTwips(toNumber(tmp, getVM(fn)));
 
     if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
     {
@@ -1373,7 +1373,7 @@ movieclip_localToGlobal(const fn_call& fn)
         );
         return ret;
     }
-    y = pixelsToTwips(tmp.to_number());
+    y = pixelsToTwips(toNumber(tmp, getVM(fn)));
 
     point pt(x, y);
     const SWFMatrix world_mat = getWorldMatrix(*movieclip);
@@ -1816,7 +1816,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         /// Alpha is the range 0..100.
         as_value alpVal = getMember(*alphas, key);
         const double a = alpVal.is_number() ?
-            clamp<double>(alpVal.to_number(), 0, 100) : 0;
+            clamp<double>(toNumber(alpVal, getVM(fn)), 0, 100) : 0;
         const boost::uint8_t alp = 0xff * (a / 100);
 
         // Ratio is the range 0..255, but a ratio may never be smaller than

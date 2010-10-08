@@ -73,7 +73,7 @@ PixelsToTwips : SetBase
 {
     PixelsToTwips(const fn_call& fn) : SetBase(fn) {}
     boost::int32_t operator()(const as_value& val) const {
-        return pixelsToTwips(val.to_number());
+        return pixelsToTwips(toNumber(val, getVM(fn())));
     }
 };
 
@@ -182,12 +182,13 @@ class
 PushToVector
 {
 public:
-    PushToVector(std::vector<int>& v) : _v(v) {}
+    PushToVector(std::vector<int>& v, const fn_call& fn) : _v(v), _fn(fn) {}
     void operator()(const as_value& val) {
-        _v.push_back(val.to_number());
+        _v.push_back(toNumber(val, getVM(_fn)));
     }
 private:
     std::vector<int>& _v;
+    const fn_call& _fn;
 };
 
 
@@ -492,7 +493,7 @@ textformat_tabStops(const fn_call& fn)
 
 	std::vector<int> tabStops;
 
-    PushToVector pv(tabStops);
+    PushToVector pv(tabStops, fn);
     foreachArray(*arg, pv);
 
     relay->tabStopsSet(tabStops);
@@ -574,7 +575,8 @@ textformat_getTextExtent(const fn_call& fn)
     const bool limitWidth = (fn.nargs > 1);
     
     // Everything must be in twips here.
-    const double tfw = limitWidth ? pixelsToTwips(toNumber(fn.arg(1), getVM(fn))) : 0;
+    const double tfw = limitWidth ?
+        pixelsToTwips(toNumber(fn.arg(1), getVM(fn))) : 0;
 
     const bool bold = relay->bold() ? *relay->bold() : false;
     const bool italic = relay->italic() ? *relay->italic() : false;
