@@ -44,14 +44,16 @@ namespace {
 SWFMatrix
 toSWFMatrix(as_object& m)
 {
+    VM& vm = getVM(m);
+
     // This is case sensitive.
     if (getMember(m, NSV::PROP_MATRIX_TYPE).to_string() == "box") {
         
-        const double x = pixelsToTwips(getMember(m, NSV::PROP_X).to_number());
-        const double y = pixelsToTwips(getMember(m, NSV::PROP_Y).to_number());
-        const double w = pixelsToTwips(getMember(m, NSV::PROP_W).to_number());
-        const double h = pixelsToTwips(getMember(m, NSV::PROP_H).to_number()); 
-        const double r = getMember(m, NSV::PROP_R).to_number();
+        const double x = pixelsToTwips(toNumber(getMember(m, NSV::PROP_X), vm));
+        const double y = pixelsToTwips(toNumber(getMember(m, NSV::PROP_Y), vm));
+        const double w = pixelsToTwips(toNumber(getMember(m, NSV::PROP_W), vm));
+        const double h = pixelsToTwips(toNumber(getMember(m, NSV::PROP_H), vm)); 
+        const double r = toNumber(getMember(m, NSV::PROP_R), vm);
         const double a = std::cos(r) * w * 2;
         const double b = std::sin(r) * h * 2;
         const double c = -std::sin(r) * w * 2;
@@ -63,18 +65,18 @@ toSWFMatrix(as_object& m)
 
     // Convert input matrix to SWFMatrix.
     const boost::int32_t a = truncateWithFactor<65536>(
-            getMember(m, NSV::PROP_A).to_number());
+            toNumber(getMember(m, NSV::PROP_A), vm));
     const boost::int32_t b = truncateWithFactor<65536>(
-            getMember(m, NSV::PROP_B).to_number());
+            toNumber(getMember(m, NSV::PROP_B), vm));
     const boost::int32_t c = truncateWithFactor<65536>(
-            getMember(m, NSV::PROP_C).to_number());
+            toNumber(getMember(m, NSV::PROP_C), vm));
     const boost::int32_t d = truncateWithFactor<65536>(
-            getMember(m, NSV::PROP_D).to_number());
+            toNumber(getMember(m, NSV::PROP_D), vm));
 
     const boost::int32_t tx = pixelsToTwips(
-            getMember(m, NSV::PROP_TX).to_number());
+            toNumber(getMember(m, NSV::PROP_TX), vm));
     const boost::int32_t ty = pixelsToTwips(
-            getMember(m, NSV::PROP_TY).to_number());
+            toNumber(getMember(m, NSV::PROP_TY), vm));
     return SWFMatrix(a, b, c, d, tx, ty);
 
 }

@@ -252,14 +252,14 @@ color_ctor(const fn_call& fn)
 }
 
 inline void
-parseColorTransProp (as_object& obj, string_table::key key, boost::int16_t&
+parseColorTransProp(as_object& obj, string_table::key key, boost::int16_t&
         target, bool scale)
 {
 	as_value tmp;
 	if (!obj.get_member(key, &tmp)) return;
     
-	const double d = tmp.to_number();
-	if ( scale ) {   
+	const double d = toNumber(tmp, getVM(obj));
+	if (scale) {   
         target = static_cast<boost::int16_t>(d * 2.56);
     }
 	else {
