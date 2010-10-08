@@ -265,10 +265,7 @@ Sound_as::Sound_as(as_object* owner)
 
 Sound_as::~Sound_as()
 {
-
     // Just in case...
-    stopProbeTimer();
-
     if (_inputStream && _soundHandler) {
         _soundHandler->unplugInputStream(_inputStream);
         _inputStream=0;
