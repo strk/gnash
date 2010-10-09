@@ -84,7 +84,11 @@ namespace {
 
     as_object* construct_object(as_function* ctor_as_func, as_environment& env,
             unsigned int nargs);
-    as_object* safeToObject(Global_as& gl, const as_value& val);
+
+    /// Convert to object without an exception being thrown.
+    //
+    /// @return     null if the value cannot be converted to an object.
+    as_object* safeToObject(VM& vm, const as_value& val);
 
     /// Common code for ActionGetUrl and ActionGetUrl2
     //
@@ -1334,10 +1338,10 @@ ActionCastOp(ActionExec& thread)
     as_environment& env = thread.env;
 
     // Get the "instance"
-    as_object* instance = safeToObject(getGlobal(thread.env), env.top(0));
+    as_object* instance = safeToObject(getVM(thread.env), env.top(0));
 
     // Get the "super" function
-    as_object* super = safeToObject(getGlobal(thread.env), env.top(1));
+    as_object* super = safeToObject(getVM(thread.env), env.top(1));
 
     // Invalid args!
     if (!super || ! instance)
@@ -1385,7 +1389,7 @@ ActionImplementsOp(ActionExec& thread)
     as_environment& env = thread.env;
 
     as_value objval = env.pop();
-    as_object* obj = safeToObject(getGlobal(thread.env), objval);
+    as_object* obj = safeToObject(getVM(thread.env), objval);
     int count = toNumber(env.pop(), getVM(env));
 
     if (!obj) {
@@ -1403,7 +1407,7 @@ ActionImplementsOp(ActionExec& thread)
         );
         return;
     }
-    obj = safeToObject(getGlobal(thread.env), protoval);
+    obj = safeToObject(getVM(thread.env), protoval);
     if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("IMPLEMENTSOP target object's prototype is not "
@@ -1422,7 +1426,7 @@ ActionImplementsOp(ActionExec& thread)
 
     while (count--) {
         as_value ctorval = env.pop();
-        as_object* ctor = safeToObject(getGlobal(thread.env), ctorval);
+        as_object* ctor = safeToObject(getVM(thread.env), ctorval);
         if (!ctor) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("class found on stack on IMPLEMENTSOP is "
@@ -1437,7 +1441,7 @@ ActionImplementsOp(ActionExec& thread)
             );
             continue;
         }
-        as_object *inter = safeToObject(getGlobal(thread.env), protoval);
+        as_object *inter = safeToObject(getVM(thread.env), protoval);
         if (!inter) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Prototype of interface object for "
@@ -2208,7 +2212,7 @@ ActionDelete(ActionExec& thread)
             // Don't create an object! Only get the value if it is an object
             // already.
             if (target.is_object()) {
-                obj = safeToObject(getGlobal(thread.env), target);
+                obj = safeToObject(getVM(thread.env), target);
                 propertyname = var;
             }
         }
@@ -2217,7 +2221,7 @@ ActionDelete(ActionExec& thread)
         // Don't create an object! Only get the value if it is an object
         // already.
         if (env.top(1).is_object()) {
-            obj = safeToObject(getGlobal(thread.env), env.top(1));
+            obj = safeToObject(getVM(thread.env), env.top(1));
         }
     }
 
@@ -2273,7 +2277,7 @@ ActionDelete2(ActionExec& thread)
         return;
     }
 
-    as_object* obj = safeToObject(getGlobal(thread.env), target);
+    as_object* obj = safeToObject(getVM(thread.env), target);
     env.top(1).set_bool(thread.delObjectMember(*obj, var));
 }
 
@@ -2587,7 +2591,7 @@ ActionEnumerate(ActionExec& thread)
 
     env.top(0).set_undefined();
 
-    const as_object* obj = safeToObject(getGlobal(thread.env), variable);
+    const as_object* obj = safeToObject(getVM(thread.env), variable);
     if ( !obj || !variable.is_object() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2696,7 +2700,7 @@ ActionGetMember(ActionExec& thread)
     as_value member_name = env.top(0);
     as_value target = env.top(1);
 
-    as_object* obj = safeToObject(getGlobal(thread.env), target);
+    as_object* obj = safeToObject(getVM(thread.env), target);
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2744,7 +2748,7 @@ ActionSetMember(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    as_object* obj = safeToObject(getGlobal(thread.env), env.top(2));
+    as_object* obj = safeToObject(getVM(thread.env), env.top(2));
     const std::string& member_name = env.top(1).to_string();
     const as_value& member_value = env.top(0);
 
@@ -2848,7 +2852,7 @@ ActionCallMethod(ActionExec& thread)
         log_action(_(" method nargs: %d"), nargs);
     );
 
-    as_object* obj = safeToObject(getGlobal(thread.env), obj_value);
+    as_object* obj = safeToObject(getVM(thread.env), obj_value);
     if (!obj) {
         // If this value is not an object, it can neither have any members
         // nor be called as a function, so neither opcode usage is possible.
@@ -2898,7 +2902,7 @@ ActionCallMethod(ActionExec& thread)
             return;
         }
 
-        method_obj = safeToObject(getGlobal(thread.env), method_value);
+        method_obj = safeToObject(getVM(thread.env), method_value);
         if ( ! method_obj ) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("ActionCallMethod: "
@@ -2994,7 +2998,7 @@ ActionNewMethod(ActionExec& thread)
         nargs = available_args;
     }
 
-    as_object* obj = safeToObject(getGlobal(thread.env), obj_val);
+    as_object* obj = safeToObject(getVM(thread.env), obj_val);
     if (!obj) {
         // SWF integrity check
         // FIXME, should this be log_swferror?  Or log_aserror?
@@ -3059,11 +3063,11 @@ ActionInstanceOf(ActionExec& thread)
     as_environment& env = thread.env;
 
     // Get the "super" function
-    as_object* super = safeToObject(getGlobal(thread.env), env.top(0));
+    as_object* super = safeToObject(getVM(thread.env), env.top(0));
 
     // Get the "instance" (but avoid implicit conversion of primitive values!)
     as_object* instance = env.top(1).is_object() ?
-        safeToObject(getGlobal(thread.env), env.top(1)) : 0;
+        safeToObject(getVM(thread.env), env.top(1)) : 0;
 
     // Invalid args!
     if (!super || ! instance) {
@@ -3095,7 +3099,7 @@ ActionEnum2(ActionExec& thread)
     // as we copied that as_value.
     env.top(0).set_undefined();
 
-    as_object* obj = safeToObject(getGlobal(thread.env), obj_val);
+    as_object* obj = safeToObject(getVM(thread.env), obj_val);
     if (!obj || !obj_val.is_object()) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Top of stack not an object %s at ActionEnum2 "
@@ -3606,11 +3610,11 @@ ActionUnsupported(ActionExec& thread)
 }
 
 as_object*
-safeToObject(Global_as& gl, const as_value& val)
+safeToObject(VM& vm, const as_value& val)
 {
 
     try {
-        return toObject(val, getVM(gl));
+        return toObject(val, vm);
     }
     catch (const GnashException&) {
         return 0;
