@@ -551,7 +551,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     }
  
     // Clear resources.
-    gnash::clear();
+    MovieFactory::clear();
     
     return md;
 }

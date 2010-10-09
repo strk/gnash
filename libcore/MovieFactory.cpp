@@ -31,6 +31,7 @@
 #include "URL.h"
 #include "StreamProvider.h"
 #include "MovieLibrary.h"
+#include "fontlib.h"
 
 #include <string>
 #include <map>
@@ -326,6 +327,12 @@ MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
     return mov;
 }
 
+void
+MovieFactory::clear()
+{
+    movieLibrary.clear();
+    fontlib::clear();
+}
 
 } // namespace gnash
 

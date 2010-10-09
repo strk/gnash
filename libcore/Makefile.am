@@ -119,7 +119,6 @@ libgnashcore_la_SOURCES = \
 	FillStyle.cpp \
 	Font.cpp \
 	fontlib.cpp \
-	impl.cpp \
 	LoadVariablesThread.cpp \
 	SWFStream.cpp \
 	LineStyle.cpp \

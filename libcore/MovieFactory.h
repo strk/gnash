@@ -115,6 +115,11 @@ public:
             const std::string& url, const RunResources& runResources,
             bool startLoaderThread);
 
+    /// Clear the MovieFactory resources
+    //
+    /// This should be in the dtor.
+    static void clear();
+
     static MovieLibrary movieLibrary;
 };
 

@@ -541,7 +541,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     log_debug("Main loop ended, cleaning up");
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
-    gnash::clear();
+    MovieFactory::clear();
 
 }
 

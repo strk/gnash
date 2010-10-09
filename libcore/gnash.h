@@ -24,8 +24,6 @@
 #ifndef GNASH_H
 #define GNASH_H
 
-#include "dsodefs.h"
-
 /// Freedom bites
 namespace gnash {
 
@@ -39,18 +37,6 @@ enum Quality
     QUALITY_HIGH,
     QUALITY_BEST
 };
-
-/// Maximum release of resources. 
-//
-/// Calls clear_library() and
-/// fontlib::clear(), and also clears some extra internal stuff
-/// that may have been allocated (e.g. global ActionScript
-/// objects).  This should get all gnash structures off the
-/// heap, with the exception of any objects that are still
-/// referenced by the host program and haven't had drop_ref()
-/// called on them.
-///
-DSOEXPORT void clear();
 
 }   // namespace gnash
 

@@ -599,7 +599,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     // This means that movie_root must be available
     // while gnash::clear() runs
     // 
-    gnash::clear();
+    MovieFactory::clear();
 
     return true;
 }
