@@ -116,7 +116,7 @@ as_function::construct(as_object& newobj, const as_environment& env,
     // 'this' pointer. Others return a new object. This is to handle those
     // cases.
     if (isBuiltin() && ret.is_object()) {
-        as_object* fakeobj = ret.to_object(getGlobal(env));
+        as_object* fakeobj = toObject(ret, getVM(env));
 
         fakeobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this),
                 flags);
@@ -207,7 +207,7 @@ function_apply(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+		as_object* obj = toObject(fn.arg(0), getVM(fn));
 
         if (!obj) obj = new as_object(getGlobal(fn)); 
 
@@ -234,7 +234,7 @@ function_apply(const fn_call& fn)
 			);
 
 			boost::intrusive_ptr<as_object> arg1 = 
-                fn.arg(1).to_object(getGlobal(fn));
+                toObject(fn.arg(1), getVM(fn));
 
             if (arg1) {
                 PushFunctionArgs pa(new_fn_call);
@@ -264,7 +264,7 @@ function_call(const fn_call& fn)
     if (!fn.nargs || fn.arg(0).is_undefined() || fn.arg(0).is_null()) {
         tp = new as_object(getGlobal(fn));
     }
-    else tp = fn.arg(0).to_object(getGlobal(fn));
+    else tp = toObject(fn.arg(0), getVM(fn));
 
     new_fn_call.this_ptr = tp;
     new_fn_call.super = 0;

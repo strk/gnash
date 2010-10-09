@@ -168,11 +168,9 @@ loadableobject_addRequestHeader(const fn_call& fn)
     as_value customHeaders;
     as_object* array;
 
-    Global_as& gl = getGlobal(fn);
-
     if (fn.this_ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
-        array = customHeaders.to_object(gl);
+        array = toObject(customHeaders, getVM(fn));
         if (!array)
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -183,7 +181,7 @@ loadableobject_addRequestHeader(const fn_call& fn)
         }
     }
     else {
-        array = gl.createArray();
+        array = getGlobal(fn).createArray();
         // This property is always initialized on the first call to
         // addRequestHeaders. It has default properties.
         fn.this_ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array);
@@ -199,11 +197,10 @@ loadableobject_addRequestHeader(const fn_call& fn)
         return as_value();
     }
     
-    if (fn.nargs == 1)
-    {
+    if (fn.nargs == 1) {
         // This must be an array (or something like it). Keys / values are
         // pushed in valid pairs to the _customHeaders array.    
-        as_object* headerArray = fn.arg(0).to_object(gl);
+        as_object* headerArray = toObject(fn.arg(0), getVM(fn));
 
         if (!headerArray) {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -328,7 +325,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
 
     // TODO: if this isn't an XML or LoadVars, it won't work, but we should
     // check how far things get before it fails.
-    as_object* target = fn.arg(1).to_object(getGlobal(fn));
+    as_object* target = toObject(fn.arg(1), getVM(fn));
 
     // According to the Flash 8 Cookbook (Joey Lott, Jeffrey Bardzell), p 427,
     // this method sends by GET unless overridden, and always by GET in the
@@ -357,7 +354,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
 
             /// Read in our custom headers if they exist and are an
             /// array.
-            as_object* array = customHeaders.to_object(getGlobal(fn));
+            as_object* array = toObject(customHeaders, getVM(fn));
             if (array) {
                 WriteHeaders wh(headers);
                 foreachArray(*array, wh);

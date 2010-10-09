@@ -84,7 +84,7 @@ namespace {
 
     as_object* construct_object(as_function* ctor_as_func, as_environment& env,
             unsigned int nargs);
-    as_object* toObject(Global_as& gl, const as_value& val);
+    as_object* safeToObject(Global_as& gl, const as_value& val);
 
     /// Common code for ActionGetUrl and ActionGetUrl2
     //
@@ -1334,10 +1334,10 @@ ActionCastOp(ActionExec& thread)
     as_environment& env = thread.env;
 
     // Get the "instance"
-    as_object* instance = toObject(getGlobal(thread.env), env.top(0));
+    as_object* instance = safeToObject(getGlobal(thread.env), env.top(0));
 
     // Get the "super" function
-    as_object* super = toObject(getGlobal(thread.env), env.top(1));
+    as_object* super = safeToObject(getGlobal(thread.env), env.top(1));
 
     // Invalid args!
     if (!super || ! instance)
@@ -1385,7 +1385,7 @@ ActionImplementsOp(ActionExec& thread)
     as_environment& env = thread.env;
 
     as_value objval = env.pop();
-    as_object* obj = toObject(getGlobal(thread.env), objval);
+    as_object* obj = safeToObject(getGlobal(thread.env), objval);
     int count = toNumber(env.pop(), getVM(env));
 
     if (!obj) {
@@ -1403,7 +1403,7 @@ ActionImplementsOp(ActionExec& thread)
         );
         return;
     }
-    obj = toObject(getGlobal(thread.env), protoval);
+    obj = safeToObject(getGlobal(thread.env), protoval);
     if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("IMPLEMENTSOP target object's prototype is not "
@@ -1422,7 +1422,7 @@ ActionImplementsOp(ActionExec& thread)
 
     while (count--) {
         as_value ctorval = env.pop();
-        as_object* ctor = toObject(getGlobal(thread.env), ctorval);
+        as_object* ctor = safeToObject(getGlobal(thread.env), ctorval);
         if (!ctor) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("class found on stack on IMPLEMENTSOP is "
@@ -1437,7 +1437,7 @@ ActionImplementsOp(ActionExec& thread)
             );
             continue;
         }
-        as_object *inter = toObject(getGlobal(thread.env), protoval);
+        as_object *inter = safeToObject(getGlobal(thread.env), protoval);
         if (!inter) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Prototype of interface object for "
@@ -2208,7 +2208,7 @@ ActionDelete(ActionExec& thread)
             // Don't create an object! Only get the value if it is an object
             // already.
             if (target.is_object()) {
-                obj = toObject(getGlobal(thread.env), target);
+                obj = safeToObject(getGlobal(thread.env), target);
                 propertyname = var;
             }
         }
@@ -2217,7 +2217,7 @@ ActionDelete(ActionExec& thread)
         // Don't create an object! Only get the value if it is an object
         // already.
         if (env.top(1).is_object()) {
-            obj = toObject(getGlobal(thread.env), env.top(1));
+            obj = safeToObject(getGlobal(thread.env), env.top(1));
         }
     }
 
@@ -2273,7 +2273,7 @@ ActionDelete2(ActionExec& thread)
         return;
     }
 
-    as_object* obj = toObject(getGlobal(thread.env), target);
+    as_object* obj = safeToObject(getGlobal(thread.env), target);
     env.top(1).set_bool(thread.delObjectMember(*obj, var));
 }
 
@@ -2327,7 +2327,7 @@ ActionCallFunction(ActionExec& thread)
         )
     }
     else if (!function.is_function()) {
-        as_object* obj = function.to_object(getGlobal(thread.env));
+        as_object* obj = toObject(function, getVM(thread.env));
         super = obj->get_super();
         this_ptr = thread.getThisPointer();
     }
@@ -2587,7 +2587,7 @@ ActionEnumerate(ActionExec& thread)
 
     env.top(0).set_undefined();
 
-    const boost::intrusive_ptr<as_object> obj = toObject(getGlobal(thread.env), variable);
+    const as_object* obj = safeToObject(getGlobal(thread.env), variable);
     if ( !obj || !variable.is_object() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2696,8 +2696,7 @@ ActionGetMember(ActionExec& thread)
     as_value member_name = env.top(0);
     as_value target = env.top(1);
 
-    boost::intrusive_ptr<as_object> obj =
-        toObject(getGlobal(thread.env), target);
+    as_object* obj = safeToObject(getGlobal(thread.env), target);
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2710,9 +2709,9 @@ ActionGetMember(ActionExec& thread)
         return;
     }
 
-    IF_VERBOSE_ACTION (
-    log_action(_(" ActionGetMember: target: %s (object %p)"),
-               target, static_cast<void *>(obj.get()));
+    IF_VERBOSE_ACTION(
+        log_action(_(" ActionGetMember: target: %s (object %p)"),
+                   target, static_cast<void*>(obj));
     );
 
     string_table& st = getStringTable(env);
@@ -2745,7 +2744,7 @@ ActionSetMember(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    boost::intrusive_ptr<as_object> obj = toObject(getGlobal(thread.env), env.top(2));
+    as_object* obj = safeToObject(getGlobal(thread.env), env.top(2));
     const std::string& member_name = env.top(1).to_string();
     const as_value& member_value = env.top(0);
 
@@ -2849,7 +2848,7 @@ ActionCallMethod(ActionExec& thread)
         log_action(_(" method nargs: %d"), nargs);
     );
 
-    as_object* obj = toObject(getGlobal(thread.env), obj_value);
+    as_object* obj = safeToObject(getGlobal(thread.env), obj_value);
     if (!obj) {
         // If this value is not an object, it can neither have any members
         // nor be called as a function, so neither opcode usage is possible.
@@ -2899,7 +2898,7 @@ ActionCallMethod(ActionExec& thread)
             return;
         }
 
-        method_obj = toObject(getGlobal(thread.env), method_value);
+        method_obj = safeToObject(getGlobal(thread.env), method_value);
         if ( ! method_obj ) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("ActionCallMethod: "
@@ -2995,7 +2994,7 @@ ActionNewMethod(ActionExec& thread)
         nargs = available_args;
     }
 
-    boost::intrusive_ptr<as_object> obj = toObject(getGlobal(thread.env), obj_val);
+    as_object* obj = safeToObject(getGlobal(thread.env), obj_val);
     if (!obj) {
         // SWF integrity check
         // FIXME, should this be log_swferror?  Or log_aserror?
@@ -3060,11 +3059,11 @@ ActionInstanceOf(ActionExec& thread)
     as_environment& env = thread.env;
 
     // Get the "super" function
-    as_object* super = toObject(getGlobal(thread.env), env.top(0));
+    as_object* super = safeToObject(getGlobal(thread.env), env.top(0));
 
     // Get the "instance" (but avoid implicit conversion of primitive values!)
     as_object* instance = env.top(1).is_object() ?
-        toObject(getGlobal(thread.env), env.top(1)) : NULL;
+        safeToObject(getGlobal(thread.env), env.top(1)) : 0;
 
     // Invalid args!
     if (!super || ! instance) {
@@ -3096,7 +3095,7 @@ ActionEnum2(ActionExec& thread)
     // as we copied that as_value.
     env.top(0).set_undefined();
 
-    as_object* obj = toObject(getGlobal(thread.env), obj_val);
+    as_object* obj = safeToObject(getGlobal(thread.env), obj_val);
     if (!obj || !obj_val.is_object()) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Top of stack not an object %s at ActionEnum2 "
@@ -3229,9 +3228,7 @@ ActionExtends(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    Global_as& gl = getGlobal(thread.env);
-
-    as_object* super = env.top(0).to_object(gl);
+    as_object* super = toObject(env.top(0), getVM(thread.env));
     as_function* sub = env.top(1).to_function();
 
     if (!super ||!sub) {
@@ -3250,8 +3247,9 @@ ActionExtends(ActionExec& thread)
     }
     env.drop(2);
 
-    as_object* newproto = new as_object(gl);
-    as_object* p = getMember(*super, NSV::PROP_PROTOTYPE).to_object(gl);
+    as_object* newproto = new as_object(getGlobal(thread.env));
+    as_object* p =
+        toObject(getMember(*super, NSV::PROP_PROTOTYPE), getVM(thread.env));
     newproto->set_prototype(p);
 
     if (getSWFVersion(*super) > 5) {
@@ -3448,7 +3446,7 @@ ActionWith(ActionExec& thread)
 #endif
 
     const as_value& val = env.pop();
-    as_object* with_obj = val.to_object(getGlobal(thread.env));
+    as_object* with_obj = toObject(val, getVM(thread.env));
 
     ++pc; // skip tag code
 
@@ -3572,18 +3570,6 @@ ActionDefineFunction(ActionExec& thread)
         );
 
         thread.setVariable(name, function_value);
-#ifdef USE_DEBUGGER
-        // WARNING: toObject(getGlobal(thread.env), new_obj) can return a newly allocated
-        //          thing into the intrusive_ptr, so the debugger
-        //          will be left with a deleted object !!
-        //          Rob: we don't want to use void pointers here..
-        boost::intrusive_ptr<as_object> o = toObject(getGlobal(thread.env), function_value);
-#ifndef GNASH_USE_GC
-        o->add_ref(); // this will leak, but at least debugger won't end up
-                  // with a dandling reference...
-#endif //ndef GNASH_USE_GC
-                debugger.addSymbol(o.get(), name);
-#endif
     }
 
     // Otherwise push the function literal on the stack
@@ -3620,13 +3606,13 @@ ActionUnsupported(ActionExec& thread)
 }
 
 as_object*
-toObject(Global_as& gl, const as_value& val)
+safeToObject(Global_as& gl, const as_value& val)
 {
 
     try {
-        return val.to_object(gl);
+        return toObject(val, getVM(gl));
     }
-    catch (const GnashException& gl) {
+    catch (const GnashException&) {
         return 0;
     }
 

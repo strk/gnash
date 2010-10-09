@@ -460,7 +460,7 @@ toNumber(const as_value& v, const VM& vm)
 as_object*
 toObject(const as_value& v, const VM& vm)
 {
-    return v.to_object(*vm.getGlobal());
+    return v.to_object(vm);
 }
 
 boost::int32_t

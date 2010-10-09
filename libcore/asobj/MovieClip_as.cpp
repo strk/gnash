@@ -487,7 +487,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::intrusive_ptr<as_object> initObj;
 
     if (fn.nargs > 3 ) {
-        initObj = fn.arg(3).to_object(getGlobal(fn));
+        initObj = toObject(fn.arg(3), getVM(fn));
         if (!initObj) {
             // This is actually a valid thing to do,
             // the documented behaviour is to just NOT
@@ -527,7 +527,7 @@ movieclip_attachAudio(const fn_call& fn)
     }
 
     NetStream_as* ns;
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), ns))
+    if (!isNativeType(toObject(fn.arg(0), getVM(fn)), ns))
     { 
         std::stringstream ss; fn.dump_args(ss);
         // TODO: find out what to do here
@@ -742,7 +742,7 @@ movieclip_duplicateMovieClip(const fn_call& fn)
     // Copy members from initObject
     if (fn.nargs == 3)
     {
-        as_object* initObject = fn.arg(2).to_object(getGlobal(fn));
+        as_object* initObject = toObject(fn.arg(2), getVM(fn));
         ch = movieclip->duplicateMovieClip(newname, depthValue, initObject);
     }
     else
@@ -1162,10 +1162,8 @@ movieclip_meth(const fn_call& fn)
 
     if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 
-    const as_value& v = fn.arg(0);
-    as_object* o = v.to_object(getGlobal(fn));
+    as_object* o = toObject(fn.arg(0), getVM(fn));
     if (!o) {
-        log_debug(_("meth(%s): first argument doesn't cast to object"), v);
         return as_value(MovieClip::METHOD_NONE);
     }
 
@@ -1276,7 +1274,7 @@ movieclip_globalToLocal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
+    boost::intrusive_ptr<as_object> obj = toObject(fn.arg(0), getVM(fn));
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1338,7 +1336,7 @@ movieclip_localToGlobal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
+    boost::intrusive_ptr<as_object> obj = toObject(fn.arg(0), getVM(fn));
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1410,7 +1408,7 @@ movieclip_setMask(const fn_call& fn)
     else
     {
 
-        as_object* obj = arg.to_object(getGlobal(fn));
+        as_object* obj = toObject(arg, getVM(fn));
         DisplayObject* mask = get<DisplayObject>(obj);
         if (!mask)
         {
@@ -1755,11 +1753,10 @@ movieclip_beginGradientFill(const fn_call& fn)
     }
 
     typedef boost::intrusive_ptr<as_object> ObjPtr;
-    Global_as& gl = getGlobal(fn);
-    ObjPtr colors = fn.arg(1).to_object(gl);
-    ObjPtr alphas = fn.arg(2).to_object(gl);
-    ObjPtr ratios = fn.arg(3).to_object(gl);
-    ObjPtr matrix = fn.arg(4).to_object(gl);
+    ObjPtr colors = toObject(fn.arg(1), getVM(fn));
+    ObjPtr alphas = toObject(fn.arg(2), getVM(fn));
+    ObjPtr ratios = toObject(fn.arg(3), getVM(fn));
+    ObjPtr matrix = toObject(fn.arg(4), getVM(fn));
 
     if (!colors || !alphas || !ratios || !matrix) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1969,7 +1966,7 @@ movieclip_beginBitmapFill(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
     BitmapData_as* bd;
 
     if (!isNativeType(obj, bd) || bd->disposed()) {
@@ -1983,7 +1980,7 @@ movieclip_beginBitmapFill(const fn_call& fn)
     SWFMatrix mat;
 
     if (fn.nargs > 1) {
-        as_object* matrix = fn.arg(1).to_object(getGlobal(fn));
+        as_object* matrix = toObject(fn.arg(1), getVM(fn));
         if (matrix) {
             mat = toSWFMatrix(*matrix);
         }
@@ -2049,7 +2046,7 @@ movieclip_attachBitmap(const fn_call& fn)
         return as_value();
     }
 
-    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
     BitmapData_as* bd;
 
     if (!isNativeType(obj, bd) || bd->disposed()) {

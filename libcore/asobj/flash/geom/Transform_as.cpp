@@ -153,7 +153,7 @@ transform_colorTransform(const fn_call& fn)
         );
     }
 
-    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
     if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
@@ -313,7 +313,7 @@ transform_matrix(const fn_call& fn)
     }
 
 
-    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -369,7 +369,7 @@ transform_ctor(const fn_call& fn)
     }
 
     // TODO: does this have to be a MovieClip or can it be any DisplayObject?
-    as_object* o = fn.arg(0).to_object(getGlobal(fn));
+    as_object* o = toObject(fn.arg(0), getVM(fn));
     MovieClip* mc = get<MovieClip>(o);
 
     if (!mc) return as_value();

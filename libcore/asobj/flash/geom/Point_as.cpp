@@ -129,7 +129,7 @@ point_add(const fn_call& fn)
         }
         );
         const as_value& arg1 = fn.arg(0);
-        as_object* o = arg1.to_object(getGlobal(fn));
+        as_object* o = toObject(arg1, getVM(fn));
         if ( ! o )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -200,7 +200,7 @@ point_equals(const fn_call& fn)
         );
         return as_value(false);
     }
-    as_object* o = arg1.to_object(getGlobal(fn));
+    as_object* o = toObject(arg1, getVM(fn));
     assert(o);
     if (!o->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
@@ -330,7 +330,7 @@ point_subtract(const fn_call& fn)
         }
         );
         const as_value& arg1 = fn.arg(0);
-        as_object* o = arg1.to_object(getGlobal(fn));
+        as_object* o = toObject(arg1, getVM(fn));
         if ( ! o )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -440,7 +440,7 @@ point_distance(const fn_call& fn)
         );
         return as_value();
     }
-    as_object* o1 = arg1.to_object(getGlobal(fn));
+    as_object* o1 = toObject(arg1, getVM(fn));
     assert(o1);
     if (!o1->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
@@ -452,7 +452,7 @@ point_distance(const fn_call& fn)
     }
 
     const as_value& arg2 = fn.arg(1);
-    as_object* o2 = arg2.to_object(getGlobal(fn));
+    as_object* o2 = toObject(arg2, getVM(fn));
     assert(o2);
     // it seems there's no need to check arg2 (see actionscript.all/Point.as)
 
@@ -512,7 +512,7 @@ point_interpolate(const fn_call& fn)
         );
 
         const as_value& p0val = fn.arg(0);
-        as_object* p0 = p0val.to_object(getGlobal(fn));
+        as_object* p0 = toObject(p0val, getVM(fn));
         if ( ! p0 )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -527,7 +527,7 @@ point_interpolate(const fn_call& fn)
         }
 
         const as_value& p1val = fn.arg(1);
-        as_object* p1 = p1val.to_object(getGlobal(fn));
+        as_object* p1 = toObject(p1val, getVM(fn));
         if ( ! p1 )
         {
             IF_VERBOSE_ASCODING_ERRORS(

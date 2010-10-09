@@ -319,7 +319,7 @@ mysql_qetData(const fn_call& fn)
 
     if (fn.nargs > 0) {
         std::string sql = fn.arg(0).to_string();
-	    as_object* arr = fn.arg(1).to_object(getGlobal(fn));
+	    as_object* arr = toObject(fn.arg(1), getVM(fn));
 
         MySQL::query_t qresult;
 

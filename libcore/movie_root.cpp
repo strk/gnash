@@ -2580,7 +2580,7 @@ getBuiltinObject(movie_root& mr, string_table::key cl)
 
     as_value val;
     if (!gl.get_member(cl, &val)) return 0;
-    return val.to_object(gl);
+    return toObject(val, mr.getVM());
 }
 
 void

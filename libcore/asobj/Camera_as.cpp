@@ -246,8 +246,8 @@ camera_get(const fn_call& fn)
 
     // Properties are attached to the prototype (not __proto__) when get() is
     // called. 
-    as_object* proto =
-        getMember(*ptr, NSV::PROP_PROTOTYPE).to_object(getGlobal(fn));
+    as_object* proto = toObject(
+        getMember(*ptr, NSV::PROP_PROTOTYPE), getVM(fn));
 
     attachCameraProperties(*proto);
 

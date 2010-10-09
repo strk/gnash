@@ -261,7 +261,7 @@ colortransform_concat(const fn_call& fn)
         // Log error
         return as_value();
     }
-    as_object* o = fn.arg(0).to_object(getGlobal(fn));
+    as_object* o = toObject(fn.arg(0), getVM(fn));
     ColorTransform_as* tr;
     if (!isNativeType(o, tr)) {
         return as_value();

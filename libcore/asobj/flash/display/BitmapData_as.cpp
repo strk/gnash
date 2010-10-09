@@ -446,7 +446,7 @@ bitmapdata_draw(const fn_call& fn)
         return as_value();
     }
 
-    as_object* o = fn.arg(0).to_object(getGlobal(fn));
+    as_object* o = toObject(fn.arg(0), getVM(fn));
     MovieClip* mc = get<MovieClip>(o);
     if (!mc) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -460,11 +460,11 @@ bitmapdata_draw(const fn_call& fn)
 
     Transform t;
     if (fn.nargs > 1) {
-        as_object* o = fn.arg(1).to_object(getGlobal(fn));
+        as_object* o = toObject(fn.arg(1), getVM(fn));
         if (o) t.matrix = toSWFMatrix(*o);
     }
     if (fn.nargs > 2) {
-        as_object* o = fn.arg(2).to_object(getGlobal(fn));
+        as_object* o = toObject(fn.arg(2), getVM(fn));
         ColorTransform_as* tr;
         if (isNativeType(o, tr)) {
             t.colorTransform = toCxForm(*tr);
@@ -495,7 +495,7 @@ bitmapdata_fillRect(const fn_call& fn)
     }
 
     // This can be any object with the right properties.   
-    as_object* obj = arg.to_object(getGlobal(fn));
+    as_object* obj = toObject(arg, getVM(fn));
     assert(obj);
     
     as_value x, y, w, h;

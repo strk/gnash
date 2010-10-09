@@ -100,7 +100,7 @@ public:
     void operator()(const as_value& v)
     {
 
-        boost::intrusive_ptr<as_object> o = v.to_object(getGlobal(_fn));
+        as_object* o = toObject(v, getVM(_fn));
         if (!o) return;
 
 #ifdef GNASH_DEBUG_BROADCASTER
@@ -113,7 +113,7 @@ public:
 
         if (method.is_function()) {
             _fn.super = o->get_super(_eventURI);
-            _fn.this_ptr = o.get();
+            _fn.this_ptr = o;
             method.to_function()->call(_fn);
         }
 
@@ -148,8 +148,8 @@ AsBroadcaster::initialize(as_object& o)
     Global_as& gl = getGlobal(o);
 
     // Find _global.AsBroadcaster.
-    as_object* asb =
-        getMember(gl, NSV::CLASS_AS_BROADCASTER).to_object(gl);
+    as_object* asb = toObject(
+            getMember(gl, NSV::CLASS_AS_BROADCASTER), getVM(o));
 
     // If it's not an object, these are left undefined, but they are
     // always attached to the initialized object.
@@ -248,7 +248,7 @@ asbroadcaster_initialize(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<as_object> tgt = tgtval.to_object(getGlobal(fn));
+    boost::intrusive_ptr<as_object> tgt = toObject(tgtval, getVM(fn));
     if ( ! tgt )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -301,7 +301,7 @@ asbroadcaster_addListener(const fn_call& fn)
         return as_value(false); 
     }
 
-    as_object* listeners = listenersValue.to_object(getGlobal(fn));
+    as_object* listeners = toObject(listenersValue, getVM(fn));
 
     // We checked is_object() above.
     assert(listeners); 
@@ -346,7 +346,7 @@ asbroadcaster_removeListener(const fn_call& fn)
         return as_value(false); // TODO: check this
     }
 
-    as_object* listeners = listenersValue.to_object(getGlobal(fn));
+    as_object* listeners = toObject(listenersValue, getVM(fn));
     assert(listeners);
 
     as_value listenerToRemove; 
@@ -410,7 +410,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
         return as_value(); // TODO: check this
     }
 
-    as_object* listeners = listenersValue.to_object(getGlobal(fn));
+    as_object* listeners = toObject(listenersValue, getVM(fn));
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(

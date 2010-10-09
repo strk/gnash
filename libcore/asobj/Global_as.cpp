@@ -200,7 +200,7 @@ Global_as::createClass(Global_as::ASFunction ctor, as_object* prototype)
 as_object*
 Global_as::createString(const std::string& s)
 {
-    // This is not really correct. If there is no String class, to_object()
+    // This is not really correct. If there is no String class, toObject()
     // returns an undefined value, not a null object. The behaviour is the
     // same for versions 5 to 8.
     return constructObject(*this, s, NSV::CLASS_STRING);
@@ -209,7 +209,7 @@ Global_as::createString(const std::string& s)
 as_object*
 Global_as::createNumber(double d)
 {
-    // This is not really correct. If there is no String class, to_object()
+    // This is not really correct. If there is no String class, toObject()
     // returns an undefined value, not a null object. The behaviour is the
     // same for versions 5 to 8.
     return constructObject(*this, d, NSV::CLASS_NUMBER);
@@ -227,7 +227,7 @@ Global_as::createArray()
     as_object* array = new as_object(*this);
 
     as_value ctor = getMember(*this, NSV::CLASS_ARRAY);
-    as_object* obj = ctor.to_object(*this);
+    as_object* obj = toObject(ctor, gnash::getVM(*this));
     if (obj) {
         as_value proto;
         if (obj->get_member(NSV::PROP_PROTOTYPE, &proto)) {
@@ -656,7 +656,7 @@ global_assetpropflags(const fn_call& fn)
     );
     
     // object
-    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object(getGlobal(fn));
+    boost::intrusive_ptr<as_object> obj = toObject(fn.arg(0), getVM(fn));
     if ( ! obj ) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Invalid call to ASSetPropFlags: "
@@ -806,9 +806,7 @@ global_assetnative(const fn_call& fn)
         return as_value();
     }
 
-    Global_as& gl = getGlobal(fn);
-
-    as_object* targetObject = fn.arg(0).to_object(gl);
+    as_object* targetObject = toObject(fn.arg(0), getVM(fn));
     if (!targetObject) {
         return as_value();
     }
@@ -877,9 +875,7 @@ global_assetnativeaccessor(const fn_call& fn)
         return as_value();
     }
 
-    Global_as& gl = getGlobal(fn);
-
-    as_object* targetObject = fn.arg(0).to_object(gl);
+    as_object* targetObject = toObject(fn.arg(0), getVM(fn));
     if (!targetObject) {
         return as_value();
     }
@@ -1019,7 +1015,7 @@ global_setInterval(const fn_call& fn)
 
 	unsigned timer_arg = 1;
 
-	as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+	as_object* obj = toObject(fn.arg(0), getVM(fn));
 	if (!obj) {
 
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -1091,7 +1087,7 @@ global_setTimeout(const fn_call& fn)
 
 	unsigned timer_arg = 1;
 
-	as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+	as_object* obj = toObject(fn.arg(0), getVM(fn));
 	if (!obj) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);

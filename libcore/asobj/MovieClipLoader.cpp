@@ -181,7 +181,7 @@ moviecliploader_getProgress(const fn_call& fn)
 		return as_value();
 	}
 
-	as_object* target = fn.arg(0).to_object(getGlobal(fn));
+	as_object* target = toObject(fn.arg(0), getVM(fn));
   
 	if (!target) {
 		IF_VERBOSE_ASCODING_ERRORS(

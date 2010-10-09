@@ -68,8 +68,8 @@ color_class_init(as_object& where, const ObjectURI& uri)
     as_object* cl = registerBuiltinClass(where, color_ctor,
             attachColorInterface, 0, uri);
 
-    as_object* proto =
-        getMember(*cl, NSV::PROP_PROTOTYPE).to_object(getGlobal(where));
+    as_object* proto = toObject(
+        getMember(*cl, NSV::PROP_PROTOTYPE), getVM(where));
 
     if (!proto) return;
 
@@ -190,7 +190,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-	as_object* trans = fn.arg(0).to_object(getGlobal(fn));
+	as_object* trans = toObject(fn.arg(0), getVM(fn));
 
     if (!trans) {
 		IF_VERBOSE_ASCODING_ERRORS(

@@ -621,8 +621,8 @@ public:
     bool operator()(const as_value& a, const as_value& b) const {
 
         // why do we cast ao/bo to objects here ?
-        as_object* ao = a.to_object(getGlobal(_obj));
-        as_object* bo = b.to_object(getGlobal(_obj));
+        as_object* ao = toObject(a, getVM(_obj));
+        as_object* bo = toObject(b, getVM(_obj));
 
         assert(ao);
         assert(bo);
@@ -667,8 +667,8 @@ public:
         std::vector<as_cmp_fn>::iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        as_object* ao = a.to_object(getGlobal(_obj));
-        as_object* bo = b.to_object(getGlobal(_obj));
+        as_object* ao = toObject(a, getVM(_obj));
+        as_object* bo = toObject(b, getVM(_obj));
 
         // TODO: this may not be correct, but it is better than accessing
         // null pointers.
@@ -708,8 +708,8 @@ public:
         Comps::const_iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        as_object* ao = a.to_object(getGlobal(_obj));
-        as_object* bo = b.to_object(getGlobal(_obj));
+        as_object* ao = toObject(a, getVM(_obj));
+        as_object* bo = toObject(b, getVM(_obj));
 
         for (Props::iterator pit = _prps.begin(), pend = _prps.end();
                 pit != pend; ++pit, ++cmp)
@@ -1113,7 +1113,7 @@ array_sortOn(const fn_call& fn)
     // case: sortOn(["prop1", "prop2"] ...)
     if (fn.arg(0).is_object()) 
     {
-        as_object* props = fn.arg(0).to_object(getGlobal(fn));
+        as_object* props = toObject(fn.arg(0), getVM(fn));
         assert(props);
 
         std::vector<string_table::key> prp;
@@ -1135,7 +1135,7 @@ array_sortOn(const fn_call& fn)
         // case: sortOn(["prop1", "prop2"], [Array.FLAG1, Array.FLAG2])
         else if (fn.arg(1).is_object()) {
 
-            as_object* farray = fn.arg(1).to_object(getGlobal(fn));
+            as_object* farray = toObject(fn.arg(1), getVM(fn));
 
             // Only an array will do for this case.
             if (farray->array() && arrayLength(*farray) == optnum) {
@@ -1355,8 +1355,7 @@ array_concat(const fn_call& fn)
         // The type is checked using instanceOf.
         const as_value& arg = fn.arg(i);
 
-        Global_as& gl = getGlobal(fn);
-        as_object* other = arg.to_object(gl);
+        as_object* other = toObject(arg, getVM(fn));
 
         if (other) {
             // If it's not an array, we want to carry on and add it as an

@@ -232,7 +232,7 @@ Rectangle_containsPoint(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_object* arg = (fn.nargs > 0) ? fn.arg(0).to_object(getGlobal(fn)) : 0;
+    as_object* arg = (fn.nargs > 0) ? toObject(fn.arg(0), getVM(fn)) : 0;
     
     VM& vm = getVM(fn);
 

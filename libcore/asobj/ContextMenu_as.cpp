@@ -62,8 +62,7 @@ public:
     CopyMenuItems(string_table::key c, as_object& nc) : _c(c), _target(nc) {}
 
     void operator()(const as_value& val) {
-        Global_as& gl = getGlobal(_target);
-        as_object* obj = val.to_object(gl);
+        as_object* obj = toObject(val, getVM(_target));
         as_value cp = callMethod(obj, _c);
         callMethod(&_target, NSV::PROP_PUSH, cp);
     }
@@ -159,7 +158,7 @@ contextmenu_copy(const fn_call& fn)
         if (arr) {
             as_object* customs;
             if (customItems.is_object() &&
-                    (customs = customItems.to_object(getGlobal(fn)))) {
+                    (customs = toObject(customItems, getVM(fn)))) {
                 string_table::key copykey = getStringTable(fn).find("copy");
                 CopyMenuItems c(copykey, *arr);
                 foreachArray(*customs, c);

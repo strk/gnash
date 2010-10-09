@@ -349,7 +349,7 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
-    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
 	NetStream_as* ns;
 
     if (isNativeType(obj, ns)) {

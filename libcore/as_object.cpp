@@ -787,7 +787,7 @@ as_object::instanceOf(as_object* ctor)
         return false;
     }
 
-    as_object* ctorProto = protoVal.to_object(getGlobal(*this));
+    as_object* ctorProto = toObject(protoVal, getVM(*this));
     if (!ctorProto) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
         log_debug("Object %p can't be an instance of an object (%p) "
@@ -974,7 +974,7 @@ as_object::get_prototype() const
     
     const as_value& proto = prop->getValue(*this);
     
-    return proto.to_object(getGlobal(*this));
+    return toObject(proto, getVM(*this));
 }
 
 as_object*
@@ -1002,7 +1002,7 @@ as_object::get_path_element(const ObjectURI& uri)
         return NULL;
     }
     
-    return tmp.to_object(getGlobal(*this));
+    return toObject(tmp, getVM(*this));
 }
 
 void
@@ -1139,9 +1139,9 @@ sendEvent(as_object& o, const as_environment& env, const ObjectURI& name)
 as_object*
 getObjectWithPrototype(Global_as& gl, string_table::key c)
 {
-    as_object* ctor = getMember(gl, c).to_object(gl);
-    as_object* proto = ctor ?
-        getMember(*ctor, NSV::PROP_PROTOTYPE).to_object(gl) : 0;
+    as_object* ctor = toObject(getMember(gl, c), getVM(gl));
+    as_object* proto = ctor ? 
+        toObject(getMember(*ctor, NSV::PROP_PROTOTYPE), getVM(gl)) : 0;
 
     as_object* o = createObject(gl);
     o->set_prototype(proto ? proto : as_value());

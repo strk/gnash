@@ -124,7 +124,7 @@ XMLNode_as::object()
     if (!_object) {
         as_object* o = createObject(_global);
         as_object* xn =
-            getMember(_global, NSV::CLASS_XMLNODE).to_object(_global);
+            toObject(getMember(_global, NSV::CLASS_XMLNODE), getVM(_global));
         if (xn) {
             o->set_prototype(getMember(*xn, NSV::PROP_PROTOTYPE));
             o->init_member(NSV::PROP_CONSTRUCTOR, xn);
@@ -603,7 +603,7 @@ xmlnode_appendChild(const fn_call& fn)
 	}
 
 	XMLNode_as* node;
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), node)) {
+    if (!isNativeType(toObject(fn.arg(0), getVM(fn)), node)) {
 		IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("First argument to XMLNode::appendChild() is not "
                     "an XMLNode"));
@@ -651,7 +651,7 @@ xmlnode_insertBefore(const fn_call& fn)
 
 	XMLNode_as* newnode;
 
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), newnode)) {
+    if (!isNativeType(toObject(fn.arg(0), getVM(fn)), newnode)) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
 		log_aserror(_("First argument to XMLNode.insertBefore(%s) is not "
@@ -662,7 +662,7 @@ xmlnode_insertBefore(const fn_call& fn)
 
 	XMLNode_as* pos;
 
-    if (!isNativeType(fn.arg(1).to_object(getGlobal(fn)), pos)) {
+    if (!isNativeType(toObject(fn.arg(1), getVM(fn)), pos)) {
 		IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
 		log_aserror(_("Second argument to XMLNode.insertBefore(%s) is not "

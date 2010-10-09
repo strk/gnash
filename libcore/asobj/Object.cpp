@@ -138,10 +138,8 @@ attachObjectInterface(as_object& o)
 as_value
 object_ctor(const fn_call& fn)
 {
-    Global_as& gl = getGlobal(fn);
-
     if (fn.nargs == 1) {
-        as_object* obj = fn.arg(0).to_object(gl);
+        as_object* obj = toObject(fn.arg(0), getVM(fn));
         if (obj) return as_value(obj);
     }
 
@@ -150,6 +148,8 @@ object_ctor(const fn_call& fn)
             log_aserror(_("Too many args to Object constructor"));
         );
     }
+
+    Global_as& gl = getGlobal(fn);
 
     if (!fn.isInstantiation()) {
         return new as_object(gl);
@@ -410,7 +410,7 @@ object_isPrototypeOf(const fn_call& fn)
         return as_value(false); 
     }
 
-    as_object* arg = fn.arg(0).to_object(getGlobal(fn));
+    as_object* arg = toObject(fn.arg(0), getVM(fn));
     if (!arg) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("First arg to Object.isPrototypeOf(%s) is "

@@ -687,7 +687,7 @@ textfield_setTextFormat(const fn_call& fn)
     }
 
     TextFormat_as* tf;
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), tf)) {
+    if (!isNativeType(toObject(fn.arg(0), getVM(fn)), tf)) {
 
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);

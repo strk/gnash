@@ -622,7 +622,7 @@ xml_new(const fn_call& fn)
 
         // Copy constructor clones nodes.
         if (fn.arg(0).is_object()) {
-            as_object* other = fn.arg(0).to_object(getGlobal(fn));
+            as_object* other = toObject(fn.arg(0), getVM(fn));
             XML_as* xml;
             if (isNativeType(other, xml)) {
                 as_object* clone = xml->cloneNode(true)->object();

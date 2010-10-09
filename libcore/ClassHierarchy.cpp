@@ -119,8 +119,7 @@ public:
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
         if (mTarget->get_member(_decl.uri, &us)) {
-            Global_as& gl = getGlobal(fn);
-            if (!us.to_object(gl)) {
+            if (!toObject(us, getVM(fn))) {
                 log_error("Native class %s is not an object after "
                         "initialization (%s)",
                         st.value(getName(_decl.uri)), us);

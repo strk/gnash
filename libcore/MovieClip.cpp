@@ -711,7 +711,7 @@ MovieClip::pathElement(const ObjectURI& uri)
         return getObject(tmp.toDisplayObject(true));
     }
 
-    return tmp.to_object(getGlobal(*getObject(this)));
+    return toObject(tmp, getVM(*getObject(this)));
 }
 
 bool

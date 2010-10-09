@@ -451,8 +451,10 @@ as_value::to_bool(const int version) const
 
 // Return value as an object.
 as_object*
-as_value::to_object(Global_as& global) const
+as_value::to_object(const VM& vm) const
 {
+    Global_as& global = *vm.getGlobal();
+
     switch (_type)
     {
         case OBJECT:

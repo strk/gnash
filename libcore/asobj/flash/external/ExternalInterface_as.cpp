@@ -253,7 +253,7 @@ externalinterface_addCallback(const fn_call& fn)
         boost::intrusive_ptr<as_object> asCallback;
         if (fn.arg(2).is_object()) {
             log_debug("adding callback %s", name);
-            asCallback = (fn.arg(2).to_object(getGlobal(fn)));
+            asCallback = (toObject(fn.arg(2), getVM(fn)));
             mr.addExternalCallback(fn.this_ptr, name, asCallback.get());
         }
      }
@@ -418,7 +418,7 @@ externalinterface_uArgumentsToXML(const fn_call& fn)
     if (fn.nargs == 2) {
         std::vector<as_value> args;
         if (fn.arg(0).is_object()) {
-            as_object *obj = fn.arg(0).to_object(getGlobal(fn));
+            as_object *obj = toObject(fn.arg(0), getVM(fn));
             VM& vm = getVM(*obj);    
             PropsSerializer props(vm);
             obj->visitProperties<IsEnumerable>(props);
@@ -487,7 +487,7 @@ externalinterface_uArrayToXML(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     
     if (fn.nargs == 1) {
-        as_object *obj = fn.arg(0).to_object(getGlobal(fn));
+        as_object *obj = toObject(fn.arg(0), getVM(fn));
         std::string str = ExternalInterface::arrayToXML(obj);
         return as_value(str);
     }
@@ -568,7 +568,7 @@ externalinterface_uObjectToXML(const fn_call& fn)
     
     if (fn.nargs == 1) {
         if (!fn.arg(0).is_null() && !fn.arg(0).is_undefined()) {
-            as_object *obj = fn.arg(0).to_object(getGlobal(fn));
+            as_object *obj = toObject(fn.arg(0), getVM(fn));
             std::string str = ExternalInterface::objectToXML(obj);
             return as_value(str);
         } else {

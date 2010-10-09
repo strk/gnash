@@ -187,7 +187,7 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
     call.callerDef = callerDef;
 
 	try {
-		if (as_object* func = method.to_object(getGlobal(env))) {
+		if (as_object* func = toObject(method, getVM(env))) {
             // Call function.
 		    val = func->call(call);
 		}

@@ -916,7 +916,7 @@ sound_new(const fn_call& fn)
 
         if (!arg0.is_null() && !arg0.is_undefined()) {
 
-            as_object* obj = arg0.to_object(getGlobal(fn));
+            as_object* obj = toObject(arg0, getVM(fn));
             DisplayObject* ch = get<DisplayObject>(obj);
             IF_VERBOSE_ASCODING_ERRORS(
                 if (!ch) {

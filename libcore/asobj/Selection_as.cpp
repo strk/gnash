@@ -212,7 +212,7 @@ selection_setFocus(const fn_call& fn)
     }
     else {
         /// Try converting directly to DisplayObject.
-        as_object* obj = focus.to_object(getGlobal(fn));
+        as_object* obj = toObject(focus, getVM(fn));
         ch = get<DisplayObject>(obj);
     }
 
