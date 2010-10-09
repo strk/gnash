@@ -31,7 +31,8 @@
 #include <boost/cstdint.hpp> // For C99 int types
 #include <boost/noncopyable.hpp>
 
-#include "ObjectURI.h" // for composition
+#include "ObjectURI.h" 
+#include "GC.h"
 #include "Transform.h"
 #include "event_id.h" 
 #include "SWFRect.h"
@@ -39,7 +40,6 @@
 #include "SWFCxForm.h"
 #include "dsodefs.h" 
 #include "snappingrange.h"
-#include "VM.h"
 #ifdef USE_SWFTREE
 # include "tree.hh"
 #endif
@@ -50,6 +50,8 @@
 // Forward declarations
 namespace gnash {
     class MovieClip;
+    class movie_root;
+    class fn_call;
     class Movie;
     class ExecutableCode;
     class action_buffer;
@@ -60,6 +62,7 @@ namespace gnash {
     class as_object;
     class as_value;
     class as_environment;
+    class DisplayObject;
     namespace SWF {
         class TextRecord;
     }

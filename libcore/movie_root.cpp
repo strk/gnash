@@ -503,16 +503,10 @@ movie_root::reset()
 {
     sound::sound_handler* sh = _runResources.soundHandler();
     if (sh) sh->reset();
-    clear();
-    _disableScripts = false;
-}
 
-void
-movie_root::clear()
-{
     // reset background color, to allow 
     // next load to set it again.
-    m_background_color.set(255,255,255,255);
+    m_background_color.set(255, 255, 255, 255);
     m_background_color_set = false;
 
     // wipe out live chars
@@ -542,6 +536,8 @@ movie_root::clear()
 #endif
 
     setInvalidated();
+
+    _disableScripts = false;
 }
 
 void

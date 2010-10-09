@@ -584,21 +584,14 @@ play_movie(const std::string& filename, const RunResources& runResources)
     // destruction when core gnash doesn't need it anymore
     md = 0;
 
-    log_debug("-- Clearning movie_root");
-
-    // clear movie_root (shouldn't have bad consequences on itself)
-    m.clear();
-
-    log_debug("-- Clearning gnash");
+    log_debug("-- Cleaning gnash");
  
     // Clear resources.
     // Forces run of GC, which in turn may invoke
     // destuctors of (say) MovieClip which would try
     // to access the movie_root to unregister self
     //
-    // This means that movie_root must be available
-    // while gnash::clear() runs
-    // 
+    // This means that movie_root must be available.
     MovieFactory::clear();
 
     return true;

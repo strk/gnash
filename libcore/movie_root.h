@@ -68,6 +68,16 @@
 #include "gnashconfig.h" //USE_SWFTREE
 #endif
 
+#include <map>
+#include <string>
+#include <vector>
+#include <deque>
+#include <list>
+#include <set>
+#include <bitset>
+#include <boost/noncopyable.hpp>
+#include <boost/thread/thread.hpp>
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
@@ -80,6 +90,7 @@
 #include "MovieLoader.h"
 #include "ExternalInterface.h"
 #include "GC.h"
+#include "VM.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -94,16 +105,6 @@
 # define GNASH_PARANOIA_LEVEL 1
 #endif
 
-#include <map>
-#include <string>
-#include <vector>
-#include <deque>
-#include <list>
-#include <set>
-#include <bitset>
-#include <boost/noncopyable.hpp>
-#include <boost/thread/thread.hpp>
-
 // Forward declarations
 namespace gnash {
     class ExecutableCode; // for ActionQueue
@@ -114,16 +115,16 @@ namespace gnash {
     class IOChannel;
     class RunResources;
     class Button;
+    class VM;
 }
 
-namespace gnash
-{
+namespace gnash {
 
 struct DepthComparator
 {
     typedef MovieClip* LevelMovie;
 
-    bool operator() (const LevelMovie& d1, const LevelMovie& d2)
+    bool operator()(const LevelMovie& d1, const LevelMovie& d2) const
     {
         return d1->get_depth() < d2->get_depth();
     }
@@ -634,13 +635,6 @@ public:
 #endif
         _liveChars.push_front(ch);
     }
-
-    /// Cleanup all resources and run the GC collector
-    //
-    /// This method should be invoked before calling setRootMovie again
-    /// for a clean restart.
-    ///
-    void clear();
 
     /// Reset stage to its initial state
     void reset();

@@ -70,7 +70,7 @@ public:
     /// This isn't optional. It must always be available, or nothing
     /// can be loaded.
     //
-    /// @return     A StreamProvider (presently a global singleton).
+    /// @return     A StreamProvider 
     const StreamProvider& streamProvider() const {
         assert (_streamProvider.get());
         return *_streamProvider;

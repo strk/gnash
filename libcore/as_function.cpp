@@ -43,24 +43,6 @@ namespace {
     as_value function_ctor(const fn_call& fn);
 }
 
-// This function returns the singleton
-// instance of the ActionScript Function object
-// prototype, which is what the AS Function class
-// exports, thus what each AS function instance inherit.
-// 
-// The returned object can be accessed by ActionScript
-// code through Function.__proto__.prototype.
-// User AS code can add or modify members of this object
-// to modify behaviour of all Function AS instances.
-// 
-// FIXME: do not use a static specifier for the proto
-// object, as multiple runs of a single movie should
-// each use a 'clean', unmodified, version of the
-// prototype. What should really happen is that this
-// prototype gets initializated by initialization of
-// the Function class itself, which would be a member
-// of the _global object for each movie instance.
-
 as_function::as_function(Global_as& gl)
 	:
 	as_object(gl)

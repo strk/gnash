@@ -19,7 +19,7 @@
 //
 
 #include "MorphShape.h"
-#include "VM.h"
+
 #include "swf/ShapeRecord.h"
 #include "Geometry.h"
 #include "SWFMatrix.h"

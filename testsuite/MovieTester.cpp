@@ -582,7 +582,7 @@ MovieTester::initTestingMediaHandlers()
 void
 MovieTester::restart() 
 {
-    _movie_root->clear(); // restart();
+    _movie_root->reset(); 
     MovieClip::MovieVariables v;
     // We pass 'v' twice, as the second one is for scriptable
     // Variables, which isn't fully implemented yet.

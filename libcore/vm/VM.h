@@ -70,12 +70,8 @@ namespace gnash {
 //
 /// This header also contains a few utility functions for ActionScript
 /// operations.
-//
-/// Currently the VM is a singleton, but this usage is deprecated. In future
-/// is should be fully re-entrant.
 class DSOEXPORT VM : boost::noncopyable
 {
-
 public:
 
 	typedef as_value (*as_c_function_ptr)(const fn_call& fn);
