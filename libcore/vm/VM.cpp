@@ -457,6 +457,12 @@ toNumber(const as_value& v, const VM& vm)
     return v.to_number(vm.getSWFVersion());
 }
 
+as_object*
+toObject(const as_value& v, const VM& vm)
+{
+    return v.to_object(*vm.getGlobal());
+}
+
 boost::int32_t
 toInt(const as_value& v, const VM& vm)
 {

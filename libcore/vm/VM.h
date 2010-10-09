@@ -396,6 +396,13 @@ bool toBool(const as_value& v, const VM& vm);
 /// @return     The double value of the passed as_value.
 double toNumber(const as_value& v, const VM& vm);
 
+/// Convert an as_value to an object
+//
+/// @param val  The value to return as an object
+/// @param vm   The VM to use for the conversion.
+/// @return     The Object representation value of the passed as_value.
+as_object* toObject(const as_value& v, const VM& vm);
+
 /// AS2-compatible conversion to 32bit integer
 //
 /// This truncates large numbers to fit in the 32-bit space. It is not a 
