@@ -70,6 +70,8 @@ namespace {
     bool compareBoolean(const as_value& boolean, const as_value& other,
             int version);
     inline bool findMethod(as_object& obj, string_table::key m, as_value& ret);
+    template<typename T> as_object* constructObject(VM& vm, const T& arg,
+            string_table::key className);
 }
 
 namespace {
@@ -451,9 +453,8 @@ as_value::to_bool(const int version) const
 
 // Return value as an object.
 as_object*
-as_value::to_object(const VM& vm) const
+as_value::to_object(VM& vm) const
 {
-    Global_as& global = *vm.getGlobal();
 
     switch (_type)
     {
@@ -464,13 +465,13 @@ as_value::to_object(const VM& vm) const
             return getObject(toDisplayObject());
 
         case STRING:
-            return global.createString(getStr());
+            return constructObject(vm, getStr(), NSV::CLASS_STRING);
 
         case NUMBER:
-            return global.createNumber(getNum());
+            return constructObject(vm, getNum(), NSV::CLASS_NUMBER);
 
         case BOOLEAN:
-            return global.createBoolean(getBool());
+            return constructObject(vm, getBool(), NSV::CLASS_BOOLEAN);
 
         default:
             // Invalid to convert exceptions.
@@ -481,17 +482,17 @@ as_value::to_object(const VM& vm) const
 MovieClip*
 as_value::toMovieClip(bool allowUnloaded) const
 {
-    if ( _type != DISPLAYOBJECT ) return 0;
+    if (_type != DISPLAYOBJECT) return 0;
 
     DisplayObject *ch = getCharacter(allowUnloaded);
-    if ( ! ch ) return 0;
+    if (!ch) return 0;
     return ch->to_movie();
 }
 
 DisplayObject*
 as_value::toDisplayObject(bool allowUnloaded) const
 {
-    if (_type != DISPLAYOBJECT) return NULL;
+    if (_type != DISPLAYOBJECT) return 0;
     return getCharacter(allowUnloaded);
 }
 
@@ -975,6 +976,49 @@ inline bool
 findMethod(as_object& obj, string_table::key m, as_value& ret)
 {
     return obj.get_member(m, &ret) && ret.is_object();
+}
+
+/// Construct an instance of the specified global class.
+//
+/// If the class is not present or is not a constructor function, this
+/// function throws an ActionTypeError.
+//
+/// TODO: consider whether ActionTypeError is an appropriate exception.
+/// TODO: test the other failure cases.
+template<typename T>
+as_object*
+constructObject(VM& vm, const T& arg, string_table::key className)
+{
+
+    as_object& gl = *vm.getGlobal();
+
+    as_value clval;
+
+    // This is tested in actionscript.all/Object.as to return an 
+    // undefined value. We throw the exception back to the VM, which pushes
+    // an undefined value onto the stack.
+    if (!gl.get_member(className, &clval) ) {
+        throw ActionTypeError();
+    }
+    
+    // This is not properly tested.
+    if (!clval.is_function()) {
+        throw ActionTypeError();
+    }
+    
+    as_function* ctor = clval.to_function();
+
+    // This is also not properly tested.
+    if (!ctor) throw ActionTypeError();
+
+    fn_call::Args args;
+    args += arg;
+
+    as_environment env(vm);
+    as_object* ret = constructInstance(*ctor, env, args);
+
+    return ret;
+
 }
 
 } // unnamed namespace

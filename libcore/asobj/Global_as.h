@@ -63,12 +63,6 @@ public:
     
     void registerClasses();
 
-    as_object* createString(const std::string& s);
-
-    as_object* createNumber(double d);
-
-    as_object* createBoolean(bool b);
-    
     as_object* createArray();
 
     VM& getVM() const {

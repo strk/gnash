@@ -138,8 +138,6 @@ namespace {
     as_value local_errorConstructor(const fn_call& fn);
     
     void registerNatives(as_object& global);
-    template<typename T> as_object* constructObject(Global_as& gl, const T& arg,
-            string_table::key className);
 }
 
 Global_as::Global_as(VM& vm)
@@ -197,24 +195,6 @@ Global_as::createClass(Global_as::ASFunction ctor, as_object* prototype)
     return cl;
 }
 
-as_object*
-Global_as::createString(const std::string& s)
-{
-    // This is not really correct. If there is no String class, toObject()
-    // returns an undefined value, not a null object. The behaviour is the
-    // same for versions 5 to 8.
-    return constructObject(*this, s, NSV::CLASS_STRING);
-}
-
-as_object*
-Global_as::createNumber(double d)
-{
-    // This is not really correct. If there is no String class, toObject()
-    // returns an undefined value, not a null object. The behaviour is the
-    // same for versions 5 to 8.
-    return constructObject(*this, d, NSV::CLASS_NUMBER);
-
-}
 
 /// Construct an Array.
 //
@@ -239,12 +219,6 @@ Global_as::createArray()
     array->init_member(NSV::PROP_LENGTH, 0.0);
     array->setArray();
     return array;
-}
-
-as_object*
-Global_as::createBoolean(bool b)
-{
-    return constructObject(*this, b, NSV::CLASS_BOOLEAN);
 }
 
 void 
@@ -1170,45 +1144,6 @@ global_enableDebugConsole(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl("_global.enableDebugConsole"));
     return as_value();
-}
-/// Construct an instance of the specified global class.
-//
-/// If the class is not present or is not a constructor function, this
-/// function throws an ActionTypeError.
-//
-/// TODO: consider whether ActionTypeError is an appropriate exception.
-/// TODO: test the other failure cases.
-template<typename T>
-as_object*
-constructObject(Global_as& gl, const T& arg, string_table::key className)
-{
-    as_value clval;
-
-    // This is tested in actionscript.all/Object.as to return an 
-    // undefined value. We throw the exception back to the VM, which pushes
-    // an undefined value onto the stack.
-    if (!gl.get_member(className, &clval) ) {
-        throw ActionTypeError();
-    }
-    
-    // This is not properly tested.
-    if (!clval.is_function()) {
-        throw ActionTypeError();
-    }
-    
-    as_function* ctor = clval.to_function();
-
-    // This is also not properly tested.
-    if (!ctor) throw ActionTypeError();
-
-    fn_call::Args args;
-    args += arg;
-
-    as_environment env(getVM(gl));
-    as_object* ret = constructInstance(*ctor, env, args);
-
-    return ret;
-
 }
 
 void

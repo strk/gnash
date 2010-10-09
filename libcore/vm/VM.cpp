@@ -458,7 +458,7 @@ toNumber(const as_value& v, const VM& vm)
 }
 
 as_object*
-toObject(const as_value& v, const VM& vm)
+toObject(const as_value& v, VM& vm)
 {
     return v.to_object(vm);
 }

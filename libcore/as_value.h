@@ -256,7 +256,7 @@ public:
     /// @param global   The global object object for the conversion. This
     ///                 contains the prototypes or constructors necessary for
     ///                 conversion.
-    as_object* to_object(const VM& vm) const;
+    as_object* to_object(VM& vm) const;
     
     /// Returns value as a MovieClip if it is a MovieClip.
     //

@@ -401,7 +401,7 @@ double toNumber(const as_value& v, const VM& vm);
 /// @param val  The value to return as an object
 /// @param vm   The VM to use for the conversion.
 /// @return     The Object representation value of the passed as_value.
-as_object* toObject(const as_value& v, const VM& vm);
+as_object* toObject(const as_value& v, VM& vm);
 
 /// AS2-compatible conversion to 32bit integer
 //
