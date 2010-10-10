@@ -498,7 +498,7 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 	if ( _formatCtx )
 	{
 		// TODO: check if this is correct (should we create RIIA classes for ffmpeg stuff?)
-		//av_close_input_file(_formatCtx); // NOTE: this one triggers a mismatched free/delete on _byteIOBuffer !
+		//av_close_input_file(_formatCtx); // NOTE: this one triggers a mismatched free/delete on _byteIOBuffer with libavformat.so.52 !
 		av_free(_formatCtx);
 	}
 
