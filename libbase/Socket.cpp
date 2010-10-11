@@ -321,7 +321,7 @@ Socket::write(const void* src, std::streamsize num)
     const char* buf = static_cast<const char*>(src);
 
     while (toWrite > 0) {
-        bytesSent = ::send(_socket, buf, toWrite, 0);
+        bytesSent = ::send(_socket, buf, toWrite, MSG_NOSIGNAL);
         if (bytesSent < 0) {
             const int err = errno;
             log_error("Socket send error %s", std::strerror(err));
