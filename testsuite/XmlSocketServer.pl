@@ -7,6 +7,7 @@ $SIG{PIPE}='IGNORE';
 my $m=new IO::Socket::INET(Listen=>1,LocalPort=>2229,Reuse=>1,Proto=>'tcp');
 my $O=new IO::Select($m);
 
+$verbose = ( $ARGV[0] eq '-v' ) ? 1 : 0;
 
 $/ = "\0";
 
@@ -20,10 +21,10 @@ while (@S = $O->can_read) {
             my $R=sysread($_, $i, 16000);
             
             # Log message received:
-            print "XmlSocketServer: received \"$i\"\n";
+            print "XmlSocketServer: received \"$i\"\n" if $verbose;
             
             if ($i =~ m/closeNow/) {
-                print("Closing...\n");
+                print("Closing...\n") if $verbose;
                 close($m);
                 Time::HiRes::sleep(1);
             }
@@ -39,7 +40,7 @@ while (@S = $O->can_read) {
                 # Sleep a bit before sending a reply to mimic web traffic
                 # (well, sort of).
                 Time::HiRes::sleep(0.5);
-                print "XmlSocketServer: sending \"$i\" \n";
+                print "XmlSocketServer: sending \"$i\" \n" if $verbose;
               
                 $i =~ s/\*NEWLINE\*/\n/g;
                 $i =~ s/\*NULL\*/\0/g;
