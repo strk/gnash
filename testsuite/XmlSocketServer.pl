@@ -46,13 +46,12 @@ while (@S = $O->can_read) {
 
             if ($i =~ m/closeNow/) {
                 print("XmlSocketServer: closing...\n") if $verbose;
-                close($m);
-                break; # Time::HiRes::sleep(1); 
+                close($C) || die "Could not close reading Socket";
             }
-
         }
     }
 }
 
+close($m) || die "Could not close server Socket";
 print("XmlSocketServer: salut!\n") if $verbose;
 
