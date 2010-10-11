@@ -33,7 +33,7 @@ while (@S = $O->can_read) {
             
                 # Sleep a bit before sending a reply to mimic web traffic
                 # (well, sort of).
-                Time::HiRes::sleep(0.5);
+                Time::HiRes::sleep(0.1);
                 print "XmlSocketServer: sending \"$i\" \n" if $verbose;
               
                 $i =~ s/\*NEWLINE\*/\n/g;
