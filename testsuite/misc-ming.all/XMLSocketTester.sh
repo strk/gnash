@@ -58,7 +58,7 @@ cat << EOF
 outlog=${top_builddir}/testoutlog.\$$
 (
     echo "Running first process"
-    $perl ${top_srcdir}/testsuite/XmlSocketServer.pl
+    $perl ${top_srcdir}/testsuite/XmlSocketServer.pl \$@
 ) &
 (
     echo "Running second process"
