@@ -63,8 +63,7 @@ function handleConnect(connectionStatus) {
 // Store data and send next lot.
 function handleData(data) {       
     receivedArray.push(data);
-    str = xmlArray[gc++];
-    myXML.send(str);
+    myXML.send(xmlArray[gc++]);
 };                                         
 
 function handleDisconnect() {              
