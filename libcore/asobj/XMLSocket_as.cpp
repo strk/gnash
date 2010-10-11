@@ -253,7 +253,7 @@ XMLSocket_as::checkForIncomingData()
         callMethod(&owner(), NSV::PROP_ON_DATA, *it);
     }
     
-    if (_socket.bad()) {
+    if (_socket.eof()) {
         callMethod(&owner(), NSV::PROP_ON_CLOSE);
         close();
         return;
