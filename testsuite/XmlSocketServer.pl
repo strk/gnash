@@ -39,9 +39,7 @@ while (@S = $O->can_read) {
                 $i =~ s/\*NEWLINE\*/\n/g;
                 $i =~ s/\*NULL\*/\0/g;
 
-                foreach $C($O->handles) {
-                    $T=syswrite($C, $i, 16000);
-                }
+                $T=syswrite($_, $i, 16000);
             }
 
             if ($i =~ m/closeNow/) {
