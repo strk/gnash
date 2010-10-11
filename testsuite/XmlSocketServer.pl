@@ -23,12 +23,6 @@ while (@S = $O->can_read) {
             # Log message received:
             print "XmlSocketServer: received \"$i\"\n" if $verbose;
             
-            if ($i =~ m/closeNow/) {
-                print("Closing...\n") if $verbose;
-                close($m);
-                Time::HiRes::sleep(1);
-            }
-
             if ($R==0) {
                 $T=syswrite($_, "\n", 16000);
                 if ($T==undef) {
@@ -49,7 +43,16 @@ while (@S = $O->can_read) {
                     $T=syswrite($C, $i, 16000);
                 }
             }
+
+            if ($i =~ m/closeNow/) {
+                print("XmlSocketServer: closing...\n") if $verbose;
+                close($m);
+                break; # Time::HiRes::sleep(1); 
+            }
+
         }
     }
 }
+
+print("XmlSocketServer: salut!\n") if $verbose;
 
