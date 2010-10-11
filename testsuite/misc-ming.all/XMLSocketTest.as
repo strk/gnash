@@ -14,7 +14,9 @@ xmlArray[8] = undefined;
 xmlArray[9] = 9;
 xmlArray[10] = "";
 a = "";
-for (i = 0; i < 15000; ++i) { a += "a"; };
+for (i = 0; i < 250; ++i) {
+ a += "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; // 60
+};
 xmlArray[11] = a;
 xmlArray[12] = 'Last Item';
 xmlArray[13] = 'closeNow';
@@ -36,7 +38,7 @@ expectedArray[11] = '</xml>';
 expectedArray[12] = 'undefined';
 expectedArray[13] = 9;
 expectedArray[14] = '';
-// Don't check 15.
+// Don't check 15 (we'll only check length)
 expectedArray[16] = 'Last Item';
 
  gc = 0;
