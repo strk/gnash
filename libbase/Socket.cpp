@@ -359,8 +359,7 @@ Socket::go_to_end()
 bool
 Socket::eof() const
 {
-    log_error("eof() called for Socket");
-    return false;
+    return !_size && bad();
 }
 
 } // namespace gnash
