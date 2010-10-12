@@ -1413,9 +1413,6 @@ fi
 LC_KEY=${lckey}
 AC_SUBST(LC_KEY)
 
-dnl FIXME: this should go away when gtk.cpp is cleaned up..
-AC_DEFINE([BUILD_CANVAS], [], [Build GTK Canvas support for the GTK Widget ])
-
 AC_ARG_ENABLE(python,
   AC_HELP_STRING([--enable-python],[Enable python for the python wrapper]),
 [case "${enableval}" in

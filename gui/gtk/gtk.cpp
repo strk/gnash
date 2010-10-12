@@ -56,9 +56,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <string>
 
-#ifdef BUILD_CANVAS
 #include "gtk_canvas.h"
-#endif
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
@@ -253,18 +251,11 @@ GtkGui::init(int argc, char **argv[])
         }
     }
 
-#ifdef BUILD_CANVAS
     _canvas = gnash_canvas_new();
     gnash_canvas_setup(GNASH_CANVAS(_canvas), hwaccel, renderer, argc, argv);
     // Increase reference count to prevent its destruction (which could happen
     // later if we remove it from its container).
     g_object_ref(G_OBJECT(_canvas));
-#else
-    _drawingArea = gtk_drawing_area_new();
-    // Increase reference count to prevent its destruction (which could happen
-    // later if we remove it from its container).
-    g_object_ref(G_OBJECT(_drawingArea));
-#endif
 
     _resumeButton = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(_resumeButton),
@@ -291,28 +282,15 @@ GtkGui::init(int argc, char **argv[])
     }
 #endif
 
-#ifdef BUILD_CANVAS
     gtk_box_pack_start(GTK_BOX(_vbox), _canvas, TRUE, TRUE, 0);
-#else
-    gtk_box_pack_start(GTK_BOX(_vbox), _drawingArea, TRUE, TRUE, 0);
-#endif
 
     setupEvents();
 
     gtk_widget_realize(_window);
-#ifdef BUILD_CANVAS
     gtk_widget_show(_canvas);
-#else
-    gtk_widget_show(_drawingArea);
-#endif
     gtk_widget_show(_window);
     
-#ifdef BUILD_CANVAS
     _renderer = gnash_canvas_get_renderer(GNASH_CANVAS(_canvas));
-#else
-    _renderer.reset(_glue->createRenderHandler());
-    if (!_renderer.get()) return false;
-#endif
     _runResources.setRenderer(_renderer);
 
     // The first time stop() was called, stopHook() might not have had a chance
