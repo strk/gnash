@@ -38,11 +38,7 @@ namespace gnash {
 namespace SWF {
 
 
-/// StaticText DisplayObject 
-//
-/// This is either read from SWF stream 
-/// or (hopefully) created with scripting
-///
+/// Static text definition tag
 class DefineTextTag : public DefinitionTag
 {
 public:
