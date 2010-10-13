@@ -322,7 +322,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     _runResources->setStreamProvider(sp);
 
-    // Set the Hardware video decoding resources. none, vaapi, xv, omap
+    // Set the Hardware video decoding resources. none, vaapi, omap
     _runResources->setHWAccelBackend(_hwaccel);
     // Set the Renderer resource, opengl, agg, or cairo
     _runResources->setRenderBackend(_renderer);

@@ -316,14 +316,6 @@ if BUILD_GTK_GUI
 	@echo "	ATK_CFLAGS is $(ATK_CFLAGS)"
 	@echo "	ATK_LIBS is $(ATK_LIBS)"
 endif
-if BUILD_HILDON_GUI
-	@echo "	HILDON_CFLAGS is $(HILDON_CFLAGS)"
-	@echo "	HILDON_LIBS is $(HILDON_LIBS)"
-endif
-if BUILD_ALP_GUI
-	@echo " ALP_CFLAGS is $(ALP_CFLAGS)"
-	@echo "	ALP_LIBS is $(ALP_LIBS)"
-endif
 	@echo "	X11_CFLAGS is $(X11_CFLAGS)"
 	@echo "	X11_LIBS is $(X11_LIBS)"
 	@echo "Support libraries..."
@@ -425,14 +417,8 @@ else
 	@echo "	Supported GUI: GTK"
 endif
 endif
-if BUILD_HILDON_GUI
-	@echo "	Supported GUI: HILDON"
-endif
 if BUILD_DUMP_GUI
 	@echo "	Supported GUI: Dump"
-endif
-if BUILD_ALP_GUI
-	@echo "	Supported GUI: ALP/Hiker"
 endif
 if BUILD_KDE3_GUI
 	@echo "	Supported GUI: KDE3"

@@ -45,12 +45,6 @@
 #include "gtk_glue_cairo.h"
 #endif
 
-// This uses the Xv extension to X11, which has widespread support
-// for Hw video scaling.
-#ifdef HAVE_XV
-#include "gtk_glue_agg_xv.h"
-#endif
-
 // AGG support, which is the default, for rendering in the canvas.
 #include "gtk_glue_agg.h"
 
@@ -269,14 +263,6 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         } else
 #endif
 #ifdef RENDERER_AGG
-#ifdef HAVE_XV
-        if (hwaccel == "xv") {
-            // Use the X11 XV extension, which works on most GPUs.
-            canvas->glue.reset(new gnash::GtkAggXvGlue);
-            // Set the hardware acclerator to the next one to try
-            // if initializing fails.
-        } else 
-#endif // HAVE_XV
         {
             canvas->glue.reset(new gnash::GtkAggGlue);
         }

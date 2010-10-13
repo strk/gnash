@@ -23,30 +23,13 @@
 #include "gnashconfig.h"
 #endif
 
-#include "gnash.h"
-#include "gtk_glue.h"
-
 #include <string>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
-#ifdef BUILD_CANVAS
-#include "gtk_canvas.h"
-#endif
+#include "gtk_glue.h"
 
-#ifdef GUI_HILDON
-extern "C" {
-# include <hildon/hildon.h>
-}
-#endif
-
-#ifdef USE_ALP
-# include <alp/bundlemgr.h>
-#endif
-
-namespace gnash
-{
-
+namespace gnash {
 
 class GtkGui : public Gui
 {
@@ -139,10 +122,6 @@ public:
 
 private:
 
-#ifdef GUI_HILDON
-    HildonProgram *_hildon_program;
-#endif
-
     GtkWidget* _window;
     GtkWidget* _resumeButton;
     
@@ -150,11 +129,7 @@ private:
     GtkWidget* _overlay;
     
     // The area rendered into by Gnash
-#ifdef BUILD_CANVAS
     GtkWidget* _canvas;
-#else
-    GtkWidget* _drawingArea;
-#endif
 
     GtkMenu* _popup_menu;
     GtkMenu* _popup_menu_alt;

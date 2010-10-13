@@ -56,9 +56,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <string>
 
-#ifdef BUILD_CANVAS
 #include "gtk_canvas.h"
-#endif
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
@@ -74,10 +72,6 @@ extern "C" {
 
 #ifdef HAVE_GST_GST_H
 # include "gst/gstversion.h" // Only for the version number
-#endif
-
-#ifdef GUI_HILDON
-# include <hildon/hildon.h>
 #endif
 
 #ifdef HAVE_VA_VA_H
@@ -163,9 +157,6 @@ GtkGui::~GtkGui()
 GtkGui::GtkGui(unsigned long xid, float scale, bool loop, RunResources& r)
     :
     Gui(xid, scale, loop, r)
-#ifdef GUI_HILDON
-    ,_hildon_program(0)
-#endif
     ,_window(0)
     ,_resumeButton(0)
     ,_overlay(0)
@@ -188,10 +179,6 @@ GtkGui::init(int argc, char **argv[])
 
     gtk_init(&argc, argv);
 
-#ifdef GUI_HILDON
-    _hildon_program = hildon_program_get_instance();
-#endif
-
     addPixmapDirectory (PKGDATADIR);
 
     if (_xid) {
@@ -202,12 +189,7 @@ GtkGui::init(int argc, char **argv[])
 #endif
         log_debug (_("Created XEmbedded window"));
     } else {
-#ifdef GUI_HILDON
-        _window = hildon_window_new();
-        hildon_program_add_window(_hildon_program, HILDON_WINDOW(_window));
-#else
         _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-#endif
         log_debug (_("Created top level window"));
     }
     
@@ -253,18 +235,11 @@ GtkGui::init(int argc, char **argv[])
         }
     }
 
-#ifdef BUILD_CANVAS
     _canvas = gnash_canvas_new();
     gnash_canvas_setup(GNASH_CANVAS(_canvas), hwaccel, renderer, argc, argv);
     // Increase reference count to prevent its destruction (which could happen
     // later if we remove it from its container).
     g_object_ref(G_OBJECT(_canvas));
-#else
-    _drawingArea = gtk_drawing_area_new();
-    // Increase reference count to prevent its destruction (which could happen
-    // later if we remove it from its container).
-    g_object_ref(G_OBJECT(_drawingArea));
-#endif
 
     _resumeButton = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(_resumeButton),
@@ -285,34 +260,21 @@ GtkGui::init(int argc, char **argv[])
     gtk_widget_show(_vbox);
     gtk_container_add(GTK_CONTAINER(_window), _vbox);
 
-#if defined(USE_MENUS) && !defined(GUI_HILDON)
+#if defined(USE_MENUS) 
     if ( ! _xid ) {
         createMenuBar();
     }
 #endif
 
-#ifdef BUILD_CANVAS
     gtk_box_pack_start(GTK_BOX(_vbox), _canvas, TRUE, TRUE, 0);
-#else
-    gtk_box_pack_start(GTK_BOX(_vbox), _drawingArea, TRUE, TRUE, 0);
-#endif
 
     setupEvents();
 
     gtk_widget_realize(_window);
-#ifdef BUILD_CANVAS
     gtk_widget_show(_canvas);
-#else
-    gtk_widget_show(_drawingArea);
-#endif
     gtk_widget_show(_window);
     
-#ifdef BUILD_CANVAS
     _renderer = gnash_canvas_get_renderer(GNASH_CANVAS(_canvas));
-#else
-    _renderer.reset(_glue->createRenderHandler());
-    if (!_renderer.get()) return false;
-#endif
     _runResources.setRenderer(_renderer);
 
     // The first time stop() was called, stopHook() might not have had a chance
@@ -708,13 +670,7 @@ GtkGui::createMenuBar()
 {
     _menubar = gtk_menu_bar_new();
     gtk_widget_show(_menubar);
-#ifdef GUI_HILDON
-//     _hildon_toolbar = create_hildon_toolbar(_hildon_program);
-//     hildon_window_add_toolbar(HILDON_WINDOW(_window),
-//                               GTK_TOOLBAR(_hildon_toolbar));
-#else
     gtk_box_pack_start(GTK_BOX(_vbox), _menubar, FALSE, FALSE, 0);
-#endif
 
     createFileMenu(_menubar);
     createEditMenu(_menubar);
@@ -764,12 +720,6 @@ GtkGui::createMenu()
     gtk_container_add(GTK_CONTAINER(_popup_menu), quit);
     g_signal_connect(quit, "activate", G_CALLBACK(menuQuit), this);
 
-#ifdef GUI_HILDON
-     hildon_window_set_menu(HILDON_WINDOW(_window),
-                               GTK_MENU(_popup_menu));
-     gtk_widget_show_all(GTK_WIDGET(_popup_menu));   
-#endif
-
     return true;
 }
 
@@ -795,12 +745,6 @@ GtkGui::createMenuAlt()
     gtk_widget_show(quit);
     gtk_container_add(GTK_CONTAINER(_popup_menu_alt), quit);
     g_signal_connect(quit, "activate", G_CALLBACK(menuQuit), this);
-
-#ifdef GUI_HILDON
-     hildon_window_set_menu(HILDON_WINDOW(_window),
-                               GTK_MENU(_popup_menu_alt));
-     gtk_widget_show_all(GTK_WIDGET(_popup_menu_alt));   
-#endif
 
     return true;
 }
