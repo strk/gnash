@@ -292,21 +292,6 @@ if BUILD_GTK_GUI
 include $(srcdir)/gtk/gtk.am
 endif
 
-# if ALP				# Access Linux Platform
-# gtk_gnash_LDFLAGS += "-shared -Xlinker -z -Xlinker defs $(GTK2_LIBS)"
-# gtk_gnash_LDADD += $(ALP_LIBS)
-# endif
-#
-# Build the GTK/ALP gui
-if BUILD_ALP_GUI
-include $(srcdir)/am-frag/alp.am
-endif
-
-# Build the GTK/HILDON gui
-if BUILD_HILDON_GUI
-include $(srcdir)/am-frag/hildon.am
-endif
-
 # Build the DUMP gui
 if BUILD_DUMP_GUI
 include $(srcdir)/am-frag/dump.am

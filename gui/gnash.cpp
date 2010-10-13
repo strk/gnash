@@ -64,16 +64,6 @@ extern "C" {
 # include "gst/gstversion.h"
 #endif
 
-#ifdef GUI_ALP
-#include <alp/title.h>
-#include <alp/menubar.h>
-#include <alp/bundlemgr.h>
-#include <alp/appmgr.h>
-# define gnash_main alp_main
-#else
-# define gnash_main main
-#endif
-
 using std::cerr;
 using std::endl;
 using std::cout;
@@ -116,8 +106,8 @@ usage()
     << _("  -vp                      Be (very) verbose about parsing\n") 
 #endif
     << _("  -A <file>                Audio dump file (wave format)\n") 
-    << _("  --hwaccel <none|vaapi|xv> Hardware Video Accelerator to use\n") 
-    << _("                           none|vaapi|xv|omap (default: none)\n") 
+    << _("  --hwaccel <none|vaapi> Hardware Video Accelerator to use\n") 
+    << _("                           none|vaapi|omap (default: none)\n") 
     << _("  -x,  --xid <ID>          X11 Window ID for display\n") 
     << _("  -w,  --writelog          Produce the disk based debug log\n") 
     << _("  -j,  --width <width>     Set window width\n") 
@@ -387,9 +377,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                         case 'v':
                             player.setHWAccel("vaapi");
                             break;
-                        case 'x':
-                            player.setHWAccel("xv");
-                            break;
                         case 'n':
                         default:
                             player.setHWAccel("none");
@@ -519,7 +506,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 }
 
 int
-gnash_main(int argc, char *argv[])
+main(int argc, char *argv[])
 {
     
     std::ios::sync_with_stdio(false);

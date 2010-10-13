@@ -57,14 +57,6 @@ if BUILD_GTK_GUI
 PROGS += gui/.libs/gtk-gnash
 endif
 
-if BUILD_HILDON_GUI
-PROGS += gui/.libs/hildon-gnash
-endif
-
-if BUILD_ALP_GUI
-PROGS += gui/.libs/alp-gnash
-endif
-
 if BUILD_KDE_GUI
 PROGS += gui/.libs/kde-gnash
 endif

@@ -29,17 +29,6 @@
 
 #include "gtk_glue.h"
 
-
-#ifdef GUI_HILDON
-extern "C" {
-# include <hildon/hildon.h>
-}
-#endif
-
-#ifdef USE_ALP
-# include <alp/bundlemgr.h>
-#endif
-
 namespace gnash {
 
 class GtkGui : public Gui
@@ -132,10 +121,6 @@ public:
     bool checkX11Extension(const std::string& ext);
 
 private:
-
-#ifdef GUI_HILDON
-    HildonProgram *_hildon_program;
-#endif
 
     GtkWidget* _window;
     GtkWidget* _resumeButton;

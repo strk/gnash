@@ -634,15 +634,6 @@ AC_ARG_ENABLE(gui,
   while test -n "${enableval}" ; do
     val=`echo ${enableval} | cut -d ' ' -f 1`
     case "${val}" in
-      hildon|HILDON|hildon2|HILDON2)
-        build_hildon=yes
-        AC_DEFINE(USE_HILDON, [1], [Use the Hildon mobile framework])
-        build_gtk=yes
-        ;;
-      alp|ALP|alp|ALP)
-        build_alp=yes
-        build_gtk=yes
-        ;;
       gtk|GTK|gtk2|GTK2)
         build_gtk=yes
         ;;
@@ -702,7 +693,7 @@ AC_ARG_ENABLE(gui,
         build_qt4=yes
         build_sdl=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump|aos4|haiku)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
          ;;
       esac
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -1119,15 +1110,14 @@ dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
 dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
 
-build_xv=yes
 build_vaapi=yes
-hwaccel_list="VAAPI XVideo"
-nhwaccel=2
+hwaccel_list="VAAPI"
+nhwaccel=1
 AC_ARG_ENABLE(hwaccel,
   AC_HELP_STRING([--enable-hwaccel], [Specify which accleration to support to enable (none,vaapi,omap)]),
   if test -z ${enableval}; then
       hwaccel_list="none"
-      nhwaccel=1
+      nhwaccel=0
       enableval=""
   fi
   while test -n "${enableval}" ; do
@@ -1137,7 +1127,6 @@ AC_ARG_ENABLE(hwaccel,
         hwaccel_list="none"
         build_vaapi=no
         build_omap=no
-        dnl build_xv=no
         nhwaccel=0
         ;;
       va*|VA*)
@@ -1145,17 +1134,11 @@ AC_ARG_ENABLE(hwaccel,
         build_vaapi=yes
         nhwaccel=$((nhwaccel+1))
         ;;
-      xv*|XV*|Xv*)
-        hwaccel_list="${hwaccel_list} XVideo"
-        dnl build_xv=yes
-        nhwaccel=$((nhwaccel+1))
-        ;;
       all|ALL)
-        hwaccel_list="XVideo VAAPI OMAP"
-        nhwaccel=3
+        hwaccel_list="VAAPI OMAP"
+        nhwaccel=2
         build_omap=yes
         build_vaapi=yes
-        dnl build_xv=yes
         ;;
       omap*|OMAP*)
         hwaccel_list="${hwaccel_list} omap"
@@ -1216,12 +1199,12 @@ dnl Only build the vaapi support if we have a version of FFmpeg that
 dnl supports it.
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${found_libva_incl}" = xyes; then
   build_vaapi=yes
-  hwaccel_list="VAAPI XVideo"
-  nhwaccel=2
+  hwaccel_list="VAAPI"
+  nhwaccel=1
 else
   build_vaapi=no
-  hwaccel_list="XVideo"
-  nhwaccel=1
+  hwaccel_list=""
+  nhwaccel=0
 fi
 
 dnl Until the hwaccel patches in FFmpeg wind up in the ffmpeg-plugin,
@@ -1757,23 +1740,8 @@ sbox=no
 if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
   sbox=yes
 fi
-if test x"${build_alp}" = xyes; then
-  GNASH_PATH_ALP
-  if test x"${have_alp}" = x"yes"; then
-    AC_DEFINE([HAVE_ALP], 1, [Access Linux Platform framework])
-  fi
-  dnl @@ It makes NO sense to set cross_compiling here,
-  dnl @@ *after* it is used in conditionals above
-  dnl @@ (AM_CONDITIONAL and directories search)
-  dnl cross_compiling=yes
-dnl  build_gtk=yes
-  build_kde3=no
-  build_ogl=no
-  build_gles=no
-  build_agg=yes
-fi
 
-if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
+if test x$build_gtk = xyes -o $build_alp = xyes; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
@@ -1783,13 +1751,6 @@ if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
    if test x"${build_cairo}" = xyes; then
       GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
    fi
-fi
-if test x"${build_hildon}" = xyes; then
-  GNASH_PATH_HILDON
-  build_gtk=yes
-  build_kde3=no
-dnl   build_ogl=no
-dnl   build_agg=yes
 fi
 dnl TODO: add checks for all other GUIs
 
@@ -2399,8 +2360,6 @@ AM_CONDITIONAL(BUILD_QT4_GUI,      [ test x$build_qt4 = xyes ])
 AM_CONDITIONAL(BUILD_KDE3_GUI,     [ test x$build_kde3 = xyes ])
 AM_CONDITIONAL(BUILD_KDE4_GUI,     [ test x$build_kde4 = xyes ])
 
-AM_CONDITIONAL(BUILD_ALP_GUI,      [ test x$build_alp = xyes ])
-AM_CONDITIONAL(BUILD_HILDON_GUI,   [ test x$build_hildon = xyes ])
 AM_CONDITIONAL(BUILD_GTK_GUI,      [ test x$build_gtk = xyes ])
 AM_CONDITIONAL(BUILD_FLTK_GUI,     [ test x$build_fltk = xyes ])
 AM_CONDITIONAL(BUILD_SDL_GUI,      [ test x$build_sdl = xyes ])
@@ -3206,23 +3165,6 @@ if test x$build_gtk = xyes -a x$build_ogl = xyes ; then
 fi
 
 
-if test x$build_hildon = xyes; then #{
-  if test x"$HILDON_LIBS" != x; then
-    if test x"$HILDON_CFLAGS" != x; then
-      echo "        HILDON flags are: $HILDON_CFLAGS"
-    else
-      echo "        HILDON flags are: default include path"
-    fi
-      echo "        HILDON libs are: $HILDON_LIBS"
-  else
-    echo "        ERROR: No HILDON development package installed!" >&3
-    echo "               Install it from http://gtk.org" >&3
-    #echo "               or .deb users: apt-get install libhildon.0-dev" >&3
-    echo "               or .deb users: apt-get install libhildon-1-dev" >&3
-    echo "               or .rpm users: yum install hildon-devel" >&3
-  fi
-fi
-
 if test x$build_gtk = xyes; then #{
   if test x"$GTK2_LIBS" != x; then
     if test x"$GTK2_CFLAGS" != x; then
@@ -3811,16 +3753,6 @@ else
   echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
   echo "                 or .deb users: apt-get install dejagnu" >&4
   echo "                 or .rpm users: yum install dejagnu" >&4
-fi
-
-dnl Access Linux Platform
-if test x"${build_alp}" = xyes; then
-  if test x"${ALP_CFLAGS}" != x; then
-    echo "        ALP flags are: $ALP_CFLAGS"
-    echo "        ALP libs are: $ALP_LIBS"
-  else
-    echo "        ERROR: No ALP development package is installed." >&3
-  fi
 fi
 
 dnl Haiku
