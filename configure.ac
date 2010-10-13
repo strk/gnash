@@ -194,6 +194,7 @@ esac
 AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
 AM_CONDITIONAL(WIN32, test x$windows = xyes)
 AM_CONDITIONAL(HAIKU, test x$haiku = xyes)
+AM_CONDITIONAL(AMIGAOS4, test x$amigaos4 = xyes)
 
 dnl Get build date for helping us debugging
 BUILDDATE="`date +%Y%m%d`"
