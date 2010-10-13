@@ -235,7 +235,9 @@ attachExternalInterfaceStaticInterface(as_object& o)
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 7);
 }
 
-// This adds a function that can be called from javascript.
+/// This adds a function that can be called from javascript.
+//
+/// TODO: addCallback takes three arguments; only two are handled here.
 as_value
 externalinterface_addCallback(const fn_call& fn)
 {
@@ -250,17 +252,14 @@ externalinterface_addCallback(const fn_call& fn)
     if (fn.nargs > 1) {
         const as_value& name_as = fn.arg(0);
         std::string name = name_as.to_string();
-        boost::intrusive_ptr<as_object> asCallback;
-        if (fn.arg(2).is_object()) {
+        if (fn.arg(1).is_object()) {
             log_debug("adding callback %s", name);
-            asCallback = (toObject(fn.arg(2), getVM(fn)));
-            mr.addExternalCallback(fn.this_ptr, name, asCallback.get());
+            as_object* asCallback = toObject(fn.arg(1), getVM(fn));
+            mr.addExternalCallback(fn.this_ptr, name, asCallback);
         }
-     }
+    }
 
-    // This function doesn't actually have a return value, but we do this
-    // to quiet warnings about not returning anything, as the return
-    // value should never be checked anyway.
+    // Documented to return a boolean, but seems untested.
     return as_value(false);    
 }
 
@@ -272,7 +271,7 @@ externalinterface_call(const fn_call& fn)
     movie_root& mr = getRoot(fn);
     as_value val;
 
-    if (fn.nargs >= 2) {
+    if (fn.nargs > 1) {
         const as_value& methodName_as = fn.arg(0);
         const std::string methodName = methodName_as.to_string();
         const std::vector<as_value>& args = fn.getArgs();
@@ -606,7 +605,8 @@ externalinterface_uToAS(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     
     if (fn.nargs == 1) {
-        as_value val = ExternalInterface::toAS(getGlobal(fn), fn.arg(0).to_string());
+        as_value val = ExternalInterface::toAS(getGlobal(fn),
+                fn.arg(0).to_string());
         return val;
     }
     
