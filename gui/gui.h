@@ -23,6 +23,12 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/intrusive_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/function.hpp>
+#include <string>
+#include <map>
+
 #include "SWFRect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "GnashKey.h" // for gnash::key::code type
@@ -31,18 +37,11 @@
 #include "SystemClock.h"
 #include "gnash.h" // for Quality
 #include "movie_root.h"
+#include "ScreenShotter.h"
 
 #ifdef USE_SWFTREE
 #include "tree.hh" // for tree
 #endif
-
-#include <boost/intrusive_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/function.hpp>
-#include <vector>
-#include <cstdlib> 
-#include <string>
-#include <map>
 
 // Define this to enable fps debugging without touching
 // gnashconfig.h
@@ -65,8 +64,7 @@
 #define ENABLE_KEYBOARD_MOUSE_MOVEMENTS 1
 
 // Forward declarations
-namespace gnash
-{
+namespace gnash {
     class RunResources;
     class movie_root;
     class movie_definition;
@@ -79,81 +77,6 @@ enum gnash_cursor_type {
   CURSOR_HAND,
   CURSOR_NORMAL,
   CURSOR_INPUT
-};
-
-FileType typeFromFileName(const std::string& fileName);
-
-/// Handles screen dumps.
-class ScreenShotter
-{
-public:
-
-    typedef std::vector<size_t> FrameList;
-
-    /// Create a ScreenShotter with renderer and output name.
-    ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName,
-            int quality = 100)
-        :
-        _renderer(r),
-        _immediate(false),
-        _fileName(fileName),
-        _last(false),
-        _type(typeFromFileName(fileName)),
-        _quality(quality)
-    {
-    }
-
-    /// Take a screenshot at the next possible moment.
-    void now() {
-        _immediate = true;
-    }
-
-    /// Take a screenshot when the last frame is reached.
-    void lastFrame() {
-        _last = true;
-    }
-
-    /// Called on the last frame before exit.
-    //
-    /// Which frame is last depends on the execution path of the SWF, whether
-    /// the SWF loops, whether a timeout was requested or a maximum number of
-    /// advances set. Those conditions are not knowable in advance, so
-    /// the last frame is a special case.
-    void last() const;
-
-    /// Takes a screenshot if required.
-    //
-    /// Called on each advance.
-    //
-    /// @param frameAdvance     used to check whether a screenshot is required
-    ///                         as well as to construct the filename.
-    void screenShot(size_t frameAdvance);
-
-    /// Request a list of frames to be rendered to image files.
-    void setFrames(const FrameList& frames);
-
-private:
-
-    /// Take the screenshot.
-    void saveImage(const std::string& filename) const;
-
-    boost::shared_ptr<Renderer> _renderer;
-
-    /// If true, the next call to screenshot will take a screenshot
-    bool _immediate;
-
-    /// Name used to generate output file.
-    const std::string _fileName;
-
-    /// Whether to take a screenshot on the last frame.
-    bool _last;
-
-    FrameList _frames;
-
-    const FileType _type;
-
-    const int _quality;
-
 };
 
 /// Parent class from which all GUI implementations will depend.

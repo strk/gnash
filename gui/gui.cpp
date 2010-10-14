@@ -25,11 +25,7 @@
 #include "gui.h"
 
 #include <vector>
-#include <cstdio>
-#include <cstring>
 #include <algorithm> 
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "MovieClip.h"
 #include "Renderer.h"
@@ -37,10 +33,10 @@
 #include "movie_root.h"
 #include "VM.h"
 #include "DisplayObject.h"
-#include "tu_file.h"
 #include "gnash.h"
 #include "RunResources.h"
 #include "StreamProvider.h"
+#include "ScreenShotter.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
@@ -1017,27 +1013,6 @@ Gui::advanceMovie()
 	return true;
 }
 
-FileType
-typeFromFileName(const std::string& filename)
-{
-    struct { const char* ext; FileType type; } matches[] =
-        {
-            { ".png",   GNASH_FILETYPE_PNG },
-            { ".jpg",   GNASH_FILETYPE_JPEG },
-            { ".jpeg",   GNASH_FILETYPE_JPEG }
-        };
-    
-    for (size_t i = 0; i < 3; ++i) {
-        const char* ext = matches[i].ext;
-        const std::string::size_type pos = filename.rfind(ext);
-        if (pos != std::string::npos &&
-                pos + std::strlen(ext) == filename.size()) {
-            return matches[i].type;
-        }
-    }
-    return GNASH_FILETYPE_PNG;
-}
-
 void
 Gui::takeScreenShot()
 {
@@ -1049,7 +1024,8 @@ Gui::takeScreenShot()
         const std::string& name = (p == std::string::npos) ? url.path() :
             url.path().substr(p + 1);
         const std::string& filename = "screenshot-" + name + "-%f";
-        _screenShotter.reset(new ScreenShotter(_renderer, filename));
+        _screenShotter.reset(new ScreenShotter(_renderer, filename,
+                    GNASH_FILETYPE_PNG));
     }
     assert (_screenShotter.get());
     _screenShotter->now();
@@ -1366,49 +1342,6 @@ Gui::callCallback(int fd)
     boost::function<void()>& f = it->second;
 
     f();
-}
-
-void
-ScreenShotter::saveImage(const std::string& id) const
-{
-    // Replace all "%f" in the filename with the frameAdvance.
-    std::string outfile(_fileName);
-    boost::replace_all(outfile, "%f", id);
-    
-    FILE* f = std::fopen(outfile.c_str(), "wb");
-    if (f) {
-        boost::shared_ptr<IOChannel> t(new tu_file(f, true));
-        _renderer->renderToImage(t, _type, _quality);
-    } else {
-        log_error("Failed to open screenshot file \"%s\"!", outfile);
-    }
-}
-
-void
-ScreenShotter::screenShot(size_t frameAdvance)
-{
-    // Save an image if an spontaneous screenshot was requested or the
-    // frame is in the list of requested frames.
-    if (_immediate || std::binary_search(_frames.begin(), _frames.end(),
-                frameAdvance)) {
-        saveImage(boost::lexical_cast<std::string>(frameAdvance));
-        _immediate = false;
-    }
-}
-
-void
-ScreenShotter::last() const
-{
-    if (_last) {
-	saveImage("last");
-    }
-}
-
-void
-ScreenShotter::setFrames(const FrameList& frames)
-{
-    _frames = frames;
-    std::sort(_frames.begin(), _frames.end());
 }
 
 // end of namespace

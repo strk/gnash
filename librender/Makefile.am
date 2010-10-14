@@ -63,11 +63,17 @@ noinst_HEADERS = \
 	Renderer_agg_style.h \
 	Renderer_cairo.h \
 	Renderer_ogl.h \
-        PathParser.h
+	PathParser.h \
+	ScreenShotter.h \
+	$(NULL)
 
 pkglib_LTLIBRARIES = libgnashrender.la
 libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
-libgnashrender_la_SOURCES = PathParser.cpp
+libgnashrender_la_SOURCES = \
+	PathParser.cpp \
+	ScreenShotter.cpp \
+	$(NULL)
+
 libgnashrender_la_LDFLAGS =  -release $(VERSION) 
 
 if BUILD_OGL_RENDERER

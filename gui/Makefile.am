@@ -233,9 +233,12 @@ EXTRA_DIST += \
 	EventDevice.cpp
 
 GUI_SRCS = gnash.cpp \
-	gui.cpp gui.h \
-	Player.cpp Player.h \
-	NullGui.cpp NullGui.h \
+	gui.cpp \
+	gui.h \
+	Player.cpp \
+	Player.h \
+	NullGui.cpp \
+	NullGui.h \
 	$(DEVICES) \
 	$(NULL)
 

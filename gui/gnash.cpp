@@ -46,6 +46,7 @@
 #include "GnashException.h"
 #include "revno.h"
 #include "MediaHandler.h"
+#include "ScreenShotter.h"
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
