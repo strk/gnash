@@ -193,6 +193,9 @@ check_equals (xml, '<object></object>');
 xml = EI._objectToXML(o);
 check_equals (xml, '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
 
+xml = EI._objectToXML(o, 1, 2, 3);
+xcheck_equals (xml, '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
+
 xml = EI._objectToXML(undefined);
 check_equals (xml, '<object></object>');
 
@@ -201,6 +204,9 @@ check_equals (xml, '<object></object>');
 
 xml = EI._objectToXML(6);
 check_equals (xml, '<object></object>');
+
+xml = EI._objectToXML();
+xcheck_equals (xml, '<object></object>');
 
 // An Array
 anArray = [ 12, "tr", 1 ];
@@ -293,6 +299,6 @@ xcheck_equals (typeOf(val), 'object');
 #elif OUTPUT_VERSION < 8 // }{
 	check_totals(49);
 #else // SWF8+ }{
-	check_totals(97);
+	check_totals(99);
 # endif // }
 
