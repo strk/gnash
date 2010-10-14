@@ -181,7 +181,14 @@ public:
     /// Write RGB image data using the parameters supplied at construction.
     //
     /// @param rgbData  The raw RGB image data to write as a JPEG.
-    void writeImageRGB(const unsigned char* rgbData);
+    virtual void writeImageRGB(const unsigned char* rgbData);
+
+    /// Write RGBA image data using the parameters supplied at construction.
+    //
+    /// Note: transparency is ignored because JPEG doesn't support it!
+    //
+    /// @param rgbaData  The raw RGBA image data to write as a JPEG.
+    virtual void writeImageRGBA(const unsigned char* rgbaData);
 
     /// Create a JpegOutput, transferring ownership to the caller.
     //

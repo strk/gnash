@@ -599,6 +599,23 @@ JpegOutput::writeImageRGB(const unsigned char* rgbData)
     }
 }
 
+void
+JpegOutput::writeImageRGBA(const unsigned char* rgbaData)
+{
+    boost::scoped_array<unsigned char> data(new unsigned char[_width * 3]);
+
+    for (size_t y = 0; y < _height; ++y) {
+        for (size_t x = 0; x < _width; ++x) {
+            data[x * 3] = rgbaData[y * _width * 4 + x * 4];
+            data[x * 3 + 1] = rgbaData[y * _width * 4 + x * 4 + 1];
+            data[x * 3 + 2] = rgbaData[y * _width * 4 + x * 4 + 2];
+        }
+
+        unsigned char* ypos = data.get();
+        // JPEG needs non-const data.
+        jpeg_write_scanlines(&m_cinfo, &ypos, 1);
+    }
+}
 
 std::auto_ptr<Output>
 JpegOutput::create(boost::shared_ptr<IOChannel> o, size_t width, size_t height,
