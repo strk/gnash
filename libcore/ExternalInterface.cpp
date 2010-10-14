@@ -58,14 +58,10 @@ class PropsSerializer : public AbstractPropertyVisitor
 public:
     
     PropsSerializer(VM& vm)
-        : _st(vm.getStringTable()),
-          _error(false)
+        : _st(vm.getStringTable())
         { /* do nothing */}
     
-    bool success() const { return !_error; }
-
     bool accept(const ObjectURI& uri, const as_value& val) {
-        if (_error) return true;
 
         const string_table::key key = getName(uri);
 
@@ -80,23 +76,43 @@ public:
 
 //        log_debug(" serializing property %s", id);
         
-        _xml << "<property id=\"" << id << "\">";
-        _xml << ExternalInterface::toXML(val);
-        _xml << "</property>";
+        std::stringstream xml;
+        xml << "<property id=\"" << id << "\">";
+        xml << ExternalInterface::toXML(val);
+        xml << "</property>";
 
-        _noprops.push_back(val);
+        _propsxml.push_back(xml.str());
             
         return true;
     }
 
-    std::string getXML() { return _xml.str(); };
-    std::vector<as_value> getArgs() { return _noprops; };
+    std::string getReverseXML() {
+        typedef std::vector<std::string> Strings;
+        std::stringstream xml;
+        for (Strings::const_reverse_iterator
+            i=_propsxml.rbegin(), e=_propsxml.rend();
+            i != e; ++i)
+        {
+            xml << *i;
+        }
+        return xml.str();
+    };
+
+    std::string getXML() {
+        typedef std::vector<std::string> Strings;
+        std::stringstream xml;
+        for (Strings::const_iterator
+            i=_propsxml.begin(), e=_propsxml.end();
+            i != e; ++i)
+        {
+            xml << *i;
+        }
+        return xml.str();
+    };
     
 private:
     string_table&       _st;
-    mutable bool        _error;
-    std::stringstream   _xml;
-    std::vector<as_value>   _noprops;
+    std::vector<std::string> _propsxml;
 };
 
 }
@@ -131,11 +147,7 @@ ExternalInterface::objectToXML(as_object *obj)
     // Get all the properties
     PropsSerializer props(vm);
     obj->visitProperties<IsEnumerable>(props);
-    if (!props.success()) {
-        log_error("Could not serialize object");
-    } else {
-        std::vector<as_value> properties = props.getArgs();
-    }
+    ss << props.getReverseXML();
     ss << "</object>";
     
     return ss.str();
@@ -157,9 +169,6 @@ ExternalInterface::arrayToXML(as_object *obj)
     ss << "<array>";
     PropsSerializer props(vm);
     obj->visitProperties<IsEnumerable>(props);
-    if (!props.success()) {
-        log_error("Could not serialize object");
-    }
     ss << props.getXML();
     
     ss << "</array>";

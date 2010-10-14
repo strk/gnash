@@ -194,7 +194,7 @@ xml = EI._objectToXML(nc);
 check_equals (xml, '<object></object>');
 
 xml = EI._objectToXML(o);
-xcheck_equals (xml, '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
+check_equals (xml, '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
 
 xml = EI._objectToXML(undefined);
 check_equals (xml, '<object></object>');
