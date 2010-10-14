@@ -48,6 +48,7 @@
 #include "VM.h"
 #include "SystemClock.h"
 #include "ExternalInterface.h"
+#include "ScreenShotter.h"
 
 #include "GnashSystemIOHeaders.h" // for write() 
 #include "log.h"
@@ -533,8 +534,12 @@ Player::run(int argc, char* argv[], const std::string& infile,
                 url.path().substr(p + 1);
             _screenshotFile = "screenshot-" + name + "-%f";
         }
-
-        _gui->requestScreenShots(v, last, _screenshotFile, _screenshotQuality);
+        if (!last && v.empty()) return;
+        
+        std::auto_ptr<ScreenShotter> ss(new ScreenShotter(_screenshotFile, _screenshotQuality));
+        if (last) ss->lastFrame();
+        ss->setFrames(v);
+        _gui->setScreenShotter(ss);
     }
 
     _gui->run();

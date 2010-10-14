@@ -37,7 +37,6 @@
 #include "SystemClock.h"
 #include "gnash.h" // for Quality
 #include "movie_root.h"
-#include "ScreenShotter.h"
 
 #ifdef USE_SWFTREE
 #include "tree.hh" // for tree
@@ -65,6 +64,7 @@
 
 // Forward declarations
 namespace gnash {
+    class ScreenShotter;
     class RunResources;
     class movie_root;
     class movie_definition;
@@ -122,13 +122,7 @@ public:
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
 
-    /// Request a list of screenshots
-    //
-    /// @param l        A list of frames to render to an image file
-    /// @param last     Whether to render the last frame before exist
-    /// @param filename The filename pattern to save images as.
-    void requestScreenShots(const ScreenShotter::FrameList& l, bool last,
-            const std::string& filename, int quality);
+    void setScreenShotter(std::auto_ptr<ScreenShotter> ss);
 
     /** \brief
      * Create and display our window.

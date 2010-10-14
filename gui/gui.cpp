@@ -1012,6 +1012,12 @@ Gui::advanceMovie()
 }
 
 void
+Gui::setScreenShotter(std::auto_ptr<ScreenShotter> ss)
+{
+    _screenShotter.reset(ss.release());
+}
+
+void
 Gui::takeScreenShot()
 {
     if (!_screenShotter.get()) {
@@ -1026,22 +1032,6 @@ Gui::takeScreenShot()
     }
     assert (_screenShotter.get());
     _screenShotter->now();
-}
-
-void
-Gui::requestScreenShots(const ScreenShotter::FrameList& l, bool last,
-        const std::string& filename, int quality)
-{
-    // Nothing to do if there is no renderer or if no frames should be
-    // saved.
-    if (!_renderer.get() || (l.empty() && !last)) {
-        return;
-    }
-
-    _screenShotter.reset(new ScreenShotter(filename, quality));
-    if (last) _screenShotter->lastFrame();
-    _screenShotter->setFrames(l);
-
 }
 
 void
