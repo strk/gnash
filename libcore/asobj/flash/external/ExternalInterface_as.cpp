@@ -271,6 +271,12 @@ externalinterface_call(const fn_call& fn)
     movie_root& mr = getRoot(fn);
     as_value val;
 
+    if (mr.getControlFD() <= 0) {
+        log_debug("ExternalInterface not accessible on call.");
+        val.set_null();
+        return as_value(val);
+    }
+
     if (fn.nargs > 1) {
         const as_value& methodName_as = fn.arg(0);
         const std::string methodName = methodName_as.to_string();
@@ -282,12 +288,10 @@ externalinterface_call(const fn_call& fn)
             // There was an error trying to Invoke the callback
             if (result == ExternalInterface::makeString("Error")
                 || (result == ExternalInterface::makeString("SecurityError"))) {
-                val.set_null();
+                log_trace("VAL: %s", val);
+                val.set_undefined();
             }
-        } else {
-            // We got nothing back from the Invoke, so return an error
-            val.set_null();
-        }
+        } 
     }
     
     return val;
