@@ -27,13 +27,9 @@ flash.system.Security.allowDomain("localhost");
 ASSetPropFlags (_global, "flash", 0, 5248);
 
 #if OUTPUT_VERSION < 6
-
-if (flash.external.ExternalInterface == undefined) {
-    pass("ExternalInterface class doesn't exist in older versions");
-} else {
-    fail("ExternalInterface class doesn't exist in older versions");
-}
-
+ check_equals(typeof(flash.external.ExternalInterface), 'undefined');
+#else
+ check_equals(typeof(flash.external.ExternalInterface), 'function');
 #endif
 
 EI = flash.external.ExternalInterface;
@@ -415,10 +411,8 @@ if (typeOf(val) == "object") {
 
 #endif  // version > 7 }
 
-#if OUTPUT_VERSION < 6 // {
+#if OUTPUT_VERSION < 7 // {
 	check_totals(1);
-#elif OUTPUT_VERSION < 7 // }{
-	check_totals(0);
 #elif OUTPUT_VERSION < 8 // }{
 	check_totals(2);
 #else // SWF8+ }{
