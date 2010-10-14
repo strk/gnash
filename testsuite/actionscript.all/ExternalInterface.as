@@ -211,7 +211,7 @@ check_equals (xml,
 '<array><property id="0"><number>12</number></property><property id="1"><string>tr</string></property><property id="2"><number>1</number></property><property id="3"><undefined/></property></array>'
 );
 
-xml = EI._argumentsToXML(anArray, 0);
+xml = EI._argumentsToXML(anArray);
 xcheck_equals (xml, 
 '<arguments><string>tr</string><number>1</number><undefined/></arguments>'
 );
