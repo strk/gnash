@@ -160,17 +160,30 @@ ExternalInterface::arrayToXML(as_object *obj)
     // GNASH_REPORT_FUNCTION;
     std::stringstream ss;
     if (obj == 0) {
-        //log_error("Need a valid AS Object!");
+        // callers should check (we might just abort here)
+        log_error("Need a valid AS Object!");
         return ss.str();
     }
 
     VM& vm = getVM(*obj);    
+    string_table& st = vm.getStringTable();
     
     ss << "<array>";
-    PropsSerializer props(vm);
-    obj->visitProperties<IsEnumerable>(props);
-    ss << props.getXML();
-    
+
+    // This is an ActionScript-like implementation, which is why it looks
+    // like poor C++.
+    const int length = toInt(getMember(*obj, NSV::PROP_LENGTH), vm);
+    int i = 0;
+    while (i < length) {
+        std::ostringstream s;
+        s << i;
+        as_value el = getMember(*obj, st.find(s.str()));
+        ss << "<property id=\"" << i << "\">"
+           << toXML(el)
+           << "</property>";
+        ++i;
+    }
+
     ss << "</array>";
     
     return ss.str();

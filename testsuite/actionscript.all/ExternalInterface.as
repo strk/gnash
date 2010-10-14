@@ -157,9 +157,6 @@ nc = Mouse;
 // A native object
 no = new XML;
 
-// An Array
-a = [ 12, 34, "tr", 1, 2, 3, 4 ];
-
 // Try instantiating.
 r = new EI;
 // You get an object
@@ -205,11 +202,19 @@ check_equals (xml, '<object></object>');
 xml = EI._objectToXML(6);
 check_equals (xml, '<object></object>');
 
-xml = EI._arrayToXML(a);
-check_equals (xml, '<array><property id="0"><number>12</number></property><property id="1"><number>34</number></property><property id="2"><string>tr</string></property><property id="3"><number>1</number></property><property id="4"><number>2</number></property><property id="5"><number>3</number></property><property id="6"><number>4</number></property></array>');
+// An Array
+anArray = [ 12, "tr", 1 ];
+anArray.length = 4;
 
-xml = EI._argumentsToXML(a, 0);
-check_equals (xml, '<arguments><number>34</number><string>tr</string><number>1</number><number>2</number><number>3</number><number>4</number></arguments>');
+xml = EI._arrayToXML(anArray);
+check_equals (xml,
+'<array><property id="0"><number>12</number></property><property id="1"><string>tr</string></property><property id="2"><number>1</number></property><property id="3"><undefined/></property></array>'
+);
+
+xml = EI._argumentsToXML(anArray, 0);
+xcheck_equals (xml, 
+'<arguments><string>tr</string><number>1</number><undefined/></arguments>'
+);
 
 // xml = EI._toXML(o);
 // if (xml == '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>') {
