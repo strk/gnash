@@ -134,18 +134,13 @@ function TestASMethod (msg) {
 // we need to add a method anyway to test being called by Javascript.
 ret = EI.addCallback("TestASMethod", null, TestASMethod);
 check_equals(typeof(ret), 'boolean');
-check_equals(ret, false);
-
-if (EI.available == true) {
-  note("ExternalInterface available, calling TestJSMethod");
-  // This test tries to invoke a Javascript method running in the browser
-  if (EI.call("TestJSMethod", "test") == null) {
-    pass("ExternalInterface::call(\"TestJSMethod\") == null");
-  } else {
-    fail("ExternalInterface::call(\"TestJSMethod\") == null");
-  }
+check_equals(ret, EI.available); // returns true if available...
+ret = EI.call("TestJSMethod", "test");
+if ( EI.available ) {
+    check_equals(typeof(ret), 'undefined');
+} else {
+    check_equals(typeof(ret), 'null');
 }
-
 
 // An object
 o = { a: 1, b: "string" };
@@ -285,6 +280,6 @@ xcheck_equals (typeOf(val), 'object');
 #elif OUTPUT_VERSION < 8 // }{
 	check_totals(49);
 #else // SWF8+ }{
-	check_totals(92);
+	check_totals(93);
 # endif // }
 
