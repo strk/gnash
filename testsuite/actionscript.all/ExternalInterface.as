@@ -25,38 +25,92 @@
 flash.system.Security.allowDomain("localhost");
 
 ASSetPropFlags (_global, "flash", 0, 5248);
-
-#if OUTPUT_VERSION < 6
- check_equals(typeof(flash.external.ExternalInterface), 'undefined');
-#else
- check_equals(typeof(flash.external.ExternalInterface), 'function');
-#endif
-
 EI = flash.external.ExternalInterface;
 
-#if OUTPUT_VERSION > 6 // {
+#if OUTPUT_VERSION < 6 // {
 
-// First make sure all the documented methods and properties exist
-if (EI.hasOwnProperty("call")) {
-    pass("ExternalInterface::call() exists");
-} else {
-    fail("ExternalInterface::call() doesn't exist");
-}
+check_equals(typeof(EI), 'undefined');
 
-if (EI.hasOwnProperty("addCallback")) {
-    pass("ExternalInterface::addCallback() exists");
-} else {
-    fail("ExternalInterface::addCallback() doesn't exist");
-}
+#else // OUTPUT_VERSION >= 6 }{
 
-#endif // }
+check_equals(typeof(EI), 'function');
+check(EI.hasOwnProperty('addCallback'));
+check(EI.hasOwnProperty("_argumentsToAS"));
+check(EI.hasOwnProperty("_argumentsToXML"));
+check(EI.hasOwnProperty("_arrayToAS"));
+check(EI.hasOwnProperty("_arrayToJS"));
+check(EI.hasOwnProperty("_arrayToXML"));
+check(EI.hasOwnProperty('available'));
+check(EI.hasOwnProperty('call'));
+check(EI.hasOwnProperty("_callIn"));
+check(EI.hasOwnProperty("_callOut"));
+check(EI.hasOwnProperty("_escapeXML"));
+check(EI.hasOwnProperty("_evalJS"));
+check(EI.hasOwnProperty("_initJS"));
+check(EI.hasOwnProperty("_jsQuoteString"));
+check(EI.hasOwnProperty("_objectID"));
+check(EI.hasOwnProperty("_objectToAS"));
+check(EI.hasOwnProperty("_objectToJS"));
+check(EI.hasOwnProperty("_objectToXML"));
+check(EI.hasOwnProperty("_toAS"));
+check(EI.hasOwnProperty("_toJS"));
+check(EI.hasOwnProperty("_toXML"));
+check(EI.hasOwnProperty("_unescapeXML"));
+check(EI.hasOwnProperty("prototype"));
+check(!EI.hasOwnProperty("marshallExceptions"));
+check(!EI.hasOwnProperty("objectID"));
+// Empty prototype...
+var s = ''; for (var i in EI.prototype) s += i; check_equals(s, '');
 
-#if OUTPUT_VERSION > 7 // {
-if (EI.hasOwnProperty("available")) {
-    pass("ExternalInterface::available() exists");
-} else {
-    fail("ExternalInterface::available() doesn't exist");
-}
+#if OUTPUT_VERSION < 8 // {
+
+xcheck_equals(typeof(EI.addCallback), 'undefined');
+xcheck_equals(typeof(EI._argumentsToAS), 'undefined');
+xcheck_equals(typeof(EI._argumentsToXML), 'undefined');
+xcheck_equals(typeof(EI._arrayToAS), 'undefined');
+xcheck_equals(typeof(EI._arrayToJS), 'undefined');
+xcheck_equals(typeof(EI._arrayToXML), 'undefined');
+check_equals(typeof(EI.available), 'undefined');
+check_equals(typeof(EI.call), 'function');
+xcheck_equals(typeof(EI._callIn), 'undefined');
+check_equals(typeof(EI._callOut), 'undefined');
+check_equals(typeof(EI._escapeXML), 'undefined');
+check_equals(typeof(EI._evalJS), 'undefined');
+check_equals(typeof(EI._initJS), 'undefined');
+check_equals(typeof(EI._jsQuoteString), 'undefined');
+check_equals(typeof(EI._objectID), 'undefined');
+xcheck_equals(typeof(EI._objectToAS), 'undefined');
+xcheck_equals(typeof(EI._objectToJS), 'undefined');
+xcheck_equals(typeof(EI._objectToXML), 'undefined');
+xcheck_equals(typeof(EI._toAS), 'undefined');
+xcheck_equals(typeof(EI._toJS), 'undefined');
+xcheck_equals(typeof(EI._toXML), 'undefined');
+check_equals(typeof(EI._unescapeXML), 'undefined');
+
+#else //  OUTPUT_VERSION >= 8  }{
+
+check_equals(typeof(EI.addCallback), 'function');
+check_equals(typeof(EI._argumentsToAS), 'function');
+check_equals(typeof(EI._argumentsToXML), 'function');
+check_equals(typeof(EI._arrayToAS), 'function');
+check_equals(typeof(EI._arrayToJS), 'function');
+check_equals(typeof(EI._arrayToXML), 'function');
+check_equals(typeof(EI.available), 'boolean');
+check_equals(typeof(EI.call), 'function');
+check_equals(typeof(EI._callIn), 'function');
+check_equals(typeof(EI._callOut), 'function');
+check_equals(typeof(EI._escapeXML), 'function');
+check_equals(typeof(EI._evalJS), 'function');
+check_equals(typeof(EI._initJS), 'function');
+check_equals(typeof(EI._jsQuoteString), 'function');
+check_equals(typeof(EI._objectID), 'function');
+check_equals(typeof(EI._objectToAS), 'function');
+check_equals(typeof(EI._objectToJS), 'function');
+check_equals(typeof(EI._objectToXML), 'function');
+check_equals(typeof(EI._toAS), 'function');
+check_equals(typeof(EI._toJS), 'function');
+check_equals(typeof(EI._toXML), 'function');
+check_equals(typeof(EI._unescapeXML), 'function');
 
 // Create a test function for the callback
 function TestASMethod (msg) {
@@ -78,13 +132,12 @@ function TestASMethod (msg) {
 // This adds a callback that the brower can call from Javascript. This is
 // a bit of a bogus test case, as addCallback() doesn't return anything, but
 // we need to add a method anyway to test being called by Javascript.
-if (EI.addCallback("TestASMethod", null, TestASMethod) == false) {
-    pass("ExternalInterface::addCallback(\"TestASMethod\")");
-} else {
-    fail("ExternalInterface::addCallback(\"TestASMethod\")");
-}
+ret = EI.addCallback("TestASMethod", null, TestASMethod);
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, false);
 
 if (EI.available == true) {
+  note("ExternalInterface available, calling TestJSMethod");
   // This test tries to invoke a Javascript method running in the browser
   if (EI.call("TestJSMethod", "test") == null) {
     pass("ExternalInterface::call(\"TestJSMethod\") == null");
@@ -93,131 +146,6 @@ if (EI.available == true) {
   }
 }
 
-// The default is false, so if we can set it to true, it worked
-EI.marshallExceptions = true;
-if (EI.marshallExceptions == true) {
-    pass("ExternalInterface::marshallExceptions()");
-} else if (EI.objectID == undefined) {
-    pass("ExternalInterface::objectID is correct");
-} else {
-    fail("ExternalInterface::objectID property isn't correct");
-}
-
-// Then make sure all the undocumented methods and properties exist
-if (EI.hasOwnProperty("_argumentsToXML")) {
-    pass("ExternalInterface::_argumentsToXML() exists");
-} else {
-    fail("ExternalInterface::_argumentsToXML() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_argumentsToAS")) {
-    pass("ExternalInterface::_argumentsToAS() exists");
-} else {
-    fail("ExternalInterface::_argumentsToAS() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_unescapeXML")) {
-    pass("ExternalInterface::_unescapeXML() exists");
-} else {
-    fail("ExternalInterface::_unescapeXML() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_toXML")) {
-    pass("ExternalInterface::_toXML() exists");
-} else {
-    fail("ExternalInterface::_toXML() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_toJS")) {
-    pass("ExternalInterface::_toJS() exists");
-} else {
-    fail("ExternalInterface::_toJS() doesn't exist");
-}
-
-
-if (EI.hasOwnProperty("_toAS")) {
-    pass("ExternalInterface::_toAS() exists");
-} else {
-    fail("ExternalInterface::_toAS() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_objectToXML")) {
-    pass("ExternalInterface::_objectToXML() exists");
-} else {
-    fail("ExternalInterface::_objectToXML() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_objectToJS")) {
-    pass("ExternalInterface::_objectToJS() exists");
-} else {
-    fail("ExternalInterface::_objectToJS() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_objectToAS")) {
-    pass("ExternalInterface::_objectToAS() exists");
-} else {
-    fail("ExternalInterface::_objectToAS() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_objectID")) {
-    pass("ExternalInterface::_objectID() exists");
-} else {
-    fail("ExternalInterface::_objectID() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_jsQuoteString")) {
-    pass("ExternalInterface::_jsQuoteString() exists");
-} else {
-    fail("ExternalInterface::_jsQuoteString() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_initJS")) {
-    pass("ExternalInterface::_initJS() exists");
-} else {
-    fail("ExternalInterface::_initJS() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_evalJS")) {
-    pass("ExternalInterface::_evalJS() exists");
-} else {
-    fail("ExternalInterface::_evalJS() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_escapeXML")) {
-    pass("ExternalInterface::_escapeXML() exists");
-} else {
-    fail("ExternalInterface::_escapeXML() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_callOut")) {
-    pass("ExternalInterface::_callOut() exists");
-} else {
-    fail("ExternalInterface::_callOut() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_callIn")) {
-    pass("ExternalInterface::_callIn() exists");
-} else {
-    fail("ExternalInterface::_callIn() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_arrayToXML")) {
-    pass("ExternalInterface::_arrayToXML() exists");
-} else {
-    fail("ExternalInterface::_arrayToXML() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_arrayToJS")) {
-    pass("ExternalInterface::_arrayToJS() exists");
-} else {
-    fail("ExternalInterface::_arrayToJS() doesn't exist");
-}
-
-if (EI.hasOwnProperty("_arrayToAS")) {
-    pass("ExternalInterface::_arrayToAS() exists");
-} else {
-    fail("ExternalInterface::_arrayToAS() doesn't exist");
-}
 
 // An object
 o = { a: 1, b: "string" };
@@ -239,76 +167,54 @@ a = [ 12, 34, "tr", 1, 2, 3, 4 ];
 
 // Try instantiating.
 r = new EI;
-
 // You get an object
-if (typeof(r) == "object") {
-    pass("ExternalInterface::ExternalInterface()");
-} else {
-    fail("ExternalInterface::ExternalInterface()");
-}
+check_equals(typeof(r), 'object');
+check(r instanceOf EI);
 
-// check(r instanceOf EI);
-if (r instanceOf EI) {
-    pass("ExternalInterface instanceOf");
-} else {
-    fail("ExternalInterface instanceOf");
-}
-
-// But it doesn't do much.
-if (r._toXML(o) == undefined) {
-    pass("ExternalInterface undefined");
-} else {
-    fail("ExternalInterface undefined");
-}
+// All methods are class statics, not inherited
+check_equals(typeof(r.addCallback), 'undefined');
+check_equals(typeof(r._argumentsToAS), 'undefined');
+check_equals(typeof(r._argumentsToXML), 'undefined');
+check_equals(typeof(r._arrayToAS), 'undefined');
+check_equals(typeof(r._arrayToJS), 'undefined');
+check_equals(typeof(r._arrayToXML), 'undefined');
+check_equals(typeof(r.available), 'undefined');
+check_equals(typeof(r.call), 'undefined');
+check_equals(typeof(r._callIn), 'undefined');
+check_equals(typeof(r._callOut), 'undefined');
+check_equals(typeof(r._escapeXML), 'undefined');
+check_equals(typeof(r._evalJS), 'undefined');
+check_equals(typeof(r._initJS), 'undefined');
+check_equals(typeof(r._jsQuoteString), 'undefined');
+check_equals(typeof(r._objectID), 'undefined');
+check_equals(typeof(r._objectToAS), 'undefined');
+check_equals(typeof(r._objectToJS), 'undefined');
+check_equals(typeof(r._objectToXML), 'undefined');
+check_equals(typeof(r._toAS), 'undefined');
+check_equals(typeof(r._toJS), 'undefined');
+check_equals(typeof(r._toXML), 'undefined');
+check_equals(typeof(r._unescapeXML), 'undefined');
 
 xml = EI._objectToXML(nc);
-if (xml == '<object></object>') {
-    pass("ExternalInterface::_objectToXML(native class)");
-} else {
-    fail("ExternalInterface::_objectToXML(native class)");
-}
+check_equals (xml, '<object></object>');
 
 xml = EI._objectToXML(o);
-if (xml == '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>') {
-    xpass("ExternalInterface::_objectToXML(object)");
-} else {
-    xfail("ExternalInterface::_objectToXML(object)");
-}
+xcheck_equals (xml, '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
 
 xml = EI._objectToXML(undefined);
-if (xml == "<object></object>") {
-    pass("ExternalInterface::_objectToXML(undefined)");
-} else {
-    fail("ExternalInterface::_objectToXML(undefined)");
-}
+check_equals (xml, '<object></object>');
 
 xml = EI._objectToXML(null);
-if (xml == "<object></object>") {
-    pass("ExternalInterface::_objectToXML(null)");
-} else {
-    fail("ExternalInterface::_objectToXML(null)");
-}
+check_equals (xml, '<object></object>');
 
 xml = EI._objectToXML(6);
-if (xml == "<object></object>") {
-    pass("ExternalInterface::_objectToXML(number)");
-} else {
-    fail("ExternalInterface::_objectToXML(number)");
-}
+check_equals (xml, '<object></object>');
 
 xml = EI._arrayToXML(a);
-if (xml == '<array><property id="0"><number>12</number></property><property id="1"><number>34</number></property><property id="2"><string>tr</string></property><property id="3"><number>1</number></property><property id="4"><number>2</number></property><property id="5"><number>3</number></property><property id="6"><number>4</number></property></array>') {
-    pass("ExternalInterface::_arrayToXML(array)");
-} else {
-    fail("ExternalInterface::_arrayToXML(array)");
-}
+check_equals (xml, '<array><property id="0"><number>12</number></property><property id="1"><number>34</number></property><property id="2"><string>tr</string></property><property id="3"><number>1</number></property><property id="4"><number>2</number></property><property id="5"><number>3</number></property><property id="6"><number>4</number></property></array>');
 
 xml = EI._argumentsToXML(a, 0);
-if (xml == '<arguments><number>34</number><string>tr</string><number>1</number><number>2</number><number>3</number><number>4</number></arguments>') {
-    pass("ExternalInterface::_argumentsToXML()");
-} else {
-    fail("ExternalInterface::_argumentsToXML()");
-}
+check_equals (xml, '<arguments><number>34</number><string>tr</string><number>1</number><number>2</number><number>3</number><number>4</number></arguments>');
 
 // xml = EI._toXML(o);
 // if (xml == '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>') {
@@ -325,18 +231,10 @@ if (xml == '<arguments><number>34</number><string>tr</string><number>1</number><
 // }
 
 xml = EI._toXML(123.456);
-if (xml == "<number>123.456</number>") {
-    pass("ExternalInterface::_toXML(number)");
-} else {
-    fail("ExternalInterface::_toXML(number)");
-}
+check_equals (xml , "<number>123.456</number>");
 
 xml = EI._objectToXML(no);
-if (xml == '<object><property id="namespaceURI"><null/></property><property id="localName"><null/></property><property id="prefix"><null/></property><property id="previousSibling"><null/></property><property id="parentNode"><null/></property><property id="nodeValue"><null/></property><property id="nodeType"><number>1</number></property><property id="nodeName"><null/></property><property id="nextSibling"><null/></property><property id="lastChild"><null/></property><property id="firstChild"><null/></property><property id="childNodes"><array></array></property><property id="attributes"><null/></property><property id="getPrefixForNamespace"><null/></property><property id="getNamespaceForPrefix"><null/></property><property id="toString"><null/></property><property id="hasChildNodes"><null/></property><property id="appendChild"><null/></property><property id="insertBefore"><null/></property><property id="removeNode"><null/></property><property id="cloneNode"><null/></property><property id="xmlDecl"><undefined/></property><property id="status"><number>0</number></property><property id="loaded"><undefined/></property><property id="ignoreWhite"><false/></property><property id="docTypeDecl"><undefined/></property><property id="contentType"><string>application/x-www-form-urlencoded</string></property><property id="addRequestHeader"><null/></property><property id="getBytesTotal"><null/></property><property id="getBytesLoaded"><null/></property><property id="onData"><null/></property><property id="onLoad"><null/></property><property id="sendAndLoad"><null/></property><property id="send"><null/></property><property id="load"><null/></property><property id="parseXML"><null/></property><property id="createTextNode"><null/></property><property id="createElement"><null/></property></object>') {
-    xpass("ExternalInterface::_objectToXML(native object)");
-} else {
-    xfail("ExternalInterface::_objectToXML(native object)");
-}
+xcheck_equals (xml, '<object><property id="namespaceURI"><null/></property><property id="localName"><null/></property><property id="prefix"><null/></property><property id="previousSibling"><null/></property><property id="parentNode"><null/></property><property id="nodeValue"><null/></property><property id="nodeType"><number>1</number></property><property id="nodeName"><null/></property><property id="nextSibling"><null/></property><property id="lastChild"><null/></property><property id="firstChild"><null/></property><property id="childNodes"><array></array></property><property id="attributes"><null/></property><property id="getPrefixForNamespace"><null/></property><property id="getNamespaceForPrefix"><null/></property><property id="toString"><null/></property><property id="hasChildNodes"><null/></property><property id="appendChild"><null/></property><property id="insertBefore"><null/></property><property id="removeNode"><null/></property><property id="cloneNode"><null/></property><property id="xmlDecl"><undefined/></property><property id="status"><number>0</number></property><property id="loaded"><undefined/></property><property id="ignoreWhite"><false/></property><property id="docTypeDecl"><undefined/></property><property id="contentType"><string>application/x-www-form-urlencoded</string></property><property id="addRequestHeader"><null/></property><property id="getBytesTotal"><null/></property><property id="getBytesLoaded"><null/></property><property id="onData"><null/></property><property id="onLoad"><null/></property><property id="sendAndLoad"><null/></property><property id="send"><null/></property><property id="load"><null/></property><property id="parseXML"><null/></property><property id="createTextNode"><null/></property><property id="createElement"><null/></property></object>');
 
 // xcheck_equals(EI._objectToJS(o), '({a:1,b:"string"})');
 
@@ -347,12 +245,8 @@ if (xml == '<object><property id="namespaceURI"><null/></property><property id="
 // escape / unescape
 rin = "& ß+ü < << <>''\"";
 rout = "&amp; ß+ü &lt; &lt;&lt; &lt;&gt;&apos;&apos;&quot;";
-
-if (EI._escapeXML(rin) == rout) {
-    pass("ExternalInterface::_escapeXML()");
-} else {
-    fail("ExternalInterface::_escapeXML()");
-}
+ret = EI._escapeXML(rin);
+check_equals(ret, rout);
 
 // It doesn't escape html entities.
 rin = "&amp; ß+ü &nbsp; &lt; &lt;&lt; &lt;&gt;&apos;&apos;&quot;";
@@ -361,61 +255,36 @@ ret  = EI._unescapeXML(rin);
 // This test will until fail until we can figure out the best way to
 // match the converted strings. Testing in GDB show the result is correct,
 // so this is mainly a test case problem.
-if (ret == "& ß+ü &nbsp; < << <>''\"") {
-    xpass("ExternalInterface::_unescapeXML()");
-} else {
-    xfail("ExternalInterface::_unescapeXML()");
-}
+xcheck_equals (ret, "& ß+ü &nbsp; < << <>''\"");
 
 val = EI._toAS("<number>34.56</number>");
-if (val == 34.56) {
-    pass("ExternalInterface::_toAS(number)");
-} else {
-    fail("ExternalInterface::_toAS(number)");
-}
+xcheck_equals (typeof(val), 'undefined');
 
 val = EI._toAS("<string>Hello World!</string>");
-if (val == "Hello World!") {
-    pass("ExternalInterface::_toAS(string)");
-} else {
-    fail("ExternalInterface::_toAS(string)");
-}
+xcheck_equals (typeof(val), 'undefined');
 
 val = EI._toAS("<null/>");
-if (val == null) {
-    pass("ExternalInterface::_toAS(null)");
-} else {
-    fail("ExternalInterface::_toAS(null)");
-}
+xcheck_equals (typeof(val), 'undefined');
 
 val = EI._toAS("<true/>");
-if (val == true) {
-    pass("ExternalInterface::_toAS(true)");
-} else {
-    fail("ExternalInterface::_toAS(true)");
-}
+xcheck_equals (typeof(val), 'undefined');
 
 val = EI._toAS("<false/>");
-if (val == false) {
-    pass("ExternalInterface::_toAS(false)");
-} else {
-    fail("ExternalInterface::_toAS(false)");
-}
+xcheck_equals (typeof(val), 'undefined');
 
 val = EI._objectToAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
-if (typeOf(val) == "object") {
-    xpass("ExternalInterface::_objectToAS(object)");
-} else {
-    xfail("ExternalInterface::_objectToAS(object)");
-}
+xcheck_equals (typeOf(val), 'object');
 
 #endif  // version > 7 }
 
-#if OUTPUT_VERSION < 7 // {
+#endif // OUTPUT_VERSION >= 6 }
+
+
+#if OUTPUT_VERSION < 6 // {
 	check_totals(1);
 #elif OUTPUT_VERSION < 8 // }{
-	check_totals(2);
+	check_totals(49);
 #else // SWF8+ }{
-	check_totals(45);
+	check_totals(92);
 # endif // }
 
