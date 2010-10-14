@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-#include "dejagnu.as"
+#include "check.as"
 
 flash.system.Security.allowDomain("localhost");
 
@@ -38,7 +38,7 @@ if (flash.external.ExternalInterface == undefined) {
 
 EI = flash.external.ExternalInterface;
 
-#if OUTPUT_VERSION > 6
+#if OUTPUT_VERSION > 6 // {
 
 // First make sure all the documented methods and properties exist
 if (EI.hasOwnProperty("call")) {
@@ -52,9 +52,10 @@ if (EI.hasOwnProperty("addCallback")) {
 } else {
     fail("ExternalInterface::addCallback() doesn't exist");
 }
-#endif
 
-#if OUTPUT_VERSION > 7
+#endif // }
+
+#if OUTPUT_VERSION > 7 // {
 if (EI.hasOwnProperty("available")) {
     pass("ExternalInterface::available() exists");
 } else {
@@ -412,7 +413,15 @@ if (typeOf(val) == "object") {
     xfail("ExternalInterface::_objectToAS(object)");
 }
 
-#endif  // version > 7
+#endif  // version > 7 }
 
-totals();
+#if OUTPUT_VERSION < 6 // {
+	check_totals(1);
+#elif OUTPUT_VERSION < 7 // }{
+	check_totals(0);
+#elif OUTPUT_VERSION < 8 // }{
+	check_totals(2);
+#else // SWF8+ }{
+	check_totals(45);
+# endif // }
 
