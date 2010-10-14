@@ -259,8 +259,8 @@ externalinterface_addCallback(const fn_call& fn)
         }
     }
 
-    // Documented to return a boolean, but seems untested.
-    return as_value(false);    
+    // Returns true unless unavailable (which we checked above)
+    return as_value(true);    
 }
 
 // This calls a Javascript function in the browser.
