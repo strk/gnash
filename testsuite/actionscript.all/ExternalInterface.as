@@ -219,6 +219,10 @@ xml = EI._argumentsToXML();
 xcheck_equals (xml, '<arguments></arguments>');
 xml = EI._argumentsToXML(['single']);
 xcheck_equals (xml, '<arguments></arguments>');
+xml = EI._argumentsToXML('one');
+xcheck_equals (xml, '<arguments><undefined/><undefined/></arguments>');
+xml = EI._argumentsToXML(1,2,3);
+xcheck_equals (xml, '<arguments></arguments>');
 
 // xml = EI._toXML(o);
 // if (xml == '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>') {
@@ -289,6 +293,6 @@ xcheck_equals (typeOf(val), 'object');
 #elif OUTPUT_VERSION < 8 // }{
 	check_totals(49);
 #else // SWF8+ }{
-	check_totals(95);
+	check_totals(97);
 # endif // }
 
