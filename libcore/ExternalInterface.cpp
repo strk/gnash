@@ -135,19 +135,16 @@ ExternalInterface::objectToXML(as_object *obj)
     
     std::stringstream ss;
 
-    if (obj == 0) {
-        //log_error("Need a valid AS Object!");
-        return ss.str();
+    ss << "<object>";
+
+    if (obj) {
+        VM& vm = getVM(*obj);
+        // Get all the properties
+        PropsSerializer props(vm);
+        obj->visitProperties<IsEnumerable>(props);
+        ss << props.getReverseXML();
     }
 
-    VM& vm = getVM(*obj);
-    
-    ss << "<object>";
-    
-    // Get all the properties
-    PropsSerializer props(vm);
-    obj->visitProperties<IsEnumerable>(props);
-    ss << props.getReverseXML();
     ss << "</object>";
     
     return ss.str();

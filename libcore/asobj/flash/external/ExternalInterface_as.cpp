@@ -567,17 +567,14 @@ externalinterface_uObjectToXML(const fn_call& fn)
 {
     // GNASH_REPORT_FUNCTION;
     
-    if (fn.nargs == 1) {
-        if (!fn.arg(0).is_null() && !fn.arg(0).is_undefined()) {
-            as_object *obj = toObject(fn.arg(0), getVM(fn));
-            std::string str = ExternalInterface::objectToXML(obj);
-            return as_value(str);
-        } else {
-            return as_value("<object></object>");
-        }
+    as_object *obj = 0;
+
+    if (fn.nargs) {
+        obj = toObject(fn.arg(0), getVM(fn));
     }
     
-    return as_value();
+    const std::string& str = ExternalInterface::objectToXML(obj);
+    return as_value(str);
 }
 
 as_value
