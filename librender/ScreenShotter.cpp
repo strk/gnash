@@ -58,10 +58,8 @@ typeFromFileName(const std::string& filename)
     return GNASH_FILETYPE_PNG;
 }
 
-ScreenShotter::ScreenShotter(boost::shared_ptr<Renderer> r,
-        const std::string& fileName, int quality)
+ScreenShotter::ScreenShotter(const std::string& fileName, int quality)
     :
-    _renderer(r),
     _immediate(false),
     _fileName(fileName),
     _last(false),
@@ -70,10 +68,9 @@ ScreenShotter::ScreenShotter(boost::shared_ptr<Renderer> r,
 {
 }
 
-ScreenShotter::ScreenShotter(boost::shared_ptr<Renderer> r,
-        const std::string& fileName, FileType type, int quality)
+ScreenShotter::ScreenShotter(const std::string& fileName, FileType type,
+        int quality)
     :
-    _renderer(r),
     _immediate(false),
     _fileName(fileName),
     _last(false),
@@ -87,7 +84,7 @@ ScreenShotter::~ScreenShotter()
 }
 
 void
-ScreenShotter::saveImage(const std::string& id) const
+ScreenShotter::saveImage(const Renderer& r, const std::string& id) const
 {
     // Replace all "%f" in the filename with the frameAdvance.
     std::string outfile(_fileName);
@@ -96,29 +93,30 @@ ScreenShotter::saveImage(const std::string& id) const
     FILE* f = std::fopen(outfile.c_str(), "wb");
     if (f) {
         boost::shared_ptr<IOChannel> t(new tu_file(f, true));
-        _renderer->renderToImage(t, _type, _quality);
-    } else {
+        r.renderToImage(t, _type, _quality);
+    }
+    else {
         log_error("Failed to open screenshot file \"%s\"!", outfile);
     }
 }
 
 void
-ScreenShotter::screenShot(size_t frameAdvance)
+ScreenShotter::screenShot(const Renderer& r, size_t frameAdvance)
 {
     // Save an image if an spontaneous screenshot was requested or the
     // frame is in the list of requested frames.
     if (_immediate || std::binary_search(_frames.begin(), _frames.end(),
                 frameAdvance)) {
-        saveImage(boost::lexical_cast<std::string>(frameAdvance));
+        saveImage(r, boost::lexical_cast<std::string>(frameAdvance));
         _immediate = false;
     }
 }
 
 void
-ScreenShotter::last() const
+ScreenShotter::last(const Renderer& r) const
 {
     if (_last) {
-        saveImage("last");
+        saveImage(r, "last");
     }
 }
 

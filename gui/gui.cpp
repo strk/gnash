@@ -197,11 +197,9 @@ Gui::unsetFullscreen()
 void
 Gui::quit()
 {
-    log_debug(__PRETTY_FUNCTION__);
-
     // Take a screenshot of the last frame if required.
-    if (_screenShotter.get()) {
-        _screenShotter->last();
+    if (_screenShotter.get() && _renderer.get()) {
+        _screenShotter->last(*_renderer);
     }
     
     quitUI();
@@ -960,7 +958,7 @@ Gui::advanceMovie()
 #ifdef GNASH_FPS_DEBUG
     // will be a no-op if fps_timer_interval is zero
     if (advanced) {
-	fpsCounterTick();
+        fpsCounterTick();
     }
 #endif
     
@@ -996,8 +994,8 @@ Gui::advanceMovie()
 		}
 	}
 
-    if (_screenShotter.get()) {
-        _screenShotter->screenShot(_advances);
+    if (_screenShotter.get() && _renderer.get()) {
+        _screenShotter->screenShot(*_renderer, _advances);
     }
 
     // Only increment advances and check for exit condition when we've
@@ -1024,8 +1022,7 @@ Gui::takeScreenShot()
         const std::string& name = (p == std::string::npos) ? url.path() :
             url.path().substr(p + 1);
         const std::string& filename = "screenshot-" + name + "-%f";
-        _screenShotter.reset(new ScreenShotter(_renderer, filename,
-                    GNASH_FILETYPE_PNG));
+        _screenShotter.reset(new ScreenShotter(filename, GNASH_FILETYPE_PNG));
     }
     assert (_screenShotter.get());
     _screenShotter->now();
@@ -1041,7 +1038,7 @@ Gui::requestScreenShots(const ScreenShotter::FrameList& l, bool last,
         return;
     }
 
-    _screenShotter.reset(new ScreenShotter(_renderer, filename, quality));
+    _screenShotter.reset(new ScreenShotter(filename, quality));
     if (last) _screenShotter->lastFrame();
     _screenShotter->setFrames(l);
 

@@ -39,12 +39,10 @@ public:
     typedef std::vector<size_t> FrameList;
 
     /// Create a ScreenShotter with output type selected from filename
-    ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName,
-            int quality = 100);
+    ScreenShotter(const std::string& fileName, int quality = 100);
     
     /// Create a ScreenShotter, specifying the output type.
-    ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName,
-            FileType f, int quality = 100);
+    ScreenShotter(const std::string& fileName, FileType f, int quality = 100);
 
     ~ScreenShotter();
 
@@ -60,11 +58,13 @@ public:
 
     /// Called on the last frame before exit.
     //
+    /// @param r                The renderer to use to render the image.
+    //
     /// Which frame is last depends on the execution path of the SWF, whether
     /// the SWF loops, whether a timeout was requested or a maximum number of
     /// advances set. Those conditions are not knowable in advance, so
     /// the last frame is a special case.
-    void last() const;
+    void last(const Renderer& r) const;
 
     /// Takes a screenshot if required.
     //
@@ -72,7 +72,8 @@ public:
     //
     /// @param frameAdvance     used to check whether a screenshot is required
     ///                         as well as to construct the filename.
-    void screenShot(size_t frameAdvance);
+    /// @param r                The renderer to use to render the image.
+    void screenShot(const Renderer& r, size_t frameAdvance);
 
     /// Request a list of frames to be rendered to image files.
     void setFrames(const FrameList& frames);
@@ -80,9 +81,7 @@ public:
 private:
 
     /// Take the screenshot.
-    void saveImage(const std::string& filename) const;
-
-    boost::shared_ptr<Renderer> _renderer;
+    void saveImage(const Renderer& r, const std::string& filename) const;
 
     /// If true, the next call to screenshot will take a screenshot
     bool _immediate;
