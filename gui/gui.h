@@ -81,6 +81,7 @@ enum gnash_cursor_type {
   CURSOR_INPUT
 };
 
+FileType typeFromFileName(const std::string& fileName);
 
 /// Handles screen dumps.
 class ScreenShotter
@@ -90,13 +91,17 @@ public:
     typedef std::vector<size_t> FrameList;
 
     /// Create a ScreenShotter with renderer and output name.
-    ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName)
+    ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName,
+            int quality = 100)
         :
         _renderer(r),
         _immediate(false),
         _fileName(fileName),
-        _last(false)
-    {}
+        _last(false),
+        _type(typeFromFileName(fileName)),
+        _quality(quality)
+    {
+    }
 
     /// Take a screenshot at the next possible moment.
     void now() {
@@ -144,6 +149,10 @@ private:
     bool _last;
 
     FrameList _frames;
+
+    const FileType _type;
+
+    const int _quality;
 
 };
 
@@ -196,7 +205,7 @@ public:
     /// @param last     Whether to render the last frame before exist
     /// @param filename The filename pattern to save images as.
     void requestScreenShots(const ScreenShotter::FrameList& l, bool last,
-            const std::string& filename);
+            const std::string& filename, int quality);
 
     /** \brief
      * Create and display our window.

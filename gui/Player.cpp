@@ -105,7 +105,8 @@ Player::Player()
     _hostfd(-1),
     _controlfd(-1),
     _startFullscreen(false),
-    _hideMenu(false)
+    _hideMenu(false),
+    _screenshotQuality(100)
 {
 }
 
@@ -533,7 +534,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
             _screenshotFile = "screenshot-" + name + "-%f";
         }
 
-        _gui->requestScreenShots(v, last, _screenshotFile);
+        _gui->requestScreenShots(v, last, _screenshotFile, _screenshotQuality);
     }
 
     _gui->run();

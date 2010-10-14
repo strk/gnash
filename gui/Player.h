@@ -197,6 +197,13 @@ public:
         _screenshotFile = file;
     }
 
+    /// Set the quality for screenshot output.
+    //
+    /// A %f in the filename will be replaced with the frame number.
+    void setScreenShotQuality(int quality) {
+        _screenshotQuality = quality;
+    }
+
 private:
 
     /// Whether to ue HW video decoding support, no value means disabled.
@@ -369,6 +376,11 @@ private:
     //
     /// If empty, a default is used.
     std::string _screenshotFile;
+    
+    /// The filename to save screenshots to.
+    //
+    /// By default 100.
+    int _screenshotQuality;
 
     /// The identifier for the media handler.
     //

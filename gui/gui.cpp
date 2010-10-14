@@ -1017,6 +1017,27 @@ Gui::advanceMovie()
 	return true;
 }
 
+FileType
+typeFromFileName(const std::string& filename)
+{
+    struct { const char* ext; FileType type; } matches[] =
+        {
+            { ".png",   GNASH_FILETYPE_PNG },
+            { ".jpg",   GNASH_FILETYPE_JPEG },
+            { ".jpeg",   GNASH_FILETYPE_JPEG }
+        };
+    
+    for (size_t i = 0; i < 3; ++i) {
+        const char* ext = matches[i].ext;
+        const std::string::size_type pos = filename.rfind(ext);
+        if (pos != std::string::npos &&
+                pos + std::strlen(ext) == filename.size()) {
+            return matches[i].type;
+        }
+    }
+    return GNASH_FILETYPE_PNG;
+}
+
 void
 Gui::takeScreenShot()
 {
@@ -1036,15 +1057,15 @@ Gui::takeScreenShot()
 
 void
 Gui::requestScreenShots(const ScreenShotter::FrameList& l, bool last,
-        const std::string& filename)
+        const std::string& filename, int quality)
 {
     // Nothing to do if there is no renderer or if no frames should be
     // saved.
     if (!_renderer.get() || (l.empty() && !last)) {
-	return;
+        return;
     }
 
-    _screenShotter.reset(new ScreenShotter(_renderer, filename));
+    _screenShotter.reset(new ScreenShotter(_renderer, filename, quality));
     if (last) _screenShotter->lastFrame();
     _screenShotter->setFrames(l);
 
@@ -1357,7 +1378,7 @@ ScreenShotter::saveImage(const std::string& id) const
     FILE* f = std::fopen(outfile.c_str(), "wb");
     if (f) {
         boost::shared_ptr<IOChannel> t(new tu_file(f, true));
-        _renderer->renderToImage(t, GNASH_FILETYPE_PNG);
+        _renderer->renderToImage(t, _type, _quality);
     } else {
         log_error("Failed to open screenshot file \"%s\"!", outfile);
     }
