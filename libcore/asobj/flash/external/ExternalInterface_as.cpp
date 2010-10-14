@@ -418,30 +418,28 @@ externalinterface_uArgumentsToXML(const fn_call& fn)
 
     std::stringstream ss;
     
-    if (fn.nargs == 2) {
-        std::vector<as_value> args;
-        if (fn.arg(0).is_object()) {
-            as_object *obj = toObject(fn.arg(0), getVM(fn));
-            VM& vm = getVM(*obj);    
-            PropsSerializer props(vm);
-            obj->visitProperties<IsEnumerable>(props);
-            if (!props.success()) {
-                log_error("Could not serialize object");
-                return false;
-            }
-            args = props.getArgs();
-            // For some reason the pp drops the first element of the array,
-            // so we do too.
-            args.erase(args.begin());
-        } else {
-            for (size_t i=0; i<fn.nargs; i++) {
-                args.push_back(fn.arg(i));
+    std::vector<as_value> args;
+    VM& vm = getVM(fn);
+    string_table& st = vm.getStringTable();
+
+    if (fn.nargs) {
+        // This is an ActionScript-like implementation, which is why it looks
+        // like poor C++.
+        as_object* obj = fn.arg(0).to_object(vm);
+        if ( obj ) {
+            const int length = toInt(getMember(*obj, NSV::PROP_LENGTH), vm);
+            int i = 1;
+            while (i < length) {
+                std::ostringstream s;
+                s << i;
+                as_value el = getMember(*obj, st.find(s.str()));
+                args.push_back(el);
+                ++i;
             }
         }
-        return ExternalInterface::argumentsToXML(args);
     }
-    
-    return as_value();
+
+    return ExternalInterface::argumentsToXML(args);
 }
 
 as_value

@@ -212,17 +212,17 @@ check_equals (xml,
 );
 
 xml = EI._argumentsToXML(anArray);
-xcheck_equals (xml, 
+check_equals (xml, 
 '<arguments><string>tr</string><number>1</number><undefined/></arguments>'
 );
 xml = EI._argumentsToXML();
-xcheck_equals (xml, '<arguments></arguments>');
+check_equals (xml, '<arguments></arguments>');
 xml = EI._argumentsToXML(['single']);
-xcheck_equals (xml, '<arguments></arguments>');
+check_equals (xml, '<arguments></arguments>');
 xml = EI._argumentsToXML('one');
-xcheck_equals (xml, '<arguments><undefined/><undefined/></arguments>');
+check_equals (xml, '<arguments><undefined/><undefined/></arguments>');
 xml = EI._argumentsToXML(1,2,3);
-xcheck_equals (xml, '<arguments></arguments>');
+check_equals (xml, '<arguments></arguments>');
 
 // xml = EI._toXML(o);
 // if (xml == '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>') {
