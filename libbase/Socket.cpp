@@ -323,7 +323,7 @@ Socket::write(const void* src, std::streamsize num)
 
     // For broken pipe we prefer being notified with
     // a return of -1 from ::send.
-    sighandler_t oldSig = signal(SIGPIPE, SIG_IGN);
+    sighandler_t oldSig = std::signal(SIGPIPE, SIG_IGN);
 
     while (toWrite > 0) {
         bytesSent = ::send(_socket, buf, toWrite, 0);
@@ -331,7 +331,7 @@ Socket::write(const void* src, std::streamsize num)
             const int err = errno;
             log_error("Socket send error %s", std::strerror(err));
             _error = true;
-            signal(SIGPIPE, oldSig);
+            std::signal(SIGPIPE, oldSig);
             return 0;
         }
 
@@ -339,7 +339,7 @@ Socket::write(const void* src, std::streamsize num)
         toWrite -= bytesSent;
         buf += bytesSent;
     }
-    signal(SIGPIPE, oldSig);
+    std::signal(SIGPIPE, oldSig);
     return num - toWrite;
 }
 
