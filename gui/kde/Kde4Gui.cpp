@@ -466,8 +466,8 @@ Kde4Gui::showProperties()
             SIGNAL(clicked()), SLOT(close()));
 
 #ifdef USE_SWFTREE
-    std::auto_ptr<InfoTree> infoptr = getMovieInfo();
-    InfoTree& info = *infoptr;
+    std::auto_ptr<movie_root::InfoTree> infoptr = getMovieInfo();
+    const movie_root::InfoTree& info = *infoptr;
 
     QTreeWidget *tree = new QTreeWidget();
     tree->setColumnCount(2);
@@ -480,8 +480,10 @@ Kde4Gui::showProperties()
 
     int prevDepth = 0;
     QStack<QTreeWidgetItem*> stack;
-    for (InfoTree::iterator i=info.begin(), e=info.end(); i!=e; ++i) {
-        StringPair& p = *i;
+    for (movie_root::InfoTree::iterator i = info.begin(), e = info.end();
+            i != e; ++i) {
+
+        const movie_root::InfoTree::value_type& p = *i;
 
         QStringList cols;
         cols.append(p.first.c_str());

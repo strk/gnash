@@ -865,8 +865,7 @@ public:
     bool DSOEXPORT allowHandCursor() const;
 
 #ifdef USE_SWFTREE
-    typedef std::pair<std::string, std::string> StringPair; 
-    typedef tree<StringPair> InfoTree; 
+    typedef tree<std::pair<std::string, std::string> > InfoTree; 
     /// Append DisplayObject info in the tree
     //
     /// @param tr
@@ -876,8 +875,6 @@ public:
     /// The iterator to append info to.
     ///
     /// @return iterator the appended subtree
-    ///
-    // TODO: use a typedef for tree<StringPair> ?
     virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
             InfoTree::iterator it);
 #endif

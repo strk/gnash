@@ -564,11 +564,6 @@ public:
     /// current gui
     void setShowMenuState(bool state);
 
-    // This is a flag that specifies whether exceptions in ActionScript
-    // should be propogated to JavaScript in the browser.
-    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
-    bool getMarshallExceptions() { return _marshallExceptions; };
-    
     /// Sets the Stage object's align mode.
     void setStageScaleMode(ScaleMode sm);
     
@@ -856,9 +851,9 @@ public:
     }
 
 #ifdef USE_SWFTREE
-    typedef std::pair<std::string, std::string> StringPair;
-    void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
-    void getCharacterTree(tree<StringPair>& tr, tree<StringPair>::iterator it);
+    typedef tree<std::pair<std::string, std::string> > InfoTree;
+    void getMovieInfo(InfoTree& tr, InfoTree::iterator it);
+    void getCharacterTree(InfoTree& tr, InfoTree::iterator it);
 #endif
 
     const RunResources& runResources() const { return _runResources; }
@@ -1123,7 +1118,6 @@ private:
     std::bitset<4u> _alignMode;
 
     AllowScriptAccessMode _allowScriptAccess;
-    bool _marshallExceptions;
 
     /// Whether to show the menu or not.
     bool _showMenu;

@@ -961,11 +961,11 @@ Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     os << actChars.size() << " active DisplayObjects for state " <<
         mouseStateName(_mouseState);
     InfoTree::iterator localIter = tr.append_child(selfIt,
-            StringPair(_("Button state"), os.str()));
+            std::make_pair(_("Button state"), os.str()));
 
     os.str("");
     os << std::boolalpha << isEnabled();
-    localIter = tr.append_child(selfIt, StringPair(_("Enabled"), os.str()));
+    localIter = tr.append_child(selfIt, std::make_pair(_("Enabled"), os.str()));
 
     std::for_each(actChars.begin(), actChars.end(),
             boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 

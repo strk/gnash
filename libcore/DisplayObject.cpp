@@ -826,46 +826,48 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 	const std::string yes = _("yes");
 	const std::string no = _("no");
 
-	it = tr.append_child(it, StringPair(getTarget(), typeName(*this)));
+	it = tr.append_child(it, std::make_pair(getTarget(), typeName(*this)));
 
 	std::ostringstream os;
 	os << get_depth();
-	tr.append_child(it, StringPair(_("Depth"), os.str()));
+	tr.append_child(it, std::make_pair(_("Depth"), os.str()));
 
     /// Don't add if the DisplayObject has no ratio value
     if (get_ratio() >= 0)
     {
         os.str("");
         os << get_ratio();
-        tr.append_child(it, StringPair(_("Ratio"), os.str()));
+        tr.append_child(it, std::make_pair(_("Ratio"), os.str()));
     }	    
 
     /// Don't add if it's not a real clipping depth
-    if (int cd = get_clip_depth() != noClipDepthValue)
-    {
+    const int cd = get_clip_depth();
+    if (cd != noClipDepthValue) {
 		os.str("");
 		if (_maskee) os << "Dynamic mask";
 		else os << cd;
 
-		tr.append_child(it, StringPair(_("Clipping depth"), os.str()));	    
+		tr.append_child(it, std::make_pair(_("Clipping depth"), os.str()));	    
     }
 
     os.str("");
     os << getBounds().width() << "x" << getBounds().height();
-	tr.append_child(it, StringPair(_("Dimensions"), os.str()));	
+	tr.append_child(it, std::make_pair(_("Dimensions"), os.str()));	
 
-	tr.append_child(it, StringPair(_("Dynamic"), isDynamic() ? yes : no));	
-	tr.append_child(it, StringPair(_("Mask"), isMaskLayer() ? yes : no));	    
-	tr.append_child(it, StringPair(_("Destroyed"), isDestroyed() ? yes : no));
-	tr.append_child(it, StringPair(_("Unloaded"), unloaded() ? yes : no));
+	tr.append_child(it, std::make_pair(_("Dynamic"), isDynamic() ? yes : no));	
+	tr.append_child(it, std::make_pair(_("Mask"), isMaskLayer() ? yes : no));	    
+	tr.append_child(it, std::make_pair(_("Destroyed"),
+                isDestroyed() ? yes : no));
+	tr.append_child(it, std::make_pair(_("Unloaded"), unloaded() ? yes : no));
 	
     os.str("");
     os << _blendMode;
-    tr.append_child(it, StringPair(_("Blend mode"), os.str()));
+    tr.append_child(it, std::make_pair(_("Blend mode"), os.str()));
 #ifndef NDEBUG
     // This probably isn't interesting for non-developers
-    tr.append_child(it, StringPair(_("Invalidated"), _invalidated ? yes : no));
-    tr.append_child(it, StringPair(_("Child invalidated"),
+    tr.append_child(it, std::make_pair(_("Invalidated"),
+                _invalidated ? yes : no));
+    tr.append_child(it, std::make_pair(_("Child invalidated"),
                 _child_invalidated ? yes : no));
 #endif
 	return it;
