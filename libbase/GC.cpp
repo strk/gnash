@@ -18,13 +18,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "GC.h"
-#include "utility.h" // for typeName()
-
-#ifdef GNASH_GC_DEBUG
-#include "log.h"
-#endif
 
 #include <cstdlib>
+
+#include "utility.h" // for typeName()
+#include "GnashAlgorithm.h"
+
+#ifdef GNASH_GC_DEBUG
+# include "log.h"
+#endif
+
 
 namespace gnash {
 
@@ -41,10 +44,9 @@ GC::GC(GcRoot& root)
 #ifdef GNASH_GC_DEBUG 
     log_debug(_("GC %p created"), (void*)this);
 #endif
-    char *gcgap = std::getenv("GNASH_GC_TRIGGER_THRESHOLD");
-    if (gcgap)
-    {
-        unsigned int gap = std::strtoul(gcgap, NULL, 0);
+    char* gcgap = std::getenv("GNASH_GC_TRIGGER_THRESHOLD");
+    if (gcgap) {
+        const size_t gap = std::strtoul(gcgap, NULL, 0);
         _maxNewCollectablesCount = gap;
     }
 }
@@ -54,9 +56,8 @@ GC::~GC()
 #ifdef GNASH_GC_DEBUG 
     log_debug(_("GC deleted, deleting all managed resources - collector run %d times"), _collectorRuns);
 #endif
-
-    for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
-    {
+    for (ResList::const_iterator i = _resList.begin(), e = _resList.end();
+            i != e; ++i) {
         delete *i;
     }
 }
@@ -64,17 +65,17 @@ GC::~GC()
 size_t
 GC::cleanUnreachable()
 {
-    size_t deleted = 0;
 
 #if (GNASH_GC_DEBUG > 1)
     log_debug(_("GC: sweep scan started"));
 #endif
 
-    for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
-    {
+    size_t deleted = 0;
+
+    for (ResList::iterator i = _resList.begin(), e = _resList.end(); i != e;) {
         const GcResource* res = *i;
-        if ( ! res->isReachable() )
-        {
+        if (!res->isReachable()) {
+
 #if GNASH_GC_DEBUG > 1
             log_debug(_("GC: recycling object %p (%s)"), res, typeName(*res));
 #endif
@@ -82,8 +83,7 @@ GC::cleanUnreachable()
             delete res;
             i = _resList.erase(i); // _resListSize updated at end of loop
         }
-        else
-        {
+        else {
             res->clearReachable();
             ++i;
         }
@@ -95,7 +95,6 @@ GC::cleanUnreachable()
     log_debug(_("GC: recycled %d unreachable resources - %d left"),
             deleted, _resListSize);
 #endif
-
 
     return deleted;
 }
@@ -112,7 +111,10 @@ GC::runCycle()
 #endif
 
 #ifdef GNASH_GC_DEBUG 
-    log_debug(_("GC: collection cycle started - %d/%d new resources allocated since last run (from %d to %d)"), _resListSize-_lastResCount, _maxNewCollectablesCount, _lastResCount, _resListSize);
+    log_debug(_("GC: collection cycle started - %d/%d new resources "
+            "allocated since last run (from %d to %d)"),
+            _resListSize - _lastResCount, _maxNewCollectablesCount,
+            _lastResCount, _resListSize);
 #endif // GNASH_GC_DEBUG
 
     // Mark all resources as reachable
@@ -123,18 +125,14 @@ GC::runCycle()
 
     _lastResCount = _resListSize;
 
-    //assert(_lastResCount == _resList.size()); // O(n)...
-
 }
 
 void
 GC::countCollectables(CollectablesCount& count) const
 {
-    for (ResList::const_iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
-    {
-        const GcResource* res = *i;
-        std::string type = typeName(*res);
-        count[type]++;
+    for (ResList::const_iterator i = _resList.begin(), e = _resList.end();
+            i!=e; ++i) {
+        count[typeName(**i)]++;
     }
 }
 

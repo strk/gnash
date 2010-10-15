@@ -20,12 +20,6 @@
 #ifndef GNASH_GC_H
 #define GNASH_GC_H
 
-#include <list>
-#include <map>
-#include <string>
-
-#include "dsodefs.h"
-
 // Define the following macro to enable GC verbosity 
 // Verbosity levels:
 //   1 - print stats about how many resources are registered and how many 
@@ -35,15 +29,18 @@
 //   
 //#define GNASH_GC_DEBUG 1
 
+#include <list>
+#include <map>
+#include <string>
+#include <cassert>
+
+#include "dsodefs.h"
 #ifdef GNASH_GC_DEBUG
 # include "log.h"
 # include "utility.h"
-# include <typeinfo>
 #endif
 
-#include <cassert>
-
-
+// Forward declarations.
 namespace gnash {
     class GC;
 }
@@ -66,7 +63,7 @@ public:
     ///
     /// Use setReachable() on the resources stored in this
     /// container.
-    virtual void markReachableResources() const=0;
+    virtual void markReachableResources() const = 0;
 
     virtual ~GcRoot() {}
 };
@@ -76,7 +73,6 @@ public:
 /// Instances of this class can be managed by a GC object.
 class GcResource
 {
-
 public:
 
     friend class GC;
@@ -93,8 +89,7 @@ public:
     //
     /// If the object wasn't reachable before, this call triggers
     /// scan of all contained objects too.
-    void setReachable() const
-    {
+    void setReachable() const {
 
         if (_reachable) {
 
@@ -138,8 +133,7 @@ protected:
     ///
     /// The default implementation doesn't mark anything.
     ///
-    virtual void markReachableResources() const
-    {
+    virtual void markReachableResources() const {
         assert(_reachable);
 #if GNASH_GC_DEBUG > 1
         log_debug(_("Class %s didn't override the markReachableResources() "
@@ -152,9 +146,7 @@ protected:
     /// This is protected to allow subclassing, but ideally it
     /// sould be private, so only the GC is allowed to delete us.
     ///
-    virtual ~GcResource()
-    {
-    }
+    virtual ~GcResource() {}
 
 private:
 
@@ -199,8 +191,8 @@ public:
     /// The item to be managed by this collector.
     /// Can't be NULL. The caller gives up ownerhip
     /// of it, which will only be deleted by this GC.
-    void addCollectable(const GcResource* item)
-    {
+    void addCollectable(const GcResource* item) {
+
 #ifndef NDEBUG
         assert(item);
         assert(!item->isReachable());
@@ -215,8 +207,8 @@ public:
     }
 
     /// Run the collector, if worth it
-    void fuzzyCollect()
-    {
+    void fuzzyCollect() {
+
         // Heuristic to decide wheter or not to run the collection cycle
         //
         //
@@ -273,11 +265,10 @@ public:
 private:
 
     /// List of collectables
-    typedef std::list<const GcResource *> ResList;
+    typedef std::list<const GcResource*> ResList;
 
     /// Mark all reachable resources
-    void markReachable()
-    {
+    void markReachable() {
 #if GNASH_GC_DEBUG > 2
         log_debug(_("GC %p: MARK SCAN"), (void*)this);
 #endif
