@@ -28,6 +28,7 @@ namespace {
 
 #include <cstring>
 #include <cerrno>
+#include <csignal>
 #include <boost/lexical_cast.hpp>
 
 #include "URL.h"
@@ -320,17 +321,17 @@ Socket::write(const void* src, std::streamsize num)
 
     const char* buf = static_cast<const char*>(src);
 
+    // For broken pipe we prefer being notified with
+    // a return of -1 from ::send.
+    sighandler_t oldSig = signal(SIGPIPE, SIG_IGN);
+
     while (toWrite > 0) {
-        // I'd like to get no SIGPIPE here, as we wouldn't
-        // know how to handle. Instead, for broken pipe I'd
-        // prefer being notified with a return of -1.
-        // Is that possible, in a standard way ?
-        // MSG_NOSIGNAL was reported as being non-standard flag..
         bytesSent = ::send(_socket, buf, toWrite, 0);
         if (bytesSent < 0) {
             const int err = errno;
             log_error("Socket send error %s", std::strerror(err));
             _error = true;
+            signal(SIGPIPE, oldSig);
             return 0;
         }
 
@@ -338,6 +339,7 @@ Socket::write(const void* src, std::streamsize num)
         toWrite -= bytesSent;
         buf += bytesSent;
     }
+    signal(SIGPIPE, oldSig);
     return num - toWrite;
 }
 
