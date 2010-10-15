@@ -210,6 +210,26 @@ PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
 }
 
 void
+PropertyList::enumerateKeys(std::vector<ObjectURI>& uris, PropertyTracker& donelist)
+    const
+{
+	string_table& st = getStringTable(_owner);
+
+    // We should enumerate in order of creation, not lexicographically.
+	for (const_iterator i = _props.begin(),
+            ie = _props.end(); i != ie; ++i) {
+
+		if (i->getFlags().get_dont_enum()) continue;
+
+        const ObjectURI& uri = i->uri();
+
+		if (donelist.insert(uri).second) {
+			uris.push_back(uri);
+		}
+	}
+}
+
+void
 PropertyList::dump()
 {
     ObjectURI::Logger l(getStringTable(_owner));

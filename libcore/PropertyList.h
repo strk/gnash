@@ -21,6 +21,7 @@
 
 #include <set> 
 #include <map> 
+#include <vector> 
 #include <string> // for use within map 
 #include <cassert> // for inlines
 #include <utility> // for std::pair
@@ -154,6 +155,7 @@ public:
     /// @param donelist     Don't enumerate properties in donelist.
     ///                     Enumerated properties are added to donelist.
     void enumerateKeys(as_environment& env, PropertyTracker& donelist) const;
+    void enumerateKeys(std::vector<ObjectURI>& uris, PropertyTracker& donelist) const;
 
     /// Set the value of a property, creating a new one if it doesn't exist.
     //

@@ -174,7 +174,7 @@ class as_object : public GcResource, boost::noncopyable
 
 public:
     
-    typedef std::pair<std::string, std::string> KeyValuePair;
+    typedef std::pair<std::string, as_value> KeyValuePair;
 
     /// This is used to hold an intermediate copy of an as_object's properties.
     //
@@ -434,7 +434,12 @@ public:
     /// implementation will keep track of visited object to avoid infinite
     /// loops in the prototype chain.  NOTE: the MM player just chokes in
     /// this case.
+    ///
+    /// @deprecate use the version taking vector<ObjectURI>
+    ///
     void enumeratePropertyKeys(as_environment& env) const;
+
+    void enumeratePropertyKeys(std::vector<ObjectURI>& uris) const;
 
     /// Add a watch trigger, overriding any other defined for same name.
     //
@@ -916,7 +921,7 @@ isNativeType(as_object* obj, T*& relay)
 /// Enumerate all non-hidden properties to the passed container
 //
 /// NB: it is likely that this call will change the object, as accessing
-/// propertyproperty  values may call getter-setters.
+/// property values may call getter-setters.
 //
 /// The enumeration recurses through the prototype chain. This implementation
 /// will keep track of visited object to avoid infinite loops in the

@@ -247,7 +247,7 @@ public:
     ///
     /// The default implementation adds nothing
     ///
-    virtual void enumerateNonProperties(as_environment&) const {}
+    virtual void enumerateNonProperties(std::vector<ObjectURI>&) const {}
 
     /// \brief
     /// Return the parent of this DisplayObject, or NULL if

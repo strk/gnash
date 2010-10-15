@@ -270,7 +270,7 @@ public:
 
     bool accept(const ObjectURI& uri, const as_value& val) {
         _to.push_front(std::make_pair(_st.value(getName(uri)),
-                                      val.to_string(_version)));
+                                      val));
         return true;
     }
 
@@ -918,12 +918,23 @@ as_object::copyProperties(const as_object& o)
 void
 as_object::enumeratePropertyKeys(as_environment& env) const
 {
+    typedef std::vector<ObjectURI> URIs;
+    URIs uris;
+    enumeratePropertyKeys(uris);
+    string_table& st = getVM(*this).getStringTable();
+    for (URIs::const_iterator i=uris.begin(), e=uris.end();
+            i!=e; ++i)
+    {
+        env.push(i->toString(st));
+    }
+}
 
-    assert(env.top(0).is_undefined());
-
+void
+as_object::enumeratePropertyKeys(std::vector<ObjectURI>& uris) const
+{
     // Hack to handle MovieClips.
     if (displayObject()) {
-        displayObject()->enumerateNonProperties(env);
+        displayObject()->enumerateNonProperties(uris);
     }
 
     // this set will keep track of visited objects,
@@ -934,7 +945,7 @@ as_object::enumeratePropertyKeys(as_environment& env) const
 	
     const as_object* current(this);
     while (current && visited.insert(current).second) {
-        current->_members.enumerateKeys(env, doneList);
+        current->_members.enumerateKeys(uris, doneList);
         current = current->get_prototype();
     }
 }
@@ -1017,7 +1028,7 @@ getURLEncodedVars(as_object& o, std::string& data)
     for (as_object::SortedPropertyList::const_iterator i=props.begin(),
             e=props.end(); i!=e; ++i) {
         std::string name = i->first;
-        std::string value = i->second;
+        std::string value = i->second.to_string();
         if (!name.empty() && name[0] == '$') continue; // see bug #22006
         URL::encode(value);
 

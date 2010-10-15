@@ -572,9 +572,9 @@ public:
 
     /// Enumerate child DisplayObjects
     //
-    /// See as_object::enumerateNonProperties(as_environment&) for more info.
+    /// See DisplayObject::enumerateNonProperties for more info.
     ///
-    virtual void enumerateNonProperties(as_environment&) const;
+    void enumerateNonProperties(std::vector<ObjectURI>&) const;
 
     /// Delete DisplayObjects removed from the stage
     /// from the display lists

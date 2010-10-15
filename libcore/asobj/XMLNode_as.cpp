@@ -44,12 +44,14 @@ namespace gnash {
 
 // Function Prototypes
 namespace {
+    typedef std::pair<std::string, std::string> StringPair;
+    typedef std::vector<StringPair> StringPairs;
     void enumerateAttributes(const XMLNode_as& node,
-            as_object::SortedPropertyList& attributes);
-    bool prefixMatches(const as_object::SortedPropertyList::value_type& val,
+            StringPairs& attributes);
+    bool prefixMatches(const StringPairs::value_type& val,
             const std::string& prefix);
     bool namespaceMatches(
-            const as_object::SortedPropertyList::value_type& val,
+            const StringPairs::value_type& val,
             const std::string& ns);    
 
     as_value xmlnode_new(const fn_call& fn);
@@ -299,8 +301,8 @@ bool
 XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
 {
     XMLNode_as* node = this;
-    as_object::SortedPropertyList::const_iterator it; 
-    as_object::SortedPropertyList attrs;
+    StringPairs::const_iterator it; 
+    StringPairs attrs;
     
     while (node) {
         enumerateAttributes(*node, attrs);
@@ -336,8 +338,8 @@ void
 XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
 {
     XMLNode_as* node = this;
-    as_object::SortedPropertyList::const_iterator it; 
-    as_object::SortedPropertyList attrs;
+    StringPairs::const_iterator it; 
+    StringPairs attrs;
     
     while (node) {
 
@@ -411,11 +413,11 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         xmlout << "<" << nodeName;
     
         // Process the attributes, if any
-        as_object::SortedPropertyList attrs;
+        StringPairs attrs;
         enumerateAttributes(xml, attrs);
         if (!attrs.empty()) {
 
-            for (as_object::SortedPropertyList::iterator i = 
+            for (StringPairs::iterator i = 
                     attrs.begin(), e = attrs.end(); i != e; ++i) { 
                 escapeXML(i->second);
                 xmlout << " " << i->first << "=\"" << i->second << "\"";
@@ -993,12 +995,19 @@ xmlnode_childNodes(const fn_call& fn)
 
 void
 enumerateAttributes(const XMLNode_as& node,
-        as_object::SortedPropertyList& attrs)
+        StringPairs& pairs)
 {
-    attrs.clear();
+    pairs.clear();
+
     as_object* obj = node.getAttributes();
     if (obj) {
+        as_object::SortedPropertyList attrs;
         enumerateProperties(*obj, attrs);
+        for (as_object::SortedPropertyList::const_iterator i=attrs.begin(), 
+                e=attrs.end(); i!=e; ++i)
+        {
+            pairs.push_back(std::make_pair(i->first, i->second.to_string()));
+        }
     }
 
 }
@@ -1006,7 +1015,7 @@ enumerateAttributes(const XMLNode_as& node,
 /// Return true if this attribute is a namespace specifier and the
 /// namespace matches.
 bool
-namespaceMatches(const as_object::SortedPropertyList::value_type& val,
+namespaceMatches(const StringPairs::value_type& val,
         const std::string& ns)
 {
     StringNoCaseEqual noCaseCompare;
@@ -1016,7 +1025,7 @@ namespaceMatches(const as_object::SortedPropertyList::value_type& val,
 
 
 bool
-prefixMatches(const as_object::SortedPropertyList::value_type& val,
+prefixMatches(const StringPairs::value_type& val,
         const std::string& prefix)
 {
     const std::string& name = val.first;

@@ -2038,12 +2038,12 @@ MovieClip::isEnabled() const
 
 class EnumerateVisitor {
 
-    as_environment& _env;
+    std::vector<ObjectURI>& _dst;
 
 public:
-    explicit EnumerateVisitor(as_environment& env)
+    explicit EnumerateVisitor(std::vector<ObjectURI>& dst)
         :
-        _env(env)
+        _dst(dst)
     {}
 
     void operator() (DisplayObject* ch) {
@@ -2059,15 +2059,14 @@ public:
         
         // Referenceable DisplayObject always have an object.
         assert(getObject(ch));
-        string_table& st = getStringTable(*getObject(ch));
-        _env.push(name.toString(st));
+        _dst.push_back(name);
     }
 };
 
 void
-MovieClip::enumerateNonProperties(as_environment& env) const
+MovieClip::enumerateNonProperties(std::vector<ObjectURI>& uris) const
 {
-    EnumerateVisitor visitor(env);
+    EnumerateVisitor visitor(uris);
     _displayList.visitAll(visitor);
 }
 
