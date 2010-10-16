@@ -257,6 +257,12 @@ public:
     ///                 contains the prototypes or constructors necessary for
     ///                 conversion.
     as_object* to_object(VM& vm) const;
+
+    /// Return the value as an as_object only if it is an as_object.
+    //
+    /// Note that this performs no conversion, so returns 0 if the as_value
+    /// is not an object.
+    as_object* get_object() const;
     
     /// Returns value as a MovieClip if it is a MovieClip.
     //

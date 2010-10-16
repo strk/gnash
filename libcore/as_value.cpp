@@ -508,6 +508,16 @@ as_value::to_function() const
     return 0;
 }
 
+as_object*
+as_value::get_object() const
+{
+    if (_type == OBJECT) {
+        return getObj();
+    }
+
+    return 0;
+}
+
 void
 as_value::set_undefined()
 {
