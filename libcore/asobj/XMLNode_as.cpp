@@ -533,26 +533,25 @@ attachXMLNodeInterface(as_object& o)
     const int protectedFlags = 0;
 
     // Just the protected flag:
-    o.init_property("nodeValue", &xmlnode_nodeValue, 
-            &xmlnode_nodeValue, protectedFlags);
-    o.init_property("nodeName", &xmlnode_nodeName, 
-            &xmlnode_nodeName, protectedFlags);
 
+    o.init_readonly_property("attributes", &xmlnode_attributes, protectedFlags);
+    o.init_readonly_property("childNodes", &xmlnode_childNodes, protectedFlags);
     o.init_readonly_property("firstChild", &xmlnode_firstChild, protectedFlags);
     o.init_readonly_property("lastChild", &xmlnode_lastChild, protectedFlags);
+    o.init_readonly_property("nextSibling", 
+            &xmlnode_nextSibling, protectedFlags);
+    o.init_property("nodeName", &xmlnode_nodeName, 
+            &xmlnode_nodeName, protectedFlags);
+    o.init_readonly_property("nodeType", &xmlnode_nodeType, protectedFlags);
+    o.init_property("nodeValue", &xmlnode_nodeValue, 
+            &xmlnode_nodeValue, protectedFlags);
+    o.init_readonly_property("parentNode", &xmlnode_parentNode, protectedFlags);
+    o.init_readonly_property("previousSibling", 
+            &xmlnode_previousSibling, protectedFlags);
+    o.init_readonly_property("prefix", &xmlnode_prefix, protectedFlags);
     o.init_readonly_property("localName", &xmlnode_localName, protectedFlags);
     o.init_readonly_property("namespaceURI", 
             &xmlnode_namespaceURI, protectedFlags);
-    o.init_readonly_property("nextSibling", 
-            &xmlnode_nextSibling, protectedFlags);
-    o.init_readonly_property("prefix", &xmlnode_prefix, protectedFlags);
-    o.init_readonly_property("previousSibling", 
-            &xmlnode_previousSibling, protectedFlags);
-    o.init_readonly_property("nodeType", &xmlnode_nodeType, protectedFlags);
-    o.init_readonly_property("attributes", &xmlnode_attributes, protectedFlags);
-    o.init_readonly_property("childNodes", &xmlnode_childNodes, protectedFlags);
-    o.init_readonly_property("parentNode", &xmlnode_parentNode, protectedFlags);
-
 }
 
 
