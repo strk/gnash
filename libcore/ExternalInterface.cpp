@@ -213,8 +213,8 @@ ExternalInterface::toXML(const as_value &val)
     } else if (val.is_function()) {
         ss << "<function>" << val.to_string() << "</function>";
     } else if (val.is_object()) {
-//        as_object *obj = (as_object *)&val;
-//         ss << "<object></object>";
+        as_object *obj = val.get_object();
+        ss << objectToXML(obj);
     } else {
         log_error("Can't convert unknown type %d", val.to_string());
     }
