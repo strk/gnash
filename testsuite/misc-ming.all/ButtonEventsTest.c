@@ -590,7 +590,7 @@ main(int argc, char **argv)
 		"_root.testno=0;"
 		"_root.square1.onRollOut = function() { _root.testno++; delete _root.square1.onRollOut; nextFrame(); };"
 		"_root.note('"
-		"0. Roll over and out the red square, not touching the small dark-red square in it."
+		"0. Roll over and out the red square, not touching the small dark-red square in it.\n   The cursor should turn to an hand while on the square."
 		"');");
 
 	/* hitTest should work on every child, not just first added */
