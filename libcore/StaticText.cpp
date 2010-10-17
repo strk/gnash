@@ -20,6 +20,7 @@
 
 #include "StaticText.h"
 #include "swf/DefineTextTag.h"
+#include "log.h"
 
 namespace gnash
 {
@@ -46,12 +47,12 @@ StaticText::setSelectionColor(boost::uint32_t color)
 }
 
 bool
-StaticText::pointInShape(boost::int32_t /*x*/, boost::int32_t /*y*/) const
+StaticText::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-    // TODO: this has never worked as it relied on the default
-    // pointTestLocal in DefinitionTag, which returned false. There are
-    // no tests for whether StaticText has a proper hit test.
-    return false;
+    // TODO: check actual point in shape, as tested 
+    //       in misc-ming.all/DefineTextTest.swf
+    LOG_ONCE(log_unimpl("StaticText::pointInShape"));
+    return pointInBounds(x, y);
 }
 
 

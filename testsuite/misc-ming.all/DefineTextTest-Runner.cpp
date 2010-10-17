@@ -116,9 +116,9 @@ main(int /*argc*/, char** /*argv*/)
 
 	as_value eot;
 	bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
-	xcheck(endOfTestFound);
-	xcheck(eot.is_bool());
-	xcheck(eot.to_bool(8));
+	check(endOfTestFound);
+	check(eot.is_bool());
+	check(eot.to_bool(8));
 
 	// TODO: use check_pixel for checking bacground colors
 }
