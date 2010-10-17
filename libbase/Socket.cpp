@@ -37,6 +37,13 @@ namespace {
 #include "utility.h"
 #include "GnashAlgorithm.h"
 
+/*
+  TODO: use sigaction();
+ */
+#ifndef sighandler_t
+	typedef void (*sighandler_t)(int);
+#endif
+
 namespace gnash {
 
 Socket::Socket()
