@@ -226,6 +226,21 @@ namespace {
     void ActionUnsupported(ActionExec& thread);
 }
 
+namespace {
+
+class Enumerator : public KeyVisitor
+{
+public:
+    explicit Enumerator(as_environment& env) : _env(env) {}
+    virtual void operator()(const ObjectURI& uri) {
+        _env.push(uri.toString(getStringTable(_env)));
+    }
+private:
+    as_environment& _env;
+};
+
+}
+
 namespace SWF { 
 
 ActionHandler::ActionHandler()
@@ -2574,7 +2589,8 @@ static void
 enumerateObject(as_environment& env, const as_object& obj)
 {
     assert(env.top(0).is_undefined());
-    obj.enumeratePropertyKeys(env);
+    Enumerator en(env);
+    obj.visitKeys(en);
 }
 
 void

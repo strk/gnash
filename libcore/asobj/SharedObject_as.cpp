@@ -105,7 +105,7 @@ namespace {
 namespace { 
 
 /// Class used to serialize properties of an object to a buffer in SOL format
-class SOLPropsBufSerializer : public AbstractPropertyVisitor
+class SOLPropsBufSerializer : public PropertyVisitor
 {
 
 public:

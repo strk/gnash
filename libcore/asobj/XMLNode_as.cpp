@@ -1005,6 +1005,7 @@ enumerateAttributes(const XMLNode_as& node,
         for (as_object::SortedPropertyList::const_iterator i=attrs.begin(), 
                 e=attrs.end(); i!=e; ++i)
         {
+            // TODO: second argument should take version.
             pairs.push_back(std::make_pair(i->first, i->second.to_string()));
         }
     }

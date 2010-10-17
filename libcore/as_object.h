@@ -57,15 +57,6 @@ namespace gnash {
 namespace gnash {
 
 
-/// An abstract property visitor
-class AbstractPropertyVisitor {
-public:
-
-    /// This function should return false if no further visits are needed.
-    virtual bool accept(const ObjectURI& uri, const as_value& val) = 0;
-    virtual ~AbstractPropertyVisitor() {}
-};
-
 /// A trigger that can be associated with a property name
 class Trigger
 {
@@ -425,22 +416,6 @@ public:
     void init_readonly_property(const std::string& key,
             as_c_function_ptr getter, int flags = DefaultFlags);
 
-    /// Enumerate all non-hidden property keys to the given as_environment.
-    //
-    /// NB: this function does not access the property values, so callers
-    /// can be certain no values will be changed.
-    //
-    /// The enumeration recurses through the prototype chain. This
-    /// implementation will keep track of visited object to avoid infinite
-    /// loops in the prototype chain.  NOTE: the MM player just chokes in
-    /// this case.
-    ///
-    /// @deprecate use the version taking vector<ObjectURI>
-    ///
-    void enumeratePropertyKeys(as_environment& env) const;
-
-    void enumeratePropertyKeys(std::vector<ObjectURI>& uris) const;
-
     /// Add a watch trigger, overriding any other defined for same name.
     //
     /// @param uri      property identifier
@@ -603,13 +578,26 @@ public:
     /// change the object.
     //
     /// @param visitor  The visitor function. Will be invoked for each property
-    ///                 of this object with a string_table::key
-    ///                 reference as first argument and a const as_value
-    ///                 reference as second argument.
+    ///                 of this object with an ObjectURI as first argument and
+    ///                 a const as_value as second argument.
     template<typename T>
-    void visitProperties(AbstractPropertyVisitor& visitor) const {
+    void visitProperties(PropertyVisitor& visitor) const {
         _members.visitValues<T>(visitor);
     }
+
+    /// Visit all visible property identifiers.
+    //
+    /// NB: this function does not access the property values, so callers
+    /// can be certain no values will be changed.
+    //
+    /// The enumeration recurses through the prototype chain. This
+    /// implementation will keep track of visited object to avoid infinite
+    /// loops in the prototype chain.  NOTE: the MM player just chokes in
+    /// this case.
+    //
+    /// @param visitor  The visitor function. Will be invoked for each property
+    ///                 of this object with an ObjectURI as the only argument.
+    void visitKeys(KeyVisitor& visitor) const;
 
     /// Add a getter/setter property if no member already has that name.
     //

@@ -63,6 +63,7 @@ namespace gnash {
     class as_value;
     class as_environment;
     class DisplayObject;
+    class KeyVisitor;
     namespace SWF {
         class TextRecord;
     }
@@ -241,13 +242,11 @@ public:
 
     /// Enumerate any non-proper properties
     //
-    /// This function is called by enumerateProperties(as_environment&) 
-    /// to allow for enumeration of properties that are derived from the
-    /// DisplayObject type, e.g. DisplayList members.
+    /// This function allows enumeration of properties that are
+    /// derived from the DisplayObject type, e.g. DisplayList members.
     ///
     /// The default implementation adds nothing
-    ///
-    virtual void enumerateNonProperties(std::vector<ObjectURI>&) const {}
+    virtual void visitNonProperties(KeyVisitor&) const {}
 
     /// \brief
     /// Return the parent of this DisplayObject, or NULL if

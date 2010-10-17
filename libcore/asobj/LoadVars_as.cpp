@@ -132,7 +132,7 @@ loadvars_tostring(const fn_call& fn)
     as_object* global = &getGlobal(*ptr);
     std::ostringstream o;
     
-    int ver = getSWFVersion(*global);
+    const int ver = getSWFVersion(*global);
 
     // LoadVars.toString() calls _global.escape().
 	for (VarMap::const_iterator it=vars.begin(), itEnd=vars.end();
@@ -141,8 +141,8 @@ loadvars_tostring(const fn_call& fn)
         if (it != vars.begin()) o << "&";
         const std::string& var = 
             callMethod(global, NSV::PROP_ESCAPE, it->first).to_string();
-        const std::string& val = 
-            callMethod(global, NSV::PROP_ESCAPE, it->second.to_string(ver)).to_string();
+        const std::string& val = callMethod(global, NSV::PROP_ESCAPE,
+            it->second.to_string(ver)).to_string();
         o << var << "=" << val;
 	}
     return as_value(o.str()); 

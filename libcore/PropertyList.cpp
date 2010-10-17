@@ -189,11 +189,9 @@ PropertyList::dump(std::map<std::string, as_value>& to)
 }
 
 void
-PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
+PropertyList::visitKeys(KeyVisitor& visitor, PropertyTracker& donelist)
     const
 {
-	string_table& st = getStringTable(_owner);
-
     // We should enumerate in order of creation, not lexicographically.
 	for (const_iterator i = _props.begin(),
             ie = _props.end(); i != ie; ++i) {
@@ -203,28 +201,7 @@ PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
         const ObjectURI& uri = i->uri();
 
 		if (donelist.insert(uri).second) {
-            const std::string& qname = st.value(getName(uri));
-			env.push(qname);
-		}
-	}
-}
-
-void
-PropertyList::enumerateKeys(std::vector<ObjectURI>& uris, PropertyTracker& donelist)
-    const
-{
-	string_table& st = getStringTable(_owner);
-
-    // We should enumerate in order of creation, not lexicographically.
-	for (const_iterator i = _props.begin(),
-            ie = _props.end(); i != ie; ++i) {
-
-		if (i->getFlags().get_dont_enum()) continue;
-
-        const ObjectURI& uri = i->uri();
-
-		if (donelist.insert(uri).second) {
-			uris.push_back(uri);
+			visitor(uri);
 		}
 	}
 }
