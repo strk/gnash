@@ -578,15 +578,14 @@ public:
     /// change the object.
     //
     /// @param visitor  The visitor function. Will be invoked for each property
-    ///                 of this object with a string_table::key
-    ///                 reference as first argument and a const as_value
-    ///                 reference as second argument.
+    ///                 of this object with an ObjectURI as first argument and
+    ///                 a const as_value as second argument.
     template<typename T>
     void visitProperties(PropertyVisitor& visitor) const {
         _members.visitValues<T>(visitor);
     }
 
-    /// Visit all property visible keys.
+    /// Visit all visible property identifiers.
     //
     /// NB: this function does not access the property values, so callers
     /// can be certain no values will be changed.
@@ -595,6 +594,9 @@ public:
     /// implementation will keep track of visited object to avoid infinite
     /// loops in the prototype chain.  NOTE: the MM player just chokes in
     /// this case.
+    //
+    /// @param visitor  The visitor function. Will be invoked for each property
+    ///                 of this object with an ObjectURI as the only argument.
     void visitKeys(KeyVisitor& visitor) const;
 
     /// Add a getter/setter property if no member already has that name.
