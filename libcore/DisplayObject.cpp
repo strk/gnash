@@ -736,6 +736,7 @@ DisplayObject::markReachableResources() const
 /// 1. Only AS-referenceable objects may use a hand cursor (TODO: check
 ///    Video). 
 /// 2. Only objects with a release event may use a hand cursor.
+///    CANNOT CONFIRM THE ABOVE, SEE ButtonEventsTest.swf in misc-ming.all
 /// 3. The default value (if the property is not defined) is true.
 bool
 DisplayObject::allowHandCursor() const
@@ -743,7 +744,10 @@ DisplayObject::allowHandCursor() const
     as_object* obj = getObject(this);
     if (!obj) return false;
 
-    if (!hasEventHandler(event_id::RELEASE)) return false;
+    // Checking for RELEASE breaks ButtonEventsTest.
+    // I guess such an event would influence wheter or not this
+    // character would become an active one, despite hand cursor
+    //if (!hasEventHandler(event_id::RELEASE)) return false;
 
     as_value val;
     if (!obj->get_member(NSV::PROP_USEHANDCURSOR, &val)) {
