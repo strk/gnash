@@ -244,6 +244,10 @@ public:
 	/// handles mouse events
 	bool isMouseOverMouseEntity();
 
+	/// Return true if a gui would be using an hand
+	/// cursor in the current position.
+	bool usingHandCursor();
+
 	/// \brief
 	/// Return the number of times a sound has been stopped,
 	/// or 0 if sound testing is not supported. See canTestSound().

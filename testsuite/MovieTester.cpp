@@ -447,6 +447,21 @@ MovieTester::isMouseOverMouseEntity()
     return (_movie_root->getActiveEntityUnderPointer());
 }
 
+bool
+MovieTester::usingHandCursor()
+{
+	DisplayObject* activeEntity = _movie_root->getActiveEntityUnderPointer();
+	if ( ! activeEntity ) return false;
+
+    if ( activeEntity->isSelectableTextField() ) {
+        return false; // setCursor(CURSOR_INPUT);
+    } else if ( activeEntity->allowHandCursor() ) {
+        return true; // setCursor(CURSOR_HAND);
+    } else {
+        return false; // setCursor(CURSOR_NORMAL);
+    }
+}
+
 geometry::SnappingRanges2d<int>
 MovieTester::getInvalidatedRanges() const
 {
