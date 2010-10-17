@@ -47,6 +47,25 @@ namespace gnash {
 
 namespace gnash {
 
+/// An abstract property visitor
+class AbstractPropertyVisitor {
+public:
+
+    /// This function should return false if no further visits are needed.
+    virtual bool accept(const ObjectURI& uri, const as_value& val) = 0;
+    virtual ~AbstractPropertyVisitor() {}
+};
+
+/// An abstract key visitor
+class KeyVisitor {
+public:
+
+    /// This function should return false if no further visits are needed.
+    virtual void operator()(const ObjectURI& uri) = 0;
+    virtual ~KeyVisitor() {}
+};
+
+
 /// Set of properties associated with an ActionScript object.
 //
 /// The PropertyList container is the sole owner of the Property
@@ -154,8 +173,7 @@ public:
     ///
     /// @param donelist     Don't enumerate properties in donelist.
     ///                     Enumerated properties are added to donelist.
-    void enumerateKeys(as_environment& env, PropertyTracker& donelist) const;
-    void enumerateKeys(std::vector<ObjectURI>& uris, PropertyTracker& donelist) const;
+    void visitKeys(KeyVisitor& v, PropertyTracker& donelist) const;
 
     /// Set the value of a property, creating a new one if it doesn't exist.
     //

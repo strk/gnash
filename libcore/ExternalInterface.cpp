@@ -49,15 +49,20 @@
 
 namespace gnash {
 
-#if 0
-class ExternalExecutor: public movie_root::AbstractExternalCallback {
+namespace {
+
+class Enumerator : public KeyVisitor
+{
 public:
-	void notify()
-	{
-	    log_debug(_("external_callback()"));
-	}
+    Enumerator(std::vector<ObjectURI>& uris) : _uris(uris) {}
+    void operator()(const ObjectURI& u) {
+        _uris.push_back(u);
+    }
+private:
+    std::vector<ObjectURI>& _uris;
 };
-#endif
+
+}
 
 /// Convert an AS object to an XML string.
 std::string
@@ -79,9 +84,10 @@ ExternalInterface::_objectToXML(as_object *obj)
         string_table& st = vm.getStringTable();
         typedef std::vector<ObjectURI> URIs;
         URIs uris;
-        obj->enumeratePropertyKeys(uris);
-        for (URIs::const_reverse_iterator i=uris.rbegin(), e=uris.rend();
-                i!=e; ++i) {
+        Enumerator en(uris);
+        obj->visitKeys(en);
+        for (URIs::const_reverse_iterator i = uris.rbegin(), e = uris.rend();
+                i != e; ++i) {
             as_value val = getMember(*obj, *i); 
             const std::string& id = i->toString(st);
             ss << "<property id=\"" << id << "\">";

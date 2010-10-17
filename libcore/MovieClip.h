@@ -573,8 +573,7 @@ public:
     /// Enumerate child DisplayObjects
     //
     /// See DisplayObject::enumerateNonProperties for more info.
-    ///
-    void enumerateNonProperties(std::vector<ObjectURI>&) const;
+    virtual void visitNonProperties(KeyVisitor& v) const;
 
     /// Delete DisplayObjects removed from the stage
     /// from the display lists

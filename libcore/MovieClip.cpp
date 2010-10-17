@@ -339,7 +339,7 @@ class BoundsFinder
 public:
     explicit BoundsFinder(SWFRect& b) : _bounds(b) {}
 
-    void operator() (DisplayObject* ch) {
+    void operator()(DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
         if (ch->unloaded()) return;
         SWFRect chb = ch->getBounds();
@@ -349,6 +349,146 @@ public:
 
 private:
     SWFRect& _bounds;
+};
+
+struct ReachableMarker
+{
+    void operator()(DisplayObject *ch) const {
+        ch->setReachable();
+    }
+};
+
+/// Find the first visible DisplayObject whose shape contain the point
+/// and is not the DisplayObject being dragged or any of its childs
+//
+/// Point coordinates in world TWIPS
+///
+class DropTargetFinder {
+
+    /// Highest depth hidden by a mask
+    //
+    /// This will be -1 initially, and set
+    /// the the depth of a mask when the mask
+    /// doesn't contain the query point, while
+    /// scanning a DisplayList bottom-up
+    ///
+    int _highestHiddenDepth;
+
+    boost::int32_t _x;
+    boost::int32_t _y;
+    DisplayObject* _dragging;
+    mutable const DisplayObject* _dropch;
+
+    typedef std::vector<const DisplayObject*> Candidates;
+    Candidates _candidates;
+
+    mutable bool _checked;
+
+public:
+
+    DropTargetFinder(boost::int32_t x, boost::int32_t y, DisplayObject* dragging)
+        :
+        _highestHiddenDepth(std::numeric_limits<int>::min()),
+        _x(x),
+        _y(y),
+        _dragging(dragging),
+        _dropch(0),
+        _candidates(),
+        _checked(false)
+    {}
+
+    void operator() (const DisplayObject* ch)
+    {
+        assert(!_checked);
+        if ( ch->get_depth() <= _highestHiddenDepth )
+        {
+            if ( ch->isMaskLayer() )
+            {
+                log_debug(_("CHECKME: nested mask in DropTargetFinder. "
+                        "This mask is %s at depth %d outer mask masked "
+                        "up to depth %d."),
+                        ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
+                // Hiding mask still in effect...
+            }
+            return;
+        }
+
+        if ( ch->isMaskLayer() )
+        {
+            if ( ! ch->visible() )
+            {
+                log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
+            }
+            if ( ! ch->pointInShape(_x, _y) )
+            {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask not hitting "
+                        "the query point %g,%g and masking up to depth %d"),
+                    ch->getTarget(), ch->get_depth(), _x, _y,
+                    ch->get_clip_depth());
+#endif 
+                _highestHiddenDepth = ch->get_clip_depth();
+            }
+            else
+            {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask "
+                            "hitting the query point %g,%g"),
+                            ch->getTarget(), ch->get_depth(), _x, _y);
+#endif
+            }
+
+            return;
+        }
+
+        _candidates.push_back(ch);
+
+    }
+
+    void checkCandidates() const
+    {
+        if ( _checked ) return;
+        for (Candidates::const_reverse_iterator i=_candidates.rbegin(),
+                        e=_candidates.rend(); i!=e; ++i)
+        {
+            const DisplayObject* ch = *i;
+            const DisplayObject* dropChar = ch->findDropTarget(_x, _y, _dragging);
+            if ( dropChar )
+            {
+                _dropch = dropChar;
+                break;
+            }
+        }
+        _checked = true;
+    }
+
+    const DisplayObject* getDropChar() const
+    {
+        checkCandidates();
+        return _dropch;
+    }
+};
+
+class DisplayListVisitor
+{
+public:
+    DisplayListVisitor(KeyVisitor& v) : _v(v) {}
+
+    void operator()(DisplayObject* ch) const {
+         if (!isReferenceable(*ch)) return;
+         // Don't enumerate unloaded DisplayObjects
+         if (ch->unloaded()) return;
+          
+         const ObjectURI& name = ch->get_name();
+         // Don't enumerate unnamed DisplayObjects
+         if (name.empty()) return;
+          
+         // Referenceable DisplayObject always have an object.
+         assert(getObject(ch));
+         _v(name);
+    }
+private:
+    KeyVisitor& _v;
 };
 
 } // anonymous namespace
@@ -1401,117 +1541,6 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     return ch; 
 }
 
-/// Find the first visible DisplayObject whose shape contain the point
-/// and is not the DisplayObject being dragged or any of its childs
-//
-/// Point coordinates in world TWIPS
-///
-class DropTargetFinder {
-
-    /// Highest depth hidden by a mask
-    //
-    /// This will be -1 initially, and set
-    /// the the depth of a mask when the mask
-    /// doesn't contain the query point, while
-    /// scanning a DisplayList bottom-up
-    ///
-    int _highestHiddenDepth;
-
-    boost::int32_t _x;
-    boost::int32_t _y;
-    DisplayObject* _dragging;
-    mutable const DisplayObject* _dropch;
-
-    typedef std::vector<const DisplayObject*> Candidates;
-    Candidates _candidates;
-
-    mutable bool _checked;
-
-public:
-
-    DropTargetFinder(boost::int32_t x, boost::int32_t y, DisplayObject* dragging)
-        :
-        _highestHiddenDepth(std::numeric_limits<int>::min()),
-        _x(x),
-        _y(y),
-        _dragging(dragging),
-        _dropch(0),
-        _candidates(),
-        _checked(false)
-    {}
-
-    void operator() (const DisplayObject* ch)
-    {
-        assert(!_checked);
-        if ( ch->get_depth() <= _highestHiddenDepth )
-        {
-            if ( ch->isMaskLayer() )
-            {
-                log_debug(_("CHECKME: nested mask in DropTargetFinder. "
-                        "This mask is %s at depth %d outer mask masked "
-                        "up to depth %d."),
-                        ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
-                // Hiding mask still in effect...
-            }
-            return;
-        }
-
-        if ( ch->isMaskLayer() )
-        {
-            if ( ! ch->visible() )
-            {
-                log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
-            }
-            if ( ! ch->pointInShape(_x, _y) )
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask not hitting "
-                        "the query point %g,%g and masking up to depth %d"),
-                    ch->getTarget(), ch->get_depth(), _x, _y,
-                    ch->get_clip_depth());
-#endif 
-                _highestHiddenDepth = ch->get_clip_depth();
-            }
-            else
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask "
-                            "hitting the query point %g,%g"),
-                            ch->getTarget(), ch->get_depth(), _x, _y);
-#endif
-            }
-
-            return;
-        }
-
-        _candidates.push_back(ch);
-
-    }
-
-    void checkCandidates() const
-    {
-        if ( _checked ) return;
-        for (Candidates::const_reverse_iterator i=_candidates.rbegin(),
-                        e=_candidates.rend(); i!=e; ++i)
-        {
-            const DisplayObject* ch = *i;
-            const DisplayObject* dropChar = ch->findDropTarget(_x, _y, _dragging);
-            if ( dropChar )
-            {
-                _dropch = dropChar;
-                break;
-            }
-        }
-        _checked = true;
-    }
-
-    const DisplayObject* getDropChar() const
-    {
-        checkCandidates();
-        return _dropch;
-    }
-};
-
 const DisplayObject*
 MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
         DisplayObject* dragging) const
@@ -2036,56 +2065,21 @@ MovieClip::isEnabled() const
     return toBool(enabled, getVM(*obj));
 }
 
-class EnumerateVisitor {
-
-    std::vector<ObjectURI>& _dst;
-
-public:
-    explicit EnumerateVisitor(std::vector<ObjectURI>& dst)
-        :
-        _dst(dst)
-    {}
-
-    void operator() (DisplayObject* ch) {
-
-        if (!isReferenceable(*ch)) return;
-
-        // Don't enumerate unloaded DisplayObjects
-        if (ch->unloaded()) return;
-        
-        const ObjectURI& name = ch->get_name();
-        // Don't enumerate unnamed DisplayObjects
-        if (name.empty()) return;
-        
-        // Referenceable DisplayObject always have an object.
-        assert(getObject(ch));
-        _dst.push_back(name);
-    }
-};
 
 void
-MovieClip::enumerateNonProperties(std::vector<ObjectURI>& uris) const
+MovieClip::visitNonProperties(KeyVisitor& v) const
 {
-    EnumerateVisitor visitor(uris);
-    _displayList.visitAll(visitor);
+    DisplayListVisitor dv(v);
+    _displayList.visitAll(dv);
 }
 
 void
 MovieClip::cleanupDisplayList()
 {
-    //log_debug("%s.cleanDisplayList() called, current dlist is %p", 
-    //getTarget(), (void*)&_displayList);
     _displayList.removeUnloaded();
-
     cleanup_textfield_variables();
 }
 
-struct ReachableMarker {
-    void operator() (DisplayObject *ch)
-    {
-        ch->setReachable();
-    }
-};
 void
 MovieClip::markOwnResources() const
 {

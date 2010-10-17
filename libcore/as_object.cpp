@@ -916,25 +916,11 @@ as_object::copyProperties(const as_object& o)
 }
 
 void
-as_object::enumeratePropertyKeys(as_environment& env) const
-{
-    typedef std::vector<ObjectURI> URIs;
-    URIs uris;
-    enumeratePropertyKeys(uris);
-    string_table& st = getVM(*this).getStringTable();
-    for (URIs::const_iterator i=uris.begin(), e=uris.end();
-            i!=e; ++i)
-    {
-        env.push(i->toString(st));
-    }
-}
-
-void
-as_object::enumeratePropertyKeys(std::vector<ObjectURI>& uris) const
+as_object::visitKeys(KeyVisitor& visitor) const
 {
     // Hack to handle MovieClips.
     if (displayObject()) {
-        displayObject()->enumerateNonProperties(uris);
+        displayObject()->visitNonProperties(visitor);
     }
 
     // this set will keep track of visited objects,
@@ -945,7 +931,7 @@ as_object::enumeratePropertyKeys(std::vector<ObjectURI>& uris) const
 	
     const as_object* current(this);
     while (current && visited.insert(current).second) {
-        current->_members.enumerateKeys(uris, doneList);
+        current->_members.visitKeys(visitor, doneList);
         current = current->get_prototype();
     }
 }
