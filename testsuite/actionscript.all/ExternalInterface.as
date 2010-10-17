@@ -142,12 +142,6 @@ if ( EI.available ) {
     check_equals(typeof(ret), 'null');
 }
 
-// An object with circular references
-oc = {};
-oc.a = {};
-oc.a.a = oc.b;
-oc.b = oc.a;
-
 // A native class
 nc = Mouse;
 
@@ -194,9 +188,17 @@ xml = EI._objectToXML(o, 1, 2, 3);
 check_equals (xml, '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
 
 // An object with an object reference
+
 o = { o: o };
 xml = EI._objectToXML(o);
 check_equals (xml, '<object><property id="o"><object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object></property></object>');
+
+// An object with circular references
+// (the proprietary player hangs here, we jus don't want to segfault)
+// oc = {};
+// oc.cr = oc;
+// xml = EI._objectToXML(oc);
+// check_equals (xml, '');
 
 // An undefined
 
