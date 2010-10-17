@@ -46,7 +46,11 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DGNASHBINDIR=\"$(GNASHBINDIR)\" \
 if HAIKU
   AM_CPPFLAGS += -DXP_HAIKU
 else
+if AMIGAOS4
+  AM_CPPFLAGS += -DXP_AMIGAOS4
+else
   AM_CPPFLAGS += -DXP_UNIX -DMOZ_X11
+endif
 endif
 
 # AM_CXXFLAGS = $(AM_CPPFLAGS)
@@ -60,7 +64,7 @@ noinst_HEADERS = plugin.h \
          mozilla-sdk/include/nptypes.h
 
 if !WIN32
-
+if !AMIGAOS4
 plugin_LTLIBRARIES = libgnashplugin.la
 
 libgnashplugin_la_SOURCES  = plugin.cpp \
@@ -101,6 +105,7 @@ if VISIBILITY_WORKS
 libgnashplugin_la_CXXFLAGS = -fvisibility=hidden
 endif
 
+endif # AMIGAOS4
 endif # WIN32
 
 test_perms:
@@ -117,6 +122,7 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	$(RM) $(DESTDIR)$(plugindir)/*.a $(DESTDIR)$(plugindir)/*.la
 
 if !WIN32
+if !AMIGAOS4
 install-plugin install-plugins: $(plugin_LTLIBRARIES) $(PKGLIB)
 	@test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 	@echo "Installing plugin to $(DESTDIR)$(plugindir)"
@@ -125,6 +131,10 @@ install-plugin install-plugins: $(plugin_LTLIBRARIES) $(PKGLIB)
 	else \
 	  cp -f libgnashplugin.so* $(DESTDIR)$(plugindir)/libgnashplugin.so; \
 	fi
+else
+install-plugin install-plugins: 
+	: # do nothing
+endif	# end of if not amigaos4
 else
 install-plugin install-plugins: 
 	: # do nothing
