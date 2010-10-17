@@ -2877,6 +2877,7 @@ plugin/npapi/Makefile
 plugin/klash/Makefile
 plugin/klash4/Makefile
 plugin/win32/Makefile
+plugin/aos4/Makefile
 cygnal/Makefile
 cygnal/libnet/Makefile
 cygnal/libamf/Makefile

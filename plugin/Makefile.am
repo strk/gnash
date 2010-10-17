@@ -33,6 +33,9 @@ SUBDIRS += npapi
 if WIN32
 SUBDIRS += win32
 endif
+if AMIGAOS4
+SUBDIRS += aos4
+endif
 endif # NPAPI
 
 # make sure these files make it into the distribution tarball.
