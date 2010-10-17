@@ -477,6 +477,10 @@ main(int argc, char **argv)
 		"};"
 		);
 
+	check_equals(mo, "typeof(square1.button)", "'object'");
+	check(mo, "square1.button instanceOf Button");
+    // TODO: check existance of useHandCursor
+
 	//
 	// Mouse buttons events
 	//
@@ -742,7 +746,7 @@ main(int argc, char **argv)
             "square1.button._visible = true;"
 			"square1.button.enabled = false;"
 			"stop();"
-			"_root.totals(160);"
+			"_root.totals(162);"
 			"_root.note('-- Button disabled, try playing with it, nothing should happen --');"
 		);
 		SWFMovie_nextFrame(mo); /* showFrame */
