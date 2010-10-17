@@ -142,9 +142,6 @@ if ( EI.available ) {
     check_equals(typeof(ret), 'null');
 }
 
-// An object
-o = { a: 1, b: "string" };
-
 // An object with circular references
 oc = {};
 oc.a = {};
@@ -187,11 +184,21 @@ check_equals(typeof(r._unescapeXML), 'undefined');
 xml = EI._objectToXML(nc);
 check_equals (xml, '<object></object>');
 
+// An object
+o = { a: 1, b: "string" };
+
 xml = EI._objectToXML(o);
 check_equals (xml, '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
 
 xml = EI._objectToXML(o, 1, 2, 3);
 check_equals (xml, '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
+
+// An object with an object reference
+o = { o: o };
+xml = EI._objectToXML(o);
+check_equals (xml, '<object><property id="o"><object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object></property></object>');
+
+// An undefined
 
 xml = EI._objectToXML(undefined);
 check_equals (xml, '<object></object>');
@@ -299,6 +306,6 @@ xcheck_equals (typeOf(val), 'object');
 #elif OUTPUT_VERSION < 8 // }{
 	check_totals(49);
 #else // SWF8+ }{
-	check_totals(99);
+	check_totals(100);
 # endif // }
 
