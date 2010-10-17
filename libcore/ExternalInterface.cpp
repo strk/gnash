@@ -61,9 +61,13 @@ public:
 
 /// Convert an AS object to an XML string.
 std::string
-ExternalInterface::objectToXML(as_object *obj)
+ExternalInterface::_objectToXML(as_object *obj)
 {
     // GNASH_REPORT_FUNCTION;
+
+    if ( ! _visited.insert(obj).second ) { 
+        return "<circular/>";
+    }
     
     std::stringstream ss;
 
@@ -81,7 +85,7 @@ ExternalInterface::objectToXML(as_object *obj)
             as_value val = getMember(*obj, *i); 
             const std::string& id = i->toString(st);
             ss << "<property id=\"" << id << "\">";
-            ss << ExternalInterface::toXML(val);
+            ss << _toXML(val);
             ss << "</property>";
         }
     }
@@ -93,7 +97,7 @@ ExternalInterface::objectToXML(as_object *obj)
 
 /// Convert an AS object to an XML string.
 std::string
-ExternalInterface::arrayToXML(as_object *obj)
+ExternalInterface::_arrayToXML(as_object *obj)
 {
     // GNASH_REPORT_FUNCTION;
     std::stringstream ss;
@@ -117,7 +121,7 @@ ExternalInterface::arrayToXML(as_object *obj)
         s << i;
         as_value el = getMember(*obj, st.find(s.str()));
         ss << "<property id=\"" << i << "\">"
-           << toXML(el)
+           << _toXML(el) 
            << "</property>";
         ++i;
     }
@@ -129,7 +133,7 @@ ExternalInterface::arrayToXML(as_object *obj)
 
 /// Convert an AS object to an XML string.
 std::string
-ExternalInterface::toXML(const as_value &val)
+ExternalInterface::_toXML(const as_value &val)
 {
     // GNASH_REPORT_FUNCTION;
     
@@ -155,7 +159,7 @@ ExternalInterface::toXML(const as_value &val)
         ss << "<function>" << val.to_string() << "</function>";
     } else if (val.is_object()) {
         as_object *obj = val.get_object();
-        ss << objectToXML(obj);
+        ss << _objectToXML(obj);
     } else {
         log_error("Can't convert unknown type %d", val.to_string());
     }
@@ -477,7 +481,8 @@ ExternalInterface::makeInvoke (const std::string &method,
     ss << "<invoke name=\"" << method << "\" returntype=\"xml\">";
     ss << "<arguments>";
     for (it=args.begin(); it != args.end(); ++it) {
-        ss << ExternalInterface::toXML(*it);
+        // Should we avoid re-serializing the same object ?
+        ss << toXML(*it);
     }
     
     ss << "</arguments>";

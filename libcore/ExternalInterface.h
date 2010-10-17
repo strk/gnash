@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <boost/shared_ptr.hpp>
 
 #include "dsodefs.h" /* For DSOEXPORT */
@@ -52,9 +53,6 @@ struct DSOEXPORT ExternalInterface
     // that while probably designed to be used internally, get used
     // by ActionScript coders.
 
-    /// Convert an AS object to an XML string.
-    DSOEXPORT static std::string toXML(const as_value &obj);
-    
     /// Convert an XML string to an AS value.
     DSOEXPORT static as_value toAS(Global_as& as, const std::string &xml);
 
@@ -63,14 +61,25 @@ struct DSOEXPORT ExternalInterface
                                                    std::string &xml);
     
     DSOEXPORT static as_value argumentsToXML(std::vector<as_value> &args);
-//    as_value argumentsToAS();
     
-    DSOEXPORT static std::string objectToXML(as_object *obj);
     DSOEXPORT static as_value objectToAS(Global_as& gl, const std::string &xml);
-//  std::string objectToJS(as_object &obj);
-//  as_value toJS(const std::string &xml);;
+
+    static std::string objectToXML(as_object *obj) {
+        ExternalInterface ei;
+        return ei._objectToXML(obj);
+    }
     
-    DSOEXPORT static std::string arrayToXML(as_object *obj);
+    static std::string arrayToXML(as_object *obj) {
+        ExternalInterface ei;
+        return ei._arrayToXML(obj);
+    }
+
+    /// Convert an AS object to an XML string.
+    static std::string toXML(const as_value &obj) {
+        ExternalInterface ei;
+        return ei._toXML(obj);
+    }
+    
 
 //  static std::string arrayToJS();
 //  static as_value arrayToAS();
@@ -113,6 +122,14 @@ struct DSOEXPORT ExternalInterface
 
     DSOEXPORT static size_t writeBrowser(int fd, const std::string &xml);
     DSOEXPORT static std::string readBrowser(int fd);
+
+private:
+
+    DSOEXPORT std::string _toXML(const as_value &obj);
+    DSOEXPORT std::string _objectToXML(as_object* obj);
+    DSOEXPORT std::string _arrayToXML(as_object *obj);
+
+    std::set<as_object*> _visited;
 };
 
 } // end of gnash namespace
