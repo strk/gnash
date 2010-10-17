@@ -90,7 +90,7 @@ void attachExternalInterfaceStaticInterface(as_object& o);
 namespace {
 
 /// Class used to serialize properties of an object to a buffer
-class PropsSerializer : public AbstractPropertyVisitor
+class PropsSerializer : public PropertyVisitor
 {
 
 public:

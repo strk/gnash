@@ -51,7 +51,7 @@ string_table::key arrayKey(string_table& st, size_t i);
 //
 /// Strict arrays have no non-hidden non-numeric properties. Only real arrays
 /// are strict arrays; any users of this functor should check that first.
-class IsStrictArray : public AbstractPropertyVisitor
+class IsStrictArray : public PropertyVisitor
 {
 public:
     IsStrictArray(string_table& st) : _strict(true), _st(st) {}

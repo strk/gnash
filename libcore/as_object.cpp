@@ -233,7 +233,7 @@ as_super::get_super(const ObjectURI& fname)
 }
 
 /// A PropertyList visitor copying properties to an object
-class PropsCopier : public AbstractPropertyVisitor
+class PropsCopier : public PropertyVisitor
 {
 
 public:
@@ -257,7 +257,7 @@ private:
     as_object& _tgt;
 };
 
-class PropertyEnumerator : public AbstractPropertyVisitor
+class PropertyEnumerator : public PropertyVisitor
 {
 public:
     PropertyEnumerator(const as_object& this_ptr,

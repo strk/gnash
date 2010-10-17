@@ -48,12 +48,12 @@ namespace gnash {
 namespace gnash {
 
 /// An abstract property visitor
-class AbstractPropertyVisitor {
+class PropertyVisitor {
 public:
 
     /// This function should return false if no further visits are needed.
     virtual bool accept(const ObjectURI& uri, const as_value& val) = 0;
-    virtual ~AbstractPropertyVisitor() {}
+    virtual ~PropertyVisitor() {}
 };
 
 /// An abstract key visitor

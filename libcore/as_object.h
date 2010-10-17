@@ -582,7 +582,7 @@ public:
     ///                 reference as first argument and a const as_value
     ///                 reference as second argument.
     template<typename T>
-    void visitProperties(AbstractPropertyVisitor& visitor) const {
+    void visitProperties(PropertyVisitor& visitor) const {
         _members.visitValues<T>(visitor);
     }
 

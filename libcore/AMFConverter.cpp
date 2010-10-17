@@ -47,7 +47,7 @@ namespace amf {
 namespace {
 
 /// Class used to serialize properties of an object to a buffer
-class ObjectSerializer : public AbstractPropertyVisitor
+class ObjectSerializer : public PropertyVisitor
 {
 
 public:
