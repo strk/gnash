@@ -138,11 +138,20 @@ ExternalInterface::objectToXML(as_object *obj)
     ss << "<object>";
 
     if (obj) {
-        VM& vm = getVM(*obj);
         // Get all the properties
-        PropsSerializer props(vm);
-        obj->visitProperties<IsEnumerable>(props);
-        ss << props.getReverseXML();
+        VM& vm = getVM(*obj);
+        string_table& st = vm.getStringTable();
+        typedef std::vector<ObjectURI> URIs;
+        URIs uris;
+        obj->enumeratePropertyKeys(uris);
+        for (URIs::const_reverse_iterator i=uris.rbegin(), e=uris.rend();
+                i!=e; ++i) {
+            as_value val = getMember(*obj, *i); 
+            const std::string& id = i->toString(st);
+            ss << "<property id=\"" << id << "\">";
+            ss << ExternalInterface::toXML(val);
+            ss << "</property>";
+        }
     }
 
     ss << "</object>";
