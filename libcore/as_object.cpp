@@ -974,34 +974,6 @@ as_object::get_prototype() const
     return toObject(proto, getVM(*this));
 }
 
-as_object*
-as_object::get_path_element(const ObjectURI& uri)
-{
-//#define DEBUG_TARGET_FINDING 1
-
-#ifdef DEBUG_TARGET_FINDING 
-    ObjectURI::Logger l(getStringTable(*this));
-#endif
-
-    as_value tmp;
-    if (!get_member(uri, &tmp)) {
-#ifdef DEBUG_TARGET_FINDING 
-        log_debug("Member %s not found in object %p",
-                  l.debug(uri), (void*)this);
-#endif
-        return NULL;
-    }
-    if (!tmp.is_object()) {
-#ifdef DEBUG_TARGET_FINDING 
-        log_debug("Member %s of object %p is not an object (%s)",
-                  l.debug(uri), (void*)this, tmp);
-#endif
-        return NULL;
-    }
-    
-    return toObject(tmp, getVM(*this));
-}
-
 void
 getURLEncodedVars(as_object& o, std::string& data)
 {
@@ -1122,6 +1094,16 @@ Trigger::call(const as_value& oldval, const as_value& newval,
         throw;
     }
 }
+
+as_object*
+getPathElement(as_object& o, const ObjectURI& uri)
+{
+    as_value tmp;
+    if (!o.get_member(uri, &tmp)) return 0;
+    if (!tmp.is_object()) return 0;
+    return toObject(tmp, getVM(o));
+}
+
 
 void
 sendEvent(as_object& o, const as_environment& env, const ObjectURI& name)

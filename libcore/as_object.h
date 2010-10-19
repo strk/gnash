@@ -449,15 +449,6 @@ public:
     /// @return         true if the named property was found, false otherwise.
     virtual bool get_member(const ObjectURI& uri, as_value* val);
 
-    /// Resolve the given relative path component
-    //
-    /// Path components are only objects, if the given string
-    /// points to a non-object member, NULL is returned.
-    ///
-    /// Main use if for getvariable and settarget resolution,
-    /// currently implemented in as_environment.
-    as_object* get_path_element(const ObjectURI& uri);
-
     /// Get the super object of this object.
     ///
     /// The super should be __proto__ if this is a prototype object
@@ -857,6 +848,15 @@ public:
 /// @param data     Output parameter, will be set to the url-encoded
 ///                 variables string without any leading delimiter.
 void getURLEncodedVars(as_object& o, std::string& data);
+
+/// Resolve the given relative path component
+//
+/// Path components are only objects, if the given string
+/// points to a non-object member, NULL is returned.
+///
+/// Main use if for getvariable and settarget resolution,
+/// currently implemented in as_environment.
+as_object* getPathElement(as_object& o, const ObjectURI& uri);
 
 
 /// Extract the DisplayObject attached to an object

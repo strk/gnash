@@ -113,7 +113,7 @@ getElement(as_object* obj, const ObjectURI& uri)
 {
     DisplayObject* d = obj->displayObject();
     if (d) return d->pathElement(uri);
-    return obj->get_path_element(uri);
+    return getPathElement(*obj, uri);
 }
 
 }

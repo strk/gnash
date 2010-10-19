@@ -2099,7 +2099,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
         ObjectURI uri(st.find(part));
         o = o->displayObject() ?
             o->displayObject()->pathElement(uri) :
-            o->get_path_element(uri);
+            getPathElement(*o, uri);
 
         if (!o) {
 #ifdef GNASH_DEBUG_TARGET_RESOLUTION
