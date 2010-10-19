@@ -792,8 +792,7 @@ GtkGui::makeTreeModel(std::auto_ptr<movie_root::InfoTree> treepointer)
     };
     
     GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
-                         G_TYPE_STRING,
-                         G_TYPE_STRING);
+                         G_TYPE_STRING, G_TYPE_STRING);
     
     GtkTreeIter iter;
     GtkTreeIter child_iter;
@@ -803,8 +802,9 @@ GtkGui::makeTreeModel(std::auto_ptr<movie_root::InfoTree> treepointer)
     int depth = 0;    
 
     assert(info.depth(info.begin()) == 0); // seems assumed in the code below
-    for (movie_root::InfoTree::iterator i = info.begin(), e = info.end(); i!=e; ++i)
-    {
+    for (movie_root::InfoTree::iterator i = info.begin(), e = info.end();
+            i != e; ++i) {
+
         const movie_root::InfoTree::value_type& p = *i;
 
         std::ostringstream os;
@@ -819,22 +819,23 @@ GtkGui::makeTreeModel(std::auto_ptr<movie_root::InfoTree> treepointer)
         }
 
         if (newdepth < depth) {
-            int gap = depth-newdepth;
+            int gap = depth - newdepth;
             depth = newdepth;
             while (gap--) {
-                gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  
+                gtk_tree_model_iter_parent(GTK_TREE_MODEL(model),
+                        &parent_iter, &iter);  
                 iter = parent_iter;
             }
         }
 
         //Read in data from present node
-        if (depth == 0) gtk_tree_store_append (model, &child_iter, NULL);
-        else gtk_tree_store_append (model, &child_iter, &iter);
+        if (depth == 0) gtk_tree_store_append(model, &child_iter, NULL);
+        else gtk_tree_store_append(model, &child_iter, &iter);
 
-        gtk_tree_store_set (model, &child_iter,
-                           STRING1_COLUMN, p.first.c_str(),   // "Variable"
-                           STRING2_COLUMN, p.second.c_str(),  // "Value"
-                           -1);
+        gtk_tree_store_set(model, &child_iter,
+                          STRING1_COLUMN, p.first.c_str(),   // "Variable"
+                          STRING2_COLUMN, p.second.c_str(),  // "Value"
+                          -1);
 
     }
 
@@ -1714,8 +1715,8 @@ GtkGui::showPropertiesDialog()
     gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(treeview), TRUE);
 
     gint coloffset;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
+    GtkCellRenderer* renderer;
+    GtkTreeViewColumn* column;
 
     // Add columns:
     
