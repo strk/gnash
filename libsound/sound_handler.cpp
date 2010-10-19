@@ -365,6 +365,7 @@ sound_handler::swfToOutSamples(const media::SoundInfo& sinfo,
 
 
 
+/* private */
 void
 sound_handler::playSound(int sound_handle,
         int loopCount, unsigned int inPoint, unsigned int outPoint,
