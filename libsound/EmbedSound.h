@@ -58,7 +58,8 @@ public:
 
     /// Construct a sound with given data, info and volume.
     //
-    /// @param data The encoded sound data. May be the NULL pointer for streaming sounds,
+    /// @param data The encoded sound data.
+    ///     May be the NULL pointer for streaming sounds,
     ///     in which case data will be appended later using ::append()
     ///
     /// @param info encoding info

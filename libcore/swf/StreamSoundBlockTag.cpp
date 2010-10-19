@@ -34,14 +34,14 @@ void
 StreamSoundBlockTag::executeActions(MovieClip* m, DisplayList& /*dlist*/) const
 {
 
-	sound::sound_handler* handler = getRunResources(*getObject(m)).soundHandler(); 
-	if (handler)
-	{
-		// This makes it possible to stop only the stream when framejumping.
-		m->setStreamSoundId(m_handler_id);
+    sound::sound_handler* handler = getRunResources(*getObject(m)).soundHandler(); 
+    if (handler)
+    {
+        // This makes it possible to stop only the stream when framejumping.
+        m->setStreamSoundId(m_handler_id);
 
-		handler->playStream(m_handler_id, _blockId);
-	}
+        handler->playStream(m_handler_id, _blockId);
+    }
 }
 
 /* public static */
@@ -56,7 +56,7 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     // If we don't have a sound_handler registered stop here
     if (!handler)
     {
-	    // log_debug ?
+        // log_debug ?
         return;
     }
 
@@ -84,10 +84,10 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     if (format == media::AUDIO_CODEC_MP3)
     {
         in.ensureBytes(4);
-	    // FIXME: use these values !
+        // FIXME: use these values !
         unsigned int samplesCount = in.read_u16(); UNUSED(samplesCount);
         unsigned int seekSamples = in.read_u16();
-	    if (seekSamples) LOG_ONCE(log_unimpl(_("MP3 soundblock seek samples")));
+        if (seekSamples) LOG_ONCE(log_unimpl(_("MP3 soundblock seek samples")));
     }
 
     const unsigned int dataLength = in.get_tag_end_position() - in.tell();
@@ -128,5 +128,5 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
