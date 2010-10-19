@@ -1930,24 +1930,21 @@ MovieClip::loadVariables(const std::string& urlstr,
     
     // Encode our vars for sending.
     if (sendVarsMethod != METHOD_NONE) {
-        getURLEncodedVars(*getObject(this), postdata);
+        postdata = getURLEncodedVars(*getObject(this));
     }
 
-    try 
-    {
-        const StreamProvider& sp = getRunResources(*getObject(this)).streamProvider();
+    try {
+        const StreamProvider& sp = 
+            getRunResources(*getObject(this)).streamProvider();
         
-        if (sendVarsMethod == METHOD_POST)
-        {
+        if (sendVarsMethod == METHOD_POST) {
             // use POST method
             _loadVariableRequests.push_back(
                     new LoadVariablesThread(sp, url, postdata));
         }
-        else
-        {
+        else {
             // use GET method
-            if (sendVarsMethod == METHOD_GET)
-            {
+            if (sendVarsMethod == METHOD_GET) {
                 // Append variables
                 std::string qs = url.querystring();
                 if (qs.empty()) url.set_querystring(postdata);

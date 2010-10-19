@@ -993,20 +993,19 @@ xmlnode_childNodes(const fn_call& fn)
 
 
 void
-enumerateAttributes(const XMLNode_as& node,
-        StringPairs& pairs)
+enumerateAttributes(const XMLNode_as& node, StringPairs& pairs)
 {
     pairs.clear();
 
     as_object* obj = node.getAttributes();
     if (obj) {
-        as_object::SortedPropertyList attrs;
-        enumerateProperties(*obj, attrs);
-        for (as_object::SortedPropertyList::const_iterator i=attrs.begin(), 
-                e=attrs.end(); i!=e; ++i)
-        {
+        string_table& st = getStringTable(*obj);
+        SortedPropertyList attrs = enumerateProperties(*obj);
+        for (SortedPropertyList::const_reverse_iterator i = attrs.rbegin(), 
+                e = attrs.rend(); i != e; ++i) {
             // TODO: second argument should take version.
-            pairs.push_back(std::make_pair(i->first, i->second.to_string()));
+            pairs.push_back(
+                std::make_pair(i->first.toString(st), i->second.to_string()));
         }
     }
 

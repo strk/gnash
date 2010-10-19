@@ -3788,7 +3788,7 @@ commonGetURL(as_environment& env, as_value target,
             log_error(_("commonGetURL: current target is undefined"));
             return;
         }
-        getURLEncodedVars(*curtgt, varsToSend);
+        varsToSend = getURLEncodedVars(*curtgt);
     }
 
 

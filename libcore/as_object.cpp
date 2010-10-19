@@ -260,27 +260,20 @@ private:
 class PropertyEnumerator : public PropertyVisitor
 {
 public:
-    PropertyEnumerator(const as_object& this_ptr,
-                       as_object::SortedPropertyList& to)
+    PropertyEnumerator(SortedPropertyList& to)
         :
-        _version(getSWFVersion(this_ptr)),
-        _st(getStringTable(this_ptr)),
         _to(to)
     {}
 
     bool accept(const ObjectURI& uri, const as_value& val) {
-        _to.push_front(std::make_pair(_st.value(getName(uri)),
-                                      val));
+        _to.push_back(std::make_pair(uri, val));
         return true;
     }
-
 private:
-    const int _version;
-    string_table& _st;
-    as_object::SortedPropertyList& _to;
+    SortedPropertyList& _to;
 };
 
-} // end of anonymous namespace
+} // anonymous namespace
 
 
 const int as_object::DefaultFlags;
@@ -930,23 +923,6 @@ as_object::visitKeys(KeyVisitor& visitor) const
     }
 }
 
-void
-enumerateProperties(as_object& obj, as_object::SortedPropertyList& to)
-{
-
-    // this set will keep track of visited objects,
-    // to avoid infinite loops
-    std::set<as_object*> visited;
-
-    PropertyEnumerator e(obj, to);
-    as_object* current(&obj);
-
-    while (current && visited.insert(current).second) {
-        current->visitProperties<IsEnumerable>(e);
-        current = current->get_prototype();
-    }
-
-}
 
 Property*
 as_object::getOwnProperty(const ObjectURI& uri)
@@ -968,26 +944,30 @@ as_object::get_prototype() const
     return toObject(proto, getVM(*this));
 }
 
-void
-getURLEncodedVars(as_object& o, std::string& data)
+std::string
+getURLEncodedVars(as_object& o)
 {
-    as_object::SortedPropertyList props;
-    enumerateProperties(o, props);
+    SortedPropertyList props = enumerateProperties(o);
 
-    std::string del;
-    data.clear();
+    std::string data;
+    string_table& st = getStringTable(o);
     
-    for (as_object::SortedPropertyList::const_iterator i=props.begin(),
-            e=props.end(); i!=e; ++i) {
-        std::string name = i->first;
-        std::string value = i->second.to_string();
-        if (!name.empty() && name[0] == '$') continue; // see bug #22006
+    for (SortedPropertyList::const_reverse_iterator i = props.rbegin(),
+            e = props.rend(); i != e; ++i) {
+
+        const std::string& name = i->first.toString(st);
+        const std::string& value = i->second.to_string();
+        
+        // see bug #22006
+        if (!name.empty() && name[0] == '$') continue; 
+
         URL::encode(value);
+        if (i != props.rbegin()) data += '&';
 
-        data += del + name + "=" + value;
+        data += name + "=" + value;
 
-        del = "&";
     }
+    return data;
 }
 
 bool
@@ -1087,6 +1067,26 @@ Trigger::call(const as_value& oldval, const as_value& newval,
         _executing = false;
         throw;
     }
+}
+
+SortedPropertyList
+enumerateProperties(as_object& obj)
+{
+
+    // this set will keep track of visited objects,
+    // to avoid infinite loops
+    std::set<as_object*> visited;
+
+    SortedPropertyList to;
+    PropertyEnumerator e(to);
+    as_object* current(&obj);
+
+    while (current && visited.insert(current).second) {
+        current->visitProperties<IsEnumerable>(e);
+        current = current->get_prototype();
+    }
+    return to;
+
 }
 
 as_object*

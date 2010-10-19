@@ -38,7 +38,6 @@
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <deque>
 
 // Forward declarations
 namespace gnash {
@@ -164,18 +163,6 @@ class as_object : public GcResource, boost::noncopyable
 {
 
 public:
-    
-    typedef std::pair<std::string, as_value> KeyValuePair;
-
-    /// This is used to hold an intermediate copy of an as_object's properties.
-    //
-    /// AS enumerates in reverse order of creation. In order to make sure
-    /// that the properties are in the correct order, the first element of
-    /// a SortedPropertyList should hold the last created property.
-    //
-    /// We use a deque because we push to the front in order to preserve the
-    /// ordering for the copy.
-    typedef std::deque<KeyValuePair> SortedPropertyList;
     
     /// Construct an ActionScript object with no prototype associated.
     //
@@ -836,9 +823,9 @@ public:
 /// as non-enumerable ones.
 //
 /// @param o        The object whose properties should be encoded.
-/// @param data     Output parameter, will be set to the url-encoded
-///                 variables string without any leading delimiter.
-void getURLEncodedVars(as_object& o, std::string& data);
+/// @return         the url-encoded variables string without any leading
+///                 delimiter.
+std::string getURLEncodedVars(as_object& o);
 
 /// Resolve the given relative path component
 //
@@ -897,6 +884,16 @@ isNativeType(as_object* obj, T*& relay)
     return relay;
 }
 
+/// This is used to hold an intermediate copy of an as_object's properties.
+//
+/// AS enumerates in reverse order of creation. In order to make sure
+/// that the properties are in the correct order, the first element of
+/// a SortedPropertyList should hold the last created property.
+//
+/// We use a deque because we push to the front in order to preserve the
+/// ordering for the copy.
+typedef std::vector<std::pair<ObjectURI, as_value> > SortedPropertyList;
+    
 /// Enumerate all non-hidden properties to the passed container
 //
 /// NB: it is likely that this call will change the object, as accessing
@@ -905,7 +902,7 @@ isNativeType(as_object* obj, T*& relay)
 /// The enumeration recurses through the prototype chain. This implementation
 /// will keep track of visited object to avoid infinite loops in the
 /// prototype chain.  NOTE: the MM player just chokes in this case.
-void enumerateProperties(as_object& o, as_object::SortedPropertyList& to);
+SortedPropertyList enumerateProperties(as_object& o);
 
 /// Get the VM from an as_object.
 VM& getVM(const as_object& o);
