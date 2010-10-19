@@ -22,8 +22,11 @@
 # include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
 #endif
 
-#include "DisplayList.h" // DisplayList 
 #include "DisplayObjectContainer.h"
+
+#include <utility>
+
+#include "DisplayList.h" // DisplayList 
 #include "InteractiveObject.h"
 #include "log.h"
 #include "dsodefs.h" // for DSOEXPORT

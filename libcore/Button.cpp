@@ -25,6 +25,7 @@
 #include "Button.h"
 
 #include <boost/bind.hpp>
+#include <utility>
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DefineButtonTag.h"

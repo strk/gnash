@@ -27,6 +27,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
+#include <utility>
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"

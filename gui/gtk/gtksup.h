@@ -27,6 +27,7 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
+#include "gui.h"
 #include "gtk_glue.h"
 
 namespace gnash {
@@ -145,7 +146,7 @@ private:
 
 #ifdef USE_SWFTREE
     // Create a tree model for displaying movie info
-    GtkTreeModel* makeTreeModel (std::auto_ptr<movie_root::InfoTree> treepointer);
+    GtkTreeModel* makeTreeModel(std::auto_ptr<movie_root::InfoTree> tree);
 #endif
 
     void stopHook();

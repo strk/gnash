@@ -22,57 +22,38 @@
 #include "gnashconfig.h"
 #endif
 
-#include "log.h"
+#include "gtksup.h"
 
+#include <iostream>
+#include <string>
+#include <utility>
+#include <gtk/gtk.h>
+#include <gdk/gdk.h>
+#include <gdk/gdkkeysyms.h>
+#ifdef HAVE_VA_VA_H
+# include <va/va.h>
+# include "vaapi_utils.h"
+#endif
+#ifdef HAVE_VA_VA_X11_H
+# include <va/va_x11.h>
+#endif
+#ifdef HAVE_X11
+# include <X11/keysym.h>
+# include <gdk/gdkx.h>
+# include <X11/Xlib.h>
+# include <X11/extensions/Xv.h>
+# include <X11/extensions/Xvlib.h>
+#endif
+
+#include "log.h"
 #include "gui.h"
 #include "rc.h"
-#include "gtksup.h"
 #include "sound_handler.h"
 #include "Renderer.h"
 #include "RunResources.h"
 #include "VM.h"
 #include "gnash.h" // Quality
-
-#include <iostream>
-
-#ifdef HAVE_VA_VA_H
-#include <va/va.h>
-#include "vaapi_utils.h"
-#endif
-#ifdef HAVE_VA_VA_X11_H
-#include <va/va_x11.h>
-#endif
-
-#ifdef HAVE_X11
-#include <X11/keysym.h>
-#include <gdk/gdkx.h>
-#include <X11/Xlib.h>
-#include <X11/extensions/Xv.h>
-#include <X11/extensions/Xvlib.h>
-#endif
-
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
-#include <gdk/gdkkeysyms.h>
-#include <string>
-
 #include "gtk_canvas.h"
-
-#ifdef HAVE_FFMPEG_AVCODEC_H
-extern "C" {
-# include "ffmpeg/avcodec.h" // Only for the version number
-}
-#endif
-
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-extern "C" {
-# include "libavcodec/avcodec.h" // Only for the version number
-}
-#endif
-
-#ifdef HAVE_GST_GST_H
-# include "gst/gstversion.h" // Only for the version number
-#endif
 
 #ifdef HAVE_VA_VA_H
 extern VAStatus va_getDriverName(VADisplay dpy, char **driver_name);

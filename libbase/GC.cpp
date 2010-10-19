@@ -132,7 +132,7 @@ GC::countCollectables(CollectablesCount& count) const
 {
     for (ResList::const_iterator i = _resList.begin(), e = _resList.end();
             i!=e; ++i) {
-        count[typeName(**i)]++;
+        ++count[typeName(**i)];
     }
 }
 
