@@ -27,9 +27,9 @@
 
 // Forward declarations
 namespace gnash {
-	class SWFStream;
-	class movie_definition;
-	class RunResources;
+    class SWFStream;
+    class movie_definition;
+    class RunResources;
 }
 
 namespace gnash {
@@ -50,13 +50,13 @@ namespace SWF {
 class StreamSoundBlockTag : public ControlTag
 {
 
-	/// Id of the stream this tag should play
-	boost::uint16_t	m_handler_id;
+    /// Id of the stream this tag should play
+    boost::uint16_t m_handler_id;
 
-	/// Offset in the stream buffer to play
-	sound::sound_handler::StreamBlockId _blockId;
+    /// Offset in the stream buffer to play
+    sound::sound_handler::StreamBlockId _blockId;
 
-	//int		latency;
+    //int       latency;
 
 public:
 
@@ -67,30 +67,30 @@ public:
     ///
     boost::uint16_t getStreamId() const { return m_handler_id; }
 
-	/// Start the associated block of sound
-	void executeActions(MovieClip* m, DisplayList& dlist) const;
+    /// Start the associated block of sound
+    void executeActions(MovieClip* m, DisplayList& dlist) const;
 
-	/// Load an SWF::SOUNDSTREAMBLOCK (19) tag.
-	static void loader(SWFStream& in, TagType tag, movie_definition& m,
+    /// Load an SWF::SOUNDSTREAMBLOCK (19) tag.
+    static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& r);
 
 private:
 
-	/// Create a ControlTag playing the given sample when executed.
-	//
-	/// @param streamId
-	///	Identifier of the stream to play.
-	///
-	/// @param blockId
-	///	Identifier of the stream block to play.
-	///
+    /// Create a ControlTag playing the given sample when executed.
+    //
+    /// @param streamId
+    /// Identifier of the stream to play.
+    ///
+    /// @param blockId
+    /// Identifier of the stream block to play.
+    ///
     /// This should only be constructed using the loader() function.
-	StreamSoundBlockTag(int streamId,
-	                    sound::sound_handler::StreamBlockId blockId)
-		:
-		m_handler_id(streamId),
-		_blockId(blockId)
-	{}
+    StreamSoundBlockTag(int streamId,
+                        sound::sound_handler::StreamBlockId blockId)
+        :
+        m_handler_id(streamId),
+        _blockId(blockId)
+    {}
 };
 
 
