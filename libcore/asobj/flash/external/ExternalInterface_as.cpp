@@ -25,7 +25,6 @@
 #include <sstream>
 #include <boost/algorithm/string/erase.hpp>
 #include <algorithm>
-#include <boost/lexical_cast.hpp>
 #include "GnashSystemNetHeaders.h"
 
 #include "ExternalInterface.h"
