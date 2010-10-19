@@ -1144,7 +1144,8 @@ Gui::getMovieInfo() const
            << " - depth:" << ch->get_depth()
            << " - useHandCursor:" << ch->allowHandCursor()
            << ")";
-    	firstLevelIter = tr->append_child(topIter, std::make_pair("Active entity under mouse pointer", ss.str()));
+    	firstLevelIter = tr->append_child(topIter, 
+                std::make_pair("Active entity under mouse pointer", ss.str()));
     }
 
     ch = stage.getEntityUnderPointer();
@@ -1153,7 +1154,8 @@ Gui::getMovieInfo() const
         ss << ch->getTarget() << " (" + typeName(*ch) 
            << " - depth:" << ch->get_depth()
            << ")";
-	firstLevelIter = tr->append_child(topIter, std::make_pair("Topmost entity under mouse pointer", ss.str()));
+        firstLevelIter = tr->append_child(topIter, 
+            std::make_pair("Topmost entity under mouse pointer", ss.str()));
     }
     
     ch = stage.getDraggingCharacter();
@@ -1161,7 +1163,8 @@ Gui::getMovieInfo() const
         std::stringstream ss;
         ss << ch->getTarget() << " (" + typeName(*ch) 
            << " - depth:" << ch->get_depth() << ")";
-    	firstLevelIter = tr->append_child(topIter, std::make_pair("Dragging character: ", ss.str()));
+    	firstLevelIter = tr->append_child(topIter,
+                std::make_pair("Dragging character: ", ss.str()));
     }
 
     //
