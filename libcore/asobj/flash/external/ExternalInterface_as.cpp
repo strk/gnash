@@ -97,10 +97,10 @@ private:
     std::vector<ObjectURI>& _uris;
 };
 
-class ToXML
+class ArrayToXML
 {
 public:
-    ToXML(as_value& ret, const fn_call& fn)
+    ArrayToXML(as_value& ret, const fn_call& fn)
         :
         _ret(ret),
         _fn(fn),
@@ -125,6 +125,28 @@ private:
     as_value& _ret;
     const fn_call& _fn;
     size_t _count;
+};
+
+class ArgsToXML
+{
+public:
+    ArgsToXML(as_value& ret, const fn_call& fn)
+        :
+        _ret(ret),
+        _fn(fn)
+    {}
+
+    void operator()(const as_value& val) {
+        VM& vm = getVM(_fn);
+        as_object* ei = 
+            _fn.env().find_object("flash.external.ExternalInterface");
+        string_table& st = getStringTable(_fn);
+        const as_value& x = callMethod(ei, st.find("_toXML"), val);
+        newAdd(_ret, x, vm);
+    }
+private:
+    as_value& _ret;
+    const fn_call& _fn;
 };
 
 
@@ -405,46 +427,30 @@ externalInterfaceConstructor(const fn_call& fn)
 as_value
 externalinterface_uArgumentsToXML(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-
-    std::stringstream ss;
-    
-    std::vector<as_value> args;
-    VM& vm = getVM(fn);
-    string_table& st = vm.getStringTable();
+    as_value ret("<arguments>");
 
     if (fn.nargs) {
-        // This is an ActionScript-like implementation, which is why it looks
-        // like poor C++.
-        as_object* obj = fn.arg(0).to_object(vm);
-        if ( obj ) {
-            const int length = toInt(getMember(*obj, NSV::PROP_LENGTH), vm);
-            int i = 1;
-            while (i < length) {
-                std::ostringstream s;
-                s << i;
-                as_value el = getMember(*obj, st.find(s.str()));
-                args.push_back(el);
-                ++i;
+        as_object *obj = toObject(fn.arg(0), getVM(fn));
+        if (obj) {
+            ArgsToXML tx(ret, fn);
+            size_t size = arrayLength(*obj);
+            string_table& st = getStringTable(*obj);
+            if (size) {
+                for (size_t i = 1; i < static_cast<size_t>(size); ++i) {
+                    tx(getOwnProperty(*obj, arrayKey(st, i)));
+                }
             }
         }
     }
-
-    return ExternalInterface::argumentsToXML(args);
+    
+    newAdd(ret, "</arguments>", getVM(fn));
+    return ret;
 }
 
 as_value
 externalinterface_uArgumentsToAS(const fn_call& /*fn*/)
 {
-    // GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
-#if 0
-    std::string str(fn.arg(0).to_string());
-    if (fn.nargs > 0) {
-        return ExternalInterface::argumentsToAS();
-    }
-#endif
-
     return as_value();
 }
 
@@ -481,7 +487,7 @@ externalinterface_uArrayToXML(const fn_call& fn)
     if (fn.nargs) {
         as_object *obj = toObject(fn.arg(0), getVM(fn));
         if (obj) {
-            ToXML tx(ret, fn);
+            ArrayToXML tx(ret, fn);
             foreachArray(*obj, tx);
         }
     }
