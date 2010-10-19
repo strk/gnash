@@ -23,13 +23,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "string_table.h"
-#include "GC.h" // for inheritance from GcResource (to complete)
-#include "PropertyList.h"
-#include "PropFlags.h"
-#include "Relay.h"
-#include "ObjectURI.h"
-
 #include <map>
 #include <vector>
 #include <cmath>
@@ -38,6 +31,13 @@
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
+
+#include "string_table.h"
+#include "GC.h" // for inheritance from GcResource (to complete)
+#include "PropertyList.h"
+#include "PropFlags.h"
+#include "Relay.h"
+#include "ObjectURI.h"
 
 // Forward declarations
 namespace gnash {
@@ -886,12 +886,9 @@ isNativeType(as_object* obj, T*& relay)
 
 /// This is used to hold an intermediate copy of an as_object's properties.
 //
-/// AS enumerates in reverse order of creation. In order to make sure
-/// that the properties are in the correct order, the first element of
-/// a SortedPropertyList should hold the last created property.
-//
-/// We use a deque because we push to the front in order to preserve the
-/// ordering for the copy.
+/// AS enumerates in reverse order of creation because these values are
+/// pushed to the stack. The first value to be popped is then the oldest
+/// property.
 typedef std::vector<std::pair<ObjectURI, as_value> > SortedPropertyList;
     
 /// Enumerate all non-hidden properties to the passed container
@@ -901,7 +898,13 @@ typedef std::vector<std::pair<ObjectURI, as_value> > SortedPropertyList;
 //
 /// The enumeration recurses through the prototype chain. This implementation
 /// will keep track of visited object to avoid infinite loops in the
-/// prototype chain.  NOTE: the MM player just chokes in this case.
+/// prototype chain.  NOTE: the Adobe player just chokes in this case.
+//
+/// Note that the last element of the returned container is the oldest
+/// property, so iterate in reverse to mimic AS behaviour.
+//
+/// @param o        The object whose properties should be enumerated.
+/// @return         A list of properties in reverse creation order.
 SortedPropertyList enumerateProperties(as_object& o);
 
 /// Get the VM from an as_object.
