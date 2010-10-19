@@ -25,6 +25,7 @@
 #include <sstream>
 #include <boost/algorithm/string/erase.hpp>
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 #include "GnashSystemNetHeaders.h"
 
 #include "ExternalInterface.h"
@@ -95,6 +96,37 @@ public:
 private:
     std::vector<ObjectURI>& _uris;
 };
+
+class ToXML
+{
+public:
+    ToXML(as_value& ret, const fn_call& fn)
+        :
+        _ret(ret),
+        _fn(fn),
+        _count(0)
+    {}
+
+    void operator()(const as_value& val) {
+        VM& vm = getVM(_fn);
+        string_table& st = getStringTable(_fn);
+
+        newAdd(_ret, "<property id=\"", vm);
+        newAdd(_ret, static_cast<double>(_count), vm);
+        newAdd(_ret, "\">", vm);
+        as_object* ei = 
+            _fn.env().find_object("flash.external.ExternalInterface");
+        const as_value& x = callMethod(ei, st.find("_toXML"), val);
+        newAdd(_ret, x, vm);
+        newAdd(_ret, "</property>", vm);
+        ++_count;
+    }
+private:
+    as_value& _ret;
+    const fn_call& _fn;
+    size_t _count;
+};
+
 
 }
 
@@ -444,15 +476,18 @@ externalinterface_uArrayToJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uArrayToXML(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    
-    if (fn.nargs == 1) {
+    as_value ret("<array>");
+
+    if (fn.nargs) {
         as_object *obj = toObject(fn.arg(0), getVM(fn));
-        std::string str = ExternalInterface::arrayToXML(obj);
-        return as_value(str);
+        if (obj) {
+            ToXML tx(ret, fn);
+            foreachArray(*obj, tx);
+        }
     }
     
-    return as_value();
+    newAdd(ret, "</array>", getVM(fn));
+    return ret;
 }
 
 as_value

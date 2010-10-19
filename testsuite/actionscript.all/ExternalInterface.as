@@ -236,6 +236,11 @@ check_equals (xml, '<arguments><undefined/><undefined/></arguments>');
 xml = EI._argumentsToXML(1,2,3);
 check_equals (xml, '<arguments></arguments>');
 
+// It uses the length property...
+str = "hi";
+ret = flash.external.ExternalInterface._arrayToXML(str);
+check_equals(ret, '<array><property id="0"><undefined/></property><property id="1"><undefined/></property></array>');
+
 // xml = EI._toXML(o);
 // if (xml == '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>') {
 //     pass("ExternalInterface::_toXML(object)");
@@ -308,6 +313,6 @@ xcheck_equals (typeOf(val), 'object');
 #elif OUTPUT_VERSION < 8 // }{
 	check_totals(49);
 #else // SWF8+ }{
-	check_totals(100);
+	check_totals(101);
 # endif // }
 
