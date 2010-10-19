@@ -564,11 +564,6 @@ public:
     /// current gui
     void setShowMenuState(bool state);
 
-    // This is a flag that specifies whether exceptions in ActionScript
-    // should be propogated to JavaScript in the browser.
-    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
-    bool getMarshallExceptions() { return _marshallExceptions; };
-    
     /// Sets the Stage object's align mode.
     void setStageScaleMode(ScaleMode sm);
     
@@ -1123,7 +1118,6 @@ private:
     std::bitset<4u> _alignMode;
 
     AllowScriptAccessMode _allowScriptAccess;
-    bool _marshallExceptions;
 
     /// Whether to show the menu or not.
     bool _showMenu;

@@ -103,42 +103,6 @@ ExternalInterface::_objectToXML(as_object *obj)
 
 /// Convert an AS object to an XML string.
 std::string
-ExternalInterface::_arrayToXML(as_object *obj)
-{
-    // GNASH_REPORT_FUNCTION;
-    std::stringstream ss;
-    if (obj == 0) {
-        // callers should check (we might just abort here)
-        log_error("Need a valid AS Object!");
-        return ss.str();
-    }
-
-    VM& vm = getVM(*obj);    
-    string_table& st = vm.getStringTable();
-    
-    ss << "<array>";
-
-    // This is an ActionScript-like implementation, which is why it looks
-    // like poor C++.
-    const int length = toInt(getMember(*obj, NSV::PROP_LENGTH), vm);
-    int i = 0;
-    while (i < length) {
-        std::ostringstream s;
-        s << i;
-        as_value el = getMember(*obj, st.find(s.str()));
-        ss << "<property id=\"" << i << "\">"
-           << _toXML(el) 
-           << "</property>";
-        ++i;
-    }
-
-    ss << "</array>";
-    
-    return ss.str();
-}
-
-/// Convert an AS object to an XML string.
-std::string
 ExternalInterface::_toXML(const as_value &val)
 {
     // GNASH_REPORT_FUNCTION;
@@ -236,24 +200,6 @@ ExternalInterface::toAS(Global_as& /*gl*/, const std::string &xml)
     }
 
     return val;
-}
-
-as_value
-ExternalInterface::argumentsToXML(std::vector<as_value> &args)
-{
-    // GNASH_REPORT_FUNCTION;
-
-    std::vector<as_value>::iterator it;
-    std::stringstream ss;
-
-    ss << "<arguments>";
-    for (it=args.begin(); it != args.end(); it++) {
-        as_value val = *it;
-        ss << toXML(val);
-    }
-    ss << "</arguments>";
-    
-    return as_value(ss.str());
 }
 
 std::map<std::string, as_value>
