@@ -574,15 +574,47 @@ externalinterface_uToJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uToXML(const fn_call& fn)
 {
-//  GNASH_REPORT_FUNCTION;
 
-    if (fn.nargs == 1) {
-        as_value val = fn.arg(0);
-        std::string str = ExternalInterface::toXML(val);
-        return as_value(str);
+    // Probably implemented with switch(typeof value)
+    if (fn.nargs) {
+
+        as_object* ei = 
+            fn.env().find_object("flash.external.ExternalInterface");
+        string_table& st = getStringTable(fn);
+        VM& vm = getVM(fn);
+
+        const as_value& val = fn.arg(0);
+        if (val.is_string()) {
+            as_value ret = "<string>";
+            newAdd(ret, callMethod(ei, st.find("_escapeXML"), val), vm);
+            newAdd(ret, "</string>", vm);
+            return ret;
+        }
+        if (val.is_undefined()) {
+            return as_value("<undefined/>");
+        }
+        if (val.is_number()) {
+            as_value ret = "<number>";
+            newAdd(ret, val, vm);
+            newAdd(ret, "</number>", vm);
+            return ret;
+        }
+        if (val.is_null()) {
+            return as_value("<null/>");
+        }
+        if (val.is_bool()) {
+            return toBool(val, vm) ? as_value("<true/>") : as_value("<false/>");
+        }
+        if (val.is_object()) {
+            as_object* obj = toObject(val, vm);
+            assert(obj);
+            if (hasOwnProperty(*obj, NSV::PROP_LENGTH)) {
+                return callMethod(ei, st.find("_arrayToXML"), val);
+            }
+            return callMethod(ei, st.find("_objectToXML"), val);
+        }
     }
-    
-    return as_value();
+    return as_value("<null/>");
 }
 
 as_value
